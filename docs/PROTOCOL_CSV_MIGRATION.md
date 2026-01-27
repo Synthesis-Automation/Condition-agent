@@ -144,82 +144,65 @@ data/
 
 ## CSV Schema Details
 
-### ✅ Literature-Compatible Columns (22 columns)
+### Protocol CSV Format (29 columns)
 
-The protocol CSV format **exactly matches** the HTE literature CSV format (e.g., `C_N_Coupling_canonical.csv`) for the first 22 columns. This ensures compatibility between protocol and literature datasets.
+The protocol CSV format follows the standardized protocol format (as seen in `protocols_01.csv`):
 
-**All 22 Literature Columns (in order):**
-1. `reaction_id` - Unique reaction identifier (populated from protocol_id)
-2. `detected_reaction_type` - Reaction family (populated from protocol family)
-3. `reaction_smiles` - Reaction SMILES string (populated from protocol)
-4. `yield` - Reaction yield % (typically empty for protocols - literature only)
-5. `z_score` - Statistical z-score (typically empty for protocols - literature only)
-6. `reactant_1` - Reactant 1 descriptor (typically empty for protocols - literature only)
-7. `reactant_2` - Reactant 2 descriptor (typically empty for protocols - literature only)
-8. `reactant_3` - Reactant 3 descriptor (typically empty for protocols - literature only)
-9. `formed_motifs` - Product functional groups (typically empty for protocols - literature only)
-10. `catalyst` - Catalyst name(s) (populated from chemicals with "/" delimiter)
-11. `ligand` - Ligand name(s) (populated from chemicals with "/" delimiter)
-12. `base` - Base name(s) (populated from chemicals with "/" delimiter)
-13. `acid` - Acid name(s) (populated from chemicals with "/" delimiter)
-14. `oxidant` - Oxidant name(s) (populated from chemicals with "/" delimiter)
-15. `reductant` - Reductant name(s) (populated from chemicals with "/" delimiter)
-16. `additive` - Additive name(s) (populated from chemicals with "/" delimiter)
-17. `condensation_agent` - Condensation agent name(s) (populated from chemicals with "/" delimiter)
-18. `other_reagent` - Other reagent name(s) (populated from chemicals with "/" delimiter)
-19. `solvent` - Solvent name(s) (populated from chemicals with "/" delimiter)
-20. `spectator_groups` - Spectator functional groups (typically empty for protocols - literature only)
-21. `reference` - Paper title/reference (populated from source.title)
-22. `Reaction_Key` - Reaction transformation key (typically empty for protocols - literature only)
+**All 29 Columns (in order):**
 
-**Note:** Columns 4-9, 20, and 22 are HTE/literature-specific experimental fields that are typically empty for protocol data, but are included for schema compatibility.
+1. `reaction_id` - Unique reaction identifier
+2. `reaction_type` - Reaction family/type
+3. `yield_pct` - Overall yield percentage (typically empty for protocols)
+4. `temperature_c` - Reaction temperature in Celsius
+5. `time_h` - Reaction time in hours
+6. `reaction_smiles` - Reaction SMILES string
+7. `reference` - Paper title/reference
+8. `reactant_cas` - CAS numbers of reactants (comma-separated)
+9. `product_cas` - CAS numbers of products (comma-separated)
+10. `reagent_cas` - CAS numbers of reagents (comma-separated)
+11. `catalyst_cas` - CAS numbers of catalysts (comma-separated)
+12. `solvent_cas` - CAS numbers of solvents (comma-separated)
+13. `reactant_amd` - AMD IDs of reactants (comma-separated, typically empty)
+14. `product_amd` - AMD IDs of products (comma-separated, typically empty)
+15. `reagent_amd` - AMD IDs of reagents (comma-separated, typically empty)
+16. `catalyst_amd` - AMD IDs of catalysts (comma-separated, typically empty)
+17. `solvent_amd` - AMD IDs of solvents (comma-separated, typically empty)
+18. `experimental_procedure` - Full experimental procedure text
+19. `stages` - Number of reaction stages
+20. `steps` - Number of steps
+21. `product_yield_1` - Yield for product 1 (typically empty)
+22. `product_yield_2` - Yield for product 2 (typically empty)
+23. `product_yield_3` - Yield for product 3 (typically empty)
+24. `product_yield_4` - Yield for product 4 (typically empty)
+25. `product_yield_5` - Yield for product 5 (typically empty)
+26. `product_yield_6` - Yield for product 6 (typically empty)
+27. `product_yield_7` - Yield for product 7 (typically empty)
+28. `notes` - Additional notes
+29. `reaction_setup_json` - JSON-encoded full reaction setup (nested structure preserved)
 
-### Protocol-Specific Columns (7 additional columns)
-23. `protocol_id` - Unique identifier for protocol (same as reaction_id)
-24. `reaction_smarts` - Semicolon-delimited SMARTS patterns (e.g., "c-Br>>c-C;[Br]>>[C]")
-25. `tags` - Semicolon-delimited tags (e.g., "coupling;palladium;Suzuki")
-26. `notes` - Descriptive notes about the protocol
-27. `source` - JSON-encoded source metadata: `{"title":"...","journal":"...","year":2023,"doi":"..."}`
-28. `reaction_setup_json` - JSON-encoded reaction setup (nested structure preserved)
-29. `original_procedure` - Full text procedure from original paper
+**Fields Populated from Protocol JSON:**
+- `reaction_id`, `reaction_type`, `reaction_smiles`, `reference` - From metadata
+- `temperature_c`, `time_h` - Extracted from conditions
+- `*_cas` columns - Extracted from chemicals with CAS numbers
+- `experimental_procedure` - From original_procedure
+- `stages`, `steps` - Calculated from reaction_setup
+- `notes` - From protocol notes
+- `reaction_setup_json` - Full JSON encoding of reaction_setup
+
+**Fields Typically Empty:**
+- `yield_pct` - Overall yield (not in protocol metadata)
+- `*_amd` columns - AMD IDs (not in protocol data)
+- `product_yield_1-7` - Multi-product yields (not in protocol data)
 
 ### Delimiter Conventions
-- **Semicolon (`;`)**: Lists within a field (SMARTS patterns, tags)
-- **Slash (`/`)**: Multiple reagents in the same role (e.g., "Pd(OAc)2/PdCl2")
-- **JSON strings**: Complex nested data (source, reaction_setup)
+- **Comma (`,`)**: Multiple values in CAS/AMD fields (e.g., "765-30-0, 29914-75-8")
+- **JSON strings**: Complex nested data (reaction_setup_json)
 
-## Compatibility with Literature CSV
+## Example CSV Row
 
-The protocol CSV format is **100% compatible** with literature CSV files from the HTE database. The first 22 columns are identical in name, order, and format.
-
-### Combining Protocol and Literature Data
-
-```python
-import pandas as pd
-
-# Load literature data (e.g., from HTE experiments)
-lit_df = pd.read_csv('data/HTE_db/literature/C_N_Coupling_canonical.csv')
-
-# Load protocol data
-prot_df = pd.read_csv('data/protocol_db_v2_csv/Suzuki_Coupling.csv')
-
-# Select only literature columns from protocol data
-prot_lit_cols = prot_df[lit_df.columns]
-
-# Combine both datasets
-combined_df = pd.concat([lit_df, prot_lit_cols], ignore_index=True)
-
-print(f"Literature: {len(lit_df)} reactions")
-print(f"Protocols: {len(prot_df)} reactions")
-print(f"Combined: {len(combined_df)} reactions")
-```
-
-### Verification
-
-```bash
-# Verify column compatibility
-python -c "import pandas as pd; lit=pd.read_csv('data/HTE_db/literature/C_N_Coupling_canonical.csv', nrows=1); prot=pd.read_csv('data/protocol_db_v2_csv/Suzuki_Coupling.csv', nrows=1); print('Match:', list(lit.columns)==list(prot.columns[:22]))"
-# Output: Match: True
+```csv
+reaction_id,reaction_type,yield_pct,temperature_c,time_h,reaction_smiles,reference,...
+suzuki_coupling_of_aryl_pinacol,Suzuki_Coupling,,100,8,O=C(OC(C)(C)C)NC1=C(Br)...,"Suzuki coupling of aryl pinacol boronate with aryl bromide",...
 ```
 
 ## Migration Path

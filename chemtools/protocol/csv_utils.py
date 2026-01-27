@@ -5,62 +5,38 @@ from typing import Any, Dict, List, Optional
 
 from chemtools.reagent.constants import ROLE_ALIASES
 
-# Standard literature columns (22 columns) - matches HTE literature CSV format exactly
-# These columns are shared between protocol CSV and literature CSV (e.g., C_N_Coupling_canonical.csv)
-# Some columns (yield, z_score, reactant_1-3, formed_motifs, spectator_groups, Reaction_Key)
-# are typically empty for protocol data but included for schema compatibility
-STANDARD_LITERATURE_COLUMNS = (
-    "reaction_id",
-    "detected_reaction_type",
-    "reaction_smiles",
-    "yield",                    # Literature only (empty for protocols)
-    "z_score",                  # Literature only (empty for protocols)
-    "reactant_1",               # Literature only (empty for protocols)
-    "reactant_2",               # Literature only (empty for protocols)
-    "reactant_3",               # Literature only (empty for protocols)
-    "formed_motifs",            # Literature only (empty for protocols)
-    "catalyst",
-    "ligand",
-    "base",
-    "acid",
-    "oxidant",
-    "reductant",
-    "additive",
-    "condensation_agent",
-    "other_reagent",
-    "solvent",
-    "spectator_groups",         # Literature only (empty for protocols)
-    "reference",
-    "Reaction_Key",             # Literature only (empty for protocols)
-)
-
-# Additional protocol-specific columns (7 columns)
-# These columns extend the literature schema with protocol-specific metadata
-EXTRA_PROTOCOL_COLUMNS = (
-    "protocol_id",              # Same as reaction_id, kept for clarity
-    "reaction_smarts",          # Semicolon-delimited SMARTS patterns
-    "tags",                     # Semicolon-delimited tags
-    "notes",                    # Protocol notes
-    "source",                   # JSON-encoded source metadata
+# Protocol CSV columns matching the standard protocol format (29 columns)
+# Based on protocols_01.csv format with integrated reference information
+PROTOCOL_CSV_COLUMNS = (
+    "reaction_id",              # Unique reaction identifier
+    "reaction_type",            # Reaction family/type
+    "yield_pct",                # Overall yield percentage
+    "temperature_c",            # Reaction temperature in Celsius
+    "time_h",                   # Reaction time in hours
+    "reaction_smiles",          # Reaction SMILES string
+    "reference",                # Full reference with journal, volume, pages, year, DOI, URL
+    "reactant_cas",             # CAS numbers of reactants (comma-separated)
+    "product_cas",              # CAS numbers of products (comma-separated)
+    "reagent_cas",              # CAS numbers of reagents (comma-separated)
+    "catalyst_cas",             # CAS numbers of catalysts (comma-separated)
+    "solvent_cas",              # CAS numbers of solvents (comma-separated)
+    "reactant_amd",             # AMD IDs of reactants (comma-separated)
+    "product_amd",              # AMD IDs of products (comma-separated)
+    "reagent_amd",              # AMD IDs of reagents (comma-separated)
+    "catalyst_amd",             # AMD IDs of catalysts (comma-separated)
+    "solvent_amd",              # AMD IDs of solvents (comma-separated)
+    "experimental_procedure",   # Full experimental procedure text
+    "stages",                   # Number of reaction stages
+    "steps",                    # Number of steps
+    "product_yield_1",          # Yield for product 1
+    "product_yield_2",          # Yield for product 2
+    "product_yield_3",          # Yield for product 3
+    "product_yield_4",          # Yield for product 4
+    "product_yield_5",          # Yield for product 5
+    "product_yield_6",          # Yield for product 6
+    "product_yield_7",          # Yield for product 7
+    "notes",                    # Additional notes
     "reaction_setup_json",      # JSON-encoded full reaction setup
-    "original_procedure",       # Full text procedure
-)
-
-# Complete protocol CSV schema (29 columns total)
-# First 22 columns match literature CSV exactly, then 7 protocol-specific columns
-PROTOCOL_CSV_COLUMNS = STANDARD_LITERATURE_COLUMNS + EXTRA_PROTOCOL_COLUMNS
-
-ROLE_COLUMNS = (
-    ("catalyst", "metal_catalyst"),
-    ("ligand", "ligand"),
-    ("base", "base"),
-    ("acid", "acid"),
-    ("oxidant", "oxidant"),
-    ("reductant", "reductant"),
-    ("additive", "additive"),
-    ("condensation_agent", "condensation_agent"),
-    ("other_reagent", "other_reagent"),
-    ("solvent", "solvent"),
 )
 
 
@@ -168,98 +144,179 @@ def _format_source_field(source: Dict[str, Any]) -> str:
         return ""
 
 
-def _append_role_value(bucket: Dict[str, List[str]], role: str, value: str) -> None:
-    if not value:
-        return
-    if role not in bucket:
-        bucket[role] = []
-    bucket[role].append(value)
-
-
-def _chemicals_to_role_map(chemicals: List[Dict[str, Any]]) -> Dict[str, List[str]]:
-    bucket: Dict[str, List[str]] = {}
+def _extract_cas_numbers(chemicals: List[Dict[str, Any]], role_filter: Optional[List[str]] = None) -> str:
+    """Extract CAS numbers from chemicals list, optionally filtered by role."""
+    cas_numbers = []
     for chem in chemicals:
-        role = _clean_text(chem.get("role"))
-        name = _clean_text(chem.get("abbreviation")) or _clean_text(chem.get("name"))
-        if not role or not name:
-            continue
-        normalized = ROLE_ALIASES.get(role, role)
-        if normalized in ("metal_catalyst", "co_catalyst", "catalyst"):
-            _append_role_value(bucket, "catalyst", name)
-        elif normalized == "ligand":
-            _append_role_value(bucket, "ligand", name)
-        elif normalized == "base":
-            _append_role_value(bucket, "base", name)
-        elif normalized == "acid":
-            _append_role_value(bucket, "acid", name)
-        elif normalized == "oxidant":
-            _append_role_value(bucket, "oxidant", name)
-        elif normalized == "reductant":
-            _append_role_value(bucket, "reductant", name)
-        elif normalized == "additive":
-            _append_role_value(bucket, "additive", name)
-        elif normalized == "condensation_agent":
-            _append_role_value(bucket, "condensation_agent", name)
-        elif normalized == "other_reagent":
-            _append_role_value(bucket, "other_reagent", name)
-        elif normalized == "solvent":
-            _append_role_value(bucket, "solvent", name)
-    return bucket
+        role = _clean_text(chem.get("role", ""))
+        cas = _clean_text(chem.get("cas", ""))
+        
+        if cas and (role_filter is None or role in role_filter):
+            cas_numbers.append(cas)
+    
+    return ", ".join(cas_numbers) if cas_numbers else ""
 
 
-def _build_reaction_setup_from_row(row: Dict[str, Any]) -> List[Dict[str, Any]]:
-    chemicals: List[Dict[str, Any]] = []
-    for column, role in ROLE_COLUMNS:
-        value = row.get(column)
-        if not value:
-            continue
-        for item in _split_slash(value):
-            chemicals.append({"name": item, "role": role})
-    if not chemicals:
-        return []
-    return [{"chemicals": chemicals, "conditions": []}]
+def _extract_temperature(protocol_data: Dict[str, Any]) -> str:
+    """Extract temperature from protocol conditions."""
+    reaction_setup = protocol_data.get("reaction_setup", [])
+    if not reaction_setup or not isinstance(reaction_setup, list):
+        return ""
+    
+    # Get conditions from first setup step
+    first_setup = reaction_setup[0] if reaction_setup else {}
+    conditions = first_setup.get("conditions", []) if isinstance(first_setup, dict) else []
+    
+    if conditions and len(conditions) > 0:
+        # Use the main reaction conditions (usually the last or longest step)
+        main_cond = conditions[-1] if len(conditions) > 1 else conditions[0]
+        temp = main_cond.get("temperature_C")
+        if temp is not None:
+            return str(temp)
+    
+    return ""
+
+
+def _extract_time(protocol_data: Dict[str, Any]) -> str:
+    """Extract time from protocol conditions."""
+    reaction_setup = protocol_data.get("reaction_setup", [])
+    if not reaction_setup or not isinstance(reaction_setup, list):
+        return ""
+    
+    # Get conditions from first setup step
+    first_setup = reaction_setup[0] if reaction_setup else {}
+    conditions = first_setup.get("conditions", []) if isinstance(first_setup, dict) else []
+    
+    if conditions and len(conditions) > 0:
+        # Use the main reaction conditions (usually the last or longest step)
+        main_cond = conditions[-1] if len(conditions) > 1 else conditions[0]
+        time_h = main_cond.get("time_h")
+        if time_h is not None:
+            return str(time_h)
+    
+    return ""
+
+
+def _count_stages(protocol_data: Dict[str, Any]) -> str:
+    """Count number of reaction stages."""
+    reaction_setup = protocol_data.get("reaction_setup", [])
+    if reaction_setup and isinstance(reaction_setup, list):
+        return str(len(reaction_setup))
+    return ""
+
+
+def _count_steps(protocol_data: Dict[str, Any]) -> str:
+    """Count total number of steps across all stages."""
+    reaction_setup = protocol_data.get("reaction_setup", [])
+    if not reaction_setup or not isinstance(reaction_setup, list):
+        return ""
+    
+    total_steps = 0
+    for setup in reaction_setup:
+        if isinstance(setup, dict):
+            conditions = setup.get("conditions", [])
+            if conditions and isinstance(conditions, list):
+                total_steps += len(conditions)
+    
+    return str(total_steps) if total_steps > 0 else ""
+
+
+def _format_integrated_reference(source: Dict[str, Any]) -> str:
+    """Format all reference details into a single integrated string."""
+    if not source:
+        return ""
+    
+    parts = []
+    
+    # Title
+    title = _clean_text(source.get("title"))
+    if title:
+        parts.append(title)
+    
+    # Journal, Volume, Pages (Year)
+    journal_parts = []
+    journal = _clean_text(source.get("journal"))
+    if journal:
+        journal_parts.append(journal)
+    
+    volume = source.get("volume")
+    if volume:
+        journal_parts.append(f"Vol. {volume}")
+    
+    pages = _clean_text(source.get("pages"))
+    if pages:
+        journal_parts.append(f"pp. {pages}")
+    
+    year = source.get("year")
+    if journal_parts and year:
+        parts.append(f"{', '.join(journal_parts)} ({year})")
+    elif journal_parts:
+        parts.append(", ".join(journal_parts))
+    elif year:
+        parts.append(f"({year})")
+    
+    # DOI
+    doi = _clean_text(source.get("doi"))
+    if doi:
+        parts.append(f"DOI: {doi}")
+    
+    # URL
+    url = _clean_text(source.get("url"))
+    if url:
+        parts.append(f"URL: {url}")
+    
+    return ". ".join(parts) if parts else ""
 
 
 def row_to_protocol(row: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Convert CSV row to protocol JSON format.
+    
+    Args:
+        row: CSV row as dictionary
+        
+    Returns:
+        Protocol dictionary in JSON format
+    """
     reaction_smiles = _clean_text(row.get("reaction_smiles"))
-    family = _clean_text(row.get("detected_reaction_type")) or _clean_text(row.get("reaction_family"))
-    reaction_smarts = parse_semicolon_list(row.get("reaction_smarts"))
-    tags = parse_semicolon_list(row.get("tags"))
+    family = _clean_text(row.get("reaction_type"))
     notes = _clean_text(row.get("notes"))
-    protocol_id = _clean_text(row.get("protocol_id")) or _clean_text(row.get("reaction_id"))
-    source = parse_source_field(row.get("source"))
+    protocol_id = _clean_text(row.get("reaction_id"))
     reference = _clean_text(row.get("reference"))
-    if reference and not source.get("title"):
-        source["title"] = reference
 
+    # Parse reaction_setup_json if present
     reaction_setup = _parse_json_field(row.get("reaction_setup_json"))
     if not isinstance(reaction_setup, list):
-        reaction_setup = _build_reaction_setup_from_row(row)
+        reaction_setup = []
 
-    original_procedure = _clean_text(row.get("original_procedure"))
+    # Build source metadata from integrated reference string
+    # The reference is now a formatted string, so we store it as title
+    # For now, keep it simple - full parsing would be complex
+    source: Dict[str, Any] = {}
+    if reference:
+        source["title"] = reference
 
+    # Build metadata
     metadata: Dict[str, Any] = {
         "id": protocol_id,
         "source_reference": source,
     }
-    if tags:
-        metadata["tags"] = tags
 
+    # Build reaction object
     reaction: Dict[str, Any] = {
         "reaction_smiles": reaction_smiles,
         "family": family,
-        "reaction_SMARTS": reaction_smarts,
         "notes": notes,
-        "tags": tags,
     }
 
+    # Build protocol data
     protocol_data: Dict[str, Any] = {
         "schema_version": "2.0",
         "source_type": "protocol",
         "metadata": metadata,
         "reaction": reaction,
         "reaction_setup": reaction_setup,
-        "original_procedure": original_procedure,
+        "original_procedure": _clean_text(row.get("experimental_procedure")),
         "source": source,
     }
 
@@ -267,57 +324,96 @@ def row_to_protocol(row: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def protocol_to_row(protocol_data: Dict[str, Any]) -> Dict[str, str]:
+    """
+    Convert protocol JSON to CSV row matching protocols_01.csv format.
+    
+    Args:
+        protocol_data: Protocol dictionary in JSON format
+        
+    Returns:
+        CSV row as dictionary
+    """
     reaction = protocol_data.get("reaction", {}) or {}
     metadata = protocol_data.get("metadata", {}) or {}
     source = extract_source(protocol_data)
 
     reaction_smiles = _clean_text(reaction.get("reaction_smiles"))
     family = _clean_text(reaction.get("family"))
-    tags = extract_tags(protocol_data)
     notes = extract_notes(protocol_data)
     protocol_id = _clean_text(metadata.get("id")) or _clean_text(metadata.get("protocol_id"))
 
-    reaction_smarts_raw = reaction.get("reaction_SMARTS", [])
-    if isinstance(reaction_smarts_raw, str):
-        reaction_smarts = parse_semicolon_list(reaction_smarts_raw)
-    else:
-        reaction_smarts = [str(item).strip() for item in reaction_smarts_raw if str(item).strip()]
-
+    # Get reaction setup
     reaction_setup = protocol_data.get("reaction_setup", [])
     reaction_setup_json = ""
     if reaction_setup:
         reaction_setup_json = json.dumps(reaction_setup, ensure_ascii=True, separators=(",", ":"))
 
-    original_procedure = _clean_text(protocol_data.get("original_procedure"))
-
+    # Extract chemicals from reaction setup
     chemicals = []
     if reaction_setup and isinstance(reaction_setup, list):
         first_setup = reaction_setup[0] if reaction_setup else {}
         chemicals = first_setup.get("chemicals", []) if isinstance(first_setup, dict) else []
 
-    role_values = _chemicals_to_role_map(chemicals)
+    # Extract CAS numbers by role
+    reactant_roles = ["starting_material", "reactant"]
+    product_roles = ["product"]
+    reagent_roles = ["reagent", "base", "acid", "oxidant", "reductant", "additive", "condensation_agent", "other_reagent"]
+    catalyst_roles = ["metal_catalyst", "co_catalyst", "catalyst", "ligand"]
+    solvent_roles = ["solvent"]
 
+    reactant_cas = _extract_cas_numbers(chemicals, reactant_roles)
+    product_cas = _extract_cas_numbers(chemicals, product_roles)
+    reagent_cas = _extract_cas_numbers(chemicals, reagent_roles)
+    catalyst_cas = _extract_cas_numbers(chemicals, catalyst_roles)
+    solvent_cas = _extract_cas_numbers(chemicals, solvent_roles)
+
+    # Extract experimental parameters
+    temperature_c = _extract_temperature(protocol_data)
+    time_h = _extract_time(protocol_data)
+    stages = _count_stages(protocol_data)
+    steps = _count_steps(protocol_data)
+
+    # Get experimental procedure
+    experimental_procedure = _clean_text(protocol_data.get("original_procedure"))
+
+    # Format integrated reference string from all source details
+    integrated_reference = _format_integrated_reference(source)
+
+    # Initialize row with all columns
     row: Dict[str, str] = {col: "" for col in PROTOCOL_CSV_COLUMNS}
-    row.update(
-        {
-            "reaction_id": protocol_id,
-            "detected_reaction_type": family,
-            "reaction_smiles": reaction_smiles,
-            "reference": _clean_text(source.get("title")),
-            "protocol_id": protocol_id,
-            "reaction_smarts": serialize_semicolon_list(reaction_smarts),
-            "tags": serialize_semicolon_list(tags),
-            "notes": notes,
-            "source": _format_source_field(source),
-            "reaction_setup_json": reaction_setup_json,
-            "original_procedure": original_procedure,
-        }
-    )
-
-    for column, _role in ROLE_COLUMNS:
-        values = role_values.get(column, [])
-        if values:
-            row[column] = "/".join(values)
+    
+    # Populate row
+    row.update({
+        "reaction_id": protocol_id,
+        "reaction_type": family,
+        "yield_pct": "",  # Not typically in protocol data
+        "temperature_c": temperature_c,
+        "time_h": time_h,
+        "reaction_smiles": reaction_smiles,
+        "reference": integrated_reference,
+        "reactant_cas": reactant_cas,
+        "product_cas": product_cas,
+        "reagent_cas": reagent_cas,
+        "catalyst_cas": catalyst_cas,
+        "solvent_cas": solvent_cas,
+        "reactant_amd": "",  # AMD IDs not in protocol data
+        "product_amd": "",
+        "reagent_amd": "",
+        "catalyst_amd": "",
+        "solvent_amd": "",
+        "experimental_procedure": experimental_procedure,
+        "stages": stages,
+        "steps": steps,
+        "product_yield_1": "",  # Multi-product yields not in protocol data
+        "product_yield_2": "",
+        "product_yield_3": "",
+        "product_yield_4": "",
+        "product_yield_5": "",
+        "product_yield_6": "",
+        "product_yield_7": "",
+        "notes": notes,
+        "reaction_setup_json": reaction_setup_json,
+    })
 
     return row
 
