@@ -22,6 +22,47 @@ from .reaction_detection import detect_reaction_types
 from .spectator_rank import rank_spectator_groups
 
 
+def _extract_motif_ids(motifs: Iterable[Any]) -> List[str]:
+    items: List[str] = []
+    for motif in motifs or []:
+        if isinstance(motif, dict):
+            cid = motif.get("compound_id")
+            if cid:
+                items.append(str(cid))
+        else:
+            text = str(motif).strip()
+            if text:
+                items.append(text)
+    return items
+
+
+def select_primary_reacted_motifs(
+    reactant_entries: Iterable[Any],
+    reacted_set: set[str],
+) -> List[str]:
+    primary: List[str] = []
+    for entry in reactant_entries or []:
+        motifs = []
+        if isinstance(entry, dict):
+            motifs = _extract_motif_ids(entry.get("motifs", []))
+        else:
+            motifs = _extract_motif_ids(entry)
+        reacted_here = [m for m in motifs if m in reacted_set]
+        if reacted_here:
+            primary.append(reacted_here[0])
+    return primary
+
+
+def select_primary_formed_motif(
+    product_motifs: Iterable[Any],
+    formed_set: set[str],
+) -> Optional[str]:
+    for motif in _extract_motif_ids(product_motifs):
+        if motif in formed_set:
+            return motif
+    return None
+
+
 def format_reaction_key(
     reacted: Iterable[str],
     formed: Iterable[str],
@@ -617,13 +658,20 @@ def featurize_reaction(
         for bundle in reactant_bundles:
             reactant_motifs.update(_collect_motif_ids(bundle.get("motifs", [])))
             reactant_motifs.update(_collect_motif_ids(bundle.get("context_motifs", [])))
-        
+
         product_motifs = set(product_motif_ids)
         reacted = reactant_motifs - product_motifs
         formed = product_motifs - reactant_motifs
         spectators = reactant_motifs & product_motifs
-        
-        reaction_key = format_reaction_key(reacted, formed, spectators)
+
+        primary_reacted = select_primary_reacted_motifs(reactant_bundles, reacted)
+        primary_formed = select_primary_formed_motif(product_motif_ids, formed)
+
+        reaction_key = format_reaction_key(
+            primary_reacted if primary_reacted else reacted,
+            [primary_formed] if primary_formed else formed,
+            spectators,
+        )
 
     reaction = {
         "reaction_smiles": reaction_smiles,
@@ -656,4 +704,10 @@ def featurize_reaction(
     }
 
 
-__all__ = ["featurize_molecule", "featurize_reaction", "format_reaction_key"]
+__all__ = [
+    "featurize_molecule",
+    "featurize_reaction",
+    "format_reaction_key",
+    "select_primary_reacted_motifs",
+    "select_primary_formed_motif",
+]

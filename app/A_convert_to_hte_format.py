@@ -18,6 +18,11 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import chemtools components
 from chemtools.featurizers.structural import featurize_molecule
+from chemtools.featurizers.unified import (
+    format_reaction_key,
+    select_primary_reacted_motifs,
+    select_primary_formed_motif,
+)
 from chemtools.featurizers.reaction_detection import detect_reaction_types
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
 from chemtools.smiles import normalize
@@ -700,17 +705,11 @@ def process_reaction_dataset(
                         if rc > 0:
                             spectators_set.add(m)
 
-                primary_reacted_motifs = []
-                for r_info in reactant_data:
-                    r_motifs = r_info["motifs"]
-                    reacted_here = [m for m in r_motifs if m in reacted_set]
-                    if reacted_here:
-                        primary_reacted_motifs.append(reacted_here[0])
-
+                primary_reacted_motifs = select_primary_reacted_motifs(reactant_data, reacted_set)
                 primary_reacted_str = _reactant_key(primary_reacted_motifs) or "None"
 
-                formed_here = [m for m in _dedupe_list(product_motifs) if m in formed_set]
-                primary_formed_str = formed_here[0] if formed_here else "None"
+                primary_formed = select_primary_formed_motif(product_motifs, formed_set)
+                primary_formed_str = primary_formed if primary_formed else "None"
                 formed_motifs_str = _reactant_key(list(formed_set)) or "None"
 
                 spectators_str = _reactant_key(list(spectators_set)) or "None"
@@ -889,17 +888,11 @@ def process_reaction_dataset(
                     if rc > 0:
                         spectators_set.add(m)
 
-            primary_reacted_motifs = []
-            for r_info in reactant_data:
-                r_motifs = r_info["motifs"]
-                reacted_here = [m for m in r_motifs if m in reacted_set]
-                if reacted_here:
-                    primary_reacted_motifs.append(reacted_here[0])
-
+            primary_reacted_motifs = select_primary_reacted_motifs(reactant_data, reacted_set)
             primary_reacted_str = _reactant_key(primary_reacted_motifs) or "None"
 
-            formed_here = [m for m in _dedupe_list(product_motifs) if m in formed_set]
-            primary_formed_str = formed_here[0] if formed_here else "None"
+            primary_formed = select_primary_formed_motif(product_motifs, formed_set)
+            primary_formed_str = primary_formed if primary_formed else "None"
             formed_motifs_str = _reactant_key(list(formed_set)) or "None"
 
             spectators_str = _reactant_key(list(spectators_set)) or "None"

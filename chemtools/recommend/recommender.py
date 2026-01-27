@@ -26,7 +26,12 @@ from pathlib import Path
 import json
 
 from chemtools.featurizers.structural import featurize_molecule
-from chemtools.featurizers.unified import featurize_reaction, format_reaction_key
+from chemtools.featurizers.unified import (
+    featurize_reaction,
+    format_reaction_key,
+    select_primary_reacted_motifs,
+    select_primary_formed_motif,
+)
 from chemtools.featurizers.spectator_rank import weighted_spectator_similarity
 from chemtools.smiles import normalize_reaction
 
@@ -2060,10 +2065,11 @@ class HTERecommender:
         query_spectator_groups: Set[str] = set()
         product_motifs_from_rxn = set()
         
+        reaction_data = None
         if reaction_smiles and (">" in reaction_smiles or "." in reaction_smiles):
             try:
                 rxn_features = featurize_reaction(reaction_smiles, options={"confirm_coupling_products": True})
-                reaction_data = rxn_features.get("reaction", {})
+            reaction_data = rxn_features.get("reaction", {})
                 rxn_type_data = reaction_data.get("reaction_type", {})
                 detected_type = rxn_type_data.get("reaction_type")
                 detected_confidence = rxn_type_data.get("confidence", 0.0)
@@ -2104,7 +2110,22 @@ class HTERecommender:
             result.reacted_motifs = tuple(sorted(reacted_set))
             result.formed_motifs = tuple(sorted(formed_set))
             result.spectator_motifs = tuple(sorted(spectator_set))
-            result.query_reaction_key = format_reaction_key(reacted_set, formed_set, spectator_set)
+
+            primary_reacted = None
+            if reaction_data:
+                primary_reacted = select_primary_reacted_motifs(
+                    reaction_data.get("reactants") or [],
+                    reacted_set,
+                )
+            if not primary_reacted:
+                primary_reacted = sorted(reacted_set)
+
+            primary_formed = select_primary_formed_motif(product_motifs, formed_set)
+            result.query_reaction_key = format_reaction_key(
+                primary_reacted,
+                [primary_formed] if primary_formed else formed_set,
+                spectator_set,
+            )
         
         # Step 3: Match against database
         query_motifs = set(type_a) | set(type_b)
