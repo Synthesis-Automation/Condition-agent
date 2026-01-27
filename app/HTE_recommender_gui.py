@@ -103,7 +103,10 @@ def _collect_reaction_spectator_groups(reaction_smiles: str) -> List[str]:
         return []
 
     try:
-        payload = featurize_reaction(reaction_smiles)
+        payload = featurize_reaction(
+            reaction_smiles,
+            options={"confirm_coupling_products": True},
+        )
     except Exception:
         return []
 

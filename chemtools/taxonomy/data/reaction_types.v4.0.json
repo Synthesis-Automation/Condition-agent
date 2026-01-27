@@ -26,6 +26,29 @@
       ]
     },
     {
+      "id": "Miyaura_borylation",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles"
+      },
+      "products": {
+        "product": "@organoboron"
+      },
+      "catalysts": [
+        "Pd"
+      ],
+      "examples": [
+        "Brc1ccccc1.B1OC(C)(C)C(C)(C)O1B2OC(C)(C)C(C)(C)O2>>B1OC(C)(C)C(C)(C)O1c1ccccc1"
+      ],
+      "aliases": [
+        "Miyaura borylation",
+        "Miyaura-Borylation",
+        "Borylation, Miyaura",
+        "Borylation-Miyaura",
+        "miyaura_borylation"
+      ],
+      "description": "Pd-catalyzed borylation of aryl/vinyl electrophiles to form boronate esters (Miyaura borylation)."
+    },
+    {
       "id": "C_N_Coupling",
       "aliases": [
         "C-N Coupling",
