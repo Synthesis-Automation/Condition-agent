@@ -5,16 +5,20 @@ from typing import Any, Dict, List, Optional
 
 from chemtools.reagent.constants import ROLE_ALIASES
 
+# Standard literature columns (22 columns) - matches HTE literature CSV format exactly
+# These columns are shared between protocol CSV and literature CSV (e.g., C_N_Coupling_canonical.csv)
+# Some columns (yield, z_score, reactant_1-3, formed_motifs, spectator_groups, Reaction_Key)
+# are typically empty for protocol data but included for schema compatibility
 STANDARD_LITERATURE_COLUMNS = (
     "reaction_id",
     "detected_reaction_type",
     "reaction_smiles",
-    "yield",
-    "z_score",
-    "reactant_1",
-    "reactant_2",
-    "reactant_3",
-    "formed_motifs",
+    "yield",                    # Literature only (empty for protocols)
+    "z_score",                  # Literature only (empty for protocols)
+    "reactant_1",               # Literature only (empty for protocols)
+    "reactant_2",               # Literature only (empty for protocols)
+    "reactant_3",               # Literature only (empty for protocols)
+    "formed_motifs",            # Literature only (empty for protocols)
     "catalyst",
     "ligand",
     "base",
@@ -25,21 +29,25 @@ STANDARD_LITERATURE_COLUMNS = (
     "condensation_agent",
     "other_reagent",
     "solvent",
-    "spectator_groups",
+    "spectator_groups",         # Literature only (empty for protocols)
     "reference",
-    "Reaction_Key",
+    "Reaction_Key",             # Literature only (empty for protocols)
 )
 
+# Additional protocol-specific columns (7 columns)
+# These columns extend the literature schema with protocol-specific metadata
 EXTRA_PROTOCOL_COLUMNS = (
-    "protocol_id",
-    "reaction_smarts",
-    "tags",
-    "notes",
-    "source",
-    "reaction_setup_json",
-    "original_procedure",
+    "protocol_id",              # Same as reaction_id, kept for clarity
+    "reaction_smarts",          # Semicolon-delimited SMARTS patterns
+    "tags",                     # Semicolon-delimited tags
+    "notes",                    # Protocol notes
+    "source",                   # JSON-encoded source metadata
+    "reaction_setup_json",      # JSON-encoded full reaction setup
+    "original_procedure",       # Full text procedure
 )
 
+# Complete protocol CSV schema (29 columns total)
+# First 22 columns match literature CSV exactly, then 7 protocol-specific columns
 PROTOCOL_CSV_COLUMNS = STANDARD_LITERATURE_COLUMNS + EXTRA_PROTOCOL_COLUMNS
 
 ROLE_COLUMNS = (
