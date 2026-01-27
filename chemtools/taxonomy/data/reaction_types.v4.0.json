@@ -376,24 +376,37 @@
       "id": "Arylation_acidic_C_H",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
-        "nucleophile": "Alkyl-H-acidic"
+        "nucleophile": [
+          "R_acidic-H",
+          "@acidic_ch"
+        ]
       },
       "products": {
-        "product": "Ar-R"
+        "product": [
+          "Ar-Alkyl",
+          "Ar-RCH2",
+          "Ar-R2CH",
+          "Ar-R3C"
+        ]
       },
       "catalysts": [
         "Pd",
-        "Ni"
+        "Ni",
+        "Cu"
       ],
       "examples": [
-        "Brc1ccccc1.CC(=O)C>>CC(=O)Cc1ccccc1"
+        "Brc1ccccc1.CC(=O)C>>CC(=O)Cc1ccccc1",
+        "O=C1CCCC1.Brc2ccc(C(C)=O)cc2>>O=C(C)c3ccc(C4C(CCC4)=O)cc3"
       ],
       "aliases": [
-        "arylation_acidic_c_h"
-      ]
+        "arylation_acidic_c_h",
+        "C-H arylation acidic",
+        "alpha arylation"
+      ],
+      "description": "Arylation of C-H acidic compounds (alpha to carbonyl or other EWG) with aryl electrophiles."
     },
     {
-      "id": "C_H_arylation",
+      "id": "Ar_H_arylation",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "substrate": "Ar-H"
@@ -409,6 +422,7 @@
         "Brc1ccccc1.c1ccccc1>>c1ccc(-c2ccccc2)cc1"
       ],
       "aliases": [
+        "ar_h_arylation",
         "c_h_arylation"
       ]
     },

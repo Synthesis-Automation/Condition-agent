@@ -48,6 +48,26 @@
         "Chan_lam_cn"
       ]
     },
+    "acidic_ch": {
+      "name": "C-H Acidic Compounds",
+      "description": "Compounds with acidic C-H bonds (alpha to EWG) for alpha-arylation reactions.",
+      "members": [
+        "R_acidic-H",
+        "Alkyl-COR",
+        "RCH2-COR",
+        "R2CH-COR",
+        "R3C-COR",
+        "Alkyl-CN",
+        "RCH2-CN",
+        "R2CH-CN",
+        "Alkyl-SO2R",
+        "RCH2-SO2R",
+        "Alkyl-NO2"
+      ],
+      "usage": [
+        "Arylation_acidic_C_H"
+      ]
+    },
     "amines_nh": {
       "name": "N-H Amines",
       "description": "Primary/secondary amines and N-H heterocycles for C-N coupling.",
