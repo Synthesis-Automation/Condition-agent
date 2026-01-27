@@ -44,6 +44,8 @@ def _infer_source_group(source_path: Optional[Path]) -> str:
     for part in parts:
         if part in ("literature", "datasets", "dataset"):
             return "literature"
+        if part == "protocols":
+            return "protocols"
         if part == "rules":
             return "rules"
         if part in ("experiments", "experiment", "experiements"):
@@ -70,7 +72,7 @@ def _collect_hte_files(db_path: Path) -> List[Path]:
     candidates.extend(db_path.glob("*.csv"))
     candidates.extend(db_path.glob("*.jsonl"))
 
-    for subdir in ("literature", "datasets", "rules", "experiments", "experiment", "experiements"):
+    for subdir in ("literature", "datasets", "protocols", "rules", "experiments", "experiment", "experiements"):
         sub_path = db_path / subdir
         if not sub_path.exists():
             continue

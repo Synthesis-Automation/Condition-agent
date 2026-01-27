@@ -47,10 +47,11 @@ from .smarts_generator_cli import (
     RDKIT_AVAILABLE as PROTOCOL_SMARTS_RDKIT_AVAILABLE,
 )
 
-from .batch_update_protocol_smarts import (
-    ProtocolSmartsUpdater,
-    ProcessingResult,
-)
+# Commented out - module not found
+# from .batch_update_protocol_smarts import (
+#     ProtocolSmartsUpdater,
+#     ProcessingResult,
+# )
 
 __all__ = [
     'ProtocolIndexer',
@@ -65,6 +66,6 @@ __all__ = [
     'visualize_pattern_with_examples',
     'smarts_generator_main',
     'PROTOCOL_SMARTS_RDKIT_AVAILABLE',
-    'ProtocolSmartsUpdater',
-    'ProcessingResult',
+    # 'ProtocolSmartsUpdater',  # Commented out - module not found
+    # 'ProcessingResult',
 ]

@@ -201,10 +201,10 @@ class ProtocolIndexer:
         drfp_fingerprints = []
         drfp_filenames = []
         
-        for json_path in protocol_files:
+        for protocol_path in protocol_files:
             try:
-                filename = json_path.name
-                file_hash = self._compute_file_hash(json_path)
+                filename = protocol_path.name
+                file_hash = self._compute_file_hash(protocol_path)
                 
                 # Check if file has changed (check against any record from this file)
                 file_unchanged = False
@@ -225,8 +225,11 @@ class ProtocolIndexer:
                     skipped += 1
                     continue
                 
-                # Process the file (returns lists now)
-                records_list, drfp_fps_list = self._process_protocol_file(json_path, file_hash, compute_drfp)
+                # Process the file based on extension
+                if protocol_path.suffix.lower() == '.csv':
+                    records_list, drfp_fps_list = self._process_protocol_csv(protocol_path, file_hash, compute_drfp)
+                else:  # .json
+                    records_list, drfp_fps_list = self._process_protocol_file(protocol_path, file_hash, compute_drfp)
                 
                 # Add all records from this file
                 for record, drfp_fp in zip(records_list, drfp_fps_list):
@@ -239,7 +242,7 @@ class ProtocolIndexer:
                         drfp_filenames.append(record.filename)
                 
             except Exception as e:
-                logger.error(f"Error processing {json_path.name}: {e}")
+                logger.error(f"Error processing {protocol_path.name}: {e}")
                 errors += 1
         
         # Save DRFP fingerprints to separate NPZ file
@@ -278,19 +281,30 @@ class ProtocolIndexer:
         logger.info(f"  DRFP fingerprints: {len(drfp_fingerprints) if drfp_fingerprints else 0}")
     
     def _find_protocol_files(self) -> List[Path]:
-        """Find all protocol JSON files (excluding examples and hidden files)"""
-        json_files = []
+        """Find all protocol files (JSON and CSV, excluding examples and hidden files)"""
+        protocol_files = []
         
-        for json_path in self.protocol_dir.glob('*.json'):
-            # Skip hidden files and schema files
-            if json_path.name.startswith('.'):
+        # Find CSV files (preferred format)
+        for csv_path in self.protocol_dir.glob('*.csv'):
+            # Skip hidden files and temp files
+            if csv_path.name.startswith('.') or csv_path.name.startswith('~'):
                 continue
-            if 'schema' in json_path.name.lower():
-                continue
-            if json_path.is_file():
-                json_files.append(json_path)
+            if csv_path.is_file():
+                protocol_files.append(csv_path)
         
-        return sorted(json_files)
+        # Find JSON files (legacy format) only if no CSV files found
+        if not protocol_files:
+            logger.info("No CSV files found, falling back to JSON files")
+            for json_path in self.protocol_dir.glob('*.json'):
+                # Skip hidden files and schema files
+                if json_path.name.startswith('.'):
+                    continue
+                if 'schema' in json_path.name.lower():
+                    continue
+                if json_path.is_file():
+                    protocol_files.append(json_path)
+        
+        return sorted(protocol_files)
     
     def _compute_file_hash(self, file_path: Path) -> str:
         """Compute MD5 hash of file for change detection"""
@@ -302,19 +316,19 @@ class ProtocolIndexer:
     
     def _process_protocol_file(
         self,
-        json_path: Path,
+        protocol_path: Path,
         file_hash: str,
         compute_drfp: bool
     ) -> tuple[List[ProtocolRecord], List[Optional[Any]]]:
         """
-        Process a single protocol file and create index records
+        Process a single protocol JSON file and create index records
         
         Each JSON file can now contain either:
         - A single protocol object (legacy format)
         - An array of protocol objects (new format)
         
         Args:
-            json_path: Path to protocol JSON file
+            protocol_path: Path to protocol JSON file
             file_hash: MD5 hash of the file
             compute_drfp: Whether to compute DRFP fingerprint
         
@@ -322,7 +336,7 @@ class ProtocolIndexer:
             Tuple of (List[ProtocolRecord], List[drfp_fingerprint])
             drfp_fingerprint is None if not computed or computation failed
         """
-        with open(json_path, 'r', encoding='utf-8') as f:
+        with open(protocol_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
         # Handle both array and single protocol formats
@@ -338,14 +352,66 @@ class ProtocolIndexer:
             # Generate unique filename for each protocol in array
             if len(protocols) > 1:
                 # Multiple protocols: use index suffix
-                protocol_id = f"{json_path.stem}[{idx}]"
+                protocol_id = f"{protocol_path.stem}[{idx}]"
             else:
                 # Single protocol: use original filename
-                protocol_id = json_path.stem
+                protocol_id = protocol_path.stem
             
             record, drfp_fp = self._process_single_protocol(
                 protocol_data=protocol_data,
-                json_path=json_path,
+                protocol_path=protocol_path,
+                protocol_id=protocol_id,
+                file_hash=file_hash,
+                compute_drfp=compute_drfp
+            )
+            records.append(record)
+            drfp_fps.append(drfp_fp)
+        
+        return records, drfp_fps
+    
+    def _process_protocol_csv(
+        self,
+        csv_path: Path,
+        file_hash: str,
+        compute_drfp: bool
+    ) -> tuple[List[ProtocolRecord], List[Optional[Any]]]:
+        """
+        Process a single protocol CSV file and create index records
+        
+        Args:
+            csv_path: Path to protocol CSV file
+            file_hash: MD5 hash of the file
+            compute_drfp: Whether to compute DRFP fingerprint
+        
+        Returns:
+            Tuple of (List[ProtocolRecord], List[drfp_fingerprint])
+            drfp_fingerprint is None if not computed or computation failed
+        """
+        from .csv_utils import read_protocol_csv
+        
+        # Load protocols from CSV
+        protocols = read_protocol_csv(str(csv_path))
+        
+        records = []
+        drfp_fps = []
+        
+        for idx, protocol_data in enumerate(protocols):
+            # Generate unique protocol ID from protocol_id field or row index
+            metadata = protocol_data.get('metadata', {}) or {}
+            protocol_id_from_data = metadata.get('id', '')
+            
+            if protocol_id_from_data:
+                protocol_id = protocol_id_from_data
+            elif len(protocols) > 1:
+                # Multiple protocols: use CSV filename + index
+                protocol_id = f"{csv_path.stem}[{idx}]"
+            else:
+                # Single protocol: use CSV filename
+                protocol_id = csv_path.stem
+            
+            record, drfp_fp = self._process_single_protocol(
+                protocol_data=protocol_data,
+                protocol_path=csv_path,
                 protocol_id=protocol_id,
                 file_hash=file_hash,
                 compute_drfp=compute_drfp
@@ -358,7 +424,7 @@ class ProtocolIndexer:
     def _process_single_protocol(
         self,
         protocol_data: Dict[str, Any],
-        json_path: Path,
+        protocol_path: Path,
         protocol_id: str,
         file_hash: str,
         compute_drfp: bool
@@ -368,7 +434,7 @@ class ProtocolIndexer:
         
         Args:
             protocol_data: Protocol JSON object
-            json_path: Path to source JSON file
+            protocol_path: Path to source file (JSON or CSV)
             protocol_id: Unique identifier for this protocol
             file_hash: MD5 hash of the file
             compute_drfp: Whether to compute DRFP fingerprint
@@ -414,12 +480,12 @@ class ProtocolIndexer:
                 if drfp_fp is not None:
                     has_drfp = True
             except Exception as e:
-                logger.debug(f"Could not compute DRFP for {json_path.name}: {e}")
+                logger.debug(f"Could not compute DRFP for {protocol_path.name}: {e}")
         
         # Create record (without embedding DRFP)
         record = ProtocolRecord(
-            filename=protocol_id,  # Use protocol_id instead of json_path.name
-            filepath=str(json_path.relative_to(self.protocol_dir.parent)),
+            filename=protocol_id,  # Use protocol_id instead of protocol_path.name
+            filepath=str(protocol_path.relative_to(self.protocol_dir.parent)),
             file_hash=file_hash,
             reaction_smiles=reaction_smiles,
             reaction_smarts=reaction_smarts,

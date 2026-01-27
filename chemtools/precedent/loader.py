@@ -30,21 +30,29 @@ def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-_ENV_LIT_DIR = os.environ.get("CHEMTOOLS_LITERATURE_DIR", "").strip()
-LITERATURE_DIR = (
-    os.path.abspath(_ENV_LIT_DIR)
-    if _ENV_LIT_DIR
-    else os.path.join(BASE_DIR, "data", "HTE_db", "literature")
+_ENV_HTE_DIR = os.environ.get("CHEMTOOLS_HTE_DB_DIR", "").strip()
+HTE_DB_DIR = (
+    os.path.abspath(_ENV_HTE_DIR)
+    if _ENV_HTE_DIR
+    else os.path.join(BASE_DIR, "data", "HTE_db")
 )
+# Backward compatibility
+_ENV_LIT_DIR = os.environ.get("CHEMTOOLS_LITERATURE_DIR", "").strip()
+if _ENV_LIT_DIR:
+    HTE_DB_DIR = os.path.dirname(os.path.abspath(_ENV_LIT_DIR))
 
 
 def _iter_literature_files() -> List[str]:
-    """List all CSV files in the literature dataset directory."""
+    """List all CSV files from HTE database (literature, protocols, rules, experiments)."""
     files: List[str] = []
-    if os.path.isdir(LITERATURE_DIR):
-        for name in os.listdir(LITERATURE_DIR):
-            if name.lower().endswith(".csv"):
-                files.append(os.path.join(LITERATURE_DIR, name))
+    subdirs = ["literature", "protocols", "rules", "experiments"]
+    
+    for subdir in subdirs:
+        subdir_path = os.path.join(HTE_DB_DIR, subdir)
+        if os.path.isdir(subdir_path):
+            for name in os.listdir(subdir_path):
+                if name.lower().endswith(".csv"):
+                    files.append(os.path.join(subdir_path, name))
     return sorted(files)
 
 
@@ -339,7 +347,8 @@ def _load_literature_cached(family_key: Tuple[str, ...]) -> List[Dict[str, Any]]
 
 def _load_selective(families: Optional[List[str]] = None) -> List[Dict[str, Any]]:
     """
-    Load literature CSV rows, optionally filtered by reaction family.
+    Load HTE database CSV rows from all sources (literature, protocols, rules, experiments),
+    optionally filtered by reaction family.
     
     Args:
         families: Optional list of family names to load (e.g., ["C_N_Coupling_Pd"]).
