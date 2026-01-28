@@ -16,14 +16,18 @@ result = featurize_reaction(
 print("Full reaction bundle:")
 print(f"  reaction_type: {result.get('reaction_type')}")
 print(f"  confidence: {result.get('confidence')}")
+print(f"  Top-level keys: {list(result.keys())}")
 
 # Check if detection has validation
-detection = result.get('detection', {})
-print(f"\nDetection payload keys: {list(detection.keys())}")
-if 'validation' in detection:
-    print(f"Validation: {detection['validation']}")
+extended = result.get('extended', {})
+print(f"\nExtended keys: {list(extended.keys())}")
+
+detection_ext = extended.get('detection', {})
+print(f"Extended.detection keys: {list(detection_ext.keys())}")
+if 'validation' in detection_ext:
+    print(f"Validation found: {detection_ext['validation']}")
 else:
-    print("No validation in detection payload")
+    print("No validation in extended.detection")
 
 # Check aggregates
 aggregates = result.get('aggregates')

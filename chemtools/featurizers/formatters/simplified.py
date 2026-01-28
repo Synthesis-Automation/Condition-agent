@@ -284,6 +284,12 @@ def build_extended_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
                 "matches": matches[:5],
                 "total_matches": len(matches),
             }
+        # Include validation metadata if present
+        validation = detection.get("validation")
+        if validation:
+            if "detection" not in extended:
+                extended["detection"] = {}
+            extended["detection"]["validation"] = validation
     
     # Add aggregates
     aggregates = full_reaction.get("aggregates", {})

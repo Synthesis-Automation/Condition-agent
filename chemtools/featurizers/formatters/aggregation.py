@@ -92,13 +92,13 @@ def aggregate_reaction_features(
             if isinstance(motif, dict):
                 cid = motif.get("compound_id")
                 if cid:
-                    reactant_motif_ids.append(str(cid))
+                    reactant_motif_ids.append(normalize_motif_id(str(cid)))
         if context_entries:
             for motif in context_entries:
                 if isinstance(motif, dict):
                     cid = motif.get("compound_id")
                     if cid:
-                        reactant_motif_ids.append(str(cid))
+                        reactant_motif_ids.append(normalize_motif_id(str(cid)))
 
     # Analyze motif changes if products are provided
     if product_motif_ids:

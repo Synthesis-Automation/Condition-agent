@@ -18,7 +18,7 @@ def extract_motif_ids(*motif_collections: Iterable[Any]) -> List[str]:
         *motif_collections: Variable number of motif iterables
         
     Returns:
-        List of compound ID strings
+        List of normalized compound ID strings
     """
     items: List[str] = []
     for collection in motif_collections:
@@ -26,11 +26,11 @@ def extract_motif_ids(*motif_collections: Iterable[Any]) -> List[str]:
             if isinstance(motif, dict):
                 cid = motif.get("compound_id")
                 if cid:
-                    items.append(str(cid))
+                    items.append(normalize_motif_id(str(cid)))
             else:
                 text = str(motif).strip()
                 if text:
-                    items.append(text)
+                    items.append(normalize_motif_id(text))
     return items
 
 

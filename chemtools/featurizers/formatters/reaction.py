@@ -274,6 +274,7 @@ def featurize_reaction(
         # Preserve original detection info but update the main type
         if isinstance(reaction_type, dict):
             reaction_type["reaction_type"] = validated["reaction_type"]
+            reaction_type["name"] = validated["reaction_type"]  # Also update 'name' field!
             reaction_type["confidence"] = validated["confidence"]
         else:
             reaction_type = validated["reaction_type"]

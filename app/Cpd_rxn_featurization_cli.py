@@ -346,6 +346,15 @@ def _print_extended_section(extended: Dict[str, Any], *, indent: int = 0) -> Non
             name = match.get("name", "unknown")
             conf = match.get("confidence", 0)
             print(f"{prefix}    - {name} [confidence: {conf:.2f}]")
+        
+        # Show validation if present
+        validation = detection.get("validation")
+        if validation:
+            print(f"{prefix}  Detection Validation:")
+            print(f"{prefix}    Original: {validation.get('original_detection')}")
+            print(f"{prefix}    Corrected to: {validation.get('validated_detection')} (confidence: {validation.get('validation_confidence', 0):.2f})")
+            print(f"{prefix}    Reason: {validation.get('validation_reason')}")
+            print(f"{prefix}    Method: {validation.get('validation_method')}")
     
     aggregates = extended.get("aggregates")
     if aggregates:
