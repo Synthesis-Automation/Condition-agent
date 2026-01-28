@@ -305,11 +305,68 @@ def _print_snar_feasibility(items: Iterable[Dict[str, Any]], *, indent: int = 0)
             print(f"{prefix}    Reason: {reason}")
 
 
+def _print_extended_section(extended: Dict[str, Any], *, indent: int = 0) -> None:
+    """Print extended section with detailed analysis for conditions recommendation."""
+    if not extended:
+        return
+    prefix = " " * indent
+    print(f"{prefix}Extended Analysis (for Conditions Recommendation):")
+    
+    # Molecule extended info
+    per_motif = extended.get("per_motif_analysis")
+    if per_motif:
+        print(f"{prefix}  Per-Motif Analysis ({len(per_motif)}):")
+        for analysis in per_motif:
+            motif_id = analysis.get("motif_id", "unknown")
+            print(f"{prefix}    - {motif_id}")
+            
+            steric = analysis.get("steric")
+            if steric:
+                print(f"{prefix}      steric: score={steric.get('score')}, classification={steric.get('classification')}")
+            
+            electronic = analysis.get("electronic")
+            if electronic:
+                print(f"{prefix}      electronic: score={electronic.get('score')}, description={electronic.get('description')}")
+            
+            nearby = analysis.get("nearby_groups")
+            if nearby:
+                print(f"{prefix}      nearby_groups: {', '.join(nearby)}")
+    
+    snar = extended.get("snar_feasibility")
+    if snar:
+        _print_snar_feasibility(snar, indent=indent + 2)
+    
+    # Reaction extended info
+    detection = extended.get("detection")
+    if detection:
+        matches = detection.get("matches", [])
+        total = detection.get("total_matches", len(matches))
+        print(f"{prefix}  Detection Matches (showing {len(matches)} of {total}):")
+        for match in matches:
+            name = match.get("name", "unknown")
+            conf = match.get("confidence", 0)
+            print(f"{prefix}    - {name} [confidence: {conf:.2f}]")
+    
+    aggregates = extended.get("aggregates")
+    if aggregates:
+        print(f"{prefix}  Aggregates:")
+        for key in sorted(aggregates):
+            value = aggregates[key]
+            print(f"{prefix}    - {key}: {_format_value(value)}")
+    
+    role_classification = extended.get("role_classification")
+    if role_classification:
+        reactant_roles = role_classification.get("reactants")
+        if reactant_roles:
+            _print_roles_summary(reactant_roles, indent=indent + 2)
+
+
 def _print_molecule_detail(
     payload: Dict[str, Any],
     *,
     indent: int = 0,
     show_rdkit: bool = False,
+    show_extended: bool = True,
 ) -> None:
     molecule = _get_molecule_payload(payload)
     prefix = " " * indent
@@ -317,19 +374,21 @@ def _print_molecule_detail(
 
     if show_rdkit:
         _print_rdkit_props(molecule.get("rdkit_props") or {}, indent=indent)
+    
+    # Core information
     _print_motifs(molecule.get("motifs") or [], indent=indent)
-    ranked = molecule.get("ranked_motifs") or []
-    if ranked:
-        print(f"{prefix}Ranked Motifs:")
-        print(_format_list([_clean_compound_id(str(item)) for item in ranked], indent=indent + 2))
-    _print_motif_analyses(molecule.get("analyses") or [], indent=indent)
-    _print_snar_feasibility(molecule.get("snar_feasibility") or [], indent=indent)
+    
+    # Extended information (useful for conditions recommendation)
+    if show_extended:
+        extended = molecule.get("extended")
+        if extended:
+            _print_extended_section(extended, indent=indent)
 
 
-def _print_molecule_summary(payload: Dict[str, Any], *, show_rdkit: bool = False) -> None:
+def _print_molecule_summary(payload: Dict[str, Any], *, show_rdkit: bool = False, show_extended: bool = True) -> None:
     print("\nSummary (Molecule)")
     print("-" * 72)
-    _print_molecule_detail(payload, indent=0, show_rdkit=show_rdkit)
+    _print_molecule_detail(payload, indent=0, show_rdkit=show_rdkit, show_extended=show_extended)
 
 
 def _print_normalized_entries(title: str, entries: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
@@ -355,43 +414,26 @@ def _print_normalized_entries(title: str, entries: Iterable[Dict[str, Any]], *, 
             print(f"{prefix}    {key}: {formatted}")
 
 
-def _print_reaction_type(
-    reaction_type: Dict[str, Any],
+def _print_reaction_type_summary(
+    reaction_type_str: str | None,
+    confidence: float | None,
     *,
     indent: int = 0,
     reaction_key: str | None = None,
 ) -> None:
-    if not reaction_type:
+    """Print reaction type summary from v2 core format."""
+    if not reaction_type_str:
         return
     prefix = " " * indent
     print(f"{prefix}Reaction Type:")
     lines = []
     if reaction_key:
         lines.append(f"reaction_key: {reaction_key}")
-    for key in ("reaction_type", "name", "category", "confidence"):
-        value = reaction_type.get(key)
-        if value is not None:
-            if key == "confidence":
-                lines.append(f"{key}: {value:.4f}")
-            else:
-                lines.append(f"{key}: {value}")
+    lines.append(f"reaction_type: {reaction_type_str}")
+    if confidence is not None:
+        lines.append(f"confidence: {confidence:.4f}")
     if lines:
         print(_format_list(lines, indent=indent + 2))
-    
-    alternatives = reaction_type.get("alternatives")
-    if alternatives:
-        print(f"{prefix}  Alternatives:")
-        for alt in alternatives:
-            alt_name = alt.get("name") or alt.get("reaction_type")
-            alt_conf = alt.get("confidence", 0.0)
-            print(f"{prefix}    - {alt_name} [Conf: {alt_conf:.4f}]")
-
-    slot_evidence = reaction_type.get("slot_evidence") or {}
-    if slot_evidence:
-        print(f"{prefix}  Slot Evidence:")
-        for slot in sorted(slot_evidence):
-            motifs = slot_evidence.get(slot) or []
-            print(f"{prefix}    - {slot}: {_format_value(motifs)}")
 
 
 def _print_detection(detection: Dict[str, Any], *, indent: int = 0) -> None:
@@ -534,6 +576,7 @@ def _print_reaction_summary(
     *,
     show_roles: bool = False,
     show_rdkit: bool = False,
+    show_extended: bool = True,
 ) -> None:
     reaction = _get_reaction_payload(payload)
     print("\nSummary (Reaction)")
@@ -543,30 +586,20 @@ def _print_reaction_summary(
     if reaction_key:
         print(f"Reaction Key: {_clean_compound_id(reaction_key)}")
 
-    # normalized = reaction.get("normalized") or {}
-    # if normalized:
-    #     print("Normalization:")
-    #     normalization_lines = _format_mapping_lines(
-    #         {
-    #             "input": normalized.get("input"),
-    #             "normalized": normalized.get("normalized"),
-    #         }
-    #     )
-    #     if normalization_lines:
-    #         print(_format_list(normalization_lines, indent=2))
-    #     errors = normalized.get("errors") or []
-    #     if errors:
-    #         print(_format_list([f"errors: {_format_value(errors)}"], indent=2))
-    #     _print_normalized_entries("Reactants", normalized.get("reactants") or [], indent=2)
-    #     _print_normalized_entries("Agents", normalized.get("agents") or [], indent=2)
-    #     _print_normalized_entries("Products", normalized.get("products") or [], indent=2)
-
-    _print_reaction_type(
-        reaction.get("reaction_type") or {},
+    # Core reaction information
+    _print_reaction_type_summary(
+        reaction.get("reaction_type"),
+        reaction.get("confidence"),
         reaction_key=reaction.get("reaction_key"),
     )
-    _print_detection(reaction.get("detection") or {})
 
+    # Show extended analysis if available (most useful for conditions recommendation)
+    if show_extended:
+        extended = reaction.get("extended")
+        if extended:
+            _print_extended_section(extended, indent=0)
+
+    # Aggregates (useful for conditions)
     aggregates = reaction.get("aggregates") or {}
     if aggregates:
         print("Aggregates:")
@@ -574,10 +607,7 @@ def _print_reaction_summary(
         if lines:
             print(_format_list(lines))
 
-    if show_roles:
-        _print_roles_summary(reaction.get("roles") or {})
-        _print_agent_roles(reaction.get("agent_roles") or {})
-
+    # Intramolecular flag
     intramolecular = reaction.get("intramolecular")
     if intramolecular:
         print("Intramolecular:")
@@ -588,25 +618,25 @@ def _print_reaction_summary(
         else:
             print(f"  - {intramolecular}")
 
+    # Show reactants with extended info
     reactants = reaction.get("reactants") or []
     print(f"Reactants ({len(reactants)}):")
     if reactants:
         for idx, reactant in enumerate(reactants, start=1):
             print(f"  Reactant {idx}:")
-            _print_molecule_detail(reactant, indent=4, show_rdkit=show_rdkit)
+            _print_molecule_detail(reactant, indent=4, show_rdkit=show_rdkit, show_extended=show_extended)
     else:
         print("  - none")
 
+    # Show products with extended info
     products = reaction.get("products") or []
     print(f"Products ({len(products)}):")
     if products:
         for idx, product in enumerate(products, start=1):
             print(f"  Product {idx}:")
-            _print_molecule_detail(product, indent=4, show_rdkit=show_rdkit)
+            _print_molecule_detail(product, indent=4, show_rdkit=show_rdkit, show_extended=show_extended)
     else:
         print("  - none")
-
-    _print_reaction_feasibility(reaction.get("feasibility") or {})
 
 
 def _print_readable(
@@ -614,12 +644,13 @@ def _print_readable(
     *,
     show_roles: bool = False,
     show_rdkit: bool = False,
+    show_extended: bool = True,
 ) -> None:
     kind = payload.get("kind")
     if kind == "molecule":
-        _print_molecule_summary(payload, show_rdkit=show_rdkit)
+        _print_molecule_summary(payload, show_rdkit=show_rdkit, show_extended=show_extended)
     elif kind == "reaction":
-        _print_reaction_summary(payload, show_roles=show_roles, show_rdkit=show_rdkit)
+        _print_reaction_summary(payload, show_roles=show_roles, show_rdkit=show_rdkit, show_extended=show_extended)
     else:
         print("\nSummary")
         print("-" * 72)
@@ -719,9 +750,12 @@ def main() -> int:
             if mode in {"reaction", "r"} or (mode == "auto" and ">" in smiles):
                 reaction_options = dict(current_options)
                 reaction_options.setdefault("motif_site_filter", "substituent")
+                reaction_options["detailed"] = True  # Enable extended output
                 payload = featurize_reaction(smiles, options=reaction_options)
             else:
-                payload = featurize_molecule(smiles, options=current_options)
+                molecule_options = dict(current_options)
+                molecule_options["detailed"] = True  # Enable extended output
+                payload = featurize_molecule(smiles, options=molecule_options)
         except Exception as exc:
             print(f"Error: {exc}")
             continue
