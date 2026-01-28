@@ -336,25 +336,8 @@ def _print_extended_section(extended: Dict[str, Any], *, indent: int = 0) -> Non
     if snar:
         _print_snar_feasibility(snar, indent=indent + 2)
     
-    # Reaction extended info
-    detection = extended.get("detection")
-    if detection:
-        matches = detection.get("matches", [])
-        total = detection.get("total_matches", len(matches))
-        print(f"{prefix}  Detection Matches (showing {len(matches)} of {total}):")
-        for match in matches:
-            name = match.get("name", "unknown")
-            conf = match.get("confidence", 0)
-            print(f"{prefix}    - {name} [confidence: {conf:.2f}]")
-        
-        # Show validation if present
-        validation = detection.get("validation")
-        if validation:
-            print(f"{prefix}  Detection Validation:")
-            print(f"{prefix}    Original: {validation.get('original_detection')}")
-            print(f"{prefix}    Corrected to: {validation.get('validated_detection')} (confidence: {validation.get('validation_confidence', 0):.2f})")
-            print(f"{prefix}    Reason: {validation.get('validation_reason')}")
-            print(f"{prefix}    Method: {validation.get('validation_method')}")
+    # Reaction extended info (focus on conditions recommendation data)
+    # Note: Detection info is not shown here as it duplicates the main Reaction Type field
     
     aggregates = extended.get("aggregates")
     if aggregates:
@@ -367,15 +350,8 @@ def _print_extended_section(extended: Dict[str, Any], *, indent: int = 0) -> Non
     if role_classification:
         reactant_roles = role_classification.get("reactants")
         if reactant_roles:
-            # Show role classification reaction type (often more accurate than main detection)
-            role_rxn_type = reactant_roles.get("reaction_type")
-            role_conf = reactant_roles.get("confidence")
-            if role_rxn_type:
-                print(f"{prefix}  Role-Based Reaction Type: {role_rxn_type}", end="")
-                if role_conf is not None:
-                    print(f" (confidence: {role_conf:.2f})", end="")
-                print()  # newline
-            
+            # Note: Role classification reaction type is NOT displayed to avoid confusion
+            # with the main reaction_type field. Only show the role assignments.
             _print_roles_summary(reactant_roles, indent=indent + 2)
 
 
@@ -488,23 +464,19 @@ def _print_roles_summary(roles: Dict[str, Any], *, indent: int = 0) -> None:
     if not roles:
         return
     prefix = " " * indent
-    print(f"{prefix}Role Classification:")
-    lines = []
-    for key in (
-        "reaction_type",
-        "confidence",
-        "detection_method",
-        "num_reactants",
-        "has_multi_functional_substrates",
-    ):
-        value = roles.get(key)
-        if value is not None:
-            lines.append(f"{key}: {value}")
-    if lines:
-        print(_format_list(lines, indent=indent + 2))
+    print(f"{prefix}Reactant Roles:")
+    
+    # Only show useful metadata (skip redundant reaction_type/confidence)
+    num_reactants = roles.get("num_reactants")
+    has_multi_functional = roles.get("has_multi_functional_substrates")
+    if num_reactants is not None:
+        print(f"{prefix}  - num_reactants: {num_reactants}")
+    if has_multi_functional is not None:
+        print(f"{prefix}  - has_multi_functional_substrates: {has_multi_functional}")
+    
     reactants = roles.get("reactants") or []
     if reactants:
-        print(f"{prefix}  Reactants:")
+        print(f"{prefix}  Assignments:")
         for reactant in reactants:
             pos = reactant.get("position")
             name = reactant.get("name") or reactant.get("category") or "unknown"

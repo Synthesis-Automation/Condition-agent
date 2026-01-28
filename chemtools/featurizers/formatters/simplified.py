@@ -243,13 +243,17 @@ def build_extended_molecule(full_molecule: Dict[str, Any]) -> Dict[str, Any]:
 
 def build_extended_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Build extended reaction output with detailed analysis.
+    Build extended reaction output with detailed analysis for conditions recommendation.
     
     Extended output includes core fields plus:
-    - extended.detection: All detection matches (not just best)
-    - extended.aggregates: Reaction-wide statistics
-    - extended.role_classification: Reactant/agent role analysis
+    - extended.aggregates: Reaction-wide statistics (steric/electronic properties)
+    - extended.role_classification: Reactant/agent role assignments (not detection)
+    - extended.intramolecular: Intramolecular reaction flags
     - extended.normalization_log: Input normalization details
+    
+    Note: Detection information (reaction_type/confidence) is NOT included in extended
+    section as it would duplicate the main reaction_type field. Extended section focuses
+    solely on additional data needed for conditions recommendation.
     
     Args:
         full_reaction: Complete reaction bundle from reaction.py
@@ -271,27 +275,14 @@ def build_extended_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
     core["reactants"] = reactants_extended
     core["products"] = products_extended
     
-    # Build extended section
+    # Build extended section with information useful for conditions recommendation
     extended: Dict[str, Any] = {}
     
-    # Add detection matches
-    detection = full_reaction.get("detection", {})
-    if detection:
-        matches = detection.get("matches", [])
-        if matches:
-            # Format matches with top 5
-            extended["detection"] = {
-                "matches": matches[:5],
-                "total_matches": len(matches),
-            }
-        # Include validation metadata if present
-        validation = detection.get("validation")
-        if validation:
-            if "detection" not in extended:
-                extended["detection"] = {}
-            extended["detection"]["validation"] = validation
+    # Note: Detection info is intentionally NOT included here since it's already
+    # shown in the main reaction_type/confidence fields. Extended section focuses
+    # on the additional analysis needed for conditions recommendation.
     
-    # Add aggregates
+    # Add aggregates (reaction-wide statistics for conditions selection)
     aggregates = full_reaction.get("aggregates", {})
     if aggregates:
         extended["aggregates"] = aggregates

@@ -276,16 +276,16 @@ def get_reactant_summary(classification: ReactionClassification) -> Dict[str, An
     """
     Generate a human-readable summary of the reaction classification.
     
+    Note: This returns only the role assignments, not reaction type detection.
+    The main reaction type is determined by the detection system, not role classification.
+    
     Args:
         classification: Result from classify_reactants_with_context
     
     Returns:
-        Dict with summary information
+        Dict with role assignment information (no redundant reaction_type)
     """
     summary = {
-        "reaction_type": classification.reaction_type,
-        "confidence": classification.reaction_confidence,
-        "detection_method": classification.detection_method,
         "num_reactants": len(classification.reactants),
         "has_multi_functional_substrates": classification.has_multi_functional,
         "reactants": []
