@@ -235,7 +235,9 @@
       },
       "products": {
         "product": [
-          "Ar-C#C"
+          "Ar-Alkynyl",
+          "HeteroAr-Alkynyl",
+          "Alkenyl-Alkynyl"
         ]
       },
       "catalysts": [

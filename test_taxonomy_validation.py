@@ -83,6 +83,32 @@ def test_organometallic_exclusion():
     print("✓ Organometallic exclusion: PASSED")
 
 
+def test_sonogashira():
+    """Test Sonogashira detection."""
+    result = validate_detection_with_reacted_motifs(
+        "Unknown",
+        0.3,
+        ["Ar-I", "Alkyl-Alkynyl_terminal"],
+        ["Ar-Alkynyl"]
+    )
+    assert result["reaction_type"] == "Sonogashira"
+    assert result["confidence"] == 0.95
+    print("✓ Sonogashira: PASSED")
+
+
+def test_sonogashira_heteroar():
+    """Test Sonogashira with HeteroAr."""
+    result = validate_detection_with_reacted_motifs(
+        "Unknown",
+        0.3,
+        ["HeteroAr-Br", "Ar-Alkynyl_terminal"],
+        ["HeteroAr-Alkynyl"]
+    )
+    assert result["reaction_type"] == "Sonogashira"
+    assert result["confidence"] == 0.95
+    print("✓ Sonogashira with HeteroAr: PASSED")
+
+
 if __name__ == "__main__":
     print("Testing taxonomy-driven validation...")
     print("=" * 60)
@@ -93,6 +119,8 @@ if __name__ == "__main__":
     test_cn_coupling_heteroar()
     test_no_correction_needed()
     test_organometallic_exclusion()
+    test_sonogashira()
+    test_sonogashira_heteroar()
     
     print("=" * 60)
     print("✅ All taxonomy-driven validation tests PASSED!")

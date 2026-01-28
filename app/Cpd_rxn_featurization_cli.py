@@ -476,7 +476,15 @@ def _print_roles_summary(roles: Dict[str, Any], *, indent: int = 0) -> None:
     
     reactants = roles.get("reactants") or []
     if reactants:
-        print(f"{prefix}  Assignments:")
+        # Count actual reactants (positions) vs total items shown
+        actual_count = len(reactants)
+        total_alt_count = sum(len(r.get("alternative_functional_groups") or []) for r in reactants)
+        
+        if total_alt_count > 0:
+            print(f"{prefix}  Assignments ({actual_count} reactants, {total_alt_count} alternatives shown):")
+        else:
+            print(f"{prefix}  Assignments:")
+            
         for reactant in reactants:
             pos = reactant.get("position")
             name = reactant.get("name") or reactant.get("category") or "unknown"
@@ -491,7 +499,7 @@ def _print_roles_summary(roles: Dict[str, Any], *, indent: int = 0) -> None:
                 print(f"{prefix}      {', '.join(detail_parts)}")
             alternatives = reactant.get("alternative_functional_groups") or []
             if alternatives:
-                print(f"{prefix}      alternatives:")
+                print(f"{prefix}      alternatives (other groups in same molecule):")
                 for alt in alternatives:
                     alt_label = alt.get("name") or alt.get("category") or "unknown"
                     alt_parts = []
