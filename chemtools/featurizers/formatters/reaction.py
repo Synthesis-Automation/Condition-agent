@@ -257,6 +257,35 @@ def featurize_reaction(
     aggregates = aggregate_reaction_features(
         reactant_bundles, product_motif_ids=product_motif_ids
     )
+    
+    # Validate detection using reacted motifs patterns
+    from .detection_validation import validate_detection_with_reacted_motifs
+    
+    validated = validate_detection_with_reacted_motifs(
+        initial_detection=reaction_type.get("reaction_type", "Unknown") if isinstance(reaction_type, dict) else str(reaction_type),
+        initial_confidence=reaction_type.get("confidence", 0.0) if isinstance(reaction_type, dict) else 0.0,
+        reacted_motifs=aggregates.get("reacted_motifs", []),
+        formed_motifs=aggregates.get("formed_motifs", []),
+        spectator_motifs=aggregates.get("spectator_motifs", []),
+    )
+    
+    # Update reaction type if corrected
+    if validated.get("corrected_from"):
+        # Preserve original detection info but update the main type
+        if isinstance(reaction_type, dict):
+            reaction_type["reaction_type"] = validated["reaction_type"]
+            reaction_type["confidence"] = validated["confidence"]
+        else:
+            reaction_type = validated["reaction_type"]
+        
+        # Add validation metadata to detection payload
+        detection_payload["validation"] = {
+            "original_detection": validated["corrected_from"],
+            "validated_detection": validated["reaction_type"],
+            "validation_method": validated["validation_method"],
+            "validation_reason": validated["reason"],
+            "validation_confidence": validated["confidence"],
+        }
 
     # Classify reactant roles
     roles_summary = None
