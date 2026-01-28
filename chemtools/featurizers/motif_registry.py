@@ -75,7 +75,11 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
         # Auto-generate ID as A+B when missing (v1.3 simplified format)
         if not compound_id:
             if group_a and group_b:
-                compound_id = f"{group_a}{group_b}"
+                # Avoid double dash if group_b starts with dash
+                if group_b.startswith("-"):
+                    compound_id = f"{group_a}{group_b}"
+                else:
+                    compound_id = f"{group_a}-{group_b}"
             else:
                 continue
         if group_a and group_b:

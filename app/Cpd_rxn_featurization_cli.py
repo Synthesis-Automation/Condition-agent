@@ -682,9 +682,7 @@ def main() -> int:
     print("Enter 'q' to quit.")
 
     while True:
-        mode = _prompt("Mode (compound/reaction/auto) [auto]: ").strip().lower()
-        if not mode:
-            mode = "auto"
+        mode = "auto"  # Default mode
         if mode in {"q", "quit", "exit"}:
             return 0
         if mode not in {"compound", "reaction", "auto", "c", "r"}:

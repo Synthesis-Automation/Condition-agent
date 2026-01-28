@@ -154,7 +154,11 @@ class CompoundSuggester:
                     template = "via_oxygen"
                 
                 # Generate compound suggestion
-                compound_id = f"{scaffold}-{substituent}"
+                # Avoid double dash if substituent starts with dash
+                if substituent.startswith("-"):
+                    compound_id = f"{scaffold}{substituent}"
+                else:
+                    compound_id = f"{scaffold}-{substituent}"
                 compound_name = compound_id  # Simplified naming
                 
                 # Generate description
