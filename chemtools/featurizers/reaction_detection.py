@@ -21,6 +21,31 @@ from .detection import (
     ReactionDetectionResult,
 )
 
+# Re-export coupling functions for backward compatibility
+from .detection.coupling import (
+    confirm_coupling_product_by_attachment,
+)
+
+# Re-export taxonomy loader for tests
+from ..taxonomy.reaction_catalog import load_reaction_catalog
+
+
+# Wrapper for old Suzuki-specific function signature
+def confirm_suzuki_product_by_attachment(reactants, products):
+    """Backward compatibility wrapper for old Suzuki confirmation function.
+    
+    Args:
+        reactants: List of reactant SMILES
+        products: List of product SMILES
+        
+    Returns:
+        Tuple of (success: bool, reason: str)
+    """
+    return confirm_coupling_product_by_attachment(
+        reactants, products, "Suzuki_miyaura"
+    )
+
+
 __all__ = [
     "detect_reaction_types",
     "detect_reaction_types_from_smiles",
@@ -28,4 +53,7 @@ __all__ = [
     "clear_bond_change_cache",
     "ReactionMatch",
     "ReactionDetectionResult",
+    "confirm_coupling_product_by_attachment",
+    "confirm_suzuki_product_by_attachment",
+    "load_reaction_catalog",
 ]

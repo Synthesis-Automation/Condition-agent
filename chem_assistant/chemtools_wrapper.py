@@ -13,8 +13,8 @@ from pydantic import BaseModel, Field
 
 from chemtools.featurizers import analysis as analysis_tools
 from chemtools.featurizers import calculable as calculable_tools
-from chemtools.featurizers import molecule as motif_molecule
-from chemtools.featurizers import reaction as motif_reaction
+from chemtools.featurizers.motifs import classification as motif_molecule
+from chemtools.featurizers.motifs import detection as motif_reaction
 from chemtools.featurizers import reaction_detection as reaction_detection_tools
 from chemtools.featurizers import reaction_pair as reaction_pair_tools
 from chemtools.featurizers import unified as unified_tools

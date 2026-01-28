@@ -1,5 +1,13 @@
 ﻿"""
 Taxonomy v2 package.
+
+Centralized taxonomy data loading and management.
 """
 
-__all__: list[str] = []
+from . import loader
+from . import reaction_catalog
+
+__all__ = [
+    "loader",
+    "reaction_catalog",
+]

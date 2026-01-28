@@ -11,7 +11,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional, Set, Tuple
 
-from ....taxonomy import reaction_catalog
+from ....taxonomy import loader
 
 
 def _load_reaction_types_raw() -> Dict[str, Any]:
@@ -20,8 +20,7 @@ def _load_reaction_types_raw() -> Dict[str, Any]:
     Returns a dictionary keyed by reaction type ID with full metadata.
     This is the single source of truth for reaction definitions.
     """
-    catalog = reaction_catalog.load_reaction_catalog()
-    return catalog.get("reactions", {})
+    return loader.load_reaction_types_dict()
 
 
 def get_reaction_type_definitions() -> Dict[str, Any]:
@@ -34,10 +33,7 @@ def get_reaction_type_definitions() -> Dict[str, Any]:
 
 def get_reaction_types_file() -> Path:
     """Return the canonical path to the reaction types taxonomy file."""
-    # This function is in reactants/ which is 4 levels deep from project root
-    # chemtools/featurizers/analysis/reactants/ -> go up 4 levels
-    repo_root = Path(__file__).resolve().parents[4]
-    return repo_root / "data" / "knowledge_base" / "taxonomy" / "reaction_types.v4.0.json"
+    return loader.REACTION_TYPES_FILE
 
 
 def clear_reaction_type_cache() -> None:

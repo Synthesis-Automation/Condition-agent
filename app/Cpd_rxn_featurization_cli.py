@@ -111,9 +111,9 @@ def _format_primary_compound_id(entry: Dict[str, Any]) -> str:
 
 @lru_cache(maxsize=1)
 def _load_compound_registry() -> Dict[str, Any]:
-    from chemtools.featurizers import motif_registry
+    from chemtools.featurizers.motifs import registry
 
-    return motif_registry.build_compound_registry(motif_registry._default_registry_paths())
+    return registry.build_compound_registry(registry._default_registry_paths())
 
 
 def _compound_specificity_key(compound_id: str) -> tuple[int, int, int, str] | None:

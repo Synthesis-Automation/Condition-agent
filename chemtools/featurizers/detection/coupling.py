@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
-from chemtools.taxonomy import reaction_catalog
 from chemtools.util.rdkit_helpers import rdkit_available, parse_smiles
 from chemtools.util.smarts_cache import compile_smarts
 
@@ -34,8 +33,9 @@ def _load_coupling_specs_from_taxonomy() -> Dict[str, CouplingConfirmationSpec]:
     Returns:
         Dictionary mapping reaction_type -> CouplingConfirmationSpec
     """
-    catalog = reaction_catalog.load_reaction_catalog()
-    reaction_types = catalog.get("reaction_types", [])
+    from chemtools.taxonomy import loader
+    
+    reaction_types = loader.load_reaction_types_list()
     
     specs: Dict[str, CouplingConfirmationSpec] = {}
     

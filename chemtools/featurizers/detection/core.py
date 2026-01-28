@@ -14,7 +14,7 @@ from ...taxonomy.reaction_catalog import load_reaction_catalog
 from .models import ReactionMatch, ReactionDetectionResult
 from .bond_changes import detect_reaction_types_by_bond_changes, clear_bond_change_cache
 from .matchers import _detect_motif_profile, detect_motif_ids_from_smiles, match_reaction_definition
-from .coupling import confirm_coupling_product_by_attachment, COUPLING_CONFIRMATION_SPECS
+from .coupling import confirm_coupling_product_by_attachment, get_coupling_confirmation_specs
 
 
 # Re-export for backward compatibility
@@ -146,10 +146,11 @@ def detect_reaction_types_from_smiles(
             matches.append(match)
 
     if (confirm_suzuki_products or confirm_coupling_products) and product_smiles is not None:
+        coupling_specs = get_coupling_confirmation_specs()
         confirmed: List[ReactionMatch] = []
         for match in matches:
             # Skip confirmation if not requested or reaction type not supported
-            if match.reaction_type not in COUPLING_CONFIRMATION_SPECS:
+            if match.reaction_type not in coupling_specs:
                 confirmed.append(match)
                 continue
             
