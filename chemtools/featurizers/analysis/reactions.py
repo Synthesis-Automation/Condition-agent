@@ -4,6 +4,13 @@ Reaction-level helpers that interface with the taxonomy registry.
 This module centralises the family alias logic that was previously embedded in
 ``chemtools.router`` so that other components can consume the canonical
 reaction identifiers without depending on the routing heuristics.
+
+IMPORTANT: Reaction types should be defined in taxonomy/data/reaction_types.v4.0.json.
+This alias mapping is for legacy compatibility only. New reactions should be added
+to the taxonomy JSON, not to FAMILY_ALIAS_OVERRIDES.
+
+The system is taxonomy-driven: reaction detection uses the definitions in reaction_types
+JSON, and this module only provides backward-compatible alias resolution.
 """
 
 from __future__ import annotations
@@ -32,20 +39,16 @@ FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
     "Suzuki": "suzuki_miyaura",
     "Suzuki-Miyaura": "suzuki_miyaura",
     "Sonogashira_CC": "sonogashira",
-    "Sonogashira": "sonogashira",
     "Sonogashira_coupling": "sonogashira",
     "Heck": "heck",
     "HeckMizoroki_coupling": "heck",
-    "Stille_coupling": "suzuki_miyaura",
-    "Negishi_coupling": "suzuki_miyaura",
-    "Kumada_coupling": "suzuki_miyaura",
-    "Hiyama_coupling": "suzuki_miyaura",
+    # Note: Stille, Negishi, Kumada, Hiyama are distinct reactions defined in taxonomy
+    # They should NOT map to suzuki_miyaura - each uses different organometallic reagents
+    "Stille_coupling": "Stille",
+    "Negishi_coupling": "Negishi",
+    "Kumada_coupling": "Kumada",
+    "Hiyama_coupling": "Hiyama",
     "Miyaura_borylation": "suzuki_miyaura",
-    "Stille": "suzuki_miyaura",
-    "Negishi": "suzuki_miyaura",
-    "Kumada": "suzuki_miyaura",
-    "Hiyama": "suzuki_miyaura",
-    "Miyaura": "suzuki_miyaura",
     "Olefin_metathesis": "ring_closing_metathesis",
     "RCM": "ring_closing_metathesis",
     
@@ -122,15 +125,17 @@ FAMILY_ALIAS_OVERRIDES: Dict[str, str] = {
 }
 
 CN_FAMILIES_CANONICAL: Set[str] = {"c_n_cross_coupling", "snar_cn"}
-CO_FAMILIES_CANONICAL: Set[str] = set()
-CS_FAMILIES_CANONICAL: Set[str] = set()
+CO_FAMILIES_CANONICAL: Set[str] = {"c_o_coupling"}
+CS_FAMILIES_CANONICAL: Set[str] = {"c_s_coupling"}
 AMIDE_FAMILIES_CANONICAL: Set[str] = {"amide_coupling"}
-SONOGASHIRA_FAMILIES_CANONICAL: Set[str] = {"sonogashira"}
-SUZUKI_FAMILIES_CANONICAL: Set[str] = {"suzuki_miyaura"}
-NEGISHI_FAMILIES_CANONICAL: Set[str] = set()
-STILLE_FAMILIES_CANONICAL: Set[str] = set()
-HECK_FAMILIES_CANONICAL: Set[str] = {"heck"}
-RCM_FAMILIES_CANONICAL: Set[str] = set()
+SONOGASHIRA_FAMILIES_CANONICAL: Set[str] = {"sonogashira", "Sonogashira"}
+SUZUKI_FAMILIES_CANONICAL: Set[str] = {"suzuki_miyaura", "Suzuki_miyaura"}
+NEGISHI_FAMILIES_CANONICAL: Set[str] = {"Negishi"}
+STILLE_FAMILIES_CANONICAL: Set[str] = {"Stille"}
+KUMADA_FAMILIES_CANONICAL: Set[str] = {"Kumada"}
+HIYAMA_FAMILIES_CANONICAL: Set[str] = {"Hiyama"}
+HECK_FAMILIES_CANONICAL: Set[str] = {"heck", "Heck"}
+RCM_FAMILIES_CANONICAL: Set[str] = {"ring_closing_metathesis"}
 ULLMANN_SPECIFIC_CANONICAL: Set[str] = set()
 BUCHWALD_SPECIFIC_CANONICAL: Set[str] = set()
 
@@ -207,6 +212,8 @@ __all__ = [
     "SUZUKI_FAMILIES_CANONICAL",
     "NEGISHI_FAMILIES_CANONICAL",
     "STILLE_FAMILIES_CANONICAL",
+    "KUMADA_FAMILIES_CANONICAL",
+    "HIYAMA_FAMILIES_CANONICAL",
     "HECK_FAMILIES_CANONICAL",
     "RCM_FAMILIES_CANONICAL",
     "ULLMANN_SPECIFIC_CANONICAL",

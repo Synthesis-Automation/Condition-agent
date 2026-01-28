@@ -33,99 +33,15 @@ REACTION_TYPES_FILE = _reaction_catalog.REACTION_TYPES_FILE
 def _get_calculable() -> Any:
     """Lazy import of the calculable module to avoid circular imports."""
     from .. import calculable as _calc
+
     return _calc
 
 
-# Manual overrides sourced from the original z-score pipeline.
-CSV_REACTANT_OVERRIDES: Dict[str, str] = {
-    "ArBr": "Ar-Br",
-    "ArCl": "Ar-Cl",
-    "ArI": "Ar-I",
-    "ArF": "Ar-F",
-    "ArOH": "Ar-OH",
-    "ArOSO2R": "Ar-OTs",
-    "Alkyl-Br": "R-Br",
-    "Alkyl-Cl": "R-Cl",
-    "Alkyl-I": "R-I",
-    "Alkyl-OSO2R": "R-OSO2R",
-    "alkene-Br": "Vinyl-Br",
-    "alkene-I": "Vinyl-I",
-    "ArB(OR)2": "Ar-B(OR)2",
-    "ArB(OH)2": "Ar-B(OH)2",
-    "ArBF3K": "Ar-BF3K",
-    "RNH2 a-branch": "Any-NH2",
-    "RNH2": "Any-NH2",
-    "R2NH a-branch": "Any-NHR",
-    "R2NH": "Any-NHR",
-    "ArNH2": "Ar-NH2",
-    "ArNHR": "Ar-NHR",
-    "Ar2NH": "Ar-NHAr",
-    "arom. NH": "AromN-H",
-    "alkeneB(OR)2": "Vinyl-B(OR)2",
-    "Alkyl-B(OH)2": "R-B(OH)2",
-    "Alkyl-B(OR)2": "Any-B(OR)2",
-    "Alkyl-BF3K": "R-BF3K",
-    "Alkyl-OH a-branch": "R2CH-OH",
-    "Alkyl-OH primary": "RCH2-OH",
-    "Lactam": "Any-Lactam",
-    "RCONH2": "Any-CONHR",
-    "ROC(O)NR2": "Any-Carbamate",
-    "Urea": "Any-Urea",
-    "Alkyl-M": "R-M",
-    "Alkyl-H acidic": "R-H-acidic",
-    "Alkyl-H": "R-H",
-    "alkene": "Any-Alkene",
-    "alkyne": "Any-Alkyne",
-    "Ar-H": "Ar-H",
-    "enolether": "Any-EnolEther",
-    "RSH": "Any-SH",
-    "RCO2H or M": "Any-CO2H",
-}
-
-CSV_REACTION_OVERRIDES: Dict[str, str] = {
-    "Buchwald-Hartwig": "Buchwald-Hartwig",
-    "Suzuki-Miyaura": "Suzuki-Miyaura",
-    "Suzuki-Miyaura, in situ": "Suzuki-Miyaura-in-situ",
-    "Arylation, acidic C-H": "Arylation-acidic-C-H",
-    "Amide coupling": "Amide-coupling",
-    "CN-Coupling": "CN-Coupling",
-    "CO-Coupling": "CO-Coupling",
-    "Condensation": "Condensation",
-    "CH-Activation": "CH-Activation",
-    "Negishi, in-situ": "Negishi-in-situ",
-    "Cyclization": "Cyclization",
-    "Borylation, Miyaura": "Borylation-Miyaura",
-    "Alkylation": "Alkylation",
-    "Deprotection": "Deprotection",
-    "Negishi": "Negishi",
-    "Heck": "Heck",
-    "CC-Coupling": "CC-Coupling",
-    "SNAr": "SNAr",
-    "Hydrolysis": "Hydrolysis",
-    "Salt formation": "Salt-formation",
-    "Sonogashira": "Sonogashira",
-    "Stetter": "Stetter",
-    "Cyanation": "Cyanation",
-    "Oxidation": "Oxidation",
-    "Activation": "Activation",
-    "Hydrodehalogenation": "Hydrodehalogenation",
-    "Glycosidation": "Glycosidation",
-    "Stannylation": "Stannylation",
-    "Dehydration": "Dehydration",
-    "Dimerization, reductive": "Dimerization-reductive",
-    "Mitsunobu": "Mitsunobu",
-    "CS-Coupling": "CS-Coupling",
-    "Borylation, C-H": "Borylation-C-H",
-    "Wittig": "Wittig",
-    "Sandmeyer": "Sandmeyer",
-    "Addition": "Addition",
-    "Hydration": "Hydration",
-    "Reduction": "Reduction",
-    "Deoxyfluorination": "Deoxyfluorination",
-    "Chlorination": "Halogenation-Chlorination",
-    "Fluorination, oxidative": "Fluorination-oxidative",
-    "Protection": "Protection",
-}
+# Note: Legacy CSV_REACTANT_OVERRIDES and CSV_REACTION_OVERRIDES removed.
+# All aliases should be defined in taxonomy JSON files:
+#   - Reactant aliases: chemtools/taxonomy/data/organic_compounds.v*.json
+#   - Reaction aliases: chemtools/taxonomy/data/reaction_types.v*.json
+# This ensures single source of truth and taxonomy-driven design.
 
 
 @dataclass(frozen=True)
@@ -299,7 +215,7 @@ def clear_reactant_type_cache() -> None:
 
 @lru_cache(maxsize=None)
 def _reactant_alias_index() -> Dict[str, str]:
-    """Build a lookup of aliases → canonical category IDs."""
+    """Build a lookup of aliases → canonical category IDs from taxonomy only."""
     definitions = _load_reactant_types_raw()
     alias_map: Dict[str, str] = {}
     for category, data in definitions.items():
@@ -312,7 +228,7 @@ def _reactant_alias_index() -> Dict[str, str]:
                 alias_map[member_id.lower()] = category
             for alias in member.get("aliases", []):
                 alias_map[alias.lower()] = category
-    alias_map.update({k.lower(): v for k, v in CSV_REACTANT_OVERRIDES.items()})
+    # Note: All aliases now sourced from taxonomy JSON files only
     return alias_map
 
 
@@ -355,14 +271,14 @@ def iter_reactant_matches(
 ) -> List[ReactantMatch]:
     """
     Return all SMARTS matches for ``smiles``.
-    
+
     Now uses the unified feature system for detection, returning all matching
     reactant types as ReactantMatch objects.
-    
+
     Args:
         smiles: SMILES string to analyze
         reactant_types: Deprecated, no longer used (for backward compatibility only)
-    
+
     Returns:
         List of ReactantMatch objects for all detected reactant types
     """
@@ -373,7 +289,7 @@ def iter_reactant_matches(
             DeprecationWarning,
             stacklevel=2,
         )
-    
+
     smiles = (smiles or "").strip()
     if not smiles:
         return []
@@ -383,34 +299,34 @@ def iter_reactant_matches(
     reactant_features = _calc.get_reactant_type_features(smiles)
     if not reactant_features:
         return []
-    
+
     matches: List[ReactantMatch] = []
-    
+
     # Get all detected member types
     member_types = reactant_features.get("member_types", [])
     categories = reactant_features.get("categories", [])
-    
+
     # Load feature specs to get metadata
     spec = _calc._load_feature_spec()
     features_by_token = {f["token"]: f for f in spec.get("features", [])}
-    
+
     # Build matches from detected member-level features
     for member_id in member_types:
         token = f"{member_id}_reactant"
         if not reactant_features.get(token, False):
             continue
-        
+
         feature_spec = features_by_token.get(token, {})
         metadata = feature_spec.get("metadata", {})
-        
+
         # Extract SMARTS pattern
         detect = feature_spec.get("detect", {})
         smarts_patterns = detect.get("smarts_any", [])
         smarts = smarts_patterns[0] if smarts_patterns else ""
-        
+
         category = metadata.get("reactant_category", "")
         priority = metadata.get("priority", 1)
-        
+
         matches.append(
             ReactantMatch(
                 category=category,
@@ -424,10 +340,10 @@ def iter_reactant_matches(
                 is_general=priority < 2,  # Heuristic: priority 1 is general
             )
         )
-    
+
     # Sort by (priority descending, member id for determinism)
     matches.sort(key=lambda m: (-m.specificity, m.member_type))
-    
+
     return matches
 
 
@@ -436,15 +352,15 @@ def classify_reactant_smiles(
 ) -> Optional[ReactantMatch]:
     """
     Return the most specific SMARTS match for the SMILES input.
-    
+
     Now delegates to the unified feature system (chemtools.featurizers.calculable)
     for reactant detection, but maintains backward compatibility by returning
     a ReactantMatch with the expected structure.
-    
+
     Args:
         smiles: SMILES string to classify
         reactant_types: Deprecated, no longer used (for backward compatibility only)
-    
+
     Returns:
         ReactantMatch with category, member_type, name, etc., or None if no match
     """
@@ -455,13 +371,13 @@ def classify_reactant_smiles(
             DeprecationWarning,
             stacklevel=2,
         )
-    
+
     # Use the unified feature system
     _calc = _get_calculable()
     result = _calc.classify_reactant_smiles(smiles)
     if result is None:
         return None
-    
+
     # Convert to ReactantMatch structure expected by this module
     return ReactantMatch(
         category=result.get("category", ""),
@@ -550,13 +466,19 @@ def get_reactant_category_matches(
 
     for category_id, entry in index.get("categories", {}).items():
         token = entry.get("token")
-        if token and reactant_features.get(token, False) and category_id not in priorities:
+        if (
+            token
+            and reactant_features.get(token, False)
+            and category_id not in priorities
+        ):
             priorities[category_id] = 0
 
     if not priorities:
         return sorted(categories)
 
-    return [cid for cid, _ in sorted(priorities.items(), key=lambda kv: (-kv[1], kv[0]))]
+    return [
+        cid for cid, _ in sorted(priorities.items(), key=lambda kv: (-kv[1], kv[0]))
+    ]
 
 
 def get_all_reactant_matches(
@@ -719,8 +641,6 @@ def required_reactant_categories(reaction_id: str) -> Optional[Dict[str, List[st
 
 __all__ = [
     "ReactantMatch",
-    "CSV_REACTANT_OVERRIDES",
-    "CSV_REACTION_OVERRIDES",
     "get_reactant_type_definitions",
     "get_reactant_types_file",
     "clear_reactant_type_cache",

@@ -1,12 +1,15 @@
 """
 Context-aware reactant classification using reaction type information.
 
-This module provides a two-pass approach for identifying reactants:
+This module provides a taxonomy-driven two-pass approach for identifying reactants:
 1. Pass 1: Detect reaction type from reaction SMILES (or accept user-provided type)
 2. Pass 2: Classify reactants with knowledge of expected functional groups for that reaction
 
 This solves the multi-functional group problem where a molecule like Brc1ccc(N)cc1
 contains both ArBr and ArNH2 - we can determine which is reactive based on reaction context.
+
+All reactant roles (electrophile, nucleophile, coupling_partner, etc.) are defined in
+the taxonomy (chemtools/taxonomy/data/reaction_types.v*.json), not hardcoded.
 """
 
 from __future__ import annotations
@@ -16,7 +19,6 @@ from typing import Any, Dict, List, Optional
 
 from .reactants import ReactantMatch, iter_reactant_matches
 from .smiles import normalize_reaction
-from ._registry import get_registry
 from ...reaction_type_detection import detect_reaction  # New unified API
 
 
@@ -74,62 +76,45 @@ class ReactionClassification:
 
 def _infer_reactant_role(reactant_type_id: str, reaction_type: str) -> Optional[str]:
     """
-    Infer likely role of a reactant type in a given reaction.
+    Infer likely role of a reactant type in a given reaction using taxonomy.
     
-    This is a heuristic based on common reaction patterns.
+    This queries the reaction_types taxonomy to determine if the reactant_type_id
+    matches any of the defined role slots (electrophile, nucleophile, etc.).
+    
+    Args:
+        reactant_type_id: Reactant category ID (e.g., "Ar-Br", "Ar-B(OR)2")
+        reaction_type: Reaction type ID (e.g., "suzuki_miyaura", "c_n_cross_coupling")
+    
+    Returns:
+        Role string like "electrophile", "nucleophile", "coupling_partner", or None
     """
-    # Common electrophile patterns
-    if reactant_type_id in {
-        "ArX*", "Alkyl-X", "VinylX*", "HetAr-X", "Allylic-X", "Benzylic-X",
-        "Ar-X", "Ar-Br", "Ar-Cl", "Ar-I", "Ar-F",
-        "R-X", "R-Br", "R-Cl", "R-I", "R-F",
-        "Vinyl-X", "Vinyl-Br", "Vinyl-Cl", "Vinyl-I",
-        "HetAr-X", "HetAr-Br", "HetAr-Cl", "HetAr-I",
-        "Allyl-X", "Allyl-Br", "Allyl-Cl", "Allyl-I",
-        "Bn-X", "Bn-Br", "Bn-Cl", "Bn-I",
-        "Propargyl-X", "Propargyl-Br", "Propargyl-Cl", "Propargyl-I", "Propargyl-OTf", "Propargyl-Sulfonate",
-        "Alkynyl-X", "Alkynyl-Br", "Alkynyl-Cl", "Alkynyl-I", "Alkynyl-OTf", "Alkynyl-Sulfonate",
-        "Csp2-X", "Csp2-Sulfonate", "Any-Sulfonate", "Ar-OTf", "Ar-OTs", "Ar-OMs",
-        "R-OTf", "R-OTs", "R-OMs"
-    }:
-        return "electrophile"
+    from ...taxonomy import reaction_catalog
     
-    # Common nucleophile patterns
-    if reactant_type_id in {
-        "RNH2/R2NH", "ArNH2/Ar2NH", "ROH", "ArOH", "RSH",
-        "Any-NH2", "Any-NHR", "Ar-NH2", "Ar-NHR", "Ar-NHAr", "AromN-H",
-        "R-OH", "Ar-OH", "R2CH-OH", "RCH2-OH", "Any-SH",
-        "Bn-NH2", "Bn-NHR", "Allyl-NH2", "Allyl-NHR", "Propargyl-NH2", "Propargyl-NHR",
-        "Bn-OH", "Allyl-OH", "Propargyl-OH"
-    }:
-        return "nucleophile"
+    # Load reaction catalog
+    definitions, _ = reaction_catalog.load_reaction_catalog()
     
-    # Organometallic coupling partners
-    if reactant_type_id in {
-        "ArB*", "RB*", "RMgX", "RZnX", "RLi", "R-M",
-        "Ar-B(OH)2", "Ar-B(OR)2", "R-B(OH)2", "R-B(OR)2", "Ar-BF3K", "R-BF3K",
-        "Vinyl-B(OR)2", "R-MgX", "R-ZnX", "R-Li", "R-M", "Ar-MgX", "Ar-ZnX", "Ar-Li", "Ar-M"
-    }:
-        return "coupling_partner"
+    # Normalize reaction type (try exact match, then case-insensitive)
+    reaction_def = definitions.get(reaction_type)
+    if not reaction_def:
+        # Try case-insensitive lookup
+        for rxn_id, rxn in definitions.items():
+            if rxn_id.lower() == reaction_type.lower():
+                reaction_def = rxn
+                break
     
-    # Carbonyl compounds (often electrophiles or undergo addition)
-    if reactant_type_id in {
-        "Aldehyde", "Ketone", "Any-Aldehyde", "Any-Ketone",
-        "Any-CO2H", "Ar-CO2H", "R-CO2H", "Any-Ester", "Ar-Ester", "Any-CHO", "Any-CO-R"
-    }:
-        return "electrophile"
+    if not reaction_def:
+        return None
     
-    # Alkenes (Heck, metathesis, addition)
-    if reactant_type_id in {"Alkene", "Any-Alkene"}:
-        if "heck" in reaction_type.lower():
-            return "coupling_partner"
-        return "substrate"
+    # reaction_def.reactants is a dict: {"electrophile": SlotRequirement, "nucleophile": SlotRequirement, ...}
+    # Each SlotRequirement has .allowed = list of reactant type IDs
+    if not isinstance(reaction_def.reactants, dict):
+        return None
     
-    # Alkynes (Sonogashira)
-    if reactant_type_id in {"Alkyne", "Any-Alkyne"}:
-        if "sonogashira" in reaction_type.lower():
-            return "coupling_partner"
-        return "substrate"
+    # Check each role slot to see if our reactant_type_id is in the allowed list
+    for role, slot_req in reaction_def.reactants.items():
+        if hasattr(slot_req, 'allowed'):
+            if reactant_type_id in slot_req.allowed:
+                return role
     
     return None
 
@@ -201,21 +186,27 @@ def classify_reactants_with_context(
         detection_method = "none"
         confidence = 0.0
     
-    # Step 3: Get expected reactant types for this reaction
-    registry = get_registry()
-    expected_types: List[Dict[str, Any]] = []
+    # Step 3: Get expected reactant types for this reaction from taxonomy
+    from ...taxonomy import reaction_catalog
     
-    if registry and reaction_type != "Unknown":
-        reaction_def = registry.reaction_types.get(reaction_type)
-        if reaction_def:
-            expected_types = [
-                {
-                    "reactant_type_id": r.reactant_type_id,
-                    "notes": r.notes,
-                    "tokens": r.original_tokens
-                }
-                for r in reaction_def.reactants
-            ]
+    expected_types: List[str] = []  # List of allowed reactant type IDs
+    
+    if reaction_type != "Unknown":
+        definitions, _ = reaction_catalog.load_reaction_catalog()
+        
+        # Try exact match, then case-insensitive
+        reaction_def = definitions.get(reaction_type)
+        if not reaction_def:
+            for rxn_id, rxn in definitions.items():
+                if rxn_id.lower() == reaction_type.lower():
+                    reaction_def = rxn
+                    break
+        
+        if reaction_def and isinstance(reaction_def.reactants, dict):
+            # Collect all allowed reactant types from all roles
+            for role, slot_req in reaction_def.reactants.items():
+                if hasattr(slot_req, 'allowed'):
+                    expected_types.extend(slot_req.allowed)
     
     # Step 4: Classify each reactant with context
     contextual_reactants: List[ContextualReactantMatch] = []
@@ -239,20 +230,14 @@ def classify_reactants_with_context(
         alternatives = []
         
         if expected_types:
-            # Match against expected reactant types
-            for expected in expected_types:
-                expected_id = expected["reactant_type_id"]
-                
-                for match in all_matches:
-                    if match.category == expected_id:
-                        best_match = match
-                        is_expected = True
-                        role = _infer_reactant_role(expected_id, reaction_type)
-                        # Collect other matches as alternatives
-                        alternatives = [m for m in all_matches if m != best_match]
-                        break
-                
-                if best_match:
+            # Match against expected reactant types from taxonomy
+            for match in all_matches:
+                if match.category in expected_types:
+                    best_match = match
+                    is_expected = True
+                    role = _infer_reactant_role(match.category, reaction_type)
+                    # Collect other matches as alternatives
+                    alternatives = [m for m in all_matches if m != best_match]
                     break
         
         # Fallback: use most specific match

@@ -492,7 +492,28 @@
       ],
       "aliases": [
         "snar_cn"
-      ]
+      ],
+      "metadata": {
+        "feasibility": {
+          "electronic_activation": {
+            "description": "SNAr requires electron-withdrawing groups to activate the aromatic ring",
+            "thresholds": {
+              "neutral_score": 5.0,
+              "minimum_activation": 6.0,
+              "high_activation": 7.0
+            },
+            "interpretation": {
+              "below_6.0": "Ring is likely too electron-rich for SNAr without strong activation",
+              "6.0_to_7.0": "Ring is moderately activated for SNAr",
+              "above_7.0": "Ring is highly activated for SNAr"
+            }
+          },
+          "electrophile_types": [
+            "Ar-Cl", "Ar-Br", "Ar-I", "Ar-F",
+            "AromN-Cl", "AromN-Br", "AromN-I", "AromN-F"
+          ]
+        }
+      }
     },
     {
       "id": "Amide_formation",

@@ -259,13 +259,4 @@ def confirm_coupling_product_by_attachment(
     return False, "no_substructure_match"
 
 
-def confirm_suzuki_product_by_attachment(
-    reactant_smiles: Iterable[str],
-    product_smiles: Iterable[str],
-) -> Tuple[bool, Optional[str]]:
-    """Backward-compatible wrapper for Suzuki confirmation."""
-    return confirm_coupling_product_by_attachment(
-        reactant_smiles,
-        product_smiles,
-        "Suzuki_miyaura",
-    )
+# Legacy Suzuki-specific function removed - use confirm_coupling_product_by_attachment instead

@@ -9,13 +9,12 @@ from __future__ import annotations
 from typing import Iterable, List, Optional
 
 from chemtools.util.rdkit_helpers import rdkit_available
-from chemtools.smiles import normalize_reaction
 from ...taxonomy.reaction_catalog import load_reaction_catalog
 
 from .models import ReactionMatch, ReactionDetectionResult
 from .bond_changes import detect_reaction_types_by_bond_changes, clear_bond_change_cache
 from .matchers import _detect_motif_profile, detect_motif_ids_from_smiles, match_reaction_definition
-from .coupling import confirm_coupling_product_by_attachment, confirm_suzuki_product_by_attachment, COUPLING_CONFIRMATION_SPECS
+from .coupling import confirm_coupling_product_by_attachment, COUPLING_CONFIRMATION_SPECS
 
 
 # Re-export for backward compatibility
@@ -46,11 +45,15 @@ def detect_reaction_types(
         max_hits_per_compound: Limit motif matches per compound
         use_bond_changes: Try bond change analysis first
         bond_change_threshold: Minimum similarity for bond changes
-        confirm_suzuki_products: Verify Suzuki products by attachment
-        confirm_coupling_products: Verify coupling products by attachment
+        confirm_suzuki_products: Verify Suzuki coupling products by attachment (legacy parameter)
+        confirm_coupling_products: Verify all coupling products by attachment (general approach)
         
     Returns:
         ReactionDetectionResult with ranked matches
+        
+    Note:
+        Product confirmation uses a general coupling validation system that works for
+        Suzuki, Negishi, Stille, Kumada, Hiyama, Sonogashira, C-N, C-O, and C-S couplings.
     """
     if not reaction_smiles:
         return ReactionDetectionResult(matches=[], error="empty_reaction")
@@ -62,6 +65,9 @@ def detect_reaction_types(
         )
         if bond_change_result.matches:
             return bond_change_result
+    
+    # Lazy import to avoid circular dependency
+    from chemtools.smiles import normalize_reaction
     
     normalized = normalize_reaction(reaction_smiles)
     reactants = normalized.get("reactants") or []
@@ -107,11 +113,14 @@ def detect_reaction_types_from_smiles(
         reactant_smiles: List of reactant SMILES
         product_smiles: Optional list of product SMILES
         max_hits_per_compound: Limit motif matches per compound
-        confirm_suzuki_products: Verify Suzuki products by attachment
-        confirm_coupling_products: Verify coupling products by attachment
+        confirm_suzuki_products: Verify Suzuki coupling products (legacy - use confirm_coupling_products)
+        confirm_coupling_products: Verify all coupling products by attachment (general approach)
         
     Returns:
         ReactionDetectionResult with ranked matches
+        
+    Note:
+        Uses a general coupling validation system supporting 9+ coupling reaction types.
     """
     if not rdkit_available():
         return ReactionDetectionResult(matches=[], error="rdkit_unavailable")
@@ -139,19 +148,29 @@ def detect_reaction_types_from_smiles(
     if (confirm_suzuki_products or confirm_coupling_products) and product_smiles is not None:
         confirmed: List[ReactionMatch] = []
         for match in matches:
-            if match.reaction_type == "Suzuki_miyaura" and confirm_suzuki_products:
-                ok, reason = confirm_suzuki_product_by_attachment(reactant_smiles, product_smiles)
-            else:
-                if not confirm_coupling_products or match.reaction_type not in COUPLING_CONFIRMATION_SPECS:
-                    confirmed.append(match)
-                    continue
-                ok, reason = confirm_coupling_product_by_attachment(
-                    reactant_smiles,
-                    product_smiles,
-                    match.reaction_type,
-                )
+            # Skip confirmation if not requested or reaction type not supported
+            if match.reaction_type not in COUPLING_CONFIRMATION_SPECS:
+                confirmed.append(match)
+                continue
+            
+            # Only confirm if explicitly requested for this reaction type
+            should_confirm = (
+                (confirm_suzuki_products and match.reaction_type == "Suzuki_miyaura") or
+                (confirm_coupling_products)
+            )
+            if not should_confirm:
+                confirmed.append(match)
+                continue
+            
+            # Use general coupling confirmation for all reaction types
+            ok, reason = confirm_coupling_product_by_attachment(
+                reactant_smiles,
+                product_smiles,
+                match.reaction_type,
+            )
             if not ok:
                 continue
+            
             slot_evidence = {**match.slot_evidence}
             if reason:
                 slot_evidence["product_confirmation"] = [reason]
