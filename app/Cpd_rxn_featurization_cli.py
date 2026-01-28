@@ -37,13 +37,14 @@ def _format_value(value: Any) -> str:
         if not value:
             return "none"
         if all(isinstance(v, (str, int, float, bool)) for v in value):
-            return ", ".join(str(v) for v in value)
+            # Clean up compound IDs in lists
+            return ", ".join(_clean_compound_id(str(v)) for v in value)
         return json.dumps(value, sort_keys=True)
     if isinstance(value, dict):
         if not value:
             return "none"
         return json.dumps(value, sort_keys=True)
-    return str(value)
+    return _clean_compound_id(str(value))
 
 
 def _format_kv_inline(data: Dict[str, Any]) -> str:
@@ -89,13 +90,21 @@ def _format_summary(data: Dict[str, Any], keys: Iterable[str]) -> str:
     return _format_kv_inline(summary) if summary else "none"
 
 
+def _clean_compound_id(cid: str) -> str:
+    """Clean up double dashes in compound IDs for display."""
+    if isinstance(cid, str):
+        return cid.replace("--", "-")
+    return str(cid)
+
+
 def _format_compound_id(entry: Dict[str, Any]) -> str:
     cid = entry.get("compound_id", "unknown")
+    cid = _clean_compound_id(cid)
     alt_ids = entry.get("alt_compound_ids")
     if alt_ids:
         if isinstance(alt_ids, (set, list)):
             # Use the provided order (pre-sorted by complexity/specificity)
-            all_ids = [cid] + list(alt_ids)
+            all_ids = [cid] + [_clean_compound_id(str(alt)) for alt in alt_ids]
             cid = ", ".join(all_ids)
     if entry.get("undocumented"):
         cid += " [UNDOCUMENTED]"
@@ -310,7 +319,7 @@ def _print_molecule_detail(
     ranked = molecule.get("ranked_motifs") or []
     if ranked:
         print(f"{prefix}Ranked Motifs:")
-        print(_format_list([str(item) for item in ranked], indent=indent + 2))
+        print(_format_list([_clean_compound_id(str(item)) for item in ranked], indent=indent + 2))
     _print_motif_analyses(molecule.get("analyses") or [], indent=indent)
     _print_snar_feasibility(molecule.get("snar_feasibility") or [], indent=indent)
 
@@ -530,7 +539,7 @@ def _print_reaction_summary(
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
     reaction_key = reaction.get("reaction_key")
     if reaction_key:
-        print(f"Reaction Key: {reaction_key}")
+        print(f"Reaction Key: {_clean_compound_id(reaction_key)}")
 
     # normalized = reaction.get("normalized") or {}
     # if normalized:
@@ -567,12 +576,15 @@ def _print_reaction_summary(
         _print_roles_summary(reaction.get("roles") or {})
         _print_agent_roles(reaction.get("agent_roles") or {})
 
-    intramolecular = reaction.get("intramolecular") or {}
+    intramolecular = reaction.get("intramolecular")
     if intramolecular:
         print("Intramolecular:")
-        lines = _format_mapping_lines(intramolecular)
-        if lines:
-            print(_format_list(lines, indent=2))
+        if isinstance(intramolecular, dict):
+            lines = _format_mapping_lines(intramolecular)
+            if lines:
+                print(_format_list(lines, indent=2))
+        else:
+            print(f"  - {intramolecular}")
 
     reactants = reaction.get("reactants") or []
     print(f"Reactants ({len(reactants)}):")
