@@ -24,6 +24,7 @@ from chemtools.featurizers.unified import (
     select_primary_formed_motif,
     detect_reaction_types,
 )
+from chemtools.featurizers.formatters.reaction import featurize_reaction
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
 from chemtools.smiles import normalize
 from chemtools.reagent.lookup import find_reagent
@@ -39,16 +40,30 @@ def cached_featurize(smiles: str):
 
 @lru_cache(maxsize=20000)
 def _detect_reaction_type(reaction_smiles: str) -> str:
+    """
+    Detect reaction type using full featurization pipeline with taxonomy-driven validation.
+    
+    This now uses featurize_reaction() which includes:
+    - Slot-based detection
+    - Product-based validation (taxonomy-driven)
+    - Reacted motif pattern matching
+    
+    This ensures accurate detection (e.g., Suzuki_miyaura instead of Arylation_Ar_H
+    when organoboron + aryl halide → biaryl pattern is present).
+    """
     if not reaction_smiles:
         return ""
     try:
-        detection = detect_reaction_types(reaction_smiles)
+        result = featurize_reaction(reaction_smiles)
+        reaction_type = result.get("reaction_type", {})
+        
+        # Extract reaction type from the result (handles both dict and string formats)
+        if isinstance(reaction_type, dict):
+            return reaction_type.get("reaction_type", "")
+        return str(reaction_type) if reaction_type else ""
+        
     except Exception:
         return ""
-    matches = getattr(detection, "matches", None) or []
-    if not matches:
-        return ""
-    return matches[0].reaction_type or ""
 
 
 CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
