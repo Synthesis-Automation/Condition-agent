@@ -205,14 +205,19 @@ def featurize_reaction(
     
     include_roles = to_bool(options.get("include_roles"), default=True)
     include_agent_roles = to_bool(options.get("include_agent_roles"), default=True)
-    confirm_suzuki_products = to_bool(options.get("confirm_suzuki_products"), default=False)
-    confirm_coupling_products = to_bool(options.get("confirm_coupling_products"), default=False)
+    
+    # General coupling confirmation (supports 9+ coupling reaction types)
+    # Backward compatibility: map old Suzuki-specific parameter to general one
+    confirm_coupling = options.get("confirm_coupling_products")
+    if confirm_coupling is None:
+        # Check for legacy Suzuki-specific parameter
+        confirm_coupling = options.get("confirm_suzuki_products")
+    confirm_coupling_products = to_bool(confirm_coupling, default=True)
 
     # Detect reaction type
     detection = detect_reaction_types(
         reaction_smiles,
         max_hits_per_compound=options.get("max_hits_per_compound"),
-        confirm_suzuki_products=confirm_suzuki_products,
         confirm_coupling_products=confirm_coupling_products,
     )
     detection_payload = detection.to_dict()
