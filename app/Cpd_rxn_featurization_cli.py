@@ -358,6 +358,15 @@ def _print_extended_section(extended: Dict[str, Any], *, indent: int = 0) -> Non
     if role_classification:
         reactant_roles = role_classification.get("reactants")
         if reactant_roles:
+            # Show role classification reaction type (often more accurate than main detection)
+            role_rxn_type = reactant_roles.get("reaction_type")
+            role_conf = reactant_roles.get("confidence")
+            if role_rxn_type:
+                print(f"{prefix}  Role-Based Reaction Type: {role_rxn_type}", end="")
+                if role_conf is not None:
+                    print(f" (confidence: {role_conf:.2f})", end="")
+                print()  # newline
+            
             _print_roles_summary(reactant_roles, indent=indent + 2)
 
 
@@ -427,8 +436,6 @@ def _print_reaction_type_summary(
     prefix = " " * indent
     print(f"{prefix}Reaction Type:")
     lines = []
-    if reaction_key:
-        lines.append(f"reaction_key: {reaction_key}")
     lines.append(f"reaction_type: {reaction_type_str}")
     if confidence is not None:
         lines.append(f"confidence: {confidence:.4f}")
@@ -582,9 +589,46 @@ def _print_reaction_summary(
     print("\nSummary (Reaction)")
     print("-" * 72)
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
+    
+    # Display reaction key with generation breakdown
     reaction_key = reaction.get("reaction_key")
     if reaction_key:
         print(f"Reaction Key: {_clean_compound_id(reaction_key)}")
+        
+        # Explain the reaction key components from aggregates or extended section
+        aggregates = reaction.get("aggregates")
+        if not aggregates:
+            extended = reaction.get("extended", {})
+            aggregates = extended.get("aggregates", {})
+        
+        if aggregates:
+            reacted = aggregates.get("reacted_motifs", [])
+            formed = aggregates.get("formed_motifs", [])
+            spectators = aggregates.get("spectator_motifs", [])
+            
+            print("  Reaction Key Generation:")
+            if reacted:
+                if isinstance(reacted, list):
+                    reacted_str = "|".join(str(m) for m in reacted)
+                else:
+                    reacted_str = str(reacted)
+                print(f"    Reacted motifs: {reacted_str}")
+            
+            if formed:
+                if isinstance(formed, list):
+                    formed_str = ", ".join(str(m) for m in formed)
+                else:
+                    formed_str = str(formed)
+                print(f"    Formed motifs: {formed_str}")
+            
+            if spectators:
+                if isinstance(spectators, list):
+                    spectators_str = ", ".join(str(m) for m in spectators)
+                else:
+                    spectators_str = str(spectators)
+                print(f"    Spectator groups: {spectators_str}")
+            
+            print(f"    Format: [Reacted] -> [Formed] || [Spectators]")
 
     # Core reaction information
     _print_reaction_type_summary(
