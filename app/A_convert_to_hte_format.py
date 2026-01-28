@@ -647,14 +647,14 @@ def process_reaction_dataset(
 
                         current_r_motifs = []
                         for m in motifs:
-                            cid = m.get("compound_id", "")
+                            cid = m.get("id", "")
                             if cid:
                                 current_r_motifs.append(cid)
 
                         context_ids = []
                         context_scaffolds: List[str] = []
                         for m in context_motifs:
-                            cid = m.get("compound_id", "")
+                            cid = m.get("id", "")
                             if cid:
                                 context_ids.append(cid)
                                 context_scaffolds.append(cid)
@@ -680,11 +680,11 @@ def process_reaction_dataset(
                     p_motifs = p_analysis.get("motifs", [])
                     p_context = p_analysis.get("context_motifs", [])
                     for m in p_motifs:
-                        cid = m.get("compound_id", "")
+                        cid = m.get("id", "")
                         if cid:
                             product_motifs.append(cid)
                     for m in p_context:
-                        cid = m.get("compound_id", "")
+                        cid = m.get("id", "")
                         if cid:
                             product_motifs.append(cid)
                 except Exception:
@@ -830,14 +830,14 @@ def process_reaction_dataset(
 
                     current_r_motifs = []
                     for m in motifs:
-                        cid = m.get("compound_id", "")
+                        cid = m.get("id", "")
                         if cid:
                             current_r_motifs.append(cid)
 
                     context_ids = []
                     context_scaffolds: List[str] = []
                     for m in context_motifs:
-                        cid = m.get("compound_id", "")
+                        cid = m.get("id", "")
                         if cid:
                             context_ids.append(cid)
                             context_scaffolds.append(cid)
@@ -863,11 +863,11 @@ def process_reaction_dataset(
                 p_motifs = p_analysis.get("motifs", [])
                 p_context = p_analysis.get("context_motifs", [])
                 for m in p_motifs:
-                    cid = m.get("compound_id", "")
+                    cid = m.get("id", "")
                     if cid:
                         product_motifs.append(cid)
                 for m in p_context:
-                    cid = m.get("compound_id", "")
+                    cid = m.get("id", "")
                     if cid:
                         product_motifs.append(cid)
             except Exception:
