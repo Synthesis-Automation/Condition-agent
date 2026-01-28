@@ -22,7 +22,6 @@ from chemtools.featurizers.unified import (
     format_reaction_key,
     select_primary_reacted_motifs,
     select_primary_formed_motif,
-    detect_reaction_types,
 )
 from chemtools.featurizers.formatters.reaction import featurize_reaction
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
