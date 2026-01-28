@@ -1,0 +1,252 @@
+================================================================================
+FULL PAYLOAD (formatted)
+================================================================================
+{
+  "reaction_smiles": "Ic1ccncc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccncc2)cc1",
+  "reaction_type": "Suzuki_miyaura",
+  "confidence": 0.95,
+  "reaction_key": "Ar-B(OH)2|Ar-I -> Ar-Ar || Pyridine",
+  "reactants": [
+    {
+      "smiles": "Ic1ccncc1",
+      "motifs": [
+        {
+          "id": "Ar-I",
+          "rank": 626.0,
+          "a_atom_idx": 1,
+          "b_atom_idx": 0
+        }
+      ],
+      "properties": {
+        "max_steric": 0.0,
+        "avg_electronic": 6.2
+      },
+      "rdkit": {
+        "mw": 205.0,
+        "logP": 1.7,
+        "tpsa": 12.9
+      },
+      "extended": {
+        "per_motif_analysis": [
+          {
+            "motif_id": "Ar-I",
+            "steric": {
+              "score": 0.0,
+              "classification": "",
+              "description": "no steric"
+            },
+            "electronic": {
+              "score": 6.2,
+              "description": "electron poor"
+            },
+            "nearby_groups": [
+              "Pyridine"
+            ]
+          }
+        ],
+        "context_motifs": [
+          "Pyridine"
+        ],
+        "ranked_motifs": [
+          "Ar-I"
+        ]
+      }
+    },
+    {
+      "smiles": "OB(O)c1ccccc1",
+      "motifs": [
+        {
+          "id": "Ar-B(OH)2",
+          "rank": 646.0,
+          "a_atom_idx": 3,
+          "b_atom_idx": 1
+        }
+      ],
+      "properties": {
+        "max_steric": 0.0,
+        "avg_electronic": 5.0
+      },
+      "rdkit": {
+        "mw": 121.9,
+        "logP": -0.6,
+        "tpsa": 40.5
+      },
+      "extended": {
+        "per_motif_analysis": [
+          {
+            "motif_id": "Ar-B(OH)2",
+            "steric": {
+              "score": 0.0,
+              "classification": "",
+              "description": "no steric"
+            },
+            "electronic": {
+              "score": 5.0,
+              "description": "neutral"
+            }
+          }
+        ],
+        "ranked_motifs": [
+          "Ar-B(OH)2"
+        ]
+      }
+    }
+  ],
+  "products": [
+    {
+      "smiles": "c1ccc(-c2ccncc2)cc1",
+      "motifs": [
+        {
+          "id": "Ar-Ar",
+          "rank": 166.0,
+          "a_atom_idx": 4,
+          "b_atom_idx": 4
+        }
+      ],
+      "properties": {
+        "max_steric": 0.0,
+        "avg_electronic": 6.2
+      },
+      "rdkit": {
+        "mw": 155.2,
+        "logP": 2.7,
+        "tpsa": 12.9
+      },
+      "extended": {
+        "per_motif_analysis": [
+          {
+            "motif_id": "Ar-Ar",
+            "steric": {
+              "score": 0.0,
+              "classification": "",
+              "description": "no steric"
+            },
+            "electronic": {
+              "score": 6.2,
+              "description": "electron poor"
+            },
+            "nearby_groups": [
+              "Pyridine"
+            ]
+          }
+        ],
+        "context_motifs": [
+          "Pyridine"
+        ],
+        "ranked_motifs": [
+          "Ar-Ar"
+        ]
+      }
+    }
+  ],
+  "feasibility": "unknown",
+  "extended": {
+    "detection": {
+      "matches": [
+        {
+          "reaction_type": "Arylation_Ar_H",
+          "name": "Arylation_Ar_H",
+          "category": null,
+          "confidence": 1.0,
+          "matched_slots": 3,
+          "required_slots": 3,
+          "slot_evidence": {
+            "substrate": [
+              "Ar-H"
+            ],
+            "electrophile": [
+              "Ar-I"
+            ],
+            "product:product": [
+              "Ar-Ar"
+            ]
+          }
+        }
+      ],
+      "total_matches": 1,
+      "validation": {
+        "original_detection": "Arylation_Ar_H",
+        "validated_detection": "Suzuki_miyaura",
+        "validation_method": "reacted_motifs_pattern",
+        "validation_reason": "Organoboron + aryl halide \u2192 biaryl pattern",
+        "validation_confidence": 0.95
+      }
+    },
+    "aggregates": {
+      "reactant_count": 2,
+      "motif_ids": [
+        "Ar-B(OH)2",
+        "Ar-I"
+      ],
+      "reacted_motifs": [
+        "Ar-B(OH)2",
+        "Ar-I"
+      ],
+      "formed_motifs": [
+        "Ar-Ar"
+      ],
+      "spectator_motifs": [
+        "Pyridine"
+      ],
+      "spectator_groups_combined": [
+        "Pyridine"
+      ],
+      "spectator_groups_ranked": [
+        "Pyridine"
+      ],
+      "max_aryl_steric": 0.0,
+      "max_alkyl_steric": 0.0,
+      "avg_aryl_electronic": 5.0,
+      "electron_poor_aryl": false
+    },
+    "role_classification": {
+      "reactants": {
+        "reaction_type": "Suzuki_miyaura",
+        "confidence": 1.0,
+        "detection_method": "rule_based",
+        "num_reactants": 1,
+        "has_multi_functional_substrates": false,
+        "reactants": [
+          {
+            "position": 0,
+            "category": "Ar-I",
+            "member_type": "Ar-I",
+            "name": "",
+            "role": "electrophile",
+            "is_expected": true,
+            "has_alternatives": false
+          }
+        ]
+      },
+      "agents": {
+        "entries": [],
+        "agent_count": 0,
+        "role_counts": {},
+        "family_counts": {},
+        "role_flags": {},
+        "flags": {
+          "metal_catalyst": false,
+          "organo_catalyst": false,
+          "enzyme": false,
+          "ligand": false,
+          "base": false,
+          "acid": false,
+          "solvent": false,
+          "additive": false,
+          "oxidant": false,
+          "reductant": false,
+          "condensation_agent": false,
+          "other_reagent": false
+        }
+      }
+    },
+    "intramolecular": true,
+    "normalization_log": {
+      "input": "Ic1ccncc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccncc2)cc1",
+      "normalized": "Ic1ccncc1.OB(O)c1ccccc1>>c1ccc(-c2ccncc2)cc1",
+      "errors": []
+    }
+  },
+  "kind": "reaction",
+  "schema_version": "v2"
+}
