@@ -17,13 +17,13 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # Import chemtools components
-from chemtools.featurizers.structural import featurize_molecule
 from chemtools.featurizers.unified import (
+    featurize_molecule,
     format_reaction_key,
     select_primary_reacted_motifs,
     select_primary_formed_motif,
+    detect_reaction_types,
 )
-from chemtools.featurizers.reaction_detection import detect_reaction_types
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
 from chemtools.smiles import normalize
 from chemtools.reagent.lookup import find_reagent

@@ -18,7 +18,7 @@ from chemtools.util import rdkit_helpers
 from .analysis.reaction_context import classify_reactants_with_context, get_reactant_summary
 from .analysis.feasibility import analyze_snar_feasibility, analyze_molecule_snar_feasibility
 from .molecule import featurize_molecule as _featurize_molecule
-from .reaction_detection import detect_reaction_types
+from .detection import detect_reaction_types
 from .spectator_rank import rank_spectator_groups
 
 
@@ -732,4 +732,5 @@ __all__ = [
     "format_reaction_key",
     "select_primary_reacted_motifs",
     "select_primary_formed_motif",
+    "detect_reaction_types",
 ]

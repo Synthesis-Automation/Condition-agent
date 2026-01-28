@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from .featurizers.reaction_detection import detect_reaction_types
+from .featurizers.detection import detect_reaction_types
 
 
 def _confidence_from_match(matched_slots: int, required_slots: int) -> float:

@@ -1,12 +1,9 @@
 """
-Reactant and reaction type utilities shared across ChemTools and HTE pipelines.
+Reactant and reaction type utilities for ChemTools and HTE pipelines.
 
-This module centralises the SMARTS-driven reactant classification helpers using
-the unified feature detection system (``chemtools.featurizers.calculable``) as
-the single source of truth for reactant identification (organic_compounds).
-
-Note: This module now delegates reactant classification to the unified feature
-system while maintaining backward compatibility with the legacy API.
+This module provides SMARTS-driven reactant classification using
+the unified feature detection system (``chemtools.featurizers.calculable``)
+and organic compound taxonomy.
 """
 
 from __future__ import annotations
@@ -146,53 +143,6 @@ class ReactantMatch:
     is_general: bool
 
 
-def _pick_legacy_alias(entity_type: str, entity_id: str) -> Optional[str]:
-    registry = get_registry()
-    if registry is None:
-        return None
-
-    matches = [
-        record
-        for record in registry.aliases.values()
-        if record.entity_type == entity_type and record.entity_id == entity_id
-    ]
-    if not matches:
-        return None
-
-    if entity_type == "reactant_type":
-        filtered = [
-            record
-            for record in matches
-            if (record.notes or "").lower() not in {"member_id", "member"}
-        ]
-        if filtered:
-            matches = filtered
-
-    def _is_preferred(alias: str) -> bool:
-        if not alias:
-            return False
-        if alias.lower() != alias:
-            return True
-        return any(ch in alias for ch in ("*", "-", " "))
-
-    # Prefer aliases explicitly marked as original/legacy.
-    for record in matches:
-        note = (record.notes or "").lower()
-        if note in {"original_id", "legacy_id"} and record.alias:
-            if record.alias.lower() != entity_id.lower():
-                return record.alias
-
-    for record in matches:
-        if record.alias and record.alias.lower() != entity_id.lower() and _is_preferred(record.alias):
-            return record.alias
-
-    for record in matches:
-        if record.alias:
-            return record.alias
-
-    return None
-
-
 @lru_cache(maxsize=1)
 def _load_reactant_types_raw() -> Dict[str, dict]:
     registry = get_registry()
@@ -201,7 +151,6 @@ def _load_reactant_types_raw() -> Dict[str, dict]:
 
     definitions: Dict[str, dict] = {}
     for reactant_id, reactant in registry.reactant_types.items():
-        legacy_id = _pick_legacy_alias("reactant_type", reactant_id)
         members: List[dict] = []
         for member in reactant.members:
             members.append(
@@ -223,7 +172,6 @@ def _load_reactant_types_raw() -> Dict[str, dict]:
             "aliases": list(reactant.aliases),
             "metadata": copy.deepcopy(reactant.metadata),
             "members": members,
-            "legacy_id": legacy_id,
         }
     return definitions
 
@@ -285,7 +233,6 @@ def _load_reactant_types_from_file(path: Path) -> Dict[str, dict]:
             "aliases": list(entry.get("aliases", [])),
             "metadata": entry_meta,
             "members": members,
-            "legacy_id": entry.get("legacy_id") or entry_id,
         }
 
     return definitions
@@ -325,10 +272,9 @@ def _load_reactant_types_from_compounds(compounds: Iterable[dict]) -> Dict[str, 
                     "name": name,
                     "smarts": smarts,
                     "aliases": aliases,
-                    "metadata": {"legacy_taxonomy_id": compound_id, "group": group},
+                    "metadata": {"taxonomy_id": compound_id, "group": group},
                 }
             ],
-            "legacy_id": compound_id,
         }
 
     return definitions
@@ -357,17 +303,15 @@ def _reactant_alias_index() -> Dict[str, str]:
     definitions = _load_reactant_types_raw()
     alias_map: Dict[str, str] = {}
     for category, data in definitions.items():
-        legacy_category = data.get("legacy_id") or category
-        alias_map[category.lower()] = legacy_category
-        alias_map[legacy_category.lower()] = legacy_category
+        alias_map[category.lower()] = category
         for alias in data.get("aliases", []):
-            alias_map[alias.lower()] = legacy_category
+            alias_map[alias.lower()] = category
         for member in data.get("members", []):
             member_id = member.get("id", "")
             if member_id:
-                alias_map[member_id.lower()] = legacy_category
+                alias_map[member_id.lower()] = category
             for alias in member.get("aliases", []):
-                alias_map[alias.lower()] = legacy_category
+                alias_map[alias.lower()] = category
     alias_map.update({k.lower(): v for k, v in CSV_REACTANT_OVERRIDES.items()})
     return alias_map
 
@@ -389,12 +333,11 @@ def build_reactant_lookup() -> Tuple[Dict[str, str], Dict[str, str]]:
     id_to_category: Dict[str, str] = {}
 
     for category_id, data in definitions.items():
-        legacy_category = data.get("legacy_id") or category_id
         for member in data.get("members", []):
             canonical = member.get("id")
             if not canonical:
                 continue
-            id_to_category[canonical] = legacy_category
+            id_to_category[canonical] = category_id
             alias_map[canonical.lower()] = canonical
             for alias in member.get("aliases", []):
                 if alias:
@@ -564,7 +507,7 @@ def classify_reactant_group(
 def classify_reactant_batch(
     smiles_list: Iterable[str], reactant_types: Optional[Dict[str, dict]] = None
 ) -> List[Optional[ReactantMatch]]:
-    """Batch classification wrapper mirroring the legacy helper."""
+    """Batch classification wrapper for reactant type detection."""
     if reactant_types is not None:
         warnings.warn(
             "The 'reactant_types' parameter is deprecated and will be ignored.",

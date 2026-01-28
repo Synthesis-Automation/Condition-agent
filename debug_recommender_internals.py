@@ -1,7 +1,7 @@
 
 print("Script start")
 from chemtools.recommend.recommender import HTERecommender, PROJECT_ROOT
-from chemtools.featurizers.reaction import featurize_reaction
+from chemtools.featurizers.unified import featurize_reaction
 import pandas as pd
 
 try:

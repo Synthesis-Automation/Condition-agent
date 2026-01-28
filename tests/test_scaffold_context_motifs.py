@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from chemtools.featurizers.molecule import featurize_molecule
+from chemtools.featurizers.unified import featurize_molecule
 from chemtools.util import rdkit_helpers
 
 

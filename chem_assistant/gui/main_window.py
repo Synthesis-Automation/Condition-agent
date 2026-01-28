@@ -35,7 +35,7 @@ from chem_assistant.chemtools_agent import ChemToolsAgent
 from chem_assistant.gui.dialogs import LLMConfigDialog
 from chemtools.visualization import render_molecule_image, render_reaction_image
 from chemtools.util.rdkit_helpers import parse_smiles
-from chemtools.featurizers.reaction_detection import detect_reaction_types
+from chemtools.featurizers.detection import detect_reaction_types
 
 IMAGE_MARKUP = re.compile(
     r"\[\[(reaction|molecule)_image:(.+?)\]\]", re.IGNORECASE | re.DOTALL
@@ -423,7 +423,7 @@ class ChemAssistantWindow(QMainWindow):
             smiles = " ".join(args).strip()
 
         try:
-            from chemtools.featurizers.molecule import featurize_molecule
+            from chemtools.featurizers.unified import featurize_molecule
 
             payload = featurize_molecule(smiles)
             meta = payload.get("meta", {}) if isinstance(payload, dict) else {}

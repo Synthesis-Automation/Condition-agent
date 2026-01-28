@@ -25,8 +25,8 @@ import pandas as pd
 from pathlib import Path
 import json
 
-from chemtools.featurizers.structural import featurize_molecule
 from chemtools.featurizers.unified import (
+    featurize_molecule,
     featurize_reaction,
     format_reaction_key,
     select_primary_reacted_motifs,
