@@ -161,22 +161,12 @@ def _filter_most_specific_analyses(
 
 
 def _get_molecule_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
-    # Handle new core format (v2) - no nested wrapper
-    if payload.get("schema_version") == "v2" and payload.get("kind") == "molecule":
-        return payload
-    # Handle legacy format (v1) - nested under 'molecule' key
-    if "molecule" in payload and isinstance(payload.get("molecule"), dict):
-        return payload["molecule"]
+    """Extract molecule payload (v2 format only)."""
     return payload
 
 
 def _get_reaction_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
-    # Handle new core format (v2) - no nested wrapper
-    if payload.get("schema_version") == "v2" and payload.get("kind") == "reaction":
-        return payload
-    # Handle legacy format (v1) - nested under 'reaction' key
-    if "reaction" in payload and isinstance(payload.get("reaction"), dict):
-        return payload["reaction"]
+    """Extract reaction payload (v2 format only)."""
     return payload
 
 
@@ -209,15 +199,8 @@ def _print_motifs(motifs: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
     lines = []
     for motif in motifs_list:
         # v2 format: {"id": "Ar-Br", "rank": 450, "a_atom_idx": 5}
-        # v1 format: {"compound_id": "Ar-Br", "rank_score": 450, "a_atom_idx": 5}
-        if "id" in motif:
-            # v2 format
-            display_name = _clean_compound_id(motif.get("id", "unknown"))
-            rank = motif.get("rank", 0)
-        else:
-            # v1 format
-            display_name = _format_compound_id(motif)
-            rank = motif.get("rank_score", 0)
+        display_name = _clean_compound_id(motif.get("id", "unknown"))
+        rank = motif.get("rank", 0)
         
         a_idx = motif.get("a_atom_idx")
         b_idx = motif.get("b_atom_idx")

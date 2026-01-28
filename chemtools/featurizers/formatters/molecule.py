@@ -90,14 +90,12 @@ def featurize_molecule(
         options: Featurization options
             - detailed (bool): If True, return extended format with all analysis.
                              If False (default), return simplified core format.
-            - legacy (bool): If True, return old nested format (deprecated).
         
     Returns:
-        Core bundle (6 fields) or extended bundle (6 + extended section)
+        Core bundle (6 fields) or extended bundle (7 fields with extended section)
     """
     options = options or {}
     use_detailed = to_bool(options.get("detailed"), default=False)
-    use_legacy = to_bool(options.get("legacy"), default=False)
     
     # Build full molecule bundle first
     molecule = build_molecule_bundle(
@@ -110,19 +108,6 @@ def featurize_molecule(
     snar_feasibility = analyze_molecule_snar_feasibility(molecule)
     if snar_feasibility:
         molecule["snar_feasibility"] = snar_feasibility
-    
-    # Return legacy format if requested (deprecated)
-    if use_legacy:
-        meta = {
-            "rdkit_available": rdkit_helpers.rdkit_available(),
-            "errors": [molecule.get("meta", {}).get("error")] if molecule.get("meta", {}).get("error") else [],
-        }
-        return {
-            "schema_version": "v1",
-            "kind": "molecule",
-            "molecule": molecule,
-            "meta": meta,
-        }
     
     # Return simplified format (core or extended)
     if use_detailed:
