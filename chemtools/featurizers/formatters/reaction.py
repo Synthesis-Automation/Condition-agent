@@ -20,6 +20,7 @@ from ..analysis.feasibility import analyze_snar_feasibility
 from .molecule import build_molecule_bundle, to_bool
 from .aggregation import aggregate_reaction_features, infer_intramolecular
 from .utils import extract_motif_ids
+from .simplified import build_core_reaction, build_extended_reaction
 
 
 def format_reaction_type_summary(detection: Any) -> Dict[str, Any]:
@@ -187,17 +188,23 @@ def featurize_reaction(
     options: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
-    Return a unified reaction feature bundle.
+    Return a reaction feature bundle (core or extended format).
     
     Args:
         reaction_smiles: Reaction SMILES with >> separator
         registry_paths: Custom taxonomy paths
         options: Featurization options
+            - detailed (bool): If True, return extended format with all analysis.
+                             If False (default), return simplified core format.
+            - legacy (bool): If True, return old nested format (deprecated).
         
     Returns:
-        Complete reaction bundle with detection, roles, aggregates
+        Core bundle (7 fields) or extended bundle (7 + extended section)
     """
     options = options or {}
+    use_detailed = to_bool(options.get("detailed"), default=False)
+    use_legacy = to_bool(options.get("legacy"), default=False)
+    
     include_roles = to_bool(options.get("include_roles"), default=True)
     include_agent_roles = to_bool(options.get("include_agent_roles"), default=True)
     confirm_suzuki_products = to_bool(options.get("confirm_suzuki_products"), default=False)
@@ -325,13 +332,35 @@ def featurize_reaction(
     if rt_id == "snar_cn" or rt_id == "c_n_cross_coupling":
         reaction["feasibility"] = analyze_snar_feasibility(reaction)
 
+    # Return legacy format if requested (deprecated)
+    if use_legacy:
+        meta = {
+            "rdkit_available": rdkit_helpers.rdkit_available(),
+            "errors": [detection_payload.get("error")] if detection_payload.get("error") else [],
+        }
+        return {
+            "schema_version": "v1",
+            "kind": "reaction",
+            "reaction": reaction,
+            "meta": meta,
+        }
+    
+    # Return simplified format (core or extended)
+    if use_detailed:
+        result = build_extended_reaction(reaction)
+    else:
+        result = build_core_reaction(reaction)
+    
+    # Add metadata
+    result["kind"] = "reaction"
+    result["schema_version"] = "v2"
+    
     meta = {
         "rdkit_available": rdkit_helpers.rdkit_available(),
-        "errors": [detection_payload.get("error")] if detection_payload.get("error") else [],
     }
-    return {
-        "schema_version": "v1",
-        "kind": "reaction",
-        "reaction": reaction,
-        "meta": meta,
-    }
+    if detection_payload.get("error"):
+        meta["errors"] = [detection_payload["error"]]
+    if meta.get("errors") or not meta.get("rdkit_available", True):
+        result["meta"] = meta
+    
+    return result

@@ -12,6 +12,7 @@ from typing import Any, Dict, Optional
 from chemtools.util import rdkit_helpers
 from ..molecule import featurize_molecule as _featurize_molecule
 from ..analysis.feasibility import analyze_molecule_snar_feasibility
+from .simplified import build_core_molecule, build_extended_molecule
 
 
 def to_bool(value: Any, *, default: bool) -> bool:
@@ -81,34 +82,64 @@ def featurize_molecule(
     options: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
-    Return a unified molecule feature bundle.
+    Return a molecule feature bundle (core or extended format).
     
     Args:
         smiles: Molecule SMILES string
         registry_paths: Custom taxonomy paths
         options: Featurization options
+            - detailed (bool): If True, return extended format with all analysis.
+                             If False (default), return simplified core format.
+            - legacy (bool): If True, return old nested format (deprecated).
         
     Returns:
-        Complete molecule bundle with schema metadata
+        Core bundle (6 fields) or extended bundle (6 + extended section)
     """
+    options = options or {}
+    use_detailed = to_bool(options.get("detailed"), default=False)
+    use_legacy = to_bool(options.get("legacy"), default=False)
+    
+    # Build full molecule bundle first
     molecule = build_molecule_bundle(
         smiles,
         registry_paths=registry_paths,
         options=options,
     )
-    meta = {
-        "rdkit_available": rdkit_helpers.rdkit_available(),
-        "errors": [molecule.get("meta", {}).get("error")] if molecule.get("meta", {}).get("error") else [],
-    }
-
-    # Add SNAr feasibility check for molecules
+    
+    # Add SNAr feasibility check
     snar_feasibility = analyze_molecule_snar_feasibility(molecule)
     if snar_feasibility:
         molecule["snar_feasibility"] = snar_feasibility
-
-    return {
-        "schema_version": "v1",
-        "kind": "molecule",
-        "molecule": molecule,
-        "meta": meta,
+    
+    # Return legacy format if requested (deprecated)
+    if use_legacy:
+        meta = {
+            "rdkit_available": rdkit_helpers.rdkit_available(),
+            "errors": [molecule.get("meta", {}).get("error")] if molecule.get("meta", {}).get("error") else [],
+        }
+        return {
+            "schema_version": "v1",
+            "kind": "molecule",
+            "molecule": molecule,
+            "meta": meta,
+        }
+    
+    # Return simplified format (core or extended)
+    if use_detailed:
+        result = build_extended_molecule(molecule)
+    else:
+        result = build_core_molecule(molecule)
+    
+    # Add metadata
+    result["kind"] = "molecule"
+    result["schema_version"] = "v2"
+    
+    meta = {
+        "rdkit_available": rdkit_helpers.rdkit_available(),
     }
+    if molecule.get("meta", {}).get("error"):
+        meta["errors"] = [molecule["meta"]["error"]]
+    if meta.get("errors") or not meta.get("rdkit_available", True):
+        result["meta"] = meta
+    
+    return result

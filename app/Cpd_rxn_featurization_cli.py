@@ -161,12 +161,20 @@ def _filter_most_specific_analyses(
 
 
 def _get_molecule_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+    # Handle new core format (v2) - no nested wrapper
+    if payload.get("schema_version") == "v2" and payload.get("kind") == "molecule":
+        return payload
+    # Handle legacy format (v1) - nested under 'molecule' key
     if "molecule" in payload and isinstance(payload.get("molecule"), dict):
         return payload["molecule"]
     return payload
 
 
 def _get_reaction_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+    # Handle new core format (v2) - no nested wrapper
+    if payload.get("schema_version") == "v2" and payload.get("kind") == "reaction":
+        return payload
+    # Handle legacy format (v1) - nested under 'reaction' key
     if "reaction" in payload and isinstance(payload.get("reaction"), dict):
         return payload["reaction"]
     return payload
@@ -200,11 +208,21 @@ def _print_motifs(motifs: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
     print(f"{prefix}Motifs ({len(motifs_list)}):")
     lines = []
     for motif in motifs_list:
-        display_name = _format_compound_id(motif)
+        # v2 format: {"id": "Ar-Br", "rank": 450, "a_atom_idx": 5}
+        # v1 format: {"compound_id": "Ar-Br", "rank_score": 450, "a_atom_idx": 5}
+        if "id" in motif:
+            # v2 format
+            display_name = _clean_compound_id(motif.get("id", "unknown"))
+            rank = motif.get("rank", 0)
+        else:
+            # v1 format
+            display_name = _format_compound_id(motif)
+            rank = motif.get("rank_score", 0)
+        
         a_idx = motif.get("a_atom_idx")
         b_idx = motif.get("b_atom_idx")
         bond = motif.get("bond")
-        rank_score = motif.get("rank_score")
+        
         details = []
         if a_idx is not None:
             details.append(f"a={a_idx}")
@@ -212,8 +230,9 @@ def _print_motifs(motifs: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
             details.append(f"b={b_idx}")
         if bond is not None:
             details.append(f"bond={bond}")
-        if isinstance(rank_score, (int, float)):
-            details.append(f"rank={float(rank_score):.2f}")
+        if isinstance(rank, (int, float)) and rank > 0:
+            details.append(f"rank={float(rank):.2f}")
+        
         if details:
             lines.append(f"{display_name} ({', '.join(details)})")
         else:
