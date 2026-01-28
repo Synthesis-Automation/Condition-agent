@@ -23,7 +23,22 @@
       ],
       "aliases": [
         "suzuki_miyaura"
-      ]
+      ],
+      "metadata": {
+        "coupling_confirmation": {
+          "nucleophile_smarts": [
+            "[B:1](-[O,C:2])(-[O,C])(-[c,C])",
+            "[B:1](-[O,C:2])(-[O,C])(-[c,C])-[c,C]",
+            "[B:1](-[O:2])(-[O])-[c,C]",
+            "[B:1](-[O:2])(-[O])-[c,C]-[c,C]",
+            "[c,C:1]-[B:2](-[O,C])(-[O,C])",
+            "[c,C:1]-[B:2](-[O])(-[O])",
+            "[c,C:1]-[c,C]-[B:2](-[O,C])(-[O,C])",
+            "[c,C:1]-[c,C]-[B:2](-[O])(-[O])"
+          ],
+          "require_distinct_molecules": true
+        }
+      }
     },
     {
       "id": "Miyaura_borylation",
@@ -72,6 +87,13 @@
           "Pd": "Buchwald-Hartwig",
           "Cu": "Ullmann",
           "Ni": "Ni-catalyzed"
+        },
+        "coupling_confirmation": {
+          "nucleophile_smarts": [
+            "[N;H2;$(N-[#6]):1][H:2]",
+            "[N;H1;$(N(-[#6])-[#6]):1][H:2]"
+          ],
+          "require_distinct_molecules": true
         }
       },
       "reactants": {
@@ -130,6 +152,12 @@
           "Pd": "Buchwald-Hartwig",
           "Cu": "Ullmann",
           "Ni": "Ni-catalyzed"
+        },
+        "coupling_confirmation": {
+          "nucleophile_smarts": [
+            "[O;H1;$(O-[#6]):1][H:2]"
+          ],
+          "require_distinct_molecules": true
         }
       }
     },
@@ -190,6 +218,12 @@
           "Pd": "Buchwald-Hartwig",
           "Cu": "Ullmann",
           "Ni": "Ni-catalyzed"
+        },
+        "coupling_confirmation": {
+          "nucleophile_smarts": [
+            "[S;H1;$(S-[#6]):1][H:2]"
+          ],
+          "require_distinct_molecules": true
         }
       }
     },
@@ -213,7 +247,16 @@
       ],
       "aliases": [
         "sonogashira"
-      ]
+      ],
+      "metadata": {
+        "coupling_confirmation": {
+          "nucleophile_smarts": [
+            "[C:1]#[C;H1:2]",
+            "[c:1]-[C:2]#[C;H1]"
+          ],
+          "require_distinct_molecules": true
+        }
+      }
     },
     {
       "id": "Heck",
@@ -259,7 +302,16 @@
       ],
       "aliases": [
         "negishi"
-      ]
+      ],
+      "metadata": {
+        "coupling_confirmation": {
+          "nucleophile_smarts": [
+            "[c,C:1]-[Zn:2]",
+            "[c,C:1]-[c,C]-[Zn:2]"
+          ],
+          "require_distinct_molecules": true
+        }
+      }
     },
     {
       "id": "Stille",
@@ -282,7 +334,16 @@
       ],
       "aliases": [
         "stille"
-      ]
+      ],
+      "metadata": {
+        "coupling_confirmation": {
+          "nucleophile_smarts": [
+            "[c,C:1]-[Sn:2]",
+            "[c,C:1]-[c,C]-[Sn:2]"
+          ],
+          "require_distinct_molecules": true
+        }
+      }
     },
     {
       "id": "Kumada",
@@ -306,7 +367,16 @@
       ],
       "aliases": [
         "kumada"
-      ]
+      ],
+      "metadata": {
+        "coupling_confirmation": {
+          "nucleophile_smarts": [
+            "[c,C:1]-[Mg:2]",
+            "[c,C:1]-[c,C]-[Mg:2]"
+          ],
+          "require_distinct_molecules": true
+        }
+      }
     },
     {
       "id": "Hiyama",
@@ -329,7 +399,16 @@
       ],
       "aliases": [
         "hiyama"
-      ]
+      ],
+      "metadata": {
+        "coupling_confirmation": {
+          "nucleophile_smarts": [
+            "[c,C:1]-[Si:2]",
+            "[c,C:1]-[c,C]-[Si:2]"
+          ],
+          "require_distinct_molecules": true
+        }
+      }
     },
     {
       "id": "Cyanation_coupling",

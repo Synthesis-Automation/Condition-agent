@@ -130,6 +130,9 @@ def analyze_molecule_snar_feasibility(molecule_payload: Dict[str, Any]) -> List[
     """
     Analyze SNAr feasibility for all aryl halides in a molecule.
     """
+    # Load SNAr configuration from taxonomy
+    electrophile_types, thresholds, interpretations = _load_snar_config()
+    
     results = []
     motifs = molecule_payload.get("motifs", [])
     electronics = molecule_payload.get("electronics", {}).get("aryl", [])

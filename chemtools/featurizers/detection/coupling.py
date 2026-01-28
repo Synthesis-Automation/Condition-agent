@@ -2,58 +2,18 @@
 Coupling reaction confirmation by attachment site analysis.
 
 Validates cross-coupling products by connecting reactive sites and matching products.
+All SMARTS patterns are loaded from reaction taxonomy (reaction_types.v4.0.json).
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
-from chemtools.util.rdkit_helpers import rdkit_available
+from chemtools.taxonomy import reaction_catalog
+from chemtools.util.rdkit_helpers import rdkit_available, parse_smiles
 from chemtools.util.smarts_cache import compile_smarts
-from chemtools.util.rdkit_helpers import parse_smiles
-
-
-# SMARTS patterns for common coupling partners
-_ELECTROPHILE_SMARTS = (
-    "[c:1]-[F,Cl,Br,I:2]",
-    "[C;X2,X3:1]-[F,Cl,Br,I:2]",
-    "[c:1]-[O:2]S(=O)(=O)[#6,F]",
-    "[C;X2,X3:1]-[O:2]S(=O)(=O)[#6,F]",
-)
-_BORON_SMARTS = (
-    "[c:1]-[B:2](O)O",
-    "[C;X2,X3:1]-[B:2](O)O",
-    "[c:1]-[B:2](O[#6])O[#6]",
-    "[C;X2,X3:1]-[B:2](O[#6])O[#6]",
-    "[c:1]-[B:2]1OC(C)(C)C(C)(C)O1",
-    "[C;X2,X3:1]-[B:2]1OC(C)(C)C(C)(C)O1",
-    "[c:1]-[B-:2](F)(F)F",
-    "[C;X2,X3:1]-[B-:2](F)(F)F",
-)
-_ORGANOZINC_SMARTS = (
-    "[c:1]-[Zn:2]",
-    "[C;X2,X3:1]-[Zn:2]",
-)
-_ORGANOTIN_SMARTS = (
-    "[c:1]-[Sn:2]",
-    "[C;X2,X3:1]-[Sn:2]",
-)
-_ORGANOMAGNESIUM_SMARTS = (
-    "[c:1]-[Mg:2]",
-    "[C;X2,X3:1]-[Mg:2]",
-)
-_ORGANOSILICON_SMARTS = (
-    "[c:1]-[Si:2]",
-    "[C;X2,X3:1]-[Si:2]",
-)
-_AMINE_NH_SMARTS = (
-    "[N:1]",
-    "[n:1]",
-)
-_ALCOHOL_OH_SMARTS = ("[O:1;H1;!$(O-[C,S,P]=O)]",)
-_THIOL_SH_SMARTS = ("[S:1;H1;!$(S-[C,S,P]=O)]",)
-_TERMINAL_ALKYNE_SMARTS = ("[C:1]#[CH]", "[C:1]#[CH1]")
 
 
 @dataclass(frozen=True)
@@ -64,18 +24,83 @@ class CouplingConfirmationSpec:
     require_distinct_molecules: bool = True
 
 
-# Registry of coupling reaction confirmation specs
-COUPLING_CONFIRMATION_SPECS: Dict[str, CouplingConfirmationSpec] = {
-    "Suzuki_miyaura": CouplingConfirmationSpec(_ELECTROPHILE_SMARTS, _BORON_SMARTS),
-    "Negishi": CouplingConfirmationSpec(_ELECTROPHILE_SMARTS, _ORGANOZINC_SMARTS),
-    "Stille": CouplingConfirmationSpec(_ELECTROPHILE_SMARTS, _ORGANOTIN_SMARTS),
-    "Kumada": CouplingConfirmationSpec(_ELECTROPHILE_SMARTS, _ORGANOMAGNESIUM_SMARTS),
-    "Hiyama": CouplingConfirmationSpec(_ELECTROPHILE_SMARTS, _ORGANOSILICON_SMARTS),
-    "Sonogashira": CouplingConfirmationSpec(_ELECTROPHILE_SMARTS, _TERMINAL_ALKYNE_SMARTS),
-    "C_N_Coupling": CouplingConfirmationSpec(_ELECTROPHILE_SMARTS, _AMINE_NH_SMARTS),
-    "C_O_Coupling": CouplingConfirmationSpec(_ELECTROPHILE_SMARTS, _ALCOHOL_OH_SMARTS),
-    "C_S_Coupling": CouplingConfirmationSpec(_ELECTROPHILE_SMARTS, _THIOL_SH_SMARTS),
-}
+@lru_cache(maxsize=1)
+def _load_coupling_specs_from_taxonomy() -> Dict[str, CouplingConfirmationSpec]:
+    """Load coupling confirmation specs from reaction taxonomy.
+    
+    Reads SMARTS patterns for electrophiles and nucleophiles from each
+    coupling reaction's metadata in reaction_types.v4.0.json.
+    
+    Returns:
+        Dictionary mapping reaction_type -> CouplingConfirmationSpec
+    """
+    catalog = reaction_catalog.load_reaction_catalog()
+    reaction_types = catalog.get("reaction_types", [])
+    
+    specs: Dict[str, CouplingConfirmationSpec] = {}
+    
+    # Default electrophile patterns (used as fallback if not specified)
+    default_electrophile_smarts = (
+        "[c:1]-[F,Cl,Br,I:2]",
+        "[C;X2,X3:1]-[F,Cl,Br,I:2]",
+        "[c:1]-[O:2]S(=O)(=O)[#6,F]",
+        "[C;X2,X3:1]-[O:2]S(=O)(=O)[#6,F]",
+    )
+    
+    for rxn_data in reaction_types:
+        if not isinstance(rxn_data, dict):
+            continue
+        
+        rxn_id = rxn_data.get("id")
+        if not rxn_id:
+            continue
+            
+        metadata = rxn_data.get("metadata", {})
+        coupling_config = metadata.get("coupling_confirmation")
+        
+        if not coupling_config or not isinstance(coupling_config, dict):
+            continue
+            
+        # Extract patterns from taxonomy
+        electrophile_patterns = coupling_config.get("electrophile_smarts")
+        nucleophile_patterns = coupling_config.get("nucleophile_smarts")
+        
+        if not nucleophile_patterns:
+            continue
+            
+        # Use default electrophiles if not specified
+        if not electrophile_patterns:
+            electrophile_patterns = default_electrophile_smarts
+            
+        # Convert to tuples
+        if isinstance(electrophile_patterns, list):
+            electrophile_patterns = tuple(electrophile_patterns)
+        elif isinstance(electrophile_patterns, str):
+            electrophile_patterns = (electrophile_patterns,)
+            
+        if isinstance(nucleophile_patterns, list):
+            nucleophile_patterns = tuple(nucleophile_patterns)
+        elif isinstance(nucleophile_patterns, str):
+            nucleophile_patterns = (nucleophile_patterns,)
+            
+        require_distinct = coupling_config.get("require_distinct_molecules", True)
+        
+        specs[rxn_id] = CouplingConfirmationSpec(
+            electrophile_smarts=electrophile_patterns,
+            nucleophile_smarts=nucleophile_patterns,
+            require_distinct_molecules=require_distinct,
+        )
+    
+    return specs
+
+
+def get_coupling_confirmation_specs() -> Dict[str, CouplingConfirmationSpec]:
+    """Get all coupling confirmation specs from taxonomy (cached).
+    
+    Returns:
+        Dictionary mapping reaction_type -> CouplingConfirmationSpec
+    """
+    return _load_coupling_specs_from_taxonomy()
 
 
 def _compile_mapped_patterns(smarts_list: Iterable[str]) -> List[Tuple[Any, int, Optional[int]]]:
@@ -198,11 +223,26 @@ def confirm_coupling_product_by_attachment(
     product_smiles: Iterable[str],
     reaction_type: str,
 ) -> Tuple[bool, Optional[str]]:
-    """Confirm a coupling product by connecting attachment-point atoms and matching products."""
+    """Confirm a coupling product by connecting attachment-point atoms and matching products.
+    
+    Uses SMARTS patterns loaded from reaction taxonomy to identify electrophile
+    and nucleophile attachment sites, then builds a candidate product and checks
+    if it matches the actual product.
+    
+    Args:
+        reactant_smiles: SMILES strings of reactants
+        product_smiles: SMILES strings of products
+        reaction_type: Reaction type identifier (e.g., "Suzuki_miyaura", "C_N_Coupling")
+        
+    Returns:
+        Tuple of (success: bool, reason: str)
+    """
     if not rdkit_available():
         return False, "rdkit_unavailable"
 
-    spec = COUPLING_CONFIRMATION_SPECS.get(reaction_type)
+    # Load coupling specs from taxonomy
+    specs = get_coupling_confirmation_specs()
+    spec = specs.get(reaction_type)
     if spec is None:
         return False, "unsupported_reaction"
 
