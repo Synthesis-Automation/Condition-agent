@@ -290,16 +290,14 @@ def featurize_reaction(
         # Collect full motif dicts for fingerprint-aware comparison
         product_motifs_full.extend(bundle.get("motifs", []))
 
-    # Get initial reaction type for pattern-based filtering
-    initial_reaction_type = reaction_type.get("reaction_type") if isinstance(reaction_type, dict) else None
-    
-    # Aggregate features with reaction type for pattern-based motif filtering
-    # Pass product_motifs (full dicts) for fingerprint-aware comparison
+    # Aggregate features without pattern-based filtering
+    # Pattern filtering is skipped to avoid removing reacted motifs based on incorrect initial detection
+    # The validation step will correct the detection using unfiltered reacted motifs
     aggregates = aggregate_reaction_features(
         reactant_bundles,
         product_motif_ids=product_motif_ids,
         product_motifs=product_motifs_full,
-        reaction_type=initial_reaction_type,
+        reaction_type=None,  # Disable pattern-based filtering
     )
     
     # Validate detection using reacted motifs patterns

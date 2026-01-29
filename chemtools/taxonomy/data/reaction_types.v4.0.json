@@ -161,7 +161,11 @@
       "id": "Chan_Lam_C_N_Coupling",
       "reactants": {
         "electrophile": "@organoboron",
-        "nucleophile": "@amines_nh"
+        "nucleophile": [
+          "@amines_nh",
+          "HeteroAr-NH2",
+          "HeteroAr-NHR"
+        ]
       },
       "products": {
         "product": "@aryl_amines"
@@ -618,15 +622,28 @@
     {
       "id": "Snar_cn",
       "reactants": {
-        "electrophile": "@aromatic_halides",
-        "activator": "@aromatic_activators",
-        "nucleophile": "@amines_nh"
+        "electrophile": [
+          "Ar-F",
+          "Ar-Cl",
+          "Ar-Br",
+          "HeteroAr-F",
+          "HeteroAr-Cl",
+          "HeteroAr-Br"
+        ],
+        "nucleophile": [
+          "@amines_nh",
+          "R2CH-NH2",
+          "RCH2-NH2",
+          "HeteroAr-NH2",
+          "HeteroAr-NHR"
+        ]
       },
       "products": {
         "product": "@aryl_amines"
       },
       "examples": [
-        "Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1"
+        "Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1",
+        "Clc1ncccn1.NCC>>NCCNc1ncccn1"
       ],
       "aliases": [
         "snar_cn"

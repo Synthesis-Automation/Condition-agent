@@ -213,7 +213,7 @@ def extract_motif_with_bond_info(motif: Dict[str, Any]) -> Dict[str, Any]:
         - fingerprint: Heteroatom H-count/connectivity signature (for change detection)
         - h_count: Total H count on heteroatoms (quick comparison)
     """
-    cid = motif.get("compound_id")
+    cid = motif.get("compound_id") or motif.get("id")
     if not cid:
         return {}
     return {
@@ -498,7 +498,7 @@ def aggregate_reaction_features(
     electronic_scores: List[float] = []
     motifs: set[str] = set()
     reactant_motif_ids: List[str] = []
-    reactant_motifs_full: List[Dict[str, Any]] = []  # Phase 3: Preserve full motif dicts
+    reactant_motifs_per_mol: List[List[Dict[str, Any]]] = []  # Keep separate per reactant to avoid atom index collisions
     spectator_groups: List[str] = []
     spectator_seen: set[str] = set()
     scaffold_ids = load_scaffold_motif_ids()
@@ -518,31 +518,40 @@ def aggregate_reaction_features(
         motif_entries = reactant.get("motifs", [])
         context_entries = reactant.get("context_motifs", [])
         for motif in motif_entries:
-            compound_id = normalize_motif_id(motif.get("compound_id") or "")
+            compound_id = normalize_motif_id(motif.get("compound_id") or motif.get("id") or "")
             if compound_id:
                 motifs.add(str(compound_id))
         
-        # Phase 3: Collect full motif dicts with bond info
+        # Phase 3: Collect full motif dicts with bond info (per reactant to avoid atom index collisions)
+        motifs_for_this_reactant: List[Dict[str, Any]] = []
         for motif in motif_entries:
             if isinstance(motif, dict):
-                cid = motif.get("compound_id")
+                cid = motif.get("compound_id") or motif.get("id")
                 if cid:
                     reactant_motif_ids.append(normalize_motif_id(str(cid)))
                     motif_info = extract_motif_with_bond_info(motif)
                     if motif_info:
-                        reactant_motifs_full.append(motif_info)
+                        motifs_for_this_reactant.append(motif_info)
         if context_entries:
             for motif in context_entries:
                 if isinstance(motif, dict):
-                    cid = motif.get("compound_id")
+                    cid = motif.get("compound_id") or motif.get("id")
                     if cid:
                         reactant_motif_ids.append(normalize_motif_id(str(cid)))
                         motif_info = extract_motif_with_bond_info(motif)
                         if motif_info:
-                            reactant_motifs_full.append(motif_info)
+                            motifs_for_this_reactant.append(motif_info)
+        
+        if motifs_for_this_reactant:
+            reactant_motifs_per_mol.append(motifs_for_this_reactant)
     
-    # Phase 3: Select primary motif per attachment atom
-    reactant_motifs_full = select_primary_motifs_by_atom(reactant_motifs_full)
+    # Phase 3: Select primary motif per attachment atom WITHIN EACH REACTANT
+    # This prevents atom index collisions between different reactants (e.g., piperazine atom 3 vs aniline atom 3)
+    reactant_motifs_full: List[Dict[str, Any]] = []
+    for motifs_for_mol in reactant_motifs_per_mol:
+        primary_for_mol = select_primary_motifs_by_atom(motifs_for_mol)
+        reactant_motifs_full.extend(primary_for_mol)
+    
     # Extract IDs from primary motifs for use in change analysis
     primary_motif_ids_list = [m.get("id", "") for m in reactant_motifs_full if m.get("id")]
 
