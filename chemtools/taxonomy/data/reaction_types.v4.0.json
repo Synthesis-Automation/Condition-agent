@@ -86,8 +86,8 @@
         },
         "coupling_confirmation": {
           "nucleophile_smarts": [
-            "[N;H2;$(N-[#6]):1][H:2]",
-            "[N;H1;$(N(-[#6])-[#6]):1][H:2]"
+            "[NX3;H2;$([N]-[#6]);!$(NC=O):1]",
+            "[NX3;H1;$([N](-[#6])-[#6]);!$(NC=O):1]"
           ],
           "require_distinct_molecules": true
         }
