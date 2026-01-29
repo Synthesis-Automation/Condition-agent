@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional
 
 from .reactants import ReactantMatch, iter_reactant_matches
 from .smiles import normalize_reaction
-from ...reaction_type_detection import detect_reaction  # New unified API
+from ...detection import detect_reaction_type
 
 
 @dataclass
@@ -169,17 +169,13 @@ def classify_reactants_with_context(
         detection_method = "user_provided"
         confidence = 1.0
     elif auto_detect:
-        # Auto-detect using unified API
-        detection_result = detect_reaction(reaction_smiles, use_ml=True)
-        reaction_type = detection_result.get("family", "Unknown")
-        confidence = detection_result.get("confidence", 0.0)
+        # Auto-detect using new API
+        detection_result = detect_reaction_type(reaction_smiles)
+        reaction_type = detection_result.top_match.reaction_type if detection_result.top_match else "Unknown"
+        confidence = detection_result.top_match.confidence if detection_result.top_match else 0.0
         
-        # Determine detection method
-        method = detection_result.get("method", "rule")
-        if "ml" in method.lower():
-            detection_method = "ml_detected"
-        else:
-            detection_method = "rule_based"
+        # Detection method is always motif-based now
+        detection_method = "motif_based"
     else:
         # No reaction type available
         reaction_type = "Unknown"

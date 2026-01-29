@@ -17,14 +17,10 @@ from .formatters import (
     select_primary_formed_motif,
 )
 
-# Re-export detection for convenience
-from .detection import detect_reaction_types
-
 __all__ = [
     "featurize_molecule",
     "featurize_reaction",
     "format_reaction_key",
     "select_primary_reacted_motifs",
     "select_primary_formed_motif",
-    "detect_reaction_types",
 ]

@@ -13,7 +13,6 @@ from typing import Any, Dict, Iterable, List, Optional
 from chemtools.util import rdkit_helpers
 from chemtools.smiles import normalize_reaction
 
-from ..detection import detect_reaction_types
 from ..analysis.reaction_context import classify_reactants_with_context, get_reactant_summary
 from ..analysis.feasibility import analyze_snar_feasibility
 
@@ -30,12 +29,21 @@ def format_reaction_type_summary(detection: Any) -> Dict[str, Any]:
         return {"reaction_type": "Unknown", "confidence": 0.0, "slot_evidence": {}}
     
     best = matches[0]
+    # Construct slot_evidence from new API structure
+    slot_evidence = {}
+    if best.electrophile:
+        slot_evidence["electrophile"] = best.electrophile
+    if best.nucleophile:
+        slot_evidence["nucleophile"] = best.nucleophile
+    if best.product:
+        slot_evidence["product"] = best.product
+    
     result = {
         "reaction_type": best.reaction_type,
-        "name": best.name,
-        "category": best.category,
+        "name": best.reaction_type,  # Use reaction_type as name for compatibility
+        "category": "coupling",  # Default category - could be improved
         "confidence": best.confidence,
-        "slot_evidence": {slot: list(values) for slot, values in best.slot_evidence.items()},
+        "slot_evidence": slot_evidence,
     }
     
     # Add alternatives if available (top 3 total)
@@ -44,7 +52,7 @@ def format_reaction_type_summary(detection: Any) -> Dict[str, Any]:
         for alt in matches[1:3]:
             alts.append({
                 "reaction_type": alt.reaction_type,
-                "name": alt.name,
+                "name": alt.reaction_type,
                 "confidence": alt.confidence
             })
         result["alternatives"] = alts
@@ -243,14 +251,11 @@ def featurize_reaction(
         confirm_coupling = options.get("confirm_suzuki_products")
     confirm_coupling_products = to_bool(confirm_coupling, default=True)
 
-    # Detect reaction type
-    detection = detect_reaction_types(
-        reaction_smiles,
-        max_hits_per_compound=options.get("max_hits_per_compound"),
-        confirm_coupling_products=confirm_coupling_products,
-    )
-    detection_payload = detection.to_dict()
-    reaction_type = format_reaction_type_summary(detection)
+    # NOTE: Reaction type detection removed to avoid circular dependency
+    # Detection now happens separately via chemtools.detection.detect_reaction_type()
+    # which calls featurize_reaction() to extract motifs
+    reaction_type = {"reaction_type": "Unknown", "confidence": 0.0, "slot_evidence": {}}
+    detection_payload = {}
 
     # Normalize reaction SMILES
     normalized = normalize_reaction(reaction_smiles)

@@ -6,9 +6,7 @@ from typing import List
 __all__ = [
     "analysis",
     "calculable",
-    "detection",
     "molecule",
-    "reaction_detection",
     "reaction_pair",
     "unified",
 ]

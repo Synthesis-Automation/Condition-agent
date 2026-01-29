@@ -12,7 +12,7 @@ from . import reactions as _reactions
 from . import reactants as _reactants
 from . import smiles as _smiles
 from ...taxonomy import reaction_catalog as _reaction_catalog
-from ..detection import detect_reaction_types_from_smiles
+from ...detection import detect_reaction_type
 
 __all__ = [
     "normalize",
@@ -111,10 +111,7 @@ def analyze_reaction(
     ]
     product_smiles_for_detection = [s for s in product_smiles_for_detection if s]
 
-    detection_result = detect_reaction_types_from_smiles(
-        reactant_smiles_for_detection,
-        product_smiles=product_smiles_for_detection,
-    )
+    detection_result = detect_reaction_type(reaction_smiles)
     detection_payload = detection_result.to_dict()
     matches = detection_result.matches
     canonical_family = matches[0].reaction_type if matches else None
@@ -139,7 +136,14 @@ def analyze_reaction(
                 "reference_reactions": list(rt.reference_reactions),
                 "notes": rt.notes,
             }
-        slot_evidence = {slot: list(values) for slot, values in matches[0].slot_evidence.items()}
+        # Construct slot_evidence from new API structure
+        slot_evidence = {}
+        if matches[0].electrophile:
+            slot_evidence["electrophile"] = matches[0].electrophile
+        if matches[0].nucleophile:
+            slot_evidence["nucleophile"] = matches[0].nucleophile
+        if matches[0].product:
+            slot_evidence["product"] = matches[0].product
 
     return {
         "input": reaction_smiles,

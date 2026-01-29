@@ -41,7 +41,7 @@ See CHEMTOOLS_QUICKSTART.md for more examples.
 """
 
 from .context import ChemTools, chem, ResourceConfig
-from .reaction_type_detection import detect_reaction
+from .detection import detect_reaction_type, detect_reaction_types, DetectionResult, ReactionMatch
 from ._atom_mapping import (
     add_atom_mapping,
     analyze_bond_changes,
@@ -81,8 +81,12 @@ __all__ = [
     "chem",          # Global singleton instance (recommended)
     "ChemTools",     # Class for custom instances
     "ResourceConfig", # Configuration dataclass
-    "detect_reaction", # Unified reaction detection API
-    # Atom mapping and bond analysis (NEW)
+    # Reaction type detection (NEW - clean API)
+    "detect_reaction_type",  # Main detection function
+    "detect_reaction_types", # Alias for detect_reaction_type
+    "DetectionResult",       # Detection result dataclass
+    "ReactionMatch",         # Individual match dataclass
+    # Atom mapping and bond analysis
     "add_atom_mapping",  # Add atom mapping to reaction SMILES
     "analyze_bond_changes",  # High-level bond analysis (RXNMapper)
     "analyze_with_mcs",  # MCS-based bond change estimation

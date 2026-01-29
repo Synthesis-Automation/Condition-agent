@@ -35,7 +35,7 @@ from chem_assistant.chemtools_agent import ChemToolsAgent
 from chem_assistant.gui.dialogs import LLMConfigDialog
 from chemtools.visualization import render_molecule_image, render_reaction_image
 from chemtools.util.rdkit_helpers import parse_smiles
-from chemtools.featurizers.detection import detect_reaction_types
+from chemtools import detect_reaction_type
 
 IMAGE_MARKUP = re.compile(
     r"\[\[(reaction|molecule)_image:(.+?)\]\]", re.IGNORECASE | re.DOTALL
@@ -293,10 +293,10 @@ class ChemAssistantWindow(QMainWindow):
                     p_mol = parse_smiles(products)
                     if r_mol and p_mol:
                         try:
-                            detection = detect_reaction_types(reaction_smiles)
-                            if detection.matches:
-                                best = detection.matches[0]
-                                self.validation_label.setText(f"OK Reaction: {best.name} detected")
+                            detection = detect_reaction_type(reaction_smiles)
+                            if detection.top_match:
+                                best = detection.top_match
+                                self.validation_label.setText(f"OK Reaction: {best.reaction_type} detected")
                             else:
                                 self.validation_label.setText("OK Reaction SMILES detected")
                         except Exception:
