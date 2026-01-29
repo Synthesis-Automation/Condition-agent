@@ -279,6 +279,7 @@ def featurize_reaction(
     product_smiles = [s for s in product_smiles if s]
     product_bundles: List[Dict[str, Any]] = []
     product_motif_ids: List[str] = []
+    product_motifs_full: List[Dict[str, Any]] = []  # Full motif dicts with fingerprints
     for smiles in product_smiles:
         try:
             bundle = build_molecule_bundle(smiles, registry_paths=registry_paths, options=options)
@@ -286,14 +287,18 @@ def featurize_reaction(
             continue
         product_bundles.append(bundle)
         product_motif_ids.extend(extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", [])))
+        # Collect full motif dicts for fingerprint-aware comparison
+        product_motifs_full.extend(bundle.get("motifs", []))
 
     # Get initial reaction type for pattern-based filtering
     initial_reaction_type = reaction_type.get("reaction_type") if isinstance(reaction_type, dict) else None
     
     # Aggregate features with reaction type for pattern-based motif filtering
+    # Pass product_motifs (full dicts) for fingerprint-aware comparison
     aggregates = aggregate_reaction_features(
         reactant_bundles,
         product_motif_ids=product_motif_ids,
+        product_motifs=product_motifs_full,
         reaction_type=initial_reaction_type,
     )
     

@@ -1414,21 +1414,107 @@
     },
     {
       "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazine_NH2",
+      "priority": 3,
+      "description": "Alkyl hydrazine with terminal -NH2 (Alkyl-NHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazine_NHR",
+      "priority": 2,
+      "description": "Alkyl hydrazine with terminal -NHR (Alkyl-NHNHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazine_NR",
+      "priority": 2,
+      "description": "Alkyl hydrazine with terminal -NR2 or =NR (Alkyl-NHN=)."
+    },
+    {
+      "template": "single_bond",
       "A": "Ar",
       "B": "-Hydrazine",
       "description": "Aryl hydrazine (Ar-N-N subunit)."
     },
     {
       "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazine_NH2",
+      "priority": 3,
+      "description": "Aryl hydrazine with terminal -NH2 (Ar-NHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazine_NHR",
+      "priority": 2,
+      "description": "Aryl hydrazine with terminal -NHR (Ar-NHNHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazine_NR",
+      "priority": 2,
+      "description": "Aryl hydrazine with terminal -NR2 or =NR (Ar-NHN=)."
+    },
+    {
+      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Hydrazide",
+      "priority": 6,
       "description": "Alkyl hydrazide (Alkyl-CONHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazide_NH2",
+      "priority": 7,
+      "description": "Alkyl hydrazide with terminal -NH2 (Alkyl-CONHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazide_NHR",
+      "priority": 7,
+      "description": "Alkyl hydrazide with terminal -NHR (Alkyl-CONHNHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazide_NR",
+      "priority": 7,
+      "description": "Alkyl hydrazide condensed (Alkyl-CONHN=, hydrazone)."
     },
     {
       "template": "single_bond",
       "A": "Ar",
       "B": "-Hydrazide",
+      "priority": 8,
       "description": "Aryl hydrazide (Ar-CONHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazide_NH2",
+      "priority": 9,
+      "description": "Aryl hydrazide with terminal -NH2 (Ar-CONHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazide_NHR",
+      "priority": 9,
+      "description": "Aryl hydrazide with terminal -NHR (Ar-CONHNHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazide_NR",
+      "priority": 9,
+      "description": "Aryl hydrazide condensed (Ar-CONHN=, hydrazone)."
     },
     {
       "template": "single_bond",

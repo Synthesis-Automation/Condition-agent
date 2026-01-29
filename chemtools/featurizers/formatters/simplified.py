@@ -26,7 +26,7 @@ def build_core_molecule(full_molecule: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         Simplified core molecule with 4-6 fields
     """
-    # Extract simplified motifs (just id and rank)
+    # Extract simplified motifs (just id and rank, plus fingerprint for change detection)
     motifs = []
     for m in full_molecule.get("motifs", []):
         motif = {
@@ -38,6 +38,11 @@ def build_core_molecule(full_molecule: Dict[str, Any]) -> Dict[str, Any]:
             motif["a_atom_idx"] = m.get("a_atom_idx")
         if m.get("b_atom_idx") is not None:
             motif["b_atom_idx"] = m.get("b_atom_idx")
+        # Include fingerprint for substitution state change detection
+        if m.get("fingerprint"):
+            motif["fingerprint"] = m.get("fingerprint")
+        if m.get("h_count") is not None:
+            motif["h_count"] = m.get("h_count")
         motifs.append(motif)
     
     # Extract key properties from analyses
@@ -149,6 +154,11 @@ def build_core_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
         "products": products,
         "feasibility": feasibility,
     }
+    
+    # Include full aggregates for motif change analysis and spectator groups
+    aggregates = full_reaction.get("aggregates", {})
+    if aggregates:
+        core["aggregates"] = aggregates
     
     return core
 

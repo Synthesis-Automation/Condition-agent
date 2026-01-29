@@ -290,7 +290,28 @@
       "kind": "substituent",
       "priority": 1,
       "smarts": "[NX3:2][NX3]",
-      "description": "Hydrazine-like substituent (-NN unit); attach via nitrogen."
+      "description": "Hydrazine-like substituent (-NN unit, any substitution); attach via nitrogen."
+    },
+    {
+      "id": "-Hydrazine_NH2",
+      "kind": "substituent",
+      "priority": 3,
+      "smarts": "[NX3:2][NX3;H2]",
+      "description": "Hydrazine with terminal -NH2 (primary hydrazine); attach via proximal nitrogen."
+    },
+    {
+      "id": "-Hydrazine_NHR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3:2][NX3;H1]",
+      "description": "Hydrazine with terminal -NHR (secondary hydrazine); attach via proximal nitrogen."
+    },
+    {
+      "id": "-Hydrazine_NR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3:2][NX3;H0]",
+      "description": "Hydrazine with terminal -NR2 or =NR (fully substituted/condensed hydrazine); attach via proximal nitrogen."
     },
     {
       "id": "-OH",
@@ -400,7 +421,28 @@
       "kind": "substituent",
       "priority": 1,
       "smarts": "[CX3:2](=O)[NX3][NX3]",
-      "description": "Hydrazide functional group (N-substituted or non-substituted); attach via carbonyl carbon."
+      "description": "Hydrazide functional group (any substitution state); attach via carbonyl carbon."
+    },
+    {
+      "id": "-Hydrazide_NH2",
+      "kind": "substituent",
+      "priority": 3,
+      "smarts": "[CX3:2](=O)[NX3][NX3;H2]",
+      "description": "Hydrazide with terminal -NH2 (primary hydrazide, e.g., R-CONHNH2); attach via carbonyl carbon."
+    },
+    {
+      "id": "-Hydrazide_NHR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[CX3:2](=O)[NX3][NX3;H1]",
+      "description": "Hydrazide with terminal -NHR (secondary hydrazide); attach via carbonyl carbon."
+    },
+    {
+      "id": "-Hydrazide_NR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[CX3:2](=O)[NX3][NX3;H0]",
+      "description": "Hydrazide with terminal -NR2 or =NR (fully substituted/condensed hydrazide, e.g., hydrazone); attach via carbonyl carbon."
     },
     {
       "id": "-SO2NH2",
@@ -473,14 +515,58 @@
     {
       "id": "-Urea",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[NX3:2][CX3](=O)[NX3]",
-      "description": "Urea-like substituent (-NCON unit); attach via nitrogen."
+      "description": "Urea-like substituent (-NCON unit, any substitution); attach via nitrogen."
+    },
+    {
+      "id": "-Urea_NH2",
+      "kind": "substituent",
+      "priority": 3,
+      "smarts": "[NX3:2][CX3](=O)[NX3;H2]",
+      "description": "Urea with terminal -NH2 (e.g., R-NHCONH2); attach via substituted nitrogen."
+    },
+    {
+      "id": "-Urea_NHR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3:2][CX3](=O)[NX3;H1]",
+      "description": "Urea with terminal -NHR (e.g., R-NHCONHR'); attach via nitrogen."
+    },
+    {
+      "id": "-Urea_NR2",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3:2][CX3](=O)[NX3;H0]",
+      "description": "Urea with terminal -NR2 (fully substituted); attach via nitrogen."
     },
     {
       "id": "-Thiourea",
       "kind": "substituent",
+      "priority": 1,
       "smarts": "[NX3:2][CX3](=S)[NX3]",
-      "description": "Thiourea-like substituent (-NCSN unit); attach via nitrogen."
+      "description": "Thiourea-like substituent (-NCSN unit, any substitution); attach via nitrogen."
+    },
+    {
+      "id": "-Thiourea_NH2",
+      "kind": "substituent",
+      "priority": 3,
+      "smarts": "[NX3:2][CX3](=S)[NX3;H2]",
+      "description": "Thiourea with terminal -NH2 (e.g., R-NHCSNH2); attach via substituted nitrogen."
+    },
+    {
+      "id": "-Thiourea_NHR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3:2][CX3](=S)[NX3;H1]",
+      "description": "Thiourea with terminal -NHR (e.g., R-NHCSNHR'); attach via nitrogen."
+    },
+    {
+      "id": "-Thiourea_NR2",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3:2][CX3](=S)[NX3;H0]",
+      "description": "Thiourea with terminal -NR2 (fully substituted); attach via nitrogen."
     },
     {
       "id": "-N(R)CO2R",
