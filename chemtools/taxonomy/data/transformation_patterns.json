@@ -1,0 +1,198 @@
+{
+  "version": "1.3",
+  "description": "Defines leaving groups for each reaction type to identify reacted motifs.",
+  "notes": "Observable-based model: leaving_groups = substituents present in reactants but absent in products. Byproducts (H2O, HBr, etc.) are typically not shown in reaction SMILES and are not tracked.",
+  
+  "pattern_types": {
+    "_comment": "Reference only - not used in logic. All patterns reduce to: which substituents disappear?",
+    "coupling_substitution": {
+      "description": "Leaving groups completely leave the scaffold. Observable: substituent gone in product.",
+      "examples": ["Ar-Br + Ar-B(OH)2 → Ar-Ar", "Ar-Br + NaN3 → Ar-N3", "Ar-Br + R-NH2 → Ar-NHR"]
+    },
+    "condensation": {
+      "description": "Functional groups transform/combine. Part of group stays (e.g., -COOH → -CO-).",
+      "example": "R-COOH + R-NH2 → R-CONH-R",
+      "note": "Cannot easily identify leaving group from motif alone"
+    },
+    "addition": {
+      "description": "Groups add across multiple bond. No leaving group from substrate.",
+      "example": "R-C=C-R + H2 → R-CH-CH-R"
+    },
+    "cycloaddition": {
+      "description": "Two unsaturated systems combine to form a ring. Both substrates consumed entirely.",
+      "examples": ["[3+2]: R-N3 + R-C≡C-R → triazole", "[4+2]: diene + dienophile → cyclohexene (Diels-Alder)"]
+    },
+    "elimination": {
+      "description": "Small molecule eliminated (H2O, HX, etc.), often forming unsaturation.",
+      "examples": ["R-CH2-CH2-OH → R-CH=CH2 (+ H2O)", "R-CH2-CH2-Br + base → R-CH=CH2 (+ HBr)"]
+    }
+  },
+  
+  "reaction_patterns": {
+    "Suzuki_miyaura": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F", "-B(OH)2", "-Bpin", "-BF3K", "-B(OR)2"],
+      "notes": "Both halide/pseudohalide AND boron group are leaving groups"
+    },
+    "Miyaura_borylation": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F"],
+      "formed_groups": ["-Bpin", "-B(OR)2"]
+    },
+    "C_N_Coupling": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F", "-NH2", "-NHR", "-NR2", "-H"],
+      "notes": "Halide leaves electrophile, amine N-H bond breaks (detected as -NH2 motif)"
+    },
+    "Chan_Lam_C_N_Coupling": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-B(OH)2", "-Bpin", "-H"],
+      "notes": "Boron leaves aryl, H leaves amine"
+    },
+    "C_O_Coupling": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F", "-OH", "-H"],
+      "notes": "Halide leaves electrophile, alcohol O-H bond breaks (detected as -OH motif)"
+    },
+    "C_S_Coupling": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F", "-SH", "-H"],
+      "notes": "Halide leaves electrophile, thiol S-H bond breaks (detected as -SH motif)"
+    },
+    "Sonogashira": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-H"],
+      "notes": "Halide leaves aryl, terminal H leaves alkyne"
+    },
+    "Heck": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-H"],
+      "notes": "Halide leaves aryl, vinylic H leaves alkene"
+    },
+    "Negishi": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-Zn*", "-ZnCl", "-ZnBr", "-ZnI"]
+    },
+    "Stille": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-Sn*", "-SnBu3", "-SnMe3"]
+    },
+    "Kumada": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-MgBr", "-MgCl", "-MgI"]
+    },
+    "Hiyama": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-SiMe3", "-Si(OR)3", "-SiF3"]
+    },
+    "Cyanation_coupling": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf"],
+      "formed_groups": ["-CN"],
+      "notes": "CN comes from reagent (CuCN, Zn(CN)2, etc.)"
+    },
+    "Azide_coupling": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs"],
+      "formed_groups": ["-N3"]
+    },
+    "Snar_cn": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-F", "-Cl", "-Br", "-NO2"],
+      "formed_groups": ["-NH2", "-NHR", "-NR2", "-OR", "-SR"]
+    },
+    "Halogenation_aromatic": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-H"],
+      "formed_groups": ["-Br", "-Cl", "-I", "-F"]
+    },
+    "Amide_formation": {
+      "pattern": "condensation",
+      "leaving_groups": ["-CO2H", "-COOH", "-COCl", "-NH2", "-NHR", "-NR2"],
+      "notes": "Carboxylic acid/chloride + amine -> amide. Both functional groups participate."
+    },
+    "Esterification": {
+      "pattern": "condensation",
+      "leaving_groups": ["-CO2H", "-COOH", "-COCl", "-OH"],
+      "notes": "Carboxylic acid/chloride + alcohol -> ester."
+    },
+    "Acylation_amide": {
+      "pattern": "condensation",
+      "leaving_groups": ["-OH", "-Cl", "-OR", "-H"]
+    },
+    "Acylation_ester": {
+      "pattern": "condensation",
+      "leaving_groups": ["-OH", "-Cl", "-OR", "-H", "-CO2H", "-COOH", "-COCl", "-COOR"]
+    },
+    "Reductive_amination": {
+      "pattern": "condensation",
+      "leaving_groups": ["-CHO", "-C(=O)", "-COR", "-NH2", "-NHR"],
+      "notes": "Aldehyde/ketone + amine -> imine -> amine"
+    },
+    "Claisen_condensation": {
+      "pattern": "condensation",
+      "leaving_groups": ["-OR", "-H"],
+      "notes": "Ester + enolate condensation"
+    },
+    "Hydrogenation": {
+      "pattern": "addition",
+      "leaving_groups": [],
+      "notes": "No leaving groups - H2 adds across unsaturation"
+    },
+    "Epoxidation": {
+      "pattern": "addition",
+      "leaving_groups": [],
+      "notes": "O adds across C=C to form epoxide"
+    },
+    "Click_cuaac": {
+      "pattern": "cycloaddition",
+      "leaving_groups": [],
+      "notes": "[3+2] Azide + alkyne cycloaddition - both substrates consumed entirely to form triazole"
+    },
+    "Diels_Alder": {
+      "pattern": "cycloaddition",
+      "leaving_groups": [],
+      "notes": "[4+2] Diene + dienophile cycloaddition - both substrates consumed entirely"
+    },
+    "Ring_closing_metathesis": {
+      "pattern": "metathesis",
+      "leaving_groups": ["-CH=CH2"],
+      "notes": "Olefin metathesis - ethylene eliminated"
+    },
+    "Oxidation_alcohol": {
+      "pattern": "elimination",
+      "leaving_groups": ["-H"],
+      "notes": "H removed during oxidation (alcohol -> aldehyde/ketone)"
+    },
+    "Dehydration": {
+      "pattern": "elimination",
+      "leaving_groups": ["-OH", "-H"],
+      "notes": "H2O eliminated, forms unsaturation"
+    },
+    "Reduction_nitro": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-NO2"],
+      "formed_groups": ["-NH2"]
+    },
+    "Arylation_acidic_C_H": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-H"],
+      "notes": "Halide leaves aryl, acidic H leaves substrate"
+    },
+    "Arylation_Ar_H": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-H"],
+      "notes": "C-H activation - H leaves aromatic"
+    },
+    "Minisci_alkylation": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-H", "-COOH"],
+      "notes": "H leaves heteroarene, COOH leaves as CO2 from radical precursor"
+    },
+    "Minisci_acylation": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-H"],
+      "notes": "H leaves heteroarene"
+    }
+  }
+}
