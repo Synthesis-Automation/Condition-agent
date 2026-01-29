@@ -82,6 +82,11 @@ Examples:
         help='Filter by catalyst metal type (e.g., Pd, Cu, Ni, palladium, copper)'
     )
     parser.add_argument(
+        '--reaction-key-only',
+        action='store_true',
+        help='Only match using reaction_key/signatures; disable reactant-type fallback'
+    )
+    parser.add_argument(
         '--db-path',
         type=str,
         default='data/HTE_db',
@@ -138,7 +143,7 @@ Examples:
         if args.batch:
             return process_batch(
                 recommender, args.batch, output, 
-                args.top_k, args.min_exp, args.reaction, args.catalyst,
+                args.top_k, args.min_exp, args.reaction, args.catalyst, args.reaction_key_only,
                 args.json, args.compact
             )
         
@@ -165,7 +170,8 @@ Examples:
             top_k=args.top_k,
             min_experiments=args.min_exp,
             reaction_type_filter=args.reaction,
-            catalyst_filter=args.catalyst
+            catalyst_filter=args.catalyst,
+            reaction_key_only=args.reaction_key_only
         )
         
         if args.json:
@@ -184,7 +190,7 @@ Examples:
 
 def process_batch(
     recommender, batch_file, output, 
-    top_k, min_exp, reaction_filter, catalyst_filter,
+    top_k, min_exp, reaction_filter, catalyst_filter, reaction_key_only,
     json_format, compact
 ):
     """Process batch file with reactant pairs"""
@@ -214,7 +220,8 @@ def process_batch(
             top_k=top_k,
             min_experiments=min_exp,
             reaction_type_filter=reaction_filter,
-            catalyst_filter=catalyst_filter
+            catalyst_filter=catalyst_filter,
+            reaction_key_only=reaction_key_only
         )
         
         results.append(result)

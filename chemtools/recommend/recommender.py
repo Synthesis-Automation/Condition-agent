@@ -120,7 +120,7 @@ def _compute_hte_manifest(file_paths: List[Path]) -> Dict[str, Any]:
             }
         )
     entries.sort(key=lambda item: item["path"])
-    return {"version": 1, "files": entries}
+    return {"version": 2, "files": entries}
 
 
 def _load_hte_cache(
@@ -246,6 +246,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
         "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category",
         "Source_File", "Source_Group", "Source_Row", "spectator_groups",
+        "Reactant_Signature_Core", "Reactant_Signature_Ext",
     ]
     for col in required_cols:
         if col not in df.columns:
@@ -298,6 +299,28 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         ),
         axis=1,
     )
+
+    if "Reaction_Key" in df.columns:
+        keys = df["Reaction_Key"].fillna("").astype(str).str.strip()
+        signatures = keys.apply(_reaction_key_to_signatures)
+        df["Reactant_Signature_Core"] = signatures.apply(lambda pair: pair[0])
+        df["Reactant_Signature_Ext"] = signatures.apply(lambda pair: pair[1])
+
+    df["Reactant_Signature_Core"] = df["Reactant_Signature_Core"].fillna("")
+    df["Reactant_Signature_Ext"] = df["Reactant_Signature_Ext"].fillna("")
+
+    core_from_reactants = df.apply(
+        lambda row: _reactant_types_to_signature(
+            [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
+        ),
+        axis=1,
+    )
+    core_mask = df["Reactant_Signature_Core"].astype(str).str.strip() == ""
+    if core_mask.any():
+        df.loc[core_mask, "Reactant_Signature_Core"] = core_from_reactants[core_mask]
+    ext_mask = df["Reactant_Signature_Ext"].astype(str).str.strip() == ""
+    if ext_mask.any():
+        df.loc[ext_mask, "Reactant_Signature_Ext"] = df.loc[ext_mask, "Reactant_Signature_Core"]
 
     if source_path is not None:
         df["Source_File"] = _format_source_path(source_path)
@@ -375,12 +398,29 @@ def _load_hte_database_cached(
             transformation_indices[key] = group_df
         unkeyed_df = df[df["Reaction_Key"] == ""]
         if not unkeyed_df.empty:
-            for key, group_df in unkeyed_df.groupby("Reaction_Type_Standardized"):
-                transformation_indices[key] = group_df
+            if "Reactant_Signature_Core" in unkeyed_df.columns:
+                sig_series = unkeyed_df["Reactant_Signature_Core"].fillna("").astype(str).str.strip()
+                sig_df = unkeyed_df[sig_series != ""]
+                for key, group_df in sig_df.groupby("Reactant_Signature_Core"):
+                    transformation_indices[key] = group_df
+                unkeyed_df = unkeyed_df[sig_series == ""]
+            if not unkeyed_df.empty:
+                for key, group_df in unkeyed_df.groupby("Reaction_Type_Standardized"):
+                    transformation_indices[key] = group_df
     else:
-        grouped_rxn = df.groupby("Reaction_Type_Standardized")
-        for key, group_df in grouped_rxn:
-            transformation_indices[key] = group_df
+        if "Reactant_Signature_Core" in df.columns:
+            sig_series = df["Reactant_Signature_Core"].fillna("").astype(str).str.strip()
+            sig_df = df[sig_series != ""]
+            for key, group_df in sig_df.groupby("Reactant_Signature_Core"):
+                transformation_indices[key] = group_df
+            remaining = df[sig_series == ""]
+            if not remaining.empty:
+                for key, group_df in remaining.groupby("Reaction_Type_Standardized"):
+                    transformation_indices[key] = group_df
+        else:
+            grouped_rxn = df.groupby("Reaction_Type_Standardized")
+            for key, group_df in grouped_rxn:
+                transformation_indices[key] = group_df
 
     print(f"Indexed {len(indexed_data)} reactant combinations and {len(transformation_indices)} transformation types")
     _save_hte_cache(cache_dir, manifest, df, indexed_data, reaction_type_patterns, transformation_indices)
@@ -1086,6 +1126,34 @@ def _split_motif_tokens(value: Any) -> List[str]:
     if not text or text.lower() == "nan":
         return []
     return [token.strip() for token in _MOTIF_SPLIT_RE.split(text) if token.strip()]
+
+
+def _encode_signature(tokens: Iterable[str]) -> str:
+    """Encode motif tokens into a stable, sorted signature string."""
+    if not tokens:
+        return ""
+    cleaned = {token for token in tokens if token}
+    if not cleaned:
+        return ""
+    return "|".join(sorted(cleaned))
+
+
+def _reactant_types_to_signature(values: Iterable[Any]) -> str:
+    """Build a reactant signature from reactant type fields."""
+    tokens: List[str] = []
+    for value in values:
+        tokens.extend(_split_motif_tokens(value))
+    return _encode_signature(tokens)
+
+
+def _reaction_key_to_signatures(key: str) -> Tuple[str, str]:
+    """Project a Reaction_Key into core/ext reactant signatures."""
+    if not key:
+        return "", ""
+    reacted, _, spectators = _parse_transformation_key(key)
+    core = _encode_signature(reacted)
+    ext = _encode_signature(set(reacted) | set(spectators))
+    return core, ext
 
 
 def _intramolecular_likely_from_fields(
@@ -1978,23 +2046,25 @@ class HTERecommender:
         reaction_type_filter: Optional[str] = None,
         catalyst_filter: Optional[str] = None,
         source_group: Optional[str] = None,
+        reaction_key_only: bool = False,
         use_aryl_steric_electronic_weighting: bool = False,
         use_spectator_groups: bool = True,
     ) -> HTERecommendationResult:
         """
         Recommend conditions based on reactant SMILES.
         
-        Args:
-            reactant_a_smiles: SMILES of first reactant
-            reactant_b_smiles: SMILES of second reactant (optional)
-            product_smiles: Optional product SMILES to refine reacted/formed motifs in scoring
-            top_k: Number of recommendations to return
-            min_experiments: Minimum experiments for a condition to be recommended
-            reaction_type_filter: Optional filter for specific reaction type
-            catalyst_filter: Optional filter by metal type (e.g., 'Pd', 'Cu', 'Ni', 'palladium', 'copper')
-            source_group: Optional source group filter (literature, rules, experiments)
-            use_aryl_steric_electronic_weighting: Apply aryl steric/electronic weighting when available
-            use_spectator_groups: Whether to apply spectator group weighting when available
+            Args:
+                reactant_a_smiles: SMILES of first reactant
+                reactant_b_smiles: SMILES of second reactant (optional)
+                product_smiles: Optional product SMILES to refine reacted/formed motifs in scoring
+                top_k: Number of recommendations to return
+                min_experiments: Minimum experiments for a condition to be recommended
+                reaction_type_filter: Optional filter for specific reaction type
+                catalyst_filter: Optional filter by metal type (e.g., 'Pd', 'Cu', 'Ni', 'palladium', 'copper')
+                source_group: Optional source group filter (literature, rules, experiments)
+                reaction_key_only: Only match using reaction_key/signatures; no reactant-type fallback
+                use_aryl_steric_electronic_weighting: Apply aryl steric/electronic weighting when available
+                use_spectator_groups: Whether to apply spectator group weighting when available
         
         Returns:
             HTERecommendationResult with ranked condition recommendations
@@ -2016,12 +2086,12 @@ class HTERecommender:
             if resolved_filter:
                 reaction_type_filter = resolved_filter
         
-        # Step 1: Detect reactant types
+        # Step 1: Detect reactant types (used for fallback only)
         type_a, cat_a = self._detect_reactant_types(reactant_a_smiles)
         collapsed_a = _collapse_motif_tokens(type_a) if type_a else ""
         result.reactant_a_type = collapsed_a
         result.reactant_a_category = cat_a
-        
+
         if reactant_b_smiles:
             type_b, cat_b = self._detect_reactant_types(reactant_b_smiles)
             collapsed_b = _collapse_motif_tokens(type_b) if type_b else ""
@@ -2032,10 +2102,6 @@ class HTERecommender:
             result.reactant_b_type = ""
             result.reactant_b_category = ""
             collapsed_b = ""
-        
-        # If no type detected, return empty
-        if not type_a:
-            return result
 
         # Step 1.5: Detect reaction type using full reaction SMILES (if available)
         # This provides more accurate reaction type detection than pattern-based prediction
@@ -2127,42 +2193,95 @@ class HTERecommender:
                     [primary_formed] if primary_formed else formed_set,
                     spectator_set,
                 )
+        # If no reaction key and no reactant types, return empty
+        if not result.query_reaction_key and not type_a:
+            return result
+
+        query_core_signature = ""
+        query_ext_signature = ""
+        if result.query_reaction_key:
+            query_core_signature, query_ext_signature = _reaction_key_to_signatures(
+                result.query_reaction_key
+            )
+        elif query_reacted is not None:
+            query_core_signature = _encode_signature(query_reacted)
+            query_ext_signature = _encode_signature(
+                set(query_reacted) | (query_spectators or set())
+            )
+        if reaction_key_only and not (result.query_reaction_key or query_core_signature or query_ext_signature):
+            return result
         
-        # Step 3: Match against database
+        # Step 3: Match against database (reaction-key first)
         query_motifs = set(type_a) | set(type_b)
+        if query_core_signature:
+            query_motifs = set(_split_motif_tokens(query_core_signature))
         query_intramolecular_likely = _intramolecular_likely_from_fields(
             collapsed_a,
             collapsed_b,
             "",
         )
         
-        scored_matches = []
-        for db_key, group_df in self.transformation_indices.items():
-            score = self._score_transformation_match(
-                query_motifs,
-                db_key,
-                query_reacted=query_reacted,
-                query_formed=query_formed,
-                query_spectators=query_spectators,
-            )
-            if score > 0:
-                # Weight the z-score by the match score
-                temp_df = group_df.copy()
-                if source_group:
-                    temp_df = _filter_source_group(temp_df, source_group)
-                    if temp_df.empty:
-                        continue
-                
-                temp_df['match_score'] = score
-                temp_df['_transformation_key'] = db_key
-                _apply_intramolecular_boost(temp_df, query_intramolecular_likely)
+        key_match_df: Optional[pd.DataFrame] = None
+        key_match_label = ""
+        key_match_score = 0.0
+        key_match_priority = 0
+        if result.query_reaction_key and result.query_reaction_key in self.transformation_indices:
+            key_match_df = self.transformation_indices[result.query_reaction_key].copy()
+            key_match_label = result.query_reaction_key
+            key_match_score = 1.0
+            key_match_priority = 0
+        elif query_core_signature and query_core_signature in self.transformation_indices:
+            key_match_df = self.transformation_indices[query_core_signature].copy()
+            key_match_label = query_core_signature
+            key_match_score = 0.75
+            key_match_priority = 1
+            result.is_fallback_match = True
+        elif query_ext_signature and query_ext_signature in self.transformation_indices:
+            key_match_df = self.transformation_indices[query_ext_signature].copy()
+            key_match_label = query_ext_signature
+            key_match_score = 0.55
+            key_match_priority = 2
+            result.is_fallback_match = True
 
-                temp_df['match_priority'] = 1
+        scored_matches = []
+        if key_match_df is not None and source_group:
+            key_match_df = _filter_source_group(key_match_df, source_group)
+            if key_match_df.empty:
+                key_match_df = None
+        if key_match_df is None:
+            for db_key, group_df in self.transformation_indices.items():
+                score = self._score_transformation_match(
+                    query_motifs,
+                    db_key,
+                    query_reacted=query_reacted,
+                    query_formed=query_formed,
+                    query_spectators=query_spectators,
+                )
+                if score > 0:
+                    # Weight the z-score by the match score
+                    temp_df = group_df.copy()
+                    if source_group:
+                        temp_df = _filter_source_group(temp_df, source_group)
+                        if temp_df.empty:
+                            continue
                     
-                scored_matches.append(temp_df)
+                    temp_df['match_score'] = score
+                    temp_df['_transformation_key'] = db_key
+                    _apply_intramolecular_boost(temp_df, query_intramolecular_likely)
+
+                    temp_df['match_priority'] = 1
+                        
+                    scored_matches.append(temp_df)
         
         matched_df = None
         match_dfs: List[pd.DataFrame] = []
+        if key_match_df is not None:
+            key_match_df["match_score"] = key_match_score
+            key_match_df["_transformation_key"] = key_match_label
+            key_match_df["match_priority"] = key_match_priority
+            _apply_intramolecular_boost(key_match_df, query_intramolecular_likely)
+            match_dfs.append(key_match_df)
+            result.matched_motifs = (key_match_label, "")
         if scored_matches:
             match_dfs.extend(scored_matches)
             # Use the highest scoring transformation as the "matched motifs" for display
@@ -2180,128 +2299,131 @@ class HTERecommender:
         reacted_set = query_reacted or set()
         spectator_set = query_spectators or set()
 
-        if key in self.indexed_data:
-            direct_match = self.indexed_data[key].copy()
-            direct_key = key
-            if source_group:
-                direct_match = _filter_source_group(direct_match, source_group)
-                if direct_match.empty:
-                    direct_match = None
-                    direct_key = None
-            if direct_match is not None:
-                direct_match['match_score'] = 1.0
-                direct_match['match_priority'] = 0
-                _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
-                if not result.matched_motifs:
-                    pick_a = _prioritize_motifs(type_a, reacted_set, spectator_set)
-                    pick_b = _prioritize_motifs(type_b, reacted_set, spectator_set)
-                    if pick_a or pick_b:
-                        result.matched_motifs = (
-                            pick_a[0] if pick_a else "",
-                            pick_b[0] if pick_b else "",
-                        )
-                    else:
-                        result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
-        if direct_match is None:
-            list_a = _prioritize_motifs(type_a, reacted_set, spectator_set) or [""]
-            list_b = _prioritize_motifs(type_b, reacted_set, spectator_set) or [""]
-            for ma in list_a:
-                for mb in list_b:
-                    if not ma and not mb:
-                        continue
-                    candidate = _reactant_key([ma, mb])
-                    if candidate in self.indexed_data:
-                        direct_match = self.indexed_data[candidate].copy()
-                        direct_key = candidate
-                        if source_group:
-                            direct_match = _filter_source_group(direct_match, source_group)
-                            if direct_match.empty:
-                                direct_match = None
-                                direct_key = None
-                                continue
-                        direct_match['match_score'] = 1.0
-                        direct_match['match_priority'] = 0
-                        _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
-                        if not result.matched_motifs:
-                            result.matched_motifs = (ma, mb)
-                        fallback_used = True
-                        break
+        has_query_key = bool(result.query_reaction_key or query_core_signature or query_ext_signature)
+        if not has_query_key:
+            if key in self.indexed_data:
+                direct_match = self.indexed_data[key].copy()
+                direct_key = key
+                if source_group:
+                    direct_match = _filter_source_group(direct_match, source_group)
+                    if direct_match.empty:
+                        direct_match = None
+                        direct_key = None
                 if direct_match is not None:
-                    break
-        
-        fallback_match: Optional[pd.DataFrame] = None
-        expand_for_coverage = False
-        if (
-            direct_match is not None
-            and self.df is not None
-            and "Source_Group" in direct_match.columns
-            and not source_group
-        ):
-            direct_groups = {g for g in direct_match["Source_Group"].unique() if str(g).strip()}
-            available_groups = {g for g in self.df["Source_Group"].unique() if str(g).strip()}
-            if available_groups and direct_groups and not (available_groups <= direct_groups):
-                expand_for_coverage = True
-
-        should_expand = direct_match is None or (
-            direct_match is not None and len(direct_match) < min_experiments
-        ) or expand_for_coverage
-        if should_expand:
-            tiers_a = _build_fallback_tiers(type_a, reacted_set, spectator_set)
-            tiers_b = _build_fallback_tiers(type_b, reacted_set, spectator_set)
-            tier_pairs: List[Tuple[int, int, int, List[str], List[str]]] = []
-            for idx_a, list_a in enumerate(tiers_a):
-                for idx_b, list_b in enumerate(tiers_b):
-                    tier_pairs.append((idx_a + idx_b, idx_a, idx_b, list_a, list_b))
-            tier_pairs.sort(key=lambda item: (item[0], item[1], item[2]))
-
-            for _, idx_a, idx_b, list_a, list_b in tier_pairs:
+                    direct_match['match_score'] = 1.0
+                    direct_match['match_priority'] = 0
+                    _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
+                    if not result.matched_motifs:
+                        pick_a = _prioritize_motifs(type_a, reacted_set, spectator_set)
+                        pick_b = _prioritize_motifs(type_b, reacted_set, spectator_set)
+                        if pick_a or pick_b:
+                            result.matched_motifs = (
+                                pick_a[0] if pick_a else "",
+                                pick_b[0] if pick_b else "",
+                            )
+                        else:
+                            result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
+            if direct_match is None:
+                list_a = _prioritize_motifs(type_a, reacted_set, spectator_set) or [""]
+                list_b = _prioritize_motifs(type_b, reacted_set, spectator_set) or [""]
                 for ma in list_a:
                     for mb in list_b:
                         if not ma and not mb:
                             continue
                         candidate = _reactant_key([ma, mb])
-                        if direct_key and candidate == direct_key:
-                            continue
                         if candidate in self.indexed_data:
-                            fallback_match = self.indexed_data[candidate].copy()
+                            direct_match = self.indexed_data[candidate].copy()
+                            direct_key = candidate
                             if source_group:
-                                fallback_match = _filter_source_group(fallback_match, source_group)
-                                if fallback_match.empty:
-                                    fallback_match = None
+                                direct_match = _filter_source_group(direct_match, source_group)
+                                if direct_match.empty:
+                                    direct_match = None
+                                    direct_key = None
                                     continue
-                            if (
-                                expand_for_coverage
-                                and "Source_Group" in fallback_match.columns
-                                and direct_match is not None
-                            ):
-                                direct_groups = {
-                                    g
-                                    for g in direct_match["Source_Group"].unique()
-                                    if str(g).strip()
-                                }
-                                candidate_groups = {
-                                    g
-                                    for g in fallback_match["Source_Group"].unique()
-                                    if str(g).strip()
-                                }
-                                if not (candidate_groups - direct_groups):
-                                    fallback_match = None
-                                    continue
-                            if direct_match is None:
-                                fallback_match['match_score'] = 1.0
-                                fallback_match['match_priority'] = idx_a + idx_b
-                            else:
-                                fallback_match['match_score'] = 0.85
-                                fallback_match['match_priority'] = 1 + idx_a + idx_b
-                            _apply_intramolecular_boost(fallback_match, query_intramolecular_likely)
+                            direct_match['match_score'] = 1.0
+                            direct_match['match_priority'] = 0
+                            _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
                             if not result.matched_motifs:
                                 result.matched_motifs = (ma, mb)
                             fallback_used = True
                             break
+                    if direct_match is not None:
+                        break
+        
+        fallback_match: Optional[pd.DataFrame] = None
+        expand_for_coverage = False
+        if not has_query_key:
+            if (
+                direct_match is not None
+                and self.df is not None
+                and "Source_Group" in direct_match.columns
+                and not source_group
+            ):
+                direct_groups = {g for g in direct_match["Source_Group"].unique() if str(g).strip()}
+                available_groups = {g for g in self.df["Source_Group"].unique() if str(g).strip()}
+                if available_groups and direct_groups and not (available_groups <= direct_groups):
+                    expand_for_coverage = True
+
+            should_expand = direct_match is None or (
+                direct_match is not None and len(direct_match) < min_experiments
+            ) or expand_for_coverage
+            if should_expand:
+                tiers_a = _build_fallback_tiers(type_a, reacted_set, spectator_set)
+                tiers_b = _build_fallback_tiers(type_b, reacted_set, spectator_set)
+                tier_pairs: List[Tuple[int, int, int, List[str], List[str]]] = []
+                for idx_a, list_a in enumerate(tiers_a):
+                    for idx_b, list_b in enumerate(tiers_b):
+                        tier_pairs.append((idx_a + idx_b, idx_a, idx_b, list_a, list_b))
+                tier_pairs.sort(key=lambda item: (item[0], item[1], item[2]))
+
+                for _, idx_a, idx_b, list_a, list_b in tier_pairs:
+                    for ma in list_a:
+                        for mb in list_b:
+                            if not ma and not mb:
+                                continue
+                            candidate = _reactant_key([ma, mb])
+                            if direct_key and candidate == direct_key:
+                                continue
+                            if candidate in self.indexed_data:
+                                fallback_match = self.indexed_data[candidate].copy()
+                                if source_group:
+                                    fallback_match = _filter_source_group(fallback_match, source_group)
+                                    if fallback_match.empty:
+                                        fallback_match = None
+                                        continue
+                                if (
+                                    expand_for_coverage
+                                    and "Source_Group" in fallback_match.columns
+                                    and direct_match is not None
+                                ):
+                                    direct_groups = {
+                                        g
+                                        for g in direct_match["Source_Group"].unique()
+                                        if str(g).strip()
+                                    }
+                                    candidate_groups = {
+                                        g
+                                        for g in fallback_match["Source_Group"].unique()
+                                        if str(g).strip()
+                                    }
+                                    if not (candidate_groups - direct_groups):
+                                        fallback_match = None
+                                        continue
+                                if direct_match is None:
+                                    fallback_match['match_score'] = 1.0
+                                    fallback_match['match_priority'] = idx_a + idx_b
+                                else:
+                                    fallback_match['match_score'] = 0.85
+                                    fallback_match['match_priority'] = 1 + idx_a + idx_b
+                                _apply_intramolecular_boost(fallback_match, query_intramolecular_likely)
+                                if not result.matched_motifs:
+                                    result.matched_motifs = (ma, mb)
+                                fallback_used = True
+                                break
+                        if fallback_match is not None:
+                            break
                     if fallback_match is not None:
                         break
-                if fallback_match is not None:
-                    break
 
         if direct_match is not None:
             match_dfs.append(direct_match)

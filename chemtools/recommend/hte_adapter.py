@@ -188,6 +188,7 @@ def recommend_from_reaction(
     min_experiments: int = 2,
     catalyst_filter: Optional[str] = None,
     source_group: Optional[str] = None,
+    reaction_key_only: bool = False,
     use_aryl_steric_electronic_weighting: bool = False,
     use_spectator_groups: bool = True,
     **_: Any,
@@ -236,6 +237,7 @@ def recommend_from_reaction(
         reaction_type_filter=reaction_type,
         catalyst_filter=catalyst_filter,
         source_group=source_group,
+        reaction_key_only=reaction_key_only,
         use_aryl_steric_electronic_weighting=use_aryl_steric_electronic_weighting,
         use_spectator_groups=use_spectator_groups,
     )

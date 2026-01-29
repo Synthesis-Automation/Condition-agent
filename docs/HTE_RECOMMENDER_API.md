@@ -24,6 +24,7 @@ $payload = @{
     reaction_smiles = "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
     reaction_type_filter = "C_N_Coupling"
     catalyst_filter = "Pd"
+    reaction_key_only = $true
   }
 } | ConvertTo-Json -Depth 6
 

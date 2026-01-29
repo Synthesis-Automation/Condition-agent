@@ -45,6 +45,9 @@ class HTERecommendationInput(BaseModel):
     catalyst_filter: Optional[str] = Field(
         None, description="Optional catalyst filter (e.g., Pd, Cu)"
     )
+    reaction_key_only: bool = Field(
+        False, description="Only match using reaction_key/signatures; disable reactant-type fallback"
+    )
     top_k: int = Field(10, ge=1, le=200, description="Number of recommendations to return")
     min_experiments: int = Field(2, ge=1, le=200, description="Minimum experiments per condition")
 
@@ -104,6 +107,7 @@ def recommend_hte(payload: HTERecommendationRequest) -> Dict[str, Any]:
         min_experiments=request_input.min_experiments,
         reaction_type_filter=request_input.reaction_type_filter or None,
         catalyst_filter=request_input.catalyst_filter or None,
+        reaction_key_only=request_input.reaction_key_only,
     )
 
     source_map = getattr(result, "recommendations_by_source", {}) or {}
