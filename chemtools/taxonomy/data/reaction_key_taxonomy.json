@@ -1,0 +1,360 @@
+{
+  "version": "1.0",
+  "description": "Reaction type definitions based purely on reacted/formed motifs from reaction key analysis.",
+  "notes": "Each reaction type defines required reacted and formed patterns. Groups starting with @ reference motif_sets. Priority determines match order for overlapping patterns.",
+  "reaction_types": [
+    {
+      "id": "Suzuki_miyaura",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@organoboron"]
+      },
+      "formed": {
+        "any_of": ["Ar-Ar", "Ar-Alkenyl", "Alkenyl-Alkenyl", "HeteroAr-Ar", "HeteroAr-Alkenyl"]
+      },
+      "description": "Pd-catalyzed cross-coupling of aryl/vinyl halides with organoboron compounds.",
+      "aliases": ["suzuki", "suzuki_coupling", "suzuki_miyaura"]
+    },
+    {
+      "id": "Miyaura_borylation",
+      "priority": 90,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"]
+      },
+      "formed": {
+        "any_of": ["@organoboron"]
+      },
+      "description": "Pd-catalyzed borylation of aryl/vinyl electrophiles.",
+      "aliases": ["miyaura_borylation", "borylation"]
+    },
+    {
+      "id": "C_N_Coupling",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@amines_nh"]
+      },
+      "formed": {
+        "any_of": ["@aryl_amines", "@aryl_amides"]
+      },
+      "description": "C-N cross-coupling (Buchwald-Hartwig, Ullmann).",
+      "aliases": ["buchwald_hartwig", "ullmann_cn", "c_n_coupling", "aryl_amination"]
+    },
+    {
+      "id": "C_O_Coupling",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@alcohols_oh"]
+      },
+      "formed": {
+        "any_of": ["@aryl_ethers"]
+      },
+      "description": "C-O cross-coupling for aryl ether formation.",
+      "aliases": ["ullmann_co", "c_o_coupling", "aryl_ether"]
+    },
+    {
+      "id": "C_S_Coupling",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@thiols_sh"]
+      },
+      "formed": {
+        "any_of": ["Ar-SR", "HeteroAr-SR", "Alkenyl-SR"]
+      },
+      "description": "C-S cross-coupling for aryl thioether formation.",
+      "aliases": ["c_s_coupling", "aryl_thioether"]
+    },
+    {
+      "id": "Chan_Lam_C_N_Coupling",
+      "priority": 95,
+      "reacted": {
+        "any_of": ["@organoboron"],
+        "all_of": ["@amines_nh"]
+      },
+      "formed": {
+        "any_of": ["@aryl_amines"]
+      },
+      "description": "Chan-Lam C-N coupling using organoboron and amines.",
+      "aliases": ["chan_lam", "chan_lam_cn"]
+    },
+    {
+      "id": "Sonogashira",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@terminal_alkynes"]
+      },
+      "formed": {
+        "any_of": ["Ar-Alkynyl", "HeteroAr-Alkynyl", "Alkenyl-Alkynyl"]
+      },
+      "description": "Pd/Cu-catalyzed coupling of aryl halides with terminal alkynes.",
+      "aliases": ["sonogashira"]
+    },
+    {
+      "id": "Heck",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@terminal_alkenes"]
+      },
+      "formed": {
+        "any_of": ["Ar-Alkenyl", "Alkenyl-Alkenyl"]
+      },
+      "description": "Pd-catalyzed vinylation of aryl halides.",
+      "aliases": ["heck", "mizoroki_heck"]
+    },
+    {
+      "id": "Negishi",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@organozinc"]
+      },
+      "formed": {
+        "any_of": ["Ar-Ar", "Ar-Alkenyl", "Alkenyl-Alkenyl"]
+      },
+      "description": "Pd/Ni-catalyzed coupling with organozinc reagents.",
+      "aliases": ["negishi"]
+    },
+    {
+      "id": "Stille",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@organotin"]
+      },
+      "formed": {
+        "any_of": ["Ar-Ar", "Ar-Alkenyl", "Alkenyl-Alkenyl"]
+      },
+      "description": "Pd-catalyzed coupling with organotin reagents.",
+      "aliases": ["stille"]
+    },
+    {
+      "id": "Kumada",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@organomagnesium"]
+      },
+      "formed": {
+        "any_of": ["Ar-Ar", "Ar-Alkenyl", "Alkenyl-Alkenyl"]
+      },
+      "description": "Ni/Pd-catalyzed coupling with Grignard reagents.",
+      "aliases": ["kumada"]
+    },
+    {
+      "id": "Hiyama",
+      "priority": 100,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@organosilicon"]
+      },
+      "formed": {
+        "any_of": ["Ar-Ar", "Ar-Alkenyl", "Alkenyl-Alkenyl"]
+      },
+      "description": "Pd-catalyzed coupling with organosilicon reagents.",
+      "aliases": ["hiyama"]
+    },
+    {
+      "id": "Cyanation_coupling",
+      "priority": 80,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"]
+      },
+      "formed": {
+        "any_of": ["Ar-CN", "HeteroAr-CN", "Alkenyl-CN"]
+      },
+      "exclude_reacted": ["@thiols_sh", "@amines_nh", "@alcohols_oh"],
+      "description": "Pd/Cu-catalyzed cyanation of aryl halides.",
+      "aliases": ["cyanation", "cyanation_coupling"]
+    },
+    {
+      "id": "Azide_coupling",
+      "priority": 80,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"]
+      },
+      "formed": {
+        "any_of": ["Ar-N3", "HeteroAr-N3"]
+      },
+      "description": "Coupling to form aryl azides.",
+      "aliases": ["azide_coupling"]
+    },
+    {
+      "id": "Sandmeyer",
+      "priority": 90,
+      "reacted": {
+        "any_of": ["Ar-NH2", "HeteroAr-NH2", "Ar-N2+", "HeteroAr-N2+"]
+      },
+      "formed": {
+        "any_of": ["Ar-Br", "Ar-Cl", "Ar-I", "Ar-CN", "Ar-OH", "Ar-F",
+                   "HeteroAr-Br", "HeteroAr-Cl", "HeteroAr-I", "HeteroAr-CN"]
+      },
+      "exclude_reacted": ["@sp2_electrophiles"],
+      "description": "Sandmeyer reaction converting anilines via diazonium to aryl halides/cyanides.",
+      "aliases": ["sandmeyer"]
+    },
+    {
+      "id": "Arylation_acidic_C_H",
+      "priority": 85,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"],
+        "all_of": ["@acidic_ch"]
+      },
+      "formed": {
+        "any_of": ["Ar-Alkyl", "Ar-R_acidic"]
+      },
+      "description": "Alpha-arylation of compounds with acidic C-H bonds.",
+      "aliases": ["alpha_arylation", "arylation_acidic_ch"]
+    },
+    {
+      "id": "Carbonylation",
+      "priority": 80,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"]
+      },
+      "formed": {
+        "any_of": ["Ar-COR", "Ar-CO2R", "Ar-CONR2", "Ar-CHO",
+                   "HeteroAr-COR", "HeteroAr-CO2R", "Alkenyl-COR"]
+      },
+      "exclude_reacted": ["@amines_nh", "@alcohols_oh", "@thiols_sh"],
+      "description": "Pd-catalyzed carbonylation reactions.",
+      "aliases": ["carbonylation", "carbonylative_coupling"]
+    },
+    {
+      "id": "Reductive_coupling",
+      "priority": 75,
+      "reacted": {
+        "any_of": ["@sp2_electrophiles"]
+      },
+      "formed": {
+        "any_of": ["Ar-Ar", "Ar-H"]
+      },
+      "exclude_reacted": ["@organoboron", "@organozinc", "@organotin", "@organomagnesium"],
+      "description": "Reductive homo-coupling of aryl halides.",
+      "aliases": ["reductive_coupling", "ullmann_homocoupling"]
+    },
+    {
+      "id": "Hydrodebromination",
+      "priority": 70,
+      "reacted": {
+        "any_of": ["Ar-Br", "Ar-I", "Ar-Cl"]
+      },
+      "formed": {
+        "any_of": ["Ar-H"]
+      },
+      "description": "Reductive removal of halogen.",
+      "aliases": ["hydrodehalogenation", "hydrodebromination"]
+    },
+    {
+      "id": "Halogenation",
+      "priority": 70,
+      "reacted": {
+        "any_of": ["Ar-H"]
+      },
+      "formed": {
+        "any_of": ["Ar-Br", "Ar-Cl", "Ar-I", "Ar-F",
+                   "HeteroAr-Br", "HeteroAr-Cl", "HeteroAr-I"]
+      },
+      "description": "Aromatic halogenation.",
+      "aliases": ["bromination", "chlorination", "iodination", "halogenation"]
+    },
+    {
+      "id": "Nitration",
+      "priority": 70,
+      "reacted": {
+        "any_of": ["Ar-H"]
+      },
+      "formed": {
+        "any_of": ["Ar-NO2", "HeteroAr-NO2"]
+      },
+      "description": "Aromatic nitration.",
+      "aliases": ["nitration"]
+    },
+    {
+      "id": "Reduction_nitro",
+      "priority": 75,
+      "reacted": {
+        "any_of": ["Ar-NO2", "HeteroAr-NO2", "Alkyl-NO2"]
+      },
+      "formed": {
+        "any_of": ["Ar-NH2", "HeteroAr-NH2", "Alkyl-NH2"]
+      },
+      "description": "Reduction of nitro groups to amines.",
+      "aliases": ["nitro_reduction"]
+    },
+    {
+      "id": "Esterification",
+      "priority": 65,
+      "reacted": {
+        "any_of": ["@carboxylic_acids"],
+        "all_of": ["@alcohols_oh"]
+      },
+      "formed": {
+        "any_of": ["Ar-CO2R", "Alkyl-CO2R", "Acyl-CO2R"]
+      },
+      "description": "Ester formation from carboxylic acids and alcohols.",
+      "aliases": ["esterification"]
+    },
+    {
+      "id": "Amide_formation",
+      "priority": 65,
+      "reacted": {
+        "any_of": ["@carboxylic_acids", "@acyl_halides"],
+        "all_of": ["@amines_nh"]
+      },
+      "formed": {
+        "any_of": ["Ar-CONR2", "Ar-CONHR", "Alkyl-CONR2", "Alkyl-CONHR"]
+      },
+      "description": "Amide formation from acids/acid chlorides and amines.",
+      "aliases": ["amidation", "amide_formation", "amide_coupling"]
+    },
+    {
+      "id": "Acylation_friedel_crafts",
+      "priority": 60,
+      "reacted": {
+        "any_of": ["@acyl_halides", "Acyl-OAc"]
+      },
+      "formed": {
+        "any_of": ["Ar-COR", "HeteroAr-COR"]
+      },
+      "description": "Friedel-Crafts acylation.",
+      "aliases": ["friedel_crafts_acylation", "fc_acylation"]
+    },
+    {
+      "id": "Alkylation_friedel_crafts",
+      "priority": 60,
+      "reacted": {
+        "any_of": ["Alkyl-Br", "Alkyl-Cl", "Alkyl-I", "Bn-Br", "Bn-Cl"]
+      },
+      "formed": {
+        "any_of": ["Ar-Alkyl", "Ar-Bn"]
+      },
+      "description": "Friedel-Crafts alkylation.",
+      "aliases": ["friedel_crafts_alkylation", "fc_alkylation"]
+    }
+  ],
+  "motif_sets": {
+    "_note": "References to compound_logic.json motif_sets. Prefix with @ to reference.",
+    "sp2_electrophiles": "@compound_logic:sp2_electrophiles",
+    "organoboron": "@compound_logic:organoboron",
+    "amines_nh": "@compound_logic:amines_nh",
+    "alcohols_oh": "@compound_logic:alcohols_oh",
+    "thiols_sh": "@compound_logic:thiols_sh",
+    "terminal_alkynes": "@compound_logic:terminal_alkynes",
+    "terminal_alkenes": "@compound_logic:terminal_alkenes",
+    "organozinc": "@compound_logic:organozinc",
+    "organotin": "@compound_logic:organotin",
+    "organomagnesium": "@compound_logic:organomagnesium",
+    "organosilicon": "@compound_logic:organosilicon",
+    "aryl_amines": "@compound_logic:aryl_amines",
+    "aryl_amides": "@compound_logic:aryl_amides",
+    "aryl_ethers": "@compound_logic:aryl_ethers",
+    "acidic_ch": "@compound_logic:acidic_ch",
+    "carboxylic_acids": "@compound_logic:carboxylic_acids",
+    "acyl_halides": "@compound_logic:acyl_halides"
+  }
+}
