@@ -195,6 +195,113 @@
     },
     {
       "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-Cl",
+      "description": "Heteroaryl chloride (HeteroAr-Cl).",
+      "reactivity_weight": 1.5
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-Br",
+      "description": "Heteroaryl bromide (HeteroAr-Br).",
+      "reactivity_weight": 2.5
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-I",
+      "description": "Heteroaryl iodide (HeteroAr-I).",
+      "reactivity_weight": 3.0
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-F",
+      "description": "Heteroaryl fluoride (HeteroAr-F).",
+      "reactivity_weight": 1.0
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-OTf",
+      "description": "Heteroaryl triflate (HeteroAr-OTf).",
+      "reactivity_weight": 2.0
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-OMs",
+      "description": "Heteroaryl mesylate (HeteroAr-OMs).",
+      "reactivity_weight": 1.5
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-OTs",
+      "description": "Heteroaryl tosylate (HeteroAr-OTs).",
+      "reactivity_weight": 1.5
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-B(OH)2",
+      "description": "Heteroaryl boronic acid (HeteroAr-B(OH)2).",
+      "reactivity_weight": 2.0
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-Bpin",
+      "description": "Heteroaryl pinacol boronate (HeteroAr-Bpin).",
+      "reactivity_weight": 2.0
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-B(OR)2",
+      "description": "Heteroaryl boronate ester (HeteroAr-B(OR)2).",
+      "reactivity_weight": 2.0
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-BF3K",
+      "description": "Heteroaryl trifluoroborate (HeteroAr-BF3K).",
+      "reactivity_weight": 2.0
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-H",
+      "description": "Heteroaryl C-H bond (HeteroAr-H)."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-NH2",
+      "description": "Heteroaryl amine (HeteroAr-NH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-N2+",
+      "description": "Heteroaryl diazonium cation (HeteroAr-N2+), intermediate for Sandmeyer reaction."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-NHR",
+      "description": "Heteroaryl secondary amine (HeteroAr-NHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-OH",
+      "description": "Heteroaryl alcohol (HeteroAr-OH)."
+    },
+    {
+      "template": "single_bond",
       "A": "AromN",
       "B": "-H",
       "description": "Aromatic N-H (e.g., pyrrole, indole N-H) (AromN-H)."
@@ -618,6 +725,12 @@
       "A": "Ar",
       "B": "-NH2",
       "description": "Aryl primary amine (Ar-NH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-N2+",
+      "description": "Aryl diazonium cation (Ar-N2+), intermediate for Sandmeyer reaction."
     },
     {
       "template": "single_bond",
@@ -1313,21 +1426,107 @@
     },
     {
       "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazine_NH2",
+      "priority": 3,
+      "description": "Alkyl hydrazine with terminal -NH2 (Alkyl-NHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazine_NHR",
+      "priority": 2,
+      "description": "Alkyl hydrazine with terminal -NHR (Alkyl-NHNHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazine_NR",
+      "priority": 2,
+      "description": "Alkyl hydrazine with terminal -NR2 or =NR (Alkyl-NHN=)."
+    },
+    {
+      "template": "single_bond",
       "A": "Ar",
       "B": "-Hydrazine",
       "description": "Aryl hydrazine (Ar-N-N subunit)."
     },
     {
       "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazine_NH2",
+      "priority": 3,
+      "description": "Aryl hydrazine with terminal -NH2 (Ar-NHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazine_NHR",
+      "priority": 2,
+      "description": "Aryl hydrazine with terminal -NHR (Ar-NHNHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazine_NR",
+      "priority": 2,
+      "description": "Aryl hydrazine with terminal -NR2 or =NR (Ar-NHN=)."
+    },
+    {
+      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Hydrazide",
+      "priority": 6,
       "description": "Alkyl hydrazide (Alkyl-CONHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazide_NH2",
+      "priority": 7,
+      "description": "Alkyl hydrazide with terminal -NH2 (Alkyl-CONHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazide_NHR",
+      "priority": 7,
+      "description": "Alkyl hydrazide with terminal -NHR (Alkyl-CONHNHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-Hydrazide_NR",
+      "priority": 7,
+      "description": "Alkyl hydrazide condensed (Alkyl-CONHN=, hydrazone)."
     },
     {
       "template": "single_bond",
       "A": "Ar",
       "B": "-Hydrazide",
+      "priority": 8,
       "description": "Aryl hydrazide (Ar-CONHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazide_NH2",
+      "priority": 9,
+      "description": "Aryl hydrazide with terminal -NH2 (Ar-CONHNH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazide_NHR",
+      "priority": 9,
+      "description": "Aryl hydrazide with terminal -NHR (Ar-CONHNHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-Hydrazide_NR",
+      "priority": 9,
+      "description": "Aryl hydrazide condensed (Ar-CONHN=, hydrazone)."
     },
     {
       "template": "single_bond",

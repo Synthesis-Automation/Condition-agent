@@ -221,12 +221,15 @@
     },
     "aryl_amines": {
       "name": "Aryl Amines",
-      "description": "C-N coupling products.",
+      "description": "C-N coupling products (including heteroaryl).",
       "members": [
         "Ar-NH2",
         "Ar-NHR",
         "Ar-NR2",
-        "Ar-AromN"
+        "Ar-AromN",
+        "HeteroAr-NH2",
+        "HeteroAr-NHR",
+        "HeteroAr-NR2"
       ],
       "usage": [
         "C_N_Coupling"

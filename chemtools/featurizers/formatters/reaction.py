@@ -104,10 +104,39 @@ def select_primary_formed_motif(
     product_motifs: Iterable[Any],
     formed_set: set[str],
 ) -> Optional[str]:
-    """Select the first formed motif from products."""
-    for motif in extract_motif_ids(product_motifs):
-        if motif in formed_set:
-            return motif
+    """
+    Select the primary formed motif from products.
+    
+    Prioritizes compound motifs (scaffold-substituent like Ar-Br, HeteroAr-OH)
+    over generic functional group motifs to identify the key transformation.
+    
+    Args:
+        product_motifs: Product motif IDs
+        formed_set: Set of motifs that were formed
+        
+    Returns:
+        Primary formed motif ID, or None if no formed motifs
+    """
+    candidates = [m for m in extract_motif_ids(product_motifs) if m in formed_set]
+    if not candidates:
+        return None
+    
+    # Prioritize scaffold-substituent patterns (Ar-X, HeteroAr-X, Alkenyl-X, etc.)
+    # over generic functional groups (R3C-X, RCH2-X, Alkyl-X, etc.)
+    scaffold_substituent_motifs = []
+    for m in candidates:
+        if "-" not in m:
+            continue
+        scaffold = m.split("-", 1)[0]
+        # Include only named scaffolds, exclude generic R-groups
+        if not any(scaffold.startswith(prefix) for prefix in ["R", "Alkyl"]):
+            scaffold_substituent_motifs.append(m)
+    
+    if scaffold_substituent_motifs:
+        return scaffold_substituent_motifs[0]
+    
+    # Fall back to first formed motif
+    return candidates[0]
     return None
 
 
@@ -250,6 +279,7 @@ def featurize_reaction(
     product_smiles = [s for s in product_smiles if s]
     product_bundles: List[Dict[str, Any]] = []
     product_motif_ids: List[str] = []
+    product_motifs_full: List[Dict[str, Any]] = []  # Full motif dicts with fingerprints
     for smiles in product_smiles:
         try:
             bundle = build_molecule_bundle(smiles, registry_paths=registry_paths, options=options)
@@ -257,10 +287,17 @@ def featurize_reaction(
             continue
         product_bundles.append(bundle)
         product_motif_ids.extend(extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", [])))
+        # Collect full motif dicts for fingerprint-aware comparison
+        product_motifs_full.extend(bundle.get("motifs", []))
 
-    # Aggregate features
+    # Aggregate features without pattern-based filtering
+    # Pattern filtering is skipped to avoid removing reacted motifs based on incorrect initial detection
+    # The validation step will correct the detection using unfiltered reacted motifs
     aggregates = aggregate_reaction_features(
-        reactant_bundles, product_motif_ids=product_motif_ids
+        reactant_bundles,
+        product_motif_ids=product_motif_ids,
+        product_motifs=product_motifs_full,
+        reaction_type=None,  # Disable pattern-based filtering
     )
     
     # Validate detection using reacted motifs patterns
@@ -304,40 +341,21 @@ def featurize_reaction(
 
     intramolecular = infer_intramolecular(reactant_smiles, product_smiles, roles_summary)
 
-    # Generate Reaction_Key
+    # Generate Reaction_Key using filtered aggregates
     reaction_key = None
     if product_bundles and reactant_bundles:
-        reactant_primary: List[str] = []
-        for bundle in reactant_bundles:
-            reactant_primary.extend(extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", [])))
-
+        # Use the pre-computed aggregates which have pattern-based filtering applied
+        reacted = set(aggregates.get("reacted_motifs", []))
+        formed = set(aggregates.get("formed_motifs", []))
+        spectators = set(aggregates.get("spectator_motifs", []))
+        
+        # Select primary motifs for key generation
+        primary_reacted = select_primary_reacted_motifs(reactant_bundles, reacted)
+        
         product_primary: List[str] = []
         for bundle in product_bundles:
             product_primary.extend(extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", [])))
-
-        reactant_counts = Counter(reactant_primary)
-        product_counts = Counter(product_primary)
-
-        reacted: set[str] = set()
-        formed: set[str] = set()
-        spectators: set[str] = set()
-        all_motifs = set(reactant_counts.keys()) | set(product_counts.keys())
-        for motif in all_motifs:
-            rc = reactant_counts.get(motif, 0)
-            pc = product_counts.get(motif, 0)
-            if pc > rc:
-                formed.add(motif)
-                if rc > 0:
-                    spectators.add(motif)
-            elif pc < rc:
-                reacted.add(motif)
-                if pc > 0:
-                    spectators.add(motif)
-            else:
-                if rc > 0:
-                    spectators.add(motif)
-
-        primary_reacted = select_primary_reacted_motifs(reactant_bundles, reacted)
+        primary_formed = select_primary_formed_motif(product_primary, formed)
         primary_formed = select_primary_formed_motif(product_primary, formed)
 
         reaction_key = format_reaction_key(

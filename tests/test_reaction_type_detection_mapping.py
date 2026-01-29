@@ -1,6 +1,6 @@
 import pytest
 
-from chemtools.featurizers import reaction_detection as rd
+from chemtools.featurizers import detection as rd
 from chemtools.taxonomy.reaction_catalog import ReactionTypeDefinition
 
 

@@ -27,10 +27,6 @@
       "metadata": {
         "coupling_confirmation": {
           "nucleophile_smarts": [
-            "[B:1](-[O,C:2])(-[O,C])(-[c,C])",
-            "[B:1](-[O,C:2])(-[O,C])(-[c,C])-[c,C]",
-            "[B:1](-[O:2])(-[O])-[c,C]",
-            "[B:1](-[O:2])(-[O])-[c,C]-[c,C]",
             "[c,C:1]-[B:2](-[O,C])(-[O,C])",
             "[c,C:1]-[B:2](-[O])(-[O])",
             "[c,C:1]-[c,C]-[B:2](-[O,C])(-[O,C])",
@@ -90,8 +86,8 @@
         },
         "coupling_confirmation": {
           "nucleophile_smarts": [
-            "[N;H2;$(N-[#6]):1][H:2]",
-            "[N;H1;$(N(-[#6])-[#6]):1][H:2]"
+            "[NX3;H2;$([N]-[#6]);!$(NC=O):1]",
+            "[NX3;H1;$([N](-[#6])-[#6]);!$(NC=O):1]"
           ],
           "require_distinct_molecules": true
         }
@@ -165,7 +161,11 @@
       "id": "Chan_Lam_C_N_Coupling",
       "reactants": {
         "electrophile": "@organoboron",
-        "nucleophile": "@amines_nh"
+        "nucleophile": [
+          "@amines_nh",
+          "HeteroAr-NH2",
+          "HeteroAr-NHR"
+        ]
       },
       "products": {
         "product": "@aryl_amines"
@@ -415,11 +415,14 @@
     {
       "id": "Cyanation_coupling",
       "reactants": {
-        "electrophile": "@sp2_electrophiles",
-        "nucleophile": "CN-"
+        "electrophile": "@sp2_electrophiles"
       },
       "products": {
-        "product": "Ar-CN"
+        "product": [
+          "Ar-CN",
+          "HeteroAr-CN",
+          "Alkenyl-CN"
+        ]
       },
       "catalysts": [
         "Pd",
@@ -427,10 +430,12 @@
         "Ni"
       ],
       "examples": [
-        "Brc1ccccc1.[C-]#N>>N#Cc1ccccc1"
+        "Brc1ccccc1.[C-]#N>>N#Cc1ccccc1",
+        "IC=CCCCCCC.CC(C)(O)C#N>>N#CC=CCCCCCC"
       ],
       "aliases": [
-        "cyanation_coupling"
+        "cyanation_coupling",
+        "nitrile_coupling"
       ]
     },
     {
@@ -451,6 +456,62 @@
       ],
       "aliases": [
         "azide_coupling"
+      ]
+    },
+    {
+      "id": "Sandmeyer",
+      "reactants": {
+        "substrate": [
+          "Ar-NH2",
+          "HeteroAr-NH2",
+          "Ar-N2+",
+          "HeteroAr-N2+"
+        ]
+      },
+      "products": {
+        "product": [
+          "Ar-Br",
+          "Ar-Cl",
+          "Ar-I",
+          "Ar-CN",
+          "HeteroAr-Br",
+          "HeteroAr-Cl",
+          "HeteroAr-I",
+          "HeteroAr-CN"
+        ]
+      },
+      "catalysts": [
+        "Cu"
+      ],
+      "examples": [
+        "Nc1ccccc1>>Brc1ccccc1",
+        "Nc1ccccc1>>Clc1ccccc1",
+        "N#[N+]c1ccccc1>>Brc1ccccc1"
+      ],
+      "aliases": [
+        "sandmeyer",
+        "sandmeyer_reaction"
+      ]
+    },
+    {
+      "id": "Michael_addition",
+      "reactants": {
+        "michael_acceptor": [
+          "Alkenyl-COR",
+          "Alkenyl-CO2R",
+          "Alkenyl-CO2H",
+          "Alkenyl-CN"
+        ]
+      },
+      "products": {},
+      "catalysts": [],
+      "examples": [
+        "C=CC(C)=O.CCOC(=O)CC(=O)OCC>>CCOC(=O)CC(CC(C)=O)C(=O)OCC",
+        "C=CC#N.N>>NCCC#N"
+      ],
+      "aliases": [
+        "michael_addition",
+        "conjugate_addition"
       ]
     },
     {
@@ -561,15 +622,28 @@
     {
       "id": "Snar_cn",
       "reactants": {
-        "electrophile": "@aromatic_halides",
-        "activator": "@aromatic_activators",
-        "nucleophile": "@amines_nh"
+        "electrophile": [
+          "Ar-F",
+          "Ar-Cl",
+          "Ar-Br",
+          "HeteroAr-F",
+          "HeteroAr-Cl",
+          "HeteroAr-Br"
+        ],
+        "nucleophile": [
+          "@amines_nh",
+          "R2CH-NH2",
+          "RCH2-NH2",
+          "HeteroAr-NH2",
+          "HeteroAr-NHR"
+        ]
       },
       "products": {
         "product": "@aryl_amines"
       },
       "examples": [
-        "Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1"
+        "Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1",
+        "Clc1ncccn1.NCC>>NCCNc1ncccn1"
       ],
       "aliases": [
         "snar_cn"

@@ -10,7 +10,7 @@ from collections import Counter
 from functools import lru_cache
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 import re
 
 from ..spectator_rank import rank_spectator_groups
@@ -21,6 +21,434 @@ from .utils import extract_scores, group_id_from_motif_id, normalize_motif_id
 _SPECTATOR_GROUP_STOPLIST = {
     "Ar", "R", "Any", "Alkyl", "Alkenyl", "Alkynyl", "H",
 }
+
+
+@lru_cache(maxsize=1)
+def load_transformation_patterns() -> Dict[str, Any]:
+    """Load transformation patterns from taxonomy."""
+    path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "transformation_patterns.json"
+    if not path.exists():
+        return {}
+    try:
+        with path.open("r", encoding="utf-8", errors="replace") as handle:
+            return json.load(handle)
+    except Exception:
+        return {}
+
+
+def get_substituent(motif_id: str) -> str:
+    """Extract substituent part from motif ID (e.g., 'Ar-Br' -> '-Br')."""
+    if "-" in motif_id:
+        parts = motif_id.split("-", 1)
+        return "-" + parts[1] if len(parts) > 1 else ""
+    return ""
+
+
+def get_scaffold(motif_id: str) -> str:
+    """Extract scaffold part from motif ID (e.g., 'Ar-Br' -> 'Ar')."""
+    if "-" in motif_id:
+        return motif_id.split("-", 1)[0]
+
+
+def make_motif_key(motif: Dict[str, Any]) -> str:
+    """
+    Create a unique key for a motif that includes fingerprint info.
+    
+    This allows distinguishing between the same compound_id with different
+    substitution states (e.g., Ar-Hydrazide with NH2 vs Ar-Hydrazide with N=).
+    
+    Key format: "{compound_id}|{fingerprint}" or just "{compound_id}" if no fingerprint.
+    """
+    compound_id = motif.get("compound_id") or motif.get("id", "")
+    fingerprint = motif.get("fingerprint", "")
+    if fingerprint:
+        return f"{compound_id}|{fingerprint}"
+    return compound_id
+
+
+def analyze_motif_changes_with_fingerprints(
+    reactant_motifs: List[Dict[str, Any]],
+    product_motifs: List[Dict[str, Any]],
+) -> Tuple[Set[str], Set[str], Set[str]]:
+    """
+    Analyze motif changes using fingerprints to detect substitution state changes.
+    
+    This is the fingerprint-aware version of analyze_substituent_changes.
+    It can detect when a functional group has changed (e.g., hydrazide NH2 -> hydrazone)
+    even though the core SMARTS pattern still matches.
+    
+    Args:
+        reactant_motifs: List of motif dicts from reactants (with fingerprint field)
+        product_motifs: List of motif dicts from products (with fingerprint field)
+        
+    Returns:
+        Tuple of (reacted_motifs, formed_motifs, spectator_motifs) as compound_id sets
+    """
+    # Build keyed representations with fingerprints
+    reactant_keys = [make_motif_key(m) for m in reactant_motifs]
+    product_keys = [make_motif_key(m) for m in product_motifs]
+    
+    reactant_key_counts = Counter(reactant_keys)
+    product_key_counts = Counter(product_keys)
+    
+    # Map keys back to compound_ids
+    key_to_id: Dict[str, str] = {}
+    for m in reactant_motifs + product_motifs:
+        key = make_motif_key(m)
+        compound_id = m.get("compound_id") or m.get("id", "")
+        key_to_id[key] = compound_id
+    
+    reacted_set: Set[str] = set()
+    formed_set: Set[str] = set()
+    spectator_set: Set[str] = set()
+    
+    # Compare by fingerprinted keys
+    all_keys = set(reactant_key_counts) | set(product_key_counts)
+    for key in all_keys:
+        rc = reactant_key_counts.get(key, 0)
+        pc = product_key_counts.get(key, 0)
+        compound_id = key_to_id.get(key, key.split("|")[0])
+        
+        if pc > rc:
+            formed_set.add(compound_id)
+            if rc > 0:
+                spectator_set.add(compound_id)
+        elif pc < rc:
+            reacted_set.add(compound_id)
+            if pc > 0:
+                spectator_set.add(compound_id)
+        else:
+            if rc > 0:
+                spectator_set.add(compound_id)
+    
+    # Additional check: same compound_id but different fingerprints = change
+    # Group by base compound_id
+    reactant_by_id: Dict[str, List[str]] = {}
+    for m in reactant_motifs:
+        cid = m.get("compound_id") or m.get("id", "")
+        fp = m.get("fingerprint", "")
+        reactant_by_id.setdefault(cid, []).append(fp)
+    
+    product_by_id: Dict[str, List[str]] = {}
+    for m in product_motifs:
+        cid = m.get("compound_id") or m.get("id", "")
+        fp = m.get("fingerprint", "")
+        product_by_id.setdefault(cid, []).append(fp)
+    
+    # Check for fingerprint changes within same compound_id
+    for cid in set(reactant_by_id) & set(product_by_id):
+        r_fps = set(reactant_by_id[cid])
+        p_fps = set(product_by_id[cid])
+        
+        # If fingerprints differ, this group participated in reaction
+        if r_fps != p_fps:
+            # Remove from spectator, add to both reacted and formed
+            spectator_set.discard(cid)
+            if r_fps - p_fps:  # Some fingerprints disappeared
+                reacted_set.add(cid)
+            if p_fps - r_fps:  # Some fingerprints appeared
+                formed_set.add(cid)
+    
+    return reacted_set, formed_set, spectator_set
+
+
+def select_primary_motifs_by_atom(motif_dicts: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Select primary motif for each attachment atom (a_atom_idx).
+    
+    When multiple motifs share the same attachment atom (e.g., R_acidic-CN and 
+    R_acidic-OH on same carbon), only one can be the primary reactive site.
+    Uses reactivity_weight to select, falls back to priority.
+    
+    Args:
+        motif_dicts: List of motif dictionaries with a_idx (or a_atom_idx), reactivity_weight, etc.
+        
+    Returns:
+        Filtered list with one primary motif per attachment atom
+    """
+    if not motif_dicts:
+        return []
+    
+    # Group by attachment atom (supports both a_idx and a_atom_idx keys)
+    by_atom: Dict[int, List[Dict[str, Any]]] = {}
+    for m in motif_dicts:
+        a_idx = m.get("a_idx") or m.get("a_atom_idx")
+        if a_idx is None:
+            # No atom info, keep as-is
+            continue
+        by_atom.setdefault(a_idx, []).append(m)
+    
+    # Select best motif per atom
+    selected: List[Dict[str, Any]] = []
+    for a_idx, motifs in by_atom.items():
+        if len(motifs) == 1:
+            selected.append(motifs[0])
+        else:
+            # Sort by reactivity_weight (desc), then priority (desc)
+            best = max(
+                motifs, 
+                key=lambda m: (m.get("reactivity_weight", 0), m.get("priority", 0))
+            )
+            selected.append(best)
+    
+    # Add any motifs without atom info
+    for m in motif_dicts:
+        a_idx = m.get("a_idx") or m.get("a_atom_idx")
+        if a_idx is None:
+            selected.append(m)
+    
+    return selected
+
+
+def extract_motif_with_bond_info(motif: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extract motif info preserving bond-level data and fingerprint.
+    
+    Returns dict with:
+        - id: Normalized compound ID
+        - a_idx: Attachment atom index
+        - b_idx: Substituent atom index  
+        - bond: Site bond tuple
+        - reactivity_weight: For primary site selection
+        - fingerprint: Heteroatom H-count/connectivity signature (for change detection)
+        - h_count: Total H count on heteroatoms (quick comparison)
+    """
+    cid = motif.get("compound_id") or motif.get("id")
+    if not cid:
+        return {}
+    return {
+        "id": normalize_motif_id(str(cid)),
+        "compound_id": normalize_motif_id(str(cid)),  # Alias for fingerprint functions
+        "a_idx": motif.get("a_atom_idx"),
+        "b_idx": motif.get("b_atom_idx"),
+        "bond": motif.get("bond"),
+        "reactivity_weight": motif.get("reactivity_weight", 0),
+        "priority": motif.get("priority", 0),
+        "fingerprint": motif.get("fingerprint", ""),
+        "h_count": motif.get("h_count", 0),
+    }
+
+
+def analyze_motif_changes_with_bonds(
+    reactant_motifs: List[Dict[str, Any]],
+    product_motifs: List[Dict[str, Any]],
+) -> Tuple[Set[str], Set[str], Set[str]]:
+    """
+    Analyze motif changes using bond-level tracking.
+    
+    Compares motifs by both ID and bond position when available.
+    Falls back to ID-only comparison when bond info missing.
+    
+    Args:
+        reactant_motifs: List of motif dicts with id, a_idx, b_idx, bond
+        product_motifs: List of motif dicts with id, a_idx, b_idx, bond
+        
+    Returns:
+        Tuple of (reacted_ids, formed_ids, spectator_ids)
+    """
+    # Build reactant index: (id, bond) -> motif
+    reactant_by_id: Dict[str, List[Dict]] = {}
+    reactant_by_bond: Dict[Tuple, Dict] = {}
+    for m in reactant_motifs:
+        mid = m.get("id", "")
+        if mid:
+            reactant_by_id.setdefault(mid, []).append(m)
+        bond = m.get("bond")
+        if bond:
+            reactant_by_bond[tuple(sorted(bond))] = m
+    
+    # Build product index
+    product_by_id: Dict[str, List[Dict]] = {}
+    product_by_bond: Dict[Tuple, Dict] = {}
+    for m in product_motifs:
+        mid = m.get("id", "")
+        if mid:
+            product_by_id.setdefault(mid, []).append(m)
+        bond = m.get("bond")
+        if bond:
+            product_by_bond[tuple(sorted(bond))] = m
+    
+    # Analyze changes
+    all_ids = set(reactant_by_id.keys()) | set(product_by_id.keys())
+    reacted_ids: Set[str] = set()
+    formed_ids: Set[str] = set()
+    spectator_ids: Set[str] = set()
+    
+    for mid in all_ids:
+        r_count = len(reactant_by_id.get(mid, []))
+        p_count = len(product_by_id.get(mid, []))
+        
+        if p_count > r_count:
+            formed_ids.add(mid)
+            if r_count > 0:
+                spectator_ids.add(mid)
+        elif p_count < r_count:
+            reacted_ids.add(mid)
+            if p_count > 0:
+                spectator_ids.add(mid)
+        else:
+            if r_count > 0:
+                spectator_ids.add(mid)
+    
+    # Bond-level refinement: if bond still exists in product, motif didn't react
+    for mid in list(reacted_ids):
+        r_motifs = reactant_by_id.get(mid, [])
+        for rm in r_motifs:
+            bond = rm.get("bond")
+            if bond and tuple(sorted(bond)) in product_by_bond:
+                # Bond still exists in product - this specific instance is spectator
+                # But if ANY instance reacted, keep in reacted
+                pass  # Keep current classification for now
+    
+    # Apply substituent-centric refinement
+    return analyze_substituent_changes(
+        [m.get("id", "") for m in reactant_motifs if m.get("id")],
+        [m.get("id", "") for m in product_motifs if m.get("id")]
+    )
+
+
+def analyze_substituent_changes(
+    reactant_motif_ids: List[str],
+    product_motif_ids: List[str],
+) -> Tuple[Set[str], Set[str], Set[str]]:
+    """
+    Analyze motif changes using substituent-centric comparison.
+    
+    This approach focuses on which substituents disappear/appear,
+    working across different scaffold types (Ar, HeteroAr, Alkenyl, etc.).
+    
+    Args:
+        reactant_motif_ids: List of motif IDs from reactants
+        product_motif_ids: List of motif IDs from products
+        
+    Returns:
+        Tuple of (reacted_motifs, formed_motifs, spectator_motifs)
+    """
+    reactant_counts = Counter(reactant_motif_ids)
+    product_counts = Counter(product_motif_ids)
+    
+    # Build substituent -> motifs mapping for both sides
+    reactant_subs: Dict[str, List[str]] = {}
+    for motif_id in reactant_motif_ids:
+        sub = get_substituent(motif_id)
+        if sub:
+            reactant_subs.setdefault(sub, []).append(motif_id)
+    
+    product_subs: Dict[str, List[str]] = {}
+    for motif_id in product_motif_ids:
+        sub = get_substituent(motif_id)
+        if sub:
+            product_subs.setdefault(sub, []).append(motif_id)
+    
+    reacted_set: Set[str] = set()
+    formed_set: Set[str] = set()
+    spectator_set: Set[str] = set()
+    
+    # Analyze each motif using count comparison
+    for motif_id in set(reactant_counts) | set(product_counts):
+        rc = reactant_counts.get(motif_id, 0)
+        pc = product_counts.get(motif_id, 0)
+        
+        if pc > rc:
+            formed_set.add(motif_id)
+            if rc > 0:
+                spectator_set.add(motif_id)
+        elif pc < rc:
+            reacted_set.add(motif_id)
+            if pc > 0:
+                spectator_set.add(motif_id)
+        else:
+            if rc > 0:
+                spectator_set.add(motif_id)
+    
+    # Cross-scaffold substituent matching:
+    # If substituent appears in products on ANY scaffold, motifs with that 
+    # substituent might be spectators, not truly reacted
+    consumed_subs = set(reactant_subs.keys()) - set(product_subs.keys())
+    appeared_subs = set(product_subs.keys()) - set(reactant_subs.keys())
+    
+    # Refine reacted: prioritize motifs with truly consumed substituents
+    refined_reacted: Set[str] = set()
+    for motif_id in reacted_set:
+        sub = get_substituent(motif_id)
+        # If substituent is in consumed list, definitely reacted
+        if sub in consumed_subs:
+            refined_reacted.add(motif_id)
+        # If substituent still exists on other scaffolds, might be spectator
+        elif sub in product_subs:
+            # Check count - if product count is lower overall, still reacted
+            sub_rc = len(reactant_subs.get(sub, []))
+            sub_pc = len(product_subs.get(sub, []))
+            if sub_pc < sub_rc:
+                refined_reacted.add(motif_id)
+            else:
+                spectator_set.add(motif_id)
+        else:
+            # No substituent info, keep original classification
+            refined_reacted.add(motif_id)
+    
+    # Refine formed: prioritize motifs with truly new substituents
+    refined_formed: Set[str] = set()
+    for motif_id in formed_set:
+        sub = get_substituent(motif_id)
+        if sub in appeared_subs:
+            refined_formed.add(motif_id)
+        elif sub in reactant_subs:
+            sub_rc = len(reactant_subs.get(sub, []))
+            sub_pc = len(product_subs.get(sub, []))
+            if sub_pc > sub_rc:
+                refined_formed.add(motif_id)
+            else:
+                spectator_set.add(motif_id)
+        else:
+            refined_formed.add(motif_id)
+    
+    return refined_reacted, refined_formed, spectator_set
+
+
+def filter_reacted_by_pattern(
+    reacted_motifs: List[str],
+    reaction_type: Optional[str],
+) -> List[str]:
+    """
+    Filter reacted motifs using transformation pattern rules.
+    
+    Uses the unified 'leaving_groups' field from transformation_patterns.json.
+    Only keeps motifs whose substituent matches expected leaving groups.
+    
+    Args:
+        reacted_motifs: Raw list of reacted motif IDs
+        reaction_type: Detected reaction type ID
+        
+    Returns:
+        Filtered list of reacted motifs relevant to the reaction
+    """
+    if not reaction_type or not reacted_motifs:
+        return reacted_motifs
+    
+    patterns = load_transformation_patterns()
+    reaction_patterns = patterns.get("reaction_patterns", {})
+    
+    pattern_info = reaction_patterns.get(reaction_type)
+    if not pattern_info:
+        return reacted_motifs
+    
+    # All patterns now use unified 'leaving_groups' field
+    leaving_groups: Set[str] = set(pattern_info.get("leaving_groups", []))
+    
+    if not leaving_groups:
+        # No leaving groups defined (e.g., addition reactions) - return original
+        return reacted_motifs
+    
+    # Filter: keep only motifs with substituents in leaving_groups
+    filtered = []
+    for motif in reacted_motifs:
+        sub = get_substituent(motif)
+        if sub in leaving_groups:
+            filtered.append(motif)
+    
+    # If filtering removed everything, return original (fallback)
+    return filtered if filtered else reacted_motifs
 
 
 @lru_cache(maxsize=1)
@@ -48,6 +476,8 @@ def aggregate_reaction_features(
     reactants: Iterable[Dict[str, Any]],
     *,
     product_motif_ids: Optional[List[str]] = None,
+    product_motifs: Optional[List[Dict[str, Any]]] = None,
+    reaction_type: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Aggregate features across all reactants and products.
@@ -55,6 +485,9 @@ def aggregate_reaction_features(
     Args:
         reactants: List of reactant feature bundles
         product_motif_ids: Optional list of product motif IDs for change analysis
+        product_motifs: Optional list of product motif dicts with fingerprints
+                       (for fingerprint-aware change detection)
+        reaction_type: Optional reaction type ID for pattern-based filtering
         
     Returns:
         Aggregated features including motifs, spectators, steric/electronic stats
@@ -65,6 +498,7 @@ def aggregate_reaction_features(
     electronic_scores: List[float] = []
     motifs: set[str] = set()
     reactant_motif_ids: List[str] = []
+    reactant_motifs_per_mol: List[List[Dict[str, Any]]] = []  # Keep separate per reactant to avoid atom index collisions
     spectator_groups: List[str] = []
     spectator_seen: set[str] = set()
     scaffold_ids = load_scaffold_motif_ids()
@@ -84,51 +518,63 @@ def aggregate_reaction_features(
         motif_entries = reactant.get("motifs", [])
         context_entries = reactant.get("context_motifs", [])
         for motif in motif_entries:
-            compound_id = normalize_motif_id(motif.get("compound_id") or "")
+            compound_id = normalize_motif_id(motif.get("compound_id") or motif.get("id") or "")
             if compound_id:
                 motifs.add(str(compound_id))
         
+        # Phase 3: Collect full motif dicts with bond info (per reactant to avoid atom index collisions)
+        motifs_for_this_reactant: List[Dict[str, Any]] = []
         for motif in motif_entries:
             if isinstance(motif, dict):
-                cid = motif.get("compound_id")
+                cid = motif.get("compound_id") or motif.get("id")
                 if cid:
                     reactant_motif_ids.append(normalize_motif_id(str(cid)))
+                    motif_info = extract_motif_with_bond_info(motif)
+                    if motif_info:
+                        motifs_for_this_reactant.append(motif_info)
         if context_entries:
             for motif in context_entries:
                 if isinstance(motif, dict):
-                    cid = motif.get("compound_id")
+                    cid = motif.get("compound_id") or motif.get("id")
                     if cid:
                         reactant_motif_ids.append(normalize_motif_id(str(cid)))
+                        motif_info = extract_motif_with_bond_info(motif)
+                        if motif_info:
+                            motifs_for_this_reactant.append(motif_info)
+        
+        if motifs_for_this_reactant:
+            reactant_motifs_per_mol.append(motifs_for_this_reactant)
+    
+    # Phase 3: Select primary motif per attachment atom WITHIN EACH REACTANT
+    # This prevents atom index collisions between different reactants (e.g., piperazine atom 3 vs aniline atom 3)
+    reactant_motifs_full: List[Dict[str, Any]] = []
+    for motifs_for_mol in reactant_motifs_per_mol:
+        primary_for_mol = select_primary_motifs_by_atom(motifs_for_mol)
+        reactant_motifs_full.extend(primary_for_mol)
+    
+    # Extract IDs from primary motifs for use in change analysis
+    primary_motif_ids_list = [m.get("id", "") for m in reactant_motifs_full if m.get("id")]
 
     # Analyze motif changes if products are provided
-    if product_motif_ids:
-        reactant_counts = Counter(reactant_motif_ids)
-        product_counts = Counter(product_motif_ids)
-        reacted_set: set[str] = set()
-        formed_set: set[str] = set()
-        spectator_motifs_set = {
-            motif_id
-            for motif_id in reactant_counts
-            if product_counts.get(motif_id, 0) > 0
-        }
-        
-        for motif_id in set(reactant_counts) | set(product_counts):
-            rc = reactant_counts.get(motif_id, 0)
-            pc = product_counts.get(motif_id, 0)
-            if pc > rc:
-                formed_set.add(motif_id)
-                if rc > 0:
-                    spectator_motifs_set.add(motif_id)
-            elif pc < rc:
-                reacted_set.add(motif_id)
-                if pc > 0:
-                    spectator_motifs_set.add(motif_id)
-            else:
-                if rc > 0:
-                    spectator_motifs_set.add(motif_id)
+    if product_motif_ids or product_motifs:
+        # Use fingerprint-aware comparison if full motif dicts are available
+        if product_motifs and any(m.get("fingerprint") for m in reactant_motifs_full):
+            # Extract product motifs with fingerprints
+            product_motifs_with_fp = [extract_motif_with_bond_info(m) for m in product_motifs if isinstance(m, dict)]
+            product_motifs_with_fp = [m for m in product_motifs_with_fp if m.get("id")]
+            
+            reacted_set, formed_set, spectator_motifs_set = analyze_motif_changes_with_fingerprints(
+                reactant_motifs_full, product_motifs_with_fp
+            )
+        else:
+            # Fallback to ID-only comparison
+            product_ids = product_motif_ids or [m.get("compound_id") or m.get("id", "") for m in (product_motifs or [])]
+            reacted_set, formed_set, spectator_motifs_set = analyze_substituent_changes(
+                primary_motif_ids_list, product_ids
+            )
         
         # Collect spectator groups
-        for motif_id in reactant_motif_ids:
+        for motif_id in primary_motif_ids_list:
             if motif_id not in spectator_motifs_set:
                 continue
             group_id = group_id_from_motif_id(motif_id)
@@ -145,17 +591,23 @@ def aggregate_reaction_features(
                 spectator_seen.add(motif_id)
                 spectator_groups.append(motif_id)
         
-        reacted_motifs = sorted(reacted_set)
+        # Apply transformation pattern filtering to reacted motifs
+        raw_reacted = sorted(reacted_set)
+        reacted_motifs = filter_reacted_by_pattern(raw_reacted, reaction_type)
         formed_motifs = sorted(formed_set)
         spectator_motifs = sorted(spectator_motifs_set)
 
     avg_electronic = None
     if electronic_scores:
         avg_electronic = round(sum(electronic_scores) / len(electronic_scores), 2)
+    
+    # Phase 3: Extract primary motif IDs (after per-atom selection)
+    primary_motif_ids = [m.get("id", "") for m in reactant_motifs_full if m.get("id")]
 
     return {
         "reactant_count": len(reactant_list),
         "motif_ids": sorted(motifs),
+        "primary_motif_ids": sorted(set(primary_motif_ids)),  # Phase 3: After per-atom selection
         "reacted_motifs": reacted_motifs,
         "formed_motifs": formed_motifs,
         "spectator_motifs": spectator_motifs,

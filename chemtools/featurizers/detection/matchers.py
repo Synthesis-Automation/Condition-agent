@@ -12,8 +12,8 @@ from typing import Any, Dict, Iterable, List, Optional, Set
 
 from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
 
-from ..motif_detect import detect_motifs
-from ..motif_registry import build_compound_registry
+from ..motifs.detection import detect_motifs
+from ..motifs.registry import build_compound_registry
 from ...taxonomy.reaction_catalog import ReactionTypeDefinition, load_reaction_catalog
 
 from .models import ReactionMatch, ReactionDetectionResult

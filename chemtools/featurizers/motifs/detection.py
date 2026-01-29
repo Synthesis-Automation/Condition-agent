@@ -7,6 +7,114 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 from .models import CompoundPattern, _DISCOVERY_SKIP_SUBSTITUENTS
 
 
+def compute_motif_fingerprint(mol: Any, matched_atoms: Set[int]) -> str:
+    """
+    Compute a fingerprint string that captures the state of matched atoms.
+    
+    This fingerprint includes:
+    - For each matched heteroatom: element, H count, heavy-atom degree, hybridization
+    - Sorted by atom index for consistency
+    
+    The fingerprint allows detecting when a functional group has changed
+    (e.g., hydrazide NH2 -> hydrazone N=) even if the core SMARTS still matches.
+    
+    Works correctly with molecules that have explicit H's (via AddHs).
+    
+    Args:
+        mol: RDKit molecule object
+        matched_atoms: Set of atom indices that matched the SMARTS
+        
+    Returns:
+        A fingerprint string like "N:H2:D1:SP3,N:H1:D2:SP2" (sorted by index)
+    """
+    if not matched_atoms:
+        return ""
+    
+    try:
+        parts = []
+        for idx in sorted(matched_atoms):
+            atom = mol.GetAtomWithIdx(idx)
+            symbol = atom.GetSymbol()
+            # Only fingerprint heteroatoms (N, O, S, P) - these are where H-count matters
+            if symbol not in ("N", "O", "S", "P"):
+                continue
+            
+            # Count H neighbors (works for both explicit and implicit H molecules)
+            # GetTotalNumHs() returns 0 after AddHs(), so count explicit H neighbors
+            h_count = 0
+            heavy_neighbors = 0
+            for neighbor in atom.GetNeighbors():
+                if neighbor.GetSymbol() == "H":
+                    h_count += 1
+                else:
+                    heavy_neighbors += 1
+            
+            # Also add implicit H if any (shouldn't be any after AddHs, but be safe)
+            h_count += atom.GetNumImplicitHs()
+            
+            # Get hybridization
+            hyb = str(atom.GetHybridization()).split(".")[-1]  # SP3, SP2, SP, etc
+            
+            parts.append(f"{symbol}:H{h_count}:D{heavy_neighbors}:{hyb}")
+        return ",".join(parts)
+    except Exception:
+        return ""
+
+
+def compute_extended_fingerprint(mol: Any, matched_atoms: Set[int], a_idx: int, b_idx: int) -> Dict[str, Any]:
+    """
+    Compute extended fingerprint with structured data for fine-grained comparison.
+    
+    Returns a dict with:
+    - heteroatom_h_counts: Dict mapping atom index to H count for N/O/S/P
+    - total_h_on_heteroatoms: Sum of H on all heteroatoms (quick comparison)
+    - fingerprint_str: String representation for hashing/comparison
+    
+    Works correctly with molecules that have explicit H's (via AddHs).
+    
+    Args:
+        mol: RDKit molecule
+        matched_atoms: Set of matched atom indices
+        a_idx: Scaffold attachment atom index
+        b_idx: Substituent attachment atom index
+    """
+    result = {
+        "heteroatom_h_counts": {},
+        "total_h_on_heteroatoms": 0,
+        "fingerprint_str": "",
+    }
+    
+    if not matched_atoms:
+        return result
+    
+    try:
+        parts = []
+        for idx in sorted(matched_atoms):
+            atom = mol.GetAtomWithIdx(idx)
+            symbol = atom.GetSymbol()
+            if symbol in ("N", "O", "S", "P"):
+                # Count H neighbors (works for molecules with explicit H's)
+                h_count = 0
+                heavy_neighbors = 0
+                for neighbor in atom.GetNeighbors():
+                    if neighbor.GetSymbol() == "H":
+                        h_count += 1
+                    else:
+                        heavy_neighbors += 1
+                # Also add implicit H if any
+                h_count += atom.GetNumImplicitHs()
+                
+                result["heteroatom_h_counts"][idx] = h_count
+                result["total_h_on_heteroatoms"] += h_count
+                parts.append(f"{symbol}:H{h_count}:D{heavy_neighbors}")
+        
+        result["fingerprint_str"] = ",".join(parts)
+    except Exception:
+        pass
+    
+    return result
+
+
 def detect_motifs(
     mol: Any,
     compiled_compounds: Iterable[CompoundPattern],
@@ -77,6 +185,12 @@ def detect_motifs(
             if key in seen:
                 continue
             seen.add(key)
+            
+            # Compute fingerprint capturing H-count and connectivity on heteroatoms
+            matched_atom_set = set(match)
+            fingerprint = compute_motif_fingerprint(mol, matched_atom_set)
+            extended_fp = compute_extended_fingerprint(mol, matched_atom_set, a_idx, b_idx)
+            
             raw_hits.append(
                 {
                     "compound_id": compound.compound_id,
@@ -89,7 +203,9 @@ def detect_motifs(
                     "group_b": compound.group_b,
                     "reactivity_weight": compound.reactivity_weight,
                     "undocumented": False,
-                    "atoms": set(match),
+                    "atoms": matched_atom_set,
+                    "fingerprint": fingerprint,
+                    "h_count": extended_fp["total_h_on_heteroatoms"],
                 }
             )
 
