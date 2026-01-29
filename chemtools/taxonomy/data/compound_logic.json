@@ -147,7 +147,8 @@
         "CH3-SH",
         "RCH2-SH",
         "R2CH-SH",
-        "R3C-SH"
+        "R3C-SH",
+        "Thiocarbonyl-SH"
       ],
       "usage": [
         "C_S_Coupling"
