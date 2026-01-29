@@ -1008,11 +1008,11 @@ def process_reaction_dataset(
     df["z_score"] = df["z_score"].round(2)
 
     canonical_cols = [
-        "reaction_id", "detected_reaction_type", "reaction_smiles", "yield", "z_score",
+        "reaction_id", "detected_reaction_type", "reaction_smiles", "Reaction_Key",
         "reactant_1", "reactant_2", "reactant_3", "formed_motifs",
         "catalyst", "ligand", "base", "acid", "oxidant", "reductant",
         "additive", "condensation_agent", "other_reagent", "solvent",
-        "spectator_groups", "reference", "Reaction_Key",
+        "spectator_groups", "reference", "yield", "z_score",
     ]
     df = df[canonical_cols]
 

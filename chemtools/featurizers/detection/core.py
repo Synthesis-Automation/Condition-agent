@@ -188,14 +188,15 @@ def detect_reaction_types_from_smiles(
         "C_O_Coupling": 100,
         "C_S_Coupling": 100,
         "Amide_formation": 100,
+        "Azide_coupling": 100,  # Specific transformation - prioritize over generic C-H arylation
         "C_H_arylation": 10,
         "Arylation_acidic_C_H": 10,
     }
 
     matches.sort(
         key=lambda m: (
+            -_PRIORITIES.get(m.reaction_type, 50),  # Priority first!
             -m.matched_slots,
-            -_PRIORITIES.get(m.reaction_type, 50),
             -sum(len(v) for v in m.slot_evidence.values()),
             m.reaction_type,
         )

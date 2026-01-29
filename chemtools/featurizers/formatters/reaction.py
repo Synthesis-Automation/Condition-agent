@@ -104,10 +104,39 @@ def select_primary_formed_motif(
     product_motifs: Iterable[Any],
     formed_set: set[str],
 ) -> Optional[str]:
-    """Select the first formed motif from products."""
-    for motif in extract_motif_ids(product_motifs):
-        if motif in formed_set:
-            return motif
+    """
+    Select the primary formed motif from products.
+    
+    Prioritizes compound motifs (scaffold-substituent like Ar-Br, HeteroAr-OH)
+    over generic functional group motifs to identify the key transformation.
+    
+    Args:
+        product_motifs: Product motif IDs
+        formed_set: Set of motifs that were formed
+        
+    Returns:
+        Primary formed motif ID, or None if no formed motifs
+    """
+    candidates = [m for m in extract_motif_ids(product_motifs) if m in formed_set]
+    if not candidates:
+        return None
+    
+    # Prioritize scaffold-substituent patterns (Ar-X, HeteroAr-X, Alkenyl-X, etc.)
+    # over generic functional groups (R3C-X, RCH2-X, Alkyl-X, etc.)
+    scaffold_substituent_motifs = []
+    for m in candidates:
+        if "-" not in m:
+            continue
+        scaffold = m.split("-", 1)[0]
+        # Include only named scaffolds, exclude generic R-groups
+        if not any(scaffold.startswith(prefix) for prefix in ["R", "Alkyl"]):
+            scaffold_substituent_motifs.append(m)
+    
+    if scaffold_substituent_motifs:
+        return scaffold_substituent_motifs[0]
+    
+    # Fall back to first formed motif
+    return candidates[0]
     return None
 
 
