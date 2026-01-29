@@ -411,11 +411,14 @@
     {
       "id": "Cyanation_coupling",
       "reactants": {
-        "electrophile": "@sp2_electrophiles",
-        "nucleophile": "CN-"
+        "electrophile": "@sp2_electrophiles"
       },
       "products": {
-        "product": "Ar-CN"
+        "product": [
+          "Ar-CN",
+          "HeteroAr-CN",
+          "Alkenyl-CN"
+        ]
       },
       "catalysts": [
         "Pd",
@@ -423,10 +426,12 @@
         "Ni"
       ],
       "examples": [
-        "Brc1ccccc1.[C-]#N>>N#Cc1ccccc1"
+        "Brc1ccccc1.[C-]#N>>N#Cc1ccccc1",
+        "IC=CCCCCCC.CC(C)(O)C#N>>N#CC=CCCCCCC"
       ],
       "aliases": [
-        "cyanation_coupling"
+        "cyanation_coupling",
+        "nitrile_coupling"
       ]
     },
     {
