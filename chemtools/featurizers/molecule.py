@@ -16,8 +16,8 @@ from .alkyl_steric import analyze_alkyl_steric
 from .aryl_electronics import analyze_aryl_electronics
 from .aryl_steric import analyze_aryl_steric
 from .nearby_groups import analyze_nearby_groups
-from .motif_detect import detect_motifs
-from .motif_registry import build_compound_registry, _default_registry_paths
+from .motifs.detection import detect_motifs
+from .motifs.registry import build_compound_registry, _default_registry_paths
 
 _INORGANIC_SMARTS = (
     "O=C=O",
