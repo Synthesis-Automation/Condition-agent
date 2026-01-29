@@ -105,18 +105,7 @@ def validate_detection_with_reacted_motifs(
                     "reason": f"Taxonomy pattern: {' + '.join(matched_slots)} → {defn.name}",
                 }
     
-    # Exclusion rule: Arylation_Ar_H with organometallic nucleophile
-    if initial_detection == "Arylation_Ar_H":
-        if _has_organometallic_nucleophile_taxonomy(reacted_set, definitions):
-            return {
-                "reaction_type": "Unknown",
-                "confidence": 0.3,
-                "validation_method": "reacted_motifs_exclusion",
-                "corrected_from": initial_detection,
-                "reason": "Organometallic nucleophile present - not C-H activation",
-            }
-    
-    # No correction needed
+    # No correction needed - pattern consistent with slot-based detection
     return {
         "reaction_type": initial_detection,
         "confidence": initial_confidence,
@@ -124,24 +113,3 @@ def validate_detection_with_reacted_motifs(
         "corrected_from": None,
         "reason": "Pattern consistent with slot-based detection",
     }
-
-
-def _has_organometallic_nucleophile_taxonomy(
-    motifs: Set[str], 
-    definitions: Dict[str, ReactionTypeDefinition]
-) -> bool:
-    """
-    Check for any organometallic nucleophile using taxonomy definitions.
-    Looks for motifs matching organoboron, organotin, organozinc patterns.
-    """
-    # Find organoboron, organotin, organozinc patterns from taxonomy
-    organometallic_motifs = set()
-    
-    for reaction_id in ["Suzuki_miyaura", "Stille", "Negishi"]:
-        if reaction_id in definitions:
-            defn = definitions[reaction_id]
-            for slot_name, slot_req in defn.reactants.items():
-                if "nucleophile" in slot_name.lower() or "organo" in slot_name.lower():
-                    organometallic_motifs.update(slot_req.allowed)
-    
-    return any(m in motifs for m in organometallic_motifs)
