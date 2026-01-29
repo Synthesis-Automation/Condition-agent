@@ -34,7 +34,7 @@ def detect_reaction_types(
     max_hits_per_compound: Optional[int] = None,
     use_bond_changes: bool = False,
     bond_change_threshold: float = 0.4,
-    confirm_coupling_products: bool = True,
+    confirm_coupling_products: bool = False,
 ) -> ReactionDetectionResult:
     """
     Detect reaction types from a reaction SMILES string.
@@ -44,16 +44,15 @@ def detect_reaction_types(
         max_hits_per_compound: Limit motif matches per compound
         use_bond_changes: Try bond change analysis first
         bond_change_threshold: Minimum similarity for bond changes
-        confirm_coupling_products: Verify coupling products by attachment (default True)
-            Supports 9+ coupling reactions: Suzuki, Negishi, Stille, Kumada, Hiyama,
-            Sonogashira, Buchwald-Hartwig (C-N), C-O, and C-S couplings
+        confirm_coupling_products: Verify coupling products by attachment (default False)
+            DEPRECATED: Reacted motifs analysis is now sufficient for validation
         
     Returns:
         ReactionDetectionResult with ranked matches
         
     Note:
-        Product confirmation uses a general validation system that analyzes bond formation
-        patterns to confirm coupling products across multiple reaction types.
+        Validation now relies on reacted/formed motifs analysis instead of
+        SMARTS-based coupling confirmation, which had issues with implicit hydrogens.
     """
     if not reaction_smiles:
         return ReactionDetectionResult(matches=[], error="empty_reaction")
@@ -102,7 +101,7 @@ def detect_reaction_types_from_smiles(
     *,
     product_smiles: Optional[Iterable[str]] = None,
     max_hits_per_compound: Optional[int] = None,
-    confirm_coupling_products: bool = True,
+    confirm_coupling_products: bool = False,
 ) -> ReactionDetectionResult:
     """
     Detect reaction types from a list of reactant SMILES strings.
@@ -111,16 +110,15 @@ def detect_reaction_types_from_smiles(
         reactant_smiles: List of reactant SMILES
         product_smiles: Optional list of product SMILES
         max_hits_per_compound: Limit motif matches per compound
-        confirm_coupling_products: Verify coupling products by attachment (default True)
-            Supports 9+ coupling reactions across all major cross-coupling types
+        confirm_coupling_products: Verify coupling products by attachment (default False)
+            DEPRECATED: Reacted motifs analysis is now sufficient for validation
         
     Returns:
         ReactionDetectionResult with ranked matches
         
     Note:
-        Product confirmation analyzes bond formation patterns to validate coupling
-        reactions including Suzuki, Negishi, Stille, Kumada, Hiyama, Sonogashira,
-        Buchwald-Hartwig (C-N), C-O, and C-S couplings.
+        Validation now relies on reacted/formed motifs analysis instead of
+        SMARTS-based coupling confirmation, which had issues with implicit hydrogens.
     """
     if not rdkit_available():
         return ReactionDetectionResult(matches=[], error="rdkit_unavailable")
@@ -144,6 +142,43 @@ def detect_reaction_types_from_smiles(
         match = match_reaction_definition(definition, detected_profile, product_profile)
         if match is not None:
             matches.append(match)
+
+    # Validate using formed motifs when products are available
+    if product_smiles is not None and reactant_smiles:
+        # Get formed motifs from reaction key analysis
+        from chemtools.featurizers.formatters.reaction import featurize_reaction
+        try:
+            full_rxn = '.'.join(reactant_smiles) + '>>' + '.'.join(product_smiles)
+            rxn_result = featurize_reaction(full_rxn)
+            aggregates = rxn_result.get('aggregates', {})
+            formed_motifs = set(aggregates.get('formed_motifs', []))
+            
+            if formed_motifs:
+                validated: List[ReactionMatch] = []
+                for match in matches:
+                    definition = definitions.get(match.reaction_type)
+                    if not definition or not definition.products:
+                        # No product requirements - keep match
+                        validated.append(match)
+                        continue
+                    
+                    # Check if at least one product slot matches formed motifs
+                    has_formed_product = False
+                    for slot_req in definition.products.values():
+                        if slot_req.allowed:
+                            for motif in slot_req.allowed:
+                                if motif in formed_motifs:
+                                    has_formed_product = True
+                                    break
+                            if has_formed_product:
+                                break
+                    
+                    if has_formed_product:
+                        validated.append(match)
+                
+                matches = validated
+        except Exception:
+            pass  # If validation fails, use unfiltered matches
 
     # Validate coupling products by analyzing bond formation patterns
     if confirm_coupling_products and product_smiles is not None:

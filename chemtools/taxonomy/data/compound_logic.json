@@ -239,7 +239,8 @@
       "name": "Aryl Ethers",
       "description": "C-O coupling products.",
       "members": [
-        "Ar-Ar"
+        "Ar-OR",
+        "AromN-OR"
       ],
       "usage": [
         "C_O_Coupling"

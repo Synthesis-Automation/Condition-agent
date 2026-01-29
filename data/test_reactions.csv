@@ -38,3 +38,7 @@ visible_light_promoted_c_s_cross_coupling_reaction,VisibleLight_Coupling_ArylBr+
 31-043-CAS-22374930,C_N_Coupling,72,,,CN1CC[C@](C(=O)[C@]2(c3ccccc3Br)CCN(C)C2=O)(c2ccccc2Br)C1=O>>CN1CC[C@](C(=O)[C@]2(c3ccccc3N=[N+]=[N-])CCN(C)C2=O)(c2ccccc2N=[N+]=[N-])C1=O,"Journal of the American Chemical Society (2020), 142(27), 11685-11690","3144-09-0, 2097963-55-6",2747281-42-9,"147-85-3, 1310-73-2, 7681-65-4, 26628-22-8",,"64-17-5, 7732-18-5",,,,,,,1,1,72,,,,,,,sealed tube used,
 31-614-CAS-35965024,C_N_Coupling,80,,,Ic1ccccc1.CC(C)(C)OC(=O)NN>>CC(C)(C)OC(=O)N(N)c1ccccc1,"European Journal of Organic Chemistry (2023), 26(14), e202300049","288-32-4, 333-47-1",2641918-53-6,534-17-8,"66-71-7, 7681-65-4",68-12-2,,,,,,,1,1,80,,,,,,,"Ullmann reaction, sealed flask used",
 31-172-CAS-23087622,C_N_Coupling,85,,,Ic1ccccc1.O=CNC1=CCCCC1>>O=CN(C1=CCCCC1)c1ccccc1,"ACS Catalysis (2021), 11(2), 858-864","615-36-1, 2770463-37-9",2770463-46-0,"1972-28-7, 7778-53-2",7681-65-4,108-88-3,,,,,,,1,1,85,,,,,,,"thermal, sealed Schlenk tube used",
+C_O_Couping,,86,,,Cc1cc(C)cc(O)c1.CC(=O)c1ccc(I)cc1>>CC(=O)c1ccc(Oc2cc(C)cc(C)c2)cc1,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,O=c1oc2cc(Br)ccc2cc1-c1ccccc1.CC(C)(C)OC(=O)NCCN>>NCCNc1ccc2cc(-c3ccccc3)c(=O)oc2c1,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,NC(=O)c1ccccc1.Clc1cccc(I)c1>>O=C(Nc1cccc(Cl)c1)c1ccccc1,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,CC1(C)NC(=O)NC1=O.Cc1cc(C)c([I+]c2ccc(C#N)cc2)c(C)c1.O=S(=O)([O-])C(F)(F)F>>CC1(C)NC(=O)N(c2ccc(C#N)cc2)C1=O,,,,,,,,,,,,,,,,,,,,,,,

@@ -85,12 +85,13 @@ def validate_detection_with_reacted_motifs(
                 break
         
         # If all required reactant slots matched, check product formation (if defined)
-        if all_slots_match and len(matched_slots) >= 2:  # At least 2 reactant slots
+        if all_slots_match and len(matched_slots) >= 1:  # At least 1 reactant slot (changed from 2)
             # Check if expected products are formed (if product patterns are defined)
             product_match = True
             if defn.products:
                 product_match = False
                 for slot_name, slot_req in defn.products.items():
+                    # For reactions with only 1 reactant slot, require products to be FORMED, not just present
                     if slot_req.allowed and _motifs_match_slot(formed_set, slot_req.allowed):
                         product_match = True
                         break
