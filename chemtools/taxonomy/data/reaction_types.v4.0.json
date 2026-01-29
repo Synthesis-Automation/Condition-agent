@@ -490,6 +490,27 @@
       ]
     },
     {
+      "id": "Michael_addition",
+      "reactants": {
+        "michael_acceptor": [
+          "Alkenyl-COR",
+          "Alkenyl-CO2R",
+          "Alkenyl-CO2H",
+          "Alkenyl-CN"
+        ]
+      },
+      "products": {},
+      "catalysts": [],
+      "examples": [
+        "C=CC(C)=O.CCOC(=O)CC(=O)OCC>>CCOC(=O)CC(CC(C)=O)C(=O)OCC",
+        "C=CC#N.N>>NCCC#N"
+      ],
+      "aliases": [
+        "michael_addition",
+        "conjugate_addition"
+      ]
+    },
+    {
       "id": "Arylation_acidic_C_H",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
