@@ -274,6 +274,12 @@
       "description": "Primary amine N substituent (-NH2)."
     },
     {
+      "id": "-N2+",
+      "kind": "substituent",
+      "smarts": "[N+:2]#[N;D1]",
+      "description": "Diazonium cation (-N2+), used in Sandmeyer reaction."
+    },
+    {
       "id": "-NHR",
       "kind": "substituent",
       "smarts": "[N;H1;!$(N-[C,S,P]=O):2]",

@@ -285,6 +285,12 @@
     {
       "template": "single_bond",
       "A": "HeteroAr",
+      "B": "-N2+",
+      "description": "Heteroaryl diazonium cation (HeteroAr-N2+), intermediate for Sandmeyer reaction."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
       "B": "-NHR",
       "description": "Heteroaryl secondary amine (HeteroAr-NHR)."
     },
@@ -719,6 +725,12 @@
       "A": "Ar",
       "B": "-NH2",
       "description": "Aryl primary amine (Ar-NH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-N2+",
+      "description": "Aryl diazonium cation (Ar-N2+), intermediate for Sandmeyer reaction."
     },
     {
       "template": "single_bond",

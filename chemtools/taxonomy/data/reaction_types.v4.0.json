@@ -455,6 +455,41 @@
       ]
     },
     {
+      "id": "Sandmeyer",
+      "reactants": {
+        "substrate": [
+          "Ar-NH2",
+          "HeteroAr-NH2",
+          "Ar-N2+",
+          "HeteroAr-N2+"
+        ]
+      },
+      "products": {
+        "product": [
+          "Ar-Br",
+          "Ar-Cl",
+          "Ar-I",
+          "Ar-CN",
+          "HeteroAr-Br",
+          "HeteroAr-Cl",
+          "HeteroAr-I",
+          "HeteroAr-CN"
+        ]
+      },
+      "catalysts": [
+        "Cu"
+      ],
+      "examples": [
+        "Nc1ccccc1>>Brc1ccccc1",
+        "Nc1ccccc1>>Clc1ccccc1",
+        "N#[N+]c1ccccc1>>Brc1ccccc1"
+      ],
+      "aliases": [
+        "sandmeyer",
+        "sandmeyer_reaction"
+      ]
+    },
+    {
       "id": "Arylation_acidic_C_H",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
