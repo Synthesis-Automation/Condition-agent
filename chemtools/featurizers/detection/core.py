@@ -143,43 +143,6 @@ def detect_reaction_types_from_smiles(
         if match is not None:
             matches.append(match)
 
-    # Validate using formed motifs when products are available
-    if product_smiles is not None and reactant_smiles:
-        # Get formed motifs from reaction key analysis
-        from chemtools.featurizers.formatters.reaction import featurize_reaction
-        try:
-            full_rxn = '.'.join(reactant_smiles) + '>>' + '.'.join(product_smiles)
-            rxn_result = featurize_reaction(full_rxn)
-            aggregates = rxn_result.get('aggregates', {})
-            formed_motifs = set(aggregates.get('formed_motifs', []))
-            
-            if formed_motifs:
-                validated: List[ReactionMatch] = []
-                for match in matches:
-                    definition = definitions.get(match.reaction_type)
-                    if not definition or not definition.products:
-                        # No product requirements - keep match
-                        validated.append(match)
-                        continue
-                    
-                    # Check if at least one product slot matches formed motifs
-                    has_formed_product = False
-                    for slot_req in definition.products.values():
-                        if slot_req.allowed:
-                            for motif in slot_req.allowed:
-                                if motif in formed_motifs:
-                                    has_formed_product = True
-                                    break
-                            if has_formed_product:
-                                break
-                    
-                    if has_formed_product:
-                        validated.append(match)
-                
-                matches = validated
-        except Exception:
-            pass  # If validation fails, use unfiltered matches
-
     # Validate coupling products by analyzing bond formation patterns
     if confirm_coupling_products and product_smiles is not None:
         coupling_specs = get_coupling_confirmation_specs()
