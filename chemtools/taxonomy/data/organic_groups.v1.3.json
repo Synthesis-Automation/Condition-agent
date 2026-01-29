@@ -20,7 +20,7 @@
     {
       "id": "HeteroAr",
       "kind": "scaffold",
-      "priority": 5,
+      "priority": 6,
       "smarts": "[c;$(c:a:[n,o,s,p]),$(c:a:a:[n,o,s,p]),$(c:a:a:a:[n,o,s,p]):1]",
       "description": "Heteroaryl attachment via aromatic carbon in a heteroaromatic ring (e.g., pyridine-C, furan-C, thiophene-C) (HeteroAr-)."
     },
