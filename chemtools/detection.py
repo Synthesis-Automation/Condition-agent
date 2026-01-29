@@ -131,7 +131,8 @@ def extract_reaction_key(reaction_smiles: str) -> Tuple[List[str], List[str], Li
     """
     from .featurizers.formatters.reaction import featurize_reaction
     
-    result = featurize_reaction(reaction_smiles)
+    # Skip role classification to avoid circular dependency
+    result = featurize_reaction(reaction_smiles, options={"include_roles": False})
     aggregates = result.get("aggregates", {})
     
     reacted = aggregates.get("reacted_motifs", [])
