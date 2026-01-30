@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from chemtools.util import rdkit_helpers
 from chemtools.smiles import normalize_reaction
@@ -88,6 +88,25 @@ def format_reaction_key(
     spectators_str = "|".join(spectators_list) if spectators_list else "[]"
     
     return f"{reacted_str} -> {formed_str} || {spectators_str}"
+
+
+def _parse_reaction_key_parts(key: str) -> Tuple[List[str], List[str], List[str]]:
+    """Parse a Reaction_Key into reacted/formed/spectator motif lists."""
+    if not key or " -> " not in key:
+        return [], [], []
+    main_part, *rest = key.split(" || ")
+    reacted_part, formed_part = (main_part.split(" -> ") + [""])[:2]
+    spectators_part = rest[0] if rest else ""
+
+    def parse_part(part: str) -> List[str]:
+        part = part.strip()
+        if not part or part in {"[]", "None"}:
+            return []
+        if part.startswith("[") and part.endswith("]"):
+            part = part[1:-1]
+        return [token.strip() for token in part.split("|") if token.strip() and token.strip() != "[]"]
+
+    return parse_part(reacted_part), parse_part(formed_part), parse_part(spectators_part)
 
 
 def select_primary_reacted_motifs(
@@ -348,6 +367,7 @@ def featurize_reaction(
 
     # Generate Reaction_Key using filtered aggregates
     reaction_key = None
+    reaction_keys_alt: List[str] = []
     if product_bundles and reactant_bundles:
         # Use the pre-computed aggregates which have pattern-based filtering applied
         reacted = set(aggregates.get("reacted_motifs", []))
@@ -361,13 +381,51 @@ def featurize_reaction(
         for bundle in product_bundles:
             product_primary.extend(extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", [])))
         primary_formed = select_primary_formed_motif(product_primary, formed)
-        primary_formed = select_primary_formed_motif(product_primary, formed)
 
         reaction_key = format_reaction_key(
             primary_reacted if primary_reacted else reacted,
             [primary_formed] if primary_formed else formed,
             spectators,
         )
+        # Alternate keys for multi-event reactions (one per formed motif)
+        if formed:
+            reacted_basis = primary_reacted if primary_reacted else sorted(reacted)
+            for formed_motif in sorted(formed):
+                alt_key = format_reaction_key(reacted_basis, [formed_motif], spectators)
+                if alt_key != reaction_key and alt_key not in reaction_keys_alt:
+                    reaction_keys_alt.append(alt_key)
+        # If primary key doesn't match any reaction type, promote best-matching alt key
+        if reaction_key and reaction_keys_alt:
+            try:
+                from chemtools.reaction_key_matcher_v2 import detect_from_reaction_key_v2
+
+                reacted_primary, formed_primary, spectators_primary = _parse_reaction_key_parts(reaction_key)
+                primary_match, _ = detect_from_reaction_key_v2(
+                    reacted_primary, formed_primary, spectators_primary
+                )
+                if primary_match is None:
+                    best_key = None
+                    best_score: Optional[Tuple[float, int]] = None
+                    for alt_key in reaction_keys_alt:
+                        reacted_alt, formed_alt, spectators_alt = _parse_reaction_key_parts(alt_key)
+                        alt_match, _ = detect_from_reaction_key_v2(
+                            reacted_alt, formed_alt, spectators_alt
+                        )
+                        if not alt_match:
+                            continue
+                        score = (
+                            alt_match.confidence,
+                            len(alt_match.matched_reacted) + len(alt_match.matched_formed),
+                        )
+                        if best_score is None or score > best_score:
+                            best_score = score
+                            best_key = alt_key
+                    if best_key:
+                        reaction_keys_alt = [k for k in reaction_keys_alt if k != best_key]
+                        reaction_keys_alt.insert(0, reaction_key)
+                        reaction_key = best_key
+            except Exception:
+                pass
 
     reaction = {
         "reaction_smiles": reaction_smiles,
@@ -378,6 +436,7 @@ def featurize_reaction(
         "products": product_bundles,
         "aggregates": aggregates,
         "reaction_key": reaction_key,
+        "reaction_keys_alt": reaction_keys_alt,
         "roles": roles_summary,
         "agent_roles": agent_roles,
         "intramolecular": intramolecular,

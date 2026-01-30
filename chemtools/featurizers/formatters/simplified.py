@@ -154,6 +154,9 @@ def build_core_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
         "products": products,
         "feasibility": feasibility,
     }
+    reaction_keys_alt = full_reaction.get("reaction_keys_alt") or []
+    if reaction_keys_alt:
+        core["reaction_keys_alt"] = reaction_keys_alt
     
     # Include full aggregates for motif change analysis and spectator groups
     aggregates = full_reaction.get("aggregates", {})

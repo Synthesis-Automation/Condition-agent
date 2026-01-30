@@ -41,21 +41,30 @@
       "name": "Organoboron Reagents",
       "description": "Boronic acids, esters, trifluoroborates for Suzuki coupling.",
       "members": [
+        "Alkenyl-B(OH)2",
+        "Alkenyl-B(OR)2",
+        "Alkenyl-B*",
+        "Alkenyl-BF3K",
+        "Alkenyl-Bpin",
+        "Alkyl-B(OH)2",
+        "Alkyl-B*",
+        "Alkyl-BF3K",
+        "Alkyl-Bpin",
         "Ar-B(OH)2",
-        "Ar-Bpin",
-        "Ar-BF3K",
         "Ar-B(OR)2",
         "Ar-B*",
-        "Alkyl-B*",
+        "Ar-BF3K",
+        "Ar-Bpin",
         "HeteroAr-B(OH)2",
-        "HeteroAr-Bpin",
-        "HeteroAr-BF3K",
         "HeteroAr-B(OR)2",
-        "Alkenyl-B(OH)2",
-        "Alkenyl-Bpin",
-        "Alkenyl-BF3K",
-        "Alkenyl-B(OR)2",
-        "Alkenyl-B*"
+        "HeteroAr-BF3K",
+        "HeteroAr-Bpin",
+        "R2CH-B(OH)2",
+        "R2CH-B(OR)2",
+        "R3C-B(OH)2",
+        "R3C-B(OR)2",
+        "RCH2-B(OH)2",
+        "RCH2-B(OR)2"
       ],
       "usage": [
         "Suzuki_miyaura",
@@ -214,7 +223,7 @@
     },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
-      "description": "Terminal alkynes (C≡C-H) for Sonogashira coupling.",
+      "description": "Terminal alkynes (C\u2261C-H) for Sonogashira coupling.",
       "members": [
         "Ar-Alkynyl_terminal",
         "Alkyl-Alkynyl_terminal"
@@ -258,6 +267,274 @@
       ],
       "usage": [
         "C_N_Coupling"
+      ]
+    },
+    "acyl_halides": {
+      "name": "Acyl Halides",
+      "description": "Acyl halides (acid chlorides/bromides/iodides/fluorides) for acylation.",
+      "members": [
+        "Ar-COBr",
+        "Ar-COCl",
+        "Ar-COF",
+        "Ar-COI"
+      ],
+      "usage": [
+        "Acylation_amide",
+        "Acylation_ester",
+        "Acylation_friedel_crafts",
+        "Amide_formation"
+      ]
+    },
+    "aromatic_halides": {
+      "name": "Aromatic Halides",
+      "description": "Aryl/heteroaryl halides for halogenation.",
+      "members": [
+        "Ar-Br",
+        "Ar-Cl",
+        "Ar-F",
+        "Ar-I",
+        "HeteroAr-Br",
+        "HeteroAr-Cl",
+        "HeteroAr-F",
+        "HeteroAr-I"
+      ],
+      "usage": [
+        "Halogenation_aromatic"
+      ]
+    },
+    "azides": {
+      "name": "Azides",
+      "description": "Organic azides for coupling/click reactions.",
+      "members": [
+        "Alkenyl-N3",
+        "Alkyl-N3",
+        "Alkynyl-N3",
+        "Allyl-N3",
+        "Ar-N3",
+        "Bn-N3",
+        "R2CH-N3",
+        "R3C-N3",
+        "RCH2-N3"
+      ],
+      "usage": [
+        "Azide_coupling",
+        "Click_cuaac"
+      ]
+    },
+    "carbonyls": {
+      "name": "Carbonyls",
+      "description": "Aldehydes and ketones (carbonyl substrates).",
+      "members": [
+        "Alkenyl-CHO",
+        "Alkenyl-COR",
+        "Alkyl-CHO",
+        "Alkyl-COR",
+        "Alkynyl-COR",
+        "Allyl-COR",
+        "Ar-CHO",
+        "Ar-COR",
+        "Bn-COR",
+        "R2CH-CHO",
+        "R2CH-COR",
+        "R3C-CHO",
+        "R3C-COR",
+        "RCH2-CHO",
+        "RCH2-COR"
+      ],
+      "usage": [
+        "Reductive_amination",
+        "Oxidation_alcohol"
+      ]
+    },
+    "esters": {
+      "name": "Esters",
+      "description": "Ester products and substrates (R-CO2R).",
+      "members": [
+        "Alkenyl-CO2R",
+        "Alkyl-CO2R",
+        "Alkynyl-CO2R",
+        "Allyl-CO2R",
+        "Ar-CO2R",
+        "Bn-CO2R",
+        "R2CH-CO2R",
+        "R3C-CO2R",
+        "RCH2-CO2R"
+      ],
+      "usage": [
+        "Esterification",
+        "Acylation_ester",
+        "Claisen_condensation"
+      ]
+    },
+    "hydrogenation_substrates": {
+      "name": "Hydrogenation Substrates",
+      "description": "Alkenes/alkynes for hydrogenation.",
+      "members": [
+        "Alkenyl-Alkenyl",
+        "Alkenyl-B(OH)2",
+        "Alkenyl-B(OR)2",
+        "Alkenyl-B*",
+        "Alkenyl-BF3K",
+        "Alkenyl-Bpin",
+        "Alkenyl-Br",
+        "Alkenyl-CHO",
+        "Alkenyl-CN",
+        "Alkenyl-CO2H",
+        "Alkenyl-CO2R",
+        "Alkenyl-CONH2",
+        "Alkenyl-CONHR",
+        "Alkenyl-CONR2",
+        "Alkenyl-COR",
+        "Alkenyl-Cl",
+        "Alkenyl-F",
+        "Alkenyl-H",
+        "Alkenyl-I",
+        "Alkenyl-LactamN",
+        "Alkenyl-Mg*",
+        "Alkenyl-N3",
+        "Alkenyl-NH2",
+        "Alkenyl-NHR",
+        "Alkenyl-NO2",
+        "Alkenyl-NR2",
+        "Alkenyl-OCSSR",
+        "Alkenyl-OH",
+        "Alkenyl-OMs",
+        "Alkenyl-OR",
+        "Alkenyl-OSO2R",
+        "Alkenyl-OTf",
+        "Alkenyl-OTs",
+        "Alkenyl-SH",
+        "Alkenyl-SO2NHR",
+        "Alkenyl-SO2NR2",
+        "Alkenyl-SO2R",
+        "Alkenyl-SR",
+        "Alkenyl-Si*",
+        "Alkenyl-Sn*",
+        "Alkenyl-Thiourea",
+        "Alkenyl-Zn*",
+        "Alkenyl_terminal-Alkenyl_terminal",
+        "Alkyl-Alkynyl",
+        "Alkyl-Alkynyl_terminal",
+        "Alkynyl-Br",
+        "Alkynyl-CN",
+        "Alkynyl-CO2R",
+        "Alkynyl-CONH2",
+        "Alkynyl-CONHR",
+        "Alkynyl-CONR2",
+        "Alkynyl-COR",
+        "Alkynyl-Cl",
+        "Alkynyl-F",
+        "Alkynyl-H",
+        "Alkynyl-I",
+        "Alkynyl-LactamN",
+        "Alkynyl-N3",
+        "Alkynyl-NH2",
+        "Alkynyl-NHR",
+        "Alkynyl-NO2",
+        "Alkynyl-NR2",
+        "Alkynyl-OCSSR",
+        "Alkynyl-OH",
+        "Alkynyl-OR",
+        "Alkynyl-SH",
+        "Alkynyl-SO2NHR",
+        "Alkynyl-SO2NR2",
+        "Alkynyl-SO2R",
+        "Alkynyl-SR",
+        "Alkynyl-Si*",
+        "Alkynyl-Thiourea",
+        "Ar-Alkenyl",
+        "Ar-Alkenyl_terminal",
+        "Ar-Alkynyl",
+        "Ar-Alkynyl_terminal"
+      ],
+      "usage": [
+        "Hydrogenation"
+      ]
+    },
+    "nitro_compounds": {
+      "name": "Nitro Compounds",
+      "description": "Nitro substrates for reduction.",
+      "members": [
+        "Alkenyl-NO2",
+        "Alkyl-NO2",
+        "Alkynyl-NO2",
+        "Allyl-NO2",
+        "Ar-NO2",
+        "Bn-NO2",
+        "R2CH-NO2",
+        "R3C-NO2",
+        "RCH2-NO2"
+      ],
+      "usage": [
+        "Reduction_nitro"
+      ]
+    },
+    "organomagnesium": {
+      "name": "Organomagnesium",
+      "description": "Grignard reagents for Kumada coupling.",
+      "members": [
+        "Alkenyl-Mg*",
+        "Alkyl-Mg*",
+        "Ar-Mg*",
+        "R2CH-Mg*",
+        "R3C-Mg*",
+        "RCH2-Mg*"
+      ],
+      "usage": [
+        "Kumada"
+      ]
+    },
+    "organosilicon": {
+      "name": "Organosilicon",
+      "description": "Organosilicon reagents for Hiyama coupling.",
+      "members": [
+        "Alkenyl-Si*",
+        "Alkyl-Si*",
+        "Alkynyl-Si*",
+        "Ar-Si*"
+      ],
+      "usage": [
+        "Hiyama"
+      ]
+    },
+    "organotin": {
+      "name": "Organotin",
+      "description": "Organotin reagents for Stille coupling.",
+      "members": [
+        "Alkenyl-Sn*",
+        "Alkyl-Sn*",
+        "Ar-Sn*",
+        "R2CH-Sn*",
+        "R3C-Sn*",
+        "RCH2-Sn*"
+      ],
+      "usage": [
+        "Stille"
+      ]
+    },
+    "organozinc": {
+      "name": "Organozinc",
+      "description": "Organozinc reagents for Negishi coupling.",
+      "members": [
+        "Alkenyl-Zn*",
+        "Alkyl-Zn*",
+        "Ar-Zn*",
+        "R2CH-Zn*",
+        "R3C-Zn*",
+        "RCH2-Zn*"
+      ],
+      "usage": [
+        "Negishi"
+      ]
+    },
+    "terminal_alkenes": {
+      "name": "Terminal Alkenes",
+      "description": "Terminal alkenes for Heck coupling.",
+      "members": [
+        "Alkenyl-H"
+      ],
+      "usage": [
+        "Heck"
       ]
     }
   }

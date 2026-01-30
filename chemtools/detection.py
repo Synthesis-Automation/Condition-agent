@@ -163,6 +163,12 @@ def _match_reaction_type(
     reaction_id = reaction_def.get("id", "")
     reactants_def = reaction_def.get("reactants", {})
     products_def = reaction_def.get("products", {})
+
+    # Exclude reactions if any disqualifying motifs are present
+    exclude_patterns = reaction_def.get("exclude_reacted") or []
+    exclude_set = _expand_pattern(exclude_patterns, motif_sets) if exclude_patterns else set()
+    if exclude_set and reacted & exclude_set:
+        return None
     
     electrophile_matches = []
     nucleophile_matches = []

@@ -102,6 +102,13 @@ def match_reaction_type_v2(
     reaction_id = reaction_def.get("id", "")
     reactants_def = reaction_def.get("reactants", {})
     products_def = reaction_def.get("products", {})
+
+    # Exclude reactions if any disqualifying motifs are present
+    exclude_patterns = reaction_def.get("exclude_reacted") or []
+    if exclude_patterns:
+        excluded_set = expand_pattern(exclude_patterns, motif_sets)
+        if reacted_motifs & excluded_set:
+            return None
     
     matched_reacted: Dict[str, List[str]] = {}
     matched_formed: Dict[str, List[str]] = {}

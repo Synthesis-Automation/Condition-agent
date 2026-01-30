@@ -12,7 +12,8 @@
         "product": [
           "Ar-Ar",
           "Ar-Alkenyl",
-          "Alkenyl-Alkenyl"
+          "Alkenyl-Alkenyl",
+          "Ar-Alkyl"
         ]
       },
       "catalysts": [
@@ -164,7 +165,8 @@
       },
       "products": {
         "product": [
-          "Ar-SR"
+          "Ar-SR",
+          "Alkenyl-SR"
         ]
       },
       "catalysts": [
@@ -400,6 +402,8 @@
           "Ar-Cl",
           "Ar-I",
           "Ar-CN",
+          "Ar-OH",
+          "Ar-F",
           "HeteroAr-Br",
           "HeteroAr-Cl",
           "HeteroAr-I",
@@ -418,6 +422,129 @@
         "sandmeyer",
         "sandmeyer_reaction"
       ]
+    },
+    {
+      "id": "Carbonylation",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles"
+      },
+      "products": {
+        "product": [
+          "Ar-COR",
+          "Ar-CO2R",
+          "Ar-CONR2",
+          "Ar-CHO",
+          "Alkenyl-COR"
+        ]
+      },
+      "exclude_reacted": [
+        "@amines_nh",
+        "@alcohols_oh",
+        "@thiols_sh"
+      ],
+      "aliases": [
+        "carbonylation",
+        "carbonylative_coupling"
+      ],
+      "description": "Pd-catalyzed carbonylation reactions."
+    },
+    {
+      "id": "Reductive_coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles"
+      },
+      "products": {
+        "product": [
+          "Ar-Ar",
+          "Ar-H"
+        ]
+      },
+      "exclude_reacted": [
+        "@organoboron",
+        "@organozinc",
+        "@organotin",
+        "@organomagnesium"
+      ],
+      "aliases": [
+        "reductive_coupling",
+        "ullmann_homocoupling"
+      ],
+      "description": "Reductive homo-coupling of aryl halides."
+    },
+    {
+      "id": "Hydrodebromination",
+      "reactants": {
+        "substrate": [
+          "Ar-Br",
+          "Ar-I",
+          "Ar-Cl"
+        ]
+      },
+      "products": {
+        "product": [
+          "Ar-H"
+        ]
+      },
+      "aliases": [
+        "hydrodehalogenation",
+        "hydrodebromination"
+      ],
+      "description": "Reductive removal of halogen."
+    },
+    {
+      "id": "Nitration",
+      "reactants": {
+        "substrate": [
+          "Ar-H"
+        ]
+      },
+      "products": {
+        "product": [
+          "Ar-NO2"
+        ]
+      },
+      "aliases": [
+        "nitration"
+      ],
+      "description": "Aromatic nitration."
+    },
+    {
+      "id": "Acylation_friedel_crafts",
+      "reactants": {
+        "electrophile": "@acyl_halides"
+      },
+      "products": {
+        "product": [
+          "Ar-COR"
+        ]
+      },
+      "aliases": [
+        "friedel_crafts_acylation",
+        "fc_acylation"
+      ],
+      "description": "Friedel-Crafts acylation."
+    },
+    {
+      "id": "Alkylation_friedel_crafts",
+      "reactants": {
+        "electrophile": [
+          "Alkyl-Br",
+          "Alkyl-Cl",
+          "Alkyl-I",
+          "Bn-Br",
+          "Bn-Cl"
+        ]
+      },
+      "products": {
+        "product": [
+          "Ar-Alkyl"
+        ]
+      },
+      "aliases": [
+        "friedel_crafts_alkylation",
+        "fc_alkylation"
+      ],
+      "description": "Friedel-Crafts alkylation."
     },
     {
       "id": "Michael_addition",
@@ -599,7 +726,10 @@
     {
       "id": "Amide_formation",
       "reactants": {
-        "acid": "@carboxylic_acids",
+        "acid": [
+          "@carboxylic_acids",
+          "@acyl_halides"
+        ],
         "nucleophile": "@amines_nh"
       },
       "products": {
@@ -754,7 +884,8 @@
       "products": {
         "product": [
           "Ar-NH2",
-          "NH2"
+          "HeteroAr-NH2",
+          "Alkyl-NH2"
         ]
       },
       "examples": [
@@ -778,7 +909,11 @@
         "c1ccccc1.ClCl>>c1ccccc1Cl"
       ],
       "aliases": [
-        "halogenation_aromatic"
+        "halogenation_aromatic",
+        "halogenation",
+        "bromination",
+        "chlorination",
+        "iodination"
       ]
     },
     {
