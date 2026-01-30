@@ -457,6 +457,19 @@ def _format_list(values: Any) -> str:
     return " / ".join(items)
 
 
+def _normalize_reaction_key(value: Any) -> Optional[str]:
+    """Normalize reaction key text; return None for empty placeholders."""
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text or text.lower() == "none":
+        return None
+    compact = text.replace(" ", "")
+    if compact == "[]->[]||[]":
+        return None
+    return text
+
+
 def _aggregate_spectator_groups(values: pd.Series) -> str:
     if values is None:
         return ""
@@ -2122,7 +2135,7 @@ class HTERecommender:
         query_spectator_groups: Set[str] = set()
         product_motifs_from_rxn = set()
         
-        reaction_data = None
+        reaction_data: Dict[str, Any] = {}
         if reaction_smiles and (">" in reaction_smiles or "." in reaction_smiles):
             try:
                 rxn_features = featurize_reaction(
@@ -2132,10 +2145,18 @@ class HTERecommender:
                         "motif_site_filter": "substituent",
                     },
                 )
-                reaction_data = rxn_features.get("reaction", {})
+                if isinstance(rxn_features, dict):
+                    nested = rxn_features.get("reaction")
+                    reaction_data = nested if isinstance(nested, dict) else rxn_features
                 rxn_type_data = reaction_data.get("reaction_type", {})
-                detected_type = rxn_type_data.get("reaction_type")
-                detected_confidence = rxn_type_data.get("confidence", 0.0)
+                detected_type = None
+                detected_confidence = 0.0
+                if isinstance(rxn_type_data, dict):
+                    detected_type = rxn_type_data.get("reaction_type") or rxn_type_data.get("name")
+                    detected_confidence = rxn_type_data.get("confidence", 0.0) or 0.0
+                else:
+                    detected_type = str(rxn_type_data).strip() if rxn_type_data else None
+                    detected_confidence = reaction_data.get("confidence", 0.0) or 0.0
                 
                 if detected_type and detected_type != "Unknown" and detected_confidence > 0.5:
                     result.predicted_reaction_type = detected_type
@@ -2148,9 +2169,13 @@ class HTERecommender:
                         if isinstance(prod, dict):
                             for motif in prod.get("motifs", []):
                                 if isinstance(motif, dict):
-                                    compound_id = motif.get("compound_id")
+                                    compound_id = motif.get("compound_id") or motif.get("id")
                                     if compound_id:
                                         product_motifs_from_rxn.add(compound_id)
+                                else:
+                                    text = str(motif).strip()
+                                    if text:
+                                        product_motifs_from_rxn.add(text)
             except Exception:
                 # Fallback to pattern-based prediction if featurization fails
                 pass
@@ -2164,7 +2189,16 @@ class HTERecommender:
             result.product_type = ",".join(sorted(product_motifs))
 
             reactant_set = set(type_a) | set(type_b)
-            reacted_set, formed_set, spectator_set = _derive_query_sets(reactant_set, product_motifs)
+            reacted_set: Set[str] = set()
+            formed_set: Set[str] = set()
+            spectator_set: Set[str] = set()
+            aggregates = reaction_data.get("aggregates") if isinstance(reaction_data, dict) else None
+            if isinstance(aggregates, dict):
+                reacted_set = set(aggregates.get("reacted_motifs") or [])
+                formed_set = set(aggregates.get("formed_motifs") or [])
+                spectator_set = set(aggregates.get("spectator_motifs") or [])
+            if not (reacted_set or formed_set or spectator_set):
+                reacted_set, formed_set, spectator_set = _derive_query_sets(reactant_set, product_motifs)
             query_reacted = reacted_set
             query_formed = formed_set
             query_spectators = spectator_set
@@ -2184,14 +2218,14 @@ class HTERecommender:
                 primary_reacted = sorted(reacted_set)
 
             primary_formed = select_primary_formed_motif(product_motifs, formed_set)
-            result.query_reaction_key = None
-            if reaction_data and reaction_data.get("reaction_key"):
-                result.query_reaction_key = reaction_data.get("reaction_key")
-            else:
-                result.query_reaction_key = format_reaction_key(
-                    primary_reacted,
-                    [primary_formed] if primary_formed else formed_set,
-                    spectator_set,
+            result.query_reaction_key = _normalize_reaction_key(reaction_data.get("reaction_key"))
+            if not result.query_reaction_key:
+                result.query_reaction_key = _normalize_reaction_key(
+                    format_reaction_key(
+                        primary_reacted,
+                        [primary_formed] if primary_formed else formed_set,
+                        spectator_set,
+                    )
                 )
         # If no reaction key and no reactant types, return empty
         if not result.query_reaction_key and not type_a:

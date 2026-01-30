@@ -150,6 +150,28 @@ def _format_nearby_groups(groups: List[str]) -> str:
     return ", ".join(groups) if groups else "None"
 
 
+def _clean_reaction_key_text(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text or text.lower() == "none":
+        return ""
+    compact = text.replace(" ", "")
+    if compact == "[]->[]||[]":
+        return ""
+    return text
+
+
+def _format_matched_key(value: Any) -> str:
+    if isinstance(value, tuple):
+        parts = [str(item).strip() for item in value if str(item).strip()]
+        if not parts:
+            return ""
+        if len(parts) == 1:
+            return parts[0]
+        return " + ".join(parts)
+    text = str(value or "").strip()
+    return text
+
+
 def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
     if data_type == "precedent":
         return [
@@ -552,53 +574,28 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         data_type = _detect_csv_type(Path(self.db_path_edit.text().strip()))
         reaction_smiles = self.reaction_smiles_edit.text().strip()
 
-        reactant_a = getattr(result, "reactant_a_smiles", "")
-        reactant_b = getattr(result, "reactant_b_smiles", "") or "None"
-        product = getattr(result, "product_smiles", "") or "None"
         type_a = getattr(result, "reactant_a_type", "")
-        cat_a = getattr(result, "reactant_a_category", "")
         type_b = getattr(result, "reactant_b_type", "")
-        cat_b = getattr(result, "reactant_b_category", "")
-        predicted = getattr(result, "predicted_reaction_type", "") or "Unknown"
-        confidence = getattr(result, "reaction_type_confidence", 0.0) * 100
         detected = getattr(result, "matched_motifs", None)
-        detected_label = ""
-        if isinstance(detected, tuple):
-            detected_label = ", ".join([item for item in detected if item])
-        matches = getattr(result, "total_matching_experiments", 0)
-        coverage = getattr(result, "database_coverage", 0.0)
         spectator_summary = _format_nearby_groups(
             _collect_reaction_spectator_groups(reaction_smiles)
         )
         self._spectator_groups_summary = spectator_summary
 
-        source_group = self._source_group_label or "All"
-        weighting_label = "on" if self._aryl_weighting_enabled else "off"
-        query_key = getattr(result, "query_reaction_key", None)
+        query_key = _clean_reaction_key_text(getattr(result, "query_reaction_key", None))
         reacted_motifs = getattr(result, "reacted_motifs", None)
         formed_motifs = getattr(result, "formed_motifs", None)
         spectator_motifs = getattr(result, "spectator_motifs", None)
-
-        matched_text = f"MATCHED: {detected_label or 'None'} | PRED: {predicted} ({confidence:.1f}%)"
+        matched_key = _clean_reaction_key_text(_format_matched_key(detected))
         summary_lines = [
-            html.escape(
-                f"Data: {data_type} | Source: {source_group} | Aryl weighting: {weighting_label} | Matches: {matches} | Coverage: {coverage:.2f}%"
-            ),
-            (
-                f'<span style="color:#ffeb3b; font-weight:700;">'
-                f"{html.escape(matched_text)}"
-                f"</span>"
-            ),
             html.escape(f"Query Reaction Key: {query_key or 'None'}"),
-            html.escape(f"Matched Reaction Key: {detected_label or 'None'}"),
+            html.escape(f"Matched Reaction Key: {matched_key or 'None'}"),
             html.escape(f"Reacted Motifs: {', '.join(reacted_motifs) if reacted_motifs else 'None'}"),
             html.escape(f"Formed Motifs: {', '.join(formed_motifs) if formed_motifs else 'None'}"),
             html.escape(f"Spectator Motifs: {', '.join(spectator_motifs) if spectator_motifs else 'None'}"),
-            html.escape(f"Reactant Types: A={type_a or 'None'} | B={type_b or 'None'}"),
         ]
-        if stats:
-            stats_line = " | ".join(f"{key}: {stats[key]}" for key in sorted(stats))
-            summary_lines.append(html.escape(f"Stats: {stats_line}"))
+        if not query_key:
+            summary_lines.append(html.escape(f"Reactant Types (fallback): A={type_a or 'None'} | B={type_b or 'None'}"))
         self.summary.setHtml("<br>".join(summary_lines))
 
         recs = list(getattr(result, "recommendations", []) or [])
