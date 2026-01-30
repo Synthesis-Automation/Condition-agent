@@ -9,6 +9,8 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 from chemtools.util.smarts_cache import compile_smarts
 
+from ._ring_utils import find_aryl_ring
+
 _ELECTRONICS_METHOD = "tag_weighted_v1"
 _ELECTRONIC_GROUP_IDS = [
     "NO2",
@@ -106,7 +108,7 @@ def analyze_aryl_electronics(
     if ipso is None or x_root is None:
         return empty_result()
 
-    ring_atoms = _find_aryl_ring(mol, ipso)
+    ring_atoms = find_aryl_ring(mol, ipso)
     if not ring_atoms:
         return empty_result()
 
@@ -240,23 +242,6 @@ def _compute_electronics(
 
     return e_sum, contributions
 
-
-def _find_aryl_ring(mol: Any, ipso: int) -> Optional[Set[int]]:
-    ring_info = mol.GetRingInfo()
-    rings = list(ring_info.AtomRings())
-    candidates = []
-    for ring in rings:
-        if ipso not in ring:
-            continue
-        if not all(mol.GetAtomWithIdx(idx).GetIsAromatic() for idx in ring):
-            continue
-        candidates.append(ring)
-    if not candidates:
-        return None
-
-    six_membered = [ring for ring in candidates if len(ring) == 6]
-    target = min(six_membered or candidates, key=len)
-    return set(target)
 
 
 def _ring_distances(mol: Any, ring_atoms: Set[int], ipso: int) -> Dict[int, int]:

@@ -26,6 +26,36 @@ _INORGANIC_SMARTS = (
     "[CX3](=O)(O)O",
     "[OX2H]C(=O)[O-]",
 )
+_BACKGROUND_MOTIF_IDS = {"Ar-H", "R-H", "Any-H", "Alkyl-H", "Alkenyl-H", "Alkynyl-H"}
+_ARYL_PREFIXES = (
+    "Ar-",
+    "AromN-",
+    "Pyridine-",
+    "Pyrimidine-",
+    "Pyrrole-",
+    "Indole-",
+    "Thiophene-",
+    "Furan-",
+    "Imidazole-",
+    "Quinoline-",
+    "Isoquinoline-",
+)
+_ALKYL_PREFIXES = (
+    "R-",
+    "Bn-",
+    "Allyl-",
+    "Alkyl-",
+    "Alkenyl-",
+    "Any-",
+    "RCH2-",
+    "R2CH-",
+    "R3C-",
+    "Vinyl-",
+    "Alkynyl-",
+    "Acyl-",
+    "Propargyl-",
+    "H-",
+)
 
 
 def _is_inorganic_molecule(mol: Any) -> bool:
@@ -37,6 +67,123 @@ def _is_inorganic_molecule(mol: Any) -> bool:
         if pattern and mol.HasSubstructMatch(pattern):
             return True
     return False
+
+
+def _build_payload(
+    *,
+    smiles: str,
+    meta: Dict[str, Any],
+    motifs: Optional[List[Dict[str, Any]]] = None,
+    context_motifs: Optional[List[Dict[str, Any]]] = None,
+    ranked_motifs: Optional[List[str]] = None,
+    steric: Optional[Dict[str, Any]] = None,
+    electronics: Optional[Dict[str, Any]] = None,
+    nearby: Optional[List[Dict[str, Any]]] = None,
+    aryl_analysis: Optional[Dict[str, Any]] = None,
+    analyses: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
+    return {
+        "schema_version": "v2",
+        "smiles": smiles,
+        "motifs": motifs or [],
+        "context_motifs": context_motifs or [],
+        "ranked_motifs": ranked_motifs or [],
+        "steric": steric or {"aryl": [], "alkyl": []},
+        "electronics": electronics or {"aryl": []},
+        "nearby": nearby or [],
+        "aryl_analysis": aryl_analysis or _empty_aryl_analysis(),
+        "analyses": analyses or [],
+        "meta": meta,
+    }
+
+
+def _normalize_alt_ids(alt_ids: Any) -> List[str]:
+    if isinstance(alt_ids, set):
+        return sorted(str(item) for item in alt_ids if item)
+    if isinstance(alt_ids, list):
+        return [str(item) for item in alt_ids if item]
+    return []
+
+
+def _normalize_target_groups(target_groups: Any) -> List[str]:
+    if not target_groups:
+        return []
+    if isinstance(target_groups, str):
+        return [target_groups]
+    return [str(item) for item in target_groups if item]
+
+
+def _matches_target_group(compound_id: str, target: str) -> bool:
+    if compound_id == target:
+        return True
+    if compound_id.endswith("-" + target):
+        return True
+    return target.startswith("-") and compound_id.endswith(target)
+
+
+def _filter_motifs_by_targets(
+    motifs: List[Dict[str, Any]],
+    target_groups: List[str],
+) -> tuple[List[Dict[str, Any]], set[str]]:
+    if not target_groups:
+        return motifs, set()
+
+    filtered: List[Dict[str, Any]] = []
+    requested_ids: set[str] = set()
+
+    for motif in motifs:
+        compound_id = motif.get("compound_id", "")
+        if not compound_id:
+            continue
+        if any(_matches_target_group(compound_id, target) for target in target_groups):
+            filtered.append(motif)
+            requested_ids.add(compound_id)
+
+    if filtered:
+        return filtered, requested_ids
+
+    return motifs, set()
+
+
+def _filter_background_motifs(
+    motifs: List[Dict[str, Any]],
+    *,
+    include_h_motifs: bool,
+    requested_ids: set[str],
+) -> List[Dict[str, Any]]:
+    if include_h_motifs:
+        return motifs
+
+    non_background = [m for m in motifs if m.get("compound_id") not in _BACKGROUND_MOTIF_IDS]
+    if non_background:
+        return [
+            m
+            for m in motifs
+            if m.get("compound_id") not in _BACKGROUND_MOTIF_IDS
+            or m.get("compound_id") in requested_ids
+        ]
+    return motifs
+
+
+def _dedupe_background_motifs(motifs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    seen: set[str] = set()
+    deduped: List[Dict[str, Any]] = []
+    for motif in motifs:
+        compound_id = motif.get("compound_id")
+        if compound_id in _BACKGROUND_MOTIF_IDS:
+            if compound_id in seen:
+                continue
+            seen.add(compound_id)
+        deduped.append(motif)
+    return deduped
+
+
+def _motif_family(compound_id: str) -> Optional[str]:
+    if compound_id.startswith(_ARYL_PREFIXES):
+        return "aryl"
+    if compound_id.startswith(_ALKYL_PREFIXES):
+        return "alkyl"
+    return None
 
 
 _ORGANOMETAL_B_GROUPS = {
@@ -297,45 +444,20 @@ def featurize_molecule(
     meta = {"rdkit_available": rdkit_available(), "error": None}
     if not meta["rdkit_available"]:
         meta["error"] = "rdkit_unavailable"
-        return {
-            "schema_version": "v2",
-            "smiles": smiles,
-            "motifs": [],
-            "ranked_motifs": [],
-            "steric": {"aryl": [], "alkyl": []},
-            "electronics": {"aryl": []},
-            "aryl_analysis": _empty_aryl_analysis(),
-            "analyses": [],
-            "meta": meta,
-        }
+        return _build_payload(smiles=smiles, meta=meta)
 
     mol = parse_smiles(smiles)
     if mol is None:
         meta["error"] = "invalid_smiles"
-        return {
-            "schema_version": "v2",
-            "smiles": smiles,
-            "motifs": [],
-            "ranked_motifs": [],
-            "steric": {"aryl": [], "alkyl": []},
-            "electronics": {"aryl": []},
-            "aryl_analysis": _empty_aryl_analysis(),
-            "analyses": [],
-            "meta": meta,
-        }
+        return _build_payload(smiles=smiles, meta=meta)
 
     if _is_inorganic_molecule(mol):
-        return {
-            "schema_version": "v2",
-            "smiles": smiles,
-            "motifs": [{"compound_id": "Inorganic"}],
-            "ranked_motifs": ["Inorganic"],
-            "steric": {"aryl": [], "alkyl": []},
-            "electronics": {"aryl": []},
-            "aryl_analysis": _empty_aryl_analysis(),
-            "analyses": [],
-            "meta": meta,
-        }
+        return _build_payload(
+            smiles=smiles,
+            meta=meta,
+            motifs=[{"compound_id": "Inorganic"}],
+            ranked_motifs=["Inorganic"],
+        )
 
     from rdkit import Chem
     mol = Chem.AddHs(mol)
@@ -396,63 +518,14 @@ def featurize_molecule(
         **ring_metrics,
     }
 
-    # Filter by target groups if provided
-    target_groups = options.get("target_groups")
-    if target_groups:
-        if isinstance(target_groups, str):
-            target_groups = [target_groups]
-        
-        filtered_motifs = []
-        for m in motifs:
-            cid = m.get("compound_id", "")
-            # Match if cid matches target exactly, or ends with "-target", 
-            # or ends with "target" if target already starts with "-"
-            for tg in target_groups:
-                if cid == tg:
-                    filtered_motifs.append(m)
-                    break
-                if cid.endswith("-" + tg):
-                    filtered_motifs.append(m)
-                    break
-                if tg.startswith("-") and cid.endswith(tg):
-                    filtered_motifs.append(m)
-                    break
-        
-        # Only apply filter if we actually found matches for the target groups
-        if filtered_motifs:
-            motifs = filtered_motifs
-
-    # Identify background motifs (H-motifs)
-    background_ids = {"Ar-H", "R-H", "Any-H", "Alkyl-H", "Alkenyl-H", "Alkynyl-H"}
-    
-    # Determine which motifs were explicitly requested via target_groups
-    requested_ids = set()
-    if target_groups:
-        for m in motifs:
-            cid = m.get("compound_id", "")
-            for tg in target_groups:
-                if cid == tg or cid.endswith("-" + tg) or (tg.startswith("-") and cid.endswith(tg)):
-                    requested_ids.add(cid)
-                    break
-
-    # Filter background motifs if other motifs exist, unless explicitly requested or include_h_motifs is True
-    if not options.get("include_h_motifs", False):
-        non_bg_motifs = [m for m in motifs if m.get("compound_id") not in background_ids]
-        if non_bg_motifs:
-            # Keep non-background motifs + any background motifs that were explicitly requested
-            motifs = [m for m in motifs if m.get("compound_id") not in background_ids or m.get("compound_id") in requested_ids]
-    # Collapse duplicate background motifs (e.g., Alkyl-H per C-H bond).
-    if motifs:
-        seen_background = set()
-        deduped = []
-        for m in motifs:
-            cid = m.get("compound_id")
-            if cid in background_ids:
-                if cid in seen_background:
-                    continue
-                seen_background.add(cid)
-            deduped.append(m)
-        motifs = deduped
+    target_groups = _normalize_target_groups(options.get("target_groups"))
+    motifs, requested_ids = _filter_motifs_by_targets(motifs, target_groups)
+    motifs = _filter_background_motifs(
+        motifs,
+        include_h_motifs=bool(options.get("include_h_motifs", False)),
+        requested_ids=requested_ids,
+    )
+    motifs = _dedupe_background_motifs(motifs)
 
     ranked_motifs = []
     if motifs:
@@ -464,11 +537,8 @@ def featurize_molecule(
     analyses = []
     for hit in motifs:
         compound_id = hit["compound_id"]
-        # Aryl/Heteroaryl motifs
-        if compound_id.startswith((
-            "Ar-", "AromN-", "Pyridine-", "Pyrimidine-", "Pyrrole-", "Indole-", 
-            "Thiophene-", "Furan-", "Imidazole-", "Quinoline-", "Isoquinoline-"
-        )):
+        family = _motif_family(compound_id)
+        if family == "aryl":
             steric = analyze_aryl_steric(mol, hit, include_details=include_steric_details)
             if include_ipso_group == "both":
                 electronic = [
@@ -510,11 +580,7 @@ def featurize_molecule(
                     "undocumented": hit.get("undocumented", False),
                 }
             )
-        # Alkyl/Generic motifs
-        elif compound_id.startswith((
-            "R-", "Bn-", "Allyl-", "Alkyl-", "Alkenyl-", "Any-", "RCH2-", "R2CH-", "R3C-",
-            "Vinyl-", "Alkynyl-", "Acyl-", "Propargyl-", "H-"
-        )):
+        elif family == "alkyl":
             steric = analyze_alkyl_steric(mol, hit, include_details=include_steric_details)
             nearby = analyze_nearby_groups(mol, hit, all_context_motifs, groups, compound_map)
             analyses.append(
@@ -532,15 +598,15 @@ def featurize_molecule(
     electronic_payload = {"aryl": []}
     nearby_payload = []
     for analysis in analyses:
-        alt_ids = analysis.get("alt_compound_ids", set())
+        alt_ids = _normalize_alt_ids(analysis.get("alt_compound_ids", set()))
         steric_entry = {
             "compound_id": analysis.get("compound_id"),
-            "alt_compound_ids": list(alt_ids) if isinstance(alt_ids, set) else alt_ids,
+            "alt_compound_ids": alt_ids,
             "center": analysis.get("center"),
             "result": analysis.get("steric"),
             "undocumented": analysis.get("undocumented", False),
         }
-        if analysis.get("compound_id", "").startswith(("Ar-", "AromN-")):
+        if _motif_family(analysis.get("compound_id", "")) == "aryl":
             steric_payload["aryl"].append(steric_entry)
         else:
             steric_payload["alkyl"].append(steric_entry)
@@ -548,7 +614,7 @@ def featurize_molecule(
             electronic_payload["aryl"].append(
                 {
                     "compound_id": analysis.get("compound_id"),
-                    "alt_compound_ids": list(alt_ids) if isinstance(alt_ids, set) else alt_ids,
+                    "alt_compound_ids": alt_ids,
                     "center": analysis.get("center"),
                     "result": analysis.get("electronic"),
                     "undocumented": analysis.get("undocumented", False),
@@ -558,26 +624,25 @@ def featurize_molecule(
             nearby_payload.append(
                 {
                     "compound_id": analysis.get("compound_id"),
-                    "alt_compound_ids": list(alt_ids) if isinstance(alt_ids, set) else alt_ids,
+                    "alt_compound_ids": alt_ids,
                     "center": analysis.get("center"),
                     "result": analysis.get("nearby_groups"),
                     "undocumented": analysis.get("undocumented", False),
                 }
             )
 
-    return {
-        "schema_version": "v2",
-        "smiles": smiles,
-        "motifs": motifs,
-        "context_motifs": context_motifs,
-        "ranked_motifs": ranked_motifs,
-        "steric": steric_payload,
-        "electronics": electronic_payload,
-        "nearby": nearby_payload,
-        "aryl_analysis": aryl_analysis,
-        "analyses": analyses,
-        "meta": meta,
-    }
+    return _build_payload(
+        smiles=smiles,
+        meta=meta,
+        motifs=motifs,
+        context_motifs=context_motifs,
+        ranked_motifs=ranked_motifs,
+        steric=steric_payload,
+        electronics=electronic_payload,
+        nearby=nearby_payload,
+        aryl_analysis=aryl_analysis,
+        analyses=analyses,
+    )
 
 
 def analyze_smiles(

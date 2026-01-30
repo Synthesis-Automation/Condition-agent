@@ -5,7 +5,9 @@ Aryl steric analysis around the ipso carbon using ortho bulk heuristics.
 from __future__ import annotations
 
 from collections import deque
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Set
+
+from ._ring_utils import find_aryl_ring
 
 _BULK_CAP_PER_SUB = 12
 _BULK_CAP_TOTAL = 20
@@ -43,7 +45,7 @@ def analyze_aryl_steric(
     if ipso is None or x_root is None:
         return empty_result()
 
-    ring_atoms = _find_aryl_ring(mol, ipso)
+    ring_atoms = find_aryl_ring(mol, ipso)
     if not ring_atoms:
         return empty_result()
 
@@ -86,23 +88,6 @@ def analyze_aryl_steric(
         }
     return result
 
-
-def _find_aryl_ring(mol: Any, ipso: int) -> Optional[Set[int]]:
-    ring_info = mol.GetRingInfo()
-    rings = list(ring_info.AtomRings())
-    candidates = []
-    for ring in rings:
-        if ipso not in ring:
-            continue
-        if not all(mol.GetAtomWithIdx(idx).GetIsAromatic() for idx in ring):
-            continue
-        candidates.append(ring)
-    if not candidates:
-        return None
-
-    six_membered = [ring for ring in candidates if len(ring) == 6]
-    target = min(six_membered or candidates, key=len)
-    return set(target)
 
 
 def _ortho_bulk(

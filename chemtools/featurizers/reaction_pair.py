@@ -366,7 +366,7 @@ def featurize_flat(
             pass  # Graceful degradation if calculable module unavailable
 
     # Attach role-aware only when explicitly enabled via env (default off for speed).
-    attach_flag = (os.environ.get("CHEMTOOLS_ATTACH_ROLE_AWARE", "").strip().lower() in {"1", "true", "yes", "on"})
+    attach_flag = _get_env_bool("CHEMTOOLS_ATTACH_ROLE_AWARE", False)
     if attach_flag and _HAS_ROLE_FEATS and _role_feat is not None:
         try:
             elec_ra = _role_feat(electrophile, roles=["aryl_halide"])  # type: ignore[arg-type]
@@ -478,16 +478,7 @@ def featurize_pair(
     if nuc_structural:
         nuc_payload["structural"] = nuc_structural
 
-    pair_features = {
-        "LG": flat.get("LG"),
-        "elec_class": flat.get("elec_class"),
-        "ortho_count": flat.get("ortho_count"),
-        "para_EWG": flat.get("para_EWG"),
-        "heteroaryl": flat.get("heteroaryl"),
-        "nuc_class": flat.get("nuc_class"),
-        "n_basicity": flat.get("n_basicity"),
-        "steric_alpha": flat.get("steric_alpha"),
-    }
+    pair_features = {**elec_features, **nuc_features}
 
     return {
         "schema_version": "v2",
