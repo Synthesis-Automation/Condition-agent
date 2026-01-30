@@ -45,6 +45,7 @@
         "Ar-Bpin",
         "Ar-BF3K",
         "Ar-B(OR)2",
+        "Ar-B*",
         "HeteroAr-B(OH)2",
         "HeteroAr-Bpin",
         "HeteroAr-BF3K",
@@ -52,7 +53,8 @@
         "Alkenyl-B(OH)2",
         "Alkenyl-Bpin",
         "Alkenyl-BF3K",
-        "Alkenyl-B(OR)2"
+        "Alkenyl-B(OR)2",
+        "Alkenyl-B*"
       ],
       "usage": [
         "Suzuki_miyaura",

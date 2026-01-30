@@ -179,6 +179,13 @@
       "description": "Nitrile core; attach via cyano carbon (-CN)."
     },
     {
+      "id": "-NC",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[N;D2:2]#C",
+      "description": "Isonitrile (isocyanide) core; attach via nitrogen (-N#C)."
+    },
+    {
       "id": "-SCN",
       "kind": "substituent",
       "priority": 1,
@@ -219,6 +226,13 @@
       "priority": 2,
       "smarts": "[B:2]1OC(C)(C)C(C)(C)O1",
       "description": "Bpin core; attach via boron (-Bpin)."
+    },
+    {
+      "id": "-B*",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[B:2]",
+      "description": "Generic organoboron group (-B*), attach via boron."
     },
     {
       "id": "-Sn*",

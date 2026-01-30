@@ -627,9 +627,21 @@
     },
     {
       "template": "single_bond",
+      "A": "Ar",
+      "B": "-B*",
+      "description": "Aryl organoboron (generic Ar-B*)."
+    },
+    {
+      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-B(OH)2",
       "description": "Vinyl/alkenyl boronic acid (Alkenyl-B(OH)2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "-B*",
+      "description": "Vinyl/alkenyl organoboron (Alkenyl-B*)."
     },
     {
       "template": "single_bond",
