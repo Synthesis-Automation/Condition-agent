@@ -120,7 +120,7 @@ def _compute_hte_manifest(file_paths: List[Path]) -> Dict[str, Any]:
             }
         )
     entries.sort(key=lambda item: item["path"])
-    return {"version": 2, "files": entries}
+    return {"version": 3, "files": entries}
 
 
 def _load_hte_cache(
@@ -1805,10 +1805,14 @@ class HTERecommender:
                 # Check for 'protocols' or raw path containing 'protocol'
                 is_protocol = (group_df['Source_Group'] == 'protocols').any()
                 if not is_protocol:
-                     # Fallback check if source_group wasn't normalized
-                     is_protocol = group_df['Source_Group'].astype(str).str.contains('protocol', case=False, na=False).any()
-                
-                if is_protocol:
+                    # Fallback check if source_group wasn't normalized
+                    is_protocol = group_df['Source_Group'].astype(str).str.contains('protocol', case=False, na=False).any()
+
+                is_rule = (group_df['Source_Group'] == 'rules').any()
+                if not is_rule:
+                    is_rule = group_df['Source_Group'].astype(str).str.contains('rule', case=False, na=False).any()
+
+                if is_protocol or is_rule:
                     current_min_exp = 1
             
             if len(group_df) < current_min_exp:
@@ -2111,10 +2115,10 @@ class HTERecommender:
             product_smiles=product_smiles
         )
 
-        # Normalize source group and adjust min_experiments for protocols
+        # Normalize source group and adjust min_experiments for protocols/rules
         if source_group:
             source_group = _normalize_source_group(source_group)
-            if source_group == "protocols" and min_experiments > 1:
+            if source_group in {"protocols", "rules"} and min_experiments > 1:
                 min_experiments = 1
 
         if reaction_type_filter:
