@@ -424,31 +424,6 @@
       ]
     },
     {
-      "id": "Carbonylation",
-      "reactants": {
-        "electrophile": "@sp2_electrophiles"
-      },
-      "products": {
-        "product": [
-          "Ar-COR",
-          "Ar-CO2R",
-          "Ar-CONR2",
-          "Ar-CHO",
-          "Alkenyl-COR"
-        ]
-      },
-      "exclude_reacted": [
-        "@amines_nh",
-        "@alcohols_oh",
-        "@thiols_sh"
-      ],
-      "aliases": [
-        "carbonylation",
-        "carbonylative_coupling"
-      ],
-      "description": "Pd-catalyzed carbonylation reactions."
-    },
-    {
       "id": "Reductive_coupling",
       "reactants": {
         "electrophile": "@sp2_electrophiles"

@@ -109,6 +109,54 @@ def _parse_reaction_key_parts(key: str) -> Tuple[List[str], List[str], List[str]
     return parse_part(reacted_part), parse_part(formed_part), parse_part(spectators_part)
 
 
+def _select_primary_reaction_key(
+    reaction_key: Optional[str],
+    reaction_keys_alt: List[str],
+) -> Tuple[Optional[str], List[str]]:
+    """Promote a matching alt key when the primary key has no reaction-type match."""
+    if not reaction_key or not reaction_keys_alt:
+        return reaction_key, reaction_keys_alt
+
+    try:
+        from chemtools.reaction_key_matcher_v2 import detect_from_reaction_key_v2
+    except Exception:
+        return reaction_key, reaction_keys_alt
+
+    try:
+        reacted_primary, formed_primary, spectators_primary = _parse_reaction_key_parts(reaction_key)
+        primary_match, _ = detect_from_reaction_key_v2(
+            reacted_primary, formed_primary, spectators_primary
+        )
+        if primary_match is not None:
+            return reaction_key, reaction_keys_alt
+
+        best_key = None
+        best_score: Optional[Tuple[float, int]] = None
+        for alt_key in reaction_keys_alt:
+            reacted_alt, formed_alt, spectators_alt = _parse_reaction_key_parts(alt_key)
+            alt_match, _ = detect_from_reaction_key_v2(
+                reacted_alt, formed_alt, spectators_alt
+            )
+            if not alt_match:
+                continue
+            score = (
+                alt_match.confidence,
+                len(alt_match.matched_reacted) + len(alt_match.matched_formed),
+            )
+            if best_score is None or score > best_score:
+                best_score = score
+                best_key = alt_key
+
+        if not best_key:
+            return reaction_key, reaction_keys_alt
+
+        new_alt = [k for k in reaction_keys_alt if k != best_key]
+        new_alt.insert(0, reaction_key)
+        return best_key, new_alt
+    except Exception:
+        return reaction_key, reaction_keys_alt
+
+
 def select_primary_reacted_motifs(
     reactant_entries: Iterable[Any],
     reacted_set: set[str],
@@ -394,38 +442,9 @@ def featurize_reaction(
                 alt_key = format_reaction_key(reacted_basis, [formed_motif], spectators)
                 if alt_key != reaction_key and alt_key not in reaction_keys_alt:
                     reaction_keys_alt.append(alt_key)
-        # If primary key doesn't match any reaction type, promote best-matching alt key
-        if reaction_key and reaction_keys_alt:
-            try:
-                from chemtools.reaction_key_matcher_v2 import detect_from_reaction_key_v2
-
-                reacted_primary, formed_primary, spectators_primary = _parse_reaction_key_parts(reaction_key)
-                primary_match, _ = detect_from_reaction_key_v2(
-                    reacted_primary, formed_primary, spectators_primary
-                )
-                if primary_match is None:
-                    best_key = None
-                    best_score: Optional[Tuple[float, int]] = None
-                    for alt_key in reaction_keys_alt:
-                        reacted_alt, formed_alt, spectators_alt = _parse_reaction_key_parts(alt_key)
-                        alt_match, _ = detect_from_reaction_key_v2(
-                            reacted_alt, formed_alt, spectators_alt
-                        )
-                        if not alt_match:
-                            continue
-                        score = (
-                            alt_match.confidence,
-                            len(alt_match.matched_reacted) + len(alt_match.matched_formed),
-                        )
-                        if best_score is None or score > best_score:
-                            best_score = score
-                            best_key = alt_key
-                    if best_key:
-                        reaction_keys_alt = [k for k in reaction_keys_alt if k != best_key]
-                        reaction_keys_alt.insert(0, reaction_key)
-                        reaction_key = best_key
-            except Exception:
-                pass
+        reaction_key, reaction_keys_alt = _select_primary_reaction_key(
+            reaction_key, reaction_keys_alt
+        )
 
     reaction = {
         "reaction_smiles": reaction_smiles,
