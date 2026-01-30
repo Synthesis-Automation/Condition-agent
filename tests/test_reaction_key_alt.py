@@ -39,9 +39,10 @@ def test_multi_event_reaction_promotes_suzuki_alt() -> None:
     assert alt_keys
 
     from chemtools.reaction_key_matcher_v2 import detect_from_reaction_key_v2
-    # Primary key may reflect the side reaction (carbonylation), but at least one alt should match Suzuki.
+    keys = [result["reaction_key"]] + alt_keys
+    # At least one key should match Suzuki (primary or alt).
     suzuki_found = False
-    for key in alt_keys:
+    for key in keys:
         reacted, formed, spectators = reaction_fmt._parse_reaction_key_parts(key)
         match, _ = detect_from_reaction_key_v2(reacted, formed, spectators)
         if match and match.reaction_type == "Suzuki_miyaura":

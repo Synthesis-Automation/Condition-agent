@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from chemtools.util import rdkit_helpers
 from chemtools.smiles import normalize_reaction
@@ -107,6 +107,88 @@ def _parse_reaction_key_parts(key: str) -> Tuple[List[str], List[str], List[str]
         return [token.strip() for token in part.split("|") if token.strip() and token.strip() != "[]"]
 
     return parse_part(reacted_part), parse_part(formed_part), parse_part(spectators_part)
+
+
+def _atom_signature(atom: Any) -> Tuple[int, bool, int, int, Tuple[int, ...]]:
+    """Build a simple signature for mapped-atom change detection."""
+    return (
+        atom.GetAtomicNum(),
+        bool(atom.GetIsAromatic()),
+        int(atom.GetTotalDegree()),
+        int(atom.GetTotalNumHs()),
+        tuple(sorted(n.GetAtomicNum() for n in atom.GetNeighbors())),
+    )
+
+
+def _collect_mapped_signatures(mols: List[Any]) -> Tuple[Dict[int, Tuple[int, bool, int, int, Tuple[int, ...]]], bool]:
+    """Collect atom map signatures; return (map -> signature, conflict_found)."""
+    signatures: Dict[int, Tuple[int, bool, int, int, Tuple[int, ...]]] = {}
+    conflict = False
+    for mol in mols:
+        if mol is None:
+            continue
+        for atom in mol.GetAtoms():
+            map_num = atom.GetAtomMapNum()
+            if not map_num:
+                continue
+            sig = _atom_signature(atom)
+            if map_num in signatures and signatures[map_num] != sig:
+                conflict = True
+            signatures[map_num] = sig
+    return signatures, conflict
+
+
+def _detect_changed_map_numbers(
+    reactant_mols: List[Any],
+    product_mols: List[Any],
+    *,
+    min_common: int = 3,
+) -> Set[int]:
+    """Return map numbers with changed local environments, or empty if low-confidence."""
+    reactant_maps, reactant_conflict = _collect_mapped_signatures(reactant_mols)
+    product_maps, product_conflict = _collect_mapped_signatures(product_mols)
+    if reactant_conflict or product_conflict:
+        return set()
+    common = set(reactant_maps) & set(product_maps)
+    if len(common) < min_common:
+        return set()
+    changed = {m for m in common if reactant_maps[m] != product_maps[m]}
+    return changed
+
+
+def _select_primary_formed_by_mapping(
+    product_bundles: List[Dict[str, Any]],
+    product_mols: List[Any],
+    formed_set: Set[str],
+    changed_maps: Set[int],
+) -> Optional[str]:
+    """Select primary formed motif when its attachment atom is mapped as changed."""
+    if not changed_maps:
+        return None
+    candidates: List[str] = []
+    for idx, bundle in enumerate(product_bundles):
+        mol = product_mols[idx] if idx < len(product_mols) else None
+        if mol is None:
+            continue
+        for motif in bundle.get("motifs", []):
+            if not isinstance(motif, dict):
+                continue
+            cid = motif.get("compound_id") or motif.get("id")
+            if not cid or cid not in formed_set:
+                continue
+            a_idx = motif.get("a_atom_idx") or motif.get("a_idx")
+            if a_idx is None:
+                continue
+            try:
+                atom = mol.GetAtomWithIdx(int(a_idx))
+            except Exception:
+                continue
+            map_num = atom.GetAtomMapNum()
+            if map_num and map_num in changed_maps:
+                candidates.append(str(cid))
+    if not candidates:
+        return None
+    return select_primary_formed_motif(candidates, formed_set)
 
 
 def _select_primary_reaction_key(
@@ -352,12 +434,14 @@ def featurize_reaction(
     product_bundles: List[Dict[str, Any]] = []
     product_motif_ids: List[str] = []
     product_motifs_full: List[Dict[str, Any]] = []  # Full motif dicts with fingerprints
+    product_mols: List[Any] = []
     for smiles in product_smiles:
         try:
             bundle = build_molecule_bundle(smiles, registry_paths=registry_paths, options=options)
         except Exception:
             continue
         product_bundles.append(bundle)
+        product_mols.append(rdkit_helpers.parse_smiles(smiles))
         product_motif_ids.extend(extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", [])))
         # Collect full motif dicts for fingerprint-aware comparison
         product_motifs_full.extend(bundle.get("motifs", []))
@@ -428,7 +512,16 @@ def featurize_reaction(
         product_primary: List[str] = []
         for bundle in product_bundles:
             product_primary.extend(extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", [])))
-        primary_formed = select_primary_formed_motif(product_primary, formed)
+        primary_formed = None
+        # Mapping-aware primary formed selection (high-confidence only)
+        if rdkit_helpers.rdkit_available():
+            reactant_mols = [rdkit_helpers.parse_smiles(s) for s in reactant_smiles]
+            changed_maps = _detect_changed_map_numbers(reactant_mols, product_mols)
+            primary_formed = _select_primary_formed_by_mapping(
+                product_bundles, product_mols, formed, changed_maps
+            )
+        if primary_formed is None:
+            primary_formed = select_primary_formed_motif(product_primary, formed)
 
         reaction_key = format_reaction_key(
             primary_reacted if primary_reacted else reacted,
