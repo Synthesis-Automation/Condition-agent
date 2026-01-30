@@ -587,9 +587,21 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         formed_motifs = getattr(result, "formed_motifs", None)
         spectator_motifs = getattr(result, "spectator_motifs", None)
         matched_key = _clean_reaction_key_text(_format_matched_key(detected))
+        reaction_filter = self.reaction_filter_edit.text().strip() or None
+        detected_reaction_type = getattr(result, "predicted_reaction_type", None)
+        detected_confidence = getattr(result, "reaction_type_confidence", None)
+        if detected_reaction_type:
+            if isinstance(detected_confidence, (int, float)):
+                detected_display = f"{detected_reaction_type} ({detected_confidence:.2f})"
+            else:
+                detected_display = str(detected_reaction_type)
+        else:
+            detected_display = "None"
         summary_lines = [
             html.escape(f"Query Reaction Key: {query_key or 'None'}"),
             html.escape(f"Matched Reaction Key: {matched_key or 'None'}"),
+            html.escape(f"Reaction Type Filter: {reaction_filter or 'None'}"),
+            html.escape(f"Detected Reaction Type: {detected_display}"),
             html.escape(f"Reacted Motifs: {', '.join(reacted_motifs) if reacted_motifs else 'None'}"),
             html.escape(f"Formed Motifs: {', '.join(formed_motifs) if formed_motifs else 'None'}"),
             html.escape(f"Spectator Motifs: {', '.join(spectator_motifs) if spectator_motifs else 'None'}"),

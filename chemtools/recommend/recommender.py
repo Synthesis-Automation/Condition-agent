@@ -1141,6 +1141,18 @@ def _split_motif_tokens(value: Any) -> List[str]:
     return [token.strip() for token in _MOTIF_SPLIT_RE.split(text) if token.strip()]
 
 
+def _signature_matches(query_sets: Iterable[Set[str]], value: Any) -> bool:
+    tokens = set(_split_motif_tokens(value))
+    if not tokens:
+        return False
+    for query_tokens in query_sets:
+        if not query_tokens:
+            continue
+        if tokens.issubset(query_tokens) or query_tokens.issubset(tokens):
+            return True
+    return False
+
+
 def _encode_signature(tokens: Iterable[str]) -> str:
     """Encode motif tokens into a stable, sorted signature string."""
     if not tokens:
@@ -1156,7 +1168,10 @@ def _reactant_types_to_signature(values: Iterable[Any]) -> str:
     tokens: List[str] = []
     for value in values:
         tokens.extend(_split_motif_tokens(value))
-    return _encode_signature(tokens)
+    if not tokens:
+        return ""
+    expanded = _expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map())
+    return _encode_signature(expanded or tokens)
 
 
 def _reaction_key_to_signatures(key: str) -> Tuple[str, str]:
@@ -1663,6 +1678,7 @@ class HTERecommender:
         3. If product motifs are available, softly prefer matching 'formed' motifs.
         """
         reacted, formed, spectators = _parse_transformation_key(db_key)
+        is_transform_key = " -> " in db_key and " || " in db_key
         
         # DEBUG
         debug_mode = False
@@ -1674,7 +1690,14 @@ class HTERecommender:
 
         # 1. Core match: query must contain all 'reacted' motifs
         core_set = query_reacted if query_reacted is not None else query_motifs
-        if not reacted or not reacted.issubset(core_set):
+        if not reacted or not core_set:
+            return 0.0
+        if is_transform_key:
+            core_match = reacted.issubset(core_set)
+        else:
+            # Signature-style key: allow query motifs to be a subset of a broader DB signature.
+            core_match = reacted.issubset(core_set) or core_set.issubset(reacted)
+        if not core_match:
             return 0.0
             
         # 2. Spectator match
@@ -2559,6 +2582,50 @@ class HTERecommender:
                     counts = type_series.value_counts()
                     result.predicted_reaction_type = counts.index[0]
                     result.reaction_type_confidence = float(counts.iloc[0] / counts.sum())
+
+        # Enforce reaction-type + motif matching for rules/experiments
+        if "Source_Group" in matched_df.columns:
+            rules_mask = matched_df["Source_Group"].isin({"rules", "experiments"})
+            if rules_mask.any():
+                target_reaction = reaction_type_filter or result.predicted_reaction_type
+                target_reaction = _resolve_reaction_type_label(target_reaction)
+                if target_reaction:
+                    type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+                    type_mask = type_series.apply(
+                        lambda value: _resolve_reaction_type_label(value) == target_reaction if value else False
+                    )
+                else:
+                    type_mask = pd.Series([False] * len(matched_df), index=matched_df.index)
+
+                query_signatures: List[str] = []
+                if query_core_signature:
+                    query_signatures.append(query_core_signature)
+                if query_ext_signature and query_ext_signature not in query_signatures:
+                    query_signatures.append(query_ext_signature)
+                reactant_signature = _reactant_types_to_signature([collapsed_a, collapsed_b])
+                if reactant_signature and reactant_signature not in query_signatures:
+                    query_signatures.append(reactant_signature)
+                query_sets = [set(_split_motif_tokens(sig)) for sig in query_signatures if sig]
+
+                if query_sets:
+                    core_series = (
+                        matched_df["Reactant_Signature_Core"]
+                        if "Reactant_Signature_Core" in matched_df.columns
+                        else pd.Series([""] * len(matched_df), index=matched_df.index)
+                    )
+                    ext_series = (
+                        matched_df["Reactant_Signature_Ext"]
+                        if "Reactant_Signature_Ext" in matched_df.columns
+                        else pd.Series([""] * len(matched_df), index=matched_df.index)
+                    )
+                    core_mask = core_series.apply(lambda value: _signature_matches(query_sets, value))
+                    ext_mask = ext_series.apply(lambda value: _signature_matches(query_sets, value))
+                    motif_mask = core_mask | ext_mask
+                else:
+                    motif_mask = pd.Series([False] * len(matched_df), index=matched_df.index)
+
+                enforce_mask = rules_mask & type_mask & motif_mask
+                matched_df = matched_df[~rules_mask | enforce_mask]
         
         result.total_matching_experiments = len(matched_df)
         coverage_df = self.df
