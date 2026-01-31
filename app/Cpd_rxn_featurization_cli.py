@@ -575,8 +575,6 @@ def _print_reaction_summary(
     show_extended: bool = True,
 ) -> None:
     reaction = _get_reaction_payload(payload)
-    print("\nSummary (Reaction)")
-    print("-" * 72)
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
     
     reaction_key = reaction.get("reaction_key")
