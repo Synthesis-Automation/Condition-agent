@@ -4,12 +4,9 @@ import re
 import pandas as pd
 from pathlib import Path
 from typing import List, Dict, Any, Tuple, Iterable, Optional
-import numpy as np
 from functools import lru_cache
 import argparse
 import sys
-import os
-from collections import Counter, defaultdict
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -17,12 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # Import chemtools components
-from chemtools.featurizers.unified import (
-    featurize_molecule,
-    format_reaction_key,
-    select_primary_reacted_motifs,
-    select_primary_formed_motif,
-)
+from chemtools.featurizers.unified import featurize_molecule
 from chemtools.featurizers.formatters.reaction import featurize_reaction
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
 from chemtools.smiles import normalize
@@ -35,6 +27,22 @@ def cached_featurize(smiles: str):
     # also ensures that Aromatic scaffolds win over Aliphatic ones due to updated priorities.
     options = {"motif_site_filter": "substituent"}
     return featurize_molecule(smiles, options=options)
+
+
+@lru_cache(maxsize=20000)
+def cached_featurize_reaction(smiles: str) -> Dict[str, Any]:
+    """Cache reaction featurization to keep Reaction_Key generation consistent."""
+    if not smiles:
+        return {}
+    options = {
+        "include_roles": False,
+        "include_agent_roles": False,
+        "motif_site_filter": "substituent",
+    }
+    try:
+        return featurize_reaction(smiles, options=options)
+    except Exception:
+        return {}
 
 
 @lru_cache(maxsize=20000)
@@ -628,7 +636,7 @@ def process_reaction_dataset(
                 if ">>" not in smiles:
                     skipped_no_arrow += 1
                     continue
-                reactants_part, products_part = smiles.split(">>")
+                reactants_part, _ = smiles.split(">>")
                 reactants = reactants_part.split(".")
                 reagents = extract_reagents(record, csv_row=row)
                 if drop_no_catalyst and not reagents.get("catalyst"):
@@ -636,7 +644,6 @@ def process_reaction_dataset(
                     continue
                 _collect_reagent_smiles(record, None, unknown_cas)
 
-                motif_ids = []
                 reactant_data = []
 
                 for r_smiles in reactants:
@@ -651,12 +658,10 @@ def process_reaction_dataset(
                             if cid:
                                 current_r_motifs.append(cid)
 
-                        context_ids = []
                         context_scaffolds: List[str] = []
                         for m in context_motifs:
                             cid = m.get("id", "")
                             if cid:
-                                context_ids.append(cid)
                                 context_scaffolds.append(cid)
 
                         current_r_motifs = _apply_aromn_scaffold_override(
@@ -666,78 +671,24 @@ def process_reaction_dataset(
                         reactant_data.append({
                             "motifs": _dedupe_list(current_r_motifs),
                         })
-                        motif_ids.extend(current_r_motifs)
-                        motif_ids.extend(context_ids)
                     except Exception:
                         continue
 
                 if not reactant_data:
                     continue
 
-                product_motifs = []
-                try:
-                    p_analysis = cached_featurize(products_part)
-                    p_motifs = p_analysis.get("motifs", [])
-                    p_context = p_analysis.get("context_motifs", [])
-                    for m in p_motifs:
-                        cid = m.get("id", "")
-                        if cid:
-                            product_motifs.append(cid)
-                    for m in p_context:
-                        cid = m.get("id", "")
-                        if cid:
-                            product_motifs.append(cid)
-                except Exception:
-                    pass
+                rxn_bundle = cached_featurize_reaction(smiles)
+                aggregates = rxn_bundle.get("aggregates") or {}
+                reacted_set = set(aggregates.get("reacted_motifs") or [])
+                formed_set = set(aggregates.get("formed_motifs") or [])
+                spectators_set = set(aggregates.get("spectator_motifs") or [])
+                reaction_key = rxn_bundle.get("reaction_key") or ""
 
-                r_counts = Counter(motif_ids)
-                p_counts = Counter(product_motifs)
-
-                PERSISTENT_HETEROCYCLES = {"Pyridine", "Quinoline", "Isoquinoline", "Pyrimidine", "Pyrazine", "Pyridazine"}
-                for h_id in PERSISTENT_HETEROCYCLES:
-                    if r_counts[h_id] > 0 and p_counts[h_id] < r_counts[h_id]:
-                        p_counts[h_id] = r_counts[h_id]
-
-                reacted_set = set()
-                formed_set = set()
-                spectators_set = set()
-
-                all_motifs = set(r_counts.keys()) | set(p_counts.keys())
-                for m in all_motifs:
-                    rc = r_counts.get(m, 0)
-                    pc = p_counts.get(m, 0)
-
-                    if pc > rc:
-                        formed_set.add(m)
-                        if rc > 0:
-                            spectators_set.add(m)
-                    elif pc < rc:
-                        reacted_set.add(m)
-                        if pc > 0:
-                            spectators_set.add(m)
-                    else:
-                        if rc > 0:
-                            spectators_set.add(m)
-
-                primary_reacted_motifs = select_primary_reacted_motifs(reactant_data, reacted_set)
-                primary_reacted_str = _reactant_key(primary_reacted_motifs) or "None"
-
-                primary_formed = select_primary_formed_motif(product_motifs, formed_set)
-                primary_formed_str = primary_formed if primary_formed else "None"
                 formed_motifs_str = _reactant_key(list(formed_set)) or "None"
-
-                spectators_str = _reactant_key(list(spectators_set)) or "None"
 
                 primary_reactant_motifs = _select_primary_reactant_motifs(
                     reactant_data,
                     reacted_set,
-                )
-
-                # Use shared format_reaction_key function for consistency
-                reaction_key = format_reaction_key(
-                    primary_reacted_motifs,
-                    [primary_formed_str] if primary_formed_str != "None" else [],
-                    list(spectators_set)
                 )
 
                 if len(reactants) == 1:
@@ -811,7 +762,7 @@ def process_reaction_dataset(
                 skipped_no_arrow += 1
                 continue
 
-            reactants_part, products_part = smiles.split(">>")
+            reactants_part, _ = smiles.split(">>")
             reactants = reactants_part.split(".")
             reagents = extract_reagents(record)
             if drop_no_catalyst and not reagents.get("catalyst"):
@@ -819,7 +770,6 @@ def process_reaction_dataset(
                 continue
             _collect_reagent_smiles(record, None, unknown_cas)
 
-            motif_ids = []
             reactant_data = []
 
             for r_smiles in reactants:
@@ -834,12 +784,10 @@ def process_reaction_dataset(
                         if cid:
                             current_r_motifs.append(cid)
 
-                    context_ids = []
                     context_scaffolds: List[str] = []
                     for m in context_motifs:
                         cid = m.get("id", "")
                         if cid:
-                            context_ids.append(cid)
                             context_scaffolds.append(cid)
 
                     current_r_motifs = _apply_aromn_scaffold_override(
@@ -849,78 +797,24 @@ def process_reaction_dataset(
                     reactant_data.append({
                         "motifs": _dedupe_list(current_r_motifs),
                     })
-                    motif_ids.extend(current_r_motifs)
-                    motif_ids.extend(context_ids)
                 except Exception:
                     continue
 
             if not reactant_data:
                 continue
 
-            product_motifs = []
-            try:
-                p_analysis = cached_featurize(products_part)
-                p_motifs = p_analysis.get("motifs", [])
-                p_context = p_analysis.get("context_motifs", [])
-                for m in p_motifs:
-                    cid = m.get("id", "")
-                    if cid:
-                        product_motifs.append(cid)
-                for m in p_context:
-                    cid = m.get("id", "")
-                    if cid:
-                        product_motifs.append(cid)
-            except Exception:
-                pass
+            rxn_bundle = cached_featurize_reaction(smiles)
+            aggregates = rxn_bundle.get("aggregates") or {}
+            reacted_set = set(aggregates.get("reacted_motifs") or [])
+            formed_set = set(aggregates.get("formed_motifs") or [])
+            spectators_set = set(aggregates.get("spectator_motifs") or [])
+            reaction_key = rxn_bundle.get("reaction_key") or ""
 
-            r_counts = Counter(motif_ids)
-            p_counts = Counter(product_motifs)
-
-            PERSISTENT_HETEROCYCLES = {"Pyridine", "Quinoline", "Isoquinoline", "Pyrimidine", "Pyrazine", "Pyridazine"}
-            for h_id in PERSISTENT_HETEROCYCLES:
-                if r_counts[h_id] > 0 and p_counts[h_id] < r_counts[h_id]:
-                    p_counts[h_id] = r_counts[h_id]
-
-            reacted_set = set()
-            formed_set = set()
-            spectators_set = set()
-
-            all_motifs = set(r_counts.keys()) | set(p_counts.keys())
-            for m in all_motifs:
-                rc = r_counts.get(m, 0)
-                pc = p_counts.get(m, 0)
-
-                if pc > rc:
-                    formed_set.add(m)
-                    if rc > 0:
-                        spectators_set.add(m)
-                elif pc < rc:
-                    reacted_set.add(m)
-                    if pc > 0:
-                        spectators_set.add(m)
-                else:
-                    if rc > 0:
-                        spectators_set.add(m)
-
-            primary_reacted_motifs = select_primary_reacted_motifs(reactant_data, reacted_set)
-            primary_reacted_str = _reactant_key(primary_reacted_motifs) or "None"
-
-            primary_formed = select_primary_formed_motif(product_motifs, formed_set)
-            primary_formed_str = primary_formed if primary_formed else "None"
             formed_motifs_str = _reactant_key(list(formed_set)) or "None"
-
-            spectators_str = _reactant_key(list(spectators_set)) or "None"
 
             primary_reactant_motifs = _select_primary_reactant_motifs(
                 reactant_data,
                 reacted_set,
-            )
-
-            # Use shared format_reaction_key function for consistency
-            reaction_key = format_reaction_key(
-                primary_reacted_motifs,
-                [primary_formed_str] if primary_formed_str != "None" else [],
-                list(spectators_set)
             )
 
             if len(reactants) == 1:

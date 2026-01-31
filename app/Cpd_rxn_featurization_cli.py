@@ -579,7 +579,6 @@ def _print_reaction_summary(
     print("-" * 72)
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
     
-    # Display reaction key with generation breakdown
     reaction_key = reaction.get("reaction_key")
     if reaction_key:
         print(f"Reaction Key: {_clean_compound_id(reaction_key)}")
@@ -617,59 +616,13 @@ def _print_reaction_summary(
                     spectators_str = str(spectators)
                 print(f"    Spectator groups: {spectators_str}")
             
-            print(f"    Format: [Reacted] -> [Formed] || [Spectators]")
+            print("    Format: [Reacted] -> [Formed] || [Spectators]")
 
-    # Core reaction information
     _print_reaction_type_summary(
         reaction.get("reaction_type"),
         reaction.get("confidence"),
         reaction_key=reaction.get("reaction_key"),
     )
-
-    # Show extended analysis if available (most useful for conditions recommendation)
-    if show_extended:
-        extended = reaction.get("extended")
-        if extended:
-            _print_extended_section(extended, indent=0)
-
-    # Aggregates (useful for conditions)
-    aggregates = reaction.get("aggregates") or {}
-    if aggregates:
-        print("Aggregates:")
-        lines = _format_mapping_lines(aggregates)
-        if lines:
-            print(_format_list(lines))
-
-    # Intramolecular flag
-    intramolecular = reaction.get("intramolecular")
-    if intramolecular:
-        print("Intramolecular:")
-        if isinstance(intramolecular, dict):
-            lines = _format_mapping_lines(intramolecular)
-            if lines:
-                print(_format_list(lines, indent=2))
-        else:
-            print(f"  - {intramolecular}")
-
-    # Show reactants with extended info
-    reactants = reaction.get("reactants") or []
-    print(f"Reactants ({len(reactants)}):")
-    if reactants:
-        for idx, reactant in enumerate(reactants, start=1):
-            print(f"  Reactant {idx}:")
-            _print_molecule_detail(reactant, indent=4, show_rdkit=show_rdkit, show_extended=show_extended)
-    else:
-        print("  - none")
-
-    # Show products with extended info
-    products = reaction.get("products") or []
-    print(f"Products ({len(products)}):")
-    if products:
-        for idx, product in enumerate(products, start=1):
-            print(f"  Product {idx}:")
-            _print_molecule_detail(product, indent=4, show_rdkit=show_rdkit, show_extended=show_extended)
-    else:
-        print("  - none")
 
 
 def _print_readable(
@@ -774,13 +727,15 @@ def main() -> int:
         if smiles.lower() in {"q", "quit", "exit"}:
             return 0
 
-        targets = _prompt("Target Groups (optional, e.g. Br,CN): ").strip()
         current_options = dict(options)
-        if targets:
-            current_options["target_groups"] = [tg.strip() for tg in targets.split(",")]
+        is_reaction = ">" in smiles
+        if not is_reaction:
+            targets = _prompt("Target Groups (optional, e.g. Br,CN): ").strip()
+            if targets:
+                current_options["target_groups"] = [tg.strip() for tg in targets.split(",")]
 
         try:
-            if mode in {"reaction", "r"} or (mode == "auto" and ">" in smiles):
+            if mode in {"reaction", "r"} or (mode == "auto" and is_reaction):
                 reaction_options = dict(current_options)
                 reaction_options.setdefault("motif_site_filter", "substituent")
                 reaction_options["detailed"] = True  # Enable extended output

@@ -2235,16 +2235,17 @@ class HTERecommender:
             result.formed_motifs = tuple(sorted(formed_set))
             result.spectator_motifs = tuple(sorted(spectator_set))
 
+            primary_formed = select_primary_formed_motif(product_motifs, formed_set)
+            formed_for_key = {primary_formed} if primary_formed else formed_set
             primary_reacted = None
             if reaction_data:
                 primary_reacted = select_primary_reacted_motifs(
                     reaction_data.get("reactants") or [],
                     reacted_set,
+                    formed_for_key,
                 )
             if not primary_reacted:
                 primary_reacted = sorted(reacted_set)
-
-            primary_formed = select_primary_formed_motif(product_motifs, formed_set)
             result.query_reaction_key = _normalize_reaction_key(reaction_data.get("reaction_key"))
             if not result.query_reaction_key:
                 result.query_reaction_key = _normalize_reaction_key(
