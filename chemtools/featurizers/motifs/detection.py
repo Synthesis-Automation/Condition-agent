@@ -6,6 +6,10 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from .models import CompoundPattern, _DISCOVERY_SKIP_SUBSTITUENTS
 
+_ANY_GROUP_FALLBACKS = {
+    "-SH": "Any-SH",
+}
+
 
 def compute_motif_fingerprint(mol: Any, matched_atoms: Set[int]) -> str:
     """
@@ -422,6 +426,8 @@ def detect_motifs(
         if "alt_bonds" in h:
             h["alt_bonds"] = sorted(list(h["alt_bonds"]))
 
+    _inject_any_group_fallbacks(mol, registry, final_hits)
+
     return final_hits
 
 
@@ -682,6 +688,79 @@ def _find_query_map_atom(query: Any, *, map_num: int) -> Optional[int]:
         if atom.GetAtomMapNum() == map_num:
             return atom.GetIdx()
     return None
+
+
+def _inject_any_group_fallbacks(
+    mol: Any,
+    registry: Optional[Dict[str, Any]],
+    hits: List[Dict[str, Any]],
+) -> None:
+    """Add Any-* motif hits when no specific scaffold-substituent motif exists."""
+    if not registry:
+        return
+    compiled_groups = registry.get("compiled_groups", {})
+    if not compiled_groups:
+        return
+
+    existing = {h.get("compound_id") for h in hits if h.get("compound_id")}
+    for sub_id, any_id in _ANY_GROUP_FALLBACKS.items():
+        if any_id in existing:
+            continue
+        if any(cid.endswith(sub_id) for cid in existing):
+            continue
+
+        sub_group = next(
+            (g for g in compiled_groups.values() if g.get("id") == sub_id and g.get("kind") == "substituent"),
+            None,
+        )
+        if not sub_group:
+            continue
+        matches = mol.GetSubstructMatches(sub_group["query"])
+        if not matches:
+            continue
+
+        for match in matches:
+            b_idx = None
+            for atom in sub_group["query"].GetAtoms():
+                if atom.GetAtomMapNum() == 2:
+                    b_idx = match[atom.GetIdx()]
+                    break
+            if b_idx is None:
+                continue
+            mol_atom_b = mol.GetAtomWithIdx(b_idx)
+            neighbors = [n.GetIdx() for n in mol_atom_b.GetNeighbors() if n.GetSymbol() != "H"]
+            a_idx = min(neighbors) if neighbors else b_idx
+
+            matched_atoms = set(match)
+            if a_idx not in matched_atoms:
+                matched_atoms.add(a_idx)
+
+            fingerprint = compute_group_fingerprint(
+                mol,
+                matched_atoms,
+                a_idx=a_idx,
+                b_idx=b_idx,
+            )
+            extended_fp = compute_extended_fingerprint(mol, matched_atoms, a_idx, b_idx)
+
+            hits.append(
+                {
+                    "compound_id": any_id,
+                    "match_atom_map": {"1": a_idx, "2": b_idx},
+                    "a_atom_idx": a_idx,
+                    "b_atom_idx": b_idx,
+                    "bond": tuple(sorted([a_idx, b_idx])),
+                    "priority": sub_group.get("priority", 0),
+                    "complexity": sub_group.get("complexity", 0),
+                    "group_b": sub_id,
+                    "reactivity_weight": 0.0,
+                    "undocumented": True,
+                    "atoms": matched_atoms,
+                    "fingerprint": fingerprint,
+                    "h_count": extended_fp.get("total_h_on_heteroatoms", 0),
+                    "note": "Any-group fallback (Risk: High)",
+                }
+            )
 
 
 __all__ = [
