@@ -148,7 +148,26 @@ def analyze_motif_changes_with_fingerprints(
                 reacted_set.add(cid)
             if p_fps - r_fps:  # Some fingerprints appeared
                 formed_set.add(cid)
-    
+
+    # Substituent-centric override (scaffold changes): if a substituent disappears
+    # globally, ensure motifs with that substituent are marked as reacted.
+    reactant_ids = [m.get("compound_id") or m.get("id", "") for m in reactant_motifs]
+    product_ids = [m.get("compound_id") or m.get("id", "") for m in product_motifs]
+    reactant_subs: Dict[str, List[str]] = {}
+    for motif_id in reactant_ids:
+        if not motif_id:
+            continue
+        sub = get_substituent(motif_id)
+        if sub:
+            reactant_subs.setdefault(sub, []).append(motif_id)
+    product_subs = {get_substituent(m) for m in product_ids if m}
+    consumed_subs = set(reactant_subs.keys()) - product_subs
+    if consumed_subs:
+        for sub in consumed_subs:
+            for motif_id in reactant_subs.get(sub, []):
+                reacted_set.add(motif_id)
+                spectator_set.discard(motif_id)
+
     return reacted_set, formed_set, spectator_set
 
 
@@ -548,9 +567,11 @@ def aggregate_reaction_features(
     # Phase 3: Select primary motif per attachment atom WITHIN EACH REACTANT
     # This prevents atom index collisions between different reactants (e.g., piperazine atom 3 vs aniline atom 3)
     reactant_motifs_full: List[Dict[str, Any]] = []
+    reactant_motifs_for_changes: List[Dict[str, Any]] = []
     for motifs_for_mol in reactant_motifs_per_mol:
         primary_for_mol = select_primary_motifs_by_atom(motifs_for_mol)
         reactant_motifs_full.extend(primary_for_mol)
+        reactant_motifs_for_changes.extend(motifs_for_mol)
     
     # Extract IDs from primary motifs for use in change analysis
     primary_motif_ids_list = [m.get("id", "") for m in reactant_motifs_full if m.get("id")]
@@ -558,13 +579,13 @@ def aggregate_reaction_features(
     # Analyze motif changes if products are provided
     if product_motif_ids or product_motifs:
         # Use fingerprint-aware comparison if full motif dicts are available
-        if product_motifs and any(m.get("fingerprint") for m in reactant_motifs_full):
+        if product_motifs:
             # Extract product motifs with fingerprints
             product_motifs_with_fp = [extract_motif_with_bond_info(m) for m in product_motifs if isinstance(m, dict)]
             product_motifs_with_fp = [m for m in product_motifs_with_fp if m.get("id")]
             
             reacted_set, formed_set, spectator_motifs_set = analyze_motif_changes_with_fingerprints(
-                reactant_motifs_full, product_motifs_with_fp
+                reactant_motifs_for_changes, product_motifs_with_fp
             )
         else:
             # Fallback to ID-only comparison
