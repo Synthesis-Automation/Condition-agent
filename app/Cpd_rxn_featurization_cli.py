@@ -575,6 +575,22 @@ def _print_reaction_summary(
     show_extended: bool = True,
 ) -> None:
     reaction = _get_reaction_payload(payload)
+    def _collect_entry_motifs(entry: Dict[str, Any]) -> List[str]:
+        seen = set()
+        items: List[str] = []
+        for motif in entry.get("motifs") or []:
+            if not isinstance(motif, dict):
+                continue
+            cid = motif.get("id") or motif.get("compound_id")
+            if not cid:
+                continue
+            cid = _clean_compound_id(str(cid))
+            if cid in seen:
+                continue
+            seen.add(cid)
+            items.append(cid)
+        return items
+
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
     
     reaction_key = reaction.get("reaction_key")
@@ -615,6 +631,28 @@ def _print_reaction_summary(
                 print(f"    Spectator groups: {spectators_str}")
             
             print("    Format: [Reacted] -> [Formed] || [Spectators]")
+
+    reactants = reaction.get("reactants") or []
+    products = reaction.get("products") or []
+    print(f"Reactant motifs ({len(reactants)}):")
+    if reactants:
+        for idx, entry in enumerate(reactants, start=1):
+            smiles = entry.get("smiles") or ""
+            motifs = _collect_entry_motifs(entry)
+            motif_str = ", ".join(motifs) if motifs else "none"
+            print(f"  - [{idx}] {smiles}: {motif_str}")
+    else:
+        print("  - none")
+
+    print(f"Product motifs ({len(products)}):")
+    if products:
+        for idx, entry in enumerate(products, start=1):
+            smiles = entry.get("smiles") or ""
+            motifs = _collect_entry_motifs(entry)
+            motif_str = ", ".join(motifs) if motifs else "none"
+            print(f"  - [{idx}] {smiles}: {motif_str}")
+    else:
+        print("  - none")
 
     _print_reaction_type_summary(
         reaction.get("reaction_type"),

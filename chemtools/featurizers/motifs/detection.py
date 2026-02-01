@@ -56,9 +56,45 @@ def compute_motif_fingerprint(mol: Any, matched_atoms: Set[int]) -> str:
             hyb = str(atom.GetHybridization()).split(".")[-1]  # SP3, SP2, SP, etc
             
             parts.append(f"{symbol}:H{h_count}:D{heavy_neighbors}:{hyb}")
-        return ",".join(parts)
+        return ",".join(sorted(parts))
     except Exception:
         return ""
+
+
+def compute_group_fingerprint(
+    mol: Any,
+    matched_atoms: Set[int],
+    *,
+    a_idx: Optional[int],
+    b_idx: Optional[int],
+) -> str:
+    """
+    Compute a group-level fingerprint focused on the substituent side.
+
+    Uses the matched atom subgraph connected to b_idx, excluding the scaffold
+    attachment atom (a_idx) when possible. Falls back to full motif fingerprint.
+    """
+    if b_idx is None or a_idx is None or not matched_atoms:
+        return compute_motif_fingerprint(mol, matched_atoms)
+    try:
+        visited: Set[int] = set()
+        stack = [b_idx]
+        exclude = {a_idx} if a_idx != b_idx else set()
+        while stack:
+            idx = stack.pop()
+            if idx in visited or idx in exclude:
+                continue
+            visited.add(idx)
+            atom = mol.GetAtomWithIdx(idx)
+            for neighbor in atom.GetNeighbors():
+                n_idx = neighbor.GetIdx()
+                if n_idx in matched_atoms and n_idx not in visited:
+                    stack.append(n_idx)
+        if not visited:
+            return compute_motif_fingerprint(mol, matched_atoms)
+        return compute_motif_fingerprint(mol, visited)
+    except Exception:
+        return compute_motif_fingerprint(mol, matched_atoms)
 
 
 def compute_extended_fingerprint(mol: Any, matched_atoms: Set[int], a_idx: int, b_idx: int) -> Dict[str, Any]:
@@ -188,7 +224,12 @@ def detect_motifs(
             
             # Compute fingerprint capturing H-count and connectivity on heteroatoms
             matched_atom_set = set(match)
-            fingerprint = compute_motif_fingerprint(mol, matched_atom_set)
+            fingerprint = compute_group_fingerprint(
+                mol,
+                matched_atom_set,
+                a_idx=a_idx,
+                b_idx=b_idx,
+            )
             extended_fp = compute_extended_fingerprint(mol, matched_atom_set, a_idx, b_idx)
             
             raw_hits.append(
