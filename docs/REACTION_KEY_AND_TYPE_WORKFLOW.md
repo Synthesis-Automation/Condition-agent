@@ -45,6 +45,7 @@ Entry point: `chemtools/featurizers/formatters/reaction.py:featurize_reaction()`
      an alt key when the primary key has no reaction-type match.
 
 Outputs stored in the reaction bundle:
+
 - `reaction_key` (primary)
 - `reaction_keys_alt` (alternatives)
 - `aggregates.reacted_motifs`, `aggregates.formed_motifs`,
@@ -91,6 +92,7 @@ This is a correction/validation step, not the main detection API.
 
 `chemtools/reaction_key_matcher_v2.py` can detect reaction types from
 reacted/formed motifs and is used to:
+
 - Choose the best primary Reaction_Key (alt key promotion).
 - Provide a direct detection path from a Reaction_Key when needed.
 
