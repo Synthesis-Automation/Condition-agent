@@ -439,6 +439,8 @@ def select_primary_reacted_motifs(
         product_map = _load_product_to_nucleophile_map()
         for motif_id in formed_set:
             preferred_nucleophiles.update(product_map.get(motif_id, set()))
+
+    entries: List[Dict[str, Any]] = []
     for entry in reactant_entries or []:
         motifs = []
         if isinstance(entry, dict):
@@ -446,27 +448,87 @@ def select_primary_reacted_motifs(
         else:
             motifs = extract_motif_ids(entry)
         reacted_here = [m for m in motifs if m in reacted_set]
-        if reacted_here:
-            idx_map = {m: idx for idx, m in enumerate(motifs)}
-            if preferred_nucleophiles:
-                preferred = [m for m in reacted_here if m in preferred_nucleophiles]
-                if preferred:
-                    preferred.sort(key=lambda m: idx_map.get(m, 0))
-                    primary.append(preferred[0])
-                    continue
-            if electrophiles or nucleophiles:
-                def _score(motif_id: str) -> tuple[int, int]:
-                    if preferred_nucleophiles and motif_id in nucleophiles and motif_id not in preferred_nucleophiles:
-                        return (0, idx_map.get(motif_id, 0))
-                    if motif_id in nucleophiles:
-                        return (2, idx_map.get(motif_id, 0))
-                    if motif_id in electrophiles:
-                        return (1, idx_map.get(motif_id, 0))
+        if not reacted_here:
+            continue
+        idx_map = {m: idx for idx, m in enumerate(motifs)}
+        nuc_here = [m for m in reacted_here if m in nucleophiles]
+        elec_here = [m for m in reacted_here if m in electrophiles]
+        pref_nuc_here = [m for m in reacted_here if m in preferred_nucleophiles]
+        entries.append(
+            {
+                "motifs": motifs,
+                "reacted": reacted_here,
+                "idx_map": idx_map,
+                "nuc": nuc_here,
+                "elec": elec_here,
+                "pref_nuc": pref_nuc_here,
+            }
+        )
+
+    selected_nuc = False
+    selected_elec = False
+    deferred: List[Dict[str, Any]] = []
+
+    def _pick_by_order(candidates: List[str], idx_map: Dict[str, int]) -> Optional[str]:
+        if not candidates:
+            return None
+        ordered = sorted(candidates, key=lambda m: idx_map.get(m, 0))
+        return ordered[0]
+
+    # Pass 1: lock in single-role reactants (only nucleophile or only electrophile).
+    for entry in entries:
+        nuc_here = entry["nuc"]
+        elec_here = entry["elec"]
+        idx_map = entry["idx_map"]
+        if nuc_here and not elec_here:
+            pick = _pick_by_order(entry["pref_nuc"] or nuc_here, idx_map)
+            if pick:
+                primary.append(pick)
+                selected_nuc = True
+                continue
+        if elec_here and not nuc_here:
+            pick = _pick_by_order(elec_here, idx_map)
+            if pick:
+                primary.append(pick)
+                selected_elec = True
+                continue
+        deferred.append(entry)
+
+    # Pass 2: balance roles when both are available on the same reactant.
+    for entry in deferred:
+        reacted_here = entry["reacted"]
+        idx_map = entry["idx_map"]
+        nuc_here = entry["nuc"]
+        elec_here = entry["elec"]
+
+        if not selected_elec and elec_here:
+            pick = _pick_by_order(elec_here, idx_map)
+            if pick:
+                primary.append(pick)
+                selected_elec = True
+                continue
+        if not selected_nuc and (entry["pref_nuc"] or nuc_here):
+            pick = _pick_by_order(entry["pref_nuc"] or nuc_here, idx_map)
+            if pick:
+                primary.append(pick)
+                selected_nuc = True
+                continue
+
+        # Fallback to previous scoring (nucleophile > electrophile > other).
+        if electrophiles or nucleophiles:
+            def _score(motif_id: str) -> tuple[int, int]:
+                if preferred_nucleophiles and motif_id in nucleophiles and motif_id not in preferred_nucleophiles:
                     return (0, idx_map.get(motif_id, 0))
-                best = sorted(reacted_here, key=lambda m: (-_score(m)[0], _score(m)[1]))[0]
-                primary.append(best)
-            else:
-                primary.append(reacted_here[0])
+                if motif_id in nucleophiles:
+                    return (2, idx_map.get(motif_id, 0))
+                if motif_id in electrophiles:
+                    return (1, idx_map.get(motif_id, 0))
+                return (0, idx_map.get(motif_id, 0))
+            best = sorted(reacted_here, key=lambda m: (-_score(m)[0], _score(m)[1]))[0]
+            primary.append(best)
+        else:
+            primary.append(reacted_here[0])
+
     return primary
 
 
