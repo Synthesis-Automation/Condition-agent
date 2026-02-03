@@ -614,10 +614,19 @@ def _print_reaction_summary(
     
     reaction_key = reaction.get("reaction_key")
     reaction_key_logic = reaction.get("reaction_key_logic")
+    reaction_key_bond = reaction.get("reaction_key_bond")
+    reaction_key_composite = reaction.get("reaction_key_composite")
+    product_broad_tags = reaction.get("product_broad_tags") or []
     if reaction_key:
         print(f"Reaction Key: {_highlight(_clean_compound_id(reaction_key))}")
     if reaction_key_logic:
         print(f"Logic Reaction Key: {_highlight(_clean_compound_id(reaction_key_logic))}")
+    if reaction_key_bond:
+        print(f"Bond-Change Key: {_highlight(_clean_compound_id(reaction_key_bond))}")
+    if reaction_key_composite:
+        print(f"Composite Key: {_highlight(_clean_compound_id(reaction_key_composite))}")
+    if product_broad_tags:
+        print(f"Broad Product Tags: {_format_value(product_broad_tags)}")
         
         # Explain the reaction key components from aggregates or extended section
         aggregates = reaction.get("aggregates")

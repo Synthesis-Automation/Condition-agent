@@ -273,6 +273,181 @@ def format_logic_reaction_key(
     return base + " || " + " || ".join(extras)
 
 
+def _map_atom_labels(mapped_smiles: str) -> Dict[int, str]:
+    """Build a map_num -> label mapping from a mapped reaction SMILES."""
+    if not mapped_smiles or ">>" not in mapped_smiles:
+        return {}
+    labels: Dict[int, str] = {}
+    reactants_smiles, products_smiles = mapped_smiles.split(">>", 1)
+    for side in (reactants_smiles, products_smiles):
+        for part in side.split("."):
+            mol = rdkit_helpers.parse_smiles(part)
+            if mol is None:
+                continue
+            for atom in mol.GetAtoms():
+                map_num = atom.GetAtomMapNum()
+                if not map_num or map_num in labels:
+                    continue
+                symbol = atom.GetSymbol()
+                if atom.GetIsAromatic():
+                    labels[map_num] = f"{symbol}(ar)"
+                else:
+                    labels[map_num] = symbol
+    return labels
+
+
+def _format_bond_tokens(
+    bonds: Iterable[Any],
+    labels: Dict[int, str],
+) -> List[str]:
+    tokens: List[str] = []
+    seen: Set[Tuple[str, str]] = set()
+    for bond in bonds or []:
+        if not isinstance(bond, (tuple, list)) or len(bond) < 2:
+            continue
+        a, b = bond[0], bond[1]
+        if isinstance(a, int):
+            a_label = labels.get(a, f"#{a}")
+        else:
+            a_label = str(a).split()[0]
+        if isinstance(b, int):
+            b_label = labels.get(b, f"#{b}")
+        else:
+            b_label = str(b).split()[0]
+        pair = tuple(sorted((a_label, b_label)))
+        if pair in seen:
+            continue
+        seen.add(pair)
+        tokens.append(f"{pair[0]}-{pair[1]}")
+    return tokens
+
+
+def format_bond_change_key(reaction_smiles: str) -> Optional[str]:
+    """Generate a bond-change key from atom mapping (POC)."""
+    if not reaction_smiles or not rdkit_helpers.rdkit_available():
+        return None
+    try:
+        from chemtools._atom_mapping import analyze_bond_changes_hybrid
+    except Exception:
+        return None
+    try:
+        analysis = analyze_bond_changes_hybrid(reaction_smiles, use_mcs=False)
+    except Exception:
+        return None
+    if not analysis or not analysis.get("success"):
+        return None
+    result = analysis.get("recommended_result") or analysis.get("rxnmapper_result") or analysis.get("manual_result")
+    if not result or not result.get("success"):
+        return None
+    mapped_smiles = result.get("mapped_smiles") or ""
+    labels = _map_atom_labels(mapped_smiles)
+    broken = _format_bond_tokens(result.get("broken_bonds"), labels)
+    formed = _format_bond_tokens(result.get("formed_bonds"), labels)
+    if not broken and not formed:
+        return None
+    parts: List[str] = []
+    if broken:
+        parts.append("break: " + "; ".join(broken))
+    if formed:
+        parts.append("form: " + "; ".join(formed))
+    return " | ".join(parts)
+
+
+def _extract_bond_section(bond_key: Optional[str], *, section: str) -> List[str]:
+    if not bond_key:
+        return []
+    marker = f"{section}: "
+    parts = [p.strip() for p in bond_key.split(" | ") if p.strip()]
+    for part in parts:
+        if part.startswith(marker):
+            payload = part[len(marker):].strip()
+            if not payload:
+                return []
+            return [tok.strip() for tok in payload.split(";") if tok.strip()]
+    return []
+
+
+def _is_carbon_label(label: str) -> bool:
+    return label == "C" or label.startswith("C(")
+
+
+def _is_sulfur_label(label: str) -> bool:
+    return label == "S" or label.startswith("S(")
+
+
+def _infer_product_broad_tags(bond_key: Optional[str]) -> List[str]:
+    tags: List[str] = []
+    formed = _extract_bond_section(bond_key, section="form")
+    if not formed:
+        return tags
+    for token in formed:
+        if "-" not in token:
+            continue
+        left, right = [t.strip() for t in token.split("-", 1)]
+        if (_is_carbon_label(left) and _is_sulfur_label(right)) or (
+            _is_sulfur_label(left) and _is_carbon_label(right)
+        ):
+            tags.append("Product_C-S")
+            if left.endswith("(ar)") or right.endswith("(ar)"):
+                tags.append("Product_Aryl_S")
+            break
+    return sorted(set(tags))
+
+
+def _format_motif_list(items: Iterable[str]) -> str:
+    values = sorted(str(item) for item in items if item)
+    return "|".join(values) if values else "[]"
+
+
+def _format_role_tokens(roles_summary: Optional[Dict[str, Any]]) -> List[str]:
+    if not roles_summary or not isinstance(roles_summary, dict):
+        return []
+    reactants = roles_summary.get("reactants") or []
+    tokens: List[str] = []
+    for entry in reactants:
+        if not isinstance(entry, dict):
+            continue
+        role = entry.get("role")
+        category = entry.get("category")
+        if not role or not category:
+            continue
+        tokens.append(f"{role}={category}")
+    return tokens
+
+
+def format_composite_reaction_key(
+    reacted: Iterable[str],
+    formed: Iterable[str],
+    spectators: Iterable[str],
+    *,
+    bond_key: Optional[str] = None,
+    roles_summary: Optional[Dict[str, Any]] = None,
+) -> str:
+    """Compose a multi-view reaction key (bond-change + motif delta + roles)."""
+    sections: List[str] = []
+    if bond_key:
+        sections.append(f"bond: {bond_key}")
+
+    sections.append(f"reacted: {_format_motif_list(reacted)}")
+    sections.append(f"formed: {_format_motif_list(formed)}")
+    if spectators:
+        sections.append(f"spectators: {_format_motif_list(spectators)}")
+
+    role_tokens = _format_role_tokens(roles_summary)
+    if role_tokens:
+        sections.append("roles: " + "; ".join(sorted(set(role_tokens))))
+
+    flags: List[str] = []
+    if bond_key and ("; " in bond_key or bond_key.count("-") >= 2):
+        flags.append("multi_bond")
+    if roles_summary and roles_summary.get("has_multi_functional_substrates"):
+        flags.append("multi_site")
+    if flags:
+        sections.append("flags: " + "; ".join(flags))
+
+    return " || ".join(sections)
+
+
 def _parse_reaction_key_parts(key: str) -> Tuple[List[str], List[str], List[str]]:
     """Parse a Reaction_Key into reacted/formed/spectator motif lists."""
     if not key or " -> " not in key:
@@ -784,6 +959,9 @@ def featurize_reaction(
     reaction_key = None
     reaction_keys_alt: List[str] = []
     reaction_key_logic: Optional[str] = None
+    reaction_key_bond: Optional[str] = None
+    reaction_key_composite: Optional[str] = None
+    product_broad_tags: List[str] = []
     if product_bundles and reactant_bundles:
         # Use the pre-computed aggregates which have pattern-based filtering applied
         reacted = set(aggregates.get("reacted_motifs", []))
@@ -834,6 +1012,15 @@ def featurize_reaction(
             spectators,
             reaction_type_id=rt_id,
         )
+        reaction_key_bond = format_bond_change_key(reaction_smiles)
+        reaction_key_composite = format_composite_reaction_key(
+            reacted_for_key,
+            formed_for_key,
+            spectators,
+            bond_key=reaction_key_bond,
+            roles_summary=roles_summary,
+        )
+        product_broad_tags = _infer_product_broad_tags(reaction_key_bond)
 
     reaction = {
         "reaction_smiles": reaction_smiles,
@@ -846,6 +1033,9 @@ def featurize_reaction(
         "reaction_key": reaction_key,
         "reaction_keys_alt": reaction_keys_alt,
         "reaction_key_logic": reaction_key_logic,
+        "reaction_key_bond": reaction_key_bond,
+        "reaction_key_composite": reaction_key_composite,
+        "product_broad_tags": product_broad_tags,
         "roles": roles_summary,
         "agent_roles": agent_roles,
         "intramolecular": intramolecular,
