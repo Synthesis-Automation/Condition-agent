@@ -21,6 +21,10 @@ Ar-B(OH)2
 
 Ar-COOR vs. ArCO-OR
 
+Ar-COCl vs ArCO-Cl
+
+Ar-NHR vs ArNHR-H
+
 [Alkyl-NHR]
 
 Ar2N-H
