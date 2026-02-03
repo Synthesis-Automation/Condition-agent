@@ -1,0 +1,104 @@
+{
+  "version": "v1",
+  "description": "Likely bond-breaking hints for common functional groups. Used to build logic reaction keys.",
+  "group_hints": {
+    "-F": {
+      "break": "A-B"
+    },
+    "-Cl": {
+      "break": "A-B"
+    },
+    "-Br": {
+      "break": "A-B"
+    },
+    "-I": {
+      "break": "A-B"
+    },
+    "-OTf": {
+      "break": "A-O"
+    },
+    "-OTs": {
+      "break": "A-O"
+    },
+    "-OMs": {
+      "break": "A-O"
+    },
+    "-OSO2R": {
+      "break": "A-O"
+    },
+    "-NHR": {
+      "break": "B-H"
+    },
+    "-NH2": {
+      "break": "B-H"
+    },
+    "-OH": {
+      "break": "B-H"
+    },
+    "-SH": {
+      "break": "B-H"
+    },
+    "-COCl": {
+      "break": "C-X"
+    },
+    "-COBr": {
+      "break": "C-X"
+    },
+    "-COI": {
+      "break": "C-X"
+    },
+    "-COF": {
+      "break": "C-X"
+    },
+    "-CO2H": {
+      "break": "C-OH"
+    },
+    "-CO2R": {
+      "break": "C-OR"
+    },
+    "-H": {
+      "break": "A-H"
+    },
+    "-B(OH)2": {
+      "break": "A-B"
+    },
+    "-Bpin": {
+      "break": "A-B"
+    },
+    "-B(OR)2": {
+      "break": "A-B"
+    },
+    "-BF3K": {
+      "break": "A-B"
+    },
+    "-Sn*": {
+      "break": "A-B"
+    },
+    "-Zn*": {
+      "break": "A-B"
+    },
+    "-Mg*": {
+      "break": "A-B"
+    },
+    "-Si*": {
+      "break": "A-B"
+    },
+    "-NR2": {},
+    "-OR": {},
+    "-SR": {},
+    "-CN": {},
+    "-N3": {}
+  },
+  "reaction_overrides": {
+    "Minisci_alkylation": {
+      "-CO2H": {
+        "break": "C-CO2"
+      }
+    },
+    "Minisci_acylation": {
+      "-CO2H": {
+        "break": "C-CO2"
+      }
+    }
+  }
+}

@@ -155,6 +155,10 @@ def build_core_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
         "feasibility": feasibility,
     }
     reaction_keys_alt = full_reaction.get("reaction_keys_alt") or []
+    reaction_key_logic = full_reaction.get("reaction_key_logic") or ""
+    if reaction_key_logic:
+        core["reaction_key_logic"] = reaction_key_logic
+
     if reaction_keys_alt:
         core["reaction_keys_alt"] = reaction_keys_alt
     

@@ -5,6 +5,7 @@ CLI for testing compound and reaction featurizations.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 import argparse
@@ -95,6 +96,24 @@ def _clean_compound_id(cid: str) -> str:
     if isinstance(cid, str):
         return cid.replace("--", "-")
     return str(cid)
+
+
+def _supports_color() -> bool:
+    if not sys.stdout.isatty():
+        return False
+    if os.environ.get("NO_COLOR"):
+        return False
+    if os.environ.get("TERM") == "dumb":
+        return False
+    return True
+
+
+def _highlight(text: str) -> str:
+    if not text:
+        return text
+    if not _supports_color():
+        return text
+    return f"\x1b[96m{text}\x1b[0m"
 
 
 def _format_compound_id(entry: Dict[str, Any]) -> str:
@@ -594,8 +613,11 @@ def _print_reaction_summary(
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
     
     reaction_key = reaction.get("reaction_key")
+    reaction_key_logic = reaction.get("reaction_key_logic")
     if reaction_key:
-        print(f"Reaction Key: {_clean_compound_id(reaction_key)}")
+        print(f"Reaction Key: {_highlight(_clean_compound_id(reaction_key))}")
+    if reaction_key_logic:
+        print(f"Logic Reaction Key: {_highlight(_clean_compound_id(reaction_key_logic))}")
         
         # Explain the reaction key components from aggregates or extended section
         aggregates = reaction.get("aggregates")

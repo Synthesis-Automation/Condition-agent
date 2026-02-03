@@ -14,6 +14,7 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from chemtools.util import rdkit_helpers
 from chemtools.smiles import normalize_reaction
+from chemtools.taxonomy.reactivity_hints import load_reactivity_hints
 
 from ..analysis.reaction_context import classify_reactants_with_context, get_reactant_summary
 from ..analysis.feasibility import analyze_snar_feasibility
@@ -175,6 +176,101 @@ def format_reaction_key(
     spectators_str = "|".join(spectators_list) if spectators_list else "[]"
     
     return f"{reacted_str} -> {formed_str} || {spectators_str}"
+
+
+
+@lru_cache(maxsize=1)
+def _load_reactivity_hints() -> Dict[str, Any]:
+    return load_reactivity_hints()
+
+
+def _select_group_hint(motif_id: str, reaction_type: Optional[str]) -> Optional[Dict[str, Any]]:
+    hints = _load_reactivity_hints()
+    group_hints = hints.get("group_hints") or {}
+    if not group_hints:
+        return None
+
+    match_id = None
+    for group_id in sorted(group_hints.keys(), key=len, reverse=True):
+        if motif_id.endswith(group_id):
+            match_id = group_id
+            break
+    if not match_id:
+        return None
+
+    hint = dict(group_hints.get(match_id) or {})
+    overrides = hints.get("reaction_overrides") or {}
+    if reaction_type:
+        override = overrides.get(reaction_type, {}).get(match_id)
+        if isinstance(override, dict):
+            hint.update(override)
+
+    hint["group_id"] = match_id
+    return hint
+
+
+def _format_logic_break_tokens(motifs: Iterable[str], reaction_type: Optional[str]) -> List[str]:
+    tokens: List[str] = []
+    seen: Set[str] = set()
+    for motif in sorted(motifs) if motifs else []:
+        hint = _select_group_hint(str(motif), reaction_type)
+        if not hint:
+            continue
+        br = hint.get("break")
+        if not br:
+            continue
+        token = f"{motif}({br})"
+        if token in seen:
+            continue
+        tokens.append(token)
+        seen.add(token)
+    return tokens
+
+
+def _is_likely_ab_motif(motif_id: str) -> bool:
+    if not motif_id or "-" not in motif_id:
+        return False
+    if motif_id.startswith("Motif-"):
+        return False
+    if motif_id.startswith("Any-"):
+        return False
+    return True
+
+
+def _format_logic_form_tokens(motifs: Iterable[str]) -> List[str]:
+    tokens: List[str] = []
+    seen: Set[str] = set()
+    for motif in sorted(motifs) if motifs else []:
+        motif_id = str(motif)
+        if not _is_likely_ab_motif(motif_id):
+            continue
+        token = f"{motif_id}(A-B)"
+        if token in seen:
+            continue
+        tokens.append(token)
+        seen.add(token)
+    return tokens
+
+
+def format_logic_reaction_key(
+    reacted: Iterable[str],
+    formed: Iterable[str],
+    spectators: Iterable[str],
+    *,
+    reaction_type_id: Optional[str] = None,
+) -> str:
+    base = format_reaction_key(reacted, formed, spectators)
+    break_tokens = _format_logic_break_tokens(reacted, reaction_type_id)
+    form_tokens = _format_logic_form_tokens(formed)
+    if not break_tokens and not form_tokens:
+        return base
+
+    extras: List[str] = []
+    if break_tokens:
+        extras.append("break: " + "; ".join(break_tokens))
+    if form_tokens:
+        extras.append("form: " + "; ".join(form_tokens))
+    return base + " || " + " || ".join(extras)
 
 
 def _parse_reaction_key_parts(key: str) -> Tuple[List[str], List[str], List[str]]:
@@ -614,9 +710,18 @@ def featurize_reaction(
 
     intramolecular = infer_intramolecular(reactant_smiles, product_smiles, roles_summary)
 
+    rt_id = None
+    if isinstance(reaction_type, dict):
+        rt_id = reaction_type.get("reaction_type")
+    elif reaction_type is not None:
+        rt_id = str(reaction_type)
+    if rt_id == "Unknown":
+        rt_id = None
+
     # Generate Reaction_Key using filtered aggregates
     reaction_key = None
     reaction_keys_alt: List[str] = []
+    reaction_key_logic: Optional[str] = None
     if product_bundles and reactant_bundles:
         # Use the pre-computed aggregates which have pattern-based filtering applied
         reacted = set(aggregates.get("reacted_motifs", []))
@@ -640,13 +745,14 @@ def featurize_reaction(
         if primary_formed is None:
             primary_formed = select_primary_formed_motif(product_primary, formed)
 
-        formed_for_key = {primary_formed} if primary_formed else formed
+        formed_for_key = [primary_formed] if primary_formed else formed
         # Select primary motifs for key generation
         primary_reacted = select_primary_reacted_motifs(reactant_bundles, reacted, formed_for_key)
+        reacted_for_key = primary_reacted if primary_reacted else reacted
 
         reaction_key = format_reaction_key(
-            primary_reacted if primary_reacted else reacted,
-            [primary_formed] if primary_formed else formed,
+            reacted_for_key,
+            formed_for_key,
             spectators,
         )
         # Alternate keys for multi-event reactions (one per formed motif)
@@ -660,6 +766,13 @@ def featurize_reaction(
             reaction_key, reaction_keys_alt
         )
 
+        reaction_key_logic = format_logic_reaction_key(
+            reacted_for_key,
+            formed_for_key,
+            spectators,
+            reaction_type_id=rt_id,
+        )
+
     reaction = {
         "reaction_smiles": reaction_smiles,
         "normalized": normalized,
@@ -670,13 +783,13 @@ def featurize_reaction(
         "aggregates": aggregates,
         "reaction_key": reaction_key,
         "reaction_keys_alt": reaction_keys_alt,
+        "reaction_key_logic": reaction_key_logic,
         "roles": roles_summary,
         "agent_roles": agent_roles,
         "intramolecular": intramolecular,
     }
 
     # Add feasibility analysis for specific reaction types
-    rt_id = reaction_type.get("reaction_type")
     if rt_id == "snar_cn" or rt_id == "c_n_cross_coupling":
         reaction["feasibility"] = analyze_snar_feasibility(reaction)
 
