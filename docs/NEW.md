@@ -10,3 +10,23 @@ Add post‑analysis self‑check: compare detection vs analysis vs HTE for agree
 # ChemTools Toolkit
 
 If you ever want a clean rebuild, delete results/hte_cache.
+
+# System design
+
+A-S
+
+Ar-CHO, Ar-Cl
+
+Ar-B(OH)2
+
+Ar-COOR vs. ArCO-OR
+
+[Alkyl-NHR]
+
+Ar2N-H
+
+R3N
+
+Ar-SH vs. ArS-H
+
+SCN-H
