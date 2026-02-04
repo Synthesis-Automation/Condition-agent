@@ -771,6 +771,7 @@ def featurize_reaction(
     
     include_roles = to_bool(options.get("include_roles"), default=True)
     include_agent_roles = to_bool(options.get("include_agent_roles"), default=True)
+    skip_bond_analysis = to_bool(options.get("skip_bond_analysis"), default=False)
     
     # General coupling confirmation (supports 9+ coupling reaction types)
     # Backward compatibility: map old Suzuki-specific parameter to general one
@@ -890,8 +891,11 @@ def featurize_reaction(
         reacted_full = set(aggregates.get("reacted_motifs", []))
         spectators = set(aggregates.get("spectator_motifs", []))
 
-        bond_analysis = _get_bond_change_analysis(reaction_smiles)
-        bond_key = format_bond_change_key(reaction_smiles, analysis=bond_analysis)
+        bond_analysis = None
+        bond_key = None
+        if not skip_bond_analysis:
+            bond_analysis = _get_bond_change_analysis(reaction_smiles)
+            bond_key = format_bond_change_key(reaction_smiles, analysis=bond_analysis)
         product_broad_tags = _infer_product_broad_tags_with_validation(
             bond_key=bond_key,
             product_smiles=product_smiles,

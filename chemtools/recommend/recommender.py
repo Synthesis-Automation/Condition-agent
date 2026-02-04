@@ -222,7 +222,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
                     return ""
                 try:
                     context = featurize_reaction(s)
-                    return context.get("reaction", {}).get("reaction_key") or ""
+                    return context.get("reaction_key") or ""
                 except Exception:
                     return ""
             df["Reaction_Key"] = df["reaction_smiles"].apply(_gen_rxn_key)
