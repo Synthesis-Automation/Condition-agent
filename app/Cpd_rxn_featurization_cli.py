@@ -626,6 +626,9 @@ def _print_reaction_summary(
         print(f"CRK-v1: {_highlight_blue(_clean_compound_id(reaction_key))}")
     if product_broad_tags:
         print(f"Broad Product Tags: {_format_value(product_broad_tags)}")
+    product_motifs_reactive = reaction.get("product_motifs_reactive") or []
+    if product_motifs_reactive:
+        print(f"Product Motifs (Reactive): {_format_value(product_motifs_reactive)}")
         
         # Explain the reaction key components from aggregates or extended section
         aggregates = reaction.get("aggregates")

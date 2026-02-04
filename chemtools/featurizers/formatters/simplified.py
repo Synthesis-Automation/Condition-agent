@@ -155,8 +155,11 @@ def build_core_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
         "feasibility": feasibility,
     }
     product_broad_tags = full_reaction.get("product_broad_tags") or []
+    product_motifs_reactive = full_reaction.get("product_motifs_reactive") or []
     if product_broad_tags:
         core["product_broad_tags"] = product_broad_tags
+    if product_motifs_reactive:
+        core["product_motifs_reactive"] = product_motifs_reactive
     
     # Include full aggregates for motif change analysis and spectator groups
     aggregates = full_reaction.get("aggregates", {})

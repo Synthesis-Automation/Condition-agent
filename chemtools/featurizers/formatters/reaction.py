@@ -7,7 +7,9 @@ Handles reaction type detection, reactant/product processing, and reaction key g
 from __future__ import annotations
 
 from functools import lru_cache
+import json
 import re
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from chemtools.util import rdkit_helpers
@@ -128,6 +130,23 @@ def _get_bond_change_analysis(reaction_smiles: str) -> Optional[Dict[str, Any]]:
     if not result or not result.get("success"):
         return None
     return result
+
+
+@lru_cache(maxsize=1)
+def _load_compound_logic_sets() -> Dict[str, Set[str]]:
+    path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "compound_logic.json"
+    if not path.exists():
+        return {}
+    try:
+        with path.open("r", encoding="utf-8", errors="replace") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return {}
+    motif_sets: Dict[str, Set[str]] = {}
+    for set_name, set_data in (payload.get("motif_sets", {}) or {}).items():
+        members = set_data.get("members", []) or []
+        motif_sets[set_name] = set(str(m) for m in members if m)
+    return motif_sets
 
 
 def format_bond_change_key(
@@ -275,6 +294,10 @@ def _parse_element(label: str) -> str:
     if "(" in label:
         label = label.split("(", 1)[0]
     return label
+
+
+def _is_aromatic_label(label: str) -> bool:
+    return label.endswith("(ar)")
 
 
 def _bond_elements_from_key(bond_key: Optional[str]) -> Set[str]:
@@ -677,6 +700,66 @@ def _format_motif_list(items: Iterable[str]) -> str:
     return "|".join(values) if values else "[]"
 
 
+def _select_reactive_product_motifs(
+    product_motifs: Iterable[Dict[str, Any]],
+    *,
+    bond_key: Optional[str],
+    formed_motifs: Iterable[str],
+) -> List[str]:
+    """Select product motifs that align with bond formation (reaction-center motifs)."""
+    motif_ids = [
+        str(m.get("compound_id") or m.get("id"))
+        for m in product_motifs
+        if isinstance(m, dict) and (m.get("compound_id") or m.get("id"))
+    ]
+    motif_set = set(motif_ids)
+    formed_set = {str(m) for m in formed_motifs if m}
+
+    if not bond_key:
+        if formed_set:
+            return sorted(motif_set & formed_set) or sorted(formed_set)
+        return []
+
+    formed_bonds = _extract_bond_section(bond_key, section="form")
+    if not formed_bonds:
+        if formed_set:
+            return sorted(motif_set & formed_set) or sorted(formed_set)
+        return []
+
+    logic_sets = _load_compound_logic_sets()
+    target_ids: Set[str] = set()
+
+    def add_set(name: str) -> None:
+        target_ids.update(logic_sets.get(name, set()))
+
+    for token in formed_bonds:
+        if "-" not in token:
+            continue
+        left, right = [t.strip() for t in token.split("-", 1)]
+        left_el = _parse_element(left)
+        right_el = _parse_element(right)
+        left_ar = _is_aromatic_label(left)
+        right_ar = _is_aromatic_label(right)
+
+        elements = {left_el, right_el}
+        if "C" in elements and "N" in elements:
+            add_set("aryl_amines")
+            add_set("aryl_amides")
+        if "C" in elements and "O" in elements:
+            add_set("aryl_ethers")
+        if "C" in elements and "S" in elements:
+            add_set("aryl_thioethers")
+        if left_el == "C" and right_el == "C" and left_ar and right_ar:
+            target_ids.add("Ar-Ar")
+
+    reactive = sorted(motif_set & target_ids)
+    if reactive:
+        return reactive
+    if formed_set:
+        return sorted(motif_set & formed_set) or sorted(formed_set)
+    return []
+
+
 def classify_agent_roles(agents: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
     """Classify reagents/solvents by role using reagent taxonomy."""
     from functools import lru_cache
@@ -887,6 +970,7 @@ def featurize_reaction(
     # Generate CRK-v1 reaction key (single source of truth)
     reaction_key = None
     product_broad_tags: List[str] = []
+    product_motifs_reactive: List[str] = []
     if product_bundles and reactant_bundles:
         reacted_full = set(aggregates.get("reacted_motifs", []))
         spectators = set(aggregates.get("spectator_motifs", []))
@@ -899,6 +983,11 @@ def featurize_reaction(
         product_broad_tags = _infer_product_broad_tags_with_validation(
             bond_key=bond_key,
             product_smiles=product_smiles,
+        )
+        product_motifs_reactive = _select_reactive_product_motifs(
+            product_motifs_full,
+            bond_key=bond_key,
+            formed_motifs=aggregates.get("formed_motifs", []),
         )
         reacted_for_crk = _filter_reactants_for_crk(reacted_full, bond_key)
         if not reacted_for_crk and reacted_full:
@@ -929,6 +1018,7 @@ def featurize_reaction(
         "aggregates": aggregates,
         "reaction_key": reaction_key,
         "product_broad_tags": product_broad_tags,
+        "product_motifs_reactive": product_motifs_reactive,
         "roles": roles_summary,
         "agent_roles": agent_roles,
         "intramolecular": intramolecular,

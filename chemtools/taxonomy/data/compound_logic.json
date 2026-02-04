@@ -259,6 +259,16 @@
         "C_O_Coupling"
       ]
     },
+    "aryl_thioethers": {
+      "name": "Aryl Thioethers",
+      "description": "C-S coupling products (aryl thioethers).",
+      "members": [
+        "Ar-SR"
+      ],
+      "usage": [
+        "C_S_Coupling"
+      ]
+    },
     "aryl_amides": {
       "name": "Aryl Amides",
       "description": "N-aryl amide products (N-acyl anilides).",
