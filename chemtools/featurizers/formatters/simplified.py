@@ -158,6 +158,7 @@ def build_core_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
     reaction_key_logic = full_reaction.get("reaction_key_logic") or ""
     reaction_key_bond = full_reaction.get("reaction_key_bond") or ""
     reaction_key_composite = full_reaction.get("reaction_key_composite") or ""
+    reaction_key_crk = full_reaction.get("reaction_key_crk") or ""
     product_broad_tags = full_reaction.get("product_broad_tags") or []
     if reaction_key_logic:
         core["reaction_key_logic"] = reaction_key_logic
@@ -165,6 +166,8 @@ def build_core_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
         core["reaction_key_bond"] = reaction_key_bond
     if reaction_key_composite:
         core["reaction_key_composite"] = reaction_key_composite
+    if reaction_key_crk:
+        core["reaction_key_crk"] = reaction_key_crk
     if product_broad_tags:
         core["product_broad_tags"] = product_broad_tags
 

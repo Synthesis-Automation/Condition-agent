@@ -9,6 +9,7 @@ from __future__ import annotations
 from collections import Counter
 from functools import lru_cache
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
@@ -322,8 +323,7 @@ def _format_bond_tokens(
     return tokens
 
 
-def format_bond_change_key(reaction_smiles: str) -> Optional[str]:
-    """Generate a bond-change key from atom mapping (POC)."""
+def _get_bond_change_analysis(reaction_smiles: str) -> Optional[Dict[str, Any]]:
     if not reaction_smiles or not rdkit_helpers.rdkit_available():
         return None
     try:
@@ -339,6 +339,18 @@ def format_bond_change_key(reaction_smiles: str) -> Optional[str]:
     result = analysis.get("recommended_result") or analysis.get("rxnmapper_result") or analysis.get("manual_result")
     if not result or not result.get("success"):
         return None
+    return result
+
+
+def format_bond_change_key(
+    reaction_smiles: str,
+    *,
+    analysis: Optional[Dict[str, Any]] = None,
+) -> Optional[str]:
+    """Generate a bond-change key from atom mapping (POC)."""
+    result = analysis or _get_bond_change_analysis(reaction_smiles)
+    if not result:
+        return None
     mapped_smiles = result.get("mapped_smiles") or ""
     labels = _map_atom_labels(mapped_smiles)
     broken = _format_bond_tokens(result.get("broken_bonds"), labels)
@@ -351,6 +363,99 @@ def format_bond_change_key(reaction_smiles: str) -> Optional[str]:
     if formed:
         parts.append("form: " + "; ".join(formed))
     return " | ".join(parts)
+
+
+def _extract_bond_pairs_from_key(bond_key: Optional[str]) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]]]:
+    formed_pairs: List[Tuple[str, str]] = []
+    broken_pairs: List[Tuple[str, str]] = []
+    for token in _extract_bond_section(bond_key, section="form"):
+        if "-" not in token:
+            continue
+        left, right = [t.strip() for t in token.split("-", 1)]
+        formed_pairs.append((left, right))
+    for token in _extract_bond_section(bond_key, section="break"):
+        if "-" not in token:
+            continue
+        left, right = [t.strip() for t in token.split("-", 1)]
+        broken_pairs.append((left, right))
+    return formed_pairs, broken_pairs
+
+
+def _pair_reactants_from_bonds(
+    reacted: Iterable[str],
+    bond_key: Optional[str],
+) -> List[str]:
+    """Heuristic pairing of nucleophile/electrophile using bond-change tokens."""
+    if not bond_key:
+        return []
+    formed_pairs, broken_pairs = _extract_bond_pairs_from_key(bond_key)
+    if not formed_pairs:
+        return []
+
+    def pick_prefix(token: str, prefixes: Tuple[str, ...]) -> Optional[str]:
+        for pref in prefixes:
+            if token.endswith(pref):
+                return pref
+        return None
+
+    halides = ("-I", "-Br", "-Cl", "-F")
+    nucleophiles = ("-SH", "-NH2", "-NHR", "-OH")
+
+    reacted_list = [str(r) for r in reacted if r]
+    pairs: List[str] = []
+
+    for formed in formed_pairs:
+        # Try to detect which heteroatom formed the bond (S/N/O).
+        left, right = formed
+        hetero = None
+        if _is_sulfur_label(left) or _is_sulfur_label(right):
+            hetero = "S"
+        elif left.startswith("N") or right.startswith("N"):
+            hetero = "N"
+        elif left.startswith("O") or right.startswith("O"):
+            hetero = "O"
+        if not hetero:
+            continue
+
+        nuc = None
+        for motif in reacted_list:
+            if hetero == "S" and motif.endswith("-SH"):
+                nuc = motif
+                break
+            if hetero == "N" and (motif.endswith("-NH2") or motif.endswith("-NHR")):
+                nuc = motif
+                break
+            if hetero == "O" and motif.endswith("-OH"):
+                nuc = motif
+                break
+
+        if not nuc:
+            continue
+
+        # Match electrophile by halide in broken bonds.
+        elec = None
+        for broken in broken_pairs:
+            b_left, b_right = broken
+            if any(x in b_left for x in ("I", "Br", "Cl", "F")) or any(x in b_right for x in ("I", "Br", "Cl", "F")):
+                for motif in reacted_list:
+                    if any(motif.endswith(h) for h in halides):
+                        elec = motif
+                        break
+            if elec:
+                break
+
+        if nuc and elec:
+            pairs.append(f"{nuc}~{elec}")
+
+    # De-dup
+    out: List[str] = []
+    seen: Set[str] = set()
+    for p in pairs:
+        if p in seen:
+            continue
+        seen.add(p)
+        out.append(p)
+    return out
 
 
 def _extract_bond_section(bond_key: Optional[str], *, section: str) -> List[str]:
@@ -375,6 +480,285 @@ def _is_sulfur_label(label: str) -> bool:
     return label == "S" or label.startswith("S(")
 
 
+def _parse_element(label: str) -> str:
+    label = label.strip()
+    if label.startswith("#"):
+        return ""
+    if "(" in label:
+        label = label.split("(", 1)[0]
+    return label
+
+
+def _bond_elements_from_key(bond_key: Optional[str]) -> Set[str]:
+    elements: Set[str] = set()
+    for section in ("break", "form"):
+        for token in _extract_bond_section(bond_key, section=section):
+            if "-" not in token:
+                continue
+            left, right = [t.strip() for t in token.split("-", 1)]
+            left_el = _parse_element(left)
+            right_el = _parse_element(right)
+            if left_el:
+                elements.add(left_el)
+            if right_el:
+                elements.add(right_el)
+    return elements
+
+
+def _filter_reactants_for_crk(
+    reacted: Iterable[str],
+    bond_key: Optional[str],
+) -> List[str]:
+    if not bond_key:
+        return sorted(str(r) for r in reacted if r)
+    elements = _bond_elements_from_key(bond_key)
+    if not elements:
+        return sorted(str(r) for r in reacted if r)
+    elements_non_c = {el for el in elements if el != "C"}
+
+    group_element_map = {
+        "-I": {"I"},
+        "-Br": {"Br"},
+        "-Cl": {"Cl"},
+        "-F": {"F"},
+        "-SH": {"S", "H"},
+        "-OH": {"O", "H"},
+        "-NH2": {"N", "H"},
+        "-NHR": {"N", "H"},
+        "-NR2": {"N"},
+        "-OR": {"O"},
+        "-SR": {"S"},
+        "-N3": {"N"},
+        "-CN": {"C", "N"},
+        "-COCl": {"C", "Cl"},
+        "-COBr": {"C", "Br"},
+        "-COI": {"C", "I"},
+        "-COF": {"C", "F"},
+        "-CO2H": {"C", "O", "H"},
+        "-CO2R": {"C", "O"},
+        "-B(OH)2": {"B"},
+        "-Bpin": {"B"},
+        "-B(OR)2": {"B"},
+        "-BF3K": {"B"},
+        "-Sn*": {"Sn"},
+        "-Zn*": {"Zn"},
+        "-Mg*": {"Mg"},
+        "-Si*": {"Si"},
+        "-H": {"H"},
+    }
+
+    filtered: List[str] = []
+    for motif in reacted:
+        if not motif:
+            continue
+        hint = _select_group_hint(str(motif), None)
+        group_id = hint.get("group_id") if hint else None
+        if not group_id:
+            filtered.append(str(motif))
+            continue
+        group_elements = group_element_map.get(group_id)
+        if not group_elements:
+            filtered.append(str(motif))
+            continue
+        if elements_non_c:
+            if elements_non_c.intersection(group_elements):
+                filtered.append(str(motif))
+        elif elements.intersection(group_elements):
+            filtered.append(str(motif))
+    return sorted(filtered)
+
+
+def _strip_atom_mapping(smiles: str) -> str:
+    return re.sub(r":\d+", "", smiles)
+
+
+def _build_map_info(
+    mapped_smiles: str,
+    reactant_smiles: List[str],
+) -> Dict[int, Dict[str, Any]]:
+    """Map atom map numbers to element/aromatic/reactant index."""
+    if not mapped_smiles or ">>" not in mapped_smiles:
+        return {}
+    reactants_side = mapped_smiles.split(">>", 1)[0]
+    components = [c for c in reactants_side.split(".") if c]
+
+    # Canonical reactant smiles for matching
+    canon_reactants: List[str] = []
+    for smi in reactant_smiles:
+        canon = rdkit_helpers.canonical_smiles(smi) or smi
+        canon_reactants.append(canon)
+    remaining: Dict[str, List[int]] = {}
+    for idx, smi in enumerate(canon_reactants):
+        remaining.setdefault(smi, []).append(idx)
+
+    info: Dict[int, Dict[str, Any]] = {}
+    for comp in components:
+        comp_unmapped = _strip_atom_mapping(comp)
+        comp_canon = rdkit_helpers.canonical_smiles(comp_unmapped) or comp_unmapped
+        react_idx = None
+        if comp_canon in remaining and remaining[comp_canon]:
+            react_idx = remaining[comp_canon].pop(0)
+        mol = rdkit_helpers.parse_smiles(comp)
+        if mol is None:
+            continue
+        for atom in mol.GetAtoms():
+            map_num = atom.GetAtomMapNum()
+            if not map_num:
+                continue
+            info[map_num] = {
+                "element": atom.GetSymbol(),
+                "aromatic": bool(atom.GetIsAromatic()),
+                "reactant_idx": react_idx,
+            }
+    return info
+
+
+def _find_halide_for_carbon(
+    carbon_map: int,
+    broken_bonds: Iterable[Any],
+    map_info: Dict[int, Dict[str, Any]],
+) -> Optional[str]:
+    priority = {"I": 3, "Br": 2, "Cl": 1, "F": 0}
+    found: List[str] = []
+    for bond in broken_bonds or []:
+        if not isinstance(bond, (tuple, list)) or len(bond) < 2:
+            continue
+        a, b = bond[0], bond[1]
+        if a == carbon_map:
+            other = b
+        elif b == carbon_map:
+            other = a
+        else:
+            continue
+
+        if isinstance(other, int):
+            element = map_info.get(other, {}).get("element")
+        else:
+            element = _parse_element(str(other))
+        if element in priority:
+            found.append(element)
+    if not found:
+        return None
+    found.sort(key=lambda el: -priority.get(el, 0))
+    return found[0]
+
+
+def _reacted_motifs_by_reactant(
+    reactant_bundles: Iterable[Dict[str, Any]],
+    reacted_set: Set[str],
+) -> List[List[str]]:
+    buckets: List[List[str]] = []
+    for bundle in reactant_bundles or []:
+        motifs = extract_motif_ids(bundle.get("motifs", []))
+        buckets.append([m for m in motifs if m in reacted_set])
+    return buckets
+
+
+def _pair_reactants_from_mapping(
+    reacted_set: Set[str],
+    *,
+    analysis: Optional[Dict[str, Any]],
+    reactant_smiles: List[str],
+    reactant_bundles: List[Dict[str, Any]],
+) -> List[str]:
+    if not analysis:
+        return []
+    mapped_smiles = analysis.get("mapped_smiles") or ""
+    broken_bonds = analysis.get("broken_bonds") or []
+    formed_bonds = analysis.get("formed_bonds") or []
+    if not mapped_smiles or not formed_bonds:
+        return []
+
+    map_info = _build_map_info(mapped_smiles, reactant_smiles)
+    if not map_info:
+        return []
+
+    reacted_by_idx = _reacted_motifs_by_reactant(reactant_bundles, reacted_set)
+    pairs: List[str] = []
+
+    for bond in formed_bonds:
+        if not isinstance(bond, (tuple, list)) or len(bond) < 2:
+            continue
+        a, b = bond[0], bond[1]
+        if not isinstance(a, int) or not isinstance(b, int):
+            continue
+        a_info = map_info.get(a)
+        b_info = map_info.get(b)
+        if not a_info or not b_info:
+            continue
+        # Identify hetero vs carbon.
+        if a_info["element"] == "C" and b_info["element"] in {"S", "N", "O"}:
+            carbon_map, hetero_map = a, b
+            hetero_el = b_info["element"]
+        elif b_info["element"] == "C" and a_info["element"] in {"S", "N", "O"}:
+            carbon_map, hetero_map = b, a
+            hetero_el = a_info["element"]
+        else:
+            continue
+
+        nuc_idx = map_info.get(hetero_map, {}).get("reactant_idx")
+        elec_idx = map_info.get(carbon_map, {}).get("reactant_idx")
+        if nuc_idx is None or elec_idx is None:
+            continue
+        if nuc_idx >= len(reacted_by_idx) or elec_idx >= len(reacted_by_idx):
+            continue
+
+        nuc_candidates = reacted_by_idx[nuc_idx]
+        elec_candidates = reacted_by_idx[elec_idx]
+        if not nuc_candidates or not elec_candidates:
+            continue
+
+        if hetero_el == "S":
+            nuc = next((m for m in nuc_candidates if m.endswith("-SH")), nuc_candidates[0])
+        elif hetero_el == "N":
+            nuc = next((m for m in nuc_candidates if m.endswith("-NH2") or m.endswith("-NHR")), nuc_candidates[0])
+        elif hetero_el == "O":
+            nuc = next((m for m in nuc_candidates if m.endswith("-OH")), nuc_candidates[0])
+        else:
+            nuc = nuc_candidates[0]
+
+        halide = _find_halide_for_carbon(carbon_map, broken_bonds, map_info)
+        if halide:
+            elec = next((m for m in elec_candidates if m.endswith(f"-{halide}")), elec_candidates[0])
+        else:
+            elec = elec_candidates[0]
+
+        if nuc and elec:
+            pairs.append(f"{nuc}~{elec}")
+
+    out: List[str] = []
+    seen: Set[str] = set()
+    for p in pairs:
+        if p in seen:
+            continue
+        seen.add(p)
+        out.append(p)
+    return out
+
+
+def _fallback_pairs_by_halide_priority(reacted: Iterable[str]) -> List[str]:
+    """Fallback pairing when mapping is unavailable."""
+    reacted_list = [str(r) for r in reacted if r]
+    if not reacted_list:
+        return []
+    nucleophile = next((m for m in reacted_list if m.endswith("-SH")), None)
+    if not nucleophile:
+        nucleophile = next((m for m in reacted_list if m.endswith("-NH2") or m.endswith("-NHR")), None)
+    if not nucleophile:
+        nucleophile = next((m for m in reacted_list if m.endswith("-OH")), None)
+    if not nucleophile:
+        return []
+    halide_priority = ["-I", "-Br", "-Cl", "-F"]
+    electrophile = None
+    for h in halide_priority:
+        electrophile = next((m for m in reacted_list if m.endswith(h)), None)
+        if electrophile:
+            break
+    if not electrophile:
+        return []
+    return [f"{nucleophile}~{electrophile}"]
+
+
 def _infer_product_broad_tags(bond_key: Optional[str]) -> List[str]:
     tags: List[str] = []
     formed = _extract_bond_section(bond_key, section="form")
@@ -392,6 +776,103 @@ def _infer_product_broad_tags(bond_key: Optional[str]) -> List[str]:
                 tags.append("Product_Aryl_S")
             break
     return sorted(set(tags))
+
+
+def _select_primary_broad_tag(tags: Iterable[str]) -> str:
+    if not tags:
+        return "[]"
+    priority = {
+        "Product_Aryl_S": 2,
+        "Product_C-S": 1,
+    }
+    candidates = [str(t) for t in tags if t]
+    if not candidates:
+        return "[]"
+    candidates.sort(key=lambda t: (-priority.get(t, 0), t))
+    return candidates[0]
+
+
+def _detect_aryl_s_from_product_smiles(product_smiles: Iterable[str]) -> bool:
+    if not rdkit_helpers.rdkit_available():
+        return False
+    # Aromatic carbon bonded to sulfur (aryl thioether/aryl sulfur link)
+    # Matches c-S- and c-S(=O)- variants loosely.
+    smarts = "[c][S]"
+    try:
+        from chemtools.util.smarts_cache import compile_smarts
+    except Exception:
+        return False
+    patt = compile_smarts(smarts, validate=False)
+    if patt is None:
+        return False
+    for smi in product_smiles or []:
+        mol = rdkit_helpers.parse_smiles(smi)
+        if mol is None:
+            continue
+        try:
+            if mol.HasSubstructMatch(patt):
+                return True
+        except Exception:
+            continue
+    return False
+
+
+def _infer_product_broad_tags_with_validation(
+    *,
+    bond_key: Optional[str],
+    product_smiles: Iterable[str],
+) -> List[str]:
+    """Infer broad product tags with mapping-first + SMARTS fallback."""
+    tags = _infer_product_broad_tags(bond_key)
+    if "Product_Aryl_S" in tags:
+        return tags
+    # Fallback: product structure contains aryl-S bond.
+    if _detect_aryl_s_from_product_smiles(product_smiles):
+        tags.append("Product_C-S")
+        tags.append("Product_Aryl_S")
+    return sorted(set(tags))
+
+
+def format_crk_key(
+    *,
+    bond_key: Optional[str],
+    reacted: Iterable[str],
+    spectators: Iterable[str],
+    product_broad_tags: Iterable[str],
+    roles_summary: Optional[Dict[str, Any]],
+    intramolecular: Optional[bool],
+    pairs: Optional[Iterable[str]] = None,
+) -> str:
+    """Build a composite Condition Recommendation Key (CRK-v1)."""
+    reactants_text = _format_motif_list(reacted)
+    broad_tags = sorted(str(t) for t in product_broad_tags if t)
+    products_text = "|".join(broad_tags) if broad_tags else "[]"
+    products_primary = _select_primary_broad_tag(broad_tags)
+
+    summary = f"|{reactants_text} -> {products_primary}"
+    if products_text != "[]" and products_primary != "[]" and products_text != products_primary:
+        extras = [t for t in broad_tags if t != products_primary]
+        if extras:
+            summary += f" (+{'|'.join(extras)})"
+
+    sections: List[str] = [f"CRK-v1 {summary}"]
+
+    if bond_key:
+        formed = _extract_bond_section(bond_key, section="form")
+        broken = _extract_bond_section(bond_key, section="break")
+        if formed:
+            sections.append("bond_formed: " + "; ".join(formed))
+        if broken:
+            sections.append("bond_broken: " + "; ".join(broken))
+
+    if spectators:
+        sections.append("spectators: " + _format_motif_list(spectators))
+
+    pair_list = [str(p) for p in (pairs or []) if p]
+    if pair_list:
+        sections.append("pairs: " + "; ".join(pair_list))
+
+    return " | ".join(sections)
 
 
 def _format_motif_list(items: Iterable[str]) -> str:
@@ -962,9 +1443,10 @@ def featurize_reaction(
     reaction_key_bond: Optional[str] = None
     reaction_key_composite: Optional[str] = None
     product_broad_tags: List[str] = []
+    reaction_key_crk: Optional[str] = None
     if product_bundles and reactant_bundles:
         # Use the pre-computed aggregates which have pattern-based filtering applied
-        reacted = set(aggregates.get("reacted_motifs", []))
+        reacted_full = set(aggregates.get("reacted_motifs", []))
         formed = set(aggregates.get("formed_motifs", []))
         spectators = set(aggregates.get("spectator_motifs", []))
         
@@ -987,8 +1469,8 @@ def featurize_reaction(
 
         formed_for_key = [primary_formed] if primary_formed else formed
         # Select primary motifs for key generation
-        primary_reacted = select_primary_reacted_motifs(reactant_bundles, reacted, formed_for_key)
-        reacted_for_key = primary_reacted if primary_reacted else reacted
+        primary_reacted = select_primary_reacted_motifs(reactant_bundles, reacted_full, formed_for_key)
+        reacted_for_key = primary_reacted if primary_reacted else reacted_full
 
         reaction_key = format_reaction_key(
             reacted_for_key,
@@ -1012,7 +1494,8 @@ def featurize_reaction(
             spectators,
             reaction_type_id=rt_id,
         )
-        reaction_key_bond = format_bond_change_key(reaction_smiles)
+        bond_analysis = _get_bond_change_analysis(reaction_smiles)
+        reaction_key_bond = format_bond_change_key(reaction_smiles, analysis=bond_analysis)
         reaction_key_composite = format_composite_reaction_key(
             reacted_for_key,
             formed_for_key,
@@ -1020,7 +1503,28 @@ def featurize_reaction(
             bond_key=reaction_key_bond,
             roles_summary=roles_summary,
         )
-        product_broad_tags = _infer_product_broad_tags(reaction_key_bond)
+        product_broad_tags = _infer_product_broad_tags_with_validation(
+            bond_key=reaction_key_bond,
+            product_smiles=product_smiles,
+        )
+        reacted_for_crk = _filter_reactants_for_crk(reacted_full, reaction_key_bond)
+        pairs = _pair_reactants_from_mapping(
+            reacted_full,
+            analysis=bond_analysis,
+            reactant_smiles=reactant_smiles,
+            reactant_bundles=reactant_bundles,
+        )
+        if not pairs:
+            pairs = _fallback_pairs_by_halide_priority(reacted_for_crk)
+        reaction_key_crk = format_crk_key(
+            bond_key=reaction_key_bond,
+            reacted=reacted_for_crk,
+            spectators=spectators,
+            product_broad_tags=product_broad_tags,
+            roles_summary=roles_summary,
+            intramolecular=intramolecular,
+            pairs=pairs,
+        )
 
     reaction = {
         "reaction_smiles": reaction_smiles,
@@ -1035,6 +1539,7 @@ def featurize_reaction(
         "reaction_key_logic": reaction_key_logic,
         "reaction_key_bond": reaction_key_bond,
         "reaction_key_composite": reaction_key_composite,
+        "reaction_key_crk": reaction_key_crk,
         "product_broad_tags": product_broad_tags,
         "roles": roles_summary,
         "agent_roles": agent_roles,

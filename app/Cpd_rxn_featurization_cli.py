@@ -116,6 +116,14 @@ def _highlight(text: str) -> str:
     return f"\x1b[96m{text}\x1b[0m"
 
 
+def _highlight_blue(text: str) -> str:
+    if not text:
+        return text
+    if not _supports_color():
+        return text
+    return f"\x1b[94m{text}\x1b[0m"
+
+
 def _format_compound_id(entry: Dict[str, Any]) -> str:
     cid = entry.get("compound_id", "unknown")
     cid = _clean_compound_id(cid)
@@ -616,6 +624,7 @@ def _print_reaction_summary(
     reaction_key_logic = reaction.get("reaction_key_logic")
     reaction_key_bond = reaction.get("reaction_key_bond")
     reaction_key_composite = reaction.get("reaction_key_composite")
+    reaction_key_crk = reaction.get("reaction_key_crk")
     product_broad_tags = reaction.get("product_broad_tags") or []
     if reaction_key:
         print(f"Reaction Key: {_highlight(_clean_compound_id(reaction_key))}")
@@ -625,6 +634,8 @@ def _print_reaction_summary(
         print(f"Bond-Change Key: {_highlight(_clean_compound_id(reaction_key_bond))}")
     if reaction_key_composite:
         print(f"Composite Key: {_highlight(_clean_compound_id(reaction_key_composite))}")
+    if reaction_key_crk:
+        print(f"CRK-v1: {_highlight_blue(_clean_compound_id(reaction_key_crk))}")
     if product_broad_tags:
         print(f"Broad Product Tags: {_format_value(product_broad_tags)}")
         
