@@ -26,7 +26,7 @@ Order of operations in featurize_reaction():
    - Compares reactant vs product motifs
    - Correctly identifies reacted_motifs: ['Ar-B(OH)2', 'Ar-Br']
 
-4. Generate reaction_key (line ~303)
+4. Generate CRK-v1 reaction_key (line ~303)
    - Uses reacted_motifs for key generation
 
 The detection system CAN'T use reacted_motifs because they haven't been

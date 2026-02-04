@@ -6,11 +6,8 @@ Handles reaction type detection, reactant/product processing, and reaction key g
 
 from __future__ import annotations
 
-from collections import Counter
 from functools import lru_cache
-import json
 import re
-from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from chemtools.util import rdkit_helpers
@@ -25,89 +22,6 @@ from .utils import extract_motif_ids
 from .simplified import build_core_reaction, build_extended_reaction
 
 
-@lru_cache(maxsize=1)
-def _load_motif_sets() -> Dict[str, Set[str]]:
-    path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "compound_logic.json"
-    if not path.exists():
-        return {}
-    try:
-        with path.open("r", encoding="utf-8", errors="replace") as handle:
-            payload = json.load(handle)
-    except Exception:
-        return {}
-    motif_sets: Dict[str, Set[str]] = {}
-    for set_name, set_data in (payload.get("motif_sets", {}) or {}).items():
-        members = set_data.get("members", []) or []
-        motif_sets[set_name] = set(str(m) for m in members if m)
-    return motif_sets
-
-
-def _expand_pattern(pattern: Any, motif_sets: Dict[str, Set[str]]) -> Set[str]:
-    if pattern is None:
-        return set()
-    if isinstance(pattern, str):
-        if pattern.startswith("@"):
-            return motif_sets.get(pattern[1:], set())
-        return {pattern}
-    if isinstance(pattern, list):
-        expanded: Set[str] = set()
-        for item in pattern:
-            expanded.update(_expand_pattern(item, motif_sets))
-        return expanded
-    return set()
-
-
-@lru_cache(maxsize=1)
-def _load_reactant_slot_sets() -> tuple[Set[str], Set[str]]:
-    """Load electrophile/nucleophile motif sets from the reaction taxonomy."""
-    path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "reaction_types.v4.0.json"
-    if not path.exists():
-        return set(), set()
-    try:
-        with path.open("r", encoding="utf-8", errors="replace") as handle:
-            payload = json.load(handle)
-    except Exception:
-        return set(), set()
-    motif_sets = _load_motif_sets()
-    electrophiles: Set[str] = set()
-    nucleophiles: Set[str] = set()
-    for reaction_def in payload.get("reaction_types", []) or []:
-        reactants = reaction_def.get("reactants", {}) or {}
-        for slot_name, slot_pattern in reactants.items():
-            if slot_name == "nucleophile":
-                nucleophiles.update(_expand_pattern(slot_pattern, motif_sets))
-            elif slot_name in {"electrophile", "substrate"}:
-                electrophiles.update(_expand_pattern(slot_pattern, motif_sets))
-    return electrophiles, nucleophiles
-
-
-@lru_cache(maxsize=1)
-def _load_product_to_nucleophile_map() -> Dict[str, Set[str]]:
-    """Map product motifs to allowed nucleophile motifs from the taxonomy."""
-    path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "reaction_types.v4.0.json"
-    if not path.exists():
-        return {}
-    try:
-        with path.open("r", encoding="utf-8", errors="replace") as handle:
-            payload = json.load(handle)
-    except Exception:
-        return {}
-    motif_sets = _load_motif_sets()
-    mapping: Dict[str, Set[str]] = {}
-    for reaction_def in payload.get("reaction_types", []) or []:
-        reactants = reaction_def.get("reactants", {}) or {}
-        products = reaction_def.get("products", {}) or {}
-        nucleophile_pattern = reactants.get("nucleophile")
-        if not nucleophile_pattern:
-            continue
-        nucleophiles = _expand_pattern(nucleophile_pattern, motif_sets)
-        if not nucleophiles:
-            continue
-        for slot_pattern in products.values():
-            product_set = _expand_pattern(slot_pattern, motif_sets)
-            for motif_id in product_set:
-                mapping.setdefault(motif_id, set()).update(nucleophiles)
-    return mapping
 
 
 def format_reaction_type_summary(detection: Any) -> Dict[str, Any]:
@@ -763,238 +677,6 @@ def _format_motif_list(items: Iterable[str]) -> str:
     return "|".join(values) if values else "[]"
 
 
-def _atom_signature(atom: Any) -> Tuple[int, bool, int, int, Tuple[int, ...]]:
-    """Build a simple signature for mapped-atom change detection."""
-    return (
-        atom.GetAtomicNum(),
-        bool(atom.GetIsAromatic()),
-        int(atom.GetTotalDegree()),
-        int(atom.GetTotalNumHs()),
-        tuple(sorted(n.GetAtomicNum() for n in atom.GetNeighbors())),
-    )
-
-
-def _collect_mapped_signatures(mols: List[Any]) -> Tuple[Dict[int, Tuple[int, bool, int, int, Tuple[int, ...]]], bool]:
-    """Collect atom map signatures; return (map -> signature, conflict_found)."""
-    signatures: Dict[int, Tuple[int, bool, int, int, Tuple[int, ...]]] = {}
-    conflict = False
-    for mol in mols:
-        if mol is None:
-            continue
-        for atom in mol.GetAtoms():
-            map_num = atom.GetAtomMapNum()
-            if not map_num:
-                continue
-            sig = _atom_signature(atom)
-            if map_num in signatures and signatures[map_num] != sig:
-                conflict = True
-            signatures[map_num] = sig
-    return signatures, conflict
-
-
-def _detect_changed_map_numbers(
-    reactant_mols: List[Any],
-    product_mols: List[Any],
-    *,
-    min_common: int = 3,
-) -> Set[int]:
-    """Return map numbers with changed local environments, or empty if low-confidence."""
-    reactant_maps, reactant_conflict = _collect_mapped_signatures(reactant_mols)
-    product_maps, product_conflict = _collect_mapped_signatures(product_mols)
-    if reactant_conflict or product_conflict:
-        return set()
-    common = set(reactant_maps) & set(product_maps)
-    if len(common) < min_common:
-        return set()
-    changed = {m for m in common if reactant_maps[m] != product_maps[m]}
-    return changed
-
-
-def _select_primary_formed_by_mapping(
-    product_bundles: List[Dict[str, Any]],
-    product_mols: List[Any],
-    formed_set: Set[str],
-    changed_maps: Set[int],
-) -> Optional[str]:
-    """Select primary formed motif when its attachment atom is mapped as changed."""
-    if not changed_maps:
-        return None
-    candidates: List[str] = []
-    for idx, bundle in enumerate(product_bundles):
-        mol = product_mols[idx] if idx < len(product_mols) else None
-        if mol is None:
-            continue
-        for motif in bundle.get("motifs", []):
-            if not isinstance(motif, dict):
-                continue
-            cid = motif.get("compound_id") or motif.get("id")
-            if not cid or cid not in formed_set:
-                continue
-            a_idx = motif.get("a_atom_idx") or motif.get("a_idx")
-            if a_idx is None:
-                continue
-            try:
-                atom = mol.GetAtomWithIdx(int(a_idx))
-            except Exception:
-                continue
-            map_num = atom.GetAtomMapNum()
-            if map_num and map_num in changed_maps:
-                candidates.append(str(cid))
-    if not candidates:
-        return None
-    return select_primary_formed_motif(candidates, formed_set)
-
-
-def select_primary_reacted_motifs(
-    reactant_entries: Iterable[Any],
-    reacted_set: set[str],
-    formed_set: Optional[set[str]] = None,
-) -> List[str]:
-    """Select primary reacted motif from each reactant.
-
-    Prioritize nucleophile motifs (taxonomy-driven) over electrophiles when both
-    are present on the same reactant (e.g., Ar-SH vs Ar-Cl).
-    """
-    primary: List[str] = []
-    electrophiles, nucleophiles = _load_reactant_slot_sets()
-    preferred_nucleophiles: Set[str] = set()
-    if formed_set:
-        product_map = _load_product_to_nucleophile_map()
-        for motif_id in formed_set:
-            preferred_nucleophiles.update(product_map.get(motif_id, set()))
-
-    entries: List[Dict[str, Any]] = []
-    for entry in reactant_entries or []:
-        motifs = []
-        if isinstance(entry, dict):
-            motifs = extract_motif_ids(entry.get("motifs", []))
-        else:
-            motifs = extract_motif_ids(entry)
-        reacted_here = [m for m in motifs if m in reacted_set]
-        if not reacted_here:
-            continue
-        idx_map = {m: idx for idx, m in enumerate(motifs)}
-        nuc_here = [m for m in reacted_here if m in nucleophiles]
-        elec_here = [m for m in reacted_here if m in electrophiles]
-        pref_nuc_here = [m for m in reacted_here if m in preferred_nucleophiles]
-        entries.append(
-            {
-                "motifs": motifs,
-                "reacted": reacted_here,
-                "idx_map": idx_map,
-                "nuc": nuc_here,
-                "elec": elec_here,
-                "pref_nuc": pref_nuc_here,
-            }
-        )
-
-    selected_nuc = False
-    selected_elec = False
-    deferred: List[Dict[str, Any]] = []
-
-    def _pick_by_order(candidates: List[str], idx_map: Dict[str, int]) -> Optional[str]:
-        if not candidates:
-            return None
-        ordered = sorted(candidates, key=lambda m: idx_map.get(m, 0))
-        return ordered[0]
-
-    # Pass 1: lock in single-role reactants (only nucleophile or only electrophile).
-    for entry in entries:
-        nuc_here = entry["nuc"]
-        elec_here = entry["elec"]
-        idx_map = entry["idx_map"]
-        if nuc_here and not elec_here:
-            pick = _pick_by_order(entry["pref_nuc"] or nuc_here, idx_map)
-            if pick:
-                primary.append(pick)
-                selected_nuc = True
-                continue
-        if elec_here and not nuc_here:
-            pick = _pick_by_order(elec_here, idx_map)
-            if pick:
-                primary.append(pick)
-                selected_elec = True
-                continue
-        deferred.append(entry)
-
-    # Pass 2: balance roles when both are available on the same reactant.
-    for entry in deferred:
-        reacted_here = entry["reacted"]
-        idx_map = entry["idx_map"]
-        nuc_here = entry["nuc"]
-        elec_here = entry["elec"]
-
-        if not selected_elec and elec_here:
-            pick = _pick_by_order(elec_here, idx_map)
-            if pick:
-                primary.append(pick)
-                selected_elec = True
-                continue
-        if not selected_nuc and (entry["pref_nuc"] or nuc_here):
-            pick = _pick_by_order(entry["pref_nuc"] or nuc_here, idx_map)
-            if pick:
-                primary.append(pick)
-                selected_nuc = True
-                continue
-
-        # Fallback to previous scoring (nucleophile > electrophile > other).
-        if electrophiles or nucleophiles:
-            def _score(motif_id: str) -> tuple[int, int]:
-                if preferred_nucleophiles and motif_id in nucleophiles and motif_id not in preferred_nucleophiles:
-                    return (0, idx_map.get(motif_id, 0))
-                if motif_id in nucleophiles:
-                    return (2, idx_map.get(motif_id, 0))
-                if motif_id in electrophiles:
-                    return (1, idx_map.get(motif_id, 0))
-                return (0, idx_map.get(motif_id, 0))
-            best = sorted(reacted_here, key=lambda m: (-_score(m)[0], _score(m)[1]))[0]
-            primary.append(best)
-        else:
-            primary.append(reacted_here[0])
-
-    return primary
-
-
-def select_primary_formed_motif(
-    product_motifs: Iterable[Any],
-    formed_set: set[str],
-) -> Optional[str]:
-    """
-    Select the primary formed motif from products.
-    
-    Prioritizes compound motifs (scaffold-substituent like Ar-Br, HeteroAr-OH)
-    over generic functional group motifs to identify the key transformation.
-    
-    Args:
-        product_motifs: Product motif IDs
-        formed_set: Set of motifs that were formed
-        
-    Returns:
-        Primary formed motif ID, or None if no formed motifs
-    """
-    candidates = [m for m in extract_motif_ids(product_motifs) if m in formed_set]
-    if not candidates:
-        return None
-    
-    # Prioritize scaffold-substituent patterns (Ar-X, HeteroAr-X, Alkenyl-X, etc.)
-    # over generic functional groups (R3C-X, RCH2-X, Alkyl-X, etc.)
-    scaffold_substituent_motifs = []
-    for m in candidates:
-        if "-" not in m:
-            continue
-        scaffold = m.split("-", 1)[0]
-        # Include only named scaffolds, exclude generic R-groups
-        if not any(scaffold.startswith(prefix) for prefix in ["R", "Alkyl"]):
-            scaffold_substituent_motifs.append(m)
-    
-    if scaffold_substituent_motifs:
-        return scaffold_substituent_motifs[0]
-    
-    # Fall back to first formed motif
-    return candidates[0]
-    return None
-
-
 def classify_agent_roles(agents: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
     """Classify reagents/solvents by role using reagent taxonomy."""
     from functools import lru_cache
@@ -1132,14 +814,12 @@ def featurize_reaction(
     product_bundles: List[Dict[str, Any]] = []
     product_motif_ids: List[str] = []
     product_motifs_full: List[Dict[str, Any]] = []  # Full motif dicts with fingerprints
-    product_mols: List[Any] = []
     for smiles in product_smiles:
         try:
             bundle = build_molecule_bundle(smiles, registry_paths=registry_paths, options=options)
         except Exception:
             continue
         product_bundles.append(bundle)
-        product_mols.append(rdkit_helpers.parse_smiles(smiles))
         product_motif_ids.extend(extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", [])))
         # Collect full motif dicts for fingerprint-aware comparison
         product_motifs_full.extend(bundle.get("motifs", []))

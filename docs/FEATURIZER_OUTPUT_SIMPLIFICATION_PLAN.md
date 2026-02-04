@@ -55,7 +55,7 @@ The current compound and reaction featurizers produce overly complex nested outp
   "kind": "reaction",
   "reaction": {
     "reaction_smiles": "...",
-    "reaction_key": "...",         # Formatted motif summary
+    "reaction_key": "...",         # CRK-v1 summary
     "normalized": {...},           # Normalization metadata
     "reaction_type": {...},        # Best match + alternatives
     "detection": {...},            # All detection matches + evidence
@@ -137,7 +137,7 @@ Essential information for 80% of use cases:
   "reaction_smiles": "...",
   "reaction_type": "Suzuki-Miyaura",   # Best match only
   "confidence": 0.92,
-  "reaction_key": "Ar-Br|Ar-B(OR)2 -> Ar-Ar || []",
+  "reaction_key": "CRK-v1 |Ar-Br|Ar-B(OR)2 -> [] | products_broad: [] | bond_formed: C(ar)-C(ar) | bond_broken: Br-C(ar); B-C(ar) | spectators: []",
   "reactants": [                       # Simplified molecules
     {
       "smiles": "...",

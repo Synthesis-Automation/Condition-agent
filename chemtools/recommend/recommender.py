@@ -228,6 +228,10 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
             df["Reaction_Key"] = df["reaction_smiles"].apply(_gen_rxn_key)
 
     if "Reaction_Key" in df.columns:
+        df["Reaction_Key"] = df["Reaction_Key"].fillna("").astype(str).str.strip()
+        crk_mask = df["Reaction_Key"].str.startswith("CRK-v1")
+        if (~crk_mask).any():
+            df.loc[~crk_mask, "Reaction_Key"] = ""
         if "Reaction_Type_Standardized" not in df.columns or not any(df["Reaction_Type_Standardized"]):
             df["Reaction_Type_Standardized"] = df["Reaction_Key"]
         if "Reactant_Types_Key" not in df.columns or not any(df["Reactant_Types_Key"]):
@@ -457,6 +461,8 @@ def _normalize_reaction_key(value: Any) -> Optional[str]:
         return None
     text = str(value).strip()
     if not text or text.lower() == "none":
+        return None
+    if not text.startswith("CRK-v1"):
         return None
     compact = text.replace(" ", "")
     if compact == "[]->[]||[]":
@@ -1169,7 +1175,7 @@ def _reactant_types_to_signature(values: Iterable[Any]) -> str:
 
 
 def _reaction_key_to_signatures(key: str) -> Tuple[str, str]:
-    """Project a Reaction_Key into core/ext reactant signatures."""
+    """Project a CRK-v1 Reaction_Key into core/ext reactant signatures."""
     if not key:
         return "", ""
     reacted, _, spectators = _parse_transformation_key(key)
@@ -1336,41 +1342,38 @@ def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
         return set(), set(), set()
 
     text = str(key).strip()
-    if text.startswith("CRK-v1"):
-        sections = [section.strip() for section in text.split(" | ") if section.strip()]
-        summary = sections[0].strip()
-        summary = summary[len("CRK-v1"):].strip()
-        if summary.startswith("|"):
-            summary = summary[1:].strip()
+    if not text.startswith("CRK-v1"):
+        return set(), set(), set()
 
-        def _clean(tokens: Iterable[str]) -> List[str]:
-            return [t for t in tokens if t and t != "[]"]
+    sections = [section.strip() for section in text.split(" | ") if section.strip()]
+    summary = sections[0].strip()
+    summary = summary[len("CRK-v1"):].strip()
+    if summary.startswith("|"):
+        summary = summary[1:].strip()
 
-        reacted: Set[str] = set()
-        if "->" in summary:
-            reactant_part = summary.split("->", 1)[0].strip()
-            tokens = _clean(_split_motif_tokens(reactant_part))
-            reacted = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
+    def _clean(tokens: Iterable[str]) -> List[str]:
+        return [t for t in tokens if t and t != "[]"]
 
-        formed: Set[str] = set()
-        spectators: Set[str] = set()
-        for section in sections[1:]:
-            lower = section.lower()
-            if lower.startswith("products_broad:"):
-                payload = section.split(":", 1)[1].strip()
-                tokens = _clean(_split_motif_tokens(payload))
-                formed = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
-            elif lower.startswith("spectators:"):
-                payload = section.split(":", 1)[1].strip()
-                tokens = _clean(_split_motif_tokens(payload))
-                spectators = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
+    reacted: Set[str] = set()
+    if "->" in summary:
+        reactant_part = summary.split("->", 1)[0].strip()
+        tokens = _clean(_split_motif_tokens(reactant_part))
+        reacted = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
 
-        return reacted, formed, spectators
+    formed: Set[str] = set()
+    spectators: Set[str] = set()
+    for section in sections[1:]:
+        lower = section.lower()
+        if lower.startswith("products_broad:"):
+            payload = section.split(":", 1)[1].strip()
+            tokens = _clean(_split_motif_tokens(payload))
+            formed = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
+        elif lower.startswith("spectators:"):
+            payload = section.split(":", 1)[1].strip()
+            tokens = _clean(_split_motif_tokens(payload))
+            spectators = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
 
-    # Fallback: treat flat signatures as reacted motifs only.
-    tokens = _split_motif_tokens(text)
-    expanded = _expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map())
-    return set(expanded), set(), set()
+    return reacted, formed, spectators
 
 
 def _derive_query_sets(

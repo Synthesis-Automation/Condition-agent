@@ -168,7 +168,7 @@ Created `test_clean_system.py`:
   "reaction_smiles": "...",
   "reaction_type": "Suzuki_miyaura", # Simple string
   "confidence": 1.0,
-  "reaction_key": "Ar-Br|Ar-B(OH)2 -> Ar-Ar || []",
+  "reaction_key": "CRK-v1 |Ar-Br|Ar-B(OH)2 -> [] | products_broad: [] | bond_formed: C(ar)-C(ar) | bond_broken: Br-C(ar); B-C(ar) | spectators: []",
   "reactants": [{                   # Simplified molecules
     "smiles": "c1ccccc1Br",
     "motifs": [{"id": "Ar-Br", "rank": 582}],
@@ -238,7 +238,7 @@ molecule = featurize_molecule("c1ccccc1Br")
 
 # Reaction - gets simplified core by default
 reaction = featurize_reaction("c1ccccc1Br.c1ccccc1B(O)O>>c1ccccc1-c2ccccc2")
-# Returns 9 fields: reaction_smiles, reaction_type, confidence, reaction_key, 
+# Returns 9 fields: reaction_smiles, reaction_type, confidence, reaction_key,
 #                   reactants, products, feasibility, kind, schema_version
 ```
 
