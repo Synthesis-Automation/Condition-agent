@@ -328,11 +328,18 @@ def _filter_reactants_for_crk(
     reacted: Iterable[str],
     bond_key: Optional[str],
 ) -> List[str]:
+    scaffold_ids: Set[str] = set()
+    try:
+        from .aggregation import load_scaffold_motif_ids
+        scaffold_ids = load_scaffold_motif_ids()
+    except Exception:
+        scaffold_ids = set()
+
     if not bond_key:
-        return sorted(str(r) for r in reacted if r)
+        return sorted(str(r) for r in reacted if r and str(r) not in scaffold_ids)
     elements = _bond_elements_from_key(bond_key)
     if not elements:
-        return sorted(str(r) for r in reacted if r)
+        return sorted(str(r) for r in reacted if r and str(r) not in scaffold_ids)
     elements_non_c = {el for el in elements if el != "C"}
 
     group_element_map = {
@@ -370,6 +377,8 @@ def _filter_reactants_for_crk(
     for motif in reacted:
         if not motif:
             continue
+        if str(motif) in scaffold_ids:
+            continue
         group_id = _match_group_id(str(motif), group_element_map)
         if not group_id:
             filtered.append(str(motif))
@@ -386,6 +395,9 @@ def _filter_reactants_for_crk(
     filtered_sorted = sorted(filtered)
     if filtered_sorted:
         return filtered_sorted
+    fallback = [str(r) for r in reacted if r and str(r) not in scaffold_ids]
+    if fallback:
+        return sorted(fallback)
     return sorted(str(r) for r in reacted if r)
 
 
@@ -674,7 +686,7 @@ def format_crk_key(
         if extras:
             summary += f" (+{'|'.join(extras)})"
 
-    sections: List[str] = [f"CRK-v1 {summary}"]
+    sections: List[str] = [summary]
     sections.append("products_broad: " + products_text)
 
     if bond_key:
@@ -758,6 +770,31 @@ def _select_reactive_product_motifs(
     if formed_set:
         return sorted(motif_set & formed_set) or sorted(formed_set)
     return []
+
+
+def _scaffold_spectators_from_bundles(
+    reactant_bundles: Iterable[Dict[str, Any]],
+    product_bundles: Iterable[Dict[str, Any]],
+) -> Set[str]:
+    """Identify scaffold motifs present on both sides to treat as spectators in CRK."""
+    try:
+        from .aggregation import load_scaffold_motif_ids
+    except Exception:
+        return set()
+    scaffold_ids = load_scaffold_motif_ids()
+    if not scaffold_ids:
+        return set()
+    reactant_ids: Set[str] = set()
+    product_ids: Set[str] = set()
+    for bundle in reactant_bundles or []:
+        reactant_ids.update(
+            extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", []))
+        )
+    for bundle in product_bundles or []:
+        product_ids.update(
+            extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", []))
+        )
+    return set(m for m in reactant_ids & product_ids if m in scaffold_ids)
 
 
 def classify_agent_roles(agents: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
@@ -974,6 +1011,8 @@ def featurize_reaction(
     if product_bundles and reactant_bundles:
         reacted_full = set(aggregates.get("reacted_motifs", []))
         spectators = set(aggregates.get("spectator_motifs", []))
+        scaffold_spectators = _scaffold_spectators_from_bundles(reactant_bundles, product_bundles)
+        spectators_for_crk = spectators | scaffold_spectators
 
         bond_analysis = None
         bond_key = None
@@ -1003,7 +1042,7 @@ def featurize_reaction(
         reaction_key = format_crk_key(
             bond_key=bond_key,
             reacted=reacted_for_crk,
-            spectators=spectators,
+            spectators=spectators_for_crk,
             product_broad_tags=product_broad_tags,
             pairs=pairs,
         )

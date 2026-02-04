@@ -5,8 +5,8 @@ reactant motifs (experiments/rules), while others have full `Reaction_Key`.
 
 ## Canonical projection
 
-- **Reaction_Key** format (CRK-v1):
-  `CRK-v1 |Reactants -> Product_Broad | products_broad: ... | bond_formed: ... | bond_broken: ... | spectators: ...`
+- **Reaction_Key** format (CRK):
+  `|Reactants -> Product_Broad | products_broad: ... | bond_formed: ... | bond_broken: ... | spectators: ...`
 - **Reactant signature (core)**: tokens from `Reactants` (the CRK summary)
 - **Reactant signature (ext)**: tokens from `Reactants + spectators`
 
@@ -16,7 +16,7 @@ Counts are not encoded yet (multiplicity support is reserved for v2).
 Example:
 
 ```
-Reaction_Key: CRK-v1 |Ar-Br|R-NH2 -> Product_Aryl_N | products_broad: Product_Aryl_N|Product_C-N | bond_formed: C(ar)-N | bond_broken: Br-C(ar) | spectators: Pyridine
+Reaction_Key: |Ar-Br|R-NH2 -> Product_Aryl_N | products_broad: Product_Aryl_N|Product_C-N | bond_formed: C(ar)-N | bond_broken: Br-C(ar) | spectators: Pyridine
 Core signature: Ar-Br|R-NH2
 Ext signature: Ar-Br|Pyridine|R-NH2
 ```

@@ -31,12 +31,12 @@ Entry point: `chemtools/featurizers/formatters/reaction.py:featurize_reaction()`
    aryl-sulfur bonds (e.g., `Product_Aryl_S`).
 6. Filter reacted motifs to those touching bond changes; if filtering yields
    an empty set, fall back to all reacted motifs.
-7. Build the single Condition Recommendation Key (CRK-v1):
-   - `CRK-v1 |Reactants -> Product_Broad | products_broad: ... | bond_formed: ... | bond_broken: ... | spectators: ... | pairs: ...`
+7. Build the single Condition Recommendation Key (CRK):
+   - `|Reactants -> Product_Broad | products_broad: ... | bond_formed: ... | bond_broken: ... | spectators: ... | pairs: ...`
 
 Outputs stored in the reaction bundle:
 
-- `reaction_key` (CRK-v1)
+- `reaction_key` (CRK)
 - `product_broad_tags`
 - `aggregates.reacted_motifs`, `aggregates.formed_motifs`,
   `aggregates.spectator_motifs`
@@ -81,7 +81,7 @@ This is a correction/validation step, not the main detection API.
 ## Outputs Summary
 
 - Reaction key and motif deltas are produced by the featurizer:
-  - `reaction_key` (CRK-v1), `product_broad_tags`, `aggregates.*`
+  - `reaction_key` (CRK), `product_broad_tags`, `aggregates.*`
 - Reaction type detection (primary) is produced by `chemtools/detection.py`:
   - `DetectionResult.matches`, `DetectionResult.top_match`,
     `DetectionResult.reaction_key`

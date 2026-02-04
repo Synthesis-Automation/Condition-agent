@@ -168,7 +168,7 @@ Created `test_clean_system.py`:
   "reaction_smiles": "...",
   "reaction_type": "Suzuki_miyaura", # Simple string
   "confidence": 1.0,
-  "reaction_key": "CRK-v1 |Ar-Br|Ar-B(OH)2 -> [] | products_broad: [] | bond_formed: C(ar)-C(ar) | bond_broken: Br-C(ar); B-C(ar) | spectators: []",
+  "reaction_key": "|Ar-Br|Ar-B(OH)2 -> [] | products_broad: [] | bond_formed: C(ar)-C(ar) | bond_broken: Br-C(ar); B-C(ar) | spectators: []",
   "reactants": [{                   # Simplified molecules
     "smiles": "c1ccccc1Br",
     "motifs": [{"id": "Ar-Br", "rank": 582}],

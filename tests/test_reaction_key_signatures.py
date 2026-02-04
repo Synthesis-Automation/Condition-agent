@@ -6,7 +6,7 @@ from chemtools.recommend.recommender import (
 
 def test_reaction_key_to_signatures_core_ext():
     key = (
-        "CRK-v1 |Ar-Br|R-NH2 -> Product_Aryl_N | products_broad: Product_Aryl_N|Product_C-N "
+        "|Ar-Br|R-NH2 -> Product_Aryl_N | products_broad: Product_Aryl_N|Product_C-N "
         "| bond_formed: C(ar)-N | bond_broken: Br-C(ar) | spectators: Pyridine"
     )
     core, ext = _reaction_key_to_signatures(key)

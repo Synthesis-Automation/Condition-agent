@@ -462,8 +462,6 @@ def _normalize_reaction_key(value: Any) -> Optional[str]:
     text = str(value).strip()
     if not text or text.lower() == "none":
         return None
-    if not text.startswith("CRK-v1"):
-        return None
     compact = text.replace(" ", "")
     if compact == "[]->[]||[]":
         return None
@@ -1175,7 +1173,7 @@ def _reactant_types_to_signature(values: Iterable[Any]) -> str:
 
 
 def _reaction_key_to_signatures(key: str) -> Tuple[str, str]:
-    """Project a CRK-v1 Reaction_Key into core/ext reactant signatures."""
+    """Project a CRK Reaction_Key into core/ext reactant signatures."""
     if not key:
         return "", ""
     reacted, _, spectators = _parse_transformation_key(key)
@@ -1342,12 +1340,13 @@ def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
         return set(), set(), set()
 
     text = str(key).strip()
-    if not text.startswith("CRK-v1"):
+    if "->" not in text:
         return set(), set(), set()
 
     sections = [section.strip() for section in text.split(" | ") if section.strip()]
     summary = sections[0].strip()
-    summary = summary[len("CRK-v1"):].strip()
+    if summary.startswith("CRK-v1"):
+        summary = summary[len("CRK-v1"):].strip()
     if summary.startswith("|"):
         summary = summary[1:].strip()
 
@@ -1682,7 +1681,7 @@ class HTERecommender:
         3. If product motifs are available, softly prefer matching 'formed' motifs.
         """
         reacted, formed, spectators = _parse_transformation_key(db_key)
-        is_transform_key = str(db_key).strip().startswith("CRK-v1")
+        is_transform_key = "->" in str(db_key)
         
         # DEBUG
         debug_mode = False
