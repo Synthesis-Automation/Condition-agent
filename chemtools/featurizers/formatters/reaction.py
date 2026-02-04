@@ -673,6 +673,7 @@ def format_crk_key(
     spectators: Iterable[str],
     product_broad_tags: Iterable[str],
     product_motifs_reactive: Optional[Iterable[str]] = None,
+    include_product: bool = False,
 ) -> str:
     """Build a composite Condition Recommendation Key (CRK-v1)."""
     reactants_text = _format_motif_list(reacted)
@@ -696,9 +697,11 @@ def format_crk_key(
         candidates.sort(key=lambda t: (-score(t)[0], -score(t)[1], score(t)[2]))
         return candidates[0]
 
-    products_primary = _select_primary_reactive(reactive_products)
-    if products_primary == "[]":
-        products_primary = _select_primary_broad_tag(broad_tags)
+    products_primary = "[]"
+    if include_product:
+        products_primary = _select_primary_reactive(reactive_products)
+        if products_primary == "[]":
+            products_primary = _select_primary_broad_tag(broad_tags)
 
     summary = f"|{reactants_text} -> {products_primary}"
 
@@ -903,6 +906,7 @@ def featurize_reaction(
     include_roles = to_bool(options.get("include_roles"), default=True)
     include_agent_roles = to_bool(options.get("include_agent_roles"), default=True)
     skip_bond_analysis = to_bool(options.get("skip_bond_analysis"), default=False)
+    include_product_in_crk = to_bool(options.get("include_product_in_crk"), default=False)
     
     # General coupling confirmation (supports 9+ coupling reaction types)
     # Backward compatibility: map old Suzuki-specific parameter to general one
@@ -1048,6 +1052,7 @@ def featurize_reaction(
             spectators=spectators_for_crk,
             product_broad_tags=product_broad_tags,
             product_motifs_reactive=product_motifs_reactive,
+            include_product=include_product_in_crk,
         )
 
     reaction = {

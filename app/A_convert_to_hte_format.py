@@ -29,18 +29,23 @@ def cached_featurize(smiles: str):
     return featurize_molecule(smiles, options=options)
 
 
+_CRK_REACTION_OPTIONS = {
+    # Match Cpd_rxn_featurization_cli defaults for CRK generation.
+    "include_roles": False,
+    "include_agent_roles": False,
+    "motif_site_filter": "substituent",
+    "confirm_coupling_products": True,
+    "discovery_mode": True,
+}
+
+
 @lru_cache(maxsize=20000)
 def cached_featurize_reaction(smiles: str) -> Dict[str, Any]:
     """Cache reaction featurization to keep Reaction_Key generation consistent."""
     if not smiles:
         return {}
-    options = {
-        "include_roles": False,
-        "include_agent_roles": False,
-        "motif_site_filter": "substituent",
-    }
     try:
-        return featurize_reaction(smiles, options=options)
+        return featurize_reaction(smiles, options=_CRK_REACTION_OPTIONS)
     except Exception:
         return {}
 

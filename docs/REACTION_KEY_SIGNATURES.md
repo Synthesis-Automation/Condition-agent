@@ -7,6 +7,7 @@ reactant motifs (experiments/rules), while others have full `Reaction_Key`.
 
 - **Reaction_Key** format (CRK):
   `|Reactants -> Product | bond_formed: ... | bond_broken: ... | spectators: ...`
+  - Product is optional in CRK; when disabled it is reported as `[]`.
 - **Reactant signature (core)**: tokens from `Reactants` (the CRK summary)
 - **Reactant signature (ext)**: tokens from `Reactants + spectators`
 
