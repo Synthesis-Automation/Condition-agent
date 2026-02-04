@@ -575,6 +575,9 @@ def _add_undocumented(
     atoms: Set[int],
 ) -> None:
     """Add an undocumented motif hit if not already documented."""
+    # Block known invalid scaffold/substituent combos (avoid fake motifs).
+    if s.get("id") == "R_acidic" and sub.get("id") == "-SH":
+        return
     # Check if this combination is already documented
     combo_id = combination_map.get((s["id"], sub["id"]))
     if combo_id and combo_id in compound_map:

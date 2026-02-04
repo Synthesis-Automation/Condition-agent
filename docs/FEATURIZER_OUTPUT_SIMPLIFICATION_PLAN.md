@@ -137,7 +137,7 @@ Essential information for 80% of use cases:
   "reaction_smiles": "...",
   "reaction_type": "Suzuki-Miyaura",   # Best match only
   "confidence": 0.92,
-  "reaction_key": "|Ar-Br|Ar-B(OR)2 -> [] | products_broad: [] | bond_formed: C(ar)-C(ar) | bond_broken: Br-C(ar); B-C(ar) | spectators: []",
+  "reaction_key": "|Ar-Br|Ar-B(OR)2 -> Ar-Ar | bond_formed: C(ar)-C(ar) | bond_broken: Br-C(ar); B-C(ar) | spectators: []",
   "reactants": [                       # Simplified molecules
     {
       "smiles": "...",

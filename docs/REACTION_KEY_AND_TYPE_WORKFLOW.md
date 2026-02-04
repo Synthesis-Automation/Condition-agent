@@ -32,7 +32,7 @@ Entry point: `chemtools/featurizers/formatters/reaction.py:featurize_reaction()`
 6. Filter reacted motifs to those touching bond changes; if filtering yields
    an empty set, fall back to all reacted motifs.
 7. Build the single Condition Recommendation Key (CRK):
-   - `|Reactants -> Product_Broad | products_broad: ... | bond_formed: ... | bond_broken: ... | spectators: ... | pairs: ...`
+   - `|Reactants -> Product | bond_formed: ... | bond_broken: ... | spectators: ...`
 
 Outputs stored in the reaction bundle:
 

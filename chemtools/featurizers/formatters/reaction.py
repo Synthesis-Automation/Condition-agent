@@ -672,22 +672,37 @@ def format_crk_key(
     reacted: Iterable[str],
     spectators: Iterable[str],
     product_broad_tags: Iterable[str],
-    pairs: Optional[Iterable[str]] = None,
+    product_motifs_reactive: Optional[Iterable[str]] = None,
 ) -> str:
     """Build a composite Condition Recommendation Key (CRK-v1)."""
     reactants_text = _format_motif_list(reacted)
     broad_tags = sorted(str(t) for t in product_broad_tags if t)
-    products_text = "|".join(broad_tags) if broad_tags else "[]"
-    products_primary = _select_primary_broad_tag(broad_tags)
+    reactive_products = sorted(str(t) for t in (product_motifs_reactive or []) if t)
+
+    def _select_primary_reactive(items: List[str]) -> str:
+        if not items:
+            return "[]"
+        candidates = [t for t in items if t]
+        if not candidates:
+            return "[]"
+        # Prefer scaffold-substituent motifs over generic Any-* or Motif-*.
+        def score(item: str) -> tuple[int, int, str]:
+            penalty = 0
+            if item.startswith("Any-") or item.startswith("Motif-"):
+                penalty = -2
+            if "-" in item:
+                return (2 + penalty, len(item), item)
+            return (1 + penalty, len(item), item)
+        candidates.sort(key=lambda t: (-score(t)[0], -score(t)[1], score(t)[2]))
+        return candidates[0]
+
+    products_primary = _select_primary_reactive(reactive_products)
+    if products_primary == "[]":
+        products_primary = _select_primary_broad_tag(broad_tags)
 
     summary = f"|{reactants_text} -> {products_primary}"
-    if products_text != "[]" and products_primary != "[]" and products_text != products_primary:
-        extras = [t for t in broad_tags if t != products_primary]
-        if extras:
-            summary += f" (+{'|'.join(extras)})"
 
     sections: List[str] = [summary]
-    sections.append("products_broad: " + products_text)
 
     if bond_key:
         formed = _extract_bond_section(bond_key, section="form")
@@ -699,10 +714,6 @@ def format_crk_key(
 
     if spectators:
         sections.append("spectators: " + _format_motif_list(spectators))
-
-    pair_list = [str(p) for p in (pairs or []) if p]
-    if pair_list:
-        sections.append("pairs: " + "; ".join(pair_list))
 
     return " | ".join(sections)
 
@@ -1031,20 +1042,12 @@ def featurize_reaction(
         reacted_for_crk = _filter_reactants_for_crk(reacted_full, bond_key)
         if not reacted_for_crk and reacted_full:
             reacted_for_crk = sorted(str(r) for r in reacted_full if r)
-        pairs = _pair_reactants_from_mapping(
-            reacted_full,
-            analysis=bond_analysis,
-            reactant_smiles=reactant_smiles,
-            reactant_bundles=reactant_bundles,
-        )
-        if not pairs:
-            pairs = _fallback_pairs_by_halide_priority(reacted_for_crk)
         reaction_key = format_crk_key(
             bond_key=bond_key,
             reacted=reacted_for_crk,
             spectators=spectators_for_crk,
             product_broad_tags=product_broad_tags,
-            pairs=pairs,
+            product_motifs_reactive=product_motifs_reactive,
         )
 
     reaction = {

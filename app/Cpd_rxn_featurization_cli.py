@@ -663,7 +663,7 @@ def _print_reaction_summary(
                     spectators_str = str(spectators)
                 print(f"    Spectator groups: {spectators_str}")
             
-            print("    Format: CRK-v1 |Reactants -> Product_Broad | products_broad: ... | bond_formed: ... | bond_broken: ... | spectators: ...")
+            print("    Format: |Reactants -> Product | bond_formed: ... | bond_broken: ... | spectators: ...")
 
     reactants = reaction.get("reactants") or []
     products = reaction.get("products") or []

@@ -1354,16 +1354,30 @@ def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
         return [t for t in tokens if t and t != "[]"]
 
     reacted: Set[str] = set()
+    formed: Set[str] = set()
     if "->" in summary:
-        reactant_part = summary.split("->", 1)[0].strip()
+        reactant_part, product_part = summary.split("->", 1)
+        reactant_part = reactant_part.strip()
+        product_part = product_part.strip()
+        if "(" in product_part:
+            product_part = product_part.split("(", 1)[0].strip()
         tokens = _clean(_split_motif_tokens(reactant_part))
         reacted = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
-
-    formed: Set[str] = set()
+        if product_part and product_part != "[]":
+            tokens = _clean(_split_motif_tokens(product_part))
+            formed = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
     spectators: Set[str] = set()
     for section in sections[1:]:
         lower = section.lower()
-        if lower.startswith("products_broad:"):
+        if lower.startswith("products_reactive:"):
+            if formed:
+                continue
+            payload = section.split(":", 1)[1].strip()
+            tokens = _clean(_split_motif_tokens(payload))
+            formed = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
+        elif lower.startswith("products_broad:"):
+            if formed:
+                continue
             payload = section.split(":", 1)[1].strip()
             tokens = _clean(_split_motif_tokens(payload))
             formed = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
