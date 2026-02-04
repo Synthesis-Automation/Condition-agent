@@ -2,9 +2,8 @@
 
 This document summarizes how the system determines the Reaction_Key and the
 reaction type from a reaction SMILES string. It reflects the current code paths
-in `chemtools/featurizers/formatters/reaction.py`, `chemtools/detection.py`, and
-`chemtools/reaction_key_matcher_v2.py`, plus taxonomy data in
-`chemtools/taxonomy/data/`.
+in `chemtools/featurizers/formatters/reaction.py` and `chemtools/detection.py`,
+plus taxonomy data in `chemtools/taxonomy/data/`.
 
 ## Inputs and Taxonomy Sources
 
@@ -27,27 +26,18 @@ Entry point: `chemtools/featurizers/formatters/reaction.py:featurize_reaction()`
 3. Aggregate reaction features with `aggregate_reaction_features`:
    - Computes motif deltas (reacted, formed, spectator) by comparing reactant
      and product motif counts.
-4. Select primary formed motif:
-   - If RDKit mapping is available, `changed` atom maps guide
-     `_select_primary_formed_by_mapping`.
-   - Otherwise, fallback to `select_primary_formed_motif`.
-5. Select primary reacted motifs (one per reactant when possible):
-   - `select_primary_reacted_motifs` prefers nucleophile/electrophile motifs
-     using taxonomy-driven slot sets, optionally guided by the formed motif.
-6. Format the Reaction_Key:
-   - `format_reaction_key(reacted, formed, spectators)` returns
-     `Reacted -> Formed || Spectators`.
-7. Generate alternate keys:
-   - One alt key per formed motif (multi-event reactions).
-8. Choose the best primary key:
-   - `_select_primary_reaction_key` uses
-     `chemtools/reaction_key_matcher_v2.detect_from_reaction_key_v2` to promote
-     an alt key when the primary key has no reaction-type match.
+4. Compute bond-change analysis (atom-mapped) when RDKit is available.
+5. Infer broad product tags from bond changes, with a SMARTS fallback for
+   aryl-sulfur bonds (e.g., `Product_Aryl_S`).
+6. Filter reacted motifs to those touching bond changes; if filtering yields
+   an empty set, fall back to all reacted motifs.
+7. Build the single Condition Recommendation Key (CRK-v1):
+   - `CRK-v1 |Reactants -> Product_Broad | products_broad: ... | bond_formed: ... | bond_broken: ... | spectators: ... | pairs: ...`
 
 Outputs stored in the reaction bundle:
 
-- `reaction_key` (primary)
-- `reaction_keys_alt` (alternatives)
+- `reaction_key` (CRK-v1)
+- `product_broad_tags`
 - `aggregates.reacted_motifs`, `aggregates.formed_motifs`,
   `aggregates.spectator_motifs`
 
@@ -88,18 +78,10 @@ using `validate_detection_with_reacted_motifs()`:
 
 This is a correction/validation step, not the main detection API.
 
-### Reaction key matcher (auxiliary)
-
-`chemtools/reaction_key_matcher_v2.py` can detect reaction types from
-reacted/formed motifs and is used to:
-
-- Choose the best primary Reaction_Key (alt key promotion).
-- Provide a direct detection path from a Reaction_Key when needed.
-
 ## Outputs Summary
 
 - Reaction key and motif deltas are produced by the featurizer:
-  - `reaction_key`, `reaction_keys_alt`, `aggregates.*`
+  - `reaction_key` (CRK-v1), `product_broad_tags`, `aggregates.*`
 - Reaction type detection (primary) is produced by `chemtools/detection.py`:
   - `DetectionResult.matches`, `DetectionResult.top_match`,
     `DetectionResult.reaction_key`
@@ -131,7 +113,6 @@ Goal: reduce ambiguous or misleading Reaction_Key strings.
   - RDKit mapping availability
   - non-empty reacted/formed motifs
 - When quality is low, emit a warning in `result.meta.errors`.
-- Log whether the primary key was promoted from `reaction_keys_alt`.
 
 ### 3) Strengthen taxonomy-driven constraints (general)
 
@@ -149,10 +130,9 @@ patches or ad-hoc heuristics.
 Goal: prevent drift and regressions across refactors.
 
 - Add tests for:
-  - Reaction_Key format and stability across representative reactions.
-  - Detection consistency between `detect_reaction_type()` and
-    `detect_from_reaction_key_v2()` for the same reaction SMILES.
-  - Correct handling of multi-event reactions (alt key promotion).
+  - CRK-v1 format and stability across representative reactions.
+  - Detection consistency between `detect_reaction_type()` and CRK-derived
+    signatures for the same reaction SMILES.
 - Prefer fixture-driven tests in `tests/test_reaction_key_generation.py` and
   `tests/test_reaction_type_detection.py`.
 

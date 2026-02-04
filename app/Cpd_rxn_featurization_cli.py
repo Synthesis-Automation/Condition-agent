@@ -621,21 +621,9 @@ def _print_reaction_summary(
     print(f"Reaction SMILES: {reaction.get('reaction_smiles')}")
     
     reaction_key = reaction.get("reaction_key")
-    reaction_key_logic = reaction.get("reaction_key_logic")
-    reaction_key_bond = reaction.get("reaction_key_bond")
-    reaction_key_composite = reaction.get("reaction_key_composite")
-    reaction_key_crk = reaction.get("reaction_key_crk")
     product_broad_tags = reaction.get("product_broad_tags") or []
     if reaction_key:
-        print(f"Reaction Key: {_highlight(_clean_compound_id(reaction_key))}")
-    if reaction_key_logic:
-        print(f"Logic Reaction Key: {_highlight(_clean_compound_id(reaction_key_logic))}")
-    if reaction_key_bond:
-        print(f"Bond-Change Key: {_highlight(_clean_compound_id(reaction_key_bond))}")
-    if reaction_key_composite:
-        print(f"Composite Key: {_highlight(_clean_compound_id(reaction_key_composite))}")
-    if reaction_key_crk:
-        print(f"CRK-v1: {_highlight_blue(_clean_compound_id(reaction_key_crk))}")
+        print(f"CRK-v1: {_highlight_blue(_clean_compound_id(reaction_key))}")
     if product_broad_tags:
         print(f"Broad Product Tags: {_format_value(product_broad_tags)}")
         
@@ -672,7 +660,7 @@ def _print_reaction_summary(
                     spectators_str = str(spectators)
                 print(f"    Spectator groups: {spectators_str}")
             
-            print("    Format: [Reacted] -> [Formed] || [Spectators]")
+            print("    Format: CRK-v1 |Reactants -> Product_Broad | products_broad: ... | bond_formed: ... | bond_broken: ... | spectators: ...")
 
     reactants = reaction.get("reactants") or []
     products = reaction.get("products") or []

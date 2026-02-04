@@ -15,7 +15,6 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from chemtools.util import rdkit_helpers
 from chemtools.smiles import normalize_reaction
-from chemtools.taxonomy.reactivity_hints import load_reactivity_hints
 
 from ..analysis.reaction_context import classify_reactants_with_context, get_reactant_summary
 from ..analysis.feasibility import analyze_snar_feasibility
@@ -147,131 +146,6 @@ def format_reaction_type_summary(detection: Any) -> Dict[str, Any]:
         result["alternatives"] = alts
         
     return result
-
-
-def format_reaction_key(
-    reacted: Iterable[str],
-    formed: Iterable[str],
-    spectators: Iterable[str]
-) -> str:
-    """
-    Format motif sets into standardized Reaction_Key string.
-    
-    Format: Reacted -> Formed || Spectators
-    Example: Ar-Br|R_acidic-H -> Ar-Alkyl || Ar-COR|RCH2-COR|R_acidic-H
-    
-    Args:
-        reacted: Motifs consumed in the reaction
-        formed: Motifs created in the product
-        spectators: Motifs present but unchanged
-    
-    Returns:
-        Formatted Reaction_Key string
-    """
-    reacted_list = sorted(reacted) if reacted else []
-    formed_list = sorted(formed) if formed else []
-    spectators_list = sorted(spectators) if spectators else []
-    
-    reacted_str = "|".join(reacted_list) if reacted_list else "[]"
-    formed_str = "|".join(formed_list) if formed_list else "[]"
-    spectators_str = "|".join(spectators_list) if spectators_list else "[]"
-    
-    return f"{reacted_str} -> {formed_str} || {spectators_str}"
-
-
-
-@lru_cache(maxsize=1)
-def _load_reactivity_hints() -> Dict[str, Any]:
-    return load_reactivity_hints()
-
-
-def _select_group_hint(motif_id: str, reaction_type: Optional[str]) -> Optional[Dict[str, Any]]:
-    hints = _load_reactivity_hints()
-    group_hints = hints.get("group_hints") or {}
-    if not group_hints:
-        return None
-
-    match_id = None
-    for group_id in sorted(group_hints.keys(), key=len, reverse=True):
-        if motif_id.endswith(group_id):
-            match_id = group_id
-            break
-    if not match_id:
-        return None
-
-    hint = dict(group_hints.get(match_id) or {})
-    overrides = hints.get("reaction_overrides") or {}
-    if reaction_type:
-        override = overrides.get(reaction_type, {}).get(match_id)
-        if isinstance(override, dict):
-            hint.update(override)
-
-    hint["group_id"] = match_id
-    return hint
-
-
-def _format_logic_break_tokens(motifs: Iterable[str], reaction_type: Optional[str]) -> List[str]:
-    tokens: List[str] = []
-    seen: Set[str] = set()
-    for motif in sorted(motifs) if motifs else []:
-        hint = _select_group_hint(str(motif), reaction_type)
-        if not hint:
-            continue
-        br = hint.get("break")
-        if not br:
-            continue
-        token = f"{motif}({br})"
-        if token in seen:
-            continue
-        tokens.append(token)
-        seen.add(token)
-    return tokens
-
-
-def _is_likely_ab_motif(motif_id: str) -> bool:
-    if not motif_id or "-" not in motif_id:
-        return False
-    if motif_id.startswith("Motif-"):
-        return False
-    if motif_id.startswith("Any-"):
-        return False
-    return True
-
-
-def _format_logic_form_tokens(motifs: Iterable[str]) -> List[str]:
-    tokens: List[str] = []
-    seen: Set[str] = set()
-    for motif in sorted(motifs) if motifs else []:
-        motif_id = str(motif)
-        if not _is_likely_ab_motif(motif_id):
-            continue
-        token = f"{motif_id}(A-B)"
-        if token in seen:
-            continue
-        tokens.append(token)
-        seen.add(token)
-    return tokens
-
-
-def format_logic_reaction_key(
-    reacted: Iterable[str],
-    formed: Iterable[str],
-    spectators: Iterable[str],
-    *,
-    reaction_type_id: Optional[str] = None,
-) -> str:
-    base = format_reaction_key(reacted, formed, spectators)
-    break_tokens = _format_logic_break_tokens(reacted, reaction_type_id)
-    form_tokens = _format_logic_form_tokens(formed)
-    if not break_tokens and not form_tokens:
-        return base
-
-    extras: List[str] = []
-    if break_tokens:
-        extras.append("break: " + "; ".join(break_tokens))
-    if form_tokens:
-        extras.append("form: " + "; ".join(form_tokens))
-    return base + " || " + " || ".join(extras)
 
 
 def _map_atom_labels(mapped_smiles: str) -> Dict[int, str]:
@@ -505,6 +379,14 @@ def _bond_elements_from_key(bond_key: Optional[str]) -> Set[str]:
     return elements
 
 
+def _match_group_id(motif_id: str, group_element_map: Dict[str, Set[str]]) -> Optional[str]:
+    motif_id = str(motif_id)
+    for group_id in sorted(group_element_map.keys(), key=len, reverse=True):
+        if motif_id.endswith(group_id):
+            return group_id
+    return None
+
+
 def _filter_reactants_for_crk(
     reacted: Iterable[str],
     bond_key: Optional[str],
@@ -551,8 +433,7 @@ def _filter_reactants_for_crk(
     for motif in reacted:
         if not motif:
             continue
-        hint = _select_group_hint(str(motif), None)
-        group_id = hint.get("group_id") if hint else None
+        group_id = _match_group_id(str(motif), group_element_map)
         if not group_id:
             filtered.append(str(motif))
             continue
@@ -565,7 +446,10 @@ def _filter_reactants_for_crk(
                 filtered.append(str(motif))
         elif elements.intersection(group_elements):
             filtered.append(str(motif))
-    return sorted(filtered)
+    filtered_sorted = sorted(filtered)
+    if filtered_sorted:
+        return filtered_sorted
+    return sorted(str(r) for r in reacted if r)
 
 
 def _strip_atom_mapping(smiles: str) -> str:
@@ -839,8 +723,6 @@ def format_crk_key(
     reacted: Iterable[str],
     spectators: Iterable[str],
     product_broad_tags: Iterable[str],
-    roles_summary: Optional[Dict[str, Any]],
-    intramolecular: Optional[bool],
     pairs: Optional[Iterable[str]] = None,
 ) -> str:
     """Build a composite Condition Recommendation Key (CRK-v1)."""
@@ -856,6 +738,7 @@ def format_crk_key(
             summary += f" (+{'|'.join(extras)})"
 
     sections: List[str] = [f"CRK-v1 {summary}"]
+    sections.append("products_broad: " + products_text)
 
     if bond_key:
         formed = _extract_bond_section(bond_key, section="form")
@@ -878,74 +761,6 @@ def format_crk_key(
 def _format_motif_list(items: Iterable[str]) -> str:
     values = sorted(str(item) for item in items if item)
     return "|".join(values) if values else "[]"
-
-
-def _format_role_tokens(roles_summary: Optional[Dict[str, Any]]) -> List[str]:
-    if not roles_summary or not isinstance(roles_summary, dict):
-        return []
-    reactants = roles_summary.get("reactants") or []
-    tokens: List[str] = []
-    for entry in reactants:
-        if not isinstance(entry, dict):
-            continue
-        role = entry.get("role")
-        category = entry.get("category")
-        if not role or not category:
-            continue
-        tokens.append(f"{role}={category}")
-    return tokens
-
-
-def format_composite_reaction_key(
-    reacted: Iterable[str],
-    formed: Iterable[str],
-    spectators: Iterable[str],
-    *,
-    bond_key: Optional[str] = None,
-    roles_summary: Optional[Dict[str, Any]] = None,
-) -> str:
-    """Compose a multi-view reaction key (bond-change + motif delta + roles)."""
-    sections: List[str] = []
-    if bond_key:
-        sections.append(f"bond: {bond_key}")
-
-    sections.append(f"reacted: {_format_motif_list(reacted)}")
-    sections.append(f"formed: {_format_motif_list(formed)}")
-    if spectators:
-        sections.append(f"spectators: {_format_motif_list(spectators)}")
-
-    role_tokens = _format_role_tokens(roles_summary)
-    if role_tokens:
-        sections.append("roles: " + "; ".join(sorted(set(role_tokens))))
-
-    flags: List[str] = []
-    if bond_key and ("; " in bond_key or bond_key.count("-") >= 2):
-        flags.append("multi_bond")
-    if roles_summary and roles_summary.get("has_multi_functional_substrates"):
-        flags.append("multi_site")
-    if flags:
-        sections.append("flags: " + "; ".join(flags))
-
-    return " || ".join(sections)
-
-
-def _parse_reaction_key_parts(key: str) -> Tuple[List[str], List[str], List[str]]:
-    """Parse a Reaction_Key into reacted/formed/spectator motif lists."""
-    if not key or " -> " not in key:
-        return [], [], []
-    main_part, *rest = key.split(" || ")
-    reacted_part, formed_part = (main_part.split(" -> ") + [""])[:2]
-    spectators_part = rest[0] if rest else ""
-
-    def parse_part(part: str) -> List[str]:
-        part = part.strip()
-        if not part or part in {"[]", "None"}:
-            return []
-        if part.startswith("[") and part.endswith("]"):
-            part = part[1:-1]
-        return [token.strip() for token in part.split("|") if token.strip() and token.strip() != "[]"]
-
-    return parse_part(reacted_part), parse_part(formed_part), parse_part(spectators_part)
 
 
 def _atom_signature(atom: Any) -> Tuple[int, bool, int, int, Tuple[int, ...]]:
@@ -1028,54 +843,6 @@ def _select_primary_formed_by_mapping(
     if not candidates:
         return None
     return select_primary_formed_motif(candidates, formed_set)
-
-
-def _select_primary_reaction_key(
-    reaction_key: Optional[str],
-    reaction_keys_alt: List[str],
-) -> Tuple[Optional[str], List[str]]:
-    """Promote a matching alt key when the primary key has no reaction-type match."""
-    if not reaction_key or not reaction_keys_alt:
-        return reaction_key, reaction_keys_alt
-
-    try:
-        from chemtools.reaction_key_matcher_v2 import detect_from_reaction_key_v2
-    except Exception:
-        return reaction_key, reaction_keys_alt
-
-    try:
-        reacted_primary, formed_primary, spectators_primary = _parse_reaction_key_parts(reaction_key)
-        primary_match, _ = detect_from_reaction_key_v2(
-            reacted_primary, formed_primary, spectators_primary
-        )
-        if primary_match is not None:
-            return reaction_key, reaction_keys_alt
-
-        best_key = None
-        best_score: Optional[Tuple[float, int]] = None
-        for alt_key in reaction_keys_alt:
-            reacted_alt, formed_alt, spectators_alt = _parse_reaction_key_parts(alt_key)
-            alt_match, _ = detect_from_reaction_key_v2(
-                reacted_alt, formed_alt, spectators_alt
-            )
-            if not alt_match:
-                continue
-            score = (
-                alt_match.confidence,
-                len(alt_match.matched_reacted) + len(alt_match.matched_formed),
-            )
-            if best_score is None or score > best_score:
-                best_score = score
-                best_key = alt_key
-
-        if not best_key:
-            return reaction_key, reaction_keys_alt
-
-        new_alt = [k for k in reaction_keys_alt if k != best_key]
-        new_alt.insert(0, reaction_key)
-        return best_key, new_alt
-    except Exception:
-        return reaction_key, reaction_keys_alt
 
 
 def select_primary_reacted_motifs(
@@ -1436,78 +1203,22 @@ def featurize_reaction(
     if rt_id == "Unknown":
         rt_id = None
 
-    # Generate Reaction_Key using filtered aggregates
+    # Generate CRK-v1 reaction key (single source of truth)
     reaction_key = None
-    reaction_keys_alt: List[str] = []
-    reaction_key_logic: Optional[str] = None
-    reaction_key_bond: Optional[str] = None
-    reaction_key_composite: Optional[str] = None
     product_broad_tags: List[str] = []
-    reaction_key_crk: Optional[str] = None
     if product_bundles and reactant_bundles:
-        # Use the pre-computed aggregates which have pattern-based filtering applied
         reacted_full = set(aggregates.get("reacted_motifs", []))
-        formed = set(aggregates.get("formed_motifs", []))
         spectators = set(aggregates.get("spectator_motifs", []))
-        
-        # Select primary formed motif first to guide reacted motif selection.
-        product_primary: List[str] = []
-        for bundle in product_bundles:
-            product_primary.extend(
-                extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", []))
-            )
-        primary_formed = None
-        # Mapping-aware primary formed selection (high-confidence only)
-        if rdkit_helpers.rdkit_available():
-            reactant_mols = [rdkit_helpers.parse_smiles(s) for s in reactant_smiles]
-            changed_maps = _detect_changed_map_numbers(reactant_mols, product_mols)
-            primary_formed = _select_primary_formed_by_mapping(
-                product_bundles, product_mols, formed, changed_maps
-            )
-        if primary_formed is None:
-            primary_formed = select_primary_formed_motif(product_primary, formed)
 
-        formed_for_key = [primary_formed] if primary_formed else formed
-        # Select primary motifs for key generation
-        primary_reacted = select_primary_reacted_motifs(reactant_bundles, reacted_full, formed_for_key)
-        reacted_for_key = primary_reacted if primary_reacted else reacted_full
-
-        reaction_key = format_reaction_key(
-            reacted_for_key,
-            formed_for_key,
-            spectators,
-        )
-        # Alternate keys for multi-event reactions (one per formed motif)
-        if formed:
-            reacted_basis = primary_reacted if primary_reacted else sorted(reacted)
-            for formed_motif in sorted(formed):
-                alt_key = format_reaction_key(reacted_basis, [formed_motif], spectators)
-                if alt_key != reaction_key and alt_key not in reaction_keys_alt:
-                    reaction_keys_alt.append(alt_key)
-        reaction_key, reaction_keys_alt = _select_primary_reaction_key(
-            reaction_key, reaction_keys_alt
-        )
-
-        reaction_key_logic = format_logic_reaction_key(
-            reacted_for_key,
-            formed_for_key,
-            spectators,
-            reaction_type_id=rt_id,
-        )
         bond_analysis = _get_bond_change_analysis(reaction_smiles)
-        reaction_key_bond = format_bond_change_key(reaction_smiles, analysis=bond_analysis)
-        reaction_key_composite = format_composite_reaction_key(
-            reacted_for_key,
-            formed_for_key,
-            spectators,
-            bond_key=reaction_key_bond,
-            roles_summary=roles_summary,
-        )
+        bond_key = format_bond_change_key(reaction_smiles, analysis=bond_analysis)
         product_broad_tags = _infer_product_broad_tags_with_validation(
-            bond_key=reaction_key_bond,
+            bond_key=bond_key,
             product_smiles=product_smiles,
         )
-        reacted_for_crk = _filter_reactants_for_crk(reacted_full, reaction_key_bond)
+        reacted_for_crk = _filter_reactants_for_crk(reacted_full, bond_key)
+        if not reacted_for_crk and reacted_full:
+            reacted_for_crk = sorted(str(r) for r in reacted_full if r)
         pairs = _pair_reactants_from_mapping(
             reacted_full,
             analysis=bond_analysis,
@@ -1516,13 +1227,11 @@ def featurize_reaction(
         )
         if not pairs:
             pairs = _fallback_pairs_by_halide_priority(reacted_for_crk)
-        reaction_key_crk = format_crk_key(
-            bond_key=reaction_key_bond,
+        reaction_key = format_crk_key(
+            bond_key=bond_key,
             reacted=reacted_for_crk,
             spectators=spectators,
             product_broad_tags=product_broad_tags,
-            roles_summary=roles_summary,
-            intramolecular=intramolecular,
             pairs=pairs,
         )
 
@@ -1535,11 +1244,6 @@ def featurize_reaction(
         "products": product_bundles,
         "aggregates": aggregates,
         "reaction_key": reaction_key,
-        "reaction_keys_alt": reaction_keys_alt,
-        "reaction_key_logic": reaction_key_logic,
-        "reaction_key_bond": reaction_key_bond,
-        "reaction_key_composite": reaction_key_composite,
-        "reaction_key_crk": reaction_key_crk,
         "product_broad_tags": product_broad_tags,
         "roles": roles_summary,
         "agent_roles": agent_roles,

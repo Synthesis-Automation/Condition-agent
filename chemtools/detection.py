@@ -127,7 +127,7 @@ def extract_reaction_key(reaction_smiles: str) -> Tuple[List[str], List[str], Li
     Extract reacted/formed/spectator motifs from reaction SMILES.
     
     Returns:
-        Tuple of (reacted, formed, spectator, reaction_key_string)
+        Tuple of (reacted, formed, spectator, reaction_key_string). The key is CRK-v1.
     """
     from .featurizers.formatters.reaction import featurize_reaction
     

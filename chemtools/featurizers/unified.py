@@ -9,18 +9,9 @@ The implementation has been refactored into:
 - formatters/utils.py: Shared utility functions
 """
 
-from .formatters import (
-    featurize_molecule,
-    featurize_reaction,
-    format_reaction_key,
-    select_primary_reacted_motifs,
-    select_primary_formed_motif,
-)
+from .formatters import featurize_molecule, featurize_reaction
 
 __all__ = [
     "featurize_molecule",
     "featurize_reaction",
-    "format_reaction_key",
-    "select_primary_reacted_motifs",
-    "select_primary_formed_motif",
 ]

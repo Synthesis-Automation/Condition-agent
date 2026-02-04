@@ -25,13 +25,7 @@ import pandas as pd
 from pathlib import Path
 import json
 
-from chemtools.featurizers.unified import (
-    featurize_molecule,
-    featurize_reaction,
-    format_reaction_key,
-    select_primary_reacted_motifs,
-    select_primary_formed_motif,
-)
+from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
 from chemtools.featurizers.spectator_rank import weighted_spectator_similarity
 from chemtools.smiles import normalize_reaction
 
@@ -1333,43 +1327,50 @@ def _expand_reactant_keys(
 
 def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
     """
-    Parse transformation key format: [Reacted] -> [Formed] || [Spectators]
+    Parse CRK-v1 format: CRK-v1 |Reactants -> Product_Broad | products_broad: ... | spectators: ...
     
     Returns:
         (reacted_set, formed_set, spectators_set)
     """
-    if " -> " not in key or " || " not in key:
-        # Fallback for old flat keys (treat all as reacted)
-        tokens = _split_motif_tokens(key)
-        expanded = _expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map())
-        return set(expanded), set(), set()
-    
-    try:
-        parts = key.split(" || ")
-        
-        def parse_part(p):
-            p = p.strip()
-            if p == "[]" or p == "None" or not p:
-                return set()
-            # Remove brackets if present
-            if p.startswith("[") and p.endswith("]"):
-                p = p[1:-1]
-            tokens = _split_motif_tokens(p)
-            expanded = _expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map())
-            return set(expanded)
+    if not key:
+        return set(), set(), set()
 
-        spectators = parse_part(parts[1])
-        
-        rxn_parts = parts[0].split(" -> ")
-        reacted = parse_part(rxn_parts[0])
-        formed = parse_part(rxn_parts[1])
-        
+    text = str(key).strip()
+    if text.startswith("CRK-v1"):
+        sections = [section.strip() for section in text.split(" | ") if section.strip()]
+        summary = sections[0].strip()
+        summary = summary[len("CRK-v1"):].strip()
+        if summary.startswith("|"):
+            summary = summary[1:].strip()
+
+        def _clean(tokens: Iterable[str]) -> List[str]:
+            return [t for t in tokens if t and t != "[]"]
+
+        reacted: Set[str] = set()
+        if "->" in summary:
+            reactant_part = summary.split("->", 1)[0].strip()
+            tokens = _clean(_split_motif_tokens(reactant_part))
+            reacted = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
+
+        formed: Set[str] = set()
+        spectators: Set[str] = set()
+        for section in sections[1:]:
+            lower = section.lower()
+            if lower.startswith("products_broad:"):
+                payload = section.split(":", 1)[1].strip()
+                tokens = _clean(_split_motif_tokens(payload))
+                formed = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
+            elif lower.startswith("spectators:"):
+                payload = section.split(":", 1)[1].strip()
+                tokens = _clean(_split_motif_tokens(payload))
+                spectators = set(_expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map()))
+
         return reacted, formed, spectators
-    except:
-        # Robust fallback
-        tokens = _split_motif_tokens(key)
-        expanded = _expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map())
-        return set(expanded), set(), set()
+
+    # Fallback: treat flat signatures as reacted motifs only.
+    tokens = _split_motif_tokens(text)
+    expanded = _expand_motif_tokens(tokens, _load_motif_sets(), _load_scope_map())
+    return set(expanded), set(), set()
 
 
 def _derive_query_sets(
@@ -1678,7 +1679,7 @@ class HTERecommender:
         3. If product motifs are available, softly prefer matching 'formed' motifs.
         """
         reacted, formed, spectators = _parse_transformation_key(db_key)
-        is_transform_key = " -> " in db_key and " || " in db_key
+        is_transform_key = str(db_key).strip().startswith("CRK-v1")
         
         # DEBUG
         debug_mode = False
@@ -2235,26 +2236,7 @@ class HTERecommender:
             result.formed_motifs = tuple(sorted(formed_set))
             result.spectator_motifs = tuple(sorted(spectator_set))
 
-            primary_formed = select_primary_formed_motif(product_motifs, formed_set)
-            formed_for_key = {primary_formed} if primary_formed else formed_set
-            primary_reacted = None
-            if reaction_data:
-                primary_reacted = select_primary_reacted_motifs(
-                    reaction_data.get("reactants") or [],
-                    reacted_set,
-                    formed_for_key,
-                )
-            if not primary_reacted:
-                primary_reacted = sorted(reacted_set)
             result.query_reaction_key = _normalize_reaction_key(reaction_data.get("reaction_key"))
-            if not result.query_reaction_key:
-                result.query_reaction_key = _normalize_reaction_key(
-                    format_reaction_key(
-                        primary_reacted,
-                        [primary_formed] if primary_formed else formed_set,
-                        spectator_set,
-                    )
-                )
         # If no reaction key and no reactant types, return empty
         if not result.query_reaction_key and not type_a:
             return result
