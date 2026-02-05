@@ -358,6 +358,36 @@ def _filter_reactants_for_crk(
         if right_el:
             formed_elements.add(right_el)
 
+    bond_tokens = _extract_bond_section(bond_key, section="form") + _extract_bond_section(
+        bond_key, section="break"
+    )
+
+    def _parse_bond_token(token: str) -> Optional[Tuple[str, bool, str, bool]]:
+        if "-" not in token:
+            return None
+        left, right = [t.strip() for t in token.split("-", 1)]
+        left_el = _parse_element(left)
+        right_el = _parse_element(right)
+        if not left_el or not right_el:
+            return None
+        return (left_el, _is_aromatic_label(left), right_el, _is_aromatic_label(right))
+
+    parsed_bonds = [entry for entry in (_parse_bond_token(t) for t in bond_tokens) if entry]
+
+    def _has_c_c_bond() -> bool:
+        for left_el, _left_ar, right_el, _right_ar in parsed_bonds:
+            if left_el == "C" and right_el == "C":
+                return True
+        return False
+
+    def _has_non_aromatic_c_bond(other_elements: Set[str]) -> bool:
+        for left_el, left_ar, right_el, right_ar in parsed_bonds:
+            if left_el == "C" and not left_ar and right_el in other_elements:
+                return True
+            if right_el == "C" and not right_ar and left_el in other_elements:
+                return True
+        return False
+
     group_element_map = {
         "-I": {"I"},
         "-Br": {"Br"},
@@ -398,6 +428,7 @@ def _filter_reactants_for_crk(
         if str(motif) in scaffold_ids:
             continue
         motif_str = str(motif)
+        scaffold = motif_str.split("-", 1)[0] if "-" in motif_str else motif_str
         # Keep N/O/S nucleophiles when corresponding bonds form.
         keep_by_formed = False
         if "N" in formed_elements and (
@@ -412,6 +443,9 @@ def _filter_reactants_for_crk(
             keep_by_formed = True
         if "S" in formed_elements and (motif_str.endswith("-SH") or motif_str.endswith("-SR")):
             keep_by_formed = True
+        if scaffold.startswith("Alkenyl") or scaffold.startswith("Alkynyl"):
+            if _has_c_c_bond():
+                keep_by_formed = True
 
         group_id = _match_group_id(motif_str, group_element_map)
         keep_by_elements = False
@@ -423,6 +457,20 @@ def _filter_reactants_for_crk(
                         keep_by_elements = True
                 elif elements.intersection(group_elements):
                     keep_by_elements = True
+
+        # For carbonyl-derived groups, element overlap alone is too permissive.
+        # Require explicit nucleophile logic to keep these when they are spectators.
+        if group_id in {
+            "-CO2R",
+            "-CO2H",
+            "-COR",
+            "-CONH2",
+            "-CONHR",
+            "-CONR2",
+        }:
+            # Carbonyl-derived motifs should only be kept if a non-aromatic carbonyl bond changes.
+            if not _has_non_aromatic_c_bond({"O", "N", "Cl", "Br", "I", "F", "S"}):
+                keep_by_elements = False
 
         # Drop pure spectators unless they align with bond elements or formed nucleophiles.
         if motif_str in spectator_ids and not (keep_by_formed or keep_by_elements):
