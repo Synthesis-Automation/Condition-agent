@@ -26,6 +26,7 @@ from pathlib import Path
 import json
 
 from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
+from chemtools.featurizers.formatters.reaction import get_crk_options
 from chemtools.featurizers.spectator_rank import weighted_spectator_similarity
 from chemtools.smiles import normalize_reaction
 
@@ -221,7 +222,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
                 if not s or s.lower() == "nan":
                     return ""
                 try:
-                    context = featurize_reaction(s)
+                    context = featurize_reaction(s, options=get_crk_options())
                     return context.get("reaction_key") or ""
                 except Exception:
                     return ""
@@ -2184,10 +2185,7 @@ class HTERecommender:
             try:
                 rxn_features = featurize_reaction(
                     reaction_smiles,
-                    options={
-                        "confirm_coupling_products": True,
-                        "motif_site_filter": "substituent",
-                    },
+                    options=get_crk_options(),
                 )
                 if isinstance(rxn_features, dict):
                     nested = rxn_features.get("reaction")

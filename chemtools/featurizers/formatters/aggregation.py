@@ -24,6 +24,54 @@ _SPECTATOR_GROUP_STOPLIST = {
 
 
 @lru_cache(maxsize=1)
+def _load_group_sets() -> Dict[str, Any]:
+    try:
+        from chemtools.taxonomy import loader as taxonomy_loader
+    except Exception:
+        return {}
+    payload = taxonomy_loader.load_group_logic()
+    if not payload:
+        return {}
+    group_sets = payload.get("group_sets", {}) or {}
+    return group_sets if isinstance(group_sets, dict) else {}
+
+
+def _expand_group_set(
+    set_id: str,
+    group_sets: Dict[str, Any],
+    *,
+    _seen: Optional[Set[str]] = None,
+) -> Set[str]:
+    if not group_sets or not set_id:
+        return set()
+    if _seen is None:
+        _seen = set()
+    if set_id in _seen:
+        return set()
+    _seen.add(set_id)
+    set_data = group_sets.get(set_id, {}) or {}
+    members = set_data.get("members", []) or []
+    expanded: Set[str] = set()
+    for member in members:
+        if not member:
+            continue
+        member_str = str(member)
+        if member_str in group_sets:
+            expanded.update(_expand_group_set(member_str, group_sets, _seen=_seen))
+        else:
+            expanded.add(member_str)
+    return expanded
+
+
+@lru_cache(maxsize=1)
+def _load_carbonyl_groups() -> Set[str]:
+    group_sets = _load_group_sets()
+    if not group_sets:
+        return set()
+    return _expand_group_set("Carbonyl_Group", group_sets)
+
+
+@lru_cache(maxsize=1)
 def load_transformation_patterns() -> Dict[str, Any]:
     """Load transformation patterns from taxonomy."""
     path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "transformation_patterns.json"
@@ -148,6 +196,23 @@ def analyze_motif_changes_with_fingerprints(
                 reacted_set.add(cid)
             if p_fps - r_fps:  # Some fingerprints appeared
                 formed_set.add(cid)
+
+    # Stable carbonyl groups: if counts match, treat as spectators even if fingerprints differ.
+    carbonyl_groups = _load_carbonyl_groups()
+    if carbonyl_groups:
+        reactant_id_counts = Counter(
+            m.get("compound_id") or m.get("id", "") for m in reactant_motifs
+        )
+        product_id_counts = Counter(
+            m.get("compound_id") or m.get("id", "") for m in product_motifs
+        )
+        for cid in set(reactant_id_counts) & set(product_id_counts):
+            if reactant_id_counts[cid] != product_id_counts[cid]:
+                continue
+            if any(str(cid).endswith(group_id) for group_id in carbonyl_groups):
+                reacted_set.discard(cid)
+                formed_set.discard(cid)
+                spectator_set.add(cid)
 
     # Substituent-centric override (scaffold changes): if a substituent disappears
     # globally, ensure motifs with that substituent are marked as reacted.
@@ -524,6 +589,9 @@ def aggregate_reaction_features(
     reacted_motifs: List[str] = []
     formed_motifs: List[str] = []
     spectator_motifs: List[str] = []
+    reacted_motif_counts: Dict[str, int] = {}
+    formed_motif_counts: Dict[str, int] = {}
+    spectator_motif_counts: Dict[str, int] = {}
 
     # Extract features from each reactant
     for reactant in reactant_list:
@@ -583,16 +651,25 @@ def aggregate_reaction_features(
             # Extract product motifs with fingerprints
             product_motifs_with_fp = [extract_motif_with_bond_info(m) for m in product_motifs if isinstance(m, dict)]
             product_motifs_with_fp = [m for m in product_motifs_with_fp if m.get("id")]
+            product_motifs_primary = select_primary_motifs_by_atom(product_motifs_with_fp)
             
             reacted_set, formed_set, spectator_motifs_set = analyze_motif_changes_with_fingerprints(
                 reactant_motifs_for_changes, product_motifs_with_fp
             )
+            reactant_ids_for_counts = [
+                m.get("compound_id") or m.get("id", "") for m in reactant_motifs_full
+            ]
+            product_ids_for_counts = [
+                m.get("compound_id") or m.get("id", "") for m in product_motifs_primary
+            ]
         else:
             # Fallback to ID-only comparison
             product_ids = product_motif_ids or [m.get("compound_id") or m.get("id", "") for m in (product_motifs or [])]
             reacted_set, formed_set, spectator_motifs_set = analyze_substituent_changes(
                 primary_motif_ids_list, product_ids
             )
+            reactant_ids_for_counts = primary_motif_ids_list
+            product_ids_for_counts = product_ids
         
         # Collect spectator groups
         for motif_id in primary_motif_ids_list:
@@ -618,6 +695,47 @@ def aggregate_reaction_features(
         formed_motifs = sorted(formed_set)
         spectator_motifs = sorted(spectator_motifs_set)
 
+        # Build count-aware views (supports cases where some motifs react and some remain)
+        reactant_id_counts = Counter(
+            normalize_motif_id(str(mid)) for mid in reactant_ids_for_counts if mid
+        )
+        product_id_counts = Counter(
+            normalize_motif_id(str(mid)) for mid in product_ids_for_counts if mid
+        )
+        for motif_id in set(reactant_id_counts) | set(product_id_counts):
+            r_count = reactant_id_counts.get(motif_id, 0)
+            p_count = product_id_counts.get(motif_id, 0)
+            if motif_id in reacted_set:
+                reacted_motif_counts[motif_id] = max(r_count - p_count, 0)
+            if motif_id in formed_set:
+                formed_motif_counts[motif_id] = max(p_count - r_count, 0)
+            if motif_id in spectator_motifs_set:
+                spectator_motif_counts[motif_id] = min(r_count, p_count)
+
+        # Reconcile lists with counts (e.g., motifs that are effectively unchanged).
+        def _count_positive(value: int | None) -> bool:
+            return value is None or value > 0
+
+        reacted_motifs = [
+            m for m in reacted_motifs
+            if _count_positive(reacted_motif_counts.get(m))
+        ]
+        formed_motifs = [
+            m for m in formed_motifs
+            if _count_positive(formed_motif_counts.get(m))
+        ]
+        # If counts indicate unchanged motifs, ensure they appear as spectators.
+        for motif_id, r_count in reactant_id_counts.items():
+            p_count = product_id_counts.get(motif_id, 0)
+            if r_count <= 0 or p_count <= 0 or r_count != p_count:
+                continue
+            if reacted_motif_counts.get(motif_id) == 0 and formed_motif_counts.get(motif_id, 0) == 0:
+                if motif_id not in spectator_motif_counts:
+                    spectator_motif_counts[motif_id] = r_count
+                if motif_id not in spectator_motifs_set:
+                    spectator_motifs_set.add(motif_id)
+        spectator_motifs = sorted(spectator_motifs_set)
+
     avg_electronic = None
     if electronic_scores:
         avg_electronic = round(sum(electronic_scores) / len(electronic_scores), 2)
@@ -630,8 +748,11 @@ def aggregate_reaction_features(
         "motif_ids": sorted(motifs),
         "primary_motif_ids": sorted(set(primary_motif_ids)),  # Phase 3: After per-atom selection
         "reacted_motifs": reacted_motifs,
+        "reacted_motif_counts": reacted_motif_counts,
         "formed_motifs": formed_motifs,
+        "formed_motif_counts": formed_motif_counts,
         "spectator_motifs": spectator_motifs,
+        "spectator_motif_counts": spectator_motif_counts,
         "spectator_groups_combined": spectator_groups,
         "spectator_groups_ranked": rank_spectator_groups(spectator_groups),
         "max_aryl_steric": max(aryl_scores) if aryl_scores else 0.0,

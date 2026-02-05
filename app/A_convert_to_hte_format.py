@@ -15,7 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import chemtools components
 from chemtools.featurizers.unified import featurize_molecule
-from chemtools.featurizers.formatters.reaction import featurize_reaction
+from chemtools.featurizers.formatters.reaction import featurize_reaction, get_crk_options
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
 from chemtools.smiles import normalize
 from chemtools.reagent.lookup import find_reagent
@@ -29,23 +29,13 @@ def cached_featurize(smiles: str):
     return featurize_molecule(smiles, options=options)
 
 
-_CRK_REACTION_OPTIONS = {
-    # Match Cpd_rxn_featurization_cli defaults for CRK generation.
-    "include_roles": False,
-    "include_agent_roles": False,
-    "motif_site_filter": "substituent",
-    "confirm_coupling_products": True,
-    "discovery_mode": True,
-}
-
-
 @lru_cache(maxsize=20000)
 def cached_featurize_reaction(smiles: str) -> Dict[str, Any]:
     """Cache reaction featurization to keep Reaction_Key generation consistent."""
     if not smiles:
         return {}
     try:
-        return featurize_reaction(smiles, options=_CRK_REACTION_OPTIONS)
+        return featurize_reaction(smiles, options=get_crk_options())
     except Exception:
         return {}
 

@@ -24,6 +24,15 @@ from .utils import extract_motif_ids
 from .simplified import build_core_reaction, build_extended_reaction
 
 
+def get_crk_options() -> Dict[str, Any]:
+    """Return standardized options for CRK-v1 reaction key generation."""
+    return {
+        "include_roles": False,
+        "include_agent_roles": False,
+        "motif_site_filter": "substituent",
+        "confirm_coupling_products": True,
+        "discovery_mode": True,
+    }
 
 
 def format_reaction_type_summary(detection: Any) -> Dict[str, Any]:
@@ -92,7 +101,7 @@ def _format_bond_tokens(
     labels: Dict[int, str],
 ) -> List[str]:
     tokens: List[str] = []
-    seen: Set[Tuple[str, str]] = set()
+    seen: Set[Tuple[Any, ...]] = set()
     for bond in bonds or []:
         if not isinstance(bond, (tuple, list)) or len(bond) < 2:
             continue
@@ -106,9 +115,13 @@ def _format_bond_tokens(
         else:
             b_label = str(b).split()[0]
         pair = tuple(sorted((a_label, b_label)))
-        if pair in seen:
+        if isinstance(a, int) and isinstance(b, int):
+            bond_id = ("map", min(a, b), max(a, b))
+        else:
+            bond_id = ("label", pair[0], pair[1])
+        if bond_id in seen:
             continue
-        seen.add(pair)
+        seen.add(bond_id)
         tokens.append(f"{pair[0]}-{pair[1]}")
     return tokens
 
@@ -200,6 +213,21 @@ def format_bond_change_key(
     labels = _map_atom_labels(mapped_smiles)
     broken = _format_bond_tokens(result.get("broken_bonds"), labels)
     formed = _format_bond_tokens(result.get("formed_bonds"), labels)
+    if broken and formed:
+        # Remove any bonds that appear as both broken and formed (mapping artifacts).
+        overlap = set(broken) & set(formed)
+        if overlap:
+            from collections import Counter
+            broken_counts = Counter(broken)
+            formed_counts = Counter(formed)
+            for token in overlap:
+                drop = min(broken_counts.get(token, 0), formed_counts.get(token, 0))
+                if drop <= 0:
+                    continue
+                broken_counts[token] -= drop
+                formed_counts[token] -= drop
+            broken = [t for t, count in broken_counts.items() for _ in range(count) if count > 0]
+            formed = [t for t, count in formed_counts.items() for _ in range(count) if count > 0]
     if not broken and not formed:
         return None
     parts: List[str] = []
@@ -259,6 +287,176 @@ def _bond_elements_from_key(bond_key: Optional[str]) -> Set[str]:
             if right_el:
                 elements.add(right_el)
     return elements
+
+
+def _label_formed_bonds(
+    formed: Iterable[str],
+    product_motifs_reactive: Iterable[str],
+) -> List[str]:
+    """Attach product motif labels to formed bond tokens when possible."""
+    tokens = [str(t) for t in formed if t]
+    motifs = [str(m) for m in product_motifs_reactive if m]
+    if not tokens or not motifs:
+        return []
+
+    cc_labels = [m for m in motifs if m in {"Ar-Ar", "Ar-Alkyl", "Ar-Alkenyl", "Ar-Alkynyl"}]
+    cn_labels = [m for m in motifs if m.startswith("Ar-N") or m == "Ar-AromN"]
+    co_labels = [m for m in motifs if m == "Ar-OR"]
+    cs_labels = [m for m in motifs if m == "Ar-SR"]
+
+    cc_idx = 0
+    cn_idx = 0
+    co_idx = 0
+    cs_idx = 0
+
+    labeled: List[str] = []
+    for token in tokens:
+        if "-" not in token:
+            labeled.append(token)
+            continue
+        left, right = [t.strip() for t in token.split("-", 1)]
+        left_el = _parse_element(left)
+        right_el = _parse_element(right)
+        left_ar = _is_aromatic_label(left)
+        right_ar = _is_aromatic_label(right)
+        elements = {left_el, right_el}
+        is_aryl_carbon = (left_el == "C" and left_ar) or (right_el == "C" and right_ar)
+
+        label = None
+        if elements == {"C"} and is_aryl_carbon:
+            if cc_idx < len(cc_labels):
+                label = cc_labels[cc_idx]
+                cc_idx += 1
+        elif "N" in elements and "C" in elements and is_aryl_carbon:
+            if cn_idx < len(cn_labels):
+                label = cn_labels[cn_idx]
+                cn_idx += 1
+        elif "O" in elements and "C" in elements and is_aryl_carbon:
+            if co_idx < len(co_labels):
+                label = co_labels[co_idx]
+                co_idx += 1
+        elif "S" in elements and "C" in elements and is_aryl_carbon:
+            if cs_idx < len(cs_labels):
+                label = cs_labels[cs_idx]
+                cs_idx += 1
+
+        if label:
+            labeled.append(f"{token}[{label}]")
+        else:
+            labeled.append(token)
+    return labeled
+
+
+@lru_cache(maxsize=1)
+def _load_group_sets() -> Dict[str, Any]:
+    try:
+        from chemtools.taxonomy import loader as taxonomy_loader
+    except Exception:
+        return {}
+    payload = taxonomy_loader.load_group_logic()
+    if not payload:
+        return {}
+    group_sets = payload.get("group_sets", {}) or {}
+    return group_sets if isinstance(group_sets, dict) else {}
+
+
+def _expand_group_set(
+    set_id: str,
+    group_sets: Dict[str, Any],
+    *,
+    _seen: Optional[Set[str]] = None,
+) -> Set[str]:
+    if not group_sets or not set_id:
+        return set()
+    if _seen is None:
+        _seen = set()
+    if set_id in _seen:
+        return set()
+    _seen.add(set_id)
+    set_data = group_sets.get(set_id, {}) or {}
+    members = set_data.get("members", []) or []
+    expanded: Set[str] = set()
+    for member in members:
+        if not member:
+            continue
+        member_str = str(member)
+        if member_str in group_sets:
+            expanded.update(_expand_group_set(member_str, group_sets, _seen=_seen))
+        else:
+            expanded.add(member_str)
+    return expanded
+
+
+@lru_cache(maxsize=1)
+def _load_leaving_groups() -> Set[str]:
+    group_sets = _load_group_sets()
+    if not group_sets:
+        return set()
+    return _expand_group_set("LeavingGroup", group_sets)
+
+
+def _reacted_has_leaving_groups(reacted: Iterable[str]) -> bool:
+    leaving_groups = _load_leaving_groups()
+    if not leaving_groups:
+        return False
+    for motif in reacted:
+        motif_str = str(motif)
+        for group_id in leaving_groups:
+            if motif_str.endswith(group_id):
+                return True
+    return False
+
+
+def _nucleophile_elements_from_motifs(
+    reacted: Iterable[str],
+    group_element_map: Dict[str, Set[str]],
+) -> Set[str]:
+    elements: Set[str] = set()
+    for motif in reacted:
+        group_id = _match_group_id(str(motif), group_element_map)
+        if not group_id:
+            continue
+        elements.update(group_element_map.get(group_id, set()))
+    elements.discard("C")
+    elements.discard("H")
+    return elements
+
+
+def _sanitize_bond_key(
+    bond_key: Optional[str],
+    reacted: Iterable[str],
+    *,
+    group_element_map: Dict[str, Set[str]],
+) -> Optional[str]:
+    if not bond_key:
+        return None
+    broken = _extract_bond_section(bond_key, section="break")
+    formed = _extract_bond_section(bond_key, section="form")
+    if not broken and not formed:
+        return None
+    if not broken and formed and _reacted_has_leaving_groups(reacted):
+        nucleophile_elements = _nucleophile_elements_from_motifs(reacted, group_element_map)
+        if nucleophile_elements:
+            filtered = []
+            for token in formed:
+                if "-" not in token:
+                    continue
+                left, right = [t.strip() for t in token.split("-", 1)]
+                left_el = _parse_element(left)
+                right_el = _parse_element(right)
+                if left_el in nucleophile_elements or right_el in nucleophile_elements:
+                    filtered.append(token)
+            formed = filtered
+        else:
+            formed = []
+        if not formed:
+            return None
+    parts: List[str] = []
+    if broken:
+        parts.append("break: " + "; ".join(broken))
+    if formed:
+        parts.append("form: " + "; ".join(formed))
+    return " | ".join(parts) if parts else None
 
 
 def _match_group_id(motif_id: str, group_element_map: Dict[str, Set[str]]) -> Optional[str]:
@@ -703,6 +901,10 @@ def format_crk_key(
         broken = _extract_bond_section(bond_key, section="break")
         if formed:
             sections.append("bond_formed: " + "; ".join(formed))
+            if product_motifs_reactive:
+                labeled = _label_formed_bonds(formed, product_motifs_reactive)
+                if labeled:
+                    sections.append("bond_formed_labeled: " + "; ".join(labeled))
         if broken:
             sections.append("bond_broken: " + "; ".join(broken))
 
@@ -735,18 +937,19 @@ def _select_reactive_product_motifs(
     reacted_set = {str(m) for m in reacted_motifs if m}
 
     inferred = _infer_product_motifs_from_logic(reacted_set, bond_key)
+    inferred_in_product = [m for m in inferred if m in motif_set] if motif_set else inferred
 
     if not bond_key:
-        if inferred:
-            return inferred
+        if inferred_in_product:
+            return inferred_in_product
         if formed_set:
             return sorted(motif_set & formed_set) or sorted(formed_set)
         return []
 
     formed_bonds = _extract_bond_section(bond_key, section="form")
     if not formed_bonds:
-        if inferred:
-            return inferred
+        if inferred_in_product:
+            return inferred_in_product
         if formed_set:
             return sorted(motif_set & formed_set) or sorted(formed_set)
         return []
@@ -776,14 +979,17 @@ def _select_reactive_product_motifs(
             add_set("aryl_thioethers")
         if left_el == "C" and right_el == "C" and left_ar and right_ar:
             target_ids.add("Ar-Ar")
+        if left_el == "C" and right_el == "C" and (left_ar ^ right_ar):
+            # Aryl-sp2/sp3 C-C formation; include aryl-alkyl/alkenyl/alkynyl if present.
+            for candidate in ("Ar-Alkyl", "Ar-Alkenyl", "Ar-Alkynyl"):
+                if candidate in formed_set:
+                    target_ids.add(candidate)
 
     reactive = sorted(motif_set & target_ids)
-    if inferred:
+    if inferred_in_product:
         if reactive:
-            overlap = sorted(set(reactive) & set(inferred))
-            if overlap:
-                return overlap
-        return inferred
+            return sorted(set(reactive) | set(inferred_in_product))
+        return inferred_in_product
     if reactive:
         return reactive
     if formed_set:
@@ -1162,6 +1368,11 @@ def featurize_reaction(
         if not skip_bond_analysis:
             bond_analysis = _get_bond_change_analysis(reaction_smiles)
             bond_key = format_bond_change_key(reaction_smiles, analysis=bond_analysis)
+        bond_key = _sanitize_bond_key(
+            bond_key,
+            reacted_full,
+            group_element_map=_load_group_element_map(),
+        )
         product_broad_tags = _infer_product_broad_tags_with_validation(
             bond_key=bond_key,
             product_smiles=product_smiles,

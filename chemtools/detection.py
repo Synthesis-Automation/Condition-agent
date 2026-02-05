@@ -129,10 +129,10 @@ def extract_reaction_key(reaction_smiles: str) -> Tuple[List[str], List[str], Li
     Returns:
         Tuple of (reacted, formed, spectator, reaction_key_string). The key is CRK-v1.
     """
-    from .featurizers.formatters.reaction import featurize_reaction
+    from .featurizers.formatters.reaction import featurize_reaction, get_crk_options
     
     # Skip role classification to avoid circular dependency
-    result = featurize_reaction(reaction_smiles, options={"include_roles": False})
+    result = featurize_reaction(reaction_smiles, options=get_crk_options())
     aggregates = result.get("aggregates", {})
     
     reacted = aggregates.get("reacted_motifs", [])
