@@ -70,6 +70,17 @@ def _format_mapping_lines(data: Dict[str, Any], *, sort_keys: bool = True) -> Li
     return lines
 
 
+def _extract_crk_section(crk_key: str, label: str) -> str:
+    if not crk_key:
+        return ""
+    prefix = f"{label}: "
+    parts = [p.strip() for p in crk_key.split(" | ") if p.strip()]
+    for part in parts:
+        if part.startswith(prefix):
+            return part[len(prefix):].strip()
+    return ""
+
+
 _STERIC_SUMMARY_KEYS = (
     "score_0_10",
     "group_bulk_0_10",
@@ -655,6 +666,13 @@ def _print_reaction_summary(
                 else:
                     formed_str = str(formed)
                 print(f"    Formed motifs: {formed_str}")
+
+            bond_formed = _extract_crk_section(reaction_key or "", "bond_formed")
+            bond_broken = _extract_crk_section(reaction_key or "", "bond_broken")
+            if bond_formed:
+                print(f"    Bond formed: {bond_formed}")
+            if bond_broken:
+                print(f"    Bond broken: {bond_broken}")
             
             if spectators:
                 if isinstance(spectators, list):
