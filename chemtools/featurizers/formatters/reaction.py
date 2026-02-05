@@ -327,6 +327,7 @@ def _match_group_id(motif_id: str, group_element_map: Dict[str, Set[str]]) -> Op
 def _filter_reactants_for_crk(
     reacted: Iterable[str],
     bond_key: Optional[str],
+    spectators: Optional[Iterable[str]] = None,
 ) -> List[str]:
     scaffold_ids: Set[str] = set()
     try:
@@ -342,16 +343,32 @@ def _filter_reactants_for_crk(
         return sorted(str(r) for r in reacted if r and str(r) not in scaffold_ids)
     elements_non_c = {el for el in elements if el != "C"}
 
+    # If N/O/S bonds are formed, make sure N/O/S nucleophiles are not dropped
+    # just because they have -H suffixes (e.g., AromN-H).
+    formed_tokens = _extract_bond_section(bond_key, section="form")
+    formed_elements: Set[str] = set()
+    for token in formed_tokens:
+        if "-" not in token:
+            continue
+        left, right = [t.strip() for t in token.split("-", 1)]
+        left_el = _parse_element(left)
+        right_el = _parse_element(right)
+        if left_el:
+            formed_elements.add(left_el)
+        if right_el:
+            formed_elements.add(right_el)
+
     group_element_map = {
         "-I": {"I"},
         "-Br": {"Br"},
         "-Cl": {"Cl"},
         "-F": {"F"},
-        "-SH": {"S", "H"},
-        "-OH": {"O", "H"},
-        "-NH2": {"N", "H"},
-        "-NHR": {"N", "H"},
+        "-SH": {"S"},
+        "-OH": {"O"},
+        "-NH2": {"N"},
+        "-NHR": {"N"},
         "-NR2": {"N"},
+        "-NHCOR": {"N"},
         "-OR": {"O"},
         "-SR": {"S"},
         "-N3": {"N"},
@@ -360,7 +377,7 @@ def _filter_reactants_for_crk(
         "-COBr": {"C", "Br"},
         "-COI": {"C", "I"},
         "-COF": {"C", "F"},
-        "-CO2H": {"C", "O", "H"},
+        "-CO2H": {"C", "O"},
         "-CO2R": {"C", "O"},
         "-B(OH)2": {"B"},
         "-Bpin": {"B"},
@@ -373,25 +390,52 @@ def _filter_reactants_for_crk(
         "-H": {"H"},
     }
 
+    spectator_ids = {str(s) for s in (spectators or []) if s}
     filtered: List[str] = []
     for motif in reacted:
         if not motif:
             continue
         if str(motif) in scaffold_ids:
             continue
-        group_id = _match_group_id(str(motif), group_element_map)
+        motif_str = str(motif)
+        # Keep N/O/S nucleophiles when corresponding bonds form.
+        keep_by_formed = False
+        if "N" in formed_elements and (
+            motif_str.endswith("-NH2")
+            or motif_str.endswith("-NHR")
+            or motif_str.endswith("-NR2")
+            or motif_str.endswith("-NHCOR")
+            or motif_str == "AromN-H"
+        ):
+            keep_by_formed = True
+        if "O" in formed_elements and (motif_str.endswith("-OH") or motif_str.endswith("-OR")):
+            keep_by_formed = True
+        if "S" in formed_elements and (motif_str.endswith("-SH") or motif_str.endswith("-SR")):
+            keep_by_formed = True
+
+        group_id = _match_group_id(motif_str, group_element_map)
+        keep_by_elements = False
+        if group_id:
+            group_elements = group_element_map.get(group_id)
+            if group_elements:
+                if elements_non_c:
+                    if elements_non_c.intersection(group_elements):
+                        keep_by_elements = True
+                elif elements.intersection(group_elements):
+                    keep_by_elements = True
+
+        # Drop pure spectators unless they align with bond elements or formed nucleophiles.
+        if motif_str in spectator_ids and not (keep_by_formed or keep_by_elements):
+            continue
+
+        if keep_by_formed:
+            filtered.append(motif_str)
+            continue
         if not group_id:
-            filtered.append(str(motif))
+            filtered.append(motif_str)
             continue
-        group_elements = group_element_map.get(group_id)
-        if not group_elements:
-            filtered.append(str(motif))
-            continue
-        if elements_non_c:
-            if elements_non_c.intersection(group_elements):
-                filtered.append(str(motif))
-        elif elements.intersection(group_elements):
-            filtered.append(str(motif))
+        if keep_by_elements:
+            filtered.append(motif_str)
     filtered_sorted = sorted(filtered)
     if filtered_sorted:
         return filtered_sorted
@@ -680,27 +724,11 @@ def format_crk_key(
     broad_tags = sorted(str(t) for t in product_broad_tags if t)
     reactive_products = sorted(str(t) for t in (product_motifs_reactive or []) if t)
 
-    def _select_primary_reactive(items: List[str]) -> str:
-        if not items:
-            return "[]"
-        candidates = [t for t in items if t]
-        if not candidates:
-            return "[]"
-        # Prefer scaffold-substituent motifs over generic Any-* or Motif-*.
-        def score(item: str) -> tuple[int, int, str]:
-            penalty = 0
-            if item.startswith("Any-") or item.startswith("Motif-"):
-                penalty = -2
-            if "-" in item:
-                return (2 + penalty, len(item), item)
-            return (1 + penalty, len(item), item)
-        candidates.sort(key=lambda t: (-score(t)[0], -score(t)[1], score(t)[2]))
-        return candidates[0]
-
     products_primary = "[]"
     if include_product:
-        products_primary = _select_primary_reactive(reactive_products)
-        if products_primary == "[]":
+        if reactive_products:
+            products_primary = "|".join(reactive_products)
+        else:
             products_primary = _select_primary_broad_tag(broad_tags)
 
     summary = f"|{reactants_text} -> {products_primary}"
@@ -731,6 +759,7 @@ def _select_reactive_product_motifs(
     *,
     bond_key: Optional[str],
     formed_motifs: Iterable[str],
+    reacted_motifs: Iterable[str],
 ) -> List[str]:
     """Select product motifs that align with bond formation (reaction-center motifs)."""
     motif_ids = [
@@ -740,14 +769,21 @@ def _select_reactive_product_motifs(
     ]
     motif_set = set(motif_ids)
     formed_set = {str(m) for m in formed_motifs if m}
+    reacted_set = {str(m) for m in reacted_motifs if m}
+
+    inferred = _infer_product_motifs_from_logic(reacted_set, bond_key)
 
     if not bond_key:
+        if inferred:
+            return inferred
         if formed_set:
             return sorted(motif_set & formed_set) or sorted(formed_set)
         return []
 
     formed_bonds = _extract_bond_section(bond_key, section="form")
     if not formed_bonds:
+        if inferred:
+            return inferred
         if formed_set:
             return sorted(motif_set & formed_set) or sorted(formed_set)
         return []
@@ -779,11 +815,100 @@ def _select_reactive_product_motifs(
             target_ids.add("Ar-Ar")
 
     reactive = sorted(motif_set & target_ids)
+    if inferred:
+        if reactive:
+            overlap = sorted(set(reactive) & set(inferred))
+            if overlap:
+                return overlap
+        return inferred
     if reactive:
         return reactive
     if formed_set:
         return sorted(motif_set & formed_set) or sorted(formed_set)
     return []
+
+
+def _infer_product_motifs_from_logic(
+    reacted_motifs: Iterable[str],
+    bond_key: Optional[str],
+) -> List[str]:
+    """Infer likely product motifs from reacted motifs + bond formation."""
+    if not bond_key:
+        return []
+    reacted_list = [str(m) for m in reacted_motifs if m]
+    if not reacted_list:
+        return []
+    formed_bonds = _extract_bond_section(bond_key, section="form")
+    if not formed_bonds:
+        return []
+
+    logic_sets = _load_compound_logic_sets()
+    amines = logic_sets.get("aryl_amines", set())
+    amides = logic_sets.get("aryl_amides", set())
+    ethers = logic_sets.get("aryl_ethers", set())
+    thioethers = logic_sets.get("aryl_thioethers", set())
+
+    def has_suffix(suffixes: Tuple[str, ...]) -> bool:
+        return any(m.endswith(sfx) for m in reacted_list for sfx in suffixes)
+
+    def has_any(values: Set[str]) -> bool:
+        if not values:
+            return False
+        for m in reacted_list:
+            if m in values:
+                return True
+        return False
+
+    inferred: Set[str] = set()
+    for token in formed_bonds:
+        if "-" not in token:
+            continue
+        left, right = [t.strip() for t in token.split("-", 1)]
+        left_el = _parse_element(left)
+        right_el = _parse_element(right)
+        left_ar = _is_aromatic_label(left)
+        right_ar = _is_aromatic_label(right)
+        elements = {left_el, right_el}
+        is_aryl_carbon = (left_el == "C" and left_ar) or (right_el == "C" and right_ar)
+
+        if "C" in elements and "S" in elements and is_aryl_carbon:
+            if has_any(logic_sets.get("thiols_sh", set())) or has_suffix(("-SH",)):
+                if "Ar-SR" in thioethers:
+                    inferred.add("Ar-SR")
+
+        if "C" in elements and "O" in elements and is_aryl_carbon:
+            if has_any(logic_sets.get("alcohols_oh", set())) or has_suffix(("-OH",)):
+                if "Ar-OR" in ethers:
+                    inferred.add("Ar-OR")
+
+        if "C" in elements and "N" in elements and is_aryl_carbon:
+            n_is_aromatic = (left_el == "N" and left_ar) or (right_el == "N" and right_ar)
+            if n_is_aromatic:
+                if "Ar-AromN" in amines:
+                    inferred.add("Ar-AromN")
+                continue
+
+            if has_suffix(("-NHCOR",)):
+                if "Ar-NRCOR" in amides:
+                    inferred.add("Ar-NRCOR")
+                continue
+            if has_suffix(("-NH2",)):
+                if "Ar-NH2" in amines:
+                    inferred.add("Ar-NH2")
+                continue
+            if has_suffix(("-NHR",)):
+                if "Ar-NHR" in amines:
+                    inferred.add("Ar-NHR")
+                continue
+            if has_suffix(("-NR2",)):
+                if "Ar-NR2" in amines:
+                    inferred.add("Ar-NR2")
+                continue
+
+            if "AromN-H" in reacted_list and "Ar-AromN" in amines:
+                inferred.add("Ar-AromN")
+
+    return sorted(inferred)
 
 
 def _scaffold_spectators_from_bundles(
@@ -906,7 +1031,7 @@ def featurize_reaction(
     include_roles = to_bool(options.get("include_roles"), default=True)
     include_agent_roles = to_bool(options.get("include_agent_roles"), default=True)
     skip_bond_analysis = to_bool(options.get("skip_bond_analysis"), default=False)
-    include_product_in_crk = to_bool(options.get("include_product_in_crk"), default=False)
+    include_product_in_crk = to_bool(options.get("include_product_in_crk"), default=True)
     
     # General coupling confirmation (supports 9+ coupling reaction types)
     # Backward compatibility: map old Suzuki-specific parameter to general one
@@ -1042,8 +1167,13 @@ def featurize_reaction(
             product_motifs_full,
             bond_key=bond_key,
             formed_motifs=aggregates.get("formed_motifs", []),
+            reacted_motifs=reacted_full,
         )
-        reacted_for_crk = _filter_reactants_for_crk(reacted_full, bond_key)
+        reacted_for_crk = _filter_reactants_for_crk(
+            reacted_full,
+            bond_key,
+            spectators=spectators_for_crk,
+        )
         if not reacted_for_crk and reacted_full:
             reacted_for_crk = sorted(str(r) for r in reacted_full if r)
         reaction_key = format_crk_key(
