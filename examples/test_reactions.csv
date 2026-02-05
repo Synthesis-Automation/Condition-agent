@@ -60,3 +60,4 @@ C_O_Couping,,86,,,Cc1cc(C)cc(O)c1.CC(=O)c1ccc(I)cc1>>CC(=O)c1ccc(Oc2cc(C)cc(C)c2
 ,,,,,CC(N)=O.O=[N+]([O-])c1ccc(Oc2ccnc(Cl)c2)c(F)c1>>CC(=O)Nc1cc(Oc2ccc([N+](=O)[O-])cc2F)ccn1,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,COC(=O)c1cc(Br)c(C(=O)OC)cc1Br.CCCCCCC1(CCCCCC)c2cc(N)ccc2-c2ccc(N)cc21>>CCCCCCC1(CCCCCC)c2cc(Nc3cc(C(=O)OC)c(Br)cc3C(=O)OC)ccc2-c2ccc(Nc3cc(C(=O)OC)c(Br)cc3C(=O)OC)cc21,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,[C-]#[N+]c1ccc(Cl)c(Cl)c1.Ic1ccccc1CSc1ccccc1>>Clc1ccc(-n2cc(Sc3ccccc3)c3ccccc32)cc1Cl,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,OB(O)c1ccccc1.CCCCBr.O=S(=O)(F)Oc1ccccc1C(F)(F)F>>CCCCc1cccc(C(F)(F)F)c1-c1ccccc1,,,,,,,,,,,,,,,,,,,,,,,

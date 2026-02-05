@@ -645,6 +645,13 @@
       "description": "Generic sulfonate ester substituent (-OSO2R)."
     },
     {
+      "id": "-OSO2F",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[O:2]S(=O)(=O)F",
+      "description": "Fluorosulfate ester substituent (-OSO2F)."
+    },
+    {
       "id": "-COR",
       "kind": "substituent",
       "priority": 1,

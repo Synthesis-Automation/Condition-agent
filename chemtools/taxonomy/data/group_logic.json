@@ -1,6 +1,165 @@
 {
   "version": "1.0",
   "description": "Centralized logic combinations for functional groups.",
+  "group_elements": {
+    "-I": [
+      "I"
+    ],
+    "-Br": [
+      "Br"
+    ],
+    "-Cl": [
+      "Cl"
+    ],
+    "-F": [
+      "F"
+    ],
+    "-SH": [
+      "S"
+    ],
+    "-OH": [
+      "O"
+    ],
+    "-NH2": [
+      "N"
+    ],
+    "-NHR": [
+      "N"
+    ],
+    "-NR2": [
+      "N"
+    ],
+    "-NHCOR": [
+      "N"
+    ],
+    "-OR": [
+      "O"
+    ],
+    "-SR": [
+      "S"
+    ],
+    "-N3": [
+      "N"
+    ],
+    "-CN": [
+      "C",
+      "N"
+    ],
+    "-COCl": [
+      "C",
+      "Cl"
+    ],
+    "-COBr": [
+      "C",
+      "Br"
+    ],
+    "-COI": [
+      "C",
+      "I"
+    ],
+    "-COF": [
+      "C",
+      "F"
+    ],
+    "-CO2H": [
+      "C",
+      "O"
+    ],
+    "-CO2R": [
+      "C",
+      "O"
+    ],
+    "-B(OH)2": [
+      "B"
+    ],
+    "-Bpin": [
+      "B"
+    ],
+    "-B(OR)2": [
+      "B"
+    ],
+    "-BF3K": [
+      "B"
+    ],
+    "-Sn*": [
+      "Sn"
+    ],
+    "-Zn*": [
+      "Zn"
+    ],
+    "-Mg*": [
+      "Mg"
+    ],
+    "-Si*": [
+      "Si"
+    ],
+    "-H": [
+      "H"
+    ]
+  },
+  "product_inference": {
+    "suffixes": {
+      "thiol": [
+        "-SH"
+      ],
+      "alcohol": [
+        "-OH"
+      ],
+      "amide": [
+        "-NHCOR"
+      ],
+      "amine_primary": [
+        "-NH2"
+      ],
+      "amine_secondary": [
+        "-NHR"
+      ],
+      "amine_tertiary": [
+        "-NR2"
+      ]
+    },
+    "aromatic_nitrogen": [
+      "AromN-H"
+    ],
+    "alkyl_prefixes": [
+      "RCH2",
+      "R2CH",
+      "R3C",
+      "Alkyl",
+      "Bn",
+      "Allyl",
+      "Propargyl",
+      "CH3"
+    ],
+    "alkyl_leaving": [
+      "-Br",
+      "-Cl",
+      "-I",
+      "-OTf",
+      "-OMs",
+      "-OTs"
+    ],
+    "alkenyl_leaving": [
+      "Alkenyl-Br",
+      "Alkenyl-Cl",
+      "Alkenyl-I",
+      "Alkenyl-OTf",
+      "Alkenyl-OMs",
+      "Alkenyl-OTs",
+      "Alkenyl-H"
+    ],
+    "alkynyl_leaving": [
+      "Alkynyl-Br",
+      "Alkynyl-Cl",
+      "Alkynyl-I",
+      "Alkynyl-OTf",
+      "Alkynyl-OMs",
+      "Alkynyl-OTs",
+      "Alkynyl-H",
+      "Ar-Alkynyl_terminal",
+      "Alkyl-Alkynyl_terminal"
+    ]
+  },
   "group_sets": {
     "X": {
       "name": "Halogen",
@@ -42,7 +201,8 @@
         "-OTf",
         "-OTs",
         "-OMs",
-        "-OSO2R"
+        "-OSO2R",
+        "-OSO2F"
       ],
       "description": "Sulfonate leaving groups (Triflate, Tosylate, Mesylate, etc.)."
     },

@@ -492,6 +492,12 @@
     },
     {
       "template": "single_bond",
+      "A": "Ar",
+      "B": "-OSO2F",
+      "description": "Aryl fluorosulfate (Ar-OSO2F)."
+    },
+    {
+      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OTs",
       "description": "Vinyl/alkenyl tosylate (Alkenyl-OTs); Vinyl/alkenyl-O-tosylate motif."

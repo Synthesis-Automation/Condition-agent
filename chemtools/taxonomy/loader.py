@@ -17,6 +17,7 @@ from typing import Any, Dict, List, Tuple
 _TAXONOMY_DIR = Path(__file__).resolve().parent / "data"
 REACTION_TYPES_FILE = _TAXONOMY_DIR / "reaction_types.v4.0.json"
 COMPOUND_LOGIC_FILE = _TAXONOMY_DIR / "compound_logic.json"
+GROUP_LOGIC_FILE = _TAXONOMY_DIR / "group_logic.json"
 ORGANIC_COMPOUNDS_FILE = _TAXONOMY_DIR / "organic_compounds.v1.3.json"
 SCAFFOLD_MOTIFS_FILE = _TAXONOMY_DIR / "scaffold_motifs.v1.3.json"
 
@@ -72,6 +73,23 @@ def load_compound_logic() -> Dict[str, Any]:
     
     try:
         with COMPOUND_LOGIC_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def load_group_logic() -> Dict[str, Any]:
+    """Load group logic taxonomy JSON.
+    
+    Returns:
+        Dictionary with group_sets and optional group_elements configuration
+    """
+    if not GROUP_LOGIC_FILE.exists():
+        return {}
+    
+    try:
+        with GROUP_LOGIC_FILE.open("r", encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return {}
@@ -153,6 +171,7 @@ def clear_taxonomy_cache() -> None:
     load_reaction_types_list.cache_clear()
     load_reaction_types_dict.cache_clear()
     load_compound_logic.cache_clear()
+    load_group_logic.cache_clear()
     load_organic_compounds.cache_clear()
     load_scaffold_motifs.cache_clear()
 
@@ -160,12 +179,14 @@ def clear_taxonomy_cache() -> None:
 __all__ = [
     "REACTION_TYPES_FILE",
     "COMPOUND_LOGIC_FILE",
+    "GROUP_LOGIC_FILE",
     "ORGANIC_COMPOUNDS_FILE",
     "SCAFFOLD_MOTIFS_FILE",
     "load_reaction_types_raw",
     "load_reaction_types_list",
     "load_reaction_types_dict",
     "load_compound_logic",
+    "load_group_logic",
     "load_organic_compounds",
     "load_scaffold_motifs",
     "get_reaction_by_id",

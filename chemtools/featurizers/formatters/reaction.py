@@ -149,6 +149,44 @@ def _load_compound_logic_sets() -> Dict[str, Set[str]]:
     return motif_sets
 
 
+@lru_cache(maxsize=1)
+def _load_group_element_map() -> Dict[str, Set[str]]:
+    try:
+        from chemtools.taxonomy import loader as taxonomy_loader
+    except Exception:
+        return {}
+    payload = taxonomy_loader.load_group_logic()
+    if not payload:
+        return {}
+    mapping = payload.get("group_elements", {}) or {}
+    group_element_map: Dict[str, Set[str]] = {}
+    for group_id, elements in mapping.items():
+        if not group_id or not elements:
+            continue
+        if isinstance(elements, (list, tuple, set)):
+            values = {str(el) for el in elements if el}
+        else:
+            values = {str(elements)}
+        if values:
+            group_element_map[str(group_id)] = values
+    return group_element_map
+
+
+@lru_cache(maxsize=1)
+def _load_group_inference_rules() -> Dict[str, Any]:
+    try:
+        from chemtools.taxonomy import loader as taxonomy_loader
+    except Exception:
+        return {}
+    payload = taxonomy_loader.load_group_logic()
+    if not payload:
+        return {}
+    rules = payload.get("product_inference", {}) or {}
+    if not isinstance(rules, dict):
+        return {}
+    return rules
+
+
 def format_bond_change_key(
     reaction_smiles: str,
     *,
@@ -170,99 +208,6 @@ def format_bond_change_key(
     if formed:
         parts.append("form: " + "; ".join(formed))
     return " | ".join(parts)
-
-
-def _extract_bond_pairs_from_key(bond_key: Optional[str]) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]]]:
-    formed_pairs: List[Tuple[str, str]] = []
-    broken_pairs: List[Tuple[str, str]] = []
-    for token in _extract_bond_section(bond_key, section="form"):
-        if "-" not in token:
-            continue
-        left, right = [t.strip() for t in token.split("-", 1)]
-        formed_pairs.append((left, right))
-    for token in _extract_bond_section(bond_key, section="break"):
-        if "-" not in token:
-            continue
-        left, right = [t.strip() for t in token.split("-", 1)]
-        broken_pairs.append((left, right))
-    return formed_pairs, broken_pairs
-
-
-def _pair_reactants_from_bonds(
-    reacted: Iterable[str],
-    bond_key: Optional[str],
-) -> List[str]:
-    """Heuristic pairing of nucleophile/electrophile using bond-change tokens."""
-    if not bond_key:
-        return []
-    formed_pairs, broken_pairs = _extract_bond_pairs_from_key(bond_key)
-    if not formed_pairs:
-        return []
-
-    def pick_prefix(token: str, prefixes: Tuple[str, ...]) -> Optional[str]:
-        for pref in prefixes:
-            if token.endswith(pref):
-                return pref
-        return None
-
-    halides = ("-I", "-Br", "-Cl", "-F")
-    nucleophiles = ("-SH", "-NH2", "-NHR", "-OH")
-
-    reacted_list = [str(r) for r in reacted if r]
-    pairs: List[str] = []
-
-    for formed in formed_pairs:
-        # Try to detect which heteroatom formed the bond (S/N/O).
-        left, right = formed
-        hetero = None
-        if _is_sulfur_label(left) or _is_sulfur_label(right):
-            hetero = "S"
-        elif left.startswith("N") or right.startswith("N"):
-            hetero = "N"
-        elif left.startswith("O") or right.startswith("O"):
-            hetero = "O"
-        if not hetero:
-            continue
-
-        nuc = None
-        for motif in reacted_list:
-            if hetero == "S" and motif.endswith("-SH"):
-                nuc = motif
-                break
-            if hetero == "N" and (motif.endswith("-NH2") or motif.endswith("-NHR")):
-                nuc = motif
-                break
-            if hetero == "O" and motif.endswith("-OH"):
-                nuc = motif
-                break
-
-        if not nuc:
-            continue
-
-        # Match electrophile by halide in broken bonds.
-        elec = None
-        for broken in broken_pairs:
-            b_left, b_right = broken
-            if any(x in b_left for x in ("I", "Br", "Cl", "F")) or any(x in b_right for x in ("I", "Br", "Cl", "F")):
-                for motif in reacted_list:
-                    if any(motif.endswith(h) for h in halides):
-                        elec = motif
-                        break
-            if elec:
-                break
-
-        if nuc and elec:
-            pairs.append(f"{nuc}~{elec}")
-
-    # De-dup
-    out: List[str] = []
-    seen: Set[str] = set()
-    for p in pairs:
-        if p in seen:
-            continue
-        seen.add(p)
-        out.append(p)
-    return out
 
 
 def _extract_bond_section(bond_key: Optional[str], *, section: str) -> List[str]:
@@ -388,37 +333,7 @@ def _filter_reactants_for_crk(
                 return True
         return False
 
-    group_element_map = {
-        "-I": {"I"},
-        "-Br": {"Br"},
-        "-Cl": {"Cl"},
-        "-F": {"F"},
-        "-SH": {"S"},
-        "-OH": {"O"},
-        "-NH2": {"N"},
-        "-NHR": {"N"},
-        "-NR2": {"N"},
-        "-NHCOR": {"N"},
-        "-OR": {"O"},
-        "-SR": {"S"},
-        "-N3": {"N"},
-        "-CN": {"C", "N"},
-        "-COCl": {"C", "Cl"},
-        "-COBr": {"C", "Br"},
-        "-COI": {"C", "I"},
-        "-COF": {"C", "F"},
-        "-CO2H": {"C", "O"},
-        "-CO2R": {"C", "O"},
-        "-B(OH)2": {"B"},
-        "-Bpin": {"B"},
-        "-B(OR)2": {"B"},
-        "-BF3K": {"B"},
-        "-Sn*": {"Sn"},
-        "-Zn*": {"Zn"},
-        "-Mg*": {"Mg"},
-        "-Si*": {"Si"},
-        "-H": {"H"},
-    }
+    group_element_map = _load_group_element_map()
 
     spectator_ids = {str(s) for s in (spectators or []) if s}
     filtered: List[str] = []
@@ -895,6 +810,21 @@ def _infer_product_motifs_from_logic(
     amides = logic_sets.get("aryl_amides", set())
     ethers = logic_sets.get("aryl_ethers", set())
     thioethers = logic_sets.get("aryl_thioethers", set())
+    inference_rules = _load_group_inference_rules()
+    suffix_rules = inference_rules.get("suffixes", {}) or {}
+    thiol_suffixes = tuple(str(s) for s in (suffix_rules.get("thiol", []) or []) if s)
+    alcohol_suffixes = tuple(str(s) for s in (suffix_rules.get("alcohol", []) or []) if s)
+    amide_suffixes = tuple(str(s) for s in (suffix_rules.get("amide", []) or []) if s)
+    amine_primary_suffixes = tuple(str(s) for s in (suffix_rules.get("amine_primary", []) or []) if s)
+    amine_secondary_suffixes = tuple(str(s) for s in (suffix_rules.get("amine_secondary", []) or []) if s)
+    amine_tertiary_suffixes = tuple(str(s) for s in (suffix_rules.get("amine_tertiary", []) or []) if s)
+    aromatic_nitrogen = {
+        str(s) for s in (inference_rules.get("aromatic_nitrogen", []) or []) if s
+    }
+    alkyl_prefixes = tuple(str(s) for s in (inference_rules.get("alkyl_prefixes", []) or []) if s)
+    alkyl_leaving = tuple(str(s) for s in (inference_rules.get("alkyl_leaving", []) or []) if s)
+    alkenyl_leaving = set(str(s) for s in (inference_rules.get("alkenyl_leaving", []) or []) if s)
+    alkynyl_leaving = set(str(s) for s in (inference_rules.get("alkynyl_leaving", []) or []) if s)
 
     def has_suffix(suffixes: Tuple[str, ...]) -> bool:
         return any(m.endswith(sfx) for m in reacted_list for sfx in suffixes)
@@ -918,14 +848,16 @@ def _infer_product_motifs_from_logic(
         right_ar = _is_aromatic_label(right)
         elements = {left_el, right_el}
         is_aryl_carbon = (left_el == "C" and left_ar) or (right_el == "C" and right_ar)
+        is_c_c = left_el == "C" and right_el == "C"
+        is_aryl_sp3_c = is_c_c and (left_ar ^ right_ar)
 
         if "C" in elements and "S" in elements and is_aryl_carbon:
-            if has_any(logic_sets.get("thiols_sh", set())) or has_suffix(("-SH",)):
+            if has_any(logic_sets.get("thiols_sh", set())) or has_suffix(thiol_suffixes):
                 if "Ar-SR" in thioethers:
                     inferred.add("Ar-SR")
 
         if "C" in elements and "O" in elements and is_aryl_carbon:
-            if has_any(logic_sets.get("alcohols_oh", set())) or has_suffix(("-OH",)):
+            if has_any(logic_sets.get("alcohols_oh", set())) or has_suffix(alcohol_suffixes):
                 if "Ar-OR" in ethers:
                     inferred.add("Ar-OR")
 
@@ -936,25 +868,48 @@ def _infer_product_motifs_from_logic(
                     inferred.add("Ar-AromN")
                 continue
 
-            if has_suffix(("-NHCOR",)):
+            if has_suffix(amide_suffixes):
                 if "Ar-NRCOR" in amides:
                     inferred.add("Ar-NRCOR")
                 continue
-            if has_suffix(("-NH2",)):
+            if has_suffix(amine_primary_suffixes):
                 if "Ar-NH2" in amines:
                     inferred.add("Ar-NH2")
                 continue
-            if has_suffix(("-NHR",)):
+            if has_suffix(amine_secondary_suffixes):
                 if "Ar-NHR" in amines:
                     inferred.add("Ar-NHR")
                 continue
-            if has_suffix(("-NR2",)):
+            if has_suffix(amine_tertiary_suffixes):
                 if "Ar-NR2" in amines:
                     inferred.add("Ar-NR2")
                 continue
 
-            if "AromN-H" in reacted_list and "Ar-AromN" in amines:
+            if aromatic_nitrogen and any(m in aromatic_nitrogen for m in reacted_list) and "Ar-AromN" in amines:
                 inferred.add("Ar-AromN")
+
+        if is_aryl_sp3_c:
+            has_alkyl_electrophile = False
+            if alkyl_prefixes and alkyl_leaving:
+                has_alkyl_electrophile = any(
+                    m.startswith(alkyl_prefixes) and m.endswith(alkyl_leaving) for m in reacted_list
+                )
+            if has_alkyl_electrophile:
+                inferred.add("Ar-Alkyl")
+            if alkenyl_leaving and (
+                any(
+                    m in alkenyl_leaving or (alkyl_leaving and m.startswith("Alkenyl-") and m.endswith(alkyl_leaving))
+                    for m in reacted_list
+                )
+            ):
+                inferred.add("Ar-Alkenyl")
+            if alkynyl_leaving and (
+                any(
+                    m in alkynyl_leaving or (alkyl_leaving and m.startswith("Alkynyl-") and m.endswith(alkyl_leaving))
+                    for m in reacted_list
+                )
+            ):
+                inferred.add("Ar-Alkynyl")
 
     return sorted(inferred)
 
