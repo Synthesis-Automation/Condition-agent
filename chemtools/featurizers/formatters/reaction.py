@@ -20,7 +20,7 @@ from ..analysis.feasibility import analyze_snar_feasibility
 
 from .molecule import build_molecule_bundle, to_bool
 from .aggregation import aggregate_reaction_features, infer_intramolecular
-from .utils import extract_motif_ids
+from .utils import extract_motif_ids, normalize_motif_id
 from .simplified import build_core_reaction, build_extended_reaction
 
 
@@ -198,6 +198,53 @@ def _load_group_inference_rules() -> Dict[str, Any]:
     if not isinstance(rules, dict):
         return {}
     return rules
+
+
+@lru_cache(maxsize=1)
+def _load_reaction_catalog_data() -> Tuple[Dict[str, Any], Dict[str, str]]:
+    try:
+        from chemtools.taxonomy.reaction_catalog import load_reaction_catalog
+    except Exception:
+        return {}, {}
+    try:
+        definitions, alias_map = load_reaction_catalog()
+    except Exception:
+        return {}, {}
+    return definitions, alias_map
+
+
+def _resolve_reaction_type_id(reaction_type: Optional[str]) -> Optional[str]:
+    if not reaction_type:
+        return None
+    definitions, alias_map = _load_reaction_catalog_data()
+    if not definitions:
+        return None
+    label = str(reaction_type).strip()
+    if not label:
+        return None
+    if label in definitions:
+        return label
+    resolved = alias_map.get(label.lower())
+    if resolved and resolved in definitions:
+        return resolved
+    return None
+
+
+def _taxonomy_allowed_product_motifs(reaction_type: Optional[str]) -> Set[str]:
+    resolved = _resolve_reaction_type_id(reaction_type)
+    if not resolved:
+        return set()
+    definitions, _ = _load_reaction_catalog_data()
+    definition = definitions.get(resolved)
+    if not definition:
+        return set()
+    allowed: Set[str] = set()
+    for slot_req in definition.products.values():
+        for motif in slot_req.allowed:
+            motif_id = str(motif).strip()
+            if motif_id:
+                allowed.add(motif_id)
+    return allowed
 
 
 def format_bond_change_key(
@@ -919,41 +966,25 @@ def _format_motif_list(items: Iterable[str]) -> str:
     return "|".join(values) if values else "[]"
 
 
-def _select_reactive_product_motifs(
-    product_motifs: Iterable[Dict[str, Any]],
+def _project_formed_motifs_by_taxonomy(
     *,
-    bond_key: Optional[str],
-    formed_motifs: Iterable[str],
-    reacted_motifs: Iterable[str],
+    reaction_type: Optional[str],
+    formed_in_product: Set[str],
+    inferred_in_product: Iterable[str],
 ) -> List[str]:
-    """Select product motifs that align with bond formation (reaction-center motifs)."""
-    motif_ids = [
-        str(m.get("compound_id") or m.get("id"))
-        for m in product_motifs
-        if isinstance(m, dict) and (m.get("compound_id") or m.get("id"))
-    ]
-    motif_set = set(motif_ids)
-    formed_set = {str(m) for m in formed_motifs if m}
-    reacted_set = {str(m) for m in reacted_motifs if m}
-
-    inferred = _infer_product_motifs_from_logic(reacted_set, bond_key)
-    inferred_in_product = [m for m in inferred if m in motif_set] if motif_set else inferred
-
-    if not bond_key:
-        if inferred_in_product:
-            return inferred_in_product
-        if formed_set:
-            return sorted(motif_set & formed_set) or sorted(formed_set)
+    allowed = _taxonomy_allowed_product_motifs(reaction_type)
+    if not allowed:
         return []
+    projected = set(formed_in_product) | {str(m) for m in inferred_in_product if m}
+    projected &= allowed
+    return sorted(projected)
 
-    formed_bonds = _extract_bond_section(bond_key, section="form")
-    if not formed_bonds:
-        if inferred_in_product:
-            return inferred_in_product
-        if formed_set:
-            return sorted(motif_set & formed_set) or sorted(formed_set)
-        return []
 
+def _target_product_motifs_from_formed_bonds(
+    *,
+    formed_bonds: Iterable[str],
+    formed_set: Set[str],
+) -> Set[str]:
     logic_sets = _load_compound_logic_sets()
     target_ids: Set[str] = set()
 
@@ -973,6 +1004,7 @@ def _select_reactive_product_motifs(
         if "C" in elements and "N" in elements:
             add_set("aryl_amines")
             add_set("aryl_amides")
+            add_set("amides")
         if "C" in elements and "O" in elements:
             add_set("aryl_ethers")
         if "C" in elements and "S" in elements:
@@ -980,20 +1012,81 @@ def _select_reactive_product_motifs(
         if left_el == "C" and right_el == "C" and left_ar and right_ar:
             target_ids.add("Ar-Ar")
         if left_el == "C" and right_el == "C" and (left_ar ^ right_ar):
-            # Aryl-sp2/sp3 C-C formation; include aryl-alkyl/alkenyl/alkynyl if present.
             for candidate in ("Ar-Alkyl", "Ar-Alkenyl", "Ar-Alkynyl"):
                 if candidate in formed_set:
                     target_ids.add(candidate)
 
-    reactive = sorted(motif_set & target_ids)
+    return target_ids
+
+
+def _select_reactive_product_motifs(
+    product_motifs: Iterable[Dict[str, Any]],
+    *,
+    bond_key: Optional[str],
+    formed_motifs: Iterable[str],
+    reacted_motifs: Iterable[str],
+    reaction_type: Optional[str] = None,
+) -> List[str]:
+    """Select reaction-center product motifs with taxonomy constraints first."""
+    motif_ids = [
+        normalize_motif_id(str(m.get("compound_id") or m.get("id")))
+        for m in product_motifs
+        if isinstance(m, dict) and (m.get("compound_id") or m.get("id"))
+    ]
+    motif_set = set(motif_ids)
+    formed_set = {normalize_motif_id(str(m)) for m in formed_motifs if m}
+    reacted_set = {normalize_motif_id(str(m)) for m in reacted_motifs if m}
+    formed_in_product = (motif_set & formed_set) if motif_set else set(formed_set)
+
+    inferred = _infer_product_motifs_from_logic(reacted_set, bond_key)
+    inferred_norm = [normalize_motif_id(str(m)) for m in inferred if m]
+    inferred_in_product = [m for m in inferred_norm if m in motif_set] if motif_set else inferred_norm
+
+    taxonomy_projected = _project_formed_motifs_by_taxonomy(
+        reaction_type=reaction_type,
+        formed_in_product=formed_in_product,
+        inferred_in_product=inferred_in_product,
+    )
+    if taxonomy_projected:
+        return taxonomy_projected
+
+    if not bond_key:
+        if inferred_in_product:
+            return inferred_in_product
+        if formed_in_product:
+            return sorted(formed_in_product)
+        if formed_set:
+            return sorted(formed_set)
+        return []
+
+    formed_bonds = _extract_bond_section(bond_key, section="form")
+    if not formed_bonds:
+        if inferred_in_product:
+            return inferred_in_product
+        if formed_in_product:
+            return sorted(formed_in_product)
+        if formed_set:
+            return sorted(formed_set)
+        return []
+
+    target_ids = _target_product_motifs_from_formed_bonds(
+        formed_bonds=formed_bonds,
+        formed_set=formed_set,
+    )
+    if motif_set:
+        reactive = sorted((motif_set & target_ids) & formed_in_product)
+    else:
+        reactive = sorted(formed_set & target_ids)
     if inferred_in_product:
         if reactive:
             return sorted(set(reactive) | set(inferred_in_product))
         return inferred_in_product
     if reactive:
         return reactive
+    if formed_in_product:
+        return sorted(formed_in_product)
     if formed_set:
-        return sorted(motif_set & formed_set) or sorted(formed_set)
+        return sorted(formed_set)
     return []
 
 
@@ -1382,7 +1475,15 @@ def featurize_reaction(
             bond_key=bond_key,
             formed_motifs=aggregates.get("formed_motifs", []),
             reacted_motifs=reacted_full,
+            reaction_type=rt_id,
         )
+        formed_all = sorted(str(m) for m in (aggregates.get("formed_motifs") or []) if m)
+        formed_center = sorted(set(product_motifs_reactive))
+        formed_center_set = set(formed_center)
+        formed_context = sorted(m for m in formed_all if m not in formed_center_set)
+        aggregates["formed_motifs_all"] = formed_all
+        aggregates["formed_motifs_center"] = formed_center
+        aggregates["formed_motifs_context"] = formed_context
         reacted_for_crk = _filter_reactants_for_crk(
             reacted_full,
             bond_key,

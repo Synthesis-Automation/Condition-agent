@@ -650,6 +650,8 @@ def _print_reaction_summary(
         if aggregates:
             reacted = aggregates.get("reacted_motifs", [])
             formed = aggregates.get("formed_motifs", [])
+            formed_center = aggregates.get("formed_motifs_center", [])
+            formed_context = aggregates.get("formed_motifs_context", [])
             spectators = aggregates.get("spectator_motifs", [])
             
             print("  Reaction Key Generation:")
@@ -665,7 +667,19 @@ def _print_reaction_summary(
                     formed_str = ", ".join(str(m) for m in formed)
                 else:
                     formed_str = str(formed)
-                print(f"    Formed motifs: {formed_str}")
+                print(f"    Formed motifs (all): {formed_str}")
+            if formed_center:
+                if isinstance(formed_center, list):
+                    formed_center_str = ", ".join(str(m) for m in formed_center)
+                else:
+                    formed_center_str = str(formed_center)
+                print(f"    Formed motifs (reaction-center): {formed_center_str}")
+            if formed_context:
+                if isinstance(formed_context, list):
+                    formed_context_str = ", ".join(str(m) for m in formed_context)
+                else:
+                    formed_context_str = str(formed_context)
+                print(f"    Formed motifs (context): {formed_context_str}")
 
             bond_formed = _extract_crk_section(reaction_key or "", "bond_formed")
             bond_broken = _extract_crk_section(reaction_key or "", "bond_broken")
