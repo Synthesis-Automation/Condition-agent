@@ -263,6 +263,46 @@ def test_scaffold_alias_expands_to_aromn_h() -> None:
     assert "AromN-H" in expanded
 
 
+def test_exact_match_priority_beats_fallback_alias(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    df["Reactant_A_Type"] = ["Ar-Br"]
+    df["Reactant_B_Type"] = ["Ar-B(OH)2"]
+    df["Source_Group"] = ["rules"]
+    df["Reactant_Signature_Core"] = ["Ar-B(OH)2|Ar-Br"]
+    df["Reactant_Signature_Ext"] = ["Ar-B(OH)2|Ar-Br"]
+
+    direct_key = hte._reactant_key(["Ar-Br", "Ar-B(OH)2"])
+    fallback_key = hte._reactant_key(["Ar-X", "Ar-B(OH)2"])
+    indexed_data = {
+        direct_key: df.iloc[[0]].copy(),
+        fallback_key: df.iloc[[0]].copy(),
+    }
+    reaction_type_patterns = {direct_key: hte.Counter({"Suzuki_miyaura": 1})}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "B(" in smiles:
+            return ["Ar-B(OH)2"], "Aryl Boronate"
+        return ["Ar-Br", "Ar-X"], "Aryl Halide"
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Brc1ccccc1",
+        reactant_b_smiles="OB(O)c1ccccc1",
+        top_k=1,
+        min_experiments=2,
+    )
+
+    assert result.recommendations
+    assert result.recommendations[0].match_score == 1.0
+
+
 def test_key_match_backfills_rules_and_experiments_with_aromatic_alias(monkeypatch) -> None:
     df = pd.DataFrame(
         {

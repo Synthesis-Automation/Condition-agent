@@ -21,6 +21,7 @@ import hashlib
 import pickle
 import itertools
 import re
+import logging
 import pandas as pd
 from pathlib import Path
 import json
@@ -36,6 +37,7 @@ except Exception:
     _reaction_catalog = None
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+LOGGER = logging.getLogger(__name__)
 
 
 def _infer_source_group(source_path: Optional[Path]) -> str:
@@ -354,13 +356,13 @@ def _load_hte_database_cached(
         frames.append(frame)
 
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
-    print(f"Loaded HTE database: {len(df)} experiments from {len(file_paths)} files")
+    LOGGER.info("Loaded HTE database: %s experiments from %s files", len(df), len(file_paths))
 
     indexed_data: Dict[str, pd.DataFrame] = {}
     reaction_type_patterns: Dict[str, Counter] = {}
     transformation_indices: Dict[str, pd.DataFrame] = {}
 
-    print("Building reactant type indices...")
+    LOGGER.info("Building reactant type indices...")
 
     motif_sets = _load_motif_sets()
     scope_map = _load_scope_map()
@@ -421,7 +423,11 @@ def _load_hte_database_cached(
             for key, group_df in grouped_rxn:
                 transformation_indices[key] = group_df
 
-    print(f"Indexed {len(indexed_data)} reactant combinations and {len(transformation_indices)} transformation types")
+    LOGGER.info(
+        "Indexed %s reactant combinations and %s transformation types",
+        len(indexed_data),
+        len(transformation_indices),
+    )
     _save_hte_cache(cache_dir, manifest, df, indexed_data, reaction_type_patterns, transformation_indices)
     return df, indexed_data, reaction_type_patterns, transformation_indices
 
@@ -1038,10 +1044,7 @@ def _load_aromatic_scaffold_ids() -> Set[str]:
         if group_id and "aromatic" in description:
             aromatic_ids.add(group_id)
 
-    if not aromatic_ids:
-        aromatic_ids.update(_AROMATIC_SCAFFOLD_FALLBACK)
-    else:
-        aromatic_ids.update(_AROMATIC_SCAFFOLD_FALLBACK)
+    aromatic_ids.update(_AROMATIC_SCAFFOLD_FALLBACK)
     return aromatic_ids
 
 
@@ -1846,14 +1849,6 @@ class HTERecommender:
         """
         reacted, formed, spectators = _parse_transformation_key(db_key)
         is_transform_key = "->" in str(db_key)
-        
-        # DEBUG
-        debug_mode = False
-        if debug_mode and "Ar-Br" in db_key:
-             print(f"DEBUG MATCH: {db_key}")
-             print(f"  Query Reacted: {query_reacted}")
-             print(f"  DB Reacted: {reacted}")
-             print(f"  Subset? {reacted.issubset(query_reacted if query_reacted else set())}")
 
         # 1. Core match: query must contain all 'reacted' motifs
         core_set = query_reacted if query_reacted is not None else query_motifs
@@ -1964,7 +1959,6 @@ class HTERecommender:
         
         # Group by condition combination
         condition_cols = ['Catalyst', 'Ligand', 'Base', 'Solvent']
-        optional_cols = ['Secondary Solvent', 'Additive', 'Coupling Reagent']
         
         grouped = matched_df.groupby(condition_cols, dropna=False)
         
@@ -2680,7 +2674,7 @@ class HTERecommender:
         if match_dfs:
             matched_df = pd.concat(match_dfs, axis=0)
             if 'match_priority' in matched_df.columns:
-                matched_df = matched_df.sort_values(['match_priority', 'match_score'], ascending=False)
+                matched_df = matched_df.sort_values(['match_priority', 'match_score'], ascending=[True, False])
             elif 'match_score' in matched_df.columns:
                 matched_df = matched_df.sort_values('match_score', ascending=False)
             matched_df = matched_df[~matched_df.index.duplicated(keep="first")]
@@ -3150,8 +3144,8 @@ def format_recommendation(rec: ConditionRecommendation, rank: int = 1) -> str:
         f"Success Rate: {rec.success_rate:.1f}% ({rec.num_experiments} experiments)",
         f"Avg Yield: {rec.avg_yield:.1f}% | Median: {rec.median_yield:.1f}%",
         f"Match Score: {rec.match_score:.2f}",
-        f"",
-        f"🧪 CONDITIONS:",
+        "",
+        "🧪 CONDITIONS:",
         f"  Catalyst: {rec.catalyst}",
         f"  Ligand: {rec.ligand}",
         f"  Base: {rec.base}",
@@ -3166,8 +3160,8 @@ def format_recommendation(rec: ConditionRecommendation, rank: int = 1) -> str:
         lines.append(f"  Coupling Reagent: {rec.coupling_reagent}")
     
     lines.extend([
-        f"",
-        f"📊 STATISTICS:",
+        "",
+        "📊 STATISTICS:",
         f"  Reaction Type: {rec.reaction_type}",
         f"  Z-Score: Avg={rec.avg_z_score:.2f}, Range=[{rec.z_score_range[0]:.2f}, {rec.z_score_range[1]:.2f}]",
         f"  Reactant Types: {rec.reactant_types[0]} + {rec.reactant_types[1]}"
@@ -3196,7 +3190,7 @@ def format_result(result: HTERecommendationResult) -> str:
         lines.append(f"Product: {result.product_smiles}")
 
     lines.extend([
-        f"",
+        "",
         f"🎯 PREDICTED REACTION TYPE: {result.predicted_reaction_type}",
         f"   Confidence: {result.reaction_type_confidence*100:.1f}%",
     ])
@@ -3205,13 +3199,13 @@ def format_result(result: HTERecommendationResult) -> str:
         lines.append(f"   Matched Transformation: {result.matched_motifs[0]}")
 
     lines.extend([
-        f"",
-        f"📊 DATABASE MATCH:",
+        "",
+        "📊 DATABASE MATCH:",
         f"   {result.total_matching_experiments} matching experiments",
         f"   ({result.database_coverage:.2f}% of database)",
-        f"",
+        "",
         f"🏆 TOP RECOMMENDATIONS: {len(result.recommendations)} conditions found",
-        f"   (Ranked by Average Z-Score)",
+        "   (Ranked by Average Z-Score)",
         "="*80
     ])
     
