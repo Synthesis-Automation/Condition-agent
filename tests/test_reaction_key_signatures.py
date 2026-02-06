@@ -1,6 +1,7 @@
 from chemtools.recommend.recommender import (
     _reaction_key_to_signatures,
     _reactant_types_to_signature,
+    _signature_matches,
 )
 
 
@@ -22,3 +23,8 @@ def test_reaction_key_to_signatures_empty():
 def test_reactant_types_to_signature():
     sig = _reactant_types_to_signature(["R-NH2", "Ar-Br"])
     assert sig == "Ar-Br|R-NH2"
+
+
+def test_signature_matches_aromatic_scaffold_equivalents():
+    query_sets = [set(["Ar-B(OH)2", "HeteroAr-Br"])]
+    assert _signature_matches(query_sets, "Ar-B(OH)2|Ar-Br") is True

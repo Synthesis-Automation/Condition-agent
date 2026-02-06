@@ -7,7 +7,7 @@ from chemtools.recommend.recommender import HTERecommender
 def _make_min_hte_df() -> pd.DataFrame:
     return pd.DataFrame(
         {
-            "Reaction_Type_Standardized": ["suzuki_miyaura"],
+            "Reaction_Type_Standardized": ["Suzuki_miyaura"],
             "Reactant_A_Type": ["Ar-X"],
             "Reactant_B_Type": ["Ar-X"],
             "Reactant_C_Type": [""],
@@ -261,3 +261,89 @@ def test_scaffold_alias_expands_to_aromn_h() -> None:
     expanded = hte._expand_reactant_field("Pyrazole", motif_sets, scope_map)
     assert "Pyrazole" in expanded
     assert "AromN-H" in expanded
+
+
+def test_key_match_backfills_rules_and_experiments_with_aromatic_alias(monkeypatch) -> None:
+    df = pd.DataFrame(
+        {
+            "Reaction_Type_Standardized": ["Suzuki_miyaura", "Suzuki_miyaura", "Suzuki_miyaura"],
+            "Reactant_A_Type": ["HeteroAr-Br", "Ar-Br", "Ar-Br"],
+            "Reactant_B_Type": ["Ar-B(OH)2", "Ar-B(OH)2", "Ar-B(OH)2"],
+            "Reactant_C_Type": ["", "", ""],
+            "Catalyst": ["Pd", "Ni", "Pd"],
+            "Ligand": ["PPh3", "dtbpy", "SPhos"],
+            "Base": ["K2CO3", "Cs2CO3", "K3PO4"],
+            "Solvent": ["DMF", "DMAc", "THF"],
+            "Secondary Solvent": ["", "", ""],
+            "Additive": ["", "", ""],
+            "Coupling Reagent": ["", "", ""],
+            "AREA_TOTAL_REDUCED": [85.0, 70.0, 78.0],
+            "z-Score": [2.2, 1.3, 1.6],
+            "Reactant_A_Category": ["", "", ""],
+            "Reactant_B_Category": ["", "", ""],
+            "Reaction_Category": ["", "", ""],
+            "Is_Intramolecular": [False, False, False],
+            "Source_File": ["tests", "tests", "tests"],
+            "Source_Group": ["literature", "rules", "experiments"],
+            "spectator_groups": ["", "", ""],
+            "Reactant_Signature_Core": [
+                "Ar-B(OH)2|HeteroAr-Br",
+                "Ar-B(OH)2|Ar-Br",
+                "Ar-B(OH)2|Ar-Br",
+            ],
+            "Reactant_Signature_Ext": [
+                "Ar-B(OH)2|HeteroAr-Br",
+                "Ar-B(OH)2|Ar-Br",
+                "Ar-B(OH)2|Ar-Br",
+            ],
+            "Reaction_Key": [
+                "CRK-v1 |Ar-B(OH)2|HeteroAr-Br -> Ar-Ar | bond_formed: C(ar)-C(ar)",
+                "",
+                "",
+            ],
+        }
+    )
+
+    transformation_indices = {
+        "Ar-B(OH)2|HeteroAr-Br": df.iloc[[0]].copy(),
+    }
+    indexed_data = {
+        hte._reactant_key(["Ar-B(OH)2", "Ar-Br"]): df.iloc[[1, 2]].copy(),
+    }
+    reaction_type_patterns = {
+        hte._reactant_key(["Ar-B(OH)2", "Ar-Br"]): hte.Counter({"Suzuki_miyaura": 2}),
+    }
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return [], "Unknown"
+
+    def fake_featurize_reaction(smiles: str, options=None):
+        return {
+            "reaction_type": "Suzuki_miyaura",
+            "reaction_key": "CRK-v1 |Ar-B(OH)2|HeteroAr-Br -> Ar-Ar | bond_formed: C(ar)-C(ar)",
+            "aggregates": {
+                "reacted_motifs": ["Ar-B(OH)2", "HeteroAr-Br"],
+                "formed_motifs": ["Ar-Ar"],
+                "spectator_motifs": [],
+            },
+        }
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(hte, "featurize_reaction", fake_featurize_reaction)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Brc1cccnc1",
+        reactant_b_smiles="Nc1ccccc1B(O)O",
+        product_smiles="Nc1ccccc1-c1cccnc1",
+        top_k=3,
+        min_experiments=1,
+    )
+
+    assert result.total_matching_experiments >= 3
+    assert "rules" in result.recommendations_by_source
+    assert "experiments" in result.recommendations_by_source

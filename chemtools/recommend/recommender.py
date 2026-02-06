@@ -867,8 +867,24 @@ _HALIDE_SUFFIXES = {"Cl", "Br", "I", "F"}
 _ARYL_HALIDE_MOTIFS = {"Ar-F", "Ar-Cl", "Ar-Br", "Ar-I", "Ar-X"}
 _SPECTATOR_MATCH_WEIGHT = 0.7
 _INTRAMOLECULAR_MATCH_BOOST = 1.2
+_AROMATIC_SCAFFOLD_FALLBACK = {"Ar", "HeteroAr", "AromN"}
 
 _NH_HETEROCYCLE_TAG = "nh-heteroaromatic"
+
+
+def _compound_entry_id(entry: Dict[str, Any]) -> str:
+    motif_id = str(entry.get("id") or "").strip()
+    if motif_id:
+        return motif_id
+    scaffold = str(entry.get("A") or "").strip()
+    substituent = str(entry.get("B") or "").strip()
+    if not scaffold or not substituent:
+        return ""
+    if substituent.startswith("-"):
+        substituent = substituent[1:]
+    if not substituent:
+        return ""
+    return f"{scaffold}-{substituent}"
 
 
 @lru_cache(maxsize=1)
@@ -908,7 +924,7 @@ def _load_scope_map() -> Dict[str, List[str]]:
     for entry in compounds:
         if not isinstance(entry, dict):
             continue
-        cid = str(entry.get("id") or "").strip()
+        cid = _compound_entry_id(entry)
         a_val = str(entry.get("A") or "").strip()
         b_val = str(entry.get("B") or "").strip()
         template = str(entry.get("template") or "").strip()
@@ -1002,6 +1018,68 @@ def _load_scaffold_alias_map() -> Dict[str, List[str]]:
 
 
 @lru_cache(maxsize=1)
+def _load_aromatic_scaffold_ids() -> Set[str]:
+    if not _COMPOUND_GROUPS_FILE.exists():
+        return set(_AROMATIC_SCAFFOLD_FALLBACK)
+    try:
+        with _COMPOUND_GROUPS_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return set(_AROMATIC_SCAFFOLD_FALLBACK)
+
+    aromatic_ids: Set[str] = set()
+    for entry in payload.get("groups", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        if str(entry.get("kind") or "").strip() != "scaffold":
+            continue
+        group_id = str(entry.get("id") or "").strip()
+        description = str(entry.get("description") or "").lower()
+        if group_id and "aromatic" in description:
+            aromatic_ids.add(group_id)
+
+    if not aromatic_ids:
+        aromatic_ids.update(_AROMATIC_SCAFFOLD_FALLBACK)
+    else:
+        aromatic_ids.update(_AROMATIC_SCAFFOLD_FALLBACK)
+    return aromatic_ids
+
+
+@lru_cache(maxsize=1)
+def _load_motif_compatibility_map() -> Dict[str, Set[str]]:
+    if not _COMPOUND_SCOPE_FILE.exists():
+        return {}
+    try:
+        with _COMPOUND_SCOPE_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return {}
+
+    aromatic_scaffolds = _load_aromatic_scaffold_ids()
+    by_substituent: Dict[str, Set[str]] = defaultdict(set)
+    for entry in payload.get("compounds", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        motif_id = _compound_entry_id(entry)
+        scaffold = str(entry.get("A") or "").strip()
+        substituent = str(entry.get("B") or "").strip()
+        if not motif_id or not scaffold or not substituent:
+            continue
+        if scaffold in aromatic_scaffolds:
+            by_substituent[substituent].add(motif_id)
+
+    compatibility: Dict[str, Set[str]] = {}
+    for members in by_substituent.values():
+        if len(members) < 2:
+            continue
+        for motif_id in members:
+            others = members - {motif_id}
+            if others:
+                compatibility[motif_id] = set(others)
+    return compatibility
+
+
+@lru_cache(maxsize=1)
 def _load_compound_tags() -> Dict[str, Set[str]]:
     if not _COMPOUND_SCOPE_FILE.exists():
         return {}
@@ -1016,7 +1094,7 @@ def _load_compound_tags() -> Dict[str, Set[str]]:
     for entry in compounds:
         if not isinstance(entry, dict):
             continue
-        cid = str(entry.get("id") or "").strip()
+        cid = _compound_entry_id(entry)
         if not cid:
             continue
         tags: Set[str] = set()
@@ -1043,7 +1121,7 @@ def _load_compound_ids() -> Set[str]:
     for entry in compounds:
         if not isinstance(entry, dict):
             continue
-        cid = str(entry.get("id") or "").strip()
+        cid = _compound_entry_id(entry)
         if cid:
             ids.add(cid)
     return ids
@@ -1066,6 +1144,7 @@ def _filter_generic_motifs(motifs: Iterable[str]) -> List[str]:
 
 def _expand_parent_motifs(motifs: Iterable[str]) -> List[str]:
     compound_ids = _load_compound_ids()
+    compatibility = _load_motif_compatibility_map()
     expanded = list(motifs)
     alias_map = _load_scaffold_alias_map()
     for motif in motifs:
@@ -1073,6 +1152,9 @@ def _expand_parent_motifs(motifs: Iterable[str]) -> List[str]:
         aliases = alias_map.get(text) or []
         if aliases:
             expanded.extend(aliases)
+        compat_members = compatibility.get(text) or set()
+        if compat_members:
+            expanded.extend(sorted(compat_members))
         if "-" not in text:
             continue
         prefix, suffix = text.rsplit("-", 1)
@@ -1140,6 +1222,71 @@ def _split_motif_tokens(value: Any) -> List[str]:
     return [token.strip() for token in _MOTIF_SPLIT_RE.split(text) if token.strip()]
 
 
+@lru_cache(maxsize=4096)
+def _expanded_match_tokens(token: str) -> Set[str]:
+    text = str(token).strip()
+    if not text:
+        return set()
+    expanded: Set[str] = {text}
+    alias_map = _load_scaffold_alias_map()
+    expanded.update(alias_map.get(text) or [])
+    expanded.update(_load_motif_compatibility_map().get(text) or set())
+
+    compound_ids = _load_compound_ids()
+    for member in list(expanded):
+        if "-" not in member:
+            continue
+        prefix, suffix = member.rsplit("-", 1)
+        if suffix in _HALIDE_SUFFIXES:
+            generic = f"{prefix}-X"
+            if generic in compound_ids:
+                expanded.add(generic)
+    return expanded
+
+
+def _motif_tokens_compatible(left: str, right: str) -> bool:
+    left_text = str(left).strip()
+    right_text = str(right).strip()
+    if not left_text or not right_text:
+        return False
+    if left_text == right_text:
+        return True
+    left_expanded = _expanded_match_tokens(left_text)
+    right_expanded = _expanded_match_tokens(right_text)
+    if not left_expanded or not right_expanded:
+        return False
+    if right_text in left_expanded or left_text in right_expanded:
+        return True
+    return bool(left_expanded & right_expanded)
+
+
+def _token_set_subset_compatible(required: Set[str], available: Set[str]) -> bool:
+    if not required:
+        return True
+    if not available:
+        return False
+    for req in required:
+        if not any(_motif_tokens_compatible(req, cand) for cand in available):
+            return False
+    return True
+
+
+def _token_set_overlap_compatible(left: Set[str], right: Set[str]) -> int:
+    if not left or not right:
+        return 0
+    used_right: Set[str] = set()
+    overlap = 0
+    for left_token in sorted(left):
+        for right_token in sorted(right):
+            if right_token in used_right:
+                continue
+            if _motif_tokens_compatible(left_token, right_token):
+                used_right.add(right_token)
+                overlap += 1
+                break
+    return overlap
+
+
 def _signature_matches(query_sets: Iterable[Set[str]], value: Any) -> bool:
     tokens = set(_split_motif_tokens(value))
     if not tokens:
@@ -1147,7 +1294,9 @@ def _signature_matches(query_sets: Iterable[Set[str]], value: Any) -> bool:
     for query_tokens in query_sets:
         if not query_tokens:
             continue
-        if tokens.issubset(query_tokens) or query_tokens.issubset(tokens):
+        if _token_set_subset_compatible(tokens, query_tokens) or _token_set_subset_compatible(
+            query_tokens, tokens
+        ):
             return True
     return False
 
@@ -1711,10 +1860,12 @@ class HTERecommender:
         if not reacted or not core_set:
             return 0.0
         if is_transform_key:
-            core_match = reacted.issubset(core_set)
+            core_match = _token_set_subset_compatible(reacted, core_set)
         else:
             # Signature-style key: allow query motifs to be a subset of a broader DB signature.
-            core_match = reacted.issubset(core_set) or core_set.issubset(reacted)
+            core_match = _token_set_subset_compatible(reacted, core_set) or _token_set_subset_compatible(
+                core_set, reacted
+            )
         if not core_match:
             return 0.0
             
@@ -1731,9 +1882,9 @@ class HTERecommender:
             # DB has spectators but query doesn't
             spectator_score = 0.5
         else:
-            intersection = spectators & query_spectators
-            union = spectators | query_spectators
-            spectator_score = len(intersection) / len(union)
+            overlap = _token_set_overlap_compatible(spectators, query_spectators)
+            union_count = len(spectators) + len(query_spectators) - overlap
+            spectator_score = (overlap / union_count) if union_count else 1.0
 
         base_score = 0.5 + (0.5 * spectator_score)
 
@@ -1747,11 +1898,12 @@ class HTERecommender:
         elif not query_formed:
             formed_score = 0.6
         else:
-            formed_union = formed | query_formed
-            if not formed_union:
+            formed_overlap = _token_set_overlap_compatible(formed, query_formed)
+            formed_union_count = len(formed) + len(query_formed) - formed_overlap
+            if formed_union_count <= 0:
                 formed_score = 0.5
             else:
-                formed_score = len(formed & query_formed) / len(formed_union)
+                formed_score = formed_overlap / formed_union_count
 
         formed_multiplier = 1.0 + (0.1 * formed_score)
         return base_score * (0.7 + 0.3 * formed_score) * formed_multiplier
@@ -2269,6 +2421,22 @@ class HTERecommender:
         if reaction_key_only and not (result.query_reaction_key or query_core_signature or query_ext_signature):
             return result
         
+        lookup_type_a = list(type_a)
+        lookup_type_b = list(type_b)
+        lookup_collapsed_a = collapsed_a
+        lookup_collapsed_b = collapsed_b
+        if not lookup_type_a and not lookup_type_b and query_reacted:
+            reacted_seed = _prioritize_motifs(sorted(query_reacted), query_reacted, query_spectators or set())
+            if reacted_seed:
+                if len(reacted_seed) > 1:
+                    lookup_type_a = [reacted_seed[0]]
+                    lookup_type_b = reacted_seed[1:]
+                else:
+                    lookup_type_a = [reacted_seed[0]]
+                    lookup_type_b = []
+                lookup_collapsed_a = _collapse_motif_tokens(lookup_type_a)
+                lookup_collapsed_b = _collapse_motif_tokens(lookup_type_b)
+
         # Step 3: Match against database (reaction-key first)
         query_motifs = set(type_a) | set(type_b)
         if query_core_signature:
@@ -2350,7 +2518,7 @@ class HTERecommender:
                 best_key = best_match["Reaction_Type_Standardized"].iloc[0]
             result.matched_motifs = (best_key, "")
 
-        key = _reactant_key([collapsed_a, collapsed_b])
+        key = _reactant_key([lookup_collapsed_a, lookup_collapsed_b])
         direct_match: Optional[pd.DataFrame] = None
         direct_key: Optional[str] = None
         fallback_used = False
@@ -2358,7 +2526,28 @@ class HTERecommender:
         spectator_set = query_spectators or set()
 
         has_query_key = bool(result.query_reaction_key or query_core_signature or query_ext_signature)
-        if not has_query_key:
+        allow_direct_backfill = False
+        if has_query_key and not reaction_key_only:
+            matched_groups: Set[str] = set()
+            current_match_count = 0
+            for frame in match_dfs:
+                if frame is None or frame.empty:
+                    continue
+                current_match_count += len(frame)
+                if "Source_Group" not in frame.columns:
+                    continue
+                labels = frame["Source_Group"].fillna("").astype(str).str.strip()
+                for label in labels:
+                    normalized = _normalize_source_group(label)
+                    if normalized:
+                        matched_groups.add(normalized)
+            if current_match_count < min_experiments:
+                allow_direct_backfill = True
+            elif not source_group:
+                required_groups = {"rules", "experiments"}
+                allow_direct_backfill = bool(required_groups - matched_groups)
+
+        if not has_query_key or allow_direct_backfill:
             if key in self.indexed_data:
                 direct_match = self.indexed_data[key].copy()
                 direct_key = key
@@ -2372,8 +2561,8 @@ class HTERecommender:
                     direct_match['match_priority'] = 0
                     _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
                     if not result.matched_motifs:
-                        pick_a = _prioritize_motifs(type_a, reacted_set, spectator_set)
-                        pick_b = _prioritize_motifs(type_b, reacted_set, spectator_set)
+                        pick_a = _prioritize_motifs(lookup_type_a, reacted_set, spectator_set)
+                        pick_b = _prioritize_motifs(lookup_type_b, reacted_set, spectator_set)
                         if pick_a or pick_b:
                             result.matched_motifs = (
                                 pick_a[0] if pick_a else "",
@@ -2382,8 +2571,8 @@ class HTERecommender:
                         else:
                             result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
             if direct_match is None:
-                list_a = _prioritize_motifs(type_a, reacted_set, spectator_set) or [""]
-                list_b = _prioritize_motifs(type_b, reacted_set, spectator_set) or [""]
+                list_a = _prioritize_motifs(lookup_type_a, reacted_set, spectator_set) or [""]
+                list_b = _prioritize_motifs(lookup_type_b, reacted_set, spectator_set) or [""]
                 for ma in list_a:
                     for mb in list_b:
                         if not ma and not mb:
@@ -2410,7 +2599,7 @@ class HTERecommender:
         
         fallback_match: Optional[pd.DataFrame] = None
         expand_for_coverage = False
-        if not has_query_key:
+        if not has_query_key or allow_direct_backfill:
             if (
                 direct_match is not None
                 and self.df is not None
@@ -2426,8 +2615,8 @@ class HTERecommender:
                 direct_match is not None and len(direct_match) < min_experiments
             ) or expand_for_coverage
             if should_expand:
-                tiers_a = _build_fallback_tiers(type_a, reacted_set, spectator_set)
-                tiers_b = _build_fallback_tiers(type_b, reacted_set, spectator_set)
+                tiers_a = _build_fallback_tiers(lookup_type_a, reacted_set, spectator_set)
+                tiers_b = _build_fallback_tiers(lookup_type_b, reacted_set, spectator_set)
                 tier_pairs: List[Tuple[int, int, int, List[str], List[str]]] = []
                 for idx_a, list_a in enumerate(tiers_a):
                     for idx_b, list_b in enumerate(tiers_b):
