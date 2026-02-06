@@ -34,7 +34,7 @@ def get_crk_options() -> Dict[str, Any]:
         "include_agent_roles": False,
         "motif_site_filter": "substituent",
         "confirm_coupling_products": True,
-        "discovery_mode": True,
+        "discovery_mode": False,
         "reactant_coverage_guard": True,
     }
 
