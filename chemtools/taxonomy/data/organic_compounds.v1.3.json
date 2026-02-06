@@ -285,6 +285,18 @@
     {
       "template": "single_bond",
       "A": "HeteroAr",
+      "B": "-NC",
+      "description": "Heteroaryl isonitrile (HeteroAr-NC)."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-CN",
+      "description": "Heteroaryl nitrile (HeteroAr-CN)."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
       "B": "-N2+",
       "description": "Heteroaryl diazonium cation (HeteroAr-N2+), intermediate for Sandmeyer reaction."
     },
@@ -737,6 +749,12 @@
       "A": "Ar",
       "B": "-CN",
       "description": "Aryl nitrile (Ar-CN)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-NC",
+      "description": "Aryl isonitrile (Ar-NC)."
     },
     {
       "template": "single_bond",

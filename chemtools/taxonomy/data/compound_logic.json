@@ -92,8 +92,8 @@
       ]
     },
     "amines_nh": {
-      "name": "N-H Amines",
-      "description": "Primary/secondary amines and N-H heterocycles for C-N coupling.",
+      "name": "N-H Nitrogen Nucleophiles",
+      "description": "Primary/secondary amines, N-H heterocycles, and N-H amide/sulfonamide nucleophiles for C-N coupling.",
       "members": [
         "Ar-NH2",
         "Ar-NHR",
@@ -117,6 +117,16 @@
         "R3C-NH2",
         "R3C-NHR",
         "AromN-H",
+        "Alkyl-CONH2",
+        "Alkyl-CONHR",
+        "Ar-CONH2",
+        "Ar-CONHR",
+        "HeteroAr-CONH2",
+        "HeteroAr-CONHR",
+        "Alkyl-SO2NH2",
+        "Alkyl-SO2NHR",
+        "Ar-SO2NH2",
+        "Ar-SO2NHR",
         "Ar-NHCOR",
         "Alkyl-NHCOR"
       ],
@@ -287,7 +297,19 @@
       "name": "Aryl Amides",
       "description": "N-aryl amide products (N-acyl anilides).",
       "members": [
+        "Ar-NHCOR",
+        "HeteroAr-NHCOR",
         "Ar-NRCOR"
+      ],
+      "usage": [
+        "C_N_Coupling"
+      ]
+    },
+    "aryl_sulfonamides": {
+      "name": "Aryl Sulfonamides",
+      "description": "N-aryl sulfonamide products from C-N coupling.",
+      "members": [
+        "Ar-N(R)SO2R"
       ],
       "usage": [
         "C_N_Coupling"

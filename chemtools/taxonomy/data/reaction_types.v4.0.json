@@ -90,7 +90,8 @@
       "products": {
         "product": [
           "@aryl_amines",
-          "@aryl_amides"
+          "@aryl_amides",
+          "@aryl_sulfonamides"
         ]
       },
       "catalysts": [
