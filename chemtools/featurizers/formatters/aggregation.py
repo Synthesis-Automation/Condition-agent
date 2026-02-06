@@ -18,7 +18,7 @@ from ..spectator_rank import rank_spectator_groups
 from .utils import extract_scores, group_id_from_motif_id, normalize_motif_id
 
 
-_SPECTATOR_GROUP_STOPLIST = {
+_DEFAULT_SPECTATOR_GROUP_STOPLIST = {
     "Ar", "R", "Any", "Alkyl", "Alkenyl", "Alkynyl", "H",
 }
 
@@ -34,6 +34,25 @@ def _load_group_sets() -> Dict[str, Any]:
         return {}
     group_sets = payload.get("group_sets", {}) or {}
     return group_sets if isinstance(group_sets, dict) else {}
+
+
+@lru_cache(maxsize=1)
+def _load_spectator_group_stoplist() -> Set[str]:
+    try:
+        from chemtools.taxonomy import loader as taxonomy_loader
+    except Exception:
+        return set(_DEFAULT_SPECTATOR_GROUP_STOPLIST)
+    payload = taxonomy_loader.load_featurizer_logic()
+    if not payload:
+        return set(_DEFAULT_SPECTATOR_GROUP_STOPLIST)
+    aggregation = payload.get("aggregation", {}) or {}
+    if not isinstance(aggregation, dict):
+        return set(_DEFAULT_SPECTATOR_GROUP_STOPLIST)
+    stoplist = aggregation.get("spectator_group_stoplist", [])
+    if not isinstance(stoplist, list):
+        return set(_DEFAULT_SPECTATOR_GROUP_STOPLIST)
+    configured = {str(v) for v in stoplist if isinstance(v, str) and v.strip()}
+    return configured or set(_DEFAULT_SPECTATOR_GROUP_STOPLIST)
 
 
 def _expand_group_set(
@@ -676,7 +695,7 @@ def aggregate_reaction_features(
             if motif_id not in spectator_motifs_set:
                 continue
             group_id = group_id_from_motif_id(motif_id)
-            if not group_id or group_id in _SPECTATOR_GROUP_STOPLIST:
+            if not group_id or group_id in _load_spectator_group_stoplist():
                 continue
             if group_id in spectator_seen:
                 continue

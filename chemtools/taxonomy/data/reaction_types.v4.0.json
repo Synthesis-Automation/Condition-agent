@@ -23,7 +23,10 @@
         "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
       ],
       "aliases": [
-        "suzuki_miyaura"
+        "suzuki_miyaura",
+        "Suzuki",
+        "Suzuki-Miyaura",
+        "Suzuki_CC"
       ]
     },
     {
@@ -65,7 +68,12 @@
         "Ni-catalyzed amination",
         "buchwald_hartwig_cn",
         "ullmann_cn",
-        "c_n_cross_coupling"
+        "c_n_cross_coupling",
+        "Buchwald_CN",
+        "ChanLam_Narylation",
+        "UllmannGoldberg_Narylation",
+        "buchwald_hartwig_c_n",
+        "cn_coupling"
       ],
       "description": "Aryl amination via C-N cross-coupling; named variants differ mainly by catalyst.",
       "metadata": {
@@ -196,7 +204,6 @@
           "Pd": "Buchwald-Hartwig",
           "Cu": "Ullmann",
           "Ni": "Ni-catalyzed"
-
         }
       }
     },
@@ -221,7 +228,9 @@
         "Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1"
       ],
       "aliases": [
-        "sonogashira"
+        "sonogashira",
+        "Sonogashira_CC",
+        "Sonogashira_coupling"
       ]
     },
     {
@@ -243,7 +252,8 @@
         "Brc1ccccc1.C=Cc1ccccc1>>c1ccc(/C=C/c2ccccc2)cc1"
       ],
       "aliases": [
-        "heck"
+        "heck",
+        "HeckMizoroki_coupling"
       ]
     },
     {
@@ -267,7 +277,8 @@
         "Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1"
       ],
       "aliases": [
-        "negishi"
+        "negishi",
+        "Negishi_coupling"
       ]
     },
     {
@@ -290,7 +301,8 @@
         "Brc1ccccc1.c1ccc(Sn(C)C)cc1>>c1ccc(-c2ccccc2)cc1"
       ],
       "aliases": [
-        "stille"
+        "stille",
+        "Stille_coupling"
       ]
     },
     {
@@ -314,7 +326,8 @@
         "Brc1ccccc1.c1ccc(MgBr)cc1>>c1ccc(-c2ccccc2)cc1"
       ],
       "aliases": [
-        "kumada"
+        "kumada",
+        "Kumada_coupling"
       ]
     },
     {
@@ -337,7 +350,8 @@
         "Brc1ccccc1.c1ccc(Si(OC)3)cc1>>c1ccc(-c2ccccc2)cc1"
       ],
       "aliases": [
-        "hiyama"
+        "hiyama",
+        "Hiyama_coupling"
       ]
     },
     {
@@ -674,7 +688,17 @@
         "Clc1ncccn1.NCC>>NCCNc1ncccn1"
       ],
       "aliases": [
-        "snar_cn"
+        "snar_cn",
+        "Aromatic_Nucleophilic_Substitution",
+        "SNAr",
+        "SNAr-CN",
+        "SNAr-CO",
+        "SNAr-CS",
+        "SNAr_amination",
+        "S_NAr",
+        "aromatic_nucleophilic_substitution",
+        "s_nar",
+        "snar"
       ],
       "metadata": {
         "feasibility": {
@@ -692,8 +716,14 @@
             }
           },
           "electrophile_types": [
-            "Ar-Cl", "Ar-Br", "Ar-I", "Ar-F",
-            "AromN-Cl", "AromN-Br", "AromN-I", "AromN-F"
+            "Ar-Cl",
+            "Ar-Br",
+            "Ar-I",
+            "Ar-F",
+            "AromN-Cl",
+            "AromN-Br",
+            "AromN-I",
+            "AromN-F"
           ]
         }
       }
@@ -730,7 +760,10 @@
         "CC(=O)O.CCO>>CC(=O)OCC"
       ],
       "aliases": [
-        "esterification"
+        "esterification",
+        "Ester_formation",
+        "Fischer_esterification",
+        "Steglich_esterification"
       ]
     },
     {
@@ -783,7 +816,9 @@
         "C=CCCC=C>>C1=CCCC1"
       ],
       "aliases": [
-        "ring_closing_metathesis"
+        "ring_closing_metathesis",
+        "Olefin_metathesis",
+        "RCM"
       ]
     },
     {
@@ -888,7 +923,18 @@
         "halogenation",
         "bromination",
         "chlorination",
-        "iodination"
+        "iodination",
+        "Aliphatic_Halide_Exchange",
+        "Appel_halogenation",
+        "Aromatic_Halogen_Exchange",
+        "BalzSchiemann",
+        "Chlorination_SOCl2_oxalyl_chloride",
+        "Deoxy_fluorination",
+        "Difluoromethylation",
+        "Electrophilic_fluorination",
+        "NBS_NCS_NIS_halogenation",
+        "Sandmeyer_reactions",
+        "Trifluoromethylation"
       ]
     },
     {

@@ -5,7 +5,6 @@ Motif-based steric and electronic analysis using organic compound motifs.
 from __future__ import annotations
 
 from functools import lru_cache
-import json
 from pathlib import Path
 from typing import Any, Dict, Optional, List
 
@@ -19,15 +18,15 @@ from .nearby_groups import analyze_nearby_groups
 from .motifs.detection import detect_motifs
 from .motifs.registry import build_compound_registry, _default_registry_paths
 
-_INORGANIC_SMARTS = (
+_DEFAULT_INORGANIC_SMARTS = (
     "O=C=O",
     "[CX3](=O)([O-])[O-]",
     "[CX3](=O)([O-])O",
     "[CX3](=O)(O)O",
     "[OX2H]C(=O)[O-]",
 )
-_BACKGROUND_MOTIF_IDS = {"Ar-H", "R-H", "Any-H", "Alkyl-H", "Alkenyl-H", "Alkynyl-H"}
-_ARYL_PREFIXES = (
+_DEFAULT_BACKGROUND_MOTIF_IDS = {"Ar-H", "R-H", "Any-H", "Alkyl-H", "Alkenyl-H", "Alkynyl-H"}
+_DEFAULT_ARYL_PREFIXES = (
     "Ar-",
     "AromN-",
     "Pyridine-",
@@ -40,7 +39,7 @@ _ARYL_PREFIXES = (
     "Quinoline-",
     "Isoquinoline-",
 )
-_ALKYL_PREFIXES = (
+_DEFAULT_ALKYL_PREFIXES = (
     "R-",
     "Bn-",
     "Allyl-",
@@ -57,12 +56,98 @@ _ALKYL_PREFIXES = (
     "H-",
 )
 
+_DEFAULT_ORGANOMETAL_B_GROUPS = {
+    "B_Any",
+    "B(OH)2",
+    "B(OR)2",
+    "Bpin",
+    "BF3K",
+    "Zn",
+    "Mg",
+    "Sn",
+    "Si",
+}
+_DEFAULT_ORGANOMETAL_REACTIVITY_BONUS = 4.0
+_DEFAULT_REACTANT_MOTIF_BONUS = 2.0
+
+
+@lru_cache(maxsize=1)
+def _load_molecule_logic() -> Dict[str, Any]:
+    try:
+        from ..taxonomy import loader as taxonomy_loader
+    except Exception:
+        return {}
+    payload = taxonomy_loader.load_featurizer_logic()
+    if not payload:
+        return {}
+    section = payload.get("molecule", {}) or {}
+    return section if isinstance(section, dict) else {}
+
+
+def _inorganic_smarts() -> List[str]:
+    logic = _load_molecule_logic()
+    values = logic.get("inorganic_smarts", [])
+    if isinstance(values, list):
+        items = [str(v) for v in values if isinstance(v, str) and v.strip()]
+        if items:
+            return items
+    return list(_DEFAULT_INORGANIC_SMARTS)
+
+
+def _background_motif_ids() -> set[str]:
+    logic = _load_molecule_logic()
+    values = logic.get("background_motif_ids", [])
+    if isinstance(values, list):
+        items = {str(v) for v in values if isinstance(v, str) and v.strip()}
+        if items:
+            return items
+    return set(_DEFAULT_BACKGROUND_MOTIF_IDS)
+
+
+def _motif_family_prefixes() -> tuple[tuple[str, ...], tuple[str, ...]]:
+    logic = _load_molecule_logic()
+    family = logic.get("motif_family_prefixes", {}) or {}
+    if not isinstance(family, dict):
+        return _DEFAULT_ARYL_PREFIXES, _DEFAULT_ALKYL_PREFIXES
+    aryl = family.get("aryl")
+    alkyl = family.get("alkyl")
+    aryl_prefixes = tuple(str(v) for v in aryl if isinstance(v, str) and v.strip()) if isinstance(aryl, list) else ()
+    alkyl_prefixes = tuple(str(v) for v in alkyl if isinstance(v, str) and v.strip()) if isinstance(alkyl, list) else ()
+    return (
+        aryl_prefixes or _DEFAULT_ARYL_PREFIXES,
+        alkyl_prefixes or _DEFAULT_ALKYL_PREFIXES,
+    )
+
+
+def _motif_ranking_rules() -> tuple[set[str], float, float]:
+    logic = _load_molecule_logic()
+    ranking = logic.get("motif_ranking", {}) or {}
+    if not isinstance(ranking, dict):
+        return (
+            set(_DEFAULT_ORGANOMETAL_B_GROUPS),
+            _DEFAULT_ORGANOMETAL_REACTIVITY_BONUS,
+            _DEFAULT_REACTANT_MOTIF_BONUS,
+        )
+    raw_groups = ranking.get("organometal_group_b", [])
+    groups = (
+        {str(v) for v in raw_groups if isinstance(v, str) and v.strip()}
+        if isinstance(raw_groups, list)
+        else set()
+    )
+    organometal_bonus = ranking.get("organometal_bonus", _DEFAULT_ORGANOMETAL_REACTIVITY_BONUS)
+    reactant_bonus = ranking.get("reactant_motif_bonus", _DEFAULT_REACTANT_MOTIF_BONUS)
+    return (
+        groups or set(_DEFAULT_ORGANOMETAL_B_GROUPS),
+        float(organometal_bonus),
+        float(reactant_bonus),
+    )
+
 
 def _is_inorganic_molecule(mol: Any) -> bool:
     has_carbon = any(atom.GetAtomicNum() == 6 for atom in mol.GetAtoms())
     if not has_carbon:
         return True
-    for smarts in _INORGANIC_SMARTS:
+    for smarts in _inorganic_smarts():
         pattern = compile_smarts(smarts, validate=False)
         if pattern and mol.HasSubstructMatch(pattern):
             return True
@@ -153,24 +238,26 @@ def _filter_background_motifs(
 ) -> List[Dict[str, Any]]:
     if include_h_motifs:
         return motifs
+    background_ids = _background_motif_ids()
 
-    non_background = [m for m in motifs if m.get("compound_id") not in _BACKGROUND_MOTIF_IDS]
+    non_background = [m for m in motifs if m.get("compound_id") not in background_ids]
     if non_background:
         return [
             m
             for m in motifs
-            if m.get("compound_id") not in _BACKGROUND_MOTIF_IDS
+            if m.get("compound_id") not in background_ids
             or m.get("compound_id") in requested_ids
         ]
     return motifs
 
 
 def _dedupe_background_motifs(motifs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    background_ids = _background_motif_ids()
     seen: set[str] = set()
     deduped: List[Dict[str, Any]] = []
     for motif in motifs:
         compound_id = motif.get("compound_id")
-        if compound_id in _BACKGROUND_MOTIF_IDS:
+        if compound_id in background_ids:
             if compound_id in seen:
                 continue
             seen.add(compound_id)
@@ -179,43 +266,31 @@ def _dedupe_background_motifs(motifs: List[Dict[str, Any]]) -> List[Dict[str, An
 
 
 def _motif_family(compound_id: str) -> Optional[str]:
-    if compound_id.startswith(_ARYL_PREFIXES):
+    aryl_prefixes, alkyl_prefixes = _motif_family_prefixes()
+    if compound_id.startswith(aryl_prefixes):
         return "aryl"
-    if compound_id.startswith(_ALKYL_PREFIXES):
+    if compound_id.startswith(alkyl_prefixes):
         return "alkyl"
     return None
 
 
-_ORGANOMETAL_B_GROUPS = {
-    "B_Any",
-    "B(OH)2",
-    "B(OR)2",
-    "Bpin",
-    "BF3K",
-    "Zn",
-    "Mg",
-    "Sn",
-    "Si",
-}
-_ORGANOMETAL_REACTIVITY_BONUS = 4.0
-_REACTANT_MOTIF_BONUS = 2.0
-
-
 @lru_cache(maxsize=1)
 def _load_reaction_reactant_motifs() -> set[str]:
-    base = Path(__file__).resolve().parents[1] / "taxonomy" / "data"
-    rt_path = base / "reaction_types.v4.0.json"
-    logic_path = base / "compound_logic.json"
-    if not rt_path.exists() or not logic_path.exists():
-        return set()
     try:
-        with rt_path.open("r", encoding="utf-8") as handle:
-            reaction_types = json.load(handle).get("reaction_types", []) or []
-        with logic_path.open("r", encoding="utf-8") as handle:
-            logic_data = json.load(handle)
+        from ..taxonomy import loader as taxonomy_loader
     except Exception:
         return set()
-    motif_sets = logic_data.get("motif_sets", {}) or {}
+
+    reaction_payload = taxonomy_loader.load_reaction_types_raw()
+    logic_data = taxonomy_loader.load_compound_logic()
+    reaction_types = reaction_payload.get("reaction_types", []) or []
+    if not reaction_types or not logic_data:
+        return set()
+
+    try:
+        motif_sets = logic_data.get("motif_sets", {}) or {}
+    except Exception:
+        motif_sets = {}
     out: set[str] = set()
 
     def add_value(value: Any) -> None:
@@ -253,27 +328,29 @@ def _load_reaction_reactant_motifs() -> set[str]:
 
 
 def _motif_rank_score(hit: Dict[str, Any]) -> float:
+    organometal_groups, organometal_bonus, reactant_motif_bonus = _motif_ranking_rules()
     reactivity = float(hit.get("reactivity_weight") or 0.0)
     group_b = hit.get("group_b")
-    if group_b in _ORGANOMETAL_B_GROUPS:
-        reactivity += _ORGANOMETAL_REACTIVITY_BONUS
+    if group_b in organometal_groups:
+        reactivity += organometal_bonus
     compound_id = hit.get("compound_id")
     if compound_id and compound_id in _load_reaction_reactant_motifs():
-        reactivity += _REACTANT_MOTIF_BONUS
+        reactivity += reactant_motif_bonus
     priority = int(hit.get("priority") or 0)
     complexity = int(hit.get("complexity") or 0)
     return (reactivity * 100.0) + (priority * 10.0) + complexity
 
 
 def _motif_rank_breakdown(hit: Dict[str, Any]) -> Dict[str, Any]:
+    organometal_groups, organometal_bonus, reactant_motif_bonus = _motif_ranking_rules()
     compound_id = hit.get("compound_id")
     group_b = hit.get("group_b")
     base_reactivity = float(hit.get("reactivity_weight") or 0.0)
-    organometal_bonus = _ORGANOMETAL_REACTIVITY_BONUS if group_b in _ORGANOMETAL_B_GROUPS else 0.0
+    organometal_bonus_value = organometal_bonus if group_b in organometal_groups else 0.0
     reactant_bonus = 0.0
     if compound_id and compound_id in _load_reaction_reactant_motifs():
-        reactant_bonus = _REACTANT_MOTIF_BONUS
-    reactivity_total = base_reactivity + organometal_bonus + reactant_bonus
+        reactant_bonus = reactant_motif_bonus
+    reactivity_total = base_reactivity + organometal_bonus_value + reactant_bonus
     priority = int(hit.get("priority") or 0)
     complexity = int(hit.get("complexity") or 0)
     score = (reactivity_total * 100.0) + (priority * 10.0) + complexity
@@ -281,7 +358,7 @@ def _motif_rank_breakdown(hit: Dict[str, Any]) -> Dict[str, Any]:
         "compound_id": compound_id,
         "group_b": group_b,
         "base_reactivity": base_reactivity,
-        "organometal_bonus": organometal_bonus,
+        "organometal_bonus": organometal_bonus_value,
         "reactant_bonus": reactant_bonus,
         "reactivity_total": reactivity_total,
         "priority": priority,
@@ -314,13 +391,12 @@ def print_motif_rank_breakdown(motifs: List[Dict[str, Any]]) -> None:
 
 @lru_cache(maxsize=1)
 def _load_heterocycle_scaffold_ids() -> set[str]:
-    path = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
-    if not path.exists():
-        return set()
     try:
-        with path.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
+        from ..taxonomy import loader as taxonomy_loader
     except Exception:
+        return set()
+    payload = taxonomy_loader.load_scaffold_motifs()
+    if not payload:
         return set()
     heterocycles: set[str] = set()
     for entry in payload.get("compounds", []) or []:

@@ -5,18 +5,18 @@ Spectator group ranking utilities.
 from __future__ import annotations
 
 from functools import lru_cache
-import json
-from pathlib import Path
 from typing import Iterable, List, Set
 
-_HETEROCYCLE_WEIGHT = 5.0
-_AMINE_WEIGHT = 4.0
-_ACID_WEIGHT = 3.0
-_ALCOHOL_WEIGHT = 2.0
-_THIOL_WEIGHT = 1.5
-_DEFAULT_WEIGHT = 1.0
+_DEFAULT_WEIGHTS = {
+    "default": 1.0,
+    "scaffold": 5.0,
+    "amine": 4.0,
+    "acid": 3.0,
+    "alcohol": 2.0,
+    "thiol": 1.5,
+}
 
-_AMINE_GROUPS = {
+_DEFAULT_AMINE_GROUPS = {
     "NH2",
     "NHR",
     "NR2",
@@ -27,7 +27,7 @@ _AMINE_GROUPS = {
     "Hydrazine",
 }
 
-_ACID_GROUPS = {
+_DEFAULT_ACID_GROUPS = {
     "CO2H",
     "SO3H",
     "PO3H2",
@@ -35,19 +35,55 @@ _ACID_GROUPS = {
     "PO2H2",
 }
 
-_ALCOHOL_GROUPS = {"OH"}
-_THIOL_GROUPS = {"SH"}
+_DEFAULT_ALCOHOL_GROUPS = {"OH"}
+_DEFAULT_THIOL_GROUPS = {"SH"}
+
+
+@lru_cache(maxsize=1)
+def _load_spectator_logic() -> dict:
+    try:
+        from ..taxonomy import loader as taxonomy_loader
+    except Exception:
+        return {}
+    payload = taxonomy_loader.load_featurizer_logic()
+    if not payload:
+        return {}
+    section = payload.get("spectator_rank", {}) or {}
+    return section if isinstance(section, dict) else {}
+
+
+def _configured_weight(name: str) -> float:
+    logic = _load_spectator_logic()
+    weights = logic.get("weights", {}) or {}
+    if not isinstance(weights, dict):
+        return float(_DEFAULT_WEIGHTS[name])
+    value = weights.get(name, _DEFAULT_WEIGHTS[name])
+    try:
+        return float(value)
+    except Exception:
+        return float(_DEFAULT_WEIGHTS[name])
+
+
+def _configured_group_set(name: str, default: Set[str]) -> Set[str]:
+    logic = _load_spectator_logic()
+    group_sets = logic.get("group_sets", {}) or {}
+    if not isinstance(group_sets, dict):
+        return set(default)
+    values = group_sets.get(name, [])
+    if not isinstance(values, list):
+        return set(default)
+    configured = {str(v) for v in values if isinstance(v, str) and v.strip()}
+    return configured or set(default)
 
 
 @lru_cache(maxsize=1)
 def _load_scaffold_motif_ids() -> Set[str]:
-    path = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
-    if not path.exists():
-        return set()
     try:
-        with path.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
+        from ..taxonomy import loader as taxonomy_loader
     except Exception:
+        return set()
+    payload = taxonomy_loader.load_scaffold_motifs()
+    if not payload:
         return set()
     motifs = set()
     for entry in payload.get("compounds", []) or []:
@@ -63,17 +99,21 @@ def spectator_group_weight(group_id: str) -> float:
     text = str(group_id or "").strip()
     if not text:
         return 0.0
+    amine_groups = _configured_group_set("amine", _DEFAULT_AMINE_GROUPS)
+    acid_groups = _configured_group_set("acid", _DEFAULT_ACID_GROUPS)
+    alcohol_groups = _configured_group_set("alcohol", _DEFAULT_ALCOHOL_GROUPS)
+    thiol_groups = _configured_group_set("thiol", _DEFAULT_THIOL_GROUPS)
     if text in _load_scaffold_motif_ids():
-        return _HETEROCYCLE_WEIGHT
-    if text in _AMINE_GROUPS:
-        return _AMINE_WEIGHT
-    if text in _ACID_GROUPS:
-        return _ACID_WEIGHT
-    if text in _ALCOHOL_GROUPS:
-        return _ALCOHOL_WEIGHT
-    if text in _THIOL_GROUPS:
-        return _THIOL_WEIGHT
-    return _DEFAULT_WEIGHT
+        return _configured_weight("scaffold")
+    if text in amine_groups:
+        return _configured_weight("amine")
+    if text in acid_groups:
+        return _configured_weight("acid")
+    if text in alcohol_groups:
+        return _configured_weight("alcohol")
+    if text in thiol_groups:
+        return _configured_weight("thiol")
+    return _configured_weight("default")
 
 
 def rank_spectator_groups(groups: Iterable[str]) -> List[str]:

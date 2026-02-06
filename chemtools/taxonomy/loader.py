@@ -20,6 +20,7 @@ COMPOUND_LOGIC_FILE = _TAXONOMY_DIR / "compound_logic.json"
 GROUP_LOGIC_FILE = _TAXONOMY_DIR / "group_logic.json"
 ORGANIC_COMPOUNDS_FILE = _TAXONOMY_DIR / "organic_compounds.v1.3.json"
 SCAFFOLD_MOTIFS_FILE = _TAXONOMY_DIR / "scaffold_motifs.v1.3.json"
+FEATURIZER_LOGIC_FILE = _TAXONOMY_DIR / "featurizer_logic.json"
 
 
 @lru_cache(maxsize=1)
@@ -129,6 +130,23 @@ def load_scaffold_motifs() -> Dict[str, Any]:
         return {}
 
 
+@lru_cache(maxsize=1)
+def load_featurizer_logic() -> Dict[str, Any]:
+    """Load featurizer-specific chemistry logic JSON.
+
+    Returns:
+        Dictionary containing featurizer logic configuration.
+    """
+    if not FEATURIZER_LOGIC_FILE.exists():
+        return {}
+
+    try:
+        with FEATURIZER_LOGIC_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 def get_reaction_by_id(reaction_id: str) -> Dict[str, Any] | None:
     """Get a single reaction definition by ID.
     
@@ -174,6 +192,7 @@ def clear_taxonomy_cache() -> None:
     load_group_logic.cache_clear()
     load_organic_compounds.cache_clear()
     load_scaffold_motifs.cache_clear()
+    load_featurizer_logic.cache_clear()
 
 
 __all__ = [
@@ -182,6 +201,7 @@ __all__ = [
     "GROUP_LOGIC_FILE",
     "ORGANIC_COMPOUNDS_FILE",
     "SCAFFOLD_MOTIFS_FILE",
+    "FEATURIZER_LOGIC_FILE",
     "load_reaction_types_raw",
     "load_reaction_types_list",
     "load_reaction_types_dict",
@@ -189,6 +209,7 @@ __all__ = [
     "load_group_logic",
     "load_organic_compounds",
     "load_scaffold_motifs",
+    "load_featurizer_logic",
     "get_reaction_by_id",
     "get_reaction_metadata",
     "clear_taxonomy_cache",
