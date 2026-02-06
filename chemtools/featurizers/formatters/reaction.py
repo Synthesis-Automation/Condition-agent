@@ -24,6 +24,9 @@ from .utils import extract_motif_ids, normalize_motif_id
 from .simplified import build_core_reaction, build_extended_reaction
 
 
+_UNCLASSIFIED_REACTANT_MOTIF = "Unclassified-Reactant"
+
+
 def get_crk_options() -> Dict[str, Any]:
     """Return standardized options for CRK-v1 reaction key generation."""
     return {
@@ -32,7 +35,52 @@ def get_crk_options() -> Dict[str, Any]:
         "motif_site_filter": "substituent",
         "confirm_coupling_products": True,
         "discovery_mode": True,
+        "reactant_coverage_guard": True,
     }
+
+
+def _bundle_has_taxonomy_motif(bundle: Dict[str, Any]) -> bool:
+    for key in ("motifs", "context_motifs"):
+        for motif in bundle.get(key) or []:
+            cid = ""
+            if isinstance(motif, dict):
+                cid = str(motif.get("compound_id") or motif.get("id") or "").strip()
+            else:
+                cid = str(motif).strip()
+            if not cid or cid == "unknown":
+                continue
+            if cid.startswith("Unclassified-"):
+                continue
+            return True
+    return False
+
+
+def _ensure_reactant_coverage(
+    reactant_bundles: List[Dict[str, Any]],
+    *,
+    enabled: bool,
+) -> None:
+    if not enabled:
+        return
+    for bundle in reactant_bundles:
+        if _bundle_has_taxonomy_motif(bundle):
+            continue
+        motifs = bundle.get("motifs")
+        if not isinstance(motifs, list):
+            motifs = []
+            bundle["motifs"] = motifs
+        motifs.append(
+            {
+                "compound_id": _UNCLASSIFIED_REACTANT_MOTIF,
+                "undocumented": True,
+                "coverage_guard": True,
+                "reason": "no_taxonomy_motif_detected",
+            }
+        )
+        ranked = bundle.get("ranked_motifs")
+        if isinstance(ranked, list):
+            if _UNCLASSIFIED_REACTANT_MOTIF not in ranked:
+                ranked.append(_UNCLASSIFIED_REACTANT_MOTIF)
 
 
 def format_reaction_type_summary(detection: Any) -> Dict[str, Any]:
@@ -605,9 +653,11 @@ def _filter_reactants_for_crk(
     reacted_ids = {str(r) for r in reacted if r}
     spectator_ids = {str(s) for s in (spectators or []) if s}
 
-    # Promote aromatic C-H partner from spectators for Minisci-like
-    # decarboxylative C-C(ar) formation so CRK reactants stay mechanistic.
+    # Ensure aromatic C-H partner for Minisci-like decarboxylative C-C(ar)
+    # formation so CRK reactants stay mechanistic even if C-H motifs are
+    # simultaneously marked as spectators by motif-delta logic.
     promoted_from_spectators: List[str] = []
+    must_keep_aromatic_ch: Set[str] = set()
     logic_sets = _load_compound_logic_sets()
     carboxylic_acids = logic_sets.get("carboxylic_acids", set())
     has_decarboxylative_partner = any(
@@ -628,8 +678,10 @@ def _filter_reactants_for_crk(
             break
     if has_decarboxylative_partner and has_aryl_c_c_formation:
         for candidate in ("HeteroAr-H", "AromN-H", "Ar-H"):
-            if candidate in spectator_ids and candidate not in reacted_ids:
-                promoted_from_spectators.append(candidate)
+            if candidate in reacted_ids or candidate in spectator_ids:
+                must_keep_aromatic_ch.add(candidate)
+                if candidate in spectator_ids and candidate not in reacted_ids:
+                    promoted_from_spectators.append(candidate)
                 break
 
     filtered: List[str] = []
@@ -640,6 +692,9 @@ def _filter_reactants_for_crk(
             continue
         motif_str = str(motif)
         scaffold = motif_str.split("-", 1)[0] if "-" in motif_str else motif_str
+        if motif_str in must_keep_aromatic_ch:
+            filtered.append(motif_str)
+            continue
         # Keep N/O/S nucleophiles when corresponding bonds form.
         keep_by_formed = False
         if "N" in formed_elements and (
@@ -1439,6 +1494,7 @@ def featurize_reaction(
     include_agent_roles = to_bool(options.get("include_agent_roles"), default=True)
     skip_bond_analysis = to_bool(options.get("skip_bond_analysis"), default=False)
     include_product_in_crk = to_bool(options.get("include_product_in_crk"), default=True)
+    reactant_coverage_guard = to_bool(options.get("reactant_coverage_guard"), default=True)
     
     # General coupling confirmation (supports 9+ coupling reaction types)
     # Backward compatibility: map old Suzuki-specific parameter to general one
@@ -1470,6 +1526,7 @@ def featurize_reaction(
         build_molecule_bundle(smiles, registry_paths=registry_paths, options=options)
         for smiles in reactant_smiles
     ]
+    _ensure_reactant_coverage(reactant_bundles, enabled=reactant_coverage_guard)
 
     # Featurize products
     product_smiles = [

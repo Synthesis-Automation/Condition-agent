@@ -82,3 +82,26 @@ def test_minisci_acylation_with_thiophene_keto_acid() -> None:
     assert product_part != "[]"
     assert "COR" in product_part
     assert "|Acyl-CO2H|" in reaction_key
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_minisci_alkylation_keeps_heteroar_h_in_crk_reactants() -> None:
+    rxn = "CC(=O)O.Cc1ccc2cc(F)ccc2n1>>Cc1cc(C)c2cc(F)ccc2n1"
+    result = featurize_reaction(
+        rxn,
+        options={
+            "include_ar_h": False,
+            "target_groups": None,
+            "discovery_mode": True,
+            "confirm_coupling_products": True,
+            "motif_site_filter": "substituent",
+            "detailed": True,
+        },
+    )
+    reaction_key = result.get("reaction_key") or ""
+    summary = reaction_key.split(" | ", 1)[0]
+    reactant_part = summary.split("->", 1)[0].strip().lstrip("|")
+    reactants = {token for token in reactant_part.split("|") if token and token != "[]"}
+    assert result.get("reaction_type") == "Minisci_alkylation"
+    assert "HeteroAr-H" in reactants
+    assert any(token.endswith("-CO2H") for token in reactants)

@@ -785,6 +785,13 @@ def _parse_args() -> argparse.Namespace:
         help="Focus on specific motifs (e.g., 'Br', 'H', 'CN'). Comma-separated.",
     )
     parser.add_argument(
+        "--no-reactant-coverage-guard",
+        action="store_false",
+        dest="reactant_coverage_guard",
+        help="Disable coverage guard that labels reactants without taxonomy motifs.",
+    )
+    parser.set_defaults(reactant_coverage_guard=True)
+    parser.add_argument(
         "--show-roles",
         action="store_true",
         help="Show agent roles and role classification in reaction summaries.",
@@ -809,6 +816,7 @@ def main() -> int:
         "target_groups": target_groups,
         "discovery_mode": args.discovery,
         "confirm_coupling_products": True,
+        "reactant_coverage_guard": args.reactant_coverage_guard,
     }
     print("ChemTools Featurization CLI")
     print("Enter 'q' to quit.")
