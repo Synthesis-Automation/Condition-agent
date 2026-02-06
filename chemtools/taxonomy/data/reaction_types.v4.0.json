@@ -613,16 +613,24 @@
     {
       "id": "Minisci_alkylation",
       "reactants": {
-        "substrate": "Ar-H",
+        "substrate": [
+          "Ar-H",
+          "HeteroAr-H",
+          "AromN-H"
+        ],
         "acid": [
           "Alkyl-CO2H",
+          "R_acidic-CO2H",
           "RCH2-CO2H",
           "R2CH-CO2H",
           "R3C-CO2H"
         ]
       },
       "products": {
-        "product": "Ar-R"
+        "product": [
+          "Ar-R",
+          "Ar-Alkyl"
+        ]
       },
       "aliases": [
         "Minisci",
@@ -638,7 +646,11 @@
     {
       "id": "Minisci_acylation",
       "reactants": {
-        "substrate": "Ar-H",
+        "substrate": [
+          "Ar-H",
+          "HeteroAr-H",
+          "AromN-H"
+        ],
         "acid": [
           "Acyl-CO2H",
           "Ar-CHO",

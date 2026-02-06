@@ -570,6 +570,28 @@ def _filter_reactants_for_crk(
                 return True
         return False
 
+    def _has_c_c_cleavage() -> bool:
+        for token in _extract_bond_section(bond_key, section="break"):
+            if "-" not in token:
+                continue
+            left, right = [t.strip() for t in token.split("-", 1)]
+            if _parse_element(left) == "C" and _parse_element(right) == "C":
+                return True
+        return False
+
+    def _has_aryl_c_c_formation() -> bool:
+        for token in _extract_bond_section(bond_key, section="form"):
+            if "-" not in token:
+                continue
+            left, right = [t.strip() for t in token.split("-", 1)]
+            left_el = _parse_element(left)
+            right_el = _parse_element(right)
+            left_ar = _is_aromatic_label(left)
+            right_ar = _is_aromatic_label(right)
+            if left_el == "C" and right_el == "C" and (left_ar or right_ar):
+                return True
+        return False
+
     def _has_non_aromatic_c_bond(other_elements: Set[str]) -> bool:
         for left_el, left_ar, right_el, right_ar in parsed_bonds:
             if left_el == "C" and not left_ar and right_el in other_elements:
@@ -580,7 +602,36 @@ def _filter_reactants_for_crk(
 
     group_element_map = _load_group_element_map()
 
+    reacted_ids = {str(r) for r in reacted if r}
     spectator_ids = {str(s) for s in (spectators or []) if s}
+
+    # Promote aromatic C-H partner from spectators for Minisci-like
+    # decarboxylative C-C(ar) formation so CRK reactants stay mechanistic.
+    promoted_from_spectators: List[str] = []
+    logic_sets = _load_compound_logic_sets()
+    carboxylic_acids = logic_sets.get("carboxylic_acids", set())
+    has_decarboxylative_partner = any(
+        (m in carboxylic_acids) or m.endswith("-CO2H") or m.endswith("-COOH")
+        for m in reacted_ids
+    )
+    has_aryl_c_c_formation = False
+    for token in formed_tokens:
+        if "-" not in token:
+            continue
+        left, right = [t.strip() for t in token.split("-", 1)]
+        left_el = _parse_element(left)
+        right_el = _parse_element(right)
+        left_ar = _is_aromatic_label(left)
+        right_ar = _is_aromatic_label(right)
+        if left_el == "C" and right_el == "C" and (left_ar or right_ar):
+            has_aryl_c_c_formation = True
+            break
+    if has_decarboxylative_partner and has_aryl_c_c_formation:
+        for candidate in ("HeteroAr-H", "AromN-H", "Ar-H"):
+            if candidate in spectator_ids and candidate not in reacted_ids:
+                promoted_from_spectators.append(candidate)
+                break
+
     filtered: List[str] = []
     for motif in reacted:
         if not motif:
@@ -629,7 +680,13 @@ def _filter_reactants_for_crk(
             "-CONR2",
         }:
             # Carbonyl-derived motifs should only be kept if a non-aromatic carbonyl bond changes.
-            if not _has_non_aromatic_c_bond({"O", "N", "Cl", "Br", "I", "F", "S"}):
+            if (
+                group_id == "-CO2H"
+                and _has_c_c_cleavage()
+                and _has_aryl_c_c_formation()
+            ):
+                keep_by_elements = True
+            elif not _has_non_aromatic_c_bond({"O", "N", "Cl", "Br", "I", "F", "S"}):
                 keep_by_elements = False
 
         # Drop pure spectators unless they align with bond elements or formed nucleophiles.
@@ -646,10 +703,17 @@ def _filter_reactants_for_crk(
             filtered.append(motif_str)
     filtered_sorted = sorted(filtered)
     if filtered_sorted:
+        if promoted_from_spectators:
+            filtered_sorted = sorted(set(filtered_sorted) | set(promoted_from_spectators))
         return filtered_sorted
     fallback = [str(r) for r in reacted if r and str(r) not in scaffold_ids]
     if fallback:
-        return sorted(fallback)
+        fallback_sorted = sorted(fallback)
+        if promoted_from_spectators:
+            fallback_sorted = sorted(set(fallback_sorted) | set(promoted_from_spectators))
+        return fallback_sorted
+    if promoted_from_spectators:
+        return sorted(set(promoted_from_spectators))
     return sorted(str(r) for r in reacted if r)
 
 
@@ -1435,11 +1499,26 @@ def featurize_reaction(
             for m in (aggregates.get("formed_motifs") or [])
             if m
         )
-        reacted_all = sorted(normalize_motif_id(str(m)) for m in reacted_full if m)
+        reacted_for_detection = _filter_reactants_for_crk(
+            reacted_full,
+            bond_key,
+            spectators=spectators_for_crk,
+        )
+        if not reacted_for_detection and reacted_full:
+            reacted_for_detection = sorted(
+                normalize_motif_id(str(m))
+                for m in reacted_full
+                if m
+            )
+        spectators_for_detection = sorted(
+            normalize_motif_id(str(m))
+            for m in (set(spectators_for_crk) - set(reacted_for_detection))
+            if m
+        )
         reaction_key_raw = format_crk_key(
             bond_key=bond_key,
-            reacted=reacted_all,
-            spectators=spectators_for_crk,
+            reacted=reacted_for_detection,
+            spectators=spectators_for_detection,
             product_broad_tags=[],
             product_motifs_reactive=formed_all,
             include_product=True,
@@ -1499,17 +1578,12 @@ def featurize_reaction(
         aggregates["formed_motifs_all"] = formed_all
         aggregates["formed_motifs_center"] = formed_center
         aggregates["formed_motifs_context"] = formed_context
-        reacted_for_crk = _filter_reactants_for_crk(
-            reacted_full,
-            bond_key,
-            spectators=spectators_for_crk,
-        )
-        if not reacted_for_crk and reacted_full:
-            reacted_for_crk = sorted(str(r) for r in reacted_full if r)
+        reacted_for_crk = list(reacted_for_detection)
+        spectators_for_key = sorted(set(spectators_for_crk) - set(reacted_for_crk))
         reaction_key = format_crk_key(
             bond_key=bond_key,
             reacted=reacted_for_crk,
-            spectators=spectators_for_crk,
+            spectators=spectators_for_key,
             product_broad_tags=product_broad_tags,
             product_motifs_reactive=product_motifs_reactive,
             include_product=include_product_in_crk,
