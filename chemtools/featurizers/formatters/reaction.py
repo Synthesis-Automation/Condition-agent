@@ -1167,6 +1167,7 @@ def _infer_product_motifs_from_logic(
     formed_bonds = _extract_bond_section(bond_key, section="form")
     if not formed_bonds:
         return []
+    broken_bonds = _extract_bond_section(bond_key, section="break")
 
     logic_sets = _load_compound_logic_sets()
     amines = logic_sets.get("aryl_amines", set())
@@ -1273,6 +1274,46 @@ def _infer_product_motifs_from_logic(
                 )
             ):
                 inferred.add("Ar-Alkynyl")
+
+    # Decarboxylative aromatic C-H functionalization (Minisci-like):
+    # infer product class from bond topology + reactant motifs, even when the
+    # same product motif family is present on both sides and delta counts are zero.
+    has_aryl_c_c_formation = any(
+        "-" in token
+        and _parse_element(token.split("-", 1)[0].strip()) == "C"
+        and _parse_element(token.split("-", 1)[1].strip()) == "C"
+        and (
+            _is_aromatic_label(token.split("-", 1)[0].strip())
+            or _is_aromatic_label(token.split("-", 1)[1].strip())
+        )
+        for token in formed_bonds
+    )
+    has_c_c_cleavage = any(
+        "-" in token
+        and _parse_element(token.split("-", 1)[0].strip()) == "C"
+        and _parse_element(token.split("-", 1)[1].strip()) == "C"
+        for token in broken_bonds
+    )
+    aromatic_ch_sites = {"Ar-H", "HeteroAr-H", "AromN-H"}
+    has_aromatic_ch_substrate = any(m in aromatic_ch_sites for m in reacted_list)
+    carboxylic_acids = logic_sets.get("carboxylic_acids", set())
+    has_carboxylate_partner = any(
+        (m in carboxylic_acids) or m.endswith("-CO2H") or m.endswith("-COOH")
+        for m in reacted_list
+    )
+    has_acyl_ketoacid_partner = any(
+        m == "Acyl-CO2H" or (m.startswith("Acyl-") and m.endswith("-CO2H"))
+        for m in reacted_list
+    )
+    if has_aryl_c_c_formation and has_c_c_cleavage and has_aromatic_ch_substrate and has_carboxylate_partner:
+        if has_acyl_ketoacid_partner:
+            # Keep Ar-COR for broad taxonomy compatibility and add heteroaryl
+            # variant when the reacting C-H site is heteroaromatic.
+            inferred.add("Ar-COR")
+            if any(m in {"HeteroAr-H", "AromN-H"} for m in reacted_list):
+                inferred.add("HeteroAr-COR")
+        else:
+            inferred.add("Ar-Alkyl")
 
     return sorted(inferred)
 
@@ -1494,11 +1535,6 @@ def featurize_reaction(
         )
 
         # Determine reaction type from CRK_raw (before product projection).
-        formed_all = sorted(
-            normalize_motif_id(str(m))
-            for m in (aggregates.get("formed_motifs") or [])
-            if m
-        )
         reacted_for_detection = _filter_reactants_for_crk(
             reacted_full,
             bond_key,
@@ -1510,6 +1546,20 @@ def featurize_reaction(
                 for m in reacted_full
                 if m
             )
+        formed_raw = {
+            normalize_motif_id(str(m))
+            for m in (aggregates.get("formed_motifs") or [])
+            if m
+        }
+        formed_inferred = {
+            normalize_motif_id(str(m))
+            for m in _infer_product_motifs_from_logic(
+                reacted_for_detection,
+                bond_key,
+            )
+            if m
+        }
+        formed_all = sorted(formed_raw | formed_inferred)
         spectators_for_detection = sorted(
             normalize_motif_id(str(m))
             for m in (set(spectators_for_crk) - set(reacted_for_detection))
@@ -1568,8 +1618,8 @@ def featurize_reaction(
         product_motifs_reactive = _select_reactive_product_motifs(
             product_motifs_full,
             bond_key=bond_key,
-            formed_motifs=aggregates.get("formed_motifs", []),
-            reacted_motifs=reacted_full,
+            formed_motifs=formed_all,
+            reacted_motifs=reacted_for_detection,
             reaction_type=rt_id,
         )
         formed_center = sorted(set(product_motifs_reactive))

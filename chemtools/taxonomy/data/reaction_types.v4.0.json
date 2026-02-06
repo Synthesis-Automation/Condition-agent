@@ -661,7 +661,10 @@
         ]
       },
       "products": {
-        "product": "Ar-COR"
+        "product": [
+          "Ar-COR",
+          "HeteroAr-COR"
+        ]
       },
       "aliases": [
         "Minisci acylation",
