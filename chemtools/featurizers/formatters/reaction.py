@@ -1343,9 +1343,7 @@ def featurize_reaction(
         confirm_coupling = options.get("confirm_suzuki_products")
     confirm_coupling_products = to_bool(confirm_coupling, default=True)
 
-    # NOTE: Reaction type detection removed to avoid circular dependency
-    # Detection now happens separately via chemtools.detection.detect_reaction_type()
-    # which calls featurize_reaction() to extract motifs
+    # Start with Unknown, then determine from CRK_raw after bond/motif extraction.
     reaction_type = {"reaction_type": "Unknown", "confidence": 0.0, "slot_evidence": {}}
     detection_payload = {}
 
@@ -1397,36 +1395,6 @@ def featurize_reaction(
         reaction_type=None,  # Disable pattern-based filtering
     )
     
-    # Validate detection using reacted motifs patterns
-    from .detection_validation import validate_detection_with_reacted_motifs
-    
-    validated = validate_detection_with_reacted_motifs(
-        initial_detection=reaction_type.get("reaction_type", "Unknown") if isinstance(reaction_type, dict) else str(reaction_type),
-        initial_confidence=reaction_type.get("confidence", 0.0) if isinstance(reaction_type, dict) else 0.0,
-        reacted_motifs=aggregates.get("reacted_motifs", []),
-        formed_motifs=aggregates.get("formed_motifs", []),
-        spectator_motifs=aggregates.get("spectator_motifs", []),
-    )
-    
-    # Update reaction type if corrected
-    if validated.get("corrected_from"):
-        # Preserve original detection info but update the main type
-        if isinstance(reaction_type, dict):
-            reaction_type["reaction_type"] = validated["reaction_type"]
-            reaction_type["name"] = validated["reaction_type"]  # Also update 'name' field!
-            reaction_type["confidence"] = validated["confidence"]
-        else:
-            reaction_type = validated["reaction_type"]
-        
-        # Add validation metadata to detection payload
-        detection_payload["validation"] = {
-            "original_detection": validated["corrected_from"],
-            "validated_detection": validated["reaction_type"],
-            "validation_method": validated["validation_method"],
-            "validation_reason": validated["reason"],
-            "validation_confidence": validated["confidence"],
-        }
-
     # Classify reactant roles
     roles_summary = None
     if include_roles:
@@ -1439,12 +1407,6 @@ def featurize_reaction(
     intramolecular = infer_intramolecular(reactant_smiles, product_smiles, roles_summary)
 
     rt_id = None
-    if isinstance(reaction_type, dict):
-        rt_id = reaction_type.get("reaction_type")
-    elif reaction_type is not None:
-        rt_id = str(reaction_type)
-    if rt_id == "Unknown":
-        rt_id = None
 
     # Generate CRK-v1 reaction key (single source of truth)
     reaction_key = None
@@ -1466,6 +1428,60 @@ def featurize_reaction(
             reacted_full,
             group_element_map=_load_group_element_map(),
         )
+
+        # Determine reaction type from CRK_raw (before product projection).
+        formed_all = sorted(
+            normalize_motif_id(str(m))
+            for m in (aggregates.get("formed_motifs") or [])
+            if m
+        )
+        reacted_all = sorted(normalize_motif_id(str(m)) for m in reacted_full if m)
+        reaction_key_raw = format_crk_key(
+            bond_key=bond_key,
+            reacted=reacted_all,
+            spectators=spectators_for_crk,
+            product_broad_tags=[],
+            product_motifs_reactive=formed_all,
+            include_product=True,
+        )
+        from .detection_validation import validate_detection_with_crk_key
+
+        validated = validate_detection_with_crk_key(
+            initial_detection=(
+                reaction_type.get("reaction_type", "Unknown")
+                if isinstance(reaction_type, dict)
+                else str(reaction_type)
+            ),
+            initial_confidence=(
+                reaction_type.get("confidence", 0.0)
+                if isinstance(reaction_type, dict)
+                else 0.0
+            ),
+            reaction_key=reaction_key_raw,
+        )
+        if validated.get("reaction_type"):
+            if isinstance(reaction_type, dict):
+                reaction_type["reaction_type"] = validated["reaction_type"]
+                reaction_type["name"] = validated["reaction_type"]
+                reaction_type["confidence"] = validated["confidence"]
+            else:
+                reaction_type = validated["reaction_type"]
+        detection_payload["validation"] = {
+            "original_detection": validated.get("corrected_from"),
+            "validated_detection": validated.get("reaction_type"),
+            "validation_method": validated.get("validation_method"),
+            "validation_reason": validated.get("reason"),
+            "validation_confidence": validated.get("confidence"),
+            "reaction_key_raw": reaction_key_raw,
+        }
+
+        if isinstance(reaction_type, dict):
+            rt_id = reaction_type.get("reaction_type")
+        elif reaction_type is not None:
+            rt_id = str(reaction_type)
+        if rt_id == "Unknown":
+            rt_id = None
+
         product_broad_tags = _infer_product_broad_tags_with_validation(
             bond_key=bond_key,
             product_smiles=product_smiles,
@@ -1477,7 +1493,6 @@ def featurize_reaction(
             reacted_motifs=reacted_full,
             reaction_type=rt_id,
         )
-        formed_all = sorted(str(m) for m in (aggregates.get("formed_motifs") or []) if m)
         formed_center = sorted(set(product_motifs_reactive))
         formed_center_set = set(formed_center)
         formed_context = sorted(m for m in formed_all if m not in formed_center_set)
@@ -1499,6 +1514,14 @@ def featurize_reaction(
             product_motifs_reactive=product_motifs_reactive,
             include_product=include_product_in_crk,
         )
+
+    if rt_id is None:
+        if isinstance(reaction_type, dict):
+            rt_id = reaction_type.get("reaction_type")
+        elif reaction_type is not None:
+            rt_id = str(reaction_type)
+        if rt_id == "Unknown":
+            rt_id = None
 
     reaction = {
         "reaction_smiles": reaction_smiles,
