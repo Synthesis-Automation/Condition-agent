@@ -29,9 +29,11 @@
       "id": "Pyrazole",
       "smarts": [
         "[nH]1nccc1",
-        "n1[nH]ccc1"
+        "n1[nH]ccc1",
+        "n1nccc1",
+        "n1cccn1"
       ],
-      "description": "Pyrazole (NH-heteroaromatic)."
+      "description": "Pyrazole (NH-heteroaromatic and N-substituted pyrazole)."
     },
     {
       "id": "Triazole",

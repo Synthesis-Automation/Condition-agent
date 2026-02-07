@@ -52,3 +52,22 @@ def test_pyridine_context_is_not_misclassified_as_reacted() -> None:
     assert "Pyridine" not in reacted
     assert "Pyridine" in spectators
     assert "Pyridine" in groups
+
+
+def test_n_substituted_pyrazole_detected_as_named_spectator_group() -> None:
+    if not rdkit_helpers.rdkit_available():
+        return
+
+    rxn = (
+        "Cc1ccc(-c2cc(C(F)(F)F)nn2-c2ccc(S(N)(=O)=O)cc2)cc1.OB(O)c1ccc(C(F)(F)F)cc1"
+        ">>Cc1ccc(-c2cc(C(F)(F)F)nn2-c2ccc(S(=O)(=O)Nc3ccc(C(F)(F)F)cc3)cc2)cc1"
+    )
+    payload = featurize_reaction(rxn, options={"detailed": True, "motif_site_filter": "substituent"})
+    aggregates = payload.get("aggregates") or {}
+    spectators = set(aggregates.get("spectator_motifs") or [])
+    groups = set(aggregates.get("spectator_groups_ranked") or [])
+    reaction_key = str(payload.get("reaction_key") or "")
+
+    assert "Pyrazole" in spectators
+    assert "Pyrazole" in groups
+    assert "Pyrazole" in reaction_key
