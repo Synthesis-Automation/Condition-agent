@@ -653,6 +653,11 @@ def _print_reaction_summary(
             formed_center = aggregates.get("formed_motifs_center", [])
             formed_context = aggregates.get("formed_motifs_context", [])
             spectators = aggregates.get("spectator_motifs", [])
+            spectator_groups = (
+                aggregates.get("spectator_groups_ranked")
+                or aggregates.get("spectator_groups_combined")
+                or []
+            )
             
             print("  Reaction Key Generation:")
             if reacted:
@@ -688,12 +693,18 @@ def _print_reaction_summary(
             if bond_broken:
                 print(f"    Bond broken: {bond_broken}")
             
+            if spectator_groups:
+                if isinstance(spectator_groups, list):
+                    groups_str = ", ".join(str(m) for m in spectator_groups)
+                else:
+                    groups_str = str(spectator_groups)
+                print(f"    Spectator groups: {groups_str}")
             if spectators:
                 if isinstance(spectators, list):
                     spectators_str = ", ".join(str(m) for m in spectators)
                 else:
                     spectators_str = str(spectators)
-                print(f"    Spectator groups: {spectators_str}")
+                print(f"    Spectator motifs: {spectators_str}")
             
             print("    Format: |Reactants -> Product | bond_formed: ... | bond_broken: ... | spectators: ...")
 

@@ -343,13 +343,19 @@ _SPECTATOR_GROUP_STOPLIST = {
     "Alkynyl",
     "H",
 }
+_HETERO_C_H_SCAFFOLD_GROUPS = {"HeteroAr", "AromN"}
 
 def _group_id_from_motif_id(motif_id: str) -> str:
     text = str(motif_id).strip()
     if not text:
         return ""
     if "-" in text:
-        return text.split("-")[-1].strip()
+        scaffold, group_id = text.rsplit("-", 1)
+        scaffold = scaffold.strip()
+        group_id = group_id.strip()
+        if group_id == "H" and scaffold in _HETERO_C_H_SCAFFOLD_GROUPS:
+            return scaffold
+        return group_id
     return text
 
 def _collect_spectator_groups(

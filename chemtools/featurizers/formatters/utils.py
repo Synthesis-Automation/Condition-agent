@@ -9,6 +9,8 @@ from __future__ import annotations
 from typing import Any, Iterable, List
 import re
 
+_HETERO_C_H_SCAFFOLD_GROUPS = {"HeteroAr", "AromN"}
+
 
 def extract_motif_ids(*motif_collections: Iterable[Any]) -> List[str]:
     """
@@ -94,5 +96,11 @@ def group_id_from_motif_id(motif_id: str) -> str:
     if not text:
         return ""
     if "-" in text:
-        return text.split("-")[-1].strip()
+        scaffold, group_id = text.rsplit("-", 1)
+        scaffold = scaffold.strip()
+        group_id = group_id.strip()
+        # Preserve heteroaromatic scaffold identity for C-H spectator motifs.
+        if group_id == "H" and scaffold in _HETERO_C_H_SCAFFOLD_GROUPS:
+            return scaffold
+        return group_id
     return text

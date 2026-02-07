@@ -22,6 +22,7 @@ from .molecule import build_molecule_bundle, to_bool
 from .aggregation import aggregate_reaction_features, infer_intramolecular
 from .utils import extract_motif_ids, normalize_motif_id
 from .simplified import build_core_reaction, build_extended_reaction
+from ..spectator_rank import rank_spectator_groups
 
 
 _UNCLASSIFIED_REACTANT_MOTIF = "Unclassified-Reactant"
@@ -1546,6 +1547,7 @@ def featurize_reaction(
         product_motif_ids.extend(extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", [])))
         # Collect full motif dicts for fingerprint-aware comparison
         product_motifs_full.extend(bundle.get("motifs", []))
+        product_motifs_full.extend(bundle.get("context_motifs", []))
 
     # Aggregate features without pattern-based filtering
     # Pattern filtering is skipped to avoid removing reacted motifs based on incorrect initial detection
@@ -1579,6 +1581,17 @@ def featurize_reaction(
         spectators = set(aggregates.get("spectator_motifs", []))
         scaffold_spectators = _scaffold_spectators_from_bundles(reactant_bundles, product_bundles)
         spectators_for_crk = spectators | scaffold_spectators
+        if scaffold_spectators:
+            group_list = list(aggregates.get("spectator_groups_combined") or [])
+            seen_groups = {str(g).strip() for g in group_list if str(g).strip()}
+            for scaffold_id in sorted(scaffold_spectators):
+                sid = str(scaffold_id).strip()
+                if not sid or sid in seen_groups:
+                    continue
+                seen_groups.add(sid)
+                group_list.append(sid)
+            aggregates["spectator_groups_combined"] = group_list
+            aggregates["spectator_groups_ranked"] = rank_spectator_groups(group_list)
 
         bond_analysis = None
         bond_key = None

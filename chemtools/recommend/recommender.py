@@ -874,6 +874,7 @@ _ARYL_HALIDE_MOTIFS = {"Ar-F", "Ar-Cl", "Ar-Br", "Ar-I", "Ar-X"}
 _SPECTATOR_MATCH_WEIGHT = 0.7
 _INTRAMOLECULAR_MATCH_BOOST = 1.2
 _AROMATIC_SCAFFOLD_FALLBACK = {"Ar", "HeteroAr", "AromN"}
+_HETERO_C_H_SCAFFOLD_GROUPS = {"HeteroAr", "AromN"}
 
 _NH_HETEROCYCLE_TAG = "nh-heteroaromatic"
 
@@ -1393,7 +1394,12 @@ def _group_id_from_motif_id(motif_id: str) -> str:
     if not text:
         return ""
     if "-" in text:
-        return text.split("-")[-1].strip()
+        scaffold, group_id = text.rsplit("-", 1)
+        scaffold = scaffold.strip()
+        group_id = group_id.strip()
+        if group_id == "H" and scaffold in _HETERO_C_H_SCAFFOLD_GROUPS:
+            return scaffold
+        return group_id
     return text
 
 
