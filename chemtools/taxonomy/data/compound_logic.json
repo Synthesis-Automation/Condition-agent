@@ -312,7 +312,8 @@
         "Ar-N(R)SO2R"
       ],
       "usage": [
-        "C_N_Coupling"
+        "C_N_Coupling",
+        "Chan_lam_cn"
       ]
     },
     "acyl_halides": {

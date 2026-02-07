@@ -154,7 +154,11 @@
         ]
       },
       "products": {
-        "product": "@aryl_amines"
+        "product": [
+          "@aryl_amines",
+          "@aryl_amides",
+          "@aryl_sulfonamides"
+        ]
       },
       "catalysts": [
         "Cu"
@@ -163,7 +167,10 @@
         "c1ccccc1B(O)O.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
       ],
       "aliases": [
-        "chan_lam_cn"
+        "chan_lam_cn",
+        "chan_lam",
+        "Chan-Lam C-N",
+        "Chan Lam C-N"
       ]
     },
     {
