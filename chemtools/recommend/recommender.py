@@ -28,7 +28,10 @@ import json
 
 from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
 from chemtools.featurizers.formatters.reaction import get_crk_options
-from chemtools.featurizers.spectator_rank import weighted_spectator_similarity
+from chemtools.featurizers.spectator_rank import (
+    spectator_group_weight,
+    weighted_spectator_similarity,
+)
 from chemtools.smiles import normalize_reaction
 
 try:
@@ -475,14 +478,47 @@ def _normalize_reaction_key(value: Any) -> Optional[str]:
     return text
 
 
-def _aggregate_spectator_groups(values: pd.Series) -> str:
+def _aggregate_spectator_groups(
+    values: pd.Series,
+    *,
+    query_groups: Optional[Set[str]] = None,
+    max_items: int = 4,
+) -> str:
     if values is None:
         return ""
     series = values.fillna("").astype(str).str.strip()
     series = series[series != ""]
     if series.empty:
         return ""
-    return str(series.value_counts().index[0]).strip()
+
+    token_counter: Counter[str] = Counter()
+    for text in series:
+        tokens = _split_group_tokens(text)
+        for token in tokens:
+            token_counter[token] += 1
+    if not token_counter:
+        return ""
+
+    def _sort_key(group_id: str) -> Tuple[float, int, str]:
+        return (
+            -spectator_group_weight(group_id),
+            -int(token_counter.get(group_id, 0)),
+            str(group_id),
+        )
+
+    if query_groups:
+        overlap = [gid for gid in token_counter if gid in query_groups]
+        if overlap:
+            picked = sorted(overlap, key=_sort_key)[:max_items]
+            return " / ".join(picked)
+
+    weighted = [gid for gid in token_counter if spectator_group_weight(gid) > 0]
+    if weighted:
+        picked = sorted(weighted, key=_sort_key)[:max_items]
+        return " / ".join(picked)
+
+    most_common = token_counter.most_common(max_items)
+    return " / ".join(group for group, _ in most_common)
 
 
 def _normalize_reaction_type_value(value: Any) -> str:
@@ -1951,7 +1987,8 @@ class HTERecommender:
         self,
         matched_df: pd.DataFrame,
         top_k: int = 10,
-        min_experiments: int = 1
+        min_experiments: int = 1,
+        query_spectator_groups: Optional[Set[str]] = None,
     ) -> List[ConditionRecommendation]:
         """
         Aggregate and rank condition combinations from matched experiments.
@@ -2063,7 +2100,10 @@ class HTERecommender:
 
             spectator_groups = ""
             if "spectator_groups" in group_df.columns:
-                spectator_groups = _aggregate_spectator_groups(group_df["spectator_groups"])
+                spectator_groups = _aggregate_spectator_groups(
+                    group_df["spectator_groups"],
+                    query_groups=query_spectator_groups,
+                )
             spectator_score = (
                 float(group_df["spectator_score"].mean())
                 if "spectator_score" in group_df.columns
@@ -2895,7 +2935,10 @@ class HTERecommender:
                     if not label or label.lower() == "nan":
                         label = "unknown"
                     group_candidates = self._aggregate_conditions(
-                        group_df, pool_size, min_experiments
+                        group_df,
+                        pool_size,
+                        min_experiments,
+                        query_spectator_groups=query_spectator_groups,
                     )
                     if top_k > 0 and len(group_candidates) > top_k:
                         by_source[label] = self._select_diverse_conditions(
@@ -2907,7 +2950,10 @@ class HTERecommender:
                 result.recommendations = self._combine_recommendations_by_source(by_source, top_k)
             else:
                 candidates = self._aggregate_conditions(
-                    matched_df, pool_size, min_experiments
+                    matched_df,
+                    pool_size,
+                    min_experiments,
+                    query_spectator_groups=query_spectator_groups,
                 )
                 if top_k > 0 and len(candidates) > top_k:
                     result.recommendations = self._select_diverse_conditions(

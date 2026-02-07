@@ -197,14 +197,24 @@ def _reaction_image_path(prefix: str) -> Path:
     return output_dir / f"{prefix}_{time.time_ns()}.png"
 
 
-def _scale_pixmap_half(pixmap: QtGui.QPixmap) -> QtGui.QPixmap:
+_REACTION_PREVIEW_RENDER_SIZE: Tuple[int, int] = (1800, 600)
+_MOLECULE_PREVIEW_RENDER_SIZE: Tuple[int, int] = (900, 600)
+
+
+def _fit_pixmap_to_screen(pixmap: QtGui.QPixmap) -> QtGui.QPixmap:
     if pixmap.isNull():
         return pixmap
-    new_width = max(1, int(pixmap.width() * 0.5))
-    new_height = max(1, int(pixmap.height() * 0.5))
+    screen = QtGui.QGuiApplication.primaryScreen()
+    if screen is None:
+        return pixmap
+    available = screen.availableGeometry()
+    max_width = max(1, int(available.width() * 0.88))
+    max_height = max(1, int(available.height() * 0.72))
+    if pixmap.width() <= max_width and pixmap.height() <= max_height:
+        return pixmap
     return pixmap.scaled(
-        new_width,
-        new_height,
+        max_width,
+        max_height,
         QtCore.Qt.AspectRatioMode.KeepAspectRatio,
         QtCore.Qt.TransformationMode.SmoothTransformation,
     )
@@ -828,8 +838,12 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                 info_label.setText("")
                 output_path = temp_path / "reaction.png"
                 try:
-                    render_reaction_image(reaction_smiles, output_path)
-                    pixmap = _scale_pixmap_half(QtGui.QPixmap(str(output_path)))
+                    render_reaction_image(
+                        reaction_smiles,
+                        output_path,
+                        size=_REACTION_PREVIEW_RENDER_SIZE,
+                    )
+                    pixmap = _fit_pixmap_to_screen(QtGui.QPixmap(str(output_path)))
                 except Exception as exc:
                     info_label.setText(f"Unable to render reaction image: {exc}")
                 else:
@@ -844,8 +858,13 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                         continue
                     output_path = temp_path / f"reactant_{label.lower()}.png"
                     try:
-                        render_molecule_image(smiles, output_path, legend=f"Reactant {label}")
-                        pixmap = _scale_pixmap_half(QtGui.QPixmap(str(output_path)))
+                        render_molecule_image(
+                            smiles,
+                            output_path,
+                            size=_MOLECULE_PREVIEW_RENDER_SIZE,
+                            legend=f"Reactant {label}",
+                        )
+                        pixmap = _fit_pixmap_to_screen(QtGui.QPixmap(str(output_path)))
                     except Exception as exc:
                         info_label.setText(f"Unable to render reactant images: {exc}")
                         break
