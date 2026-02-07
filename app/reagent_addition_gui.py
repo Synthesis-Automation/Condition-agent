@@ -103,22 +103,33 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         form.addRow("Registry folder:", registry_row)
 
         self.cas_input.setPlaceholderText("e.g. 14221-01-3")
-        form.addRow("CAS (required):", self.cas_input)
-
         self.name_input.setPlaceholderText("Optional (auto-resolve if enabled)")
-        form.addRow("Name:", self.name_input)
+        self.smiles_input.setPlaceholderText("Optional SMILES")
+        self.tag_input.setPlaceholderText("Optional tag")
+        input_grid = QtWidgets.QGridLayout()
+        input_grid.setHorizontalSpacing(12)
+        input_grid.setVerticalSpacing(8)
+        input_grid.setColumnStretch(1, 1)
+        input_grid.setColumnStretch(3, 1)
+
+        input_grid.addWidget(QtWidgets.QLabel("CAS (required):"), 0, 0)
+        input_grid.addWidget(self.cas_input, 0, 1)
+        input_grid.addWidget(QtWidgets.QLabel("Tag:"), 0, 2)
+        input_grid.addWidget(self.tag_input, 0, 3)
+
+        input_grid.addWidget(QtWidgets.QLabel("Name:"), 1, 0)
+        input_grid.addWidget(self.name_input, 1, 1)
+        input_grid.addWidget(QtWidgets.QLabel("Role:"), 1, 2)
+        input_grid.addWidget(self.role_combo, 1, 3)
+
+        input_grid.addWidget(QtWidgets.QLabel("SMILES:"), 2, 0)
+        input_grid.addWidget(self.smiles_input, 2, 1)
+        input_grid.addWidget(QtWidgets.QLabel("Family:"), 2, 2)
+        input_grid.addWidget(self.family_combo, 2, 3)
+        form.addRow(input_grid)
 
         self.abbr_input.setPlaceholderText("Optional abbreviation")
         form.addRow("Abbreviation:", self.abbr_input)
-
-        self.smiles_input.setPlaceholderText("Optional SMILES")
-        form.addRow("SMILES:", self.smiles_input)
-
-        self.tag_input.setPlaceholderText("Optional tag")
-        form.addRow("Tag:", self.tag_input)
-
-        form.addRow("Role:", self.role_combo)
-        form.addRow("Family:", self.family_combo)
         checkbox_row = QtWidgets.QHBoxLayout()
         checkbox_row.addWidget(self.allow_default_checkbox)
         checkbox_row.addWidget(self.auto_resolve_checkbox)

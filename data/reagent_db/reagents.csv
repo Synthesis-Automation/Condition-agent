@@ -22,7 +22,7 @@ B(OH)3,,10043-35-3,B(O)(O)O,H3BO3,powder,1.5,61.833,219,169,,,additive,lewis_aci
 B(OMe)3,TMB,121-43-7,COB(OC)OC,C3H9BO3,liquid,0.932,103.913,68,-34,0,0,additive,lewis_acid_promoters,lewis acid promoters,,,
 benzaldehyde oxime,BZOX,932-90-1,C1=CC=C(C=C1)C=NO,,powder,,,,,,,additive,lewis_acid_promoters,lewis acid promoters,,,
 Butylated hydroxytoluene,BHT,128-37-0,Cc1cc(C(C)(C)C)c(O)c(C(C)(C)C)c1,C15H24O,powder,0.927,220.3505,263.6,69,0,0,additive,radical_suppressors,radical suppressors,,,
-Cesium fluoride,CsF,13400-13-0,[Cs+].[F-],CsF,powder,,151.9038551,19.5,682,0,0,additive,fluoride_sources_activators,fluoride sources activators,,,
+Cesium fluoride,CsF,13400-13-0,[Cs+].[F-],CsF,powder,,151.9038551,19.5,682,0,0,base,fluoride_sources_activators,fluoride sources activators,,,
 DMAP,DMAP,1122-58-3,CN(C)c1ccncc1,C7H10N2,powder,0.76,122.1677,194.9,108,0,0,additive,lewis_acid_promoters,lewis acid promoters,base,nucleophilic_catalyst_bases,moderate base
 HFIP,HFIP,920-66-1,OC(C(F)(F)F)C(F)(F)F,C3H2F6O,liquid,1.608,168.0378,412.7,-4,0,0,additive,fluoride_sources_activators,fluoride sources activators,solvent,fluorinated_alcohols,high acidic solvent
 HOPO,HOPO,14097-15-5,,,,,,,,,,additive,amide_coupling_additives,amide coupling additives,,,
@@ -1024,6 +1024,7 @@ Copper(II)phosphate,,7798-23-4,[O-]P(=O)([O-])[O-].[O-]P(=O)([O-])[O-].[Cu+2].[C
 Coppermolybdenumoxide,,13767-34-5,O.O.O.O.[Cu].[Mo],CuMoO4,powder,3.4,223.504,,500,,,metal_catalyst,,,,,
 Copric chloride dihydrate,,10125-13-0,[Cu+2],Cl2CuH4O2,powder,2.54,170.483,,100,0,0,metal_catalyst,,,,,
 Crabtree's Catalyst,,64536-78-3,C1CCC(CC1)P(C2CCCCC2)C3CCCCC3.C1CC=CCCC=C1.C1=CC=NC=C1.F[P-](F)(F)(F)(F)F.[Ir],C31H50F6IrNP2,powder,,804.89,,175,0,0,metal_catalyst,,,,,
+Cu-TMEDA catalyst,Cu-TMEDA,30698-64-7,,C12H36Cl2Cu2N4O2,powder,,466.4,,,0,0,metal_catalyst,cu_ii_salts,,,,
 Cupric nitrate trihydrate,Cu(NO3)2,10031-43-3,[Cu+2],CuH6N2O9,powder,1,241.6,,114,0,0,metal_catalyst,,,,,
 Cupric sulfide,,1317-40-4,[Cu+2].[S-2],CuS,powder,,95.611,,220,0,0,metal_catalyst,,,,,
 Cuprous chloride,CuCl,7758-89-6,[Cu+]Cl,ClCu,powder,4.14,98.999,1490,430,0,0,metal_catalyst,,,,,
@@ -1856,6 +1857,7 @@ Tetrachlorobis(tetrahydrofuran)titanium(IV),,31011-57-1,C1CCOC1.C1CCOC1.[Ti+4],C
 Tetrachlorobis(tetrahydrofuran)zirconium(IV),,21959-01-3,C1CCOC1.C1CCOC1.Cl[Zr](Cl)(Cl)Cl,C8H16Cl4O2Zr,powder,,377.247,,175,,,metal_catalyst,,,,,
 tetrahydro-I(2),,1174218-30-4,[B-](F)(F)(F)F.CC1=CC(=CC(=C1)P(C2=CC(=CC(=C2)C)C)C3=C4CCC5=CC(=C(CCC(=C3)C=C4)C=C5)P(C6=CC(=CC(=C6)C)C)C7=CC(=CC(=C7)C)C)C.C1CC=CCCC=C1.[Rh],C56H62BF4P2Rh,powder,,,,,,,metal_catalyst,,,,,
 "Tetrakis(2,2,6,6-tetramethyl-3,5-heptanedionato)niobium(IV)",,41706-15-4,CC(C)(C)C(=CC(=O)C(C)(C)C)O.CC(C)(C)C(=CC(=O)C(C)(C)C)O.CC(C)(C)C(=CC(=O)C(C)(C)C)O.CC(C)(C)C(=CC(=O)C(C)(C)C)O.[Nb],C44H76NbO8,powder,,825.976,325,219,,,metal_catalyst,,,,,
+tetrakis(acetonitrile)copper(I) hexafluorophosphate,[(CH3CN)4Cu]PF6,64443-05-6,,C8H12CuF6N4P,powder,,372.72,,,0,0,metal_catalyst,copper_salt,,,,
 Tetrakis(acetonitrile)palladium(II) bis(tetrafluoroborate),Pd(MeCN)4(BF4)2,21797-13-7,[B-](F)(F)(F)F.[B-](F)(F)(F)F.CC#N.CC#N.CC#N.CC#N.[Pd+2],C8H12B2F8N4Pd,powder,,444.237,,230,,,metal_catalyst,pd_ii_salts,Pd(2) catalyst,,,
 tetrakis(caprolactam); dirhodium,,138984-26-6,[O-]C1=NCCCCC1.[O-]C1=NCCCCC1.[O-]C1=NCCCCC1.[O-]C1=NCCCCC1.[Rh+2].[Rh+2],C24H40N4O4Rh2,liquid,,654.4098,,,0,0,metal_catalyst,,,,,
 Tetrakis(dimethylamino)titanium(IV),,3275-24-9,C[N-]C.C[N-]C.C[N-]C.C[N-]C.[Ti+4],C8H24N4Ti,liquid,,224.17,,,0,0,metal_catalyst,,,,,
@@ -26480,7 +26482,7 @@ ZSM-5,ZSM-5,308081-08-5,CCC1(c2c[nH]cn2)Cc2ccccc2C1,,powder,1,100,,,0,0,organic_
 {[2-(4-chlorophenoxy)-6-fluorophenyl]methyl}(methyl)amine,,902836-83-3,CNCc1c(F)cccc1Oc1ccc(Cl)cc1,C14H13ClFNO,liquid,1.219,265.711,325.2,,0,0,organic_compound,,,,,
 {[2-(PHENYLSULFONYL)ETHYL]SULFONYL}BENZENE,,599-94-0,O=S(=O)(CCS(=O)(=O)c1ccccc1)c1ccccc1,C14H14O4S2,liquid,1.327,310.389,566,,0,0,organic_compound,,,,,
 {[4-(trifluoromethyl)phenyl]sulfanyl}acetic acid,,349-83-7,O=C(O)CSc1cccc(C(F)(F)F)c1,C9H7F3O2S,powder,,236.211,307.6,105,0,0,organic_compound,,,,,
-鑾藉綍?Butyrolactone,,96-48-0,O=C1CCCO1,C4H6O2,liquid,1.413,86.0892,358.8,-45,0,0,organic_compound,,,,,
+閼捐棄缍?Butyrolactone,,96-48-0,O=C1CCCO1,C4H6O2,liquid,1.413,86.0892,358.8,-45,0,0,organic_compound,,,,,
 "1,3-Bis(2,6-diisopropylphenyl)-4,5-dihydro-1H-imidazol-3-ium chloride",SIPrCl,258278-25-0,,,,,,,,,,organo_catalyst,cinchona_alkaloids,cinchona alkaloids,,,
 4CzIPN,4CzIPN,1416881-52-1,,,,,,,,,,organo_catalyst,photocatalysts_organic,photocatalysts organic,,,
 Cinchonidine,Cinchonidine,90-63-1,,,,,,,,,,organo_catalyst,cinchona_alkaloids,cinchona alkaloids,,,
