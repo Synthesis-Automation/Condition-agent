@@ -10,6 +10,7 @@ from typing import Iterable, List, Set
 _DEFAULT_WEIGHTS = {
     "default": 1.0,
     "scaffold": 5.0,
+    "hetero_scaffold": 7.0,
     "amine": 4.0,
     "acid": 3.0,
     "alcohol": 2.0,
@@ -37,6 +38,19 @@ _DEFAULT_ACID_GROUPS = {
 
 _DEFAULT_ALCOHOL_GROUPS = {"OH"}
 _DEFAULT_THIOL_GROUPS = {"SH"}
+_DEFAULT_IGNORED_GROUPS = {
+    "Ar",
+    "R",
+    "Any",
+    "H",
+    "Alkyl",
+    "Alkenyl",
+    "Alkynyl",
+    "Ar-Ar",
+    "Ar-Alkyl",
+    "Ar-Alkenyl",
+    "Ar-Alkynyl",
+}
 
 
 @lru_cache(maxsize=1)
@@ -95,14 +109,41 @@ def _load_scaffold_motif_ids() -> Set[str]:
     return motifs
 
 
+@lru_cache(maxsize=1)
+def _load_heteroaromatic_scaffold_ids() -> Set[str]:
+    try:
+        from ..taxonomy import loader as taxonomy_loader
+    except Exception:
+        return set()
+    payload = taxonomy_loader.load_scaffold_motifs()
+    if not payload:
+        return set()
+    hetero_ids: Set[str] = set()
+    for entry in payload.get("compounds", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        motif_id = str(entry.get("id") or "").strip()
+        if not motif_id:
+            continue
+        desc = str(entry.get("description") or "").lower()
+        if "heteroaromatic" in desc:
+            hetero_ids.add(motif_id)
+    return hetero_ids
+
+
 def spectator_group_weight(group_id: str) -> float:
     text = str(group_id or "").strip()
     if not text:
+        return 0.0
+    ignored_groups = _configured_group_set("ignored", _DEFAULT_IGNORED_GROUPS)
+    if text in ignored_groups:
         return 0.0
     amine_groups = _configured_group_set("amine", _DEFAULT_AMINE_GROUPS)
     acid_groups = _configured_group_set("acid", _DEFAULT_ACID_GROUPS)
     alcohol_groups = _configured_group_set("alcohol", _DEFAULT_ALCOHOL_GROUPS)
     thiol_groups = _configured_group_set("thiol", _DEFAULT_THIOL_GROUPS)
+    if text in _load_heteroaromatic_scaffold_ids():
+        return _configured_weight("hetero_scaffold")
     if text in _load_scaffold_motif_ids():
         return _configured_weight("scaffold")
     if text in amine_groups:

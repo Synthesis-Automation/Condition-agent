@@ -1647,6 +1647,12 @@ class HTERecommendationResult:
     reacted_motifs: Optional[Tuple[str, ...]] = None
     formed_motifs: Optional[Tuple[str, ...]] = None
     spectator_motifs: Optional[Tuple[str, ...]] = None
+    query_spectator_groups: Optional[Tuple[str, ...]] = None
+    spectator_scoring_applied: bool = False
+    spectator_rows_with_groups: int = 0
+    spectator_rows_total: int = 0
+    spectator_similarity_avg: float = 0.0
+    spectator_similarity_range: Tuple[float, float] = (0.0, 0.0)
     query_reaction_key: Optional[str] = None  # Formatted Reaction_Key for the query
     
     # Recommendations
@@ -2099,7 +2105,9 @@ class HTERecommender:
             key=lambda x: (x.match_score, x.spectator_score, x.avg_z_score, x.confidence_score),
             reverse=True,
         )
-        
+
+        if top_k <= 0:
+            return recommendations
         return recommendations[:top_k]
 
     def _combine_recommendations_by_source(
@@ -2244,6 +2252,8 @@ class HTERecommender:
 
         results = list(deduped.values())
         results.sort(key=lambda item: item.match_score, reverse=True)
+        if top_k <= 0:
+            return results
         return results[:top_k]
     
     def recommend(
@@ -2401,6 +2411,7 @@ class HTERecommender:
             result.reacted_motifs = tuple(sorted(reacted_set))
             result.formed_motifs = tuple(sorted(formed_set))
             result.spectator_motifs = tuple(sorted(spectator_set))
+            result.query_spectator_groups = tuple(sorted(query_spectator_groups))
 
             result.query_reaction_key = _normalize_reaction_key(reaction_data.get("reaction_key"))
         # If no reaction key and no reactant types, return empty
@@ -2726,6 +2737,22 @@ class HTERecommender:
             spectator_scores = row_group_sets.apply(
                 lambda row_groups: _spectator_similarity(query_spectator_groups, row_groups)
             )
+            row_group_counts = row_group_sets.apply(len)
+            rows_with_groups = int((row_group_counts > 0).sum())
+            rows_total = int(len(row_group_sets))
+            if len(spectator_scores) > 0:
+                score_min = float(spectator_scores.min())
+                score_max = float(spectator_scores.max())
+                score_avg = float(spectator_scores.mean())
+            else:
+                score_min = 0.0
+                score_max = 0.0
+                score_avg = 0.0
+            result.spectator_scoring_applied = True
+            result.spectator_rows_with_groups = rows_with_groups
+            result.spectator_rows_total = rows_total
+            result.spectator_similarity_avg = score_avg
+            result.spectator_similarity_range = (score_min, score_max)
             matched_df["spectator_score"] = spectator_scores
             weight = (1.0 - _SPECTATOR_MATCH_WEIGHT) + (_SPECTATOR_MATCH_WEIGHT * spectator_scores)
             if "match_score" in matched_df.columns:
@@ -3099,9 +3126,17 @@ class HTERecommender:
                     # Normalize z-score to 0-1 range (assuming typical range -3 to +3)
                     normalized_zscore = (cond.avg_z_score + 3) / 6.0
                     normalized_zscore = max(0, min(1, normalized_zscore))
-                    
-                    # 60% diversity, 40% performance
-                    combined_score = (diversity_score / 4.0) * 0.6 + normalized_zscore * 0.4
+                    # Include relevance terms so spectator-aware matching remains
+                    # effective even after diversity selection.
+                    normalized_match = max(0.0, min(1.0, float(cond.match_score)))
+                    normalized_spectator = max(0.0, min(1.0, float(cond.spectator_score)))
+
+                    combined_score = (
+                        (diversity_score / 4.0) * 0.45
+                        + normalized_zscore * 0.30
+                        + normalized_match * 0.20
+                        + normalized_spectator * 0.05
+                    )
                 else:
                     combined_score = diversity_score
                 

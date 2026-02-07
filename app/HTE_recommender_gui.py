@@ -97,13 +97,47 @@ def _safe_text(value: Any) -> str:
     return str(value)
 
 
-def _collect_reaction_spectator_groups(reaction_smiles: str) -> List[str]:
+def _format_items(value: Any, *, sep: str = ", ") -> str:
+    if value is None:
+        return "None"
+    if isinstance(value, (list, tuple, set)):
+        items = [str(v).strip() for v in value if str(v).strip()]
+        return sep.join(items) if items else "None"
+    text = str(value).strip()
+    return text if text else "None"
+
+
+def _extract_crk_section(crk_key: str, label: str) -> str:
+    if not crk_key:
+        return ""
+    prefix = f"{label}: "
+    parts = [p.strip() for p in crk_key.split(" | ") if p.strip()]
+    for part in parts:
+        if part.startswith(prefix):
+            return part[len(prefix):].strip()
+    return ""
+
+
+def _collect_reaction_analysis(reaction_smiles: str) -> Dict[str, Any]:
+    info: Dict[str, Any] = {
+        "reaction_key": "",
+        "product_broad_tags": [],
+        "product_motifs_reactive": [],
+        "reacted_motifs": [],
+        "formed_motifs": [],
+        "formed_motifs_center": [],
+        "formed_motifs_context": [],
+        "spectator_motifs": [],
+        "spectator_groups": [],
+        "bond_formed": "",
+        "bond_broken": "",
+    }
     if not reaction_smiles:
-        return []
+        return info
     try:
         from chemtools.featurizers.unified import featurize_reaction
     except Exception:
-        return []
+        return info
 
     try:
         payload = featurize_reaction(
@@ -111,20 +145,50 @@ def _collect_reaction_spectator_groups(reaction_smiles: str) -> List[str]:
             options={"confirm_coupling_products": True},
         )
     except Exception:
-        return []
+        return info
 
     if not isinstance(payload, dict):
-        return []
-    reaction = payload.get("reaction")
+        return info
+    reaction = payload.get("reaction") if isinstance(payload.get("reaction"), dict) else payload
     if not isinstance(reaction, dict):
-        return []
+        return info
     aggregates = reaction.get("aggregates") or {}
+    reaction_key = str(reaction.get("reaction_key") or "").strip()
     groups = aggregates.get("spectator_groups_ranked") or aggregates.get("spectator_groups_combined") or []
     cleaned = [str(group).strip() for group in groups if str(group).strip()]
+    info.update(
+        {
+            "reaction_key": reaction_key,
+            "product_broad_tags": list(reaction.get("product_broad_tags") or []),
+            "product_motifs_reactive": list(reaction.get("product_motifs_reactive") or []),
+            "reacted_motifs": list(aggregates.get("reacted_motifs") or []),
+            "formed_motifs": list(aggregates.get("formed_motifs") or []),
+            "formed_motifs_center": list(aggregates.get("formed_motifs_center") or []),
+            "formed_motifs_context": list(aggregates.get("formed_motifs_context") or []),
+            "spectator_motifs": list(aggregates.get("spectator_motifs") or []),
+            "spectator_groups": cleaned,
+            "bond_formed": _extract_crk_section(reaction_key, "bond_formed"),
+            "bond_broken": _extract_crk_section(reaction_key, "bond_broken"),
+        }
+    )
     if os.environ.get("HTE_DEBUG_SPECTATORS") == "1":
         print(f"[HTE_DEBUG] reaction_smiles={reaction_smiles}")
         print(f"[HTE_DEBUG] spectator_groups_combined={cleaned}")
-    return cleaned
+    return info
+
+
+def _collect_reaction_spectator_groups(reaction_smiles: str) -> List[str]:
+    info = _collect_reaction_analysis(reaction_smiles)
+    return list(info.get("spectator_groups") or [])
+
+
+def _format_score_stats(scores: List[float], *, max_items: int = 6) -> str:
+    if not scores:
+        return "None"
+    preview = ", ".join(f"{score:.3f}" for score in scores[:max_items])
+    if len(scores) > max_items:
+        preview += f", ... (+{len(scores) - max_items} more)"
+    return preview
 
 
 def _reaction_image_path(prefix: str) -> Path:
@@ -281,8 +345,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.reaction_smiles_edit.setPlaceholderText("A.B>>P or A.B or A")
 
         self.top_k_spin = QtWidgets.QSpinBox()
-        self.top_k_spin.setRange(1, 200)
+        self.top_k_spin.setRange(0, 200)
+        self.top_k_spin.setSpecialValueText("All")
         self.top_k_spin.setValue(10)
+        self.top_k_spin.setToolTip("Max recommendations to display. Set to All (0) to show every matched condition.")
 
         self.min_exp_spin = QtWidgets.QSpinBox()
         self.min_exp_spin.setRange(1, 200)
@@ -574,22 +640,44 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         data_type = _detect_csv_type(Path(self.db_path_edit.text().strip()))
         reaction_smiles = self.reaction_smiles_edit.text().strip()
 
+        recs = list(getattr(result, "recommendations", []) or [])
         type_a = getattr(result, "reactant_a_type", "")
         type_b = getattr(result, "reactant_b_type", "")
         detected = getattr(result, "matched_motifs", None)
-        spectator_summary = _format_nearby_groups(
-            _collect_reaction_spectator_groups(reaction_smiles)
-        )
+        reaction_info = _collect_reaction_analysis(reaction_smiles)
+        spectator_summary = _format_nearby_groups(list(reaction_info.get("spectator_groups") or []))
         self._spectator_groups_summary = spectator_summary
 
-        query_key = _clean_reaction_key_text(getattr(result, "query_reaction_key", None))
-        reacted_motifs = getattr(result, "reacted_motifs", None)
-        formed_motifs = getattr(result, "formed_motifs", None)
-        spectator_motifs = getattr(result, "spectator_motifs", None)
+        query_key = _clean_reaction_key_text(
+            getattr(result, "query_reaction_key", None) or reaction_info.get("reaction_key", "")
+        )
+        reacted_motifs = getattr(result, "reacted_motifs", None) or reaction_info.get("reacted_motifs", [])
+        formed_motifs = getattr(result, "formed_motifs", None) or reaction_info.get("formed_motifs", [])
+        spectator_motifs = getattr(result, "spectator_motifs", None) or reaction_info.get("spectator_motifs", [])
         matched_key = _clean_reaction_key_text(_format_matched_key(detected))
         reaction_filter = self.reaction_filter_edit.text().strip() or None
         detected_reaction_type = getattr(result, "predicted_reaction_type", None)
         detected_confidence = getattr(result, "reaction_type_confidence", None)
+        query_spectator_groups = (
+            getattr(result, "query_spectator_groups", None)
+            or tuple(reaction_info.get("spectator_groups") or [])
+        )
+        scoring_applied = bool(getattr(result, "spectator_scoring_applied", False))
+        rows_with_groups = int(getattr(result, "spectator_rows_with_groups", 0) or 0)
+        rows_total = int(getattr(result, "spectator_rows_total", 0) or 0)
+        sim_avg = float(getattr(result, "spectator_similarity_avg", 0.0) or 0.0)
+        sim_range = getattr(result, "spectator_similarity_range", (0.0, 0.0)) or (0.0, 0.0)
+        try:
+            sim_min = float(sim_range[0])
+            sim_max = float(sim_range[1])
+        except Exception:
+            sim_min = 0.0
+            sim_max = 0.0
+        displayed_scores = [
+            float(getattr(rec, "spectator_score", 0.0) or 0.0)
+            for rec in recs
+        ]
+
         if detected_reaction_type:
             if isinstance(detected_confidence, (int, float)):
                 detected_display = f"{detected_reaction_type} ({detected_confidence:.2f})"
@@ -606,11 +694,39 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             html.escape(f"Formed Motifs: {', '.join(formed_motifs) if formed_motifs else 'None'}"),
             html.escape(f"Spectator Motifs: {', '.join(spectator_motifs) if spectator_motifs else 'None'}"),
         ]
+        summary_lines.extend(
+            [
+                "<br><b>Reaction Key Generation</b>",
+                html.escape(f"CRK: {_format_items(reaction_info.get('reaction_key'))}"),
+                html.escape(f"Broad Product Tags: {_format_items(reaction_info.get('product_broad_tags'))}"),
+                html.escape(f"Product Motifs (Reactive): {_format_items(reaction_info.get('product_motifs_reactive'))}"),
+                html.escape(f"Reacted motifs: {_format_items(reaction_info.get('reacted_motifs'), sep='|')}"),
+                html.escape(f"Formed motifs (all): {_format_items(reaction_info.get('formed_motifs'))}"),
+                html.escape(f"Formed motifs (reaction-center): {_format_items(reaction_info.get('formed_motifs_center'))}"),
+                html.escape(f"Formed motifs (context): {_format_items(reaction_info.get('formed_motifs_context'))}"),
+                html.escape(f"Bond formed: {_format_items(reaction_info.get('bond_formed'))}"),
+                html.escape(f"Bond broken: {_format_items(reaction_info.get('bond_broken'))}"),
+                html.escape(f"Spectator groups: {_format_items(reaction_info.get('spectator_groups'))}"),
+                html.escape(f"Spectator motifs: {_format_items(reaction_info.get('spectator_motifs'))}"),
+                "<br><b>Spectator Ranking</b>",
+                html.escape(f"Query spectator groups: {_format_items(query_spectator_groups)}"),
+                html.escape(
+                    "Scoring formula: match_score *= (1 - 0.70) + 0.70 * spectator_similarity"
+                ),
+                html.escape(f"Spectator scoring applied: {'Yes' if scoring_applied else 'No'}"),
+                html.escape(f"Matched rows with spectator groups: {rows_with_groups}/{rows_total}"),
+                html.escape(
+                    f"Row spectator similarity: avg={sim_avg:.3f}, range=[{sim_min:.3f}, {sim_max:.3f}]"
+                ),
+                html.escape(
+                    f"Displayed recommendation spectator scores: {_format_score_stats(displayed_scores)}"
+                ),
+            ]
+        )
         if not query_key:
             summary_lines.append(html.escape(f"Reactant Types (fallback): A={type_a or 'None'} | B={type_b or 'None'}"))
         self.summary.setHtml("<br>".join(summary_lines))
 
-        recs = list(getattr(result, "recommendations", []) or [])
         source_map = getattr(result, "recommendations_by_source", {}) or {}
         normalized_map: Dict[str, List[Any]] = {}
         for key, items in source_map.items():

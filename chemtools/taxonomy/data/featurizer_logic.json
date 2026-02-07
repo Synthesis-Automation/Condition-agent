@@ -77,14 +77,28 @@
   },
   "spectator_rank": {
     "weights": {
-      "default": 1.0,
+      "default": 0.8,
       "scaffold": 5.0,
-      "amine": 4.0,
+      "hetero_scaffold": 7.0,
+      "amine": 5.0,
       "acid": 3.0,
-      "alcohol": 2.0,
-      "thiol": 1.5
+      "alcohol": 3.5,
+      "thiol": 3.5
     },
     "group_sets": {
+      "ignored": [
+        "Ar",
+        "R",
+        "Any",
+        "H",
+        "Alkyl",
+        "Alkenyl",
+        "Alkynyl",
+        "Ar-Ar",
+        "Ar-Alkyl",
+        "Ar-Alkenyl",
+        "Ar-Alkynyl"
+      ],
       "amine": [
         "NH2",
         "NHR",

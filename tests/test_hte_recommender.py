@@ -128,6 +128,43 @@ def test_recommend_source_group_filter(monkeypatch) -> None:
     assert result.recommendations[0].catalyst == "Pd"
 
 
+def test_recommend_top_k_zero_returns_all_matches(monkeypatch) -> None:
+    base = _make_min_hte_df()
+    alt_1 = base.copy()
+    alt_1["Catalyst"] = ["Ni"]
+    alt_2 = base.copy()
+    alt_2["Catalyst"] = ["Cu"]
+    df = pd.concat([base, alt_1, alt_2], ignore_index=True)
+
+    indexed_data = {"Ar-X": df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return ["Ar-X"], "Aryl Halide"
+
+    def fake_precedent(self, *args, **kwargs):
+        return []
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Brc1ccccc1",
+        top_k=0,
+        min_experiments=1,
+    )
+
+    assert result.total_matching_experiments == 3
+    assert len(result.recommendations) == 3
+    assert set(rec.catalyst for rec in result.recommendations) == {"Pd", "Ni", "Cu"}
+
+
 def test_summarize_conditions_filters(monkeypatch) -> None:
     df = _make_summary_df()
     indexed_data = {"Ar-X": df}
