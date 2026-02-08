@@ -16,6 +16,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+RUN_ALL_SOURCE_SENTINEL = "__run_all_recommendation__"
+RUN_ALL_GROUPS: Tuple[str, ...] = ("literature", "protocols", "experiments", "rules")
+
 
 def _parse_reaction_smiles(reaction_smiles: str) -> Tuple[str, Optional[str], Optional[str]]:
     text = (reaction_smiles or "").strip()
@@ -77,7 +80,36 @@ def _normalize_source_group_label(value: Any) -> str:
         return "rules"
     if text in ("protocols", "protocol"):
         return "protocols"
+    if text == "precedent":
+        return "precedent"
     return text
+
+
+def _recommendation_fingerprint(rec: Any) -> str:
+    try:
+        return json.dumps(asdict(rec), sort_keys=True, default=str)
+    except Exception:
+        return str(id(rec))
+
+
+def _dedupe_recommendations(recs: List[Any]) -> List[Any]:
+    out: List[Any] = []
+    seen: set[str] = set()
+    for rec in recs or []:
+        key = _recommendation_fingerprint(rec)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(rec)
+    return out
+
+
+def _normalize_recommendations_by_source(source_map: Dict[str, Any]) -> Dict[str, List[Any]]:
+    normalized_map: Dict[str, List[Any]] = {}
+    for key, items in (source_map or {}).items():
+        normalized_key = _normalize_source_group_label(key)
+        normalized_map.setdefault(normalized_key, []).extend(list(items or []))
+    return normalized_map
 
 
 def _format_float(value: Optional[float]) -> str:
@@ -311,6 +343,106 @@ class RecommendationWorker(QtCore.QObject):
         self.source_group = source_group
         self.use_aryl_weighting = use_aryl_weighting
 
+    def _run_single(
+        self,
+        recommender: Any,
+        reactant_a: str,
+        reactant_b: Optional[str],
+        product: Optional[str],
+        source_group: Optional[str],
+    ) -> Any:
+        return recommender.recommend(
+            reactant_a_smiles=reactant_a,
+            reactant_b_smiles=reactant_b,
+            product_smiles=product,
+            top_k=self.top_k,
+            min_experiments=self.min_exp,
+            reaction_type_filter=self.reaction_filter or None,
+            catalyst_filter=self.catalyst_filter or None,
+            source_group=source_group,
+            use_aryl_steric_electronic_weighting=self.use_aryl_weighting,
+        )
+
+    def _run_all_recommendations(
+        self,
+        recommender: Any,
+        reactant_a: str,
+        reactant_b: Optional[str],
+        product: Optional[str],
+    ) -> Any:
+        self.progress.emit("Running all recommendation sources ...")
+        baseline = self._run_single(
+            recommender,
+            reactant_a,
+            reactant_b,
+            product,
+            None,
+        )
+
+        baseline_map = _normalize_recommendations_by_source(
+            getattr(baseline, "recommendations_by_source", {}) or {}
+        )
+        merged_by_source: Dict[str, List[Any]] = {}
+
+        for group_name in RUN_ALL_GROUPS:
+            self.progress.emit(f"Running {group_name} recommendation ...")
+            group_result = self._run_single(
+                recommender,
+                reactant_a,
+                reactant_b,
+                product,
+                group_name,
+            )
+            group_map = _normalize_recommendations_by_source(
+                getattr(group_result, "recommendations_by_source", {}) or {}
+            )
+            group_recs = list(group_map.get(group_name) or [])
+            if not group_recs:
+                group_recs = list(getattr(group_result, "recommendations", []) or [])
+            merged_by_source[group_name] = _dedupe_recommendations(group_recs)
+
+            if group_name == "literature":
+                precedent_recs = list(group_map.get("precedent") or [])
+                if precedent_recs:
+                    merged_by_source["precedent"] = _dedupe_recommendations(precedent_recs)
+
+        for key, items in baseline_map.items():
+            if key not in merged_by_source and items:
+                merged_by_source[key] = _dedupe_recommendations(list(items))
+
+        source_order = ["literature", "protocols", "rules", "experiments", "precedent"]
+        extras = [k for k in sorted(merged_by_source) if k not in source_order]
+        merged_all: List[Any] = []
+        for key in source_order + extras:
+            merged_all.extend(list(merged_by_source.get(key) or []))
+
+        baseline.recommendations_by_source = merged_by_source
+        baseline.recommendations = _dedupe_recommendations(merged_all)
+        return baseline
+
+    def _run_precedent_only(
+        self,
+        recommender: Any,
+        reactant_a: str,
+        reactant_b: Optional[str],
+        product: Optional[str],
+    ) -> Any:
+        self.progress.emit("Running precedent recommendation ...")
+        result = self._run_single(
+            recommender,
+            reactant_a,
+            reactant_b,
+            product,
+            "literature",
+        )
+        source_map = _normalize_recommendations_by_source(
+            getattr(result, "recommendations_by_source", {}) or {}
+        )
+        precedent_recs = _dedupe_recommendations(list(source_map.get("precedent") or []))
+        result.recommendations_by_source = {"precedent": precedent_recs}
+        result.recommendations = precedent_recs
+        return result
+
     def run(self) -> None:
         try:
             from chemtools.recommend import HTERecommender
@@ -321,19 +453,29 @@ class RecommendationWorker(QtCore.QObject):
 
             self.progress.emit(f"Loading HTE data from {self.db_path} ...")
             recommender = HTERecommender(self.db_path)
-            self.progress.emit("Running recommendation ...")
-
-            result = recommender.recommend(
-                reactant_a_smiles=reactant_a,
-                reactant_b_smiles=reactant_b,
-                product_smiles=product,
-                top_k=self.top_k,
-                min_experiments=self.min_exp,
-                reaction_type_filter=self.reaction_filter or None,
-                catalyst_filter=self.catalyst_filter or None,
-                source_group=self.source_group or None,
-                use_aryl_steric_electronic_weighting=self.use_aryl_weighting,
-            )
+            if self.source_group == RUN_ALL_SOURCE_SENTINEL:
+                result = self._run_all_recommendations(
+                    recommender,
+                    reactant_a,
+                    reactant_b,
+                    product,
+                )
+            elif _normalize_source_group_label(self.source_group) == "precedent":
+                result = self._run_precedent_only(
+                    recommender,
+                    reactant_a,
+                    reactant_b,
+                    product,
+                )
+            else:
+                self.progress.emit("Running recommendation ...")
+                result = self._run_single(
+                    recommender,
+                    reactant_a,
+                    reactant_b,
+                    product,
+                    self.source_group or None,
+                )
             stats = recommender.get_statistics()
             self.finished.emit(True, result, "OK", stats)
         except Exception as exc:
@@ -371,7 +513,17 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.catalyst_filter_edit.setPlaceholderText("Optional catalyst filter (e.g., Pd, Cu)")
 
         self.source_group_combo = QtWidgets.QComboBox()
-        self.source_group_combo.addItems(["All", "literature", "protocols", "experiments", "rules"])
+        self.source_group_combo.addItems(
+            [
+                "All",
+                "Run all recommendation",
+                "Precedent",
+                "literature",
+                "protocols",
+                "experiments",
+                "rules",
+            ]
+        )
         self.source_group_combo.setToolTip(
             "Filter results to a specific HTE source group (protocols=curated literature with detailed procedures, rules live in data/HTE_db/rules)."
         )
@@ -588,7 +740,13 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             min_exp=self.min_exp_spin.value(),
             reaction_filter=self.reaction_filter_edit.text().strip(),
             catalyst_filter=self.catalyst_filter_edit.text().strip(),
-            source_group="" if self._source_group_label == "All" else self._source_group_label,
+            source_group=(
+                ""
+                if self._source_group_label == "All"
+                else RUN_ALL_SOURCE_SENTINEL
+                if self._source_group_label == "Run all recommendation"
+                else self._source_group_label
+            ),
             use_aryl_weighting=self._aryl_weighting_enabled,
         )
         self.worker.moveToThread(self.thread)
@@ -743,6 +901,26 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             normalized_key = _normalize_source_group_label(key)
             normalized_map.setdefault(normalized_key, []).extend(items)
         source_map = normalized_map
+        base_groups = ["literature", "protocols", "rules", "experiments", "precedent"]
+        extra_groups = [g for g in sorted(source_map) if g not in base_groups]
+
+        display_recs = list(recs)
+        source_label = (self._source_group_label or "").strip().lower()
+        if source_label in {"all", "run all recommendation"} and source_map:
+            merged: List[Any] = []
+            seen: set[str] = set()
+            for source_group in base_groups + extra_groups:
+                for rec in list(source_map.get(source_group) or []):
+                    try:
+                        rec_key = json.dumps(asdict(rec), sort_keys=True, default=str)
+                    except Exception:
+                        rec_key = str(id(rec))
+                    if rec_key in seen:
+                        continue
+                    seen.add(rec_key)
+                    merged.append(rec)
+            if merged:
+                display_recs = merged
 
         try:
             from chemtools.formatters import format_hte_output
@@ -767,10 +945,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.table = self._create_results_table()
         self.results_tabs.addTab(self.table, "All")
         all_columns = _table_columns_for_type(data_type)
-        self._populate_table(self.table, recs, all_columns)
+        self._populate_table(self.table, display_recs, all_columns)
 
-        base_groups = ["literature", "protocols", "rules", "experiments", "precedent"]
-        extra_groups = [g for g in sorted(source_map) if g not in base_groups]
         for source_group in base_groups + extra_groups:
             group_recs = list(source_map.get(source_group) or [])
             group_table = self._create_results_table()

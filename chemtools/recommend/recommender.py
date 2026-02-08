@@ -545,8 +545,49 @@ def _resolve_reaction_type_label(label: Optional[str]) -> str:
         return ""
     if _reaction_catalog is None:
         return text
-    resolved = _reaction_catalog.resolve_reaction_type(text)
-    return resolved or text
+    candidates: List[str] = [text, text.lower()]
+
+    cleaned = re.sub(r"\([^)]*\)", "", text).strip()
+    if cleaned:
+        candidates.extend([cleaned, cleaned.lower()])
+
+        trimmed = re.sub(r"[_\-\s]*sample\s*\d+\s*$", "", cleaned, flags=re.IGNORECASE).strip()
+        trimmed = re.sub(
+            r"[_\-\s]*dataset[_\-\s]*converted(?:[_\-\s]*\d+)?\s*$",
+            "",
+            trimmed,
+            flags=re.IGNORECASE,
+        ).strip()
+        if trimmed:
+            candidates.extend([trimmed, trimmed.lower()])
+            candidates.extend(
+                [
+                    trimmed.replace(" ", "_"),
+                    trimmed.replace(" ", "-"),
+                    trimmed.replace("-", "_"),
+                    trimmed.replace("_", "-"),
+                ]
+            )
+
+    seen: Set[str] = set()
+    for candidate in candidates:
+        cand = str(candidate).strip()
+        if not cand:
+            continue
+        key = cand.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        resolved = _reaction_catalog.resolve_reaction_type(cand)
+        if resolved:
+            return resolved
+
+    low = text.lower()
+    if "suzuki" in low:
+        resolved = _reaction_catalog.resolve_reaction_type("suzuki")
+        if resolved:
+            return resolved
+    return text
 
 
 def _format_source_reaction_ids(
@@ -1202,6 +1243,13 @@ def _expand_parent_motifs(motifs: Iterable[str]) -> List[str]:
             candidate = f"{prefix}-X"
             if candidate in compound_ids:
                 expanded.append(candidate)
+            # Expand aromatic halides across leaving groups to enable chemistry-aware
+            # fallback (e.g., Ar-Cl query can borrow Ar-Br literature precedent).
+            if prefix in _AROMATIC_SCAFFOLD_FALLBACK:
+                expanded.extend(f"{prefix}-{hal}" for hal in sorted(_HALIDE_SUFFIXES))
+                expanded.append(candidate)
+        elif suffix == "X" and prefix in _AROMATIC_SCAFFOLD_FALLBACK:
+            expanded.extend(f"{prefix}-{hal}" for hal in sorted(_HALIDE_SUFFIXES))
     return _dedupe_list(expanded)
 
 
@@ -2345,6 +2393,30 @@ class HTERecommender:
             resolved_filter = _resolve_reaction_type_label(reaction_type_filter)
             if resolved_filter:
                 reaction_type_filter = resolved_filter
+
+        target_reaction_for_matching = ""
+        if reaction_type_filter:
+            target_reaction_for_matching = reaction_type_filter
+        elif (
+            result.predicted_reaction_type
+            and result.predicted_reaction_type != "Unknown"
+            and result.reaction_type_confidence >= 0.5
+        ):
+            target_reaction_for_matching = _resolve_reaction_type_label(
+                result.predicted_reaction_type
+            )
+
+        def _filter_target_reaction(df: pd.DataFrame) -> pd.DataFrame:
+            if (
+                not target_reaction_for_matching
+                or "Reaction_Type_Standardized" not in df.columns
+            ):
+                return df
+            type_series = df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+            type_mask = type_series.apply(
+                lambda value: _resolve_reaction_type_label(value) == target_reaction_for_matching if value else False
+            )
+            return df[type_mask]
         
         # Step 1: Detect reactant types (used for fallback only)
         type_a, cat_a = self._detect_reactant_types(reactant_a_smiles)
@@ -2488,6 +2560,16 @@ class HTERecommender:
                 lookup_collapsed_a = _collapse_motif_tokens(lookup_type_a)
                 lookup_collapsed_b = _collapse_motif_tokens(lookup_type_b)
 
+        if (
+            not target_reaction_for_matching
+            and result.predicted_reaction_type
+            and result.predicted_reaction_type != "Unknown"
+            and result.reaction_type_confidence >= 0.5
+        ):
+            target_reaction_for_matching = _resolve_reaction_type_label(
+                result.predicted_reaction_type
+            )
+
         # Step 3: Match against database (reaction-key first)
         query_motifs = set(type_a) | set(type_b)
         if query_core_signature:
@@ -2525,6 +2607,10 @@ class HTERecommender:
             key_match_df = _filter_source_group(key_match_df, source_group)
             if key_match_df.empty:
                 key_match_df = None
+        if key_match_df is not None:
+            key_match_df = _filter_target_reaction(key_match_df)
+            if key_match_df.empty:
+                key_match_df = None
         if key_match_df is None:
             for db_key, group_df in self.transformation_indices.items():
                 score = self._score_transformation_match(
@@ -2541,6 +2627,9 @@ class HTERecommender:
                         temp_df = _filter_source_group(temp_df, source_group)
                         if temp_df.empty:
                             continue
+                    temp_df = _filter_target_reaction(temp_df)
+                    if temp_df.empty:
+                        continue
                     
                     temp_df['match_score'] = score
                     temp_df['_transformation_key'] = db_key
@@ -2608,6 +2697,11 @@ class HTERecommender:
                         direct_match = None
                         direct_key = None
                 if direct_match is not None:
+                    direct_match = _filter_target_reaction(direct_match)
+                    if direct_match.empty:
+                        direct_match = None
+                        direct_key = None
+                if direct_match is not None:
                     direct_match['match_score'] = 1.0
                     direct_match['match_priority'] = 0
                     _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
@@ -2638,6 +2732,11 @@ class HTERecommender:
                                     direct_match = None
                                     direct_key = None
                                     continue
+                            direct_match = _filter_target_reaction(direct_match)
+                            if direct_match.empty:
+                                direct_match = None
+                                direct_key = None
+                                continue
                             direct_match['match_score'] = 1.0
                             direct_match['match_priority'] = 0
                             _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
@@ -2689,6 +2788,10 @@ class HTERecommender:
                                     if fallback_match.empty:
                                         fallback_match = None
                                         continue
+                                fallback_match = _filter_target_reaction(fallback_match)
+                                if fallback_match.empty:
+                                    fallback_match = None
+                                    continue
                                 if (
                                     expand_for_coverage
                                     and "Source_Group" in fallback_match.columns
@@ -2748,22 +2851,15 @@ class HTERecommender:
         
         # Apply reaction type filter if specified
         if reaction_type_filter:
-            # Allow matches that:
-            # 1. Have matching Reaction_Type
-            # 2. Are key-based matches (presumed structural match) via _transformation_key or Reaction_Key
-            # 3. Have match_score > 0.9 (strong similarity match)
-            
-            cond_type = matched_df['Reaction_Type_Standardized'] == reaction_type_filter
-            
-            cond_key = pd.Series([False] * len(matched_df), index=matched_df.index)
-            if "_transformation_key" in matched_df.columns:
-                cond_key |= matched_df["_transformation_key"].notna()
-            
-            # If Result has query key, check for exact key match
-            if result.query_reaction_key and "Reaction_Key" in matched_df.columns:
-                 cond_key |= (matched_df["Reaction_Key"] == result.query_reaction_key)
-
-            matched_df = matched_df[cond_type | cond_key]
+            if "Reaction_Type_Standardized" in matched_df.columns:
+                type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+                target_reaction = _resolve_reaction_type_label(reaction_type_filter)
+                type_mask = type_series.apply(
+                    lambda value: _resolve_reaction_type_label(value) == target_reaction if value else False
+                )
+                matched_df = matched_df[type_mask]
+            else:
+                matched_df = matched_df.iloc[0:0]
         
         # Apply catalyst filter if specified
         if catalyst_filter:
@@ -2904,28 +3000,14 @@ class HTERecommender:
             ):
                 # Apply detected reaction type as filter
                 if "Reaction_Type_Standardized" in matched_df.columns:
-                    if result.query_reaction_key and "Reaction_Key" in matched_df.columns:
-                        key_series = matched_df["Reaction_Key"].fillna("").astype(str).str.strip()
-                        if not (key_series == result.query_reaction_key).any():
-                            type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
-                            detected_normalized = _resolve_reaction_type_label(result.predicted_reaction_type)
-                            type_mask = type_series.apply(
-                                lambda x: _resolve_reaction_type_label(x) == detected_normalized if x else False
-                            )
-                            filtered_df = matched_df[type_mask]
-                            if len(filtered_df) >= min_experiments:
-                                matched_df = filtered_df
-                                result.is_filtered_by_detected_type = True
-                    else:
-                        type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
-                        detected_normalized = _resolve_reaction_type_label(result.predicted_reaction_type)
+                    type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+                    detected_normalized = _resolve_reaction_type_label(result.predicted_reaction_type)
+                    if detected_normalized:
                         type_mask = type_series.apply(
                             lambda x: _resolve_reaction_type_label(x) == detected_normalized if x else False
                         )
-                        filtered_df = matched_df[type_mask]
-                        if len(filtered_df) >= min_experiments:
-                            matched_df = filtered_df
-                            result.is_filtered_by_detected_type = True
+                        matched_df = matched_df[type_mask]
+                        result.is_filtered_by_detected_type = True
             
             pool_size = max(top_k * 3, top_k)
             if "Source_Group" in matched_df.columns:

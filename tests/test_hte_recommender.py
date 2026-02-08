@@ -424,3 +424,185 @@ def test_key_match_backfills_rules_and_experiments_with_aromatic_alias(monkeypat
     assert result.total_matching_experiments >= 3
     assert "rules" in result.recommendations_by_source
     assert "experiments" in result.recommendations_by_source
+
+
+def _make_mixed_reaction_type_key_df() -> tuple[pd.DataFrame, str]:
+    query_key = "CRK-v1 |Ar-B(OH)2|Ar-Cl -> Ar-Ar | bond_formed: C(ar)-C(ar)"
+    suzuki = _make_min_hte_df()
+    suzuki["Reaction_Type_Standardized"] = ["Suzuki_miyaura"]
+    suzuki["Catalyst"] = ["Pd"]
+    suzuki["z-Score"] = [1.5]
+    suzuki["AREA_TOTAL_REDUCED"] = [78.0]
+    suzuki["Reaction_Key"] = [query_key]
+    suzuki["Reactant_Signature_Core"] = ["Ar-B(OH)2|Ar-Cl"]
+    suzuki["Reactant_Signature_Ext"] = ["Ar-B(OH)2|Ar-Cl"]
+
+    chan_lam = suzuki.copy()
+    chan_lam["Reaction_Type_Standardized"] = ["ChanLam_dataset_converted (2)"]
+    chan_lam["Catalyst"] = ["Cu"]
+    chan_lam["z-Score"] = [4.2]
+    chan_lam["AREA_TOTAL_REDUCED"] = [89.0]
+
+    df = pd.concat([chan_lam, suzuki], ignore_index=True)
+    return df, query_key
+
+
+def test_reaction_type_filter_blocks_cross_family_key_matches(monkeypatch) -> None:
+    df, query_key = _make_mixed_reaction_type_key_df()
+    indexed_data = {}
+    reaction_type_patterns = {}
+    transformation_indices = {query_key: df.copy()}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return [], "Unknown"
+
+    def fake_featurize_reaction(smiles: str, options=None):
+        return {
+            "reaction_type": {"reaction_type": "Suzuki_miyaura", "confidence": 0.95},
+            "reaction_key": query_key,
+            "aggregates": {
+                "reacted_motifs": ["Ar-B(OH)2", "Ar-Cl"],
+                "formed_motifs": ["Ar-Ar"],
+                "spectator_motifs": [],
+            },
+        }
+
+    def fake_precedent(self, *args, **kwargs):
+        return []
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(hte, "featurize_reaction", fake_featurize_reaction)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="B(O)Oc1ccccc1",
+        product_smiles="c1ccccc1-c1ccccc1",
+        top_k=5,
+        min_experiments=1,
+        reaction_type_filter="Suzuki",
+        source_group="literature",
+    )
+
+    assert result.recommendations
+    assert result.total_matching_experiments == 1
+    assert all(rec.reaction_type == "Suzuki_miyaura" for rec in result.recommendations)
+
+
+def test_detected_type_filter_applies_even_when_query_key_matches(monkeypatch) -> None:
+    df, query_key = _make_mixed_reaction_type_key_df()
+    indexed_data = {}
+    reaction_type_patterns = {}
+    transformation_indices = {query_key: df.copy()}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return [], "Unknown"
+
+    def fake_featurize_reaction(smiles: str, options=None):
+        return {
+            "reaction_type": {"reaction_type": "Suzuki_miyaura", "confidence": 0.95},
+            "reaction_key": query_key,
+            "aggregates": {
+                "reacted_motifs": ["Ar-B(OH)2", "Ar-Cl"],
+                "formed_motifs": ["Ar-Ar"],
+                "spectator_motifs": [],
+            },
+        }
+
+    def fake_precedent(self, *args, **kwargs):
+        return []
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(hte, "featurize_reaction", fake_featurize_reaction)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="B(O)Oc1ccccc1",
+        product_smiles="c1ccccc1-c1ccccc1",
+        top_k=5,
+        min_experiments=1,
+        source_group="literature",
+    )
+
+    assert result.recommendations
+    assert result.is_filtered_by_detected_type is True
+    assert all(rec.reaction_type == "Suzuki_miyaura" for rec in result.recommendations)
+
+
+def test_resolve_reaction_type_label_handles_sample_suffix() -> None:
+    assert hte._resolve_reaction_type_label("suzuki_miyaura_sample500") == "Suzuki_miyaura"
+
+
+def test_detected_type_prefers_family_specific_halide_fallback(monkeypatch) -> None:
+    chan_lam = _make_min_hte_df()
+    chan_lam["Reaction_Type_Standardized"] = ["ChanLam_dataset_converted (2)"]
+    chan_lam["Reactant_A_Type"] = ["Ar-B(OH)2"]
+    chan_lam["Reactant_B_Type"] = ["Ar-Cl"]
+    chan_lam["Catalyst"] = ["Cu"]
+    chan_lam["z-Score"] = [4.0]
+    chan_lam["AREA_TOTAL_REDUCED"] = [86.0]
+
+    suzuki = chan_lam.copy()
+    suzuki["Reaction_Type_Standardized"] = ["suzuki_miyaura_sample500"]
+    suzuki["Reactant_B_Type"] = ["Ar-Br"]
+    suzuki["Catalyst"] = ["Pd"]
+    suzuki["z-Score"] = [1.8]
+    suzuki["AREA_TOTAL_REDUCED"] = [74.0]
+
+    df = pd.concat([chan_lam, suzuki], ignore_index=True)
+    indexed_data = {
+        hte._reactant_key(["Ar-B(OH)2", "Ar-Cl"]): chan_lam.copy(),
+        hte._reactant_key(["Ar-B(OH)2", "Ar-Br"]): suzuki.copy(),
+    }
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return [], "Unknown"
+
+    def fake_featurize_reaction(smiles: str, options=None):
+        return {
+            "reaction_type": {"reaction_type": "Suzuki_miyaura", "confidence": 0.95},
+            "reaction_key": "CRK-v1 |Ar-B(OH)2|Ar-Cl -> Ar-Ar | bond_formed: C(ar)-C(ar)",
+            "aggregates": {
+                "reacted_motifs": ["Ar-Cl", "Ar-B(OH)2"],
+                "formed_motifs": ["Ar-Ar"],
+                "spectator_motifs": [],
+            },
+        }
+
+    def fake_precedent(self, *args, **kwargs):
+        return []
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(hte, "featurize_reaction", fake_featurize_reaction)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="B(O)Oc1ccccc1",
+        product_smiles="c1ccccc1-c1ccccc1",
+        top_k=5,
+        min_experiments=1,
+        source_group="literature",
+    )
+
+    assert result.recommendations
+    assert result.is_filtered_by_detected_type is True
+    assert all(rec.reaction_type == "suzuki_miyaura_sample500" for rec in result.recommendations)
