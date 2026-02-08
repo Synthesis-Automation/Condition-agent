@@ -1148,7 +1148,7 @@ class RDFWorker(QtCore.QObject):
                     f"Successful: {successful}\n"
                     f"Failed: {failed}\n\n"
                     f"Output files saved to:\n"
-                    f"  - data/reaction_dataset/<ReactionType>.csv\n"
+                    f"  - data-processor/reaction_dataset/<ReactionType>.csv\n"
                     f"  - {self.folder_path}/<ReactionType>/<ReactionType>.md"
                 )
             else:
@@ -1216,7 +1216,7 @@ class RDFWorker(QtCore.QObject):
             # Calculate output paths for this reaction type
             self._emit(f"[5/5] Generating output files...")
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            dataset_dir = os.path.join(repo_root, "data", "reaction_dataset")
+            dataset_dir = os.path.join(repo_root, "data-processor", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
             
             # Use reaction_type as filename (sanitized)
@@ -1478,7 +1478,7 @@ class RDFWorker(QtCore.QObject):
         self._emit("Generating CSV export...")
         generator.generate_csv_export(rows, self.output_csv_path, source_name, rdf_map=rdf_map)
         
-        # NOTE: JSONL export is no longer used; CSV is saved directly to data/reaction_dataset/.
+        # NOTE: JSONL export is no longer used; CSV is saved directly to data-processor/reaction_dataset/.
 
     @Slot() if Slot else (lambda f: f)
     def run(self):
@@ -1662,7 +1662,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         # Add note about file locations
         note_label = QtWidgets.QLabel(
             "Note: All RDF files in folder and subfolders will be combined\n"
-            "      CSV ->data/reaction_dataset/{category}.csv\n"
+            "      CSV ->data-processor/reaction_dataset/{category}.csv\n"
             "      Markdown output is disabled"
         )
         note_label.setStyleSheet("font-style: italic; color: #666; font-size: 10px;")
@@ -1789,10 +1789,10 @@ class RDFProcessorWindow(QtWidgets.QWidget):
                 if idx + 1 < len(folder_parts):
                     category_name = folder_parts[idx + 1]
             
-            # CSV: Save directly to data/reaction_dataset/
+            # CSV: Save directly to data-processor/reaction_dataset/
             # Use category name (all subfolders are automatically included)
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            dataset_dir = os.path.join(repo_root, "data", "reaction_dataset")
+            dataset_dir = os.path.join(repo_root, "data-processor", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
             
             final_name = _safe(category_name) or "dataset"
@@ -1803,7 +1803,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         except Exception:
             # Fallback: use default paths
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            dataset_dir = os.path.join(repo_root, "data", "reaction_dataset")
+            dataset_dir = os.path.join(repo_root, "data-processor", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
             output_csv = os.path.join(dataset_dir, "dataset.csv")
             
