@@ -141,6 +141,7 @@ Never call `Chem.MolFromSmarts()` directly.
 - `docs/HTE_RECOMMENDER.md` - System behavior and scoring
 - `docs/HTE_RECOMMENDER_API.md` - API payloads and usage
 - `docs/HTE_ANALYTICS.md` - Analytics and evaluation
+- `docs/ML_CHANLAM_REBUILD_BENCHMARK_PHASE4.md` - Phase 4 side-by-side ML benchmark
 - `docs/REACTION_DETECTION_METHODS.md` - Detection heuristics
 - `docs/UNIFIED_FEATURIZERS.md` - Feature alignment
 - `docs/TAXONOMY_*` - Taxonomy strategy and alignment

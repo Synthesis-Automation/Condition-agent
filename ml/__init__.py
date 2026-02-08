@@ -1,2 +1,4 @@
-"""Chan-Lam ML training utilities."""
+"""Chan-Lam ML rebuilt package.
 
+Use `python -m ml.cli ...` for train/evaluate/recommend workflows.
+"""

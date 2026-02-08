@@ -1,0 +1,54 @@
+{
+  "input_csv": "data\\HTE_db\\literature\\ChanLam_dataset_converted (2)_canonical.csv",
+  "rows": 3892,
+  "folds": 8,
+  "config": {
+    "feature_profile": "core_full",
+    "with_condition_props": true,
+    "stage1_shortlist_k": 20,
+    "stage1_shrinkage_m": 20.0,
+    "stage2_model_type": "rf_reg",
+    "stage2_n_estimators": 160,
+    "blend_weights": {
+      "w_stage1": 0.35,
+      "w_stage2": 0.65
+    },
+    "max_folds": 8
+  },
+  "metrics": {
+    "stage1": {
+      "spearman_mean": 0.602471299197278,
+      "spearman_std": 0.28771000762033244,
+      "apyr_mean": 83.99774774774775,
+      "apyr_std": 15.768468236847944,
+      "top1_hit_ge_50": 0.75,
+      "top1_hit_ge_70": 0.5,
+      "top3_hit_ge_50": 0.75,
+      "top3_hit_ge_70": 0.5
+    },
+    "stage2": {
+      "spearman_mean": 0.5607749975568012,
+      "spearman_std": 0.30118815477932004,
+      "apyr_mean": 78.81240615615616,
+      "apyr_std": 13.498716657249588,
+      "top1_hit_ge_50": 0.5625,
+      "top1_hit_ge_70": 0.375,
+      "top3_hit_ge_50": 0.6875,
+      "top3_hit_ge_70": 0.375
+    },
+    "final": {
+      "spearman_mean": 0.45852667574628286,
+      "spearman_std": 0.26746869848013993,
+      "apyr_mean": 80.12387387387386,
+      "apyr_std": 15.524211293054684,
+      "top1_hit_ge_50": 0.6875,
+      "top1_hit_ge_70": 0.375,
+      "top3_hit_ge_50": 0.6875,
+      "top3_hit_ge_70": 0.4375
+    }
+  },
+  "comparisons": {
+    "final_minus_stage2_apyr": 1.3114677177177043,
+    "final_minus_stage2_spearman": -0.1022483218105183
+  }
+}
