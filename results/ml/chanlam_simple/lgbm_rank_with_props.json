@@ -1,0 +1,442 @@
+{
+  "input_csv": "data\\HTE_db\\literature\\ChanLam_dataset_converted (2)_canonical.csv",
+  "rows": 3892,
+  "model_type": "lgbm_rank",
+  "with_condition_props": true,
+  "features": {
+    "categorical": [
+      "catalyst",
+      "base",
+      "solvent",
+      "catalyst_metal",
+      "catalyst_family",
+      "base_family",
+      "base_strength_band",
+      "base_inorganic_band",
+      "solvent_family",
+      "solvent_class",
+      "solvent_proticity",
+      "solvent_polarity_band"
+    ],
+    "numeric": [
+      "sulf_motif_count",
+      "sulf_aryl_steric_max",
+      "sulf_alkyl_steric_max",
+      "sulf_aryl_electronic_avg",
+      "bor_motif_count",
+      "bor_aryl_steric_max",
+      "bor_alkyl_steric_max",
+      "bor_aryl_electronic_avg",
+      "is_cu_catalyst",
+      "is_strong_base",
+      "is_polar_solvent"
+    ],
+    "text": [
+      "formed_motifs_tokens",
+      "spectator_groups_tokens",
+      "sulf_motif_tokens",
+      "bor_motif_tokens"
+    ]
+  },
+  "random_split_cv": {
+    "splits": 5,
+    "test_size": 0.2,
+    "spearman_mean": 0.5592588758823591,
+    "spearman_std": 0.026846052613944814,
+    "apyr_mean": 68.6844522923033,
+    "apyr_std": 1.752200075553698,
+    "per_fold": [
+      {
+        "fold": 1,
+        "spearman": 0.5868254447861614,
+        "apyr_mean": 68.52013726697889,
+        "apyr_std": 11.690037025356029
+      },
+      {
+        "fold": 2,
+        "spearman": 0.5453521949573127,
+        "apyr_mean": 69.44093030022147,
+        "apyr_std": 11.543788391466025
+      },
+      {
+        "fold": 3,
+        "spearman": 0.546174199813755,
+        "apyr_mean": 71.1712930091129,
+        "apyr_std": 13.167425669345702
+      },
+      {
+        "fold": 4,
+        "spearman": 0.5941768591645283,
+        "apyr_mean": 68.52829032827488,
+        "apyr_std": 11.831911980728693
+      },
+      {
+        "fold": 5,
+        "spearman": 0.5237656806900383,
+        "apyr_mean": 65.76161055692839,
+        "apyr_std": 10.06828800477084
+      }
+    ]
+  },
+  "logo_cv": {
+    "folds": 44,
+    "global_spearman": 0.4731970906233491,
+    "global_apyr_mean": 60.63446444462379,
+    "global_apyr_std": 8.041508229808208,
+    "global_apyr_n_groups": 44,
+    "per_fold": [
+      {
+        "fold": 1,
+        "group": "CC(=O)c1cccc(S(N)(=O)=O)c1",
+        "rows": 16,
+        "spearman": 0.8647058823529412,
+        "apyr_mean": 53.75,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 2,
+        "group": "CC(C)(C)OC(=O)N1CCC(S(N)(=O)=O)CC1",
+        "rows": 111,
+        "spearman": 0.5764710786058944,
+        "apyr_mean": 66.2587115417304,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 3,
+        "group": "CC(C)c1cc(C(C)C)c(S(N)(=O)=O)c(C(C)C)c1",
+        "rows": 10,
+        "spearman": -0.13939393939393938,
+        "apyr_mean": 55.0,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 4,
+        "group": "CCOC(=O)c1ccccc1S(N)(=O)=O",
+        "rows": 222,
+        "spearman": 0.35471032572900646,
+        "apyr_mean": 61.30681243040794,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 5,
+        "group": "CCOc1ccc(S(N)(=O)=O)cc1OCC",
+        "rows": 111,
+        "spearman": 0.6957412595253216,
+        "apyr_mean": 68.16816816816817,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 6,
+        "group": "CN(C)C(=O)c1cccnc1S(N)(=O)=O",
+        "rows": 111,
+        "spearman": 0.23629447303874787,
+        "apyr_mean": 52.43504373939157,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 7,
+        "group": "CN(C)CCS(N)(=O)=O",
+        "rows": 222,
+        "spearman": 0.49607972496409003,
+        "apyr_mean": 76.93693693693695,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 8,
+        "group": "CN(C)c1ccc(S(N)(=O)=O)cc1[N+](=O)[O-]",
+        "rows": 16,
+        "spearman": 0.5117647058823529,
+        "apyr_mean": 53.125,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 9,
+        "group": "COC(=O)c1cc(Br)cc(S(N)(=O)=O)c1",
+        "rows": 222,
+        "spearman": 0.634529660663443,
+        "apyr_mean": 77.9048279048279,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 10,
+        "group": "COC(=O)c1ccc(I)cc1S(N)(=O)=O",
+        "rows": 16,
+        "spearman": 0.7647058823529411,
+        "apyr_mean": 52.5,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 11,
+        "group": "COC(=O)c1oc(S(N)(=O)=O)cc1C",
+        "rows": 222,
+        "spearman": 0.36501543530952696,
+        "apyr_mean": 69.54496869751107,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 12,
+        "group": "COCCCCS(N)(=O)=O",
+        "rows": 111,
+        "spearman": 0.6933576696846706,
+        "apyr_mean": 69.20045045045045,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 13,
+        "group": "COCCOc1ccccc1S(N)(=O)=O",
+        "rows": 222,
+        "spearman": 0.5925090504089027,
+        "apyr_mean": 76.1948389067033,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 14,
+        "group": "COc1cccc(CS(N)(=O)=O)c1",
+        "rows": 16,
+        "spearman": 0.8735294117647058,
+        "apyr_mean": 65.625,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 15,
+        "group": "COc1cccc2c(S(N)(=O)=O)cccc12",
+        "rows": 111,
+        "spearman": 0.5533022986491303,
+        "apyr_mean": 70.05829358770535,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 16,
+        "group": "CS(N)(=O)=O",
+        "rows": 16,
+        "spearman": 0.7294117647058823,
+        "apyr_mean": 56.25,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 17,
+        "group": "C[Si](C)(C)CCS(N)(=O)=O",
+        "rows": 15,
+        "spearman": 0.6357142857142856,
+        "apyr_mean": 60.666666666666664,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 18,
+        "group": "Cc1c(Cl)cccc1S(N)(=O)=O",
+        "rows": 15,
+        "spearman": 0.24285714285714283,
+        "apyr_mean": 53.33333333333333,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 19,
+        "group": "Cc1cc(CS(N)(=O)=O)no1",
+        "rows": 222,
+        "spearman": 0.43658114445970825,
+        "apyr_mean": 63.34393216746158,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 20,
+        "group": "Cc1ccc(-c2cc(C(F)(F)F)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+        "rows": 222,
+        "spearman": 0.6962398023986114,
+        "apyr_mean": 65.61043802423112,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 21,
+        "group": "Cc1cccnc1S(N)(=O)=O",
+        "rows": 16,
+        "spearman": 0.16764705882352943,
+        "apyr_mean": 49.03846153846154,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 22,
+        "group": "Cc1nn(C)cc1S(N)(=O)=O",
+        "rows": 15,
+        "spearman": 0.5071428571428571,
+        "apyr_mean": 53.333333333333336,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 23,
+        "group": "Cn1cc(S(N)(=O)=O)c2ccccc21",
+        "rows": 111,
+        "spearman": 0.33276285552012846,
+        "apyr_mean": 61.029601029601025,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 24,
+        "group": "N#CCCCS(N)(=O)=O",
+        "rows": 222,
+        "spearman": 0.6908660052632309,
+        "apyr_mean": 74.90444990444992,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 25,
+        "group": "N#Cc1ccccc1CS(N)(=O)=O",
+        "rows": 16,
+        "spearman": 0.4794117647058824,
+        "apyr_mean": 53.125,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 26,
+        "group": "NS(=O)(=O)C(F)(F)F",
+        "rows": 15,
+        "spearman": -0.2642857142857143,
+        "apyr_mean": 53.333333333333336,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 27,
+        "group": "NS(=O)(=O)CCc1ccccc1",
+        "rows": 111,
+        "spearman": 0.6737218046827074,
+        "apyr_mean": 68.94767107533065,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 28,
+        "group": "NS(=O)(=O)Cc1cccc(C(F)(F)F)c1",
+        "rows": 111,
+        "spearman": 0.5154989272554323,
+        "apyr_mean": 72.92292292292292,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 29,
+        "group": "NS(=O)(=O)Cc1ccccc1",
+        "rows": 15,
+        "spearman": 0.7142857142857142,
+        "apyr_mean": 63.63636363636363,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 30,
+        "group": "NS(=O)(=O)c1c(Cl)nc2sccn12",
+        "rows": 16,
+        "spearman": 0.7147058823529412,
+        "apyr_mean": 58.482142857142854,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 31,
+        "group": "NS(=O)(=O)c1c(F)c(F)c(F)c(F)c1F",
+        "rows": 16,
+        "spearman": -0.0588235294117647,
+        "apyr_mean": 53.125,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 32,
+        "group": "NS(=O)(=O)c1c(F)cccc1Br",
+        "rows": 16,
+        "spearman": 0.15882352941176472,
+        "apyr_mean": 56.25,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 33,
+        "group": "NS(=O)(=O)c1cc(Cl)c(F)cc1Cl",
+        "rows": 111,
+        "spearman": 0.39884342345797,
+        "apyr_mean": 57.14750895473787,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 34,
+        "group": "NS(=O)(=O)c1cc(Cl)ccc1[N+](=O)[O-]",
+        "rows": 16,
+        "spearman": 0.2823529411764706,
+        "apyr_mean": 55.416666666666664,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 35,
+        "group": "NS(=O)(=O)c1ccc(-c2ccccn2)s1",
+        "rows": 111,
+        "spearman": 0.42388247310327454,
+        "apyr_mean": 59.101567320745396,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 36,
+        "group": "NS(=O)(=O)c1ccc(Cl)s1",
+        "rows": 16,
+        "spearman": 0.3558823529411765,
+        "apyr_mean": 53.125,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 37,
+        "group": "NS(=O)(=O)c1ccc(OC(F)(F)F)cc1Cl",
+        "rows": 15,
+        "spearman": 0.2928571428571428,
+        "apyr_mean": 53.333333333333336,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 38,
+        "group": "NS(=O)(=O)c1ccc([N+](=O)[O-])cc1",
+        "rows": 111,
+        "spearman": 0.38722089865259135,
+        "apyr_mean": 58.957033957033964,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 39,
+        "group": "NS(=O)(=O)c1ccc2c(c1)CCC2",
+        "rows": 111,
+        "spearman": 0.7517385715047546,
+        "apyr_mean": 67.53702855397772,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 40,
+        "group": "NS(=O)(=O)c1cccc(F)n1",
+        "rows": 222,
+        "spearman": 0.5268984647985281,
+        "apyr_mean": 56.50061826532415,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 41,
+        "group": "NS(=O)(=O)c1cccc2nonc12",
+        "rows": 16,
+        "spearman": 0.23823529411764705,
+        "apyr_mean": 53.125,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 42,
+        "group": "NS(=O)(=O)c1ccccc1",
+        "rows": 16,
+        "spearman": 0.7088235294117646,
+        "apyr_mean": 53.125,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 43,
+        "group": "NS(=O)(=O)c1ccccc1I",
+        "rows": 222,
+        "spearman": 0.5354120713007455,
+        "apyr_mean": 66.24764299182905,
+        "apyr_std": 0.0
+      },
+      {
+        "fold": 44,
+        "group": "NS(=O)(=O)c1cnc(Cl)c(Cl)c1",
+        "rows": 16,
+        "spearman": -0.26176470588235295,
+        "apyr_mean": 48.958333333333336,
+        "apyr_std": 0.0
+      }
+    ]
+  }
+}

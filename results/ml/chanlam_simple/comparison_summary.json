@@ -1,0 +1,26 @@
+{
+  "rf_no_props.json": {
+    "model_type": "rf_reg",
+    "with_condition_props": false,
+    "logo_spearman": 0.6274268562162134,
+    "logo_apyr": 80.60340738465737,
+    "random_spearman": 0.8248076299141962,
+    "random_apyr": 88.17179971351412
+  },
+  "rf_with_props.json": {
+    "model_type": "rf_reg",
+    "with_condition_props": true,
+    "logo_spearman": 0.6349225031538586,
+    "logo_apyr": 81.6964748839749,
+    "random_spearman": 0.8390316726275462,
+    "random_apyr": 89.44220003372823
+  },
+  "lgbm_rank_with_props.json": {
+    "model_type": "lgbm_rank",
+    "with_condition_props": true,
+    "logo_spearman": 0.4731970906233491,
+    "logo_apyr": 60.63446444462379,
+    "random_spearman": 0.5592588758823591,
+    "random_apyr": 68.6844522923033
+  }
+}
