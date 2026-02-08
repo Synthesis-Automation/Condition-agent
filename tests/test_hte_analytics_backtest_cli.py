@@ -1,7 +1,15 @@
 import argparse
 import json
+import sys
+from pathlib import Path
 
 import pandas as pd
+import pytest
+
+# Ensure repo root is on sys.path for direct script execution.
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import app.HTE_analytics_cli as cli
 
@@ -135,3 +143,7 @@ def test_cmd_backtest_skips_unseen_conditions_by_default(monkeypatch, tmp_path) 
     assert report["skipped_unseen_condition"] == 1
     assert report["metrics"]["count"] == 0
     assert report["metrics"]["hit@1"] == 0.0
+
+
+if __name__ == "__main__":
+    raise SystemExit(pytest.main([__file__]))
