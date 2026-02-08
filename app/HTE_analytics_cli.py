@@ -6,17 +6,25 @@ Provides command-line access to HTE database analytics:
 - Analyze catalysts
 - View reaction type summaries
 - Export filtered datasets
+- Backtest deterministic HTE recommender on held-out rows
 """
 
 import argparse
+import json
+import random
 import sys
+import tempfile
 from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+
+import pandas as pd
 
 # Ensure repo root is on sys.path for direct execution.
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from chemtools.recommend import HTERecommender
 from chemtools.recommend.analytics import HTEAnalytics
 
 
@@ -86,6 +94,7 @@ def _run_wizard(db_path: str) -> int:
         "  3) Reaction type summary\n"
         "  4) Metal usage\n"
         "  5) Export filtered dataset\n"
+        "  6) Backtest HTE recommender\n"
         "  q) Quit\n"
     )
     while True:
@@ -153,8 +162,237 @@ def _run_wizard(db_path: str) -> int:
                 min_yield=_prompt_float("Minimum yield", None),
             )
             cmd_export(args)
+        elif choice == "6":
+            default_input = db_path
+            db_path_obj = Path(db_path)
+            if db_path_obj.is_dir():
+                default_input = str(db_path_obj / "experiments" / "HTE_canonical.csv")
+            args = argparse.Namespace(
+                input=_prompt("Input CSV path for backtest", default_input),
+                reaction=_prompt("Reaction type filter (optional)", ""),
+                catalyst=_prompt("Catalyst filter (optional)", ""),
+                source_group=_prompt("Source group filter (optional)", ""),
+                test_fraction=_prompt_float("Test fraction", 0.2) or 0.2,
+                test_size=_prompt_int("Exact test size (0 to disable)", 0),
+                seed=_prompt_int("Random seed", 13),
+                top_k=_prompt_int("Recommendation top-k", 10),
+                hit_ks=_prompt("Hit@k list (comma-separated)", "1,3,5,10"),
+                min_experiments=_prompt_int("Minimum experiments per condition", 1),
+                reaction_key_only=_prompt_yes_no("Use reaction-key-only matching", False),
+                use_spectator_groups=_prompt_yes_no("Use spectator group weighting", True),
+                allow_unseen_conditions=_prompt_yes_no("Include unseen train conditions as misses", False),
+                train_output=_prompt("Save train split CSV path (optional)", ""),
+                output=_prompt(
+                    "Output JSON path",
+                    "results/hte_recommender_backtest.json",
+                ),
+                per_row_output=_prompt("Per-row CSV output path (optional)", ""),
+            )
+            if not args.reaction:
+                args.reaction = None
+            if not args.catalyst:
+                args.catalyst = None
+            if not args.source_group:
+                args.source_group = None
+            if int(args.test_size) <= 0:
+                args.test_size = None
+            if not args.train_output:
+                args.train_output = None
+            if not args.per_row_output:
+                args.per_row_output = None
+            cmd_backtest(args)
         else:
             print("Invalid choice. Try again.")
+
+
+def _parse_reaction_smiles(reaction_smiles: str) -> Tuple[str, Optional[str], Optional[str]]:
+    text = str(reaction_smiles or "").strip()
+    if not text:
+        return "", None, None
+    if ">>" in text:
+        reactants_part, product = text.split(">>", 1)
+        reactants = [r for r in reactants_part.split(".") if r]
+        reactant_a = reactants[0] if reactants else ""
+        reactant_b = ".".join(reactants[1:]) if len(reactants) > 1 else None
+        product_smiles = product.strip() or None
+        return reactant_a, reactant_b, product_smiles
+    reactants = [r for r in text.split(".") if r]
+    reactant_a = reactants[0] if reactants else ""
+    reactant_b = ".".join(reactants[1:]) if len(reactants) > 1 else None
+    return reactant_a, reactant_b, None
+
+
+def _normalize_text(value: Any) -> str:
+    if value is None:
+        return ""
+    try:
+        if pd.isna(value):
+            return ""
+    except Exception:
+        pass
+    text = str(value).strip()
+    if not text or text.lower() in {"nan", "none"}:
+        return ""
+    return text
+
+
+def _first_present_value(row: pd.Series, candidates: Iterable[str]) -> Any:
+    for col in candidates:
+        if col in row.index:
+            return row[col]
+    return None
+
+
+def _extract_query_from_row(row: pd.Series) -> Tuple[str, Optional[str], Optional[str], str]:
+    reaction_smiles = _normalize_text(
+        _first_present_value(
+            row,
+            ("reaction_smiles", "Reaction_SMILES", "reactionSmiles"),
+        )
+    )
+    if reaction_smiles:
+        reactant_a, reactant_b, product = _parse_reaction_smiles(reaction_smiles)
+        return reactant_a, reactant_b, product, reaction_smiles
+
+    reactant_a = _normalize_text(
+        _first_present_value(
+            row,
+            ("reactant_a_smiles", "Reactant_A_SMILES", "reactant_a", "Reactant_A"),
+        )
+    )
+    reactant_b = _normalize_text(
+        _first_present_value(
+            row,
+            ("reactant_b_smiles", "Reactant_B_SMILES", "reactant_b", "Reactant_B"),
+        )
+    )
+    product = _normalize_text(
+        _first_present_value(
+            row,
+            ("product_smiles", "Product_SMILES", "product", "Product"),
+        )
+    )
+    return reactant_a, (reactant_b or None), (product or None), ""
+
+
+def _condition_key(
+    catalyst: Any,
+    ligand: Any,
+    base: Any,
+    solvent: Any,
+    secondary_solvent: Any,
+    additive: Any,
+    coupling_reagent: Any,
+) -> Tuple[str, str, str, str, str, str, str]:
+    return (
+        _normalize_text(catalyst),
+        _normalize_text(ligand),
+        _normalize_text(base),
+        _normalize_text(solvent),
+        _normalize_text(secondary_solvent),
+        _normalize_text(additive),
+        _normalize_text(coupling_reagent),
+    )
+
+
+def _row_condition_key(row: pd.Series) -> Tuple[str, str, str, str, str, str, str]:
+    return _condition_key(
+        _first_present_value(row, ("Catalyst", "catalyst")),
+        _first_present_value(row, ("Ligand", "ligand")),
+        _first_present_value(row, ("Base", "base")),
+        _first_present_value(row, ("Solvent", "solvent")),
+        _first_present_value(row, ("Secondary Solvent", "secondary_solvent", "Secondary_Solvent")),
+        _first_present_value(row, ("Additive", "additive")),
+        _first_present_value(row, ("Coupling Reagent", "coupling_reagent", "Coupling_Reagent")),
+    )
+
+
+def _rec_condition_key(rec: Any) -> Tuple[str, str, str, str, str, str, str]:
+    return _condition_key(
+        getattr(rec, "catalyst", ""),
+        getattr(rec, "ligand", ""),
+        getattr(rec, "base", ""),
+        getattr(rec, "solvent", ""),
+        getattr(rec, "secondary_solvent", ""),
+        getattr(rec, "additive", ""),
+        getattr(rec, "coupling_reagent", ""),
+    )
+
+
+def _rank_for_key(recs: Iterable[Any], target_key: Tuple[str, str, str, str, str, str, str]) -> Optional[int]:
+    for idx, rec in enumerate(recs, start=1):
+        if _rec_condition_key(rec) == target_key:
+            return idx
+    return None
+
+
+def _mean_or_zero(values: List[float]) -> float:
+    if not values:
+        return 0.0
+    return float(sum(values) / len(values))
+
+
+def _compute_backtest_metrics(ranks: List[Optional[int]], ks: Iterable[int]) -> Dict[str, Any]:
+    total = len(ranks)
+    if total == 0:
+        out: Dict[str, Any] = {
+            "count": 0,
+            "query_coverage": 0.0,
+            "mrr": 0.0,
+            "avg_rank": None,
+        }
+        for k in ks:
+            out[f"hit@{k}"] = 0.0
+        return out
+
+    hits = [r for r in ranks if r is not None]
+    out = {
+        "count": total,
+        "query_coverage": float(len(hits) / total),
+        "mrr": float(sum(1.0 / r for r in hits) / total) if total else 0.0,
+        "avg_rank": float(sum(hits) / len(hits)) if hits else None,
+    }
+    for k in ks:
+        out[f"hit@{k}"] = float(sum(1 for r in hits if r <= k) / total)
+    return out
+
+
+def _prepare_split(
+    df: pd.DataFrame,
+    *,
+    test_fraction: float,
+    test_size: Optional[int],
+    seed: int,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    indices = list(df.index)
+    if not indices:
+        return df.iloc[0:0].copy(), df.iloc[0:0].copy()
+    rng = random.Random(seed)
+    rng.shuffle(indices)
+    if test_size is None:
+        test_count = max(1, int(len(indices) * test_fraction))
+    else:
+        test_count = min(max(1, int(test_size)), len(indices))
+    test_set = set(indices[:test_count])
+    test_df = df.loc[list(test_set)].copy()
+    train_df = df.loc[[idx for idx in indices if idx not in test_set]].copy()
+    return train_df, test_df
+
+
+def _filter_rows_by_contains(
+    df: pd.DataFrame,
+    *,
+    value: Optional[str],
+    candidates: Iterable[str],
+) -> pd.DataFrame:
+    text = _normalize_text(value)
+    if not text:
+        return df
+    for col in candidates:
+        if col in df.columns:
+            mask = df[col].fillna("").astype(str).str.contains(text, case=False, regex=False)
+            return df[mask].copy()
+    return df
 
 
 def cmd_list_pairs(args):
@@ -385,6 +623,184 @@ def cmd_export(args):
     print(f"\nExport complete: {count:,} experiments")
 
 
+def cmd_backtest(args):
+    """Backtest HTERecommender on held-out rows from an input CSV."""
+    input_path = Path(args.input)
+    if not input_path.exists():
+        raise FileNotFoundError(f"Input file not found: {input_path}")
+
+    df = pd.read_csv(input_path)
+    df = _filter_rows_by_contains(
+        df,
+        value=getattr(args, "reaction", None),
+        candidates=("Reaction_Type_Standardized", "reaction_type"),
+    )
+    df = _filter_rows_by_contains(
+        df,
+        value=getattr(args, "catalyst", None),
+        candidates=("Catalyst", "catalyst"),
+    )
+    df = _filter_rows_by_contains(
+        df,
+        value=getattr(args, "source_group", None),
+        candidates=("Source_Group", "source_group"),
+    )
+
+    if df.empty:
+        raise ValueError("No rows left after filters. Adjust --reaction/--catalyst/--source-group.")
+
+    train_df, test_df = _prepare_split(
+        df,
+        test_fraction=float(args.test_fraction),
+        test_size=args.test_size,
+        seed=int(args.seed),
+    )
+    if train_df.empty or test_df.empty:
+        raise ValueError("Train/test split failed. Increase dataset size or adjust split parameters.")
+
+    temp_train_path: Optional[Path] = None
+    train_path: Path
+    if args.train_output:
+        train_path = Path(args.train_output)
+        train_path.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        handle = tempfile.NamedTemporaryFile(delete=False, suffix=".csv")
+        handle.close()
+        temp_train_path = Path(handle.name)
+        train_path = temp_train_path
+    train_df.to_csv(train_path, index=False)
+
+    ks = [int(v.strip()) for v in str(args.hit_ks).split(",") if str(v).strip()]
+    if not ks:
+        ks = [1, 3, 5, 10]
+    top_k_eval = max(int(args.top_k), max(ks))
+
+    recommender = HTERecommender(str(train_path))
+    train_condition_keys = {_row_condition_key(row) for _, row in train_df.iterrows()}
+
+    ranks: List[Optional[int]] = []
+    db_coverages: List[float] = []
+    match_counts: List[float] = []
+    per_row_records: List[Dict[str, Any]] = []
+
+    skipped_invalid_query = 0
+    skipped_empty_condition = 0
+    skipped_unseen_condition = 0
+    no_recommendation_count = 0
+
+    try:
+        for _, row in test_df.iterrows():
+            target_key = _row_condition_key(row)
+            if not any(target_key):
+                skipped_empty_condition += 1
+                continue
+            if (not args.allow_unseen_conditions) and target_key not in train_condition_keys:
+                skipped_unseen_condition += 1
+                continue
+
+            reactant_a, reactant_b, product_smiles, query_key = _extract_query_from_row(row)
+            if not reactant_a:
+                skipped_invalid_query += 1
+                continue
+
+            result = recommender.recommend(
+                reactant_a_smiles=reactant_a,
+                reactant_b_smiles=reactant_b,
+                product_smiles=product_smiles,
+                top_k=top_k_eval,
+                min_experiments=int(args.min_experiments),
+                reaction_key_only=bool(args.reaction_key_only),
+                use_spectator_groups=bool(args.use_spectator_groups),
+            )
+            recs = list(getattr(result, "recommendations", []) or [])
+            if not recs:
+                no_recommendation_count += 1
+            rank = _rank_for_key(recs, target_key)
+            ranks.append(rank)
+            db_coverages.append(float(getattr(result, "database_coverage", 0.0) or 0.0))
+            match_counts.append(float(getattr(result, "total_matching_experiments", 0.0) or 0.0))
+
+            if args.per_row_output:
+                per_row_records.append(
+                    {
+                        "query": query_key or reactant_a,
+                        "rank": rank,
+                        "found": rank is not None,
+                        "recommendations_returned": len(recs),
+                        "database_coverage_pct": float(getattr(result, "database_coverage", 0.0) or 0.0),
+                        "matching_experiments": int(getattr(result, "total_matching_experiments", 0) or 0),
+                    }
+                )
+
+        metrics = _compute_backtest_metrics(ranks, ks)
+        report: Dict[str, Any] = {
+            "input_csv": str(input_path),
+            "rows_after_filters": int(len(df)),
+            "train_rows": int(len(train_df)),
+            "test_rows": int(len(test_df)),
+            "evaluated_rows": int(len(ranks)),
+            "skipped_invalid_query": int(skipped_invalid_query),
+            "skipped_empty_condition": int(skipped_empty_condition),
+            "skipped_unseen_condition": int(skipped_unseen_condition),
+            "no_recommendation_count": int(no_recommendation_count),
+            "settings": {
+                "reaction_filter": getattr(args, "reaction", None),
+                "catalyst_filter": getattr(args, "catalyst", None),
+                "source_group_filter": getattr(args, "source_group", None),
+                "test_fraction": float(args.test_fraction),
+                "test_size": args.test_size,
+                "seed": int(args.seed),
+                "min_experiments": int(args.min_experiments),
+                "top_k_eval": int(top_k_eval),
+                "hit_ks": ks,
+                "reaction_key_only": bool(args.reaction_key_only),
+                "use_spectator_groups": bool(args.use_spectator_groups),
+                "allow_unseen_conditions": bool(args.allow_unseen_conditions),
+            },
+            "metrics": metrics,
+            "diagnostics": {
+                "avg_database_coverage_pct": _mean_or_zero(db_coverages),
+                "avg_matching_experiments": _mean_or_zero(match_counts),
+            },
+        }
+
+        if args.output:
+            output_path = Path(args.output)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+        if args.per_row_output and per_row_records:
+            per_row_path = Path(args.per_row_output)
+            per_row_path.parent.mkdir(parents=True, exist_ok=True)
+            pd.DataFrame(per_row_records).to_csv(per_row_path, index=False)
+
+        print("\n" + "=" * 80)
+        print("HTE RECOMMENDER BACKTEST")
+        print("=" * 80)
+        print(f"Input rows (after filters): {report['rows_after_filters']:,}")
+        print(f"Train/Test/Evaluated: {report['train_rows']:,} / {report['test_rows']:,} / {report['evaluated_rows']:,}")
+        print(f"Query coverage: {metrics['query_coverage'] * 100:.1f}%")
+        print(f"MRR: {metrics['mrr']:.4f}")
+        if metrics["avg_rank"] is not None:
+            print(f"Avg rank (hits only): {metrics['avg_rank']:.2f}")
+        else:
+            print("Avg rank (hits only): N/A")
+        for k in ks:
+            print(f"Hit@{k}: {metrics[f'hit@{k}'] * 100:.1f}%")
+        print(f"Avg DB coverage: {report['diagnostics']['avg_database_coverage_pct']:.2f}%")
+        print(f"Avg matching experiments: {report['diagnostics']['avg_matching_experiments']:.2f}")
+        if args.output:
+            print(f"\nSaved report to {args.output}")
+        if args.per_row_output and per_row_records:
+            print(f"Saved per-row details to {args.per_row_output}")
+    finally:
+        if temp_train_path is not None:
+            try:
+                temp_train_path.unlink(missing_ok=True)
+            except Exception:
+                pass
+
+
 def main():
     if len(sys.argv) == 1:
         return _run_default_summary("data/HTE_db")
@@ -408,6 +824,9 @@ Examples:
   
   # Export Pd-catalyzed Suzuki data
   python -m chemtools.recommend.analytics export suzuki_pd.csv --reaction Suzuki --catalyst Pd
+
+  # Backtest deterministic HTE recommender on held-out rows
+  python app/HTE_analytics_cli.py backtest --input data/HTE_db/experiments/HTE_canonical.csv --top-k 10 --hit-ks 1,3,5,10
         """
     )
     
@@ -471,6 +890,72 @@ Examples:
     export_parser.add_argument('--reactant-a', help='Filter by reactant A type')
     export_parser.add_argument('--reactant-b', help='Filter by reactant B type')
     export_parser.add_argument('--min-yield', type=float, help='Minimum yield threshold')
+
+    # Backtest command
+    backtest_parser = subparsers.add_parser('backtest', help='Backtest HTE recommender offline')
+    backtest_parser.add_argument(
+        '--input',
+        default='data/HTE_db/experiments/HTE_canonical.csv',
+        help='Input HTE CSV for train/test backtest (default: data/HTE_db/experiments/HTE_canonical.csv)',
+    )
+    backtest_parser.add_argument('--reaction', help='Optional reaction type filter before split')
+    backtest_parser.add_argument('--catalyst', help='Optional catalyst filter before split')
+    backtest_parser.add_argument('--source-group', help='Optional source group filter before split')
+    backtest_parser.add_argument(
+        '--test-fraction',
+        type=float,
+        default=0.2,
+        help='Fraction of rows for test split when --test-size is not set (default: 0.2)',
+    )
+    backtest_parser.add_argument(
+        '--test-size',
+        type=int,
+        default=None,
+        help='Exact number of test rows (overrides --test-fraction)',
+    )
+    backtest_parser.add_argument('--seed', type=int, default=13, help='Random seed for split reproducibility')
+    backtest_parser.add_argument('--top-k', type=int, default=10, help='Top-k recommendations to request')
+    backtest_parser.add_argument(
+        '--hit-ks',
+        default='1,3,5,10',
+        help='Comma-separated k values for hit@k reporting (default: 1,3,5,10)',
+    )
+    backtest_parser.add_argument(
+        '--min-experiments',
+        type=int,
+        default=1,
+        help='Minimum experiments required per condition in recommender (default: 1)',
+    )
+    backtest_parser.add_argument(
+        '--reaction-key-only',
+        action='store_true',
+        help='Only match by reaction key/signatures (disable reactant-type fallback)',
+    )
+    backtest_parser.add_argument(
+        '--without-spectator-groups',
+        action='store_true',
+        help='Disable spectator-group weighting during backtest queries',
+    )
+    backtest_parser.add_argument(
+        '--allow-unseen-conditions',
+        action='store_true',
+        help='Include test rows whose exact condition key is unseen in train (counted as misses if not retrieved)',
+    )
+    backtest_parser.add_argument(
+        '--train-output',
+        default=None,
+        help='Optional path to save train split CSV (default: temporary file)',
+    )
+    backtest_parser.add_argument(
+        '--output',
+        default='results/hte_recommender_backtest.json',
+        help='Path to write JSON report (default: results/hte_recommender_backtest.json)',
+    )
+    backtest_parser.add_argument(
+        '--per-row-output',
+        default=None,
+        help='Optional CSV path for per-row ranks and diagnostics',
+    )
     
     args = parser.parse_args()
     
@@ -492,6 +977,9 @@ Examples:
             cmd_metals(args)
         elif args.command == 'export':
             cmd_export(args)
+        elif args.command == 'backtest':
+            args.use_spectator_groups = not bool(args.without_spectator_groups)
+            cmd_backtest(args)
         return 0
     except Exception as e:
         print(f"\nError: {e}", file=sys.stderr)
