@@ -667,3 +667,128 @@ def test_precedent_recommendations_respect_source_group_filter(monkeypatch) -> N
     assert recs
     assert len(recs) == 1
     assert recs[0].reaction_id == "lit:1"
+
+
+def test_recommend_returns_precedent_when_structured_match_missing(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    indexed_data = {}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return ["Ar-X"], "Aryl Halide"
+
+    def fake_precedent(self, *args, **kwargs):
+        return [
+            hte.ConditionRecommendation(
+                catalyst="Pd",
+                ligand="PPh3",
+                base="K2CO3",
+                solvent="DMF",
+                match_score=0.95,
+                reaction_type="Suzuki_miyaura",
+                reaction_id="precedent:1",
+            )
+        ]
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Brc1ccccc1",
+        reactant_b_smiles="OB(O)c1ccccc1",
+        top_k=5,
+        min_experiments=1,
+        source_group="literature",
+    )
+
+    assert result.total_matching_experiments == 0
+    assert "precedent" in result.recommendations_by_source
+    assert len(result.recommendations_by_source["precedent"]) == 1
+    assert result.recommendations
+    assert result.recommendations[0].reaction_id == "precedent:1"
+
+
+def test_precedent_exact_reaction_rescue_works_across_family_filter(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    indexed_data = {"Ar-X": df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_knn(*args, **kwargs):
+        return {"precedents": []}
+
+    query_a = "CO.OB(O)c1ccccc1"
+    query_b = "Brc1ccccn1"
+    product = "c1ccncc1.c1ccc(-c2ccccn2)cc1.COc1ccccn1"
+
+    def fake_iter_files():
+        return ["fake/C_O_Coupling_canonical.csv"]
+
+    def fake_source_group(path: str):
+        return "literature"
+
+    def fake_file_family(path: str):
+        return "C_O_Coupling"
+
+    def fake_read_records(path: str):
+        return [
+            {
+                "reaction_smiles": f"{query_b}.{query_a}>>{product}",
+                "reaction_id": "C_O_Coupling",
+                "catalyst": "Pd(OAc)2",
+                "base": "KOH",
+                "solvent": "MeOH/THF",
+                "yield": "3",
+            }
+        ]
+
+    def fake_make_row(rec, *, row_index, file_family=None, source_group=None):
+        return {
+            "reaction_id": f"{file_family}:{row_index}",
+            "dataset_reaction_id": rec.get("reaction_id"),
+            "reaction_smiles": rec.get("reaction_smiles"),
+            "yield_value": float(rec.get("yield") or 0.0),
+            "base_uid": rec.get("base"),
+            "solvent_uid": rec.get("solvent"),
+            "rxn_type": "C_O_Coupling",
+            "source_file": file_family,
+            "source_group": source_group,
+            "reference": "",
+            "conditions": {
+                "catalyst": rec.get("catalyst"),
+                "base": rec.get("base"),
+                "solvent": rec.get("solvent"),
+            },
+        }
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr("chemtools.precedent.knn", fake_knn)
+    monkeypatch.setattr("chemtools.precedent.loader._iter_literature_files", fake_iter_files)
+    monkeypatch.setattr("chemtools.precedent.loader._infer_source_group_from_path", fake_source_group)
+    monkeypatch.setattr("chemtools.precedent.loader._file_family_from_name", fake_file_family)
+    monkeypatch.setattr("chemtools.precedent.loader._read_csv_records", fake_read_records)
+    monkeypatch.setattr("chemtools.precedent.loader._make_row_from_csv", fake_make_row)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    recs = recommender._build_precedent_recommendations(
+        reactant_a_smiles=query_a,
+        reactant_b_smiles=query_b,
+        product_smiles=product,
+        reaction_type="Suzuki_miyaura",
+        top_k=5,
+        source_group="literature",
+    )
+
+    assert recs
+    assert recs[0].reaction_id == "C_O_Coupling:0"
+    assert recs[0].reaction_type == "C_O_Coupling"
+    assert recs[0].match_score == 1.0

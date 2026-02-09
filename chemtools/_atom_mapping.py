@@ -389,10 +389,16 @@ def analyze_with_mcs(reaction_smiles: str) -> Dict[str, Any]:
                 'method': 'mcs'
             }
         
-        # Combine reactants into single molecule (for MCS comparison)
-        # This is a simplification - MCS works best on similar molecules
-        reactant_mol = reactant_mols[0] if len(reactant_mols) == 1 else Chem.CombineMols(*reactant_mols)
-        product_mol = product_mols[0] if len(product_mols) == 1 else Chem.CombineMols(*product_mols)
+        # Combine reactants/products into single molecules for MCS comparison.
+        # RDKit CombineMols accepts two molecules at a time, so fold iteratively.
+        def _combine_many(mols: List[Any]) -> Any:
+            combined = mols[0]
+            for mol in mols[1:]:
+                combined = Chem.CombineMols(combined, mol)
+            return combined
+
+        reactant_mol = reactant_mols[0] if len(reactant_mols) == 1 else _combine_many(reactant_mols)
+        product_mol = product_mols[0] if len(product_mols) == 1 else _combine_many(product_mols)
         
         # Find Maximum Common Substructure
         mcs_result = rdFMCS.FindMCS(

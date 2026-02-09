@@ -2306,6 +2306,32 @@ class HTERecommender:
 
         reaction_match_cache: Dict[str, Set[str]] = {}
 
+        def _reaction_text_key(rsmi: Any) -> str:
+            text = str(rsmi or "").strip()
+            if not text or ">" not in text:
+                return ""
+            parts = text.split(">")
+            if len(parts) == 2 and ">>" in text:
+                reactants, products = parts[0], parts[1]
+                agents = ""
+            elif len(parts) == 3:
+                reactants, agents, products = parts
+            else:
+                return text
+
+            def _canon_side(side: str) -> str:
+                tokens = [tok.strip() for tok in side.split(".") if tok.strip()]
+                tokens.sort()
+                return ".".join(tokens)
+
+            return ">".join(
+                [
+                    _canon_side(reactants),
+                    _canon_side(agents),
+                    _canon_side(products),
+                ]
+            )
+
         def _reaction_match_keys(rsmi: Any) -> Set[str]:
             text = str(rsmi or "").strip()
             if not text or ">" not in text:
@@ -2373,38 +2399,62 @@ class HTERecommender:
             }
 
         query_reaction_keys = _reaction_match_keys(reaction_smiles)
+        query_text_key = _reaction_text_key(reaction_smiles)
+        if query_text_key:
+            query_reaction_keys.add(query_text_key)
         has_exact_precedent = any(
             query_reaction_keys.intersection(_reaction_match_keys(prec.get("reaction_smiles")))
             for prec in precedents
         ) if query_reaction_keys else False
 
         if query_reaction_keys and not has_exact_precedent:
-            candidate_rows: List[Dict[str, Any]] = []
             try:
-                from chemtools.precedent.loader import _load as _load_precedent_rows
-                candidate_rows = list(_load_precedent_rows() or [])
+                from chemtools.precedent.loader import (
+                    _file_family_from_name,
+                    _infer_source_group_from_path,
+                    _iter_literature_files,
+                    _make_row_from_csv,
+                    _read_csv_records,
+                )
             except Exception:
-                candidate_rows = []
-
-            if precedent_source_filter:
-                candidate_rows = [
-                    row
-                    for row in candidate_rows
-                    if _normalize_source_group(row.get("source_group")) == precedent_source_filter
-                ]
+                _iter_literature_files = None  # type: ignore[assignment]
 
             exact_precedents: List[Dict[str, Any]] = []
             seen_exact_ids: Set[str] = set()
-            for row in candidate_rows:
-                row_keys = _reaction_match_keys(row.get("reaction_smiles"))
-                if not row_keys or not query_reaction_keys.intersection(row_keys):
-                    continue
-                row_id = str(row.get("reaction_id") or "").strip()
-                if row_id and row_id in seen_exact_ids:
-                    continue
-                if row_id:
-                    seen_exact_ids.add(row_id)
-                exact_precedents.append(_row_to_precedent(row, similarity=1.0))
+            if _iter_literature_files is not None:
+                for path in _iter_literature_files():
+                    source_label = _normalize_source_group(_infer_source_group_from_path(path))
+                    if precedent_source_filter and source_label != precedent_source_filter:
+                        continue
+                    try:
+                        records = _read_csv_records(path)
+                    except Exception:
+                        continue
+                    file_family = _file_family_from_name(path)
+                    for row_index, record in enumerate(records):
+                        row_reaction = str(record.get("reaction_smiles") or "").strip()
+                        if not row_reaction or ">" not in row_reaction:
+                            continue
+                        row_text_key = _reaction_text_key(row_reaction)
+                        if (
+                            row_reaction not in query_reaction_keys
+                            and row_text_key not in query_reaction_keys
+                        ):
+                            continue
+                        row = _make_row_from_csv(
+                            record,
+                            row_index=row_index,
+                            file_family=file_family,
+                            source_group=source_label,
+                        )
+                        if row is None:
+                            continue
+                        row_id = str(row.get("reaction_id") or "").strip()
+                        if row_id and row_id in seen_exact_ids:
+                            continue
+                        if row_id:
+                            seen_exact_ids.add(row_id)
+                        exact_precedents.append(_row_to_precedent(row, similarity=1.0))
 
             if exact_precedents:
                 existing_ids = {
@@ -2986,6 +3036,18 @@ class HTERecommender:
                 result.is_fallback_match = True
 
         if matched_df is None:
+            if (source_group or "").lower() in {"", "literature", "datasets", "dataset"}:
+                precedent_recs = self._build_precedent_recommendations(
+                    reactant_a_smiles,
+                    reactant_b_smiles,
+                    product_smiles,
+                    reaction_type_filter or result.predicted_reaction_type,
+                    top_k,
+                    source_group=source_group,
+                )
+                if precedent_recs:
+                    result.recommendations_by_source["precedent"] = precedent_recs
+                    result.recommendations = precedent_recs[:top_k] if top_k > 0 else precedent_recs
             return result
 
         if "Source_Group" in matched_df.columns:
