@@ -259,6 +259,14 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
             else:
                 df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
 
+    # Enforce numeric dtypes for score/yield fields to prevent runtime math errors
+    # (e.g., accidental string values from malformed CSV rows).
+    df["AREA_TOTAL_REDUCED"] = pd.to_numeric(df["AREA_TOTAL_REDUCED"], errors="coerce").fillna(0.0)
+    df["z-Score"] = pd.to_numeric(df["z-Score"], errors="coerce").fillna(0.0)
+    for optional_numeric in ("temperature_C", "time_h", "pressure_bar", "concentration_M"):
+        if optional_numeric in df.columns:
+            df[optional_numeric] = pd.to_numeric(df[optional_numeric], errors="coerce")
+
     df["Reaction_Type_Standardized"] = (
         df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
     )
@@ -2088,7 +2096,7 @@ class HTERecommender:
             coupling_reagent = group_df['Coupling Reagent'].mode().iloc[0] if not group_df['Coupling Reagent'].isna().all() else None
             
             # Calculate statistics
-            yields = group_df['AREA_TOTAL_REDUCED']
+            yields = pd.to_numeric(group_df['AREA_TOTAL_REDUCED'], errors='coerce').fillna(0.0)
             num_exp = len(group_df)
             success_count = (yields > SUCCESS_THRESHOLD).sum()
             success_rate = (success_count / num_exp) * 100.0
@@ -2096,14 +2104,19 @@ class HTERecommender:
             median_yield = yields.median()
             
             # Z-score statistics (primary ranking metric)
-            z_scores = group_df['z-Score']
+            z_scores = pd.to_numeric(group_df['z-Score'], errors='coerce').fillna(0.0)
             
             # If match_score is present, weight the z-score
             if 'match_score' in group_df.columns:
                 # Weighted average z-score
-                avg_z_score = (z_scores * group_df['match_score']).sum() / group_df['match_score'].sum()
+                match_series = pd.to_numeric(group_df['match_score'], errors='coerce').fillna(0.0)
+                weight_sum = float(match_series.sum())
+                if weight_sum > 0:
+                    avg_z_score = float((z_scores * match_series).sum() / weight_sum)
+                else:
+                    avg_z_score = float(z_scores.mean())
             else:
-                avg_z_score = z_scores.mean()
+                avg_z_score = float(z_scores.mean())
                 
             z_min = z_scores.min()
             z_max = z_scores.max()
@@ -2152,13 +2165,16 @@ class HTERecommender:
                     group_df["spectator_groups"],
                     query_groups=query_spectator_groups,
                 )
-            spectator_score = (
-                float(group_df["spectator_score"].mean())
-                if "spectator_score" in group_df.columns
-                else 0.0
-            )
+            spectator_score = 0.0
+            if "spectator_score" in group_df.columns:
+                spectator_series = pd.to_numeric(group_df["spectator_score"], errors="coerce").fillna(0.0)
+                spectator_score = float(spectator_series.mean())
             
-            match_score = group_df['match_score'].mean() if 'match_score' in group_df.columns else 1.0
+            if 'match_score' in group_df.columns:
+                match_series = pd.to_numeric(group_df['match_score'], errors='coerce').fillna(0.0)
+                match_score = float(match_series.mean())
+            else:
+                match_score = 1.0
             
             rec = ConditionRecommendation(
                 catalyst=catalyst if pd.notna(catalyst) else "",
