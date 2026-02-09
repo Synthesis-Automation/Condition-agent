@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
@@ -20,7 +21,38 @@ from .utils import (
 )
 
 
+def _registry_cache_key(
+    registry_paths: Mapping[str, str | Path],
+) -> Tuple[Tuple[str, str], ...]:
+    """Create a stable cache key from registry paths."""
+    key_parts: List[Tuple[str, str]] = []
+    for name, path_value in registry_paths.items():
+        resolved = str(Path(path_value).resolve())
+        key_parts.append((str(name), resolved))
+    key_parts.sort(key=lambda item: item[0])
+    return tuple(key_parts)
+
+
+@lru_cache(maxsize=32)
+def _build_compound_registry_cached(
+    cache_key: Tuple[Tuple[str, str], ...],
+) -> Dict[str, Any]:
+    path_map = {name: Path(path_str) for name, path_str in cache_key}
+    return _build_compound_registry_uncached(path_map)
+
+
 def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[str, Any]:
+    """Load and compile motif registry from taxonomy files.
+
+    Results are cached by registry path set to avoid repeated JSON loading and
+    SMARTS compilation across per-molecule/per-reaction calls.
+    """
+    return _build_compound_registry_cached(_registry_cache_key(registry_paths))
+
+
+def _build_compound_registry_uncached(
+    registry_paths: Mapping[str, str | Path],
+) -> Dict[str, Any]:
     """Load and compile motif registry from taxonomy files.
     
     This is the main entry point for building the motif detection system.
@@ -197,6 +229,11 @@ def build_compound_registry(registry_paths: Mapping[str, str | Path]) -> Dict[st
     }
 
 
+def clear_compound_registry_cache() -> None:
+    """Clear in-memory registry cache (useful for tests or taxonomy reloads)."""
+    _build_compound_registry_cached.cache_clear()
+
+
 def _load_groups(path: Path) -> Dict[str, Dict[str, Any]]:
     """Load group definitions from JSON file."""
     payload = _load_json(path)
@@ -267,6 +304,7 @@ def _default_registry_paths() -> Dict[str, Path]:
 
 __all__ = [
     "build_compound_registry",
+    "clear_compound_registry_cache",
     "_load_groups",
     "_load_templates",
     "_load_compounds",

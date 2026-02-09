@@ -68,6 +68,19 @@ def _detect_reaction_type(reaction_smiles: str) -> str:
         return ""
 
 
+def _extract_reaction_type_from_bundle(bundle: Dict[str, Any]) -> str:
+    """Extract normalized reaction type string from a featurize_reaction bundle."""
+    if not isinstance(bundle, dict):
+        return ""
+    reaction_type = bundle.get("reaction_type")
+    if isinstance(reaction_type, dict):
+        value = reaction_type.get("reaction_type") or reaction_type.get("name") or ""
+        return str(value).strip()
+    if reaction_type:
+        return str(reaction_type).strip()
+    return ""
+
+
 CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
 CAS_INLINE_PATTERN = re.compile(r"\b\d{2,7}-\d{2}-\d\b")
 
@@ -702,7 +715,10 @@ def process_reaction_dataset(
                 spectator_groups = rank_spectator_groups(
                     _collect_spectator_groups(reactant_data, spectators_set)
                 )
-                detected_reaction_type = _detect_reaction_type(smiles)
+                detected_reaction_type = _extract_reaction_type_from_bundle(rxn_bundle)
+                if not detected_reaction_type:
+                    # Fallback keeps compatibility for any unexpected bundle shape.
+                    detected_reaction_type = _detect_reaction_type(smiles)
 
                 row_out = {
                     "reaction_id": source_label,
@@ -828,7 +844,10 @@ def process_reaction_dataset(
             spectator_groups = rank_spectator_groups(
                 _collect_spectator_groups(reactant_data, spectators_set)
             )
-            detected_reaction_type = _detect_reaction_type(smiles)
+            detected_reaction_type = _extract_reaction_type_from_bundle(rxn_bundle)
+            if not detected_reaction_type:
+                # Fallback keeps compatibility for any unexpected bundle shape.
+                detected_reaction_type = _detect_reaction_type(smiles)
 
             row = {
                 "reaction_id": source_label,
