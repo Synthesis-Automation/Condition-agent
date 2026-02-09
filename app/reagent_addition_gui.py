@@ -36,7 +36,7 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Reagent Addition (reagents.csv)")
-        self.resize(820, 760)
+        self.resize(920, 760)
 
         self.service: Optional[ReagentAdditionService] = None
 
@@ -83,6 +83,7 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
             | QtWidgets.QAbstractItemView.EditTrigger.EditKeyPressed
         )
         self.status_label = QtWidgets.QLabel("")
+        self.status_label.setStyleSheet("color: #5DADE2;")
         self._preview_header: List[str] = []
         self._preview_executor = ThreadPoolExecutor(max_workers=1)
         self._preview_future: Optional[Future[Dict[str, Any]]] = None
