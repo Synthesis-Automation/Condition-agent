@@ -56,6 +56,20 @@ def _iter_literature_files() -> List[str]:
     return sorted(files)
 
 
+def _infer_source_group_from_path(path: str) -> str:
+    text = os.path.normpath(path).lower()
+    parts = text.split(os.sep)
+    if "literature" in parts or "datasets" in parts or "dataset" in parts:
+        return "literature"
+    if "protocols" in parts or "protocol" in parts:
+        return "protocols"
+    if "rules" in parts or "rule" in parts:
+        return "rules"
+    if "experiments" in parts or "experiment" in parts or "experiements" in parts:
+        return "experiments"
+    return "unknown"
+
+
 def _file_family_from_name(filename: str) -> str:
     stem = os.path.splitext(os.path.basename(filename))[0]
     if stem.lower().endswith("_canonical"):
@@ -165,6 +179,7 @@ def _make_row_from_csv(
     *,
     row_index: int,
     file_family: Optional[str] = None,
+    source_group: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
     """Transform a CSV record into the standardized precedent format."""
     try:
@@ -267,6 +282,7 @@ def _make_row_from_csv(
             "reaction_id": rxn_id,
             "dataset_reaction_id": raw_reaction_id,
             "source_file": _clean_text(file_family),
+            "source_group": _clean_text(source_group),
             "rxn_type": fam_txt,
             "yield_value": yield_val,
             "T_C": None,
@@ -318,6 +334,7 @@ def _load_literature_cached(family_key: Tuple[str, ...]) -> List[Dict[str, Any]]
 
     for path in _iter_literature_files():
         file_family = _file_family_from_name(path)
+        source_group = _infer_source_group_from_path(path)
         mapped_family = _dataset_family_map(file_family, fallback=file_family)
         if family_filter:
             candidates = {
@@ -335,7 +352,12 @@ def _load_literature_cached(family_key: Tuple[str, ...]) -> List[Dict[str, Any]]
             continue
 
         for row_index, rec in enumerate(records):
-            row = _make_row_from_csv(rec, row_index=row_index, file_family=file_family)
+            row = _make_row_from_csv(
+                rec,
+                row_index=row_index,
+                file_family=file_family,
+                source_group=source_group,
+            )
             if row is None:
                 continue
             if family_filter:

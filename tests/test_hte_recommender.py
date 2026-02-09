@@ -606,3 +606,64 @@ def test_detected_type_prefers_family_specific_halide_fallback(monkeypatch) -> N
     assert result.recommendations
     assert result.is_filtered_by_detected_type is True
     assert all(rec.reaction_type == "suzuki_miyaura_sample500" for rec in result.recommendations)
+
+
+def test_precedent_recommendations_respect_source_group_filter(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    indexed_data = {"Ar-X": df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_knn(*args, **kwargs):
+        return {
+            "precedents": [
+                {
+                    "conditions": {
+                        "catalyst": ["Pd(OAc)2"],
+                        "ligand": ["SPhos"],
+                        "base": ["K3PO4"],
+                        "solvent": ["THF"],
+                    },
+                    "similarity": 0.91,
+                    "yield": 82.0,
+                    "dataset_reaction_id": "Suzuki_miyaura",
+                    "rxn_type": "Suzuki",
+                    "reaction_id": "lit:1",
+                    "source_group": "literature",
+                },
+                {
+                    "conditions": {
+                        "catalyst": ["PdCl2"],
+                        "ligand": ["PPh3"],
+                        "base": ["K2CO3"],
+                        "solvent": ["DMF"],
+                    },
+                    "similarity": 0.87,
+                    "yield": 74.0,
+                    "dataset_reaction_id": "Suzuki_miyaura",
+                    "rxn_type": "Suzuki",
+                    "reaction_id": "rules:1",
+                    "source_group": "rules",
+                },
+            ]
+        }
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr("chemtools.precedent.knn", fake_knn)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    recs = recommender._build_precedent_recommendations(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="B(O)Oc1ccccc1",
+        product_smiles="c1ccccc1-c1ccccc1",
+        reaction_type="Suzuki_miyaura",
+        top_k=10,
+        source_group="literature",
+    )
+
+    assert recs
+    assert len(recs) == 1
+    assert recs[0].reaction_id == "lit:1"

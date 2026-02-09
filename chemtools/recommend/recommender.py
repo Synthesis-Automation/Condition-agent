@@ -2249,6 +2249,7 @@ class HTERecommender:
         product_smiles: Optional[str],
         reaction_type: Optional[str],
         top_k: int,
+        source_group: Optional[str] = None,
     ) -> List[ConditionRecommendation]:
         try:
             from chemtools import precedent
@@ -2290,6 +2291,18 @@ class HTERecommender:
         family = reaction_type or None
         pack = precedent.knn(family=family, features=features, k=max(top_k, 10), relax=relax)
         precedents = list(pack.get("precedents", []) or [])
+        normalized_source = _normalize_source_group(source_group) if source_group else ""
+        precedent_source_filter = ""
+        if normalized_source in {"literature", "datasets", "dataset"}:
+            precedent_source_filter = "literature"
+        elif normalized_source in {"protocols", "rules", "experiments"}:
+            precedent_source_filter = normalized_source
+        if precedent_source_filter:
+            precedents = [
+                prec
+                for prec in precedents
+                if _normalize_source_group(prec.get("source_group")) == precedent_source_filter
+            ]
 
         def _condition_value(conditions: Dict[str, Any], key: str, fallback: Optional[str]) -> str:
             raw = conditions.get(key) if conditions else None
@@ -3050,6 +3063,7 @@ class HTERecommender:
                 product_smiles,
                 reaction_type_filter or result.predicted_reaction_type,
                 top_k,
+                source_group=source_group,
             )
             if precedent_recs:
                 result.recommendations_by_source["precedent"] = precedent_recs
