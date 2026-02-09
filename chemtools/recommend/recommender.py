@@ -2304,6 +2304,136 @@ class HTERecommender:
                 if _normalize_source_group(prec.get("source_group")) == precedent_source_filter
             ]
 
+        reaction_match_cache: Dict[str, Set[str]] = {}
+
+        def _reaction_match_keys(rsmi: Any) -> Set[str]:
+            text = str(rsmi or "").strip()
+            if not text or ">" not in text:
+                return set()
+            cached = reaction_match_cache.get(text)
+            if cached is not None:
+                return cached
+
+            keys: Set[str] = {text}
+            try:
+                normalized = normalize_reaction(text)
+            except Exception:
+                reaction_match_cache[text] = keys
+                return keys
+
+            normalized_text = str(normalized.get("normalized") or "").strip()
+            if normalized_text:
+                keys.add(normalized_text)
+
+            def _collect_side(entries: Any) -> List[str]:
+                items: List[str] = []
+                for entry in entries or []:
+                    if not isinstance(entry, dict):
+                        continue
+                    side_smi = (
+                        entry.get("smiles_norm")
+                        or entry.get("largest_smiles")
+                        or entry.get("input")
+                    )
+                    if side_smi:
+                        items.append(str(side_smi).strip())
+                items.sort()
+                return items
+
+            reactants = _collect_side(normalized.get("reactants"))
+            agents = _collect_side(normalized.get("agents"))
+            products = _collect_side(normalized.get("products"))
+            canonical = ">".join(
+                [
+                    ".".join(reactants),
+                    ".".join(agents),
+                    ".".join(products),
+                ]
+            )
+            if canonical:
+                keys.add(canonical)
+
+            reaction_match_cache[text] = keys
+            return keys
+
+        def _row_to_precedent(row: Dict[str, Any], *, similarity: float = 1.0) -> Dict[str, Any]:
+            return {
+                "reaction_id": row.get("reaction_id"),
+                "dataset_reaction_id": row.get("dataset_reaction_id"),
+                "reaction_smiles": row.get("reaction_smiles") or "",
+                "similarity": similarity,
+                "yield": row.get("yield_value"),
+                "base_uid": row.get("base_uid"),
+                "solvent_uid": row.get("solvent_uid"),
+                "rxn_type": row.get("rxn_type"),
+                "source_file": row.get("source_file"),
+                "source_group": row.get("source_group"),
+                "reference": row.get("reference"),
+                "conditions": row.get("conditions"),
+            }
+
+        query_reaction_keys = _reaction_match_keys(reaction_smiles)
+        has_exact_precedent = any(
+            query_reaction_keys.intersection(_reaction_match_keys(prec.get("reaction_smiles")))
+            for prec in precedents
+        ) if query_reaction_keys else False
+
+        if query_reaction_keys and not has_exact_precedent:
+            candidate_rows: List[Dict[str, Any]] = []
+            try:
+                from chemtools.precedent.loader import _load as _load_precedent_rows
+                candidate_rows = list(_load_precedent_rows() or [])
+            except Exception:
+                candidate_rows = []
+
+            if precedent_source_filter:
+                candidate_rows = [
+                    row
+                    for row in candidate_rows
+                    if _normalize_source_group(row.get("source_group")) == precedent_source_filter
+                ]
+
+            exact_precedents: List[Dict[str, Any]] = []
+            seen_exact_ids: Set[str] = set()
+            for row in candidate_rows:
+                row_keys = _reaction_match_keys(row.get("reaction_smiles"))
+                if not row_keys or not query_reaction_keys.intersection(row_keys):
+                    continue
+                row_id = str(row.get("reaction_id") or "").strip()
+                if row_id and row_id in seen_exact_ids:
+                    continue
+                if row_id:
+                    seen_exact_ids.add(row_id)
+                exact_precedents.append(_row_to_precedent(row, similarity=1.0))
+
+            if exact_precedents:
+                existing_ids = {
+                    str(prec.get("reaction_id") or "").strip()
+                    for prec in precedents
+                    if prec.get("reaction_id")
+                }
+
+                def _yield_value(prec: Dict[str, Any]) -> float:
+                    value = prec.get("yield")
+                    if isinstance(value, (int, float)):
+                        return float(value)
+                    try:
+                        return float(str(value).strip())
+                    except Exception:
+                        return -1.0
+
+                prepend = [
+                    prec
+                    for prec in exact_precedents
+                    if str(prec.get("reaction_id") or "").strip() not in existing_ids
+                ]
+                prepend.sort(
+                    key=lambda prec: (_yield_value(prec), str(prec.get("reaction_id") or "")),
+                    reverse=True,
+                )
+                if prepend:
+                    precedents = prepend + precedents
+
         def _condition_value(conditions: Dict[str, Any], key: str, fallback: Optional[str]) -> str:
             raw = conditions.get(key) if conditions else None
             if not raw:
