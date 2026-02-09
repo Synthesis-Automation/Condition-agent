@@ -54,7 +54,7 @@
     "id": "DEF_sonogashira_general",
     "description": "General Sonogashira coupling with CuI cocatalyst and amine base. Thoroughly degassed conditions.",
     "conditions": {
-      "catalyst": "PdCl2(PPh3)2 or Pd(dppf)Cl2路DCM",
+      "catalyst": "PdCl2(PPh3)2 or Pd(dppf)Cl2",
       "catalyst_loading_molpct": "0.5-2.0",
       "ligand": "Built-in (PPh3 or dppf)",
       "base": "Et3N or DIPEA",
