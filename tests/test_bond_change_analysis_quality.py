@@ -67,3 +67,67 @@ def test_get_bond_change_analysis_rejects_low_conf_disagreement(
     )
 
     assert result is None
+
+
+def test_decarboxylative_rescue_without_bond_key_selects_product_motif() -> None:
+    product_motifs = [
+        {"compound_id": "Ar-COR"},
+        {"compound_id": "Ar-F"},
+        {"compound_id": "AromN-H"},
+    ]
+    reactive = reaction_formatter._select_reactive_product_motifs(
+        product_motifs,
+        bond_key=None,
+        formed_motifs=[],
+        reacted_motifs=["Acyl-CO2H", "HeteroAr-H"],
+        reaction_type=None,
+    )
+    assert "Ar-COR" in reactive
+
+
+def test_fallback_mapping_used_for_product_projection_even_when_strict_bond_key_disabled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured = {"bond_key": None}
+
+    def fake_with_quality(_reaction_smiles: str):
+        return (
+            {
+                "success": True,
+                "broken_bonds": [(1, "O (leaving group)")],
+                "formed_bonds": [(1, 2)],
+            },
+            True,  # unreliable => strict mapping disabled
+            {
+                "method": "hybrid",
+                "combined_confidence": 0.4,
+                "agreement": {"rxnmapper_vs_mcs": False},
+                "validation": "Methods disagree - review recommended",
+            },
+        )
+
+    def fake_infer_broad(*, bond_key, product_smiles):
+        captured["bond_key"] = bond_key
+        return []
+
+    monkeypatch.setattr(
+        reaction_formatter,
+        "_get_bond_change_analysis_with_quality",
+        fake_with_quality,
+    )
+    monkeypatch.setattr(
+        reaction_formatter,
+        "_infer_product_broad_tags_with_validation",
+        fake_infer_broad,
+    )
+
+    result = reaction_formatter.featurize_reaction(
+        "c1cc[nH]c1.O=C(O)C(=O)c1ccccc1F>>O=C(c1ccc[nH]1)c1ccccc1F",
+        options={"detailed": True},
+    )
+    reaction_key = result.get("reaction_key") or ""
+
+    assert "-> []" not in reaction_key
+    assert "bond_formed:" not in reaction_key
+    assert "bond_broken:" not in reaction_key
+    assert captured["bond_key"] is not None

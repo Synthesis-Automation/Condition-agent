@@ -54,6 +54,43 @@ def _hybrid_mapping_is_unreliable(analysis: Dict[str, Any]) -> bool:
     return combined_conf < _HYBRID_MAPPING_MIN_CONFIDENCE
 
 
+def _preferred_bond_change_result(analysis: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    if not isinstance(analysis, dict):
+        return None
+    for key in ("recommended_result", "rxnmapper_result", "manual_result"):
+        candidate = analysis.get(key)
+        if isinstance(candidate, dict) and candidate.get("success"):
+            return candidate
+    return None
+
+
+def _get_bond_change_analysis_with_quality(
+    reaction_smiles: str,
+) -> Tuple[Optional[Dict[str, Any]], bool, Optional[Dict[str, Any]]]:
+    """
+    Return preferred bond-change analysis with reliability metadata.
+
+    Returns:
+        (preferred_result, unreliable, raw_hybrid_analysis)
+    """
+    if not reaction_smiles or not rdkit_helpers.rdkit_available():
+        return None, False, None
+    try:
+        from chemtools._atom_mapping import analyze_bond_changes_hybrid
+    except Exception:
+        return None, False, None
+    try:
+        analysis = analyze_bond_changes_hybrid(reaction_smiles, use_mcs=True)
+    except Exception:
+        return None, False, None
+    if not analysis or not analysis.get("success"):
+        return None, False, analysis if isinstance(analysis, dict) else None
+    preferred = _preferred_bond_change_result(analysis)
+    if not preferred:
+        return None, False, analysis
+    return preferred, _hybrid_mapping_is_unreliable(analysis), analysis
+
+
 def get_crk_options() -> Dict[str, Any]:
     """Return standardized options for CRK-v1 reaction key generation."""
     return {
@@ -201,25 +238,15 @@ def _format_bond_tokens(
     return tokens
 
 
-def _get_bond_change_analysis(reaction_smiles: str) -> Optional[Dict[str, Any]]:
-    if not reaction_smiles or not rdkit_helpers.rdkit_available():
-        return None
-    try:
-        from chemtools._atom_mapping import analyze_bond_changes_hybrid
-    except Exception:
-        return None
-    try:
-        analysis = analyze_bond_changes_hybrid(reaction_smiles, use_mcs=True)
-    except Exception:
-        return None
-    if not analysis or not analysis.get("success"):
-        return None
-    if _hybrid_mapping_is_unreliable(analysis):
+def _get_bond_change_analysis(
+    reaction_smiles: str,
+    *,
+    allow_unreliable: bool = False,
+) -> Optional[Dict[str, Any]]:
+    result, unreliable, _raw = _get_bond_change_analysis_with_quality(reaction_smiles)
+    if unreliable and not allow_unreliable:
         # Prefer no bond key over low-confidence mapped bond deltas.
         # This preserves motif-based CRK reactants when mapping is noisy.
-        return None
-    result = analysis.get("recommended_result") or analysis.get("rxnmapper_result") or analysis.get("manual_result")
-    if not result or not result.get("success"):
         return None
     return result
 
@@ -1191,6 +1218,12 @@ def _select_reactive_product_motifs(
     inferred = _infer_product_motifs_from_logic(reacted_set, bond_key)
     inferred_norm = [normalize_motif_id(str(m)) for m in inferred if m]
     inferred_in_product = [m for m in inferred_norm if m in motif_set] if motif_set else inferred_norm
+    rescue_without_bond = _rescue_decarboxylative_product_motifs_without_bond_key(
+        reacted_motifs=reacted_set,
+        product_motif_ids=motif_set or formed_set,
+    )
+    if rescue_without_bond:
+        inferred_in_product = sorted(set(inferred_in_product) | set(rescue_without_bond))
 
     taxonomy_projected = _project_formed_motifs_by_taxonomy(
         reaction_type=reaction_type,
@@ -1238,6 +1271,49 @@ def _select_reactive_product_motifs(
     if formed_set:
         return sorted(formed_set)
     return []
+
+
+def _rescue_decarboxylative_product_motifs_without_bond_key(
+    *,
+    reacted_motifs: Iterable[str],
+    product_motif_ids: Iterable[str],
+) -> List[str]:
+    """
+    Rescue decarboxylative C-H functionalization product motifs without bond_key.
+
+    This is used when mapping-derived bond deltas are unavailable/unreliable.
+    """
+    reacted_set = {normalize_motif_id(str(m)) for m in reacted_motifs if m}
+    product_set = {normalize_motif_id(str(m)) for m in product_motif_ids if m}
+    if not reacted_set or not product_set:
+        return []
+
+    aromatic_ch_sites = {"Ar-H", "HeteroAr-H", "AromN-H"}
+    has_aromatic_ch_substrate = any(m in aromatic_ch_sites for m in reacted_set)
+    if not has_aromatic_ch_substrate:
+        return []
+
+    logic_sets = _load_compound_logic_sets()
+    carboxylic_acids = logic_sets.get("carboxylic_acids", set())
+    has_carboxylate_partner = any(
+        (m in carboxylic_acids) or m.endswith("-CO2H") or m.endswith("-COOH")
+        for m in reacted_set
+    )
+    if not has_carboxylate_partner:
+        return []
+
+    candidates: Set[str] = set()
+    # Acylation classes
+    if "Ar-COR" in product_set:
+        candidates.add("Ar-COR")
+    if any(m in {"HeteroAr-H", "AromN-H"} for m in reacted_set) and "HeteroAr-COR" in product_set:
+        candidates.add("HeteroAr-COR")
+    # Alkylation classes
+    for motif_id in ("Ar-Alkyl", "Ar-Alkenyl", "Ar-Alkynyl"):
+        if motif_id in product_set:
+            candidates.add(motif_id)
+
+    return sorted(candidates)
 
 
 def _infer_product_motifs_from_logic(
@@ -1624,15 +1700,47 @@ def featurize_reaction(
             aggregates["spectator_groups_ranked"] = rank_spectator_groups(group_list)
 
         bond_analysis = None
+        fallback_bond_analysis = None
         bond_key = None
+        fallback_bond_key = None
         if not skip_bond_analysis:
-            bond_analysis = _get_bond_change_analysis(reaction_smiles)
-            bond_key = format_bond_change_key(reaction_smiles, analysis=bond_analysis)
+            preferred_bond_analysis, mapping_unreliable, mapping_meta = _get_bond_change_analysis_with_quality(
+                reaction_smiles
+            )
+            if preferred_bond_analysis:
+                if mapping_unreliable:
+                    fallback_bond_analysis = preferred_bond_analysis
+                    agreement_payload = (mapping_meta or {}).get("agreement") or {}
+                    detection_payload["mapping_warning"] = {
+                        "reason": "low_confidence_mapping_disagreement",
+                        "fallback_used_for_product_projection": True,
+                        "combined_confidence": _to_float_or_default(
+                            (mapping_meta or {}).get("combined_confidence"),
+                            0.0,
+                        ),
+                        "agreement_rxnmapper_vs_mcs": agreement_payload.get("rxnmapper_vs_mcs"),
+                        "validation": (mapping_meta or {}).get("validation"),
+                    }
+                else:
+                    bond_analysis = preferred_bond_analysis
+            if bond_analysis:
+                bond_key = format_bond_change_key(reaction_smiles, analysis=bond_analysis)
+            if fallback_bond_analysis:
+                fallback_bond_key = format_bond_change_key(
+                    reaction_smiles,
+                    analysis=fallback_bond_analysis,
+                )
         bond_key = _sanitize_bond_key(
             bond_key,
             reacted_full,
             group_element_map=_load_group_element_map(),
         )
+        fallback_bond_key = _sanitize_bond_key(
+            fallback_bond_key,
+            reacted_full,
+            group_element_map=_load_group_element_map(),
+        )
+        projection_bond_key = bond_key or fallback_bond_key
 
         # Determine reaction type from CRK_raw (before product projection).
         reacted_for_detection = _filter_reactants_for_crk(
@@ -1659,6 +1767,16 @@ def featurize_reaction(
             )
             if m
         }
+        if not formed_inferred:
+            rescue_formed = _rescue_decarboxylative_product_motifs_without_bond_key(
+                reacted_motifs=reacted_for_detection,
+                product_motif_ids=(
+                    normalize_motif_id(str(m.get("compound_id") or m.get("id")))
+                    for m in product_motifs_full
+                    if isinstance(m, dict) and (m.get("compound_id") or m.get("id"))
+                ),
+            )
+            formed_inferred = {normalize_motif_id(str(m)) for m in rescue_formed if m}
         formed_all = sorted(formed_raw | formed_inferred)
         spectators_for_detection = sorted(
             normalize_motif_id(str(m))
@@ -1712,12 +1830,12 @@ def featurize_reaction(
             rt_id = None
 
         product_broad_tags = _infer_product_broad_tags_with_validation(
-            bond_key=bond_key,
+            bond_key=projection_bond_key,
             product_smiles=product_smiles,
         )
         product_motifs_reactive = _select_reactive_product_motifs(
             product_motifs_full,
-            bond_key=bond_key,
+            bond_key=projection_bond_key,
             formed_motifs=formed_all,
             reacted_motifs=reacted_for_detection,
             reaction_type=rt_id,
