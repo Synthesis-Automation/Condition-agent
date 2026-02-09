@@ -295,7 +295,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
     )
     if "Is_Intramolecular" not in df.columns:
         df["Is_Intramolecular"] = df["Intramolecular_Likely"]
-    df = df.drop(columns=["_reactant_count"])
+    df = df.drop(columns=["_reactant_count"], errors="ignore")
 
     df["Reactant_Types_Key"] = df.apply(
         lambda row: _reactant_key(
