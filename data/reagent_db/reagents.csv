@@ -169,6 +169,7 @@ NaN3,NaN3,26628-22-8,,,powder,1,65.01,,,0,0,inorganic_compound,,,additive,al_sal
 2-diaMine,,102494-87-1,,,,,,,,,,ligand,diamines,2 N ligand,,,
 "3,4,7,8-Tetramethyl-1,10-phenanthroline",tmphen,1660-93-1,Cc1cnc2c(ccc3c(C)c(C)cnc32)c1C,C16H16N2,powder,1.129,236.3116,435.2,277,0,0,ligand,phenanthrolines,2 N ligand,,,
 "4,4',4''-Tri-tert-butyl-2,2':6',2''-terpyridine",tBu3-terpy,115091-29-7,,,,,,,,,,ligand,terpyridines,3 N ligand,,,
+"4,4'-Bi-1,3-benzodioxole-5,5'-diylbis(diphenylphosphine)",SEGPHOS,244261-66-3,,C38H28O4P2,powder,,610.6,,,0,0,ligand,bidentate_diphosphines,,,,
 "4,4'-di-tert-Butyl-2,2'-bipyridine",dtbbpy,72914-19-3,,,,,,,,,,ligand,bipyridines,2 N ligand,,,
 "4,4'-di-tert-butyl-N-cyano-(2,2'-bipyridine)-6-carboximidamide",dtbCbpy,2755915-54-7,,,,,,,,,,ligand,bipyridines,2 N ligand,,,
 "4,4'-Dimethyl-2,2'-bipyridine","4,4'-Dimethyl-2,2'-bipyridine",1134-35-6,CC1=CC(=NC=C1)C2=NC=CC(=C2)C,C12H12N2,powder,1.2,184.24,309.3,169,,,ligand,bipyridines,2 N ligand,,,
