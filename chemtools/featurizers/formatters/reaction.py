@@ -26,6 +26,32 @@ from ..spectator_rank import rank_spectator_groups
 
 
 _UNCLASSIFIED_REACTANT_MOTIF = "Unclassified-Reactant"
+_HYBRID_MAPPING_MIN_CONFIDENCE = 0.65
+
+
+def _to_float_or_default(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except Exception:
+        return default
+
+
+def _hybrid_mapping_is_unreliable(analysis: Dict[str, Any]) -> bool:
+    """
+    Flag low-confidence hybrid mapping when RXNMapper and MCS disagree.
+
+    In this case, mapped bond deltas are often noisy and can remove true
+    reaction-center signals downstream after bond sanitization.
+    """
+    if not isinstance(analysis, dict):
+        return False
+    if str(analysis.get("method") or "").strip() != "hybrid":
+        return False
+    agreement = (analysis.get("agreement") or {}).get("rxnmapper_vs_mcs")
+    if agreement is not False:
+        return False
+    combined_conf = _to_float_or_default(analysis.get("combined_confidence"), 0.0)
+    return combined_conf < _HYBRID_MAPPING_MIN_CONFIDENCE
 
 
 def get_crk_options() -> Dict[str, Any]:
@@ -183,10 +209,14 @@ def _get_bond_change_analysis(reaction_smiles: str) -> Optional[Dict[str, Any]]:
     except Exception:
         return None
     try:
-        analysis = analyze_bond_changes_hybrid(reaction_smiles, use_mcs=False)
+        analysis = analyze_bond_changes_hybrid(reaction_smiles, use_mcs=True)
     except Exception:
         return None
     if not analysis or not analysis.get("success"):
+        return None
+    if _hybrid_mapping_is_unreliable(analysis):
+        # Prefer no bond key over low-confidence mapped bond deltas.
+        # This preserves motif-based CRK reactants when mapping is noisy.
         return None
     result = analysis.get("recommended_result") or analysis.get("rxnmapper_result") or analysis.get("manual_result")
     if not result or not result.get("success"):

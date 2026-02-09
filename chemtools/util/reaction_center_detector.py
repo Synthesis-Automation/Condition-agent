@@ -58,6 +58,26 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
         changed_atoms = set()
         broken_bonds = []
         formed_bonds = []
+        seen_broken_bonds: Set[Tuple[Any, Any]] = set()
+        seen_formed_bonds: Set[Tuple[Any, Any]] = set()
+
+        def _append_unique_bond(
+            sink: List[Tuple[Any, Any]],
+            seen: Set[Tuple[Any, Any]],
+            a: Any,
+            b: Any,
+        ) -> None:
+            """Append a bond once using canonical ordering for mapped atom pairs."""
+            if isinstance(a, int) and isinstance(b, int):
+                key = (min(a, b), max(a, b))
+                record = key
+            else:
+                key = (a, b)
+                record = (a, b)
+            if key in seen:
+                return
+            seen.add(key)
+            sink.append(record)
         
         # Check all mapped atoms
         all_map_nums = set(reactant_map_to_atom.keys()) | set(product_map_to_atom.keys())
@@ -117,22 +137,42 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
                     
                     # Broken bonds
                     for neighbor_map in r_neighbor_maps - p_neighbor_maps:
-                        broken_bonds.append((map_num, neighbor_map))
+                        _append_unique_bond(
+                            broken_bonds,
+                            seen_broken_bonds,
+                            map_num,
+                            neighbor_map,
+                        )
                     
                     # Formed bonds
                     for neighbor_map in p_neighbor_maps - r_neighbor_maps:
-                        formed_bonds.append((map_num, neighbor_map))
+                        _append_unique_bond(
+                            formed_bonds,
+                            seen_formed_bonds,
+                            map_num,
+                            neighbor_map,
+                        )
         
         # Add leaving/joining groups to broken/formed bonds
         # Format: (mapped_atom, "X" where X is element symbol)
         for leaving in leaving_groups:
             map_num, element, bond_type = leaving
-            broken_bonds.append((map_num, f"{element} (leaving group)"))
+            _append_unique_bond(
+                broken_bonds,
+                seen_broken_bonds,
+                map_num,
+                f"{element} (leaving group)",
+            )
             changed_atoms.add(map_num)
         
         for joining in joining_groups:
             map_num, element, bond_type = joining
-            formed_bonds.append((map_num, f"{element} (joining group)"))
+            _append_unique_bond(
+                formed_bonds,
+                seen_formed_bonds,
+                map_num,
+                f"{element} (joining group)",
+            )
             changed_atoms.add(map_num)
         
         spectator_atoms = all_map_nums - changed_atoms
