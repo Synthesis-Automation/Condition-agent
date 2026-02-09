@@ -199,6 +199,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
     column_mapping = {
         "reaction_type": "Reaction_Type_Standardized",
         "reaction_category": "Reaction_Category",
+        "rule_tier": "Rule_Tier",
         "reactant_1": "Reactant_A_Type",
         "reactant_2": "Reactant_B_Type",
         "reactant_3": "Reactant_C_Type",
@@ -250,12 +251,14 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
         "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category",
         "Source_File", "Source_Group", "Source_Row", "spectator_groups",
-        "Reactant_Signature_Core", "Reactant_Signature_Ext",
+        "Reactant_Signature_Core", "Reactant_Signature_Ext", "Rule_Tier",
     ]
     for col in required_cols:
         if col not in df.columns:
             if col in ("Source_File", "Source_Group"):
                 df[col] = ""
+            elif col == "Rule_Tier":
+                df[col] = 0.0
             else:
                 df[col] = "" if col not in ["AREA_TOTAL_REDUCED", "z-Score"] else 0.0
 
@@ -263,6 +266,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
     # (e.g., accidental string values from malformed CSV rows).
     df["AREA_TOTAL_REDUCED"] = pd.to_numeric(df["AREA_TOTAL_REDUCED"], errors="coerce").fillna(0.0)
     df["z-Score"] = pd.to_numeric(df["z-Score"], errors="coerce").fillna(0.0)
+    df["Rule_Tier"] = df["Rule_Tier"].apply(_coerce_rule_tier_value).astype(float)
     for optional_numeric in ("temperature_C", "time_h", "pressure_bar", "concentration_M"):
         if optional_numeric in df.columns:
             df[optional_numeric] = pd.to_numeric(df[optional_numeric], errors="coerce")
@@ -667,6 +671,43 @@ def _normalize_source_group(value: Optional[str]) -> str:
     return label
 
 
+def _coerce_rule_tier_value(value: Any) -> float:
+    """Normalize rule tier values to numeric (fallback=0, default=1, preferred=2)."""
+    if value is None:
+        return 0.0
+    if isinstance(value, (int, float)) and not pd.isna(value):
+        return float(value)
+    text = str(value).strip().lower()
+    if not text or text == "nan":
+        return 0.0
+    try:
+        return float(text)
+    except ValueError:
+        pass
+    if text in {"fallback", "backup", "low"}:
+        return 0.0
+    if text in {"default", "normal", "medium"}:
+        return 1.0
+    if text in {"preferred", "high", "primary"}:
+        return 2.0
+    return 0.0
+
+
+def _ensure_rule_tier_column(df: pd.DataFrame) -> pd.DataFrame:
+    """Ensure Rule_Tier exists as a numeric column (cache/backward compatible)."""
+    if df is None:
+        return df
+    frame = df.copy()
+    if "Rule_Tier" in frame.columns:
+        frame["Rule_Tier"] = frame["Rule_Tier"].apply(_coerce_rule_tier_value).astype(float)
+        return frame
+    if "rule_tier" in frame.columns:
+        frame["Rule_Tier"] = frame["rule_tier"].apply(_coerce_rule_tier_value).astype(float)
+        return frame
+    frame["Rule_Tier"] = 0.0
+    return frame
+
+
 def _filter_source_group(
     df: pd.DataFrame, source_group: Optional[str]
 ) -> pd.DataFrame:
@@ -958,6 +999,8 @@ _HALIDE_SUFFIXES = {"Cl", "Br", "I", "F"}
 _ARYL_HALIDE_MOTIFS = {"Ar-F", "Ar-Cl", "Ar-Br", "Ar-I", "Ar-X"}
 _SPECTATOR_MATCH_WEIGHT = 0.7
 _INTRAMOLECULAR_MATCH_BOOST = 1.2
+_RULE_TIER_BOOST_STEP = 0.05
+_RULE_TIER_MAX_BOOST = 1.2
 _AROMATIC_SCAFFOLD_FALLBACK = {"Ar", "HeteroAr", "AromN"}
 _HETERO_C_H_SCAFFOLD_GROUPS = {"HeteroAr", "AromN"}
 
@@ -1784,10 +1827,16 @@ class HTERecommender:
         self.transformation_indices: Dict[str, pd.DataFrame] = {}
 
         df, indexed_data, patterns, trans_indices = _load_hte_database_cached(str(self.db_path))
-        self.df = df
-        self.indexed_data = dict(indexed_data)
+        self.df = _ensure_rule_tier_column(df)
+        self.indexed_data = {
+            key: _ensure_rule_tier_column(group_df)
+            for key, group_df in dict(indexed_data).items()
+        }
         self.reaction_type_patterns = dict(patterns)
-        self.transformation_indices = dict(trans_indices)
+        self.transformation_indices = {
+            key: _ensure_rule_tier_column(group_df)
+            for key, group_df in dict(trans_indices).items()
+        }
     
     def _detect_reactant_types(self, smiles: str) -> Tuple[List[str], Optional[str]]:
         """
@@ -3069,6 +3118,32 @@ class HTERecommender:
         if "Source_Group" in matched_df.columns:
             matched_df = matched_df.copy()
             matched_df["Source_Group"] = matched_df["Source_Group"].apply(_normalize_source_group)
+
+        # Apply mild priority boost for rule rows using Rule_Tier (fallback=0, default=1, preferred=2+).
+        # Keep this bounded so rule priors do not overpower reaction/experiment evidence.
+        tier_col = "Rule_Tier" if "Rule_Tier" in matched_df.columns else (
+            "rule_tier" if "rule_tier" in matched_df.columns else ""
+        )
+        if tier_col and "Source_Group" in matched_df.columns:
+            rules_mask = matched_df["Source_Group"] == "rules"
+            if rules_mask.any():
+                rule_tiers = (
+                    matched_df.loc[rules_mask, tier_col]
+                    .apply(_coerce_rule_tier_value)
+                    .astype(float)
+                )
+                rule_boost = (1.0 + (_RULE_TIER_BOOST_STEP * rule_tiers)).clip(
+                    lower=1.0,
+                    upper=_RULE_TIER_MAX_BOOST,
+                )
+                if "match_score" in matched_df.columns:
+                    base_scores = pd.to_numeric(
+                        matched_df.loc[rules_mask, "match_score"],
+                        errors="coerce",
+                    ).fillna(0.0)
+                    matched_df.loc[rules_mask, "match_score"] = base_scores * rule_boost
+                else:
+                    matched_df.loc[rules_mask, "match_score"] = rule_boost
         
         # Apply reaction type filter if specified
         if reaction_type_filter:

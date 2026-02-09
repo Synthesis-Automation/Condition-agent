@@ -1,3 +1,3 @@
 reaction_type,rule_id,rule_tier,reactant_1,reactant_2,reactant_3,catalyst,ligand,base,solvent,additive,Secondary Solvent,Coupling Reagent,temperature_C,time_h,atmosphere,pressure_bar,concentration_M,yield,z_score,reference,notes
-Suzuki_miyaura,SUZ_01,default,@sp2_electrophiles,@organoboron,,Pd-PEPPSI-type G3 with P(tBu)3 (representative),P(tBu)3,K3PO4 (aq) or Cs2CO3; alt: NaOtBu,"1,4-dioxane",,H2O,boronic acid or boronate,100,,N2,,,95,2,suzuki_rulebook_v1,General Suzuki starter
-Suzuki_miyaura,SUZ_02,backup,@sp2_electrophiles,@organoboron,,PdCl2(dtbpf),dtbpf,"K3PO4 (aq, 3.25 M)","1,4-dioxane",,H2O,boronic acid or boronate,80,,N2,,,95,2,suzuki_rulebook_v1,dtbpf backup condition
+Suzuki_miyaura,SUZ_01,1,@sp2_electrophiles,@organoboron,,Pd-PEPPSI-type G3 with P(tBu)3 (representative),P(tBu)3,K3PO4 (aq) or Cs2CO3; alt: NaOtBu,"1,4-dioxane",,H2O,boronic acid or boronate,100,,N2,,,95,2,suzuki_rulebook_v1,General Suzuki starter
+Suzuki_miyaura,SUZ_02,0,@sp2_electrophiles,@organoboron,,PdCl2(dtbpf),dtbpf,"K3PO4 (aq, 3.25 M)","1,4-dioxane",,H2O,boronic acid or boronate,80,,N2,,,95,2,suzuki_rulebook_v1,dtbpf backup condition

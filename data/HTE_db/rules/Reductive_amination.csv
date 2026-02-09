@@ -1,6 +1,6 @@
 reaction_type,rule_id,rule_tier,reactant_1,reactant_2,reactant_3,catalyst,ligand,base,solvent,additive,Secondary Solvent,Coupling Reagent,temperature_C,time_h,atmosphere,pressure_bar,concentration_M,yield,z_score,reference,notes
-Reductive_amination,RA_STAB_ALD_01,default,@amines_nh,Ar-CHO,,,,,MeCN,NaBH(OAc)3; AcOH,,,25,4,N2,,0.2,92,1.6,reductive_amination_rulebook_v1,General aldehyde reductive amination starter
-Reductive_amination,RA_STAB_ALD_02,default,@amines_nh,Alkyl-CHO,,,,,MeCN,NaBH(OAc)3; AcOH,,,25,4,N2,,0.2,90,1.4,reductive_amination_rulebook_v1,Aliphatic aldehyde variant
-Reductive_amination,RA_STAB_KET_03,default,@amines_nh,Ar-COR,,,,,DCE,NaBH(OAc)3; AcOH; 3A MS,,,40,12,N2,,0.2,88,1.2,reductive_amination_rulebook_v1,Aryl ketone or hindered system
-Reductive_amination,RA_NABH3CN_04,backup,@amines_nh,@carbonyls,,,,,MeOH,NaBH3CN; NH4OAc,,,25,6,N2,,0.2,82,0.8,reductive_amination_rulebook_v1,Alternative cyanoborohydride route
-Reductive_amination,RA_H2_PDC_05,backup,@amines_nh,@carbonyls,,10% Pd/C,,,EtOH,H2,,,40,8,H2,1.0,0.2,80,0.6,reductive_amination_rulebook_v1,Hydrogenation route when hydrogen-sensitive groups are absent
+Reductive_amination,RA_STAB_ALD_01,1,@amines_nh,Ar-CHO,,,,,MeCN,NaBH(OAc)3; AcOH,,,25,4,N2,,0.2,92,1.6,reductive_amination_rulebook_v1,General aldehyde reductive amination starter
+Reductive_amination,RA_STAB_ALD_02,1,@amines_nh,Alkyl-CHO,,,,,MeCN,NaBH(OAc)3; AcOH,,,25,4,N2,,0.2,90,1.4,reductive_amination_rulebook_v1,Aliphatic aldehyde variant
+Reductive_amination,RA_STAB_KET_03,1,@amines_nh,Ar-COR,,,,,DCE,NaBH(OAc)3; AcOH; 3A MS,,,40,12,N2,,0.2,88,1.2,reductive_amination_rulebook_v1,Aryl ketone or hindered system
+Reductive_amination,RA_NABH3CN_04,0,@amines_nh,@carbonyls,,,,,MeOH,NaBH3CN; NH4OAc,,,25,6,N2,,0.2,82,0.8,reductive_amination_rulebook_v1,Alternative cyanoborohydride route
+Reductive_amination,RA_H2_PDC_05,0,@amines_nh,@carbonyls,,10% Pd/C,,,EtOH,H2,,,40,8,H2,1.0,0.2,80,0.6,reductive_amination_rulebook_v1,Hydrogenation route when hydrogen-sensitive groups are absent
