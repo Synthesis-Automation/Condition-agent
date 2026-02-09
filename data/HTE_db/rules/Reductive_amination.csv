@@ -1,0 +1,2 @@
+reaction_type,yield,z_score,reactant_1,reactant_2,catalyst,ligand,base,acid,reductant,oxidant,additive,condensation_agent,other_reagents,solvent,temperature_C
+Reductive_amination,95,2,@amines_nh,"Ar-CHO, Alkyl-CHO, Alkenyl-CHO",,,,,NaBH(OAc)3,,AcOH,,,"DCE, MeCN",25
