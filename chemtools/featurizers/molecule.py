@@ -581,7 +581,9 @@ def featurize_molecule(
                 mol,
                 scaffold_compiled,
                 max_hits_per_compound=max_hits,
-                registry=scaffold_registry,
+                # Context pass is scaffold-only; disable registry-driven Any-* fallbacks
+                # so generic substituent labels do not leak into reaction delta/CRK.
+                registry=None,
                 discovery_mode=discovery_mode,
                 site_filter=site_filter,
             )
