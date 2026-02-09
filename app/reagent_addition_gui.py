@@ -15,8 +15,8 @@ from chemtools.reagent.addition_service import (  # noqa: E402
     ReagentAdditionService,
 )
 
-DEFAULT_LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai").strip() or "openai"
-DEFAULT_LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o").strip() or "gpt-4o"
+DEFAULT_LLM_PROVIDER = os.getenv("LLM_PROVIDER", "aliyun").strip() or "aliyun"
+DEFAULT_LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-v3.2").strip() or "deepseek-v3.2"
 
 try:
     from llmtools.clients import AVAILABLE_MODELS as LLM_AVAILABLE_MODELS
@@ -24,11 +24,11 @@ try:
 except Exception:  # pragma: no cover - optional dependency
     LLM_AVAILABLE_MODELS = {
         "openai": ["gpt-4o", "gpt-4o-mini"],
-        "aliyun": ["deepseek-v3", "deepseek-r1"],
+        "aliyun": ["deepseek-v3.2", "deepseek-v3", "deepseek-r1"],
     }
     LLM_RECOMMENDED_MODELS = {
         "openai": {"balanced": "gpt-4o"},
-        "aliyun": {"balanced": "deepseek-v3"},
+        "aliyun": {"balanced": "deepseek-v3.2"},
     }
 
 
@@ -36,7 +36,7 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Reagent Addition (reagents.csv)")
-        self.resize(920, 760)
+        self.resize(1040, 760)
 
         self.service: Optional[ReagentAdditionService] = None
 
