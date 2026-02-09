@@ -2,8 +2,9 @@ import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from concurrent.futures import Future, ThreadPoolExecutor
 
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -35,7 +36,7 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Reagent Addition (reagents.csv)")
-        self.resize(900, 860)
+        self.resize(820, 760)
 
         self.service: Optional[ReagentAdditionService] = None
 
@@ -55,6 +56,7 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         self.auto_resolve_checkbox = QtWidgets.QCheckBox("Auto-resolve name/smiles from CAS")
         self.auto_resolve_checkbox.setChecked(True)
         self.ai_assist_checkbox = QtWidgets.QCheckBox("AI-assist")
+        self.ai_assist_checkbox.setChecked(True)
         self.llm_provider_combo = QtWidgets.QComboBox()
         self.llm_model_combo = QtWidgets.QComboBox()
         self.llm_model_combo.setEditable(True)
@@ -64,12 +66,16 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         self.clear_button = QtWidgets.QPushButton("Clear")
 
         self.preview_table = QtWidgets.QTableWidget()
-        self.preview_table.setColumnCount(2)
-        self.preview_table.setHorizontalHeaderLabels(["Field", "Value"])
+        self.preview_table.setColumnCount(4)
+        self.preview_table.setHorizontalHeaderLabels(["Field", "Value", "Field", "Value"])
         header = self.preview_table.horizontalHeader()
-        header.setStretchLastSection(True)
-        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
+        header.setStretchLastSection(False)
+        for col in range(4):
+            header.setSectionResizeMode(col, QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.preview_table.verticalHeader().setVisible(False)
+        self.preview_table.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
         self.preview_table.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.preview_table.setEditTriggers(
             QtWidgets.QAbstractItemView.EditTrigger.DoubleClicked
@@ -78,6 +84,16 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         )
         self.status_label = QtWidgets.QLabel("")
         self._preview_header: List[str] = []
+        self._preview_executor = ThreadPoolExecutor(max_workers=1)
+        self._preview_future: Optional[Future[Dict[str, Any]]] = None
+        self._preview_poll_timer = QtCore.QTimer(self)
+        self._preview_poll_timer.setInterval(100)
+        self._preview_poll_timer.timeout.connect(self._on_preview_poll)
+        self._status_anim_timer = QtCore.QTimer(self)
+        self._status_anim_timer.setInterval(180)
+        self._status_anim_timer.timeout.connect(self._tick_status_animation)
+        self._status_anim_base = "Dry run in progress"
+        self._status_anim_step = 0
 
         self._build_layout()
         self._set_defaults()
@@ -318,11 +334,40 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         return True
 
     def _on_preview(self) -> None:
+        if self._preview_future and not self._preview_future.done():
+            return
         if not self._ensure_service():
             return
         payload = self._gather_payload()
+        self.preview_button.setEnabled(False)
+        self.save_button.setEnabled(False)
+        self._start_status_animation("Dry run in progress")
         try:
-            result = self.service.preview_entry(**payload)
+            self._preview_future = self._preview_executor.submit(self.service.preview_entry, **payload)
+            self._preview_poll_timer.start()
+        except Exception as exc:
+            self._stop_status_animation()
+            self.preview_button.setEnabled(True)
+            self._show_error(f"Unexpected error: {exc}")
+            return
+
+    def _on_preview_poll(self) -> None:
+        future = self._preview_future
+        if future is None:
+            self._preview_poll_timer.stop()
+            self._stop_status_animation()
+            self.preview_button.setEnabled(True)
+            return
+        if not future.done():
+            return
+
+        self._preview_poll_timer.stop()
+        self._stop_status_animation()
+        self.preview_button.setEnabled(True)
+        self._preview_future = None
+
+        try:
+            result = future.result()
         except (ReagentAdditionError, ValueError) as exc:
             self._show_error(str(exc))
             return
@@ -408,15 +453,39 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
 
         header, row = self.service.build_csv_row(entry, role=role)
         self._preview_header = header
-        self.preview_table.setRowCount(len(header))
-        for idx, field in enumerate(header):
-            field_item = QtWidgets.QTableWidgetItem(field)
+        field_positions: Dict[str, Tuple[int, int]] = {}
+        row_count = (len(header) + 1) // 2
+        self.preview_table.setRowCount(row_count)
+        for idx in range(row_count):
+            left_field_idx = idx * 2
+            right_field_idx = left_field_idx + 1
+
+            left_field = header[left_field_idx]
+            field_positions[left_field] = (idx, 1)
+            field_item = QtWidgets.QTableWidgetItem(left_field)
             field_item.setFlags(field_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
             self.preview_table.setItem(idx, 0, field_item)
-            value_item = QtWidgets.QTableWidgetItem(row.get(field, ""))
+            value_item = QtWidgets.QTableWidgetItem(row.get(left_field, ""))
             self.preview_table.setItem(idx, 1, value_item)
 
-        self.preview_table.resizeColumnsToContents()
+            if right_field_idx < len(header):
+                right_field = header[right_field_idx]
+                field_positions[right_field] = (idx, 3)
+                field_item_2 = QtWidgets.QTableWidgetItem(right_field)
+                field_item_2.setFlags(field_item_2.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable)
+                self.preview_table.setItem(idx, 2, field_item_2)
+                value_item_2 = QtWidgets.QTableWidgetItem(row.get(right_field, ""))
+                self.preview_table.setItem(idx, 3, value_item_2)
+            else:
+                empty_field_item = QtWidgets.QTableWidgetItem("")
+                empty_field_item.setFlags(
+                    empty_field_item.flags() & ~QtCore.Qt.ItemFlag.ItemIsEditable
+                )
+                self.preview_table.setItem(idx, 2, empty_field_item)
+                self.preview_table.setItem(idx, 3, QtWidgets.QTableWidgetItem(""))
+
+        self._attach_preview_role_family_selectors(row, field_positions)
+        self._adjust_preview_column_widths()
         self._resize_preview_table()
 
     def _clear_preview_table(self) -> None:
@@ -434,16 +503,118 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         if not header:
             header = []
             for row in range(self.preview_table.rowCount()):
-                item = self.preview_table.item(row, 0)
-                if item:
-                    header.append(item.text().strip())
+                for field_col in (0, 2):
+                    item = self.preview_table.item(row, field_col)
+                    if item:
+                        field = item.text().strip()
+                        if field:
+                            header.append(field)
         row_data: Dict[str, str] = {}
-        for idx, field in enumerate(header):
-            value_item = self.preview_table.item(idx, 1)
-            row_data[field] = value_item.text() if value_item else ""
+        for row in range(self.preview_table.rowCount()):
+            left_field_item = self.preview_table.item(row, 0)
+            if left_field_item:
+                left_field = left_field_item.text().strip()
+                if left_field:
+                    row_data[left_field] = self._preview_value_from_cell(row, 1)
+
+            right_field_item = self.preview_table.item(row, 2)
+            if right_field_item:
+                right_field = right_field_item.text().strip()
+                if right_field:
+                    row_data[right_field] = self._preview_value_from_cell(row, 3)
         return row_data
 
+    def _preview_value_from_cell(self, row: int, value_col: int) -> str:
+        widget = self.preview_table.cellWidget(row, value_col)
+        if isinstance(widget, QtWidgets.QComboBox):
+            data = widget.currentData()
+            if data is None:
+                return ""
+            return str(data).strip()
+        value_item = self.preview_table.item(row, value_col)
+        return value_item.text() if value_item else ""
+
+    def _attach_preview_role_family_selectors(
+        self,
+        row_data: Dict[str, str],
+        field_positions: Dict[str, Tuple[int, int]],
+    ) -> None:
+        if not self.service:
+            return
+        role_pos = field_positions.get("role_1")
+        family_pos = field_positions.get("family_1")
+        if not role_pos and not family_pos:
+            return
+
+        role_combo: Optional[QtWidgets.QComboBox] = None
+        family_combo: Optional[QtWidgets.QComboBox] = None
+        role_value = str(row_data.get("role_1") or "").strip()
+        family_value = str(row_data.get("family_1") or "").strip()
+
+        if role_pos:
+            role_combo = QtWidgets.QComboBox()
+            role_combo.addItem("Auto-detect", "")
+            role_ids: set[str] = set()
+            for entry in self.service.list_roles():
+                role_id = str(entry.get("role") or "").strip()
+                if not role_id or role_id in role_ids:
+                    continue
+                role_ids.add(role_id)
+                label = str(entry.get("label") or role_id).strip()
+                role_combo.addItem(f"{label} ({role_id})", role_id)
+            if role_value and role_combo.findData(role_value) < 0:
+                role_combo.addItem(role_value, role_value)
+            role_combo.setCurrentIndex(max(role_combo.findData(role_value), 0))
+            self.preview_table.setCellWidget(role_pos[0], role_pos[1], role_combo)
+
+        if family_pos:
+            family_combo = QtWidgets.QComboBox()
+            self._populate_preview_family_combo(
+                family_combo,
+                role_value or "",
+                preferred_family=family_value,
+            )
+            self.preview_table.setCellWidget(family_pos[0], family_pos[1], family_combo)
+
+        if role_combo and family_combo:
+            role_combo.currentIndexChanged.connect(
+                lambda _idx: self._populate_preview_family_combo(
+                    family_combo,
+                    str(role_combo.currentData() or "").strip(),
+                    preferred_family="",
+                )
+            )
+
+    def _populate_preview_family_combo(
+        self,
+        combo: QtWidgets.QComboBox,
+        role_value: str,
+        *,
+        preferred_family: str,
+    ) -> None:
+        if not self.service:
+            return
+        combo.blockSignals(True)
+        try:
+            combo.clear()
+            combo.addItem("Auto-detect", "")
+            family_ids: set[str] = set()
+            role_arg = role_value or None
+            for entry in self.service.list_families(role_arg):
+                family_id = str(entry.get("family_id") or "").strip()
+                if not family_id or family_id in family_ids:
+                    continue
+                family_ids.add(family_id)
+                label = str(entry.get("label") or family_id).strip()
+                combo.addItem(f"{label} ({family_id})", family_id)
+            if preferred_family and combo.findData(preferred_family) < 0:
+                combo.addItem(preferred_family, preferred_family)
+            combo.setCurrentIndex(max(combo.findData(preferred_family), 0))
+        finally:
+            combo.blockSignals(False)
+
     def _resize_preview_table(self) -> None:
+        self._adjust_preview_column_widths()
         header = self.preview_table.horizontalHeader()
         total_height = header.height()
         for row in range(self.preview_table.rowCount()):
@@ -455,6 +626,26 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         desired = total_height + base
         if desired > self.height():
             self.resize(self.width(), desired)
+
+    def _adjust_preview_column_widths(self) -> None:
+        if self.preview_table.columnCount() != 4:
+            return
+        viewport_width = self.preview_table.viewport().width()
+        if viewport_width <= 0:
+            return
+
+        field_width = int(viewport_width * 0.18)
+        value_width = int(viewport_width * 0.32)
+        widths = [field_width, value_width, field_width, value_width]
+        remainder = viewport_width - sum(widths)
+        widths[-1] += remainder
+
+        for col, width in enumerate(widths):
+            self.preview_table.setColumnWidth(col, max(60, width))
+
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:  # type: ignore[name-defined]
+        super().resizeEvent(event)
+        self._adjust_preview_column_widths()
 
     def _format_status(self, result: Dict[str, Any], *, prefix: str = "Status") -> str:
         status = result.get("status", "ok")
@@ -469,7 +660,29 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         return f"{prefix}: {status}"
 
     def _show_error(self, message: str) -> None:
+        self._stop_status_animation()
         QtWidgets.QMessageBox.warning(self, "Reagent addition", message)
+
+    def _start_status_animation(self, base_text: str) -> None:
+        self._status_anim_base = base_text
+        self._status_anim_step = 0
+        self.status_label.setText(base_text)
+        self._status_anim_timer.start()
+
+    def _tick_status_animation(self) -> None:
+        dots = "." * ((self._status_anim_step % 3) + 1)
+        self.status_label.setText(f"{self._status_anim_base}{dots}")
+        self._status_anim_step += 1
+
+    def _stop_status_animation(self) -> None:
+        if self._status_anim_timer.isActive():
+            self._status_anim_timer.stop()
+
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+        self._preview_poll_timer.stop()
+        self._stop_status_animation()
+        self._preview_executor.shutdown(wait=False, cancel_futures=True)
+        super().closeEvent(event)
 
 
 def main() -> None:
