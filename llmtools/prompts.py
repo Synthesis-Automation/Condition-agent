@@ -419,6 +419,65 @@ Generate a complete protocol including:
 
 
 # =============================================================================
+# REACTION FEATURIZATION REVIEW
+# =============================================================================
+
+REACTION_FEATURIZATION_REVIEW = PromptTemplate(
+    template="""You are a chemistry quality-control assistant for a deterministic reaction featurization pipeline.
+
+Task: Review the deterministic output and suggest a corrected reaction type only when confidence is low or edge-case signals are present.
+
+Reaction SMILES: {reaction_smiles}
+Normalized reaction: {normalized_reaction}
+
+Deterministic reaction type: {deterministic_reaction_type}
+Deterministic confidence: {deterministic_confidence}
+Mapping warning: {mapping_warning}
+
+CRK raw key: {reaction_key_raw}
+CRK final key: {reaction_key}
+
+Reacted motifs: {reacted_motifs}
+Formed motifs: {formed_motifs}
+Spectator motifs: {spectator_motifs}
+Product broad tags: {product_broad_tags}
+Product reactive motifs: {product_motifs_reactive}
+
+Allowed taxonomy reaction types:
+{reaction_type_candidates}
+
+Rules:
+1. Suggest ONLY one reaction type from the allowed taxonomy list, or "Unknown".
+2. Prefer deterministic result when evidence is weak.
+3. Do not invent new reaction labels.
+4. Keep rationale short and chemistry-based.
+
+Respond with ONLY valid JSON:
+{{
+  "suggested_reaction_type": "reaction_type_id_or_Unknown",
+  "confidence": 0.0,
+  "rationale": "short explanation",
+  "requires_human_review": false,
+  "uncertainty_flags": ["optional_flag"]
+}}
+""",
+    reaction_smiles="",
+    normalized_reaction="",
+    deterministic_reaction_type="Unknown",
+    deterministic_confidence="0.0",
+    mapping_warning="None",
+    reaction_key_raw="None",
+    reaction_key="None",
+    reacted_motifs="[]",
+    formed_motifs="[]",
+    spectator_motifs="[]",
+    product_broad_tags="[]",
+    product_motifs_reactive="[]",
+    reaction_type_candidates="Unknown",
+)
+
+
+# =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
 
@@ -449,6 +508,7 @@ def get_template(name: str) -> PromptTemplate:
         "reagent_role_classification": REAGENT_ROLE_CLASSIFICATION,
         "reagent_field_assignment": REAGENT_FIELD_ASSIGNMENT,
         "reagent_entry_verification": REAGENT_ENTRY_VERIFICATION,
+        "reaction_featurization_review": REACTION_FEATURIZATION_REVIEW,
     }
     
     key = name.lower().replace(" ", "_").replace("-", "_")
@@ -479,6 +539,7 @@ def list_templates() -> Dict[str, str]:
         "reagent_role_classification": "Classify reagent role from chemistry",
         "reagent_field_assignment": "Assign family and fields for reagent role",
         "reagent_entry_verification": "Verify reagent entry for errors",
+        "reaction_featurization_review": "Review uncertain reaction featurization output",
     }
 
 

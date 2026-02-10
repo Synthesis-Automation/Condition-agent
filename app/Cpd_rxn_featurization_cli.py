@@ -818,6 +818,58 @@ def _parse_args() -> argparse.Namespace:
         action="store_true",
         help="Show RDKit properties in molecule summaries.",
     )
+    parser.add_argument(
+        "--llm-assist",
+        action="store_true",
+        help="Enable LLM-assisted reaction type review for uncertain reactions.",
+    )
+    parser.add_argument(
+        "--llm-provider",
+        default=os.environ.get("CHEMTOOLS_LLM_PROVIDER", "openai"),
+        help="LLM provider for assist mode (default: openai, env: CHEMTOOLS_LLM_PROVIDER).",
+    )
+    parser.add_argument(
+        "--llm-model",
+        default=os.environ.get("CHEMTOOLS_LLM_MODEL", ""),
+        help=(
+            "LLM model for assist mode (env: CHEMTOOLS_LLM_MODEL). "
+            "Required when --llm-assist is enabled."
+        ),
+    )
+    parser.add_argument(
+        "--llm-temperature",
+        type=float,
+        default=0.0,
+        help="LLM temperature for assist mode (default: 0.0).",
+    )
+    parser.add_argument(
+        "--llm-max-tokens",
+        type=int,
+        default=700,
+        help="Max output tokens for LLM assist mode (default: 700).",
+    )
+    parser.add_argument(
+        "--llm-timeout",
+        type=int,
+        default=60,
+        help="LLM timeout in seconds for assist mode (default: 60).",
+    )
+    parser.add_argument(
+        "--llm-confidence-threshold",
+        type=float,
+        default=0.60,
+        help="Run LLM assist when confidence is below this threshold (default: 0.60).",
+    )
+    parser.add_argument(
+        "--llm-always",
+        action="store_true",
+        help="Run LLM assist for all reactions (not only uncertain ones).",
+    )
+    parser.add_argument(
+        "--llm-no-crk-validation",
+        action="store_true",
+        help="Disable CRK validation gate before applying LLM-suggested reaction type.",
+    )
     return parser.parse_args()
 
 
@@ -835,8 +887,35 @@ def main() -> int:
         "confirm_coupling_products": True,
         "reactant_coverage_guard": args.reactant_coverage_guard,
     }
+    llm_model = str(args.llm_model or "").strip()
+    if args.llm_assist:
+        if not llm_model:
+            print("Error: --llm-model is required when --llm-assist is enabled.")
+            print("Tip: set --llm-model gpt-5-mini (or use env CHEMTOOLS_LLM_MODEL).")
+            return 2
+        options["llm_assist"] = {
+            "enabled": True,
+            "provider": str(args.llm_provider or "openai").strip().lower(),
+            "model": llm_model,
+            "temperature": float(args.llm_temperature),
+            "max_tokens": int(args.llm_max_tokens),
+            "timeout": int(args.llm_timeout),
+            "only_on_uncertain": not bool(args.llm_always),
+            "confidence_threshold": float(args.llm_confidence_threshold),
+            "require_crk_validation": not bool(args.llm_no_crk_validation),
+        }
     print("ChemTools Featurization CLI")
     print("Enter 'q' to quit.")
+    if args.llm_assist:
+        llm_opts = options.get("llm_assist", {})
+        print(
+            "LLM assist enabled: "
+            f"provider={llm_opts.get('provider')}, "
+            f"model={llm_opts.get('model')}, "
+            f"only_on_uncertain={llm_opts.get('only_on_uncertain')}, "
+            f"threshold={llm_opts.get('confidence_threshold')}, "
+            f"require_crk_validation={llm_opts.get('require_crk_validation')}"
+        )
 
     while True:
         mode = "auto"  # Default mode
@@ -868,6 +947,7 @@ def main() -> int:
                 payload = featurize_reaction(smiles, options=reaction_options)
             else:
                 molecule_options = dict(current_options)
+                molecule_options.pop("llm_assist", None)
                 molecule_options["detailed"] = True  # Enable extended output
                 payload = featurize_molecule(smiles, options=molecule_options)
         except Exception as exc:

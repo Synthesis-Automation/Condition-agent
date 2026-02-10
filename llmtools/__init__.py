@@ -43,6 +43,11 @@ from llmtools.reagent_review import (
     build_review_prompt,
     review_taxonomy_proposal,
 )
+from llmtools.reaction_featurization_review import (
+    LLMReactionFeaturizationOptions,
+    build_reaction_featurization_prompt,
+    review_reaction_featurization,
+)
 
 __all__ = [
     "LLMClient",
@@ -51,5 +56,8 @@ __all__ = [
     "LLMReviewOptions",
     "build_review_prompt",
     "review_taxonomy_proposal",
+    "LLMReactionFeaturizationOptions",
+    "build_reaction_featurization_prompt",
+    "review_reaction_featurization",
     "__version__",
 ]
