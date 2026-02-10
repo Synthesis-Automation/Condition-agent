@@ -14,6 +14,14 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Set, Tuple
 REACTION_TYPES_FILE = Path(__file__).resolve().parent / "data" / "reaction_types.v4.0.json"
 COMPOUND_LOGIC_FILE = Path(__file__).resolve().parent / "data" / "compound_logic.json"
 _DEFAULT_SLOTS = ("electrophiles", "nucleophiles", "acids", "activators", "substrate", "reagent")
+REACTION_CONSTRAINT_KEYS = (
+    "include_reacted",
+    "exclude_reacted",
+    "include_formed",
+    "exclude_formed",
+    "min_reactant_slot_matches",
+    "min_product_slot_matches",
+)
 
 
 @dataclass(frozen=True)
@@ -183,6 +191,38 @@ def _normalize_reactants(
     return reactants
 
 
+def _to_non_negative_int(value: Any, default: int = 0) -> int:
+    try:
+        out = int(value)
+    except Exception:
+        out = int(default)
+    return max(0, out)
+
+
+def normalize_reaction_constraints(raw: Any) -> Dict[str, Any]:
+    """
+    Normalize reaction constraints into a stable schema for all reaction families.
+
+    Even if source JSON omits `constraints`, the loader provides this normalized
+    payload with default values.
+    """
+    payload = dict(raw or {}) if isinstance(raw, dict) else {}
+    return {
+        "include_reacted": _dedupe(_coerce_list(payload.get("include_reacted"))),
+        "exclude_reacted": _dedupe(_coerce_list(payload.get("exclude_reacted"))),
+        "include_formed": _dedupe(_coerce_list(payload.get("include_formed"))),
+        "exclude_formed": _dedupe(_coerce_list(payload.get("exclude_formed"))),
+        "min_reactant_slot_matches": _to_non_negative_int(
+            payload.get("min_reactant_slot_matches"),
+            default=0,
+        ),
+        "min_product_slot_matches": _to_non_negative_int(
+            payload.get("min_product_slot_matches"),
+            default=0,
+        ),
+    }
+
+
 @lru_cache(maxsize=1)
 def load_reaction_catalog(
     path: Optional[Path] = None,
@@ -229,7 +269,7 @@ def load_reaction_catalog(
         catalysts = [str(c) for c in (entry.get("catalysts") or []) if isinstance(c, str)]
         conditions = entry.get("conditions")
         metadata = dict(entry.get("metadata") or {})
-        constraints = dict(entry.get("constraints") or {})
+        constraints = normalize_reaction_constraints(entry.get("constraints"))
         raw_references = entry.get("reference_reactions")
         if not raw_references:
             raw_references = entry.get("examples") or []
@@ -291,4 +331,6 @@ __all__ = [
     "list_reaction_type_ids",
     "get_reaction_type",
     "resolve_reaction_type",
+    "normalize_reaction_constraints",
+    "REACTION_CONSTRAINT_KEYS",
 ]

@@ -173,6 +173,7 @@ def _validate_llm_suggested_type_with_crk(
             initial_detection=suggested_reaction_type,
             initial_confidence=0.9,
             reaction_key=str(reaction_key_raw),
+            include_evidence=False,
         )
     except Exception as exc:
         return False, f"validation_error: {exc}"
@@ -1961,6 +1962,8 @@ def featurize_reaction(
             "validation_confidence": validated.get("confidence"),
             "reaction_key_raw": reaction_key_raw,
         }
+        if validated.get("evidence") is not None:
+            detection_payload["evidence"] = validated.get("evidence")
 
         if isinstance(reaction_type, dict):
             rt_id = reaction_type.get("reaction_type")

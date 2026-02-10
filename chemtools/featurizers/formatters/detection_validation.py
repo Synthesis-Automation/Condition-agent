@@ -36,6 +36,69 @@ def _motifs_match_slot(motifs: Set[str], allowed: List[str]) -> bool:
     return any(m in motifs for m in allowed)
 
 
+def _as_str_set(values: Any) -> Set[str]:
+    if not values:
+        return set()
+    if isinstance(values, (list, tuple, set)):
+        return {str(v) for v in values if str(v).strip()}
+    return {str(values)} if str(values).strip() else set()
+
+
+def _constraints_match(
+    constraints: Dict[str, Any],
+    reacted_set: Set[str],
+    formed_set: Set[str],
+    *,
+    reactant_slot_matches: int = 0,
+    product_slot_matches: int = 0,
+) -> bool:
+    """Apply lightweight include/exclude constraints on reacted/formed motifs."""
+    include_reacted = _as_str_set(constraints.get("include_reacted"))
+    exclude_reacted = _as_str_set(constraints.get("exclude_reacted"))
+    include_formed = _as_str_set(constraints.get("include_formed"))
+    exclude_formed = _as_str_set(constraints.get("exclude_formed"))
+    min_reactant_slot_matches = int(constraints.get("min_reactant_slot_matches") or 0)
+    min_product_slot_matches = int(constraints.get("min_product_slot_matches") or 0)
+
+    if include_reacted and not include_reacted.issubset(reacted_set):
+        return False
+    if exclude_reacted and (exclude_reacted & reacted_set):
+        return False
+    if include_formed and not include_formed.issubset(formed_set):
+        return False
+    if exclude_formed and (exclude_formed & formed_set):
+        return False
+    if reactant_slot_matches < max(0, min_reactant_slot_matches):
+        return False
+    if product_slot_matches < max(0, min_product_slot_matches):
+        return False
+    return True
+
+
+def _score_specificity_candidate(
+    *,
+    reaction_id: str,
+    matched_slots: List[str],
+    product_slot_matches: int,
+    reactant_support: int,
+    product_support: int,
+    reactant_allowed_total: int,
+    product_allowed_total: int,
+    catalog_index: int,
+) -> Tuple[int, int, int, int, int, int, int, int]:
+    """Score candidate specificity for stable ranking."""
+    return (
+        len(matched_slots),          # prefer broader slot support
+        product_slot_matches,        # prefer stronger product evidence
+        reactant_support,            # reactant evidence overlap
+        product_support,             # product evidence overlap
+        -reactant_allowed_total,     # fewer allowed motifs => more specific
+        -product_allowed_total,      # fewer allowed motifs => more specific
+        -len(reaction_id),           # stable tie-break
+        -catalog_index,              # preserve deterministic order as last tie-break
+    )
+
+
 def _split_motif_tokens(value: str) -> List[str]:
     tokens = [tok.strip() for tok in re.split(r"[|,;/]", value) if tok.strip()]
     return [normalize_motif_id(tok) for tok in tokens if tok and tok != "[]"]
@@ -92,11 +155,117 @@ def _parse_crk_key(
     return reacted, formed, spectators, formed_bonds, broken_bonds
 
 
-def _match_reaction_catalog(
+def _collect_ranked_catalog_candidates(
+    reacted_set: Set[str],
+    formed_set: Set[str],
+) -> List[Dict[str, Any]]:
+    """Collect and rank taxonomy candidates using specificity-aware scoring."""
+    definitions, _ = _get_catalog()
+    candidates: List[Dict[str, Any]] = []
+
+    for catalog_index, (reaction_id, defn) in enumerate(definitions.items()):
+        if not defn.reactants:
+            continue
+
+        all_slots_match = True
+        matched_slots: List[str] = []
+        reactant_allowed_union: Set[str] = set()
+        reactant_allowed_total = 0
+        for slot_name, slot_req in defn.reactants.items():
+            if not slot_req.allowed:
+                continue
+            allowed = set(slot_req.allowed)
+            reactant_allowed_union.update(allowed)
+            reactant_allowed_total += len(allowed)
+            if _motifs_match_slot(reacted_set, slot_req.allowed):
+                matched_slots.append(slot_name)
+            else:
+                all_slots_match = False
+                break
+
+        if not all_slots_match or len(matched_slots) < 1:
+            continue
+
+        product_match = True
+        product_slot_matches = 0
+        product_allowed_union: Set[str] = set()
+        product_allowed_total = 0
+        if defn.products:
+            product_match = False
+            for slot_req in defn.products.values():
+                if slot_req.allowed and _motifs_match_slot(formed_set, slot_req.allowed):
+                    product_match = True
+                    product_slot_matches += 1
+                if slot_req.allowed:
+                    allowed = set(slot_req.allowed)
+                    product_allowed_union.update(allowed)
+                    product_allowed_total += len(allowed)
+
+        if not product_match:
+            continue
+
+        if not _constraints_match(
+            defn.constraints or {},
+            reacted_set,
+            formed_set,
+            reactant_slot_matches=len(matched_slots),
+            product_slot_matches=product_slot_matches,
+        ):
+            continue
+
+        reactant_support = len(reacted_set & reactant_allowed_union)
+        product_support = len(formed_set & product_allowed_union)
+        score = _score_specificity_candidate(
+            reaction_id=reaction_id,
+            matched_slots=matched_slots,
+            product_slot_matches=product_slot_matches,
+            reactant_support=reactant_support,
+            product_support=product_support,
+            reactant_allowed_total=reactant_allowed_total,
+            product_allowed_total=product_allowed_total,
+            catalog_index=catalog_index,
+        )
+
+        candidates.append(
+            {
+                "reaction_id": reaction_id,
+                "display_name": defn.name,
+                "matched_reactant_slots": list(matched_slots),
+                "matched_product_slots": int(product_slot_matches),
+                "reactant_support": int(reactant_support),
+                "product_support": int(product_support),
+                "reactant_allowed_total": int(reactant_allowed_total),
+                "product_allowed_total": int(product_allowed_total),
+                "score": score,
+                "catalog_index": int(catalog_index),
+            }
+        )
+
+    candidates.sort(key=lambda c: c.get("score"), reverse=True)
+    return candidates
+
+
+def _match_reaction_catalog_specificity(
     reacted_set: Set[str],
     formed_set: Set[str],
 ) -> Optional[Tuple[str, List[str], str]]:
-    """Return best taxonomy match as (reaction_id, matched_slots, display_name)."""
+    """Return best match using specificity-aware ranked candidates."""
+    candidates = _collect_ranked_catalog_candidates(reacted_set, formed_set)
+    if not candidates:
+        return None
+    top = candidates[0]
+    return (
+        str(top["reaction_id"]),
+        [str(s) for s in top["matched_reactant_slots"]],
+        str(top["display_name"]),
+    )
+
+
+def _match_reaction_catalog_legacy(
+    reacted_set: Set[str],
+    formed_set: Set[str],
+) -> Optional[Tuple[str, List[str], str]]:
+    """Return first taxonomy match (legacy pre-specificity behavior)."""
     definitions, _ = _get_catalog()
     for reaction_id, defn in definitions.items():
         if not defn.reactants:
@@ -123,10 +292,68 @@ def _match_reaction_catalog(
                 if slot_req.allowed and _motifs_match_slot(formed_set, slot_req.allowed):
                     product_match = True
                     break
-
         if product_match:
             return reaction_id, matched_slots, defn.name
     return None
+
+
+def _match_reaction_catalog(
+    reacted_set: Set[str],
+    formed_set: Set[str],
+    *,
+    use_legacy: bool = False,
+) -> Optional[Tuple[str, List[str], str]]:
+    """Return best taxonomy match as (reaction_id, matched_slots, display_name)."""
+    if use_legacy:
+        return _match_reaction_catalog_legacy(reacted_set, formed_set)
+    return _match_reaction_catalog_specificity(reacted_set, formed_set)
+
+
+def _build_match_evidence(
+    *,
+    reacted_set: Set[str],
+    formed_set: Set[str],
+    selected_match: Optional[Tuple[str, List[str], str]],
+    use_legacy: bool,
+    max_candidates: int = 5,
+) -> Dict[str, Any]:
+    matcher = "taxonomy_legacy_v1" if use_legacy else "taxonomy_specificity_v2"
+    candidates = _collect_ranked_catalog_candidates(reacted_set, formed_set)
+    top_candidates = [
+        {
+            "reaction_id": c.get("reaction_id"),
+            "display_name": c.get("display_name"),
+            "matched_reactant_slots": c.get("matched_reactant_slots"),
+            "matched_product_slots": c.get("matched_product_slots"),
+            "reactant_support": c.get("reactant_support"),
+            "product_support": c.get("product_support"),
+            "reactant_allowed_total": c.get("reactant_allowed_total"),
+            "product_allowed_total": c.get("product_allowed_total"),
+            "score": list(c.get("score") or []),
+        }
+        for c in candidates[: max(1, int(max_candidates))]
+    ]
+
+    selected_payload: Optional[Dict[str, Any]] = None
+    if selected_match:
+        rid, matched_slots, display_name = selected_match
+        selected_payload = {
+            "reaction_id": rid,
+            "display_name": display_name,
+            "matched_reactant_slots": list(matched_slots),
+        }
+        candidate = next((c for c in candidates if c.get("reaction_id") == rid), None)
+        if candidate:
+            selected_payload["matched_product_slots"] = candidate.get("matched_product_slots")
+            selected_payload["score"] = list(candidate.get("score") or [])
+
+    return {
+        "matcher": matcher,
+        "reacted_motifs": sorted(reacted_set),
+        "formed_motifs": sorted(formed_set),
+        "selected": selected_payload,
+        "top_candidates": top_candidates,
+    }
 
 
 def _format_validation_response(
@@ -136,39 +363,53 @@ def _format_validation_response(
     match: Optional[Tuple[str, List[str], str]],
     method: str,
     reason_prefix: str,
+    evidence: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     if match is None:
-        return {
+        payload = {
             "reaction_type": initial_detection,
             "confidence": initial_confidence,
             "validation_method": "slot_based_confirmed",
             "corrected_from": None,
             "reason": "Pattern consistent with slot-based detection",
         }
+        if evidence is not None:
+            payload["evidence"] = evidence
+        return payload
 
     reaction_id, matched_slots, display_name = match
     if reaction_id != initial_detection:
-        return {
+        payload = {
             "reaction_type": reaction_id,
             "confidence": 0.95,
             "validation_method": method,
             "corrected_from": initial_detection,
             "reason": f"{reason_prefix}: {' + '.join(matched_slots)} -> {display_name}",
         }
+        if evidence is not None:
+            payload["evidence"] = evidence
+        return payload
 
-    return {
+    payload = {
         "reaction_type": initial_detection,
         "confidence": max(initial_confidence, 0.95),
         "validation_method": "slot_based_confirmed",
         "corrected_from": None,
         "reason": "Pattern consistent with slot-based detection",
     }
+    if evidence is not None:
+        payload["evidence"] = evidence
+    return payload
 
 
 def validate_detection_with_crk_key(
     initial_detection: str,
     initial_confidence: float,
     reaction_key: str,
+    *,
+    use_legacy: bool = False,
+    include_evidence: bool = True,
+    max_candidates: int = 5,
 ) -> Dict[str, Any]:
     """
     Validate and refine reaction type detection from CRK key.
@@ -176,13 +417,25 @@ def validate_detection_with_crk_key(
     This is the preferred streamlined path: CRK_raw -> taxonomy match.
     """
     reacted_set, formed_set, _spectators, _formed_bonds, _broken_bonds = _parse_crk_key(reaction_key)
-    match = _match_reaction_catalog(reacted_set, formed_set)
+    match = _match_reaction_catalog(reacted_set, formed_set, use_legacy=use_legacy)
+    evidence = (
+        _build_match_evidence(
+            reacted_set=reacted_set,
+            formed_set=formed_set,
+            selected_match=match,
+            use_legacy=use_legacy,
+            max_candidates=max_candidates,
+        )
+        if include_evidence
+        else None
+    )
     return _format_validation_response(
         initial_detection=initial_detection,
         initial_confidence=initial_confidence,
         match=match,
         method="crk_pattern",
         reason_prefix="Taxonomy pattern (CRK)",
+        evidence=evidence,
     )
 
 
@@ -192,6 +445,10 @@ def validate_detection_with_reacted_motifs(
     reacted_motifs: List[str],
     formed_motifs: List[str],
     spectator_motifs: Optional[List[str]] = None,
+    *,
+    use_legacy: bool = False,
+    include_evidence: bool = True,
+    max_candidates: int = 5,
 ) -> Dict[str, Any]:
     """
     Validate and refine reaction type detection using reacted motifs.
@@ -214,11 +471,23 @@ def validate_detection_with_reacted_motifs(
     """
     reacted_set = {normalize_motif_id(str(m)) for m in (reacted_motifs or []) if m}
     formed_set = {normalize_motif_id(str(m)) for m in (formed_motifs or []) if m}
-    match = _match_reaction_catalog(reacted_set, formed_set)
+    match = _match_reaction_catalog(reacted_set, formed_set, use_legacy=use_legacy)
+    evidence = (
+        _build_match_evidence(
+            reacted_set=reacted_set,
+            formed_set=formed_set,
+            selected_match=match,
+            use_legacy=use_legacy,
+            max_candidates=max_candidates,
+        )
+        if include_evidence
+        else None
+    )
     return _format_validation_response(
         initial_detection=initial_detection,
         initial_confidence=initial_confidence,
         match=match,
         method="reacted_motifs_pattern",
         reason_prefix="Taxonomy pattern",
+        evidence=evidence,
     )

@@ -165,6 +165,16 @@ def build_core_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
     aggregates = full_reaction.get("aggregates", {})
     if aggregates:
         core["aggregates"] = aggregates
+
+    detection = full_reaction.get("detection")
+    if isinstance(detection, dict):
+        detection_out: Dict[str, Any] = {}
+        for key in ("validation", "evidence", "mapping_warning", "llm_assist", "error"):
+            value = detection.get(key)
+            if value is not None and value != {} and value != [] and value != "":
+                detection_out[key] = value
+        if detection_out:
+            core["detection"] = detection_out
     
     return core
 

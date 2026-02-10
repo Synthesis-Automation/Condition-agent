@@ -436,6 +436,35 @@
       ]
     },
     {
+      "id": "Quinazolinone_annulation",
+      "reactants": {
+        "amine": [
+          "Ar-NH2",
+          "HeteroAr-NH2"
+        ],
+        "amide": [
+          "Ar-NHCOR",
+          "Ar-CONHR",
+          "HeteroAr-NHCOR",
+          "HeteroAr-CONHR"
+        ],
+        "c1_source": [
+          "CH3-OH"
+        ]
+      },
+      "products": {
+        "heterocycle": [
+          "Pyrimidine"
+        ]
+      },
+      "aliases": [
+        "quinazolinone_annulation",
+        "quinazolin_4_one_formation",
+        "o_aminobenzamide_c1_annulation"
+      ],
+      "description": "Oxidative annulation of o-aminobenzamides with methanol-derived C1 insertion to quinazolin-4-one motifs."
+    },
+    {
       "id": "Sandmeyer",
       "reactants": {
         "substrate": [

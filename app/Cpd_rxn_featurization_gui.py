@@ -52,7 +52,7 @@ class FeaturizationWindow(QtWidgets.QWidget):
         self.smiles_input.setPlaceholderText(
             "Enter molecule SMILES or reaction SMILES (A.B>>P)."
         )
-        self.smiles_input.setFixedHeight(96)
+        self.smiles_input.setFixedHeight(64)
         self.target_groups_input = QtWidgets.QLineEdit()
         self.target_groups_input.setPlaceholderText("Optional, comma-separated (e.g. Br,CN)")
 
@@ -351,9 +351,84 @@ class FeaturizationWindow(QtWidgets.QWidget):
                     show_extended=True,
                 )
             text = buffer.getvalue().strip()
+            evidence_text = self._format_detection_evidence_summary(payload)
+            if evidence_text:
+                if text:
+                    text = f"{text}\n\n{evidence_text}"
+                else:
+                    text = evidence_text
             return text or "(No summary output)"
         except Exception:
             return json.dumps(payload, indent=2, sort_keys=True)
+
+    def _format_detection_evidence_summary(self, payload: Dict[str, Any]) -> str:
+        detection = payload.get("detection") if isinstance(payload, dict) else None
+        if not isinstance(detection, dict):
+            return ""
+
+        lines: List[str] = []
+        evidence = detection.get("evidence")
+        if isinstance(evidence, dict):
+            lines.append("Detection Evidence")
+            lines.append("-" * 72)
+            matcher = str(evidence.get("matcher") or "").strip()
+            if matcher:
+                lines.append(f"matcher: {matcher}")
+
+            selected = evidence.get("selected")
+            if isinstance(selected, dict):
+                sel_rid = str(selected.get("reaction_id") or "").strip() or "Unknown"
+                lines.append(f"selected: {sel_rid}")
+                sel_slots = selected.get("matched_reactant_slots") or []
+                if sel_slots:
+                    lines.append(f"selected_reactant_slots: {', '.join(str(s) for s in sel_slots)}")
+                sel_prod_slots = selected.get("matched_product_slots")
+                if sel_prod_slots is not None:
+                    lines.append(f"selected_product_slots: {sel_prod_slots}")
+                sel_score = selected.get("score")
+                if isinstance(sel_score, list):
+                    lines.append(f"selected_score: {self._format_score_vector(sel_score)}")
+
+            top_candidates = evidence.get("top_candidates") or []
+            if isinstance(top_candidates, list) and top_candidates:
+                lines.append("top_candidates:")
+                for idx, candidate in enumerate(top_candidates[:5], start=1):
+                    if not isinstance(candidate, dict):
+                        continue
+                    rid = str(candidate.get("reaction_id") or "Unknown")
+                    reactant_support = candidate.get("reactant_support")
+                    product_support = candidate.get("product_support")
+                    matched_slots = candidate.get("matched_reactant_slots") or []
+                    score = candidate.get("score")
+                    detail_parts: List[str] = []
+                    if matched_slots:
+                        detail_parts.append(f"slots={len(matched_slots)}")
+                    if reactant_support is not None:
+                        detail_parts.append(f"reactant_support={reactant_support}")
+                    if product_support is not None:
+                        detail_parts.append(f"product_support={product_support}")
+                    if isinstance(score, list):
+                        detail_parts.append(f"score={self._format_score_vector(score)}")
+                    if detail_parts:
+                        lines.append(f"  {idx}. {rid} ({'; '.join(detail_parts)})")
+                    else:
+                        lines.append(f"  {idx}. {rid}")
+
+        llm_assist = detection.get("llm_assist")
+        if isinstance(llm_assist, dict):
+            if lines:
+                lines.append("")
+            lines.append("LLM Assist")
+            lines.append("-" * 72)
+            for key in ("used", "status", "decision"):
+                if key in llm_assist:
+                    lines.append(f"{key}: {llm_assist.get(key)}")
+
+        return "\n".join(lines).strip()
+
+    @staticmethod
+    def _format_score_vector(score: List[Any]) -> str:
+        return "[" + ", ".join(str(v) for v in score) + "]"
 
     def _on_poll(self) -> None:
         if not self._future:
