@@ -6,6 +6,7 @@ Boron Trichloride,BCl3,10294-34-5,ClB(Cl)Cl,BCl3,liquid,0.738,117.17,12,-107,0,0
 Boron trifluoride etherate,BF3-Et2O,109-63-7,CCOCC.FB(F)F,C4H10BF3O,liquid,1.12,141.928,126,-60,0,0,acid,boron_lewis_acids,strong Lewis acid,,,
 Hydrochloric Acid,HCl,7647-01-0,Cl,ClH,liquid,1.18,36.461,5.8,-35,0,0,acid,mineral_acids,strong acid,,,
 p-Toluenesulfonic acid,p-TsOH,104-15-4,,,,,,,,,,acid,sulfonic_acids,strong acid,,,
+Ytterbium triflate,YbOTf3,54761-04-5,,C3F9O9S3Yb,powder,,620.3,,,0,0,acid,rare_earth_triflates,,,,
 1-Adamantane carboxylic acid,1-AdCO2H,828-51-3,O=C(O)C12CC3CC(CC(C3)C1)C2,C11H16O2,powder,,180.2435,304.7,172,0,0,additive,carboxylate_promoters_ch_activation,carboxylate promoters ch activation,,,
 1-Hydroxy-7-azabenzotriazole,HOAt,39968-33-7,,,,,,,,,,additive,amide_coupling_additives,amide coupling additives,,,
 1-Hydroxybenzotriazole,HOBt,2592-95-2,On1nnc2ccccc21,C6H5N3O,powder,,135.12,,156,0,0,additive,amide_coupling_additives,amide coupling additives,,,

@@ -132,7 +132,8 @@
       ],
       "usage": [
         "C_N_Coupling",
-        "Chan_lam_cn"
+        "Chan_lam_cn",
+        "Alkyl_Nucleophilic_Substitution"
       ]
     },
     "alcohols_oh": {
@@ -153,7 +154,8 @@
         "R3C-OH"
       ],
       "usage": [
-        "C_O_Coupling"
+        "C_O_Coupling",
+        "Alkyl_Nucleophilic_Substitution"
       ]
     },
     "thiols_sh": {
@@ -173,7 +175,120 @@
         "Thiocarbonyl-SH"
       ],
       "usage": [
-        "C_S_Coupling"
+        "C_S_Coupling",
+        "Alkyl_Nucleophilic_Substitution"
+      ]
+    },
+    "alkyl_electrophiles": {
+      "name": "Alkyl Electrophiles",
+      "description": "Alkyl/benzylic/allylic/propargylic halides and sulfonates used in nucleophilic substitution.",
+      "members": [
+        "Alkyl-I",
+        "Alkyl-Br",
+        "Alkyl-Cl",
+        "Alkyl-F",
+        "Alkyl-OTf",
+        "Alkyl-OMs",
+        "Alkyl-OTs",
+        "RCH2-I",
+        "RCH2-Br",
+        "RCH2-Cl",
+        "RCH2-F",
+        "R2CH-I",
+        "R2CH-Br",
+        "R2CH-Cl",
+        "R2CH-F",
+        "R3C-I",
+        "R3C-Br",
+        "R3C-Cl",
+        "R3C-F",
+        "CH3-I",
+        "CH3-Br",
+        "CH3-Cl",
+        "CH3-F",
+        "Bn-I",
+        "Bn-Br",
+        "Bn-Cl",
+        "Bn-F",
+        "Bn-OTf",
+        "Bn-OMs",
+        "Bn-OTs",
+        "Allyl-I",
+        "Allyl-Br",
+        "Allyl-Cl",
+        "Allyl-F",
+        "Allyl-OTf",
+        "Allyl-OMs",
+        "Allyl-OTs",
+        "Propargyl-I",
+        "Propargyl-Br",
+        "Propargyl-Cl",
+        "Propargyl-OTf",
+        "Propargyl-OMs",
+        "Propargyl-OTs"
+      ],
+      "usage": [
+        "Alkyl_Nucleophilic_Substitution"
+      ]
+    },
+    "alkyl_substitution_products": {
+      "name": "Alkyl Substitution Products",
+      "description": "Products formed by N/O/S nucleophilic substitution on alkyl electrophiles.",
+      "members": [
+        "Alkyl-NH2",
+        "Alkyl-NHR",
+        "Alkyl-NR2",
+        "RCH2-NH2",
+        "RCH2-NHR",
+        "RCH2-NR2",
+        "R2CH-NH2",
+        "R2CH-NHR",
+        "R2CH-NR2",
+        "R3C-NH2",
+        "R3C-NHR",
+        "R3C-NR2",
+        "CH3-NH2",
+        "CH3-NHR",
+        "CH3-NR2",
+        "Bn-NH2",
+        "Bn-NHR",
+        "Bn-NR2",
+        "Allyl-NH2",
+        "Allyl-NHR",
+        "Allyl-NR2",
+        "Propargyl-NH2",
+        "Alkyl-OR",
+        "RCH2-OR",
+        "R2CH-OR",
+        "R3C-OR",
+        "CH3-OR",
+        "Bn-OR",
+        "Allyl-OR",
+        "Ar-OR",
+        "Alkyl-SR",
+        "RCH2-SR",
+        "R2CH-SR",
+        "R3C-SR",
+        "CH3-SR",
+        "Bn-SR",
+        "Allyl-SR",
+        "Ar-SR",
+        "Alkyl-AromN",
+        "Ar-AromN",
+        "Ar-NH2",
+        "Ar-NHR",
+        "Ar-NR2",
+        "HeteroAr-NH2",
+        "HeteroAr-NHR",
+        "Alkyl-NHCOR",
+        "Alkyl-NRCOR",
+        "Ar-NHCOR",
+        "Ar-NRCOR",
+        "Alkyl-N(R)SO2R",
+        "Ar-N(R)SO2R"
+      ],
+      "usage": [
+        "Alkyl_Nucleophilic_Substitution"
       ]
     },
     "carboxylic_acids": {
@@ -281,7 +396,8 @@
         "AromN-OR"
       ],
       "usage": [
-        "C_O_Coupling"
+        "C_O_Coupling",
+        "Alkyl_Nucleophilic_Substitution"
       ]
     },
     "aryl_thioethers": {
@@ -291,7 +407,8 @@
         "Ar-SR"
       ],
       "usage": [
-        "C_S_Coupling"
+        "C_S_Coupling",
+        "Alkyl_Nucleophilic_Substitution"
       ]
     },
     "aryl_amides": {
@@ -314,17 +431,20 @@
       ],
       "usage": [
         "C_N_Coupling",
-        "Chan_lam_cn"
+        "Chan_lam_cn",
+        "Alkyl_Nucleophilic_Substitution"
       ]
     },
     "acyl_halides": {
       "name": "Acyl Halides",
       "description": "Acyl halides (acid chlorides/bromides/iodides/fluorides) for acylation.",
       "members": [
+        "Acyl-Cl",
         "Ar-COBr",
         "Ar-COCl",
         "Ar-COF",
-        "Ar-COI"
+        "Ar-COI",
+        "Alkyl-COCl"
       ],
       "usage": [
         "Acyl_Halides_formation",

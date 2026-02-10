@@ -59,6 +59,12 @@
       "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F", "-SH", "-H"],
       "notes": "Halide leaves electrophile, thiol S-H bond breaks (detected as -SH motif)"
     },
+    "Alkyl_Nucleophilic_Substitution": {
+      "pattern": "coupling_substitution",
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F", "-NH2", "-NHR", "-OH", "-SH", "-H"],
+      "formed_groups": ["-NHR", "-NR2", "-OR", "-SR", "AromN"],
+      "notes": "Alkyl halide/sulfonate substitution by N/O/S nucleophiles (SN2-like alkylation)."
+    },
     "Sonogashira": {
       "pattern": "coupling_substitution",
       "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-H"],

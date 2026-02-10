@@ -216,6 +216,33 @@
       }
     },
     {
+      "id": "Alkyl_Nucleophilic_Substitution",
+      "reactants": {
+        "electrophile": "@alkyl_electrophiles",
+        "nucleophile": [
+          "@amines_nh",
+          "@alcohols_oh",
+          "@thiols_sh"
+        ]
+      },
+      "products": {
+        "product": "@alkyl_substitution_products"
+      },
+      "examples": [
+        "CCO.CBr>>CCOC",
+        "CN.CBr>>CNC",
+        "CS.CBr>>CSC"
+      ],
+      "aliases": [
+        "alkyl_nucleophilic_substitution",
+        "alkyl_substitution",
+        "SN2",
+        "SN2_substitution",
+        "alkyl_sn2"
+      ],
+      "description": "N/O/S nucleophilic substitution on alkyl electrophiles (halides/sulfonates), covering SN2-like alkylation."
+    },
+    {
       "id": "Sonogashira",
       "reactants": {
         "electrophile": "@sp2_electrophiles",

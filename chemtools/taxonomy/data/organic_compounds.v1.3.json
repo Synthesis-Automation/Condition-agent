@@ -832,6 +832,13 @@
     },
     {
       "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-COCl",
+      "priority": 6,
+      "description": "Alkyl acid chloride (Alkyl-COCl)."
+    },
+    {
+      "template": "single_bond",
       "A": "Ar",
       "B": "-COF",
       "description": "Aryl acid fluoride (Ar-COF)."

@@ -26,3 +26,15 @@ def test_validate_detection_with_crk_key_acyl_halides_formation() -> None:
     )
     assert result["reaction_type"] == "Acyl_Halides_formation"
     assert result["validation_method"] == "crk_pattern"
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_detects_aliphatic_acid_chloride_as_alkyl_cocl() -> None:
+    rxn = "O=C(O)CN1C(=O)c2ccccc2C1=O>>O=C(Cl)CN1C(=O)c2ccccc2C1=O"
+    result = featurize_reaction(rxn, options={"detailed": True})
+    reaction_key = result.get("reaction_key") or ""
+    aggregates = result.get("aggregates") or {}
+
+    assert result.get("reaction_type") == "Acyl_Halides_formation"
+    assert "-> Alkyl-COCl" in reaction_key
+    assert "Alkyl-COCl" in (aggregates.get("formed_motifs") or [])

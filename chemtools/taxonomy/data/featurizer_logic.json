@@ -129,6 +129,7 @@
     "C_N_Coupling": "c_n_cross_coupling",
     "C_O_Coupling": "c_o_coupling",
     "C_S_Coupling": "c_s_coupling",
+    "Alkyl_Nucleophilic_Substitution": "alkyl_nucleophilic_substitution",
     "Snar_cn": "snar_cn",
     "Amide_formation": "amide_formation",
     "Esterification": "esterification",
