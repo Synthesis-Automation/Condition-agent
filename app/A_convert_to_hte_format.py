@@ -25,7 +25,7 @@ def cached_featurize(smiles: str):
     """Cache featurization results to speed up processing of repeated reactants."""
     # Use substituent-level filtering to avoid redundant labels (e.g., Ar-NR2 and RCH2-NR2)
     # also ensures that Aromatic scaffolds win over Aliphatic ones due to updated priorities.
-    options = {"motif_site_filter": "substituent"}
+    options = {"motif_site_filter": "substituent", "detailed": True}
     return featurize_molecule(smiles, options=options)
 
 
@@ -298,6 +298,27 @@ def _apply_aromn_scaffold_override(
         insert_at = min(idx, len(filtered))
         filtered.insert(insert_at, scaffold)
     return filtered
+
+
+def _extract_motif_ids(entries: Any) -> List[str]:
+    ids: List[str] = []
+    for entry in entries or []:
+        if isinstance(entry, dict):
+            cid = str(entry.get("id") or entry.get("compound_id") or "").strip()
+        else:
+            cid = str(entry).strip()
+        if cid:
+            ids.append(cid)
+    return ids
+
+
+def _extract_context_scaffolds(analysis: Dict[str, Any]) -> List[str]:
+    context_ids: List[str] = []
+    context_ids.extend(_extract_motif_ids(analysis.get("context_motifs", [])))
+    extended = analysis.get("extended")
+    if isinstance(extended, dict):
+        context_ids.extend(_extract_motif_ids(extended.get("context_motifs", [])))
+    return _dedupe_list(context_ids)
 
 def _dedupe_list(values: Iterable[str]) -> List[str]:
     seen = set()
@@ -664,19 +685,8 @@ def process_reaction_dataset(
                     try:
                         analysis = cached_featurize(r_smiles)
                         motifs = analysis.get("motifs", [])
-                        context_motifs = analysis.get("context_motifs", [])
-
-                        current_r_motifs = []
-                        for m in motifs:
-                            cid = m.get("id", "")
-                            if cid:
-                                current_r_motifs.append(cid)
-
-                        context_scaffolds: List[str] = []
-                        for m in context_motifs:
-                            cid = m.get("id", "")
-                            if cid:
-                                context_scaffolds.append(cid)
+                        current_r_motifs = _extract_motif_ids(motifs)
+                        context_scaffolds = _extract_context_scaffolds(analysis)
 
                         current_r_motifs = _apply_aromn_scaffold_override(
                             current_r_motifs,
@@ -793,19 +803,8 @@ def process_reaction_dataset(
                 try:
                     analysis = cached_featurize(r_smiles)
                     motifs = analysis.get("motifs", [])
-                    context_motifs = analysis.get("context_motifs", [])
-
-                    current_r_motifs = []
-                    for m in motifs:
-                        cid = m.get("id", "")
-                        if cid:
-                            current_r_motifs.append(cid)
-
-                    context_scaffolds: List[str] = []
-                    for m in context_motifs:
-                        cid = m.get("id", "")
-                        if cid:
-                            context_scaffolds.append(cid)
+                    current_r_motifs = _extract_motif_ids(motifs)
+                    context_scaffolds = _extract_context_scaffolds(analysis)
 
                     current_r_motifs = _apply_aromn_scaffold_override(
                         current_r_motifs,

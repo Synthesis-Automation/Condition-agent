@@ -10,6 +10,7 @@ from typing import Any, Dict, Iterable, List, Optional
 
 from . import reactions as _reactions
 from . import reactants as _reactants
+from . import reaction_record as _reaction_record
 from . import smiles as _smiles
 from ...taxonomy import reaction_catalog as _reaction_catalog
 from ...detection import detect_reaction_type
@@ -17,6 +18,7 @@ from ...detection import detect_reaction_type
 __all__ = [
     "normalize",
     "normalize_reaction",
+    "ReactionRecord",
     "ReactantMatch",
     "classify_reactant_smiles",
     "classify_reactant_category",
@@ -34,6 +36,7 @@ __all__ = [
 # Re-export frequently used helpers for convenience.
 normalize = _smiles.normalize
 normalize_reaction = _smiles.normalize_reaction
+ReactionRecord = _reaction_record.ReactionRecord
 ReactantMatch = _reactants.ReactantMatch
 classify_reactant_smiles = _reactants.classify_reactant_smiles
 classify_reactant_category = _reactants.classify_reactant_category
@@ -78,17 +81,12 @@ def analyze_reaction(
     Analyse a reaction SMILES string, returning normalised components,
     per-reactant taxonomy matches, and canonical reaction family metadata.
     """
-    norm = normalize_reaction(reaction_smiles)
+    norm = ReactionRecord.from_payload(normalize_reaction(reaction_smiles))
 
     reactant_results: List[Dict[str, Any]] = []
     reactant_smiles_for_detection: List[str] = []
-    for item in norm.get("reactants") or []:
-        smiles_value = (
-            item.get("smiles_norm")
-            or item.get("largest_smiles")
-            or item.get("input")
-            or ""
-        )
+    for component in norm.reactants:
+        smiles_value = component.preferred_smiles
         if smiles_value:
             reactant_smiles_for_detection.append(smiles_value)
         best = classify_reactant_smiles(smiles_value)
@@ -96,7 +94,7 @@ def analyze_reaction(
         categories = _reactants.get_reactant_category_matches(smiles_value)
         reactant_results.append(
             {
-                "normalized": item,
+                "normalized": component.to_payload(),
                 "taxonomy": {
                     "best_match": _match_to_dict(best),
                     "category_matches": categories,
@@ -105,11 +103,7 @@ def analyze_reaction(
             }
         )
 
-    product_smiles_for_detection = [
-        item.get("smiles_norm") or item.get("largest_smiles") or item.get("input") or ""
-        for item in (norm.get("products") or [])
-    ]
-    product_smiles_for_detection = [s for s in product_smiles_for_detection if s]
+    product_smiles_for_detection = norm.product_smiles
 
     detection_result = detect_reaction_type(reaction_smiles)
     detection_payload = detection_result.to_dict()
@@ -147,10 +141,10 @@ def analyze_reaction(
 
     return {
         "input": reaction_smiles,
-        "normalized": norm,
+        "normalized": norm.to_payload(),
         "reactants": reactant_results,
-        "agents": norm.get("agents") or [],
-        "products": norm.get("products") or [],
+        "agents": norm.agent_payloads,
+        "products": [component.to_payload() for component in norm.products],
         "family": {
             "detected": detection_payload,
             "canonical_id": canonical_family,

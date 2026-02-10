@@ -28,6 +28,7 @@ import json
 
 from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
 from chemtools.featurizers.formatters.reaction import get_crk_options
+from chemtools.featurizers.analysis.reaction_record import ReactionRecord
 from chemtools.featurizers.spectator_rank import (
     spectator_group_weight,
     weighted_spectator_similarity,
@@ -857,13 +858,9 @@ def _merge_role_scores(
 def _aryl_role_scores_for_reaction(reaction_smiles: str) -> Dict[str, Dict[str, Optional[float]]]:
     if not reaction_smiles:
         return {}
-    normalized = normalize_reaction(reaction_smiles)
-    reactants = normalized.get("reactants") or []
+    record = ReactionRecord.from_payload(normalize_reaction(reaction_smiles))
     role_maps: List[Dict[str, Dict[str, Optional[float]]]] = []
-    for entry in reactants:
-        if not isinstance(entry, dict):
-            continue
-        smi = entry.get("smiles_norm") or entry.get("largest_smiles") or entry.get("input")
+    for smi in record.reactant_smiles:
         if not smi:
             continue
         role_maps.append(_aryl_role_scores_for_smiles(smi))
@@ -2389,13 +2386,8 @@ class HTERecommender:
 
         reactant_pool: List[str] = []
         if ">" in reaction_smiles:
-            normalized = normalize_reaction(reaction_smiles)
-            for entry in normalized.get("reactants", []) or []:
-                if not isinstance(entry, dict):
-                    continue
-                smi = entry.get("smiles_norm") or entry.get("largest_smiles") or entry.get("input")
-                if smi:
-                    reactant_pool.append(smi)
+            record = ReactionRecord.from_payload(normalize_reaction(reaction_smiles))
+            reactant_pool = record.reactant_smiles
         if not reactant_pool:
             reactant_pool = [reactant_a_smiles]
             if reactant_b_smiles:
@@ -2464,33 +2456,22 @@ class HTERecommender:
 
             keys: Set[str] = {text}
             try:
-                normalized = normalize_reaction(text)
+                record = ReactionRecord.from_payload(normalize_reaction(text))
             except Exception:
                 reaction_match_cache[text] = keys
                 return keys
 
-            normalized_text = str(normalized.get("normalized") or "").strip()
+            normalized_text = str(record.normalized or "").strip()
             if normalized_text:
                 keys.add(normalized_text)
 
-            def _collect_side(entries: Any) -> List[str]:
-                items: List[str] = []
-                for entry in entries or []:
-                    if not isinstance(entry, dict):
-                        continue
-                    side_smi = (
-                        entry.get("smiles_norm")
-                        or entry.get("largest_smiles")
-                        or entry.get("input")
-                    )
-                    if side_smi:
-                        items.append(str(side_smi).strip())
-                items.sort()
-                return items
-
-            reactants = _collect_side(normalized.get("reactants"))
-            agents = _collect_side(normalized.get("agents"))
-            products = _collect_side(normalized.get("products"))
+            reactants = sorted(record.reactant_smiles)
+            agents = sorted(
+                component.preferred_smiles
+                for component in record.agents
+                if component.preferred_smiles
+            )
+            products = sorted(record.product_smiles)
             canonical = ">".join(
                 [
                     ".".join(reactants),

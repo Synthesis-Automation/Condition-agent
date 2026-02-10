@@ -26,7 +26,7 @@ def extract_motif_ids(*motif_collections: Iterable[Any]) -> List[str]:
     for collection in motif_collections:
         for motif in collection or []:
             if isinstance(motif, dict):
-                cid = motif.get("compound_id")
+                cid = motif.get("compound_id") or motif.get("id")
                 if cid:
                     items.append(normalize_motif_id(str(cid)))
             else:

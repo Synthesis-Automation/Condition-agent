@@ -17,6 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+from .reaction_record import ReactionRecord
 from .reactants import ReactantMatch, iter_reactant_matches
 from .smiles import normalize_reaction
 from ...detection import detect_reaction_type
@@ -153,12 +154,8 @@ def classify_reactants_with_context(
         >>> result.reactants[1].category  # "ArNH2/Ar2NH" (NH2 is reactive in BH)
     """
     # Step 1: Normalize reaction
-    normalized = normalize_reaction(reaction_smiles)
-    reactant_smiles = [
-        (r.get("smiles_norm") or r.get("largest_smiles") or r.get("input") or "")
-        for r in (normalized.get("reactants") or [])
-    ]
-    reactant_smiles = [s for s in reactant_smiles if s]
+    record = ReactionRecord.from_payload(normalize_reaction(reaction_smiles))
+    reactant_smiles = record.reactant_smiles
     
     # Step 2: Determine reaction type
     detection_method = "unknown"

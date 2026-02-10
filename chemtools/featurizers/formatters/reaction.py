@@ -17,6 +17,7 @@ from chemtools.smiles import normalize_reaction
 
 from ..analysis.reaction_context import classify_reactants_with_context, get_reactant_summary
 from ..analysis.feasibility import analyze_snar_feasibility
+from ..analysis.reaction_record import ReactionRecord
 
 from .molecule import build_molecule_bundle, to_bool
 from .aggregation import aggregate_reaction_features, infer_intramolecular
@@ -1617,16 +1618,13 @@ def featurize_reaction(
 
     # Normalize reaction SMILES
     normalized = normalize_reaction(reaction_smiles)
-    reactant_smiles = [
-        item.get("smiles_norm") or item.get("largest_smiles") or item.get("input") or ""
-        for item in (normalized.get("reactants") or [])
-    ]
-    reactant_smiles = [s for s in reactant_smiles if s]
+    reaction_record = ReactionRecord.from_payload(normalized)
+    reactant_smiles = reaction_record.reactant_smiles
 
     # Classify agents/reagents
     agent_roles = None
     if include_agent_roles:
-        agent_roles = classify_agent_roles(normalized.get("agents") or [])
+        agent_roles = classify_agent_roles(reaction_record.agent_payloads)
 
     # Featurize reactants
     reactant_bundles = [
@@ -1636,11 +1634,7 @@ def featurize_reaction(
     _ensure_reactant_coverage(reactant_bundles, enabled=reactant_coverage_guard)
 
     # Featurize products
-    product_smiles = [
-        item.get("smiles_norm") or item.get("largest_smiles") or item.get("input") or ""
-        for item in (normalized.get("products") or [])
-    ]
-    product_smiles = [s for s in product_smiles if s]
+    product_smiles = reaction_record.product_smiles
     product_bundles: List[Dict[str, Any]] = []
     product_motif_ids: List[str] = []
     product_motifs_full: List[Dict[str, Any]] = []  # Full motif dicts with fingerprints

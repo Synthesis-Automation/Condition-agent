@@ -1,17 +1,33 @@
 """
 Unified feature bundles for molecules and reactions.
 
-SIMPLIFIED: This module now imports from the formatters/ subpackage.
-The implementation has been refactored into:
-- formatters/molecule.py: Molecule featurization and bundling
-- formatters/reaction.py: Reaction featurization and bundling
-- formatters/aggregation.py: Feature aggregation logic
-- formatters/utils.py: Shared utility functions
+This module forwards to ``chemtools.featurizers.formatters`` while keeping a
+small compatibility shim for legacy callers that expect ``result["reaction"]``
+to contain the reaction payload.
 """
 
-from .formatters import featurize_molecule, featurize_reaction
+from __future__ import annotations
 
-__all__ = [
-    "featurize_molecule",
-    "featurize_reaction",
-]
+from typing import Any, Dict, Optional
+
+from .formatters import featurize_molecule as _featurize_molecule
+from .formatters import featurize_reaction as _featurize_reaction
+
+
+def featurize_molecule(smiles: str, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+    return _featurize_molecule(smiles, *args, **kwargs)
+
+
+def featurize_reaction(
+    reaction_smiles: str,
+    *args: Any,
+    **kwargs: Any,
+) -> Dict[str, Any]:
+    payload: Dict[str, Any] = _featurize_reaction(reaction_smiles, *args, **kwargs)
+    if isinstance(payload, dict) and "reaction" not in payload:
+        payload = dict(payload)
+        payload["reaction"] = dict(payload)
+    return payload
+
+
+__all__ = ["featurize_molecule", "featurize_reaction"]

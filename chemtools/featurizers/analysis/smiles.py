@@ -11,6 +11,7 @@ from ...util.rdkit_helpers import (
     parse_smiles,
     rdkit_available,
 )
+from .reaction_record import ReactionRecord
 
 __all__ = ["normalize", "normalize_reaction"]
 
@@ -148,28 +149,11 @@ def normalize_reaction(rsmi: str) -> Dict[str, Any]:
     reactants = _normalize_list(r)
     agents = _normalize_list(a)
     products = _normalize_list(p)
-
-    def join_side(items: List[Dict[str, Any]]) -> str:
-        out = []
-        for it in items:
-            s = it.get("smiles_norm") or it.get("largest_smiles") or it.get("input") or ""
-            if s:
-                out.append(s)
-        return ".".join(out)
-
-    normalized = ">".join(
-        [join_side(reactants), join_side(agents), join_side(products)]
+    record = ReactionRecord.from_component_payloads(
+        input_smiles=rsmi,
+        reactants=reactants,
+        agents=agents,
+        products=products,
     )
-    errors = []
-    for it in reactants + agents + products:
-        if it.get("error"):
-            errors.append(it["input"])
-    return {
-        "input": rsmi,
-        "reactants": reactants,
-        "agents": agents,
-        "products": products,
-        "normalized": normalized,
-        "errors": errors,
-    }
+    return record.to_payload()
 
