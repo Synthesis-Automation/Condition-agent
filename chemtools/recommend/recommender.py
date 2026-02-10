@@ -1010,6 +1010,13 @@ _GENERIC_FALLBACK_MOTIFS = {
     "Ar-H",
     "Alkyl-H",
 }
+_RULE_NON_CORE_QUERY_MOTIFS = {
+    "Ar-R",
+    "Ar-H",
+    "Alkyl-H",
+    "R_acidic-H",
+    "Inorganic",
+}
 _HALIDE_SUFFIXES = {"Cl", "Br", "I", "F"}
 _ARYL_HALIDE_MOTIFS = {"Ar-F", "Ar-Cl", "Ar-Br", "Ar-I", "Ar-X"}
 _SPECTATOR_MATCH_WEIGHT = 0.7
@@ -1453,6 +1460,41 @@ def _signature_matches(query_sets: Iterable[Set[str]], value: Any) -> bool:
         ):
             return True
     return False
+
+
+def _select_rule_required_core_tokens(query_tokens: Set[str]) -> Set[str]:
+    """Keep only essential motifs for rule-path enforcement."""
+    cleaned = {token for token in query_tokens if token}
+    if not cleaned:
+        return set()
+
+    required = {token for token in cleaned if token not in _RULE_NON_CORE_QUERY_MOTIFS}
+    if len(required) >= 2:
+        return required
+
+    informative_required = {token for token in required if _motif_tag_score(token) > 0}
+    if informative_required:
+        return informative_required
+    if required:
+        return required
+
+    informative_all = {token for token in cleaned if _motif_tag_score(token) > 0}
+    return informative_all or cleaned
+
+
+def _build_rule_required_core_query_sets(query_sets: Iterable[Set[str]]) -> List[Set[str]]:
+    narrowed: List[Set[str]] = []
+    seen: Set[Tuple[str, ...]] = set()
+    for query_tokens in query_sets:
+        selected = _select_rule_required_core_tokens(set(query_tokens))
+        if not selected:
+            continue
+        key = tuple(sorted(selected))
+        if key in seen:
+            continue
+        seen.add(key)
+        narrowed.append(selected)
+    return narrowed
 
 
 def _encode_signature(tokens: Iterable[str]) -> str:
@@ -3246,10 +3288,14 @@ class HTERecommender:
                     result.predicted_reaction_type = counts.index[0]
                     result.reaction_type_confidence = float(counts.iloc[0] / counts.sum())
 
-        # Enforce reaction-type + motif matching for rules/experiments
+        # Enforce reaction-type + motif matching for rules/experiments.
+        # Rules use a required-core-motif path to avoid over-constraining on
+        # helper motifs (e.g., R_acidic-H) that are common in query keys.
         if "Source_Group" in matched_df.columns:
-            rules_mask = matched_df["Source_Group"].isin({"rules", "experiments"})
-            if rules_mask.any():
+            enforce_rows_mask = matched_df["Source_Group"].isin({"rules", "experiments"})
+            rules_rows_mask = matched_df["Source_Group"] == "rules"
+            experiments_rows_mask = matched_df["Source_Group"] == "experiments"
+            if enforce_rows_mask.any():
                 target_reaction = reaction_type_filter or result.predicted_reaction_type
                 target_reaction = _resolve_reaction_type_label(target_reaction)
                 if target_reaction:
@@ -3281,14 +3327,30 @@ class HTERecommender:
                         if "Reactant_Signature_Ext" in matched_df.columns
                         else pd.Series([""] * len(matched_df), index=matched_df.index)
                     )
-                    core_mask = core_series.apply(lambda value: _signature_matches(query_sets, value))
-                    ext_mask = ext_series.apply(lambda value: _signature_matches(query_sets, value))
-                    motif_mask = core_mask | ext_mask
+                    rule_query_sets = _build_rule_required_core_query_sets(query_sets) or query_sets
+                    rule_core_mask = core_series.apply(
+                        lambda value: _signature_matches(rule_query_sets, value)
+                    )
+                    rule_ext_mask = ext_series.apply(
+                        lambda value: _signature_matches(rule_query_sets, value)
+                    )
+                    exp_core_mask = core_series.apply(lambda value: _signature_matches(query_sets, value))
+                    exp_ext_mask = ext_series.apply(lambda value: _signature_matches(query_sets, value))
+
+                    motif_mask = pd.Series([False] * len(matched_df), index=matched_df.index)
+                    if rules_rows_mask.any():
+                        motif_mask.loc[rules_rows_mask] = (
+                            rule_core_mask.loc[rules_rows_mask] | rule_ext_mask.loc[rules_rows_mask]
+                        )
+                    if experiments_rows_mask.any():
+                        motif_mask.loc[experiments_rows_mask] = (
+                            exp_core_mask.loc[experiments_rows_mask] | exp_ext_mask.loc[experiments_rows_mask]
+                        )
                 else:
                     motif_mask = pd.Series([False] * len(matched_df), index=matched_df.index)
 
-                enforce_mask = rules_mask & type_mask & motif_mask
-                matched_df = matched_df[~rules_mask | enforce_mask]
+                enforce_mask = enforce_rows_mask & type_mask & motif_mask
+                matched_df = matched_df[~enforce_rows_mask | enforce_mask]
         
         result.total_matching_experiments = len(matched_df)
         coverage_df = self.df

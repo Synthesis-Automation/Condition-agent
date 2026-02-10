@@ -608,6 +608,64 @@ def test_detected_type_prefers_family_specific_halide_fallback(monkeypatch) -> N
     assert all(rec.reaction_type == "suzuki_miyaura_sample500" for rec in result.recommendations)
 
 
+def test_rules_required_core_motif_path_ignores_non_core_query_token(monkeypatch) -> None:
+    query_key = "CRK-v1 |Ar-B(OH)2|Ar-OMs|R_acidic-H -> Ar-Ar | bond_formed: C(ar)-C(ar)"
+    df = _make_min_hte_df()
+    df["Source_Group"] = ["rules"]
+    df["Reaction_Type_Standardized"] = ["Suzuki_miyaura"]
+    df["Reactant_A_Type"] = ["@sp2_electrophiles"]
+    df["Reactant_B_Type"] = ["@organoboron"]
+    df["Reactant_Signature_Core"] = ["Ar-B(OH)2|Ar-OMs"]
+    df["Reactant_Signature_Ext"] = ["Ar-B(OH)2|Ar-OMs"]
+    df["Catalyst"] = ["Pd(OAc)2"]
+    df["Base"] = ["K3PO4"]
+    df["Solvent"] = ["1,4-dioxane"]
+
+    indexed_data = {}
+    reaction_type_patterns = {}
+    transformation_indices = {query_key: df.copy()}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return [], "Unknown"
+
+    def fake_featurize_reaction(smiles: str, options=None):
+        return {
+            "reaction_type": {"reaction_type": "Suzuki_miyaura", "confidence": 0.95},
+            "reaction_key": query_key,
+            "aggregates": {
+                "reacted_motifs": ["Ar-B(OH)2", "Ar-OMs", "R_acidic-H"],
+                "formed_motifs": ["Ar-Ar"],
+                "spectator_motifs": [],
+            },
+        }
+
+    def fake_precedent(self, *args, **kwargs):
+        return []
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(hte, "featurize_reaction", fake_featurize_reaction)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="O=S(Oc1ccccc1)(C)=O",
+        reactant_b_smiles="OB(c2ccccc2)O",
+        product_smiles="c3(c4ccccc4)ccccc3",
+        source_group="rules",
+        top_k=5,
+        min_experiments=1,
+    )
+
+    assert result.total_matching_experiments == 1
+    assert "rules" in result.recommendations_by_source
+    assert result.recommendations
+    assert result.recommendations[0].reaction_type == "Suzuki_miyaura"
+
+
 def test_precedent_recommendations_respect_source_group_filter(monkeypatch) -> None:
     df = _make_min_hte_df()
     indexed_data = {"Ar-X": df}
