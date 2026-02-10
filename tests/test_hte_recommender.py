@@ -714,6 +714,84 @@ def test_recommend_returns_precedent_when_structured_match_missing(monkeypatch) 
     assert result.recommendations[0].reaction_id == "precedent:1"
 
 
+def test_recommend_returns_precedent_when_structured_match_missing_for_protocols(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    indexed_data = {}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return ["Ar-X"], "Aryl Halide"
+
+    def fake_precedent(self, *args, **kwargs):
+        return [
+            hte.ConditionRecommendation(
+                catalyst="Pd(OAc)2",
+                ligand="SPhos",
+                base="K3PO4",
+                solvent="THF",
+                match_score=1.0,
+                reaction_type="Suzuki_miyaura",
+                reaction_id="protocol_exact:1",
+            )
+        ]
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Brc1ccccc1",
+        reactant_b_smiles="OB(O)c1ccccc1",
+        top_k=5,
+        min_experiments=1,
+        source_group="protocols",
+    )
+
+    assert result.total_matching_experiments == 0
+    assert "precedent" in result.recommendations_by_source
+    assert len(result.recommendations_by_source["precedent"]) == 1
+    assert result.recommendations
+    assert result.recommendations[0].reaction_id == "protocol_exact:1"
+
+
+def test_normalize_hte_dataframe_prefers_detected_type_and_backfills_reaction_key(monkeypatch) -> None:
+    df = pd.DataFrame(
+        {
+            "reaction_id": ["palladium_catalyzed_buchwald_hartwig_amination_and"],
+            "detected_reaction_type": ["Suzuki_miyaura"],
+            "reaction_smiles": [
+                "CC(C)(C)c1ccc(OS(=O)(=O)C)cc1.B(O)(O)c2ccccc2>>CC(C)(C)c1ccc(-c2ccccc2)cc1"
+            ],
+            "Reaction_Key": [""],
+            "reactant_1": ["Ar-OMs|R_acidic-H"],
+            "reactant_2": ["Ar-B(OH)2"],
+            "reactant_3": [""],
+            "catalyst": ["Pd(OAc)2"],
+            "base": ["Et3N/K3PO4"],
+            "solvent": ["DCM/t-BuOH"],
+            "yield": [0.0],
+            "z_score": [0.0],
+        }
+    )
+
+    def fake_featurize_reaction(smiles: str, options=None):
+        return {
+            "reaction_key": "CRK-v1 |Ar-B(OH)2|Ar-OMs|R_acidic-H -> Ar-Ar | spectators: Ar-Alkyl"
+        }
+
+    monkeypatch.setattr(hte, "featurize_reaction", fake_featurize_reaction)
+
+    normalized = hte._normalize_hte_dataframe(df)
+
+    assert normalized.loc[0, "Reaction_Type_Standardized"] == "Suzuki_miyaura"
+    assert str(normalized.loc[0, "Reaction_Key"]).startswith("CRK-v1")
+
+
 def test_precedent_exact_reaction_rescue_works_across_family_filter(monkeypatch) -> None:
     df = _make_min_hte_df()
     indexed_data = {"Ar-X": df}

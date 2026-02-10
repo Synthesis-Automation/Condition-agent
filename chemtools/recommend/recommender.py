@@ -120,7 +120,7 @@ def _compute_hte_manifest(file_paths: List[Path]) -> Dict[str, Any]:
             }
         )
     entries.sort(key=lambda item: item["path"])
-    return {"version": 3, "files": entries}
+    return {"version": 5, "files": entries}
 
 
 def _load_hte_cache(
@@ -198,6 +198,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
 
     column_mapping = {
         "reaction_type": "Reaction_Type_Standardized",
+        "detected_reaction_type": "Reaction_Type_Standardized",
         "reaction_category": "Reaction_Category",
         "rule_tier": "Rule_Tier",
         "reactant_1": "Reactant_A_Type",
@@ -217,12 +218,25 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
     df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
     if "Source_Row" not in df.columns:
         df["Source_Row"] = list(range(len(df)))
-    if "Reaction_Type_Standardized" not in df.columns and "reaction_id" in df.columns:
-        df = df.rename(columns={"reaction_id": "Reaction_Type_Standardized"})
+    if "Reaction_Type_Standardized" not in df.columns:
+        df["Reaction_Type_Standardized"] = ""
+    if "reaction_id" in df.columns:
+        existing_types = df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+        fallback_types = df["reaction_id"].fillna("").astype(str).str.strip()
+        missing_type_mask = (existing_types == "") | existing_types.str.lower().eq("unknown")
+        if missing_type_mask.any():
+            df.loc[missing_type_mask, "Reaction_Type_Standardized"] = fallback_types[missing_type_mask]
 
-    # Generate Reaction_Key from SMILES for Protocol DB if missing
-    if "reaction_smiles" in df.columns and "Reaction_Key" not in df.columns:
-        if df["reaction_smiles"].astype(str).str.strip().any():
+    # Generate Reaction_Key from reaction_smiles when missing/invalid.
+    if "reaction_smiles" in df.columns:
+        if "Reaction_Key" not in df.columns:
+            df["Reaction_Key"] = ""
+        reaction_smiles_series = df["reaction_smiles"].fillna("").astype(str).str.strip()
+        reaction_key_series = df["Reaction_Key"].fillna("").astype(str).str.strip()
+        needs_key_mask = reaction_smiles_series.ne("") & (
+            reaction_key_series.eq("") | reaction_key_series.str.lower().eq("nan")
+        )
+        if needs_key_mask.any():
             def _gen_rxn_key(smiles_val: Any) -> str:
                 s = str(smiles_val).strip()
                 if not s or s.lower() == "nan":
@@ -232,7 +246,8 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
                     return context.get("reaction_key") or ""
                 except Exception:
                     return ""
-            df["Reaction_Key"] = df["reaction_smiles"].apply(_gen_rxn_key)
+
+            df.loc[needs_key_mask, "Reaction_Key"] = reaction_smiles_series[needs_key_mask].apply(_gen_rxn_key)
 
     if "Reaction_Key" in df.columns:
         df["Reaction_Key"] = df["Reaction_Key"].fillna("").astype(str).str.strip()
@@ -3101,18 +3116,17 @@ class HTERecommender:
                 result.is_fallback_match = True
 
         if matched_df is None:
-            if (source_group or "").lower() in {"", "literature", "datasets", "dataset"}:
-                precedent_recs = self._build_precedent_recommendations(
-                    reactant_a_smiles,
-                    reactant_b_smiles,
-                    product_smiles,
-                    reaction_type_filter or result.predicted_reaction_type,
-                    top_k,
-                    source_group=source_group,
-                )
-                if precedent_recs:
-                    result.recommendations_by_source["precedent"] = precedent_recs
-                    result.recommendations = precedent_recs[:top_k] if top_k > 0 else precedent_recs
+            precedent_recs = self._build_precedent_recommendations(
+                reactant_a_smiles,
+                reactant_b_smiles,
+                product_smiles,
+                reaction_type_filter or result.predicted_reaction_type,
+                top_k,
+                source_group=source_group,
+            )
+            if precedent_recs:
+                result.recommendations_by_source["precedent"] = precedent_recs
+                result.recommendations = precedent_recs[:top_k] if top_k > 0 else precedent_recs
             return result
 
         if "Source_Group" in matched_df.columns:
