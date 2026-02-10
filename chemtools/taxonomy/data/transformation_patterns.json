@@ -116,6 +116,12 @@
       "leaving_groups": ["-CO2H", "-COOH", "-COCl", "-OH"],
       "notes": "Carboxylic acid/chloride + alcohol -> ester."
     },
+    "Acyl_Halides_formation": {
+      "pattern": "condensation",
+      "leaving_groups": ["-CO2H", "-COOH", "-OH"],
+      "formed_groups": ["-COCl", "-COBr", "-COI", "-COF"],
+      "notes": "Carboxylic acid conversion to acyl halide (acid chloride/bromide/iodide/fluoride)."
+    },
     "Acylation_amide": {
       "pattern": "condensation",
       "leaving_groups": ["-OH", "-Cl", "-OR", "-H"]

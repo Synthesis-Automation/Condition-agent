@@ -790,6 +790,27 @@
       ]
     },
     {
+      "id": "Acyl_Halides_formation",
+      "reactants": {
+        "acid": "@carboxylic_acids"
+      },
+      "products": {
+        "product": "@acyl_halides"
+      },
+      "examples": [
+        "O=C(O)c1ccccc1>>O=C(Cl)c1ccccc1"
+      ],
+      "aliases": [
+        "acyl_halides_formation",
+        "Acyl_halide_formation",
+        "Acid_halide_formation",
+        "Acid_chloride_formation",
+        "acyl_halide_formation",
+        "acid_halide_formation",
+        "acid_chloride_formation"
+      ]
+    },
+    {
       "id": "Acylation_amide",
       "reactants": {
         "electrophile": "@acyl_halides",

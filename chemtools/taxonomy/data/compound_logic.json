@@ -190,6 +190,7 @@
         "RCH2-CO2H"
       ],
       "usage": [
+        "Acyl_Halides_formation",
         "Amide_formation",
         "Esterification",
         "Oxidation_alcohol"
@@ -326,6 +327,7 @@
         "Ar-COI"
       ],
       "usage": [
+        "Acyl_Halides_formation",
         "Acylation_amide",
         "Acylation_ester",
         "Acylation_friedel_crafts",
