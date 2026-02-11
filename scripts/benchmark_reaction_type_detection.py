@@ -18,6 +18,7 @@ import argparse
 import csv
 import json
 import sys
+from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -32,6 +33,7 @@ from chemtools.featurizers.unified import featurize_reaction
 from chemtools.taxonomy.reaction_catalog import (
     load_reaction_catalog,
 )
+from chemtools.util.ingestion_routing import classify_reaction_for_taxonomy_benchmark
 
 
 REACTION_COL_CANDIDATES = (
@@ -107,12 +109,15 @@ def _benchmark_file(
     path: Path,
     *,
     limit: int,
+    routing_policy: str,
 ) -> Dict[str, Any]:
     rows_out: List[Dict[str, Any]] = []
     total = 0
     usable = 0
     legacy_correct = 0
     new_correct = 0
+    routed_excluded = 0
+    route_counts: Counter[str] = Counter()
 
     with path.open("r", encoding="utf-8", errors="replace") as handle:
         reader = csv.DictReader(handle)
@@ -136,6 +141,13 @@ def _benchmark_file(
             reaction_smiles = str(row.get(reaction_col) or "").strip()
             truth = _normalize_type(row.get(truth_col))
             if not reaction_smiles or not truth:
+                continue
+            route = classify_reaction_for_taxonomy_benchmark(reaction_smiles)
+            route_name = str(route.get("route") or "")
+            if route_name:
+                route_counts[route_name] += 1
+            if routing_policy == "exclude_complex" and bool(route.get("excluded")):
+                routed_excluded += 1
                 continue
             payload = _safe_featurize(reaction_smiles)
             if not payload:
@@ -188,6 +200,8 @@ def _benchmark_file(
         "rows": rows_out,
         "total": total,
         "usable": usable,
+        "routed_excluded": routed_excluded,
+        "routing_route_counts": route_counts.most_common(),
         "legacy_correct": legacy_correct,
         "new_correct": new_correct,
     }
@@ -215,6 +229,12 @@ def main() -> int:
         "--out-csv",
         help="Optional output CSV for per-row predictions.",
     )
+    parser.add_argument(
+        "--routing-policy",
+        default="exclude_complex",
+        choices=["none", "exclude_complex"],
+        help="Ingestion routing policy before taxonomy benchmarking.",
+    )
     args = parser.parse_args()
 
     files = _iter_input_files(args.input)
@@ -225,17 +245,23 @@ def main() -> int:
     all_rows: List[Dict[str, Any]] = []
     grand_total = 0
     grand_usable = 0
+    grand_routed_excluded = 0
     grand_legacy = 0
     grand_new = 0
 
     print(f"Benchmarking {len(files)} file(s)...")
     for path in files:
-        result = _benchmark_file(path, limit=max(0, int(args.limit)))
+        result = _benchmark_file(
+            path,
+            limit=max(0, int(args.limit)),
+            routing_policy=str(args.routing_policy),
+        )
         if result.get("error"):
             print(f"- {path.name}: {result['error']}")
             continue
 
         usable = int(result["usable"])
+        routed_excluded = int(result.get("routed_excluded") or 0)
         legacy_correct = int(result["legacy_correct"])
         new_correct = int(result["new_correct"])
         legacy_acc = _ratio(legacy_correct, usable)
@@ -243,12 +269,13 @@ def main() -> int:
         delta = new_acc - legacy_acc
 
         print(
-            f"- {path.name}: usable={usable}, "
+            f"- {path.name}: usable={usable}, routed_excluded={routed_excluded}, "
             f"legacy={legacy_acc:.3f}, new={new_acc:.3f}, delta={delta:+.3f}"
         )
 
         grand_total += int(result["total"])
         grand_usable += usable
+        grand_routed_excluded += routed_excluded
         grand_legacy += legacy_correct
         grand_new += new_correct
         all_rows.extend(result["rows"])
@@ -261,6 +288,7 @@ def main() -> int:
     grand_new_acc = _ratio(grand_new, grand_usable)
     print("\nOverall:")
     print(f"  total rows scanned: {grand_total}")
+    print(f"  routed excluded rows: {grand_routed_excluded}")
     print(f"  usable rows: {grand_usable}")
     print(f"  legacy accuracy: {grand_legacy_acc:.4f}")
     print(f"  new accuracy:    {grand_new_acc:.4f}")
@@ -290,7 +318,9 @@ def main() -> int:
     print(
         json.dumps(
             {
+                "routing_policy": str(args.routing_policy),
                 "usable": grand_usable,
+                "routed_excluded": grand_routed_excluded,
                 "legacy_accuracy": grand_legacy_acc,
                 "new_accuracy": grand_new_acc,
                 "delta": grand_new_acc - grand_legacy_acc,

@@ -1,0 +1,455 @@
+{
+  "clusters": [
+    {
+      "cluster_id": "Alkyl-N(R)CO2R|CH3-OH -> R2CH-OR || events:c_o_bond_formation|intermolecular_or_multi_component",
+      "count": 6,
+      "event_signature": "c_o_bond_formation|intermolecular_or_multi_component",
+      "motif_signature": "Alkyl-N(R)CO2R|CH3-OH -> R2CH-OR",
+      "outside_taxonomy_motifs": [
+        [
+          "Alkyl-N(R)CO2R",
+          6
+        ]
+      ],
+      "quality_levels": {
+        "high": 6
+      },
+      "reasons": [
+        [
+          "motif_outside_reaction_taxonomy",
+          6
+        ],
+        [
+          "mapping_warning",
+          1
+        ]
+      ],
+      "recommended_action": "tighten_or_expand_slot_constraints",
+      "samples": [
+        {
+          "outside_taxonomy_motifs": [
+            "Alkyl-N(R)CO2R"
+          ],
+          "quality_level": "high",
+          "quality_score": 1.0,
+          "reaction_id": "31-010-CAS-18158069",
+          "reaction_key": "|Alkyl-N(R)CO2R|CH3-OH -> R2CH-OR | bond_formed: C-O | bond_formed_labeled: C-O | bond_broken: C-N | spectators: R2CH-OR",
+          "reaction_smiles": "CO.CCCC(NC(=O)OC)OC>>CCCC(OC)OC",
+          "reaction_type": "Event:C-O",
+          "reasons": [
+            "motif_outside_reaction_taxonomy"
+          ],
+          "row_number": 6,
+          "source_file": "reaction_dataset_10x100_sample.csv",
+          "source_path": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_10x100_sample.csv",
+          "source_reaction_label": "Acetal ketal formation",
+          "unclassified_motifs": []
+        },
+        {
+          "outside_taxonomy_motifs": [
+            "Alkyl-N(R)CO2R"
+          ],
+          "quality_level": "high",
+          "quality_score": 1.0,
+          "reaction_id": "31-010-CAS-18285385",
+          "reaction_key": "|Alkyl-N(R)CO2R|CH3-OH -> R2CH-OR | bond_formed: C-O | bond_formed_labeled: C-O | bond_broken: C-N | spectators: R2CH-OR|RCH2-CO2R|R_acidic-H",
+          "reaction_smiles": "CO.COC(=O)CCCCC(NC(=O)OC)OC>>COC(=O)CCCCC(OC)OC",
+          "reaction_type": "Event:C-O",
+          "reasons": [
+            "motif_outside_reaction_taxonomy"
+          ],
+          "row_number": 11,
+          "source_file": "reaction_dataset_10x100_sample.csv",
+          "source_path": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_10x100_sample.csv",
+          "source_reaction_label": "Acetal ketal formation",
+          "unclassified_motifs": []
+        },
+        {
+          "outside_taxonomy_motifs": [
+            "Alkyl-N(R)CO2R"
+          ],
+          "quality_level": "high",
+          "quality_score": 1.0,
+          "reaction_id": "31-010-CAS-18220876",
+          "reaction_key": "|Alkyl-N(R)CO2R|CH3-OH -> R2CH-OR | bond_formed: C-O | bond_formed_labeled: C-O | bond_broken: C-N | spectators: R2CH-OR|RCH2-CO2R|R_acidic-H",
+          "reaction_smiles": "CO.COC(=O)CCC(NC(=O)OC)OC>>COC(=O)CCC(OC)OC",
+          "reaction_type": "Event:C-O",
+          "reasons": [
+            "motif_outside_reaction_taxonomy"
+          ],
+          "row_number": 8,
+          "source_file": "reaction_dataset_10x100_sample.csv",
+          "source_path": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_10x100_sample.csv",
+          "source_reaction_label": "Acetal ketal formation",
+          "unclassified_motifs": []
+        },
+        {
+          "outside_taxonomy_motifs": [
+            "Alkyl-N(R)CO2R"
+          ],
+          "quality_level": "high",
+          "quality_score": 0.85,
+          "reaction_id": "31-010-CAS-18256134",
+          "reaction_key": "|Alkyl-N(R)CO2R|CH3-OH -> R2CH-OR | spectators: R2CH-OR|RCH2-OR",
+          "reaction_smiles": "CO.COC(=O)NC(CCOC(C)C)OC>>COC(CCOC(C)C)OC",
+          "reaction_type": "Event:C-O",
+          "reasons": [
+            "mapping_warning",
+            "motif_outside_reaction_taxonomy"
+          ],
+          "row_number": 9,
+          "source_file": "reaction_dataset_10x100_sample.csv",
+          "source_path": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_10x100_sample.csv",
+          "source_reaction_label": "Acetal ketal formation",
+          "unclassified_motifs": []
+        },
+        {
+          "outside_taxonomy_motifs": [
+            "Alkyl-N(R)CO2R"
+          ],
+          "quality_level": "high",
+          "quality_score": 1.0,
+          "reaction_id": "31-010-CAS-18280491",
+          "reaction_key": "|Alkyl-N(R)CO2R|CH3-OH -> R2CH-OR | bond_formed: C-O | bond_formed_labeled: C-O | bond_broken: C-N | spectators: R2CH-OR",
+          "reaction_smiles": "CO.CCCCCCCC(NC(=O)OC)OC>>CCCCCCCC(OC)OC",
+          "reaction_type": "Event:C-O",
+          "reasons": [
+            "motif_outside_reaction_taxonomy"
+          ],
+          "row_number": 10,
+          "source_file": "reaction_dataset_10x100_sample.csv",
+          "source_path": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_10x100_sample.csv",
+          "source_reaction_label": "Acetal ketal formation",
+          "unclassified_motifs": []
+        }
+      ],
+      "source_files": [
+        [
+          "reaction_dataset_10x100_sample.csv",
+          6
+        ]
+      ],
+      "source_labels": [
+        [
+          "Acetal ketal formation",
+          6
+        ]
+      ],
+      "top_taxonomy_candidates": [
+        {
+          "category": "",
+          "matched_formed_motifs": [
+            "R2CH-OR"
+          ],
+          "matched_reacted_motifs": [
+            "CH3-OH"
+          ],
+          "name": "Alkyl_Nucleophilic_Substitution",
+          "product_overlap": 1.0,
+          "reactant_overlap": 0.5,
+          "reaction_id": "Alkyl_Nucleophilic_Substitution",
+          "score": 0.675
+        },
+        {
+          "category": "",
+          "matched_formed_motifs": [],
+          "matched_reacted_motifs": [
+            "CH3-OH"
+          ],
+          "name": "C_O_Coupling",
+          "product_overlap": 0.0,
+          "reactant_overlap": 0.5,
+          "reaction_id": "C_O_Coupling",
+          "score": 0.325
+        },
+        {
+          "category": "",
+          "matched_formed_motifs": [],
+          "matched_reacted_motifs": [
+            "CH3-OH"
+          ],
+          "name": "Alcohol_to_Alkyl_Halide",
+          "product_overlap": 0.0,
+          "reactant_overlap": 0.5,
+          "reaction_id": "Alcohol_to_Alkyl_Halide",
+          "score": 0.325
+        },
+        {
+          "category": "",
+          "matched_formed_motifs": [],
+          "matched_reacted_motifs": [
+            "CH3-OH"
+          ],
+          "name": "Quinazolinone_annulation",
+          "product_overlap": 0.0,
+          "reactant_overlap": 0.5,
+          "reaction_id": "Quinazolinone_annulation",
+          "score": 0.325
+        },
+        {
+          "category": "",
+          "matched_formed_motifs": [],
+          "matched_reacted_motifs": [
+            "CH3-OH"
+          ],
+          "name": "Esterification",
+          "product_overlap": 0.0,
+          "reactant_overlap": 0.5,
+          "reaction_id": "Esterification",
+          "score": 0.325
+        }
+      ],
+      "unclassified_motifs": []
+    },
+    {
+      "cluster_id": "R3C-OR -> Alkyl-COR|R_acidic-H || events:none",
+      "count": 1,
+      "event_signature": "none",
+      "motif_signature": "R3C-OR -> Alkyl-COR|R_acidic-H",
+      "outside_taxonomy_motifs": [],
+      "quality_levels": {
+        "high": 1
+      },
+      "reasons": [
+        [
+          "unknown_reaction_type",
+          1
+        ]
+      ],
+      "recommended_action": "consider_new_reaction_family_or_multistep_bucket",
+      "samples": [
+        {
+          "outside_taxonomy_motifs": [],
+          "quality_level": "high",
+          "quality_score": 0.75,
+          "reaction_id": "31-006-CAS-6529633",
+          "reaction_key": "|R3C-OR -> Alkyl-COR|R_acidic-H | spectators: Inorganic",
+          "reaction_smiles": "COC(C)(C)OC.O=C=O>>CC(C)=O.COC(=O)OC",
+          "reaction_type": "Unknown",
+          "reasons": [
+            "unknown_reaction_type"
+          ],
+          "row_number": 4,
+          "source_file": "reaction_dataset_10x100_sample.csv",
+          "source_path": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_10x100_sample.csv",
+          "source_reaction_label": "Acetal ketal formation",
+          "unclassified_motifs": []
+        }
+      ],
+      "source_files": [
+        [
+          "reaction_dataset_10x100_sample.csv",
+          1
+        ]
+      ],
+      "source_labels": [
+        [
+          "Acetal ketal formation",
+          1
+        ]
+      ],
+      "top_taxonomy_candidates": [
+        {
+          "category": "",
+          "matched_formed_motifs": [
+            "Alkyl-COR"
+          ],
+          "matched_reacted_motifs": [],
+          "name": "Oxidation_alcohol",
+          "product_overlap": 0.5,
+          "reactant_overlap": 0.0,
+          "reaction_id": "Oxidation_alcohol",
+          "score": 0.175
+        },
+        {
+          "category": "",
+          "matched_formed_motifs": [
+            "Alkyl-COR"
+          ],
+          "matched_reacted_motifs": [],
+          "name": "Wacker_oxidation",
+          "product_overlap": 0.5,
+          "reactant_overlap": 0.0,
+          "reaction_id": "Wacker_oxidation",
+          "score": 0.175
+        },
+        {
+          "category": "",
+          "matched_formed_motifs": [],
+          "matched_reacted_motifs": [],
+          "name": "Suzuki_miyaura",
+          "product_overlap": 0.0,
+          "reactant_overlap": 0.0,
+          "reaction_id": "Suzuki_miyaura",
+          "score": 0.0
+        },
+        {
+          "category": "",
+          "matched_formed_motifs": [],
+          "matched_reacted_motifs": [],
+          "name": "Miyaura_borylation",
+          "product_overlap": 0.0,
+          "reactant_overlap": 0.0,
+          "reaction_id": "Miyaura_borylation",
+          "score": 0.0
+        },
+        {
+          "category": "",
+          "matched_formed_motifs": [],
+          "matched_reacted_motifs": [],
+          "name": "Ircatalyzed_CH_borylation",
+          "product_overlap": 0.0,
+          "reactant_overlap": 0.0,
+          "reaction_id": "Ircatalyzed_CH_borylation",
+          "score": 0.0
+        }
+      ],
+      "unclassified_motifs": []
+    }
+  ],
+  "files": [
+    {
+      "empty_reaction_key_rate": 0.0,
+      "errors": 0,
+      "low_reaction_key_quality_rate": 0.0,
+      "processed": 20,
+      "routed_excluded": 0,
+      "source_file": "reaction_dataset_10x100_sample.csv",
+      "unknown_reaction_type_rate": 0.05,
+      "unresolved_rate": 0.35,
+      "with_outside_taxonomy_motif_rate": 0.3,
+      "with_unclassified_motif_rate": 0.0
+    }
+  ],
+  "ingestion_routing": {
+    "policy": "exclude_complex",
+    "reason_counts": [
+      [
+        "eligible",
+        20
+      ]
+    ],
+    "route_counts": [
+      [
+        "eligible_taxonomy_benchmark",
+        20
+      ]
+    ]
+  },
+  "quality_levels": {
+    "high": 17,
+    "medium": 3
+  },
+  "summary": {
+    "empty_reaction_key": {
+      "count": 0,
+      "rate": 0.0
+    },
+    "featurization_errors": 0,
+    "input_rows": 20,
+    "low_reaction_key_quality": {
+      "count": 0,
+      "rate": 0.0
+    },
+    "missing_formed_motifs": {
+      "count": 0,
+      "rate": 0.0
+    },
+    "processed_reactions": 20,
+    "routed_excluded_rows": {
+      "count": 0,
+      "rate_vs_input": 0.0
+    },
+    "unknown_reaction_type": {
+      "count": 1,
+      "rate": 0.05
+    },
+    "unresolved_reactions": {
+      "count": 7,
+      "rate": 0.35
+    },
+    "with_mapping_warning": {
+      "count": 11,
+      "rate": 0.55
+    }
+  },
+  "taxonomy_coverage": {
+    "formed_slot_motif_count": 234,
+    "reacted_slot_motif_count": 281,
+    "reaction_types_in_taxonomy": 50,
+    "top_motifs_outside_reaction_taxonomy": [
+      [
+        "Alkyl-N(R)CO2R",
+        6
+      ]
+    ],
+    "total_slot_motif_count": 350
+  },
+  "top_anomalies": [
+    [
+      "mapping_unreliable_fallback_used",
+      11
+    ],
+    [
+      "multi_transform_record_possible",
+      6
+    ]
+  ],
+  "top_predicted_reaction_types": [
+    [
+      "Event:C-O",
+      12
+    ],
+    [
+      "Multi-Event:Ann+C-O+C-C",
+      4
+    ],
+    [
+      "Alkyl_Nucleophilic_Substitution",
+      1
+    ],
+    [
+      "Reduction_carbonyl",
+      1
+    ],
+    [
+      "Unknown",
+      1
+    ],
+    [
+      "Multi-Event:Ann+C-O",
+      1
+    ]
+  ],
+  "top_unclassified_motifs": [],
+  "top_unknown_formed_motifs": [
+    [
+      "Alkyl-COR",
+      1
+    ],
+    [
+      "R_acidic-H",
+      1
+    ]
+  ],
+  "top_unknown_reacted_motifs": [
+    [
+      "R3C-OR",
+      1
+    ]
+  ],
+  "unresolved_reason_counts": [
+    [
+      "motif_outside_reaction_taxonomy",
+      6
+    ],
+    [
+      "unknown_reaction_type",
+      1
+    ],
+    [
+      "mapping_warning",
+      1
+    ]
+  ]
+}

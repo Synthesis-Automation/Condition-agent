@@ -32,6 +32,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from chemtools.featurizers.unified import featurize_reaction
 from chemtools.taxonomy.reaction_catalog import load_reaction_catalog
+from chemtools.util.ingestion_routing import classify_reaction_for_taxonomy_benchmark
 
 
 REACTION_COL_CANDIDATES: Tuple[str, ...] = (
@@ -332,6 +333,7 @@ def build_discovery_report(
     sample_per_cluster: int = 5,
     seed: int = 20260211,
     progress_every: int = 0,
+    routing_policy: str = "none",
 ) -> Dict[str, Any]:
     rng = random.Random(seed)
     run_options = {
@@ -347,7 +349,9 @@ def build_discovery_report(
         taxonomy_formed_universe.update(item.get("products") or set())
     taxonomy_union = taxonomy_reacted_universe | taxonomy_formed_universe
 
+    input_rows = 0
     processed = 0
+    routed_excluded = 0
     errors = 0
     unknown_reaction_type = 0
     empty_reaction_key = 0
@@ -364,10 +368,13 @@ def build_discovery_report(
     outside_taxonomy_motifs: Counter[str] = Counter()
     unknown_reacted_motifs: Counter[str] = Counter()
     unknown_formed_motifs: Counter[str] = Counter()
+    routing_route_counts: Counter[str] = Counter()
+    routing_reason_counts: Counter[str] = Counter()
 
     per_file_stats: DefaultDict[str, Dict[str, int]] = defaultdict(
         lambda: {
             "processed": 0,
+            "routed_excluded": 0,
             "errors": 0,
             "unknown_reaction_type": 0,
             "empty_reaction_key": 0,
@@ -388,6 +395,19 @@ def build_discovery_report(
             continue
         source_file = str(row.get("source_file") or "unknown_source").strip() or "unknown_source"
         source_label = str(row.get("source_reaction_label") or "").strip()
+
+        input_rows += 1
+        route_payload = classify_reaction_for_taxonomy_benchmark(reaction_smiles)
+        routing_route = str(route_payload.get("route") or "").strip()
+        routing_reason = str(route_payload.get("reason") or "").strip()
+        if routing_route:
+            routing_route_counts[routing_route] += 1
+        if routing_reason:
+            routing_reason_counts[routing_reason] += 1
+        if routing_policy == "exclude_complex" and bool(route_payload.get("excluded")):
+            routed_excluded += 1
+            per_file_stats[source_file]["routed_excluded"] += 1
+            continue
 
         processed += 1
         per_file_stats[source_file]["processed"] += 1
@@ -601,6 +621,7 @@ def build_discovery_report(
         per_file_rows.append(
             {
                 "source_file": source_file,
+                "routed_excluded": int(stats.get("routed_excluded", 0)),
                 "processed": processed_n,
                 "errors": int(stats.get("errors", 0)),
                 "unknown_reaction_type_rate": round(int(stats.get("unknown_reaction_type", 0)) / denom, 4),
@@ -617,9 +638,15 @@ def build_discovery_report(
     per_file_rows.sort(key=lambda row: (row["unresolved_rate"], row["processed"]), reverse=True)
 
     denominator = max(1, processed)
+    input_denominator = max(1, input_rows)
     return {
         "summary": {
+            "input_rows": input_rows,
             "processed_reactions": processed,
+            "routed_excluded_rows": {
+                "count": routed_excluded,
+                "rate_vs_input": round(routed_excluded / input_denominator, 4),
+            },
             "featurization_errors": errors,
             "unknown_reaction_type": {
                 "count": unknown_reaction_type,
@@ -645,6 +672,11 @@ def build_discovery_report(
                 "count": unresolved_total,
                 "rate": round(unresolved_total / denominator, 4),
             },
+        },
+        "ingestion_routing": {
+            "policy": routing_policy,
+            "route_counts": routing_route_counts.most_common(),
+            "reason_counts": routing_reason_counts.most_common(),
         },
         "taxonomy_coverage": {
             "reaction_types_in_taxonomy": len(taxonomy),
@@ -771,6 +803,12 @@ def _parse_args() -> argparse.Namespace:
         help="Allow rows without '>>' in reaction SMILES column",
     )
     parser.add_argument(
+        "--routing-policy",
+        default="exclude_complex",
+        choices=["none", "exclude_complex"],
+        help="Ingestion routing policy before taxonomy benchmarking.",
+    )
+    parser.add_argument(
         "--output-json",
         default=DEFAULT_OUTPUT_JSON,
         help=f"Output JSON path (default: {DEFAULT_OUTPUT_JSON})",
@@ -801,6 +839,7 @@ def main() -> int:
         sample_per_cluster=max(1, int(args.sample_per_cluster)),
         seed=int(args.seed),
         progress_every=max(0, int(args.progress_every)),
+        routing_policy=str(args.routing_policy),
     )
 
     top_clusters = max(1, int(args.top_clusters))
@@ -814,11 +853,15 @@ def main() -> int:
     write_samples_csv(output_samples, report.get("clusters") or [])
 
     summary = report.get("summary") or {}
+    input_rows = summary.get("input_rows", 0)
     processed = summary.get("processed_reactions", 0)
+    routed_excluded = (summary.get("routed_excluded_rows") or {}).get("count", 0)
     unknown = (summary.get("unknown_reaction_type") or {}).get("count", 0)
     unresolved = (summary.get("unresolved_reactions") or {}).get("count", 0)
     print(f"Discovery JSON: {output_json}")
     print(f"Discovery samples CSV: {output_samples}")
+    print(f"Input rows: {input_rows}")
+    print(f"Routed excluded rows: {routed_excluded}")
     print(f"Processed reactions: {processed}")
     print(f"Unknown reaction types: {unknown}")
     print(f"Unresolved reactions: {unresolved}")
