@@ -15,6 +15,36 @@ from chemtools.util import rdkit_helpers
 
 
 _HALOGENS = {"F", "Cl", "Br", "I"}
+_PATTERN_SMARTS = {
+    "ester": "[CX3](=O)[OX2][#6]",
+    "carboxy_acid": "[CX3](=O)[OX2H]",
+    "carboxylate": "[CX3](=O)[O-]",
+    "phenol": "[c][OX2H]",
+    "benzyl_halide": "[c][CH2][Cl,Br,I]",
+    "benzyl_aryl_ether": "[c][CH2][O][c]",
+}
+_EVENT_SIGNATURE_PRIORITY = [
+    "benzyl_o_alkylation_like",
+    "ester_hydrolysis_like",
+    "amidation_like",
+    "ring_closure_or_annulation",
+    "leaving_group_displacement",
+    "c_n_bond_formation",
+    "c_o_bond_formation",
+    "c_s_bond_formation",
+    "c_c_bond_formation",
+]
+_EVENT_SIGNATURE_CODE = {
+    "benzyl_o_alkylation_like": "BzOAlk",
+    "ester_hydrolysis_like": "EsterHyd",
+    "amidation_like": "Amid",
+    "ring_closure_or_annulation": "Ann",
+    "leaving_group_displacement": "LGDisp",
+    "c_n_bond_formation": "C-N",
+    "c_o_bond_formation": "C-O",
+    "c_s_bond_formation": "C-S",
+    "c_c_bond_formation": "C-C",
+}
 
 
 def _split_reaction_sides(reaction_smiles: str) -> Tuple[List[str], List[str]]:
@@ -128,6 +158,91 @@ def _quality_bucket(score: float) -> str:
     return "low"
 
 
+def _count_molecules_matching_smarts(
+    smiles_list: Iterable[str],
+    smarts_list: Iterable[str],
+) -> int:
+    if not rdkit_helpers.rdkit_available():
+        return 0
+    try:
+        from chemtools.util.smarts_cache import compile_smarts
+    except Exception:
+        return 0
+    patterns = []
+    for smarts in smarts_list:
+        patt = compile_smarts(smarts, validate=False)
+        if patt is not None:
+            patterns.append(patt)
+    if not patterns:
+        return 0
+
+    hits = 0
+    for smiles in smiles_list or []:
+        mol = rdkit_helpers.parse_smiles(smiles)
+        if mol is None:
+            continue
+        try:
+            if any(mol.HasSubstructMatch(p) for p in patterns):
+                hits += 1
+        except Exception:
+            continue
+    return hits
+
+
+def _infer_event_families(events: Iterable[Dict[str, Any]]) -> Set[str]:
+    kinds = {
+        str(ev.get("kind")).strip()
+        for ev in (events or [])
+        if isinstance(ev, dict) and str(ev.get("kind") or "").strip()
+    }
+    families: Set[str] = set()
+    has_benzyl_o_alkylation = "benzyl_o_alkylation_like" in kinds
+    if has_benzyl_o_alkylation:
+        families.add("o_alkylation")
+
+    if "ester_hydrolysis_like" in kinds:
+        families.add("hydrolysis")
+    if "amidation_like" in kinds:
+        families.add("acyl_transfer")
+    if "ring_closure_or_annulation" in kinds:
+        families.add("annulation")
+
+    bond_formation_kinds = {
+        "c_n_bond_formation",
+        "c_o_bond_formation",
+        "c_s_bond_formation",
+        "c_c_bond_formation",
+    }
+    has_bond_formation = bool(kinds & bond_formation_kinds)
+    has_displacement = "leaving_group_displacement" in kinds
+    if not has_benzyl_o_alkylation:
+        if has_displacement and has_bond_formation:
+            families.add("substitution")
+        elif has_displacement:
+            families.add("displacement")
+        elif has_bond_formation:
+            families.add("bond_formation")
+    return families
+
+
+def format_multi_event_signature(events: Iterable[Dict[str, Any]]) -> str:
+    kinds = {
+        str(ev.get("kind")).strip()
+        for ev in (events or [])
+        if isinstance(ev, dict) and str(ev.get("kind") or "").strip()
+    }
+    ordered_codes: List[str] = []
+    for kind in _EVENT_SIGNATURE_PRIORITY:
+        if kind not in kinds:
+            continue
+        code = _EVENT_SIGNATURE_CODE.get(kind)
+        if code and code not in ordered_codes:
+            ordered_codes.append(code)
+    if len(ordered_codes) < 2:
+        return ""
+    return "+".join(ordered_codes[:4])
+
+
 def summarize_reaction_events(
     *,
     reaction_smiles: str,
@@ -204,17 +319,71 @@ def summarize_reaction_events(
         if not _has_explicit_acyl_activation_like(reacted_set):
             anomalies.append("amidation_without_explicit_activation_marker")
 
-    primary_kinds = {
-        "c_n_bond_formation",
-        "c_o_bond_formation",
-        "c_s_bond_formation",
-        "c_c_bond_formation",
-        "leaving_group_displacement",
-        "ring_closure_or_annulation",
-        "amidation_like",
-    }
-    primary_count = sum(1 for ev in events if ev.get("kind") in primary_kinds)
-    if primary_count >= 3:
+    reactant_ester_count = _count_molecules_matching_smarts(
+        reactant_smiles,
+        [_PATTERN_SMARTS["ester"]],
+    )
+    product_ester_count = _count_molecules_matching_smarts(
+        product_smiles,
+        [_PATTERN_SMARTS["ester"]],
+    )
+    reactant_acid_like_count = _count_molecules_matching_smarts(
+        reactant_smiles,
+        [_PATTERN_SMARTS["carboxy_acid"], _PATTERN_SMARTS["carboxylate"]],
+    )
+    product_acid_like_count = _count_molecules_matching_smarts(
+        product_smiles,
+        [_PATTERN_SMARTS["carboxy_acid"], _PATTERN_SMARTS["carboxylate"]],
+    )
+    if (
+        reactant_ester_count > product_ester_count
+        and product_acid_like_count > reactant_acid_like_count
+    ):
+        events.append(
+            _event(
+                "ester_hydrolysis_like",
+                0.82,
+                {
+                    "reactant_ester_count": reactant_ester_count,
+                    "product_ester_count": product_ester_count,
+                    "reactant_acid_like_count": reactant_acid_like_count,
+                    "product_acid_like_count": product_acid_like_count,
+                },
+            )
+        )
+
+    reactant_phenol_count = _count_molecules_matching_smarts(
+        reactant_smiles,
+        [_PATTERN_SMARTS["phenol"]],
+    )
+    reactant_benzyl_halide_count = _count_molecules_matching_smarts(
+        reactant_smiles,
+        [_PATTERN_SMARTS["benzyl_halide"]],
+    )
+    product_benzyl_aryl_ether_count = _count_molecules_matching_smarts(
+        product_smiles,
+        [_PATTERN_SMARTS["benzyl_aryl_ether"]],
+    )
+    if (
+        reactant_phenol_count > 0
+        and reactant_benzyl_halide_count > 0
+        and product_benzyl_aryl_ether_count > 0
+    ):
+        events.append(
+            _event(
+                "benzyl_o_alkylation_like",
+                0.84,
+                {
+                    "reactant_phenol_count": reactant_phenol_count,
+                    "reactant_benzyl_halide_count": reactant_benzyl_halide_count,
+                    "product_benzyl_aryl_ether_count": product_benzyl_aryl_ether_count,
+                },
+            )
+        )
+
+    event_families = _infer_event_families(events)
+    has_complex_family = bool(event_families & {"hydrolysis", "acyl_transfer", "annulation"})
+    if len(event_families) >= 3 or (len(event_families) >= 2 and has_complex_family):
         anomalies.append("multi_transform_record_possible")
 
     if isinstance(mapping_warning, dict) and mapping_warning:
@@ -236,6 +405,7 @@ def summarize_reaction_events(
     return {
         "events": events,
         "anomalies": anomalies,
+        "event_families": sorted(event_families),
         "bond_pairs": {
             "formed": sorted(list(formed_pairs)),
             "broken": sorted(list(broken_pairs)),
@@ -252,3 +422,8 @@ def summarize_reaction_events(
         },
     }
 
+
+__all__ = [
+    "format_multi_event_signature",
+    "summarize_reaction_events",
+]

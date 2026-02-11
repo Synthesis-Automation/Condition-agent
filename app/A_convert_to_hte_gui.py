@@ -3,7 +3,7 @@ import os
 import json
 import pandas as pd
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -12,6 +12,23 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from PyQt6 import QtWidgets, QtCore
 from app.A_convert_to_hte_format import process_reaction_dataset, enrich_reaction_dataset_cas
+
+DEFAULT_LLM_PROVIDER = os.getenv("CHEMTOOLS_LLM_PROVIDER", os.getenv("LLM_PROVIDER", "openai")).strip() or "openai"
+DEFAULT_LLM_MODEL = os.getenv("CHEMTOOLS_LLM_MODEL", os.getenv("LLM_MODEL", "")).strip()
+
+try:
+    from llmtools.clients import AVAILABLE_MODELS as LLM_AVAILABLE_MODELS
+    from llmtools.clients import RECOMMENDED_MODELS as LLM_RECOMMENDED_MODELS
+except Exception:
+    LLM_AVAILABLE_MODELS = {
+        "openai": ["gpt-4o", "gpt-4o-mini", "gpt-5-mini"],
+        "aliyun": ["deepseek-v3.2", "deepseek-v3", "deepseek-r1"],
+    }
+    LLM_RECOMMENDED_MODELS = {
+        "openai": {"balanced": "gpt-4o"},
+        "aliyun": {"balanced": "deepseek-v3.2"},
+    }
+
 
 class ConversionWorker(QtCore.QObject):
     finished = QtCore.pyqtSignal(bool, str)
@@ -24,6 +41,7 @@ class ConversionWorker(QtCore.QObject):
         reagent_csv_path: str,
         new_reagents_path: str,
         skip_cas_enrichment: bool,
+        llm_assist_options: Optional[Dict[str, Any]] = None,
     ):
         super().__init__()
         self.jobs = jobs
@@ -31,6 +49,7 @@ class ConversionWorker(QtCore.QObject):
         self.reagent_csv_path = reagent_csv_path
         self.new_reagents_path = new_reagents_path
         self.skip_cas_enrichment = skip_cas_enrichment
+        self.llm_assist_options = llm_assist_options or None
 
     def run(self):
         try:
@@ -69,6 +88,7 @@ class ConversionWorker(QtCore.QObject):
                         drop_no_catalyst=self.drop_no_catalyst,
                         reagent_csv_path=self.reagent_csv_path,
                         new_reagents_path=self.new_reagents_path,
+                        llm_assist_options=self.llm_assist_options,
                     )
                     print("")
                 self.finished.emit(True, f"Successfully processed {total} file(s).")
@@ -95,6 +115,28 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.drop_catalyst_check.setChecked(True)
         self.skip_cas_check = QtWidgets.QCheckBox("Skip CAS enrichment (faster)")
         self.protocol_mode_check = QtWidgets.QCheckBox("Protocol CSV mode (skip enrichment, save to HTE_db/protocols)")
+        self.llm_assist_checkbox = QtWidgets.QCheckBox("LLM assist for reaction typing/key")
+        self.llm_provider_combo = QtWidgets.QComboBox()
+        self.llm_model_combo = QtWidgets.QComboBox()
+        self.llm_model_combo.setEditable(True)
+        self.llm_temperature_spin = QtWidgets.QDoubleSpinBox()
+        self.llm_temperature_spin.setRange(0.0, 2.0)
+        self.llm_temperature_spin.setSingleStep(0.1)
+        self.llm_temperature_spin.setDecimals(2)
+        self.llm_temperature_spin.setValue(0.0)
+        self.llm_max_tokens_spin = QtWidgets.QSpinBox()
+        self.llm_max_tokens_spin.setRange(16, 32768)
+        self.llm_max_tokens_spin.setValue(700)
+        self.llm_timeout_spin = QtWidgets.QSpinBox()
+        self.llm_timeout_spin.setRange(5, 600)
+        self.llm_timeout_spin.setValue(60)
+        self.llm_threshold_spin = QtWidgets.QDoubleSpinBox()
+        self.llm_threshold_spin.setRange(0.0, 1.0)
+        self.llm_threshold_spin.setSingleStep(0.05)
+        self.llm_threshold_spin.setDecimals(2)
+        self.llm_threshold_spin.setValue(0.60)
+        self.llm_always_checkbox = QtWidgets.QCheckBox("Always run LLM (not only uncertain)")
+        self.llm_no_crk_validation_checkbox = QtWidgets.QCheckBox("Disable CRK validation gate")
         
         self.btn_run = QtWidgets.QPushButton("Start Conversion")
         self.btn_quit = QtWidgets.QPushButton("Quit")
@@ -105,6 +147,8 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.progress_bar.setVisible(False)
         
         self._setup_layout()
+        self._populate_llm_providers()
+        self._on_llm_assist_toggled(self.llm_assist_checkbox.isChecked())
         self._load_datasets()
         
         # Connections
@@ -112,6 +156,8 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.source_dir_edit.editingFinished.connect(self._load_datasets)
         self.input_edit.textEdited.connect(self._on_input_edited)
         self.protocol_mode_check.stateChanged.connect(self._on_protocol_mode_changed)
+        self.llm_assist_checkbox.toggled.connect(self._on_llm_assist_toggled)
+        self.llm_provider_combo.currentTextChanged.connect(self._on_llm_provider_changed)
         self.btn_run.clicked.connect(self.run_processing)
         self.btn_quit.clicked.connect(self.close)
         
@@ -160,6 +206,37 @@ class HTEConverterWindow(QtWidgets.QWidget):
         form.addRow("", self.drop_catalyst_check)
         form.addRow("", self.skip_cas_check)
         form.addRow("", self.protocol_mode_check)
+
+        llm_toggle_row = QtWidgets.QHBoxLayout()
+        llm_toggle_row.addWidget(self.llm_assist_checkbox)
+        llm_toggle_row.addWidget(self.llm_always_checkbox)
+        llm_toggle_row.addWidget(self.llm_no_crk_validation_checkbox)
+        llm_toggle_row.addStretch()
+        form.addRow("LLM:", llm_toggle_row)
+
+        llm_model_row = QtWidgets.QHBoxLayout()
+        llm_model_row.addWidget(QtWidgets.QLabel("Provider"))
+        llm_model_row.addWidget(self.llm_provider_combo)
+        llm_model_row.addSpacing(12)
+        llm_model_row.addWidget(QtWidgets.QLabel("Model"))
+        llm_model_row.addWidget(self.llm_model_combo)
+        llm_model_row.addStretch()
+        form.addRow("LLM Model:", llm_model_row)
+
+        llm_params_row = QtWidgets.QHBoxLayout()
+        llm_params_row.addWidget(QtWidgets.QLabel("Temperature"))
+        llm_params_row.addWidget(self.llm_temperature_spin)
+        llm_params_row.addSpacing(12)
+        llm_params_row.addWidget(QtWidgets.QLabel("Max tokens"))
+        llm_params_row.addWidget(self.llm_max_tokens_spin)
+        llm_params_row.addSpacing(12)
+        llm_params_row.addWidget(QtWidgets.QLabel("Timeout (s)"))
+        llm_params_row.addWidget(self.llm_timeout_spin)
+        llm_params_row.addSpacing(12)
+        llm_params_row.addWidget(QtWidgets.QLabel("Confidence threshold"))
+        llm_params_row.addWidget(self.llm_threshold_spin)
+        llm_params_row.addStretch()
+        form.addRow("LLM Params:", llm_params_row)
         
         layout.addLayout(form)
         
@@ -257,6 +334,68 @@ class HTEConverterWindow(QtWidgets.QWidget):
         # Enable skip CAS enrichment automatically
         self.skip_cas_check.setChecked(True)
 
+    def _populate_llm_providers(self) -> None:
+        providers = sorted(LLM_AVAILABLE_MODELS.keys()) or ["openai", "aliyun"]
+        self.llm_provider_combo.blockSignals(True)
+        self.llm_provider_combo.clear()
+        self.llm_provider_combo.addItems(providers)
+        fallback_provider = (
+            DEFAULT_LLM_PROVIDER if DEFAULT_LLM_PROVIDER in providers else providers[0]
+        )
+        self.llm_provider_combo.setCurrentText(fallback_provider)
+        self.llm_provider_combo.blockSignals(False)
+        self._populate_llm_models(fallback_provider, prefer=DEFAULT_LLM_MODEL)
+
+    def _populate_llm_models(self, provider: str, *, prefer: Optional[str] = None) -> None:
+        provider_key = (provider or "openai").strip().lower()
+        presets = list(LLM_AVAILABLE_MODELS.get(provider_key) or [])
+        current_text = (prefer or self.llm_model_combo.currentText() or "").strip()
+        self.llm_model_combo.blockSignals(True)
+        try:
+            self.llm_model_combo.clear()
+            self.llm_model_combo.addItems(presets)
+            if current_text and current_text in presets:
+                self.llm_model_combo.setCurrentText(current_text)
+            else:
+                recommended = (LLM_RECOMMENDED_MODELS.get(provider_key) or {}).get("balanced")
+                fallback = (recommended or (presets[0] if presets else "")).strip()
+                if provider_key == DEFAULT_LLM_PROVIDER.lower() and DEFAULT_LLM_MODEL:
+                    fallback = DEFAULT_LLM_MODEL
+                self.llm_model_combo.setCurrentText(fallback)
+        finally:
+            self.llm_model_combo.blockSignals(False)
+
+    def _on_llm_provider_changed(self, provider: str) -> None:
+        self._populate_llm_models(provider)
+
+    def _on_llm_assist_toggled(self, enabled: bool) -> None:
+        self.llm_provider_combo.setEnabled(enabled)
+        self.llm_model_combo.setEnabled(enabled)
+        self.llm_temperature_spin.setEnabled(enabled)
+        self.llm_max_tokens_spin.setEnabled(enabled)
+        self.llm_timeout_spin.setEnabled(enabled)
+        self.llm_threshold_spin.setEnabled(enabled)
+        self.llm_always_checkbox.setEnabled(enabled)
+        self.llm_no_crk_validation_checkbox.setEnabled(enabled)
+
+    def _gather_llm_assist_options(self) -> Optional[Dict[str, Any]]:
+        if not self.llm_assist_checkbox.isChecked():
+            return None
+        llm_model = self.llm_model_combo.currentText().strip()
+        if not llm_model:
+            raise ValueError("LLM model is required when LLM assist is enabled.")
+        return {
+            "enabled": True,
+            "provider": self.llm_provider_combo.currentText().strip().lower() or "openai",
+            "model": llm_model,
+            "temperature": float(self.llm_temperature_spin.value()),
+            "max_tokens": int(self.llm_max_tokens_spin.value()),
+            "timeout": int(self.llm_timeout_spin.value()),
+            "only_on_uncertain": not self.llm_always_checkbox.isChecked(),
+            "confidence_threshold": float(self.llm_threshold_spin.value()),
+            "require_crk_validation": not self.llm_no_crk_validation_checkbox.isChecked(),
+        }
+
     def _get_input_paths(self) -> List[str]:
         if self.selected_input_paths:
             return list(self.selected_input_paths)
@@ -317,10 +456,15 @@ class HTEConverterWindow(QtWidgets.QWidget):
         jobs = self._build_jobs(input_paths, output_text)
         if not jobs:
             return
+        try:
+            llm_assist_options = self._gather_llm_assist_options()
+        except Exception as exc:
+            QtWidgets.QMessageBox.critical(self, "Error", str(exc))
+            return
 
         # Check if protocol mode
         if self.protocol_mode_check.isChecked():
-            self._run_protocol_conversion(jobs)
+            self._run_protocol_conversion(jobs, llm_assist_options=llm_assist_options)
             return
 
         self.setEnabled(False)
@@ -336,6 +480,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
             str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
             str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
             self.skip_cas_check.isChecked(),
+            llm_assist_options=llm_assist_options,
         )
         self.worker.moveToThread(self.thread)
         
@@ -345,7 +490,12 @@ class HTEConverterWindow(QtWidgets.QWidget):
         
         self.thread.start()
 
-    def _run_protocol_conversion(self, jobs: List[tuple[str, str]]):
+    def _run_protocol_conversion(
+        self,
+        jobs: List[tuple[str, str]],
+        *,
+        llm_assist_options: Optional[Dict[str, Any]],
+    ):
         """Convert protocol CSV to HTE format with full processing"""
         try:
             self.log.clear()
@@ -355,6 +505,11 @@ class HTEConverterWindow(QtWidgets.QWidget):
             self.log_msg("  - Reaction type detection")
             self.log_msg("  - Motif extraction")
             self.log_msg("  - Spectator group ranking")
+            if llm_assist_options:
+                self.log_msg(
+                    "  - LLM assist: "
+                    f"{llm_assist_options.get('provider')}/{llm_assist_options.get('model')}"
+                )
             self.log_msg("")
             
             # Redirect stdout to capture processing logs
@@ -408,6 +563,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
                         drop_no_catalyst=self.drop_catalyst_check.isChecked(),
                         reagent_csv_path=str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
                         new_reagents_path=str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
+                        llm_assist_options=llm_assist_options,
                     )
                     
                     # Restore original columns

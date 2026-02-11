@@ -14,8 +14,8 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # Import chemtools components
-from chemtools.featurizers.unified import featurize_molecule
-from chemtools.featurizers.formatters.reaction import featurize_reaction, get_crk_options
+from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
+from chemtools.featurizers.formatters.reaction import get_crk_options
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
 from chemtools.smiles import normalize
 from chemtools.reagent.lookup import find_reagent
@@ -30,18 +30,53 @@ def cached_featurize(smiles: str):
 
 
 @lru_cache(maxsize=20000)
-def cached_featurize_reaction(smiles: str) -> Dict[str, Any]:
+def cached_featurize_reaction(
+    smiles: str,
+    llm_assist_signature: str = "",
+) -> Dict[str, Any]:
     """Cache reaction featurization to keep Reaction_Key generation consistent."""
     if not smiles:
         return {}
     try:
-        return featurize_reaction(smiles, options=get_crk_options())
+        return featurize_reaction(
+            smiles,
+            options=_build_reaction_options(llm_assist_signature),
+        )
     except Exception:
         return {}
 
 
+def _build_reaction_options(llm_assist_signature: str = "") -> Dict[str, Any]:
+    options = get_crk_options()
+    if not llm_assist_signature:
+        return options
+    try:
+        llm_assist_cfg = json.loads(llm_assist_signature)
+    except Exception:
+        return options
+    if isinstance(llm_assist_cfg, dict):
+        options["llm_assist"] = llm_assist_cfg
+    return options
+
+
+def _llm_assist_signature(llm_assist_options: Optional[Dict[str, Any]]) -> str:
+    if not isinstance(llm_assist_options, dict):
+        return ""
+    payload = dict(llm_assist_options)
+    if not payload.get("enabled", True):
+        return ""
+    payload["enabled"] = True
+    try:
+        return json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    except Exception:
+        return ""
+
+
 @lru_cache(maxsize=20000)
-def _detect_reaction_type(reaction_smiles: str) -> str:
+def _detect_reaction_type(
+    reaction_smiles: str,
+    llm_assist_signature: str = "",
+) -> str:
     """
     Detect reaction type using full featurization pipeline with taxonomy-driven validation.
     
@@ -56,7 +91,10 @@ def _detect_reaction_type(reaction_smiles: str) -> str:
     if not reaction_smiles:
         return ""
     try:
-        result = featurize_reaction(reaction_smiles)
+        result = featurize_reaction(
+            reaction_smiles,
+            options=_build_reaction_options(llm_assist_signature),
+        )
         reaction_type = result.get("reaction_type", {})
         
         # Extract reaction type from the result (handles both dict and string formats)
@@ -601,6 +639,7 @@ def process_reaction_dataset(
     drop_no_catalyst: bool = True,
     reagent_csv_path: Optional[str | Path] = None,
     new_reagents_path: Optional[str | Path] = None,
+    llm_assist_options: Optional[Dict[str, Any]] = None,
 ):
     """Convert reaction dataset to a minimal HTE recommender CSV."""
     input_path = Path(input_path)
@@ -617,6 +656,9 @@ def process_reaction_dataset(
     new_reagents_csv = Path(new_reagents_path) if new_reagents_path else (
         PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"
     )
+    llm_signature = _llm_assist_signature(llm_assist_options)
+    if llm_signature:
+        print("LLM assist enabled for reaction featurization.")
     
     rows = []
     print(f"Reading {input_path}...")
@@ -701,7 +743,7 @@ def process_reaction_dataset(
                 if not reactant_data:
                     continue
 
-                rxn_bundle = cached_featurize_reaction(smiles)
+                rxn_bundle = cached_featurize_reaction(smiles, llm_signature)
                 aggregates = rxn_bundle.get("aggregates") or {}
                 reacted_set = set(aggregates.get("reacted_motifs") or [])
                 formed_set = set(aggregates.get("formed_motifs") or [])
@@ -728,7 +770,7 @@ def process_reaction_dataset(
                 detected_reaction_type = _extract_reaction_type_from_bundle(rxn_bundle)
                 if not detected_reaction_type:
                     # Fallback keeps compatibility for any unexpected bundle shape.
-                    detected_reaction_type = _detect_reaction_type(smiles)
+                    detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
 
                 row_out = {
                     "reaction_id": source_label,
@@ -819,7 +861,7 @@ def process_reaction_dataset(
             if not reactant_data:
                 continue
 
-            rxn_bundle = cached_featurize_reaction(smiles)
+            rxn_bundle = cached_featurize_reaction(smiles, llm_signature)
             aggregates = rxn_bundle.get("aggregates") or {}
             reacted_set = set(aggregates.get("reacted_motifs") or [])
             formed_set = set(aggregates.get("formed_motifs") or [])
@@ -846,7 +888,7 @@ def process_reaction_dataset(
             detected_reaction_type = _extract_reaction_type_from_bundle(rxn_bundle)
             if not detected_reaction_type:
                 # Fallback keeps compatibility for any unexpected bundle shape.
-                detected_reaction_type = _detect_reaction_type(smiles)
+                detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
 
             row = {
                 "reaction_id": source_label,

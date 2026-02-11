@@ -23,7 +23,7 @@ from .molecule import build_molecule_bundle, to_bool
 from .aggregation import aggregate_reaction_features, infer_intramolecular
 from .utils import extract_motif_ids, normalize_motif_id
 from .simplified import build_core_reaction, build_extended_reaction
-from .reaction_events import summarize_reaction_events
+from .reaction_events import format_multi_event_signature, summarize_reaction_events
 from ..spectator_rank import rank_spectator_groups
 
 
@@ -1216,6 +1216,21 @@ def _format_motif_list(items: Iterable[str]) -> str:
     return "|".join(values) if values else "[]"
 
 
+def _append_crk_event_signature(
+    reaction_key: Optional[str],
+    reaction_events: Dict[str, Any],
+) -> str:
+    text = str(reaction_key or "").strip()
+    if not text:
+        return ""
+    if "events:" in text:
+        return text
+    signature = format_multi_event_signature(reaction_events.get("events") or [])
+    if not signature:
+        return text
+    return f"{text} | events: {signature}"
+
+
 def _project_formed_motifs_by_taxonomy(
     *,
     reaction_type: Optional[str],
@@ -1963,6 +1978,7 @@ def featurize_reaction(
             else None,
         )
         if reaction_events:
+            reaction_key = _append_crk_event_signature(reaction_key, reaction_events)
             detection_payload["reaction_key_quality"] = (
                 reaction_events.get("reaction_key_quality") or {}
             )

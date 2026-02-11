@@ -368,6 +368,18 @@ class FeaturizationWindow(QtWidgets.QWidget):
             return ""
 
         lines: List[str] = []
+        event_signature = self._extract_multi_event_signature(payload)
+        reaction_events = payload.get("reaction_events")
+        if event_signature:
+            lines.append("Multi-Event Signature")
+            lines.append("-" * 72)
+            lines.append(f"signature: {event_signature}")
+            if isinstance(reaction_events, dict):
+                families = reaction_events.get("event_families") or []
+                if isinstance(families, list) and families:
+                    lines.append(f"families: {', '.join(str(f) for f in families)}")
+            lines.append("")
+
         primary = detection.get("primary_detection")
         if isinstance(primary, dict):
             lines.append("Primary Detection")
@@ -459,6 +471,51 @@ class FeaturizationWindow(QtWidgets.QWidget):
     @staticmethod
     def _format_score_vector(score: List[Any]) -> str:
         return "[" + ", ".join(str(v) for v in score) + "]"
+
+    @staticmethod
+    def _extract_crk_section(reaction_key: str, label: str) -> str:
+        if not reaction_key:
+            return ""
+        prefix = f"{label}: "
+        parts = [p.strip() for p in reaction_key.split(" | ") if p.strip()]
+        for part in parts:
+            if part.startswith(prefix):
+                return part[len(prefix):].strip()
+        return ""
+
+    def _extract_multi_event_signature(self, payload: Dict[str, Any]) -> str:
+        reaction_key = str(payload.get("reaction_key") or "").strip()
+        from_key = self._extract_crk_section(reaction_key, "events")
+        if from_key:
+            return from_key
+        reaction_events = payload.get("reaction_events")
+        if not isinstance(reaction_events, dict):
+            return ""
+        events = reaction_events.get("events")
+        if not isinstance(events, list):
+            return ""
+        kind_codes = {
+            "benzyl_o_alkylation_like": "BzOAlk",
+            "ester_hydrolysis_like": "EsterHyd",
+            "amidation_like": "Amid",
+            "ring_closure_or_annulation": "Ann",
+            "leaving_group_displacement": "LGDisp",
+            "c_n_bond_formation": "C-N",
+            "c_o_bond_formation": "C-O",
+            "c_s_bond_formation": "C-S",
+            "c_c_bond_formation": "C-C",
+        }
+        seen: List[str] = []
+        for event in events:
+            if not isinstance(event, dict):
+                continue
+            kind = str(event.get("kind") or "").strip()
+            code = kind_codes.get(kind)
+            if code and code not in seen:
+                seen.append(code)
+        if len(seen) < 2:
+            return ""
+        return "+".join(seen[:4])
 
     def _on_poll(self) -> None:
         if not self._future:

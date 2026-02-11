@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import pytest
 
-from chemtools.featurizers.formatters.reaction_events import summarize_reaction_events
+from chemtools.featurizers.formatters.reaction_events import (
+    format_multi_event_signature,
+    summarize_reaction_events,
+)
 from chemtools.featurizers.unified import featurize_reaction
 from chemtools.util.rdkit_helpers import rdkit_available
 
@@ -79,3 +82,32 @@ def test_reaction_events_for_multi_transform_example_flags_anomalies() -> None:
     anomalies = set(summary.get("anomalies") or [])
     assert "amidation_without_explicit_activation_marker" in anomalies
     assert "multi_transform_record_possible" in anomalies
+
+
+def test_event_signature_formatter_for_multi_event_payload() -> None:
+    signature = format_multi_event_signature(
+        [
+            {"kind": "c_o_bond_formation", "confidence": 0.9},
+            {"kind": "benzyl_o_alkylation_like", "confidence": 0.84},
+            {"kind": "ester_hydrolysis_like", "confidence": 0.82},
+        ]
+    )
+    assert signature.startswith("BzOAlk+EsterHyd")
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_reaction_key_displays_multi_event_signature_for_benzyl_alkylation_hydrolysis() -> None:
+    rxn = (
+        "Oc1c(Br)cc(Br)c2cccnc12.CCOC(=O)c1cc2cc3c(cc2nc1CBr)OCO3"
+        ">>"
+        "O=C(O)c1cc2cc3c(cc2nc1COc1c(Br)cc(Br)c2cccnc12)OCO3"
+    )
+    result = featurize_reaction(rxn, options={"detailed": True, "confirm_coupling_products": True})
+    reaction_key = str(result.get("reaction_key") or "")
+    summary = result.get("reaction_events") or {}
+    kinds = _event_kinds(summary)
+    assert "benzyl_o_alkylation_like" in kinds
+    assert "ester_hydrolysis_like" in kinds
+    assert "events:" in reaction_key
+    assert "BzOAlk" in reaction_key
+    assert "EsterHyd" in reaction_key
