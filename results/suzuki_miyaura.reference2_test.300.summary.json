@@ -1,0 +1,9 @@
+{
+  "source_csv": "results\\suzuki_miyaura.reference2_test.csv",
+  "output_csv": "results\\suzuki_miyaura.reference2_test.300.csv",
+  "seed": 20260211,
+  "sample_size": 300,
+  "source_rows": 16061,
+  "output_rows": 300,
+  "unique_references_in_subset": 299
+}
