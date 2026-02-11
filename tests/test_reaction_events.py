@@ -104,6 +104,7 @@ def test_reaction_key_displays_multi_event_signature_for_benzyl_alkylation_hydro
     )
     result = featurize_reaction(rxn, options={"detailed": True, "confirm_coupling_products": True})
     reaction_key = str(result.get("reaction_key") or "")
+    reaction_type = result.get("reaction_type")
     summary = result.get("reaction_events") or {}
     kinds = _event_kinds(summary)
     assert "benzyl_o_alkylation_like" in kinds
@@ -111,3 +112,8 @@ def test_reaction_key_displays_multi_event_signature_for_benzyl_alkylation_hydro
     assert "events:" in reaction_key
     assert "BzOAlk" in reaction_key
     assert "EsterHyd" in reaction_key
+    if isinstance(reaction_type, dict):
+        rt_text = str(reaction_type.get("reaction_type") or "")
+    else:
+        rt_text = str(reaction_type or "")
+    assert rt_text.startswith("Multi-Event:")

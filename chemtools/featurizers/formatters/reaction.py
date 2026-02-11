@@ -1231,6 +1231,15 @@ def _append_crk_event_signature(
     return f"{text} | events: {signature}"
 
 
+def _infer_multi_event_fallback_label(reaction_events: Dict[str, Any]) -> Optional[str]:
+    if not isinstance(reaction_events, dict):
+        return None
+    signature = format_multi_event_signature(reaction_events.get("events") or [])
+    if not signature:
+        return None
+    return f"Multi-Event:{signature}"
+
+
 def _project_formed_motifs_by_taxonomy(
     *,
     reaction_type: Optional[str],
@@ -2000,6 +2009,17 @@ def featurize_reaction(
                     if quality_level == "high" and anomaly_text not in critical_anomalies:
                         continue
                     quality_warnings.append(f"reaction_key_anomaly:{anomaly_text}")
+
+            if rt_id is None:
+                fallback_label = _infer_multi_event_fallback_label(reaction_events)
+                if fallback_label:
+                    reaction_type = _set_reaction_type_payload(
+                        reaction_type,
+                        fallback_label,
+                        0.35,
+                    )
+                    rt_id = fallback_label
+                    detection_payload["event_fallback_reaction_type"] = fallback_label
 
     if rt_id is None:
         if isinstance(reaction_type, dict):
