@@ -1,0 +1,97 @@
+{
+  "empty_reaction_key": {
+    "count": 0,
+    "rate": 0.0
+  },
+  "error_count": 0,
+  "low_reaction_key_quality": {
+    "count": 3,
+    "rate": 0.0063
+  },
+  "quality_levels": {
+    "high": 435,
+    "low": 3,
+    "medium": 42
+  },
+  "top_anomalies": [
+    [
+      "mapping_unreliable_fallback_used",
+      184
+    ],
+    [
+      "multi_transform_record_possible",
+      37
+    ],
+    [
+      "amidation_without_explicit_activation_marker",
+      30
+    ]
+  ],
+  "top_unresolved_motif_signatures": [
+    [
+      "none -> none",
+      4
+    ],
+    [
+      "Ar-CHO -> Ar-COR",
+      3
+    ],
+    [
+      "R3C-CO2H -> Ar-Alkyl",
+      3
+    ],
+    [
+      "Ar-I|Thiocarbonyl-SH -> none",
+      2
+    ],
+    [
+      "Alkynyl-H|Ar-Br -> Ar-Alkynyl_terminal",
+      2
+    ],
+    [
+      "HeteroAr-Br -> Ar-Alkenyl",
+      2
+    ],
+    [
+      "Ar-Br|RCH2-Mg* -> Ar-Alkyl",
+      2
+    ],
+    [
+      "Ar-CHO|Inorganic -> Bn-OH",
+      2
+    ],
+    [
+      "Ar-CN|Inorganic -> Bn-NH2",
+      2
+    ],
+    [
+      "Ar-COR|Inorganic|R_acidic-H -> Ar-Alkyl|R2CH-OH",
+      2
+    ],
+    [
+      "Alkenyl-Alkenyl -> Alkyl-H",
+      2
+    ],
+    [
+      "R2CH-Br -> R2CH-OH",
+      2
+    ],
+    [
+      "RCH2-Br|Unclassified-Reactant -> RCH2-CN|R_acidic-H",
+      2
+    ],
+    [
+      "Inorganic|RCH2-Br -> RCH2-I",
+      2
+    ],
+    [
+      "Inorganic|R3C-Cl -> R3C-OH",
+      2
+    ]
+  ],
+  "total_reactions": 480,
+  "unknown_reaction_type": {
+    "count": 174,
+    "rate": 0.3625
+  }
+}

@@ -23,6 +23,7 @@ from .molecule import build_molecule_bundle, to_bool
 from .aggregation import aggregate_reaction_features, infer_intramolecular
 from .utils import extract_motif_ids, normalize_motif_id
 from .simplified import build_core_reaction, build_extended_reaction
+from .reaction_events import summarize_reaction_events
 from ..spectator_rank import rank_spectator_groups
 
 
@@ -123,12 +124,76 @@ def _is_reaction_uncertain_for_llm_assist(
         reasons.append("mapping_warning")
     if not str(reaction_key or "").strip():
         reasons.append("missing_reaction_key")
+    key_quality = detection_payload.get("reaction_key_quality")
+    if isinstance(key_quality, dict):
+        level = str(key_quality.get("level") or "").strip().lower()
+        score = _to_float_or_default(key_quality.get("score_0_1"), 1.0)
+        if level == "low" or score < 0.45:
+            reasons.append("low_reaction_key_quality")
+        elif level == "medium":
+            reasons.append("medium_reaction_key_quality")
     validation_payload = detection_payload.get("validation")
     if isinstance(validation_payload, dict):
         validated = str(validation_payload.get("validated_detection") or "").strip()
         if not validated or validated.lower() == "unknown":
             reasons.append("unknown_validated_detection")
     return bool(reasons), reasons
+
+
+def _run_primary_reaction_type_detection(
+    reaction_smiles: str,
+) -> Dict[str, Any]:
+    """
+    Run the canonical detection API and return normalized payload.
+
+    This is optional because it can be more expensive than local validation.
+    """
+    try:
+        from chemtools.detection import detect_reaction_type
+    except Exception as exc:
+        return {
+            "status": "error",
+            "error": f"detection_import_error: {exc}",
+            "summary": None,
+            "matches": [],
+        }
+    try:
+        result = detect_reaction_type(reaction_smiles)
+    except Exception as exc:
+        return {
+            "status": "error",
+            "error": f"detection_runtime_error: {exc}",
+            "summary": None,
+            "matches": [],
+        }
+
+    summary = format_reaction_type_summary(result)
+    matches_payload: List[Dict[str, Any]] = []
+    for match in getattr(result, "matches", []) or []:
+        slot_evidence: Dict[str, Any] = {}
+        electrophile = list(getattr(match, "electrophile", []) or [])
+        nucleophile = list(getattr(match, "nucleophile", []) or [])
+        product = list(getattr(match, "product", []) or [])
+        if electrophile:
+            slot_evidence["electrophile"] = electrophile
+        if nucleophile:
+            slot_evidence["nucleophile"] = nucleophile
+        if product:
+            slot_evidence["product"] = product
+        matches_payload.append(
+            {
+                "reaction_type": str(getattr(match, "reaction_type", "") or ""),
+                "name": str(getattr(match, "reaction_type", "") or ""),
+                "confidence": _to_float_or_default(getattr(match, "confidence", 0.0), 0.0),
+                "slot_evidence": slot_evidence,
+            }
+        )
+    return {
+        "status": "ok",
+        "error": getattr(result, "error", None),
+        "summary": summary,
+        "matches": matches_payload,
+    }
 
 
 def _run_llm_reaction_assist(
@@ -243,6 +308,7 @@ def get_crk_options() -> Dict[str, Any]:
     return {
         "include_roles": False,
         "include_agent_roles": False,
+        "include_reaction_type": False,
         "motif_site_filter": "substituent",
         "confirm_coupling_products": True,
         "discovery_mode": False,
@@ -1746,6 +1812,7 @@ def featurize_reaction(
     
     include_roles = to_bool(options.get("include_roles"), default=True)
     include_agent_roles = to_bool(options.get("include_agent_roles"), default=True)
+    include_reaction_type = to_bool(options.get("include_reaction_type"), default=False)
     skip_bond_analysis = to_bool(options.get("skip_bond_analysis"), default=False)
     include_product_in_crk = to_bool(options.get("include_product_in_crk"), default=True)
     reactant_coverage_guard = to_bool(options.get("reactant_coverage_guard"), default=True)
@@ -1761,11 +1828,34 @@ def featurize_reaction(
     # Start with Unknown, then determine from CRK_raw after bond/motif extraction.
     reaction_type = {"reaction_type": "Unknown", "confidence": 0.0, "slot_evidence": {}}
     detection_payload = {}
+    quality_warnings: List[str] = []
 
     # Normalize reaction SMILES
     normalized = normalize_reaction(reaction_smiles)
     reaction_record = ReactionRecord.from_payload(normalized)
     reactant_smiles = reaction_record.reactant_smiles
+
+    if include_reaction_type:
+        primary_detection = _run_primary_reaction_type_detection(reaction_smiles)
+        detection_payload["primary_detection"] = {
+            "status": primary_detection.get("status"),
+        }
+        primary_error = primary_detection.get("error")
+        if primary_error:
+            detection_payload["primary_detection"]["error"] = primary_error
+        primary_matches = primary_detection.get("matches") or []
+        if isinstance(primary_matches, list) and primary_matches:
+            detection_payload["matches"] = primary_matches
+        primary_summary = primary_detection.get("summary")
+        if isinstance(primary_summary, dict):
+            rt_candidate = _resolve_reaction_type_id(primary_summary.get("reaction_type"))
+            rt_conf = _to_float_or_default(primary_summary.get("confidence"), 0.0)
+            if rt_candidate:
+                reaction_type = _set_reaction_type_payload(
+                    reaction_type,
+                    rt_candidate,
+                    rt_conf,
+                )
 
     # Classify agents/reagents
     agent_roles = None
@@ -1818,6 +1908,7 @@ def featurize_reaction(
 
     rt_id = None
     llm_assist_meta: Optional[Dict[str, Any]] = None
+    reaction_events: Dict[str, Any] = {}
 
     # Generate CRK-v1 reaction key (single source of truth)
     reaction_key = None
@@ -2000,6 +2091,41 @@ def featurize_reaction(
             include_product=include_product_in_crk,
         )
 
+        reaction_events = summarize_reaction_events(
+            reaction_smiles=reaction_smiles,
+            bond_key=bond_key,
+            fallback_bond_key=fallback_bond_key,
+            reacted_motifs=aggregates.get("reacted_motifs") or [],
+            formed_motifs=aggregates.get("formed_motifs_all")
+            or aggregates.get("formed_motifs")
+            or [],
+            mapping_warning=detection_payload.get("mapping_warning")
+            if isinstance(detection_payload, dict)
+            else None,
+        )
+        if reaction_events:
+            detection_payload["reaction_key_quality"] = (
+                reaction_events.get("reaction_key_quality") or {}
+            )
+            quality_payload = reaction_events.get("reaction_key_quality") or {}
+            quality_level = str(quality_payload.get("level") or "").strip().lower()
+            quality_score = _to_float_or_default(quality_payload.get("score_0_1"), 1.0)
+            if quality_level == "low" or quality_score < 0.45:
+                quality_warnings.append("low_reaction_key_quality")
+            anomalies = reaction_events.get("anomalies") or []
+            if isinstance(anomalies, list):
+                critical_anomalies = {
+                    "mapping_unreliable_fallback_used",
+                    "amidation_without_explicit_activation_marker",
+                }
+                for anomaly in anomalies:
+                    anomaly_text = str(anomaly).strip()
+                    if not anomaly_text:
+                        continue
+                    if quality_level == "high" and anomaly_text not in critical_anomalies:
+                        continue
+                    quality_warnings.append(f"reaction_key_anomaly:{anomaly_text}")
+
     if rt_id is None:
         if isinstance(reaction_type, dict):
             rt_id = reaction_type.get("reaction_type")
@@ -2147,6 +2273,8 @@ def featurize_reaction(
         "agent_roles": agent_roles,
         "intramolecular": intramolecular,
     }
+    if reaction_events:
+        reaction["reaction_events"] = reaction_events
 
     # Add feasibility analysis for specific reaction types
     if rt_id == "snar_cn" or rt_id == "c_n_cross_coupling":
@@ -2165,8 +2293,19 @@ def featurize_reaction(
     meta = {
         "rdkit_available": rdkit_helpers.rdkit_available(),
     }
+    meta_errors: List[str] = []
     if detection_payload.get("error"):
-        meta["errors"] = [detection_payload["error"]]
+        meta_errors.append(str(detection_payload["error"]))
+    if quality_warnings:
+        seen_errors: Set[str] = set()
+        for warning in quality_warnings:
+            text = str(warning).strip()
+            if not text or text in seen_errors:
+                continue
+            seen_errors.add(text)
+            meta_errors.append(text)
+    if meta_errors:
+        meta["errors"] = meta_errors
     if llm_assist_meta is not None:
         meta["llm_assist"] = llm_assist_meta
     if meta.get("errors") or not meta.get("rdkit_available", True):

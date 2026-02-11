@@ -259,6 +259,7 @@ class FeaturizationWindow(QtWidgets.QWidget):
             "target_groups": target_groups or None,
             "discovery_mode": self.discovery_checkbox.isChecked(),
             "confirm_coupling_products": True,
+            "include_reaction_type": True,
             "reactant_coverage_guard": self.reactant_coverage_guard_checkbox.isChecked(),
         }
         if self.llm_assist_checkbox.isChecked():
@@ -367,6 +368,35 @@ class FeaturizationWindow(QtWidgets.QWidget):
             return ""
 
         lines: List[str] = []
+        primary = detection.get("primary_detection")
+        if isinstance(primary, dict):
+            lines.append("Primary Detection")
+            lines.append("-" * 72)
+            lines.append(f"status: {primary.get('status')}")
+            if primary.get("error"):
+                lines.append(f"error: {primary.get('error')}")
+            matches = detection.get("matches") or []
+            if isinstance(matches, list) and matches:
+                lines.append("top_matches:")
+                for idx, match in enumerate(matches[:3], start=1):
+                    if not isinstance(match, dict):
+                        continue
+                    rid = str(match.get("reaction_type") or match.get("name") or "Unknown")
+                    conf = match.get("confidence")
+                    lines.append(f"  {idx}. {rid} (confidence={conf})")
+            lines.append("")
+
+        key_quality = detection.get("reaction_key_quality")
+        if isinstance(key_quality, dict) and key_quality:
+            lines.append("Reaction Key Quality")
+            lines.append("-" * 72)
+            lines.append(f"level: {key_quality.get('level')}")
+            lines.append(f"score_0_1: {key_quality.get('score_0_1')}")
+            reasons = key_quality.get("reasons") or []
+            if reasons:
+                lines.append(f"reasons: {', '.join(str(r) for r in reasons)}")
+            lines.append("")
+
         evidence = detection.get("evidence")
         if isinstance(evidence, dict):
             lines.append("Detection Evidence")

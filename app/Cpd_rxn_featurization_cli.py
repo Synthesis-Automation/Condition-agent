@@ -736,6 +736,58 @@ def _print_reaction_summary(
         reaction_key=reaction.get("reaction_key"),
     )
 
+    detection = reaction.get("detection")
+    if isinstance(detection, dict):
+        primary = detection.get("primary_detection")
+        matches = detection.get("matches") or []
+        if isinstance(primary, dict) and primary:
+            status = primary.get("status")
+            error = primary.get("error")
+            print("Primary Detection:")
+            print(f"  status: {status}")
+            if error:
+                print(f"  error: {error}")
+        if isinstance(matches, list) and matches:
+            print(f"Primary Detection Matches (top {min(3, len(matches))}):")
+            for idx, match in enumerate(matches[:3], start=1):
+                if not isinstance(match, dict):
+                    continue
+                rtype = match.get("reaction_type") or match.get("name") or "Unknown"
+                conf = match.get("confidence")
+                slot = match.get("slot_evidence") or {}
+                slot_text = _format_kv_inline(slot) if isinstance(slot, dict) and slot else "none"
+                print(f"  {idx}. {rtype} (confidence={conf}) slots={slot_text}")
+
+    reaction_events = reaction.get("reaction_events")
+    if isinstance(reaction_events, dict) and reaction_events:
+        print("Reaction Events:")
+        quality = reaction_events.get("reaction_key_quality") or {}
+        if isinstance(quality, dict) and quality:
+            level = quality.get("level")
+            score = quality.get("score_0_1")
+            if level is not None or score is not None:
+                print(f"  Key quality: level={level}, score={score}")
+            reasons = quality.get("reasons") or []
+            if reasons:
+                print(f"  Key quality reasons: {_format_value(reasons)}")
+        events = reaction_events.get("events") or []
+        if events:
+            for idx, event in enumerate(events, start=1):
+                if not isinstance(event, dict):
+                    print(f"  {idx}. {event}")
+                    continue
+                kind = event.get("kind") or "unknown_event"
+                conf = event.get("confidence")
+                details = event.get("details") or {}
+                detail_text = ""
+                if isinstance(details, dict) and details:
+                    detail_text = f" [{_format_kv_inline(details)}]"
+                conf_text = f" (confidence={conf})" if conf is not None else ""
+                print(f"  {idx}. {kind}{conf_text}{detail_text}")
+        anomalies = reaction_events.get("anomalies") or []
+        if anomalies:
+            print(f"  Anomalies: {_format_value(anomalies)}")
+
 
 def _print_readable(
     payload: Dict[str, Any],
@@ -885,6 +937,7 @@ def main() -> int:
         "target_groups": target_groups,
         "discovery_mode": args.discovery,
         "confirm_coupling_products": True,
+        "include_reaction_type": True,
         "reactant_coverage_guard": args.reactant_coverage_guard,
     }
     llm_model = str(args.llm_model or "").strip()
