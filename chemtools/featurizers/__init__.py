@@ -7,6 +7,7 @@ __all__ = [
     "analysis",
     "calculable",
     "molecule",
+    "reaction_assist",
     "reaction_pair",
     "unified",
 ]

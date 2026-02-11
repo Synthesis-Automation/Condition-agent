@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from chemtools.featurizers.formatters import reaction as reaction_formatter
 from chemtools.featurizers.formatters import detection_validation
+from chemtools.featurizers import reaction_assist
 
 
 def test_get_crk_options_disables_primary_detection() -> None:
@@ -84,7 +85,7 @@ def test_low_reaction_key_quality_adds_meta_warning(
 
 
 def test_llm_uncertainty_includes_key_quality_reason() -> None:
-    uncertain, reasons = reaction_formatter._is_reaction_uncertain_for_llm_assist(
+    uncertain, reasons = reaction_assist.is_reaction_uncertain_for_llm_assist(
         reaction_type={"reaction_type": "C_N_Coupling", "confidence": 0.92},
         detection_payload={
             "reaction_key_quality": {

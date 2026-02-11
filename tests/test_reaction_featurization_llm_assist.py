@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from chemtools.featurizers.formatters import reaction as reaction_formatter
+from chemtools.featurizers import reaction_assist
+from chemtools.featurizers import unified as unified_featurizer
 
 
 def _llm_assist_options() -> dict:
@@ -20,12 +21,12 @@ def test_llm_assist_applies_taxonomy_validated_override(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        reaction_formatter,
-        "_is_reaction_uncertain_for_llm_assist",
+        reaction_assist,
+        "is_reaction_uncertain_for_llm_assist",
         lambda **_: (True, ["unknown_reaction_type"]),
     )
     monkeypatch.setattr(
-        reaction_formatter,
+        reaction_assist,
         "_run_llm_reaction_assist",
         lambda context, llm_assist: {
             "status": "ok",
@@ -43,12 +44,12 @@ def test_llm_assist_applies_taxonomy_validated_override(
         },
     )
     monkeypatch.setattr(
-        reaction_formatter,
+        reaction_assist,
         "_validate_llm_suggested_type_with_crk",
         lambda suggested_reaction_type, reaction_key_raw: (True, "validated_with_crk"),
     )
 
-    result = reaction_formatter.featurize_reaction(
+    result = unified_featurizer.featurize_reaction(
         "CCO.CN>>CCN",
         options=_llm_assist_options(),
     )
@@ -63,12 +64,12 @@ def test_llm_assist_rejects_override_on_validation_mismatch(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        reaction_formatter,
-        "_is_reaction_uncertain_for_llm_assist",
+        reaction_assist,
+        "is_reaction_uncertain_for_llm_assist",
         lambda **_: (True, ["unknown_reaction_type"]),
     )
     monkeypatch.setattr(
-        reaction_formatter,
+        reaction_assist,
         "_run_llm_reaction_assist",
         lambda context, llm_assist: {
             "status": "ok",
@@ -84,7 +85,7 @@ def test_llm_assist_rejects_override_on_validation_mismatch(
         },
     )
     monkeypatch.setattr(
-        reaction_formatter,
+        reaction_assist,
         "_validate_llm_suggested_type_with_crk",
         lambda suggested_reaction_type, reaction_key_raw: (
             False,
@@ -92,7 +93,7 @@ def test_llm_assist_rejects_override_on_validation_mismatch(
         ),
     )
 
-    result = reaction_formatter.featurize_reaction(
+    result = unified_featurizer.featurize_reaction(
         "CCO.CN>>CCN",
         options=_llm_assist_options(),
     )
@@ -108,8 +109,8 @@ def test_llm_assist_skips_when_not_uncertain(
     called = {"count": 0}
 
     monkeypatch.setattr(
-        reaction_formatter,
-        "_is_reaction_uncertain_for_llm_assist",
+        reaction_assist,
+        "is_reaction_uncertain_for_llm_assist",
         lambda **_: (False, []),
     )
 
@@ -117,9 +118,9 @@ def test_llm_assist_skips_when_not_uncertain(
         called["count"] += 1
         return {"status": "ok", "analysis": {}}
 
-    monkeypatch.setattr(reaction_formatter, "_run_llm_reaction_assist", _never_called)
+    monkeypatch.setattr(reaction_assist, "_run_llm_reaction_assist", _never_called)
 
-    result = reaction_formatter.featurize_reaction(
+    result = unified_featurizer.featurize_reaction(
         "CCO.CN>>CCN",
         options=_llm_assist_options(),
     )
