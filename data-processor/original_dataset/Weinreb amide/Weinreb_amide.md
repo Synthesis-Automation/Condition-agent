@@ -16,7 +16,7 @@ Total reactions: 579
 - Yield %: 63
 - Reagents: 429-41-4 (429-41-4) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)C[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)C[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)C[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)C[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-049-CAS-19587786
 
@@ -24,7 +24,7 @@ Total reactions: 579
 - Yield %: 44
 - Reagents: 429-41-4 (429-41-4) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)CC[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@H]2C[C@H](CO)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)CC[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@H]2C[C@H](CO)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-049-CAS-19587793
 
@@ -32,7 +32,7 @@ Total reactions: 579
 - Yield %: 59
 - Reagents: 429-41-4 (429-41-4) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)CC[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)CC[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-049-CAS-19587811
 
@@ -40,7 +40,7 @@ Total reactions: 579
 - Yield %: 65
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 60-29-7 (60-29-7), 123-91-1 (123-91-1)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-049-CAS-19587815
 
@@ -48,7 +48,7 @@ Total reactions: 579
 - Yield %: 62
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 60-29-7 (60-29-7), 123-91-1 (123-91-1)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@H]1C[C@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@H]2C[C@H](O)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@H]1C[C@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@H]2C[C@H](O)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-049-CAS-19587823
 
@@ -56,7 +56,7 @@ Total reactions: 579
 - Yield %: 48
 - Reagents: 429-41-4 (429-41-4) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@H]2C[C@H](CO)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@H]2C[C@H](CO)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-049-CAS-19587828
 
@@ -64,7 +64,7 @@ Total reactions: 579
 - Yield %: 59
 - Reagents: 429-41-4 (429-41-4) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: CON(C)C(=O)[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C.CCCCCCCCc1ccc([CH2][Mg][Br])cc1>>CCCCCCCCc1ccc(CC(=O)[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CON(C)C(=O)[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C.CCCCCCCCc1ccc(C[Mg]Br)cc1>>CCCCCCCCc1ccc(CC(=O)[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-049-CAS-19587831
 
@@ -72,7 +72,7 @@ Total reactions: 579
 - Yield %: 68
 - Reagents: 429-41-4 (429-41-4) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: CON(C)C(=O)[C@H]1C[C@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C.CCCCCCCCc1ccc([CH2][Mg][Br])cc1>>CCCCCCCCc1ccc(CC(=O)[C@H]2C[C@H](O)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CON(C)C(=O)[C@H]1C[C@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C.CCCCCCCCc1ccc(C[Mg]Br)cc1>>CCCCCCCCc1ccc(CC(=O)[C@H]2C[C@H](O)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-117-CAS-19206288
 
@@ -80,7 +80,7 @@ Total reactions: 579
 - Yield %: 38
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: C=C[CH2][Mg][Br].CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>C/C=C/C(=O)C[C@H]1CC[C@@H](CC(=O)/C=C/C)N1Cc1ccccc1.C=CCC(=O)C[C@H]1CC[C@@H](CC(=O)CC=C)N1Cc1ccccc1
+- SMILES: C=CC[Mg]Br.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>C/C=C/C(=O)C[C@H]1CC[C@@H](CC(=O)/C=C/C)N1Cc1ccccc1.C=CCC(=O)C[C@H]1CC[C@@H](CC(=O)CC=C)N1Cc1ccccc1
 
 ## Reaction 31-117-CAS-19206289
 
@@ -88,7 +88,7 @@ Total reactions: 579
 - Yield %: 53
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: C=C[CH2][Mg][Br].CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>C/C=C/C(=O)C[C@H]1CC[C@@H](CC(=O)/C=C/C)N1C
+- SMILES: C=CC[Mg]Br.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>C/C=C/C(=O)C[C@H]1CC[C@@H](CC(=O)/C=C/C)N1C
 
 ## Reaction 31-352-CAS-23798009
 
@@ -112,7 +112,7 @@ Total reactions: 579
 - Yield %: 60
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1), 141-78-6 (141-78-6), 7732-18-5 (7732-18-5)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)C1=CN=C(Nc2ccc(C(F)(F)F)cc2)N(C(=O)OC(C)(C)C)C1>>CC(C)(C)OC(=O)N1CC(C(=O)c2ccccc2)=CN=C1Nc1ccc(C(F)(F)F)cc1
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)C1=CN=C(Nc2ccc(C(F)(F)F)cc2)N(C(=O)OC(C)(C)C)C1>>CC(C)(C)OC(=O)N1CC(C(=O)c2ccccc2)=CN=C1Nc1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-373-CAS-18004522
 
@@ -128,7 +128,7 @@ Total reactions: 579
 - Yield %: 59
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1), 141-78-6 (141-78-6), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH2]CCC.CON(C)C(=O)C1=CN=C(Nc2ccccc2)N(C(=O)OC(C)(C)C)C1>>CCCCC(=O)C1=CN=C(Nc2ccccc2)N(C(=O)OC(C)(C)C)C1
+- SMILES: [Li]CCCC.CON(C)C(=O)C1=CN=C(Nc2ccccc2)N(C(=O)OC(C)(C)C)C1>>CCCCC(=O)C1=CN=C(Nc2ccccc2)N(C(=O)OC(C)(C)C)C1
 
 ## Reaction 31-373-CAS-18011414
 
@@ -152,7 +152,7 @@ Total reactions: 579
 - Yield %: 81
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1), 141-78-6 (141-78-6), 7732-18-5 (7732-18-5)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)C1=CN=C(Nc2ccccc2)N(C(=O)OC(C)(C)C)C1>>CC(C)(C)OC(=O)N1CC(C(=O)c2ccccc2)=CN=C1Nc1ccccc1
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)C1=CN=C(Nc2ccccc2)N(C(=O)OC(C)(C)C)C1>>CC(C)(C)OC(=O)N1CC(C(=O)c2ccccc2)=CN=C1Nc1ccccc1
 
 ## Reaction 31-373-CAS-18665394
 
@@ -263,7 +263,7 @@ Total reactions: 579
 - Yield %: 96
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1ccccc1>>CC(=O)/C=C(\C)c1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1ccccc1>>CC(=O)/C=C(\C)c1ccccc1
 
 ## Reaction 31-373-CAS-18800522
 
@@ -271,7 +271,7 @@ Total reactions: 579
 - Yield %: 96
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1ccccc1C>>CC(=O)/C=C(\C)c1ccccc1C
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1ccccc1C>>CC(=O)/C=C(\C)c1ccccc1C
 
 ## Reaction 31-373-CAS-18800523
 
@@ -279,7 +279,7 @@ Total reactions: 579
 - Yield %: 89
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1cccc(C)c1>>CC(=O)/C=C(\C)c1cccc(C)c1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1cccc(C)c1>>CC(=O)/C=C(\C)c1cccc(C)c1
 
 ## Reaction 31-373-CAS-18800524
 
@@ -287,7 +287,7 @@ Total reactions: 579
 - Yield %: 92
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1ccc(C)cc1>>CC(=O)/C=C(\C)c1ccc(C)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1ccc(C)cc1>>CC(=O)/C=C(\C)c1ccc(C)cc1
 
 ## Reaction 31-373-CAS-18800525
 
@@ -295,7 +295,7 @@ Total reactions: 579
 - Yield %: 96
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COc1ccccc1/C(C)=C/C(=O)N(C)OC>>COc1ccccc1/C(C)=C/C(C)=O
+- SMILES: C[Mg]Br.COc1ccccc1/C(C)=C/C(=O)N(C)OC>>COc1ccccc1/C(C)=C/C(C)=O
 
 ## Reaction 31-373-CAS-18800526
 
@@ -303,7 +303,7 @@ Total reactions: 579
 - Yield %: 91
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1ccc(NC(=O)OC(C)(C)C)cc1>>CC(=O)/C=C(\C)c1ccc(NC(=O)OC(C)(C)C)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1ccc(NC(=O)OC(C)(C)C)cc1>>CC(=O)/C=C(\C)c1ccc(NC(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-18800527
 
@@ -311,7 +311,7 @@ Total reactions: 579
 - Yield %: 91
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1ccc(N(Cc2ccccc2)C(=O)OC(C)(C)C)cc1>>CC(=O)/C=C(\C)c1ccc(N(Cc2ccccc2)C(=O)OC(C)(C)C)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1ccc(N(Cc2ccccc2)C(=O)OC(C)(C)C)cc1>>CC(=O)/C=C(\C)c1ccc(N(Cc2ccccc2)C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-18800528
 
@@ -319,7 +319,7 @@ Total reactions: 579
 - Yield %: 89
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1ccc(F)cc1>>CC(=O)/C=C(\C)c1ccc(F)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1ccc(F)cc1>>CC(=O)/C=C(\C)c1ccc(F)cc1
 
 ## Reaction 31-373-CAS-18800529
 
@@ -327,7 +327,7 @@ Total reactions: 579
 - Yield %: 90
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1ccccc1Br>>CC(=O)/C=C(\C)c1ccccc1Br
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1ccccc1Br>>CC(=O)/C=C(\C)c1ccccc1Br
 
 ## Reaction 31-373-CAS-18800530
 
@@ -335,7 +335,7 @@ Total reactions: 579
 - Yield %: 97
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1ccc(-c2ccccc2)cc1>>CC(=O)/C=C(\C)c1ccc(-c2ccccc2)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1ccc(-c2ccccc2)cc1>>CC(=O)/C=C(\C)c1ccc(-c2ccccc2)cc1
 
 ## Reaction 31-373-CAS-18800531
 
@@ -343,7 +343,7 @@ Total reactions: 579
 - Yield %: 96
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1cccc2ccccc12>>CC(=O)/C=C(\C)c1cccc2ccccc12
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1cccc2ccccc12>>CC(=O)/C=C(\C)c1cccc2ccccc12
 
 ## Reaction 31-373-CAS-18800532
 
@@ -351,7 +351,7 @@ Total reactions: 579
 - Yield %: 87
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(/c1ccccc1)C(C)C>>CC(=O)/C=C(/c1ccccc1)C(C)C
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(/c1ccccc1)C(C)C>>CC(=O)/C=C(/c1ccccc1)C(C)C
 
 ## Reaction 31-373-CAS-18866849
 
@@ -493,7 +493,7 @@ Total reactions: 579
 - Yield %: 66
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH3].CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>CC(=O)C[C@H]1CC[C@@H](CC(C)=O)N1Cc1ccccc1
+- SMILES: [Li]C.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>CC(=O)C[C@H]1CC[C@@H](CC(C)=O)N1Cc1ccccc1
 
 ## Reaction 31-373-CAS-19206268
 
@@ -501,7 +501,7 @@ Total reactions: 579
 - Yield %: 65
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>CC(=O)C[C@H]1CC[C@@H](CC(C)=O)N1Cc1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>CC(=O)C[C@H]1CC[C@@H](CC(C)=O)N1Cc1ccccc1
 
 ## Reaction 31-373-CAS-19206269
 
@@ -509,7 +509,7 @@ Total reactions: 579
 - Yield %: 80
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH3].CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1S(=O)(=O)c1ccc(C)cc1>>CC(=O)C[C@H]1CC[C@@H](CC(C)=O)N1S(=O)(=O)c1ccc(C)cc1
+- SMILES: [Li]C.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1S(=O)(=O)c1ccc(C)cc1>>CC(=O)C[C@H]1CC[C@@H](CC(C)=O)N1S(=O)(=O)c1ccc(C)cc1
 
 ## Reaction 31-373-CAS-19206270
 
@@ -517,7 +517,7 @@ Total reactions: 579
 - Yield %: 80
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1S(=O)(=O)c1ccc(C)cc1>>CC(=O)C[C@H]1CC[C@@H](CC(C)=O)N1S(=O)(=O)c1ccc(C)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1S(=O)(=O)c1ccc(C)cc1>>CC(=O)C[C@H]1CC[C@@H](CC(C)=O)N1S(=O)(=O)c1ccc(C)cc1
 
 ## Reaction 31-373-CAS-19206271
 
@@ -525,7 +525,7 @@ Total reactions: 579
 - Yield %: 49
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH2]CCC.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>CCCCC(=O)C[C@H]1CC[C@@H](CC(=O)CCCC)N1Cc1ccccc1
+- SMILES: [Li]CCCC.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>CCCCC(=O)C[C@H]1CC[C@@H](CC(=O)CCCC)N1Cc1ccccc1
 
 ## Reaction 31-373-CAS-19206272
 
@@ -533,7 +533,7 @@ Total reactions: 579
 - Yield %: 64
 - Reagents: 110-18-9 (110-18-9) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH2]CCC.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CCCCC(=O)C[C@H]1CC[C@@H](CC(=O)CCCC)N1C
+- SMILES: [Li]CCCC.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CCCCC(=O)C[C@H]1CC[C@@H](CC(=O)CCCC)N1C
 
 ## Reaction 31-373-CAS-19206276
 
@@ -541,7 +541,7 @@ Total reactions: 579
 - Yield %: 56
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][C]#CCCCOC1CCCCO1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CN1[C@@H](CC(=O)C#CCCCOC2CCCCO2)CC[C@H]1CC(=O)C#CCCCOC1CCCCO1
+- SMILES: [Li]C#CCCCOC1CCCCO1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CN1[C@@H](CC(=O)C#CCCCOC2CCCCO2)CC[C@H]1CC(=O)C#CCCCOC1CCCCO1
 
 ## Reaction 31-373-CAS-19206278
 
@@ -549,7 +549,7 @@ Total reactions: 579
 - Yield %: 42
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1), 7732-18-5 (7732-18-5)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CNC(=O)C[C@H]1CC[C@@H](CC(=O)c2ccccc2)N1C
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CNC(=O)C[C@H]1CC[C@@H](CC(=O)c2ccccc2)N1C
 
 ## Reaction 31-373-CAS-19206279
 
@@ -557,7 +557,7 @@ Total reactions: 579
 - Yield %: 30
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CNC(=O)C[C@H]1CC[C@@H](CC(=O)c2ccccc2)N1C
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CNC(=O)C[C@H]1CC[C@@H](CC(=O)c2ccccc2)N1C
 
 ## Reaction 31-373-CAS-19206280
 
@@ -565,7 +565,7 @@ Total reactions: 579
 - Yield %: 45
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][c]1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>O=C(C[C@H]1CC[C@@H](CC(=O)c2cccs2)N1Cc1ccccc1)c1cccs1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccs2)N1Cc1ccccc1
+- SMILES: [Li]c1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>O=C(C[C@H]1CC[C@@H](CC(=O)c2cccs2)N1Cc1ccccc1)c1cccs1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccs2)N1Cc1ccccc1
 
 ## Reaction 31-373-CAS-19206281
 
@@ -573,7 +573,7 @@ Total reactions: 579
 - Yield %: 23
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>O=C(C[C@H]1CC[C@@H](CC(=O)c2cccs2)N1Cc1ccccc1)c1cccs1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccs2)N1Cc1ccccc1
+- SMILES: Br[Mg]c1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1Cc1ccccc1>>O=C(C[C@H]1CC[C@@H](CC(=O)c2cccs2)N1Cc1ccccc1)c1cccs1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccs2)N1Cc1ccccc1
 
 ## Reaction 31-373-CAS-19206282
 
@@ -581,7 +581,7 @@ Total reactions: 579
 - Yield %: 41
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][c]1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CN1[C@@H](CC(=O)c2cccs2)CC[C@H]1CC(=O)c1cccs1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccs2)N1C
+- SMILES: [Li]c1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CN1[C@@H](CC(=O)c2cccs2)CC[C@H]1CC(=O)c1cccs1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccs2)N1C
 
 ## Reaction 31-373-CAS-19206283
 
@@ -589,7 +589,7 @@ Total reactions: 579
 - Yield %: 18
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CN1[C@@H](CC(=O)c2cccs2)CC[C@H]1CC(=O)c1cccs1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccs2)N1C
+- SMILES: Br[Mg]c1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CN1[C@@H](CC(=O)c2cccs2)CC[C@H]1CC(=O)c1cccs1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccs2)N1C
 
 ## Reaction 31-373-CAS-19206284
 
@@ -597,7 +597,7 @@ Total reactions: 579
 - Yield %: 60
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][c]1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1S(=O)(=O)c1ccc(C)cc1>>Cc1ccc(S(=O)(=O)N2[C@@H](CC(=O)c3cccs3)CC[C@H]2CC(=O)c2cccs2)cc1
+- SMILES: [Li]c1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1S(=O)(=O)c1ccc(C)cc1>>Cc1ccc(S(=O)(=O)N2[C@@H](CC(=O)c3cccs3)CC[C@H]2CC(=O)c2cccs2)cc1
 
 ## Reaction 31-373-CAS-19206285
 
@@ -605,7 +605,7 @@ Total reactions: 579
 - Yield %: 70
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1S(=O)(=O)c1ccc(C)cc1>>Cc1ccc(S(=O)(=O)N2[C@@H](CC(=O)c3cccs3)CC[C@H]2CC(=O)c2cccs2)cc1
+- SMILES: Br[Mg]c1cccs1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1S(=O)(=O)c1ccc(C)cc1>>Cc1ccc(S(=O)(=O)N2[C@@H](CC(=O)c3cccs3)CC[C@H]2CC(=O)c2cccs2)cc1
 
 ## Reaction 31-373-CAS-19206286
 
@@ -613,7 +613,7 @@ Total reactions: 579
 - Yield %: 51
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][c]1cccnc1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CN1[C@@H](CC(=O)c2cccnc2)CC[C@H]1CC(=O)c1cccnc1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccnc2)N1C
+- SMILES: [Li]c1cccnc1.CON(C)C(=O)C[C@H]1CC[C@@H](CC(=O)N(C)OC)N1C>>CN1[C@@H](CC(=O)c2cccnc2)CC[C@H]1CC(=O)c1cccnc1.CNC(=O)C[C@@H]1CC[C@H](CC(=O)c2cccnc2)N1C
 
 ## Reaction 31-373-CAS-19378550
 
@@ -621,7 +621,7 @@ Total reactions: 579
 - Yield %: 72
 - Reagents: 77-92-9 (77-92-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 5614-37-9 (5614-37-9)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)[C@@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@H]1C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)[C@@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@H]1C(=O)c1ccccc1
 
 ## Reaction 31-373-CAS-19378551
 
@@ -629,7 +629,7 @@ Total reactions: 579
 - Yield %: 75
 - Reagents: 77-92-9 (77-92-9) [UNK]
 - Solvents: 108-88-3 (108-88-3), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1ccccc1
 
 ## Reaction 31-373-CAS-19378552
 
@@ -637,7 +637,7 @@ Total reactions: 579
 - Yield %: 29
 - Reagents: 77-92-9 (77-92-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 5614-37-9 (5614-37-9)
-- SMILES: Cc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>Cc1ccc(C(=O)[C@H]2CCCN2C(=O)OC(C)(C)C)cc1
+- SMILES: Cc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>Cc1ccc(C(=O)[C@H]2CCCN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19378553
 
@@ -645,7 +645,7 @@ Total reactions: 579
 - Yield %: 50
 - Reagents: 28987-79-3 (28987-79-3) [UNK], 77-92-9 (77-92-9) [ADDITIVE]
 - Solvents: 108-88-3 (108-88-3), 109-99-9 (109-99-9)
-- SMILES: Cc1ccc[c]([Mg][Br])c1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>Cc1cccc(C(=O)[C@H]2CCCN2C(=O)OC(C)(C)C)c1
+- SMILES: Cc1cccc([Mg]Br)c1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>Cc1cccc(C(=O)[C@H]2CCCN2C(=O)OC(C)(C)C)c1
 
 ## Reaction 31-373-CAS-19378554
 
@@ -653,7 +653,7 @@ Total reactions: 579
 - Yield %: 48
 - Reagents: 77-92-9 (77-92-9) [UNK]
 - Solvents: 96-47-9 (96-47-9), 108-88-3 (108-88-3)
-- SMILES: CC(C)(C)c1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1ccc(C(C)(C)C)cc1
+- SMILES: CC(C)(C)c1ccc([Mg]Br)cc1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1ccc(C(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19378555
 
@@ -661,7 +661,7 @@ Total reactions: 579
 - Yield %: 43
 - Reagents: 77-92-9 (77-92-9) [UNK]
 - Solvents: 108-88-3 (108-88-3), 109-99-9 (109-99-9)
-- SMILES: [Br][Mg][c]1ccc2ccccc2c1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1ccc2ccccc2c1
+- SMILES: Br[Mg]c1ccc2ccccc2c1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1ccc2ccccc2c1
 
 ## Reaction 31-373-CAS-19378556
 
@@ -669,7 +669,7 @@ Total reactions: 579
 - Yield %: 24
 - Reagents: 77-92-9 (77-92-9) [UNK]
 - Solvents: 108-88-3 (108-88-3), 5614-37-9 (5614-37-9)
-- SMILES: Fc1cc(F)c[c]([Mg][Br])c1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1cc(F)cc(F)c1
+- SMILES: Fc1cc(F)cc([Mg]Br)c1.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1cc(F)cc(F)c1
 
 ## Reaction 31-373-CAS-19378557
 
@@ -677,7 +677,7 @@ Total reactions: 579
 - Yield %: 47
 - Reagents: 77-92-9 (77-92-9) [UNK]
 - Solvents: 108-88-3 (108-88-3), 109-99-9 (109-99-9)
-- SMILES: CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C.COc1cc(OC)c[c]([Mg][Br])c1>>COc1cc(OC)cc(C(=O)[C@H]2CCCN2C(=O)OC(C)(C)C)c1
+- SMILES: CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C.COc1cc(OC)cc([Mg]Br)c1>>COc1cc(OC)cc(C(=O)[C@H]2CCCN2C(=O)OC(C)(C)C)c1
 
 ## Reaction 31-373-CAS-19378558
 
@@ -685,7 +685,7 @@ Total reactions: 579
 - Yield %: 51
 - Reagents: 77-92-9 (77-92-9) [UNK]
 - Solvents: 96-47-9 (96-47-9), 108-88-3 (108-88-3)
-- SMILES: Fc1c[c]([Mg][Br])cc(F)c1F.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1cc(F)c(F)c(F)c1
+- SMILES: Fc1cc([Mg]Br)cc(F)c1F.CON(C)C(=O)[C@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@@H]1C(=O)c1cc(F)c(F)c(F)c1
 
 ## Reaction 31-373-CAS-19473506
 
@@ -693,7 +693,7 @@ Total reactions: 579
 - Yield %: 65
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)CN(C)C(=O)OC(C)(C)C>>CN(CC(=O)c1ccccc1)C(=O)OC(C)(C)C
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)CN(C)C(=O)OC(C)(C)C>>CN(CC(=O)c1ccccc1)C(=O)OC(C)(C)C
 
 ## Reaction 31-373-CAS-19473507
 
@@ -701,7 +701,7 @@ Total reactions: 579
 - Yield %: 55
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cc[c]([Mg][Br])cc1.CON(C)C(=O)CN(C)C(=O)OC(C)(C)C>>COc1ccc(C(=O)CN(C)C(=O)OC(C)(C)C)cc1
+- SMILES: COc1ccc([Mg]Br)cc1.CON(C)C(=O)CN(C)C(=O)OC(C)(C)C>>COc1ccc(C(=O)CN(C)C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19473508
 
@@ -709,7 +709,7 @@ Total reactions: 579
 - Yield %: 75
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@H](Cc1ccccc1)N(C)C(=O)OC(C)(C)C>>COc1ccc(C(=O)[C@H](Cc2ccccc2)N(C)C(=O)OC(C)(C)C)cc1
+- SMILES: COc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@H](Cc1ccccc1)N(C)C(=O)OC(C)(C)C>>COc1ccc(C(=O)[C@H](Cc2ccccc2)N(C)C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19473509
 
@@ -717,7 +717,7 @@ Total reactions: 579
 - Yield %: 43
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)[C@H](C(C)C)N(C)C(=O)OC(C)(C)C>>CC(C)[C@H](C(=O)c1ccccc1)N(C)C(=O)OC(C)(C)C
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)[C@H](C(C)C)N(C)C(=O)OC(C)(C)C>>CC(C)[C@H](C(=O)c1ccccc1)N(C)C(=O)OC(C)(C)C
 
 ## Reaction 31-373-CAS-19473510
 
@@ -725,7 +725,7 @@ Total reactions: 579
 - Yield %: 100
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cc[c]([Mg][Br])cc1.CCN(CC(=O)N(C)OC)C(=O)OC(C)(C)C>>CCN(CC(=O)c1ccc(OC)cc1)C(=O)OC(C)(C)C
+- SMILES: COc1ccc([Mg]Br)cc1.CCN(CC(=O)N(C)OC)C(=O)OC(C)(C)C>>CCN(CC(=O)c1ccc(OC)cc1)C(=O)OC(C)(C)C
 
 ## Reaction 31-373-CAS-19473511
 
@@ -733,7 +733,7 @@ Total reactions: 579
 - Yield %: 88
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CCN(CC(=O)N(C)OC)C(=O)OC(C)(C)C>>CCN(CC(=O)c1ccccc1)C(=O)OC(C)(C)C
+- SMILES: Br[Mg]c1ccccc1.CCN(CC(=O)N(C)OC)C(=O)OC(C)(C)C>>CCN(CC(=O)c1ccccc1)C(=O)OC(C)(C)C
 
 ## Reaction 31-373-CAS-19473512
 
@@ -741,7 +741,7 @@ Total reactions: 579
 - Yield %: 29
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@@H]1CCCN1C(=O)OC(C)(C)C>>COc1ccc(C(=O)[C@@H]2CCCN2C(=O)OC(C)(C)C)cc1
+- SMILES: COc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@@H]1CCCN1C(=O)OC(C)(C)C>>COc1ccc(C(=O)[C@@H]2CCCN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19473513
 
@@ -844,69 +844,69 @@ Total reactions: 579
 - Type: Weinreb amide
 - Yield %: 62
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)C[C@@H]1CCCN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)C[C@@H]2CCCN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)C[C@@H]1CCCN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)C[C@@H]2CCCN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587765
 
 - Type: Weinreb amide
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)C[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)C[C@@H]2C[C@@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)C[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)C[C@@H]2C[C@@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587778
 
 - Type: Weinreb amide
 - Yield %: 68
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)C[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)C[C@H]2C[C@H](CO[Si](c3ccccc3)(c3ccccc3)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)C[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)C[C@H]2C[C@H](CO[Si](c3ccccc3)(c3ccccc3)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587784
 
 - Type: Weinreb amide
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)CC[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@H]2C[C@H](CO[Si](c3ccccc3)(c3ccccc3)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)CC[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@H]2C[C@H](CO[Si](c3ccccc3)(c3ccccc3)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587791
 
 - Type: Weinreb amide
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)CC[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@@H]2C[C@@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)CC[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@@H]2C[C@@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587806
 
 - Type: Weinreb amide
 - Yield %: 65
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@@H]1CCCN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@@H]2CCCN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@@H]1CCCN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@@H]2CCCN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587809
 
 - Type: Weinreb amide
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@@H]2C[C@@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@@H]2C[C@@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587813
 
 - Type: Weinreb amide
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@H]1C[C@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@H]2C[C@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@H]1C[C@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@H]2C[C@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587821
 
 - Type: Weinreb amide
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@H]2C[C@H](CO[Si](c3ccccc3)(c3ccccc3)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)[C@H]1C[C@H](CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)[C@H]2C[C@H](CO[Si](c3ccccc3)(c3ccccc3)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587825
 
 - Type: Weinreb amide
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CON(C)C(=O)[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C.CCCCCCCCc1ccc([CH2][Mg][Br])cc1>>CCCCCCCCc1ccc(CC(=O)[C@@H]2C[C@@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CON(C)C(=O)[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C.CCCCCCCCc1ccc(C[Mg]Br)cc1>>CCCCCCCCc1ccc(CC(=O)[C@@H]2C[C@@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19587829
 
 - Type: Weinreb amide
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CON(C)C(=O)[C@H]1C[C@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C.CCCCCCCCc1ccc([CH2][Mg][Br])cc1>>CCCCCCCCc1ccc(CC(=O)[C@H]2C[C@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
+- SMILES: CON(C)C(=O)[C@H]1C[C@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C.CCCCCCCCc1ccc(C[Mg]Br)cc1>>CCCCCCCCc1ccc(CC(=O)[C@H]2C[C@H](O[Si](C)(C)C(C)(C)C)CN2C(=O)OC(C)(C)C)cc1
 
 ## Reaction 31-373-CAS-19645928
 
@@ -922,7 +922,7 @@ Total reactions: 579
 - Yield %: 70
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 25265-68-3 (25265-68-3), 7732-18-5 (7732-18-5)
-- SMILES: Cc1cc(C)c[c]([Mg][Br])c1.CON(CCN(Cc1ccc(C(C)(C)C)cc1)C(=O)OC(C)(C)C)C(=O)CCCC(c1ccccc1)c1ccccc1>>Cc1cc(C)cc(C(=O)CCCC(c2ccccc2)c2ccccc2)c1
+- SMILES: Cc1cc(C)cc([Mg]Br)c1.CON(CCN(Cc1ccc(C(C)(C)C)cc1)C(=O)OC(C)(C)C)C(=O)CCCC(c1ccccc1)c1ccccc1>>Cc1cc(C)cc(C(=O)CCCC(c2ccccc2)c2ccccc2)c1
 
 ## Reaction 31-373-CAS-20202229
 
@@ -930,7 +930,7 @@ Total reactions: 579
 - Yield %: 79
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)Cc1c(-c2ccccc2)[nH]c2ccccc12>>O=C(Cc1c(-c2ccccc2)[nH]c2ccccc12)c1ccccc1.CNC(=O)C(c1ccccc1)c1c(-c2ccccc2)[nH]c2ccccc12
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)Cc1c(-c2ccccc2)[nH]c2ccccc12>>O=C(Cc1c(-c2ccccc2)[nH]c2ccccc12)c1ccccc1.CNC(=O)C(c1ccccc1)c1c(-c2ccccc2)[nH]c2ccccc12
 
 ## Reaction 31-373-CAS-20202230
 
@@ -938,7 +938,7 @@ Total reactions: 579
 - Yield %: 50
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: COc1cc[c]([Mg][Br])cc1.CON(C)C(=O)Cc1c(-c2ccccc2)[nH]c2ccccc12>>COc1ccc(C(=O)Cc2c(-c3ccccc3)[nH]c3ccccc23)cc1.CNC(=O)C(c1ccc(OC)cc1)c1c(-c2ccccc2)[nH]c2ccccc12
+- SMILES: COc1ccc([Mg]Br)cc1.CON(C)C(=O)Cc1c(-c2ccccc2)[nH]c2ccccc12>>COc1ccc(C(=O)Cc2c(-c3ccccc3)[nH]c3ccccc23)cc1.CNC(=O)C(c1ccc(OC)cc1)c1c(-c2ccccc2)[nH]c2ccccc12
 
 ## Reaction 31-373-CAS-20202231
 
@@ -946,14 +946,14 @@ Total reactions: 579
 - Yield %: 37
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: Clc1cc[c]([Mg][Br])cc1.CON(C)C(=O)Cc1c(-c2ccccc2)[nH]c2ccccc12>>O=C(Cc1c(-c2ccccc2)[nH]c2ccccc12)c1ccc(Cl)cc1.CNC(=O)C(c1ccc(Cl)cc1)c1c(-c2ccccc2)[nH]c2ccccc12
+- SMILES: Clc1ccc([Mg]Br)cc1.CON(C)C(=O)Cc1c(-c2ccccc2)[nH]c2ccccc12>>O=C(Cc1c(-c2ccccc2)[nH]c2ccccc12)c1ccc(Cl)cc1.CNC(=O)C(c1ccc(Cl)cc1)c1c(-c2ccccc2)[nH]c2ccccc12
 
 ## Reaction 31-373-CAS-20326124
 
 - Type: Weinreb amide
 - Yield %: 60
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: C[CH2][Mg][Br].C=C[C@H](CC(=O)N1CCOCC1)c1ccccc1>>C=C[C@H](CC(=O)CC)c1ccccc1
+- SMILES: CC[Mg]Br.C=C[C@H](CC(=O)N1CCOCC1)c1ccccc1>>C=C[C@H](CC(=O)CC)c1ccccc1
 
 ## Reaction 31-373-CAS-20640561
 
@@ -1169,28 +1169,28 @@ Total reactions: 579
 - Type: Weinreb amide
 - Yield %: 65
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: CON(C)C(=O)CCC(=O)N(C)OC.[Br][Mg][C]1=Cc2ccccc2CC1>>O=C(CCC(=O)C1=Cc2ccccc2CC1)C1=Cc2ccccc2CC1
+- SMILES: CON(C)C(=O)CCC(=O)N(C)OC.Br[Mg]C1=Cc2ccccc2CC1>>O=C(CCC(=O)C1=Cc2ccccc2CC1)C1=Cc2ccccc2CC1
 
 ## Reaction 31-373-CAS-20702252
 
 - Type: Weinreb amide
 - Yield %: 84
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: CON(C)C(=O)CCC(=O)N(C)OC.[Br][Mg][C]1=Cc2ccccc2CCC1>>O=C(CCC(=O)C1=Cc2ccccc2CCC1)C1=Cc2ccccc2CCC1
+- SMILES: CON(C)C(=O)CCC(=O)N(C)OC.Br[Mg]C1=Cc2ccccc2CCC1>>O=C(CCC(=O)C1=Cc2ccccc2CCC1)C1=Cc2ccccc2CCC1
 
 ## Reaction 31-373-CAS-20702253
 
 - Type: Weinreb amide
 - Yield %: 73
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: [Br][Mg]/[CH]=C/c1ccccc1.CON(C)C(=O)CCC(=O)N(C)OC>>O=C(/C=C/c1ccccc1)CCC(=O)/C=C/c1ccccc1
+- SMILES: Br[Mg]/C=C/c1ccccc1.CON(C)C(=O)CCC(=O)N(C)OC>>O=C(/C=C/c1ccccc1)CCC(=O)/C=C/c1ccccc1
 
 ## Reaction 31-373-CAS-20702254
 
 - Type: Weinreb amide
 - Yield %: 11
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: CON(C)C(=O)CCC(=O)N(C)OC.[Br][Mg][CH]=CC1CCCCC1>>O=C(/C=C/C1CCCCC1)CCC(=O)/C=C/C1CCCCC1.O=C(/C=C\C1CCCCC1)CCC(=O)/C=C/C1CCCCC1.O=C(/C=C\C1CCCCC1)CCC(=O)/C=C\C1CCCCC1
+- SMILES: CON(C)C(=O)CCC(=O)N(C)OC.Br[Mg]C=CC1CCCCC1>>O=C(/C=C/C1CCCCC1)CCC(=O)/C=C/C1CCCCC1.O=C(/C=C\C1CCCCC1)CCC(=O)/C=C/C1CCCCC1.O=C(/C=C\C1CCCCC1)CCC(=O)/C=C\C1CCCCC1
 
 ## Reaction 31-373-CAS-20702255
 
@@ -2145,63 +2145,63 @@ Total reactions: 579
 - Yield %: 93
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C(\C)c1ccc(Br)cc1>>CC(=O)/C=C(\C)c1ccc(Br)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C(\C)c1ccc(Br)cc1>>CC(=O)/C=C(\C)c1ccc(Br)cc1
 
 ## Reaction 31-373-CAS-22739632
 
 - Type: Weinreb amide
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CC(C)[CH2][Mg][Cl].CON(C)C(=O)[C@@H](O)Cc1ccccc1>>CC(C)CC(=O)[C@@H](O)Cc1ccccc1
+- SMILES: CC(C)C[Mg]Cl.CON(C)C(=O)[C@@H](O)Cc1ccccc1>>CC(C)CC(=O)[C@@H](O)Cc1ccccc1
 
 ## Reaction 31-373-CAS-22739633
 
 - Type: Weinreb amide
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CC(C)[CH2][Mg][Cl].CON(C)C(=O)[C@@H](O)Cc1ccc(O)cc1>>CC(C)CC(=O)[C@@H](O)Cc1ccc(O)cc1
+- SMILES: CC(C)C[Mg]Cl.CON(C)C(=O)[C@@H](O)Cc1ccc(O)cc1>>CC(C)CC(=O)[C@@H](O)Cc1ccc(O)cc1
 
 ## Reaction 31-373-CAS-22739634
 
 - Type: Weinreb amide
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Cl][Mg][CH2]c1ccccc1.CON(C)C(=O)[C@@H](O)Cc1ccc(O)cc1>>O=C(Cc1ccccc1)[C@@H](O)Cc1ccc(O)cc1
+- SMILES: Cl[Mg]Cc1ccccc1.CON(C)C(=O)[C@@H](O)Cc1ccc(O)cc1>>O=C(Cc1ccccc1)[C@@H](O)Cc1ccc(O)cc1
 
 ## Reaction 31-373-CAS-22739635
 
 - Type: Weinreb amide
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Cl][Mg][CH2]c1ccccc1.CON(C)C(=O)[C@@H](O)Cc1c[nH]c2ccccc12>>O=C(Cc1ccccc1)[C@@H](O)Cc1c[nH]c2ccccc12
+- SMILES: Cl[Mg]Cc1ccccc1.CON(C)C(=O)[C@@H](O)Cc1c[nH]c2ccccc12>>O=C(Cc1ccccc1)[C@@H](O)Cc1c[nH]c2ccccc12
 
 ## Reaction 31-373-CAS-22739636
 
 - Type: Weinreb amide
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Cl][Mg][CH2]c1ccc(OCc2ccccc2)cc1.CON(C)C(=O)[C@@H](O)Cc1c[nH]c2ccccc12>>O=C(Cc1ccc(OCc2ccccc2)cc1)[C@@H](O)Cc1c[nH]c2ccccc12
+- SMILES: Cl[Mg]Cc1ccc(OCc2ccccc2)cc1.CON(C)C(=O)[C@@H](O)Cc1c[nH]c2ccccc12>>O=C(Cc1ccc(OCc2ccccc2)cc1)[C@@H](O)Cc1c[nH]c2ccccc12
 
 ## Reaction 31-373-CAS-22739637
 
 - Type: Weinreb amide
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Cl][Mg][CH2]c1ccc(OCc2ccccc2)cc1.CON(C)C(=O)[C@@H](O)Cc1ccccc1>>O=C(Cc1ccc(OCc2ccccc2)cc1)[C@@H](O)Cc1ccccc1
+- SMILES: Cl[Mg]Cc1ccc(OCc2ccccc2)cc1.CON(C)C(=O)[C@@H](O)Cc1ccccc1>>O=C(Cc1ccc(OCc2ccccc2)cc1)[C@@H](O)Cc1ccccc1
 
 ## Reaction 31-373-CAS-22739638
 
 - Type: Weinreb amide
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Cl][Mg][CH2]c1ccc(OCc2ccccc2)cc1.CON(C)C(=O)[C@@H](O)Cc1ccc(O)cc1>>O=C(Cc1ccc(OCc2ccccc2)cc1)[C@@H](O)Cc1ccc(O)cc1
+- SMILES: Cl[Mg]Cc1ccc(OCc2ccccc2)cc1.CON(C)C(=O)[C@@H](O)Cc1ccc(O)cc1>>O=C(Cc1ccc(OCc2ccccc2)cc1)[C@@H](O)Cc1ccc(O)cc1
 
 ## Reaction 31-373-CAS-22739639
 
 - Type: Weinreb amide
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Cl][Mg][CH2]c1ccccc1.CON(C)C(=O)[C@@H](O)Cc1ccccc1>>O=C(Cc1ccccc1)[C@@H](O)Cc1ccccc1
+- SMILES: Cl[Mg]Cc1ccccc1.CON(C)C(=O)[C@@H](O)Cc1ccccc1>>O=C(Cc1ccccc1)[C@@H](O)Cc1ccccc1
 
 ## Reaction 31-373-CAS-22844576
 
@@ -2209,7 +2209,7 @@ Total reactions: 579
 - Yield %: 69
 - Reagents: 4111-54-0 (4111-54-0) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH](Br)Br.COC(=O)c1ccc(C(=O)N(C)OC)cc1>>COC(=O)c1ccc(C(=O)C(Br)Br)cc1
+- SMILES: [Li]C(Br)Br.COC(=O)c1ccc(C(=O)N(C)OC)cc1>>COC(=O)c1ccc(C(=O)C(Br)Br)cc1
 
 ## Reaction 31-373-CAS-22845143
 
@@ -2217,7 +2217,7 @@ Total reactions: 579
 - Yield %: 67
 - Reagents: 4111-54-0 (4111-54-0) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH](Cl)Cl.COC(=O)c1ccc(C(=O)N(C)OC)cc1>>COC(=O)c1ccc(C(=O)C(Cl)Cl)cc1
+- SMILES: [Li]C(Cl)Cl.COC(=O)c1ccc(C(=O)N(C)OC)cc1>>COC(=O)c1ccc(C(=O)C(Cl)Cl)cc1
 
 ## Reaction 31-373-CAS-22845308
 
@@ -2225,7 +2225,7 @@ Total reactions: 579
 - Yield %: 79
 - Reagents: 4111-54-0 (4111-54-0) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH](Br)Br.CON(C)C(=O)c1ccc(C(=O)N(C)OC)cc1>>O=C(c1ccc(C(=O)C(Br)Br)cc1)C(Br)Br
+- SMILES: [Li]C(Br)Br.CON(C)C(=O)c1ccc(C(=O)N(C)OC)cc1>>O=C(c1ccc(C(=O)C(Br)Br)cc1)C(Br)Br
 
 ## Reaction 31-373-CAS-22845746
 
@@ -2233,50 +2233,50 @@ Total reactions: 579
 - Yield %: 90
 - Reagents: 4111-54-0 (4111-54-0) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH](Cl)Cl.CON(C)C(=O)c1ccc(C(=O)N(C)OC)cc1>>O=C(c1ccc(C(=O)C(Cl)Cl)cc1)C(Cl)Cl
+- SMILES: [Li]C(Cl)Cl.CON(C)C(=O)c1ccc(C(=O)N(C)OC)cc1>>O=C(c1ccc(C(=O)C(Cl)Cl)cc1)C(Cl)Cl
 
 ## Reaction 31-373-CAS-23287669
 
 - Type: Weinreb amide
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1)
-- SMILES: [Li][c]1ccccc1.COc1ccc(CCC(=O)N(C)OC)cc1OC>>COc1ccc(CCC(=O)c2ccccc2)cc1OC
+- SMILES: [Li]c1ccccc1.COc1ccc(CCC(=O)N(C)OC)cc1OC>>COc1ccc(CCC(=O)c2ccccc2)cc1OC
 
 ## Reaction 31-373-CAS-23287835
 
 - Type: Weinreb amide
 - Yield %: 54
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)CC1c2ccccc2-c2ccccc21>>O=C(CC1c2ccccc2-c2ccccc21)c1ccccc1
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)CC1c2ccccc2-c2ccccc21>>O=C(CC1c2ccccc2-c2ccccc21)c1ccccc1
 
 ## Reaction 31-373-CAS-23288062
 
 - Type: Weinreb amide
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)CCc1ccccc1C>>Cc1ccccc1CCC(=O)c1ccccc1
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)CCc1ccccc1C>>Cc1ccccc1CCC(=O)c1ccccc1
 
 ## Reaction 31-373-CAS-23289548
 
 - Type: Weinreb amide
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)CCc1ccc(C(F)(F)F)cc1>>O=C(CCc1ccc(C(F)(F)F)cc1)c1ccccc1
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)CCc1ccc(C(F)(F)F)cc1>>O=C(CCc1ccc(C(F)(F)F)cc1)c1ccccc1
 
 ## Reaction 31-373-CAS-23290444
 
 - Type: Weinreb amide
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)CC1CCc2ccccc21>>O=C(CC1CCc2ccccc21)c1ccccc1
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)CC1CCc2ccccc21>>O=C(CC1CCc2ccccc21)c1ccccc1
 
 ## Reaction 31-373-CAS-23293156
 
 - Type: Weinreb amide
 - Solvents: 109-99-9 (109-99-9), 142-96-1 (142-96-1)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)CCc1cccc(F)c1>>O=C(CCc1cccc(F)c1)c1ccccc1
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)CCc1cccc(F)c1>>O=C(CCc1cccc(F)c1)c1ccccc1
 
 ## Reaction 31-373-CAS-23425702
 
 - Type: Weinreb amide
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)[C@@H]1COc2ccccc2O1>>CC(=O)[C@@H]1COc2ccccc2O1
+- SMILES: C[Mg]Br.CON(C)C(=O)[C@@H]1COc2ccccc2O1>>CC(=O)[C@@H]1COc2ccccc2O1
 
 ## Reaction 31-373-CAS-23493558
 
@@ -2299,7 +2299,7 @@ Total reactions: 579
 - Yield %: 91
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Cl].CC[C@@H]1CN(C(=O)OCc2ccccc2)C[C@@H]1C(=O)N(C)OC>>CC[C@@H]1CN(C(=O)OCc2ccccc2)C[C@@H]1C(C)=O
+- SMILES: C[Mg]Cl.CC[C@@H]1CN(C(=O)OCc2ccccc2)C[C@@H]1C(=O)N(C)OC>>CC[C@@H]1CN(C(=O)OCc2ccccc2)C[C@@H]1C(C)=O
 
 ## Reaction 31-373-CAS-23800693
 
@@ -2315,7 +2315,7 @@ Total reactions: 579
 - Yield %: 89
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Cl].CC[C@@H]1CN(C(=O)OCc2ccccc2)C[C@@H]1C(=O)N(C)OC>>CC[C@@H]1CN(C(=O)OCc2ccccc2)C[C@@H]1C(C)=O
+- SMILES: C[Mg]Cl.CC[C@@H]1CN(C(=O)OCc2ccccc2)C[C@@H]1C(=O)N(C)OC>>CC[C@@H]1CN(C(=O)OCc2ccccc2)C[C@@H]1C(C)=O
 
 ## Reaction 31-373-CAS-23801167
 
@@ -2323,7 +2323,7 @@ Total reactions: 579
 - Yield %: 98
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Cl].CCC1=C(C(=O)N(C)OC)CN(C(=O)OCc2ccccc2)C1>>CCC1=C(C(C)=O)CN(C(=O)OCc2ccccc2)C1
+- SMILES: C[Mg]Cl.CCC1=C(C(=O)N(C)OC)CN(C(=O)OCc2ccccc2)C1>>CCC1=C(C(C)=O)CN(C(=O)OCc2ccccc2)C1
 
 ## Reaction 31-614-CAS-23991708
 
@@ -2331,7 +2331,7 @@ Total reactions: 579
 - Yield %: 87
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [Li][CH2]CCC.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>CCCCC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.CCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1
+- SMILES: [Li]CCCC.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>CCCCC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.CCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-23991709
 
@@ -2339,7 +2339,7 @@ Total reactions: 579
 - Yield %: 92
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: C=[CH][Mg][Cl].CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>C=CC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.C=CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
+- SMILES: C=C[Mg]Cl.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>C=CC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.C=CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-23991718
 
@@ -2347,7 +2347,7 @@ Total reactions: 579
 - Yield %: 32
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: C#[C][Mg][Cl].CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>C#CC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.C#CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
+- SMILES: C#C[Mg]Cl.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>C#CC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.C#CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-23991720
 
@@ -2355,7 +2355,7 @@ Total reactions: 579
 - Yield %: 74
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>O=C(/C(Cl)=C/CCCCOCc1ccccc1)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>O=C(/C(Cl)=C/CCCCOCc1ccccc1)c1ccccc1
 
 ## Reaction 31-614-CAS-23991722
 
@@ -2363,7 +2363,7 @@ Total reactions: 579
 - Yield %: 80
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>O=C(c1ccccc1)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.O=C(/C(Cl)=C/CCCCOCc1ccccc1)c1ccccc1
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>O=C(c1ccccc1)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.O=C(/C(Cl)=C/CCCCOCc1ccccc1)c1ccccc1
 
 ## Reaction 31-614-CAS-23991723
 
@@ -2371,7 +2371,7 @@ Total reactions: 579
 - Yield %: 40
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [Li][CH2]CCC.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>CCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1.CCCCC(=O)/C=C/CCCCOCc1ccccc1
+- SMILES: [Li]CCCC.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>CCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1.CCCCC(=O)/C=C/CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-23991724
 
@@ -2379,7 +2379,7 @@ Total reactions: 579
 - Yield %: 16
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [Li][CH2]CCC.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>CCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1.CCCCC(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1
+- SMILES: [Li]CCCC.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>CCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1.CCCCC(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-23991725
 
@@ -2395,7 +2395,7 @@ Total reactions: 579
 - Yield %: 41
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: CCCC[CH2][Mg][Br].CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>CCCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1.CCCCCC(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1
+- SMILES: CCCCC[Mg]Br.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>CCCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1.CCCCCC(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-23991728
 
@@ -2403,7 +2403,7 @@ Total reactions: 579
 - Yield %: 84
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: CCCC[CH2][Mg][Br].CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>CCCCCC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.CCCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1
+- SMILES: CCCCC[Mg]Br.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>CCCCCC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.CCCCCC(=O)/C(Cl)=C/CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-23991729
 
@@ -2411,7 +2411,7 @@ Total reactions: 579
 - Yield %: 61
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>O=C(c1ccccc1)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.O=C(/C(Cl)=C/CCCCOCc1ccccc1)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>O=C(c1ccccc1)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.O=C(/C(Cl)=C/CCCCOCc1ccccc1)c1ccccc1
 
 ## Reaction 31-614-CAS-23991730
 
@@ -2419,7 +2419,7 @@ Total reactions: 579
 - Yield %: 78
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [Li][c]1ccccc1.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>O=C(/C(Cl)=C/CCCCOCc1ccccc1)c1ccccc1
+- SMILES: [Li]c1ccccc1.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>O=C(/C(Cl)=C/CCCCOCc1ccccc1)c1ccccc1
 
 ## Reaction 31-614-CAS-23991732
 
@@ -2435,7 +2435,7 @@ Total reactions: 579
 - Yield %: 90
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: C=[CH][Mg][Cl].CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>C=CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
+- SMILES: C=C[Mg]Cl.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>C=CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-23991735
 
@@ -2443,7 +2443,7 @@ Total reactions: 579
 - Yield %: 89
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>CC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1>>CC(=O)[C@@H](Cl)[C@@H](Cl)CCCCOCc1ccccc1.CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-23991738
 
@@ -2451,7 +2451,7 @@ Total reactions: 579
 - Yield %: 11
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>CC(=O)/C(Cl)=C/CCCCOCc1ccccc1.CC(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>CC(=O)/C(Cl)=C/CCCCOCc1ccccc1.CC(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-24044182
 
@@ -2459,7 +2459,7 @@ Total reactions: 579
 - Yield %: 94
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 123-91-1 (123-91-1)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)[C@@H](Cl)[C@H](Cl)CCCCOCc1ccccc1>>CC(=O)/C(Cl)=C/CCCCOCc1ccccc1
 
 ## Reaction 31-614-CAS-24226797
 
@@ -2467,7 +2467,7 @@ Total reactions: 579
 - Yield %: 84
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: Cc1cc[c]([Mg][Br])cc1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccc(C)cc1
+- SMILES: Cc1ccc([Mg]Br)cc1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccc(C)cc1
 
 ## Reaction 31-614-CAS-24226806
 
@@ -2475,7 +2475,7 @@ Total reactions: 579
 - Yield %: 97
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1ccc[c]([Mg][Br])c1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1cccc(OC)c1
+- SMILES: COc1cccc([Mg]Br)c1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1cccc(OC)c1
 
 ## Reaction 31-614-CAS-24226807
 
@@ -2483,7 +2483,7 @@ Total reactions: 579
 - Yield %: 84
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: Clc1cc[c]([Mg][Br])cc1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccc(Cl)cc1
+- SMILES: Clc1ccc([Mg]Br)cc1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccc(Cl)cc1
 
 ## Reaction 31-614-CAS-24226808
 
@@ -2491,7 +2491,7 @@ Total reactions: 579
 - Yield %: 89
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cc[c]([Mg][Br])cc1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccc(OC)cc1
+- SMILES: COc1ccc([Mg]Br)cc1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccc(OC)cc1
 
 ## Reaction 31-614-CAS-24226811
 
@@ -2507,7 +2507,7 @@ Total reactions: 579
 - Yield %: 73
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.C=CC[C@@H](CCC)C(=O)N(C)OC>>C=CC[C@@H](CCC)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.C=CC[C@@H](CCC)C(=O)N(C)OC>>C=CC[C@@H](CCC)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-24226815
 
@@ -2523,7 +2523,7 @@ Total reactions: 579
 - Yield %: 88
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CCCC[C@H](CCC)C(=O)N(C)OC>>CCCC[C@H](CCC)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CCCC[C@H](CCC)C(=O)N(C)OC>>CCCC[C@H](CCC)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-24226820
 
@@ -2531,7 +2531,7 @@ Total reactions: 579
 - Yield %: 96
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cccc[c]1[Mg][Br].CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccccc1OC
+- SMILES: COc1ccccc1[Mg]Br.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccccc1OC
 
 ## Reaction 31-614-CAS-24226823
 
@@ -2539,7 +2539,7 @@ Total reactions: 579
 - Yield %: 80
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.C=CC[C@@H](CCCC)C(=O)N(C)OC>>C=CC[C@@H](CCCC)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.C=CC[C@@H](CCCC)C(=O)N(C)OC>>C=CC[C@@H](CCCC)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-24226824
 
@@ -2547,7 +2547,7 @@ Total reactions: 579
 - Yield %: 83
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)[C@H](C)Cc1ccccc1>>C[C@H](Cc1ccccc1)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)[C@H](C)Cc1ccccc1>>C[C@H](Cc1ccccc1)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-24226827
 
@@ -2555,7 +2555,7 @@ Total reactions: 579
 - Yield %: 81
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cc[c]([Mg][Br])cc1.COc1ccc2cc([C@H](C)C(=O)N(C)OC)ccc2c1>>COc1ccc(C(=O)[C@@H](C)c2ccc3cc(OC)ccc3c2)cc1
+- SMILES: COc1ccc([Mg]Br)cc1.COc1ccc2cc([C@H](C)C(=O)N(C)OC)ccc2c1>>COc1ccc(C(=O)[C@@H](C)c2ccc3cc(OC)ccc3c2)cc1
 
 ## Reaction 31-614-CAS-24226829
 
@@ -2563,7 +2563,7 @@ Total reactions: 579
 - Yield %: 79
 - Reagents: 1191-15-7 (1191-15-7) [UNK], 304-59-6 (304-59-6) [ADDITIVE], 12125-02-9 (12125-02-9) [ADDITIVE], 87413-09-0 (87413-09-0) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3), 7732-18-5 (7732-18-5), 75-09-2 (75-09-2)
-- SMILES: COc1ccc(COCCC[C@H](CCCO[Si](C)(C)C(C)(C)C)C(=O)N(C)OC)cc1.COc1cc[c]([Mg][Br])cc1>>COc1ccc(COCCC[C@H](CCCO[Si](C)(C)C(C)(C)C)C(=O)c2ccc(OC)cc2)cc1
+- SMILES: COc1ccc(COCCC[C@H](CCCO[Si](C)(C)C(C)(C)C)C(=O)N(C)OC)cc1.COc1ccc([Mg]Br)cc1>>COc1ccc(COCCC[C@H](CCCO[Si](C)(C)C(C)(C)C)C(=O)c2ccc(OC)cc2)cc1
 
 ## Reaction 31-614-CAS-24226830
 
@@ -2579,7 +2579,7 @@ Total reactions: 579
 - Yield %: 86
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cc[c]([Mg][Br])cc1.COc1ccc([C@H](C)C(=O)N(C)OC)cc1>>COc1ccc(C(=O)[C@@H](C)c2ccc(OC)cc2)cc1
+- SMILES: COc1ccc([Mg]Br)cc1.COc1ccc([C@H](C)C(=O)N(C)OC)cc1>>COc1ccc(C(=O)[C@@H](C)c2ccc(OC)cc2)cc1
 
 ## Reaction 31-614-CAS-24226837
 
@@ -2587,7 +2587,7 @@ Total reactions: 579
 - Yield %: 81
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CCC[C@H](Cc1ccccc1)C(=O)N(C)OC>>CCC[C@H](Cc1ccccc1)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CCC[C@H](Cc1ccccc1)C(=O)N(C)OC>>CCC[C@H](Cc1ccccc1)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-24226838
 
@@ -2595,28 +2595,28 @@ Total reactions: 579
 - Yield %: 70
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.C=CC[C@@H](CC)C(=O)N(C)OC>>C=CC[C@@H](CC)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.C=CC[C@@H](CC)C(=O)N(C)OC>>C=CC[C@@H](CC)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-24226916
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CC[C@H](C(=O)N(C)OC)c1ccccc1>>CC[C@H](C(=O)c1ccccc1)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CC[C@H](C(=O)N(C)OC)c1ccccc1>>CC[C@H](C(=O)c1ccccc1)c1ccccc1
 
 ## Reaction 31-614-CAS-24226920
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CC[C@H](C(=O)N(C)OC)c1ccc(C(F)(F)F)cc1>>CC[C@H](C(=O)c1ccccc1)c1ccc(C(F)(F)F)cc1
+- SMILES: Br[Mg]c1ccccc1.CC[C@H](C(=O)N(C)OC)c1ccc(C(F)(F)F)cc1>>CC[C@H](C(=O)c1ccccc1)c1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-614-CAS-24226937
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CC[C@H](C)C(=O)N(C)OC>>CC[C@H](C)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-25042618
 
@@ -2624,7 +2624,7 @@ Total reactions: 579
 - Yield %: 95
 - Reagents: 7732-18-5 (7732-18-5) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: COc1ccc[c]([Mg][Br])c1.CON(C)C(=O)c1cccc(Br)c1>>COc1cccc(C(=O)c2cccc(Br)c2)c1
+- SMILES: COc1cccc([Mg]Br)c1.CON(C)C(=O)c1cccc(Br)c1>>COc1cccc(C(=O)c2cccc(Br)c2)c1
 
 ## Reaction 31-614-CAS-25125297
 
@@ -2746,98 +2746,98 @@ Total reactions: 579
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/c1ccccc1>>CC(=O)/C(C)=C/c1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/c1ccccc1>>CC(=O)/C(C)=C/c1ccccc1
 
 ## Reaction 31-614-CAS-31904327
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/c1ccc(Br)cc1>>CC(=O)/C(C)=C/c1ccc(Br)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/c1ccc(Br)cc1>>CC(=O)/C(C)=C/c1ccc(Br)cc1
 
 ## Reaction 31-614-CAS-31904328
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/c1ccc(F)cc1>>CC(=O)/C(C)=C/c1ccc(F)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/c1ccc(F)cc1>>CC(=O)/C(C)=C/c1ccc(F)cc1
 
 ## Reaction 31-614-CAS-31904330
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/c1ccc(Cl)cc1>>CC(=O)/C(C)=C/c1ccc(Cl)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/c1ccc(Cl)cc1>>CC(=O)/C(C)=C/c1ccc(Cl)cc1
 
 ## Reaction 31-614-CAS-31904331
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CCOC(=O)c1ccc(/C=C(\C)C(=O)N(C)OC)cc1>>CCOC(=O)c1ccc(/C=C(\C)C(C)=O)cc1
+- SMILES: C[Mg]Br.CCOC(=O)c1ccc(/C=C(\C)C(=O)N(C)OC)cc1>>CCOC(=O)c1ccc(/C=C(\C)C(C)=O)cc1
 
 ## Reaction 31-614-CAS-31904333
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COc1ccc(/C=C(\C)C(=O)N(C)OC)cc1>>COc1ccc(/C=C(\C)C(C)=O)cc1
+- SMILES: C[Mg]Br.COc1ccc(/C=C(\C)C(=O)N(C)OC)cc1>>COc1ccc(/C=C(\C)C(C)=O)cc1
 
 ## Reaction 31-614-CAS-31904334
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/c1ccc2ccccc2c1>>CC(=O)/C(C)=C/c1ccc2ccccc2c1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/c1ccc2ccccc2c1>>CC(=O)/C(C)=C/c1ccc2ccccc2c1
 
 ## Reaction 31-614-CAS-31904335
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/c1ccc(C)cc1>>CC(=O)/C(C)=C/c1ccc(C)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/c1ccc(C)cc1>>CC(=O)/C(C)=C/c1ccc(C)cc1
 
 ## Reaction 31-614-CAS-31904336
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COc1ccc(/C=C(\C)C(=O)N(C)OC)c(OC)c1>>COc1ccc(/C=C(\C)C(C)=O)c(OC)c1
+- SMILES: C[Mg]Br.COc1ccc(/C=C(\C)C(=O)N(C)OC)c(OC)c1>>COc1ccc(/C=C(\C)C(C)=O)c(OC)c1
 
 ## Reaction 31-614-CAS-31904337
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COc1cccc(/C=C(\C)C(=O)N(C)OC)c1>>COc1cccc(/C=C(\C)C(C)=O)c1
+- SMILES: C[Mg]Br.COc1cccc(/C=C(\C)C(=O)N(C)OC)c1>>COc1cccc(/C=C(\C)C(C)=O)c1
 
 ## Reaction 31-614-CAS-31904338
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/c1cccs1>>CC(=O)/C(C)=C/c1cccs1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/c1cccs1>>CC(=O)/C(C)=C/c1cccs1
 
 ## Reaction 31-614-CAS-31904339
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/c1ccc(C(F)(F)F)cc1>>CC(=O)/C(C)=C/c1ccc(C(F)(F)F)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/c1ccc(C(F)(F)F)cc1>>CC(=O)/C(C)=C/c1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-614-CAS-31904340
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/CCc1ccccc1>>CC(=O)/C(C)=C/CCc1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/CCc1ccccc1>>CC(=O)/C(C)=C/CCc1ccccc1
 
 ## Reaction 31-614-CAS-31904341
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C(C)=C/c1ccsc1>>CC(=O)/C(C)=C/c1ccsc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C(C)=C/c1ccsc1>>CC(=O)/C(C)=C/c1ccsc1
 
 ## Reaction 31-614-CAS-32463245
 
@@ -2845,7 +2845,7 @@ Total reactions: 579
 - Yield %: 43
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CO/C(=C/c1ccccc1)C(=O)N(C)OC.CO/C(=C\c1ccccc1)C(=O)N(C)OC>>CO/C(=C\c1ccccc1)C(=O)c1ccccc1.CO/C(=C/c1ccccc1)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CO/C(=C/c1ccccc1)C(=O)N(C)OC.CO/C(=C\c1ccccc1)C(=O)N(C)OC>>CO/C(=C\c1ccccc1)C(=O)c1ccccc1.CO/C(=C/c1ccccc1)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-32463247
 
@@ -2853,7 +2853,7 @@ Total reactions: 579
 - Yield %: 29
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CO/C(=C/c1ccccc1)C(=O)N(C)OC.CO/C(=C\c1ccccc1)C(=O)N(C)OC>>CO/C(=C\c1ccccc1)C(C)=O.CO/C(=C/c1ccccc1)C(C)=O
+- SMILES: C[Mg]Br.CO/C(=C/c1ccccc1)C(=O)N(C)OC.CO/C(=C\c1ccccc1)C(=O)N(C)OC>>CO/C(=C\c1ccccc1)C(C)=O.CO/C(=C/c1ccccc1)C(C)=O
 
 ## Reaction 31-614-CAS-32463249
 
@@ -2861,7 +2861,7 @@ Total reactions: 579
 - Yield %: 55
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CCCCC[CH2][Mg][Br].CCCCC/C=C(/OC)C(=O)N(C)OC.CCCCC/C=C(\OC)C(=O)N(C)OC>>CCCCC/C=C(/OC)C(=O)CCCCCC.CCCCC/C=C(\OC)C(=O)CCCCCC
+- SMILES: CCCCCC[Mg]Br.CCCCC/C=C(/OC)C(=O)N(C)OC.CCCCC/C=C(\OC)C(=O)N(C)OC>>CCCCC/C=C(/OC)C(=O)CCCCCC.CCCCC/C=C(\OC)C(=O)CCCCCC
 
 ## Reaction 31-614-CAS-32463250
 
@@ -2869,7 +2869,7 @@ Total reactions: 579
 - Yield %: 12
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: C[CH](C)[Mg][Cl].CO/C(=C/c1ccccc1)C(=O)N(C)OC.CO/C(=C\c1ccccc1)C(=O)N(C)OC>>CO/C(=C/c1ccccc1)C(=O)C(C)C.CO/C(=C\c1ccccc1)C(=O)C(C)C
+- SMILES: CC(C)[Mg]Cl.CO/C(=C/c1ccccc1)C(=O)N(C)OC.CO/C(=C\c1ccccc1)C(=O)N(C)OC>>CO/C(=C/c1ccccc1)C(=O)C(C)C.CO/C(=C\c1ccccc1)C(=O)C(C)C
 
 ## Reaction 31-614-CAS-32463251
 
@@ -2877,7 +2877,7 @@ Total reactions: 579
 - Yield %: 19
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH2]CCC.CO/C(=C/c1ccccc1)C(=O)N(C)OC.CO/C(=C\c1ccccc1)C(=O)N(C)OC>>CCCCC(=O)/C(=C\c1ccccc1)OC.CCCCC(=O)/C(=C/c1ccccc1)OC
+- SMILES: [Li]CCCC.CO/C(=C/c1ccccc1)C(=O)N(C)OC.CO/C(=C\c1ccccc1)C(=O)N(C)OC>>CCCCC(=O)/C(=C\c1ccccc1)OC.CCCCC(=O)/C(=C/c1ccccc1)OC
 
 ## Reaction 31-614-CAS-32463252
 
@@ -2885,7 +2885,7 @@ Total reactions: 579
 - Yield %: 82
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CCCCC/C=C(/OC)C(=O)N(C)OC>>CCCCC/C=C(/OC)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CCCCC/C=C(/OC)C(=O)N(C)OC>>CCCCC/C=C(/OC)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-32463253
 
@@ -2893,7 +2893,7 @@ Total reactions: 579
 - Yield %: 55
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CO/C(=C/c1ccc(OC)cc1)C(=O)N(C)OC.CO/C(=C\c1ccc(OC)cc1)C(=O)N(C)OC>>CO/C(=C/c1ccc(OC)cc1)C(=O)c1ccccc1.CO/C(=C\c1ccc(OC)cc1)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CO/C(=C/c1ccc(OC)cc1)C(=O)N(C)OC.CO/C(=C\c1ccc(OC)cc1)C(=O)N(C)OC>>CO/C(=C/c1ccc(OC)cc1)C(=O)c1ccccc1.CO/C(=C\c1ccc(OC)cc1)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-32463254
 
@@ -2901,7 +2901,7 @@ Total reactions: 579
 - Yield %: 58
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CCCCC[CH2][Mg][Br].CO/C(=C/C(C)C)C(=O)N(C)OC>>CCCCCCC(=O)/C(=C\C(C)C)OC
+- SMILES: CCCCCC[Mg]Br.CO/C(=C/C(C)C)C(=O)N(C)OC>>CCCCCCC(=O)/C(=C\C(C)C)OC
 
 ## Reaction 31-614-CAS-32463255
 
@@ -2909,7 +2909,7 @@ Total reactions: 579
 - Yield %: 75
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CO/C(=C/C(C)C)C(=O)N(C)OC>>CO/C(=C/C(C)C)C(=O)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CO/C(=C/C(C)C)C(=O)N(C)OC>>CO/C(=C/C(C)C)C(=O)c1ccccc1
 
 ## Reaction 31-614-CAS-32463258
 
@@ -2917,7 +2917,7 @@ Total reactions: 579
 - Yield %: 46
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CCCCC[CH2][Mg][Br].CO/C(=C/c1ccc(OC)cc1)C(=O)N(C)OC.CO/C(=C\c1ccc(OC)cc1)C(=O)N(C)OC>>CCCCCCC(=O)/C(=C\c1ccc(OC)cc1)OC.CCCCCCC(=O)/C(=C/c1ccc(OC)cc1)OC
+- SMILES: CCCCCC[Mg]Br.CO/C(=C/c1ccc(OC)cc1)C(=O)N(C)OC.CO/C(=C\c1ccc(OC)cc1)C(=O)N(C)OC>>CCCCCCC(=O)/C(=C\c1ccc(OC)cc1)OC.CCCCCCC(=O)/C(=C/c1ccc(OC)cc1)OC
 
 ## Reaction 31-614-CAS-32529778
 
@@ -3157,7 +3157,7 @@ Total reactions: 579
 - Yield %: 23
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][CH2]Cc1ccccc1.CON(C)C(=O)C12CC1(c1ccccc1)C2>>O=C(CCc1ccccc1)C12CC1(c1ccccc1)C2
+- SMILES: Br[Mg]CCc1ccccc1.CON(C)C(=O)C12CC1(c1ccccc1)C2>>O=C(CCc1ccccc1)C12CC1(c1ccccc1)C2
 
 ## Reaction 31-614-CAS-32693252
 
@@ -3165,7 +3165,7 @@ Total reactions: 579
 - Yield %: 86
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: C=C[CH2][Mg][Cl].C=CCC1(C(=O)N(C)OC)CCCN1CCc1ccc(OC)c(OC)c1>>C=CCC1(C(=O)C=CC)CCCN1CCc1ccc(OC)c(OC)c1
+- SMILES: C=CC[Mg]Cl.C=CCC1(C(=O)N(C)OC)CCCN1CCc1ccc(OC)c(OC)c1>>C=CCC1(C(=O)C=CC)CCCN1CCc1ccc(OC)c(OC)c1
 
 ## Reaction 31-614-CAS-32693262
 
@@ -3173,7 +3173,7 @@ Total reactions: 579
 - Yield %: 80
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: C=C[CH2][Mg][Cl].C=CCC1(C(=O)N(C)OC)CCCCN1CCc1ccc(OC)c(OC)c1>>C=CCC1(C(=O)C=CC)CCCCN1CCc1ccc(OC)c(OC)c1
+- SMILES: C=CC[Mg]Cl.C=CCC1(C(=O)N(C)OC)CCCCN1CCc1ccc(OC)c(OC)c1>>C=CCC1(C(=O)C=CC)CCCCN1CCc1ccc(OC)c(OC)c1
 
 ## Reaction 31-614-CAS-32738492
 
@@ -3253,7 +3253,7 @@ Total reactions: 579
 - Yield %: 54
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3), 7732-18-5 (7732-18-5)
-- SMILES: C=[CH][Mg][Br].CON(C)C(=O)C(O[Si](C)(C)C(C)(C)C)c1ccccc1>>C=CC(=O)C(O[Si](C)(C)C(C)(C)C)c1ccccc1
+- SMILES: C=C[Mg]Br.CON(C)C(=O)C(O[Si](C)(C)C(C)(C)C)c1ccccc1>>C=CC(=O)C(O[Si](C)(C)C(C)(C)C)c1ccccc1
 
 ## Reaction 31-614-CAS-32738508
 
@@ -3285,7 +3285,7 @@ Total reactions: 579
 - Yield %: 83
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH2]CCC.CON(C)C(=O)C(O[Si](C)(C)C(C)(C)C)c1ccccc1>>CCCCC(=O)C(O[Si](C)(C)C(C)(C)C)c1ccccc1
+- SMILES: [Li]CCCC.CON(C)C(=O)C(O[Si](C)(C)C(C)(C)C)c1ccccc1>>CCCCC(=O)C(O[Si](C)(C)C(C)(C)C)c1ccccc1
 
 ## Reaction 31-614-CAS-32738514
 
@@ -3293,7 +3293,7 @@ Total reactions: 579
 - Yield %: 95
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH2]CCC.CON(C)C(=O)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1>>CCCCC(=O)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1
+- SMILES: [Li]CCCC.CON(C)C(=O)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1>>CCCCC(=O)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1
 
 ## Reaction 31-614-CAS-32738517
 
@@ -3339,7 +3339,7 @@ Total reactions: 579
 - Type: Weinreb amide
 - Yield %: 75
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: [Br][Mg][c]1ccccc1.CON(C)C(=O)c1cccc2occc12>>O=C(c1ccccc1)c1cccc2occc12
+- SMILES: Br[Mg]c1ccccc1.CON(C)C(=O)c1cccc2occc12>>O=C(c1ccccc1)c1cccc2occc12
 
 ## Reaction 31-614-CAS-33456739
 
@@ -3355,7 +3355,7 @@ Total reactions: 579
 - Yield %: 32
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH2]CCC.Brc1ccc(COCC#Cc2ccccc2)cc1.CON(C)C(=O)c1ccccc1>>CCCCC(=C=C(OCc1ccccc1)C(=O)c1ccccc1)c1ccccc1.CCCCC(=C=C(OCc1ccc(C(=O)c2ccccc2)cc1)C(=O)c1ccccc1)c1ccccc1
+- SMILES: [Li]CCCC.Brc1ccc(COCC#Cc2ccccc2)cc1.CON(C)C(=O)c1ccccc1>>CCCCC(=C=C(OCc1ccccc1)C(=O)c1ccccc1)c1ccccc1.CCCCC(=C=C(OCc1ccc(C(=O)c2ccccc2)cc1)C(=O)c1ccccc1)c1ccccc1
 
 ## Reaction 31-614-CAS-33607136
 
@@ -3363,35 +3363,35 @@ Total reactions: 579
 - Yield %: 40
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH2]CCC.Brc1ccccc1COCC#Cc1ccccc1.CON(C)C(=O)c1ccccc1>>CCCCC(=C=C(OCc1ccccc1)C(=O)c1ccccc1)c1ccccc1.CCCCC(=C=C(OCc1ccccc1C(=O)c1ccccc1)C(=O)c1ccccc1)c1ccccc1
+- SMILES: [Li]CCCC.Brc1ccccc1COCC#Cc1ccccc1.CON(C)C(=O)c1ccccc1>>CCCCC(=C=C(OCc1ccccc1)C(=O)c1ccccc1)c1ccccc1.CCCCC(=C=C(OCc1ccccc1C(=O)c1ccccc1)C(=O)c1ccccc1)c1ccccc1
 
 ## Reaction 31-614-CAS-34404811
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)Cc1ccc(O)cc1>>CC(=O)Cc1ccc(O)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)Cc1ccc(O)cc1>>CC(=O)Cc1ccc(O)cc1
 
 ## Reaction 31-614-CAS-34404823
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)Cc1ccc(Cl)cc1>>CC(=O)Cc1ccc(Cl)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)Cc1ccc(Cl)cc1>>CC(=O)Cc1ccc(Cl)cc1
 
 ## Reaction 31-614-CAS-34404871
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CCCCOc1ccccc1CC(=O)N(C)OC>>CCCCOc1ccccc1CC(C)=O
+- SMILES: C[Mg]Br.CCCCOc1ccccc1CC(=O)N(C)OC>>CCCCOc1ccccc1CC(C)=O
 
 ## Reaction 31-614-CAS-34404874
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CCOc1ccccc1CC(=O)N(C)OC>>CCOc1ccccc1CC(C)=O
+- SMILES: C[Mg]Br.CCOc1ccccc1CC(=O)N(C)OC>>CCOc1ccccc1CC(C)=O
 
 ## Reaction 31-614-CAS-34404876
 
@@ -3399,14 +3399,14 @@ Total reactions: 579
 - Yield %: 64
 - Reagents: 584-08-7 (584-08-7) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 75-05-8 (75-05-8), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CON(C)C(=O)Cc1ccccc1O.CCBr.[CH3][Mg][Br]>>CCOc1ccccc1CC(C)=O
+- SMILES: CON(C)C(=O)Cc1ccccc1O.CCBr.C[Mg]Br>>CCOc1ccccc1CC(C)=O
 
 ## Reaction 31-614-CAS-34404881
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)Cc1ccccc1OC(C)C>>CC(=O)Cc1ccccc1OC(C)C
+- SMILES: C[Mg]Br.CON(C)C(=O)Cc1ccccc1OC(C)C>>CC(=O)Cc1ccccc1OC(C)C
 
 ## Reaction 31-614-CAS-34404882
 
@@ -3414,14 +3414,14 @@ Total reactions: 579
 - Yield %: 64
 - Reagents: 584-08-7 (584-08-7) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 75-05-8 (75-05-8), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CON(C)C(=O)Cc1ccccc1O.CC(C)Br.[CH3][Mg][Br]>>CC(=O)Cc1ccccc1OC(C)C
+- SMILES: CON(C)C(=O)Cc1ccccc1O.CC(C)Br.C[Mg]Br>>CC(=O)Cc1ccccc1OC(C)C
 
 ## Reaction 31-614-CAS-34404885
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)Cc1ccc(OCc2ccccc2)cc1>>CC(=O)Cc1ccc(OCc2ccccc2)cc1
+- SMILES: C[Mg]Br.CON(C)C(=O)Cc1ccc(OCc2ccccc2)cc1>>CC(=O)Cc1ccc(OCc2ccccc2)cc1
 
 ## Reaction 31-614-CAS-34404889
 
@@ -3429,42 +3429,42 @@ Total reactions: 579
 - Yield %: 64
 - Reagents: 584-08-7 (584-08-7) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 75-05-8 (75-05-8), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CON(C)C(=O)Cc1ccccc1O.CCCCBr.[CH3][Mg][Br]>>CCCCOc1ccccc1CC(C)=O
+- SMILES: CON(C)C(=O)Cc1ccccc1O.CCCCBr.C[Mg]Br>>CCCCOc1ccccc1CC(C)=O
 
 ## Reaction 31-614-CAS-34404891
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COc1ccc2cccc(CC(=O)N(C)OC)c2c1>>COc1ccc2cccc(CC(C)=O)c2c1
+- SMILES: C[Mg]Br.COc1ccc2cccc(CC(=O)N(C)OC)c2c1>>COc1ccc2cccc(CC(C)=O)c2c1
 
 ## Reaction 31-614-CAS-34404893
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COc1ccccc1CC(=O)N(C)OC>>COc1ccccc1CC(C)=O
+- SMILES: C[Mg]Br.COc1ccccc1CC(=O)N(C)OC>>COc1ccccc1CC(C)=O
 
 ## Reaction 31-614-CAS-34404900
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COc1ccc(CC(=O)N(C)OC)cc1Br>>COc1ccc(CC(C)=O)cc1Br
+- SMILES: C[Mg]Br.COc1ccc(CC(=O)N(C)OC)cc1Br>>COc1ccc(CC(C)=O)cc1Br
 
 ## Reaction 31-614-CAS-34404903
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COc1ccc(CC(=O)N(C)OC)c(Br)c1>>COc1ccc(CC(C)=O)c(Br)c1
+- SMILES: C[Mg]Br.COc1ccc(CC(=O)N(C)OC)c(Br)c1>>COc1ccc(CC(C)=O)c(Br)c1
 
 ## Reaction 31-614-CAS-34404905
 
 - Type: Weinreb amide
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COc1ccc(CC(=O)N(C)OC)cc1F>>COc1ccc(CC(C)=O)cc1F
+- SMILES: C[Mg]Br.COc1ccc(CC(=O)N(C)OC)cc1F>>COc1ccc(CC(C)=O)cc1F
 
 ## Reaction 31-614-CAS-34705314
 
@@ -3472,7 +3472,7 @@ Total reactions: 579
 - Yield %: 95
 - Reagents: 7732-18-5 (7732-18-5) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: CC#[C][Mg][Br].CON(C)C(=O)c1ccccc1C(=C1CC1)c1ccccc1>>CC#CC(=O)c1ccccc1C(=C1CC1)c1ccccc1
+- SMILES: CC#C[Mg]Br.CON(C)C(=O)c1ccccc1C(=C1CC1)c1ccccc1>>CC#CC(=O)c1ccccc1C(=C1CC1)c1ccccc1
 
 ## Reaction 31-614-CAS-35611483
 
@@ -3712,7 +3712,7 @@ Total reactions: 579
 - Yield %: 23
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][CH2]Cc1ccccc1.CON(C)C(=O)C12CC1(c1ccccc1)C2>>O=C(CCc1ccccc1)C12CC1(c1ccccc1)C2
+- SMILES: Br[Mg]CCc1ccccc1.CON(C)C(=O)C12CC1(c1ccccc1)C2>>O=C(CCc1ccccc1)C12CC1(c1ccccc1)C2
 
 ## Reaction 31-614-CAS-35774832
 
@@ -3728,7 +3728,7 @@ Total reactions: 579
 - Yield %: 85
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)[C@H](c1ccccc1)c1ccccc1I>>CC(=O)[C@H](c1ccccc1)c1ccccc1I
+- SMILES: C[Mg]Br.CON(C)C(=O)[C@H](c1ccccc1)c1ccccc1I>>CC(=O)[C@H](c1ccccc1)c1ccccc1I
 
 ## Reaction 31-614-CAS-36832556
 
@@ -4150,7 +4150,7 @@ Total reactions: 579
 - Yield %: 57
 - Reagents: 304-59-6 (304-59-6) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: C[CH](C)[Mg][Cl].CON(C)C(=O)CC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O[Si](C)(C)C(C)(C)C)CC[C@]4(C)[C@H]3CC[C@]12C>>CC(C)C(=O)CC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O[Si](C)(C)C(C)(C)C)CC[C@]4(C)[C@H]3CC[C@]12C.CNC(=O)CC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O[Si](C)(C)C(C)(C)C)CC[C@]4(C)[C@H]3CC[C@]12C
+- SMILES: CC(C)[Mg]Cl.CON(C)C(=O)CC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O[Si](C)(C)C(C)(C)C)CC[C@]4(C)[C@H]3CC[C@]12C>>CC(C)C(=O)CC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O[Si](C)(C)C(C)(C)C)CC[C@]4(C)[C@H]3CC[C@]12C.CNC(=O)CC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC=C4C[C@@H](O[Si](C)(C)C(C)(C)C)CC[C@]4(C)[C@H]3CC[C@]12C
 
 ## Reaction 31-614-CAS-39688295
 
@@ -4158,7 +4158,7 @@ Total reactions: 579
 - Yield %: 62
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)[C@H](CC(=O)OC(C)(C)C)NC(=O)OCc1ccccc1>>CC(=O)[C@H](CC(=O)OC(C)(C)C)NC(=O)OCc1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)[C@H](CC(=O)OC(C)(C)C)NC(=O)OCc1ccccc1>>CC(=O)[C@H](CC(=O)OC(C)(C)C)NC(=O)OCc1ccccc1
 
 ## Reaction 31-614-CAS-39688306
 
@@ -4166,7 +4166,7 @@ Total reactions: 579
 - Yield %: 62
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)[C@@H](CC(=O)OC(C)(C)C)NC(=O)OCc1ccccc1>>CC(=O)[C@@H](CC(=O)OC(C)(C)C)NC(=O)OCc1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)[C@@H](CC(=O)OC(C)(C)C)NC(=O)OCc1ccccc1>>CC(=O)[C@@H](CC(=O)OC(C)(C)C)NC(=O)OCc1ccccc1
 
 ## Reaction 31-614-CAS-40197791
 
@@ -4182,7 +4182,7 @@ Total reactions: 579
 - Yield %: 89
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.CCCCC(CC(=O)N(C)OC)Cc1ccccc1>>CCCCC(CC(=O)c1ccccc1)Cc1ccccc1
+- SMILES: Br[Mg]c1ccccc1.CCCCC(CC(=O)N(C)OC)Cc1ccccc1>>CCCCC(CC(=O)c1ccccc1)Cc1ccccc1
 
 ## Reaction 31-614-CAS-41773815
 
@@ -4230,7 +4230,7 @@ Total reactions: 579
 - Yield %: 88
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C/[C@H](C)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1>>CC(=O)/C=C/[C@H](C)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C/[C@H](C)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1>>CC(=O)/C=C/[C@H](C)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1
 
 ## Reaction 31-614-CAS-43179293
 
@@ -4238,7 +4238,7 @@ Total reactions: 579
 - Yield %: 94
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].CON(C)C(=O)/C=C/[C@@H](C)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1>>CC(=O)/C=C/[C@@H](C)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1
+- SMILES: C[Mg]Br.CON(C)C(=O)/C=C/[C@@H](C)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1>>CC(=O)/C=C/[C@@H](C)[C@H](O[Si](C)(C)C(C)(C)C)c1ccccc1
 
 ## Reaction 31-614-CAS-44581385
 
@@ -4246,7 +4246,7 @@ Total reactions: 579
 - Yield %: 79
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][C]#Cc1ccccc1.CON(C)C(=O)C[C@H](CCc1ccccc1)O[Si](C)(C)C(C)(C)C>>CC(C)(C)[Si](C)(C)O[C@@H](CCc1ccccc1)CC(=O)C#Cc1ccccc1
+- SMILES: Br[Mg]C#Cc1ccccc1.CON(C)C(=O)C[C@H](CCc1ccccc1)O[Si](C)(C)C(C)(C)C>>CC(C)(C)[Si](C)(C)O[C@@H](CCc1ccccc1)CC(=O)C#Cc1ccccc1
 
 ## Reaction 31-614-CAS-44581388
 
@@ -4262,14 +4262,14 @@ Total reactions: 579
 - Yield %: 83
 - Reagents: 7647-01-0 (7647-01-0) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 64-17-5 (64-17-5), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][C]#Cc1ccccc1.CON(C)C(=O)C[C@H](CCc1ccccc1)O[Si](C)(C)C(C)(C)C>>O=C(C#Cc1ccccc1)C[C@@H](O)CCc1ccccc1
+- SMILES: Br[Mg]C#Cc1ccccc1.CON(C)C(=O)C[C@H](CCc1ccccc1)O[Si](C)(C)C(C)(C)C>>O=C(C#Cc1ccccc1)C[C@@H](O)CCc1ccccc1
 
 ## Reaction 31-614-CAS-44581393
 
 - Type: Weinreb amide
 - Yield %: 93
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: [Cl][Mg][CH2]Cc1ccccc1.CON(C)C(=O)C[C@H](CCc1ccccc1)O[Si](C)(C)C(C)(C)C>>CC(C)(C)[Si](C)(C)O[C@@H](CCc1ccccc1)CC(=O)CCc1ccccc1
+- SMILES: Cl[Mg]CCc1ccccc1.CON(C)C(=O)C[C@H](CCc1ccccc1)O[Si](C)(C)C(C)(C)C>>CC(C)(C)[Si](C)(C)O[C@@H](CCc1ccccc1)CC(=O)CCc1ccccc1
 
 ## Reaction 31-614-CAS-44848331
 

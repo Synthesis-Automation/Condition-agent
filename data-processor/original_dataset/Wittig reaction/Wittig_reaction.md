@@ -1655,7 +1655,7 @@ Total reactions: 1183
 - Type: Wittig reaction
 - Yield %: 11
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: O=Cc1ccccc1.CC=P12c3cc(C)c(C)c[c]3[Sb]([c]3cc(C)c(C)cc31)[c]1cc(C)c(C)cc12>>C/C=C\c1ccccc1.C/C=C/c1ccccc1.Cc1c[c]2c(cc1C)P1(=O)c3cc(C)c(C)c[c]3[Sb]2[c]2cc(C)c(C)cc21
+- SMILES: O=Cc1ccccc1.CC=P12c3cc(C)c(C)cc3[Sb](c3cc(C)c(C)cc31)c1cc(C)c(C)cc12>>C/C=C\c1ccccc1.C/C=C/c1ccccc1.Cc1cc2c(cc1C)P1(=O)c3cc(C)c(C)cc3[Sb]2c2cc(C)c(C)cc21
 
 ## Reaction 31-339-CAS-16597965
 
@@ -2860,7 +2860,7 @@ Total reactions: 1183
 - Type: Wittig reaction
 - Yield %: 11
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: O=Cc1ccccc1.CC=P12c3cc(C)c(C)c[c]3[Sb]([c]3cc(C)c(C)cc31)[c]1cc(C)c(C)cc12>>C/C=C\c1ccccc1.C/C=C/c1ccccc1.Cc1c[c]2c(cc1C)P1(=O)c3cc(C)c(C)c[c]3[Sb]2[c]2cc(C)c(C)cc21
+- SMILES: O=Cc1ccccc1.CC=P12c3cc(C)c(C)cc3[Sb](c3cc(C)c(C)cc31)c1cc(C)c(C)cc12>>C/C=C\c1ccccc1.C/C=C/c1ccccc1.Cc1cc2c(cc1C)P1(=O)c3cc(C)c(C)cc3[Sb]2c2cc(C)c(C)cc21
 
 ## Reaction 31-339-CAS-19869385
 
@@ -3502,7 +3502,7 @@ Total reactions: 1183
 - Yield %: 87
 - Reagents: 1070-89-9 (1070-89-9) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: CC[P+]12c3cc(C)c(C)c[c]3[Sb]([c]3cc(C)c(C)cc31)[c]1cc(C)c(C)cc12.[I-].O=Cc1ccccc1>>C/C=C/c1ccccc1.Cc1c[c]2c(cc1C)P1(=O)c3cc(C)c(C)c[c]3[Sb]2[c]2cc(C)c(C)cc21
+- SMILES: CC[P+]12c3cc(C)c(C)cc3[Sb](c3cc(C)c(C)cc31)c1cc(C)c(C)cc12.[I-].O=Cc1ccccc1>>C/C=C/c1ccccc1.Cc1cc2c(cc1C)P1(=O)c3cc(C)c(C)cc3[Sb]2c2cc(C)c(C)cc21
 
 ## Reaction 31-339-CAS-20780697
 
@@ -3510,7 +3510,7 @@ Total reactions: 1183
 - Yield %: 11
 - Reagents: 1070-89-9 (1070-89-9) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: O=Cc1ccccc1.CC=P12c3cc(C)c(C)c[c]3[Sb]([c]3cc(C)c(C)cc31)[c]1cc(C)c(C)cc12>>C/C=C\c1ccccc1.C/C=C/c1ccccc1
+- SMILES: O=Cc1ccccc1.CC=P12c3cc(C)c(C)cc3[Sb](c3cc(C)c(C)cc31)c1cc(C)c(C)cc12>>C/C=C\c1ccccc1.C/C=C/c1ccccc1
 
 ## Reaction 31-339-CAS-20794155
 
@@ -3568,7 +3568,7 @@ Total reactions: 1183
 - Yield %: 98
 - Reagents: 109-72-8 (109-72-8) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: CCOC(=O)C(C)P(=O)(OCC)OCC.CCC[CH2][Sn](/[CH]=C/C=O)([CH2]CCC)[CH2]CCC>>CCC[CH2][Sn](/[CH]=C/C=C(\C)C(=O)OCC)([CH2]CCC)[CH2]CCC
+- SMILES: CCOC(=O)C(C)P(=O)(OCC)OCC.CCCC[Sn](/C=C/C=O)(CCCC)CCCC>>CCCC[Sn](/C=C/C=C(\C)C(=O)OCC)(CCCC)CCCC
 
 ## Reaction 31-339-CAS-20895378
 

@@ -8050,7 +8050,7 @@ Total reactions: 1090
 - Yield %: 85
 - Reagents: 288-32-4 (288-32-4) [UNK], 144-55-8 (144-55-8) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 7732-18-5 (7732-18-5)
-- SMILES: CC[Si](Cl)(CC)CC.CC1(C)[C@@H](O[Si](C)(C)C(C)(C)C)C=[C]([Sn]([CH3])([CH3])[CH3])[C@@]1(O)CO>>CC[Si](CC)(CC)OC[C@]1(O)[C]([Sn]([CH3])([CH3])[CH3])=C[C@H](O[Si](C)(C)C(C)(C)C)C1(C)C
+- SMILES: CC[Si](Cl)(CC)CC.CC1(C)[C@@H](O[Si](C)(C)C(C)(C)C)C=C([Sn](C)(C)C)[C@@]1(O)CO>>CC[Si](CC)(CC)OC[C@]1(O)C([Sn](C)(C)C)=C[C@H](O[Si](C)(C)C(C)(C)C)C1(C)C
 
 ## Reaction 31-614-CAS-39354381
 

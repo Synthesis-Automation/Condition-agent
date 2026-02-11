@@ -3712,7 +3712,7 @@ Total reactions: 1500
 - Yield %: 77
 - Reagents: 7732-18-5 (7732-18-5) [UNK]
 - Solvents: 67-64-1 (67-64-1)
-- SMILES: N#CS.[K].O=C(Cl)CCCC(=O)Cl.Cc1cc(N)ccc1-[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>Cc1cc(NC(=S)NC(=O)CCCC(=O)NC(=S)Nc2ccc(-[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)c(C)c2)ccc1-[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: N#CS.[K].O=C(Cl)CCCC(=O)Cl.CC1=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=CC(N)=C1>>CC1=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=CC(NC(=S)NC(=O)CCCC(=O)NC(=S)NC2=CC(C)=C([C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=C2)=C1
 
 ## Reaction 31-614-CAS-24382436
 
@@ -9695,14 +9695,14 @@ Total reactions: 1500
 - Type: Urea and thiourea formation
 - Yield %: 81
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: S=C=Nc1ccccc1.NC[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>S=C(NC[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92)Nc1ccccc1
+- SMILES: S=C=Nc1ccccc1.NC[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>S=C(NC[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29)NC1=CC=CC=C1
 
 ## Reaction 31-614-CAS-41430158
 
 - Type: Urea and thiourea formation
 - Yield %: 97
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: S=C=Nc1ccccc1.N[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>S=C(Nc1ccccc1)N[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: S=C=Nc1ccccc1.N[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>S=C(NC1=CC=CC=C1)N[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-614-CAS-41665303
 
@@ -10316,7 +10316,7 @@ Total reactions: 1500
 - Yield %: 81
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 67-64-1 (67-64-1), 7732-18-5 (7732-18-5)
-- SMILES: N#CS.[K].O=C(Cl)c1cccs1.Nc1ccc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1>>O=C(NC(=S)Nc1ccc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1)c1cccs1
+- SMILES: N#CS.[K].O=C(Cl)c1cccs1.NC1=CC=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1>>O=C(NC(=S)NC1=CC=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1)C1=CC=CS1
 
 ## Reaction 31-614-CAS-45170031
 
@@ -10324,7 +10324,7 @@ Total reactions: 1500
 - Yield %: 80
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 67-64-1 (67-64-1), 7732-18-5 (7732-18-5)
-- SMILES: N#CS.[K].O=C(Cl)C1CCCCC1.Nc1ccc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1>>O=C(NC(=S)Nc1ccc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1)C1CCCCC1
+- SMILES: N#CS.[K].O=C(Cl)C1CCCCC1.NC1=CC=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1>>O=C(NC(=S)NC1=CC=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1)C1CCCCC1
 
 ## Reaction 31-614-CAS-45170033
 
@@ -10332,7 +10332,7 @@ Total reactions: 1500
 - Yield %: 83
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 67-64-1 (67-64-1), 7732-18-5 (7732-18-5)
-- SMILES: N#CS.[K].O=C(Cl)c1ccco1.Nc1ccc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1>>O=C(NC(=S)Nc1ccc(-[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1)c1ccco1
+- SMILES: N#CS.[K].O=C(Cl)c1ccco1.NC1=CC=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1>>O=C(NC(=S)NC1=CC=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1)C1=CC=CO1
 
 ## Reaction 31-614-CAS-45699130
 
