@@ -437,7 +437,7 @@ Total reactions: 1346
 - Type: Hydrazinolysis
 - Yield %: 18
 - Solvents: 64-19-7 (64-19-7)
-- SMILES: CNN.CN1c2ccccc2Sc2cc(C=CC(=O)[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)ccc21>>CN1c2ccccc2Sc2cc(-c3cc(-[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)nn3C)ccc21.CN1c2ccccc2Sc2cc(C3CC([c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)=NN3C)ccc21
+- SMILES: CNN.CN1C2=CC=CC=C2SC2=CC(C=CC(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)=CC=C21>>CN1N=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1C1=CC=C2C(=C1)SC1=CC=CC=C1N2C.CN1C2=CC=CC=C2SC2=CC(C3CC([C-]45->[Fe+2]6789%10%11%12(<-[CH-]%13[CH]6=[CH]7[CH]8=[CH]%139)[CH](=[CH]4%10)[CH]%11=[CH]5%12)=NN3C)=CC=C21
 
 ## Reaction 31-260-CAS-4431646
 
@@ -1351,7 +1351,7 @@ Total reactions: 1346
 - Type: Hydrazinolysis
 - Yield %: 86
 - Reagents: 7803-57-8 (7803-57-8) [UNK]
-- SMILES: CCn1c(=S)[nH]c2c(c1=O)C1(CCCCC1)Cc1ccccc1-2>>CCn1c(=NN)[nH]c2c(c1=O)C1(CCCCC1)Cc1ccccc1-2
+- SMILES: CCn1c(=S)[nH]c2c(c1=O)C1(CCCCC1)Cc1ccccc1-2>>CCn1c(=O)c2c([nH]c1=NN)-c1ccccc1CC21CCCCC1
 
 ## Reaction 31-310-CAS-10328343
 
@@ -1539,7 +1539,7 @@ Total reactions: 1346
 
 - Type: Hydrazinolysis
 - Reagents: 302-01-2 (302-01-2) [UNK]
-- SMILES: Cc1ccc(-n2c(=S)[nH]c3ccccc3c2=O)cc1C>>Cc1ccc(-n2c(=NN)[nH]c3ccccc3c2=O)cc1C
+- SMILES: Cc1ccc(-n2c(=S)[nH]c3ccccc3c2=O)cc1C>>Cc1ccc(-n2c(=O)c3ccccc3[nH]c2=NN)cc1C
 
 ## Reaction 31-310-CAS-11160447
 
@@ -2135,7 +2135,7 @@ Total reactions: 1346
 
 - Type: Hydrazinolysis
 - Solvents: 64-17-5 (64-17-5)
-- SMILES: O=Cc1ccccc1.NN=C1C=C(c2ccccc2)CS1>>C(=NN=C1C=C(c2ccccc2)CS1)c1ccccc1.C(=NNc1cc(-c2ccccc2)cs1)c1ccccc1
+- SMILES: O=Cc1ccccc1.NN=C1C=C(c2ccccc2)CS1>>C1=C(c2ccccc2)CSC1=NN=Cc1ccccc1.C(=NNc1cc(-c2ccccc2)cs1)c1ccccc1
 
 ## Reaction 31-310-CAS-13141821
 
@@ -2197,7 +2197,7 @@ Total reactions: 1346
 
 - Type: Hydrazinolysis
 - Reagents: 302-01-2 (302-01-2) [UNK]
-- SMILES: CCCCOc1ccc(-n2c(=S)[nH]c3ccccc3c2=O)cc1>>CCCCOc1ccc(-n2c(=NN)[nH]c3ccccc3c2=O)cc1
+- SMILES: CCCCOc1ccc(-n2c(=S)[nH]c3ccccc3c2=O)cc1>>CCCCOc1ccc(-n2c(=O)c3ccccc3[nH]c2=NN)cc1
 
 ## Reaction 31-310-CAS-13287347
 
@@ -2839,7 +2839,7 @@ Total reactions: 1346
 
 - Type: Hydrazinolysis
 - Reagents: 302-01-2 (302-01-2) [UNK]
-- SMILES: CC(C)CCOc1ccc(-n2c(=S)[nH]c3ccccc3c2=O)cc1>>CC(C)CCOc1ccc(-n2c(=NN)[nH]c3ccccc3c2=O)cc1
+- SMILES: CC(C)CCOc1ccc(-n2c(=S)[nH]c3ccccc3c2=O)cc1>>CC(C)CCOc1ccc(-n2c(=O)c3ccccc3[nH]c2=NN)cc1
 
 ## Reaction 31-310-CAS-15417239
 
@@ -4463,7 +4463,7 @@ Total reactions: 1346
 
 - Type: Hydrazinolysis
 - Reagents: 302-01-2 (302-01-2) [UNK]
-- SMILES: CCOc1ccccc1-n1c(=S)[nH]c2ccccc2c1=O>>CCOc1ccccc1-n1c(=NN)[nH]c2ccccc2c1=O
+- SMILES: CCOc1ccccc1-n1c(=S)[nH]c2ccccc2c1=O>>CCOc1ccccc1-n1c(=O)c2ccccc2[nH]c1=NN
 
 ## Reaction 31-310-CAS-23302824
 
@@ -5251,7 +5251,7 @@ Total reactions: 1346
 - Yield %: 75
 - Reagents: 7803-57-8 (7803-57-8) [UNK]
 - Solvents: 64-19-7 (64-19-7)
-- SMILES: CC(=O)O.CN1c2ccccc2Sc2cc(C=CC(=O)[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)ccc21>>CC(=O)N1N=C([c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)CC1c1ccc2c(c1)Sc1ccccc1N2C
+- SMILES: CC(=O)O.CN1C2=CC=CC=C2SC2=CC(C=CC(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)=CC=C21>>CC(=O)N1N=C([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)CC1C1=CC=C2C(=C1)SC1=CC=CC=C1N2C
 
 ## Reaction 31-310-CAS-3991720
 
@@ -5843,7 +5843,7 @@ Total reactions: 1346
 - Yield %: 80
 - Reagents: 7803-57-8 (7803-57-8) [UNK]
 - Solvents: 64-19-7 (64-19-7)
-- SMILES: CC(=O)O.CCCCN1c2ccccc2Sc2cc(C=CC(=O)[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)ccc21>>CCCCN1c2ccccc2Sc2cc(C3CC([c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)=NN3C(C)=O)ccc21
+- SMILES: CC(=O)O.CCCCN1C2=CC=CC=C2SC2=CC(C=CC(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)=CC=C21>>CCCCN1C2=CC=CC=C2SC2=CC(C3CC([C-]45->[Fe+2]6789%10%11%12(<-[CH-]%13[CH]6=[CH]7[CH]8=[CH]%139)[CH](=[CH]4%10)[CH]%11=[CH]5%12)=NN3C(C)=O)=CC=C21
 
 ## Reaction 31-310-CAS-6147539
 
@@ -5970,7 +5970,7 @@ Total reactions: 1346
 
 - Type: Hydrazinolysis
 - Reagents: 302-01-2 (302-01-2) [UNK]
-- SMILES: CCOc1cccc(-n2c(=S)[nH]c3ccccc3c2=O)c1>>CCOc1cccc(-n2c(=NN)[nH]c3ccccc3c2=O)c1
+- SMILES: CCOc1cccc(-n2c(=S)[nH]c3ccccc3c2=O)c1>>CCOc1cccc(-n2c(=O)c3ccccc3[nH]c2=NN)c1
 
 ## Reaction 31-310-CAS-6612647
 
@@ -6072,7 +6072,7 @@ Total reactions: 1346
 
 - Type: Hydrazinolysis
 - Reagents: 302-01-2 (302-01-2) [UNK]
-- SMILES: Cc1ccc(-n2c(=S)[nH]c3ccccc3c2=O)c(C)c1>>Cc1ccc(-n2c(=NN)[nH]c3ccccc3c2=O)c(C)c1
+- SMILES: Cc1ccc(-n2c(=S)[nH]c3ccccc3c2=O)c(C)c1>>Cc1ccc(-n2c(=O)c3ccccc3[nH]c2=NN)c(C)c1
 
 ## Reaction 31-310-CAS-6878797
 
@@ -6098,7 +6098,7 @@ Total reactions: 1346
 
 - Type: Hydrazinolysis
 - Reagents: 302-01-2 (302-01-2) [UNK]
-- SMILES: Cc1cccc(-n2c(=S)[nH]c3ccccc3c2=O)c1>>Cc1cccc(-n2c(=NN)[nH]c3ccccc3c2=O)c1
+- SMILES: Cc1cccc(-n2c(=S)[nH]c3ccccc3c2=O)c1>>Cc1cccc(-n2c(=O)c3ccccc3[nH]c2=NN)c1
 
 ## Reaction 31-310-CAS-6972161
 
@@ -6776,7 +6776,7 @@ Total reactions: 1346
 
 - Type: Hydrazinolysis
 - Reagents: 302-01-2 (302-01-2) [UNK]
-- SMILES: Cc1cccc(-n2c(=S)[nH]c3ccccc3c2=O)c1C>>Cc1cccc(-n2c(=NN)[nH]c3ccccc3c2=O)c1C
+- SMILES: Cc1cccc(-n2c(=S)[nH]c3ccccc3c2=O)c1C>>Cc1cccc(-n2c(=O)c3ccccc3[nH]c2=NN)c1C
 
 ## Reaction 31-310-CAS-9229784
 
@@ -7320,7 +7320,7 @@ Total reactions: 1346
 - Yield %: 65
 - Reagents: 64-19-7 (64-19-7) [UNK]
 - Solvents: 68-12-2 (68-12-2)
-- SMILES: O=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.NNC(=O)c1cn(CCn2cc(C(=O)NN)c3ccccc32)c2ccccc12>>O=C(NN=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92)c1cn(CCn2cc(C(=O)NN=C[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)c3ccccc32)c2ccccc12
+- SMILES: O=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.NNC(=O)c1cn(CCn2cc(C(=O)NN)c3ccccc32)c2ccccc12>>O=C(NN=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29)C1=CN(CCN2C=C(C(=O)NN=C[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C3=CC=CC=C32)C2=CC=CC=C12
 
 ## Reaction 31-614-CAS-24840633
 

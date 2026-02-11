@@ -672,7 +672,7 @@ Total reactions: 614
 - Yield %: 86
 - Reagents: 762-04-9 (762-04-9) [UNK], 7647-01-0 (7647-01-0) [ADDITIVE]
 - Solvents: 629-14-1 (629-14-1), 7732-18-5 (7732-18-5)
-- SMILES: Cc1cc[c]([Mg][Br])cc1>>Cc1ccc([PH](=O)c2ccc(C)cc2)cc1
+- SMILES: Cc1ccc([Mg]Br)cc1>>Cc1ccc([PH](=O)c2ccc(C)cc2)cc1
 
 ## Reaction 31-614-CAS-26271755
 
@@ -1327,7 +1327,7 @@ Total reactions: 614
 - Yield %: 86
 - Reagents: 762-04-9 (762-04-9) [UNK], 7647-01-0 (7647-01-0) [ADDITIVE]
 - Solvents: 629-14-1 (629-14-1), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1>>O=[PH](c1ccccc1)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1>>O=[PH](c1ccccc1)c1ccccc1
 
 ## Reaction 31-614-CAS-27771037
 
@@ -1837,7 +1837,7 @@ Total reactions: 614
 - Yield %: 86
 - Reagents: 762-04-9 (762-04-9) [UNK], 7647-01-0 (7647-01-0) [ADDITIVE]
 - Solvents: 629-14-1 (629-14-1), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][CH2]c1ccccc1>>O=[PH](Cc1ccccc1)Cc1ccccc1
+- SMILES: Br[Mg]Cc1ccccc1>>O=[PH](Cc1ccccc1)Cc1ccccc1
 
 ## Reaction 31-614-CAS-28907773
 

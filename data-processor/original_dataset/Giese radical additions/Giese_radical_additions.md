@@ -641,7 +641,7 @@ Total reactions: 612
 - Yield %: 30
 - Reagents: 7550-35-8 (7550-35-8) [UNK], 54678-23-8 (54678-23-8) [ADDITIVE], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 60-29-7 (60-29-7), 7732-18-5 (7732-18-5)
-- SMILES: C=C[CH2][Mg][Br].CC(C)(C)[Si](C)(C)OC[C@@H]1[C@](C)(CO[Si](C)(C)C(C)(C)C)CCC[C@@]12C=CC(=O)OC2.C=CCI>>C=CC[C@@H]1CC(=O)OC[C@]12CCC[C@@](C)(CO[Si](C)(C)C(C)(C)C)[C@H]2CO[Si](C)(C)C(C)(C)C.C=CC[C@@H]1[C@@H](CC=C)C(=O)OC[C@]12CCC[C@@](C)(CO[Si](C)(C)C(C)(C)C)[C@H]2CO[Si](C)(C)C(C)(C)C
+- SMILES: C=CC[Mg]Br.CC(C)(C)[Si](C)(C)OC[C@@H]1[C@](C)(CO[Si](C)(C)C(C)(C)C)CCC[C@@]12C=CC(=O)OC2.C=CCI>>C=CC[C@@H]1CC(=O)OC[C@]12CCC[C@@](C)(CO[Si](C)(C)C(C)(C)C)[C@H]2CO[Si](C)(C)C(C)(C)C.C=CC[C@@H]1[C@@H](CC=C)C(=O)OC[C@]12CCC[C@@](C)(CO[Si](C)(C)C(C)(C)C)[C@H]2CO[Si](C)(C)C(C)(C)C
 
 ## Reaction 31-255-CAS-20117505
 
@@ -649,7 +649,7 @@ Total reactions: 612
 - Yield %: 79
 - Reagents: 7550-35-8 (7550-35-8) [UNK], 54678-23-8 (54678-23-8) [ADDITIVE], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 60-29-7 (60-29-7), 7732-18-5 (7732-18-5)
-- SMILES: C=C[CH2][Mg][Br].CC(C)(C)[Si](C)(C)OC[C@@H]1[C@](C)(CO[Si](C)(C)C(C)(C)C)CCC[C@@]12C=CC(=O)OC2>>C=CC[C@@H]1CC(=O)OC[C@]12CCC[C@@](C)(CO[Si](C)(C)C(C)(C)C)[C@H]2CO[Si](C)(C)C(C)(C)C
+- SMILES: C=CC[Mg]Br.CC(C)(C)[Si](C)(C)OC[C@@H]1[C@](C)(CO[Si](C)(C)C(C)(C)C)CCC[C@@]12C=CC(=O)OC2>>C=CC[C@@H]1CC(=O)OC[C@]12CCC[C@@](C)(CO[Si](C)(C)C(C)(C)C)[C@H]2CO[Si](C)(C)C(C)(C)C
 
 ## Reaction 31-255-CAS-20187100
 
@@ -2267,7 +2267,7 @@ Total reactions: 612
 - Yield %: 65
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.COC(=O)C1=C[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccccc2)[Se][C@H](C(C)(C)C)N1C=O
+- SMILES: Br[Mg]c1ccccc1.COC(=O)C1=C[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccccc2)[Se][C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-24785596
 
@@ -2275,7 +2275,7 @@ Total reactions: 612
 - Yield %: 60
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cc[c]([Mg][Br])cc1.COC(=O)C1=C[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(OC)cc2)[Se][C@H](C(C)(C)C)N1C=O
+- SMILES: COc1ccc([Mg]Br)cc1.COC(=O)C1=C[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(OC)cc2)[Se][C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-24785597
 
@@ -2283,7 +2283,7 @@ Total reactions: 612
 - Yield %: 70
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH3].COC(=O)C1=C[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](C)[Se][C@H](C(C)(C)C)N1C=O
+- SMILES: [Li]C.COC(=O)C1=C[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](C)[Se][C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-24785599
 
@@ -2291,7 +2291,7 @@ Total reactions: 612
 - Yield %: 55
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CC(C)(C)Oc1cc[c]([Mg][Br])cc1.COC(=O)C1=C[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(OC(C)(C)C)cc2)[Se][C@H](C(C)(C)C)N1C=O
+- SMILES: CC(C)(C)Oc1ccc([Mg]Br)cc1.COC(=O)C1=C[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(OC(C)(C)C)cc2)[Se][C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-24785611
 
@@ -2299,7 +2299,7 @@ Total reactions: 612
 - Yield %: 65
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Li][CH3].COC(=O)C1=C(C)[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@H]1N(C=O)[C@@H](C(C)(C)C)[Se]C1(C)C
+- SMILES: [Li]C.COC(=O)C1=C(C)[Se][C@H](C(C)(C)C)N1C=O>>COC(=O)[C@H]1N(C=O)[C@@H](C(C)(C)C)[Se]C1(C)C
 
 ## Reaction 31-614-CAS-24785617
 
@@ -2484,7 +2484,7 @@ Total reactions: 612
 - Type: Giese radical additions
 - Yield %: 80
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: CC1(O)C=CC(=O)C=C1.CC(C)[Si](C#[C][Mg][Br])(C(C)C)C(C)C>>CC(C)[Si](C#C[C@H]1CC(=O)C=C[C@@]1(C)O)(C(C)C)C(C)C
+- SMILES: CC1(O)C=CC(=O)C=C1.CC(C)[Si](C#C[Mg]Br)(C(C)C)C(C)C>>CC(C)[Si](C#C[C@H]1CC(=O)C=C[C@@]1(C)O)(C(C)C)C(C)C
 
 ## Reaction 31-614-CAS-31938679
 
@@ -2497,7 +2497,7 @@ Total reactions: 612
 
 - Type: Giese radical additions
 - Solvents: 108-88-3 (108-88-3), 109-99-9 (109-99-9), 616-38-6 (616-38-6)
-- SMILES: [CH3][Mg][Br].CCOC(=O)CCC1=C(OC)CCCC1=O>>CCOC(=O)CCC1=C(C)CCCC1=O
+- SMILES: C[Mg]Br.CCOC(=O)CCC1=C(OC)CCCC1=O>>CCOC(=O)CCC1=C(C)CCCC1=O
 
 ## Reaction 31-614-CAS-31938722
 
@@ -2510,7 +2510,7 @@ Total reactions: 612
 
 - Type: Giese radical additions
 - Reagents: 557-20-0 (557-20-0) [UNK]
-- SMILES: CC1(O)C=CC(=O)C=C1.C[Si](C)(C)C#[C][Mg][Br]>>C[C@]1(O)C=CC(=O)C[C@H]1C#C[Si](C)(C)C
+- SMILES: CC1(O)C=CC(=O)C=C1.C[Si](C)(C)C#C[Mg]Br>>C[C@]1(O)C=CC(=O)C[C@H]1C#C[Si](C)(C)C
 
 ## Reaction 31-614-CAS-31981694
 
@@ -2518,7 +2518,7 @@ Total reactions: 612
 - Yield %: 73
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
 - Solvents: 67-56-1 (67-56-1), 75-05-8 (75-05-8)
-- SMILES: C[CH2][Ge]([CH2]C)([CH2]C)[CH]1CCCCC1.COC(=O)/C=C/C(=O)OC>>COC(=O)CC(C(=O)OC)C1CCCCC1
+- SMILES: CC[Ge](CC)(CC)C1CCCCC1.COC(=O)/C=C/C(=O)OC>>COC(=O)CC(C(=O)OC)C1CCCCC1
 
 ## Reaction 31-614-CAS-31981696
 
@@ -2526,7 +2526,7 @@ Total reactions: 612
 - Yield %: 85
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
 - Solvents: 67-56-1 (67-56-1), 75-05-8 (75-05-8)
-- SMILES: C[CH2][Ge]([CH2]C)([CH2]C)[CH]1CCCCC1.CC=C(C(=O)OCC)C(=O)OCC>>CCOC(=O)C(C(=O)OCC)C(C)C1CCCCC1
+- SMILES: CC[Ge](CC)(CC)C1CCCCC1.CC=C(C(=O)OCC)C(=O)OCC>>CCOC(=O)C(C(=O)OCC)C(C)C1CCCCC1
 
 ## Reaction 31-614-CAS-31981699
 
@@ -2534,7 +2534,7 @@ Total reactions: 612
 - Yield %: 82
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
 - Solvents: 67-56-1 (67-56-1), 75-05-8 (75-05-8)
-- SMILES: C[CH2][Ge]([CH2]C)([CH2]C)[CH]1CCCCC1.COC(=O)/C=C\C(=O)OC>>COC(=O)CC(C(=O)OC)C1CCCCC1
+- SMILES: CC[Ge](CC)(CC)C1CCCCC1.COC(=O)/C=C\C(=O)OC>>COC(=O)CC(C(=O)OC)C1CCCCC1
 
 ## Reaction 31-614-CAS-32584756
 
@@ -2549,119 +2549,119 @@ Total reactions: 612
 - Type: Giese radical additions
 - Yield %: 78
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.CC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCCCC(C(=O)OCC)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.CC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCCCC(C(=O)OCC)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730574
 
 - Type: Giese radical additions
 - Yield %: 72
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.CCCCC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCCCCCCC(C(=O)OCC)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.CCCCC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCCCCCCC(C(=O)OCC)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730575
 
 - Type: Giese radical additions
 - Yield %: 49
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.CCCCCCC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCCCCCCCCC(C(=O)OCC)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.CCCCCCC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCCCCCCCCC(C(=O)OCC)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730582
 
 - Type: Giese radical additions
 - Yield %: 82
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.CO[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCOC)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.CO[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCOC)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730583
 
 - Type: Giese radical additions
 - Yield %: 75
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.CC(C)[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCC(C)C)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.CC(C)[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCC(C)C)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730586
 
 - Type: Giese radical additions
 - Yield %: 90
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1=CC=C(N[CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2>>CCOC(=O)C(CCNc1ccccc1)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1=CC=C(N[CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2>>CCOC(=O)C(CCNc1ccccc1)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730587
 
 - Type: Giese radical additions
 - Yield %: 71
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.ClCC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCCCCl)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.ClCC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCCCCl)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730591
 
 - Type: Giese radical additions
 - Yield %: 82
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.N#CC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCCC#N)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.N#CC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCCC#N)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730595
 
 - Type: Giese radical additions
 - Yield %: 57
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.FC(F)(F)C[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCCC(F)(F)F)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.FC(F)(F)C[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCCC(F)(F)F)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730600
 
 - Type: Giese radical additions
 - Yield %: 75
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.CC(=O)OCC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCCCOC(C)=O)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.CC(=O)OCC[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCOC(=O)C(CCCCOC(C)=O)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730601
 
 - Type: Giese radical additions
 - Yield %: 21
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.C=C[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>C=CCCC(C(=O)OCC)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.C=C[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>C=CCCC(C(=O)OCC)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730613
 
 - Type: Giese radical additions
 - Yield %: 72
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1=CC=C([CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2>>CCOC(=O)C(CCc1ccccc1)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1=CC=C([CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2>>CCOC(=O)C(CCc1ccccc1)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730614
 
 - Type: Giese radical additions
 - Yield %: 84
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OC)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C.C1=CC=C(N[CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2>>COC(=O)C(CCNc1ccccc1)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C
+- SMILES: C=C(C(=O)OC)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C.C1=CC=C(N[CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2>>COC(=O)C(CCNc1ccccc1)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C
 
 ## Reaction 31-614-CAS-32730619
 
 - Type: Giese radical additions
 - Yield %: 30
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OC)N1C(=O)c2ccccc2C1=O.C1=CC=C(N[CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2>>COC(=O)C(CCNc1ccccc1)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OC)N1C(=O)c2ccccc2C1=O.C1=CC=C(N[CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2>>COC(=O)C(CCNc1ccccc1)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730620
 
 - Type: Giese radical additions
 - Yield %: 75
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)CCC1=O.C1=CC=C(N[CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2>>CCOC(=O)C(CCNc1ccccc1)N1C(=O)CCC1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)CCC1=O.C1=CC=C(N[CH2-][Si+4]23([O-]C4=CC=CC=C4[O-]2)[O-]C2=CC=CC=C2[O-]3)C=C1.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2>>CCOC(=O)C(CCNc1ccccc1)N1C(=O)CCC1=O
 
 ## Reaction 31-614-CAS-32730624
 
 - Type: Giese radical additions
 - Yield %: 83
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1=CC=C2[O-][Si+4]3([CH-]4CCCCC4)([O-]C2=C1)[O-]C1=CC=CC=C1[O-]3.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2>>CCOC(=O)C(CC1CCCCC1)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)OCC)N1C(=O)c2ccccc2C1=O.C1=CC=C2[O-][Si+4]3([CH-]4CCCCC4)([O-]C2=C1)[O-]C1=CC=CC=C1[O-]3.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2>>CCOC(=O)C(CC1CCCCC1)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-32730717
 
 - Type: Giese radical additions
 - Yield %: 56
 - Solvents: 67-68-5 (67-68-5)
-- SMILES: C=C(C(=O)N1C(=O)OC[C@@H]1C(C)(C)C)N1C(=O)c2ccccc2C1=O.C1C[O]2->[K+]3456<-[O]1CC[O]->3CC[O]->4CC[O]->5CC[O]->6CC2.C[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCC[C@@H](C(=O)N1C(=O)OC[C@@H]1C(C)(C)C)N1C(=O)c2ccccc2C1=O.CCC[C@H](C(=O)N1C(=O)OC[C@@H]1C(C)(C)C)N1C(=O)c2ccccc2C1=O
+- SMILES: C=C(C(=O)N1C(=O)OC[C@@H]1C(C)(C)C)N1C(=O)c2ccccc2C1=O.C1CO2->[K+]3456<-O1CCO->3CCO->4CCO->5CCO->6CC2.C[CH2-][Si+4]12([O-]C3=CC=CC=C3[O-]1)[O-]C1=CC=CC=C1[O-]2>>CCC[C@@H](C(=O)N1C(=O)OC[C@@H]1C(C)(C)C)N1C(=O)c2ccccc2C1=O.CCC[C@H](C(=O)N1C(=O)OC[C@@H]1C(C)(C)C)N1C(=O)c2ccccc2C1=O
 
 ## Reaction 31-614-CAS-33433000
 
@@ -2693,7 +2693,7 @@ Total reactions: 612
 - Yield %: 71
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [Br][Mg][c]1ccccc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccccc2)S[C@H](C(C)(C)C)N1C=O
+- SMILES: Br[Mg]c1ccccc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccccc2)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34511401
 
@@ -2708,34 +2708,34 @@ Total reactions: 612
 - Type: Giese radical additions
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: C[Si](C)(C)C#[C][Mg][Br].C[C@]1(O)C=CC(=O)C[C@@H]1O>>C[C@@]1(O)[C@@H](O)CC(=O)C[C@@H]1C#C[Si](C)(C)C
+- SMILES: C[Si](C)(C)C#C[Mg]Br.C[C@]1(O)C=CC(=O)C[C@@H]1O>>C[C@@]1(O)[C@@H](O)CC(=O)C[C@@H]1C#C[Si](C)(C)C
 
 ## Reaction 31-614-CAS-34511445
 
 - Type: Giese radical additions
 - Yield %: 10
-- SMILES: CC1(O)C=CC(=O)C=C1.CC(C)[Si](C#[C][Zn][C]#C[Si](C(C)C)(C(C)C)C(C)C)(C(C)C)C(C)C>>CC(C)[Si](C#C[C@H]1CC(=O)C=C[C@@]1(C)O)(C(C)C)C(C)C
+- SMILES: CC1(O)C=CC(=O)C=C1.CC(C)[Si](C#C[Zn]C#C[Si](C(C)C)(C(C)C)C(C)C)(C(C)C)C(C)C>>CC(C)[Si](C#C[C@H]1CC(=O)C=C[C@@]1(C)O)(C(C)C)C(C)C
 
 ## Reaction 31-614-CAS-34511452
 
 - Type: Giese radical additions
 - Yield %: 80
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: CC1(O)C=CC(=O)C=C1.CC(C)[Si](C#[C][Mg][Br])(C(C)C)C(C)C>>CC(C)[Si](C#C[C@H]1CC(=O)C=C[C@@]1(C)O)(C(C)C)C(C)C
+- SMILES: CC1(O)C=CC(=O)C=C1.CC(C)[Si](C#C[Mg]Br)(C(C)C)C(C)C>>CC(C)[Si](C#C[C@H]1CC(=O)C=C[C@@]1(C)O)(C(C)C)C(C)C
 
 ## Reaction 31-614-CAS-34511460
 
 - Type: Giese radical additions
 - Yield %: 55
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: CC1(O)C=CC(=O)C=C1.CC(C)[Si](C#[C][Mg][Cl])(C(C)C)C(C)C>>CC(C)[Si](C#C[C@H]1CC(=O)C=C[C@@]1(C)O)(C(C)C)C(C)C
+- SMILES: CC1(O)C=CC(=O)C=C1.CC(C)[Si](C#C[Mg]Cl)(C(C)C)C(C)C>>CC(C)[Si](C#C[C@H]1CC(=O)C=C[C@@]1(C)O)(C(C)C)C(C)C
 
 ## Reaction 31-614-CAS-34511466
 
 - Type: Giese radical additions
 - Yield %: 69
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: O=C1C=CCCC1.CC(C)[Si](C#[C][Mg][Br])(C(C)C)C(C)C>>CC(C)[Si](C#CC1CCCC(=O)C1)(C(C)C)C(C)C
+- SMILES: O=C1C=CCCC1.CC(C)[Si](C#C[Mg]Br)(C(C)C)C(C)C>>CC(C)[Si](C#CC1CCCC(=O)C1)(C(C)C)C(C)C
 
 ## Reaction 31-614-CAS-34511478
 
@@ -2748,13 +2748,13 @@ Total reactions: 612
 
 - Type: Giese radical additions
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: [Li][CH3].CCOC(=O)CCC1=C(OC)CCCC1=O>>CCOC(=O)CCC1=C(C)CCCC1=O
+- SMILES: [Li]C.CCOC(=O)CCC1=C(OC)CCCC1=O>>CCOC(=O)CCC1=C(C)CCCC1=O
 
 ## Reaction 31-614-CAS-34511555
 
 - Type: Giese radical additions
 - Solvents: 108-88-3 (108-88-3), 109-99-9 (109-99-9), 616-38-6 (616-38-6)
-- SMILES: [CH3][Mg][Br].CCOC(=O)CCC1=C(OC)CCCC1=O>>CCOC(=O)CCC1=C(C)CCCC1=O
+- SMILES: C[Mg]Br.CCOC(=O)CCC1=C(OC)CCCC1=O>>CCOC(=O)CCC1=C(C)CCCC1=O
 
 ## Reaction 31-614-CAS-34578603
 
@@ -2762,7 +2762,7 @@ Total reactions: 612
 - Yield %: 75
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: Cc1cc[c]([Mg][Br])cc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(C)cc2)S[C@H](C(C)(C)C)N1C=O
+- SMILES: Cc1ccc([Mg]Br)cc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(C)cc2)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34578604
 
@@ -2770,7 +2770,7 @@ Total reactions: 612
 - Yield %: 55
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1ccc[c]([Mg][Br])c1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2cccc(OC)c2)S[C@H](C(C)(C)C)N1C=O
+- SMILES: COc1cccc([Mg]Br)c1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2cccc(OC)c2)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34578605
 
@@ -2778,7 +2778,7 @@ Total reactions: 612
 - Yield %: 68
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cccc[c]1[Mg][Br].COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccccc2OC)S[C@H](C(C)(C)C)N1C=O
+- SMILES: COc1ccccc1[Mg]Br.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccccc2OC)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34578606
 
@@ -2786,7 +2786,7 @@ Total reactions: 612
 - Yield %: 89
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: Cc1cc(C)[c]([Mg][Br])c(C)c1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2c(C)cc(C)cc2C)S[C@H](C(C)(C)C)N1C=O
+- SMILES: Cc1cc(C)c([Mg]Br)c(C)c1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2c(C)cc(C)cc2C)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34578607
 
@@ -2794,7 +2794,7 @@ Total reactions: 612
 - Yield %: 33
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: Clc1cc[c]([Mg][Br])cc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(Cl)cc2)S[C@H](C(C)(C)C)N1C=O
+- SMILES: Clc1ccc([Mg]Br)cc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(Cl)cc2)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34578608
 
@@ -2802,7 +2802,7 @@ Total reactions: 612
 - Yield %: 25
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: Fc1ccc[c]([Mg][Br])c1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2cccc(F)c2)S[C@H](C(C)(C)C)N1C=O
+- SMILES: Fc1cccc([Mg]Br)c1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2cccc(F)c2)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34578609
 
@@ -2810,7 +2810,7 @@ Total reactions: 612
 - Yield %: 49
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: Fc1cc[c]([Mg][Br])cc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(F)cc2)S[C@H](C(C)(C)C)N1C=O
+- SMILES: Fc1ccc([Mg]Br)cc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(F)cc2)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34578615
 
@@ -2818,7 +2818,7 @@ Total reactions: 612
 - Yield %: 58
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: [CH3][Mg][Br].COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](C)S[C@H](C(C)(C)C)N1C=O
+- SMILES: C[Mg]Br.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](C)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34578617
 
@@ -2826,7 +2826,7 @@ Total reactions: 612
 - Yield %: 74
 - Reagents: 54678-23-8 (54678-23-8) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1cc[c]([Mg][Br])cc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(OC)cc2)S[C@H](C(C)(C)C)N1C=O
+- SMILES: COc1ccc([Mg]Br)cc1.COC(=O)C1=CS[C@H](C(C)(C)C)N1C=O>>COC(=O)[C@@H]1[C@@H](c2ccc(OC)cc2)S[C@H](C(C)(C)C)N1C=O
 
 ## Reaction 31-614-CAS-34578622
 
@@ -3324,7 +3324,7 @@ Total reactions: 612
 - Yield %: 18
 - Reagents: 1149-23-1 (1149-23-1) [UNK]
 - Solvents: 75-05-8 (75-05-8)
-- SMILES: CC(=O)C1=CC=[C-](->[Ni+2]2([Br-])<-[N]3=CC=C(C(C)(C)C)C=C3C3=CC(C(C)(C)C)=CC=[N]->23)C=C1.C=CC=O>>CC(=O)c1ccc(-c2ccc(C(C)=O)cc2)cc1.CC(=O)c1ccc(CCC=O)cc1
+- SMILES: CC(=O)C1=CC=[C-](->[Ni+2]2([Br-])<-N3=CC=C(C(C)(C)C)C=C3C3=CC(C(C)(C)C)=CC=N->23)C=C1.C=CC=O>>CC(=O)c1ccc(-c2ccc(C(C)=O)cc2)cc1.CC(=O)c1ccc(CCC=O)cc1
 
 ## Reaction 31-614-CAS-38967200
 
@@ -3812,28 +3812,28 @@ Total reactions: 612
 - Type: Giese radical additions
 - Yield %: 48
 - Solvents: 67-56-1 (67-56-1), 1665-00-5 (1665-00-5)
-- SMILES: C=CC(=O)OCC.CC1=C2N=C3C4=CC=CC=C4C4=NC5=C(C)C=CC=[N]5->[Al+3](<-[CH3-])(<-[CH3-])(<-[N]2=CC=C1)<-[N-]34>>CCCC(=O)OCC
+- SMILES: C=CC(=O)OCC.CC1=C2N=C3C4=CC=CC=C4C4=NC5=C(C)C=CC=N5->[Al+3](<-[CH3-])(<-[CH3-])(<-N2=CC=C1)<-[N-]34>>CCCC(=O)OCC
 
 ## Reaction 31-614-CAS-42656589
 
 - Type: Giese radical additions
 - Yield %: 21
 - Solvents: 67-56-1 (67-56-1), 1665-00-5 (1665-00-5)
-- SMILES: O=C1C=CC(=O)N1c1ccccc1.CC1=C2N=C3C4=CC=CC=C4C4=NC5=C(C)C=CC=[N]5->[Al+3](<-[CH3-])(<-[CH3-])(<-[N]2=CC=C1)<-[N-]34>>CC1CC(=O)N(c2ccccc2)C1=O
+- SMILES: O=C1C=CC(=O)N1c1ccccc1.CC1=C2N=C3C4=CC=CC=C4C4=NC5=C(C)C=CC=N5->[Al+3](<-[CH3-])(<-[CH3-])(<-N2=CC=C1)<-[N-]34>>CC1CC(=O)N(c2ccccc2)C1=O
 
 ## Reaction 31-614-CAS-42656590
 
 - Type: Giese radical additions
 - Yield %: 18
 - Solvents: 67-56-1 (67-56-1), 1665-00-5 (1665-00-5)
-- SMILES: O=C1C=CCC1.CC1=C2N=C3C4=CC=CC=C4C4=NC5=C(C)C=CC=[N]5->[Al+3](<-[CH3-])(<-[CH3-])(<-[N]2=CC=C1)<-[N-]34>>CC1CCC(=O)C1
+- SMILES: O=C1C=CCC1.CC1=C2N=C3C4=CC=CC=C4C4=NC5=C(C)C=CC=N5->[Al+3](<-[CH3-])(<-[CH3-])(<-N2=CC=C1)<-[N-]34>>CC1CCC(=O)C1
 
 ## Reaction 31-614-CAS-42656600
 
 - Type: Giese radical additions
 - Yield %: 58
 - Solvents: 67-56-1 (67-56-1), 1665-00-5 (1665-00-5)
-- SMILES: O=C1C=CC(=O)N1.CC1=C2N=C3C4=CC=CC=C4C4=NC5=C(C)C=CC=[N]5->[Al+3](<-[CH3-])(<-[CH3-])(<-[N]2=CC=C1)<-[N-]34>>CC1CC(=O)NC1=O
+- SMILES: O=C1C=CC(=O)N1.CC1=C2N=C3C4=CC=CC=C4C4=NC5=C(C)C=CC=N5->[Al+3](<-[CH3-])(<-[CH3-])(<-N2=CC=C1)<-[N-]34>>CC1CC(=O)NC1=O
 
 ## Reaction 31-614-CAS-42973339
 
@@ -4723,7 +4723,7 @@ Total reactions: 612
 - Yield %: 59
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 108-88-3 (108-88-3), 7732-18-5 (7732-18-5)
-- SMILES: C=C(Cc1c(OC)ccc(OC)c1Br)[C@@H](C)CCC1(C)C=CC(=O)C=C1.[CH3][Al]([CH3])[CH3]>>C=C(Cc1c(OC)ccc(OC)c1Br)[C@@H](C)CC[C@@]1(C)C=CC(=O)C[C@@H]1C.C=C(Cc1c(OC)ccc(OC)c1Br)[C@@H](C)CC[C@@]1(C)C=CC(=O)C[C@H]1C
+- SMILES: C=C(Cc1c(OC)ccc(OC)c1Br)[C@@H](C)CCC1(C)C=CC(=O)C=C1.C[Al](C)C>>C=C(Cc1c(OC)ccc(OC)c1Br)[C@@H](C)CC[C@@]1(C)C=CC(=O)C[C@@H]1C.C=C(Cc1c(OC)ccc(OC)c1Br)[C@@H](C)CC[C@@]1(C)C=CC(=O)C[C@H]1C
 
 ## Reaction 31-614-CAS-45522058
 
@@ -4731,5 +4731,5 @@ Total reactions: 612
 - Yield %: 76
 - Reagents: 12125-02-9 (12125-02-9) [UNK]
 - Solvents: 109-99-9 (109-99-9), 108-88-3 (108-88-3), 7732-18-5 (7732-18-5)
-- SMILES: CC(C)=CCCC1(C)C=CC(=O)C=C1.[CH3][Al]([CH3])[CH3]>>CC(C)=CCC[C@@]1(C)C=CC(=O)C[C@@H]1C
+- SMILES: CC(C)=CCCC1(C)C=CC(=O)C=C1.C[Al](C)C>>CC(C)=CCC[C@@]1(C)C=CC(=O)C[C@@H]1C
 

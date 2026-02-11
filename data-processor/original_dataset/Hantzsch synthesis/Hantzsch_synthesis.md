@@ -12339,7 +12339,7 @@ Total reactions: 1740
 - Type: Hantzsch synthesis
 - Yield %: 96
 - Reagents: 631-61-8 (631-61-8) [UNK]
-- SMILES: CCOC(=O)CC(C)=O.O=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>CCOC(=O)C1=C(C)NC(C)=C(C(=O)OCC)C1[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: CCOC(=O)CC(C)=O.O=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CCOC(=O)C1=C(C)NC(C)=C(C(=O)OCC)C1[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-614-CAS-42834566
 
@@ -12353,7 +12353,7 @@ Total reactions: 1740
 - Type: Hantzsch synthesis
 - Yield %: 95
 - Reagents: 631-61-8 (631-61-8) [UNK]
-- SMILES: COC(=O)CC(C)=O.O=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>COC(=O)C1=C(C)NC(C)=C(C(=O)OC)C1[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: COC(=O)CC(C)=O.O=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>COC(=O)C1=C(C)NC(C)=C(C(=O)OC)C1[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-614-CAS-42834568
 

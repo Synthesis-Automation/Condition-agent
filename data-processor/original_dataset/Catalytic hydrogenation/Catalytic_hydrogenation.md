@@ -50,7 +50,7 @@ Total reactions: 1999
 - Yield %: 95
 - Reagents: 1493-13-6 (1493-13-6) [UNK], 15681-89-7 (15681-89-7) [ADDITIVE]
 - Solvents: 67-64-1 (67-64-1), 75-05-8 (75-05-8), 1455-13-6 (1455-13-6)
-- SMILES: [H-][B+3]12[N-]3C=CC=[N]3->[W]3(<-[N]#[O+])(<-[CH]4=[CH]->3C(C(F)(F)F)=CCC4)(<-[N]3=CC=C[N-]31)(<-[N]1=CC=C[N-]12)[P](C)(C)C>>[H-][B+3]12[N-]3C=CC=[N]3->[W]3(<-[N]#[O+])(<-[CH]4=[CH]->3[C@@H](C(F)(F)F)CC[C@H]4[2H])(<-[N]3=CC=C[N-]31)(<-[N]1=CC=C[N-]12)[P](C)(C)C
+- SMILES: [H-][B+3]12[N-]3C=CC=N3->[W]3(<-N#[O+])(P(C)(C)C)(<-N4=CC=C[N-]41)(<-N1=CC=C[N-]12)[CH]1=[CH]3C(C(F)(F)F)=CCC1>>[H-][B+3]12[N-]3C=CC=N3->[W]3(<-N#[O+])(P(C)(C)C)(<-N4=CC=C[N-]41)(<-N1=CC=C[N-]12)[CH]1=[CH]3[C@@H](C(F)(F)F)CC[C@H]1[2H]
 
 ## Reaction 31-116-CAS-23829902
 
@@ -729,7 +729,7 @@ Total reactions: 1999
 - Yield %: 98
 - Reagents: 1333-74-0 (1333-74-0) [UNK], 109-66-0 (109-66-0) [ADDITIVE]
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=C(c1ccccc1)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>CC(c1ccccc1)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: C=C(C1=CC=CC=C1)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC(C1=CC=CC=C1)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-242-CAS-21657710
 
@@ -1224,7 +1224,7 @@ Total reactions: 1999
 - Yield %: 97
 - Reagents: 865-48-5 (865-48-5) [UNK]
 - Solvents: 64-17-5 (64-17-5)
-- SMILES: C(#C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92)c1ccccc1>>C(=C/[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92)\c1ccccc1
+- SMILES: C(#C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29)C1=CC=CC=C1>>C1=CC=C(/C=C/[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1
 
 ## Reaction 31-242-CAS-21925663
 
@@ -2232,7 +2232,7 @@ Total reactions: 1999
 - Type: Catalytic hydrogenation
 - Yield %: 85
 - Reagents: 108-93-0 (108-93-0) [UNK]
-- SMILES: N#CC(=C1CCCCC1)c1ccccc1.C[c]12->[IrH+3]3456(<-[O-]c7ccccc7-c7cc[nH][n]->37)<-[c]1(C)[c]->4(C)[c-]->5(C)[c]->62C>>N#CC(c1ccccc1)C1CCCCC1.C[c]12->[Ir+3]34567(<-[O-]c8ccccc8-c8cc[n](->[Ir+3]9%10%11%12%13(<-[O-]c%14ccccc%14-c%14cc[n]->3[n-]->9%14)<-[c]3(C)[c]->%10(C)[c]->%11(C)[c-]->%12(C)[c]->%133C)[n-]->48)<-[c]1(C)[c]->5(C)[c-]->6(C)[c]->72C
+- SMILES: N#CC(=C1CCCCC1)c1ccccc1.[H-][Ir+3]12345(<-[O-]C6=CC=CC=C6C6=N->1NC=C6)<-[C-]1(C)C2(C)=C3(C)C4(C)=C15C>>N#CC(c1ccccc1)C1CCCCC1.CC12=C3(C)[C-]4(C)->[Ir+3]13567(<-[O-]C1=CC=CC=C1C1=CC=N(->[Ir+3]389%10%11(<-[O-]C%12=CC=CC=C%12C%12=CC=N->5[N-]->3%12)<-[C-]3(C)C8(C)=C9(C)C%10(C)=C3%11C)[N-]->61)C2(C)=C47C
 
 ## Reaction 31-242-CAS-23021579
 
@@ -3676,13 +3676,13 @@ Total reactions: 1999
 - Yield %: 80
 - Reagents: 1333-74-0 (1333-74-0) [UNK]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: CC(C)[P]1(C(C)C)OC2=CC=CC3=[N]2->[Rh+]12(<-[CH]1=[CH]->2CC/C=C\CC1)[P](C(C)C)(C(C)C)O3.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1>>CC(C)[P]1(C(C)C)OC2=CC=CC3=[N]2->[Rh+]12(<-[CH]1=[CH]->2CCCCCC1)[P](C(C)C)(C(C)C)O3.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1
+- SMILES: CC(C)P1(C(C)C)OC2=CC=CC3=N2->[Rh+]12([CH]1=[CH]2CC/C=C\CC1)P(C(C)C)(C(C)C)O3.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1>>CC(C)P1(C(C)C)OC2=CC=CC3=N2->[Rh+]12([CH]1=[CH]2CCCCCC1)P(C(C)C)(C(C)C)O3.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1
 
 ## Reaction 31-614-CAS-24186492
 
 - Type: Catalytic hydrogenation
 - Yield %: 100
-- SMILES: C1=C\CC/C=C\CC/1.CC(C)[P]1(C(C)C)OC2=CC=CC3=[N]2->[Rh+]12([H][H]2)[P](C(C)C)(C(C)C)O3.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1>>CC(C)[P]1(C(C)C)OC2=CC=CC3=[N]2->[Rh+]12(<-[CH]1=[CH]->2CCCCCC1)[P](C(C)C)(C(C)C)O3.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1
+- SMILES: C1=C\CC/C=C\CC/1.CC(C)P1(C(C)C)OC2=CC=CC3=N2->[Rh+]12([H][H]2)P(C(C)C)(C(C)C)O3.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1>>CC(C)P1(C(C)C)OC2=CC=CC3=N2->[Rh+]12([CH]1=[CH]2CCCCCC1)P(C(C)C)(C(C)C)O3.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1
 
 ## Reaction 31-614-CAS-24379518
 
@@ -3690,7 +3690,7 @@ Total reactions: 1999
 - Yield %: 97
 - Reagents: 1333-74-0 (1333-74-0) [UNK]
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: [H-][Ru+4]12([Cl-])=[C-2]3C(=CC4=CC=CC=C4C=C3C[P]1(C(C)(C)C)C(C)(C)C)C[P]2(C(C)(C)C)C(C)(C)C>>[H][C@@]12CC3=CC=CC=C3C[C@]3([H])C[P](C(C)(C)C)(C(C)(C)C)[Ru+4]([H-])([H-])([Cl-])(<-[C-]13[H])[P](C(C)(C)C)(C(C)(C)C)C2
+- SMILES: [H-][Ru+4]12([Cl-])=[C-2]3C(=CC4=CC=CC=C4C=C3CP1(C(C)(C)C)C(C)(C)C)CP2(C(C)(C)C)C(C)(C)C>>[H][C@@]12CC3=CC=CC=C3C[C@]3([H])CP(C(C)(C)C)(C(C)(C)C)[Ru+4]([H-])([H-])([Cl-])(<-[C-]13[H])P(C(C)(C)C)(C(C)(C)C)C2
 
 ## Reaction 31-614-CAS-24408987
 
@@ -4491,7 +4491,7 @@ Total reactions: 1999
 - Type: Catalytic hydrogenation
 - Yield %: 82
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: [H-][Zr+4]12345678([Cl-])(<-[CH]9=[CH]->1[CH-]->2[CH]->3=[CH]->49)<-[CH]1=[CH]->5[CH-]->6[CH]->7=[CH]->81.C[Si](C)(C)[CH-]1C#C[CH-]([Si](C)(C)C)->[Zr+4]<-123456789(<-[cH]1[cH]->2[cH]->3[cH-]->4[cH]->51)<-[cH]1[cH]->6[cH]->7[cH-]->8[cH]->91>>C[Si](C)(C)[CH-]1C=C[CH-]([Si](C)(C)C)->[Zr+4]<-123456789(<-[cH]1[cH]->2[cH]->3[cH-]->4[cH]->51)<-[cH]1[cH]->6[cH]->7[cH-]->8[cH]->91.[H][C-]1(C=[C-]([C-]([H])([Si](C)(C)C)->[Zr+4]<-123456789(<-[CH]1=[CH]->2[CH-]->3[CH]->4=[CH]->51)<-[CH]1=[CH]->6[CH-]->7[CH]->8=[CH]->91)->[Zr+4]12345678([Cl-])(<-[CH]9=[CH]->1[CH-]->2[CH]->3=[CH]->49)<-[CH]1=[CH]->5[CH-]->6[CH]->7=[CH]->81)[Si](C)(C)C
+- SMILES: [H-][Zr+4]12345678([Cl-])(<-[CH-]9[CH]1=[CH]2[CH]3=[CH]94)<-[CH-]1[CH]5=[CH]6[CH]7=[CH]18.C[Si](C)(C)[CH-]1->[Zr+4]23456789(<-[CH-]%10[CH]2=[CH]3[CH]4=[CH]%105)(<-[CH-]2[CH]6=[CH]7[CH]8=[CH]29)<-[CH-]([Si](C)(C)C)C#C1>>[H][C@-]1([Si](C)(C)C)->[Zr+4]23456789(<-[CH-]%10[CH]2=[CH]3[CH]4=[CH]%105)(<-[CH-]2[CH]6=[CH]7[CH]8=[CH]29)<-[C@@-]([H])([Si](C)(C)C)C=C1.[H][C@-]1([Si](C)(C)C)->[Zr+4]23456789(<-[CH-]%10[CH]2=[CH]3[CH]4=[CH]%105)(<-[CH-]2[CH]6=[CH]7[CH]8=[CH]29)<-[C@-]([H])([Si](C)(C)C)[C-](->[Zr+4]23456789([Cl-])(<-[CH-]%10[CH]2=[CH]3[CH]4=[CH]%105)<-[CH-]2[CH]6=[CH]7[CH]8=[CH]29)=C1
 
 ## Reaction 31-614-CAS-31382111
 
@@ -4722,7 +4722,7 @@ Total reactions: 1999
 - Type: Catalytic hydrogenation
 - Yield %: 100
 - Reagents: 1333-74-0 (1333-74-0) [UNK]
-- SMILES: C1CCC([P]2(C3CCCCC3)CC[P](C3CCCCC3)(C3CCCCC3)[Rh+]2345<-[CH]2=[CH]->3C3CC2[CH]->4=[CH]->53)CC1.FS(F)(F)(F)(F)C1=CC(S(F)(F)(F)(F)F)=C[C-]([B+3]([C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)([C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)[C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)=C1>>FS(F)(F)(F)(F)C1=CC(S(F)(F)(F)(F)F)=C[C-]([B+3]([C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)([C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)[C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)=C1.[H]1[CH]23->[Rh+]145(<-[CH]2([H]4)C1CCC3C1)[P](C1CCCCC1)(C1CCCCC1)CC[P]5(C1CCCCC1)C1CCCCC1
+- SMILES: C1CCC(P2(C3CCCCC3)CCP(C3CCCCC3)(C3CCCCC3)[Rh+]2345[CH]2=[CH]3C3CC2[CH]4=[CH]35)CC1.FS(F)(F)(F)(F)C1=CC(S(F)(F)(F)(F)F)=C[C-]([B+3]([C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)([C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)[C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)=C1>>FS(F)(F)(F)(F)C1=CC(S(F)(F)(F)(F)F)=C[C-]([B+3]([C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)([C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)[C-]2=CC(S(F)(F)(F)(F)F)=CC(S(F)(F)(F)(F)F)=C2)=C1.[H]1[CH]23C4CCC(C4)[CH]24[H][Rh+]1342P(C1CCCCC1)(C1CCCCC1)CCP2(C1CCCCC1)C1CCCCC1
 
 ## Reaction 31-614-CAS-31840453
 
@@ -5616,7 +5616,7 @@ Total reactions: 1999
 - Type: Catalytic hydrogenation
 - Yield %: 85
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: CC1=CC(C)=C(N2C=CN(C3=C(C)C=C(C)C=C3C)[C-2]2=[Ru+6]([Cl-])([Cl-])(=[CH-2]C2=CC=CC=C2)[P](C2CCCCC2)(C2CCCCC2)C2CCCCC2)C(C)=C1.C/C=C\c1cc(-c2cc(OCCC[Si](OCC)(OCC)OCC)cc(OCCC[Si](OCC)(OCC)OCC)c2)ccc1OC(C)C.C/C=C/c1cc(-c2cc(OCCC[Si](OCC)(OCC)OCC)cc(OCCC[Si](OCC)(OCC)OCC)c2)ccc1OC(C)C>>CCO[Si](CCCOC1=CC(OCCC[Si](OCC)(OCC)OCC)=CC(C2=CC=C3[O](C(C)C)->[Ru+6]([Cl-])([Cl-])(=[CH-2]C3=C2)=[C-2]2N(C3=C(C)C=C(C)C=C3C)CCN2C2=C(C)C=C(C)C=C2C)=C1)(OCC)OCC
+- SMILES: CC1=CC(C)=C(N2C=CN(C3=C(C)C=C(C)C=C3C)[C-2]2=[Ru+6]([Cl-])([Cl-])(=[CH-2]C2=CC=CC=C2)P(C2CCCCC2)(C2CCCCC2)C2CCCCC2)C(C)=C1.C/C=C\c1cc(-c2cc(OCCC[Si](OCC)(OCC)OCC)cc(OCCC[Si](OCC)(OCC)OCC)c2)ccc1OC(C)C.C/C=C/c1cc(-c2cc(OCCC[Si](OCC)(OCC)OCC)cc(OCCC[Si](OCC)(OCC)OCC)c2)ccc1OC(C)C>>CCO[Si](CCCOC1=CC(OCCC[Si](OCC)(OCC)OCC)=CC(C2=CC=C3C(=C2)[CH-2]=[Ru+6]([Cl-])([Cl-])(=[C-2]2N(C4=C(C)C=C(C)C=C4C)CCN2C2=C(C)C=C(C)C=C2C)<-O3C(C)C)=C1)(OCC)OCC
 
 ## Reaction 31-614-CAS-34189641
 
@@ -6367,7 +6367,7 @@ Total reactions: 1999
 - Yield %: 100
 - Reagents: 1333-74-0 (1333-74-0) [UNK]
 - Solvents: 1076-43-3 (1076-43-3)
-- SMILES: Cc1ccc2ccc3C[Si-](C(C)(C)C)(C(C)(C)C)[IrH+3]4(<-[CH3-])(<-[CH]5=[CH]->4CCCCCC5)<-[n]3c2n1>>C1CCCCCCC1
+- SMILES: [H-][Ir+3]12(<-[CH3-])(<-N3=C(C=CC4=CC=C(C)N=C43)C[Si-]1(C(C)(C)C)C(C)(C)C)[CH]1=[CH]2CCCCCC1>>C1CCCCCCC1
 
 ## Reaction 31-614-CAS-34586719
 
@@ -6375,7 +6375,7 @@ Total reactions: 1999
 - Yield %: 78
 - Reagents: 1333-74-0 (1333-74-0) [UNK]
 - Solvents: 1076-43-3 (1076-43-3)
-- SMILES: C1CCC(P(C2CCCCC2)C2CCCCC2)CC1.Cc1ccc2ccc3C[Si-](C(C)(C)C)(C(C)(C)C)[IrH+3]4(<-[CH3-])(<-[CH]5=[CH]->4CCCCCC5)<-[n]3c2n1>>C1CCCCCCC1.Cc1ccc2ccc3C[Si-]([IrH4+5](<-[n]3c2n1)[P](C1CCCCC1)(C1CCCCC1)C1CCCCC1)(C(C)(C)C)C(C)(C)C
+- SMILES: C1CCC(P(C2CCCCC2)C2CCCCC2)CC1.[H-][Ir+3]12(<-[CH3-])(<-N3=C(C=CC4=CC=C(C)N=C43)C[Si-]1(C(C)(C)C)C(C)(C)C)[CH]1=[CH]2CCCCCC1>>C1CCCCCCC1.Cc1ccc2ccc3C[Si-]([IrH4+5](<-n3c2n1)[P](C1CCCCC1)(C1CCCCC1)C1CCCCC1)(C(C)(C)C)C(C)(C)C
 
 ## Reaction 31-614-CAS-34586720
 
@@ -9601,7 +9601,7 @@ Total reactions: 1999
 - Yield %: 80
 - Reagents: 1333-74-0 (1333-74-0) [UNK]
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C[c]12->[Ta+4]3456789(<-[CH2]=[CH]->3[CH2-]->4)(<-[c]1(C)[c]->5(C)[c-]->6(C)[c]->72C)[S-2][Ta+4]8123456(<-[CH2]=[CH]->1[CH2-]->2)(<-[c]1(C)[c]->3(C)[c]->4(C)[c-]->5(C)[c]->61C)[S-2]9>>CC[CH2-]->[Ta+4]123456(<-[c]7(C)[c]->1(C)[c]->2(C)[c-]->3(C)[c]->47C)[S-2][Ta+4]5123478(<-[CH2]=[CH]->1[CH2-]->2)(<-[c]1(C)[c]->3(C)[c]->4(C)[c-]->7(C)[c]->81C)[S-2]6
+- SMILES: CC12=C3(C)[C-]4(C)->[Ta+4]1356789(<-[CH2-][CH]5=[CH2]6)([S-2][Ta+4]71356%10%11(<-[CH2-][CH]1=[CH2]3)(<-[C-]1(C)C5(C)=C6(C)C%10(C)=C1%11C)[S-2]8)C2(C)=C49C>>CC[CH2-]->[Ta+4]123456(<-[C-]7(C)C1(C)=C2(C)C3(C)=C74C)[S-2][Ta+4]5123478(<-[CH2-][CH]1=[CH2]2)(<-[C-]1(C)C3(C)=C4(C)C7(C)=C18C)[S-2]6
 
 ## Reaction 31-614-CAS-38274004
 
@@ -11041,7 +11041,7 @@ Total reactions: 1999
 - Yield %: 92
 - Reagents: 1333-74-0 (1333-74-0) [UNK]
 - Solvents: 1693-74-9 (1693-74-9)
-- SMILES: C=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>CC[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: C=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-614-CAS-39495981
 
@@ -14252,7 +14252,7 @@ Total reactions: 1999
 - Type: Catalytic hydrogenation
 - Yield %: 83
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C[C]12->[Ti+3]3456([N-3]7[Ti+4]89%10%11%12(<-[CH-]=[C]%13(C)[N-2]3->[Ti+3]<-%1373%14%15%16(<-[C]7(C)=[C]->3(C)[C-]->%14(C)[C]->%15([Si](C)(C)C)=[C]->%167C)[H-]8)<-[C]3(C)=[C]->9(C)[C-]->%10(C)[C]->%11([Si](C)(C)C)=[C]->%123C)<-[C]1(C)=[C]->4([Si](C)(C)C)[C-]->5(C)[C]->6=2C>>C[C]12->[Ti+4]34567([NH-2]->[Ti+4]89%10%11%12([N-3]3[Ti+4]3%13%14%15%16%17%18(<-[CH-2]4[CH-]->3[CH-]->8%13[H]%14)<-[C]3(C)=[C]->%15(C)[C-]->%16(C)[C]->%17([Si](C)(C)C)=[C]->%183C)<-[C]3(C)=[C]->9(C)[C-]->%10(C)[C]->%11([Si](C)(C)C)=[C]->%123C)<-[C]1(C)=[C]->5([Si](C)(C)C)[C-]->6(C)[C]->7=2C
+- SMILES: CC12=[CH-]->[Ti+4]34567(<-[C-]8(C)C3(C)=C4(C)C5(C)=C86[Si](C)(C)C)[H-][Ti+3]134568(<-[N-2]2[Ti+3]129%10(<-[C-]%11(C)C1(C)=C2(C)C9(C)=C%11%10[Si](C)(C)C)[N-3]73)<-[C-]1(C)C4(C)=C5(C)C6(C)=C18[Si](C)(C)C>>CC12=C3(C)[C-]4(C)->[Ti+4]13567([NH-2]->[Ti+4]1389%10(<-[C-]%11(C)C1(C)=C3(C)C8(C)=C%119[Si](C)(C)C)[N-3]5[Ti+4]13589%11%12(<-[CH-2]6[CH-]->1[CH-]%103[H]5)<-[C-]1(C)C8(C)=C9(C)C%11(C)=C1%12[Si](C)(C)C)C2(C)=C47[Si](C)(C)C
 
 ## Reaction 31-614-CAS-44300231
 
@@ -14260,7 +14260,7 @@ Total reactions: 1999
 - Yield %: 83
 - Reagents: 1333-74-0 (1333-74-0) [UNK]
 - Solvents: 110-54-3 (110-54-3)
-- SMILES: C[C]12->[Ti+3]3456([N-3]7[Ti+4]89%10%11%12(<-[CH-]=[C]%13(C)[N-2]3->[Ti+3]<-%1373%14%15%16(<-[C]7(C)=[C]->3(C)[C-]->%14(C)[C]->%15([Si](C)(C)C)=[C]->%167C)[H-]8)<-[C]3(C)=[C]->9(C)[C-]->%10(C)[C]->%11([Si](C)(C)C)=[C]->%123C)<-[C]1(C)=[C]->4([Si](C)(C)C)[C-]->5(C)[C]->6=2C>>CC(C)[N-2]1[Ti+3]23456(<-[C]7(C)=[C]->2(C)[C-]->3(C)[C]->4([Si](C)(C)C)=[C]->57C)[H-][Ti+4]23457(<-[C]8(C)=[C]->2(C)[C-]->3(C)[C]->4([Si](C)(C)C)=[C]->58C)[H-][Ti+3]<-12345(<-[C]1(C)=[C]->2(C)[C-]->3(C)[C]->4([Si](C)(C)C)=[C]->51C)[N-3]67
+- SMILES: CC12=[CH-]->[Ti+4]34567(<-[C-]8(C)C3(C)=C4(C)C5(C)=C86[Si](C)(C)C)[H-][Ti+3]134568(<-[N-2]2[Ti+3]129%10(<-[C-]%11(C)C1(C)=C2(C)C9(C)=C%11%10[Si](C)(C)C)[N-3]73)<-[C-]1(C)C4(C)=C5(C)C6(C)=C18[Si](C)(C)C>>CC(C)[N-2]1->[Ti+3]23456(<-[C-]7(C)C2(C)=C3(C)C4(C)=C75[Si](C)(C)C)[H-][Ti+4]23457(<-[C-]8(C)C2(C)=C3(C)C4(C)=C85[Si](C)(C)C)[H-][Ti+3]12345(<-[C-]1(C)C2(C)=C3(C)C4(C)=C15[Si](C)(C)C)[N-3]67
 
 ## Reaction 31-614-CAS-44300260
 
@@ -14268,7 +14268,7 @@ Total reactions: 1999
 - Yield %: 100
 - Reagents: 7727-37-9 (7727-37-9) [UNK], 1333-74-0 (1333-74-0) [ADDITIVE]
 - Solvents: 1076-43-3 (1076-43-3)
-- SMILES: C[C]12->[Ti+2]3456789(<-[C]1(C)=[C]->3([Si](C)(C)C)[C-]->4(C)[C]->5=2C)<-[C]123#[C]64->[Ti+3]156%10%11%12(<-[C]1(C)=[C]->5(C)[C-]->6(C)[C]->%10([Si](C)(C)C)=[C]->%111C)([H-]7)[H-][Ti+3]21567(<-[CH-]3CCC4)(<-[C]2(C)=[C]->1(C)[C-]->5(C)[C]->6([Si](C)(C)C)=[C]->72C)([H-]8)[H-]9%12>>C[C]12->[Ti+3]34567([N-2](C8CCCCC8)->[Ti+3]89%10%11%12(<-[C]%13(C)=[C]->8(C)[C-]->9(C)[C]->%10([Si](C)(C)C)=[C]->%11%13C)[H-][Ti+4]89%10%11(<-[C]%13(C)=[C]->8(C)[C-]->9(C)[C]->%10([Si](C)(C)C)=[C]->%11%13C)([H-]3)[N-3]4%12)<-[C]1(C)=[C]->5([Si](C)(C)C)[C-]->6(C)[C]->7=2C
+- SMILES: CC12=C3(C)[C-]4(C)->[Ti+2]1356789([H-][Ti+3]13%10%11%12%13%14(<-[C-]%15(C)C1(C)=C3(C)C%10(C)=C%15%11[Si](C)(C)C)[H-][Ti+3]13%10%11%15(<-[CH-]%16CCCC5%12#C%166%131)(<-[C-]1(C)C3(C)=C%10(C)C%11(C)=C1%15[Si](C)(C)C)([H-]7)[H-]8%14)C2(C)=C49[Si](C)(C)C>>CC12=C3(C)[C-]4(C)->[Ti+3]13567([H-][Ti+4]1389%10(<-[C-]%11(C)C1(C)=C3(C)C8(C)=C%119[Si](C)(C)C)[H-][Ti+3]1389(<-[N-2]5C5CCCCC5)(<-[C-]5(C)C1(C)=C3(C)C8(C)=C59[Si](C)(C)C)[N-3]6%10)C2(C)=C47[Si](C)(C)C
 
 ## Reaction 31-614-CAS-44553176
 
@@ -15131,7 +15131,7 @@ Total reactions: 1999
 - Yield %: 82
 - Reagents: 3400-45-1 (3400-45-1) [UNK], 10534-59-5 (10534-59-5) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: C#C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>C=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: C#C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>C=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-614-CAS-45380683
 

@@ -461,7 +461,7 @@ Total reactions: 1125
 - Yield %: 93
 - Reagents: 56-23-5 (56-23-5) [UNK], 603-35-0 (603-35-0) [ADDITIVE]
 - Solvents: 56-23-5 (56-23-5), 75-05-8 (75-05-8)
-- SMILES: CCC[CH2][Sn]([CH2]O)([CH2]CCC)[CH2]CCC>>CCC[CH2][Sn]([CH2]Cl)([CH2]CCC)[CH2]CCC
+- SMILES: CCCC[Sn](CO)(CCCC)CCCC>>CCCC[Sn](CCl)(CCCC)CCCC
 
 ## Reaction 31-048-CAS-10685219
 
@@ -5889,7 +5889,7 @@ Total reactions: 1125
 - Yield %: 80
 - Reagents: 56-23-5 (56-23-5) [UNK], 603-35-0 (603-35-0) [ADDITIVE]
 - Solvents: 56-23-5 (56-23-5), 75-05-8 (75-05-8)
-- SMILES: CC(C)[C@@H]1CC[C@@H](C)C[C@H]1[Sn]([CH3])([CH3])[CH2]O>>CC(C)[C@@H]1CC[C@@H](C)C[C@H]1[Sn]([CH3])([CH3])[CH2]Cl
+- SMILES: CC(C)[C@@H]1CC[C@@H](C)C[C@H]1[Sn](C)(C)CO>>CC(C)[C@@H]1CC[C@@H](C)C[C@H]1[Sn](C)(C)CCl
 
 ## Reaction 31-048-CAS-4535300
 
@@ -6800,7 +6800,7 @@ Total reactions: 1125
 - Yield %: 88
 - Reagents: 56-23-5 (56-23-5) [UNK], 603-35-0 (603-35-0) [ADDITIVE]
 - Solvents: 56-23-5 (56-23-5), 75-05-8 (75-05-8)
-- SMILES: [2H][C@H](O)[Sn]([CH3])([CH3])[C@@H]1C[C@H](C)CC[C@H]1C(C)C>>[2H][C@@H](Cl)[Sn]([CH3])([CH3])[C@@H]1C[C@H](C)CC[C@H]1C(C)C
+- SMILES: [2H][C@H](O)[Sn](C)(C)[C@@H]1C[C@H](C)CC[C@H]1C(C)C>>[2H][C@@H](Cl)[Sn](C)(C)[C@@H]1C[C@H](C)CC[C@H]1C(C)C
 
 ## Reaction 31-048-CAS-6663591
 

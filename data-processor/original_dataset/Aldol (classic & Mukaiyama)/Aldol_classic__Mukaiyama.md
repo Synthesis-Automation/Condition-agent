@@ -3870,7 +3870,7 @@ Total reactions: 2499
 - Yield %: 95
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 7732-18-5 (7732-18-5)
-- SMILES: CCC[CH2][Sn](/[CH]=C/C=O)([CH2]CCC)[CH2]CCC.C/C=C(/C=C(\OC)O[Si](C)(C)C)OC>>CCC[CH2][Sn](/[CH]=C/[C@H](O)[C@@H](C)/C(=C/C(=O)OC)OC)([CH2]CCC)[CH2]CCC
+- SMILES: CCCC[Sn](/C=C/C=O)(CCCC)CCCC.C/C=C(/C=C(\OC)O[Si](C)(C)C)OC>>CCCC[Sn](/C=C/[C@H](O)[C@@H](C)/C(=C/C(=O)OC)OC)(CCCC)CCCC
 
 ## Reaction 31-330-CAS-13405566
 
@@ -5255,7 +5255,7 @@ Total reactions: 2499
 - Yield %: 84
 - Reagents: 14044-65-6 (14044-65-6) [UNK], 17360-25-7 (17360-25-7) [ADDITIVE], 144-55-8 (144-55-8) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CCC[CH2][Sn](/[CH]=C/C=C(/C)C=O)([CH2]CCC)[CH2]CCC.COC(O[Si](C)(C)C)=C(C)C>>CCC[CH2][Sn](/[CH]=C/C=C(/C)[C@@H](O)C(C)(C)C(=O)OC)([CH2]CCC)[CH2]CCC
+- SMILES: CCCC[Sn](/C=C/C=C(/C)C=O)(CCCC)CCCC.COC(O[Si](C)(C)C)=C(C)C>>CCCC[Sn](/C=C/C=C(/C)[C@@H](O)C(C)(C)C(=O)OC)(CCCC)CCCC
 
 ## Reaction 31-330-CAS-14962954
 
@@ -15135,7 +15135,7 @@ Total reactions: 2499
 - Yield %: 82
 - Reagents: 109-63-7 (109-63-7) [UNK], 121-44-8 (121-44-8) [ADDITIVE], 62778-11-4 (62778-11-4) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 109-99-9 (109-99-9)
-- SMILES: O=Cc1ccc([N+](=O)[O-])cc1.CC=C(O[Si](C)(C)C)[CH-]1[CH]2=[CH]3C(C)O[C-](=O)->[Fe+2]<-3<-2<-1([C]#O)([C]#O)[C]#O>>CC(C(=O)[CH-]1[CH]2=[CH]3C(C)O[C-](=O)->[Fe+2]<-3<-2<-1([C]#O)([C]#O)[C]#O)C(O)C1=CC=C([N+](=O)[O-])C=C1
+- SMILES: O=Cc1ccc([N+](=O)[O-])cc1.CC=C(O[Si](C)(C)C)[CH-]1->[Fe+2]23(C#O)(C#O)(C#O)<-[C-](=O)OC(C)[CH]2=[CH]13>>CC(C(=O)[CH-]1->[Fe+2]23(C#O)(C#O)(C#O)<-[C-](=O)OC(C)[CH]2=[CH]13)C(O)C1=CC=C([N+](=O)[O-])C=C1
 
 ## Reaction 31-330-CAS-6635015
 
@@ -16321,7 +16321,7 @@ Total reactions: 2499
 - Yield %: 92
 - Reagents: 791-28-6 (791-28-6) [UNK], 144-55-8 (144-55-8) [ADDITIVE]
 - Solvents: 108-88-3 (108-88-3), 7732-18-5 (7732-18-5)
-- SMILES: CCC[CH2][Sn](/[CH]=C/C=C(\C)C=O)([CH2]CCC)[CH2]CCC.COC(O[Si](C)(C)C)=C(C)C>>CCC[CH2][Sn](/[CH]=C/C=C(\C)[C@@H](O[Si](C)(C)C)C(C)(C)C(=O)OC)([CH2]CCC)[CH2]CCC
+- SMILES: CCCC[Sn](/C=C/C=C(\C)C=O)(CCCC)CCCC.COC(O[Si](C)(C)C)=C(C)C>>CCCC[Sn](/C=C/C=C(\C)[C@@H](O[Si](C)(C)C)C(C)(C)C(=O)OC)(CCCC)CCCC
 
 ## Reaction 31-330-CAS-8040887
 
@@ -17110,7 +17110,7 @@ Total reactions: 2499
 - Yield %: 81
 - Reagents: 109-63-7 (109-63-7) [UNK], 110-86-1 (110-86-1) [ADDITIVE], 7664-39-3 (7664-39-3) [ADDITIVE]
 - Solvents: 60-29-7 (60-29-7), 75-09-2 (75-09-2)
-- SMILES: O=Cc1ccccc1.C=C(O[Si](C)(C)C)[CH-]1[CH]2=[CH]3C(CCCCC)O[C-](=O)->[Fe+2]<-3<-2<-1([C]#O)([C]#O)[C]#O>>CCCCCC1O[C-](=O)->[Fe+2]23([C]#O)([C]#O)([C]#O)<-[CH]1=[CH]->2[CH-]->3C(=O)CC(O)C1=CC=CC=C1
+- SMILES: O=Cc1ccccc1.C=C(O[Si](C)(C)C)[CH-]1->[Fe+2]23(C#O)(C#O)(C#O)<-[C-](=O)OC(CCCCC)[CH]2=[CH]13>>CCCCCC1O[C-](=O)->[Fe+2]23(C#O)(C#O)(C#O)<-[CH-](C(=O)CC(O)C4=CC=CC=C4)[CH]2=[CH]13
 
 ## Reaction 31-330-CAS-8844915
 

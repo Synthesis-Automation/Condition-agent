@@ -1553,7 +1553,7 @@ Total reactions: 2890
 - Yield %: 90
 - Reagents: 10049-08-8 (10049-08-8) [UNK]
 - Solvents: 64-17-5 (64-17-5)
-- SMILES: CCO.O=CCCC1=CCC=CC1>>CCOC(CC[C]12->[Ru+2]34567([Cl-])(<-[CH](=[CH]->3[CH]->4=1)[CH]->5=[CH]->62)[Cl-][Ru+2]12345([Cl-])(<-[CH]6=[CH]->1[CH]->2=[C]->3(CCC(OCC)OCC)[CH]->4=[CH]->56)[Cl-]7)OCC
+- SMILES: CCO.O=CCCC1=CCC=CC1>>CCOC(CCC12=[CH]3[CH]4=[CH]5[CH]6=[CH]1[Ru+2]546321([Cl-])[Cl-][Ru+2]23456([Cl-])([Cl-]1)[CH]1=[CH]2[CH]3=C4(CCC(OCC)OCC)[CH]5=[CH]16)OCC
 
 ## Reaction 31-301-CAS-11133251
 
@@ -8093,7 +8093,7 @@ Total reactions: 2890
 - Type: Acetal ketal formation
 - Yield %: 89
 - Reagents: 7440-23-5 (7440-23-5) [UNK]
-- SMILES: CO.COC(=O)C(F)(F)F.O=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>COC(OC)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: CO.COC(=O)C(F)(F)F.O=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>COC(OC)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-301-CAS-18719016
 

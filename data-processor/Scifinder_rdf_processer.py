@@ -4,6 +4,8 @@
 Simple Qt6 GUI wrapper for processing RDF files only.
 Lets the user pick a folder containing RDF files and processes all RDF files in the folder.
 Works with PySide6 (preferred) or PyQt6 if installed.
+
+MAXSUM smiles: 160
 """
 from __future__ import annotations
 
@@ -997,6 +999,13 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         "product_yield_7": _yield_at(7),
                         "notes": _format_notes(rdf_data.get("notes", "")),
                     }
+                    # Skip records with reaction SMILES longer than 160 characters
+                    if len(rxn_smi) > 160:
+                        continue
+                    # Skip chemically invalid SMILES
+                    if RDKIT_AVAILABLE and rxn_smi:
+                        if not _is_valid_smiles(r_smi) and not _is_valid_smiles(p_smi):
+                            continue
                     writer.writerow(entry)
                     if idx % 100 == 0:
                         print(f"  Processed {idx}/{len(rows)} reactions for CSV...")
@@ -1011,6 +1020,17 @@ try:
 except Exception:
     Chem = None  # type: ignore
     RDKIT_AVAILABLE = False
+
+
+def _is_valid_smiles(smiles: str) -> bool:
+    """Check if a SMILES string is chemically valid using RDKit."""
+    if not smiles or not RDKIT_AVAILABLE:
+        return False
+    try:
+        mol = Chem.MolFromSmiles(smiles, sanitize=True)
+        return mol is not None
+    except Exception:
+        return False
 
 
 class RDFWorker(QtCore.QObject):

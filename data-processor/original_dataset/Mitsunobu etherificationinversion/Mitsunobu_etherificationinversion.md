@@ -7749,7 +7749,7 @@ Total reactions: 1114
 - Yield %: 76
 - Reagents: 603-35-0 (603-35-0) [UNK], 870-50-8 (870-50-8) [ADDITIVE], 121-44-8 (121-44-8) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: Oc1cncc(Br)c1.COc1ccc(COc2cccc(C[C@@H](CO)NC(=O)OC(C)(C)C)c2)cc1.Cc1nn(C(=O)OC(C)(C)C)c2cc[c]([Sn]([CH3])([CH3])[CH3])cc12>>COc1ccc(COc2cccc(C[C@@H](COc3cncc(-c4ccc5c(c4)c(C)nn5C(=O)OC(C)(C)C)c3)NC(=O)OC(C)(C)C)c2)cc1
+- SMILES: Oc1cncc(Br)c1.COc1ccc(COc2cccc(C[C@@H](CO)NC(=O)OC(C)(C)C)c2)cc1.Cc1nn(C(=O)OC(C)(C)C)c2ccc([Sn](C)(C)C)cc12>>COc1ccc(COc2cccc(C[C@@H](COc3cncc(-c4ccc5c(c4)c(C)nn5C(=O)OC(C)(C)C)c3)NC(=O)OC(C)(C)C)c2)cc1
 
 ## Reaction 31-012-CAS-9488979
 

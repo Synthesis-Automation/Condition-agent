@@ -1615,7 +1615,7 @@ Total reactions: 553
 - Type: Liebeskind–Srogl coupling
 - Yield %: 61
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: N#Cc1ccc(B(O)O)cc1.CSc1nc(Cl)c(-c2c3[n]4->[Cu+3]56<-[n-]7c2ccc7c(-c2c(C)cc(C)cc2C)c2ccc(c7ccc(c(-c8c(C)cc(C)cc8C)c4C=C3)[n-]->57)[n-]->62)c(Cl)n1>>Cc1cc(C)c(-c2c3[n]4->[Cu+3]56<-[n-]7c(ccc7c(-c7c(C)cc(C)cc7C)c7ccc(c8ccc2[n-]->58)[n-]->67)c(-c2c(Cl)nc(-c5ccc(C#N)cc5)nc2Cl)c4C=C3)c(C)c1
+- SMILES: N#Cc1ccc(B(O)O)cc1.CSc1nc(Cl)c(-c2c3n4->[Cu+3]56<-[n-]7c2ccc7c(-c2c(C)cc(C)cc2C)c2ccc(c7ccc(c(-c8c(C)cc(C)cc8C)c4C=C3)[n-]->57)[n-]->62)c(Cl)n1>>Cc1cc(C)c(-c2c3n4->[Cu+3]56<-[n-]7c(ccc7c(-c7c(C)cc(C)cc7C)c7ccc(c8ccc2[n-]->58)[n-]->67)c(-c2c(Cl)nc(-c5ccc(C#N)cc5)nc2Cl)c4C=C3)c(C)c1
 
 ## Reaction 31-179-CAS-21041746
 
@@ -3678,7 +3678,7 @@ Total reactions: 553
 - Yield %: 75
 - Reagents: 497-19-8 (497-19-8) [UNK]
 - Solvents: 108-88-3 (108-88-3), 7732-18-5 (7732-18-5)
-- SMILES: OB(O)c1ccccc1.Cc1cc(C)c(-c2c3[n]4->[Cu+3]56<-[n-]7c(ccc7c(-c7c(C)cc(C)cc7C)c7ccc(c8ccc2[n-]->58)[n-]->67)c(-c2c(Cl)ncnc2Cl)c4C=C3)c(C)c1>>Cc1cc(C)c(-c2c3[n]4->[Cu+3]56<-[n-]7c(ccc7c(-c7c(C)cc(C)cc7C)c7ccc(c8ccc2[n-]->58)[n-]->67)c(-c2c(-c5ccccc5)ncnc2-c2ccccc2)c4C=C3)c(C)c1
+- SMILES: OB(O)c1ccccc1.Cc1cc(C)c(-c2c3n4->[Cu+3]56<-[n-]7c(ccc7c(-c7c(C)cc(C)cc7C)c7ccc(c8ccc2[n-]->58)[n-]->67)c(-c2c(Cl)ncnc2Cl)c4C=C3)c(C)c1>>Cc1cc(C)c(-c2c3n4->[Cu+3]56<-[n-]7c(ccc7c(-c7c(C)cc(C)cc7C)c7ccc(c8ccc2[n-]->58)[n-]->67)c(-c2c(-c5ccccc5)ncnc2-c2ccccc2)c4C=C3)c(C)c1
 
 ## Reaction 31-179-CAS-5153331
 

@@ -2779,7 +2779,7 @@ Total reactions: 2218
 
 - Type: C–H amination and azidation
 - Yield %: 70
-- SMILES: COc1ccc(N)cc1.[O-][Cl+3]([O-])([O-])[O-].c1ccc([N]2=Nc3cccc[n]3->[Ru+2]<-234(<-[N](=Nc2cccc[n]->32)c2ccccc2)<-[N](=Nc2cccc[n]->42)c2ccccc2)cc1>>COc1ccc(Nc2ccc([N]3=Nc4cccc[n]4->[Ru+2]<-345(<-[N](=Nc3cccc[n]->43)c3ccc(Nc4ccc(OC)cc4)cc3)<-[N](=Nc3cccc[n]->53)c3ccc(Nc4ccc(OC)cc4)cc3)cc2)cc1.[O-][Cl+3]([O-])([O-])[O-]
+- SMILES: COc1ccc(N)cc1.[O-][Cl+3]([O-])([O-])[O-].c1ccc(N2=Nc3ccccn3->[Ru+2]<-234(<-N(=Nc2ccccn->32)c2ccccc2)<-N(=Nc2ccccn->42)c2ccccc2)cc1>>COc1ccc(Nc2ccc(N3=Nc4ccccn4->[Ru+2]<-345(<-N(=Nc3ccccn->43)c3ccc(Nc4ccc(OC)cc4)cc3)<-N(=Nc3ccccn->53)c3ccc(Nc4ccc(OC)cc4)cc3)cc2)cc1.[O-][Cl+3]([O-])([O-])[O-]
 
 ## Reaction 31-080-CAS-10545676
 
@@ -5290,7 +5290,7 @@ Total reactions: 2218
 - Yield %: 83
 - Reagents: 79950-15-5 (79950-15-5) [UNK], 7772-98-7 (7772-98-7) [ADDITIVE], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: COc1ccc[c]([Zn][I])c1.C[C@@H](NOC(=O)c1ccccc1)c1ccccc1>>COc1ccccc1N[C@H](C)c1ccccc1
+- SMILES: COc1cccc([Zn]I)c1.C[C@@H](NOC(=O)c1ccccc1)c1ccccc1>>COc1ccccc1N[C@H](C)c1ccccc1
 
 ## Reaction 31-080-CAS-16590414
 
@@ -10657,7 +10657,7 @@ Total reactions: 2218
 - Type: C–H amination and azidation
 - Yield %: 94
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: [N-]=[N+]=Nc1ccccc1-c1ccccc1.CC1(C)Cc2cccc(CC(C)(C)C3=[O]->[Rh+2]456<-[O]=C7[O-]->[Rh+2]4(<-[O]=C1[O-]->5)(<-[O]=C([O-]->6)C(C)(C)Cc1cccc(CC7(C)C)c1)<-[O-]3)c2>>c1ccc2c(c1)[nH]c1ccccc12.CC1(C)Cc2cccc(CC(C)(C)C3=[O]->[Rh+2]456<-[O]=C7[O-]->[Rh+2]4(<-[O]=C1[O-]->5)(<-[O]=C([O-]->6)C(C)(C)Cc1cccc(CC7(C)C)c1)(<-[O-]3)<-[nH]1c3ccccc3c3ccccc31)c2
+- SMILES: [N-]=[N+]=Nc1ccccc1-c1ccccc1.CC1(C)Cc2cccc(CC(C)(C)C3=O->[Rh+2]456<-O=C7[O-]->[Rh+2]4(<-O=C1[O-]->5)(<-O=C([O-]->6)C(C)(C)Cc1cccc(CC7(C)C)c1)<-[O-]3)c2>>c1ccc2c(c1)[nH]c1ccccc12.CC1(C)Cc2cccc(CC(C)(C)C3=O->[Rh+2]456<-O=C7[O-]->[Rh+2]4(<-O=C1[O-]->5)(<-O=C([O-]->6)C(C)(C)Cc1cccc(CC7(C)C)c1)(<-[O-]3)<-[nH]1c3ccccc3c3ccccc31)c2
 
 ## Reaction 31-080-CAS-23156226
 
@@ -11419,7 +11419,7 @@ Total reactions: 2218
 - Yield %: 96
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
 - Solvents: 64-17-5 (64-17-5)
-- SMILES: C[C@@H]1[NH2]->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4[n]->21)<-[c-]1ccccc1-c1ccc2ccccc2[n]->31>>C[C@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccccc6[n]->25)<-[c-]2ccccc2-c2ccc5cccc([NH]->31)c5[n]->42.CC1=[NH]->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4[n]->21)<-[c-]1ccccc1-c1ccc2ccccc2[n]->31
+- SMILES: C[C@@H]1N->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4n->21)<-[c-]1ccccc1-c1ccc2ccccc2n->31>>C[C@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccccc6n->25)<-[c-]2ccccc2-c2ccc5cccc(N->31)c5n->42.CC1=N->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4n->21)<-[c-]1ccccc1-c1ccc2ccccc2n->31
 
 ## Reaction 31-080-CAS-23852589
 
@@ -11427,7 +11427,7 @@ Total reactions: 2218
 - Yield %: 89
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
 - Solvents: 64-17-5 (64-17-5)
-- SMILES: Cc1ccc2ccc3-c4cccc[c-]4->[Ir+3]45(<-[NH2][C@@H](C)C(=O)[O-]->4)(<-[c-]4ccccc4-c4ccc6ccc(C)cc6[n]->54)<-[n]3c2c1>>Cc1ccc2ccc3-c4cccc[c-]4->[Ir+3]456(<-[O-]C(=O)[C@H](C)[NH]->4c4c(C)ccc7ccc(-c8cccc[c-]->58)[n]->6c47)<-[n]3c2c1
+- SMILES: Cc1ccc2ccc3-c4cccc[c-]4->[Ir+3]45(<-N[C@@H](C)C(=O)[O-]->4)(<-[c-]4ccccc4-c4ccc6ccc(C)cc6n->54)<-n3c2c1>>Cc1ccc2ccc3-c4cccc[c-]4->[Ir+3]456(<-[O-]C(=O)[C@H](C)N->4c4c(C)ccc7ccc(-c8cccc[c-]->58)n->6c47)<-n3c2c1
 
 ## Reaction 31-080-CAS-23853170
 
@@ -11435,7 +11435,7 @@ Total reactions: 2218
 - Yield %: 86
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
 - Solvents: 64-17-5 (64-17-5)
-- SMILES: C[C@@H]1[NH2]->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccc(Br)cc4[n]->21)<-[c-]1ccccc1-c1ccc2ccc(Br)cc2[n]->31>>C[C@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccc(Br)cc6[n]->25)<-[c-]2ccccc2-c2ccc5ccc(Br)c([NH]->31)c5[n]->42
+- SMILES: C[C@@H]1N->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccc(Br)cc4n->21)<-[c-]1ccccc1-c1ccc2ccc(Br)cc2n->31>>C[C@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccc(Br)cc6n->25)<-[c-]2ccccc2-c2ccc5ccc(Br)c(N->31)c5n->42
 
 ## Reaction 31-080-CAS-23853294
 
@@ -11443,7 +11443,7 @@ Total reactions: 2218
 - Yield %: 88
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
 - Solvents: 64-17-5 (64-17-5)
-- SMILES: C[C@H]1[NH2]->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4[n]->21)<-[c-]1ccccc1-c1ccc2ccccc2[n]->31.C[C@H]1[NH2]->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4[n]->21)<-[c-]1ccccc1-c1ccc2ccccc2[n]->31>>C[C@@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccccc6[n]->25)<-[c-]2ccccc2-c2ccc5cccc([NH]->31)c5[n]->42
+- SMILES: C[C@H]1N->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4n->21)<-[c-]1ccccc1-c1ccc2ccccc2n->31.C[C@H]1N->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4n->21)<-[c-]1ccccc1-c1ccc2ccccc2n->31>>C[C@@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccccc6n->25)<-[c-]2ccccc2-c2ccc5cccc(N->31)c5n->42
 
 ## Reaction 31-080-CAS-23853699
 
@@ -11451,7 +11451,7 @@ Total reactions: 2218
 - Yield %: 85
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
 - Solvents: 64-17-5 (64-17-5)
-- SMILES: CC(C)[C@H]1[NH2]->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4[n]->21)<-[c-]1ccccc1-c1ccc2ccccc2[n]->31>>CC(C)[C@@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccccc6[n]->25)<-[c-]2ccccc2-c2ccc5cccc([NH]->31)c5[n]->42
+- SMILES: CC(C)[C@H]1N->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccccc4n->21)<-[c-]1ccccc1-c1ccc2ccccc2n->31>>CC(C)[C@@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccccc6n->25)<-[c-]2ccccc2-c2ccc5cccc(N->31)c5n->42
 
 ## Reaction 31-080-CAS-23853832
 
@@ -11459,7 +11459,7 @@ Total reactions: 2218
 - Yield %: 89
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
 - Solvents: 64-17-5 (64-17-5)
-- SMILES: C[C@@H]1[NH2]->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccc(Cl)cc4[n]->21)<-[c-]1ccccc1-c1ccc2ccc(Cl)cc2[n]->31>>C[C@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccc(Cl)cc6[n]->25)<-[c-]2ccccc2-c2ccc5ccc(Cl)c([NH]->31)c5[n]->42
+- SMILES: C[C@@H]1N->[Ir+3]23(<-[O-]C1=O)(<-[c-]1ccccc1-c1ccc4ccc(Cl)cc4n->21)<-[c-]1ccccc1-c1ccc2ccc(Cl)cc2n->31>>C[C@H]1C(=O)[O-]->[Ir+3]234(<-[c-]5ccccc5-c5ccc6ccc(Cl)cc6n->25)<-[c-]2ccccc2-c2ccc5ccc(Cl)c(N->31)c5n->42
 
 ## Reaction 31-080-CAS-23862737
 
@@ -11743,7 +11743,7 @@ Total reactions: 2218
 - Type: C–H amination and azidation
 - Yield %: 70
 - Reagents: 7782-44-7 (7782-44-7) [UNK]
-- SMILES: Cc1ccc(N)cc1.Cn1cc[n]2->[Ru+2]34(<-[N](=Nc12)c1ccccc1)(<-[N](=Nc1n(C)cc[n]->31)c1ccccc1)<-[N](=Nc1n(C)cc[n]->41)c1ccccc1.[O-][Cl+3]([O-])([O-])[O-]>>Cc1ccc(Nc2ccc([N]3=Nc4n(C)cc[n]4->[Ru+2]<-345(<-[N](=Nc3n(C)cc[n]->43)c3ccc(Nc4ccc(C)cc4)cc3)<-[N](=Nc3n(C)cc[n]->53)c3ccc(Nc4ccc(C)cc4)cc3)cc2)cc1.[O-][Cl+3]([O-])([O-])[O-]
+- SMILES: Cc1ccc(N)cc1.Cn1ccn2->[Ru+2]34(<-N(=Nc12)c1ccccc1)(<-N(=Nc1n(C)ccn->31)c1ccccc1)<-N(=Nc1n(C)ccn->41)c1ccccc1.[O-][Cl+3]([O-])([O-])[O-]>>Cc1ccc(Nc2ccc(N3=Nc4n(C)ccn4->[Ru+2]<-345(<-N(=Nc3n(C)ccn->43)c3ccc(Nc4ccc(C)cc4)cc3)<-N(=Nc3n(C)ccn->53)c3ccc(Nc4ccc(C)cc4)cc3)cc2)cc1.[O-][Cl+3]([O-])([O-])[O-]
 
 ## Reaction 31-080-CAS-2985447
 
@@ -12510,7 +12510,7 @@ Total reactions: 2218
 
 - Type: C–H amination and azidation
 - Yield %: 74
-- SMILES: [N-]=[N+]=[N-]->[Ru+5]1234<-[N](=C[N-](c5ccccc5)->[Ru]1(<-[N](=C[N-]->2c1ccccc1)c1ccccc1)(<-[N](=C[N-]->3c1ccccc1)c1ccccc1)<-[N-](C=[N]->4c1ccccc1)c1ccccc1)c1ccccc1>>C1=[N](c2ccccc2)->[Ru]234<-[N](=C[N-]5c6ccccc6[NH-]->[Ru+5]<-52(<-[N](=C[N-]->3c2ccccc2)c2ccccc2)(<-[N](=C[N-]->4c2ccccc2)c2ccccc2)<-[N-]1c1ccccc1)c1ccccc1
+- SMILES: [N-]=[N+]=[N-]->[Ru+5]1234<-N(=C[N-](c5ccccc5)->[Ru]1(<-N(=C[N-]->2c1ccccc1)c1ccccc1)(<-N(=C[N-]->3c1ccccc1)c1ccccc1)<-[N-](C=N->4c1ccccc1)c1ccccc1)c1ccccc1>>C1=N(c2ccccc2)->[Ru]234<-N(=C[N-]5c6ccccc6[NH-]->[Ru+5]<-52(<-N(=C[N-]->3c2ccccc2)c2ccccc2)(<-N(=C[N-]->4c2ccccc2)c2ccccc2)<-[N-]1c1ccccc1)c1ccccc1
 
 ## Reaction 31-080-CAS-4902831
 
@@ -12665,7 +12665,7 @@ Total reactions: 2218
 
 - Type: C–H amination and azidation
 - Yield %: 70
-- SMILES: [Li][c]1c(OC)cccc1OC.C=C(N=[N+]=[N-])c1ccccc1>>COc1cccc(OC)c1N
+- SMILES: [Li]c1c(OC)cccc1OC.C=C(N=[N+]=[N-])c1ccccc1>>COc1cccc(OC)c1N
 
 ## Reaction 31-080-CAS-5208596
 
@@ -14304,7 +14304,7 @@ Total reactions: 2218
 - Type: C–H amination and azidation
 - Yield %: 99
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: [N-]=[N+]=[N-]->[Ru+5]1234<-[N](=C[N-](c5cc(Cl)cc(Cl)c5)->[Ru]1(<-[N](=C[N-]->2c1cc(Cl)cc(Cl)c1)c1cc(Cl)cc(Cl)c1)(<-[N](=C[N-]->3c1cc(Cl)cc(Cl)c1)c1cc(Cl)cc(Cl)c1)<-[N-](C=[N]->4c1cc(Cl)cc(Cl)c1)c1cc(Cl)cc(Cl)c1)c1cc(Cl)cc(Cl)c1.CCCCCC>>CCCCCC.Clc1cc(Cl)cc([N]2=C[N-](c3cc(Cl)cc(Cl)c3)->[Ru+5]3456<-[NH-]c7c(Cl)cc(Cl)cc7[N-]->3C=[N](c3cc(Cl)cc(Cl)c3)->[Ru]<-24(<-[N-](C=[N]->5c2cc(Cl)cc(Cl)c2)c2cc(Cl)cc(Cl)c2)<-[N-](C=[N]->6c2cc(Cl)cc(Cl)c2)c2cc(Cl)cc(Cl)c2)c1
+- SMILES: [N-]=[N+]=[N-]->[Ru+5]1234<-N(=C[N-](c5cc(Cl)cc(Cl)c5)->[Ru]1(<-N(=C[N-]->2c1cc(Cl)cc(Cl)c1)c1cc(Cl)cc(Cl)c1)(<-N(=C[N-]->3c1cc(Cl)cc(Cl)c1)c1cc(Cl)cc(Cl)c1)<-[N-](C=N->4c1cc(Cl)cc(Cl)c1)c1cc(Cl)cc(Cl)c1)c1cc(Cl)cc(Cl)c1.CCCCCC>>CCCCCC.Clc1cc(Cl)cc(N2=C[N-](c3cc(Cl)cc(Cl)c3)->[Ru+5]3456<-[NH-]c7c(Cl)cc(Cl)cc7[N-]->3C=N(c3cc(Cl)cc(Cl)c3)->[Ru]<-24(<-[N-](C=N->5c2cc(Cl)cc(Cl)c2)c2cc(Cl)cc(Cl)c2)<-[N-](C=N->6c2cc(Cl)cc(Cl)c2)c2cc(Cl)cc(Cl)c2)c1
 
 ## Reaction 31-080-CAS-9223835
 

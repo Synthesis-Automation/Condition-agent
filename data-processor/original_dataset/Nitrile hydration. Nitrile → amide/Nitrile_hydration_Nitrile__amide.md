@@ -1496,7 +1496,7 @@ Total reactions: 2500
 - Yield %: 80
 - Reagents: 67-56-1 (67-56-1) [UNK], 16853-85-3 (16853-85-3) [ADDITIVE], 7732-18-5 (7732-18-5) [ADDITIVE]
 - Solvents: 60-29-7 (60-29-7), 67-56-1 (67-56-1)
-- SMILES: [Br][Mg][c]1ccccc1.C=CCCC#N>>C=CCCC(N)c1ccccc1
+- SMILES: Br[Mg]c1ccccc1.C=CCCC#N>>C=CCCC(N)c1ccccc1
 
 ## Reaction 31-520-CAS-10322720
 
@@ -1575,7 +1575,7 @@ Total reactions: 2500
 - Yield %: 76
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: N#Cc1ccc2ccccc2c1.C[CH](C)[Mg][Br]>>CC(C)C(N)c1ccc2ccccc2c1
+- SMILES: N#Cc1ccc2ccccc2c1.CC(C)[Mg]Br>>CC(C)C(N)c1ccc2ccccc2c1
 
 ## Reaction 31-520-CAS-10549773
 
@@ -1846,7 +1846,7 @@ Total reactions: 2500
 - Yield %: 76
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: N#Cc1ccccc1.[Br][Mg][CH2]c1ccccc1>>NC(Cc1ccccc1)c1ccccc1
+- SMILES: N#Cc1ccccc1.Br[Mg]Cc1ccccc1>>NC(Cc1ccccc1)c1ccccc1
 
 ## Reaction 31-520-CAS-1113604
 
@@ -2438,7 +2438,7 @@ Total reactions: 2500
 - Yield %: 95
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: N#Cc1ccc2ccccc2c1.[Br][Mg][CH]1CC1>>NC(c1ccc2ccccc2c1)C1CC1
+- SMILES: N#Cc1ccc2ccccc2c1.Br[Mg]C1CC1>>NC(c1ccc2ccccc2c1)C1CC1
 
 ## Reaction 31-520-CAS-12675817
 
@@ -2666,7 +2666,7 @@ Total reactions: 2500
 - Yield %: 84
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: [Br][Mg][c]1ccccc1.COc1ccc(C#N)cc1OC>>COc1ccc(C(N)c2ccccc2)cc1OC
+- SMILES: Br[Mg]c1ccccc1.COc1ccc(C#N)cc1OC>>COc1ccc(C(N)c2ccccc2)cc1OC
 
 ## Reaction 31-520-CAS-1327770
 
@@ -2730,7 +2730,7 @@ Total reactions: 2500
 - Yield %: 80
 - Reagents: 20393-66-2 (20393-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: N#Cc1ccccc1.[Li][CH2]CCC>>CCCCC(N)c1ccccc1
+- SMILES: N#Cc1ccccc1.[Li]CCCC>>CCCCC(N)c1ccccc1
 
 ## Reaction 31-520-CAS-13505312
 
@@ -2959,7 +2959,7 @@ Total reactions: 2500
 - Yield %: 85
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: N#Cc1ccc(C(F)(F)F)cc1.C[CH2][Mg][Br]>>CCC(N)c1ccc(C(F)(F)F)cc1
+- SMILES: N#Cc1ccc(C(F)(F)F)cc1.CC[Mg]Br>>CCC(N)c1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-520-CAS-14196726
 
@@ -3223,7 +3223,7 @@ Total reactions: 2500
 - Yield %: 85
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: [CH3][Mg][Br].N#Cc1ccc(C(F)(F)F)cc1>>CC(N)c1ccc(C(F)(F)F)cc1
+- SMILES: C[Mg]Br.N#Cc1ccc(C(F)(F)F)cc1>>CC(N)c1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-520-CAS-14813378
 
@@ -3452,7 +3452,7 @@ Total reactions: 2500
 - Yield %: 75
 - Reagents: 22560-16-3 (22560-16-3) [UNK], 85116-37-6 (85116-37-6) [ADDITIVE], 7647-01-0 (7647-01-0) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: Cc1ccccc1C#N.C=C[CH2][Mg][Cl]>>C=CCC(N)c1ccccc1C
+- SMILES: Cc1ccccc1C#N.C=CC[Mg]Cl>>C=CCC(N)c1ccccc1C
 
 ## Reaction 31-520-CAS-15397194
 
@@ -3460,7 +3460,7 @@ Total reactions: 2500
 - Yield %: 76
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: [Br][Mg][CH2]c1ccccc1.COc1ccc(C#N)cc1OC>>COc1ccc(C(N)Cc2ccccc2)cc1OC
+- SMILES: Br[Mg]Cc1ccccc1.COc1ccc(C#N)cc1OC>>COc1ccc(C(N)Cc2ccccc2)cc1OC
 
 ## Reaction 31-520-CAS-15411437
 
@@ -7439,7 +7439,7 @@ Total reactions: 2500
 - Yield %: 95
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: [CH3][Mg][Br].COc1ccc(C#N)cc1OC>>COc1ccc(C(C)N)cc1OC
+- SMILES: C[Mg]Br.COc1ccc(C#N)cc1OC>>COc1ccc(C(C)N)cc1OC
 
 ## Reaction 31-520-CAS-20135842
 
@@ -9046,7 +9046,7 @@ Total reactions: 2500
 - Yield %: 88
 - Reagents: 7646-69-7 (7646-69-7) [UNK], 7646-85-7 (7646-85-7) [ADDITIVE], 7631-86-9 (7631-86-9) [ADDITIVE], 121-44-8 (121-44-8) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 60-29-7 (60-29-7), 110-54-3 (110-54-3)
-- SMILES: N#Cc1ccc(-c2ccccc2)cc1.C=C[CH2][Mg][Br]>>C=CCC(N)c1ccc(-c2ccccc2)cc1
+- SMILES: N#Cc1ccc(-c2ccccc2)cc1.C=CC[Mg]Br>>C=CCC(N)c1ccc(-c2ccccc2)cc1
 
 ## Reaction 31-520-CAS-22066632
 
@@ -9054,7 +9054,7 @@ Total reactions: 2500
 - Yield %: 72
 - Reagents: 7646-69-7 (7646-69-7) [UNK], 7646-85-7 (7646-85-7) [ADDITIVE], 7631-86-9 (7631-86-9) [ADDITIVE], 121-44-8 (121-44-8) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 60-29-7 (60-29-7), 110-54-3 (110-54-3)
-- SMILES: COc1ccc(C#N)cc1.C=C[CH2][Mg][Br]>>C=CCC(N)c1ccc(OC)cc1
+- SMILES: COc1ccc(C#N)cc1.C=CC[Mg]Br>>C=CCC(N)c1ccc(OC)cc1
 
 ## Reaction 31-520-CAS-22066633
 
@@ -9062,7 +9062,7 @@ Total reactions: 2500
 - Yield %: 73
 - Reagents: 7646-69-7 (7646-69-7) [UNK], 7646-85-7 (7646-85-7) [ADDITIVE], 7631-86-9 (7631-86-9) [ADDITIVE], 121-44-8 (121-44-8) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 60-29-7 (60-29-7), 110-54-3 (110-54-3)
-- SMILES: N#Cc1ccc(Br)cc1.C=C[CH2][Mg][Br]>>C=CCC(N)c1ccc(Br)cc1
+- SMILES: N#Cc1ccc(Br)cc1.C=CC[Mg]Br>>C=CCC(N)c1ccc(Br)cc1
 
 ## Reaction 31-520-CAS-22066634
 
@@ -9070,7 +9070,7 @@ Total reactions: 2500
 - Yield %: 85
 - Reagents: 7646-69-7 (7646-69-7) [UNK], 7646-85-7 (7646-85-7) [ADDITIVE], 7631-86-9 (7631-86-9) [ADDITIVE], 121-44-8 (121-44-8) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 60-29-7 (60-29-7), 110-54-3 (110-54-3)
-- SMILES: N#Cc1ccc(C#Cc2ccccc2)cc1.C=C[CH2][Mg][Br]>>C=CCC(N)c1ccc(C#Cc2ccccc2)cc1
+- SMILES: N#Cc1ccc(C#Cc2ccccc2)cc1.C=CC[Mg]Br>>C=CCC(N)c1ccc(C#Cc2ccccc2)cc1
 
 ## Reaction 31-520-CAS-22066635
 
@@ -9078,7 +9078,7 @@ Total reactions: 2500
 - Yield %: 74
 - Reagents: 7646-69-7 (7646-69-7) [UNK], 7646-85-7 (7646-85-7) [ADDITIVE], 7631-86-9 (7631-86-9) [ADDITIVE], 121-44-8 (121-44-8) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 60-29-7 (60-29-7), 110-54-3 (110-54-3)
-- SMILES: Cn1cc(C#N)c2ccccc21.C=C[CH2][Mg][Br]>>C=CCC(N)c1cn(C)c2ccccc12
+- SMILES: Cn1cc(C#N)c2ccccc21.C=CC[Mg]Br>>C=CCC(N)c1cn(C)c2ccccc12
 
 ## Reaction 31-520-CAS-22066636
 
@@ -9086,7 +9086,7 @@ Total reactions: 2500
 - Yield %: 79
 - Reagents: 7646-69-7 (7646-69-7) [UNK], 7646-85-7 (7646-85-7) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 60-29-7 (60-29-7)
-- SMILES: COc1ccc(C#N)cc1.CC(C)=C[CH2][Mg][Br]>>C=CC(C)(C)C(N)c1ccc(OC)cc1
+- SMILES: COc1ccc(C#N)cc1.CC(C)=CC[Mg]Br>>C=CC(C)(C)C(N)c1ccc(OC)cc1
 
 ## Reaction 31-520-CAS-22227048
 
@@ -11035,7 +11035,7 @@ Total reactions: 2500
 - Yield %: 75
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: [Br][Mg][c]1ccccc1.N#Cc1ccc(C(F)(F)F)cc1>>NC(c1ccccc1)c1ccc(C(F)(F)F)cc1
+- SMILES: Br[Mg]c1ccccc1.N#Cc1ccc(C(F)(F)F)cc1>>NC(c1ccccc1)c1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-520-CAS-2629289
 
@@ -11155,7 +11155,7 @@ Total reactions: 2500
 - Yield %: 79
 - Reagents: 67-56-1 (67-56-1) [UNK], 16940-66-2 (16940-66-2) [ADDITIVE], 1336-21-6 (1336-21-6) [ADDITIVE], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: CC1(C)OC[C@H]([C@@H](O)[C@H](C#N)N(Cc2ccccc2)C(C)(C)C)O1.C/C=C/[CH2][Mg][Br]>>C=C[C@@H](C)[C@@H](N)[C@@H]([C@H](O)[C@H]1COC(C)(C)O1)N(Cc1ccccc1)C(C)(C)C
+- SMILES: CC1(C)OC[C@H]([C@@H](O)[C@H](C#N)N(Cc2ccccc2)C(C)(C)C)O1.C/C=C/C[Mg]Br>>C=C[C@@H](C)[C@@H](N)[C@@H]([C@H](O)[C@H]1COC(C)(C)O1)N(Cc1ccccc1)C(C)(C)C
 
 ## Reaction 31-520-CAS-3053599
 
@@ -11399,7 +11399,7 @@ Total reactions: 2500
 - Yield %: 90
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: N#Cc1ccc(C(F)(F)F)cc1.C[CH](C)[Mg][Br]>>CC(C)C(N)c1ccc(C(F)(F)F)cc1
+- SMILES: N#Cc1ccc(C(F)(F)F)cc1.CC(C)[Mg]Br>>CC(C)C(N)c1ccc(C(F)(F)F)cc1
 
 ## Reaction 31-520-CAS-357698
 
@@ -11518,7 +11518,7 @@ Total reactions: 2500
 - Yield %: 71
 - Reagents: 22560-16-3 (22560-16-3) [UNK], 85116-37-6 (85116-37-6) [ADDITIVE], 7647-01-0 (7647-01-0) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: N#Cc1ccccc1.C=C[CH2][Mg][Cl]>>C=CC[C@H](N)c1ccccc1
+- SMILES: N#Cc1ccccc1.C=CC[Mg]Cl>>C=CC[C@H](N)c1ccccc1
 
 ## Reaction 31-520-CAS-3860233
 
@@ -11603,7 +11603,7 @@ Total reactions: 2500
 - Yield %: 87
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: N#Cc1ccc2ccccc2c1.[Br][Mg][CH2]c1ccccc1>>NC(Cc1ccccc1)c1ccc2ccccc2c1
+- SMILES: N#Cc1ccc2ccccc2c1.Br[Mg]Cc1ccccc1>>NC(Cc1ccccc1)c1ccc2ccccc2c1
 
 ## Reaction 31-520-CAS-4119341
 
@@ -12170,7 +12170,7 @@ Total reactions: 2500
 - Yield %: 90
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: N#Cc1ccc(C(F)(F)F)cc1.[Br][Mg][CH]1CC1>>NC(c1ccc(C(F)(F)F)cc1)C1CC1
+- SMILES: N#Cc1ccc(C(F)(F)F)cc1.Br[Mg]C1CC1>>NC(c1ccc(C(F)(F)F)cc1)C1CC1
 
 ## Reaction 31-520-CAS-5774880
 
@@ -12242,7 +12242,7 @@ Total reactions: 2500
 - Yield %: 84
 - Reagents: 22560-16-3 (22560-16-3) [UNK], 85116-37-6 (85116-37-6) [ADDITIVE], 7647-01-0 (7647-01-0) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: Cc1ccc(C#N)cc1.C=C[CH2][Mg][Cl]>>C=CCC(N)c1ccc(C)cc1
+- SMILES: Cc1ccc(C#N)cc1.C=CC[Mg]Cl>>C=CCC(N)c1ccc(C)cc1
 
 ## Reaction 31-520-CAS-6000371
 
@@ -12352,7 +12352,7 @@ Total reactions: 2500
 - Yield %: 95
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: [CH3][Mg][Br].N#Cc1ccncc1>>CC(N)c1ccncc1
+- SMILES: C[Mg]Br.N#Cc1ccncc1>>CC(N)c1ccncc1
 
 ## Reaction 31-520-CAS-6270934
 
@@ -12376,7 +12376,7 @@ Total reactions: 2500
 - Yield %: 93
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: [Br][Mg][c]1ccccc1.N#Cc1ccc2ccccc2c1>>NC(c1ccccc1)c1ccc2ccccc2c1
+- SMILES: Br[Mg]c1ccccc1.N#Cc1ccc2ccccc2c1>>NC(c1ccccc1)c1ccc2ccccc2c1
 
 ## Reaction 31-520-CAS-6301484
 
@@ -12504,7 +12504,7 @@ Total reactions: 2500
 - Yield %: 88
 - Reagents: 16940-66-2 (16940-66-2) [UNK], 17199-29-0 (17199-29-0) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: N#Cc1ccccc1.[Li][CH2]CCC>>CCCC[C@@H](N)c1ccccc1
+- SMILES: N#Cc1ccccc1.[Li]CCCC>>CCCC[C@@H](N)c1ccccc1
 
 ## Reaction 31-520-CAS-661158
 
@@ -12593,7 +12593,7 @@ Total reactions: 2500
 - Yield %: 95
 - Reagents: 14044-65-6 (14044-65-6) [UNK]
 - Solvents: 109-99-9 (109-99-9), 110-54-3 (110-54-3)
-- SMILES: N#Cc1ccccc1.[Li][CH2]CCC>>CCCCC(N)c1ccccc1
+- SMILES: N#Cc1ccccc1.[Li]CCCC>>CCCCC(N)c1ccccc1
 
 ## Reaction 31-520-CAS-6829292
 
@@ -13262,7 +13262,7 @@ Total reactions: 2500
 - Yield %: 89
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: [CH3][Mg][Br].N#Cc1ccc2ccccc2c1>>CC(N)c1ccc2ccccc2c1
+- SMILES: C[Mg]Br.N#Cc1ccc2ccccc2c1>>CC(N)c1ccc2ccccc2c1
 
 ## Reaction 31-520-CAS-8145513
 
@@ -13373,7 +13373,7 @@ Total reactions: 2500
 - Yield %: 85
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: N#Cc1ccc2ccccc2c1.C[CH2][Mg][Br]>>CCC(N)c1ccc2ccccc2c1
+- SMILES: N#Cc1ccc2ccccc2c1.CC[Mg]Br>>CCC(N)c1ccc2ccccc2c1
 
 ## Reaction 31-520-CAS-842837
 
@@ -13580,7 +13580,7 @@ Total reactions: 2500
 - Yield %: 87
 - Reagents: 16940-66-2 (16940-66-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 67-56-1 (67-56-1)
-- SMILES: N#Cc1ccccc1.[Br][Mg][c]1ccccc1>>NC(c1ccccc1)c1ccccc1
+- SMILES: N#Cc1ccccc1.Br[Mg]c1ccccc1>>NC(c1ccccc1)c1ccccc1
 
 ## Reaction 31-520-CAS-9020574
 
@@ -18242,7 +18242,7 @@ Total reactions: 2500
 - Type: Nitrile hydration. Nitrile → amide
 - Yield %: 83
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: N#CCc1ccccc1.CC1=CC=C([N-2]=[U+4]23456789(<-[CH]%10=[CH]->2[C-]->3(C(C)(C)C)[CH]->4=[C]->5%10C(C)(C)C)(<-[CH]2=[CH]->6[C-]->7(C(C)(C)C)[CH]->8=[C]->92C(C)(C)C)<-[N]2=CC=C(N(C)C)C=C2)C=C1>>Cc1ccc([N-]2C(Cc3ccccc3)[NH-]->[U+4]<-23456789%10(<-[N-]=C=Cc2ccccc2)(<-[cH]2[cH]->3[c-]->4(C(C)(C)C)[cH]->5[c]->62C(C)(C)C)<-[cH]2[cH]->7[c-]->8(C(C)(C)C)[cH]->9[c]->%102C(C)(C)C)cc1
+- SMILES: N#CCc1ccccc1.CC1=CC=C([N-2]=[U+4]23456789(<-N%10=CC=C(N(C)C)C=C%10)(<-[C-]%10(C(C)(C)C)[CH]2=[CH]3C4(C(C)(C)C)=[CH]%105)<-[C-]2(C(C)(C)C)[CH]6=[CH]7C8(C(C)(C)C)=[CH]29)C=C1>>CC1=CC=C([N-]2->[U+4]3456789%10(<-[N-]=C=CC%11=CC=CC=C%11)(<-[NH-]C2CC2=CC=CC=C2)(<-[C-]2(C(C)(C)C)[CH]3=[CH]4C5(C(C)(C)C)=[CH]26)<-[C-]2(C(C)(C)C)[CH]7=[CH]8C9(C(C)(C)C)=[CH]2%10)C=C1
 
 ## Reaction 31-614-CAS-41152012
 

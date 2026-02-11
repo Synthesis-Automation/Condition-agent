@@ -446,7 +446,7 @@ Total reactions: 1274
 - Yield %: 92
 - Reagents: 429-41-4 (429-41-4) [UNK]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5), 75-09-2 (75-09-2)
-- SMILES: CCC1=C(CC)c2cc3c(CC)c(CC)c4c(C=CC=O)c5[n]6->[Ni+2]7(<-[n]2c1cc1c(CC)c(CC)c(cc6C(CC)=C5CC)[n-]->71)<-[n-]34.C[Si](C)(C)C(F)(F)F>>CCC1=C(CC)c2cc3c(CC)c(CC)c4c(C=CC(O[Si](C)(C)C)C(F)(F)F)c5[n]6->[Ni+2]7(<-[n]2c1cc1c(CC)c(CC)c(cc6C(CC)=C5CC)[n-]->71)<-[n-]34
+- SMILES: CCC1=C(CC)c2cc3c(CC)c(CC)c4c(C=CC=O)c5n6->[Ni+2]7(<-n2c1cc1c(CC)c(CC)c(cc6C(CC)=C5CC)[n-]->71)<-[n-]34.C[Si](C)(C)C(F)(F)F>>CCC1=C(CC)c2cc3c(CC)c(CC)c4c(C=CC(O[Si](C)(C)C)C(F)(F)F)c5n6->[Ni+2]7(<-n2c1cc1c(CC)c(CC)c(cc6C(CC)=C5CC)[n-]->71)<-[n-]34
 
 ## Reaction 31-345-CAS-10694389
 

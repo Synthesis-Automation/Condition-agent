@@ -65,6 +65,81 @@ Interpretation:
 - The residual `none -> none` bucket is mostly coordination/organometallic heavy-complex chemistry not covered by current organic motif taxonomy.
 - This should be handled by data curation and routing, not by adding many new organic motifs.
 
+## Post-Routing Checkpoint (Exclusion Policy Applied)
+
+Routing-enabled discovery and benchmark outputs:
+
+- `results/reaction_coverage_discovery.10x100.routed.json`
+- `results/reaction_coverage_discovery_samples.10x100.routed.csv`
+- `results/taxonomy_expansion_todos.10x100.routed.json`
+- `results/taxonomy_expansion_todos.10x100.routed.md`
+- `results/reaction_type_benchmark.10x100.routed.csv`
+
+Coverage summary (`routing_policy=exclude_complex`):
+
+- Input rows: `920`
+- Routed excluded: `22` (`2.39%`)
+- Processed for taxonomy benchmark: `898`
+- Unknown reaction type: `32` (`3.56%`)
+- Unresolved reactions: `194` (`21.60%`)
+
+Routing split:
+
+- `eligible_taxonomy_benchmark`: `898`
+- `exclude_unparseable_components`: `13`
+- `exclude_organometallic_or_coordination_complex`: `9`
+
+Benchmark snapshot (`898` usable rows after routing):
+
+- Legacy accuracy: `0.2405`
+- New specificity-aware accuracy: `0.2261`
+- Delta: `-0.0145`
+
+Interpretation:
+
+- The ingestion routing removed the known low-information/noisy subset exactly as intended (`22` rows).
+- Most remaining unresolved rows are now motif-slot gaps (`motif_outside_reaction_taxonomy`) rather than malformed chemistry.
+- This confirms motif expansion should be the next priority on the routed set.
+
+## Motif Coverage Step 1 (Implemented)
+
+Implemented taxonomy slot coverage for priority motifs:
+
+- `Alkyl-N(R)CO2R`
+- `Ar-C=N`
+- `Alkyl-H`
+- `Alkyl-CF3`
+
+Taxonomy changes:
+
+- `compound_logic.json`:
+  - Added `imines` set (`Ar-C=N`) used by `Reductive_amination` and `Hydrogenation`.
+  - Added `carbamate_amines` set (`Alkyl-N(R)CO2R`, `Ar-N(R)CO2R`) used by `Reductive_amination`.
+- `reaction_types.v4.0.json`:
+  - `Reductive_amination.electrophile`: `@carbonyls` + `@imines`
+  - `Reductive_amination.product`: added `@carbamate_amines`
+  - `Hydrogenation.substrate`: `@hydrogenation_substrates` + `@imines`
+  - `Trifluoromethylation.substrate`: added `Alkyl-H`
+  - `Trifluoromethylation.product`: added `Alkyl-CF3`
+
+Outputs:
+
+- `results/reaction_coverage_discovery.10x100.routed.motif_cov1.json`
+- `results/reaction_coverage_discovery_samples.10x100.routed.motif_cov1.csv`
+- `results/taxonomy_expansion_todos.10x100.routed.motif_cov1.json`
+- `results/taxonomy_expansion_todos.10x100.routed.motif_cov1.md`
+
+Impact vs routed baseline:
+
+- Unresolved: `194/898` (`21.60%`) -> `116/898` (`12.92%`) (`-78` rows, `-8.68 pp`)
+- Unknown reaction type: unchanged at `32/898` (`3.56%`)
+- Top outside-taxonomy motifs no longer include the 4 targeted motifs.
+
+Benchmark impact (same routed 10x100 sample):
+
+- Legacy accuracy: unchanged (`0.2405`)
+- New specificity-aware accuracy: unchanged (`0.2261`)
+
 ## Applied Taxonomy Edits
 
 The following reaction-type updates were applied in `chemtools/taxonomy/data/reaction_types.v4.0.json`:
@@ -156,6 +231,22 @@ Top motifs currently outside reaction-slot taxonomy (weighted by unresolved coun
 
 3. Add stricter input validation/normalization before featurization for records that produce empty reacted and formed motifs.
 4. Only add new motifs/families when a cluster remains high-count after extraction + alias corrections.
+
+## Next Step (Motif-First on Routed Set)
+
+Prioritize motifs with highest unresolved impact in `results/reaction_coverage_discovery.10x100.routed.json`:
+
+1. `Alkyl-N(R)CO2R` (`72`)
+2. `Ar-C=N` (`35`)
+3. `Alkyl-H` (`16`)
+4. `Alkyl-CF3` (`9`)
+
+Execution order:
+
+1. Add compound definitions and pattern coverage for these motifs.
+2. Re-run discovery on the same 10x100 sample with `--routing-policy exclude_complex`.
+3. Regenerate TODOs and compare unresolved-rate delta against `194/898`.
+4. Promote new reaction-family slots only for clusters that remain high-count after motif coverage expands.
 
 Concrete rule candidates for ingestion:
 

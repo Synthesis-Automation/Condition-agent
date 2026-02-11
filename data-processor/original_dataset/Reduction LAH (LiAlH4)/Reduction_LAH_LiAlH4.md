@@ -1933,7 +1933,7 @@ Total reactions: 658
 - Yield %: 99
 - Reagents: 16853-85-3 (16853-85-3) [UNK], 12125-02-9 (12125-02-9) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CC(C)(CCC=O)[c]12->[Fe+2]3456789(<-[cH]1[c]->3(P(c1ccccc1)c1ccccc1)[c-]->4(P(c1ccccc1)c1ccccc1)[cH]->52)<-[cH]1[c]->6(C(C)(C)CCC=O)[cH]->7[c-]->8(P(c2ccccc2)c2ccccc2)[c]->91P(c1ccccc1)c1ccccc1>>CC(C)(CCCO)[c]12->[Fe+2]3456789(<-[cH]1[c]->3(P(c1ccccc1)c1ccccc1)[c-]->4(P(c1ccccc1)c1ccccc1)[cH]->52)<-[cH]1[c]->6(C(C)(C)CCCO)[cH]->7[c-]->8(P(c2ccccc2)c2ccccc2)[c]->91P(c1ccccc1)c1ccccc1
+- SMILES: CC(C)(CCC=O)C12=[CH]3[C-]4(P(C5=CC=CC=C5)C5=CC=CC=C5)->[Fe+2]3156789(<-[C-]1(P(C3=CC=CC=C3)C3=CC=CC=C3)[CH]5=C6(C(C)(C)CCC=O)[CH]7=C18P(C1=CC=CC=C1)C1=CC=CC=C1)[CH]2=C49P(C1=CC=CC=C1)C1=CC=CC=C1>>CC(C)(CCCO)C12=[CH]3[C-]4(P(C5=CC=CC=C5)C5=CC=CC=C5)->[Fe+2]3156789(<-[C-]1(P(C3=CC=CC=C3)C3=CC=CC=C3)[CH]5=C6(C(C)(C)CCCO)[CH]7=C18P(C1=CC=CC=C1)C1=CC=CC=C1)[CH]2=C49P(C1=CC=CC=C1)C1=CC=CC=C1
 
 ## Reaction 31-513-CAS-1608826
 
@@ -3528,7 +3528,7 @@ Total reactions: 658
 - Yield %: 65
 - Reagents: 16853-85-3 (16853-85-3) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: CC(=O)[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(C(C)=O)[cH]->91>>CC(O)[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(C(C)O)[cH]->91
+- SMILES: CC(=O)[C-]12->[Fe+2]3456789(<-[C-]%10(C(C)=O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC(O)[C-]12->[Fe+2]3456789(<-[C-]%10(C(C)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-513-CAS-5322573
 
@@ -5012,7 +5012,7 @@ Total reactions: 658
 - Yield %: 57
 - Reagents: 22560-16-3 (22560-16-3) [UNK], 108-48-5 (108-48-5) [ADDITIVE], 7790-28-5 (7790-28-5) [ADDITIVE]
 - Solvents: 109-99-9 (109-99-9), 67-64-1 (67-64-1), 60-29-7 (60-29-7)
-- SMILES: C=C1[C@@H]2CC[C@@H]3[C@H]4OC(=O)O[C@]3(C)C[C@]42C[C@@H](O)[C@@]2(O)[C@H]1CC(=O)C2(C)C.[Li][CH3]>>CC1(C)[C@@H](O)C[C@H]2[C@](C)(O)[C@@H]3CC[C@@H]4[C@@H](O)[C@@]3(C[C@@H](O)[C@@]21O)C[C@@]4(C)O
+- SMILES: C=C1[C@@H]2CC[C@@H]3[C@H]4OC(=O)O[C@]3(C)C[C@]42C[C@@H](O)[C@@]2(O)[C@H]1CC(=O)C2(C)C.[Li]C>>CC1(C)[C@@H](O)C[C@H]2[C@](C)(O)[C@@H]3CC[C@@H]4[C@@H](O)[C@@]3(C[C@@H](O)[C@@]21O)C[C@@]4(C)O
 
 ## Reaction 31-614-CAS-37667836
 

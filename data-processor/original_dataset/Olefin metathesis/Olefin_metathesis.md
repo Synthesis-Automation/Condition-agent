@@ -920,7 +920,7 @@ Total reactions: 2332
 - Yield %: 98
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)(C)C)(C(C)(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(C1=CC=CC2=C1C=CC=C2)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)(C)C)C(C)(C)C)[C]->7=2C1=CC=CC2=C1C=CC=C2
+- SMILES: C=CCP(C(C)(C)C)(C(C)(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(C1=CC=CC2=C1C=CC=C2)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(C4=CC=CC5=C4C=CC=C5)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)(C)C)(C(C)(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-10665865
 
@@ -928,7 +928,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)(C)C)(C(C)(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=C(CC)C2=CC=CC=C21)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)(C)C)C(C)(C)C)[C]->7=2N1C=C(CC)C2=CC=CC=C21
+- SMILES: C=CCP(C(C)(C)C)(C(C)(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=C(CC)C2=CC=CC=C21)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=C(CC)C5=CC=CC=C54)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)(C)C)(C(C)(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-10750089
 
@@ -971,7 +971,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)(C)C)(C(C)(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=CC2=CC=CC=C21)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)(C)C)C(C)(C)C)[C]->7=2N1C=CC2=CC=CC=C21
+- SMILES: C=CCP(C(C)(C)C)(C(C)(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=CC2=CC=CC=C21)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=CC5=CC=CC=C54)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)(C)C)(C(C)(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-11032838
 
@@ -1407,7 +1407,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 96
 - Solvents: 71-43-2 (71-43-2), 67-64-1 (67-64-1)
-- SMILES: C=CC[c]12->[Ru+2]3456789(<-[c]%10(C)[c]->3(C)[c]->4(C)[c-]->5(C)[c]->6%10C)<-[c]1(CC(=C)C)[c]->71cccc[c]->81[c-]->92CC(=C)C>>C=C(C)C[c-]12->[Ru+2]3456789(<-[c]%10(C)[c]->3(C)[c]->4(C)[c-]->5(C)[c]->6%10C)<-[c]3([c]->71CC=C(C)C3)[c]->81cccc[c]->912
+- SMILES: C=CCC12=C3(CC(=C)C)C45=CC=CC=C46[C-]1(CC(=C)C)->[Ru+2]56321478<-[C-]2(C)C1(C)=C4(C)C7(C)=C28C>>C=C(C)C[C-]12->[Ru+2]3456789(<-[C-]%10(C)C3(C)=C4(C)C5(C)=C%106C)C3(=CC=CC=C317)C81=C29CC=C(C)C1
 
 ## Reaction 31-470-CAS-14153610
 
@@ -1450,7 +1450,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 98
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=CC[C]12->[Mn+]345([C]#O)([C]#O)(<-[CH](=[CH]->3[C-]->41Br)[CH]->5=2)[P](CC(=C)C)(C1=CC=CC=C1)C1=CC=CC=C1>>CC1=CC[C]23->[Mn+]456([C]#O)([C]#O)(<-[CH](=[CH]->4[C-]->52Br)[CH]->6=3)[P](C1)(C1=CC=CC=C1)C1=CC=CC=C1
+- SMILES: C=CCC12=[CH]3[CH]4=[CH]5[C-]1(Br)->[Mn+]4532(C#O)(C#O)P(CC(=C)C)(C1=CC=CC=C1)C1=CC=CC=C1>>CC1=CCC23=[CH]4[CH]5=[CH]6[C-]2(Br)->[Mn+]5643(C#O)(C#O)P(C2=CC=CC=C2)(C2=CC=CC=C2)C1
 
 ## Reaction 31-470-CAS-14372714
 
@@ -1479,7 +1479,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 81
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=CC[P](C1=CC=CC=C1)(C1=CC=CC=C1)[Mn+]1234([C]#O)([C]#O)<-[CH]5=[CH]->1[C-]->2(C=C)[CH]->3=[CH]->45>>O#[C][Mn+]12345([C]#O)<-[CH]6=[CH]->1[C-]->2(C=CC[P]3(C1=CC=CC=C1)C1=CC=CC=C1)[CH]->4=[CH]->56
+- SMILES: C=CCP(C1=CC=CC=C1)(C1=CC=CC=C1)[Mn+]1234(C#O)(C#O)<-[C-]5(C=C)[CH]1=[CH]2[CH]3=[CH]54>>O#C[Mn+]12345(C#O)<-[C-]6(C=CCP1(C1=CC=CC=C1)C1=CC=CC=C1)[CH]2=[CH]3[CH]4=[CH]65
 
 ## Reaction 31-470-CAS-14610524
 
@@ -1487,7 +1487,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C1CCCCC1)(C1CCCCC1)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=C(C)C2=CC=CC=C21)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C1CCCCC1)C1CCCCC1)[C]->7=2N1C=C(C)C2=CC=CC=C21
+- SMILES: C=CCP(C1CCCCC1)(C1CCCCC1)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=C(C)C2=CC=CC=C21)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=C(C)C5=CC=CC=C54)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C1CCCCC1)(C1CCCCC1)CC=C5C
 
 ## Reaction 31-470-CAS-14630273
 
@@ -1575,7 +1575,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 88
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=CC[C-]12->[Mn+]345([C]#O)([C]#O)(<-[CH](=[CH]->31)[CH]->4=[CH]->52)[P](CC(=C)C)(C1=CC=CC=C1)C1=CC=CC=C1>>CC1=CC[C-]23->[Mn+]456([C]#O)([C]#O)(<-[CH](=[CH]->42)[CH]->5=[CH]->63)[P](C1)(C1=CC=CC=C1)C1=CC=CC=C1
+- SMILES: C=CC[C-]12->[Mn+]345(C#O)(C#O)(P(CC(=C)C)(C6=CC=CC=C6)C6=CC=CC=C6)[CH](=[CH]13)[CH]4=[CH]25>>CC1=CC[C-]23->[Mn+]456(C#O)(C#O)([CH](=[CH]24)[CH]5=[CH]36)P(C2=CC=CC=C2)(C2=CC=CC=C2)C1
 
 ## Reaction 31-470-CAS-15077007
 
@@ -1604,7 +1604,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)(C)C)(C(C)(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=CC2=CC(OC)=CC=C21)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)(C)C)C(C)(C)C)[C]->7=2N1C=CC2=CC(OC)=CC=C21
+- SMILES: C=CCP(C(C)(C)C)(C(C)(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=CC2=CC(OC)=CC=C21)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=CC5=CC(OC)=CC=C54)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)(C)C)(C(C)(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-15242417
 
@@ -1804,7 +1804,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)(C)C)(C(C)(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=C(Br)C2=CC=CC=C21)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)(C)C)C(C)(C)C)[C]->7=2N1C=C(Br)C2=CC=CC=C21
+- SMILES: C=CCP(C(C)(C)C)(C(C)(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=C(Br)C2=CC=CC=C21)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=C(Br)C5=CC=CC=C54)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)(C)C)(C(C)(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-15703647
 
@@ -1818,7 +1818,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 85
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=CCO[C@@]1(CC=C)[C@@H]2[C@H]3C[C@@H]4[C@@H]5[C@H]3[C@]13C=CC=C[C@@]53[C@@](CC=C)(OCC=C)[C@@H]42>>C1=C[C@]23[C@H]4[C@@H]5C[C@@H]6[C@H]4[C@@]2(C=C1)[C@]1(CC=CCO1)[C@@H]6[C@@H]5[C@@]31CC=CCO1
+- SMILES: C=CCO[C@@]1(CC=C)[C@@H]2[C@H]3C[C@@H]4[C@@H]5[C@H]3[C@]13C=CC=C[C@@]53[C@@](CC=C)(OCC=C)[C@@H]42>>C1=C[C@]23[C@@H]4[C@H]5C[C@@H]6[C@H]([C@H]5C25CC=CCO5)C2(CC=CCO2)[C@@]3(C=C1)[C@@H]64
 
 ## Reaction 31-470-CAS-15728322
 
@@ -2866,35 +2866,35 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 95
 - Solvents: 75-09-2 (75-09-2), 67-68-5 (67-68-5)
-- SMILES: C=CC[C@H](N1C(=O)OC[C@@H]1C=C)[Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC>>CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[C@@H]1CC=C[C@H]2COC(=O)N12
+- SMILES: C=CC[C@H](N1C(=O)OC[C@@H]1C=C)[Sn](CCCC)(CCCC)CCCC>>CCCC[Sn](CCCC)(CCCC)[C@@H]1CC=C[C@H]2COC(=O)N12
 
 ## Reaction 31-470-CAS-16271080
 
 - Type: Olefin metathesis
 - Yield %: 90
 - Solvents: 75-09-2 (75-09-2), 67-68-5 (67-68-5)
-- SMILES: C=CC[C@@H](N1C(=O)OC[C@@H]1C=C)[Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC>>CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[C@H]1CC=C[C@H]2COC(=O)N21
+- SMILES: C=CC[C@@H](N1C(=O)OC[C@@H]1C=C)[Sn](CCCC)(CCCC)CCCC>>CCCC[Sn](CCCC)(CCCC)[C@H]1CC=C[C@H]2COC(=O)N21
 
 ## Reaction 31-470-CAS-16271081
 
 - Type: Olefin metathesis
 - Yield %: 82
 - Solvents: 75-09-2 (75-09-2), 67-68-5 (67-68-5)
-- SMILES: C=CC[C@H](N1C(=O)OC[C@@H]1/C=C/c1ccccc1)[Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC>>CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[C@@H]1CC=C[C@H]2COC(=O)N12
+- SMILES: C=CC[C@H](N1C(=O)OC[C@@H]1/C=C/c1ccccc1)[Sn](CCCC)(CCCC)CCCC>>CCCC[Sn](CCCC)(CCCC)[C@@H]1CC=C[C@H]2COC(=O)N12
 
 ## Reaction 31-470-CAS-16271083
 
 - Type: Olefin metathesis
 - Yield %: 93
 - Solvents: 75-09-2 (75-09-2), 67-68-5 (67-68-5)
-- SMILES: C=CCC[C@H](N1C(=O)OC[C@@H]1C=C)[Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC>>CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[C@@H]1CCC=C[C@H]2COC(=O)N12
+- SMILES: C=CCC[C@H](N1C(=O)OC[C@@H]1C=C)[Sn](CCCC)(CCCC)CCCC>>CCCC[Sn](CCCC)(CCCC)[C@@H]1CCC=C[C@H]2COC(=O)N12
 
 ## Reaction 31-470-CAS-16271084
 
 - Type: Olefin metathesis
 - Yield %: 94
 - Solvents: 75-09-2 (75-09-2), 67-68-5 (67-68-5)
-- SMILES: C=CCC[C@@H](N1C(=O)OC[C@@H]1C=C)[Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC>>CCC[CH2][Sn]([CH2]CCC)([CH2]CCC)[C@H]1CCC=C[C@H]2COC(=O)N21
+- SMILES: C=CCC[C@@H](N1C(=O)OC[C@@H]1C=C)[Sn](CCCC)(CCCC)CCCC>>CCCC[Sn](CCCC)(CCCC)[C@H]1CCC=C[C@H]2COC(=O)N21
 
 ## Reaction 31-470-CAS-16275642
 
@@ -4556,7 +4556,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 99
 - Solvents: 107-06-2 (107-06-2)
-- SMILES: C=CCCCCC1=C(C)NC(NC(=O)NCCCCCCOC2=CC=C(C3=[N]4->[Cu+]5(<-[N]6=C(C7=CC=C(OCCC=C)C=C7)C=CC7=C6C4=C(C=C7)C=C3)<-[N]3=C(C4=CC=C(OCCC=C)C=C4)C=CC4=C3C3=C(C=C4)C=CC(C4=CC=C(OCCCCCCNC(=O)NC6=NC(=O)C(CCCCC=C)=C(C)N6)C=C4)=[N]->53)C=C2)=NC1=O.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C=CCCCCC1=C(C)NC(NC(=O)NCCCCCCOC2=CC=C(C3=[N]4->[Cu+]5(<-[N]6=C(C7=CC=C(OCCC=C)C=C7)C=CC7=C6C4=C(C=C7)C=C3)<-[N]3=C4C=CC6=C3C3=C(C=C6)C=CC(=[N]->53)C3=CC=C(C=C3)OCCCCCCNC(=O)NC3=NC(=O)C(=C(C)N3)CCCC/C=C/CCOC3=CC=C4C=C3)C=C2)=NC1=O.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+- SMILES: C=CCCCCC1=C(C)NC(NC(=O)NCCCCCCOC2=CC=C(C3=N4->[Cu+]5(<-N6=C(C7=CC=C(OCCC=C)C=C7)C=CC7=C6C4=C(C=C7)C=C3)<-N3=C(C4=CC=C(OCCC=C)C=C4)C=CC4=C3C3=C(C=C4)C=CC(C4=CC=C(OCCCCCCNC(=O)NC6=NC(=O)C(CCCCC=C)=C(C)N6)C=C4)=N->53)C=C2)=NC1=O.[F-][P+5]([F-])([F-])([F-])([F-])[F-]>>C=CCCCCC1=C(C)NC(NC(=O)NCCCCCCOC2=CC=C(C3=N4->[Cu+]5(<-N6=C(C7=CC=C(OCCC=C)C=C7)C=CC7=C6C4=C(C=C7)C=C3)<-N3=C4C=CC6=C3C3=C(C=C6)C=CC(=N->53)C3=CC=C(C=C3)OCCCCCCNC(=O)NC3=NC(=O)C(=C(C)N3)CCCC/C=C/CCOC3=CC=C4C=C3)C=C2)=NC1=O.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
 
 ## Reaction 31-470-CAS-17781120
 
@@ -4898,21 +4898,21 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 99
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C1=CC=CC=C1)(C1=CC=CC=C1)[Mn+]1234([C]#O)([C]#O)[P-]5[C]->1(CC(=C)C)=[C]->21CCCC[C]->31=[C]->45CC(=C)C>>C=C(C)C[C]12->[Mn+]3456([C]#O)([C]#O)<-[C](=[C]->37CCCC[C]->4=17)(CC(C)=CC[P]5(C1=CC=CC=C1)C1=CC=CC=C1)[P-]26
+- SMILES: C=CCP(C1=CC=CC=C1)(C1=CC=CC=C1)[Mn+]1234(C#O)(C#O)[P-]5C1(CC(=C)C)=C21CCCCC13=C54CC(=C)C>>C=C(C)CC12=C34CCCCC35=C36CC(C)=CCP(C7=CC=CC=C7)(C7=CC=CC=C7)[Mn+]1345(C#O)(C#O)[P-]26
 
 ## Reaction 31-470-CAS-18383655
 
 - Type: Olefin metathesis
 - Yield %: 77
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[C]12->[Mn+]345([C]#O)([C]#O)([P-]1[C]->3(CC=C)=[C]->41CCCC[C]->5=21)[P](CC=C)(C1=CC=CC=C1)C1=CC=CC=C1>>C=CC[C]12->[Mn+]3456([C]#O)([C]#O)<-[C](=[C]->37CCCC[C]->4=17)(CC=CC[P]5(C1=CC=CC=C1)C1=CC=CC=C1)[P-]26
+- SMILES: C=CCC12=C34CCCCC35=C3(CC=C)[P-]1[Mn+]2345(C#O)(C#O)P(CC=C)(C1=CC=CC=C1)C1=CC=CC=C1>>C=CCC12=C34CCCCC35=C36CC=CCP(C7=CC=CC=C7)(C7=CC=CC=C7)[Mn+]1345(C#O)(C#O)[P-]26
 
 ## Reaction 31-470-CAS-18383656
 
 - Type: Olefin metathesis
 - Yield %: 99
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C1=CC=CC=C1)(C1=CC=CC=C1)[Mn+]1234([C]#O)([C]#O)[P-]5[C]->1(CC=C(C)C)=[C]->21CCCC[C]->31=[C]->45CC=C(C)C>>CC(C)=CC[C]12->[Mn+]3456([C]#O)([C]#O)<-[C](=[C]->37CCCC[C]->4=17)(CC=CC[P]5(C1=CC=CC=C1)C1=CC=CC=C1)[P-]26
+- SMILES: C=CCP(C1=CC=CC=C1)(C1=CC=CC=C1)[Mn+]1234(C#O)(C#O)[P-]5C1(CC=C(C)C)=C21CCCCC13=C54CC=C(C)C>>CC(C)=CCC12=C34CCCCC35=C36CC=CCP(C7=CC=CC=C7)(C7=CC=CC=C7)[Mn+]3154(C#O)(C#O)[P-]62
 
 ## Reaction 31-470-CAS-18384121
 
@@ -4948,7 +4948,7 @@ Total reactions: 2332
 - Yield %: 75
 - Reagents: 109-92-2 (109-92-2) [UNK]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=CCOCCOCCOc1ccc(C2=[N]3->[Cu+2]4(<-[N]5=C(c6ccc(OCCOCCOCC=C)cc6)C=CC5=Cc5ccc(-c6ccc(OCCOCCOCC=C)cc6)[n-]->45)<-[n-]4c(C=C3C=C2)ccc4-c2ccc(OCCOCCOCC=C)cc2)cc1>>C1=CC2=[N]3->[Cu+2]4(<-[N]5=C6C=CC5=Cc5ccc([n-]->45)-c4ccc(cc4)OCCOCCOC/C=C\COCCOCCOc4ccc6cc4)<-[n-]4c(ccc4-c4ccc(cc4)OCCOCCOC/C=C\COCCOCCOc4ccc2cc4)C=C13
+- SMILES: C=CCOCCOCCOc1ccc(C2=N3->[Cu+2]4(<-N5=C(c6ccc(OCCOCCOCC=C)cc6)C=CC5=Cc5ccc(-c6ccc(OCCOCCOCC=C)cc6)[n-]->45)<-[n-]4c(C=C3C=C2)ccc4-c2ccc(OCCOCCOCC=C)cc2)cc1>>C1=CC2=N3->[Cu+2]4(<-N5=C6C=CC5=Cc5ccc([n-]->45)-c4ccc(cc4)OCCOCCOC/C=C\COCCOCCOc4ccc6cc4)<-[n-]4c(ccc4-c4ccc(cc4)OCCOCCOC/C=C\COCCOCCOc4ccc2cc4)C=C13
 
 ## Reaction 31-470-CAS-18423895
 
@@ -5515,7 +5515,7 @@ Total reactions: 2332
 - Yield %: 90
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2), 75-09-2 (75-09-2)
-- SMILES: C=CC[c]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(CC(=C)C)[cH]->6%10)<-[cH]([cH]->71)[cH]->8[c-]->92P(=O)(c1ccccc1)c1ccccc1>>CC1=CC[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[c-]->6(C1)[cH]->7%11)<-[cH]([cH]->8[c]->92P(=O)(c1ccccc1)c1ccccc1)[cH]->%103.C=CC[c]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(CC(=C)C)[cH]->6%10)<-[cH]([cH]->71)[cH]->8[c-]->92P(=O)(c1ccccc1)c1ccccc1
+- SMILES: C=CCC12=[CH]3[CH]4=[CH]5[C-]1(P(=O)(C1=CC=CC=C1)C1=CC=CC=C1)->[Fe+2]45321678<-[C-]2(CC(=C)C)[CH]1=[CH]6[CH]7=[CH]28>>CC1=CC[C-]23->[Fe+2]456789%10(<-[C-]%11(C1)[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=C3%10P(=O)(C1=CC=CC=C1)C1=CC=CC=C1.C=CCC12=[CH]3[CH]4=[CH]5[C-]1(P(=O)(C1=CC=CC=C1)C1=CC=CC=C1)->[Fe+2]45321678<-[C-]2(CC(=C)C)[CH]1=[CH]6[CH]7=[CH]28
 
 ## Reaction 31-470-CAS-18859710
 
@@ -5552,7 +5552,7 @@ Total reactions: 2332
 - Yield %: 98
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)C)(C(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=CC2=CC=CC=C21)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)C)C(C)C)[C]->7=2N1C=CC2=CC=CC=C21
+- SMILES: C=CCP(C(C)C)(C(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=CC2=CC=CC=C21)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=CC5=CC=CC=C54)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)C)(C(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-18899295
 
@@ -6479,7 +6479,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 90
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=Cc1cc(OC)c(OC)c(OC)[c]1[Ge]([CH3])([CH3])[c]1c(C=C)cc(OC)c(OC)c1OC>>COc1cc2[c](c(OC)c1OC)[Ge]([CH3])([CH3])[c]1c(cc(OC)c(OC)c1OC)C=C2
+- SMILES: C=Cc1cc(OC)c(OC)c(OC)c1[Ge](C)(C)c1c(C=C)cc(OC)c(OC)c1OC>>COc1cc2c(c(OC)c1OC)[Ge](C)(C)c1c(cc(OC)c(OC)c1OC)C=C2
 
 ## Reaction 31-470-CAS-19601360
 
@@ -6493,7 +6493,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 80
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=Cc1cc2c(c[c]1[Ge]([CH3])([CH3])[c]1cc3c(cc1C=C)OCO3)OCO2>>[CH3][Ge]1([CH3])[c]2cc3c(cc2C=Cc2cc4c(c[c]21)OCO4)OCO3
+- SMILES: C=Cc1cc2c(cc1[Ge](C)(C)c1cc3c(cc1C=C)OCO3)OCO2>>C[Ge]1(C)c2cc3c(cc2C=Cc2cc4c(cc21)OCO4)OCO3
 
 ## Reaction 31-470-CAS-19601363
 
@@ -6507,7 +6507,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 70
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=Cc1cc(F)cc[c]1[Ge]([CH3])([CH3])[c]1ccc(F)cc1C=C>>[CH3][Ge]1([CH3])[c]2ccc(F)cc2C=Cc2cc(F)cc[c]21
+- SMILES: C=Cc1cc(F)ccc1[Ge](C)(C)c1ccc(F)cc1C=C>>C[Ge]1(C)c2ccc(F)cc2C=Cc2cc(F)ccc21
 
 ## Reaction 31-470-CAS-19601366
 
@@ -6521,7 +6521,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 78
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=Cc1cc(OC)c(OC)c[c]1[Ge]([CH3])([CH3])[c]1cc(OC)c(OC)cc1C=C>>COc1cc2[c](cc1OC)[Ge]([CH3])([CH3])[c]1cc(OC)c(OC)cc1C=C2
+- SMILES: C=Cc1cc(OC)c(OC)cc1[Ge](C)(C)c1cc(OC)c(OC)cc1C=C>>COc1cc2c(cc1OC)[Ge](C)(C)c1cc(OC)c(OC)cc1C=C2
 
 ## Reaction 31-470-CAS-19607548
 
@@ -8447,7 +8447,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 95
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=CCCCCCN1C=CN2CC3=CC=CC4=[N]3->[Rh+5]([C]#O)(=[C-2]12)=[C-2]1N(CCCCCC=C)C=CN1C4.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1>>FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1.O#[C][Rh+5]12<-[N]3=C4C=CC=C3CN3C=CN(CCCCC/C=C/CCCCCN5C=CN(C4)[C-2]=15)[C-2]=23
+- SMILES: C=CCCCCCN1C=CN2CC3=CC=CC4=N3->[Rh+5](C#O)(=[C-2]12)=[C-2]1N(CCCCCC=C)C=CN1C4.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1>>FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1.O#C[Rh+5]12<-N3=C4C=CC=C3CN3C=CN(CCCCC/C=C/CCCCCN5C=CN(C4)[C-2]=15)[C-2]=23
 
 ## Reaction 31-470-CAS-21071318
 
@@ -8554,7 +8554,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 82
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=CCCCCCN1C=CN2C3=CC=CC4=[N]3->[Rh+5]([C]#O)(=[C-2]12)=[C-2]1N(CCCCCC=C)C=CN41.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1>>FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1.O#[C][Rh+5]12<-[N]3=C4C=CC=C3N3C=CN(CCCCC/C=C\CCCCCN5C=CN4[C-2]=15)[C-2]=23
+- SMILES: C=CCCCCCN1C=CN2C3=CC=CC4=N3->[Rh+5](C#O)(=[C-2]12)=[C-2]1N(CCCCCC=C)C=CN41.FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1>>FC(F)(F)C1=CC(C(F)(F)F)=C[C-]([B+3]([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)([C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)[C-]2=CC(C(F)(F)F)=CC(C(F)(F)F)=C2)=C1.O#C[Rh+5]12<-N3=C4C=CC=C3N3C=CN(CCCCC/C=C\CCCCCN5C=CN4[C-2]=15)[C-2]=23
 
 ## Reaction 31-470-CAS-21201324
 
@@ -9192,7 +9192,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)C)(C(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=CC=C1)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)C)C(C)C)[C]->7=2N1C=CC=C1
+- SMILES: C=CCP(C(C)C)(C(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=CC=C1)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=CC=C4)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)C)(C(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-22165013
 
@@ -10886,7 +10886,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)(C)C)(C(C)(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(F)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)(C)C)C(C)(C)C)[C]->7=2F
+- SMILES: C=CCP(C(C)(C)C)(C(C)(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(F)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(F)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)(C)C)(C(C)(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-251757
 
@@ -11079,7 +11079,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 80
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=C[C-]12->[Mn+]345([C]#O)([C]#O)(<-[CH](=[CH]->31)[CH]->4=[CH]->52)[P](CC(=C)C)(C1=CC=CC=C1)C1=CC=CC=C1>>CC1=C[C-]23->[Mn+]456([C]#O)([C]#O)(<-[CH](=[CH]->42)[CH]->5=[CH]->63)[P](C1)(C1=CC=CC=C1)C1=CC=CC=C1
+- SMILES: C=C[C-]12->[Mn+]345(C#O)(C#O)(P(CC(=C)C)(C6=CC=CC=C6)C6=CC=CC=C6)[CH](=[CH]13)[CH]4=[CH]25>>CC1=C[C-]23->[Mn+]456(C#O)(C#O)([CH](=[CH]24)[CH]5=[CH]36)P(C2=CC=CC=C2)(C2=CC=CC=C2)C1
 
 ## Reaction 31-470-CAS-3375748
 
@@ -11174,7 +11174,7 @@ Total reactions: 2332
 - Yield %: 94
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C1CCCCC1)(C1CCCCC1)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=CC2=CC=CC=C21)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C1CCCCC1)C1CCCCC1)[C]->7=2N1C=CC2=CC=CC=C21
+- SMILES: C=CCP(C1CCCCC1)(C1CCCCC1)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=CC2=CC=CC=C21)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=CC5=CC=CC=C54)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C1CCCCC1)(C1CCCCC1)CC=C5C
 
 ## Reaction 31-470-CAS-3995852
 
@@ -11217,7 +11217,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)(C)C)(C(C)(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=C(C)C2=CC=CC=C21)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)(C)C)C(C)(C)C)[C]->7=2N1C=C(C)C2=CC=CC=C21
+- SMILES: C=CCP(C(C)(C)C)(C(C)(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=C(C)C2=CC=CC=C21)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=C(C)C5=CC=CC=C54)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)(C)C)(C(C)(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-4261223
 
@@ -11324,7 +11324,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)(C)C)(C(C)(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(N1C=CC=C1)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)(C)C)C(C)(C)C)[C]->7=2N1C=CC=C1
+- SMILES: C=CCP(C(C)(C)C)(C(C)(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(N1C=CC=C1)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(N4C=CC=C4)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)(C)C)(C(C)(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-4994618
 
@@ -11439,7 +11439,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 93
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=CC[C-]12->[Mn+]345([C]#O)([C]#O)(<-[CH](=[CH]->31)[CH]->4=[CH]->52)[P](CC=C)(C1=CC=CC=C1)C1=CC=CC=C1>>O#[C][Mn+]12345([C]#O)<-[CH]6=[CH]->1[C-]->2(CC=CC[P]3(C1=CC=CC=C1)C1=CC=CC=C1)[CH]->4=[CH]->56
+- SMILES: C=CC[C-]12->[Mn+]345(C#O)(C#O)(P(CC=C)(C6=CC=CC=C6)C6=CC=CC=C6)[CH](=[CH]13)[CH]4=[CH]25>>O#C[Mn+]12345(C#O)<-[C-]6(CC=CCP1(C1=CC=CC=C1)C1=CC=CC=C1)[CH]2=[CH]3[CH]4=[CH]65
 
 ## Reaction 31-470-CAS-5505476
 
@@ -11482,7 +11482,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 99
 - Solvents: 71-43-2 (71-43-2), 67-64-1 (67-64-1)
-- SMILES: C=CC[c]12->[Fe+2]3456789(<-[c]%10(C)[c]->3(C)[c]->4(C)[c-]->5(C)[c]->6%10C)<-[c]1(CC(=C)CC)[c]->71cccc[c]->81[c-]->92CC(=C)CC>>C=C(CC)C[c-]12->[Fe+2]3456789(<-[c]%10(C)[c]->3(C)[c]->4(C)[c-]->5(C)[c]->6%10C)<-[c]3([c]->71CC=C(CC)C3)[c]->81cccc[c]->912
+- SMILES: C=CCC12=C3(CC(=C)CC)C45=CC=CC=C46[C-]1(CC(=C)CC)->[Fe+2]56321478<-[C-]2(C)C1(C)=C4(C)C7(C)=C28C>>C=C(CC)C[C-]12->[Fe+2]3456789(<-[C-]%10(C)C3(C)=C4(C)C5(C)=C%106C)C3(=CC=CC=C317)C81=C29CC=C(CC)C1
 
 ## Reaction 31-470-CAS-5604821
 
@@ -11648,7 +11648,7 @@ Total reactions: 2332
 - Yield %: 6
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2), 75-09-2 (75-09-2)
-- SMILES: C=CC[c]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(CC(=C)C)[cH]->6%10)<-[cH]([cH]->71)[cH]->8[c-]->92P(c1ccccc1)c1ccccc1>>CC1=CC[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[c-]->6(C1)[cH]->7%11)<-[cH]([cH]->8[c]->92P(c1ccccc1)c1ccccc1)[cH]->%103.C=CC[c]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(CC(=C)C)[cH]->6%10)<-[cH]([cH]->71)[cH]->8[c-]->92P(c1ccccc1)c1ccccc1
+- SMILES: C=CCC12=[CH]3[CH]4=[CH]5[C-]1(P(C1=CC=CC=C1)C1=CC=CC=C1)->[Fe+2]45321678<-[C-]2(CC(=C)C)[CH]1=[CH]6[CH]7=[CH]28>>CC1=CC[C-]23->[Fe+2]456789%10(<-[C-]%11(C1)[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=C3%10P(C1=CC=CC=C1)C1=CC=CC=C1.C=CCC12=[CH]3[CH]4=[CH]5[C-]1(P(C1=CC=CC=C1)C1=CC=CC=C1)->[Fe+2]45321678<-[C-]2(CC(=C)C)[CH]1=[CH]6[CH]7=[CH]28
 
 ## Reaction 31-470-CAS-6442646
 
@@ -11741,7 +11741,7 @@ Total reactions: 2332
 - Yield %: 99
 - Reagents: 67-64-1 (67-64-1) [UNK]
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CC[P](C(C)(C)C)(C(C)(C)C)[Cr]12345([C]#O)([C]#O)<-[CH]6=[CH]->1[C]->2(C(=C)C)=[C]->3(OC)[C]->4(C(=C)C)=[CH]->56>>C=C(C)[C]12->[Cr]34567([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[C]->5(C(C)=CC[P]6(C(C)(C)C)C(C)(C)C)[C]->7=2OC
+- SMILES: C=CCP(C(C)(C)C)(C(C)(C)C)[Cr]12345(C#O)(C#O)[CH]6=[CH]1C2(C(=C)C)=C3(OC)C4(C(=C)C)=[CH]65>>C=C(C)C12=C3(OC)C45=[CH]6[CH]7=[CH]1[Cr]76423(C#O)(C#O)P(C(C)(C)C)(C(C)(C)C)CC=C5C
 
 ## Reaction 31-470-CAS-6768632
 
@@ -11906,7 +11906,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 99
 - Solvents: 71-43-2 (71-43-2), 67-64-1 (67-64-1)
-- SMILES: C=CC[c]12->[Fe+2]3456789(<-[c]%10(C)[c]->3(C)[c]->4(C)[c-]->5(C)[c]->6%10C)<-[c]1(CC(=C)C)[c]->71cccc[c]->81[c-]->92CC(=C)C>>C=C(C)C[c-]12->[Fe+2]3456789(<-[c]%10(C)[c]->3(C)[c]->4(C)[c-]->5(C)[c]->6%10C)<-[c]3([c]->71CC=C(C)C3)[c]->81cccc[c]->912
+- SMILES: C=CCC12=C3(CC(=C)C)C45=CC=CC=C46[C-]1(CC(=C)C)->[Fe+2]56321478<-[C-]2(C)C1(C)=C4(C)C7(C)=C28C>>C=C(C)C[C-]12->[Fe+2]3456789(<-[C-]%10(C)C3(C)=C4(C)C5(C)=C%106C)C3(=CC=CC=C317)C81=C29CC=C(C)C1
 
 ## Reaction 31-470-CAS-7773490
 
@@ -11949,7 +11949,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 85
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=CC[C-]12->[Mn+]345([C]#O)([C]#O)(<-[CH](=[CH]->31)[CH]->4=[CH]->52)[P](CC=C)(C1CCCCC1)C1CCCCC1>>O#[C][Mn+]12345([C]#O)<-[CH]6=[CH]->1[C-]->2(CC=CC[P]3(C1CCCCC1)C1CCCCC1)[CH]->4=[CH]->56
+- SMILES: C=CC[C-]12->[Mn+]345(C#O)(C#O)(P(CC=C)(C6CCCCC6)C6CCCCC6)[CH](=[CH]13)[CH]4=[CH]25>>O#C[Mn+]12345(C#O)<-[C-]6(CC=CCP1(C1CCCCC1)C1CCCCC1)[CH]2=[CH]3[CH]4=[CH]65
 
 ## Reaction 31-470-CAS-7969517
 
@@ -12264,7 +12264,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 99
 - Solvents: 71-43-2 (71-43-2), 67-64-1 (67-64-1)
-- SMILES: C=CC[c]12->[Fe+2]3456789(<-[c]%10(Cc%11ccccc%11)[c]->3(Cc3ccccc3)[c]->4(Cc3ccccc3)[c-]->5(Cc3ccccc3)[c]->6%10Cc3ccccc3)<-[c]1(CC(=C)C)[c]->71cccc[c]->81[c-]->92CC(=C)C>>C=C(C)C[c-]12->[Fe+2]3456789(<-[c]%10(Cc%11ccccc%11)[c]->3(Cc3ccccc3)[c]->4(Cc3ccccc3)[c-]->5(Cc3ccccc3)[c]->6%10Cc3ccccc3)<-[c]3([c]->71CC=C(C)C3)[c]->81cccc[c]->912
+- SMILES: C=CCC12=C3(CC(=C)C)C45=CC=CC=C46[C-]1(CC(=C)C)->[Fe+2]56321478<-[C-]2(CC3=CC=CC=C3)C1(CC1=CC=CC=C1)=C4(CC1=CC=CC=C1)C7(CC1=CC=CC=C1)=C28CC1=CC=CC=C1>>C=C(C)C[C-]12->[Fe+2]3456789(<-[C-]%10(CC%11=CC=CC=C%11)C3(CC3=CC=CC=C3)=C4(CC3=CC=CC=C3)C5(CC3=CC=CC=C3)=C%106CC3=CC=CC=C3)C3(=CC=CC=C317)C81=C29CC=C(C)C1
 
 ## Reaction 31-470-CAS-9945991
 
@@ -12375,7 +12375,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 70
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: C=CCOC(CC(=C)[Si](C)(C)c1ccccc1)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>C[Si](C)(C1=CCOC([c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)C1)c1ccccc1
+- SMILES: C=CCOC(CC(=C)[Si](C)(C)C1=CC=CC=C1)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>C[Si](C)(C1=CC=CC=C1)C1=CCOC([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C1
 
 ## Reaction 31-614-CAS-24034208
 
@@ -13563,28 +13563,28 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 78
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC.ClCc1ccc(Br)c2ccccc12>>C=C1C=CC2(CC=CC2)c2ccccc21
+- SMILES: C=CC[Sn](CCCC)(CCCC)CCCC.ClCc1ccc(Br)c2ccccc12>>C=C1C=CC2(CC=CC2)c2ccccc21
 
 ## Reaction 31-614-CAS-32273715
 
 - Type: Olefin metathesis
 - Yield %: 75
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC.C=CCCc1ccc(CCl)cc1>>C=C1C=CC2(C=C1)CC=CCC2
+- SMILES: C=CC[Sn](CCCC)(CCCC)CCCC.C=CCCc1ccc(CCl)cc1>>C=C1C=CC2(C=C1)CC=CCC2
 
 ## Reaction 31-614-CAS-32273720
 
 - Type: Olefin metathesis
 - Yield %: 74
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC.C=CCc1ccc(CCl)cc1>>C=C1C=CC2(C=C1)CC=CC2
+- SMILES: C=CC[Sn](CCCC)(CCCC)CCCC.C=CCc1ccc(CCl)cc1>>C=C1C=CC2(C=C1)CC=CC2
 
 ## Reaction 31-614-CAS-32273724
 
 - Type: Olefin metathesis
 - Yield %: 71
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC.ClC(c1ccc(Br)c2ccccc12)C1CCCCC1>>C1=CCC2(C=C/C(=C\C3CCCCC3)c3ccccc32)C1
+- SMILES: C=CC[Sn](CCCC)(CCCC)CCCC.ClC(c1ccc(Br)c2ccccc12)C1CCCCC1>>C1=CCC2(C=C/C(=C\C3CCCCC3)c3ccccc32)C1
 
 ## Reaction 31-614-CAS-32327392
 
@@ -13655,98 +13655,98 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 82
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccc(C)cc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(C)cc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccc(C)cc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(C)cc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
 
 ## Reaction 31-614-CAS-32985861
 
 - Type: Olefin metathesis
 - Yield %: 73
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccccc2)S(C)(=O)=O)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccccc1)/C(S(C)(=O)=O)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccccc2)S(C)(=O)=O)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccccc1)/C(S(C)(=O)=O)=C\2
 
 ## Reaction 31-614-CAS-32985864
 
 - Type: Olefin metathesis
 - Yield %: 80
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccccc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccccc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
 
 ## Reaction 31-614-CAS-32985866
 
 - Type: Olefin metathesis
 - Yield %: 73
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccc(OC)cc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc(C2(O)C/C=C\Cc3c(ccc(OC)c3OC)/C=C\2S(=O)(=O)c2ccc(C)cc2)cc1
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccc(OC)cc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc(C2(O)C/C=C\Cc3c(ccc(OC)c3OC)/C=C\2S(=O)(=O)c2ccc(C)cc2)cc1
 
 ## Reaction 31-614-CAS-32985872
 
 - Type: Olefin metathesis
 - Yield %: 72
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2ccc(OC)cc2)ccc(OC)c1OC>>COc1ccc(S(=O)(=O)/C2=C/c3ccc(OC)c(OC)c3C/C=C\CC2(O)c2ccccc2)cc1
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2ccc(OC)cc2)ccc(OC)c1OC>>COc1ccc(S(=O)(=O)/C2=C/c3ccc(OC)c(OC)c3C/C=C\CC2(O)c2ccccc2)cc1
 
 ## Reaction 31-614-CAS-32985873
 
 - Type: Olefin metathesis
 - Yield %: 74
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccc3ccccc3c2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc3ccccc3c1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccc3ccccc3c2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc3ccccc3c1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
 
 ## Reaction 31-614-CAS-32985874
 
 - Type: Olefin metathesis
 - Yield %: 80
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccc(-c3ccccc3)cc2)S(=O)(=O)c2ccccc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(-c3ccccc3)cc1)/C(S(=O)(=O)c1ccccc1)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccc(-c3ccccc3)cc2)S(=O)(=O)c2ccccc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(-c3ccccc3)cc1)/C(S(=O)(=O)c1ccccc1)=C\2
 
 ## Reaction 31-614-CAS-32985875
 
 - Type: Olefin metathesis
 - Yield %: 80
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccc(-c3ccccc3)cc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(-c3ccccc3)cc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccc(-c3ccccc3)cc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(-c3ccccc3)cc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
 
 ## Reaction 31-614-CAS-32985876
 
 - Type: Olefin metathesis
 - Yield %: 74
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2cccc(C)c2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccccc1)/C(S(=O)(=O)c1cccc(C)c1)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2cccc(C)c2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccccc1)/C(S(=O)(=O)c1cccc(C)c1)=C\2
 
 ## Reaction 31-614-CAS-32985877
 
 - Type: Olefin metathesis
 - Yield %: 78
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccc(OC)cc2)S(C)(=O)=O)ccc(OC)c1OC>>COc1ccc(C2(O)C/C=C\Cc3c(ccc(OC)c3OC)/C=C\2S(C)(=O)=O)cc1
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccc(OC)cc2)S(C)(=O)=O)ccc(OC)c1OC>>COc1ccc(C2(O)C/C=C\Cc3c(ccc(OC)c3OC)/C=C\2S(C)(=O)=O)cc1
 
 ## Reaction 31-614-CAS-32985880
 
 - Type: Olefin metathesis
 - Yield %: 81
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2ccccc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccccc1)/C(S(=O)(=O)c1ccccc1)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2ccccc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccccc1)/C(S(=O)(=O)c1ccccc1)=C\2
 
 ## Reaction 31-614-CAS-32985882
 
 - Type: Olefin metathesis
 - Yield %: 71
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccc(Cl)cc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(Cl)cc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccc(Cl)cc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(Cl)cc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
 
 ## Reaction 31-614-CAS-32985885
 
 - Type: Olefin metathesis
 - Yield %: 70
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OCCCC>>CCCCOc1c(OC)ccc2c1C/C=C\CC(O)(c1ccccc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccccc2)S(=O)(=O)c2ccc(C)cc2)ccc(OC)c1OCCCC>>CCCCOc1c(OC)ccc2c1C/C=C\CC(O)(c1ccccc1)/C(S(=O)(=O)c1ccc(C)cc1)=C\2
 
 ## Reaction 31-614-CAS-32985886
 
 - Type: Olefin metathesis
 - Yield %: 76
 - Solvents: 109-99-9 (109-99-9), 75-09-2 (75-09-2)
-- SMILES: C=C[CH2][Mg][Br].C=CCc1c(/C=C(\C(=O)c2ccc(-c3ccccc3)cc2)S(C)(=O)=O)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(-c3ccccc3)cc1)/C(S(C)(=O)=O)=C\2
+- SMILES: C=CC[Mg]Br.C=CCc1c(/C=C(\C(=O)c2ccc(-c3ccccc3)cc2)S(C)(=O)=O)ccc(OC)c1OC>>COc1ccc2c(c1OC)C/C=C\CC(O)(c1ccc(-c3ccccc3)cc1)/C(S(C)(=O)=O)=C\2
 
 ## Reaction 31-614-CAS-33260911
 
@@ -14015,14 +14015,14 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 81
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: [H][C]1([C@H](CC=C)C(=C)C(=O)OC)=[C]2(CC=C)[C]3(=[CH2]->[Fe]<-3<-1<-2([C]#O)([C]#O)[C]#O)N1C(=O)OC[C@@H]1C(C)C>>[H][C]12->[Fe]34([C]#O)([C]#O)([C]#O)<-[CH2]=[C]->3(N3C(=O)OC[C@@H]3C(C)C)[C]->4=1CC=CC[C@@H]2C(=C)C(=O)OC
+- SMILES: [H]C1([C@H](CC=C)C(=C)C(=O)OC)=C2(CC=C)C3(N4C(=O)OC[C@@H]4C(C)C)=[CH2][Fe]312(C#O)(C#O)C#O>>[H]C12=C3(CC=CC[C@@H]1C(=C)C(=O)OC)C1(N4C(=O)OC[C@@H]4C(C)C)=[CH2][Fe]123(C#O)(C#O)C#O
 
 ## Reaction 31-614-CAS-33937310
 
 - Type: Olefin metathesis
 - Yield %: 87
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: [H][C]1([C@H](C=C)C2C(=O)OC(C)(C)OC2=O)=[C]2(CCC=C)[C]3(=[CH2]->[Fe]<-3<-1<-2([C]#O)([C]#O)[C]#O)N1C(=O)OC[C@@H]1C(C)C>>[H][C]12->[Fe]34([C]#O)([C]#O)([C]#O)<-[CH2]=[C]->3(N3C(=O)OC[C@@H]3C(C)C)[C]->4=1CCC=C[C@@H]2C1C(=O)OC(C)(C)OC1=O
+- SMILES: [H]C1([C@H](C=C)C2C(=O)OC(C)(C)OC2=O)=C2(CCC=C)C3(N4C(=O)OC[C@@H]4C(C)C)=[CH2][Fe]312(C#O)(C#O)C#O>>[H]C12=C3(CCC=C[C@@H]1C1C(=O)OC(C)(C)OC1=O)C1(N4C(=O)OC[C@@H]4C(C)C)=[CH2][Fe]123(C#O)(C#O)C#O
 
 ## Reaction 31-614-CAS-34288474
 
@@ -14690,7 +14690,7 @@ Total reactions: 2332
 - Type: Olefin metathesis
 - Yield %: 77
 - Solvents: 107-06-2 (107-06-2)
-- SMILES: C[O]1CC[O]2CC[O](C)->[Gd+3]<-1<-2345(<-[O]=C([CH-]C(=[O]->3)C(F)(F)F)C(F)(F)F)(<-[O]=C([CH-]C(=[O]->4)C(F)(F)F)C(F)(F)F)<-[O]=C([CH-]C(=[O]->5)C(F)(F)F)C(F)(F)F.C=CCn1c(-c2nc(-c3nc4cc(Br)ccc4n3CC=C)c(C=C)c(C)c2C=C)nc2cc(Br)ccc21>>Cc1c2c3[n]4->[Gd+3]567(<-[O]=C([CH-]C(=[O]->5)C(F)(F)F)C(F)(F)F)(<-[O]=C([CH-]C(=[O]->6)C(F)(F)F)C(F)(F)F)(<-[O]=C([CH-]C(=[O]->7)C(F)(F)F)C(F)(F)F)(<-[n]5c-3n(c3ccc(Br)cc35)CC=C2)<-[n]2c3n(c5ccc(Br)cc52)CC=Cc1c4-3
+- SMILES: CO1CCO2CCO(C)->[Gd+3]<-1<-2345(<-O=C([CH-]C(=O->3)C(F)(F)F)C(F)(F)F)(<-O=C([CH-]C(=O->4)C(F)(F)F)C(F)(F)F)<-O=C([CH-]C(=O->5)C(F)(F)F)C(F)(F)F.C=CCn1c(-c2nc(-c3nc4cc(Br)ccc4n3CC=C)c(C=C)c(C)c2C=C)nc2cc(Br)ccc21>>Cc1c2c3n4->[Gd+3]567(<-O=C([CH-]C(=O->5)C(F)(F)F)C(F)(F)F)(<-O=C([CH-]C(=O->6)C(F)(F)F)C(F)(F)F)(<-O=C([CH-]C(=O->7)C(F)(F)F)C(F)(F)F)(<-n5c-3n(c3ccc(Br)cc35)CC=C2)<-n2c3n(c5ccc(Br)cc52)CC=Cc1c4-3
 
 ## Reaction 31-614-CAS-36832626
 

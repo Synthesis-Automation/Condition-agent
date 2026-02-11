@@ -3126,7 +3126,7 @@ Total reactions: 454
 - Yield %: 79
 - Reagents: 64-19-7 (64-19-7) [UNK]
 - Solvents: 71-36-3 (71-36-3)
-- SMILES: NCc1ccc(C(F)(F)F)cc1.[2H]C(=O)c1ccc(C)cc1.N#[C][K]>>[2H]C(NCc1ccc(C(F)(F)F)cc1)(C(=O)O)c1ccc(C)cc1
+- SMILES: NCc1ccc(C(F)(F)F)cc1.[2H]C(=O)c1ccc(C)cc1.N#C[K]>>[2H]C(NCc1ccc(C(F)(F)F)cc1)(C(=O)O)c1ccc(C)cc1
 
 ## Reaction 31-614-CAS-42976501
 
@@ -3304,7 +3304,7 @@ Total reactions: 454
 - Yield %: 73
 - Reagents: 6674-22-2 (6674-22-2) [UNK]
 - Solvents: 123-91-1 (123-91-1)
-- SMILES: O=[C-2]1->[Co+2]2([C]#O)([C]#O)([C]#O)[C-2](=O)->[Co+2]12([C]#O)([C]#O)[C]#O.Cc1ccc2nc(-c3ccc([N+](=O)[O-])cc3)c(NC(C)(C)C)n2c1>>Cc1ccc2nc3c4ccc([N+](=O)[O-])cc4c(=O)n(C(C)(C)C)c3n2c1
+- SMILES: O=[C-2]1->[Co+2]2(C#O)(C#O)(C#O)[C-2](=O)->[Co+2]12(C#O)(C#O)C#O.Cc1ccc2nc(-c3ccc([N+](=O)[O-])cc3)c(NC(C)(C)C)n2c1>>Cc1ccc2nc3c4ccc([N+](=O)[O-])cc4c(=O)n(C(C)(C)C)c3n2c1
 
 ## Reaction 31-614-CAS-47217424
 
@@ -3319,7 +3319,7 @@ Total reactions: 454
 - Yield %: 86
 - Reagents: 6674-22-2 (6674-22-2) [UNK]
 - Solvents: 123-91-1 (123-91-1)
-- SMILES: O=[C-2]1->[Co+2]2([C]#O)([C]#O)([C]#O)[C-2](=O)->[Co+2]12([C]#O)([C]#O)[C]#O.CC(C)(C)Nc1c(-c2ccc([N+](=O)[O-])cc2)nc2ccccn12>>CC(C)(C)n1c(=O)c2cc([N+](=O)[O-])ccc2c2nc3ccccn3c21
+- SMILES: O=[C-2]1->[Co+2]2(C#O)(C#O)(C#O)[C-2](=O)->[Co+2]12(C#O)(C#O)C#O.CC(C)(C)Nc1c(-c2ccc([N+](=O)[O-])cc2)nc2ccccn12>>CC(C)(C)n1c(=O)c2cc([N+](=O)[O-])ccc2c2nc3ccccn3c21
 
 ## Reaction 31-614-CAS-47217429
 
@@ -3327,7 +3327,7 @@ Total reactions: 454
 - Yield %: 77
 - Reagents: 6674-22-2 (6674-22-2) [UNK]
 - Solvents: 123-91-1 (123-91-1)
-- SMILES: O=[C-2]1->[Co+2]2([C]#O)([C]#O)([C]#O)[C-2](=O)->[Co+2]12([C]#O)([C]#O)[C]#O.Cc1ccn2c(NC(C)(C)C)c(-c3ccc([N+](=O)[O-])cc3)nc2c1>>Cc1ccn2c(c1)nc1c3ccc([N+](=O)[O-])cc3c(=O)n(C(C)(C)C)c12
+- SMILES: O=[C-2]1->[Co+2]2(C#O)(C#O)(C#O)[C-2](=O)->[Co+2]12(C#O)(C#O)C#O.Cc1ccn2c(NC(C)(C)C)c(-c3ccc([N+](=O)[O-])cc3)nc2c1>>Cc1ccn2c(c1)nc1c3ccc([N+](=O)[O-])cc3c(=O)n(C(C)(C)C)c12
 
 ## Reaction 31-614-CAS-47217430
 
@@ -3342,7 +3342,7 @@ Total reactions: 454
 - Yield %: 70
 - Reagents: 6674-22-2 (6674-22-2) [UNK]
 - Solvents: 123-91-1 (123-91-1)
-- SMILES: O=[C-2]1->[Co+2]2([C]#O)([C]#O)([C]#O)[C-2](=O)->[Co+2]12([C]#O)([C]#O)[C]#O.Cc1cccc2nc(-c3ccc([N+](=O)[O-])cc3)c(NC(C)(C)C)n12>>Cc1cccc2nc3c4ccc([N+](=O)[O-])cc4c(=O)n(C(C)(C)C)c3n12
+- SMILES: O=[C-2]1->[Co+2]2(C#O)(C#O)(C#O)[C-2](=O)->[Co+2]12(C#O)(C#O)C#O.Cc1cccc2nc(-c3ccc([N+](=O)[O-])cc3)c(NC(C)(C)C)n12>>Cc1cccc2nc3c4ccc([N+](=O)[O-])cc4c(=O)n(C(C)(C)C)c3n12
 
 ## Reaction 31-614-CAS-47217439
 
@@ -3350,7 +3350,7 @@ Total reactions: 454
 - Yield %: 75
 - Reagents: 6674-22-2 (6674-22-2) [UNK]
 - Solvents: 123-91-1 (123-91-1)
-- SMILES: O=[C-2]1->[Co+2]2([C]#O)([C]#O)([C]#O)[C-2](=O)->[Co+2]12([C]#O)([C]#O)[C]#O.CC(C)(C)CC(C)(C)Nc1c(-c2ccc([N+](=O)[O-])cc2)nc2ccccn12>>CC(C)(C)CC(C)(C)n1c(=O)c2cc([N+](=O)[O-])ccc2c2nc3ccccn3c21
+- SMILES: O=[C-2]1->[Co+2]2(C#O)(C#O)(C#O)[C-2](=O)->[Co+2]12(C#O)(C#O)C#O.CC(C)(C)CC(C)(C)Nc1c(-c2ccc([N+](=O)[O-])cc2)nc2ccccn12>>CC(C)(C)CC(C)(C)n1c(=O)c2cc([N+](=O)[O-])ccc2c2nc3ccccn3c21
 
 ## Reaction 31-614-CAS-47217454
 

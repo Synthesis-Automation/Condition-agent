@@ -1071,7 +1071,10 @@
     {
       "id": "Reductive_amination",
       "reactants": {
-        "electrophile": "@carbonyls",
+        "electrophile": [
+          "@carbonyls",
+          "@imines"
+        ],
         "nucleophile": "@amines_nh"
       },
       "products": {
@@ -1079,7 +1082,8 @@
           "Alkyl-NHR",
           "Alkyl-NR2",
           "Ar-NHR",
-          "Ar-NR2"
+          "Ar-NR2",
+          "@carbamate_amines"
         ]
       },
       "examples": [
@@ -1110,7 +1114,10 @@
     {
       "id": "Hydrogenation",
       "reactants": {
-        "substrate": "@hydrogenation_substrates",
+        "substrate": [
+          "@hydrogenation_substrates",
+          "@imines"
+        ],
         "reagent": [
           "H2"
         ]
@@ -1340,6 +1347,7 @@
         "substrate": [
           "Ar-H",
           "HeteroAr-H",
+          "Alkyl-H",
           "Ar-I",
           "Ar-Br",
           "HeteroAr-I",
@@ -1350,7 +1358,8 @@
         "product": [
           "Ar-CF3",
           "HeteroAr-CF3",
-          "Alkenyl-CF3"
+          "Alkenyl-CF3",
+          "Alkyl-CF3"
         ]
       },
       "examples": [

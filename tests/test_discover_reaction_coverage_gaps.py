@@ -96,3 +96,63 @@ def test_build_discovery_report_counts_gaps(monkeypatch) -> None:
     outside = dict(report["taxonomy_coverage"]["top_motifs_outside_reaction_taxonomy"])
     assert outside.get("Ar-X", 0) == 1
     assert report["clusters"]
+
+
+def test_build_discovery_report_applies_routing_policy(monkeypatch) -> None:
+    defs = {
+        "dummy_type": _Defn(
+            name="Dummy",
+            category="test",
+            reactants={"r1": _Slot(["A"])},
+            products={"p1": _Slot(["B"])},
+        )
+    }
+
+    def fake_catalog():
+        return defs, {}
+
+    def fake_featurize(reaction_smiles: str, options=None):
+        return {
+            "reaction_type": "dummy_type",
+            "reaction_key": "A->B",
+            "aggregates": {"reacted_motifs": ["A"], "formed_motifs": ["B"]},
+            "reactants": [{"motifs": [{"id": "A"}]}],
+            "products": [{"motifs": [{"id": "B"}]}],
+            "reaction_events": {
+                "events": [{"kind": "x"}],
+                "reaction_key_quality": {"level": "high", "score_0_1": 1.0},
+                "anomalies": [],
+            },
+        }
+
+    def fake_route(reaction_smiles: str):
+        if reaction_smiles == "SKIP>>X":
+            return {
+                "route": "exclude_organometallic_or_coordination_complex",
+                "excluded": True,
+                "reason": "coordination_arrow_and_metal_token",
+            }
+        return {
+            "route": "eligible_taxonomy_benchmark",
+            "excluded": False,
+            "reason": "eligible",
+        }
+
+    monkeypatch.setattr(discovery, "load_reaction_catalog", fake_catalog)
+    monkeypatch.setattr(discovery, "featurize_reaction", fake_featurize)
+    monkeypatch.setattr(discovery, "classify_reaction_for_taxonomy_benchmark", fake_route)
+
+    rows = [
+        {"reaction_smiles": "SKIP>>X", "source_file": "f1.csv"},
+        {"reaction_smiles": "RUN>>Y", "source_file": "f1.csv"},
+    ]
+    report = discovery.build_discovery_report(rows, routing_policy="exclude_complex")
+    summary = report["summary"]
+
+    assert summary["input_rows"] == 2
+    assert summary["routed_excluded_rows"]["count"] == 1
+    assert summary["processed_reactions"] == 1
+    assert dict(report["ingestion_routing"]["route_counts"]) == {
+        "exclude_organometallic_or_coordination_complex": 1,
+        "eligible_taxonomy_benchmark": 1,
+    }

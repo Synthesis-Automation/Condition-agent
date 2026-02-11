@@ -516,6 +516,28 @@
         "Oxidation_alcohol"
       ]
     },
+    "imines": {
+      "name": "Imines",
+      "description": "Imine substrates used as preformed electrophiles or hydrogenation substrates.",
+      "members": [
+        "Ar-C=N"
+      ],
+      "usage": [
+        "Reductive_amination",
+        "Hydrogenation"
+      ]
+    },
+    "carbamate_amines": {
+      "name": "Carbamate-Protected Amines",
+      "description": "N-protected amine products commonly formed in reductive amination workflows.",
+      "members": [
+        "Alkyl-N(R)CO2R",
+        "Ar-N(R)CO2R"
+      ],
+      "usage": [
+        "Reductive_amination"
+      ]
+    },
     "esters": {
       "name": "Esters",
       "description": "Ester products and substrates (R-CO2R).",

@@ -427,7 +427,7 @@ Total reactions: 1467
 - Type: Knoevenagel condensation
 - Yield %: 90
 - Solvents: 25322-68-3 (25322-68-3)
-- SMILES: CN1CC(=O)N=C1N.O=Cc1coc2ccc([N+](=O)[O-])cc2c1=O>>CN1C(=Cc2coc3ccc([N+](=O)[O-])cc3c2=O)C(=O)N=C1N
+- SMILES: CN1CC(=O)N=C1N.O=Cc1coc2ccc([N+](=O)[O-])cc2c1=O>>CN1C(N)=NC(=O)C1=Cc1coc2ccc([N+](=O)[O-])cc2c1=O
 
 ## Reaction 31-329-CAS-12455698
 

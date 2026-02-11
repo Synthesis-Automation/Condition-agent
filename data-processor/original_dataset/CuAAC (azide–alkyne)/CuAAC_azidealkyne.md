@@ -5785,42 +5785,42 @@ Total reactions: 1436
 - Type: CuAAC (azide–alkyne)
 - Yield %: 94
 - Solvents: 109-99-9 (109-99-9), 121-44-8 (121-44-8)
-- SMILES: C#CCOc1ccccc1/C=C/C(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCn1cc(COc2ccccc2/C=C/C(=O)[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)nn1)(OCC)OCC
+- SMILES: C#CCOC1=C(/C=C/C(=O)[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=CC=C1.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCN1C=C(COC2=C(/C=C/C(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=CC=C2)N=N1)(OCC)OCC
 
 ## Reaction 31-287-CAS-19619839
 
 - Type: CuAAC (azide–alkyne)
 - Yield %: 94
 - Solvents: 109-99-9 (109-99-9), 121-44-8 (121-44-8)
-- SMILES: C#CCOc1ccc(/C=C/C(=O)[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCn1cc(COc2ccc(/C=C/C(=O)[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)cc2)nn1)(OCC)OCC
+- SMILES: C#CCOC1=CC=C(/C=C/C(=O)[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCN1C=C(COC2=CC=C(/C=C/C(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=C2)N=N1)(OCC)OCC
 
 ## Reaction 31-287-CAS-19619840
 
 - Type: CuAAC (azide–alkyne)
 - Yield %: 94
 - Solvents: 109-99-9 (109-99-9), 121-44-8 (121-44-8)
-- SMILES: C#CCOc1ccc(/C=C/C(=O)[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1OC.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCn1cc(COc2ccc(/C=C/C(=O)[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)cc2OC)nn1)(OCC)OCC
+- SMILES: C#CCOC1=C(OC)C=C(/C=C/C(=O)[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCN1C=C(COC2=C(OC)C=C(/C=C/C(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=C2)N=N1)(OCC)OCC
 
 ## Reaction 31-287-CAS-19619841
 
 - Type: CuAAC (azide–alkyne)
 - Yield %: 94
 - Solvents: 109-99-9 (109-99-9), 121-44-8 (121-44-8)
-- SMILES: C#CCOc1cc(/C=C/C(=O)[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)ccc1OC.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCn1cc(COc2cc(/C=C/C(=O)[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)ccc2OC)nn1)(OCC)OCC
+- SMILES: C#CCOC1=C(OC)C=CC(/C=C/C(=O)[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)=C1.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCN1C=C(COC2=C(OC)C=CC(/C=C/C(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)=C2)N=N1)(OCC)OCC
 
 ## Reaction 31-287-CAS-19619844
 
 - Type: CuAAC (azide–alkyne)
 - Yield %: 94
 - Solvents: 109-99-9 (109-99-9), 121-44-8 (121-44-8)
-- SMILES: C#CCOc1ccccc1C(=O)/C=C/[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCn1cc(COc2ccccc2C(=O)/C=C/[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)nn1)(OCC)OCC
+- SMILES: C#CCOC1=C(C(=O)/C=C/[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=CC=C1.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCN1C=C(COC2=C(C(=O)/C=C/[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=CC=C2)N=N1)(OCC)OCC
 
 ## Reaction 31-287-CAS-19619845
 
 - Type: CuAAC (azide–alkyne)
 - Yield %: 94
 - Solvents: 109-99-9 (109-99-9), 121-44-8 (121-44-8)
-- SMILES: C#CCOc1ccc(C(=O)/C=C/[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCn1cc(COc2ccc(C(=O)/C=C/[c-]34->[Fe+2]56789%10%11(<-[cH]%12[cH]->5[cH]->6[cH-]->7[cH]->8%12)<-[cH]([cH]->9[cH]->%103)[cH]->%114)cc2)nn1)(OCC)OCC
+- SMILES: C#CCOC1=CC=C(C(=O)/C=C/[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1.CCO[Si](CCCN=[N+]=[N-])(OCC)OCC>>CCO[Si](CCCN1C=C(COC2=CC=C(C(=O)/C=C/[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=C2)N=N1)(OCC)OCC
 
 ## Reaction 31-287-CAS-19908479
 
@@ -7554,7 +7554,7 @@ Total reactions: 1436
 - Type: CuAAC (azide–alkyne)
 - Yield %: 15
 - Solvents: 71-36-3 (71-36-3), 7732-18-5 (7732-18-5)
-- SMILES: [N-]=[N+]=NC[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.C#C[C@H]1C[N@]2CC[C@H]1C[C@H]2[C@H](O)c1ccnc2ccc(OC)cc12>>COc1ccc2nccc(C(O)C3CC4CCN3CC4c3cn(C[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)nn3)c2c1.COc1ccc2nccc(C(O)C3CC4CCN3CC4c3cn(C[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)nn3)c2c1.COc1ccc2nccc(C(O)C3CC4CCN3CC4c3cn(C[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)nn3)c2c1
+- SMILES: [N-]=[N+]=NC[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.C#C[C@H]1C[N@]2CC[C@H]1C[C@H]2[C@H](O)c1ccnc2ccc(OC)cc12>>COC1=CC2=C(C=C1)N=CC=C2C(O)C1CC2CCN1CC2C1=CN(C[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)N=N1.COC1=CC2=C(C=C1)N=CC=C2C(O)C1CC2CCN1CC2C1=CN(C[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)N=N1.COC1=CC2=C(C=C1)N=CC=C2C(O)C1CC2CCN1CC2C1=CN(C[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)N=N1
 
 ## Reaction 31-287-CAS-3124614
 
@@ -8444,7 +8444,7 @@ Total reactions: 1436
 - Type: CuAAC (azide–alkyne)
 - Yield %: 17
 - Solvents: 71-36-3 (71-36-3), 7732-18-5 (7732-18-5)
-- SMILES: C#C[C@H]1C[N@]2CC[C@H]1C[C@H]2[C@H](O)c1ccnc2ccc(OC)cc12.[N-]=[N+]=Nc1ccc(C=CC(=O)[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)cc1>>COc1ccc2nccc(C(O)C3CC4CCN3CC4c3cn(-c4ccc(C=CC(=O)[c-]56->[Fe+2]789%10%11%12%13(<-[cH]%14[cH]->7[cH]->8[cH-]->9[cH]->%10%14)<-[cH]([cH]->%11[cH]->%125)[cH]->%136)cc4)nn3)c2c1.COc1ccc2nccc(C(O)C3CC4CCN3CC4c3cn(-c4ccc(C=CC(=O)[c-]56->[Fe+2]789%10%11%12%13(<-[cH]%14[cH]->7[cH]->8[cH-]->9[cH]->%10%14)<-[cH]([cH]->%11[cH]->%125)[cH]->%136)cc4)nn3)c2c1
+- SMILES: C#C[C@H]1C[N@]2CC[C@H]1C[C@H]2[C@H](O)c1ccnc2ccc(OC)cc12.[N-]=[N+]=NC1=CC=C(C=CC(=O)[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=C1>>COC1=CC2=C(C=C1)N=CC=C2C(O)C1CC2CCN1CC2C1=CN(C2=CC=C(C=CC(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=C2)N=N1.COC1=CC2=C(C=C1)N=CC=C2C(O)C1CC2CCN1CC2C1=CN(C2=CC=C(C=CC(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=C2)N=N1
 
 ## Reaction 31-287-CAS-5608981
 
@@ -8550,7 +8550,7 @@ Total reactions: 1436
 - Type: CuAAC (azide–alkyne)
 - Yield %: 78
 - Solvents: 71-36-3 (71-36-3), 7732-18-5 (7732-18-5)
-- SMILES: [N-]=[N+]=N[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.C#C[C@H]1C[N@]2CC[C@H]1C[C@H]2[C@H](O)c1ccnc2ccc(OC)cc12>>COc1ccc2nccc(C(O)C3CC4CCN3CC4c3cn(-[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)nn3)c2c1
+- SMILES: [N-]=[N+]=N[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.C#C[C@H]1C[N@]2CC[C@H]1C[C@H]2[C@H](O)c1ccnc2ccc(OC)cc12>>COC1=CC2=C(C=C1)N=CC=C2C(O)C1CC2CCN1CC2C1=CN([C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)N=N1
 
 ## Reaction 31-287-CAS-5867889
 
@@ -9206,7 +9206,7 @@ Total reactions: 1436
 - Type: CuAAC (azide–alkyne)
 - Yield %: 12
 - Solvents: 71-36-3 (71-36-3), 7732-18-5 (7732-18-5)
-- SMILES: C#C[C@H]1C[N@]2CC[C@H]1C[C@H]2[C@H](O)c1ccnc2ccc(OC)cc12.[N-]=[N+]=Nc1ccccc1C=CC(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>COc1ccc2nccc(C(O)C3CC4CCN3CC4c3cn(-c4ccccc4C=CC(=O)[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)nn3)c2c1.COc1ccc2nccc(C(O)C3CC4CCN3CC4c3cn(-c4ccccc4C=CC(=O)[c-]45->[Fe+2]6789%10%11%12(<-[cH]%13[cH]->6[cH]->7[cH-]->8[cH]->9%13)<-[cH]([cH]->%10[cH]->%114)[cH]->%125)nn3)c2c1
+- SMILES: C#C[C@H]1C[N@]2CC[C@H]1C[C@H]2[C@H](O)c1ccnc2ccc(OC)cc12.[N-]=[N+]=NC1=C(C=CC(=O)[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C=CC=C1>>COC1=CC2=C(C=C1)N=CC=C2C(O)C1CC2CCN1CC2C1=CN(C2=C(C=CC(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=CC=C2)N=N1.COC1=CC2=C(C=C1)N=CC=C2C(O)C1CC2CCN1CC2C1=CN(C2=C(C=CC(=O)[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C=CC=C2)N=N1
 
 ## Reaction 31-287-CAS-8071032
 

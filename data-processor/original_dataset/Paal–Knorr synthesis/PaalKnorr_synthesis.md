@@ -675,7 +675,7 @@ Total reactions: 1985
 
 - Type: Paal–Knorr synthesis
 - Yield %: 88
-- SMILES: CC(=O)CCC(C)=O.N[C@@H]1C(=O)N(c2cc3c4ccccc4ccc3c3ccccc23)[C@H]1[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>Cc1ccc(C)n1C1C(=O)N(c2cc3c4ccccc4ccc3c3ccccc23)C1[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: CC(=O)CCC(C)=O.N[C@@H]1C(=O)N(C2=CC3=C(C=CC4=CC=CC=C43)C3=CC=CC=C32)[C@H]1[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC1=CC=C(C)N1C1C(=O)N(C2=CC3=C(C=CC4=CC=CC=C43)C3=CC=CC=C32)C1[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-309-CAS-11772774
 

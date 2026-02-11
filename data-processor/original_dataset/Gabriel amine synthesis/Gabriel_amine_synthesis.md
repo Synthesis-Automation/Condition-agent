@@ -359,7 +359,7 @@ Total reactions: 263
 - Type: Gabriel amine synthesis
 - Yield %: 50
 - Solvents: 108-89-4 (108-89-4)
-- SMILES: O=C1NC(=O)c2ccccc21.Br[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(Br)[cH]->91>>O=C1c2ccccc2C(=O)N1[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(N2C(=O)c3ccccc3C2=O)[cH]->91
+- SMILES: O=C1NC(=O)c2ccccc21.Br[C-]12->[Fe+2]3456789(<-[C-]%10(Br)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>O=C1C2=CC=CC=C2C(=O)N1[C-]12->[Fe+2]3456789(<-[C-]%10(N%11C(=O)C%12=CC=CC=C%12C%11=O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-041-CAS-15445375
 

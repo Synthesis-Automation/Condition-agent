@@ -1284,7 +1284,7 @@ Total reactions: 1350
 - Yield %: 75
 - Reagents: 584-08-7 (584-08-7) [UNK], 7757-82-6 (7757-82-6) [ADDITIVE], 56553-60-7 (56553-60-7) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: CC(C)(C)OC(=O)CC[C@H](N)C(=O)OC(C)(C)C.Cl.CN1C=CN(CC2=CC=C(C=O)C=C2)[C-2]1=[Pt+4]([I-])([I-])<-[N]1=CC=CC=C1>>CN1C=CN(CC2=CC=C(CNC(CCC(=O)OC(C)(C)C)C(=O)OC(C)(C)C)C=C2)[C-2]1=[Pt+4]([I-])([I-])<-[NH2]C(CCC(=O)OC(C)(C)C)C(=O)OC(C)(C)C
+- SMILES: CC(C)(C)OC(=O)CC[C@H](N)C(=O)OC(C)(C)C.Cl.CN1C=CN(CC2=CC=C(C=O)C=C2)[C-2]1=[Pt+4]([I-])([I-])<-N1=CC=CC=C1>>CN1C=CN(CC2=CC=C(CNC(CCC(=O)OC(C)(C)C)C(=O)OC(C)(C)C)C=C2)[C-2]1=[Pt+4]([I-])([I-])<-NC(CCC(=O)OC(C)(C)C)C(=O)OC(C)(C)C
 
 ## Reaction 31-313-CAS-11136652
 
@@ -1500,7 +1500,7 @@ Total reactions: 1350
 - Yield %: 84
 - Reagents: 56553-60-7 (56553-60-7) [UNK], 1310-73-2 (1310-73-2) [ADDITIVE]
 - Solvents: 107-06-2 (107-06-2), 7732-18-5 (7732-18-5)
-- SMILES: C1CCNCC1.CC(C)(C)[c-]12->[Fe+2]3456789(<-[cH]([cH]->31)[c]->4(C=O)[cH]->52)<-[cH]1[cH]->6[c-]->7(C(C)(C)C)[cH]->8[c]->91C=O>>CC(C)(C)[c-]12->[Fe+2]3456789(<-[cH]([cH]->31)[c]->4(CN1CCCCC1)[cH]->52)<-[cH]1[cH]->6[c-]->7(C(C)(C)C)[cH]->8[c]->91CN1CCCCC1
+- SMILES: C1CCNCC1.CC(C)(C)[C-]12->[Fe+2]3456789(<-[C-]%10(C(C)(C)C)[CH]3=[CH]4C5(C=O)=[CH]%106)[CH](=[CH]17)C8(C=O)=[CH]29>>CC(C)(C)[C-]12->[Fe+2]3456789(<-[C-]%10(C(C)(C)C)[CH]3=[CH]4C5(CN3CCCCC3)=[CH]%106)[CH](=[CH]17)C8(CN1CCCCC1)=[CH]29
 
 ## Reaction 31-313-CAS-11645642
 
@@ -3303,7 +3303,7 @@ Total reactions: 1350
 - Yield %: 55
 - Reagents: 56553-60-7 (56553-60-7) [UNK], 1310-73-2 (1310-73-2) [ADDITIVE]
 - Solvents: 107-06-2 (107-06-2), 7732-18-5 (7732-18-5)
-- SMILES: C=Cc1ccc(CN)cc1.CC(C)(CCC=O)[c]12->[Fe+2]3456789(<-[cH]1[c]->3(P(c1ccccc1)c1ccccc1)[c-]->4(P(c1ccccc1)c1ccccc1)[cH]->52)<-[cH]1[c]->6(C(C)(C)CCC=O)[cH]->7[c-]->8(P(c2ccccc2)c2ccccc2)[c]->91P(c1ccccc1)c1ccccc1>>C=Cc1ccc(CNCCCC(C)(C)[c]23->[Fe+2]456789%10(<-[cH]2[c]->4(P(c2ccccc2)c2ccccc2)[c-]->5(P(c2ccccc2)c2ccccc2)[cH]->63)<-[cH]2[c]->7(C(C)(C)CCCNCc3ccc(C=C)cc3)[cH]->8[c-]->9(P(c3ccccc3)c3ccccc3)[c]->%102P(c2ccccc2)c2ccccc2)cc1
+- SMILES: C=Cc1ccc(CN)cc1.CC(C)(CCC=O)C12=[CH]3[C-]4(P(C5=CC=CC=C5)C5=CC=CC=C5)->[Fe+2]3156789(<-[C-]1(P(C3=CC=CC=C3)C3=CC=CC=C3)[CH]5=C6(C(C)(C)CCC=O)[CH]7=C18P(C1=CC=CC=C1)C1=CC=CC=C1)[CH]2=C49P(C1=CC=CC=C1)C1=CC=CC=C1>>C=CC1=CC=C(CNCCCC(C)(C)C23=[CH]4[C-]5(P(C6=CC=CC=C6)C6=CC=CC=C6)->[Fe+2]426789%10(<-[C-]2(P(C4=CC=CC=C4)C4=CC=CC=C4)[CH]6=C7(C(C)(C)CCCNCC4=CC=C(C=C)C=C4)[CH]8=C29P(C2=CC=CC=C2)C2=CC=CC=C2)[CH]3=C5%10P(C2=CC=CC=C2)C2=CC=CC=C2)C=C1
 
 ## Reaction 31-313-CAS-16079070
 
@@ -3311,7 +3311,7 @@ Total reactions: 1350
 - Yield %: 50
 - Reagents: 56553-60-7 (56553-60-7) [UNK], 1310-73-2 (1310-73-2) [ADDITIVE]
 - Solvents: 107-06-2 (107-06-2), 7732-18-5 (7732-18-5)
-- SMILES: C=Cc1ccc(CN)cc1.CC(C)P(C(C)C)[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[c]->6(C(C)(C)CCC=O)[cH]->7[c-]->8(P(c2ccccc2)c2ccccc2)[c]->91P(c1ccccc1)c1ccccc1>>C=Cc1ccc(CNCCCC(C)(C)[c]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[c-]->6(P(C(C)C)C(C)C)[cH]->7%11)<-[cH]2[c]->8(P(c2ccccc2)c2ccccc2)[c-]->9(P(c2ccccc2)c2ccccc2)[cH]->%103)cc1
+- SMILES: C=Cc1ccc(CN)cc1.CC(C)P(C(C)C)[C-]12->[Fe+2]3456789(<-[C-]%10(P(C%11=CC=CC=C%11)C%11=CC=CC=C%11)[CH]3=C4(C(C)(C)CCC=O)[CH]5=C%106P(C3=CC=CC=C3)C3=CC=CC=C3)[CH](=[CH]17)[CH]8=[CH]29>>C=CC1=CC=C(CNCCCC(C)(C)C23=[CH]4[C-]5(P(C6=CC=CC=C6)C6=CC=CC=C6)->[Fe+2]426789%10(<-[C-]2(P(C(C)C)C(C)C)[CH]6=[CH]7[CH]8=[CH]29)[CH]3=C5%10P(C2=CC=CC=C2)C2=CC=CC=C2)C=C1
 
 ## Reaction 31-313-CAS-16079071
 
@@ -3319,7 +3319,7 @@ Total reactions: 1350
 - Yield %: 55
 - Reagents: 56553-60-7 (56553-60-7) [UNK], 1310-73-2 (1310-73-2) [ADDITIVE]
 - Solvents: 107-06-2 (107-06-2), 7732-18-5 (7732-18-5)
-- SMILES: C=Cc1ccc(CN)cc1.CC(C)(CCC=O)[c]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(P(c3ccccc3)c3ccccc3)[cH]->6%10)<-[cH]1[c]->7(P(c1ccccc1)c1ccccc1)[c-]->8(P(c1ccccc1)c1ccccc1)[cH]->92>>C=Cc1ccc(CNCCCC(C)(C)[c]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[c-]->6(P(c4ccccc4)c4ccccc4)[cH]->7%11)<-[cH]2[c]->8(P(c2ccccc2)c2ccccc2)[c-]->9(P(c2ccccc2)c2ccccc2)[cH]->%103)cc1
+- SMILES: C=Cc1ccc(CN)cc1.CC(C)(CCC=O)C12=[CH]3[C-]4(P(C5=CC=CC=C5)C5=CC=CC=C5)->[Fe+2]3156789(<-[C-]1(P(C3=CC=CC=C3)C3=CC=CC=C3)[CH]5=[CH]6[CH]7=[CH]18)[CH]2=C49P(C1=CC=CC=C1)C1=CC=CC=C1>>C=CC1=CC=C(CNCCCC(C)(C)C23=[CH]4[C-]5(P(C6=CC=CC=C6)C6=CC=CC=C6)->[Fe+2]426789%10(<-[C-]2(P(C4=CC=CC=C4)C4=CC=CC=C4)[CH]6=[CH]7[CH]8=[CH]29)[CH]3=C5%10P(C2=CC=CC=C2)C2=CC=CC=C2)C=C1
 
 ## Reaction 31-313-CAS-16157446
 
@@ -5288,7 +5288,7 @@ Total reactions: 1350
 - Yield %: 96
 - Reagents: 56553-60-7 (56553-60-7) [UNK], 1310-73-2 (1310-73-2) [ADDITIVE]
 - Solvents: 107-06-2 (107-06-2), 7732-18-5 (7732-18-5)
-- SMILES: c1ccc(CNCc2ccccc2)cc1.CC(C)(C)[c-]12->[Fe+2]3456789(<-[cH]([cH]->31)[c]->4(C=O)[cH]->52)<-[cH]1[cH]->6[c-]->7(C(C)(C)C)[cH]->8[c]->91C=O>>CC(C)(C)[c]12->[Fe+2]3456789(<-[cH]1[cH]->3[c-]->4(CN(Cc1ccccc1)Cc1ccccc1)[cH]->52)<-[cH]1[cH]->6[c-]->7(CN(Cc2ccccc2)Cc2ccccc2)[cH]->8[c]->91C(C)(C)C
+- SMILES: c1ccc(CNCc2ccccc2)cc1.CC(C)(C)[C-]12->[Fe+2]3456789(<-[C-]%10(C(C)(C)C)[CH]3=[CH]4C5(C=O)=[CH]%106)[CH](=[CH]17)C8(C=O)=[CH]29>>CC(C)(C)C12=[CH]3[C-]4(CN(CC5=CC=CC=C5)CC5=CC=CC=C5)->[Fe+2]3156789(<-[C-]1(CN(CC3=CC=CC=C3)CC3=CC=CC=C3)[CH]5=[CH]6C7(C(C)(C)C)=[CH]18)[CH]2=[CH]49
 
 ## Reaction 31-313-CAS-2503547
 
@@ -7080,7 +7080,7 @@ Total reactions: 1350
 - Yield %: 65
 - Reagents: 7757-82-6 (7757-82-6) [UNK], 56553-60-7 (56553-60-7) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: N[C@@H](Cc1ccccc1)C(=O)OCc1ccccc1.CN1C=CN(CC2=CC=C(C=O)C=C2)[C-2]1=[Pt+4]([I-])([I-])<-[NH2]C1CCCCC1>>CN1C=CN(CC2=CC=C(CNC(CC3=CC=CC=C3)C(=O)OCC3=CC=CC=C3)C=C2)[C-2]1=[Pt+4]([I-])([I-])<-[NH2]C1CCCCC1
+- SMILES: N[C@@H](Cc1ccccc1)C(=O)OCc1ccccc1.CN1C=CN(CC2=CC=C(C=O)C=C2)[C-2]1=[Pt+4]([I-])([I-])<-NC1CCCCC1>>CN1C=CN(CC2=CC=C(CNC(CC3=CC=CC=C3)C(=O)OCC3=CC=CC=C3)C=C2)[C-2]1=[Pt+4]([I-])([I-])<-NC1CCCCC1
 
 ## Reaction 31-313-CAS-6259281
 
@@ -7296,7 +7296,7 @@ Total reactions: 1350
 - Yield %: 54
 - Reagents: 10035-10-6 (10035-10-6) [UNK], 56553-60-7 (56553-60-7) [ADDITIVE], 7779-88-6 (7779-88-6) [ADDITIVE]
 - Solvents: 64-19-7 (64-19-7), 7732-18-5 (7732-18-5), 75-09-2 (75-09-2), 67-56-1 (67-56-1)
-- SMILES: C[C@@H]1NC(=O)c2coc(n2)[C@H](CCCNC(=O)OCc2ccccc2)NC(=O)c2coc(n2)[C@H](C)NC(=O)c2coc(n2)[C@H](CCCNC(=O)OCc2ccccc2)NC(=O)c2coc1n2.O=Cc1ccccn1>>C[C@@H]1NC(=O)c2coc(n2)[C@H](CCC[N]23Cc4cccc[n]4->[Zn+2]<-2<-[n]2ccccc2C3)NC(=O)c2coc(n2)[C@H](C)NC(=O)c2coc(n2)[C@H](CCC[N]23Cc4cccc[n]4->[Zn+2]<-2<-[n]2ccccc2C3)NC(=O)c2coc1n2.O=[N+]([O-])[O-]
+- SMILES: C[C@@H]1NC(=O)c2coc(n2)[C@H](CCCNC(=O)OCc2ccccc2)NC(=O)c2coc(n2)[C@H](C)NC(=O)c2coc(n2)[C@H](CCCNC(=O)OCc2ccccc2)NC(=O)c2coc1n2.O=Cc1ccccn1>>C[C@@H]1NC(=O)c2coc(n2)[C@H](CCCN23Cc4ccccn4->[Zn+2]<-2<-n2ccccc2C3)NC(=O)c2coc(n2)[C@H](C)NC(=O)c2coc(n2)[C@H](CCCN23Cc4ccccn4->[Zn+2]<-2<-n2ccccc2C3)NC(=O)c2coc1n2.O=[N+]([O-])[O-]
 
 ## Reaction 31-313-CAS-6929731
 
@@ -7552,7 +7552,7 @@ Total reactions: 1350
 - Yield %: 74
 - Reagents: 56553-60-7 (56553-60-7) [UNK], 1310-73-2 (1310-73-2) [ADDITIVE]
 - Solvents: 107-06-2 (107-06-2), 7732-18-5 (7732-18-5)
-- SMILES: C1CCNC1.CC(C)(C)[c-]12->[Fe+2]3456789(<-[cH]([cH]->31)[c]->4(C=O)[cH]->52)<-[cH]1[cH]->6[c-]->7(C(C)(C)C)[cH]->8[c]->91C=O>>CC(C)(C)[c-]12->[Fe+2]3456789(<-[cH]([cH]->31)[c]->4(CN1CCCC1)[cH]->52)<-[cH]1[cH]->6[c-]->7(C(C)(C)C)[cH]->8[c]->91CN1CCCC1
+- SMILES: C1CCNC1.CC(C)(C)[C-]12->[Fe+2]3456789(<-[C-]%10(C(C)(C)C)[CH]3=[CH]4C5(C=O)=[CH]%106)[CH](=[CH]17)C8(C=O)=[CH]29>>CC(C)(C)[C-]12->[Fe+2]3456789(<-[C-]%10(C(C)(C)C)[CH]3=[CH]4C5(CN3CCCC3)=[CH]%106)[CH](=[CH]17)C8(CN1CCCC1)=[CH]29
 
 ## Reaction 31-313-CAS-7478727
 
@@ -9520,7 +9520,7 @@ Total reactions: 1350
 - Yield %: 62
 - Reagents: 56553-60-7 (56553-60-7) [UNK]
 - Solvents: 107-06-2 (107-06-2)
-- SMILES: C=CCN.O=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>C=CCNC[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: C=CCN.O=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>C=CCNC[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-614-CAS-31824125
 
@@ -9544,7 +9544,7 @@ Total reactions: 1350
 - Yield %: 96
 - Reagents: 56553-60-7 (56553-60-7) [UNK]
 - Solvents: 107-06-2 (107-06-2)
-- SMILES: C=CCNC.O=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>C=CCN(C)C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: C=CCNC.O=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>C=CCN(C)C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-614-CAS-31935437
 
@@ -9552,7 +9552,7 @@ Total reactions: 1350
 - Yield %: 63
 - Reagents: 56553-60-7 (56553-60-7) [UNK]
 - Solvents: 107-06-2 (107-06-2)
-- SMILES: C=CCN.O=C[c]12->[Fe+2]3456789%10<-[cH]%11[cH]->3[cH]->4[c-]->5(CC=CC[c-]->6([cH]->7[cH]->81)[cH]->92)[cH]->%10%11>>C=CCNC[c]12->[Fe+2]3456789%10<-[cH]%11[cH]->3[cH]->4[c-]->5(CC=CC[c-]->6([cH]->7[cH]->81)[cH]->92)[cH]->%10%11
+- SMILES: C=CCN.O=CC12=[CH]3[C-]45->[Fe+2]316789%10(<-[C-]1(CC=CC4)[CH]6=[CH]7[CH]8=[CH]19)[CH]2=[CH]5%10>>C=CCNCC12=[CH]3[C-]45->[Fe+2]316789%10(<-[C-]1(CC=CC4)[CH]6=[CH]7[CH]8=[CH]19)[CH]2=[CH]5%10
 
 ## Reaction 31-614-CAS-31935438
 
@@ -9560,7 +9560,7 @@ Total reactions: 1350
 - Yield %: 72
 - Reagents: 56553-60-7 (56553-60-7) [UNK]
 - Solvents: 107-06-2 (107-06-2)
-- SMILES: C=CCNc1ccccc1.O=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>C=CCN(C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92)c1ccccc1
+- SMILES: C=CCNc1ccccc1.O=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>C=CCN(C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29)C1=CC=CC=C1
 
 ## Reaction 31-614-CAS-31935451
 
@@ -9568,7 +9568,7 @@ Total reactions: 1350
 - Yield %: 50
 - Reagents: 56553-60-7 (56553-60-7) [UNK]
 - Solvents: 107-06-2 (107-06-2)
-- SMILES: C=CCN.O=C[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(C=O)[cH]->91>>C=CCN1C[c-]23->[Fe+2]456789%10(<-[cH]([cH]->4[cH]->52)[cH]->63)<-[cH]2[cH]->7[cH]->8[c-]->9(C1)[cH]->%102
+- SMILES: C=CCN.O=C[C-]12->[Fe+2]3456789(<-[C-]%10(C=O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>C=CCN1C[C-]23->[Fe+2]456789%10(<-[C-]%11(C1)[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10
 
 ## Reaction 31-614-CAS-31980165
 

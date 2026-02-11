@@ -272,7 +272,7 @@ Total reactions: 70
 - Yield %: 73
 - Reagents: 688-73-3 (688-73-3) [UNK]
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=C1[C@@H](O)CC[C@@]2(C)C[C@H](O[Si](C)(C)C(C)(C)C)C3=C(C)C[C@H](OC(=S)SC)[C@@H]([C@@H](OC(=S)SC)[C@H]12)C3(C)C>>C=C1[C@H]2C[C@@H]3CCC(C)=C([C@@H](O[Si](C)(C)C(C)(C)C)C[C@]2(C)CC[C@@H]1O)C3(C)C
+- SMILES: C=C1[C@@H](O)CC[C@@]2(C)C[C@H](O[Si](C)(C)C(C)(C)C)C3=C(C)C[C@H](OC(=S)SC)[C@@H](C(OC(=S)SC)[C@H]12)C3(C)C>>C=C1[C@H]2C[C@@H]3CCC(C)=C([C@@H](O[Si](C)(C)C(C)(C)C)C[C@]2(C)CC[C@@H]1O)C3(C)C
 
 ## Reaction 31-535-CAS-19449236
 

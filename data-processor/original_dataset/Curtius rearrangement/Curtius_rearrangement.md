@@ -2008,7 +2008,7 @@ Total reactions: 973
 - Yield %: 55
 - Reagents: 7087-68-5 (7087-68-5) [UNK], 26386-88-9 (26386-88-9) [ADDITIVE]
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: O=C(O)C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.CC(C)(C)c1cc2c(O)c(c1)Cc1cc(C(C)(C)C)cc(c1OCCCN)Cc1cc(C(C)(C)C)cc(c1O)Cc1cc(C(C)(C)C)cc(c1OCCCN)C2>>CC(C)(C)c1cc2c(O)c(c1)Cc1cc(C(C)(C)C)cc(c1OCCCNC(=O)NC[c-]13->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->91)[cH]->%103)Cc1cc(C(C)(C)C)cc(c1O)Cc1cc(C(C)(C)C)cc(c1OCCCNC(=O)NC[c-]13->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->91)[cH]->%103)C2
+- SMILES: O=C(O)C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.CC(C)(C)c1cc2c(O)c(c1)Cc1cc(C(C)(C)C)cc(c1OCCCN)Cc1cc(C(C)(C)C)cc(c1O)Cc1cc(C(C)(C)C)cc(c1OCCCN)C2>>CC(C)(C)C1=CC2=C(O)C(=C1)CC1=CC(C(C)(C)C)=CC(=C1OCCCNC(=O)NC[C-]13->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]18)[CH]9=[CH]3%10)CC1=CC(C(C)(C)C)=CC(=C1O)CC1=C(OCCCNC(=O)NC[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C(=CC(C(C)(C)C)=C1)C2
 
 ## Reaction 31-316-CAS-18145724
 
@@ -2016,7 +2016,7 @@ Total reactions: 973
 - Yield %: 51
 - Reagents: 7087-68-5 (7087-68-5) [UNK], 26386-88-9 (26386-88-9) [ADDITIVE]
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: O=C(O)CCC[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.CC(C)(C)c1cc2c(O)c(c1)Cc1cc(C(C)(C)C)cc(c1OCCCN)Cc1cc(C(C)(C)C)cc(c1O)Cc1cc(C(C)(C)C)cc(c1OCCCN)C2>>CC(C)(C)c1cc2c(O)c(c1)Cc1cc(C(C)(C)C)cc(c1OCCCNC(=O)NCCC[c-]13->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->91)[cH]->%103)Cc1cc(C(C)(C)C)cc(c1O)Cc1cc(C(C)(C)C)cc(c1OCCCNC(=O)NCCC[c-]13->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->91)[cH]->%103)C2
+- SMILES: O=C(O)CCC[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.CC(C)(C)c1cc2c(O)c(c1)Cc1cc(C(C)(C)C)cc(c1OCCCN)Cc1cc(C(C)(C)C)cc(c1O)Cc1cc(C(C)(C)C)cc(c1OCCCN)C2>>CC(C)(C)C1=CC2=C(O)C(=C1)CC1=CC(C(C)(C)C)=CC(=C1OCCCNC(=O)NCCC[C-]13->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]18)[CH]9=[CH]3%10)CC1=CC(C(C)(C)C)=CC(=C1O)CC1=C(OCCCNC(=O)NCCC[C-]34->[Fe+2]56789%10%11(<-[CH-]%12[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C(=CC(C(C)(C)C)=C1)C2
 
 ## Reaction 31-316-CAS-18175617
 
@@ -2671,7 +2671,7 @@ Total reactions: 973
 - Type: Curtius rearrangement
 - Yield %: 20
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: CC(C)(C)O.[N-]=[N+]=NC(=O)[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(C(=O)N=[N+]=[N-])[cH]->91.[N-]=[N+]=NC(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(C(=O)O)[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>CC(C)(C)OC(=O)N[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(C(=O)O)[cH]->91.CC(C)(C)OC(=O)N[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(NC(=O)OC(C)(C)C)[cH]->91
+- SMILES: CC(C)(C)O.[N-]=[N+]=NC(=O)[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)N=[N+]=[N-])[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.[N-]=[N+]=NC(=O)[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC(C)(C)OC(=O)N[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.CC(C)(C)OC(=O)N[C-]12->[Fe+2]3456789(<-[C-]%10(NC(=O)OC(C)(C)C)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-367-CAS-15054826
 
@@ -3278,7 +3278,7 @@ Total reactions: 973
 - Type: Curtius rearrangement
 - Yield %: 30
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: CO.[CH3-]->[W+2]1234([C]#O)([C]#O)([C]#O)<-[CH]5=[CH]->1[C-]->2(C(=O)N=[N+]=[N-])[CH]->3=[CH]->45>>COC(=O)N[C-]12->[W+2]345(<-[CH3-])([C]#O)([C]#O)([C]#O)<-[CH](=[CH]->31)[CH]->4=[CH]->52
+- SMILES: CO.[CH3-]->[W+2]1234(C#O)(C#O)(C#O)<-[C-]5(C(=O)N=[N+]=[N-])[CH]1=[CH]2[CH]3=[CH]54>>COC(=O)N[C-]12->[W+2]345(<-[CH3-])(C#O)(C#O)(C#O)[CH](=[CH]13)[CH]4=[CH]25
 
 ## Reaction 31-449-CAS-135717
 
@@ -4343,28 +4343,28 @@ Total reactions: 973
 - Type: Curtius rearrangement
 - Yield %: 70
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: CC(C)(C)O.[N-]=[N+]=NC(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(C(=O)O)[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>CC(C)(C)OC(=O)N[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(C(=O)O)[cH]->91
+- SMILES: CC(C)(C)O.[N-]=[N+]=NC(=O)[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC(C)(C)OC(=O)N[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-449-CAS-18751846
 
 - Type: Curtius rearrangement
 - Yield %: 51
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: OCc1ccccc1.[N-]=[N+]=NC(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(C(=O)O)[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>O=C(N[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(C(=O)O)[cH]->91)OCc1ccccc1
+- SMILES: OCc1ccccc1.[N-]=[N+]=NC(=O)[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>O=C(N[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29)OCC1=CC=CC=C1
 
 ## Reaction 31-449-CAS-18751847
 
 - Type: Curtius rearrangement
 - Yield %: 49
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: OCC1c2ccccc2-c2ccccc21.[N-]=[N+]=NC(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(C(=O)O)[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>O=C(N[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(C(=O)O)[cH]->91)OCC1c2ccccc2-c2ccccc21
+- SMILES: OCC1c2ccccc2-c2ccccc21.[N-]=[N+]=NC(=O)[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>O=C(N[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29)OCC1C2=CC=CC=C2C2=CC=CC=C21
 
 ## Reaction 31-449-CAS-18751848
 
 - Type: Curtius rearrangement
 - Yield %: 53
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=CCO.[N-]=[N+]=NC(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(C(=O)O)[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>C=CCOC(=O)N[c-]12->[Fe+2]3456789(<-[cH]([cH]->3[cH]->41)[cH]->52)<-[cH]1[cH]->6[cH]->7[c-]->8(C(=O)O)[cH]->91
+- SMILES: C=CCO.[N-]=[N+]=NC(=O)[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>C=CCOC(=O)N[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-449-CAS-1912642
 
@@ -5179,7 +5179,7 @@ Total reactions: 973
 
 - Type: Curtius rearrangement
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: COC(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(C(=O)N=[N+]=[N-])[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>COC(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[c-]->5(N=C=O)[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: COC(=O)[C-]12->[Fe+2]3456789(<-[C-]%10(C(=O)N=[N+]=[N-])[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>COC(=O)[C-]12->[Fe+2]3456789(<-[C-]%10(N=C=O)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-449-CAS-2474897
 
@@ -5963,7 +5963,7 @@ Total reactions: 973
 
 - Type: Curtius rearrangement
 - Solvents: 71-43-2 (71-43-2)
-- SMILES: [N-]=[N+]=NC(=O)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>O=C=N[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: [N-]=[N+]=NC(=O)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>O=C=N[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-449-CAS-7444902
 

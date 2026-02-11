@@ -75,7 +75,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 87
 - Solvents: 108-88-3 (108-88-3), 109-99-9 (109-99-9)
-- SMILES: B1C2CCCC1CCC2.C=C[C-]12->[Sm+3]3456789%10(<-[C](C)(=[C]->31C)[C]->4(C)=[C]->52C)(<-[C]1(C)=[C]->6(C)[C-]->7(C=C)[C]->8(C)=[C]->91C)[Cl-][Li+](<-[O](CC)CC)(<-[O](CC)CC)[Cl-]%10>>C[C]12->[Lu+3]3456789%10(<-[C]1(C)=[C]->3(C)[C-]->4(CCB1C3CCCC1CCC3)[C]->5=2C)(<-[C]1(C)=[C]->6(C)[C-]->7(CCB2C3CCCC2CCC3)[C]->8(C)=[C]->91C)[Cl-][Li+](<-[O]1CCCC1)(<-[O]1CCCC1)[Cl-]%10
+- SMILES: B1C2CCCC1CCC2.C=C[C-]12->[Sm+3]3456789%10(<-[C-]%11(C=C)C3(C)=C4(C)C5(C)=C%116C)([Cl-][Li+](<-O(CC)CC)(<-O(CC)CC)[Cl-]7)C(C)(=C18C)C9(C)=C2%10C>>CC12=C3(C)[C-]4(CCB5C6CCCC5CCC6)->[Lu+3]1356789%10(<-[C-]1(CCB3C%11CCCC3CCC%11)C5(C)=C6(C)C7(C)=C18C)([Cl-][Li+](<-O1CCCC1)(<-O1CCCC1)[Cl-]9)C2(C)=C4%10C
 
 ## Reaction 31-227-CAS-13709303
 
@@ -178,7 +178,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 78
 - Solvents: 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: C1=CCCCC1.B1C2CCCC1CCC2.[Li][CH]=C.O=C(Cl)C1CCCCC1.CN>>CN1=C(C2CCCCC2)C[CH-](C2CCCCC2)[B+3]12[CH-]1CCC[CH-]2CCC1
+- SMILES: C1=CCCCC1.B1C2CCCC1CCC2.[Li]C=C.O=C(Cl)C1CCCCC1.CN>>CN1=C(C2CCCCC2)C[CH-](C2CCCCC2)[B+3]12[CH-]1CCC[CH-]2CCC1
 
 ## Reaction 31-242-CAS-22930889
 
@@ -634,7 +634,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 77
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=CCOCC=C.[Cl-]1[Y+3]23456789%10%11(<-[BH]%12[CH]->2=[CH]->3[CH]->4=[CH]->5[CH-]->6%12)(<-[BH]2[CH]->7=[CH]->8[CH]->9=[CH]->%10[CH-]->%112)[Cl-][Y+3]123456789%10%11(<-[BH]1[CH]->2=[CH]->3[CH]->4=[CH]->5[CH-]->61)<-[BH]1[CH]->7=[CH]->8[CH]->9=[CH]->%10[CH-]->%111>>C=CC[O]1CCC[B]23->[Y+3]<-1456789%10%11%12%13([Cl-])(<-[CH](=[CH]->4[CH-]->52)[CH]->6=[CH]->73)<-[CH]1=[CH]->8[CH-]->9[B]->%10(CCC[O]->%11CC=C)[CH]->%12=[CH]->%131
+- SMILES: C=CCOCC=C.[Cl-]1[Y+3]23456789%10%11(<-B%12[CH]2=[CH]3[CH]4=[CH]5[CH-]->6%12)(<-B2[CH]7=[CH]8[CH]9=[CH]%10[CH-]->%112)[Cl-][Y+3]123456789%10%11(<-B1[CH]2=[CH]3[CH]4=[CH]5[CH-]->61)<-B1[CH]7=[CH]8[CH]9=[CH]%10[CH-]->%111>>C=CCO1->[Y+3]23456789%10%11%12([Cl-])(<-[CH-]%13[CH]2=[CH]3[CH]4=[CH]5B->6%13CCC1)<-[CH-]1[CH]7=[CH]8[CH]9=[CH]%10B->%111CCCO->%12CC=C
 
 ## Reaction 31-246-CAS-10574262
 
@@ -767,7 +767,7 @@ Total reactions: 2107
 - Yield %: 74
 - Reagents: 252265-33-1 (252265-33-1) [UNK]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: CC(C)(C)/C=[CH]\[Ge]([CH3])([CH3])[CH3].OCCCO>>CC(C)(C)C[CH](B1OCCCO1)[Ge]([CH3])([CH3])[CH3]
+- SMILES: CC(C)(C)/C=C\[Ge](C)(C)C.OCCCO>>CC(C)(C)CC(B1OCCCO1)[Ge](C)(C)C
 
 ## Reaction 31-246-CAS-10932005
 
@@ -879,7 +879,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 77
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: C=CC[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[CH](=[CH]->31)[CH]->4=[CH]->52)<-[CH]1=[CH]->6[C-]->7(CC=C)[CH]->8=[CH]->91.Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F>>FC1=C(F)C(F)=C(B(CCC[C-]23->[Zr+4]456789%10([Cl-])([Cl-])(<-[CH](=[CH]->42)[CH]->5=[CH]->63)<-[CH]2=[CH]->7[C-]->8(CCCB(C3=C(F)C(F)=C(F)C(F)=C3F)C3=C(F)C(F)=C(F)C(F)=C3F)[CH]->9=[CH]->%102)C2=C(F)C(F)=C(F)C(F)=C2F)C(F)=C1F
+- SMILES: C=CC[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[C-]%10(CC=C)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F>>FC1=C(F)C(F)=C(B(CCC[C-]23->[Zr+4]456789%10([Cl-])([Cl-])(<-[C-]%11(CCCB(C%12=C(F)C(F)=C(F)C(F)=C%12F)C%12=C(F)C(F)=C(F)C(F)=C%12F)[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C2=C(F)C(F)=C(F)C(F)=C2F)C(F)=C1F
 
 ## Reaction 31-246-CAS-11257075
 
@@ -969,7 +969,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 96
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: B1C2CCCC1CCC2.[Cl-][Zr+4]123456789([Cl-])<-[CH]%10=[CH]->1[C-]->2(CC=CC[C-]->31[CH]->4=[CH]->5[CH]->6=[CH]->71)[CH]->8=[CH]->9%10>>[Cl-][Zr+4]123456789([Cl-])<-[CH]%10=[CH]->1[C-]->2(CCC(C[C-]->31[CH]->4=[CH]->5[CH]->6=[CH]->71)B1C2CCCC1CCC2)[CH]->8=[CH]->9%10
+- SMILES: B1C2CCCC1CCC2.[Cl-][Zr+4]123456789([Cl-])<-[C-]%10(CC=CC[C-]->1%11[CH]2=[CH]3[CH]4=[CH]%115)[CH]6=[CH]7[CH]8=[CH]%109>>[Cl-][Zr+4]123456789([Cl-])<-[C-]%10(CCC(B%11C%12CCCC%11CCC%12)C[C-]->1%11[CH]2=[CH]3[CH]4=[CH]%115)[CH]6=[CH]7[CH]8=[CH]%109
 
 ## Reaction 31-246-CAS-11668638
 
@@ -1112,7 +1112,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 86
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: B1C2CCCC1CCC2.C=CC[c-]12->[Hf+4]3456789%10%11%12%13(<-[CH2-][CH]->3=[CH]->4CC[CH-]->5C[c-]->63[cH]->7[cH]->8[cH]->9[cH]->%103)<-[cH]([cH]->%11[cH]->%121)[cH]->%132>>C1CC2CCCC(C1)B2CCC[c-]12->[Hf+4]3456789%10%11%12%13(<-[CH2-][CH]->3=[CH]->4CC[CH-]->5C[c-]->63[cH]->7[cH]->8[cH]->9[cH]->%103)<-[cH]([cH]->%11[cH]->%121)[cH]->%132
+- SMILES: B1C2CCCC1CCC2.C=CC[C-]12->[Hf+4]3456789%10%11%12%13(<-[CH2-][CH]3=[CH]4CC[CH-]->5C[C-]->63[CH]7=[CH]8[CH]9=[CH]3%10)[CH](=[CH]1%11)[CH]%12=[CH]2%13>>C1CC2CCCC(C1)B2CCC[C-]12->[Hf+4]3456789%10%11%12%13(<-[CH2-][CH]3=[CH]4CC[CH-]->5C[C-]->63[CH]7=[CH]8[CH]9=[CH]3%10)[CH](=[CH]1%11)[CH]%12=[CH]2%13
 
 ## Reaction 31-246-CAS-12069797
 
@@ -1357,7 +1357,7 @@ Total reactions: 2107
 - Yield %: 76
 - Reagents: 252265-33-1 (252265-33-1) [UNK]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: CC(C)CC/C=[CH]\[Ge]([CH3])([CH3])[CH3].OCCCO>>CC(C)CCC[CH](B1OCCCO1)[Ge]([CH3])([CH3])[CH3]
+- SMILES: CC(C)CC/C=C\[Ge](C)(C)C.OCCCO>>CC(C)CCCC(B1OCCCO1)[Ge](C)(C)C
 
 ## Reaction 31-246-CAS-13068871
 
@@ -1378,7 +1378,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 100
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: B1C2CCCC1CCC2.C=CCCC(C)(C)[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[CH](=[CH]->31)[CH]->4=[CH]->52)<-[CH]1=[CH]->6[C-]->7(C(C)(C)CCC=C)[CH]->8=[CH]->91>>CC(C)(CCCCB1C2CCCC1CCC2)[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[CH](=[CH]->31)[CH]->4=[CH]->52)<-[CH]1=[CH]->6[C-]->7(C(C)(C)CCCCB2C3CCCC2CCC3)[CH]->8=[CH]->91
+- SMILES: B1C2CCCC1CCC2.C=CCCC(C)(C)[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[C-]%10(C(C)(C)CCC=C)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC(C)(CCCCB1C2CCCC1CCC2)[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[C-]%10(C(C)(C)CCCCB%11C%12CCCC%11CCC%12)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-246-CAS-13120092
 
@@ -1560,7 +1560,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 90
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.[Cl-][Zr+4]123456789([Cl-])<-[CH]%10=[CH]->1[C-]->2(CC=CC[C-]->31[CH]->4=[CH]->5[CH]->6=[CH]->71)[CH]->8=[CH]->9%10>>FC1=C(F)C(F)=C(B(C2=C(F)C(F)=C(F)C(F)=C2F)C2CC[C-]34->[Zr+4]56789%10%11([Cl-])([Cl-])(<-[CH](=[CH]->53)[CH]->6=[CH]->74)<-[CH]3=[CH]->8[C-]->9(C2)[CH]->%10=[CH]->%113)C(F)=C1F
+- SMILES: Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.[Cl-][Zr+4]123456789([Cl-])<-[C-]%10(CC=CC[C-]->1%11[CH]2=[CH]3[CH]4=[CH]%115)[CH]6=[CH]7[CH]8=[CH]%109>>FC1=C(F)C(F)=C(B(C2=C(F)C(F)=C(F)C(F)=C2F)C2CC[C-]34->[Zr+4]56789%10%11([Cl-])([Cl-])(<-[C-]%12(C2)[CH]5=[CH]6[CH]7=[CH]%128)[CH](=[CH]39)[CH]%10=[CH]4%11)C(F)=C1F
 
 ## Reaction 31-246-CAS-13789340
 
@@ -2053,7 +2053,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 84
 - Solvents: 108-88-3 (108-88-3), 110-54-3 (110-54-3)
-- SMILES: B1C2CCCC1CCC2.C=CCC1[C-]23->[Zr+4]456789%10([Cl-])([Cl-])(<-[CH](=[CH]->42)[CH]->5=[CH]->63)<-[C]2(C)=[C]->7(C)[C-]->81[C]->9(C)=[C]->%102C>>C[C]12->[Zr+4]3456789%10([Cl-])([Cl-])<-[CH]%11=[CH]->3[C-]->4(C(CCCB3C4CCCC3CCC4)[C-]->5([C]->6=1C)[C]->7(C)=[C]->82C)[CH]->9=[CH]->%10%11
+- SMILES: B1C2CCCC1CCC2.C=CCC1[C-]23->[Zr+4]456789%10([Cl-])([Cl-])(<-[C-]1%11C4(C)=C5(C)C6(C)=C%117C)[CH](=[CH]28)[CH]9=[CH]3%10>>CC12=C3(C)[C-]45->[Zr+4]136789%10([Cl-])([Cl-])(<-[C-]1(C4CCCB3C4CCCC3CCC4)[CH]6=[CH]7[CH]8=[CH]19)C2(C)=C5%10C
 
 ## Reaction 31-246-CAS-15211886
 
@@ -2067,7 +2067,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 100
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: B1C2CCCC1CCC2.C=CCCC(C)(C)[C]12->[Zr+4]3456789%10([Cl-])([Cl-])<-[CH]1=[CH]->3[C-]->4([Si](C)(C)[C-]->51[C]->6(C)=[C]->7(C)[C]->8(C)=[C]->91C)[CH]->%10=2>>CC(C)(CCCCB1C2CCCC1CCC2)[C]12->[Zr+4]3456789%10([Cl-])([Cl-])<-[CH]1=[CH]->3[C-]->4([Si](C)(C)[C-]->51[C]->6(C)=[C]->7(C)[C]->8(C)=[C]->91C)[CH]->%10=2
+- SMILES: B1C2CCCC1CCC2.C=CCCC(C)(C)C12=[CH]3[C-]45->[Zr+4]316789%10([Cl-])([Cl-])(<-[C-]1(C6(C)=C7(C)C8(C)=C19C)[Si]4(C)C)[CH]2=[CH]5%10>>CC(C)(CCCCB1C2CCCC1CCC2)C12=[CH]3[C-]45->[Zr+4]316789%10([Cl-])([Cl-])(<-[C-]1(C6(C)=C7(C)C8(C)=C19C)[Si]4(C)C)[CH]2=[CH]5%10
 
 ## Reaction 31-246-CAS-1525955
 
@@ -2318,7 +2318,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 95
 - Solvents: 1665-00-5 (1665-00-5)
-- SMILES: B1C2CCCC1CCC2.C[Si]1(C)C=C(B2C3CCCC2CCC3)C2=C1[Si](C)([c-]13->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->91)[cH]->%103)CC2>>C[Si]1(C)C2=C(CC[Si]2(C)[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)C(B2C3CCCC2CCC3)C1B1C2CCCC1CCC2
+- SMILES: B1C2CCCC1CCC2.C[Si]1(C)C=C(B2C3CCCC2CCC3)C2=C1[Si](C)([C-]13->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]18)[CH]9=[CH]3%10)CC2>>C[Si]1(C)C2=C(CC[Si]2(C)[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)C(B2C3CCCC2CCC3)C1B1C2CCCC1CCC2
 
 ## Reaction 31-246-CAS-16203776
 
@@ -2357,7 +2357,7 @@ Total reactions: 2107
 - Yield %: 90
 - Reagents: 75-77-4 (75-77-4) [UNK]
 - Solvents: 109-66-0 (109-66-0)
-- SMILES: C=CP(c1c(C)cc(C)cc1C)c1c(C)cc(C)cc1C.CC[O](->[Li+]<-[O](CC)CC)CC.[H-][B+3]([H-])([C-]1=CC(C(F)(F)F)=CC(C(F)(F)F)=C1)[C-]1=CC(C(F)(F)F)=CC(C(F)(F)F)=C1>>Cc1cc(C)c(P(CCB(c2cc(C(F)(F)F)cc(C(F)(F)F)c2)c2cc(C(F)(F)F)cc(C(F)(F)F)c2)c2c(C)cc(C)cc2C)c(C)c1
+- SMILES: C=CP(c1c(C)cc(C)cc1C)c1c(C)cc(C)cc1C.CCO(->[Li+]<-O(CC)CC)CC.[H-][B+3]([H-])([C-]1=CC(C(F)(F)F)=CC(C(F)(F)F)=C1)[C-]1=CC(C(F)(F)F)=CC(C(F)(F)F)=C1>>Cc1cc(C)c(P(CCB(c2cc(C(F)(F)F)cc(C(F)(F)F)c2)c2cc(C(F)(F)F)cc(C(F)(F)F)c2)c2c(C)cc(C)cc2C)c(C)c1
 
 ## Reaction 31-246-CAS-1632110
 
@@ -2422,7 +2422,7 @@ Total reactions: 2107
 - Yield %: 72
 - Reagents: 1333-74-0 (1333-74-0) [UNK]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.Cc1cc(C)c(P(c2c(C)cc(C)cc2C)[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[c]->92/C=C/c2ccccc2)[cH]->%103)c(C)c1>>[H+].[H][C]12->[Fe+2]3456789(<-[CH]%10=[CH]->3[CH-]->4[CH]->5=[CH]->6%10)<-[CH]=1[C-]->7(P(C1=C(C)C=C(C)C=C1C)C1=C(C)C=C(C)C=C1C)[C]->8(C[C@-]([H])(C1=CC=CC=C1)[B+3]([H-])([C-]1=C(F)C(F)=C(F)C(F)=C1F)[C-]1=C(F)C(F)=C(F)C(F)=C1F)=[C]->92[H].[H+].[H][C]12->[Fe+2]3456789(<-[CH]%10=[CH]->3[CH-]->4[CH]->5=[CH]->6%10)<-[CH]=1[C-]->7(P(C1=C(C)C=C(C)C=C1C)C1=C(C)C=C(C)C=C1C)[C]->8(C[C@@-]([H])(C1=CC=CC=C1)[B+3]([H-])([C-]1=C(F)C(F)=C(F)C(F)=C1F)[C-]1=C(F)C(F)=C(F)C(F)=C1F)=[C]->92[H]
+- SMILES: Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.[H]C12=C3([H])[C-]4(P(C5=C(C)C=C(C)C=C5C)C5=C(C)C=C(C)C=C5C)->[Fe+2]1356789(<-[CH-]1[CH]5=[CH]6[CH]7=[CH]18)[CH]2=C49/C=C/C1=CC=CC=C1>>[H+].[H]C12=[CH]3[C-]4(P(C5=C(C)C=C(C)C=C5C)C5=C(C)C=C(C)C=C5C)->[Fe+2]3156789(<-[CH-]1[CH]5=[CH]6[CH]7=[CH]18)C2([H])=C49C[C@-]([H])(C1=CC=CC=C1)[B+3]([H-])([C-]1=C(F)C(F)=C(F)C(F)=C1F)[C-]1=C(F)C(F)=C(F)C(F)=C1F.[H+].[H]C12=[CH]3[C-]4(P(C5=C(C)C=C(C)C=C5C)C5=C(C)C=C(C)C=C5C)->[Fe+2]3156789(<-[CH-]1[CH]5=[CH]6[CH]7=[CH]18)C2([H])=C49C[C@@-]([H])(C1=CC=CC=C1)[B+3]([H-])([C-]1=C(F)C(F)=C(F)C(F)=C1F)[C-]1=C(F)C(F)=C(F)C(F)=C1F
 
 ## Reaction 31-246-CAS-16624463
 
@@ -2783,21 +2783,21 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 85
 - Solvents: 109-66-0 (109-66-0)
-- SMILES: C=CCN1C(C)(C)CCCC1(C)C.Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.CC1(C)CCCC(C)(C)N1.[Li].O=C(c1ccccc1)c1ccccc1>>CC1(C)CCCC(C)(C)N1CC[CH-]1[B+3]([C-]2=C(F)C(F)=C(F)C(F)=C2F)([C-]2=C(F)C(F)=C(F)C(F)=C2F)[O-](->[Li+]<-[NH]2C(C)(C)CCCC2(C)C)C1(C1=CC=CC=C1)C1=CC=CC=C1
+- SMILES: C=CCN1C(C)(C)CCCC1(C)C.Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.CC1(C)CCCC(C)(C)N1.[Li].O=C(c1ccccc1)c1ccccc1>>CC1(C)CCCC(C)(C)N1CC[CH-]1[B+3]([C-]2=C(F)C(F)=C(F)C(F)=C2F)([C-]2=C(F)C(F)=C(F)C(F)=C2F)[O-](->[Li+]<-N2C(C)(C)CCCC2(C)C)C1(C1=CC=CC=C1)C1=CC=CC=C1
 
 ## Reaction 31-246-CAS-17757058
 
 - Type: Brown Hydroboration
 - Yield %: 79
 - Solvents: 109-66-0 (109-66-0)
-- SMILES: C=CCN1C(C)(C)CCCC1(C)C.Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.CC1(C)CCCC(C)(C)N1.[Li].O=C1c2ccccc2-c2ccccc21>>CC1(C)CCCC(C)(C)N1CC[CH-]1[B+3]([C-]2=C(F)C(F)=C(F)C(F)=C2F)([C-]2=C(F)C(F)=C(F)C(F)=C2F)[O-](->[Li+]<-[NH]2C(C)(C)CCCC2(C)C)C12C1=CC=CC=C1C1=CC=CC=C12
+- SMILES: C=CCN1C(C)(C)CCCC1(C)C.Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.CC1(C)CCCC(C)(C)N1.[Li].O=C1c2ccccc2-c2ccccc21>>CC1(C)CCCC(C)(C)N1CC[CH-]1[B+3]([C-]2=C(F)C(F)=C(F)C(F)=C2F)([C-]2=C(F)C(F)=C(F)C(F)=C2F)[O-](->[Li+]<-N2C(C)(C)CCCC2(C)C)C12C1=CC=CC=C1C1=CC=CC=C12
 
 ## Reaction 31-246-CAS-17757073
 
 - Type: Brown Hydroboration
 - Yield %: 79
 - Solvents: 109-66-0 (109-66-0)
-- SMILES: C=CCc1ccccc1.Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.CC1(C)CCCC(C)(C)N1.[Li].O=C(c1ccccc1)c1ccccc1>>CC1(C)CCCC(C)(C)[NH]1->[Li+]<-[O-]1[B+3]([C-]2=C(F)C(F)=C(F)C(F)=C2F)([C-]2=C(F)C(F)=C(F)C(F)=C2F)[CH-](CCC2=CC=CC=C2)C1(C1=CC=CC=C1)C1=CC=CC=C1
+- SMILES: C=CCc1ccccc1.Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.CC1(C)CCCC(C)(C)N1.[Li].O=C(c1ccccc1)c1ccccc1>>CC1(C)CCCC(C)(C)N1->[Li+]<-[O-]1[B+3]([C-]2=C(F)C(F)=C(F)C(F)=C2F)([C-]2=C(F)C(F)=C(F)C(F)=C2F)[CH-](CCC2=CC=CC=C2)C1(C1=CC=CC=C1)C1=CC=CC=C1
 
 ## Reaction 31-246-CAS-17760684
 
@@ -3237,7 +3237,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 90
 - Solvents: 1076-43-3 (1076-43-3)
-- SMILES: CC1(C)OBOC1(C)C.C=CCN=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>CC1(C)OB(CCCN=C[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)OC1(C)C
+- SMILES: CC1(C)OBOC1(C)C.C=CCN=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC1(C)OB(CCCN=C[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)OC1(C)C
 
 ## Reaction 31-246-CAS-18903747
 
@@ -3286,7 +3286,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 90
 - Solvents: 1076-43-3 (1076-43-3)
-- SMILES: CC1(C)OBOC1(C)C.C=CCN=C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>CC1(C)OB(CCCN(C[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)B2OC(C)(C)C(C)(C)O2)OC1(C)C
+- SMILES: CC1(C)OBOC1(C)C.C=CCN=C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC1(C)OB(CCCN(C[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)B2OC(C)(C)C(C)(C)O2)OC1(C)C
 
 ## Reaction 31-246-CAS-18903755
 
@@ -4088,7 +4088,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 97
 - Solvents: 110-54-3 (110-54-3)
-- SMILES: C#CC(C)(C)C.B([c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>CC(C)(C)C=CB([c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: C#CC(C)(C)C.B([C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC(C)(C)C=CB([C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-246-CAS-200650
 
@@ -4599,7 +4599,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 76
 - Solvents: 75-05-8 (75-05-8)
-- SMILES: N#C/C=C/c1ccccc1.[BH3]=C1N(C)C(Cl)=C(Cl)N1C>>CN1C(=[BH2]C(C#N)CC2=CC=CC=C2)N(C)C(Cl)=C1Cl
+- SMILES: N#C/C=C/c1ccccc1.[BH3]=C1N(C)C(Cl)=C(Cl)N1C>>CN1C(Cl)=C(Cl)N(C)C1=[BH2]C(C#N)CC1=CC=CC=C1
 
 ## Reaction 31-246-CAS-20839162
 
@@ -4885,7 +4885,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 87
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.C=CC[C-]12->[Zr+4]3456([Cl-])([Cl-])(<-[CH](=[CH]->31)[CH]->4=[CH]->52)<-[N](C1=CC=CC=C1)=C(C)[C-](C#N[B+3]([C-]1=C(F)C(F)=C(F)C(F)=C1F)([C-]1=C(F)C(F)=C(F)C(F)=C1F)[C-]1=C(F)C(F)=C(F)C(F)=C1F)C(C)=[N]->6C1=C(C(C)C)C=CC=C1C(C)C>>CC1[C-](C#N[B+3]([C-]2=C(F)C(F)=C(F)C(F)=C2F)([C-]2=C(F)C(F)=C(F)C(F)=C2F)[C-]2=C(F)C(F)=C(F)C(F)=C2F)C(C)=[N](C2=C(C(C)C)C=CC=C2C(C)C)->[Zr+4]2345([Cl-])([Cl-])(<-[CH]6=[CH]->2[C-]->3(CCCB(C2=C(F)C(F)=C(F)C(F)=C2F)C2=C(F)C(F)=C(F)C(F)=C2F)[CH]->4=[CH]->56)<-[N]=1C1=CC=CC=C1
+- SMILES: Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.C=CC[C-]12->[Zr+4]3456([Cl-])([Cl-])(<-N(C7=CC=CC=C7)=C(C)[C-](C#N[B+3]([C-]7=C(F)C(F)=C(F)C(F)=C7F)([C-]7=C(F)C(F)=C(F)C(F)=C7F)[C-]7=C(F)C(F)=C(F)C(F)=C7F)C(C)=N->3C3=C(C(C)C)C=CC=C3C(C)C)[CH](=[CH]14)[CH]5=[CH]26>>CC1=N(C2=CC=CC=C2)->[Zr+4]2345([Cl-])([Cl-])(<-N(C6=C(C(C)C)C=CC=C6C(C)C)=C(C)[C-]1C#N[B+3]([C-]1=C(F)C(F)=C(F)C(F)=C1F)([C-]1=C(F)C(F)=C(F)C(F)=C1F)[C-]1=C(F)C(F)=C(F)C(F)=C1F)<-[C-]1(CCCB(C6=C(F)C(F)=C(F)C(F)=C6F)C6=C(F)C(F)=C(F)C(F)=C6F)[CH]2=[CH]3[CH]4=[CH]15
 
 ## Reaction 31-246-CAS-21000348
 
@@ -5093,7 +5093,7 @@ Total reactions: 2107
 - Yield %: 73
 - Reagents: 21947-87-5 (21947-87-5) [UNK], 67-56-1 (67-56-1) [ADDITIVE], 144-55-8 (144-55-8) [ADDITIVE], 7722-84-1 (7722-84-1) [ADDITIVE]
 - Solvents: 60-29-7 (60-29-7), 7732-18-5 (7732-18-5)
-- SMILES: C=C=[CH][Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC.O=C/C=C/c1ccccc1>>CCC[CH2][Sn](/[CH]=C/C[C@H](O)/C=C/c1ccccc1)([CH2]CCC)[CH2]CCC
+- SMILES: C=C=C[Sn](CCCC)(CCCC)CCCC.O=C/C=C/c1ccccc1>>CCCC[Sn](/C=C/C[C@H](O)/C=C/c1ccccc1)(CCCC)CCCC
 
 ## Reaction 31-246-CAS-21078208
 
@@ -5101,7 +5101,7 @@ Total reactions: 2107
 - Yield %: 71
 - Reagents: 21947-87-5 (21947-87-5) [UNK], 67-56-1 (67-56-1) [ADDITIVE], 144-55-8 (144-55-8) [ADDITIVE], 7722-84-1 (7722-84-1) [ADDITIVE]
 - Solvents: 60-29-7 (60-29-7), 7732-18-5 (7732-18-5)
-- SMILES: C=C=[CH][Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC.O=CCOCc1ccccc1>>CCC[CH2][Sn](/[CH]=C/C[C@H](O)COCc1ccccc1)([CH2]CCC)[CH2]CCC
+- SMILES: C=C=C[Sn](CCCC)(CCCC)CCCC.O=CCOCc1ccccc1>>CCCC[Sn](/C=C/C[C@H](O)COCc1ccccc1)(CCCC)CCCC
 
 ## Reaction 31-246-CAS-21078721
 
@@ -5109,7 +5109,7 @@ Total reactions: 2107
 - Yield %: 78
 - Reagents: 21947-87-5 (21947-87-5) [UNK], 67-56-1 (67-56-1) [ADDITIVE], 144-55-8 (144-55-8) [ADDITIVE], 7722-84-1 (7722-84-1) [ADDITIVE]
 - Solvents: 60-29-7 (60-29-7), 7732-18-5 (7732-18-5)
-- SMILES: C=C=[CH][Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC.O=Cc1ccccc1>>CCC[CH2][Sn](/[CH]=C/C[C@H](O)c1ccccc1)([CH2]CCC)[CH2]CCC
+- SMILES: C=C=C[Sn](CCCC)(CCCC)CCCC.O=Cc1ccccc1>>CCCC[Sn](/C=C/C[C@H](O)c1ccccc1)(CCCC)CCCC
 
 ## Reaction 31-246-CAS-21081002
 
@@ -5195,7 +5195,7 @@ Total reactions: 2107
 - Yield %: 71
 - Reagents: 21932-54-7 (21932-54-7) [UNK], 67-56-1 (67-56-1) [ADDITIVE], 144-55-8 (144-55-8) [ADDITIVE], 7722-84-1 (7722-84-1) [ADDITIVE]
 - Solvents: 60-29-7 (60-29-7), 7732-18-5 (7732-18-5)
-- SMILES: C=C=[CH][Sn]([CH2]CCC)([CH2]CCC)[CH2]CCC.O=CCCc1ccccc1>>CCC[CH2][Sn](/[CH]=C/C[C@@H](O)CCc1ccccc1)([CH2]CCC)[CH2]CCC
+- SMILES: C=C=C[Sn](CCCC)(CCCC)CCCC.O=CCCc1ccccc1>>CCCC[Sn](/C=C/C[C@@H](O)CCc1ccccc1)(CCCC)CCCC
 
 ## Reaction 31-246-CAS-21088979
 
@@ -7112,7 +7112,7 @@ Total reactions: 2107
 
 - Type: Brown Hydroboration
 - Yield %: 87
-- SMILES: C#C[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92.CC1(C)OBOC1(C)C>>CC1(C)OB(C(C[c-]23->[Fe+2]456789%10(<-[cH]%11[cH]->4[cH]->5[cH-]->6[cH]->7%11)<-[cH]([cH]->8[cH]->92)[cH]->%103)B2OC(C)(C)C(C)(C)O2)OC1(C)C
+- SMILES: C#C[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29.CC1(C)OBOC1(C)C>>CC1(C)OB(C(C[C-]23->[Fe+2]456789%10(<-[CH-]%11[CH]4=[CH]5[CH]6=[CH]%117)[CH](=[CH]28)[CH]9=[CH]3%10)B2OC(C)(C)C(C)(C)O2)OC1(C)C
 
 ## Reaction 31-246-CAS-21947128
 
@@ -8195,7 +8195,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 89
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: B1C2CCCC1CCC2.C=CCCN1C(C(C)(C)C)=CC2C3=CC=CC(C)=[N]3->[Zn+2]([Br-])([Br-])<-[N]=21>>CC1=[N]2->[Zn+2]([Br-])([Br-])<-[N]3=C(C2=CC=C1)C=C(C(C)(C)C)N3CCCCB1C2CCCC1CCC2
+- SMILES: B1C2CCCC1CCC2.C=CCCN1C(C(C)(C)C)=CC2=N1->[Zn+2]([Br-])([Br-])<-N1=C(C)C=CC=C21>>CC1=N2->[Zn+2]([Br-])([Br-])<-N3=C(C=C(C(C)(C)C)N3CCCCB3C4CCCC3CCC4)C2=CC=C1
 
 ## Reaction 31-246-CAS-22874637
 
@@ -8454,7 +8454,7 @@ Total reactions: 2107
 
 - Type: Brown Hydroboration
 - Yield %: 100
-- SMILES: B1C2CCCC1CCC2.C=[CH][Sn]([CH3])([CH3])[CH]=C>>[CH3][Sn]1([CH3])[CH2]CC(B2C3CCCC2CCC3)[CH2]1
+- SMILES: B1C2CCCC1CCC2.C=C[Sn](C)(C)C=C>>C[Sn]1(C)CCC(B2C3CCCC2CCC3)C1
 
 ## Reaction 31-246-CAS-23234300
 
@@ -9065,7 +9065,7 @@ Total reactions: 2107
 - Yield %: 80
 - Reagents: 252265-33-1 (252265-33-1) [UNK]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: CCCC/C=[CH]\[Ge]([CH3])([CH3])[CH3].OCCCO>>CCCCC[CH](B1OCCCO1)[Ge]([CH3])([CH3])[CH3]
+- SMILES: CCCC/C=C\[Ge](C)(C)C.OCCCO>>CCCCCC(B1OCCCO1)[Ge](C)(C)C
 
 ## Reaction 31-246-CAS-2390545
 
@@ -9392,7 +9392,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 87
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.C=CC[C-]12->[Zr+4]3456([Cl-])([Cl-])(<-[CH](=[CH]->31)[CH]->4=[CH]->52)<-[N](C1=CC=CC=C1)=C(C)[CH-]C(C)=[N]->6C1=C(C(C)C)C=CC=C1C(C)C>>CC1[CH-]C(C)=[N](C2=C(C(C)C)C=CC=C2C(C)C)->[Zr+4]2345([Cl-])([Cl-])(<-[CH]6=[CH]->2[C-]->3(CCCB(C2=C(F)C(F)=C(F)C(F)=C2F)C2=C(F)C(F)=C(F)C(F)=C2F)[CH]->4=[CH]->56)<-[N]=1C1=CC=CC=C1
+- SMILES: Fc1c(F)c(F)c(Bc2c(F)c(F)c(F)c(F)c2F)c(F)c1F.C=CC[C-]12->[Zr+4]3456([Cl-])([Cl-])(<-N(C7=CC=CC=C7)=C(C)[CH-]C(C)=N->3C3=C(C(C)C)C=CC=C3C(C)C)[CH](=[CH]14)[CH]5=[CH]26>>CC1=N(C2=CC=CC=C2)->[Zr+4]2345([Cl-])([Cl-])(<-N(C6=C(C(C)C)C=CC=C6C(C)C)=C(C)[CH-]1)<-[C-]1(CCCB(C6=C(F)C(F)=C(F)C(F)=C6F)C6=C(F)C(F)=C(F)C(F)=C6F)[CH]2=[CH]3[CH]4=[CH]15
 
 ## Reaction 31-246-CAS-3198455
 
@@ -9475,7 +9475,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 81
 - Solvents: 108-88-3 (108-88-3), 109-99-9 (109-99-9)
-- SMILES: B1C2CCCC1CCC2.C=C[C-]12->[Sm+3]3456789%10(<-[C](C)(=[C]->31C)[C]->4(C)=[C]->52C)(<-[C]1(C)=[C]->6(C)[C-]->7(C=C)[C]->8(C)=[C]->91C)[Cl-][Li+](<-[O](CC)CC)(<-[O](CC)CC)[Cl-]%10>>C[C]12->[Sm+3]3456789%10(<-[C]1(C)=[C]->3(C)[C-]->4(CCB1C3CCCC1CCC3)[C]->5=2C)(<-[C]1(C)=[C]->6(C)[C-]->7(CCB2C3CCCC2CCC3)[C]->8(C)=[C]->91C)[Cl-][Li+](<-[O]1CCCC1)(<-[O]1CCCC1)[Cl-]%10
+- SMILES: B1C2CCCC1CCC2.C=C[C-]12->[Sm+3]3456789%10(<-[C-]%11(C=C)C3(C)=C4(C)C5(C)=C%116C)([Cl-][Li+](<-O(CC)CC)(<-O(CC)CC)[Cl-]7)C(C)(=C18C)C9(C)=C2%10C>>CC12=C3(C)[C-]4(CCB5C6CCCC5CCC6)->[Sm+3]1356789%10(<-[C-]1(CCB3C%11CCCC3CCC%11)C5(C)=C6(C)C7(C)=C18C)([Cl-][Li+](<-O1CCCC1)(<-O1CCCC1)[Cl-]9)C2(C)=C4%10C
 
 ## Reaction 31-246-CAS-3528933
 
@@ -9533,7 +9533,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 100
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: B1C2CCCC1CCC2.C=CCCC(C)(C)[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[CH]%10=[CH]->3[CH-]->4[CH]->5=[CH]->6%10)<-[CH](=[CH]->71)[CH]->8=[CH]->92>>CC(C)(CCCCB1C2CCCC1CCC2)[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[CH]%10=[CH]->3[CH-]->4[CH]->5=[CH]->6%10)<-[CH](=[CH]->71)[CH]->8=[CH]->92
+- SMILES: B1C2CCCC1CCC2.C=CCCC(C)(C)[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC(C)(CCCCB1C2CCCC1CCC2)[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-246-CAS-3691172
 
@@ -9708,7 +9708,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 89
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=CCCCC.[Cl-]1[Y+3]23456789%10%11(<-[BH]%12[CH]->2=[CH]->3[CH]->4=[CH]->5[CH-]->6%12)(<-[BH]2[CH]->7=[CH]->8[CH]->9=[CH]->%10[CH-]->%112)[Cl-][Y+3]123456789%10%11(<-[BH]1[CH]->2=[CH]->3[CH]->4=[CH]->5[CH-]->61)<-[BH]1[CH]->7=[CH]->8[CH]->9=[CH]->%10[CH-]->%111>>CCCCCC[B]12->[Y+3]3456789%10%11([Cl-])(<-[CH](=[CH]->3[CH-]->41)[CH]->5=[CH]->62)<-[CH]1=[CH]->7[CH-]->8[B]->9(CCCCCC)[CH]->%10=[CH]->%111
+- SMILES: C=CCCCC.[Cl-]1[Y+3]23456789%10%11(<-B%12[CH]2=[CH]3[CH]4=[CH]5[CH-]->6%12)(<-B2[CH]7=[CH]8[CH]9=[CH]%10[CH-]->%112)[Cl-][Y+3]123456789%10%11(<-B1[CH]2=[CH]3[CH]4=[CH]5[CH-]->61)<-B1[CH]7=[CH]8[CH]9=[CH]%10[CH-]->%111>>CCCCCCB12->[Y+3]3456789%10%11([Cl-])(<-[CH-]1[CH]3=[CH]4[CH]5=[CH]26)<-[CH-]1[CH]7=[CH]8[CH]9=[CH]%10B->%111CCCCCC
 
 ## Reaction 31-246-CAS-414739
 
@@ -9862,7 +9862,7 @@ Total reactions: 2107
 - Yield %: 82
 - Reagents: 252265-33-1 (252265-33-1) [UNK]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: CCCCC/C=[CH]\[Ge]([CH3])([CH3])[CH3].OCCCO>>CCCCCC[CH](B1OCCCO1)[Ge]([CH3])([CH3])[CH3]
+- SMILES: CCCCC/C=C\[Ge](C)(C)C.OCCCO>>CCCCCCC(B1OCCCO1)[Ge](C)(C)C
 
 ## Reaction 31-246-CAS-4515214
 
@@ -10244,7 +10244,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 95
 - Solvents: 108-88-3 (108-88-3), 109-99-9 (109-99-9)
-- SMILES: B1C2CCCC1CCC2.C=CC[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[CH](=[CH]->31)[CH]->4=[CH]->52)<-[CH]1=[CH]->6[C-]->7(CC=C)[CH]->8=[CH]->91>>[Cl-][Zr+4]12345678([Cl-])(<-[CH]9=[CH]->1[C-]->2(CCCB1C2CCCC1CCC2)[CH]->3=[CH]->49)<-[CH]1=[CH]->5[C-]->6(CCCB2C3CCCC2CCC3)[CH]->7=[CH]->81
+- SMILES: B1C2CCCC1CCC2.C=CC[C-]12->[Zr+4]3456789([Cl-])([Cl-])(<-[C-]%10(CC=C)[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>[Cl-][Zr+4]12345678([Cl-])(<-[C-]9(CCCB%10C%11CCCC%10CCC%11)[CH]1=[CH]2[CH]3=[CH]94)<-[C-]1(CCCB2C3CCCC2CCC3)[CH]5=[CH]6[CH]7=[CH]18
 
 ## Reaction 31-246-CAS-564872
 
@@ -10258,7 +10258,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 94
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=CCCCC.[Cl-][Lu+3]123456789%10(<-[BH]%11[CH]->1=[CH]->2[CH]->3=[CH]->4[CH-]->5%11)<-[BH]1[CH]->6=[CH]->7[CH]->8=[CH]->9[CH-]->%101>>CCCCCC[B]12->[Lu+3]3456789%10%11([Cl-])(<-[CH](=[CH]->3[CH-]->41)[CH]->5=[CH]->62)<-[CH]1=[CH]->7[CH-]->8[B]->9(CCCCCC)[CH]->%10=[CH]->%111
+- SMILES: C=CCCCC.[Cl-][Lu+3]123456789%10(<-B%11[CH]1=[CH]2[CH]3=[CH]4[CH-]->5%11)<-B1[CH]6=[CH]7[CH]8=[CH]9[CH-]->%101>>CCCCCCB12->[Lu+3]3456789%10%11([Cl-])(<-[CH-]1[CH]3=[CH]4[CH]5=[CH]26)<-[CH-]1[CH]7=[CH]8[CH]9=[CH]%10B->%111CCCCCC
 
 ## Reaction 31-246-CAS-5708096
 
@@ -10392,7 +10392,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 78
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=CCOCCC.[Cl-]1[Y+3]23456789%10%11(<-[BH]%12[CH]->2=[CH]->3[CH]->4=[CH]->5[CH-]->6%12)(<-[BH]2[CH]->7=[CH]->8[CH]->9=[CH]->%10[CH-]->%112)[Cl-][Y+3]123456789%10%11(<-[BH]1[CH]->2=[CH]->3[CH]->4=[CH]->5[CH-]->61)<-[BH]1[CH]->7=[CH]->8[CH]->9=[CH]->%10[CH-]->%111>>CCC[O]1CCC[B]23->[Y+3]<-1456789%10%11%12%13([Cl-])(<-[CH](=[CH]->4[CH-]->52)[CH]->6=[CH]->73)<-[CH]1=[CH]->8[CH-]->9[B]->%10(CCC[O]->%11CCC)[CH]->%12=[CH]->%131
+- SMILES: C=CCOCCC.[Cl-]1[Y+3]23456789%10%11(<-B%12[CH]2=[CH]3[CH]4=[CH]5[CH-]->6%12)(<-B2[CH]7=[CH]8[CH]9=[CH]%10[CH-]->%112)[Cl-][Y+3]123456789%10%11(<-B1[CH]2=[CH]3[CH]4=[CH]5[CH-]->61)<-B1[CH]7=[CH]8[CH]9=[CH]%10[CH-]->%111>>CCCO1->[Y+3]23456789%10%11%12([Cl-])(<-[CH-]%13[CH]2=[CH]3[CH]4=[CH]5B->6%13CCC1)<-[CH-]1[CH]7=[CH]8[CH]9=[CH]%10B->%111CCCO->%12CCC
 
 ## Reaction 31-246-CAS-6272694
 
@@ -10535,7 +10535,7 @@ Total reactions: 2107
 - Yield %: 80
 - Reagents: 252265-33-1 (252265-33-1) [UNK]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: CCCCCC/C=[CH]\[Ge]([CH3])([CH3])[CH3].OCCCO>>CCCCCCC[CH](B1OCCCO1)[Ge]([CH3])([CH3])[CH3]
+- SMILES: CCCCCC/C=C\[Ge](C)(C)C.OCCCO>>CCCCCCCC(B1OCCCO1)[Ge](C)(C)C
 
 ## Reaction 31-246-CAS-6652508
 
@@ -10791,7 +10791,7 @@ Total reactions: 2107
 - Yield %: 85
 - Reagents: 13292-87-0 (13292-87-0) [UNK]
 - Solvents: 110-54-3 (110-54-3)
-- SMILES: B1C2CCCC1CCC2.C=[CH][Ge]([CH]=C)([CH2]C)[CH2]C.CO>>COB1C2CCCC1CCC2.C[CH2][Ge]1([CH2]C)[CH2]CB(OC)C[CH2]1
+- SMILES: B1C2CCCC1CCC2.C=C[Ge](C=C)(CC)CC.CO>>COB1C2CCCC1CCC2.CC[Ge]1(CC)CCB(OC)CC1
 
 ## Reaction 31-246-CAS-7599626
 
@@ -11029,7 +11029,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 79
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: C=CCOCC=C.[Cl-]1[Y+3]23456789%10%11(<-[BH]%12[CH]->2=[CH]->3[CH]->4=[CH]->5[CH-]->6%12)(<-[BH]2[CH]->7=[CH]->8[CH]->9=[CH]->%10[CH-]->%112)[Cl-][Y+3]123456789%10%11(<-[BH]1[CH]->2=[CH]->3[CH]->4=[CH]->5[CH-]->61)<-[BH]1[CH]->7=[CH]->8[CH]->9=[CH]->%10[CH-]->%111>>[Cl-][Y+3]123456789%10%11%12<-[CH]%13=[CH]->1[CH-]->2[B]->3(CCC[O]->4CCC[B]->51[CH]->6=[CH]->7[CH]->8=[CH]->9[CH-]->%101)[CH]->%11=[CH]->%12%13
+- SMILES: C=CCOCC=C.[Cl-]1[Y+3]23456789%10%11(<-B%12[CH]2=[CH]3[CH]4=[CH]5[CH-]->6%12)(<-B2[CH]7=[CH]8[CH]9=[CH]%10[CH-]->%112)[Cl-][Y+3]123456789%10%11(<-B1[CH]2=[CH]3[CH]4=[CH]5[CH-]->61)<-B1[CH]7=[CH]8[CH]9=[CH]%10[CH-]->%111>>[Cl-][Y+3]123456789%10%11%12<-[CH-]%13[CH]1=[CH]2[CH]3=[CH]4B->5%13CCCO->6CCCB->71[CH]8=[CH]9[CH]%10=[CH]%11[CH-]->%121
 
 ## Reaction 31-246-CAS-841945
 
@@ -11157,7 +11157,7 @@ Total reactions: 2107
 - Yield %: 72
 - Reagents: 252265-33-1 (252265-33-1) [UNK]
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: [CH3][Ge]([CH3])([CH3])/[CH]=C\CCCCl.OCCCO>>[CH3][Ge]([CH3])([CH3])[CH](CCCCCl)B1OCCCO1
+- SMILES: C[Ge](C)(C)/C=C\CCCCl.OCCCO>>C[Ge](C)(C)C(CCCCCl)B1OCCCO1
 
 ## Reaction 31-246-CAS-8781807
 
@@ -11485,7 +11485,7 @@ Total reactions: 2107
 - Yield %: 84
 - Reagents: 13292-87-0 (13292-87-0) [UNK]
 - Solvents: 110-54-3 (110-54-3)
-- SMILES: B1C2CCCC1CCC2.C=[CH][Ge]([CH]=C)([CH2]CC)[CH2]CC.CO>>COB1C2CCCC1CCC2.CC[CH2][Ge]1([CH2]CC)[CH2]CB(OC)C[CH2]1
+- SMILES: B1C2CCCC1CCC2.C=C[Ge](C=C)(CCC)CCC.CO>>COB1C2CCCC1CCC2.CCC[Ge]1(CCC)CCB(OC)CC1
 
 ## Reaction 31-246-CAS-9716166
 
@@ -11573,7 +11573,7 @@ Total reactions: 2107
 
 - Type: Brown Hydroboration
 - Yield %: 90
-- SMILES: B(C1CCCCC1)C1CCCCC1.C1=CC=[C-]([B+3]([C-]2=CC=CC=C2)([C-]2=CC=CC=C2)[C-]2=CC=CC=C2)C=C1.C=CC[P]1(CC=C)CC[P](CC=C)(CC=C)[Rh+]12[P](CC=C)(CC=C)CC[P]2(CC=C)CC=C>>C1=CC=[C-]([B+3]([C-]2=CC=CC=C2)([C-]2=CC=CC=C2)[C-]2=CC=CC=C2)C=C1.C1CCC(B(CCC[P]2(CCCB(C3CCCCC3)C3CCCCC3)CC[P](CCCB(C3CCCCC3)C3CCCCC3)(CCCB(C3CCCCC3)C3CCCCC3)[Rh+]23[P](CCCB(C2CCCCC2)C2CCCCC2)(CCCB(C2CCCCC2)C2CCCCC2)CC[P]3(CCCB(C2CCCCC2)C2CCCCC2)CCCB(C2CCCCC2)C2CCCCC2)C2CCCCC2)CC1
+- SMILES: B(C1CCCCC1)C1CCCCC1.C1=CC=[C-]([B+3]([C-]2=CC=CC=C2)([C-]2=CC=CC=C2)[C-]2=CC=CC=C2)C=C1.C=CCP1(CC=C)CCP(CC=C)(CC=C)[Rh+]12P(CC=C)(CC=C)CCP2(CC=C)CC=C>>C1=CC=[C-]([B+3]([C-]2=CC=CC=C2)([C-]2=CC=CC=C2)[C-]2=CC=CC=C2)C=C1.C1CCC(B(CCCP2(CCCB(C3CCCCC3)C3CCCCC3)CCP(CCCB(C3CCCCC3)C3CCCCC3)(CCCB(C3CCCCC3)C3CCCCC3)[Rh+]23P(CCCB(C2CCCCC2)C2CCCCC2)(CCCB(C2CCCCC2)C2CCCCC2)CCP3(CCCB(C2CCCCC2)C2CCCCC2)CCCB(C2CCCCC2)C2CCCCC2)C2CCCCC2)CC1
 
 ## Reaction 31-614-CAS-24150157
 
@@ -11593,7 +11593,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 100
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: B1C2CCCC1CCC2.C=CCN1C=CN2C3=CC=CC4=[N]3->[Fe+4]([C]#O)([C]#O)(=[C-2]12)=[C-2]1N(CC=C)C=CN41>>O#[C][Fe+4]12([C]#O)<-[N]3=C(C=CC=C3N3C=CN(CCCB4C5CCCC4CCC5)[C-2]=13)N1C=CN(CCCB3C4CCCC3CCC4)[C-2]=21
+- SMILES: B1C2CCCC1CCC2.C=CCN1C=CN2C3=CC=CC4=N3->[Fe+4](C#O)(C#O)(=[C-2]12)=[C-2]1N(CC=C)C=CN41>>O#C[Fe+4]12(C#O)<-N3=C(C=CC=C3N3C=CN(CCCB4C5CCCC4CCC5)[C-2]=13)N1C=CN(CCCB3C4CCCC3CCC4)[C-2]=21
 
 ## Reaction 31-614-CAS-24405831
 
@@ -11601,7 +11601,7 @@ Total reactions: 2107
 - Yield %: 74
 - Reagents: 14044-65-6 (14044-65-6) [UNK]
 - Solvents: 109-99-9 (109-99-9)
-- SMILES: CC=C(C)C.C=CCN1C=CN2C3=CC=CC4=[N]3->[Fe+4]([C]#O)([C]#O)(=[C-2]12)=[C-2]1N(CC=C)C=CN41>>CC(C)C(C)B(CCCN1C=CN2C3=CC=CC4=[N]3->[Fe+4]([C]#O)([C]#O)(=[C-2]12)=[C-2]1N(CCCB(C(C)C(C)C)C(C)C(C)C)C=CN41)C(C)C(C)C
+- SMILES: CC=C(C)C.C=CCN1C=CN2C3=CC=CC4=N3->[Fe+4](C#O)(C#O)(=[C-2]12)=[C-2]1N(CC=C)C=CN41>>CC(C)C(C)B(CCCN1C=CN2C3=CC=CC4=N3->[Fe+4](C#O)(C#O)(=[C-2]12)=[C-2]1N(CCCB(C(C)C(C)C)C(C)C(C)C)C=CN41)C(C)C(C)C
 
 ## Reaction 31-614-CAS-24406221
 
@@ -11657,7 +11657,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 93
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: B(C1CCCCC1)C1CCCCC1.C=CC[P]1(CC=C)CC[P](CC=C)(CC=C)[Co+]12345<-[c]1(C)[c]->2(C)[c]->3(C)[c-]->4(C)[c]->51C>>C[c]12->[Co+]3456(<-[c]1(C)[c]->3(C)[c-]->4(C)[c]->52C)[P](CCCB(C1CCCCC1)C1CCCCC1)(CCCB(C1CCCCC1)C1CCCCC1)CC[P]6(CCCB(C1CCCCC1)C1CCCCC1)CCCB(C1CCCCC1)C1CCCCC1
+- SMILES: B(C1CCCCC1)C1CCCCC1.C=CCP1(CC=C)CCP(CC=C)(CC=C)[Co+]12345<-[C-]1(C)C2(C)=C3(C)C4(C)=C15C>>CC12=C3(C)[C-]4(C)->[Co+]1356(C2(C)=C45C)P(CCCB(C1CCCCC1)C1CCCCC1)(CCCB(C1CCCCC1)C1CCCCC1)CCP6(CCCB(C1CCCCC1)C1CCCCC1)CCCB(C1CCCCC1)C1CCCCC1
 
 ## Reaction 31-614-CAS-24862601
 
@@ -11852,7 +11852,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 71
 - Solvents: 110-54-3 (110-54-3)
-- SMILES: Bc1c(C)cc(C)cc1C.C=C[P]1(C=C)CC[P](C=C)(C=C)[Co+]12345<-[c]1(C)[c]->2(C)[c]->3(C)[c-]->4(C)[c]->51C>>Cc1cc(C)c(B2CC[P]3(CC2)CC[P]2(CCB(c4c(C)cc(C)cc4C)CC2)[Co+]32456<-[c]3(C)[c]->2(C)[c]->4(C)[c-]->5(C)[c]->63C)c(C)c1
+- SMILES: Bc1c(C)cc(C)cc1C.C=CP1(C=C)CCP(C=C)(C=C)[Co+]12345<-[C-]1(C)C2(C)=C3(C)C4(C)=C15C>>CC1=CC(C)=C(B2CCP3(CC2)CCP2(CCB(C4=C(C)C=C(C)C=C4C)CC2)[Co+]32456<-[C-]3(C)C2(C)=C4(C)C5(C)=C36C)C(C)=C1
 
 ## Reaction 31-614-CAS-32631135
 
@@ -12770,7 +12770,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 90
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: B(C1CCCCC1)C1CCCCC1.C=CC[P]1(CC=C)CC[P](CC=C)(CC=C)[Fe+2]12345([Cl-])<-[C]1(C)=[C]->2(C)[C-]->3(C)[C]->4(C)=[C]->51C>>C[C]12->[Fe+2]3456([Cl-])(<-[C]1(C)=[C]->3(C)[C-]->4(C)[C]->5=2C)[P](CCCB(C1CCCCC1)C1CCCCC1)(CCCB(C1CCCCC1)C1CCCCC1)CC[P]6(CCCB(C1CCCCC1)C1CCCCC1)CCCB(C1CCCCC1)C1CCCCC1
+- SMILES: B(C1CCCCC1)C1CCCCC1.C=CCP1(CC=C)CCP(CC=C)(CC=C)[Fe+2]12345([Cl-])<-[C-]1(C)C2(C)=C3(C)C4(C)=C15C>>CC12=C3(C)[C-]4(C)->[Fe+2]1356([Cl-])(C2(C)=C45C)P(CCCB(C1CCCCC1)C1CCCCC1)(CCCB(C1CCCCC1)C1CCCCC1)CCP6(CCCB(C1CCCCC1)C1CCCCC1)CCCB(C1CCCCC1)C1CCCCC1
 
 ## Reaction 31-614-CAS-37998279
 
@@ -13396,7 +13396,7 @@ Total reactions: 2107
 - Yield %: 71
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.C[CH2][Mg][Br]>>CC[C@H](B1OC(C)(C)C(C)(C)O1)[C@@H](C)c1ccccc1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.CC[Mg]Br>>CC[C@H](B1OC(C)(C)C(C)(C)O1)[C@@H](C)c1ccccc1
 
 ## Reaction 31-614-CAS-39362236
 
@@ -13404,7 +13404,7 @@ Total reactions: 2107
 - Yield %: 88
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.[Br][Mg][CH2]c1ccccc1>>C[C@@H](c1ccccc1)[C@H](Cc1ccccc1)B1OC(C)(C)C(C)(C)O1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.Br[Mg]Cc1ccccc1>>C[C@@H](c1ccccc1)[C@H](Cc1ccccc1)B1OC(C)(C)C(C)(C)O1
 
 ## Reaction 31-614-CAS-39362237
 
@@ -13412,7 +13412,7 @@ Total reactions: 2107
 - Yield %: 76
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.[CH3][Mg][Br]>>C[C@H](c1ccccc1)[C@@H](C)B1OC(C)(C)C(C)(C)O1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.C[Mg]Br>>C[C@H](c1ccccc1)[C@@H](C)B1OC(C)(C)C(C)(C)O1
 
 ## Reaction 31-614-CAS-39362240
 
@@ -13420,7 +13420,7 @@ Total reactions: 2107
 - Yield %: 87
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.[Br][Mg][c]1ccccc1>>C[C@H](c1ccccc1)[C@H](B1OC(C)(C)C(C)(C)O1)c1ccccc1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.Br[Mg]c1ccccc1>>C[C@H](c1ccccc1)[C@H](B1OC(C)(C)C(C)(C)O1)c1ccccc1
 
 ## Reaction 31-614-CAS-39362241
 
@@ -13428,7 +13428,7 @@ Total reactions: 2107
 - Yield %: 82
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.C=C[CH2][Mg][Br]>>C=CC[C@@H](B1OC(C)(C)C(C)(C)O1)[C@H](C)c1ccccc1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.C=CC[Mg]Br>>C=CC[C@@H](B1OC(C)(C)C(C)(C)O1)[C@H](C)c1ccccc1
 
 ## Reaction 31-614-CAS-39362242
 
@@ -13436,7 +13436,7 @@ Total reactions: 2107
 - Yield %: 88
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.CC(C)=CC[CH2][Mg][Br]>>CC(C)=CCC[C@H](B1OC(C)(C)C(C)(C)O1)[C@@H](C)c1ccccc1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.CC(C)=CCC[Mg]Br>>CC(C)=CCC[C@H](B1OC(C)(C)C(C)(C)O1)[C@@H](C)c1ccccc1
 
 ## Reaction 31-614-CAS-39362244
 
@@ -13444,7 +13444,7 @@ Total reactions: 2107
 - Yield %: 94
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.C[Si](C)(C)C#C[CH2][Mg][Br]>>C[C@@H](c1ccccc1)[C@H](CC#C[Si](C)(C)C)B1OC(C)(C)C(C)(C)O1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.C[Si](C)(C)C#CC[Mg]Br>>C[C@@H](c1ccccc1)[C@H](CC#C[Si](C)(C)C)B1OC(C)(C)C(C)(C)O1
 
 ## Reaction 31-614-CAS-39362248
 
@@ -13460,7 +13460,7 @@ Total reactions: 2107
 - Yield %: 92
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 75-18-3 (75-18-3)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.[Li][c]1ccccc1C>>Cc1ccccc1[C@H](B1OC(C)(C)C(C)(C)O1)[C@@H](C)c1ccccc1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.[Li]c1ccccc1C>>Cc1ccccc1[C@H](B1OC(C)(C)C(C)(C)O1)[C@@H](C)c1ccccc1
 
 ## Reaction 31-614-CAS-39362250
 
@@ -13468,7 +13468,7 @@ Total reactions: 2107
 - Yield %: 73
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.CSc1cc[c]([Mg][Br])cc1>>CSc1ccc([C@H](B2OC(C)(C)C(C)(C)O2)[C@@H](C)c2ccccc2)cc1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.CSc1ccc([Mg]Br)cc1>>CSc1ccc([C@H](B2OC(C)(C)C(C)(C)O2)[C@@H](C)c2ccccc2)cc1
 
 ## Reaction 31-614-CAS-39362253
 
@@ -13476,7 +13476,7 @@ Total reactions: 2107
 - Yield %: 80
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.C[Si](C)(C)c1cc[c]([Mg][Br])cc1>>C[C@@H](c1ccccc1)[C@@H](B1OC(C)(C)C(C)(C)O1)c1ccc([Si](C)(C)C)cc1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.C[Si](C)(C)c1ccc([Mg]Br)cc1>>C[C@@H](c1ccccc1)[C@@H](B1OC(C)(C)C(C)(C)O1)c1ccc([Si](C)(C)C)cc1
 
 ## Reaction 31-614-CAS-39362254
 
@@ -13484,7 +13484,7 @@ Total reactions: 2107
 - Yield %: 84
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 75-18-3 (75-18-3)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.[Li][c]1cc(C(F)(F)F)cc(C(F)(F)F)c1>>C[C@@H](c1ccccc1)[C@@H](B1OC(C)(C)C(C)(C)O1)c1cc(C(F)(F)F)cc(C(F)(F)F)c1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.[Li]c1cc(C(F)(F)F)cc(C(F)(F)F)c1>>C[C@@H](c1ccccc1)[C@@H](B1OC(C)(C)C(C)(C)O1)c1cc(C(F)(F)F)cc(C(F)(F)F)c1
 
 ## Reaction 31-614-CAS-39362257
 
@@ -13492,7 +13492,7 @@ Total reactions: 2107
 - Yield %: 82
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 60-29-7 (60-29-7)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.Fc1cc[c]([Mg][Br])cc1>>C[C@@H](c1ccccc1)[C@@H](B1OC(C)(C)C(C)(C)O1)c1ccc(F)cc1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.Fc1ccc([Mg]Br)cc1>>C[C@@H](c1ccccc1)[C@@H](B1OC(C)(C)C(C)(C)O1)c1ccc(F)cc1
 
 ## Reaction 31-614-CAS-39362263
 
@@ -13500,7 +13500,7 @@ Total reactions: 2107
 - Yield %: 74
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 75-18-3 (75-18-3)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.[Li][CH]=C1CCCCC1>>C[C@@H](c1ccccc1)[C@H](C=C1CCCCC1)B1OC(C)(C)C(C)(C)O1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.[Li]C=C1CCCCC1>>C[C@@H](c1ccccc1)[C@H](C=C1CCCCC1)B1OC(C)(C)C(C)(C)O1
 
 ## Reaction 31-614-CAS-39362269
 
@@ -13508,7 +13508,7 @@ Total reactions: 2107
 - Yield %: 79
 - Reagents: 617-86-7 (617-86-7) [UNK], 10294-34-5 (10294-34-5) [ADDITIVE]
 - Solvents: 75-09-2 (75-09-2), 109-99-9 (109-99-9)
-- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.N#Cc1cc[c]([Mg][Br])cc1>>C[C@@H](c1ccccc1)[C@@H](B1OC(C)(C)C(C)(C)O1)c1ccc(C#N)cc1
+- SMILES: C/C(=C\I)c1ccccc1.CC(C)(O)C(C)(C)O.N#Cc1ccc([Mg]Br)cc1>>C[C@@H](c1ccccc1)[C@@H](B1OC(C)(C)C(C)(C)O1)c1ccc(C#N)cc1
 
 ## Reaction 31-614-CAS-39362281
 
@@ -14371,7 +14371,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 70
 - Solvents: 108-88-3 (108-88-3)
-- SMILES: B(C1CCCCC1)C1CCCCC1.C=C[P](C1=CC=CC=C1)(C1=CC=CC=C1)[Ni+2]([Br-])([Br-])[P](C=C)(C1=CC=CC=C1)C1=CC=CC=C1>>C[C@H](B(C1CCCCC1)C1CCCCC1)[P](C1=CC=CC=C1)(C1=CC=CC=C1)[Ni+2]([Br-])([Br-])[P](C1=CC=CC=C1)(C1=CC=CC=C1)[C@@H](C)B(C1CCCCC1)C1CCCCC1
+- SMILES: B(C1CCCCC1)C1CCCCC1.C=CP(C1=CC=CC=C1)(C1=CC=CC=C1)[Ni+2]([Br-])([Br-])P(C=C)(C1=CC=CC=C1)C1=CC=CC=C1>>C[C@H](B(C1CCCCC1)C1CCCCC1)P(C1=CC=CC=C1)(C1=CC=CC=C1)[Ni+2]([Br-])([Br-])P(C1=CC=CC=C1)(C1=CC=CC=C1)[C@@H](C)B(C1CCCCC1)C1CCCCC1
 
 ## Reaction 31-614-CAS-41197355
 
@@ -14978,7 +14978,7 @@ Total reactions: 2107
 - Type: Brown Hydroboration
 - Yield %: 95
 - Solvents: 75-09-2 (75-09-2)
-- SMILES: B(C1CCCCC1)C1CCCCC1.C=CCC1N2C(C)=CC(C)=[N]2->[Zn+2]([Cl-])([Cl-])<-[N]2=C(C)C=C(C)N12>>CC1=CC(C)=[N]2->[Zn+2]([Cl-])([Cl-])<-[N]3=C(C)C=C(C)N3C(CCCB(C3CCCCC3)C3CCCCC3)N12
+- SMILES: B(C1CCCCC1)C1CCCCC1.C=CCC1N2C(C)=CC(C)=N2->[Zn+2]([Cl-])([Cl-])<-N2=C(C)C=C(C)N12>>CC1=CC(C)=N2->[Zn+2]([Cl-])([Cl-])<-N3=C(C)C=C(C)N3C(CCCB(C3CCCCC3)C3CCCCC3)N12
 
 ## Reaction 31-614-CAS-42658696
 

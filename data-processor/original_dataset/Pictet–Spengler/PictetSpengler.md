@@ -1688,7 +1688,7 @@ Total reactions: 486
 - Yield %: 72
 - Reagents: 12125-02-9 (12125-02-9) [UNK], 76-05-1 (76-05-1) [ADDITIVE], 144-55-8 (144-55-8) [ADDITIVE]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5), 75-09-2 (75-09-2)
-- SMILES: [CH3][Mg][I].C/C=C1/C(=O)N(CCc2c[nH]c3ccccc23)C(=O)C1CC=C(C)C>>C/C=C1/C(=O)N2CCc3c([nH]c4ccccc34)[C@@]2(C)[C@@H]1CC=C(C)C
+- SMILES: C[Mg]I.C/C=C1/C(=O)N(CCc2c[nH]c3ccccc23)C(=O)C1CC=C(C)C>>C/C=C1/C(=O)N2CCc3c([nH]c4ccccc34)[C@@]2(C)[C@@H]1CC=C(C)C
 
 ## Reaction 31-087-CAS-19995029
 
@@ -1696,7 +1696,7 @@ Total reactions: 486
 - Yield %: 85
 - Reagents: 12125-02-9 (12125-02-9) [UNK], 76-05-1 (76-05-1) [ADDITIVE], 144-55-8 (144-55-8) [ADDITIVE]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5), 75-09-2 (75-09-2)
-- SMILES: [CH3][Mg][I].O=C1C=CC(=O)N1CCc1c[nH]c2ccccc12>>CC12C=CC(=O)N1CCc1c2[nH]c2ccccc12
+- SMILES: C[Mg]I.O=C1C=CC(=O)N1CCc1c[nH]c2ccccc12>>CC12C=CC(=O)N1CCc1c2[nH]c2ccccc12
 
 ## Reaction 31-087-CAS-2016246
 
@@ -2012,7 +2012,7 @@ Total reactions: 486
 - Yield %: 84
 - Reagents: 12125-02-9 (12125-02-9) [UNK], 75-75-2 (75-75-2) [ADDITIVE]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5), 75-09-2 (75-09-2)
-- SMILES: [Cl][Mg][c]1ccccc1.COc1cc(CCN2C(=O)C3CCC3C2=O)cc(OC)c1>>COc1cc2c(c(OC)c1)[C@]1(c3ccccc3)[C@H]3CC[C@H]3C(=O)N1CC2.COc1cc2c(c(OC)c1)[C@@]1(c3ccccc3)[C@H]3CC[C@H]3C(=O)N1CC2
+- SMILES: Cl[Mg]c1ccccc1.COc1cc(CCN2C(=O)C3CCC3C2=O)cc(OC)c1>>COc1cc2c(c(OC)c1)[C@]1(c3ccccc3)[C@H]3CC[C@H]3C(=O)N1CC2.COc1cc2c(c(OC)c1)[C@@]1(c3ccccc3)[C@H]3CC[C@H]3C(=O)N1CC2
 
 ## Reaction 31-087-CAS-21640128
 
@@ -3421,7 +3421,7 @@ Total reactions: 486
 - Yield %: 3
 - Reagents: 75-75-2 (75-75-2) [UNK]
 - Solvents: 60-29-7 (60-29-7), 109-99-9 (109-99-9), 108-88-3 (108-88-3)
-- SMILES: [Cl][Mg][c]1ccccc1.COc1cc(CCN2C(=O)C3CCC3C2=O)cc(OC)c1>>COc1cc2c(c(OC)c1)[C@]1(c3ccccc3)[C@H]3CC[C@H]3C(=O)N1CC2.COc1cc2c(c(OC)c1)[C@@]1(c3ccccc3)[C@H]3CC[C@H]3C(=O)N1CC2
+- SMILES: Cl[Mg]c1ccccc1.COc1cc(CCN2C(=O)C3CCC3C2=O)cc(OC)c1>>COc1cc2c(c(OC)c1)[C@]1(c3ccccc3)[C@H]3CC[C@H]3C(=O)N1CC2.COc1cc2c(c(OC)c1)[C@@]1(c3ccccc3)[C@H]3CC[C@H]3C(=O)N1CC2
 
 ## Reaction 31-087-CAS-8838466
 

@@ -8,7 +8,7 @@ Total reactions: 367
 - Yield %: 71
 - Reagents: 7647-01-0 (7647-01-0) [UNK]
 - Solvents: 108-88-3 (108-88-3), 67-56-1 (67-56-1), 7732-18-5 (7732-18-5)
-- SMILES: CC(C)[CH2][AlH][CH2]C(C)C.COC(=O)[C@H](CO)NC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1[C@H](C=O)COC1(C)C
+- SMILES: CC(C)C[AlH]CC(C)C.COC(=O)[C@H](CO)NC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1[C@H](C=O)COC1(C)C
 
 ## Reaction 31-233-CAS-5046055
 
@@ -31,13 +31,13 @@ Total reactions: 367
 - Type: DIBAL‑H Partial reductions
 - Reagents: 7732-18-5 (7732-18-5) [UNK]
 - Solvents: 75-09-2 (75-09-2), 108-88-3 (108-88-3), 109-99-9 (109-99-9)
-- SMILES: CC(C)[CH2][AlH][CH2]C(C)C.COC(=O)C[C@H](C)CC[C@H](O)C(C)C>>CC(C)[C@@H]1CC[C@@H](C)C[C@@H](O)O1.CC(C)CO[C@@H]1C[C@H](C)CC[C@@H](C(C)C)O1.CC(C)[C@@H](O)CC[C@@H](C)CC=O
+- SMILES: CC(C)C[AlH]CC(C)C.COC(=O)C[C@H](C)CC[C@H](O)C(C)C>>CC(C)[C@@H]1CC[C@@H](C)C[C@@H](O)O1.CC(C)CO[C@@H]1C[C@H](C)CC[C@@H](C(C)C)O1.CC(C)[C@@H](O)CC[C@@H](C)CC=O
 
 ## Reaction 31-301-CAS-22769975
 
 - Type: DIBAL‑H Partial reductions
 - Solvents: 75-09-2 (75-09-2), 108-88-3 (108-88-3), 109-99-9 (109-99-9), 7732-18-5 (7732-18-5)
-- SMILES: CC(C)[CH2][AlH][CH2]C(C)C.COC(=O)CCCCCO>>O=CCCCCCO.CC(C)COC1CCCCCO1
+- SMILES: CC(C)C[AlH]CC(C)C.COC(=O)CCCCCO>>O=CCCCCCO.CC(C)COC1CCCCCO1
 
 ## Reaction 31-313-CAS-19056968
 
@@ -181,7 +181,7 @@ Total reactions: 367
 - Yield %: 48
 - Reagents: 79-37-8 (79-37-8) [UNK], 304-59-6 (304-59-6) [ADDITIVE]
 - Solvents: 71-43-2 (71-43-2), 75-09-2 (75-09-2), 108-88-3 (108-88-3), 141-78-6 (141-78-6)
-- SMILES: C=C[C@@]12CC=CC[C@@H]1[C@@H](C(=O)O)C(=O)N(C)C2.CC(C)[CH2][AlH][CH2]C(C)C>>C=C[C@@]12CC=CC[C@@H]1[C@@H](CO)C(=O)N(C)C2.C=C[C@@]12CC=CC[C@@H]1[C@H](CO)C(=O)N(C)C2.C=C[C@@]12CC=CC[C@@H]1[C@@H](C=O)C(=O)N(C)C2.C=C[C@@]12CC=CC[C@@H]1[C@@H](COCC(C)C)C(=O)N(C)C2
+- SMILES: C=C[C@@]12CC=CC[C@@H]1[C@@H](C(=O)O)C(=O)N(C)C2.CC(C)C[AlH]CC(C)C>>C=C[C@@]12CC=CC[C@@H]1[C@@H](CO)C(=O)N(C)C2.C=C[C@@]12CC=CC[C@@H]1[C@H](CO)C(=O)N(C)C2.C=C[C@@]12CC=CC[C@@H]1[C@@H](C=O)C(=O)N(C)C2.C=C[C@@]12CC=CC[C@@H]1[C@@H](COCC(C)C)C(=O)N(C)C2
 
 ## Reaction 31-515-CAS-10250078
 

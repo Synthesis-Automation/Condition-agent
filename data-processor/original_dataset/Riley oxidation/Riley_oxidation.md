@@ -3353,7 +3353,7 @@ Total reactions: 557
 - Yield %: 70
 - Reagents: 7446-08-4 (7446-08-4) [UNK]
 - Solvents: 60-29-7 (60-29-7)
-- SMILES: CC(C)CC=NC(C(C)(C)C)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92>>CC(C)C(=O)C=NC(C(C)(C)C)[c-]12->[Fe+2]3456789(<-[cH]%10[cH]->3[cH]->4[cH-]->5[cH]->6%10)<-[cH]([cH]->7[cH]->81)[cH]->92
+- SMILES: CC(C)CC=NC(C(C)(C)C)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29>>CC(C)C(=O)C=NC(C(C)(C)C)[C-]12->[Fe+2]3456789(<-[CH-]%10[CH]3=[CH]4[CH]5=[CH]%106)[CH](=[CH]17)[CH]8=[CH]29
 
 ## Reaction 31-494-CAS-6243281
 
