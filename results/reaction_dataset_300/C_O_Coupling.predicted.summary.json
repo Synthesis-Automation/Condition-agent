@@ -1,0 +1,24 @@
+{
+  "empty_reaction_key": {
+    "count": 1,
+    "rate": 0.0033
+  },
+  "input_csv": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300\\C_O_Coupling.csv",
+  "low_reaction_key_quality": {
+    "count": 2,
+    "rate": 0.0067
+  },
+  "output_csv": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300\\C_O_Coupling.predicted.csv",
+  "prediction_errors": 0,
+  "processed_rows": 300,
+  "reaction_column": "reaction_smiles",
+  "total_rows": 300,
+  "unknown_reaction_type": {
+    "count": 1,
+    "rate": 0.0033
+  },
+  "with_mapping_warning": {
+    "count": 114,
+    "rate": 0.38
+  }
+}

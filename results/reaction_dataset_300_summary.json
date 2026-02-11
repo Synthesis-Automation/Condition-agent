@@ -1,0 +1,840 @@
+{
+  "files": [
+    {
+      "file": "Acetal_ketal_formation.csv",
+      "input_rows": 2814,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1524
+    },
+    {
+      "file": "Acyl_Halides_formation.csv",
+      "input_rows": 1952,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1195
+    },
+    {
+      "file": "Addition_of_Halogens_to_Double_or_Triple_Bonds.csv",
+      "input_rows": 1436,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1048
+    },
+    {
+      "file": "Addition_of_Hydrazine_Derivatives_to_Carbonyl_Compounds.csv",
+      "input_rows": 20,
+      "sampled_rows": 20,
+      "status": "ok",
+      "valid_rows": 20
+    },
+    {
+      "file": "Aldol_classic__Mukaiyama.csv",
+      "input_rows": 2348,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1752
+    },
+    {
+      "file": "Aliphatic_Halide_Exchange.csv",
+      "input_rows": 267,
+      "sampled_rows": 256,
+      "status": "ok",
+      "valid_rows": 256
+    },
+    {
+      "file": "Allylic_Benzylic_and_Vinylic_Halogenations.csv",
+      "input_rows": 1282,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1042
+    },
+    {
+      "file": "Amide_formation.csv",
+      "input_rows": 31497,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 30345
+    },
+    {
+      "file": "Anhydride_coupling.csv",
+      "input_rows": 1708,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1441
+    },
+    {
+      "file": "Appel_halogenation.csv",
+      "input_rows": 240,
+      "sampled_rows": 202,
+      "status": "ok",
+      "valid_rows": 202
+    },
+    {
+      "file": "Aromatic_Halogen_Exchange.csv",
+      "input_rows": 247,
+      "sampled_rows": 194,
+      "status": "ok",
+      "valid_rows": 194
+    },
+    {
+      "file": "BAIB.csv",
+      "input_rows": 1003,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 712
+    },
+    {
+      "file": "BalzSchiemann.csv",
+      "input_rows": 83,
+      "sampled_rows": 46,
+      "status": "ok",
+      "valid_rows": 46
+    },
+    {
+      "file": "BartonMcCombie_deoxygenation.csv",
+      "input_rows": 46,
+      "sampled_rows": 44,
+      "status": "ok",
+      "valid_rows": 44
+    },
+    {
+      "file": "Beckmann_rearrangement.csv",
+      "input_rows": 1462,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 483
+    },
+    {
+      "file": "Benzylic_oxidation.csv",
+      "input_rows": 50,
+      "sampled_rows": 42,
+      "status": "ok",
+      "valid_rows": 42
+    },
+    {
+      "file": "Biginelli_condensation.csv",
+      "input_rows": 2478,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 813
+    },
+    {
+      "file": "Birch_reduction.csv",
+      "input_rows": 860,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 700
+    },
+    {
+      "file": "Brown_Hydroboration.csv",
+      "input_rows": 1792,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1399
+    },
+    {
+      "file": "BuchererBergs.csv",
+      "input_rows": 35,
+      "sampled_rows": 34,
+      "status": "ok",
+      "valid_rows": 34
+    },
+    {
+      "file": "CDI-mediated_amidation.csv",
+      "input_rows": 1101,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1088
+    },
+    {
+      "file": "CH_amination_and_azidation.csv",
+      "input_rows": 2181,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1964
+    },
+    {
+      "file": "C_N_Coupling.csv",
+      "input_rows": 23817,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 21897
+    },
+    {
+      "file": "C_O_Coupling.csv",
+      "input_rows": 11751,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 9556
+    },
+    {
+      "file": "C_S_Coupling.csv",
+      "input_rows": 10641,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 7786
+    },
+    {
+      "file": "Carbamate_formation.csv",
+      "input_rows": 1435,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1355
+    },
+    {
+      "file": "Catalytic_hydrogenation.csv",
+      "input_rows": 1924,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1359
+    },
+    {
+      "file": "ChanLam_Narylation.csv",
+      "input_rows": 640,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 567
+    },
+    {
+      "file": "ChanLam_sulfonamide_converted.csv",
+      "input_rows": 3892,
+      "sampled_rows": 54,
+      "status": "ok",
+      "valid_rows": 54
+    },
+    {
+      "file": "Chlorination_SOCl2_oxalyl_chloride.csv",
+      "input_rows": 1077,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 839
+    },
+    {
+      "file": "Clemmensen_reduction.csv",
+      "input_rows": 166,
+      "sampled_rows": 116,
+      "status": "ok",
+      "valid_rows": 116
+    },
+    {
+      "file": "CuAAC_azidealkyne.csv",
+      "input_rows": 1093,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1093
+    },
+    {
+      "file": "Curtius_rearrangement.csv",
+      "input_rows": 816,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 779
+    },
+    {
+      "file": "DIBALH_Partial_reductions.csv",
+      "input_rows": 355,
+      "sampled_rows": 272,
+      "status": "ok",
+      "valid_rows": 272
+    },
+    {
+      "file": "Decarboxylative_arylation.csv",
+      "input_rows": 160,
+      "sampled_rows": 159,
+      "status": "ok",
+      "valid_rows": 159
+    },
+    {
+      "file": "Deoxy_fluorination.csv",
+      "input_rows": 929,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 759
+    },
+    {
+      "file": "DessMartin_periodinane_DMP_Alcohols__aldehydesketones.csv",
+      "input_rows": 490,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 467
+    },
+    {
+      "file": "Difluoromethylation.csv",
+      "input_rows": 307,
+      "sampled_rows": 292,
+      "status": "ok",
+      "valid_rows": 292
+    },
+    {
+      "file": "Electrophilic_fluorination.csv",
+      "input_rows": 280,
+      "sampled_rows": 220,
+      "status": "ok",
+      "valid_rows": 220
+    },
+    {
+      "file": "EschweilerClarke_methylation.csv",
+      "input_rows": 88,
+      "sampled_rows": 84,
+      "status": "ok",
+      "valid_rows": 84
+    },
+    {
+      "file": "Fischer_esterification.csv",
+      "input_rows": 693,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 535
+    },
+    {
+      "file": "Fischer_indole_synthesis.csv",
+      "input_rows": 542,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 356
+    },
+    {
+      "file": "Formation_of_Oximes.csv",
+      "input_rows": 10,
+      "sampled_rows": 10,
+      "status": "ok",
+      "valid_rows": 10
+    },
+    {
+      "file": "Gabriel_amine_synthesis.csv",
+      "input_rows": 248,
+      "sampled_rows": 235,
+      "status": "ok",
+      "valid_rows": 235
+    },
+    {
+      "file": "Gewald_reaction.csv",
+      "input_rows": 573,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 355
+    },
+    {
+      "file": "Giese_radical_additions.csv",
+      "input_rows": 532,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 506
+    },
+    {
+      "file": "GroebkeBlackburnBienaym.csv",
+      "input_rows": 431,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 427
+    },
+    {
+      "file": "Hantzsch_synthesis.csv",
+      "input_rows": 1730,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 436
+    },
+    {
+      "file": "HeckMizoroki_coupling.csv",
+      "input_rows": 2770,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 2532
+    },
+    {
+      "file": "Hiyama_coupling.csv",
+      "input_rows": 938,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 559
+    },
+    {
+      "file": "Hofmann_rearrangement.csv",
+      "input_rows": 591,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 460
+    },
+    {
+      "file": "HornerWadsworthEmmons.csv",
+      "input_rows": 1420,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1397
+    },
+    {
+      "file": "Hydrazinolysis.csv",
+      "input_rows": 1285,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1269
+    },
+    {
+      "file": "IBX.csv",
+      "input_rows": 1510,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1426
+    },
+    {
+      "file": "Ircatalyzed_CH_borylation.csv",
+      "input_rows": 940,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 863
+    },
+    {
+      "file": "Jones_oxidation.csv",
+      "input_rows": 84,
+      "sampled_rows": 82,
+      "status": "ok",
+      "valid_rows": 82
+    },
+    {
+      "file": "Julia-Kocienski_Olefination.csv",
+      "input_rows": 1303,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1244
+    },
+    {
+      "file": "KabachnikFields.csv",
+      "input_rows": 594,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 566
+    },
+    {
+      "file": "Knoevenagel_condensation.csv",
+      "input_rows": 1442,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1097
+    },
+    {
+      "file": "Knorr_pyrrole_synthesis.csv",
+      "input_rows": 652,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 519
+    },
+    {
+      "file": "Kumada_coupling.csv",
+      "input_rows": 2474,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1788
+    },
+    {
+      "file": "LiebeskindSrogl_coupling.csv",
+      "input_rows": 442,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 432
+    },
+    {
+      "file": "Mannich__Petasis_boronoMannich.csv",
+      "input_rows": 943,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 707
+    },
+    {
+      "file": "Michael_addition.csv",
+      "input_rows": 1394,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1278
+    },
+    {
+      "file": "Minisci.csv",
+      "input_rows": 262,
+      "sampled_rows": 252,
+      "status": "ok",
+      "valid_rows": 252
+    },
+    {
+      "file": "Mitsunobu_etherificationinversion.csv",
+      "input_rows": 972,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 926
+    },
+    {
+      "file": "NBS_NCS_NIS_halogenation.csv",
+      "input_rows": 2448,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 2047
+    },
+    {
+      "file": "NaBH4_carbonyl_reductions.csv",
+      "input_rows": 1087,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 787
+    },
+    {
+      "file": "Negishi_coupling.csv",
+      "input_rows": 2410,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 2205
+    },
+    {
+      "file": "Nitrile_hydration_Nitrile__amide.csv",
+      "input_rows": 2470,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1280
+    },
+    {
+      "file": "NozakiHiyamaKishi.csv",
+      "input_rows": 843,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 696
+    },
+    {
+      "file": "Olefin_metathesis.csv",
+      "input_rows": 1992,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1740
+    },
+    {
+      "file": "Oxidation-BAIB.csv",
+      "input_rows": 1003,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 712
+    },
+    {
+      "file": "Oxidation_IBX.csv",
+      "input_rows": 1510,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1426
+    },
+    {
+      "file": "Oxidation_of_Aromatic_Side_Chains.csv",
+      "input_rows": 50,
+      "sampled_rows": 42,
+      "status": "ok",
+      "valid_rows": 42
+    },
+    {
+      "file": "Oxidation_of_Arylmethanes_to_Aldehydes.csv",
+      "input_rows": 23,
+      "sampled_rows": 18,
+      "status": "ok",
+      "valid_rows": 18
+    },
+    {
+      "file": "Oximehy_drazone_formation.csv",
+      "input_rows": 30,
+      "sampled_rows": 30,
+      "status": "ok",
+      "valid_rows": 30
+    },
+    {
+      "file": "PaalKnorr_synthesis.csv",
+      "input_rows": 1953,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1240
+    },
+    {
+      "file": "Passerini_3component.csv",
+      "input_rows": 1638,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1444
+    },
+    {
+      "file": "PictetSpengler.csv",
+      "input_rows": 443,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 418
+    },
+    {
+      "file": "Reduction-Borane.csv",
+      "input_rows": 816,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 502
+    },
+    {
+      "file": "Reduction_LAH_LiAlH4.csv",
+      "input_rows": 609,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 436
+    },
+    {
+      "file": "Reduction_NaBHOAc3_NaBH3CN.csv",
+      "input_rows": 1172,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1157
+    },
+    {
+      "file": "Reductive_amination.csv",
+      "input_rows": 3247,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 3002
+    },
+    {
+      "file": "Riley_oxidation.csv",
+      "input_rows": 530,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 367
+    },
+    {
+      "file": "Rosenmund_reduction.csv",
+      "input_rows": 17,
+      "sampled_rows": 16,
+      "status": "ok",
+      "valid_rows": 16
+    },
+    {
+      "file": "RuppertPrakash_TMSCF3.csv",
+      "input_rows": 1221,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 840
+    },
+    {
+      "file": "SNAr_amination.csv",
+      "input_rows": 1934,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1877
+    },
+    {
+      "file": "SPAAC_strainpromoted_click.csv",
+      "input_rows": 232,
+      "sampled_rows": 219,
+      "status": "ok",
+      "valid_rows": 219
+    },
+    {
+      "file": "Sandmeyer_reactions.csv",
+      "input_rows": 138,
+      "sampled_rows": 132,
+      "status": "ok",
+      "valid_rows": 132
+    },
+    {
+      "file": "Sharpless_dihydroxylation.csv",
+      "input_rows": 434,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 400
+    },
+    {
+      "file": "Skraup_DoebnerMiller.csv",
+      "input_rows": 32,
+      "sampled_rows": 29,
+      "status": "ok",
+      "valid_rows": 29
+    },
+    {
+      "file": "Sonogashira_coupling.csv",
+      "input_rows": 1191,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1147
+    },
+    {
+      "file": "Staudinger_reduction.csv",
+      "input_rows": 1541,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1491
+    },
+    {
+      "file": "Steglich_esterification.csv",
+      "input_rows": 623,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 612
+    },
+    {
+      "file": "Stille_coupling.csv",
+      "input_rows": 2671,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1861
+    },
+    {
+      "file": "Strainpromoted_click.csv",
+      "input_rows": 198,
+      "sampled_rows": 186,
+      "status": "ok",
+      "valid_rows": 186
+    },
+    {
+      "file": "SuFEx.csv",
+      "input_rows": 460,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 460
+    },
+    {
+      "file": "Sulfonamide_formation.csv",
+      "input_rows": 238,
+      "sampled_rows": 236,
+      "status": "ok",
+      "valid_rows": 236
+    },
+    {
+      "file": "Swern_oxidation.csv",
+      "input_rows": 724,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 520
+    },
+    {
+      "file": "TEMPObleach-Primary_alcohols_to_aldehydesacids.csv",
+      "input_rows": 1166,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 650
+    },
+    {
+      "file": "TEMPObleach_Oxidations_Primary_alcohols__aldehydesacids.csv",
+      "input_rows": 1199,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 683
+    },
+    {
+      "file": "TPAPNMO_Catalytic_Ru_oxidations.csv",
+      "input_rows": 52,
+      "sampled_rows": 37,
+      "status": "ok",
+      "valid_rows": 37
+    },
+    {
+      "file": "TetrazineTCO_iEDDA.csv",
+      "input_rows": 148,
+      "sampled_rows": 141,
+      "status": "ok",
+      "valid_rows": 141
+    },
+    {
+      "file": "Thioether_formation.csv",
+      "input_rows": 1933,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1875
+    },
+    {
+      "file": "Thiolene_and_thiolyne.csv",
+      "input_rows": 334,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 320
+    },
+    {
+      "file": "Transfer_hydrogenation.csv",
+      "input_rows": 1997,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 801
+    },
+    {
+      "file": "Trifluoromethylation.csv",
+      "input_rows": 417,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 390
+    },
+    {
+      "file": "Ugi_4-component_reaction.csv",
+      "input_rows": 1328,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1317
+    },
+    {
+      "file": "Urea_and_thiourea_formation.csv",
+      "input_rows": 1437,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 1369
+    },
+    {
+      "file": "Wacker_oxidation.csv",
+      "input_rows": 1178,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 715
+    },
+    {
+      "file": "Wacker_oxidation_Alkene__ketone_PdCl2_CuCl_O2.csv",
+      "input_rows": 1228,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 762
+    },
+    {
+      "file": "Weinreb_amide.csv",
+      "input_rows": 544,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 483
+    },
+    {
+      "file": "Williamson_ether_synthesis.csv",
+      "input_rows": 1000,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 946
+    },
+    {
+      "file": "Wittig_reaction.csv",
+      "input_rows": 981,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 945
+    },
+    {
+      "file": "WolffKishner.csv",
+      "input_rows": 398,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 343
+    },
+    {
+      "file": "mCPBA_epoxidation_Alkene__epoxide.csv",
+      "input_rows": 661,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 480
+    },
+    {
+      "file": "suzuki_miyaura.csv",
+      "input_rows": 45119,
+      "sampled_rows": 300,
+      "status": "ok",
+      "valid_rows": 39509
+    }
+  ],
+  "files_scanned": 118,
+  "files_with_lt_target": 30,
+  "input_dir": "C:\\Git-softwares\\Condition-agent\\data-processor\\reaction_dataset",
+  "output_dir": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300",
+  "per_file": 300,
+  "reaction_column": "reaction_smiles",
+  "seed": 20260211,
+  "total_input_rows": 236586,
+  "total_sampled_rows": 30100,
+  "total_valid_rows": 195596
+}
