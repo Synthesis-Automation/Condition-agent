@@ -164,7 +164,9 @@ def _collect_ranked_catalog_candidates(
     candidates: List[Dict[str, Any]] = []
 
     for catalog_index, (reaction_id, defn) in enumerate(definitions.items()):
-        if not defn.reactants:
+        has_reactant_slots = bool(defn.reactants)
+        has_product_slots = bool(defn.products)
+        if not has_reactant_slots and not has_product_slots:
             continue
 
         all_slots_match = True
@@ -183,7 +185,9 @@ def _collect_ranked_catalog_candidates(
                 all_slots_match = False
                 break
 
-        if not all_slots_match or len(matched_slots) < 1:
+        if not all_slots_match:
+            continue
+        if has_reactant_slots and len(matched_slots) < 1:
             continue
 
         product_match = True
@@ -268,7 +272,9 @@ def _match_reaction_catalog_legacy(
     """Return first taxonomy match (legacy pre-specificity behavior)."""
     definitions, _ = _get_catalog()
     for reaction_id, defn in definitions.items():
-        if not defn.reactants:
+        has_reactant_slots = bool(defn.reactants)
+        has_product_slots = bool(defn.products)
+        if not has_reactant_slots and not has_product_slots:
             continue
 
         all_slots_match = True
@@ -282,7 +288,9 @@ def _match_reaction_catalog_legacy(
                 all_slots_match = False
                 break
 
-        if not all_slots_match or len(matched_slots) < 1:
+        if not all_slots_match:
+            continue
+        if has_reactant_slots and len(matched_slots) < 1:
             continue
 
         product_match = True

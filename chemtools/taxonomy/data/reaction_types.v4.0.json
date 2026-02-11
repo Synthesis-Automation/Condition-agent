@@ -269,6 +269,164 @@
       "description": "N/O/S nucleophilic substitution on alkyl electrophiles (halides/sulfonates), covering SN2-like alkylation."
     },
     {
+      "id": "Alcohol_to_Alkyl_Halide",
+      "reactants": {
+        "substrate": "@alcohols_oh"
+      },
+      "products": {
+        "product": [
+          "Alkyl-I",
+          "Alkyl-Br",
+          "Alkyl-Cl",
+          "Alkyl-F",
+          "RCH2-I",
+          "RCH2-Br",
+          "RCH2-Cl",
+          "RCH2-F",
+          "R2CH-I",
+          "R2CH-Br",
+          "R2CH-Cl",
+          "R2CH-F",
+          "R3C-I",
+          "R3C-Br",
+          "R3C-Cl",
+          "R3C-F",
+          "CH3-I",
+          "CH3-Br",
+          "CH3-Cl",
+          "CH3-F",
+          "Bn-I",
+          "Bn-Br",
+          "Bn-Cl",
+          "Bn-F",
+          "Allyl-I",
+          "Allyl-Br",
+          "Allyl-Cl",
+          "Allyl-F",
+          "Propargyl-I",
+          "Propargyl-Br",
+          "Propargyl-Cl"
+        ]
+      },
+      "examples": [
+        "CCO>>CCBr",
+        "c1ccccc1CO>>c1ccccc1CBr",
+        "CC(C)O>>CC(C)Cl"
+      ],
+      "aliases": [
+        "alcohol_to_alkyl_halide",
+        "alcohol_halogenation",
+        "Appel_halogenation",
+        "Appel halogenation",
+        "Chlorination_SOCl2_oxalyl_chloride",
+        "Chlorination SOCl2 oxalyl chloride",
+        "Deoxy_fluorination"
+      ],
+      "description": "Conversion of alcohols to alkyl/benzylic/allylic halides (e.g., Appel, SOCl2/oxalyl chloride, PBr3, deoxyfluorination).",
+      "constraints": {
+        "include_reacted": [],
+        "exclude_reacted": [],
+        "include_formed": [],
+        "exclude_formed": [],
+        "min_reactant_slot_matches": 1,
+        "min_product_slot_matches": 1
+      }
+    },
+    {
+      "id": "Aliphatic_Halide_Exchange",
+      "reactants": {
+        "substrate": [
+          "Alkyl-I",
+          "Alkyl-Br",
+          "Alkyl-Cl",
+          "Alkyl-F",
+          "RCH2-I",
+          "RCH2-Br",
+          "RCH2-Cl",
+          "RCH2-F",
+          "R2CH-I",
+          "R2CH-Br",
+          "R2CH-Cl",
+          "R2CH-F",
+          "R3C-I",
+          "R3C-Br",
+          "R3C-Cl",
+          "R3C-F",
+          "CH3-I",
+          "CH3-Br",
+          "CH3-Cl",
+          "CH3-F",
+          "Bn-I",
+          "Bn-Br",
+          "Bn-Cl",
+          "Bn-F",
+          "Allyl-I",
+          "Allyl-Br",
+          "Allyl-Cl",
+          "Allyl-F",
+          "Propargyl-I",
+          "Propargyl-Br",
+          "Propargyl-Cl"
+        ]
+      },
+      "products": {
+        "product": [
+          "Alkyl-I",
+          "Alkyl-Br",
+          "Alkyl-Cl",
+          "Alkyl-F",
+          "RCH2-I",
+          "RCH2-Br",
+          "RCH2-Cl",
+          "RCH2-F",
+          "R2CH-I",
+          "R2CH-Br",
+          "R2CH-Cl",
+          "R2CH-F",
+          "R3C-I",
+          "R3C-Br",
+          "R3C-Cl",
+          "R3C-F",
+          "CH3-I",
+          "CH3-Br",
+          "CH3-Cl",
+          "CH3-F",
+          "Bn-I",
+          "Bn-Br",
+          "Bn-Cl",
+          "Bn-F",
+          "Allyl-I",
+          "Allyl-Br",
+          "Allyl-Cl",
+          "Allyl-F",
+          "Propargyl-I",
+          "Propargyl-Br",
+          "Propargyl-Cl"
+        ]
+      },
+      "examples": [
+        "CCCl>>CCI",
+        "CCBr>>CCCl",
+        "c1ccccc1CCl>>c1ccccc1CI"
+      ],
+      "aliases": [
+        "Aliphatic_Halide_Exchange",
+        "Aliphatic Halide Exchange",
+        "aliphatic_halide_exchange",
+        "alkyl_halide_exchange",
+        "Finkelstein"
+      ],
+      "description": "Interconversion of alkyl/benzylic/allylic halides (including Finkelstein-type exchange).",
+      "constraints": {
+        "include_reacted": [],
+        "exclude_reacted": [],
+        "include_formed": [],
+        "exclude_formed": [],
+        "min_reactant_slot_matches": 1,
+        "min_product_slot_matches": 1
+      }
+    },
+    {
       "id": "Sonogashira",
       "reactants": {
         "electrophile": "@sp2_electrophiles",
@@ -524,7 +682,9 @@
       ],
       "aliases": [
         "sandmeyer",
-        "sandmeyer_reaction"
+        "sandmeyer_reaction",
+        "Sandmeyer_reactions",
+        "BalzSchiemann"
       ]
     },
     {
@@ -1129,19 +1289,50 @@
         "halogenation",
         "bromination",
         "chlorination",
-        "iodination",
-        "Aliphatic_Halide_Exchange",
-        "Appel_halogenation",
-        "Aromatic_Halogen_Exchange",
-        "BalzSchiemann",
-        "Chlorination_SOCl2_oxalyl_chloride",
-        "Deoxy_fluorination",
-        "Difluoromethylation",
-        "Electrophilic_fluorination",
-        "NBS_NCS_NIS_halogenation",
-        "Sandmeyer_reactions",
-        "Trifluoromethylation"
+        "iodination"
       ]
+    },
+    {
+      "id": "Halogenation_unsaturated",
+      "reactants": {},
+      "products": {
+        "product": [
+          "Alkenyl-Br",
+          "Alkenyl-Cl",
+          "Alkenyl-I",
+          "Alkenyl-F",
+          "Alkynyl-Br",
+          "Alkynyl-Cl",
+          "Alkynyl-I",
+          "Alkynyl-F",
+          "Allyl-Br",
+          "Allyl-Cl",
+          "Allyl-I",
+          "Allyl-F",
+          "Propargyl-Br",
+          "Propargyl-Cl",
+          "Propargyl-I"
+        ]
+      },
+      "examples": [
+        "C=C>>CCBr",
+        "C#C>>C=CBr"
+      ],
+      "aliases": [
+        "halogenation_unsaturated",
+        "Addition_of_Halogens_to_Double_or_Triple_Bonds",
+        "Allylic_Benzylic_and_Vinylic_Halogenations",
+        "NBS_NCS_NIS_halogenation"
+      ],
+      "description": "Halogenation of unsaturated/aliphatic allylic-propargylic motifs where product-side vinylic/allylic/propargylic halides are dominant.",
+      "constraints": {
+        "include_reacted": [],
+        "exclude_reacted": [],
+        "include_formed": [],
+        "exclude_formed": [],
+        "min_reactant_slot_matches": 0,
+        "min_product_slot_matches": 1
+      }
     },
     {
       "id": "Trifluoromethylation",

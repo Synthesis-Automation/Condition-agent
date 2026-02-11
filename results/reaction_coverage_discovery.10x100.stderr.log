@@ -1,0 +1,111 @@
+C:\Users\xubar\AppData\Local\Programs\Python\Python312\Lib\site-packages\rxnmapper\batched_mapper.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+Token indices sequence length is longer than the specified maximum sequence length for this model (867 > 512). Running this sequence through the model will result in indexing errors
+RXNMapper failed to map reaction: Reaction SMILES has 867 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 867 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 867 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 867 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 867 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 867 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 540 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 540 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 540 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 540 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 540 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 540 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 911 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 911 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 911 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 911 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 911 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 911 tokens, should be at most 512.

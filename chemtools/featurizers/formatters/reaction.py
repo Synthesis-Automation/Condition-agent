@@ -1236,6 +1236,48 @@ def _infer_multi_event_fallback_label(reaction_events: Dict[str, Any]) -> Option
         return None
     signature = format_multi_event_signature(reaction_events.get("events") or [])
     if not signature:
+        events = reaction_events.get("events") or []
+        if isinstance(events, list):
+            for event in events:
+                if not isinstance(event, dict):
+                    continue
+                kind = str(event.get("kind") or "").strip()
+                if not kind:
+                    continue
+                code = kind
+                if kind in {
+                    "intramolecular_likely",
+                    "intermolecular_or_multi_component",
+                }:
+                    continue
+                if kind == "c_n_bond_formation":
+                    code = "C-N"
+                elif kind == "c_o_bond_formation":
+                    code = "C-O"
+                elif kind == "c_s_bond_formation":
+                    code = "C-S"
+                elif kind == "c_c_bond_formation":
+                    code = "C-C"
+                elif kind == "leaving_group_displacement":
+                    code = "LGDisp"
+                elif kind == "amidation_like":
+                    code = "Amid"
+                elif kind == "ester_hydrolysis_like":
+                    code = "EsterHyd"
+                elif kind == "ring_closure_or_annulation":
+                    code = "Ann"
+                elif kind == "benzyl_o_alkylation_like":
+                    code = "BzOAlk"
+                return f"Event:{code}"
+        quality_payload = reaction_events.get("reaction_key_quality") or {}
+        if isinstance(quality_payload, dict):
+            reasons = quality_payload.get("reasons") or []
+            reasons_set = {str(r).strip() for r in reasons if str(r).strip()}
+            if {
+                "missing_formed_bond_and_product_motif_evidence",
+                "missing_bond_key",
+            }.issubset(reasons_set):
+                return "Unresolved:NoMotifEvidence"
         return None
     return f"Multi-Event:{signature}"
 

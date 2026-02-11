@@ -1,0 +1,1059 @@
+C:\Users\xubar\AppData\Local\Programs\Python\Python312\Lib\site-packages\rxnmapper\batched_mapper.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Token indices sequence length is longer than the specified maximum sequence length for this model (527 > 512). Running this sequence through the model will result in indexing errors
+RXNMapper failed to map reaction: Reaction SMILES has 527 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 527 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 527 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 527 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 527 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 527 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 559 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 559 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 559 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 559 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 559 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 559 tokens, should be at most 512.
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: Reaction SMILES has 519 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 519 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 519 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 519 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 519 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 519 tokens, should be at most 512.
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: Reaction SMILES has 867 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 867 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 867 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 867 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 867 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 867 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 540 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 540 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 540 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 540 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 540 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 540 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 911 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 911 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 911 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 911 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 911 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 911 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 614 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 614 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 614 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 614 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 614 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 614 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 551 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 551 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 551 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 551 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 551 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 551 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 654 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 654 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 654 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 654 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 654 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 654 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 567 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 567 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 567 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 567 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 567 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 567 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 704 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 704 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 704 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 704 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 704 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 704 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 630 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 630 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 630 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 630 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 630 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 630 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 640 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 640 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 640 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 640 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 640 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 640 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1053 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1053 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1053 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1053 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1053 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1053 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 547 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 547 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 547 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 547 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 547 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 547 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 889 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 889 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 889 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 889 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 889 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 889 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 643 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 643 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 643 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 643 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 643 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 643 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 576 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 576 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 576 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 576 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 576 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 576 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 659 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 659 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 659 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 659 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 659 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 659 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 640 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 640 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 640 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 640 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 640 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 640 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 535 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 535 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 535 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 535 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 535 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 535 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 607 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 607 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 607 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 607 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 607 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 607 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 515 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 515 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 515 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 515 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 515 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 515 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 562 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 562 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 562 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 562 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 562 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 562 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 525 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 525 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 525 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 525 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 525 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 525 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 524 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 524 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 524 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 524 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 524 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 524 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 539 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 539 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 539 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 539 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 539 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 539 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 575 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 575 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 575 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 575 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 575 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 575 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 806 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 806 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 765 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 765 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 765 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 765 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 765 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 765 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 801 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 801 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 801 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 801 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 801 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 801 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 785 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 785 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 785 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 785 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 785 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 785 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 759 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 759 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 759 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 759 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 759 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 759 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 667 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 667 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 667 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 667 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 667 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 667 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 940 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 940 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 940 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 940 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 940 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 940 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 624 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 624 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 624 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 624 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 624 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 624 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1090 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1090 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1090 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1090 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1090 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1090 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1206 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1206 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1206 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1206 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1206 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1206 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 893 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 893 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 893 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 893 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 893 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 893 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 898 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 898 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 898 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 898 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 898 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 898 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 563 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 563 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 563 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 563 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 563 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 563 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 809 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 809 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 809 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 809 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 809 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 809 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 805 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 805 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 805 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 805 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 805 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 805 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 805 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 805 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 805 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 805 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 805 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 805 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 556 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 556 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 556 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 556 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 556 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 556 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 800 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 800 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 800 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 800 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 800 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 800 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 970 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 970 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 970 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 970 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 970 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 970 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1287 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1287 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1287 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1287 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1287 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1287 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 571 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 571 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 571 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 571 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 571 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 571 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1143 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1143 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1143 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1143 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1143 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1143 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1311 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1311 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1311 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1311 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1311 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1311 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1381 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1381 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1381 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1381 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1381 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1381 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 547 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 547 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 547 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 547 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 547 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 547 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 703 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 703 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 703 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 703 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 703 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 703 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 787 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 787 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 787 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 787 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 787 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 787 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 553 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 553 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 553 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 553 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 553 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 553 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 541 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 541 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 541 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 541 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 541 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 541 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 731 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 731 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 731 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 731 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 731 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 731 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 686 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 686 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 686 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 686 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 686 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 686 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 864 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 864 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 864 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 864 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 864 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 864 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 791 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 791 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 791 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 791 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 791 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 791 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 719 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 719 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 719 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 719 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 719 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 719 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 649 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 649 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 649 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 649 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 649 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 649 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 541 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 541 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 541 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 541 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 541 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 541 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 575 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 575 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 575 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 575 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 575 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 575 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 589 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 589 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 589 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 589 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 589 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 589 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 756 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 756 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 756 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 756 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 756 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 756 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 643 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 643 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 643 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 643 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 643 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 643 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 762 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 762 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 762 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 762 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 762 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 762 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 643 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 643 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 643 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 643 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 643 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 643 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 553 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 553 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 553 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 553 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 553 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 553 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 597 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 597 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 597 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 597 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 597 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 597 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 572 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 572 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 572 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 572 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 572 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 572 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 570 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 570 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 570 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 570 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 570 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 570 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1022 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1022 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1022 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1022 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 1022 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 1022 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 601 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 601 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 601 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 601 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 601 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 601 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 574 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 574 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 574 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 574 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 574 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 574 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 537 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 537 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 537 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 537 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 537 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 537 tokens, should be at most 512.
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: Reaction SMILES has 602 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 602 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 602 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 602 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 602 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 602 tokens, should be at most 512.
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: "" is not a valid SMILES string
+Atom mapping failed: "" is not a valid SMILES string
+RXNMapper failed to map reaction: Reaction SMILES has 886 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 886 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 886 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 886 tokens, should be at most 512.
+RXNMapper failed to map reaction: Reaction SMILES has 886 tokens, should be at most 512.
+Atom mapping failed: Reaction SMILES has 886 tokens, should be at most 512.
