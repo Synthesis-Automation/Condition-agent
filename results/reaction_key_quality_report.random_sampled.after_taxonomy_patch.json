@@ -1,0 +1,98 @@
+{
+  "empty_reaction_key": {
+    "count": 2,
+    "rate": 0.0058
+  },
+  "error_count": 0,
+  "low_reaction_key_quality": {
+    "count": 6,
+    "rate": 0.0174
+  },
+  "quality_levels": {
+    "high": 293,
+    "low": 4,
+    "medium": 46,
+    "unknown": 2
+  },
+  "top_anomalies": [
+    [
+      "mapping_unreliable_fallback_used",
+      143
+    ],
+    [
+      "multi_transform_record_possible",
+      50
+    ],
+    [
+      "amidation_without_explicit_activation_marker",
+      13
+    ]
+  ],
+  "top_unresolved_motif_signatures": [
+    [
+      "none -> none",
+      6
+    ],
+    [
+      "Alkyl-COR|R_acidic-H -> none",
+      3
+    ],
+    [
+      "RCH2-COR|R_acidic-H -> none",
+      3
+    ],
+    [
+      "R2CH-CO2H|RCH2-OH|R_acidic-H -> Alkyl-N(R)CO2R",
+      2
+    ],
+    [
+      "Acyl-CO2H|Ar-Br -> Ar-CONR2",
+      2
+    ],
+    [
+      "Alkyl-H|Inorganic|RCH2-CHO|R_acidic-H -> RCH2-OR",
+      2
+    ],
+    [
+      "Alkyl-H -> Ar-Bpin",
+      2
+    ],
+    [
+      "Ar-CHO|RCH2-NHR -> Bn-NR2|RCH2-NR2",
+      2
+    ],
+    [
+      "Alkyl-COCl -> RCH2-CHO",
+      2
+    ],
+    [
+      "RCH2-CO2H|RCH2-SH -> none",
+      2
+    ],
+    [
+      "RCH2-SH -> RCH2-SR",
+      2
+    ],
+    [
+      "Alkyl-F|Alkyl-I|Ar-I|HeteroAr-H -> Ar-CF3",
+      2
+    ],
+    [
+      "none -> RCH2-COR|R_acidic-H",
+      2
+    ],
+    [
+      "Alkyl-Si*|RCH2-COR|R_acidic-H -> RCH2-OR",
+      1
+    ],
+    [
+      "Ar-CHO|CH3-OH -> R2CH-OR",
+      1
+    ]
+  ],
+  "total_reactions": 345,
+  "unknown_reaction_type": {
+    "count": 168,
+    "rate": 0.487
+  }
+}

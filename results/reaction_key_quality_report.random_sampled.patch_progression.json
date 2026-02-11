@@ -1,0 +1,27 @@
+{
+  "deltas": {
+    "unknown_v1_minus_orig": -0.1217,
+    "unknown_v2_minus_orig": -0.1362,
+    "unknown_v2_minus_v1": -0.0145
+  },
+  "empty_key_rate": {
+    "orig": 0.0058,
+    "v1": 0.0058,
+    "v2": 0.0058
+  },
+  "low_quality_rate": {
+    "orig": 0.0174,
+    "v1": 0.0174,
+    "v2": 0.0174
+  },
+  "totals": {
+    "orig": 345,
+    "v1": 345,
+    "v2": 345
+  },
+  "unknown_rate": {
+    "orig": 0.6087,
+    "v1": 0.487,
+    "v2": 0.4725
+  }
+}

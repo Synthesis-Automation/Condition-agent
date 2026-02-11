@@ -53,6 +53,32 @@
       "description": "Pd-catalyzed borylation of aryl/vinyl electrophiles to form boronate esters (Miyaura borylation)."
     },
     {
+      "id": "Ircatalyzed_CH_borylation",
+      "reactants": {
+        "substrate": [
+          "Ar-H",
+          "HeteroAr-H",
+          "AromN-H"
+        ]
+      },
+      "products": {
+        "product": "@organoboron"
+      },
+      "catalysts": [
+        "Ir"
+      ],
+      "examples": [
+        "c1ccccc1.B1OC(C)(C)C(C)(C)O1B2OC(C)(C)C(C)(C)O2>>B1OC(C)(C)C(C)(C)O1c1ccccc1"
+      ],
+      "aliases": [
+        "Ircatalyzed_CH_borylation",
+        "ir_c_h_borylation",
+        "C-H borylation",
+        "Ir-catalyzed C-H borylation"
+      ],
+      "description": "Direct C-H borylation of arenes/heteroarenes under iridium catalysis."
+    },
+    {
       "id": "C_N_Coupling",
       "aliases": [
         "C-N Coupling",
@@ -971,7 +997,10 @@
     {
       "id": "Oxidation_alcohol",
       "reactants": {
-        "substrate": "@alcohols_oh"
+        "substrate": [
+          "@alcohols_oh",
+          "Ar-Alkyl"
+        ]
       },
       "products": {
         "product": [
@@ -983,8 +1012,35 @@
         "c1ccccc1CO>>c1ccccc1C=O"
       ],
       "aliases": [
-        "oxidation_alcohol"
-      ]
+        "oxidation_alcohol",
+        "Benzylic_oxidation",
+        "Oxidation_of_Aromatic_Side_Chains"
+      ],
+      "description": "Oxidation of alcohols and benzylic side chains to carbonyl or carboxylic-acid products."
+    },
+    {
+      "id": "Reduction_carbonyl",
+      "reactants": {
+        "substrate": "@carbonyls"
+      },
+      "products": {
+        "product": [
+          "@alcohols_oh",
+          "Ar-Alkyl"
+        ]
+      },
+      "examples": [
+        "CC(=O)c1ccccc1>>CC(O)c1ccccc1"
+      ],
+      "aliases": [
+        "reduction_carbonyl",
+        "carbonyl_reduction",
+        "NaBH4_carbonyl_reductions",
+        "Reduction_LAH_LiAlH4",
+        "Reduction-Borane",
+        "DIBALH_Partial_reductions"
+      ],
+      "description": "Reduction of aldehydes/ketones to alcohol products using hydride reagents."
     },
     {
       "id": "Reduction_nitro",
@@ -1006,10 +1062,60 @@
       ]
     },
     {
+      "id": "Rosenmund_reduction",
+      "reactants": {
+        "substrate": "@acyl_halides"
+      },
+      "products": {
+        "product": [
+          "Alkyl-CHO",
+          "Ar-CHO",
+          "RCH2-CHO",
+          "R2CH-CHO",
+          "R3C-CHO"
+        ]
+      },
+      "examples": [
+        "O=C(Cl)c1ccccc1>>O=Cc1ccccc1"
+      ],
+      "aliases": [
+        "rosenmund_reduction",
+        "Rosenmund_reduction",
+        "Rosenmund reduction"
+      ],
+      "description": "Selective reduction of acyl halides to aldehydes (Rosenmund-type)."
+    },
+    {
+      "id": "Wacker_oxidation",
+      "reactants": {
+        "substrate": [
+          "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
+          "Alkenyl-H",
+          "Alkenyl-Alkenyl",
+          "Alkenyl_terminal-Alkenyl_terminal"
+        ]
+      },
+      "products": {
+        "product": "@carbonyls"
+      },
+      "examples": [
+        "C=CC>>CC(=O)C"
+      ],
+      "aliases": [
+        "wacker_oxidation",
+        "Wacker_oxidation_Alkene__ketone_PdCl2_CuCl_O2",
+        "Wacker oxidation. Alkene → ketone (PdCl2 CuCl O2)"
+      ],
+      "description": "Pd/Cu-catalyzed oxidation of alkenes to carbonyl products (Wacker oxidation)."
+    },
+    {
       "id": "Halogenation_aromatic",
       "reactants": {
         "substrate": [
-          "Ar-H"
+          "Ar-H",
+          "HeteroAr-H",
+          "AromN-H"
         ]
       },
       "products": {
@@ -1036,6 +1142,34 @@
         "Sandmeyer_reactions",
         "Trifluoromethylation"
       ]
+    },
+    {
+      "id": "Trifluoromethylation",
+      "reactants": {
+        "substrate": [
+          "Ar-H",
+          "HeteroAr-H",
+          "Ar-I",
+          "Ar-Br",
+          "HeteroAr-I",
+          "HeteroAr-Br"
+        ]
+      },
+      "products": {
+        "product": [
+          "Ar-CF3",
+          "HeteroAr-CF3",
+          "Alkenyl-CF3"
+        ]
+      },
+      "examples": [
+        "c1ccccc1>>FC(F)(F)c1ccccc1"
+      ],
+      "aliases": [
+        "trifluoromethylation",
+        "Trifluoromethylation"
+      ],
+      "description": "Installation of CF3 group on aryl/heteroaryl/alkenyl substrates."
     },
     {
       "id": "Epoxidation",
