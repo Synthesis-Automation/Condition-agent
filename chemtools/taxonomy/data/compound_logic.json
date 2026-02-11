@@ -284,8 +284,12 @@
         "Alkyl-NRCOR",
         "Ar-NHCOR",
         "Ar-NRCOR",
-        "Alkyl-N(R)SO2R",
-        "Ar-N(R)SO2R"
+        "Ar-SO2NH2",
+        "Ar-SO2NHR",
+        "Ar-SO2NR2",
+        "Alkyl-SO2NH2",
+        "Alkyl-SO2NHR",
+        "Alkyl-SO2NR2"
       ],
       "usage": [
         "Alkyl_Nucleophilic_Substitution"
@@ -363,7 +367,7 @@
     },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
-      "description": "Terminal alkynes (C\u2261C-H) for Sonogashira coupling.",
+      "description": "Terminal alkynes (C≡C-H) for Sonogashira coupling.",
       "members": [
         "Ar-Alkynyl_terminal",
         "Alkyl-Alkynyl_terminal"
@@ -424,10 +428,15 @@
       ]
     },
     "aryl_sulfonamides": {
-      "name": "Aryl Sulfonamides",
-      "description": "N-aryl sulfonamide products from C-N coupling.",
+      "name": "Sulfonamides",
+      "description": "Sulfonamide products tracked via explicit SO2NHx motifs.",
       "members": [
-        "Ar-N(R)SO2R"
+        "Ar-SO2NH2",
+        "Ar-SO2NHR",
+        "Ar-SO2NR2",
+        "Alkyl-SO2NH2",
+        "Alkyl-SO2NHR",
+        "Alkyl-SO2NR2"
       ],
       "usage": [
         "C_N_Coupling",
@@ -525,17 +534,6 @@
       "usage": [
         "Reductive_amination",
         "Hydrogenation"
-      ]
-    },
-    "carbamate_amines": {
-      "name": "Carbamate-Protected Amines",
-      "description": "N-protected amine products commonly formed in reductive amination workflows.",
-      "members": [
-        "Alkyl-N(R)CO2R",
-        "Ar-N(R)CO2R"
-      ],
-      "usage": [
-        "Reductive_amination"
       ]
     },
     "esters": {

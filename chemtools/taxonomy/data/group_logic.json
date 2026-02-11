@@ -283,13 +283,6 @@
       ],
       "description": "Thiol and thioether groups."
     },
-    "Carbamate_All": {
-      "name": "Carbamate (All)",
-      "members": [
-        "-N(R)CO2R"
-      ],
-      "description": "Secondary and tertiary carbamates."
-    },
     "Fluorinated_Group": {
       "name": "Fluorinated Group",
       "members": [

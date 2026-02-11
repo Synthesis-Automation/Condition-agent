@@ -20,7 +20,8 @@ def test_chan_lam_cn_detects_aryl_sulfonamide_nucleophile() -> None:
     reaction_key = result.get("reaction_key") or ""
     assert result.get("reaction_type") == "Chan_Lam_C_N_Coupling"
     assert "Ar-SO2NH2" in reaction_key
-    assert "Ar-N(R)SO2R" in reaction_key
+    assert "SO2NHR" in reaction_key
+    assert "N(R)SO2R" not in reaction_key
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
@@ -39,5 +40,5 @@ def test_chan_lam_cn_detects_alkyl_sulfonamide_nucleophile() -> None:
     reaction_key = result.get("reaction_key") or ""
     assert result.get("reaction_type") == "Chan_Lam_C_N_Coupling"
     assert "Alkyl-SO2NH2" in reaction_key
-    assert "Ar-N(R)SO2R" in reaction_key
-
+    assert "SO2NHR" in reaction_key
+    assert "N(R)SO2R" not in reaction_key

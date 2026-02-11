@@ -4,13 +4,6 @@
   "notes": "Mapping-only attachpoint convention:\n- Scaffold groups (kind=scaffold): the attach atom is the atom mapped as :1 in `smarts`.\n- Substituent groups (kind=substituent): the attach atom is the atom mapped as :2 in `smarts`.\n- If a group has multiple attachpoints, it may contain both :1 and :2 (or multiple mapped atoms) in `smarts`.\nThe legacy fields `attach_points` and `attach_labels` were removed; attachpoints are inferred from atom-maps in `smarts`.",
   "groups": [
     {
-      "id": "CH3",
-      "kind": "scaffold",
-      "priority": 3,
-      "smarts": "[CX4H3:1]",
-      "description": "Methyl (0° alkyl) attachment point (CH3-)."
-    },
-    {
       "id": "Ar",
       "kind": "scaffold",
       "priority": 5,
@@ -46,11 +39,32 @@
       "description": "Terminal alkenyl attachment (R-CH=CH2), attached at the internal carbon."
     },
     {
+      "id": "Alkynyl",
+      "kind": "scaffold",
+      "priority": 5,
+      "smarts": "[#6]#[#6:1]",
+      "description": "Alkynyl attachment at a carbon in a C#C unit (general; internal/terminal)."
+    },
+    {
+      "id": "Alkynyl_terminal",
+      "kind": "scaffold",
+      "priority": 5,
+      "smarts": "[C]#[CH:1]",
+      "description": "Terminal alkynyl attachment at the terminal sp carbon (R-C≡C-H)."
+    },
+    {
       "id": "Alkyl",
       "kind": "scaffold",
       "priority": 3,
       "smarts": "[CX4:1]",
       "description": "Alkyl (sp3 carbon) attachment point (Alkyl-)."
+    },
+    {
+      "id": "CH3",
+      "kind": "scaffold",
+      "priority": 3,
+      "smarts": "[CX4H3:1]",
+      "description": "Methyl (0° alkyl) attachment point (CH3-)."
     },
     {
       "id": "RCH2",
@@ -102,25 +116,25 @@
       "description": "Acidic alkyl (sp3 carbon) attached to an electron-withdrawing group (e.g., alpha to carbonyl, nitrile, sulfone, nitro)."
     },
     {
-      "id": "Alkynyl",
-      "kind": "scaffold",
-      "priority": 5,
-      "smarts": "[#6]#[#6:1]",
-      "description": "Alkynyl attachment at a carbon in a C#C unit (general; internal/terminal)."
-    },
-    {
-      "id": "Alkynyl_terminal",
-      "kind": "scaffold",
-      "priority": 5,
-      "smarts": "[C]#[CH:1]",
-      "description": "Terminal alkynyl attachment at the terminal sp carbon (R-C≡C-H)."
-    },
-    {
       "id": "Acyl",
       "kind": "scaffold",
       "priority": 5,
       "smarts": "[CX3H0,H1:1](=O)",
       "description": "Acyl carbon attachment point (Acyl-, including formyl HCO-), used for acyl electrophiles/features."
+    },
+    {
+      "id": "-H",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[H:2]",
+      "description": "Hydrogen substituent substituent (-H)."
+    },
+    {
+      "id": "-F",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[F:2]",
+      "description": "Fluoro substituent substituent (-F)."
     },
     {
       "id": "-Cl",
@@ -144,13 +158,6 @@
       "description": "Iodo substituent substituent (-I)."
     },
     {
-      "id": "-F",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[F:2]",
-      "description": "Fluoro substituent substituent (-F)."
-    },
-    {
       "id": "-CF3",
       "kind": "substituent",
       "priority": 2,
@@ -158,18 +165,11 @@
       "description": "Trifluoromethyl substituent (-CF3)."
     },
     {
-      "id": "-H",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[H:2]",
-      "description": "Hydrogen substituent substituent (-H)."
-    },
-    {
-      "id": "-CHO",
+      "id": "-OCF3",
       "kind": "substituent",
       "priority": 2,
-      "smarts": "[C:2]([H])=O",
-      "description": "Aldehyde core; attach via formyl carbon (-CHO)."
+      "smarts": "[OX2:2][CX4](F)(F)F",
+      "description": "Trifluoromethoxy substituent (-OCF3)."
     },
     {
       "id": "-CN",
@@ -200,6 +200,19 @@
       "description": "Isothiocyanate core; attach via nitrogen (-NCS)."
     },
     {
+      "id": "-N3",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[N:2]=[N+]=[N-]",
+      "description": "Azide substituent (-N3); attach via nitrogen."
+    },
+    {
+      "id": "-N2+",
+      "kind": "substituent",
+      "smarts": "[N+:2]#[N;D1]",
+      "description": "Diazonium cation (-N2+), used in Sandmeyer reaction."
+    },
+    {
       "id": "-NO2",
       "kind": "substituent",
       "priority": 2,
@@ -207,11 +220,50 @@
       "description": "Nitro core; attach via nitro nitrogen (-NO2)."
     },
     {
-      "id": "-N3",
+      "id": "-C=N",
       "kind": "substituent",
-      "priority": 2,
-      "smarts": "[N:2]=[N+]=[N-]",
-      "description": "Azide substituent (-N3); attach via nitrogen."
+      "priority": 1,
+      "smarts": "[CX3:2]=[NX3,NX2]",
+      "description": "Imino group (C=N core); attach via carbon."
+    },
+    {
+      "id": "-OH",
+      "kind": "substituent",
+      "smarts": "[O;H1;!$(O-[C,S,P]=O):2]",
+      "description": "Hydroxy substituent (-OH)."
+    },
+    {
+      "id": "-OR",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[O;H0;!$(O-[C,S,P]=O):2][#6]",
+      "description": "Ether substituent (-OR)."
+    },
+    {
+      "id": "-SH",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[S;H1;!$(S-[C,S,P]=O):2]",
+      "description": "Thiol substituent (-SH)."
+    },
+    {
+      "id": "-SR",
+      "kind": "substituent",
+      "smarts": "[S;H0;!$(S-[C,S,P]=O):2][#6]",
+      "description": "Sulfide/thioether group (-SR)."
+    },
+    {
+      "id": "-OCSSR",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[O:2]C(=S)S[#6]",
+      "description": "O-thiocarbonate substituent (-OCSSR)."
+    },
+    {
+      "id": "-Epoxide_Group",
+      "kind": "substituent",
+      "smarts": "[O;R1]1[C;R1][C;R1:2]1",
+      "description": "Epoxide (oxirane) ring substituent."
     },
     {
       "id": "-B(OH)2",
@@ -221,11 +273,24 @@
       "description": "Boronic acid core; attach via boron (-B(OH)2)."
     },
     {
+      "id": "-B(OR)2",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[B:2](O[#6])O[#6]",
+      "description": "Generic boronate ester core; attach via boron."
+    },
+    {
       "id": "-Bpin",
       "kind": "substituent",
       "priority": 2,
       "smarts": "[B:2]1OC(C)(C)C(C)(C)O1",
       "description": "Bpin core; attach via boron (-Bpin)."
+    },
+    {
+      "id": "-BF3K",
+      "kind": "substituent",
+      "smarts": "[B-:2](F)(F)F",
+      "description": "Trifluoroborate substituent (-BF3K)."
     },
     {
       "id": "-B*",
@@ -263,35 +328,66 @@
       "description": "Grignard group (-MgX)."
     },
     {
-      "id": "-BF3K",
+      "id": "-CHO",
       "kind": "substituent",
-      "smarts": "[B-:2](F)(F)F",
-      "description": "Trifluoroborate substituent (-BF3K)."
+      "priority": 2,
+      "smarts": "[C:2]([H])=O",
+      "description": "Aldehyde core; attach via formyl carbon (-CHO)."
     },
     {
-      "id": "-SH",
+      "id": "-COR",
       "kind": "substituent",
       "priority": 1,
-      "smarts": "[S;H1;!$(S-[C,S,P]=O):2]",
-      "description": "Thiol substituent (-SH)."
+      "smarts": "[CX3;!$(C-[O,N,F,Cl,Br,I]):2](=O)[#6]",
+      "description": "Ketone core; attach via carbonyl carbon (-COR)."
     },
     {
-      "id": "-SR",
+      "id": "-CO2H",
       "kind": "substituent",
-      "smarts": "[S;H0;!$(S-[C,S,P]=O):2][#6]",
-      "description": "Sulfide/thioether group (-SR)."
+      "priority": 2,
+      "smarts": "[C:2](=O)[OX2H]",
+      "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon."
+    },
+    {
+      "id": "-CO2R",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[CX3:2](=O)O[#6]",
+      "description": "Ester substituent (-CO2R), attach via carbonyl carbon."
+    },
+    {
+      "id": "-COF",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[CX3:2](=O)F",
+      "description": "Acyl fluoride substituent (-COF), attach via carbonyl carbon."
+    },
+    {
+      "id": "-COCl",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[CX3:2](=O)Cl",
+      "description": "Acyl chloride substituent (-COCl), attach via carbonyl carbon."
+    },
+    {
+      "id": "-COBr",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[CX3:2](=O)Br",
+      "description": "Acyl bromide substituent (-COBr), attach via carbonyl carbon."
+    },
+    {
+      "id": "-COI",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[CX3:2](=O)I",
+      "description": "Acyl iodide substituent (-COI), attach via carbonyl carbon."
     },
     {
       "id": "-NH2",
       "kind": "substituent",
       "smarts": "[N;H2;!$(N-[C,S,P]=O):2]",
       "description": "Primary amine N substituent (-NH2)."
-    },
-    {
-      "id": "-N2+",
-      "kind": "substituent",
-      "smarts": "[N+:2]#[N;D1]",
-      "description": "Diazonium cation (-N2+), used in Sandmeyer reaction."
     },
     {
       "id": "-NHR",
@@ -311,109 +407,6 @@
       "priority": 1,
       "smarts": "[NX3:2][NX3]",
       "description": "Hydrazine-like substituent (-NN unit, any substitution); attach via nitrogen."
-    },
-    {
-      "id": "-Hydrazine_NH2",
-      "kind": "substituent",
-      "priority": 3,
-      "smarts": "[NX3:2][NX3;H2]",
-      "description": "Hydrazine with terminal -NH2 (primary hydrazine); attach via proximal nitrogen."
-    },
-    {
-      "id": "-Hydrazine_NHR",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3:2][NX3;H1]",
-      "description": "Hydrazine with terminal -NHR (secondary hydrazine); attach via proximal nitrogen."
-    },
-    {
-      "id": "-Hydrazine_NR",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3:2][NX3;H0]",
-      "description": "Hydrazine with terminal -NR2 or =NR (fully substituted/condensed hydrazine); attach via proximal nitrogen."
-    },
-    {
-      "id": "-OH",
-      "kind": "substituent",
-      "smarts": "[O;H1;!$(O-[C,S,P]=O):2]",
-      "description": "Hydroxy substituent (-OH)."
-    },
-    {
-      "id": "-OR",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[O;H0;!$(O-[C,S,P]=O):2][#6]",
-      "description": "Ether substituent (-OR)."
-    },
-    {
-      "id": "-OCF3",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[OX2:2][CX4](F)(F)F",
-      "description": "Trifluoromethoxy substituent (-OCF3)."
-    },
-    {
-      "id": "-Epoxide_Group",
-      "kind": "substituent",
-      "smarts": "[O;R1]1[C;R1][C;R1:2]1",
-      "description": "Epoxide (oxirane) ring substituent."
-    },
-    {
-      "id": "-OCSSR",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[O:2]C(=S)S[#6]",
-      "description": "O-thiocarbonate substituent (-OCSSR)."
-    },
-    {
-      "id": "-CO2H",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[C:2](=O)[OX2H]",
-      "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon."
-    },
-    {
-      "id": "-CO2R",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[CX3:2](=O)O[#6]",
-      "description": "Ester substituent (-CO2R), attach via carbonyl carbon."
-    },
-    {
-      "id": "-SO3H",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[S:2](=O)(=O)[OX2H]",
-      "description": "Sulfonic acid substituent (-SO3H), attach via sulfur."
-    },
-    {
-      "id": "-COCl",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[CX3:2](=O)Cl",
-      "description": "Acyl chloride substituent (-COCl), attach via carbonyl carbon."
-    },
-    {
-      "id": "-COF",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[CX3:2](=O)F",
-      "description": "Acyl fluoride substituent (-COF), attach via carbonyl carbon."
-    },
-    {
-      "id": "-COBr",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[CX3:2](=O)Br",
-      "description": "Acyl bromide substituent (-COBr), attach via carbonyl carbon."
-    },
-    {
-      "id": "-COI",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[CX3:2](=O)I",
-      "description": "Acyl iodide substituent (-COI), attach via carbonyl carbon."
     },
     {
       "id": "-CONH2",
@@ -437,6 +430,20 @@
       "description": "Tertiary amide substituent (no N-H); attach via carbonyl carbon."
     },
     {
+      "id": "-NHCOR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3;H1:2][CX3](=O)[#6]",
+      "description": "Amide N-H core (N-H) attached via nitrogen."
+    },
+    {
+      "id": "-NRCOR",
+      "kind": "substituent",
+      "priority": 2,
+      "smarts": "[NX3;H0:2][CX3](=O)[#6]",
+      "description": "Amide N-R core (N-alkyl/aryl) attached via nitrogen."
+    },
+    {
       "id": "-Hydrazide",
       "kind": "substituent",
       "priority": 1,
@@ -444,25 +451,66 @@
       "description": "Hydrazide functional group (any substitution state); attach via carbonyl carbon."
     },
     {
-      "id": "-Hydrazide_NH2",
+      "id": "-Urea",
       "kind": "substituent",
-      "priority": 3,
-      "smarts": "[CX3:2](=O)[NX3][NX3;H2]",
-      "description": "Hydrazide with terminal -NH2 (primary hydrazide, e.g., R-CONHNH2); attach via carbonyl carbon."
+      "priority": 1,
+      "smarts": "[NX3:2][CX3](=O)[NX3]",
+      "description": "Urea-like substituent (-NCON unit, any substitution); attach via nitrogen."
     },
     {
-      "id": "-Hydrazide_NHR",
+      "id": "-Thiourea",
       "kind": "substituent",
-      "priority": 2,
-      "smarts": "[CX3:2](=O)[NX3][NX3;H1]",
-      "description": "Hydrazide with terminal -NHR (secondary hydrazide); attach via carbonyl carbon."
+      "priority": 1,
+      "smarts": "[NX3:2][CX3](=S)[NX3]",
+      "description": "Thiourea-like substituent (-NCSN unit, any substitution); attach via nitrogen."
     },
     {
-      "id": "-Hydrazide_NR",
+      "id": "-LactamN",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[NX3;r;H1,H0:2][CX3;r]=O",
+      "description": "Lactam substituent (cyclic amide); attach via nitrogen."
+    },
+    {
+      "id": "-SO2R",
       "kind": "substituent",
       "priority": 2,
-      "smarts": "[CX3:2](=O)[NX3][NX3;H0]",
-      "description": "Hydrazide with terminal -NR2 or =NR (fully substituted/condensed hydrazide, e.g., hydrazone); attach via carbonyl carbon."
+      "smarts": "[SX4:2](=O)(=O)[#6]",
+      "description": "Sulfone substituent (-SO2R); attach via sulfur."
+    },
+    {
+      "id": "-SO2H",
+      "kind": "substituent",
+      "smarts": "[SX3:2](=O)[OX2H]",
+      "description": "Sulfinic acid core; attach via sulfur."
+    },
+    {
+      "id": "-SO2F",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[SX4:2](=O)(=O)F",
+      "description": "Sulfonyl fluoride core; attach via sulfur."
+    },
+    {
+      "id": "-SO2Cl",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[SX4:2](=O)(=O)Cl",
+      "description": "Sulfonyl chloride core; attach via sulfur."
+    },
+    {
+      "id": "-SO2Br",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[SX4:2](=O)(=O)Br",
+      "description": "Sulfonyl bromide core; attach via sulfur."
+    },
+    {
+      "id": "-SO2I",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[SX4:2](=O)(=O)I",
+      "description": "Sulfonyl iodide core; attach via sulfur."
     },
     {
       "id": "-SO2NH2",
@@ -486,135 +534,17 @@
       "description": "Tertiary sulfonamide core; attach via sulfur."
     },
     {
-      "id": "-SO2R",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[SX4:2](=O)(=O)[#6]",
-      "description": "Sulfone substituent (-SO2R); attach via sulfur."
-    },
-    {
-      "id": "-SO2Cl",
+      "id": "-SO3H",
       "kind": "substituent",
       "priority": 1,
-      "smarts": "[SX4:2](=O)(=O)Cl",
-      "description": "Sulfonyl chloride core; attach via sulfur."
-    },
-    {
-      "id": "-SO2F",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[SX4:2](=O)(=O)F",
-      "description": "Sulfonyl fluoride core; attach via sulfur."
-    },
-    {
-      "id": "-SO2Br",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[SX4:2](=O)(=O)Br",
-      "description": "Sulfonyl bromide core; attach via sulfur."
-    },
-    {
-      "id": "-SO2I",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[SX4:2](=O)(=O)I",
-      "description": "Sulfonyl iodide core; attach via sulfur."
-    },
-    {
-      "id": "-SO2H",
-      "kind": "substituent",
-      "smarts": "[SX3:2](=O)[OX2H]",
-      "description": "Sulfinic acid core; attach via sulfur."
+      "smarts": "[S:2](=O)(=O)[OX2H]",
+      "description": "Sulfonic acid substituent (-SO3H), attach via sulfur."
     },
     {
       "id": "-Sulfamide",
       "kind": "substituent",
       "smarts": "[NX3:2][SX4](=O)(=O)[NX3]",
       "description": "Sulfamide-like substituent (-NSO2N unit); attach via nitrogen."
-    },
-    {
-      "id": "-Urea",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[NX3:2][CX3](=O)[NX3]",
-      "description": "Urea-like substituent (-NCON unit, any substitution); attach via nitrogen."
-    },
-    {
-      "id": "-Urea_NH2",
-      "kind": "substituent",
-      "priority": 3,
-      "smarts": "[NX3:2][CX3](=O)[NX3;H2]",
-      "description": "Urea with terminal -NH2 (e.g., R-NHCONH2); attach via substituted nitrogen."
-    },
-    {
-      "id": "-Urea_NHR",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3:2][CX3](=O)[NX3;H1]",
-      "description": "Urea with terminal -NHR (e.g., R-NHCONHR'); attach via nitrogen."
-    },
-    {
-      "id": "-Urea_NR2",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3:2][CX3](=O)[NX3;H0]",
-      "description": "Urea with terminal -NR2 (fully substituted); attach via nitrogen."
-    },
-    {
-      "id": "-Thiourea",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[NX3:2][CX3](=S)[NX3]",
-      "description": "Thiourea-like substituent (-NCSN unit, any substitution); attach via nitrogen."
-    },
-    {
-      "id": "-Thiourea_NH2",
-      "kind": "substituent",
-      "priority": 3,
-      "smarts": "[NX3:2][CX3](=S)[NX3;H2]",
-      "description": "Thiourea with terminal -NH2 (e.g., R-NHCSNH2); attach via substituted nitrogen."
-    },
-    {
-      "id": "-Thiourea_NHR",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3:2][CX3](=S)[NX3;H1]",
-      "description": "Thiourea with terminal -NHR (e.g., R-NHCSNHR'); attach via nitrogen."
-    },
-    {
-      "id": "-Thiourea_NR2",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3:2][CX3](=S)[NX3;H0]",
-      "description": "Thiourea with terminal -NR2 (fully substituted); attach via nitrogen."
-    },
-    {
-      "id": "-N(R)CO2R",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3;H1,H0:2][CX3](=O)[OX2][#6]",
-      "description": "Any carbamate core (N-H or N-R); attach via nitrogen."
-    },
-    {
-      "id": "-NHCOR",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3;H1:2][CX3](=O)[#6]",
-      "description": "Amide N-H core (N-H) attached via nitrogen."
-    },
-    {
-      "id": "-NRCOR",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3;H0:2][CX3](=O)[#6]",
-      "description": "Amide N-R core (N-alkyl/aryl) attached via nitrogen."
-    },
-    {
-      "id": "-N(R)SO2R",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[NX3;H1,H0:2][SX4](=O)(=O)[#6]",
-      "description": "Any sulfonamide core (N-H or N-R) attached via nitrogen."
     },
     {
       "id": "-OTf",
@@ -652,27 +582,6 @@
       "description": "Fluorosulfate ester substituent (-OSO2F)."
     },
     {
-      "id": "-COR",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[CX3;!$(C-[O,N,F,Cl,Br,I]):2](=O)[#6]",
-      "description": "Ketone core; attach via carbonyl carbon (-COR)."
-    },
-    {
-      "id": "-LactamN",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[NX3;r;H1,H0:2][CX3;r]=O",
-      "description": "Lactam substituent (cyclic amide); attach via nitrogen."
-    },
-    {
-      "id": "-PR3+",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[PX4+:2]([#6])([#6])[#6]",
-      "description": "Phosphonium salt core; attach via phosphorus."
-    },
-    {
       "id": "-PR2",
       "kind": "substituent",
       "priority": 1,
@@ -680,18 +589,11 @@
       "description": "Phosphino group (PR2); attach via phosphorus."
     },
     {
-      "id": "-C=N",
+      "id": "-PR3+",
       "kind": "substituent",
       "priority": 1,
-      "smarts": "[CX3:2]=[NX3,NX2]",
-      "description": "Imino group (C=N core); attach via carbon."
-    },
-    {
-      "id": "-B(OR)2",
-      "kind": "substituent",
-      "priority": 1,
-      "smarts": "[B:2](O[#6])O[#6]",
-      "description": "Generic boronate ester core; attach via boron."
+      "smarts": "[PX4+:2]([#6])([#6])[#6]",
+      "description": "Phosphonium salt core; attach via phosphorus."
     }
   ]
 }

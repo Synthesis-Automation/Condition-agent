@@ -39,4 +39,5 @@ def test_cn_coupling_detects_tosylamide_nucleophile() -> None:
     reaction_key = result.get("reaction_key") or ""
     assert result.get("reaction_type") == "C_N_Coupling"
     assert "Ar-SO2NH2" in reaction_key
-    assert "Ar-N(R)SO2R" in reaction_key
+    assert "SO2NHR" in reaction_key
+    assert "N(R)SO2R" not in reaction_key

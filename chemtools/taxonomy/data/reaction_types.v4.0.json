@@ -1082,8 +1082,7 @@
           "Alkyl-NHR",
           "Alkyl-NR2",
           "Ar-NHR",
-          "Ar-NR2",
-          "@carbamate_amines"
+          "Ar-NR2"
         ]
       },
       "examples": [
