@@ -1231,6 +1231,96 @@ def _append_crk_event_signature(
     return f"{text} | events: {signature}"
 
 
+def _append_crk_reaction_types(
+    reaction_key: Optional[str],
+    reaction_types: Iterable[str],
+) -> str:
+    text = str(reaction_key or "").strip()
+    if not text:
+        return ""
+    if "reaction_types:" in text:
+        return text
+    values = [str(rt).strip() for rt in reaction_types if str(rt).strip()]
+    if len(values) < 2:
+        return text
+    return f"{text} | reaction_types: {'+'.join(values)}"
+
+
+def _extract_match_slot_sets(match_payload: Dict[str, Any]) -> Tuple[Set[str], Set[str]]:
+    slot_evidence = match_payload.get("slot_evidence") if isinstance(match_payload, dict) else {}
+    if not isinstance(slot_evidence, dict):
+        return set(), set()
+    reactants: Set[str] = set()
+    products: Set[str] = set()
+    for slot_name, values in slot_evidence.items():
+        entries: List[str] = []
+        if isinstance(values, list):
+            entries = [normalize_motif_id(str(v)) for v in values if str(v).strip()]
+        elif values is not None and str(values).strip():
+            entries = [normalize_motif_id(str(values))]
+        if not entries:
+            continue
+        slot_text = str(slot_name).strip().lower()
+        if "product" in slot_text:
+            products.update(entries)
+        else:
+            reactants.update(entries)
+    return reactants, products
+
+
+def _infer_multi_reaction_types_from_matches(
+    *,
+    primary_reaction_type: Optional[str],
+    matches: Iterable[Dict[str, Any]],
+    confidence_tolerance: float = 0.05,
+) -> List[str]:
+    """
+    Infer concurrent reaction families from primary detection matches.
+
+    Promote a secondary reaction type only when it has orthogonal motif evidence:
+    at least one reactant motif and one product motif not already explained by
+    the primary reaction match.
+    """
+    match_list = [m for m in (matches or []) if isinstance(m, dict)]
+    if not match_list:
+        return []
+
+    primary_id = _resolve_reaction_type_id(primary_reaction_type) or str(primary_reaction_type or "").strip()
+    if not primary_id:
+        return []
+
+    primary_match: Optional[Dict[str, Any]] = None
+    for match in match_list:
+        rid = _resolve_reaction_type_id(match.get("reaction_type")) or str(match.get("reaction_type") or "").strip()
+        if rid == primary_id:
+            primary_match = match
+            break
+    if primary_match is None:
+        primary_match = match_list[0]
+
+    primary_conf = _to_float_or_default(primary_match.get("confidence"), 0.0)
+    primary_reactants, primary_products = _extract_match_slot_sets(primary_match)
+
+    selected: List[str] = [primary_id]
+    seen: Set[str] = {primary_id}
+    for match in match_list:
+        rid = _resolve_reaction_type_id(match.get("reaction_type")) or str(match.get("reaction_type") or "").strip()
+        if not rid or rid in seen:
+            continue
+        conf = _to_float_or_default(match.get("confidence"), 0.0)
+        if conf + 1e-9 < (primary_conf - float(confidence_tolerance)):
+            continue
+        candidate_reactants, candidate_products = _extract_match_slot_sets(match)
+        if not candidate_products:
+            continue
+        unique_reactants = candidate_reactants - primary_reactants
+        unique_products = candidate_products - primary_products
+        if unique_reactants and unique_products:
+            selected.append(rid)
+            seen.add(rid)
+    return selected
+
+
 def _infer_multi_event_fallback_label(reaction_events: Dict[str, Any]) -> Optional[str]:
     if not isinstance(reaction_events, dict):
         return None
@@ -2182,6 +2272,33 @@ def featurize_reaction(
                     )
                     rt_id = fallback_label
                     detection_payload["event_fallback_reaction_type"] = fallback_label
+
+        # Promote multi-reaction labels when orthogonal evidence exists.
+        multi_types = _infer_multi_reaction_types_from_matches(
+            primary_reaction_type=rt_id,
+            matches=detection_payload.get("matches") or [],
+        )
+        if len(multi_types) > 1:
+            multi_label = f"Multi-Event:{'+'.join(multi_types)}"
+            multi_display = " / ".join(multi_types)
+            reaction_type = _set_reaction_type_payload(
+                reaction_type,
+                multi_label,
+                max(
+                    _to_float_or_default(
+                        reaction_type.get("confidence") if isinstance(reaction_type, dict) else 0.0,
+                        0.0,
+                    ),
+                    0.9,
+                ),
+            )
+            if isinstance(reaction_type, dict):
+                reaction_type["name"] = multi_display
+            rt_id = multi_label
+            detection_payload["multi_reaction_types"] = multi_types
+            detection_payload["primary_reaction_type"] = multi_types[0]
+            detection_payload["co_reaction_types"] = multi_types[1:]
+            reaction_key = _append_crk_reaction_types(reaction_key, multi_types)
 
     if rt_id is None:
         if isinstance(reaction_type, dict):

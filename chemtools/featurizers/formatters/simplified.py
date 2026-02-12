@@ -179,6 +179,9 @@ def build_core_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
             "reaction_key_quality",
             "primary_detection",
             "matches",
+            "multi_reaction_types",
+            "primary_reaction_type",
+            "co_reaction_types",
             "llm_assist",
             "error",
         ):

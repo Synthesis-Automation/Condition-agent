@@ -514,6 +514,7 @@
       "products": {
         "product": [
           "Ar-Ar",
+          "Ar-Alkyl",
           "Ar-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
@@ -955,6 +956,37 @@
       "examples": [
         "c1cnccn1.O=C(O)C(=O)c1ccccc1>>O=C(c1ccccc1)c1cnccn1"
       ]
+    },
+    {
+      "id": "Decarboxylative_Coupling",
+      "reactants": {
+        "electrophile": "@sp2_electrophiles",
+        "acid": [
+          "Acyl-CO2H",
+          "Alkyl-CO2H",
+          "R_acidic-CO2H",
+          "RCH2-CO2H",
+          "R2CH-CO2H",
+          "R3C-CO2H"
+        ]
+      },
+      "aliases": [
+        "Decarboxylative coupling",
+        "Decarboxylative_arylation",
+        "decarboxylative_coupling"
+      ],
+      "description": "Decarboxylative coupling with Ar-X-like sp2 electrophiles and carboxylic-acid-derived partners (analogous to Minisci radical generation, but with electrophilic Ar-X coupling partner).",
+      "examples": [
+        "O=C(O)C(=O)c1ccccc1.N#Cc1ccc(Br)cc1>>N#Cc1ccc(C(=O)c2ccccc2)cc1"
+      ],
+      "constraints": {
+        "include_reacted": [],
+        "exclude_reacted": [],
+        "include_formed": [],
+        "exclude_formed": [],
+        "min_reactant_slot_matches": 2,
+        "min_product_slot_matches": 0
+      }
     },
     {
       "id": "Snar_cn",
