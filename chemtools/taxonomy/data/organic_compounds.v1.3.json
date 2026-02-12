@@ -845,6 +845,19 @@
     },
     {
       "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "-COF",
+      "description": "Alkenyl acid fluoride (Alkenyl-COF)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-COF",
+      "priority": 6,
+      "description": "Alkyl acid fluoride (Alkyl-COF)."
+    },
+    {
+      "template": "single_bond",
       "A": "Ar",
       "B": "-COBr",
       "description": "Aryl acid bromide (Ar-COBr)."

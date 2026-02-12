@@ -1,0 +1,97 @@
+{
+  "input_dir": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300",
+  "files_scanned": 11,
+  "files": [
+    {
+      "file": "Acetal_ketal_formation.csv",
+      "status": "ok",
+      "rows": 300,
+      "unknown": 3,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Acetal_ketal_formation.predicted.csv"
+    },
+    {
+      "file": "Acyl_Halides_formation.csv",
+      "status": "ok",
+      "rows": 300,
+      "unknown": 15,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Acyl_Halides_formation.predicted.csv"
+    },
+    {
+      "file": "Addition_of_Halogens_to_Double_or_Triple_Bonds.csv",
+      "status": "ok",
+      "rows": 300,
+      "unknown": 133,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Addition_of_Halogens_to_Double_or_Triple_Bonds.predicted.csv"
+    },
+    {
+      "file": "Addition_of_Hydrazine_Derivatives_to_Carbonyl_Compounds.csv",
+      "status": "ok",
+      "rows": 20,
+      "unknown": 0,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Addition_of_Hydrazine_Derivatives_to_Carbonyl_Compounds.predicted.csv"
+    },
+    {
+      "file": "Aldol_classic__Mukaiyama.csv",
+      "status": "ok",
+      "rows": 300,
+      "unknown": 0,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Aldol_classic__Mukaiyama.predicted.csv"
+    },
+    {
+      "file": "Aliphatic_Halide_Exchange.csv",
+      "status": "ok",
+      "rows": 256,
+      "unknown": 2,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Aliphatic_Halide_Exchange.predicted.csv"
+    },
+    {
+      "file": "Allylic_Benzylic_and_Vinylic_Halogenations.csv",
+      "status": "ok",
+      "rows": 300,
+      "unknown": 178,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Allylic_Benzylic_and_Vinylic_Halogenations.predicted.csv"
+    },
+    {
+      "file": "Amide_formation.csv",
+      "status": "ok",
+      "rows": 300,
+      "unknown": 2,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Amide_formation.predicted.csv"
+    },
+    {
+      "file": "Anhydride_coupling.csv",
+      "status": "ok",
+      "rows": 300,
+      "unknown": 0,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Anhydride_coupling.predicted.csv"
+    },
+    {
+      "file": "Appel_halogenation.csv",
+      "status": "ok",
+      "rows": 202,
+      "unknown": 1,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Appel_halogenation.predicted.csv"
+    },
+    {
+      "file": "Aromatic_Halogen_Exchange.csv",
+      "status": "ok",
+      "rows": 194,
+      "unknown": 0,
+      "errors": 0,
+      "output": "results\\reaction_dataset_300\\Aromatic_Halogen_Exchange.predicted.csv"
+    }
+  ],
+  "total_rows": 2772,
+  "total_unknown": 334,
+  "total_errors": 0
+}

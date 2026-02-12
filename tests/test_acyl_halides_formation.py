@@ -38,3 +38,27 @@ def test_detects_aliphatic_acid_chloride_as_alkyl_cocl() -> None:
     assert result.get("reaction_type") == "Acyl_Halides_formation"
     assert "-> Alkyl-COCl" in reaction_key
     assert "Alkyl-COCl" in (aggregates.get("formed_motifs") or [])
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_detects_aliphatic_acid_fluoride_as_alkyl_cof() -> None:
+    rxn = "CCCCCCCCCC(=O)O>>CCCCCCCCCC(=O)F"
+    result = featurize_reaction(rxn, options={"detailed": True})
+    reaction_key = result.get("reaction_key") or ""
+    aggregates = result.get("aggregates") or {}
+
+    assert result.get("reaction_type") == "Acyl_Halides_formation"
+    assert "-> Alkyl-COF" in reaction_key
+    assert "Alkyl-COF" in (aggregates.get("formed_motifs") or [])
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_detects_alkenyl_acid_fluoride_as_alkenyl_cof() -> None:
+    rxn = "O=C(O)/C=C/C1CCCCC1>>O=C(F)/C=C/C1CCCCC1"
+    result = featurize_reaction(rxn, options={"detailed": True})
+    reaction_key = result.get("reaction_key") or ""
+    aggregates = result.get("aggregates") or {}
+
+    assert result.get("reaction_type") == "Acyl_Halides_formation"
+    assert "-> Alkenyl-COF" in reaction_key
+    assert "Alkenyl-COF" in (aggregates.get("formed_motifs") or [])

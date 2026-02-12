@@ -449,11 +449,13 @@
       "description": "Acyl halides (acid chlorides/bromides/iodides/fluorides) for acylation.",
       "members": [
         "Acyl-Cl",
+        "Alkenyl-COF",
         "Ar-COBr",
         "Ar-COCl",
         "Ar-COF",
         "Ar-COI",
-        "Alkyl-COCl"
+        "Alkyl-COCl",
+        "Alkyl-COF"
       ],
       "usage": [
         "Acyl_Halides_formation",

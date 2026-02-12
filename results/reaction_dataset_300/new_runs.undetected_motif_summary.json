@@ -1,0 +1,223 @@
+{
+  "files_scanned": 13,
+  "per_file": {
+    "Acetal_ketal_formation.predicted.csv": {
+      "rows_scanned": 300,
+      "rows_with_reaction_key": 300,
+      "rows_with_undetected_markers": 20,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "[]",
+          18
+        ],
+        [
+          "Unclassified-Reactant",
+          2
+        ]
+      ],
+      "undetected_marker_counts": {
+        "empty_list_placeholder": 18,
+        "unclassified_motif": 2
+      }
+    },
+    "Acyl_Halides_formation.predicted.csv": {
+      "rows_scanned": 300,
+      "rows_with_reaction_key": 300,
+      "rows_with_undetected_markers": 17,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "[]",
+          17
+        ]
+      ],
+      "undetected_marker_counts": {
+        "empty_list_placeholder": 17
+      }
+    },
+    "Addition_of_Halogens_to_Double_or_Triple_Bonds.predicted.csv": {
+      "rows_scanned": 300,
+      "rows_with_reaction_key": 300,
+      "rows_with_undetected_markers": 86,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "[]",
+          86
+        ],
+        [
+          "Unclassified-Reactant",
+          1
+        ]
+      ],
+      "undetected_marker_counts": {
+        "empty_list_placeholder": 86,
+        "unclassified_motif": 1
+      }
+    },
+    "Addition_of_Hydrazine_Derivatives_to_Carbonyl_Compounds.predicted.csv": {
+      "rows_scanned": 20,
+      "rows_with_reaction_key": 20,
+      "rows_with_undetected_markers": 9,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "[]",
+          9
+        ]
+      ],
+      "undetected_marker_counts": {
+        "empty_list_placeholder": 9
+      }
+    },
+    "Aldol_classic__Mukaiyama.predicted.csv": {
+      "rows_scanned": 300,
+      "rows_with_reaction_key": 300,
+      "rows_with_undetected_markers": 0,
+      "status": "ok",
+      "top_undetected_tokens": [],
+      "undetected_marker_counts": {}
+    },
+    "Aliphatic_Halide_Exchange.predicted.csv": {
+      "rows_scanned": 256,
+      "rows_with_reaction_key": 256,
+      "rows_with_undetected_markers": 14,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "[]",
+          14
+        ]
+      ],
+      "undetected_marker_counts": {
+        "empty_list_placeholder": 14
+      }
+    },
+    "Allylic_Benzylic_and_Vinylic_Halogenations.predicted.csv": {
+      "rows_scanned": 300,
+      "rows_with_reaction_key": 300,
+      "rows_with_undetected_markers": 145,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "[]",
+          145
+        ]
+      ],
+      "undetected_marker_counts": {
+        "empty_list_placeholder": 145
+      }
+    },
+    "Amide_formation.predicted.csv": {
+      "rows_scanned": 300,
+      "rows_with_reaction_key": 300,
+      "rows_with_undetected_markers": 3,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "Unclassified-Reactant",
+          3
+        ]
+      ],
+      "undetected_marker_counts": {
+        "unclassified_motif": 3
+      }
+    },
+    "Anhydride_coupling.predicted.csv": {
+      "rows_scanned": 300,
+      "rows_with_reaction_key": 300,
+      "rows_with_undetected_markers": 20,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "[]",
+          14
+        ],
+        [
+          "Unclassified-Reactant",
+          6
+        ]
+      ],
+      "undetected_marker_counts": {
+        "empty_list_placeholder": 14,
+        "unclassified_motif": 6
+      }
+    },
+    "Appel_halogenation.predicted.csv": {
+      "rows_scanned": 202,
+      "rows_with_reaction_key": 202,
+      "rows_with_undetected_markers": 0,
+      "status": "ok",
+      "top_undetected_tokens": [],
+      "undetected_marker_counts": {}
+    },
+    "Aromatic_Halogen_Exchange.predicted.csv": {
+      "rows_scanned": 194,
+      "rows_with_reaction_key": 194,
+      "rows_with_undetected_markers": 15,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "[]",
+          27
+        ]
+      ],
+      "undetected_marker_counts": {
+        "empty_list_placeholder": 27
+      }
+    },
+    "C_O_Coupling.predicted.csv": {
+      "rows_scanned": 300,
+      "rows_with_reaction_key": 299,
+      "rows_with_undetected_markers": 6,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "[]",
+          5
+        ],
+        [
+          "Unclassified-Reactant",
+          2
+        ]
+      ],
+      "undetected_marker_counts": {
+        "empty_list_placeholder": 5,
+        "unclassified_motif": 2
+      }
+    },
+    "C_S_Coupling.predicted.minimal.csv": {
+      "rows_scanned": 300,
+      "rows_with_reaction_key": 300,
+      "rows_with_undetected_markers": 2,
+      "status": "ok",
+      "top_undetected_tokens": [
+        [
+          "Unclassified-Reactant",
+          2
+        ]
+      ],
+      "undetected_marker_counts": {
+        "unclassified_motif": 2
+      }
+    }
+  },
+  "rows_scanned": 3372,
+  "rows_with_reaction_key": 3371,
+  "rows_with_undetected_markers": 337,
+  "top_undetected_tokens": [
+    [
+      "[]",
+      335
+    ],
+    [
+      "Unclassified-Reactant",
+      16
+    ]
+  ],
+  "undetected_marker_counts": {
+    "empty_list_placeholder": 335,
+    "unclassified_motif": 16
+  }
+}
