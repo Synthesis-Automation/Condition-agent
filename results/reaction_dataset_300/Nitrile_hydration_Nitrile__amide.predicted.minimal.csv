@@ -1,0 +1,301 @@
+reaction_smiles,detected_reaction_type,reaction_key
+N#CCCCCl.CC(C)Nc1ccccc1>>CC(C)N(CCCCN)c1ccccc1,Alkyl_Nucleophilic_Substitution,|Ar-NHR|R2CH-NHR|RCH2-CN|RCH2-Cl -> Ar-NR2|R2CH-NR2|RCH2-NH2|RCH2-NR2 | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-Cl | events: LGDisp+C-N
+CCNc1ccccc1.N#CCCCCl>>CCN(CCCCN)c1ccccc1,Alkyl_Nucleophilic_Substitution,|Ar-NHR|RCH2-CN|RCH2-Cl|RCH2-NHR -> Ar-NR2|RCH2-NH2|RCH2-NR2 | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-Cl | events: LGDisp+C-N
+N#Cc1ccc(Br)cc1>>NCc1ccccc1,Reduction_nitrile_to_amine,|Ar-Br -> Bn-NH2 | bond_broken: Br-C(ar)
+N#Cc1ccccc1C=O.NCc1cc(C(F)(F)F)cc(C(F)(F)F)c1>>O=C1NC(NCc2cc(C(F)(F)F)cc(C(F)(F)F)c2)c2ccccc21,Reductive_amination,|Ar-CHO|Ar-CN|Bn-NH2 -> Bn-NHR|R2CH-NHR | spectators: Ar-CF3 | events: Ann+C-N
+N#Cc1ccccc1.O=Cc1ccccc1.Oc1ccc2ccccc2c1>>O=C(NC(c1ccccc1)c1c(O)ccc2ccccc12)c1ccccc1,Multi-Event:C-N+C-C,|Ar-CHO|Ar-CN -> Ar-Alkyl|Ar-CONHR | bond_formed: C-N; C-C(ar) | bond_formed_labeled: C-N; C-C(ar)[Ar-Alkyl] | spectators: Ar-OH | events: C-N+C-C
+CC(=O)c1ccccc1.N#Cc1ccccc1.O=Cc1ccccc1>>O=C(CC(NC(=O)c1ccccc1)c1ccccc1)c1ccccc1,Multi-Event:C-N+C-C,|Ar-CHO|Ar-CN|R_acidic-H -> Ar-CONHR | spectators: Ar-COR | events: C-N+C-C
+CCCCN.N#Cc1ccccc1C=O>>CCCCNC1NC(=O)c2ccccc21,Reductive_amination,|Ar-CHO|Ar-CN|RCH2-NH2 -> R2CH-NHR|RCH2-NHR | bond_formed: C-N; C-N | bond_formed_labeled: C-N; C-N | events: Ann+C-N
+NCc1ccc(Cl)cc1.N#Cc1ccccc1C=O>>O=C1NC(NCc2ccc(Cl)cc2)c2ccccc21,Reductive_amination,|Ar-CHO|Ar-CN|Bn-NH2 -> Bn-NHR|R2CH-NHR | bond_formed: C-N; C-N | bond_formed_labeled: C-N; C-N | spectators: Ar-Cl | events: Ann+C-N
+CCC(C#N)=C1C2CC3CC(C2)CC1C3>>CCC(CN)C1C2CC3CC(C2)CC1C3,Reduction_nitrile_to_amine,|Alkenyl-CN -> RCH2-NH2
+N#CC=Cc1ccccc1>>Cl.NCCCc1ccccc1,Reduction_nitrile_to_amine,|Alkenyl-CN|Ar-Alkenyl -> RCH2-NH2
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.CCCC[C@H](C#N)/C=C/c1ccccc1>>CCCC[C@@H](CCc1ccccc1)CNC(=O)OC(C)(C)C,Event:C-N,|Ar-Alkenyl|Inorganic|R2CH-CN|R_acidic-H -> Ar-Alkyl
+CC(=O)OC(C)=O.COc1ccc(CN2C(=O)[C@@]3(C[C@@H]3C#N)c3ccccc32)cc1>>COc1ccc(CN2C(=O)C(CCCNC(C)=O)c3ccccc32)cc1.COc1ccc(CN2C(=O)[C@@]3(C[C@@H]3CNC(C)=O)c3ccccc32)cc1,Claisen_condensation,|Alkyl-CO2R|R2CH-CN -> Alkyl-NHCOR | spectators: Ar-Alkyl|Ar-NRCOR|Ar-OR|Bn-LactamN|R_acidic-H | events: Ann+C-N+C-C
+CC(=O)OC(C)=O.Cc1ccc2c(c1)[C@@]1(C[C@@H]1C#N)C(=O)N2C>>CC(=O)NCCCC1C(=O)N(C)c2ccc(C)cc21.CC(=O)NC[C@@H]1C[C@@]12C(=O)N(C)c1ccc(C)cc12,Claisen_condensation,|Alkyl-CO2R|R2CH-CN -> Alkyl-NHCOR | spectators: Alkyl-NRCOR|Ar-Alkyl|Ar-NRCOR|R_acidic-H | events: Ann+C-N+C-C
+CC(=O)OC(C)=O.CN1C(=O)[C@]2(C[C@@H]2C#N)c2cc(F)ccc21>>CC(=O)NCCCC1C(=O)N(C)c2ccc(F)cc21.CC(=O)NC[C@@H]1C[C@@]12C(=O)N(C)c1ccc(F)cc12,Claisen_condensation,|Alkyl-CO2R|R2CH-CN -> Alkyl-NHCOR | spectators: Alkyl-NRCOR|Ar-Alkyl|Ar-F|Ar-NRCOR|R_acidic-H | events: Ann+C-N+C-C
+CC(=O)OC(C)=O.N#C[C@H]1C[C@]12C(=O)N(Cc1ccccc1)c1ccc(F)cc12>>CC(=O)NCCCC1C(=O)N(Cc2ccccc2)c2ccc(F)cc21.CC(=O)NC[C@@H]1C[C@@]12C(=O)N(Cc1ccccc1)c1ccc(F)cc12,Claisen_condensation,|Alkyl-CO2R|R2CH-CN -> Alkyl-NHCOR | spectators: Ar-Alkyl|Ar-F|Ar-NRCOR|Bn-LactamN|R_acidic-H | events: Ann+C-N+C-C
+CCCCC#N>>CCCCC1N[C@@H](CCCC)[C@H](CCCC)N1,Multi-Event:Ann+C-N,|RCH2-CN -> R2CH-NHR | bond_formed: C-N; C-N | bond_formed_labeled: C-N; C-N | events: Ann+C-N
+COC1(C#N)CCCCCCC1>>COC1(CN)CCCCCCC1.O=C(O)C(=O)O,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2 | spectators: R3C-OR
+COC1(C#N)CCC(C)CC1>>COC1(CN)CCC(C)CC1.O=C(O)C(=O)O,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2 | bond_formed: C-C; C-O; C-O | bond_formed_labeled: C-C; C-O; C-O | spectators: R3C-OR | events: C-O+C-C
+CC#N.CC(=O)Nc1ccc(N)cc1>>CCNc1ccc(NC(C)=O)cc1,Unknown,|Ar-NH2|CH3-CN|R_acidic-H -> Ar-NHR|RCH2-NHR | spectators: Ar-NHCOR
+Nc1ccccc1.CC(C)(C)C#N>>CC(C)(C)CNc1ccccc1,Unknown,|Ar-NH2|R3C-CN -> Ar-NHR|RCH2-NHR
+Nc1ccccc1.N#CCCC#N>>N#CCCCNc1ccccc1,Unknown,|Ar-NH2|RCH2-CN|R_acidic-H -> Ar-NHR|RCH2-NHR
+CC#N.COc1cc(N)cc(OC)c1OC>>CCNc1cc(OC)c(OC)c(OC)c1,Unknown,|Ar-NH2|CH3-CN|R_acidic-H -> Ar-NHR|RCH2-NHR | spectators: Ar-OR
+CC(C)(C)C#N.O=C(Cl)OCc1ccc([N+](=O)[O-])cc1.CC(C)(C)CO>>CC(C)(C)COC(NC(=O)OCc1ccc([N+](=O)[O-])cc1)C(C)(C)C,Multi-Event:LGDisp+C-N+C-O,|Acyl-Cl|R3C-CN|RCH2-OH -> RCH2-OR | spectators: Ar-Alkyl|Ar-NO2 | events: LGDisp+C-N+C-O
+N#Cc1ccccc1.CC(C)C(=O)Cl.CO>>COC(NC(=O)C(C)C)c1ccccc1,Multi-Event:LGDisp+C-N+C-O,|Alkyl-COCl|Ar-CN|CH3-OH -> Alkyl-NHCOR | spectators: R_acidic-H | events: LGDisp+C-N+C-O
+CC(C)(C)OC(=O)N1CCC(C#N)(c2ccc(F)cc2)CC1.CS(=O)(=O)Cl>>CC(C)(C)OC(=O)N1CCC(CNS(C)(=O)=O)(c2ccc(F)cc2)CC1,Unknown,|Alkyl-SO2Cl|R3C-CN -> Alkyl-SO2NHR | spectators: Ar-Alkyl|Ar-F|R_acidic-H
+CC(C)(C)OC(=O)N1CCC(C#N)(c2ccc(F)c(F)c2)CC1.CS(=O)(=O)Cl>>CC(C)(C)OC(=O)N1CCC(CNS(C)(=O)=O)(c2ccc(F)c(F)c2)CC1,Unknown,|Alkyl-SO2Cl|R3C-CN -> Alkyl-SO2NHR | spectators: Ar-Alkyl|Ar-F|R_acidic-H
+Cc1cc(C2(C#N)CCN(C(=O)OC(C)(C)C)CC2)ccc1Cl.CS(=O)(=O)Cl>>Cc1cc(C2(CNS(C)(=O)=O)CCN(C(=O)OC(C)(C)C)CC2)ccc1Cl,Unknown,|Alkyl-SO2Cl|R3C-CN -> Alkyl-SO2NHR | spectators: Ar-Alkyl|Ar-Cl|R_acidic-H
+CCC1(C)CC(C2OC2C#N)CCO1>>CCC1(C)CC(C(O)CCN)CCO1,Reduction_nitrile_to_amine,|R2CH-OR -> RCH2-NH2 | bond_broken: C-O | spectators: RCH2-OR
+CC(=O)c1ccc(C#N)cc1>>CC(O)c1ccc(CN)cc1,Reduction_nitrile_to_amine / Reduction_carbonyl_to_alcohol,|Ar-CN|Ar-COR|R_acidic-H -> Bn-NH2 | reaction_types: Reduction_nitrile_to_amine+Reduction_carbonyl_to_alcohol
+CC(=O)c1ccccc1.N#Cc1ccccc1>>CC(O)c1ccccc1.NCc1ccccc1,Reduction_nitrile_to_amine / Reduction_carbonyl_to_alcohol,|Ar-CN|Ar-COR|R_acidic-H -> Bn-NH2 | reaction_types: Reduction_nitrile_to_amine+Reduction_carbonyl_to_alcohol
+COC(=O)c1ccccc1.N#Cc1ccccc1>>NCc1ccccc1.OCc1ccccc1,Reduction_nitrile_to_amine / Reduction_ester_to_alcohol,|Ar-CN|Ar-CO2R -> Bn-NH2 | reaction_types: Reduction_nitrile_to_amine+Reduction_ester_to_alcohol
+N#Cc1ccc(C=Nc2ccccc2)cc1>>NCc1ccc(CNc2ccccc2)cc1,Reduction_imine_to_amine,|Ar-C=N|Ar-CN -> Ar-NHR|Bn-NH2|Bn-NHR
+N#CCCCN(CCC#N)Cc1ccccc1>>NCCCCN(CCCN)Cc1ccccc1,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: Bn-NR2|RCH2-NR2
+N#Cc1ccc(N)cc1>>NCc1ccc(N)cc1.Nc1ccc(CNCc2ccc(N)cc2)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-NH2
+N#Cc1cc2ccccc2[nH]1>>NCc1cc2ccccc2[nH]1,Reduction_nitrile_to_amine,|HeteroAr-CN -> Bn-NH2 | spectators: AromN-H|HeteroAr-H|Indole
+COc1ccccc1CO.N#CCCc1ccccc1>>COc1ccccc1C(=O)NCCCc1ccccc1,Event:C-N,|RCH2-CN -> Ar-CONHR | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-Alkyl|Ar-OR
+N#CC1CC1>>NCC1CC1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2
+Cc1ccccc1C#N>>Cc1ccccc1CN,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Alkyl
+OCCc1ccccc1.N#CC1CCCC1>>O=C(Cc1ccccc1)NCC1CCCC1,Event:C-N,|Ar-Alkyl|R2CH-CN -> Alkyl-NHCOR|Bn-CONHR | bond_formed: C-N | bond_formed_labeled: C-N | spectators: R_acidic-H
+N#CCCO>>[2H]C([2H])(N)CCO,Reduction_nitrile_to_amine,|R_acidic-H -> RCH2-NH2 | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H | spectators: RCH2-OH
+CCCCCCCCCCCCCC#N>>CCCCCCCCCCCCCCO.CCCCCCCCCCCCCCN,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+Cc1ccc(C#N)c(C)c1>>Cc1ccc(CN)c(C)c1.Cl,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Alkyl
+N#CCc1ccc(Cl)cc1>>NCCc1ccc(Cl)cc1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: Ar-Cl
+Cc1ncc(C#N)c(N)n1>>Cc1ncc(CN)c(N)n1,Reduction_nitrile_to_amine,|HeteroAr-CN -> Bn-NH2 | spectators: Ar-Alkyl|HeteroAr-H|HeteroAr-NH2|Pyrimidine
+N#CC=Cc1ccccc1>>O=CC=Cc1ccccc1.NCC=Cc1ccccc1,Reduction_nitrile_to_amine,|Alkenyl-CN -> RCH2-NH2 | spectators: Ar-Alkenyl
+COc1ccccc1C#N>>COc1ccccc1CN,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-OR
+COc1ccc(C#N)cc1.C=CCB([C@@H]1C[C@@H]2C[C@H]([C@H]1C)C2(C)C)[C@@H]1C[C@@H]2C[C@H]([C@H]1C)C2(C)C>>C=CC[C@H](N)c1ccc(OC)cc1,Reduction_nitrile_to_amine,|Alkyl-B* -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: B-C | spectators: Ar-OR
+N#Cc1ccsc1>>NCc1ccsc1,Reduction_nitrile_to_amine,|HeteroAr-CN -> Bn-NH2 | spectators: HeteroAr-H|Thiophene
+N#CCCCNc1ccc(F)cc1>>NCCCCNc1ccc(F)cc1,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-F|Ar-NHR|RCH2-NHR
+Cc1ccc(C#N)cc1>>Cc1ccc(CN)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Alkyl
+N#Cc1ccccc1.C=C=C(C)C>>C=CC(C)(C)C(N)c1ccccc1,Reduction_nitrile_to_amine,|Alkyl-H|Ar-CN -> R2CH-NH2
+COC(=O)C[C@H](C)[C@H](C)C#N>>C[C@@H]1CNC(=O)C[C@@H]1C,Claisen_condensation,|R2CH-CN|RCH2-CO2R -> Alkyl-NHCOR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: R_acidic-H | events: Ann+C-N
+CO.N#Cc1ccc(F)cc1>>O=CNCc1ccc(F)cc1,Event:C-N,|Ar-CN -> Ar-Alkyl | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-F
+N#CCc1ccc(Br)cc1>>Cl.NCCc1ccc(Br)cc1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|Inorganic|RCH2-NH2 | spectators: Ar-Br
+Cc1cc(C)cc(C(C)(F)C#N)c1>>Cc1cc(C)cc(C(C)(F)CN)c1.Cl,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2 | spectators: Ar-Alkyl|R3C-F
+Cc1cccc(CC#N)c1>>Cc1cccc(CCN)c1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: Ar-Alkyl
+COCC#N.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>COCCNC(=O)OC(C)(C)C,Event:C-N,|Inorganic|RCH2-CN|R_acidic-H -> [] | spectators: RCH2-OR
+N#CCc1ccccc1.CCCCNCc1ccccc1>>CCCCNCCc1ccccc1,Unknown,|Bn-CN|Bn-NHR|R_acidic-H -> Ar-Alkyl | spectators: RCH2-NHR
+CC(=O)OC(C)=O.N#CCc1ccccc1>>CC(=O)NCCc1ccccc1,Claisen_condensation,|Alkyl-CO2R|Bn-CN -> Alkyl-NHCOR | spectators: R_acidic-H
+N#Cc1cccc(Cl)c1>>Cl.NCc1cccc(Cl)c1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Cl
+CC(C)(C)OC(=O)N[C@@H](CC#N)c1ccccc1>>CC(C)(C)OC(=O)N[C@@H](CCN)c1ccccc1,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl
+C[Mg]Br.N#Cc1ccc(C(F)(F)F)cc1>>CC(N)c1ccc(C(F)(F)F)cc1,Reduction_nitrile_to_amine,|Alkyl-Mg* -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-Mg | spectators: Ar-CF3
+N#CC1CCCCC1>>NCC1CCCCC1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2
+CC(C)O.N#CC12CC3CC(CC(C3)C1)C2>>CC(C)NCC12CC3CC(CC(C3)C1)C2,Event:C-N,|R2CH-OH|R3C-CN -> R2CH-NHR|RCH2-NHR
+CN1C(=O)C(C)(CC2(C#N)CCCCC2)c2cc(F)ccc21>>CN1c2ccc(F)cc2[C@]2(C)CC3(CCCCC3)CN[C@H]12,Multi-Event:Ann+C-N,|Alkyl-NRCOR|Ar-NRCOR|R3C-CN -> Ar-NR2 | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Alkyl|Ar-F | events: Ann+C-N
+CC(C)(C)OC(=O)N[C@H](c1ccccc1)[C@@H](C#N)c1ccccc1>>CC(C)(C)OC(=O)NC(c1ccccc1)C(CN)c1ccccc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl
+Br[Mg]Cc1ccccc1.COc1ccc(C#N)cc1OC>>COc1ccc(C(N)Cc2ccccc2)cc1OC,Reduction_nitrile_to_amine,|RCH2-Mg* -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-Mg | spectators: Ar-Alkyl|Ar-OR
+COC(=O)C[C@H](CC#N)c1ccccc1>>O=C1C[C@@H](c2ccccc2)CCN1,Claisen_condensation,|RCH2-CN|RCH2-CO2R -> Alkyl-NHCOR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H | events: Ann+C-N
+N#Cc1ccccc1F>>Fc1ccccc1CNCc1ccccc1F,Multi-Event:Ann+C-N+C-C,|Ar-CN -> Ar-F|Bn-NHR | bond_formed: C(ar)-C(ar); C(ar)-C(ar); C-N | bond_formed_labeled: C(ar)-C(ar); C(ar)-C(ar); C-N | spectators: Ar-F | events: Ann+C-N+C-C
+N#CC(Cl)(Cl)Cl.Cn1ccc2ccccc21.O=C(OC(=O)C(F)(F)F)C(F)(F)F>>Cn1cc(C(NC(=O)C(F)(F)F)C(Cl)(Cl)Cl)c2ccccc21,Claisen_condensation,|Alkyl-CN|Alkyl-CO2R|HeteroAr-H -> Alkyl-NHCOR|Ar-Alkyl | spectators: Alkyl-AromN|Alkyl-Cl|Alkyl-F | events: C-N+C-C
+Cc1ccc(C#N)cc1>>Cc1ccc(CN)cc1.Cl,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Alkyl
+N#Cc1cccc2[nH]ccc12>>NCc1cccc2[nH]ccc12,Reduction_nitrile_to_amine,|HeteroAr-CN -> Bn-NH2 | spectators: AromN-H|HeteroAr-H|Indole
+N#Cc1cccnc1>>Cl.NCc1cccnc1,Reduction_nitrile_to_amine,|HeteroAr-CN -> Bn-NH2 | spectators: HeteroAr-H|Pyridine
+N#CC(Cc1ccc2ccccc2c1)(Cc1ccc2ccccc2c1)C(=O)NCCN>>NCCNC(=O)C(CN)(Cc1ccc2ccccc2c1)Cc1ccc2ccccc2c1,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2 | spectators: Alkyl-NHCOR|Ar-Alkyl|R3C-CONHR|RCH2-NH2
+CCCCCCCCCC#N>>CCCCCCCCCCN.Cl,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+N#CCCC1(c2ccc(F)cc2)OCc2cc(Br)ccc21>>NCCCC1(c2ccc(F)cc2)OCc2cc(Br)ccc21,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl|Ar-Br|Ar-F|Bn-OR
+COc1cccc(C#N)c1>>COc1cccc(CNCc2cccc(OC)c2)c1,Multi-Event:Ann+C-N,|Ar-CN -> Ar-OR|Bn-NHR | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-OR | events: Ann+C-N
+N#Cc1ccc(Cl)cc1>>Clc1ccc(CNCc2ccc(Cl)cc2)cc1,Multi-Event:Ann+C-N,|Ar-CN -> Ar-Cl|Bn-NHR | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-Cl | events: Ann+C-N
+N#Cc1ccccc1Cl>>Clc1ccccc1CNCc1ccccc1Cl,Multi-Event:Ann+C-N,|Ar-CN -> Ar-Cl|Bn-NHR | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-Cl | events: Ann+C-N
+N#Cc1ccc(C(F)(F)F)cc1>>FC(F)(F)c1ccc(CNCc2ccc(C(F)(F)F)cc2)cc1,Multi-Event:Ann+C-N+C-C,|Ar-CN -> Ar-CF3|Bn-NHR | spectators: Ar-CF3 | events: Ann+C-N+C-C
+COC(=O)c1ccc(C#N)cc1>>COC(=O)c1ccc(CNCc2ccc(C(=O)OC)cc2)cc1,Multi-Event:Ann+C-N+C-O,|Ar-CN -> Ar-CO2R|Bn-NHR | bond_formed: C(ar)-O; C-O; C-N | bond_formed_labeled: C(ar)-O; C-O; C-N | spectators: Ar-CO2R | events: Ann+C-N+C-O
+Cc1ccc(C#N)cc1>>Cc1ccc(CN)cc1.Cc1ccc(C=NCc2ccc(C)cc2)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-Alkyl | events: Ann+C-N
+N#Cc1cccc(F)c1.O=[PH](c1ccccc1)c1ccccc1>>O=P(NC(c1cccc(F)c1)P(=O)(c1ccccc1)c1ccccc1)(c1ccccc1)c1ccccc1,Multi-Event:Ann+C-C,|Ar-CN|Ar-H -> Ar-Alkyl | spectators: Ar-F | events: Ann+C-C
+N#Cc1ccc(F)cc1.O=[PH](c1ccccc1)c1ccccc1>>O=P(NC(c1ccc(F)cc1)P(=O)(c1ccccc1)c1ccccc1)(c1ccccc1)c1ccccc1,Multi-Event:Ann+C-C,|Ar-CN|Ar-H -> Ar-Alkyl | spectators: Ar-F | events: Ann+C-C
+N#CC1CCCCC1.O=[PH](c1ccccc1)c1ccccc1>>O=P(NC(C1CCCCC1)P(=O)(c1ccccc1)c1ccccc1)(c1ccccc1)c1ccccc1,Multi-Event:Ann+C-C,|R2CH-CN|R_acidic-H -> Alkyl-H | spectators: Ar-H | events: Ann+C-C
+N#CCc1ccccc1.O=[PH](c1ccccc1)c1ccccc1>>O=P(NC(Cc1ccccc1)P(=O)(c1ccccc1)c1ccccc1)(c1ccccc1)c1ccccc1,Multi-Event:Ann+C-C,|Ar-H|Bn-CN|R_acidic-H -> Ar-Alkyl | events: Ann+C-C
+CC(C)(C)c1ccc(C#N)cc1>>CC(C)(C)c1ccc(CN)cc1.Cl,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Alkyl
+N#Cc1ccccn1>>Cl.NCc1ccccn1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: HeteroAr-H|Pyridine
+COc1ccc(C#N)cn1>>COc1ccc(CN)cn1.Cl,Reduction_nitrile_to_amine,|HeteroAr-CN -> Bn-NH2 | spectators: Ar-OR|HeteroAr-H|Pyridine
+CC(=O)Nc1ccc(C#N)cc1>>CC(=O)Nc1ccc(CN)cc1.Cl,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-NHCOR|R_acidic-H
+Oc1ccc(Cl)c2ccccc12.CCOC(=O)C(C#N)=Cc1cccs1>>CCOC(=O)C1=C(c2cccs2)Oc2c(cc(Cl)c3ccccc23)C1N,Reduction_nitrile_to_amine,|Alkenyl-CN|Ar-OH -> R2CH-NH2 | bond_formed: C-O; C-C(ar) | bond_formed_labeled: C-O; C-C(ar) | spectators: Alkenyl-CO2R|Ar-Alkenyl|Ar-Cl|HeteroAr-H|Thiophene | events: Ann+C-O+C-C
+COc1ccc(N[C@H](c2ccccc2Br)[C@H](C#N)Cc2ccccc2)cc1>>COc1ccc(N[C@H](c2ccccc2Br)[C@H](CN)Cc2ccccc2)cc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl|Ar-Br|Ar-NHR|Ar-OR|R2CH-NHR
+N#Cc1ccccc1N>>NCc1ccccc1N,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-NH2
+N#Cc1ccncc1>>NCc1ccncc1,Reduction_nitrile_to_amine,|HeteroAr-CN -> Bn-NH2 | spectators: HeteroAr-H|Pyridine
+Cc1ccc(/C(=C(\CC#N)C(F)(F)F)c2ccccc2)cc1.CC(=O)OC(C)=O>>CC(=O)NCC/C(=C(/c1ccccc1)c1ccc(C)cc1)C(F)(F)F,Claisen_condensation,|Alkyl-CO2R|RCH2-CN -> Alkyl-NHCOR | spectators: Alkyl-F|Ar-Alkenyl|Ar-Alkyl|R_acidic-H
+CCCC#N>>CCCCN.Cl,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+CCC(C)O.N#Cc1ccccc1>>CCC(C)NCc1ccccc1,Event:C-N,|Ar-CN|R2CH-OH -> Bn-NHR|R2CH-NHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O
+CC#N>>CC(N)P(=O)(O)O,Reduction_nitrile_to_amine,|CH3-CN|R_acidic-H -> R2CH-NH2 | bond_formed: C-P | bond_formed_labeled: C-P
+O=CO.C[C@]1(C#N)[C@H](F)[C@H](F)C[C@H](F)[C@@H]1F>>C[C@]1(CNC=O)[C@H](F)[C@H](F)C[C@H](F)[C@@H]1F,Event:C-N,|R3C-CN|Unclassified-Reactant -> [] | bond_formed: C-N | bond_broken: C-O | spectators: R2CH-F
+CC(C)N(Bc1ccccc1C#N)C(C)C>>CC(C)N(B1NCc2ccccc21)C(C)C,Event:Ann,|Ar-CN -> Bn-NHR | bond_formed: B-N | bond_formed_labeled: B-N | spectators: Ar-B*|R2CH-NR2
+CCOc1ccc2ccccc2c1C(=O)Nc1ccc(CC#N)cc1>>CCOc1ccc2c(c1C(=O)Nc1ccc(CCN)cc1)CCCC2.Cl,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|Inorganic|RCH2-NH2 | spectators: Ar-NHCOR|Ar-OR
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.CCOC(=O)C[C@@H](C#N)c1ccccc1>>CCOC(=O)C[C@@H](CNC(=O)OC(C)(C)C)c1ccccc1,Event:C-N,|Inorganic|R2CH-CN|R_acidic-H -> [] | spectators: Ar-Alkyl|RCH2-CO2R
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.C[C@@H](C#N)c1cccc(Cl)c1>>C[C@@H](CNC(=O)OC(C)(C)C)c1cccc(Cl)c1,Event:C-N,|Inorganic|R2CH-CN|R_acidic-H -> [] | spectators: Ar-Alkyl|Ar-Cl
+CCC(=O)Nc1ccc(C#N)cc1>>CCC(=O)Nc1ccc(CN)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-NHCOR|R_acidic-H
+N#Cc1cccc(C(F)(F)F)c1>>Cl.NCc1cccc(C(F)(F)F)c1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-CF3
+Cc1ccc(C(C#N)CC(F)(F)C(F)(F)C(F)(F)C(F)(F)F)cc1>>Cc1ccc(C(CN)CC(F)(F)C(F)(F)C(F)(F)C(F)(F)F)cc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Alkyl-CF3|Alkyl-F|Ar-Alkyl
+N#Cc1ccccc1[N+](=O)[O-]>>NCc1ccccc1N=O,Reduction_nitrile_to_amine,|Ar-CN|Ar-NO2 -> Bn-NH2 | bond_broken: N-O
+N#Cc1cccc(C#N)c1>>Cl.NCc1cccc(CN)c1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2
+N#CC1CCCC1>>Cl.[2H]C([2H])(N)C1CCCC1,Reduction_nitrile_to_amine,|R_acidic-H -> RCH2-NH2 | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H
+N#CC12CC3CC(CC(C3)C1)C2>>Cl.[2H]C([2H])(N)C12CC3CC(CC(C3)C1)C2,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2 | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H
+CCCCOCCC#N>>Cl.[2H]C([2H])(N)CCOCCCC,Reduction_nitrile_to_amine,|R_acidic-H -> RCH2-NH2 | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H | spectators: RCH2-OR
+N#C/C=C/c1ccc(Cl)cc1>>Cl.NC/C=C/c1ccc(Cl)cc1,Reduction_nitrile_to_amine,|Alkenyl-CN -> RCH2-NH2 | spectators: Ar-Alkenyl|Ar-Cl
+N#CC(c1ccccc1)c1ccccc1>>Cl.NCC(c1ccccc1)c1ccccc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl
+CCCCCCCCC#N>>CCCCCCCCCN.Cl,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+N#CCCCCCCCCC#N>>Cl.NCCCCCCCCCCN,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+N#CCc1ccccc1>>NCCc1ccccc1.c1ccc(CCNCCc2ccccc2)cc1,Event:Ann,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2|RCH2-NHR
+N#CCCC#N>>Cl.NCCCCN,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+N#Cc1ccc(C(F)(F)F)cc1>>NCc1ccc(C(F)(F)F)cc1.FC(F)(F)c1ccc(C=NCc2ccc(C(F)(F)F)cc2)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-CF3 | events: Ann+C-N+C-C
+COc1ccc(C#N)cc1>>COc1ccc(CN)cc1.COc1ccc(CNCc2ccc(OC)cc2)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-OR
+N#CCc1ccccc1>>NCCc1ccccc1.C(Cc1ccccc1)=NCCc1ccccc1,Multi-Event:Ann+C-N+C-C,|Bn-CN -> Ar-Alkyl | bond_formed: C(ar)-N; C-C(ar) | bond_formed_labeled: C(ar)-N; C-C(ar)[Ar-Alkyl] | events: Ann+C-N+C-C
+CC(C)(C)C#N>>CC(C)(C)CN,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2
+CC(C)CC(C)(C)C#N>>CC(C)CC(C)(C)CN,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2
+C[Mg]Br.COc1ccc(C#N)cc1OC>>COc1ccc(C(C)N)cc1OC,Reduction_nitrile_to_amine,|Alkyl-Mg* -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-Mg | spectators: Ar-OR
+CC(C)Cc1ccc([C@H](C)C#N)cc1>>CC(C)Cc1ccc([C@H](C)CN)cc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl
+N#CC(O)c1ccccc1>>NCCc1ccccc1.NCC(O)c1ccccc1,Reduction_nitrile_to_amine,|R2CH-CN -> RCH2-NH2 | bond_formed: C(ar)-C(ar); C(ar)-C(ar) | bond_formed_labeled: C(ar)-C(ar); C(ar)-C(ar) | spectators: Ar-Alkyl|R2CH-OH | events: Ann+C-C
+N#Cc1ccc(F)cc1>>Cl.[2H]C([2H])(N)c1ccc(F)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H | spectators: Ar-F
+CC(C)(C)c1ccc(C#N)cc1>>Cl.[2H]C([2H])(N)c1ccc(C(C)(C)C)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H | spectators: Ar-Alkyl
+CSc1ccc(C#N)cc1>>Cl.[2H]C([2H])(N)c1ccc(SC)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H | spectators: Ar-SR
+CC(C#N)c1ccccc1>>Cl.[2H]C([2H])(N)C(C)c1ccccc1,Reduction_nitrile_to_amine,|R_acidic-H -> RCH2-NH2 | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H | spectators: Ar-Alkyl
+N#CCc1ccc2c(c1)OCO2>>[2H]C([2H])(N)Cc1ccc2c(c1)OCO2,Unknown,|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H | spectators: Ar-OR
+CC(C)O.N#Cc1ccccc1>>CC(C)NCc1ccccc1,Event:C-N,|Ar-CN|R2CH-OH -> Bn-NHR|R2CH-NHR
+CC(C)O.CCCC#N>>CCCCNCCCC.CCCCNC(C)C,Multi-Event:C-N+C-C,|R2CH-OH|RCH2-CN -> R2CH-NHR|RCH2-NHR | bond_formed: C-N; C-C; C-C | bond_formed_labeled: C-N; C-C; C-C | bond_broken: C-O | events: C-N+C-C
+N#Cc1ccncc1>>Cl.NCc1ccncc1,Reduction_nitrile_to_amine,|HeteroAr-CN -> Bn-NH2 | spectators: HeteroAr-H|Pyridine
+CCO.COc1ccc(C#N)cc1>>CCNCc1ccc(OC)cc1,Event:C-N,|Ar-CN|RCH2-OH -> Bn-NHR|RCH2-NHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-OR
+CC(C)(C#N)C(=O)Nc1ccccc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NCC(C)(C)C(=O)Nc1ccccc1,Event:C-N,|Inorganic|R3C-CN -> [] | spectators: Ar-NHCOR
+Cc1cc(C)cc(CC#N)c1>>Cc1cc(C)cc(CCN)c1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: Ar-Alkyl
+COC(=O)C(CC#N)c1ccc(OC)cc1>>COc1ccc(C2CCNC2=O)cc1,Claisen_condensation,|R2CH-CO2R|RCH2-CN -> Alkyl-NHCOR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|R_acidic-H | events: Ann+C-N
+C=CCOc1ccc(C#N)cc1>>C=CCOc1ccc(CN)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Allyl-OR|Ar-OR
+CCC#N>>CCCNCCC,Event:C-N,|RCH2-CN -> RCH2-NHR | bond_formed: C-N | bond_formed_labeled: C-N
+N#CCCc1ccccc1>>c1ccc(CCCNCCCc2ccccc2)cc1,Multi-Event:Ann+C-N+C-C,|RCH2-CN -> Ar-Alkyl|RCH2-NHR | bond_formed: C(ar)-C(ar); C(ar)-C(ar); C(ar)-C(ar); C-N | bond_formed_labeled: C(ar)-C(ar)[Ar-Alkyl]; C(ar)-C(ar); C(ar)-C(ar); C-N | spectators: Ar-Alkyl | events: Ann+C-N+C-C
+N#CCc1cccnc1>>c1cncc(CCNCCc2cccnc2)c1,Multi-Event:Ann+C-N+C-C,|Bn-CN -> Ar-Alkyl|HeteroAr-H|Pyridine|RCH2-NHR | bond_formed: C(ar)-C(ar); C(ar)-C(ar); C(ar)-N; C(ar)-N | bond_formed_labeled: C(ar)-C(ar)[Ar-Alkyl]; C(ar)-C(ar); C(ar)-N; C(ar)-N | spectators: HeteroAr-H|Pyridine | events: Ann+C-N+C-C
+CC(C)C#N>>CC(C)CNCC(C)C,Multi-Event:C-N+C-C,|R2CH-CN -> RCH2-NHR | bond_formed: C-C; C-C; C-C; C-N | bond_formed_labeled: C-C; C-C; C-C; C-N | events: C-N+C-C
+COc1ccc(C#N)cc1.C=CC[Mg]Br>>C=CCC(N)c1ccc(OC)cc1,Reduction_nitrile_to_amine,|RCH2-Mg* -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-Mg | spectators: Ar-OR
+N#CCc1cccc(Cl)c1>>N[C@@H](Cc1cccc(Cl)c1)[C@@H](N)Cc1cccc(Cl)c1,Multi-Event:Ann+C-C,|Bn-CN -> Ar-Alkyl|Ar-Cl|R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | spectators: Ar-Cl | events: Ann+C-C
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.CC(C)(C)c1ccc(NC(=O)C[C@@H](C#N)CC(F)(F)F)cc1>>CC(C)(C)OC(=O)NC[C@H](CC(=O)Nc1ccc(C(C)(C)C)cc1)CC(F)(F)F,Event:C-N,|Inorganic|R2CH-CN -> [] | spectators: Alkyl-CF3|Ar-Alkyl|Ar-NHCOR|R_acidic-H
+CC[Si](CC)(CC)ON(C)C(c1ccccc1)C(C)(C)C#N>>CN(O)C(c1ccccc1)C(C)(C)CN,Reduction_nitrile_to_amine,|Alkyl-Si* -> RCH2-NH2 | bond_broken: O-Si | spectators: Ar-Alkyl|CH3-NR2|R2CH-NR2
+CCCCCCCCCCCCCCCCCCC#N>>CCCCCCCCCCCCCCCCCCCN,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+N#Cc1ccc2c(c1)OCO2>>Cl.NCc1ccc2c(c1)OCO2,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-OR
+N#CCc1c(-c2ccccn2)[nH]c2ccccc12>>NCCc1c(-c2ccccn2)[nH]c2ccccc12,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: Ar-Ar|AromN-H|HeteroAr-H|Indole|Pyridine
+N#CCc1c(-c2ccccc2)[nH]c2ccccc12>>NCCc1c(-c2ccccc2)[nH]c2ccccc12,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: Ar-Ar|AromN-H|HeteroAr-H|Indole
+O=Cc1ccccc1.CC(C)(C)C#N>>CC(C)(C)CNCc1ccccc1.Cl,Event:C-N,|Ar-CHO|R3C-CN -> Bn-NHR|Inorganic|RCH2-NHR
+N#Cc1ccccc1.Cc1cccc(C=O)c1>>Cc1cccc(CNCc2ccccc2)c1.Cl,Event:C-N,|Ar-CHO|Ar-CN -> Bn-NHR|Inorganic | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Alkyl
+O=Cc1ccccc1.CCCCC#N>>CCCCCNCc1ccccc1.Cl,Event:C-N,|Ar-CHO|RCH2-CN -> Bn-NHR|Inorganic|RCH2-NHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O
+O=Cc1ccccc1.N#Cc1ccc(F)cc1>>Cl.Fc1ccc(CNCc2ccccc2)cc1,Event:C-N,|Ar-CHO|Ar-CN -> Bn-NHR|Inorganic | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-F
+CCCCC#N.O=Cc1ccc2c(c1)OCO2>>CCCCCNCc1ccc2c(c1)OCO2.Cl,Event:C-N,|Ar-CHO|RCH2-CN -> Bn-NHR|Inorganic|RCH2-NHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-OR
+CCCCC#N.CC(C)(C)c1ccc(C=O)cc1>>CCCCCNCc1ccc(C(C)(C)C)cc1.Cl,Event:C-N,|Ar-CHO|RCH2-CN|R_acidic-H -> Bn-NHR|Inorganic|RCH2-NHR | spectators: Ar-Alkyl
+O=Cc1ccccc1.Cc1ccc(C#N)cc1>>Cc1ccc(CNCc2ccccc2)cc1.Cl,Event:C-N,|Ar-CHO|Ar-CN -> Bn-NHR|Inorganic | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Alkyl
+O=Cc1ccccc1.N#CC1CCCCC1>>Cl.c1ccc(CNCC2CCCCC2)cc1,Event:C-N,|Ar-CHO|R2CH-CN|R_acidic-H -> Bn-NHR|Inorganic|RCH2-NHR
+N#Cc1ccccc1.CC1(C)OB(c2ccc(C=O)cc2)OC1(C)C>>CC1(C)OB(c2ccc(CNCc3ccccc3)cc2)OC1(C)C.Cl,Event:C-N,|Ar-CHO|Ar-CN -> Bn-NHR|Inorganic | spectators: Ar-Bpin
+O=Cc1ccccc1.N#Cc1ccc2ccccc2c1>>Cl.c1ccc(CNCc2ccc3ccccc3c2)cc1,Event:C-N,|Ar-CHO|Ar-CN -> Bn-NHR|Inorganic
+N#Cc1ccccc1.O=Cc1ccc(F)cc1>>Cl.Fc1ccc(CNCc2ccccc2)cc1,Event:C-N,|Ar-CHO|Ar-CN -> Bn-NHR|Inorganic | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-F
+N#CCc1ccc(F)cc1>>Cl.NCCc1ccc(F)cc1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|Inorganic|RCH2-NH2 | spectators: Ar-F
+Cn1cc(C2(C#N)CC2)cn1>>Cn1cc(C2(CN)CC2)cn1,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2 | spectators: Alkyl-AromN|Ar-Alkyl|HeteroAr-H|Pyrazole
+N#CCc1ccsc1>>NCCc1ccsc1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: HeteroAr-H|Thiophene
+N#CCCCc1ccccc1>>Cl.NCCCCc1ccccc1,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl
+N#Cc1cccc(OCc2ccccc2)c1>>Cl.NCc1cccc(OCc2ccccc2)c1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-OR|Bn-OR
+CC(=O)OC(C)=O.CN1C(=O)C(CCC#N)c2ccccc21>>CC(=O)NCCCC1C(=O)N(C)c2ccccc21,Claisen_condensation,|Alkyl-CO2R|RCH2-CN -> Alkyl-NHCOR | spectators: Alkyl-NRCOR|Ar-Alkyl|Ar-NRCOR|R_acidic-H
+COC(=O)[C@@H](CC#N)c1ccccc1>>O=C1NCC[C@H]1c1ccccc1,Claisen_condensation,|R2CH-CO2R|RCH2-CN -> Alkyl-NHCOR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H | events: Ann+C-N
+CC(=O)OC(C)=O.N#CCCCc1ccccc1>>CC(=O)NCCCCc1ccccc1,Claisen_condensation,|Alkyl-CO2R|RCH2-CN -> Alkyl-NHCOR | spectators: Ar-Alkyl|R_acidic-H
+Cc1cn(CCC#N)c(=O)[nH]c1=O.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>Cc1cn(CCCNC(=O)OC(C)(C)C)c(=O)[nH]c1=O,Event:C-N,|Inorganic|RCH2-CN|R_acidic-H -> [] | spectators: Alkyl-AromN|Ar-Alkyl|AromN-H|HeteroAr-H|Pyrimidine
+CC1(C)OC[C@H]([C@@H](O)[C@H](C#N)N(Cc2ccccc2)C(C)(C)C)O1.C/C=C/C[Mg]Br>>C=C[C@@H](C)[C@@H](N)[C@@H]([C@H](O)[C@H]1COC(C)(C)O1)N(Cc1ccccc1)C(C)(C)C,Reduction_nitrile_to_amine,|R2CH-CN|RCH2-Mg*|R_acidic-H -> R2CH-NH2 | spectators: Bn-NR2|R2CH-NR2|R2CH-OH|R3C-NR2|R3C-OR|RCH2-OR
+CO.N#Cc1cccc(C(F)(F)F)c1>>O=CNCc1cccc(C(F)(F)F)c1,Event:C-N,|Ar-CN -> Ar-Alkyl | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-CF3
+CC(C)C#N.C=C=Cc1ccccc1>>C=CC(c1ccccc1)C(N)C(C)C,Reduction_nitrile_to_amine,|Ar-H|R2CH-CN|R_acidic-H -> R2CH-NH2
+CC(C)O.N#Cc1ccccc1>>NCc1ccccc1.CC(C)=NCc1ccccc1,Reduction_nitrile_to_amine,|Ar-CN|R2CH-OH -> Bn-NH2 | bond_formed: C-C; C-N; C(ar)-C(ar); C-C(ar); C-C(ar) | bond_formed_labeled: C-C; C-N; C(ar)-C(ar); C-C(ar); C-C(ar) | bond_broken: C-O | events: Ann+C-N+C-C
+CC1(C)CC(C(O)CC#N)CCO1>>CC1(C)CC(C(O)CCN)CCO1,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: R2CH-OH|RCH2-OR
+N#CC(c1ccccc1)c1ccccc1>>NCC(c1ccccc1)c1ccccc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl
+OCc1ccco1.N#CCCc1ccccc1>>O=C(NCCCc1ccccc1)c1ccco1,Event:C-N,|RCH2-CN -> Ar-CONHR | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-Alkyl|Furan|HeteroAr-H
+C=CC#N.COC(=O)CCCCCCC/C=C\CCCCCCCC(=O)OC>>COC(=O)CCCCCCCCCCN,Reduction_nitrile_to_amine,|Alkenyl-CN|RCH2-CO2R|R_acidic-H -> RCH2-NH2
+N#Cc1ccccc1.C=CC[Mg]Cl>>C=CC[C@H](N)c1ccccc1,Reduction_nitrile_to_amine,|RCH2-Mg* -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-Mg
+N#CC(C(=O)OCc1ccccc1)c1cc(C(F)(F)F)ccc1[N+](=O)[O-]>>FC(F)(F)c1ccc2[nH]ccc2c1.NCCc1cc(C(F)(F)F)ccc1N,Reduction_nitro / Reduction_nitrile_to_amine,|Ar-NO2|R2CH-CN|R2CH-CO2R|R_acidic-H -> Ar-NH2 | spectators: Ar-Alkyl|Ar-CF3 | events: Ann+C-N+C-C | reaction_types: Reduction_nitro+Reduction_nitrile_to_amine
+CC(F)(C#N)c1ccc(Cl)cc1>>CC(F)(CN)c1ccc(Cl)cc1.Cl,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2 | spectators: Ar-Alkyl|Ar-Cl|R3C-F
+CO.N#Cc1ccccc1>>O=CNCc1ccccc1,Event:C-N,|Ar-CN -> Ar-Alkyl | bond_formed: C-N | bond_formed_labeled: C-N
+CC(C)O.CCCOc1ccc(C#N)cc1>>CCCOc1ccc(CN)cc1.CCCOc1ccc(N=C(C)C)cc1,Reduction_nitrile_to_amine,|Ar-CN|R2CH-OH -> Bn-NH2 | bond_formed: C-O; C-C(ar); C-C(ar); C(ar)-C(ar); C(ar)-N | bond_formed_labeled: C-O; C-C(ar); C-C(ar); C(ar)-C(ar); C(ar)-N | spectators: Ar-OR | events: Ann+C-N+C-O+C-C
+N#CCCCC#N>>C1CCNCC1.Cl,Event:Ann,|RCH2-CN|R_acidic-H -> Inorganic|RCH2-NHR
+N#CCOc1ccc(Cl)cc1.C=C=C[Si](C)(C)C(C)(C)C>>CC(C)(C)[Si](C)(C)C=CCC(N)COc1ccc(Cl)cc1,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> R2CH-NH2 | spectators: Alkyl-Si*|Ar-Cl|Ar-OR
+COc1ccc(NCCCCC#N)cc1>>COc1ccc(NCCCCCN)cc1,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-NHR|Ar-OR|RCH2-NHR
+CO.N#Cc1ccc(Br)cc1>>O=CNCc1ccc(Br)cc1,Event:C-N,|Ar-CN -> Ar-Alkyl | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-Br
+N#Cc1ccccc1F>>NCc1ccccc1F,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-F
+CCC[C@@H](C#N)SCc1ccccc1>>CCC[C@@H](CN)SCc1ccccc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Bn-SR
+N#CCCc1ccccc1.CC(CO)c1ccccc1>>CC(C(=O)NCCCc1ccccc1)c1ccccc1,Event:C-N,|RCH2-CN -> Alkyl-NHCOR | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-Alkyl|R_acidic-H
+N#CCCCCl>>Cl.NCCCCCl,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: RCH2-Cl
+O=[N+]([O-])c1ccccc1.CCCCCCCCCCCC#N>>CCCCCCCCCCCCNc1ccccc1,Unknown,|Ar-NO2|RCH2-CN|R_acidic-H -> Ar-NHR|RCH2-NHR
+C=C1CC[C@H]2C(C)(C)CCC[C@]2(C)[C@H]1CCC(C#N)c1ccc2c(c1)OCO2>>C=C1CC[C@H]2C(C)(C)CCC[C@]2(C)[C@H]1CCC(CN)c1ccc2c(c1)OCO2.Cl,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl|Ar-OR
+N#CC(F)c1ccc(Cl)cc1>>Cl.NCC(F)c1ccc(Cl)cc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl|Ar-Cl|R2CH-F
+CCOC(=O)C(CCC#N)C(C)=O>>CCOC(=O)C1=C(C)NCCC1,Claisen_condensation / Wittig_reaction,|R2CH-CO2R|R2CH-COR|RCH2-CN -> Alkenyl-CO2R|Alkenyl-NHR|RCH2-NHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | events: Ann+C-N | reaction_types: Claisen_condensation+Wittig_reaction
+CC(C#N)CCC#N>>CC1CCCNC1.Cl,Event:Ann,|R2CH-CN|RCH2-CN|R_acidic-H -> Inorganic|RCH2-NHR
+CCCCCCCCCCCCCCCCCC#N>>CCCCCCCCCCCCCCCCCCN.Cl,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+N#Cc1ccc(Br)cc1Cl>>NCc1ccc(Br)cc1Cl,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Br|Ar-Cl
+CC(C)O.N#Cc1ccc(-c2ccccc2)cc1>>CC(C)NCc1ccc(-c2ccccc2)cc1,Event:C-N,|Ar-CN|R2CH-OH -> Bn-NHR|R2CH-NHR | spectators: Ar-Ar
+CC(C)(C)OC(=O)N(CCC#N)CCCCCCCN(CCC#N)C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N(CCCN)CCCCCCCN(CCCN)C(=O)OC(C)(C)C,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+COc1ccc(C#N)cn1>>COc1ccc(CN)cn1,Reduction_nitrile_to_amine,|HeteroAr-CN -> Bn-NH2 | spectators: Ar-OR|HeteroAr-H|Pyridine
+COc1ccc(NCCCCC#N)cc1OC>>COc1ccc(NCCCCCN)cc1OC,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-NHR|Ar-OR|RCH2-NHR
+N#Cc1ccccc1.C=CCB([C@@H]1C[C@@H]2C[C@H]([C@H]1C)C2(C)C)[C@@H]1C[C@@H]2C[C@H]([C@H]1C)C2(C)C>>C=CC[C@H](N)c1ccccc1,Reduction_nitrile_to_amine,|Alkyl-B* -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: B-C
+N#CCCCNc1ccccc1>>NCCCCNc1ccccc1,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-NHR|RCH2-NHR
+N#CCc1ccc(Cl)c(Cl)c1>>NCCc1ccc(Cl)c(Cl)c1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: Ar-Cl
+OCCc1ccccc1.N#[13C]CCc1ccccc1>>O=C(Cc1ccccc1)N[13CH2]CCc1ccccc1,Event:C-N,|RCH2-CN -> Alkyl-NHCOR|Bn-CONHR | bond_formed: C-N | bond_formed_labeled: C-N | spectators: Ar-Alkyl|R_acidic-H
+Cc1cccc([N+](=O)[O-])c1.CCCC#N>>CCCCNc1cccc(C)c1,Unknown,|Ar-NO2|RCH2-CN -> Ar-NHR|RCH2-NHR | bond_broken: N-O | spectators: Ar-Alkyl
+N#Cc1ccc(CS(N)(=O)=O)cc1>>NCc1ccc(CS(N)(=O)=O)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Alkyl-SO2NH2|Ar-Alkyl|R_acidic-H
+CC1(C)CCCC(C)(C)N1OC(C#N)c1ccccc1>>CC1(C)CCCC(C)(C)N1OC(CN)c1ccccc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl|R3C-NR2
+CC(C)C[C@@H](C#N)SCc1ccccc1>>CC(C)C[C@@H](CN)SCc1ccccc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Bn-SR
+CN(CCCC#N)c1ccccc1>>CN(CCCCN)c1ccccc1,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-NR2|CH3-NR2|RCH2-NR2
+N#Cc1ccc2ccccc2c1.CC[Mg]Br>>CCC(N)c1ccc2ccccc2c1,Reduction_nitrile_to_amine,|RCH2-Mg* -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-Mg
+CCCCCCCCCCC#N>>CCCCCCCCCCCN.Cl,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+CC(C)[Si](Oc1ccc(C#N)cc1)(C(C)C)C(C)C>>CC(C)[Si](Oc1ccc(CN)cc1)(C(C)C)C(C)C,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Alkyl-Si*
+Cc1ccc([N+](=O)[O-])cc1.CCCC#N>>CCCCNc1ccc(C)cc1.CCCCN(CCCC)c1ccc(C)cc1,Multi-Event:Ann+C-N+C-C,|Ar-NO2|RCH2-CN|R_acidic-H -> Ar-NHR|Ar-NR2 | spectators: Ar-Alkyl | events: Ann+C-N+C-C
+N#CCc1ccc(Cl)cc1>>[2H]C([2H])(N)C([2H])([2H])c1ccc(Cl)cc1,Unknown,|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | bond_formed: C-H; C-H; C-H; C-H | bond_formed_labeled: C-H; C-H; C-H; C-H | spectators: Ar-Cl
+CSc1ccc(CC#N)cc1>>[2H]C([2H])(N)C([2H])([2H])c1ccc(SC)cc1,Unknown,|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | bond_formed: C-H; C-H; C-H; C-H | bond_formed_labeled: C-H; C-H; C-H; C-H | spectators: Ar-SR
+N#CCc1ccc(F)cc1>>[2H]C([2H])(N)C([2H])([2H])c1ccc(F)cc1,Unknown,|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | bond_formed: C-H; C-H; C-H; C-H | bond_formed_labeled: C-H; C-H; C-H; C-H | spectators: Ar-F
+CC(C#N)c1ccccc1>>[2H]C([2H])(N)C([2H])(C)c1ccccc1,Reduction_nitrile_to_amine,|R_acidic-H -> RCH2-NH2 | bond_formed: C-H; C-H; C-H | bond_formed_labeled: C-H; C-H; C-H | spectators: Ar-Alkyl
+N#CCc1ccc(Cl)c(F)c1>>[2H]C([2H])(N)C([2H])([2H])c1ccc(Cl)c(F)c1,Unknown,|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | bond_formed: C-H; C-H; C-H; C-H | bond_formed_labeled: C-H; C-H; C-H; C-H | spectators: Ar-Cl|Ar-F
+Cc1cccc(C)c1C#N>>Cc1cccc(C)c1CN.Cl,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Alkyl
+N#C/C=C/c1ccccc1>>NC/C=C/c1ccccc1,Reduction_nitrile_to_amine,|Alkenyl-CN -> RCH2-NH2 | spectators: Ar-Alkenyl
+CO.N#Cc1ccc(C(=O)O)cc1>>COC(=O)c1ccc(CNCc2ccc(C(=O)OC)cc2)cc1,Esterification,|Ar-CN|Ar-CO2H|CH3-OH -> Ar-CO2R | bond_formed: C-O; C(ar)-C(ar); C(ar)-N | bond_formed_labeled: C-O; C(ar)-C(ar); C(ar)-N | events: Amid+Ann+C-N+C-O
+N#Cc1ccc(-c2ccccc2)cc1>>[H-][B+3]([H-])([H-])[NH2]CC1=CC=C(C2=CC=CC=C2)C=C1,Unresolved:NoMotifEvidence,|[] -> []
+Cc1cccc(C#N)c1>>[H-][B+3]([H-])([H-])[NH2]CC1=CC(C)=CC=C1,Unresolved:NoMotifEvidence,|[] -> []
+N#Cc1ccc2c(c1)OCO2>>[H-][B+3]([H-])([H-])[NH2]CC1=CC=C2OCOC2=C1,Unresolved:NoMotifEvidence,|[] -> []
+N#CC12CC3CC(CC(C3)C1)C2>>[H-][B+3]([H-])([H-])[NH2]CC12CC3CC(CC(C3)C1)C2,Unresolved:NoMotifEvidence,|[] -> []
+NCc1ccccc1.Cc1ccc(C#N)cc1>>Cc1ccc(CNCc2ccccc2)cc1.Cc1ccc(CNCc2ccc(C)cc2)cc1,Multi-Event:Ann+C-N+C-C,|Ar-CN|Bn-NH2 -> Ar-Alkyl|Bn-NHR | bond_formed: C(ar)-C(ar); C(ar)-C(ar); C(ar)-C(ar); C-N; C-N | bond_formed_labeled: C(ar)-C(ar)[Ar-Alkyl]; C(ar)-C(ar); C(ar)-C(ar); C-N; C-N | spectators: Ar-Alkyl | events: Ann+C-N+C-C
+COc1ccc(N)cc1.COc1ccc(C#N)cc1>>COc1ccc(CNc2ccc(OC)cc2)cc1,Unknown,|Ar-CN|Ar-NH2 -> Ar-NHR|Bn-NHR | spectators: Ar-OR
+N#Cc1ccc(OCc2ccccc2)cc1>>NCc1ccc(OCc2ccccc2)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-OR|Bn-OR
+N#Cc1ccc(C(N)=O)cc1>>NCc1ccc(C(N)=O)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-CONH2
+N#Cc1ccc2c(c1)COC2=O>>NCc1ccc2c(c1)COC2=O,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Alkyl|Ar-CO2R
+N#CC(c1ccccc1)C1CCCCC1>>NCC(c1ccccc1)C1CCCCC1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl
+COc1cc(CC#N)cc(OC)c1OC>>COc1cc(CCN)cc(OC)c1OC,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: Ar-OR
+N#CCCCCCCC#N>>NCCCCCCCCN,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+N#Cc1ccc(-c2ccc(C#N)cc2)cc1>>NCc1ccc(-c2ccc(CN)cc2)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Ar
+CCCCOC(=O)C(C)Oc1ccc(Oc2ccc(C#N)cc2F)cc1>>CCCCOC(=O)[C@@H](C)Oc1ccc(Oc2ccc(CN)cc2F)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-F|Ar-OR|R2CH-CO2R|R_acidic-H
+CN(C)CCCC1(c2ccc(F)cc2)OCc2cc(C#N)ccc21>>CN(C)CCCC1(c2ccc(F)cc2)OCc2cc(CN)ccc21,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Alkyl|Ar-F|Bn-OR|CH3-NR2|RCH2-NR2
+COc1ccc(C#N)cc1>>NCc1ccccc1,Reduction_nitrile_to_amine,|Ar-OR -> Bn-NH2 | bond_broken: C(ar)-O
+Cc1ccc(C#N)cc1.O=C(O)c1ccccc1>>Cc1ccc(CNC(=O)c2ccccc2)cc1,Multi-Event:Amid+C-N,|Ar-CN|Ar-CO2H -> Ar-CONHR | spectators: Ar-Alkyl | events: Amid+C-N
+N#Cc1ccc(F)cc1.O=C(O)c1ccccc1>>O=C(NCc1ccc(F)cc1)c1ccccc1,Multi-Event:Amid+C-N,|Ar-CN|Ar-CO2H -> Ar-CONHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-F | events: Amid+C-N
+N#Cc1ccsc1.O=C(O)c1ccccc1>>O=C(NCc1ccsc1)c1ccccc1,Multi-Event:Amid+C-N,|Ar-CO2H|HeteroAr-CN -> Ar-CONHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: HeteroAr-H|Thiophene | events: Amid+C-N
+N#Cc1ccc(F)c(C(F)(F)F)c1.O=C(O)C(F)(F)F>>O=C(NCc1ccc(F)c(C(F)(F)F)c1)C(F)(F)F,Multi-Event:Amid+C-N,|Alkyl-CO2H|Ar-CN -> Alkyl-NHCOR | spectators: Alkyl-F|Ar-CF3|Ar-F | events: Amid+C-N
+N#Cc1ccccc1.O=C(O)c1ccccc1>>Cl.c1ccc(CNCc2ccccc2)cc1,Multi-Event:Amid+C-N,|Ar-CN|Ar-CO2H -> Bn-NHR|Inorganic | events: Amid+C-N
+COc1ccc(CC#N)cc1OC.O=C(O)c1ccccc1>>COc1ccc(CCNC(=O)c2ccccc2)cc1OC,Multi-Event:Amid+C-N,|Ar-CO2H|Bn-CN|R_acidic-H -> Ar-CONHR | spectators: Ar-OR | events: Amid+C-N
+N#CCc1ccc(Cl)cc1Cl.O=C(O)c1ccccc1>>O=C(NCCc1ccc(Cl)cc1Cl)c1ccccc1,Multi-Event:Amid+C-N,|Ar-CO2H|Bn-CN -> Ar-CONHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Cl | events: Amid+C-N
+Cc1cccc(C#N)c1.CCCCCC(=O)O>>CCCCCC(=O)NCc1cccc(C)c1,Multi-Event:Amid+C-N,|Ar-CN|RCH2-CO2H -> Alkyl-NHCOR | spectators: Ar-Alkyl|R_acidic-H | events: Amid+C-N
+N#Cc1c(F)cccc1Br>>Cl.NCc1c(F)cccc1Br,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Br|Ar-F
+N#C[C@H]1CCc2ccccc2O1>>Cl.NC[C@H]1CCc2ccccc2O1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl|Ar-OR
+CC(=O)c1ccccc1.Cc1ccc(C#N)cc1>>Cc1ccc(CNC(C)c2ccccc2)cc1,Event:C-N,|Ar-CN|Ar-COR -> Bn-NHR|R2CH-NHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Alkyl
+CC(=O)c1ccccc1.N#CC1CCCCC1>>CC(NCC1CCCCC1)c1ccccc1,Event:C-N,|Ar-COR|R2CH-CN -> Ar-Alkyl|R2CH-NHR|RCH2-NHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O
+CC(=O)c1ccc(Cl)cc1.N#Cc1ccccc1>>CC(NCc1ccccc1)c1ccc(Cl)cc1,Event:C-N,|Ar-CN|Ar-COR -> Ar-Alkyl|Bn-NHR|R2CH-NHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Cl
+CN1C(=O)[C@@](C)(CC#N)c2ccccc21>>CN1C[C@@](C)(CCN)c2ccccc21,Reduction_nitrile_to_amine,|Alkyl-NRCOR|Ar-NRCOR -> RCH2-NH2 | bond_broken: C-O | spectators: Ar-Alkyl
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.COc1ccc(/C=C/CC(C#N)c2ccccc2F)cc1>>COc1ccc(CCCC(CNC(=O)OC(C)(C)C)c2ccccc2F)cc1,Event:C-N,|Ar-Alkenyl|Inorganic|R2CH-CN|R_acidic-H -> Ar-Alkyl | spectators: Ar-Alkyl|Ar-F|Ar-OR
+COC(=O)c1c(C(C)(C#N)c2ccccc2)ccnc1OC>>COc1nccc2c1C(=O)NCC2(C)c1ccccc1,Claisen_condensation,|Ar-CO2R|R3C-CN -> Ar-CONHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|HeteroAr-H|Pyridine | events: Ann+C-N
+N#CCc1ccc(F)cc1F>>NCCc1ccc(F)cc1F,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: Ar-F
+N#CCc1ccc2ccccc2c1>>NCCc1ccc2ccccc2c1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2
+N#CCc1ccc2c(c1)OCO2>>NCCc1ccc2c(c1)OCO2,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | spectators: Ar-OR
+COc1ccc(C#N)c(OC)c1>>COc1ccc(CN)c(OC)c1.Cl,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-OR
+CCC1(C#N)CC2(COC2)C1>>CCC12CNCC(CO)(C1)C2,Multi-Event:Ann+C-N,|R3C-CN|RCH2-OR -> RCH2-NHR|RCH2-OH | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | events: Ann+C-N
+N#CC1(Cc2ccccc2)CC2(COC2)C1>>OCC12CNCC(Cc3ccccc3)(C1)C2,Multi-Event:Ann+C-N,|R3C-CN|RCH2-OR -> RCH2-NHR|RCH2-OH | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Alkyl | events: Ann+C-N
+N#CC1(C2CCCC2)CC2(COC2)C1>>OCC12CNCC(C3CCCC3)(C1)C2,Multi-Event:Ann+C-N,|R3C-CN|RCH2-OR -> RCH2-NHR|RCH2-OH | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | events: Ann+C-N
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.CCC(C#N)CCC(c1ccccc1)c1ccc(C(C)(C)C)cc1>>CCC(CCC(c1ccccc1)c1ccc(C(C)(C)C)cc1)CNC(=O)OC(C)(C)C,Event:C-N,|Inorganic|R2CH-CN|R_acidic-H -> [] | spectators: Ar-Alkyl
+N#Cc1ccncc1>>c1cc(CNCc2ccncc2)ccn1,Multi-Event:Ann+C-N+C-C,|HeteroAr-CN -> Bn-NHR|HeteroAr-H|Pyridine | bond_formed: C(ar)-C(ar); C(ar)-C(ar); C(ar)-N(ar); C-N | bond_formed_labeled: C(ar)-C(ar); C(ar)-C(ar); C(ar)-N(ar); C-N | spectators: HeteroAr-H|Pyridine | events: Ann+C-N+C-C
+NCc1ccccc1.N#Cc1ccco1>>c1ccc(CNCc2ccco2)cc1.c1coc(CNCc2ccco2)c1,Multi-Event:Ann+C-N+C-O+C-C,|Bn-NH2|HeteroAr-CN -> Bn-NHR|Furan|HeteroAr-H | bond_formed: C(ar)-C(ar); C-N; C-N; C(ar)-O(ar); C-C(ar) | bond_formed_labeled: C(ar)-C(ar); C-N; C-N; C(ar)-O(ar); C-C(ar) | spectators: Furan|HeteroAr-H | events: Ann+C-N+C-O+C-C
+N#Cc1ccccc1.C#Cc1cccc(C)c1.CC1(C)OBOC1(C)C>>Cc1cccc(/C=C/B2OC(C)(C)C(C)(C)O2)c1.CC1(C)OB(NCc2ccccc2)OC1(C)C,Multi-Event:Ann+C-C,|Alkyl-H|Ar-Alkynyl_terminal|Ar-CN -> Alkenyl-Bpin|Ar-Alkenyl | spectators: Ar-Alkyl | events: Ann+C-C
+N#Cc1cc(Cl)cc(Cl)c1>>Cl.NCc1cc(Cl)cc(Cl)c1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-Cl
+N#CCCl>>Cl.NCCCl,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2 | spectators: RCH2-Cl
+N#Cc1ccccc1C#N>>Cl.N#Cc1ccccc1CN,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2
+C=C(C)CNc1cccc(C)c1C#N>>Cc1cccc2c1C(N)C(C)(C)CN2,Reduction_nitrile_to_amine,|Ar-CN -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | spectators: Ar-Alkyl|Ar-NHR|RCH2-NHR | events: Ann+C-C
+C=C1CCCCC1CCC#N>>C[C@@]12CCCC[C@@H]1CC[C@@H]2N,Reduction_nitrile_to_amine,|RCH2-CN -> R2CH-NH2 | bond_formed: C-C | bond_formed_labeled: C-C | events: Ann+C-C
+C=C(C)CCCC#N.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NC1CCCC1(C)C,Multi-Event:Ann+C-N+C-C,|Inorganic|RCH2-CN|R_acidic-H -> Alkyl-H | events: Ann+C-N+C-C
+N#Cc1ccccc1NCC1=CCCC1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NC1c2ccccc2NCC12CCCC2,Multi-Event:Ann+C-N+C-C,|Ar-CN|Inorganic -> Ar-Alkyl | spectators: Ar-NHR|RCH2-NHR | events: Ann+C-N+C-C
+C=C(C)CNc1cc(C)ccc1C#N.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>Cc1ccc2c(c1)NCC(C)(C)C2NC(=O)OC(C)(C)C,Multi-Event:Ann+C-N+C-C,|Ar-CN|Inorganic -> Ar-Alkyl | spectators: Ar-Alkyl|Ar-NHR|RCH2-NHR | events: Ann+C-N+C-C
+Cc1ccccc1C#N>>[2H]N(C([2H])([2H])c1ccccc1C)C([2H])([2H])c1ccccc1C,Multi-Event:Ann+C-N,|Ar-CN -> Ar-Alkyl|Bn-NHR | bond_formed: H-N; C-N; C-H; C-H | bond_formed_labeled: H-N; C-N; C-H; C-H | spectators: Ar-Alkyl | events: Ann+C-N
+N#Cc1ccccc1>>[2H]N(C([2H])([2H])c1ccccc1)C([2H])([2H])c1ccccc1,Multi-Event:Ann+C-N+C-C,|Ar-CN -> Bn-NHR | bond_formed: H-N; C(ar)-N; C-H; C-H; C(ar)-C(ar); C(ar)-C(ar); C(ar)-H; C(ar)-H | bond_formed_labeled: H-N; C(ar)-N; C-H; C-H; C(ar)-C(ar); C(ar)-C(ar); C(ar)-H; C(ar)-H | events: Ann+C-N+C-C
+N#Cc1ccc(Cl)cc1>>[2H]N(C([2H])([2H])c1ccc(Cl)cc1)C([2H])([2H])c1ccc(Cl)cc1,Multi-Event:Ann+C-N,|Ar-CN -> Ar-Cl|Bn-NHR | bond_formed: H-N; C-N; C-H; C-H | bond_formed_labeled: H-N; C-N; C-H; C-H | spectators: Ar-Cl | events: Ann+C-N
+CC#N>>[2H]N(C([2H])([2H])C)C([2H])([2H])C,Multi-Event:C-N+C-C,|CH3-CN|R_acidic-H -> RCH2-NHR | bond_formed: H-N; C-N; C-H; C-H; C-H; C-H; C-C | bond_formed_labeled: H-N; C-N; C-H; C-H; C-H; C-H; C-C | events: C-N+C-C
+N#CCCc1ccccc1>>[2H]N(C([2H])([2H])CCc1ccccc1)C([2H])([2H])CCc1ccccc1,Multi-Event:Ann+C-N+C-C,|RCH2-CN|R_acidic-H -> Ar-Alkyl | bond_formed: H-N; C(ar)-N; C(ar)-H; C(ar)-H; C-C(ar); C-H; C-H | bond_formed_labeled: H-N; C(ar)-N; C(ar)-H; C(ar)-H; C-C(ar)[Ar-Alkyl]; C-H; C-H | spectators: Ar-Alkyl | events: Ann+C-N+C-C
+N#Cc1ccccc1.CCCCCN>>[2H]N(CCCCC)C([2H])([2H])c1ccccc1.[2H]N(C([2H])([2H])c1ccccc1)C([2H])([2H])c1ccccc1,Multi-Event:Ann+C-N,|Ar-CN|RCH2-NH2 -> Bn-NHR|RCH2-NHR | bond_formed: H-N; C-N; C-H; C-H; C-N; H-N | bond_formed_labeled: H-N; C-N; C-H; C-H; C-N; H-N | events: Ann+C-N
+N#CCc1ccc(C(F)(F)F)cc1>>Cl.NCCc1ccc(C(F)(F)F)cc1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|Inorganic|RCH2-NH2 | spectators: Ar-CF3
+N#CCc1cccc(Cl)c1>>Cl.NCCc1cccc(Cl)c1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|Inorganic|RCH2-NH2 | spectators: Ar-Cl
+N#CC(C#N)(Cc1ccccc1Br)c1ccccc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NC[C@](C#N)(Cc1ccccc1Br)c1ccccc1,Event:C-N,|Inorganic -> [] | spectators: Ar-Alkyl|Ar-Br|R3C-CN
+N#CC(C#N)(Cc1ccccc1)c1ccccc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NC[C@](C#N)(Cc1ccccc1)c1ccccc1,Event:C-N,|Inorganic -> [] | spectators: Ar-Alkyl|R3C-CN
+CC(C)Cc1ccc(C(C#N)(C#N)Cc2ccccc2)cc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)Cc1ccc([C@](C#N)(CNC(=O)OC(C)(C)C)Cc2ccccc2)cc1,Event:C-N,|Inorganic -> [] | spectators: Ar-Alkyl|R3C-CN
+N#CC(C#N)(Cc1c(F)cccc1F)c1ccccc1.O=C(Cl)c1ccccc1>>N#C[C@@](CNC(=O)c1ccccc1)(Cc1c(F)cccc1F)c1ccccc1,Multi-Event:LGDisp+C-N,|Ar-COCl -> Ar-CONHR | spectators: Ar-Alkyl|Ar-F|R3C-CN | events: LGDisp+C-N
+Cc1cc(C)cc(C(C#N)(C#N)Cc2ccccc2)c1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>Cc1cc(C)cc([C@](C#N)(CNC(=O)OC(C)(C)C)Cc2ccccc2)c1,Event:C-N,|Inorganic -> [] | spectators: Ar-Alkyl|R3C-CN
+CC1(C)c2ccccc2-c2ccc(C(C#N)(C#N)Cc3ccccc3)cc21.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NC[C@](C#N)(Cc1ccccc1)c1ccc2c(c1)C(C)(C)c1ccccc1-2,Event:C-N,|Inorganic -> [] | spectators: Ar-Alkyl|Ar-Ar|R3C-CN
+CC(C)(C)OC(=O)n1ccc2cc(C(C#N)(C#N)Cc3ccccc3)ccc21.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NC[C@](C#N)(Cc1ccccc1)c1ccc2c(ccn2C(=O)OC(C)(C)C)c1,Event:C-N,|Inorganic -> [] | spectators: Ar-Alkyl|HeteroAr-H|R3C-CN
+CCC(C#N)(C#N)c1ccccc1.O=C(Cl)c1ccccc1>>CC[C@@](C#N)(CNC(=O)c1ccccc1)c1ccccc1,Multi-Event:LGDisp+C-N,|Ar-COCl -> Ar-CONHR | spectators: Ar-Alkyl|R3C-CN | events: LGDisp+C-N
+CC(C)(C)C(C)(C#N)C#N.O=C(Cl)c1ccccc1>>CC(C)(C)[C@](C)(C#N)CNC(=O)c1ccccc1,Multi-Event:LGDisp+C-N,|Ar-COCl -> Ar-CONHR | spectators: R3C-CN | events: LGDisp+C-N
+N#CC(C#N)(CCc1ccc(Cl)cc1)c1ccccc1>>N#C[C@@](CN)(CCc1ccc(Cl)cc1)c1ccccc1,Unknown,|[] -> RCH2-NH2 | spectators: Ar-Alkyl|Ar-Cl|R3C-CN
+N#Cc1cccs1.O=C(O)c1ccc(Br)cc1>>O=C(NCc1cccs1)c1ccc(Br)cc1,Multi-Event:Amid+C-N,|Ar-CO2H|HeteroAr-CN -> Ar-CONHR | bond_formed: C-N | bond_formed_labeled: C-N | bond_broken: C-O | spectators: Ar-Br|HeteroAr-H|Thiophene | events: Amid+C-N
+CC(C)(C)OC(=O)OC(=O)OC(C)(C)C.COC(=O)c1cc(F)cc2[nH]c(-c3ccc(C#N)cc3)c(CC#N)c12>>COC(=O)c1cc(F)cc2[nH]c(-c3ccc(CNC(=O)OC(C)(C)C)cc3)c(CCNC(=O)OC(C)(C)C)c12,Event:C-N,|Ar-CN|Bn-CN|Inorganic|R_acidic-H -> Ar-Alkyl | spectators: Ar-Ar|Ar-CO2R|AromN-H|HeteroAr-F|HeteroAr-H|Indole
+N#Cc1ccc(OC(F)(F)F)cc1>>Cl.NCc1ccc(OC(F)(F)F)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Ar-OCF3
+C=CC[C@](C)(C#N)c1cccc2ccccc12>>C=CC[C@](C)(CN)c1cccc2ccccc12,Reduction_nitrile_to_amine,|R3C-CN -> RCH2-NH2 | spectators: Ar-Alkyl
+N#CCc1ccccc1>>[2H]N([2H])C([2H])([2H])C([2H])([2H])c1ccccc1,Unknown,|Bn-CN|R_acidic-H -> Ar-Alkyl|RCH2-NH2 | bond_formed: H-N; H-N; C-H; C-H; C-H; C-H | bond_formed_labeled: H-N; H-N; C-H; C-H; C-H; C-H
+COc1ccc(C(C#N)c2ccc(OC)cc2)cc1>>COc1ccc(C(CN)c2ccc(OC)cc2)cc1,Reduction_nitrile_to_amine,|R2CH-CN|R_acidic-H -> RCH2-NH2 | spectators: Ar-Alkyl|Ar-OR
+CCC#N>>CCCN.Cl,Reduction_nitrile_to_amine,|RCH2-CN|R_acidic-H -> RCH2-NH2
+N#Cc1ccc(C(O)(C(F)(F)F)C(F)(F)F)cc1>>NCc1ccc(C(O)(C(F)(F)F)C(F)(F)F)cc1,Reduction_nitrile_to_amine,|Ar-CN -> Bn-NH2 | spectators: Alkyl-CF3|Ar-Alkyl|R3C-OH

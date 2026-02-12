@@ -1,0 +1,273 @@
+reaction_smiles,detected_reaction_type,reaction_key
+CC(C)C[AlH]CC(C)C.COC(=O)[C@H](CO)NC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1[C@H](C=O)COC1(C)C,Oxidation_alcohol,|Alkyl-H|R2CH-CO2R|RCH2-OH -> R2CH-CHO | spectators: R_acidic-H | events: Ann+C-N+C-C
+C#CC(=O)OCC>>O=C/C=C\I,Claisen_condensation,|Alkynyl-CO2R -> Alkenyl-CHO|Alkenyl-I
+CC(C)C[AlH]CC(C)C.COC(=O)C[C@H](C)CC[C@H](O)C(C)C>>CC(C)[C@@H]1CC[C@@H](C)C[C@@H](O)O1.CC(C)CO[C@@H]1C[C@H](C)CC[C@@H](C(C)C)O1.CC(C)[C@@H](O)CC[C@@H](C)CC=O,Claisen_condensation,|Alkyl-H|RCH2-CO2R -> R2CH-OR|RCH2-CHO|RCH2-OR | spectators: R2CH-OH|R_acidic-H | events: Ann+C-O+C-C
+CC(C)C[AlH]CC(C)C.COC(=O)CCCCCO>>O=CCCCCCO.CC(C)COC1CCCCCO1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO|RCH2-OR | bond_formed: C-O; C-O; C-C; C-C | bond_formed_labeled: C-O; C-O; C-C; C-C | bond_broken: Al-C | spectators: RCH2-OH|R_acidic-H | events: Ann+C-O+C-C
+CCOC(=O)c1ccccc1.C1CCNCC1>>OCc1ccccc1.O=Cc1ccccc1.c1ccc(CN2CCCCC2)cc1,Reduction_ester_to_alcohol,|Ar-CO2R|RCH2-NHR -> Bn-OH | bond_formed: C-C(ar); C-C(ar); C-C(ar); C-C(ar); C(ar)-C(ar); C-N | bond_formed_labeled: C-C(ar); C-C(ar); C-C(ar); C-C(ar); C(ar)-C(ar); C-N | bond_broken: C-O; C-C | events: Ann+C-N+C-C
+CC1=C(C=O)C(C)(C)CC=C1.CCOC(=O)CP(=O)(OCC)OCC>>CC1=C(/C=C/C=O)C(C)(C)CC=C1,Claisen_condensation,|RCH2-CO2R|R_acidic-H -> Alkenyl-Alkenyl | spectators: Alkenyl-Alkenyl|Alkenyl-CHO
+CCOC(=O)/C=C(\C)CP(=O)(OCC)OCC.CC1=C(/C=C/C=O)C(C)(C)CC=C1>>CC1=C(/C=C/C=C/C(C)=C/C=O)C(C)(C)CC=C1,Michael_addition,|Alkenyl-CO2R -> Alkenyl-Alkenyl | spectators: Alkenyl-Alkenyl|Alkenyl-CHO
+CC1=C(C=O)C(C)(C)CC=C1.CCOC(=O)/C=C(\C)CP(=O)(OCC)OCC>>CC1=C(/C=C/C(C)=C/C=O)C(C)(C)CC=C1,Michael_addition,|Alkenyl-CO2R -> Alkenyl-Alkenyl | spectators: Alkenyl-Alkenyl|Alkenyl-CHO
+CCOC(=O)CP(=O)(OCC)OCC.CC1=C(/C=C/C(C)=C/C=O)C(C)(C)CC=C1>>CC1=C(/C=C/C(C)=C/C=C/C=O)C(C)(C)CC=C1,Claisen_condensation,|RCH2-CO2R|R_acidic-H -> Alkenyl-Alkenyl | spectators: Alkenyl-Alkenyl|Alkenyl-CHO
+CC1=C(/C=C/C(C)=C/C=O)C(C)(C)CC=C1.CCOC(=O)/C=C(\C)CP(=O)(OCC)OCC>>CC1=C(/C=C/C(C)=C/C=C/C(C)=C/C=O)C(C)(C)CC=C1,Michael_addition,|Alkenyl-CO2R -> Alkenyl-Alkenyl | spectators: Alkenyl-Alkenyl|Alkenyl-CHO
+CCOC(=O)/C=C(\C)CP(=O)(OCC)OCC.CC1=C(/C=C/C=C/C(C)=C/C=O)C(C)(C)CC=C1>>CC1=C(/C=C/C=C/C(C)=C/C=C/C(C)=C/C=O)C(C)(C)CC=C1,Michael_addition,|Alkenyl-CO2R -> Alkenyl-Alkenyl | spectators: Alkenyl-Alkenyl|Alkenyl-CHO
+CCOC(=O)/C=C(\C)CP(=O)(OCC)OCC.CC1=C(/C=C/C(C)=C/C=C/C=O)C(C)(C)CC=C1>>CC1=C(/C=C/C(C)=C/C=C/C=C/C(C)=C/C=O)C(C)(C)CC=C1,Michael_addition,|Alkenyl-CO2R -> Alkenyl-Alkenyl | spectators: Alkenyl-Alkenyl|Alkenyl-CHO
+CC1=C(/C=C/C(C)=C/C=C/C(C)=C/C=O)C(C)(C)CC=C1.CCOC(=O)CP(=O)(OCC)OCC>>CC1=C(/C=C/C(C)=C/C=C/C(C)=C/C=C/C=O)C(C)(C)CC=C1,Claisen_condensation,|RCH2-CO2R|R_acidic-H -> Alkenyl-Alkenyl | spectators: Alkenyl-Alkenyl|Alkenyl-CHO
+O=C1CCCCCO1>>CC(O)CCCC=O,Reduction_ester_to_alcohol,|RCH2-CO2R -> R2CH-OH | bond_broken: C-O | spectators: R_acidic-H
+CC(C)[C@@H]1CC[C@@H](C)CC(=O)O1>>CC(C)[C@@H]1CC[C@@H](C)C[C@@H](O)O1.CC(C)[C@@H](O)CC[C@@H](C)CC=O,Claisen_condensation / Reduction_ester_to_alcohol,|RCH2-CO2R -> R2CH-OH|R2CH-OR|RCH2-CHO | bond_formed: C-C; C-C; C-C; C-O | bond_formed_labeled: C-C; C-C; C-C; C-O | spectators: R_acidic-H | events: C-O+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+C=C1C(=O)O[C@H](c2ccc3c(c2)OCO3)[C@@H]1C>>C=C1C(O)O[C@H](c2ccc3c(c2)OCO3)[C@@H]1C.C=C(C=O)[C@@H](C)[C@H](O)c1ccc2c(c1)OCO2,Michael_addition / Reduction_ester_to_alcohol,|Alkenyl-CO2R -> Ar-OR | bond_formed: C-C(ar); C-O | bond_formed_labeled: C-C(ar); C-O | spectators: Ar-Alkyl|Ar-OR | events: Ann+C-O+C-C | reaction_types: Michael_addition+Reduction_ester_to_alcohol
+O=C1OCc2ccccc21>>O=Cc1ccccc1CO.OC1OCc2ccccc21,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R -> Ar-CHO|Bn-OH|Bn-OR|R2CH-OH | bond_formed: C(ar)-C(ar); C(ar)-C(ar) | bond_formed_labeled: C(ar)-C(ar); C(ar)-C(ar) | spectators: Ar-Alkyl | events: Ann+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CC(=O)c1ccccc1.CCOC(=O)c1cccc(C)c1>>CC(O)c1ccccc1.Cc1cccc(C=O)c1,Reduction_ester_to_alcohol,|Ar-CO2R|Ar-COR -> R2CH-OH | bond_broken: C-O | spectators: Ar-Alkyl
+O=C1CCCCO1>>OC1CCCCO1.O=CCCCCO,Claisen_condensation / Reduction_ester_to_alcohol,|RCH2-CO2R -> R2CH-OH|RCH2-CHO|RCH2-OH|RCH2-OR | bond_formed: C-O; C-C | bond_formed_labeled: C-O; C-C | spectators: R_acidic-H | events: C-O+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+O=C1CCCCCCO1>>O=CCCCCCCO.OC1CCCCCCO1,Claisen_condensation / Reduction_ester_to_alcohol,|RCH2-CO2R -> R2CH-OH|RCH2-CHO|RCH2-OH|RCH2-OR | bond_formed: C-O; C-C | bond_formed_labeled: C-O; C-C | spectators: R_acidic-H | events: C-O+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CC1CC[C@@H](C(C)C)CC(=O)O1>>CC1CC[C@@H](C(C)C)CC(O)O1.CC(O)CC[C@H](CC=O)C(C)C,Claisen_condensation / Reduction_ester_to_alcohol,|RCH2-CO2R -> R2CH-OH|R2CH-OR|RCH2-CHO | bond_formed: C-C; C-C; C-O | bond_formed_labeled: C-C; C-C; C-O | spectators: R_acidic-H | events: C-O+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+COC(=O)/C=C/CCc1ccccc1>>O=C/C=C/CCc1ccccc1.OC/C=C/CCc1ccccc1,Reduction_ester_to_alcohol,|Alkenyl-CO2R -> RCH2-OH | bond_formed: C-C; C-C | bond_formed_labeled: C-C; C-C | bond_broken: C-O | spectators: Ar-Alkyl | events: Ann+C-C
+CC1CC[C@@H](C(C)C)CC(=O)O1>>CC(O)CC[C@H](CC(O)OC(C)CC[C@H](CC=O)C(C)C)C(C)C,Claisen_condensation / Reduction_ester_to_alcohol,|RCH2-CO2R -> R2CH-OH|R2CH-OR|RCH2-CHO | bond_formed: C-C; C-C; C-C; C-C; C-O | bond_formed_labeled: C-C; C-C; C-C; C-C; C-O | spectators: R_acidic-H | events: C-O+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCOC(=O)/C=C/c1ccc(OC)cc1>>COc1ccc(/C=C/C=O)cc1.COc1ccc(/C=C/CO)cc1,Michael_addition / Reduction_ester_to_alcohol,|Alkenyl-CO2R -> Alkenyl-CHO|RCH2-OH | bond_formed: C-C(ar); C-C(ar); C(ar)-C(ar); C(ar)-C(ar) | bond_formed_labeled: C-C(ar); C-C(ar); C(ar)-C(ar); C(ar)-C(ar) | bond_broken: C-C | spectators: Ar-Alkenyl|Ar-OR | events: Ann+C-C | reaction_types: Michael_addition+Reduction_ester_to_alcohol
+COC(=O)C[C@H](C)CC[C@H](O)C(C)C>>CC(C)[C@@H]1CC[C@@H](C)C[C@@H](O)O1.CC(C)[C@@H](O)CC[C@@H](C)CC=O,Claisen_condensation,|RCH2-CO2R -> R2CH-OR|RCH2-CHO | spectators: R2CH-OH|R_acidic-H | events: Ann+C-O+C-C
+CCOC(=O)/C=C/CCc1ccccc1>>O=C/C=C/CCc1ccccc1.OC/C=C/CCc1ccccc1,Reduction_ester_to_alcohol,|Alkenyl-CO2R -> RCH2-OH | bond_formed: C-C; C-C; C-C | bond_formed_labeled: C-C; C-C; C-C | bond_broken: C-O | spectators: Ar-Alkyl | events: Ann+C-C
+CCCCCC(=O)OC>>CCCCCC=O.CCCCCCO,Reduction_ester_to_alcohol,|RCH2-CO2R -> RCH2-OH | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-O | spectators: R_acidic-H
+C#Cc1ccc2c(c1)C(c1ccccn1)=NCc1c(C(=O)OCC)ncn1-2>>C#Cc1ccc2c(c1)C(c1ccccn1)=NCc1c(C=O)ncn1-2.C#Cc1ccc2c(c1)C(c1ccccn1)=NCc1c(CO)ncn1-2,Reduction_ester_to_alcohol,|Ar-CO2R -> Bn-OH | bond_formed: C(ar)-N(ar); C(ar)-N(ar); C-N(ar); C-N(ar) | bond_formed_labeled: C(ar)-N(ar); C(ar)-N(ar); C-N(ar); C-N(ar) | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Alkynyl_terminal|Ar-AromN|Ar-C=N|HeteroAr-H|Pyridine | events: Ann+C-N
+COC(=O)C[C@@H](C(=O)OC)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C>>COC(=O)[C@H](CC=O)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C.COC(=O)[C@H](CCO)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C,Claisen_condensation / Reduction_ester_to_alcohol,|RCH2-CO2R -> RCH2-CHO|RCH2-OH|R_acidic-H | spectators: R2CH-CO2R|R_acidic-H | events: C-O+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCOC(=O)c1ccnc(C(=O)OCC)c1>>O=Cc1ccnc(C=O)c1.CCOC(=O)c1ccnc(C=O)c1.CCOC(=O)c1ccnc(CO)c1.O=Cc1cc(CO)ccn1,Multi-Event:Ann+C-N+C-C,|[] -> Ar-CHO|Bn-OH|HeteroAr-H | bond_formed: C-C(ar); C-C(ar); C(ar)-N(ar); C(ar)-N(ar); C(ar)-C(ar) | bond_formed_labeled: C-C(ar); C-C(ar); C(ar)-N(ar); C(ar)-N(ar); C(ar)-C(ar) | bond_broken: C-O | spectators: Ar-CO2R|HeteroAr-H|Pyridine | events: Ann+C-N+C-C
+CCCC(=O)OC>>CCCCO.CCCC=O,Reduction_ester_to_alcohol,|RCH2-CO2R -> RCH2-OH | bond_formed: C-C; C-C; C-C | bond_formed_labeled: C-C; C-C; C-C | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)c1ccc(OC)cc1>>COc1ccc(CO)cc1.COc1ccc(C=O)cc1,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R -> Ar-CHO|Bn-OH | bond_formed: C-C(ar); C-C(ar); C(ar)-C(ar); C(ar)-O | bond_formed_labeled: C-C(ar); C-C(ar); C(ar)-C(ar); C(ar)-O | bond_broken: C-C | spectators: Ar-OR | events: Ann+C-O+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCOC(=O)/C=C\CCc1ccccc1>>OC/C=C\CCc1ccccc1.O=C/C=C\CCc1ccccc1,Reduction_ester_to_alcohol,|Alkenyl-CO2R -> RCH2-OH | bond_formed: C-C; C-C | bond_formed_labeled: C-C; C-C | bond_broken: C-O | spectators: Ar-Alkyl | events: Ann+C-C
+CCOC(=O)CCc1ccccc1>>O=CCCc1ccccc1.OCCCc1ccccc1,Reduction_ester_to_alcohol,|RCH2-CO2R -> RCH2-OH | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H | events: Ann+C-C
+CCOC(=O)/C=C/CCC(c1ccccc1)(c1ccccc1)c1ccccc1>>O=C/C=C/CCC(c1ccccc1)(c1ccccc1)c1ccccc1.OC/C=C/CCC(c1ccccc1)(c1ccccc1)c1ccccc1,Michael_addition / Reduction_ester_to_alcohol,|Alkenyl-CO2R -> Alkenyl-CHO|RCH2-OH | spectators: Ar-Alkyl | events: Ann+C-C | reaction_types: Michael_addition+Reduction_ester_to_alcohol
+CCOC(=O)/C=C/c1ccccc1>>OC/C=C/c1ccccc1.O=C/C=C/c1ccccc1,Reduction_ester_to_alcohol,|Alkenyl-CO2R -> RCH2-OH | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-O | spectators: Ar-Alkenyl | events: Ann+C-C
+CC(C)OC(=O)/C=C/CCc1ccccc1>>O=C/C=C/CCc1ccccc1.OC/C=C/CCc1ccccc1,Reduction_ester_to_alcohol,|Alkenyl-CO2R -> RCH2-OH | bond_formed: C-C; C-C(ar); C-C(ar) | bond_formed_labeled: C-C; C-C(ar); C-C(ar) | bond_broken: C-O | spectators: Ar-Alkyl | events: Ann+C-C
+CCOC(=O)/C=C/c1ccc(Br)cc1>>O=C/C=C/c1ccc(Br)cc1.OC/C=C/c1ccc(Br)cc1,Reduction_ester_to_alcohol,|Alkenyl-CO2R -> RCH2-OH | bond_formed: C-C; C-C; C-C(ar); C-C(ar); C(ar)-C(ar) | bond_formed_labeled: C-C; C-C; C-C(ar); C-C(ar); C(ar)-C(ar) | bond_broken: C-O | spectators: Ar-Alkenyl|Ar-Br | events: Ann+C-C
+CCCCCCCCCCCC(=O)OC(C)C>>CCCCCCCCCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCCC(=O)OCC>>CCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)C1CCN(C(=O)OC(C)(C)C)CC1>>CC(C)(C)OC(=O)N1CCC(C=O)CC1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)c1ccccc1C>>Cc1ccccc1C=O,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Alkyl
+CCOC(=O)c1ccccc1>>O=Cc1ccccc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O
+CCCCCCCC(=O)OC>>CCCCCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCCCCC(=O)OCC>>CCCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)[C@H](C)O[Si](C)(C)C(C)(C)C>>C[C@@H](C=O)O[Si](C)(C)C(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-Si*|R_acidic-H
+COC(=O)CCc1ccccc1-c1ccco1>>O=CCCc1ccccc1-c1ccco1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Ar|Furan|HeteroAr-H|R_acidic-H
+CCOC(=O)c1ccc(F)cc1>>O=Cc1ccc(F)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-F
+CCOC(=O)c1ccc(Br)cc1>>O=Cc1ccc(Br)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Br
+CCCCCC(=O)OC(C)C>>CCCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)c1cccc(C#N)c1>>N#Cc1cccc(C=O)c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-CN
+C[C@H](NC(=O)OCc1ccccc1)C(=O)O>>C[C@@H](C=O)NC(=O)OCc1ccccc1,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+CCOC(=O)[C@H](C)[C@@H](C)O[Si](C)(C)C(C)(C)C>>C[C@@H](C=O)[C@@H](C)O[Si](C)(C)C(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-Si*|R_acidic-H
+CSCC[C@H](NC(=O)OC(C)(C)C)C(=O)O>>CSCC[C@@H](C=O)NC(=O)OC(C)(C)C,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: RCH2-SR|R_acidic-H
+CCCCCC(=O)O>>CCCCCC=O,Unknown,|RCH2-CO2H -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+CC(C)(C)OC(=O)c1ccccc1>>O=Cc1ccccc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O
+CC1(C)OC(=O)c2c(O)cccc2O1>>O=Cc1c(O)cccc1O,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-CHO|Ar-OH | spectators: Ar-OH | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCOC(=O)c1ccc(OC)cc1>>COc1ccc(C=O)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-OR
+O=C(O)c1cccc([N+](=O)[O-])c1>>O=Cc1cccc([N+](=O)[O-])c1,Unknown,|Ar-CO2H -> Ar-CHO | bond_broken: C-O | spectators: Ar-NO2
+CCOC(=O)c1cccc(Cl)c1>>O=Cc1cccc(Cl)c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Cl
+CC(C)C[C@H](NC(=O)OCc1ccccc1)C(=O)O>>CC(C)C[C@@H](C=O)NC(=O)OCc1ccccc1,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+CCOC(=O)[C@H](C)NC(=O)OC(C)(C)C>>C[C@@H](C=O)NC(=O)OC(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+Cc1cccc(C(=O)OC(C)C)c1>>Cc1cccc(C=O)c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | spectators: Ar-Alkyl
+CC(C)OC(=O)C=Cc1ccccc1>>O=CC=Cc1ccccc1,Michael_addition,|Alkenyl-CO2R -> Alkenyl-CHO | bond_broken: C-O | spectators: Ar-Alkenyl
+CCOC(=O)C=Cc1ccccc1>>O=CC=Cc1ccccc1,Michael_addition,|Alkenyl-CO2R -> Alkenyl-CHO | bond_broken: C-O | spectators: Ar-Alkenyl
+CCOC(=O)c1ccc2ccccc2c1>>O=Cc1ccc2ccccc2c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O
+COC(=O)c1cc(Cl)c(Br)cc1C(=O)OC>>COC(=O)c1cc(Cl)c(Br)cc1C=O.COC(=O)c1cc(Br)c(Cl)cc1C=O,Event:Ann,|[] -> Ar-Br|Ar-CHO | spectators: Ar-Br|Ar-CO2R|Ar-Cl
+COC(=O)C(C)c1ccc(OC)c(OC)c1>>COc1ccc(C(C)C=O)cc1OC,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|R_acidic-H
+CCOC(=O)c1ccc([N+](=O)[O-])cc1>>O=Cc1ccc([N+](=O)[O-])cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-NO2
+CCCCCCCCCCC(=O)OCC>>CCCCCCCCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+COC(=O)[C@@H](NC(=O)OC(C)(C)C)C(C)C>>CC(C)[C@@H](C=O)NC(=O)OC(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCCC[C@@H](C(=O)OC)n1cc([C@@](C)(NC(=O)c2ccccc2OC)C(C)C)nn1>>CCCC[C@@H](C=O)n1cc([C@@](C)(NC(=O)c2ccccc2OC)C(C)C)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Alkyl-NHCOR|Ar-Alkyl|Ar-CONHR|Ar-OR|HeteroAr-H|R_acidic-H
+O=C(Oc1ccccc1)c1ccccc1>>O=Cc1ccccc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O
+CCOC(=O)c1ccc(F)cc1.CC(C)OC(=O)c1ccccc1>>O=Cc1ccccc1.O=Cc1ccc(F)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | spectators: Ar-F
+COC(=O)[C@@H]1COC(C)(C)N1S(=O)(=O)c1ccc(C)cc1>>Cc1ccc(S(=O)(=O)N2[C@H](C=O)COC2(C)C)cc1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-SO2NR2|RCH2-OR|R_acidic-H
+CC1(C)OC(=O)c2c(cccc2OS(=O)(=O)C(F)(F)F)O1>>O=Cc1c(O)cccc1OS(=O)(=O)C(F)(F)F,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-CHO|Ar-OH | spectators: Ar-OTf | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCCCC/C=C\C(C)(C)C(=O)O>>CCCCC/C=C\C(C)(C)C=O,Unknown,|R3C-CO2H -> R3C-CHO | bond_broken: C-O
+CCOC(=O)C1CCN(Cc2ccccc2)CC1>>O=CC1CCN(Cc2ccccc2)CC1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Bn-NR2|RCH2-NR2|R_acidic-H
+CCOC(=O)CC(C)NC(=O)OC(C)(C)C>>CC(CC=O)NC(=O)OC(C)(C)C,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+C=Cc1cc(OCc2ccccc2)cc2c1C(=O)OC(C)(C)O2>>C=Cc1cc(OCc2ccccc2)cc(O)c1C=O,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-CHO|Ar-OH | spectators: Ar-Alkenyl_terminal|Bn-OR | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CC(C)(C)OC(=O)N1CCC[C@H]1C(=O)O>>CC(C)(C)OC(=O)N1CCC[C@H]1C=O,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)c1ccc(C)cc1>>Cc1ccc(C=O)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Alkyl
+CCOC(=O)c1ccc(Cl)cc1>>O=Cc1ccc(Cl)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Cl
+CC(C)OC(=O)c1ccccc1>>O=Cc1ccccc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O
+CCOC(=O)/C=C/C(C)=C/[C@H](C)[C@H](Cc1ccccc1)OC>>CO[C@@H](Cc1ccccc1)[C@@H](C)/C=C(C)/C=C/C=O,Michael_addition,|Alkenyl-CO2R -> Alkenyl-CHO | bond_broken: C-O | spectators: Alkenyl-Alkenyl|Ar-Alkyl|R2CH-OR
+CCOC(=O)CC(C)O[Si](C)(C)C(C)(C)C>>CC(CC=O)O[Si](C)(C)C(C)(C)C,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Alkyl-Si*|R_acidic-H
+COC(=O)CCc1ccccc1-c1ccoc1>>O=CCCc1ccccc1-c1ccoc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Ar|Furan|HeteroAr-H|R_acidic-H
+CC(C)OC(=O)c1ccc2ccccc2c1>>O=Cc1ccc2ccccc2c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O
+COC(=O)C[C@H](NC(=O)OC(C)(C)C)C(=O)O>>COC(=O)C[C@@H](C=O)NC(=O)OC(C)(C)C,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: RCH2-CO2R|R_acidic-H
+C[C@H](CC(=O)O)C[C@@H](C)O[Si](c1ccccc1)(c1ccccc1)C(C)(C)C>>C[C@H](CC=O)C[C@@H](C)O[Si](c1ccccc1)(c1ccccc1)C(C)(C)C,Unknown,|RCH2-CO2H -> RCH2-CHO | bond_broken: C-O | spectators: Alkyl-Si*|Ar-Si*|R_acidic-H
+COC(=O)[C@@H](N(Cc1ccccc1)C(=O)OC(C)(C)C)C(C)(C)C>>CC(C)(C)OC(=O)N(Cc1ccccc1)[C@H](C=O)C(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+COC(=O)CCc1ccccc1-c1cccs1>>O=CCCc1ccccc1-c1cccs1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Ar|HeteroAr-H|R_acidic-H|Thiophene
+CCCC[C@@H](C(=O)OC)n1cc([C@@](C)(NC(=O)c2ccsc2)C(C)C)nn1>>CCCC[C@@H](C=O)n1cc([C@@](C)(NC(=O)c2ccsc2)C(C)C)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Alkyl-NHCOR|Ar-Alkyl|Ar-CONHR|HeteroAr-H|R_acidic-H|Thiophene
+CC(C)OC(=O)C1CCCCC1>>O=CC1CCCCC1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)CCCCBr>>O=CCCCCBr,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: RCH2-Br|R_acidic-H
+CCOC(=O)c1ccco1>>O=Cc1ccco1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Furan|HeteroAr-H
+CCOC(=O)C[C@@H](CCc1ccccc1)O[Si](C)(C)C>>C[Si](C)(C)O[C@@H](CC=O)CCc1ccccc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Alkyl-Si*|Ar-Alkyl|R_acidic-H
+COC(=O)[C@H](Cc1ccccc1)N(Cc1ccccc1)C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N(Cc1ccccc1)[C@H](C=O)Cc1ccccc1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+COC(=O)[C@@H]1[C@@H](C)OC(C)(C)N1C(=O)OC(C)(C)C>>C[C@H]1OC(C)(C)N(C(=O)OC(C)(C)C)[C@@H]1C=O,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: R3C-OR|R_acidic-H
+CCOC(=O)C[C@H](C)OC1CCCCO1>>C[C@@H](CC=O)OC1CCCCO1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R2CH-OR|RCH2-OR|R_acidic-H
+COC(=O)c1cccc(Cl)c1>>O=Cc1cccc(Cl)c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Cl
+CCOC(=O)C1CCCCC1>>O=CC1CCCCC1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)c1ccccc1OC>>COc1ccccc1C=O,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-OR
+CC(C)OC(=O)c1ccc(F)cc1>>O=Cc1ccc(F)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-F
+CCOC(=O)CCCBr>>O=CCCCBr,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: RCH2-Br|R_acidic-H
+COC(=O)[C@H](Cc1ccccc1)NC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N[C@H](C=O)Cc1ccccc1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+CC(C)(C)[Si](C)(C)Cl.C[C@@H]1CC(=O)O1>>C[C@H](CC=O)O[Si](C)(C)C(C)(C)C,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | spectators: Alkyl-Si*|R_acidic-H
+CCCC[C@@H](C(=O)OC)n1cc([C@@](C)(NC(=O)c2cccc(OC)c2)C(C)C)nn1>>CCCC[C@@H](C=O)n1cc([C@@](C)(NC(=O)c2cccc(OC)c2)C(C)C)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Alkyl-NHCOR|Ar-Alkyl|Ar-CONHR|Ar-OR|HeteroAr-H|R_acidic-H
+CC1(C)OC(=O)c2c(OCc3ccccc3)cccc2O1>>O=Cc1c(O)cccc1OCc1ccccc1,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-CHO|Ar-OH | spectators: Bn-OR | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCCC[C@@H](C(=O)OC)n1cc([C@@](C)(NC(=O)c2cccc(F)c2)C(C)C)nn1>>CCCC[C@@H](C=O)n1cc([C@@](C)(NC(=O)c2cccc(F)c2)C(C)C)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Alkyl-NHCOR|Ar-Alkyl|Ar-CONHR|Ar-F|HeteroAr-H|R_acidic-H
+CC[C@H](C)[C@H](NC(=O)OC(C)(C)C)C(=O)O>>CC[C@H](C)[C@@H](C=O)NC(=O)OC(C)(C)C,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)c1cccc2nnsc12>>O=Cc1cccc2nnsc12,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: HeteroAr-H
+CC1(C)OC(=O)c2c(F)cccc2O1>>O=Cc1c(O)cccc1F,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-CHO|Ar-OH | spectators: Ar-F | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCOC(=O)c1ccccc1Br>>O=Cc1ccccc1Br,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Br
+COC(=O)[C@@H](COP(=O)(OCc1ccccc1)OCc1ccccc1)OCc1ccccc1>>O=C[C@@H](COP(=O)(OCc1ccccc1)OCc1ccccc1)OCc1ccccc1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Bn-OR|R_acidic-H
+COC(=O)[C@@H](COP(=O)(OCc1ccccc1)OCc1ccccc1)OCc1ccccc1>>[2H]C(=O)[C@@H](COP(=O)(OCc1ccccc1)OCc1ccccc1)OCc1ccccc1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_formed: C-H | bond_formed_labeled: C-H | bond_broken: C-O | spectators: Ar-Alkyl|Bn-OR|R_acidic-H
+COCOc1cccc2c1C(=O)OC(C)(C)O2>>COCOc1cccc(O)c1C=O,Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-OH | bond_broken: C-O | spectators: RCH2-OR
+CCOC(=O)COCC#C[Si](C(C)C)(C(C)C)C(C)C>>CC(C)[Si](C#CCOCC=O)(C(C)C)C(C)C,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Alkyl-Alkynyl|Alkyl-Si*|Alkynyl-Si*|Propargyl-H|RCH2-OR|R_acidic-H
+CCOC(=O)c1cn[nH]c1>>O=Cc1cn[nH]c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: AromN-H|HeteroAr-H|Pyrazole
+CCCCCCCCCC[C@H]1C[C@@H]1C(=O)OCC.CCCCCCCCCC[C@H]1C[C@H]1C(=O)OCC>>CCCCCCCCCC[C@H]1C[C@H]1C=O.CCCCCCCCCC[C@@H]1C[C@H]1C=O,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | spectators: R_acidic-H
+COC(=O)[C@H]1CC=C[C@@H](O[Si](C)(C)C(C)(C)C)C1>>CC(C)(C)[Si](C)(C)O[C@@H]1C=CC[C@H](C=O)C1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-Si*|R_acidic-H
+Cc1ccc(S(=O)(=O)OCCOCCOCCOCCOCCOCCOCCOCCOCCC(=O)OC(C)(C)C)cc1>>Cc1ccc(S(=O)(=O)OCCOCCOCCOCCOCCOCCOCCOCCOCCC=O)cc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | spectators: Alkyl-OTs|RCH2-OR|R_acidic-H
+CCOC(=O)CC/C=C(\C)CC/C=C(\C)CCC=C(C)C>>CC(C)=CCC/C(C)=C/CC/C(C)=C/CCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+CC(C)(C)OC(=O)N1CCCC1C(=O)O>>CC(C)(C)OC(=O)N1CCCC1C=O,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+COC(=O)CCc1ccc(OC(C)(C)C)cc1>>CC(C)(C)Oc1ccc(CCC=O)cc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|R_acidic-H
+CC1=COC(=O)[C@@H]2[C@@H](C)CC[C@@H]12>>CC(C=O)[C@@H]1CC[C@H](C)[C@H]1C=O,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO|R_acidic-H | bond_broken: C-O | spectators: R_acidic-H
+CC1(C)OC(=O)c2cc(Br)ccc2O1>>O=Cc1cc(Br)ccc1O,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-CHO|Ar-OH | spectators: Ar-Br | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCOC(=O)c1ccccc1.CN(C)C(=O)c1ccc(F)cc1>>O=Cc1ccccc1.O=Cc1ccc(F)cc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | bond_broken: C-N; C-O | spectators: Ar-F
+CCOC(=O)c1ccccc1.CN(C)C(=O)c1cccc(Cl)c1>>O=Cc1ccccc1.O=Cc1cccc(Cl)c1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | bond_broken: C-N; C-O | spectators: Ar-Cl
+CCOC(=O)c1ccccc1.CN(C)C(=O)c1cccc(Br)c1>>O=Cc1ccccc1.O=Cc1cccc(Br)c1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | bond_broken: C-N; C-O | spectators: Ar-Br
+CCOC(=O)c1ccccc1.CN(C)C(=O)c1cccc([N+](=O)[O-])c1>>O=Cc1cccc([N+](=O)[O-])c1.O=Cc1ccccc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | spectators: Ar-NO2
+CCOC(=O)c1ccccc1.COc1ccc(C(=O)N(C)C)cc1>>O=Cc1ccccc1.COc1ccc(C=O)cc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | spectators: Ar-OR
+CCOC(=O)c1ccccc1.CN(C)C(=O)c1ccco1>>O=Cc1ccco1.O=Cc1ccccc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | bond_broken: C-O; C-N | spectators: Furan|HeteroAr-H
+CCOC(=O)c1ccccc1.CN(C)C(=O)c1ccc2ccccc2c1>>O=Cc1ccc2ccccc2c1.O=Cc1ccccc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | bond_broken: C-N; C-O
+CCOC(=O)c1ccccc1.CN(C)C(=O)C1CCCCC1>>O=Cc1ccccc1.O=CC1CCCCC1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|R2CH-CONR2 -> Ar-CHO | spectators: R_acidic-H
+CCOC(=O)c1ccc([N+](=O)[O-])cc1.CN(C)C(=O)c1ccccc1>>O=Cc1ccccc1.O=Cc1ccc([N+](=O)[O-])cc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | spectators: Ar-NO2
+CCOC(=O)c1ccc([N+](=O)[O-])cc1.CCCCCC(=O)N(C)C>>CCCCCC=O.O=Cc1ccc([N+](=O)[O-])cc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|RCH2-CONR2 -> Ar-CHO|RCH2-CHO | spectators: Ar-NO2|R_acidic-H
+CCOC(=O)c1ccc(OC)cc1.CN(C)C(=O)c1ccccc1>>O=Cc1ccccc1.COc1ccc(C=O)cc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | bond_broken: C-O; C-N | spectators: Ar-OR
+CCOC(=O)c1ccc(OC)cc1.CCCCCC(=O)N(C)C>>CCCCCC=O.COc1ccc(C=O)cc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|RCH2-CONR2 -> Ar-CHO|RCH2-CHO | spectators: Ar-OR|R_acidic-H
+CCCCCC(=O)OC.CN(C)C(=O)c1ccccc1>>CCCCCC=O.O=Cc1ccccc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CONR2|RCH2-CO2R -> Ar-CHO|RCH2-CHO | bond_broken: C-O; C-N | spectators: R_acidic-H
+CCCCCC(=O)OC.CCCCCCCCCC(=O)N(C)C>>CCCCCC=O.CCCCCCCCCC=O,Claisen_condensation,|Alkyl-NRCOR|RCH2-CO2R|RCH2-CONR2 -> RCH2-CHO | spectators: R_acidic-H
+CCOC(=O)c1ccccc1.Cc1cccc(C(=O)N(C)C)c1>>O=Cc1ccccc1.Cc1cccc(O)c1.Oc1ccccc1.Cc1cccc(C=O)c1,Claisen_condensation / Reduction_ester_to_alcohol,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-Alkyl | spectators: Ar-Alkyl | events: Ann+C-O+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCOC(=O)c1ccccc1.Cc1cccc(C(=O)N(C)C)c1>>O=Cc1ccccc1.Cc1cccc(C=O)c1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO | bond_broken: C-N; C-O | spectators: Ar-Alkyl
+CCOC(=O)c1ccccc1.Cc1cccc(C(=O)N(C)C)c1>>O=Cc1ccccc1.Cc1cccc(O)c1.Cc1cccc(C=O)c1,Claisen_condensation / Reduction_ester_to_alcohol,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-Alkyl | spectators: Ar-Alkyl | events: Ann+C-O+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCOC(=O)c1ccccc1.Cc1cccc(C(=O)N(C)C)c1>>O=Cc1ccccc1.Oc1ccccc1.Cc1cccc(C=O)c1,Claisen_condensation / Reduction_ester_to_alcohol,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO|Ar-OH | spectators: Ar-Alkyl | events: Ann+C-C | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+COC(=O)[C@@H](CO[Si](C)(C)C(C)(C)C)NC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N[C@@H](C=O)CO[Si](C)(C)C(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-Si*|R_acidic-H
+CCOC(=O)CCCCC(=O)OCC>>O=CCCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | spectators: R_acidic-H
+CCCCCCC(=O)O>>CCCCCCC=O,Unknown,|RCH2-CO2H -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+COC(=O)CCc1ccc(OC)cc1>>COc1ccc(CCC=O)cc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|R_acidic-H
+CCOC(=O)CCc1ccccc1>>O=CCCc1ccccc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+CC(C)=CCC[C@@H](C)CC(=O)O>>CC(C)=CCC[C@@H](C)CC=O,Unknown,|RCH2-CO2H -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+C#Cc1ccc2c(c1)C(c1ccccn1)=NCc1c(C(=O)OCC)ncn1-2>>C#Cc1ccc2c(c1)C(c1ccccn1)=NCc1c(C=O)ncn1-2,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Alkynyl_terminal|Ar-AromN|Ar-C=N|HeteroAr-H|Pyridine
+COC(=O)C[C@H](C)SC>>CS[C@@H](C)CC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R2CH-SR|R_acidic-H
+COC(=O)c1cc(Br)c(Br)cc1C(=O)OC>>COC(=O)c1cc(Br)c(Br)cc1C=O,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Br
+C=C(C[Si](C)(C)C)[C@@]1(C)CCC=C(C(=O)OC)C1>>C=C(C[Si](C)(C)C)[C@@]1(C)CCC=C(C=O)C1,Michael_addition,|Alkenyl-CO2R -> Alkenyl-CHO | bond_broken: C-O | spectators: Alkyl-Si*
+COC(=O)C1COc2cscc2O1>>O=CC1COc2cscc2O1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-OR|HeteroAr-H|R_acidic-H|Thiophene
+CC(C)(C)OC(=O)NC(Cc1ccccc1)C(=O)O>>CC(C)(C)OC(=O)NC(C=O)Cc1ccccc1,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+CCCCCCCCCCCCCCCCCC(=O)OC>>CCCCCCCCCCCCCCCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCCCCC[C@@H](O)C/C=C\CCCCCCCC(=O)OC>>CCCCCC[C@@H](O)C/C=C\CCCCCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R2CH-OH|R_acidic-H
+CCOC(=O)c1ccnc(C(=O)OCC)c1>>CCOC(=O)c1ccnc(C=O)c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: HeteroAr-H|Pyridine
+CCOC(=O)c1ccc(OC)c(OC)c1>>COc1ccc(C=O)cc1OC,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-OR
+CC(C)(C)OC(=O)N[C@@H](CSc1ccccc1)CC(=O)OCc1ccccc1>>CC(C)(C)OC(=O)N[C@H](CC=O)CSc1ccccc1,Oxidation_alcohol,|Ar-Alkyl|RCH2-CO2R -> RCH2-CHO | spectators: Ar-SR|R_acidic-H
+CC[C@@H](OC)[C@@H](C)CCCCC(=O)OC>>CC[C@@H](OC)[C@@H](C)CCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R2CH-OR|R_acidic-H
+CC1(C)OC(=O)c2ccccc2O1>>O=Cc1ccccc1O,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-CHO|Ar-OH | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CC(C(=O)O)c1ccccc1>>CC(C=O)c1ccccc1,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+COC(=O)[C@@H](CO[Si](C)(C)C(C)(C)C)NC(=O)OCc1ccccc1>>CC(C)(C)[Si](C)(C)OC[C@H](C=O)NC(=O)OCc1ccccc1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-Si*|Ar-Alkyl|R_acidic-H
+COC(=O)c1ccccc1>>O=Cc1ccccc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O
+CCOC(=O)C[C@@H](C)OC1CCCCO1>>C[C@H](CC=O)OC1CCCCO1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R2CH-OR|RCH2-OR|R_acidic-H
+COC(=O)CCc1ccccc1-c1cc2ccccc2n1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)n1c(-c2ccccc2CCC=O)cc2ccccc21,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Ar|HeteroAr-H|R_acidic-H
+O=C(N[C@@H](Cc1ccccc1)C(=O)O)OCc1ccccc1>>O=C[C@H](Cc1ccccc1)NC(=O)OCc1ccccc1,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+CCOC(=O)c1cocc1C(=O)OCC>>O=Cc1cocc1C=O.CCOC(=O)c1cocc1C=O,Claisen_condensation,|Ar-CO2R -> Ar-CHO|Furan|HeteroAr-H | spectators: Furan|HeteroAr-H | events: Ann+C-O+C-C
+COC(=O)[C@H](C)NC(=O)OC(C)(C)C>>C[C@@H](C=O)NC(=O)OC(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)c1ccccc1.CCOC(=O)CCCCBr>>O=Cc1ccccc1.O=CCCCCBr,Claisen_condensation,|Ar-CO2R|RCH2-CO2R -> Ar-CHO|RCH2-CHO | bond_broken: C-O | spectators: RCH2-Br|R_acidic-H
+CC(C)OC(=O)c1ccc(Cl)cc1>>O=Cc1ccc(Cl)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Cl
+CCOC(=O)c1ccncc1>>O=Cc1ccncc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: HeteroAr-H|Pyridine
+C=CCOc1cccc2c1C(=O)OC(C)(C)O2>>C=CCOc1cccc(O)c1C=O,Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-OH | bond_broken: C-O | spectators: Allyl-OR
+CCOC(=O)c1ccc(Br)s1>>O=Cc1ccc(Br)s1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: HeteroAr-Br|HeteroAr-H|Thiophene
+CC1(C)OC(=O)c2ccc(Cl)cc2O1>>O=Cc1ccc(Cl)cc1O,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-CHO|Ar-OH | spectators: Ar-Cl | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+COC(=O)CC[C@@H](C(=O)OC(C)(C)C)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)[C@H](CCC=O)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R2CH-CO2R|R_acidic-H
+O=C(O)CCCCCCCBr>>O=CCCCCCCCBr,Unknown,|RCH2-CO2H -> RCH2-CHO | bond_broken: C-O | spectators: RCH2-Br|R_acidic-H
+COC(=O)C1CCCCC1>>O=CC1CCCCC1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CC(C)(C)OC(=O)N[C@@H](Cc1ccccc1)C(=O)O>>CC(C)(C)OC(=O)N[C@H](C=O)Cc1ccccc1,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+O=C(O)Cc1ccccc1>>O=CCc1ccccc1,Unknown,|RCH2-CO2H -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+COc1cccc(C(=O)O)c1OC>>COc1cccc(C=O)c1OC,Unknown,|Ar-CO2H -> Ar-CHO | bond_broken: C-O | spectators: Ar-OR
+CCOC(=O)/C=C/CCC(c1ccccc1)(c1ccccc1)c1ccccc1>>O=C/C=C/CCC(c1ccccc1)(c1ccccc1)c1ccccc1,Michael_addition,|Alkenyl-CO2R -> Alkenyl-CHO | bond_broken: C-O | spectators: Ar-Alkyl
+COC(=O)[C@@H]1COC(C)(C)N1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1[C@H](C=O)COC1(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: RCH2-OR|R_acidic-H
+CCCC[C@@H](C(=O)OC)n1cc([C@@](C)(NC(=O)c2ccccc2)C(C)C)nn1>>CCCC[C@@H](C=O)n1cc([C@@](C)(NC(=O)c2ccccc2)C(C)C)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Alkyl-NHCOR|Ar-Alkyl|Ar-CONHR|HeteroAr-H|R_acidic-H
+CCOC(=O)c1cocc1C(=O)OCC>>CCOC(=O)c1cocc1C=O,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Furan|HeteroAr-H
+COC(=O)CN(Cc1ccccc1)C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N(CC=O)Cc1ccccc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+CC(C)OC(=O)c1ccc(Br)cc1>>O=Cc1ccc(Br)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Br
+CC(C)[C@H]1CC[C@@H](C)CC(=O)O1>>CC(C)[C@H](O)CC[C@@H](C)CC=O,Reduction_ester_to_alcohol,|RCH2-CO2R -> R2CH-OH | bond_broken: C-O | spectators: R_acidic-H
+CCOC(=O)c1cccnc1>>O=Cc1cccnc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: HeteroAr-H|Pyridine
+CSCC[C@@H](NC(=O)OC(C)(C)C)C(=O)O>>CSCCC(C=O)NC(=O)OC(C)(C)C,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: RCH2-SR|R_acidic-H
+COC(=O)[C@@H]1CCCN1C(=O)[C@@H]1Cc2ccccc2CN1C(=O)CCCc1ccccc1>>O=C[C@@H]1CCCN1C(=O)[C@@H]1Cc2ccccc2CN1C(=O)CCCc1ccccc1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-NRCOR|Ar-Alkyl|R2CH-CONR2|RCH2-CONR2|R_acidic-H
+COC(=O)[C@H](C)N(Cc1ccccc1)C(=O)OC(C)(C)C>>C[C@@H](C=O)N(Cc1ccccc1)C(=O)OC(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+CCOC(=O)c1cnco1>>O=Cc1cnco1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: HeteroAr-H|Oxazole
+COC(=O)[C@@H]1CCCN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1CCC[C@H]1C=O,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CC1(C)OC(=O)c2cc(I)ccc2O1>>O=Cc1cc(I)ccc1O,Claisen_condensation / Reduction_ester_to_alcohol,|Ar-CO2R|Ar-OR -> Ar-CHO|Ar-OH | spectators: Ar-I | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+COC(=O)Cc1ccc(OC)c(OC)c1>>COc1ccc(CC=O)cc1OC,Claisen_condensation,|Bn-CO2R -> Ar-Alkyl|RCH2-CHO | bond_broken: C-O | spectators: Ar-OR|R_acidic-H
+COC(=O)[C@@H]1COC(c2ccccc2)=N1>>O=C[C@@H]1COC(c2ccccc2)=N1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-C=N|RCH2-OR|R_acidic-H
+COC(=O)Cc1ccc(C(F)(F)F)cc1>>O=CCc1ccc(C(F)(F)F)cc1,Claisen_condensation,|Bn-CO2R -> Ar-Alkyl|RCH2-CHO | bond_broken: C-O | spectators: Ar-CF3|R_acidic-H
+COC(=O)C[C@@H](C(=O)OC(C)(C)C)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)[C@H](CC=O)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R2CH-CO2R|R_acidic-H
+C=CCCCCCCCCC(=O)O>>C=CCCCCCCCCC=O,Unknown,|RCH2-CO2H -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+COC(=O)c1ccc(OC)c(OC)c1>>COc1ccc(C=O)cc1OC,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-OR
+O=C(O)c1cccc(Cl)c1>>O=Cc1cccc(Cl)c1,Unknown,|Ar-CO2H -> Ar-CHO | bond_broken: C-O | spectators: Ar-Cl
+COC(=O)[C@@H]1COC(C)(C)N1C(=O)OCc1ccccc1>>CC1(C)OC[C@@H](C=O)N1C(=O)OCc1ccccc1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|RCH2-OR|R_acidic-H
+CCOC(=O)/C=C\I>>O=C/C=C\I,Michael_addition,|Alkenyl-CO2R -> Alkenyl-CHO | bond_broken: C-O | spectators: Alkenyl-I
+CC(C)C(NC(=O)OC(C)(C)C)C(=O)O>>CC(C)C(C=O)NC(=O)OC(C)(C)C,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+COC(=O)CCc1ccccc1-c1cc2ccccc2o1>>O=CCCc1ccccc1-c1cc2ccccc2o1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Ar|Benzofuran|HeteroAr-H|R_acidic-H
+CC(C)OC(=O)c1cccc([N+](=O)[O-])c1>>O=Cc1cccc([N+](=O)[O-])c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-NO2
+CCOC(=O)c1ccccn1>>O=Cc1ccccn1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: HeteroAr-H|Pyridine
+COC(=O)CCc1ccccc1-c1ccsc1>>O=CCCc1ccccc1-c1ccsc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Ar|HeteroAr-H|R_acidic-H|Thiophene
+COC(=O)[C@H](CO[Si](C)(C)C(C)(C)C)NC(=O)OCc1ccccc1>>CC(C)(C)[Si](C)(C)OC[C@@H](C=O)NC(=O)OCc1ccccc1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-Si*|Ar-Alkyl|R_acidic-H
+COC(=O)[C@@H](C)O[Si](C)(C)C(C)(C)C>>C[C@H](C=O)O[Si](C)(C)C(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-Si*|R_acidic-H
+CC(C)OC(=O)c1ccco1>>O=Cc1ccco1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Furan|HeteroAr-H
+CCOC(=O)Cc1ccccc1>>O=CCc1ccccc1,Claisen_condensation,|Bn-CO2R -> Ar-Alkyl|RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+COC(=O)CCc1ccccc1>>O=CCCc1ccccc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+CCOC(=O)c1ccc(F)cc1Cl>>O=Cc1ccc(F)cc1Cl,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Cl|Ar-F
+CCOC(=O)[C@H](C)CO[Si](C)(C)C(C)(C)C>>C[C@@H](C=O)CO[Si](C)(C)C(C)(C)C,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-Si*|R_acidic-H
+CC(C)[C@H](NC(=O)OC(C)(C)C)C(=O)O>>CC(C)[C@@H](C=O)NC(=O)OC(C)(C)C,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+CCCCCCCCCCCC(=O)OCC>>CCCCCCCCCCCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: R_acidic-H
+COC(=O)CCc1ccccc1-c1cccn1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)n1cccc1-c1ccccc1CCC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Ar|HeteroAr-H|R_acidic-H
+Cc1ccccc1C(=O)O>>Cc1ccccc1C=O,Unknown,|Ar-CO2H -> Ar-CHO | bond_broken: C-O | spectators: Ar-Alkyl
+CCOC(=O)[C@@H]1CC=Cc2cccn21>>O=C[C@@H]1CC=Cc2cccn21,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkenyl|HeteroAr-H|R_acidic-H
+O=C(O)[C@@H]1CCCN1C(=O)OCC1c2ccccc2-c2ccccc21>>O=C[C@@H]1CCCN1C(=O)OCC1c2ccccc2-c2ccccc21,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Ar|R_acidic-H
+CC(C)CC(NC(=O)OCc1ccccc1)C(=O)O>>CC(C)CC(C=O)NC(=O)OCc1ccccc1,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|R_acidic-H
+C[C@H](NC(=O)OC(C)(C)C)C(=O)O>>C[C@@H](C=O)NC(=O)OC(C)(C)C,Unknown,|R2CH-CO2H -> R2CH-CHO | bond_broken: C-O | spectators: R_acidic-H
+COc1ccc(C(=O)OC(C)C)cc1>>COc1ccc(C=O)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | spectators: Ar-OR
+COC(=O)c1ccc(CO[Si](c2ccccc2)(c2ccccc2)C(C)(C)C)cc1-c1cc(OC)ccc1OC>>COc1ccc(OC)c(-c2cc(CO[Si](c3ccccc3)(c3ccccc3)C(C)(C)C)ccc2C=O)c1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Alkyl-Si*|Ar-Alkyl|Ar-Ar|Ar-OR|Ar-Si*
+CCOC(=O)C[C@H](CCl)O[Si](C)(C)C(C)(C)C>>CC(C)(C)[Si](C)(C)O[C@@H](CCl)CC=O,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Alkyl-Si*|RCH2-Cl|R_acidic-H
+COC(=O)C1Cc2ncccc2CN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1Cc2cccnc2CC1C=O,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|HeteroAr-H|Pyridine|R_acidic-H
+COC(=O)C1Cc2cccnc2CN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1Cc2ncccc2CC1C=O,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|HeteroAr-H|Pyridine|R_acidic-H
+COC(=O)C1Cc2nccnc2CN1C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)N1Cc2nccnc2CC1C=O,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Ar-Alkyl|HeteroAr-H|Pyrimidine|R_acidic-H
+CC1(C)OC(=O)C2C3CCCCC3C2(C)O1>>CC(=O)[C@@H]1CCCC[C@@H]1CC=O.CC(=O)[C@@H]1CCCC[C@H]1CC=O,Claisen_condensation,|R2CH-CO2R|R3C-OR -> R2CH-COR|RCH2-CHO|R_acidic-H | spectators: R_acidic-H
+CC1(C)OC(=O)[C@@H]2C(C)(C)C(C)(C)[C@]2(C)O1>>CC(=O)C(C)(C)C(C)(C)CC=O,Claisen_condensation,|R2CH-CO2R|R3C-OR -> R3C-COR|RCH2-CHO|R_acidic-H | spectators: R_acidic-H
+CC1(C)OC(=O)C2C3CCCCC3C2(C)O1>>[2H]C(=O)CC1CCCCC1C(C)=O,Claisen_condensation,|R2CH-CO2R|R3C-OR -> R2CH-COR|RCH2-CHO|R_acidic-H | spectators: R_acidic-H
+CCOC(=O)CCB1OC(C)(C)C(C)(C)O1>>CC1(C)OB(CCC=O)OC1(C)C,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Alkyl-Bpin|R_acidic-H
+COC(=O)c1ccc(C(=O)N(C)C)cc1>>O=Cc1ccc(C=O)cc1,Claisen_condensation,|Alkyl-NRCOR|Ar-CO2R|Ar-CONR2 -> Ar-CHO
+COC(=O)c1ccc(C#N)cc1>>N#Cc1ccc(C=O)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-CN
+CCOC(=O)c1ccccc1Cl>>O=Cc1ccccc1Cl,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Cl
+COC(=O)c1ccc(C#N)cc1>>O=Cc1ccc(C=O)cc1,Claisen_condensation,|Ar-CN|Ar-CO2R -> Ar-CHO | bond_broken: C-O; C-N
+COC(=O)c1ccc(C(=O)OC)cc1>>O=Cc1ccc(C=O)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O
+COC(=O)c1ccc(C=O)cc1>>O=Cc1ccc(C=O)cc1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-CHO
+CCOC(=O)c1coc(/C=C\CNC(=O)OC)n1>>COC(=O)NC/C=C\c1nc(C=O)co1,Claisen_condensation,|Ar-CO2R -> Ar-CHO | bond_broken: C-O | spectators: Ar-Alkenyl|HeteroAr-H|Oxazole
+COC(=O)[C@H]1C[C@@](c2ccccc2)(C(F)(F)F)O[Si](C)(C)C1>>C[Si]1(C)C[C@@H](C=O)C[C@@](c2ccccc2)(C(F)(F)F)O1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-CF3|Alkyl-Si*|Ar-Alkyl|R_acidic-H
+COC(=O)/C=C/c1ccc(Br)cc1.CON(C)C(=O)/C=C/c1ccccc1>>OC/C=C/c1ccccc1.O=C/C=C/c1ccc(Br)cc1.OC/C=C/c1ccc(Br)cc1,Michael_addition / Reduction_ester_to_alcohol,|Alkenyl-CO2R|Alkenyl-CONR2|Alkyl-NRCOR -> Alkenyl-CHO|RCH2-OH | spectators: Ar-Alkenyl|Ar-Br | events: Ann+C-C | reaction_types: Michael_addition+Reduction_ester_to_alcohol
+COC(=O)[C@H]1CS(=O)(=O)C[C@@H]1N(CC(C)C)C(=O)OC(C)(C)C>>CC(C)CN(C(=O)OC(C)(C)C)[C@H]1CS(=O)(=O)C[C@@H]1C=O,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: RCH2-SO2R|R_acidic-H
+CCOC(=O)CC1(C)OCCO1>>CC1(CC=O)OCCO1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: RCH2-OR|R_acidic-H
+CCOC(=O)CCc1cccc(C(F)(F)F)c1.CCOC(CCc1cccc(C(F)(F)F)c1)OCC>>O=CCCc1cccc(C(F)(F)F)c1.OCCCc1cccc(C(F)(F)F)c1,Claisen_condensation / Reduction_ester_to_alcohol,|RCH2-CO2R|RCH2-OR -> RCH2-CHO|RCH2-OH | spectators: Ar-Alkyl|Ar-CF3|R_acidic-H | reaction_types: Claisen_condensation+Reduction_ester_to_alcohol
+CCOC(=O)CC1CC2(CCN(c3ccc([C@@H]4c5ccc(OC(C)(C)C)cc5CC[C@@H]4c4ccccc4)cc3)CC2)C1>>CC(C)(C)Oc1ccc2c(c1)CC[C@H](c1ccccc1)[C@@H]2c1ccc(N2CCC3(CC2)CC(CC=O)C3)cc1,Claisen_condensation,|RCH2-CO2R -> RCH2-CHO | bond_broken: C-O | spectators: Ar-Alkyl|Ar-NR2|Ar-OR|RCH2-NR2|R_acidic-H
+COC(=O)[C@H](Cc1cnc[nH]1)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>O=C[C@H](Cc1cnc[nH]1)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|AromN-H|Bn-NHR|HeteroAr-H|Imidazole|R2CH-NHR|R_acidic-H
+COC(=O)[C@H](C)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>C[C@@H](C=O)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|R_acidic-H
+COC(=O)[C@H](CCC(=O)O)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>O=C[C@H](CCC(=O)O)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|RCH2-CO2H|R_acidic-H
+COC(=O)[C@H](CC(C)C)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>CC(C)C[C@@H](C=O)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|R_acidic-H
+CCOC(=O)[C@H](CCSC)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>CSCC[C@@H](C=O)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|RCH2-SR|R_acidic-H
+COC(=O)[C@H](C(C)O)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>CC(O)[C@@H](C=O)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|R2CH-OH|R_acidic-H
+CCOC(=O)[C@H](Cc1ccccc1)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>O=C[C@H](Cc1ccccc1)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|R_acidic-H
+COC(=O)[C@H](C(C)C)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>CC(C)[C@@H](C=O)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|R_acidic-H
+COC(=O)[C@H](Cc1ccc(O)cc1)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>O=C[C@H](Cc1ccc(O)cc1)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OH|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|R_acidic-H
+COC(=O)[C@H](CCCCN)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>NCCCC[C@@H](C=O)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|RCH2-NH2|R_acidic-H
+COC(=O)[C@H](c1ccccc1)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>O=C[C@H](c1ccccc1)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|R_acidic-H
+CCOC(=O)[C@H](Cc1ccccc1)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1>>O=C[C@H](Cc1ccccc1)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Bn-NR2|HeteroAr-H|R2CH-NR2|RCH2-NR2|R_acidic-H
+COC(=O)[C@H](Cc1cnc[nH]1)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1>>O=C[C@H](Cc1cnc[nH]1)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|AromN-H|Bn-NR2|HeteroAr-H|Imidazole|R2CH-NR2|RCH2-NR2|R_acidic-H
+COC(=O)[C@H](CO)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1>>O=C[C@H](CO)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Bn-NR2|HeteroAr-H|R2CH-NR2|RCH2-NR2|RCH2-OH|R_acidic-H
+COC(=O)[C@H](CO)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>O=C[C@H](CO)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|Bn-NHR|HeteroAr-H|R2CH-NHR|RCH2-OH|R_acidic-H
+COC(=O)[C@H](Cc1c[nH]c2ccccc12)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1>>O=C[C@H](Cc1c[nH]c2ccccc12)n1cc(C(NCc2ccc3c(c2)OCO3)C2CCCCC2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OR|AromN-H|Bn-NHR|HeteroAr-H|Indole|R2CH-NHR|R_acidic-H
+CCOC(=O)[C@H](CCSC)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1>>CSCC[C@@H](C=O)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Bn-NR2|HeteroAr-H|R2CH-NR2|RCH2-NR2|RCH2-SR|R_acidic-H
+COC(=O)[C@H](c1ccccc1)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1>>O=C[C@H](c1ccccc1)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Bn-NR2|HeteroAr-H|R2CH-NR2|RCH2-NR2|R_acidic-H
+COC(=O)[C@H](C(C)O)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1>>CC(O)[C@@H](C=O)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Bn-NR2|HeteroAr-H|R2CH-NR2|R2CH-OH|RCH2-NR2|R_acidic-H
+COC(=O)[C@H](Cc1c[nH]c2ccccc12)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1>>O=C[C@H](Cc1c[nH]c2ccccc12)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|AromN-H|Bn-NR2|HeteroAr-H|Indole|R2CH-NR2|RCH2-NR2|R_acidic-H
+COC(=O)[C@H](Cc1ccc(O)cc1)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1>>O=C[C@H](Cc1ccc(O)cc1)n1cc(C(C2CCCCC2)N2CCc3ccccc3C2)nn1,Claisen_condensation,|R2CH-CO2R -> R2CH-CHO | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-OH|Bn-NR2|HeteroAr-H|R2CH-NR2|RCH2-NR2|R_acidic-H
+COC(=O)c1nc(CCCCNc2ccnc3ccccc23)ccc1O[Si](C)(C)C(C)(C)C>>O=Cc1nc(CCCCNc2ccnc3ccccc23)ccc1O,Claisen_condensation,|Alkyl-Si*|Ar-CO2R -> Ar-CHO|HeteroAr-OH | bond_broken: C-O; O-Si | spectators: Ar-Alkyl|HeteroAr-H|HeteroAr-NHR|Pyridine|Quinoline|RCH2-NHR

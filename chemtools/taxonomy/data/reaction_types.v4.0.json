@@ -1301,28 +1301,128 @@
       "description": "Oxidation of alcohols and benzylic side chains to carbonyl or carboxylic-acid products."
     },
     {
-      "id": "Reduction_carbonyl",
+      "id": "Reduction_carbonyl_to_alcohol",
       "reactants": {
         "substrate": "@carbonyls"
       },
       "products": {
+        "product": "@alcohols_oh"
+      },
+      "examples": [
+        "CC(=O)c1ccccc1>>CC(O)c1ccccc1",
+        "c1ccccc1C=O>>c1ccccc1CO"
+      ],
+      "aliases": [
+        "reduction_carbonyl_to_alcohol",
+        "aldehyde_ketone_to_alcohol",
+        "NaBH4_carbonyl_reductions",
+        "Reduction_LAH_LiAlH4",
+        "Reduction-Borane"
+      ],
+      "description": "Reduction of aldehydes and ketones to alcohol products."
+    },
+    {
+      "id": "Reduction_imine_to_amine",
+      "reactants": {
+        "substrate": "@imines"
+      },
+      "products": {
         "product": [
-          "@alcohols_oh",
-          "Ar-Alkyl"
+          "Ar-NH2",
+          "Ar-NHR",
+          "Ar-NR2",
+          "Alkyl-NH2",
+          "Alkyl-NHR",
+          "Alkyl-NR2",
+          "RCH2-NH2",
+          "RCH2-NHR",
+          "RCH2-NR2",
+          "R2CH-NH2",
+          "R2CH-NHR",
+          "R2CH-NR2",
+          "R3C-NH2",
+          "R3C-NHR",
+          "R3C-NR2",
+          "Bn-NH2",
+          "Bn-NHR",
+          "Bn-NR2"
         ]
       },
       "examples": [
-        "CC(=O)c1ccccc1>>CC(O)c1ccccc1"
+        "c1ccccc1C=Nc1ccccc1>>c1ccccc1CNc1ccccc1"
       ],
       "aliases": [
-        "reduction_carbonyl",
-        "carbonyl_reduction",
-        "NaBH4_carbonyl_reductions",
-        "Reduction_LAH_LiAlH4",
-        "Reduction-Borane",
-        "DIBALH_Partial_reductions"
+        "reduction_imine_to_amine",
+        "imine_reduction"
       ],
-      "description": "Reduction of aldehydes/ketones to alcohol products using hydride reagents."
+      "description": "Reduction of imines to amines."
+    },
+    {
+      "id": "Reduction_nitrile_to_amine",
+      "reactants": {
+        "substrate": [
+          "Ar-CN",
+          "HeteroAr-CN",
+          "Alkyl-CN",
+          "RCH2-CN",
+          "R2CH-CN",
+          "R3C-CN",
+          "CH3-CN",
+          "Alkenyl-CN",
+          "Alkynyl-CN"
+        ]
+      },
+      "products": {
+        "product": [
+          "Alkyl-NH2",
+          "RCH2-NH2",
+          "R2CH-NH2",
+          "R3C-NH2",
+          "CH3-NH2",
+          "Bn-NH2"
+        ]
+      },
+      "examples": [
+        "N#Cc1ccccc1>>NCc1ccccc1",
+        "N#CCCC>>NCCCC"
+      ],
+      "aliases": [
+        "reduction_nitrile_to_amine",
+        "nitrile_reduction"
+      ],
+      "description": "Reduction of nitriles to primary amines."
+    },
+    {
+      "id": "Reduction_ester_to_alcohol",
+      "reactants": {
+        "substrate": "@esters"
+      },
+      "products": {
+        "product": "@alcohols_oh"
+      },
+      "examples": [
+        "COC(=O)c1ccccc1>>OCc1ccccc1",
+        "CCOC(=O)CC>>CCCO"
+      ],
+      "aliases": [
+        "reduction_ester_to_alcohol",
+        "ester_reduction"
+      ],
+      "description": "Reduction of esters to alcohol products.",
+      "constraints": {
+        "include_reacted": [],
+        "exclude_reacted": [],
+        "include_formed": [],
+        "exclude_formed": [],
+        "include_bond_formed": [],
+        "exclude_bond_formed": [],
+        "include_bond_broken": [
+          "C-O"
+        ],
+        "exclude_bond_broken": [],
+        "min_reactant_slot_matches": 1,
+        "min_product_slot_matches": 1
+      }
     },
     {
       "id": "Reduction_nitro",
