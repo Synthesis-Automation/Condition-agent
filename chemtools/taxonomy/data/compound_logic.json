@@ -88,7 +88,8 @@
         "Alkyl-NO2"
       ],
       "usage": [
-        "Arylation_acidic_C_H"
+        "Arylation_acidic_C_H",
+        "Michael_addition"
       ]
     },
     "amines_nh": {
@@ -133,7 +134,8 @@
       "usage": [
         "C_N_Coupling",
         "Chan_lam_cn",
-        "Alkyl_Nucleophilic_Substitution"
+        "Alkyl_Nucleophilic_Substitution",
+        "Michael_addition"
       ]
     },
     "alcohols_oh": {
@@ -179,7 +181,8 @@
       ],
       "usage": [
         "C_S_Coupling",
-        "Alkyl_Nucleophilic_Substitution"
+        "Alkyl_Nucleophilic_Substitution",
+        "Michael_addition"
       ]
     },
     "alkyl_electrophiles": {

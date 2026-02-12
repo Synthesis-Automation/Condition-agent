@@ -820,9 +820,29 @@
           "Alkenyl-CO2R",
           "Alkenyl-CO2H",
           "Alkenyl-CN"
+        ],
+        "nucleophile": [
+          "@acidic_ch",
+          "@amines_nh",
+          "@thiols_sh"
         ]
       },
-      "products": {},
+      "products": {
+        "product": [
+          "RCH2-COR",
+          "R2CH-COR",
+          "R3C-COR",
+          "RCH2-CO2R",
+          "R2CH-CO2R",
+          "R3C-CO2R",
+          "RCH2-CO2H",
+          "R2CH-CO2H",
+          "R3C-CO2H",
+          "RCH2-CN",
+          "R2CH-CN",
+          "R3C-CN"
+        ]
+      },
       "catalysts": [],
       "examples": [
         "C=CC(C)=O.CCOC(=O)CC(=O)OCC>>CCOC(=O)CC(CC(C)=O)C(=O)OCC",
@@ -831,7 +851,12 @@
       "aliases": [
         "michael_addition",
         "conjugate_addition"
-      ]
+      ],
+      "description": "Conjugate (1,4-) addition of nucleophiles to activated alkenes (Michael acceptors).",
+      "constraints": {
+        "min_reactant_slot_matches": 2,
+        "min_product_slot_matches": 1
+      }
     },
     {
       "id": "Arylation_acidic_C_H",
