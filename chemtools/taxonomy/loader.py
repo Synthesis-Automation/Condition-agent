@@ -21,6 +21,7 @@ GROUP_LOGIC_FILE = _TAXONOMY_DIR / "group_logic.json"
 ORGANIC_COMPOUNDS_FILE = _TAXONOMY_DIR / "organic_compounds.v1.3.json"
 SCAFFOLD_MOTIFS_FILE = _TAXONOMY_DIR / "scaffold_motifs.v1.3.json"
 FEATURIZER_LOGIC_FILE = _TAXONOMY_DIR / "featurizer_logic.json"
+SYNTHON_FILE = _TAXONOMY_DIR / "synthons.v1.json"
 
 
 @lru_cache(maxsize=1)
@@ -147,6 +148,23 @@ def load_featurizer_logic() -> Dict[str, Any]:
         return {}
 
 
+@lru_cache(maxsize=1)
+def load_synthons() -> Dict[str, Any]:
+    """Load synthon taxonomy JSON.
+
+    Returns:
+        Dictionary containing synthon class definitions.
+    """
+    if not SYNTHON_FILE.exists():
+        return {}
+
+    try:
+        with SYNTHON_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 def get_reaction_by_id(reaction_id: str) -> Dict[str, Any] | None:
     """Get a single reaction definition by ID.
     
@@ -193,6 +211,7 @@ def clear_taxonomy_cache() -> None:
     load_organic_compounds.cache_clear()
     load_scaffold_motifs.cache_clear()
     load_featurizer_logic.cache_clear()
+    load_synthons.cache_clear()
 
 
 __all__ = [
@@ -202,6 +221,7 @@ __all__ = [
     "ORGANIC_COMPOUNDS_FILE",
     "SCAFFOLD_MOTIFS_FILE",
     "FEATURIZER_LOGIC_FILE",
+    "SYNTHON_FILE",
     "load_reaction_types_raw",
     "load_reaction_types_list",
     "load_reaction_types_dict",
@@ -210,6 +230,7 @@ __all__ = [
     "load_organic_compounds",
     "load_scaffold_motifs",
     "load_featurizer_logic",
+    "load_synthons",
     "get_reaction_by_id",
     "get_reaction_metadata",
     "clear_taxonomy_cache",

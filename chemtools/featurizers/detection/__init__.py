@@ -37,6 +37,7 @@ class DetectionResult:
     reacted_motifs: List[str] = field(default_factory=list)
     formed_motifs: List[str] = field(default_factory=list)
     reaction_key: str = ""
+    synthon_evidence: Dict[str, Any] = field(default_factory=dict)
     error: Optional[str] = None
 
     @property
@@ -142,12 +143,18 @@ def detect_reaction_types(
         electrophile = getattr(match, "electrophile", None) or []
         nucleophile = getattr(match, "nucleophile", None) or []
         product = getattr(match, "product", None) or []
+        slot_sources = getattr(match, "slot_sources", None) or {}
+        synthon_slot_evidence = getattr(match, "synthon_slot_evidence", None) or {}
         if electrophile:
             slot_evidence["electrophile"] = list(electrophile)
         if nucleophile:
             slot_evidence["nucleophile"] = list(nucleophile)
         if product:
             slot_evidence["product"] = list(product)
+        if slot_sources:
+            slot_evidence["slot_sources"] = dict(slot_sources)
+        if synthon_slot_evidence:
+            slot_evidence["synthon_slot_evidence"] = dict(synthon_slot_evidence)
         compat_matches.append(
             ReactionMatch(
                 reaction_type=_normalize_reaction_type_name(getattr(match, "reaction_type", "")),
@@ -160,6 +167,7 @@ def detect_reaction_types(
         reacted_motifs=list(getattr(motif_result, "reacted_motifs", []) or []),
         formed_motifs=list(getattr(motif_result, "formed_motifs", []) or []),
         reaction_key=str(getattr(motif_result, "reaction_key", "") or ""),
+        synthon_evidence=dict(getattr(motif_result, "synthon_evidence", {}) or {}),
         error=getattr(motif_result, "error", None),
     )
 

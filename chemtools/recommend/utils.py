@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 
 from .. import constraints
+from ..synthon import select_electrophile_nucleophile
 from ..taxonomy import reaction_catalog as _reaction_catalog
 
 
@@ -209,7 +210,7 @@ def pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
     """
     Pick electrophile and nucleophile from reactant list.
     
-    Uses simple heuristic: looks for halides or sulfonates.
+    Uses taxonomy-driven synthon assignment with a legacy heuristic fallback.
     
     Args:
         reactants: List of reactant SMILES
@@ -217,25 +218,7 @@ def pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
     Returns:
         (electrophile_smiles, nucleophile_smiles)
     """
-    def is_electrophile(s: str) -> bool:
-        t = (s or "").lower()
-        return (
-            ("br" in t) or ("cl" in t) or (" i" in t)
-            or ("os(=o)(=o)c(f)(f)f" in t) or ("otf" in t)
-        )
-    
-    if not reactants:
-        return "", ""
-    if len(reactants) == 1:
-        return reactants[0], ""
-    
-    r0, r1 = reactants[0], reactants[1]
-    if is_electrophile(r0):
-        return r0, r1
-    if is_electrophile(r1):
-        return r1, r0
-    
-    return r0, r1
+    return select_electrophile_nucleophile(reactants)
 
 
 def median(vals: List[float]) -> float | None:

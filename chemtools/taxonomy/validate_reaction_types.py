@@ -17,10 +17,13 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
+from chemtools.taxonomy import loader as taxonomy_loader
 from chemtools.taxonomy.reaction_catalog import (
     REACTION_CONSTRAINT_KEYS,
+    REACTION_SYNTHON_SLOT_KEYS,
     REACTION_TYPES_FILE,
     normalize_reaction_constraints,
+    normalize_reaction_synthons,
 )
 
 
@@ -34,6 +37,12 @@ def _validate_constraints(payload: Dict[str, Any]) -> Dict[str, Any]:
     issues: List[str] = []
     updates: List[str] = []
     allowed = set(REACTION_CONSTRAINT_KEYS)
+    allowed_synthon_slot_keys = set(REACTION_SYNTHON_SLOT_KEYS)
+    known_synthon_ids = {
+        str(entry.get("id")).strip()
+        for entry in (taxonomy_loader.load_synthons().get("synthons") or [])
+        if isinstance(entry, dict) and str(entry.get("id") or "").strip()
+    }
 
     for idx, entry in enumerate(reactions):
         if not isinstance(entry, dict):
@@ -61,7 +70,66 @@ def _validate_constraints(payload: Dict[str, Any]) -> Dict[str, Any]:
             # Ensure explicit constraints field exists for all families.
             entry["constraints"] = normalized
 
+        raw_synthons = entry.get("synthons")
+        if raw_synthons is not None and not isinstance(raw_synthons, dict):
+            issues.append(f"{rid}: synthons must be an object")
+            raw_synthons = {}
+        raw_synthons = dict(raw_synthons or {})
+        for slot_name, slot_spec in raw_synthons.items():
+            if not isinstance(slot_spec, dict):
+                continue
+            unknown_slot_keys = sorted(
+                key for key in slot_spec.keys()
+                if key not in allowed_synthon_slot_keys
+            )
+            if unknown_slot_keys:
+                issues.append(
+                    f"{rid}: synthons.{slot_name} unknown keys: {', '.join(unknown_slot_keys)}"
+                )
+        normalized_synthons = normalize_reaction_synthons(raw_synthons)
+        unknown_synthon_ids = sorted(
+            synthon_id
+            for slot_req in normalized_synthons.values()
+            for synthon_id in slot_req.allowed
+            if known_synthon_ids and synthon_id not in known_synthon_ids
+        )
+        if unknown_synthon_ids:
+            issues.append(
+                f"{rid}: unknown synthon ids: {', '.join(_dedupe(unknown_synthon_ids))}"
+            )
+        if raw_synthons != {
+            slot: {
+                "include": value.allowed,
+                "min_hits": value.min_hits,
+                "min_reactants": value.min_reactants,
+            }
+            for slot, value in normalized_synthons.items()
+        }:
+            if raw_synthons:
+                updates.append(f"{rid}:synthons")
+        if raw_synthons:
+            # Keep source-like structure but normalized values.
+            entry["synthons"] = {
+                slot: {
+                    "include": value.allowed,
+                    "min_hits": value.min_hits,
+                    "min_reactants": value.min_reactants,
+                }
+                for slot, value in normalized_synthons.items()
+            }
+
     return {"issues": issues, "updates": updates, "count": len(reactions)}
+
+
+def _dedupe(values: List[str]) -> List[str]:
+    seen = set()
+    out: List[str] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        out.append(value)
+    return out
 
 
 def main() -> int:

@@ -4,7 +4,7 @@ Reaction type catalog utilities for taxonomy v2.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 import json
 from pathlib import Path
@@ -13,6 +13,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Set, Tuple
 
 REACTION_TYPES_FILE = Path(__file__).resolve().parent / "data" / "reaction_types.v4.0.json"
 COMPOUND_LOGIC_FILE = Path(__file__).resolve().parent / "data" / "compound_logic.json"
+SYNTHON_FILE = Path(__file__).resolve().parent / "data" / "synthons.v1.json"
 _DEFAULT_SLOTS = ("electrophiles", "nucleophiles", "acids", "activators", "substrate", "reagent")
 REACTION_CONSTRAINT_KEYS = (
     "include_reacted",
@@ -25,6 +26,16 @@ REACTION_CONSTRAINT_KEYS = (
     "exclude_bond_broken",
     "min_reactant_slot_matches",
     "min_product_slot_matches",
+)
+REACTION_SYNTHON_SLOT_KEYS = (
+    "synthon_sets",
+    "synthon_set",
+    "motif_sets",
+    "motif_set",
+    "include",
+    "exclude",
+    "min_hits",
+    "min_reactants",
 )
 
 
@@ -43,6 +54,7 @@ class ReactionTypeDefinition:
     reference_reactions: List[str]
     notes: Optional[str]
     constraints: Dict[str, Any]
+    synthons: Dict[str, "SlotRequirement"] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -173,6 +185,128 @@ def _expand_reactant_slot(
     return SlotRequirement(allowed=[], min_hits=1, min_reactants=1)
 
 
+@lru_cache(maxsize=1)
+def _load_synthon_sets() -> Dict[str, List[str]]:
+    if not SYNTHON_FILE.exists():
+        return {}
+    try:
+        with SYNTHON_FILE.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return {}
+
+    synthons = payload.get("synthons") or []
+    by_role: Dict[str, List[str]] = {}
+    all_ids: List[str] = []
+    sets: Dict[str, List[str]] = {}
+
+    for entry in synthons:
+        if not isinstance(entry, dict):
+            continue
+        synthon_id = str(entry.get("id") or "").strip()
+        role = str(entry.get("role") or "").strip().lower()
+        if not synthon_id:
+            continue
+        sets[synthon_id] = [synthon_id]
+        all_ids.append(synthon_id)
+        if role:
+            by_role.setdefault(role, []).append(synthon_id)
+
+    for role, members in by_role.items():
+        deduped = _dedupe(members)
+        sets[role] = deduped
+        sets[f"{role}_synthons"] = deduped
+        if role == "electrophile":
+            sets["electrophiles"] = deduped
+        if role == "nucleophile":
+            sets["nucleophiles"] = deduped
+
+    sets["all"] = _dedupe(all_ids)
+
+    custom_sets = payload.get("synthon_sets") or {}
+    if isinstance(custom_sets, dict):
+        for set_name, set_data in custom_sets.items():
+            if not set_name:
+                continue
+            members = _coerce_list((set_data or {}).get("members")) if isinstance(set_data, dict) else _coerce_list(set_data)
+            expanded: List[str] = []
+            for member in members:
+                if member.startswith("@"):
+                    expanded.extend(sets.get(member[1:], []))
+                else:
+                    expanded.append(member)
+            sets[str(set_name)] = _dedupe(expanded)
+
+    return sets
+
+
+def _expand_synthon_slot(
+    values: Any,
+    synthon_sets: Mapping[str, Iterable[str]],
+) -> SlotRequirement:
+    min_hits = 1
+    min_reactants = 1
+
+    def resolve_value(v: str) -> List[str]:
+        if v.startswith("@"):
+            return _coerce_list(synthon_sets.get(v[1:]))
+        return [v]
+
+    if isinstance(values, str):
+        expanded = resolve_value(values)
+        return SlotRequirement(allowed=_dedupe(expanded), min_hits=1, min_reactants=1)
+
+    if isinstance(values, list):
+        expanded = []
+        for value in values:
+            if isinstance(value, str):
+                expanded.extend(resolve_value(value))
+            else:
+                expanded.append(str(value))
+        return SlotRequirement(allowed=_dedupe(expanded), min_hits=1, min_reactants=1)
+
+    if isinstance(values, dict):
+        expanded: List[str] = []
+        set_tokens = _coerce_list(values.get("synthon_sets") or values.get("synthon_set"))
+        # Accept motif_set keys to keep schema evolution tolerant.
+        if not set_tokens:
+            set_tokens = _coerce_list(values.get("motif_sets") or values.get("motif_set"))
+        for set_name in set_tokens:
+            expanded.extend(_coerce_list(synthon_sets.get(set_name)))
+
+        for value in _coerce_list(values.get("include")):
+            expanded.extend(resolve_value(value))
+
+        exclude = set(_coerce_list(values.get("exclude")))
+        if exclude:
+            expanded = [value for value in expanded if value not in exclude]
+
+        min_hits = int(values.get("min_hits") or 1)
+        min_reactants = int(values.get("min_reactants") or 1)
+        return SlotRequirement(
+            allowed=_dedupe(expanded),
+            min_hits=max(min_hits, 1),
+            min_reactants=max(min_reactants, 1),
+        )
+
+    return SlotRequirement(allowed=[], min_hits=1, min_reactants=1)
+
+
+def normalize_reaction_synthons(
+    raw: Any,
+    synthon_sets: Optional[Mapping[str, Iterable[str]]] = None,
+) -> Dict[str, SlotRequirement]:
+    if not isinstance(raw, dict):
+        return {}
+    synthon_sets = synthon_sets or {}
+    normalized: Dict[str, SlotRequirement] = {}
+    for slot, values in raw.items():
+        cleaned = _expand_synthon_slot(values, synthon_sets)
+        if cleaned.allowed or isinstance(values, (list, dict, str)):
+            normalized[slot] = cleaned
+    return normalized
+
+
 def _normalize_reactants(
     raw: Any,
     motif_sets: Optional[Mapping[str, Iterable[str]]] = None,
@@ -252,6 +386,7 @@ def load_reaction_catalog(
                         motif_sets[k] = v
         except Exception:
             pass
+    synthon_sets = _load_synthon_sets()
 
     definitions: Dict[str, ReactionTypeDefinition] = {}
     alias_map: Dict[str, str] = {}
@@ -278,6 +413,7 @@ def load_reaction_catalog(
         conditions = entry.get("conditions")
         metadata = dict(entry.get("metadata") or {})
         constraints = normalize_reaction_constraints(entry.get("constraints"))
+        synthons = normalize_reaction_synthons(entry.get("synthons"), synthon_sets)
         raw_references = entry.get("reference_reactions")
         if not raw_references:
             raw_references = entry.get("examples") or []
@@ -298,6 +434,7 @@ def load_reaction_catalog(
             reference_reactions=reference_reactions,
             notes=notes,
             constraints=constraints,
+            synthons=synthons,
         )
 
         register_alias(rxn_id, rxn_id)
@@ -340,5 +477,7 @@ __all__ = [
     "get_reaction_type",
     "resolve_reaction_type",
     "normalize_reaction_constraints",
+    "normalize_reaction_synthons",
     "REACTION_CONSTRAINT_KEYS",
+    "REACTION_SYNTHON_SLOT_KEYS",
 ]

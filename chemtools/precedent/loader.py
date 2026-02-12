@@ -8,25 +8,12 @@ import csv
 import os
 from functools import lru_cache
 
-# Helper to pick electrophile vs nucleophile from reactants list
+from ..synthon import select_electrophile_nucleophile
+
+
 def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
-    """Heuristically identify electrophile and nucleophile from reactant list."""
-    def is_electrophile(s: str) -> bool:
-        t = (s or "").lower()
-        return (
-            ("br" in t) or ("cl" in t) or (" i" in t)
-            or ("os(=o)(=o)c(f)(f)f" in t) or ("otf" in t)
-        )
-    if not reactants:
-        return "", ""
-    if len(reactants) == 1:
-        return reactants[0], ""
-    r0, r1 = reactants[0], reactants[1]
-    if is_electrophile(r0):
-        return r0, r1
-    if is_electrophile(r1):
-        return r1, r0
-    return r0, r1
+    """Identify electrophile and nucleophile from reactant list."""
+    return select_electrophile_nucleophile(reactants)
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))

@@ -86,12 +86,18 @@ def _run_primary_reaction_type_detection(
         electrophile = list(getattr(match, "electrophile", []) or [])
         nucleophile = list(getattr(match, "nucleophile", []) or [])
         product = list(getattr(match, "product", []) or [])
+        slot_sources = dict(getattr(match, "slot_sources", {}) or {})
+        synthon_slot_evidence = dict(getattr(match, "synthon_slot_evidence", {}) or {})
         if electrophile:
             slot_evidence["electrophile"] = electrophile
         if nucleophile:
             slot_evidence["nucleophile"] = nucleophile
         if product:
             slot_evidence["product"] = product
+        if slot_sources:
+            slot_evidence["slot_sources"] = slot_sources
+        if synthon_slot_evidence:
+            slot_evidence["synthon_slot_evidence"] = synthon_slot_evidence
         matches_payload.append(
             {
                 "reaction_type": str(getattr(match, "reaction_type", "") or ""),
@@ -105,6 +111,7 @@ def _run_primary_reaction_type_detection(
         "error": getattr(result, "error", None),
         "summary": summary,
         "matches": matches_payload,
+        "synthon_evidence": dict(getattr(result, "synthon_evidence", {}) or {}),
     }
 
 
@@ -235,6 +242,12 @@ def format_reaction_type_summary(detection: Any) -> Dict[str, Any]:
         slot_evidence["nucleophile"] = best.nucleophile
     if best.product:
         slot_evidence["product"] = best.product
+    slot_sources = dict(getattr(best, "slot_sources", {}) or {})
+    if slot_sources:
+        slot_evidence["slot_sources"] = slot_sources
+    synthon_slot_evidence = dict(getattr(best, "synthon_slot_evidence", {}) or {})
+    if synthon_slot_evidence:
+        slot_evidence["synthon_slot_evidence"] = synthon_slot_evidence
     
     result = {
         "reaction_type": best.reaction_type,

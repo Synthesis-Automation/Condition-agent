@@ -17,6 +17,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+from .synthon import classify_reactant_synthons
+
 
 # =============================================================================
 # Data Models
@@ -30,9 +32,11 @@ class ReactionMatch:
     electrophile: List[str] = field(default_factory=list)
     nucleophile: List[str] = field(default_factory=list)
     product: List[str] = field(default_factory=list)
+    slot_sources: Dict[str, str] = field(default_factory=dict)
+    synthon_slot_evidence: Dict[str, List[str]] = field(default_factory=dict)
     
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        payload: Dict[str, Any] = {
             "reaction_type": self.reaction_type,
             "confidence": self.confidence,
             "slots": {
@@ -41,6 +45,11 @@ class ReactionMatch:
                 "product": self.product,
             },
         }
+        if self.slot_sources:
+            payload["slot_sources"] = dict(self.slot_sources)
+        if self.synthon_slot_evidence:
+            payload["synthon_slot_evidence"] = dict(self.synthon_slot_evidence)
+        return payload
 
 
 @dataclass
@@ -50,6 +59,7 @@ class DetectionResult:
     reacted_motifs: List[str] = field(default_factory=list)
     formed_motifs: List[str] = field(default_factory=list)
     reaction_key: str = ""
+    synthon_evidence: Dict[str, Any] = field(default_factory=dict)
     error: Optional[str] = None
     
     @property
@@ -63,6 +73,8 @@ class DetectionResult:
             "formed_motifs": self.formed_motifs,
             "reaction_key": self.reaction_key,
         }
+        if self.synthon_evidence:
+            result["synthon_evidence"] = self.synthon_evidence
         if self.error:
             result["error"] = self.error
         return result
@@ -143,6 +155,130 @@ def extract_reaction_key(reaction_smiles: str) -> Tuple[List[str], List[str], Li
     return reacted, formed, spectator, reaction_key
 
 
+def _extract_reactant_smiles(reaction_smiles: str) -> List[str]:
+    if not reaction_smiles or ">>" not in reaction_smiles:
+        return []
+    try:
+        from .smiles import normalize_reaction
+    except Exception:
+        normalize_reaction = None  # type: ignore[assignment]
+    if normalize_reaction is None:
+        left = reaction_smiles.split(">>", 1)[0]
+        return [tok for tok in left.split(".") if tok]
+    try:
+        normalized = normalize_reaction(reaction_smiles)
+    except Exception:
+        normalized = None
+    reactants: List[str] = []
+    if isinstance(normalized, dict):
+        for entry in normalized.get("reactants", []) or []:
+            if not isinstance(entry, dict):
+                continue
+            smiles = (
+                entry.get("smiles_norm")
+                or entry.get("largest_smiles")
+                or entry.get("input")
+            )
+            if smiles:
+                reactants.append(str(smiles))
+    if reactants:
+        return reactants
+    left = reaction_smiles.split(">>", 1)[0]
+    return [tok for tok in left.split(".") if tok]
+
+
+def _build_synthon_context(reaction_smiles: str) -> Dict[str, Any]:
+    reactants = _extract_reactant_smiles(reaction_smiles)
+    role_to_motifs: Dict[str, Set[str]] = {"electrophile": set(), "nucleophile": set()}
+    role_to_indices: Dict[str, Set[int]] = {"electrophile": set(), "nucleophile": set()}
+    reactant_assignments: List[Dict[str, Any]] = []
+    all_motifs: Set[str] = set()
+
+    for idx, smiles in enumerate(reactants):
+        assignments = classify_reactant_synthons(smiles)
+        formatted_assignments: List[Dict[str, Any]] = []
+        for hit in assignments:
+            matched = sorted({str(m) for m in hit.matched_motifs if str(m)})
+            if not matched:
+                continue
+            role = str(hit.role or "").strip().lower()
+            if role in role_to_motifs:
+                role_to_motifs[role].update(matched)
+                role_to_indices[role].add(idx)
+            all_motifs.update(matched)
+            formatted_assignments.append(
+                {
+                    "synthon_id": hit.synthon_id,
+                    "role": role,
+                    "matched_motifs": matched,
+                    "priority": int(hit.priority),
+                }
+            )
+        reactant_assignments.append(
+            {
+                "index": idx,
+                "smiles": smiles,
+                "assignments": formatted_assignments,
+            }
+        )
+
+    role_motifs = {
+        role: sorted(values) for role, values in role_to_motifs.items() if values
+    }
+    role_indices = {
+        role: sorted(values) for role, values in role_to_indices.items() if values
+    }
+
+    distinct_roles = False
+    electrophiles = role_to_indices.get("electrophile", set())
+    nucleophiles = role_to_indices.get("nucleophile", set())
+    if electrophiles and nucleophiles:
+        distinct_roles = any(e != n for e in electrophiles for n in nucleophiles)
+
+    return {
+        "reactants": reactants,
+        "reactant_assignments": reactant_assignments,
+        "role_motifs": role_motifs,
+        "role_indices": role_indices,
+        "all_motifs": sorted(all_motifs),
+        "distinct_roles": distinct_roles,
+    }
+
+
+def _slot_roles(slot_name: str) -> Tuple[str, ...]:
+    text = str(slot_name or "").strip().lower()
+    if not text:
+        return tuple()
+    if text == "electrophile" or text.startswith("electrophile_"):
+        return ("electrophile",)
+    if text == "nucleophile" or text.startswith("nucleophile_"):
+        return ("nucleophile",)
+    if text == "substrate":
+        return ("electrophile",)
+    if "electrophile" in text:
+        return ("electrophile",)
+    if "nucleophile" in text or "partner" in text:
+        return ("nucleophile",)
+    return tuple()
+
+
+def _slot_synthon_matches(
+    slot_name: str,
+    slot_set: Set[str],
+    synthon_context: Dict[str, Any],
+) -> Set[str]:
+    if not slot_set or not synthon_context:
+        return set()
+    role_motifs = synthon_context.get("role_motifs", {}) or {}
+    role_matches: Set[str] = set()
+    for role in _slot_roles(slot_name):
+        role_matches.update(set(role_motifs.get(role, []) or []))
+    if role_matches:
+        return slot_set & role_matches
+    all_motifs = set(synthon_context.get("all_motifs", []) or [])
+    return slot_set & all_motifs
+
+
 # =============================================================================
 # Matching Logic
 # =============================================================================
@@ -152,6 +288,7 @@ def _match_reaction_type(
     formed: Set[str],
     reaction_def: Dict[str, Any],
     motif_sets: Dict[str, Set[str]],
+    synthon_context: Optional[Dict[str, Any]] = None,
 ) -> Optional[ReactionMatch]:
     """
     Match reaction key against a reaction type definition.
@@ -173,17 +310,33 @@ def _match_reaction_type(
     electrophile_matches = []
     nucleophile_matches = []
     product_matches = []
+    slot_sources: Dict[str, str] = {}
+    synthon_slot_evidence: Dict[str, List[str]] = {}
+    reactant_slot_total = 0
     
     # Match reactant slots
     for slot_name, slot_pattern in reactants_def.items():
         slot_set = _expand_pattern(slot_pattern, motif_sets)
         if not slot_set:
             continue
-        
-        matches = reacted & slot_set
-        if not matches:
+
+        reactant_slot_total += 1
+        motif_matches = reacted & slot_set
+        synthon_matches = _slot_synthon_matches(
+            slot_name,
+            slot_set,
+            synthon_context or {},
+        )
+        if motif_matches:
+            matches = set(motif_matches)
+            slot_sources[slot_name] = "motif"
+        elif synthon_matches:
+            matches = set(synthon_matches)
+            slot_sources[slot_name] = "synthon"
+            synthon_slot_evidence[slot_name] = sorted(synthon_matches)
+        else:
             return None  # Required slot not matched
-        
+
         if slot_name == "electrophile":
             electrophile_matches = sorted(matches)
         elif slot_name == "nucleophile":
@@ -207,16 +360,16 @@ def _match_reaction_type(
         return None
     
     # Calculate confidence
-    total_slots = len(reactants_def) + (1 if products_def else 0)
-    matched_slots = (1 if electrophile_matches else 0) + \
-                   (1 if nucleophile_matches else 0) + \
-                   (1 if product_matches else 0)
+    total_slots = reactant_slot_total + (1 if products_def else 0)
+    matched_slots = reactant_slot_total + (1 if product_matches else 0)
     
     confidence = matched_slots / max(total_slots, 1)
     
     # Boost for matching both reactant slots
     if electrophile_matches and nucleophile_matches:
         confidence = min(1.0, confidence + 0.15)
+    if synthon_context and synthon_context.get("distinct_roles"):
+        confidence = min(1.0, confidence + 0.05)
     
     return ReactionMatch(
         reaction_type=reaction_id,
@@ -224,6 +377,8 @@ def _match_reaction_type(
         electrophile=electrophile_matches,
         nucleophile=nucleophile_matches,
         product=product_matches,
+        slot_sources=slot_sources,
+        synthon_slot_evidence=synthon_slot_evidence,
     )
 
 
@@ -265,13 +420,20 @@ def detect_reaction_type(reaction_smiles: str) -> DetectionResult:
     
     reaction_types = _load_reaction_types()
     motif_sets = _load_motif_sets()
+    synthon_context = _build_synthon_context(reaction_smiles)
     
     reacted_set = set(reacted)
     formed_set = set(formed)
     
     matches: List[ReactionMatch] = []
     for reaction_def in reaction_types:
-        match = _match_reaction_type(reacted_set, formed_set, reaction_def, motif_sets)
+        match = _match_reaction_type(
+            reacted_set,
+            formed_set,
+            reaction_def,
+            motif_sets,
+            synthon_context=synthon_context,
+        )
         if match:
             matches.append(match)
     
@@ -286,6 +448,11 @@ def detect_reaction_type(reaction_smiles: str) -> DetectionResult:
         reacted_motifs=reacted,
         formed_motifs=formed,
         reaction_key=reaction_key,
+        synthon_evidence={
+            "reactants": synthon_context.get("reactant_assignments", []),
+            "role_motifs": synthon_context.get("role_motifs", {}),
+            "distinct_roles": bool(synthon_context.get("distinct_roles")),
+        },
     )
 
 
