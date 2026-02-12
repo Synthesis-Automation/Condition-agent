@@ -30,6 +30,10 @@ def _mk_defn(
             "exclude_reacted": [],
             "include_formed": [],
             "exclude_formed": [],
+            "include_bond_formed": [],
+            "exclude_bond_formed": [],
+            "include_bond_broken": [],
+            "exclude_bond_broken": [],
             "min_reactant_slot_matches": 0,
             "min_product_slot_matches": 0,
         },
@@ -86,3 +90,31 @@ def test_specificity_matcher_can_outrank_legacy_first_hit(
     assert legacy["reaction_type"] == "Broad_class"
     assert improved["reaction_type"] == "Specific_class"
     assert improved["evidence"]["matcher"] == "taxonomy_specificity_v2"
+
+
+def test_crk_validation_can_use_bond_change_constraints(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    broad = _mk_defn(
+        "EventLike",
+        reactants={"substrate": ["Alkenyl-CHO"]},
+        products={"product": ["Alkenyl-Alkenyl"]},
+    )
+    wittig_like = _mk_defn(
+        "Wittig_like",
+        reactants={"substrate": ["Alkenyl-CHO"]},
+        products={"product": ["Alkenyl-Alkenyl"]},
+    )
+    broad.constraints["exclude_bond_broken"] = ["C-P"]
+    wittig_like.constraints["include_bond_broken"] = ["C-P"]
+    definitions = {"EventLike": broad, "Wittig_like": wittig_like}
+
+    monkeypatch.setattr(dv, "_get_catalog", lambda: (definitions, {}))
+    crk = "|Alkenyl-CHO -> Alkenyl-Alkenyl | bond_formed: C-C | bond_broken: C-P; C-O"
+    result = dv.validate_detection_with_crk_key(
+        initial_detection="Unknown",
+        initial_confidence=0.0,
+        reaction_key=crk,
+        use_legacy=False,
+    )
+    assert result["reaction_type"] == "Wittig_like"

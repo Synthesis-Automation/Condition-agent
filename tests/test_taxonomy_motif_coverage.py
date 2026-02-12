@@ -26,6 +26,8 @@ def test_reductive_amination_and_trifluoromethylation_include_new_motifs() -> No
     reductive_products = reductive.products["product"].allowed
     assert "Ar-C=N" in reductive_reactants
     assert "Alkyl-N(R)CO2R" not in reductive_products
+    assert "Ar-NHR" not in reductive_products
+    assert "Bn-NHR" in reductive_products
 
     cf3 = definitions["Trifluoromethylation"]
     cf3_reactants = cf3.reactants["substrate"].allowed

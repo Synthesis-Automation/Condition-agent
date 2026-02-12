@@ -49,6 +49,8 @@ def _constraints_match(
     reacted_set: Set[str],
     formed_set: Set[str],
     *,
+    formed_bond_tokens: Optional[Set[str]] = None,
+    broken_bond_tokens: Optional[Set[str]] = None,
     reactant_slot_matches: int = 0,
     product_slot_matches: int = 0,
 ) -> bool:
@@ -57,8 +59,14 @@ def _constraints_match(
     exclude_reacted = _as_str_set(constraints.get("exclude_reacted"))
     include_formed = _as_str_set(constraints.get("include_formed"))
     exclude_formed = _as_str_set(constraints.get("exclude_formed"))
+    include_bond_formed = _as_str_set(constraints.get("include_bond_formed"))
+    exclude_bond_formed = _as_str_set(constraints.get("exclude_bond_formed"))
+    include_bond_broken = _as_str_set(constraints.get("include_bond_broken"))
+    exclude_bond_broken = _as_str_set(constraints.get("exclude_bond_broken"))
     min_reactant_slot_matches = int(constraints.get("min_reactant_slot_matches") or 0)
     min_product_slot_matches = int(constraints.get("min_product_slot_matches") or 0)
+    formed_bonds = formed_bond_tokens or set()
+    broken_bonds = broken_bond_tokens or set()
 
     if include_reacted and not include_reacted.issubset(reacted_set):
         return False
@@ -67,6 +75,14 @@ def _constraints_match(
     if include_formed and not include_formed.issubset(formed_set):
         return False
     if exclude_formed and (exclude_formed & formed_set):
+        return False
+    if include_bond_formed and not include_bond_formed.issubset(formed_bonds):
+        return False
+    if exclude_bond_formed and (exclude_bond_formed & formed_bonds):
+        return False
+    if include_bond_broken and not include_bond_broken.issubset(broken_bonds):
+        return False
+    if exclude_bond_broken and (exclude_bond_broken & broken_bonds):
         return False
     if reactant_slot_matches < max(0, min_reactant_slot_matches):
         return False
@@ -102,6 +118,20 @@ def _score_specificity_candidate(
 def _split_motif_tokens(value: str) -> List[str]:
     tokens = [tok.strip() for tok in re.split(r"[|,;/]", value) if tok.strip()]
     return [normalize_motif_id(tok) for tok in tokens if tok and tok != "[]"]
+
+
+def _canonicalize_bond_token(token: str) -> Optional[str]:
+    text = str(token or "").strip()
+    if "-" not in text:
+        return None
+    left, right = [t.strip() for t in text.split("-", 1)]
+    left_match = re.search(r"[A-Z][a-z]?", left)
+    right_match = re.search(r"[A-Z][a-z]?", right)
+    if not left_match or not right_match:
+        return None
+    left_el = left_match.group(0)
+    right_el = right_match.group(0)
+    return "-".join(sorted((left_el, right_el)))
 
 
 def _parse_crk_key(
@@ -158,6 +188,9 @@ def _parse_crk_key(
 def _collect_ranked_catalog_candidates(
     reacted_set: Set[str],
     formed_set: Set[str],
+    *,
+    formed_bond_tokens: Optional[Set[str]] = None,
+    broken_bond_tokens: Optional[Set[str]] = None,
 ) -> List[Dict[str, Any]]:
     """Collect and rank taxonomy candidates using specificity-aware scoring."""
     definitions, _ = _get_catalog()
@@ -212,6 +245,8 @@ def _collect_ranked_catalog_candidates(
             defn.constraints or {},
             reacted_set,
             formed_set,
+            formed_bond_tokens=formed_bond_tokens,
+            broken_bond_tokens=broken_bond_tokens,
             reactant_slot_matches=len(matched_slots),
             product_slot_matches=product_slot_matches,
         ):
@@ -252,9 +287,17 @@ def _collect_ranked_catalog_candidates(
 def _match_reaction_catalog_specificity(
     reacted_set: Set[str],
     formed_set: Set[str],
+    *,
+    formed_bond_tokens: Optional[Set[str]] = None,
+    broken_bond_tokens: Optional[Set[str]] = None,
 ) -> Optional[Tuple[str, List[str], str]]:
     """Return best match using specificity-aware ranked candidates."""
-    candidates = _collect_ranked_catalog_candidates(reacted_set, formed_set)
+    candidates = _collect_ranked_catalog_candidates(
+        reacted_set,
+        formed_set,
+        formed_bond_tokens=formed_bond_tokens,
+        broken_bond_tokens=broken_bond_tokens,
+    )
     if not candidates:
         return None
     top = candidates[0]
@@ -268,6 +311,9 @@ def _match_reaction_catalog_specificity(
 def _match_reaction_catalog_legacy(
     reacted_set: Set[str],
     formed_set: Set[str],
+    *,
+    formed_bond_tokens: Optional[Set[str]] = None,
+    broken_bond_tokens: Optional[Set[str]] = None,
 ) -> Optional[Tuple[str, List[str], str]]:
     """Return first taxonomy match (legacy pre-specificity behavior)."""
     definitions, _ = _get_catalog()
@@ -300,8 +346,19 @@ def _match_reaction_catalog_legacy(
                 if slot_req.allowed and _motifs_match_slot(formed_set, slot_req.allowed):
                     product_match = True
                     break
-        if product_match:
-            return reaction_id, matched_slots, defn.name
+        if not product_match:
+            continue
+        if not _constraints_match(
+            defn.constraints or {},
+            reacted_set,
+            formed_set,
+            formed_bond_tokens=formed_bond_tokens,
+            broken_bond_tokens=broken_bond_tokens,
+            reactant_slot_matches=len(matched_slots),
+            product_slot_matches=1 if product_match else 0,
+        ):
+            continue
+        return reaction_id, matched_slots, defn.name
     return None
 
 
@@ -310,11 +367,23 @@ def _match_reaction_catalog(
     formed_set: Set[str],
     *,
     use_legacy: bool = False,
+    formed_bond_tokens: Optional[Set[str]] = None,
+    broken_bond_tokens: Optional[Set[str]] = None,
 ) -> Optional[Tuple[str, List[str], str]]:
     """Return best taxonomy match as (reaction_id, matched_slots, display_name)."""
     if use_legacy:
-        return _match_reaction_catalog_legacy(reacted_set, formed_set)
-    return _match_reaction_catalog_specificity(reacted_set, formed_set)
+        return _match_reaction_catalog_legacy(
+            reacted_set,
+            formed_set,
+            formed_bond_tokens=formed_bond_tokens,
+            broken_bond_tokens=broken_bond_tokens,
+        )
+    return _match_reaction_catalog_specificity(
+        reacted_set,
+        formed_set,
+        formed_bond_tokens=formed_bond_tokens,
+        broken_bond_tokens=broken_bond_tokens,
+    )
 
 
 def _build_match_evidence(
@@ -425,7 +494,23 @@ def validate_detection_with_crk_key(
     This is the preferred streamlined path: CRK_raw -> taxonomy match.
     """
     reacted_set, formed_set, _spectators, _formed_bonds, _broken_bonds = _parse_crk_key(reaction_key)
-    match = _match_reaction_catalog(reacted_set, formed_set, use_legacy=use_legacy)
+    formed_bond_tokens = {
+        tok
+        for tok in (_canonicalize_bond_token(t) for t in (_formed_bonds or []))
+        if tok
+    }
+    broken_bond_tokens = {
+        tok
+        for tok in (_canonicalize_bond_token(t) for t in (_broken_bonds or []))
+        if tok
+    }
+    match = _match_reaction_catalog(
+        reacted_set,
+        formed_set,
+        use_legacy=use_legacy,
+        formed_bond_tokens=formed_bond_tokens,
+        broken_bond_tokens=broken_bond_tokens,
+    )
     evidence = (
         _build_match_evidence(
             reacted_set=reacted_set,

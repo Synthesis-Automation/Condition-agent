@@ -514,7 +514,6 @@
       "products": {
         "product": [
           "Ar-Ar",
-          "Ar-Alkyl",
           "Ar-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
@@ -564,6 +563,7 @@
       "products": {
         "product": [
           "Ar-Ar",
+          "Ar-Alkyl",
           "Ar-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
@@ -1141,10 +1141,21 @@
       },
       "products": {
         "product": [
+          "Alkyl-NH2",
           "Alkyl-NHR",
           "Alkyl-NR2",
-          "Ar-NHR",
-          "Ar-NR2"
+          "RCH2-NH2",
+          "RCH2-NHR",
+          "RCH2-NR2",
+          "R2CH-NH2",
+          "R2CH-NHR",
+          "R2CH-NR2",
+          "R3C-NH2",
+          "R3C-NHR",
+          "R3C-NR2",
+          "Bn-NH2",
+          "Bn-NHR",
+          "Bn-NR2"
         ]
       },
       "examples": [
@@ -1153,6 +1164,49 @@
       "aliases": [
         "reductive_amination"
       ]
+    },
+    {
+      "id": "Wittig_reaction",
+      "reactants": {
+        "substrate": "@carbonyls"
+      },
+      "products": {
+        "product": [
+          "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
+          "Alkenyl-Alkenyl",
+          "Alkenyl-CO2R",
+          "Alkenyl-COR",
+          "Alkenyl-CHO",
+          "Alkenyl-CO2H"
+        ]
+      },
+      "examples": [
+        "O=Cc1ccccc1.C[P+](c1ccccc1)(c1ccccc1)c1ccccc1>>C=Cc1ccccc1"
+      ],
+      "aliases": [
+        "Wittig",
+        "Wittig reaction",
+        "wittig",
+        "wittig_reaction"
+      ],
+      "description": "Wittig/HWE-like olefination of carbonyls to C=C products, supported by C-P bond cleavage evidence.",
+      "constraints": {
+        "include_reacted": [],
+        "exclude_reacted": [],
+        "include_formed": [],
+        "exclude_formed": [],
+        "include_bond_formed": [
+          "C-C"
+        ],
+        "exclude_bond_formed": [],
+        "include_bond_broken": [
+          "C-P"
+        ],
+        "exclude_bond_broken": [],
+        "min_reactant_slot_matches": 1,
+        "min_product_slot_matches": 1
+      }
     },
     {
       "id": "Ring_closing_metathesis",

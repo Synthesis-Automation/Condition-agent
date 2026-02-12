@@ -19,6 +19,10 @@ REACTION_CONSTRAINT_KEYS = (
     "exclude_reacted",
     "include_formed",
     "exclude_formed",
+    "include_bond_formed",
+    "exclude_bond_formed",
+    "include_bond_broken",
+    "exclude_bond_broken",
     "min_reactant_slot_matches",
     "min_product_slot_matches",
 )
@@ -212,6 +216,10 @@ def normalize_reaction_constraints(raw: Any) -> Dict[str, Any]:
         "exclude_reacted": _dedupe(_coerce_list(payload.get("exclude_reacted"))),
         "include_formed": _dedupe(_coerce_list(payload.get("include_formed"))),
         "exclude_formed": _dedupe(_coerce_list(payload.get("exclude_formed"))),
+        "include_bond_formed": _dedupe(_coerce_list(payload.get("include_bond_formed"))),
+        "exclude_bond_formed": _dedupe(_coerce_list(payload.get("exclude_bond_formed"))),
+        "include_bond_broken": _dedupe(_coerce_list(payload.get("include_bond_broken"))),
+        "exclude_bond_broken": _dedupe(_coerce_list(payload.get("exclude_bond_broken"))),
         "min_reactant_slot_matches": _to_non_negative_int(
             payload.get("min_reactant_slot_matches"),
             default=0,

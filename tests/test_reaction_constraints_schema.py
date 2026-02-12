@@ -15,6 +15,10 @@ def test_normalize_reaction_constraints_provides_full_schema() -> None:
     assert normalized["exclude_reacted"] == []
     assert normalized["include_formed"] == []
     assert normalized["exclude_formed"] == []
+    assert normalized["include_bond_formed"] == []
+    assert normalized["exclude_bond_formed"] == []
+    assert normalized["include_bond_broken"] == []
+    assert normalized["exclude_bond_broken"] == []
     assert normalized["min_reactant_slot_matches"] == 0
     assert normalized["min_product_slot_matches"] == 0
 
