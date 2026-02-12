@@ -1,0 +1,17 @@
+reaction_smiles,detected_reaction_type,reaction_key
+O=C(Cl)c1ccc2ccccc2c1>>O=Cc1ccc2ccccc2c1,Rosenmund_reduction,|Ar-COCl -> Ar-CHO | bond_broken: C-Cl
+COCCN(Cc1ccccc1)C(Br)C(=O)Cl>>COCCN(Cc1ccccc1)C(Br)C=O,Rosenmund_reduction,|Alkyl-COCl -> R2CH-CHO | bond_broken: C-Cl | spectators: Bn-NR2|R2CH-Br|R2CH-NR2|RCH2-NR2|RCH2-OR|R_acidic-H
+CC1(C)OC2C3CC(C2O1)C1(C(=O)Cl)CC(=O)OCC31>>CC1(C)OC2C3CC(C2O1)C1(C=O)CC(=O)OCC31,Rosenmund_reduction,|Alkyl-COCl -> R3C-CHO | bond_broken: C-Cl | spectators: R3C-OR|RCH2-CO2R|R_acidic-H
+CSCCC(C(=O)Cl)N1C(=O)c2ccccc2C1=O>>CSCCC(C=O)N1C(=O)c2ccccc2C1=O,Rosenmund_reduction,|Alkyl-COCl -> R2CH-CHO | bond_broken: C-Cl | spectators: Alkyl-NRCOR|Ar-CONR2|RCH2-SR|R_acidic-H
+CC(C[C@@]1(C)CCCC[C@@H]1CCC(=O)Cl)C(=O)Cl>>CC(C=O)C[C@@]1(C)CCCC[C@@H]1CCC=O,Rosenmund_reduction,|Alkyl-COCl -> R2CH-CHO|RCH2-CHO | bond_broken: C-Cl | spectators: R_acidic-H
+COc1cc(C(=O)Cl)cc(OC)c1OC>>COc1cc(C=O)cc(OC)c1OC,Rosenmund_reduction,|Ar-COCl -> Ar-CHO | bond_broken: C-Cl | spectators: Ar-OR
+CC(C)(C)C1CCCCC1C(=O)Cl>>CC(C)(C)C1CCCCC1C=O,Rosenmund_reduction,|Alkyl-COCl -> R2CH-CHO | bond_broken: C-Cl | spectators: R_acidic-H
+O=C(Cl)CCCCCCC/C=C\CCCCCCCC(=O)Cl>>O=CCCCCCCC/C=C\CCCCCCCC=O,Rosenmund_reduction,|Alkyl-COCl -> RCH2-CHO | bond_broken: C-Cl | spectators: R_acidic-H
+CC(C)c1ccc2c(c1)CC[C@H]1[C@](C)(C(=O)Cl)CCC[C@]21C>>CC(C)c1ccc2c(c1)CC[C@H]1[C@](C)(C=O)CCC[C@]21C,Rosenmund_reduction,|Alkyl-COCl -> R3C-CHO | bond_broken: C-Cl | spectators: Ar-Alkyl
+C[C@H]1CC=C(Cl)[C@@H](/C=C/C(=O)Cl)C1(C)C>>C[C@H]1CC=C(Cl)[C@@H](/C=C/C=O)C1(C)C,Event:LGDisp,|Acyl-Cl -> Alkenyl-CHO | bond_broken: C-Cl | spectators: Alkenyl-Cl
+O=C(Cl)C[C@H]1C(=O)OCN1C(=O)OCc1ccccc1>>O=CC[C@H]1C(=O)OCN1C(=O)OCc1ccccc1,Rosenmund_reduction,|Alkyl-COCl -> RCH2-CHO | bond_broken: C-Cl | spectators: Ar-Alkyl|R2CH-CO2R|R_acidic-H
+O=C(Cl)CC[C@H]1C(=O)OCN1C(=O)OCc1ccccc1>>O=CCC[C@H]1C(=O)OCN1C(=O)OCc1ccccc1,Rosenmund_reduction,|Alkyl-COCl -> RCH2-CHO | bond_broken: C-Cl | spectators: Ar-Alkyl|R2CH-CO2R|R_acidic-H
+COC(=O)N1COC(=O)[C@@H]1CC(=O)Cl>>COC(=O)N1COC(=O)[C@@H]1CC=O,Rosenmund_reduction,|Alkyl-COCl -> RCH2-CHO | bond_broken: C-Cl | spectators: R2CH-CO2R|R_acidic-H
+CC(C)(C)OC(=O)[C@H](CCC(=O)Cl)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C>>CC(C)(C)OC(=O)[C@H](CCC=O)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C,Rosenmund_reduction,|Alkyl-COCl -> RCH2-CHO | bond_broken: C-Cl | spectators: R2CH-CO2R|R_acidic-H
+CC(C)OC(=O)CCCC(=O)Cl>>CC(C)OC(=O)CCCC=O,Rosenmund_reduction,|Alkyl-COCl -> RCH2-CHO | bond_broken: C-Cl | spectators: RCH2-CO2R|R_acidic-H
+O=C(Cl)c1c(F)c(F)cc(F)c1F>>O=Cc1c(F)c(F)cc(F)c1F,Rosenmund_reduction,|Ar-COCl -> Ar-CHO | bond_broken: C-Cl | spectators: Ar-F

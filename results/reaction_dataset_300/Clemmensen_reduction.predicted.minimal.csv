@@ -1,0 +1,117 @@
+reaction_smiles,detected_reaction_type,reaction_key
+CCOC(=O)CCC(=O)c1ccc2c(Br)c(OC)ccc2c1>>COc1ccc2cc(CCCC(=O)O)ccc2c1,Claisen_condensation / Arylation_acidic_C_H,|Ar-Br|Ar-COR|RCH2-CO2R -> Ar-Alkyl|RCH2-CO2H | bond_broken: C-O; Br-C(ar) | spectators: Ar-OR|R_acidic-H | events: EsterHyd+LGDisp | reaction_types: Claisen_condensation+Arylation_acidic_C_H
+CC(=O)c1ccccc1>>[2H]C([2H])([2H])C([2H])([2H])c1ccccc1,Unknown,|Ar-COR|R_acidic-H -> Ar-Alkyl | bond_formed: C-H; C-H; C-H; C-H; C-H | bond_formed_labeled: C-H; C-H; C-H; C-H; C-H | bond_broken: C-O
+COc1cccc([C@]2(CC(C)=O)C=CN(C)C[C@@H]2C)c1>>COc1cccc([C@]23CCC[C@H](C2)N(C)C[C@@H]3C)c1,Multi-Event:Ann+C-C,|Alkenyl-NR2|RCH2-COR -> R2CH-NR2 | bond_formed: C-C | bond_formed_labeled: C-C | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|CH3-NR2|RCH2-NR2 | events: Ann+C-C
+COC(=O)[C@@]12CC[C@@]34C(=O)C(=O)[C@@H](C[C@@H]3C1)C[C@H]4[C@H]2O>>O=C(O)C12CCC34CCC(CC3C1)CC4C2,Oxidation_alcohol,|R2CH-COR|R2CH-OH|R3C-CO2R|R3C-COR -> R3C-CO2H | bond_broken: C-O
+O=C(CCCCC(=O)c1ccccc1)c1ccccc1>>C(/C=C/c1ccccc1)=C\CCc1ccccc1,Wittig_reaction,|Ar-COR|R_acidic-H -> Alkenyl-Alkenyl|Ar-Alkenyl
+CC(=O)C(C)C(C)=O>>CCC(C)(O)C(C)=O,Reduction_carbonyl_to_alcohol,|R2CH-COR|R_acidic-H -> R3C-OH
+O=C(c1ccccc1)[C@@H]1CCCC[C@H]1C(=O)c1ccccc1>>OC(c1ccccc1)C1CCCCC1Cc1ccccc1,Reduction_carbonyl_to_alcohol,|Ar-COR -> R2CH-OH | bond_broken: C-O
+O=C(c1ccccc1)C(O)c1ccccc1>>c1ccc(CCc2ccccc2)cc1.C(=C/c1ccccc1)\c1ccccc1,Wittig_reaction,|Ar-COR|R2CH-OH|R_acidic-H -> Ar-Alkenyl | spectators: Ar-Alkyl | events: Ann+C-C
+O=C(c1ccccc1)C(O)c1ccccc1>>c1ccc(CCc2ccccc2)cc1,Unknown,|Ar-COR|R2CH-OH -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl
+COc1ccccc1C(C)=O>>CCc1ccccc1OC,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OR
+O=C(/C=C/c1ccccc1)c1ccccc1>>c1ccc(CCCc2ccccc2)cc1,Michael_addition,|Alkenyl-COR|Ar-Alkenyl -> Ar-Alkyl
+CC(=O)c1ccc(Br)cc1>>CCc1ccc(Br)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Br
+O=C1CCCCCCCCCCC(=O)OCCC1>>O=C1CCCCCCCCCCCCCCO1,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: RCH2-CO2R|R_acidic-H
+O=C(/C=C/c1ccccc1)c1ccccc1>>C(=C/c1ccccc1)\Cc1ccccc1,Michael_addition,|Alkenyl-COR -> Ar-Alkyl | spectators: Ar-Alkenyl
+O=C(c1ccccc1)[C@@H]1CCCC[C@H]1C(=O)c1ccccc1>>O=C(c1ccccc1)C1CCCCC1Cc1ccccc1,Unknown,|Ar-COR|R_acidic-H -> Ar-Alkyl | bond_broken: C-O
+O=C(c1ccccc1)c1ccccc1>>c1ccc(Cc2ccccc2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+O=C(c1ccccc1)[C@@H]1CCC[C@H]1C(=O)c1ccccc1>>O=C(c1ccccc1)C1CCCC1Cc1ccccc1,Unknown,|Ar-COR|R_acidic-H -> Ar-Alkyl | bond_broken: C-O
+CC(=O)c1ccccc1>>CCc1ccccc1.C=Cc1ccccc1,Wittig_reaction,|Ar-COR -> Ar-Alkenyl_terminal | bond_formed: C(ar)-C(ar) | bond_formed_labeled: C(ar)-C(ar) | bond_broken: C-O | events: Ann+C-C
+CN1C(=O)C(C=O)C(=O)N(C)C1=O>>CC1C(=O)N(C)C(=O)N(C)C1=O,Unknown,|R2CH-CHO -> [] | bond_broken: C-O | spectators: Alkyl-NRCOR|R2CH-CONR2|R_acidic-H
+Cc1ccc2c(c1)C(=O)/C(=C/c1ccc(Cl)cc1)C(c1ccc(Cl)cc1)O2>>Cc1ccc2c(c1)CC(Cc1ccc(Cl)cc1)C(c1ccc(Cl)cc1)O2.Cc1ccc2c(c1)C=C(Cc1ccc(Cl)cc1)C(c1ccc(Cl)cc1)O2,Michael_addition,|Alkenyl-COR -> Ar-Alkyl | bond_formed: C(ar)-C(ar); C(ar)-C(ar); C(ar)-Cl; C(ar)-O | bond_formed_labeled: C(ar)-C(ar)[Ar-Alkyl]; C(ar)-C(ar); C(ar)-Cl; C(ar)-O | spectators: Ar-Alkenyl|Ar-Alkyl|Ar-Cl|Ar-OR | events: Ann+C-O+C-C
+CCCCC(=O)c1c2ccc(c1OC)CCc1ccc(c(O)c1)CC2>>CCC/C=C/c1c2ccc(c1OC)CCc1ccc(c(O)c1)CC2,Wittig_reaction,|Ar-COR -> Ar-Alkenyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OH|Ar-OR
+O=C1CCCCCCC1>>C1CCCCCCC1,Unknown,|RCH2-COR -> Alkyl-H | bond_broken: C-O
+CCCCC(=O)c1c2ccc(c1O)CCc1ccc(c(O)c1C(=O)CCCC)CC2>>CCCCCc1c2ccc(c1O)CCc1ccc(c(O)c1CCCCC)CC2,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OH
+O=C(c1ccccc1)[C@@H]1CCC[C@H]1C(=O)c1ccccc1>>c1ccc(CC2CCCC2Cc2ccccc2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+CCCC(=O)c1ccccc1>>CCCCc1ccccc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+O=C(CCCCC(=O)c1ccccc1)c1ccccc1>>O=C(CCCCCc1ccccc1)c1ccccc1,Unknown,|Ar-COR|R_acidic-H -> Ar-Alkyl | bond_broken: C-O
+COc1cc(C(C)=O)ccc1O>>CCc1ccc(O)c(OC)c1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OH|Ar-OR
+CCCCCCn1c2cc(CC)c(C(=O)c3ccccc3C(=O)O)cc2c2cc(C(=O)c3ccccc3C(=O)O)c(CC)cc21>>CCCCCCn1c2cc(CC)c(Cc3ccccc3C(=O)O)cc2c2cc(Cc3ccccc3C(=O)O)c(CC)cc21,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-CO2H|HeteroAr-H
+COc1ccc(C(=O)C(C)C)cc1OC>>COc1ccc(CC(C)C)cc1OC,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OR
+CC(=O)C1CCCC(=O)C1>>CC(=O)C1CCCCC1,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: R2CH-COR|R_acidic-H
+COCO[C@H]1CC[C@@]2(C)[C@@H](CC[C@@H]3[C@@H]2CC[C@]2(C)C(=O)CC[C@@H]32)C1>>COCO[C@H]1CC[C@@]2(C)[C@@H](CC[C@H]3[C@@H]4CCC[C@@]4(C)CC[C@@H]32)C1,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: RCH2-OR
+COc1ccc(C2CC(=O)c3ccccc3O2)cc1>>COc1ccc(C2CCc3ccccc3O2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR
+CC(=O)c1ccccc1>>CCc1ccccc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+CC(C)(C)C(=O)c1ccccc1>>CC(C)=C(C)c1ccccc1.CC(C)(C)Cc1ccccc1,Wittig_reaction,|Ar-COR -> Ar-Alkenyl | events: Ann+C-C
+CCCCCC(C)=O>>CCCCCCC,Unknown,|RCH2-COR -> Alkyl-H | bond_broken: C-O
+CCCCCCCCCC(=O)C1C(=O)N(C)C(=O)N(C)C1=O>>CCCCCCCCCCC1C(=O)N(C)C(=O)N(C)C1=O,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: Alkyl-NRCOR|R2CH-CONR2|R_acidic-H
+CC(=O)[C@H]1CC[C@H]2[C@@H]3CC[C@H]4CC(=O)CC[C@]4(C)[C@H]3CC[C@]12C>>CC(=O)[C@H]1CC[C@H]2[C@@H]3CC[C@H]4CCCC[C@]4(C)[C@H]3CC[C@]12C,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: R2CH-COR|R_acidic-H
+CC(=O)C1CCC(=O)C1>>CCC1CCC(=O)C1,Unknown,|R2CH-COR -> [] | bond_broken: C-O | spectators: RCH2-COR|R_acidic-H
+O=C(c1ccccc1)[C@@H]1CCC[C@H]1C(=O)c1ccccc1>>C(=C1CCCC1Cc1ccccc1)c1ccccc1,Wittig_reaction,|Ar-COR -> Ar-Alkenyl | bond_broken: C-O
+O=C(CCCCC(=O)c1ccccc1)c1ccccc1>>c1ccc(CCCCCCc2ccccc2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+CCCCC(CC)Cn1c2cc(CC)c(C(=O)c3ccccc3C(=O)O)cc2c2cc(C(=O)c3ccccc3C(=O)O)c(CC)cc21>>CCCCC(CC)Cn1c2cc(CC)c(Cc3ccccc3C(=O)O)cc2c2cc(Cc3ccccc3C(=O)O)c(CC)cc21,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-CO2H|HeteroAr-H
+O=C(c1ccccc1)C1CCCCC1>>C(=C1CCCCC1)c1ccccc1.c1ccc(CC2CCCCC2)cc1,Wittig_reaction,|Ar-COR -> Ar-Alkenyl | bond_formed: C-C(ar); C-C; C-C | bond_formed_labeled: C-C(ar)[Ar-Alkenyl]; C-C; C-C | bond_broken: C-O | events: Ann+C-C
+CC(=O)C1C(=O)NC(=O)NC1=O>>CCC1C(=O)NC(=O)NC1=O,Unknown,|R2CH-COR -> [] | bond_broken: C-O | spectators: R2CH-CONHR|R_acidic-H
+CC(=O)CCc1ccccc1>>CCCCc1ccccc1,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: Ar-Alkyl
+CC(C)CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC[C@H]4CC(=O)CC[C@]4(C)[C@H]3CC[C@]12C>>CC(C)CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC[C@H]4CCCC[C@]4(C)[C@H]3CC[C@]12C,Unknown,|RCH2-COR -> Alkyl-H | bond_broken: C-O
+O=C(c1ccccc1)[C@@H]1CCCC[C@H]1C(=O)c1ccccc1>>c1ccc(CC2CCCCC2Cc2ccccc2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+O=C(CCl)CCl>>ClCCCCl,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: RCH2-Cl
+COc1ccc(OCC[C@@]23CC(=O)C[C@@H]2[C@@H](C)CC(=O)N3)cc1>>COc1ccc(OCC[C@@]23CCC[C@@H]2[C@@H](C)CC(=O)N3)cc1,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: Alkyl-NHCOR|Ar-OR|RCH2-CONHR|R_acidic-H
+O=C(O)CCC(=O)c1ccc(Cl)cc1>>O=C(O)CCCc1ccc(Cl)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Cl|RCH2-CO2H|R_acidic-H
+O=C(O)CCC(=O)c1ccc(Br)cc1>>O=C(O)CCCc1ccc(Br)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Br|RCH2-CO2H|R_acidic-H
+CCOC(=O)CCC(=O)c1c(OC)cc(OC)c(C)c1OC>>CCOC(=O)CCCc1c(OC)cc(OC)c(C)c1OC,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|RCH2-CO2R|R_acidic-H
+CCOC(=O)CCC(=O)c1c(OC)cc(OC)cc1OC>>CCOC(=O)CCCc1c(OC)cc(OC)cc1OC,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OR|RCH2-CO2R|R_acidic-H
+CCOC(=O)CCC(=O)c1ccc(OC)c(C)c1OC>>CCOC(=O)CCCc1ccc(OC)c(C)c1OC,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|RCH2-CO2R|R_acidic-H
+CCOC(=O)CCCc1ccc(OC)c(C(=O)C(C)C)c1>>CCOC(=O)CCCc1ccc(OC)c(CC(C)C)c1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|RCH2-CO2R|R_acidic-H
+CC(C)OC(=O)C[C@@H]1CC(=O)c2ccccc2O1>>CC(C)OC(=O)C[C@@H]1CCc2ccccc2O1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OR|RCH2-CO2R|R_acidic-H
+CC(=O)C1C(=O)N(C)C(=O)N(C)C1=O>>CCC1C(=O)N(C)C(=O)N(C)C1=O,Unknown,|R2CH-COR -> [] | bond_broken: C-O | spectators: Alkyl-NRCOR|R2CH-CONR2|R_acidic-H
+C[C@]12CCC(=O)C[C@@H]1CC[C@@H]1[C@@H]2CC[C@]2(C)[C@@H](O)CC[C@@H]12>>C[C@]12CCCC[C@@H]1CC[C@@H]1[C@@H]2CC[C@]2(C)[C@@H](O)CC[C@@H]12,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: R2CH-OH
+C#CCN(c1ccc(C)cc1)c1oc2ccccc2c(=O)c1C=O>>C#CCN(c1ccc(C)cc1)c1oc2ccccc2c(=O)c1C,Unknown,|Ar-CHO -> Ar-Alkyl | bond_broken: C-O | spectators: Alkyl-Alkynyl_terminal|Ar-Alkyl|Ar-NR2|HeteroAr-H|Propargyl-H|RCH2-NR2
+CC#CCN(c1ccccc1)c1oc2ccc(C)cc2c(=O)c1C=O>>CC#CCN(c1ccccc1)c1oc2ccc(C)cc2c(=O)c1C,Unknown,|Ar-CHO -> Ar-Alkyl | bond_broken: C-O | spectators: Alkyl-Alkynyl|Ar-Alkyl|Ar-NR2|HeteroAr-H|Propargyl-H|RCH2-NR2
+Cc1ccc(N(c2ccccc2Br)c2oc3ccc(C)cc3c(=O)c2C=O)cc1>>Cc1ccc(N(c2ccccc2Br)c2oc3ccc(C)cc3c(=O)c2C)cc1,Unknown,|Ar-CHO -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Br|Ar-NR2|HeteroAr-H
+O=Cc1c(Nc2ccccc2)oc2ccccc2c1=O>>Cc1c(Nc2ccccc2)oc2ccccc2c1=O,Unknown,|Ar-CHO -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-NHR|HeteroAr-H
+Cc1ccc2oc(N(C)c3ccccc3)c(C=O)c(=O)c2c1>>Cc1ccc2oc(N(C)c3ccccc3)c(C)c(=O)c2c1,Unknown,|Ar-CHO -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-NR2|CH3-NR2|HeteroAr-H
+C=CCN(c1ccc(C)cc1)c1oc2ccc(C)cc2c(=O)c1C=O>>C=CCN(c1ccc(C)cc1)c1oc2ccc(C)cc2c(=O)c1C,Unknown,|Ar-CHO -> Ar-Alkyl | bond_broken: C-O | spectators: Allyl-NR2|Ar-Alkyl|Ar-NR2|HeteroAr-H
+O=Cc1c(Nc2ccc(Cl)cc2)oc2ccccc2c1=O>>Cc1c(Nc2ccc(Cl)cc2)oc2ccccc2c1=O,Unknown,|Ar-CHO -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Cl|Ar-NHR|HeteroAr-H
+O=C1C2C3CCC4C2C(=O)C2C1C3C42>>C1CC2C3CC4C5CC3C1C5C24,Unknown,|R2CH-COR|R_acidic-H -> Alkyl-H
+COc1ccc(C(C)=O)cc1>>CCc1ccc(OC)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OR
+O=C(c1ccccc1)[C@@H]1CC[C@H]1C(=O)c1ccccc1>>c1ccc(CC2CCC2Cc2ccccc2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+CC(=O)C(C)C(C)=O>>CCC(C)C(C)=O,Unknown,|R2CH-COR|R_acidic-H -> [] | bond_broken: C-O
+O=C(CCc1ccccc1)c1ccccc1>>c1ccc(CCCc2ccccc2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl
+O=C(C(=O)c1ccccc1)c1ccccc1>>c1ccc(CCc2ccccc2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+CC1COC(=O)CCCCCCCCCCC(=O)C1>>CC1CCCCCCCCCCCCC(=O)OC1,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: RCH2-CO2R|R_acidic-H
+COc1cc2c(cc1OC)C(C)CC2=O>>COc1cc2c(cc1OC)C(C)CC2,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR
+CCCCCC(=O)CCCCC>>CCCCCCCCCCC,Unknown,|RCH2-COR -> Alkyl-H | bond_broken: C-O
+CCCCCCc1cc2c(cc1C(=O)c1ccccc1C(=O)O)c1cc(C(=O)c3ccccc3C(=O)O)c(CCCCCC)cc1n2CCCCCC>>CCCCCCc1cc2c(cc1Cc1ccccc1C(=O)O)c1cc(Cc3ccccc3C(=O)O)c(CCCCCC)cc1n2CCCCCC,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-CO2H|HeteroAr-H
+CCCCCCn1c2ccc(C(=O)c3ccccc3C(=O)O)cc2c2cc(C(=O)c3ccccc3C(=O)O)ccc21>>CCCCCCn1c2ccc(Cc3ccccc3C(=O)O)cc2c2cc(Cc3ccccc3C(=O)O)ccc21,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Alkyl-AromN|Ar-CO2H|HeteroAr-H
+CC(C)=O>>CCC,Unknown,|Alkyl-COR -> Alkyl-H | bond_broken: C-O
+O=C1CCOc2cccc(O)c21>>Oc1cccc2c1CCCO2,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OH|Ar-OR
+COc1ccc2c(c1)C(=O)C=C1C(C)(C)CCCC12C>>COc1ccc2c(c1)CC=C1C(C)(C)CCCC12C.COc1ccc2c(c1)C=C[C@H]1C(C)(C)CCC[C@]21C.COc1ccc2c(c1)C=C[C@@H]1C(C)(C)CCC[C@]21C,Michael_addition / Wittig_reaction,|Alkenyl-COR -> Ar-Alkenyl|Ar-Alkyl | spectators: Ar-Alkyl|Ar-OR | events: Ann+C-O+C-C | reaction_types: Michael_addition+Wittig_reaction
+CCCCCCCCCC(=O)C1C(=O)NC(=O)NC1=O>>CCCCCCCCCCC1C(=O)NC(=O)NC1=O,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: R2CH-CONHR|R_acidic-H
+C[C@]12CCC(=O)C[C@@H]1CC[C@@H]1[C@@H]2CC[C@]2(C)C(=O)CC[C@@H]12>>C[C@]12CCCC[C@@H]1CC[C@@H]1[C@@H]2CC[C@]2(C)C(=O)CC[C@@H]12,Unknown,|RCH2-COR|R_acidic-H -> [] | bond_broken: C-O
+CC(=O)C1CCC(=O)C1>>CC(=O)C1CCCC1,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: R2CH-COR|R_acidic-H
+CCCCCCCCCCCCCC(=O)c1ccc(Cc2ccc(C(=O)CCCCCCCCCCCCC)cc2)cc1>>CCCCCCCCCCCCCCc1ccc(Cc2ccc(CCCCCCCCCCCCCC)cc2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl
+O=C(c1ccccc1)[C@@H]1CCC[C@H]1C(=O)c1ccccc1>>C(=C1\CCC\C1=C/c1ccccc1)\c1ccccc1,Wittig_reaction,|Ar-COR|R_acidic-H -> Alkenyl-Alkenyl|Ar-Alkenyl
+CC(=O)c1ccccc1>>[2H]C([2H])(C)c1ccccc1,Unknown,|Ar-COR|R_acidic-H -> Ar-Alkyl | bond_formed: C-H; C-H | bond_formed_labeled: C-H; C-H | bond_broken: C-O
+CC1C(=O)CC(C)(C)CC1=O>>CCC1CC(C)(C)CC1=O,Unknown,|RCH2-COR|R_acidic-H -> [] | bond_broken: C-O
+[2H]C([2H])([2H])C(=O)c1ccc(Cl)cc1>>[2H]C([2H])([2H])Cc1ccc(Cl)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Cl
+[2H]C([2H])(C)C(=O)c1ccccc1>>[2H]C([2H])(C)Cc1ccccc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+CC[C@@]1(O)C(=O)OCc2c1cc1n(c2=O)Cc2c-1nc1ccccc1c2C(=O)c1ccccc1>>CC[C@@]1(O)C(=O)OCc2c1cc1n(c2=O)Cc2c-1nc1ccccc1c2Cc1ccccc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Alkyl-AromN|Ar-Alkyl|Ar-Ar|HeteroAr-H|Pyridine|Quinoline|R3C-CO2R|R3C-OH
+O=CCCc1ccccc1>>CCCc1ccccc1,Unknown,|RCH2-CHO -> [] | bond_broken: C-O | spectators: Ar-Alkyl
+COc1cc2c(cc1OC)C(C)(C)CC2=O>>COc1cc2c(cc1OC)C(C)(C)CC2,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR
+CC(C)CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC(=O)[C@H]4CC(=O)CC[C@]4(C)[C@H]3CC[C@]12C>>CC(C)CCC[C@@H](C)[C@H]1CC[C@H]2[C@@H]3CC(=O)[C@H]4CCCC[C@]4(C)[C@H]3CC[C@]12C,Unknown,|RCH2-COR|R_acidic-H -> [] | bond_broken: C-O
+CCCC(=O)c1ccccc1>>CCCCc1ccccc1.CC/C=C/c1ccccc1.CC/C=C\c1ccccc1,Wittig_reaction,|Ar-COR -> Ar-Alkenyl | bond_broken: C-O
+O=CC1C(=O)NC(=O)NC1=O>>CC1C(=O)NC(=O)NC1=O,Unknown,|R2CH-CHO -> [] | bond_broken: C-O | spectators: R2CH-CONHR|R_acidic-H
+Cc1ccc2c(c1)C(=O)CC(c1ccc(Cl)cc1)O2>>Cc1ccc2c(c1)CCC(c1ccc(Cl)cc1)O2,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-Cl|Ar-OR
+CC1(C)CC(=O)CC(=O)C1>>CC1(C)CCCC(=O)C1,Unknown,|RCH2-COR|R_acidic-H -> [] | bond_broken: C-O
+O=C1CCCCC1>>C1CCCCC1,Unknown,|RCH2-COR -> Alkyl-H | bond_broken: C-O
+CC1(C)CC(=O)c2ccc(O)cc2O1>>CC1(C)CCc2ccc(O)cc2O1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OH|Ar-OR
+CCCC(=O)CCC>>CCCCCCC,Unknown,|RCH2-COR -> Alkyl-H | bond_broken: C-O
+CC1(C)CCCC2(C)CCC(=O)C=C12>>CC1(C)CCCC2(C)CCCC=C12.CC1(C)CCCC2(C)CCC(=C3C=C4C(C)(C)CCCC4(C)CC3)C=C12,Michael_addition / Wittig_reaction,|Alkenyl-COR -> Alkenyl-Alkenyl|Alkenyl-H|Alkyl-H | bond_formed: C-C; C-C; C-C; C-C; C-C; C-C | bond_formed_labeled: C-C; C-C; C-C; C-C; C-C; C-C | bond_broken: C-O | events: Ann+C-C | reaction_types: Michael_addition+Wittig_reaction
+CCCCCCn1c2cc(Br)c(C(=O)c3ccccc3C(=O)O)cc2c2cc(C(=O)c3ccccc3C(=O)O)c(Br)cc21>>CCCCCCn1c2cc(Br)c(Cc3ccccc3C(=O)O)cc2c2cc(Cc3ccccc3C(=O)O)c(Br)cc21,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Alkyl-AromN|Ar-CO2H|HeteroAr-Br|HeteroAr-H
+O=C1CC(c2ccccc2)Oc2ccccc21>>c1ccc(C2CCc3ccccc3O2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR
+CCC(=O)c1ccccc1>>CCCc1ccccc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O
+C[C@]12CC[C@H](O)C[C@@H]1CC[C@@H]1[C@@H]2CC[C@]2(C)C(=O)CC[C@@H]12>>C[C@@]12CCC[C@H]1[C@@H]1CC[C@H]3C[C@@H](O)CC[C@]3(C)[C@H]1CC2,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: R2CH-OH
+CCC(=O)c1ccccc1>>CCCc1ccccc1.C/C=C\c1ccccc1.C/C=C/c1ccccc1,Wittig_reaction,|Ar-COR -> Ar-Alkenyl | bond_broken: C-O
+O=C1/C(=C/c2ccccc2)C(c2ccccc2)Oc2ccccc21>>c1ccc(CC2Cc3ccccc3OC2c2ccccc2)cc1.C1=C(Cc2ccccc2)C(c2ccccc2)Oc2ccccc21,Michael_addition,|Alkenyl-COR -> Ar-OR | bond_formed: C(ar)-O | bond_formed_labeled: C(ar)-O[Ar-OR] | spectators: Ar-Alkenyl|Ar-Alkyl|Ar-OR | events: Ann+C-O
+O=C1CCCCCC1>>C1CCCCCC1,Unknown,|RCH2-COR -> Alkyl-H | bond_broken: C-O
+CC1=C2CCCC(=O)C2(C)CCC1=O>>CC1=C2CCCC(=O)C2(C)CCC1.CC1=CCC[C@@]2(C)C(=O)CCC[C@H]12,Michael_addition,|Alkenyl-COR -> RCH2-COR | bond_formed: C-C; C-C; C-C | bond_formed_labeled: C-C; C-C; C-C | spectators: RCH2-COR|R_acidic-H | events: Ann+C-C
+Br.CN(C)CC(=O)c1ccc(O)cc1>>CN(C)CCc1ccc(O)cc1,Unknown,|Ar-COR|Inorganic -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OH|CH3-NR2|RCH2-NR2
+CCCCCCCCCCCC(=O)c1ccc(Oc2ccc(C(=O)CCCCCCCCCCC)cc2)cc1>>CCCCCCCCCCCCc1ccc(Oc2ccc(CCCCCCCCCCCC)cc2)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OR
+CC12CCCCC1=CC(=O)CC2>>CC12CCCC=C1CCCC2.CC12CCCCC1=CC(=C1C=C3CCCCC3(C)CC1)CC2,Michael_addition / Wittig_reaction,|Alkenyl-COR -> Alkenyl-Alkenyl|Alkenyl-H|Alkyl-H | bond_formed: C-C; C-C | bond_formed_labeled: C-C; C-C | bond_broken: C-O | events: Ann+C-C | reaction_types: Michael_addition+Wittig_reaction
+CC(=O)c1ccc(O)cc1>>CCc1ccc(O)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-OH
+CC(=O)c1ccc(F)cc1>>CCc1ccc(F)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-F
+C#Cc1ccc(C(C)=O)cc1>>C#Cc1ccc(CC)cc1,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-Alkynyl_terminal
+CC(=O)c1ccccc1I>>CCc1ccccc1I,Unknown,|Ar-COR -> Ar-Alkyl | bond_broken: C-O | spectators: Ar-I
+O=C1CCC(c2ccccc2)CC1>>c1ccc(C2CCCCC2)cc1,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: Ar-Alkyl
+COc1cc2c3c(c4cc(OC)c(OC)cc4c2cc1OC)CN1C(=O)CC(=O)C1C3>>COc1cc2c3c(c4cc(OC)c(OC)cc4c2cc1OC)CN1C(=O)CCC1C3,Unknown,|RCH2-COR -> [] | bond_broken: C-O | spectators: Ar-Alkyl|Ar-OR|Bn-LactamN|RCH2-CONR2|R_acidic-H

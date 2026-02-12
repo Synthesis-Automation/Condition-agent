@@ -1,0 +1,24 @@
+{
+  "empty_reaction_key": {
+    "count": 0,
+    "rate": 0.0
+  },
+  "input_csv": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300\\Clemmensen_reduction.csv",
+  "low_reaction_key_quality": {
+    "count": 0,
+    "rate": 0.0
+  },
+  "output_csv": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300\\Clemmensen_reduction.predicted.csv",
+  "prediction_errors": 0,
+  "processed_rows": 116,
+  "reaction_column": "reaction_smiles",
+  "total_rows": 116,
+  "unknown_reaction_type": {
+    "count": 93,
+    "rate": 0.8017
+  },
+  "with_mapping_warning": {
+    "count": 8,
+    "rate": 0.069
+  }
+}
