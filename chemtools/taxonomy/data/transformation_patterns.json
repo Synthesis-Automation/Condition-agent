@@ -141,20 +141,25 @@
       "leaving_groups": ["-CHO", "-C(=O)", "-COR", "-NH2", "-NHR"],
       "notes": "Aldehyde/ketone + amine -> imine -> amine"
     },
-    "Claisen_condensation": {
-      "pattern": "condensation",
-      "leaving_groups": ["-OR", "-H"],
-      "notes": "Ester + enolate condensation"
-    },
-    "Hydrogenation": {
+    "Alkene_Hydrogenation": {
       "pattern": "addition",
       "leaving_groups": [],
-      "notes": "No leaving groups - H2 adds across unsaturation"
+      "notes": "No leaving groups - H2 adds across C=C to give saturated products."
     },
     "Epoxidation": {
       "pattern": "addition",
       "leaving_groups": [],
       "notes": "O adds across C=C to form epoxide"
+    },
+    "Wacker_oxidation_terminal_alkene_to_ketone": {
+      "pattern": "addition",
+      "leaving_groups": [],
+      "notes": "Oxidative hydration of terminal alkenes to ketones under Pd/Cu catalysis."
+    },
+    "Wacker_oxidation_internal_alkene_to_ketone": {
+      "pattern": "addition",
+      "leaving_groups": [],
+      "notes": "Oxidative hydration of internal alkenes to ketones under Pd/Cu catalysis."
     },
     "Click_cuaac": {
       "pattern": "cycloaddition",
@@ -166,15 +171,56 @@
       "leaving_groups": [],
       "notes": "[4+2] Diene + dienophile cycloaddition - both substrates consumed entirely"
     },
-    "Ring_closing_metathesis": {
-      "pattern": "metathesis",
-      "leaving_groups": ["-CH=CH2"],
-      "notes": "Olefin metathesis - ethylene eliminated"
-    },
-    "Oxidation_alcohol": {
+    
+    "Oxidation_primary_alcohol_to_aldehyde": {
       "pattern": "elimination",
       "leaving_groups": ["-H"],
-      "notes": "H removed during oxidation (alcohol -> aldehyde/ketone)"
+      "notes": "Primary alcohol oxidation to aldehyde."
+    },
+    "Oxidation_secondary_alcohol_to_ketone": {
+      "pattern": "elimination",
+      "leaving_groups": ["-H"],
+      "notes": "Secondary alcohol oxidation to ketone."
+    },
+    "Oxidation_primary_alcohol_to_carboxylic_acid": {
+      "pattern": "elimination",
+      "leaving_groups": ["-H"],
+      "notes": "Primary alcohol oxidation to carboxylic acid."
+    },
+    "Benzylic_CH_oxidation_to_carbonyl": {
+      "pattern": "elimination",
+      "leaving_groups": ["-H"],
+      "notes": "Benzylic C-H oxidation to aldehyde/ketone."
+    },
+    "Benzylic_CH_oxidation_to_carboxylic_acid": {
+      "pattern": "elimination",
+      "leaving_groups": ["-H"],
+      "notes": "Benzylic C-H deep oxidation to carboxylic acid."
+    },
+    "Oxidation_aldehyde_to_carboxylic_acid": {
+      "pattern": "elimination",
+      "leaving_groups": ["-H"],
+      "notes": "Aldehyde oxidation to carboxylic acid."
+    },
+    "Baeyer_villiger_oxidation": {
+      "pattern": "addition",
+      "leaving_groups": [],
+      "notes": "Oxidative oxygen insertion into ketones to form esters/lactones."
+    },
+    "Alkene_oxidative_cleavage_to_carbonyl": {
+      "pattern": "addition",
+      "leaving_groups": [],
+      "notes": "Oxidative C=C cleavage to aldehyde/ketone fragments."
+    },
+    "Alkene_oxidative_cleavage_to_carboxylic_acid": {
+      "pattern": "addition",
+      "leaving_groups": [],
+      "notes": "Strong oxidative C=C cleavage to carboxylic acids."
+    },
+    "Oxidation_sulfide_to_sulfone": {
+      "pattern": "addition",
+      "leaving_groups": [],
+      "notes": "Oxidation of sulfides (thioethers) to sulfones."
     },
     "Dehydration": {
       "pattern": "elimination",

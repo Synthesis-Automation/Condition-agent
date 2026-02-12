@@ -42,6 +42,11 @@ Track phased migration to taxonomy-driven synthon logic for reaction detection a
   - Added tests:
     - `tests/test_reaction_catalog_synthons.py`
     - `tests/test_validate_reaction_types_synthons.py`
+  - Seeded `synthons` blocks into 13 core coupling families in:
+    - `chemtools/taxonomy/data/reaction_types.v4.0.json`
+    - Families: `Suzuki_miyaura`, `Miyaura_borylation`, `C_N_Coupling`, `Chan_Lam_C_N_Coupling`,
+      `C_O_Coupling`, `C_S_Coupling`, `Alkyl_Nucleophilic_Substitution`, `Sonogashira`, `Heck`,
+      `Negishi`, `Stille`, `Kumada`, `Hiyama`.
 
 ## Validation Log
 
@@ -50,6 +55,7 @@ Track phased migration to taxonomy-driven synthon logic for reaction detection a
 - Ran: `pytest -q tests/test_hte_recommender.py -k "precedent_recommendations_respect_source_group_filter or recommend_returns_precedent_when_structured_match_missing or recommend_returns_precedent_when_structured_match_missing_for_protocols"`
 - Ran: `pytest -q tests/test_reaction_catalog_synthons.py tests/test_validate_reaction_types_synthons.py`
 - Ran: `pytest -q tests/test_reaction_type_detection_mapping.py tests/test_detection_validation_evidence.py`
+- Ran: `pytest -q tests/test_reaction_catalog_synthons.py tests/test_validate_reaction_types_synthons.py tests/test_synthon_detection_phase2.py tests/test_synthon_role_assignment.py`
 
 ## Remaining Roadmap
 

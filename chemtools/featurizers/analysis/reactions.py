@@ -130,9 +130,7 @@ STILLE_FAMILIES_CANONICAL: Set[str] = _canonical_label_set(["stille", "Stille"])
 KUMADA_FAMILIES_CANONICAL: Set[str] = _canonical_label_set(["kumada", "Kumada"])
 HIYAMA_FAMILIES_CANONICAL: Set[str] = _canonical_label_set(["hiyama", "Hiyama"])
 HECK_FAMILIES_CANONICAL: Set[str] = _canonical_label_set(["heck", "Heck"])
-RCM_FAMILIES_CANONICAL: Set[str] = _canonical_label_set(
-    ["ring_closing_metathesis", "Ring_closing_metathesis"]
-)
+RCM_FAMILIES_CANONICAL: Set[str] = set()
 ULLMANN_SPECIFIC_CANONICAL: Set[str] = set()
 BUCHWALD_SPECIFIC_CANONICAL: Set[str] = set()
 

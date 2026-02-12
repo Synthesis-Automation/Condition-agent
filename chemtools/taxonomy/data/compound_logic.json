@@ -155,7 +155,10 @@
       ],
       "usage": [
         "C_O_Coupling",
-        "Alkyl_Nucleophilic_Substitution"
+        "Alkyl_Nucleophilic_Substitution",
+        "Oxidation_primary_alcohol_to_aldehyde",
+        "Oxidation_secondary_alcohol_to_ketone",
+        "Oxidation_primary_alcohol_to_carboxylic_acid"
       ]
     },
     "thiols_sh": {
@@ -312,7 +315,10 @@
         "Acyl_Halides_formation",
         "Amide_formation",
         "Esterification",
-        "Oxidation_alcohol"
+        "Oxidation_primary_alcohol_to_carboxylic_acid",
+        "Benzylic_CH_oxidation_to_carboxylic_acid",
+        "Oxidation_aldehyde_to_carboxylic_acid",
+        "Alkene_oxidative_cleavage_to_carboxylic_acid"
       ]
     },
     "amides": {
@@ -525,7 +531,12 @@
       ],
       "usage": [
         "Reductive_amination",
-        "Oxidation_alcohol"
+        "Oxidation_primary_alcohol_to_aldehyde",
+        "Oxidation_secondary_alcohol_to_ketone",
+        "Benzylic_CH_oxidation_to_carbonyl",
+        "Alkene_oxidative_cleavage_to_carbonyl",
+        "Wacker_oxidation_terminal_alkene_to_ketone",
+        "Wacker_oxidation_internal_alkene_to_ketone"
       ]
     },
     "imines": {
@@ -535,8 +546,7 @@
         "Ar-C=N"
       ],
       "usage": [
-        "Reductive_amination",
-        "Hydrogenation"
+        "Reduction_imine_to_amine"
       ]
     },
     "esters": {
@@ -556,7 +566,7 @@
       "usage": [
         "Esterification",
         "Acylation_ester",
-        "Claisen_condensation"
+        "Baeyer_villiger_oxidation"
       ]
     },
     "hydrogenation_substrates": {
@@ -641,7 +651,7 @@
         "Ar-Alkynyl_terminal"
       ],
       "usage": [
-        "Hydrogenation"
+        "Alkene_Hydrogenation"
       ]
     },
     "nitro_compounds": {

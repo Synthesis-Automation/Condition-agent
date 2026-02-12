@@ -349,164 +349,7 @@
       ],
       "description": "N/O/S nucleophilic substitution on alkyl electrophiles (halides/sulfonates), covering SN2-like alkylation."
     },
-    {
-      "id": "Alcohol_to_Alkyl_Halide",
-      "reactants": {
-        "substrate": "@alcohols_oh"
-      },
-      "products": {
-        "product": [
-          "Alkyl-I",
-          "Alkyl-Br",
-          "Alkyl-Cl",
-          "Alkyl-F",
-          "RCH2-I",
-          "RCH2-Br",
-          "RCH2-Cl",
-          "RCH2-F",
-          "R2CH-I",
-          "R2CH-Br",
-          "R2CH-Cl",
-          "R2CH-F",
-          "R3C-I",
-          "R3C-Br",
-          "R3C-Cl",
-          "R3C-F",
-          "CH3-I",
-          "CH3-Br",
-          "CH3-Cl",
-          "CH3-F",
-          "Bn-I",
-          "Bn-Br",
-          "Bn-Cl",
-          "Bn-F",
-          "Allyl-I",
-          "Allyl-Br",
-          "Allyl-Cl",
-          "Allyl-F",
-          "Propargyl-I",
-          "Propargyl-Br",
-          "Propargyl-Cl"
-        ]
-      },
-      "examples": [
-        "CCO>>CCBr",
-        "c1ccccc1CO>>c1ccccc1CBr",
-        "CC(C)O>>CC(C)Cl"
-      ],
-      "aliases": [
-        "alcohol_to_alkyl_halide",
-        "alcohol_halogenation",
-        "Appel_halogenation",
-        "Appel halogenation",
-        "Chlorination_SOCl2_oxalyl_chloride",
-        "Chlorination SOCl2 oxalyl chloride",
-        "Deoxy_fluorination"
-      ],
-      "description": "Conversion of alcohols to alkyl/benzylic/allylic halides (e.g., Appel, SOCl2/oxalyl chloride, PBr3, deoxyfluorination).",
-      "constraints": {
-        "include_reacted": [],
-        "exclude_reacted": [],
-        "include_formed": [],
-        "exclude_formed": [],
-        "min_reactant_slot_matches": 1,
-        "min_product_slot_matches": 1
-      }
-    },
-    {
-      "id": "Aliphatic_Halide_Exchange",
-      "reactants": {
-        "substrate": [
-          "Alkyl-I",
-          "Alkyl-Br",
-          "Alkyl-Cl",
-          "Alkyl-F",
-          "RCH2-I",
-          "RCH2-Br",
-          "RCH2-Cl",
-          "RCH2-F",
-          "R2CH-I",
-          "R2CH-Br",
-          "R2CH-Cl",
-          "R2CH-F",
-          "R3C-I",
-          "R3C-Br",
-          "R3C-Cl",
-          "R3C-F",
-          "CH3-I",
-          "CH3-Br",
-          "CH3-Cl",
-          "CH3-F",
-          "Bn-I",
-          "Bn-Br",
-          "Bn-Cl",
-          "Bn-F",
-          "Allyl-I",
-          "Allyl-Br",
-          "Allyl-Cl",
-          "Allyl-F",
-          "Propargyl-I",
-          "Propargyl-Br",
-          "Propargyl-Cl"
-        ]
-      },
-      "products": {
-        "product": [
-          "Alkyl-I",
-          "Alkyl-Br",
-          "Alkyl-Cl",
-          "Alkyl-F",
-          "RCH2-I",
-          "RCH2-Br",
-          "RCH2-Cl",
-          "RCH2-F",
-          "R2CH-I",
-          "R2CH-Br",
-          "R2CH-Cl",
-          "R2CH-F",
-          "R3C-I",
-          "R3C-Br",
-          "R3C-Cl",
-          "R3C-F",
-          "CH3-I",
-          "CH3-Br",
-          "CH3-Cl",
-          "CH3-F",
-          "Bn-I",
-          "Bn-Br",
-          "Bn-Cl",
-          "Bn-F",
-          "Allyl-I",
-          "Allyl-Br",
-          "Allyl-Cl",
-          "Allyl-F",
-          "Propargyl-I",
-          "Propargyl-Br",
-          "Propargyl-Cl"
-        ]
-      },
-      "examples": [
-        "CCCl>>CCI",
-        "CCBr>>CCCl",
-        "c1ccccc1CCl>>c1ccccc1CI"
-      ],
-      "aliases": [
-        "Aliphatic_Halide_Exchange",
-        "Aliphatic Halide Exchange",
-        "aliphatic_halide_exchange",
-        "alkyl_halide_exchange",
-        "Finkelstein"
-      ],
-      "description": "Interconversion of alkyl/benzylic/allylic halides (including Finkelstein-type exchange).",
-      "constraints": {
-        "include_reacted": [],
-        "exclude_reacted": [],
-        "include_formed": [],
-        "exclude_formed": [],
-        "min_reactant_slot_matches": 1,
-        "min_product_slot_matches": 1
-      }
-    },
+    
     {
       "id": "Aromatic_Halogen_Exchange",
       "reactants": {
@@ -1123,6 +966,15 @@
           "R3C-CO2H"
         ]
       },
+      "products": {
+        "product": [
+          "Ar-COR",
+          "Ar-CONHR",
+          "Ar-CONR2",
+          "Ar-Alkyl",
+          "Alkenyl-CONR2"
+        ]
+      },
       "aliases": [
         "Decarboxylative coupling",
         "Decarboxylative_arylation",
@@ -1138,7 +990,7 @@
         "include_formed": [],
         "exclude_formed": [],
         "min_reactant_slot_matches": 2,
-        "min_product_slot_matches": 0
+        "min_product_slot_matches": 1
       }
     },
     {
@@ -1286,10 +1138,7 @@
     {
       "id": "Reductive_amination",
       "reactants": {
-        "electrophile": [
-          "@carbonyls",
-          "@imines"
-        ],
+        "electrophile": "@carbonyls",
         "nucleophile": "@amines_nh"
       },
       "products": {
@@ -1362,46 +1211,45 @@
       }
     },
     {
-      "id": "Ring_closing_metathesis",
-      "reactants": {
-        "alkene": "@terminal_alkenes"
-      },
-      "constraints": {
-        "min_hits": 2,
-        "min_reactants": 1
-      },
-      "examples": [
-        "C=CCCC=C>>C1=CCCC1"
-      ],
-      "aliases": [
-        "ring_closing_metathesis",
-        "Olefin_metathesis",
-        "RCM"
-      ]
-    },
-    {
-      "id": "Hydrogenation",
+      "id": "Alkene_Hydrogenation",
       "reactants": {
         "substrate": [
-          "@hydrogenation_substrates",
-          "@imines"
+          "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
+          "Alkenyl-H",
+          "Alkenyl-Alkenyl",
+          "Alkenyl_terminal-Alkenyl_terminal"
         ],
         "reagent": [
           "H2"
+        ]
+      },
+      "products": {
+        "product": [
+          "Ar-Alkyl",
+          "Alkyl-H"
         ]
       },
       "examples": [
         "C=C.[H][H]>>CC"
       ],
       "aliases": [
-        "hydrogenation"
-      ]
+        "alkene_hydrogenation"
+      ],
+      "description": "Catalytic hydrogenation of alkene motifs to saturated products."
     },
     {
       "id": "Click_cuaac",
       "reactants": {
         "alkyne": "@terminal_alkynes",
         "azide": "@azides"
+      },
+      "products": {
+        "product": [
+          "Alkyl-AromN",
+          "Ar-AromN",
+          "HeteroAr-H"
+        ]
       },
       "catalysts": [
         "Cu"
@@ -1411,7 +1259,8 @@
       ],
       "aliases": [
         "click_cuaac"
-      ]
+      ],
+      "description": "Cu-catalyzed azide-alkyne cycloaddition forming triazole-like heteroaromatic products."
     },
     {
       "id": "Acylation_ester",
@@ -1430,28 +1279,279 @@
       ]
     },
     {
-      "id": "Oxidation_alcohol",
+      "id": "Oxidation_primary_alcohol_to_aldehyde",
       "reactants": {
         "substrate": [
-          "@alcohols_oh",
+          "RCH2-OH",
+          "Bn-OH",
+          "Allyl-OH",
+          "Propargyl-OH",
+          "CH3-OH"
+        ]
+      },
+      "products": {
+        "product": [
+          "Alkyl-CHO",
+          "Alkenyl-CHO",
+          "Ar-CHO",
+          "RCH2-CHO",
+          "R2CH-CHO",
+          "R3C-CHO"
+        ]
+      },
+      "examples": [
+        "c1ccccc1CO>>c1ccccc1C=O",
+        "CCCO>>CCC=O"
+      ],
+      "aliases": [
+        "oxidation_primary_alcohol_to_aldehyde",
+        "primary_alcohol_oxidation_to_aldehyde"
+      ],
+      "description": "Selective oxidation of primary alcohols to aldehydes."
+    },
+    {
+      "id": "Oxidation_secondary_alcohol_to_ketone",
+      "reactants": {
+        "substrate": [
+          "R2CH-OH"
+        ]
+      },
+      "products": {
+        "product": [
+          "Alkyl-COR",
+          "Alkenyl-COR",
+          "Ar-COR",
+          "Alkynyl-COR",
+          "Bn-COR",
+          "RCH2-COR",
+          "R2CH-COR",
+          "R3C-COR"
+        ]
+      },
+      "examples": [
+        "CC(O)c1ccccc1>>CC(=O)c1ccccc1",
+        "OC1CCCCC1>>O=C1CCCCC1"
+      ],
+      "aliases": [
+        "oxidation_secondary_alcohol_to_ketone",
+        "secondary_alcohol_oxidation_to_ketone"
+      ],
+      "description": "Oxidation of secondary alcohols to ketones."
+    },
+    {
+      "id": "Oxidation_primary_alcohol_to_carboxylic_acid",
+      "reactants": {
+        "substrate": [
+          "RCH2-OH",
+          "Bn-OH",
+          "Allyl-OH",
+          "Propargyl-OH",
+          "CH3-OH"
+        ]
+      },
+      "products": {
+        "product": [
+          "Acyl-CO2H",
+          "Alkyl-CO2H",
+          "Alkenyl-CO2H",
+          "Ar-CO2H",
+          "RCH2-CO2H",
+          "R2CH-CO2H",
+          "R3C-CO2H"
+        ]
+      },
+      "examples": [
+        "c1ccccc1CO>>O=C(O)c1ccccc1"
+      ],
+      "aliases": [
+        "oxidation_primary_alcohol_to_carboxylic_acid",
+        "primary_alcohol_oxidation_to_carboxylic_acid"
+      ],
+      "description": "Over-oxidation of primary alcohols to carboxylic acids."
+    },
+    {
+      "id": "Benzylic_CH_oxidation_to_carbonyl",
+      "reactants": {
+        "substrate": [
           "Ar-Alkyl"
         ]
       },
       "products": {
         "product": [
-          "@carbonyls",
-          "@carboxylic_acids"
+          "Ar-CHO",
+          "Ar-COR"
         ]
       },
       "examples": [
-        "c1ccccc1CO>>c1ccccc1C=O"
+        "Cc1ccccc1>>O=Cc1ccccc1",
+        "CCc1ccccc1>>CC(=O)c1ccccc1"
       ],
       "aliases": [
-        "oxidation_alcohol",
-        "Benzylic_oxidation",
-        "Oxidation_of_Aromatic_Side_Chains"
+        "benzylic_ch_oxidation_to_carbonyl",
+        "benzylic_oxidation_to_carbonyl"
       ],
-      "description": "Oxidation of alcohols and benzylic side chains to carbonyl or carboxylic-acid products."
+      "description": "Benzylic C-H oxidation to aldehyde or ketone products."
+    },
+    {
+      "id": "Benzylic_CH_oxidation_to_carboxylic_acid",
+      "reactants": {
+        "substrate": [
+          "Ar-Alkyl"
+        ]
+      },
+      "products": {
+        "product": [
+          "Ar-CO2H"
+        ]
+      },
+      "examples": [
+        "Cc1ccccc1>>O=C(O)c1ccccc1"
+      ],
+      "aliases": [
+        "benzylic_ch_oxidation_to_carboxylic_acid",
+        "benzylic_oxidation_to_carboxylic_acid"
+      ],
+      "description": "Deep benzylic C-H oxidation to benzoic-acid type products."
+    },
+    {
+      "id": "Oxidation_aldehyde_to_carboxylic_acid",
+      "reactants": {
+        "substrate": [
+          "Alkenyl-CHO",
+          "Alkyl-CHO",
+          "Ar-CHO",
+          "RCH2-CHO",
+          "R2CH-CHO",
+          "R3C-CHO"
+        ]
+      },
+      "products": {
+        "product": [
+          "Acyl-CO2H",
+          "Alkyl-CO2H",
+          "Alkenyl-CO2H",
+          "Ar-CO2H",
+          "RCH2-CO2H",
+          "R2CH-CO2H",
+          "R3C-CO2H"
+        ]
+      },
+      "examples": [
+        "O=Cc1ccccc1>>O=C(O)c1ccccc1"
+      ],
+      "aliases": [
+        "oxidation_aldehyde_to_carboxylic_acid",
+        "aldehyde_oxidation_to_carboxylic_acid"
+      ],
+      "description": "Oxidation of aldehydes to carboxylic acids."
+    },
+    {
+      "id": "Baeyer_villiger_oxidation",
+      "reactants": {
+        "substrate": [
+          "Alkenyl-COR",
+          "Alkyl-COR",
+          "Alkynyl-COR",
+          "Allyl-COR",
+          "Ar-COR",
+          "Bn-COR",
+          "RCH2-COR",
+          "R2CH-COR",
+          "R3C-COR"
+        ]
+      },
+      "products": {
+        "product": "@esters"
+      },
+      "examples": [
+        "CC(=O)c1ccccc1>>CC(=O)Oc1ccccc1"
+      ],
+      "aliases": [
+        "baeyer_villiger_oxidation",
+        "baeyer_villiger"
+      ],
+      "description": "Oxidative oxygen insertion of ketones to esters/lactones (Baeyer-Villiger)."
+    },
+    {
+      "id": "Alkene_oxidative_cleavage_to_carbonyl",
+      "reactants": {
+        "substrate": [
+          "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
+          "Alkenyl-H",
+          "Alkenyl-Alkenyl",
+          "Alkenyl_terminal-Alkenyl_terminal"
+        ]
+      },
+      "products": {
+        "product": "@carbonyls"
+      },
+      "examples": [
+        "C=CC1=CC=CC=C1>>O=CC1=CC=CC=C1.C=O"
+      ],
+      "aliases": [
+        "alkene_oxidative_cleavage_to_carbonyl",
+        "ozonolysis_to_carbonyl"
+      ],
+      "description": "Oxidative C=C cleavage delivering aldehyde/ketone fragments."
+    },
+    {
+      "id": "Alkene_oxidative_cleavage_to_carboxylic_acid",
+      "reactants": {
+        "substrate": [
+          "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
+          "Alkenyl-H",
+          "Alkenyl-Alkenyl",
+          "Alkenyl_terminal-Alkenyl_terminal"
+        ]
+      },
+      "products": {
+        "product": "@carboxylic_acids"
+      },
+      "examples": [
+        "C=CC1=CC=CC=C1>>O=C(O)C1=CC=CC=C1"
+      ],
+      "aliases": [
+        "alkene_oxidative_cleavage_to_carboxylic_acid",
+        "oxidative_cleavage_to_acid"
+      ],
+      "description": "Strong oxidative C=C cleavage delivering carboxylic-acid fragments."
+    },
+    {
+      "id": "Oxidation_sulfide_to_sulfone",
+      "reactants": {
+        "substrate": [
+          "Alkyl-SR",
+          "RCH2-SR",
+          "R2CH-SR",
+          "R3C-SR",
+          "Bn-SR",
+          "Allyl-SR",
+          "Alkenyl-SR",
+          "Alkynyl-SR"
+        ]
+      },
+      "products": {
+        "product": [
+          "Alkyl-SO2R",
+          "RCH2-SO2R",
+          "R2CH-SO2R",
+          "R3C-SO2R",
+          "Bn-SO2R",
+          "Allyl-SO2R",
+          "Alkenyl-SO2R",
+          "Alkynyl-SO2R"
+        ]
+      },
+      "examples": [
+        "CCSC>>CCS(=O)(=O)C"
+      ],
+      "aliases": [
+        "oxidation_sulfide_to_sulfone",
+        "sulfide_oxidation_to_sulfone"
+      ],
+      "description": "Oxidation of thioethers to sulfones."
     },
     {
       "id": "Reduction_carbonyl_to_alcohol",
@@ -1621,28 +1721,52 @@
       "description": "Selective reduction of acyl halides to aldehydes (Rosenmund-type)."
     },
     {
-      "id": "Wacker_oxidation",
+      "id": "Wacker_oxidation_terminal_alkene_to_ketone",
       "reactants": {
         "substrate": [
-          "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
           "Alkenyl-H",
-          "Alkenyl-Alkenyl",
           "Alkenyl_terminal-Alkenyl_terminal"
         ]
       },
       "products": {
-        "product": "@carbonyls"
+        "product": [
+          "Alkyl-COR",
+          "Ar-COR",
+          "RCH2-COR"
+        ]
       },
       "examples": [
         "C=CC>>CC(=O)C"
       ],
       "aliases": [
-        "wacker_oxidation",
-        "Wacker_oxidation_Alkene__ketone_PdCl2_CuCl_O2",
-        "Wacker oxidation. Alkene → ketone (PdCl2 CuCl O2)"
+        "wacker_oxidation_terminal_alkene_to_ketone"
       ],
-      "description": "Pd/Cu-catalyzed oxidation of alkenes to carbonyl products (Wacker oxidation)."
+      "description": "Pd/Cu-catalyzed Wacker oxidation of terminal alkenes to methyl ketones."
+    },
+    {
+      "id": "Wacker_oxidation_internal_alkene_to_ketone",
+      "reactants": {
+        "substrate": [
+          "Ar-Alkenyl",
+          "Alkenyl-Alkenyl"
+        ]
+      },
+      "products": {
+        "product": [
+          "Alkyl-COR",
+          "Ar-COR",
+          "RCH2-COR",
+          "R2CH-COR"
+        ]
+      },
+      "examples": [
+        "CC=CC>>CC(=O)CC"
+      ],
+      "aliases": [
+        "wacker_oxidation_internal_alkene_to_ketone"
+      ],
+      "description": "Pd/Cu-catalyzed Wacker oxidation of internal alkenes to ketones."
     },
     {
       "id": "Halogenation_aromatic",
@@ -1667,48 +1791,7 @@
         "iodination"
       ]
     },
-    {
-      "id": "Halogenation_unsaturated",
-      "reactants": {},
-      "products": {
-        "product": [
-          "Alkenyl-Br",
-          "Alkenyl-Cl",
-          "Alkenyl-I",
-          "Alkenyl-F",
-          "Alkynyl-Br",
-          "Alkynyl-Cl",
-          "Alkynyl-I",
-          "Alkynyl-F",
-          "Allyl-Br",
-          "Allyl-Cl",
-          "Allyl-I",
-          "Allyl-F",
-          "Propargyl-Br",
-          "Propargyl-Cl",
-          "Propargyl-I"
-        ]
-      },
-      "examples": [
-        "C=C>>CCBr",
-        "C#C>>C=CBr"
-      ],
-      "aliases": [
-        "halogenation_unsaturated",
-        "Addition_of_Halogens_to_Double_or_Triple_Bonds",
-        "Allylic_Benzylic_and_Vinylic_Halogenations",
-        "NBS_NCS_NIS_halogenation"
-      ],
-      "description": "Halogenation of unsaturated/aliphatic allylic-propargylic motifs where product-side vinylic/allylic/propargylic halides are dominant.",
-      "constraints": {
-        "include_reacted": [],
-        "exclude_reacted": [],
-        "include_formed": [],
-        "exclude_formed": [],
-        "min_reactant_slot_matches": 0,
-        "min_product_slot_matches": 1
-      }
-    },
+    
     {
       "id": "Trifluoromethylation",
       "reactants": {
@@ -1744,7 +1827,10 @@
       "reactants": {
         "substrate": [
           "Ar-Alkenyl",
-          "Alkenyl-Alkenyl"
+          "Ar-Alkenyl_terminal",
+          "Alkenyl-H",
+          "Alkenyl-Alkenyl",
+          "Alkenyl_terminal-Alkenyl_terminal"
         ]
       },
       "products": {
@@ -1757,22 +1843,9 @@
       ],
       "aliases": [
         "epoxidation"
-      ]
-    },
-    {
-      "id": "Claisen_condensation",
-      "reactants": {
-        "ester": "@esters"
-      },
-      "constraints": {
-        "min_hits": 2
-      },
-      "examples": [
-        "CCOC(=O)C.CCOC(=O)C>>CC(=O)CC(=O)OCC"
       ],
-      "aliases": [
-        "claisen_condensation"
-      ]
+      "description": "Oxidation of alkenes to epoxides."
     }
+    
   ]
 }
