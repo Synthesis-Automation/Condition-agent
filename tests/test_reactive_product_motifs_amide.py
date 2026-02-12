@@ -5,11 +5,11 @@ from chemtools.featurizers.unified import featurize_reaction
 from chemtools.util.rdkit_helpers import rdkit_available
 
 
-def test_select_reactive_product_motifs_prefers_amides_over_generic_aryl_alkyl() -> None:
+def test_select_reactive_product_motifs_collapses_duplicate_group_representations() -> None:
     product_motifs = [
-        {"id": "Ar-Alkyl"},
-        {"id": "Alkyl-NHCOR"},
-        {"id": "Ar-CONHR"},
+        {"id": "Ar-Alkyl", "atoms": {0, 1}},
+        {"id": "Alkyl-NHCOR", "atoms": {3, 4, 5, 6, 7}, "priority": 5, "rank_score": 448.0},
+        {"id": "Ar-CONHR", "atoms": {4, 5, 6, 7}, "priority": 7, "rank_score": 426.0},
     ]
 
     selected = _select_reactive_product_motifs(
@@ -17,10 +17,10 @@ def test_select_reactive_product_motifs_prefers_amides_over_generic_aryl_alkyl()
         bond_key="break: C-O | form: C-N",
         formed_motifs=["Ar-Alkyl", "Alkyl-NHCOR", "Ar-CONHR"],
         reacted_motifs=["Ar-CO2H", "Bn-NH2"],
-        reaction_type="Amide_formation",
+        reaction_type="Unknown",
     )
 
-    assert selected == ["Alkyl-NHCOR", "Ar-CONHR"]
+    assert selected == ["Ar-CONHR"]
 
 
 def test_select_reactive_product_motifs_uses_taxonomy_for_suzuki_products() -> None:
@@ -79,4 +79,19 @@ def test_featurize_reaction_cli_like_options_detects_amide_center_motifs() -> No
 
     assert result.get("reaction_type") == "Amide_formation"
     assert "Ar-Alkyl" not in reactive
-    assert set(reactive) == {"Bn-NHCOR", "HeteroAr-CONHR"}
+    assert set(reactive) == {"HeteroAr-CONHR"}
+
+
+def test_featurize_reaction_amide_uses_single_group_for_same_product_center() -> None:
+    if not rdkit_available():
+        pytest.skip("rdkit not available")
+
+    rxn = "COCCN.O=C(O)c1cc(I)cc(CNc2ccc(Cl)c(O)c2)c1>>COCCNC(=O)c1cc(I)cc(CNc2ccc(Cl)c(O)c2)c1"
+    result = featurize_reaction(rxn, options={"detailed": True, "include_reaction_type": True})
+    reaction_key = str(result.get("reaction_key") or "")
+    reactive = result.get("product_motifs_reactive") or []
+
+    assert result.get("reaction_type") == "Amide_formation"
+    assert "Ar-CONHR" in reactive
+    assert "Alkyl-NHCOR" not in reactive
+    assert "-> Ar-CONHR" in reaction_key

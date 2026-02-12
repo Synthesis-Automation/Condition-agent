@@ -1296,6 +1296,123 @@ def _project_formed_motifs_by_taxonomy(
     return sorted(projected)
 
 
+def _motif_atoms_from_entry(entry: Dict[str, Any]) -> Set[int]:
+    atoms_raw = entry.get("atoms")
+    atoms: Set[int] = set()
+    if isinstance(atoms_raw, (list, tuple, set)):
+        for value in atoms_raw:
+            try:
+                atoms.add(int(value))
+            except Exception:
+                continue
+    for key in ("a_atom_idx", "b_atom_idx"):
+        value = entry.get(key)
+        try:
+            atoms.add(int(value))
+        except Exception:
+            continue
+    return atoms
+
+
+def _jaccard_similarity(left: Set[int], right: Set[int]) -> float:
+    if not left or not right:
+        return 0.0
+    union = left | right
+    if not union:
+        return 0.0
+    return len(left & right) / float(len(union))
+
+
+def _collapse_redundant_reactive_product_motifs(
+    motifs: Iterable[str],
+    product_motifs: Iterable[Dict[str, Any]],
+) -> List[str]:
+    """
+    Collapse duplicate representations of the same product center.
+
+    General rule: if two motifs have identical group fingerprints and strongly
+    overlapping matched atoms, keep a single canonical motif (higher priority,
+    then higher rank_score).
+    """
+    values = sorted({str(m) for m in motifs if str(m).strip()})
+    if len(values) < 2:
+        return values
+
+    allowed = set(values)
+    candidates: List[Dict[str, Any]] = []
+    for motif in product_motifs or []:
+        if not isinstance(motif, dict):
+            continue
+        motif_id = normalize_motif_id(str(motif.get("compound_id") or motif.get("id") or ""))
+        if not motif_id or motif_id not in allowed:
+            continue
+        fingerprint = str(motif.get("fingerprint") or "").strip()
+        atoms = _motif_atoms_from_entry(motif)
+        if len(atoms) < 2:
+            continue
+        candidates.append(
+            {
+                "motif_id": motif_id,
+                "fingerprint": fingerprint,
+                "atoms": atoms,
+                "priority": _to_float_or_default(motif.get("priority"), 0.0),
+                "rank_score": _to_float_or_default(motif.get("rank_score"), 0.0),
+            }
+        )
+
+    if len(candidates) < 2:
+        return values
+
+    parent = list(range(len(candidates)))
+
+    def _find(idx: int) -> int:
+        while parent[idx] != idx:
+            parent[idx] = parent[parent[idx]]
+            idx = parent[idx]
+        return idx
+
+    def _union(a: int, b: int) -> None:
+        ra = _find(a)
+        rb = _find(b)
+        if ra != rb:
+            parent[rb] = ra
+
+    for i in range(len(candidates)):
+        for j in range(i + 1, len(candidates)):
+            left = candidates[i]
+            right = candidates[j]
+            if left["motif_id"] == right["motif_id"]:
+                continue
+            # If both fingerprints are present and different, do not merge.
+            if left["fingerprint"] and right["fingerprint"] and left["fingerprint"] != right["fingerprint"]:
+                continue
+            if _jaccard_similarity(left["atoms"], right["atoms"]) >= 0.75:
+                _union(i, j)
+
+    clusters: Dict[int, List[int]] = {}
+    for idx in range(len(candidates)):
+        clusters.setdefault(_find(idx), []).append(idx)
+
+    keep_ids: Set[str] = set(values)
+    for member_indices in clusters.values():
+        if len(member_indices) < 2:
+            continue
+        ranked = sorted(
+            member_indices,
+            key=lambda idx: (
+                -float(candidates[idx]["priority"]),
+                -float(candidates[idx]["rank_score"]),
+                str(candidates[idx]["motif_id"]),
+            ),
+        )
+        chosen_id = str(candidates[ranked[0]]["motif_id"])
+        cluster_ids = {str(candidates[idx]["motif_id"]) for idx in member_indices}
+        for motif_id in cluster_ids:
+            if motif_id != chosen_id:
+                keep_ids.discard(motif_id)
+    return sorted(keep_ids)
+
+
 def _target_product_motifs_from_formed_bonds(
     *,
     formed_bonds: Iterable[str],
@@ -1344,6 +1461,9 @@ def _select_reactive_product_motifs(
     reaction_type: Optional[str] = None,
 ) -> List[str]:
     """Select reaction-center product motifs with taxonomy constraints first."""
+    def _finalize(values: Iterable[str]) -> List[str]:
+        return _collapse_redundant_reactive_product_motifs(values, product_motifs)
+
     motif_ids = [
         normalize_motif_id(str(m.get("compound_id") or m.get("id")))
         for m in product_motifs
@@ -1370,25 +1490,25 @@ def _select_reactive_product_motifs(
         inferred_in_product=inferred_in_product,
     )
     if taxonomy_projected:
-        return taxonomy_projected
+        return _finalize(taxonomy_projected)
 
     if not bond_key:
         if inferred_in_product:
-            return inferred_in_product
+            return _finalize(inferred_in_product)
         if formed_in_product:
-            return sorted(formed_in_product)
+            return _finalize(sorted(formed_in_product))
         if formed_set:
-            return sorted(formed_set)
+            return _finalize(sorted(formed_set))
         return []
 
     formed_bonds = _extract_bond_section(bond_key, section="form")
     if not formed_bonds:
         if inferred_in_product:
-            return inferred_in_product
+            return _finalize(inferred_in_product)
         if formed_in_product:
-            return sorted(formed_in_product)
+            return _finalize(sorted(formed_in_product))
         if formed_set:
-            return sorted(formed_set)
+            return _finalize(sorted(formed_set))
         return []
 
     target_ids = _target_product_motifs_from_formed_bonds(
@@ -1401,14 +1521,14 @@ def _select_reactive_product_motifs(
         reactive = sorted(formed_set & target_ids)
     if inferred_in_product:
         if reactive:
-            return sorted(set(reactive) | set(inferred_in_product))
-        return inferred_in_product
+            return _finalize(sorted(set(reactive) | set(inferred_in_product)))
+        return _finalize(inferred_in_product)
     if reactive:
-        return reactive
+        return _finalize(reactive)
     if formed_in_product:
-        return sorted(formed_in_product)
+        return _finalize(sorted(formed_in_product))
     if formed_set:
-        return sorted(formed_set)
+        return _finalize(sorted(formed_set))
     return []
 
 

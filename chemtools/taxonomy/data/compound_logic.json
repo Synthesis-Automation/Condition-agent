@@ -479,7 +479,8 @@
         "HeteroAr-I"
       ],
       "usage": [
-        "Halogenation_aromatic"
+        "Halogenation_aromatic",
+        "Aromatic_Halogen_Exchange"
       ]
     },
     "azides": {

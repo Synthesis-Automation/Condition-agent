@@ -405,6 +405,7 @@
       "id": "-Hydrazine",
       "kind": "substituent",
       "priority": 1,
+      "broad_definition": true,
       "smarts": "[NX3:2][NX3]",
       "description": "Hydrazine-like substituent (-NN unit, any substitution); attach via nitrogen."
     },
@@ -447,6 +448,7 @@
       "id": "-Hydrazide",
       "kind": "substituent",
       "priority": 1,
+      "broad_definition": true,
       "smarts": "[CX3:2](=O)[NX3][NX3]",
       "description": "Hydrazide functional group (any substitution state); attach via carbonyl carbon."
     },
@@ -454,6 +456,7 @@
       "id": "-Urea",
       "kind": "substituent",
       "priority": 1,
+      "broad_definition": true,
       "smarts": "[NX3:2][CX3](=O)[NX3]",
       "description": "Urea-like substituent (-NCON unit, any substitution); attach via nitrogen."
     },
@@ -461,6 +464,7 @@
       "id": "-Thiourea",
       "kind": "substituent",
       "priority": 1,
+      "broad_definition": true,
       "smarts": "[NX3:2][CX3](=S)[NX3]",
       "description": "Thiourea-like substituent (-NCSN unit, any substitution); attach via nitrogen."
     },
@@ -543,6 +547,7 @@
     {
       "id": "-Sulfamide",
       "kind": "substituent",
+      "broad_definition": true,
       "smarts": "[NX3:2][SX4](=O)(=O)[NX3]",
       "description": "Sulfamide-like substituent (-NSO2N unit); attach via nitrogen."
     },

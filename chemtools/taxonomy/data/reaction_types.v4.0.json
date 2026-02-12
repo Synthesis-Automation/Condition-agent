@@ -427,6 +427,36 @@
       }
     },
     {
+      "id": "Aromatic_Halogen_Exchange",
+      "reactants": {
+        "substrate": "@aromatic_halides"
+      },
+      "products": {
+        "product": "@aromatic_halides"
+      },
+      "examples": [
+        "O=[N+]([O-])c1ccc(Cl)cc1>>O=[N+]([O-])c1ccc(F)cc1",
+        "COc1ccc(Br)cc1>>COc1ccc(I)cc1"
+      ],
+      "aliases": [
+        "Aromatic_Halogen_Exchange",
+        "Aromatic Halogen Exchange",
+        "aromatic_halogen_exchange",
+        "ArX_exchange",
+        "Ar-X exchange",
+        "Halex_aromatic"
+      ],
+      "description": "Interconversion of aromatic/heteroaromatic halides (Ar-X to Ar-Y; halogen exchange).",
+      "constraints": {
+        "include_reacted": [],
+        "exclude_reacted": [],
+        "include_formed": [],
+        "exclude_formed": [],
+        "min_reactant_slot_matches": 1,
+        "min_product_slot_matches": 1
+      }
+    },
+    {
       "id": "Sonogashira",
       "reactants": {
         "electrophile": "@sp2_electrophiles",

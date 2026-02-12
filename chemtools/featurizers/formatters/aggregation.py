@@ -91,6 +91,76 @@ def _load_carbonyl_groups() -> Set[str]:
 
 
 @lru_cache(maxsize=1)
+def _load_broad_definition_groups() -> Set[str]:
+    """Load group IDs flagged as broad_definition from organic group taxonomy."""
+    path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "organic_groups.v1.3.json"
+    if not path.exists():
+        return set()
+    try:
+        with path.open("r", encoding="utf-8", errors="replace") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return set()
+    groups = payload.get("groups", []) or []
+    if not isinstance(groups, list):
+        return set()
+    broad: Set[str] = set()
+    for entry in groups:
+        if not isinstance(entry, dict):
+            continue
+        if not bool(entry.get("broad_definition")):
+            continue
+        gid = str(entry.get("id") or "").strip()
+        if gid:
+            broad.add(gid)
+    return broad
+
+
+def _is_broad_definition_motif_id(motif_id: str) -> bool:
+    motif_text = str(motif_id or "").strip()
+    if not motif_text:
+        return False
+    for group_id in _load_broad_definition_groups():
+        if motif_text.endswith(group_id):
+            return True
+    return False
+
+
+def _broad_fingerprint_changed_ids(
+    reactant_motifs: List[Dict[str, Any]],
+    product_motifs: List[Dict[str, Any]],
+) -> Set[str]:
+    """
+    Return motif IDs with broad_definition=true whose fingerprint profile changed.
+
+    This catches site-state changes where motif ID counts stay constant across
+    reactant/product sides (e.g., Ar-Hydrazine still present but transformed).
+    """
+    reactant_fp: Dict[str, Counter[str]] = {}
+    product_fp: Dict[str, Counter[str]] = {}
+
+    for motif in reactant_motifs:
+        cid = normalize_motif_id(str(motif.get("compound_id") or motif.get("id") or ""))
+        if not cid or not _is_broad_definition_motif_id(cid):
+            continue
+        fp = str(motif.get("fingerprint", "") or "")
+        reactant_fp.setdefault(cid, Counter())[fp] += 1
+
+    for motif in product_motifs:
+        cid = normalize_motif_id(str(motif.get("compound_id") or motif.get("id") or ""))
+        if not cid or not _is_broad_definition_motif_id(cid):
+            continue
+        fp = str(motif.get("fingerprint", "") or "")
+        product_fp.setdefault(cid, Counter())[fp] += 1
+
+    changed: Set[str] = set()
+    for cid in set(reactant_fp) & set(product_fp):
+        if reactant_fp[cid] != product_fp[cid]:
+            changed.add(cid)
+    return changed
+
+
+@lru_cache(maxsize=1)
 def load_transformation_patterns() -> Dict[str, Any]:
     """Load transformation patterns from taxonomy."""
     path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "transformation_patterns.json"
@@ -611,6 +681,7 @@ def aggregate_reaction_features(
     reacted_motif_counts: Dict[str, int] = {}
     formed_motif_counts: Dict[str, int] = {}
     spectator_motif_counts: Dict[str, int] = {}
+    broad_fp_changed_ids: Set[str] = set()
 
     # Extract features from each reactant
     for reactant in reactant_list:
@@ -675,6 +746,14 @@ def aggregate_reaction_features(
             reacted_set, formed_set, spectator_motifs_set = analyze_motif_changes_with_fingerprints(
                 reactant_motifs_for_changes, product_motifs_with_fp
             )
+            broad_fp_changed_ids = _broad_fingerprint_changed_ids(
+                reactant_motifs_for_changes,
+                product_motifs_with_fp,
+            )
+            if broad_fp_changed_ids:
+                reacted_set.update(broad_fp_changed_ids)
+                formed_set.update(broad_fp_changed_ids)
+                spectator_motifs_set.difference_update(broad_fp_changed_ids)
             reactant_ids_for_counts = [
                 m.get("compound_id") or m.get("id", "") for m in reactant_motifs_full
             ]
@@ -728,6 +807,13 @@ def aggregate_reaction_features(
                 reacted_motif_counts[motif_id] = max(r_count - p_count, 0)
             if motif_id in formed_set:
                 formed_motif_counts[motif_id] = max(p_count - r_count, 0)
+            if (
+                motif_id in broad_fp_changed_ids
+                and r_count > 0
+                and p_count > 0
+                and r_count == p_count
+            ):
+                reacted_motif_counts[motif_id] = max(reacted_motif_counts.get(motif_id, 0), 1)
             if motif_id in spectator_motifs_set:
                 spectator_motif_counts[motif_id] = min(r_count, p_count)
 
