@@ -647,35 +647,6 @@
       ]
     },
     {
-      "id": "Quinazolinone_annulation",
-      "reactants": {
-        "amine": [
-          "Ar-NH2",
-          "HeteroAr-NH2"
-        ],
-        "amide": [
-          "Ar-NHCOR",
-          "Ar-CONHR",
-          "HeteroAr-NHCOR",
-          "HeteroAr-CONHR"
-        ],
-        "c1_source": [
-          "CH3-OH"
-        ]
-      },
-      "products": {
-        "heterocycle": [
-          "Pyrimidine"
-        ]
-      },
-      "aliases": [
-        "quinazolinone_annulation",
-        "quinazolin_4_one_formation",
-        "o_aminobenzamide_c1_annulation"
-      ],
-      "description": "Oxidative annulation of o-aminobenzamides with methanol-derived C1 insertion to quinazolin-4-one motifs."
-    },
-    {
       "id": "Sandmeyer",
       "reactants": {
         "substrate": [
@@ -715,50 +686,7 @@
       ]
     },
     {
-      "id": "Reductive_coupling",
-      "reactants": {
-        "electrophile": "@sp2_electrophiles"
-      },
-      "products": {
-        "product": [
-          "Ar-Ar",
-          "Ar-H"
-        ]
-      },
-      "exclude_reacted": [
-        "@organoboron",
-        "@organozinc",
-        "@organotin",
-        "@organomagnesium"
-      ],
-      "aliases": [
-        "reductive_coupling",
-        "ullmann_homocoupling"
-      ],
-      "description": "Reductive homo-coupling of aryl halides."
-    },
-    {
-      "id": "Hydrodebromination",
-      "reactants": {
-        "substrate": [
-          "Ar-Br",
-          "Ar-I",
-          "Ar-Cl"
-        ]
-      },
-      "products": {
-        "product": [
-          "Ar-H"
-        ]
-      },
-      "aliases": [
-        "hydrodehalogenation",
-        "hydrodebromination"
-      ],
-      "description": "Reductive removal of halogen."
-    },
-    {
-      "id": "Nitration",
+      "id": "Aryl_Nitration",
       "reactants": {
         "substrate": [
           "Ar-H"
@@ -1019,7 +947,7 @@
       }
     },
     {
-      "id": "Snar_cn",
+      "id": "SNAr_CN",
       "reactants": {
         "electrophile": [
           "Ar-F",
@@ -1750,60 +1678,6 @@
         "Rosenmund reduction"
       ],
       "description": "Selective reduction of acyl halides to aldehydes (Rosenmund-type)."
-    },
-    {
-      "id": "Wacker_oxidation_terminal_alkene_to_ketone",
-      "reactants": {
-        "substrate": [
-          "Ar-Alkenyl_terminal",
-          "Alkyl-Alkenyl",
-          "RCH2-Alkenyl",
-          "Alkenyl-H",
-          "Alkenyl_terminal-Alkenyl_terminal"
-        ]
-      },
-      "products": {
-        "product": [
-          "Alkyl-COR",
-          "Ar-COR",
-          "RCH2-COR"
-        ]
-      },
-      "examples": [
-        "C=CC>>CC(=O)C"
-      ],
-      "aliases": [
-        "wacker_oxidation_terminal_alkene_to_ketone"
-      ],
-      "description": "Pd/Cu-catalyzed Wacker oxidation of terminal alkenes to methyl ketones."
-    },
-    {
-      "id": "Wacker_oxidation_internal_alkene_to_ketone",
-      "reactants": {
-        "substrate": [
-          "Ar-Alkenyl",
-          "Alkyl-Alkenyl",
-          "RCH2-Alkenyl",
-          "R2CH-Alkenyl",
-          "R3C-Alkenyl",
-          "Alkenyl-Alkenyl"
-        ]
-      },
-      "products": {
-        "product": [
-          "Alkyl-COR",
-          "Ar-COR",
-          "RCH2-COR",
-          "R2CH-COR"
-        ]
-      },
-      "examples": [
-        "CC=CC>>CC(=O)CC"
-      ],
-      "aliases": [
-        "wacker_oxidation_internal_alkene_to_ketone"
-      ],
-      "description": "Pd/Cu-catalyzed Wacker oxidation of internal alkenes to ketones."
     },
     {
       "id": "Halogenation_aromatic",
