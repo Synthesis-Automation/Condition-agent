@@ -51,6 +51,18 @@ def _format_text(value: Any, max_len: int = 1200) -> str:
     return text
 
 
+def _format_json(value: Any, max_len: int = 2000) -> str:
+    if value is None:
+        return "None"
+    try:
+        text = json.dumps(value, ensure_ascii=True, sort_keys=True)
+    except Exception:
+        return _format_text(value, max_len=max_len)
+    if len(text) > max_len:
+        return text[: max_len - 3] + "..."
+    return text
+
+
 @dataclass
 class LLMReactionFeaturizationOptions:
     """Runtime configuration for LLM featurization review."""
@@ -88,8 +100,15 @@ def build_reaction_featurization_prompt(context: Dict[str, Any]) -> str:
         reacted_motifs=_format_values(context.get("reacted_motifs", [])),
         formed_motifs=_format_values(context.get("formed_motifs", [])),
         spectator_motifs=_format_values(context.get("spectator_motifs", [])),
+        reacted_formed_overlap=_format_values(context.get("reacted_formed_overlap", [])),
         product_broad_tags=_format_values(context.get("product_broad_tags", [])),
         product_motifs_reactive=_format_values(context.get("product_motifs_reactive", [])),
+        event_kinds=_format_values(context.get("event_kinds", [])),
+        reaction_key_quality=_format_json(context.get("reaction_key_quality")),
+        stoichiometry_delta=_format_json(context.get("stoichiometry_delta")),
+        reacted_motif_counts=_format_json(context.get("reacted_motif_counts")),
+        formed_motif_counts=_format_json(context.get("formed_motif_counts")),
+        spectator_motif_counts=_format_json(context.get("spectator_motif_counts")),
         reaction_type_candidates=candidate_text,
     )
 
@@ -174,6 +193,20 @@ def review_reaction_featurization(
             "rationale": str(parsed.get("rationale") or "").strip(),
             "requires_human_review": bool(parsed.get("requires_human_review", False)),
             "uncertainty_flags": norm_flags,
+            "mechanistic_family": str(parsed.get("mechanistic_family") or "").strip(),
+            "mechanistic_rationale": str(parsed.get("mechanistic_rationale") or "").strip(),
+            "tautomer_or_representation_issue": bool(
+                parsed.get("tautomer_or_representation_issue", False)
+            ),
+            "taxonomy_gap_suspected": bool(parsed.get("taxonomy_gap_suspected", False)),
+            "taxonomy_gap_note": str(parsed.get("taxonomy_gap_note") or "").strip(),
+            "deterministic_checks_used": [
+                str(v).strip()
+                for v in (parsed.get("deterministic_checks_used") or [])
+                if str(v).strip()
+            ]
+            if isinstance(parsed.get("deterministic_checks_used"), list)
+            else [],
         }
 
     return output

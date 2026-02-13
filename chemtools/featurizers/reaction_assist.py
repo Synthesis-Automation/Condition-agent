@@ -8,8 +8,11 @@ override only when configured.
 
 from __future__ import annotations
 
+from collections import Counter
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple
+
+from chemtools.util import rdkit_helpers
 
 from .formatters.molecule import to_bool
 
@@ -91,6 +94,59 @@ def _set_reaction_type_payload(
         max(0.0, min(1.0, _to_float_or_default(confidence, 0.0))),
         3,
     )
+
+
+def _extract_smiles_list(bundles: Any) -> List[str]:
+    if not isinstance(bundles, list):
+        return []
+    smiles_list: List[str] = []
+    for entry in bundles:
+        if not isinstance(entry, dict):
+            continue
+        smiles = str(entry.get("smiles") or "").strip()
+        if smiles:
+            smiles_list.append(smiles)
+    return smiles_list
+
+
+def _count_elements(smiles_list: List[str]) -> Counter[str]:
+    counts: Counter[str] = Counter()
+    for smiles in smiles_list:
+        mol = rdkit_helpers.parse_smiles(smiles)
+        if mol is None:
+            continue
+        for atom in mol.GetAtoms():
+            counts[str(atom.GetSymbol())] += 1
+    return counts
+
+
+def _build_stoichiometry_delta(
+    reactant_smiles: List[str],
+    product_smiles: List[str],
+) -> Dict[str, Any]:
+    if not rdkit_helpers.rdkit_available():
+        return {"rdkit_available": False}
+
+    reactant_counts = _count_elements(reactant_smiles)
+    product_counts = _count_elements(product_smiles)
+    if not reactant_counts and not product_counts:
+        return {"rdkit_available": True}
+
+    element_delta: Dict[str, int] = {}
+    for element in sorted(set(reactant_counts) | set(product_counts)):
+        delta = int(product_counts.get(element, 0) - reactant_counts.get(element, 0))
+        if delta != 0:
+            element_delta[element] = delta
+
+    reactant_total = int(sum(reactant_counts.values()))
+    product_total = int(sum(product_counts.values()))
+    return {
+        "rdkit_available": True,
+        "reactant_total_atoms": reactant_total,
+        "product_total_atoms": product_total,
+        "atom_count_delta": product_total - reactant_total,
+        "element_delta": element_delta,
+    }
 
 
 def is_reaction_uncertain_for_llm_assist(
@@ -283,7 +339,42 @@ def apply_llm_reaction_assist(
                 "spectator_motifs": aggregates.get("spectator_motifs") or [],
                 "product_broad_tags": out.get("product_broad_tags") or [],
                 "product_motifs_reactive": out.get("product_motifs_reactive") or [],
+                "reaction_events": out.get("reaction_events") or {},
+                "reaction_key_quality": detection_payload.get("reaction_key_quality")
+                or ((out.get("reaction_events") or {}).get("reaction_key_quality")),
+                "reacted_motif_counts": aggregates.get("reacted_motif_counts") or {},
+                "formed_motif_counts": aggregates.get("formed_motif_counts") or {},
+                "spectator_motif_counts": aggregates.get("spectator_motif_counts") or {},
             }
+            reacted_set = {
+                str(m).strip()
+                for m in (review_context.get("reacted_motifs") or [])
+                if str(m).strip()
+            }
+            formed_set = {
+                str(m).strip()
+                for m in (review_context.get("formed_motifs") or [])
+                if str(m).strip()
+            }
+            review_context["reacted_formed_overlap"] = sorted(reacted_set & formed_set)
+
+            reaction_events = review_context.get("reaction_events")
+            event_kinds: List[str] = []
+            if isinstance(reaction_events, dict):
+                for event in reaction_events.get("events") or []:
+                    if not isinstance(event, dict):
+                        continue
+                    kind = str(event.get("kind") or "").strip()
+                    if kind:
+                        event_kinds.append(kind)
+            review_context["event_kinds"] = event_kinds
+
+            reactant_smiles = _extract_smiles_list(out.get("reactants"))
+            product_smiles = _extract_smiles_list(out.get("products"))
+            review_context["stoichiometry_delta"] = _build_stoichiometry_delta(
+                reactant_smiles,
+                product_smiles,
+            )
             review = _run_llm_reaction_assist(review_context, llm_assist)
             llm_assist_meta["status"] = str(review.get("status") or "unknown")
             llm_assist_meta["provider"] = review.get("provider") or llm_assist.get(
@@ -312,6 +403,31 @@ def apply_llm_reaction_assist(
                     llm_assist_meta["uncertainty_flags"] = list(
                         analysis.get("uncertainty_flags") or []
                     )
+                if analysis.get("mechanistic_family"):
+                    llm_assist_meta["mechanistic_family"] = str(
+                        analysis.get("mechanistic_family") or ""
+                    )
+                if analysis.get("mechanistic_rationale"):
+                    llm_assist_meta["mechanistic_rationale"] = str(
+                        analysis.get("mechanistic_rationale") or ""
+                    )
+                if analysis.get("tautomer_or_representation_issue") is not None:
+                    llm_assist_meta["tautomer_or_representation_issue"] = bool(
+                        analysis.get("tautomer_or_representation_issue")
+                    )
+                if analysis.get("taxonomy_gap_suspected") is not None:
+                    llm_assist_meta["taxonomy_gap_suspected"] = bool(
+                        analysis.get("taxonomy_gap_suspected")
+                    )
+                if analysis.get("taxonomy_gap_note"):
+                    llm_assist_meta["taxonomy_gap_note"] = str(
+                        analysis.get("taxonomy_gap_note") or ""
+                    )
+                checks = analysis.get("deterministic_checks_used")
+                if isinstance(checks, list):
+                    llm_assist_meta["deterministic_checks_used"] = [
+                        str(v) for v in checks if str(v).strip()
+                    ]
 
                 if not suggested_label or suggested_label.lower() == "unknown":
                     llm_assist_meta["decision"] = "no_valid_suggestion"

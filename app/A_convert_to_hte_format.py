@@ -119,6 +119,92 @@ def _extract_reaction_type_from_bundle(bundle: Dict[str, Any]) -> str:
     return ""
 
 
+def _build_taxonomy_gap_entry(
+    rxn_bundle: Dict[str, Any],
+    *,
+    source_dataset: str,
+    source_format: str,
+    source_row_index: int,
+    reaction_smiles: str,
+    reaction_key: str,
+    detected_reaction_type: str,
+    reference: str,
+) -> Optional[Dict[str, Any]]:
+    """Build an export row when LLM assist flags taxonomy coverage gaps."""
+    if not isinstance(rxn_bundle, dict):
+        return None
+    meta = rxn_bundle.get("meta")
+    if not isinstance(meta, dict):
+        return None
+    llm_meta = meta.get("llm_assist")
+    if not isinstance(llm_meta, dict):
+        return None
+    if not bool(llm_meta.get("taxonomy_gap_suspected", False)):
+        return None
+
+    return {
+        "source_dataset": source_dataset,
+        "source_format": source_format,
+        "source_row_index": int(source_row_index),
+        "reaction_smiles": reaction_smiles,
+        "reaction_key": reaction_key,
+        "detected_reaction_type": detected_reaction_type or "Unknown",
+        "suggested_reaction_type": str(llm_meta.get("suggested_reaction_type") or "Unknown"),
+        "suggested_confidence": llm_meta.get("suggested_confidence"),
+        "decision": str(llm_meta.get("decision") or ""),
+        "status": str(llm_meta.get("status") or ""),
+        "validation": str(llm_meta.get("validation") or ""),
+        "provider": str(llm_meta.get("provider") or ""),
+        "model": str(llm_meta.get("model") or ""),
+        "requires_human_review": bool(llm_meta.get("requires_human_review", False)),
+        "taxonomy_gap_suspected": True,
+        "taxonomy_gap_note": str(llm_meta.get("taxonomy_gap_note") or ""),
+        "mechanistic_family": str(llm_meta.get("mechanistic_family") or ""),
+        "mechanistic_rationale": str(llm_meta.get("mechanistic_rationale") or ""),
+        "tautomer_or_representation_issue": bool(
+            llm_meta.get("tautomer_or_representation_issue", False)
+        ),
+        "uncertainty_flags": list(llm_meta.get("uncertainty_flags") or []),
+        "uncertainty_reasons": list(llm_meta.get("uncertainty_reasons") or []),
+        "deterministic_checks_used": list(llm_meta.get("deterministic_checks_used") or []),
+        "reference": reference or "",
+        "llm_assist_meta": llm_meta,
+    }
+
+
+def _write_taxonomy_gap_exports(
+    output_path: Path,
+    gap_entries: List[Dict[str, Any]],
+) -> None:
+    """Write taxonomy-gap sidecar reports in JSON and CSV formats."""
+    if not gap_entries:
+        return
+
+    json_path = output_path.with_name(f"{output_path.stem}.taxonomy_gaps.json")
+    csv_path = output_path.with_name(f"{output_path.stem}.taxonomy_gaps.csv")
+
+    with json_path.open("w", encoding="utf-8") as handle:
+        json.dump(gap_entries, handle, ensure_ascii=False, indent=2)
+
+    csv_rows: List[Dict[str, Any]] = []
+    for entry in gap_entries:
+        row = dict(entry)
+        for key in (
+            "uncertainty_flags",
+            "uncertainty_reasons",
+            "deterministic_checks_used",
+            "llm_assist_meta",
+        ):
+            value = row.get(key)
+            if isinstance(value, (list, dict)):
+                row[key] = json.dumps(value, ensure_ascii=False, sort_keys=True)
+        csv_rows.append(row)
+    pd.DataFrame(csv_rows).to_csv(csv_path, index=False)
+
+    print(f"Saved {len(gap_entries)} taxonomy-gap entries to {json_path}")
+    print(f"Saved {len(gap_entries)} taxonomy-gap entries to {csv_path}")
+
+
 CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
 CAS_INLINE_PATTERN = re.compile(r"\b\d{2,7}-\d{2}-\d\b")
 
@@ -661,6 +747,7 @@ def process_reaction_dataset(
         print("LLM assist enabled for reaction featurization.")
     
     rows = []
+    taxonomy_gap_entries: List[Dict[str, Any]] = []
     print(f"Reading {input_path}...")
     if not input_path.exists():
         print(f"Error: Input file {input_path} not found.")
@@ -771,6 +858,18 @@ def process_reaction_dataset(
                 if not detected_reaction_type:
                     # Fallback keeps compatibility for any unexpected bundle shape.
                     detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
+                gap_entry = _build_taxonomy_gap_entry(
+                    rxn_bundle,
+                    source_dataset=source_label,
+                    source_format="csv",
+                    source_row_index=i + 2,
+                    reaction_smiles=smiles,
+                    reaction_key=reaction_key,
+                    detected_reaction_type=detected_reaction_type,
+                    reference=str(row.get("reference", "") or ""),
+                )
+                if gap_entry:
+                    taxonomy_gap_entries.append(gap_entry)
 
                 row_out = {
                     "reaction_id": source_label,
@@ -889,6 +988,18 @@ def process_reaction_dataset(
             if not detected_reaction_type:
                 # Fallback keeps compatibility for any unexpected bundle shape.
                 detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
+            gap_entry = _build_taxonomy_gap_entry(
+                rxn_bundle,
+                source_dataset=source_label,
+                source_format="jsonl",
+                source_row_index=i + 1,
+                reaction_smiles=smiles,
+                reaction_key=reaction_key,
+                detected_reaction_type=detected_reaction_type,
+                reference=str(record.get("reference", "") or ""),
+            )
+            if gap_entry:
+                taxonomy_gap_entries.append(gap_entry)
 
             row = {
                 "reaction_id": source_label,
@@ -973,6 +1084,11 @@ def process_reaction_dataset(
 
     df.to_csv(output_path, index=False)
     print(f"Successfully saved {len(df)} reactions to {output_path}")
+    if llm_signature:
+        if taxonomy_gap_entries:
+            _write_taxonomy_gap_exports(output_path, taxonomy_gap_entries)
+        else:
+            print("No taxonomy-gap entries were flagged by LLM assist.")
     if unknown_cas:
         _write_new_reagents(new_reagents_csv, unknown_cas)
         print(f"Saved {len(unknown_cas)} new reagent CAS entries to {new_reagents_csv}")

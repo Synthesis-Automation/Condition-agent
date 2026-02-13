@@ -42,6 +42,8 @@ def test_build_reaction_featurization_prompt_includes_context() -> None:
     assert "Unknown" in prompt
     assert "Ar-Br" in prompt
     assert "Ar-NR2" in prompt
+    assert "Stoichiometry delta" in prompt
+    assert "Reaction event kinds" in prompt
 
 
 def test_review_reaction_featurization_parses_json_fences() -> None:
@@ -67,3 +69,43 @@ def test_review_reaction_featurization_parses_json_fences() -> None:
     assert analysis.get("suggested_reaction_type") == "C_N_Coupling"
     assert analysis.get("confidence") == 0.82
     assert analysis.get("requires_human_review") is False
+
+
+def test_review_reaction_featurization_parses_extended_optional_fields() -> None:
+    options = LLMReactionFeaturizationOptions(
+        enabled=True,
+        provider="openai",
+        model="gpt-test",
+    )
+    fake = _FakeLLMClient(
+        """{
+  "suggested_reaction_type":"SNAr_CN",
+  "confidence":0.73,
+  "rationale":"C-Cl displacement with C-N formation",
+  "requires_human_review":true,
+  "uncertainty_flags":["taxonomy_boundary_case"],
+  "mechanistic_family":"SNAr",
+  "mechanistic_rationale":"Electron-poor heteroaryl C-Cl plus N nucleophile signal",
+  "tautomer_or_representation_issue":true,
+  "taxonomy_gap_suspected":true,
+  "taxonomy_gap_note":"Hydrazine-like motif in product set not explicit in slot constraints",
+  "deterministic_checks_used":["reaction_key","event_kinds","stoichiometry_delta"]
+}"""
+    )
+
+    out = review_reaction_featurization(
+        {"reaction_smiles": "CCO.CN>>CCN"},
+        options,
+        client=fake,  # type: ignore[arg-type]
+    )
+
+    assert out["status"] == "ok"
+    analysis = out.get("analysis") or {}
+    assert analysis.get("mechanistic_family") == "SNAr"
+    assert analysis.get("tautomer_or_representation_issue") is True
+    assert analysis.get("taxonomy_gap_suspected") is True
+    assert analysis.get("deterministic_checks_used") == [
+        "reaction_key",
+        "event_kinds",
+        "stoichiometry_delta",
+    ]

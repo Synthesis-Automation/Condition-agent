@@ -40,6 +40,11 @@ def test_llm_assist_applies_taxonomy_validated_override(
                 "rationale": "motif pattern supports amide formation",
                 "requires_human_review": False,
                 "uncertainty_flags": [],
+                "mechanistic_family": "acyl_transfer",
+                "mechanistic_rationale": "C-N formation adjacent to carbonyl",
+                "tautomer_or_representation_issue": False,
+                "taxonomy_gap_suspected": False,
+                "deterministic_checks_used": ["reaction_key", "event_kinds"],
             },
         },
     )
@@ -58,6 +63,8 @@ def test_llm_assist_applies_taxonomy_validated_override(
     meta = result.get("meta", {}).get("llm_assist", {})
     assert meta.get("decision") == "applied"
     assert meta.get("status") == "ok"
+    assert meta.get("mechanistic_family") == "acyl_transfer"
+    assert meta.get("deterministic_checks_used") == ["reaction_key", "event_kinds"]
 
 
 def test_llm_assist_rejects_override_on_validation_mismatch(
@@ -129,3 +136,42 @@ def test_llm_assist_skips_when_not_uncertain(
     assert meta.get("decision") == "deterministic_kept"
     assert meta.get("used") is False
     assert called["count"] == 0
+
+
+def test_llm_assist_review_context_includes_richer_deterministic_signals(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict = {}
+
+    monkeypatch.setattr(
+        reaction_assist,
+        "is_reaction_uncertain_for_llm_assist",
+        lambda **_: (True, ["low_confidence"]),
+    )
+
+    def _capture_context(context, llm_assist):
+        captured.update(context)
+        return {
+            "status": "ok",
+            "provider": llm_assist.get("provider"),
+            "model": llm_assist.get("model"),
+            "analysis": {
+                "suggested_reaction_type": "Unknown",
+                "confidence": 0.2,
+                "rationale": "no override",
+                "requires_human_review": True,
+                "uncertainty_flags": ["taxonomy_boundary_case"],
+            },
+        }
+
+    monkeypatch.setattr(reaction_assist, "_run_llm_reaction_assist", _capture_context)
+
+    _ = unified_featurizer.featurize_reaction(
+        "Clc1ncc(-c2ccccc2)cn1>>NN=c1ncc(-c2ccccc2)c[nH]1",
+        options=_llm_assist_options(),
+    )
+
+    assert isinstance(captured.get("stoichiometry_delta"), dict)
+    assert "element_delta" in captured.get("stoichiometry_delta", {})
+    assert isinstance(captured.get("event_kinds"), list)
+    assert "reaction_key_quality" in captured

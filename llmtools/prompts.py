@@ -440,8 +440,15 @@ CRK final key: {reaction_key}
 Reacted motifs: {reacted_motifs}
 Formed motifs: {formed_motifs}
 Spectator motifs: {spectator_motifs}
+Reacted/formed motif overlap: {reacted_formed_overlap}
 Product broad tags: {product_broad_tags}
 Product reactive motifs: {product_motifs_reactive}
+Reaction event kinds: {event_kinds}
+Reaction-key quality: {reaction_key_quality}
+Stoichiometry delta: {stoichiometry_delta}
+Reacted motif counts: {reacted_motif_counts}
+Formed motif counts: {formed_motif_counts}
+Spectator motif counts: {spectator_motif_counts}
 
 Allowed taxonomy reaction types:
 {reaction_type_candidates}
@@ -451,6 +458,8 @@ Rules:
 2. Prefer deterministic result when evidence is weak.
 3. Do not invent new reaction labels.
 4. Keep rationale short and chemistry-based.
+5. If evidence suggests representation effects (tautomer/proton-shift), mark it explicitly.
+6. If chemistry appears valid but taxonomy coverage is missing, set taxonomy_gap_suspected=true.
 
 Respond with ONLY valid JSON:
 {{
@@ -458,7 +467,13 @@ Respond with ONLY valid JSON:
   "confidence": 0.0,
   "rationale": "short explanation",
   "requires_human_review": false,
-  "uncertainty_flags": ["optional_flag"]
+  "uncertainty_flags": ["optional_flag"],
+  "mechanistic_family": "short_family_label",
+  "mechanistic_rationale": "short deterministic explanation",
+  "tautomer_or_representation_issue": false,
+  "taxonomy_gap_suspected": false,
+  "taxonomy_gap_note": "",
+  "deterministic_checks_used": ["reaction_key", "motif_delta", "event_kinds"]
 }}
 """,
     reaction_smiles="",
@@ -471,8 +486,15 @@ Respond with ONLY valid JSON:
     reacted_motifs="[]",
     formed_motifs="[]",
     spectator_motifs="[]",
+    reacted_formed_overlap="[]",
     product_broad_tags="[]",
     product_motifs_reactive="[]",
+    event_kinds="[]",
+    reaction_key_quality="{}",
+    stoichiometry_delta="{}",
+    reacted_motif_counts="{}",
+    formed_motif_counts="{}",
+    spectator_motif_counts="{}",
     reaction_type_candidates="Unknown",
 )
 
