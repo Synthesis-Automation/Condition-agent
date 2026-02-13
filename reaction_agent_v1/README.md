@@ -10,8 +10,25 @@ This folder is the first implementation of a general-purpose reaction analysis a
 ## Current toolchain
 
 1. `analyze_reaction`: wraps `poc_gpt52_reaction_v2` deterministic taxonomy analyzer
-2. `validate_decision`: agent-level confidence/candidate gate
-3. `coverage_advice`: taxonomy/tool coverage expansion suggestions for unknown cases
+2. `fallback_candidate_retrieval`: placeholder contract (not implemented yet)
+3. `validate_decision`: agent-level confidence/candidate gate
+4. `confidence_calibrator`: placeholder contract (not implemented yet)
+5. `llm_rerank_constrained`: placeholder contract (not implemented yet)
+6. `precedent_lookup`: placeholder contract (not implemented yet)
+7. `coverage_advice`: taxonomy/tool coverage expansion suggestions for unknown cases
+
+## Workflow (foundation mode)
+
+Deterministic sequence in current foundation implementation:
+
+1. `analyze`
+2. `fallback_candidates` (only when deterministic candidates are empty)
+3. `validate`
+4. `confidence_calibration` (placeholder)
+5. `llm_rerank` (placeholder)
+6. `precedent_lookup` (placeholder)
+7. `coverage` (only when final decision is `unknown`)
+8. `finalize`
 
 ## Run
 

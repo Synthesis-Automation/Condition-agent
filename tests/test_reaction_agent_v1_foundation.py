@@ -12,7 +12,17 @@ def test_foundation_gateway_classifies_known_reaction() -> None:
     assert result.final_decision["reaction_type"] == "Amide_formation"
     assert float(result.final_decision["confidence"]) >= 0.9
     actions = [row.action for row in result.trace]
-    assert actions[:3] == ["analyze", "validate", "finalize"]
+    assert actions[:6] == [
+        "analyze",
+        "validate",
+        "confidence_calibration",
+        "llm_rerank",
+        "precedent_lookup",
+        "finalize",
+    ]
+    assert result.tool_artifacts["confidence_calibration"]["status"] == "not_implemented"
+    assert result.tool_artifacts["llm_rerank"]["status"] == "not_implemented"
+    assert result.tool_artifacts["precedent_lookup"]["status"] == "not_implemented"
     assert result.coverage_suggestions == []
 
 
@@ -24,7 +34,12 @@ def test_foundation_gateway_unknown_triggers_coverage_advice() -> None:
     assert result.status == "completed"
     assert result.final_decision["reaction_type"] == "unknown"
     actions = [row.action for row in result.trace]
+    assert "fallback_candidates" in actions
+    assert "confidence_calibration" in actions
+    assert "llm_rerank" in actions
+    assert "precedent_lookup" in actions
     assert "coverage" in actions
+    assert result.tool_artifacts["fallback_candidates"]["status"] == "not_implemented"
     assert len(result.coverage_suggestions) >= 1
     suggestion_ids = {row["suggestion_id"] for row in result.coverage_suggestions}
     assert "tool-candidate-retrieval-gap" in suggestion_ids

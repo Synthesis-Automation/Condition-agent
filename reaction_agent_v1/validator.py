@@ -13,11 +13,11 @@ class AgentDecisionValidator:
     def __init__(self, *, min_confidence: float = 0.5) -> None:
         self.min_confidence = min_confidence
 
-    def validate_analysis(self, analysis: Dict[str, Any]) -> ValidationReport:
-        """Validate the analysis and return a final decision."""
+    def validate_evidence(self, evidence: Dict[str, Any]) -> ValidationReport:
+        """Validate canonical evidence and return a final decision."""
         issues: List[str] = []
-        decision = dict(analysis.get("decision") or {})
-        candidate_rows = analysis.get("taxonomy_candidates") or []
+        decision = dict(evidence.get("provisional_decision") or evidence.get("decision") or {})
+        candidate_rows = evidence.get("taxonomy_candidates") or []
         candidate_ids = {
             str(row.get("reaction_type"))
             for row in candidate_rows
@@ -66,3 +66,11 @@ class AgentDecisionValidator:
                 "rationale": decision.get("rationale", "Validated deterministic decision."),
             },
         )
+
+    def validate_analysis(self, analysis: Dict[str, Any]) -> ValidationReport:
+        """Backward-compatible wrapper for analysis-shaped payloads."""
+        evidence_like = {
+            "provisional_decision": dict(analysis.get("decision") or {}),
+            "taxonomy_candidates": list(analysis.get("taxonomy_candidates") or []),
+        }
+        return self.validate_evidence(evidence_like)

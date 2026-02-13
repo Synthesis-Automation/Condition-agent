@@ -85,8 +85,10 @@ class AgentRunResult:
     reaction_smiles: str
     status: str
     final_decision: Dict[str, Any]
+    evidence: Dict[str, Any]
     analysis: Dict[str, Any]
     validation: Dict[str, Any]
+    tool_artifacts: Dict[str, Any]
     coverage_suggestions: List[Dict[str, Any]]
     trace: List[TraceEvent]
 

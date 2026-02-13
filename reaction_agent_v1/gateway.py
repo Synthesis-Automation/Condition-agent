@@ -92,8 +92,28 @@ class ReactionAgentGateway:
     def _tool_kwargs(self, action: str, state: SessionState) -> Dict[str, Any]:
         if action == "analyze":
             return {"reaction_smiles": state.reaction_smiles}
+        if action == "fallback_candidates":
+            return {
+                "reaction_smiles": state.reaction_smiles,
+                "analysis": state.context.get("analysis", {}),
+            }
         if action == "validate":
             return {"analysis": state.context.get("analysis", {})}
+        if action == "confidence_calibration":
+            return {
+                "analysis": state.context.get("analysis", {}),
+                "validation": state.context.get("validation", {}),
+            }
+        if action == "llm_rerank":
+            return {
+                "analysis": state.context.get("analysis", {}),
+                "validation": state.context.get("validation", {}),
+            }
+        if action == "precedent_lookup":
+            return {
+                "reaction_smiles": state.reaction_smiles,
+                "analysis": state.context.get("analysis", {}),
+            }
         if action == "coverage":
             return {
                 "reaction_smiles": state.reaction_smiles,
@@ -102,14 +122,31 @@ class ReactionAgentGateway:
         return {}
 
     def _persist_tool_payload(self, *, state: SessionState, action: str, payload: Dict[str, Any]) -> None:
+        artifacts = state.context.setdefault("tool_artifacts", {})
         if action == "analyze":
             state.context["analysis"] = payload
+            return
+        if action == "fallback_candidates":
+            state.context["fallback_candidates"] = payload
+            artifacts["fallback_candidates"] = payload
             return
         if action == "validate":
             state.context["validation"] = payload
             validation_final = payload.get("final_decision") or {}
             if validation_final:
                 state.context["final_decision"] = validation_final
+            return
+        if action == "confidence_calibration":
+            state.context["confidence_calibration"] = payload
+            artifacts["confidence_calibration"] = payload
+            return
+        if action == "llm_rerank":
+            state.context["llm_rerank"] = payload
+            artifacts["llm_rerank"] = payload
+            return
+        if action == "precedent_lookup":
+            state.context["precedent_lookup"] = payload
+            artifacts["precedent_lookup"] = payload
             return
         if action == "coverage":
             state.context["coverage_suggestions"] = payload.get("suggestions", [])
@@ -133,6 +170,7 @@ class ReactionAgentGateway:
             final_decision=dict(state.context.get("final_decision") or {}),
             analysis=dict(state.context.get("analysis") or {}),
             validation=dict(state.context.get("validation") or {}),
+            tool_artifacts=dict(state.context.get("tool_artifacts") or {}),
             coverage_suggestions=list(state.context.get("coverage_suggestions") or []),
             trace=[event for event in state.trace],
         )

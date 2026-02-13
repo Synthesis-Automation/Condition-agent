@@ -29,6 +29,7 @@ def _print_human(payload: Dict[str, Any]) -> None:
     )
     print(f"Status: {payload['status']}")
     print(f"Coverage suggestions: {len(payload['coverage_suggestions'])}")
+    print(f"Tool artifacts: {sorted(payload.get('tool_artifacts', {}).keys())}")
     print("Trace:")
     for row in payload["trace"]:
         print(
