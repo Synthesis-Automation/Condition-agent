@@ -49,6 +49,7 @@ openai>=1.0.0                   # OpenAI API client (also supports Aliyun/DeepSe
 # ----------------------------------------------------------------------------
 # ML Models for Chemistry (Optional)
 # ----------------------------------------------------------------------------
+setuptools<81                  # rxnmapper 0.4.2 still imports pkg_resources (removed in setuptools>=81)
 rxn-insight                     # ML-based reaction type classification
 rxnmapper                       # Automatic atom mapping for reactions (NEW)
                                 # Enables bond breaking/formation analysis

@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 import json
 import re
+import warnings
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from rdkit import Chem
@@ -13,6 +14,14 @@ from rdkit.Chem.rdMolDescriptors import CalcMolFormula
 
 from chemtools.detection import detect_reaction_type
 from chemtools.taxonomy.loader import load_reaction_types_dict
+
+# rxnmapper 0.4.2 imports pkg_resources and emits a deprecation UserWarning.
+# Keep output clean for agent/CLI runs until upstream removes pkg_resources usage.
+warnings.filterwarnings(
+    "ignore",
+    message=r"pkg_resources is deprecated as an API.*",
+    category=UserWarning,
+)
 
 
 class GeneralReactionAnalysisError(ValueError):
