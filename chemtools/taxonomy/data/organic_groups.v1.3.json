@@ -402,6 +402,20 @@
       "description": "Tertiary amine N core, no N-H (-NR2)."
     },
     {
+      "id": "-NHOH",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[N;H1;!$(N-[C,S,P]=O):2][O;H1]",
+      "description": "Hydroxylamine substituent (-NHOH); attach via nitrogen."
+    },
+    {
+      "id": "-ONH2",
+      "kind": "substituent",
+      "priority": 1,
+      "smarts": "[O;H0;!$(O-[C,S,P]=O):2][N;H2]",
+      "description": "O-linked hydroxylamine substituent (-ONH2); attach via oxygen."
+    },
+    {
       "id": "-Hydrazine",
       "kind": "substituent",
       "priority": 1,

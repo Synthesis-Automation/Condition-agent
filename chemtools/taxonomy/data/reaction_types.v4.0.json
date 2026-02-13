@@ -1241,27 +1241,25 @@
         "substrate": [
           "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
-          "Alkenyl-H",
-          "Alkenyl-Alkenyl",
-          "Alkenyl_terminal-Alkenyl_terminal"
-        ],
-        "reagent": [
-          "H2"
-        ]
+          "Alkyl-Alkenyl",
+          "RCH2-Alkenyl",
+          "R2CH-Alkenyl",
+          "R3C-Alkenyl"        ]
       },
       "products": {
         "product": [
           "Ar-Alkyl",
-          "Alkyl-H"
+          "Alkyl-Alkyl"
         ]
       },
       "examples": [
-        "C=C.[H][H]>>CC"
+        "C=C.[H][H]>>CC",
+        "C=CCCCCCC>>CCCCCCCC"
       ],
       "aliases": [
         "alkene_hydrogenation"
       ],
-      "description": "Catalytic hydrogenation of alkene motifs to saturated products."
+      "description": "Catalytic hydrogenation of alkene motifs to saturated products; typing allows reaction SMILES where H2 is omitted but still requires saturated product evidence."
     },
     {
       "id": "Click_cuaac",
@@ -1503,9 +1501,13 @@
         "substrate": [
           "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
-          "Alkenyl-H",
+          "Alkyl-Alkenyl",
+          "RCH2-Alkenyl",
+          "R2CH-Alkenyl",
+          "R3C-Alkenyl",
           "Alkenyl-Alkenyl",
-          "Alkenyl_terminal-Alkenyl_terminal"
+          "Alkenyl_terminal-Alkenyl_terminal",
+          "Alkenyl-H"
         ]
       },
       "products": {
@@ -1526,9 +1528,13 @@
         "substrate": [
           "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
-          "Alkenyl-H",
+          "Alkyl-Alkenyl",
+          "RCH2-Alkenyl",
+          "R2CH-Alkenyl",
+          "R3C-Alkenyl",
           "Alkenyl-Alkenyl",
-          "Alkenyl_terminal-Alkenyl_terminal"
+          "Alkenyl_terminal-Alkenyl_terminal",
+          "Alkenyl-H"
         ]
       },
       "products": {
@@ -1750,6 +1756,8 @@
       "reactants": {
         "substrate": [
           "Ar-Alkenyl_terminal",
+          "Alkyl-Alkenyl",
+          "RCH2-Alkenyl",
           "Alkenyl-H",
           "Alkenyl_terminal-Alkenyl_terminal"
         ]
@@ -1774,6 +1782,10 @@
       "reactants": {
         "substrate": [
           "Ar-Alkenyl",
+          "Alkyl-Alkenyl",
+          "RCH2-Alkenyl",
+          "R2CH-Alkenyl",
+          "R3C-Alkenyl",
           "Alkenyl-Alkenyl"
         ]
       },
@@ -1853,9 +1865,13 @@
         "substrate": [
           "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
-          "Alkenyl-H",
+          "Alkyl-Alkenyl",
+          "RCH2-Alkenyl",
+          "R2CH-Alkenyl",
+          "R3C-Alkenyl",
           "Alkenyl-Alkenyl",
-          "Alkenyl_terminal-Alkenyl_terminal"
+          "Alkenyl_terminal-Alkenyl_terminal",
+          "Alkenyl-H"
         ]
       },
       "products": {

@@ -137,6 +137,30 @@
     },
     {
       "template": "single_bond",
+      "A": "Alkyl",
+      "B": "Alkenyl",
+      "description": "Alkyl-substituted alkene motif (Alkyl-Alkenyl)."
+    },
+    {
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "Alkenyl",
+      "description": "Primary alkyl-substituted alkene motif (RCH2-Alkenyl)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "Alkenyl",
+      "description": "Secondary alkyl-substituted alkene motif (R2CH-Alkenyl)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "Alkenyl",
+      "description": "Tertiary alkyl-substituted alkene motif (R3C-Alkenyl)."
+    },
+    {
+      "template": "single_bond",
       "A": "Ar",
       "B": "Alkenyl_terminal",
       "description": "Aryl-terminal alkenyl bond (e.g., styrene with terminal vinyl)."
