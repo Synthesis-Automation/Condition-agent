@@ -61,8 +61,6 @@ class ReactionEvidence:
             }
             self.taxonomy_candidates = list(analysis.get("taxonomy_candidates") or [])
             self.provisional_decision = dict(analysis.get("decision") or {})
-            if analysis.get("validation"):
-                self.validation = dict(analysis.get("validation") or {})
         if payload.get("diff"):
             self.diff.update(dict(payload.get("diff") or {}))
         if payload.get("detection"):
@@ -85,6 +83,43 @@ class ReactionEvidence:
         for key, value in self.detection.items():
             result[key] = value
         return result
+
+    def merge_fallback_candidates(self, candidates: List[Dict[str, Any]]) -> None:
+        """Merge fallback candidates into taxonomy candidate list."""
+        if not candidates:
+            return
+
+        merged: Dict[str, Dict[str, Any]] = {}
+        for row in self.taxonomy_candidates:
+            rid = str(row.get("reaction_type") or "").strip()
+            if rid:
+                merged[rid] = dict(row)
+        for row in candidates:
+            rid = str(row.get("reaction_type") or "").strip()
+            if not rid:
+                continue
+            score = float(row.get("deterministic_score") or 0.0)
+            existing = merged.get(rid)
+            if existing is None or score > float(existing.get("deterministic_score") or 0.0):
+                merged[rid] = dict(row)
+
+        self.taxonomy_candidates = sorted(
+            merged.values(),
+            key=lambda item: (
+                -float(item.get("deterministic_score") or 0.0),
+                str(item.get("reaction_type") or ""),
+            ),
+        )
+
+        current_rt = str((self.provisional_decision or {}).get("reaction_type") or "unknown")
+        if current_rt == "unknown" and self.taxonomy_candidates:
+            top = self.taxonomy_candidates[0]
+            self.provisional_decision = {
+                "reaction_type": top.get("reaction_type", "unknown"),
+                "confidence": float(top.get("deterministic_score") or 0.0),
+                "source": "fallback_candidate_retrieval",
+                "rationale": "Fallback candidate retrieval recovered taxonomy candidates from reaction diff evidence.",
+            }
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""

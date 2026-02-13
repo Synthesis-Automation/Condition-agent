@@ -21,6 +21,8 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def _print_human(payload: Dict[str, Any]) -> None:
     final_decision = payload["final_decision"]
+    evidence = payload.get("evidence", {})
+    diff_ready = bool((evidence.get("diff") or {}).get("principal_pair"))
     print(f"Session: {payload['session_id']}")
     print(f"Reaction: {payload['reaction_smiles']}")
     print(
@@ -28,6 +30,7 @@ def _print_human(payload: Dict[str, Any]) -> None:
         f"(confidence={float(final_decision.get('confidence', 0.0)):.2f})"
     )
     print(f"Status: {payload['status']}")
+    print(f"Evidence diff ready: {diff_ready}")
     print(f"Coverage suggestions: {len(payload['coverage_suggestions'])}")
     print(f"Tool artifacts: {sorted(payload.get('tool_artifacts', {}).keys())}")
     print("Trace:")

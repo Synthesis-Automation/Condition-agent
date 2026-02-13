@@ -7,6 +7,9 @@ import time
 from typing import Any, Callable, Dict, List
 
 from poc_gpt52_reaction_v2 import analyze_reaction_general
+from chemtools.taxonomy.loader import load_reaction_types_dict
+from chemtools.util.rdkit_helpers import parse_smiles
+from chemtools.util.smarts_cache import compile_smarts
 
 from .contracts import ToolExecutionResult
 from .coverage_advisor import CoverageAdvisor
@@ -74,6 +77,168 @@ def _placeholder_payload(
     }
 
 
+def _split_reactants(reaction_smiles: str) -> List[str]:
+    left = str(reaction_smiles or "").split(">>", 1)[0]
+    return [token.strip() for token in left.split(".") if token.strip()]
+
+
+def _count_aromatic_ring_n(smiles: str) -> int:
+    mol = parse_smiles(smiles)
+    if mol is None:
+        return 0
+    return sum(
+        1
+        for atom in mol.GetAtoms()
+        if atom.GetSymbol() == "N" and atom.GetIsAromatic() and atom.IsInRing()
+    )
+
+
+def _has_any_pattern(smiles_list: List[str], smarts: str) -> bool:
+    pattern = compile_smarts(smarts, validate=False)
+    if not pattern:
+        return False
+    for smiles in smiles_list:
+        mol = parse_smiles(smiles)
+        if mol and mol.HasSubstructMatch(pattern):
+            return True
+    return False
+
+
+def _fallback_rank_candidates(
+    *,
+    reaction_smiles: str,
+    evidence: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    taxonomy = load_reaction_types_dict()
+    principal_pair = (evidence.get("diff") or {}).get("principal_pair") or {}
+    principal_reactant = str(principal_pair.get("reactant_smiles") or "")
+    reacted = {str(m) for m in ((evidence.get("detection") or {}).get("reacted_motifs") or [])}
+    formed = {str(m) for m in ((evidence.get("detection") or {}).get("formed_motifs") or [])}
+    reaction_key = str((evidence.get("detection") or {}).get("reaction_key") or "")
+    reaction_key_lower = reaction_key.lower()
+    reacted_upper = {item.upper() for item in reacted}
+
+    reactants = _split_reactants(reaction_smiles)
+    has_hydrazine_like = _has_any_pattern(reactants, "[N]-[N]") or _has_any_pattern(reactants, "[N]=[N]")
+    has_boron = _has_any_pattern(reactants, "[B]")
+    has_grignard = _has_any_pattern(reactants, "[Mg]")
+    has_amine = _has_any_pattern(reactants, "[NX3;H1,H2]")
+    aromatic_ring_n = _count_aromatic_ring_n(principal_reactant)
+
+    aryl_halide_reacted = bool({"AR-CL", "AR-BR", "AR-I"} & reacted_upper)
+    c_n_event = ("lgdisp+c-n" in reaction_key_lower) or ("bond_formed: c(ar)-n" in reaction_key_lower)
+    c_c_event = ("lgdisp+c-c" in reaction_key_lower) or ("bond_formed: c(ar)-c" in reaction_key_lower)
+
+    scored: Dict[str, Dict[str, Any]] = {}
+
+    def add_candidate(reaction_type: str, base_score: float, reason: str, signals: Dict[str, Any]) -> None:
+        if reaction_type not in taxonomy:
+            return
+        score = max(0.0, min(0.99, base_score))
+        existing = scored.get(reaction_type)
+        if existing is None or score > float(existing["score"]):
+            meta = taxonomy.get(reaction_type) or {}
+            scored[reaction_type] = {
+                "reaction_type": reaction_type,
+                "score": round(score, 2),
+                "taxonomy_name": str(meta.get("name") or reaction_type),
+                "taxonomy_category": str(meta.get("category") or "unknown"),
+                "reason": reason,
+                "signals": signals,
+            }
+
+    if aryl_halide_reacted and c_n_event:
+        score = 0.58
+        if has_amine:
+            score += 0.08
+        add_candidate(
+            "C_N_Coupling",
+            score,
+            "Aryl-halide leaving-group displacement with C-N bond formation signal.",
+            {
+                "aryl_halide_reacted": aryl_halide_reacted,
+                "c_n_event": c_n_event,
+                "has_amine": has_amine,
+            },
+        )
+
+        snar_score = 0.62
+        if aromatic_ring_n >= 2:
+            snar_score += 0.08
+        if has_hydrazine_like:
+            snar_score += 0.1
+        if "pyrimidine" in reaction_key_lower:
+            snar_score += 0.08
+        add_candidate(
+            "SNAr_CN",
+            snar_score,
+            "Electron-poor aromatic substitution-like signature with C-N displacement.",
+            {
+                "aryl_halide_reacted": aryl_halide_reacted,
+                "c_n_event": c_n_event,
+                "principal_aromatic_ring_n": aromatic_ring_n,
+                "has_hydrazine_like": has_hydrazine_like,
+            },
+        )
+
+    if aryl_halide_reacted and c_c_event:
+        if has_boron:
+            add_candidate(
+                "Suzuki_miyaura",
+                0.76,
+                "Aryl-halide + boron reagent with C-C formation signature.",
+                {
+                    "aryl_halide_reacted": aryl_halide_reacted,
+                    "c_c_event": c_c_event,
+                    "has_boron": has_boron,
+                },
+            )
+        if has_grignard:
+            add_candidate(
+                "Kumada",
+                0.74,
+                "Aryl-halide + organomagnesium reagent with C-C formation signature.",
+                {
+                    "aryl_halide_reacted": aryl_halide_reacted,
+                    "c_c_event": c_c_event,
+                    "has_grignard": has_grignard,
+                },
+            )
+
+    if not aryl_halide_reacted and has_boron and has_amine and c_n_event:
+        add_candidate(
+            "Chan_Lam_C_N_Coupling",
+            0.62,
+            "Boron + amine C-N coupling signature without aryl-halide leaving group.",
+            {
+                "has_boron": has_boron,
+                "has_amine": has_amine,
+                "c_n_event": c_n_event,
+            },
+        )
+
+    ranked = sorted(scored.values(), key=lambda item: (-item["score"], item["reaction_type"]))
+    candidates: List[Dict[str, Any]] = []
+    for row in ranked:
+        candidates.append(
+            {
+                "reaction_type": row["reaction_type"],
+                "deterministic_score": row["score"],
+                "detector_confidence": 0.0,
+                "taxonomy_name": row["taxonomy_name"],
+                "taxonomy_category": row["taxonomy_category"],
+                "evidence": {
+                    "fallback_rule": row["reason"],
+                    "signals": row["signals"],
+                    "reacted_motifs": sorted(reacted),
+                    "formed_motifs": sorted(formed),
+                    "reaction_key": reaction_key,
+                },
+            }
+        )
+    return candidates
+
+
 def build_default_registry(*, min_confidence: float = 0.5) -> ToolRegistry:
     """Build default tool registry with deterministic chemistry tools."""
     registry = ToolRegistry()
@@ -128,22 +293,20 @@ def build_default_registry(*, min_confidence: float = 0.5) -> ToolRegistry:
         return {"suggestions": cards}
 
     def fallback_candidate_retrieval_tool(reaction_smiles: str, evidence: Dict[str, Any]) -> Dict[str, Any]:
-        return _placeholder_payload(
-            tool_name="fallback_candidate_retrieval",
-            summary="Fallback candidate retrieval based on bond-change and motif deltas.",
-            expected_inputs=[
-                "reaction_smiles",
-                "evidence.detection.reaction_key",
-                "evidence.diff.core_formula_delta",
-                "evidence.diff.principal_pair",
-            ],
-            expected_outputs=[
-                "candidate_reaction_types",
-                "candidate_scores",
-                "retrieval_evidence",
-            ],
-            next_action="Merge candidates into evidence.taxonomy_candidates before validate_decision.",
-        )
+        candidates = _fallback_rank_candidates(reaction_smiles=reaction_smiles, evidence=evidence)
+        return {
+            "status": "ok",
+            "tool": "fallback_candidate_retrieval",
+            "summary": "Recovered fallback candidates from reaction diff evidence.",
+            "candidate_reaction_types": [row["reaction_type"] for row in candidates],
+            "candidate_scores": {row["reaction_type"]: row["deterministic_score"] for row in candidates},
+            "retrieval_evidence": {
+                "reacted_motifs": list((evidence.get("detection") or {}).get("reacted_motifs") or []),
+                "formed_motifs": list((evidence.get("detection") or {}).get("formed_motifs") or []),
+                "reaction_key": str((evidence.get("detection") or {}).get("reaction_key") or ""),
+            },
+            "recovered_candidates": candidates,
+        }
 
     def confidence_calibrator_tool(evidence: Dict[str, Any], validation: Dict[str, Any]) -> Dict[str, Any]:
         return _placeholder_payload(

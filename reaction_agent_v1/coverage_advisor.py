@@ -93,17 +93,18 @@ class CoverageAdvisor:
         if not candidates:
             suggestions.append(
                 CoverageSuggestionCard(
-                    suggestion_id="tool-candidate-retrieval-gap",
+                    suggestion_id="tool-fallback-rule-coverage-gap",
                     kind="tool",
                     priority=85,
-                    title="Add secondary candidate retrieval path for zero-hit taxonomy detections",
+                    title="Expand fallback retrieval rule coverage for zero-hit detections",
                     rationale=(
-                        "Detector returned zero taxonomy candidates; add fallback retrieval from "
-                        "bond-change signatures and principal-pair formula deltas."
+                        "Detector and current fallback retrieval still returned zero taxonomy candidates; "
+                        "expand fallback rules and retrieval features."
                     ),
                     proposed_changes=[
-                        "Implement fallback candidate retrieval tool using bond-change and delta signatures.",
-                        "Feed fallback candidates into validator-gated ranking before final unknown.",
+                        "Add broader rule templates using reacted/formed motif combinations and reaction_key events.",
+                        "Incorporate bond-change signatures as additional retrieval features.",
+                        "Track fallback miss clusters and promote top clusters into taxonomy/tool updates.",
                     ],
                     evidence={
                         "reaction_smiles": reaction_smiles,

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from .contracts import AgentRunResult, SessionState
+from .evidence import ReactionEvidence
 from .memory import SessionMemory
 from .planner import DynamicPlanner
 from .tool_registry import ToolRegistry, build_default_registry
@@ -34,6 +35,7 @@ class ReactionAgentGateway:
     ) -> AgentRunResult:
         """Run one analysis loop for a reaction."""
         state = self.memory.create_session(reaction_smiles=reaction_smiles, session_id=session_id)
+        state.context["evidence"] = ReactionEvidence(reaction_smiles=reaction_smiles).to_dict()
         self._execute_loop(state=state, max_steps=max_steps)
         return self._build_result(state)
 
@@ -90,91 +92,114 @@ class ReactionAgentGateway:
             self._finalize_state(state)
 
     def _tool_kwargs(self, action: str, state: SessionState) -> Dict[str, Any]:
-        if action == "analyze":
+        evidence = self._load_evidence(state)
+        if action == "reaction_diff":
             return {"reaction_smiles": state.reaction_smiles}
         if action == "fallback_candidates":
             return {
                 "reaction_smiles": state.reaction_smiles,
-                "analysis": state.context.get("analysis", {}),
+                "evidence": evidence.to_dict(),
             }
         if action == "validate":
-            return {"analysis": state.context.get("analysis", {})}
+            return {"evidence": evidence.to_dict()}
         if action == "confidence_calibration":
             return {
-                "analysis": state.context.get("analysis", {}),
-                "validation": state.context.get("validation", {}),
+                "evidence": evidence.to_dict(),
+                "validation": dict(evidence.validation),
             }
         if action == "llm_rerank":
             return {
-                "analysis": state.context.get("analysis", {}),
-                "validation": state.context.get("validation", {}),
+                "evidence": evidence.to_dict(),
+                "validation": dict(evidence.validation),
             }
         if action == "precedent_lookup":
             return {
                 "reaction_smiles": state.reaction_smiles,
-                "analysis": state.context.get("analysis", {}),
+                "evidence": evidence.to_dict(),
             }
         if action == "coverage":
             return {
                 "reaction_smiles": state.reaction_smiles,
-                "analysis": state.context.get("analysis", {}),
+                "evidence": evidence.to_dict(),
             }
         return {}
 
     def _persist_tool_payload(self, *, state: SessionState, action: str, payload: Dict[str, Any]) -> None:
-        artifacts = state.context.setdefault("tool_artifacts", {})
-        if action == "analyze":
-            state.context["analysis"] = payload
+        evidence = self._load_evidence(state)
+        if action == "reaction_diff":
+            evidence.merge_diff_payload(payload)
+            self._save_evidence(state, evidence)
             return
         if action == "fallback_candidates":
-            state.context["fallback_candidates"] = payload
-            artifacts["fallback_candidates"] = payload
+            evidence.tool_artifacts["fallback_candidates"] = payload
+            recovered = list(payload.get("recovered_candidates") or [])
+            if recovered:
+                evidence.merge_fallback_candidates(recovered)
+            self._save_evidence(state, evidence)
             return
         if action == "validate":
-            state.context["validation"] = payload
+            evidence.validation = dict(payload)
             validation_final = payload.get("final_decision") or {}
             if validation_final:
-                state.context["final_decision"] = validation_final
+                evidence.final_decision = dict(validation_final)
+            self._save_evidence(state, evidence)
             return
         if action == "confidence_calibration":
-            state.context["confidence_calibration"] = payload
-            artifacts["confidence_calibration"] = payload
+            evidence.tool_artifacts["confidence_calibration"] = payload
+            self._save_evidence(state, evidence)
             return
         if action == "llm_rerank":
-            state.context["llm_rerank"] = payload
-            artifacts["llm_rerank"] = payload
+            evidence.tool_artifacts["llm_rerank"] = payload
+            self._save_evidence(state, evidence)
             return
         if action == "precedent_lookup":
-            state.context["precedent_lookup"] = payload
-            artifacts["precedent_lookup"] = payload
+            evidence.tool_artifacts["precedent_lookup"] = payload
+            self._save_evidence(state, evidence)
             return
         if action == "coverage":
-            state.context["coverage_suggestions"] = payload.get("suggestions", [])
+            evidence.coverage_suggestions = list(payload.get("suggestions") or [])
+            self._save_evidence(state, evidence)
 
     def _finalize_state(self, state: SessionState) -> None:
-        if "final_decision" not in state.context:
-            validation = state.context.get("validation") or {}
-            validation_final = validation.get("final_decision") or {}
+        evidence = self._load_evidence(state)
+        if not evidence.final_decision:
+            validation_final = (evidence.validation or {}).get("final_decision") or {}
             if validation_final:
-                state.context["final_decision"] = validation_final
+                evidence.final_decision = dict(validation_final)
             else:
-                analysis = state.context.get("analysis") or {}
-                state.context["final_decision"] = analysis.get("decision", {"reaction_type": "unknown", "confidence": 0.0})
+                evidence.final_decision = dict(
+                    evidence.provisional_decision
+                    or {"reaction_type": "unknown", "confidence": 0.0, "source": "finalize_fallback"}
+                )
+        self._save_evidence(state, evidence)
         state.status = "completed"
 
     def _build_result(self, state: SessionState) -> AgentRunResult:
+        evidence = self._load_evidence(state)
         return AgentRunResult(
             session_id=state.session_id,
             reaction_smiles=state.reaction_smiles,
             status=state.status,
-            final_decision=dict(state.context.get("final_decision") or {}),
-            analysis=dict(state.context.get("analysis") or {}),
-            validation=dict(state.context.get("validation") or {}),
-            tool_artifacts=dict(state.context.get("tool_artifacts") or {}),
-            coverage_suggestions=list(state.context.get("coverage_suggestions") or []),
+            final_decision=dict(evidence.final_decision or evidence.provisional_decision),
+            evidence=evidence.to_dict(),
+            analysis=evidence.to_analysis_view(),
+            validation=dict(evidence.validation),
+            tool_artifacts=dict(evidence.tool_artifacts),
+            coverage_suggestions=list(evidence.coverage_suggestions),
             trace=[event for event in state.trace],
         )
 
     def export_session(self, session_id: str) -> Dict[str, Any]:
         """Export session state as dictionary."""
         return self.memory.export_session(session_id)
+
+    def _load_evidence(self, state: SessionState) -> ReactionEvidence:
+        payload = state.context.get("evidence")
+        if isinstance(payload, dict) and payload.get("reaction_smiles"):
+            return ReactionEvidence.from_dict(payload)
+        evidence = ReactionEvidence(reaction_smiles=state.reaction_smiles)
+        self._save_evidence(state, evidence)
+        return evidence
+
+    def _save_evidence(self, state: SessionState, evidence: ReactionEvidence) -> None:
+        state.context["evidence"] = evidence.to_dict()
