@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from typing import Optional, List
 import os
 
@@ -16,6 +17,24 @@ def _import_rdkit():
         rdMolStandardize = None  # type: ignore
     return Chem, rdMolStandardize
 
+
+@contextmanager
+def _suppress_rdkit_parse_logging():
+    """Temporarily suppress RDKit parse logging for noisy invalid inputs."""
+    try:
+        from rdkit import rdBase  # type: ignore
+    except Exception:
+        yield
+        return
+
+    blocker = getattr(rdBase, "BlockLogs", None)
+    if blocker is None:
+        yield
+        return
+
+    with blocker():
+        yield
+
 def rdkit_available() -> bool:
     Chem, _ = _import_rdkit()
     return Chem is not None
@@ -24,7 +43,8 @@ def canonical_smiles(smiles: str) -> Optional[str]:
     Chem, _ = _import_rdkit()
     if Chem is None:
         return None
-    m = Chem.MolFromSmiles(smiles)
+    with _suppress_rdkit_parse_logging():
+        m = Chem.MolFromSmiles(smiles)
     if not m:
         return None
     return Chem.MolToSmiles(m, canonical=True)
@@ -34,7 +54,8 @@ def parse_smiles(smiles: str):
     if Chem is None:
         return None
     try:
-        return Chem.MolFromSmiles(smiles)
+        with _suppress_rdkit_parse_logging():
+            return Chem.MolFromSmiles(smiles)
     except Exception:
         return None
 

@@ -291,6 +291,12 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
     )
 
+    # Keep reactant columns as object/string so downstream normalization can
+    # safely write empty strings without dtype warnings on float columns.
+    for reactant_col in ("Reactant_A_Type", "Reactant_B_Type", "Reactant_C_Type"):
+        if reactant_col in df.columns:
+            df[reactant_col] = df[reactant_col].astype(object)
+
     def _normalize_reactants_row(row: pd.Series) -> pd.Series:
         raw = [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
         cleaned: List[str] = []
