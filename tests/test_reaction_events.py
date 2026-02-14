@@ -43,6 +43,13 @@ def test_reaction_events_detect_displacement_and_cn_formation() -> None:
     assert "C-N" in (profile.get("formed_bond_classes") or [])
     assert "I" in (profile.get("leaving_groups") or [])
     assert "N" in (profile.get("nucleophile_elements") or [])
+    electrophile = summary.get("electrophile_profile") or {}
+    assert electrophile.get("hybridization_guess") == "sp2_aromatic"
+    assert "aromatic_sp2" in (electrophile.get("environment_tags") or [])
+    nucleophile = summary.get("nucleophile_profile") or {}
+    assert "N" in (nucleophile.get("bond_forming_elements") or [])
+    mechanisms = summary.get("mechanism_shortlist") or []
+    assert any((row.get("name") == "SNAr") for row in mechanisms if isinstance(row, dict))
 
 
 def test_reaction_events_flag_amidation_without_activation() -> None:
@@ -82,6 +89,19 @@ def test_reaction_events_redox_assessment_marks_c_h_formation_as_reduction() -> 
     )
     redox = summary.get("redox_assessment") or {}
     assert redox.get("classification") == "net_reduction"
+
+
+def test_reaction_events_selectivity_risks_include_ambident_sites() -> None:
+    summary = summarize_reaction_events(
+        reaction_smiles="CCBr.KSCN>>CCSCN",
+        bond_key="form: C-S | break: C-Br",
+        fallback_bond_key=None,
+        reacted_motifs=["Alkyl-Br", "Alkyl-SCN"],
+        formed_motifs=["Alkyl-SR"],
+        mapping_warning=None,
+    )
+    risks = set(summary.get("selectivity_risks") or [])
+    assert "ambident_site_selectivity" in risks
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")

@@ -42,6 +42,12 @@ def _split_bond_tokens(value: str) -> List[str]:
     return [tok.strip() for tok in str(value).split(";") if tok.strip()]
 
 
+def _split_csv_tokens(value: str) -> List[str]:
+    if not value:
+        return []
+    return [tok.strip() for tok in re.split(r"[,+]", str(value)) if tok.strip()]
+
+
 def _canonical_bond_class_token(value: Any) -> str:
     token = str(value or "").strip()
     if "-" not in token:
@@ -301,6 +307,48 @@ def build_reaction_events_payload(
             except Exception:
                 pass
 
+        electrophile_profile = reaction_events.get("electrophile_profile")
+        if isinstance(electrophile_profile, Mapping):
+            hybridization = str(electrophile_profile.get("hybridization_guess") or "").strip()
+            if hybridization:
+                payload["electrophile_hybridization"] = hybridization
+            environment_tags = electrophile_profile.get("environment_tags")
+            if isinstance(environment_tags, list):
+                cleaned_env = _dedupe_sorted(environment_tags)
+                if cleaned_env:
+                    payload["electrophile_environment_tags"] = cleaned_env
+
+        nucleophile_profile = reaction_events.get("nucleophile_profile")
+        if isinstance(nucleophile_profile, Mapping):
+            candidate_classes = nucleophile_profile.get("candidate_classes")
+            if isinstance(candidate_classes, list):
+                cleaned_classes = _dedupe_sorted(candidate_classes)
+                if cleaned_classes:
+                    payload["nucleophile_candidate_classes"] = cleaned_classes
+            ambident = nucleophile_profile.get("ambident_possible")
+            if isinstance(ambident, bool):
+                payload["ambident_possible"] = ambident
+
+        mechanism_shortlist = reaction_events.get("mechanism_shortlist")
+        if isinstance(mechanism_shortlist, list):
+            mechanism_names: List[str] = []
+            for item in mechanism_shortlist:
+                if isinstance(item, Mapping):
+                    name = str(item.get("name") or "").strip()
+                else:
+                    name = str(item).strip()
+                if name:
+                    mechanism_names.append(name)
+            cleaned_mechanisms = _dedupe_sorted(mechanism_names)
+            if cleaned_mechanisms:
+                payload["mechanism_shortlist"] = cleaned_mechanisms
+
+        selectivity_risks = reaction_events.get("selectivity_risks")
+        if isinstance(selectivity_risks, list):
+            cleaned_risks = _dedupe_sorted(selectivity_risks)
+            if cleaned_risks:
+                payload["selectivity_risks"] = cleaned_risks
+
         quality = reaction_events.get("reaction_key_quality")
         if isinstance(quality, Mapping):
             quality_payload: Dict[str, Any] = {}
@@ -434,6 +482,30 @@ def serialize_reaction_events_payload(payload: Mapping[str, Any]) -> str:
     if anomalies:
         parts.append("anom:" + ",".join(anomalies))
 
+    mechanisms = _dedupe_sorted(payload.get("mechanism_shortlist") or [])
+    if mechanisms:
+        parts.append("mech:" + "+".join(mechanisms))
+
+    risks = _dedupe_sorted(payload.get("selectivity_risks") or [])
+    if risks:
+        parts.append("risk:" + ",".join(risks))
+
+    electrophile_hyb = str(payload.get("electrophile_hybridization") or "").strip()
+    if electrophile_hyb:
+        parts.append(f"ehyb:{electrophile_hyb}")
+
+    electrophile_env = _dedupe_sorted(payload.get("electrophile_environment_tags") or [])
+    if electrophile_env:
+        parts.append("eenv:" + "+".join(electrophile_env))
+
+    nucleophile_classes = _dedupe_sorted(payload.get("nucleophile_candidate_classes") or [])
+    if nucleophile_classes:
+        parts.append("nclass:" + "+".join(nucleophile_classes))
+
+    ambident_possible = payload.get("ambident_possible")
+    if isinstance(ambident_possible, bool):
+        parts.append("amb:1" if ambident_possible else "amb:0")
+
     return " | ".join(parts)
 
 
@@ -500,6 +572,18 @@ def deserialize_reaction_events_text(text: Any) -> Dict[str, Any]:
                 pass
         elif label == "anom":
             payload["anomalies"] = [tok.strip() for tok in data.split(",") if tok.strip()]
+        elif label == "mech":
+            payload["mechanism_shortlist"] = _split_event_tokens(data)
+        elif label == "risk":
+            payload["selectivity_risks"] = _split_csv_tokens(data)
+        elif label == "ehyb":
+            payload["electrophile_hybridization"] = data
+        elif label == "eenv":
+            payload["electrophile_environment_tags"] = _split_event_tokens(data)
+        elif label == "nclass":
+            payload["nucleophile_candidate_classes"] = _split_event_tokens(data)
+        elif label == "amb":
+            payload["ambident_possible"] = data in {"1", "true", "yes"}
         elif label == "q":
             # q:high(0.85) or q:(0.85)
             match = re.match(r"(?P<level>[a-zA-Z_]+)?(?:\((?P<score>[^)]+)\))?$", data)

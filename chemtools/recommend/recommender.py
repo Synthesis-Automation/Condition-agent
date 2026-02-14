@@ -1894,6 +1894,13 @@ def _reaction_events_to_match_key(value: Any) -> str:
         )
         if cleaned_families and not event_signature and not token_chunks:
             token_chunks.append("fam=" + "+".join(cleaned_families))
+    mechanism_shortlist = payload.get("mechanism_shortlist")
+    if isinstance(mechanism_shortlist, (list, tuple, set)):
+        cleaned_mechanisms = sorted(
+            {str(name).strip() for name in mechanism_shortlist if str(name).strip()}
+        )
+        if cleaned_mechanisms and not event_signature and not token_chunks:
+            token_chunks.append("mech=" + "+".join(cleaned_mechanisms))
 
     formed_tokens: List[str] = []
     raw_formed = payload.get("bond_formed")
@@ -1953,6 +1960,12 @@ def _reaction_events_to_match_key(value: Any) -> str:
         redox = str((payload.get("redox_assessment") or {}).get("classification") or "").strip()
     if redox:
         token_chunks.append("redox=" + redox)
+
+    # Last-resort fallback when structured event details are sparse.
+    if not token_chunks:
+        ehyb = str(payload.get("electrophile_hybridization") or "").strip()
+        if ehyb:
+            token_chunks.append("ehyb=" + ehyb)
 
     if not token_chunks:
         return ""

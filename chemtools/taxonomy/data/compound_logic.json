@@ -420,6 +420,7 @@
       "description": "C-O coupling products.",
       "members": [
         "Ar-OR",
+        "HeteroAr-OR",
         "AromN-OR"
       ],
       "usage": [

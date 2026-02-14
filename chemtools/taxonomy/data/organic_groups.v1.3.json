@@ -154,7 +154,7 @@
       "id": "-I",
       "kind": "substituent",
       "priority": 1,
-      "smarts": "[I:2]",
+      "smarts": "[I;D1;!+:2]",
       "description": "Iodo substituent substituent (-I)."
     },
     {
@@ -217,7 +217,7 @@
       "kind": "substituent",
       "priority": 2,
       "broad_definition": true,
-      "smarts": "[I+:2]([#6])[#6]",
+      "smarts": "[$([I+]([#6])[#6]):2]",
       "description": "Iodonium center (typically diaryl/alkyl-aryl iodonium salts), attach via iodine."
     },
     {

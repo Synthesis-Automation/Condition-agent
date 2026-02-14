@@ -92,6 +92,72 @@ def _constraints_match(
     return True
 
 
+_SNAR_ACTIVATING_TOKENS = (
+    "HeteroAr",
+    "AromN",
+    "Pyridine",
+    "Pyridyl",
+    "Pyrimidine",
+    "Pyrimidyl",
+    "Pyrazine",
+    "Triazine",
+    "Quinoline",
+    "Isoquinoline",
+    "-NO2",
+    "-CN",
+    "-COR",
+    "-CO2",
+    "-SO2",
+    "-CHO",
+    "-CF3",
+    "-N2+",
+)
+_SNAR_DEACTIVATING_TOKENS = (
+    "Ar-OR",
+    "Ar-NR2",
+    "Ar-NHR",
+    "Ar-NH2",
+    "Ar-SR",
+    "Ar-Alkyl",
+)
+
+
+def _snar_activation_supported(
+    reacted_set: Set[str],
+    formed_set: Set[str],
+    spectators_set: Optional[Set[str]] = None,
+) -> bool:
+    """Return whether motif evidence supports SNAr electronic activation."""
+    motif_space: Set[str] = set(reacted_set) | set(formed_set) | set(spectators_set or set())
+    if not motif_space:
+        return False
+
+    # Heteroaryl context is a strong SNAr activation signal.
+    for motif in motif_space:
+        text = str(motif)
+        if text.startswith("HeteroAr-") or text.startswith("AromN-"):
+            return True
+        if any(tag in text for tag in ("Pyridine", "Pyridyl", "Pyrimidine", "Pyrazine", "Triazine", "Quinoline")):
+            return True
+
+    # Common electron-withdrawing activation tags.
+    for motif in motif_space:
+        text = str(motif)
+        if any(token in text for token in _SNAR_ACTIVATING_TOKENS):
+            return True
+
+    # Explicitly down-rank electron-rich aryl systems without activation.
+    has_deactivating = any(
+        any(token in str(motif) for token in _SNAR_DEACTIVATING_TOKENS)
+        for motif in motif_space
+    )
+    if has_deactivating:
+        return False
+
+    # Plain Ar-X without activation defaults to unsupported SNAr assignment.
+    return False
+
+
 def _score_specificity_candidate(
     *,
     reaction_id: str,
@@ -189,6 +255,7 @@ def _parse_crk_key(
 def _collect_ranked_catalog_candidates(
     reacted_set: Set[str],
     formed_set: Set[str],
+    spectators_set: Optional[Set[str]] = None,
     *,
     formed_bond_tokens: Optional[Set[str]] = None,
     broken_bond_tokens: Optional[Set[str]] = None,
@@ -242,6 +309,14 @@ def _collect_ranked_catalog_candidates(
         if not product_match:
             continue
 
+        if str(reaction_id) == "SNAr_CN":
+            if not _snar_activation_supported(
+                reacted_set,
+                formed_set,
+                spectators_set=spectators_set,
+            ):
+                continue
+
         if not _constraints_match(
             defn.constraints or {},
             reacted_set,
@@ -288,6 +363,7 @@ def _collect_ranked_catalog_candidates(
 def _match_reaction_catalog_specificity(
     reacted_set: Set[str],
     formed_set: Set[str],
+    spectators_set: Optional[Set[str]] = None,
     *,
     formed_bond_tokens: Optional[Set[str]] = None,
     broken_bond_tokens: Optional[Set[str]] = None,
@@ -296,6 +372,7 @@ def _match_reaction_catalog_specificity(
     candidates = _collect_ranked_catalog_candidates(
         reacted_set,
         formed_set,
+        spectators_set=spectators_set,
         formed_bond_tokens=formed_bond_tokens,
         broken_bond_tokens=broken_bond_tokens,
     )
@@ -312,6 +389,7 @@ def _match_reaction_catalog_specificity(
 def _match_reaction_catalog_legacy(
     reacted_set: Set[str],
     formed_set: Set[str],
+    spectators_set: Optional[Set[str]] = None,
     *,
     formed_bond_tokens: Optional[Set[str]] = None,
     broken_bond_tokens: Optional[Set[str]] = None,
@@ -349,6 +427,13 @@ def _match_reaction_catalog_legacy(
                     break
         if not product_match:
             continue
+        if str(reaction_id) == "SNAr_CN":
+            if not _snar_activation_supported(
+                reacted_set,
+                formed_set,
+                spectators_set=spectators_set,
+            ):
+                continue
         if not _constraints_match(
             defn.constraints or {},
             reacted_set,
@@ -366,6 +451,7 @@ def _match_reaction_catalog_legacy(
 def _match_reaction_catalog(
     reacted_set: Set[str],
     formed_set: Set[str],
+    spectators_set: Optional[Set[str]] = None,
     *,
     use_legacy: bool = False,
     formed_bond_tokens: Optional[Set[str]] = None,
@@ -376,12 +462,14 @@ def _match_reaction_catalog(
         return _match_reaction_catalog_legacy(
             reacted_set,
             formed_set,
+            spectators_set=spectators_set,
             formed_bond_tokens=formed_bond_tokens,
             broken_bond_tokens=broken_bond_tokens,
         )
     return _match_reaction_catalog_specificity(
         reacted_set,
         formed_set,
+        spectators_set=spectators_set,
         formed_bond_tokens=formed_bond_tokens,
         broken_bond_tokens=broken_bond_tokens,
     )
@@ -391,12 +479,17 @@ def _build_match_evidence(
     *,
     reacted_set: Set[str],
     formed_set: Set[str],
+    spectators_set: Optional[Set[str]] = None,
     selected_match: Optional[Tuple[str, List[str], str]],
     use_legacy: bool,
     max_candidates: int = 5,
 ) -> Dict[str, Any]:
     matcher = "taxonomy_legacy_v1" if use_legacy else "taxonomy_specificity_v2"
-    candidates = _collect_ranked_catalog_candidates(reacted_set, formed_set)
+    candidates = _collect_ranked_catalog_candidates(
+        reacted_set,
+        formed_set,
+        spectators_set=spectators_set,
+    )
     top_candidates = [
         {
             "reaction_id": c.get("reaction_id"),
@@ -525,6 +618,7 @@ def validate_detection_with_crk_key(
     match = _match_reaction_catalog(
         reacted_set,
         formed_set,
+        spectators_set=_spectators,
         use_legacy=use_legacy,
         formed_bond_tokens=formed_bond_tokens,
         broken_bond_tokens=broken_bond_tokens,
@@ -533,6 +627,7 @@ def validate_detection_with_crk_key(
         _build_match_evidence(
             reacted_set=reacted_set,
             formed_set=formed_set,
+            spectators_set=_spectators,
             selected_match=match,
             use_legacy=use_legacy,
             max_candidates=max_candidates,
@@ -582,11 +677,18 @@ def validate_detection_with_reacted_motifs(
     """
     reacted_set = {normalize_motif_id(str(m)) for m in (reacted_motifs or []) if m}
     formed_set = {normalize_motif_id(str(m)) for m in (formed_motifs or []) if m}
-    match = _match_reaction_catalog(reacted_set, formed_set, use_legacy=use_legacy)
+    spectator_set = {normalize_motif_id(str(m)) for m in (spectator_motifs or []) if m}
+    match = _match_reaction_catalog(
+        reacted_set,
+        formed_set,
+        spectators_set=spectator_set,
+        use_legacy=use_legacy,
+    )
     evidence = (
         _build_match_evidence(
             reacted_set=reacted_set,
             formed_set=formed_set,
+            spectators_set=spectator_set,
             selected_match=match,
             use_legacy=use_legacy,
             max_candidates=max_candidates,

@@ -3,6 +3,7 @@ from __future__ import annotations
 from chemtools.recommend.reaction_key_utils import (
     build_reaction_events_payload,
     canonicalize_reaction_key_minimal,
+    deserialize_reaction_events_text,
     serialize_reaction_events_payload,
 )
 
@@ -42,6 +43,19 @@ def test_build_reaction_events_payload_includes_redox_and_event_details() -> Non
             },
         ],
         "event_families": ["substitution"],
+        "electrophile_profile": {
+            "hybridization_guess": "sp2_aromatic",
+            "environment_tags": ["aromatic_sp2", "ewg_activated"],
+        },
+        "nucleophile_profile": {
+            "candidate_classes": ["amine"],
+            "ambident_possible": False,
+        },
+        "mechanism_shortlist": [
+            {"name": "SNAr", "confidence": 0.78},
+            {"name": "oa_based_coupling", "confidence": 0.4},
+        ],
+        "selectivity_risks": ["ambident_site_selectivity"],
         "ring_change": {"delta": 0},
         "transformation_profile": {
             "molecularity": "intermolecular_or_multi_component",
@@ -74,6 +88,12 @@ def test_build_reaction_events_payload_includes_redox_and_event_details() -> Non
     assert payload["leaving_groups"] == ["Br"]
     assert payload["nucleophile_elements"] == ["N"]
     assert payload["ring_delta"] == 0
+    assert payload["electrophile_hybridization"] == "sp2_aromatic"
+    assert payload["electrophile_environment_tags"] == ["aromatic_sp2", "ewg_activated"]
+    assert payload["nucleophile_candidate_classes"] == ["amine"]
+    assert payload["ambident_possible"] is False
+    assert payload["mechanism_shortlist"] == ["SNAr", "oa_based_coupling"]
+    assert payload["selectivity_risks"] == ["ambident_site_selectivity"]
     assert "reaction_key_quality" in payload
 
     text = serialize_reaction_events_payload(payload)
@@ -86,3 +106,12 @@ def test_build_reaction_events_payload_includes_redox_and_event_details() -> Non
     assert "form_cls:C-N" in text
     assert "lg:Br" in text
     assert "nuc:N" in text
+    assert "mech:SNAr+oa_based_coupling" in text
+    assert "risk:ambident_site_selectivity" in text
+    assert "ehyb:sp2_aromatic" in text
+    assert "nclass:amine" in text
+
+    parsed = deserialize_reaction_events_text(text)
+    assert parsed["mechanism_shortlist"] == ["SNAr", "oa_based_coupling"]
+    assert parsed["selectivity_risks"] == ["ambident_site_selectivity"]
+    assert parsed["electrophile_hybridization"] == "sp2_aromatic"

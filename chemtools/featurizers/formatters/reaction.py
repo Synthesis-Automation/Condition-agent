@@ -699,6 +699,101 @@ def _sanitize_bond_key(
     return " | ".join(parts) if parts else None
 
 
+def _motif_non_carbon_elements(
+    motifs: Iterable[str],
+    *,
+    group_element_map: Dict[str, Set[str]],
+) -> Set[str]:
+    elements: Set[str] = set()
+    for motif in motifs or []:
+        group_id = _match_group_id(str(motif), group_element_map)
+        if not group_id:
+            continue
+        for element in group_element_map.get(group_id, set()):
+            if element not in {"C", "H"}:
+                elements.add(element)
+    return elements
+
+
+def _assess_bond_key_consistency(
+    *,
+    bond_key: Optional[str],
+    reacted_motifs: Iterable[str],
+    formed_motifs: Iterable[str],
+    group_element_map: Dict[str, Set[str]],
+) -> Dict[str, Any]:
+    if not bond_key:
+        return {"score_0_1": 1.0, "level": "high", "reasons": []}
+    formed_tokens = _extract_bond_section(bond_key, section="form")
+    broken_tokens = _extract_bond_section(bond_key, section="break")
+    if not formed_tokens and not broken_tokens:
+        return {
+            "score_0_1": 0.2,
+            "level": "low",
+            "reasons": ["bond_key_missing_form_and_break_sections"],
+        }
+
+    reacted_elements = _motif_non_carbon_elements(
+        reacted_motifs,
+        group_element_map=group_element_map,
+    )
+    formed_elements = _motif_non_carbon_elements(
+        formed_motifs,
+        group_element_map=group_element_map,
+    )
+
+    penalties = 0
+    reasons: List[str] = []
+
+    def _parse_pair(token: str) -> Optional[Tuple[str, str]]:
+        if "-" not in token:
+            return None
+        left, right = [part.strip() for part in token.split("-", 1)]
+        left_el = _parse_element(left)
+        right_el = _parse_element(right)
+        if not left_el or not right_el:
+            return None
+        return left_el, right_el
+
+    for token in broken_tokens:
+        parsed = _parse_pair(token)
+        if parsed is None:
+            continue
+        left, right = parsed
+        for element in (left, right):
+            if element in {"C", "H"}:
+                continue
+            if element not in reacted_elements:
+                penalties += 1
+                reasons.append(f"broken_bond_element_without_reactant_motif:{element}")
+
+    for token in formed_tokens:
+        parsed = _parse_pair(token)
+        if parsed is None:
+            continue
+        left, right = parsed
+        for element in (left, right):
+            if element in {"C", "H"}:
+                continue
+            if element not in formed_elements:
+                penalties += 1
+                reasons.append(f"formed_bond_element_without_product_motif:{element}")
+
+    score = max(0.0, 1.0 - (0.25 * float(penalties)))
+    if score >= 0.75:
+        level = "high"
+    elif score >= 0.45:
+        level = "medium"
+    else:
+        level = "low"
+
+    return {
+        "score_0_1": round(score, 3),
+        "level": level,
+        "reasons": sorted(set(reasons)),
+    }
+
+
 def _match_group_id(motif_id: str, group_element_map: Dict[str, Set[str]]) -> Optional[str]:
     motif_id = str(motif_id)
     for group_id in sorted(group_element_map.keys(), key=len, reverse=True):
@@ -1556,6 +1651,81 @@ def _target_product_motifs_from_formed_bonds(
     return target_ids
 
 
+_SP2_ELECTROPHILE_LEAVING_SUFFIXES = (
+    "-F",
+    "-Cl",
+    "-Br",
+    "-I",
+    "-OTf",
+    "-OMs",
+    "-OTs",
+    "-N2+",
+    "-Iodonium",
+)
+
+
+def _has_sp2_electrophile_prefix(reacted_set: Set[str], prefix: str) -> bool:
+    token = f"{prefix}-"
+    return any(
+        motif.startswith(token) and motif.endswith(_SP2_ELECTROPHILE_LEAVING_SUFFIXES)
+        for motif in reacted_set
+    )
+
+
+def _apply_scaffold_consistency_preference(
+    selected_motifs: Iterable[str],
+    *,
+    product_motifs: Iterable[Dict[str, Any]],
+    reacted_set: Set[str],
+) -> List[str]:
+    """
+    Prefer scaffold-consistent formed motifs (Ar/HeteroAr/AromN) in CRK output.
+
+    Example: if reacted electrophile is HeteroAr-X and product contains both
+    Ar-OR and HeteroAr-OR representations, prefer HeteroAr-OR.
+    """
+    selected = [
+        normalize_motif_id(str(m))
+        for m in selected_motifs
+        if normalize_motif_id(str(m))
+    ]
+    if not selected:
+        return []
+
+    product_ids = {
+        normalize_motif_id(str(m.get("compound_id") or m.get("id")))
+        for m in product_motifs
+        if isinstance(m, dict) and (m.get("compound_id") or m.get("id"))
+    }
+    product_ids = {mid for mid in product_ids if mid}
+    if not product_ids:
+        return sorted(set(selected))
+
+    has_heteroaryl_electrophile = _has_sp2_electrophile_prefix(reacted_set, "HeteroAr")
+    has_aryl_electrophile = _has_sp2_electrophile_prefix(reacted_set, "Ar")
+    has_aromn_electrophile = _has_sp2_electrophile_prefix(reacted_set, "AromN")
+
+    target_prefix = ""
+    if has_heteroaryl_electrophile and not has_aryl_electrophile:
+        target_prefix = "HeteroAr"
+    elif has_aromn_electrophile and not has_aryl_electrophile and not has_heteroaryl_electrophile:
+        target_prefix = "AromN"
+
+    if not target_prefix:
+        return sorted(set(selected))
+
+    out: Set[str] = set()
+    for motif in selected:
+        if motif.startswith("Ar-"):
+            suffix = motif[len("Ar-"):]
+            candidate = f"{target_prefix}-{suffix}"
+            if candidate in product_ids:
+                out.add(candidate)
+                continue
+        out.add(motif)
+    return sorted(out)
+
+
 def _select_reactive_product_motifs(
     product_motifs: Iterable[Dict[str, Any]],
     *,
@@ -1565,9 +1735,6 @@ def _select_reactive_product_motifs(
     reaction_type: Optional[str] = None,
 ) -> List[str]:
     """Select reaction-center product motifs with taxonomy constraints first."""
-    def _finalize(values: Iterable[str]) -> List[str]:
-        return _collapse_redundant_reactive_product_motifs(values, product_motifs)
-
     motif_ids = [
         normalize_motif_id(str(m.get("compound_id") or m.get("id")))
         for m in product_motifs
@@ -1576,6 +1743,15 @@ def _select_reactive_product_motifs(
     motif_set = set(motif_ids)
     formed_set = {normalize_motif_id(str(m)) for m in formed_motifs if m}
     reacted_set = {normalize_motif_id(str(m)) for m in reacted_motifs if m}
+
+    def _finalize(values: Iterable[str]) -> List[str]:
+        collapsed = _collapse_redundant_reactive_product_motifs(values, product_motifs)
+        return _apply_scaffold_consistency_preference(
+            collapsed,
+            product_motifs=product_motifs,
+            reacted_set=reacted_set,
+        )
+
     formed_in_product = (motif_set & formed_set) if motif_set else set(formed_set)
 
     inferred = _infer_product_motifs_from_logic(reacted_set, bond_key)
@@ -2115,15 +2291,16 @@ def featurize_reaction(
                     reaction_smiles,
                     analysis=fallback_bond_analysis,
                 )
+        group_element_map = _load_group_element_map()
         bond_key = _sanitize_bond_key(
             bond_key,
             reacted_full,
-            group_element_map=_load_group_element_map(),
+            group_element_map=group_element_map,
         )
         fallback_bond_key = _sanitize_bond_key(
             fallback_bond_key,
             reacted_full,
-            group_element_map=_load_group_element_map(),
+            group_element_map=group_element_map,
         )
         projection_bond_key = bond_key or fallback_bond_key
 
@@ -2168,6 +2345,45 @@ def featurize_reaction(
             if strict_product_motif_validation
             else formed_all
         )
+        bond_key_consistency = _assess_bond_key_consistency(
+            bond_key=bond_key,
+            reacted_motifs=reacted_for_detection,
+            formed_motifs=formed_all,
+            group_element_map=group_element_map,
+        )
+        detection_payload["bond_key_consistency"] = bond_key_consistency
+        bond_key_demoted = False
+        if bond_key and _to_float_or_default(bond_key_consistency.get("score_0_1"), 1.0) < 0.45:
+            bond_key_demoted = True
+            quality_warnings.append("bond_key_demoted_low_consistency")
+            bond_key = None
+            fallback_bond_key = None
+            projection_bond_key = None
+            formed_inferred = {
+                normalize_motif_id(str(m))
+                for m in _infer_product_motifs_from_logic(
+                    reacted_for_detection,
+                    bond_key,
+                )
+                if m
+            }
+            if not formed_inferred:
+                rescue_formed = _rescue_decarboxylative_product_motifs_without_bond_key(
+                    reacted_motifs=reacted_for_detection,
+                    product_motif_ids=(
+                        normalize_motif_id(str(m.get("compound_id") or m.get("id")))
+                        for m in product_motifs_full
+                        if isinstance(m, dict) and (m.get("compound_id") or m.get("id"))
+                    ),
+                )
+                formed_inferred = {normalize_motif_id(str(m)) for m in rescue_formed if m}
+            formed_all = sorted(formed_raw | formed_inferred)
+            formed_for_validation = (
+                sorted(formed_raw)
+                if strict_product_motif_validation
+                else formed_all
+            )
+
         spectators_for_detection = sorted(
             normalize_motif_id(str(m))
             for m in (set(spectators_for_crk) - set(reacted_for_detection))
@@ -2262,11 +2478,41 @@ def featurize_reaction(
             else None,
         )
         if reaction_events:
+            if bond_key_demoted:
+                anomalies = reaction_events.setdefault("anomalies", [])
+                if isinstance(anomalies, list) and "bond_key_demoted_due_to_inconsistency" not in anomalies:
+                    anomalies.append("bond_key_demoted_due_to_inconsistency")
             reaction_key = _append_crk_event_signature(reaction_key, reaction_events)
             detection_payload["reaction_key_quality"] = (
                 reaction_events.get("reaction_key_quality") or {}
             )
             quality_payload = reaction_events.get("reaction_key_quality") or {}
+            if isinstance(quality_payload, dict):
+                consistency_score = _to_float_or_default(
+                    (bond_key_consistency or {}).get("score_0_1"),
+                    1.0,
+                )
+                if consistency_score < 0.75:
+                    merged_score = min(
+                        _to_float_or_default(quality_payload.get("score_0_1"), 1.0),
+                        consistency_score,
+                    )
+                    quality_payload["score_0_1"] = round(merged_score, 3)
+                    if merged_score >= 0.75:
+                        quality_payload["level"] = "high"
+                    elif merged_score >= 0.45:
+                        quality_payload["level"] = "medium"
+                    else:
+                        quality_payload["level"] = "low"
+                    merged_reasons = list(quality_payload.get("reasons") or [])
+                    for reason in (bond_key_consistency.get("reasons") or []):
+                        reason_text = str(reason).strip()
+                        if reason_text and reason_text not in merged_reasons:
+                            merged_reasons.append(reason_text)
+                    marker = "bond_key_consistency_penalty"
+                    if marker not in merged_reasons:
+                        merged_reasons.append(marker)
+                    quality_payload["reasons"] = merged_reasons
             quality_level = str(quality_payload.get("level") or "").strip().lower()
             quality_score = _to_float_or_default(quality_payload.get("score_0_1"), 1.0)
             if quality_level == "low" or quality_score < 0.45:

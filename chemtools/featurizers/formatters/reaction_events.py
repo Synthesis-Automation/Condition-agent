@@ -46,6 +46,28 @@ _EVENT_SIGNATURE_CODE = {
     "c_c_bond_formation": "C-C",
 }
 _REDOX_HETERO = {"N", "O", "S", "P", "F", "Cl", "Br", "I"}
+_SCAFFOLD_SP3_PREFIXES = (
+    "Alkyl-",
+    "CH3-",
+    "RCH2-",
+    "R2CH-",
+    "R3C-",
+    "Bn-",
+    "Allyl-",
+    "Propargyl-",
+)
+_SCAFFOLD_SP2_PREFIXES = ("Ar-", "HeteroAr-", "AromN-", "Alkenyl-")
+_SCAFFOLD_SP_PREFIXES = ("Alkynyl-",)
+_EWG_TOKENS = ("NO2", "CN", "CO2", "COR", "CHO", "SO2", "CF3")
+_AMBIDENT_TOKENS = ("-SCN", "-NCS", "-NO2", "-CN", "Hydrazine")
+_NUCLEOPHILE_CLASS_HINTS = {
+    "amine": ("-NH2", "-NHR", "-NR2", "Hydrazine"),
+    "alcohol_or_phenol": ("-OH", "-OR"),
+    "thiol_or_thioether": ("-SH", "-SR"),
+    "cyanide_like": ("-CN", "-NC", "-SCN", "-NCS"),
+    "carbon_nucleophile_like": ("R_acidic", "Alkenyl-", "Alkynyl-"),
+}
+_OA_PARTNER_HINTS = ("-B(", "-BF", "Bpin", "-Zn", "-Sn", "-Mg", "-Si", "-Li", "Grignard")
 
 
 def _split_reaction_sides(reaction_smiles: str) -> Tuple[List[str], List[str]]:
@@ -237,6 +259,148 @@ def _compute_redox_assessment(
         "reasons": reasons,
         "signals": signals,
     }
+
+
+def _guess_electrophile_hybridization(reacted_motifs: Set[str]) -> str:
+    for motif in reacted_motifs:
+        text = str(motif)
+        if text.startswith(_SCAFFOLD_SP_PREFIXES):
+            return "sp"
+    for motif in reacted_motifs:
+        text = str(motif)
+        if text.startswith(_SCAFFOLD_SP2_PREFIXES):
+            if text.startswith(("Ar-", "HeteroAr-", "AromN-")):
+                return "sp2_aromatic"
+            return "sp2"
+    for motif in reacted_motifs:
+        if str(motif).startswith(_SCAFFOLD_SP3_PREFIXES):
+            return "sp3"
+    return "unknown"
+
+
+def _electrophile_environment_tags(reacted_motifs: Set[str]) -> List[str]:
+    tags: Set[str] = set()
+    for motif in reacted_motifs:
+        text = str(motif)
+        if text.startswith("Bn-"):
+            tags.add("benzylic")
+        if text.startswith("Allyl-"):
+            tags.add("allylic")
+        if text.startswith("Propargyl-"):
+            tags.add("propargylic")
+        if text.startswith(("Ar-", "HeteroAr-", "AromN-")):
+            tags.add("aromatic_sp2")
+        if any(token in text for token in _EWG_TOKENS):
+            tags.add("ewg_activated")
+    return sorted(tags)
+
+
+def _nucleophile_candidate_classes(
+    reacted_motifs: Set[str],
+    formed_pairs: Set[Tuple[str, str]],
+) -> List[str]:
+    classes: Set[str] = set()
+    for motif in reacted_motifs:
+        text = str(motif)
+        for cls, tokens in _NUCLEOPHILE_CLASS_HINTS.items():
+            if any(token in text for token in tokens):
+                classes.add(cls)
+    if ("C", "N") in formed_pairs:
+        classes.add("amine")
+    if ("C", "O") in formed_pairs:
+        classes.add("alcohol_or_phenol")
+    if ("C", "S") in formed_pairs:
+        classes.add("thiol_or_thioether")
+    if ("C", "C") in formed_pairs:
+        classes.add("carbon_nucleophile_like")
+    return sorted(classes)
+
+
+def _mechanism_shortlist(
+    *,
+    reacted_motifs: Set[str],
+    event_kinds: Set[str],
+    formed_pairs: Set[Tuple[str, str]],
+    electrophile_hybridization: str,
+    electrophile_tags: List[str],
+    leaving_groups: Set[str],
+) -> List[Dict[str, Any]]:
+    shortlist: List[Dict[str, Any]] = []
+
+    def add(name: str, confidence: float, reasons: List[str]) -> None:
+        shortlist.append(
+            {
+                "name": name,
+                "confidence": round(max(0.0, min(1.0, confidence)), 2),
+                "reasons": reasons,
+            }
+        )
+
+    has_displacement = "leaving_group_displacement" in event_kinds
+    has_c_hetero = bool({("C", "N"), ("C", "O"), ("C", "S")} & formed_pairs)
+    has_c_c = ("C", "C") in formed_pairs
+    has_ewg = "ewg_activated" in set(electrophile_tags)
+
+    if has_displacement and electrophile_hybridization == "sp3" and has_c_hetero:
+        add("SN2", 0.72, ["sp3_electrophile", "c_hetero_bond_formation", "leaving_group_displacement"])
+    if has_displacement and electrophile_hybridization == "sp2_aromatic" and has_c_hetero:
+        conf = 0.78 if has_ewg else 0.6
+        reasons = ["aryl_or_heteroaryl_electrophile", "leaving_group_displacement", "c_hetero_bond_formation"]
+        if has_ewg:
+            reasons.append("ewg_activation")
+        add("SNAr", conf, reasons)
+    if "amidation_like" in event_kinds:
+        add("acyl_substitution", 0.8, ["amidation_like_event", "c_n_bond_formation"])
+
+    has_sp2_halide = False
+    for motif in reacted_motifs:
+        text = str(motif)
+        if text.startswith(("Ar-", "HeteroAr-", "Alkenyl-")) and any(
+            token in text for token in ("-Cl", "-Br", "-I", "-OTf", "-OTs", "-OMs")
+        ):
+            has_sp2_halide = True
+            break
+    has_oa_partner = any(any(token in str(motif) for token in _OA_PARTNER_HINTS) for motif in reacted_motifs)
+    if has_sp2_halide and (has_c_c or has_c_hetero) and has_oa_partner:
+        add(
+            "oa_based_coupling",
+            0.74,
+            ["sp2_electrophile_with_leaving_group", "cross_coupling_partner_like", "new_c_c_or_c_hetero_bond"],
+        )
+
+    # E2 is treated as a competing mechanism flag, not primary path assignment.
+    if has_displacement and electrophile_hybridization == "sp3" and bool(leaving_groups):
+        add("E2_competitor", 0.45, ["sp3_leaving_group_substrate", "possible_beta_h_elimination_competition"])
+
+    shortlist.sort(key=lambda row: float(row.get("confidence", 0.0)), reverse=True)
+    return shortlist[:4]
+
+
+def _selectivity_risks(
+    *,
+    reacted_motifs: Set[str],
+    event_kinds: Set[str],
+    electrophile_hybridization: str,
+    nucleophile_classes: List[str],
+) -> List[str]:
+    risks: Set[str] = set()
+    if "leaving_group_displacement" in event_kinds and electrophile_hybridization == "sp3":
+        # Practical default: substitution on sp3 C-LG often competes with elimination.
+        has_non_methyl_sp3 = any(
+            str(motif).startswith(prefix) for motif in reacted_motifs for prefix in ("Alkyl-", "RCH2-", "R2CH-", "R3C-", "Bn-", "Allyl-", "Propargyl-")
+        )
+        if has_non_methyl_sp3:
+            risks.add("substitution_vs_elimination")
+
+    ambident = any(any(token in str(motif) for token in _AMBIDENT_TOKENS) for motif in reacted_motifs)
+    if ambident:
+        risks.add("ambident_site_selectivity")
+
+    # Simple overreaction signal: multiple nucleophile classes in the same record.
+    if len(set(nucleophile_classes)) >= 2:
+        risks.add("overreaction_or_chemoselectivity")
+
+    return sorted(risks)
 
 
 def _count_molecules_matching_smarts(
@@ -493,6 +657,27 @@ def summarize_reaction_events(
 
     formed_bond_classes = sorted("-".join(pair) for pair in formed_pairs)
     broken_bond_classes = sorted("-".join(pair) for pair in broken_pairs)
+    electrophile_hybridization = _guess_electrophile_hybridization(reacted_set)
+    electrophile_tags = _electrophile_environment_tags(reacted_set)
+    nucleophile_classes = _nucleophile_candidate_classes(reacted_set, formed_pairs)
+    ambident_possible = any(
+        any(token in str(motif) for token in _AMBIDENT_TOKENS)
+        for motif in reacted_set
+    )
+    mechanism_shortlist = _mechanism_shortlist(
+        reacted_motifs=reacted_set,
+        event_kinds=event_kinds,
+        formed_pairs=formed_pairs,
+        electrophile_hybridization=electrophile_hybridization,
+        electrophile_tags=electrophile_tags,
+        leaving_groups=leaving_groups,
+    )
+    selectivity_risks = _selectivity_risks(
+        reacted_motifs=reacted_set,
+        event_kinds=event_kinds,
+        electrophile_hybridization=electrophile_hybridization,
+        nucleophile_classes=nucleophile_classes,
+    )
 
     has_complex_family = bool(event_families & {"hydrolysis", "acyl_transfer", "annulation"})
     if len(event_families) >= 3 or (len(event_families) >= 2 and has_complex_family):
@@ -519,6 +704,20 @@ def summarize_reaction_events(
         "events": events,
         "anomalies": anomalies,
         "event_families": sorted(event_families),
+        "electrophile_profile": {
+            "center_element": "C",
+            "hybridization_guess": electrophile_hybridization,
+            "leaving_group_elements": sorted(leaving_groups),
+            "environment_tags": electrophile_tags,
+            "ewg_activation_likely": "ewg_activated" in set(electrophile_tags),
+        },
+        "nucleophile_profile": {
+            "bond_forming_elements": sorted(nucleophile_elements),
+            "candidate_classes": nucleophile_classes,
+            "ambident_possible": ambident_possible,
+        },
+        "mechanism_shortlist": mechanism_shortlist,
+        "selectivity_risks": selectivity_risks,
         "transformation_profile": {
             "molecularity": molecularity,
             "event_count": len(events),

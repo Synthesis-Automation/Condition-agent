@@ -131,3 +131,50 @@ def test_fallback_mapping_used_for_product_projection_even_when_strict_bond_key_
     assert "bond_formed:" not in reaction_key
     assert "bond_broken:" not in reaction_key
     assert captured["bond_key"] is not None
+
+
+def test_low_bond_key_consistency_demotes_bond_sections_in_reaction_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_with_quality(_reaction_smiles: str):
+        return (
+            {
+                "success": True,
+                "broken_bonds": [(1, 2)],
+                "formed_bonds": [(2, 3)],
+            },
+            False,
+            {
+                "method": "hybrid",
+                "combined_confidence": 0.9,
+                "agreement": {"rxnmapper_vs_mcs": True},
+            },
+        )
+
+    def fake_format_bond_change_key(_reaction_smiles: str, analysis=None):
+        _ = analysis
+        return "break: C-P; C-Cl | form: C-S"
+
+    monkeypatch.setattr(
+        reaction_formatter,
+        "_get_bond_change_analysis_with_quality",
+        fake_with_quality,
+    )
+    monkeypatch.setattr(
+        reaction_formatter,
+        "format_bond_change_key",
+        fake_format_bond_change_key,
+    )
+
+    result = reaction_formatter.featurize_reaction(
+        "Brc1ccccc1.NCc1ccccc1>>c1ccccc1NCc1ccccc1",
+        options={"detailed": True},
+    )
+    reaction_key = str(result.get("reaction_key") or "")
+    reaction_events = result.get("reaction_events") or {}
+    quality = reaction_events.get("reaction_key_quality") or {}
+
+    assert "bond_formed:" not in reaction_key
+    assert "bond_broken:" not in reaction_key
+    assert float(quality.get("score_0_1") or 1.0) < 0.45
+    assert "bond_key_consistency_penalty" in (quality.get("reasons") or [])

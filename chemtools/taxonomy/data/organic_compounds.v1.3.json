@@ -219,6 +219,13 @@
     },
     {
       "template": "single_bond",
+      "A": "Ar",
+      "B": "-Iodonium",
+      "description": "Aryl iodonium salt motif (Ar-Iodonium).",
+      "reactivity_weight": 3.2
+    },
+    {
+      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-Cl",
       "description": "Heteroaryl chloride (HeteroAr-Cl).",
@@ -237,6 +244,13 @@
       "B": "-I",
       "description": "Heteroaryl iodide (HeteroAr-I).",
       "reactivity_weight": 3.0
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-Iodonium",
+      "description": "Heteroaryl iodonium salt motif (HeteroAr-Iodonium).",
+      "reactivity_weight": 3.2
     },
     {
       "template": "single_bond",
@@ -335,6 +349,13 @@
       "A": "HeteroAr",
       "B": "-OH",
       "description": "Heteroaryl alcohol (HeteroAr-OH)."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-OR",
+      "description": "Heteroaryl ether (HeteroAr-OR).",
+      "reactivity_weight": 1.0
     },
     {
       "template": "single_bond",
