@@ -177,6 +177,7 @@ def build_core_reaction(full_reaction: Dict[str, Any]) -> Dict[str, Any]:
             "evidence",
             "mapping_warning",
             "reaction_key_quality",
+            "reactant_precheck",
             "primary_detection",
             "matches",
             "multi_reaction_types",
