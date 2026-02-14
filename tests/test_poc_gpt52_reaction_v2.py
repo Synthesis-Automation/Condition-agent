@@ -1,6 +1,6 @@
 """Tests for general-purpose taxonomy-first reaction analysis PoC v2."""
 
-from poc_gpt52_reaction_v2 import analyze_reaction_general
+from chemtools.reaction_inference import analyze_reaction_general
 
 
 def test_v2_detects_amide_formation_without_llm() -> None:

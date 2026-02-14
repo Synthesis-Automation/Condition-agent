@@ -1,6 +1,6 @@
 """Tests for v1-v2 benchmark utility."""
 
-from poc_gpt52_reaction_v2.benchmark import run_benchmark
+from chemtools.reaction_inference_benchmark import run_benchmark
 
 
 def test_benchmark_reports_consistent_summary_shape() -> None:

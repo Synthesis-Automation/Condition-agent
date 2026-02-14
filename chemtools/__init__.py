@@ -42,6 +42,12 @@ See CHEMTOOLS_QUICKSTART.md for more examples.
 
 from .context import ChemTools, chem, ResourceConfig
 from .detection import detect_reaction_type, detect_reaction_types, DetectionResult, ReactionMatch
+from .reaction_inference import (
+    analyze_reaction_general,
+    GeneralReactionAnalysis,
+    ReactionDecision,
+    ReactionValidation,
+)
 from ._atom_mapping import (
     add_atom_mapping,
     analyze_bond_changes,
@@ -86,6 +92,10 @@ __all__ = [
     "detect_reaction_types", # Alias for detect_reaction_type
     "DetectionResult",       # Detection result dataclass
     "ReactionMatch",         # Individual match dataclass
+    "analyze_reaction_general",  # General taxonomy-first reaction inference
+    "GeneralReactionAnalysis",
+    "ReactionDecision",
+    "ReactionValidation",
     # Atom mapping and bond analysis
     "add_atom_mapping",  # Add atom mapping to reaction SMILES
     "analyze_bond_changes",  # High-level bond analysis (RXNMapper)
