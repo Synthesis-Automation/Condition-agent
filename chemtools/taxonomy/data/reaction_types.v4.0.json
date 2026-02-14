@@ -39,7 +39,12 @@
         "Suzuki",
         "Suzuki-Miyaura",
         "Suzuki_CC"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Miyaura_borylation",
@@ -158,7 +163,12 @@
       ],
       "examples": [
         "Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-N"
+        ]
+      }
     },
     {
       "id": "C_O_Coupling",
@@ -210,6 +220,11 @@
           "Cu": "Ullmann",
           "Ni": "Ni-catalyzed"
         }
+      },
+      "constraints": {
+        "include_bond_formed": [
+          "C-O"
+        ]
       }
     },
     {
@@ -252,7 +267,12 @@
         "chan_lam",
         "Chan-Lam C-N",
         "Chan Lam C-N"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-N"
+        ]
+      }
     },
     {
       "id": "C_S_Coupling",
@@ -306,6 +326,11 @@
           "Cu": "Ullmann",
           "Ni": "Ni-catalyzed"
         }
+      },
+      "constraints": {
+        "include_bond_formed": [
+          "C-S"
+        ]
       }
     },
     {
@@ -416,7 +441,12 @@
         "sonogashira",
         "Sonogashira_CC",
         "Sonogashira_coupling"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Heck",
@@ -451,7 +481,12 @@
       "aliases": [
         "heck",
         "HeckMizoroki_coupling"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Negishi",
@@ -488,7 +523,12 @@
       "aliases": [
         "negishi",
         "Negishi_coupling"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Stille",
@@ -524,7 +564,12 @@
       "aliases": [
         "stille",
         "Stille_coupling"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Kumada",
@@ -562,7 +607,12 @@
       "aliases": [
         "kumada",
         "Kumada_coupling"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Hiyama",
@@ -598,7 +648,12 @@
       "aliases": [
         "hiyama",
         "Hiyama_coupling"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Cyanation_coupling",
@@ -624,7 +679,12 @@
       "aliases": [
         "cyanation_coupling",
         "nitrile_coupling"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Azide_coupling",
@@ -644,7 +704,12 @@
       ],
       "aliases": [
         "azide_coupling"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-N"
+        ]
+      }
     },
     {
       "id": "Sandmeyer",
@@ -817,7 +882,12 @@
         "C-H arylation acidic",
         "alpha arylation"
       ],
-      "description": "Arylation of C-H acidic compounds (alpha to carbonyl or other EWG) with aryl electrophiles."
+      "description": "Arylation of C-H acidic compounds (alpha to carbonyl or other EWG) with aryl electrophiles.",
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Arylation_Ar_H",
@@ -838,7 +908,12 @@
       "aliases": [
         "ar_h_arylation",
         "c_h_arylation"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Minisci_alkylation",
@@ -871,7 +946,12 @@
       "description": "Alkyl carboxylic acids add to aromatic C-H sites (often electron-deficient heteroarenes such as pyridine).",
       "examples": [
         "O=C(O)C1CCCCC1.Cc1ccnc2ccccc12>>Cc1cc(C2CCCCC2)nc2ccccc12"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Minisci_acylation",
@@ -904,7 +984,12 @@
       "description": "Alpha-keto acids add to aromatic C-H sites to form aryl ketones (Minisci acylation).",
       "examples": [
         "c1cnccn1.O=C(O)C(=O)c1ccccc1>>O=C(c1ccccc1)c1cnccn1"
-      ]
+      ],
+      "constraints": {
+        "include_bond_formed": [
+          "C-C"
+        ]
+      }
     },
     {
       "id": "Decarboxylative_Coupling",
@@ -942,6 +1027,9 @@
         "exclude_reacted": [],
         "include_formed": [],
         "exclude_formed": [],
+        "include_bond_formed": [
+          "C-C"
+        ],
         "min_reactant_slot_matches": 2,
         "min_product_slot_matches": 1
       }
@@ -1011,6 +1099,11 @@
             "AromN-F"
           ]
         }
+      },
+      "constraints": {
+        "include_bond_formed": [
+          "C-N"
+        ]
       }
     },
     {

@@ -76,11 +76,12 @@ def _constraints_match(
         return False
     if exclude_formed and (exclude_formed & formed_set):
         return False
-    if include_bond_formed and not include_bond_formed.issubset(formed_bonds):
+    # Enforce include-bond constraints only when bond evidence is available.
+    if include_bond_formed and formed_bond_tokens and not include_bond_formed.issubset(formed_bonds):
         return False
     if exclude_bond_formed and (exclude_bond_formed & formed_bonds):
         return False
-    if include_bond_broken and not include_bond_broken.issubset(broken_bonds):
+    if include_bond_broken and broken_bond_tokens and not include_bond_broken.issubset(broken_bonds):
         return False
     if exclude_bond_broken and (exclude_bond_broken & broken_bonds):
         return False
@@ -450,6 +451,23 @@ def _format_validation_response(
             "corrected_from": None,
             "reason": "Pattern consistent with slot-based detection",
         }
+        initial_text = str(initial_detection or "").strip()
+        if initial_text and initial_text != "Unknown" and isinstance(evidence, dict):
+            top_candidates = evidence.get("top_candidates")
+            reacted_evidence = evidence.get("reacted_motifs") or []
+            formed_evidence = evidence.get("formed_motifs") or []
+            if (
+                isinstance(top_candidates, list)
+                and not top_candidates
+                and (reacted_evidence or formed_evidence)
+            ):
+                payload = {
+                    "reaction_type": "Unknown",
+                    "confidence": 0.0,
+                    "validation_method": "crk_pattern_conflict",
+                    "corrected_from": initial_detection,
+                    "reason": "No taxonomy-consistent CRK match for observed motif/bond evidence",
+                }
         if evidence is not None:
             payload["evidence"] = evidence
         return payload

@@ -985,6 +985,11 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         dialog = QtWidgets.QDialog(self)
         dialog.setWindowTitle("Reaction Preview")
+        dialog.setWindowFlags(
+            dialog.windowFlags()
+            | QtCore.Qt.WindowType.WindowSystemMenuHint
+            | QtCore.Qt.WindowType.WindowMinimizeButtonHint
+        )
         dialog.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         dialog.destroyed.connect(lambda: setattr(self, "_reaction_dialog", None))
 

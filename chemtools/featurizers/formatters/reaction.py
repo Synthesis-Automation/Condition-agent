@@ -178,6 +178,7 @@ def get_crk_options() -> Dict[str, Any]:
         "include_reaction_type": False,
         "motif_site_filter": "substituent",
         "confirm_coupling_products": True,
+        "strict_product_motif_validation": True,
         "discovery_mode": False,
         "reactant_coverage_guard": True,
     }
@@ -1965,6 +1966,10 @@ def featurize_reaction(
     skip_bond_analysis = to_bool(options.get("skip_bond_analysis"), default=False)
     include_product_in_crk = to_bool(options.get("include_product_in_crk"), default=True)
     reactant_coverage_guard = to_bool(options.get("reactant_coverage_guard"), default=True)
+    strict_product_motif_validation = to_bool(
+        options.get("strict_product_motif_validation"),
+        default=True,
+    )
     
     # General coupling confirmation (supports 9+ coupling reaction types)
     # Backward compatibility: map old Suzuki-specific parameter to general one
@@ -2158,6 +2163,11 @@ def featurize_reaction(
             )
             formed_inferred = {normalize_motif_id(str(m)) for m in rescue_formed if m}
         formed_all = sorted(formed_raw | formed_inferred)
+        formed_for_validation = (
+            sorted(formed_raw)
+            if strict_product_motif_validation
+            else formed_all
+        )
         spectators_for_detection = sorted(
             normalize_motif_id(str(m))
             for m in (set(spectators_for_crk) - set(reacted_for_detection))
@@ -2168,7 +2178,7 @@ def featurize_reaction(
             reacted=reacted_for_detection,
             spectators=spectators_for_detection,
             product_broad_tags=[],
-            product_motifs_reactive=formed_all,
+            product_motifs_reactive=formed_for_validation,
             include_product=True,
         )
         from .detection_validation import validate_detection_with_crk_key

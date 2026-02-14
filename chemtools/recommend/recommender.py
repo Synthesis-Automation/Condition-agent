@@ -2757,6 +2757,7 @@ class HTERecommender:
         product_motifs_from_rxn = set()
         
         reaction_data: Dict[str, Any] = {}
+        has_product_guided_detection = False
         if reaction_smiles and (">" in reaction_smiles or "." in reaction_smiles):
             try:
                 rxn_features = featurize_reaction(
@@ -2766,6 +2767,8 @@ class HTERecommender:
                 if isinstance(rxn_features, dict):
                     nested = rxn_features.get("reaction")
                     reaction_data = nested if isinstance(nested, dict) else rxn_features
+                if product_smiles and reaction_data:
+                    has_product_guided_detection = True
                 rxn_type_data = reaction_data.get("reaction_type", {})
                 detected_type = None
                 detected_confidence = 0.0
@@ -2776,7 +2779,13 @@ class HTERecommender:
                     detected_type = str(rxn_type_data).strip() if rxn_type_data else None
                     detected_confidence = reaction_data.get("confidence", 0.0) or 0.0
                 
-                if detected_type and detected_type != "Unknown" and detected_confidence > 0.5:
+                # When product-guided featurization is available, keep that
+                # signal as authoritative and avoid reactant-only fallback
+                # overriding it downstream.
+                if has_product_guided_detection and detected_type:
+                    result.predicted_reaction_type = detected_type
+                    result.reaction_type_confidence = float(detected_confidence)
+                elif detected_type and detected_type != "Unknown" and detected_confidence > 0.5:
                     result.predicted_reaction_type = detected_type
                     result.reaction_type_confidence = detected_confidence
                 
@@ -3260,13 +3269,20 @@ class HTERecommender:
                         matched_df["match_score"] = weight_series
 
         # Step 2: Predict reaction type (using reactant patterns; fallback to match frequency)
-        if result.matched_motifs and not result.predicted_reaction_type:
+        if (
+            result.matched_motifs
+            and not result.predicted_reaction_type
+            and not has_product_guided_detection
+        ):
             pred_rxn, rxn_conf = self._predict_reaction_type(
                 result.reactant_a_type, result.reactant_b_type
             )
             result.predicted_reaction_type = pred_rxn
             result.reaction_type_confidence = rxn_conf
-        if not result.predicted_reaction_type or result.predicted_reaction_type == "Unknown":
+        if (
+            (not result.predicted_reaction_type or result.predicted_reaction_type == "Unknown")
+            and not has_product_guided_detection
+        ):
             if "Reaction_Type_Standardized" in matched_df.columns:
                 type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
                 type_series = type_series[type_series != ""]
