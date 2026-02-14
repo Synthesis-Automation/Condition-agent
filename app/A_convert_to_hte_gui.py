@@ -12,6 +12,10 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from PyQt6 import QtWidgets, QtCore
 from app.A_convert_to_hte_format import process_reaction_dataset, enrich_reaction_dataset_cas
+from chemtools.recommend.reaction_key_utils import (
+    build_reaction_events_payload,
+    serialize_reaction_events_payload,
+)
 
 DEFAULT_LLM_PROVIDER = os.getenv("CHEMTOOLS_LLM_PROVIDER", os.getenv("LLM_PROVIDER", "openai")).strip() or "openai"
 DEFAULT_LLM_MODEL = os.getenv("CHEMTOOLS_LLM_MODEL", os.getenv("LLM_MODEL", "")).strip()
@@ -97,6 +101,25 @@ class ConversionWorker(QtCore.QObject):
                 
         except Exception as e:
             self.finished.emit(False, f"Error: {str(e)}")
+
+
+def _ensure_reaction_events_column(df: pd.DataFrame) -> pd.DataFrame:
+    """Ensure output CSV contains standardized Reaction_Events payloads."""
+    if "Reaction_Key" not in df.columns:
+        return df
+    out = df.copy()
+    if "Reaction_Events" not in out.columns:
+        out["Reaction_Events"] = ""
+    series = out["Reaction_Events"].fillna("").astype(str).str.strip()
+    missing_mask = series.eq("") | series.str.lower().eq("nan")
+    if not missing_mask.any():
+        return out
+
+    key_series = out["Reaction_Key"].fillna("").astype(str)
+    out.loc[missing_mask, "Reaction_Events"] = key_series[missing_mask].apply(
+        lambda key: serialize_reaction_events_payload(build_reaction_events_payload(key))
+    )
+    return out
 
 class HTEConverterWindow(QtWidgets.QWidget):
     def __init__(self):
@@ -202,7 +225,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
 
         form.addRow("Input CSV(s):", input_layout)
         form.addRow("Output CSV/Folder:", self.output_edit)
-        form.addRow("", QtWidgets.QLabel("Output includes formed_motifs, spectator_groups, and reactant_3 columns."))
+        form.addRow("", QtWidgets.QLabel("Output includes formed_motifs, spectator_groups, reactant_3, and Reaction_Events columns."))
         form.addRow("", self.drop_catalyst_check)
         form.addRow("", self.skip_cas_check)
         form.addRow("", self.protocol_mode_check)
@@ -608,6 +631,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
                             output_df['reaction_setup_json'] = setup_json_backup
                             print(f"✓ Added reaction_setup_json to {len(output_df)} rows")
                     
+                    output_df = _ensure_reaction_events_column(output_df)
                     output_df.to_csv(output_path, index=False)
                     print(f"✓ Saved enhanced output with {len(output_df)} rows and {len(output_df.columns)} columns")
                     

@@ -839,7 +839,13 @@ def test_normalize_hte_dataframe_prefers_detected_type_and_backfills_reaction_ke
 
     def fake_featurize_reaction(smiles: str, options=None):
         return {
-            "reaction_key": "CRK-v1 |Ar-B(OH)2|Ar-OMs|R_acidic-H -> Ar-Ar | spectators: Ar-Alkyl"
+            "reaction_key": (
+                "CRK-v1 |Ar-B(OH)2|Ar-OMs|R_acidic-H -> Ar-Ar "
+                "| bond_formed: C(ar)-C(ar) "
+                "| bond_broken: C(ar)-O "
+                "| spectators: Ar-Alkyl "
+                "| events: LGDisp+C-C"
+            )
         }
 
     monkeypatch.setattr(hte, "featurize_reaction", fake_featurize_reaction)
@@ -847,7 +853,12 @@ def test_normalize_hte_dataframe_prefers_detected_type_and_backfills_reaction_ke
     normalized = hte._normalize_hte_dataframe(df)
 
     assert normalized.loc[0, "Reaction_Type_Standardized"] == "Suzuki_miyaura"
-    assert str(normalized.loc[0, "Reaction_Key"]).startswith("CRK-v1")
+    assert str(normalized.loc[0, "Reaction_Key"]).startswith("|")
+    assert "bond_formed:" not in str(normalized.loc[0, "Reaction_Key"])
+    assert "events:" not in str(normalized.loc[0, "Reaction_Key"])
+    events_text = str(normalized.loc[0, "Reaction_Events"])
+    assert "form:" in events_text
+    assert "sig:" in events_text
 
 
 def test_precedent_exact_reaction_rescue_works_across_family_filter(monkeypatch) -> None:

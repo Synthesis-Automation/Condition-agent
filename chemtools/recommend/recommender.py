@@ -34,6 +34,12 @@ from chemtools.featurizers.spectator_rank import (
     weighted_spectator_similarity,
 )
 from chemtools.smiles import normalize_reaction
+from chemtools.recommend.reaction_key_utils import (
+    build_reaction_events_payload,
+    canonicalize_reaction_key_minimal,
+    normalize_reaction_events_text,
+    serialize_reaction_events_payload,
+)
 
 try:
     from chemtools.taxonomy import reaction_catalog as _reaction_catalog
@@ -214,6 +220,8 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "solvent": "Solvent",
         "additive": "Additive",
         "Spectator Groups": "spectator_groups",
+        "reaction_events": "Reaction_Events",
+        "Reaction Events": "Reaction_Events",
     }
 
     df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
@@ -244,17 +252,35 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
                     return ""
                 try:
                     context = featurize_reaction(s, options=get_crk_options())
-                    return context.get("reaction_key") or ""
+                    return str(context.get("reaction_key") or "")
                 except Exception:
                     return ""
 
             df.loc[needs_key_mask, "Reaction_Key"] = reaction_smiles_series[needs_key_mask].apply(_gen_rxn_key)
 
     if "Reaction_Key" in df.columns:
-        df["Reaction_Key"] = df["Reaction_Key"].fillna("").astype(str).str.strip()
-        crk_mask = df["Reaction_Key"].str.startswith("CRK-v1")
-        if (~crk_mask).any():
-            df.loc[~crk_mask, "Reaction_Key"] = ""
+        if "Reaction_Events" not in df.columns:
+            df["Reaction_Events"] = ""
+        raw_key_series = df["Reaction_Key"].fillna("").astype(str).str.strip()
+        raw_events_series = df["Reaction_Events"].fillna("").astype(str).str.strip()
+        normalized_keys: List[str] = []
+        normalized_events: List[str] = []
+        for raw_key, raw_events in zip(raw_key_series.tolist(), raw_events_series.tolist()):
+            minimal_key = canonicalize_reaction_key_minimal(raw_key)
+            normalized_keys.append(minimal_key)
+            if raw_events and raw_events.lower() != "nan":
+                normalized_text = normalize_reaction_events_text(raw_events)
+                normalized_events.append(normalized_text or raw_events)
+            else:
+                events_payload = build_reaction_events_payload(raw_key)
+                normalized_events.append(
+                    serialize_reaction_events_payload(events_payload)
+                )
+        df["Reaction_Key"] = normalized_keys
+        df["Reaction_Events"] = normalized_events
+        valid_mask = df["Reaction_Key"].fillna("").astype(str).str.contains("->", regex=False)
+        if (~valid_mask).any():
+            df.loc[~valid_mask, "Reaction_Key"] = ""
         if "Reaction_Type_Standardized" not in df.columns or not any(df["Reaction_Type_Standardized"]):
             df["Reaction_Type_Standardized"] = df["Reaction_Key"]
         if "Reactant_Types_Key" not in df.columns or not any(df["Reactant_Types_Key"]):
@@ -267,7 +293,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "Secondary Solvent", "Coupling Reagent", "AREA_TOTAL_REDUCED", "z-Score",
         "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category",
         "Source_File", "Source_Group", "Source_Row", "spectator_groups",
-        "Reactant_Signature_Core", "Reactant_Signature_Ext", "Rule_Tier",
+        "Reactant_Signature_Core", "Reactant_Signature_Ext", "Rule_Tier", "Reaction_Events",
     ]
     for col in required_cols:
         if col not in df.columns:
@@ -503,11 +529,11 @@ def _normalize_reaction_key(value: Any) -> Optional[str]:
     """Normalize reaction key text; return None for empty placeholders."""
     if value is None:
         return None
-    text = str(value).strip()
+    text = canonicalize_reaction_key_minimal(value)
     if not text or text.lower() == "none":
         return None
     compact = text.replace(" ", "")
-    if compact == "[]->[]||[]":
+    if compact in {"[]->[]||[]", "CRK-v1|[]->[]", "|[]->[]"}:
         return None
     return text
 
@@ -1816,6 +1842,7 @@ class ConditionRecommendation:
     reaction_category: Optional[str] = None
     reaction_id: Optional[str] = None
     reaction_key: Optional[str] = None
+    reaction_events: Optional[str] = None
     reactant_types: Tuple[str, str] = ("", "")
     z_score_range: Tuple[float, float] = (0.0, 0.0)
 
@@ -2260,6 +2287,12 @@ class HTERecommender:
                 key_series = key_series[key_series != ""]
                 if not key_series.empty:
                     reaction_key = key_series.mode().iloc[0]
+            reaction_events = None
+            if "Reaction_Events" in group_df.columns:
+                events_series = group_df["Reaction_Events"].fillna("").astype(str).str.strip()
+                events_series = events_series[events_series != ""]
+                if not events_series.empty:
+                    reaction_events = events_series.mode().iloc[0]
             reaction_id = _format_source_reaction_ids(group_df)
             
             # Reactant types (from first row)
@@ -2304,6 +2337,7 @@ class HTERecommender:
                 reaction_category=reaction_category,
                 reaction_id=reaction_id,
                 reaction_key=reaction_key,
+                reaction_events=reaction_events,
                 reactant_types=reactant_types,
                 z_score_range=(z_min, z_max),
                 spectator_groups=spectator_groups,

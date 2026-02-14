@@ -108,6 +108,8 @@ def _serialize_recommendation(rec: Any) -> Dict[str, Any]:
         "reaction_type": rec.reaction_type,
         "reaction_category": rec.reaction_category,
         "reaction_id": rec.reaction_id,
+        "reaction_key": rec.reaction_key,
+        "reaction_events": rec.reaction_events,
         "reactant_types": list(rec.reactant_types) if rec.reactant_types else [],
         "z_score_range": list(rec.z_score_range) if rec.z_score_range else [],
     }

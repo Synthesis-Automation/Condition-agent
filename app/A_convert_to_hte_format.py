@@ -17,6 +17,11 @@ if str(PROJECT_ROOT) not in sys.path:
 from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
 from chemtools.featurizers.formatters.reaction import get_crk_options
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
+from chemtools.recommend.reaction_key_utils import (
+    build_reaction_events_payload,
+    canonicalize_reaction_key_minimal,
+    serialize_reaction_events_payload,
+)
 from chemtools.smiles import normalize
 from chemtools.reagent.lookup import find_reagent
 
@@ -835,7 +840,15 @@ def process_reaction_dataset(
                 reacted_set = set(aggregates.get("reacted_motifs") or [])
                 formed_set = set(aggregates.get("formed_motifs") or [])
                 spectators_set = set(aggregates.get("spectator_motifs") or [])
-                reaction_key = rxn_bundle.get("reaction_key") or ""
+                reaction_key_raw = str(rxn_bundle.get("reaction_key") or "")
+                reaction_key = canonicalize_reaction_key_minimal(reaction_key_raw) or reaction_key_raw
+                reaction_events_payload = build_reaction_events_payload(
+                    reaction_key_raw,
+                    rxn_bundle.get("reaction_events")
+                    if isinstance(rxn_bundle.get("reaction_events"), dict)
+                    else None,
+                )
+                reaction_events_text = serialize_reaction_events_payload(reaction_events_payload)
 
                 formed_motifs_str = _reactant_key(list(formed_set)) or "None"
 
@@ -894,6 +907,7 @@ def process_reaction_dataset(
                     "spectator_groups": " / ".join(spectator_groups),
                     "reference": row.get("reference", ""),
                     "Reaction_Key": reaction_key,
+                    "Reaction_Events": reaction_events_text,
                     "_reaction_key": reaction_key,
                 }
                 rows.append(row_out)
@@ -965,7 +979,15 @@ def process_reaction_dataset(
             reacted_set = set(aggregates.get("reacted_motifs") or [])
             formed_set = set(aggregates.get("formed_motifs") or [])
             spectators_set = set(aggregates.get("spectator_motifs") or [])
-            reaction_key = rxn_bundle.get("reaction_key") or ""
+            reaction_key_raw = str(rxn_bundle.get("reaction_key") or "")
+            reaction_key = canonicalize_reaction_key_minimal(reaction_key_raw) or reaction_key_raw
+            reaction_events_payload = build_reaction_events_payload(
+                reaction_key_raw,
+                rxn_bundle.get("reaction_events")
+                if isinstance(rxn_bundle.get("reaction_events"), dict)
+                else None,
+            )
+            reaction_events_text = serialize_reaction_events_payload(reaction_events_payload)
 
             formed_motifs_str = _reactant_key(list(formed_set)) or "None"
 
@@ -1024,6 +1046,7 @@ def process_reaction_dataset(
                 "spectator_groups": " / ".join(spectator_groups),
                 "reference": record.get("reference", ""),
                 "Reaction_Key": reaction_key,
+                "Reaction_Events": reaction_events_text,
                 "_reaction_key": reaction_key,
             }
             rows.append(row)
@@ -1074,7 +1097,7 @@ def process_reaction_dataset(
     df["z_score"] = df["z_score"].round(2)
 
     canonical_cols = [
-        "reaction_id", "detected_reaction_type", "reaction_smiles", "Reaction_Key",
+        "reaction_id", "detected_reaction_type", "reaction_smiles", "Reaction_Key", "Reaction_Events",
         "reactant_1", "reactant_2", "reactant_3", "formed_motifs",
         "catalyst", "ligand", "base", "acid", "oxidant", "reductant",
         "additive", "condensation_agent", "other_reagent", "solvent",
