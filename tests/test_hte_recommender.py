@@ -128,6 +128,59 @@ def test_recommend_source_group_filter(monkeypatch) -> None:
     assert result.recommendations[0].catalyst == "Pd"
 
 
+def test_recommend_can_match_by_reaction_events_key(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    df["Reaction_Type_Standardized"] = ["C_N_Coupling"]
+    df["Reaction_Key"] = [""]
+    df["Reaction_Events"] = ["sig:LGDisp+C-N | form:C(ar)-N | break:Br-C(ar)"]
+
+    event_key = hte._reaction_events_to_match_key(df.loc[0, "Reaction_Events"])
+    indexed_data = {}
+    reaction_type_patterns = {}
+    transformation_indices = {event_key: df.copy()}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return [], "Unknown"
+
+    def fake_featurize_reaction(smiles: str, options=None):
+        return {
+            "reaction_type": {"reaction_type": "C_N_Coupling", "confidence": 0.95},
+            "reaction_key": "",
+            "reaction_events": {
+                "events": [
+                    {"kind": "c_n_bond_formation", "confidence": 0.9},
+                    {"kind": "leaving_group_displacement", "confidence": 0.92},
+                ],
+                "bond_pairs": {"formed": [("C", "N")], "broken": [("Br", "C")]},
+            },
+            "aggregates": {
+                "reacted_motifs": ["Ar-Br", "HeteroAr-NH2"],
+                "formed_motifs": ["HeteroAr-NHR"],
+                "spectator_motifs": [],
+            },
+        }
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(hte, "featurize_reaction", fake_featurize_reaction)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Brc1ccccc1",
+        reactant_b_smiles="Nc1ncccn1",
+        product_smiles="c1ccc(Nc2ncccn2)cc1",
+        top_k=1,
+        min_experiments=1,
+    )
+
+    assert result.total_matching_experiments == 1
+    assert result.recommendations
+    assert result.query_reaction_events_key == event_key
+
+
 def test_recommend_top_k_zero_returns_all_matches(monkeypatch) -> None:
     base = _make_min_hte_df()
     alt_1 = base.copy()

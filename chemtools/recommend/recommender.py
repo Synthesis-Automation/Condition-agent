@@ -37,6 +37,7 @@ from chemtools.smiles import normalize_reaction
 from chemtools.recommend.reaction_key_utils import (
     build_reaction_events_payload,
     canonicalize_reaction_key_minimal,
+    deserialize_reaction_events_text,
     normalize_reaction_events_text,
     serialize_reaction_events_payload,
 )
@@ -48,6 +49,29 @@ except Exception:
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 LOGGER = logging.getLogger(__name__)
+_EVENT_MATCH_PREFIX = "RXNEVT|"
+_EVENT_SIGNATURE_PRIORITY = [
+    "benzyl_o_alkylation_like",
+    "ester_hydrolysis_like",
+    "amidation_like",
+    "ring_closure_or_annulation",
+    "leaving_group_displacement",
+    "c_n_bond_formation",
+    "c_o_bond_formation",
+    "c_s_bond_formation",
+    "c_c_bond_formation",
+]
+_EVENT_SIGNATURE_CODE = {
+    "benzyl_o_alkylation_like": "BzOAlk",
+    "ester_hydrolysis_like": "EsterHyd",
+    "amidation_like": "Amid",
+    "ring_closure_or_annulation": "Ann",
+    "leaving_group_displacement": "LGDisp",
+    "c_n_bond_formation": "C-N",
+    "c_o_bond_formation": "C-O",
+    "c_s_bond_formation": "C-S",
+    "c_c_bond_formation": "C-C",
+}
 
 
 def _infer_source_group(source_path: Optional[Path]) -> str:
@@ -278,6 +302,9 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
                 )
         df["Reaction_Key"] = normalized_keys
         df["Reaction_Events"] = normalized_events
+        df["Reaction_Events_Key"] = [
+            _reaction_events_to_match_key(value) for value in normalized_events
+        ]
         valid_mask = df["Reaction_Key"].fillna("").astype(str).str.contains("->", regex=False)
         if (~valid_mask).any():
             df.loc[~valid_mask, "Reaction_Key"] = ""
@@ -285,6 +312,11 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
             df["Reaction_Type_Standardized"] = df["Reaction_Key"]
         if "Reactant_Types_Key" not in df.columns or not any(df["Reactant_Types_Key"]):
             df["Reactant_Types_Key"] = df["Reaction_Key"]
+    if "Reaction_Events" in df.columns and "Reaction_Events_Key" not in df.columns:
+        events_series = df["Reaction_Events"].fillna("").astype(str).str.strip()
+        df["Reaction_Events_Key"] = [
+            _reaction_events_to_match_key(value) for value in events_series.tolist()
+        ]
 
     required_cols = [
         "Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type",
@@ -294,6 +326,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         "Reactant_A_Category", "Reactant_B_Category", "Reaction_Category",
         "Source_File", "Source_Group", "Source_Row", "spectator_groups",
         "Reactant_Signature_Core", "Reactant_Signature_Ext", "Rule_Tier", "Reaction_Events",
+        "Reaction_Events_Key",
     ]
     for col in required_cols:
         if col not in df.columns:
@@ -484,6 +517,14 @@ def _load_hte_database_cached(
         else:
             grouped_rxn = df.groupby("Reaction_Type_Standardized")
             for key, group_df in grouped_rxn:
+                transformation_indices[key] = group_df
+
+    # Add event-aware indices so noisy/missing Reaction_Key values can still match.
+    if "Reaction_Events_Key" in df.columns:
+        event_key_series = df["Reaction_Events_Key"].fillna("").astype(str).str.strip()
+        event_df = df[event_key_series != ""]
+        for key, group_df in event_df.groupby("Reaction_Events_Key"):
+            if key and key not in transformation_indices:
                 transformation_indices[key] = group_df
 
     LOGGER.info(
@@ -1769,6 +1810,126 @@ def _parse_transformation_key(key: str) -> Tuple[Set[str], Set[str], Set[str]]:
     return reacted, formed, spectators
 
 
+def _normalize_bond_token_text(value: str) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    return text.replace(" ", "")
+
+
+def _canonicalize_bond_token_for_match(value: str) -> str:
+    token = _normalize_bond_token_text(value)
+    if not token or "-" not in token:
+        return token
+    left, right = token.split("-", 1)
+
+    def _elem(part: str) -> str:
+        text = str(part or "").strip()
+        if "(" in text:
+            text = text.split("(", 1)[0].strip()
+        return text
+
+    left_el = _elem(left)
+    right_el = _elem(right)
+    if not left_el or not right_el:
+        return token
+    return "-".join(sorted((left_el, right_el)))
+
+
+def _event_signature_from_kinds(kinds: Iterable[str]) -> str:
+    kind_set = {str(kind).strip() for kind in (kinds or []) if str(kind).strip()}
+    if not kind_set:
+        return ""
+    ordered_codes: List[str] = []
+    for kind in _EVENT_SIGNATURE_PRIORITY:
+        if kind not in kind_set:
+            continue
+        code = _EVENT_SIGNATURE_CODE.get(kind)
+        if code and code not in ordered_codes:
+            ordered_codes.append(code)
+    if not ordered_codes:
+        return ""
+    return "+".join(ordered_codes[:4])
+
+
+def _reaction_events_to_match_key(value: Any) -> str:
+    """
+    Canonical match key from Reaction_Events payload/text.
+
+    Supports:
+    - Compact text format (sig/form/break/redox...)
+    - Legacy JSON text payload
+    - Featurizer-native dict payload (`events`, `bond_pairs`, `redox_assessment`)
+    """
+    payload: Dict[str, Any] = {}
+    if isinstance(value, dict):
+        payload = dict(value)
+    else:
+        payload = deserialize_reaction_events_text(value)
+        if not payload:
+            return ""
+
+    token_chunks: List[str] = []
+
+    event_signature = str(payload.get("event_signature") or "").strip()
+    event_kinds = payload.get("event_kinds")
+    if not event_kinds and isinstance(payload.get("events"), list):
+        event_kinds = [
+            str(event.get("kind") or "").strip()
+            for event in payload.get("events") or []
+            if isinstance(event, dict) and str(event.get("kind") or "").strip()
+        ]
+    if not event_signature and isinstance(event_kinds, (list, tuple, set)):
+        event_signature = _event_signature_from_kinds(event_kinds)
+    if event_signature:
+        token_chunks.append("sig=" + event_signature)
+    if isinstance(event_kinds, (list, tuple, set)):
+        cleaned_kinds = sorted({str(kind).strip() for kind in event_kinds if str(kind).strip()})
+        if cleaned_kinds and not event_signature:
+            token_chunks.append("kinds=" + "+".join(cleaned_kinds))
+
+    formed_tokens: List[str] = []
+    raw_formed = payload.get("bond_formed")
+    if isinstance(raw_formed, (list, tuple, set)):
+        formed_tokens.extend(_canonicalize_bond_token_for_match(str(token)) for token in raw_formed)
+    bond_pairs = payload.get("bond_pairs")
+    if isinstance(bond_pairs, dict):
+        for pair in bond_pairs.get("formed") or []:
+            if isinstance(pair, (list, tuple)) and len(pair) == 2:
+                left = str(pair[0]).strip()
+                right = str(pair[1]).strip()
+                if left and right:
+                    formed_tokens.append("-".join(sorted((left, right))))
+    formed_tokens = sorted({token for token in formed_tokens if token})
+    if formed_tokens:
+        token_chunks.append("form=" + ";".join(formed_tokens))
+
+    broken_tokens: List[str] = []
+    raw_broken = payload.get("bond_broken")
+    if isinstance(raw_broken, (list, tuple, set)):
+        broken_tokens.extend(_canonicalize_bond_token_for_match(str(token)) for token in raw_broken)
+    if isinstance(bond_pairs, dict):
+        for pair in bond_pairs.get("broken") or []:
+            if isinstance(pair, (list, tuple)) and len(pair) == 2:
+                left = str(pair[0]).strip()
+                right = str(pair[1]).strip()
+                if left and right:
+                    broken_tokens.append("-".join(sorted((left, right))))
+    broken_tokens = sorted({token for token in broken_tokens if token})
+    if broken_tokens:
+        token_chunks.append("break=" + ";".join(broken_tokens))
+
+    redox = str(payload.get("redox_classification") or "").strip()
+    if not redox and isinstance(payload.get("redox_assessment"), dict):
+        redox = str((payload.get("redox_assessment") or {}).get("classification") or "").strip()
+    if redox:
+        token_chunks.append("redox=" + redox)
+
+    if not token_chunks:
+        return ""
+    return _EVENT_MATCH_PREFIX + "|".join(token_chunks)
+
+
 def _derive_query_sets(
     reactant_motifs: Set[str],
     product_motifs: Set[str],
@@ -1876,6 +2037,7 @@ class HTERecommendationResult:
     spectator_similarity_avg: float = 0.0
     spectator_similarity_range: Tuple[float, float] = (0.0, 0.0)
     query_reaction_key: Optional[str] = None  # Formatted Reaction_Key for the query
+    query_reaction_events_key: Optional[str] = None
     
     # Recommendations
     recommendations: List[ConditionRecommendation] = field(default_factory=list)
@@ -2871,8 +3033,24 @@ class HTERecommender:
             result.query_spectator_groups = tuple(sorted(query_spectator_groups))
 
             result.query_reaction_key = _normalize_reaction_key(reaction_data.get("reaction_key"))
+
+        query_events_payload = (
+            reaction_data.get("reaction_events")
+            if isinstance(reaction_data.get("reaction_events"), dict)
+            else None
+        )
+        query_reaction_events_key = _reaction_events_to_match_key(query_events_payload or {})
+        if not query_reaction_events_key:
+            query_reaction_events_key = _reaction_events_to_match_key(
+                build_reaction_events_payload(
+                    reaction_data.get("reaction_key") or "",
+                    query_events_payload,
+                )
+            )
+        result.query_reaction_events_key = query_reaction_events_key or None
+
         # If no reaction key and no reactant types, return empty
-        if not result.query_reaction_key and not type_a:
+        if not result.query_reaction_key and not result.query_reaction_events_key and not type_a:
             return result
 
         query_core_signature = ""
@@ -2886,7 +3064,12 @@ class HTERecommender:
             query_ext_signature = _encode_signature(
                 set(query_reacted) | (query_spectators or set())
             )
-        if reaction_key_only and not (result.query_reaction_key or query_core_signature or query_ext_signature):
+        if reaction_key_only and not (
+            result.query_reaction_key
+            or query_core_signature
+            or query_ext_signature
+            or result.query_reaction_events_key
+        ):
             return result
         
         lookup_type_a = list(type_a)
@@ -2945,6 +3128,15 @@ class HTERecommender:
             key_match_label = query_ext_signature
             key_match_score = 0.55
             key_match_priority = 2
+            result.is_fallback_match = True
+        elif (
+            result.query_reaction_events_key
+            and result.query_reaction_events_key in self.transformation_indices
+        ):
+            key_match_df = self.transformation_indices[result.query_reaction_events_key].copy()
+            key_match_label = result.query_reaction_events_key
+            key_match_score = 0.5
+            key_match_priority = 3
             result.is_fallback_match = True
 
         scored_matches = []
@@ -3010,7 +3202,12 @@ class HTERecommender:
         reacted_set = query_reacted or set()
         spectator_set = query_spectators or set()
 
-        has_query_key = bool(result.query_reaction_key or query_core_signature or query_ext_signature)
+        has_query_key = bool(
+            result.query_reaction_key
+            or query_core_signature
+            or query_ext_signature
+            or result.query_reaction_events_key
+        )
         allow_direct_backfill = False
         if has_query_key and not reaction_key_only:
             matched_groups: Set[str] = set()
