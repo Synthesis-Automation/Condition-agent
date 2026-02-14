@@ -29,3 +29,9 @@ def test_loaded_reaction_definitions_have_normalized_constraints() -> None:
     required = set(REACTION_CONSTRAINT_KEYS)
     for defn in definitions.values():
         assert required.issubset(set(defn.constraints.keys()))
+
+
+def test_loaded_reaction_definitions_expose_redox_neutral_flags() -> None:
+    definitions, _ = load_reaction_catalog()
+    assert definitions["Suzuki_miyaura"].redox_neutral is True
+    assert definitions["Reductive_amination"].redox_neutral is False

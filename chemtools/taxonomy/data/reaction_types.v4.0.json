@@ -4,6 +4,7 @@
   "reaction_types": [
     {
       "id": "Suzuki_miyaura",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organoboron"
@@ -48,6 +49,7 @@
     },
     {
       "id": "Miyaura_borylation",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles"
       },
@@ -78,6 +80,7 @@
     },
     {
       "id": "Ircatalyzed_CH_borylation",
+      "redox_neutral": true,
       "reactants": {
         "substrate": [
           "Ar-H",
@@ -104,6 +107,7 @@
     },
     {
       "id": "C_N_Coupling",
+      "redox_neutral": true,
       "aliases": [
         "C-N Coupling",
         "C N Coupling",
@@ -172,6 +176,7 @@
     },
     {
       "id": "C_O_Coupling",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@alcohols_oh"
@@ -229,6 +234,7 @@
     },
     {
       "id": "Chan_Lam_C_N_Coupling",
+      "redox_neutral": false,
       "reactants": {
         "electrophile": "@organoboron",
         "nucleophile": [
@@ -276,6 +282,7 @@
     },
     {
       "id": "C_S_Coupling",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@thiols_sh"
@@ -335,6 +342,7 @@
     },
     {
       "id": "Alkyl_Nucleophilic_Substitution",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@alkyl_electrophiles",
         "nucleophile": [
@@ -377,6 +385,7 @@
     
     {
       "id": "Aromatic_Halogen_Exchange",
+      "redox_neutral": true,
       "reactants": {
         "substrate": "@aromatic_halides"
       },
@@ -407,6 +416,7 @@
     },
     {
       "id": "Sonogashira",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@terminal_alkynes"
@@ -450,6 +460,7 @@
     },
     {
       "id": "Heck",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@terminal_alkenes"
@@ -490,6 +501,7 @@
     },
     {
       "id": "Negishi",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organozinc"
@@ -532,6 +544,7 @@
     },
     {
       "id": "Stille",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organotin"
@@ -573,6 +586,7 @@
     },
     {
       "id": "Kumada",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organomagnesium"
@@ -616,6 +630,7 @@
     },
     {
       "id": "Hiyama",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": "@organosilicon"
@@ -657,6 +672,7 @@
     },
     {
       "id": "Cyanation_coupling",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles"
       },
@@ -688,6 +704,7 @@
     },
     {
       "id": "Azide_coupling",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@sp2_electrophiles"
       },
@@ -713,6 +730,7 @@
     },
     {
       "id": "Sandmeyer",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-NH2",
@@ -752,6 +770,7 @@
     },
     {
       "id": "Aryl_Nitration",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-H"
@@ -769,6 +788,7 @@
     },
     {
       "id": "Acylation_friedel_crafts",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@acyl_halides"
       },
@@ -785,6 +805,7 @@
     },
     {
       "id": "Alkylation_friedel_crafts",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": [
           "Alkyl-Br",
@@ -807,6 +828,7 @@
     },
     {
       "id": "Michael_addition",
+      "redox_neutral": true,
       "reactants": {
         "michael_acceptor": [
           "Alkenyl-COR",
@@ -853,6 +875,7 @@
     },
     {
       "id": "Arylation_acidic_C_H",
+      "redox_neutral": false,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "nucleophile": [
@@ -891,6 +914,7 @@
     },
     {
       "id": "Arylation_Ar_H",
+      "redox_neutral": false,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "substrate": "Ar-H"
@@ -917,6 +941,7 @@
     },
     {
       "id": "Minisci_alkylation",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-H",
@@ -955,6 +980,7 @@
     },
     {
       "id": "Minisci_acylation",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-H",
@@ -993,6 +1019,7 @@
     },
     {
       "id": "Decarboxylative_Coupling",
+      "redox_neutral": false,
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "acid": [
@@ -1036,6 +1063,7 @@
     },
     {
       "id": "SNAr_CN",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": [
           "Ar-F",
@@ -1108,6 +1136,7 @@
     },
     {
       "id": "Amide_formation",
+      "redox_neutral": true,
       "reactants": {
         "acid": [
           "@carboxylic_acids",
@@ -1127,6 +1156,7 @@
     },
     {
       "id": "Esterification",
+      "redox_neutral": true,
       "reactants": {
         "acid": "@carboxylic_acids",
         "nucleophile": "@alcohols_oh"
@@ -1146,6 +1176,7 @@
     },
     {
       "id": "Acyl_Halides_formation",
+      "redox_neutral": true,
       "reactants": {
         "acid": "@carboxylic_acids"
       },
@@ -1167,6 +1198,7 @@
     },
     {
       "id": "Acylation_amide",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@acyl_halides",
         "nucleophile": "@amines_nh"
@@ -1183,6 +1215,7 @@
     },
     {
       "id": "Reductive_amination",
+      "redox_neutral": false,
       "reactants": {
         "electrophile": "@carbonyls",
         "nucleophile": "@amines_nh"
@@ -1215,6 +1248,7 @@
     },
     {
       "id": "Wittig_reaction",
+      "redox_neutral": true,
       "reactants": {
         "substrate": "@carbonyls"
       },
@@ -1258,6 +1292,7 @@
     },
     {
       "id": "Alkene_Hydrogenation",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-Alkenyl",
@@ -1284,6 +1319,7 @@
     },
     {
       "id": "Click_cuaac",
+      "redox_neutral": true,
       "reactants": {
         "alkyne": "@terminal_alkynes",
         "azide": "@azides"
@@ -1308,6 +1344,7 @@
     },
     {
       "id": "Acylation_ester",
+      "redox_neutral": true,
       "reactants": {
         "electrophile": "@acyl_halides",
         "nucleophile": "@alcohols_oh"
@@ -1324,6 +1361,7 @@
     },
     {
       "id": "Oxidation_primary_alcohol_to_aldehyde",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "RCH2-OH",
@@ -1355,6 +1393,7 @@
     },
     {
       "id": "Oxidation_secondary_alcohol_to_ketone",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "R2CH-OH"
@@ -1384,6 +1423,7 @@
     },
     {
       "id": "Oxidation_primary_alcohol_to_carboxylic_acid",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "RCH2-OH",
@@ -1415,6 +1455,7 @@
     },
     {
       "id": "Benzylic_CH_oxidation_to_carbonyl",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-Alkyl"
@@ -1438,6 +1479,7 @@
     },
     {
       "id": "Benzylic_CH_oxidation_to_carboxylic_acid",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-Alkyl"
@@ -1459,6 +1501,7 @@
     },
     {
       "id": "Oxidation_aldehyde_to_carboxylic_acid",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Alkenyl-CHO",
@@ -1491,6 +1534,7 @@
     },
     {
       "id": "Baeyer_villiger_oxidation",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Alkenyl-COR",
@@ -1518,6 +1562,7 @@
     },
     {
       "id": "Alkene_oxidative_cleavage_to_carbonyl",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-Alkenyl",
@@ -1545,6 +1590,7 @@
     },
     {
       "id": "Alkene_oxidative_cleavage_to_carboxylic_acid",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-Alkenyl",
@@ -1572,6 +1618,7 @@
     },
     {
       "id": "Oxidation_sulfide_to_sulfone",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Alkyl-SR",
@@ -1607,6 +1654,7 @@
     },
     {
       "id": "Reduction_carbonyl_to_alcohol",
+      "redox_neutral": false,
       "reactants": {
         "substrate": "@carbonyls"
       },
@@ -1628,6 +1676,7 @@
     },
     {
       "id": "Reduction_imine_to_amine",
+      "redox_neutral": false,
       "reactants": {
         "substrate": "@imines"
       },
@@ -1664,6 +1713,7 @@
     },
     {
       "id": "Reduction_nitrile_to_amine",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-CN",
@@ -1699,6 +1749,7 @@
     },
     {
       "id": "Reduction_ester_to_alcohol",
+      "redox_neutral": false,
       "reactants": {
         "substrate": "@esters"
       },
@@ -1731,6 +1782,7 @@
     },
     {
       "id": "Reduction_nitro",
+      "redox_neutral": false,
       "reactants": {
         "substrate": "@nitro_compounds"
       },
@@ -1750,6 +1802,7 @@
     },
     {
       "id": "Rosenmund_reduction",
+      "redox_neutral": false,
       "reactants": {
         "substrate": "@acyl_halides"
       },
@@ -1774,6 +1827,7 @@
     },
     {
       "id": "Halogenation_aromatic",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-H",
@@ -1798,6 +1852,7 @@
     
     {
       "id": "Trifluoromethylation",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-H",
@@ -1828,6 +1883,7 @@
     },
     {
       "id": "Epoxidation",
+      "redox_neutral": false,
       "reactants": {
         "substrate": [
           "Ar-Alkenyl",
@@ -1857,3 +1913,4 @@
     
   ]
 }
+

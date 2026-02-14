@@ -54,6 +54,7 @@ class ReactionTypeDefinition:
     reference_reactions: List[str]
     notes: Optional[str]
     constraints: Dict[str, Any]
+    redox_neutral: Optional[bool] = None
     synthons: Dict[str, "SlotRequirement"] = field(default_factory=dict)
 
 
@@ -337,6 +338,12 @@ def _to_non_negative_int(value: Any, default: int = 0) -> int:
     return max(0, out)
 
 
+def _coerce_optional_bool(value: Any) -> Optional[bool]:
+    if isinstance(value, bool):
+        return value
+    return None
+
+
 def normalize_reaction_constraints(raw: Any) -> Dict[str, Any]:
     """
     Normalize reaction constraints into a stable schema for all reaction families.
@@ -413,6 +420,7 @@ def load_reaction_catalog(
         conditions = entry.get("conditions")
         metadata = dict(entry.get("metadata") or {})
         constraints = normalize_reaction_constraints(entry.get("constraints"))
+        redox_neutral = _coerce_optional_bool(entry.get("redox_neutral"))
         synthons = normalize_reaction_synthons(entry.get("synthons"), synthon_sets)
         raw_references = entry.get("reference_reactions")
         if not raw_references:
@@ -434,6 +442,7 @@ def load_reaction_catalog(
             reference_reactions=reference_reactions,
             notes=notes,
             constraints=constraints,
+            redox_neutral=redox_neutral,
             synthons=synthons,
         )
 

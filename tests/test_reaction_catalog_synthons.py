@@ -44,4 +44,4 @@ def test_load_reaction_catalog_normalizes_synthon_slots(tmp_path: Path) -> None:
     assert "nucleophile" in toy.synthons
     assert "sp2_electrophile" in toy.synthons["electrophile"].allowed
     assert toy.synthons["nucleophile"].allowed == ["amine_nucleophile"]
-
+    assert toy.redox_neutral is None
