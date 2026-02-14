@@ -1,0 +1,24 @@
+{
+  "empty_reaction_key": {
+    "count": 5,
+    "rate": 0.0167
+  },
+  "input_csv": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300\\Kumada_coupling.csv",
+  "low_reaction_key_quality": {
+    "count": 5,
+    "rate": 0.0167
+  },
+  "output_csv": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300\\Kumada_coupling.predicted.csv",
+  "prediction_errors": 0,
+  "processed_rows": 300,
+  "reaction_column": "reaction_smiles",
+  "total_rows": 300,
+  "unknown_reaction_type": {
+    "count": 5,
+    "rate": 0.0167
+  },
+  "with_mapping_warning": {
+    "count": 150,
+    "rate": 0.5
+  }
+}

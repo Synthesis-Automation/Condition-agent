@@ -1,0 +1,24 @@
+{
+  "empty_reaction_key": {
+    "count": 0,
+    "rate": 0.0
+  },
+  "input_csv": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300\\Reduction_NaBHOAc3_NaBH3CN.csv",
+  "low_reaction_key_quality": {
+    "count": 0,
+    "rate": 0.0
+  },
+  "output_csv": "C:\\Git-softwares\\Condition-agent\\results\\reaction_dataset_300\\Reduction_NaBHOAc3_NaBH3CN.predicted.csv",
+  "prediction_errors": 0,
+  "processed_rows": 300,
+  "reaction_column": "reaction_smiles",
+  "total_rows": 300,
+  "unknown_reaction_type": {
+    "count": 10,
+    "rate": 0.0333
+  },
+  "with_mapping_warning": {
+    "count": 146,
+    "rate": 0.4867
+  }
+}
