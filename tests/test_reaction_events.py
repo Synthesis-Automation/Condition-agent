@@ -35,6 +35,9 @@ def test_reaction_events_detect_displacement_and_cn_formation() -> None:
     quality = summary.get("reaction_key_quality") or {}
     assert quality.get("level") in {"high", "medium", "low"}
     assert isinstance(quality.get("score_0_1"), float)
+    redox = summary.get("redox_assessment") or {}
+    assert redox.get("classification") in {"redox_neutral", "net_oxidation", "net_reduction", "uncertain"}
+    assert isinstance(redox.get("confidence"), float)
 
 
 def test_reaction_events_flag_amidation_without_activation() -> None:
@@ -48,6 +51,32 @@ def test_reaction_events_flag_amidation_without_activation() -> None:
     )
     assert "amidation_without_explicit_activation_marker" in (summary.get("anomalies") or [])
     assert "amidation_like" in _event_kinds(summary)
+
+
+def test_reaction_events_redox_assessment_marks_balanced_substitution_as_neutral() -> None:
+    summary = summarize_reaction_events(
+        reaction_smiles="Ic1ccccc1.N>>Nc1ccccc1",
+        bond_key="form: C-N | break: C-I",
+        fallback_bond_key=None,
+        reacted_motifs=["Ar-I", "Ar-NH2"],
+        formed_motifs=["Ar-NR2"],
+        mapping_warning=None,
+    )
+    redox = summary.get("redox_assessment") or {}
+    assert redox.get("classification") == "redox_neutral"
+
+
+def test_reaction_events_redox_assessment_marks_c_h_formation_as_reduction() -> None:
+    summary = summarize_reaction_events(
+        reaction_smiles="C=C>>CC",
+        bond_key="form: C-H",
+        fallback_bond_key=None,
+        reacted_motifs=[],
+        formed_motifs=[],
+        mapping_warning=None,
+    )
+    redox = summary.get("redox_assessment") or {}
+    assert redox.get("classification") == "net_reduction"
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")

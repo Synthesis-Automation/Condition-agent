@@ -45,6 +45,7 @@ _EVENT_SIGNATURE_CODE = {
     "c_s_bond_formation": "C-S",
     "c_c_bond_formation": "C-C",
 }
+_REDOX_HETERO = {"N", "O", "S", "P", "F", "Cl", "Br", "I"}
 
 
 def _split_reaction_sides(reaction_smiles: str) -> Tuple[List[str], List[str]]:
@@ -156,6 +157,86 @@ def _quality_bucket(score: float) -> str:
     if score >= 0.45:
         return "medium"
     return "low"
+
+
+def _compute_redox_assessment(
+    formed_pairs: Set[Tuple[str, str]],
+    broken_pairs: Set[Tuple[str, str]],
+) -> Dict[str, Any]:
+    """
+    Heuristic redox assessment from bond-pair deltas.
+
+    Score convention:
+    - positive: net oxidation signal on substrate carbons
+    - negative: net reduction signal on substrate carbons
+    """
+
+    signals: List[str] = []
+    score = 0.0
+
+    formed_het = sum(
+        1 for a, b in formed_pairs if "C" in (a, b) and ({a, b} - {"C"}) and next(iter({a, b} - {"C"})) in _REDOX_HETERO
+    )
+    broken_het = sum(
+        1 for a, b in broken_pairs if "C" in (a, b) and ({a, b} - {"C"}) and next(iter({a, b} - {"C"})) in _REDOX_HETERO
+    )
+    formed_ch = int(("C", "H") in formed_pairs)
+    broken_ch = int(("C", "H") in broken_pairs)
+
+    # Forming C-hetero bonds and breaking C-H bonds are oxidation-like.
+    score += float(formed_het)
+    score += float(broken_ch)
+    # Breaking C-hetero bonds and forming C-H bonds are reduction-like.
+    score -= float(broken_het)
+    score -= float(formed_ch)
+
+    if formed_het:
+        signals.append(f"formed_c_hetero={formed_het}")
+    if broken_het:
+        signals.append(f"broken_c_hetero={broken_het}")
+    if formed_ch:
+        signals.append("formed_c_h")
+    if broken_ch:
+        signals.append("broken_c_h")
+
+    has_evidence = bool(formed_pairs or broken_pairs)
+    if not has_evidence:
+        return {
+            "classification": "uncertain",
+            "confidence": 0.2,
+            "score": 0.0,
+            "reasons": ["missing_bond_change_evidence"],
+            "signals": [],
+        }
+
+    if abs(score) < 0.5:
+        classification = "redox_neutral"
+    elif score > 0:
+        classification = "net_oxidation"
+    else:
+        classification = "net_reduction"
+
+    # Confidence is higher when there are explicit C-H changes or multiple
+    # oxidation-state-relevant bond changes.
+    informative = formed_het + broken_het + formed_ch + broken_ch
+    confidence = 0.55 + min(0.35, 0.1 * max(0, informative - 1))
+    confidence = round(max(0.2, min(0.95, confidence)), 2)
+
+    reasons: List[str] = []
+    if classification == "redox_neutral":
+        reasons.append("oxidation_and_reduction_signals_balanced_or_absent")
+    elif classification == "net_oxidation":
+        reasons.append("oxidation_signals_exceed_reduction_signals")
+    else:
+        reasons.append("reduction_signals_exceed_oxidation_signals")
+
+    return {
+        "classification": classification,
+        "confidence": confidence,
+        "score": round(score, 2),
+        "reasons": reasons,
+        "signals": signals,
+    }
 
 
 def _count_molecules_matching_smarts(
@@ -401,6 +482,7 @@ def summarize_reaction_events(
         quality_score -= min(0.45, 0.15 * len(anomalies))
         quality_reasons.extend(anomalies)
     quality_score = max(0.0, min(1.0, quality_score))
+    redox_assessment = _compute_redox_assessment(formed_pairs, broken_pairs)
 
     return {
         "events": events,
@@ -420,6 +502,7 @@ def summarize_reaction_events(
             "level": _quality_bucket(quality_score),
             "reasons": quality_reasons,
         },
+        "redox_assessment": redox_assessment,
     }
 
 

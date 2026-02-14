@@ -761,6 +761,15 @@ def _print_reaction_summary(
     reaction_events = reaction.get("reaction_events")
     if isinstance(reaction_events, dict) and reaction_events:
         print("Reaction Events:")
+        redox = reaction_events.get("redox_assessment") or {}
+        if isinstance(redox, dict) and redox:
+            cls = redox.get("classification")
+            conf = redox.get("confidence")
+            score = redox.get("score")
+            print(f"  Redox: class={cls}, confidence={conf}, score={score}")
+            reasons = redox.get("reasons") or []
+            if reasons:
+                print(f"  Redox reasons: {_format_value(reasons)}")
         quality = reaction_events.get("reaction_key_quality") or {}
         if isinstance(quality, dict) and quality:
             level = quality.get("level")
