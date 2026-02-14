@@ -818,17 +818,31 @@ def aggregate_reaction_features(
                 spectator_motif_counts[motif_id] = min(r_count, p_count)
 
         # Reconcile lists with counts (e.g., motifs that are effectively unchanged).
-        def _count_positive(value: int | None) -> bool:
+        # Reacted motifs require explicit evidence: positive count delta or a
+        # broad-definition fingerprint drift marker.
+        def _reacted_count_positive(motif_id: str) -> bool:
+            value = reacted_motif_counts.get(motif_id)
+            if value is None:
+                return motif_id in broad_fp_changed_ids
+            return value > 0
+
+        # Formed motifs keep legacy behavior to avoid dropping valid product-side
+        # motifs when primary-site counting is sparse.
+        def _formed_count_positive(motif_id: str) -> bool:
+            value = formed_motif_counts.get(motif_id)
             return value is None or value > 0
 
-        reacted_motifs = [
-            m for m in reacted_motifs
-            if _count_positive(reacted_motif_counts.get(m))
-        ]
-        formed_motifs = [
-            m for m in formed_motifs
-            if _count_positive(formed_motif_counts.get(m))
-        ]
+        unsupported_reacted = [m for m in reacted_motifs if not _reacted_count_positive(m)]
+        for motif_id in unsupported_reacted:
+            spectator_motifs_set.add(motif_id)
+            if motif_id not in spectator_motif_counts:
+                spectator_motif_counts[motif_id] = max(
+                    1,
+                    reactant_id_counts.get(motif_id, 0),
+                )
+
+        reacted_motifs = [m for m in reacted_motifs if _reacted_count_positive(m)]
+        formed_motifs = [m for m in formed_motifs if _formed_count_positive(m)]
         # If counts indicate unchanged motifs, ensure they appear as spectators.
         for motif_id, r_count in reactant_id_counts.items():
             p_count = product_id_counts.get(motif_id, 0)

@@ -95,3 +95,26 @@ def test_featurize_reaction_amide_uses_single_group_for_same_product_center() ->
     assert "Ar-CONHR" in reactive
     assert "Alkyl-NHCOR" not in reactive
     assert "-> Ar-CONHR" in reaction_key
+
+
+def test_hydrazide_acylation_keeps_ar_alkyl_out_of_crk_reacted_list() -> None:
+    if not rdkit_available():
+        pytest.skip("rdkit not available")
+
+    rxn = "NNC(=O)c1cccs1.O=C(O)Cc1cccc2c1OCCO2>>O=C(Cc1cccc2c1OCCO2)NNC(=O)c1cccs1"
+    result = featurize_reaction(
+        rxn,
+        options={
+            "detailed": True,
+            "discovery_mode": False,
+            "include_ar_h": False,
+            "motif_site_filter": "substituent",
+            "confirm_coupling_products": True,
+        },
+    )
+    reaction_key = str(result.get("reaction_key") or "")
+    summary = reaction_key.split(" | ", 1)[0]
+    reacted = set((result.get("aggregates") or {}).get("reacted_motifs") or [])
+
+    assert "Ar-Alkyl" not in reacted
+    assert "|Ar-Alkyl|" not in summary
