@@ -35,8 +35,22 @@ def test_build_reaction_events_payload_includes_redox_and_event_details() -> Non
     reaction_events = {
         "events": [
             {"kind": "c_n_bond_formation", "confidence": 0.9},
-            {"kind": "leaving_group_displacement", "confidence": 0.92},
+            {
+                "kind": "leaving_group_displacement",
+                "confidence": 0.92,
+                "details": {"leaving_group": "Br", "nucleophile_element": "N"},
+            },
         ],
+        "event_families": ["substitution"],
+        "ring_change": {"delta": 0},
+        "transformation_profile": {
+            "molecularity": "intermolecular_or_multi_component",
+            "formed_bond_classes": ["C-N"],
+            "broken_bond_classes": ["Br-C"],
+            "leaving_groups": ["Br"],
+            "nucleophile_elements": ["N"],
+            "ring_delta": 0,
+        },
         "reaction_key_quality": {
             "score_0_1": 0.85,
             "level": "high",
@@ -53,6 +67,13 @@ def test_build_reaction_events_payload_includes_redox_and_event_details() -> Non
     assert payload["event_signature"] == "LGDisp+C-N"
     assert payload["redox_neutral"] is True
     assert payload["redox_classification"] == "redox_neutral"
+    assert payload["event_families"] == ["substitution"]
+    assert payload["molecularity"] == "intermolecular_or_multi_component"
+    assert payload["formed_bond_classes"] == ["C-N"]
+    assert payload["broken_bond_classes"] == ["Br-C"]
+    assert payload["leaving_groups"] == ["Br"]
+    assert payload["nucleophile_elements"] == ["N"]
+    assert payload["ring_delta"] == 0
     assert "reaction_key_quality" in payload
 
     text = serialize_reaction_events_payload(payload)
@@ -60,3 +81,8 @@ def test_build_reaction_events_payload_includes_redox_and_event_details() -> Non
     assert "form:C(ar)-N" in text
     assert "break:Br-C(ar)" in text
     assert "redox:redox_neutral" in text
+    assert "fam:substitution" in text
+    assert "mol:intermolecular_or_multi_component" in text
+    assert "form_cls:C-N" in text
+    assert "lg:Br" in text
+    assert "nuc:N" in text

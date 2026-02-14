@@ -1887,6 +1887,13 @@ def _reaction_events_to_match_key(value: Any) -> str:
         cleaned_kinds = sorted({str(kind).strip() for kind in event_kinds if str(kind).strip()})
         if cleaned_kinds and not event_signature:
             token_chunks.append("kinds=" + "+".join(cleaned_kinds))
+    event_families = payload.get("event_families")
+    if isinstance(event_families, (list, tuple, set)):
+        cleaned_families = sorted(
+            {str(family).strip() for family in event_families if str(family).strip()}
+        )
+        if cleaned_families and not event_signature and not token_chunks:
+            token_chunks.append("fam=" + "+".join(cleaned_families))
 
     formed_tokens: List[str] = []
     raw_formed = payload.get("bond_formed")
@@ -1901,6 +1908,17 @@ def _reaction_events_to_match_key(value: Any) -> str:
                 if left and right:
                     formed_tokens.append("-".join(sorted((left, right))))
     formed_tokens = sorted({token for token in formed_tokens if token})
+    if not formed_tokens:
+        formed_classes = payload.get("formed_bond_classes")
+        if isinstance(formed_classes, (list, tuple, set)):
+            formed_tokens = sorted(
+                {
+                    _canonicalize_bond_token_for_match(str(token))
+                    for token in formed_classes
+                    if str(token).strip()
+                }
+            )
+            formed_tokens = [token for token in formed_tokens if token]
     if formed_tokens:
         token_chunks.append("form=" + ";".join(formed_tokens))
 
@@ -1916,6 +1934,17 @@ def _reaction_events_to_match_key(value: Any) -> str:
                 if left and right:
                     broken_tokens.append("-".join(sorted((left, right))))
     broken_tokens = sorted({token for token in broken_tokens if token})
+    if not broken_tokens:
+        broken_classes = payload.get("broken_bond_classes")
+        if isinstance(broken_classes, (list, tuple, set)):
+            broken_tokens = sorted(
+                {
+                    _canonicalize_bond_token_for_match(str(token))
+                    for token in broken_classes
+                    if str(token).strip()
+                }
+            )
+            broken_tokens = [token for token in broken_tokens if token]
     if broken_tokens:
         token_chunks.append("break=" + ";".join(broken_tokens))
 

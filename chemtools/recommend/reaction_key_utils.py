@@ -42,6 +42,72 @@ def _split_bond_tokens(value: str) -> List[str]:
     return [tok.strip() for tok in str(value).split(";") if tok.strip()]
 
 
+def _canonical_bond_class_token(value: Any) -> str:
+    token = str(value or "").strip()
+    if "-" not in token:
+        return ""
+    left, right = [part.strip() for part in token.split("-", 1)]
+
+    def _element(part: str) -> str:
+        text = str(part or "").strip()
+        if "(" in text:
+            text = text.split("(", 1)[0].strip()
+        # Keep atom symbol only (e.g., "C(ar)" -> "C").
+        match = re.search(r"[A-Z][a-z]?", text)
+        return match.group(0) if match else ""
+
+    left_el = _element(left)
+    right_el = _element(right)
+    if not left_el or not right_el:
+        return ""
+    return "-".join(sorted((left_el, right_el)))
+
+
+def _bond_classes_from_pairs(values: Any) -> List[str]:
+    if not isinstance(values, (list, tuple, set)):
+        return []
+    out: List[str] = []
+    for pair in values:
+        if not isinstance(pair, (list, tuple)) or len(pair) != 2:
+            continue
+        left = str(pair[0]).strip()
+        right = str(pair[1]).strip()
+        if not left or not right:
+            continue
+        out.append("-".join(sorted((left, right))))
+    return _dedupe_sorted(out)
+
+
+def _event_families_from_kinds(values: Any) -> List[str]:
+    kinds = {str(v).strip() for v in (values or []) if str(v).strip()}
+    if not kinds:
+        return []
+    families: set[str] = set()
+    if "benzyl_o_alkylation_like" in kinds:
+        families.add("o_alkylation")
+    if "ester_hydrolysis_like" in kinds:
+        families.add("hydrolysis")
+    if "amidation_like" in kinds:
+        families.add("acyl_transfer")
+    if "ring_closure_or_annulation" in kinds:
+        families.add("annulation")
+    bond_formation = {
+        "c_n_bond_formation",
+        "c_o_bond_formation",
+        "c_s_bond_formation",
+        "c_c_bond_formation",
+    }
+    has_bond = bool(kinds & bond_formation)
+    has_disp = "leaving_group_displacement" in kinds
+    if has_disp and has_bond:
+        families.add("substitution")
+    elif has_disp:
+        families.add("displacement")
+    elif has_bond:
+        families.add("bond_formation")
+    return _dedupe_sorted(families)
+
+
 def _dedupe_sorted(values: Iterable[str]) -> List[str]:
     cleaned = {str(value).strip() for value in values if str(value).strip()}
     return sorted(cleaned)
@@ -132,10 +198,16 @@ def build_reaction_events_payload(
 
     if bond_formed:
         payload["bond_formed"] = _dedupe_sorted(bond_formed)
+        payload["formed_bond_classes"] = _dedupe_sorted(
+            _canonical_bond_class_token(token) for token in bond_formed
+        )
     if bond_formed_labeled:
         payload["bond_formed_labeled"] = _dedupe_sorted(bond_formed_labeled)
     if bond_broken:
         payload["bond_broken"] = _dedupe_sorted(bond_broken)
+        payload["broken_bond_classes"] = _dedupe_sorted(
+            _canonical_bond_class_token(token) for token in bond_broken
+        )
     if event_signature:
         payload["event_signature"] = event_signature
     if reaction_types:
@@ -145,14 +217,89 @@ def build_reaction_events_payload(
         events = reaction_events.get("events")
         if isinstance(events, list) and events:
             kinds = []
+            leaving_groups: List[str] = []
+            nucleophile_elements: List[str] = []
+            molecularity = ""
             for event in events:
                 if not isinstance(event, Mapping):
                     continue
                 kind = str(event.get("kind") or "").strip()
                 if kind:
                     kinds.append(kind)
+                if kind == "intramolecular_likely":
+                    molecularity = "intramolecular"
+                elif kind == "intermolecular_or_multi_component" and not molecularity:
+                    molecularity = "intermolecular_or_multi_component"
+                if kind != "leaving_group_displacement":
+                    continue
+                details = event.get("details")
+                if not isinstance(details, Mapping):
+                    continue
+                lg = str(details.get("leaving_group") or "").strip()
+                if lg:
+                    leaving_groups.append(lg)
+                nuc = str(details.get("nucleophile_element") or "").strip()
+                if nuc:
+                    nucleophile_elements.append(nuc)
             if kinds:
                 payload["event_kinds"] = _dedupe_sorted(kinds)
+                if "event_families" not in payload:
+                    inferred = _event_families_from_kinds(kinds)
+                    if inferred:
+                        payload["event_families"] = inferred
+            if molecularity:
+                payload["molecularity"] = molecularity
+            if leaving_groups:
+                payload["leaving_groups"] = _dedupe_sorted(leaving_groups)
+            if nucleophile_elements:
+                payload["nucleophile_elements"] = _dedupe_sorted(nucleophile_elements)
+
+        event_families = reaction_events.get("event_families")
+        if isinstance(event_families, list):
+            cleaned_families = _dedupe_sorted(event_families)
+            if cleaned_families:
+                payload["event_families"] = cleaned_families
+
+        anomalies = reaction_events.get("anomalies")
+        if isinstance(anomalies, list):
+            cleaned_anomalies = _dedupe_sorted(anomalies)
+            if cleaned_anomalies:
+                payload["anomalies"] = cleaned_anomalies
+
+        ring_change = reaction_events.get("ring_change")
+        if isinstance(ring_change, Mapping):
+            try:
+                ring_delta = int(ring_change.get("delta"))
+                payload["ring_delta"] = ring_delta
+            except Exception:
+                pass
+
+        bond_pairs = reaction_events.get("bond_pairs")
+        if isinstance(bond_pairs, Mapping):
+            formed_classes = _bond_classes_from_pairs(bond_pairs.get("formed"))
+            broken_classes = _bond_classes_from_pairs(bond_pairs.get("broken"))
+            if formed_classes:
+                payload.setdefault("formed_bond_classes", formed_classes)
+            if broken_classes:
+                payload.setdefault("broken_bond_classes", broken_classes)
+
+        profile = reaction_events.get("transformation_profile")
+        if isinstance(profile, Mapping):
+            molecularity = str(profile.get("molecularity") or "").strip()
+            if molecularity:
+                payload["molecularity"] = molecularity
+            for key in ("formed_bond_classes", "broken_bond_classes", "leaving_groups", "nucleophile_elements"):
+                values = profile.get(key)
+                if isinstance(values, list):
+                    cleaned_values = _dedupe_sorted(values)
+                    if cleaned_values:
+                        payload[key] = cleaned_values
+            try:
+                ring_delta = profile.get("ring_delta")
+                if ring_delta is not None:
+                    payload["ring_delta"] = int(ring_delta)
+            except Exception:
+                pass
 
         quality = reaction_events.get("reaction_key_quality")
         if isinstance(quality, Mapping):
@@ -252,6 +399,41 @@ def serialize_reaction_events_payload(payload: Mapping[str, Any]) -> str:
     if kinds:
         parts.append("kinds:" + "+".join(kinds))
 
+    families = _dedupe_sorted(payload.get("event_families") or [])
+    if families:
+        parts.append("fam:" + "+".join(families))
+
+    molecularity = str(payload.get("molecularity") or "").strip()
+    if molecularity:
+        parts.append(f"mol:{molecularity}")
+
+    formed_classes = _dedupe_sorted(payload.get("formed_bond_classes") or [])
+    if formed_classes:
+        parts.append("form_cls:" + ";".join(formed_classes))
+
+    broken_classes = _dedupe_sorted(payload.get("broken_bond_classes") or [])
+    if broken_classes:
+        parts.append("break_cls:" + ";".join(broken_classes))
+
+    leaving_groups = _dedupe_sorted(payload.get("leaving_groups") or [])
+    if leaving_groups:
+        parts.append("lg:" + "+".join(leaving_groups))
+
+    nucleophile_elements = _dedupe_sorted(payload.get("nucleophile_elements") or [])
+    if nucleophile_elements:
+        parts.append("nuc:" + "+".join(nucleophile_elements))
+
+    ring_delta = payload.get("ring_delta")
+    try:
+        if ring_delta is not None:
+            parts.append(f"ringd:{int(ring_delta)}")
+    except Exception:
+        pass
+
+    anomalies = _dedupe_sorted(payload.get("anomalies") or [])
+    if anomalies:
+        parts.append("anom:" + ",".join(anomalies))
+
     return " | ".join(parts)
 
 
@@ -299,6 +481,25 @@ def deserialize_reaction_events_text(text: Any) -> Dict[str, Any]:
                 pass
         elif label == "kinds":
             payload["event_kinds"] = _split_event_tokens(data)
+        elif label == "fam":
+            payload["event_families"] = _split_event_tokens(data)
+        elif label == "mol":
+            payload["molecularity"] = data
+        elif label == "form_cls":
+            payload["formed_bond_classes"] = _split_bond_tokens(data)
+        elif label == "break_cls":
+            payload["broken_bond_classes"] = _split_bond_tokens(data)
+        elif label == "lg":
+            payload["leaving_groups"] = _split_event_tokens(data)
+        elif label == "nuc":
+            payload["nucleophile_elements"] = _split_event_tokens(data)
+        elif label == "ringd":
+            try:
+                payload["ring_delta"] = int(data)
+            except Exception:
+                pass
+        elif label == "anom":
+            payload["anomalies"] = [tok.strip() for tok in data.split(",") if tok.strip()]
         elif label == "q":
             # q:high(0.85) or q:(0.85)
             match = re.match(r"(?P<level>[a-zA-Z_]+)?(?:\((?P<score>[^)]+)\))?$", data)

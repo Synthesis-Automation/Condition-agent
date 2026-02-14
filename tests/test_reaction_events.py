@@ -38,6 +38,11 @@ def test_reaction_events_detect_displacement_and_cn_formation() -> None:
     redox = summary.get("redox_assessment") or {}
     assert redox.get("classification") in {"redox_neutral", "net_oxidation", "net_reduction", "uncertain"}
     assert isinstance(redox.get("confidence"), float)
+    profile = summary.get("transformation_profile") or {}
+    assert profile.get("molecularity") in {"intramolecular", "intermolecular_or_multi_component", "unknown"}
+    assert "C-N" in (profile.get("formed_bond_classes") or [])
+    assert "I" in (profile.get("leaving_groups") or [])
+    assert "N" in (profile.get("nucleophile_elements") or [])
 
 
 def test_reaction_events_flag_amidation_without_activation() -> None:

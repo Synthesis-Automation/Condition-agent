@@ -463,6 +463,37 @@ def summarize_reaction_events(
         )
 
     event_families = _infer_event_families(events)
+    event_kinds = {
+        str(ev.get("kind")).strip()
+        for ev in events
+        if isinstance(ev, dict) and str(ev.get("kind") or "").strip()
+    }
+    molecularity = "unknown"
+    if "intramolecular_likely" in event_kinds:
+        molecularity = "intramolecular"
+    elif "intermolecular_or_multi_component" in event_kinds:
+        molecularity = "intermolecular_or_multi_component"
+
+    leaving_groups: Set[str] = set()
+    nucleophile_elements: Set[str] = set()
+    for ev in events:
+        if not isinstance(ev, dict):
+            continue
+        if str(ev.get("kind") or "").strip() != "leaving_group_displacement":
+            continue
+        details = ev.get("details") or {}
+        if not isinstance(details, dict):
+            continue
+        lg = str(details.get("leaving_group") or "").strip()
+        if lg:
+            leaving_groups.add(lg)
+        nuc = str(details.get("nucleophile_element") or "").strip()
+        if nuc:
+            nucleophile_elements.add(nuc)
+
+    formed_bond_classes = sorted("-".join(pair) for pair in formed_pairs)
+    broken_bond_classes = sorted("-".join(pair) for pair in broken_pairs)
+
     has_complex_family = bool(event_families & {"hydrolysis", "acyl_transfer", "annulation"})
     if len(event_families) >= 3 or (len(event_families) >= 2 and has_complex_family):
         anomalies.append("multi_transform_record_possible")
@@ -488,6 +519,15 @@ def summarize_reaction_events(
         "events": events,
         "anomalies": anomalies,
         "event_families": sorted(event_families),
+        "transformation_profile": {
+            "molecularity": molecularity,
+            "event_count": len(events),
+            "formed_bond_classes": formed_bond_classes,
+            "broken_bond_classes": broken_bond_classes,
+            "leaving_groups": sorted(leaving_groups),
+            "nucleophile_elements": sorted(nucleophile_elements),
+            "ring_delta": ring_delta,
+        },
         "bond_pairs": {
             "formed": sorted(list(formed_pairs)),
             "broken": sorted(list(broken_pairs)),
