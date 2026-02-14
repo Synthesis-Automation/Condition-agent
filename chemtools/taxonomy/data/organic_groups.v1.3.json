@@ -213,6 +213,14 @@
       "description": "Diazonium cation (-N2+), used in Sandmeyer reaction."
     },
     {
+      "id": "-Iodonium",
+      "kind": "substituent",
+      "priority": 2,
+      "broad_definition": true,
+      "smarts": "[I+:2]([#6])[#6]",
+      "description": "Iodonium center (typically diaryl/alkyl-aryl iodonium salts), attach via iodine."
+    },
+    {
       "id": "-NO2",
       "kind": "substituent",
       "priority": 2,
@@ -465,6 +473,14 @@
       "broad_definition": true,
       "smarts": "[CX3:2](=O)[NX3][NX3]",
       "description": "Hydrazide functional group (any substitution state); attach via carbonyl carbon."
+    },
+    {
+      "id": "-Sulfonylhydrazone",
+      "kind": "substituent",
+      "priority": 2,
+      "broad_definition": true,
+      "smarts": "[CX3:2]=[NX2][NX3][SX4](=O)(=O)[#6]",
+      "description": "N-sulfonylhydrazone motif (R2C=NN-SO2R), attach via imine carbon."
     },
     {
       "id": "-Urea",
