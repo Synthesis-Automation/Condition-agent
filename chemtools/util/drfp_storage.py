@@ -26,6 +26,9 @@ import os
 import numpy as np
 from typing import Dict, List, Optional, Union
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class DRFPLoader:
@@ -44,7 +47,6 @@ class DRFPLoader:
             npz_path: Path to .npz file containing fingerprints
         """
         self.npz_path = str(npz_path)
-        self._data: Optional[np.lib.npzfile.NpzFile] = None
         self._fps: Optional[np.ndarray] = None
         self._index: Optional[Dict[str, int]] = None
         self._n_bits: int = 4096
@@ -60,23 +62,22 @@ class DRFPLoader:
             raise FileNotFoundError(f"DRFP file not found: {self.npz_path}")
         
         # Load compressed NPZ
-        data = np.load(self.npz_path, allow_pickle=True)
-        
-        # Extract arrays
-        self._fps = data['fps']  # Shape: (N, 4096), dtype=uint8
-        reaction_ids = data['reaction_ids']  # Shape: (N,), dtype=object (strings)
-        
-        # Store metadata
-        if 'n_bits' in data:
-            self._n_bits = int(data['n_bits'])
-        if 'radius' in data:
-            self._radius = int(data['radius'])
+        with np.load(self.npz_path, allow_pickle=True) as data:
+            # Extract arrays
+            self._fps = data['fps']  # Shape: (N, 4096), dtype=uint8
+            reaction_ids = data['reaction_ids']  # Shape: (N,), dtype=object (strings)
+            
+            # Store metadata
+            if 'n_bits' in data:
+                self._n_bits = int(data['n_bits'])
+            if 'radius' in data:
+                self._radius = int(data['radius'])
         
         # Build index: reaction_id -> row number
         self._index = {str(rid): i for i, rid in enumerate(reaction_ids)}
         
         self._loaded = True
-        print(f"Loaded {len(self._index)} DRFP fingerprints from {self.npz_path}")
+        logger.info("Loaded %d DRFP fingerprints from %s", len(self._index), self.npz_path)
     
     def get_fingerprint(self, reaction_id: str) -> Optional[np.ndarray]:
         """
@@ -192,8 +193,12 @@ def save_drfp_index(
     
     # Report file size
     file_size_mb = os.path.getsize(output_path) / (1024 * 1024)
-    print(f"Saved {len(reaction_ids)} fingerprints to {output_path}")
-    print(f"File size: {file_size_mb:.2f} MB ({file_size_mb/len(reaction_ids)*1000:.1f} KB per reaction)")
+    logger.info("Saved %d fingerprints to %s", len(reaction_ids), output_path)
+    logger.info(
+        "File size: %.2f MB (%.1f KB per reaction)",
+        file_size_mb,
+        file_size_mb / len(reaction_ids) * 1000,
+    )
 
 
 def extract_drfp_from_jsonl(
@@ -255,7 +260,7 @@ def extract_drfp_from_jsonl(
             fingerprints.append(drfp_fp)
             reaction_ids.append(reaction_id)
     
-    print(f"Extracted {len(fingerprints)} DRFP fingerprints from {jsonl_path}")
+    logger.info("Extracted %d DRFP fingerprints from %s", len(fingerprints), jsonl_path)
     
     # Save if output path provided
     if output_npz_path and fingerprints:

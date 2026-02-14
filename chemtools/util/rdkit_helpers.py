@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import Optional, List
+from typing import Optional
 import os
 
 def _import_rdkit():
@@ -56,16 +56,6 @@ def parse_smiles(smiles: str):
     try:
         with _suppress_rdkit_parse_logging():
             return Chem.MolFromSmiles(smiles)
-    except Exception:
-        return None
-
-def parse_smarts(smarts: str):
-    """Parse a SMARTS pattern into an RDKit molecule; returns None if unavailable."""
-    Chem, _ = _import_rdkit()
-    if Chem is None:
-        return None
-    try:
-        return Chem.MolFromSmarts(smarts)
     except Exception:
         return None
 

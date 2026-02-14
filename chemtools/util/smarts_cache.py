@@ -276,6 +276,3 @@ def log_cache_stats(level: int = logging.INFO) -> None:
         f"(hits={info['hits']}, misses={info['misses']})"
     )
 
-
-# Backward compatibility alias
-compile_smarts_pattern = compile_smarts

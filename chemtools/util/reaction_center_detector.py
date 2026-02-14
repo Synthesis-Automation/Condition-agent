@@ -5,10 +5,9 @@ Identifies which atoms/bonds change in a reaction to focus SMARTS patterns
 on the reaction center, not spectator groups.
 """
 
-from typing import Dict, List, Set, Tuple, Optional, Any
+from typing import Dict, List, Set, Tuple, Any
 try:
     from rdkit import Chem
-    from rdkit.Chem import AllChem
     HAS_RDKIT = True
 except ImportError:
     HAS_RDKIT = False
@@ -31,12 +30,31 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
         return {'error': 'RDKit not available'}
     
     try:
+        if not isinstance(mapped_smiles, str) or '>>' not in mapped_smiles:
+            return {'error': "Expected mapped reaction SMILES containing '>>'", 'success': False}
+
         # Split reaction
         reactants_smiles, products_smiles = mapped_smiles.split('>>')
-        
-        # Parse molecules
-        reactant_mols = [Chem.MolFromSmiles(s) for s in reactants_smiles.split('.')]
-        product_mols = [Chem.MolFromSmiles(s) for s in products_smiles.split('.')]
+
+        reactant_components = [s for s in reactants_smiles.split('.') if s]
+        product_components = [s for s in products_smiles.split('.') if s]
+        if not reactant_components or not product_components:
+            return {'error': 'Mapped reaction must include reactants and products', 'success': False}
+
+        # Parse molecules with explicit validation for clearer failure modes.
+        reactant_mols = []
+        for smi in reactant_components:
+            mol = Chem.MolFromSmiles(smi)
+            if mol is None:
+                return {'error': f'Invalid mapped reactant component: {smi}', 'success': False}
+            reactant_mols.append(mol)
+
+        product_mols = []
+        for smi in product_components:
+            mol = Chem.MolFromSmiles(smi)
+            if mol is None:
+                return {'error': f'Invalid mapped product component: {smi}', 'success': False}
+            product_mols.append(mol)
         
         # Build atom map → atom index mapping for reactants
         reactant_map_to_atom = {}
@@ -95,8 +113,8 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
                 changed_atoms.add(map_num)
             else:
                 # Atom in both - check if bonds changed
-                r_atom, r_mol = reactant_map_to_atom[map_num]
-                p_atom, p_mol = product_map_to_atom[map_num]
+                r_atom, _ = reactant_map_to_atom[map_num]
+                p_atom, _ = product_map_to_atom[map_num]
                 
                 # Get neighbors by map number (mapped atoms only)
                 r_neighbors = set()
@@ -156,7 +174,7 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
         # Add leaving/joining groups to broken/formed bonds
         # Format: (mapped_atom, "X" where X is element symbol)
         for leaving in leaving_groups:
-            map_num, element, bond_type = leaving
+            map_num, element, _bond_type = leaving
             _append_unique_bond(
                 broken_bonds,
                 seen_broken_bonds,
@@ -166,7 +184,7 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
             changed_atoms.add(map_num)
         
         for joining in joining_groups:
-            map_num, element, bond_type = joining
+            map_num, element, _bond_type = joining
             _append_unique_bond(
                 formed_bonds,
                 seen_formed_bonds,
@@ -189,43 +207,6 @@ def identify_changed_atoms_from_mapped_smiles(mapped_smiles: str) -> Dict[str, A
         
     except Exception as e:
         return {'error': str(e), 'success': False}
-
-
-def generate_smarts_from_mapped_reaction(mapped_smiles: str) -> Dict[str, Any]:
-    """Generate focused SMARTS pattern from atom-mapped reaction SMILES.
-    
-    Args:
-        mapped_smiles: Atom-mapped reaction SMILES
-        
-    Returns:
-        Dictionary with 'core' and 'guards_forbid' keys
-    """
-    # Identify changed atoms
-    change_info = identify_changed_atoms_from_mapped_smiles(mapped_smiles)
-    
-    if not change_info.get('success'):
-        raise ValueError(f"Could not identify reaction center: {change_info.get('error')}")
-    
-    changed_atoms = change_info['changed_atoms']
-    broken_bonds = change_info['broken_bonds']
-    formed_bonds = change_info['formed_bonds']
-    
-    # Extract reactant and product SMILES
-    reactants_smiles, products_smiles = mapped_smiles.split('>>')
-    
-    # Build SMARTS pattern focusing on changed atoms
-    # This is a simplified version - could be expanded
-    # For now, we'll extract the immediate environment of changed atoms
-    
-    # TODO: Implement smart SMARTS extraction based on changed atoms
-    # For now, return the changed atoms info
-    return {
-        'changed_atoms': list(changed_atoms),
-        'broken_bonds': broken_bonds,
-        'formed_bonds': formed_bonds,
-        'core': f"Reaction involves {len(changed_atoms)} atoms",
-        'guards_forbid': []
-    }
 
 
 def compare_unmapped_reaction_to_find_changes(reaction_smiles: str) -> Dict[str, Any]:
@@ -281,23 +262,3 @@ def compare_unmapped_reaction_to_find_changes(reaction_smiles: str) -> Dict[str,
         
     except Exception as e:
         return {'error': str(e), 'success': False}
-
-
-if __name__ == '__main__':
-    # Test with Sonogashira example
-    print("Testing Sonogashira coupling with atom mapping")
-    print("="*80)
-    
-    # Manually mapped Sonogashira (simplified)
-    mapped = "[c:1]1[cH:2][cH:3][cH:4][cH:5][c:6]1[I:7].[C:8]#[C:9]>>[c:1]1[cH:2][cH:3][cH:4][cH:5][c:6]1[C:8]#[C:9]"
-    
-    result = identify_changed_atoms_from_mapped_smiles(mapped)
-    
-    if result.get('success'):
-        print(f"Changed atoms: {result['changed_atoms']}")
-        print(f"Broken bonds: {result['broken_bonds']}")
-        print(f"Formed bonds: {result['formed_bonds']}")
-        print(f"Spectator atoms: {result['spectator_atoms']}")
-        print("\nConclusion: Focus SMARTS on atoms 6,7,8,9 (the C-I breaking and C-C forming)")
-    else:
-        print(f"Error: {result.get('error')}")
