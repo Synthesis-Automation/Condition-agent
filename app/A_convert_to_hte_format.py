@@ -3,7 +3,7 @@ import json
 import re
 import pandas as pd
 from pathlib import Path
-from typing import List, Dict, Any, Tuple, Iterable, Optional, Set
+from typing import List, Dict, Any, Tuple, Iterable, Optional, Set, Mapping
 from functools import lru_cache
 from collections import Counter
 import argparse
@@ -23,6 +23,7 @@ from chemtools.recommend.reaction_key_utils import (
     canonicalize_reaction_key_minimal,
     serialize_reaction_events_payload,
 )
+from chemtools.taxonomy import reaction_catalog
 from chemtools.smiles import normalize
 from chemtools.reagent.lookup import find_reagent
 from chemtools.util.ingestion_routing import classify_reaction_for_taxonomy_benchmark
@@ -233,27 +234,16 @@ _COMPLEX_COUNTERION_RE = (
     re.compile(r"\[B\+3\]\(\[F-\]\)\(\[F-\]\)\[F-\]"),
     re.compile(r"\[P\+5\]\(\[F-\]\)\(\[F-\]\)\(\[F-\]\)\(\[F-\]\)\[F-\]"),
 )
-_DATASET_SCOPE_RULES: Dict[str, Dict[str, Set[str]]] = {
-    "C_N_Coupling": {
-        "required_bond_classes": {"C-N"},
-        "required_event_kinds": {"c_n_bond_formation"},
-    },
-    "C_O_Coupling": {
-        "required_bond_classes": {"C-O"},
-        "required_event_kinds": {"c_o_bond_formation"},
-    },
-    "C_S_Coupling": {
-        "required_bond_classes": {"C-S"},
-        "required_event_kinds": {"c_s_bond_formation"},
-    },
+_EVENT_KIND_BY_BOND_CLASS = {
+    "C-N": "c_n_bond_formation",
+    "C-O": "c_o_bond_formation",
+    "C-S": "c_s_bond_formation",
+    "C-C": "c_c_bond_formation",
 }
-_CORE_BOND_CLASSES = {"C-N", "C-O", "C-S", "C-C"}
-_CORE_BOND_EVENT_KINDS = {
-    "c_n_bond_formation",
-    "c_o_bond_formation",
-    "c_s_bond_formation",
-    "c_c_bond_formation",
-}
+_SCOPE_SOURCE_SUFFIX_RE = re.compile(
+    r"(?:_(?:canonical|subset|sample(?:_input|_output)?|fix\d+|input|output))+$",
+    re.IGNORECASE,
+)
 
 
 def _split_reaction_sides(reaction_smiles: str) -> Tuple[List[str], List[str]]:
@@ -332,14 +322,80 @@ def _cleanup_reaction_smiles_for_featurization(reaction_smiles: str) -> Tuple[st
     return cleaned, stats
 
 
-def _dataset_scope_rule_for_label(source_label: str) -> Optional[Dict[str, Set[str]]]:
-    label = str(source_label or "").strip().lower()
-    if not label:
-        return None
-    for dataset_name, rule in _DATASET_SCOPE_RULES.items():
-        if dataset_name.lower() in label:
-            return rule
+def _candidate_scope_labels(source_label: str) -> List[str]:
+    text = str(source_label or "").strip()
+    if not text:
+        return []
+    labels = [text]
+    stripped = _SCOPE_SOURCE_SUFFIX_RE.sub("", text)
+    if stripped and stripped != text:
+        labels.append(stripped)
+    return _dedupe_list(labels)
+
+
+def _flatten_product_motifs(
+    product_slots: Mapping[str, Any],
+) -> Set[str]:
+    motifs: Set[str] = set()
+    for slot in (product_slots or {}).values():
+        allowed = getattr(slot, "allowed", None)
+        if not isinstance(allowed, list):
+            continue
+        for value in allowed:
+            token = str(value).strip()
+            if token:
+                motifs.add(token)
+    return motifs
+
+
+@lru_cache(maxsize=512)
+def _resolve_scope_reaction_id_from_source_label(source_label: str) -> Optional[str]:
+    definitions, alias_map = reaction_catalog.load_reaction_catalog()
+    reaction_ids = sorted(definitions.keys(), key=len, reverse=True)
+
+    for candidate in _candidate_scope_labels(source_label):
+        direct = reaction_catalog.resolve_reaction_type(candidate)
+        if direct:
+            return direct
+
+        lowered = candidate.lower()
+        for rid in reaction_ids:
+            if rid.lower() in lowered:
+                return rid
+
+        for alias, rid in alias_map.items():
+            alias_norm = str(alias).lower().replace("-", "_").replace(" ", "_")
+            if len(alias_norm) >= 4 and alias_norm in lowered:
+                return rid
     return None
+
+
+@lru_cache(maxsize=512)
+def _scope_policy_for_source_label(source_label: str) -> Optional[Dict[str, Set[str]]]:
+    reaction_id = _resolve_scope_reaction_id_from_source_label(source_label)
+    if not reaction_id:
+        return None
+    definition = reaction_catalog.get_reaction_type(reaction_id)
+    if definition is None:
+        return None
+
+    constraints = definition.constraints or {}
+    required_bond_classes = {
+        str(token).strip()
+        for token in (constraints.get("include_bond_formed") or [])
+        if str(token).strip()
+    }
+    required_event_kinds = {
+        _EVENT_KIND_BY_BOND_CLASS[token]
+        for token in required_bond_classes
+        if token in _EVENT_KIND_BY_BOND_CLASS
+    }
+    allowed_product_motifs = _flatten_product_motifs(definition.products or {})
+    return {
+        "required_bond_classes": required_bond_classes,
+        "required_event_kinds": required_event_kinds,
+        "allowed_product_motifs": allowed_product_motifs,
+    }
 
 
 def _is_out_of_scope_for_dataset(
@@ -348,11 +404,12 @@ def _is_out_of_scope_for_dataset(
     formed_motifs: Optional[Iterable[str]] = None,
 ) -> Tuple[bool, str]:
     """
-    Mark rows out-of-scope only when bond-change evidence explicitly points to
-    a competing coupling class (e.g., C-C in a C_N dataset).
+    Taxonomy-driven dataset scope check:
+    - derive expected bond classes from reaction_type constraints
+    - cross-check against event evidence and formed product motifs
     """
-    rule = _dataset_scope_rule_for_label(source_label)
-    if not rule:
+    policy = _scope_policy_for_source_label(source_label)
+    if not policy:
         return False, "unscoped_dataset"
 
     formed_motif_tokens = {
@@ -360,13 +417,6 @@ def _is_out_of_scope_for_dataset(
         for token in (formed_motifs or [])
         if str(token).strip()
     }
-    if "C_N_Coupling".lower() in str(source_label or "").lower():
-        has_n_like_formed = any("N" in token for token in formed_motif_tokens)
-        if has_n_like_formed:
-            return False, "expected_n_formed_motif_present"
-        if "Ar-Ar" in formed_motif_tokens:
-            return True, "formed_motif_conflict_ar_ar"
-
     formed_classes = {
         str(token).strip()
         for token in (reaction_events_payload.get("formed_bond_classes") or [])
@@ -377,20 +427,23 @@ def _is_out_of_scope_for_dataset(
         for token in (reaction_events_payload.get("event_kinds") or [])
         if str(token).strip()
     }
-    required_classes = set(rule.get("required_bond_classes") or set())
-    required_kinds = set(rule.get("required_event_kinds") or set())
+    required_classes = set(policy.get("required_bond_classes") or set())
+    required_kinds = set(policy.get("required_event_kinds") or set())
+    allowed_product_motifs = set(policy.get("allowed_product_motifs") or set())
+
+    if allowed_product_motifs and (formed_motif_tokens & allowed_product_motifs):
+        return False, "expected_product_motif_present"
 
     if formed_classes & required_classes:
         return False, "expected_bond_class_present"
     if event_kinds & required_kinds:
         return False, "expected_event_kind_present"
 
-    explicit_classes = formed_classes & _CORE_BOND_CLASSES
-    explicit_kinds = event_kinds & _CORE_BOND_EVENT_KINDS
-
-    if explicit_classes and not (explicit_classes & required_classes):
+    if allowed_product_motifs and formed_motif_tokens and not (formed_motif_tokens & allowed_product_motifs):
+        return True, "formed_motif_conflict"
+    if required_classes and formed_classes and not (formed_classes & required_classes):
         return True, "formed_bond_class_conflict"
-    if explicit_kinds and not (explicit_kinds & required_kinds):
+    if required_kinds and event_kinds and not (event_kinds & required_kinds):
         return True, "event_kind_conflict"
     return False, "insufficient_scope_evidence"
 

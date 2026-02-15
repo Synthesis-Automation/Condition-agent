@@ -46,7 +46,7 @@ def test_scope_filter_uses_formed_motifs_for_cn_guardrails() -> None:
         {"Ar-Ar", "HeteroAr-H"},
     )
     assert out_of_scope is True
-    assert reason == "formed_motif_conflict_ar_ar"
+    assert reason == "formed_motif_conflict"
 
     kept, kept_reason = hte_convert._is_out_of_scope_for_dataset(
         "C_N_Coupling",
@@ -54,7 +54,7 @@ def test_scope_filter_uses_formed_motifs_for_cn_guardrails() -> None:
         {"HeteroAr-NHR"},
     )
     assert kept is False
-    assert kept_reason == "expected_n_formed_motif_present"
+    assert kept_reason == "expected_product_motif_present"
 
 
 def test_process_dataset_drops_explicit_out_of_scope_rows(tmp_path, monkeypatch) -> None:
@@ -176,3 +176,23 @@ def test_scope_filter_for_cs_dataset() -> None:
     )
     assert kept is False
     assert kept_reason == "expected_event_kind_present"
+
+
+def test_scope_filter_flags_suzuki_borylation_like_out_of_scope() -> None:
+    blocked, reason = hte_convert._is_out_of_scope_for_dataset(
+        "suzuki_miyaura_fix34_sample_input",
+        {"formed_bond_classes": ["B-C"]},
+        {"Ar-Bpin"},
+    )
+    assert blocked is True
+    assert reason == "formed_motif_conflict"
+
+
+def test_scope_filter_keeps_suzuki_cc_in_scope() -> None:
+    kept, reason = hte_convert._is_out_of_scope_for_dataset(
+        "suzuki_miyaura",
+        {"formed_bond_classes": ["C-C"]},
+        {"Ar-Ar"},
+    )
+    assert kept is False
+    assert reason in {"expected_product_motif_present", "expected_bond_class_present"}
