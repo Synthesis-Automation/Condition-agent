@@ -110,7 +110,7 @@
         "Hydrazine"
       ],
       "acid": [
-        "CO2H",
+        "COOH",
         "SO3H",
         "PO3H2",
         "PO3H",
@@ -144,3 +144,4 @@
     "Halogenation_aromatic": "halogenation_aromatic"
   }
 }
+

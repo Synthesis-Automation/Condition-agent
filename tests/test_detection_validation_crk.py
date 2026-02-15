@@ -5,7 +5,7 @@ from chemtools.featurizers.formatters.detection_validation import (
 
 def test_validate_detection_with_crk_key_amide() -> None:
     crk_raw = (
-        "|Bn-NH2|HeteroAr-CO2H -> Ar-Alkyl|Bn-NHCOR|HeteroAr-CONHR "
+        "|Bn-NH2|HeteroAr-COOH -> Ar-Alkyl|Bn-NHCOR|HeteroAr-CONHR "
         "| bond_formed: C-N | bond_broken: C-O | spectators: Ar-F|HeteroAr-H|Pyrimidine"
     )
     result = validate_detection_with_crk_key(
@@ -20,7 +20,7 @@ def test_validate_detection_with_crk_key_amide() -> None:
 
 def test_validate_detection_with_crk_key_normalizes_double_dash_tokens() -> None:
     crk_raw = (
-        "|Bn-NH2|HeteroAr-CO2H -> Ar-Alkyl|Bn--NHCOR|HeteroAr--CONHR "
+        "|Bn-NH2|HeteroAr-COOH -> Ar-Alkyl|Bn--NHCOR|HeteroAr--CONHR "
         "| bond_formed: C-N | bond_broken: C-O"
     )
     result = validate_detection_with_crk_key(
@@ -57,3 +57,4 @@ def test_validate_detection_with_crk_key_keeps_snar_when_heteroaryl_activation_p
         reaction_key=crk_raw,
     )
     assert result["reaction_type"] == "SNAr_CN"
+

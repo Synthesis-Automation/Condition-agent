@@ -41,6 +41,7 @@ from chemtools.recommend.reaction_key_utils import (
     normalize_reaction_events_text,
     serialize_reaction_events_payload,
 )
+from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
 
 try:
     from chemtools.taxonomy import reaction_catalog as _reaction_catalog
@@ -1178,13 +1179,19 @@ def _load_scope_map() -> Dict[str, List[str]]:
 
 
 @lru_cache(maxsize=1)
-def _load_group_tags() -> Dict[str, Set[str]]:
+def _load_compound_groups_payload() -> Dict[str, Any]:
     if not _COMPOUND_GROUPS_FILE.exists():
         return {}
     try:
-        with _COMPOUND_GROUPS_FILE.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
+        return load_organic_groups_with_compositions(_COMPOUND_GROUPS_FILE)
     except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def _load_group_tags() -> Dict[str, Set[str]]:
+    payload = _load_compound_groups_payload()
+    if not payload:
         return {}
     groups = payload.get("groups") or []
     tag_map: Dict[str, Set[str]] = {}
@@ -1246,12 +1253,8 @@ def _load_scaffold_alias_map() -> Dict[str, List[str]]:
 
 @lru_cache(maxsize=1)
 def _load_aromatic_scaffold_ids() -> Set[str]:
-    if not _COMPOUND_GROUPS_FILE.exists():
-        return set(_AROMATIC_SCAFFOLD_FALLBACK)
-    try:
-        with _COMPOUND_GROUPS_FILE.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-    except Exception:
+    payload = _load_compound_groups_payload()
+    if not payload:
         return set(_AROMATIC_SCAFFOLD_FALLBACK)
 
     aromatic_ids: Set[str] = set()

@@ -832,8 +832,8 @@
       "reactants": {
         "michael_acceptor": [
           "Alkenyl-COR",
-          "Alkenyl-CO2R",
-          "Alkenyl-CO2H",
+          "Alkenyl-COOR",
+          "Alkenyl-COOH",
           "Alkenyl-CN"
         ],
         "nucleophile": [
@@ -847,12 +847,12 @@
           "RCH2-COR",
           "R2CH-COR",
           "R3C-COR",
-          "RCH2-CO2R",
-          "R2CH-CO2R",
-          "R3C-CO2R",
-          "RCH2-CO2H",
-          "R2CH-CO2H",
-          "R3C-CO2H",
+          "RCH2-COOR",
+          "R2CH-COOR",
+          "R3C-COOR",
+          "RCH2-COOH",
+          "R2CH-COOH",
+          "R3C-COOH",
           "RCH2-CN",
           "R2CH-CN",
           "R3C-CN"
@@ -949,11 +949,11 @@
           "AromN-H"
         ],
         "acid": [
-          "Alkyl-CO2H",
-          "R_acidic-CO2H",
-          "RCH2-CO2H",
-          "R2CH-CO2H",
-          "R3C-CO2H"
+          "Alkyl-COOH",
+          "R_acidic-COOH",
+          "RCH2-COOH",
+          "R2CH-COOH",
+          "R3C-COOH"
         ]
       },
       "products": {
@@ -988,7 +988,7 @@
           "AromN-H"
         ],
         "acid": [
-          "Acyl-CO2H",
+          "Acyl-COOH",
           "Ar-CHO",
           "Alkyl-CHO",
           "RCH2-CHO",
@@ -1023,12 +1023,12 @@
       "reactants": {
         "electrophile": "@sp2_electrophiles",
         "acid": [
-          "Acyl-CO2H",
-          "Alkyl-CO2H",
-          "R_acidic-CO2H",
-          "RCH2-CO2H",
-          "R2CH-CO2H",
-          "R3C-CO2H"
+          "Acyl-COOH",
+          "Alkyl-COOH",
+          "R_acidic-COOH",
+          "RCH2-COOH",
+          "R2CH-COOH",
+          "R3C-COOH"
         ]
       },
       "products": {
@@ -1217,7 +1217,10 @@
       "id": "Reductive_amination",
       "redox_neutral": false,
       "reactants": {
-        "electrophile": "@carbonyls",
+        "electrophile": [
+          "@carbonyls",
+          "@imines"
+        ],
         "nucleophile": "@amines_nh"
       },
       "products": {
@@ -1257,10 +1260,10 @@
           "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
           "Alkenyl-Alkenyl",
-          "Alkenyl-CO2R",
+          "Alkenyl-COOR",
           "Alkenyl-COR",
           "Alkenyl-CHO",
-          "Alkenyl-CO2H"
+          "Alkenyl-COOH"
         ]
       },
       "examples": [
@@ -1435,13 +1438,13 @@
       },
       "products": {
         "product": [
-          "Acyl-CO2H",
-          "Alkyl-CO2H",
-          "Alkenyl-CO2H",
-          "Ar-CO2H",
-          "RCH2-CO2H",
-          "R2CH-CO2H",
-          "R3C-CO2H"
+          "Acyl-COOH",
+          "Alkyl-COOH",
+          "Alkenyl-COOH",
+          "Ar-COOH",
+          "RCH2-COOH",
+          "R2CH-COOH",
+          "R3C-COOH"
         ]
       },
       "examples": [
@@ -1487,7 +1490,7 @@
       },
       "products": {
         "product": [
-          "Ar-CO2H"
+          "Ar-COOH"
         ]
       },
       "examples": [
@@ -1514,13 +1517,13 @@
       },
       "products": {
         "product": [
-          "Acyl-CO2H",
-          "Alkyl-CO2H",
-          "Alkenyl-CO2H",
-          "Ar-CO2H",
-          "RCH2-CO2H",
-          "R2CH-CO2H",
-          "R3C-CO2H"
+          "Acyl-COOH",
+          "Alkyl-COOH",
+          "Alkenyl-COOH",
+          "Ar-COOH",
+          "RCH2-COOH",
+          "R2CH-COOH",
+          "R3C-COOH"
         ]
       },
       "examples": [
@@ -1913,4 +1916,5 @@
     
   ]
 }
+
 

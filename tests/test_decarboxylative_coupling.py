@@ -17,5 +17,6 @@ def test_decarboxylative_coupling_detected_for_ar_x_partner() -> None:
     )
     reaction_key = str(result.get("reaction_key") or "")
     assert result.get("reaction_type") == "Decarboxylative_Coupling"
-    assert "|Acyl-CO2H|Ar-Br" in reaction_key
+    assert "|Acyl-COOH|Ar-Br" in reaction_key
+
 

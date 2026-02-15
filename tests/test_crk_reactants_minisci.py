@@ -17,7 +17,7 @@ def test_crk_reactants_include_heteroar_h_for_minisci_like_reaction() -> None:
 
     assert "HeteroAr-H" in reactants
     assert any(
-        token == "R_acidic-H" or token.endswith("-CO2H")
+        token == "R_acidic-H" or token.endswith("-COOH")
         for token in reactants
     )
     assert result.get("reaction_type") == "Minisci_alkylation"
@@ -56,7 +56,7 @@ def test_minisci_acylation_detection_with_cli_like_options() -> None:
     )
     reaction_key = result.get("reaction_key") or ""
     assert result.get("reaction_type") == "Minisci_acylation"
-    assert "|Acyl-CO2H|" in reaction_key
+    assert "|Acyl-COOH|" in reaction_key
     assert "HeteroAr-H" in reaction_key.split("->", 1)[0]
 
 
@@ -81,7 +81,7 @@ def test_minisci_acylation_with_thiophene_keto_acid() -> None:
     product_part = summary.split("->", 1)[1].strip()
     assert product_part != "[]"
     assert "COR" in product_part
-    assert "|Acyl-CO2H|" in reaction_key
+    assert "|Acyl-COOH|" in reaction_key
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
@@ -104,4 +104,5 @@ def test_minisci_alkylation_keeps_heteroar_h_in_crk_reactants() -> None:
     reactants = {token for token in reactant_part.split("|") if token and token != "[]"}
     assert result.get("reaction_type") == "Minisci_alkylation"
     assert "HeteroAr-H" in reactants
-    assert any(token.endswith("-CO2H") for token in reactants)
+    assert any(token.endswith("-COOH") for token in reactants)
+

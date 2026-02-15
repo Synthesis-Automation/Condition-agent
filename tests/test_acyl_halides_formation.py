@@ -14,11 +14,11 @@ def test_detects_acyl_halides_formation_from_carboxylic_acid() -> None:
     reaction_key = result.get("reaction_key") or ""
 
     assert result.get("reaction_type") == "Acyl_Halides_formation"
-    assert "|Ar-CO2H -> Ar-COCl" in reaction_key
+    assert "|Ar-COOH -> Ar-COCl" in reaction_key
 
 
 def test_validate_detection_with_crk_key_acyl_halides_formation() -> None:
-    crk_raw = "|Ar-CO2H -> Ar-COCl | bond_formed: C-Cl | bond_broken: C-O | spectators: Ar-Alkyl"
+    crk_raw = "|Ar-COOH -> Ar-COCl | bond_formed: C-Cl | bond_broken: C-O | spectators: Ar-Alkyl"
     result = validate_detection_with_crk_key(
         initial_detection="Unknown",
         initial_confidence=0.0,
@@ -62,3 +62,4 @@ def test_detects_alkenyl_acid_fluoride_as_alkenyl_cof() -> None:
     assert result.get("reaction_type") == "Acyl_Halides_formation"
     assert "-> Alkenyl-COF" in reaction_key
     assert "Alkenyl-COF" in (aggregates.get("formed_motifs") or [])
+

@@ -18,4 +18,5 @@ def test_broad_definition_group_hydrazine_marked_reacted_on_acylation() -> None:
     assert "Ar-Hydrazine" in reacted
     assert "Ar-Hydrazine" not in spectator
     assert "Ar-Hydrazide" in formed
-    assert "|Ar-CO2H|Ar-Hydrazine -> Ar-Hydrazide" in reaction_key
+    assert "|Ar-COOH|Ar-Hydrazine -> Ar-Hydrazide" in reaction_key
+

@@ -196,7 +196,7 @@ This is primarily useful for `Ar-*`.
 1) Find ring containing `anchor` as in sterics.
 2) For each ring atom, find substituent branches (neighbors not in ring).
 3) Recognize substituent group ids minimally (v1.0):
-   - NO2, CN, CHO, CO2H, CO2R, CONHR
+   - NO2, CN, CHO, COOH, COOR, CONHR
    - Use group tags to map to strengths (`ewg_strong`/`ewg_moderate`).
 4) Position weights by ring distance from anchor:
    - ortho 1.0, meta 0.6, para 1.2
@@ -280,3 +280,4 @@ Options:
 - `alkyl_steric.py` (from separate plan; scaffold + optional group_bulk)
 - `analyze.py` (dispatcher)
 - `tests/` (pytest)
+

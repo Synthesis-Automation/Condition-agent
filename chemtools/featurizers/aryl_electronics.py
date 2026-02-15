@@ -16,8 +16,8 @@ _ELECTRONIC_GROUP_IDS = [
     "NO2",
     "CN",
     "CHO",
-    "CO2R",
-    "CO2H",
+    "COOR",
+    "COOH",
     "CONHR",
     "NR2",
     "NHR",
@@ -49,8 +49,8 @@ _GROUP_STRENGTH_MAP = {
     "NO2": "ewg_strong",
     "CN": "ewg_strong",
     "CHO": "ewg_moderate",
-    "CO2R": "ewg_moderate",
-    "CO2H": "ewg_moderate",
+    "COOR": "ewg_moderate",
+    "COOH": "ewg_moderate",
     "CONHR": "ewg_moderate",
     "F": "ewg_weak",
     "Cl": "ewg_weak",
@@ -327,3 +327,4 @@ def _gasteiger_charge(mol: Any, ipso: int) -> Optional[float]:
 
 def _clamp(value: float, min_value: float, max_value: float) -> float:
     return max(min_value, min(max_value, value))
+

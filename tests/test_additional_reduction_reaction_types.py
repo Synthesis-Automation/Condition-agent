@@ -51,6 +51,7 @@ def test_reduction_ester_to_alcohol_detected() -> None:
     )
     reaction_key = str(result.get("reaction_key") or "")
     assert result.get("reaction_type") == "Reduction_ester_to_alcohol"
-    assert "Ar-CO2R" in reaction_key
+    assert "Ar-COOR" in reaction_key
     assert "Bn-OH" in reaction_key
+
 

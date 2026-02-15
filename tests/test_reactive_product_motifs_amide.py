@@ -16,7 +16,7 @@ def test_select_reactive_product_motifs_collapses_duplicate_group_representation
         product_motifs,
         bond_key="break: C-O | form: C-N",
         formed_motifs=["Ar-Alkyl", "Alkyl-NHCOR", "Ar-CONHR"],
-        reacted_motifs=["Ar-CO2H", "Bn-NH2"],
+        reacted_motifs=["Ar-COOH", "Bn-NH2"],
         reaction_type="Unknown",
     )
 
@@ -118,3 +118,4 @@ def test_hydrazide_acylation_keeps_ar_alkyl_out_of_crk_reacted_list() -> None:
 
     assert "Ar-Alkyl" not in reacted
     assert "|Ar-Alkyl|" not in summary
+

@@ -18,7 +18,8 @@ import json
 import sys
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Any
-from collections import defaultdict
+
+from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
 
 
 class CompoundSuggester:
@@ -36,18 +37,17 @@ class CompoundSuggester:
     def load_data(self) -> bool:
         """Load and categorize groups"""
         try:
-            with open(self.groups_file, 'r', encoding='utf-8') as f:
-                groups_data = json.load(f)
-                for group in groups_data.get('groups', []):
-                    group_id = group['id']
-                    self.groups[group_id] = group
-                    
-                    # Categorize by kind
-                    kind = group.get('kind', 'unknown')
-                    if kind == 'scaffold':
-                        self.scaffolds[group_id] = group
-                    elif kind == 'substituent':
-                        self.substituents[group_id] = group
+            groups_data = load_organic_groups_with_compositions(self.groups_file)
+            for group in groups_data.get('groups', []):
+                group_id = group['id']
+                self.groups[group_id] = group
+                
+                # Categorize by kind
+                kind = group.get('kind', 'unknown')
+                if kind == 'scaffold':
+                    self.scaffolds[group_id] = group
+                elif kind == 'substituent':
+                    self.substituents[group_id] = group
                         
             print(f"✓ Loaded {len(self.groups)} groups ({len(self.scaffolds)} scaffolds, {len(self.substituents)} substituents)")
         except Exception as e:
@@ -112,7 +112,7 @@ class CompoundSuggester:
         suggestions = []
         
         # Common substituents that should pair with most scaffolds
-        common_substituents = ['Cl', 'Br', 'I', 'F', 'H', 'OH', 'NH2', 'B(OH)2']
+        common_substituents = ['-Cl', '-Br', '-I', '-F', '-H', '-OH', '-NH2', '-B(OH)2']
         
         # Common scaffolds
         common_scaffolds = ['Ar', 'Alkyl', 'Bn', 'Allyl', 'Alkenyl', 'Alkynyl']

@@ -12,7 +12,7 @@ def test_priority_motifs_are_covered_by_reaction_slots() -> None:
         for slot in defn.products.values():
             covered.update(slot.allowed)
 
-    assert "Alkyl-N(R)CO2R" not in covered
+    assert "Alkyl-N(R)COOR" not in covered
     assert "Ar-C=N" in covered
     assert "Alkyl-H" in covered
     assert "Alkyl-CF3" in covered
@@ -25,7 +25,7 @@ def test_reductive_amination_and_trifluoromethylation_include_new_motifs() -> No
     reductive_reactants = reductive.reactants["electrophile"].allowed
     reductive_products = reductive.products["product"].allowed
     assert "Ar-C=N" in reductive_reactants
-    assert "Alkyl-N(R)CO2R" not in reductive_products
+    assert "Alkyl-N(R)COOR" not in reductive_products
     assert "Ar-NHR" not in reductive_products
     assert "Bn-NHR" in reductive_products
 
@@ -34,3 +34,4 @@ def test_reductive_amination_and_trifluoromethylation_include_new_motifs() -> No
     cf3_products = cf3.products["product"].allowed
     assert "Alkyl-H" in cf3_reactants
     assert "Alkyl-CF3" in cf3_products
+

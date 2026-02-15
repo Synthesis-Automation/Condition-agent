@@ -1,0 +1,132 @@
+{
+  "version": "v1",
+  "notes": "Generated substituent groups. Each entry references a linker label plus a terminal_group from organic_groups.v1.3.json. Tail SMARTS comes from terminal_group.tail_smarts when available, otherwise terminal_group.smarts with atom-map stripped.",
+  "linkers": [
+    {
+      "label": "CO",
+      "priority": 2,
+      "smarts_template": "[CX3:2](=O){TAIL}",
+      "description": "Carbonyl linker for acyl-derived substituents."
+    },
+    {
+      "label": "OCO",
+      "priority": 2,
+      "smarts_template": "[OX2:2][CX3](=O){TAIL}",
+      "description": "O-carbamoyl/carbonate linker (R-O-C(=O)-)."
+    },
+    {
+      "label": "SO",
+      "priority": 2,
+      "smarts_template": "[SX3:2](=O){TAIL}",
+      "description": "Sulfinyl linker (R-S(=O)-)."
+    },
+    {
+      "label": "SO2",
+      "priority": 2,
+      "smarts_template": "[SX4:2](=O)(=O){TAIL}",
+      "description": "Sulfonyl linker for sulfone/sulfonamide-derived substituents."
+    }
+  ],
+  "groups": [
+    {
+      "id": "-CONH2",
+      "label": "CO",
+      "terminal_group": "-NH2",
+      "aliases": [
+        "-CO-NH2"
+      ],
+      "description": "Primary amide substituent (-CONH2); attach via carbonyl carbon."
+    },
+    {
+      "id": "-CONHR",
+      "label": "CO",
+      "terminal_group": "-NHR",
+      "aliases": [
+        "-CO-NHR"
+      ],
+      "description": "Secondary amide substituent (-CONHR); attach via carbonyl carbon."
+    },
+    {
+      "id": "-CONR2",
+      "label": "CO",
+      "terminal_group": "-NR2",
+      "aliases": [
+        "-CO-NR2"
+      ],
+      "description": "Tertiary amide substituent (-CONR2); attach via carbonyl carbon."
+    },
+    {
+      "id": "-CON3",
+      "label": "CO",
+      "terminal_group": "-N3",
+      "aliases": [
+        "-CO-N3"
+      ],
+      "description": "Acyl azide substituent (-CON3); attach via carbonyl carbon."
+    },
+    {
+      "id": "-CONHNH2",
+      "label": "CO",
+      "terminal_group": "-Hydrazine",
+      "aliases": [
+        "-CO-NHNH2"
+      ],
+      "description": "Acyl hydrazide substituent (-CONHNH2); attach via carbonyl carbon."
+    },
+    {
+      "id": "-COOH",
+      "label": "CO",
+      "terminal_group": "-OH",
+      "aliases": [
+        "-CO2H"
+      ],
+      "description": "Carboxylic acid substituent (-COOH); attach via carbonyl carbon."
+    },
+    {
+      "id": "-COOR",
+      "label": "CO",
+      "terminal_group": "-OR",
+      "aliases": [
+        "-CO2R"
+      ],
+      "description": "Ester substituent (-COOR); attach via carbonyl carbon."
+    },
+    {
+      "id": "-SO2NH2",
+      "label": "SO2",
+      "terminal_group": "-NH2",
+      "aliases": [
+        "-SO2-NH2"
+      ],
+      "description": "Primary sulfonamide core; attach via sulfur."
+    },
+    {
+      "id": "-SO2NHR",
+      "label": "SO2",
+      "terminal_group": "-NHR",
+      "aliases": [
+        "-SO2-NHR"
+      ],
+      "description": "Secondary sulfonamide core; attach via sulfur."
+    },
+    {
+      "id": "-SO2NR2",
+      "label": "SO2",
+      "terminal_group": "-NR2",
+      "aliases": [
+        "-SO2-NR2"
+      ],
+      "description": "Tertiary sulfonamide core; attach via sulfur."
+    },
+    {
+      "id": "-SO2NHNH2",
+      "label": "SO2",
+      "terminal_group": "-Hydrazine",
+      "aliases": [
+        "-SO2-NHNH2"
+      ],
+      "description": "Sulfonylhydrazide substituent (-SO2NHNH2); attach via sulfur."
+    }
+  ]
+}
+

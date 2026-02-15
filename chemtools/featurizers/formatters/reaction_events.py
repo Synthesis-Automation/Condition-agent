@@ -152,7 +152,7 @@ def _ring_count(smiles_list: Iterable[str]) -> int:
 def _has_carboxylic_acid_like(motif_ids: Set[str]) -> bool:
     for mid in motif_ids:
         m = str(mid)
-        if "CO2H" in m or "COOH" in m:
+        if "COOH" in m:
             return True
     return False
 
@@ -749,3 +749,4 @@ __all__ = [
     "format_multi_event_signature",
     "summarize_reaction_events",
 ]
+

@@ -917,7 +917,7 @@ def _filter_reactants_for_crk(
     logic_sets = _load_compound_logic_sets()
     carboxylic_acids = logic_sets.get("carboxylic_acids", set())
     has_decarboxylative_partner = any(
-        (m in carboxylic_acids) or m.endswith("-CO2H") or m.endswith("-COOH")
+        (m in carboxylic_acids) or m.endswith("-COOH")
         for m in reacted_ids
     )
     has_aryl_c_c_formation = False
@@ -985,8 +985,8 @@ def _filter_reactants_for_crk(
         # For carbonyl-derived groups, element overlap alone is too permissive.
         # Require explicit nucleophile logic to keep these when they are spectators.
         if group_id in {
-            "-CO2R",
-            "-CO2H",
+            "-COOR",
+            "-COOH",
             "-COR",
             "-CONH2",
             "-CONHR",
@@ -994,7 +994,7 @@ def _filter_reactants_for_crk(
         }:
             # Carbonyl-derived motifs should only be kept if a non-aromatic carbonyl bond changes.
             if (
-                group_id == "-CO2H"
+                group_id == "-COOH"
                 and _has_c_c_cleavage()
                 and _has_aryl_c_c_formation()
             ):
@@ -1857,7 +1857,7 @@ def _rescue_decarboxylative_product_motifs_without_bond_key(
     logic_sets = _load_compound_logic_sets()
     carboxylic_acids = logic_sets.get("carboxylic_acids", set())
     has_carboxylate_partner = any(
-        (m in carboxylic_acids) or m.endswith("-CO2H") or m.endswith("-COOH")
+        (m in carboxylic_acids) or m.endswith("-COOH")
         for m in reacted_set
     )
     if not has_carboxylate_partner:
@@ -2021,11 +2021,20 @@ def _infer_product_motifs_from_logic(
     has_aromatic_ch_substrate = any(m in aromatic_ch_sites for m in reacted_list)
     carboxylic_acids = logic_sets.get("carboxylic_acids", set())
     has_carboxylate_partner = any(
-        (m in carboxylic_acids) or m.endswith("-CO2H") or m.endswith("-COOH")
+        (m in carboxylic_acids) or m.endswith("-COOH")
         for m in reacted_list
     )
     has_acyl_ketoacid_partner = any(
-        m == "Acyl-CO2H" or (m.startswith("Acyl-") and m.endswith("-CO2H"))
+        m == "Acyl-COOH" or (m.startswith("Acyl-") and m.endswith("-COOH"))
+        for m in reacted_list
+    )
+    has_sp2_halide_partner = any(
+        (
+            m.startswith("Ar-")
+            or m.startswith("HeteroAr-")
+            or m.startswith("AromN-")
+        )
+        and m.endswith(_SP2_ELECTROPHILE_LEAVING_SUFFIXES)
         for m in reacted_list
     )
     if has_aryl_c_c_formation and has_c_c_cleavage and has_aromatic_ch_substrate and has_carboxylate_partner:
@@ -2037,6 +2046,9 @@ def _infer_product_motifs_from_logic(
                 inferred.add("HeteroAr-COR")
         else:
             inferred.add("Ar-Alkyl")
+    # Decarboxylative acyl cross-coupling with sp2 halide partners.
+    if has_aryl_c_c_formation and has_c_c_cleavage and has_acyl_ketoacid_partner and has_sp2_halide_partner:
+        inferred.add("Ar-COR")
 
     return sorted(inferred)
 
@@ -2401,7 +2413,7 @@ def featurize_reaction(
         formed_all = sorted(formed_raw | formed_inferred)
         formed_for_validation = (
             sorted(formed_raw)
-            if strict_product_motif_validation
+            if (strict_product_motif_validation and formed_raw)
             else formed_all
         )
         bond_key_consistency = _assess_bond_key_consistency(
@@ -2439,7 +2451,7 @@ def featurize_reaction(
             formed_all = sorted(formed_raw | formed_inferred)
             formed_for_validation = (
                 sorted(formed_raw)
-                if strict_product_motif_validation
+                if (strict_product_motif_validation and formed_raw)
                 else formed_all
             )
 
@@ -2688,3 +2700,4 @@ def featurize_reaction(
         result["meta"] = meta
     
     return result
+

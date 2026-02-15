@@ -14,6 +14,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from .substituent_composer import load_organic_groups_with_compositions
+
 _BASE_FILE = "calculable_features.json"
 _PROPERTIES_FILE = "calculable_features_properties.json"
 _DERIVED_FILE = "calculable_features_derived.json"
@@ -51,7 +53,7 @@ def _coerce_feature_list(value: Any, *, path: Path) -> list[dict[str, Any]]:
 
 
 def _load_groups(path: Path) -> Dict[str, Dict[str, Any]]:
-    payload = _safe_load_json(path)
+    payload = load_organic_groups_with_compositions(path)
     groups = payload.get("groups", [])
     return {
         group["id"]: group

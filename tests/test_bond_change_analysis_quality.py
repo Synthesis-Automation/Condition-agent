@@ -79,7 +79,7 @@ def test_decarboxylative_rescue_without_bond_key_selects_product_motif() -> None
         product_motifs,
         bond_key=None,
         formed_motifs=[],
-        reacted_motifs=["Acyl-CO2H", "HeteroAr-H"],
+        reacted_motifs=["Acyl-COOH", "HeteroAr-H"],
         reaction_type=None,
     )
     assert "Ar-COR" in reactive
@@ -178,3 +178,4 @@ def test_low_bond_key_consistency_demotes_bond_sections_in_reaction_key(
     assert "bond_broken:" not in reaction_key
     assert float(quality.get("score_0_1") or 1.0) < 0.45
     assert "bond_key_consistency_penalty" in (quality.get("reasons") or [])
+

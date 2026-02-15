@@ -238,6 +238,7 @@
       "id": "-OH",
       "kind": "substituent",
       "smarts": "[O;H1;!$(O-[C,S,P]=O):2]",
+      "tail_smarts": "[O;H1]",
       "description": "Hydroxy substituent (-OH)."
     },
     {
@@ -245,6 +246,7 @@
       "kind": "substituent",
       "priority": 1,
       "smarts": "[O;H0;!$(O-[C,S,P]=O):2][#6]",
+      "tail_smarts": "[O;H0][#6]",
       "description": "Ether substituent (-OR)."
     },
     {
@@ -350,20 +352,6 @@
       "description": "Ketone core; attach via carbonyl carbon (-COR)."
     },
     {
-      "id": "-CO2H",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[C:2](=O)[OX2H]",
-      "description": "Carboxylic acid substituent (-CO2H), attach via carbonyl carbon."
-    },
-    {
-      "id": "-CO2R",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[CX3:2](=O)O[#6]",
-      "description": "Ester substituent (-CO2R), attach via carbonyl carbon."
-    },
-    {
       "id": "-COF",
       "kind": "substituent",
       "priority": 1,
@@ -395,18 +383,21 @@
       "id": "-NH2",
       "kind": "substituent",
       "smarts": "[N;H2;!$(N-[C,S,P]=O):2]",
+      "tail_smarts": "[N;H2]",
       "description": "Primary amine N substituent (-NH2)."
     },
     {
       "id": "-NHR",
       "kind": "substituent",
       "smarts": "[N;H1;!$(N-[C,S,P]=O):2]",
+      "tail_smarts": "[N;H1]",
       "description": "Secondary amine N substituent with one N-H (-NHR)."
     },
     {
       "id": "-NR2",
       "kind": "substituent",
       "smarts": "[NX3;H0;!$(N-[C,S,P]=O):2]",
+      "tail_smarts": "[NX3;H0]",
       "description": "Tertiary amine N core, no N-H (-NR2)."
     },
     {
@@ -430,27 +421,6 @@
       "broad_definition": true,
       "smarts": "[NX3:2][NX3]",
       "description": "Hydrazine-like substituent (-NN unit, any substitution); attach via nitrogen."
-    },
-    {
-      "id": "-CONH2",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[CX3:2](=O)[NX3;H2]",
-      "description": "Primary amide substituent (-CONH2); attach via carbonyl carbon."
-    },
-    {
-      "id": "-CONHR",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[CX3:2](=O)[NX3;H1]",
-      "description": "Secondary amide substituent (-CONHR); attach via carbonyl carbon."
-    },
-    {
-      "id": "-CONR2",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[CX3:2](=O)[NX3;H0]",
-      "description": "Tertiary amide substituent (no N-H); attach via carbonyl carbon."
     },
     {
       "id": "-NHCOR",
@@ -545,27 +515,6 @@
       "priority": 1,
       "smarts": "[SX4:2](=O)(=O)I",
       "description": "Sulfonyl iodide core; attach via sulfur."
-    },
-    {
-      "id": "-SO2NH2",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[SX4:2](=O)(=O)[NX3;H2]",
-      "description": "Primary sulfonamide core; attach via sulfur."
-    },
-    {
-      "id": "-SO2NHR",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[SX4:2](=O)(=O)[NX3;H1]",
-      "description": "Secondary sulfonamide core; attach via sulfur."
-    },
-    {
-      "id": "-SO2NR2",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[SX4:2](=O)(=O)[NX3;H0]",
-      "description": "Tertiary sulfonamide core; attach via sulfur."
     },
     {
       "id": "-SO3H",

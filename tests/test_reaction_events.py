@@ -57,7 +57,7 @@ def test_reaction_events_flag_amidation_without_activation() -> None:
         reaction_smiles="O=C(O)c1ccccc1.NCC>>O=C(NCC)c1ccccc1",
         bond_key="form: C-N",
         fallback_bond_key=None,
-        reacted_motifs=["Ar-CO2H", "Bn-NHR"],
+        reacted_motifs=["Ar-COOH", "Bn-NHR"],
         formed_motifs=["Ar-CONR2"],
         mapping_warning=None,
     )
@@ -171,3 +171,4 @@ def test_reaction_key_displays_multi_event_signature_for_benzyl_alkylation_hydro
     else:
         rt_text = str(reaction_type or "")
     assert rt_text.startswith("Multi-Event:")
+

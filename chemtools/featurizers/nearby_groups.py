@@ -61,5 +61,9 @@ def _resolve_group_id(compound_id: str, compound_map: Optional[Dict[str, Any]]) 
         if group_b:
             return str(group_b)
     if "-" in compound_id:
-        return compound_id.split("-")[-1]
+        # Fallback when registry entry is unavailable: keep full substituent suffix.
+        # Example: Ar-CO-NH2 -> -CO-NH2 (not just -NH2).
+        _, _, suffix = compound_id.partition("-")
+        if suffix:
+            return f"-{suffix}"
     return None

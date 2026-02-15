@@ -7,6 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
+from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
 from chemtools.util.smarts_cache import compile_smarts
 
 from .models import CompoundPattern, _DEFAULT_TEMPLATES
@@ -236,7 +237,7 @@ def clear_compound_registry_cache() -> None:
 
 def _load_groups(path: Path) -> Dict[str, Dict[str, Any]]:
     """Load group definitions from JSON file."""
-    payload = _load_json(path)
+    payload = load_organic_groups_with_compositions(path)
     groups = payload.get("groups", [])
     return {
         group["id"]: group

@@ -114,17 +114,17 @@
     },
     "Amide_formation": {
       "pattern": "condensation",
-      "leaving_groups": ["-CO2H", "-COOH", "-COCl", "-NH2", "-NHR", "-NR2"],
+      "leaving_groups": ["-COOH", "-COOH", "-COCl", "-NH2", "-NHR", "-NR2"],
       "notes": "Carboxylic acid/chloride + amine -> amide. Both functional groups participate."
     },
     "Esterification": {
       "pattern": "condensation",
-      "leaving_groups": ["-CO2H", "-COOH", "-COCl", "-OH"],
+      "leaving_groups": ["-COOH", "-COOH", "-COCl", "-OH"],
       "notes": "Carboxylic acid/chloride + alcohol -> ester."
     },
     "Acyl_Halides_formation": {
       "pattern": "condensation",
-      "leaving_groups": ["-CO2H", "-COOH", "-OH"],
+      "leaving_groups": ["-COOH", "-COOH", "-OH"],
       "formed_groups": ["-COCl", "-COBr", "-COI", "-COF"],
       "notes": "Carboxylic acid conversion to acyl halide (acid chloride/bromide/iodide/fluoride)."
     },
@@ -134,7 +134,7 @@
     },
     "Acylation_ester": {
       "pattern": "condensation",
-      "leaving_groups": ["-OH", "-Cl", "-OR", "-H", "-CO2H", "-COOH", "-COCl", "-COOR"]
+      "leaving_groups": ["-OH", "-Cl", "-OR", "-H", "-COOH", "-COOH", "-COCl", "-COOR"]
     },
     "Reductive_amination": {
       "pattern": "condensation",
@@ -254,3 +254,4 @@
     }
   }
 }
+

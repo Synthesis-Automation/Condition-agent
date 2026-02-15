@@ -19,7 +19,24 @@ import json
 import sys
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Any
-from collections import defaultdict
+
+from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
+from chemtools.util.rdkit_helpers import rdkit_available
+from chemtools.util.smarts_cache import compile_smarts
+
+_GENERATED_ONLY_GROUP_IDS = {
+    "-COOH",
+    "-COOR",
+    "-CONH2",
+    "-CONHR",
+    "-CONR2",
+    "-CON3",
+    "-CONHNH2",
+    "-SO2NH2",
+    "-SO2NHR",
+    "-SO2NR2",
+    "-SO2NHNH2",
+}
 
 
 class TaxonomyValidator:
@@ -33,14 +50,31 @@ class TaxonomyValidator:
         self.errors: List[str] = []
         self.warnings: List[str] = []
         self.fixes_applied: List[str] = []
+        self.composed_count: int = 0
+        self.base_group_ids: Set[str] = set()
         
     def load_data(self) -> bool:
         """Load both JSON files"""
         try:
-            with open(self.groups_file, 'r', encoding='utf-8') as f:
-                groups_data = json.load(f)
-                self.groups = {g['id']: g for g in groups_data.get('groups', [])}
-                print(f"✓ Loaded {len(self.groups)} organic groups from {self.groups_file.name}")
+            with open(self.groups_file, "r", encoding="utf-8") as f:
+                base_payload = json.load(f)
+            self.base_group_ids = {
+                str(g.get("id") or "").strip()
+                for g in (base_payload.get("groups") or [])
+                if isinstance(g, dict) and g.get("id")
+            }
+
+            groups_data = load_organic_groups_with_compositions(self.groups_file)
+            self.groups = {
+                g["id"]: g
+                for g in groups_data.get("groups", [])
+                if isinstance(g, dict) and g.get("id")
+            }
+            composed = groups_data.get("composed_groups", {}) or {}
+            self.composed_count = int(composed.get("generated_count") or 0)
+            for msg in composed.get("errors", []) or []:
+                self.errors.append(f"Composed group error: {msg}")
+            print(f"✓ Loaded {len(self.groups)} organic groups from {self.groups_file.name}")
         except Exception as e:
             self.errors.append(f"Failed to load groups: {e}")
             return False
@@ -94,6 +128,35 @@ class TaxonomyValidator:
                     self.errors.append(f"Compound '{comp_id}': Group B='{b_ref}' not found in organic_groups")
         
         return valid_refs, missing_refs
+
+    def validate_composed_group_smarts(self) -> None:
+        """Validate SMARTS compilability for composed groups."""
+        composed = [
+            group
+            for group in self.groups.values()
+            if isinstance(group, dict) and isinstance(group.get("generated"), dict)
+        ]
+        if not composed:
+            return
+        if not rdkit_available():
+            self.warnings.append("RDKit unavailable; skipped composed SMARTS validation.")
+            return
+        for group in composed:
+            group_id = str(group.get("id") or "")
+            smarts = str(group.get("smarts") or "")
+            if not smarts:
+                self.errors.append(f"Composed group '{group_id}' missing SMARTS.")
+                continue
+            if compile_smarts(smarts, validate=False) is None:
+                self.errors.append(f"Composed group '{group_id}' has invalid SMARTS.")
+
+    def validate_generated_only_groups(self) -> None:
+        bad = sorted(_GENERATED_ONLY_GROUP_IDS & self.base_group_ids)
+        for group_id in bad:
+            self.errors.append(
+                f"Group '{group_id}' must be generated via substituent_fragments.v1.json, "
+                "not defined directly in organic_groups.v1.3.json."
+            )
     
     def check_explicit_id_fields(self) -> int:
         """Check for explicit 'id' fields (should be auto-generated from A-B)"""
@@ -219,8 +282,20 @@ class TaxonomyValidator:
         # 4. Check dependencies
         print("\n4. Validating version dependencies...")
         self.validate_dependencies()
-        
-        # 5. Generate usage report
+
+        # 5. Enforce generated-only groups
+        print("\n5. Enforcing generated-only group policy...")
+        self.validate_generated_only_groups()
+
+        # 6. Validate composed group SMARTS
+        print("\n6. Validating composed substituent SMARTS...")
+        self.validate_composed_group_smarts()
+        if self.composed_count:
+            print(f"  ✓ Loaded {self.composed_count} composed substituent group(s)")
+        else:
+            print("  ℹ No composed substituent groups generated")
+
+        # 7. Generate usage report
         self.generate_usage_report(valid_refs)
         
         return True
@@ -306,3 +381,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

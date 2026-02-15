@@ -760,6 +760,12 @@ def aggregate_reaction_features(
             product_ids_for_counts = [
                 m.get("compound_id") or m.get("id", "") for m in product_motifs_primary
             ]
+            reactant_ids_for_counts_full = [
+                m.get("compound_id") or m.get("id", "") for m in reactant_motifs_for_changes
+            ]
+            product_ids_for_counts_full = [
+                m.get("compound_id") or m.get("id", "") for m in product_motifs_with_fp
+            ]
         else:
             # Fallback to ID-only comparison
             product_ids = product_motif_ids or [m.get("compound_id") or m.get("id", "") for m in (product_motifs or [])]
@@ -768,6 +774,8 @@ def aggregate_reaction_features(
             )
             reactant_ids_for_counts = primary_motif_ids_list
             product_ids_for_counts = product_ids
+            reactant_ids_for_counts_full = primary_motif_ids_list
+            product_ids_for_counts_full = product_ids
         
         # Collect spectator groups
         for motif_id in primary_motif_ids_list:
@@ -800,13 +808,37 @@ def aggregate_reaction_features(
         product_id_counts = Counter(
             normalize_motif_id(str(mid)) for mid in product_ids_for_counts if mid
         )
-        for motif_id in set(reactant_id_counts) | set(product_id_counts):
+        reactant_id_counts_full = Counter(
+            normalize_motif_id(str(mid)) for mid in reactant_ids_for_counts_full if mid
+        )
+        product_id_counts_full = Counter(
+            normalize_motif_id(str(mid)) for mid in product_ids_for_counts_full if mid
+        )
+        all_count_ids = (
+            set(reactant_id_counts)
+            | set(product_id_counts)
+            | set(reactant_id_counts_full)
+            | set(product_id_counts_full)
+        )
+        for motif_id in all_count_ids:
             r_count = reactant_id_counts.get(motif_id, 0)
             p_count = product_id_counts.get(motif_id, 0)
             if motif_id in reacted_set:
-                reacted_motif_counts[motif_id] = max(r_count - p_count, 0)
+                reacted_delta = max(r_count - p_count, 0)
+                if reacted_delta <= 0:
+                    reacted_delta = max(
+                        reactant_id_counts_full.get(motif_id, 0) - product_id_counts_full.get(motif_id, 0),
+                        0,
+                    )
+                reacted_motif_counts[motif_id] = reacted_delta
             if motif_id in formed_set:
-                formed_motif_counts[motif_id] = max(p_count - r_count, 0)
+                formed_delta = max(p_count - r_count, 0)
+                if formed_delta <= 0:
+                    formed_delta = max(
+                        product_id_counts_full.get(motif_id, 0) - reactant_id_counts_full.get(motif_id, 0),
+                        0,
+                    )
+                formed_motif_counts[motif_id] = formed_delta
             if (
                 motif_id in broad_fp_changed_ids
                 and r_count > 0

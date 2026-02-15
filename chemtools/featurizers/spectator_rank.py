@@ -29,7 +29,7 @@ _DEFAULT_AMINE_GROUPS = {
 }
 
 _DEFAULT_ACID_GROUPS = {
-    "CO2H",
+    "COOH",
     "SO3H",
     "PO3H2",
     "PO3H",
@@ -193,3 +193,4 @@ __all__ = [
     "spectator_group_weight",
     "weighted_spectator_similarity",
 ]
+
