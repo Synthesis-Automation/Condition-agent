@@ -1,0 +1,8 @@
+row_index,reaction_id,detected_reaction_type,reaction_smiles,Reaction_Key,Reaction_Events,reference,yield,z_score
+1066,C_N_Coupling,Unknown,CN(C)->[Zn+2]([Cl-])([Cl-])<-N(C)C.CC(C)(C)[C@H](NC(=O)c1ccccc1)[C@@H](O)c1cnccc1Cl>>CN(C)c1ccncc1[C@H](O)[C@@H](NC(=O)c1ccccc1)C(C)(C)C,,,"Journal of Organic Chemistry (2018), 83(20), 12449-12459",78,-0.84
+1067,C_N_Coupling,Unknown,Cl.Clc1ccncc1.CN(C)->[Zn+2]([Cl-])([Cl-])<-N(C)C>>CN(C)c1ccncc1.Cl,,,"Journal of Organic Chemistry (2018), 83(20), 12449-12459",82,-0.3
+1070,C_N_Coupling,Unknown,Cl.Clc1ccncc1.CC(C)(C)OC(=O)NC1CCN(->[Zn+2]([Cl-])([Cl-])<-N2CCC(NC(=O)OC(C)(C)C)C2)C1>>CC(C)(C)OC(=O)NC1CCN(c2ccncc2)C1,,,"Journal of Organic Chemistry (2018), 83(20), 12449-12459",86,0.23
+1073,C_N_Coupling,Unknown,CN(C)->[Zn+2]([Cl-])([Cl-])<-N(C)C.OC(c1cnccc1Cl)C(c1ccccc1)(c1ccccc1)c1ccccc1>>CN(C)c1ccncc1C(O)C(c1ccccc1)(c1ccccc1)c1ccccc1,,,"Journal of Organic Chemistry (2018), 83(20), 12449-12459",83,-0.17
+1074,C_N_Coupling,Unknown,Clc1ccncc1-c1c(-c2ccccc2)ccc2ccccc12.CN(C)->[Zn+2]([Cl-])([Cl-])<-N(C)C>>CN(C)c1ccncc1-c1c(-c2ccccc2)ccc2ccccc12,,,"Journal of Organic Chemistry (2018), 83(20), 12449-12459",78,-0.84
+1075,C_N_Coupling,Unknown,Cl.Clc1ccncc1.C[C@H](N->[Zn+2]([Cl-])([Cl-])<-N[C@@H](C)C1=CC=CC=C1)C1=CC=CC=C1>>C[C@H](Nc1ccncc1)c1ccccc1,,,"Journal of Organic Chemistry (2018), 83(20), 12449-12459",83,-0.17
+23043,C_N_Coupling,Unknown,O=Cc1c(Cl)c2ccccc2oc1=O.Nc1ccncc1.CCO[PH](=O)OCC>>CCOP(OCC)(=O->[Zn+2]([Cl-])([Cl-])[Cl-])C(O)C1=C([N+]2=CC=C(N)C=C2)C2=CC=CC=C2OC1=O,,,"Journal of Organic Chemistry (2024), 89(11), 7662-7670",100,2.1
