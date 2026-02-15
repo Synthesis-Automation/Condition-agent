@@ -65,6 +65,7 @@ def test_composed_groups_are_merged_without_duplicates() -> None:
     assert "-CONHNH2" in ids
     assert "-COOH" in ids
     assert "-COOR" in ids
+    assert "-OCONH2" in ids
     assert "-SO2NHNH2" in ids
     assert "-PO2OH" in ids
     assert "-PO2OR" in ids
@@ -90,6 +91,7 @@ def test_composed_groups_smarts_compile() -> None:
         "-CONHNH2",
         "-COOH",
         "-COOR",
+        "-OCONH2",
         "-SO2NHNH2",
         "-PO2OH",
         "-PO2OR",
@@ -107,6 +109,7 @@ def test_registry_includes_composed_groups() -> None:
     assert "-CONHNH2" in groups
     assert "-COOH" in groups
     assert "-COOR" in groups
+    assert "-OCONH2" in groups
     assert "-SO2NHNH2" in groups
     assert "-PO2OH" in groups
     assert "-PO2OR" in groups
@@ -118,6 +121,7 @@ def test_registry_has_curated_composed_compounds() -> None:
     compound_map = registry.get("compound_map", {}) or {}
     assert "Ar-CON3" in compound_map
     assert "Alkyl-CONHNH2" in compound_map
+    assert "Alkyl-OCONH2" in compound_map
     assert "Ar-COOH" in compound_map
     assert "Ar-COOR" in compound_map
     assert "Bn-SO2NHNH2" in compound_map
@@ -135,6 +139,7 @@ def test_compound_expansion_added_for_composed_groups() -> None:
         ("Ar", "-SO2NHNH2"),
         ("Alkyl", "-CON3"),
         ("Alkyl", "-CONHNH2"),
+        ("Alkyl", "-OCONH2"),
         ("Alkyl", "-SO2NHNH2"),
         ("RCH2", "-CON3"),
         ("RCH2", "-CONHNH2"),
@@ -192,11 +197,15 @@ def test_compound_logic_sets_include_composed_compounds() -> None:
 
     assert "Ar-CONHNH2" in sets["amines_nh"]
     assert "Alkyl-CONHNH2" in sets["amines_nh"]
+    assert "Alkyl-OCONH2" in sets["amines_nh"]
+    assert "H-NH2" in sets["amines_nh"]
+    assert "H-CONH2" in sets["amines_nh"]
     assert "Ar-SO2NHNH2" in sets["amines_nh"]
     assert "Alkyl-SO2NHNH2" in sets["amines_nh"]
 
     assert "Ar-CONHNH2" in sets["amides"]
     assert "RCH2-CONHNH2" in sets["amides"]
+    assert "H-CONH2" in sets["amides"]
 
     assert "Ar-SO2NHNH2" in sets["aryl_sulfonamides"]
     assert "Alkyl-SO2NHNH2" in sets["aryl_sulfonamides"]
@@ -215,6 +224,7 @@ def test_generated_only_groups_not_defined_in_base_organic_groups() -> None:
         "-CONR2",
         "-CON3",
         "-CONHNH2",
+        "-OCONH2",
         "-SO2NH2",
         "-SO2NHR",
         "-SO2NR2",

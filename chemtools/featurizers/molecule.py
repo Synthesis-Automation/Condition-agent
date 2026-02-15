@@ -527,13 +527,7 @@ def featurize_molecule(
         meta["error"] = "invalid_smiles"
         return _build_payload(smiles=smiles, meta=meta)
 
-    if _is_inorganic_molecule(mol):
-        return _build_payload(
-            smiles=smiles,
-            meta=meta,
-            motifs=[{"compound_id": "Inorganic"}],
-            ranked_motifs=["Inorganic"],
-        )
+    is_inorganic = _is_inorganic_molecule(mol)
 
     from rdkit import Chem
     mol = Chem.AddHs(mol)
@@ -604,6 +598,13 @@ def featurize_molecule(
         requested_ids=requested_ids,
     )
     motifs = _dedupe_background_motifs(motifs)
+    if is_inorganic and not motifs:
+        return _build_payload(
+            smiles=smiles,
+            meta=meta,
+            motifs=[{"compound_id": "Inorganic"}],
+            ranked_motifs=["Inorganic"],
+        )
 
     ranked_motifs = []
     if motifs:

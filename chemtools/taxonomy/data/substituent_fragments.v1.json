@@ -134,6 +134,15 @@
       "description": "Ester substituent (-COOR); attach via carbonyl carbon."
     },
     {
+      "id": "-OCONH2",
+      "label": "OCO",
+      "terminal_group": "-NH2",
+      "aliases": [
+        "-OCO-NH2"
+      ],
+      "description": "Primary carbamate substituent (-OCONH2); attach via oxygen."
+    },
+    {
       "id": "-SO2NH2",
       "label": "SO2",
       "terminal_group": "-NH2",

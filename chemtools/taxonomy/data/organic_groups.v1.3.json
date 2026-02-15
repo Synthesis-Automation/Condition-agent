@@ -123,6 +123,13 @@
       "description": "Acyl carbon attachment point (Acyl-, including formyl HCO-), used for acyl electrophiles/features."
     },
     {
+      "id": "H",
+      "kind": "scaffold",
+      "priority": 0,
+      "smarts": "[H:1]",
+      "description": "Pseudo-scaffold hydrogen placeholder for tightly allowlisted H-* motifs only."
+    },
+    {
       "id": "-H",
       "kind": "substituent",
       "priority": 1,

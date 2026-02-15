@@ -34,6 +34,18 @@
       "description": "Vinylic C-H bond."
     },
     {
+      "A": "H",
+      "B": "-NH2",
+      "smarts": "[NX3H3:1]",
+      "description": "Ammonia nucleophile motif (NH3) represented as allowlisted pseudo-scaffold H-NH2."
+    },
+    {
+      "A": "H",
+      "B": "-CONH2",
+      "smarts": "[CX3H1:1](=O)[NX3H2:2]",
+      "description": "Formamide motif (HCONH2) represented as allowlisted pseudo-scaffold H-CONH2."
+    },
+    {
       "template": "single_bond",
       "A": "RCH2",
       "B": "-B(OR)2",
@@ -1706,6 +1718,12 @@
       "A": "Alkyl",
       "B": "-CONH2",
       "description": "Alkyl primary amide (Alkyl-CONH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-OCONH2",
+      "description": "Alkyl primary carbamate (Alkyl-OCONH2)."
     },
     {
       "template": "single_bond",

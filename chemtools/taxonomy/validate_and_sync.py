@@ -35,6 +35,7 @@ _GENERATED_ONLY_GROUP_IDS = {
     "-CONR2",
     "-CON3",
     "-CONHNH2",
+    "-OCONH2",
     "-SO2NH2",
     "-SO2NHR",
     "-SO2NR2",
@@ -44,6 +45,11 @@ _GENERATED_ONLY_GROUP_IDS = {
     "-PO2NH2",
     "-PO2NHR",
     "-PO2NR2",
+}
+
+_H_PSEUDO_ALLOWED_COMPOUND_IDS = {
+    "H-NH2",
+    "H-CONH2",
 }
 
 
@@ -180,6 +186,35 @@ class TaxonomyValidator:
                 f"Group '{group_id}' must be generated via substituent_fragments.v1.json, "
                 "not defined directly in organic_groups.v1.3.json."
             )
+
+    def validate_h_pseudo_scaffold_policy(self) -> None:
+        """Allow only tightly controlled H-* pseudo-scaffold compounds."""
+        for compound in self.compounds_list:
+            if not isinstance(compound, dict):
+                continue
+            a_ref = str(compound.get("A") or "").strip()
+            b_ref = str(compound.get("B") or "").strip()
+            explicit_id = str(compound.get("id") or "").strip()
+            compound_id = explicit_id
+            if not compound_id and a_ref and b_ref:
+                compound_id = f"{a_ref}{b_ref}" if b_ref.startswith("-") else f"{a_ref}-{b_ref}"
+
+            if a_ref == "H":
+                if compound_id not in _H_PSEUDO_ALLOWED_COMPOUND_IDS:
+                    self.errors.append(
+                        f"Compound '{compound_id or '<missing-id>'}' uses pseudo-scaffold A='H' "
+                        "but is not in the allowlist."
+                    )
+                has_direct_smarts = bool(compound.get("smarts") or compound.get("smarts_any"))
+                if not has_direct_smarts:
+                    self.errors.append(
+                        f"Compound '{compound_id or '<missing-id>'}' with A='H' must define explicit SMARTS."
+                    )
+
+            if compound_id in _H_PSEUDO_ALLOWED_COMPOUND_IDS and a_ref != "H":
+                self.errors.append(
+                    f"Compound '{compound_id}' is allowlisted as pseudo-scaffold but does not use A='H'."
+                )
     
     def check_explicit_id_fields(self) -> int:
         """Check for explicit 'id' fields (should be auto-generated from A-B)"""
@@ -310,19 +345,23 @@ class TaxonomyValidator:
         print("\n5. Enforcing generated-only group policy...")
         self.validate_generated_only_groups()
 
-        # 6. Validate substituent fragments schema
-        print("\n6. Validating substituent fragments schema...")
+        # 6. Enforce pseudo-scaffold H policy
+        print("\n6. Enforcing pseudo-scaffold H policy...")
+        self.validate_h_pseudo_scaffold_policy()
+
+        # 7. Validate substituent fragments schema
+        print("\n7. Validating substituent fragments schema...")
         self.validate_substituent_fragments_schema()
 
-        # 7. Validate composed group SMARTS
-        print("\n7. Validating composed substituent SMARTS...")
+        # 8. Validate composed group SMARTS
+        print("\n8. Validating composed substituent SMARTS...")
         self.validate_composed_group_smarts()
         if self.composed_count:
             print(f"  ✓ Loaded {self.composed_count} composed substituent group(s)")
         else:
             print("  ℹ No composed substituent groups generated")
 
-        # 8. Generate usage report
+        # 9. Generate usage report
         self.generate_usage_report(valid_refs)
         
         return True
