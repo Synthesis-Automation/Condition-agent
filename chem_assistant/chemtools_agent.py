@@ -5,6 +5,9 @@ LangGraph agent for ChemTools featurization, analysis, and reagent registry acce
 import json
 import os
 import re
+import ast
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 from dotenv import load_dotenv
@@ -33,6 +36,10 @@ DEFAULT_ALIYUN_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
 _REACTION_SMILES_RE = re.compile(
     r"([A-Za-z0-9@+\-\[\]\(\)=#%/.]+>>[A-Za-z0-9@+\-\[\]\(\)=#%/.]*)"
+)
+_RUNTIME_POLICY_PREFIX = "Runtime policy (installed by "
+_RUNTIME_POLICY_MARKER = (
+    "Runtime policy (installed by chem_assistant.chemtools_agent)"
 )
 
 
@@ -330,11 +337,33 @@ class ConditionRecommendationResponse(BaseModel):
     warnings: List[str] = Field(default_factory=list)
 
 
-def _safe_json_loads(value: str) -> Optional[Dict[str, Any]]:
+def _safe_json_loads(value: str) -> Optional[Any]:
+    if not isinstance(value, str):
+        return None
     try:
         return json.loads(value)
     except json.JSONDecodeError:
         return None
+
+
+def _coerce_mapping(value: Any) -> Optional[Dict[str, Any]]:
+    if isinstance(value, dict):
+        return value
+    if not isinstance(value, str):
+        return None
+    text = value.strip()
+    if not text:
+        return None
+
+    parsed = _safe_json_loads(text)
+    if isinstance(parsed, dict):
+        return parsed
+
+    try:
+        literal = ast.literal_eval(text)
+    except (ValueError, SyntaxError):
+        return None
+    return literal if isinstance(literal, dict) else None
 
 
 def _coerce_list(value: Any) -> List[Any]:
@@ -379,6 +408,92 @@ def _to_int(value: Any, default: int = 0) -> int:
         return default
 
 
+def _registered_tool_names() -> List[str]:
+    names = {
+        str(getattr(tool, "name", "")).strip()
+        for tool in CHEMTOOLS_TOOLS
+        if str(getattr(tool, "name", "")).strip()
+    }
+    return sorted(names)
+
+
+@lru_cache(maxsize=1)
+def _runtime_capabilities() -> Dict[str, bool]:
+    root = Path(__file__).resolve().parents[1]
+    hte_ready = (root / "data" / "HTE_db").exists()
+    kb_ready = (root / "data" / "knowledge_base").exists()
+    taxonomy_ready = False
+    try:
+        from chemtools.taxonomy.reaction_catalog import load_reaction_catalog
+
+        rxn_defs, _ = load_reaction_catalog()
+        taxonomy_ready = bool(rxn_defs)
+    except Exception:
+        taxonomy_ready = False
+    return {
+        "hte_ready": hte_ready,
+        "kb_ready": kb_ready,
+        "taxonomy_ready": taxonomy_ready,
+    }
+
+
+def _append_runtime_tool_policy(system_prompt: str) -> str:
+    prompt = str(system_prompt or "").strip()
+    if not prompt:
+        return prompt
+    if _RUNTIME_POLICY_PREFIX in prompt:
+        return prompt
+
+    tool_names = _registered_tool_names()
+    capabilities = _runtime_capabilities()
+    has_hte_tool = "hte_recommend_conditions" in tool_names
+    has_kb_tools = any(
+        name in tool_names for name in ("rag_search", "kb_recommend_conditions")
+    )
+
+    policy_lines = [
+        _RUNTIME_POLICY_MARKER,
+        f"- Registered tools: {len(tool_names)}",
+        "- Always call the minimum number of tools needed for the user request.",
+        "- Start with one primary tool, then add follow-up tools only when evidence is missing.",
+        "- If required inputs are missing, ask for them explicitly instead of guessing.",
+    ]
+    if has_hte_tool and capabilities["hte_ready"]:
+        policy_lines.append(
+            "- HTE data is available; for condition screening prefer hte_recommend_conditions first."
+        )
+    elif has_hte_tool:
+        policy_lines.append(
+            "- hte_recommend_conditions exists but HTE data is unavailable; require explicit hte_db_path before use."
+        )
+    else:
+        policy_lines.append(
+            "- HTE tool is unavailable; avoid promising condition recommendations."
+        )
+    if has_kb_tools and capabilities["kb_ready"]:
+        policy_lines.append(
+            "- Knowledge base is available; use rag_search/kb_recommend_conditions only for protocol, rules, or literature requests."
+        )
+    elif has_kb_tools:
+        policy_lines.append(
+            "- KB tools exist but knowledge_base data is unavailable; avoid KB retrieval until a valid root is provided."
+        )
+    else:
+        policy_lines.append(
+            "- KB retrieval tools are unavailable; avoid KB-specific claims."
+        )
+    if capabilities["taxonomy_ready"]:
+        policy_lines.append(
+            "- Taxonomy is available; prefer taxonomy-consistent reaction naming and filter values."
+        )
+    else:
+        policy_lines.append(
+            "- Taxonomy appears unavailable; report uncertainty for reaction-family conclusions."
+        )
+
+    return f"{prompt}\n\n" + "\n".join(policy_lines)
+
+
 def _extract_tool_payload(
     messages: List[BaseMessage],
     tool_name: str,
@@ -387,8 +502,11 @@ def _extract_tool_payload(
     for message in messages:
         if isinstance(message, AIMessage):
             for call in getattr(message, "tool_calls", []) or []:
-                call_id = call.get("id") or call.get("tool_call_id")
-                name = call.get("name")
+                call_payload = _coerce_mapping(call)
+                if not call_payload:
+                    continue
+                call_id = call_payload.get("id") or call_payload.get("tool_call_id")
+                name = call_payload.get("name")
                 if call_id and name:
                     call_map[str(call_id)] = name
 
@@ -399,20 +517,22 @@ def _extract_tool_payload(
         if call_map.get(str(tool_call_id)) != tool_name:
             continue
         artifact = getattr(message, "artifact", None)
-        if isinstance(artifact, dict):
-            return artifact
+        artifact_payload = _coerce_mapping(artifact)
+        if artifact_payload is not None:
+            return artifact_payload
         content = getattr(message, "content", None)
-        if isinstance(content, dict):
-            return content
+        content_payload = _coerce_mapping(content)
+        if content_payload is not None:
+            return content_payload
         if isinstance(content, list):
             if len(content) == 1 and isinstance(content[0], dict):
                 return content[0]
             joined = "".join(str(item) for item in content)
-            payload = _safe_json_loads(joined)
+            payload = _coerce_mapping(joined)
             if payload is not None:
                 return payload
         if isinstance(content, str):
-            payload = _safe_json_loads(content)
+            payload = _coerce_mapping(content)
             if payload is not None:
                 return payload
     return None
@@ -423,6 +543,8 @@ def _build_condition_response(
     tool_payload: Dict[str, Any],
     kb_payload: Optional[Dict[str, Any]] = None,
 ) -> ConditionRecommendationResponse:
+    tool_payload = tool_payload if isinstance(tool_payload, dict) else {}
+
     warnings: List[str] = []
     success = bool(tool_payload.get("success", True))
     if not success:
@@ -431,9 +553,13 @@ def _build_condition_response(
         warnings.append("hte_recommend_conditions failed.")
         if detail:
             warnings.append(str(detail))
+        elif isinstance(error, str) and error.strip():
+            warnings.append(error.strip())
 
-    input_block = tool_payload.get("input") or {}
-    diagnostics = tool_payload.get("diagnostics") or {}
+    input_block_raw = tool_payload.get("input")
+    diagnostics_raw = tool_payload.get("diagnostics")
+    input_block = input_block_raw if isinstance(input_block_raw, dict) else {}
+    diagnostics = diagnostics_raw if isinstance(diagnostics_raw, dict) else {}
     evidence = ConditionEvidence(
         reaction_smiles=input_block.get("reaction_smiles"),
         reactant_a_smiles=input_block.get("reactant_a_smiles")
@@ -522,14 +648,21 @@ def _build_condition_response(
 
     knowledge_base: List[KBConditionItem] = []
     if kb_payload:
-        kb_success = bool(kb_payload.get("success", True))
+        kb_payload_map = (
+            kb_payload
+            if isinstance(kb_payload, dict)
+            else _coerce_mapping(kb_payload)
+        ) or {}
+        kb_success = bool(kb_payload_map.get("success", True))
         if not kb_success:
             warnings.append("kb_recommend_conditions failed.")
-        for item in _coerce_list(kb_payload.get("results")):
+        for item in _coerce_list(kb_payload_map.get("results")):
             if not isinstance(item, dict):
                 continue
-            condition = item.get("condition") or {}
-            extras = item.get("extras") or {}
+            condition_raw = item.get("condition")
+            extras_raw = item.get("extras")
+            condition = condition_raw if isinstance(condition_raw, dict) else {}
+            extras = extras_raw if isinstance(extras_raw, dict) else {}
             knowledge_base.append(
                 KBConditionItem(
                     rank=_to_int(item.get("rank"), len(knowledge_base) + 1),
@@ -697,11 +830,18 @@ class ChemToolsAgent:
         system_prompt: Optional[str] = None,
         verbose: bool = False,
         auto_check: bool = True,
+        runtime_tool_policy: bool = True,
     ):
         self.llm = get_llm_client(provider, model, temperature)
-        self.system_prompt = system_prompt or CHEMISTRY_SYSTEM_PROMPT
+        base_prompt = system_prompt or CHEMISTRY_SYSTEM_PROMPT
+        self.system_prompt = (
+            _append_runtime_tool_policy(base_prompt)
+            if runtime_tool_policy
+            else base_prompt
+        )
         self.verbose = verbose
         self.auto_check = auto_check
+        self.runtime_tool_policy = runtime_tool_policy
         self.agent_factory_name = _LANGGRAPH_AGENT_FACTORY_NAME
         self.tools = CHEMTOOLS_TOOLS
         self.agent = LANGGRAPH_AGENT_FACTORY(
@@ -727,22 +867,41 @@ class ChemToolsAgent:
                 {"messages": messages},
                 config={"recursion_limit": recursion_limit},
             )
-            structured_payload = _extract_tool_payload(
-                result.get("messages", []), "hte_recommend_conditions"
+            result_payload = (
+                result
+                if isinstance(result, dict)
+                else _coerce_mapping(result)
+            ) or {}
+            result_messages = result_payload.get("messages")
+            if not isinstance(result_messages, list):
+                result_messages = []
+            extracted_payload = _extract_tool_payload(
+                result_messages, "hte_recommend_conditions"
+            )
+            structured_payload = (
+                extracted_payload
+                if isinstance(extracted_payload, dict)
+                else _coerce_mapping(extracted_payload)
             )
             if structured_payload is not None:
                 kb_payload = None
                 try:
                     from chem_assistant.chemtools_wrapper import kb_recommend_conditions
 
-                    diagnostics = structured_payload.get("diagnostics") or {}
+                    diagnostics_raw = structured_payload.get("diagnostics")
+                    diagnostics = (
+                        diagnostics_raw
+                        if isinstance(diagnostics_raw, dict)
+                        else {}
+                    )
                     predicted = (
                         structured_payload.get("predicted_reaction_type")
                         or diagnostics.get("predicted_reaction_type")
                     )
                     kb_query = query
-                    if predicted and predicted.lower() not in (query or "").lower():
-                        kb_query = f"{query} {predicted}"
+                    predicted_text = str(predicted).strip() if predicted is not None else ""
+                    if predicted_text and predicted_text.lower() not in (query or "").lower():
+                        kb_query = f"{query} {predicted_text}"
                     kb_payload = kb_recommend_conditions.invoke({"query": kb_query})
                 except Exception:
                     kb_payload = None
@@ -752,10 +911,13 @@ class ChemToolsAgent:
                 if _wants_human_readable(query) and not _wants_json(query):
                     return _format_condition_summary(structured_response)
                 return structured_response.model_dump_json(indent=2)
-            final_message = result["messages"][-1]
+            if not result_messages:
+                return str(result)
+            final_message = result_messages[-1]
             if isinstance(final_message, AIMessage):
                 return final_message.content
-            return str(final_message.content)
+            final_content = getattr(final_message, "content", final_message)
+            return str(final_content)
         except Exception as exc:
             if self.verbose:
                 print(f"Agent error: {exc}")
@@ -786,38 +948,59 @@ class ChemToolsAgent:
         analysis_error = None
 
         try:
-            unified_result = unified_featurize_reaction.invoke(
+            unified_result_raw = unified_featurize_reaction.invoke(
                 {"reaction_smiles": reaction_smiles}
             )
+            unified_result = (
+                unified_result_raw
+                if isinstance(unified_result_raw, dict)
+                else _coerce_mapping(unified_result_raw)
+            ) or {}
             if unified_result.get("success"):
                 unified_payload = unified_result
             else:
-                unified_error = unified_result.get("error")
+                unified_error = unified_result.get("error") or (
+                    f"unexpected payload: {type(unified_result_raw).__name__}"
+                )
         except Exception as exc:
             unified_error = str(exc)
 
         try:
-            analysis_result = analysis_analyze_reaction.invoke(
+            analysis_result_raw = analysis_analyze_reaction.invoke(
                 {"reaction_smiles": reaction_smiles}
             )
+            analysis_result = (
+                analysis_result_raw
+                if isinstance(analysis_result_raw, dict)
+                else _coerce_mapping(analysis_result_raw)
+            ) or {}
             if analysis_result.get("success"):
                 analysis_payload = analysis_result
             else:
-                analysis_error = analysis_result.get("error")
+                analysis_error = analysis_result.get("error") or (
+                    f"unexpected payload: {type(analysis_result_raw).__name__}"
+                )
         except Exception as exc:
             analysis_error = str(exc)
 
         unified_type = None
         unified_conf = None
         if unified_payload:
-            reaction = unified_payload.get("reaction") or {}
-            reaction_type = reaction.get("reaction_type") or {}
+            reaction_raw = unified_payload.get("reaction")
+            reaction = reaction_raw if isinstance(reaction_raw, dict) else {}
+            reaction_type_raw = reaction.get("reaction_type")
+            reaction_type = (
+                reaction_type_raw
+                if isinstance(reaction_type_raw, dict)
+                else {}
+            )
             unified_type = reaction_type.get("reaction_type") or reaction_type.get("name")
             unified_conf = reaction_type.get("confidence")
 
         analysis_family = None
         if analysis_payload:
-            family = analysis_payload.get("family") or {}
+            family_raw = analysis_payload.get("family")
+            family = family_raw if isinstance(family_raw, dict) else {}
             analysis_family = family.get("canonical_id")
 
         agree = (
