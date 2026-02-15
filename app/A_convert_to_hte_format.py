@@ -3,8 +3,9 @@ import json
 import re
 import pandas as pd
 from pathlib import Path
-from typing import List, Dict, Any, Tuple, Iterable, Optional
+from typing import List, Dict, Any, Tuple, Iterable, Optional, Set
 from functools import lru_cache
+from collections import Counter
 import argparse
 import sys
 
@@ -24,6 +25,7 @@ from chemtools.recommend.reaction_key_utils import (
 )
 from chemtools.smiles import normalize
 from chemtools.reagent.lookup import find_reagent
+from chemtools.util.ingestion_routing import classify_reaction_for_taxonomy_benchmark
 
 @lru_cache(maxsize=10000)
 def cached_featurize(smiles: str):
@@ -212,6 +214,185 @@ def _write_taxonomy_gap_exports(
 
 CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
 CAS_INLINE_PATTERN = re.compile(r"\b\d{2,7}-\d{2}-\d\b")
+_TRANSITION_OR_HEAVY_METALS: Set[str] = {
+    "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn",
+    "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd",
+    "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg",
+    "Ga", "In", "Sn", "Sb", "Bi",
+    "La", "Ce", "Pr", "Nd", "Sm", "Eu", "Gd", "Tb", "Dy",
+    "Ho", "Er", "Tm", "Yb", "Lu",
+}
+_METAL_TOKEN_RE = re.compile(r"\[([A-Z][a-z]?)(?:[^\]]*)\]")
+_SIMPLE_COUNTERION_COMPONENTS = {
+    "Cl", "Br", "I", "F",
+    "[Cl-]", "[Br-]", "[I-]", "[F-]",
+    "[Na+]", "[K+]", "[Li+]", "[Cs+]", "[Rb+]",
+    "[NH4+]",
+}
+_COMPLEX_COUNTERION_RE = (
+    re.compile(r"\[B\+3\]\(\[F-\]\)\(\[F-\]\)\[F-\]"),
+    re.compile(r"\[P\+5\]\(\[F-\]\)\(\[F-\]\)\(\[F-\]\)\(\[F-\]\)\[F-\]"),
+)
+_DATASET_SCOPE_RULES: Dict[str, Dict[str, Set[str]]] = {
+    "C_N_Coupling": {
+        "required_bond_classes": {"C-N"},
+        "required_event_kinds": {"c_n_bond_formation"},
+    },
+    "C_O_Coupling": {
+        "required_bond_classes": {"C-O"},
+        "required_event_kinds": {"c_o_bond_formation"},
+    },
+    "C_S_Coupling": {
+        "required_bond_classes": {"C-S"},
+        "required_event_kinds": {"c_s_bond_formation"},
+    },
+}
+_CORE_BOND_CLASSES = {"C-N", "C-O", "C-S", "C-C"}
+_CORE_BOND_EVENT_KINDS = {
+    "c_n_bond_formation",
+    "c_o_bond_formation",
+    "c_s_bond_formation",
+    "c_c_bond_formation",
+}
+
+
+def _split_reaction_sides(reaction_smiles: str) -> Tuple[List[str], List[str]]:
+    text = str(reaction_smiles or "").strip()
+    if not text or ">>" not in text:
+        return [], []
+    left, right = text.split(">>", 1)
+    reactants = [part for part in left.split(".") if part]
+    products = [part for part in right.split(".") if part]
+    return reactants, products
+
+
+def _contains_heavy_metal_token(text: str) -> bool:
+    tokens = {m for m in _METAL_TOKEN_RE.findall(str(text or "")) if m}
+    return bool(tokens & _TRANSITION_OR_HEAVY_METALS)
+
+
+def _is_coordination_component(smiles: str) -> bool:
+    token = str(smiles or "").strip()
+    return bool(token) and ("->" in token or "<-" in token) and _contains_heavy_metal_token(token)
+
+
+def _is_counterion_component(smiles: str) -> bool:
+    token = str(smiles or "").strip()
+    if not token:
+        return False
+    if token in _SIMPLE_COUNTERION_COMPONENTS:
+        return True
+    return any(pattern.search(token) for pattern in _COMPLEX_COUNTERION_RE)
+
+
+def _cleanup_reaction_smiles_for_featurization(reaction_smiles: str) -> Tuple[str, Dict[str, int]]:
+    """
+    Remove common spectator artifacts that break deterministic featurization:
+    - dative metal-complex components using -> / <- notation
+    - trivial counterion-only fragments (e.g., Cl, [Na+], BF4-, PF6-)
+    """
+    text = str(reaction_smiles or "").strip()
+    stats = {
+        "coordination_removed": 0,
+        "counterion_removed": 0,
+        "cleanup_applied": 0,
+    }
+    reactants, products = _split_reaction_sides(text)
+    if not reactants or not products:
+        return text, stats
+
+    def _filter_side(parts: List[str]) -> Tuple[List[str], int, int]:
+        kept: List[str] = []
+        removed_coord = 0
+        removed_counter = 0
+        multi_component = len(parts) > 1
+        for token in parts:
+            if _is_coordination_component(token):
+                removed_coord += 1
+                continue
+            if multi_component and _is_counterion_component(token):
+                removed_counter += 1
+                continue
+            kept.append(token)
+        return kept, removed_coord, removed_counter
+
+    cleaned_reactants, left_coord, left_counter = _filter_side(reactants)
+    cleaned_products, right_coord, right_counter = _filter_side(products)
+    removed_coord = left_coord + right_coord
+    removed_counter = left_counter + right_counter
+
+    if not cleaned_reactants or not cleaned_products:
+        return text, stats
+
+    cleaned = f"{'.'.join(cleaned_reactants)}>>{'.'.join(cleaned_products)}"
+    if cleaned != text:
+        stats["coordination_removed"] = removed_coord
+        stats["counterion_removed"] = removed_counter
+        stats["cleanup_applied"] = 1
+    return cleaned, stats
+
+
+def _dataset_scope_rule_for_label(source_label: str) -> Optional[Dict[str, Set[str]]]:
+    label = str(source_label or "").strip().lower()
+    if not label:
+        return None
+    for dataset_name, rule in _DATASET_SCOPE_RULES.items():
+        if dataset_name.lower() in label:
+            return rule
+    return None
+
+
+def _is_out_of_scope_for_dataset(
+    source_label: str,
+    reaction_events_payload: Dict[str, Any],
+    formed_motifs: Optional[Iterable[str]] = None,
+) -> Tuple[bool, str]:
+    """
+    Mark rows out-of-scope only when bond-change evidence explicitly points to
+    a competing coupling class (e.g., C-C in a C_N dataset).
+    """
+    rule = _dataset_scope_rule_for_label(source_label)
+    if not rule:
+        return False, "unscoped_dataset"
+
+    formed_motif_tokens = {
+        str(token).strip()
+        for token in (formed_motifs or [])
+        if str(token).strip()
+    }
+    if "C_N_Coupling".lower() in str(source_label or "").lower():
+        has_n_like_formed = any("N" in token for token in formed_motif_tokens)
+        if has_n_like_formed:
+            return False, "expected_n_formed_motif_present"
+        if "Ar-Ar" in formed_motif_tokens:
+            return True, "formed_motif_conflict_ar_ar"
+
+    formed_classes = {
+        str(token).strip()
+        for token in (reaction_events_payload.get("formed_bond_classes") or [])
+        if str(token).strip()
+    }
+    event_kinds = {
+        str(token).strip()
+        for token in (reaction_events_payload.get("event_kinds") or [])
+        if str(token).strip()
+    }
+    required_classes = set(rule.get("required_bond_classes") or set())
+    required_kinds = set(rule.get("required_event_kinds") or set())
+
+    if formed_classes & required_classes:
+        return False, "expected_bond_class_present"
+    if event_kinds & required_kinds:
+        return False, "expected_event_kind_present"
+
+    explicit_classes = formed_classes & _CORE_BOND_CLASSES
+    explicit_kinds = event_kinds & _CORE_BOND_EVENT_KINDS
+
+    if explicit_classes and not (explicit_classes & required_classes):
+        return True, "formed_bond_class_conflict"
+    if explicit_kinds and not (explicit_kinds & required_kinds):
+        return True, "event_kind_conflict"
+    return False, "insufficient_scope_evidence"
 
 def _normalize_smiles(smiles: str) -> Optional[str]:
     if not smiles:
@@ -792,7 +973,12 @@ def process_reaction_dataset(
             skipped_no_smiles = 0
             skipped_no_arrow = 0
             skipped_no_catalyst = 0
-            skipped_other = 0
+            skipped_routing_excluded = 0
+            skipped_out_of_scope = 0
+            cleanup_rows = 0
+            cleanup_coord_components = 0
+            cleanup_counterion_components = 0
+            out_of_scope_reasons: Counter[str] = Counter()
             
             for i, row in enumerate(reader):
                 if total and i % 500 == 0:
@@ -801,9 +987,17 @@ def process_reaction_dataset(
                 if not record.get("smiles"):
                     skipped_no_smiles += 1
                     continue
-                smiles = record.get("smiles", "")
+                raw_smiles = record.get("smiles", "")
+                smiles, cleanup_stats = _cleanup_reaction_smiles_for_featurization(raw_smiles)
+                cleanup_rows += int(cleanup_stats.get("cleanup_applied", 0))
+                cleanup_coord_components += int(cleanup_stats.get("coordination_removed", 0))
+                cleanup_counterion_components += int(cleanup_stats.get("counterion_removed", 0))
                 if ">>" not in smiles:
                     skipped_no_arrow += 1
+                    continue
+                routing = classify_reaction_for_taxonomy_benchmark(smiles)
+                if routing.get("excluded"):
+                    skipped_routing_excluded += 1
                     continue
                 reactants_part, _ = smiles.split(">>")
                 reactants = reactants_part.split(".")
@@ -848,6 +1042,15 @@ def process_reaction_dataset(
                     if isinstance(rxn_bundle.get("reaction_events"), dict)
                     else None,
                 )
+                is_out_of_scope, scope_reason = _is_out_of_scope_for_dataset(
+                    source_label,
+                    reaction_events_payload,
+                    formed_set,
+                )
+                if is_out_of_scope:
+                    skipped_out_of_scope += 1
+                    out_of_scope_reasons[scope_reason] += 1
+                    continue
                 reaction_events_text = serialize_reaction_events_payload(reaction_events_payload)
 
                 formed_motifs_str = _reactant_key(list(formed_set)) or "None"
@@ -918,6 +1121,15 @@ def process_reaction_dataset(
             print(f"  Skipped - no SMILES: {skipped_no_smiles}")
             print(f"  Skipped - no >>: {skipped_no_arrow}")
             print(f"  Skipped - no catalyst: {skipped_no_catalyst}")
+            print(f"  Skipped - routing excluded: {skipped_routing_excluded}")
+            print(f"  Skipped - out of dataset scope: {skipped_out_of_scope}")
+            print(
+                "  Cleanup - rows touched:"
+                f" {cleanup_rows} (coordination fragments removed: {cleanup_coord_components},"
+                f" counterions removed: {cleanup_counterion_components})"
+            )
+            if out_of_scope_reasons:
+                print(f"  Out-of-scope reasons: {dict(out_of_scope_reasons)}")
     else:
         with open(input_path, "r", encoding="utf-8", errors="replace") as f:
             lines = f.readlines()
@@ -929,6 +1141,12 @@ def process_reaction_dataset(
         skipped_no_smiles = 0
         skipped_no_arrow = 0
         skipped_no_catalyst = 0
+        skipped_routing_excluded = 0
+        skipped_out_of_scope = 0
+        cleanup_rows = 0
+        cleanup_coord_components = 0
+        cleanup_counterion_components = 0
+        out_of_scope_reasons: Counter[str] = Counter()
 
         for i, line in enumerate(lines):
             if i % 500 == 0:
@@ -939,9 +1157,17 @@ def process_reaction_dataset(
             except:
                 continue
             
-            smiles = record.get("smiles", "")
+            raw_smiles = record.get("smiles", "")
+            smiles, cleanup_stats = _cleanup_reaction_smiles_for_featurization(raw_smiles)
+            cleanup_rows += int(cleanup_stats.get("cleanup_applied", 0))
+            cleanup_coord_components += int(cleanup_stats.get("coordination_removed", 0))
+            cleanup_counterion_components += int(cleanup_stats.get("counterion_removed", 0))
             if ">>" not in smiles:
                 skipped_no_arrow += 1
+                continue
+            routing = classify_reaction_for_taxonomy_benchmark(smiles)
+            if routing.get("excluded"):
+                skipped_routing_excluded += 1
                 continue
 
             reactants_part, _ = smiles.split(">>")
@@ -987,6 +1213,15 @@ def process_reaction_dataset(
                 if isinstance(rxn_bundle.get("reaction_events"), dict)
                 else None,
             )
+            is_out_of_scope, scope_reason = _is_out_of_scope_for_dataset(
+                source_label,
+                reaction_events_payload,
+                formed_set,
+            )
+            if is_out_of_scope:
+                skipped_out_of_scope += 1
+                out_of_scope_reasons[scope_reason] += 1
+                continue
             reaction_events_text = serialize_reaction_events_payload(reaction_events_payload)
 
             formed_motifs_str = _reactant_key(list(formed_set)) or "None"
@@ -1057,6 +1292,15 @@ def process_reaction_dataset(
         print(f"  Skipped - no SMILES: {skipped_no_smiles}")
         print(f"  Skipped - no >>: {skipped_no_arrow}")
         print(f"  Skipped - no catalyst: {skipped_no_catalyst}")
+        print(f"  Skipped - routing excluded: {skipped_routing_excluded}")
+        print(f"  Skipped - out of dataset scope: {skipped_out_of_scope}")
+        print(
+            "  Cleanup - rows touched:"
+            f" {cleanup_rows} (coordination fragments removed: {cleanup_coord_components},"
+            f" counterions removed: {cleanup_counterion_components})"
+        )
+        if out_of_scope_reasons:
+            print(f"  Out-of-scope reasons: {dict(out_of_scope_reasons)}")
         
     if not rows:
         print("Warning: No valid reactions were processed.")
