@@ -6,25 +6,67 @@
       "label": "CO",
       "priority": 2,
       "smarts_template": "[CX3:2](=O){TAIL}",
+      "allowed_terminal_groups": [
+        "-NH2",
+        "-NHR",
+        "-NR2",
+        "-N3",
+        "-Hydrazine",
+        "-OH",
+        "-OR"
+      ],
       "description": "Carbonyl linker for acyl-derived substituents."
     },
     {
       "label": "OCO",
       "priority": 2,
       "smarts_template": "[OX2:2][CX3](=O){TAIL}",
+      "allowed_terminal_groups": [
+        "-OH",
+        "-OR",
+        "-NH2",
+        "-NHR",
+        "-NR2"
+      ],
       "description": "O-carbamoyl/carbonate linker (R-O-C(=O)-)."
     },
     {
       "label": "SO",
       "priority": 2,
       "smarts_template": "[SX3:2](=O){TAIL}",
+      "allowed_terminal_groups": [
+        "-OH",
+        "-OR",
+        "-NH2",
+        "-NHR",
+        "-NR2"
+      ],
       "description": "Sulfinyl linker (R-S(=O)-)."
     },
     {
       "label": "SO2",
       "priority": 2,
       "smarts_template": "[SX4:2](=O)(=O){TAIL}",
+      "allowed_terminal_groups": [
+        "-NH2",
+        "-NHR",
+        "-NR2",
+        "-Hydrazine"
+      ],
       "description": "Sulfonyl linker for sulfone/sulfonamide-derived substituents."
+    },
+    {
+      "label": "PO2",
+      "priority": 2,
+      "smarts_template": "[PX4:2](=O)(O){TAIL}",
+      "allowed_terminal_groups": [
+        "-OH",
+        "-OR",
+        "-NH2",
+        "-NHR",
+        "-NR2"
+      ],
+      "description": "Phosphoryl linker for phosphate/phosphoramidate-like substituents."
     }
   ],
   "groups": [
@@ -126,6 +168,51 @@
         "-SO2-NHNH2"
       ],
       "description": "Sulfonylhydrazide substituent (-SO2NHNH2); attach via sulfur."
+    },
+    {
+      "id": "-PO2OH",
+      "label": "PO2",
+      "terminal_group": "-OH",
+      "aliases": [
+        "-PO2-OH"
+      ],
+      "description": "Phosphate-like acidic substituent (-PO2OH); attach via phosphorus."
+    },
+    {
+      "id": "-PO2OR",
+      "label": "PO2",
+      "terminal_group": "-OR",
+      "aliases": [
+        "-PO2-OR"
+      ],
+      "description": "Phosphate ester-like substituent (-PO2OR); attach via phosphorus."
+    },
+    {
+      "id": "-PO2NH2",
+      "label": "PO2",
+      "terminal_group": "-NH2",
+      "aliases": [
+        "-PO2-NH2"
+      ],
+      "description": "Phosphoramidate-like substituent (-PO2NH2); attach via phosphorus."
+    },
+    {
+      "id": "-PO2NHR",
+      "label": "PO2",
+      "terminal_group": "-NHR",
+      "aliases": [
+        "-PO2-NHR"
+      ],
+      "description": "Secondary phosphoramidate-like substituent (-PO2NHR); attach via phosphorus."
+    },
+    {
+      "id": "-PO2NR2",
+      "label": "PO2",
+      "terminal_group": "-NR2",
+      "aliases": [
+        "-PO2-NR2"
+      ],
+      "description": "Tertiary phosphoramidate-like substituent (-PO2NR2); attach via phosphorus."
     }
   ]
 }

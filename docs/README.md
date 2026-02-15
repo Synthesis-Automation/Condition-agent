@@ -60,6 +60,7 @@ scripts/
   index_knowledge_base.py         Indexing utilities for RAG
   validate_taxonomy_chemistry.py  Taxonomy validation
   analyze_taxonomy.py             Taxonomy analysis
+  check_substituent_fragments.py  Substituent fragment edit checklist
   rag_eval.py                     RAG evaluation
   eval_spectator_groups.py        Spectator group scoring
   check_kb_conditions.py          KB sanity checks
@@ -145,6 +146,7 @@ Never call `Chem.MolFromSmarts()` directly.
 - `docs/REACTION_DETECTION_METHODS.md` - Detection heuristics
 - `docs/UNIFIED_FEATURIZERS.md` - Feature alignment
 - `docs/TAXONOMY_*` - Taxonomy strategy and alignment
+- `docs/SUBSTITUENT_FRAGMENTS_EDITING.md` - Composite substituent editing workflow
 - `docs/WEB_UI_IMPLEMENTATION_PLAN.md` - UI plan
 
 ## Notes

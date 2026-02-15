@@ -800,6 +800,29 @@ def aggregate_reaction_features(
         reacted_motifs = filter_reacted_by_pattern(raw_reacted, reaction_type)
         formed_motifs = sorted(formed_set)
         spectator_motifs = sorted(spectator_motifs_set)
+        acyl_transfer_like = any(str(m).endswith("-COOH") for m in reacted_set) and any(
+            str(m).endswith(
+                (
+                    "-CONH2",
+                    "-CONHR",
+                    "-CONR2",
+                    "-NHCOR",
+                    "-NRCOR",
+                    "-CONHNH2",
+                    "-CON3",
+                    "-COOR",
+                )
+            )
+            for m in formed_set
+        )
+        if acyl_transfer_like:
+            broad_aryl_cc = {"Ar-Alkyl", "Ar-Alkenyl", "Ar-Alkynyl"}
+            demoted = [m for m in reacted_motifs if m in broad_aryl_cc]
+            if demoted:
+                reacted_motifs = [m for m in reacted_motifs if m not in broad_aryl_cc]
+                for motif_id in demoted:
+                    spectator_motifs_set.add(motif_id)
+                spectator_motifs = sorted(spectator_motifs_set)
 
         # Build count-aware views (supports cases where some motifs react and some remain)
         reactant_id_counts = Counter(
@@ -848,6 +871,9 @@ def aggregate_reaction_features(
                 reacted_motif_counts[motif_id] = max(reacted_motif_counts.get(motif_id, 0), 1)
             if motif_id in spectator_motifs_set:
                 spectator_motif_counts[motif_id] = min(r_count, p_count)
+        if acyl_transfer_like:
+            for motif_id in ("Ar-Alkyl", "Ar-Alkenyl", "Ar-Alkynyl"):
+                reacted_motif_counts.pop(motif_id, None)
 
         # Reconcile lists with counts (e.g., motifs that are effectively unchanged).
         # Reacted motifs require explicit evidence: positive count delta or a

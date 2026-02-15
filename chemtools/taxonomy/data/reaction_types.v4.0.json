@@ -410,6 +410,66 @@
         "exclude_reacted": [],
         "include_formed": [],
         "exclude_formed": [],
+        "exclude_bond_formed": [
+          "C-C",
+          "C-N",
+          "C-O",
+          "C-S"
+        ],
+        "min_reactant_slot_matches": 1,
+        "min_product_slot_matches": 1
+      }
+    },
+    {
+      "id": "Aliphatic_Halide_Exchange",
+      "redox_neutral": true,
+      "reactants": {
+        "substrate": [
+          "Alkyl-Br",
+          "Alkyl-Cl",
+          "Alkyl-I",
+          "Alkyl-F",
+          "Bn-Br",
+          "Bn-Cl",
+          "Bn-I",
+          "Bn-F",
+          "Allyl-Br",
+          "Allyl-Cl",
+          "Allyl-I",
+          "Allyl-F"
+        ]
+      },
+      "products": {
+        "product": [
+          "Alkyl-Br",
+          "Alkyl-Cl",
+          "Alkyl-I",
+          "Alkyl-F",
+          "Bn-Br",
+          "Bn-Cl",
+          "Bn-I",
+          "Bn-F",
+          "Allyl-Br",
+          "Allyl-Cl",
+          "Allyl-I",
+          "Allyl-F"
+        ]
+      },
+      "aliases": [
+        "Aliphatic_Halide_Exchange",
+        "Aliphatic Halide Exchange",
+        "aliphatic_halide_exchange",
+        "halex_aliphatic",
+        "Finkelstein"
+      ],
+      "description": "Interconversion of aliphatic/benzylic/allylic halides (R-X to R-Y).",
+      "constraints": {
+        "exclude_bond_formed": [
+          "C-C",
+          "C-N",
+          "C-O",
+          "C-S"
+        ],
         "min_reactant_slot_matches": 1,
         "min_product_slot_matches": 1
       }
@@ -498,6 +558,32 @@
           "C-C"
         ]
       }
+    },
+    {
+      "id": "Ring_Closing_Metathesis",
+      "redox_neutral": true,
+      "reactants": {
+        "substrate": [
+          "Alkenyl-Alkenyl",
+          "Alkenyl_terminal-Alkenyl_terminal",
+          "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal"
+        ]
+      },
+      "products": {
+        "product": [
+          "Alkenyl-Alkenyl",
+          "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal"
+        ]
+      },
+      "aliases": [
+        "ring_closing_metathesis",
+        "RCM",
+        "Ring Closing Metathesis",
+        "rcm"
+      ],
+      "description": "Ring-closing metathesis (RCM) forming cyclic alkenes."
     },
     {
       "id": "Negishi",
@@ -767,6 +853,43 @@
         "Sandmeyer_reactions",
         "BalzSchiemann"
       ]
+    },
+    {
+      "id": "Quinazolinone_annulation",
+      "redox_neutral": false,
+      "reactants": {
+        "aniline_like": [
+          "Ar-NH2",
+          "HeteroAr-NH2"
+        ],
+        "amide_like": [
+          "Ar-NHCOR",
+          "HeteroAr-NHCOR",
+          "Ar-NHCOSO2R",
+          "HeteroAr-NHCOSO2R"
+        ]
+      },
+      "products": {
+        "product": [
+          "Pyrimidine"
+        ]
+      },
+      "aliases": [
+        "quinazolinone_annulation",
+        "Quinazolinone annulation",
+        "quinazolinone_cyclization"
+      ],
+      "description": "Cyclocondensation/annulation to quinazolinone-like pyrimidine cores.",
+      "constraints": {
+        "include_bond_formed": [
+          "C-N"
+        ],
+        "include_bond_broken": [
+          "C-O"
+        ],
+        "min_reactant_slot_matches": 2,
+        "min_product_slot_matches": 1
+      }
     },
     {
       "id": "Aryl_Nitration",
@@ -1851,6 +1974,72 @@
         "chlorination",
         "iodination"
       ]
+    },
+    {
+      "id": "Halogenation_unsaturated",
+      "redox_neutral": false,
+      "reactants": {},
+      "products": {
+        "product": [
+          "Alkenyl-Br",
+          "Alkenyl-Cl",
+          "Alkenyl-I",
+          "Alkenyl-F",
+          "Alkynyl-Br",
+          "Alkynyl-Cl",
+          "Alkynyl-I",
+          "Alkynyl-F"
+        ]
+      },
+      "aliases": [
+        "halogenation_unsaturated",
+        "vinyl_halogenation",
+        "alkynyl_halogenation"
+      ],
+      "description": "Halogenation of unsaturated motifs (vinylic/alkynyl halides); supports product-only CRK fallback."
+    },
+    {
+      "id": "Alcohol_to_Alkyl_Halide",
+      "redox_neutral": true,
+      "reactants": {
+        "substrate": "@alcohols_oh"
+      },
+      "products": {
+        "product": [
+          "Alkyl-Br",
+          "Alkyl-Cl",
+          "Alkyl-I",
+          "Alkyl-F",
+          "RCH2-Br",
+          "RCH2-Cl",
+          "RCH2-I",
+          "RCH2-F",
+          "R2CH-Br",
+          "R2CH-Cl",
+          "R2CH-I",
+          "R2CH-F",
+          "R3C-Br",
+          "R3C-Cl",
+          "R3C-I",
+          "R3C-F",
+          "Bn-Br",
+          "Bn-Cl",
+          "Bn-I",
+          "Bn-F",
+          "Allyl-Br",
+          "Allyl-Cl",
+          "Allyl-I",
+          "Allyl-F"
+        ]
+      },
+      "aliases": [
+        "alcohol_to_alkyl_halide",
+        "Appel_halogenation",
+        "Appel halogenation",
+        "Chlorination_SOCl2_oxalyl_chloride",
+        "alcohol_halogenation"
+      ],
+      "description": "Conversion of alcohols to alkyl halides (Appel/SOCl2/oxalyl chloride families)."
     },
     
     {

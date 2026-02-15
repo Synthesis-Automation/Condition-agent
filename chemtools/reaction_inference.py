@@ -649,6 +649,12 @@ def analyze_reaction_general(
         broken_bonds=key_parts.get("broken_bonds") or [],
         event_tokens=key_parts.get("event_tokens") or [],
     )
+    if mechanism_family == "unknown" and decision_reaction_type == "unknown":
+        halogen_loss = any(int(formula_delta.get(el, 0)) < 0 for el in ("F", "Cl", "Br", "I"))
+        nitrogen_gain = int(formula_delta.get("N", 0)) > 0
+        aromatic_n_rich = int(features.get("core_reactant_aromatic_ring_n_count") or 0) >= 2
+        if halogen_loss and nitrogen_gain and aromatic_n_rich:
+            mechanism_family = "nucleophilic_substitution"
     tautomer_issue = _detect_tautomer_issue(products, core_product, formula_delta)
     consistency_ok, consistency_reason = _taxonomy_consistency_check(
         decision_reaction_type,

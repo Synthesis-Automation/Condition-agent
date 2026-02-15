@@ -1384,14 +1384,16 @@ def _extract_match_slot_sets(match_payload: Dict[str, Any]) -> Tuple[Set[str], S
     reactants: Set[str] = set()
     products: Set[str] = set()
     for slot_name, values in slot_evidence.items():
+        slot_text = str(slot_name).strip().lower()
+        if slot_text == "slot_sources":
+            continue
         entries: List[str] = []
-        if isinstance(values, list):
+        if isinstance(values, (list, tuple, set)):
             entries = [normalize_motif_id(str(v)) for v in values if str(v).strip()]
-        elif values is not None and str(values).strip():
+        elif isinstance(values, str) and values.strip():
             entries = [normalize_motif_id(str(values))]
         if not entries:
             continue
-        slot_text = str(slot_name).strip().lower()
         if "product" in slot_text:
             products.update(entries)
         else:

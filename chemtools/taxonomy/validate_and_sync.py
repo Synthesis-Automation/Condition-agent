@@ -20,7 +20,10 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Any
 
-from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
+from chemtools.taxonomy.substituent_composer import (
+    load_organic_groups_with_compositions,
+    validate_substituent_fragments_payload,
+)
 from chemtools.util.rdkit_helpers import rdkit_available
 from chemtools.util.smarts_cache import compile_smarts
 
@@ -36,6 +39,11 @@ _GENERATED_ONLY_GROUP_IDS = {
     "-SO2NHR",
     "-SO2NR2",
     "-SO2NHNH2",
+    "-PO2OH",
+    "-PO2OR",
+    "-PO2NH2",
+    "-PO2NHR",
+    "-PO2NR2",
 }
 
 
@@ -149,6 +157,21 @@ class TaxonomyValidator:
                 continue
             if compile_smarts(smarts, validate=False) is None:
                 self.errors.append(f"Composed group '{group_id}' has invalid SMARTS.")
+
+    def validate_substituent_fragments_schema(self) -> None:
+        """Validate substituent_fragments.v1.json editing schema."""
+        fragments_file = self.taxonomy_dir / "substituent_fragments.v1.json"
+        if not fragments_file.exists():
+            self.warnings.append("substituent_fragments.v1.json not found; skipped schema validation.")
+            return
+        try:
+            with open(fragments_file, "r", encoding="utf-8") as f:
+                payload = json.load(f)
+        except Exception as e:
+            self.errors.append(f"Failed to load substituent fragments: {e}")
+            return
+        for msg in validate_substituent_fragments_payload(payload):
+            self.errors.append(f"substituent_fragments.v1.json: {msg}")
 
     def validate_generated_only_groups(self) -> None:
         bad = sorted(_GENERATED_ONLY_GROUP_IDS & self.base_group_ids)
@@ -287,15 +310,19 @@ class TaxonomyValidator:
         print("\n5. Enforcing generated-only group policy...")
         self.validate_generated_only_groups()
 
-        # 6. Validate composed group SMARTS
-        print("\n6. Validating composed substituent SMARTS...")
+        # 6. Validate substituent fragments schema
+        print("\n6. Validating substituent fragments schema...")
+        self.validate_substituent_fragments_schema()
+
+        # 7. Validate composed group SMARTS
+        print("\n7. Validating composed substituent SMARTS...")
         self.validate_composed_group_smarts()
         if self.composed_count:
             print(f"  ✓ Loaded {self.composed_count} composed substituent group(s)")
         else:
             print("  ℹ No composed substituent groups generated")
 
-        # 7. Generate usage report
+        # 8. Generate usage report
         self.generate_usage_report(valid_refs)
         
         return True

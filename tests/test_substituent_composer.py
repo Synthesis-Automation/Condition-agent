@@ -7,7 +7,11 @@ import pytest
 
 from chemtools.featurizers.motifs.registry import _default_registry_paths, build_compound_registry
 from chemtools.featurizers.nearby_groups import _resolve_group_id
-from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
+from chemtools.taxonomy.substituent_composer import (
+    compose_groups_from_fragments,
+    load_organic_groups_with_compositions,
+    validate_substituent_fragments_payload,
+)
 from chemtools.util.rdkit_helpers import rdkit_available
 from chemtools.util.smarts_cache import compile_smarts
 
@@ -185,6 +189,67 @@ def test_substituent_fragments_uses_terminal_group_and_no_terminals_section() ->
     for entry in groups:
         assert isinstance(entry, dict)
         assert entry.get("terminal_group")
+
+
+def test_substituent_fragments_schema_validation_passes_current_payload() -> None:
+    payload = _load_substituent_fragments()
+    errors = validate_substituent_fragments_payload(payload)
+    assert errors == []
+
+
+def test_substituent_fragments_schema_rejects_deprecated_terminal_and_lowercase_label() -> None:
+    payload = {
+        "linkers": [{"label": "co", "smarts_template": "[CX3:2](=O){TAIL}"}],
+        "groups": [{"id": "-CONH2", "label": "co", "terminal": "-NH2"}],
+    }
+    errors = validate_substituent_fragments_payload(payload)
+    assert any("must be uppercase" in msg for msg in errors)
+    assert any("deprecated key 'terminal'" in msg for msg in errors)
+
+
+def test_substituent_fragments_schema_rejects_policy_overlap() -> None:
+    payload = {
+        "linkers": [
+            {
+                "label": "CO",
+                "smarts_template": "[CX3:2](=O){TAIL}",
+                "allowed_terminal_groups": ["-NH2", "-OH"],
+                "blocked_terminal_groups": ["-OH"],
+            }
+        ],
+        "groups": [{"id": "-CONH2", "label": "CO", "terminal_group": "-NH2"}],
+    }
+    errors = validate_substituent_fragments_payload(payload)
+    assert any("policy overlap" in msg for msg in errors)
+
+
+def test_compose_groups_respects_linker_terminal_policy() -> None:
+    base_groups = [
+        {"id": "-NH2", "smarts": "[NX3H2:2]", "kind": "substituent", "priority": 1},
+        {"id": "-OH", "smarts": "[OX2H:2]", "kind": "substituent", "priority": 1},
+    ]
+    fragments = {
+        "linkers": [
+            {
+                "label": "CO",
+                "smarts_template": "[CX3:2](=O){TAIL}",
+                "allowed_terminal_groups": ["-NH2"],
+                "blocked_terminal_groups": ["-OH"],
+            }
+        ],
+        "groups": [
+            {"id": "-CONH2", "label": "CO", "terminal_group": "-NH2"},
+            {"id": "-COOH", "label": "CO", "terminal_group": "-OH"},
+        ],
+    }
+    generated, errors = compose_groups_from_fragments(
+        base_groups=base_groups,
+        fragments_payload=fragments,
+    )
+    ids = {str(entry.get("id") or "") for entry in generated}
+    assert "-CONH2" in ids
+    assert "-COOH" not in ids
+    assert any("is not allowed for linker 'CO'" in msg for msg in errors)
 
 
 def test_resolve_group_id_preserves_full_suffix_when_unmapped() -> None:
