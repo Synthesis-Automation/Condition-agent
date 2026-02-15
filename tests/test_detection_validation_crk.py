@@ -45,7 +45,7 @@ def test_validate_detection_with_crk_key_avoids_snar_for_electron_rich_aryl_hali
     assert result["reaction_type"] == "C_N_Coupling"
 
 
-def test_validate_detection_with_crk_key_keeps_snar_when_heteroaryl_activation_present() -> None:
+def test_validate_detection_with_crk_key_maps_snar_like_case_to_cn_coupling() -> None:
     crk_raw = (
         "|Ar-Cl|HeteroAr-NH2 -> Ar-NHR "
         "| bond_formed: C(ar)-N | bond_broken: C(ar)-Cl "
@@ -56,5 +56,5 @@ def test_validate_detection_with_crk_key_keeps_snar_when_heteroaryl_activation_p
         initial_confidence=0.0,
         reaction_key=crk_raw,
     )
-    assert result["reaction_type"] == "SNAr_CN"
+    assert result["reaction_type"] == "C_N_Coupling"
 

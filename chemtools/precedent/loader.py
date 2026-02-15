@@ -120,11 +120,11 @@ def _dataset_family_map(raw: Optional[str], fallback: Optional[str] = None) -> s
     if tl in {"c-s coupling", "c_s coupling", "c s coupling", "c-s-coupling"}:
         return "C_S_Coupling"
     if tl in {"snar_cn", "snar_cn_coupling", "snar c-n"}:
-        return "SNAr-CN"
+        return "C_N_Coupling"
     if tl in {"snar_co", "snar_co_coupling", "snar c-o"}:
-        return "SNAr-CO"
+        return "C_O_Coupling"
     if tl in {"snar_cs", "snar_cs_coupling", "snar c-s"}:
-        return "SNAr-CS"
+        return "C_S_Coupling"
     
     # Legacy naming (supported for backward compatibility)
     if tl in {

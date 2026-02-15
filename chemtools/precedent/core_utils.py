@@ -34,11 +34,11 @@ def _family_text(family: str) -> str:
     if fl == "heck":
         return "HeckMizoroki_coupling"
     if fl == "snar_cn":
-        return "SNAr-CN"
+        return "C_N_Coupling"
     if fl == "snar_co":
-        return "SNAr-CO"
+        return "C_O_Coupling"
     if fl == "snar_cs":
-        return "SNAr-CS"
+        return "C_S_Coupling"
     if fl == "amide_coupling":
         return "Amide_formation"
     

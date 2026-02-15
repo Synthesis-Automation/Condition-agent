@@ -2547,6 +2547,156 @@
       "A": "Alkynyl",
       "B": "-LactamN",
       "description": "Alkynyl group paired with LactamN substituent."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-PO2OH",
+      "description": "Aryl phosphoryl acid motif (Ar-PO2OH)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-PO2OR",
+      "description": "Aryl phosphate ester motif (Ar-PO2OR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-PO2NH2",
+      "description": "Aryl phosphoramidate motif (Ar-PO2NH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-PO2NHR",
+      "description": "Aryl secondary phosphoramidate motif (Ar-PO2NHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-PO2NR2",
+      "description": "Aryl tertiary phosphoramidate motif (Ar-PO2NR2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-PO2OH",
+      "description": "Alkyl phosphoryl acid motif (Alkyl-PO2OH)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-PO2OR",
+      "description": "Alkyl phosphate ester motif (Alkyl-PO2OR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-PO2NH2",
+      "description": "Alkyl phosphoramidate motif (Alkyl-PO2NH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-PO2NHR",
+      "description": "Alkyl secondary phosphoramidate motif (Alkyl-PO2NHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-PO2NR2",
+      "description": "Alkyl tertiary phosphoramidate motif (Alkyl-PO2NR2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "-PO2OH",
+      "description": "Primary alkyl phosphoryl acid motif (RCH2-PO2OH)."
+    },
+    {
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "-PO2OR",
+      "description": "Primary alkyl phosphate ester motif (RCH2-PO2OR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "-PO2NH2",
+      "description": "Primary alkyl phosphoramidate motif (RCH2-PO2NH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "-PO2NHR",
+      "description": "Primary alkyl secondary phosphoramidate motif (RCH2-PO2NHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "RCH2",
+      "B": "-PO2NR2",
+      "description": "Primary alkyl tertiary phosphoramidate motif (RCH2-PO2NR2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "-PO2OH",
+      "description": "Secondary alkyl phosphoryl acid motif (R2CH-PO2OH)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "-PO2OR",
+      "description": "Secondary alkyl phosphate ester motif (R2CH-PO2OR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "-PO2NH2",
+      "description": "Secondary alkyl phosphoramidate motif (R2CH-PO2NH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "-PO2NHR",
+      "description": "Secondary alkyl secondary phosphoramidate motif (R2CH-PO2NHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R2CH",
+      "B": "-PO2NR2",
+      "description": "Secondary alkyl tertiary phosphoramidate motif (R2CH-PO2NR2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "-PO2OH",
+      "description": "Tertiary alkyl phosphoryl acid motif (R3C-PO2OH)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "-PO2OR",
+      "description": "Tertiary alkyl phosphate ester motif (R3C-PO2OR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "-PO2NH2",
+      "description": "Tertiary alkyl phosphoramidate motif (R3C-PO2NH2)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "-PO2NHR",
+      "description": "Tertiary alkyl secondary phosphoramidate motif (R3C-PO2NHR)."
+    },
+    {
+      "template": "single_bond",
+      "A": "R3C",
+      "B": "-PO2NR2",
+      "description": "Tertiary alkyl tertiary phosphoramidate motif (R3C-PO2NR2)."
     }
   ],
   "depends_on": {

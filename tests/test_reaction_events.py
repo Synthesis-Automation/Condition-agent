@@ -52,6 +52,29 @@ def test_reaction_events_detect_displacement_and_cn_formation() -> None:
     assert any((row.get("name") == "SNAr") for row in mechanisms if isinstance(row, dict))
 
 
+def test_reaction_events_detect_snar_for_co_and_cs_displacement() -> None:
+    co_summary = summarize_reaction_events(
+        reaction_smiles="Clc1ccccc1.CCO>>CCOc1ccccc1",
+        bond_key="break: C-Cl | form: C-O",
+        fallback_bond_key=None,
+        reacted_motifs=["Ar-Cl", "RCH2-OH"],
+        formed_motifs=["Ar-OR"],
+        mapping_warning=None,
+    )
+    cs_summary = summarize_reaction_events(
+        reaction_smiles="Clc1ccccc1.CS>>CSc1ccccc1",
+        bond_key="break: C-Cl | form: C-S",
+        fallback_bond_key=None,
+        reacted_motifs=["Ar-Cl", "CH3-SH"],
+        formed_motifs=["Ar-SR"],
+        mapping_warning=None,
+    )
+    co_mechanisms = co_summary.get("mechanism_shortlist") or []
+    cs_mechanisms = cs_summary.get("mechanism_shortlist") or []
+    assert any((row.get("name") == "SNAr") for row in co_mechanisms if isinstance(row, dict))
+    assert any((row.get("name") == "SNAr") for row in cs_mechanisms if isinstance(row, dict))
+
+
 def test_reaction_events_flag_amidation_without_activation() -> None:
     summary = summarize_reaction_events(
         reaction_smiles="O=C(O)c1ccccc1.NCC>>O=C(NCC)c1ccccc1",
@@ -171,4 +194,22 @@ def test_reaction_key_displays_multi_event_signature_for_benzyl_alkylation_hydro
     else:
         rt_text = str(reaction_type or "")
     assert rt_text.startswith("Multi-Event:")
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_reaction_key_includes_mech_for_snar_like_co_and_cs_cases() -> None:
+    co_result = featurize_reaction(
+        "Clc1ccccc1.CCO>>CCOc1ccccc1",
+        options={"detailed": True, "confirm_coupling_products": True},
+    )
+    cs_result = featurize_reaction(
+        "Clc1ccccc1.CS>>CSc1ccccc1",
+        options={"detailed": True, "confirm_coupling_products": True},
+    )
+    co_key = str(co_result.get("reaction_key") or "")
+    cs_key = str(cs_result.get("reaction_key") or "")
+    assert "mech:" in co_key
+    assert "SNAr" in co_key
+    assert "mech:" in cs_key
+    assert "SNAr" in cs_key
 

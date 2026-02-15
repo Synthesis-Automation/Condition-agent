@@ -63,3 +63,25 @@ def test_cn_coupling_detects_r2ch_primary_amide_nucleophile() -> None:
     assert result.get("reaction_type") == "C_N_Coupling"
     assert "R2CH-CONH2" in reaction_key
     assert "-> Ar-NHCOR" in reaction_key
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_cn_coupling_detects_hydrazide_nucleophile() -> None:
+    rxn = (
+        "CC(=O)c1ccc(Cl)cc1.CC(C)(C)OC(=O)N1CCC(C(=O)NN)CC1"
+        ">>CC(=O)c1ccc(NNC(=O)C2CCN(C(=O)OC(C)(C)C)CC2)cc1"
+    )
+    result = featurize_reaction(
+        rxn,
+        options={
+            "detailed": True,
+            "discovery_mode": False,
+            "include_ar_h": False,
+            "motif_site_filter": "substituent",
+            "confirm_coupling_products": True,
+        },
+    )
+    reaction_key = result.get("reaction_key") or ""
+    assert result.get("reaction_type") == "C_N_Coupling"
+    assert "Alkyl-Hydrazide" in reaction_key
+    assert "-> Ar-Hydrazine" in reaction_key

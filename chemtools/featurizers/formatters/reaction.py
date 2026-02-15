@@ -1354,12 +1354,29 @@ def _append_crk_event_signature(
     text = str(reaction_key or "").strip()
     if not text:
         return ""
-    if "events:" in text:
-        return text
-    signature = format_multi_event_signature(reaction_events.get("events") or [])
-    if not signature:
-        return text
-    return f"{text} | events: {signature}"
+    if "events:" not in text:
+        signature = format_multi_event_signature(reaction_events.get("events") or [])
+        if signature:
+            text = f"{text} | events: {signature}"
+
+    if "mech:" not in text:
+        mechanism_shortlist = reaction_events.get("mechanism_shortlist")
+        mechanism_names: List[str] = []
+        if isinstance(mechanism_shortlist, list):
+            seen_names: Set[str] = set()
+            for item in mechanism_shortlist:
+                if isinstance(item, dict):
+                    name = str(item.get("name") or "").strip()
+                else:
+                    name = str(item or "").strip()
+                if not name or name in seen_names:
+                    continue
+                seen_names.add(name)
+                mechanism_names.append(name)
+        if mechanism_names:
+            text = f"{text} | mech: {'+'.join(mechanism_names)}"
+
+    return text
 
 
 def _append_crk_reaction_types(
@@ -2669,7 +2686,7 @@ def featurize_reaction(
         reaction["reaction_events"] = reaction_events
 
     # Add feasibility analysis for specific reaction types
-    if rt_id == "snar_cn" or rt_id == "c_n_cross_coupling":
+    if rt_id in {"c_n_cross_coupling", "C_N_Coupling"}:
         reaction["feasibility"] = analyze_snar_feasibility(reaction)
 
     # Return simplified format (core or extended)

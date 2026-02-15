@@ -42,9 +42,9 @@ _FAMILY_ALIASES: Dict[str, str] = {
     "chan_lam": "C_N_Coupling",
     "chan_lam_cn": "C_N_Coupling",  # Legacy alias
     "c_n_cross_coupling": "C_N_Coupling",
-    "snar_cn": "SNAr-CN",
-    "snar_co": "SNAr-CO",
-    "snar_cs": "SNAr-CS",
+    "snar_cn": "C_N_Coupling",
+    "snar_co": "C_O_Coupling",
+    "snar_cs": "C_S_Coupling",
     # C-O Coupling variants -> canonical dataset name
     "C_O_Coupling": "C_O_Coupling",
     "Ullmann_CO": "C_O_Coupling",

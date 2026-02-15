@@ -59,6 +59,34 @@ _SCAFFOLD_SP3_PREFIXES = (
 _SCAFFOLD_SP2_PREFIXES = ("Ar-", "HeteroAr-", "AromN-", "Alkenyl-")
 _SCAFFOLD_SP_PREFIXES = ("Alkynyl-",)
 _EWG_TOKENS = ("NO2", "CN", "CO2", "COR", "CHO", "SO2", "CF3")
+_SNAR_ACTIVATING_TOKENS = (
+    "HeteroAr",
+    "AromN",
+    "Pyridine",
+    "Pyridyl",
+    "Pyrimidine",
+    "Pyrimidyl",
+    "Pyrazine",
+    "Triazine",
+    "Quinoline",
+    "Isoquinoline",
+    "-NO2",
+    "-CN",
+    "-COR",
+    "-CO2",
+    "-SO2",
+    "-CHO",
+    "-CF3",
+    "-N2+",
+)
+_SNAR_DEACTIVATING_TOKENS = (
+    "Ar-OR",
+    "Ar-NR2",
+    "Ar-NHR",
+    "Ar-NH2",
+    "Ar-SR",
+    "Ar-Alkyl",
+)
 _AMBIDENT_TOKENS = ("-SCN", "-NCS", "-NO2", "-CN", "Hydrazine")
 _NUCLEOPHILE_CLASS_HINTS = {
     "amine": ("-NH2", "-NHR", "-NR2", "Hydrazine"),
@@ -316,9 +344,48 @@ def _nucleophile_candidate_classes(
     return sorted(classes)
 
 
+def _snar_activation_supported(
+    *,
+    reacted_motifs: Set[str],
+    formed_motifs: Set[str],
+    electrophile_tags: List[str],
+) -> Tuple[bool, str]:
+    motif_space: Set[str] = set(reacted_motifs) | set(formed_motifs)
+    if not motif_space:
+        return False, "missing_motif_context"
+
+    has_heteroaryl_context = any(
+        str(motif).startswith(("HeteroAr-", "AromN-"))
+        or any(tag in str(motif) for tag in ("Pyridine", "Pyridyl", "Pyrimidine", "Pyrazine", "Triazine", "Quinoline"))
+        for motif in motif_space
+    )
+    if has_heteroaryl_context:
+        return True, "heteroaryl_activation"
+
+    if "ewg_activated" in set(electrophile_tags):
+        return True, "ewg_activation"
+
+    has_activation_token = any(
+        any(token in str(motif) for token in _SNAR_ACTIVATING_TOKENS)
+        for motif in motif_space
+    )
+    if has_activation_token:
+        return True, "ewg_or_heteroaryl_activation"
+
+    has_deactivating = any(
+        any(token in str(motif) for token in _SNAR_DEACTIVATING_TOKENS)
+        for motif in motif_space
+    )
+    if has_deactivating:
+        return False, "electron_rich_aryl_context"
+
+    return False, "no_activation_marker"
+
+
 def _mechanism_shortlist(
     *,
     reacted_motifs: Set[str],
+    formed_motifs: Set[str],
     event_kinds: Set[str],
     formed_pairs: Set[Tuple[str, str]],
     electrophile_hybridization: str,
@@ -339,15 +406,18 @@ def _mechanism_shortlist(
     has_displacement = "leaving_group_displacement" in event_kinds
     has_c_hetero = bool({("C", "N"), ("C", "O"), ("C", "S")} & formed_pairs)
     has_c_c = ("C", "C") in formed_pairs
-    has_ewg = "ewg_activated" in set(electrophile_tags)
+    snar_supported, snar_reason = _snar_activation_supported(
+        reacted_motifs=reacted_motifs,
+        formed_motifs=formed_motifs,
+        electrophile_tags=electrophile_tags,
+    )
 
     if has_displacement and electrophile_hybridization == "sp3" and has_c_hetero:
         add("SN2", 0.72, ["sp3_electrophile", "c_hetero_bond_formation", "leaving_group_displacement"])
     if has_displacement and electrophile_hybridization == "sp2_aromatic" and has_c_hetero:
-        conf = 0.78 if has_ewg else 0.6
+        conf = 0.78 if snar_supported else 0.52
         reasons = ["aryl_or_heteroaryl_electrophile", "leaving_group_displacement", "c_hetero_bond_formation"]
-        if has_ewg:
-            reasons.append("ewg_activation")
+        reasons.append(snar_reason)
         add("SNAr", conf, reasons)
     if "amidation_like" in event_kinds:
         add("acyl_substitution", 0.8, ["amidation_like_event", "c_n_bond_formation"])
@@ -666,6 +736,7 @@ def summarize_reaction_events(
     )
     mechanism_shortlist = _mechanism_shortlist(
         reacted_motifs=reacted_set,
+        formed_motifs=formed_set,
         event_kinds=event_kinds,
         formed_pairs=formed_pairs,
         electrophile_hybridization=electrophile_hybridization,
@@ -710,6 +781,11 @@ def summarize_reaction_events(
             "leaving_group_elements": sorted(leaving_groups),
             "environment_tags": electrophile_tags,
             "ewg_activation_likely": "ewg_activated" in set(electrophile_tags),
+            "snar_activation_supported": _snar_activation_supported(
+                reacted_motifs=reacted_set,
+                formed_motifs=formed_set,
+                electrophile_tags=electrophile_tags,
+            )[0],
         },
         "nucleophile_profile": {
             "bond_forming_elements": sorted(nucleophile_elements),

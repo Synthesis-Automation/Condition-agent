@@ -19,7 +19,11 @@ def _load_snar_config() -> Tuple[List[str], Dict[str, float], Dict[str, str]]:
     from ...taxonomy import reaction_catalog
     
     definitions, _ = reaction_catalog.load_reaction_catalog()
-    snar_def = definitions.get('Snar_cn')
+    snar_def = (
+        definitions.get("C_N_Coupling")
+        or definitions.get("SNAr_CN")
+        or definitions.get("Snar_cn")
+    )
     
     if not snar_def or not snar_def.metadata:
         # Fallback to safe defaults if taxonomy missing
@@ -35,6 +39,13 @@ def _load_snar_config() -> Tuple[List[str], Dict[str, float], Dict[str, str]]:
     electrophile_types = feasibility.get('electrophile_types', [])
     thresholds = electronic.get('thresholds', {})
     interpretations = electronic.get('interpretation', {})
+
+    if not electrophile_types:
+        return (
+            ["Ar-Cl", "Ar-Br", "Ar-I", "Ar-F", "AromN-Cl", "AromN-Br", "AromN-I", "AromN-F"],
+            {"neutral_score": 5.0, "minimum_activation": 6.0, "high_activation": 7.0},
+            {}
+        )
     
     return electrophile_types, thresholds, interpretations
 

@@ -117,6 +117,10 @@
         "R2CH-NHR",
         "R3C-NH2",
         "R3C-NHR",
+        "Alkyl-Hydrazide",
+        "Ar-Hydrazide",
+        "Alkyl-Hydrazine",
+        "Ar-Hydrazine",
         "AromN-H",
         "Alkenyl-CONH2",
         "Alkenyl-CONHR",
@@ -153,8 +157,18 @@
         "Ar-SO2NH2",
         "Ar-SO2NHR",
         "Ar-SO2NHNH2",
+        "Ar-PO2NH2",
+        "Ar-PO2NHR",
         "Ar-NHCOR",
-        "Alkyl-NHCOR"
+        "Alkyl-NHCOR",
+        "Alkyl-PO2NH2",
+        "Alkyl-PO2NHR",
+        "RCH2-PO2NH2",
+        "RCH2-PO2NHR",
+        "R2CH-PO2NH2",
+        "R2CH-PO2NHR",
+        "R3C-PO2NH2",
+        "R3C-PO2NHR"
       ],
       "usage": [
         "C_N_Coupling",
@@ -178,7 +192,12 @@
         "Propargyl-OH",
         "RCH2-OH",
         "R2CH-OH",
-        "R3C-OH"
+        "R3C-OH",
+        "Ar-PO2OH",
+        "Alkyl-PO2OH",
+        "RCH2-PO2OH",
+        "R2CH-PO2OH",
+        "R3C-PO2OH"
       ],
       "usage": [
         "C_O_Coupling",
@@ -320,7 +339,22 @@
         "Ar-SO2NR2",
         "Alkyl-SO2NH2",
         "Alkyl-SO2NHR",
-        "Alkyl-SO2NR2"
+        "Alkyl-SO2NR2",
+        "Ar-PO2OR",
+        "Alkyl-PO2OR",
+        "RCH2-PO2OR",
+        "R2CH-PO2OR",
+        "R3C-PO2OR",
+        "Ar-PO2NHR",
+        "Ar-PO2NR2",
+        "Alkyl-PO2NHR",
+        "Alkyl-PO2NR2",
+        "RCH2-PO2NHR",
+        "RCH2-PO2NR2",
+        "R2CH-PO2NHR",
+        "R2CH-PO2NR2",
+        "R3C-PO2NHR",
+        "R3C-PO2NR2"
       ],
       "usage": [
         "Alkyl_Nucleophilic_Substitution"
@@ -427,6 +461,7 @@
         "Ar-NHR",
         "Ar-NR2",
         "Ar-AromN",
+        "Ar-Hydrazine",
         "HeteroAr-NH2",
         "HeteroAr-NHR",
         "HeteroAr-NR2"
@@ -782,6 +817,38 @@
       "usage": [
         "Negishi"
       ]
+    },
+    "phosphoryl_derivatives": {
+      "name": "Phosphoryl Derivatives",
+      "description": "Composite phosphoryl substituent motifs generated via PO2 linker.",
+      "members": [
+        "Ar-PO2OH",
+        "Ar-PO2OR",
+        "Ar-PO2NH2",
+        "Ar-PO2NHR",
+        "Ar-PO2NR2",
+        "Alkyl-PO2OH",
+        "Alkyl-PO2OR",
+        "Alkyl-PO2NH2",
+        "Alkyl-PO2NHR",
+        "Alkyl-PO2NR2",
+        "RCH2-PO2OH",
+        "RCH2-PO2OR",
+        "RCH2-PO2NH2",
+        "RCH2-PO2NHR",
+        "RCH2-PO2NR2",
+        "R2CH-PO2OH",
+        "R2CH-PO2OR",
+        "R2CH-PO2NH2",
+        "R2CH-PO2NHR",
+        "R2CH-PO2NR2",
+        "R3C-PO2OH",
+        "R3C-PO2OR",
+        "R3C-PO2NH2",
+        "R3C-PO2NHR",
+        "R3C-PO2NR2"
+      ],
+      "usage": []
     },
     "terminal_alkenes": {
       "name": "Terminal Alkenes",

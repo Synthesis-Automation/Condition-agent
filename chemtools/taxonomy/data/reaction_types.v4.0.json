@@ -127,7 +127,16 @@
         "ChanLam_Narylation",
         "UllmannGoldberg_Narylation",
         "buchwald_hartwig_c_n",
-        "cn_coupling"
+        "cn_coupling",
+        "SNAr-CN",
+        "snar_cn",
+        "SNAr",
+        "S_NAr",
+        "snar",
+        "s_nar",
+        "Aromatic_Nucleophilic_Substitution",
+        "aromatic_nucleophilic_substitution",
+        "SNAr_amination"
       ],
       "description": "Aryl amination via C-N cross-coupling; named variants differ mainly by catalyst.",
       "metadata": {
@@ -139,7 +148,11 @@
       },
       "reactants": {
         "electrophile": "@sp2_electrophiles",
-        "nucleophile": "@amines_nh"
+        "nucleophile": [
+          "@amines_nh",
+          "HeteroAr-NH2",
+          "HeteroAr-NHR"
+        ]
       },
       "synthons": {
         "electrophile": {
@@ -216,7 +229,9 @@
         "Ullmann ether synthesis",
         "buchwald_hartwig_co",
         "ullmann_co",
-        "c_o_coupling"
+        "c_o_coupling",
+        "SNAr-CO",
+        "snar_co"
       ],
       "description": "Aryl ether formation via C-O coupling; named variants differ mainly by catalyst.",
       "metadata": {
@@ -324,7 +339,9 @@
         "Ullmann thioether",
         "buchwald_hartwig_cs",
         "ullmann_cs",
-        "c_s_coupling"
+        "c_s_coupling",
+        "SNAr-CS",
+        "snar_cs"
       ],
       "description": "Aryl thioether formation via C-S coupling; named variants differ mainly by catalyst.",
       "metadata": {
@@ -1182,79 +1199,6 @@
         ],
         "min_reactant_slot_matches": 2,
         "min_product_slot_matches": 1
-      }
-    },
-    {
-      "id": "SNAr_CN",
-      "redox_neutral": true,
-      "reactants": {
-        "electrophile": [
-          "Ar-F",
-          "Ar-Cl",
-          "Ar-Br",
-          "HeteroAr-F",
-          "HeteroAr-Cl",
-          "HeteroAr-Br"
-        ],
-        "nucleophile": [
-          "@amines_nh",
-          "R2CH-NH2",
-          "RCH2-NH2",
-          "HeteroAr-NH2",
-          "HeteroAr-NHR"
-        ]
-      },
-      "products": {
-        "product": "@aryl_amines"
-      },
-      "examples": [
-        "Fc1ccc([N+](=O)[O-])cc1.NC>>Nc1ccc([N+](=O)[O-])cc1",
-        "Clc1ncccn1.NCC>>NCCNc1ncccn1"
-      ],
-      "aliases": [
-        "snar_cn",
-        "Aromatic_Nucleophilic_Substitution",
-        "SNAr",
-        "SNAr-CN",
-        "SNAr-CO",
-        "SNAr-CS",
-        "SNAr_amination",
-        "S_NAr",
-        "aromatic_nucleophilic_substitution",
-        "s_nar",
-        "snar"
-      ],
-      "metadata": {
-        "feasibility": {
-          "electronic_activation": {
-            "description": "SNAr requires electron-withdrawing groups to activate the aromatic ring",
-            "thresholds": {
-              "neutral_score": 5.0,
-              "minimum_activation": 6.0,
-              "high_activation": 7.0
-            },
-            "interpretation": {
-              "below_6.0": "Ring is likely too electron-rich for SNAr without strong activation",
-              "6.0_to_7.0": "Ring is moderately activated for SNAr",
-              "above_7.0": "Ring is highly activated for SNAr"
-            }
-          },
-          "electrophile_types": [
-            "Ar-Cl",
-            "Ar-Br",
-            "Ar-I",
-            "Ar-F",
-            "AromN-Cl",
-            "AromN-Br",
-            "AromN-I",
-            "AromN-F"
-          ]
-        }
-      },
-      "constraints": {
-        "include_bond_formed": [
-          "C-N"
-        ]
       }
     },
     {

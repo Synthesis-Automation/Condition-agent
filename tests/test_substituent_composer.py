@@ -66,6 +66,9 @@ def test_composed_groups_are_merged_without_duplicates() -> None:
     assert "-COOH" in ids
     assert "-COOR" in ids
     assert "-SO2NHNH2" in ids
+    assert "-PO2OH" in ids
+    assert "-PO2OR" in ids
+    assert "-PO2NH2" in ids
 
     assert ids.count("-CONH2") == 1
     assert ids.count("-COOH") == 1
@@ -82,7 +85,16 @@ def test_composed_groups_smarts_compile() -> None:
         for entry in (payload.get("groups", []) or [])
         if isinstance(entry, dict) and entry.get("id")
     }
-    for group_id in ("-CON3", "-CONHNH2", "-COOH", "-COOR", "-SO2NHNH2"):
+    for group_id in (
+        "-CON3",
+        "-CONHNH2",
+        "-COOH",
+        "-COOR",
+        "-SO2NHNH2",
+        "-PO2OH",
+        "-PO2OR",
+        "-PO2NH2",
+    ):
         smarts = str(group_map[group_id].get("smarts") or "")
         assert smarts
         assert compile_smarts(smarts, validate=True) is not None
@@ -96,6 +108,9 @@ def test_registry_includes_composed_groups() -> None:
     assert "-COOH" in groups
     assert "-COOR" in groups
     assert "-SO2NHNH2" in groups
+    assert "-PO2OH" in groups
+    assert "-PO2OR" in groups
+    assert "-PO2NH2" in groups
 
 
 def test_registry_has_curated_composed_compounds() -> None:
@@ -106,6 +121,9 @@ def test_registry_has_curated_composed_compounds() -> None:
     assert "Ar-COOH" in compound_map
     assert "Ar-COOR" in compound_map
     assert "Bn-SO2NHNH2" in compound_map
+    assert "Ar-PO2OH" in compound_map
+    assert "Alkyl-PO2OR" in compound_map
+    assert "RCH2-PO2NH2" in compound_map
 
 
 def test_compound_expansion_added_for_composed_groups() -> None:
@@ -139,6 +157,31 @@ def test_compound_expansion_added_for_composed_groups() -> None:
         ("Alkynyl", "-CON3"),
         ("Alkynyl", "-CONHNH2"),
         ("Alkynyl", "-SO2NHNH2"),
+        ("Ar", "-PO2OH"),
+        ("Ar", "-PO2OR"),
+        ("Ar", "-PO2NH2"),
+        ("Ar", "-PO2NHR"),
+        ("Ar", "-PO2NR2"),
+        ("Alkyl", "-PO2OH"),
+        ("Alkyl", "-PO2OR"),
+        ("Alkyl", "-PO2NH2"),
+        ("Alkyl", "-PO2NHR"),
+        ("Alkyl", "-PO2NR2"),
+        ("RCH2", "-PO2OH"),
+        ("RCH2", "-PO2OR"),
+        ("RCH2", "-PO2NH2"),
+        ("RCH2", "-PO2NHR"),
+        ("RCH2", "-PO2NR2"),
+        ("R2CH", "-PO2OH"),
+        ("R2CH", "-PO2OR"),
+        ("R2CH", "-PO2NH2"),
+        ("R2CH", "-PO2NHR"),
+        ("R2CH", "-PO2NR2"),
+        ("R3C", "-PO2OH"),
+        ("R3C", "-PO2OR"),
+        ("R3C", "-PO2NH2"),
+        ("R3C", "-PO2NHR"),
+        ("R3C", "-PO2NR2"),
     }
     missing = sorted(expected - pairs)
     assert not missing, f"Missing composed compound pairs: {missing}"
@@ -176,6 +219,11 @@ def test_generated_only_groups_not_defined_in_base_organic_groups() -> None:
         "-SO2NHR",
         "-SO2NR2",
         "-SO2NHNH2",
+        "-PO2OH",
+        "-PO2OR",
+        "-PO2NH2",
+        "-PO2NHR",
+        "-PO2NR2",
     }
     overlap = sorted(ids & forbidden)
     assert not overlap, f"Generated-only groups present in base organic_groups: {overlap}"

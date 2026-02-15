@@ -116,7 +116,7 @@ def _canonical_cn_family() -> str:
 
 
 CN_FAMILIES_CANONICAL: Set[str] = _canonical_label_set(
-    ["c_n_cross_coupling", "C_N_Coupling", "snar_cn", "Snar_cn"]
+    ["c_n_cross_coupling", "C_N_Coupling"]
 )
 CO_FAMILIES_CANONICAL: Set[str] = _canonical_label_set(["c_o_coupling", "C_O_Coupling"])
 CS_FAMILIES_CANONICAL: Set[str] = _canonical_label_set(["c_s_coupling", "C_S_Coupling"])
