@@ -211,6 +211,7 @@ class LLMClient:
         system: Optional[str] = None,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        reasoning_effort: Optional[str] = None,
     ) -> LLMResponse:
         """
         Send a chat completion request.
@@ -220,6 +221,7 @@ class LLMClient:
             system: Optional system message
             temperature: Override default temperature
             max_tokens: Override default max_tokens
+            reasoning_effort: For reasoning models: "low", "medium", "high"
 
         Returns:
             LLMResponse with content and metadata
@@ -233,6 +235,7 @@ class LLMClient:
             messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,
+            reasoning_effort=reasoning_effort,
         )
 
     def chat_messages(
@@ -240,6 +243,7 @@ class LLMClient:
         messages: List[Dict[str, str]],
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        reasoning_effort: Optional[str] = None,
     ) -> LLMResponse:
         """
         Send a chat completion with full message history.
@@ -248,6 +252,8 @@ class LLMClient:
             messages: List of message dicts with role and content
             temperature: Override default temperature
             max_tokens: Override default max_tokens
+            reasoning_effort: For reasoning models (o1/o3/GPT-5): "low", "medium", "high"
+                Controls depth of reasoning. Higher = more thorough but slower/costlier.
 
         Returns:
             LLMResponse with content and metadata
@@ -268,6 +274,10 @@ class LLMClient:
         if is_gpt5_or_o_series:
             # GPT-5 and o-series: use max_completion_tokens, skip temperature (only default=1 supported)
             api_params["max_completion_tokens"] = max_tokens or self.max_tokens
+
+            # Add reasoning_effort if specified (for reasoning models)
+            if reasoning_effort:
+                api_params["reasoning_effort"] = reasoning_effort
         else:
             # Standard models: use max_tokens and temperature
             api_params["max_tokens"] = max_tokens or self.max_tokens
