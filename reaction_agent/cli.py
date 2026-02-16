@@ -186,7 +186,17 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
     if 'metadata' in result and show_details:
         print_header("METADATA")
         meta = result['metadata']
-        print(f"Model: {Colors.BOLD}{meta['model']}{Colors.END} ({meta['provider']})")
+
+        # Show model selection info if available
+        if 'model_selected' in meta:
+            print(f"Model Selected: {Colors.BOLD}{meta['model_selected']}{Colors.END}")
+            if 'mode' in meta:
+                print(f"Mode: {meta['mode']}")
+            if 'reasoning_effort' in meta and meta['reasoning_effort']:
+                print(f"Reasoning Effort: {meta['reasoning_effort']}")
+        else:
+            print(f"Model: {Colors.BOLD}{meta['model']}{Colors.END} ({meta['provider']})")
+
         print(f"Tokens: {meta['total_tokens']} (prompt: {meta['prompt_tokens']}, completion: {meta['completion_tokens']})")
         print(f"Latency: {meta['latency_ms']:.0f} ms")
 
@@ -199,7 +209,8 @@ def analyze_reaction_interactive(
     analyzer: ReactionSMILESAnalyzer,
     rxn_smiles: str,
     skip_mapping: bool = False,
-    save_output: Optional[Path] = None
+    save_output: Optional[Path] = None,
+    mode: str = "auto"
 ) -> Dict[str, Any]:
     """Analyze a reaction interactively with progress updates."""
 
@@ -207,10 +218,10 @@ def analyze_reaction_interactive(
     print("-" * 80)
 
     # Step 1: Deterministic analysis
-    print_info("Step 1/2: Running deterministic analysis...")
+    print_info(f"Step 1/2: Running deterministic analysis (mode={mode})...")
 
     try:
-        result = analyzer.analyze(rxn_smiles, skip_mapping=skip_mapping)
+        result = analyzer.analyze(rxn_smiles, skip_mapping=skip_mapping, mode=mode)
     except Exception as e:
         print_error(f"Analysis failed: {e}")
         import traceback
@@ -239,18 +250,19 @@ def analyze_reaction_interactive(
 def batch_analyze(
     analyzer: ReactionSMILESAnalyzer,
     reactions: List[str],
-    output_dir: Optional[Path] = None
+    output_dir: Optional[Path] = None,
+    mode: str = "auto"
 ) -> List[Dict[str, Any]]:
     """Analyze multiple reactions in batch."""
 
-    print_header(f"BATCH ANALYSIS ({len(reactions)} reactions)")
+    print_header(f"BATCH ANALYSIS ({len(reactions)} reactions, mode={mode})")
 
     results = []
     for i, rxn in enumerate(reactions, 1):
         print(f"\n{Colors.BOLD}[{i}/{len(reactions)}]{Colors.END} {rxn[:60]}...")
 
         try:
-            result = analyzer.analyze(rxn)
+            result = analyzer.analyze(rxn, mode=mode)
             results.append(result)
 
             # Show brief result
@@ -344,6 +356,7 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer):
                 print(f"  Provider: {analyzer.client.provider}")
                 print(f"  Temperature: {analyzer.temperature}")
                 print(f"  Max Tokens: {analyzer.max_tokens}")
+                print(f"  Reasoning Effort: {analyzer.reasoning_effort or 'N/A'}")
                 print(f"  Drop Spectators: {analyzer.drop_spectators}")
                 continue
 
@@ -386,16 +399,28 @@ Examples:
   # Interactive mode
   python reaction_agent/cli.py
 
-  # Analyze single reaction
-  python reaction_agent/cli.py --reaction "CCBr>>CCN"
+  # Analyze single reaction (auto mode - smart switching)
+  python reaction_agent/cli.py --reaction "CCBr>>CCN" --mode auto
+
+  # Analyze with fast mode (always gpt-4o)
+  python reaction_agent/cli.py --reaction "CCBr>>CCN" --mode fast
+
+  # Analyze with deep mode (always gpt-5.2 low reasoning)
+  python reaction_agent/cli.py --reaction "CCBr>>CCN" --mode deep
+
+  # Analyze with expert mode (gpt-5.2 medium reasoning)
+  python reaction_agent/cli.py --reaction "CCBr>>CCN" --mode expert
 
   # Batch analysis from file
-  python reaction_agent/cli.py --batch reactions.txt
+  python reaction_agent/cli.py --batch reactions.txt --mode auto
 
   # Deterministic only (no LLM)
   python reaction_agent/cli.py --reaction "CCBr>>CCN" --no-llm
 
-  # Use different model
+  # Always use GPT-5.2 (forces deep reasoning mode)
+  python reaction_agent/cli.py --model gpt-5.2 --reaction "CCBr>>CCN"
+
+  # Use o3-mini model
   python reaction_agent/cli.py --model o3-mini --reaction "CCBr>>CCN"
 
   # Save output
@@ -409,10 +434,15 @@ Examples:
     parser.add_argument('--interactive', '-i', action='store_true', help='Run in interactive mode (default if no reaction provided)')
 
     # LLM options
-    parser.add_argument('--model', '-m', type=str, default='gpt-4o-mini', help='LLM model to use (default: gpt-4o-mini)')
+    parser.add_argument('--model', '-m', type=str, default='gpt-4o-mini',
+                        help='LLM model to use (default: gpt-4o-mini). Specify gpt-5.2 to force deep reasoning.')
     parser.add_argument('--provider', '-p', type=str, default='openai', help='LLM provider (default: openai)')
     parser.add_argument('--temperature', '-t', type=float, default=0.0, help='Temperature (default: 0.0)')
     parser.add_argument('--max-tokens', type=int, default=2000, help='Max tokens (default: 2000)')
+    parser.add_argument('--mode', type=str, default='auto', choices=['auto', 'fast', 'deep', 'expert'],
+                        help='Analysis mode: auto (smart switching), fast (always gpt-4o), deep (gpt-5.2 low), expert (gpt-5.2 medium) (default: auto)')
+    parser.add_argument('--reasoning-effort', type=str, choices=['low', 'medium', 'high'],
+                        help='Reasoning effort level for GPT-5.2 (overrides mode defaults)')
     parser.add_argument('--no-llm', action='store_true', help='Run deterministic analysis only (no LLM)')
 
     # Analysis options
@@ -435,6 +465,9 @@ Examples:
     if not args.quiet:
         print_header("Reaction SMILES Analysis Agent - Interactive CLI")
         print(f"\nModel: {Colors.BOLD}{args.model}{Colors.END} ({args.provider})")
+        print(f"Mode: {Colors.BOLD}{args.mode}{Colors.END}")
+        if args.reasoning_effort:
+            print(f"Reasoning Effort: {Colors.BOLD}{args.reasoning_effort}{Colors.END}")
 
     # Check for API key unless running deterministic only
     if not args.no_llm:
@@ -460,6 +493,16 @@ Examples:
         if not args.quiet:
             print_info("Initializing LLM client...")
 
+        # Auto-detect if user wants to force GPT-5.2 based on model name
+        is_gpt52_model = args.model.startswith("gpt-5.2") or args.model.startswith("gpt-o3") or args.model.startswith("o3-")
+
+        # If user specified a GPT-5.2 model directly, force deep mode (unless they explicitly set a mode)
+        effective_mode = args.mode
+        if is_gpt52_model and args.mode == "auto":
+            effective_mode = "deep"
+            if not args.quiet:
+                print_info(f"Detected reasoning model '{args.model}' - using deep reasoning mode")
+
         client = LLMClient(
             provider=args.provider,
             model=args.model,
@@ -467,11 +510,22 @@ Examples:
             max_tokens=args.max_tokens
         )
 
+        # Determine reasoning effort based on mode and explicit arg
+        reasoning_effort = args.reasoning_effort
+        if reasoning_effort is None:
+            # Set defaults based on mode (will be overridden by mode in analyze())
+            if effective_mode == "deep":
+                reasoning_effort = "low"
+            elif effective_mode == "expert":
+                reasoning_effort = "medium"
+            # auto and fast modes don't set reasoning_effort at init
+
         analyzer = ReactionSMILESAnalyzer(
             client=client,
             drop_spectators=not args.keep_spectators,
             temperature=args.temperature,
-            max_tokens=args.max_tokens
+            max_tokens=args.max_tokens,
+            reasoning_effort=reasoning_effort
         )
 
         if not args.quiet:
@@ -492,7 +546,7 @@ Examples:
             reactions = [line.strip() for line in f if line.strip() and not line.startswith('#')]
 
         output_dir = args.output_dir or Path('results') / args.batch.stem
-        batch_analyze(analyzer, reactions, output_dir)
+        batch_analyze(analyzer, reactions, output_dir, mode=effective_mode)
 
     elif args.reaction:
         # Single reaction mode
@@ -500,7 +554,8 @@ Examples:
             analyzer,
             args.reaction,
             skip_mapping=args.skip_mapping,
-            save_output=args.output
+            save_output=args.output,
+            mode=effective_mode
         )
 
     else:

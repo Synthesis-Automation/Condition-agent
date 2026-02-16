@@ -115,6 +115,85 @@ Return ONLY the JSON object, no markdown fences or additional text.""",
 )
 
 
+DIRECT_SMILES_ANALYSIS = PromptTemplate(
+    template="""You are a reaction analysis engine specialized in interpreting chemical transformations.
+
+⚠️ **MAPPING FAILURE MODE** ⚠️
+
+The atom mapping tool has COMPLETELY FAILED for this reaction (0 bond changes detected, confidence {mapping_confidence:.3f}).
+This does NOT mean the reaction is invalid - it means you must analyze the SMILES strings DIRECTLY using chemical reasoning.
+
+**IGNORE the deterministic analysis** and focus on:
+1. Identifying functional groups in reactants
+2. Identifying functional groups in products
+3. Inferring what bonds MUST have changed based on structure differences
+4. Using your knowledge of organic chemistry patterns
+
+**INPUT DATA**:
+
+## Reactants SMILES
+{reactants_smiles}
+
+## Products SMILES
+{products_smiles}
+
+## Full Reaction
+{rxn_smiles_clean}
+
+**YOUR TASK**:
+
+Analyze this reaction by comparing reactant and product structures directly. Provide detailed mechanistic reasoning using this JSON schema:
+
+{{
+  "overall_class": "<one of: cross_coupling, nucleophilic_substitution, electrophilic_addition, nucleophilic_addition, elimination, condensation, cycloaddition, rearrangement, oxidation, reduction, annulation, defluorination, other>",
+  "tags": ["<specific tags like SNAr, Suzuki, cyclization, etc>"],
+  "functional_groups": {{
+    "reactants": ["<FG1: description>", "<FG2: description>"],
+    "products": ["<FG1: description>", "<FG2: description>"]
+  }},
+  "inferred_bond_changes": {{
+    "bonds_likely_broken": ["<description>"],
+    "bonds_likely_formed": ["<description>"],
+    "reasoning": "<explain how you inferred these from SMILES comparison>"
+  }},
+  "mechanism_summary": [
+    "<step 1: describe transformation>",
+    "<step 2: describe intermediate>",
+    "<step 3: describe final product formation>"
+  ],
+  "reaction_centers": [
+    {{
+      "center_id": 1,
+      "description": "<what changes at this center>",
+      "evidence": "<functional group changes observed>"
+    }}
+  ],
+  "literature_precedent": "<if this matches known chemistry, describe it>",
+  "warnings": ["mapping_failed_used_direct_analysis"],
+  "confidence": <0.5 to 0.9 based on how clear the transformation is>
+}}
+
+**CRITICAL**:
+- Compare the SMILES strings DIRECTLY - what appears in products that wasn't in reactants?
+- What disappears from reactants?
+- Look for ring formations, ring openings, functional group interconversions
+- Use your chemical knowledge - what reagents typically cause such changes?
+- Be detailed in mechanism_summary - explain the full transformation pathway
+- Confidence should be 0.5-0.9 (lower than with good mapping, but not zero)
+
+Return ONLY the JSON object, no markdown fences or additional text.""",
+    reactants_smiles="",
+    products_smiles="",
+    rxn_smiles_clean="",
+    mapping_confidence=0.0
+)
+
+
 def get_template() -> PromptTemplate:
     """Get the reaction SMILES analysis prompt template."""
     return REACTION_SMILES_ANALYSIS
+
+
+def get_direct_smiles_template() -> PromptTemplate:
+    """Get the direct SMILES analysis template (for mapping failures)."""
+    return DIRECT_SMILES_ANALYSIS

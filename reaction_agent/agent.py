@@ -12,7 +12,7 @@ import re
 from typing import Dict, Any, Optional
 
 from llmtools.clients import LLMClient
-from reaction_agent.prompts import get_template
+from reaction_agent.prompts import get_template, get_direct_smiles_template
 from reaction_agent.core import analyze_reaction_smiles as analyze_deterministic
 
 
@@ -94,26 +94,57 @@ def analyze_reaction_smiles(
     input_data = deterministic_result["input"]
     tool_facts = deterministic_result["tool_facts"]
 
-    # Step 2: Build LLM prompt
-    template = get_template()
-
-    # Format bond changes for prompt
-    bond_changes_text = _format_bond_changes(tool_facts.get("bond_changes", []))
-
-    # Format mapping QC
+    # Check for complete mapping failure (0 bond changes + low/failed mapping)
+    bond_changes = tool_facts.get("bond_changes", [])
     mapping_qc = tool_facts.get("mapping_qc", {})
-    mapping_qc_text = json.dumps(mapping_qc, indent=2)
+    mapping_conf = mapping_qc.get("confidence", 0.0)
+    mapping_ok = mapping_qc.get("ok", False)
 
-    prompt = template.format(
-        rxn_smiles_raw=input_data.get("rxn_smiles_raw", ""),
-        rxn_smiles_clean=input_data.get("rxn_smiles_clean", ""),
-        spectators=", ".join(input_data.get("spectators", [])) or "None",
-        parse_warnings=", ".join(input_data.get("parse_warnings", [])) or "None",
-        mapped_rxn_smiles=tool_facts.get("mapped_rxn_smiles") or "Not available",
-        mapping_qc=mapping_qc_text,
-        bond_changes_text=bond_changes_text,
-        reaction_center_atoms=str(tool_facts.get("reaction_center_atoms", []))
+    use_direct_analysis = (
+        len(bond_changes) == 0
+        and (not mapping_ok or mapping_conf < 0.4)
     )
+
+    # Step 2: Build LLM prompt
+    if use_direct_analysis:
+        # Mapping completely failed - use direct SMILES analysis
+        print(f"⚠️  Mapping failed completely (0 bond changes, confidence {mapping_conf:.3f})")
+        print("    → Using direct SMILES analysis mode (pattern recognition)")
+
+        template = get_direct_smiles_template()
+
+        # Parse reactants and products
+        rxn_clean = input_data.get("rxn_smiles_clean", "")
+        parts = rxn_clean.split(">>")
+        reactants_smiles = parts[0] if len(parts) > 0 else ""
+        products_smiles = parts[1] if len(parts) > 1 else ""
+
+        prompt = template.format(
+            reactants_smiles=reactants_smiles,
+            products_smiles=products_smiles,
+            rxn_smiles_clean=rxn_clean,
+            mapping_confidence=mapping_conf
+        )
+    else:
+        # Normal mode - use bond changes
+        template = get_template()
+
+        # Format bond changes for prompt
+        bond_changes_text = _format_bond_changes(bond_changes)
+
+        # Format mapping QC
+        mapping_qc_text = json.dumps(mapping_qc, indent=2)
+
+        prompt = template.format(
+            rxn_smiles_raw=input_data.get("rxn_smiles_raw", ""),
+            rxn_smiles_clean=input_data.get("rxn_smiles_clean", ""),
+            spectators=", ".join(input_data.get("spectators", [])) or "None",
+            parse_warnings=", ".join(input_data.get("parse_warnings", [])) or "None",
+            mapped_rxn_smiles=tool_facts.get("mapped_rxn_smiles") or "Not available",
+            mapping_qc=mapping_qc_text,
+            bond_changes_text=bond_changes_text,
+            reaction_center_atoms=str(tool_facts.get("reaction_center_atoms", []))
+        )
 
     # Step 3: Call LLM
     try:
