@@ -6,11 +6,34 @@
 
 This module combines:
 - **Deterministic analysis** (RDKit + rxnmapper) for ground truth facts
-- **LLM interpretation** (GPT-4) for mechanistic reasoning and classification
+- **LLM interpretation** (GPT-4/GPT-5) for mechanistic reasoning and classification
 
 **Design principle**: Tools compute facts; GPT explains facts.
 
 ## Quick Start
+
+### Interactive CLI (Recommended)
+
+```bash
+# Set API key
+export OPENAI_API_KEY='sk-...'
+
+# Start interactive mode
+python reaction_agent/cli.py
+
+# Or analyze directly
+python reaction_agent/cli.py --reaction "CCBr>>CCN"
+
+# Batch processing
+python reaction_agent/cli.py --batch reactions.txt
+
+# No LLM (deterministic only)
+python reaction_agent/cli.py --reaction "CCBr>>CCN" --no-llm
+```
+
+**See [CLI_GUIDE.md](docs/CLI_GUIDE.md) for complete CLI documentation.**
+
+### Python API
 
 ```python
 from llmtools.clients import LLMClient
@@ -32,16 +55,21 @@ print(result["interpretation"]["confidence"])      # 0.85
 
 ```
 reaction_agent/
+├── README.md             # This file
 ├── __init__.py           # Main exports
+├── cli.py                # ⭐ Interactive CLI application
 ├── core.py               # Deterministic analysis (RDKit, rxnmapper)
 ├── prompts.py            # LLM prompt templates
 ├── agent.py              # LLM integration and orchestration
+├── examples/
+│   └── sample_reactions.txt  # Sample reactions for testing
 ├── tests/
-│   └── test_core.py      # Unit tests (12 passing)
+│   └── test_core.py      # Unit tests (✅ 12/12 passing)
 ├── scripts/
 │   └── demo.py           # Demo with example reactions
 └── docs/
-    ├── README.md         # Detailed documentation
+    ├── CLI_GUIDE.md      # ⭐ Complete CLI documentation
+    ├── README.md         # Detailed API documentation
     └── IMPLEMENTATION_SUMMARY.md
 ```
 

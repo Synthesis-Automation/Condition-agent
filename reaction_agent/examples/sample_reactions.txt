@@ -1,0 +1,32 @@
+# Example reactions for batch analysis
+# Lines starting with # are comments and will be ignored
+
+# Simple alkylation
+CCBr>>CCN
+
+# Buchwald-Hartwig CN coupling
+Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1
+
+# SNAr reaction
+CN(C)C.Clc1cc(Cl)nc(Cl)c1>>CN(C)c1cc(Cl)nc(Cl)c1
+
+# Suzuki coupling
+Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1
+
+# Wittig reaction
+CCCC=O.CC(P(c1ccccc1)(c1ccccc1)c1ccccc1)=O>>CCCC=CC(C)=O
+
+# Fischer esterification
+CC(=O)O.CCO>>CC(=O)OCC.O
+
+# Amide formation
+CC(=O)O.CCN>>CC(=O)NCC.O
+
+# Grignard addition
+CC=O.CBr>>CC(C)O
+
+# Reduction
+c1ccc(C=O)cc1>>c1ccc(CO)cc1
+
+# Oxidation
+CCO>>CC=O

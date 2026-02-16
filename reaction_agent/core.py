@@ -12,6 +12,7 @@ Design: docs/reaction_smiles_analysis_agent_simple_v1.md
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Set, Tuple
 from rdkit import Chem
+from rdkit.Chem import AllChem
 import logging
 
 logger = logging.getLogger(__name__)
@@ -229,7 +230,7 @@ def extract_bond_changes(mapped_rxn_smiles: str) -> BondChangeReport:
 
     try:
         # Parse mapped reaction
-        rxn = Chem.ReactionFromSmarts(mapped_rxn_smiles, useSmiles=True)
+        rxn = AllChem.ReactionFromSmarts(mapped_rxn_smiles, useSmiles=True)
         if rxn is None:
             warnings.append("Failed to parse mapped reaction")
             return BondChangeReport(warnings=warnings)
