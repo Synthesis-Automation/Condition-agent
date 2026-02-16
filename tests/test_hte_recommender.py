@@ -597,6 +597,121 @@ def test_resolve_reaction_type_label_handles_sample_suffix() -> None:
     assert hte._resolve_reaction_type_label("suzuki_miyaura_sample500") == "Suzuki_miyaura"
 
 
+def test_best_seller_scoring_beats_single_outlier(monkeypatch) -> None:
+    outlier = pd.DataFrame(
+        {
+            "Reaction_Type_Standardized": ["Suzuki_miyaura"] * 6,
+            "Reactant_A_Type": ["Ar-Cl"] * 6,
+            "Reactant_B_Type": ["Ar-B(OH)2"] * 6,
+            "Reactant_C_Type": [""] * 6,
+            "Catalyst": ["Pd_outlier"] * 6,
+            "Ligand": ["L1"] * 6,
+            "Base": ["K2CO3"] * 6,
+            "Solvent": ["DMF"] * 6,
+            "Secondary Solvent": [""] * 6,
+            "Additive": [""] * 6,
+            "Coupling Reagent": [""] * 6,
+            "AREA_TOTAL_REDUCED": [10.0, 8.0, 7.0, 9.0, 6.0, 5.0],
+            "z-Score": [5.0, -2.0, -2.0, -2.0, -2.0, -2.0],
+            "Reactant_A_Category": [""] * 6,
+            "Reactant_B_Category": [""] * 6,
+            "Reaction_Category": [""] * 6,
+            "Is_Intramolecular": [False] * 6,
+            "Source_File": ["tests"] * 6,
+            "Source_Group": ["experiments"] * 6,
+            "spectator_groups": [""] * 6,
+            "Reactant_Signature_Core": ["Ar-B(OH)2|Ar-Cl"] * 6,
+            "Reactant_Signature_Ext": ["Ar-B(OH)2|Ar-Cl"] * 6,
+        }
+    )
+    robust = outlier.copy()
+    robust["Catalyst"] = ["Pd_robust"] * 6
+    robust["z-Score"] = [1.4, 1.6, 1.7, 1.8, 1.9, 2.0]
+    robust["AREA_TOTAL_REDUCED"] = [70.0, 72.0, 75.0, 77.0, 80.0, 83.0]
+
+    df = pd.concat([outlier, robust], ignore_index=True)
+    key = hte._reactant_key(["Ar-B(OH)2", "Ar-Cl"])
+    indexed_data = {key: df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "B(" in smiles:
+            return ["Ar-B(OH)2"], "Aryl Boronate"
+        return ["Ar-Cl"], "Aryl Halide"
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="OB(O)c1ccccc1",
+        top_k=2,
+        min_experiments=1,
+        source_group="experiments",
+        reaction_type_filter="Suzuki_miyaura",
+    )
+
+    assert len(result.recommendations) == 2
+    assert result.recommendations[0].catalyst == "Pd_robust"
+    assert result.recommendations[0].avg_z_score > result.recommendations[1].avg_z_score
+
+
+def test_aggregate_deduplicates_identical_rows_for_support_gate(monkeypatch) -> None:
+    template = _make_min_hte_df()
+    template["Reactant_A_Type"] = ["Ar-Cl"]
+    template["Reactant_B_Type"] = ["Ar-B(OH)2"]
+    template["Source_Group"] = ["experiments"]
+    template["Reactant_Signature_Core"] = ["Ar-B(OH)2|Ar-Cl"]
+    template["Reactant_Signature_Ext"] = ["Ar-B(OH)2|Ar-Cl"]
+
+    duplicate_a = pd.concat([template.copy(), template.copy()], ignore_index=True)
+
+    b1 = template.copy()
+    b1["Catalyst"] = ["Pd_B"]
+    b1["z-Score"] = [1.2]
+    b1["AREA_TOTAL_REDUCED"] = [65.0]
+    b2 = b1.copy()
+    b2["z-Score"] = [1.8]
+    b2["AREA_TOTAL_REDUCED"] = [75.0]
+
+    df = pd.concat([duplicate_a, b1, b2], ignore_index=True)
+    key = hte._reactant_key(["Ar-B(OH)2", "Ar-Cl"])
+    indexed_data = {key: df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "B(" in smiles:
+            return ["Ar-B(OH)2"], "Aryl Boronate"
+        return ["Ar-Cl"], "Aryl Halide"
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="OB(O)c1ccccc1",
+        top_k=5,
+        min_experiments=2,
+        source_group="experiments",
+        reaction_type_filter="Suzuki_miyaura",
+    )
+
+    assert result.recommendations
+    catalysts = [rec.catalyst for rec in result.recommendations]
+    assert "Pd_B" in catalysts
+    assert "Pd" not in catalysts
+
+
 def test_detected_type_prefers_family_specific_halide_fallback(monkeypatch) -> None:
     chan_lam = _make_min_hte_df()
     chan_lam["Reaction_Type_Standardized"] = ["ChanLam_dataset_converted (2)"]

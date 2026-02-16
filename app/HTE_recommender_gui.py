@@ -524,6 +524,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                 "rules",
             ]
         )
+        self.source_group_combo.setCurrentText("experiments")
         self.source_group_combo.setToolTip(
             "Filter results to a specific HTE source group (protocols=curated literature with detailed procedures, rules live in data/HTE_db/rules)."
         )

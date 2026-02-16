@@ -1096,6 +1096,7 @@ _RULE_TIER_BOOST_STEP = 0.05
 _RULE_TIER_MAX_BOOST = 1.2
 _AROMATIC_SCAFFOLD_FALLBACK = {"Ar", "HeteroAr", "AromN"}
 _HETERO_C_H_SCAFFOLD_GROUPS = {"HeteroAr", "AromN"}
+_BEST_SELLER_TOP_N = 5
 
 _NH_HETEROCYCLE_TAG = "nh-heteroaromatic"
 
@@ -2394,13 +2395,42 @@ class HTERecommender:
         
         Strategy:
         1. Group by (catalyst, ligand, base, solvent) combination
-        2. Calculate z-score statistics (primary ranking metric)
+        2. Score each condition by robust top-end z-score (best-seller style)
         3. Calculate success rate (yield > 50)
         4. Calculate avg/median yield
-        5. Compute confidence score (weighted by z-score)
-        6. Rank by average z-score (primary), then confidence score
+        5. Compute confidence score (weighted by robust z-score)
+        6. Rank by match relevance, robust z-score, and support
         """
         recommendations = []
+        if matched_df is None or matched_df.empty:
+            return recommendations
+
+        working_df = matched_df.copy()
+        # Remove exact duplicate experimental rows without requiring ELN-like IDs.
+        dedup_cols = [
+            col
+            for col in (
+                "Reaction_Type_Standardized",
+                "Reactant_A_Type",
+                "Reactant_B_Type",
+                "Catalyst",
+                "Ligand",
+                "Base",
+                "Solvent",
+                "Additive",
+                "Secondary Solvent",
+                "Coupling Reagent",
+                "AREA_TOTAL_REDUCED",
+                "z-Score",
+                "Source_File",
+                "Source_Row",
+            )
+            if col in working_df.columns
+        ]
+        if dedup_cols:
+            working_df = working_df.drop_duplicates(subset=dedup_cols)
+        if working_df.empty:
+            return recommendations
         
         # Define success threshold
         SUCCESS_THRESHOLD = 50.0
@@ -2408,7 +2438,7 @@ class HTERecommender:
         # Group by condition combination
         condition_cols = ['Catalyst', 'Ligand', 'Base', 'Solvent']
         
-        grouped = matched_df.groupby(condition_cols, dropna=False)
+        grouped = working_df.groupby(condition_cols, dropna=False)
         
         for condition_tuple, group_df in grouped:
             # Protocol data (single curated conditions) should not need 2 experiments
@@ -2446,23 +2476,16 @@ class HTERecommender:
             avg_yield = yields.mean()
             median_yield = yields.median()
             
-            # Z-score statistics (primary ranking metric)
-            z_scores = pd.to_numeric(group_df['z-Score'], errors='coerce').fillna(0.0)
-            
-            # If match_score is present, weight the z-score
-            if 'match_score' in group_df.columns:
-                # Weighted average z-score
-                match_series = pd.to_numeric(group_df['match_score'], errors='coerce').fillna(0.0)
-                weight_sum = float(match_series.sum())
-                if weight_sum > 0:
-                    avg_z_score = float((z_scores * match_series).sum() / weight_sum)
-                else:
-                    avg_z_score = float(z_scores.mean())
-            else:
-                avg_z_score = float(z_scores.mean())
-                
-            z_min = z_scores.min()
-            z_max = z_scores.max()
+            # Robust z-score: median of top-N z values to reduce outlier risk while
+            # keeping a top-end performance signal.
+            z_scores = pd.to_numeric(group_df['z-Score'], errors='coerce').dropna()
+            if z_scores.empty:
+                continue
+            z_sorted = z_scores.sort_values(ascending=False).tolist()
+            top_slice = z_sorted[: max(1, min(_BEST_SELLER_TOP_N, len(z_sorted)))]
+            avg_z_score = float(pd.Series(top_slice, dtype=float).median())
+            z_min = float(min(z_sorted))
+            z_max = float(max(z_sorted))
             
             # Confidence score (uses z-score as primary factor)
             confidence = self._calculate_confidence_score(
@@ -2553,10 +2576,15 @@ class HTERecommender:
             
             recommendations.append(rec)
         
-        # Sort by match score (prioritizing intramolecular matches if query is intramolecular),
-        # then average z-score (primary performance metric), then confidence score.
+        # Sort by match relevance first, then robust z-score and support.
         recommendations.sort(
-            key=lambda x: (x.match_score, x.spectator_score, x.avg_z_score, x.confidence_score),
+            key=lambda x: (
+                x.match_score,
+                x.avg_z_score,
+                x.num_experiments,
+                x.confidence_score,
+                x.spectator_score,
+            ),
             reverse=True,
         )
 
