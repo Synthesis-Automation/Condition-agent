@@ -1,0 +1,63 @@
+FG token,Meaning (proposed),Notes / typical role
+Alkyl-B(OH)2,alkyl boronic acid (R–B(OH)2),Boronate nucleophile in Suzuki-type couplings.
+Alkyl-B(OR)2,alkyl boronate ester (R–B(OR)2),Boronate nucleophile in Suzuki-type couplings.
+Alkyl-BF3K,alkyl trifluoroborate (R–BF3K),Boronate nucleophile in Suzuki-type couplings.
+Alkyl-Br,alkyl bromide (R–Br),Electrophile (S_N2 / cross-coupling).
+Alkyl-Cl,alkyl chloride (R–Cl),Electrophile.
+Alkyl-H,aliphatic C–H (sp3 C–H),Reacting C–H partner in C–H activation/functionalization.
+Alkyl-H acidic,acidic aliphatic C–H (activated methylene / carbon acid),"e.g., malonates, β-dicarbonyls, barbiturates; used in “Arylation, acidic C–H” etc."
+Alkyl-I,alkyl iodide (R–I),Electrophile.
+Alkyl-M,alkyl organometallic (R–M),"Generic organometallic nucleophile (e.g., Zn/Mg/Li) used in Negishi/related."
+Alkyl-OH a-branch,α-branched alcohol (secondary/tertiary or hindered),O-nucleophile / substrate where the α-carbon is substituted.
+Alkyl-OH primary,primary alcohol (RCH2OH),O-nucleophile; also substrate for activation/deoxyfluorination.
+Alkyl-OSO2R,"alkyl sulfonate (alkyl–OSO2R; e.g., mesylate/tosylate/triflate)",Leaving group electrophile in substitutions/alkylations.
+Ar-H,aromatic C–H (alternate label),Same as ArH; naming inconsistency in the dataset.
+Ar2NH,diarylamine (Ar2NH),N-nucleophile in C–N couplings.
+ArB(OH)2,aryl boronic acid (Ar–B(OH)2),Boronate nucleophile in Suzuki-type couplings.
+ArB(OR)2,"aryl boronate ester (Ar–B(OR)2; e.g., Bpin)",Boronate nucleophile in Suzuki-type couplings.
+ArBF3K,aryl trifluoroborate (Ar–BF3K),Boronate nucleophile in Suzuki-type couplings.
+ArBr,aryl bromide (Ar–Br),"Typically electrophile in cross-couplings (e.g., Buchwald–Hartwig, Suzuki, Sonogashira)."
+ArCl,aryl chloride (Ar–Cl),Electrophile; generally less reactive than ArBr/ArI.
+ArF,aryl fluoride (Ar–F),Electrophile in S_NAr or special cross-couplings.
+ArH,aromatic C–H (Ar–H),Reacting aryl C–H partner in C–H activation/borylation.
+ArI,aryl iodide (Ar–I),Electrophile; generally more reactive than ArBr/ArCl.
+ArNH2,aniline-type primary aryl amine (Ar–NH2),N-nucleophile in C–N couplings.
+ArNHR,secondary aniline (Ar–NHR),N-nucleophile in C–N couplings.
+ArOH,phenol (Ar–OH),"O-nucleophile in C–O coupling, alkylation, etc."
+ArOSO2R,"aryl sulfonate (aryl–OSO2R; e.g., triflate/tosylate/mesylate)",Pseudohalide electrophile.
+Lactam,lactam (cyclic amide),Substrate feature (often N-acylated ring).
+Protecting Group,protecting group present,Coarse tag used for deprotection reactions; specific PG not disclosed.
+R2CNR,C=N-containing N-functional group (imine/amidine-like),Coarse tag for nitrogen nucleophiles with C=N motif; R denotes generic substituent.
+R2CO,ketone (R2C=O),Electrophile in condensations/reductions.
+R2NH,secondary amine (R2NH),N-nucleophile; R = generic carbon substituent.
+R2NH a-branch,α-branched secondary amine,Secondary amine with steric hindrance adjacent to N.
+R3N,tertiary amine (R3N),"Often base / nucleophile (e.g., salt formation) rather than coupling partner."
+RCH2PPh3X,phosphonium salt (RCH2–PPh3+ X−),Wittig reagent precursor; X = halide or similar counterion.
+RCHO,aldehyde (R–CHO),Electrophile in condensations/reductions/oxidations.
+RCN,nitrile (R–C≡N),Substrate feature; can be electrophile precursor / functional group in hydrolysis/additions etc.
+RCO2H or M,"carboxylic acid or carboxylate (R–CO2H or metal salt, M+)",Acid partner in amide coupling / salt formation / decarboxylative processes.
+RCO2R,ester (R–CO2R),Substrate feature; electrophile in some transformations; product feature in CC-coupling entries.
+RCONH2,primary amide (R–CONH2),Substrate feature / coupling partner in some transformations.
+RCONHR,secondary amide (R–CONHR),Substrate feature / nucleophile in some transformations.
+RNH2,primary amine (R–NH2),"N-nucleophile in C–N couplings, alkylations, etc. R = generic carbon substituent."
+RNH2 a-branch,α-branched primary amine,Primary amine where the carbon adjacent to N is substituted (sterically hindered).
+RNHNH2,hydrazine derivative (R–NH–NH2),N-nucleophile in condensations etc.
+ROC(O)NR2,carbamate / urethane (RO–C(=O)–NR2),Often present as substrate feature; can be N-nucleophile in some couplings/condensations.
+ROCSSR,xanthate / dithiocarbonate (RO–C(=S)–SR),Common radical handle; appears in oxidative fluorination subset.
+ROR,ether (R–O–R),Substrate feature; can act as protecting group or solvent-like handle.
+RSH,thiol (R–SH),S-nucleophile in C–S coupling or substitutions.
+RSO2Cl,sulfonyl chloride (R–SO2Cl),Electrophile for sulfonylation/condensation.
+RSO2F,sulfonyl fluoride (R–SO2F),Electrophile for SuFEx / sulfonylation-type chemistry.
+RSO2NHR,sulfonamide (R–SO2–NHR),N-nucleophile / substrate feature.
+RSnR3,organostannane (R–SnR3),Nucleophile in Stille-type chemistry / stannylation entries.
+Thiourea,thiourea motif (–NH–C(=S)–NH–),N/S-nucleophile / substrate feature.
+Urea,urea motif (–NH–C(=O)–NH–),N-nucleophile / substrate feature.
+alkene,alkene (C=C),"Reacting π-bond for additions, Heck, etc."
+alkene-Br,alkenyl bromide (vinyl bromide),Electrophile in cross-coupling.
+alkene-I,alkenyl iodide (vinyl iodide),Electrophile in cross-coupling.
+alkeneB(OR)2,alkenyl boronate ester (vinyl–B(OR)2),Boronate nucleophile in Suzuki-type couplings.
+alkyne,alkyne (C≡C),"Coupling partner (e.g., Sonogashira) or cyclizations."
+arene,arene (aromatic ring),Often substrate class in reductions/hydrogenations.
+arom. NH,aromatic N–H (heteroarene N–H; “pyrrolic” or similar),Nucleophile for N-alkylation/acylation etc.
+enolether,enol ether (vinyl ether),Electron-rich alkene used in condensations/derivatizations.
+hydrazide,acyl hydrazide (R–CONH–NH2 or related),N-nucleophile in condensations/derivatizations.

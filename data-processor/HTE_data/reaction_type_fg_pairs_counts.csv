@@ -1,0 +1,189 @@
+Reaction Type,FG_sorted_norm,count
+Activation,"Alkyl-OH a-branch, Alkyl-OH a-branch",240
+Addition,"Alkyl-H acidic, RCN",96
+Alkylation,"Alkyl-OSO2R, arom. NH",480
+Alkylation,"Alkyl-Cl, R2NH a-branch",192
+Alkylation,"Alkyl-Br, RCONHR",96
+Alkylation,"Alkyl-H acidic, ArBr",96
+Alkylation,"Alkyl-Cl, R3N",48
+Alkylation,"Alkyl-Br, R3N",24
+Alkylation,"Alkyl-Br, RNH2",24
+Alkylation,"Alkyl-I, R3N",24
+Amide coupling,"ArNH2, RCO2H or M",1488
+Amide coupling,"RCO2H or M, RNH2 a-branch",1056
+Amide coupling,"RCO2H or M, RNH2",384
+Amide coupling,"R2NH a-branch, RCO2H or M",336
+Amide coupling,"RCO2H or M, RCO2H or M",312
+Amide coupling,"RNH2, RNH2",192
+Amide coupling,"R2NH, RCO2H or M",96
+Amide coupling,"R2NH, RCO2R",96
+"Arylation, acidic C-H","Alkyl-H acidic, ArBr",3960
+"Arylation, acidic C-H","Alkyl-Br, Alkyl-H acidic",192
+"Borylation, C-H","ArH, ArH",120
+"Borylation, Miyaura","ArBr, ArBr",1402
+Buchwald-Hartwig,"ArBr, R2NH a-branch",2424
+Buchwald-Hartwig,"ArBr, RNH2 a-branch",2174
+Buchwald-Hartwig,"ArCl, RNH2 a-branch",2029
+Buchwald-Hartwig,"ArCl, ArNH2",2009
+Buchwald-Hartwig,"ArBr, R2NH",1674
+Buchwald-Hartwig,"ArBr, ArNH2",1499
+Buchwald-Hartwig,"ArBr, RNH2",1032
+Buchwald-Hartwig,"ArBr, arom. NH",924
+Buchwald-Hartwig,"ArCl, arom. NH",922
+Buchwald-Hartwig,"ArBr, Lactam",696
+Buchwald-Hartwig,"ArCl, R2NH",544
+Buchwald-Hartwig,"ArCl, RCONH2",504
+Buchwald-Hartwig,"ArCl, R2NH a-branch",480
+Buchwald-Hartwig,"ArBr, ArNHR",456
+Buchwald-Hartwig,"Ar2NH, ArBr",384
+Buchwald-Hartwig,"ArCl, ArNHR",384
+Buchwald-Hartwig,"ArBr, RCONH2",336
+Buchwald-Hartwig,"ArBr, Urea",318
+Buchwald-Hartwig,"ArBr, RCONHR",288
+Buchwald-Hartwig,"ArI, R2NH",240
+Buchwald-Hartwig,"ArOSO2R, RNH2",240
+Buchwald-Hartwig,"ArI, arom. NH",216
+Buchwald-Hartwig,"ArOH, RNH2 a-branch",216
+Buchwald-Hartwig,"ArCl, Lactam",192
+Buchwald-Hartwig,"ArI, ArNHR",192
+Buchwald-Hartwig,"ArCl, RNH2",153
+Buchwald-Hartwig,"ArI, ArNH2",96
+Buchwald-Hartwig,"ArCl, R2CNR",48
+Buchwald-Hartwig,"ArBr, R2CNR",24
+CC-Coupling,"ArCl, ArCl",312
+CC-Coupling,"ArBr, RCO2R",176
+CC-Coupling,"ArBr, ArBr",96
+CC-Coupling,"ArI, RCO2R",96
+CH-Activation,"ArBr, ArH",672
+CH-Activation,"Ar-H, ArI",384
+CH-Activation,"Alkyl-H, Alkyl-H",312
+CH-Activation,"ArCl, ArH",312
+CH-Activation,"alkyne, ArH",264
+CH-Activation,"ArH, ArI",104
+CH-Activation,"RCONHR, RCONHR",96
+CH-Activation,"Ar-H, ArBr",72
+CH-Activation,"ArH, ArH",24
+CN-Coupling,"ArI, ROC(O)NR2",816
+CN-Coupling,"ArBr, arom. NH",366
+CN-Coupling,"ArBr, Urea",288
+CN-Coupling,"ArBr, RNH2",264
+CN-Coupling,"ArBr, ArBr",192
+CN-Coupling,"ArBr, ArNH2",192
+CN-Coupling,"ArBr, RCONHR",192
+CN-Coupling,"ArI, arom. NH",192
+CN-Coupling,"ArCl, R2NH",168
+CN-Coupling,"ArI, RNH2",144
+CN-Coupling,"ArBr, R2NH",120
+CN-Coupling,"ArBr, RNH2 a-branch",120
+CN-Coupling,"ArI, RNH2 a-branch",120
+CN-Coupling,"Alkyl-B(OH)2, Lactam",96
+CN-Coupling,"Alkyl-B(OH)2, arom. NH",96
+CN-Coupling,"ArBr, ArOH",96
+CN-Coupling,"ArBr, RSO2NHR",96
+CN-Coupling,"ArCl, RNH2 a-branch",96
+CN-Coupling,"ArI, R2NH",96
+CN-Coupling,"RCONHR, RCONHR",96
+CN-Coupling,"ArCl, arom. NH",48
+CN-Coupling,"Alkyl-Br, Lactam",24
+CO-Coupling,"ArBr, ArBr",771
+CO-Coupling,"Alkyl-OH a-branch, ArBr",600
+CO-Coupling,"ArBr, ArOH",432
+CO-Coupling,"ArI, ArOH",432
+CO-Coupling,"ArCl, ArCl",408
+CO-Coupling,"Alkyl-OH a-branch, ArI",120
+CO-Coupling,"ArI, ArI",120
+CO-Coupling,"alkyl-OH primary, ArBr",96
+CO-Coupling,"alkyl-OH primary, ArCl",96
+CO-Coupling,"Alkyl-OH a-branch, ArCl",48
+CS-Coupling,"ArBr, ArBr",72
+CS-Coupling,"ArBr, RSH",24
+CS-Coupling,"ArI, ArI",24
+Chlorination,"RCO2R, RCO2R",48
+Condensation,"ArNH2, RSO2Cl",432
+Condensation,"RCO2R, RNH2",312
+Condensation,"Lactam, RNH2",288
+Condensation,"Alkyl-Cl, RNH2",246
+Condensation,"R2NH a-branch, RCHO",216
+Condensation,"RCHO, Thiourea",126
+Condensation,"RCHO, RNH2 a-branch",120
+Condensation,"ArNH2, RSO2F",96
+Condensation,"RNH2 a-branch, ROC(O)NR2",96
+Condensation,"RNH2, ROR",96
+Condensation,"enolether, enolether",96
+Condensation,"hydrazide, hydrazide",96
+Cyanation,"ArBr, ArBr",264
+Cyclization,"ArBr, ArBr",672
+Cyclization,"R2NH, R2NH",192
+Cyclization,"RCO2H or M, RNHNH2",192
+Cyclization,"RCO2H or M, RCO2H or M",120
+Cyclization,"RCO2R, RCO2R",120
+Cyclization,"alkyne, ArBr",120
+Cyclization,"ArOH, ArOH",96
+Cyclization,"alkyne, alkyne",96
+Cyclization,"Alkyl-Cl, Lactam",24
+Cyclization,"RNH2, RNH2",24
+Dehydration,"RCONHR, RCONHR",192
+Deoxyfluorination,"Alkyl-OH a-branch, Alkyl-OH a-branch",48
+Deprotection,"Protecting Group, Protecting Group",840
+Deprotection,"R3N, R3N",96
+"Dimerization, reductive","ArOSO2R, ArOSO2R",192
+"Fluorination, oxidative","ArH, ArH",24
+"Fluorination, oxidative","ROCSSR, ROCSSR",24
+Glycosidation,"Alkyl-OH primary, RCO2R",192
+Heck,"alkene, ArCl",384
+Heck,"alkene, ArBr",312
+Hydration,"RCN, RCN",96
+Hydrodehalogenation,"ArCl, ArCl",216
+Hydrolysis,"ArBr, ArBr",408
+Hydrolysis,"RCN, RCN",120
+Hydrolysis,"ArCl, ArCl",96
+Mitsunobu,"ArOH, ArOH",120
+Negishi,"Alkyl-M, ArBr",432
+Negishi,"ArCl, ArCl",384
+Negishi,"Alkyl-M, ArCl",24
+"Negishi, in-situ","Alkyl-Br, ArBr",1008
+"Negishi, in-situ","Alkyl-I, ArBr",408
+"Negishi, in-situ","ArBr, ArBr",144
+"Negishi, in-situ","Alkyl-Br, ArCl",96
+"Negishi, in-situ","ArBr, ArCl",96
+Oxidation,"Alkyl-H acidic, Alkyl-H acidic",216
+Oxidation,"ArNH2, ArNH2",48
+Protection,"ArOH, ArOH",24
+Reduction,"alkene, alkene",24
+Reduction,"arene, arene",24
+SNAr,"Alkyl-OH a-branch, Lactam",216
+SNAr,"ArF, arom. NH",192
+SNAr,"Alkyl-OH a-branch, ArF",96
+SNAr,"ArF, RNH2",96
+SNAr,"ArBr, ArOH",24
+SNAr,"ArCl, RNH2 a-branch",24
+Salt formation,"RNH2, RNH2",216
+Salt formation,"R3N, R3N",180
+Sandmeyer,"ArNH2, ArNH2",96
+Sonogashira,"alkyne, ArBr",369
+Stannylation,"ArBr, RSnR3",192
+Stetter,"alkene, RCHO",288
+Suzuki-Miyaura,"ArB(OR)2, ArCl",2656
+Suzuki-Miyaura,"ArB(OR)2, ArBr",2282
+Suzuki-Miyaura,"ArB(OH)2, ArBr",2024
+Suzuki-Miyaura,"ArB(OH)2, ArCl",960
+Suzuki-Miyaura,"alkeneB(OR)2, ArBr",792
+Suzuki-Miyaura,"alkeneB(OR)2, ArCl",552
+Suzuki-Miyaura,"ArB(OR)2, ArI",528
+Suzuki-Miyaura,"Alkyl-B(OH)2, ArBr",312
+Suzuki-Miyaura,"ArBr, ArBr",312
+Suzuki-Miyaura,"ArBF3K, ArCl",240
+Suzuki-Miyaura,"Alkyl-B(OR)2, ArCl",192
+Suzuki-Miyaura,"alkene-Br, ArB(OH)2",192
+Suzuki-Miyaura,"Alkyl-BF3K, ArCl",96
+Suzuki-Miyaura,"ArB(OH)2, RCONHR",96
+Suzuki-Miyaura,"ArBF3K, ArBr",96
+Suzuki-Miyaura,"ArCl, ArCl",96
+Suzuki-Miyaura,"alkeneB(OR)2, ArI",96
+Suzuki-Miyaura,"Alkyl-B(OH)2, ArCl",24
+Suzuki-Miyaura,"Alkyl-B(OR)2, ArBr",24
+Suzuki-Miyaura,"ArBr, ArCl",24
+"Suzuki-Miyaura, in situ","ArBr, ArCl",912
+"Suzuki-Miyaura, in situ","ArBr, ArBr",288
+"Suzuki-Miyaura, in situ","alkene-I, ArBr",96
+Wittig,"R2CO, RCH2PPh3X",118

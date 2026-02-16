@@ -16,12 +16,12 @@ Scope: 10 reaction datasets, up to 100 rows per dataset (`920` reactions total).
 - unknown rate: `0.4500` (414 / 920)
 - unresolved rate: `0.5826` (536 / 920)
 
-2. Post taxonomy-alias pass (`results/reaction_coverage_discovery.10x100.post_taxonomy.json`)
+1. Post taxonomy-alias pass (`results/reaction_coverage_discovery.10x100.post_taxonomy.json`)
 
 - unknown rate: `0.2272` (209 / 920)
 - unresolved rate: `0.3783` (348 / 920)
 
-3. Post cluster-fix pass (`results/reaction_coverage_discovery.10x100.post_cluster_fixes.json`)
+1. Post cluster-fix pass (`results/reaction_coverage_discovery.10x100.post_cluster_fixes.json`)
 
 - unknown rate: `0.0424` (39 / 920)
 - unresolved rate: `0.2348` (216 / 920)
@@ -229,8 +229,8 @@ Top motifs currently outside reaction-slot taxonomy (weighted by unresolved coun
 - unresolved rate,
 - top cluster composition.
 
-3. Add stricter input validation/normalization before featurization for records that produce empty reacted and formed motifs.
-4. Only add new motifs/families when a cluster remains high-count after extraction + alias corrections.
+1. Add stricter input validation/normalization before featurization for records that produce empty reacted and formed motifs.
+2. Only add new motifs/families when a cluster remains high-count after extraction + alias corrections.
 
 ## Next Step (Motif-First on Routed Set)
 
