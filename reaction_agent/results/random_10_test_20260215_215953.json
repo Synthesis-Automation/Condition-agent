@@ -1,0 +1,1101 @@
+{
+  "timestamp": "20260215_215953",
+  "model": "gpt-4o",
+  "max_tokens": 3000,
+  "total_tested": 10,
+  "successful": 10,
+  "failed": 0,
+  "results": [
+    {
+      "reaction_id": "31-049-CAS-19587793",
+      "reaction_type": "Weinreb amide",
+      "success": true,
+      "mapping_confidence": 0.34137304264684215,
+      "mapping_ok": false,
+      "num_bond_changes": 0,
+      "overall_class": "nucleophilic_addition",
+      "tags": [],
+      "llm_confidence": 0.3,
+      "num_events": 1,
+      "num_warnings": 3,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "CCCCCCCCc1cc[c]([Mg][Br])cc1.CON(C)C(=O)CC[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1",
+          "rxn_smiles_clean": "CCCCCCCCc1ccc([Mg]Br)cc1.CON(C)C(=O)CC[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C>>CCCCCCCCc1ccc(C(=O)CC[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1",
+          "reactants_clean": [
+            "CCCCCCCCc1ccc([Mg]Br)cc1",
+            "CON(C)C(=O)CC[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C"
+          ],
+          "products_clean": [
+            "CCCCCCCCc1ccc(C(=O)CC[C@@H]2C[C@@H](O)CN2C(=O)OC(C)(C)C)cc1"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "Br[Mg][c:12]1[cH:11][cH:10][c:9]([CH2:8][CH2:7][CH2:6][CH2:5][CH2:4][CH2:3][CH2:2][CH3:1])[cH:31][cH:30]1.CON(C)[C:13](=[O:14])[CH2:15][CH2:16][C@@H:17]1[CH2:18][C@@H:19]([O:20][Si](C)(C)C(C)(C)C)[CH2:21][N:22]1[C:23](=[O:24])[O:25][C:26]([CH3:27])([CH3:28])[CH3:29]>>[CH3:1][CH2:2][CH2:3][CH2:4][CH2:5][CH2:6][CH2:7][CH2:8][c:9]1[cH:10][cH:11][c:12]([C:13](=[O:14])[CH2:15][CH2:16][C@@H:17]2[CH2:18][C@@H:19]([OH:20])[CH2:21][N:22]2[C:23](=[O:24])[O:25][C:26]([CH3:27])([CH3:28])[CH3:29])[cH:30][cH:31]1",
+          "mapping_qc": {
+            "ok": false,
+            "confidence": 0.34137304264684215,
+            "notes": [
+              "Low mapping confidence: 0.34"
+            ]
+          },
+          "bond_changes": [],
+          "reaction_center_atoms": [],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "nucleophilic_addition",
+          "tags": [],
+          "roles": {
+            "electrophile": "CCCCCCCCc1ccc([Mg]Br)cc1",
+            "nucleophile": "CON(C)C(=O)CC[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C",
+            "leaving_group": "[Mg]Br"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "addition",
+              "bond_change_refs": [],
+              "short_rationale": "Nucleophilic addition of the Grignard reagent to the carbonyl group of the amide.",
+              "confidence": 0.3
+            }
+          ],
+          "mechanism_summary": [
+            "The Grignard reagent, CCCCCCCCc1ccc([Mg]Br)cc1, acts as a nucleophile.",
+            "It attacks the carbonyl group of the amide, CON(C)C(=O)CC[C@@H]1C[C@@H](O[Si](C)(C)C(C)(C)C)CN1C(=O)OC(C)(C)C, resulting in addition and formation of the new product."
+          ],
+          "warnings": [
+            "Low mapping confidence: 0.34",
+            "No bond changes detected, which may indicate incomplete data or an error in the reaction description.",
+            "mapping_failed"
+          ],
+          "confidence": 0.3
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1509,
+          "prompt_tokens": 1169,
+          "completion_tokens": 340,
+          "latency_ms": 3626.8467999761924,
+          "temperature": 0.0
+        }
+      }
+    },
+    {
+      "reaction_id": "31-173-CAS-18125986",
+      "reaction_type": "Bucherer–Bergs",
+      "success": true,
+      "mapping_confidence": 0.14256203583763757,
+      "mapping_ok": false,
+      "num_bond_changes": 0,
+      "overall_class": "condensation",
+      "tags": [],
+      "llm_confidence": 0.2,
+      "num_events": 1,
+      "num_warnings": 3,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "N#[C][Na].N.O=C(O)O.CCOc1ccc(C(C)=O)cc1>>CCOc1ccc(C2(C)NC(=O)NC2=O)cc1",
+          "rxn_smiles_clean": "N#C[Na].N.O=C(O)O.CCOc1ccc(C(C)=O)cc1>>CCOc1ccc(C2(C)NC(=O)NC2=O)cc1",
+          "reactants_clean": [
+            "N#C[Na]",
+            "N",
+            "O=C(O)O",
+            "CCOc1ccc(C(C)=O)cc1"
+          ],
+          "products_clean": [
+            "CCOc1ccc(C2(C)NC(=O)NC2=O)cc1"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "O=[C:8]([c:7]1[cH:6][cH:5][c:4]([O:3][CH2:2][CH3:1])[cH:17][cH:16]1)[CH3:9].[NH3:10].[Na][C:11]#[N:13].O=[C:14]([OH:12])[OH:15]>>[CH3:1][CH2:2][O:3][c:4]1[cH:5][cH:6][c:7]([C:8]2([CH3:9])[NH:10][C:11](=[O:12])[NH:13][C:14]2=[O:15])[cH:16][cH:17]1",
+          "mapping_qc": {
+            "ok": false,
+            "confidence": 0.14256203583763757,
+            "notes": [
+              "Low mapping confidence: 0.14"
+            ]
+          },
+          "bond_changes": [],
+          "reaction_center_atoms": [],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "condensation",
+          "tags": [],
+          "roles": {
+            "electrophile": "O=C(O)O",
+            "nucleophile": "N",
+            "leaving_group": "H2O"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "condensation",
+              "bond_change_refs": [],
+              "short_rationale": "Formation of an amide linkage through the reaction of an amine with a carboxylic acid derivative, resulting in the formation of water as a byproduct.",
+              "confidence": 0.3
+            }
+          ],
+          "mechanism_summary": [
+            "The amine nucleophile attacks the carbonyl carbon of the carboxylic acid, leading to the formation of an amide bond.",
+            "Water is eliminated as a leaving group during the formation of the amide linkage."
+          ],
+          "warnings": [
+            "Low mapping confidence: 0.14",
+            "No bond changes detected; reaction analysis based on general chemical knowledge.",
+            "mapping_failed"
+          ],
+          "confidence": 0.2
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1133,
+          "prompt_tokens": 893,
+          "completion_tokens": 240,
+          "latency_ms": 3168.5580000048503,
+          "temperature": 0.0
+        }
+      }
+    },
+    {
+      "reaction_id": "31-330-CAS-10233286",
+      "reaction_type": "Aldol (classic & Mukaiyama)",
+      "success": true,
+      "mapping_confidence": 0.915662593215772,
+      "mapping_ok": true,
+      "num_bond_changes": 4,
+      "overall_class": "nucleophilic_addition",
+      "tags": [],
+      "llm_confidence": 0.9,
+      "num_events": 2,
+      "num_warnings": 0,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "COC(=O)C(C)=O.C=C(O[Si](C)(C)C)c1ccc(OC)cc1>>COC(=O)[C@](C)(O)CC(=O)c1ccc(OC)cc1",
+          "rxn_smiles_clean": "COC(=O)C(C)=O.C=C(O[Si](C)(C)C)c1ccc(OC)cc1>>COC(=O)[C@](C)(O)CC(=O)c1ccc(OC)cc1",
+          "reactants_clean": [
+            "COC(=O)C(C)=O",
+            "C=C(O[Si](C)(C)C)c1ccc(OC)cc1"
+          ],
+          "products_clean": [
+            "COC(=O)[C@](C)(O)CC(=O)c1ccc(OC)cc1"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "C[Si](C)(C)[O:10][C:9](=[CH2:8])[c:11]1[cH:12][cH:13][c:14]([O:15][CH3:16])[cH:17][cH:18]1.[CH3:1][O:2][C:3](=[O:4])[C:5]([CH3:6])=[O:7]>>[CH3:1][O:2][C:3](=[O:4])[C@:5]([CH3:6])([OH:7])[CH2:8][C:9](=[O:10])[c:11]1[cH:12][cH:13][c:14]([O:15][CH3:16])[cH:17][cH:18]1",
+          "mapping_qc": {
+            "ok": true,
+            "confidence": 0.915662593215772,
+            "notes": []
+          },
+          "bond_changes": [
+            {
+              "id": "BC1",
+              "change": "formed",
+              "a1": 5,
+              "a2": 8,
+              "bond": "single"
+            },
+            {
+              "id": "BC2",
+              "change": "order_change",
+              "a1": 9,
+              "a2": 10,
+              "bond": "single->double"
+            },
+            {
+              "id": "BC3",
+              "change": "order_change",
+              "a1": 5,
+              "a2": 7,
+              "bond": "double->single"
+            },
+            {
+              "id": "BC4",
+              "change": "order_change",
+              "a1": 8,
+              "a2": 9,
+              "bond": "double->single"
+            }
+          ],
+          "reaction_center_atoms": [
+            5,
+            7,
+            8,
+            9,
+            10
+          ],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "nucleophilic_addition",
+          "tags": [],
+          "roles": {
+            "electrophile": "C=C(O[Si](C)(C)C)c1ccc(OC)cc1",
+            "nucleophile": "COC(=O)C(C)=O",
+            "leaving_group": "O[Si](C)(C)C"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "bond_formation",
+              "bond_change_refs": [
+                "BC1"
+              ],
+              "short_rationale": "A new single bond is formed between the carbon of the electrophile and the nucleophile, indicating a nucleophilic addition.",
+              "confidence": 0.9
+            },
+            {
+              "event_id": "E2",
+              "event_type": "bond_order_change",
+              "bond_change_refs": [
+                "BC2",
+                "BC3",
+                "BC4"
+              ],
+              "short_rationale": "The carbonyl group of the nucleophile undergoes a change in bonding, reflecting the addition to a carbonyl structure.",
+              "confidence": 0.8
+            }
+          ],
+          "mechanism_summary": [
+            "The nucleophile attacks the electrophilic carbon of the carbonyl group, forming a new C-C bond.",
+            "Concurrent rearrangement and bond order changes, including conversion of a double bond to a single bond, stabilize the addition product."
+          ],
+          "warnings": [],
+          "confidence": 0.9
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1315,
+          "prompt_tokens": 992,
+          "completion_tokens": 323,
+          "latency_ms": 2849.758299998939,
+          "temperature": 0.0
+        }
+      }
+    },
+    {
+      "reaction_id": "31-614-CAS-40565576",
+      "reaction_type": "Groebke–Blackburn–Bienaymé",
+      "success": true,
+      "mapping_confidence": 0.9943418725010603,
+      "mapping_ok": true,
+      "num_bond_changes": 4,
+      "overall_class": "rearrangement",
+      "tags": [],
+      "llm_confidence": 0.9,
+      "num_events": 2,
+      "num_warnings": 0,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "Cc1ncc(CO)c2c(Nc3ccccn3)c(NC(C)(C)CC(C)(C)C)oc12>>Cc1ncc(CO)c2c1oc1nnn(-c3ccccn3)c12",
+          "rxn_smiles_clean": "Cc1ncc(CO)c2c(Nc3ccccn3)c(NC(C)(C)CC(C)(C)C)oc12>>Cc1ncc(CO)c2c1oc1nnn(-c3ccccn3)c12",
+          "reactants_clean": [
+            "Cc1ncc(CO)c2c(Nc3ccccn3)c(NC(C)(C)CC(C)(C)C)oc12"
+          ],
+          "products_clean": [
+            "Cc1ncc(CO)c2c1oc1nnn(-c3ccccn3)c12"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "CC(C)(C)CC(C)(C)[NH:12][c:11]1[o:10][c:9]2[c:2]([CH3:1])[n:3][cH:4][c:5]([CH2:6][OH:7])[c:8]2[c:21]1[NH:14][c:15]1[cH:16][cH:17][cH:18][cH:19][n:20]1>>[CH3:1][c:2]1[n:3][cH:4][c:5]([CH2:6][OH:7])[c:8]2[c:9]1[o:10][c:11]1[n:12][n:13][n:14](-[c:15]3[cH:16][cH:17][cH:18][cH:19][n:20]3)[c:21]21",
+          "mapping_qc": {
+            "ok": true,
+            "confidence": 0.9943418725010603,
+            "notes": []
+          },
+          "bond_changes": [
+            {
+              "id": "BC1",
+              "change": "formed",
+              "a1": 12,
+              "a2": 13,
+              "bond": "aromatic"
+            },
+            {
+              "id": "BC2",
+              "change": "formed",
+              "a1": 13,
+              "a2": 14,
+              "bond": "aromatic"
+            },
+            {
+              "id": "BC3",
+              "change": "order_change",
+              "a1": 14,
+              "a2": 21,
+              "bond": "single->aromatic"
+            },
+            {
+              "id": "BC4",
+              "change": "order_change",
+              "a1": 11,
+              "a2": 12,
+              "bond": "single->aromatic"
+            }
+          ],
+          "reaction_center_atoms": [
+            11,
+            12,
+            13,
+            14,
+            21
+          ],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "rearrangement",
+          "tags": [],
+          "roles": {
+            "electrophile": "N/A",
+            "nucleophile": "N/A",
+            "leaving_group": "N/A"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "bond_formation",
+              "bond_change_refs": [
+                "BC1",
+                "BC2"
+              ],
+              "short_rationale": "Formation of two new aromatic bonds between atoms :12, :13, and :14 indicating a rearrangement into a triazole moiety.",
+              "confidence": 0.9
+            },
+            {
+              "event_id": "E2",
+              "event_type": "bond_order_change",
+              "bond_change_refs": [
+                "BC3",
+                "BC4"
+              ],
+              "short_rationale": "Change in bond order suggests the formation of a heteroaromatic system involving atoms :11 and :21.",
+              "confidence": 0.9
+            }
+          ],
+          "mechanism_summary": [
+            "The initial step involves the formation of two new bonds between atoms :12 and :13, and :13 and :14, leading to a triazole ring formation.",
+            "Subsequently, bond order changes around the reaction center facilitate the establishment of a stable heteroaromatic system."
+          ],
+          "warnings": [],
+          "confidence": 0.9
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1321,
+          "prompt_tokens": 1019,
+          "completion_tokens": 302,
+          "latency_ms": 4893.638799956534,
+          "temperature": 0.0
+        }
+      }
+    },
+    {
+      "reaction_id": "31-467-CAS-7506303",
+      "reaction_type": "Fischer indole synthesis",
+      "success": true,
+      "mapping_confidence": 0.7391359747238481,
+      "mapping_ok": true,
+      "num_bond_changes": 4,
+      "overall_class": "rearrangement",
+      "tags": [
+        "Aromatic Reorganization"
+      ],
+      "llm_confidence": 0.7,
+      "num_events": 1,
+      "num_warnings": 1,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "COc1ccc(NN=C2CCOc3cc(C)c(C)cc3C2=O)cc1>>COc1ccc2[nH]c3c(c2c1)COc1cc(C)c(C)cc1C3=O",
+          "rxn_smiles_clean": "COc1ccc(NN=C2CCOc3cc(C)c(C)cc3C2=O)cc1>>COc1ccc2[nH]c3c(c2c1)COc1cc(C)c(C)cc1C3=O",
+          "reactants_clean": [
+            "COc1ccc(NN=C2CCOc3cc(C)c(C)cc3C2=O)cc1"
+          ],
+          "products_clean": [
+            "COc1ccc2[nH]c3c(c2c1)COc1cc(C)c(C)cc1C3=O"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "N([c:6]1[cH:5][cH:4][c:3]([O:2][CH3:1])[cH:11][cH:10]1)[N:7]=[C:8]1[CH2:9][CH2:12][O:13][c:14]2[cH:15][c:16]([CH3:17])[c:18]([CH3:19])[cH:20][c:21]2[C:22]1=[O:23]>>[CH3:1][O:2][c:3]1[cH:4][cH:5][c:6]2[nH:7][c:8]3[c:9]([c:10]2[cH:11]1)[CH2:12][O:13][c:14]1[cH:15][c:16]([CH3:17])[c:18]([CH3:19])[cH:20][c:21]1[C:22]3=[O:23]",
+          "mapping_qc": {
+            "ok": true,
+            "confidence": 0.7391359747238481,
+            "notes": []
+          },
+          "bond_changes": [
+            {
+              "id": "BC1",
+              "change": "formed",
+              "a1": 6,
+              "a2": 7,
+              "bond": "aromatic"
+            },
+            {
+              "id": "BC2",
+              "change": "formed",
+              "a1": 9,
+              "a2": 10,
+              "bond": "aromatic"
+            },
+            {
+              "id": "BC3",
+              "change": "order_change",
+              "a1": 8,
+              "a2": 9,
+              "bond": "single->aromatic"
+            },
+            {
+              "id": "BC4",
+              "change": "order_change",
+              "a1": 7,
+              "a2": 8,
+              "bond": "double->aromatic"
+            }
+          ],
+          "reaction_center_atoms": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "rearrangement",
+          "tags": [
+            "Aromatic Reorganization"
+          ],
+          "roles": {
+            "electrophile": "N([c:6]1[cH:5][cH:4][c:3]([O:2][CH3:1])[cH:11][cH:10]1)[N:7]=[C:8]1[CH2:9][CH2:12][O:13][c:14]2[cH:15][c:16]([CH3:17])[c:18]([CH3:19])[cH:20][c:21]2[C:22]1=[O:23]",
+            "nucleophile": "[CH3:1][O:2][c:3]1[cH:4][cH:5][c:6]2[nH:7][c:8]3[c:9]([c:10]2[cH:11]1)[CH2:12][O:13][c:14]1[cH:15][c:16]([CH3:17])[c:18]([CH3:19])[cH:20][c:21]1[C:22]3=[O:23]",
+            "leaving_group": "None"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "rearrangement",
+              "bond_change_refs": [
+                "BC1",
+                "BC2",
+                "BC3",
+                "BC4"
+              ],
+              "short_rationale": "The reaction involves the reorganization of aromatic bonds leading to the formation of a new aromatic system through bond formation and order changes.",
+              "confidence": 0.7
+            }
+          ],
+          "mechanism_summary": [
+            "The reaction starts with the formation of a new bond between atoms 6 and 7, facilitating a rearrangement.",
+            "Subsequently, bond order changes between atoms 8-9 and 7-8 complete the formation of a new aromatic system."
+          ],
+          "warnings": [
+            "Mapping quality is moderate, suggesting some uncertainty in the precise atom movements during the rearrangement."
+          ],
+          "confidence": 0.7
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1522,
+          "prompt_tokens": 1045,
+          "completion_tokens": 477,
+          "latency_ms": 4609.280799981207,
+          "temperature": 0.0
+        }
+      }
+    },
+    {
+      "reaction_id": "31-119-CAS-1922889",
+      "reaction_type": "Electrophilic fluorination",
+      "success": true,
+      "mapping_confidence": 0.774985868766882,
+      "mapping_ok": true,
+      "num_bond_changes": 1,
+      "overall_class": "nucleophilic_addition",
+      "tags": [],
+      "llm_confidence": 0.774985868766882,
+      "num_events": 1,
+      "num_warnings": 0,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "CCOP(=O)(OCC)C1Cc2ccccc2C1=O>>CCOP(=O)(OCC)[C@@]1(F)Cc2ccccc2C1=O",
+          "rxn_smiles_clean": "CCOP(=O)(OCC)C1Cc2ccccc2C1=O>>CCOP(=O)(OCC)[C@@]1(F)Cc2ccccc2C1=O",
+          "reactants_clean": [
+            "CCOP(=O)(OCC)C1Cc2ccccc2C1=O"
+          ],
+          "products_clean": [
+            "CCOP(=O)(OCC)[C@@]1(F)Cc2ccccc2C1=O"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "[CH3:1][CH2:2][O:3][P:4](=[O:5])([O:6][CH2:7][CH3:8])[CH:9]1[CH2:11][c:12]2[cH:13][cH:14][cH:15][cH:16][c:17]2[C:18]1=[O:19]>>[CH3:1][CH2:2][O:3][P:4](=[O:5])([O:6][CH2:7][CH3:8])[C@@:9]1([F:10])[CH2:11][c:12]2[cH:13][cH:14][cH:15][cH:16][c:17]2[C:18]1=[O:19]",
+          "mapping_qc": {
+            "ok": true,
+            "confidence": 0.774985868766882,
+            "notes": []
+          },
+          "bond_changes": [
+            {
+              "id": "BC1",
+              "change": "formed",
+              "a1": 9,
+              "a2": 10,
+              "bond": "single"
+            }
+          ],
+          "reaction_center_atoms": [
+            9,
+            10
+          ],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "nucleophilic_addition",
+          "tags": [],
+          "roles": {
+            "electrophile": "carbonyl carbon in the cyclohexanone ring",
+            "nucleophile": "fluoride ion or similar nucleophile",
+            "leaving_group": "None"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "addition",
+              "bond_change_refs": [
+                "BC1"
+              ],
+              "short_rationale": "Formation of a new C-F bond indicating the addition of a fluorine atom to the carbon adjacent to the carbonyl group.",
+              "confidence": 0.774985868766882
+            }
+          ],
+          "mechanism_summary": [
+            "A nucleophilic addition occurs where a fluorine atom adds to the carbon adjacent to the carbonyl group, forming a new C-F bond."
+          ],
+          "warnings": [],
+          "confidence": 0.774985868766882
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1117,
+          "prompt_tokens": 906,
+          "completion_tokens": 211,
+          "latency_ms": 3400.611700024456,
+          "temperature": 0.0
+        }
+      }
+    },
+    {
+      "reaction_id": "31-170-CAS-948982",
+      "reaction_type": "C_O_Coupling",
+      "success": true,
+      "mapping_confidence": 0.9690910283375656,
+      "mapping_ok": true,
+      "num_bond_changes": 1,
+      "overall_class": "nucleophilic_substitution",
+      "tags": [
+        "SNAr"
+      ],
+      "llm_confidence": 0.9690910283375656,
+      "num_events": 1,
+      "num_warnings": 0,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "N#Cc1ccc(O)cc1.O=Cc1c(F)cccc1Br>>N#Cc1ccc(Oc2cccc(Br)c2C=O)cc1",
+          "rxn_smiles_clean": "N#Cc1ccc(O)cc1.O=Cc1c(F)cccc1Br>>N#Cc1ccc(Oc2cccc(Br)c2C=O)cc1",
+          "reactants_clean": [
+            "N#Cc1ccc(O)cc1",
+            "O=Cc1c(F)cccc1Br"
+          ],
+          "products_clean": [
+            "N#Cc1ccc(Oc2cccc(Br)c2C=O)cc1"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "[N:1]#[C:2][c:3]1[cH:4][cH:5][c:6]([OH:7])[cH:17][cH:18]1.F[c:8]1[cH:9][cH:10][cH:11][c:12]([Br:13])[c:14]1[CH:15]=[O:16]>>[N:1]#[C:2][c:3]1[cH:4][cH:5][c:6]([O:7][c:8]2[cH:9][cH:10][cH:11][c:12]([Br:13])[c:14]2[CH:15]=[O:16])[cH:17][cH:18]1",
+          "mapping_qc": {
+            "ok": true,
+            "confidence": 0.9690910283375656,
+            "notes": []
+          },
+          "bond_changes": [
+            {
+              "id": "BC1",
+              "change": "formed",
+              "a1": 7,
+              "a2": 8,
+              "bond": "single"
+            }
+          ],
+          "reaction_center_atoms": [
+            7,
+            8
+          ],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "nucleophilic_substitution",
+          "tags": [
+            "SNAr"
+          ],
+          "roles": {
+            "electrophile": "O=Cc1c(F)cccc1Br",
+            "nucleophile": "N#Cc1ccc(O)cc1",
+            "leaving_group": "F"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "bond_formation",
+              "bond_change_refs": [
+                "BC1"
+              ],
+              "short_rationale": "A single bond is formed between the oxygen atom of the phenol (nucleophile) and the aromatic ring carbon of the aryl bromide (electrophile), indicating a nucleophilic aromatic substitution (SNAr) reaction.",
+              "confidence": 0.95
+            }
+          ],
+          "mechanism_summary": [
+            "The nucleophilic phenol attacks the aromatic carbon of the aryl bromide, displacing the fluorine atom via an SNAr mechanism.",
+            "The newly formed bond results in the substitution of the fluorine by the phenoxy group on the aromatic ring."
+          ],
+          "warnings": [],
+          "confidence": 0.9690910283375656
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1150,
+          "prompt_tokens": 890,
+          "completion_tokens": 260,
+          "latency_ms": 2678.5044000134803,
+          "temperature": 0.0
+        }
+      }
+    },
+    {
+      "reaction_id": "31-243-CAS-2793736",
+      "reaction_type": "Birch reduction",
+      "success": true,
+      "mapping_confidence": 0.7195084426027564,
+      "mapping_ok": true,
+      "num_bond_changes": 14,
+      "overall_class": "rearrangement",
+      "tags": [
+        "aromatic_rearrangement"
+      ],
+      "llm_confidence": 0.7,
+      "num_events": 2,
+      "num_warnings": 1,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "c1ccc2c(CCc3c[nH]c4ccccc34)c[nH]c2c1>>c1[nH]c2c(c1CCc1c[nH]c3c1CCCC3)CCCC2",
+          "rxn_smiles_clean": "c1ccc2c(CCc3c[nH]c4ccccc34)c[nH]c2c1>>c1[nH]c2c(c1CCc1c[nH]c3c1CCCC3)CCCC2",
+          "reactants_clean": [
+            "c1ccc2c(CCc3c[nH]c4ccccc34)c[nH]c2c1"
+          ],
+          "products_clean": [
+            "c1[nH]c2c(c1CCc1c[nH]c3c1CCCC3)CCCC2"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "[cH:1]1[nH:2][c:3]2[c:4]([c:5]1[CH2:6][CH2:7][c:8]1[cH:9][nH:10][c:12]3[c:11]1[cH:16][cH:15][cH:14][cH:13]3)[cH:17][cH:18][cH:19][cH:20]2>>[cH:1]1[nH:2][c:3]2[c:4]([c:5]1[CH2:6][CH2:7][c:8]1[cH:9][nH:10][c:11]3[c:12]1[CH2:13][CH2:14][CH2:15][CH2:16]3)[CH2:17][CH2:18][CH2:19][CH2:20]2",
+          "mapping_qc": {
+            "ok": true,
+            "confidence": 0.7195084426027564,
+            "notes": []
+          },
+          "bond_changes": [
+            {
+              "id": "BC1",
+              "change": "broken",
+              "a1": 10,
+              "a2": 12,
+              "bond": "aromatic"
+            },
+            {
+              "id": "BC2",
+              "change": "broken",
+              "a1": 8,
+              "a2": 11,
+              "bond": "aromatic"
+            },
+            {
+              "id": "BC3",
+              "change": "formed",
+              "a1": 10,
+              "a2": 11,
+              "bond": "aromatic"
+            },
+            {
+              "id": "BC4",
+              "change": "formed",
+              "a1": 8,
+              "a2": 12,
+              "bond": "aromatic"
+            },
+            {
+              "id": "BC5",
+              "change": "order_change",
+              "a1": 12,
+              "a2": 13,
+              "bond": "aromatic->single"
+            },
+            {
+              "id": "BC6",
+              "change": "order_change",
+              "a1": 17,
+              "a2": 18,
+              "bond": "aromatic->single"
+            },
+            {
+              "id": "BC7",
+              "change": "order_change",
+              "a1": 13,
+              "a2": 14,
+              "bond": "aromatic->single"
+            },
+            {
+              "id": "BC8",
+              "change": "order_change",
+              "a1": 18,
+              "a2": 19,
+              "bond": "aromatic->single"
+            },
+            {
+              "id": "BC9",
+              "change": "order_change",
+              "a1": 4,
+              "a2": 17,
+              "bond": "aromatic->single"
+            },
+            {
+              "id": "BC10",
+              "change": "order_change",
+              "a1": 14,
+              "a2": 15,
+              "bond": "aromatic->single"
+            },
+            {
+              "id": "BC11",
+              "change": "order_change",
+              "a1": 11,
+              "a2": 16,
+              "bond": "aromatic->single"
+            },
+            {
+              "id": "BC12",
+              "change": "order_change",
+              "a1": 19,
+              "a2": 20,
+              "bond": "aromatic->single"
+            },
+            {
+              "id": "BC13",
+              "change": "order_change",
+              "a1": 15,
+              "a2": 16,
+              "bond": "aromatic->single"
+            },
+            {
+              "id": "BC14",
+              "change": "order_change",
+              "a1": 3,
+              "a2": 20,
+              "bond": "aromatic->single"
+            }
+          ],
+          "reaction_center_atoms": [
+            3,
+            4,
+            8,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "rearrangement",
+          "tags": [
+            "aromatic_rearrangement"
+          ],
+          "roles": {
+            "electrophile": "N/A",
+            "nucleophile": "N/A",
+            "leaving_group": "N/A"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "rearrangement",
+              "bond_change_refs": [
+                "BC1",
+                "BC2",
+                "BC3",
+                "BC4"
+              ],
+              "short_rationale": "Aromatic bond rearrangement involving the breaking and forming of bonds within the naphthalene-like structure.",
+              "confidence": 0.7
+            },
+            {
+              "event_id": "E2",
+              "event_type": "bond_order_change",
+              "bond_change_refs": [
+                "BC5",
+                "BC6",
+                "BC7",
+                "BC8",
+                "BC9",
+                "BC10",
+                "BC11",
+                "BC12",
+                "BC13",
+                "BC14"
+              ],
+              "short_rationale": "Conversion of aromatic bonds to single bonds indicating a transition from an aromatic to an aliphatic structure.",
+              "confidence": 0.7
+            }
+          ],
+          "mechanism_summary": [
+            "The initial step involves a rearrangement of aromatic bonds where bonds within the naphthalene-like structure are reorganized.",
+            "Subsequently, multiple aromatic bonds are converted into single bonds, resulting in the formation of a cyclohexane-like structure."
+          ],
+          "warnings": [
+            "The mapping quality confidence is moderate, suggesting potential uncertainty in atom mapping and reaction interpretation."
+          ],
+          "confidence": 0.7
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1590,
+          "prompt_tokens": 1238,
+          "completion_tokens": 352,
+          "latency_ms": 4131.677799974568,
+          "temperature": 0.0
+        }
+      }
+    },
+    {
+      "reaction_id": "31-367-CAS-8556291",
+      "reaction_type": "Staudinger reduction",
+      "success": true,
+      "mapping_confidence": 0.003592608785811753,
+      "mapping_ok": false,
+      "num_bond_changes": 0,
+      "overall_class": "condensation",
+      "tags": [],
+      "llm_confidence": 0.2,
+      "num_events": 1,
+      "num_warnings": 3,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "C[C@@H](C(=O)OCc1ccc(OCCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)cc1)[C@H](N=[N+]=[N-])c1ccccc1.CC(C)C[C@H](N=[N+]=[N-])[C@H](C)C(=O)O>>CC(C)C[C@H](N=[N+]=[N-])[C@H](C)C(=O)N[C@H](c1ccccc1)[C@@H](C)C(=O)OCc1ccc(OCCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)cc1",
+          "rxn_smiles_clean": "C[C@@H](C(=O)OCc1ccc(OCCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)cc1)[C@H](N=[N+]=[N-])c1ccccc1.CC(C)C[C@H](N=[N+]=[N-])[C@H](C)C(=O)O>>CC(C)C[C@H](N=[N+]=[N-])[C@H](C)C(=O)N[C@H](c1ccccc1)[C@@H](C)C(=O)OCc1ccc(OCCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)cc1",
+          "reactants_clean": [
+            "C[C@@H](C(=O)OCc1ccc(OCCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)cc1)[C@H](N=[N+]=[N-])c1ccccc1",
+            "CC(C)C[C@H](N=[N+]=[N-])[C@H](C)C(=O)O"
+          ],
+          "products_clean": [
+            "CC(C)C[C@H](N=[N+]=[N-])[C@H](C)C(=O)N[C@H](c1ccccc1)[C@@H](C)C(=O)OCc1ccc(OCCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)cc1"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "O[C:11]([C@H:9]([C@H:5]([CH2:4][CH:2]([CH3:1])[CH3:3])[N:6]=[N+:7]=[N-:8])[CH3:10])=[O:12].[N-]=[N+]=[N:13][C@H:14]([c:15]1[cH:16][cH:17][cH:18][cH:19][cH:20]1)[C@@H:21]([CH3:22])[C:23](=[O:24])[O:25][CH2:26][c:27]1[cH:28][cH:29][c:30]([O:31][CH2:32][CH2:33][CH2:34][C:35]([F:36])([F:37])[C:38]([F:39])([F:40])[C:41]([F:42])([F:43])[C:44]([F:45])([F:46])[C:47]([F:48])([F:49])[C:50]([F:51])([F:52])[C:53]([F:54])([F:55])[C:56]([F:57])([F:58])[F:59])[cH:60][cH:61]1>>[CH3:1][CH:2]([CH3:3])[CH2:4][C@H:5]([N:6]=[N+:7]=[N-:8])[C@H:9]([CH3:10])[C:11](=[O:12])[NH:13][C@H:14]([c:15]1[cH:16][cH:17][cH:18][cH:19][cH:20]1)[C@@H:21]([CH3:22])[C:23](=[O:24])[O:25][CH2:26][c:27]1[cH:28][cH:29][c:30]([O:31][CH2:32][CH2:33][CH2:34][C:35]([F:36])([F:37])[C:38]([F:39])([F:40])[C:41]([F:42])([F:43])[C:44]([F:45])([F:46])[C:47]([F:48])([F:49])[C:50]([F:51])([F:52])[C:53]([F:54])([F:55])[C:56]([F:57])([F:58])[F:59])[cH:60][cH:61]1",
+          "mapping_qc": {
+            "ok": false,
+            "confidence": 0.003592608785811753,
+            "notes": [
+              "Low mapping confidence: 0.00"
+            ]
+          },
+          "bond_changes": [],
+          "reaction_center_atoms": [],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "condensation",
+          "tags": [],
+          "roles": {
+            "electrophile": "C[C@@H](C(=O)OCc1ccc(OCCCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F)cc1)[C@H](N=[N+]=[N-])c1ccccc1",
+            "nucleophile": "CC(C)C[C@H](N=[N+]=[N-])[C@H](C)C(=O)O",
+            "leaving_group": "N2"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "condensation",
+              "bond_change_refs": [],
+              "short_rationale": "Formation of an amide bond between the carboxyl group of one molecule and the amine group of another, although bond changes are not explicitly detected.",
+              "confidence": 0.2
+            }
+          ],
+          "mechanism_summary": [
+            "The carboxyl group of the ester reacts with the amine group from the other molecule.",
+            "An amide bond is formed through a condensation reaction, likely eliminating N2 gas."
+          ],
+          "warnings": [
+            "Low mapping confidence: 0.00",
+            "No bond changes detected in the analysis.",
+            "mapping_failed"
+          ],
+          "confidence": 0.2
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1986,
+          "prompt_tokens": 1661,
+          "completion_tokens": 325,
+          "latency_ms": 4145.196099998429,
+          "temperature": 0.0
+        }
+      }
+    },
+    {
+      "reaction_id": "31-452-CAS-4826074",
+      "reaction_type": "Beckmann rearrangement",
+      "success": true,
+      "mapping_confidence": 0.9817592952291362,
+      "mapping_ok": true,
+      "num_bond_changes": 2,
+      "overall_class": "nucleophilic_addition",
+      "tags": [],
+      "llm_confidence": 0.9817592952291362,
+      "num_events": 1,
+      "num_warnings": 0,
+      "full_result": {
+        "schema_version": "reaction_analysis.v1",
+        "input": {
+          "rxn_smiles_raw": "COc1ccc(CO)cc1OC>>COc1ccc(C(N)=O)cc1OC",
+          "rxn_smiles_clean": "COc1ccc(CO)cc1OC>>COc1ccc(C(N)=O)cc1OC",
+          "reactants_clean": [
+            "COc1ccc(CO)cc1OC"
+          ],
+          "products_clean": [
+            "COc1ccc(C(N)=O)cc1OC"
+          ],
+          "spectators": [],
+          "parse_warnings": [],
+          "standardization_actions": []
+        },
+        "tool_facts": {
+          "mapped_rxn_smiles": "[CH3:1][O:2][c:3]1[cH:4][cH:5][c:6]([CH2:7][OH:9])[cH:10][c:11]1[O:12][CH3:13]>>[CH3:1][O:2][c:3]1[cH:4][cH:5][c:6]([C:7]([NH2:8])=[O:9])[cH:10][c:11]1[O:12][CH3:13]",
+          "mapping_qc": {
+            "ok": true,
+            "confidence": 0.9817592952291362,
+            "notes": []
+          },
+          "bond_changes": [
+            {
+              "id": "BC1",
+              "change": "formed",
+              "a1": 7,
+              "a2": 8,
+              "bond": "single"
+            },
+            {
+              "id": "BC2",
+              "change": "order_change",
+              "a1": 7,
+              "a2": 9,
+              "bond": "single->double"
+            }
+          ],
+          "reaction_center_atoms": [
+            7,
+            8,
+            9
+          ],
+          "bond_change_warnings": []
+        },
+        "interpretation": {
+          "overall_class": "nucleophilic_addition",
+          "tags": [],
+          "roles": {
+            "electrophile": "COc1ccc(C=O)cc1OC",
+            "nucleophile": "NH3",
+            "leaving_group": "None"
+          },
+          "events": [
+            {
+              "event_id": "E1",
+              "event_type": "bond_formation",
+              "bond_change_refs": [
+                "BC1",
+                "BC2"
+              ],
+              "short_rationale": "A nucleophilic addition occurs where the nitrogen atom (:8) forms a bond with the carbon atom (:7) of the carbonyl group, resulting in a new C-N bond (BC1) and the conversion of the C=O double bond to a C=N double bond (BC2).",
+              "confidence": 0.98
+            }
+          ],
+          "mechanism_summary": [
+            "The nucleophile, likely an amine or ammonia equivalent, attacks the carbonyl carbon (:7), forming a new C-N bond.",
+            "The carbonyl oxygen (:9) is converted from a double to a single bond, while the C-N bond is subsequently transformed into a double bond, completing the formation of an amide linkage."
+          ],
+          "warnings": [],
+          "confidence": 0.9817592952291362
+        },
+        "metadata": {
+          "model": "gpt-4o-2024-08-06",
+          "provider": "openai",
+          "total_tokens": 1108,
+          "prompt_tokens": 824,
+          "completion_tokens": 284,
+          "latency_ms": 5518.345799995586,
+          "temperature": 0.0
+        }
+      }
+    }
+  ]
+}
