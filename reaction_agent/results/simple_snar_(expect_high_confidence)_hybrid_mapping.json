@@ -1,0 +1,45 @@
+{
+  "rxn_smiles": "Clc1nc2ccccc2s1.Cn1ccnc1>>CN1C=C[N+](C2=NC3=CC=CC=C3S2)=C1",
+  "deterministic_result": {
+    "input": {
+      "rxn_smiles_raw": "Clc1nc2ccccc2s1.Cn1ccnc1>>CN1C=C[N+](C2=NC3=CC=CC=C3S2)=C1",
+      "rxn_smiles_clean": "Clc1nc2ccccc2s1.Cn1ccnc1>>Cn1cc[n+](-c2nc3ccccc3s2)c1",
+      "reactants_clean": [
+        "Clc1nc2ccccc2s1",
+        "Cn1ccnc1"
+      ],
+      "products_clean": [
+        "Cn1cc[n+](-c2nc3ccccc3s2)c1"
+      ],
+      "spectators": [],
+      "parse_warnings": [],
+      "standardization_actions": []
+    },
+    "tool_facts": {
+      "mapped_rxn_smiles": "Cl[c:6]1[n:7][c:8]2[cH:9][cH:10][cH:11][cH:12][c:13]2[s:14]1.[CH3:1][n:2]1[cH:3][cH:4][n:5][cH:15]1>>[CH3:1][n:2]1[cH:3][cH:4][n+:5](-[c:6]2[n:7][c:8]3[cH:9][cH:10][cH:11][cH:12][c:13]3[s:14]2)[cH:15]1",
+      "mapping_qc": {
+        "ok": true,
+        "confidence": 0.976257586586217,
+        "notes": []
+      },
+      "bond_changes": [
+        {
+          "id": "BC1",
+          "change": "formed",
+          "a1": 5,
+          "a2": 6,
+          "bond": "single"
+        }
+      ],
+      "reaction_center_atoms": [
+        5,
+        6
+      ],
+      "bond_change_warnings": []
+    }
+  },
+  "rxnmapper_confidence": 0.976257586586217,
+  "steps_performed": [],
+  "final_confidence": 0.976257586586217,
+  "needs_manual_review": false
+}

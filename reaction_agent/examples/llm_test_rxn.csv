@@ -1,1 +1,4 @@
-O=Cc1c(F)cccc1.CC(C)(OC(N[C@H](C(O)=O)Cc2ccc(O)cc2)=O)C.CI>>COC([C@@H](NC(OC(C)(C)C)=O)Cc3ccc(Oc4c(C=O)cccc4)cc3)=O
+rare C_N coupling,Clc1nc2ccccc2s1.Cn1ccnc1>>CN1C=C[N+](C2=NC3=CC=CC=C3S2)=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
+rare three member rings,Clc1ccccn1.[N-]=[N+]=NCc1ccc(C2=NC2)cc1>>[N-]=[N+]=NCc1ccc(-c2cnc3ccccn23)cc1
+iodoium substitution,Cc1cc(C)cc(-c2ccc([I+]c3ccccc3)c(CCN(O[Si](C)(C)C(C)(C)C)C(=O)OC(C)(C)C)c2)c1.Cc1ccc(S(=O)(=O)[O-])cc1>>Cc1cc(C)cc(-c2ccc3[nH]ccc3c2)c1
+tandem reactions,c1ccc2c(c1)[nH]c1ccccc12.Fc1ccc(I)cc1.C#Cc1ccc(CC)cc1>>CCc1ccc(C#Cc2ccc(-n3c4ccccc4c4ccccc43)cc2)cc1

@@ -1,0 +1,90 @@
+{
+  "rxn_smiles": "c1ccc2c(c1)[nH]c1ccccc12.Fc1ccc(I)cc1.C#Cc1ccc(CC)cc1>>CCc1ccc(C#Cc2ccc(-n3c4ccccc4c4ccccc43)cc2)cc1",
+  "deterministic_result": {
+    "input": {
+      "rxn_smiles_raw": "c1ccc2c(c1)[nH]c1ccccc12.Fc1ccc(I)cc1.C#Cc1ccc(CC)cc1>>CCc1ccc(C#Cc2ccc(-n3c4ccccc4c4ccccc43)cc2)cc1",
+      "rxn_smiles_clean": "c1ccc2c(c1)[nH]c1ccccc12.Fc1ccc(I)cc1.C#Cc1ccc(CC)cc1>>CCc1ccc(C#Cc2ccc(-n3c4ccccc4c4ccccc43)cc2)cc1",
+      "reactants_clean": [
+        "c1ccc2c(c1)[nH]c1ccccc12",
+        "Fc1ccc(I)cc1",
+        "C#Cc1ccc(CC)cc1"
+      ],
+      "products_clean": [
+        "CCc1ccc(C#Cc2ccc(-n3c4ccccc4c4ccccc43)cc2)cc1"
+      ],
+      "spectators": [],
+      "parse_warnings": [],
+      "standardization_actions": []
+    },
+    "tool_facts": {
+      "mapped_rxn_smiles": "[CH3:1][CH2:2][c:3]1[cH:4][cH:5][c:6]([C:7]#[CH:8])[cH:28][cH:29]1.F[c:12]1[cH:11][cH:10][c:9](I)[cH:27][cH:26]1.[nH:13]1[c:14]2[cH:15][cH:16][cH:17][cH:18][c:19]2[c:20]2[cH:21][cH:22][cH:23][cH:24][c:25]12>>[CH3:1][CH2:2][c:3]1[cH:4][cH:5][c:6]([C:7]#[C:8][c:9]2[cH:10][cH:11][c:12](-[n:13]3[c:14]4[cH:15][cH:16][cH:17][cH:18][c:19]4[c:20]4[cH:21][cH:22][cH:23][cH:24][c:25]34)[cH:26][cH:27]2)[cH:28][cH:29]1",
+      "mapping_qc": {
+        "ok": false,
+        "confidence": 0.33549279789943337,
+        "notes": [
+          "Low mapping confidence: 0.34"
+        ]
+      },
+      "bond_changes": [],
+      "reaction_center_atoms": [],
+      "bond_change_warnings": []
+    }
+  },
+  "rxnmapper_confidence": 0.33549279789943337,
+  "steps_performed": [
+    "llm_assistance"
+  ],
+  "llm_assistance": {
+    "original_confidence": 0.33549279789943337,
+    "llm_analysis": {
+      "reaction_analysis": {
+        "type": "tandem cross\u2010coupling",
+        "stages": [
+          {
+            "name": "Sonogashira coupling",
+            "mechanism": "A Pd/Cu\u2010catalyzed coupling between the terminal alkyne (from C#Cc1ccc(CC)cc1) and the aryl iodide fragment (from Fc1ccc(I)cc1) forms an aryl\u2013alkyne intermediate."
+          },
+          {
+            "name": "Buchwald\u2013Hartwig type amination",
+            "mechanism": "Subsequently the nucleophilic nitrogen of carbazole (c1ccc2c(c1)[nH]c1ccccc12) displaces the iodine on the aryl fragment to form an aryl\u2013N bond, installing the carbazole unit onto the intermediate."
+          }
+        ],
+        "complexity": "complex"
+      },
+      "mapping_assessment": {
+        "current_mapping_correct": false,
+        "major_errors": [
+          "The mapping retains the fluorine substituent from Fc1ccc(I)cc1, although in the final product the F is no longer present. This indicates a failure to represent the substitution of the iodo\u2010aryl center correctly.",
+          "The iodine leaving group is not treated properly: the reactive carbon originally attached to iodine should become the coupling site rather than carrying both I and the substituent in the product.",
+          "The alkyne carbons are inconsistently mapped (e.g. [C:7]#[CH:8] in the reactant becomes [C:7]#[C:8] in the product) which may obscure the actual connectivity needed for the Sonogashira coupling.",
+          "The nucleophilic nitrogen in the carbazole (originally shown as [nH:13]) is later mapped as [n:13] without reflecting its role in bonding; its connection to the aryl ring replacing iodine is not explicitly clarified."
+        ],
+        "confidence_in_current": 0.335
+      },
+      "suggested_corrections": [
+        {
+          "issue": "The iodine\u2010bearing carbon in the iodo\u2010aryl reactant should be designated as the reactive center. Its mapping must reflect that iodine is expelled (thus not appearing in the product) and that its bonding is replaced by the carbazole nitrogens attack (forming the C\u2013N bond) and by the alkyne coupling.",
+          "priority": "high"
+        },
+        {
+          "issue": "Remove or reassign the fluorine substituent mapping since the final product does not display an F atom. The F atom in the reactant was likely a spectator or its fate has not been incorporated properly in the mapping.",
+          "priority": "high"
+        },
+        {
+          "issue": "Adjust the mapping of the two alkyne carbons so that the connectivity (triple bond) remains consistent throughout the transformation. For instance, ensuring that the terminal alkyne carbon which couples to the aryl fragment is correctly identified in both reactant and product.",
+          "priority": "medium"
+        },
+        {
+          "issue": "Clarify the mapping for the carbazole nitrogen by explicitly mapping it from the original N\u2013H to the new C\u2013N connected site in the product, taking into account the loss of the hydrogen upon bond formation.",
+          "priority": "medium"
+        }
+      ],
+      "recommended_action": "manual_review",
+      "reasoning": "A careful mechanistic analysis shows that the reaction likely proceeds in two major steps. First, a Sonogashira coupling forms an intermediate by connecting the terminal alkyne (from C#Cc1ccc(CC)cc1) to the aryl iodide (from Fc1ccc(I)cc1). Next, a Pd\u2010catalyzed Buchwald\u2013Hartwig type amination enables the carbazole\u2019s nucleophilic nitrogen (from c1ccc2c(c1)[nH]c1ccccc12) to substitute the iodine on the aryl group. The current mapping erroneously carries forward the fluorine atom and fails to treat the leaving iodine correctly. In addition, discrepancies in the alkyne carbon assignments and the treatment of the carbazole nitrogen detract from the fidelity of the mapping. A corrected mapping should trace the fate of each reactive center through these steps, ensuring that atoms lost (I, possibly F) and atoms that form new bonds (the alkyne carbon and carbazole nitrogen) are mapped appropriately. Thus, expert manual review is recommended to resolve these inconsistencies."
+    },
+    "method": "llm_assisted_mapping",
+    "recommendation": "manual_review"
+  },
+  "final_confidence": 0.33549279789943337,
+  "needs_manual_review": true
+}
