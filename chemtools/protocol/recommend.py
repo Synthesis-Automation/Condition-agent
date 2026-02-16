@@ -67,11 +67,11 @@ def match_reaction_smarts(reaction_smiles: str, smarts_patterns: List[str]) -> b
     
     try:
         from rdkit import Chem
-        from rdkit.Chem import AllChem
+        from rdkit.Chem import rdChemReactions
         
         # Parse the input reaction
         try:
-            rxn_mol = AllChem.ReactionFromSmarts(reaction_smiles, useSmiles=True)
+            rxn_mol = rdChemReactions.ReactionFromSmiles(reaction_smiles)
             if rxn_mol is None:
                 logger.debug(f"Could not parse reaction SMILES: {reaction_smiles}")
                 return True  # Permissive fallback
@@ -86,7 +86,7 @@ def match_reaction_smarts(reaction_smiles: str, smarts_patterns: List[str]) -> b
             
             try:
                 # Parse the SMARTS pattern as a reaction
-                pattern_rxn = AllChem.ReactionFromSmarts(pattern)
+                pattern_rxn = rdChemReactions.ReactionFromSmarts(pattern)
                 if pattern_rxn is None:
                     logger.debug(f"Could not parse reaction SMARTS: {pattern}")
                     continue

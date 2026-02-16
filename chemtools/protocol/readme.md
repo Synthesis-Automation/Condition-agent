@@ -205,7 +205,7 @@ You can test SMARTS patterns in Python before adding them to protocols:
 
 ```python
 from rdkit import Chem
-from rdkit.Chem import AllChem
+from rdkit.Chem import rdChemReactions
 
 # Test reaction SMARTS
 rxn_smiles = "CCBr.c1ccccc1B(O)O>>CCc1ccccc1"
@@ -214,8 +214,8 @@ pattern = "[c,C,n,o,s]Br.OB(O)[c,C,n,o,s]>>[c,C,n,o,s][c,C,n,o,s]"
 [c,n,o,s] = aryl
 
 # Parse reaction
-rxn = AllChem.ReactionFromSmarts(rxn_smiles, useSmiles=True)
-rxn_pattern = AllChem.ReactionFromSmarts(pattern)
+rxn = rdChemReactions.ReactionFromSmiles(rxn_smiles)
+rxn_pattern = rdChemReactions.ReactionFromSmarts(pattern)
 
 # Check if pattern is valid
 if rxn_pattern:
@@ -228,13 +228,13 @@ else:
 
 ### ⚠️ Critical Discovery (Oct 2025)
 
-When extracting molecules from reactions using `AllChem.ReactionFromSmarts(smiles, useSmiles=True)`, the resulting molecules **do not have aromaticity perceived by default**. This causes aromatic SMARTS patterns (using `[c]`, `[n]`, `[o]`, `[s]`) to fail matching even when they should match.
+When extracting molecules from reactions using `rdChemReactions.ReactionFromSmiles(smiles)`, the resulting molecules **do not have aromaticity perceived by default**. This causes aromatic SMARTS patterns (using `[c]`, `[n]`, `[o]`, `[s]`) to fail matching even when they should match.
 
 **Example of the Problem**:
 
 ```python
 from rdkit import Chem
-from rdkit.Chem import AllChem
+from rdkit.Chem import rdChemReactions
 
 # This works fine - standalone molecule
 mol = Chem.MolFromSmiles("BrC1=CC=CC=C1")
@@ -242,7 +242,7 @@ pattern = Chem.MolFromSmarts("[Br][c]")
 print(mol.HasSubstructMatch(pattern))  # ✅ True
 
 # This fails - molecule from reaction
-rxn = AllChem.ReactionFromSmarts("BrC1=CC=CC=C1.CC([Si](C)(C)C)=O>>CC(C2=CC=CC=C2)=O", useSmiles=True)
+rxn = rdChemReactions.ReactionFromSmiles("BrC1=CC=CC=C1.CC([Si](C)(C)C)=O>>CC(C2=CC=CC=C2)=O")
 reactants = rxn.GetReactants()
 r0 = reactants[0]
 print(r0.HasSubstructMatch(pattern))  # ❌ False - aromaticity not perceived!
@@ -288,11 +288,11 @@ This is critical when your SMARTS patterns include:
 
 ### Best Practice
 
-If you're writing custom code that uses `AllChem.ReactionFromSmarts()` with reaction SMILES:
+If you're writing custom code that parses reaction SMILES:
 
 ```python
 # Always sanitize molecules extracted from reactions
-rxn = AllChem.ReactionFromSmarts(reaction_smiles, useSmiles=True)
+rxn = rdChemReactions.ReactionFromSmiles(reaction_smiles)
 for mol in rxn.GetReactants():
     Chem.SanitizeMol(mol)
 for mol in rxn.GetProducts():

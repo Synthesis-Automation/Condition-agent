@@ -114,14 +114,14 @@ def match_reaction_smarts(reaction_smiles: str, smarts_patterns: List[str]) -> T
     
     try:
         from rdkit import Chem
-        from rdkit.Chem import AllChem
+        from rdkit.Chem import rdChemReactions
     except ImportError:
         errors.append("RDKit not available - cannot validate SMARTS patterns")
         return False, errors
     
     # Parse the input reaction
     try:
-        rxn_mol = AllChem.ReactionFromSmarts(reaction_smiles, useSmiles=True)
+        rxn_mol = rdChemReactions.ReactionFromSmiles(reaction_smiles)
         if rxn_mol is None:
             errors.append(f"Could not parse reaction SMILES: {reaction_smiles}")
             return False, errors
@@ -140,7 +140,7 @@ def match_reaction_smarts(reaction_smiles: str, smarts_patterns: List[str]) -> T
         
         try:
             # Parse the SMARTS pattern as a reaction
-            pattern_rxn = AllChem.ReactionFromSmarts(pattern)
+            pattern_rxn = rdChemReactions.ReactionFromSmarts(pattern)
             if pattern_rxn is None:
                 pattern_errors.append(f"Could not parse reaction SMARTS: {pattern}")
                 continue

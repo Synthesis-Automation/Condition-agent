@@ -107,6 +107,14 @@ class TestMappingReaction:
 class TestBondChangeExtraction:
     """Test bond change extraction from mapped reactions."""
 
+    def test_extract_from_valid_mapped_smiles(self):
+        """Regression: mapped reaction SMILES should parse in RDKit 2025."""
+        mapped_rxn = "[Cl:1][CH3:2].[OH2:3]>>[OH:3][CH3:2].[Cl-:1]"
+        result = extract_bond_changes(mapped_rxn)
+
+        assert isinstance(result, BondChangeReport)
+        assert "Failed to parse mapped reaction" not in result.warnings
+
     def test_extract_from_unmapped(self):
         """Test that extraction handles unmapped reactions gracefully."""
         rxn = "CCBr>>CCN"
