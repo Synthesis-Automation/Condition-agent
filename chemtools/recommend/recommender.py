@@ -537,6 +537,78 @@ def _load_hte_database_cached(
     return df, indexed_data, reaction_type_patterns, transformation_indices
 
 
+def _resolve_warm_cache_targets(db_path: Path, source_group: Optional[str]) -> List[Path]:
+    if not source_group:
+        return [db_path]
+    label = str(source_group).strip().lower()
+    if not label or label == "all":
+        return [db_path]
+
+    if label in ("datasets", "dataset", "lit"):
+        label = "literature"
+    elif label in ("protocol",):
+        label = "protocols"
+    elif label in ("experiment", "experiements"):
+        label = "experiments"
+
+    if not db_path.is_dir():
+        return [db_path]
+
+    sub_path = db_path / label
+    if label == "experiments":
+        canonical = sub_path / "HTE_canonical.csv"
+        if canonical.exists():
+            return [canonical]
+    if sub_path.exists():
+        return [sub_path]
+    return [db_path]
+
+
+def warm_hte_cache(
+    hte_db_path: str = "data/HTE_db",
+    *,
+    source_group: Optional[str] = None,
+    clear_memory_cache: bool = False,
+) -> Dict[str, Any]:
+    """
+    Prebuild on-disk and in-memory HTE indices so first recommendation calls are fast.
+
+    Returns:
+        Dict summary containing warmed targets, elapsed time, and index sizes.
+    """
+    if clear_memory_cache:
+        _load_hte_database_cached.cache_clear()
+
+    base_path = Path(hte_db_path)
+    if not base_path.exists():
+        raise FileNotFoundError(f"HTE database not found: {base_path}")
+
+    targets = _resolve_warm_cache_targets(base_path, source_group)
+    summary_targets: List[Dict[str, Any]] = []
+
+    for target in targets:
+        start = pd.Timestamp.utcnow()
+        df, indexed_data, reaction_type_patterns, transformation_indices = _load_hte_database_cached(str(target))
+        elapsed_s = (pd.Timestamp.utcnow() - start).total_seconds()
+        summary_targets.append(
+            {
+                "target": str(target),
+                "cache_dir": str(_hte_cache_dir(Path(target))),
+                "num_rows": int(len(df)),
+                "reactant_index_keys": int(len(indexed_data)),
+                "reaction_type_pattern_keys": int(len(reaction_type_patterns)),
+                "transformation_index_keys": int(len(transformation_indices)),
+                "elapsed_s": round(float(elapsed_s), 3),
+            }
+        )
+
+    return {
+        "base_path": str(base_path),
+        "source_group": source_group or "all",
+        "targets": summary_targets,
+    }
+
+
 def _ensure_list(values: Any) -> List[str]:
     if values is None:
         return []

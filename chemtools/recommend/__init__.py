@@ -14,6 +14,7 @@ _RECOMMENDER_EXPORTS = {
     "HTERecommender",
     "HTERecommendationResult",
     "ConditionRecommendation",
+    "warm_hte_cache",
     "format_recommendation",
     "format_result",
 }
@@ -45,6 +46,7 @@ __all__ = [
     "HTERecommender",
     "HTERecommendationResult",
     "ConditionRecommendation",
+    "warm_hte_cache",
     "format_recommendation",
     "format_result",
     "HTEAnalytics",

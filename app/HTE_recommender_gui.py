@@ -550,6 +550,29 @@ class RecommendationWorker(QtCore.QObject):
             self.finished.emit(False, None, str(exc), {})
 
 
+class CacheWarmWorker(QtCore.QObject):
+    finished = QtCore.pyqtSignal(bool, object, str)
+    progress = QtCore.pyqtSignal(str)
+
+    def __init__(self, db_path: str, source_group: str) -> None:
+        super().__init__()
+        self.db_path = db_path
+        self.source_group = source_group
+
+    def run(self) -> None:
+        try:
+            from chemtools.recommend import warm_hte_cache
+
+            self.progress.emit("Prebuilding HTE cache ...")
+            summary = warm_hte_cache(
+                self.db_path,
+                source_group=self.source_group or "all",
+            )
+            self.finished.emit(True, summary, "OK")
+        except Exception as exc:
+            self.finished.emit(False, None, str(exc))
+
+
 class HTERecommenderWindow(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
@@ -601,9 +624,11 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.aryl_weighting_check.setToolTip("Reweight matches by aryl steric/electronic similarity (when available).")
 
         self.run_button = QtWidgets.QPushButton("Run Recommendation")
+        self.prebuild_cache_button = QtWidgets.QPushButton("Prebuild Cache")
         self.clear_button = QtWidgets.QPushButton("Clear Results")
         self.export_json_button = QtWidgets.QPushButton("Export JSON")
         self.run_button.setMinimumSize(160, 34)
+        self.prebuild_cache_button.setMinimumSize(140, 34)
         self.clear_button.setMinimumSize(140, 34)
         self.export_json_button.setMinimumSize(140, 34)
         self.export_json_button.setEnabled(False)
@@ -637,6 +662,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         self.thread: Optional[QtCore.QThread] = None
         self.worker: Optional[RecommendationWorker] = None
+        self.cache_thread: Optional[QtCore.QThread] = None
+        self.cache_worker: Optional[CacheWarmWorker] = None
         self._reaction_dialog: Optional[QtWidgets.QDialog] = None
         self._spectator_groups_summary: str = ""
         self._source_group_label: str = "All"
@@ -692,6 +719,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         button_row = QtWidgets.QHBoxLayout()
         button_row.addWidget(self.run_button)
+        button_row.addWidget(self.prebuild_cache_button)
         button_row.addWidget(self.clear_button)
         button_row.addWidget(self.export_json_button)
         button_row.addStretch()
@@ -709,6 +737,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
     def _bind_signals(self) -> None:
         self.run_button.clicked.connect(self._run_recommendation)
+        self.prebuild_cache_button.clicked.connect(self._run_prebuild_cache)
         self.clear_button.clicked.connect(self._clear_results)
         self.export_json_button.clicked.connect(self._export_json_output)
         self.db_path_edit.textChanged.connect(self._update_data_type)
@@ -772,13 +801,22 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self._all_json_output = None
         self.export_json_button.setEnabled(False)
         self.run_button.setEnabled(True)
+        self.prebuild_cache_button.setEnabled(True)
         self.run_button.setText("Run Recommendation")
+        self.prebuild_cache_button.setText("Prebuild Cache")
         self.progress_bar.setVisible(False)
         if self._reaction_dialog:
             self._reaction_dialog.close()
             self._reaction_dialog = None
 
     def _run_recommendation(self) -> None:
+        if self.cache_thread and self.cache_thread.isRunning():
+            QtWidgets.QMessageBox.information(
+                self,
+                "HTE Recommender",
+                "Cache prebuild is running. Please wait for it to finish.",
+            )
+            return
         db_path = self.db_path_edit.text().strip()
         reaction_smiles = self.reaction_smiles_edit.text().strip()
         if not db_path:
@@ -799,6 +837,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.summary.clear()
         self.status.setText("Working...")
         self.run_button.setEnabled(False)
+        self.prebuild_cache_button.setEnabled(False)
         self.run_button.setText("Running...")
         self.progress_bar.setRange(0, 0)
         self.progress_bar.setVisible(True)
@@ -831,11 +870,90 @@ class HTERecommenderWindow(QtWidgets.QWidget):
     def _append_status(self, message: str) -> None:
         self.status.setText(message)
 
+    def _run_prebuild_cache(self) -> None:
+        if self.thread and self.thread.isRunning():
+            QtWidgets.QMessageBox.information(
+                self,
+                "HTE Recommender",
+                "Recommendation is running. Please wait for it to finish.",
+            )
+            return
+        if self.cache_thread and self.cache_thread.isRunning():
+            QtWidgets.QMessageBox.information(
+                self,
+                "HTE Recommender",
+                "Cache prebuild is already running.",
+            )
+            return
+
+        db_path = self.db_path_edit.text().strip()
+        if not db_path:
+            QtWidgets.QMessageBox.warning(self, "Missing data", "Select a CSV/JSONL or folder.")
+            return
+        if not Path(db_path).exists():
+            QtWidgets.QMessageBox.warning(self, "Invalid path", "The data path does not exist.")
+            return
+
+        selected = self.source_group_combo.currentText().strip()
+        normalized = _normalize_source_group_label(selected)
+        if selected in {"All", "Run all recommendation"}:
+            source_group = "all"
+        elif normalized == "precedent":
+            source_group = "literature"
+        else:
+            source_group = normalized or "all"
+
+        self.status.setText("Prebuilding cache...")
+        self.progress_bar.setRange(0, 0)
+        self.progress_bar.setVisible(True)
+        self.run_button.setEnabled(False)
+        self.prebuild_cache_button.setEnabled(False)
+        self.prebuild_cache_button.setText("Prebuilding...")
+
+        self.cache_thread = QtCore.QThread()
+        self.cache_worker = CacheWarmWorker(
+            db_path=db_path,
+            source_group=source_group,
+        )
+        self.cache_worker.moveToThread(self.cache_thread)
+        self.cache_thread.started.connect(self.cache_worker.run)
+        self.cache_worker.progress.connect(self._append_status)
+        self.cache_worker.finished.connect(self._on_prebuild_finished)
+        self.cache_thread.start()
+
+    def _on_prebuild_finished(self, success: bool, summary: object, message: str) -> None:
+        if self.cache_thread:
+            self.cache_thread.quit()
+            self.cache_thread.wait()
+        self.run_button.setEnabled(True)
+        self.prebuild_cache_button.setEnabled(True)
+        self.prebuild_cache_button.setText("Prebuild Cache")
+        self.progress_bar.setVisible(False)
+
+        if not success:
+            self.status.setText("Error")
+            QtWidgets.QMessageBox.critical(self, "HTE Recommender", message)
+            return
+
+        targets = []
+        if isinstance(summary, dict):
+            targets = list(summary.get("targets") or [])
+        target_count = len(targets)
+        total_rows = sum(int(item.get("num_rows", 0) or 0) for item in targets if isinstance(item, dict))
+        total_elapsed = sum(float(item.get("elapsed_s", 0.0) or 0.0) for item in targets if isinstance(item, dict))
+        self.status.setText(f"Cache ready ({target_count} target(s), {total_rows} rows).")
+        QtWidgets.QMessageBox.information(
+            self,
+            "HTE Recommender",
+            f"Cache prebuild completed.\nTargets: {target_count}\nRows: {total_rows}\nElapsed: {total_elapsed:.2f}s",
+        )
+
     def _on_finished(self, success: bool, result: object, message: str, stats: Dict[str, Any]) -> None:
         if self.thread:
             self.thread.quit()
             self.thread.wait()
         self.run_button.setEnabled(True)
+        self.prebuild_cache_button.setEnabled(True)
         self.run_button.setText("Run Recommendation")
         self.progress_bar.setVisible(False)
 
