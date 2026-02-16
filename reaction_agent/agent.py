@@ -46,7 +46,8 @@ def analyze_reaction_smiles(
     drop_spectators: bool = True,
     skip_mapping: bool = False,
     temperature: float = 0.0,
-    max_tokens: int = 2000
+    max_tokens: int = 2000,
+    reasoning_effort: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Analyze reaction SMILES using deterministic tools + LLM interpretation.
@@ -64,6 +65,7 @@ def analyze_reaction_smiles(
         skip_mapping: Skip mapping and bond changes (faster, less detailed)
         temperature: LLM temperature (0.0 for deterministic)
         max_tokens: Max LLM output tokens
+        reasoning_effort: For reasoning models (gpt-5.2, o3): "low", "medium", "high"
 
     Returns:
         Dict with structure:
@@ -118,7 +120,8 @@ def analyze_reaction_smiles(
         response = client.chat(
             prompt=prompt,
             temperature=temperature,
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
+            reasoning_effort=reasoning_effort
         )
     except Exception as e:
         return {
@@ -194,7 +197,8 @@ class ReactionSMILESAnalyzer:
         client: LLMClient,
         drop_spectators: bool = True,
         temperature: float = 0.0,
-        max_tokens: int = 2000
+        max_tokens: int = 2000,
+        reasoning_effort: Optional[str] = None
     ):
         """
         Initialize analyzer.
@@ -204,16 +208,19 @@ class ReactionSMILESAnalyzer:
             drop_spectators: Remove simple ions/salts from analysis
             temperature: LLM temperature (0.0 = deterministic)
             max_tokens: Max tokens for LLM response
+            reasoning_effort: For reasoning models (gpt-5.2, o3): "low", "medium", "high"
         """
         self.client = client
         self.drop_spectators = drop_spectators
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.reasoning_effort = reasoning_effort
 
     def analyze(
         self,
         rxn_smiles: str,
-        skip_mapping: bool = False
+        skip_mapping: bool = False,
+        mode: str = "auto"
     ) -> Dict[str, Any]:
         """
         Analyze a reaction SMILES string.
@@ -221,18 +228,93 @@ class ReactionSMILESAnalyzer:
         Args:
             rxn_smiles: Reaction SMILES (reactants>>products)
             skip_mapping: Skip atom mapping (faster but less detailed)
+            mode: Analysis mode:
+                - "auto": Smart switching based on mapping confidence (recommended)
+                          Uses gpt-4o for good mapping (≥0.4), gpt-5.2 for poor mapping (<0.4)
+                - "fast": Always use gpt-4o (faster, cheaper)
+                - "deep": Always use gpt-5.2 with reasoning (slower, better quality)
+                - "expert": gpt-5.2 with highest reasoning (very slow, maximum quality)
 
         Returns:
             Analysis result dict with input, tool_facts, interpretation, metadata
         """
-        return analyze_reaction_smiles(
+        # Store original model and settings
+        original_model = self.client.model
+        original_max_tokens = self.max_tokens
+        original_reasoning = self.reasoning_effort
+
+        # Step 1: Run deterministic analysis (needed for auto mode)
+        deterministic_result = analyze_deterministic(
+            rxn_smiles,
+            drop_spectators=self.drop_spectators,
+            skip_mapping=skip_mapping
+        )
+
+        # Step 2: Model selection based on mode
+        if mode == "auto":
+            # Smart switching based on mapping quality
+            mapping_conf = deterministic_result.get("tool_facts", {}).get(
+                "mapping_qc", {}
+            ).get("confidence", 1.0)
+
+            if mapping_conf < 0.4:
+                # Poor mapping - use GPT-5.2 with deep reasoning
+                print(f"⚠ Poor mapping ({mapping_conf:.3f}) - switching to GPT-5.2 deep reasoning...")
+                self.client.model = "gpt-5.2"
+                self.max_tokens = 8000
+                self.reasoning_effort = "low"  # Test showed "low" is optimal
+            else:
+                # Good mapping - use fast mode
+                self.client.model = original_model if "gpt-5" not in original_model else "gpt-4o"
+                self.max_tokens = 3000
+                self.reasoning_effort = None
+
+        elif mode == "fast":
+            # Always fast - use gpt-4o
+            self.client.model = "gpt-4o"
+            self.max_tokens = 3000
+            self.reasoning_effort = None
+
+        elif mode == "deep":
+            # Always deep - use gpt-5.2 with low reasoning
+            self.client.model = "gpt-5.2"
+            self.max_tokens = 8000
+            self.reasoning_effort = "low"
+
+        elif mode == "expert":
+            # Expert mode - gpt-5.2 with medium reasoning
+            self.client.model = "gpt-5.2"
+            self.max_tokens = 10000
+            self.reasoning_effort = "medium"
+
+        else:
+            raise ValueError(f"Unknown mode: {mode}. Use 'auto', 'fast', 'deep', or 'expert'")
+
+        # Step 3: Run analysis with selected model
+        result = analyze_reaction_smiles(
             rxn_smiles=rxn_smiles,
             client=self.client,
             drop_spectators=self.drop_spectators,
             skip_mapping=skip_mapping,
-            temperature=self.temperature,
-            max_tokens=self.max_tokens
+            temperature=self.temperature if self.reasoning_effort is None else None,
+            max_tokens=self.max_tokens,
+            reasoning_effort=self.reasoning_effort
         )
+
+        # Step 4: Add mode info to metadata
+        if "metadata" not in result:
+            result["metadata"] = {}
+
+        result["metadata"]["mode"] = mode
+        result["metadata"]["model_selected"] = self.client.model
+        result["metadata"]["reasoning_effort"] = self.reasoning_effort
+
+        # Restore original settings
+        self.client.model = original_model
+        self.max_tokens = original_max_tokens
+        self.reasoning_effort = original_reasoning
+
+        return result
 
     def analyze_batch(
         self,
