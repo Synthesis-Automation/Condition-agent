@@ -18,6 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 RUN_ALL_SOURCE_SENTINEL = "__run_all_recommendation__"
 RUN_ALL_GROUPS: Tuple[str, ...] = ("literature", "protocols", "experiments", "rules")
+_RECOMMENDER_CACHE: Dict[str, Any] = {}
 
 
 def _parse_reaction_smiles(reaction_smiles: str) -> Tuple[str, Optional[str], Optional[str]]:
@@ -35,6 +36,40 @@ def _parse_reaction_smiles(reaction_smiles: str) -> Tuple[str, Optional[str], Op
     reactant_a = reactants[0] if reactants else ""
     reactant_b = ".".join(reactants[1:]) if len(reactants) > 1 else None
     return reactant_a, reactant_b, None
+
+
+def _validate_reaction_smiles_input(reaction_smiles: str) -> Tuple[bool, str]:
+    text = str(reaction_smiles or "").strip()
+    if not text:
+        return False, "Reaction SMILES is empty."
+
+    try:
+        from chemtools.smiles import normalize_reaction
+
+        payload = normalize_reaction(text)
+    except Exception as exc:
+        return False, f"Failed to parse reaction SMILES: {exc}"
+
+    reactants = list(payload.get("reactants") or [])
+    if not reactants:
+        return False, "Reaction SMILES must contain at least one reactant."
+
+    invalid_inputs: List[str] = []
+    for component in reactants + list(payload.get("agents") or []) + list(payload.get("products") or []):
+        if not isinstance(component, dict):
+            continue
+        if str(component.get("error") or "").strip():
+            bad = str(component.get("input") or "").strip()
+            if bad:
+                invalid_inputs.append(bad)
+
+    if invalid_inputs:
+        shown = ", ".join(invalid_inputs[:3])
+        if len(invalid_inputs) > 3:
+            shown += f" (+{len(invalid_inputs) - 3} more)"
+        return False, f"Invalid SMILES token(s): {shown}"
+
+    return True, ""
 
 
 def _detect_csv_type(path: Path) -> str:
@@ -110,6 +145,37 @@ def _normalize_recommendations_by_source(source_map: Dict[str, Any]) -> Dict[str
         normalized_key = _normalize_source_group_label(key)
         normalized_map.setdefault(normalized_key, []).extend(list(items or []))
     return normalized_map
+
+
+def _resolve_db_path_for_source(db_path: str, source_group: str) -> str:
+    normalized = _normalize_source_group_label(source_group)
+    if normalized != "experiments":
+        return db_path
+    path = Path(db_path)
+    if not path.is_dir():
+        return db_path
+    candidate = path / "experiments" / "HTE_canonical.csv"
+    if candidate.exists():
+        return str(candidate)
+    return db_path
+
+
+def _recommender_cache_key(db_path: str) -> str:
+    try:
+        return str(Path(db_path).resolve())
+    except Exception:
+        return str(db_path)
+
+
+def _get_cached_recommender(db_path: str) -> Any:
+    from chemtools.recommend import HTERecommender
+
+    key = _recommender_cache_key(db_path)
+    recommender = _RECOMMENDER_CACHE.get(key)
+    if recommender is None:
+        recommender = HTERecommender(db_path)
+        _RECOMMENDER_CACHE[key] = recommender
+    return recommender
 
 
 def _format_float(value: Optional[float]) -> str:
@@ -445,14 +511,16 @@ class RecommendationWorker(QtCore.QObject):
 
     def run(self) -> None:
         try:
-            from chemtools.recommend import HTERecommender
-
             reactant_a, reactant_b, product = _parse_reaction_smiles(self.reaction_smiles)
             if not reactant_a:
                 raise ValueError("Provide a reaction SMILES with at least one reactant.")
 
-            self.progress.emit(f"Loading HTE data from {self.db_path} ...")
-            recommender = HTERecommender(self.db_path)
+            effective_db_path = self.db_path
+            if self.source_group != RUN_ALL_SOURCE_SENTINEL:
+                effective_db_path = _resolve_db_path_for_source(self.db_path, self.source_group or "")
+
+            self.progress.emit(f"Loading HTE data from {effective_db_path} ...")
+            recommender = _get_cached_recommender(effective_db_path)
             if self.source_group == RUN_ALL_SOURCE_SENTINEL:
                 result = self._run_all_recommendations(
                     recommender,
@@ -721,6 +789,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             return
         if not Path(db_path).exists():
             QtWidgets.QMessageBox.warning(self, "Invalid path", "The data path does not exist.")
+            return
+        is_valid, validation_error = _validate_reaction_smiles_input(reaction_smiles)
+        if not is_valid:
+            QtWidgets.QMessageBox.warning(self, "Invalid reaction SMILES", validation_error)
             return
 
         self._show_reaction_image(reaction_smiles)

@@ -787,6 +787,13 @@ def _ensure_rule_tier_column(df: pd.DataFrame) -> pd.DataFrame:
     """Ensure Rule_Tier exists as a numeric column (cache/backward compatible)."""
     if df is None:
         return df
+    # Fast path for already-normalized cached frames.
+    if "Rule_Tier" in df.columns:
+        try:
+            if pd.api.types.is_numeric_dtype(df["Rule_Tier"]):
+                return df
+        except Exception:
+            pass
     frame = df.copy()
     if "Rule_Tier" in frame.columns:
         frame["Rule_Tier"] = frame["Rule_Tier"].apply(_coerce_rule_tier_value).astype(float)
@@ -3185,6 +3192,8 @@ class HTERecommender:
         key_match_label = ""
         key_match_score = 0.0
         key_match_priority = 0
+        normalized_source_group = _normalize_source_group(source_group) if source_group else ""
+        skip_transformation_scan = normalized_source_group == "experiments" and not reaction_key_only
         if result.query_reaction_key and result.query_reaction_key in self.transformation_indices:
             key_match_df = self.transformation_indices[result.query_reaction_key].copy()
             key_match_label = result.query_reaction_key
@@ -3221,7 +3230,7 @@ class HTERecommender:
             key_match_df = _filter_target_reaction(key_match_df)
             if key_match_df.empty:
                 key_match_df = None
-        if key_match_df is None:
+        if key_match_df is None and not skip_transformation_scan:
             for db_key, group_df in self.transformation_indices.items():
                 score = self._score_transformation_match(
                     query_motifs,
