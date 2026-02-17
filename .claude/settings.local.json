@@ -5,7 +5,8 @@
       "Bash(python3:*)",
       "Bash(python -c:*)",
       "Bash(python:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(grep:*)"
     ]
   }
 }

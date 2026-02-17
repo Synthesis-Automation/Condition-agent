@@ -143,6 +143,12 @@
     },
     {
       "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "Ar",
+      "description": "Heterobiaryl (HeteroAr-Ar) bond."
+    },
+    {
+      "template": "single_bond",
       "A": "Ar",
       "B": "Alkenyl",
       "description": "Aryl-Alkenyl bond (e.g., styrene)."
@@ -182,12 +188,6 @@
       "A": "Alkenyl",
       "B": "Alkenyl",
       "description": "Alkenyl-Alkenyl bond (1,3-diene)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Alkenyl_terminal",
-      "B": "Alkenyl_terminal",
-      "description": "Terminal alkenyl-terminal alkenyl bond (1,3-butadiene)."
     },
     {
       "template": "single_bond",
