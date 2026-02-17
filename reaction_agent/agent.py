@@ -177,6 +177,13 @@ def analyze_reaction_smiles(
         # Format mapping QC
         mapping_qc_text = json.dumps(mapping_qc, indent=2)
 
+        # Include Tier 2 context if available to ensure consistency
+        tier2_context = ""
+        if quick_glance_result and quick_glance_result.get('success'):
+            tier2_rxn_types = quick_glance_result.get('reaction_types', [])
+            if tier2_rxn_types:
+                tier2_context = f"\n\nIMPORTANT CONTEXT: Quick analysis identified this as: {', '.join(tier2_rxn_types)}. Please verify and provide detailed mechanistic analysis consistent with this."
+
         prompt = template.format(
             rxn_smiles_raw=input_data.get("rxn_smiles_raw", ""),
             rxn_smiles_clean=input_data.get("rxn_smiles_clean", ""),
@@ -186,7 +193,7 @@ def analyze_reaction_smiles(
             mapping_qc=mapping_qc_text,
             bond_changes_text=bond_changes_text,
             reaction_center_atoms=str(tool_facts.get("reaction_center_atoms", []))
-        )
+        ) + tier2_context
 
     # Step 3: Call LLM
     try:

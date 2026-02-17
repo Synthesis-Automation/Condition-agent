@@ -266,7 +266,7 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
             print(f"\n{Colors.BOLD}Analysis Time:{Colors.END} {latency:.0f}ms ({meta.get('model', 'N/A')})")
 
     # Interpretation section
-    print_header("LLM INTERPRETATION")
+    print_header("LLM INTERPRETATION (Tier 3)")
     interp = result.get('interpretation', {})
 
     if 'error' in interp:
@@ -274,6 +274,21 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
         if 'raw_response' in interp:
             print(f"\nRaw response (truncated):\n{interp['raw_response'][:300]}...")
         return
+
+    # Check for disagreement with Tier 2
+    if 'quick_glance' in result and result['quick_glance'] and result['quick_glance'].get('success'):
+        tier2_types = [rt.lower() for rt in result['quick_glance'].get('reaction_types', [])]
+        tier3_class = interp.get('overall_class', '').lower()
+
+        # Check if Tier 3 contradicts Tier 2 on major reaction types
+        suzuki_in_t2 = any('suzuki' in rt or 'coupling' in rt for rt in tier2_types)
+        substitution_in_t3 = 'substitution' in tier3_class
+
+        if suzuki_in_t2 and substitution_in_t3:
+            print(f"{Colors.YELLOW}⚠️  Warning: Classification mismatch detected!{Colors.END}")
+            print(f"   Tier 2 (DeepSeek-v3.2): {', '.join(result['quick_glance']['reaction_types'])}")
+            print(f"   Tier 3 (gpt-4o-mini): {tier3_class}")
+            print(f"   {Colors.BOLD}→ Tier 2 is likely more accurate for this reaction.{Colors.END}\n")
 
     # Main classification
     rxn_class = interp.get('overall_class', 'N/A')
@@ -294,18 +309,23 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
         for role, value in interp['roles'].items():
             print(f"  {role}: {value}")
 
-    # Events
+    # Events - simplified display
     if interp.get('events'):
-        print(f"\n{Colors.BOLD}Mechanistic Events ({len(interp['events'])}):{Colors.END}")
-        for event in interp['events']:
-            print(f"\n  {Colors.BOLD}{event['event_id']}: {event['event_type']}{Colors.END}")
-            print(f"    Bond changes: {', '.join(event.get('bond_change_refs', []))}")
-            print(f"    {event.get('short_rationale', 'N/A')}")
-            event_conf = event.get('confidence', 0.0)
-            event_color = Colors.GREEN if event_conf >= 0.7 else Colors.YELLOW
-            print(f"    Confidence: {event_color}{event_conf:.2f}{Colors.END}")
+        events_count = len(interp['events'])
+        print(f"\n{Colors.BOLD}Mechanistic Events:{Colors.END} {events_count} detected")
 
-    # Mechanism summary
+        # Only show details if there are multiple events or if it's complex
+        show_event_details = events_count > 1 or any('complex' in str(e).lower() for e in interp['events'])
+
+        if show_event_details:
+            for event in interp['events']:
+                print(f"  • {event['event_id']}: {event['event_type']} ({', '.join(event.get('bond_change_refs', []))})")
+        else:
+            # For single simple events, just show a summary
+            event = interp['events'][0]
+            print(f"  • Single {event['event_type']} event")
+
+    # Mechanism summary - more concise
     if interp.get('mechanism_summary'):
         print(f"\n{Colors.BOLD}Mechanism Summary:{Colors.END}")
         for i, step in enumerate(interp['mechanism_summary'], 1):
