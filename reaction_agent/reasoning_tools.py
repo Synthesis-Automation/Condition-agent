@@ -278,10 +278,20 @@ def analyze_bond_changes(reaction_smiles: str) -> Dict[str, Any]:
             "combined_confidence": result.get("combined_confidence", 0.0),
         }
         if recommended:
-            summary["bonds_broken"] = recommended.get("bonds_broken", [])
-            summary["bonds_formed"] = recommended.get("bonds_formed", [])
-            summary["bond_changes_summary"] = recommended.get("bond_changes_summary", "")
+            # Keys vary by mapping method: broken_bonds/bonds_broken, etc.
+            summary["bonds_broken"] = (
+                recommended.get("broken_bonds")
+                or recommended.get("bonds_broken")
+                or []
+            )
+            summary["bonds_formed"] = (
+                recommended.get("formed_bonds")
+                or recommended.get("bonds_formed")
+                or []
+            )
             summary["changed_atoms"] = recommended.get("changed_atoms", [])
+            summary["leaving_groups"] = recommended.get("leaving_groups", [])
+            summary["joining_groups"] = recommended.get("joining_groups", [])
             summary["mapping_confidence"] = recommended.get("mapping_confidence", 0.0)
 
         return _success(summary)
