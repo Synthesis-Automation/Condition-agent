@@ -109,13 +109,13 @@ def analyze_reaction_smiles(
     if auto_interpretation and auto_interpretation.get('interpretation'):
         string_patterns = auto_interpretation['interpretation']
 
-        # Use GPT-5.2 with comprehensive prompt for detailed chemistry analysis
+        # Use DeepSeek-v3.2 (Aliyun) for comprehensive chemistry analysis
+        # Best accuracy: correctly identifies both Suzuki coupling AND THP deprotection
         # Run on ALL reactions for maximum coverage (prioritizing accuracy over cost)
         if should_run_quick_glance(string_patterns, mapping_conf, mode="always"):
             try:
-                # Create client for quick glance using GPT-5.2 with comprehensive mode
-                print(f"🔬 Tier 2: Using GPT-5.2 for comprehensive analysis...")
-                quick_client = LLMClient(provider=client.provider, model="gpt-5.2")
+                # Create client for quick glance using DeepSeek-v3.2 with comprehensive mode
+                quick_client = LLMClient(provider="aliyun", model="deepseek-v3.2")
                 quick_glance_result = quick_reaction_glance(
                     input_data.get("rxn_smiles_clean", ""),
                     quick_client,
@@ -124,7 +124,6 @@ def analyze_reaction_smiles(
                 )
 
                 if quick_glance_result.get('success'):
-                    print(f"✓ GPT-5.2 analysis successful!")
                     summary = quick_glance_result.get('summary', 'N/A')
                     # Show protecting group changes if detected
                     pg_changes = quick_glance_result.get('protecting_groups', {})
@@ -138,8 +137,6 @@ def analyze_reaction_smiles(
                         print(f"   {' | '.join(pg_note)}")
                     else:
                         print(f"💡 Quick glance: {summary}")
-                else:
-                    print(f"⚠️  GPT-5.2 quick glance failed: {quick_glance_result.get('error', 'Unknown error')}")
 
             except Exception as e:
                 print(f"⚠️  Quick glance failed: {e}")

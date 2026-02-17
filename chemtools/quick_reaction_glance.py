@@ -86,7 +86,6 @@ def quick_reaction_glance(
 
         if is_gpt5_or_o_series:
             # GPT-5/o-series: use reasoning_effort for better analysis
-            print(f"[DEBUG] Using GPT-5/o-series path with reasoning_effort=low")
             response = client.chat(
                 prompt=prompt,
                 max_tokens=max_tokens,
@@ -94,7 +93,6 @@ def quick_reaction_glance(
             )
         else:
             # Standard models: use temperature
-            print(f"[DEBUG] Using standard model path with temperature=0.0")
             response = client.chat(
                 prompt=prompt,
                 temperature=0.0,
@@ -107,13 +105,6 @@ def quick_reaction_glance(
         }
 
     elapsed = time.time() - start_time
-
-    # Debug: Print response details for GPT-5 models
-    if client.model.startswith("gpt-5"):
-        print(f"[DEBUG] GPT-5.2 response received:")
-        print(f"  Model: {response.model}")
-        print(f"  Content length: {len(response.content)} chars")
-        print(f"  Content preview: {response.content[:200] if response.content else '(empty)'}")
 
     # Parse response
     try:
