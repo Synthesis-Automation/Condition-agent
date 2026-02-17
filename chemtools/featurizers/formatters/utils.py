@@ -61,7 +61,7 @@ def extract_scores(result: Any) -> List[float]:
 
 def normalize_motif_id(motif_id: str) -> str:
     """
-    Normalize motif ID by removing double dashes and extra whitespace.
+    Normalize motif ID by removing double dashes, extra whitespace, and aliases.
     
     Args:
         motif_id: Raw motif ID string
@@ -72,6 +72,11 @@ def normalize_motif_id(motif_id: str) -> str:
     text = str(motif_id).strip()
     # Replace multiple consecutive dashes with single dash
     text = re.sub(r"-{2,}", "-", text)
+    # Canonicalize legacy pinacol boronate motif labels to generic boronate ester.
+    if text.endswith("-Bpin"):
+        text = text[:-5] + "-B(OR)2"
+    elif text in {"Bpin", "-Bpin"}:
+        text = "B(OR)2"
     # Remove leading/trailing dashes
     text = text.strip("-")
     return text

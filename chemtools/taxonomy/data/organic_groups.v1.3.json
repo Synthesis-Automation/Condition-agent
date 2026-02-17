@@ -297,13 +297,6 @@
       "description": "Generic boronate ester core; attach via boron."
     },
     {
-      "id": "-Bpin",
-      "kind": "substituent",
-      "priority": 2,
-      "smarts": "[B:2]1OC(C)(C)C(C)(C)O1",
-      "description": "Bpin core; attach via boron (-Bpin)."
-    },
-    {
       "id": "-BF3K",
       "kind": "substituent",
       "smarts": "[B-:2](F)(F)F",

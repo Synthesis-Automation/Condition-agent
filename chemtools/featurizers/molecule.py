@@ -60,7 +60,6 @@ _DEFAULT_ORGANOMETAL_B_GROUPS = {
     "B_Any",
     "B(OH)2",
     "B(OR)2",
-    "Bpin",
     "BF3K",
     "Zn",
     "Mg",

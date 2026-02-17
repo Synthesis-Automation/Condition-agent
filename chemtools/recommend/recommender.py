@@ -29,6 +29,7 @@ import json
 from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
 from chemtools.featurizers.formatters.reaction import get_crk_options
 from chemtools.featurizers.analysis.reaction_record import ReactionRecord
+from chemtools.featurizers.formatters.utils import normalize_motif_id
 from chemtools.featurizers.spectator_rank import (
     spectator_group_weight,
     weighted_spectator_similarity,
@@ -1533,7 +1534,13 @@ def _split_motif_tokens(value: Any) -> List[str]:
     text = str(value).strip()
     if not text or text.lower() == "nan":
         return []
-    return [token.strip() for token in _MOTIF_SPLIT_RE.split(text) if token.strip()]
+    return [
+        token
+        for token in (
+            normalize_motif_id(raw_token.strip()) for raw_token in _MOTIF_SPLIT_RE.split(text)
+        )
+        if token
+    ]
 
 
 @lru_cache(maxsize=4096)

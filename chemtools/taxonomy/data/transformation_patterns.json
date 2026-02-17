@@ -31,13 +31,13 @@
   "reaction_patterns": {
     "Suzuki_miyaura": {
       "pattern": "coupling_substitution",
-      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F", "-B(OH)2", "-Bpin", "-BF3K", "-B(OR)2"],
+      "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F", "-B(OH)2", "-BF3K", "-B(OR)2"],
       "notes": "Both halide/pseudohalide AND boron group are leaving groups"
     },
     "Miyaura_borylation": {
       "pattern": "coupling_substitution",
       "leaving_groups": ["-I", "-Br", "-Cl", "-OTf", "-OMs", "-OTs", "-F"],
-      "formed_groups": ["-Bpin", "-B(OR)2"]
+      "formed_groups": ["-B(OR)2"]
     },
     "C_N_Coupling": {
       "pattern": "coupling_substitution",
@@ -46,7 +46,7 @@
     },
     "Chan_Lam_C_N_Coupling": {
       "pattern": "coupling_substitution",
-      "leaving_groups": ["-B(OH)2", "-Bpin", "-H"],
+      "leaving_groups": ["-B(OH)2", "-B(OR)2", "-H"],
       "notes": "Boron leaves aryl, H leaves amine"
     },
     "C_O_Coupling": {

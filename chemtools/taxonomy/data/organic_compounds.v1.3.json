@@ -302,13 +302,6 @@
     {
       "template": "single_bond",
       "A": "HeteroAr",
-      "B": "-Bpin",
-      "description": "Heteroaryl pinacol boronate (HeteroAr-Bpin).",
-      "reactivity_weight": 2.0
-    },
-    {
-      "template": "single_bond",
-      "A": "HeteroAr",
       "B": "-B(OR)2",
       "description": "Heteroaryl boronate ester (HeteroAr-B(OR)2).",
       "reactivity_weight": 2.0
@@ -660,8 +653,8 @@
     {
       "template": "single_bond",
       "A": "Alkyl",
-      "B": "-Bpin",
-      "description": "Alkyl boronate (Bpin) (Alkyl-Bpin)."
+      "B": "-B(OR)2",
+      "description": "Alkyl boronate ester (Alkyl-B(OR)2)."
     },
     {
       "template": "single_bond",
@@ -702,13 +695,6 @@
     {
       "template": "single_bond",
       "A": "Ar",
-      "B": "-Bpin",
-      "description": "Aryl boronate (Bpin) (Ar-Bpin).",
-      "reactivity_weight": 2.0
-    },
-    {
-      "template": "single_bond",
-      "A": "Ar",
       "B": "-B*",
       "description": "Aryl organoboron (generic Ar-B*)."
     },
@@ -723,12 +709,6 @@
       "A": "Alkenyl",
       "B": "-B*",
       "description": "Vinyl/alkenyl organoboron (Alkenyl-B*)."
-    },
-    {
-      "template": "single_bond",
-      "A": "Alkenyl",
-      "B": "-Bpin",
-      "description": "Vinyl/alkenyl boronate (Bpin) (Alkenyl-Bpin)."
     },
     {
       "template": "single_bond",

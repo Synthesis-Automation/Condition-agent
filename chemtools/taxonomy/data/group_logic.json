@@ -75,9 +75,6 @@
     "-B(OH)2": [
       "B"
     ],
-    "-Bpin": [
-      "B"
-    ],
     "-B(OR)2": [
       "B"
     ],
@@ -345,7 +342,6 @@
       "name": "Organoboron Group",
       "members": [
         "-B(OH)2",
-        "-Bpin",
         "-B(OR)2",
         "-BF3K"
       ],

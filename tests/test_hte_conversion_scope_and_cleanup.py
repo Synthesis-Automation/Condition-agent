@@ -182,7 +182,7 @@ def test_scope_filter_flags_suzuki_borylation_like_out_of_scope() -> None:
     blocked, reason = hte_convert._is_out_of_scope_for_dataset(
         "suzuki_miyaura_fix34_sample_input",
         {"formed_bond_classes": ["B-C"]},
-        {"Ar-Bpin"},
+        {"Ar-B(OR)2"},
     )
     assert blocked is True
     assert reason == "formed_motif_conflict"
