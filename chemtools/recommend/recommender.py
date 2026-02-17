@@ -1219,6 +1219,29 @@ def _load_motif_sets() -> Dict[str, List[str]]:
 
 @lru_cache(maxsize=1)
 def _load_scope_map() -> Dict[str, List[str]]:
+    try:
+        from ..taxonomy import loader as taxonomy_loader
+
+        payload = taxonomy_loader.load_motif_scope_index()
+        raw_scope = payload.get("scope_map", {}) if isinstance(payload, dict) else {}
+        if isinstance(raw_scope, dict):
+            scope_map: Dict[str, List[str]] = {}
+            for key, value in raw_scope.items():
+                parent = str(key).strip()
+                if not parent:
+                    continue
+                children = [
+                    str(item).strip()
+                    for item in (value or [])
+                    if str(item).strip() and str(item).strip() != parent
+                ]
+                if children:
+                    scope_map[parent] = sorted(set(children))
+            if scope_map:
+                return scope_map
+    except Exception:
+        pass
+
     if not _COMPOUND_SCOPE_FILE.exists():
         return {}
     try:
@@ -1257,6 +1280,20 @@ def _load_scope_map() -> Dict[str, List[str]]:
         if children:
             scope_map[entry["id"]] = sorted(set(children))
     return scope_map
+
+
+@lru_cache(maxsize=1)
+def _load_scope_parent_map() -> Dict[str, Set[str]]:
+    parent_map: Dict[str, Set[str]] = defaultdict(set)
+    for parent, children in _load_scope_map().items():
+        p = str(parent).strip()
+        if not p:
+            continue
+        for child in children:
+            c = str(child).strip()
+            if c and c != p:
+                parent_map[c].add(p)
+    return dict(parent_map)
 
 
 @lru_cache(maxsize=1)
@@ -1552,6 +1589,8 @@ def _expanded_match_tokens(token: str) -> Set[str]:
     alias_map = _load_scaffold_alias_map()
     expanded.update(alias_map.get(text) or [])
     expanded.update(_load_motif_compatibility_map().get(text) or set())
+    expanded.update(_load_scope_map().get(text) or [])
+    expanded.update(_load_scope_parent_map().get(text) or set())
 
     compound_ids = _load_compound_ids()
     for member in list(expanded):

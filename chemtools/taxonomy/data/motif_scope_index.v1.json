@@ -1,0 +1,341 @@
+{
+  "version": "v1",
+  "generated_at": "2026-02-17T21:06:45.133776+00:00",
+  "generator": "chemtools.taxonomy.motif_scope_index",
+  "rdkit_available": true,
+  "probe_smiles": [
+    "CC",
+    "CCC",
+    "CC(C)C",
+    "CC(C)(C)C",
+    "Cc1ccccc1",
+    "CC=C",
+    "C=CC",
+    "CC=CC",
+    "CC=CCO",
+    "C=CC=C",
+    "c1ccccc1",
+    "c1ccncc1",
+    "c1ncccc1",
+    "C#C",
+    "CC#C",
+    "C#CC",
+    "CC#CC",
+    "CC#CCO",
+    "CCCO",
+    "COC",
+    "CC(=O)O",
+    "NCC"
+  ],
+  "scaffold_parent_map": {
+    "Acyl": [
+      "Alkyl"
+    ],
+    "Alkenyl_terminal": [
+      "Alkenyl"
+    ],
+    "Alkynyl_terminal": [
+      "Alkynyl"
+    ],
+    "AromN": [
+      "Ar"
+    ],
+    "HeteroAr": [
+      "Ar"
+    ],
+    "Propargyl": [
+      "Alkyl"
+    ],
+    "R2CH": [
+      "Alkyl"
+    ],
+    "R3C": [
+      "Alkyl"
+    ],
+    "RCH2": [
+      "Alkyl"
+    ],
+    "R_acidic": [
+      "Alkyl"
+    ]
+  },
+  "scope_map": {
+    "Alkyl-Alkenyl": [
+      "R2CH-Alkenyl",
+      "R3C-Alkenyl",
+      "RCH2-Alkenyl"
+    ],
+    "Alkyl-B(OH)2": [
+      "R2CH-B(OH)2",
+      "R3C-B(OH)2",
+      "RCH2-B(OH)2"
+    ],
+    "Alkyl-B(OR)2": [
+      "R2CH-B(OR)2",
+      "R3C-B(OR)2",
+      "RCH2-B(OR)2"
+    ],
+    "Alkyl-Br": [
+      "Propargyl-Br",
+      "R2CH-Br",
+      "R3C-Br",
+      "RCH2-Br"
+    ],
+    "Alkyl-CHO": [
+      "R2CH-CHO",
+      "R3C-CHO",
+      "RCH2-CHO"
+    ],
+    "Alkyl-CN": [
+      "R2CH-CN",
+      "R3C-CN",
+      "RCH2-CN"
+    ],
+    "Alkyl-CON3": [
+      "R2CH-CON3",
+      "R3C-CON3",
+      "RCH2-CON3"
+    ],
+    "Alkyl-CONH2": [
+      "R2CH-CONH2",
+      "R3C-CONH2",
+      "RCH2-CONH2"
+    ],
+    "Alkyl-CONHNH2": [
+      "R2CH-CONHNH2",
+      "R3C-CONHNH2",
+      "RCH2-CONHNH2"
+    ],
+    "Alkyl-CONHR": [
+      "R2CH-CONHR",
+      "R3C-CONHR",
+      "RCH2-CONHR"
+    ],
+    "Alkyl-CONR2": [
+      "R2CH-CONR2",
+      "R3C-CONR2",
+      "RCH2-CONR2"
+    ],
+    "Alkyl-COOH": [
+      "R2CH-COOH",
+      "R3C-COOH",
+      "RCH2-COOH"
+    ],
+    "Alkyl-COOR": [
+      "R2CH-COOR",
+      "R3C-COOR",
+      "RCH2-COOR"
+    ],
+    "Alkyl-COR": [
+      "R2CH-COR",
+      "R3C-COR",
+      "RCH2-COR"
+    ],
+    "Alkyl-Cl": [
+      "Propargyl-Cl",
+      "R2CH-Cl",
+      "R3C-Cl",
+      "RCH2-Cl"
+    ],
+    "Alkyl-F": [
+      "R2CH-F",
+      "R3C-F",
+      "RCH2-F"
+    ],
+    "Alkyl-H": [
+      "Propargyl-H"
+    ],
+    "Alkyl-I": [
+      "Propargyl-I",
+      "R2CH-I",
+      "R3C-I",
+      "RCH2-I"
+    ],
+    "Alkyl-LactamN": [
+      "R2CH-LactamN",
+      "R3C-LactamN",
+      "RCH2-LactamN"
+    ],
+    "Alkyl-Mg*": [
+      "R2CH-Mg*",
+      "R3C-Mg*",
+      "RCH2-Mg*"
+    ],
+    "Alkyl-N3": [
+      "R2CH-N3",
+      "R3C-N3",
+      "RCH2-N3"
+    ],
+    "Alkyl-NH2": [
+      "Propargyl-NH2",
+      "R2CH-NH2",
+      "R3C-NH2",
+      "RCH2-NH2"
+    ],
+    "Alkyl-NHR": [
+      "R2CH-NHR",
+      "R3C-NHR",
+      "RCH2-NHR"
+    ],
+    "Alkyl-NO2": [
+      "R2CH-NO2",
+      "R3C-NO2",
+      "RCH2-NO2"
+    ],
+    "Alkyl-NR2": [
+      "R2CH-NR2",
+      "R3C-NR2",
+      "RCH2-NR2"
+    ],
+    "Alkyl-OH": [
+      "Propargyl-OH",
+      "R2CH-OH",
+      "R3C-OH",
+      "RCH2-OH"
+    ],
+    "Alkyl-OMs": [
+      "Propargyl-OMs"
+    ],
+    "Alkyl-OR": [
+      "R2CH-OR",
+      "R3C-OR",
+      "RCH2-OR"
+    ],
+    "Alkyl-OSO2R": [
+      "Propargyl-OSO2R"
+    ],
+    "Alkyl-OTf": [
+      "Propargyl-OTf"
+    ],
+    "Alkyl-OTs": [
+      "Propargyl-OTs"
+    ],
+    "Alkyl-PO2NH2": [
+      "R2CH-PO2NH2",
+      "R3C-PO2NH2",
+      "RCH2-PO2NH2"
+    ],
+    "Alkyl-PO2NHR": [
+      "R2CH-PO2NHR",
+      "R3C-PO2NHR",
+      "RCH2-PO2NHR"
+    ],
+    "Alkyl-PO2NR2": [
+      "R2CH-PO2NR2",
+      "R3C-PO2NR2",
+      "RCH2-PO2NR2"
+    ],
+    "Alkyl-PO2OH": [
+      "R2CH-PO2OH",
+      "R3C-PO2OH",
+      "RCH2-PO2OH"
+    ],
+    "Alkyl-PO2OR": [
+      "R2CH-PO2OR",
+      "R3C-PO2OR",
+      "RCH2-PO2OR"
+    ],
+    "Alkyl-SH": [
+      "R2CH-SH",
+      "R3C-SH",
+      "RCH2-SH"
+    ],
+    "Alkyl-SO2NHNH2": [
+      "R2CH-SO2NHNH2",
+      "R3C-SO2NHNH2",
+      "RCH2-SO2NHNH2"
+    ],
+    "Alkyl-SO2NHR": [
+      "R2CH-SO2NHR",
+      "R3C-SO2NHR",
+      "RCH2-SO2NHR"
+    ],
+    "Alkyl-SO2NR2": [
+      "R2CH-SO2NR2",
+      "R3C-SO2NR2",
+      "RCH2-SO2NR2"
+    ],
+    "Alkyl-SO2R": [
+      "R2CH-SO2R",
+      "R3C-SO2R",
+      "RCH2-SO2R"
+    ],
+    "Alkyl-SR": [
+      "R2CH-SR",
+      "R3C-SR",
+      "RCH2-SR"
+    ],
+    "Alkyl-Sn*": [
+      "R2CH-Sn*",
+      "R3C-Sn*",
+      "RCH2-Sn*"
+    ],
+    "Alkyl-Zn*": [
+      "R2CH-Zn*",
+      "R3C-Zn*",
+      "RCH2-Zn*"
+    ],
+    "Ar-Ar": [
+      "HeteroAr-Ar"
+    ],
+    "Ar-B(OH)2": [
+      "HeteroAr-B(OH)2"
+    ],
+    "Ar-B(OR)2": [
+      "HeteroAr-B(OR)2"
+    ],
+    "Ar-BF3K": [
+      "HeteroAr-BF3K"
+    ],
+    "Ar-Br": [
+      "HeteroAr-Br"
+    ],
+    "Ar-CN": [
+      "HeteroAr-CN"
+    ],
+    "Ar-Cl": [
+      "HeteroAr-Cl"
+    ],
+    "Ar-F": [
+      "HeteroAr-F"
+    ],
+    "Ar-H": [
+      "AromN-H",
+      "HeteroAr-H"
+    ],
+    "Ar-I": [
+      "HeteroAr-I"
+    ],
+    "Ar-Iodonium": [
+      "HeteroAr-Iodonium"
+    ],
+    "Ar-N2+": [
+      "HeteroAr-N2+"
+    ],
+    "Ar-NC": [
+      "HeteroAr-NC"
+    ],
+    "Ar-NH2": [
+      "HeteroAr-NH2"
+    ],
+    "Ar-NHR": [
+      "HeteroAr-NHR"
+    ],
+    "Ar-OH": [
+      "AromN-OH",
+      "HeteroAr-OH"
+    ],
+    "Ar-OMs": [
+      "HeteroAr-OMs"
+    ],
+    "Ar-OR": [
+      "HeteroAr-OR"
+    ],
+    "Ar-OTf": [
+      "HeteroAr-OTf"
+    ],
+    "Ar-OTs": [
+      "HeteroAr-OTs"
+    ]
+  }
+}

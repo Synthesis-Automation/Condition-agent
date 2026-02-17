@@ -25,6 +25,7 @@ ORGANIC_COMPOUNDS_FILE = _TAXONOMY_DIR / "organic_compounds.v1.3.json"
 SCAFFOLD_MOTIFS_FILE = _TAXONOMY_DIR / "scaffold_motifs.v1.3.json"
 FEATURIZER_LOGIC_FILE = _TAXONOMY_DIR / "featurizer_logic.json"
 SYNTHON_FILE = _TAXONOMY_DIR / "synthons.v1.json"
+MOTIF_SCOPE_INDEX_FILE = _TAXONOMY_DIR / "motif_scope_index.v1.json"
 
 
 @lru_cache(maxsize=1)
@@ -180,6 +181,23 @@ def load_synthons() -> Dict[str, Any]:
         return {}
 
 
+@lru_cache(maxsize=1)
+def load_motif_scope_index() -> Dict[str, Any]:
+    """Load prebuilt motif scope index JSON.
+
+    Returns:
+        Dictionary containing scope_map and scaffold parent metadata.
+    """
+    if not MOTIF_SCOPE_INDEX_FILE.exists():
+        return {}
+
+    try:
+        with MOTIF_SCOPE_INDEX_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 def get_reaction_by_id(reaction_id: str) -> Dict[str, Any] | None:
     """Get a single reaction definition by ID.
     
@@ -228,6 +246,7 @@ def clear_taxonomy_cache() -> None:
     load_scaffold_motifs.cache_clear()
     load_featurizer_logic.cache_clear()
     load_synthons.cache_clear()
+    load_motif_scope_index.cache_clear()
 
 
 __all__ = [
@@ -239,6 +258,7 @@ __all__ = [
     "SCAFFOLD_MOTIFS_FILE",
     "FEATURIZER_LOGIC_FILE",
     "SYNTHON_FILE",
+    "MOTIF_SCOPE_INDEX_FILE",
     "load_reaction_types_raw",
     "load_reaction_types_list",
     "load_reaction_types_dict",
@@ -249,6 +269,7 @@ __all__ = [
     "load_scaffold_motifs",
     "load_featurizer_logic",
     "load_synthons",
+    "load_motif_scope_index",
     "get_reaction_by_id",
     "get_reaction_metadata",
     "clear_taxonomy_cache",

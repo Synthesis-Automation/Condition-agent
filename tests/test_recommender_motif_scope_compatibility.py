@@ -3,6 +3,20 @@ from __future__ import annotations
 from chemtools.recommend import recommender as hte
 
 
+def test_scope_map_includes_alkyl_boronic_acid_children() -> None:
+    hte._load_scope_map.cache_clear()
+    scope = hte._load_scope_map()
+    children = set(scope.get("Alkyl-B(OH)2") or [])
+    assert {"RCH2-B(OH)2", "R2CH-B(OH)2", "R3C-B(OH)2"} <= children
+
+
+def test_motif_token_compatibility_treats_rch2_boronic_as_alkyl_boronic() -> None:
+    hte._load_scope_parent_map.cache_clear()
+    hte._expanded_match_tokens.cache_clear()
+    assert hte._motif_tokens_compatible("RCH2-B(OH)2", "Alkyl-B(OH)2")
+    assert hte._motif_tokens_compatible("Alkyl-B(OH)2", "RCH2-B(OH)2")
+
+
 def test_heteroaryl_biaryl_compatibility_map_links_to_aryl_biaryl() -> None:
     compat = hte._load_motif_compatibility_map()
     assert "HeteroAr-Ar" in (compat.get("Ar-Ar") or set())
