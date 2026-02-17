@@ -9,12 +9,15 @@ Design: docs/reaction_smiles_analysis_agent_simple_v1.md
 
 import json
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, TYPE_CHECKING
 
 from llmtools.clients import LLMClient
 from reaction_agent.prompts import get_template, get_direct_smiles_template
 from reaction_agent.core import analyze_reaction_smiles as analyze_deterministic
 from chemtools.quick_reaction_glance import quick_reaction_glance, should_run_quick_glance
+
+if TYPE_CHECKING:
+    from reaction_agent.retry import RetryConfig
 
 
 def _strip_markdown_fences(text: str) -> str:
@@ -306,7 +309,8 @@ class ReactionSMILESAnalyzer:
         self,
         rxn_smiles: str,
         mode: str = "auto",
-        validate: bool = False
+        validate: bool = False,
+        retry_config: Optional['RetryConfig'] = None
     ) -> Dict[str, Any]:
         """
         Analyze a reaction SMILES string.
@@ -320,10 +324,25 @@ class ReactionSMILESAnalyzer:
                 - "deep": Always use gpt-5.2 with reasoning (slower, better quality)
                 - "expert": gpt-5.2 with highest reasoning (very slow, maximum quality)
             validate: Enable Tier 4 validation (RDKit + consensus checks)
+            retry_config: If provided and validate=True, enables automatic retry on validation failure
 
         Returns:
             Analysis result dict with input, tool_facts, interpretation, metadata
         """
+        # If retry requested, delegate to retry logic
+        if retry_config and validate:
+            from reaction_agent.retry import analyze_with_retry
+            return analyze_with_retry(
+                rxn_smiles=rxn_smiles,
+                initial_client=self.client,
+                config=retry_config,
+                validate=True,
+                mode=mode,
+                drop_spectators=self.drop_spectators,
+                temperature=self.temperature if self.reasoning_effort is None else None,
+                max_tokens=self.max_tokens,
+                reasoning_effort=self.reasoning_effort
+            )
         # Store original model and settings
         original_model = self.client.model
         original_max_tokens = self.max_tokens

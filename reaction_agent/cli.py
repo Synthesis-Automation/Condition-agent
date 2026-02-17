@@ -15,7 +15,7 @@ import sys
 import json
 import argparse
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, TYPE_CHECKING
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -23,6 +23,9 @@ sys.path.insert(0, str(project_root))
 
 from llmtools import LLMClient
 from reaction_agent import ReactionSMILESAnalyzer, analyze_deterministic
+
+if TYPE_CHECKING:
+    from reaction_agent.retry import RetryConfig
 
 
 # Colors for terminal output (ANSI codes)
@@ -384,13 +387,21 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
                 print(f"  Suggested model: {retry.get('model', 'N/A')}")
                 print(f"  Suggested mode: {retry.get('mode', 'N/A')}")
 
+    # Retry history section (if retry was used)
+    if 'retry_history' in result:
+        print_header("RETRY HISTORY")
+        history = result['retry_history']
+        print(history.summary())
+        print(f"\n{Colors.BOLD}Final result:{Colors.END} Attempt {result.get('final_attempt_num', 0)}")
+
 
 def analyze_reaction_interactive(
     analyzer: ReactionSMILESAnalyzer,
     rxn_smiles: str,
     save_output: Optional[Path] = None,
     mode: str = "auto",
-    validate: bool = False
+    validate: bool = False,
+    retry_config: Optional['RetryConfig'] = None
 ) -> Dict[str, Any]:
     """Analyze a reaction interactively with progress updates."""
 
@@ -401,7 +412,7 @@ def analyze_reaction_interactive(
     print_info(f"Running three-tier analysis (mode={mode})...")
 
     try:
-        result = analyzer.analyze(rxn_smiles, mode=mode, validate=validate)
+        result = analyzer.analyze(rxn_smiles, mode=mode, validate=validate, retry_config=retry_config)
     except Exception as e:
         print_error(f"Analysis failed: {e}")
         import traceback
@@ -497,8 +508,18 @@ def deterministic_only_mode(rxn_smiles: str):
         return None
 
 
-def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False):
+def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False, args=None):
     """Run interactive mode with prompts."""
+
+    # Initialize retry settings from args if provided
+    if args:
+        retry_enabled = args.validate and not args.no_retry
+        max_retries = args.max_retries
+        retry_on_warning = args.retry_on_warning
+    else:
+        retry_enabled = False
+        max_retries = 3
+        retry_on_warning = False
 
     print_header("INTERACTIVE MODE")
     print("\nEnter reaction SMILES to analyze (or 'quit' to exit)")
@@ -506,6 +527,8 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False):
     print("  'quit' or 'exit' - Exit the program")
     print("  'config' - Show current configuration")
     print("  'validate on/off' - Enable/disable Tier 4 validation")
+    print("  'retry on/off' - Enable/disable automatic retry")
+    print("  'max-retries N' - Set max retry attempts (e.g., max-retries 5)")
     print("  'help' - Show this help message")
     print("  'batch <file>' - Analyze reactions from file")
 
@@ -513,6 +536,11 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False):
         print(f"\n{Colors.GREEN}✓ Validation: ENABLED{Colors.END}")
     else:
         print(f"\n{Colors.YELLOW}✓ Validation: DISABLED (use 'validate on' to enable){Colors.END}")
+
+    if retry_enabled:
+        print(f"{Colors.GREEN}✓ Retry: ENABLED (max: {max_retries}){Colors.END}")
+    else:
+        print(f"{Colors.YELLOW}✓ Retry: DISABLED{Colors.END}")
 
     while True:
         try:
@@ -532,6 +560,8 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False):
                 print("  quit/exit - Exit the program")
                 print("  config    - Show current configuration")
                 print("  validate on/off - Enable/disable Tier 4 validation")
+                print("  retry on/off - Enable/disable automatic retry")
+                print("  max-retries N - Set max retry attempts")
                 print("  help      - Show this help message")
                 print("  batch <file> - Analyze reactions from file")
                 print("\nOr enter a reaction SMILES string to analyze")
@@ -549,6 +579,30 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False):
                     print_error("Usage: validate on|off")
                 continue
 
+            elif user_input.lower().startswith('retry '):
+                setting = user_input[6:].strip().lower()
+                if setting == 'on':
+                    retry_enabled = True
+                    print(f"{Colors.GREEN}✓ Automatic retry ENABLED{Colors.END}")
+                elif setting == 'off':
+                    retry_enabled = False
+                    print(f"{Colors.YELLOW}✓ Automatic retry DISABLED{Colors.END}")
+                else:
+                    print_error("Usage: retry on|off")
+                continue
+
+            elif user_input.lower().startswith('max-retries '):
+                try:
+                    num = int(user_input[12:].strip())
+                    if 0 <= num <= 10:
+                        max_retries = num
+                        print(f"{Colors.GREEN}✓ Max retries set to {num}{Colors.END}")
+                    else:
+                        print_error("Max retries must be between 0 and 10")
+                except ValueError:
+                    print_error("Usage: max-retries N (where N is a number)")
+                continue
+
             elif user_input.lower() == 'config':
                 print(f"\nCurrent Configuration:")
                 print(f"  Model: {analyzer.client.model}")
@@ -561,6 +615,10 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False):
                     print(f"  {Colors.GREEN}Validation: ENABLED{Colors.END}")
                 else:
                     print(f"  {Colors.YELLOW}Validation: DISABLED{Colors.END}")
+                if retry_enabled:
+                    print(f"  {Colors.GREEN}Retry: ENABLED (max: {max_retries}){Colors.END}")
+                else:
+                    print(f"  {Colors.YELLOW}Retry: DISABLED{Colors.END}")
                 continue
 
             elif user_input.lower().startswith('batch '):
@@ -577,7 +635,16 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False):
                 continue
 
             # Analyze the reaction
-            analyze_reaction_interactive(analyzer, user_input, validate=validate)
+            # Create retry config if validate and retry are enabled
+            retry_config = None
+            if validate and retry_enabled:
+                from reaction_agent.retry import RetryConfig
+                retry_config = RetryConfig(
+                    max_retries=max_retries,
+                    retry_on_warning=retry_on_warning
+                )
+
+            analyze_reaction_interactive(analyzer, user_input, validate=validate, retry_config=retry_config)
 
         except KeyboardInterrupt:
             print("\n\nInterrupted by user. Type 'quit' to exit.")
@@ -651,6 +718,24 @@ Examples:
     # Analysis options
     parser.add_argument('--keep-spectators', action='store_true', help='Keep spectators in analysis')
     parser.add_argument('--validate', action='store_true', help='Enable Tier 4 validation (RDKit + consensus checks)')
+
+    # Retry options (require --validate)
+    parser.add_argument(
+        '--max-retries',
+        type=int,
+        default=3,
+        help='Maximum retry attempts when validation fails (default: 3, requires --validate)'
+    )
+    parser.add_argument(
+        '--retry-on-warning',
+        action='store_true',
+        help='Retry even when validation status is WARNING (more aggressive, requires --validate)'
+    )
+    parser.add_argument(
+        '--no-retry',
+        action='store_true',
+        help='Disable automatic retry even with --validate'
+    )
 
     # Output options
     parser.add_argument('--output', '-o', type=Path, help='Save results to file (JSON)')
@@ -753,17 +838,27 @@ Examples:
 
     elif args.reaction:
         # Single reaction mode
+        # Create retry config if validate is enabled and retry not disabled
+        retry_config = None
+        if args.validate and not args.no_retry:
+            from reaction_agent.retry import RetryConfig
+            retry_config = RetryConfig(
+                max_retries=args.max_retries,
+                retry_on_warning=args.retry_on_warning
+            )
+
         analyze_reaction_interactive(
             analyzer,
             args.reaction,
             save_output=args.output,
             mode=effective_mode,
-            validate=args.validate
+            validate=args.validate,
+            retry_config=retry_config
         )
 
     else:
         # Interactive mode (default)
-        interactive_mode(analyzer, validate=args.validate)
+        interactive_mode(analyzer, validate=args.validate, args=args)
 
 
 if __name__ == "__main__":
