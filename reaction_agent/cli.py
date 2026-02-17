@@ -93,43 +93,6 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
             for warning in result['input']['parse_warnings']:
                 print_warning(f"Parse: {warning}")
 
-    # Tool facts section
-    if show_details:
-        print_header("DETERMINISTIC ANALYSIS")
-        tool_facts = result['tool_facts']
-
-        if tool_facts.get('mapped_rxn_smiles'):
-            print(f"Mapped: {tool_facts['mapped_rxn_smiles'][:80]}...")
-
-        mapping_qc = tool_facts['mapping_qc']
-        qc_ok = mapping_qc.get('ok', False)
-        qc_status = f"{Colors.GREEN}✓ OK{Colors.END}" if qc_ok else f"{Colors.RED}✗ Failed{Colors.END}"
-        print(f"Mapping QC: {qc_status}")
-
-        if 'confidence' in mapping_qc:
-            conf = mapping_qc['confidence']
-            conf_color = Colors.GREEN if conf >= 0.7 else Colors.YELLOW if conf >= 0.5 else Colors.RED
-            print(f"  Confidence: {conf_color}{conf:.2f}{Colors.END}")
-
-        if mapping_qc.get('notes'):
-            for note in mapping_qc['notes']:
-                print(f"  Note: {note}")
-
-        if tool_facts['bond_changes']:
-            print(f"\nBond Changes ({len(tool_facts['bond_changes'])}):")
-            for bc in tool_facts['bond_changes'][:10]:  # Show max 10
-                change_color = Colors.RED if bc['change'] == 'broken' else Colors.GREEN if bc['change'] == 'formed' else Colors.YELLOW
-                print(f"  {bc['id']}: {change_color}{bc['change']}{Colors.END} bond between :{bc['a1']} and :{bc['a2']} ({bc['bond']})")
-
-            if len(tool_facts['bond_changes']) > 10:
-                print(f"  ... and {len(tool_facts['bond_changes']) - 10} more")
-
-        if tool_facts['reaction_center_atoms']:
-            atoms_str = ', '.join(map(str, tool_facts['reaction_center_atoms'][:15]))
-            print(f"\nReaction Center: {atoms_str}")
-            if len(tool_facts['reaction_center_atoms']) > 15:
-                print(f"  ... and {len(tool_facts['reaction_center_atoms']) - 15} more atoms")
-
     # Automatic interpretation section (deterministic pattern-based)
     if 'auto_interpretation' in result and result['auto_interpretation']:
         auto_interp = result['auto_interpretation']

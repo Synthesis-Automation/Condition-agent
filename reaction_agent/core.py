@@ -393,6 +393,42 @@ def analyze_reaction_smiles(
             "bond_changes": [],
             "reaction_center_atoms": []
         }
+
+        # Still run automatic interpretation even without mapping
+        # Build a minimal hybrid_result for string-pattern-based interpretation
+        hybrid_result = {
+            'success': False,
+            'rxnmapper_result': {
+                'success': False,
+                'mapped_smiles': None,
+                'mapping_confidence': 0.0,
+                'broken_bonds': [],
+                'formed_bonds': []
+            },
+            'local_env_result': {'success': False},
+            'mcs_result': {'success': False},
+            'combined_confidence': 0.0,
+            'agreement': {}
+        }
+
+        try:
+            interpretation = interpret_reaction_pattern(clean.rxn_smiles_clean, hybrid_result)
+            interpretation_report = format_interpretation_report(
+                clean.rxn_smiles_clean,
+                hybrid_result,
+                interpretation
+            )
+
+            result["auto_interpretation"] = {
+                "interpretation": interpretation,
+                "report": interpretation_report
+            }
+        except Exception as e:
+            logger.warning(f"Automatic interpretation failed: {e}")
+            result["auto_interpretation"] = {
+                "error": str(e)
+            }
+
         return result
 
     # Step 2: Map
