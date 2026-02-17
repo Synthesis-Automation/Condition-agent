@@ -20,9 +20,15 @@ Key Requirement:
     via the taxonomy system.
 """
 
-from typing import Dict, Any, Optional, Tuple
+import logging
+from typing import Dict, Any, Optional, Tuple, TYPE_CHECKING
 from pathlib import Path
 from chemtools.recommend.recommender import HTERecommender, HTERecommendationResult
+
+if TYPE_CHECKING:
+    from reaction_agent.smiles_pipeline import ReactionPipeline, PipelineResult
+
+logger = logging.getLogger(__name__)
 
 
 class ConditionBridge:
@@ -50,15 +56,26 @@ class ConditionBridge:
         >>> print(f"Found {len(result['recommendations'].recommendations)} conditions")
     """
 
-    def __init__(self, hte_db_path: str = "data/HTE_db"):
+    def __init__(
+        self,
+        hte_db_path: str = "data/HTE_db",
+        pipeline: Optional["ReactionPipeline"] = None,
+    ):
         """
         Initialize bridge with HTE database.
 
         Args:
             hte_db_path: Path to HTE database directory (default: "data/HTE_db")
+            pipeline: Optional ReactionPipeline for pre-processing SMILES before
+                calling HTERecommender. When provided, the pipeline runs Stage 1–5
+                (normalize, featurize, quality-gate, LLM fallback) and its
+                reaction_type output is passed as reaction_type_filter to guide
+                the recommender's internal taxonomy matching. If the pipeline is
+                not provided, the original direct-featurize behaviour is unchanged.
         """
         self.hte_db_path = Path(hte_db_path)
         self.recommender = HTERecommender(str(self.hte_db_path))
+        self.pipeline: Optional["ReactionPipeline"] = pipeline
 
     def extract_smiles(
         self,
@@ -167,15 +184,50 @@ class ConditionBridge:
                 "to detect reaction type and motifs via the taxonomy system."
             )
 
-        # Call HTERecommender
-        # It handles all taxonomy/motif detection internally via featurize_reaction()
+        # Optional pipeline pre-processing: run the 5-stage pipeline to get a
+        # better reaction_type estimate (especially for complex reactions where
+        # featurize_reaction() may be low-confidence).
+        pipeline_result: Optional["PipelineResult"] = None
+        effective_reaction_type_filter = reaction_type_filter
+
+        if self.pipeline is not None:
+            rxn_smiles_clean = (
+                analysis_result.get("input", {}).get("rxn_smiles_clean", "")
+            )
+            if rxn_smiles_clean:
+                try:
+                    pipeline_result = self.pipeline.run(rxn_smiles_clean)
+                    if pipeline_result.success:
+                        if pipeline_result.used_llm_fallback:
+                            logger.info(
+                                "ConditionBridge: LLM fallback was used. "
+                                "reaction_type=%s reacted_motifs=%s",
+                                pipeline_result.reaction_type,
+                                pipeline_result.reacted_motifs,
+                            )
+                        # Use pipeline reaction_type as filter only when caller
+                        # has not already provided an explicit override.
+                        if reaction_type_filter is None and pipeline_result.reaction_type:
+                            effective_reaction_type_filter = pipeline_result.reaction_type
+                    else:
+                        logger.warning(
+                            "ConditionBridge: pipeline failed for '%s': %s",
+                            rxn_smiles_clean,
+                            pipeline_result.pipeline_warnings,
+                        )
+                except Exception as e:
+                    logger.warning("ConditionBridge: pipeline raised: %s", e)
+
+        # Call HTERecommender — it runs featurize_reaction() internally.
+        # The reaction_type_filter (optionally from the pipeline) guides its
+        # internal taxonomy matching without overriding its full motif detection.
         return self.recommender.recommend(
             reactant_a_smiles=reactant_a,
             reactant_b_smiles=reactant_b,
             product_smiles=product,  # CRITICAL for taxonomy-based detection
             top_k=top_k,
             min_experiments=min_experiments,
-            reaction_type_filter=reaction_type_filter,
+            reaction_type_filter=effective_reaction_type_filter,
             source_group="experiments"  # Phase 1: experiments only
         )
 

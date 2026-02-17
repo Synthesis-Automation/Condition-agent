@@ -25,6 +25,19 @@ Usage:
 
 __version__ = "0.1.0"
 
+from reaction_agent.smiles_pipeline import (
+    ReactionPipeline,
+    PipelineResult,
+    NormalizationResult,
+    FeaturizationResult,
+    LLMFallbackResult,
+)
+from reaction_agent.pipeline_eval import (
+    QualityConfig,
+    QualityReport,
+    QualityEvaluator,
+)
+from reaction_agent.taxonomy_prompts import TaxonomyContext
 from reaction_agent.core import (
     clean_reaction_smiles,
     map_reaction,
@@ -43,6 +56,16 @@ from reaction_agent.agent import (
 )
 
 __all__ = [
+    # Pipeline
+    "ReactionPipeline",
+    "PipelineResult",
+    "NormalizationResult",
+    "FeaturizationResult",
+    "LLMFallbackResult",
+    "QualityConfig",
+    "QualityReport",
+    "QualityEvaluator",
+    "TaxonomyContext",
     # Core deterministic functions
     "clean_reaction_smiles",
     "map_reaction",
