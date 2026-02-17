@@ -20,7 +20,8 @@ import time
 def quick_reaction_glance(
     rxn_smiles: str,
     client: LLMClient,
-    prompt_style: str = "structured"
+    prompt_style: str = "structured",
+    thorough: bool = False
 ) -> Dict[str, Any]:
     """
     Fast LLM-based reaction pattern recognition.
@@ -34,11 +35,14 @@ def quick_reaction_glance(
     Args:
         rxn_smiles: Reaction SMILES (reactants>>products)
         client: LLM client (should use cheap model like gpt-4o-mini)
-        prompt_style: "structured" or "concise" or "chemistry_expert"
+        prompt_style: "structured" or "concise" or "chemistry_expert" or "comprehensive"
+        thorough: If True, use comprehensive analysis (more tokens, better for complex reactions)
 
     Returns:
         Dict with:
         - reaction_types: list of identified reaction types
+        - all_transformations: list of ALL detected changes (if thorough=True)
+        - protecting_groups: dict with added/removed (if thorough=True)
         - patterns: list of detected patterns
         - complexity: "simple" | "moderate" | "complex" | "tandem"
         - summary: one-line description
@@ -57,23 +61,43 @@ def quick_reaction_glance(
 
     reactants, products = rxn_smiles.split('>>')
 
-    # Select prompt based on style
-    if prompt_style == "structured":
+    # Select prompt and token limit based on mode
+    if thorough or prompt_style == "comprehensive":
+        prompt = _get_comprehensive_prompt(reactants, products)
+        max_tokens = 1000  # More detailed analysis
+    elif prompt_style == "structured":
         prompt = _get_structured_prompt(reactants, products)
+        max_tokens = 300
     elif prompt_style == "concise":
         prompt = _get_concise_prompt(reactants, products)
+        max_tokens = 300
     elif prompt_style == "chemistry_expert":
         prompt = _get_chemistry_expert_prompt(reactants, products)
+        max_tokens = 300
     else:
         raise ValueError(f"Unknown prompt_style: {prompt_style}")
 
     # Call LLM
     try:
-        response = client.chat(
-            prompt=prompt,
-            temperature=0.0,
-            max_tokens=300  # Keep it short and fast
+        # Check if model is GPT-5 or o-series (needs reasoning_effort)
+        is_gpt5_or_o_series = any(
+            client.model.startswith(prefix) for prefix in ["gpt-5", "o3", "o4"]
         )
+
+        if is_gpt5_or_o_series:
+            # GPT-5/o-series: use reasoning_effort for better analysis
+            response = client.chat(
+                prompt=prompt,
+                max_tokens=max_tokens,
+                reasoning_effort="low"  # Low is optimal for quick analysis
+            )
+        else:
+            # Standard models: use temperature
+            response = client.chat(
+                prompt=prompt,
+                temperature=0.0,
+                max_tokens=max_tokens
+            )
     except Exception as e:
         return {
             'error': f'LLM call failed: {e}',
@@ -191,6 +215,58 @@ Return as JSON:
 }}
 
 JSON only, no explanation."""
+
+
+def _get_comprehensive_prompt(reactants: str, products: str) -> str:
+    """Comprehensive chemistry analysis prompt for thorough examination."""
+    return f"""You are an expert organic chemist. Analyze this reaction THOROUGHLY and COMPREHENSIVELY.
+
+Reactants: {reactants}
+Products: {products}
+
+Carefully examine and think step-by-step:
+
+1. STRUCTURAL COMPARISON:
+   - What structures/patterns appear in reactants but NOT in products? (removed/transformed)
+   - What structures/patterns appear in products but NOT in reactants? (added/formed)
+
+2. PROTECTING GROUPS (very important!):
+   - Look for: THP (tetrahydropyran like C1CCCCO1), Boc, TBDMS, Bn, Ac, Cbz, acetals, etc.
+   - Were any protecting groups ADDED? (protection)
+   - Were any protecting groups REMOVED? (deprotection)
+
+3. MAIN TRANSFORMATION:
+   - Primary reaction type (Suzuki coupling, SN2, oxidation, etc.)
+   - C-C bond formation? Bond breaking?
+
+4. ADDITIONAL TRANSFORMATIONS:
+   - Side reactions
+   - Workup transformations (acid/base labile groups)
+   - Is this tandem/sequential?
+
+5. CONTEXT:
+   - Pharmaceutical/medicinal chemistry relevance?
+   - Complex heterocycles?
+
+Return detailed JSON:
+{{
+  "main_transformation": "primary reaction type",
+  "reaction_types": ["all reaction types"],
+  "all_changes": ["list EVERY structural change you notice"],
+  "protecting_groups": {{
+    "removed": ["any deprotections with details"],
+    "added": ["any protections with details"]
+  }},
+  "side_reactions": ["any additional transformations"],
+  "complexity": "simple|moderate|complex|tandem",
+  "summary": "Complete description including ALL transformations",
+  "pharmaceutical_context": "if relevant, describe",
+  "confidence": 0.0-1.0,
+  "reasoning": "brief explanation of your analysis"
+}}
+
+CRITICAL: Respond with ONLY valid JSON. No markdown (```), no text before or after. Start with {{ and end with }}.
+JSON only, nothing else."""
 
 
 def should_run_quick_glance(

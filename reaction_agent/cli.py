@@ -205,6 +205,45 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
                 print(f"  • {pattern}")
             print()
 
+        # All changes (if comprehensive mode)
+        all_changes = quick.get('all_changes', [])
+        if all_changes:
+            print(f"{Colors.BOLD}All Structural Changes:{Colors.END}")
+            for change in all_changes[:5]:  # Show first 5
+                print(f"  • {change}")
+            if len(all_changes) > 5:
+                print(f"  ... and {len(all_changes)-5} more")
+            print()
+
+        # Protecting group changes (VERY IMPORTANT!)
+        pg_changes = quick.get('protecting_groups', {})
+        if pg_changes and (pg_changes.get('removed') or pg_changes.get('added')):
+            print(f"{Colors.BOLD}{Colors.YELLOW}Protecting Group Changes:{Colors.END}")
+            if pg_changes.get('removed'):
+                print(f"  {Colors.RED}Removed (deprotection):{Colors.END}")
+                for pg in pg_changes['removed']:
+                    print(f"    • {pg}")
+            if pg_changes.get('added'):
+                print(f"  {Colors.GREEN}Added (protection):{Colors.END}")
+                for pg in pg_changes['added']:
+                    print(f"    • {pg}")
+            print()
+
+        # Side reactions
+        side_rxns = quick.get('side_reactions', [])
+        if side_rxns:
+            print(f"{Colors.BOLD}Side/Workup Transformations:{Colors.END}")
+            for rxn in side_rxns:
+                print(f"  • {rxn}")
+            print()
+
+        # Pharmaceutical context
+        pharma_context = quick.get('pharmaceutical_context')
+        if pharma_context:
+            print(f"{Colors.BOLD}Pharmaceutical Context:{Colors.END}")
+            print(f"  {pharma_context}")
+            print()
+
         # Complexity
         complexity = quick.get('complexity', 'unknown')
         complexity_color = {

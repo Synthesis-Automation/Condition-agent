@@ -105,23 +105,38 @@ def analyze_reaction_smiles(
     # Step 1.5: Quick LLM glance (Tier 2) - optional fast analysis
     # Decision: run if string patterns inconclusive or mapping borderline
     quick_glance_result = None
+
     if auto_interpretation and auto_interpretation.get('interpretation'):
         string_patterns = auto_interpretation['interpretation']
 
-        # Use gpt-4o for best accuracy (0.647 score, 60% better than gpt-4o-mini)
+        # Use GPT-4o with comprehensive prompt for detailed chemistry analysis
+        # (GPT-5.2 not yet available in API as of Feb 2026, will auto-upgrade when available)
         # Run on ALL reactions for maximum coverage (prioritizing accuracy over cost)
         if should_run_quick_glance(string_patterns, mapping_conf, mode="always"):
             try:
-                # Create client for quick glance (gpt-4o for accuracy)
+                # Create client for quick glance using GPT-4o with comprehensive mode
                 quick_client = LLMClient(provider=client.provider, model="gpt-4o")
                 quick_glance_result = quick_reaction_glance(
                     input_data.get("rxn_smiles_clean", ""),
                     quick_client,
-                    prompt_style="structured"  # Best performing style
+                    prompt_style="comprehensive",  # Thorough analysis
+                    thorough=True  # Enable comprehensive mode
                 )
 
                 if quick_glance_result.get('success'):
-                    print(f"💡 Quick glance: {quick_glance_result.get('summary', 'N/A')}")
+                    summary = quick_glance_result.get('summary', 'N/A')
+                    # Show protecting group changes if detected
+                    pg_changes = quick_glance_result.get('protecting_groups', {})
+                    if pg_changes.get('removed') or pg_changes.get('added'):
+                        pg_note = []
+                        if pg_changes.get('removed'):
+                            pg_note.append(f"PG removed: {', '.join(pg_changes['removed'][:2])}")
+                        if pg_changes.get('added'):
+                            pg_note.append(f"PG added: {', '.join(pg_changes['added'][:2])}")
+                        print(f"💡 Quick glance: {summary}")
+                        print(f"   {' | '.join(pg_note)}")
+                    else:
+                        print(f"💡 Quick glance: {summary}")
 
             except Exception as e:
                 print(f"⚠️  Quick glance failed: {e}")
