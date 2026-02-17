@@ -90,10 +90,15 @@ PRESETS = {
 }
 
 
-def show_menu(use_llm: bool, model: str):
+def show_menu(use_llm: bool, model: str, use_reasoning: bool = True):
     print(f"\n{C.BOLD}{C.HEADER}{'='*72}{C.END}")
     print(f"{C.BOLD}{C.HEADER}  ReactionPipeline Interactive Tester{C.END}")
-    mode = f"LLM fallback ON ({model})" if use_llm else "deterministic only (no LLM)"
+    if use_reasoning:
+        mode = f"Reasoning Agent ON ({model})"
+    elif use_llm:
+        mode = f"Simple LLM fallback ({model})"
+    else:
+        mode = "deterministic only (no LLM)"
     print(f"{C.BOLD}{C.HEADER}  Mode: {mode}{C.END}")
     print(f"{C.BOLD}{C.HEADER}{'='*72}{C.END}")
     print("\n  Select a reaction:\n")
@@ -178,6 +183,101 @@ def show_stage4(llm_result, skipped_reason: str = ""):
         err("LLM fallback failed or produced incomplete output")
     for w in llm_result.warnings:
         warn(w)
+
+    # Show rich reasoning profile if available
+    profile = getattr(llm_result, 'reactivity_profile', None)
+    if profile:
+        show_reasoning_profile(profile)
+
+
+def show_reasoning_profile(profile):
+    """Display the rich ReactivityProfile from the reasoning agent."""
+    print(f"\n  {C.BOLD}{C.HEADER}--- Reasoning Agent Analysis ---{C.END}")
+
+    # Tools called
+    if profile.tools_called:
+        unique_tools = sorted(set(profile.tools_called))
+        kv("Tools used", f"{len(profile.tools_called)} calls ({', '.join(unique_tools)})")
+
+    # Electrophile
+    e = profile.electrophile
+    if e.hybridization or e.leaving_group:
+        print(f"\n  {C.BOLD}Electrophile:{C.END}")
+        if e.center_atom:
+            kv("    Center", e.center_atom)
+        if e.hybridization:
+            kv("    Hybridization", e.hybridization)
+        if e.leaving_group:
+            kv("    Leaving group", f"{e.leaving_group} ({e.leaving_group_quality})")
+        if e.electronic_class:
+            kv("    Electronics", f"score={e.electronic_score:.1f} ({e.electronic_class})")
+        if e.steric_class:
+            kv("    Sterics", f"score={e.steric_score:.1f} ({e.steric_class})")
+        if e.activation_tags:
+            kv("    Activation tags", e.activation_tags)
+
+    # Nucleophile
+    n = profile.nucleophile
+    if n.identity or n.attacking_atom:
+        print(f"\n  {C.BOLD}Nucleophile:{C.END}")
+        if n.identity:
+            kv("    Identity", n.identity)
+        if n.attacking_atom:
+            kv("    Attacking atom", n.attacking_atom)
+        if n.hardsoft:
+            kv("    Hard/soft", n.hardsoft)
+        if n.is_also_base:
+            warn("    Also acts as base (elimination risk)")
+        if n.steric_bulk:
+            kv("    Steric bulk", n.steric_bulk)
+
+    # Mechanism
+    m = profile.mechanism
+    if m.primary_class:
+        print(f"\n  {C.BOLD}Mechanism:{C.END}")
+        kv("    Primary class", m.primary_class)
+        kv("    Confidence", f"{m.confidence:.2f}")
+        if m.requires_catalyst:
+            kv("    Catalyst metals", m.likely_catalyst_metals)
+        if m.alternative_mechanisms:
+            kv("    Alternatives", m.alternative_mechanisms)
+        if m.evidence:
+            print(f"    {C.BOLD}Evidence:{C.END}")
+            for ev in m.evidence[:5]:
+                print(f"      • {ev}")
+
+    # Transformation
+    t = profile.transformation
+    if t.bonds_broken or t.bonds_formed:
+        print(f"\n  {C.BOLD}Transformation:{C.END}")
+        if t.key_bond_type:
+            kv("    Key bond type", t.key_bond_type)
+        if t.bonds_broken:
+            kv("    Bonds broken", t.bonds_broken)
+        if t.bonds_formed:
+            kv("    Bonds formed", t.bonds_formed)
+        if t.fg_removed:
+            kv("    FGs removed", t.fg_removed)
+        if t.fg_formed:
+            kv("    FGs formed", t.fg_formed)
+        if t.redox_change:
+            kv("    Redox", t.redox_change)
+
+    # Extended analysis
+    if profile.selectivity_risks:
+        print(f"\n  {C.BOLD}Selectivity risks:{C.END}")
+        for risk in profile.selectivity_risks:
+            warn(f"  {risk}")
+
+    if profile.condition_implications:
+        print(f"\n  {C.BOLD}Condition implications:{C.END}")
+        for ck, cv in profile.condition_implications.items():
+            kv(f"    {ck}", cv)
+
+    if profile.is_tandem:
+        warn("Tandem/multi-step reaction detected")
+
+    print(f"  {C.BOLD}{C.HEADER}--- End Reasoning Profile ---{C.END}")
 
 
 def show_stage5(result):
@@ -269,6 +369,8 @@ def run_pipeline(
     model: str,
     top_k: int,
     db_path: str,
+    use_reasoning: bool = True,
+    reasoning_model: str = None,
 ):
     from reaction_agent.smiles_pipeline import ReactionPipeline
 
@@ -276,7 +378,7 @@ def run_pipeline(
 
     # Build pipeline
     llm_client = None
-    if use_llm:
+    if use_llm and not use_reasoning:
         sub("Creating LLM client...")
         try:
             from llmtools.clients import LLMClient
@@ -286,7 +388,11 @@ def run_pipeline(
             err(f"Could not create LLM client: {e}")
             err("Running in deterministic-only mode")
 
-    pipeline = ReactionPipeline(llm_client=llm_client)
+    pipeline = ReactionPipeline(
+        llm_client=llm_client,
+        use_reasoning_agent=use_reasoning,
+        reasoning_model=reasoning_model or model,
+    )
 
     t0 = time.time()
 
@@ -309,13 +415,18 @@ def run_pipeline(
     llm_result = None
     llm_skip = ""
     if quality.needs_llm_fallback:
-        if llm_client is not None:
+        if use_reasoning:
+            sub(f"Running reasoning agent ({reasoning_model or model})...")
+            t_llm = time.time()
+            llm_result = pipeline.reasoning_fallback(norm.normalized_smiles, feat, quality)
+            ok(f"Reasoning agent done ({time.time()-t_llm:.2f}s)")
+        elif llm_client is not None:
             sub("Running LLM fallback...")
             t_llm = time.time()
             llm_result = pipeline.llm_fallback(norm.normalized_smiles, feat, quality)
             ok(f"LLM fallback done ({time.time()-t_llm:.2f}s)")
         else:
-            llm_skip = "No LLM client (run without --no-llm to enable)"
+            llm_skip = "No LLM client or reasoning agent"
     show_stage4(llm_result, skipped_reason=llm_skip)
 
     # Stage 5 — merge
@@ -358,6 +469,9 @@ def run_pipeline(
     kv("Total time",           f"{elapsed:.2f}s")
     kv("Quality passed",       result.quality.passed if result.quality else "N/A")
     kv("LLM fallback used",    result.used_llm_fallback)
+    if result.reactivity_profile:
+        kv("Reasoning agent",  f"YES ({result.reactivity_profile.total_tool_calls} tool calls)")
+        kv("Mechanism",        result.reactivity_profile.mechanism.primary_class or "N/A")
     kv("Final rxn type",       result.reaction_type or "None")
     kv("Final motifs",         f"{list(result.reacted_motifs)} → {list(result.formed_motifs)}")
     kv("Recommendations found", len(recs.recommendations) if recs else 0)
@@ -373,9 +487,13 @@ def main():
         description="Interactive tester for the 5-stage ReactionPipeline"
     )
     parser.add_argument("--no-llm", action="store_true",
-                        help="Disable LLM fallback (deterministic stages only)")
+                        help="Disable ALL LLM fallback (deterministic stages only)")
+    parser.add_argument("--no-reasoning", action="store_true",
+                        help="Disable reasoning agent, use simple prompt fallback instead")
     parser.add_argument("--model", default="gpt-4o",
-                        help="LLM model to use for fallback (default: gpt-4o)")
+                        help="LLM model to use (default: gpt-4o)")
+    parser.add_argument("--reasoning-model", default=None,
+                        help="Override model for reasoning agent (default: same as --model)")
     parser.add_argument("--db-path", default="data/HTE_db",
                         help="Path to HTE database directory (default: data/HTE_db)")
     parser.add_argument("--top-k", type=int, default=5,
@@ -388,12 +506,15 @@ def main():
         C.disable()
 
     use_llm = not args.no_llm
+    use_reasoning = use_llm and not args.no_reasoning
+
     if use_llm and not os.getenv("OPENAI_API_KEY"):
         print(f"{C.YELLOW}WARNING: OPENAI_API_KEY not set — LLM fallback disabled{C.END}")
         use_llm = False
+        use_reasoning = False
 
     while True:
-        show_menu(use_llm, args.model)
+        show_menu(use_llm, args.model, use_reasoning=use_reasoning)
         choice = input(f"{C.BOLD}Choice (0-6): {C.END}").strip()
 
         if choice == '0':
@@ -402,13 +523,21 @@ def main():
         elif choice in PRESETS:
             name, smiles = PRESETS[choice]
             print(f"\n{C.BOLD}Selected:{C.END} {name}")
-            run_pipeline(smiles, use_llm, args.model, args.top_k, args.db_path)
+            run_pipeline(
+                smiles, use_llm, args.model, args.top_k, args.db_path,
+                use_reasoning=use_reasoning,
+                reasoning_model=args.reasoning_model,
+            )
         elif choice == '6':
             smiles = input(f"\n{C.BOLD}Enter reaction SMILES (reactants>>product): {C.END}").strip()
             if not smiles:
                 warn("No input — returning to menu")
                 continue
-            run_pipeline(smiles, use_llm, args.model, args.top_k, args.db_path)
+            run_pipeline(
+                smiles, use_llm, args.model, args.top_k, args.db_path,
+                use_reasoning=use_reasoning,
+                reasoning_model=args.reasoning_model,
+            )
         else:
             err("Invalid choice — enter 0-6")
             continue

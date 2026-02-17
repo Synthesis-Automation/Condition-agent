@@ -14,6 +14,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from functools import lru_cache
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 import logging
@@ -107,6 +108,132 @@ class TaxonomyContext:
         ]
         return "\n".join(lines)
 
+    # ------------------------------------------------------------------
+    # Search methods (used by reasoning agent tools)
+    # ------------------------------------------------------------------
+
+    def search_reaction_types(
+        self,
+        keywords: Optional[List[str]] = None,
+        bond_type: Optional[str] = None,
+        catalyst: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """Search reaction types by keywords, bond type, or catalyst.
+
+        Returns matching entries sorted by relevance score.
+        """
+        rxn_list = _load_reaction_types_list_full()
+        if not rxn_list:
+            return []
+
+        kw_lower = [kw.lower() for kw in (keywords or [])]
+        bond_lower = bond_type.lower().strip() if bond_type else ""
+        cat_lower = catalyst.lower().strip() if catalyst else ""
+
+        matches = []
+        for entry in rxn_list:
+            if not isinstance(entry, dict):
+                continue
+            score = 0
+
+            # Build searchable text
+            searchable_parts = [
+                entry.get("id", ""),
+                entry.get("description", ""),
+            ]
+            searchable_parts.extend(entry.get("aliases", []))
+            searchable = " ".join(searchable_parts).lower()
+
+            # Keyword matching
+            for kw in kw_lower:
+                if kw in searchable:
+                    score += 1
+
+            # Bond type matching (constraints.include_bond_formed)
+            if bond_lower:
+                constraints = entry.get("constraints", {})
+                bond_formed = constraints.get("include_bond_formed", [])
+                if isinstance(bond_formed, list):
+                    for bf in bond_formed:
+                        if bond_lower in str(bf).lower():
+                            score += 2
+                            break
+
+            # Catalyst matching
+            if cat_lower:
+                catalysts = entry.get("catalysts", [])
+                if isinstance(catalysts, list):
+                    for cat in catalysts:
+                        if cat_lower in str(cat).lower():
+                            score += 2
+                            break
+
+            if score > 0:
+                matches.append({**entry, "_match_score": score})
+
+        matches.sort(key=lambda x: x.get("_match_score", 0), reverse=True)
+        return matches
+
+    def search_motifs(
+        self,
+        scaffold: str = "",
+        substituent: str = "",
+    ) -> List[str]:
+        """Search motif labels by scaffold and/or substituent part.
+
+        Returns matching motif label strings.
+        """
+        scaffold_lower = scaffold.lower().strip()
+        sub_lower = substituent.lower().strip().lstrip("-")
+
+        matches = []
+        for label in sorted(self.motif_labels):
+            # Label format: "Scaffold-Substituent" e.g. "Ar-Br"
+            if scaffold_lower and scaffold_lower not in label.lower().split("-")[0]:
+                continue
+            if sub_lower:
+                # Check if substituent appears in the part after first "-"
+                parts = label.split("-", 1)
+                if len(parts) < 2 or sub_lower not in parts[1].lower():
+                    continue
+            matches.append(label)
+        return matches
+
+    def get_motif_hierarchy(self, broad_motif: str) -> Dict[str, Any]:
+        """Get specific sub-motifs for a broad motif from the scope index.
+
+        Returns dict with 'specific_motifs' list and 'scaffold_parents' map.
+        """
+        scope_data = _load_motif_scope_index()
+        scope_map = scope_data.get("scope_map", {})
+        parent_map = scope_data.get("scaffold_parent_map", {})
+
+        result: Dict[str, Any] = {"broad_motif": broad_motif}
+
+        # Direct lookup
+        if broad_motif in scope_map:
+            result["specific_motifs"] = scope_map[broad_motif]
+        else:
+            # Case-insensitive fallback
+            for key, val in scope_map.items():
+                if key.lower() == broad_motif.lower():
+                    result["specific_motifs"] = val
+                    result["canonical_key"] = key
+                    break
+            else:
+                result["specific_motifs"] = []
+
+        # Relevant parent relationships
+        relevant_parents = {}
+        base_scaffold = broad_motif.split("-")[0]
+        for child, parents in parent_map.items():
+            if base_scaffold in parents or child == base_scaffold:
+                relevant_parents[child] = parents
+        if relevant_parents:
+            result["scaffold_parents"] = relevant_parents
+
+        return result
+
 
 # ---------------------------------------------------------------------------
 # Cached loaders
@@ -148,6 +275,45 @@ def _load_motif_labels() -> Set[str]:
     except Exception as e:
         logger.warning(f"TaxonomyContext: could not load organic compounds: {e}")
         return set()
+
+
+@lru_cache(maxsize=1)
+def _load_reaction_types_list_full() -> List[Dict[str, Any]]:
+    """Load full reaction types entries (not just IDs) for search."""
+    try:
+        from chemtools.taxonomy.loader import load_reaction_types_list
+        return load_reaction_types_list()
+    except Exception as e:
+        logger.warning(f"Could not load reaction types list: {e}")
+        return []
+
+
+@lru_cache(maxsize=1)
+def _load_motif_scope_index() -> Dict[str, Any]:
+    """Load the motif scope index (broad -> specific motif mapping)."""
+    try:
+        # Try multiple paths to find the file
+        candidates = [
+            Path(__file__).resolve().parent.parent / "chemtools" / "taxonomy" / "data" / "motif_scope_index.v1.json",
+        ]
+        # Also try via chemtools package location
+        try:
+            import chemtools.taxonomy
+            pkg_dir = Path(chemtools.taxonomy.__file__).parent
+            candidates.insert(0, pkg_dir / "data" / "motif_scope_index.v1.json")
+        except Exception:
+            pass
+
+        for path in candidates:
+            if path.exists():
+                with open(path, encoding="utf-8") as f:
+                    return json.load(f)
+
+        logger.warning("motif_scope_index.v1.json not found")
+        return {}
+    except Exception as e:
+        logger.warning(f"Could not load motif scope index: {e}")
+        return {}
 
 
 # ---------------------------------------------------------------------------
@@ -318,4 +484,7 @@ __all__ = [
     "TaxonomyContext",
     "build_llm_fallback_prompt",
     "parse_llm_fallback_response",
+    # Cached loaders (used by reasoning_tools.py)
+    "_load_reaction_types_list_full",
+    "_load_motif_scope_index",
 ]

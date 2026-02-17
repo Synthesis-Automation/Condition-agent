@@ -38,6 +38,14 @@ from reaction_agent.pipeline_eval import (
     QualityEvaluator,
 )
 from reaction_agent.taxonomy_prompts import TaxonomyContext
+from reaction_agent.reactivity_profile import (
+    ReactivityProfile,
+    ElectrophileProfile,
+    NucleophileProfile,
+    MechanismAnalysis,
+    TransformationRecord,
+)
+from reaction_agent.reasoning_agent import ReactionReasoningAgent
 from reaction_agent.core import (
     clean_reaction_smiles,
     map_reaction,
@@ -66,6 +74,13 @@ __all__ = [
     "QualityReport",
     "QualityEvaluator",
     "TaxonomyContext",
+    # Reasoning agent
+    "ReactionReasoningAgent",
+    "ReactivityProfile",
+    "ElectrophileProfile",
+    "NucleophileProfile",
+    "MechanismAnalysis",
+    "TransformationRecord",
     # Core deterministic functions
     "clean_reaction_smiles",
     "map_reaction",

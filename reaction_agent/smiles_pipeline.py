@@ -94,6 +94,7 @@ class LLMFallbackResult:
     invalid_ids_found: List[str] = field(default_factory=list)   # Rejected IDs
     raw_response: str = ""              # Full LLM JSON string for debugging
     warnings: List[str] = field(default_factory=list)
+    reactivity_profile: Optional[Any] = None   # ReactivityProfile from reasoning agent
 
 
 @dataclass
@@ -124,6 +125,9 @@ class PipelineResult:
     reaction_key: Optional[str] = None
     used_llm_fallback: bool = False
 
+    # Rich reactivity profile from reasoning agent (when available)
+    reactivity_profile: Optional[Any] = None
+
     # Aggregated warnings from all stages
     pipeline_warnings: List[str] = field(default_factory=list)
 
@@ -153,19 +157,23 @@ class ReactionPipeline:
     Each stage is a public method and returns a typed dataclass so any stage
     can be called in isolation for unit testing or debugging.
 
+    Stage 4 fallback has two modes:
+    - Reasoning agent (default): Uses ReactionReasoningAgent with RDKit tools
+      and LangGraph for intelligent chemistry analysis
+    - Simple prompt (backup): Uses taxonomy-constrained LLM prompt
+
     Args:
-        llm_client: LLM client for Stage 4 fallback (optional — if None,
-            the pipeline skips Stage 4 and returns featurize_reaction() output
-            even if the quality gate fails).
+        llm_client: LLM client for simple Stage 4 fallback (optional).
         quality_config: Configures the four quality criteria for Stage 3.
-        llm_model_override: Override the LLM model for Stage 4 (e.g. "gpt-4o").
-            If None, the client's current model is used.
+        llm_model_override: Override the LLM model for simple fallback.
+        use_reasoning_agent: If True (default), use ReactionReasoningAgent
+            for Stage 4. Falls back to simple prompt if agent unavailable.
+        reasoning_provider: LLM provider for reasoning agent (default: env).
+        reasoning_model: LLM model for reasoning agent (default: env).
 
     Example:
-        >>> from llmtools.clients import LLMClient
         >>> from reaction_agent.smiles_pipeline import ReactionPipeline
-        >>> client = LLMClient(provider="openai", model="gpt-4o")
-        >>> pipeline = ReactionPipeline(llm_client=client)
+        >>> pipeline = ReactionPipeline()
         >>> result = pipeline.run("Brc1ccccc1.B(O)(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1")
         >>> print(result.reaction_type)
     """
@@ -175,11 +183,18 @@ class ReactionPipeline:
         llm_client: Optional["LLMClient"] = None,
         quality_config: Optional[QualityConfig] = None,
         llm_model_override: Optional[str] = None,
+        use_reasoning_agent: bool = True,
+        reasoning_provider: Optional[str] = None,
+        reasoning_model: Optional[str] = None,
     ) -> None:
         self.llm_client = llm_client
         self._evaluator = QualityEvaluator(quality_config)
         self._taxonomy = TaxonomyContext()
         self._llm_model_override = llm_model_override
+        self._use_reasoning_agent = use_reasoning_agent
+        self._reasoning_provider = reasoning_provider
+        self._reasoning_model = reasoning_model
+        self._reasoning_agent = None  # Lazily initialized
 
     # ------------------------------------------------------------------
     # Main entry point
@@ -210,14 +225,17 @@ class ReactionPipeline:
         # Stage 4 — LLM fallback (conditional)
         llm_result: Optional[LLMFallbackResult] = None
         if quality.needs_llm_fallback:
-            if self.llm_client is not None:
-                logger.info(
-                    f"Pipeline Stage 4: LLM fallback triggered. Issues: {quality.issues}"
-                )
+            logger.info(
+                f"Pipeline Stage 4: LLM fallback triggered. Issues: {quality.issues}"
+            )
+            # Try reasoning agent first (default), fall back to simple prompt
+            if self._use_reasoning_agent:
+                llm_result = self.reasoning_fallback(norm.normalized_smiles, feat, quality)
+            elif self.llm_client is not None:
                 llm_result = self.llm_fallback(norm.normalized_smiles, feat, quality)
             else:
                 logger.warning(
-                    "Pipeline Stage 3 failed but no LLM client provided — "
+                    "Pipeline Stage 3 failed but no LLM client or reasoning agent — "
                     "skipping Stage 4. Quality issues: %s",
                     quality.issues,
                 )
@@ -574,6 +592,83 @@ class ReactionPipeline:
         )
 
     # ------------------------------------------------------------------
+    # Stage 4b — Reasoning agent fallback (default)
+    # ------------------------------------------------------------------
+
+    def reasoning_fallback(
+        self,
+        normalized_smiles: str,
+        feat: FeaturizationResult,
+        quality: QualityReport,
+    ) -> LLMFallbackResult:
+        """
+        Run the ReactionReasoningAgent for intelligent chemistry analysis.
+
+        The agent uses RDKit tools + LLM reasoning to build a comprehensive
+        ReactivityProfile. Taxonomy mapping is extracted from the profile.
+
+        Falls back to simple llm_fallback() if the reasoning agent is
+        unavailable or fails.
+        """
+        try:
+            if self._reasoning_agent is None:
+                from reaction_agent.reasoning_agent import ReactionReasoningAgent
+                self._reasoning_agent = ReactionReasoningAgent(
+                    provider=self._reasoning_provider,
+                    model=self._reasoning_model,
+                )
+
+            profile = self._reasoning_agent.analyze(normalized_smiles)
+
+            # Extract taxonomy fields from the profile
+            reaction_type = profile.reaction_type
+            reacted_motifs = tuple(profile.reacted_motifs)
+            formed_motifs = tuple(profile.formed_motifs)
+            confidence = profile.confidence or profile.reaction_type_confidence
+
+            success = bool(reaction_type and len(reacted_motifs) >= 1)
+
+            reasoning_parts = []
+            if profile.taxonomy_reasoning:
+                reasoning_parts.append(profile.taxonomy_reasoning)
+            if profile.mechanism.primary_class:
+                reasoning_parts.append(f"Mechanism: {profile.mechanism.primary_class}")
+            reasoning = " | ".join(reasoning_parts)
+
+            warnings = list(profile.warnings)
+            if not success:
+                warnings.append(
+                    "Reasoning agent did not return valid taxonomy mapping"
+                )
+
+            return LLMFallbackResult(
+                success=success,
+                reaction_type=reaction_type,
+                reacted_motifs=reacted_motifs,
+                formed_motifs=formed_motifs,
+                confidence=confidence,
+                reasoning=reasoning,
+                raw_response="",
+                warnings=warnings,
+                reactivity_profile=profile,
+            )
+
+        except Exception as exc:
+            logger.warning(f"Reasoning agent failed: {exc}. Falling back to simple LLM.")
+            # Fall back to simple prompt-based approach
+            if self.llm_client is not None:
+                return self.llm_fallback(normalized_smiles, feat, quality)
+            return LLMFallbackResult(
+                success=False,
+                reaction_type=None,
+                reacted_motifs=(),
+                formed_motifs=(),
+                confidence=0.0,
+                reasoning="",
+                warnings=[f"Reasoning agent failed: {exc}, no LLM client for fallback"],
+            )
+
+    # ------------------------------------------------------------------
     # Stage 5 — Merge / patch
     # ------------------------------------------------------------------
 
@@ -644,6 +739,11 @@ class ReactionPipeline:
                 "falling back to featurize_reaction() output"
             )
 
+        # Extract reactivity profile if available
+        reactivity_profile = None
+        if llm_result and hasattr(llm_result, 'reactivity_profile'):
+            reactivity_profile = llm_result.reactivity_profile
+
         return PipelineResult(
             raw_smiles=norm.normalized_smiles or "",
             normalization=norm,
@@ -657,6 +757,7 @@ class ReactionPipeline:
             spectator_motifs=spectator_motifs,
             reaction_key=reaction_key,
             used_llm_fallback=used_llm_fallback,
+            reactivity_profile=reactivity_profile,
             pipeline_warnings=all_warnings,
         )
 
