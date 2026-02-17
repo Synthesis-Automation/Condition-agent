@@ -325,16 +325,270 @@ def analyze_bond_changes(reaction_smiles: str, auto_map: bool = True) -> Dict[st
         }
 
 
+def map_by_local_environment(reaction_smiles: str, radius: int = 2) -> Dict[str, Any]:
+    """
+    Deterministic atom mapping using local environment fingerprints.
+
+    This method works well for functional group transformations where most of
+    the molecule remains unchanged. Uses Morgan fingerprints to match atoms
+    based on their local chemical environment.
+
+    Best for:
+    - Functional group transformations (oxidations, reductions, protections)
+    - Single-site modifications
+    - Reactions with clear reactant-product correspondence
+
+    Args:
+        reaction_smiles: Unmapped reaction SMILES
+        radius: Morgan fingerprint radius (default: 2, range 1-3)
+
+    Returns:
+        Dictionary with:
+        - mapped_smiles: Atom-mapped reaction SMILES
+        - broken_bonds: List of (atom1, atom2) bonds that broke
+        - formed_bonds: List of (atom1, atom2) bonds that formed
+        - changed_atoms: Set of atom map numbers that changed
+        - spectator_atoms: Set of atom map numbers unchanged
+        - mapping_stats: Statistics about the mapping process
+        - method: "local_environment"
+        - success: True if analysis succeeded
+        - confidence: 0.7-0.9 for functional group transformations
+    """
+    try:
+        from rdkit import Chem
+        from rdkit.Chem import AllChem
+    except ImportError:
+        return {
+            'success': False,
+            'error': 'RDKit not available',
+            'method': 'local_environment'
+        }
+
+    try:
+        # Parse reaction
+        if '>>' not in reaction_smiles:
+            return {
+                'success': False,
+                'error': 'Invalid reaction SMILES (missing >>)',
+                'method': 'local_environment'
+            }
+
+        reactants_smiles, products_smiles = reaction_smiles.split('>>')
+
+        # Remove existing atom mapping if present
+        def strip_atom_mapping(smiles: str) -> str:
+            return re.sub(r':\d+', '', smiles)
+
+        reactants_smiles = strip_atom_mapping(reactants_smiles)
+        products_smiles = strip_atom_mapping(products_smiles)
+
+        # Parse molecules
+        reactant_mols = [Chem.MolFromSmiles(s) for s in reactants_smiles.split('.') if s]
+        product_mols = [Chem.MolFromSmiles(s) for s in products_smiles.split('.') if s]
+
+        reactant_mols = [m for m in reactant_mols if m is not None]
+        product_mols = [m for m in product_mols if m is not None]
+
+        if not reactant_mols or not product_mols:
+            return {
+                'success': False,
+                'error': 'Could not parse reactants or products',
+                'method': 'local_environment'
+            }
+
+        # Generate atom environments using Morgan fingerprints
+        def get_atom_environments(mols, radius=2):
+            """Generate environment fingerprints for each atom."""
+            environments = []
+            for mol_idx, mol in enumerate(mols):
+                for atom_idx, atom in enumerate(mol.GetAtoms()):
+                    # Generate Morgan fingerprint for this atom
+                    env = AllChem.GetMorganFingerprint(mol, radius, fromAtoms=[atom_idx])
+
+                    # Also store atom properties for matching
+                    atom_info = {
+                        'mol_idx': mol_idx,
+                        'atom_idx': atom_idx,
+                        'element': atom.GetSymbol(),
+                        'degree': atom.GetDegree(),
+                        'formal_charge': atom.GetFormalCharge(),
+                        'hybridization': str(atom.GetHybridization()),
+                        'is_aromatic': atom.GetIsAromatic(),
+                        'num_h': atom.GetTotalNumHs(),
+                        'fingerprint': env,
+                        'atom': atom,
+                        'mol': mol
+                    }
+                    environments.append(atom_info)
+            return environments
+
+        reactant_envs = get_atom_environments(reactant_mols, radius)
+        product_envs = get_atom_environments(product_mols, radius)
+
+        # Match atoms based on fingerprint similarity
+        mapping = {}  # reactant_idx -> product_idx
+        used_products = set()
+        map_num = 1
+
+        # Phase 1: Exact fingerprint matches (spectators)
+        for r_env in reactant_envs:
+            if len(mapping) >= len(reactant_envs):
+                break
+
+            r_key = (r_env['mol_idx'], r_env['atom_idx'])
+            if r_key in mapping:
+                continue
+
+            # Find exact match in products
+            for p_env in product_envs:
+                p_key = (p_env['mol_idx'], p_env['atom_idx'])
+                if p_key in used_products:
+                    continue
+
+                # Check if fingerprints match
+                if (r_env['element'] == p_env['element'] and
+                    r_env['fingerprint'] == p_env['fingerprint']):
+                    mapping[r_key] = (p_key, map_num)
+                    used_products.add(p_key)
+                    map_num += 1
+                    break
+
+        # Phase 2: Element + connectivity matching for unmatched atoms
+        for r_env in reactant_envs:
+            r_key = (r_env['mol_idx'], r_env['atom_idx'])
+            if r_key in mapping:
+                continue
+
+            # Find best match in products based on element and properties
+            best_match = None
+            best_score = -1
+
+            for p_env in product_envs:
+                p_key = (p_env['mol_idx'], p_env['atom_idx'])
+                if p_key in used_products:
+                    continue
+
+                # Must have same element
+                if r_env['element'] != p_env['element']:
+                    continue
+
+                # Calculate similarity score
+                score = 0
+                if r_env['degree'] == p_env['degree']:
+                    score += 2
+                if r_env['formal_charge'] == p_env['formal_charge']:
+                    score += 2
+                if r_env['hybridization'] == p_env['hybridization']:
+                    score += 1
+                if r_env['is_aromatic'] == p_env['is_aromatic']:
+                    score += 1
+                if r_env['num_h'] == p_env['num_h']:
+                    score += 1
+
+                if score > best_score:
+                    best_score = score
+                    best_match = p_key
+
+            if best_match is not None and best_score >= 3:  # Minimum threshold
+                mapping[r_key] = (best_match, map_num)
+                used_products.add(best_match)
+                map_num += 1
+
+        # Apply atom mapping to molecules
+        for mol in reactant_mols + product_mols:
+            for atom in mol.GetAtoms():
+                atom.SetAtomMapNum(0)  # Clear existing mapping
+
+        for r_key, (p_key, map_n) in mapping.items():
+            r_mol_idx, r_atom_idx = r_key
+            p_mol_idx, p_atom_idx = p_key
+
+            reactant_mols[r_mol_idx].GetAtomWithIdx(r_atom_idx).SetAtomMapNum(map_n)
+            product_mols[p_mol_idx].GetAtomWithIdx(p_atom_idx).SetAtomMapNum(map_n)
+
+        # Generate mapped SMILES
+        reactants_mapped = '.'.join(Chem.MolToSmiles(m) for m in reactant_mols)
+        products_mapped = '.'.join(Chem.MolToSmiles(m) for m in product_mols)
+        mapped_smiles = f"{reactants_mapped}>>{products_mapped}"
+
+        # Analyze bond changes using the mapping
+        result = identify_changed_atoms_from_mapped_smiles(mapped_smiles)
+
+        if not result.get('success'):
+            return {
+                'success': False,
+                'error': f"Bond analysis failed: {result.get('error')}",
+                'method': 'local_environment'
+            }
+
+        # Calculate confidence based on mapping coverage and quality
+        total_r_atoms = len(reactant_envs)
+        total_p_atoms = len(product_envs)
+        mapped_atoms = len(mapping)
+
+        # Coverage: how many atoms were mapped
+        coverage = mapped_atoms / max(total_r_atoms, total_p_atoms)
+
+        # Confidence ranges from 0.7-0.9 for good functional group transformations
+        # Lower if many atoms couldn't be mapped
+        confidence = 0.7 + (coverage * 0.2)
+        confidence = min(0.9, max(0.5, confidence))
+
+        # Lower confidence if atom count changed significantly (suggests complex rearrangement)
+        atom_count_diff = abs(total_r_atoms - total_p_atoms)
+        if atom_count_diff > 3:
+            confidence *= 0.8
+
+        result['mapped_smiles'] = mapped_smiles
+        result['method'] = 'local_environment'
+        result['confidence'] = confidence
+        result['mapping_stats'] = {
+            'total_reactant_atoms': total_r_atoms,
+            'total_product_atoms': total_p_atoms,
+            'mapped_atoms': mapped_atoms,
+            'coverage': coverage,
+            'unmapped_reactants': total_r_atoms - mapped_atoms,
+            'unmapped_products': total_p_atoms - len(used_products)
+        }
+        result['interpretation'] = _interpret_local_env_mapping(
+            mapped_atoms,
+            len(result.get('broken_bonds', [])),
+            len(result.get('formed_bonds', []))
+        )
+
+        return result
+
+    except Exception as e:
+        logger.warning(f"Local environment mapping failed: {e}")
+        return {
+            'success': False,
+            'error': str(e),
+            'method': 'local_environment'
+        }
+
+
+def _interpret_local_env_mapping(mapped_atoms: int, broken: int, formed: int) -> str:
+    """Interpret local environment mapping results."""
+    if broken == 0 and formed == 0:
+        return "No structural changes detected"
+    elif broken <= 2 and formed <= 2:
+        return "Simple functional group transformation (1-2 bond changes)"
+    elif broken <= 4 and formed <= 4:
+        return "Moderate functional group transformation (3-4 bond changes)"
+    else:
+        return "Complex transformation (>4 bond changes) - consider using rxnmapper"
+
+
 def analyze_with_mcs(reaction_smiles: str) -> Dict[str, Any]:
     """
     Analyze bond changes using Maximum Common Substructure (MCS) approach.
-    
+
     This is a fallback method that works without atom mapping tools.
     Uses RDKit's FindMCS to identify unchanged atoms, then infers bond changes.
-    
+
     Args:
         reaction_smiles: Unmapped reaction SMILES
-    
+
     Returns:
         Dictionary with:
         - changed_atoms_estimated: Estimated number of changed atoms
@@ -482,57 +736,63 @@ def _interpret_mcs_changes(changed_atoms: int, broken: int, formed: int) -> str:
 def analyze_bond_changes_hybrid(
     reaction_smiles: str,
     use_rxnmapper: bool = True,
+    use_local_env: bool = True,
     use_mcs: bool = True,
     use_manual: bool = True,
     auto_map: bool = True
 ) -> Dict[str, Any]:
     """
-    Hybrid approach: Combine RXNMapper, MCS, and manual mapping for best results.
-    
+    Hybrid approach: Combine multiple mapping methods for best results.
+
     This provides the best of all worlds:
     - Manual mapping (if available): Ground truth from atom-mapped SMILES
     - RXNMapper: ML-based atom mapping with high accuracy
+    - Local environment: Deterministic mapping for functional group transformations
     - MCS: Graph-based validation and fallback
     - Combined results increase confidence
-    
+
     Priority order:
     1. Manual mapping (if reaction is already atom-mapped)
-    2. RXNMapper (ML-based, high accuracy)
-    3. MCS (graph-based, approximate)
-    
+    2. RXNMapper (ML-based, high accuracy for all reaction types)
+    3. Local environment (deterministic, best for functional group transformations)
+    4. MCS (graph-based, approximate fallback)
+
     Args:
         reaction_smiles: Reaction SMILES (mapped or unmapped)
         use_rxnmapper: If True, try RXNMapper (default: True)
+        use_local_env: If True, try local environment mapping (default: True)
         use_mcs: If True, also run MCS analysis (default: True)
         use_manual: If True, check for existing atom mapping first (default: True)
         auto_map: If True, auto-map with RXNMapper if needed (default: True)
-    
+
     Returns:
         Dictionary with:
         - manual_result: Results from manual mapping (if available)
         - rxnmapper_result: Results from RXNMapper (if used)
+        - local_env_result: Results from local environment mapping (if used)
         - mcs_result: Results from MCS (if used)
         - combined_confidence: Combined confidence score
         - agreement: Dict showing which methods agree
         - recommended_result: Best result to use
-        - method: "manual", "hybrid", "rxnmapper_only", or "mcs_only"
+        - method: "manual", "hybrid", "rxnmapper_only", "local_env_only" or "mcs_only"
     """
     results = {
         'manual_result': None,
         'rxnmapper_result': None,
+        'local_env_result': None,
         'mcs_result': None,
         'combined_confidence': 0.0,
         'agreement': {},
         'method': 'hybrid',
         'success': False
     }
-    
+
     # Check for manual mapping first (highest priority)
     if use_manual and _has_atom_mapping(reaction_smiles):
         try:
             manual_result = identify_changed_atoms_from_mapped_smiles(reaction_smiles)
             results['manual_result'] = manual_result
-            
+
             if manual_result.get('success'):
                 logger.info("Manual atom mapping detected - using as ground truth")
                 # Manual mapping gets highest confidence (1.0)
@@ -540,32 +800,44 @@ def analyze_bond_changes_hybrid(
                 manual_result['method'] = 'manual'
         except Exception as e:
             logger.warning(f"Manual mapping analysis failed: {e}")
-    
-    # Try RXNMapper first (more accurate)
+
+    # Try RXNMapper first (more accurate for complex reactions)
     if use_rxnmapper and is_available():
         try:
             rxn_result = analyze_bond_changes(reaction_smiles, auto_map=auto_map)
             results['rxnmapper_result'] = rxn_result
-            
+
             if rxn_result.get('success'):
                 logger.info(f"RXNMapper analysis successful (conf: {rxn_result.get('mapping_confidence', 'N/A')})")
         except Exception as e:
             logger.warning(f"RXNMapper analysis failed: {e}")
-    
+
+    # Try local environment mapping (good for functional group transformations)
+    if use_local_env:
+        try:
+            local_env_result = map_by_local_environment(reaction_smiles)
+            results['local_env_result'] = local_env_result
+
+            if local_env_result.get('success'):
+                logger.info(f"Local environment mapping successful (conf: {local_env_result.get('confidence', 'N/A')})")
+        except Exception as e:
+            logger.warning(f"Local environment mapping failed: {e}")
+
     # Also try MCS (validation/fallback)
     if use_mcs:
         try:
             mcs_result = analyze_with_mcs(reaction_smiles)
             results['mcs_result'] = mcs_result
-            
+
             if mcs_result.get('success'):
                 logger.info(f"MCS analysis successful (conf: {mcs_result.get('confidence', 'N/A')})")
         except Exception as e:
             logger.warning(f"MCS analysis failed: {e}")
-    
-    # Combine results with priority: Manual > RXNMapper > MCS
+
+    # Combine results with priority: Manual > RXNMapper > Local Env > MCS
     manual_ok = results['manual_result'] and results['manual_result'].get('success')
     rxn_ok = results['rxnmapper_result'] and results['rxnmapper_result'].get('success')
+    local_env_ok = results['local_env_result'] and results['local_env_result'].get('success')
     mcs_ok = results['mcs_result'] and results['mcs_result'].get('success')
     
     # Extract bond counts for comparison
@@ -575,14 +847,15 @@ def analyze_bond_changes_hybrid(
         broken = len(result.get('broken_bonds', []))
         formed = len(result.get('formed_bonds', []))
         return broken, formed
-    
+
     manual_bonds = get_bond_counts(results['manual_result'])
     rxn_bonds = get_bond_counts(results['rxnmapper_result'])
+    local_env_bonds = get_bond_counts(results['local_env_result'])
     mcs_bonds = (
         results['mcs_result'].get('likely_broken_bonds'),
         results['mcs_result'].get('likely_formed_bonds')
     ) if mcs_ok else (None, None)
-    
+
     # Check agreements (within 2 bonds tolerance)
     def bonds_agree(bonds1, bonds2, tolerance=2):
         if bonds1[0] is None or bonds2[0] is None:
@@ -590,13 +863,16 @@ def analyze_bond_changes_hybrid(
         broken_match = abs(bonds1[0] - bonds2[0]) <= tolerance
         formed_match = abs(bonds1[1] - bonds2[1]) <= tolerance
         return broken_match and formed_match
-    
+
     results['agreement'] = {
         'manual_vs_rxnmapper': bonds_agree(manual_bonds, rxn_bonds) if (manual_ok and rxn_ok) else None,
+        'manual_vs_local_env': bonds_agree(manual_bonds, local_env_bonds) if (manual_ok and local_env_ok) else None,
         'manual_vs_mcs': bonds_agree(manual_bonds, mcs_bonds) if (manual_ok and mcs_ok) else None,
+        'rxnmapper_vs_local_env': bonds_agree(rxn_bonds, local_env_bonds) if (rxn_ok and local_env_ok) else None,
         'rxnmapper_vs_mcs': bonds_agree(rxn_bonds, mcs_bonds) if (rxn_ok and mcs_ok) else None,
+        'local_env_vs_mcs': bonds_agree(local_env_bonds, mcs_bonds) if (local_env_ok and mcs_ok) else None,
     }
-    
+
     # Determine best result and confidence
     if manual_ok:
         # Manual mapping is ground truth - highest priority
@@ -604,7 +880,7 @@ def analyze_bond_changes_hybrid(
         results['method'] = 'manual'
         results['recommended_result'] = results['manual_result']
         results['combined_confidence'] = 1.0  # Manual is 100% confidence
-        
+
         # Validate against other methods
         validations = []
         if rxn_ok:
@@ -612,44 +888,64 @@ def analyze_bond_changes_hybrid(
                 validations.append('✓ RXNMapper agrees')
             else:
                 validations.append('⚠ RXNMapper disagrees - check RXNMapper accuracy')
+        if local_env_ok:
+            if results['agreement']['manual_vs_local_env']:
+                validations.append('✓ Local environment agrees')
+            else:
+                validations.append('⚠ Local environment disagrees')
         if mcs_ok:
             if results['agreement']['manual_vs_mcs']:
                 validations.append('✓ MCS agrees')
             else:
                 validations.append('⚠ MCS disagrees - expected for approximate method')
-        
+
         results['validation'] = 'Manual mapping (ground truth). ' + ', '.join(validations) if validations else 'Manual mapping (ground truth)'
-        
-    elif rxn_ok and mcs_ok:
-        # Both ML methods succeeded - check agreement
-        agreement = results['agreement']['rxnmapper_vs_mcs']
-        
-        results['success'] = True
-        results['method'] = 'hybrid'
-        
-        # Combined confidence
-        rxn_conf = results['rxnmapper_result'].get('mapping_confidence', 0.5)
-        mcs_conf = results['mcs_result'].get('confidence', 0.5)
-        
-        if agreement:
-            # Boost confidence if both agree
-            results['combined_confidence'] = min(1.0, (rxn_conf + mcs_conf) / 1.5)
-        else:
-            # Lower confidence if disagree
-            results['combined_confidence'] = max(rxn_conf, mcs_conf) * 0.8
-        
-        # Recommend RXNMapper result (more precise)
-        results['recommended_result'] = results['rxnmapper_result']
-        results['validation'] = 'Both methods agree' if agreement else 'Methods disagree - review recommended'
-        
+
     elif rxn_ok:
-        # Only RXNMapper worked
+        # RXNMapper succeeded - use it as primary, validate with others
         results['success'] = True
         results['method'] = 'rxnmapper_only'
         results['recommended_result'] = results['rxnmapper_result']
-        results['combined_confidence'] = results['rxnmapper_result'].get('mapping_confidence', 0.5)
-        results['validation'] = 'MCS validation unavailable'
-        
+        rxn_conf = results['rxnmapper_result'].get('mapping_confidence', 0.5)
+
+        # Check agreement with other methods for confidence boost
+        validations = []
+        confidence_boost = 0.0
+
+        if local_env_ok and results['agreement']['rxnmapper_vs_local_env']:
+            validations.append('✓ Local environment agrees')
+            confidence_boost += 0.05
+        elif local_env_ok:
+            validations.append('⚠ Local environment disagrees')
+
+        if mcs_ok and results['agreement']['rxnmapper_vs_mcs']:
+            validations.append('✓ MCS agrees')
+            confidence_boost += 0.03
+        elif mcs_ok:
+            validations.append('⚠ MCS disagrees')
+
+        results['combined_confidence'] = min(1.0, rxn_conf + confidence_boost)
+        results['validation'] = 'RXNMapper primary. ' + ', '.join(validations) if validations else 'RXNMapper only'
+
+        if local_env_ok or mcs_ok:
+            results['method'] = 'hybrid'
+
+    elif local_env_ok:
+        # RXNMapper failed, but local environment succeeded
+        results['success'] = True
+        results['method'] = 'local_env_only'
+        results['recommended_result'] = results['local_env_result']
+        local_conf = results['local_env_result'].get('confidence', 0.7)
+
+        # Validate with MCS if available
+        if mcs_ok and results['agreement']['local_env_vs_mcs']:
+            results['combined_confidence'] = min(1.0, local_conf + 0.05)
+            results['validation'] = 'Local environment primary, MCS agrees'
+            results['method'] = 'hybrid'
+        else:
+            results['combined_confidence'] = local_conf
+            results['validation'] = 'Local environment only (good for functional group transformations)'
+
     elif mcs_ok:
         # Only MCS worked
         results['success'] = True
@@ -673,6 +969,7 @@ __all__ = [
     'add_atom_mapping',
     'batch_add_atom_mapping',
     'analyze_bond_changes',
+    'map_by_local_environment',
     'analyze_with_mcs',
     'analyze_bond_changes_hybrid',
 ]

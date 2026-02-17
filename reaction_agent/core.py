@@ -15,6 +15,9 @@ from rdkit import Chem
 from rdkit.Chem import rdChemReactions
 import logging
 
+# Import automatic interpretation
+from chemtools.reaction_interpreter import interpret_reaction_pattern, format_interpretation_report
+
 logger = logging.getLogger(__name__)
 
 # Common spectators (simple ions and salts)
