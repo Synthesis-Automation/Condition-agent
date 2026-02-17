@@ -404,12 +404,51 @@ def analyze_reaction_smiles(
     else:
         bond_report = BondChangeReport()
 
+    # Convert bond changes to dicts for tool_facts
+    bond_changes_dicts = [bc.to_dict() for bc in bond_report.bond_changes]
+
     result["tool_facts"] = {
         "mapped_rxn_smiles": mapping.mapped_rxn_smiles,
         "mapping_qc": mapping.mapping_qc,
-        "bond_changes": [bc.to_dict() for bc in bond_report.bond_changes],
+        "bond_changes": bond_changes_dicts,
         "reaction_center_atoms": bond_report.reaction_center_atoms,
         "bond_change_warnings": bond_report.warnings
     }
+
+    # Step 4: Automatic reaction interpretation
+    # Build a hybrid_result structure for the interpreter
+    hybrid_result = {
+        'success': mapping.mapping_qc.get("ok", False),
+        'rxnmapper_result': {
+            'success': mapping.mapping_qc.get("ok", False),
+            'mapped_smiles': mapping.mapped_rxn_smiles,
+            'mapping_confidence': mapping.mapping_qc.get('confidence', 0.0),
+            'broken_bonds': [bc_dict for bc_dict in bond_changes_dicts if bc_dict['change'] == 'broken'],
+            'formed_bonds': [bc_dict for bc_dict in bond_changes_dicts if bc_dict['change'] == 'formed']
+        },
+        # Dummy entries for other methods (not used but expected by interpreter)
+        'local_env_result': {'success': False},
+        'mcs_result': {'success': False},
+        'combined_confidence': mapping.mapping_qc.get('confidence', 0.0),
+        'agreement': {}
+    }
+
+    try:
+        interpretation = interpret_reaction_pattern(clean.rxn_smiles_clean, hybrid_result)
+        interpretation_report = format_interpretation_report(
+            clean.rxn_smiles_clean,
+            hybrid_result,
+            interpretation
+        )
+
+        result["auto_interpretation"] = {
+            "interpretation": interpretation,
+            "report": interpretation_report
+        }
+    except Exception as e:
+        logger.warning(f"Automatic interpretation failed: {e}")
+        result["auto_interpretation"] = {
+            "error": str(e)
+        }
 
     return result

@@ -14,6 +14,7 @@ from typing import Dict, Any, Optional
 from llmtools.clients import LLMClient
 from reaction_agent.prompts import get_template, get_direct_smiles_template
 from reaction_agent.core import analyze_reaction_smiles as analyze_deterministic
+from chemtools.quick_reaction_glance import quick_reaction_glance, should_run_quick_glance
 
 
 def _strip_markdown_fences(text: str) -> str:
@@ -93,12 +94,38 @@ def analyze_reaction_smiles(
 
     input_data = deterministic_result["input"]
     tool_facts = deterministic_result["tool_facts"]
+    auto_interpretation = deterministic_result.get("auto_interpretation")  # Get automatic interpretation
 
     # Check for complete mapping failure (0 bond changes + low/failed mapping)
     bond_changes = tool_facts.get("bond_changes", [])
     mapping_qc = tool_facts.get("mapping_qc", {})
     mapping_conf = mapping_qc.get("confidence", 0.0)
     mapping_ok = mapping_qc.get("ok", False)
+
+    # Step 1.5: Quick LLM glance (Tier 2) - optional fast analysis
+    # Decision: run if string patterns inconclusive or mapping borderline
+    quick_glance_result = None
+    if auto_interpretation and auto_interpretation.get('interpretation'):
+        string_patterns = auto_interpretation['interpretation']
+
+        # Use gpt-4o for best accuracy (0.647 score, 60% better than gpt-4o-mini)
+        # Run on ALL reactions for maximum coverage (prioritizing accuracy over cost)
+        if should_run_quick_glance(string_patterns, mapping_conf, mode="always"):
+            try:
+                # Create client for quick glance (gpt-4o for accuracy)
+                quick_client = LLMClient(provider=client.provider, model="gpt-4o")
+                quick_glance_result = quick_reaction_glance(
+                    input_data.get("rxn_smiles_clean", ""),
+                    quick_client,
+                    prompt_style="structured"  # Best performing style
+                )
+
+                if quick_glance_result.get('success'):
+                    print(f"💡 Quick glance: {quick_glance_result.get('summary', 'N/A')}")
+
+            except Exception as e:
+                print(f"⚠️  Quick glance failed: {e}")
+                quick_glance_result = {"error": str(e), "success": False}
 
     use_direct_analysis = (
         len(bond_changes) == 0
@@ -188,7 +215,7 @@ def analyze_reaction_smiles(
             interpretation["warnings"].append("mapping_failed")
 
     # Step 6: Assemble final result
-    return {
+    result = {
         "schema_version": "reaction_analysis.v1",
         "input": input_data,
         "tool_facts": tool_facts,
@@ -203,6 +230,16 @@ def analyze_reaction_smiles(
             "temperature": temperature,
         }
     }
+
+    # Include automatic interpretation if available
+    if auto_interpretation:
+        result["auto_interpretation"] = auto_interpretation
+
+    # Include quick glance if available
+    if quick_glance_result:
+        result["quick_glance"] = quick_glance_result
+
+    return result
 
 
 class ReactionSMILESAnalyzer:

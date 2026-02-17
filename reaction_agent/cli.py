@@ -130,6 +130,102 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
             if len(tool_facts['reaction_center_atoms']) > 15:
                 print(f"  ... and {len(tool_facts['reaction_center_atoms']) - 15} more atoms")
 
+    # Automatic interpretation section (deterministic pattern-based)
+    if 'auto_interpretation' in result and result['auto_interpretation']:
+        auto_interp = result['auto_interpretation']
+
+        if 'error' not in auto_interp and 'interpretation' in auto_interp:
+            print_header("AUTOMATIC INTERPRETATION")
+
+            interpretation = auto_interp['interpretation']
+
+            # Display complexity with emoji
+            complexity = interpretation.get('reaction_complexity', 'unknown')
+            complexity_emoji = {
+                'simple': '🟢',
+                'moderate': '🟡',
+                'complex': '🟠',
+                'tandem/multi-step': '🔴'
+            }
+            emoji = complexity_emoji.get(complexity, '⚪')
+            print(f"{emoji} {Colors.BOLD}Complexity:{Colors.END} {Colors.CYAN}{complexity.upper()}{Colors.END}")
+
+            # Display detected patterns
+            if interpretation.get('patterns_detected'):
+                print(f"\n{Colors.BOLD}Patterns Detected:{Colors.END}")
+                for pattern in interpretation['patterns_detected']:
+                    print(f"  • {pattern}")
+
+            # Display likely reaction types
+            if interpretation.get('likely_reaction_types'):
+                print(f"\n{Colors.BOLD}Likely Reaction Type(s):{Colors.END}")
+                for rxn_type in interpretation['likely_reaction_types']:
+                    print(f"  • {Colors.GREEN}{rxn_type}{Colors.END}")
+
+            # Tandem reaction flag
+            if interpretation.get('tandem_reaction_suspected'):
+                print(f"\n{Colors.YELLOW}⚠️  TANDEM/MULTI-STEP REACTION SUSPECTED{Colors.END}")
+
+            # Explanation
+            if interpretation.get('explanation'):
+                print(f"\n{Colors.BOLD}Explanation:{Colors.END}")
+                for line in interpretation['explanation'].split('\n'):
+                    print(f"  {line}")
+
+            # Recommendation
+            if interpretation.get('recommendation'):
+                print(f"\n{Colors.BOLD}RECOMMENDATION:{Colors.END}")
+                for line in interpretation['recommendation'].split('\n'):
+                    print(f"  {line}")
+
+    # Quick glance section (Tier 2 LLM-based fast analysis)
+    if 'quick_glance' in result and result['quick_glance'] and result['quick_glance'].get('success'):
+        quick = result['quick_glance']
+
+        print_header("QUICK LLM GLANCE (Tier 2)")
+
+        # Summary
+        summary = quick.get('summary', 'N/A')
+        print(f"{Colors.BOLD}Summary:{Colors.END} {summary}")
+        print()
+
+        # Reaction types
+        reaction_types = quick.get('reaction_types', [])
+        if reaction_types:
+            print(f"{Colors.BOLD}Reaction Type(s):{Colors.END}")
+            for rxn_type in reaction_types:
+                print(f"  • {Colors.CYAN}{rxn_type}{Colors.END}")
+            print()
+
+        # Patterns
+        patterns = quick.get('patterns', [])
+        if patterns:
+            print(f"{Colors.BOLD}Key Patterns:{Colors.END}")
+            for pattern in patterns:
+                print(f"  • {pattern}")
+            print()
+
+        # Complexity
+        complexity = quick.get('complexity', 'unknown')
+        complexity_color = {
+            'simple': Colors.GREEN,
+            'moderate': Colors.YELLOW,
+            'complex': Colors.RED,
+            'tandem': Colors.RED
+        }.get(complexity, Colors.END)
+        print(f"{Colors.BOLD}Complexity:{Colors.END} {complexity_color}{complexity.upper()}{Colors.END}")
+
+        # Confidence
+        llm_confidence = quick.get('confidence', 0.0)
+        conf_color = Colors.GREEN if llm_confidence >= 0.7 else Colors.YELLOW if llm_confidence >= 0.5 else Colors.RED
+        print(f"{Colors.BOLD}LLM Confidence:{Colors.END} {conf_color}{llm_confidence:.2f}{Colors.END}")
+
+        # Metadata (timing)
+        if 'metadata' in quick:
+            meta = quick['metadata']
+            latency = meta.get('latency_ms', 0)
+            print(f"\n{Colors.BOLD}Analysis Time:{Colors.END} {latency:.0f}ms ({meta.get('model', 'N/A')})")
+
     # Interpretation section
     print_header("LLM INTERPRETATION")
     interp = result.get('interpretation', {})
