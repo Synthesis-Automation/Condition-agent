@@ -497,7 +497,7 @@ def deterministic_only_mode(rxn_smiles: str):
         return None
 
 
-def interactive_mode(analyzer: ReactionSMILESAnalyzer):
+def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False):
     """Run interactive mode with prompts."""
 
     print_header("INTERACTIVE MODE")
@@ -505,8 +505,14 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer):
     print("Commands:")
     print("  'quit' or 'exit' - Exit the program")
     print("  'config' - Show current configuration")
+    print("  'validate on/off' - Enable/disable Tier 4 validation")
     print("  'help' - Show this help message")
     print("  'batch <file>' - Analyze reactions from file")
+
+    if validate:
+        print(f"\n{Colors.GREEN}✓ Validation: ENABLED{Colors.END}")
+    else:
+        print(f"\n{Colors.YELLOW}✓ Validation: DISABLED (use 'validate on' to enable){Colors.END}")
 
     while True:
         try:
@@ -525,9 +531,22 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer):
                 print("\nCommands:")
                 print("  quit/exit - Exit the program")
                 print("  config    - Show current configuration")
+                print("  validate on/off - Enable/disable Tier 4 validation")
                 print("  help      - Show this help message")
                 print("  batch <file> - Analyze reactions from file")
                 print("\nOr enter a reaction SMILES string to analyze")
+                continue
+
+            elif user_input.lower().startswith('validate '):
+                setting = user_input[9:].strip().lower()
+                if setting == 'on':
+                    validate = True
+                    print(f"{Colors.GREEN}✓ Validation ENABLED{Colors.END}")
+                elif setting == 'off':
+                    validate = False
+                    print(f"{Colors.YELLOW}✓ Validation DISABLED{Colors.END}")
+                else:
+                    print_error("Usage: validate on|off")
                 continue
 
             elif user_input.lower() == 'config':
@@ -538,6 +557,10 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer):
                 print(f"  Max Tokens: {analyzer.max_tokens}")
                 print(f"  Reasoning Effort: {analyzer.reasoning_effort or 'N/A'}")
                 print(f"  Drop Spectators: {analyzer.drop_spectators}")
+                if validate:
+                    print(f"  {Colors.GREEN}Validation: ENABLED{Colors.END}")
+                else:
+                    print(f"  {Colors.YELLOW}Validation: DISABLED{Colors.END}")
                 continue
 
             elif user_input.lower().startswith('batch '):
@@ -554,7 +577,7 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer):
                 continue
 
             # Analyze the reaction
-            analyze_reaction_interactive(analyzer, user_input)
+            analyze_reaction_interactive(analyzer, user_input, validate=validate)
 
         except KeyboardInterrupt:
             print("\n\nInterrupted by user. Type 'quit' to exit.")
@@ -740,7 +763,7 @@ Examples:
 
     else:
         # Interactive mode (default)
-        interactive_mode(analyzer)
+        interactive_mode(analyzer, validate=args.validate)
 
 
 if __name__ == "__main__":
