@@ -315,12 +315,82 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
             tokens_per_sec = (meta['total_tokens'] / meta['latency_ms']) * 1000
             print(f"Speed: {tokens_per_sec:.1f} tokens/sec")
 
+    # Validation section (Tier 4)
+    if 'validation' in result:
+        print_header("VALIDATION RESULTS (Tier 4)")
+        validation = result['validation']
+
+        # Check for validation error
+        if 'error' in validation:
+            print_error(f"Validation error: {validation['error']}")
+            return
+
+        # RDKit checks
+        rdkit = validation.get('rdkit', {})
+        if rdkit.get('valid'):
+            print(f"{Colors.GREEN}✓ RDKit Checks: PASS{Colors.END}")
+        else:
+            print(f"{Colors.RED}✗ RDKit Checks: FAIL{Colors.END}")
+            for issue in rdkit.get('issues', []):
+                print(f"  ✗ {issue}")
+
+        # Show warnings if any
+        if rdkit.get('warnings'):
+            warning_count = len(rdkit['warnings'])
+            print(f"\n{Colors.YELLOW}Warnings ({warning_count}):{Colors.END}")
+            for warn in rdkit['warnings'][:5]:  # Show first 5
+                print(f"  ⚠ {warn}")
+            if warning_count > 5:
+                print(f"  ... and {warning_count - 5} more")
+
+        # Atom balance
+        atom_bal = rdkit.get('atom_balance', {})
+        if atom_bal:
+            reactants = atom_bal.get('reactants', 0)
+            products = atom_bal.get('products', 0)
+            lost = atom_bal.get('lost', 0)
+            if lost > 0:
+                print(f"\n{Colors.BOLD}Atom Balance:{Colors.END} {reactants} → {products} ({Colors.YELLOW}{lost} lost{Colors.END})")
+            else:
+                print(f"\n{Colors.BOLD}Atom Balance:{Colors.END} {reactants} → {products}")
+
+        # Consensus
+        consensus = validation.get('consensus', {})
+        quality = consensus.get('quality_score', 0.0)
+        quality_color = Colors.GREEN if quality > 0.8 else Colors.YELLOW if quality > 0.6 else Colors.RED
+        print(f"\n{Colors.BOLD}Consensus Score:{Colors.END} {quality_color}{quality:.2f} / 1.00{Colors.END}")
+
+        # Show confidence scores
+        conf_scores = consensus.get('confidence_scores', {})
+        if conf_scores:
+            tier2_conf = conf_scores.get('tier2', 0.0)
+            tier3_conf = conf_scores.get('tier3', 0.0)
+            print(f"  Tier 2 confidence: {tier2_conf:.2f}")
+            print(f"  Tier 3 confidence: {tier3_conf:.2f}")
+
+        # Gate decision
+        gate = validation.get('gate', {})
+        status = gate.get('status', 'unknown')
+        if status == 'pass':
+            print(f"\n{Colors.GREEN}✓ Overall Status: PASS - High quality analysis{Colors.END}")
+        elif status == 'warning':
+            print(f"\n{Colors.YELLOW}⚠ Overall Status: WARNING - Review recommended{Colors.END}")
+            if gate.get('suggestion'):
+                print(f"  {gate['suggestion']}")
+        else:
+            print(f"\n{Colors.RED}✗ Overall Status: FAIL - Re-analysis needed{Colors.END}")
+            if gate.get('retry_config'):
+                retry = gate['retry_config']
+                print(f"  Suggested model: {retry.get('model', 'N/A')}")
+                print(f"  Suggested mode: {retry.get('mode', 'N/A')}")
+
 
 def analyze_reaction_interactive(
     analyzer: ReactionSMILESAnalyzer,
     rxn_smiles: str,
     save_output: Optional[Path] = None,
-    mode: str = "auto"
+    mode: str = "auto",
+    validate: bool = False
 ) -> Dict[str, Any]:
     """Analyze a reaction interactively with progress updates."""
 
@@ -331,7 +401,7 @@ def analyze_reaction_interactive(
     print_info(f"Step 1/2: Running deterministic analysis (mode={mode})...")
 
     try:
-        result = analyzer.analyze(rxn_smiles, mode=mode)
+        result = analyzer.analyze(rxn_smiles, mode=mode, validate=validate)
     except Exception as e:
         print_error(f"Analysis failed: {e}")
         import traceback
@@ -557,6 +627,7 @@ Examples:
 
     # Analysis options
     parser.add_argument('--keep-spectators', action='store_true', help='Keep spectators in analysis')
+    parser.add_argument('--validate', action='store_true', help='Enable Tier 4 validation (RDKit + consensus checks)')
 
     # Output options
     parser.add_argument('--output', '-o', type=Path, help='Save results to file (JSON)')
@@ -663,7 +734,8 @@ Examples:
             analyzer,
             args.reaction,
             save_output=args.output,
-            mode=effective_mode
+            mode=effective_mode,
+            validate=args.validate
         )
 
     else:

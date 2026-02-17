@@ -48,7 +48,8 @@ def analyze_reaction_smiles(
     skip_mapping: bool = False,
     temperature: float = 0.0,
     max_tokens: int = 2000,
-    reasoning_effort: Optional[str] = None
+    reasoning_effort: Optional[str] = None,
+    validate: bool = False
 ) -> Dict[str, Any]:
     """
     Analyze reaction SMILES using deterministic tools + LLM interpretation.
@@ -68,6 +69,7 @@ def analyze_reaction_smiles(
         temperature: LLM temperature (0.0 for deterministic)
         max_tokens: Max LLM output tokens
         reasoning_effort: For reasoning models (gpt-5.2, o3): "low", "medium", "high"
+        validate: Enable Tier 4 validation (RDKit + consensus checks)
 
     Returns:
         Dict with structure:
@@ -217,6 +219,44 @@ def analyze_reaction_smiles(
     if quick_glance_result:
         result["quick_glance"] = quick_glance_result
 
+    # Step 6: Run Tier 4 validation if requested
+    if validate:
+        try:
+            from reaction_agent.validation import (
+                validate_with_rdkit,
+                check_consensus,
+                quality_gate
+            )
+
+            # Run validation checks
+            rdkit_val = validate_with_rdkit(
+                input_data.get("rxn_smiles_clean", ""),
+                result.get("quick_glance"),
+                result.get("interpretation")
+            )
+
+            consensus = check_consensus(
+                result.get("auto_interpretation"),
+                result.get("quick_glance"),
+                result.get("interpretation")
+            )
+
+            gate = quality_gate(result, rdkit_val, consensus)
+
+            # Add validation results
+            result["validation"] = {
+                "rdkit": rdkit_val,
+                "consensus": consensus,
+                "gate": gate
+            }
+        except Exception as e:
+            # Don't fail the entire analysis if validation fails
+            import traceback
+            result["validation"] = {
+                "error": f"Validation failed: {e}",
+                "traceback": traceback.format_exc()
+            }
+
     return result
 
 
@@ -265,7 +305,8 @@ class ReactionSMILESAnalyzer:
     def analyze(
         self,
         rxn_smiles: str,
-        mode: str = "auto"
+        mode: str = "auto",
+        validate: bool = False
     ) -> Dict[str, Any]:
         """
         Analyze a reaction SMILES string.
@@ -278,6 +319,7 @@ class ReactionSMILESAnalyzer:
                 - "fast": Always use gpt-4o (faster, cheaper)
                 - "deep": Always use gpt-5.2 with reasoning (slower, better quality)
                 - "expert": gpt-5.2 with highest reasoning (very slow, maximum quality)
+            validate: Enable Tier 4 validation (RDKit + consensus checks)
 
         Returns:
             Analysis result dict with input, tool_facts, interpretation, metadata
@@ -345,7 +387,8 @@ class ReactionSMILESAnalyzer:
             skip_mapping=skip_mapping,
             temperature=self.temperature if self.reasoning_effort is None else None,
             max_tokens=self.max_tokens,
-            reasoning_effort=self.reasoning_effort
+            reasoning_effort=self.reasoning_effort,
+            validate=validate
         )
 
         # Step 4: Add mode info to metadata
