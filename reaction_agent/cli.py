@@ -82,6 +82,82 @@ def print_info(text: str):
     print(f"{Colors.BLUE}ℹ {text}{Colors.END}")
 
 
+def display_recommendations(
+    recommendations,  # HTERecommendationResult
+    top_k: int = 10
+):
+    """
+    Display condition recommendations from HTE experiments database.
+
+    Args:
+        recommendations: HTERecommendationResult object from HTERecommender
+        top_k: Number of recommendations to display
+    """
+    if not recommendations.recommendations:
+        print(f"\n{Colors.YELLOW}No condition recommendations found{Colors.END}")
+        print("This could mean:")
+        print("  - Reaction type not in HTE experiments database")
+        print("  - Reactant motifs not recognized by taxonomy system")
+        print("  - No experimental data for this reaction class")
+        return
+
+    # Show detection info
+    total_expts = recommendations.total_matching_experiments
+    detected_type = recommendations.predicted_reaction_type or "Unknown"
+    confidence = recommendations.reaction_type_confidence
+
+    print(f"\n{Colors.BOLD}Taxonomy Detection:{Colors.END}")
+    print(f"  Reaction type: {Colors.GREEN}{detected_type}{Colors.END} (confidence: {confidence:.2f})")
+
+    if recommendations.reacted_motifs:
+        print(f"  Reacted motifs: {', '.join(recommendations.reacted_motifs)}")
+    if recommendations.formed_motifs:
+        print(f"  Formed motifs: {', '.join(recommendations.formed_motifs)}")
+
+    print(f"\n{Colors.BOLD}Found {len(recommendations.recommendations)} condition sets from {total_expts} experiments{Colors.END}")
+    print(f"Showing top {min(top_k, len(recommendations.recommendations))}:\n")
+
+    # Display each recommendation
+    for i, rec in enumerate(recommendations.recommendations[:top_k], 1):
+        # Color code by Z-score
+        if rec.avg_z_score > 1.0:
+            score_color = Colors.GREEN
+            score_label = "Excellent"
+        elif rec.avg_z_score > 0.0:
+            score_color = Colors.YELLOW
+            score_label = "Good"
+        else:
+            score_color = Colors.RED
+            score_label = "Poor"
+
+        # Header with rank and score
+        print(f"{Colors.BOLD}Rank {i}:{Colors.END}")
+        print(f"  {score_color}Z-Score: {rec.avg_z_score:.2f} ({score_label}){Colors.END} | "
+              f"Confidence: {rec.confidence_score:.0f}% | "
+              f"Experiments: {rec.num_experiments}")
+
+        # Conditions
+        print(f"\n  {Colors.BOLD}Conditions:{Colors.END}")
+        if rec.catalyst and rec.catalyst.strip():
+            print(f"    {Colors.CYAN}Catalyst:{Colors.END} {rec.catalyst}")
+        if rec.ligand and rec.ligand.strip():
+            print(f"    {Colors.CYAN}Ligand:{Colors.END} {rec.ligand}")
+        if rec.base and rec.base.strip():
+            print(f"    {Colors.CYAN}Base:{Colors.END} {rec.base}")
+        if rec.solvent and rec.solvent.strip():
+            print(f"    {Colors.CYAN}Solvent:{Colors.END} {rec.solvent}")
+        if rec.additive and rec.additive.strip():
+            print(f"    {Colors.CYAN}Additive:{Colors.END} {rec.additive}")
+
+        # Performance metrics
+        print(f"\n  {Colors.BOLD}Performance:{Colors.END}")
+        print(f"    Success rate: {rec.success_rate:.1f}%")
+        print(f"    Avg yield: {rec.avg_yield:.1f}%")
+        print(f"    Median yield: {rec.median_yield:.1f}%")
+
+        print()  # Blank line between recommendations
+
+
 def print_result(result: Dict[str, Any], show_details: bool = True):
     """Pretty-print analysis result."""
 
@@ -401,7 +477,9 @@ def analyze_reaction_interactive(
     save_output: Optional[Path] = None,
     mode: str = "auto",
     validate: bool = False,
-    retry_config: Optional['RetryConfig'] = None
+    retry_config: Optional['RetryConfig'] = None,
+    recommend: bool = False,
+    top_conditions: int = 10
 ) -> Dict[str, Any]:
     """Analyze a reaction interactively with progress updates."""
 
@@ -427,6 +505,55 @@ def analyze_reaction_interactive(
 
     # Print results
     print_result(result)
+
+    # Condition recommendation (if requested)
+    if recommend:
+        print_header("CONDITION RECOMMENDATIONS")
+
+        try:
+            from reaction_agent.condition_bridge import ConditionBridge
+
+            print_info("Querying HTE experiments database...")
+            bridge = ConditionBridge()
+            recommendations = bridge.recommend_conditions(
+                result,
+                top_k=top_conditions
+            )
+
+            display_recommendations(recommendations, top_conditions)
+
+            # Add recommendations to result for saving
+            result['condition_recommendations'] = {
+                'source': 'experiments',
+                'top_k': top_conditions,
+                'detected_reaction_type': recommendations.predicted_reaction_type,
+                'reaction_type_confidence': recommendations.reaction_type_confidence,
+                'total_experiments': recommendations.total_matching_experiments,
+                'reacted_motifs': list(recommendations.reacted_motifs) if recommendations.reacted_motifs else [],
+                'formed_motifs': list(recommendations.formed_motifs) if recommendations.formed_motifs else [],
+                'recommendations': [
+                    {
+                        'rank': i + 1,
+                        'z_score': rec.avg_z_score,
+                        'confidence': rec.confidence_score,
+                        'num_experiments': rec.num_experiments,
+                        'catalyst': rec.catalyst,
+                        'ligand': rec.ligand,
+                        'base': rec.base,
+                        'solvent': rec.solvent,
+                        'additive': rec.additive,
+                        'success_rate': rec.success_rate,
+                        'avg_yield': rec.avg_yield,
+                        'median_yield': rec.median_yield
+                    }
+                    for i, rec in enumerate(recommendations.recommendations[:top_conditions])
+                ]
+            }
+
+        except Exception as e:
+            print_error(f"Recommendation failed: {e}")
+            import traceback
+            traceback.print_exc()
 
     # Save output if requested
     if save_output:
@@ -516,10 +643,14 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False, a
         retry_enabled = args.validate and not args.no_retry
         max_retries = args.max_retries
         retry_on_warning = args.retry_on_warning
+        recommend_enabled = args.recommend
+        top_conditions = args.top_conditions
     else:
         retry_enabled = False
         max_retries = 3
         retry_on_warning = False
+        recommend_enabled = False
+        top_conditions = 10
 
     print_header("INTERACTIVE MODE")
     print("\nEnter reaction SMILES to analyze (or 'quit' to exit)")
@@ -529,6 +660,8 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False, a
     print("  'validate on/off' - Enable/disable Tier 4 validation")
     print("  'retry on/off' - Enable/disable automatic retry")
     print("  'max-retries N' - Set max retry attempts (e.g., max-retries 5)")
+    print("  'recommend on/off' - Enable/disable condition recommendation")
+    print("  'top-conditions N' - Set number of recommendations (e.g., top-conditions 5)")
     print("  'help' - Show this help message")
     print("  'batch <file>' - Analyze reactions from file")
 
@@ -541,6 +674,11 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False, a
         print(f"{Colors.GREEN}✓ Retry: ENABLED (max: {max_retries}){Colors.END}")
     else:
         print(f"{Colors.YELLOW}✓ Retry: DISABLED{Colors.END}")
+
+    if recommend_enabled:
+        print(f"{Colors.GREEN}✓ Recommendation: ENABLED (top: {top_conditions}){Colors.END}")
+    else:
+        print(f"{Colors.YELLOW}✓ Recommendation: DISABLED{Colors.END}")
 
     while True:
         try:
@@ -603,6 +741,30 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False, a
                     print_error("Usage: max-retries N (where N is a number)")
                 continue
 
+            elif user_input.lower().startswith('recommend '):
+                setting = user_input[10:].strip().lower()
+                if setting == 'on':
+                    recommend_enabled = True
+                    print(f"{Colors.GREEN}✓ Condition recommendation ENABLED{Colors.END}")
+                elif setting == 'off':
+                    recommend_enabled = False
+                    print(f"{Colors.YELLOW}✓ Condition recommendation DISABLED{Colors.END}")
+                else:
+                    print_error("Usage: recommend on|off")
+                continue
+
+            elif user_input.lower().startswith('top-conditions '):
+                try:
+                    num = int(user_input[15:].strip())
+                    if 1 <= num <= 50:
+                        top_conditions = num
+                        print(f"{Colors.GREEN}✓ Top conditions set to {num}{Colors.END}")
+                    else:
+                        print_error("Top conditions must be between 1 and 50")
+                except ValueError:
+                    print_error("Usage: top-conditions N (where N is a number)")
+                continue
+
             elif user_input.lower() == 'config':
                 print(f"\nCurrent Configuration:")
                 print(f"  Model: {analyzer.client.model}")
@@ -619,6 +781,10 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False, a
                     print(f"  {Colors.GREEN}Retry: ENABLED (max: {max_retries}){Colors.END}")
                 else:
                     print(f"  {Colors.YELLOW}Retry: DISABLED{Colors.END}")
+                if recommend_enabled:
+                    print(f"  {Colors.GREEN}Recommendation: ENABLED (top: {top_conditions}){Colors.END}")
+                else:
+                    print(f"  {Colors.YELLOW}Recommendation: DISABLED{Colors.END}")
                 continue
 
             elif user_input.lower().startswith('batch '):
@@ -644,7 +810,14 @@ def interactive_mode(analyzer: ReactionSMILESAnalyzer, validate: bool = False, a
                     retry_on_warning=retry_on_warning
                 )
 
-            analyze_reaction_interactive(analyzer, user_input, validate=validate, retry_config=retry_config)
+            analyze_reaction_interactive(
+                analyzer,
+                user_input,
+                validate=validate,
+                retry_config=retry_config,
+                recommend=recommend_enabled,
+                top_conditions=top_conditions
+            )
 
         except KeyboardInterrupt:
             print("\n\nInterrupted by user. Type 'quit' to exit.")
@@ -718,6 +891,19 @@ Examples:
     # Analysis options
     parser.add_argument('--keep-spectators', action='store_true', help='Keep spectators in analysis')
     parser.add_argument('--validate', action='store_true', help='Enable Tier 4 validation (RDKit + consensus checks)')
+
+    # Condition recommendation options
+    parser.add_argument(
+        '--recommend',
+        action='store_true',
+        help='Recommend reaction conditions from HTE experiments database'
+    )
+    parser.add_argument(
+        '--top-conditions',
+        type=int,
+        default=10,
+        help='Number of condition recommendations to show (default: 10)'
+    )
 
     # Retry options (require --validate)
     parser.add_argument(
@@ -853,7 +1039,9 @@ Examples:
             save_output=args.output,
             mode=effective_mode,
             validate=args.validate,
-            retry_config=retry_config
+            retry_config=retry_config,
+            recommend=args.recommend,
+            top_conditions=args.top_conditions
         )
 
     else:
