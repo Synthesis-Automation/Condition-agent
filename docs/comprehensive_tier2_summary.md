@@ -29,12 +29,14 @@ def _get_comprehensive_prompt(reactants: str, products: str) -> str:
 ### 2. Enhanced Analysis Flow
 
 **Before** (couldn't detect THP):
+
 ```
 String patterns → Deep LLM
 ❌ Missed: THP deprotection
 ```
 
 **After** (comprehensive Tier 2):
+
 ```
 String patterns → Quick LLM (GPT-4o comprehensive) → Deep LLM
 ✓ Detects: THP deprotection, all structural changes, pharma context
@@ -52,6 +54,7 @@ Based on your priority: **"accuracy and general ability is more important than c
 ### 4. Enhanced CLI Display
 
 Added sections to show:
+
 - ✓ All structural changes
 - ✓ Protecting group changes (color-coded: red for removed, green for added)
 - ✓ Side reactions and workup transformations
@@ -62,6 +65,7 @@ Added sections to show:
 ## Test Results
 
 ### Your Test Reaction
+
 ```
 CC1(C)OB(c2cnn(CCOC3CCCCO3)c2)OC1(C)C.Cc1nc(-c2cn3c(n2)-c2ccc(Br)cc2OCC3)n(C)n1
 >>
@@ -69,11 +73,13 @@ Cc1nc(-c2cn3c(n2)-c2ccc(-c4cnn(CCO)c4)cc2OCC3)n(C)n1
 ```
 
 **Tier 1 - String Patterns** (< 0.1s, Free):
+
 - ✓ Suzuki coupling
 - ✓ Tandem/multi-step
 - ✓ 16 atoms lost
 
 **Tier 2 - Quick LLM Glance** (5.9s, $0.0015):
+
 - ✓ **THP deprotection detected!**
 - ✓ Listed all structural changes
 - ✓ Identified workup transformations
@@ -81,6 +87,7 @@ Cc1nc(-c2cn3c(n2)-c2ccc(-c4cnn(CCO)c4)cc2OCC3)n(C)n1
 - Confidence: 0.95
 
 **Tier 3 - Deep Analysis** (5.0s, $0.005):
+
 - ✓ Nucleophilic substitution (SNAr)
 - ✓ Full mechanistic details
 - Confidence: 0.99
@@ -110,6 +117,7 @@ Cc1nc(-c2cn3c(n2)-c2ccc(-c4cnn(CCO)c4)cc2OCC3)n(C)n1
 ## What Makes It Work
 
 ### 1. Explicit Protecting Group Search
+
 ```json
 "protecting_groups": {
   "removed": ["THP group removed from the heterocyclic amine"],
@@ -118,6 +126,7 @@ Cc1nc(-c2cn3c(n2)-c2ccc(-c4cnn(CCO)c4)cc2OCC3)n(C)n1
 ```
 
 ### 2. Structural Comparison
+
 ```json
 "all_changes": [
   "Removal of tetrahydropyranyl (THP) group",
@@ -127,6 +136,7 @@ Cc1nc(-c2cn3c(n2)-c2ccc(-c4cnn(CCO)c4)cc2OCC3)n(C)n1
 ```
 
 ### 3. Context-Aware Analysis
+
 ```json
 "pharmaceutical_context": "The transformation of complex heterocycles
 and removal of protecting groups is often relevant in pharmaceutical
@@ -142,6 +152,7 @@ python scripts/interactive_test_cli.py
 ```
 
 **Commands**:
+
 - `<SMILES>` - Analyze a reaction
 - `examples` - Show test reactions
 - `stats` - Session statistics
@@ -149,6 +160,7 @@ python scripts/interactive_test_cli.py
 - `quit` - Exit
 
 **Features**:
+
 - Three-tier comparison side-by-side
 - Agreement/disagreement detection
 - Color-coded output
@@ -157,6 +169,7 @@ python scripts/interactive_test_cli.py
 ## Files Modified
 
 ### Core Changes
+
 1. **chemtools/quick_reaction_glance.py** (345 lines)
    - Added `thorough=True` parameter
    - Added `comprehensive` prompt style
@@ -176,7 +189,8 @@ python scripts/interactive_test_cli.py
    - Show pharmaceutical context
 
 ### New Scripts
-4. **scripts/interactive_test_cli.py** (367 lines)
+
+1. **scripts/interactive_test_cli.py** (367 lines)
    - Interactive CLI for testing
    - Three-tier comparison
    - Example reactions
@@ -185,18 +199,21 @@ python scripts/interactive_test_cli.py
 ## How to Use
 
 ### Standard CLI
+
 ```bash
 # Analyze a reaction with auto mode (recommended)
 python -m reaction_agent.cli --reaction "SMILES" --mode auto
 ```
 
 ### Interactive CLI
+
 ```bash
 # Launch interactive testing interface
 python scripts/interactive_test_cli.py
 ```
 
 ### Programmatic
+
 ```python
 from reaction_agent import ReactionSMILESAnalyzer
 from llmtools.clients import LLMClient
@@ -246,12 +263,14 @@ if should_run_quick_glance(string_patterns, mapping_conf, mode="always"):
 ## To Adjust Configuration
 
 ### Change Model (cost vs accuracy)
+
 ```python
 model="gpt-4o"       # Best accuracy, $0.0015/rxn (current)
 model="gpt-4o-mini"  # Best value, $0.00008/rxn
 ```
 
 ### Change Mode (coverage vs cost)
+
 ```python
 mode="always"  # 100% coverage (current)
 mode="auto"    # Only when Tier 1 uncertain (saves ~65% cost)
@@ -259,6 +278,7 @@ mode="never"   # Disable Tier 2
 ```
 
 ### Change Prompt Style
+
 ```python
 prompt_style="comprehensive"  # Most thorough (current)
 prompt_style="structured"     # Balanced
@@ -279,11 +299,13 @@ prompt_style="concise"        # Fastest
 ## Comparison to Manual Analysis
 
 **Your manual analysis** (2 seconds):
+
 - Suzuki coupling
 - THP deprotection
 - Boronic ester → alcohol
 
 **Code now achieves** (6 seconds):
+
 - Suzuki coupling (Tier 1)
 - THP deprotection (Tier 2) ✓
 - All structural changes (Tier 2) ✓

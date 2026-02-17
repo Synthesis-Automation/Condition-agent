@@ -43,18 +43,21 @@ The system now uses a **three-tier approach** to reaction interpretation, provid
 **File**: `chemtools/reaction_interpreter.py`
 
 **How it works**:
+
 - Simple string patterns and regex on SMILES
 - Detects functional groups (Br, B1, COC(OC), etc.)
 - Identifies reaction types by pattern combinations
 - Estimates complexity by bond changes and atom loss
 
 **Performance**:
+
 - Speed: < 0.1s (instant)
 - Cost: $0 (free)
 - Coverage: ~30-40% of reactions
 - Always runs
 
 **Output example**:
+
 ```
 🔴 Complexity: TANDEM/MULTI-STEP
 
@@ -73,28 +76,33 @@ Likely Reaction Type(s):
 **File**: `chemtools/quick_reaction_glance.py`
 
 **How it works**:
+
 - Fast LLM call with concise prompt
 - Uses cheap model (gpt-4o-mini)
 - Limited to 300 tokens output
 - Focus on pattern recognition, not mechanism
 
 **Performance** (from testing):
+
 - Speed: 1-3s average (1.35s with gpt-4o, 1.79s with gpt-4o-mini)
 - Cost: $0.0001 - $0.0015 per reaction
 - Coverage: ~80-90% of reactions
 - Accuracy: 0.647 score (gpt-4o), 0.407 score (gpt-4o-mini)
 
 **Cost-effectiveness**:
+
 - gpt-4o-mini: 842 score/$ (best value)
 - gpt-4o: 83 score/$ (best accuracy)
 
 **When it runs** (configurable):
+
 - `mode="always"`: Every reaction
 - `mode="auto"`: If Tier 1 found ≤1 pattern OR mapping confidence 0.4-0.6
 - `mode="if_uncertain"`: Only if Tier 1 found nothing
 - `mode="never"`: Disabled
 
 **Output example**:
+
 ```
 Summary: Suzuki coupling forms carbonyl-substituted aryl alkene.
 
@@ -116,21 +124,25 @@ Analysis Time: 1352ms
 **File**: `reaction_agent/agent.py`
 
 **How it works**:
+
 - Full mechanistic analysis with detailed prompts
 - Uses smart models (gpt-4o, gpt-5.2)
 - Includes bond changes, atom mapping, warnings
 - Structured output with events, roles, mechanism
 
 **Performance**:
+
 - Speed: 5-30s (depends on model and complexity)
 - Cost: $0.01-0.10 per reaction
 - Coverage: ~95%+ of reactions
 - Always runs
 
 **When it runs**:
+
 - Always (provides complete analysis)
 
 **Output example**:
+
 ```
 Reaction Class: cross_coupling
 
@@ -165,6 +177,7 @@ Comprehensive testing with 5 reactions:
 ## Current Configuration
 
 **Default settings** (in `reaction_agent/agent.py`):
+
 ```python
 # Tier 2 quick glance
 model = "gpt-4o-mini"  # Most cost-effective
@@ -173,6 +186,7 @@ mode = "auto"  # Run when Tier 1 uncertain
 ```
 
 **Decision logic**:
+
 ```python
 def should_run_quick_glance(string_patterns, mapping_conf, mode="auto"):
     if mode == "auto":

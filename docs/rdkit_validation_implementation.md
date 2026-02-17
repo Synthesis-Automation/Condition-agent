@@ -5,7 +5,9 @@
 After exploring the codebase, I found these **ready-to-use components**:
 
 ### 1. **chemtools/util/rdkit_helpers.py**
+
 Provides core RDKit utilities:
+
 - ✅ `parse_smiles(smiles)` - Parse SMILES to RDKit mol object
 - ✅ `canonical_smiles(smiles)` - Canonicalize SMILES string
 - ✅ `rdkit_available()` - Check if RDKit is available
@@ -13,18 +15,24 @@ Provides core RDKit utilities:
 - ✅ `neutralize_and_standardize(mol)` - Clean up molecules
 
 ### 2. **chemtools/featurizers/formatters/reaction_precheck.py**
+
 Provides atom counting and stoichiometry:
+
 - ✅ `_count_elements(smiles_list)` - Count all elements in molecules
 - ✅ `infer_reactant_repeats_from_stoichiometry()` - Detect atom balance issues
 
 ### 3. **chemtools/featurizers/analysis/smiles.py**
+
 Provides SMILES normalization:
+
 - ✅ `normalize(smiles)` - Normalize single SMILES
 - ✅ `normalize_reaction(rxn_smiles)` - Parse and normalize reaction SMILES
 - ✅ Split reactants/products
 
 ### 4. **chemtools/featurizers/formatters/detection_validation.py**
+
 Provides reaction type validation:
+
 - ✅ `validate_detection_with_crk_key()` - Validate using CRK patterns
 - ✅ `validate_detection_with_reacted_motifs()` - Validate using motif consumption
 - ✅ Taxonomy-based reaction matching
@@ -556,6 +564,7 @@ def display_result(result: Dict[str, Any], show_details: bool = False):
 ## Testing Plan
 
 ### Test Case 1: Simple Reaction (Should Pass)
+
 ```python
 # Suzuki coupling - straightforward
 rxn = "Brc1ccccc1.B(O)(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
@@ -565,6 +574,7 @@ assert result['validation']['gate']['status'] == 'pass'
 ```
 
 ### Test Case 2: Complex Tandem (Should Warn)
+
 ```python
 # Your Suzuki + THP deprotection
 rxn = "CC1(C)OB(c2cnn(CCOC3CCCCO3)c2)OC1(C)C.Cc1nc(-c2cn3c(n2)-c2ccc(Br)cc2OCC3)n(C)n1>>Cc1nc(-c2cn3c(n2)-c2ccc(-c4cnn(CCO)c4)cc2OCC3)n(C)n1"
@@ -579,6 +589,7 @@ assert validation['gate']['status'] in ['pass', 'warning']
 ```
 
 ### Test Case 3: Invalid Structure (Should Fail)
+
 ```python
 # Invalid SMILES
 rxn = "INVALID>>SMILES"

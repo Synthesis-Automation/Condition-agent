@@ -9,11 +9,13 @@ Successfully integrated automatic reaction interpretation into the main reaction
 ### 1. Core Analysis (`reaction_agent/core.py`)
 
 **Added import:**
+
 ```python
 from chemtools.reaction_interpreter import interpret_reaction_pattern, format_interpretation_report
 ```
 
 **Modified `analyze_reaction_smiles()` function:**
+
 - Added Step 4: Automatic reaction interpretation
 - Builds a `hybrid_result` structure compatible with the interpreter
 - Calls `interpret_reaction_pattern()` to analyze the reaction
@@ -21,6 +23,7 @@ from chemtools.reaction_interpreter import interpret_reaction_pattern, format_in
 - Adds `auto_interpretation` field to the result dictionary
 
 **Key features:**
+
 - Fast, deterministic analysis (< 0.1s)
 - Pattern detection (leaving groups, boronic esters, acetals, etc.)
 - Complexity classification (simple/moderate/complex/tandem)
@@ -29,16 +32,19 @@ from chemtools.reaction_interpreter import interpret_reaction_pattern, format_in
 ### 2. Agent Integration (`reaction_agent/agent.py`)
 
 **Modified `analyze_reaction_smiles()` function:**
+
 - Line 96: Extracts `auto_interpretation` from deterministic result
 - Lines 208-210: Includes `auto_interpretation` in final result if available
 
 **Effect:**
+
 - Automatic interpretation now flows through the full analysis pipeline
 - Available in both deterministic-only and LLM-assisted modes
 
 ### 3. CLI Display (`reaction_agent/cli.py`)
 
 **Modified `print_result()` function:**
+
 - Added new section: "AUTOMATIC INTERPRETATION" (lines 133-180)
 - Displays between deterministic analysis and LLM interpretation
 - Color-coded complexity indicators:
@@ -48,6 +54,7 @@ from chemtools.reaction_interpreter import interpret_reaction_pattern, format_in
   - 🔴 Tandem/Multi-step
 
 **Display format:**
+
 ```
 ================================================================================
   AUTOMATIC INTERPRETATION
@@ -81,26 +88,32 @@ RECOMMENDATION:
 ## Test Results
 
 ### Tandem Reaction (User's example)
+
 **Input:** `COC(OC)c1ccccc1Br.C=CC(CCCC)B1OC(C)(C)C(C)(C)O1>>C=CC(CCCC)c1ccccc1C=O`
 
 **Result:**
+
 - ✓ Correctly identified as 🔴 TANDEM/MULTI-STEP
 - ✓ Detected both reaction types: Suzuki coupling + acetal hydrolysis
 - ✓ Identified key patterns: bromide, boronic ester, acetal
 - ✓ Provided actionable recommendations
 
 ### Simple SN2 Reaction
+
 **Input:** `CCCBr.N>>CCCN`
 
 **Result:**
+
 - ✓ Correctly identified as 🟢 SIMPLE
 - ✓ High confidence (0.93)
 - ✓ Clear recommendation: "Good confidence - mapping appears reliable"
 
 ### Complex Suzuki Coupling (Single-step)
+
 **Input:** Complex Suzuki with low rxnmapper confidence (0.281)
 
 **Result:**
+
 - ✓ Correctly identified as 🟢 SIMPLE (not tandem)
 - ✓ Detected boronic ester pattern
 - ✓ Triggered automatic switch to GPT-5.2 for better LLM analysis
@@ -132,6 +145,7 @@ python -m reaction_agent.cli --reaction "SMILES" --no-llm
 ## Future Enhancements
 
 Potential improvements:
+
 1. Add more reaction type patterns (Heck, Negishi, Sonogashira, etc.)
 2. Detect protecting group additions/removals
 3. Identify redox transformations (oxidations, reductions)

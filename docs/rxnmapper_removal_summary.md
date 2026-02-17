@@ -36,6 +36,7 @@ analysis directly from SMILES without atom mapping.
 ```
 
 **Force skip mapping**:
+
 ```python
 # Always skip mapping - Tier 2 is more accurate without it
 skip_mapping = True
@@ -44,12 +45,14 @@ skip_mapping = True
 ### 2. agent.py (lines 100-165)
 
 **Removed bond changes dependency**:
+
 - Removed references to `tool_facts['bond_changes']`
 - Removed references to `mapping_qc['confidence']`
 - Changed to direct SMILES analysis only (no mapping template)
 - Pass `mapping_confidence=1.0` (not using mapping)
 
 **Tier 3 prompt generation**:
+
 ```python
 # Step 2: Build LLM prompt (direct SMILES analysis, no mapping)
 template = get_direct_smiles_template()
@@ -103,11 +106,13 @@ Note: `tool_facts` is no longer included in the result.
 **Fixed automatic interpretation to run when skip_mapping=True**:
 
 Previously, when `skip_mapping=True`, the function returned early WITHOUT running automatic interpretation. This broke the entire three-tier system because:
+
 - Tier 1 (auto_interpretation) wasn't generated
 - Tier 2 checks for auto_interpretation before running
 - Tier 3 didn't get Tier 2 context
 
 **Fixed code**:
+
 ```python
 if skip_mapping:
     result["tool_facts"] = {
@@ -160,6 +165,7 @@ if skip_mapping:
 **Removed entire "DETERMINISTIC ANALYSIS" section**:
 
 Deleted:
+
 - Mapped SMILES display
 - Mapping QC status and confidence
 - Bond changes list
@@ -298,12 +304,14 @@ METADATA (model info, tokens, timing)
 **Complex Reaction**: Suzuki coupling + THP deprotection
 
 ### Before (With Rxnmapper)
+
 - Rxnmapper: 1 bond change, "SIMPLE", missed THP deprotection
 - Tier 2: Didn't run (depends on auto_interpretation which was broken)
 - Tier 3: Misclassified as "nucleophilic_substitution"
 - Output: Messy with verbose bond changes
 
 ### After (Without Rxnmapper)
+
 - ✅ Tier 1: Detected Suzuki coupling, tandem reaction, 16 atoms lost
 - ✅ Tier 2: Identified both Suzuki-Miyaura AND THP deprotection, 5 structural changes
 - ✅ Tier 3: Correctly classified as "cross_coupling" with tags "Suzuki, deprotection, oxidation"
@@ -312,14 +320,17 @@ METADATA (model info, tokens, timing)
 ## Impact on Existing Code
 
 ### Files Modified
+
 1. `reaction_agent/agent.py` - Main orchestration
 2. `reaction_agent/core.py` - Deterministic analysis
 3. `reaction_agent/cli.py` - Display output
 
 ### API Changes
+
 - `analyze_reaction_smiles()` result no longer includes `tool_facts`
 - `skip_mapping` parameter now always forced to `True`
 - Result structure simplified:
+
   ```python
   {
       "schema_version": "reaction_analysis.v1",
@@ -332,9 +343,11 @@ METADATA (model info, tokens, timing)
   ```
 
 ### Backward Compatibility
+
 - Code expecting `result['tool_facts']` will fail
 - Fix: Use direct SMILES analysis instead
 - Example:
+
   ```python
   # OLD (broken):
   bond_changes = result['tool_facts']['bond_changes']
@@ -346,11 +359,13 @@ METADATA (model info, tokens, timing)
 ## Future Considerations
 
 ### Optional Enhancements
+
 1. **Skip Tier 3 for simple reactions**: Since Tier 2 is comprehensive, optionally skip Tier 3 for simple reactions
 2. **Use DeepSeek for Tier 3**: For maximum consistency, optionally use same model for both tiers
 3. **Remove rxnmapper dependency**: Consider removing rxnmapper from requirements.txt entirely
 
 ### Current Status
+
 - ✅ Rxnmapper code still exists but is never called (skip_mapping=True always)
 - ✅ Can optionally re-enable by setting skip_mapping=False
 - ✅ Recommended: Keep current configuration (accuracy > cost priority)
@@ -372,13 +387,14 @@ The workflow is now **simpler, faster, and more accurate** with direct SMILES an
 ### Test Verification
 
 **Before** (with rxnmapper):
+
 ```
 C:\Users\xubar\AppData\Local\Programs\Python\Python312\Lib\site-packages\rxnmapper\batched_mapper.py:4:
 UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
 ```
 
 **After** (without rxnmapper):
+
 ```
 No warnings! Clean output. ✅
 ```
-

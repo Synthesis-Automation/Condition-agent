@@ -5,19 +5,23 @@
 ### 1. ❌ **Tier 3 Classification Error (FIXED)**
 
 **Before:**
+
 ```
 LLM INTERPRETATION
 Reaction Class: nucleophilic_substitution
 Tags: SNAr
 ```
+
 ❌ **Wrong!** - Suzuki coupling is Pd-catalyzed cross-coupling, not nucleophilic substitution
 
 **After:**
+
 ```
 LLM INTERPRETATION (Tier 3)
 Reaction Class: cross_coupling
 Tags: Suzuki, deprotection, oxidation
 ```
+
 ✅ **Correct!** - Now properly identifies Suzuki coupling
 
 **Fix**: Added Tier 2 context to Tier 3 prompt to ensure consistency
@@ -25,6 +29,7 @@ Tags: Suzuki, deprotection, oxidation
 ### 2. ❌ **Simple Mechanistic Events Too Verbose (FIXED)**
 
 **Before:**
+
 ```
 Mechanistic Events (1):
 
@@ -35,18 +40,22 @@ Mechanistic Events (1):
     the bromine leaving group.
     Confidence: 0.99
 ```
+
 ❌ **Messy and redundant** - 6 lines for a simple bond formation
 
 **After:**
+
 ```
 Mechanistic Events: 1 detected
   • Single bond_formation event
 ```
+
 ✅ **Clean and concise** - 2 lines, same information
 
 ### 3. ✅ **Disagreement Warning Added (NEW)**
 
 When Tier 2 and Tier 3 disagree, users now see:
+
 ```
 ⚠️  Warning: Classification mismatch detected!
    Tier 2 (DeepSeek-v3.2): Suzuki-Miyaura cross-coupling
@@ -123,11 +132,13 @@ if interp.get('events'):
 ### Section Headers (Now Clearer)
 
 **Before:**
+
 ```
 LLM INTERPRETATION
 ```
 
 **After:**
+
 ```
 LLM INTERPRETATION (Tier 3)
 ```
@@ -180,18 +191,22 @@ Makes it clear this is Tier 3 analysis.
 ## Benefits
 
 ### 1. **Consistency**
+
 - Tier 2 and Tier 3 now agree on reaction classification
 - No more contradictions between tiers
 
 ### 2. **Clarity**
+
 - Users see "(Tier 3)" header to understand which analysis they're reading
 - Simplified mechanistic events reduce clutter
 
 ### 3. **Transparency**
+
 - Warning appears when tiers disagree (rare now, but good for edge cases)
 - Users know which tier to trust
 
 ### 4. **Accuracy**
+
 - Tier 3 benefits from Tier 2's superior chemistry understanding
 - DeepSeek-v3.2's expertise guides gpt-4o-mini's interpretation
 
