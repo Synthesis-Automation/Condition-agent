@@ -397,8 +397,8 @@ def analyze_reaction_interactive(
     print(f"\n{Colors.BOLD}Analyzing:{Colors.END} {rxn_smiles}")
     print("-" * 80)
 
-    # Step 1: Deterministic analysis
-    print_info(f"Step 1/2: Running deterministic analysis (mode={mode})...")
+    # Run three-tier analysis: Tier 1 (patterns), Tier 2 (DeepSeek LLM), Tier 3 (gpt-4o-mini LLM)
+    print_info(f"Running three-tier analysis (mode={mode})...")
 
     try:
         result = analyzer.analyze(rxn_smiles, mode=mode, validate=validate)
@@ -408,11 +408,11 @@ def analyze_reaction_interactive(
         traceback.print_exc()
         return None
 
-    print_success("Deterministic analysis complete")
+    print_success("Tier 1 (pattern matching) complete")
 
-    # Step 2: LLM interpretation (if not skipped)
+    # Display completion message based on what ran
     if 'interpretation' in result:
-        print_info("Step 2/2: LLM interpretation complete")
+        print_success("Analysis complete (Tiers 1-3)")
 
     # Print results
     print_result(result)
