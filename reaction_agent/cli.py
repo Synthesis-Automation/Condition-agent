@@ -237,13 +237,6 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
                 print(f"  • {rxn}")
             print()
 
-        # Pharmaceutical context
-        pharma_context = quick.get('pharmaceutical_context')
-        if pharma_context:
-            print(f"{Colors.BOLD}Pharmaceutical Context:{Colors.END}")
-            print(f"  {pharma_context}")
-            print()
-
         # Complexity
         complexity = quick.get('complexity', 'unknown')
         complexity_color = {

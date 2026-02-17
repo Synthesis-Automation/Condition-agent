@@ -55,15 +55,16 @@ def analyze_reaction_smiles(
 
     This is the main function that orchestrates:
     1. Deterministic cleaning (reaction_agent.core)
-    2. Atom mapping via rxnmapper
-    3. Bond change extraction
-    4. LLM interpretation with structured output
+    2. LLM interpretation with structured output
+
+    Rxnmapper has been removed - Tier 2 (DeepSeek-v3.2) provides more accurate
+    analysis directly from SMILES without atom mapping.
 
     Args:
         rxn_smiles: Raw reaction SMILES string (reactants>>products)
         client: LLM client instance
         drop_spectators: Remove simple ions/salts from mapping
-        skip_mapping: Skip mapping and bond changes (faster, less detailed)
+        skip_mapping: Skip mapping and bond changes (always True, kept for backwards compat)
         temperature: LLM temperature (0.0 for deterministic)
         max_tokens: Max LLM output tokens
         reasoning_effort: For reasoning models (gpt-5.2, o3): "low", "medium", "high"
@@ -73,11 +74,15 @@ def analyze_reaction_smiles(
         {
             "schema_version": "reaction_analysis.v1",
             "input": {...},  # raw/clean SMILES, warnings
-            "tool_facts": {...},  # mapping, bond changes
             "interpretation": {...},  # LLM analysis
+            "quick_glance": {...},  # Tier 2 DeepSeek analysis
+            "auto_interpretation": {...},  # Tier 1 string patterns
             "metadata": {...}  # LLM provider, tokens, latency
         }
     """
+    # Always skip mapping - Tier 2 is more accurate without it
+    skip_mapping = True
+
     # Step 1: Run deterministic analysis
     try:
         deterministic_result = analyze_deterministic(
@@ -93,17 +98,9 @@ def analyze_reaction_smiles(
         }
 
     input_data = deterministic_result["input"]
-    tool_facts = deterministic_result["tool_facts"]
     auto_interpretation = deterministic_result.get("auto_interpretation")  # Get automatic interpretation
 
-    # Check for complete mapping failure (0 bond changes + low/failed mapping)
-    bond_changes = tool_facts.get("bond_changes", [])
-    mapping_qc = tool_facts.get("mapping_qc", {})
-    mapping_conf = mapping_qc.get("confidence", 0.0)
-    mapping_ok = mapping_qc.get("ok", False)
-
     # Step 1.5: Quick LLM glance (Tier 2) - optional fast analysis
-    # Decision: run if string patterns inconclusive or mapping borderline
     quick_glance_result = None
 
     if auto_interpretation and auto_interpretation.get('interpretation'):
@@ -112,7 +109,7 @@ def analyze_reaction_smiles(
         # Use DeepSeek-v3.2 (Aliyun) for comprehensive chemistry analysis
         # Best accuracy: correctly identifies both Suzuki coupling AND THP deprotection
         # Run on ALL reactions for maximum coverage (prioritizing accuracy over cost)
-        if should_run_quick_glance(string_patterns, mapping_conf, mode="always"):
+        if should_run_quick_glance(string_patterns, 1.0, mode="always"):  # No mapping, use confidence=1.0
             try:
                 # Create client for quick glance using DeepSeek-v3.2 with comprehensive mode
                 quick_client = LLMClient(provider="aliyun", model="deepseek-v3.2")
@@ -142,58 +139,30 @@ def analyze_reaction_smiles(
                 print(f"⚠️  Quick glance failed: {e}")
                 quick_glance_result = {"error": str(e), "success": False}
 
-    use_direct_analysis = (
-        len(bond_changes) == 0
-        and (not mapping_ok or mapping_conf < 0.4)
-    )
+    # Always use direct SMILES analysis for Tier 3 (no mapping needed)
 
-    # Step 2: Build LLM prompt
-    if use_direct_analysis:
-        # Mapping completely failed - use direct SMILES analysis
-        print(f"⚠️  Mapping failed completely (0 bond changes, confidence {mapping_conf:.3f})")
-        print("    → Using direct SMILES analysis mode (pattern recognition)")
+    # Step 2: Build LLM prompt (direct SMILES analysis, no mapping)
+    template = get_direct_smiles_template()
 
-        template = get_direct_smiles_template()
+    # Parse reactants and products
+    rxn_clean = input_data.get("rxn_smiles_clean", "")
+    parts = rxn_clean.split(">>")
+    reactants_smiles = parts[0] if len(parts) > 0 else ""
+    products_smiles = parts[1] if len(parts) > 1 else ""
 
-        # Parse reactants and products
-        rxn_clean = input_data.get("rxn_smiles_clean", "")
-        parts = rxn_clean.split(">>")
-        reactants_smiles = parts[0] if len(parts) > 0 else ""
-        products_smiles = parts[1] if len(parts) > 1 else ""
+    # Include Tier 2 context if available to ensure consistency
+    tier2_context = ""
+    if quick_glance_result and quick_glance_result.get('success'):
+        tier2_rxn_types = quick_glance_result.get('reaction_types', [])
+        if tier2_rxn_types:
+            tier2_context = f"\n\nIMPORTANT CONTEXT: Quick analysis identified this as: {', '.join(tier2_rxn_types)}. Please verify and provide detailed mechanistic analysis consistent with this."
 
-        prompt = template.format(
-            reactants_smiles=reactants_smiles,
-            products_smiles=products_smiles,
-            rxn_smiles_clean=rxn_clean,
-            mapping_confidence=mapping_conf
-        )
-    else:
-        # Normal mode - use bond changes
-        template = get_template()
-
-        # Format bond changes for prompt
-        bond_changes_text = _format_bond_changes(bond_changes)
-
-        # Format mapping QC
-        mapping_qc_text = json.dumps(mapping_qc, indent=2)
-
-        # Include Tier 2 context if available to ensure consistency
-        tier2_context = ""
-        if quick_glance_result and quick_glance_result.get('success'):
-            tier2_rxn_types = quick_glance_result.get('reaction_types', [])
-            if tier2_rxn_types:
-                tier2_context = f"\n\nIMPORTANT CONTEXT: Quick analysis identified this as: {', '.join(tier2_rxn_types)}. Please verify and provide detailed mechanistic analysis consistent with this."
-
-        prompt = template.format(
-            rxn_smiles_raw=input_data.get("rxn_smiles_raw", ""),
-            rxn_smiles_clean=input_data.get("rxn_smiles_clean", ""),
-            spectators=", ".join(input_data.get("spectators", [])) or "None",
-            parse_warnings=", ".join(input_data.get("parse_warnings", [])) or "None",
-            mapped_rxn_smiles=tool_facts.get("mapped_rxn_smiles") or "Not available",
-            mapping_qc=mapping_qc_text,
-            bond_changes_text=bond_changes_text,
-            reaction_center_atoms=str(tool_facts.get("reaction_center_atoms", []))
-        ) + tier2_context
+    prompt = template.format(
+        reactants_smiles=reactants_smiles,
+        products_smiles=products_smiles,
+        rxn_smiles_clean=rxn_clean,
+        mapping_confidence=1.0  # Not using mapping
+    ) + tier2_context
 
     # Step 3: Call LLM
     try:
@@ -207,7 +176,6 @@ def analyze_reaction_smiles(
         return {
             "schema_version": "reaction_analysis.v1",
             "input": input_data,
-            "tool_facts": tool_facts,
             "error": f"LLM call failed: {e}"
         }
 
@@ -225,22 +193,10 @@ def analyze_reaction_smiles(
             "confidence": 0.0
         }
 
-    # Step 5: Apply QC gating
-    if not mapping_qc.get("ok", False):
-        # Degrade confidence if mapping failed
-        current_confidence = interpretation.get("confidence", 1.0)
-        interpretation["confidence"] = min(current_confidence, 0.3)
-
-        if "warnings" not in interpretation:
-            interpretation["warnings"] = []
-        if "mapping_failed" not in interpretation["warnings"]:
-            interpretation["warnings"].append("mapping_failed")
-
-    # Step 6: Assemble final result
+    # Step 5: Assemble final result
     result = {
         "schema_version": "reaction_analysis.v1",
         "input": input_data,
-        "tool_facts": tool_facts,
         "interpretation": interpretation,
         "metadata": {
             "model": response.model,

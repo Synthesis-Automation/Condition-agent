@@ -244,10 +244,6 @@ Carefully examine and think step-by-step:
    - Workup transformations (acid/base labile groups)
    - Is this tandem/sequential?
 
-5. CONTEXT:
-   - Pharmaceutical/medicinal chemistry relevance?
-   - Complex heterocycles?
-
 Return detailed JSON:
 {{
   "main_transformation": "primary reaction type",
@@ -260,7 +256,6 @@ Return detailed JSON:
   "side_reactions": ["any additional transformations"],
   "complexity": "simple|moderate|complex|tandem",
   "summary": "Complete description including ALL transformations",
-  "pharmaceutical_context": "if relevant, describe",
   "confidence": 0.0-1.0,
   "reasoning": "brief explanation of your analysis"
 }}
