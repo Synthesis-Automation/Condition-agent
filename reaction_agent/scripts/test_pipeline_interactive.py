@@ -198,10 +198,7 @@ def show_stage5(result):
 
 
 def show_stage6(recs, top_k: int, elapsed: float):
-    hdr(f"STAGE 6 — HTE Condition Recommendations (experiments, top {top_k})")
-
     if recs is None:
-        err("Recommender call failed or skipped")
         return
 
     kv("Detected reaction type", recs.predicted_reaction_type or "Unknown")
@@ -246,6 +243,23 @@ def show_stage6(recs, top_k: int, elapsed: float):
 
 
 # ---------------------------------------------------------------------------
+# Lazy HTERecommender cache — loaded at most once per session, on demand
+# ---------------------------------------------------------------------------
+_REC_CACHE: dict = {"instance": None}
+
+def _get_recommender(db_path: str):
+    """Return a cached HTERecommender, loading it on first call."""
+    if _REC_CACHE["instance"] is None:
+        print(f"\n  Loading HTE database from: {db_path}")
+        print(f"  (first load may take a moment; cached for the rest of the session)")
+        t0 = time.time()
+        from chemtools.recommend.recommender import HTERecommender
+        _REC_CACHE["instance"] = HTERecommender(db_path)
+        ok(f"HTE database ready ({time.time()-t0:.1f}s)")
+    return _REC_CACHE["instance"]
+
+
+# ---------------------------------------------------------------------------
 # Main test runner
 # ---------------------------------------------------------------------------
 
@@ -254,7 +268,7 @@ def run_pipeline(
     use_llm: bool,
     model: str,
     top_k: int,
-    recommender,           # HTERecommender instance (pre-initialised in main)
+    db_path: str,
 ):
     from reaction_agent.smiles_pipeline import ReactionPipeline
 
@@ -308,31 +322,35 @@ def run_pipeline(
     result = pipeline.merge(norm, feat, quality, llm_result)
     show_stage5(result)
 
-    # Stage 6 — HTE recommender
+    # Stage 6 — HTE recommender (on demand)
     recs = None
     rec_elapsed = 0.0
     reactants = norm.reactants
     product = norm.product
-    if product and reactants and recommender is not None:
-        sub(f"Querying HTE experiments database (top {top_k})...")
-        try:
-            t_rec = time.time()
-            recs = recommender.recommend(
-                reactant_a_smiles=reactants[0],
-                reactant_b_smiles=reactants[1] if len(reactants) > 1 else None,
-                product_smiles=product,
-                top_k=top_k,
-                min_experiments=2,
-                reaction_type_filter=result.reaction_type,  # from pipeline
-                source_group="experiments",
-            )
-            rec_elapsed = time.time() - t_rec
-        except Exception as e:
-            err(f"HTERecommender raised: {e}")
-    elif recommender is None:
-        warn("Stage 6 skipped: HTE database not loaded")
-    else:
+    hdr(f"STAGE 6 — HTE Condition Recommendations (experiments, top {top_k})")
+    if not product or not reactants:
         warn("Stage 6 skipped: no reactants/product available")
+    else:
+        ans = input(f"\n{C.BOLD}  Run HTE recommendation? (y/n): {C.END}").strip().lower()
+        if ans in ('y', 'yes'):
+            try:
+                rec = _get_recommender(db_path)
+                sub(f"Querying HTE experiments database (top {top_k})...")
+                t_rec = time.time()
+                recs = rec.recommend(
+                    reactant_a_smiles=reactants[0],
+                    reactant_b_smiles=reactants[1] if len(reactants) > 1 else None,
+                    product_smiles=product,
+                    top_k=top_k,
+                    min_experiments=2,
+                    reaction_type_filter=result.reaction_type,
+                    source_group="experiments",
+                )
+                rec_elapsed = time.time() - t_rec
+            except Exception as e:
+                err(f"HTERecommender raised: {e}")
+        else:
+            warn("Stage 6 skipped by user")
     show_stage6(recs, top_k, rec_elapsed)
 
     elapsed = time.time() - t0
@@ -374,19 +392,6 @@ def main():
         print(f"{C.YELLOW}WARNING: OPENAI_API_KEY not set — LLM fallback disabled{C.END}")
         use_llm = False
 
-    # Pre-load the HTE experiments database once so Stage 6 is fast on every call.
-    recommender = None
-    print(f"\n{C.BOLD}Loading HTE database from:{C.END} {args.db_path}")
-    print(f"  (this may take a moment on first run; results are cached after that)")
-    t_db = time.time()
-    try:
-        from chemtools.recommend.recommender import HTERecommender
-        recommender = HTERecommender(args.db_path)
-        ok(f"HTE database ready ({time.time()-t_db:.1f}s)")
-    except Exception as e:
-        warn(f"Could not load HTE database: {e}")
-        warn("Stage 6 will be skipped for this session")
-
     while True:
         show_menu(use_llm, args.model)
         choice = input(f"{C.BOLD}Choice (0-6): {C.END}").strip()
@@ -397,13 +402,13 @@ def main():
         elif choice in PRESETS:
             name, smiles = PRESETS[choice]
             print(f"\n{C.BOLD}Selected:{C.END} {name}")
-            run_pipeline(smiles, use_llm, args.model, args.top_k, recommender)
+            run_pipeline(smiles, use_llm, args.model, args.top_k, args.db_path)
         elif choice == '6':
             smiles = input(f"\n{C.BOLD}Enter reaction SMILES (reactants>>product): {C.END}").strip()
             if not smiles:
                 warn("No input — returning to menu")
                 continue
-            run_pipeline(smiles, use_llm, args.model, args.top_k, recommender)
+            run_pipeline(smiles, use_llm, args.model, args.top_k, args.db_path)
         else:
             err("Invalid choice — enter 0-6")
             continue
