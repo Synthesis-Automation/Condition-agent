@@ -58,6 +58,8 @@ AVAILABLE_MODELS = {
         "deepseek-r1-distill-qwen-14b",
         "deepseek-r1-distill-qwen-32b",
         "deepseek-r1-distill-llama-70b",
+        "kimi-k2.5",
+        "glm-4.7",
     ],
     "openai": [
         "gpt-5.2",
