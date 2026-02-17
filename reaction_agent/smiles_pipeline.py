@@ -430,8 +430,15 @@ class ReactionPipeline:
         spectator_motifs = tuple(aggregates.get("spectator_motifs") or [])
 
         # Reaction type detection
-        rxn_type_data = reaction.get("reaction_type") or {}
-        if isinstance(rxn_type_data, dict):
+        # featurize_reaction() returns reaction_type as either:
+        #   str  — plain taxonomy ID, e.g. "Suzuki_miyaura" (high confidence, treat as 1.0)
+        #   dict — {"reaction_type": "...", "confidence": 0.92}  (explicit confidence)
+        #   None — detection failed / not requested
+        rxn_type_data = reaction.get("reaction_type")
+        if isinstance(rxn_type_data, str) and rxn_type_data:
+            reaction_type = rxn_type_data
+            reaction_type_confidence = 1.0   # string form = deterministically assigned
+        elif isinstance(rxn_type_data, dict):
             reaction_type = rxn_type_data.get("reaction_type") or rxn_type_data.get("type")
             reaction_type_confidence = float(rxn_type_data.get("confidence", 0.0))
         else:

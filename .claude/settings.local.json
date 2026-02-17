@@ -3,7 +3,9 @@
     "allow": [
       "Bash(git mv:*)",
       "Bash(python3:*)",
-      "Bash(python -c:*)"
+      "Bash(python -c:*)",
+      "Bash(python:*)",
+      "Bash(awk:*)"
     ]
   }
 }

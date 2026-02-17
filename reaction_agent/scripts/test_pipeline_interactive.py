@@ -4,19 +4,27 @@ Interactive CLI tester for the ReactionPipeline (5-stage SMILES pipeline).
 Shows each stage result in detail so you can see exactly what the pipeline
 does and whether the LLM fallback fires.
 
-Usage (no LLM — deterministic stages only):
+Usage (LLM fallback ON by default, needs OPENAI_API_KEY):
     python test_pipeline_interactive.py
 
-Usage (with LLM fallback, needs OPENAI_API_KEY):
-    python test_pipeline_interactive.py --llm
-    python test_pipeline_interactive.py --llm --model gpt-4o-mini
+Usage (deterministic only, no API key needed):
+    python test_pipeline_interactive.py --no-llm
+
+Usage (different model):
+    python test_pipeline_interactive.py --model gpt-4o-mini
 """
 
 import argparse
 import os
 import sys
 import time
+import warnings
 from pathlib import Path
+
+# Suppress noisy third-party deprecation warnings that clutter CLI output
+warnings.filterwarnings("ignore", category=UserWarning, module="pkg_resources")
+warnings.filterwarnings("ignore", message=".*pkg_resources.*")
+warnings.filterwarnings("ignore", category=DeprecationWarning, module="rxnmapper")
 
 # Ensure project root is on sys.path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -189,13 +197,66 @@ def show_stage5(result):
             warn(w)
 
 
+def show_stage6(recs, top_k: int, elapsed: float):
+    hdr(f"STAGE 6 — HTE Condition Recommendations (experiments, top {top_k})")
+
+    if recs is None:
+        err("Recommender call failed or skipped")
+        return
+
+    kv("Detected reaction type", recs.predicted_reaction_type or "Unknown")
+    kv("Reaction type confidence", f"{recs.reaction_type_confidence:.3f}")
+    kv("Reacted motifs (recommender)", list(recs.reacted_motifs or []))
+    kv("Formed motifs  (recommender)", list(recs.formed_motifs or []))
+    kv("Total matching experiments", recs.total_matching_experiments)
+    kv("Fallback match", recs.is_fallback_match)
+    kv("Query time", f"{elapsed:.3f}s")
+
+    if not recs.recommendations:
+        warn("No recommendations found")
+        print("  Possible reasons:")
+        print("    - Reaction type / motifs not represented in HTE experiments database")
+        print("    - Minimum experiment count threshold not met")
+        return
+
+    print(f"\n  {C.BOLD}Top {min(top_k, len(recs.recommendations))} condition sets:{C.END}\n")
+
+    for i, rec in enumerate(recs.recommendations[:top_k], 1):
+        if rec.avg_z_score > 1.0:
+            score_col, label = C.GREEN, "Excellent"
+        elif rec.avg_z_score > 0.0:
+            score_col, label = C.YELLOW, "Good"
+        else:
+            score_col, label = C.RED, "Poor"
+
+        print(f"  {C.BOLD}Rank {i}:{C.END}  "
+              f"{score_col}Z={rec.avg_z_score:.2f} ({label}){C.END}  "
+              f"conf={rec.confidence_score:.0f}%  n={rec.num_experiments}")
+
+        parts = []
+        if rec.catalyst:  parts.append(f"cat={rec.catalyst}")
+        if rec.ligand:    parts.append(f"lig={rec.ligand}")
+        if rec.base:      parts.append(f"base={rec.base}")
+        if rec.solvent:   parts.append(f"solv={rec.solvent}")
+        if rec.additive:  parts.append(f"add={rec.additive}")
+        print(f"           {' | '.join(parts)}")
+        print(f"           success={rec.success_rate:.1f}%  "
+              f"avg_yield={rec.avg_yield:.1f}%  "
+              f"median_yield={rec.median_yield:.1f}%")
+
+
 # ---------------------------------------------------------------------------
 # Main test runner
 # ---------------------------------------------------------------------------
 
-def run_pipeline(smiles: str, use_llm: bool, model: str):
+def run_pipeline(
+    smiles: str,
+    use_llm: bool,
+    model: str,
+    top_k: int,
+    recommender,           # HTERecommender instance (pre-initialised in main)
+):
     from reaction_agent.smiles_pipeline import ReactionPipeline
-    from reaction_agent.pipeline_eval import QualityConfig
 
     print(f"\n{C.BOLD}Input SMILES:{C.END} {smiles}")
 
@@ -215,20 +276,22 @@ def run_pipeline(smiles: str, use_llm: bool, model: str):
 
     t0 = time.time()
 
-    # Run stage by stage (calling individual methods for visibility)
+    # Stage 1 — normalize
     norm = pipeline.normalize(smiles)
     show_stage1(norm)
-
     if not norm.success:
         err("Pipeline stopped at Stage 1")
         return
 
+    # Stage 2 — featurize
     feat = pipeline.featurize(norm.normalized_smiles)
     show_stage2(feat)
 
+    # Stage 3 — quality gate
     quality = pipeline.evaluate(feat)
     show_stage3(quality)
 
+    # Stage 4 — LLM fallback (conditional)
     llm_result = None
     llm_skip = ""
     if quality.needs_llm_fallback:
@@ -238,19 +301,49 @@ def run_pipeline(smiles: str, use_llm: bool, model: str):
             llm_result = pipeline.llm_fallback(norm.normalized_smiles, feat, quality)
             ok(f"LLM fallback done ({time.time()-t_llm:.2f}s)")
         else:
-            llm_skip = "No LLM client provided (run with --llm to enable)"
+            llm_skip = "No LLM client (run without --no-llm to enable)"
     show_stage4(llm_result, skipped_reason=llm_skip)
 
+    # Stage 5 — merge
     result = pipeline.merge(norm, feat, quality, llm_result)
     show_stage5(result)
 
+    # Stage 6 — HTE recommender
+    recs = None
+    rec_elapsed = 0.0
+    reactants = norm.reactants
+    product = norm.product
+    if product and reactants and recommender is not None:
+        sub(f"Querying HTE experiments database (top {top_k})...")
+        try:
+            t_rec = time.time()
+            recs = recommender.recommend(
+                reactant_a_smiles=reactants[0],
+                reactant_b_smiles=reactants[1] if len(reactants) > 1 else None,
+                product_smiles=product,
+                top_k=top_k,
+                min_experiments=2,
+                reaction_type_filter=result.reaction_type,  # from pipeline
+                source_group="experiments",
+            )
+            rec_elapsed = time.time() - t_rec
+        except Exception as e:
+            err(f"HTERecommender raised: {e}")
+    elif recommender is None:
+        warn("Stage 6 skipped: HTE database not loaded")
+    else:
+        warn("Stage 6 skipped: no reactants/product available")
+    show_stage6(recs, top_k, rec_elapsed)
+
     elapsed = time.time() - t0
     hdr("SUMMARY")
-    kv("Total time",       f"{elapsed:.2f}s")
-    kv("Quality passed",   result.quality.passed if result.quality else "N/A")
-    kv("LLM fallback used",result.used_llm_fallback)
-    kv("Final rxn type",   result.reaction_type or "None")
-    kv("Final motifs",     f"{list(result.reacted_motifs)} → {list(result.formed_motifs)}")
+    kv("Total time",           f"{elapsed:.2f}s")
+    kv("Quality passed",       result.quality.passed if result.quality else "N/A")
+    kv("LLM fallback used",    result.used_llm_fallback)
+    kv("Final rxn type",       result.reaction_type or "None")
+    kv("Final motifs",         f"{list(result.reacted_motifs)} → {list(result.formed_motifs)}")
+    kv("Recommendations found", len(recs.recommendations) if recs else 0)
+    kv("Total experiments",     recs.total_matching_experiments if recs else 0)
 
 
 # ---------------------------------------------------------------------------
@@ -261,10 +354,14 @@ def main():
     parser = argparse.ArgumentParser(
         description="Interactive tester for the 5-stage ReactionPipeline"
     )
-    parser.add_argument("--llm", action="store_true",
-                        help="Enable LLM fallback (requires OPENAI_API_KEY)")
+    parser.add_argument("--no-llm", action="store_true",
+                        help="Disable LLM fallback (deterministic stages only)")
     parser.add_argument("--model", default="gpt-4o",
                         help="LLM model to use for fallback (default: gpt-4o)")
+    parser.add_argument("--db-path", default="data/HTE_db",
+                        help="Path to HTE database directory (default: data/HTE_db)")
+    parser.add_argument("--top-k", type=int, default=5,
+                        help="Number of recommendations to show (default: 5)")
     parser.add_argument("--no-color", action="store_true",
                         help="Disable terminal colours")
     args = parser.parse_args()
@@ -272,12 +369,26 @@ def main():
     if args.no_color:
         C.disable()
 
-    if args.llm and not os.getenv("OPENAI_API_KEY"):
-        print(f"{C.RED}ERROR: --llm requires OPENAI_API_KEY to be set{C.END}")
-        sys.exit(1)
+    use_llm = not args.no_llm
+    if use_llm and not os.getenv("OPENAI_API_KEY"):
+        print(f"{C.YELLOW}WARNING: OPENAI_API_KEY not set — LLM fallback disabled{C.END}")
+        use_llm = False
+
+    # Pre-load the HTE experiments database once so Stage 6 is fast on every call.
+    recommender = None
+    print(f"\n{C.BOLD}Loading HTE database from:{C.END} {args.db_path}")
+    print(f"  (this may take a moment on first run; results are cached after that)")
+    t_db = time.time()
+    try:
+        from chemtools.recommend.recommender import HTERecommender
+        recommender = HTERecommender(args.db_path)
+        ok(f"HTE database ready ({time.time()-t_db:.1f}s)")
+    except Exception as e:
+        warn(f"Could not load HTE database: {e}")
+        warn("Stage 6 will be skipped for this session")
 
     while True:
-        show_menu(args.llm, args.model)
+        show_menu(use_llm, args.model)
         choice = input(f"{C.BOLD}Choice (0-6): {C.END}").strip()
 
         if choice == '0':
@@ -286,13 +397,13 @@ def main():
         elif choice in PRESETS:
             name, smiles = PRESETS[choice]
             print(f"\n{C.BOLD}Selected:{C.END} {name}")
-            run_pipeline(smiles, args.llm, args.model)
+            run_pipeline(smiles, use_llm, args.model, args.top_k, recommender)
         elif choice == '6':
             smiles = input(f"\n{C.BOLD}Enter reaction SMILES (reactants>>product): {C.END}").strip()
             if not smiles:
                 warn("No input — returning to menu")
                 continue
-            run_pipeline(smiles, args.llm, args.model)
+            run_pipeline(smiles, use_llm, args.model, args.top_k, recommender)
         else:
             err("Invalid choice — enter 0-6")
             continue
