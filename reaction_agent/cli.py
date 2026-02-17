@@ -319,7 +319,6 @@ def print_result(result: Dict[str, Any], show_details: bool = True):
 def analyze_reaction_interactive(
     analyzer: ReactionSMILESAnalyzer,
     rxn_smiles: str,
-    skip_mapping: bool = False,
     save_output: Optional[Path] = None,
     mode: str = "auto"
 ) -> Dict[str, Any]:
@@ -332,7 +331,7 @@ def analyze_reaction_interactive(
     print_info(f"Step 1/2: Running deterministic analysis (mode={mode})...")
 
     try:
-        result = analyzer.analyze(rxn_smiles, skip_mapping=skip_mapping, mode=mode)
+        result = analyzer.analyze(rxn_smiles, mode=mode)
     except Exception as e:
         print_error(f"Analysis failed: {e}")
         import traceback
@@ -557,7 +556,6 @@ Examples:
     parser.add_argument('--no-llm', action='store_true', help='Run deterministic analysis only (no LLM)')
 
     # Analysis options
-    parser.add_argument('--skip-mapping', action='store_true', help='Skip atom mapping (faster)')
     parser.add_argument('--keep-spectators', action='store_true', help='Keep spectators in analysis')
 
     # Output options
@@ -664,7 +662,6 @@ Examples:
         analyze_reaction_interactive(
             analyzer,
             args.reaction,
-            skip_mapping=args.skip_mapping,
             save_output=args.output,
             mode=effective_mode
         )

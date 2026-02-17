@@ -265,7 +265,6 @@ class ReactionSMILESAnalyzer:
     def analyze(
         self,
         rxn_smiles: str,
-        skip_mapping: bool = False,
         mode: str = "auto"
     ) -> Dict[str, Any]:
         """
@@ -273,7 +272,6 @@ class ReactionSMILESAnalyzer:
 
         Args:
             rxn_smiles: Reaction SMILES (reactants>>products)
-            skip_mapping: Skip atom mapping (faster but less detailed)
             mode: Analysis mode:
                 - "auto": Smart switching based on mapping confidence (recommended)
                           Uses gpt-4o for good mapping (≥0.4), gpt-5.2 for poor mapping (<0.4)
@@ -288,6 +286,9 @@ class ReactionSMILESAnalyzer:
         original_model = self.client.model
         original_max_tokens = self.max_tokens
         original_reasoning = self.reasoning_effort
+
+        # Always skip mapping - Tier 2 is more accurate without it
+        skip_mapping = True
 
         # Step 1: Run deterministic analysis (needed for auto mode)
         deterministic_result = analyze_deterministic(
@@ -364,21 +365,19 @@ class ReactionSMILESAnalyzer:
 
     def analyze_batch(
         self,
-        rxn_smiles_list: list,
-        skip_mapping: bool = False
+        rxn_smiles_list: list
     ) -> list:
         """
         Analyze multiple reactions.
 
         Args:
             rxn_smiles_list: List of reaction SMILES
-            skip_mapping: Skip atom mapping for all reactions
 
         Returns:
             List of analysis results
         """
         results = []
         for rxn in rxn_smiles_list:
-            result = self.analyze(rxn, skip_mapping=skip_mapping)
+            result = self.analyze(rxn)
             results.append(result)
         return results
