@@ -128,6 +128,12 @@ Confidence: {confidence:.2f}
 ━━━ TOOL RESULTS ━━━
 {tool_results_text}
 
+━━━ AVAILABLE TOOLS & LOCAL RESOURCES ━━━
+{tool_descriptions}
+
+Local databases accessible via the tools above:
+{resource_context}
+
 ━━━ INSTRUCTIONS ━━━
 Write a comprehensive, expert-level answer that combines:
   (a) Your chemistry knowledge and reasoning
@@ -140,6 +146,8 @@ Match depth to the question:
   • Troubleshooting → identify root causes + suggest specific fixes
   • Molecule analysis → key properties, reactivity, and context
   • Concept explanation → clear mechanistic explanation with examples
+  • Meta-question about tools/resources → describe exactly what tools and databases
+    are available, what each does, and what kinds of questions each can answer
 
 Specific guidance:
   • For conditions: don't just list them — explain the chemistry behind each choice

@@ -20,7 +20,10 @@ import os
 import sys
 import threading
 import time
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
+
+if TYPE_CHECKING:
+    from chem_coworker.response import ChemResponse
 
 
 # ---------------------------------------------------------------------------

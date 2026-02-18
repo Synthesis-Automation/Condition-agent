@@ -94,34 +94,41 @@ def _detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
         dict with success, reaction_type, family_label, confidence.
     """
     try:
-        from chemtools.featurizers.analysis.reactions import analyze_reaction
+        from chemtools.featurizers.unified import featurize_reaction
 
-        result = analyze_reaction(reaction_smiles)
+        result = featurize_reaction(reaction_smiles)
         if not result:
-            return _error("Reaction analysis returned no result")
+            return _error("Reaction featurization returned no result")
 
-        family = result.get("family") or {}
+        # Extract detection details
+        detection = result.get("detection", {})
+        validation = detection.get("validation", {})
+        evidence = detection.get("evidence", {})
+
+        reaction_type = result.get("reaction_type") or validation.get("validated_detection")
+        confidence = (
+            validation.get("validation_confidence")
+            or result.get("confidence")
+            or 0.0
+        )
+        # Human-readable label: replace underscores
+        family_label = reaction_type.replace("_", " ") if reaction_type else ""
+
+        # Collect matched motifs if available
+        reacted_motifs = evidence.get("reacted_motifs", [])
+        formed_motifs = evidence.get("formed_motifs", [])
+
         return _success({
             "reaction_smiles": reaction_smiles,
-            "reaction_type": family.get("canonical_id") or result.get("reaction_type"),
-            "family_label": family.get("label") or "",
-            "confidence": result.get("confidence", 0.0),
-            "matched_slots": result.get("matched_slots", []),
+            "reaction_type": reaction_type,
+            "family_label": family_label,
+            "confidence": float(confidence),
+            "reacted_motifs": reacted_motifs,
+            "formed_motifs": formed_motifs,
+            "reaction_key": result.get("reaction_key"),
         })
     except Exception as exc:
-        # Fallback: try simpler chemtools normalize + detect
-        try:
-            from chemtools.smiles import normalize_reaction as nr
-            norm = nr(reaction_smiles)
-            return _success({
-                "reaction_smiles": reaction_smiles,
-                "reaction_type": norm.get("reaction_type"),
-                "family_label": norm.get("family_label", ""),
-                "confidence": norm.get("confidence", 0.0),
-                "matched_slots": [],
-            })
-        except Exception:
-            return _error(f"Reaction type detection failed: {exc}")
+        return _error(f"Reaction type detection failed: {exc}")
 
 
 detect_reaction_type_tool = ToolPlugin(
@@ -153,7 +160,7 @@ def _analyze_bond_changes(reaction_smiles: str) -> Dict[str, Any]:
         dict with bonds_broken, bonds_formed, key_bond_type, leaving_groups.
     """
     try:
-        from chemtools.util.reaction_center_detector import analyze_bond_changes_hybrid
+        from chemtools._atom_mapping import analyze_bond_changes_hybrid
 
         result = analyze_bond_changes_hybrid(reaction_smiles)
         if not result:
@@ -167,40 +174,60 @@ def _analyze_bond_changes(reaction_smiles: str) -> Dict[str, Any]:
 
         broken = rec.get("broken_bonds") or rec.get("bonds_broken", [])
         formed = rec.get("formed_bonds") or rec.get("bonds_formed", [])
+        leaving = rec.get("leaving_groups", [])
 
-        # Derive key bond type from formed bonds
-        key_bond = _infer_key_bond_type(formed)
+        # Derive key bond type from leaving groups (more reliable than index pairs)
+        key_bond = _infer_key_bond_type(broken, leaving)
 
         return _success({
             "reaction_smiles": reaction_smiles,
             "bonds_broken": _to_jsonable(broken),
             "bonds_formed": _to_jsonable(formed),
             "key_bond_type": key_bond,
-            "leaving_groups": _to_jsonable(rec.get("leaving_groups", [])),
+            "leaving_groups": _to_jsonable(leaving),
             "mapping_confidence": rec.get("confidence", rec.get("mapping_confidence", "")),
         })
     except Exception as exc:
         return _error(f"Bond change analysis failed: {exc}")
 
 
-def _infer_key_bond_type(formed_bonds: list) -> str:
-    """Derive a human-readable key bond type from bond change data."""
-    if not formed_bonds:
-        return "unknown"
-    bond_str = " ".join(str(b) for b in formed_bonds).upper()
-    if "C-C" in bond_str or "C–C" in bond_str:
-        return "C-C"
-    if "C-N" in bond_str or "C–N" in bond_str:
-        return "C-N"
-    if "C-O" in bond_str or "C–O" in bond_str:
+def _infer_key_bond_type(broken_bonds: list, leaving_groups: list) -> str:
+    """Derive a human-readable key bond type from leaving groups.
+
+    Bond change data uses atom indices for formed bonds (no atom type info),
+    but leaving groups include the departing atom symbol — use those instead.
+    """
+    # Collect leaving atom symbols from both broken_bonds and leaving_groups
+    leaving_syms: set[str] = set()
+    for entry in leaving_groups:
+        # entry: [atom_idx, symbol, bond_type]
+        if isinstance(entry, (list, tuple)) and len(entry) >= 2:
+            sym = str(entry[1]).upper().split()[0]  # "B (leaving group)" → "B"
+            leaving_syms.add(sym)
+    # Also scan broken_bonds for labelled entries
+    for entry in broken_bonds:
+        if isinstance(entry, (list, tuple)) and len(entry) >= 2:
+            second = str(entry[1]).upper()
+            for sym in ("BR", "CL", "I ", "OTF", "OMS", "OTS", " N", " O", " S", " B"):
+                if sym.strip() in second:
+                    leaving_syms.add(sym.strip())
+
+    # Map leaving group pattern → key bond formed
+    # Suzuki: B + Br/Cl/I/OTf → C-C
+    if "B" in leaving_syms and leaving_syms & {"BR", "CL", "I", "OTF", "OMS"}:
+        return "C-C (Suzuki-type)"
+    # Buchwald / C-N: Br/Cl/I leaves, N participates
+    if "N" in leaving_syms or (leaving_syms & {"BR", "CL", "I"} and "B" not in leaving_syms):
+        # crude heuristic — check if N is in leaving (amination) or just Br/Cl
+        if "N" in leaving_syms:
+            return "C-N"
+        return "C-C or C-heteroatom"
+    if "O" in leaving_syms:
         return "C-O"
-    if "C-S" in bond_str or "C–S" in bond_str:
+    if "S" in leaving_syms:
         return "C-S"
-    if "C-B" in bond_str or "C–B" in bond_str:
-        return "C-B"
-    if "RING" in bond_str or "CYCL" in bond_str:
-        return "ring_closure"
-    return str(formed_bonds[0]) if formed_bonds else "unknown"
+    # Fallback
+    return "C-C" if leaving_syms else "unknown"
 
 
 analyze_bond_changes_tool = ToolPlugin(

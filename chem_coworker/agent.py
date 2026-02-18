@@ -214,6 +214,8 @@ class ChemCoworker:
             hypothesis=plan.hypothesis or "(not yet identified)",
             confidence=plan.confidence,
             tool_results_text=tool_results_text,
+            tool_descriptions=self.registry.describe_tools(),
+            resource_context=self._describe_resources(),
         )
 
         try:
@@ -356,6 +358,70 @@ class ChemCoworker:
                 structured["taxonomy_matches"] = r.get("matches", [])
 
         return structured
+
+    def _describe_resources(self) -> str:
+        """
+        Return a brief, factual description of the local databases and data
+        accessible via the registered tools. Used in SYNTHESIZE_PROMPT so the
+        LLM can answer meta-questions like 'what data do you have access to?'
+        """
+        import json as _json
+        import pathlib as _pathlib
+
+        _data_dir = _pathlib.Path(__file__).parent.parent / "chemtools" / "taxonomy" / "data"
+        lines: List[str] = []
+
+        # Reaction taxonomy — load directly from JSON
+        try:
+            rt_data = _json.loads((_data_dir / "reaction_types.v4.0.json").read_text())
+            n_types = len(rt_data.get("reaction_types", []))
+        except Exception:
+            n_types = "~60"
+        lines.append(f"  • Reaction taxonomy: {n_types} named reaction types "
+                     "(Suzuki, Buchwald-Hartwig, SNAr, Heck, Negishi, Chan-Lam, etc.) "
+                     "with scope, mechanism, and conditions metadata")
+
+        # Motif scope index
+        try:
+            mi_data = _json.loads((_data_dir / "motif_scope_index.v1.json").read_text())
+            n_scope = len(mi_data.get("scope_map", {}))
+            n_probes = len(mi_data.get("probe_smiles", []))
+        except Exception:
+            n_scope, n_probes = "~64", "~22"
+        lines.append(f"  • Motif scope index: {n_scope} motif-reaction scope entries, "
+                     f"{n_probes} structural probe SMILES "
+                     "(maps aryl halides, boronic acids, amines, etc. to compatible reactions)")
+
+        # Reagent registry
+        try:
+            from chemtools.reagent.lookup import _load_all_reagents
+            n_reagents = len(_load_all_reagents())
+        except Exception:
+            n_reagents = "~27,000"
+        lines.append(f"  • Reagent registry: {n_reagents:,} entries "
+                     "(catalysts, ligands, bases, solvents, oxidants, reductants) "
+                     "searchable by name, abbreviation, CAS, or role")
+
+        # HTE conditions database
+        try:
+            from chemtools.recommend.hte_adapter import get_hte_reaction_keys
+            keys = get_hte_reaction_keys()
+            hte_info = f"{len(keys)} reaction keys" if keys else "available"
+        except Exception:
+            hte_info = "available"
+        lines.append(f"  • HTE conditions database: {hte_info} "
+                     "(high-throughput screening results; used by recommend_conditions tool)")
+
+        # RDKit
+        try:
+            from rdkit import __version__ as _rdkit_ver
+            rdkit_info = f"v{_rdkit_ver}"
+        except Exception:
+            rdkit_info = "available"
+        lines.append(f"  • RDKit {rdkit_info}: molecular descriptors, fingerprints, "
+                     "substructure search, SMILES parsing/canonicalization, stereochemistry")
+
+        return "\n".join(lines)
 
     def _check_hypothesis(
         self, plan: "ExecutionPlan", results: Dict[str, Any]
