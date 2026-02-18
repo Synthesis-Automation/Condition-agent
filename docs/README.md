@@ -54,7 +54,6 @@ examples/
   sample500/                      Small sample dataset
 data-processor/
   process_reactions.py            Dataset normalization pipeline
-  v2_processor_core.py            Canonicalization core
   Scifinder_rdf_processer.py      RDF ingestion for source data
 scripts/
   index_knowledge_base.py         Indexing utilities for RAG
