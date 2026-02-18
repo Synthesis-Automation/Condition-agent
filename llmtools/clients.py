@@ -24,13 +24,16 @@ from typing import Any, Dict, List, Optional, Union
 
 from openai import OpenAI
 
+China = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+US = "https://dashscope-us.aliyuncs.com/compatible-mode/v1"
 
 # Default base URLs for supported providers
 DEFAULT_BASE_URLS = {
     # DashScope OpenAI-compatible endpoint
-    "aliyun": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "aliyun": US,
     "openai": "https://api.openai.com/v1",
 }
+
 
 # Recommended models by provider
 RECOMMENDED_MODELS = {
@@ -58,7 +61,8 @@ AVAILABLE_MODELS = {
         "deepseek-r1-distill-llama-70b",
         "kimi-k2.5",
         "glm-4.7",
-        "MiniMax-M2.1"
+        "MiniMax-M2.1",
+        "glm-5"
     ],
     "openai": [
         "gpt-5.2",
