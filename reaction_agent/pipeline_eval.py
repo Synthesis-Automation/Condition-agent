@@ -12,7 +12,26 @@ be tightened or relaxed per use case without touching pipeline logic.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from functools import lru_cache
+from typing import Any, Dict, FrozenSet, List, Optional, Tuple
+
+
+# ---------------------------------------------------------------------------
+# Taxonomy ID loader (lazy, cached)
+# ---------------------------------------------------------------------------
+
+@lru_cache(maxsize=1)
+def _load_valid_reaction_type_ids() -> FrozenSet[str]:
+    """Load valid reaction type IDs from taxonomy JSON (cached after first call)."""
+    try:
+        from chemtools.taxonomy.loader import load_reaction_types_list
+        entries = load_reaction_types_list()
+        return frozenset(
+            e["id"] for e in entries
+            if isinstance(e, dict) and e.get("id")
+        )
+    except Exception:
+        return frozenset()
 
 
 # ---------------------------------------------------------------------------
@@ -41,12 +60,22 @@ class QualityConfig:
             "Unclassified-Reactant" in reacted_motifs triggers fallback. This
             string is inserted by featurize_reaction()'s coverage guard when
             no taxonomy motif could be assigned to a reactant.
+        require_known_reaction_type: If True (default), the reaction_type must
+            be a valid ID from reaction_types.v4.0.json. Synthetic/fallback
+            types (e.g. "Multi-Event:LGDisp+C-C") are not accepted and will
+            trigger Stage 4. If the taxonomy cannot be loaded the check is
+            skipped rather than failing.
+        required_formed_motif_count: Exact number of formed (product) motifs
+            expected. Default 1 — each reaction should produce exactly one
+            product motif. Set to 0 to disable this check.
     """
 
     min_reaction_type_confidence: float = 0.5
     require_reaction_key: bool = True
     required_reactant_motif_count: int = 2
     allow_unclassified_reactant: bool = False
+    require_known_reaction_type: bool = True
+    required_formed_motif_count: int = 1
 
 
 # ---------------------------------------------------------------------------
@@ -147,6 +176,27 @@ class QualityEvaluator:
                     f"(reacted_motifs={list(feat.reacted_motifs)})"
                 )
 
+        # Check 6 — reaction_type must be a known taxonomy ID, not a synthetic
+        # fallback string (e.g. "Multi-Event:LGDisp+C-C")
+        if cfg.require_known_reaction_type and feat.reaction_type:
+            valid_ids = _load_valid_reaction_type_ids()
+            if valid_ids and feat.reaction_type not in valid_ids:
+                issues.append(
+                    f"reaction_type '{feat.reaction_type}' is not a known taxonomy ID "
+                    f"(not in reaction_types.v4.0.json). "
+                    f"Synthetic/fallback types are rejected."
+                )
+
+        # Check 7 — exact formed (product) motif count
+        if cfg.required_formed_motif_count > 0:
+            actual_formed = len(feat.formed_motifs)
+            if actual_formed != cfg.required_formed_motif_count:
+                issues.append(
+                    f"Wrong formed motif count: got {actual_formed}, "
+                    f"expected exactly {cfg.required_formed_motif_count} "
+                    f"(formed_motifs={list(feat.formed_motifs)})"
+                )
+
         return _build_report(issues, feat)
 
 
@@ -156,14 +206,19 @@ class QualityEvaluator:
 
 def _build_report(issues: List[str], feat: "FeaturizationResult") -> QualityReport:  # noqa: F821
     passed = len(issues) == 0
+    valid_ids = _load_valid_reaction_type_ids()
     scores: Dict[str, Any] = {
         "reaction_type": feat.reaction_type,
         "reaction_type_confidence": feat.reaction_type_confidence,
+        "reaction_type_known": (
+            feat.reaction_type in valid_ids if (feat.reaction_type and valid_ids) else None
+        ),
         "reaction_key_present": bool(feat.reaction_key),
         "has_unclassified_reactant": feat.has_unclassified_reactant,
         "reactant_motif_count": feat.reactant_motif_count,
         "reacted_motifs": list(feat.reacted_motifs),
         "formed_motifs": list(feat.formed_motifs),
+        "formed_motif_count": len(feat.formed_motifs),
     }
     return QualityReport(
         passed=passed,

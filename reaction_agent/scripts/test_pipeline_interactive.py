@@ -4,13 +4,9 @@ Interactive CLI tester for the ReactionPipeline (5-stage SMILES pipeline).
 Shows each stage result in detail so you can see exactly what the pipeline
 does and whether the LLM fallback fires.
 
-Usage (LLM fallback ON by default, needs OPENAI_API_KEY):
+Usage:
     python test_pipeline_interactive.py
-
-Usage (deterministic only, no API key needed):
     python test_pipeline_interactive.py --no-llm
-
-Usage (different model):
     python test_pipeline_interactive.py --model gpt-4o-mini
 """
 
@@ -71,26 +67,7 @@ def kv(key: str, val):
     print(f"  {C.BOLD}{key}:{C.END} {val}")
 
 
-# ---------------------------------------------------------------------------
-# Preset reactions
-# ---------------------------------------------------------------------------
-PRESETS = {
-    '1': ("Suzuki-Miyaura coupling",
-          "Brc1ccccc1.B(O)(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"),
-    '2': ("Amide formation",
-          "CC(=O)O.NCc1ccccc1>>CC(=O)NCc1ccccc1"),
-    '3': ("C-N coupling (Buchwald-Hartwig)",
-          "Brc1ccccc1.NCc1ccccc1>>c1ccc(NCc2ccccc2)cc1"),
-    '4': ("Complex Suzuki (with protecting group)",
-          "CC1(C)OB(c2cnn(CCOC3CCCCO3)c2)OC1(C)C."
-          "Cc1nc(-c2cn3c(n2)-c2ccc(Br)cc2OCC3)n(C)n1>>"
-          "Cc1nc(-c2cn3c(n2)-c2ccc(-c4cnn(CCO)c4)cc2OCC3)n(C)n1"),
-    '5': ("Simple substitution (edge case)",
-          "Brc1ccccc1.O>>Oc1ccccc1"),
-}
-
-
-def show_menu(use_llm: bool, model: str, use_reasoning: bool = True):
+def show_header(use_llm: bool, model: str, use_reasoning: bool = True):
     print(f"\n{C.BOLD}{C.HEADER}{'='*72}{C.END}")
     print(f"{C.BOLD}{C.HEADER}  ReactionPipeline Interactive Tester{C.END}")
     if use_reasoning:
@@ -101,12 +78,6 @@ def show_menu(use_llm: bool, model: str, use_reasoning: bool = True):
         mode = "deterministic only (no LLM)"
     print(f"{C.BOLD}{C.HEADER}  Mode: {mode}{C.END}")
     print(f"{C.BOLD}{C.HEADER}{'='*72}{C.END}")
-    print("\n  Select a reaction:\n")
-    for k, (name, smiles) in PRESETS.items():
-        print(f"  {C.BOLD}{k}.{C.END} {name}")
-        print(f"     {smiles[:78]}{'...' if len(smiles)>78 else ''}")
-    print(f"\n  {C.BOLD}6.{C.END} Custom SMILES")
-    print(f"  {C.BOLD}0.{C.END} Exit\n")
 
 
 # ---------------------------------------------------------------------------
@@ -513,39 +484,25 @@ def main():
         use_llm = False
         use_reasoning = False
 
-    while True:
-        show_menu(use_llm, args.model, use_reasoning=use_reasoning)
-        choice = input(f"{C.BOLD}Choice (0-6): {C.END}").strip()
+    show_header(use_llm, args.model, use_reasoning=use_reasoning)
 
-        if choice == '0':
+    while True:
+        try:
+            smiles = input(f"\n{C.BOLD}Reaction SMILES (q to exit): {C.END}").strip()
+        except EOFError:
+            break
+
+        if smiles.lower() in ('q', 'quit', 'exit'):
             print(f"\n{C.CYAN}Goodbye!{C.END}")
             break
-        elif choice in PRESETS:
-            name, smiles = PRESETS[choice]
-            print(f"\n{C.BOLD}Selected:{C.END} {name}")
-            run_pipeline(
-                smiles, use_llm, args.model, args.top_k, args.db_path,
-                use_reasoning=use_reasoning,
-                reasoning_model=args.reasoning_model,
-            )
-        elif choice == '6':
-            smiles = input(f"\n{C.BOLD}Enter reaction SMILES (reactants>>product): {C.END}").strip()
-            if not smiles:
-                warn("No input — returning to menu")
-                continue
-            run_pipeline(
-                smiles, use_llm, args.model, args.top_k, args.db_path,
-                use_reasoning=use_reasoning,
-                reasoning_model=args.reasoning_model,
-            )
-        else:
-            err("Invalid choice — enter 0-6")
+        if not smiles:
             continue
 
-        again = input(f"\n{C.BOLD}Test another? (y/n): {C.END}").strip().lower()
-        if again not in ('y', 'yes', ''):
-            print(f"\n{C.CYAN}Goodbye!{C.END}")
-            break
+        run_pipeline(
+            smiles, use_llm, args.model, args.top_k, args.db_path,
+            use_reasoning=use_reasoning,
+            reasoning_model=args.reasoning_model,
+        )
 
 
 if __name__ == "__main__":
