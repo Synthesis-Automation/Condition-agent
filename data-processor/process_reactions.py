@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import importlib.util
 import math
 import os
 import re
@@ -42,24 +43,40 @@ try:
 except Exception:
     chemtools_registry = None
 
-try:
-    from v2_processor_core import V2Processor
-except ImportError:
-    V2Processor = None
+# Optional reactant classifier (loaded dynamically if local file exists).
+classify_reactant = None
+REACTANT_TYPES = None
+_REACTANT_CLASSIFIER_LOAD_ATTEMPTED = False
 
-# Import reactant classifier if available
-try:
-    import sys
-    import os
-    # Add data-processor/other_data to path for classify_reactant import
-    other_data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'other_data')
-    if other_data_path not in sys.path:
-        sys.path.insert(0, other_data_path)
-    from classify_reactant import classify_reactant, load_reactant_types
-    REACTANT_TYPES = load_reactant_types()
-except Exception:
-    classify_reactant = None
-    REACTANT_TYPES = None
+
+def _ensure_optional_reactant_classifier() -> None:
+    global classify_reactant, REACTANT_TYPES, _REACTANT_CLASSIFIER_LOAD_ATTEMPTED
+    if _REACTANT_CLASSIFIER_LOAD_ATTEMPTED:
+        return
+    _REACTANT_CLASSIFIER_LOAD_ATTEMPTED = True
+
+    classifier_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "other_data",
+        "classify_reactant.py",
+    )
+    if not os.path.exists(classifier_path):
+        return
+
+    try:
+        spec = importlib.util.spec_from_file_location("classify_reactant_optional", classifier_path)
+        if spec is None or spec.loader is None:
+            return
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        classify_fn = getattr(module, "classify_reactant", None)
+        load_types_fn = getattr(module, "load_reactant_types", None)
+        if callable(classify_fn) and callable(load_types_fn):
+            classify_reactant = classify_fn
+            REACTANT_TYPES = load_types_fn()
+    except Exception:
+        classify_reactant = None
+        REACTANT_TYPES = None
 
 
 # ------------------------------ Schema helpers ------------------------------
@@ -165,6 +182,7 @@ def classify_reactants_from_smiles(smiles_string: str) -> Tuple[List[str], List[
         Tuple of (reactant_types, reactant_categories)
         Each is a list matching the reactant order in SMILES
     """
+    _ensure_optional_reactant_classifier()
     if not smiles_string or not classify_reactant or not REACTANT_TYPES:
         return ([], [])
     
@@ -338,32 +356,8 @@ def _is_condition_token(tok: str) -> bool:
 
 def _classify_catalyst_or_ligand(name: str) -> Tuple[str, str]:
     """Return (kind, generic) where kind in {"core", "ligand"} and generic metal tag.
-    Uses V2 taxonomy if available, otherwise falls back to heuristics.
+    Uses heuristic rules.
     """
-    if V2Processor:
-        try:
-            # Lazy init processor to avoid overhead if not needed
-            if not hasattr(_classify_catalyst_or_ligand, "_processor"):
-                _classify_catalyst_or_ligand._processor = V2Processor()
-            
-            res = _classify_catalyst_or_ligand._processor.classify_reagent(name)
-            role = res.get("role", "UNKNOWN")
-            
-            # Map V2 roles to legacy "core"/"ligand"
-            if role == "metal_catalyst":
-                # Extract metal from name or family if possible
-                metal = ""
-                n = name.lower()
-                if "pd" in n or "palladium" in n: metal = "Pd"
-                elif "cu" in n or "copper" in n: metal = "Cu"
-                elif "ni" in n or "nickel" in n: metal = "Ni"
-                return "core", metal
-            elif role == "ligand":
-                return "ligand", ""
-        except Exception:
-            pass
-
-    # Fallback to legacy heuristics
     n = name.lower()
     metal = ""
     if any(x in n for x in ["palladium", "pd("]):
@@ -1817,32 +1811,7 @@ def assemble_rows(txt: Dict[str, Dict[str, Any]], rdf: Dict[str, Dict[str, Any]]
                 'notes': r.get('notes'),
             }
         }
-        # Build V2 structured conditions if processor is available
         conditions_v2 = {}
-        if V2Processor:
-            try:
-                if not hasattr(_classify_catalyst_or_ligand, "_processor"):
-                    _classify_catalyst_or_ligand._processor = V2Processor()
-                
-                # Prepare reagents for V2 processor
-                v2_reagents = []
-                for p in reagent_pairs:
-                    nm, _, cs = p.partition('|')
-                    v2_reagents.append({"name": nm.strip(), "cas": cs.strip()})
-                for p in combined_pairs:
-                    nm, _, cs = p.partition('|')
-                    v2_reagents.append({"name": nm.strip(), "cas": cs.strip()})
-                
-                v2_solvents = []
-                for p in solvent_pairs:
-                    nm, _, cs = p.partition('|')
-                    v2_solvents.append({"name": nm.strip(), "cas": cs.strip()})
-                
-                conditions_v2 = _classify_catalyst_or_ligand._processor._standardize_conditions(
-                    v2_reagents, v2_solvents, {"conditions": {"temperature_c": temp_c, "yield_pct": yield_pct}}
-                )
-            except Exception:
-                pass
 
         row = {
             'ReactionID': rid,
