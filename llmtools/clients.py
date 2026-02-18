@@ -58,8 +58,7 @@ AVAILABLE_MODELS = {
         "deepseek-r1-distill-llama-70b",
         "kimi-k2.5",
         "glm-4.7",
-        "MiniMax-M2.1",
-        "kimi/kimi-k2.5"
+        "MiniMax-M2.1"
     ],
     "openai": [
         "gpt-5.2",
