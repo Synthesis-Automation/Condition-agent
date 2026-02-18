@@ -27,6 +27,7 @@ from openai import OpenAI
 
 # Default base URLs for supported providers
 DEFAULT_BASE_URLS = {
+    # DashScope OpenAI-compatible endpoint
     "aliyun": "https://dashscope.aliyuncs.com/compatible-mode/v1",
     "openai": "https://api.openai.com/v1",
 }
@@ -55,11 +56,11 @@ AVAILABLE_MODELS = {
         "deepseek-r1",
         "deepseek-r1-0528",
         "deepseek-v3",
-        "deepseek-r1-distill-qwen-14b",
-        "deepseek-r1-distill-qwen-32b",
         "deepseek-r1-distill-llama-70b",
         "kimi-k2.5",
         "glm-4.7",
+        "MiniMax-M2.1",
+        "kimi/kimi-k2.5"
     ],
     "openai": [
         "gpt-5.2",

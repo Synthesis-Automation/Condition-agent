@@ -9,18 +9,22 @@ The three-tier reaction interpretation system now uses **DeepSeek-v3.2 (Aliyun)*
 **Reaction**: Suzuki coupling + THP deprotection
 
 ### Tier 1 - String Patterns (Instant, Free)
+
 - ✓ Suzuki coupling detected
 - ✓ Tandem/multi-step detected
 - ✓ Significant atom loss identified
 
 ### Tier 2 - DeepSeek-v3.2 Quick Glance (16.6s, ~$0.001)
+
 **Summary**: *"One-pot Suzuki-Miyaura cross-coupling between a brominated fused heterocycle and a THP-protected pyrazoleboronic ester, followed by in situ acidic workup to remove the THP protecting group."*
 
 ✓ **Correctly identified BOTH transformations:**
+
 1. ✓ Suzuki-Miyaura coupling (primary)
 2. ✓ THP deprotection (workup)
 
 **Comprehensive Analysis:**
+
 - 5 structural changes detected
 - 2 protecting groups identified (THP + boronic ester)
 - Side/workup transformations noted
@@ -32,6 +36,7 @@ The three-tier reaction interpretation system now uses **DeepSeek-v3.2 (Aliyun)*
 **Time**: 16.6s
 
 ### Tier 3 - Deep LLM Analysis (6.0s)
+
 - Full mechanistic details (SNAr)
 - Nucleophile/electrophile roles
 - Confidence: 0.99
@@ -70,6 +75,7 @@ Tested 4 models on the same complex reaction:
 ## GPT-4o Critical Failure
 
 GPT-4o **completely missed the Suzuki coupling** (scored 0/10 points):
+
 - Misidentified as "N-alkylation removal"
 - Only detected protecting group changes
 - Found only 2 structural changes (vs 5 for DeepSeek)
@@ -78,6 +84,7 @@ GPT-4o **completely missed the Suzuki coupling** (scored 0/10 points):
 ## GPT-5.2 Status
 
 **Not usable for chemistry analysis:**
+
 - Content filtering blocks organic chemistry prompts
 - Returns empty responses for:
   - SMILES analysis
@@ -86,6 +93,7 @@ GPT-4o **completely missed the Suzuki coupling** (scored 0/10 points):
 - Works only for simple non-chemistry prompts
 
 **Evidence**:
+
 ```
 Test: "Describe Suzuki coupling" → Empty response
 Test: "What is 2+2?" → "4" ✓
@@ -157,16 +165,19 @@ if should_run_quick_glance(string_patterns, mapping_conf, mode="always"):
 ## Usage
 
 ### Command Line
+
 ```bash
 python -m reaction_agent.cli --reaction "<SMILES>" --mode auto
 ```
 
 ### Interactive CLI
+
 ```bash
 python scripts/interactive_test_cli.py
 ```
 
 ### Programmatic
+
 ```python
 from reaction_agent import ReactionSMILESAnalyzer
 from llmtools.clients import LLMClient
@@ -205,24 +216,30 @@ tier3 = result['interpretation']       # GPT-4o-mini deep analysis
 If you need to adjust the configuration:
 
 ### Speed Priority (GPT-4o)
+
 ```python
 quick_client = LLMClient(provider="openai", model="gpt-4o")
 ```
+
 - **6.9s** (2.6x faster)
 - ❌ Misses Suzuki coupling
 - Less comprehensive
 
 ### Budget Priority (GPT-4o-mini)
+
 ```python
 quick_client = LLMClient(provider="openai", model="gpt-4o-mini")
 ```
+
 - **~$0.0001/reaction** (10x cheaper)
 - ❌ Significantly less accurate
 
 ### Balanced (Kimi-k2.5)
+
 ```python
 quick_client = LLMClient(provider="aliyun", model="kimi-k2.5")
 ```
+
 - **35.8s** (2x slower than DeepSeek)
 - ✓ Same accuracy as DeepSeek
 - Slightly less detailed
@@ -230,6 +247,7 @@ quick_client = LLMClient(provider="aliyun", model="kimi-k2.5")
 ## Recommendation
 
 **Keep DeepSeek-v3.2** - It's the only model that:
+
 1. ✓ Correctly identified Suzuki coupling (primary reaction)
 2. ✓ Detected THP deprotection (your original problem)
 3. ✓ Provided comprehensive analysis (5 changes, 2 PGs)
@@ -239,11 +257,13 @@ quick_client = LLMClient(provider="aliyun", model="kimi-k2.5")
 ## Test Your Reactions
 
 Try your own reactions:
+
 ```bash
 python -m reaction_agent.cli --reaction "YOUR_SMILES" --mode auto
 ```
 
 You should see:
+
 - **Tier 1**: Instant pattern detection
 - **Tier 2**: DeepSeek-v3.2 comprehensive analysis (~17s)
 - **Tier 3**: Full mechanistic details (~6s)
