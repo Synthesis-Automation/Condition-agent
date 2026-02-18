@@ -22,6 +22,34 @@
       "description": "Two unsaturated systems combine to form a ring. Both substrates consumed entirely.",
       "examples": ["[3+2]: R-N3 + R-C≡C-R → triazole", "[4+2]: diene + dienophile → cyclohexene (Diels-Alder)"]
     },
+    "cyclization": {
+      "description": "Intramolecular ring closure where one substrate forms a new ring bond.",
+      "examples": ["HO-(CH2)5-Br -> tetrahydropyran", "diene tether -> cyclic alkene (ring-closing metathesis)"]
+    },
+    "annulation": {
+      "description": "Ring construction that forms one or more new bonds, often from two partners.",
+      "examples": ["2-aminobenzamide + carbonyl partner -> quinazolinone", "dicarbonyl + diamine -> fused heterocycle"]
+    },
+    "electrophilic_aromatic_substitution": {
+      "description": "Electrophile replaces aromatic C-H while aromaticity is restored.",
+      "examples": ["Ar-H + NO2+ -> Ar-NO2", "Ar-H + acylium -> Ar-COR", "Ar-H + Br+ -> Ar-Br"]
+    },
+    "nucleophilic_aromatic_substitution": {
+      "description": "Nucleophile replaces a leaving group on an activated aromatic ring.",
+      "examples": ["Ar-F + RNH2 -> Ar-NHR", "Ar-Cl + RO- -> Ar-OR", "Ar-X + RS- -> Ar-SR"]
+    },
+    "oxidation": {
+      "description": "Net increase in oxidation state of substrate motifs.",
+      "examples": ["R-CH2OH -> R-CHO", "R-CHO -> R-COOH", "R-SR -> R-SO2R"]
+    },
+    "reduction": {
+      "description": "Net decrease in oxidation state of substrate motifs.",
+      "examples": ["R-NO2 -> R-NH2", "R-CN -> R-CH2NH2", "R-COCl -> R-CHO"]
+    },
+    "olefination": {
+      "description": "Formation of C=C bond from carbonyl or related precursors.",
+      "examples": ["R-CHO + phosphonium ylide -> R-CH=CR2", "R2C=O + ylide -> alkene"]
+    },
     "elimination": {
       "description": "Small molecule eliminated (H2O, HX, etc.), often forming unsaturation.",
       "examples": ["R-CH2-CH2-OH → R-CH=CH2 (+ H2O)", "R-CH2-CH2-Br + base → R-CH=CH2 (+ HBr)"]
