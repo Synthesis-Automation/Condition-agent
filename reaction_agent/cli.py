@@ -28,6 +28,48 @@ if TYPE_CHECKING:
     from reaction_agent.retry import RetryConfig
 
 
+# Available models for interactive selection at startup
+SELECTABLE_MODELS = [
+    {"name": "o4-mini",       "provider": "openai"},   # 1 - default
+    {"name": "gpt-5.2",       "provider": "openai"},   # 2
+    {"name": "glm-4.7",       "provider": "aliyun"},   # 3
+    {"name": "MiniMax-M2.1",  "provider": "aliyun"},   # 4
+    {"name": "deepseek-v3.2", "provider": "aliyun"},   # 5
+]
+
+
+def select_model_interactive() -> tuple:
+    """
+    Show a numbered model menu and return (model_name, provider).
+    Pressing Enter selects the default (o4-mini / openai).
+    """
+    print("\nSelect LLM model:")
+    for i, m in enumerate(SELECTABLE_MODELS, 1):
+        default_tag = "  ← default" if i == 1 else ""
+        print(f"  [{i}] {m['name']:<18} ({m['provider']}){default_tag}")
+
+    while True:
+        try:
+            raw = input("\nEnter number [1]: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            raw = ""
+
+        if raw == "":
+            choice = 1
+        else:
+            try:
+                choice = int(raw)
+            except ValueError:
+                print(f"  Please enter a number between 1 and {len(SELECTABLE_MODELS)}.")
+                continue
+
+        if 1 <= choice <= len(SELECTABLE_MODELS):
+            selected = SELECTABLE_MODELS[choice - 1]
+            return selected["name"], selected["provider"]
+        else:
+            print(f"  Please enter a number between 1 and {len(SELECTABLE_MODELS)}.")
+
+
 # Colors for terminal output (ANSI codes)
 class Colors:
     """ANSI color codes for terminal output."""
@@ -877,9 +919,10 @@ Examples:
     parser.add_argument('--interactive', '-i', action='store_true', help='Run in interactive mode (default if no reaction provided)')
 
     # LLM options
-    parser.add_argument('--model', '-m', type=str, default='gpt-4o-mini',
-                        help='LLM model to use (default: gpt-4o-mini). Specify gpt-5.2 to force deep reasoning.')
-    parser.add_argument('--provider', '-p', type=str, default='openai', help='LLM provider (default: openai)')
+    parser.add_argument('--model', '-m', type=str, default=None,
+                        help='LLM model to use (default: interactive selection). Specify gpt-5.2 to force deep reasoning.')
+    parser.add_argument('--provider', '-p', type=str, default=None,
+                        help='LLM provider (default: auto-detected from model)')
     parser.add_argument('--temperature', '-t', type=float, default=0.0, help='Temperature (default: 0.0)')
     parser.add_argument('--max-tokens', type=int, default=2000, help='Max tokens (default: 2000)')
     parser.add_argument('--mode', type=str, default='auto', choices=['auto', 'fast', 'deep', 'expert'],
@@ -935,11 +978,27 @@ Examples:
     if args.no_color or os.name == 'nt':
         Colors.disable()
 
-    # Print banner
+    # Print banner (model info printed after selection below)
     if not args.quiet:
         print_header("Reaction SMILES Analysis Agent - Interactive CLI")
+
+    # Model / provider selection
+    if args.no_llm:
+        # No LLM needed — use dummy values
+        args.model = args.model or "none"
+        args.provider = args.provider or "none"
+    elif args.model is None:
+        # No --model flag supplied: show interactive selection menu
+        args.model, args.provider = select_model_interactive()
+    else:
+        # --model was given; auto-detect provider if not supplied
+        if args.provider is None:
+            aliyun_models = {m["name"] for m in SELECTABLE_MODELS if m["provider"] == "aliyun"}
+            args.provider = "aliyun" if args.model in aliyun_models else "openai"
+
+    if not args.quiet and not args.no_llm:
         print(f"\nModel: {Colors.BOLD}{args.model}{Colors.END} ({args.provider})")
-        print(f"Mode: {Colors.BOLD}{args.mode}{Colors.END}")
+        print(f"Mode:  {Colors.BOLD}{args.mode}{Colors.END}")
         if args.reasoning_effort:
             print(f"Reasoning Effort: {Colors.BOLD}{args.reasoning_effort}{Colors.END}")
 
