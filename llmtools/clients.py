@@ -52,7 +52,6 @@ RECOMMENDED_MODELS = {
 AVAILABLE_MODELS = {
     "aliyun": [
         "deepseek-v3.2",
-        "deepseek-v3.1",
         "deepseek-r1",
         "deepseek-r1-0528",
         "deepseek-v3",
