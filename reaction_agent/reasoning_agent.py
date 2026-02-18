@@ -22,13 +22,87 @@ import logging
 import os
 import re
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Message / JSON extraction helpers
+# ---------------------------------------------------------------------------
+
+def _get_message_text(msg: Any) -> str:
+    """Extract plain text from a LangChain message.
+
+    Handles:
+    - content as str (standard OpenAI)
+    - content as list of dicts (multi-modal / some providers)
+    - empty content on tool-call-only messages
+    """
+    content = getattr(msg, "content", "")
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts: List[str] = []
+        for item in content:
+            if isinstance(item, dict):
+                t = item.get("text") or item.get("content", "")
+                if t:
+                    parts.append(str(t))
+            elif isinstance(item, str):
+                parts.append(item)
+        return "\n".join(parts)
+    return ""
+
+
+def _extract_json_from_text(text: str) -> Optional[Dict[str, Any]]:
+    """Robustly extract a JSON object from model output text.
+
+    Handles:
+    - Plain JSON response (ideal case)
+    - JSON wrapped in ```json ... ``` or ``` ... ``` fences
+    - JSON preceded/followed by explanatory text
+    - Control characters embedded in JSON (MiniMax issue)
+    """
+    if not text:
+        return None
+
+    # Strip ASCII control characters (fixes MiniMax invalid-control-char issue)
+    # Keep \t, \n, \r but remove other control chars (\x00-\x08, \x0b-\x0c, \x0e-\x1f)
+    cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
+
+    # Strategy 1: JSON inside markdown code fence
+    fence_match = re.search(r"```(?:json)?\s*\n?([\s\S]*?)\n?```", cleaned)
+    if fence_match:
+        candidate = fence_match.group(1).strip()
+        if candidate:
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                pass
+
+    # Strategy 2: All {...} blocks — try last (most recent) first
+    brace_spans = list(re.finditer(r"\{[\s\S]*\}", cleaned))
+    for m in reversed(brace_spans):
+        try:
+            return json.loads(m.group(0))
+        except json.JSONDecodeError:
+            pass
+
+    # Strategy 3: Direct parse of the entire cleaned text
+    stripped = cleaned.strip()
+    if stripped:
+        try:
+            return json.loads(stripped)
+        except json.JSONDecodeError:
+            pass
+
+    return None
+
 
 # System prompt — bond-first reasoning with explicit disambiguation rules
 REASONING_SYSTEM_PROMPT = """You are an expert organic chemistry reasoning agent.
@@ -389,15 +463,22 @@ class ReactionReasoningAgent:
                         "output_preview": str(getattr(msg, "content", ""))[:200],
                     })
 
-            # Get the final AI message content
+            # Get the final AI message content.
+            # Strategy: walk messages newest-first; prefer messages that contain '{'
+            # (the JSON response), then fall back to any non-empty AI message.
             final_content = ""
+            fallback_content = ""
             for msg in reversed(result_messages):
-                if isinstance(msg, AIMessage) and msg.content:
-                    final_content = msg.content
-                    break
+                if isinstance(msg, AIMessage):
+                    text = _get_message_text(msg)
+                    if not fallback_content and text:
+                        fallback_content = text
+                    if text and "{" in text:
+                        final_content = text
+                        break
 
             if not final_content:
-                final_content = str(result)
+                final_content = fallback_content or str(result)
 
             # Parse JSON from the final response
             profile = self._parse_profile(
@@ -452,21 +533,13 @@ class ReactionReasoningAgent:
 
         warnings: List[str] = []
 
-        # Try to extract JSON from the response
-        text = raw_content.strip()
-        text = re.sub(r'^```(?:json)?\s*\n', '', text, flags=re.MULTILINE)
-        text = re.sub(r'\n```\s*$', '', text, flags=re.MULTILINE)
-        text = text.strip()
-
-        # Find JSON object in the text
-        json_match = re.search(r'\{[\s\S]*\}', text)
-        if json_match:
-            text = json_match.group(0)
-
-        try:
-            data = json.loads(text)
-        except json.JSONDecodeError as e:
-            warnings.append(f"Could not parse agent JSON output: {e}")
+        # Extract JSON from the agent's response using robust multi-strategy parser
+        data = _extract_json_from_text(raw_content)
+        if data is None:
+            preview = (raw_content[:150].replace("\n", "\\n")) if raw_content else "<empty>"
+            warnings.append(
+                f"Could not parse agent JSON output (response preview: {preview!r})"
+            )
             data = {}
 
         # Validate taxonomy IDs

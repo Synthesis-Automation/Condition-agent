@@ -66,7 +66,7 @@ TEST_CASES = [
     },
     {
         "name": "C-O coupling (Ar-Br + phenol)",
-        "smiles": "Brc1ccccc1.Oc1ccccc1>>c1ccc(-c2ccccc2)cc1",   # simplified; real product is Ar-O-Ar
+        "smiles": "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1",   # diphenyl ether (Ar-O-Ar)
         "expected": "C_O_Coupling",
     },
     {
@@ -109,7 +109,7 @@ class Result:
 def run_one(model: str, provider: str, case: dict) -> Result:
     from reaction_agent.reasoning_agent import ReactionReasoningAgent
 
-    agent = ReactionReasoningAgent(provider=provider, model=model)
+    agent = ReactionReasoningAgent(provider=provider, model=model, max_iterations=12)
     t0 = time.time()
     try:
         profile = agent.analyze(case["smiles"])
