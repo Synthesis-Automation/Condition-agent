@@ -146,6 +146,13 @@
       "description": "Benzothiophene (fused S-heteroaromatic)."
     },
     {
+      "id": "Epoxide",
+      "smarts": [
+        "[O;R1]1[C;R1][C;R1]1"
+      ],
+      "description": "Three-membered cyclic ether (oxirane/epoxide)."
+    },
+    {
       "id": "H2",
       "smarts": "[H][H]",
       "description": "Hydrogen gas (reductant)."
