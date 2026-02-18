@@ -39,3 +39,16 @@ def test_transformation_scoring_accepts_heteroaryl_biaryl_query_for_aryl_biaryl_
         query_spectators=set(),
     )
     assert score > 0.0
+
+
+def test_signature_lookup_candidates_include_scope_parent_variant() -> None:
+    signature = "Ar-Br|HeteroAr-B(OH)2|HeteroAr-Br"
+    candidates = set(hte._signature_lookup_candidates(signature))
+    assert "Ar-B(OH)2|Ar-Br" in candidates
+
+
+def test_signature_lookup_candidates_keep_exact_signature_first() -> None:
+    signature = "Ar-Br|HeteroAr-B(OH)2"
+    candidates = list(hte._signature_lookup_candidates(signature))
+    assert candidates
+    assert candidates[0] == signature

@@ -640,6 +640,19 @@ def _format_list(values: Any) -> str:
     return " / ".join(items)
 
 
+def _first_nonempty_text(values: Iterable[Any]) -> Optional[str]:
+    for value in values:
+        if value is None:
+            continue
+        if isinstance(value, float) and pd.isna(value):
+            continue
+        text = str(value).strip()
+        if not text or text.lower() == "nan":
+            continue
+        return text
+    return None
+
+
 def _normalize_reaction_key(value: Any) -> Optional[str]:
     """Normalize reaction key text; return None for empty placeholders."""
     if value is None:
@@ -661,13 +674,15 @@ def _aggregate_spectator_groups(
 ) -> str:
     if values is None:
         return ""
-    series = values.fillna("").astype(str).str.strip()
-    series = series[series != ""]
-    if series.empty:
-        return ""
-
     token_counter: Counter[str] = Counter()
-    for text in series:
+    for raw in values:
+        if raw is None:
+            continue
+        if isinstance(raw, float) and pd.isna(raw):
+            continue
+        text = str(raw).strip()
+        if not text:
+            continue
         tokens = _split_group_tokens(text)
         for token in tokens:
             token_counter[token] += 1
@@ -774,17 +789,14 @@ def _format_source_reaction_ids(
         return ""
 
     ids: List[str] = []
-    if "Source_File" in group_df.columns:
-        source_files = group_df["Source_File"].fillna("").astype(str).str.strip()
-    else:
-        source_files = pd.Series([""] * len(group_df), index=group_df.index)
-    if "Source_Row" in group_df.columns:
-        source_rows = group_df["Source_Row"]
-    else:
-        source_rows = pd.Series([None] * len(group_df), index=group_df.index)
+    has_source_file = "Source_File" in group_df.columns
+    has_source_row = "Source_Row" in group_df.columns
+    has_reaction_id = "reaction_id" in group_df.columns
 
+    source_files = group_df["Source_File"].tolist() if has_source_file else [None] * len(group_df)
+    source_rows = group_df["Source_Row"].tolist() if has_source_row else [None] * len(group_df)
     for file_val, row_val in zip(source_files, source_rows):
-        file_text = str(file_val).strip()
+        file_text = str(file_val or "").strip()
         if not file_text:
             continue
         file_name = Path(file_text).name if file_text else ""
@@ -800,9 +812,13 @@ def _format_source_reaction_ids(
             ids.append(file_name or file_text)
 
     ids = _dedupe_list(ids)
-    if not ids and "reaction_id" in group_df.columns:
-        fallback = group_df["reaction_id"].fillna("").astype(str).str.strip()
-        ids = _dedupe_list([value for value in fallback if value])
+    if not ids and has_reaction_id:
+        fallback: List[str] = []
+        for value in group_df["reaction_id"]:
+            text = str(value or "").strip()
+            if text and text.lower() != "nan":
+                fallback.append(text)
+        ids = _dedupe_list(fallback)
     if not ids:
         return ""
     if max_items > 0 and len(ids) > max_items:
@@ -1727,6 +1743,60 @@ def _reaction_key_to_signatures(key: str) -> Tuple[str, str]:
     return core, ext
 
 
+@lru_cache(maxsize=4096)
+def _signature_lookup_candidates(signature: str) -> Tuple[str, ...]:
+    """
+    Build lookup candidates for a reactant signature using scope-parent fallback.
+
+    Example:
+    - query token `HeteroAr-B(OH)2` can produce parent `Ar-B(OH)2`
+    - query token `HeteroAr-Br` can produce parent `Ar-Br`
+    """
+    tokens = sorted(set(_split_motif_tokens(signature)))
+    if not tokens:
+        return tuple()
+
+    parent_map = _load_scope_parent_map()
+    options: List[List[str]] = []
+    for token in tokens:
+        parents = sorted(parent_map.get(token) or set())
+        expanded = [token]
+        expanded.extend(parent for parent in parents if parent and parent != token)
+        options.append(_dedupe_list(expanded))
+
+    candidates: List[str] = []
+    seen: Set[str] = set()
+    for combo in itertools.product(*options):
+        candidate = _encode_signature(combo)
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        candidates.append(candidate)
+        # Keep this bounded to avoid combinatorial blow-up on noisy signatures.
+        if len(candidates) >= 64:
+            break
+
+    return tuple(candidates)
+
+
+@lru_cache(maxsize=1024)
+def _featurize_reaction_for_recommendation(
+    reaction_smiles: str,
+    *,
+    skip_bond_analysis: bool,
+) -> Dict[str, Any]:
+    options = dict(get_crk_options())
+    if skip_bond_analysis:
+        options["skip_bond_analysis"] = True
+    payload = featurize_reaction(
+        reaction_smiles,
+        options=options,
+    )
+    if not isinstance(payload, dict):
+        return {}
+    return payload
+
+
 def _intramolecular_likely_from_fields(
     reactant_a: Any,
     reactant_b: Any,
@@ -2556,6 +2626,33 @@ class HTERecommender:
             working_df = working_df.drop_duplicates(subset=dedup_cols)
         if working_df.empty:
             return recommendations
+
+        if "AREA_TOTAL_REDUCED" in working_df.columns:
+            working_df["_yield_numeric"] = pd.to_numeric(
+                working_df["AREA_TOTAL_REDUCED"],
+                errors="coerce",
+            ).fillna(0.0)
+        else:
+            working_df["_yield_numeric"] = 0.0
+        if "z-Score" in working_df.columns:
+            working_df["_z_numeric"] = pd.to_numeric(working_df["z-Score"], errors="coerce")
+        else:
+            working_df["_z_numeric"] = pd.Series([pd.NA] * len(working_df), index=working_df.index)
+        if "match_score" in working_df.columns:
+            working_df["_match_numeric"] = pd.to_numeric(working_df["match_score"], errors="coerce").fillna(0.0)
+        else:
+            working_df["_match_numeric"] = 1.0
+        if "spectator_score" in working_df.columns:
+            working_df["_spectator_numeric"] = pd.to_numeric(
+                working_df["spectator_score"],
+                errors="coerce",
+            ).fillna(0.0)
+        else:
+            working_df["_spectator_numeric"] = 0.0
+        if "Source_Group" in working_df.columns:
+            working_df["_source_group_norm"] = working_df["Source_Group"].apply(_normalize_source_group)
+        else:
+            working_df["_source_group_norm"] = ""
         
         # Define success threshold
         SUCCESS_THRESHOLD = 50.0
@@ -2568,17 +2665,12 @@ class HTERecommender:
         for condition_tuple, group_df in grouped:
             # Protocol data (single curated conditions) should not need 2 experiments
             current_min_exp = min_experiments
-            if 'Source_Group' in group_df.columns:
-                # Check for 'protocols' or raw path containing 'protocol'
-                is_protocol = (group_df['Source_Group'] == 'protocols').any()
-                if not is_protocol:
-                    # Fallback check if source_group wasn't normalized
-                    is_protocol = group_df['Source_Group'].astype(str).str.contains('protocol', case=False, na=False).any()
-
-                is_rule = (group_df['Source_Group'] == 'rules').any()
-                if not is_rule:
-                    is_rule = group_df['Source_Group'].astype(str).str.contains('rule', case=False, na=False).any()
-
+            if "_source_group_norm" in group_df.columns:
+                source_norm = set(
+                    value for value in group_df["_source_group_norm"] if str(value).strip()
+                )
+                is_protocol = "protocols" in source_norm
+                is_rule = "rules" in source_norm
                 if is_protocol or is_rule:
                     current_min_exp = 1
             
@@ -2589,12 +2681,12 @@ class HTERecommender:
             catalyst, ligand, base, solvent = condition_tuple
             
             # Get optional components (most common values)
-            sec_solvent = group_df['Secondary Solvent'].mode().iloc[0] if not group_df['Secondary Solvent'].isna().all() else None
-            additive = group_df['Additive'].mode().iloc[0] if not group_df['Additive'].isna().all() else None
-            coupling_reagent = group_df['Coupling Reagent'].mode().iloc[0] if not group_df['Coupling Reagent'].isna().all() else None
+            sec_solvent = _first_nonempty_text(group_df["Secondary Solvent"]) if "Secondary Solvent" in group_df.columns else None
+            additive = _first_nonempty_text(group_df["Additive"]) if "Additive" in group_df.columns else None
+            coupling_reagent = _first_nonempty_text(group_df["Coupling Reagent"]) if "Coupling Reagent" in group_df.columns else None
             
             # Calculate statistics
-            yields = pd.to_numeric(group_df['AREA_TOTAL_REDUCED'], errors='coerce').fillna(0.0)
+            yields = group_df["_yield_numeric"]
             num_exp = len(group_df)
             success_count = (yields > SUCCESS_THRESHOLD).sum()
             success_rate = (success_count / num_exp) * 100.0
@@ -2603,7 +2695,7 @@ class HTERecommender:
             
             # Robust z-score: median of top-N z values to reduce outlier risk while
             # keeping a top-end performance signal.
-            z_scores = pd.to_numeric(group_df['z-Score'], errors='coerce').dropna()
+            z_scores = group_df["_z_numeric"].dropna()
             if z_scores.empty:
                 continue
             z_sorted = z_scores.sort_values(ascending=False).tolist()
@@ -2620,34 +2712,19 @@ class HTERecommender:
             # Reaction type/category (most common, ignoring blanks)
             reaction_type = None
             if "Reaction_Type_Standardized" in group_df.columns:
-                type_series = group_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
-                type_series = type_series[type_series != ""]
-                if not type_series.empty:
-                    reaction_type = type_series.mode().iloc[0]
+                reaction_type = _first_nonempty_text(group_df["Reaction_Type_Standardized"])
             reaction_category = None
             if "Reaction_Category" in group_df.columns:
-                category_series = group_df["Reaction_Category"].fillna("").astype(str).str.strip()
-                category_series = category_series[category_series != ""]
-                if not category_series.empty:
-                    reaction_category = category_series.mode().iloc[0]
+                reaction_category = _first_nonempty_text(group_df["Reaction_Category"])
 
             reaction_key = None
             if "_transformation_key" in group_df.columns:
-                key_series = group_df["_transformation_key"].fillna("").astype(str).str.strip()
-                key_series = key_series[key_series != ""]
-                if not key_series.empty:
-                    reaction_key = key_series.mode().iloc[0]
+                reaction_key = _first_nonempty_text(group_df["_transformation_key"])
             elif "Reaction_Key" in group_df.columns:
-                key_series = group_df["Reaction_Key"].fillna("").astype(str).str.strip()
-                key_series = key_series[key_series != ""]
-                if not key_series.empty:
-                    reaction_key = key_series.mode().iloc[0]
+                reaction_key = _first_nonempty_text(group_df["Reaction_Key"])
             reaction_events = None
             if "Reaction_Events" in group_df.columns:
-                events_series = group_df["Reaction_Events"].fillna("").astype(str).str.strip()
-                events_series = events_series[events_series != ""]
-                if not events_series.empty:
-                    reaction_events = events_series.mode().iloc[0]
+                reaction_events = _first_nonempty_text(group_df["Reaction_Events"])
             reaction_id = _format_source_reaction_ids(group_df)
             
             # Reactant types (from first row)
@@ -2663,15 +2740,10 @@ class HTERecommender:
                     query_groups=query_spectator_groups,
                 )
             spectator_score = 0.0
-            if "spectator_score" in group_df.columns:
-                spectator_series = pd.to_numeric(group_df["spectator_score"], errors="coerce").fillna(0.0)
-                spectator_score = float(spectator_series.mean())
+            if "_spectator_numeric" in group_df.columns:
+                spectator_score = float(group_df["_spectator_numeric"].mean())
             
-            if 'match_score' in group_df.columns:
-                match_series = pd.to_numeric(group_df['match_score'], errors='coerce').fillna(0.0)
-                match_score = float(match_series.mean())
-            else:
-                match_score = 1.0
+            match_score = float(group_df["_match_numeric"].mean()) if "_match_numeric" in group_df.columns else 1.0
             
             rec = ConditionRecommendation(
                 catalyst=catalyst if pd.notna(catalyst) else "",
@@ -3084,6 +3156,8 @@ class HTERecommender:
             source_group = _normalize_source_group(source_group)
             if source_group in {"protocols", "rules"} and min_experiments > 1:
                 min_experiments = 1
+        normalized_source_group = _normalize_source_group(source_group) if source_group else ""
+        fast_experiments_mode = normalized_source_group == "experiments"
 
         if reaction_type_filter:
             resolved_filter = _resolve_reaction_type_label(reaction_type_filter)
@@ -3154,9 +3228,9 @@ class HTERecommender:
         has_product_guided_detection = False
         if reaction_smiles and (">" in reaction_smiles or "." in reaction_smiles):
             try:
-                rxn_features = featurize_reaction(
+                rxn_features = _featurize_reaction_for_recommendation(
                     reaction_smiles,
-                    options=get_crk_options(),
+                    skip_bond_analysis=fast_experiments_mode,
                 )
                 if isinstance(rxn_features, dict):
                     nested = rxn_features.get("reaction")
@@ -3310,33 +3384,46 @@ class HTERecommender:
         key_match_label = ""
         key_match_score = 0.0
         key_match_priority = 0
-        normalized_source_group = _normalize_source_group(source_group) if source_group else ""
         skip_transformation_scan = normalized_source_group == "experiments" and not reaction_key_only
         if result.query_reaction_key and result.query_reaction_key in self.transformation_indices:
             key_match_df = self.transformation_indices[result.query_reaction_key].copy()
             key_match_label = result.query_reaction_key
             key_match_score = 1.0
             key_match_priority = 0
-        elif query_core_signature and query_core_signature in self.transformation_indices:
-            key_match_df = self.transformation_indices[query_core_signature].copy()
-            key_match_label = query_core_signature
-            key_match_score = 0.75
-            key_match_priority = 1
-            result.is_fallback_match = True
-        elif query_ext_signature and query_ext_signature in self.transformation_indices:
-            key_match_df = self.transformation_indices[query_ext_signature].copy()
-            key_match_label = query_ext_signature
-            key_match_score = 0.55
-            key_match_priority = 2
-            result.is_fallback_match = True
-        elif (
+        if key_match_df is None and query_core_signature:
+            core_candidates = _signature_lookup_candidates(query_core_signature)
+            for idx, candidate in enumerate(core_candidates):
+                if candidate not in self.transformation_indices:
+                    continue
+                key_match_df = self.transformation_indices[candidate].copy()
+                key_match_label = candidate
+                key_match_score = 0.75 if idx == 0 else 0.7
+                key_match_priority = 1 if idx == 0 else 2
+                if idx > 0 or candidate != query_core_signature:
+                    result.is_fallback_match = True
+                break
+        if key_match_df is None and query_ext_signature:
+            ext_candidates = _signature_lookup_candidates(query_ext_signature)
+            for idx, candidate in enumerate(ext_candidates):
+                if candidate not in self.transformation_indices:
+                    continue
+                key_match_df = self.transformation_indices[candidate].copy()
+                key_match_label = candidate
+                key_match_score = 0.55 if idx == 0 else 0.5
+                key_match_priority = 3 if idx == 0 else 4
+                result.is_fallback_match = True
+                break
+        if (
+            key_match_df is None
+            and (
             result.query_reaction_events_key
             and result.query_reaction_events_key in self.transformation_indices
+            )
         ):
             key_match_df = self.transformation_indices[result.query_reaction_events_key].copy()
             key_match_label = result.query_reaction_events_key
             key_match_score = 0.5
-            key_match_priority = 3
+            key_match_priority = 5
             result.is_fallback_match = True
 
         scored_matches = []
@@ -3730,7 +3817,14 @@ class HTERecommender:
             rules_rows_mask = matched_df["Source_Group"] == "rules"
             experiments_rows_mask = matched_df["Source_Group"] == "experiments"
             if enforce_rows_mask.any():
-                target_reaction = reaction_type_filter or result.predicted_reaction_type
+                target_reaction = reaction_type_filter
+                if (
+                    not target_reaction
+                    and result.predicted_reaction_type
+                    and result.predicted_reaction_type != "Unknown"
+                    and result.reaction_type_confidence >= 0.5
+                ):
+                    target_reaction = result.predicted_reaction_type
                 target_reaction = _resolve_reaction_type_label(target_reaction)
                 if target_reaction:
                     type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
@@ -3738,7 +3832,7 @@ class HTERecommender:
                         lambda value: _resolve_reaction_type_label(value) == target_reaction if value else False
                     )
                 else:
-                    type_mask = pd.Series([False] * len(matched_df), index=matched_df.index)
+                    type_mask = pd.Series([True] * len(matched_df), index=matched_df.index)
 
                 query_signatures: List[str] = []
                 if query_core_signature:
