@@ -47,7 +47,10 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
             })
 
         # Normalize raw recommendations into a clean list
-        recs = raw if isinstance(raw, list) else raw.get("recommendations", [])
+        # "recommended_conditions" is the primary key; "recommendations" is a mirror
+        recs = raw if isinstance(raw, list) else (
+            raw.get("recommended_conditions") or raw.get("recommendations", [])
+        )
         cleaned = []
         for i, rec in enumerate(recs[:top_k], 1):
             if not isinstance(rec, dict):
@@ -70,6 +73,8 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
                 "num_experiments": int(scores.get("num_experiments", 0)),
                 "reaction_type": rec.get("reaction") or "",
                 "reactant_types": rec.get("reactant_types") or [],
+                "source": rec.get("source") or "",
+                "precedent_ids": rec.get("reaction_id") or "",
             }
             cleaned.append(entry)
 
