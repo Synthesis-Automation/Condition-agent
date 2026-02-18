@@ -50,6 +50,8 @@ class MechanismAnalysis:
     snar_feasibility: Optional[Dict[str, Any]] = None
     requires_catalyst: bool = False
     likely_catalyst_metals: List[str] = field(default_factory=list)  # ["Pd", "Ni", "Cu"]
+    key_intermediates: List[str] = field(default_factory=list)       # named intermediates
+    stepwise: List[str] = field(default_factory=list)                # step-by-step pathway
 
 
 @dataclass
@@ -96,12 +98,23 @@ class ReactivityProfile:
     reaction_type: Optional[str] = None
     reaction_type_confidence: float = 0.0
     reaction_pattern_type: str = ""              # broad pattern: coupling_substitution, condensation, etc.
+    named_reaction: str = ""                     # human-readable named reaction or description
     reacted_motifs: List[str] = field(default_factory=list)
     formed_motifs: List[str] = field(default_factory=list)
     taxonomy_reasoning: str = ""
 
+    # --- All-component role assignment ---
+    all_roles: Dict[str, str] = field(default_factory=dict)  # {smiles_fragment: role}
+
+    # --- Product verification ---
+    product_verification: Dict[str, Any] = field(default_factory=dict)  # expected/confirmed motifs + score
+
+    # --- Missing conditions ---
+    missing_conditions: List[str] = field(default_factory=list)  # conditions implied but absent from SMILES
+
     # --- Tandem / multi-step ---
     is_tandem: bool = False
+    reactive_streams: List[Dict[str, Any]] = field(default_factory=list)  # bifurcating pathway breakdown
     tandem_steps: List[Dict[str, Any]] = field(default_factory=list)
 
     # --- Agent metadata ---

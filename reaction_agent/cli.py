@@ -32,9 +32,10 @@ if TYPE_CHECKING:
 SELECTABLE_MODELS = [
     {"name": "o4-mini",       "provider": "openai"},   # 1 - default
     {"name": "gpt-5.2",       "provider": "openai"},   # 2
-    {"name": "glm-4.7",       "provider": "aliyun"},   # 3
-    {"name": "MiniMax-M2.1",  "provider": "aliyun"},   # 4
-    {"name": "deepseek-v3.2", "provider": "aliyun"},   # 5
+    {"name": "glm-5",         "provider": "aliyun"},   # 3
+    {"name": "glm-4.7",       "provider": "aliyun"},   # 4
+    {"name": "MiniMax-M2.1",  "provider": "aliyun"},   # 5
+    {"name": "deepseek-v3.2", "provider": "aliyun"},   # 6
 ]
 
 

@@ -67,6 +67,50 @@ def kv(key: str, val):
     print(f"  {C.BOLD}{key}:{C.END} {val}")
 
 
+# ---------------------------------------------------------------------------
+# Model selector (mirrors reaction_agent/cli.py)
+# ---------------------------------------------------------------------------
+
+SELECTABLE_MODELS = [
+    {"name": "o4-mini",       "provider": "openai"},   # 1 - default
+    {"name": "gpt-5.2",       "provider": "openai"},   # 2
+    {"name": "glm-5",         "provider": "aliyun"},   # 3
+    {"name": "glm-4.7",       "provider": "aliyun"},   # 4
+    {"name": "MiniMax-M2.1",  "provider": "aliyun"},   # 5
+    {"name": "deepseek-v3.2", "provider": "aliyun"},   # 6
+]
+
+_ALIYUN_MODELS = {m["name"] for m in SELECTABLE_MODELS if m["provider"] == "aliyun"}
+
+
+def select_model_interactive() -> tuple:
+    """Print numbered model menu and return (model_name, provider)."""
+    print("\nSelect LLM model:")
+    for i, m in enumerate(SELECTABLE_MODELS, 1):
+        tag = "  ← default" if i == 1 else ""
+        print(f"  [{i}] {m['name']:<18} ({m['provider']}){tag}")
+
+    while True:
+        try:
+            raw = input("\nEnter number [1]: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            raw = ""
+
+        if raw == "":
+            choice = 1
+        else:
+            try:
+                choice = int(raw)
+            except ValueError:
+                print(f"  Please enter a number between 1 and {len(SELECTABLE_MODELS)}.")
+                continue
+
+        if 1 <= choice <= len(SELECTABLE_MODELS):
+            selected = SELECTABLE_MODELS[choice - 1]
+            return selected["name"], selected["provider"]
+        print(f"  Please enter a number between 1 and {len(SELECTABLE_MODELS)}.")
+
+
 def show_header(use_llm: bool, model: str, use_reasoning: bool = True):
     print(f"\n{C.BOLD}{C.HEADER}{'='*72}{C.END}")
     print(f"{C.BOLD}{C.HEADER}  ReactionPipeline Interactive Tester{C.END}")
@@ -84,20 +128,35 @@ def show_header(use_llm: bool, model: str, use_reasoning: bool = True):
 # Stage display helpers
 # ---------------------------------------------------------------------------
 
+def _smi(s: str, n: int = 60) -> str:
+    """Truncate a SMILES string for display."""
+    if not s:
+        return "(none)"
+    return s if len(s) <= n else s[:n] + "…"
+
+
 def show_stage1(norm):
     hdr("STAGE 1 — Normalization & Pre-check")
     if norm.success:
         ok("Normalization passed")
-        kv("Normalized SMILES", norm.normalized_smiles)
-        kv("Reactants", norm.reactants)
-        kv("Product", norm.product)
-        if norm.warnings:
-            for w in norm.warnings:
+        # Reactants on one line, product on next — skip full normalized SMILES
+        # (already printed as Input SMILES above)
+        rcts = "  |  ".join(_smi(r) for r in norm.reactants)
+        kv("Reactants", rcts)
+        kv("Product  ", _smi(norm.product))
+        # Deduplicated warnings only
+        seen: set = set()
+        for w in (norm.warnings or []):
+            if w not in seen:
+                seen.add(w)
                 warn(w)
     else:
         err(f"Normalization FAILED: {norm.error}")
-        for w in norm.warnings:
-            warn(w)
+        seen: set = set()
+        for w in (norm.warnings or []):
+            if w not in seen:
+                seen.add(w)
+                warn(w)
 
 
 def show_stage2(feat):
@@ -109,7 +168,7 @@ def show_stage2(feat):
         kv("Reacted motifs",  list(feat.reacted_motifs))
         kv("Formed motifs",   list(feat.formed_motifs))
         kv("Spectator motifs",list(feat.spectator_motifs))
-        kv("Reaction key",    (feat.reaction_key[:80] + "...") if feat.reaction_key and len(feat.reaction_key) > 80 else feat.reaction_key)
+        kv("Reaction key",    _smi(feat.reaction_key, 80))
         kv("Unclassified reactant", feat.has_unclassified_reactant)
         kv("Reactant motif count",  feat.reactant_motif_count)
         for w in feat.warnings:
@@ -170,6 +229,16 @@ def show_reasoning_profile(profile):
         unique_tools = sorted(set(profile.tools_called))
         kv("Tools used", f"{len(profile.tools_called)} calls ({', '.join(unique_tools)})")
 
+    # Named reaction (new)
+    if profile.named_reaction:
+        kv("Named reaction", f"{C.CYAN}{profile.named_reaction}{C.END}")
+
+    # All component roles (new)
+    if profile.all_roles:
+        print(f"\n  {C.BOLD}Component roles:{C.END}")
+        for frag, role in profile.all_roles.items():
+            print(f"    {C.CYAN}{_smi(frag, 40)}{C.END}  →  {role}")
+
     # Electrophile
     e = profile.electrophile
     if e.hybridization or e.leaving_group:
@@ -214,6 +283,12 @@ def show_reasoning_profile(profile):
         kv("    Confidence", f"{m.confidence:.2f}")
         if m.requires_catalyst:
             kv("    Catalyst metals", m.likely_catalyst_metals)
+        if m.key_intermediates:
+            kv("    Key intermediates", m.key_intermediates)
+        if m.stepwise:
+            print(f"    {C.BOLD}Stepwise pathway:{C.END}")
+            for step in m.stepwise:
+                print(f"      {step}")
         if m.alternative_mechanisms:
             kv("    Alternatives", m.alternative_mechanisms)
         if m.evidence:
@@ -238,6 +313,38 @@ def show_reasoning_profile(profile):
         if t.redox_change:
             kv("    Redox", t.redox_change)
 
+    # Tandem / reactive streams (new)
+    if profile.is_tandem:
+        warn("Tandem/multi-step reaction detected")
+        if profile.reactive_streams:
+            print(f"\n  {C.BOLD}Reactive streams:{C.END}")
+            for s in profile.reactive_streams:
+                sid = s.get("stream_id", "?")
+                desc = s.get("description", "")
+                prod = s.get("product_fragment", "")
+                print(f"    Stream {sid}: {desc}")
+                if prod:
+                    print(f"      → {prod}")
+
+    # Product verification (new)
+    pv = profile.product_verification
+    if pv:
+        score = pv.get("verification_score", "")
+        confirmed = pv.get("confirmed_in_product", [])
+        expected = pv.get("expected_motifs", [])
+        score_color = C.GREEN if score == "high" else C.YELLOW if score == "medium" else C.RED
+        print(f"\n  {C.BOLD}Product verification:{C.END} {score_color}{score}{C.END}")
+        if expected != confirmed:
+            missing = set(expected) - set(confirmed)
+            if missing:
+                warn(f"  Expected but not confirmed: {list(missing)}")
+
+    # Missing conditions (new)
+    if profile.missing_conditions:
+        print(f"\n  {C.BOLD}Missing conditions (inferred):{C.END}")
+        for mc in profile.missing_conditions:
+            warn(f"  {mc}")
+
     # Extended analysis
     if profile.selectivity_risks:
         print(f"\n  {C.BOLD}Selectivity risks:{C.END}")
@@ -248,9 +355,6 @@ def show_reasoning_profile(profile):
         print(f"\n  {C.BOLD}Condition implications:{C.END}")
         for ck, cv in profile.condition_implications.items():
             kv(f"    {ck}", cv)
-
-    if profile.is_tandem:
-        warn("Tandem/multi-step reaction detected")
 
     print(f"  {C.BOLD}{C.HEADER}--- End Reasoning Profile ---{C.END}")
 
@@ -264,7 +368,7 @@ def show_stage5(result):
     kv("reacted_motifs",          list(result.reacted_motifs))
     kv("formed_motifs",           list(result.formed_motifs))
     kv("spectator_motifs",        list(result.spectator_motifs))
-    kv("reaction_key",            (result.reaction_key[:80] + "...") if result.reaction_key and len(result.reaction_key)>80 else result.reaction_key)
+    kv("reaction_key",            _smi(result.reaction_key, 80))
     kv("used_llm_fallback",       result.used_llm_fallback)
     if result.pipeline_warnings:
         print(f"\n  {C.BOLD}Pipeline warnings:{C.END}")
@@ -346,6 +450,7 @@ def run_pipeline(
     db_path: str,
     use_reasoning: bool = True,
     reasoning_model: str = None,
+    provider: str = "openai",
 ):
     from reaction_agent.smiles_pipeline import ReactionPipeline
 
@@ -357,7 +462,7 @@ def run_pipeline(
         sub("Creating LLM client...")
         try:
             from llmtools.clients import LLMClient
-            llm_client = LLMClient(provider="openai", model=model)
+            llm_client = LLMClient(provider=provider, model=model)
             ok(f"LLM client ready ({model})")
         except Exception as e:
             err(f"Could not create LLM client: {e}")
@@ -366,6 +471,7 @@ def run_pipeline(
     pipeline = ReactionPipeline(
         llm_client=llm_client,
         use_reasoning_agent=use_reasoning,
+        reasoning_provider=provider,
         reasoning_model=reasoning_model or model,
     )
 
@@ -465,8 +571,10 @@ def main():
                         help="Disable ALL LLM fallback (deterministic stages only)")
     parser.add_argument("--no-reasoning", action="store_true",
                         help="Disable reasoning agent, use simple prompt fallback instead")
-    parser.add_argument("--model", default="o4-mini",
-                        help="LLM model to use (default: o4-mini; use gpt-4.1 or o3 for harder reactions)")
+    parser.add_argument("--model", default=None,
+                        help="LLM model to use (default: interactive selection)")
+    parser.add_argument("--provider", default=None,
+                        help="LLM provider (default: auto-detected from model)")
     parser.add_argument("--reasoning-model", default=None,
                         help="Override model for reasoning agent (default: same as --model)")
     parser.add_argument("--db-path", default="data/HTE_db",
@@ -480,11 +588,23 @@ def main():
     if args.no_color:
         C.disable()
 
+    # Model / provider selection
+    if args.no_llm:
+        args.model = args.model or "none"
+        args.provider = args.provider or "none"
+    elif args.model is None:
+        args.model, args.provider = select_model_interactive()
+    else:
+        if args.provider is None:
+            args.provider = "aliyun" if args.model in _ALIYUN_MODELS else "openai"
+
     use_llm = not args.no_llm
     use_reasoning = use_llm and not args.no_reasoning
 
-    if use_llm and not os.getenv("OPENAI_API_KEY"):
-        print(f"{C.YELLOW}WARNING: OPENAI_API_KEY not set — LLM fallback disabled{C.END}")
+    # Check the right API key for the selected provider
+    api_key_env = f"{args.provider.upper()}_API_KEY"
+    if use_llm and not os.getenv(api_key_env):
+        print(f"{C.YELLOW}WARNING: {api_key_env} not set — LLM fallback disabled{C.END}")
         use_llm = False
         use_reasoning = False
 
@@ -506,6 +626,7 @@ def main():
             smiles, use_llm, args.model, args.top_k, args.db_path,
             use_reasoning=use_reasoning,
             reasoning_model=args.reasoning_model,
+            provider=args.provider,
         )
 
 
