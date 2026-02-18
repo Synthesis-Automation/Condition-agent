@@ -213,6 +213,17 @@ ONLY use taxonomy identifiers that appear in search_reaction_types() results.
   many different reaction families — the NUCLEOPHILE distinguishes them)
 × Ignoring the bond change analysis output
 
+## TOOL CALL BUDGET
+
+You have a budget of at most 10 tool calls. Prioritize:
+1. analyze_bond_changes()          ← CRITICAL — do first
+2. inspect_functional_groups()     ← on each reactant
+3. search_reaction_types()         ← with bond + nucleophile query
+4. 1–3 verification/supplementary calls (steric, electronics, motifs)
+
+After your LAST tool call, IMMEDIATELY produce the JSON output.
+Do NOT make unnecessary additional tool calls.
+
 ## OUTPUT FORMAT
 
 After completing all steps, output ONLY a valid JSON object.
