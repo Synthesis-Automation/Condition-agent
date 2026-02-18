@@ -202,6 +202,10 @@ def show_reasoning_profile(profile):
         if n.steric_bulk:
             kv("    Steric bulk", n.steric_bulk)
 
+    # Reaction pattern type
+    if profile.reaction_pattern_type:
+        kv("Pattern type", profile.reaction_pattern_type)
+
     # Mechanism
     m = profile.mechanism
     if m.primary_class:
@@ -461,8 +465,8 @@ def main():
                         help="Disable ALL LLM fallback (deterministic stages only)")
     parser.add_argument("--no-reasoning", action="store_true",
                         help="Disable reasoning agent, use simple prompt fallback instead")
-    parser.add_argument("--model", default="gpt-4o",
-                        help="LLM model to use (default: gpt-4o)")
+    parser.add_argument("--model", default="o4-mini",
+                        help="LLM model to use (default: o4-mini; use gpt-4.1 or o3 for harder reactions)")
     parser.add_argument("--reasoning-model", default=None,
                         help="Override model for reasoning agent (default: same as --model)")
     parser.add_argument("--db-path", default="data/HTE_db",

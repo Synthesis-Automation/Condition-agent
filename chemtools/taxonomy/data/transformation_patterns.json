@@ -3,10 +3,10 @@
   "description": "Defines leaving groups for each reaction type to identify reacted motifs.",
   "notes": "Observable-based model: leaving_groups = substituents present in reactants but absent in products. Byproducts (H2O, HBr, etc.) are typically not shown in reaction SMILES and are not tracked.",
   
-  "pattern_types": {
+  "reaction_pattern_types": {
     "_comment": "Reference only - not used in logic. All patterns reduce to: which substituents disappear?",
     "coupling_substitution": {
-      "description": "Leaving groups completely leave the scaffold. Observable: substituent gone in product.",
+      "description": "Coupling or substitution reactions where leaving groups completely leave the scaffold. Observable: substituent gone in product.",
       "examples": ["Ar-Br + Ar-B(OH)2 → Ar-Ar", "Ar-Br + NaN3 → Ar-N3", "Ar-Br + R-NH2 → Ar-NHR"]
     },
     "condensation": {

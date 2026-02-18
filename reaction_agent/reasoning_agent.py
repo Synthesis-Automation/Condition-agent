@@ -30,81 +30,132 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# System prompt — based on docs/to_do.md chemistry reasoning checklist
-REASONING_SYSTEM_PROMPT = """You are a chemistry reasoning agent analyzing an organic reaction.
-You have access to RDKit-based tools for molecular inspection and taxonomy search.
+# System prompt — bond-first reasoning with explicit disambiguation rules
+REASONING_SYSTEM_PROMPT = """You are an expert organic chemistry reasoning agent.
+You have RDKit-based tools for molecular inspection and a reaction taxonomy database.
 
-Follow this systematic checklist to build a COMPLETE reactivity profile.
-Call the tools, then synthesize your findings into a structured JSON output.
+Your goal: build a complete ReactivityProfile and identify the CORRECT reaction type.
+
+## CORE PRINCIPLE — BOND-FORMED FIRST
+
+The single most reliable signal for reaction type is the KEY BOND FORMED in the product.
+Always determine this first. Never select a reaction type that contradicts it.
+
+  C-C bond formed  →  cross-coupling family (Suzuki, Negishi, Stille, Heck, Sonogashira…)
+  C-N bond formed  →  C_N_Coupling, Chan_Lam, Reductive_amination, Amide_formation…
+  C-O bond formed  →  C_O_Coupling, Esterification, Acylation_ester…
+  C-S bond formed  →  C_S_Coupling
+  C-B bond formed  →  Miyaura_borylation
+  C-halogen formed →  Halogenation_aromatic, Azide_coupling, Cyanation_coupling…
+  no new C-X bond  →  oxidation, reduction, elimination, addition, cycloaddition…
+
+## NUCLEOPHILE → REACTION FAMILY LOOKUP
+
+After identifying the key bond, confirm by checking the nucleophile type:
+
+  Nucleophile contains -B(OH)2 / -Bpin / -BF3K   →  C-C formed  →  Suzuki_miyaura family
+  Nucleophile contains -NH2 / -NHR / -NR2 / amide →  C-N formed  →  C_N_Coupling
+  Nucleophile contains -OH / -OR (alcohol/alkoxide) →  C-O formed  →  C_O_Coupling
+  Nucleophile contains -SH / -SR (thiol/sulfide)   →  C-S formed  →  C_S_Coupling
+  Nucleophile contains -ZnX (organozinc)            →  C-C formed  →  Negishi
+  Nucleophile contains -SnR3 (organotin)            →  C-C formed  →  Stille
+  Nucleophile contains -MgX (Grignard)              →  C-C formed  →  Kumada
+  Nucleophile is terminal alkyne (-C≡CH)            →  C-C formed  →  Sonogashira
+  Nucleophile is alkene (Heck partner)              →  C-C formed  →  Heck
+
+If bond formed contradicts the nucleophile class above, flag a warning and
+re-examine — one of the assignments is wrong.
 
 ## ANALYSIS STEPS
 
 ### 1. INSPECT MOLECULES
-- Call inspect_functional_groups() on EACH reactant and the product
+- Call inspect_functional_groups() on EACH reactant and the product separately
 - Call compute_molecular_descriptors() on each molecule
-- Note what functional groups appear/disappear between reactant and product
+- List which functional groups are present in each reactant
 
-### 2. NET TRANSFORMATION
-- Call compare_reactant_product() to see structural changes (FGs removed/added)
-- Call analyze_bond_changes() to identify broken/formed bonds
-- Classify: what bond types changed (C-C, C-N, C-O, C-X)?
+### 2. NET TRANSFORMATION  ← MOST CRITICAL STEP
+- Call compare_reactant_product() → examine groups_removed and groups_added
+- Call analyze_bond_changes()     → examine bonds_broken and bonds_formed
+- Explicitly state: "KEY BOND FORMED: [C-C / C-N / C-O / C-S / other]"
+- This determination drives ALL subsequent reasoning — do not skip it
 
 ### 3. ELECTROPHILE ANALYSIS
-- Identify the carbon bearing the leaving group
-- Hybridization: sp2 (aryl/vinyl) or sp3 (alkyl)?
+- Which reactant has the leaving group (halide, pseudohalide, or activated group)?
+- Hybridization of electrophilic carbon: sp2 (aryl/vinyl) or sp3 (alkyl)?
 - Call analyze_electronics() on the electrophilic reactant
 - Call analyze_steric() on the electrophilic reactant
-- Leaving group quality assessment
 
-### 4. NUCLEOPHILE / BASE PROFILE
-- What species attacks? (amine, alcohol, thiol, organometallic, C-nucleophile)
-- Hard/soft character, steric bulk
-- Is it also a base? (elimination risk)
+### 4. NUCLEOPHILE CLASSIFICATION
+- Which reactant provides the electron pair / new bond partner?
+- Identify the attacking atom (N, C, O, S, B…)
+- Apply the NUCLEOPHILE → REACTION FAMILY table above
+- Confirm this matches the KEY BOND FORMED from Step 2
 
-### 5. MECHANISM CLASS
-Based on steps 2-4, determine the simplest mechanism:
-- If sp2 electrophile + activated ring → call check_snar_feasibility()
-- If sp2 electrophile + C-C/C-N/C-O formed → likely metal-catalyzed (OA cycle)
+### 5. REACTION PATTERN TYPE
+- Call get_reaction_pattern_types() with no argument to get all 12 definitions
+- Select ONE pattern type consistent with Step 2 + Step 4:
+  coupling_substitution | condensation | addition | cycloaddition | cyclization |
+  annulation | electrophilic_aromatic_substitution | nucleophilic_aromatic_substitution |
+  oxidation | reduction | olefination | elimination
+
+### 6. MECHANISM CLASS
+- If sp2 aryl electrophile + nucleophile → likely oxidative addition / reductive elimination cycle
+- If sp2 + activated ring + nucleophile displacement → call check_snar_feasibility()
 - If sp3 electrophile → SN2/SN1/E2 depending on steric/base
 - If C=O + nucleophile → acyl substitution or addition
-Provide reasoning and evidence from tool outputs.
 
-### 6. SELECTIVITY & RISKS
-- Competing pathways (substitution vs elimination, over-reaction)
-- Regioselectivity concerns
-- Functional group tolerance issues
+### 7. SELECTIVITY & RISKS
+- Competing pathways (substitution vs elimination, homo-coupling, over-reaction)
+- Regioselectivity, chemoselectivity concerns
 
-### 7. CONDITION IMPLICATIONS
-- What kind of catalyst/base/solvent does this mechanism need?
-- Temperature sensitivity
+### 8. CONDITION IMPLICATIONS
+- Catalyst type implied by mechanism (Pd, Cu, Ni…)
+- Base, solvent, temperature requirements
 
-### 8. TAXONOMY MAPPING
-- Call search_reaction_types() with your mechanism analysis keywords
-- Call search_motifs() for each reactant based on FG analysis
-- If a broad motif matches, call get_motif_hierarchy() to find the specific label
-- Select best-matching reaction_type ID and motif labels
-- IMPORTANT: Only use valid taxonomy identifiers from the search results
+### 9. TAXONOMY MAPPING
+SEARCH STRATEGY — always include KEY BOND TYPE + nucleophile class in query:
+  Good:  "C-N coupling amine aryl halide Pd"   (for C-N formed, amine nucleophile)
+  Bad:   "Pd coupling aryl halide"              (ignores nucleophile → Suzuki bias)
+
+Procedure:
+a) Call search_reaction_types("<bond_type> <nucleophile_class> <optional catalyst>")
+b) Call search_motifs() for each reactant based on FG analysis
+c) If a broad motif returned, call get_motif_hierarchy() to find the specific label
+d) Select the best-matching reaction_type ID
+
+CROSS-VALIDATION (mandatory before outputting):
+- Does the selected reaction_type match the KEY BOND FORMED? If not → reject and re-search
+- Call get_reaction_pattern_types(reaction_type_id="<your_ID>") to verify
+  leaving_groups match what you observed in bond analysis
+- If leaving_groups don't match → the reaction type is wrong, search again
+
+ONLY use taxonomy identifiers that appear in search_reaction_types() results.
+
+## COMMON MISTAKES TO AVOID
+
+× Selecting Suzuki_miyaura when C-N bond is formed (Suzuki always forms C-C)
+× Selecting Suzuki_miyaura when no boron species is present in reactants
+× Picking a reaction type based solely on the electrophile (Ar-I/Br/Cl appear in
+  many different reaction families — the NUCLEOPHILE distinguishes them)
+× Ignoring the bond change analysis output
 
 ## OUTPUT FORMAT
 
-After completing your analysis, return a JSON object with this structure.
-Include ALL findings — even information not directly needed for taxonomy mapping
-is valuable for later explanation steps.
-
-CRITICAL: Your final message MUST be ONLY a valid JSON object (no markdown fences,
-no text before or after). Start with { and end with }.
+After completing all steps, output ONLY a valid JSON object.
+No markdown fences, no explanatory text before or after. Start with { end with }.
 
 {
   "reaction_type": "taxonomy_ID or null",
   "reaction_type_confidence": 0.0-1.0,
+  "reaction_pattern_type": "coupling_substitution|condensation|addition|cycloaddition|cyclization|annulation|electrophilic_aromatic_substitution|nucleophilic_aromatic_substitution|oxidation|reduction|olefination|elimination",
   "reacted_motifs": ["motif1", "motif2"],
   "formed_motifs": ["motif1"],
-  "taxonomy_reasoning": "Why this mapping was chosen",
+  "taxonomy_reasoning": "Bond formed: C-N. Nucleophile: secondary amide (N-H). Electrophile: aryl iodide. → C_N_Coupling confirmed by leaving_groups match.",
 
   "electrophile": {
     "center_atom": "description",
     "hybridization": "sp2_aryl|sp2_vinyl|sp3|carbonyl",
-    "leaving_group": "Br|Cl|OTf|...",
+    "leaving_group": "I|Br|Cl|OTf|...",
     "leaving_group_quality": "excellent|good|moderate|poor",
     "steric_score": 0.0,
     "steric_class": "unhindered|moderate|hindered",
@@ -114,8 +165,8 @@ no text before or after). Start with { and end with }.
   },
 
   "nucleophile": {
-    "identity": "description",
-    "attacking_atom": "N|C|O|S",
+    "identity": "secondary amide / boronic acid / primary amine / ...",
+    "attacking_atom": "N|C|O|S|B",
     "hardsoft": "soft|hard|borderline",
     "is_also_base": false,
     "steric_bulk": "small|moderate|bulky",
@@ -123,8 +174,8 @@ no text before or after). Start with { and end with }.
   },
 
   "mechanism": {
-    "primary_class": "oa_based_coupling|snar|sn2|sn1|acyl_sub|...",
-    "evidence": ["tool-grounded evidence 1", "evidence 2"],
+    "primary_class": "oa_reductive_elimination|snar|sn2|sn1|acyl_sub|...",
+    "evidence": ["C-N bond formed per analyze_bond_changes", "N-H present in reactant 2"],
     "confidence": 0.0-1.0,
     "alternative_mechanisms": [],
     "requires_catalyst": true,
@@ -132,11 +183,11 @@ no text before or after). Start with { and end with }.
   },
 
   "transformation": {
-    "bonds_broken": ["C-Br (sp2, aryl)"],
-    "bonds_formed": ["C-C (sp2-sp2)"],
-    "key_bond_type": "C-C",
-    "fg_removed": ["aryl_bromide"],
-    "fg_formed": ["biaryl"],
+    "bonds_broken": ["C-I (sp2, aryl)", "N-H (amide)"],
+    "bonds_formed": ["C-N (sp2-N, aryl-amide)"],
+    "key_bond_type": "C-N",
+    "fg_removed": ["aryl_iodide", "secondary_amide_NH"],
+    "fg_formed": ["N-aryl_amide"],
     "redox_change": "neutral"
   },
 
@@ -156,13 +207,22 @@ def _get_llm_client(
     model: Optional[str] = None,
     temperature: float = 0,
 ):
-    """Get a LangChain ChatOpenAI client."""
+    """Get a LangChain ChatOpenAI client.
+
+    Model recommendations for the reasoning agent (multi-step tool-calling):
+      - openai:  "o4-mini" or "o3"  (best reasoning; o4-mini is cost-effective)
+                 "gpt-4.1"          (good balance, supports tool use well)
+                 "gpt-4o"           (acceptable but may misclassify edge cases)
+      - aliyun:  "qwen-max" or provider-specific reasoning model
+
+    Set LLM_MODEL env var or pass model= to override. Default: o4-mini.
+    """
     from langchain_openai import ChatOpenAI
 
     if provider is None:
         provider = os.getenv("LLM_PROVIDER", "openai")
     if model is None:
-        model = os.getenv("LLM_MODEL", "gpt-4o")
+        model = os.getenv("LLM_MODEL", "o4-mini")
 
     if provider == "aliyun":
         api_key = os.getenv("ALIYUN_API_KEY")
@@ -179,12 +239,22 @@ def _get_llm_client(
     if not api_key:
         raise RuntimeError(f"{provider.upper()}_API_KEY environment variable not set")
 
-    return ChatOpenAI(
-        model=model,
-        api_key=api_key,
-        base_url=base_url,
-        temperature=temperature,
+    # OpenAI o-series reasoning models (o1, o3, o4-mini, etc.) do not accept
+    # a temperature parameter — they only support the default value of 1.
+    _reasoning_model_prefixes = ("o1", "o3", "o4")
+    is_reasoning_model = any(
+        model.startswith(p) for p in _reasoning_model_prefixes
     )
+
+    kwargs: Dict[str, Any] = {
+        "model": model,
+        "api_key": api_key,
+        "base_url": base_url,
+    }
+    if not is_reasoning_model:
+        kwargs["temperature"] = temperature
+
+    return ChatOpenAI(**kwargs)
 
 
 def _get_agent_factory():
@@ -231,7 +301,7 @@ class ReactionReasoningAgent:
             verbose: Print debug info during execution
         """
         self.provider = provider
-        self.model_name = model or os.getenv("LLM_MODEL", "gpt-4o")
+        self.model_name = model or os.getenv("LLM_MODEL", "o4-mini")
         self.max_iterations = max_iterations
         self.verbose = verbose
 
@@ -470,6 +540,20 @@ class ReactionReasoningAgent:
             redox_change=str(trans_data.get("redox_change", "")),
         )
 
+        # Validate reaction_pattern_type against known values
+        valid_pattern_types = {
+            "coupling_substitution", "condensation", "addition", "cycloaddition",
+            "cyclization", "annulation", "electrophilic_aromatic_substitution",
+            "nucleophilic_aromatic_substitution", "oxidation", "reduction",
+            "olefination", "elimination",
+        }
+        reaction_pattern_type = str(data.get("reaction_pattern_type", ""))
+        if reaction_pattern_type and reaction_pattern_type not in valid_pattern_types:
+            warnings.append(
+                f"Unknown reaction_pattern_type '{reaction_pattern_type}' — cleared"
+            )
+            reaction_pattern_type = ""
+
         return ReactivityProfile(
             reaction_smiles=reaction_smiles,
             reactant_smiles=reactant_smiles,
@@ -486,6 +570,7 @@ class ReactionReasoningAgent:
             molecular_descriptors=data.get("molecular_descriptors", {}),
             reaction_type=reaction_type,
             reaction_type_confidence=float(data.get("reaction_type_confidence", 0.0)),
+            reaction_pattern_type=reaction_pattern_type,
             reacted_motifs=valid_reacted,
             formed_motifs=valid_formed,
             taxonomy_reasoning=str(data.get("taxonomy_reasoning", "")),

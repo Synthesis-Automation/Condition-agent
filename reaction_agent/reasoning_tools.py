@@ -108,6 +108,17 @@ class MotifHierarchyInput(BaseModel):
     )
 
 
+class PatternLookupInput(BaseModel):
+    """Look up reaction pattern type, optionally for a specific reaction ID."""
+    reaction_type_id: str = Field(
+        default="",
+        description=(
+            "Known reaction type ID to look up its pattern (e.g. 'Suzuki_miyaura'). "
+            "Leave empty to get all 12 broad pattern type definitions."
+        ),
+    )
+
+
 # ============================================================================
 # Tool 1: Functional group detection
 # ============================================================================
@@ -641,6 +652,91 @@ def get_motif_hierarchy(broad_motif: str) -> Dict[str, Any]:
 
 
 # ============================================================================
+# Tool 11: Reaction pattern type lookup
+# ============================================================================
+
+@lru_cache(maxsize=1)
+def _load_transformation_patterns() -> Dict[str, Any]:
+    """Load transformation_patterns.json (cached after first call)."""
+    try:
+        pattern_path = (
+            Path(__file__).parent.parent
+            / "chemtools" / "taxonomy" / "data"
+            / "transformation_patterns.json"
+        )
+        with open(pattern_path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        logger.warning(f"Could not load transformation_patterns.json: {e}")
+        return {}
+
+
+@tool(args_schema=PatternLookupInput)
+def get_reaction_pattern_types(reaction_type_id: str = "") -> Dict[str, Any]:
+    """Look up the broad reaction pattern type (coupling_substitution, condensation,
+    addition, cycloaddition, cyclization, annulation, EAS, SNAr, oxidation,
+    reduction, olefination, elimination).
+
+    Call with reaction_type_id="" to get all 12 pattern definitions with
+    descriptions and examples — use these to classify the current reaction.
+
+    Call with a specific reaction_type_id (e.g. "Suzuki_miyaura") to get
+    the exact pattern, leaving groups, and formed groups for that reaction.
+
+    Use this tool early to establish the broad mechanistic category before
+    drilling into electrophile/nucleophile details.
+    """
+    try:
+        data = _load_transformation_patterns()
+        if not data:
+            return _error("transformation_patterns.json could not be loaded")
+
+        pattern_types = {
+            k: v for k, v in data.get("reaction_pattern_types", {}).items()
+            if k != "_comment"
+        }
+        reaction_patterns = data.get("reaction_patterns", {})
+
+        # With no ID — return all pattern type definitions for the agent to choose from
+        if not reaction_type_id.strip():
+            return _success({
+                "available_pattern_types": pattern_types,
+                "num_pattern_types": len(pattern_types),
+                "usage_note": (
+                    "Examine the descriptions/examples and assign one of these "
+                    "pattern types to the current reaction based on its mechanism."
+                ),
+            })
+
+        # With a specific reaction type ID — look it up in reaction_patterns
+        rid = reaction_type_id.strip()
+        if rid in reaction_patterns:
+            entry = reaction_patterns[rid]
+            pattern_name = entry.get("pattern", "")
+            pattern_def = pattern_types.get(pattern_name, {})
+            return _success({
+                "reaction_type_id": rid,
+                "reaction_pattern_type": pattern_name,
+                "leaving_groups": entry.get("leaving_groups", []),
+                "formed_groups": entry.get("formed_groups", []),
+                "notes": entry.get("notes", ""),
+                "pattern_description": pattern_def.get("description", ""),
+                "pattern_examples": pattern_def.get("examples", pattern_def.get("example", "")),
+            })
+
+        # ID not found — still return all patterns so agent can classify manually
+        return _success({
+            "reaction_type_id": rid,
+            "reaction_pattern_type": None,
+            "note": f"'{rid}' not found in reaction_patterns. Use available_pattern_types to classify manually.",
+            "available_pattern_types": pattern_types,
+        })
+
+    except Exception as exc:
+        return _error(f"Pattern type lookup failed: {exc}")
+
+
+# ============================================================================
 # Exported tool list
 # ============================================================================
 
@@ -655,6 +751,7 @@ REASONING_TOOLS = [
     search_reaction_types,
     search_motifs,
     get_motif_hierarchy,
+    get_reaction_pattern_types,
 ]
 
 __all__ = [
@@ -669,4 +766,5 @@ __all__ = [
     "search_reaction_types",
     "search_motifs",
     "get_motif_hierarchy",
+    "get_reaction_pattern_types",
 ]

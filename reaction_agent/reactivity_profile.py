@@ -95,6 +95,7 @@ class ReactivityProfile:
     # --- Taxonomy mapping (for recommendation) ---
     reaction_type: Optional[str] = None
     reaction_type_confidence: float = 0.0
+    reaction_pattern_type: str = ""              # broad pattern: coupling_substitution, condensation, etc.
     reacted_motifs: List[str] = field(default_factory=list)
     formed_motifs: List[str] = field(default_factory=list)
     taxonomy_reasoning: str = ""
@@ -119,6 +120,8 @@ class ReactivityProfile:
     def summary(self) -> str:
         """One-line summary of the profile."""
         parts = []
+        if self.reaction_pattern_type:
+            parts.append(f"pattern={self.reaction_pattern_type}")
         if self.mechanism.primary_class:
             parts.append(f"mechanism={self.mechanism.primary_class}")
         if self.reaction_type:
