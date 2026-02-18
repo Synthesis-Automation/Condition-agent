@@ -239,11 +239,11 @@ def _get_llm_client(
     if not api_key:
         raise RuntimeError(f"{provider.upper()}_API_KEY environment variable not set")
 
-    # OpenAI o-series reasoning models (o1, o3, o4-mini, etc.) do not accept
-    # a temperature parameter — they only support the default value of 1.
-    _reasoning_model_prefixes = ("o1", "o3", "o4")
-    is_reasoning_model = any(
-        model.startswith(p) for p in _reasoning_model_prefixes
+    # OpenAI o-series and gpt-5 models do not accept temperature — default=1 only.
+    # Aliyun models (deepseek, kimi, glm, MiniMax) all support temperature normally.
+    _no_temp_prefixes = ("o1", "o3", "o4", "gpt-5")
+    is_reasoning_model = (provider == "openai") and any(
+        model.startswith(p) for p in _no_temp_prefixes
     )
 
     kwargs: Dict[str, Any] = {
