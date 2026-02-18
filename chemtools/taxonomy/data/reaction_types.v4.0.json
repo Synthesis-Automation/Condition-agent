@@ -399,7 +399,6 @@
       ],
       "description": "N/O/S nucleophilic substitution on alkyl electrophiles (halides/sulfonates), covering SN2-like alkylation."
     },
-    
     {
       "id": "Aromatic_Halogen_Exchange",
       "redox_neutral": true,
@@ -1089,10 +1088,7 @@
         ],
         "acid": [
           "Alkyl-COOH",
-          "R_acidic-COOH",
-          "RCH2-COOH",
-          "R2CH-COOH",
-          "R3C-COOH"
+          "R_acidic-COOH"
         ]
       },
       "products": {
@@ -1129,10 +1125,7 @@
         "acid": [
           "Acyl-COOH",
           "Ar-CHO",
-          "Alkyl-CHO",
-          "RCH2-CHO",
-          "R2CH-CHO",
-          "R3C-CHO"
+          "Alkyl-CHO"
         ]
       },
       "products": {
@@ -1164,10 +1157,7 @@
         "acid": [
           "Acyl-COOH",
           "Alkyl-COOH",
-          "R_acidic-COOH",
-          "RCH2-COOH",
-          "R2CH-COOH",
-          "R3C-COOH"
+          "R_acidic-COOH"
         ]
       },
       "products": {
@@ -1294,15 +1284,6 @@
           "Alkyl-NH2",
           "Alkyl-NHR",
           "Alkyl-NR2",
-          "RCH2-NH2",
-          "RCH2-NHR",
-          "RCH2-NR2",
-          "R2CH-NH2",
-          "R2CH-NHR",
-          "R2CH-NR2",
-          "R3C-NH2",
-          "R3C-NHR",
-          "R3C-NR2",
           "Bn-NH2",
           "Bn-NHR",
           "Bn-NR2"
@@ -1366,10 +1347,8 @@
         "substrate": [
           "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
-          "Alkyl-Alkenyl",
-          "RCH2-Alkenyl",
-          "R2CH-Alkenyl",
-          "R3C-Alkenyl"        ]
+          "Alkyl-Alkenyl"
+        ]
       },
       "products": {
         "product": [
@@ -1444,10 +1423,7 @@
         "product": [
           "Alkyl-CHO",
           "Alkenyl-CHO",
-          "Ar-CHO",
-          "RCH2-CHO",
-          "R2CH-CHO",
-          "R3C-CHO"
+          "Ar-CHO"
         ]
       },
       "examples": [
@@ -1474,10 +1450,7 @@
           "Alkenyl-COR",
           "Ar-COR",
           "Alkynyl-COR",
-          "Bn-COR",
-          "RCH2-COR",
-          "R2CH-COR",
-          "R3C-COR"
+          "Bn-COR"
         ]
       },
       "examples": [
@@ -1507,10 +1480,7 @@
           "Acyl-COOH",
           "Alkyl-COOH",
           "Alkenyl-COOH",
-          "Ar-COOH",
-          "RCH2-COOH",
-          "R2CH-COOH",
-          "R3C-COOH"
+          "Ar-COOH"
         ]
       },
       "examples": [
@@ -1575,10 +1545,7 @@
         "substrate": [
           "Alkenyl-CHO",
           "Alkyl-CHO",
-          "Ar-CHO",
-          "RCH2-CHO",
-          "R2CH-CHO",
-          "R3C-CHO"
+          "Ar-CHO"
         ]
       },
       "products": {
@@ -1586,10 +1553,7 @@
           "Acyl-COOH",
           "Alkyl-COOH",
           "Alkenyl-COOH",
-          "Ar-COOH",
-          "RCH2-COOH",
-          "R2CH-COOH",
-          "R3C-COOH"
+          "Ar-COOH"
         ]
       },
       "examples": [
@@ -1611,10 +1575,7 @@
           "Alkynyl-COR",
           "Allyl-COR",
           "Ar-COR",
-          "Bn-COR",
-          "RCH2-COR",
-          "R2CH-COR",
-          "R3C-COR"
+          "Bn-COR"
         ]
       },
       "products": {
@@ -1637,9 +1598,6 @@
           "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
           "Alkyl-Alkenyl",
-          "RCH2-Alkenyl",
-          "R2CH-Alkenyl",
-          "R3C-Alkenyl",
           "Alkenyl-Alkenyl",
           "Alkenyl_terminal-Alkenyl_terminal",
           "Alkenyl-H"
@@ -1665,9 +1623,6 @@
           "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
           "Alkyl-Alkenyl",
-          "RCH2-Alkenyl",
-          "R2CH-Alkenyl",
-          "R3C-Alkenyl",
           "Alkenyl-Alkenyl",
           "Alkenyl_terminal-Alkenyl_terminal",
           "Alkenyl-H"
@@ -1691,9 +1646,6 @@
       "reactants": {
         "substrate": [
           "Alkyl-SR",
-          "RCH2-SR",
-          "R2CH-SR",
-          "R3C-SR",
           "Bn-SR",
           "Allyl-SR",
           "Alkenyl-SR",
@@ -1703,9 +1655,6 @@
       "products": {
         "product": [
           "Alkyl-SO2R",
-          "RCH2-SO2R",
-          "R2CH-SO2R",
-          "R3C-SO2R",
           "Bn-SO2R",
           "Allyl-SO2R",
           "Alkenyl-SO2R",
@@ -1757,15 +1706,6 @@
           "Alkyl-NH2",
           "Alkyl-NHR",
           "Alkyl-NR2",
-          "RCH2-NH2",
-          "RCH2-NHR",
-          "RCH2-NR2",
-          "R2CH-NH2",
-          "R2CH-NHR",
-          "R2CH-NR2",
-          "R3C-NH2",
-          "R3C-NHR",
-          "R3C-NR2",
           "Bn-NH2",
           "Bn-NHR",
           "Bn-NR2"
@@ -1788,9 +1728,6 @@
           "Ar-CN",
           "HeteroAr-CN",
           "Alkyl-CN",
-          "RCH2-CN",
-          "R2CH-CN",
-          "R3C-CN",
           "CH3-CN",
           "Alkenyl-CN",
           "Alkynyl-CN"
@@ -1799,9 +1736,6 @@
       "products": {
         "product": [
           "Alkyl-NH2",
-          "RCH2-NH2",
-          "R2CH-NH2",
-          "R3C-NH2",
           "CH3-NH2",
           "Bn-NH2"
         ]
@@ -1878,10 +1812,7 @@
       "products": {
         "product": [
           "Alkyl-CHO",
-          "Ar-CHO",
-          "RCH2-CHO",
-          "R2CH-CHO",
-          "R3C-CHO"
+          "Ar-CHO"
         ]
       },
       "examples": [
@@ -1953,18 +1884,6 @@
           "Alkyl-Cl",
           "Alkyl-I",
           "Alkyl-F",
-          "RCH2-Br",
-          "RCH2-Cl",
-          "RCH2-I",
-          "RCH2-F",
-          "R2CH-Br",
-          "R2CH-Cl",
-          "R2CH-I",
-          "R2CH-F",
-          "R3C-Br",
-          "R3C-Cl",
-          "R3C-I",
-          "R3C-F",
           "Bn-Br",
           "Bn-Cl",
           "Bn-I",
@@ -1984,7 +1903,6 @@
       ],
       "description": "Conversion of alcohols to alkyl halides (Appel/SOCl2/oxalyl chloride families)."
     },
-    
     {
       "id": "Trifluoromethylation",
       "redox_neutral": false,
@@ -2024,9 +1942,6 @@
           "Ar-Alkenyl",
           "Ar-Alkenyl_terminal",
           "Alkyl-Alkenyl",
-          "RCH2-Alkenyl",
-          "R2CH-Alkenyl",
-          "R3C-Alkenyl",
           "Alkenyl-Alkenyl",
           "Alkenyl_terminal-Alkenyl_terminal",
           "Alkenyl-H"
@@ -2045,8 +1960,5 @@
       ],
       "description": "Oxidation of alkenes to epoxides."
     }
-    
   ]
 }
-
-

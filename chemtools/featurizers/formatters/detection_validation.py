@@ -15,6 +15,7 @@ from typing import Dict, Any, Set, List, Optional, Tuple
 from chemtools.taxonomy.reaction_catalog import (
     load_reaction_catalog,
     ReactionTypeDefinition,
+    motif_tokens_compatible,
 )
 from .utils import normalize_motif_id
 
@@ -33,7 +34,11 @@ def _get_catalog() -> Tuple[Dict[str, ReactionTypeDefinition], Dict[str, str]]:
 
 def _motifs_match_slot(motifs: Set[str], allowed: List[str]) -> bool:
     """Check if any motif matches the allowed patterns for a slot."""
-    return any(m in motifs for m in allowed)
+    for motif in motifs:
+        for allowed_token in allowed:
+            if motif_tokens_compatible(motif, allowed_token):
+                return True
+    return False
 
 
 def _as_str_set(values: Any) -> Set[str]:

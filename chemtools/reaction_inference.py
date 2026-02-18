@@ -19,7 +19,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 from .detection import detect_reaction_type
 from .featurizers.formatters.detection_validation import validate_detection_with_crk_key
 from .smiles import normalize_reaction
-from .taxonomy.reaction_catalog import get_reaction_type
+from .taxonomy.reaction_catalog import get_reaction_type, motif_tokens_compatible
 from .util.rdkit_helpers import parse_smiles, rdkit_available
 
 
@@ -447,16 +447,23 @@ def _taxonomy_consistency_check(
     formed_bond_set = {str(token) for token in formed_bonds if str(token).strip()}
     broken_bond_set = {str(token) for token in broken_bonds if str(token).strip()}
 
+    def _slot_matches(allowed_tokens: Sequence[str], observed: set[str]) -> bool:
+        for observed_token in observed:
+            for allowed_token in (allowed_tokens or []):
+                if motif_tokens_compatible(str(observed_token), str(allowed_token)):
+                    return True
+        return False
+
     for slot_name, slot_req in definition.reactants.items():
-        allowed = set(slot_req.allowed or [])
-        if allowed and not (allowed & reacted_set):
+        allowed = [str(token) for token in (slot_req.allowed or []) if str(token).strip()]
+        if allowed and not _slot_matches(allowed, reacted_set):
             return False, f"missing_reactant_slot:{slot_name}"
 
     if definition.products:
         product_match = False
         for slot_name, slot_req in definition.products.items():
-            allowed = set(slot_req.allowed or [])
-            if allowed and (allowed & formed_set):
+            allowed = [str(token) for token in (slot_req.allowed or []) if str(token).strip()]
+            if allowed and _slot_matches(allowed, formed_set):
                 product_match = True
                 break
             if not allowed:

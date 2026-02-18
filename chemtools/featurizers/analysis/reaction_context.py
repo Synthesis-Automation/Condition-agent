@@ -111,11 +111,12 @@ def _infer_reactant_role(reactant_type_id: str, reaction_type: str) -> Optional[
     if not isinstance(reaction_def.reactants, dict):
         return None
     
-    # Check each role slot to see if our reactant_type_id is in the allowed list
+    # Check each role slot with scope-aware token compatibility.
     for role, slot_req in reaction_def.reactants.items():
         if hasattr(slot_req, 'allowed'):
-            if reactant_type_id in slot_req.allowed:
-                return role
+            for allowed_token in slot_req.allowed:
+                if reaction_catalog.motif_tokens_compatible(reactant_type_id, allowed_token):
+                    return role
     
     return None
 
@@ -223,13 +224,13 @@ def classify_reactants_with_context(
         alternatives = []
         
         if expected_types:
-            # Match against expected reactant types from taxonomy
+            # Match against expected reactant types from taxonomy (scope-aware).
             for match in all_matches:
-                if match.category in expected_types:
+                matched_role = _infer_reactant_role(match.category, reaction_type)
+                if matched_role:
                     best_match = match
                     is_expected = True
-                    role = _infer_reactant_role(match.category, reaction_type)
-                    # Collect other matches as alternatives
+                    role = matched_role
                     alternatives = [m for m in all_matches if m != best_match]
                     break
         

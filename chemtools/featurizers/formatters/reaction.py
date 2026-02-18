@@ -1532,8 +1532,23 @@ def _project_formed_motifs_by_taxonomy(
     if not allowed:
         return []
     projected = set(formed_in_product) | {str(m) for m in inferred_in_product if m}
-    projected &= allowed
-    return sorted(projected)
+    try:
+        from chemtools.taxonomy.reaction_catalog import motif_tokens_compatible
+    except Exception:
+        motif_tokens_compatible = None  # type: ignore[assignment]
+
+    if motif_tokens_compatible is None:
+        projected &= allowed
+        return sorted(projected)
+
+    matched: Set[str] = set()
+    for motif in projected:
+        text = str(motif).strip()
+        if not text:
+            continue
+        if any(motif_tokens_compatible(text, allowed_tok) for allowed_tok in allowed):
+            matched.add(text)
+    return sorted(matched)
 
 
 def _motif_atoms_from_entry(entry: Dict[str, Any]) -> Set[int]:

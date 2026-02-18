@@ -76,8 +76,13 @@ def iter_reactions_for_category(
             continue
         for slot in _iter_role_slots(rxn_data):
             allowed = slot.get("allowed", [])
-            if isinstance(allowed, list) and category_id in allowed:
-                yield rxn_id, rxn_data
+            if isinstance(allowed, list):
+                for token in allowed:
+                    if reaction_catalog.motif_tokens_compatible(category_id, str(token)):
+                        yield rxn_id, rxn_data
+                        break
+                else:
+                    continue
                 break
 
 

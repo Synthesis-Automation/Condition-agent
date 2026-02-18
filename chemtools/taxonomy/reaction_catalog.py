@@ -373,6 +373,91 @@ def normalize_reaction_constraints(raw: Any) -> Dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
+def _load_motif_scope_children() -> Dict[str, Set[str]]:
+    """Load scope-map parent -> transitive children from taxonomy index."""
+    try:
+        from . import loader as taxonomy_loader
+
+        payload = taxonomy_loader.load_motif_scope_index()
+    except Exception:
+        return {}
+
+    raw_scope = payload.get("scope_map", {}) if isinstance(payload, dict) else {}
+    if not isinstance(raw_scope, dict):
+        return {}
+
+    direct: Dict[str, Set[str]] = {}
+    for key, value in raw_scope.items():
+        parent = str(key).strip()
+        if not parent:
+            continue
+        children = {
+            str(item).strip()
+            for item in (value or [])
+            if str(item).strip() and str(item).strip() != parent
+        }
+        if children:
+            direct[parent] = children
+
+    if not direct:
+        return {}
+
+    transitive: Dict[str, Set[str]] = {}
+    for parent in direct.keys():
+        seen: Set[str] = set()
+        stack = list(direct.get(parent, set()))
+        while stack:
+            child = stack.pop()
+            if child in seen:
+                continue
+            seen.add(child)
+            stack.extend(direct.get(child, set()))
+        if seen:
+            transitive[parent] = seen
+    return transitive
+
+
+@lru_cache(maxsize=1)
+def _load_motif_scope_parents() -> Dict[str, Set[str]]:
+    """Load inverse scope-map child -> transitive parents from taxonomy index."""
+    children_map = _load_motif_scope_children()
+    parents: Dict[str, Set[str]] = {}
+    for parent, children in children_map.items():
+        for child in children:
+            parents.setdefault(child, set()).add(parent)
+    return parents
+
+
+def motif_tokens_compatible(left: str, right: str) -> bool:
+    """
+    Scope-aware token compatibility for taxonomy slot matching.
+
+    A token is considered compatible if:
+    - tokens are equal; or
+    - either token is an in-scope parent/child of the other.
+    """
+    left_text = str(left or "").strip()
+    right_text = str(right or "").strip()
+    if not left_text or not right_text:
+        return False
+    if left_text == right_text:
+        return True
+
+    children_map = _load_motif_scope_children()
+    if right_text in children_map.get(left_text, set()):
+        return True
+    if left_text in children_map.get(right_text, set()):
+        return True
+
+    parent_map = _load_motif_scope_parents()
+    if right_text in parent_map.get(left_text, set()):
+        return True
+    if left_text in parent_map.get(right_text, set()):
+        return True
+    return False
+
+
+@lru_cache(maxsize=1)
 def load_reaction_catalog(
     path: Optional[Path] = None,
 ) -> Tuple[Dict[str, ReactionTypeDefinition], Dict[str, str]]:
@@ -487,6 +572,7 @@ __all__ = [
     "resolve_reaction_type",
     "normalize_reaction_constraints",
     "normalize_reaction_synthons",
+    "motif_tokens_compatible",
     "REACTION_CONSTRAINT_KEYS",
     "REACTION_SYNTHON_SLOT_KEYS",
 ]

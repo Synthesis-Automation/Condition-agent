@@ -118,3 +118,23 @@ def test_crk_validation_can_use_bond_change_constraints(
         use_legacy=False,
     )
     assert result["reaction_type"] == "Wittig_like"
+
+
+def test_scope_aware_slot_matching_accepts_child_motif_tokens(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    epox = _mk_defn(
+        "Epoxidation_like",
+        reactants={"substrate": ["Alkyl-Alkenyl"]},
+        products={"product": ["Epoxide"]},
+    )
+    definitions = {"Epoxidation_like": epox}
+    monkeypatch.setattr(dv, "_get_catalog", lambda: (definitions, {}))
+
+    result = dv.validate_detection_with_crk_key(
+        initial_detection="Unknown",
+        initial_confidence=0.0,
+        reaction_key="|RCH2-Alkenyl -> Epoxide | bond_formed: C-O",
+        use_legacy=False,
+    )
+    assert result["reaction_type"] == "Epoxidation_like"
