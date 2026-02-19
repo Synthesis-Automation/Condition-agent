@@ -171,6 +171,8 @@ def _print_response(response: "ChemResponse", verbose: bool = False) -> None:
             print(f"  {C.HYPO}{response.hypothesis}{C.R}")
         if response.plan_rationale:
             print(f"  {C.META}{response.plan_rationale}{C.R}")
+        if response.plan_revised:
+            print(f"  {C.META}↺ Plan revised after Group 0 observation{C.R}")
         print()
 
     # ── Tools called ──────────────────────────────────────────────────

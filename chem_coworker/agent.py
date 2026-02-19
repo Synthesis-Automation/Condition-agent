@@ -27,6 +27,10 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
+# When initial plan confidence is below this threshold AND the plan has >1 group,
+# the observe step fires: Group 0 runs first, then the LLM revises Groups 1+.
+_OBSERVE_THRESHOLD = 0.75
+
 # Local imports (no circular dependency — these modules don't import agent.py)
 from .response import ChemResponse  # noqa: E402
 from .plan import ExecutionPlan     # noqa: E402
@@ -183,36 +187,88 @@ class ChemCoworker:
         if self.verbose:
             logger.info(f"[ChemCoworker] {plan}")
 
-        # ── Step 4: Execute tool groups ────────────────────────────────
+        # ── Step 4: Execute tool groups (observe-then-plan) ───────────
         warnings: List[str] = []
         tool_results: Dict[str, Any] = {}
+        plan_revised = False
+        observe_llm_text = ""
+        effective_plan = plan
 
         if not plan.is_empty:
             callables = self.registry.get_callables()
-            tool_results = self.executor.run_plan(plan, callables)
 
-            # Collect any tool-level warnings
-            for name, result in tool_results.items():
-                if isinstance(result, dict) and not result.get("success", True):
-                    warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
+            if plan.confidence < _OBSERVE_THRESHOLD and len(plan.groups) > 1:
+                # Uncertain path: run G0 diagnostics first, then let LLM revise G1+
+                if self.verbose:
+                    logger.info(
+                        f"[ChemCoworker] confidence={plan.confidence:.2f} < {_OBSERVE_THRESHOLD} "
+                        f"— triggering observe step"
+                    )
 
-        tools_called = [tc.name for tc in plan.all_tool_calls if tc.name in tool_results]
+                # 4a. Execute only Group 0
+                g0_plan = ExecutionPlan(
+                    hypothesis=plan.hypothesis,
+                    confidence=plan.confidence,
+                    groups=[plan.groups[0]],
+                    rationale="G0 diagnostic run",
+                    raw_plan_text="",
+                )
+                g0_results = self.executor.run_plan(g0_plan, callables)
+                tool_results.update(g0_results)
 
-        # ── Step 5: Validate (optional revision) ──────────────────────
-        # Currently lightweight — just log if hypothesis contradicted.
-        # Future: add a revision LLM call here if validation fails.
-        contradiction = self._check_hypothesis(plan, tool_results)
+                for name, result in g0_results.items():
+                    if isinstance(result, dict) and not result.get("success", True):
+                        warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
+
+                if self.verbose:
+                    logger.info(f"[ChemCoworker] G0 results: {list(g0_results.keys())}")
+
+                # 4b. Observe step — LLM sees G0 results, produces revised plan for G1+
+                revised_plan, observe_llm_text, plan_revised = self._run_observe_step(
+                    query=query,
+                    plan=plan,
+                    g0_results=g0_results,
+                    primary_smiles=primary_smiles,
+                )
+                llm_calls += 1
+
+                # 4c. Execute revised Groups 1+
+                if not revised_plan.is_empty:
+                    g1plus_results = self.executor.run_plan(revised_plan, callables)
+                    tool_results.update(g1plus_results)
+
+                    for name, result in g1plus_results.items():
+                        if isinstance(result, dict) and not result.get("success", True):
+                            warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
+
+                effective_plan = revised_plan if not revised_plan.is_empty else plan
+
+            else:
+                # Confident path: execute all groups as before (no regression)
+                tool_results = self.executor.run_plan(plan, callables)
+
+                for name, result in tool_results.items():
+                    if isinstance(result, dict) and not result.get("success", True):
+                        warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
+
+                effective_plan = plan
+
+        # All executed tool names in insertion order (G0 + G1+ for uncertain path)
+        tools_called = list(tool_results.keys())
+
+        # ── Step 5: Validate ───────────────────────────────────────────
+        contradiction = self._check_hypothesis(effective_plan, tool_results)
         if contradiction and self.verbose:
             logger.info(f"[ChemCoworker] Hypothesis may need revision: {contradiction}")
 
-        # ── Step 6: Synthesize (LLM Call 2) ───────────────────────────
+        # ── Step 6: Synthesize (final LLM call) ───────────────────────
         tool_results_text = self._format_tool_results(tool_results)
 
         synth_text = SYNTHESIZE_PROMPT.format(
             query=query,
             task_type=task_type.upper(),
-            hypothesis=plan.hypothesis or "(not yet identified)",
-            confidence=plan.confidence,
+            hypothesis=effective_plan.hypothesis or "(not yet identified)",
+            confidence=effective_plan.confidence,
             tool_results_text=tool_results_text,
             tool_descriptions=self.registry.describe_tools(),
             resource_context=self._describe_resources(),
@@ -235,14 +291,16 @@ class ChemCoworker:
         return ChemResponse(
             query=query,
             task_type=task_type,
-            hypothesis=plan.hypothesis,
-            plan_rationale=plan.rationale,
+            hypothesis=effective_plan.hypothesis,
+            plan_rationale=effective_plan.rationale,
             plan_text=plan_text,
+            plan_revised=plan_revised,
+            observe_text=observe_llm_text,
             answer=answer,
             tools_called=tools_called,
             tool_results=tool_results,
             structured=structured,
-            confidence=plan.confidence,
+            confidence=effective_plan.confidence,
             warnings=warnings,
             model=self.model_name,
             provider=self.provider,
@@ -422,6 +480,63 @@ class ChemCoworker:
                      "substructure search, SMILES parsing/canonicalization, stereochemistry")
 
         return "\n".join(lines)
+
+    def _run_observe_step(
+        self,
+        query: str,
+        plan: "ExecutionPlan",
+        g0_results: Dict[str, Any],
+        primary_smiles: str,
+    ) -> Tuple["ExecutionPlan", str, bool]:
+        """
+        Mid-pipeline observe step: show Group 0 results to the LLM and get a
+        revised plan for Groups 1+.
+
+        Returns:
+            (revised_plan, observe_llm_text, revision_happened)
+            On LLM failure, gracefully falls back to the original plan.groups[1:].
+        """
+        from .prompts import OBSERVE_PROMPT
+        from langchain_core.messages import HumanMessage
+
+        g0_results_text = self._format_tool_results(g0_results)
+
+        # Exclude G0 tools so PlanParser silently drops any hallucinated duplicates
+        _g0_tools = {"normalize_reaction", "detect_reaction_type"}
+        remaining_tools = [n for n in self.registry.names() if n not in _g0_tools]
+
+        observe_text = OBSERVE_PROMPT.format(
+            query=query,
+            hypothesis=plan.hypothesis or "(none)",
+            initial_confidence=plan.confidence,
+            g0_results_text=g0_results_text,
+            tool_descriptions=self.registry.describe_tools(),
+        )
+
+        try:
+            observe_response = self.llm.invoke([HumanMessage(content=observe_text)])
+            observe_llm_text = self._get_text(observe_response)
+        except Exception as exc:
+            logger.warning(f"[ChemCoworker] Observe LLM call failed: {exc}. Using original plan.")
+            fallback = ExecutionPlan(
+                hypothesis=plan.hypothesis,
+                confidence=plan.confidence,
+                groups=plan.groups[1:],
+                rationale=f"[Observe step failed: {exc}] Falling back to original plan.",
+                raw_plan_text="",
+            )
+            return fallback, "", True
+
+        revised_plan = self.parser.parse(
+            observe_llm_text,
+            known_tools=remaining_tools,
+            smiles_context=primary_smiles,
+        )
+
+        if self.verbose:
+            logger.info(f"[ChemCoworker] Revised plan: {revised_plan}")
+
+        return revised_plan, observe_llm_text, True
 
     def _check_hypothesis(
         self, plan: "ExecutionPlan", results: Dict[str, Any]
