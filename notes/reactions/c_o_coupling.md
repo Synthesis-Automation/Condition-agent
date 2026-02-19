@@ -18,9 +18,11 @@ last_updated: 2026-02-18
 # C-O Coupling — Reaction Notes
 
 ### Reaction Type
+
 C-O bond formation (aryl etherification) from aryl/heteroaryl halides and alcohols/phenols; catalyzed by Pd or Cu depending on substrate
 
 ### Substrate Scope and Limitations
+
 • Substrates: aryl/heteroaryl halides with alcohols or phenols
 • Functional group tolerance depends on Pd vs Cu systems and ligand choice
 • Common incompatibilities: sterically hindered alcohols and some heterocycles
@@ -28,6 +30,7 @@ C-O bond formation (aryl etherification) from aryl/heteroaryl halides and alcoho
 ---
 
 ### HTE Data
+
 *Source: AbbVie HTE Perspective — doi: 10.1021/acs.jmedchem.5c00814 (Table 5)*
 
 #### Top conditions overall (Table 5)

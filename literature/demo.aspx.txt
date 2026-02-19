@@ -453,15 +453,15 @@ Procedure related questions
 
  
 
+ Org. Synth. 2025, 102, 86-99
 
- Org. Synth. 2016, 93, 306-318
 
 
-DOI: 10.15227/orgsyn.093.0306
+DOI: 10.15227/orgsyn.102.0086
 
-Nickel-Catalyzed Suzuki-Miyaura Coupling in t-Amyl Alcohol for the Preparation of 5-(Furan-3-yl)pyrimidine
-
+Copper-Catalyzed Suzuki-Miyaura Coupling of Unactivated Alkyl Halides with Arylborons
 
+ 
 
  
  
@@ -469,269 +469,241 @@ Nickel-Catalyzed Suzuki-Miyaura Coupling in t-Amyl Alcohol for the Preparation o
  
  
  
+
  
  
  
- 
- 
  
 
 
 
-
-Submitted by Liana Hie and Neil K. Garg*1
-
-
-
-
-Checked by Kristen Flynn, Alyssa Antropow, and Mohammad Movassaghi
-
 
 
 
-1. Procedure
+Submitted by Yonglei Zhou, Jian Li, and Weilong Xie*1
 
- 
-
- 
-5-(Furan-3-yl)pyrimidine. A 1000-mL round-bottomed flask is charged with a Teflon-coated, octagon-shaped magnetic stir bar (4.0 x 0.5 cm) and K3PO4 (60.0 g, 283 mmol, 4.50 equiv), and then attached to a gas inlet adapter (90°). The flask and its contents are flame-dried (Note 1) under oil pump vacuum (1.0 mmHg) for ca. 5 min (Note 2). After cooling to 23 °C under nitrogen, the gas inlet adapter is removed and the flask is charged with 5-bromopyrimidine (10.0 g, 63.0 mmol, 1 equiv), 3-furanylboronic acid (17.6 g, 158 mmol, 2.50 equiv), and NiCl2(PCy3)2 (0.220 g, 0.315 mmol, 0.500 mol%) (Note 3). The flask is equipped with a 24/40 oven-dried reflux condenser and a septum with a needle, and then evacuated and backfilled with nitrogen (3x). tert-Amyl alcohol (210 mL, 0.3 M) is added via cannula from an oven-dried, argon purged graduated cylinder through the septum under a flow of argon. The resulting reddish heterogeneous mixture is stirred at 23 °C for 1 h under positive nitrogen pressure (Figure 1) (Note 4).
- 
-
- 
- 
 
 
-Figure 1. Reddish heterogeneous mixture formed after mixing the reagents (Photo provided by Submitters)
+Checked by Kathryn M. Weber and Tehshik P. Yoon
+
+
+
+1. Procedure (Note 1)
 
 
 
 
 
 
-The reaction vessel containing a brown heterogeneous mixture and equipped with a reflux condenser is placed into a pre-heated oil bath set at a temperature of 120 °C (Figure 2) (Note 5).
-
-
-
- 
- 
-
-
-Figure 2. Brown heterogeneous mixture resulted after stirring at 120 °C for 1 h (Photo provided by Submitters)
-
-
-
-
-
-
-After stirring for 1 h, the reaction vessel containing a brown greenish heterogeneous mixture is removed from the oil bath and cooled to 23 °C. Thin layer chromatography is performed to check the progress of the reaction (hexanes:EtOAC = 3:1, Rf = 0.31) (Figure 3). Into the flask is added deionized water (100 mL) and Et2O (200 mL), and the resulting mixture is stirred for 15 min (Figure 4).
-
-
-
- 
- 
-
-
-Figure 3. Thin layer chromatography of the crude reaction mixture (left lane = 5-bromopyrimidine, middle lane = cross spots of 5-bromopyrimidine and the reaction mixture, right lane = reaction mixture) (Photo provided by Submitters)
-
-
+A. 1-Cyclohexyl-4-chlorobenzene (3). An oven-dried 150-mL heavy-walled pressure vessel, equipped with a Teflon-coated, football-shaped magnetic stir bar (25.4 mm x 12.7 mm) (Note 2), is charged with 4-chlorophenylboronic acid pinacol ester (8.59 g, 36.0 mmol, 1.8 equiv) (Note 3), sodium tert-butoxide (2.88 g, 30.0 mmol, 1.5 equiv) (Note 4), copper(I) bromide-dimethyl sulfide (206 mg, 1.0 mmol, 5.0 mol%) (Note 5), bathophenanthroline (499 mg, 1.5 mmol, 7.5 mol%) (Note 6), bromocyclohexane (2.50 mL, 3.3 g, 20.0 mmol, 1.0 equiv) (Note 7) in order under air. Then, toluene (Note 8) dried with magnesium sulfate (Note 9) is added using a 20-mL disposable syringe (20 mL) (Figure 1A). The vessel is sealed with a Teflon cap (Figure 1B). Then, the reaction mixture is placed in a preheated 80 ℃ silicone oil bath and stirred for 24 h (Figure 1C). The reaction solution remains in black in color (Figure 1D).
 
 
 
 
  
- 
-
 
-Figure 4. Brown homogenous mixture was formed upon stirring with water and diethyl ether (Photo provided by Submitters)
-
-
-
-
-
-
-The combined mixture is then poured into a 1000-mL separatory funnel. The reaction flask is rinsed once with H2O (100 mL) and Et2O (100 mL), and both washes are transferred to the separatory funnel (Figure 5a). The organic and aqueous layers are separated. The organic layer is washed sequentially with 1.0 M NaOH (2 x 200 mL) (Figure 5b) and saturated sodium chloride solution (200 mL) (Figure 5c).
-
  
- 
- 
- 
 
- 
 
-
- 
- 
+Figure 1. (A) Preparation of reaction materials; (B) Reaction set-up; (C) After inserting the vessel into an oil bath; (D) Color of the reaction mixture after completion
 
-
- 
-
-
- 
- 
-
-
- 
-
-
- 
- 
-
-
- 
-
- 
-
- 
-
-(a)
-
-
- 
-
-(b)
-
-
- 
-
-(c)
-
-
- 
-
  
 
 
-Figure 5. (a) The reaction mixture with water and diethyl ether in a separatory funnel. (b) The organic layer and 1.0 M NaOH. (c) The organic layer and saturated sodium chloride (Photo provided by Submitters)
+After the reaction mixture is cooled to room temperature (Note 10), it is filtered through a short pad of layered silica gel and diatomite (inner diameter = 4.25 cm, height of silica gel = 2.0 cm, height of diatomite = 0.10 cm) (Note 11) (Figure 2A) and eluted with ethyl acetate (3 × 50 mL) into a 250-mL round-bottomed flask (neck 19/26 joint) (Figure 2B). The filtrate is used to conduct TLC analysis (Note 12). The resulting solution is concentrated by rotary evaporation under reduced pressure (16 mbar, 38 ℃) to afford the crude product as a brown oil (Figure 2C). The crude oil is dissolved in dichloromethane (8.0 mL) (Note 13), and then silica gel (7 g) (Note 11) is added into the flask. Yellow powder is afforded by rotary evaporation under reduced pressure (16 mbar, 38 ℃) (Figure 2D). The powder is loaded onto a chromatography column charged with silica gel (160 g, height of 20 cm, 6.0 cm column diameter) (Note 11) and eluted with petroleum ether (Note 14) (Figure 2E). The eluent is collected in 15 mL fractions (16 x 100 mm test tubes). The desired product is obtained in fractions 26-37 (Note 15), which are combined and concentrated by rotary evaporation under reduced pressure (16 mbar, 38 ℃) to afford a colorless liquid. The liquid is then placed under a high vacuum (<1 mmHg) for 90 min to afford 2.54 g (13.0 mmol, 65%) of 1-cyclohexyl-4-chlorobenzene as a colorless oil (Notes 18, 19) (Figure 2F).
+
+
+
 
  
 
-
+ 
 
 
-The organic layer is then dried over Na2SO4 (100 g) for 15 min and filtered over a 150-mL glass-fritted filter packed with celite (30 g). The drying agent is rinsed with Et2O (100 mL) and the combined organics are concentrated by rotary evaporation (275 mmHg, 30 °C to remove Et2O and 30 mmHg, 50 °C to remove tert-amyl alcohol, The temperature was controlled by a water bath). In a 500-mL round-bottomed flask fitted with a 24/40 reflux condenser, the tan solid is dissolved in 200 mL of hexanes, which is brought to 80 °C by heating in an oil bath (Notes 6 and 7). Upon complete dissolution, the filtrate is allowed to cool to room temperature and then cooled at -20 °C for 12 h. The light tan crystals that form are collected by filtration on a 150 mL fritted funnel and washed with 100 mL of ice-cold hexane (0 °C). The resulting crystals are transferred to a 100 mL round-bottomed flask and then dried under oil pump vacuum (1.0 mmHg, 23 °C) for 8 h. The mother liquor is concentrated and a second recrystallization is performed to afford additional 5-(furan-3-yl)pyrimidine (total yield of both crops is 7.60 g, 83% yield) as a light tan crystalline solid (Notes 8 and 9).
+Figure 2. (A) Filtering through a short pad of silica gel and diatomite; (B) The eluent after filtration; (C) The crude faint yellow oil; (D) The crude yellow powder; (E) Purification by column chromatography; (F) First collection of purified title compound 3
+
+ 
+
+
+The remaining impure product is obtained in fractions 38-44 (Figure 3A), which are combined and concentrated by rotary evaporation under reduced pressure (16 mbar, 38 ℃) to afford a mixture of colorless liquid and white solid. The mixture is dissolved in dichloromethane (5.0 mL), and then silica gel (2.5 g) is added into the flask. White powder is afforded by rotary evaporation under reduced pressure (16 mbar, 38 ℃) (Figure 3B). The powder is loaded on to a chromatography column charged with silica gel (50 g, height of 25 cm, 3.0 cm column diameter) using petroleum ether as eluent (Figure 3C). The eluent is collected in 15 mL fractions (16 x 100 mm test tubes). The desired product is obtained in fractions 10-13 (Note 16), which are combined and concentrated by rotary evaporation under reduced pressure (16 mbar, 38 ℃) to afford a colorless liquid. The liquid is then placed under a high vacuum (<1 mmHg) for 90 min to afford an additional 325 mg (1.67 mmol, 8%) of 1-cyclohexyl-4-chlorobenzene as a colorless oil (Notes 18, 19) (Figure 3D). 2.87 g (14.7 mmol, 73%) of colorless oil is obtained based on the combined purifications.
+
+
 
 
  
- 
-
-
-Figure 6. Product collected as light tan crystalline solid (Photo provided by Submitters)
-
 
  
- 
 
- 
+
+Figure 3. (A) Collection of compound 3 and byproduct; (B) The crude white powder; (C) Second purification by column chromatography; (D) Second collection of purified title compound 3.
+
+ 
 
- 2. Notes
- 
+
 
+
+
+
+2. Notes
+
+
+
+
+
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with 4-chlorophenylboronic acid pinacol ester, sodium tert-butoxide, copper(I) bromide-dimethyl sulfide, bathophenanthroline, bromocyclohexane, toluene, anhydrous MgSO4, silica gel, diatomite, petroleum ether, and CDCl3.
+
+
+
+2. All glassware and Teflon-coated magnetic stir bar are oven-dried prior to reaction set-up.
+ 
+
+
+3. 4-Chlorophenylboronic acid pinacol ester (98%) was purchased from Adamas-beta and used as received (authors). 4-Chlorophenylboronic acid pinacol ester (98%) was purchased from ChemImpex and used as received (checkers). The excess amount of the boron reagent is essential to ensure the efficiency of the reaction due to the side homocoupling of the reagent.
+ 
+
+
+4. Sodium tert-butoxide (99%) was purchased from Adamas-beta and used as received (submitters). Sodium tert-butoxide (99.9%) was purchased from Sigma Aldrich and used as received (checkers).
+ 
+
+
+5. Copper(I) bromide-dimethyl sulfide (≥98%) was purchased from Adamas-beta and used as received (authors). Copper(I) bromide-dimethyl sulfide (99%) was purchased from Thermo Scientific Chemicals and used as received (checkers).
+
+ 
+
+6. Bathophenanthroline (≥98%) was purchased from Adamas-beta and used as received (authors). Bathophenanthroline (≥99.0%) was purchased from Sigma-Aldrich and used as received (checkers).
+ 
+
+
+7. Bromocyclohexane (98%) was purchased from Adamas-beta and used as received (authors). Bromocyclohexane (98%) was purchased from Sigma-Aldrich and used as received (checkers).
+
+ 
+
+8. Toluene (CP, ≥98.5%) was purchased from Sinopharm (authors). Toluene (ACS Reagent, 99%) was purchased from Sigma-Aldrich (checkers). Toluene was dried with anhydrous MgSO4 overnight without stirring (~2 g MgSO4/50 mL toluene). MgSO4 was removed via vacuum filtration before use.
+ 
+
+
+9. Anhydrous MgSO4 was purchased from General-Reagent and used as received (authors). Anhydrous MgSO4 was purchased from Sigma-Aldrich and used as received (checkers).
+ 
+
+
+10. The term "room temperature" used throughout this manuscript refers to a temperature between 20 ℃ to 25 ℃.
+ 
+
+
+11. Silica gel (AR, 300-400 mesh) was obtained from General-Reagent and used as received (authors). Silica gel (60 Å, 230-400 mesh) was purchased from Sigma-Aldrich and was used as received (checkers). Diatomite (AR) was obtained from General Reagent and used as received (authors). Celite 545 was purchased from Oakwood Chemical and used as received (checkers).
+ 
+
+
+12. The reaction progress was monitored by TLC analysis, distilled petroleum ether, Rf (product) = 0.8. The authors used TLC silica gel 60 F254 plates purchased from Shanghai Haohong Scientific Co., Ltd. Checkers used pre-coated silica gel F254 plates from SiliCycle Inc. containing a fluorescent indicator. The plates were then visualized using UV (254 nm).
+ 
+
+
+
+ 
+
+ 
+
+
+Figure 4. TLC analysis of the reaction mixture and compound 3.
+
+ 
+
+
+13. Dichloromethane (AR, ≥99.5%) was purchased from General-Reagent and used as received (authors). Dichloromethane (ACS Reagent, ≥99.5%) was purchased from Fisher Chemical and used as received (checkers).
+ 
+
+
+14. Petroleum ether (AR, boiling range 60 ℃ - 90 ℃) was purchased from General-Reagent and used as received (authors). Petroleum ether (ACS Reagent) was purchased from Sigma-Aldrich and used as received (checkers).
+ 
+
+
+15. Column chromatography was performed as follows: A column (6.0 cm diameter) is charged with silica gel (160 g) using a wet-pack method with petroleum ether (350 mL) to give a column height of 20 cm. Then, the yellow powder is loaded on silica gel. Sea sand with a 1.0 cm minimum height is added to the top of the powder. At this point, fraction collection is begun, and elution is continued with 700 mL of petroleum ether.
+ 
+
+
+
+ 
+
+ 
+
+
+Figure 5. TLC analysis of column fraction.
+
+ 
+
+
+16. Column chromatography was performed as follows: A column (3.0 cm diameter) is charged with silica gel (50 g) using a wet-pack method with petroleum ether (100 mL) to give a column height of 25 cm. Then, the white powder is loaded on silica gel. Sea sand with a 1.0 cm minimum height is added to the top of the powder. At this point, fraction collection is begun, and elution is continued with 400 mL of petroleum ether.
+ 
+
+
+
+ 
+
+ 
+
+
+Figure 6. TLC analysis of column fraction.
+
+ 
+
+
+17. Characterization data of product 3: 1H NMR pdf (500 MHz, CDCl3) δ: 7.27 - 7.21 (m, 2H), 7.16 - 7.09 (m, 2H), 2.47 (tt, J = 8.5, 2.9 Hz, 1H), 1.89 - 1.78 (m, 4H), 1.78 - 1.70 (m, 1H), 1.37 (td, J = 9.2, 2.4 Hz, 4H), 1.24 (dtq, J = 12.6, 9.3, 3.0 Hz, 1H). 13C NMR pdf (126 MHz, CDCl3) δ: 146.7, 131.4, 128.5, 128.3, 44.1, 34.6, 27.0, 26.2. IR (ATR): 2922.77, 2850.49, 1491.51, 1447.60, 1408.51, 1089.60, 1013.64, 891.97, 817.38, 775.07, 716.57, 686.83, 525.28, 427.03 cm-1.); HRMS (ESI) calcd for C8H15Cl [M]+: 194.0857; found 194.0859. The product (3) is stable on the benchtop at room temperature under air atmosphere.
+ 
+
+
+18. The purity of product (3) was determined to be 96.5% by quantitative 1H NMR pdf spectroscopy in CDCl3 using 15.3 mg of the product (3) and 15.4 mg of 1,3,5-trimethoxy benzene. Checkers: Oakwood Chemical, purity: 98%, used as received as an internal standard.
+ 
+
+
+19. A repeated reaction on half scale provided 1.53 g (78%) of the same product (checkers). A repeated reaction on an identical scale provided 2.85 g (73%) of the same product (authors).
+ 
+ 
+ 
 
  
  
-
-1. Heat resistant gloves should be worn to prevent burns.
-
-
-
-2. Submitters observed bubbling upon flame-drying likely due to water content. Checkers used anhydrous base and did not observe bubbling.
-
-
-
-3. Potassium phosphate tribasic (anhydrous) was purchased from Alfa-Aesar. 5-Bromopyrimidine (98%) and 3-furanylboronic acid (96%) were purchased from Combi-Blocks, Inc. and used as received. Bis(tricyclohexylphosphine)nickel(II) chloride (97%) and tert-amyl alcohol (ReagentPlus, 99%) were purchased from Sigma-Aldrich and used as received.
-
-
-
-4. The reaction mixture was stirred at 900 rpm.
-
-
-
-5. Temperature was monitored by a thermocouple placed directly in the oil bath.
-
-
-
-6. Submitters recommend an extra quantity of EtOAc can be added to aid dissolution, if necessary. Checkers did not use any EtOAc during recrystallizations.
-
-
-
-7. Hot filtration using a 150 mL fritted funnel can be performed to remove any brown residue, if needed. Checkers performed recrystallization with and without hot filtration, and no difference in purity was observed. Procedure for hot filtration: Glassware had been heated in the oven at 200 °C for ca. 30 min and was used within five min of removal from the oven. The hot hexanes solution (80 °C) is filtered through a glass-fritted funnel into an Erlenmeyer flask. If room-temperature glassware is used for this procedure, the product precipitates.
-
-
-
-8. A second run was performed at half scale, which provided 3.75 g (82%) of the product.
-
-
-
-9. This compound exhibits the following physiochemical properties: mp = 80-81 °C; TLC (hexanes:EtOAc = 3:1), Rf = 0.31; 1H NMR pdf(400 MHz, CDCl3) δ: 6.73 (dd, J = 1.9, 0.9 Hz, 1H), 7.57 (t, J = 1.7 Hz, 1H), 7.84 (dd, J = 1.5, 0.9 Hz, 1H), 8.85 (s, 2H), 9.12 (s, 1H); 13C NMR pdf(125 MHz, CDCl3) δ: 108.1, 120.0, 126.7, 139.5, 144.7, 153.7, 157.2; IR (film): 3136, 3112, 3041, 1969, 1957, 1880, 1607, 1575, 1549, 1513, 1438, 1414, 1340, 1187, 1159, 1091, 1061, 1012, 924, 871, 790, 732, 721, 645, 634; HRMS-ESI (m/z) cacld for C8H7N2O [M+H]+: 147.0553, found: 147.0547; Anal. Calcd for C8H6N2O: C 65.75, H 4.14, N 19.17, found: C 65.65, H 4.25, N 19.01.
- 
- 
-
-
-
 
 Working with Hazardous Chemicals
 
-
+ 
 
 The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
 
-
+ 
 
 In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
 
-
+ 
 
 The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
 
-
+ 
+ 
 
 3. Discussion
 
 
 
-Transition metal-catalyzed cross-couplings are versatile methods for carbon-carbon (C-C) and carbon-heteroatom bond formation.2 Traditionally, palladium catalysts have been most commonly utilized for this type of transformation; however, there has been a significant interest in the development of cross-coupling reactions that rely on non-precious metal catalysts. In particular, nickel has emerged as an alternative to palladium due to several factors. For example, nickel is significantly more abundant, much less expensive, and also possesses a much lower CO2 footprint.3 Moreover, nickel catalysts possess the unique ability to activate a wide range of electrophilic coupling partners, well beyond the scope of traditional cross-couplings that use palladium catalysis.3
-
+The reliability and practicality of the Suzuki-Miyaura coupling (SMC) reaction has been demonstrated by its widespread application, which involves connecting boron reagents with organic halides to form a variety of molecules.2 Given the commercial availability and high stability of both reagents, this type of reactions finds wide applications in organic synthesis and pharmaceutical industry.3 Suzuki-Miyaura reactions have been proven to be a successful protocol for C(sp2)-C(sp2) bond formation.4 However, the applications of sp3-hybridized alkyl halides are less reliable. Since the frequent involvement of two-electron oxidation addition in these systems, the coupling will be suffered from the relatively difficult oxidation addition of alkyl halides and the effects of β-hydride elimination of alkyl metal species.5 Therefore, the general method for coupling C(sp2)-C(sp3) by the SMC reaction is highly sought after and of great significance. In this regard, the coupling reaction involving halogenated alkanes catalyzed by metals such as Ni6, Co7, and Fe8 has recently been developed. However, due to relatively harsh reaction conditions and issues with functional group compatibility, it is still necessary to develop the mild, convenient and highly functional group compatible methods.
 
-
+ 
 
-Our research groups and many others have developed new protocols for aryl C-C and C-X bond formations using nickel catalysts.4,5,6,7 In our efforts to render our methodologies more industrially friendly, we have developed the nickel-catalyzed Suzuki-Miyaura coupling in 'green' solvents,8,9 such as 2-Me-THF and tert-amyl alcohol.10 The methodology proceeds under mild conditions and has a broad scope with respect to the boronic acids, the electrophiles (halides and phenolic derivatives), and heterocycle constituents.4a
-
+To make up for these shortcomings, our group recently developed a catalytic system based on copper/phenanthroline.9 The system could achieve the coupling of non-activated secondary and primary alkyl halides and arylboronic acid esters without the use of an inert atmosphere, and the system is also applicable for the various alkyhalides including iodides, bromides, and the robust chlorides. This system features high reactivity, high functional group tolerance, broad substrate scope, and can be applicable for the post-modification of various complex natural products and drug molecules.
 
-
+ 
 
-A variety of heterocyclic halides (i.e., chlorides, bromides, iodides) and phenol-derived electrophiles (i.e., carbamates, sulfamates, mesylates, and pivalates) were coupled with aryl boronic acids to give coupled products (1-7, Table 1). These results also demonstrate that heterocycles such as pyridine, pyrimidine, pyrazole, quinolone, isoquinoline, and carbazole are tolerated under these coupling conditions.
+This reaction shows a broad substrate scope (Table 1). Chain and cyclic bromination are well tolerated in the system. Substrates containing ester, ketone, amide, alkenyl and alkyne groups were all tolerated to obtain the corresponding coupling products. For the side of arylboronic acid esters, reagents with the ester, carbonyl, aldehyde, and cyanide groups all could achieve good yields after increasing the catalyst dosage. Para- and meta- substituted borate esters is not much difference in reactivity. Boric acid esters with meta- substitution or high steric hindrance require changing reaction conditions to achieve satisfactory yields. In addition, nine natural products or drug molecules, including menthol, lithocholic acid and estrone, can be post modified using this method.
 
-
-Table 1. Coupling of heterocyclic substrates with aryl boronic acids.a,b
 
 
 
  
- 
-
 
-a Conditions: NiCl2(PCy3)2 complex (5 mol %), halide substrate (1.00 equiv), aryl boronic acid (2.50 equiv), K3PO4 (4.50 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h. b Yield of product determined by 1H NMR analysis of the crude reaction mixtures using hexamethylbenzene as an internal standard. c Conditions: NiCl2(PCy3)2 complex (10 mol %), halide substrate (1.00 equiv), aryl boronic acid (4.00 equiv), K3PO4 (7.20 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h.
  
 
 
-
-
-
-The methodology could also be applied to access bis(heterocyclic) frameworks, which are prevalent motifs in numerous bioactive molecules, but are sometimes difficult to access via palladium-catalyzed methods.11 Pyridine- and pyrimidine-containing substrates were coupled with heterocyclic boronic acids to give bis(heterocycles) 8 and 9 in good to excellent yields with 1 mol% of the Ni precatalyst (Table 2). Isoquinoline- and dihydrobenzofuran-containing substrates were coupled with heterocyclic boronic acids to forge bis(heterocycles) 10 and 11 in excellent yields using 5 mol% Ni precatalyst. It should be noted that the couplings shown in Tables 1 and 2 could be achieved in the presence of 2-Me-THF or tert-amyl alcohol as the reaction medium.
-
-
-Table 2. Couplings of heterocyclic boronic acids with heterocyclic substrates. a,b­
-
-
-
- 
- 
-
-
-a Conditions: NiCl2(PCy3)2 complex (1 mol %), halide substrate (1.00 equiv), aryl boronic acid (2.50 equiv), K3PO4 (4.50 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h. b Yield of product determined by1H NMR analysis of the crude reaction mixtures using hexamethylbenzene as an internal standard. c Conditions: NiCl2(PCy3)2 complex (5 mol %), halide substrate (1.00 equiv), aryl boronic acid (4.00 equiv), K3PO4 (7.20 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h.d Conditions: NiCl2(PCy3)2 complex (10 mol %), halide substrate (1.00 equiv), aryl boronic acid (4.00 equiv), K3PO4 (7.20 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h.
- 
-
-
+Table 1. Selected Substrate Scope
 
 
 
@@ -745,50 +717,43 @@ References and Notes
  
  
  
-Department of Chemistry and Biochemistry, University of California, Los Angeles. E-mail: neilgarg@chem.ucla.edu. The authors are grateful to Boehringer Ingelheim, the ACS Green Chemistry Institute's Pharmaceutical Roundtable, Bristol-Myers Squibb, the Camille and Henry Dreyfus Foundation, the A. P. Sloan Foundation, the UCLA Gold Shield Alumnae, and the University of California, Los Angeles, for financial support. We are grateful to Bristol-Myers Squibb, the ACS Division of Organic Chemistry, the Foote and Majeti-Alapati families for fellowship support (L.H.). These studies were also supported by shared instrumentation grants from the NSF (CHE-1048804) and the National Center for Research Resources (S10RR025631).
+College of Chemistry and Chemical Engineering, Donghua University, Shanghai 201620, China; ORCID: 0000-0003-4164-0904; Email: weilongxie@dhu.edu.cn. We are grateful to the National Natural Science Foundation of China (22201034), the Natural Science Foundation of Shanghai (22ZR1402500) for generous funding.
 
  
  
-(a) Hassan, J.; Sev́ignon, M.; Gozzi, C.; Schulz, E.; Lemaire, M. Chem. Rev. 2002, 102, 1359-1470. (b) Muci, A. R.; Buchwald, S. L. In Topics in Current Chemistry; Miyaura, N., Ed.; Springer Verlag: New York, 2002; Vol. 219, pp 131-209. (c) Jiang, L.; Buchwald, S. L. In Metal-Catalyzed Cross-Coupling Reactions, 2nd ed.; Meijere, A., Diederich, F., Eds.; Wiley-VCH: Weinheim, 2004; pp 699-760. (d) Corbet, J. P.; Mignani, G. Chem. Rev. 2006, 106, 2651-2710. (e) Negishi, E. Bull. Chem. Soc. Jpn. 2007, 80, 233-257. (f) Shen, H. C. In Application of Transition Metal Catalysis in Drug Discovery and Development: An Industrial Perspective; Crawley, M. L., Trost, B. M., Eds.; John Wiley & Sons, Inc.: Hoboken, NJ, 2012; pp 25-96.
+Miyaura, N.; Yamada, K.; Suzuki, A., A new stereospecific cross-coupling by the palladium-catalyzed reaction of 1-alkenylboranes with 1-alkenyl or 1-alkynyl halides. Tetrahedron Lett. 1979, 20, 3437-3440. https://doi.org/10.1016/S0040-4039(01)95429-2.
 
  
  
-For selected recent reviews in nickel catalysis, see: (a) Tasker, S. Z.; Standley, E. A.; Jamison, T. F. Nature 2014, 509, 299-309. (b) Mesganaw, T.; Garg, N. K. Org. Process Res. Dev. 2013, 17, 29-39. (c) Yu, D.-G.; Li, B.-J.; Shi, Z.-J. Acc. Chem. Res. 2010, 43, 1486-1495. (d) Rosen, B. M.; Quasdorf, K. W.; Wilson, D. A.; Zhang, N.; Resmerita, A.-M.; Garg, N. K.; Percec, V. Chem. Rev. 2011, 111, 1346-1416. (e) Li, B.-J.; Yu, D.-G.; Sun, C.-L.; Shi, Z.-J. Chem.-Eur. J. 2011, 17, 1728-1759. (f) Cornella, J.; Zarate, C.; Martin, R. Chem. Soc. Rev. 2014, 43, 8081-8097. (g) Yamaguchi, J.; Muto, K.; Itami, K. Eur. J. Org. Chem. 2013, 19-30.
+Brown, D. G.; Boström, J., Analysis of Past and Present Synthetic Methodologies on Medicinal Chemistry: Where Have All the New Reactions Gone? J. Med. Chem. 2016, 59, 4443-4458. https://doi.org/10.1021/acs.jmedchem.5b01409.
 
  
  
-(a) Ramgren, S. D.; Hie, L.; Ye, Y.; Garg, N. K. Org. Lett. 2013, 15, 3950-3953. (b) Hie, L.; Chang, J. J.; Garg, N. K. J. Chem. Educ. 2015, 92, 571-574. (c) Hie, L.; Fine Nathel, N. F.; Hong, X.; Yang, Y.-F.; Houk, K. N.; Garg, N. K. Angew. Chem. Int. Ed. 2016, 55, 2810-2814. (d) Weires, N. A.; Baker, E. L.; Garg, N. K. Nat. Chem. 2016, 8, 75-79. (e) Hie, L.; Fine Nathel, N. F.; Shah, T. K.; Baker, E. L.; Hong, A.; Fang, Y.-F.; Liu, P.; Houk, K. N.; Garg, N. K. Nature 2015, 524, 79-83. (f) Fine Nathel, N. F.; Kim, J.; Hie, L.; Jiang, X.; Garg, N. K. ACS Catal. 2014, 4, 3289-3293. (g) Ramgren, S. D.; Hie, L.; Ye, Y.; Garg, N. K. Org. Lett. 2014, 15, 3950-3953. (h) Hie, L.; Ramgren, S. D.; Mesganaw, T.; Garg, N. K. Org. Lett. 2012, 14, 4182-4185.
+a) Littke, A. F.; Fu, G. C., A Convenient and General Method for Pd-Catalyzed Suzuki Cross-Couplings of Aryl Chlorides and Arylboronic Acids. Angew. Chem., Int. Ed. 1998, 37, 3387-3388. https://doi.org/10.1002/(SICI)1521-3773(19981231)37:24<3387::AID-ANIE3387>3.0.CO;2-P. b) Saito, S.; Sakai, M.; Miyaura, N., A synthesis of biaryls via nickel(0)-catalyzed cross-coupling reaction of chloroarenes with phenylboronic acids. Tetrahedron Lett. 1996, 37, 2993-2996. https://doi.org/10.1016/0040-4039(96)00482-0. c) Gurung, S. K.; Thapa, S.; Kafle, A.; Dickie, D. A.; Giri, R., Copper-Catalyzed Suzuki-Miyaura Coupling of Arylboronate Esters: Transmetalation with (PN)CuF and Identification of Intermediates. Org. Lett. 2014, 16, 1264-1267. https://doi.org/10.1021/ol500310u. d) Asghar, S.; Tailor, S. B.; Elorriaga, D.; Bedford, R. B., Cobalt-Catalyzed Suzuki Biaryl Coupling of Aryl Halides. Angew. Chem., Int. Ed. 2017, 56, 16367-16370. https://doi.org/10.1021/ol500310u.
 
  
  
-For selected examples of aryl C-C bond couplings using Ni catalysis, see: (a) Guan, B.-T.; Wang, Y.; Li, B.-J.; Yu, D.; Shi, Z.-J. J. Am. Chem. Soc. 2008, 130, 14468-14470. (b) Quasdorf, K. W.; Tian, X.; Garg, N. K. J. Am. Chem. Soc. 2008, 130, 14422-14423. (c) Tobisu, M.; Shimasaki, T.; Chatani, N. Angew. Chem. Int. Ed. 2008, 47, 4866- 4869. (d) Quasdorf, K. W.; Riener, M.; Petrova, K. V.; Garg, N. K. J. Am. Chem. Soc. 2009, 131, 17748-17749. (e) Antoft-Finch, A.; Blackburn, T.; Snieckus, V. J. Am. Chem. Soc. 2009, 131, 17750- 17752. (f) Xi, L.; Li, B.-J.; Wu, Z.-H.; Lu, X.-Y.; Guan, B.-T.; Wang, B.- Q.; Zhao, K.-Q.; Shi, Z.-J. Org. Lett. 2010, 12, 884-887. (g) Quasdorf, K. W.; Antoft-Finch, A.; Liu, P.; Silberstein, A. L.; Komaromi, A.; Blackburn, T.; Ramgren, S. D.; Houk, K. N.; Snieckus, V.; Garg, N. K. J. Am. Chem. Soc. 2011, 133, 6352-6363. (h) Zhang, N.; Hoffman, D. J.; Gutsche, N.; Gupta, J.; Percec, V. J. Org. Chem. 2012, 77, 5956- 5964. (i) Ge, S.; Hartwig, J. F. Angew. Chem. Int. Ed. 2012, 51, 12837- 12841.
+Luh, T.-Y.; Leung, M.-k.; Wong, K.-T., Transition Metal-Catalyzed Activation of Aliphatic C-X Bonds in Carbon-Carbon Bond Formation. Chem. Rev. 2000, 100, 3187-3204. https://doi.org/10.1021/cr990272o.
 
  
  
-For selected examples of aryl C-N bond couplings using Ni catalysis, see: (a) Ogata, T.; Hartwig, J. F. J. Am. Chem. Soc. 2008, 130, 13848-13849. (b) Gao, C.-Y.; Yang, L.-M. J. Org. Chem. 2008, 73, 1624-1627. (c) Fors, B. P.; Watson, D. A.; Biscoe, M. R.; Buchwald, S. L. J. Am. Chem. Soc. 2008, 130, 13552-13554. (d) Tobisu, M.; Shimasaki, T.; Chatani, N. Chem. Lett. 2009, 38, 710-711. (e) Shimasaki, T.; Tobisu, M.; Chatani, N. Angew. Chem. Int. Ed. 2010, 49, 2929-2932. (f) Mesganaw, T.; Silberstein, A. L.; Ramgren, S. D.; Fine Nathel, N. F.; Hong, X.; Liu, P.; Garg, N. K. Chem. Sci. 2011, 2, 1766-1771. (g) Ramgren, S. D.; Silberstein, A. L.; Yang, Y.; Garg, N. K. Angew. Chem. Int. Ed. 2011, 50, 2171-2173. (h) Ackermann, L.; Sandmann, R.; Song, W. Org. Lett. 2011, 13, 1784-1786. (i) Huang, J.-H.; Yang, L.-M. Org. Lett. 2011, 13, 3750- 3753. (j) Hie, L.; Ramgren, S. D.; Mesganaw, T.; Garg, N. K. Org. Lett. 2012, 14, 4182-4185.
+a) Zhou, J.; Fu, G. C., Suzuki Cross-Couplings of Unactivated Secondary Alkyl Bromides and Iodides. J. Am. Chem. Soc. 2004, 126, 1340-1341. https://doi.org/10.1021/ja039889k. b) González-Bobes, F.; Fu, G. C., Amino Alcohols as Ligands for Nickel-Catalyzed Suzuki Reactions of Unactivated Alkyl Halides, Including Secondary Alkyl Chlorides, with Arylboronic Acids. J. Am. Chem. Soc. 2006, 128, 5360-5361. https://doi.org/10.1021/ja0613761. c) Zultanski, S. L.; Fu, G. C., Nickel-Catalyzed Carbon-Carbon Bond-Forming Reactions of Unactivated Tertiary Alkyl Halides: Suzuki Arylations. J. Am. Chem. Soc. 2013, 135, 624-627. https://doi.org/10.1021/ja311669p. d) Balaraman, K.; Wolf, C., Palladium and Nickel Catalyzed Suzuki Cross-Coupling with Alkyl Fluorides. Org. Lett. 2021, 23, 8994-8999. https://doi.org/10.1021/acs.orglett.1c03515.
 
  
  
-For selected seminal studies on aryl C-C and C-N bond coupling using Ni catalysis, see: (a) Sengupta, S.; Leite, M.; Raslan, D. S.; Quesnelle, C.; Snieckus, V. J. Org. Chem. 1992, 57, 4066-4068. (b) Wolfe, J. P.; Buchwald, S. L. J. Am. Chem. Soc. 1997, 119, 6054- 6058. (c) Hamann, B. C.; Hartwig, J. F. J. Am. Chem. Soc. 1998, 120, 7369-7370. (d) Brenner, E.; Fort, Y. Tetrahedron Lett. 1998, 39, 5359-5362. (e) Wehn, P. M.; Du Bois, J. Org. Lett. 2005, 7, 4685- 4688.
+a) Ludwig, J. R.; Simmons, E. M.; Wisniewski, S. R.; Chirik, P. J., Cobalt-Catalyzed C(sp2)-C(sp3) Suzuki-Miyaura Cross Coupling. Org. Lett. 2021, 23, 625-630. https://doi.org/10.1021/acs.orglett.0c02934. b) Mills, L. R.; Gygi, D.; Ludwig, J. R.; Simmons, E. M.; Wisniewski, S. R.; Kim, J.; Chirik, P. J., Cobalt-Catalyzed C(sp2)-C(sp3) Suzuki-Miyaura Cross-Coupling Enabled by Well-Defined Precatalysts with L,X-Type Ligands. ACS Catal. 2022, 12, 1905-1918. https://doi.org/10.1021/acscatal.1c05586. c) Mills, L. R.; Gygi, D.; Simmons, E. M.; Wisniewski, S. R.; Kim, J.; Chirik, P. J., Mechanistic Investigations of Phenoxyimine-Cobalt(II)-Catalyzed C(sp2)-C(sp3) Suzuki-Miyaura Cross-Coupling. J. Am. Chem. Soc. 2023, 145, 17029-17041; https://doi.org/10.1021/jacs.3c02103.
 
  
  
-For solvent selection guides in medicinal chemistry, see: (a) Alfonsi, K.; Colberg, J.; Dunn, P. J.; Fevig, T.; Jennings, S.; Johnson, T. A.; Kleine, H. P.; Knight, C.; Nagy, M. A.; Perry, D. A.; Stefaniak, M. Green Chem. 2008, 10, 31-36. (b) Henderson, R. K.; Jimeńez-Gonzaĺez, C.; Constable, D. J. C.; Alston, S. R.; Inglis, G. G. A.; Fisher, G.; Sherwood, J.; Binks, S. P.; Curzons, A. D. Green Chem. 2011, 13, 854-862.
+a) Hatakeyama, T.; Hashimoto, T.; Kondo, Y.; Fujiwara, Y.; Seike, H.; Takaya, H.; Tamada, Y.; Ono, T.; Nakamura, M., Iron-Catalyzed Suzuki-Miyaura Coupling of Alkyl Halides. J. Am. Chem. Soc. 2010, 132, 10674-10676. https://doi.org/10.1021/ja103973a. b) Crockett, M. P.; Tyrol, C. C.; Wong, A. S.; Li, B.; Byers, J. A., Iron-Catalyzed Suzuki-Miyaura Cross-Coupling Reactions between Alkyl Halides and Unactivated Arylboronic Esters. Org. Lett. 2018, 20, 5233-5237. https://doi.org/10.1021/acs.orglett.8b02184. c) Crockett, M. P.; Wong, A. S.; Li, B.; Byers, J. A., Rational Design of an Iron-Based Catalyst for Suzuki-Miyaura Cross-Couplings Involving Heteroaromatic Boronic Esters and Tertiary Alkyl Electrophiles. Angew. Chem., Int. Ed. 2020, 59, 5392-5397. https://doi.org/10.1002/anie.201914315. d) Peterson, P. O.; Joannou, M. V.; Simmons, E. M.; Wisniewski, S. R.; Kim, J.; Chirik, P. J., Iron-Catalyzed C(sp2)-C(sp3) Suzuki-Miyaura Cross-Coupling Using an Alkoxide Base. ACS Catal. 2023, 13, 2443-2448. https://doi.org/10.1021/acscatal.2c05838.
 
  
  
-For the ACS Green Chemistry Institute Roundtable Solvent Selection Guide: http://www.acs.org/content/dam/acsorg/greenchemistry/industriainnovation/roundtable/acs-gci-pr-solvent-selection-guide.pdf
+Zhou, Y.; Qiu, L.; Li, J.; Xie, W. A General Copper Catalytic System for Suzuki-Miyaura Cross-Coupling of Unactivated Secondary and Primary Alkyl Halides with Arylborons. J. Am. Chem. Soc. 2023, 145, 28146-28155; https://doi.org/10.1021/jacs.3c10628.
 
  
- 
-tert-Amyl alcohol and 2-Me-THF were selected in consultation with the ACS Green Chemistry Institute. tert-Amyl alcohol is attractive due to its safety profile, low freezing point (in comparison to tert-butanol), and ability to solubilize polar compounds. 2-Me-THF is advantageous because it is obtained from renewable feedstocks and possesses many process chemistry-related over THF. For a discussion of 2-Me-THF, see: Aycock, D. F. Org. Process Res. Dev. 2007, 11, 156-159.
 
- 
- 
-For examples of Pd-catalyzed cross-coupling to access bis-heterocycles, see: (a) Zhao, D.; You, J.; Hu, C. Chem. Eur. J. 2011, 17, 5466-5492. (b) Molander, G. A.; Shin, I. Org. Lett. 2013, 15, 2534- 2537.
- 
- 
- 
+
 
 
 
@@ -802,54 +767,40 @@ For examples of Pd-catalyzed cross-coupling to access bis-heterocycles, see: (a)
  Chemical Abstracts Nomenclature (Registry Number)
 
 
-
+ 
+
+ 4-Chlorophenylboronic Acid Pinacol Ester; (195062-61-4)
 
  
- 5-Bromopyrimidine; (4595-59-9)
+ 
 
-
-
-
- 
- 3-Furanylboronic acid; (55552-70-0)
- 
-
-
+ Bromocyclohexane; (108-85-0)
 
  
- Potassium phosphate tribasic; (7778-53-2)
+ 
+
+ Copper(I) Bromide-Dimethyl Sulfide; (54678-23-8)
  
-
-
-
  
- Bis(tricyclohexylphosphine)nickel(II) chloride; (19999-87-2)
+ 
 
-
-
+ 4,7-Diphenyl-1,10-Phenanthroline; (1662-01-7)
 
  
- tert-Amyl alcohol; (75-85-4)
+ 
 
-
+ Sodium tert-butoxide; (865-48-5)
 
  
 
+ 
+
+ 
+
 
  
  
- 
-
- 
-
  
- 
-
- 
-Liana Hie was born and raised in Jakarta, Indonesia. She received her B. S. in chemistry from the University of California, Davis (UCD) in 2011. At UCD, she performed research in the laboratory of Prof. Xi Chen. She began her doctoral studies at the University of California, Los Angeles in 2011 under the supervision of Prof. Neil K. Garg. Her research focuses on the development of nickel-catalyzed cross-coupling reactions.
-
- 
-
  
 
  
@@ -858,10 +809,11 @@ Liana Hie was born and raised in Jakarta, Indonesia. She received her B. S. in c
  
 
  
-Neil Garg is a Professor of Chemistry at the University of California, Los Angeles. His laboratory develops novel synthetic strategies and methodologies to enable the total synthesis of complex bioactive molecules.
+Yonglei Zhou was born in Zhejiang in China in 1999. He graduated from Wenzhou University in 2021, and then moved to Shanghai for the Master degree under the supervision of Professor Weilong Xie in Donghua University. His research focused on the development of cross-coupling reactions using copper-catalysis.
 
  
 
+ 
  
 
  
@@ -870,10 +822,11 @@ Neil Garg is a Professor of Chemistry at the University of California, Los Angel
  
 
  
-Kristen Flynn was born and raised in New Jersey. She obtained her B.S. in chemistry from Monmouth University in 2016. During her time there, she performed research under the guidance of Prof. Massimiliano Lamberto. She has a research appointment in the Movassaghi group at MIT and will begin her Ph.D. studies at in the fall.
+Jian Li was born in Anhui in China in 2000. He graduated from Naijing Forestry University in 2022, and then moved to Shanghai for the Master degree under the supervision of Professor Weilong Xie in Donghua University. His research focused on the development of reductive coupling reactions with base metal system.
 
  
 
+ 
  
 
  
@@ -882,16 +835,34 @@ Kristen Flynn was born and raised in New Jersey. She obtained her B.S. in chemis
  
 
  
-Alyssa Antropow completed her B.S./M.S. in chemistry at Stevens Institute of Technology in 2013. As an undergraduate, she conducted research in the laboratory of Prof. A.K. Ganguly. In 2013, Alyssa began her graduate studies at MIT and joined the laboratory of Prof. Mohammad Movassaghi. Her research is focused on the total synthesis of alkaloid natural products.
+Weilong Xie was born in Taizhou of Zhejiang Province in China in 1987. He received his Bachelor degree from Zhejiang University in 2009, and obtained his Ph.D. in chemistry from Nankai University with Professor Chunming Cui in 2014. He joined Professor Sukbok Chang's Lab in 2014 as a joint postdoctoral fellow in Institute for Basic Science (IBS) and Korea Advanced Institute of Science & Technology (KAIST). In 2021, he started his independent career at the college of chemistry and chemical engineering in Donghua University. His current research interests include copper-catalyzed transformations of the inert chemical bonds, silicon chemistry, and fluorine chemistry.
 
  
 
+ 
+ 
+
+ 
+
+ 
+ 
+
+ 
+Kathryn Weber was born in Matthews, North Carolina (USA) in 1999. She received her Bachelor's degree from the University of North Carolina at Chapel Hill in 2021 where she worked with Professor Jeffrey Johnson on rhodium-catalyzed two and three component couplings employing silyl glyoxylate linchpins. She joined Professor Tehshik Yoon's Lab in Fall 2021 at the University of Wisconsin-Madison. Her current research focuses on the use of photoinduced LMCT to promote novel reactivity.
+
+ 
+
+ 
+ 
  
  
 
+ 
 
 
 Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+ 
+ 
 
 
 
