@@ -94,6 +94,7 @@ class NotesExtractor:
         self,
         source: str,
         reaction_type: str = "",
+        note_type: str = "reactions",
         save_to_literature: bool = True,
     ) -> Dict[str, Any]:
         """
@@ -103,6 +104,8 @@ class NotesExtractor:
             source: URL, file path, or raw text to process.
             reaction_type: Hint for which notes file to write to.
                            If empty, the LLM will infer it from the document.
+            note_type: Which notes subfolder to write to:
+                       "reactions" (default), "mechanisms", "substrates", "protocols".
             save_to_literature: If True and source is a URL/file, also save
                                 the raw text to the literature/ folder.
 
@@ -126,7 +129,8 @@ class NotesExtractor:
         # Pass original source so URL is embedded in the citation header
         source_url = source if source.startswith(("http://", "https://")) else ""
         extracted, detected_types = self._extract_with_llm(
-            text, source_name, reaction_type, source_url=source_url
+            text, source_name, reaction_type, source_url=source_url,
+            note_type=note_type,
         )
 
         if self.verbose:
@@ -148,14 +152,24 @@ class NotesExtractor:
 
         notes_files: List[str] = []
         for rt in types_to_file:
-            path = append_notes(rt, extracted)
+            path = append_notes(rt, extracted, note_type)
             notes_files.append(str(path))
             if self.verbose:
                 logger.info(f"[extractor] Appended to {path}")
 
+        # Rebuild index so new notes are immediately discoverable
+        try:
+            from notes.build_index import build_index
+            build_index()
+            if self.verbose:
+                logger.info("[extractor] Rebuilt notes/_index.json")
+        except Exception as exc:
+            logger.debug(f"[extractor] Could not rebuild index: {exc}")
+
         return {
             "success": True,
             "source": source_name,
+            "note_type": note_type,
             "reaction_types": types_to_file,
             "notes_files": notes_files,
             "extracted_notes": extracted,
@@ -246,6 +260,7 @@ class NotesExtractor:
         source_name: str,
         reaction_type_hint: str,
         source_url: str = "",
+        note_type: str = "reactions",
     ) -> tuple[str, List[str]]:
         """
         Call LLM to extract notes. Returns (markdown_notes, detected_reaction_types).
@@ -259,7 +274,7 @@ class NotesExtractor:
           pages: {vol, pages}
           tags: {tags}
         """
-        from .prompts import EXTRACT_NOTES_PROMPT
+        from .prompts import build_extract_prompt
         from langchain_core.messages import HumanMessage
 
         # Truncate to keep prompt manageable (LLM context limit)
@@ -268,7 +283,7 @@ class NotesExtractor:
         if len(text) > MAX_DOC:
             doc_text += f"\n\n[... document truncated at {MAX_DOC} chars for extraction ...]"
 
-        prompt = EXTRACT_NOTES_PROMPT.format(
+        prompt = build_extract_prompt(note_type).format(
             source_name=source_name,
             date=date.today().isoformat(),
             document_text=doc_text,

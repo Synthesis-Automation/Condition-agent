@@ -110,15 +110,21 @@ COMMON TOOL PATTERNS:
      []  ← no tools; answer from chemistry knowledge in the synthesis step
 
 NOTES TOOL GUIDANCE:
-   read_reaction_notes(reaction_type="suzuki_miyaura")
+   read_notes(id="suzuki_miyaura")  [also: read_reaction_notes(reaction_type=...)]
      → Use when reaction type is confirmed (HIGH or MEDIUM confidence after G0)
+     → Also works for mechanisms: read_notes(id="oxidative_addition", note_type="mechanisms")
+     → Substrates: read_notes(id="aryl_halides", note_type="substrates")
      → Run in parallel with recommend_conditions — always pair them
-     → Pass the canonical snake_case key: "suzuki_miyaura", "buchwald_hartwig", etc.
 
-   search_notes(query="copper catalyst alkyl halide sp3")
+   search_notes(query="copper catalyst alkyl halide sp3", note_types=["reactions"])
      → Use when reaction type is uncertain or for cross-cutting topics
-     → Use for troubleshooting: query describes the symptom or catalyst/condition
+     → Optional facets: bond_formed="C-N", metal="palladium", tags=["pd", "coupling"]
+     → For troubleshooting: query describes the symptom or catalyst/condition
      → Tags score higher — include catalyst name, bond type, or problem keyword
+
+   list_notes(note_type="reactions")
+     → Discover what notes are available before searching
+     → Useful for meta-questions like "what reactions do you have notes on?"
 
 HARD RULES:
    × Never call search_reaction_types before analyze_bond_changes
@@ -264,43 +270,61 @@ HARD RULES:
 # Used by NotesExtractor — NOT a query-time prompt
 # ---------------------------------------------------------------------------
 
-EXTRACT_NOTES_PROMPT = """\
-You are a chemistry knowledge curator. Your job is to read a chemistry document
-and extract generalizable, actionable knowledge that would help a bench chemist
-avoid problems and make better decisions for future reactions of the same type.
-
-━━━ SOURCE DOCUMENT ━━━
-Source: {source_name}
-Date: {date}
-
-{document_text}
-
-━━━ YOUR JOB ━━━
-
-Extract GENERALIZABLE chemistry knowledge from this document. Focus on insights
-that apply beyond this specific procedure — things a chemist should know for any
-reaction of this type.
-
-Organize your output into these sections (skip any that have no relevant content):
-
-### Reaction Type
-State the named reaction(s) this document covers and any key variants.
+_COMMON_METADATA_BLOCK = """\
 Also write these metadata lines (they will be parsed automatically):
   `reaction_types: suzuki_miyaura, negishi_coupling`   ← canonical key(s) for the notes filename
   `tags: copper, sp3_coupling, alkyl_halide, boron, NaOtBu, pressure_vessel`
   `doi: 10.15227/orgsyn.102.0086`          ← if a DOI is present in the document
-  `journal: Org. Synth.`                   ← abbreviated journal name (Org. Synth., JACS, Angew. Chem., etc.)
-  `year: 2025`                             ← publication year
-  `pages: 102, 86–99`                      ← volume, page range or article number
+  `journal: Org. Synth.`                   ← abbreviated journal name
+  `year: 2025`
+  `pages: 102, 86–99`
 
-Only write the citation lines if the information actually appears in the document — omit any that are absent.
+Only write the citation lines if the information actually appears — omit any that are absent.
 
-Tags should include 5–10 concise keywords for cross-category retrieval:
+Tags: 5–10 snake_case keywords for cross-category retrieval:
   • Metal catalysts: copper, palladium, nickel, rhodium, iron
   • Bond types: sp3_coupling, CN_coupling, CO_coupling, CC_coupling
   • Key reagents/conditions: boron, NaOtBu, toluene, microwave, pressure_vessel
   • Notable issues: beta_hydride_elimination, protodeboronation, homocoupling
-Use snake_case for multi-word terms. Do NOT include citation text in tags.
+Use snake_case for multi-word terms. Do NOT include citation text in tags.\
+"""
+
+_COMMON_RULES = """\
+━━━ RULES ━━━
+× Do NOT extract specific quantities (5 mmol, 2.0 equiv) unless they illustrate a principle
+× Do NOT extract routine workup steps
+× Do NOT copy full experimental procedures verbatim — extract the *principle*
+× Keep each bullet concise (1-2 lines)
+× Include the source name in parentheses at the end of each item
+  e.g. "Avoid DMF — proto-deboronation (Molander, Org. Syn. 2024)"\
+"""
+
+_COMMON_HEADER = """\
+You are a chemistry knowledge curator. Your job is to read a chemistry document
+and extract generalizable, actionable knowledge that would help a bench chemist
+avoid problems and make better decisions for future work of this type.
+
+━━━ SOURCE DOCUMENT ━━━
+Source: {{source_name}}
+Date: {{date}}
+
+{{document_text}}
+
+━━━ YOUR JOB ━━━
+
+Extract GENERALIZABLE chemistry knowledge from this document. Focus on insights
+that apply beyond this specific procedure.\
+"""
+
+_REACTION_SECTIONS = """\
+Organize your output into these sections (skip any that have no relevant content):
+
+### Reaction Type
+State the named reaction(s) and any key variants.
+{metadata_block}
+
+### Mechanism Overview
+Key mechanistic steps, rate-limiting step, why these conditions matter electronically/sterically.
 
 ### Solvent Notes
 Solvents to prefer or avoid, and the chemistry reason why.
@@ -309,35 +333,125 @@ Solvents to prefer or avoid, and the chemistry reason why.
 
 ### Reagent and Catalyst Notes
 Catalyst/ligand preferences, incompatibilities, or substrate-specific requirements.
-  e.g. "XPhos Pd G3 required for sterically hindered or electron-rich aryl chlorides"
-  e.g. "Avoid Pd(OAc)₂ without a phosphine ligand — rapid decomposition to Pd black"
-
-### Side Reactions
-Known side reactions, what causes them, and how to suppress them.
-  e.g. "Homocoupling of ArB(OH)₂ when Pd loading > 3 mol% or O₂ not excluded"
-  e.g. "Proto-deboronation competes above 90°C in aqueous base"
 
 ### Substrate Scope and Limitations
 What substrate classes work, what are problematic, and what modifications help.
-  e.g. "Ortho-substituted aryl bromides: require bulky ligand (SPhos, XPhos)"
-  e.g. "Electron-deficient heteroaryl chlorides: lower reactivity, increase temp to 100°C"
+
+### Functional Group Tolerance
+Explicit list of FGs tolerated vs. incompatible:
+  ✓ Tolerates: ester, nitrile, Boc-amine
+  ✗ Incompatible: free amine (coordinates catalyst), aldehyde
 
 ### Critical Conditions
-Temperature, atmosphere, addition order, concentration, or timing effects that matter.
-  e.g. "Add base LAST to prevent premature boronate hydrolysis"
-  e.g. "Degassing is critical — O₂ deactivates Pd catalyst rapidly"
+Temperature, atmosphere, addition order, concentration, or timing effects.
+
+### Side Reactions
+Known side reactions, what causes them, and how to suppress them.
+
+### Procedure Hints
+Addition order, atmosphere requirements, key observations (not full procedures).
+
+### Scale-up Notes
+What changes at larger scale: concentration, heat transfer, mixing, exotherm management.
+
+### Analytical Notes
+TLC Rf values, NMR monitoring tips, LCMS signatures for tracking progress.
 
 ### Yield / Troubleshooting Tips
-Practical observations from this source on improving outcomes.
-
-━━━ RULES ━━━
-× Do NOT extract specific quantities (5 mmol, 2.0 equiv) unless they illustrate a principle
-× Do NOT extract routine workup steps
-× Do NOT copy full experimental procedures verbatim — extract the *principle*
-× Keep each bullet concise (1-2 lines)
-× Include the source name in parentheses at the end of each item
-  e.g. "Avoid DMF — proto-deboronation (Molander, Org. Syn. 2024)"
+Practical observations from this source on improving outcomes.\
 """
+
+_MECHANISM_SECTIONS = """\
+Organize your output into these sections (skip any that have no relevant content):
+
+### Mechanism Overview
+What this mechanistic step is, which reactions it appears in, and why it matters.
+{metadata_block}
+
+### Elementary Steps
+Step-by-step description of the process with key intermediates.
+
+### Electronic Factors
+How ligand or substrate electronics affect rate or selectivity.
+
+### Steric Factors
+How ligand or substrate sterics affect rate or selectivity.
+
+### Competing Pathways
+What can compete or go wrong (e.g. β-H elimination vs. reductive elimination).
+
+### Examples
+Named reactions where this step is rate-limiting or selectivity-determining.\
+"""
+
+_SUBSTRATE_SECTIONS = """\
+Organize your output into these sections (skip any that have no relevant content):
+
+### Overview
+Reactivity, bond character, key properties of this substrate class.
+{metadata_block}
+
+### Reactivity Trends
+Relative order within the class, electronic and steric effects.
+
+### Functional Group Compatibility
+What FGs on the substrate are tolerated vs. problematic in reactions.
+
+### Preparation / Availability
+How to make or source; common commercial forms and purification notes.
+
+### Handling and Stability
+Storage, moisture/air sensitivity, shelf life.
+
+### Used In Reactions
+Which reactions use this substrate class, with notes on conditions and limitations.\
+"""
+
+_PROTOCOL_SECTIONS = """\
+Organize your output into these sections (skip any that have no relevant content):
+
+### Purpose
+What problem this protocol solves.
+{metadata_block}
+
+### When to Use
+Which reactions or conditions require this protocol.
+
+### Steps
+Key procedural steps (principles, not specific quantities).
+
+### Common Mistakes
+What goes wrong and how to avoid it.
+
+### Variations
+Alternative approaches (e.g. Schlenk vs. glovebox, balloon vs. Schlenk line).\
+"""
+
+_SECTION_MAP = {
+    "reactions": _REACTION_SECTIONS,
+    "mechanisms": _MECHANISM_SECTIONS,
+    "substrates": _SUBSTRATE_SECTIONS,
+    "protocols": _PROTOCOL_SECTIONS,
+}
+
+
+def build_extract_prompt(note_type: str = "reactions") -> str:
+    """
+    Build the LLM extraction prompt for a given note type.
+
+    Args:
+        note_type: "reactions", "mechanisms", "substrates", or "protocols".
+
+    Returns:
+        A format string with {source_name}, {date}, {document_text} placeholders.
+    """
+    sections_template = _SECTION_MAP.get(note_type, _REACTION_SECTIONS)
+    sections = sections_template.format(metadata_block=_COMMON_METADATA_BLOCK)
+    return _COMMON_HEADER + "\n\n" + sections + "\n\n" + _COMMON_RULES
+
+
+# Backward-compatible constant (reaction notes only)
+EXTRACT_NOTES_PROMPT = build_extract_prompt("reactions")
 
 
 # ---------------------------------------------------------------------------

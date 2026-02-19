@@ -432,6 +432,8 @@ def _cmd_intake(args: argparse.Namespace) -> None:
     print(f"  {C.META}Source:{C.R} {C.DIM}{args.source!r}{C.R}")
     if args.reaction_type:
         print(f"  {C.META}Hint:{C.R}   {C.DIM}{args.reaction_type}{C.R}")
+    note_type = getattr(args, "note_type", "reactions") or "reactions"
+    print(f"  {C.META}Type:{C.R}   {C.DIM}{note_type}{C.R}")
     print()
 
     spinner = Spinner("Extracting notes")
@@ -443,6 +445,7 @@ def _cmd_intake(args: argparse.Namespace) -> None:
         result = extractor.intake(
             source=args.source,
             reaction_type=args.reaction_type or "",
+            note_type=note_type,
             save_to_literature=not args.no_save,
         )
     except Exception as exc:
@@ -534,6 +537,11 @@ Examples:
     intake_parser.add_argument(
         "--reaction-type", default="",
         help="Hint for reaction type (e.g. suzuki_miyaura). Auto-detected if omitted.",
+    )
+    intake_parser.add_argument(
+        "--note-type", default="reactions",
+        choices=["reactions", "mechanisms", "substrates", "protocols"],
+        help="Which notes subfolder to write to (default: reactions).",
     )
     intake_parser.add_argument(
         "--no-save", action="store_true",
