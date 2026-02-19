@@ -6,10 +6,17 @@ Wraps the HTE-based condition recommender:
 """
 from __future__ import annotations
 
+import pathlib
 from typing import Any, Dict
 
 from ._helpers import _error, _success, _to_jsonable
 from ._base import ToolPlugin
+
+# Absolute path to HTE_db — resolved from this file's location so it works
+# regardless of the current working directory when the CLI is invoked.
+_HTE_DB_PATH = str(
+    pathlib.Path(__file__).parent.parent.parent / "data" / "HTE_db"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -38,7 +45,11 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
     try:
         from chemtools.recommend.hte_adapter import recommend_from_reaction
 
-        raw = recommend_from_reaction(reaction_smiles, k=max(top_k * 2, 25))
+        raw = recommend_from_reaction(
+            reaction_smiles,
+            k=max(top_k * 2, 25),
+            hte_db_path=_HTE_DB_PATH,
+        )
         if not raw:
             return _success({
                 "reaction_smiles": reaction_smiles,
