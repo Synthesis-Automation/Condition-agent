@@ -20,6 +20,9 @@ Features:
 """
 from __future__ import annotations
 
+import warnings
+warnings.filterwarnings("ignore", message="pkg_resources is deprecated", category=UserWarning)
+
 import argparse
 import json
 import os

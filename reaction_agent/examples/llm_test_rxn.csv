@@ -1,8 +1,0 @@
-rare C_N coupling,Clc1nc2ccccc2s1.Cn1ccnc1>>CN1C=C[N+](C2=NC3=CC=CC=C3S2)=C1.[F-][P+5]([F-])([F-])([F-])([F-])[F-]
-rare three member rings,Clc1ccccn1.[N-]=[N+]=NCc1ccc(C2=NC2)cc1>>[N-]=[N+]=NCc1ccc(-c2cnc3ccccn23)cc1
-iodoium substitution,Cc1cc(C)cc(-c2ccc([I+]c3ccccc3)c(CCN(O[Si](C)(C)C(C)(C)C)C(=O)OC(C)(C)C)c2)c1.Cc1ccc(S(=O)(=O)[O-])cc1>>Cc1cc(C)cc(-c2ccc3[nH]ccc3c2)c1
-tandem reactions,c1ccc2c(c1)[nH]c1ccccc12.Fc1ccc(I)cc1.C#Cc1ccc(CC)cc1>>CCc1ccc(C#Cc2ccc(-n3c4ccccc4c4ccccc43)cc2)cc1
-,NC=O.Cc1cc(Br)c2c(c1)C(C)(C)c1cc(C)cc(Br)c1O2>>Cc1cc(NC=O)c2c(c1)C(C)(C)c1cc(C)cc(NC=O)c1O2
-,Nc1cccc(Br)c1.c1ccc2[nH]nnc2c1>>Brc1cccc(-n2nnc3ccccc32)c1
-,c1cn[nH]c1.CN1CCc2ccccc21.Brc1cccc(SSc2cccc(Br)c2)c1>>Cn1c(-n2cccn2)c(Sc2cccc(Br)c2)c2cc(Sc3cccc(Br)c3)ccc21
-,C1CNCCOCCOCCOCCOCCN1.Clp1oc2ccc3ccccc3c2c2c(ccc3ccccc32)o1>>c1ccc2c(c1)ccc1op(N3CCOCCOCCOCCOCCN(p4oc5ccc6ccccc6c5c5c(ccc6ccccc65)o4)CC3)oc3ccc4ccccc4c3c12

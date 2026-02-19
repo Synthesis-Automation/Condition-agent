@@ -37,7 +37,7 @@ def _search_reaction_types(query: str) -> Dict[str, Any]:
         dict with matches list (id, name, description, score, catalysts).
     """
     try:
-        from reaction_agent.taxonomy_prompts import TaxonomyContext
+        from chem_coworker.taxonomy_prompts import TaxonomyContext
         ctx = TaxonomyContext()
         results = ctx.search_reaction_types(query)
         if not results:
@@ -82,7 +82,7 @@ def _search_motifs(scaffold: str = "", substituent: str = "") -> Dict[str, Any]:
         dict with matches list (motif_id, scaffold, substituent).
     """
     try:
-        from reaction_agent.taxonomy_prompts import TaxonomyContext
+        from chem_coworker.taxonomy_prompts import TaxonomyContext
         ctx = TaxonomyContext()
         results = ctx.search_motifs(scaffold=scaffold, substituent=substituent)
         return _success({
