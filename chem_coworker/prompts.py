@@ -90,8 +90,18 @@ SMILES found in query: {smiles_list}
    • recommend_conditions needs detect_reaction_type to have run first
 
 COMMON TOOL PATTERNS:
-   Reaction analysis + conditions:
-     [normalize + detect] → [bond_changes + FG] → [search_types] → [conditions]
+   Reaction analysis + conditions (standard):
+     [normalize + detect] → [bond_changes + FG + read_reaction_notes] → [conditions]
+     ↑ read_reaction_notes runs in parallel with bond_changes, using the detected reaction type
+
+   Reaction analysis + conditions (low confidence / uncertain type):
+     [normalize + detect] → [bond_changes + FG + search_notes] → [search_types] → [conditions]
+     ↑ search_notes by catalyst/bond type when reaction type is uncertain
+
+   Troubleshooting / "why did my reaction fail?":
+     [search_notes(query="symptom + reaction type") + read_reaction_notes]
+     ↑ notes often contain the exact warning the user is experiencing
+
    Molecule Q&A:
      [inspect_FGs + get_descriptors]
    Reagent lookup:
@@ -99,11 +109,23 @@ COMMON TOOL PATTERNS:
    Concept explanation:
      []  ← no tools; answer from chemistry knowledge in the synthesis step
 
+NOTES TOOL GUIDANCE:
+   read_reaction_notes(reaction_type="suzuki_miyaura")
+     → Use when reaction type is confirmed (HIGH or MEDIUM confidence after G0)
+     → Run in parallel with recommend_conditions — always pair them
+     → Pass the canonical snake_case key: "suzuki_miyaura", "buchwald_hartwig", etc.
+
+   search_notes(query="copper catalyst alkyl halide sp3")
+     → Use when reaction type is uncertain or for cross-cutting topics
+     → Use for troubleshooting: query describes the symptom or catalyst/condition
+     → Tags score higher — include catalyst name, bond type, or problem keyword
+
 HARD RULES:
    × Never call search_reaction_types before analyze_bond_changes
    × Never call a tool just to tick a box — ask "what gap does this close?"
    × Do NOT call tools you don't need — HIGH confidence = fewer tool calls
    × Treat OTf⁻, BF₄⁻, PF₆⁻ as spectators; they are NOT electrophiles
+   × Always pair read_reaction_notes with recommend_conditions when calling both
 """
 
 
@@ -157,6 +179,10 @@ Specific guidance:
   • Always flag: missing conditions (catalyst/base implied but absent from SMILES),
     uncertainty, or cases where experimental verification is needed
   • State your confidence and any important caveats
+  • If read_reaction_notes or search_notes returned content, integrate those warnings
+    and caveats prominently — they come from real experimental sources and often contain
+    the most practically important information (side reactions, workup pitfalls, etc.).
+    Cite the source file when quoting a specific note (e.g. "per suzuki_miyaura.md:").
 
 Format: conversational expert text (default).
 If the user asked for JSON or structured output, provide that instead.

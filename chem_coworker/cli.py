@@ -5,12 +5,13 @@ Usage:
     python chem_coworker/cli.py                                   # interactive chat
     python chem_coworker/cli.py --model gpt-5.2 --provider openai
     python chem_coworker/cli.py --model glm-5 --provider aliyun
+    python chem_coworker/cli.py setup                             # choose & save default model
     python chem_coworker/cli.py intake <source>                   # intake a document
     python chem_coworker/cli.py intake https://...                # fetch + extract URL
     python chem_coworker/cli.py intake paper.pdf --reaction-type suzuki_miyaura
 
 Features:
-  - Interactive model selector at startup
+  - Saved model preference (~/.chemcoworker/config.json)
   - Multi-turn conversation with history
   - Shows plan, tools, and answer in Claude Code-style output
   - Spinner animation during LLM calls
@@ -20,10 +21,12 @@ Features:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import threading
 import time
+from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 if TYPE_CHECKING:
@@ -111,6 +114,34 @@ def select_model_interactive() -> Dict[str, str]:
         pass
     print(f"  {C.DIM}Invalid — using default (o4-mini){C.R}")
     return SELECTABLE_MODELS[0]
+
+
+# ---------------------------------------------------------------------------
+# Config file (saved model preference)
+# ---------------------------------------------------------------------------
+
+_CONFIG_PATH = Path.home() / ".chemcoworker" / "config.json"
+_DEFAULT_MODEL = {"name": "o4-mini", "provider": "openai"}
+
+
+def _load_config() -> Dict[str, str]:
+    """Load saved model config. Returns default if file is missing or corrupt."""
+    try:
+        data = json.loads(_CONFIG_PATH.read_text(encoding="utf-8"))
+        if "name" in data and "provider" in data:
+            return {"name": data["name"], "provider": data["provider"]}
+    except Exception:
+        pass
+    return _DEFAULT_MODEL.copy()
+
+
+def _save_config(model: str, provider: str) -> None:
+    """Persist model choice to ~/.chemcoworker/config.json."""
+    _CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    _CONFIG_PATH.write_text(
+        json.dumps({"name": model, "provider": provider}, indent=2),
+        encoding="utf-8",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -232,13 +263,44 @@ def _print_response(response: "ChemResponse", verbose: bool = False) -> None:
 # Main CLI loop
 # ---------------------------------------------------------------------------
 
+def _cmd_setup(args: argparse.Namespace) -> None:  # noqa: ARG001
+    """Handle the 'setup' subcommand — choose and save default model."""
+    print()
+    print(f"  {C.LABEL}◆ ChemCoworker Setup{C.R}  {C.DIM}Choose your default model{C.R}")
+    print(f"  {_SEP}")
+
+    # Show current saved model (if any)
+    current = _load_config()
+    current_label = f"{current['name']}  ({current['provider']})"
+    print(f"  {C.META}Current:{C.R}  {C.DIM}{current_label}{C.R}")
+    print()
+
+    selected = select_model_interactive()
+    _save_config(selected["name"], selected["provider"])
+
+    provider_color = C.CYAN if selected["provider"] == "openai" else C.MAGENTA
+    print()
+    print(
+        f"  {C.OK}✓{C.R}  Saved  "
+        f"{C.BOLD}{selected['name']}{C.R}  "
+        f"{provider_color}{selected['provider']}{C.R}"
+    )
+    print(f"  {C.META}Config:{C.R}  {C.DIM}{_CONFIG_PATH}{C.R}")
+    print()
+
+
 def _cmd_intake(args: argparse.Namespace) -> None:
     """Handle the 'intake' subcommand."""
     import time as _time
     from chem_coworker.extractor import NotesExtractor
 
-    model = args.model or "o4-mini"
-    provider = args.provider or ("aliyun" if model in _ALIYUN_MODELS else "openai")
+    if args.model is not None:
+        model = args.model
+        provider = args.provider or ("aliyun" if model in _ALIYUN_MODELS else "openai")
+    else:
+        saved = _load_config()
+        model = saved["name"]
+        provider = args.provider or saved["provider"]
 
     print()
     print(f"  {C.LABEL}◆ ChemCoworker Intake{C.R}  {C.DIM}Document → Notes{C.R}")
@@ -323,6 +385,12 @@ Examples:
 
     subparsers = arg_parser.add_subparsers(dest="command")
 
+    # ── setup subcommand ──────────────────────────────────────────────
+    subparsers.add_parser(
+        "setup",
+        help="Choose and save your default model (written to ~/.chemcoworker/config.json)",
+    )
+
     # ── intake subcommand ─────────────────────────────────────────────
     intake_parser = subparsers.add_parser(
         "intake",
@@ -351,7 +419,10 @@ Examples:
 
     args = arg_parser.parse_args()
 
-    # ── Route to intake subcommand ────────────────────────────────────
+    # ── Route to subcommands ──────────────────────────────────────────
+    if args.command == "setup":
+        _cmd_setup(args)
+        return
     if args.command == "intake":
         _cmd_intake(args)
         return
@@ -362,14 +433,14 @@ Examples:
     print(f"  {C.META}General-purpose chemistry Q&A, analysis, and prediction{C.R}")
     print(f"  {_SEP}")
 
-    # ── Model selection ───────────────────────────────────────────────
-    if args.model is None:
-        selected = select_model_interactive()
-        model = selected["name"]
-        provider = selected["provider"]
-    else:
+    # ── Model resolution (CLI flag > saved config > built-in default) ─
+    if args.model is not None:
         model = args.model
         provider = args.provider or ("aliyun" if model in _ALIYUN_MODELS else "openai")
+    else:
+        saved = _load_config()
+        model = saved["name"]
+        provider = args.provider or saved["provider"]
 
     # ── API key check ─────────────────────────────────────────────────
     key_env = f"{provider.upper()}_API_KEY"
@@ -380,7 +451,7 @@ Examples:
 
     provider_color = C.CYAN if provider == "openai" else C.MAGENTA
     print(f"\n  {C.META}Using{C.R}  {C.BOLD}{model}{C.R}  {provider_color}{provider}{C.R}")
-    print(f"  {C.META}Type{C.R}  {C.DIM}exit · clear · tools{C.R}")
+    print(f"  {C.META}Type{C.R}  {C.DIM}exit · clear · tools  (run 'setup' to change model){C.R}")
 
     # ── Example queries ───────────────────────────────────────────────
     print(f"\n  {C.META}Examples:{C.R}")

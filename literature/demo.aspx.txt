@@ -454,12 +454,12 @@ Procedure related questions
  
 
 
- Org. Synth. 2020, 97, 314-326
+ Org. Synth. 2016, 93, 306-318
 
 
-DOI: 10.15227/orgsyn.097.0314
+DOI: 10.15227/orgsyn.093.0306
 
-Preparation of 1H-Indazole-3-carbonitrile
+Nickel-Catalyzed Suzuki-Miyaura Coupling in t-Amyl Alcohol for the Preparation of 5-(Furan-3-yl)pyrimidine
 
 
 
@@ -479,90 +479,146 @@ Preparation of 1H-Indazole-3-carbonitrile
 
 
 
-Submitted by Yonggang Chen,1* Qinghao Chen, Lushi Tan, Lu Chen, † and Xiaowei Wang†
-
+Submitted by Liana Hie and Neil K. Garg*1
 
 
 
 
-Checked by Yuma Komori, Masanori Nagatomo, and Masayuki Inoue
+Checked by Kristen Flynn, Alyssa Antropow, and Mohammad Movassaghi
 
 
 
-
-
 
-1. Procedure (Note 1)
+1. Procedure
 
  
 
  
-A.1H-Indazole-3-carbonitrile (1). A 500-mL, four-necked, round-bottomed flask is equipped with a 4 cm Teflon-coated football-shaped magnetic stir bar. The left neck is equipped with a 20 cm Dimroth condenser, which is connected to an argon bubbler. The front neck is equipped with a needle to inject argon gas inserted through a 15/25 rubber septum. The right neck is equipped with a thermocouple inserted through a 15/25 rubber septum. The central neck is equipped with a connecting adapter (lower outer joint 29/42, upper inner joint 15/25) and a 200 mL pressure-equalizing addition funnel (15/25 joint). 3-Iodo-1H-indazole (20 g, 82 mmol, 1 equiv) (Note 2) is added from the central neck, and then the flask is evacuated and backfilled with argon three times (Figures 1 and 2). Dimethylacetamide (DMAc, 160 mL) (Note 3) is added from a pressure-equalizing addition funnel. The flask is immersed in a silicone oil bath. The light-yellow solution is bubbled with argon for 1 h at 27 °C (150 mL/min). 
-
+5-(Furan-3-yl)pyrimidine. A 1000-mL round-bottomed flask is charged with a Teflon-coated, octagon-shaped magnetic stir bar (4.0 x 0.5 cm) and K3PO4 (60.0 g, 283 mmol, 4.50 equiv), and then attached to a gas inlet adapter (90°). The flask and its contents are flame-dried (Note 1) under oil pump vacuum (1.0 mmHg) for ca. 5 min (Note 2). After cooling to 23 °C under nitrogen, the gas inlet adapter is removed and the flask is charged with 5-bromopyrimidine (10.0 g, 63.0 mmol, 1 equiv), 3-furanylboronic acid (17.6 g, 158 mmol, 2.50 equiv), and NiCl2(PCy3)2 (0.220 g, 0.315 mmol, 0.500 mol%) (Note 3). The flask is equipped with a 24/40 oven-dried reflux condenser and a septum with a needle, and then evacuated and backfilled with nitrogen (3x). tert-Amyl alcohol (210 mL, 0.3 M) is added via cannula from an oven-dried, argon purged graduated cylinder through the septum under a flow of argon. The resulting reddish heterogeneous mixture is stirred at 23 °C for 1 h under positive nitrogen pressure (Figure 1) (Note 4).
+ 
 
  
  
 
- 
-Figures 1 and 2. Reaction set-up (photos provided by checker)
+
+Figure 1. Reddish heterogeneous mixture formed after mixing the reagents (Photo provided by Submitters)
 
-Potassium ferrocyanide (K4[Fe(CN)6]·3H2O , 17.3 g, 41 mmol, 0.5 equiv) (Note 4) is added from the central neck, and the mixture is heated to 40 °C. Water (120 mL) (Note 5) is added slowly from a pressure-equalizing addition funnel over 5 min, and the mixture is heated to 60 °C. The mixture is bubbled with argon for 1 h (150 mL/min). Allylpalladium(II) chloride dimer ([PdCl(C3H5)]2, 150 mg, 0.41 mmol, 0.5 mol%) (Note 6) and Xantphos (0.474 g, 0.82 mmol, 1 mol%) (Note 7) are added into the mixture from the central neck, then the neck is sealed with Teflon tape. The resulting yellow slurry is heated to 95 °C and aged with stirring for 14 h (Figure 3). Argon flow is kept during the reaction (300 mL/min) (Note 8). After completion of the reaction, the mixture is cooled to 25 °C (Figure 4). The completion of the reaction is checked by TLC (Note 9). Water (60 mL) is added and followed by 2-methyltetrahydrofuran (2-MeTHF, 140 mL) (Note 10) from a pressure-equalizing addition funnel and aged with stirring for 0.5 h. Then, the mixture is transferred to 2 L separatory funnel. The aqueous layer is separated and back-extracted with 2-MeTHF (1 × 140 mL, and 5 × 100 mL). 
+
 
 
- 
- 
 
- 
-Figure 3. Reaction mixture at 95 oC (photo provided by checker) 
+
+The reaction vessel containing a brown heterogeneous mixture and equipped with a reflux condenser is placed into a pre-heated oil bath set at a temperature of 120 °C (Figure 2) (Note 5).
 
 
 
  
  
 
- 
-Figure 4. Appearance at completion of reaction (photo provided by checker) 
+
+Figure 2. Brown heterogeneous mixture resulted after stirring at 120 °C for 1 h (Photo provided by Submitters)
 
- 
-
- 
- 
-
- 
-Figure 5. Reaction mixture in separatory funnel after aqueous wash (photo provided by checker)
-
-The combined organic layers are washed with aqueous sodium sulfate (aqueous Na2SO4, 150 mL, 0.35 N) (Note 11) (Figure 5), dried over Na2SO4, and filtered through a filter funnel fitted with a plug of glass wool into a 2 L round-bottomed flask. The organic layer is concentrated by rotary evaporation under vacuum (39 °C, 780 to 60 mmHg, 25 min) to give a solution of 1H-indazole-3-carbonitrile in DMAc.
 
 
-The 1H-indazole-3-carbonitrile DMAc solution is transferred into a 500 mL, three-necked, round-bottomed flask, and concentrated to approximately 40 mL by rotary evaporation under vacuum (39 °C, 780 to 14 mmHg, 30 min). The flask is equipped with a 4 cm Teflon-coated football-shaped magnetic stir bar. The left neck is equipped with a 15/25 rubber septum. The right neck is equipped with a thermocouple inserted through a 15/25 rubber septum. The central neck is equipped with a connecting adapter (lower outer joint 29/42, upper inner joint 15/25) and a 100 mL pressure-equalizing addition funnel (15/25 joint) (Figure 6). Water (100 mL) is added slowly from a pressure-equalizing addition funnel over 4 min, and the mixture is stirred at 25 °C for 0.5 h. 
+
+
 
-
- 
- 
-
- 
-Figure 6. Reaction set-up prior to addition of water (photo provided by checker)
-
-Water (100 mL) is added slowly from a pressure-equalizing addition funnel over 4 min, and the mixture is stirred at 25 °C for 2 h (Figure 7). The mixture is filtered through Kiriyama-funnel (SU-60, filter paper: No.5B, 60 mmφ) and washed with water (60 mL). The obtained wet cake (15.29 g) is dried under vacuum (28 °C, 0.8 mmHg, 17 h). A light-yellow solid (11.32 g, 96%) is obtained with 97.1% purity as determined by qNMR analysis (Notes 12, 13, and 14) (Figure 8).
+After stirring for 1 h, the reaction vessel containing a brown greenish heterogeneous mixture is removed from the oil bath and cooled to 23 °C. Thin layer chromatography is performed to check the progress of the reaction (hexanes:EtOAC = 3:1, Rf = 0.31) (Figure 3). Into the flask is added deionized water (100 mL) and Et2O (200 mL), and the resulting mixture is stirred for 15 min (Figure 4).
 
 
 
  
  
 
- 
-Figure 7. Crystallization slurry (photo provided by checker)
+
+Figure 3. Thin layer chromatography of the crude reaction mixture (left lane = 5-bromopyrimidine, middle lane = cross spots of 5-bromopyrimidine and the reaction mixture, right lane = reaction mixture) (Photo provided by Submitters)
+
+
+
 
 
 
  
  
 
+
+Figure 4. Brown homogenous mixture was formed upon stirring with water and diethyl ether (Photo provided by Submitters)
+
+
+
+
+
+
+The combined mixture is then poured into a 1000-mL separatory funnel. The reaction flask is rinsed once with H2O (100 mL) and Et2O (100 mL), and both washes are transferred to the separatory funnel (Figure 5a). The organic and aqueous layers are separated. The organic layer is washed sequentially with 1.0 M NaOH (2 x 200 mL) (Figure 5b) and saturated sodium chloride solution (200 mL) (Figure 5c).
+
+ 
+ 
+ 
  
-Figure 8. Isolated product (photo provided by checker)
+
+ 
+
+
+ 
+ 
+
+
+ 
+
+
+ 
+ 
+
+
+ 
+
+
+ 
+ 
+
 
  
 
+ 
+
+ 
+
+(a)
+
+
+ 
+
+(b)
+
+
+ 
+
+(c)
+
+
+ 
+
+ 
+
+
+Figure 5. (a) The reaction mixture with water and diethyl ether in a separatory funnel. (b) The organic layer and 1.0 M NaOH. (c) The organic layer and saturated sodium chloride (Photo provided by Submitters)
+
+ 
+
+
+
+
+The organic layer is then dried over Na2SO4 (100 g) for 15 min and filtered over a 150-mL glass-fritted filter packed with celite (30 g). The drying agent is rinsed with Et2O (100 mL) and the combined organics are concentrated by rotary evaporation (275 mmHg, 30 °C to remove Et2O and 30 mmHg, 50 °C to remove tert-amyl alcohol, The temperature was controlled by a water bath). In a 500-mL round-bottomed flask fitted with a 24/40 reflux condenser, the tan solid is dissolved in 200 mL of hexanes, which is brought to 80 °C by heating in an oil bath (Notes 6 and 7). Upon complete dissolution, the filtrate is allowed to cool to room temperature and then cooled at -20 °C for 12 h. The light tan crystals that form are collected by filtration on a 150 mL fritted funnel and washed with 100 mL of ice-cold hexane (0 °C). The resulting crystals are transferred to a 100 mL round-bottomed flask and then dried under oil pump vacuum (1.0 mmHg, 23 °C) for 8 h. The mother liquor is concentrated and a second recrystallization is performed to afford additional 5-(furan-3-yl)pyrimidine (total yield of both crops is 7.60 g, 83% yield) as a light tan crystalline solid (Notes 8 and 9).
+
+
+ 
+ 
+
+
+Figure 6. Product collected as light tan crystalline solid (Photo provided by Submitters)
+
+
+ 
  
 
  
@@ -574,69 +630,41 @@ Figure 8. Isolated product (photo provided by checker)
  
  
 
-1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/content/acs/en/about/governance/committees/chemicalsafety/hazard-assessment.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with 3-iodo-1H-indazole, K4[Fe(CN)6]·3H2O, allylpalladium(II) chloride dimer, Xantphos, Na2SO4, DMAc, and 2-MeTHF.
+1. Heat resistant gloves should be worn to prevent burns.
 
 
 
-2. 3-Iodo-1H-indazole (>95%, Bide Pharmatech Ltd.) was used as received (submitters). 3-Iodo-1H-indazole (98%, Combi-Blocks) was used as received (checkers).
+2. Submitters observed bubbling upon flame-drying likely due to water content. Checkers used anhydrous base and did not observe bubbling.
 
 
 
-3. DMAc (>98%, Richjoint) was used as received (submitters). DMAc (>99.5%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+3. Potassium phosphate tribasic (anhydrous) was purchased from Alfa-Aesar. 5-Bromopyrimidine (98%) and 3-furanylboronic acid (96%) were purchased from Combi-Blocks, Inc. and used as received. Bis(tricyclohexylphosphine)nickel(II) chloride (97%) and tert-amyl alcohol (ReagentPlus, 99%) were purchased from Sigma-Aldrich and used as received.
 
 
 
-4. Potassium ferrocyanide (K4[Fe(CN)6]·3H2O (>99%, Shanghai Experiment Reagent Co., Ltd.) was used as received (submitters). Potassium ferrocyanide (K4[Fe(CN)6]·3H2O (>99.5%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+4. The reaction mixture was stirred at 900 rpm.
 
 
 
-5. Water is bubbled with nitrogen for 1 h before the charge (submitters). Water is bubbled with argon for 1 h before the charge (checkers).
+5. Temperature was monitored by a thermocouple placed directly in the oil bath.
 
 
 
-6. Allylpalladium(II) chloride dimer (56%~59%Pd, Zhejiang Metallurgical Research Institute Co., Ltd.) was used as received (submitters). Allylpalladium(II) chloride dimer (57.2%~59.2%Pd, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+6. Submitters recommend an extra quantity of EtOAc can be added to aid dissolution, if necessary. Checkers did not use any EtOAc during recrystallizations.
 
 
 
-7. Xantphos (>99%, Puyang Huicheng Electronic Material Co., Ltd.) was used as received (submitters). Xantphos (>98%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+7. Hot filtration using a 150 mL fritted funnel can be performed to remove any brown residue, if needed. Checkers performed recrystallization with and without hot filtration, and no difference in purity was observed. Procedure for hot filtration: Glassware had been heated in the oven at 200 °C for ca. 30 min and was used within five min of removal from the oven. The hot hexanes solution (80 °C) is filtered through a glass-fritted funnel into an Erlenmeyer flask. If room-temperature glassware is used for this procedure, the product precipitates.
 
 
 
-8. In 1 g-scale test runs, 1 was obtained in 3% yield without any argon flow, and 1 and starting material were obtained in 60% and 30% yields, respectively, with slow argon flow (10 mL/min).
+8. A second run was performed at half scale, which provided 3.75 g (82%) of the product.
 
 
 
-9. TLC analysis of the reaction mixture was shown below. The Rf value of the product and 3-iodo-1H-indazole in hexane/EtOAc (2/1, v/v) was 0.46 and 0.32, respectively. The spot of the product can be viewed by fluorescence on silica gel 60 F254 plates (TLC Silica gel 60 F254, purchased from Merck KGaA) with UV light (254 nm).
-
-
+9. This compound exhibits the following physiochemical properties: mp = 80-81 °C; TLC (hexanes:EtOAc = 3:1), Rf = 0.31; 1H NMR pdf(400 MHz, CDCl3) δ: 6.73 (dd, J = 1.9, 0.9 Hz, 1H), 7.57 (t, J = 1.7 Hz, 1H), 7.84 (dd, J = 1.5, 0.9 Hz, 1H), 8.85 (s, 2H), 9.12 (s, 1H); 13C NMR pdf(125 MHz, CDCl3) δ: 108.1, 120.0, 126.7, 139.5, 144.7, 153.7, 157.2; IR (film): 3136, 3112, 3041, 1969, 1957, 1880, 1607, 1575, 1549, 1513, 1438, 1414, 1340, 1187, 1159, 1091, 1061, 1012, 924, 871, 790, 732, 721, 645, 634; HRMS-ESI (m/z) cacld for C8H7N2O [M+H]+: 147.0553, found: 147.0547; Anal. Calcd for C8H6N2O: C 65.75, H 4.14, N 19.17, found: C 65.65, H 4.25, N 19.01.
  
- 
-
- 
-Figure 9. TLC analysis of reaction mixture (photo provided by checker)
-
-
-
-
-
-10. 2-MeTHF (>99%, Shandong Yinuo Biomass Material Co., Ltd.) was used as received. 2-MeTHF (98%, contains 0.025% 2,6-di-t-butyl-4-methylphenol as stabilizer, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
-
-
-
-11. Na2SO4 (>99%, Chinasun Specialty Products Co., Ltd.) was used as received. Na2SO4 (>99%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
-
-
-
-12. When the reaction was carried out on a 12 g-scale, 6.82 g (97%) of the product was obtained.
-
-
-
-13. The product (1) exhibits the following analytical data: mp 129-130 °C; 1H NMR pdf (500 MHz, CDCl3) δ: 7.39 (dd, J = 7.5, 7.4 Hz, 1H), 7.55 (dd, J = 8.0, 7.5 Hz, 1H), 7.75 (d, J = 8.6 Hz, 1H), 7.87 (d, J = 8.0 Hz, 1H), 12.0 (br s, 1H). 13C NMR pdf (125 MHz, CDCl3) δ: 110.9, 113.5, 119.4, 119.8, 124.0, 124.3, 128.6, 139.9. IR (KBr film): 3158, 2922, 2236, 1513, 1480, 1349, 1253, 1182, 1076, 908 cm-1. HRMS (ESI-TOF) calcd for C8H5N3Na+ [M + Na]+ 166.0376; found 166.0378.
-
-
-
-14. The qNMR pdf was conducted using dimethyl fumarate as an internal standard. Dimethyl fumarate (>99.0%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
-
+ 
 
 
 
@@ -647,21 +675,65 @@ Working with Hazardous Chemicals
 
 The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
 
+
 
 In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
 
+
 
 The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
 
 
 3. Discussion
 
 
 
-Palladium-catalyzed cyanations are widely used for the preparation of nitrile containing compounds.2 To date, a variety of cyanide sources, including KCN, NaCN, Zn(CN)2, and potassium ferrocyanide (K4[Fe(CN)6]), have been used.2a In 1973, Takagi et al. reported the first example of palladium-catalyzed cyanation of Ar-X (X = I or Br) and potassium cyanide.3 While potassium cyanide and sodium cyanide are cheap and readily available, the palladium-catalyzed cyanation using these reagents on the scale is hindered due to the reagent toxicity, low catalyst turnover numbers (TON), and harsh reaction conditions. For example, typical Takagi's cyanation is carried out at 140-150 °C in DMF, with 2-4 mol% catalyst. Recently, considerable efforts have been made on palladium-catalyzed cyanation using zinc cyanide reagent, and improved efficiency has been achieved.4 However, the cyanation procedures that employ KCN, NaCN, and Zn(CN)2 require handling of toxic reagent and, in general, lack robustness.
+Transition metal-catalyzed cross-couplings are versatile methods for carbon-carbon (C-C) and carbon-heteroatom bond formation.2 Traditionally, palladium catalysts have been most commonly utilized for this type of transformation; however, there has been a significant interest in the development of cross-coupling reactions that rely on non-precious metal catalysts. In particular, nickel has emerged as an alternative to palladium due to several factors. For example, nickel is significantly more abundant, much less expensive, and also possesses a much lower CO2 footprint.3 Moreover, nickel catalysts possess the unique ability to activate a wide range of electrophilic coupling partners, well beyond the scope of traditional cross-couplings that use palladium catalysis.3
+
+
 
 
-Most recently, advances have been made in the area of palladium-catalyzed cyanation employing non-toxic Potassium ferrocyanide.5 The cyanation procedures using Potassium ferrocyanide not only remove the requirement of handling highly-toxic reagent but also have been demonstrated to be robust and applicable to a wide variety of substrates, including challenging heteroaromatic substrates. Herein, we describe a modified procedure to prepare the title compound in excellent yield and purity.4 Furthermore, this protocol has been successfully used for the preparation of other heteroaryl nitriles on the multi-kg scale.
+Our research groups and many others have developed new protocols for aryl C-C and C-X bond formations using nickel catalysts.4,5,6,7 In our efforts to render our methodologies more industrially friendly, we have developed the nickel-catalyzed Suzuki-Miyaura coupling in 'green' solvents,8,9 such as 2-Me-THF and tert-amyl alcohol.10 The methodology proceeds under mild conditions and has a broad scope with respect to the boronic acids, the electrophiles (halides and phenolic derivatives), and heterocycle constituents.4a
+
+
+
+
+A variety of heterocyclic halides (i.e., chlorides, bromides, iodides) and phenol-derived electrophiles (i.e., carbamates, sulfamates, mesylates, and pivalates) were coupled with aryl boronic acids to give coupled products (1-7, Table 1). These results also demonstrate that heterocycles such as pyridine, pyrimidine, pyrazole, quinolone, isoquinoline, and carbazole are tolerated under these coupling conditions.
+
+
+Table 1. Coupling of heterocyclic substrates with aryl boronic acids.a,b
+
+
+
+ 
+ 
+
+
+a Conditions: NiCl2(PCy3)2 complex (5 mol %), halide substrate (1.00 equiv), aryl boronic acid (2.50 equiv), K3PO4 (4.50 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h. b Yield of product determined by 1H NMR analysis of the crude reaction mixtures using hexamethylbenzene as an internal standard. c Conditions: NiCl2(PCy3)2 complex (10 mol %), halide substrate (1.00 equiv), aryl boronic acid (4.00 equiv), K3PO4 (7.20 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h.
+ 
+
+
+
+
+
+The methodology could also be applied to access bis(heterocyclic) frameworks, which are prevalent motifs in numerous bioactive molecules, but are sometimes difficult to access via palladium-catalyzed methods.11 Pyridine- and pyrimidine-containing substrates were coupled with heterocyclic boronic acids to give bis(heterocycles) 8 and 9 in good to excellent yields with 1 mol% of the Ni precatalyst (Table 2). Isoquinoline- and dihydrobenzofuran-containing substrates were coupled with heterocyclic boronic acids to forge bis(heterocycles) 10 and 11 in excellent yields using 5 mol% Ni precatalyst. It should be noted that the couplings shown in Tables 1 and 2 could be achieved in the presence of 2-Me-THF or tert-amyl alcohol as the reaction medium.
+
+
+Table 2. Couplings of heterocyclic boronic acids with heterocyclic substrates. a,b­
+
+
+
+ 
+ 
+
+
+a Conditions: NiCl2(PCy3)2 complex (1 mol %), halide substrate (1.00 equiv), aryl boronic acid (2.50 equiv), K3PO4 (4.50 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h. b Yield of product determined by1H NMR analysis of the crude reaction mixtures using hexamethylbenzene as an internal standard. c Conditions: NiCl2(PCy3)2 complex (5 mol %), halide substrate (1.00 equiv), aryl boronic acid (4.00 equiv), K3PO4 (7.20 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h.d Conditions: NiCl2(PCy3)2 complex (10 mol %), halide substrate (1.00 equiv), aryl boronic acid (4.00 equiv), K3PO4 (7.20 equiv), hexamethylbenzene (0.10 equiv), 100 or 120 °C, 12 h.
+ 
+
+
+
+
 
 
 
@@ -673,25 +745,48 @@ References and Notes
  
  
  
-Yonggang Chen, Process R & D, Merck & Co., Inc., P.O. Box 2000, Rahway NJ 07065, USA. Email: Yonggang.chen@merck.com ORCID : 0000-0003-3540-1384.
+Department of Chemistry and Biochemistry, University of California, Los Angeles. E-mail: neilgarg@chem.ucla.edu. The authors are grateful to Boehringer Ingelheim, the ACS Green Chemistry Institute's Pharmaceutical Roundtable, Bristol-Myers Squibb, the Camille and Henry Dreyfus Foundation, the A. P. Sloan Foundation, the UCLA Gold Shield Alumnae, and the University of California, Los Angeles, for financial support. We are grateful to Bristol-Myers Squibb, the ACS Division of Organic Chemistry, the Foote and Majeti-Alapati families for fellowship support (L.H.). These studies were also supported by shared instrumentation grants from the NSF (CHE-1048804) and the National Center for Research Resources (S10RR025631).
 
  
  
-For selected reviews, see: (a) Nauth, A. M.; Opatz, T. Org. Biomol. Chem. 2019, 17, 11-23. (b) Anbarasan, P.; Schareina, T.; Beller, M. Chem. Soc. Rev. 2011, 40, 5049-5067.
+(a) Hassan, J.; Sev́ignon, M.; Gozzi, C.; Schulz, E.; Lemaire, M. Chem. Rev. 2002, 102, 1359-1470. (b) Muci, A. R.; Buchwald, S. L. In Topics in Current Chemistry; Miyaura, N., Ed.; Springer Verlag: New York, 2002; Vol. 219, pp 131-209. (c) Jiang, L.; Buchwald, S. L. In Metal-Catalyzed Cross-Coupling Reactions, 2nd ed.; Meijere, A., Diederich, F., Eds.; Wiley-VCH: Weinheim, 2004; pp 699-760. (d) Corbet, J. P.; Mignani, G. Chem. Rev. 2006, 106, 2651-2710. (e) Negishi, E. Bull. Chem. Soc. Jpn. 2007, 80, 233-257. (f) Shen, H. C. In Application of Transition Metal Catalysis in Drug Discovery and Development: An Industrial Perspective; Crawley, M. L., Trost, B. M., Eds.; John Wiley & Sons, Inc.: Hoboken, NJ, 2012; pp 25-96.
 
  
  
-Takagi, K.; Okamoto, T.; Sakakibara, Y.; Oka, S. Chem. Lett. 1973, 471-474.
+For selected recent reviews in nickel catalysis, see: (a) Tasker, S. Z.; Standley, E. A.; Jamison, T. F. Nature 2014, 509, 299-309. (b) Mesganaw, T.; Garg, N. K. Org. Process Res. Dev. 2013, 17, 29-39. (c) Yu, D.-G.; Li, B.-J.; Shi, Z.-J. Acc. Chem. Res. 2010, 43, 1486-1495. (d) Rosen, B. M.; Quasdorf, K. W.; Wilson, D. A.; Zhang, N.; Resmerita, A.-M.; Garg, N. K.; Percec, V. Chem. Rev. 2011, 111, 1346-1416. (e) Li, B.-J.; Yu, D.-G.; Sun, C.-L.; Shi, Z.-J. Chem.-Eur. J. 2011, 17, 1728-1759. (f) Cornella, J.; Zarate, C.; Martin, R. Chem. Soc. Rev. 2014, 43, 8081-8097. (g) Yamaguchi, J.; Muto, K.; Itami, K. Eur. J. Org. Chem. 2013, 19-30.
 
  
  
-For selected references, see: (a) Tschaen, D. M.; Desmond, R.; King, A. O.; Fortin, M. C.; Pipik, B.; King, S.; Verhoeven, T. R. Synth. Commun. 1994, 24, 887-890. (b) Maligres, P. E.; Waters, M. S.; Fleitz, F.; Askin, D. Tetrahedron Lett. 1999, 40, 8193-8195. (c) Shevlin, M. Tetrahedron Lett. 2010, 51, 4833-4836. (d) Cohen, D. T.; Buchwald, S. L. Org. Lett. 2015, 17, 202-205.
+(a) Ramgren, S. D.; Hie, L.; Ye, Y.; Garg, N. K. Org. Lett. 2013, 15, 3950-3953. (b) Hie, L.; Chang, J. J.; Garg, N. K. J. Chem. Educ. 2015, 92, 571-574. (c) Hie, L.; Fine Nathel, N. F.; Hong, X.; Yang, Y.-F.; Houk, K. N.; Garg, N. K. Angew. Chem. Int. Ed. 2016, 55, 2810-2814. (d) Weires, N. A.; Baker, E. L.; Garg, N. K. Nat. Chem. 2016, 8, 75-79. (e) Hie, L.; Fine Nathel, N. F.; Shah, T. K.; Baker, E. L.; Hong, A.; Fang, Y.-F.; Liu, P.; Houk, K. N.; Garg, N. K. Nature 2015, 524, 79-83. (f) Fine Nathel, N. F.; Kim, J.; Hie, L.; Jiang, X.; Garg, N. K. ACS Catal. 2014, 4, 3289-3293. (g) Ramgren, S. D.; Hie, L.; Ye, Y.; Garg, N. K. Org. Lett. 2014, 15, 3950-3953. (h) Hie, L.; Ramgren, S. D.; Mesganaw, T.; Garg, N. K. Org. Lett. 2012, 14, 4182-4185.
 
  
  
-For selected references, see: (a) Senecal, T. D.; Shu, W.; Buchwald, S. L. Angew. Chem. Int. Ed. 2013, 52, 10035-10039. (b) Richardson, J.; Mutton, S. P. J. Org. Chem. 2018, 83, 4922-4931.
+For selected examples of aryl C-C bond couplings using Ni catalysis, see: (a) Guan, B.-T.; Wang, Y.; Li, B.-J.; Yu, D.; Shi, Z.-J. J. Am. Chem. Soc. 2008, 130, 14468-14470. (b) Quasdorf, K. W.; Tian, X.; Garg, N. K. J. Am. Chem. Soc. 2008, 130, 14422-14423. (c) Tobisu, M.; Shimasaki, T.; Chatani, N. Angew. Chem. Int. Ed. 2008, 47, 4866- 4869. (d) Quasdorf, K. W.; Riener, M.; Petrova, K. V.; Garg, N. K. J. Am. Chem. Soc. 2009, 131, 17748-17749. (e) Antoft-Finch, A.; Blackburn, T.; Snieckus, V. J. Am. Chem. Soc. 2009, 131, 17750- 17752. (f) Xi, L.; Li, B.-J.; Wu, Z.-H.; Lu, X.-Y.; Guan, B.-T.; Wang, B.- Q.; Zhao, K.-Q.; Shi, Z.-J. Org. Lett. 2010, 12, 884-887. (g) Quasdorf, K. W.; Antoft-Finch, A.; Liu, P.; Silberstein, A. L.; Komaromi, A.; Blackburn, T.; Ramgren, S. D.; Houk, K. N.; Snieckus, V.; Garg, N. K. J. Am. Chem. Soc. 2011, 133, 6352-6363. (h) Zhang, N.; Hoffman, D. J.; Gutsche, N.; Gupta, J.; Percec, V. J. Org. Chem. 2012, 77, 5956- 5964. (i) Ge, S.; Hartwig, J. F. Angew. Chem. Int. Ed. 2012, 51, 12837- 12841.
 
+ 
+ 
+For selected examples of aryl C-N bond couplings using Ni catalysis, see: (a) Ogata, T.; Hartwig, J. F. J. Am. Chem. Soc. 2008, 130, 13848-13849. (b) Gao, C.-Y.; Yang, L.-M. J. Org. Chem. 2008, 73, 1624-1627. (c) Fors, B. P.; Watson, D. A.; Biscoe, M. R.; Buchwald, S. L. J. Am. Chem. Soc. 2008, 130, 13552-13554. (d) Tobisu, M.; Shimasaki, T.; Chatani, N. Chem. Lett. 2009, 38, 710-711. (e) Shimasaki, T.; Tobisu, M.; Chatani, N. Angew. Chem. Int. Ed. 2010, 49, 2929-2932. (f) Mesganaw, T.; Silberstein, A. L.; Ramgren, S. D.; Fine Nathel, N. F.; Hong, X.; Liu, P.; Garg, N. K. Chem. Sci. 2011, 2, 1766-1771. (g) Ramgren, S. D.; Silberstein, A. L.; Yang, Y.; Garg, N. K. Angew. Chem. Int. Ed. 2011, 50, 2171-2173. (h) Ackermann, L.; Sandmann, R.; Song, W. Org. Lett. 2011, 13, 1784-1786. (i) Huang, J.-H.; Yang, L.-M. Org. Lett. 2011, 13, 3750- 3753. (j) Hie, L.; Ramgren, S. D.; Mesganaw, T.; Garg, N. K. Org. Lett. 2012, 14, 4182-4185.
 
+ 
+ 
+For selected seminal studies on aryl C-C and C-N bond coupling using Ni catalysis, see: (a) Sengupta, S.; Leite, M.; Raslan, D. S.; Quesnelle, C.; Snieckus, V. J. Org. Chem. 1992, 57, 4066-4068. (b) Wolfe, J. P.; Buchwald, S. L. J. Am. Chem. Soc. 1997, 119, 6054- 6058. (c) Hamann, B. C.; Hartwig, J. F. J. Am. Chem. Soc. 1998, 120, 7369-7370. (d) Brenner, E.; Fort, Y. Tetrahedron Lett. 1998, 39, 5359-5362. (e) Wehn, P. M.; Du Bois, J. Org. Lett. 2005, 7, 4685- 4688.
+
+ 
+ 
+For solvent selection guides in medicinal chemistry, see: (a) Alfonsi, K.; Colberg, J.; Dunn, P. J.; Fevig, T.; Jennings, S.; Johnson, T. A.; Kleine, H. P.; Knight, C.; Nagy, M. A.; Perry, D. A.; Stefaniak, M. Green Chem. 2008, 10, 31-36. (b) Henderson, R. K.; Jimeńez-Gonzaĺez, C.; Constable, D. J. C.; Alston, S. R.; Inglis, G. G. A.; Fisher, G.; Sherwood, J.; Binks, S. P.; Curzons, A. D. Green Chem. 2011, 13, 854-862.
+
+ 
+ 
+For the ACS Green Chemistry Institute Roundtable Solvent Selection Guide: http://www.acs.org/content/dam/acsorg/greenchemistry/industriainnovation/roundtable/acs-gci-pr-solvent-selection-guide.pdf
+
+ 
+ 
+tert-Amyl alcohol and 2-Me-THF were selected in consultation with the ACS Green Chemistry Institute. tert-Amyl alcohol is attractive due to its safety profile, low freezing point (in comparison to tert-butanol), and ability to solubilize polar compounds. 2-Me-THF is advantageous because it is obtained from renewable feedstocks and possesses many process chemistry-related over THF. For a discussion of 2-Me-THF, see: Aycock, D. F. Org. Process Res. Dev. 2007, 11, 156-159.
+
+ 
+ 
+For examples of Pd-catalyzed cross-coupling to access bis-heterocycles, see: (a) Zhao, D.; You, J.; Hu, C. Chem. Eur. J. 2011, 17, 5466-5492. (b) Molander, G. A.; Shin, I. Org. Lett. 2013, 15, 2534- 2537.
+ 
  
  
 
@@ -707,47 +802,37 @@ For selected references, see: (a) Senecal, T. D.; Shu, W.; Buchwald, S. L. Angew
  Chemical Abstracts Nomenclature (Registry Number)
 
 
- 
-
- 3-iodo-1H-indazole; (66607-27-0)
-
- 
- 
-
- Dimethylacetamide; (127-19-5)
-
- 
- 
-
- Potassium ferrocyanide; (14459-95-1)
-
- 
- 
-
- Allylpalladium(II) chloride dimer; (12012-95-2)
-
- 
- 
-
- Xantphos; (161265-03-8)
-
- 
- 
-
- 2-MeTHF; (96-47-9)
-
- 
- 
-
- Sodium sulfate; (7757-82-6)
-
- 
- 
-
- 1H-Indazole-3-carbonitrile; (1) (50264-88-5)
-
- 
 
+
+ 
+ 5-Bromopyrimidine; (4595-59-9)
+
+
+
+
+ 
+ 3-Furanylboronic acid; (55552-70-0)
+ 
+
+
+
+ 
+ Potassium phosphate tribasic; (7778-53-2)
+ 
+
+
+
+ 
+ Bis(tricyclohexylphosphine)nickel(II) chloride; (19999-87-2)
+
+
+
+
+ 
+ tert-Amyl alcohol; (75-85-4)
+
+
+
  
 
 
@@ -761,7 +846,7 @@ For selected references, see: (a) Senecal, T. D.; Shu, W.; Buchwald, S. L. Angew
  
 
  
-Yonggang Chen obtained his B.S. degree from Lanzhou University. After acquiring his Ph.D. at Brandeis University in the laboratory of Professor Li Deng, he commenced an American Heart Association postdoctoral fellowship at Harvard under the supervision of Professor Eric N. Jacobsen. His research interests lie in the development of new methodologies and new routes to drug substances and intermediates.
+Liana Hie was born and raised in Jakarta, Indonesia. She received her B. S. in chemistry from the University of California, Davis (UCD) in 2011. At UCD, she performed research in the laboratory of Prof. Xi Chen. She began her doctoral studies at the University of California, Los Angeles in 2011 under the supervision of Prof. Neil K. Garg. Her research focuses on the development of nickel-catalyzed cross-coupling reactions.
 
  
 
@@ -773,8 +858,7 @@ Yonggang Chen obtained his B.S. degree from Lanzhou University. After acquiring 
  
 
  
-Qinghao Chen was born in Shanghai, China, in 1979. He completed his undergraduate and doctoral studies from MIT (2000) and Harvard University (2006) under the guidance of Prof. Christopher C. Cummins and Prof. Eric N. Jacobsen, respectively. Between 2006 and 2019, he supported numerous internal and external projects across all phases of development in the Process R&D at Merck & Co., Inc., Kenilworth, NJ, USA (MSD). He is currently leading the High Throughput Experimentation group in the department of Small Molecule API Development at Janssen Pharmaceutica in Belgium.
- 
+Neil Garg is a Professor of Chemistry at the University of California, Los Angeles. His laboratory develops novel synthetic strategies and methodologies to enable the total synthesis of complex bioactive molecules.
 
  
 
@@ -786,20 +870,7 @@ Qinghao Chen was born in Shanghai, China, in 1979. He completed his undergraduat
  
 
  
-Lushi Tan is an alumnus of Hunan Normal University (B.S.) and Nanjing University (M.S.). He received his Ph.D. from the University of Minnesota in 1995 then joined Merck & Co., Inc., Kenilworth, NJ, USA (MSD) as a senior chemist. He is now a Distinguished Scientist and External Capability Lead at MSD. He supervises a team of senior scientists working to improve the capability of MSD strategic partners around the world, with responsibility for the process development and manufacturing of all MSD development compounds. Lushi's research interests range from asymmetric synthesis, catalysis, and bio-catalysis to mechanistic investigations of new reactions.
- 
-
-
- 
-
- 
-
- 
- 
-
- 
-Lu Chen was born in Shandong, China, in 1986. He graduated from Shandong University in 2008 and joined WuxiApptec since then, focusing on organic chemistry research and development.
- 
+Kristen Flynn was born and raised in New Jersey. She obtained her B.S. in chemistry from Monmouth University in 2016. During her time there, she performed research under the guidance of Prof. Massimiliano Lamberto. She has a research appointment in the Movassaghi group at MIT and will begin her Ph.D. studies at in the fall.
 
  
 
@@ -811,33 +882,7 @@ Lu Chen was born in Shandong, China, in 1986. He graduated from Shandong Univers
  
 
  
-Xiaowei Wang was born in AnHui, China, in 1985. In 2012, He received his Ph.D. from Shanghai Institute of Organic Chemistry (SIOC) under the supervision of Professor Shizheng Zhu. Then he joined WuxiApptec as a senior research scientist, and his research focuses on high-throughput screening and process development. 
- 
-
- 
-
- 
-
- 
-
- 
- 
-
- 
-Yuma Komori was born in Chiba, Japan. He graduated from the University of Tokyo in 2020 with B.S. in Pharmaceutical Sciences. He is continuing his graduate studies at the University of Tokyo under the supervision of Prof. Masayuki Inoue. His research interests are in the area of the total synthesis of complex natural products.
- 
-
- 
-
- 
-
- 
-
- 
- 
-
- 
-Masanori Nagatomo completed his Ph.D. (2012) from the University of Tokyo under the supervision of Professor Masayuki Inoue. In 2012, he carried out visiting research with Professor Phil S. Baran at The Scripps Research Institute. In the same year, he was appointed as Assistant Professor in the Graduate School of Pharmaceutical Sciences at the University of Tokyo and was promoted to Lecturer in 2018. His research efforts focus on the development of novel synthetic methodology and applications to the multistep synthesis of complex molecules.
+Alyssa Antropow completed her B.S./M.S. in chemistry at Stevens Institute of Technology in 2013. As an undergraduate, she conducted research in the laboratory of Prof. A.K. Ganguly. In 2013, Alyssa began her graduate studies at MIT and joined the laboratory of Prof. Mohammad Movassaghi. Her research is focused on the total synthesis of alkaloid natural products.
 
  
 
@@ -847,13 +892,7 @@ Masanori Nagatomo completed his Ph.D. (2012) from the University of Tokyo under 
 
 
 Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
-
- 
- 
- 
- 
- 
- 
+
 
 
  
