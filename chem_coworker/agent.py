@@ -19,7 +19,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
 
@@ -30,6 +30,10 @@ logger = logging.getLogger(__name__)
 # When initial plan confidence is below this threshold AND the plan has >1 group,
 # the observe step fires: Group 0 runs first, then the LLM revises Groups 1+.
 _OBSERVE_THRESHOLD = 0.75
+
+# A4 — Conversation compaction: auto-summarize history when it grows too long.
+_COMPACT_THRESHOLD  = 20   # total messages before triggering compaction
+_COMPACT_KEEP_RECENT = 6   # most-recent messages kept verbatim (= 3 full turns)
 
 # Local imports (no circular dependency — these modules don't import agent.py)
 from .response import ChemResponse  # noqa: E402
@@ -110,10 +114,20 @@ class ChemCoworker:
         model: Optional[str] = None,
         temperature: float = 0,
         verbose: bool = False,
+        # A3 — real-time streaming
+        progress_cb: Optional[Callable[[str, str, float], None]] = None,
+        phase_cb: Optional[Callable[[str], None]] = None,
+        # A2 — plan approval
+        plan_callback: Optional[Callable[["ExecutionPlan"], "ExecutionPlan"]] = None,
+        # A1 — pre/post tool hooks
+        hooks: Optional[Any] = None,   # HookRegistry
     ):
         self.provider = provider or os.getenv("LLM_PROVIDER", "openai")
         self.model_name = model or os.getenv("LLM_MODEL", "o4-mini")
         self.verbose = verbose
+        self.progress_cb = progress_cb
+        self.phase_cb = phase_cb
+        self.plan_callback = plan_callback
 
         self.llm = _get_llm_client(provider, model, temperature)
 
@@ -125,7 +139,11 @@ class ChemCoworker:
         self.registry = REGISTRY
         self.classifier = TaskClassifier()
         self.parser = PlanParser()
-        self.executor = ToolExecutor(verbose=verbose)
+        self.executor = ToolExecutor(
+            verbose=verbose,
+            progress_cb=progress_cb,
+            hooks=hooks,
+        )
 
     # ------------------------------------------------------------------
     # Public API
@@ -159,6 +177,7 @@ class ChemCoworker:
             tool_descriptions=self.registry.describe_tools(),
         )
 
+        if self.phase_cb: self.phase_cb("reason_start")  # A3
         try:
             reason_response = self.llm.invoke([HumanMessage(content=reason_text)])
             plan_text = self._get_text(reason_response)
@@ -173,6 +192,8 @@ class ChemCoworker:
                 elapsed_s=time.monotonic() - start,
                 llm_calls=llm_calls,
             )
+        finally:
+            if self.phase_cb: self.phase_cb("reason_done")  # A3
 
         if self.verbose:
             logger.info(f"[ChemCoworker] Plan text length: {len(plan_text)} chars")
@@ -186,6 +207,24 @@ class ChemCoworker:
 
         if self.verbose:
             logger.info(f"[ChemCoworker] {plan}")
+
+        # ── Step 3.5: Plan approval — pause for user confirmation (A2) ─
+        if self.plan_callback and not plan.is_empty:
+            from .plan import PlanRejected
+            try:
+                plan = self.plan_callback(plan)
+            except PlanRejected as e:
+                return ChemResponse(
+                    query=query,
+                    task_type=task_type,
+                    answer=f"Plan cancelled: {e}",
+                    hypothesis=plan.hypothesis,
+                    confidence=plan.confidence,
+                    model=self.model_name,
+                    provider=self.provider,
+                    elapsed_s=round(time.monotonic() - start, 2),
+                    llm_calls=llm_calls,
+                )
 
         # ── Step 4: Execute tool groups (observe-then-plan) ───────────
         warnings: List[str] = []
@@ -274,6 +313,7 @@ class ChemCoworker:
             resource_context=self._describe_resources(),
         )
 
+        if self.phase_cb: self.phase_cb("synth_start")  # A3
         try:
             synth_response = self.llm.invoke([HumanMessage(content=synth_text)])
             answer = self._get_text(synth_response)
@@ -282,6 +322,8 @@ class ChemCoworker:
             logger.error(f"[ChemCoworker] Synthesis LLM call failed: {exc}")
             answer = f"Tool results gathered but synthesis failed: {exc}"
             warnings.append(f"Synthesis failed: {exc}")
+        finally:
+            if self.phase_cb: self.phase_cb("synth_done")  # A3
 
         elapsed = time.monotonic() - start
 
@@ -322,6 +364,14 @@ class ChemCoworker:
         if history is None:
             history = []
 
+        # A4 — Compact history if it has grown too long
+        compacted = False
+        if len(history) >= _COMPACT_THRESHOLD:
+            history = self._compact_history(history)
+            compacted = True
+            if self.verbose:
+                logger.info(f"[ChemCoworker] History compacted to {len(history)} messages")
+
         # Prepend recent history as context for the reasoning step
         context = ""
         if history:
@@ -334,6 +384,7 @@ class ChemCoworker:
             query_with_context = query
 
         response = self.run(query_with_context)
+        response.compacted = compacted  # A4: tag so CLI can show notice
 
         # Update history
         history = list(history) + [
@@ -342,6 +393,42 @@ class ChemCoworker:
         ]
 
         return response, history
+
+    def _compact_history(self, history: List[Dict[str, str]]) -> List[Dict[str, str]]:
+        """
+        A4 — Summarize the oldest conversation turns via one LLM call,
+        keeping only the most recent _COMPACT_KEEP_RECENT messages verbatim.
+        Falls back to a simple truncation on LLM failure.
+        """
+        from langchain_core.messages import HumanMessage
+
+        old    = history[:-_COMPACT_KEEP_RECENT]
+        recent = history[-_COMPACT_KEEP_RECENT:]
+
+        convo = "\n".join(
+            f"{m['role'].upper()}: {m['content'][:400]}" for m in old
+        )
+        prompt = (
+            "Summarize this chemistry conversation concisely in bullet points. "
+            "Keep: reaction types discussed, conditions recommended, warnings raised, "
+            "conclusions reached. Omit: small talk, failed attempts, repeated information.\n\n"
+            + convo
+        )
+
+        if self.phase_cb: self.phase_cb("compact_start")
+        try:
+            resp = self.llm.invoke([HumanMessage(content=prompt)])
+            summary_text = self._get_text(resp)
+            summary_msg = {
+                "role": "assistant",
+                "content": f"[Summary of earlier conversation]\n{summary_text}",
+            }
+            return [summary_msg] + recent
+        except Exception as exc:
+            logger.warning(f"[ChemCoworker] History compaction LLM call failed: {exc}. Truncating.")
+            return recent  # fallback: just keep recent turns, lose old ones
+        finally:
+            if self.phase_cb: self.phase_cb("compact_done")
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -520,11 +607,13 @@ class ChemCoworker:
             tool_descriptions=self.registry.describe_tools(),
         )
 
+        if self.phase_cb: self.phase_cb("observe_start")  # A3
         try:
             observe_response = self.llm.invoke([HumanMessage(content=observe_text)])
             observe_llm_text = self._get_text(observe_response)
         except Exception as exc:
             logger.warning(f"[ChemCoworker] Observe LLM call failed: {exc}. Using original plan.")
+            if self.phase_cb: self.phase_cb("observe_done")  # A3
             fallback = ExecutionPlan(
                 hypothesis=plan.hypothesis,
                 confidence=plan.confidence,
@@ -533,6 +622,8 @@ class ChemCoworker:
                 raw_plan_text="",
             )
             return fallback, "", True
+
+        if self.phase_cb: self.phase_cb("observe_done")  # A3
 
         revised_plan = self.parser.parse(
             observe_llm_text,

@@ -260,6 +260,126 @@ def _print_response(response: "ChemResponse", verbose: bool = False) -> None:
 
 
 # ---------------------------------------------------------------------------
+# A3 — Real-time tool streaming callbacks
+# ---------------------------------------------------------------------------
+
+_running_tools: set = set()       # tools currently executing
+_phase_spinner: list = [None]     # mutable container for the active phase spinner
+
+
+def _progress(event: str, name: str, elapsed: float) -> None:
+    """Progress callback: prints one line per tool as it starts/completes."""
+    if event == "start":
+        _running_tools.add(name)
+        sys.stdout.write(
+            f"\r  {C.YELLOW}⠋{C.R} {C.DIM}{' · '.join(sorted(_running_tools))}…{C.R}   "
+        )
+        sys.stdout.flush()
+    else:
+        _running_tools.discard(name)
+        icon = f"{C.OK}✓" if event == "done" else f"{C.ERR}✗"
+        # Clear spinner line then print completed tool
+        print(f"\r  {icon}{C.R}  {C.TOOL}{name}{C.R}  {C.META}{elapsed:.1f}s{C.R}     ")
+
+
+_PHASE_LABELS = {
+    "reason_start":  "Reasoning",
+    "observe_start": "Observing",
+    "synth_start":   "Synthesizing",
+    "compact_start": "Compacting history",
+}
+
+
+def _phase(phase: str) -> None:
+    """Phase callback: starts/stops spinners around LLM calls."""
+    if phase.endswith("_start") and phase in _PHASE_LABELS:
+        _phase_spinner[0] = Spinner(_PHASE_LABELS[phase])
+        _phase_spinner[0].start()
+    elif phase.endswith("_done") and _phase_spinner[0] is not None:
+        _phase_spinner[0].stop()
+        _phase_spinner[0] = None
+
+
+# ---------------------------------------------------------------------------
+# A2 — Plan approval helpers
+# ---------------------------------------------------------------------------
+
+def _show_plan_and_confirm(plan):
+    """
+    Display the structured plan and pause for user confirmation (--plan mode).
+    Returns the (possibly modified) plan or raises PlanRejected.
+    """
+    from chem_coworker.plan import PlanRejected
+
+    print()
+    conf_str = f"{C.CONF}[{plan.confidence:.0%}]{C.R}" if plan.confidence else ""
+    print(_label("◆", "Proposed Plan") + f"  {conf_str}")
+    if plan.hypothesis:
+        print(f"  {C.HYPO}{plan.hypothesis}{C.R}")
+    if plan.rationale:
+        print(f"  {C.META}{plan.rationale}{C.R}")
+    print()
+    for i, group in enumerate(plan.groups):
+        names = "  ·  ".join(f"{C.TOOL}{c.name}{C.R}" for c in group)
+        print(f"  {C.DIM}Group {i}{C.R}  {names}")
+    print()
+
+    try:
+        raw = input(f"  {C.PROMPT}>{C.R} Proceed? [Y/n/skip <tool>]: ").strip().lower()
+    except (KeyboardInterrupt, EOFError):
+        raise PlanRejected("Cancelled by user.")
+
+    if raw in ("n", "no", "q", "quit"):
+        raise PlanRejected("Cancelled by user.")
+    if raw.startswith("skip "):
+        tool_name = raw[5:].strip()
+        return _drop_tool_from_plan(plan, tool_name)
+    print()  # blank line before streaming starts
+    return plan
+
+
+def _drop_tool_from_plan(plan, name: str):
+    """Return a copy of plan with the named tool removed from all groups."""
+    import dataclasses
+    new_groups = [
+        [c for c in group if c.name != name]
+        for group in plan.groups
+    ]
+    new_groups = [g for g in new_groups if g]
+    return dataclasses.replace(plan, groups=new_groups)
+
+
+# ---------------------------------------------------------------------------
+# In-session coworker factory
+# ---------------------------------------------------------------------------
+
+def _init_coworker(model: str, provider: str, verbose: bool, plan_mode: bool):
+    """Create a ChemCoworker with the current session settings."""
+    from chem_coworker import ChemCoworker
+    return ChemCoworker(
+        provider=provider,
+        model=model,
+        verbose=verbose,
+        progress_cb=_progress,
+        phase_cb=_phase,
+        plan_callback=_show_plan_and_confirm if plan_mode else None,
+    )
+
+
+def _print_settings(model: str, provider: str, verbose: bool, plan_mode: bool) -> None:
+    """Print current session settings."""
+    provider_color = C.CYAN if provider == "openai" else C.MAGENTA
+    print()
+    print(_label("◆", "Current Settings"))
+    print(f"  {C.META}Model   {C.R}  {C.BOLD}{model}{C.R}  {provider_color}{provider}{C.R}")
+    print(f"  {C.META}Verbose {C.R}  {C.OK if verbose else C.DIM}{'on' if verbose else 'off'}{C.R}")
+    print(f"  {C.META}Plan    {C.R}  {C.OK if plan_mode else C.DIM}{'on' if plan_mode else 'off'}{C.R}")
+    print(f"  {C.META}Config  {C.R}  {C.DIM}{_CONFIG_PATH}{C.R}")
+    print()
+    print(f"  {C.DIM}Commands: /model · /plan · /verbose · /compact · /settings{C.R}")
+
+
+# ---------------------------------------------------------------------------
 # Main CLI loop
 # ---------------------------------------------------------------------------
 
@@ -382,6 +502,10 @@ Examples:
     arg_parser.add_argument("--model", default=None, help="LLM model name (skip selector if set)")
     arg_parser.add_argument("--provider", default=None, help="LLM provider: openai or aliyun")
     arg_parser.add_argument("--verbose", action="store_true", help="Show tool result details")
+    arg_parser.add_argument(
+        "--plan", action="store_true",
+        help="A2: Show proposed tool plan and confirm before executing (plan approval mode)",
+    )
 
     subparsers = arg_parser.add_subparsers(dest="command")
 
@@ -449,9 +573,13 @@ Examples:
         print(f"     Set it with: export {key_env}=your_api_key")
         sys.exit(1)
 
+    # Mutable session state (can be changed mid-session via commands)
+    verbose   = args.verbose
+    plan_mode = args.plan
+
     provider_color = C.CYAN if provider == "openai" else C.MAGENTA
     print(f"\n  {C.META}Using{C.R}  {C.BOLD}{model}{C.R}  {provider_color}{provider}{C.R}")
-    print(f"  {C.META}Type{C.R}  {C.DIM}exit · clear · tools  (run 'setup' to change model){C.R}")
+    print(f"  {C.META}Type{C.R}  {C.DIM}/model · /plan · /verbose · /settings · exit{C.R}")
 
     # ── Example queries ───────────────────────────────────────────────
     print(f"\n  {C.META}Examples:{C.R}")
@@ -467,10 +595,12 @@ Examples:
     print()
 
     # ── Initialize agent ──────────────────────────────────────────────
+    from chem_coworker import REGISTRY
     try:
-        from chem_coworker import ChemCoworker, REGISTRY
-        coworker = ChemCoworker(provider=provider, model=model, verbose=args.verbose)
+        coworker = _init_coworker(model, provider, verbose, plan_mode)
         print(f"  {C.OK}✓{C.R}  Agent ready  {C.META}{len(REGISTRY)} tools registered{C.R}")
+        if plan_mode:
+            print(f"  {C.META}Plan approval ON{C.R}")
     except Exception as exc:
         print(f"  {C.ERR}✗{C.R}  Failed to initialize: {exc}")
         sys.exit(1)
@@ -489,32 +619,84 @@ Examples:
         if not query:
             continue
 
-        if query.lower() in ("exit", "quit", "q"):
+        ql = query.lower()
+
+        # ── Built-in commands ─────────────────────────────────────────
+        if ql in ("exit", "quit", "q"):
             print(f"  {C.META}Goodbye!{C.R}")
             break
 
-        if query.lower() == "clear":
+        if ql == "clear":
             history = []
             print(f"  {C.META}History cleared.{C.R}")
             continue
 
-        if query.lower() == "tools":
+        if ql == "tools":
             print()
             print(REGISTRY.describe_tools())
             continue
 
+        # ── Settings commands (/model, /plan, /verbose, /settings, /compact)
+        if ql in ("/model", "change model", "model"):
+            selected = select_model_interactive()
+            new_model    = selected["name"]
+            new_provider = selected["provider"]
+            _save_config(new_model, new_provider)
+            try:
+                coworker = _init_coworker(new_model, new_provider, verbose, plan_mode)
+                model, provider = new_model, new_provider
+                pc = C.CYAN if provider == "openai" else C.MAGENTA
+                print(f"  {C.OK}✓{C.R}  Switched to {C.BOLD}{model}{C.R}  {pc}{provider}{C.R}")
+                print(f"  {C.META}Config saved. History preserved.{C.R}")
+            except Exception as exc:
+                print(f"  {C.ERR}✗{C.R}  Failed to switch model: {exc}")
+            continue
+
+        if ql in ("/plan", "toggle plan"):
+            plan_mode = not plan_mode
+            coworker.plan_callback = _show_plan_and_confirm if plan_mode else None
+            state = f"{C.OK}ON{C.R}" if plan_mode else f"{C.DIM}off{C.R}"
+            print(f"  {C.META}Plan approval{C.R}  {state}")
+            continue
+
+        if ql in ("/verbose", "toggle verbose"):
+            verbose = not verbose
+            coworker.verbose = verbose
+            coworker.executor.verbose = verbose
+            state = f"{C.OK}ON{C.R}" if verbose else f"{C.DIM}off{C.R}"
+            print(f"  {C.META}Verbose{C.R}  {state}")
+            continue
+
+        if ql in ("/settings", "settings"):
+            _print_settings(model, provider, verbose, plan_mode)
+            continue
+
+        if ql in ("/compact", "compact"):
+            if len(history) < 2:
+                print(f"  {C.META}Nothing to compact (history is empty).{C.R}")
+            else:
+                history = coworker._compact_history(history)
+                print(f"  {C.META}↺ History compacted to {len(history)} messages.{C.R}")
+            continue
+
         # ── Run the agent ─────────────────────────────────────────────
-        spinner = Spinner("ChemCoworker thinking")
-        spinner.start()
+        # A3: clear streaming state; phase spinners managed by _phase callback
+        _running_tools.clear()
         try:
             response, history = coworker.chat(query, history)
         except Exception as exc:
-            spinner.stop()
+            # Stop any lingering phase spinner on error
+            if _phase_spinner[0] is not None:
+                _phase_spinner[0].stop()
+                _phase_spinner[0] = None
             print(f"\n  {C.ERR}✗{C.R}  {exc}")
             continue
-        spinner.stop()
 
-        _print_response(response, verbose=args.verbose)
+        # A4: show compaction notice if history was auto-summarized this turn
+        if response.compacted:
+            print(f"  {C.META}↺ Conversation history compacted{C.R}")
+
+        _print_response(response, verbose=verbose)
 
 
 if __name__ == "__main__":

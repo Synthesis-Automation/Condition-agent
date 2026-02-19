@@ -28,6 +28,10 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 
+class PlanRejected(Exception):
+    """Raised by a plan_callback to cancel tool execution (A2 — plan approval)."""
+
+
 @dataclass
 class ToolCall:
     """A single tool call specification (name + arguments)."""

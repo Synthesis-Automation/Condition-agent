@@ -64,6 +64,7 @@ class ChemResponse:
     provider: str = ""
     elapsed_s: float = 0.0
     llm_calls: int = 0
+    compacted: bool = False   # True if conversation history was compacted this turn (A4)
 
     # ------------------------------------------------------------------
     # Convenience methods
@@ -100,6 +101,8 @@ class ChemResponse:
             parts.append(f"hypothesis={h!r}")
         if self.plan_revised:
             parts.append("revised=True")
+        if self.compacted:
+            parts.append("compacted=True")
         if self.tools_called:
             parts.append(f"tools={self.tools_called}")
         parts.append(f"conf={self.confidence:.2f}")

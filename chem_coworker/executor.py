@@ -26,6 +26,10 @@ logger = logging.getLogger(__name__)
 # Maximum parallel threads per group
 _MAX_WORKERS = 4
 
+# Callback types (A3 — streaming, A1 — hooks)
+ProgressCallback = Callable[[str, str, float], None]
+# signature: (event: "start"|"done"|"error", tool_name: str, elapsed_s: float) -> None
+
 
 class ToolExecutor:
     """
@@ -33,9 +37,17 @@ class ToolExecutor:
     with tools within each group running in parallel.
     """
 
-    def __init__(self, max_workers: int = _MAX_WORKERS, verbose: bool = False):
+    def __init__(
+        self,
+        max_workers: int = _MAX_WORKERS,
+        verbose: bool = False,
+        progress_cb: Optional[ProgressCallback] = None,
+        hooks: Optional[Any] = None,   # HookRegistry — typed as Any to avoid circular import
+    ):
         self.max_workers = max_workers
         self.verbose = verbose
+        self.progress_cb = progress_cb
+        self.hooks = hooks
 
     def run_plan(
         self,
@@ -85,13 +97,25 @@ class ToolExecutor:
         calls: List[ToolCall],
         callables: Dict[str, Callable[..., Any]],
     ) -> Dict[str, Any]:
-        """Execute a group of ToolCalls concurrently."""
+        """Execute a group of ToolCalls concurrently, firing progress events."""
         if not calls:
             return {}
 
-        # Single call — skip overhead
+        t0 = time.monotonic()
+
+        # Fire "start" for every tool in the group before submitting (A3)
+        if self.progress_cb:
+            for call in calls:
+                self.progress_cb("start", call.name, 0.0)
+
+        # Single call — skip thread overhead
         if len(calls) == 1:
-            return {calls[0].name: self._execute_one(calls[0], callables)}
+            result = self._execute_one(calls[0], callables)
+            if self.progress_cb:
+                elapsed = time.monotonic() - t0
+                has_error = isinstance(result, dict) and not result.get("success", True)
+                self.progress_cb("error" if has_error else "done", calls[0].name, elapsed)
+            return {calls[0].name: result}
 
         results: Dict[str, Any] = {}
         workers = min(len(calls), self.max_workers)
@@ -103,11 +127,17 @@ class ToolExecutor:
             }
             for future in as_completed(future_to_name):
                 name = future_to_name[future]
+                elapsed = time.monotonic() - t0
                 try:
                     results[name] = future.result()
+                    has_error = isinstance(results[name], dict) and not results[name].get("success", True)
+                    event = "error" if has_error else "done"
                 except Exception as exc:
                     logger.warning(f"[Executor] Tool '{name}' raised: {exc}")
                     results[name] = {"success": False, "error": str(exc)}
+                    event = "error"
+                if self.progress_cb:
+                    self.progress_cb(event, name, elapsed)
 
         return results
 
@@ -116,17 +146,37 @@ class ToolExecutor:
         call: ToolCall,
         callables: Dict[str, Callable[..., Any]],
     ) -> Any:
-        """Execute a single ToolCall, with error isolation."""
+        """Execute a single ToolCall with error isolation and optional hooks (A1)."""
         fn = callables.get(call.name)
         if fn is None:
             return {"success": False, "error": f"Tool '{call.name}' not registered"}
+
+        from .hooks import HookAbort, HookContext
+        ctx = HookContext(tool_name=call.name, args=dict(call.args))
+
         try:
+            # Pre-hooks — may raise HookAbort to cancel the call
+            if self.hooks:
+                self.hooks.fire_pre(ctx)
+
             start = time.monotonic()
             result = fn(**call.args)
+            ctx.result = result
+
             if self.verbose:
                 elapsed = time.monotonic() - start
                 logger.debug(f"[Executor] {call.name} completed in {elapsed:.3f}s")
+
+            # Post-hooks — may return a replacement result
+            if self.hooks:
+                override = self.hooks.fire_post(ctx)
+                if override is not None:
+                    result = override
+
             return result
+
+        except HookAbort as e:
+            return {"success": False, "error": f"[hook aborted] {e}"}
         except Exception as exc:
             logger.warning(f"[Executor] {call.name} failed: {exc}")
             return {"success": False, "error": str(exc), "tool": call.name}
