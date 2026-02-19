@@ -9,6 +9,7 @@ Usage:
     python chem_coworker/cli.py intake <source>                   # intake a document
     python chem_coworker/cli.py intake https://...                # fetch + extract URL
     python chem_coworker/cli.py intake paper.pdf --reaction-type suzuki_miyaura
+    python chem_coworker/cli.py intake paper.pdf --extract-model deepseek-v3.2 --extract-provider aliyun
 
 Features:
   - Saved model preference (~/.chemcoworker/config.json)
@@ -417,18 +418,27 @@ def _cmd_intake(args: argparse.Namespace) -> None:
     import time as _time
     from chem_coworker.extractor import NotesExtractor
 
+    # Main model (fallback when --extract-model not set)
     if args.model is not None:
         model = args.model
-        provider = args.provider or ("aliyun" if model in _ALIYUN_MODELS else "openai")
     else:
         saved = _load_config()
         model = saved["name"]
-        provider = args.provider or saved["provider"]
+
+    # Extraction model — can be different (cheaper/faster) than the chat model
+    extract_model = args.extract_model or model
+    extract_provider = (
+        args.extract_provider
+        or ("aliyun" if extract_model in _ALIYUN_MODELS else "openai")
+    )
 
     print()
     print(f"  {C.LABEL}◆ ChemCoworker Intake{C.R}  {C.DIM}Document → Notes{C.R}")
     print(f"  {_SEP}")
-    print(f"  {C.META}Model:{C.R}  {C.BOLD}{model}{C.R}  {C.META}{provider}{C.R}")
+    if extract_model != model:
+        print(f"  {C.META}Extract model:{C.R}  {C.BOLD}{extract_model}{C.R}  {C.META}{extract_provider}{C.R}")
+    else:
+        print(f"  {C.META}Model:{C.R}  {C.BOLD}{extract_model}{C.R}  {C.META}{extract_provider}{C.R}")
     print(f"  {C.META}Source:{C.R} {C.DIM}{args.source!r}{C.R}")
     if args.reaction_type:
         print(f"  {C.META}Hint:{C.R}   {C.DIM}{args.reaction_type}{C.R}")
@@ -441,7 +451,7 @@ def _cmd_intake(args: argparse.Namespace) -> None:
     t0 = _time.time()
 
     try:
-        extractor = NotesExtractor(provider=provider, model=model, verbose=args.verbose)
+        extractor = NotesExtractor(provider=extract_provider, model=extract_model, verbose=args.verbose)
         result = extractor.intake(
             source=args.source,
             reaction_type=args.reaction_type or "",
@@ -542,6 +552,18 @@ Examples:
         "--note-type", default="reactions",
         choices=["reactions", "mechanisms", "substrates", "protocols"],
         help="Which notes subfolder to write to (default: reactions).",
+    )
+    intake_parser.add_argument(
+        "--extract-model", default=None,
+        help=(
+            "Model to use for extraction (overrides --model for this step). "
+            "Useful for a cheaper/faster model: e.g. --extract-model deepseek-v3.2 "
+            "--extract-provider aliyun"
+        ),
+    )
+    intake_parser.add_argument(
+        "--extract-provider", default=None,
+        help="Provider for --extract-model (openai or aliyun). Auto-detected if omitted.",
     )
     intake_parser.add_argument(
         "--no-save", action="store_true",
