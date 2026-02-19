@@ -1,0 +1,1319 @@
+A Publication 
+
+of Reliable
+ Methods 
+
+for the Preparation 
+
+
+ of Organic Compounds
+
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ Search Citation
+
+ 
+Search Text
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ Annual Volume
+ 
+
+ 
+
+ 
+
+ 
+ 
+ 
+ 
+ 103
+ 102
+ 101
+ 100
+ 99
+ 98
+ 97
+ 96
+ 95
+ 94
+ 93
+ 92
+ 91
+ 90
+ 89
+ 88
+ 87
+ 86
+ 85
+ 84
+ 83
+ 82
+ 81
+ 80
+ 79
+ 78
+ 77
+ 76
+ 75
+ 74
+ 73
+ 72
+ 71
+ 70
+ 69
+ 68
+ 67
+ 66
+ 65
+ 64
+ 63
+ 62
+ 61
+ 60
+ 59
+ 58
+ 57
+ 56
+ 55
+ 54
+ 53
+ 52
+ 51
+ 50
+ 49
+ 48
+ 47
+ 46
+ 45
+ 44
+ 43
+ 42
+ 41
+ 40
+ 39
+ 38
+ 37
+ 36
+ 35
+ 34
+ 33
+ 32
+ 31
+ 30
+ 29
+ 28
+ 27
+ 26
+ 25
+ 24
+ 23
+ 22
+ 21
+ 20
+ 19
+ 18
+ 17
+ 16
+ 15
+ 14
+ 13
+ 12
+ 11
+ 10
+ 9
+ 8
+ 7
+ 6
+ 5
+ 4
+ 3
+ 2
+ 1
+
+ 
+ 
+
+
+ 
+
+ 
+
+ Page
+ 
+
+ 
+
+ 
+
+ 
+ 
+ 
+
+ 
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ GO
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+
+ 
+
+ 
+ Anywhere
+ Title
+ Author
+ Checked by
+ CAS
+
+
+ 
+
+ 
+
+ 
+ 
+ 
+
+ GO
+
+ 
+ 
+
+ 
+
+ 
+
+ ?
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ Home
+
+ 
+Search
+
+ 
+For Authors
+ 
+ 
+Instructions for Articles
+
+ 
+Instructions for Perspectives
+
+ 
+Instructions for Discussion Addenda
+
+ 
+Instructions for Article Templates
+
+ 
+Instructions for Proposing Articles
+
+ Google Drive Logo
+ 
+Guidance for OS Techniques Articles
+
+ 
+Article Template
+
+ 
+OS Technique Template
+
+ 
+OS Perspective Template
+
+ 
+Discussion Addenda Template
+
+ 
+ 
+Ethical Guidelines
+
+ 
+ 
+
+ 
+Submission
+ 
+ 
+Submit an Article
+
+ 
+Submit a Perspective
+
+ 
+Submit a Discussion Addendum
+
+ 
+Propose an Article
+
+ 
+Suggest a Subject for an Article
+
+ 
+ 
+
+ 
+About OrgSyn
+ 
+ 
+About OrgSyn
+
+ 
+DEIR Statement
+
+ 
+History of OrgSyn
+
+ 
+Board of Editors
+
+ 
+Board of Directors
+
+ 
+Former Editors
+
+ 
+List of Volume Editors
+
+ 
+Most Accessed Articles
+
+ 
+Most Cited Articles
+
+ 
+ 
+
+ 
+Safety
+ 
+ 
+Safety and Waste Disposal Information
+
+ 
+Safety Notes
+
+ 
+ 
+
+ 
+Grants/Programs
+ 
+ 
+OS Philanthropy
+
+ 
+OS PUI Grants
+
+ 
+OS Workshop
+
+ 
+ 
+
+ 
+Contact OrgSyn
+ 
+ 
+Website related questions
+
+ 
+Procedure related questions
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ ^
+
+
+ Top
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ Org. Synth. 2020, 97, 314-326
+
+
+DOI: 10.15227/orgsyn.097.0314
+
+Preparation of 1H-Indazole-3-carbonitrile
+
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+
+
+Submitted by Yonggang Chen,1* Qinghao Chen, Lushi Tan, Lu Chen, † and Xiaowei Wang†
+
+
+
+
+
+Checked by Yuma Komori, Masanori Nagatomo, and Masayuki Inoue
+
+
+
+
+
+
+1. Procedure (Note 1)
+
+ 
+
+ 
+A.1H-Indazole-3-carbonitrile (1). A 500-mL, four-necked, round-bottomed flask is equipped with a 4 cm Teflon-coated football-shaped magnetic stir bar. The left neck is equipped with a 20 cm Dimroth condenser, which is connected to an argon bubbler. The front neck is equipped with a needle to inject argon gas inserted through a 15/25 rubber septum. The right neck is equipped with a thermocouple inserted through a 15/25 rubber septum. The central neck is equipped with a connecting adapter (lower outer joint 29/42, upper inner joint 15/25) and a 200 mL pressure-equalizing addition funnel (15/25 joint). 3-Iodo-1H-indazole (20 g, 82 mmol, 1 equiv) (Note 2) is added from the central neck, and then the flask is evacuated and backfilled with argon three times (Figures 1 and 2). Dimethylacetamide (DMAc, 160 mL) (Note 3) is added from a pressure-equalizing addition funnel. The flask is immersed in a silicone oil bath. The light-yellow solution is bubbled with argon for 1 h at 27 °C (150 mL/min). 
+
+
+ 
+ 
+
+ 
+Figures 1 and 2. Reaction set-up (photos provided by checker)
+
+Potassium ferrocyanide (K4[Fe(CN)6]·3H2O , 17.3 g, 41 mmol, 0.5 equiv) (Note 4) is added from the central neck, and the mixture is heated to 40 °C. Water (120 mL) (Note 5) is added slowly from a pressure-equalizing addition funnel over 5 min, and the mixture is heated to 60 °C. The mixture is bubbled with argon for 1 h (150 mL/min). Allylpalladium(II) chloride dimer ([PdCl(C3H5)]2, 150 mg, 0.41 mmol, 0.5 mol%) (Note 6) and Xantphos (0.474 g, 0.82 mmol, 1 mol%) (Note 7) are added into the mixture from the central neck, then the neck is sealed with Teflon tape. The resulting yellow slurry is heated to 95 °C and aged with stirring for 14 h (Figure 3). Argon flow is kept during the reaction (300 mL/min) (Note 8). After completion of the reaction, the mixture is cooled to 25 °C (Figure 4). The completion of the reaction is checked by TLC (Note 9). Water (60 mL) is added and followed by 2-methyltetrahydrofuran (2-MeTHF, 140 mL) (Note 10) from a pressure-equalizing addition funnel and aged with stirring for 0.5 h. Then, the mixture is transferred to 2 L separatory funnel. The aqueous layer is separated and back-extracted with 2-MeTHF (1 × 140 mL, and 5 × 100 mL). 
+
+
+ 
+ 
+
+ 
+Figure 3. Reaction mixture at 95 oC (photo provided by checker) 
+
+
+
+ 
+ 
+
+ 
+Figure 4. Appearance at completion of reaction (photo provided by checker) 
+
+ 
+
+ 
+ 
+
+ 
+Figure 5. Reaction mixture in separatory funnel after aqueous wash (photo provided by checker)
+
+The combined organic layers are washed with aqueous sodium sulfate (aqueous Na2SO4, 150 mL, 0.35 N) (Note 11) (Figure 5), dried over Na2SO4, and filtered through a filter funnel fitted with a plug of glass wool into a 2 L round-bottomed flask. The organic layer is concentrated by rotary evaporation under vacuum (39 °C, 780 to 60 mmHg, 25 min) to give a solution of 1H-indazole-3-carbonitrile in DMAc.
+
+
+The 1H-indazole-3-carbonitrile DMAc solution is transferred into a 500 mL, three-necked, round-bottomed flask, and concentrated to approximately 40 mL by rotary evaporation under vacuum (39 °C, 780 to 14 mmHg, 30 min). The flask is equipped with a 4 cm Teflon-coated football-shaped magnetic stir bar. The left neck is equipped with a 15/25 rubber septum. The right neck is equipped with a thermocouple inserted through a 15/25 rubber septum. The central neck is equipped with a connecting adapter (lower outer joint 29/42, upper inner joint 15/25) and a 100 mL pressure-equalizing addition funnel (15/25 joint) (Figure 6). Water (100 mL) is added slowly from a pressure-equalizing addition funnel over 4 min, and the mixture is stirred at 25 °C for 0.5 h. 
+
+
+ 
+ 
+
+ 
+Figure 6. Reaction set-up prior to addition of water (photo provided by checker)
+
+Water (100 mL) is added slowly from a pressure-equalizing addition funnel over 4 min, and the mixture is stirred at 25 °C for 2 h (Figure 7). The mixture is filtered through Kiriyama-funnel (SU-60, filter paper: No.5B, 60 mmφ) and washed with water (60 mL). The obtained wet cake (15.29 g) is dried under vacuum (28 °C, 0.8 mmHg, 17 h). A light-yellow solid (11.32 g, 96%) is obtained with 97.1% purity as determined by qNMR analysis (Notes 12, 13, and 14) (Figure 8).
+
+
+
+ 
+ 
+
+ 
+Figure 7. Crystallization slurry (photo provided by checker)
+
+
+
+ 
+ 
+
+ 
+Figure 8. Isolated product (photo provided by checker)
+
+ 
+
+ 
+
+ 
+
+ 2. Notes
+ 
+
+
+ 
+ 
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/content/acs/en/about/governance/committees/chemicalsafety/hazard-assessment.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with 3-iodo-1H-indazole, K4[Fe(CN)6]·3H2O, allylpalladium(II) chloride dimer, Xantphos, Na2SO4, DMAc, and 2-MeTHF.
+
+
+
+2. 3-Iodo-1H-indazole (>95%, Bide Pharmatech Ltd.) was used as received (submitters). 3-Iodo-1H-indazole (98%, Combi-Blocks) was used as received (checkers).
+
+
+
+3. DMAc (>98%, Richjoint) was used as received (submitters). DMAc (>99.5%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+
+
+
+4. Potassium ferrocyanide (K4[Fe(CN)6]·3H2O (>99%, Shanghai Experiment Reagent Co., Ltd.) was used as received (submitters). Potassium ferrocyanide (K4[Fe(CN)6]·3H2O (>99.5%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+
+
+
+5. Water is bubbled with nitrogen for 1 h before the charge (submitters). Water is bubbled with argon for 1 h before the charge (checkers).
+
+
+
+6. Allylpalladium(II) chloride dimer (56%~59%Pd, Zhejiang Metallurgical Research Institute Co., Ltd.) was used as received (submitters). Allylpalladium(II) chloride dimer (57.2%~59.2%Pd, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+
+
+
+7. Xantphos (>99%, Puyang Huicheng Electronic Material Co., Ltd.) was used as received (submitters). Xantphos (>98%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+
+
+
+8. In 1 g-scale test runs, 1 was obtained in 3% yield without any argon flow, and 1 and starting material were obtained in 60% and 30% yields, respectively, with slow argon flow (10 mL/min).
+
+
+
+9. TLC analysis of the reaction mixture was shown below. The Rf value of the product and 3-iodo-1H-indazole in hexane/EtOAc (2/1, v/v) was 0.46 and 0.32, respectively. The spot of the product can be viewed by fluorescence on silica gel 60 F254 plates (TLC Silica gel 60 F254, purchased from Merck KGaA) with UV light (254 nm).
+
+
+ 
+ 
+
+ 
+Figure 9. TLC analysis of reaction mixture (photo provided by checker)
+
+
+
+
+
+10. 2-MeTHF (>99%, Shandong Yinuo Biomass Material Co., Ltd.) was used as received. 2-MeTHF (98%, contains 0.025% 2,6-di-t-butyl-4-methylphenol as stabilizer, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+
+
+
+11. Na2SO4 (>99%, Chinasun Specialty Products Co., Ltd.) was used as received. Na2SO4 (>99%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+
+
+
+12. When the reaction was carried out on a 12 g-scale, 6.82 g (97%) of the product was obtained.
+
+
+
+13. The product (1) exhibits the following analytical data: mp 129-130 °C; 1H NMR pdf (500 MHz, CDCl3) δ: 7.39 (dd, J = 7.5, 7.4 Hz, 1H), 7.55 (dd, J = 8.0, 7.5 Hz, 1H), 7.75 (d, J = 8.6 Hz, 1H), 7.87 (d, J = 8.0 Hz, 1H), 12.0 (br s, 1H). 13C NMR pdf (125 MHz, CDCl3) δ: 110.9, 113.5, 119.4, 119.8, 124.0, 124.3, 128.6, 139.9. IR (KBr film): 3158, 2922, 2236, 1513, 1480, 1349, 1253, 1182, 1076, 908 cm-1. HRMS (ESI-TOF) calcd for C8H5N3Na+ [M + Na]+ 166.0376; found 166.0378.
+
+
+
+14. The qNMR pdf was conducted using dimethyl fumarate as an internal standard. Dimethyl fumarate (>99.0%, FUJIFILM Wako Pure Chemical Corporation) was used as received (checkers).
+
+
+
+
+
+Working with Hazardous Chemicals
+
+
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+
+3. Discussion
+
+
+
+Palladium-catalyzed cyanations are widely used for the preparation of nitrile containing compounds.2 To date, a variety of cyanide sources, including KCN, NaCN, Zn(CN)2, and potassium ferrocyanide (K4[Fe(CN)6]), have been used.2a In 1973, Takagi et al. reported the first example of palladium-catalyzed cyanation of Ar-X (X = I or Br) and potassium cyanide.3 While potassium cyanide and sodium cyanide are cheap and readily available, the palladium-catalyzed cyanation using these reagents on the scale is hindered due to the reagent toxicity, low catalyst turnover numbers (TON), and harsh reaction conditions. For example, typical Takagi's cyanation is carried out at 140-150 °C in DMF, with 2-4 mol% catalyst. Recently, considerable efforts have been made on palladium-catalyzed cyanation using zinc cyanide reagent, and improved efficiency has been achieved.4 However, the cyanation procedures that employ KCN, NaCN, and Zn(CN)2 require handling of toxic reagent and, in general, lack robustness.
+
+
+Most recently, advances have been made in the area of palladium-catalyzed cyanation employing non-toxic Potassium ferrocyanide.5 The cyanation procedures using Potassium ferrocyanide not only remove the requirement of handling highly-toxic reagent but also have been demonstrated to be robust and applicable to a wide variety of substrates, including challenging heteroaromatic substrates. Herein, we describe a modified procedure to prepare the title compound in excellent yield and purity.4 Furthermore, this protocol has been successfully used for the preparation of other heteroaryl nitriles on the multi-kg scale.
+
+
+
+ 
+
+ 
+References and Notes
+
+ 
+ 
+ 
+Yonggang Chen, Process R & D, Merck & Co., Inc., P.O. Box 2000, Rahway NJ 07065, USA. Email: Yonggang.chen@merck.com ORCID : 0000-0003-3540-1384.
+
+ 
+ 
+For selected reviews, see: (a) Nauth, A. M.; Opatz, T. Org. Biomol. Chem. 2019, 17, 11-23. (b) Anbarasan, P.; Schareina, T.; Beller, M. Chem. Soc. Rev. 2011, 40, 5049-5067.
+
+ 
+ 
+Takagi, K.; Okamoto, T.; Sakakibara, Y.; Oka, S. Chem. Lett. 1973, 471-474.
+
+ 
+ 
+For selected references, see: (a) Tschaen, D. M.; Desmond, R.; King, A. O.; Fortin, M. C.; Pipik, B.; King, S.; Verhoeven, T. R. Synth. Commun. 1994, 24, 887-890. (b) Maligres, P. E.; Waters, M. S.; Fleitz, F.; Askin, D. Tetrahedron Lett. 1999, 40, 8193-8195. (c) Shevlin, M. Tetrahedron Lett. 2010, 51, 4833-4836. (d) Cohen, D. T.; Buchwald, S. L. Org. Lett. 2015, 17, 202-205.
+
+ 
+ 
+For selected references, see: (a) Senecal, T. D.; Shu, W.; Buchwald, S. L. Angew. Chem. Int. Ed. 2013, 52, 10035-10039. (b) Richardson, J.; Mutton, S. P. J. Org. Chem. 2018, 83, 4922-4931.
+
+
+ 
+ 
+
+
+
+
+
+
+
+
+ Appendix
+
+ Chemical Abstracts Nomenclature (Registry Number)
+
+
+ 
+
+ 3-iodo-1H-indazole; (66607-27-0)
+
+ 
+ 
+
+ Dimethylacetamide; (127-19-5)
+
+ 
+ 
+
+ Potassium ferrocyanide; (14459-95-1)
+
+ 
+ 
+
+ Allylpalladium(II) chloride dimer; (12012-95-2)
+
+ 
+ 
+
+ Xantphos; (161265-03-8)
+
+ 
+ 
+
+ 2-MeTHF; (96-47-9)
+
+ 
+ 
+
+ Sodium sulfate; (7757-82-6)
+
+ 
+ 
+
+ 1H-Indazole-3-carbonitrile; (1) (50264-88-5)
+
+ 
+
+ 
+
+
+ 
+ 
+ 
+
+ 
+
+ 
+ 
+
+ 
+Yonggang Chen obtained his B.S. degree from Lanzhou University. After acquiring his Ph.D. at Brandeis University in the laboratory of Professor Li Deng, he commenced an American Heart Association postdoctoral fellowship at Harvard under the supervision of Professor Eric N. Jacobsen. His research interests lie in the development of new methodologies and new routes to drug substances and intermediates.
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+Qinghao Chen was born in Shanghai, China, in 1979. He completed his undergraduate and doctoral studies from MIT (2000) and Harvard University (2006) under the guidance of Prof. Christopher C. Cummins and Prof. Eric N. Jacobsen, respectively. Between 2006 and 2019, he supported numerous internal and external projects across all phases of development in the Process R&D at Merck & Co., Inc., Kenilworth, NJ, USA (MSD). He is currently leading the High Throughput Experimentation group in the department of Small Molecule API Development at Janssen Pharmaceutica in Belgium.
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+Lushi Tan is an alumnus of Hunan Normal University (B.S.) and Nanjing University (M.S.). He received his Ph.D. from the University of Minnesota in 1995 then joined Merck & Co., Inc., Kenilworth, NJ, USA (MSD) as a senior chemist. He is now a Distinguished Scientist and External Capability Lead at MSD. He supervises a team of senior scientists working to improve the capability of MSD strategic partners around the world, with responsibility for the process development and manufacturing of all MSD development compounds. Lushi's research interests range from asymmetric synthesis, catalysis, and bio-catalysis to mechanistic investigations of new reactions.
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+Lu Chen was born in Shandong, China, in 1986. He graduated from Shandong University in 2008 and joined WuxiApptec since then, focusing on organic chemistry research and development.
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+Xiaowei Wang was born in AnHui, China, in 1985. In 2012, He received his Ph.D. from Shanghai Institute of Organic Chemistry (SIOC) under the supervision of Professor Shizheng Zhu. Then he joined WuxiApptec as a senior research scientist, and his research focuses on high-throughput screening and process development. 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+Yuma Komori was born in Chiba, Japan. He graduated from the University of Tokyo in 2020 with B.S. in Pharmaceutical Sciences. He is continuing his graduate studies at the University of Tokyo under the supervision of Prof. Masayuki Inoue. His research interests are in the area of the total synthesis of complex natural products.
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+Masanori Nagatomo completed his Ph.D. (2012) from the University of Tokyo under the supervision of Professor Masayuki Inoue. In 2012, he carried out visiting research with Professor Phil S. Baran at The Scripps Research Institute. In the same year, he was appointed as Assistant Professor in the Graduate School of Pharmaceutical Sciences at the University of Tokyo and was promoted to Lecturer in 2018. His research efforts focus on the development of novel synthetic methodology and applications to the multistep synthesis of complex molecules.
+
+ 
+
+ 
+ 
+
+
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+ Notes
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ References/EndNotes
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ Article Compounds
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ Authors
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+  
+ 
+
+ 
+
+ Home
+ 
+
+ 
+
+ |
+ 
+
+ 
+
+ About OrgSyn 
+ 
+
+ 
+
+ |
+ 
+
+ 
+
+ Contact Us 
+ 
+
+ 
+
+ |
+ 
+
+ 
+
+ Follow Us via 
+ 
+ 
+ 
+ 
+
+ 
+
+  
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ Published by Organic Syntheses, Inc.
+ 
+
+ 
+
+ 
+
+ 
+
+ ISSN 2333-3553 (online)
+ 
+
+ 
+
+ 
+
+ 
+
+ ISSN 0078-6209 (print) 
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ We use cookies to help understand how people use our website.
+ 
+
+
+ By using our site, you agree to our use of cookies
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ This site is powered by
+ 
+
+ 
+
+ 
+
+ 
+
+ VPInformatics
+ 
+
+ 
+
+ 
+
+ 
+
+ Life Science Data Management
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ Copyright© 2026 | All Rights Reserved
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+ 
+
+ 
+
+HAZARD WARNING TO USERS
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+ The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry. 
+ These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers, 
+ and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures 
+ and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures 
+ herein. 
+ 
+
+
+ I have read and acknowledge that I have training in the field of organic chemistry 
+ and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+ 
+ 
+
+
+ 
+ 
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+ 
+No part of this Website or Database may be reproduced, stored in a
+ retrieval system or transmitted
+ in any form or by any means, electronic, mechanical, photocopying,
+ recording, scanning or
+ otherwise, except as permitted under Sections 107 or 108 of the 1976
+ United States Copyright
+ Act.
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+ 
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ Remember for 30 days

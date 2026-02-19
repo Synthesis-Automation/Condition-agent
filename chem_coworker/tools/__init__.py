@@ -161,8 +161,10 @@ from .chemistry import CHEMISTRY_TOOLS
 from .taxonomy import TAXONOMY_TOOLS
 from .conditions import CONDITIONS_TOOLS
 from .reagent import REAGENT_TOOLS
+from .literature import LITERATURE_TOOLS
+from .notes import NOTES_TOOLS
 
-for _plugin in CHEMISTRY_TOOLS + TAXONOMY_TOOLS + CONDITIONS_TOOLS + REAGENT_TOOLS:
+for _plugin in CHEMISTRY_TOOLS + TAXONOMY_TOOLS + CONDITIONS_TOOLS + REAGENT_TOOLS + LITERATURE_TOOLS + NOTES_TOOLS:
     REGISTRY.register(_plugin)
 
 # ---------------------------------------------------------------------------

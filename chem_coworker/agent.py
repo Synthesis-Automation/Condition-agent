@@ -479,6 +479,13 @@ class ChemCoworker:
         lines.append(f"  • RDKit {rdkit_info}: molecular descriptors, fingerprints, "
                      "substructure search, SMILES parsing/canonicalization, stereochemistry")
 
+        # Literature folder
+        try:
+            from .tools.literature import describe_literature_folder
+            lines.append(describe_literature_folder())
+        except Exception:
+            pass
+
         return "\n".join(lines)
 
     def _run_observe_step(

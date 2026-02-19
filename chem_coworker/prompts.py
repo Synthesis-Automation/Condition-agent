@@ -234,6 +234,87 @@ HARD RULES:
 
 
 # ---------------------------------------------------------------------------
+# Intake: extract actionable chemistry notes from a document
+# Used by NotesExtractor — NOT a query-time prompt
+# ---------------------------------------------------------------------------
+
+EXTRACT_NOTES_PROMPT = """\
+You are a chemistry knowledge curator. Your job is to read a chemistry document
+and extract generalizable, actionable knowledge that would help a bench chemist
+avoid problems and make better decisions for future reactions of the same type.
+
+━━━ SOURCE DOCUMENT ━━━
+Source: {source_name}
+Date: {date}
+
+{document_text}
+
+━━━ YOUR JOB ━━━
+
+Extract GENERALIZABLE chemistry knowledge from this document. Focus on insights
+that apply beyond this specific procedure — things a chemist should know for any
+reaction of this type.
+
+Organize your output into these sections (skip any that have no relevant content):
+
+### Reaction Type
+State the named reaction(s) this document covers and any key variants.
+Also write these metadata lines (they will be parsed automatically):
+  `reaction_types: suzuki_miyaura, negishi_coupling`   ← canonical key(s) for the notes filename
+  `tags: copper, sp3_coupling, alkyl_halide, boron, NaOtBu, pressure_vessel`
+  `doi: 10.15227/orgsyn.102.0086`          ← if a DOI is present in the document
+  `journal: Org. Synth.`                   ← abbreviated journal name (Org. Synth., JACS, Angew. Chem., etc.)
+  `year: 2025`                             ← publication year
+  `pages: 102, 86–99`                      ← volume, page range or article number
+
+Only write the citation lines if the information actually appears in the document — omit any that are absent.
+
+Tags should include 5–10 concise keywords for cross-category retrieval:
+  • Metal catalysts: copper, palladium, nickel, rhodium, iron
+  • Bond types: sp3_coupling, CN_coupling, CO_coupling, CC_coupling
+  • Key reagents/conditions: boron, NaOtBu, toluene, microwave, pressure_vessel
+  • Notable issues: beta_hydride_elimination, protodeboronation, homocoupling
+Use snake_case for multi-word terms. Do NOT include citation text in tags.
+
+### Solvent Notes
+Solvents to prefer or avoid, and the chemistry reason why.
+  ✓ Good: "THF/H₂O (3:1) — good for Pd-catalyzed couplings with inorganic base"
+  ✗ Avoid: "DMF — causes proto-deboronation of arylboronic acids under basic conditions"
+
+### Reagent and Catalyst Notes
+Catalyst/ligand preferences, incompatibilities, or substrate-specific requirements.
+  e.g. "XPhos Pd G3 required for sterically hindered or electron-rich aryl chlorides"
+  e.g. "Avoid Pd(OAc)₂ without a phosphine ligand — rapid decomposition to Pd black"
+
+### Side Reactions
+Known side reactions, what causes them, and how to suppress them.
+  e.g. "Homocoupling of ArB(OH)₂ when Pd loading > 3 mol% or O₂ not excluded"
+  e.g. "Proto-deboronation competes above 90°C in aqueous base"
+
+### Substrate Scope and Limitations
+What substrate classes work, what are problematic, and what modifications help.
+  e.g. "Ortho-substituted aryl bromides: require bulky ligand (SPhos, XPhos)"
+  e.g. "Electron-deficient heteroaryl chlorides: lower reactivity, increase temp to 100°C"
+
+### Critical Conditions
+Temperature, atmosphere, addition order, concentration, or timing effects that matter.
+  e.g. "Add base LAST to prevent premature boronate hydrolysis"
+  e.g. "Degassing is critical — O₂ deactivates Pd catalyst rapidly"
+
+### Yield / Troubleshooting Tips
+Practical observations from this source on improving outcomes.
+
+━━━ RULES ━━━
+× Do NOT extract specific quantities (5 mmol, 2.0 equiv) unless they illustrate a principle
+× Do NOT extract routine workup steps
+× Do NOT copy full experimental procedures verbatim — extract the *principle*
+× Keep each bullet concise (1-2 lines)
+× Include the source name in parentheses at the end of each item
+  e.g. "Avoid DMF — proto-deboronation (Molander, Org. Syn. 2024)"
+"""
+
+
+# ---------------------------------------------------------------------------
 # Optional: system identity for multi-turn conversations
 # ---------------------------------------------------------------------------
 

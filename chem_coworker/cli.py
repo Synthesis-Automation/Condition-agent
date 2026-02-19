@@ -1,10 +1,13 @@
 """
-ChemCoworker Interactive CLI
+ChemCoworker CLI
 
 Usage:
-    python chem_coworker/cli.py
+    python chem_coworker/cli.py                                   # interactive chat
     python chem_coworker/cli.py --model gpt-5.2 --provider openai
     python chem_coworker/cli.py --model glm-5 --provider aliyun
+    python chem_coworker/cli.py intake <source>                   # intake a document
+    python chem_coworker/cli.py intake https://...                # fetch + extract URL
+    python chem_coworker/cli.py intake paper.pdf --reaction-type suzuki_miyaura
 
 Features:
   - Interactive model selector at startup
@@ -12,6 +15,7 @@ Features:
   - Shows plan, tools, and answer in Claude Code-style output
   - Spinner animation during LLM calls
   - Wall-clock timing display
+  - Intake subcommand: extract chemistry notes from URLs, PDFs, and text files
 """
 from __future__ import annotations
 
@@ -228,6 +232,77 @@ def _print_response(response: "ChemResponse", verbose: bool = False) -> None:
 # Main CLI loop
 # ---------------------------------------------------------------------------
 
+def _cmd_intake(args: argparse.Namespace) -> None:
+    """Handle the 'intake' subcommand."""
+    import time as _time
+    from chem_coworker.extractor import NotesExtractor
+
+    model = args.model or "o4-mini"
+    provider = args.provider or ("aliyun" if model in _ALIYUN_MODELS else "openai")
+
+    print()
+    print(f"  {C.LABEL}◆ ChemCoworker Intake{C.R}  {C.DIM}Document → Notes{C.R}")
+    print(f"  {_SEP}")
+    print(f"  {C.META}Model:{C.R}  {C.BOLD}{model}{C.R}  {C.META}{provider}{C.R}")
+    print(f"  {C.META}Source:{C.R} {C.DIM}{args.source!r}{C.R}")
+    if args.reaction_type:
+        print(f"  {C.META}Hint:{C.R}   {C.DIM}{args.reaction_type}{C.R}")
+    print()
+
+    spinner = Spinner("Extracting notes")
+    spinner.start()
+    t0 = _time.time()
+
+    try:
+        extractor = NotesExtractor(provider=provider, model=model, verbose=args.verbose)
+        result = extractor.intake(
+            source=args.source,
+            reaction_type=args.reaction_type or "",
+            save_to_literature=not args.no_save,
+        )
+    except Exception as exc:
+        spinner.stop()
+        print(f"  {C.ERR}✗{C.R}  {exc}")
+        sys.exit(1)
+
+    spinner.stop()
+    elapsed = _time.time() - t0
+
+    if not result.get("success"):
+        print(f"  {C.ERR}✗{C.R}  {result.get('error', 'Unknown error')}")
+        for w in result.get("warnings", []):
+            print(f"  {C.WARN}⚠{C.R}  {w}")
+        sys.exit(1)
+
+    # ── Results ──────────────────────────────────────────────────────
+    print(f"  {C.OK}✓{C.R}  Extracted {result['char_count']:,} chars  {C.META}{elapsed:.1f}s{C.R}")
+    print()
+
+    # Reaction types detected
+    types_str = ", ".join(result["reaction_types"])
+    print(f"  {C.LABEL}◆ Reaction types{C.R}  {C.TOOL}{types_str}{C.R}")
+
+    # Notes files written
+    print(f"  {C.LABEL}◆ Notes written to{C.R}")
+    for nf in result["notes_files"]:
+        print(f"      {C.DIM}{nf}{C.R}")
+
+    # Warnings
+    for w in result.get("warnings", []):
+        print(f"  {C.WARN}⚠{C.R}  {w}")
+
+    # Preview extracted notes
+    if not args.quiet:
+        print()
+        print(_SEP_FAT)
+        preview = result["extracted_notes"]
+        if len(preview) > 2000:
+            preview = preview[:2000] + f"\n\n{C.DIM}[… {len(result['extracted_notes']) - 2000} more chars …]{C.R}"
+        for line in preview.splitlines():
+            print(f"  {line}" if line.strip() else "")
+        print(_SEP_FAT)
+
+
 def main() -> None:
     arg_parser = argparse.ArgumentParser(
         description="ChemCoworker — general-purpose chemistry AI agent",
@@ -238,12 +313,48 @@ Examples:
   python chem_coworker/cli.py --model gpt-5.2
   python chem_coworker/cli.py --model glm-5 --provider aliyun
   python chem_coworker/cli.py --verbose
+  python chem_coworker/cli.py intake https://www.orgsyn.org/demo.aspx?prep=v102p0086
+  python chem_coworker/cli.py intake paper.pdf --reaction-type buchwald_hartwig
         """,
     )
     arg_parser.add_argument("--model", default=None, help="LLM model name (skip selector if set)")
     arg_parser.add_argument("--provider", default=None, help="LLM provider: openai or aliyun")
     arg_parser.add_argument("--verbose", action="store_true", help="Show tool result details")
+
+    subparsers = arg_parser.add_subparsers(dest="command")
+
+    # ── intake subcommand ─────────────────────────────────────────────
+    intake_parser = subparsers.add_parser(
+        "intake",
+        help="Extract chemistry notes from a URL, PDF, or text file",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python chem_coworker/cli.py intake https://www.orgsyn.org/demo.aspx?prep=v102p0086
+  python chem_coworker/cli.py intake paper.pdf --reaction-type suzuki_miyaura
+  python chem_coworker/cli.py intake my_notes.txt
+        """,
+    )
+    intake_parser.add_argument("source", help="URL, file path, or raw text to process")
+    intake_parser.add_argument(
+        "--reaction-type", default="",
+        help="Hint for reaction type (e.g. suzuki_miyaura). Auto-detected if omitted.",
+    )
+    intake_parser.add_argument(
+        "--no-save", action="store_true",
+        help="Do not save fetched document to literature/ folder",
+    )
+    intake_parser.add_argument(
+        "--quiet", "-q", action="store_true",
+        help="Suppress extracted notes preview",
+    )
+
     args = arg_parser.parse_args()
+
+    # ── Route to intake subcommand ────────────────────────────────────
+    if args.command == "intake":
+        _cmd_intake(args)
+        return
 
     # ── Banner ────────────────────────────────────────────────────────
     print()
