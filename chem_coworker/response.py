@@ -65,6 +65,7 @@ class ChemResponse:
     elapsed_s: float = 0.0
     llm_calls: int = 0
     compacted: bool = False   # True if conversation history was compacted this turn (A4)
+    streamed: bool = False    # True if answer was written to stdout token-by-token
 
     # ------------------------------------------------------------------
     # Convenience methods

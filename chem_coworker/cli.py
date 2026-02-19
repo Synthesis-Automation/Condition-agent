@@ -200,29 +200,15 @@ def _print_response(response: "ChemResponse", verbose: bool = False) -> None:
     """Print a ChemResponse in Claude Code-style formatted output."""
     import json
 
-    print()
-
-    # ── Plan / Hypothesis ──────────────────────────────────────────────
-    if response.hypothesis or response.plan_rationale:
-        conf_str = f"{C.CONF}[{response.confidence:.0%}]{C.R}" if response.confidence else ""
-        print(_label("◆", "Hypothesis") + f"  {conf_str}")
-        if response.hypothesis:
-            print(f"  {C.HYPO}{response.hypothesis}{C.R}")
-        if response.plan_rationale:
-            print(f"  {C.META}{response.plan_rationale}{C.R}")
-        if response.plan_revised:
-            print(f"  {C.META}↺ Plan revised after Group 0 observation{C.R}")
-        print()
-
-    # ── Tools called ──────────────────────────────────────────────────
-    if response.tools_called:
-        # Arrow-joined tool chain
-        arrow = f"  {C.META}→{C.R}  "
-        tool_chain = arrow.join(f"{C.TOOL}{t}{C.R}" for t in response.tools_called)
-        print(_label("⎿", "Tools"))
-        print(f"  {tool_chain}")
+    if response.streamed:
+        # A5 — answer was already printed token-by-token.
+        # Flush any partial line, close the answer block, then print metadata.
+        _stream_state["writer"].flush_remaining()
+        print()          # ensure we're on a fresh line
+        print(_SEP_FAT)  # closing separator
 
         if verbose and response.tool_results:
+            # Show tool result details below the streamed answer
             print()
             for name, result in response.tool_results.items():
                 print(f"  {C.DIM}┌ {name}{C.R}")
@@ -237,17 +223,53 @@ def _print_response(response: "ChemResponse", verbose: bool = False) -> None:
                 else:
                     print(f"  {C.DIM}│{C.R}  {str(result)[:400]}")
     else:
-        print(f"  {C.META}⎿ (no tools called — answered from LLM knowledge){C.R}")
+        # Non-streaming: print everything at once (original path)
+        print()
 
-    # ── Answer ────────────────────────────────────────────────────────
-    print()
-    print(_SEP_FAT)
-    for line in response.answer.strip().splitlines():
-        # Preserve blank lines; indent content lines
-        print(f"  {line}" if line.strip() else "")
-    print(_SEP_FAT)
+        # ── Plan / Hypothesis ──────────────────────────────────────────────
+        if response.hypothesis or response.plan_rationale:
+            conf_str = f"{C.CONF}[{response.confidence:.0%}]{C.R}" if response.confidence else ""
+            print(_label("◆", "Hypothesis") + f"  {conf_str}")
+            if response.hypothesis:
+                print(f"  {C.HYPO}{response.hypothesis}{C.R}")
+            if response.plan_rationale:
+                print(f"  {C.META}{response.plan_rationale}{C.R}")
+            if response.plan_revised:
+                print(f"  {C.META}↺ Plan revised after Group 0 observation{C.R}")
+            print()
 
-    # ── Metadata footer ───────────────────────────────────────────────
+        # ── Tools called ──────────────────────────────────────────────────
+        if response.tools_called:
+            arrow = f"  {C.META}→{C.R}  "
+            tool_chain = arrow.join(f"{C.TOOL}{t}{C.R}" for t in response.tools_called)
+            print(_label("⎿", "Tools"))
+            print(f"  {tool_chain}")
+
+            if verbose and response.tool_results:
+                print()
+                for name, result in response.tool_results.items():
+                    print(f"  {C.DIM}┌ {name}{C.R}")
+                    if isinstance(result, dict):
+                        display = {k: v for k, v in result.items() if k != "success"}
+                        try:
+                            raw = json.dumps(display, indent=2, default=str)[:1000]
+                        except Exception:
+                            raw = str(display)[:600]
+                        for line in raw.splitlines():
+                            print(f"  {C.DIM}│{C.R}  {line}")
+                    else:
+                        print(f"  {C.DIM}│{C.R}  {str(result)[:400]}")
+        else:
+            print(f"  {C.META}⎿ (no tools called — answered from LLM knowledge){C.R}")
+
+        # ── Answer ────────────────────────────────────────────────────────
+        print()
+        print(_SEP_FAT)
+        for line in response.answer.strip().splitlines():
+            print(f"  {line}" if line.strip() else "")
+        print(_SEP_FAT)
+
+    # ── Metadata footer (always printed) ─────────────────────────────
     parts = [
         response.model,
         f"{response.elapsed_s:.1f}s",
@@ -292,6 +314,108 @@ _PHASE_LABELS = {
     "synth_start":   "Synthesizing",
     "compact_start": "Compacting history",
 }
+
+
+# ---------------------------------------------------------------------------
+# A5 — Answer streaming
+# ---------------------------------------------------------------------------
+
+class _LineWriter:
+    """
+    Buffers streaming tokens and writes them to stdout with a 2-space indent
+    on each line — matching the non-streaming answer display style.
+    """
+    def __init__(self) -> None:
+        self._buf = ""
+
+    def write(self, token: str) -> None:
+        self._buf += token
+        while "\n" in self._buf:
+            line, self._buf = self._buf.split("\n", 1)
+            sys.stdout.write(f"  {line}\n")
+        sys.stdout.flush()
+
+    def flush_remaining(self) -> None:
+        """Flush any partial line at end of stream (no trailing newline)."""
+        if self._buf:
+            sys.stdout.write(f"  {self._buf}")
+            sys.stdout.flush()
+            self._buf = ""
+
+    def reset(self) -> None:
+        self._buf = ""
+
+
+# Mutable streaming state — reset before each query
+_stream_state: dict = {
+    "first_chunk": True,      # True until first token arrives
+    "pre_synth_info": {},     # set by _pre_synth_cb before synthesis
+    "writer": _LineWriter(),  # line-buffered stdout writer
+}
+
+
+def _print_pre_answer_chrome(ctx: dict) -> None:
+    """Print hypothesis + tools block. Used both in streaming and non-streaming paths."""
+    hypothesis  = ctx.get("hypothesis", "")
+    confidence  = ctx.get("confidence", 0.0)
+    rationale   = ctx.get("rationale", "")
+    tools_called = ctx.get("tools_called", [])
+    plan_revised = ctx.get("plan_revised", False)
+
+    print()
+    if hypothesis or rationale:
+        conf_str = f"{C.CONF}[{confidence:.0%}]{C.R}" if confidence else ""
+        print(_label("◆", "Hypothesis") + f"  {conf_str}")
+        if hypothesis:
+            print(f"  {C.HYPO}{hypothesis}{C.R}")
+        if rationale:
+            print(f"  {C.META}{rationale}{C.R}")
+        if plan_revised:
+            print(f"  {C.META}↺ Plan revised after Group 0 observation{C.R}")
+        print()
+
+    if tools_called:
+        arrow = f"  {C.META}→{C.R}  "
+        tool_chain = arrow.join(f"{C.TOOL}{t}{C.R}" for t in tools_called)
+        print(_label("⎿", "Tools"))
+        print(f"  {tool_chain}")
+    else:
+        print(f"  {C.META}⎿ (no tools called — answered from LLM knowledge){C.R}")
+    print()
+
+
+def _pre_synth_cb(
+    hypothesis: str,
+    confidence: float,
+    rationale: str,
+    tools_called: list,
+    plan_revised: bool,
+) -> None:
+    """Called by agent right before synthesis starts — stores plan info for streaming."""
+    _stream_state["pre_synth_info"] = {
+        "hypothesis": hypothesis,
+        "confidence": confidence,
+        "rationale": rationale,
+        "tools_called": tools_called,
+        "plan_revised": plan_revised,
+    }
+
+
+def _stream_token(token: str) -> None:
+    """Called by agent for each synthesis token. Prints pre-answer chrome on first call."""
+    if _stream_state["first_chunk"]:
+        _stream_state["first_chunk"] = False
+        # Stop the Synthesizing... spinner before printing anything
+        if _phase_spinner[0] is not None:
+            _phase_spinner[0].stop()
+            _phase_spinner[0] = None
+        # Print hypothesis + tools block
+        _print_pre_answer_chrome(_stream_state["pre_synth_info"])
+        # Opening answer separator
+        print(_SEP_FAT)
+        _stream_state["writer"].reset()
+
+    _stream_state["writer"].write(token)
 
 
 def _phase(phase: str) -> None:
@@ -366,6 +490,8 @@ def _init_coworker(model: str, provider: str, verbose: bool, plan_mode: bool):
         verbose=verbose,
         progress_cb=_progress,
         phase_cb=_phase,
+        pre_synth_cb=_pre_synth_cb,
+        stream_cb=_stream_token,
         plan_callback=_show_plan_and_confirm if plan_mode else None,
     )
 
@@ -713,8 +839,11 @@ Examples:
             continue
 
         # ── Run the agent ─────────────────────────────────────────────
-        # A3: clear streaming state; phase spinners managed by _phase callback
+        # A3/A5: clear streaming state before each query
         _running_tools.clear()
+        _stream_state["first_chunk"] = True
+        _stream_state["pre_synth_info"] = {}
+        _stream_state["writer"].reset()
         try:
             response, history = coworker.chat(query, history)
         except Exception as exc:

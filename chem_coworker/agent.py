@@ -117,6 +117,9 @@ class ChemCoworker:
         # A3 — real-time streaming
         progress_cb: Optional[Callable[[str, str, float], None]] = None,
         phase_cb: Optional[Callable[[str], None]] = None,
+        # A5 — answer streaming
+        pre_synth_cb: Optional[Callable[[str, float, str, List[str], bool], None]] = None,
+        stream_cb: Optional[Callable[[str], None]] = None,
         # A2 — plan approval
         plan_callback: Optional[Callable[["ExecutionPlan"], "ExecutionPlan"]] = None,
         # A1 — pre/post tool hooks
@@ -127,6 +130,8 @@ class ChemCoworker:
         self.verbose = verbose
         self.progress_cb = progress_cb
         self.phase_cb = phase_cb
+        self.pre_synth_cb = pre_synth_cb
+        self.stream_cb = stream_cb
         self.plan_callback = plan_callback
 
         self.llm = _get_llm_client(provider, model, temperature)
@@ -313,10 +318,32 @@ class ChemCoworker:
             resource_context=self._describe_resources(),
         )
 
+        # A5 — notify CLI of plan info so it can print hypothesis/tools before streaming
+        if self.pre_synth_cb:
+            self.pre_synth_cb(
+                effective_plan.hypothesis or "",
+                effective_plan.confidence,
+                effective_plan.rationale or "",
+                tools_called,
+                plan_revised,
+            )
+
+        streamed = False
         if self.phase_cb: self.phase_cb("synth_start")  # A3
         try:
-            synth_response = self.llm.invoke([HumanMessage(content=synth_text)])
-            answer = self._get_text(synth_response)
+            if self.stream_cb:
+                # A5 — stream tokens directly to CLI as they arrive
+                answer_chunks: List[str] = []
+                for chunk in self.llm.stream([HumanMessage(content=synth_text)]):
+                    token = self._get_text(chunk)
+                    if token:
+                        self.stream_cb(token)
+                        answer_chunks.append(token)
+                answer = "".join(answer_chunks)
+                streamed = True
+            else:
+                synth_response = self.llm.invoke([HumanMessage(content=synth_text)])
+                answer = self._get_text(synth_response)
             llm_calls += 1
         except Exception as exc:
             logger.error(f"[ChemCoworker] Synthesis LLM call failed: {exc}")
@@ -348,6 +375,7 @@ class ChemCoworker:
             provider=self.provider,
             elapsed_s=round(elapsed, 2),
             llm_calls=llm_calls,
+            streamed=streamed,
         )
 
     def chat(
