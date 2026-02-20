@@ -126,6 +126,13 @@ NOTES TOOL GUIDANCE:
      → Discover what notes are available before searching
      → Useful for meta-questions like "what reactions do you have notes on?"
 
+   read_literature_source(filename="demo.aspx_prep_v102p0086.txt")
+     → Use when a note's header contains "source_file:" and the user needs the
+       full experimental procedure, exact stoichiometry, or detailed workup
+       that was intentionally omitted from the notes.
+     → Also works with original URL or partial filename.
+     → Do NOT use for general searches — use search_literature for that.
+
 HARD RULES:
    × Never call search_reaction_types before analyze_bond_changes
    × Never call a tool just to tick a box — ask "what gap does this close?"
@@ -189,6 +196,9 @@ Specific guidance:
     and caveats prominently — they come from real experimental sources and often contain
     the most practically important information (side reactions, workup pitfalls, etc.).
     Cite the source file when quoting a specific note (e.g. "per suzuki_miyaura.md:").
+  • Notes intentionally omit full experimental procedures. If the user needs exact
+    quantities, workup steps, or a full protocol, tell them to use
+    read_literature_source with the source_file listed in the note header.
 
 Format: conversational expert text (default).
 If the user asked for JSON or structured output, provide that instead.
@@ -291,9 +301,11 @@ Use snake_case for multi-word terms. Do NOT include citation text in tags.\
 
 _COMMON_RULES = """\
 ━━━ RULES ━━━
-× Do NOT extract specific quantities (5 mmol, 2.0 equiv) unless they illustrate a principle
-× Do NOT extract routine workup steps
-× Do NOT copy full experimental procedures verbatim — extract the *principle*
+× Do NOT copy full experimental procedures, workup steps, or specific quantities
+  (mmol, equiv, mL) — these remain in the source file and are retrievable on demand.
+  Instead, write one line: "Full procedure available in source file."
+× DO extract the *principles*: why a reagent was chosen, what makes conditions critical,
+  what side reactions to watch for, what substrate limitations apply.
 × Keep each bullet concise (1-2 lines)
 × Include the source name in parentheses at the end of each item
   e.g. "Avoid DMF — proto-deboronation (Molander, Org. Syn. 2024)"\

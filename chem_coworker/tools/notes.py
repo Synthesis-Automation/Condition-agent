@@ -2,17 +2,17 @@
 Notes tools for ChemCoworker.
 
 Manages a multi-type chemistry knowledge base stored as markdown files:
-  notes/reactions/   — per-reaction-type notes (conditions, warnings, HTE data)
-  notes/mechanisms/  — mechanistic principle notes
-  notes/substrates/  — substrate class notes
-  notes/protocols/   — practical technique / procedure notes
+  knowledge_base/notes/reactions/   — per-reaction-type notes (conditions, warnings, HTE data)
+  knowledge_base/notes/mechanisms/  — mechanistic principle notes
+  knowledge_base/notes/substrates/  — substrate class notes
+  knowledge_base/notes/protocols/   — practical technique / procedure notes
 
-An auto-generated _index.json (built by notes/build_index.py) enables fast
+An auto-generated _index.json (built by knowledge_base/notes/build_index.py) enables fast
 faceted retrieval by type, bond, metal, and tags without reading every file.
 
 Folder resolution (in priority order):
   1. CHEM_NOTES_PATH environment variable
-  2. {project_root}/notes/
+  2. {project_root}/knowledge_base/notes/
 
 Tools:
   - read_notes          : exact lookup by ID or reaction type across all note types
@@ -46,7 +46,7 @@ def get_notes_dir() -> Path:
     env_path = os.getenv("CHEM_NOTES_PATH")
     if env_path:
         return Path(env_path)
-    return Path(__file__).parent.parent.parent / "notes"
+    return Path(__file__).parent.parent.parent / "knowledge_base" / "notes"
 
 
 def get_index_path() -> Path:
@@ -556,7 +556,7 @@ def _list_notes(note_type: Optional[str] = None) -> Dict[str, Any]:
         return _success({
             "total_count": 0,
             "entries": [],
-            "note": "No notes found. Run 'python notes/build_index.py' to build the index.",
+            "note": "No notes found. Run 'python knowledge_base/notes/build_index.py' to build the index.",
         })
 
     return _success({"total_count": len(available), "entries": available})

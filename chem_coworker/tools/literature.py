@@ -9,16 +9,16 @@ Supported formats: .txt, .md, .pdf (requires pypdf or pdfminer.six)
 
 Document folder (in priority order):
   1. CHEM_DOCS_PATH environment variable
-  2. {project_root}/literature/
+  2. {project_root}/knowledge_base/sources/
 
 Adding documents:
-  - Drop .txt, .md, or .pdf files into the literature/ folder
+  - Drop .txt, .md, or .pdf files into the knowledge_base/sources/ folder
   - Optional: add a sidecar {filename}.meta.json with {"title": ..., "doi": ..., "year": ...}
   - Documents are cached in memory after first load; restart to pick up new files
 
 Tools:
   - search_literature : keyword search over local chemistry documents
-  - fetch_webpage     : fetch and extract text from a URL (optionally save to literature/)
+  - fetch_webpage     : fetch and extract text from a URL (optionally save to knowledge_base/sources/)
 """
 from __future__ import annotations
 
@@ -48,8 +48,8 @@ def _get_docs_dir() -> Path:
     env_path = os.getenv("CHEM_DOCS_PATH")
     if env_path:
         return Path(env_path)
-    # Default: {project_root}/literature/
-    return Path(__file__).parent.parent.parent / "literature"
+    # Default: {project_root}/knowledge_base/sources/
+    return Path(__file__).parent.parent.parent / "knowledge_base" / "sources"
 
 
 # ---------------------------------------------------------------------------
@@ -637,10 +637,135 @@ fetch_webpage_tool = ToolPlugin(
 
 
 # ---------------------------------------------------------------------------
+# read_literature_source — read a specific saved source file
+# ---------------------------------------------------------------------------
+
+def _read_literature_source(filename: str, max_chars: int = 8000) -> Dict[str, Any]:
+    """Read the full text of a specific source file from the literature/ folder.
+
+    Use this when:
+    - Notes cite a source file and you need the full experimental procedure,
+      exact quantities, or detail that was intentionally omitted from the notes
+    - The user asks "what is the exact procedure / amounts / workup?"
+    - You want to verify or expand on a condensed note
+
+    Lookup order:
+      1. Exact filename match (e.g. "demo.aspx_prep_v102p0086.txt")
+      2. Partial name match (filename is contained in a stored name or vice versa)
+      3. URL match — checks .meta.json sidecars for a matching url field
+
+    Args:
+        filename: Filename in the literature/ folder, or a URL that was used
+                  to fetch the file originally.
+        max_chars: Maximum characters to return (default 8000). Use a higher
+                   value (e.g. 20000) for full procedures.
+
+    Returns:
+        dict with: filename, text, char_count, truncated, available_files (if not found)
+    """
+    docs_dir = _get_docs_dir()
+    if not docs_dir.exists():
+        return _error(f"Literature folder not found: {docs_dir}")
+
+    supported = {".txt", ".md", ".pdf"}
+    candidates = [
+        p for p in sorted(docs_dir.iterdir())
+        if p.suffix.lower() in supported and not p.name.startswith(".")
+    ]
+
+    target_path: Optional[Path] = None
+    query_lower = filename.strip().lower()
+
+    # 1. Exact match
+    for p in candidates:
+        if p.name.lower() == query_lower:
+            target_path = p
+            break
+
+    # 2. Partial name match (query is substring of filename or vice versa)
+    if target_path is None:
+        for p in candidates:
+            if query_lower in p.name.lower() or p.name.lower() in query_lower:
+                target_path = p
+                break
+
+    # 3. URL match via .meta.json sidecars
+    if target_path is None and ("http://" in filename or "https://" in filename):
+        for p in candidates:
+            meta_path = p.with_suffix(p.suffix + ".meta.json")
+            if meta_path.exists():
+                try:
+                    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                    if meta.get("url", "").rstrip("/") == filename.rstrip("/"):
+                        target_path = p
+                        break
+                except Exception:
+                    pass
+
+    if target_path is None:
+        available = [p.name for p in candidates[:20]]
+        return _error(
+            f"No file matching {filename!r} in literature/. "
+            f"Available ({len(candidates)} files): {', '.join(available)}"
+            + (f" ... and {len(candidates) - 20} more" if len(candidates) > 20 else "")
+        )
+
+    # Load content
+    suffix = target_path.suffix.lower()
+    try:
+        if suffix == ".pdf":
+            text = _load_pdf_file(target_path)
+        else:
+            text = target_path.read_text(encoding="utf-8", errors="replace")
+    except Exception as exc:
+        return _error(f"Could not read {target_path.name}: {exc}")
+
+    if not text.strip():
+        return _error(f"File {target_path.name} is empty or could not be parsed.")
+
+    total_chars = len(text)
+    truncated = total_chars > max_chars
+    display_text = text[:max_chars] + f"\n\n[... truncated at {max_chars} chars; {total_chars} total ...]" if truncated else text
+
+    # Load sidecar metadata if available
+    meta_path = target_path.with_suffix(target_path.suffix + ".meta.json")
+    meta: Dict[str, Any] = {}
+    if meta_path.exists():
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    return _success({
+        "filename": target_path.name,
+        "title": meta.get("title", target_path.name),
+        "url": meta.get("url", ""),
+        "text": display_text,
+        "char_count": total_chars,
+        "truncated": truncated,
+    })
+
+
+read_literature_source_tool = ToolPlugin(
+    name="read_literature_source",
+    category="literature",
+    description=(
+        "Read the full saved text of a specific source document from the literature/ folder. "
+        "Use when notes cite a source file and you need the complete experimental procedure, "
+        "exact quantities, or detail intentionally omitted from the extracted notes. "
+        "Accepts filename, partial name, or original URL."
+    ),
+    prerequisites=[],
+    fn=_read_literature_source,
+)
+
+
+# ---------------------------------------------------------------------------
 # All tools in this module
 # ---------------------------------------------------------------------------
 
 LITERATURE_TOOLS = [
     search_literature_tool,
     fetch_webpage_tool,
+    read_literature_source_tool,
 ]

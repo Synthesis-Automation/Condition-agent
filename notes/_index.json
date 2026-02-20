@@ -1,7 +1,13 @@
 {
   "version": 1,
-  "last_built": "2026-02-19T19:51:11.633933+00:00",
+  "last_built": "2026-02-19T22:47:56.710621+00:00",
   "entries": [
+    {
+      "id": "alkyl_alkyl_coupling",
+      "type": "reaction",
+      "title": "Alkyl Alkyl Coupling",
+      "file": "reactions/alkyl_alkyl_coupling.md"
+    },
     {
       "id": "buchwald_hartwig_amination",
       "type": "reaction",
@@ -135,6 +141,48 @@
         "carboxylic_acid",
         "aromatic_carboxylic_acid"
       ]
+    },
+    {
+      "id": "copper_catalysis",
+      "type": "reaction",
+      "title": "Copper Catalysis",
+      "file": "reactions/copper_catalysis.md"
+    },
+    {
+      "id": "copper_catalyzed_borylation",
+      "type": "reaction",
+      "title": "Copper Catalyzed Borylation",
+      "file": "reactions/copper_catalyzed_borylation.md"
+    },
+    {
+      "id": "copper_catalyzed_cross_coupling",
+      "type": "reaction",
+      "title": "Copper Catalyzed Cross Coupling",
+      "file": "reactions/copper_catalyzed_cross_coupling.md"
+    },
+    {
+      "id": "cu_hdc",
+      "type": "reaction",
+      "title": "Cu Hdc",
+      "file": "reactions/cu_hdc.md"
+    },
+    {
+      "id": "hydroboration",
+      "type": "reaction",
+      "title": "Hydroboration",
+      "file": "reactions/hydroboration.md"
+    },
+    {
+      "id": "kumada_coupling",
+      "type": "reaction",
+      "title": "Kumada Coupling",
+      "file": "reactions/kumada_coupling.md"
+    },
+    {
+      "id": "nickel_catalyzed_cross_electrophile_coupling",
+      "type": "reaction",
+      "title": "Nickel Catalyzed Cross Electrophile Coupling",
+      "file": "reactions/nickel_catalyzed_cross_electrophile_coupling.md"
     },
     {
       "id": "palladium_catalyzed_cyanation",
@@ -277,6 +325,12 @@
         "boronic_acid",
         "boronate_ester"
       ]
+    },
+    {
+      "id": "ullmann_coupling",
+      "type": "reaction",
+      "title": "Ullmann Coupling",
+      "file": "reactions/ullmann_coupling.md"
     }
   ],
   "tag_index": {
@@ -452,13 +506,22 @@
   },
   "type_index": {
     "reaction": [
+      "alkyl_alkyl_coupling",
       "buchwald_hartwig_amination",
       "c_o_coupling",
       "carboxylic_acid_to_aldehyde_reduction",
+      "copper_catalysis",
+      "copper_catalyzed_borylation",
+      "copper_catalyzed_cross_coupling",
+      "cu_hdc",
+      "hydroboration",
+      "kumada_coupling",
+      "nickel_catalyzed_cross_electrophile_coupling",
       "palladium_catalyzed_cyanation",
       "photoredox",
       "radical_borylation",
-      "suzuki_miyaura"
+      "suzuki_miyaura",
+      "ullmann_coupling"
     ]
   }
 }

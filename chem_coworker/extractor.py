@@ -3,7 +3,7 @@ NotesExtractor — intake pipeline for chemistry documents.
 
 Reads a document (file path, URL, or raw text), calls an LLM to extract
 generalizable chemistry notes, and appends them to the appropriate
-notes/{reaction_type}.md file.
+knowledge_base/notes/{note_type}/{reaction_type}.md file.
 
 This is the "write" side of the notes system. The "read" side is the
 read_reaction_notes tool in chem_coworker/tools/notes.py.
@@ -114,7 +114,7 @@ class NotesExtractor:
             and any warnings.
         """
         # Step 1: Load text
-        text, source_name, warnings = self._load_source(source, save_to_literature)
+        text, source_name, warnings, saved_filename = self._load_source(source, save_to_literature)
         if not text:
             return {
                 "success": False,
@@ -130,7 +130,7 @@ class NotesExtractor:
         source_url = source if source.startswith(("http://", "https://")) else ""
         extracted, detected_types = self._extract_with_llm(
             text, source_name, reaction_type, source_url=source_url,
-            note_type=note_type,
+            note_type=note_type, saved_filename=saved_filename,
         )
 
         if self.verbose:
@@ -159,10 +159,10 @@ class NotesExtractor:
 
         # Rebuild index so new notes are immediately discoverable
         try:
-            from notes.build_index import build_index
+            from knowledge_base.notes.build_index import build_index
             build_index()
             if self.verbose:
-                logger.info("[extractor] Rebuilt notes/_index.json")
+                logger.info("[extractor] Rebuilt knowledge_base/notes/_index.json")
         except Exception as exc:
             logger.debug(f"[extractor] Could not rebuild index: {exc}")
 
@@ -183,8 +183,11 @@ class NotesExtractor:
 
     def _load_source(
         self, source: str, save_to_literature: bool
-    ) -> tuple[str, str, List[str]]:
-        """Returns (text, source_name, warnings)."""
+    ) -> tuple[str, str, List[str], str]:
+        """Returns (text, source_name, warnings, saved_filename).
+
+        saved_filename is the filename written to knowledge_base/sources/ (empty string if not saved).
+        """
         warnings: List[str] = []
 
         # URL
@@ -196,12 +199,13 @@ class NotesExtractor:
                 max_chars=40000,  # intake can handle more than query-time
             )
             if not result.get("success"):
-                return "", source, [result.get("error", "fetch failed")]
+                return "", source, [result.get("error", "fetch failed")], ""
             text = result.get("text", "")
             title = result.get("title") or source
-            if result.get("saved_as"):
-                warnings.append(f"Saved to literature/{result['saved_as']}")
-            return text, title, warnings
+            saved_filename = result.get("saved_as", "")
+            if saved_filename:
+                warnings.append(f"Saved to knowledge_base/sources/{saved_filename}")
+            return text, title, warnings, saved_filename
 
         # File path
         path = Path(source)
@@ -217,14 +221,15 @@ class NotesExtractor:
                 if save_to_literature:
                     self._maybe_copy_to_literature(path)
             else:
-                return "", str(path), [f"Unsupported file type: {suffix}"]
-            return text, path.name, warnings
+                return "", str(path), [f"Unsupported file type: {suffix}"], ""
+            saved_filename = path.name if save_to_literature else ""
+            return text, path.name, warnings, saved_filename
 
         # Raw text (long strings only — short strings are ambiguous)
         if len(source) > 200:
-            return source, "pasted text", warnings
+            return source, "pasted text", warnings, ""
 
-        return "", source, [f"Source not recognized as URL, file path, or text: {source!r}"]
+        return "", source, [f"Source not recognized as URL, file path, or text: {source!r}"], ""
 
     def _url_to_filename(self, url: str) -> str:
         """Generate a filesystem-safe filename from a URL."""
@@ -238,7 +243,7 @@ class NotesExtractor:
         return name[:80]  # cap length
 
     def _maybe_copy_to_literature(self, src: Path) -> None:
-        """Copy a local file to the literature/ folder if not already there."""
+        """Copy a local file to the knowledge_base/sources/ folder if not already there."""
         from .tools.literature import _get_docs_dir
         docs_dir = _get_docs_dir()
         dest = docs_dir / src.name
@@ -246,9 +251,9 @@ class NotesExtractor:
             try:
                 docs_dir.mkdir(parents=True, exist_ok=True)
                 dest.write_bytes(src.read_bytes())
-                logger.info(f"[extractor] Copied {src.name} → literature/")
+                logger.info(f"[extractor] Copied {src.name} → knowledge_base/sources/")
             except Exception as exc:
-                logger.warning(f"[extractor] Could not copy to literature/: {exc}")
+                logger.warning(f"[extractor] Could not copy to knowledge_base/sources/: {exc}")
 
     # ------------------------------------------------------------------
     # Internal: LLM extraction
@@ -261,6 +266,7 @@ class NotesExtractor:
         reaction_type_hint: str,
         source_url: str = "",
         note_type: str = "reactions",
+        saved_filename: str = "",
     ) -> tuple[str, List[str]]:
         """
         Call LLM to extract notes. Returns (markdown_notes, detected_reaction_types).
@@ -358,6 +364,9 @@ class NotesExtractor:
         # Optional URL (always first so it's easiest to click/copy)
         if source_url:
             header_lines.append(f"url: {source_url}")
+        # Local source file — enables read_literature_source look-up
+        if saved_filename:
+            header_lines.append(f"source_file: {saved_filename}")
         # Citation fields in consistent order
         for field in _CITE_FIELDS:
             if field in citation:
