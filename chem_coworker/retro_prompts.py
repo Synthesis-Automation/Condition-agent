@@ -276,6 +276,9 @@ Use ⟸ for retrosynthetic arrows. Present top 1-3 disconnections from generate_
 │                                                                  │
 │ Target ⟸ Precursor A + Precursor B                              │
 │                                                                  │
+│ Reaction SMILES: precursor_A.precursor_B>>target_SMILES         │
+│   (MANDATORY: always include this line using actual SMILES)      │
+│                                                                  │
 │ RDKit Eval: [PASS/PASS_WITH_WARNINGS/FAIL, score=X.XX]         │
 │ Expert Eval: [Your regiochemistry + mechanism assessment]        │
 │ Conditions: [from recommend_conditions or knowledge]             │
@@ -307,6 +310,8 @@ e.g., "Ask me to analyze step 2 in more detail" or
 ═══════════════════════════════════════════════════════════════════
 STYLE RULES
 ═══════════════════════════════════════════════════════════════════
+• ALWAYS include a "Reaction SMILES:" line for every disconnection in the format
+  `precursor_1.precursor_2>>target` — this is MANDATORY so the user can copy/evaluate quickly
 • Always write precursor SMILES when available from generate_disconnections
 • Use ⟸ for retro arrows (not →)
 • Cite notes files when quoting from knowledge base ("per alcohol_oxidation.md")

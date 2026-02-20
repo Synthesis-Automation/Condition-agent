@@ -292,6 +292,7 @@ def _replace_dummy(frag_mol: Any, cap: str) -> str:
     """
     try:
         from rdkit import Chem
+        from rdkit import rdBase
 
         # Use SMILES-level replacement: convert to SMILES, replace dummy notation
         smi = Chem.MolToSmiles(frag_mol)
@@ -299,12 +300,19 @@ def _replace_dummy(frag_mol: Any, cap: str) -> str:
         import re
         smi_capped = re.sub(r"\[\d*\*\]|\[Xe\]", cap, smi)
 
-        # Validate
-        mol_check = Chem.MolFromSmiles(smi_capped)
+        # Guard: a leading '=' (e.g. '=OC...') is never valid SMILES.
+        # This happens when [*] was the first atom and cap starts with '='.
+        if smi_capped.startswith("="):
+            return ""
+
+        # Validate — suppress RDKit's parse-error console noise
+        with rdBase.BlockLogs():
+            mol_check = Chem.MolFromSmiles(smi_capped)
         if mol_check is None:
             # Try without cap (leave as-is but remove dummy)
             smi_plain = re.sub(r"\[\d*\*\]|\[Xe\]", "", smi)
-            mol_check = Chem.MolFromSmiles(smi_plain)
+            with rdBase.BlockLogs():
+                mol_check = Chem.MolFromSmiles(smi_plain)
             if mol_check:
                 return Chem.MolToSmiles(mol_check)
             return ""

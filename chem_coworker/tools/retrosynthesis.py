@@ -28,7 +28,7 @@ from ._base import ToolPlugin
 # Enhanced molecular analysis specialized for retrosynthesis planning
 # ---------------------------------------------------------------------------
 
-def _inspect_target(smiles: str) -> Dict[str, Any]:
+def _inspect_target(smiles: str = "", target_smiles: str = "") -> Dict[str, Any]:
     """Analyze a target molecule's complexity and key features for retrosynthesis.
 
     Returns molecular complexity (BertzCT), ring system count, stereocenters,
@@ -38,12 +38,14 @@ def _inspect_target(smiles: str) -> Dict[str, Any]:
 
     Args:
         smiles: Target molecule SMILES (not a reaction SMILES).
+        target_smiles: Alias for smiles (accepted for compatibility).
 
     Returns:
         dict with complexity, ring_count, aromatic_rings, stereocenters,
         fg_density, heavy_atoms, strategic_notes.
     """
     try:
+        smiles = smiles or target_smiles
         from rdkit import Chem
         from rdkit.Chem import Descriptors, rdMolDescriptors, GraphDescriptors
 
@@ -153,7 +155,7 @@ inspect_target_tool = ToolPlugin(
 # Match SMARTS retron patterns → ranked list of applicable reactions
 # ---------------------------------------------------------------------------
 
-def _identify_retrons(smiles: str) -> Dict[str, Any]:
+def _identify_retrons(smiles: str = "", target_smiles: str = "") -> Dict[str, Any]:
     """Match retron SMARTS patterns to identify applicable retrosynthetic moves.
 
     Scans the target molecule for structural motifs (retrons) that imply specific
@@ -163,12 +165,14 @@ def _identify_retrons(smiles: str) -> Dict[str, Any]:
 
     Args:
         smiles: Target molecule SMILES.
+        target_smiles: Alias for smiles (accepted for compatibility).
 
     Returns:
         dict with matched_retrons (name, reaction_name, difficulty, description,
         match_count, notes, precursor_hints), total_matched.
     """
     try:
+        smiles = smiles or target_smiles
         mol_smiles = smiles.split(">>")[0].split(">")[0].strip() if ">" in smiles else smiles
 
         from chemtools.retro.disconnector import find_retrons
@@ -232,7 +236,7 @@ identify_retrons_tool = ToolPlugin(
 # Core retrosynthesis: apply transforms and produce precursor SMILES
 # ---------------------------------------------------------------------------
 
-def _generate_disconnections(smiles: str, top_k: int = 3) -> Dict[str, Any]:
+def _generate_disconnections(smiles: str, top_k: int = 3, top_n: int = 0) -> Dict[str, Any]:
     """Generate retrosynthetic precursor pairs for the top disconnections.
 
     The core retrosynthesis engine. For each matched retron, applies the
@@ -244,12 +248,15 @@ def _generate_disconnections(smiles: str, top_k: int = 3) -> Dict[str, Any]:
     Args:
         smiles: Target molecule SMILES.
         top_k: Maximum number of disconnections to return (default 3).
+        top_n: Alias for top_k (accepted for compatibility).
 
     Returns:
         dict with disconnections (rank, reaction_name, precursor_1, precursor_2,
         complexity_delta, fragment_balance, overall_score, description, notes).
     """
     try:
+        if top_n > 0:
+            top_k = top_n
         mol_smiles = smiles.split(">>")[0].split(">")[0].strip() if ">" in smiles else smiles
 
         from chemtools.retro.disconnector import rank_disconnections
@@ -330,7 +337,7 @@ generate_disconnections_tool = ToolPlugin(
 # Search notes + literature for existing synthesis routes to similar targets
 # ---------------------------------------------------------------------------
 
-def _find_retro_precedent(smiles: str, reaction_name: str = "") -> Dict[str, Any]:
+def _find_retro_precedent(smiles: str = "", reaction_name: str = "", target_smiles: str = "") -> Dict[str, Any]:
     """Search the knowledge base for synthesis precedent for this target.
 
     Queries both the reaction notes (for specific reaction-type precedent)
@@ -340,6 +347,7 @@ def _find_retro_precedent(smiles: str, reaction_name: str = "") -> Dict[str, Any
 
     Args:
         smiles: Target molecule SMILES (used to derive FG search terms).
+        target_smiles: Alias for smiles (accepted for compatibility).
         reaction_name: Optional reaction taxonomy name (e.g., "suzuki_miyaura")
                        to focus the search. Pass empty string for broad search.
 
@@ -347,6 +355,7 @@ def _find_retro_precedent(smiles: str, reaction_name: str = "") -> Dict[str, Any
         dict with notes_hits, literature_hits, route_hits, search_terms_used.
     """
     try:
+        smiles = smiles or target_smiles
         mol_smiles = smiles.split(">>")[0].split(">")[0].strip() if ">" in smiles else smiles
 
         # Build smart search query from FGs + reaction name
