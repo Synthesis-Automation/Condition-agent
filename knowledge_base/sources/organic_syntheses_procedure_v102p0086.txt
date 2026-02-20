@@ -1,0 +1,415 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 86-99
+
+DOI: 10.15227/orgsyn.102.0086
+
+Copper-Catalyzed Suzuki-Miyaura Coupling of Unactivated Alkyl Halides with Arylborons
+
+Submitted by Yonglei Zhou, Jian Li, and Weilong Xie*1
+
+Checked by Kathryn M. Weber and Tehshik P. Yoon
+
+1. Procedure (Note 1)
+
+A. 1-Cyclohexyl-4-chlorobenzene (3). An oven-dried 150-mL heavy-walled pressure vessel, equipped with a Teflon-coated, football-shaped magnetic stir bar (25.4 mm x 12.7 mm) (Note 2), is charged with 4-chlorophenylboronic acid pinacol ester (8.59 g, 36.0 mmol, 1.8 equiv) (Note 3), sodium tert-butoxide (2.88 g, 30.0 mmol, 1.5 equiv) (Note 4), copper(I) bromide-dimethyl sulfide (206 mg, 1.0 mmol, 5.0 mol%) (Note 5), bathophenanthroline (499 mg, 1.5 mmol, 7.5 mol%) (Note 6), bromocyclohexane (2.50 mL, 3.3 g, 20.0 mmol, 1.0 equiv) (Note 7) in order under air. Then, toluene (Note 8) dried with magnesium sulfate (Note 9) is added using a 20-mL disposable syringe (20 mL) (Figure 1A). The vessel is sealed with a Teflon cap (Figure 1B). Then, the reaction mixture is placed in a preheated 80 ℃ silicone oil bath and stirred for 24 h (Figure 1C). The reaction solution remains in black in color (Figure 1D).
+
+Figure 1. (A) Preparation of reaction materials; (B) Reaction set-up; (C) After inserting the vessel into an oil bath; (D) Color of the reaction mixture after completion
+
+After the reaction mixture is cooled to room temperature (Note 10), it is filtered through a short pad of layered silica gel and diatomite (inner diameter = 4.25 cm, height of silica gel = 2.0 cm, height of diatomite = 0.10 cm) (Note 11) (Figure 2A) and eluted with ethyl acetate (3 × 50 mL) into a 250-mL round-bottomed flask (neck 19/26 joint) (Figure 2B). The filtrate is used to conduct TLC analysis (Note 12). The resulting solution is concentrated by rotary evaporation under reduced pressure (16 mbar, 38 ℃) to afford the crude product as a brown oil (Figure 2C). The crude oil is dissolved in dichloromethane (8.0 mL) (Note 13), and then silica gel (7 g) (Note 11) is added into the flask. Yellow powder is afforded by rotary evaporation under reduced pressure (16 mbar, 38 ℃) (Figure 2D). The powder is loaded onto a chromatography column charged with silica gel (160 g, height of 20 cm, 6.0 cm column diameter) (Note 11) and eluted with petroleum ether (Note 14) (Figure 2E). The eluent is collected in 15 mL fractions (16 x 100 mm test tubes). The desired product is obtained in fractions 26-37 (Note 15), which are combined and concentrated by rotary evaporation under reduced pressure (16 mbar, 38 ℃) to afford a colorless liquid. The liquid is then placed under a high vacuum (<1 mmHg) for 90 min to afford 2.54 g (13.0 mmol, 65%) of 1-cyclohexyl-4-chlorobenzene as a colorless oil (Notes 18, 19) (Figure 2F).
+
+Figure 2. (A) Filtering through a short pad of silica gel and diatomite; (B) The eluent after filtration; (C) The crude faint yellow oil; (D) The crude yellow powder; (E) Purification by column chromatography; (F) First collection of purified title compound 3
+
+The remaining impure product is obtained in fractions 38-44 (Figure 3A), which are combined and concentrated by rotary evaporation under reduced pressure (16 mbar, 38 ℃) to afford a mixture of colorless liquid and white solid. The mixture is dissolved in dichloromethane (5.0 mL), and then silica gel (2.5 g) is added into the flask. White powder is afforded by rotary evaporation under reduced pressure (16 mbar, 38 ℃) (Figure 3B). The powder is loaded on to a chromatography column charged with silica gel (50 g, height of 25 cm, 3.0 cm column diameter) using petroleum ether as eluent (Figure 3C). The eluent is collected in 15 mL fractions (16 x 100 mm test tubes). The desired product is obtained in fractions 10-13 (Note 16), which are combined and concentrated by rotary evaporation under reduced pressure (16 mbar, 38 ℃) to afford a colorless liquid. The liquid is then placed under a high vacuum (<1 mmHg) for 90 min to afford an additional 325 mg (1.67 mmol, 8%) of 1-cyclohexyl-4-chlorobenzene as a colorless oil (Notes 18, 19) (Figure 3D). 2.87 g (14.7 mmol, 73%) of colorless oil is obtained based on the combined purifications.
+
+Figure 3. (A) Collection of compound 3 and byproduct; (B) The crude white powder; (C) Second purification by column chromatography; (D) Second collection of purified title compound 3.
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with 4-chlorophenylboronic acid pinacol ester, sodium tert-butoxide, copper(I) bromide-dimethyl sulfide, bathophenanthroline, bromocyclohexane, toluene, anhydrous MgSO4, silica gel, diatomite, petroleum ether, and CDCl3.
+
+2. All glassware and Teflon-coated magnetic stir bar are oven-dried prior to reaction set-up.
+
+3. 4-Chlorophenylboronic acid pinacol ester (98%) was purchased from Adamas-beta and used as received (authors). 4-Chlorophenylboronic acid pinacol ester (98%) was purchased from ChemImpex and used as received (checkers). The excess amount of the boron reagent is essential to ensure the efficiency of the reaction due to the side homocoupling of the reagent.
+
+4. Sodium tert-butoxide (99%) was purchased from Adamas-beta and used as received (submitters). Sodium tert-butoxide (99.9%) was purchased from Sigma Aldrich and used as received (checkers).
+
+5. Copper(I) bromide-dimethyl sulfide (≥98%) was purchased from Adamas-beta and used as received (authors). Copper(I) bromide-dimethyl sulfide (99%) was purchased from Thermo Scientific Chemicals and used as received (checkers).
+
+6. Bathophenanthroline (≥98%) was purchased from Adamas-beta and used as received (authors). Bathophenanthroline (≥99.0%) was purchased from Sigma-Aldrich and used as received (checkers).
+
+7. Bromocyclohexane (98%) was purchased from Adamas-beta and used as received (authors). Bromocyclohexane (98%) was purchased from Sigma-Aldrich and used as received (checkers).
+
+8. Toluene (CP, ≥98.5%) was purchased from Sinopharm (authors). Toluene (ACS Reagent, 99%) was purchased from Sigma-Aldrich (checkers). Toluene was dried with anhydrous MgSO4 overnight without stirring (~2 g MgSO4/50 mL toluene). MgSO4 was removed via vacuum filtration before use.
+
+9. Anhydrous MgSO4 was purchased from General-Reagent and used as received (authors). Anhydrous MgSO4 was purchased from Sigma-Aldrich and used as received (checkers).
+
+10. The term "room temperature" used throughout this manuscript refers to a temperature between 20 ℃ to 25 ℃.
+
+11. Silica gel (AR, 300-400 mesh) was obtained from General-Reagent and used as received (authors). Silica gel (60 Å, 230-400 mesh) was purchased from Sigma-Aldrich and was used as received (checkers). Diatomite (AR) was obtained from General Reagent and used as received (authors). Celite 545 was purchased from Oakwood Chemical and used as received (checkers).
+
+12. The reaction progress was monitored by TLC analysis, distilled petroleum ether, Rf (product) = 0.8. The authors used TLC silica gel 60 F254 plates purchased from Shanghai Haohong Scientific Co., Ltd. Checkers used pre-coated silica gel F254 plates from SiliCycle Inc. containing a fluorescent indicator. The plates were then visualized using UV (254 nm).
+
+Figure 4. TLC analysis of the reaction mixture and compound 3.
+
+13. Dichloromethane (AR, ≥99.5%) was purchased from General-Reagent and used as received (authors). Dichloromethane (ACS Reagent, ≥99.5%) was purchased from Fisher Chemical and used as received (checkers).
+
+14. Petroleum ether (AR, boiling range 60 ℃ - 90 ℃) was purchased from General-Reagent and used as received (authors). Petroleum ether (ACS Reagent) was purchased from Sigma-Aldrich and used as received (checkers).
+
+15. Column chromatography was performed as follows: A column (6.0 cm diameter) is charged with silica gel (160 g) using a wet-pack method with petroleum ether (350 mL) to give a column height of 20 cm. Then, the yellow powder is loaded on silica gel. Sea sand with a 1.0 cm minimum height is added to the top of the powder. At this point, fraction collection is begun, and elution is continued with 700 mL of petroleum ether.
+
+Figure 5. TLC analysis of column fraction.
+
+16. Column chromatography was performed as follows: A column (3.0 cm diameter) is charged with silica gel (50 g) using a wet-pack method with petroleum ether (100 mL) to give a column height of 25 cm. Then, the white powder is loaded on silica gel. Sea sand with a 1.0 cm minimum height is added to the top of the powder. At this point, fraction collection is begun, and elution is continued with 400 mL of petroleum ether.
+
+Figure 6. TLC analysis of column fraction.
+
+17. Characterization data of product 3: 1H NMR pdf (500 MHz, CDCl3) δ: 7.27 - 7.21 (m, 2H), 7.16 - 7.09 (m, 2H), 2.47 (tt, J = 8.5, 2.9 Hz, 1H), 1.89 - 1.78 (m, 4H), 1.78 - 1.70 (m, 1H), 1.37 (td, J = 9.2, 2.4 Hz, 4H), 1.24 (dtq, J = 12.6, 9.3, 3.0 Hz, 1H). 13C NMR pdf (126 MHz, CDCl3) δ: 146.7, 131.4, 128.5, 128.3, 44.1, 34.6, 27.0, 26.2. IR (ATR): 2922.77, 2850.49, 1491.51, 1447.60, 1408.51, 1089.60, 1013.64, 891.97, 817.38, 775.07, 716.57, 686.83, 525.28, 427.03 cm-1.); HRMS (ESI) calcd for C8H15Cl [M]+: 194.0857; found 194.0859. The product (3) is stable on the benchtop at room temperature under air atmosphere.
+
+18. The purity of product (3) was determined to be 96.5% by quantitative 1H NMR pdf spectroscopy in CDCl3 using 15.3 mg of the product (3) and 15.4 mg of 1,3,5-trimethoxy benzene. Checkers: Oakwood Chemical, purity: 98%, used as received as an internal standard.
+
+19. A repeated reaction on half scale provided 1.53 g (78%) of the same product (checkers). A repeated reaction on an identical scale provided 2.85 g (73%) of the same product (authors).
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+The reliability and practicality of the Suzuki-Miyaura coupling (SMC) reaction has been demonstrated by its widespread application, which involves connecting boron reagents with organic halides to form a variety of molecules.2 Given the commercial availability and high stability of both reagents, this type of reactions finds wide applications in organic synthesis and pharmaceutical industry.3 Suzuki-Miyaura reactions have been proven to be a successful protocol for C(sp2)-C(sp2) bond formation.4 However, the applications of sp3-hybridized alkyl halides are less reliable. Since the frequent involvement of two-electron oxidation addition in these systems, the coupling will be suffered from the relatively difficult oxidation addition of alkyl halides and the effects of β-hydride elimination of alkyl metal species.5 Therefore, the general method for coupling C(sp2)-C(sp3) by the SMC reaction is highly sought after and of great significance. In this regard, the coupling reaction involving halogenated alkanes catalyzed by metals such as Ni6, Co7, and Fe8 has recently been developed. However, due to relatively harsh reaction conditions and issues with functional group compatibility, it is still necessary to develop the mild, convenient and highly functional group compatible methods.
+
+To make up for these shortcomings, our group recently developed a catalytic system based on copper/phenanthroline.9 The system could achieve the coupling of non-activated secondary and primary alkyl halides and arylboronic acid esters without the use of an inert atmosphere, and the system is also applicable for the various alkyhalides including iodides, bromides, and the robust chlorides. This system features high reactivity, high functional group tolerance, broad substrate scope, and can be applicable for the post-modification of various complex natural products and drug molecules.
+
+This reaction shows a broad substrate scope (Table 1). Chain and cyclic bromination are well tolerated in the system. Substrates containing ester, ketone, amide, alkenyl and alkyne groups were all tolerated to obtain the corresponding coupling products. For the side of arylboronic acid esters, reagents with the ester, carbonyl, aldehyde, and cyanide groups all could achieve good yields after increasing the catalyst dosage. Para- and meta- substituted borate esters is not much difference in reactivity. Boric acid esters with meta- substitution or high steric hindrance require changing reaction conditions to achieve satisfactory yields. In addition, nine natural products or drug molecules, including menthol, lithocholic acid and estrone, can be post modified using this method.
+
+Table 1. Selected Substrate Scope
+
+References and Notes
+
+College of Chemistry and Chemical Engineering, Donghua University, Shanghai 201620, China; ORCID: 0000-0003-4164-0904; Email: weilongxie@dhu.edu.cn. We are grateful to the National Natural Science Foundation of China (22201034), the Natural Science Foundation of Shanghai (22ZR1402500) for generous funding.
+
+Miyaura, N.; Yamada, K.; Suzuki, A., A new stereospecific cross-coupling by the palladium-catalyzed reaction of 1-alkenylboranes with 1-alkenyl or 1-alkynyl halides. Tetrahedron Lett. 1979, 20, 3437-3440. https://doi.org/10.1016/S0040-4039(01)95429-2.
+
+Brown, D. G.; Boström, J., Analysis of Past and Present Synthetic Methodologies on Medicinal Chemistry: Where Have All the New Reactions Gone? J. Med. Chem. 2016, 59, 4443-4458. https://doi.org/10.1021/acs.jmedchem.5b01409.
+
+a) Littke, A. F.; Fu, G. C., A Convenient and General Method for Pd-Catalyzed Suzuki Cross-Couplings of Aryl Chlorides and Arylboronic Acids. Angew. Chem., Int. Ed. 1998, 37, 3387-3388. https://doi.org/10.1002/(SICI)1521-3773(19981231)37:24<3387::AID-ANIE3387>3.0.CO;2-P. b) Saito, S.; Sakai, M.; Miyaura, N., A synthesis of biaryls via nickel(0)-catalyzed cross-coupling reaction of chloroarenes with phenylboronic acids. Tetrahedron Lett. 1996, 37, 2993-2996. https://doi.org/10.1016/0040-4039(96)00482-0. c) Gurung, S. K.; Thapa, S.; Kafle, A.; Dickie, D. A.; Giri, R., Copper-Catalyzed Suzuki-Miyaura Coupling of Arylboronate Esters: Transmetalation with (PN)CuF and Identification of Intermediates. Org. Lett. 2014, 16, 1264-1267. https://doi.org/10.1021/ol500310u. d) Asghar, S.; Tailor, S. B.; Elorriaga, D.; Bedford, R. B., Cobalt-Catalyzed Suzuki Biaryl Coupling of Aryl Halides. Angew. Chem., Int. Ed. 2017, 56, 16367-16370. https://doi.org/10.1021/ol500310u.
+
+Luh, T.-Y.; Leung, M.-k.; Wong, K.-T., Transition Metal-Catalyzed Activation of Aliphatic C-X Bonds in Carbon-Carbon Bond Formation. Chem. Rev. 2000, 100, 3187-3204. https://doi.org/10.1021/cr990272o.
+
+a) Zhou, J.; Fu, G. C., Suzuki Cross-Couplings of Unactivated Secondary Alkyl Bromides and Iodides. J. Am. Chem. Soc. 2004, 126, 1340-1341. https://doi.org/10.1021/ja039889k. b) González-Bobes, F.; Fu, G. C., Amino Alcohols as Ligands for Nickel-Catalyzed Suzuki Reactions of Unactivated Alkyl Halides, Including Secondary Alkyl Chlorides, with Arylboronic Acids. J. Am. Chem. Soc. 2006, 128, 5360-5361. https://doi.org/10.1021/ja0613761. c) Zultanski, S. L.; Fu, G. C., Nickel-Catalyzed Carbon-Carbon Bond-Forming Reactions of Unactivated Tertiary Alkyl Halides: Suzuki Arylations. J. Am. Chem. Soc. 2013, 135, 624-627. https://doi.org/10.1021/ja311669p. d) Balaraman, K.; Wolf, C., Palladium and Nickel Catalyzed Suzuki Cross-Coupling with Alkyl Fluorides. Org. Lett. 2021, 23, 8994-8999. https://doi.org/10.1021/acs.orglett.1c03515.
+
+a) Ludwig, J. R.; Simmons, E. M.; Wisniewski, S. R.; Chirik, P. J., Cobalt-Catalyzed C(sp2)-C(sp3) Suzuki-Miyaura Cross Coupling. Org. Lett. 2021, 23, 625-630. https://doi.org/10.1021/acs.orglett.0c02934. b) Mills, L. R.; Gygi, D.; Ludwig, J. R.; Simmons, E. M.; Wisniewski, S. R.; Kim, J.; Chirik, P. J., Cobalt-Catalyzed C(sp2)-C(sp3) Suzuki-Miyaura Cross-Coupling Enabled by Well-Defined Precatalysts with L,X-Type Ligands. ACS Catal. 2022, 12, 1905-1918. https://doi.org/10.1021/acscatal.1c05586. c) Mills, L. R.; Gygi, D.; Simmons, E. M.; Wisniewski, S. R.; Kim, J.; Chirik, P. J., Mechanistic Investigations of Phenoxyimine-Cobalt(II)-Catalyzed C(sp2)-C(sp3) Suzuki-Miyaura Cross-Coupling. J. Am. Chem. Soc. 2023, 145, 17029-17041; https://doi.org/10.1021/jacs.3c02103.
+
+a) Hatakeyama, T.; Hashimoto, T.; Kondo, Y.; Fujiwara, Y.; Seike, H.; Takaya, H.; Tamada, Y.; Ono, T.; Nakamura, M., Iron-Catalyzed Suzuki-Miyaura Coupling of Alkyl Halides. J. Am. Chem. Soc. 2010, 132, 10674-10676. https://doi.org/10.1021/ja103973a. b) Crockett, M. P.; Tyrol, C. C.; Wong, A. S.; Li, B.; Byers, J. A., Iron-Catalyzed Suzuki-Miyaura Cross-Coupling Reactions between Alkyl Halides and Unactivated Arylboronic Esters. Org. Lett. 2018, 20, 5233-5237. https://doi.org/10.1021/acs.orglett.8b02184. c) Crockett, M. P.; Wong, A. S.; Li, B.; Byers, J. A., Rational Design of an Iron-Based Catalyst for Suzuki-Miyaura Cross-Couplings Involving Heteroaromatic Boronic Esters and Tertiary Alkyl Electrophiles. Angew. Chem., Int. Ed. 2020, 59, 5392-5397. https://doi.org/10.1002/anie.201914315. d) Peterson, P. O.; Joannou, M. V.; Simmons, E. M.; Wisniewski, S. R.; Kim, J.; Chirik, P. J., Iron-Catalyzed C(sp2)-C(sp3) Suzuki-Miyaura Cross-Coupling Using an Alkoxide Base. ACS Catal. 2023, 13, 2443-2448. https://doi.org/10.1021/acscatal.2c05838.
+
+Zhou, Y.; Qiu, L.; Li, J.; Xie, W. A General Copper Catalytic System for Suzuki-Miyaura Cross-Coupling of Unactivated Secondary and Primary Alkyl Halides with Arylborons. J. Am. Chem. Soc. 2023, 145, 28146-28155; https://doi.org/10.1021/jacs.3c10628.
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+4-Chlorophenylboronic Acid Pinacol Ester; (195062-61-4)
+
+Bromocyclohexane; (108-85-0)
+
+Copper(I) Bromide-Dimethyl Sulfide; (54678-23-8)
+
+4,7-Diphenyl-1,10-Phenanthroline; (1662-01-7)
+
+Sodium tert-butoxide; (865-48-5)
+
+Yonglei Zhou was born in Zhejiang in China in 1999. He graduated from Wenzhou University in 2021, and then moved to Shanghai for the Master degree under the supervision of Professor Weilong Xie in Donghua University. His research focused on the development of cross-coupling reactions using copper-catalysis.
+
+Jian Li was born in Anhui in China in 2000. He graduated from Naijing Forestry University in 2022, and then moved to Shanghai for the Master degree under the supervision of Professor Weilong Xie in Donghua University. His research focused on the development of reductive coupling reactions with base metal system.
+
+Weilong Xie was born in Taizhou of Zhejiang Province in China in 1987. He received his Bachelor degree from Zhejiang University in 2009, and obtained his Ph.D. in chemistry from Nankai University with Professor Chunming Cui in 2014. He joined Professor Sukbok Chang's Lab in 2014 as a joint postdoctoral fellow in Institute for Basic Science (IBS) and Korea Advanced Institute of Science & Technology (KAIST). In 2021, he started his independent career at the college of chemistry and chemical engineering in Donghua University. His current research interests include copper-catalyzed transformations of the inert chemical bonds, silicon chemistry, and fluorine chemistry.
+
+Kathryn Weber was born in Matthews, North Carolina (USA) in 1999. She received her Bachelor's degree from the University of North Carolina at Chapel Hill in 2021 where she worked with Professor Jeffrey Johnson on rhodium-catalyzed two and three component couplings employing silyl glyoxylate linchpins. She joined Professor Tehshik Yoon's Lab in Fall 2021 at the University of Wisconsin-Madison. Her current research focuses on the use of photoinduced LMCT to promote novel reactivity.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

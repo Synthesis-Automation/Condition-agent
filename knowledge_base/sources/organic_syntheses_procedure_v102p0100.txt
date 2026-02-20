@@ -1,0 +1,395 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 100-113
+
+DOI: 10.15227/orgsyn.102.0100
+
+Large-Scale NaBr/Selectfluor Mediated Alcohol Oxidation: Conversion of (-)-Borneol into (-)-Camphor
+
+Submitted by Shyam Sathyamoorthi*1
+
+Checked by Sergio Armentia Matheu, Saad Shaaban, and Nuno Maulide
+
+1. Procedure (Note 1)
+
+(-)-Camphor 1. An oven-dried, single-neck (24/40 joint) 250 mL round-bottom flask is equipped with a Teflon-coated magnetic stir bar (25.4 x 9.5 mm, octagon shape). The flask is then charged with (-)-borneol (3.0 g, 19.4 mmol, 1 equiv) (Note 2). Acetonitrile (75 mL) (Note 3) and deioinized H2O (75 mL) are measured in a graduated cylinder and decanted into the flask. NaBr (3.0 g, 29.2 mmol, 1.5 equiv) is added in one bolus (Note 4). Stirring (350 rpm) is commenced, and over a period of 5 min, the initially cloudy mixture becomes a colorless, clear solution (Figure 1A). Following this time, Selectfluor (10.3 g, 29.1 mmol, 1.5 equiv) (Note 5) is added in one bolus. The reaction mixture immediately turns orange (Figure 1B). The flask is stoppered and tightly wrapped in aluminum foil (Figure 1C). The reaction mixture is stirred in a dark fume hood for 20 hours at ambient temperature (~24 ℃).
+
+Figure 1. A. Reaction mixture with (-)-borneol, NaBr, and a 1:1 mixture of MeCN/H2O. B. Immediately upon addition of Selectfluor. C. The flask is wrapped with aluminum foil for the duration of the reaction, and the fume hood lights are turned off
+
+Following this time, thin-layer chromatography (TLC) analysis (Notes 6 and 7) indicates complete consumption of (-)-borneol (Figure 2A). The reaction mixture is diluted with EtOAc (75 mL) and transferred to a 1 L separatory funnel, after which the flask is rinsed with an additional portion of EtOAc (75 mL), which is subsequently added to the separatory funnel (Note 8). Saturated, aqueous Na2S2O3 solution (50 mL, Note 9) is added. The layers are vigorously shaken, upon which the orange color disappears (Figure 2B). The aqueous layer is drained and discarded. 50 mL of saturated, aqueous NaHCO3 solution (Note 10) is added. The layers are vigorously shaken and allowed to separate. The aqueous layer is drained and discarded. The organic layer is collected, dried with MgSO4 (14 g) (Note 11), and filtered through a plug of cotton into a 500 mL Erlenmeyer flask (24/40 joint). The MgSO4 filter cake is rinsed with an additional 150 mL of CH2Cl2 (Note 12). The filtrate is concentrated under reduced pressure using a rotary evaporator (Note 13).
+
+Figure 2. A. TLC analysis of the reaction mixture prior to quenching, stained with KMnO4 stain. Mobile phase: 10% EtOAc/hexanes. SM = starting material (Rf = 0.08), C = co-spot lane, R = reaction mixture. Product (Rf = 0.4) B. After addition of saturated aqueous Na2S2O3. C. The unpurified residue is a waxy solid
+
+Prior to purification, the resulting white residue (Figure 2C) is analyzed by 1H NMR, indicating clean conversion to 1. This residue is then purified by flash column chromatography on silica gel (Figure 3A) (Notes 14, 15, 16, and 17). The test-tube fractions containing pure product 1 (Figure 3B) are combined and concentrated under reduced pressure using a rotary evaporator (Note 13). The resulting white solid (Figure 3C) is rid of residual solvent using a high vacuum (2x10-3 mbar) for 1.5 h. Compound 1 is a white solid (2.49 g, 16.4 mmol, 84% yield) (Notes 18 and 19).
+
+Figure 3. A. Flash silica gel column chromatography set-up. B. Pure compound 1 (fractions 10 - 22). C. Compound 1
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with the chemicals used in this manuscript, as well as the proper procedures for product preparation.
+
+2. (-)-Borneol (97%) was purchased from Sigma Aldrich (authors: Thermo Scientific) and used as received.
+
+3. MeCN (HPLC Grade, 99.9%) was purchased from Fisher Scientific and used directly.
+
+4. NaBr (99%) was purchased from Sigma Aldrich (authors: Mallinckrodt Chemicals) and used directly.
+
+5. Selectfluor (97%) was purchased from ABCR (authors: Matrix Scientific, 95%) and used directly.
+
+6. Thin layer chromatography (TLC) was performed on silica gel 60 F254 (glass-backed TLC plates). The progress of the reaction is monitored by TLC analysis eluting with 10% EtOAc in hexanes. Spots are visualized after the plate is dipped in KMnO4 stain and heated.
+
+7. KMnO4 stain is prepared by dissolving 1.5 g of KMnO4, 10 g of K2CO3, and 1.25 mL of 10% aqueous NaOH solution in 200 mL of H2O.
+
+8. Ethyl Acetate (Certified ACS Reagent, 99.5%) was purchased from Fisher Scientific and used directly.
+
+9. Sodium thiosulfate pentahydrate (>99%) was purchased from Fisher Scientific and used as received. A solution was made by saturating deionized H2O with this.
+
+10. NaHCO3 (99%) was purchased from Fisher Scientific and used as received. A solution was made by saturating deionized H2O with this.
+
+11. Magnesium Sulfate (anhydrous) was purchased from Fisher Scientific and used directly.
+
+12. CH2Cl2 (Certified ACS Reagent, stabilized, 99%) was purchased from Fisher Scientific and used as received.
+
+13. A Büchi Rotovapor R-114 connected to a Fisher Scientific MaximaDry diaphragm pump is used. The bath temperature is ~35 ℃ and the vacuum strength is ~760 mm Hg.
+
+14. Hexanes (98.5%) was purchased from Fisher Scientific and used directly.
+
+15. Acetone (Certified ACS Reagent, 99%) was purchased from Fisher Scientific and used directly.
+
+16. Silica Gel (grade 60, 230-400 mesh) was purchased from Fisher Scientific.
+
+17. For flash column chromatography, a ChemGlass column (part number: CG-1197-17) is used. Column dimensions: ~30 cm (L) x ~4 cm (W). This column is filled with 73 g of silica gel and is flushed with 150 mL of hexanes. The height of the silica gel is 13 cm. The crude residue is suspended in 10 mL of toluene (Fisher Scientific, certified ACS, >99.5%) and 10 mL of CH2Cl2 and loaded onto the column. To ensure solubility and quantitative transfer, the Erlenmeyer flask and sides of the glass column are carefully rinsed with 50 mL of 1% acetone in CH2Cl2. After full adsorption onto the silica gel, the top of the silica gel is layered with sand (Fisher Scientific, sea sand, washed). The height of the sand layer is 1 cm. The column is eluted using 350 mL of 1% acetone in CH2Cl2. 26 test-tube fractions (16 x 125 mm tube size) of ~15 mL each are collected. Fractions are checked using TLC (10% EtOAc/hexanes) and visualized using KMnO4 stain.
+
+18. Analytical data for (-)-Camphor (1): 1H NMR pdf (700 MHz, CDCl3) δ 2.37 - 2.30 (m, 1H), 2.07 (t, J = 4.5 Hz, 1H), 1.97 - 1.90 (m, 1H), 1.83 (d, J = 18.2 Hz, 1H), 1.70 - 1.64 (m, 1H), 1.39 (ddd, J = 13.6, 9.4, 4.6 Hz, 1H), 1.33 (ddd, J = 13.1, 9.4, 4.0 Hz, 1H), 0.94 (s, 3H), 0.90 (s, 3H), 0.82 (s, 3H). 13C NMR pdf (101 MHz, CDCl3) δ 219.8, 57.8, 46.9, 43.4, 43.1, 30.1, 27.2, 19.9, 19.3, 9.3. Specific Rotation: [α]D20 = -40.6 (c = 1 g/100 mL, CHCl3). The purity of 1 was determined to be 100% by qNMR pdf using p-iodotoluene (Sigma Aldrich) as an internal standard.
+
+19. A second run performed by the checkers on half scale (9.7 mmol) provided 1.12 g (76%) of compound 1.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+The oxidation of alcohols is a cornerstone transformation of organic synthesis.2,3,4,5 Our laboratory has a deep interest in the development of "green" oxidations, which avoid the use of toxic metals such as osmium and chromium.6 As part of this program, we recently disclosed an oxidation protocol which makes use of NaBr and Selectfluor (1-(chloromethyl)-4-fluoro-1,4-diazoniabicyclo[2.2.2] octane bis(tetrafluoroborate) in a mixture of organic solvent and H2O.7 This reaction is remarkably versatile and allows for a functional-group tolerant oxidation of primary alcohols to carboxylic acids, secondary alcohols to ketones, and aldehydes to carboxylic acids (Schemes 1-3). In addition, our protocol allows for the oxidative cyclization of diols into lactones and for the bromination of electron-rich aromatic rings (Schemes 4-5). In this Organic Syntheses contribution, we highlight a scale-up of our initial reaction using the oxidative conversion of (-)-borneol into (-)-camphor as a convenient case study.
+
+References and Notes
+
+Corresponding author: Shyam Sathyamoorthi, ssathyam@ku.edu; https://orcid.ord/0000-0003-4705-7349. Address of all authors: Department of Medicinal Chemistry, University of Kansas, Lawrence, KS 66047. Funding: This work was supported by National Institutes of Health Grant R35GM142499.
+
+Cherepakhin, V.; Williams, T. J., Direct Oxidation of Primary Alcohols to Carboxylic Acids. Synthesis 2020, 53, 1023-1034. DOI: 10.1055/s-0040-1706102.
+
+Sheldon, R. A.; Arends, I. W. C. E.; ten Brink, G.-J.; Dijksman, A., Green, Catalytic Oxidations of Alcohols. Acc. Chem. Res. 2002, 35, 774-781. DOI: 10.1021/ar010075n.
+
+Uyanik, M.; Ishihara, K., Hypervalent iodine-mediated oxidation of alcohols. Chem. Commun. 2009, 2086-2099. DOI: 10.1039/B823399C.
+
+Luzzio, F. A., The Oxidation of Alcohols by Modified Oxochromium(VI)-Amine Reagents. In Organic Reactions; pp 1-221. DOI: 10.1002/0471264180.or053.01.
+
+Sathyamoorthi, S.; Kelley, S.P. A Study of Alkene Disulfonoxylation. Med. Chem. Res. 2024, 33, 1423 - 1431. DOI: 10.1007/s00044-024-03239-7.
+
+Joshi, H.; Paul, D.; Sathyamoorthi, S., Oxidations of Alcohols, Aldehydes, and Diols Using NaBr and Selectfluor. J. Org. Chem. 2023, 88, 11240-11252. DOI: 10.1021/acs.joc.3c01307.
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+(-)-Borneol: endo-(1S)-1,7,7-Trimethylbicyclo[2.2.1]heptan-2-ol; (464-45-9)
+
+Sodium Bromide:; (7647-15-6)
+
+Selectfluor: 1-Chloromethyl-4-fluoro-1,4-diazoniabicyclo[2.2.2]octane bis(tetrafluoroborate); (140681-55-6)
+
+(-)-Camphor: (1S)-1,7,7-Trimethylbicyclo[2.2.1]heptan-2-one; (1) (464-48-2)
+
+Shyam Sathyamoorthi completed a B.S. degree in Cell and Molecular Biology with a minor in Chemistry at Tulane University, New Orleans, Louisiana, where he worked in the labs of Professor Ken Muneoka and Professor Robert A. Pascal, Jr. He then completed a PhD in chemistry at Stanford University under the guidance of Professor Richard N. Zare (2018) as well as a Doctor of Medicine degree at the Stanford University School of Medicine (2019). In July 2019, he started his independent career as an assistant professor in the Department of Medicinal Chemistry at the University of Kansas, Lawrence, KS, USA. He was promoted to associate professor (with tenure) in 2024.
+
+Saad Shaaban has been a Senior Scientist in the Maulide group since 2022. He obtained his Ph.D. in 2018 under the supervision of Prof. Nuno Maulide at the University of Vienna-Austria. Then he embarked on a post-doctoral research period (supported by an Alexander von Humboldt fellowship) with Prof. Herbert Waldmann at the Max-Planck Institute for Molecular Physiology in Dortmund-Germany.
+
+Sergio Armentia Matheu has been a Ph.D. student at the Maulide group at the University of Vienna, Austria, since 2021. Before that, he conducted his Master's studies in Medicinal Chemistry at the University of Copenhagen, Denmark, with a final Master's thesis on the synthesis of Erythrina alkaloid analogues, under the supervision of Prof. Jesper L. Krinstensen. Prior to that, he earned his Bachelor's degree in Chemistry at the IQS School of Engineering, Barcelona, Spain.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

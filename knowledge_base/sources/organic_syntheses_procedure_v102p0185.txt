@@ -1,0 +1,447 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 185-202
+
+DOI: 10.15227/orgsyn.102.0185
+
+Synthesis of 1-(phenylsulfonyl)bicyclo[1.1.0]butane from Methyl Phenyl Sulfone and Epichlorohydrin
+
+Submitted by Joanna E. Muir, Myunggi Jung, and Vincent N. G. Lindsay*1
+
+Checked by Yu-Che Chang and M. Kevin Brown
+
+1. Procedure (Note 1)
+
+1-(Phenylsulfonyl)bicyclo[1.1.0]butane (1). A 500-mL, oven-dried, single-necked (24/40), round-bottom flask is charged with methyl phenyl sulfone (6.00 g, 38.4 mmol, 1.00 equiv) (Note 2) and equipped with a 16 x 38 mm, egg-shaped, Teflon-coated magnetic stir bar, a rubber septum (24/40), and a nitrogen inlet connected to a Schlenk line (Figure 1A). The flask is held under vacuum for 10 min, then slowly backfilled with nitrogen gas (Note 3), and the operation was performed in triplicate. The setup is maintained under a slight positive pressure of nitrogen gas. Anhydrous tetrahydrofuran (154 mL, 0.25 M) (Note 4) is added to the flask using a 60-mL syringe, and vigorous stirring (750 rpm) is initiated. Once the methyl phenyl sulfone is fully dissolved (ca. 5 min) resulting in a colorless solution (Figure 1B), the reaction is submerged in a -78 ℃ cooling bath (acetone/dry ice) (Note 5) and allowed to cool for 10 min. Di-n-butyl magnesium (n-Bu2Mg) (42.7 mL, 38.4 mmol, 1.00 equiv) (Notes 6 & 7) is slowly added in two successive portions to the flask over 5 min using a 24-mL syringe, and the reaction is stirred at -78 ℃ for 30 min (Figure 1C). At this point, formation of a white crystalline precipitate is observed. Epichlorohydrin (3.01 mL, 38.4 mmol, 1.00 equiv) (Note 8) is added to the reaction vessel in one portion using a 6-mL syringe. The cooling bath is removed, the reaction is allowed to warm to room temperature (~25 ℃) and stirred for 3 h. Completion of the first stage is confirmed by TLC analysis using hexanes : EtOAc (2 : 1) as eluent (Note 9), at which point the reaction is a translucent pale-green solution containing small amounts of solid sediments (Note 10) (Figure 1D).
+
+Figure 1. A. Setup for procedure; B. Appearance of the reaction after dissolution of methyl phenyl sulfone; C. Reaction submerged in cooling bath 30 min after the addition of n-Bu2Mg; D. Appearance of the reaction 3 h after the addition of epichlorohydrin
+
+The reaction is cooled to 0 ℃ (ice/water bath) (Figure 2A), and benzenesulfonyl chloride (6.40 mL, 49.9 mmol, 1.30 equiv) (Note 11) is slowly added using a 6-mL syringe over 2 min, affording a pale-yellow homogenous solution (Figure 2B). The reaction is stirred for an additional 10 min at 0 ℃ before the cooling bath (ice/water) is removed. The mixture is allowed to stir at room temperature (~25 ℃) for 18 h, resulting in a homogenous yellow solution (Figure 2C). Completion of the second step is monitored by TLC analysis using hexanes : EtOAc (2 : 1) as eluent (Note 12).
+
+Figure 2. A. Appearance of the reaction before addition of benzenesulfonyl chloride; B. Appearance of the reaction immediately after the addition of benzenesulfonyl chloride; C. Appearance of the reaction 18 h after addition benzenesulfonyl chloride
+
+The reaction is cooled to -78 ℃ for 10 min using a dry ice/acetone cooling bath (Note 5), before n-butyllithium (n-BuLi) (19.2 mL, 46.3 mmol, 1.20 equiv) (Note 13) is added (at -78 ℃) dropwise in two successive portions (over 20 min overall) using a 24-mL syringe (Figure 3A). The reaction is stirred for an additional 30 min at -78 ℃. The cooling bath is removed, and the reaction is stirred at room temperature (~25 ℃) for 3 h (Note 14), resulting in a homogenous orange solution (Figure 3B). Completion is monitored by TLC analysis using hexanes : EtOAc (2 : 1) (Note 15).
+
+Figure 3. A. Appearance of the reaction immediately after addition of n-BuLi; B. Appearance of reaction 3 h after the cooling bath is removed.
+
+The reaction is quenched while stirring with a "half saturated" aqueous NH4Cl solution (150 mL) (Figure 4A) (Note 16). The resulting biphasic mixture is transferred to a 500-mL separatory funnel, rinsing the reaction flask twice with 30 mL of EtOAc. The organic layer is collected, and the aqueous layer is further extracted twice with EtOAc (100 mL). The organic layers are combined into a 1-L Erlenmeyer flask, then dried by addition of one portion of MgSO4 (10 g) followed by manual stirring for 10 seconds. The mixture is filtered using a sintered glass funnel (350-mL, medium grit) fitted to a 1-L round-bottomed flask, while rinsing with additional EtOAc (50 mL). The organic solvent is evaporated under gradually reduced pressure (300 to 25 mbar at 25 ℃) until approximately 50 mL of solution remained. Silica (8 g) is added to the resulting solution (Note 17). The mixture is returned to the rotatory evaporator and concentrated under reduced pressure (25 ℃, 300 to 25 mbar) to a powdery solid (Figure 4B). The powdery solid is further dried under high vacuum for 30 min. The crude solid is then subjected to flash chromatography on silica gel (Notes 17 & 18) using EtOAc (Note 19) and hexanes (Note 20), to furnish 1-(phenylsulfonyl)bicyclo[1.1.0]butane (1) (4.2 g, 56% yield, 99.7% purity) as a white crystalline solid (Notes 21 & 22) (Figure 4C).
+
+Figure 4. A. Appearance of the reaction after quenching with H2O and NH4Cl; B. Appearance of powdery residue after concentrating with silica; C. Appearance of final product (1) after purification
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with methyl phenyl sulfone, di-n-butylmagnesium (1.0 M), benzenesulfonyl chloride, n-butyllithium (2.5 M), tetrahydrofuran, epichlorohydrin, EtOAc, magnesium sulfate, deionized water, hexanes, ammonium chloride (aqueous), silica gel, deuterated chloroform, as well as the proper procedures for working under inert atmosphere, solvent evaporation, working with dry ice baths, the application of high vacuum.
+
+2. Methyl phenyl sulfone (>98%) was purchased from AmBeed Inc. and used as received.
+
+3. Nitrogen gas was purchased from ARC3 Gases (NI300, High Pressure Industrial Grade) and used as purchased.
+
+4. Anhydrous tetrahydrofuran (inhibitor-free, ≥99.9%) was purchased from Sigma Aldrich and used as received.
+
+5. For dry ice/acetone cooling bath, slowly add acetone to dry ice. During the cooling cycles, dry ice is added as needed to keep the bath temperature at -78 ℃.
+
+6. Di-n-butyl magnesium (1M in heptane, Sure/SealTM packaging system) was purchased from Sigma Aldrich and titrated prior to use in triplicate, and the concentration of the bottle used was found to be 0.90 M. The age and concentration of this reagent was found to be crucial to get reproducible results, as older batches of reagents with a concentration of 0.50 M or less led to a significant decrease in yield. Titrations were conducted according to the method of Knochel.2 Lithium chloride (99%, anhydrous) used for the titration was purchased from Acros Organics and used as received; iodine (resublimed crystals, 99.8%, certified ACS) was purchased from Alfa Aesar and used as received.
+
+7. When available for purchase, di-n-butyl magnesium (1M in Et2O/hexanes, Sure/SealTM packaging system) can also be employed for the same procedure and generally affords higher yields (roughly a 15% increase).
+
+8. Epichlorohydrin (>99.0%) was purchased from TCI Chemicals and used as received.
+
+9. The reaction progress is evaluated using TLC analysis using glass-backed silica plates, developed with 2:1 hexanes/EtOAc and visualized under UV light (254 nm). The Rf of the methyl phenyl sulfone is 0.50, and the Rf of intermediate A (protonated form, 3-(phenylsulfonyl)cyclobutanol) is 0.10.
+
+Figure 5. Thin layer chromatography (TLC) analysis of Step 1 (3 h after epichlorohydrin addition) to intermediate A (Note 9)
+
+10. At this point of the reaction, the color may appear pale green with white solids, other times the solid may have more of a green hue. Either appearance is acceptable. Check TLC for confirmation of reaction completion.
+
+11. Benzenesulfonyl chloride (>99.0%) was purchased from TCI Chemicals and used as received.
+
+12. TLC analysis is performed according to Note 9; intermediate A (protonated form, 3-(phenylsulfonyl)cyclobutanol) has Rf =  0.10 and intermediate B (3-(phenylsulfonyl)cyclobutylbenzenesulfonate) has Rf = 0.30.
+
+Figure 6. Thin layer chromatography (TLC) analysis of Step 2 (18 h after PhSO2Cl) to intermediate B (Note 12)
+
+13. n-Butyllithium (2.5 M in hexanes, Sure/SealTM packaging system) was purchased from Sigma-Aldrich and titrated prior to use, and the concentration of the bottle used was found to be 2.41 M. Titrations were conducted according to the method of Kofron.3 Diphenylacetic acid (99%) used for the titration was purchased from Thermo Scientific and recrystallized from anhydrous toluene, vacuumed and dried prior to use.
+
+14. On smaller scale (1.0 g of methyl phenyl sulfone), the last step is often completed in 2 h when monitored by TLC analysis.
+
+15. TLC analysis is performed according to Note 9, intermediate B has Rf = 0.30, and 1-(phenylsulfonyl)bicyclo[1.1.0]butane (1) has Rf = 0.76. If benzenesulfonyl chloride is prominent to any degree on developed plate, the TLC can be developed in 9:1 hexanes/EtOAc.
+
+Figure 7. Thin layer chromatography (TLC) analysis of Step 3 (3 h after addition of n-BuLi) to Product 1 (Note 15)
+
+16. A 'half saturated' aqueous solution of NH4Cl is prepared by diluting 75 mL aq. sat. NH4Cl with 75 mL H2O.
+
+17. Silica gel (SiliCycleTM SiliaFlashTM F60, 40-63 μM, 60 Å) was purchased from SiliCycleTM and used as received.
+
+18. Purification by column chromatography is performed using 140 g of dry silica gel (Note 17) in a 500 mL, 5 cm diameter, 24/40 glass column. The column is plugged with cotton and topped with 2 cm (height) of sand. The silica is pre-wet using 5% EtOAc (Note 19) in hexanes (Note 20), and the crude product is dry loaded onto the silica. Sand (2 cm height) (Note 23) is added to ensure a level silica gel line during loading. A gradient solvent system is employed, eluting first with 1000 mL of 5% EtOAc in hexanes, followed by 2000 mL of 8% EtOAc in hexanes gradually added during elution. Fractions of 100 mL are collected, totaling 35 fractions. The desired product is obtained in fractions 21-31, and are combined into a 2000 mL, single-necked (24/40) round bottom flask. The bulk of the solvent is removed by rotatory evaporation (300 to 25 mbar at 25 ℃). The remaining solution (ca. 50 mL) is transferred to a 250 mL, single necked (24/40), round-bottom flask, rinsing with EtOAc (20 mL). The residual solvent is removed by rotatory evaporation (300 to 25 mbar at 25 ℃) to furnish the product. The product is further dried under high vacuum (ca. 0.1 torr) at ambient temperature for 4 h.
+
+19. Ethyl acetate (EtOAc, ≥99.5%, Certified ACS) was purchased from Fischer Scientific and used as received.
+
+20. Hexanes (≥98.5%, Certified ACS) was purchased from Fischer Scientific and used as received.
+
+21. The product (1) possesses the following properties: Rf = 0.76 (2 : 1 hexanes : EtOAc); mp 75-77 ℃; 1H NMR pdf (500 MHz, CDCl3) δ 7.99 - 7.87 (m, 2H), 7.64 - 7.59 (m, 1H), 7.56 (t, J = 7.5 Hz, 2H), 2.57 (p, J = 2.8 Hz, 1H), 2.52 (d, J = 3.8 Hz, 2H), 1.39 (d, J = 2.2 Hz, 2H); 13C NMR pdf (126 MHz, CDCl3) δ 142.0, 133.2, 129.3, 127.2, 38.4, 23.2, 12.7; IR (neat) 3092, 2979, 1445, 1303, 1287, 1156, 1146, 1112, 1082, 1073, 818, 754. HRMS, [M] Calc'd for C10H10O2S: 194.0402. Found: 194.0399. Purity was determined to be 99.7 wt% by quantitative 1H NMR pdf using 18.3 mg of (1) and 14.0 mg of 1,3,5-trimethoxybenzene (99%) (purchased from Combi-Blocks Chemicals and used as received).
+
+22. A second run on identical scale yielded product 1 (4.4 g, 59% yield) in >99.9 wt% purity determined by quantitative 1H NMR (Note 21). In that case, the benzenesulfonyl chloride reagent was purified via filtration through a basic alumina (Note 24) plug (6 cm long) as a solution in anhydrous Et2O, followed by concentration, prior to use in the reaction.
+
+23. Sand (sea-washed) was purchased from Fischer Scientific and used as received.
+
+24. Aluminum oxide, for chromatography, basic, Brockmann I, 40-300 μm, 60 Å was purchased from Thermo Fischer Scientific and used as received.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+Functionalized cyclobutane derivatives constitute ubiquitous structural motifs commonly found in bioactive compounds, natural products and specialized materials.4 In addition to classical [2+2] cycloaddition and ring-closing strategies, an increasingly popular approach to their formation involves the functionalization of activated bicyclo[1.1.0]butane (BCB) derivatives via cleavage of their bridging bond.5 Such a process generally results in a significant release of strain, hence these substrates are often referred to as 'strain-release' reagents, where the presence of an electron-withdrawing group at the bridgehead position considerably accelerates the reaction. 1-Sulfonylbicyclo[1.1.0]butanes (e.g., 1) constitute a powerful subset of such reagents and have found widespread utility in this regard, where the resulting sulfonyl group serves as a handle for further functionalization (Figure 8).
+
+Figure 8. Utility of 1-sulfonylbicyclo[1.1.0]butanes as spring-loaded intermediates in organic synthesis
+
+For example, the addition of nucleophiles (Nu = H, alkyl, alkenyl, NR2, SR, SeR, N3) readily proceeds in mild conditions, affording 3-sulfonylcyclobutyl substituents that can be further elaborated via alkylation and reduction events (Figure 8a).6 Treatment with a cobalt(I) catalyst instead under light irradiation leads to the initial formation of a Co(III)-cyclobutyl intermediate susceptible to homolysis, affording a cyclobutyl radical which can be functionalized in the presence of aryl iodides, Michael acceptors or acylating agents (Figure 8b).7 The distinct acidity of C-H bonds present in BCBs and the directing effect of the sulfonyl group allows for the regioselective introduction of various substituents via sequential deprotonation and treatment with electrophiles or coupling partners, leading to highly substituted 1-sulfonylbicyclo[1.1.0]butanes (Figure 8c).8 When the electrophile is a cyclic ketone, various spirocyclic cyclobutanes can be readily generated through a subsequent semipinacol rearrangement in the presence of acids or electrophiles (Figure 8d).9
+
+The first general approach to 1-sulfonylbicyclo[1.1.0]butanes was reported in a seminal report from Gaoni (Figure 9a).10 Deprotonation of an aryl methyl sulfone using ethylmagnesium bromide and electrophilic quench with allyl bromide provides a homoallyl sulfone, which is then oxidized to the γ,δ-epoxy sulfone using m-CPBA. Deprotonation of this sulfone with n-BuLi leads to a cyclopropylcarbinol via intramolecular nucleophilic substitution. Activation of the resulting alkoxide using MsCl followed by subsequent deprotonation/cyclization with n-BuLi leads to the corresponding 1-sulfonylbicyclo[1.1.0]butane. The procedure was later modified by Baran and co-workers, where the key homoallyl sulfone intermediate was accessed via reduction of a sulfonyl chloride followed by treatment with 4-bromo-1-butene (Figure 9b).6d,e
+
+Figure 9. Previous synthetic routes to 1-sulfonylbicyclo[1.1.0]butanes
+
+In 2022, our research group reported a streamlined protocol where the desired 1-sulfonylbicyclo[1.1.0]butanes can be accessed in a single pot from methyl sulfones and inexpensive epichlorohydrin via the formation of a 3-sulfonylcyclobutanoxide intermediate (present report and Figure 10).11,12
+
+Figure 10. Selected substrate scope of 1-sulfonylbicyclo[1.1.0]butanes (performed on a 0.5 mmol scale of the methyl sulfone)
+
+The main advantage of this approach comes from its succinct nature and the fact that all reagents needed are commercially available for most scope entries. In cases where the corresponding methyl sulfone is not commercially available, it can readily be prepared in one step by thioanisole oxidation13 or Cu-catalyzed cross-coupling of aryl iodides with NaSO2Me.14 In addition to the title compound 1, a wide variety of sulfonyl-substituted BCBs were readily accessed using a similar protocol as the one described herein, including alkyl (12-14) and heteroaryl sulfones (15-17) as well as a sulfonamide (18). Moreover, substituted epichlorohydrin derivatives were reported as suitable reagents, leading to the direct production of bridgehead- (19) and bridge-substituted (20) BCBs.
+
+References and Notes
+
+Department of Chemistry, North Carolina State University, 2620 Yarbrough Drive, Raleigh, NC 27695, USA. Email: vlindsa@ncsu.edu. ORCID: 0000-0002-7126-325X. This work was supported by the National Institutes of Health (NIH), National Institute of General Medical Sciences (NIGMS, R35GM142965). All nuclear magnetic resonance (NMR) spectroscopy and high-resolution mass spectrometry (HRMS) measurements were performed by the Molecular Education, Technology, and Research Innovation Center (METRIC) at NC State University, which is supported by the State of North Carolina. J.E.M. is grateful to NC State University for a Burroughs Wellcome Fellowship in Organic Chemistry. M.J. is grateful to NC State University for a Percy Lavon Julian Award in Organic Chemistry (Present address for M.J.: College of Pharmacy, Yeungnam University, 280 Daehak-ro, Gyeongsan-si, Gyeongsangbuk-do 38541, Republic of Korea).
+
+Krasovskiy, A.; Knochel, P. Convenient Titration Method for Organometallic Zinc, Magnesium, and Lanthanide Reagents. Synthesis 2006, 0890-0891. DOI: 10.1055/s-2006-926345.
+
+Kofron, W. G.; Baclawski, L. M. A convenient method for estimation of alkyllithium concentrations. J. Org. Chem. 1976, 41, 1879-1880. DOI: 10.1021/jo00872a047.
+
+For reviews on the synthesis and applications of cyclobutane derivatives, see: (a) Namyslo, J. C.; Kaufmann, D. E. The Application of Cyclobutane Derivatives in Organic Synthesis. Chem. Rev. 2003, 103, 1485-1538. DOI: 10.1021/cr010010y. (b) Lee-Ruff, E.; Mladenova, G. Enantiomerically Pure Cyclobutane Derivatives and Their Use in Organic Synthesis. Chem. Rev. 2003, 103, 1449-1484. DOI: 10.1021/cr010013a. (c) Poplata, S.; Tröster, A.; Zou, Y.-Q.; Bach, T. Recent Advances in the Synthesis of Cyclobutanes by Olefin [2 + 2] Photocycloaddition Reactions. Chem. Rev. 2016, 116, 9748-9815. DOI: 10.1021/acs.chemrev.5b00723. (d) Seiser, T.; Saget, T.; Tran, D. N.; Cramer, N. Cyclobutanes in Catalysis. Angew. Chem. Int. Ed. 2011, 50, 7740-7752. DOI: 10.1002/anie.201101053. (e) Wang, M.; Lu, P. Catalytic approaches to assemble cyclobutane motifs in natural product synthesis. Org. Chem. Front. 2018, 5, 254-259. DOI: 10.1039/C7QO00668C. (f) Barday, M.; Bouillac, P.; Coquerel, Y.; Amatore, M.; Constantieux, T.; Rodriguez, J. Enantioselective Organocatalytic Syntheses and Ring-Expansions of Cyclobutane Derivatives. Eur. J. Org. Chem. 2021, 3023-3034. DOI: 10.1002/ejoc.202100405. (g) Murakami, M.; Ishida, N. Cleavage of Carbon-Carbon σ-Bonds of Four-Membered Rings. Chem. Rev. 2021, 121, 264-299. DOI: 10.1021/acs.chemrev.0c00569.
+
+For reviews on the chemistry of BCBs, see: (a) Kelly, C. B.; Milligan, J. A.; Tilley, L. J.; Sodano, T. M. Bicyclobutanes: from curiosities to versatile reagents and covalent warheads. Chem. Sci. 2022, 13, 11721-11737. DOI: 10.1039/D2SC03948F. (b) Turkowska, J.; Durka, J.; Gryko, D. Strain release - an old tool for new transformations. Chem. Commun. 2020, 56, 5718-5734. DOI: 10.1039/D0CC01771J. (c) Walczak, M. A. A.; Krainz, T.; Wipf, P. Ring-Strain-Enabled Reaction Discovery: New Heterocycles from Bicyclo[1.1.0]butanes. Acc. Chem. Res. 2015, 48, 1149-1158. DOI: 10.1021/ar500437h. (d) Hoz, S. Chapter 19 -Bicyclo[1.1.0]butane. In The Chemistry of the Cyclopropyl Group; Rappoport, Z., Ed.; Wiley: New York, 1987; Vol. 1, pp 1121-1191. (e) Wiberg, K. B.; Lampman, G. M.; Ciula, R. P.; Connor, D. S.; Schertler, P.; Lavanish, J. Bicyclo[1.1.0]butane. Tetrahedron 1965, 21, 2749-2769. DOI: 10.1016/S0040-4020(01)98361-9.
+
+For selected examples, see: (a) Gaoni, Y. Conjugate addition of organocopper reagents to 1-arylsulfonylbicyclobutanes. synthesis of the racemic form of the sex pheromone of the citrus mealybug, Planococcus citri (Risso). Tetrahedron Lett. 1982, 23, 5215-5218. DOI: 10.1016/S0040-4039(00)85801-3. (b) Gaoni, Y.; Tomazic, A.; Potgieter, E. Stereochemistry of addition of organocopper reagents and of the hydride ion to 1-(arylsulfonyl)bicyclo[1.1.0]butanes. J. Org. Chem. 1985, 50, 2943-2947. DOI: 10.1021/jo00216a027. (c) Gaoni, Y.; Tomazic, A. Bridgehead reactivity, nucleophilic and radical additions, and lithium aluminum hydride reduction of 1-(arylsulfonyl)bicyclobutanes: general access to substituted, functionalized cyclobutanes. Syntheses of (±)-citrilol acetate, (±)-junionone, and the tricyclo[3.3.0.01,4]octane and tricyclo[4.3.0.01,7]nonane ring systems. J. Org. Chem. 1985, 50, 2948-2957. DOI: 10.1021/jo00216a028. (d) Gianatassio, R.; Lopchuk, J. M.; Wang, J.; Pan, C.-M.; Malins, L. R.; Prieto, L.; Brandt, T. A.; Collins, M. R.; Gallego, G. M.; Sach, N. W.; Spangler, J. E.; Zhu, H.; Zhu, J.; Baran, P. S. Strain-release amination. Science 2016, 351, 241-246. DOI: 10.1126/science.aad6252. (e) Lopchuk, J. M.; Fjelbye, K.; Kawamata, Y.; Malins, L. R.; Pan, C.-M.; Gianatassio, R.; Wang, J.; Prieto, L.; Bradow, J.; Brandt, T. A.; Collins, M. R.; Elleraas, J.; Ewanicki, J.; Farrell, W.; Fadeyi, O. O.; Gallego, G. M.; Mousseau, J. J.; Oliver, R.; Sach, N. W.; Smith, J. K.; Spangler, J. E.; Zhu, H.; Zhu, J.; Baran, P. S. Strain-Release Heteroatom Functionalization: Development, Scope, and Stereospecificity. J. Am. Chem. Soc. 2017, 139, 3209-3226. DOI: 10.1021/jacs.6b13229. (f) Tokunaga, K.; Sato, M.; Kuwata, K.; Miura, C.; Fuchida, H.; Matsunaga, N.; Koyanagi, S.; Ohdo, S.; Shindo, N.; Ojida, A. Bicyclobutane Carboxylic Amide as a Cysteine-Directed Strained Electrophile for Selective Targeting of Proteins. J. Am. Chem. Soc. 2020, 142, 18522-18531. DOI: 10.1021/jacs.0c07490.
+
+(a) Ociepa, M.; Wierzba, A. J.; Turkowska, J.; Gryko, D. Polarity-Reversal Strategy for the Functionalization of Electrophilic Strained Molecules via Light-Driven Cobalt Catalysis. J. Am. Chem. Soc. 2020, 142, 5355-5361. DOI: 10.1021/jacs.0c00245. (b) Wierzba, A. J.; Gryko, D. T.; Gryko, D. Acylation of electrophilic bicyclo[1.1.0]butanes via Co/Ni-catalyzed reductive cross-coupling. J. Porphyrins Phthalocyanines 2021, 25, 630-638. DOI: 10.1142/S1088424621500528.
+
+(a) Gaoni, Y. New bridgehead-substituted 1-(arylsulfonyl)bicyclo[1.1.0]butanes and some novel addition reactions of the bicyclic system. Tetrahedron 1989, 45, 2819-2840. DOI: 10.1016/S0040-4020(01)80112-5. (b) McNamee, R. E.; Haugland, M. M.; Nugent, J.; Chan, R.; Christensen, K. E.; Anderson, E. A. Synthesis of 1,3-disubstituted bicyclo[1.1.0]butanes via directed bridgehead functionalization. Chem. Sci. 2021, 12, 7480-7485. DOI: 10.1039/D1SC01836A. (c) McNamee, R. E.; Thompson, A. L.; Anderson, E. A. Synthesis and Applications of Polysubstituted Bicyclo[1.1.0]butanes. J. Am. Chem. Soc. 2021, 143, 21246-21251. DOI: 10.1021/jacs.1c11244. (d) McNamee, R. E.; Dasgupta, A.; Christensen, K. E.; Anderson, E. A. Bridge Cross-Coupling of Bicyclo[1.1.0]butanes. Org. Lett. 2024, 26, 360-364. DOI: 10.1021/acs.orglett.3c04030.
+
+(a) Kerner, M. J.; Wipf, P. Semipinacol-Type Rearrangements of [3-(Arylsulfonyl)bicyclo[1.1.0]butan-1-yl]alkanols. Org. Lett. 2021, 23, 3615-3619. DOI: 10.1021/acs.orglett.1c01004. (b) Jung, M.; Muir, J. E.; Lindsay, V. N. G. Expedient synthesis of spiro[3.3]heptan-1-ones via strain-relocating semipinacol rearrangements. Tetrahedron 2023, 134, 133296. DOI: 10.1016/j.tet.2023.133296.
+
+Gaoni, Y. Preparation of ring-substituted (arylsulfonyl)cyclopropanes and (arylsulfonyl)bicyclobutanes from γ,δ-epoxy sulfones. J. Org. Chem. 1982, 47, 2564-2571. DOI: 10.1021/jo00134a012.
+
+Jung, M.; Lindsay, V. N. G. One-Pot Synthesis of Strain-Release Reagents from Methyl Sulfones. J. Am. Chem. Soc. 2022, 144, 4764-4769. DOI: 10.1021/jacs.2c00923.
+
+For analogous cyclizations leading to 3-sulfonylcyclobutanols from epihalohydrins, see: (a) Eisch, J. J.; Dua, S. K.; Behrooz, M. Sulfone reagents in organic synthesis. Part 7. [(Phenylsulfonyl)methylene]dilithium as a novel cyclizing and homologizing reagent for bifunctional organic substrates. J. Org. Chem. 1985, 50, 3674-3676. DOI: 10.1021/jo00219a063. (b) Decesare, J. M.; Corbel, B.; Durst, T.; Blount, J. F. γ- and δ-epoxy sulfones. Formation of different ring-sized products upon reaction with CH3MgI or LiN[CH(CH3)2]2. Can. J. Chem. 1981, 59, 1415-1424. DOI: 10.1139/v81-208. (c) Corbel, B.; Decesare, J. M.; Durst, T. Preparation of cyclobutenones and cyclopent-2-enones via epoxy sulfone cyclizations. Can. J. Chem. 1978, 56, 505-511. DOI: 10.1139/v78-081.
+
+Yu, B.; Liu, A.-H.; He, L.-N.; Li, B.; Diao, Z.-F.; Li, Y.-N. Catalyst-free approach for solvent-dependent selective oxidation of organic sulfides with oxone. Green Chem. 2012, 14, 957-962. DOI: 10.1039/C2GC00027J.
+
+Baskin, J. M.; Wang, Z. An Efficient Copper Catalyst for the Formation of Sulfones from Sulfinic Acid Salts and Aryl Iodides. Org. Lett. 2002, 4, 4423-4425. DOI: 10.1021/ol0269190.
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+Methyl Phenyl Sulfone; (3112-85-4)
+
+Epichlorohydrin; (106-89-8)
+
+Di-n-butylmagnesium; (1191-47-5)
+
+Benzenesulfonyl Chloride; (98-09-9)
+
+n-Butyllithium; (109-72-8)
+
+Joanna E. Muir received her B.S. in Biochemistry in 2020 from Florida Gulf Coast University, where she worked under the mentorship of Prof. Gregory Boyce on efforts towards the synthesis of cyclopropenone-containing natural products. She started her graduate studies in the Lindsay Lab at North Carolina State University in 2021, where she is currently working on the development of new synthetic methods involving strained organic compounds.
+
+Myunggi Jung received his B.S. in Pharmaceutical Sciences in 2012 from Yeungnam University and his M.S. in Medicinal and Pharmaceutical Chemistry in 2014 from Seoul National University. From 2014 to 2018, he worked in medicinal chemistry at Daewoong Pharmaceutical. He obtained his Ph.D. in Chemistry from North Carolina State University in 2023, working with Prof. Vincent Lindsay on the chemistry of strained rings. After a postdoctoral training at The University of North Carolina, Chapel Hill (Alexanian lab, Department of Chemistry), he began his independent career at Yeungnam University (College of Pharmacy) in 2024, where he is currently an Assistant Professor.
+
+Vincent N. G. Lindsay received his B.Sc. in Chemistry in 2007 from Université de Montréal. He pursued his doctoral studies with Prof. André B. Charette (Université de Montréal) and received his Ph.D. in Chemistry in 2013, working on the development of asymmetric Rh-catalyzed cyclopropanation reactions. He then worked as a FRQNT postdoctoral fellow at the University of California, Berkeley under the supervision of Prof. Richmond Sarpong on the development of synthetic strategies to various fused N-heterocycles. He began his independent career at North Carolina State University in 2016, working on the development of novel synthetic methods involving strained ring systems.
+
+Yu-Che Chang was born and raised in Taiwan. He received his B.S. and M.S. from National Tsing Hua University in 2017 and 2019. He is currently a fourth-year graduate student in Prof. M. Kevin Brown's laboratory at Indiana University, Bloomington. His research mainly focuses on photochemical strain-release cycloadditions.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

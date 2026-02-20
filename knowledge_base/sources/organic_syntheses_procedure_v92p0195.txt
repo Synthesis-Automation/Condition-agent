@@ -1,0 +1,420 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2015, 92, 195-212
+
+DOI: 10.15227/orgsyn.092.0195
+
+Palladium-catalyzed Buchwald-Hartwig Amination and Suzuki-Miyaura Cross-coupling Reaction of Aryl Mesylates
+
+Submitted by Shun Man Wong, Pui Ying Choy, On Ying Yuen, Chau Ming So,* and Fuk Yee Kwong*1
+
+Checked by Kyohei Matsushita and Keisuke Suzuki
+
+Discussion Addendum: Org. Synth. 2024, 101,
+423
+
+1. Procedure
+
+A. 4-(tert-Butyl)phenyl methanesulfonate. An oven-dried 500-mL, single-necked, round-bottomed flask equipped with a Teflon-coated magnetic stirbar (oval, 25 mm × 7 mm) is charged with 4-tert-butylphenol (15.0 g, 100 mmol) (Note 1), dichloromethane (120 mL) (Note 2), and stirring is started. Triethylamine (42 mL, 30.5 g, 300 mmol, 3.0 equiv) (Note 3) is added slowly over 5 min, and the mixture is stirred at room temperature for 5 min. Methanesulfonyl chloride (15.5 mL, 22.94 g, 200 mmol, 2.0 equiv) (Note 4) is added dropwise through a dropping funnel (Note 5), and the mixture is stirred at room temperature under an atmosphere of air until the 4-tert-butylphenol has been completely consumed as judged by TLC analysis (Note 6). The reaction mixture is transferred into a 2-L, separatory funnel. The reaction flask is rinsed with ethyl acetate (2 × 30 mL), water (20 mL), and with ethyl acetate (30 mL). All rinses, additional ethyl acetate (500 mL) and water (200 mL) are added to the separatory funnel, the funnel is shaken, and the layers are separated. The organic layer is washed sequentially with water (200 mL), 3.5 M hydrochloric acid (2 × 200 mL) (Note 7), water (200 mL), saturated aqueous sodium hydrogen carbonate (2 × 200 mL), and brine (2 × 200 mL). The organic layer is dried over anhydrous sodium sulfate (5 g) and the mixture is filtered. The sodium sulfate is washed with ethyl acetate (50 mL) and filtered. The combined organic solution is concentrated by rotary evaporation (36 °C, 20 mmHg) to afford a yellow oil. The oil is charged on a column of 100 g of silica gel (5.5-cm diameter × 9-cm packed height) (Note 8) and eluted with 50 mL of ethyl acetate-hexane (1:15). At this point, fraction collection (100-mL fractions) is begun, and elution is continued with 250 mL of ethyl acetate-hexane (1:15) and then 1500 mL of ethyl acetate-hexane (1:9). The eluent containing the product, as identified by TLC analysis, is concentrated by rotary evaporation (33 °C, 36 mmHg) to afford a pale yellow oil. The oil is dissolved in 5 mL of dichloromethane, and 200 mL of hexane is added. The solution is cooled in a freezer (-14 °C) for 8 h, and the resulting crystals are collected by suction filtration on a Büchner funnel, washed with ice-cold hexane (4 × 25 mL), and then transferred to a 100-mL, round-bottomed flask and dried overnight at 0.01 mmHg to provide 4-(tert-butyl)phenyl methanesulfonate (18.0-18.7 g, 79-82%) (Note 9) as white shiny crystals.
+
+B. 4-(tert-Butyl)-N-methyl-N-phenylaniline. An oven-dried 250-mL, resealable Schlenk flask (Note 10) equipped with a Teflon-coated magnetic stirbar (cylindrical, 45 mm × 7 mm) is charged with palladium(II) acetate (0.0393 g, 0.175 mmol, 1.0 mol%) (Note 11) and CM-phos (0.282 g, 0.700 mmol, 4.0 mol%) (Note 12). The Schlenk flask is capped with a rubber septum and then evacuated and backfilled with nitrogen three times. Dichloromethane (18 mL) (Note 13) and triethylamine (1.8 mL) (Note 14) are added via syringe through the septum, and stirring is started. The septum is replaced with a Teflon screwcap, and the Schlenk flask is sealed. The resulting dark orange mixture is placed in a 50 °C pre-heated oil bath with stirring for 5 min to afford a yellow reaction mixture. The flask is removed from the oil bath, allowed to cool to room temperature, and then the volatiles are stripped off at 0.01 mmHg for 1 h to afford a yellow solid. The flask is charged with potassium carbonate (6.05 g, 43.8 mmol, 2.5 equiv) (Note 15), phenylboronic acid (0.0427 g, 0.350 mmol, 0.2 equiv) (Note 16), and 4-(tert-butyl)phenyl methanesulfonate (3.99 g, 17.5 mmol, 1.0 equiv). The Schlenk flask is capped with a rubber septum and then evacuated and backfilled with nitrogen three times. N-Methylaniline (2.85 mL, 26.3 mmol) (Note 17) and tert-butyl alcohol (70 mL) (Note 18) are added via syringe through the septum, and stirring is started.
+
+The septum is replaced with a Teflon screwcap, and the Schlenk flask is sealed. The reaction flask is stirred at room temperature for 10 min, then placed in a 120 °C pre-heated oil bath (Note 19) with stirring for 24 h (Note 20). The flask is removed from the oil bath, allowed to cool to room temperature, and the mixture is transferred into a 500-mL, separatory funnel. The reaction flask is rinsed with ether (2 × 50 mL), brine (2 × 50 mL), water (50 mL), and again with ether (50 mL). All rinses are added to the separatory funnel, the funnel is shaken, and the layers are separated. The aqueous layer is extracted with ether (2 × 50 mL), and the combined organic extracts are dried over anhydrous sodium sulfate (5 g). The organics are separated by filteration. The sodium sulfate is washed with ether (50 mL) and the ether separated by filtration. The combined organic phase is concentrated by rotary evaporation (40 °C, 12 mmHg) to afford brown oil. The oil is charged on a column of 130 g of silica gel (4.5-cm diameter × 16-cm packed height) (Note 7) and eluted with 130 mL hexane. At this point, fraction collection (100-mL fractions) is begun, and elution is continued with dichloromethane-hexane (1:49) until all the desired product is eluted. The eluent containing the product is concentrated by rotary evaporation (39 °C, 14 mmHg) to afford pale-yellow liquid. The liquid is dried for 1 h at 0.01 mmHg to provide 4-(tert-butyl)-N-methyl-N-phenylaniline (3.60-3.85 g, 86-92%, Note 21) as a pale-yellow liquid.
+
+C. 4-(tert-Butyl)-1,1'-biphenyl. An oven-dried 250-mL, resealable Schlenk flask (Note 10) equipped with a Teflon-coated magnetic stirbar (cylindrical, 45 mm × 7 mm) is charged with palladium(II) acetate (0.0393 g, 0.175 mmol, 1.0 mol%, Note 11) and CM-phos (0.282 g, 0.700 mmol, 4.0 mol%) (Note 12). The Schlenk flask is capped with a rubber septum and then evacuated and backfilled with nitrogen three times. Dichloromethane (18 mL) (Note 13) and triethylamine (1.8 mL, 1.31 g, 12.9 mmol, 0.74 equiv) (Note 14) are added via syringe through the septum, and stirring is started. The septum is replaced with a Teflon screwcap, and the Schlenk flask is sealed. The resulting dark orange mixture is placed in a 50 °C pre-heated oil bath with stirring for 5 min under reflux, affording a yellow reaction mixture. The flask is removed from the oil bath, allowed to cool to room temperature, then the volatiles are stripped off at 0.01 mmHg for 1 h to afford a yellow solid. The flask is charged with potassium phosphate (11.1 g, 52.5 mmol, 3.0 equiv) (Note 22), phenylboronic acid (4.27 g, 35.0 mmol, 2.0 equiv) (Note 16), and 4-(tert-butyl)phenyl methanesulfonate (3.99 g, 17.5 mmol, 1.0 equiv). The Schlenk flask is capped with a rubber septum and then evacuated and backfilled with nitrogen three times. tert-Butyl alcohol (88 mL) (Note 18) is added via syringe through the septum, and stirring is started. The septum is replaced with a Teflon screwcap and the Schlenk flask is sealed. The reaction flask is stirred at room temperature for 10 min, then placed in a 120 °C (Note 19) pre-heated oil bath with for 24 h (Note 20). The flask is removed from the oil bath, allowed to cool to room temperature, and the mixture is transferred into a 500-mL, separatory funnel. The reaction flask is rinsed with ether (2 × 50 mL), brine (2 × 50 mL), water (50 mL), and again with ether (50 mL). All rinses are added to the separatory funnel, the funnel is shaken, and the layers are separated. The aqueous layer is extracted with ether (2 × 50 mL), and the combined organic extracts are dried over anhydrous sodium sulfate (5 g). The mixture is filtered and the sodium sulfate is washed with ether (50 mL). The organic solution is concentrated by rotary evaporation (40 °C, 15 mmHg) to afford a brown oil. The oil is charged on a column of 100 g of silica gel (4.5-cm diameter × 12-cm packed height) (Note 7) and eluted with 75 mL hexane. At this point, fraction collection (100-mL fractions) is begun, and elution is continued with hexane until all the desired product is eluted. The eluent containing the product is concentrated by rotary evaporation (40 °C, 15 mmHg) to afford a colorless oil. The oil is dried for 2 h at 0.01 mmHg to provide 4-(tert-butyl)-1,1'-biphenyl (2.20-2.90 g, 60-79%) (Note 23) as a white solid.
+
+2. Notes
+
+1. The checkers used 4-tert-butylphenol (>98%) as received from Tokyo Chemical Industry Co., Ltd. (TCI). The submitters used 4-tert-butylphenol (97%) as received from Acros Organics.
+
+2. The checkers used dichloromethane (anhydrous) as received from KANTO CHEMICAL Co., Inc.. The submitters obtained dichloromethane (GR Grade) from DUKSAN and used it as received.
+
+3. Triethylamine (≥99.5%) was obtained from Aldrich Co., Inc., and used as received.
+
+4. Two equiv of methanesulfonyl chloride were used to ensure the reaction could be completed within 3 h. The checkers obtained methanesulfonyl chloride from Tokyo Chemical Industry Co., Ltd. (TCI) and used it as received. The submitters used methanesulfonyl chloride as obtained from Merck Millipore.
+
+5. Upon addition of methanesulfonyl chloride, vapor and heat were released.
+
+6. Ethyl acetate-dichloromethane­-hexane (1:2:7) [SM (Rf = 0.43), product (Rf = 0.50)] Thin layer chromatography was performed on pre-coated TLC-plates (Merck Co., Inc. TLC silica gel 60 F254, Art 5715, 0.25 mm). n-Hexane (≧95% grade) from Kanto Chemical Co. was used.
+
+7. Hydrochloric acid (reagent grade, 35%-37%) was obtained from Koso Chemical Co., Inc. and diluted with water to the desired concentration.
+
+8. The checkers used silica gel 60N (Spherical, neutral, 63-210 µm) obtained from KANTO CHEMICAL Co., Inc. The submitters used silica gel 60 (0.040-0.063 mm, 230-400 mesh ASTM) obtained from Merck Millipore.
+
+9. The analytical data of 4-(tert-butyl)phenyl methanesulfonate are as follows mp = 53-54 °C; 1H NMR pdf(600 MHz, CDCl3) δ: 1.32 (s, 9 H), 3.12 (s, 3 H), 7.20 (d, J = 8.1 Hz, 2 H), 7.42 (d, J = 8.1 Hz, 2 H); 13C NMR pdf(150 MHz, CDCl3) δ: 31.5, 34.8, 37.3, 121.5, 127.1, 147.1, 150.7; MS (EI): m/z (relative intensity) 228 (M+, 16), 213 (100), 135 (70), 91 (41), 79 (47); HRMS calcd. for C11H16O3S+: 228.0820, found 228.0811; Anal. calcd for C11H16O3S: C, 57.87; H, 7.06; S, 14.04. Found: C, 57.86; H, 6.93; S, 13.88.
+
+10. The resealable Schlenk flask used by the checkers was tailor-made with a Rotaflo stopcock and a 250-300-mL round-bottomed flask. The key bore of the Rotaflo stopcock was 10-mm. In order to have effective stirring during the reaction, Teflon-coated magnetic stirbar (cylindrical, 45 mm × 7 mm) was chosen. The resealable Schlenk flask used by the submitters was tailor-made with a Rotaflo stopcock and a 250-mL, round-bottomed flask. The key bore of the Rotaflo stopcock was 10-mm. In order to have effective stirring during reaction, Teflon-coated magnetic stirbar (cylindrical, 50 mm × 8 mm) was chosen. Photographs of the Schlenk flasks are shown below.
+
+11. Palladium(II) acetate (≥99.9% trace metals basis) was obtained from Aldrich Co., Inc., and used as received.
+
+12. CM-Phos (98%) is available commercially from Strem Chemical, Co. and can be used for the reaction described above. The checkers used material produced in their laboratory based on a procedure that has been submitted for checking by Organic Syntheses.
+
+13. The checkers used dichloromethane (anhydrous) as received from KANTO CHEMICAL Co., Inc. The submitters used dichloromethane (GR Grade) obtained from DUKSAN, and the solvent was distilled from calcium hydride under nitrogen prior to use.
+
+14. Triethylamine (≥99.5%) was obtained from Aldrich Co., Inc., and distilled from potassium hydroxide under nitrogen prior to use.
+
+15. Potassium carbonate (ACS reagent, ≥99.0%) was obtained from Aldrich Co., Inc., and used as received.
+
+16. Two equiv of phenylboronic acid were used in order to obtain the desired yield of the coupling reaction. The checkers used phenylboronic acid from Aldrich Co., Inc., and the submitters used phenylboronic acid from Soochiral Chemical Science & Technology Co., Ltd. Phenylboronic acid was recrystallized from dichloromethane and hexane prior to use.
+
+17. N-Methylaniline (98%) was obtained from Aldrich Co., Inc., and distilled under nitrogen.
+
+18. tert-Butyl alcohol (ACS reagent, ≥99.0%) was obtained from Aldrich Co., Inc., and distilled from sodium under nitrogen.
+
+19. The oil bath temperature was higher when run on a large scale than previously published examples because of the lower internal temperature of the large-scale reactions. A blast shield was used since the boiling point of tert-butyl alcohol is 82 °C and the reaction was run at 120 °C under a closed system.
+
+20. Reaction times are longer when run on a large scale than the previously published reaction times for smaller scale reactions. Efficient stirring is very important for these large-scale reactions, otherwise, very sticky and glutinous reaction mixtures form, and lower product yields are obtained.
+
+21. The analytical data of 4-(tert-butyl)-N-methyl-N-phenylaniline are as follows: 1H NMR pdf(600 MHz, CDCl3) δ: 1.32 (s, 9 H), 3.30 (s, 3 H), 6.89 (t, J = 7.8 Hz, 1 H), 6.97 (d, J = 7.8 Hz, 2 H), 7.00 (brd, J = 8.7 Hz, 2 H), 7.24 (brt, 7.8 Hz, 2 H), 7.30 (brd, J = 8.7 Hz, 2 H); 13C NMR pdf(150 MHz, CDCl3) δ: 31.6, 34.4, 40.4, 119.1, 120.4, 121.4, 126.2, 129.2, 145.0, 146.5, 149.4; MS (EI): m/z (relative intensity) 239 (M+, 31), 224 (100); HRMS calcd. for C17H21NH+: 240.1752, found 240.1743; Anal. calcd for C17H21N: C, 85.30; H, 8.84; N, 5.85. Found: C, 85.21; H, 8.59; N, 5.92. Rf = 0.5, in dichloromethane-hexane (1:19) solvent system.
+
+22. The checkers used potassium phosphate as received from Aldrich Co., Inc. The submitters use potassium phosphate (97%) as obtained from Strem Chemicals, Inc.
+
+23. The analytical data of 4-(tert-butyl)-1,1'-biphenyl are as follows: mp = 47-49 °C. 1H NMR pdf(600 MHz, CDCl3) δ: 1.36 (s, 9 H), 7.32 (t, J = 7.2 Hz, 1 H), 7.42 (t, J = 7.2 Hz, 2 H), 7.46 (d, J = 8.4 Hz, 2 H), 7.54 (d, J = 8.4 Hz, 2 H), 7.59 (d,J = 7.2 Hz, 2 H); 13C NMR pdf(150 MHz, CDCl3) δ: 31.5, 34.7, 125.9, 126.9, 127.12, 127.17, 128.8, 138.5, 141.2, 150.4; MS (EI): m/z (relative intensity) 210 (M+, 34), 195 (100), 167 (25); HRMS calcd. for C16H18+: 210.1409, found 210.1402; Anal. calcd for C16H18: C, 91.37; H, 8.63. Found: C, 91.06; H, 8.47. Rf = 0.3, in hexane solvent system.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at    http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+Palladium-catalyzed cross-coupling reactions have become an extremely versatile tool in organic synthesis for the construction of carbon-carbon as well as carbon-heteroatom bonds.2 Notably, it evolves into a synthetically attractive transformation in targeting pharmaceutically useful intermediates.3 In particular, the Buchwald-Hartwig amination and Suzuki-Miyaura cross-coupling reaction represent an effective method for the construction of C(sp2)-N and C(sp2)-C(sp2) linkages, respectively.
+
+In 2008, we reported the synthesis and applications of CM-phos,4 which showed excellent catalytic activities towards the first palladium-catalyzed amination and Suzuki coupling reaction of aryl mesylates. Aryl mesylates can be easily accessed from phenols, owing to their lower molecular mass, and cross-coupling reactions utilizing these reagents have the advantage of higher atom economy than those employing the corresponding aryl tosylates.5 However, their relatively inert leaving-group activity, with respect to tosylates, has limited their applications in coupling reactions. Thus, this area remains highly challenging as mesylates are regarded as the least active sulfonate leaving group.
+
+The examples described here demonstrate that a variety of aryl mesylates with differing substitution patterns, electronic properties, and functional groups can be coupled with differing amines and arylboronic acids in high yield on large scale up to 40 mmol (Tables 1 and 2).
+
+As shown in Tables 3 to 6, the Pd(OAc)2/CM-phos catalyst is highly effective for both amination and Suzuki coupling reactions of aryl mesylates. The examples showed that the catalytic system is applicable to couple a range of aryl/heteroaryl mesylate substrates with amine and arylboronic acid nucleophiles in high yield with low to moderate levels of catalyst loading (0.5-4 mol% Pd). Notably, the reactions require no special techniques and are amenable to large-scale synthesis.
+
+References and Notes
+
+State Key Laboratory of Chirosciences and Department of Applied Biology and Chemical Technology, The Hong Kong Polytechnic University, Hung Hom, Kowloon, Hong Kong. E-mail: chau.ming.so@polyu.edu.hk, fuk-yee.kwong@polyu.edu.hk; Fax: +852-2364-9932. We thank the Research Grants Council of Hong Kong (PolyU153008/14P) for financial support.
+
+(a) de Meijere, A.; Diederich, F., Eds. Metal-Catalyzed Cross-Coupling Reactions, 2nd ed.; Wiley-VCH: Weinheim, Germany, 2004; Vols. 1-2. (b) Beller, M.; Bolm, C. Transition Metals for Organic Synthesis : Building Blocks and Fine Chemicals, 2nd ed.; Wiley-VCH: Weinheim, Germany, 2004; Vols. 1-2. (c) Negishi, E., Ed. Handbook of Organopalladium for Organic Synthesis; Wiley-Interscience: Chichester, UK, 2002; Vols. 1-2. (d) Hassan, J.; Sévignon, M.; Gozzi, C.; Schulz, E.; Lemaire, M. Chem. Rev. 2002, 102, 1359. (e) Tsuji, J. Palladium Reagents and Catalysts, 2nd ed.; Wiley-Interscience: Chichester, UK, 2004 (f) Yin, L.; Liebscher, J., Chem. Rev. 2007, 107, 133. (g) Corbet, J.-P.; Mignani, G. Chem. Rev. 2006, 106, 2651. (h) Roglans, A.; Pla-Quintana, A.; Moreno-Mañas, M. Chem. Rev. 2006, 106, 4622.
+
+(a) King, A. O.; Yasuda, N. In Organometallics in process chemistry; Larsen, R. D., Ed.; Springer-Verlag: Berlin Heidelberg, 2004; pp. 205-245. (b) Suzuki, A. In Modern arene chemistry; Astruc, D., Ed.; Wiley-VCH: Weinheim, Germany, 2002; pp. 53-106. (c) Miyaura, N. J. Organomet. Chem. 2002, 653, 54. (d) Miyaura, N. Top. Curr. Chem. 2002, 219, 11. (e) Muci, A. R.; Buchwald, S. L. Top. Curr. Chem. 2002, 219, 211.
+
+(a) So, C. M.; Zhou, Z.; Lau, C. P.; Kwong, F. Y. Angew. Chem. Int. Ed. 2008, 47, 6402. (b) So, C. M.; Lau, C. P.; Kwong, F. Y. Angew. Chem. Int. Ed. 2008, 47, 8059. (c) So, C. M.; Kwong, F. Y. Chem. Soc. Rev. 2011, 40, 4963.
+
+Trost, B. M. Angew. Chem., Int. Ed. Engl. 1995, 34, 259.
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+4-tert-Butylphenol; (98-54-4)
+
+Triethylamine; (121-44-8)
+
+Methanesulfonyl chloride; (124-63-0)
+
+Palladium(II) acetate; (3375-31-3)
+
+CM-phos: 2-(2-(Dicyclohexylphosphino)phenyl)-1-methyl-1H-indole, (1067883-58-2)
+
+Phenylboronic acid; (98-80-6)
+
+N-Methylaniline; (100-61-8)
+
+tert-Butanol; (75-65-0)
+
+Potassium phosphate; (7778-77-0)
+
+Shun Man Wong received his B.Sc. in Chemical Technology from The Hong Kong Polytechnic University in 2010. He pursued his postgraduate study at the same university and obtained his Ph.D. degree in 2014. He is currently a research associate under the supervision of Prof. Fuk Yee Kwong, researching the synthesis of new heterocyclic phosphine ligands and their potential applications.
+
+Pui Ying Choy received her B.Sc. in Chemical Technology in The Hong Kong Polytechnic University in 2010. She pursued her postgraduate study at the same university and obtained her Ph.D. degree in 2014. She is currently a research associate under the supervision of Prof. Fuk Yee Kwong, researching the synthesis of new heterocyclic phosphine ligands and their potential applications in transition-metal catalysis.
+
+On Ying Yuen received her B.Sc. (1st class honors) in Chemical Technology from the Hong Kong Polytechnic University in 2011. Currently, she is pursuing her Ph.D. under the guidance of Prof. Fuk Yee Kwong. Her main research focuses on palladium-catalyzed direct functionalization of aromatics: process and catalyst design.
+
+Chau Ming So is currently a Visiting Assistant Professor in the Department of Applied Biology and Chemical Technology of The Hong Kong Polytechnic University. He received his B.Sc. (1st class honor) from PolyU in 2006. He pursued his postgraduate study at the same university and obtained his Ph.D. degree in 2010. He received the Hong Kong Young Scientist Award in the same year. Moreover, he was the winner of Eli Lilly the Best Thesis Award (1st Prize). In 2012-2013, he moved to Institute of Materials Research and Engineering (IMRE) as postdoctoral fellow in Prof. Tamio Hayashi's research group.
+
+Fuk Yee (Michael) Kwong is currently a Professor of the Department of Applied Biology and Chemical Technology at The Hong Kong Polytechnic University. He received his B.Sc. in 1996, and completed his Ph.D. at The Chinese University of Hong Kong in 2000 under the supervision of Professor Kin Shing Chan. In 2001-2003, he was at the Massachusetts Institute of Technology (MIT), USA, as a Croucher Foundation postdoctoral fellow in Professor Stephen L. Buchwald's research group. Kwong's research interests are new cross-coupling methodologies, carbon-hydrogen bond functionalization, and catalytic enantioselective transformations.
+
+Kyohei Matsushita was born in 1989 in Chiba, Japan. He received his B.Sc. degree in 2012 at Chuo University under the supervision of Prof. Shin-ichi Fukuzawa. In the same year, he joined the research group of Prof. Keisuke Suzuki at Tokyo Institute of Technology. In 2014, he received his M.Sc., and currently, is pursuing his Ph.D.
+
+Copyright © 1921-, Organic Syntheses, Inc.  All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

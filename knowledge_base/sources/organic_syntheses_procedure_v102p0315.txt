@@ -1,0 +1,447 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 315-334
+
+DOI: 10.15227/orgsyn.102.0315
+
+Synthesis of gem-Difluoroalkenes through Ramberg-Bäcklund Reaction of Alkyltriflones
+
+Submitted by Motoo Ohtsuka,1 Yasuyo Tahara-Tezuka,1 Yuuki Maekawa,✝ Cathleen M. Crudden,*1,✝,¥ and Masakazu Nambo*1,✝✝
+
+Checked by Nikolaos Skoulikas, Lorenz Erlbacher and Nuno Maulide
+
+1. Procedure (Note 1)
+
+A. 4-tert-Butylbenzyl trifluoromethyl sulfone (1). A 250-mL, two-necked round-bottomed flask equipped with a Teflon-coated magnetic stir bar (football-shaped, approximately 2.5 cm), and a reflux condenser capped with a rubber septum (Figure 1A) is charged with sodium trifluoromethylsulfinate (4.7 g, 30.0 mmol, 2.0 equiv) (Note 2) and potassium iodide (0.3 g, 1.5 mmol, 0.1 equiv) (Note 3). The remaining neck is sealed with a rubber septum, and the septum plugging the reflux condenser is pierced with a needle connected to a Schlenk line (vacuum/argon manifold) via rubber tubing. The flask is evacuated and backfilled with argon. After the addition of acetonitrile (30 mL, 0.5 M) (Note 4) and 4-tert-butylbenzyl bromide (2.8 mL, 15.0 mmol, 1.0 equiv) (Note 5) using syringes pierced through the side septum (Figure 1B), the reaction mixture is stirred at reflux (85 ℃) for 16 h (Figure 1C).
+
+Figure 1. Synthesis of compound 1. A. Reaction setup; B. Reaction mixture before reflux; C. Reaction after reflux for 16 h; (pictures provided by the checkers).
+
+The reaction mixture is allowed to cool to room temperature (23 ℃), after which time the solvent is removed by rotary evaporation (300 - 90 hPa, 45 ℃ water bath), providing the crude product as an orange-yellow solid. The crude product is dissolved in ethyl acetate (100 mL) and transferred to a 250-mL separatory funnel along with saturated sodium thiosulfate (40 mL) (Note 6) and water (30 mL). After agitation, the lower aqueous phase is removed, and the organic layer is washed with brine (40 mL). The organic phase is transferred to a 200-mL Erlenmeyer flask, dried over Na2SO4 (10 g), and the resulting biphasic mixture is filtered by vacuum suction through a medium-porosity, fritted glass funnel into a 250-mL round-bottomed flask. The remaining drying agent in the filter and the Erlenmeyer flask are washed with additional amount of ethyl acetate (50 mL). The solvent is removed via rotary evaporation (150 - 80 hPa, 45 ℃ water bath) providing the crude product as a pale brown solid (Figure 2A). The crude product is purified by column chromatography (Notes 7, 8) (Figure 2B) to afford 4.12 g (98 %) of the product as a pale-yellow solid (Notes 9, 10, 11) (Figure 2C).
+
+Figure 2. Purification of compound 1. A. Crude product; B. Column chromatography charged with crude product; C. Pure 4-tert-Butylbenzyl trifluoromethyl sulfone 1 (pictures provided by the checkers)
+
+B. 1-(4-tert-Butylphenyl)-2-(3,5-dimethoxyphenyl)ethyl trifluoromethyl sulfone (2). A 250-mL, single-necked round-bottomed flask equipped with a Teflon-coated magnetic stir bar (football-shaped, approximately 2.5 cm), is charged with 3,5-dimethoxybenzyl bromide (3.4 g, 14.7 mmol, 1.05 equiv) (Note 12), 4-tert-butylbenzyl trifluoromethyl sulfone (3.9 g, 14.0 mmol, 1.0 equiv) and tripotassium phosphate (4.5 g, 21.0 mmol, 1.5 equiv) (Note 13). The neck is sealed with a rubber septum which is pierced with a 20G needle connected to a Schlenk line (vacuum/argon manifold) through rubber tubing and the flask is evacuated and backfilled with argon, then equipped with an argon charged balloon. After the addition of acetonitrile (56 mL, 0.25 M) (Note 4) (Figure 3A) through a syringe, the reaction mixture is stirred at room temperature (23 ℃) for 16 h. The reaction mixture is then cooled to 0 ℃ using an ice-water bath, and a saturated aqueous solution of NH4Cl (60 mL) is slowly added. After this, acetonitrile is removed by rotary evaporation (250 - 100 hPa, 45 ℃ water bath), providing the crude product as a beige oil and water mixture (Figure 3B). To this crude mixture is added ethyl acetate (100 mL) and water (20 mL). The resulting mixture is transferred to a 250-mL separatory funnel. The lower aqueous phase is removed, the organic phase is transferred to a 250-mL Erlenmeyer flask, dried over Na2SO4 (10 g), and filtered by vacuum suction through a medium porosity fritted glass funnel into a 250-mL round-bottomed flask. The remaining drying agent in the filter and the Erlenmeyer flask are washed with an additional amount of ethyl acetate (40 mL). The solvent is removed by rotary evaporation (160 - 90 hPa, 45 ℃ water bath) providing the crude product as a beige solid (Figure 3C).
+
+Figure 3. Synthesis of compound 2. A. Reaction mixture before stirring; B. After removal of acetonitrile; C. Crude product (Photos provided by checkers)
+
+The crude product is purified by column chromatography (Note 14) (Figure 4A) to afford 5.47 g (91 %) of the product as a colorless solid (Notes 15, 16, 17) (Figure 4B).
+
+Figure 4. Purification of compound 2. A. Column chromatography charged with crude product; B. 1-(4-tert-Butylphenyl)-2-(3,5-dimethoxyphenyl)ethyl trifluoromethyl sulfone 2 (pictures provided by the checkers)
+
+C. 2-(4-tert-Butylphenyl)-1,1-difluoro-3-(3,5-dimethoxyphenyl)propylene (3). A 250-mL, two-necked round-bottomed flask equipped with a Teflon-coated magnetic stir bar (football-shaped, approximately 2.5 cm), reflux condenser capped with a rubber septum (Figure 5A) is charged with 1-(4-tert-butylphenyl)-2-(3,5-dimethoxyphenyl)ethyl trifluoromethyl sulfone (5.2 g, 12.0 mmol, 1.0 equiv). The remaining neck is sealed with a rubber septum, and the septum plugging the reflux condenser is pierced with a needle connected to a Schlenk line (vacuum/argon manifold) through rubber tubing. The flask is evacuated and backfilled with argon and an argon-filled balloon is connected to the apparatus through a needle. After the addition of tetrahydrofuran (THF, 36 mL, 0.3 M) (Note 18) and cyclohexylmagnesium bromide (24.0 mL, 1 M in THF, 24 mmol, 2.0 equiv) (Note 19) using syringes, the reaction mixture is stirred at reflux (70 ℃) for 16 h (Figure 5B).
+
+Figure 5. Synthesis of compound 3. A. Reaction setup; B. After reflux for 16 h (pictures provided by the checkers)
+
+The reaction mixture is allowed to cool to room temperature (23 ℃), and a saturated aqueous solution of NH4Cl (30 mL) is slowly added. THF is removed by rotary evaporation (320 - 120 hPa, 45 ℃ water bath). The resulting suspension of crude product is dissolved in ethyl acetate (120 mL) and 1 M aqueous HCl solution (30 mL) is added before transferring the mixture to a 250-mL separatory funnel. The lower aqueous phase is removed, the organic phase is transferred to a 250-mL Erlenmeyer flask, dried over Na2SO4 (10 g), and is then filtered by vacuum suction through a medium porosity fritted glass funnel into a 250-mL round-bottomed flask. The remaining drying agent in the filter and the Erlenmeyer flask are washed with an additional amount of ethyl acetate (40 mL). The solvent is removed via rotary evaporation (190 - 100 hPa, 45 ℃ water bath) providing the crude product as a pale red oil (Figure 6A). The crude product is purified by column chromatography (Note 20) (Figure 6B) to afford 2.2 g (52 %) of the product as a colorless oil (Notes 21, 22, 23) (Figure 6C).
+
+Figure 6. Purification of compound 3. A. Crude product; B. Column chromatography charged with crude product; C. 2-(4-tert-Butylphenyl)-1,1-difluoro-3-(3,5-dimethoxyphenyl)propylene 3 (pictures provided by the checkers)
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with ethyl acetate, sodium thiosulfate, NaCl, Na2SO4, hexane, CH2Cl2, NH4Cl, HCl, toluene as well as the proper procedures for experimental operations.
+
+2. Sodium trifluoromethanesulfinate (>95.0 %) was purchased from Tokyo Chemical Industry (TCI).
+
+3. Potassium iodide (99.5 %) was purchased from Fujifilm Wako Pure Chemical Corporation (Wako) by the authors. The checkers used potassium iodide (ReagentPlus, 99 %) from Sigma Aldrich.
+
+4. Acetonitrile (dehydrated -Super-, 99.5 %) was purchased from Kanto Chemical Co., Inc (KANTO) by the authors. The checkers used acetonitrile (extra dry, 99.9+ %, AcroSeal) from Thermo Fisher Scientific.
+
+5. 4-tert-Butylbenzyl bromide (97.0 %) was purchased from Fluorochem by the authors. The checkers used 4-tert-butylbenzyl bromide (97 %) from Thermo Fisher Scientific.
+
+6. Sodium thiosulfate was added to quench the trace amounts of iodine that formed.
+
+7. Silica gel (Silica Gel 60, 40 - 50 μm) was purchased from KANTO by the authors. The checkers used silica gel (Silica 60, 40 - 63 μm) from Macherey-Nagel.
+
+8. Sea sand (20 g) was added to the glass column (diameter 4 cm), and was wetted with the eluent (CH2Cl2 : hexane, 1 : 10, 30 mL). Slurry prepared from silica gel (70 g) with the eluent (CH2Cl2 : hexane, 1 : 10, 200 mL) was loaded into a glass column. The column was then packed with pressurized air. The crude product was dissolved in CH2Cl2 (3 mL), and then hexane (3 mL) was added. Resulting solution was added onto the column. The product was eluted using gradient elution (CH2Cl2 : hexane, 1 : 10, 440 mL, 1 : 8 (160 mL), 1 : 7 (240 mL), 1 : 5 (240 mL), 1 : 4 (250 mL), 1 : 3 (320 mL), 1 : 2 (300 mL)) and collected in 40-mL fractions in glass test tubes. The presence of product in the chromatography fractions was identified by TLC analysis on silica, where Rf of the product = 0.45 with CH2Cl2 : hexane, 1 : 2. Fractions 6 - 32 were collected (Figure 7A, 7B), combined, and concentrated under reduced pressure to obtain the product. The checkers substituted hexane with distilled heptane, achieving the same result.
+
+Figure 7. TLC analysis of compound 1. (A) Crude product; (B) TLC from the fractions of the column chromatography (pictures provided by the checkers)
+
+9. 4-tert-Butylbenzyl trifluoromethyl sulfone (1): 1H NMR pdf (700 MHz, CDCl3) δ 7.46 (d, J = 8.4 Hz, 2H), 7.35 (d, J = 8.3 Hz, 2H), 4.45 (s, 2H), 1.33 (s, 9H). 13C NMR pdf (176 MHz, CDCl3) δ 153.5, 131.2 (2C), 126.5 (2C), 119.94 (q, J = 328 Hz), 119.88, 55.8, 34.9, 31.3 (3C). 19F NMR pdf (659 MHz, CDCl3) δ -76.53 (s, 3F). HRMS (ESI) m/z calc'd. for C12H14F3O2S [M-H]-: 279.0672, found 279.0673. mp 66 - 67 ℃.
+
+10. The purity of 1 was determined to be 99 % by qNMR pdf using 1,3,5-trimethoxybenzene (TCI, >98.0 %) as internal standard.
+
+11. A second run by the checkers performed at half scale gave 1.9 g (91 %) of 1 at 99 % purity. The authors performed two runs at full scale providing 3.9 g (93 %, 99 % purity) and 3.8 g (93 %, 99 % purity) of 1 respectively.
+
+12. 3,5-Dimethoxybenzyl bromide (>97.0 %) was purchased from TCI by the authors. The checkers used 3,5-dimethoxybenzyl bromide (96 %) from abcr GmbH.
+
+13. Tripotassium phosphate (95.0 %) was purchased from Wako by the authors. The checkers used tripotassium phosphate (97 %) from Thermo Fisher Scientific.
+
+14. Sea sand (70 g) was added to the glass column (diameter 6 cm), and was wetted with the eluent (CH2Cl2 : hexane, 1 : 4, 50 mL). Slurry prepared from silica gel (150 g) with the eluent (CH2Cl2 : hexane, 1 : 10, 400 mL) was loaded into a glass column. The column was then packed with pressurized air. The crude product was dissolved in CH2Cl2 (6 mL), and then eluent (CH2Cl2 : hexane, 1 : 4, 6 mL) was added. Resulting solution was added onto the column. The product was eluted using gradient elution (CH2Cl2 : hexane, 1 : 4, (2.5 L), 1 : 3, (400 mL), 1 : 2.5, (350 mL), 1 : 2, (600 mL), 1 : 1, (2 L)) and collected in 40-mL fractions in glass test tubes. The presence of product in the chromatography fractions was identified by TLC analysis on silica and visualization with phosphomolybdic acid ethanol solution, where Rf of the product = 0.43 with CH2Cl2 : hexane, 1 : 1. Fractions 62 - 126 were collected (Figure 8), combined, and concentrated under reduced pressure to obtain the product. The checkers substituted hexane with distilled heptane, achieving the same result.
+
+Figure 8. TLC analysis of compound 2. TLC from the fractions of the column chromatography (pictures provided by the checkers)
+
+15. 1-(4-tert-Butylphenyl)-2-(3,5-dimethoxyphenyl)ethyl trifluoromethyl sulfone (2): 1H NMR pdf (700 MHz, CDCl3) δ 7.38 (d, J = 8.6 Hz, 2H), 7.28 (d, J = 8.5 Hz, 2H), 6.26 (t, J = 2.3 Hz, 1H), 6.05 (d, J = 2.2 Hz, 2H), 4.49 (dd, J = 11.6, 3.0 Hz, 1H), 3.65 (dd, J = 13.6, 3.0 Hz, 1H), 3.61 (s, 6H), 3.33 (dd, J = 13.6, 11.5 Hz, 1H), 1.30 (s, 9H). 13C NMR pdf (176 MHz, CDCl3) δ 160.9 (2C), 153.4, 137.5, 130.0 (2C), 126.1 (2C), 125.6, 120.1 (q, J = 330 Hz), 107.2 (2C), 99.7, 68.6, 55.3 (2C), 34.9, 34.7, 31.3 (3C). 19F NMR pdf (659 MHz, CDCl3) δ -73.24 (s, 3F). HRMS (ESI) m/z calc'd. for C21H24F3O4S [M-H]-: 429.1353, found 429.1355. mp 79 - 80 ℃.
+
+16. The purity of 2 was determined to be 99 % by qNMR pdf using 1,3,5-trimethoxybenzene (TCI, >98.0 %) as internal standard.
+
+17. A second run by the checkers performed at half scale gave 2.4 g (83 %) of 2 at 99 % purity. The authors performed two runs at full scale providing 5.6 g (93 %, 99 % purity) and 5.4 g (89 %, 99 % purity) of 2 respectively.
+
+18. Tetrahydrofuran (dehydrated stabilizer free -Super Plus-, >99.5 %) was purchased from KANTO by the authors. The checkers used tetrahydrofuran (extra dry over molecular sieves, 99.5 %, stabilized, AcroSeal) from Thermo Fisher Scientific.
+
+19. Cyclohexylmagnesium bromide (ca. 18 % in THF, ca. 1 M) was purchased from TCI by the authors. The checkers used cyclohexylmagnesium bromide (ca. 18 % in THF, ca. 1 M) from Fluorochem.
+
+20. Sea sand (70 g) was added to the glass column (diameter 6 cm), and was wetted with the eluent (toluene : hexane, 1 : 5, 50 mL. Slurry prepared from silica gel (200 g) with the eluent (toluene : hexane, 1 : 5, 500 mL) was loaded into a glass column. The column was then packed with pressurized air. The crude product was dissolved in toluene : hexane, 1 : 5 (0 mL) and charged onto the column. The product was eluted using elution (toluene : hexane, 1 : 5, 7 L) and collected in 40-mL fractions in glass test tubes. The presence of product in the chromatography fractions was identified by TLC analysis on silica and visualization with phosphomolybdic acid ethanol solution, where Rf of the product = 0.42 with ethyl acetate : hexane = 1 : 20. Fractions 89 - 152 were collected (Figure 9), combined, and concentrated under reduced pressure to obtain the product. The Checkers substituted hexane with distilled heptane, achieving the same result.
+
+Figure 9. TLC analysis of compound 3. TLC from the fractions of the column chromatography (pictures provided by the checkers).
+
+21. 2-(4-tert-Butylphenyl)-1,1-difluoro-3-(3,5-dimethoxyphenyl)propylene (3): 1H NMR pdf (600 MHz, CDCl3) δ 7.31 (d, J = 8.5 Hz, 2H), 7.23 (d, J = 7.1 Hz, 2H), 6.34 (d, J = 2.2 Hz, 2H), 6.30 (t, J = 2.3 Hz, 1H), 3.73 (s, 6H), 3.67 (s, 2H), 1.29 (s, 9H). 19F NMR pdf (565 MHz, CDCl3) δ -90.2 (d, J = 40.2 Hz, 1F), -90.7 (d, J = 40.1 Hz, 1F). 13C NMR pdf (151 MHz, CDCl3) δ 161.0 (2C), 154.7 (dd, J = 292.2, 287.3 Hz, 2C), 150.3, 141.2 (t, J = 2.8 Hz), 130.7 (t, J = 3.9 Hz), 127.9 (t, J = 3.6 Hz, 2C), 125.5 (2C), 106.5, 98.4, 91.2 (dd, J = 21.2, 13.5 Hz), 55.4 (2C), 34.6, 34.2 (d, J = 1.3 Hz), 31.4 (3C). HRMS (GC-TOF) m/z calc'd. for C21H24F2O2 [M]+: 346.1744, found 346.1734.
+
+22. The purity of 3 was determined to be 99 % by qNMR pdf using 1,3,5-trimethoxybenzene (TCI, >98.0 %) as internal standard.
+
+23. A second run by the checkers performed at half scale gave 1.2 g (62 %) of 3 at 98 % purity. The authors performed two runs at full scale providing 2.4 g (57 %, 97 % purity) and 2.2 g (53 %, 97 % purity) of 3 respectively.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+Fluorine is a key constituent in a wide array of pharmaceuticals, agrochemicals, and functional organic materials. As new uses for fluorine in these applications increase, so does the importance of developing efficient methods for introducing fluorine-containing functional groups into organic molecules. Recently, gem-difluoroalkenes have attracted considerable attention due to their role as useful building blocks for complex fluorinated compounds,2 and their utility as bioisosteres for carbonyl groups, which are important in medicinal chemistry.3 A variety of synthetic methods including difluoroolefination of diazo4 or carbonyl compounds,5 substitution reactions of CF3-substitited alkenes with nucleophiles,6 cross-couplings of gem-difluorovinyl substrates7 have been developed so far. However, a modular approach to fully-substituted gem-difluoroalkenes with functional groups is still lacking.
+
+In this context, we developed a new synthetic approach to gem-difluoroalkenes through the Ramberg-Bäcklund reaction of secondary alkyltriflones.8 After screening various reaction conditions, reaction with CyMgBr (2 equiv) in tetrahydrofuran (THF) at 80 ℃ for 16 h was found to be optimal. Interestingly, while bases including n-BuLi and metal alkoxides have been typically employed in the Ramberg-Bäcklund reaction of α-halo alkylsulfones,9 the present reaction proceeds specifically with Grignard reagents. This unique reactivity of triflones is attributed to the dual role of Grignard reagent as a base for α-deprotonation and a Lewis acid for the activation of C-F bond, which is supported by control experiments and DFT calculations. The secondary alkyltriflone substrates can be prepared in two steps in high yields from commercially available materials. Primary triflones are obtained through an SN2 reaction of alkyl bromides with CF3SO2Na. These products are subsequently converted into secondary alkyltriflones via α-alkylation. For benzyl triflones, the α-alkylation proceeds effectively by the use of K3PO4 as a base.
+
+Under optimized reaction conditions, a variety of secondary alkyltriflones can be applied. Selected examples of products are shown in Scheme 1. Benzylic triflones react smoothly to give the corresponding gem-difluoroalkenes (4 - 7) in high yields. The reaction proceeds with substrates containing heteroaryl groups such as quinoline (8) and indole (9), albeit with low yields. Analogously, dialkylated gem-difluoroalkenes could be prepared in good yields. A noteworthy aspect of this approach is the functional group tolerance, since products bearing useful functional groups such as chlorine, acetal, alkenyl, alkynyl, siloxy, and amino groups (10 - 15) can be successfully obtained. This reaction can even be applied to the perfluoroalkylsulfones, affording polyfluorinated alkenes (18, 19), which are difficult to access by previous methods (Scheme 2).6b
+
+Scheme 1. Scope of the Ramberg-Bäcklund Reaction of Alkyltriflones.
+
+Scheme 2. Reaction of Perfluoroalkyl Sulfones.
+
+In conclusion, a simple and practical synthesis of gem-difluoroalkenes from bench-stable and readily available secondary alkyltriflones has been achieved. Importantly, the reaction sequence involving α-alkylation of primary triflones followed by the Ramberg-Bäcklund reaction enables the rapid preparation of fully-substituted gem-difluoroalkenes in a modular manner, leading to accelerated discovery of fluorine-containing biomolecules and pharmaceuticals.
+
+References and Notes
+
+Institute of Transformative Bio-Molecules (WPI-ITbM), Nagoya University, Chikusa, Nagoya, Aichi, 464-8601, Japan. Department of Chemistry, Queen's University, Chernoff Hall, Kingston, Ontario K7L 3N6, Canada. Carbon to Metal Coating Institute, Queen's University, Kingston, Ontario, K7L 3N6, Canada. Department of Chemistry, Graduate School of Science, Nagoya University; Furo, Chikusa, Nagoya, Aichi, 464-8601, Japan. E-mail: cruddenc@chem.queensu.ca; nambo.masakazu.p3@f.mail.nagoya-u.ac.jp. ORCID: 0000-0003-2154- 8107; 0000-0003-0153-3178; MN thanks This work was supported by KAKENHI from Japan Society for the Promotion of Science (JSPS) (JP21K05068, JP24K21821 to M.N.), the Toyoaki Scholarship Foundation, and the Tokyo Kasei Chemical Promotion foundation. JSPS and Nagoya University are acknowledged for funding of this research through the World Premier International Research Center Initiative (WPI) program.
+
+(a) Zhang, X.; Cao, S. Recent advances in the synthesis and C-F functionalization of gem-difluoroalkenes. Tetrahedron Lett. 2017, 58, 375-392; doi.org/10.1016/j.tetlet.2016.12.054. (b) Koley, S.; Altman, R. A. Recent Advances in Transition Metal-Catalyzed Functionalization of gem-Difluoroalkenes. Isr. J. Chem. 2020, 313-339. doi.org/10.1002/ijch.201900173.
+
+(a) Purser, S.; Moore, P. R.; Swallow, S.; Gouverneur, V. Fluorine in medicinal chemistry. Chem. Soc. Rev. 2008, 37, 320-330. doi.org/10.1039/B610213C. (b) Meanwell, N. A. Fluorine and Fluorinated Motifs in the Design and Application of Bioisosteres for Drug Design. J. Med. Chem. 2018, 61, 5822-5880. doi.org/10.1021/acs.jmedchem.7b01788. (c) A review: FDA-approved fluorine-containing small molecules from 2015 to 2022. Sheikhi, N.; Bahraminejad, M.; Saeedi, M.; Mirfazli, S. S. Eur. J. Med. Chem. 2023, 260, 115758. doi.org/10.1016/j.ejmech.2023.115758.
+
+(a) Hu, M.; He, Z.; Gao, B.; Li, L.; Ni, C.; Hu, J. Copper-catalyzed gem-difluoroolefination of diazo compounds with TMSCF3 via C-F bond cleavage. J. Am. Chem. Soc. 2013, 135, 17302-17305. doi.org/10.1021/ja409941r. (b) gem-Difluoroolefination of Diazo Compounds with TMSCF3 or TMSCF2Br: Transition-Metal-Free Cross-Coupling of Two Carbene Precursors J. Am. Chem. Soc. 2015, 137, 14496-14501. doi.org/10.1021/jacs.5b09888.
+
+(a) Krishnamoorthy, S.; Kar, S.; Kothandaraman, J.; Prakash, G. K. S. Nucleophilic difluoromethylation of aromatic aldehydes using trimethyl(trifluoromethyl)silane (TMSCF3) J. Fluor. Chem. 2018, 208, 10-14. doi.org/10.1016/j.jfluchem.2018.01.009. (b) Zhao, Y.; Huang, W.; Zhu, L.; Hu, J. Difluoromethyl 2-pyridyl sulfone: a new gem-difluoroolefination reagent for aldehydes and ketones. Org. Lett. 2010, 12, 1444-1447. doi.org/10.1021/ol100090r.
+
+(a) Huang, Y.; Hayashi, T. Rhodium-catalyzed asymmetric arylation/defluorination of 1-(trifluoromethyl)alkenes forming enantioenriched 1,1-difluoroalkenes. J. Am. Chem. Soc. 2016, 138, 12340-12343. doi.org/10.1021/jacs.6b07844. (b) Lang, S. B.; Wiles, R. J.; Kelly, C. B.; Molander, G. A. Photoredox Generation of Carbon-Centered Radicals Enables the Construction of 1,1-Difluoroalkene Carbonyl Mimics. Angew. Chem. Int. Ed. 2017, 56, 15073-15077. doi.org/10.1002/anie.201709487. (c) Lin, Z. Y.; Lan, Y.; Wang, C. Synthesis of gem-Difluoroalkenes via Nickel-Catalyzed Reductive C-F and C-O Bond Cleavage. ACS Catal. 2019, 9, 775-780. doi.org/10.1021/acscatal.8b04348. (d) Lu, X.; Wang, X. X.; Gong, T. J.; Pi, J. J.; He, S. J.; Fu, Y. Nickel-catalyzed allylic defluorinative alkylation of trifluoromethyl alkenes with reductive decarboxylation of redox-active esters. Chem. Sci. 2019, 10, 809-814. doi.org/10.1039/C8SC04335C. (e) Zhang, J.; Yang, J. D.; Cheng, J. P. Chemoselective catalytic hydrodefluorination of trifluoromethylalkenes towards mono-/gem-di-fluoroalkenes under metal-free conditions. Nat. Commun. 2021, 12, 2835. doi.org/10.1038/s41467-021-23101-3. (f) Tahara, Y.; Ghosh, K.; Nambo, M. Visible-light photoredox-catalyzed coupling of alkylsulfones with α-(trifluoromethyl)styrenes. Can. J. Chem. 2023, 101, 491-496. doi.org/10.1139/cjc-2022-0271.
+
+(a) Du, B.; Chan, C. M.; Lee, P. Y.; Cheung, L. H.; Xu, X.; Lin, Z.; Yu, W. Y. 2,2-difluorovinyl benzoates for diverse synthesis of gem-difluoroenol ethers by Ni-catalyzed cross-coupling reactions. Nat. Commun. 2021, 12, 412. doi.org/10.1038/s41467-020-20725-9. (b) Xiong, B.; Li, Y.; Zhang, J.; Liu, J.; Zhang, X.; Lian, Z. Cross-Electrophile Coupling between Aryl/Vinyl Triflates and Vinyl Tosylates for the Synthesis of gem-Difluoroalkenes via Ni/Pd Cooperative Catalysis. Adv. Synth. Catal. 2022, 364, 1009-1015. doi.org/10.1002/adsc.202101388.
+
+Maekawa, Y.; Nambo, M.; Yokogawa, D.; Crudden, C. M. Alkyltriflones in the Ramberg-Bäcklund Reaction: An Efficient and Modular Synthesis of gem-Difluoroalkenes. J. Am. Chem. Soc. 2020, 142, 15667-15672. doi.org/10.1021/jacs.0c07924.
+
+(a) Taylor, R. J. K. Recent Developments in Ramberg-Bäcklund and Episulfone Chemistry. Chem. Commun. 1999, 217-227. doi.org/10.1039/A806615I. (b) Snyder, S. A.; Zografos, A. L.; Lin, Y. Total Synthesis of Resveratrol-Based Natural Products: a Chemoselective Solution. Angew. Chem., Int. Ed. 2007, 46, 8186-8191. doi.org/10.1002/anie.200703333 (c) Pasetto, P.; Naginskaya, J. Synthesis of Cyclic Olefins via Mitsunobu C-Alkylation Followed by Ramberg-Bäcklund Ring Contraction. Tetrahedron Lett. 2018, 59, 2797-2799. doi.org/10.1016/j.tetlet.2018.06.014.
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+Sodium trifluoromethanesulfinate; (2926-29-6)
+
+Potassium iodide; (7681-11-0)
+
+4-tert-Butylbenzyl bromide; (18880-00-7)
+
+3,5-Dimethoxybenzyl bromide; (877-88-3)
+
+Tripotassium phosphate; (7778-53-2)
+
+Cyclohexylmagnesium bromide; (931-50-0)
+
+Motoo Ohtsuka was born in Nagano, Japan, in 1984. He received his B.S. degree (2007) M.S. degree (2009) from Shinshu University. Since 2021, he has worked in Crudden/Nambo's lab. His studies focus on the development of photoreactions using organosulfones.
+
+Yasuyo Tahara-Tezuka was born in Aichi, Japan, in 1969. She received her B.S. degree from Shizuoka University in 1992. Since 2016, she has worked in Crudden/Nambo's lab. Her studies focus on the development of desulfonylative cross-coupling of organosulfones by transition-metal catalysts.
+
+Yuuki Maekawa received his Ph.D. from Gifu University in 2017 under the supervision of Professor Toshiaki Murai. In 2017 he joined the Crudden group as a postdoctoral fellow, where he studied the use of sulfur-containing compounds in metal-catalyzed cross-coupling reactions. In 2019, he was awarded a JSPS Research Fellowship for Young Scientists. He currently works as a Research Scientist at Xenon Pharmaceuticals in Vancouver, Canada.
+
+Cathleen Crudden is the AV Douglas Distinguished Professor of Chemistry and a Canada Research Chair at Queen's University. She is the Scientific Director of the Carbon-to-Metals Coating Institute at Queen's and holds a Research Professorship at the Institute of Transformative Bio-Molecules in Nagoya, Japan, where she runs a satellite lab. She carried out her M.Sc. with Mark Lautens, Ph.D. with Howard Alper, carried out a research exchange with Shinji Murai and an NSERC postdoctoral fellowship with Scott Denmark. Her research program focuses on new methods for enantiocontrolled cross-coupling reactions and the application of N-heterocyclic carbenes as ligands in materials chemistry.
+
+Masakazu Nambo completed his Ph.D. degree in 2011 under the supervision of Professor Kenichiro Itami. Since his Ph.D, He has worked as a Research Scientist (Asahi-Kasei Corporation, Japan, 2011- 2013) and then moved back to Nagoya University to work with Professor Cathleen Crudden, as a Designated Assistant Professor (2013-2018), as a Designated Lecturer (2018-2021), and now as a Designated Associate Professor. His current research interests include the establishment of new synthetic strategies for modular and straightforward synthesis using organosulfur compounds.
+
+Nikolaos Skoulikas completed his B.Sc. and M.Sc. in Chemistry at the National and Kapodistrian University of Athens under the supervision of Professor Dimitris Georgiadis, graduating top of his class. He has received several distinctions for his academic and research work, including the Leonidas Zervas Award from the Academy of Athens and scholarships from the Eugenides and Onassis Foundations. He is currently pursuing his PhD in Organic Chemistry in the group of Professor Nuno Maulide at the University of Vienna.
+
+Lorenz Erlbacher studied chemistry at the University of Vienna, undertaking his Masters research in the group of Prof. Nuno Maulide. Currently, he is a graduate student at the University of Vienna. Under the supervision of Prof. Nuno Maulide, he is conducting research on the synthesis and target identification of novel macrocyclic immunosuppressants.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

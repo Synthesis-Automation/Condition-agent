@@ -1,0 +1,451 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 494-511
+
+DOI: 10.15227/orgsyn.102.0494
+
+Large-Scale Amino-Hydroxylation Using Tethered Nitreniums
+
+Submitted by Shyam Sathyamoorthi*
+
+Checked by Theodor Elvebak and Christopher D. Vanderwal
+
+1. Procedure (Note 1)
+
+A. (E)-Hex-2-en-1-yl methoxycarbamate (1). An oven-dried, single-neck (24/40 joint) 250-mL round-bottom flask is equipped with a Teflon-coated magnetic stir bar (25.4 x 9.5 mm, octagon shape). The flask is then charged with (E)-hex-2-en-1-ol (3.0 g, 30 mmol, 1 equiv) (Note 2). 150 mL of CH2Cl2 (Note 3) is measured in a graduated cylinder and decanted into the flask. 1,1'-carbonyldiimidazole (CDI) (5.3 g, 33 mmol, 1.1 equiv) (Note 4) is added in one bolus. The pale-yellow solution is stirred (400 rpm) at ambient temperature (~24 ℃) for 4 h (Figure 1A). Following this time, the reaction mixture is transferred to a 1-L separatory funnel. Transfer is made quantitative by rinsing the round-bottom flask with an additional 50 mL of CH2Cl2. 75 mL of saturated aqueous NH4Cl solution is added (Note 5). The layers are vigorously shaken and allowed to separate. The organic layer (bottom) is collected in an Erlenmeyer flask and dried with MgSO4 (25 g) (Note 6). 100 mL of the dried organic layer is filtered through a plug of cotton into a 250 mL oven-dried, single-neck (24/40 joint) round-bottom flask and concentrated under reduced pressure using a rotary evaporator (Note 7). This process is repeated with the remaining dried organic layer (~100 mL). To ensure quantitative transfer into the round-bottom flask, the Erlenmeyer flask and the MgSO4 filter cake are rinsed with an additional 100 mL of CH2Cl2. The filtrate is concentrated under reduced pressure using a rotary evaporator to give a colorless oil. Additional CH2Cl2 is removed using a high vacuum (strength of 0.5-1 Torr) for 15 min. At this time, 1H NMR analysis shows complete conversion into (E)-hex-2-en-1-yl 1H-imidazole-1-carboxylate. A Teflon-coated magnetic stir bar (25.4 x 9.5 mm, octagon shape) is added to the round-bottom flask. Methoxyamine hydrochloride (7.5 g, 90 mmol, 3 equiv) (Note 8) is added in one bolus. Pyridine (50 mL) (Note 9) is measured in a graduated cylinder and decanted into the flask. The resulting yellow solution (Figure 1B) is stirred at ambient temperature for 18 h.
+
+Figure 1. A. Reaction mixture with (E)-hex-2-en-1-ol, CDI, and CH2Cl2; B. Reaction mixture with (E)-hex-2-en-1-yl 1H-imidazole-1-carboxylate, methoxyamine hydrochloride, and pyridine
+
+Following this time, 100 mL of heptane is added (Note 10) and the pyridine/heptane mixture is removed under reduced pressure (3 Torr) using a rotary evaporator. Another 100 mL of heptane is added, and this process is repeated. The resulting residue is dissolved in 100 mL of CH2Cl2 and transferred into a 250-mL separatory funnel. 100 mL of 1 M aqueous HCl solution (Note 11) is added. The layers are vigorously shaken and allowed to separate. The organic layer (bottom) is collected, dried with MgSO4 (12 g), and filtered through a plug of cotton into a 500-mL Erlenmeyer flask (24/40 joint). The MgSO4 filter cake is rinsed with an additional 100 mL of CH2Cl2. The filtrate is analyzed by thin-layer chromatography (Notes 12 and 13) and then concentrated under reduced pressure using a rotary evaporator to give a yellow oil. 1H NMR analysis of this crude residue shows clean conversion to product 1 with a trace of residual pyridine. This residue is then purified by flash chromatography on silica gel (Figure 2A) (Notes 14, 15, 16, and 17). The test-tube fractions, containing pure product 1, are combined and concentrated under reduced pressure (3 Torr) using a rotary evaporator. The resulting colorless oil (Figure 2B) is rid of residual solvent using a high vacuum (strength of ~0.5-1 Torr) for 2 h. Compound 1 is a colorless oil (4.42-4.58 g, 25.5-26.4 mmol, 85-88% yield) (Note 18).
+
+Figure 2. A. Flash silica gel column chromatography set-up; B. Pure product 1 ((E)-hex-2-en-1-yl methoxycarbamate) is a colorless oil
+
+B. (R*)-1-((S*)-3-Methoxy-2-oxooxazolidin-4-yl)butyl 2,2,2-trifluoroacetate (2). An oven-dried, single-neck (24/40 joint) 500 mL round-bottom flask is equipped with a Teflon-coated magnetic stir bar (25.4 x 9.5 mm, octagon shape). The flask is then charged with 1 (2.00 g, 11.5 mmol, 1 equiv). 230 mL of CH2Cl2 are measured in a graduated cylinder and decanted into the flask. [Bis(trifluoroacetoxy)iodo]benzene (PIFA) (6.70 g, 15.6 mmol, 1.4 equiv) (Note 19) is added in one bolus. The initially colorless solution (Figure 3A) is stirred (400 rpm) at ambient temperature for 4 h, over which time it turns yellow (Figure 3B).
+
+Figure 3. A. Solution with compound 1, PIFA, and CH2Cl2 at the start of the reaction; B. As the reaction progresses, a yellow color appears
+
+The reaction mixture is transferred to a 1 L separatory funnel. Transfer is made quantitative by rinsing the round-bottom flask with an additional 50 mL of CH2Cl2. 100 mL of saturated aqueous Na2S2O3 solution is added (Note 20). The layers are vigorously shaken and allowed to separate. The organic layer (bottom) is collected, dried with MgSO4 (13 g), and filtered through a plug of cotton into an Erlenmeyer flask. To ensure quantitative transfer, the MgSO4 filter cake is rinsed with an additional 200 mL of CH2Cl2. The filtrate is analyzed by thin-layer chromatography, indicating disappearance of starting compound 1 (Figure 4A). The filtrate is concentrated under reduced pressure (3 Torr) using a rotary evaporator to give a yellow oil (Figure 4B). 1H NMR analysis of this oil shows a mixture predominantly of desired compound 2 and iodobenzene. This residue is then purified by flash chromatography on silica gel (Note 21). The test-tube fractions containing pure compound 2 are combined and concentrated under reduced pressure (3 Torr) using a rotary evaporator. The residue is purified again by flash column chromatography on silica gel, and the test-tube fractions containing pure compound 2 are combined and concentrated under reduced pressure using a rotary evaporator (Note 22). The resulting yellow oil (Figure 4C) is rid of residual solvent using a high vacuum (strength of 0.5-1 Torr) for 2 h. Compound 2 is a yellow oil (1.62 g, 5.68 mmol, 49% yield) (Note 23).
+
+Figure 4. A. TLC analysis of the reaction mixture after quenching, stained with KMnO4 stain. Mobile phase: 33% EtOAc/hexanes. SM = starting material (compound 1) (Rf = 0.4), C = co-spot lane, R = reaction mixture. Product 2 has an Rf = 0.32; B. The unpurified residue is a yellow oil; C. Compound 2 ((R*)-1-((S*)-3-methoxy-2-oxooxazolidin-4-yl)butyl 2,2,2-trifluoroacetate) is a yellow oil
+
+C. (S*)-4-((R*)-1-Hydroxybutyl)-3-methoxyoxazolidin-2-one (3). An oven-dried, single-neck (24/40 joint) 250-mL round-bottom flask is equipped with a Teflon-coated magnetic stir bar (25.4 x 9.5 mm, octagon shape). The flask is then charged with 2 (1.50 g, 5.26 mmol, 1 equiv). 20 mL of CH2Cl2 are measured in a graduated cylinder and decanted into the flask. Stirring is commenced (400 rpm), and the flask is cooled to 0 ℃ using an ice-water bath over a period of 10 min. NH3 in methanol (2.0 M solution, 25 mL, 50.0 mmol, 9.5 equiv) (Note 24) is measured in a graduated cylinder and slowly decanted into the round-bottom flask at a rate of 8 mL/min. The reaction is stirred for 10 min at 0 ℃ (Figure 5A), and then the ice-water bath is removed. The reaction is warmed to room temperature (~24 ℃) with stirring over a period of 2 h (Figure 5B).
+
+Figure 5. A. Reaction mixture with compound 2 and NH3 in a 1:1 mixture of MeOH and CH2Cl2 at 0 ℃; B. After warming to room temperature (~24 ℃) over a period of 2 h
+
+TLC analysis indicates consumption of starting compound 2 (Figure 6A). At this time, the stir bar is removed, and the reaction mixture is concentrated using a rotary evaporator to give a yellow oil (Figure 6B). Additional solvent is removed using a high vacuum (strength of 0.5-1 Torr) for 15 min. 1H NMR analysis of this oil shows clean conversion to compound 3. This residue is then purified by flash chromatography on silica gel (Note 25). The test-tube fractions containing pure compound 3 are combined and concentrated under reduced pressure (3 Torr) using a rotary evaporator. The resulting yellow oil (Figure 6C) is rid of residual solvent using a high vacuum (strength of ~0.5-1 Torr) at 35 ℃ for 18 h. Compound 3 is a viscous syrup and removal of residual ethyl acetate may require longer times depending on the pump efficiency. Compound 3 is a yellow oil (0.85 g, 4.5 mmol, 85% yield) (Note 26).
+
+Figure 6. A. TLC analysis of the reaction mixture, stained with KMnO4 stain. Mobile phase: 50% EtOAc/hexanes. SM = starting material (compound 2) (Rf = 0.65), C = co-spot lane, R = reaction mixture. Product 3 has an Rf = 0.30; B. The unpurified residue is a yellow oil; C. Compound 3 ((S*)-4-((R*)-1-hydroxybutyl)-3-methoxyoxazolidin-2-one) is a yellow oil
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with the chemicals used in this manuscript, as well as the proper procedures for product preparation.
+
+2. (E)-Hex-2-en-1-ol (95%) was purchased from TCI America and used as received.
+
+3. CH2Cl2 (HPLC Grade, 99.7%, stabilized with amylene) was purchased from Fisher Scientific and used directly.
+
+4. 1,1'-Carbonyldiimidazole (98%) was purchased by the authors from Oakwood Chemical and used directly. The checkers purchased 1,1'-carbonyldiimidazole (98%) from Fischer Scientific and used it directly.
+
+5. The authors purchased NH4Cl (99.5%) from Fisher Scientific and used it as received. The checkers purchased NH4Cl (99.5%) from Acros Organics.
+
+6. The authors purchased magnesium sulfate (anhydrous) from Fisher Scientific and used it directly. The checkers purchased magnesium sulfate (anhydrous) from Research Products International and used it directly.
+
+7. A Heidolph Hei-VAP Core connected to a Welch Self-Cleaning Dry Vacuum System Model 2025 is used. The bath temperature is ~30 ℃ and the vacuum strength is ~3 mm Hg.
+
+8. Methoxyamine hydrochloride (98%) was purchased from Ambeed and used as received.
+
+9. Pyridine (99.5%) was purchased from Fisher Scientific and used as received.
+
+10. Heptane (technical grade) was purchased from Fisher Scientific and used as received.
+
+11. The authors purchased hydrochloric acid (Certified ACS Plus, 36.5 to 38%) from Fisher Chemical. The checkers purchased hydrochloric acid (ACS Grade, 36.5 to 38%) from VWR Chemicals. 1 M HCl solution was prepared by adding 83 mL of this to 917 mL of deionized water.
+
+12. Thin layer chromatography (TLC) was performed on silica gel 60 F254 (glass-backed TLC plates). The progress of the reaction is checked by TLC analysis eluting with 33% EtOAc in hexanes. Spots are visualized after the plate is dipped in KMnO4 stain and heated.
+
+Figure 7. TLC analysis of the filtrate; SM = starting material ((E)-Hex-2-en-1-ol) (Rf = 0.5), C = co-spot lane, R = reaction mixture. Product has an Rf of 0.5
+
+13. KMnO4 stain is prepared by dissolving 1.5 g of KMnO4, 10 g of K2CO3, and 1.25 mL of 10% aqueous NaOH solution in 200 mL of H2O.
+
+14. The authors purchased ethyl acetate (Certified ACS Reagent, 99.5%) from Fisher Scientific and used it directly. The checkers used ethyl acetate (ACS Reagent, ≥99.5%) purchased from Sigma-Aldrich.
+
+15. The authors purchased hexanes (98.5%) from Fisher Scientific and used it directly. The checkers obtained hexanes (ACS Reagent, ≥98.5%) from Sigma-Aldrich and used it directly.
+
+16. The authors purchased silica gel (grade 60, 230-400 mesh) from Fisher Scientific. The checkers obtained silica gel (60 Å, 40-63 μm) from SiliCycle.
+
+17. For flash column chromatography, a ChemGlass column (part number: CG-1197-17) is used. Column dimensions: ~30 cm (L) x ~4 cm (W). This column is filled with 73 g of silica gel and is flushed with 150 mL of hexanes. The height of the silica gel is 13 cm. The crude residue is dissolved in 20 mL of CH2Cl2 and loaded onto the column. After full adsorption onto the silica gel, the top of the silica gel is layered with sand (Fisher Scientific, sea sand, washed). The height of the sand layer is 1 cm. The column is eluted using 100 mL of 15% EtOAc/hexanes, 100 mL of 30% EtOAc/hexanes, and 200 mL of 50% EtOAc/hexanes. 26 test-tube fractions (16 x 125 mm tube size) of ~15 mL each are collected. Fractions are checked using TLC (33% EtOAc/hexanes) and visualized using KMnO4 stain. The checkers used a glass column with dimensions 22 cm (L) x 4 cm (W).
+
+Figure 8. Pure product 1 is found in fractions 16 to 23
+
+18. Analytical data for (E)-hex-2-en-1-yl methoxycarbamate (1): 1H NMR pdf (500 MHz, CDCl3) δ: 7.36 (broad s, 1H), 5.80 (dt, J = 15.2, 6.9 Hz, 1H), 5.57 (dtt, J = 15.3, 6.6, 1.4 Hz, 1H), 4.60 (dd, J = 6.6, 0.8 Hz, 2H), 3.74 (s, 3H), 2.03 (q, J = 7.2 Hz, 2H), 1.41 (h, J = 7.4 Hz, 2H), 0.90 (t, J = 7.4 Hz, 3H). 13C NMR pdf (126 MHz, CDCl3) δ: 157.6, 137.2, 123.7, 66.8, 64.8, 34.4, 22.1, 13.8. IR pdf (film) νmax 3476, 3380, 3274, 2959, 1715, 1603, 1500, 1229, 1116, 1032 cm-1. HRMS (ESI) m/z = [M + Na]+ Calc'd C8H15NNaO3+ 196.0950. Found 196.0948. The purity of 1 was determined to be 97-99% by qNMR pdf using p-nitrotoluene (Thermo Scientific) as an internal standard.
+
+19. [Bis(trifluoroacetoxy)iodo]benzene (97%) was purchased from Ambeed and used as received.
+
+20. The authors obtained sodium thiosulfate pentahydrate (>99%) from Fisher Scientific and used as received. Sodium thiosulfate pentahydrate (>99%) was purchased by the checkers from Spectrum Chemical and used as received. A solution was made by saturating deionized H2O with this.
+
+21. For flash column chromatography, a ChemGlass column (part number: CG-1197-17) is used. Column dimensions: ~30 cm (L) x ~4 cm (W). This column is filled with 73 g of silica gel and is flushed with 150 mL of hexanes. The height of the silica gel is 13 cm. The crude residue is dissolved in 30 mL of CH2Cl2 and loaded onto the column. After full adsorption onto the silica gel, the top of the silica gel is layered with sand (Fisher Scientific, sea sand, washed). The height of the sand layer is 1.5 cm. The column is eluted using 100 mL of 15% EtOAc/hexanes, 200 mL of 30% EtOAc/hexanes, 100 mL of 40% EtOAc/hexanes, and 200 mL of 50% EtOAc/hexanes. 40 test-tube fractions (16 x 125 mm tube size) of ~15 mL each are collected. Fractions are checked using TLC (33% EtOAc/hexanes) and visualized using KMnO4 stain. Checkers used a glass column with dimensions 22 cm (L) x 4 cm (W).
+
+Figure 9. Compound 2 is found in fractions 21 to 33
+
+22. The authors reported a yield of 51% and a purity of 97% after the first round of purification while the checkers found that a second round of purification was necessary to reach purities of ≥ 97%.
+
+23. Analytical data for (R*)-1-((S*)-3-methoxy-2-oxooxazolidin-4-yl)butyl 2,2,2-trifluoroacetate (2): 1H NMR pdf (500 MHz, CDCl3) δ 5.50 (ddd, J = 9.5, 4.4, 2.3 Hz, 1H), 4.36 (t, J = 8.7 Hz, 1H), 4.27 (t, J = 8.6 Hz, 1H), 3.99 (td, J = 8.4, 2.3 Hz, 1H), 3.82 (s, 3H), 1.72 - 1.63 (m, 1H) 1.62 - 1.54 (m, 1H) 1.50 - 1.32 (m, 2H), 0.98 (t, J = 7.3 Hz, 3H). 13C NMR pdf (126 MHz, CDCl3) δ 159.0, 157.0 (q, J = 43.0 Hz), 114.6 (q, J = 286.6 Hz), 73.6, 64.2, 61.5, 60.4, 32.3, 18.6, 13.7. IR pdf (film) νmax 2968, 1780, 1350, 1220, 1156, 1076, 1028 cm-1. HRMS (ESI) m/z = [M + H]+ Calc'd C10H15F3NO5+ 286.0902. Found 286.0905. The purity of 2 was determined to be 97-99% by qNMR pdf using p-nitrotoluene (Thermo Scientific) as an internal standard.
+
+24. NH3 in methanol solution was purchased from Oakwood Chemical and used as received.
+
+25. For flash column chromatography, a ChemGlass column (part number: CG-1197-17) is used. Column dimensions: ~30 cm (L) x ~4 cm (W). This column is filled with 73 g of silica gel and is flushed with 150 mL of hexanes. The height of the silica gel is 13 cm. The crude residue is dissolved in 30 mL of CH2Cl2 and loaded onto the column. After full adsorption onto the silica gel, the top of the silica gel is layered with sand (Fisher Scientific, sea sand, washed). The height of the sand layer is 1 cm. The column is eluted using 100 mL of 15% EtOAc/hexanes, 200 mL of 30% EtOAc/hexanes, 100 mL of 50% EtOAc/hexanes, 100 mL of 70% EtOAc/hexanes, and 200 mL of 100% EtOAc. 46 test-tube fractions (16 x 125 mm tube size) of ~15 mL each are collected. Fractions are checked using TLC (50% EtOAc/hexanes) and visualized using KMnO4 stain. Checkers used a glass column with dimensions 22 cm (L) x 4 cm (W).
+
+Figure 10. Compound 3 is found in fractions 34 to 39
+
+26. Analytical data for (S*)-4-((R*)-1-hydroxybutyl)-3-methoxyoxazolidin-2-one (3): 1H NMR pdf (500 MHz, CDCl3) δ 4.32 (dd, J = 8.7, 7.7 Hz, 1H), 4.24 (t, J = 8.4 Hz, 1H), 4.04 - 4.00 (m, 1H), 3.85 (s, 3H), 3.82 (td, J = 7.9, 2.5 Hz, 1H), 2.27 (broad s, 1H), 1.62 - 1.50 (m, 1H), 1.45 - 1.27 (m, 3H), 0.95 (t, J = 7.0 Hz, 3H). 13C NMR pdf (101 MHz, CDCl3) δ 159.4, 67.5, 64.0, 62.0, 61.9, 34.4, 19.2, 14.0. IR pdf (film) νmax 3457 (broad), 2960, 2874, 1761, 1398, 1210, 1082, 1010 cm-1. HRMS (ESI) m/z = [M + Na]+ Calc'd C8H15NNaO4+ 212.0899. Found 212.0895. The purity of 3 was determined to be 97-99% by qNMR pdf using p-nitrotoluene (Thermo Scientific) as an internal standard.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+Given the proliferation of protocols utilizing tethered nitrene chemistry over the past two decades,2,3 we were surprised to find comparatively few reports focused on tethered nitreniums.4,5 While many reports exist on the use of nitreniums for intramolecular alkene functionalization reactions, most describe the generation of these species from amines or amides. Our laboratory has an established program on the use of unusual tethers for intramolecular alkene functionalization reactions.6 We seek moieties that can be easily appended to ubiquitous alcohols or amines and that can be conveniently removed post-transformation.
+
+In line with this research theme, our laboratory recently developed and disclosed an alkene amino-trifluoroacetoxylation mediated by commercial I(III) oxidants.7 This is the first study which explores the synthetic utility of nitreniums generated in situ using carbamate tethers. We found the reaction to be predictably regioselective and stereospecific, with the geometry of the alkene substrate controlling the diastereomeric outcome in the amino-trifluoroacetate product. The trifluoroacetate group could be removed by treatment with a solution of NH3 in MeOH at ambient temperature. Overall, this amounted to a "green", metal-free alternative to existing intramolecular amino-hydroxylation protocols which generally use toxic metals such as osmium.8,9 Herein, we provide protocols for gram-scale alkene substrate preparation, our laboratory's carbamate-tethered amino-trifluoroacetoxylation, and NH3-MeOH mediated removal of the trifluoroacetate group.
+
+Schemes 1 and 2 depict the substrate scope of our transformation. In addition to N-methoxy carbamates, N-ethoxy, N-isopropoxy, N-n-butoxy, and N-isobutoxy tethers were all compatible for delivering product (Scheme 1, Entries 1 - 5). Not all tethers were useful (Scheme 1, Poor Performers). With N-alkyl carbamates or N-hydroxy carbamates, there was little to no product formation. Cis-di-substituted alkenes, trans-di-substituted alkenes, and tri-substituted alkenes were all competent (Scheme 2). In general, homoallylic carbamates gave better yields than analogous allylic ones. Terminal alkenes could be functionalized, but the products were unstable to purification (Scheme 2, Entry 3). Several functional groups were tolerated, including alkyl ethers, benzylic ethers, tosylates, and TBS ethers (Scheme 2, Entries 7 and 8).
+
+Scheme 1. Structure-Reactivity Relationship with Nitrenium Tethers
+
+Scheme 2. Alkene scope and functional group compatibility
+
+Based on literature reports and our own observations, we hypothesize that a nitrenium mechanism is likely (Scheme 3). A nitrenium is formed from the oxidation of the N-alkoxy carbamate tether by an I(III) reagent. This electrophilic nitrenium attacks the olefin, forming a transient bicyclic aziridinium ion. This aziridinium ion is opened in an exo-selective, SN2 reaction with trifluoroacetate.
+
+Scheme 3. Putative Reaction Mechanism
+
+The products were quite amenable for further transformations (Scheme 4), including for carbamate removal.
+
+Scheme 4. Further Transformations
+
+References and Notes
+
+Corresponding author: Shyam Sathyamoorthi, ssathyam@ku.edu; https://orcid.ord/0000-0003-4705-7349. Address of all authors: Department of Medicinal Chemistry, University of Kansas, Lawrence, KS 66047. Funding: This work was supported by National Institutes of Health Grant R35GM142499.
+
+Noda, H.; Tang, X.; Shibasaki, M. Catalyst-Controlled Chemoselective Nitrene Transfers. Helv. Chim. Acta 2021, 104, e2100140. DOI: 10.1002/hlca.202100140.
+
+Roizen, J. L.; Harvey, M. E.; Du Bois, J. Metal-Catalyzed Nitrogen-Atom Transfer Methods for the Oxidation of Aliphatic C-H Bonds. Acc. Chem. Res. 2012, 45, 911-922. DOI: 10.1021/ar200318q.
+
+Gassman, P. G. Nitrenium ions. Acc. Chem. Res. 1970, 3, 26-33. DOI: 10.1021/ar50025a004
+
+Wardrop, D. J.; Bowen, E. G. Synthetic Applications of Nitrenium Ions. In Nitrenes and Nitrenium Ions, 2013; pp 347-449.
+
+Sathyamoorthi, S. Fun With Unusual Functional Groups: Sulfamates, Phosphoramidates, and Di-tert-butyl Silanols. Eur. J. Org. Chem. 2024, 27, e202301283. DOI: 10.1002/ejoc.202301283
+
+Silver, R.; Nirpal, A.K.; Sathyamoorthi, S. Taming Tethered Nitreniums for Alkene Functionalization Reactions. J. Org. Chem. 2024, 89, 15352-15357. DOI: 10.1021/acs.joc.4c01886
+
+Donohoe, T. J.; Callens, C. K. A.; Lacy, A. R.; Winter, C. Tethered Aminohydroxylation Reaction and Its Application to Total Synthesis. Eur. J. Org. Chem. 2012, 2012, 655-663. DOI: 10.1002/ejoc.201101464
+
+Nilov, D.; Reiser, O. The Sharpless Asymmetric Aminohydroxylation -Scope and Limitation. Adv. Synth. Catal. 2002, 344, 1169-1173. DOI: 10.1002/1615-4169(200212)344:10<1169
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+(E)-hex-2-en-1-ol: (928-95-0)
+
+1,1'-carbonyldiimidazole: (530-62-1)
+
+Methoxyamine hydrochloride: (593-56-6)
+
+Pyridine: (110-86-1)
+
+[Bis(trifluoroacetoxy)iodo]benzene: (2712-78-9)
+
+NH3 in MeOH: (7664-41-7)
+
+Shyam Sathyamoorthi completed a B.S. degree in Cell and Molecular Biology with a minor in Chemistry at Tulane University, New Orleans, Louisiana, where he worked in the labs of Professor Ken Muneoka and Professor Robert A. Pascal, Jr. He then completed a PhD in chemistry at Stanford University under the guidance of Professor Richard N. Zare (2018) as well as a Doctor of Medicine degree at the Stanford University School of Medicine (2019). In July 2019, he started his independent career as an assistant professor in the Department of Medicinal Chemistry at the University of Kansas, Lawrence, KS, USA. He was promoted to associate professor (with tenure) in 2024.
+
+Theodor Elvebak was born in Worcester, MA in 2002 and obtained his B.S. degree from the Georgia Institute of Technology in 2023 working with Prof. M.G. Finn. He is currently a graduate student with Prof. Christopher Vanderwal at the University of California, Irvine working on natural product total synthesis.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

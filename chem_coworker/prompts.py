@@ -284,12 +284,15 @@ _COMMON_METADATA_BLOCK = """\
 Also write these metadata lines (they will be parsed automatically):
   `reaction_types: suzuki_miyaura, negishi_coupling`   ← canonical key(s) for the notes filename
   `tags: copper, sp3_coupling, alkyl_halide, boron, NaOtBu, pressure_vessel`
-  `doi: 10.15227/orgsyn.102.0086`          ← if a DOI is present in the document
-  `journal: Org. Synth.`                   ← abbreviated journal name
-  `year: 2025`
-  `pages: 102, 86–99`
+  `doi: <value>`      ← ONLY if a DOI string appears verbatim in the document text
+  `journal: <value>`  ← ONLY if the journal name appears verbatim in the document text
+  `year: <value>`     ← ONLY if the publication year appears verbatim in the document text
+  `pages: <value>`    ← ONLY if volume/page numbers appear verbatim in the document text
 
-Only write the citation lines if the information actually appears — omit any that are absent.
+⚠ STRICT RULE: Copy citation values VERBATIM from the document text only.
+  Do NOT infer, calculate, or guess doi/journal/year/pages from the URL or your training knowledge.
+  If you cannot find a value in the document text, OMIT that line entirely.
+  A missing field is always correct. A hallucinated field is always wrong.
 
 Tags: 5–10 snake_case keywords for cross-category retrieval:
   • Metal catalysts: copper, palladium, nickel, rhodium, iron
@@ -307,8 +310,12 @@ _COMMON_RULES = """\
 × DO extract the *principles*: why a reagent was chosen, what makes conditions critical,
   what side reactions to watch for, what substrate limitations apply.
 × Keep each bullet concise (1-2 lines)
-× Include the source name in parentheses at the end of each item
-  e.g. "Avoid DMF — proto-deboronation (Molander, Org. Syn. 2024)"\
+× Include a specific citation at the end of each bullet with enough detail to locate the source.
+  Always include journal, year, AND volume/page or prep ID/DOI — never just "Org. Synth. 2024":
+    ✓ "(Org. Synth. 2019, 96, 132; prep v92p0195)"
+    ✓ "(Molander, Org. Synth. 2025, 102, 86; doi:10.15227/orgsyn.102.0086)"
+    ✓ "(Smith, J. Am. Chem. Soc. 2023, 145, 1234; doi:10.1021/jacs.xxx)"
+    ✗ "(Org. Synth. 2019)"   ← too vague, do not use\
 """
 
 _COMMON_HEADER = """\
@@ -317,10 +324,11 @@ and extract generalizable, actionable knowledge that would help a bench chemist
 avoid problems and make better decisions for future work of this type.
 
 ━━━ SOURCE DOCUMENT ━━━
-Source: {{source_name}}
-Date: {{date}}
+Source: {source_name}
+URL: {source_url}
+Date: {date}
 
-{{document_text}}
+{document_text}
 
 ━━━ YOUR JOB ━━━
 
@@ -455,7 +463,7 @@ def build_extract_prompt(note_type: str = "reactions") -> str:
         note_type: "reactions", "mechanisms", "substrates", or "protocols".
 
     Returns:
-        A format string with {source_name}, {date}, {document_text} placeholders.
+        A format string with {source_name}, {source_url}, {date}, {document_text} placeholders.
     """
     sections_template = _SECTION_MAP.get(note_type, _REACTION_SECTIONS)
     sections = sections_template.format(metadata_block=_COMMON_METADATA_BLOCK)

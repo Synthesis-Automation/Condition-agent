@@ -1,0 +1,542 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 512-533
+
+DOI: 10.15227/orgsyn.102.0512
+
+Discussion Addendum for: Nickel-Catalyzed Synthesis of Ketones from Alkyl Halides and Acid Chlorides: Preparation of Ethyl 4-Oxododecanoate
+
+Omar M. Beleh and Daniel J. Weix*1
+
+Original Article: Org. Synth. 2016, 93,
+50
+
+Discussion
+
+Ketones are important components of biologically relevant scaffolds and versatile synthetic intermediates.2 Approaches to synthesize ketones have relied heavily on organometallic reagents, such as the Weinreb ketone synthesis,3 nucleophilic addition to acid chlorides4 or aldehydes5 (a subsequent oxidation step is required for aldehydes), or cross-coupling to activated acyl coupling partners.6, 7 In the past decade, the synthesis of ketones through cross-electrophile coupling (XEC) has matured, achieving broader functional group tolerance with more commercially available substrate pools. This Addendum discusses recent advancements in XEC approaches to prepare ketones, highlighting new strategies for acyl electrophile activation, practical improvements, and improved mechanistic understanding of these systems. We also note advances in this area have been comprehensively reviewed up to May 2023.8
+
+Ketones from Acyl-X + C(sp3)-X
+
+As is the case with the broader field of XEC, nickel is by far the most commonly used metal catalyst used in this class of reaction. At the time of our initial Org. Synth. report in 2016 on the synthesis of ketones from carboxylic acid derivatives through XEC,9 coupling partners in this area were generally limited to acid chlorides with alkyl halides (6 out of 10 reports).10,11,12,13,14,15 The instability of acid chlorides is a limitation to achieving broad functional group tolerance and we found early success in switching to the more stable 2-pyridyl thioester,11 inspired by pioneering work from Mukaiyama and co-workers.16 Concurrently, Hegui Gong and co-workers had showed that carboxylic acid anhydrides could also be converted into the ketone through XEC with alkyl halides.17,18,19 This approach brought an added benefit that the carboxylic acid could be coupled through an in situ activation to the mixed anhydride. The only example of enantioselective XEC with acyl electrophiles at the time was by Reisman and co-workers, which coupled acid chlorides with secondary benzyl chlorides using a chiral BOX ligand.13
+
+Coupling Partners and Activation Strategies
+
+In the past decade, several other approaches to activate carboxylic acids as acyl electrophiles have been demonstrated in XEC (Figure 1A). Activated esters and thioesters have improved stability relative to acid chlorides, but can readily undergo oxidative addition with nickel. Acid fluorides are also stable alternatives to acid chlorides that can be chromatographed and isolated. N-Acylimides are part of a class of destabilized amides20 that have been applied to transition-metal catalyzed cross-coupling, and are beginning to see use in XEC. The emergence of new acyl electrophiles in XEC can often be traced back to acid activation strategies that were originally developed for peptide coupling.21,22,23 Thus, the most useful acyl electrophiles are those that (1) are isolable and bench stable compounds, (2) can readily undergo oxidative addition with nickel catalysts to form an acylnickel(II) complex, and (3) generate byproducts that do not interfere with the XEC step. There are also less common activation strategies that generate an acyl radical in the mechanism (via the N-acylimidazole or N-acylphosphonium). These approaches are distinct from the more common radical decarboxylation in XEC (such as from N-hydroxyphthalimide esters),24 which generate an alkyl radical under reducing conditions, rather than an acyl radical.
+
+Concurrently, developments in alkyl electrophile activation have enabled access to the broadest substrate pools in XEC (Figure 1B).25 Alkyl halides are orders of magnitude more abundant than organometallic reagents and are still the most used alkyl electrophile used to make ketones. Alcohols are most commonly employed as the sulfonate ester, together with a halide salt additive to convert the unreactive sulfonate into the more reactive alkyl halide. Additionally, carboxylic acids (as the N-hydroxyphthalimide ester) and alkylamines (as the N-alkylpyridinium salt) can be coupled with acyl electrophiles. Less common types of alkyl coupling partners have also been reported for ketone synthesis such as oxime esters,26 trimethylammonium salts,27 and alkyl chlorides.28
+
+Figure 1. Classes of coupling partners in the XEC of acyl electrophiles with alkyl electrophiles and their frequency of use as of July 2025
+
+There have been increased efforts to generate acyl electrophiles in situ from the acid to reduce step count and increase synthetic utility (Figure 2). Key considerations for these strategies are (1) clean and complete conversion to the activated electrophile in a reasonable reaction time, (2) solvent compatibility for both the activation step and the XEC step in order to avoid a solvent swap, and (3) the XEC step must be able to tolerate the byproducts generated from the activation step. Hegui Gong's pioneering reports on acid anhydride couplings largely remains the most common method for in situ activation of carboxylic acids in XEC.17,18,19 Typical conditions use an excess of di-tert-butyl dicarbonate (Boc anhydride). Acid fluorides can be generated in situ from tetramethylfluoroformamidinium hexafluorophosphate (TFFH) and Proton Sponge as base.29 Recently, we showed that di-2-pyridyl carbonate (DPC) with catalytic 4-dimethylaminopyridine (DMAP) can be used to generate 2-pyridyl esters in situ for subsequent XEC.30
+
+Figure 2. Reagents for the in situ generation of acyl electrophiles from carboxylic acids
+
+Mechanism
+
+In addition to substrate pool analysis, a mechanistic understanding of XEC is key to the development of new methodology in this area. While the details of each mechanistic step can change based on conditions, the general mechanism for C(sp2)-C(sp3) XEC is shown in Figure 3.31 In this paradigm, a C(sp2) acyl electrophile (isolated or generated in situ) undergoes oxidative addition with nickel through a non-radical mechanism, generating an acylnickel(II) complex. Depending on reaction conditions and alkyl radical precursor, a variety of mechanisms can generate the C(sp3) radical, which reacts with the acylnickel(II) species to generate a nickel(III) intermediate. This readily undergoes reductive elimination to afford the ketone and a nickel(I) species. Reduction of the nickel catalyst turns over the catalytic cycle. The most common reductants are Zn and Mn, but photochemical32,33,34,35,36,37 and electrochemical38,39,40 strategies are increasingly employed.
+
+While a detailed discussion of XEC mechanism is outside the scope of this Addendum, there is an alternative route specific to acyl electrophiles involving a reversible decarbonylation step.17, 18, 41, 42 We43, 44 and others45,46,47 have shown that a CO migration and extrusion step can precede radical capture and lead to an arylnickel(II) or alkylnickel(II) under certain conditions. Subsequent radical capture at this intermediate and reductive elimination generates the R-C(sp3) product. This mechanism can be favored when (1) temperature is elevated (often >100 ℃), (2) selection of the acid activating group can promote the decarbonylation equilibrium, or (3) CO can escape the system (e.g., by an N2 flush), which prevents any reversibility.
+
+Figure 3. General mechanism for the C(sp2)-C(sp3) cross-electrophile coupling of acyl electrophiles with alkyl electrophiles. While the ketone route generally predominates, under certain conditions the decarbonylative route can become the major product-forming mechanism
+
+New Modes of Alkyl Activation Strategies Applied to Ketone Synthesis
+
+A notable advancement in XEC is the development of new approaches to couple substrate pools outside of alkyl halides. The emergence of N-hydroxyphthalimide (NHP) esters and N-alkylpyridiniums has led to increased interest in developing improved conditions to prepare ketones. Indeed, 79% of new reactions for C(sp2)-C(sp3) XEC for ketone synthesis were reported after 2016.
+
+In 2019, our group48 and Baran49 concurrently developed conditions to cross-couple two carboxylic acids for ketone synthesis (Figure 4). This type of strategy requires distinct activation modes for each carboxylic acid coupling partner and that they do not scramble under reaction conditions. Our report, in collaboration with Gellman, employed 2-pyridyl thioesters (as the acyl donor) and alkyl NHP esters (as the radical donor). This report also showed how NHP ester consumption could be tuned by the addition of zinc salts, and by using a mixed solvent system of THF and DMA. Baran's report had a similarly broad scope using in situ generated mixed anhydrides as the acyl donor. Later reports have enabled this type of coupling to be driven photochemically with Hantzsch ester as reductant.33,34,35,36,37
+
+Figure 4. Ketones from coupling two carboxylic acids
+
+Amines are also an abundant substrate pool and most commonly associated with C-N amide bond formation when reacted with a carboxylic acid. The advancement of N-alkylpyridinium salts as radical sources has enabled the use of these coupling partners in C-C bond formation. These reagents commonly prepared by the condensation of a primary or secondary amine with commercially available 2,4,6-triphenylpyrillium tetrafluoroborate. Soon after the emergence of these coupling partners in cross-coupling with aryl boronic acids,50 reports of XEC began to appear (Figure 5). The Matsuo group showed that N-aroylsuccinmides could be coupled to N-alkylpyridinium salts.51 Rasappan and co-workers performed this coupling with acyl chlorides or in situ generated anhydrides.52 Our group, in collaboration with the Watson group, showed that in situ generated acid fluorides could be coupled to N-alkylpyridiniums, including several examples of complex amine fragments derived from natural products.29 In the same report we also developed modified conditions for secondary N-alkylpyridiniums, swapping the acyl electrophile to a 2-pyridyl ester and the ligand to Bphen. Later, Kranthikumar and co-workers reported a ketone synthesis from the XEC of 2-pyridyl thioesters with N-alkylpyridiniums.53
+
+Figure 5. Ketones from coupling a carboxylic acid with an amine
+
+Alkyl alcohols represent another important substrate pool, and at time of writing they have been most generally applied to ketone synthesis as the sulfonate ester.15, 54, 55 In these reactions, in situ halide exchange introduced by a salt additive or the nickel precatalyst generates low concentrations of the alkyl halide, which is the active coupling partner. Deoxygenative XEC is far less developed in ketone synthesis despite their rapid advancement in other areas of XEC (e.g., aryl-alkyl bond formation). This is perhaps due, in part, to the challenge of overcoming transesterification of the free alcohol with the acyl electrophile. A recent report from Fleischer and co-workers disclosed promising conditions to couple thiophenyl esters with benzyl alcohols through nickel/titanium co-catalysis, although the scope is limited to methoxy-substituted benzyl alcohols.56
+
+Stereochemical Control
+
+Since the Reisman group's pioneering work on the enantioconvergent XEC of acid chlorides with secondary benzyl chlorides,13 new approaches to make α-chiral ketones have focused on coupling other classes of activated alkyl electrophiles (Figure 6). The groups of Xi-Sheng Wang, Genping Huang & Chun Zhang, and Liang-An Chen all reported conditions to couple acid chlorides with α-trifluoromethyl alkyl bromides.57,58,59 Shaolin Zhu and co-workers demonstrated a two-ligand system based on their previous work60 that enabled a migratory, enantioconvergent coupling of alkyl iodides with carboxylic acids (via in situ anhydride generation), synthesizing chiral α-arylated ketones via chain-walking.61 Liang-An Chen, Qiaorong Han, and co-workers successfully coupled acid chlorides to α-bromobenzoates to synthesize chiral acyloin products.62 Baran and co-workers reported the coupling of acid chlorides with amino acid-derived NHP esters to prepare chiral α-amino ketones.63 Reisman, Sigman and co-workers reported the synthesis of α-chiral ketones through the desymmetrization of cyclic meso-anhydrides with benzyl chlorides.46 This report also disclosed conditions for the decarbonylative XEC of meso-anhydrides with primary alkyl bromides and a wealth of mechanism-driven ligand design. In their studies of enantioconvergent XEC to 2-aryloxetanes via ring-opening, Kaiwu Dong and co-workers reported conditions that could couple to acid anhydrides.64 Across these reports, it is worth noting the structural similarity of the BOX ligands for these transformations. In analogy to other types of enantioselective C(sp2)-C(sp3) XEC, this area has seen the broadest success with activated alkyl electrophiles, the majority of examples being with alkyl halides. Mechanistically, enantioconvergent couplings remain most common, as XEC with alkyl electrophiles proceeds through an alkyl radical.
+
+In a different class of stereochemical challenge, we reported an approach to prepare (E)-enones from coupling acrylic acids (as the in situ generated 2-pyridyl ester) with alkyl bromides.30 In this case, stereochemical control comes from thermodynamic preferences accessed by nickel-mediated E/Z isomerization as the reaction progresses.
+
+Figure 6. Recent advances in the enantioselective XEC of acyl electrophiles
+
+Applications to Synthesis
+
+The improved functional group tolerance offered by XEC over alkyl nucleophiles in cross-coupling can prove beneficial in assembling complex fragments for the synthesis of natural products. The Kishi group has reported a series of XEC reactions to prepare dialkyl ketones that have been applied to total synthesis (Figure 7). The initial report employed an iron-catalyzed, copper-mediated XEC of acyl electrophiles with alkyl iodides.65 Soon after, their group reported a nickel-catalyzed system where a zirconium additive is key to activate the alkyl iodide reduction.66 Improved conditions were later reported that enabled a 1:1 stoichiometry of 2-pyridyl thioester to alkyl iodide with significantly lower catalyst loading.67 These conditions tolerate sensitive functionality such as C(sp2)-halides, alcohols, and phenols. Kishi applied these conditions to assemble late-stage fragments in syntheses of the halichondrin67,68,69 and halistatin70 classes of natural products. In a joint research effort between scientists at Eisai and the Kishi group, this chemistry was scaled to deliver over ten grams of E7130, an anticancer clinical candidate and a structural analogue of halichondrin B.71, 72
+
+Others molecules that have been completed using the Ni/Zr XEC system include (-)-irijimaside A by Umehara and Sasaki,73 and bryostatins 1, 7, and 9 by Zhenlei Song and co-workers.74 Additionally, Chulbom Lee and co-workers successfully coupled a pyridyl thioester with an NHP ester using modified conditions of the Ni/Zr system for the synthesis of a fragment of madeirolide A.75 Outside of the Ni/Zr approach, Shuanglin Qu, Qianghui Zhou, and co-workers reported a synthesis of (-)-berkelic acid by coupling an α-tertiary acyl chloride with a primary alkyl iodide.76
+
+Ketones from Acyl-X + C(sp2)-X
+
+The XEC of an acyl electrophile with other C(sp2) electrophiles has been slower to develop than C(sp2)-C(sp3) acyl-alkyl coupling. Cross-selectivity in these systems can be difficult to control as now each coupling partner reacts with nickel through a two-electron oxidative addition mechanism. This results in unselective statistical mixtures if the coupling partners react at similar rates or homodimerization if they aren't inherently well-matched. Representative examples are shown in Figure 8.
+
+Figure 7. Application of nickel/zirconium XEC to prepare halichondrins and analogous natural products
+
+Jianlin Han and co-workers demonstrated the feasibility C(sp2)-C(sp2) acyl coupling through the XEC of N-acylglutarimides with aryl iodides to prepare diaryl ketones.77 Walsh, Jianyou Mao, and co-workers reported the desymmetrizing XEC of cyclic meso-anhydrides with aryl triflates.78 Xing-Zhong Shu and co-workers developed a synthesis of enones through the XEC of aroyl fluorides with cyclic vinyl triflates.79 An alternative strategy to achieve cross-selectivity is the selection of conditions that proceed through an acyl radical to differentiate its reactivity from the other C(sp2) coupling partner. In their study on the XEC of N-acylimidazoles, which generates an acyl radical for aroyl substrates, Chao Li and co-workers showed several examples coupling to aryl bromides.80 Jia Xie ad co-workers reported a Ni/Ir photocatalytic system where triphenylphosphine can be used to generate an acyl radical via an acylphosphonium.81 This has translated to successful couplings of benzoic acid derivatives with aryl bromides (to prepare diaryl ketones)82 and vinyl triflates (to prepare enones).83
+
+Figure 8. Representative examples of ketone synthesis from the XEC of acyl electrophiles with C(sp2) electrophiles
+
+Despite these advancements, XEC approaches to prepare diaryl ketones remains underdeveloped, relying more on nucleophiles (e.g., Suzuki coupling of aroyl electrophiles with aryl boronic acids) to achieve cross-selectivity. Strategies used to distinguish C(sp2) electrophiles in biaryl XEC such as multimetallic couplings have yet to be reported with an acyl electrophile. The scope of acyl-X + C(sp2)-X couplings is also notably limited compared to other classes of XEC, with no examples of aromatic nitrogen heterocycles reported to date.
+
+Conclusions and Outlook
+
+The synthesis of ketones by XEC has rapidly grown since the time of our Org. Synth. report in 2016. The development of new strategies to activate carboxylic acids as electrophiles has been a significant contributor to this interest. 2-Pyridyl (thio)esters are especially useful as they have increased stability relative to acid chlorides but still readily undergo oxidative addition with nickel. Mixed anhydrides remain the most common approach for in situ activation. The XEC of acyl electrophiles with C(sp3) electrophiles has seen the largest number of reports, in analogy to the rapid growth of C(sp2)-C(sp3) aryl-alkyl XEC. However, as is the case with the entire field, achieving robust cross-selectivity can be challenging, as is evident in the coupling acyl electrophiles with other C(sp2) electrophiles. The XEC with acyl electrophiles relies on a relatively small set of nitrogen-based ligands (bipyridines, terpyridines, and phenanthrolines), and the development of new ligands could promote new reactivity. Certain classes of coupling partners remain challenging for XEC with acyl electrophiles, such acrylic acid-derived C(sp2) electrophiles and deoxygenative couplings of C(sp3) alkyl alcohols. Enantioselective syntheses have also developed to include other classes of activated electrophiles through enantioconvergent couplings, and there will undoubtedly continue to be advancements in this rapidly growing area.
+
+Recently, there has been increased interest in controlling the equilibrium arising from loss of CO from acylnickel(II) intermediates to promote the decarbonylative coupling and synthesize aryl-alkyl and alkyl-alkyl bonds from carboxylic acids. This provides complementary reactivity and products to the corresponding acyl coupling. As the field's understanding of XEC mechanism, ligand design, and substrate pool activation modes continue to improve, we expect the XEC of acyl electrophiles will continue to be one of the most widely used approaches to synthesize ketones.
+
+References and Notes
+
+Department of Chemistry, University of Wisconsin-Madison, Madison, Wisconsin 53706. E-Mail: dweix@wisc.edu; orcid.org/0000-0002-9552-3378. This work was supported by the NIH (R01GM097243 to DJW and F32GM146357 to OMB)
+
+Foley, D. J.; Waldmann, H. Ketones as Strategic Building Blocks for the Synthesis of Natural Product-Inspired Compounds. Chem. Soc. Rev. 2022, 51, 4094-4120. DOI: 10.1039/d2cs00101b.
+
+Nahm, S.; Weinreb, S. M. N-Methoxy-N-Methylamides as Effective Acylating Agents. Tetrahedron Letters 1981, 22, 3815-3818. DOI: 10.1016/S0040-4039(01)91316-4.
+
+Dieter, R. K. Reaction of Acyl Chlorides with Organometallic Reagents: A Banquet Table of Metals for Ketone Synthesis. Tetrahedron 1999, 55, 4177-4236. DOI: 10.1016/s0040-4020(99)00184-2.
+
+Lawrence, N. J. Aldehydes and Ketones. J. Chem. Soc., Perkin Trans. 1998, 1, 1739-1750. DOI: 10.1039/a800646f.
+
+Dander, J. E.; Garg, N. K. Breaking Amides using Nickel Catalysis. ACS Catal. 2017, 7, 1413-1423. DOI: 10.1021/acscatal.6b03277.
+
+Meng, G.; Shi, S.; Szostak, M. Cross-Coupling of Amides by N-C Bond Activation. Synlett 2016, 27, 2530-2540. DOI: 10.1055/s-0036-1588080.
+
+Ehehalt, L. E.; Beleh, O. M.; Priest, I. C.; Mouat, J. M.; Olszewski, A. K.; Ahern, B. N.; Cruz, A. R.; Chi, B. K.; Castro, A. J.; Kang, K.; Wang, J.; Weix, D. J. Cross-Electrophile Coupling: Principles, Methods, and Applications in Synthesis. Chem. Rev. 2024, 124, 13397-13569. DOI: 10.1021/acs.chemrev.4c00524.
+
+Wotal, A. C.; Batesky, D. C.; Weix, D. J. Nickel-Catalyzed Synthesis of Ketones from Alkyl Halides and Acid Chlorides: Preparation of Ethyl 4-Oxododecanoate. Org. Synth. 2016, 93, 50-62. DOI: 10.15227/orgsyn.093.0050.
+
+Marzouk, H.; Rollin, Y.; Folest, J. C.; Nédélec, J. Y.; Périchon, J. Electrochemical Synthesis of Ketones from Acid-Chlorides and Alkyl and Aryl Halides Catalyzed by Nickel-Complexes. J. Organomet. Chem. 1989, 369, C47-C50. DOI: 10.1016/0022-328x(89)85195-2.
+
+Wotal, A. C.; Weix, D. J. Synthesis of Functionalized Dialkyl Ketones from Carboxylic Acid Derivatives and Alkyl Halides. Org. Lett. 2012, 14, 1476-1479. DOI: 10.1021/ol300217x.
+
+Wu, F.; Lu, W.; Qian, Q.; Ren, Q.; Gong, H. Ketone Formation via Mild Nickel-Catalyzed Reductive Coupling of Alkyl Halides with Aryl Acid Chlorides. Org. Lett. 2012, 14, 3044-3047. DOI: 10.1021/ol3011198.
+
+Cherney, A. H.; Kadunce, N. T.; Reisman, S. E. Catalytic Asymmetric Reductive Acyl Cross-Coupling: Synthesis of Enantioenriched Acyclic α,α-Disubstituted Ketones. J. Am. Chem. Soc. 2013, 135, 7442-7445. DOI: 10.1021/ja402922w.
+
+Lu, W. B.; Liang, Z. Y.; Zhang, Y. W.; Wu, F.; Qian, Q.; Gong, H. G. Gram-Scale Ketone Synthesis by Direct Reductive Coupling of Alkyl Iodides with Acid Chlorides. Synthesis 2013, 45, 2234-2240. DOI: 10.1055/s-0033-1339297.
+
+Liang, Z.; Xue, W.; Lin, K.; Gong, H. Nickel-Catalyzed Reductive Methylation of Alkyl Halides and Acid Chlorides with Methyl p-Tosylate. Org. Lett. 2014, 16, 5620-5623. DOI: 10.1021/ol502682q.
+
+Onaka, M.; Matsuoka, Y.; Mukaiyama, T. A Convenient Method for the Direct Preparation of Ketones from 2-(6-(2-Methoxyethyl)Pyridyl) Carboxylates and Alkyl Iodides by Use of Zinc Dust and a Catalytic Amount of Nickel Dichloride. Chem. Lett. 1981, 10, 531-534. DOI: 10.1246/cl.1981.531.
+
+Yin, H.; Zhao, C.; You, H.; Lin, K.; Gong, H. Mild Ketone Formation via Ni-Catalyzed Reductive Coupling of Unactivated Alkyl Halides with Acid Anhydrides. Chem. Commun. 2012, 48, 7034-7036. DOI: 10.1039/c2cc33232a.
+
+Zhao, C.; Jia, X.; Wang, X.; Gong, H. Ni-Catalyzed Reductive Coupling of Alkyl Acids with Unactivated Tertiary Alkyl and Glycosyl Halides. J. Am. Chem. Soc. 2014, 136, 17645-17651. DOI: 10.1021/ja510653n.
+
+Jia, X.; Zhang, X.; Qian, Q.; Gong, H. Alkyl-Aryl Ketone Synthesis via Nickel-Catalyzed Reductive Coupling of Alkyl Halides with Aryl Acids and Anhydrides. Chem. Commun. 2015, 51, 10302-10305. DOI: 10.1039/c5cc03113c.
+
+Liu, C.; Szostak, M. Twisted Amides: From Obscurity to Broadly Useful Transition-Metal-Catalyzed Reactions by N-C Amide Bond Activation. Chem. - Eur. J. 2017, 23, 7157-7173. DOI: 10.1002/chem.201605012.
+
+Dutta, A. S.; Morley, J. S. Polypeptides. XII. The Preparation of 2-Pyridyl Esters and Their Use in Peptide Synthesis. J Chem Soc Perkin 1 1971, 17, 2896-2902. DOI: 10.1039/j39710002896.
+
+Lloyd, K.; Young, G. T. Amino-Acids and Peptides. Part XXXIV. Anchimerically Assisted Coupling Reactions: The Use of 2-Pyridyl Thiolesters. J. Chem. Soc. C 1971, 2890-2896. DOI: 10.1039/J39710002890.
+
+Carpino, L. A.; Beyermann, M.; Wenschuh, H.; Bienert, M. Peptide Synthesis via Amino Acid Halides. Acc. Chem. Res. 1996, 29, 268-274. DOI: 10.1021/ar950023w.
+
+Huihui, K. M. M.; Caputo, J. A.; Melchor, Z.; Olivares, A. M.; Spiewak, A. M.; Johnson, K. A.; DiBenedetto, T. A.; Kim, S.; Ackerman, L. K. G.; Weix, D. J. Decarboxylative Cross-Electrophile Coupling of N-Hydroxyphthalimide Esters with Aryl Iodides. J. Am. Chem. Soc. 2016, 138, 5016-5019. DOI: 10.1021/jacs.6b01533.
+
+Commercial availability of different alkyl sources: Alkyl-I (4,867), Alkyl-Br (36,474), Alkyl-Cl (80,813), Alkyl-OH (1,433,398), Alkyl-CO2H (781,702), Alkyl-NH2 (702,112), Alkyl-BF3K (525), Alkyl-B(OH)2 (687). Approach: REAXYS search of substructure, move to "commercially available" tab, limit to "in stock." The relative values differ slightly than our previous numbers and this can be attributed to limiting them to "in stock." Source: Elsevier REAXYS https://www.reaxys.com (accessed January 4, 2025).
+
+Ding, D.; Wang, C. Nickel-Catalyzed Reductive Electrophilic Ring Opening of Cycloketone Oxime Esters with Aroyl Chlorides. ACS Catal. 2018, 8, 11324-11329. DOI: 10.1021/acscatal.8b03930.
+
+Yang, F.; Wang, C. Nickel-Catalyzed Directed Cross-Electrophile Coupling of Phenolic Esters with Arylmethyl Trimethylammonium Triflates. J. Org. Chem. 2023, 88, 10199-10205. DOI: 10.1021/acs.joc.3c00425.
+
+Guo, C.; Wang, Z. Y.; Liu, W. H.; Liu, S. Z.; Cheng, Y. Z.; Li, Q.; Dou, J. Nickel-Catalyzed Reductive Coupling of 2-Pyridyl Esters with Unactivated Alkyl Chlorides: A Universal Synthesis of Aryl-Alkyl and Dialkyl Ketones via Dynamic Halide Exchange. Org. Biomol. Chem. 2025, 23, 6100-6105. DOI: 10.1039/d5ob00670h.
+
+Wang, J.; Hoerrner, M. E.; Watson, M. P.; Weix, D. J. Nickel-Catalyzed Synthesis of Dialkyl Ketones from the Coupling of N-Alkyl Pyridinium Salts with Activated Carboxylic Acids. Angew. Chem., Int. Ed. 2020, 59, 13484-13489. DOI: 10.1002/anie.202002271.
+
+Beleh, O. M.; Alomari, S.; Weix, D. J. Synthesis of Stereodefined Enones from the Cross-Electrophile Coupling of Activated Acrylic Acids with Alkyl Bromides. Org. Lett. 2024, 26, 7217-7221. DOI: 10.1021/acs.orglett.4c02644.
+
+Biswas, S.; Weix, D. J. Mechanism and Selectivity in Nickel-Catalyzed Cross-Electrophile Coupling of Aryl Halides with Alkyl Halides. J. Am. Chem. Soc. 2013, 135, 16192-16197. DOI: 10.1021/ja407589e.
+
+Kerackian, T.; Reina, A.; Bouyssi, D.; Monteiro, N.; Amgoune, A. Silyl Radical Mediated Cross-Electrophile Coupling of N-Acyl-imides with Alkyl Bromides under Photoredox/Nickel Dual Catalysis. Org. Lett. 2020, 22, 2240-2245. DOI: 10.1021/acs.orglett.0c00442.
+
+Brauer, J.; Quraishi, E.; Kammer, L. M.; Opatz, T. Nickel-Mediated Photoreductive Cross Coupling of Carboxylic Acid Derivatives for Ketone Synthesis. Chem. - Eur. J. 2021, 27, 18168-18174. DOI: 10.1002/chem.202103486.
+
+Escolano, M.; Cabrera-Afonso, M. J.; Ribagorda, M.; Badir, S. O.; Molander, G. A. Nickel-Mediated Synthesis of Non-Anomeric C-Acyl Glycosides through Electron Donor-Acceptor Complex Photoactivation. J. Org. Chem. 2022, 87, 4981-4990. DOI: 10.1021/acs.joc.1c03041.
+
+Xi, X.; Luo, Y.; Li, W.; Xu, M.; Zhao, H.; Chen, Y.; Zheng, S.; Qi, X.; Yuan, W. From Esters to Ketones via a Photoredox-Assisted Reductive Acyl Cross-Coupling Strategy. Angew. Chem., Int. Ed. 2022, 61, e202114731. DOI: 10.1002/anie.202114731.
+
+Chen, Y.; Xi, X.; Yuan, W. Photoinduced Nickel-Catalyzed Reductive Acyl Cross-Coupling: Facile Access to All Carbon Quaternary Aliphatic Ketones. Org. Chem. Front. 2023, 10, 3669-3675. DOI: 10.1039/D3QO00461A.
+
+Liu, J. H.; Tian, Z. Y.; Wu, Z. Y.; Huang, T. L.; Lin, Z.; Zhang, L.; Chen, J.; Hai, L.; Guo, L.; Wu, Y. Access to Ketones via Nickel-Catalyzed Coupling between S-2-Pyridyl Thioesters and Redox-Active Esters Using an Organic Reductant. J. Org. Chem. 2024, 89, 17059-17068. DOI: 10.1021/acs.joc.4c01242.
+
+Jiao, K.-J.; Ma, C.; Liu, D.; Qiu, H.; Cheng, B.; Mei, T.-S. Nickel-Catalyzed Electrochemical Reductive Relay Cross-Coupling of Alkyl Halides with Alkyl Carboxylic Acids. Org. Chem. Front. 2021, 8, 6603-6608. DOI: 10.1039/d1qo01219c.
+
+Kerackian, T.; Bouyssi, D.; Pilet, G.; Medebielle, M.; Monteiro, N.; Vantourout, J. C.; Amgoune, A. Nickel-Catalyzed Electro-Reductive Cross-Coupling of Aliphatic N-Acyl Imides with Alkyl Halides as a Strategy for Dialkyl Ketone Synthesis: Scope and Mechanistic Investigations. ACS Catal. 2022, 12, 12315-12325. DOI: 10.1021/acscatal.2c03268.
+
+Zhou, X.; Guo, L.; Zhang, H. X.; Xia, R. Y.; Yang, C.; Xia, W. J. Nickel-Catalyzed Reductive Acylation of Carboxylic Acids with Alkyl Halides and N-Hydroxyphthalimide Esters Enabled by Electrochemical Process. Adv. Synth. Catal. 2022, 364, 1526-1531. DOI: 10.1002/adsc.202200003.
+
+Yamamoto, T.; Ishizu, J.; Kohara, T.; Komiya, S.; Yamamoto, A. Oxidative Addition of Aryl Carboxylates to Nickel(0) Complexes Involving Cleavage of the Acyl-Oxygen Bond. J. Am. Chem. Soc. 1980, 102, 3758-3764. DOI: 10.1021/ja00531a016.
+
+Wotal, A. C.; Ribson, R. D.; Weix, D. J. Stoichiometric Reactions of Acylnickel(II) Complexes with Electrophiles and the Catalytic Synthesis of Ketones. Organometallics 2014, 33, 5874-5881. DOI: 10.1021/om5004682.
+
+Wang, J.; Ehehalt, L. E.; Huang, Z.; Beleh, O. M.; Guzei, I. A.; Weix, D. J. Formation of C(sp2)-C(sp3) Bonds Instead of Amide C-N Bonds from Carboxylic Acid and Amine Substrate Pools by Decarbonylative Cross-Electrophile Coupling. J. Am. Chem. Soc. 2023, 145, 9951-9958. DOI: 10.1021/jacs.2c11552.
+
+Huang, Z.; Akana, M. E.; Sanders, K. M.; Weix, D. J. A Decarbonylative Approach to Alkylnickel Intermediates and C(sp3)-C(sp3) Bond Formation. Science 2024, 385, 1331-1337. DOI: 10.1126/science.abi4860.
+
+Douthwaite, J. L.; Zhao, R.; Shim, E.; Mahjour, B.; Zimmerman, P. M.; Cernak, T. Formal Cross-Coupling of Amines and Carboxylic Acids to Form sp3-sp2 Carbon-Carbon Bonds. J. Am. Chem. Soc. 2023, 145, 10930-10937. DOI: 10.1021/jacs.2c11563.
+
+Hernandez-Mejias, A. D.; Shimozono, A. M.; Hazra, A.; Richter, S.; Tong, Z.; Langille, N. F.; Quasdorf, K.; Parsons, A. T.; Sigman, M. S.; Reisman, S. E. Ni-Catalyzed Enantioselective Desymmetrization: Development of Divergent Acyl and Decarbonylative Cross-Coupling Reactions. J. Am. Chem. Soc. 2025, 147, 3468-3477. DOI: 10.1021/jacs.4c14767.
+
+Chen, Q.; You, J.; Tian, T.; Li, Z.; Kashihara, M.; Mori, H.; Nishihara, Y. Nickel-Catalyzed Decarbonylative Reductive Alkylation of Aroyl Fluorides with Alkyl Bromides. Org. Lett. 2022, 24, 9259-9263. DOI: 10.1021/acs.orglett.2c03823.
+
+Wang, J.; Cary, B. P.; Beyer, P. D.; Gellman, S. H.; Weix, D. J. Ketones from Nickel-Catalyzed Decarboxylative, Non-Symmetric Cross-Electrophile Coupling of Carboxylic Acid Esters. Angew. Chem., Int. Ed. 2019, 58, 12081-12085. DOI: 10.1002/anie.201906000.
+
+Ni, S.; Padial, N. M.; Kingston, C.; Vantourout, J. C.; Schmitt, D. C.; Edwards, J. T.; Kruszyk, M. M.; Merchant, R. R.; Mykhailiuk, P. K.; Sanchez, B. B.; Yang, S.; Perry, M. A.; Gallego, G. M.; Mousseau, J. J.; Collins, M. R.; Cherney, R. J.; Lebed, P. S.; Chen, J. S.; Qin, T.; Baran, P. S. A Radical Approach to Anionic Chemistry: Synthesis of Ketones, Alcohols, and Amines. J. Am. Chem. Soc. 2019, 141, 6726-6739. DOI: 10.1021/jacs.9b02238.
+
+Basch, C. H.; Liao, J.; Xu, J.; Piane, J. J.; Watson, M. P. Harnessing Alkyl Amines as Electrophiles for Nickel-Catalyzed Cross Couplings via C-N Bond Activation. J. Am. Chem. Soc. 2017, 139, 5313-5316. DOI: 10.1021/jacs.7b02389.
+
+Yu, C. G.; Matsuo, Y. Nickel-Catalyzed Deaminative Acylation of Activated Aliphatic Amines with Aromatic Amides via C-N Bond Activation. Org. Lett. 2020, 22, 950-955. DOI: 10.1021/acs.orglett.9b04497.
+
+Pulikottil, F. T.; Pilli, R.; Suku, R. V.; Rasappan, R. Nickel-Catalyzed Cross-Coupling of Alkyl Carboxylic Acid Derivatives with Pyridinium Salts via C-N Bond Cleavage. Org. Lett. 2020, 22, 2902-2907. DOI: 10.1021/acs.orglett.0c00554.
+
+Kiran, I. N. C.; Kranthikumar, R. Nickel-Catalyzed Deaminative Ketone Synthesis: Coupling of Alkylpyridinium Salts with Thiopyridine Esters via C-N Bond Activation. Org. Lett. 2023, 25, 3623-3627. DOI: 10.1021/acs.orglett.3c00943.
+
+Gu, J.; Liu, J. D.; Sun, Y. R.; Wang, H. Y. Nickel-Catalyzed Reductive Methylation of Alkyl Acid with Methyl p-Tosylate. Chin. J Org. Chem. 2017, 37, 1830-1834. DOI: 10.6023/cjoc201703042.
+
+Yu, H.; Wang, Z. X. Nickel-Catalyzed Reductive Coupling of Arylcarboxylic Acid 2-Pyridyl Esters with Alkyl Methanesulfonates: Access to Alkyl Aryl Ketones. Org. Biomol. Chem. 2023, 21, 3423-3431. DOI: 10.1039/d3ob00293d.
+
+Anne Haupt, I. F. Dual Nickel/Titanium Catalyzed Cross-Electrophile Coupling of Thioesters with Benzylic Alcohols. Chem. - Eur. J. 2025, 17, e202500221. DOI: 10.1002/cctc.202500221.
+
+Wu, B. B.; Xu, J.; Bian, K. J.; Gao, Q.; Wang, X. S. Enantioselective Synthesis of Secondary β-Trifluoromethyl Alcohols via Catalytic Asymmetric Reductive Trifluoroalkylation and Diastereoselective Reduction. J. Am. Chem. Soc. 2022, 144, 6543-6550. DOI: 10.1021/jacs.2c01422.
+
+Wu, J.; Wu, H.; Liu, X.; Zhang, Y.; Huang, G.; Zhang, C. Nickel-Catalyzed Cross-Coupling of Acyl Chloride with Racemic α-Trifluoromethyl Bromide to Access Chiral α-Trifluoromethyl Ketones. Org. Lett. 2022, 24, 4322-4327. DOI: 10.1021/acs.orglett.2c01208.
+
+Lin, D.; Chen, Y.; Dong, Z.; Pei, P.; Ji, H.; Tai, L.; Chen, L. General and Modular Access to Enantioenriched α-Trifluoromethyl Ketones via Nickel-Catalyzed Reductive Trifluoroalkylation. CCS Chemistry 2023, 5, 1386-1397. DOI: 10.31635/ccschem.022.202202076.
+
+He, J.; Song, P. H.; Xu, X. F.; Zhu, S. L.; Wang, Y. Migratory Reductive Acylation between Alkyl Halides or Alkenes and Alkyl Carboxylic Acids by Nickel Catalysis. ACS Catal. 2019, 9, 3253-3259. DOI: 10.1021/acscatal.9b00521.
+
+Jiang, X.; Sheng, F. T.; Zhang, Y.; Deng, G.; Zhu, S. Ligand Relay Catalysis Enables Asymmetric Migratory Reductive Acylation of Olefins or Alkyl Halides. J. Am. Chem. Soc. 2022, 144, 21448-21456. DOI: 10.1021/jacs.2c10785.
+
+Ji, H.; Lin, D.; Tai, L.; Li, X.; Shi, Y.; Han, Q.; Chen, L. A. Nickel-Catalyzed Enantioselective Coupling of Acid Chlorides with α-Bromobenzoates: An Asymmetric Acyloin Synthesis. J. Am. Chem. Soc. 2022, 144, 23019-23029. DOI: 10.1021/jacs.2c10072.
+
+Gao, Y.; Baran, P. S. Nickel-Catalyzed Enantioselective Decarboxylative Acylation: Rapid, Modular Access to α-Amino Ketones. Angew. Chem., Int. Ed. 2023, 62, e202315203. DOI: 10.1002/anie.202315203.
+
+Zhang, L.; Wang, W.; Shen, C.; Dong, K. Enantioconvergent Cross-Electrophile Coupling of 2-Aryloxetanes with Aryl and Vinyl Halides, or Anhydrides. ACS Catal. 2025, 15, 7578-7587. DOI: 10.1021/acscatal.5c01133.
+
+Kumar, V. P.; Babu, V. S.; Yahata, K.; Kishi, Y. Fe/Cu-Mediated One-Pot Ketone Synthesis. Org. Lett. 2017, 19, 2766-2769. DOI: 10.1021/acs.orglett.7b01128.
+
+Ai, Y.; Ye, N.; Wang, Q.; Yahata, K.; Kishi, Y. Zirconium/Nickel-Mediated One-Pot Ketone Synthesis. Angew. Chem., Int. Ed. 2017, 56, 10791-10795. DOI: 10.1002/anie.201705520.
+
+Umehara, A.; Kishi, Y. Further Studies on Ni/Zr-mediated One-Pot Ketone Synthesis: Use of a Mixture of Ni(I) and Ni(II) Catalysts Greatly Improves the Molar Ratio of Coupling Partners. Chem. Lett. 2019, 48, 947-950. DOI: 10.1246/cl.190405.
+
+Yahata, K.; Ye, N.; Ai, Y.; Iso, K.; Kishi, Y. Unified, Efficient, and Scalable Synthesis of Halichondrins: Zirconium/Nickel-Mediated One-Pot Ketone Synthesis as the Final Coupling Reaction. Angew. Chem., Int. Ed. 2017, 56, 10796-10800. DOI: 10.1002/anie.201705523.
+
+Kranthikumar, R.; Kishi, Y. Application of Ni/Zr-Mediated Ketone Coupling for the Scalable Synthesis of Homohalichondrin B. Org. Lett. 2024, 26, 7105-7109. DOI: 10.1021/acs.orglett.4c02297.
+
+Praveen Kumar, V.; Kishi, Y. Total Synthesis of Halistatins 1 and 2. J. Am. Chem. Soc. 2020, 142, 14743-14749. DOI: 10.1021/jacs.0c07390.
+
+Kaburagi, Y.; Kira, K.; Yahata, K.; Iso, K.; Sato, Y.; Matsuura, F.; Ohashi, I.; Matsumoto, Y.; Isomura, M.; Sasaki, T.; Fukuyama, T.; Miyashita, Y.; Azuma, H.; Iida, D.; Ishida, T.; Itano, W.; Matsuda, M.; Matsukura, M.; Murai, N.; Nagao, S.; Seki, M.; Yamamoto, A.; Yamamoto, Y.; Yoneda, N.; Watanabe, Y.; Kamada, A.; Kayano, A.; Tagami, K.; Asano, O.; Owa, T.; Kishi, Y. Ten-Gram-Scale Total Synthesis of the Anticancer Drug Candidate E7130 to Supply Clinical Trials. Org. Lett. 2024, 26, 2837-2842. DOI: 10.1021/acs.orglett.3c03663.
+
+Sasaki, T.; Yahata, K.; Isomura, M.; Ohashi, I.; Fukuyama, T.; Miyashita, Y.; Watanabe, Y.; Murai, N.; Matsuda, M.; Kamada, A.; Kaburagi, Y.; Kira, K.; Iso, K.; Sato, Y.; Matsuura, F.; Matsumoto, Y.; Azuma, H.; Iida, D.; Ishida, T.; Itano, W.; Nagao, S.; Seki, M.; Yamamoto, A.; Yamamoto, Y.; Yoneda, N.; Matsukura, M.; Asano, O.; Kayano, A.; Tagami, K.; Owa, T.; Kishi, Y. What Does It Take to Develop Structurally Complex Molecules by Total Synthesis? Rapid Process Development and GMP Manufacturing of E7130 Drug Substance for First-in-Human Clinical Study. Org. Process Res. Dev. 2024, 28, 2077-2089. DOI: 10.1021/acs.oprd.4c00016.
+
+Suwa, T.; Sasaki, M.; Umehara, A. Total Synthesis of (-)-Irijimaside A Enabled by Ni/Zr-Mediated Reductive Ketone Coupling. Org. Lett. 2024, 26, 4377-4382. DOI: 10.1021/acs.orglett.4c01367.
+
+Guo, Q.; Yang, Y.; Zhang, H.; Wang, D.; Li, B.; Jiang, D.; Tu, X.; Gao, X.; Zhang, C.; Qin, Y.; Gao, L.; Wang, W.; Song, Z. Total Syntheses of Bryostatins 1, 7, 9 and 9-N3. Angew. Chem., Int. Ed. 2025, 64, e202423465. DOI: 10.1002/anie.202423465.
+
+Hwang, S.; Choi, M.; Jeong, M.; Lee, C. Synthesis of the C13-C27 Fragment of Madeirolide A Using Visible-Light-Promoted Radical Cyclization. Org. Lett. 2024, 26, 1067-1072. DOI: 10.1021/acs.orglett.3c04305.
+
+Cheng, H. G.; Yang, Z.; Chen, R.; Cao, L.; Tong, W. Y.; Wei, Q.; Wang, Q.; Wu, C.; Qu, S.; Zhou, Q. A Concise Total Synthesis of (-)-Berkelic Acid. Angew. Chem., Int. Ed. 2021, 60, 5141-5146. DOI: 10.1002/anie.202014660.
+
+Ni, S.; Zhang, W.; Mei, H.; Han, J.; Pan, Y. Ni-Catalyzed Reductive Cross-Coupling of Amides with Aryl Iodide Electrophiles via C-N Bond Activation. Org. Lett. 2017, 19, 2536-2539. DOI: 10.1021/acs.orglett.7b00831.
+
+Lin, T.; Mi, J.; Song, L.; Gan, J.; Luo, P.; Mao, J.; Walsh, P. J. Nickel-Catalyzed Desymmetrizing Cross-Electrophile Coupling of Cyclic meso-Anhydrides. Org. Lett. 2018, 20, 1191-1194. DOI: 10.1021/acs.orglett.8b00114.
+
+Pan, F. F.; Guo, P.; Li, C. L.; Su, P.; Shu, X. Z. Enones from Acid Fluorides and Vinyl Triflates by Reductive Nickel Catalysis. Org. Lett. 2019, 21, 3701-3705. DOI: 10.1021/acs.orglett.9b01164.
+
+Zhuo, J. M.; Zhang, Y.; Li, Z. J.; Li, C. Nickel-Catalyzed Direct Acylation of Aryl and Alkyl Bromides with Acylimidazoles. ACS Catal. 2020, 10, 3895-3903. DOI: 10.1021/acscatal.0c00246.
+
+Ling, B.; Yao, S.; Ouyang, S.; Bai, H.; Zhai, X.; Zhu, C.; Li, W.; Xie, J. Nickel-Catalyzed Highly Selective Radical C-C Coupling from Carboxylic Acids with Photoredox Catalysis. Angew. Chem., Int. Ed. 2024, 63, e202405866. DOI: 10.1002/anie.202405866.
+
+Ruzi, R.; Liu, K.; Zhu, C.; Xie, J. Upgrading Ketone Synthesis Direct from Carboxylic Acids and Organohalides. Nat. Commun. 2020, 11, 3312. DOI: 10.1038/s41467-020-17224-2.
+
+Li, Y.; Shao, Q.; He, H.; Zhu, C.; Xue, X. S.; Xie, J. Highly Selective Synthesis of All-Carbon Tetrasubstituted Alkenes by Deoxygenative Alkenylation of Carboxylic Acids. Nat. Commun. 2022, 13, 10. DOI: 10.1038/s41467-021-27507-x.
+
+Omar M. Beleh is from Ann Arbor, Michigan. He received his B.S. in biochemistry in 2015 from the University of Michigan, where he did research with Prof. Matthew Soellner. He also did a medicinal chemistry internship at Lycera Corp. in Ann Arbor. Omar then completed his Ph.D. in 2021 with Prof. Scott Miller at Yale University, where he worked on atroposelective catalysis. After his graduate studies, Omar conducted postdoctoral research under Prof. Daniel Weix, where he developed cross-electrophile coupling reactions of carboxylic acid-derived substrates. In 2025, Omar joined Eli Lilly and Company in Indianapolis, IN as a process chemist.
+
+Daniel J. Weix was raised in Oak Creek, Wisconsin. After undergraduate training with Prof. Tom Katz at Columbia University, graduate work with Prof. Jonathan Ellman at the University of California, Berkeley, and postdoctoral training with Prof. John Hartwig at Yale University and University of Illinois Urbana-Champaign, Dan started his independent career at the University of Rochester in 2008. At both Rochester and the UW-Madison (2017-), the Weix group has focused on the development of new concepts and strategies for practical organic synthesis, including cross-electrophile coupling, multimetallic catalysis, radicals in organometallic reactions, and the use of nanostructured materials in photoredox catalysis.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

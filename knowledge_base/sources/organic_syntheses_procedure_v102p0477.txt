@@ -1,0 +1,445 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 477-493
+
+DOI: 10.15227/orgsyn.102.0477
+
+Preparation of N-tert-Butylbenzenesulfinimidoyl Chloride
+
+Submitted by Teruaki Mukaiyama, Yasuo Nakamura, and Jun-ichi Matsuo1
+
+Checked by Daniel W. Zuschlag and Dirk Trauner
+
+1. Procedure (Note 1)
+
+A. S-Phenyl thioacetate (1). In air, a 100-mL single-necked (24/40 joint) round-bottomed flask equipped with a 15×8 mm octagon stir bar is charged with benzenethiol (5.38 g, 48.8 mmol, 1.0 equiv) (Note 2) and acetic anhydride (5.26 g, 51.5 mmol, 1.05 equiv) (Note 3). The round-bottom flask is equipped with a 24/40 to 14/20 glass adapter and a 10-mL dropping funnel (14/20 joint, pressure compensation) that is filled with triethylamine (5.45 g, 53.8 mmol, 1.1 equiv) (Note 4). A rubber septum is attached to the dropping funnel, through which a needle connected to an open argon manifold line is inserted. To the mixture, cooled with an ice-water bath, triethylamine is added dropwise over 3 min (Figure 1).
+
+Figure 1. Addition of Triethylamine (photo provided by checkers)
+
+The ice-water bath is then removed, and the mixture is stirred at room temperature (23 ℃) for 24 h (Note 5). The color of the reaction mixture becomes light-yellow. After 24 h, water (50 mL) is added to the reaction mixture. The resulting mixture is extracted with ethyl acetate (3x30 mL) using a 200-mL separating funnel. The combined organic extracts are washed with brine (2x30 mL), and they are transferred to a 250-mL Erlenmeyer flask. The washed organic extracts are dried over anhydrous Na2SO4 (3 g) and filtered through a cotton plug. The filtrate is then concentrated on a rotary evaporator (22 mm Hg, water bath: 33 ℃) to give a yellow crude product in a 30-mL round-bottomed flask (15/25 joint).
+
+A Claisen distillation head (all 15/25 joints), a thermometer (15/25 joint), a Liebig condenser (15/25 joint), and a cow-type distillation receiver (15/25 joint) with 10-mL and 20-mL round-bottomed flasks (15/25 joint) are attached to the flask containing the crude product and a 15×8 mm octagonal stir bar (Figure 2). Reduced-pressure distillation (2 mm Hg) is started at room temperature (~22 ℃) with an oil bath. The collection of the first distillate starts at 69 ℃ and ends at 72 ℃ (oil bath: 115 ℃). The collection of the main distillate starts at 72 ℃. As the volume of the distillate decreases, the temperature gradually drops, but the distillate is collected as a main distillate until the temperature drops to 70 ℃ (2 mm Hg, oil bath: 115 ℃). A colorless oil (6.49 g, 39.6 mmol, 87% yield, 98% purity as determined by qNMR using dimethyl sulfone as an internal standard) (Note 6) is collected as the main distillate.
+
+Figure 2. Distillation of Crude 1 (photo provided by authors)
+
+B. N,N-Dichloro-tert-butylamine (2).  In air, a 500-mL one-necked, round-bottomed flask (29/32 joint) equipped with a 25x8 mm Teflon-coated octagon stir bar is charged with tert-butylamine (5.02 g, 68.6 mmol, 1.0 equiv) (Note 7) and CH2Cl2 (180 mL) (Note 8). The flask is immersed in an ice/water bath, and the solution is stirred open to air. To the stirred solution, calcium hypochlorite (70%, 20.6 g, 144 mmol, 2.1 equiv) (Note 9) is added in one portion under cooling with an ice/water bath, and the mixture becomes a white emulsion (Figure 3).
+
+Figure 3. White Emulsion After the Addition of Ca(OCl)2 (photo provided by authors)
+
+A 250-mL dropping funnel (15/25 joint) charged with 3 N hydrochloric acid (180 mL) is attached to the flask with a joint adapter (29/32 and 15/25). In air, 3 N hydrochloric acid is added dropwise over 1 h to the stirred mixture under cooling with an ice/water bath. When the addition is complete, the addition funnel is removed.  The resulting yellow-colored, two-layered reaction mixture is stirred vigorously for 21 h in air with a gradual increase in the temperature of the ice/water cooling bath to room temperature (~22 ℃) with melting ice (Note 10) (Figure 4).
+
+Figure 4. Reaction after 21 h (photo provided by author)
+
+The mixture is transferred to a 500-mL separatory funnel, and a yellow organic layer is separated. The organic layer is washed with brine (2 x 60 mL), dried over anhydrous Na2SO4, and filtered through a cotton plug. Distillation of volatiles in the filtrate is started at 190 mm Hg under cooling with a water bath (Note 11), and the pressure is gradually reduced to 130 mm Hg at a rate of 10 mm Hg/30 min (Figure 5). Then 2 contaminated with CH2Cl2 is obtained as a yellow liquid (8.70 g, 54.7 mmol, 80% yield, 89 wt% purity as determined by qNMR using dimethyl sulfone as an internal standard) (Note 12). Compound 2 is used in the next step without purification (Note 13).
+
+Figure 5. Distillation of volatiles (photo provided by authors)
+
+C. N-tert-Butylbenzenesulfinimidoyl chloride (3). A 200-mL round-bottom flask (29/32 joint) equipped with a 25×8 mm octagonal stir bar is charged with N,N-dichloro-tert-butylamine (2) (5.50 g, 85 wt%, 32.9 mmol, 1.07 equiv) and dry benzene (60 mL) (Note 14). Soon after the addition of S-phenyl thioacetate (1) (4.88 g, 96 wt%, 30.8 mmol, 1.00 equiv) (Note 15) to the solution, a reflux condenser (29/32 joint) is attached to the flask, and the reaction mixture is stirred at reflux for 1.5 h under an atmosphere of argon (Note 16). The color of the reaction mixture changes from yellow to orange (Figure 6).
+
+Figure 6. Reaction after 1.5 h under Reflux (photo provided by authors)
+
+Volatiles are distilled out at 20-30 ℃ under vacuum (20 mm Hg) with trapping the volatiles by cooling with an ice/water bath for 20 min (Figure 7), and the reduced pressure is released by flushing with nitrogen gas to prevent hydrolysis of 3 under air. After concentration, the 200-mL round-bottomed flask containing the crude product of 3 is sealed with a glass stopper (29/32 joint).
+
+Figure 7. Evaporation of volatiles (photo provided by authors)
+
+Placed in a polyethylene glove bag (Note 17, Figure 8A) are a 200-mL round-bottomed flask with a glass stopper containing the crude product 3, a 30-mL glass filter (3G4, Shibata, cylindrical funnel) with its outlet closed up with a septum (Figure 8B), a 200-mL vacuum filtration assembly flask with a side-arm, a large spatula, a 30-mL Erlenmeyer flask, a funnel with a cotton plug, a 20-mL glass syringe with a needle, a 50-mL round-bottomed flask (15/25 joint) containing freshly distilled hexane (ca. 25 mL) sealed with a rubber septum, and a 100-mL round-bottomed flask (29/32) with a three-way stopcock (Figure 8C).
+
+Figure 8. A. Glove bag; B. Glass filter closed with a septum; C. Apparatus within glove bag (photo provided by author)
+
+The wide outlet of the glove bag is then closed, and nitrogen gas is introduced. The gas in the glove bag is then evacuated by using a diaphragm pump (Note 17). The evacuation/refilling is repeated three times. The glove bag is again filled with nitrogen and dry n-hexane (16 mL) (Note 18) is added to the 200-mL round-bottomed flask containing the crude product of 3 by using a 20-mL glass syringe with a needle at room temperature (~22 ℃). A small amount of white solids begins to precipitate in a yellow solution. The mixture is filtered through a cotton plug into a 30-mL Erlenmeyer flask to remove the white precipitate. The cotton plug is washed with dry n-hexane (1 mL). Then the 30-mL glass filter with its outlet blocked by a septum is cooled with dry ice (Note 19, Figure 9A) pressed against the outside of the glove bag. The yellow filtrate in the 30-mL Erlenmeyer flask is poured into the chilled glass filter, and yellow solids precipitate onto the filter (Note 20, Figure 9A).  When the yellow solids have fully precipitated, the septum is removed and the chilled glass filter is attached to a 200-mL vacuum filtration assembly flask with a side-arm (Note 21). The yellow solids are obtained by vacuum filtration (~150 mbar) (Figure 9B). The yellow solids (Figure 9C) are transferred to a 100-mL round-bottomed flask (29/32 joint) using a spatula in the glove bag filled with nitrogen, and the flask is sealed with a three-way stopcock. The round-bottomed flask containing solidified 3 is taken out from the glove bag, and volatiles with 3 are evacuated under vacuum (18 mm Hg) over 30 min at room temperature (~22 ℃) to yield 3 as a yellow solid (3.70 g, 15.8 mmol, 51% yield, 92% purity as determined by qNMR using dimethyl sulfone as an internal standard) (Note 22, 23, 24).
+
+Figure 9. A. Cooling the glass filter from the outside of the glove bag and precipitation of 3; B. Vacuum filtration in the glove bag; C. Isolated compound 3 (photo provided by authors)
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with triethylamine, acetic anhydride, hydrochloric acid, calcium hypochlorite, thiophenol, dichloromethane, benzene, N,N-dichloro-tert-butylamine, and N-tert-butylbenzenesulfinimidoyl chloride, as well as the proper procedures for vacuum distillation. Thiophenol, N,N-dichloro-tert-butylamine, and N-tert-butyl benzenesulfinimidoyl chloride have unpleasant odors, are highly toxic, and should be dealt with exclusively in a fume hood. All vacuum distillations in this procedure must be carried out in a well-ventilated fume hood and the glassware used should be cleaned within the fume hood.
+
+2. Benzenethiol (99%) was purchased from Acros Organic and used as received.
+
+3. Acetic anhydride (>99%) was purchased from Alfa Aesar and used as received.
+
+4. Triethylamine (99%) was purchased from Tokyo Chemical Industry and used as received.
+
+5. The reaction was monitored by TLC analysis on silica using hexane / ethyl acetate (5/1, v/v) (Figure 1). Rf of 1 = 0.7. Benzenethiol was gradually consumed until 2 h, but it was not consumed completely even after 24 h.
+
+6. Product 1 is characterized as follows: 1H NMR pdf (500 MHz, CDCl3) δ: 7.47-7.37 (5H, m), 2.42 (3H, s); 13C NMR pdf (151 MHz, CDCl3) δ: 194.0, 134.5, 129.5, 129.2, 128.0, 30.2; IR (film) 3061, 1702, 1478, 1440 cm-1; HRMS (ESI+) m/z calc'd for C8H9OS [M+H]+ 153.0374, found 153.0369. The purity of compound 1 was determined to be 97.7 wt% as determined by qNMR pdf using dimethyl sulfone as an internal standard. A second run on the same scale by the checkers yielded 6.50 g (87% yield, 96% purity by qNMR using dimethyl sulfone as an internal standard).
+
+7. Tert-butylamine (>98%) was purchased from Oakwood Chemical and used as received.
+
+8. Dichloromethane was purchased from Fischer Scientific and used as received.
+
+9. Calcium hypochlorite (70%) was purchased from Oakwood Chemical and used as received. The authors noted that old calcium hypochlorite should not be used since its use resulted in unsuccessful preparation of 2.
+
+10. The ice-water bath is not removed, and ice is allowed to melt gradually. The temperature of the cooling water ranged from 2 ℃ to 12 ℃.
+
+11. The temperature of the water bath ranges from 15 ℃ to 25 ℃.
+
+12. Product 2 is characterized as follows: 1H NMR pdf (500 MHz, CDCl3) δ: 1.38 (9H, s). 13C NMR pdf (151 MHz, CDCl3) δ: 72.6, 25.9. IR (film) 2982, 2938, 1478, 1458, 1393, 1366, 1237, 1183 cm-1; HRMS (ESI+) m/z calc'd for C4H9ClN [M-Cl]+ 108.0394, found 108.0394. Compound 2 has an unpleasant odor, and it should be handled in a well-ventilated hood. The purity of compound 2 was determined to 89.3 wt% as determined by qNMR pdf using dimethyl sulfone as an internal standard. A second run on the same scale by the checkers yielded 8.63 g (76% yield, 85% purity by qNMR using dimethyl sulfone as an internal standard).
+
+13. Distillation of the crude product induced decomposition of 2 as reported by Zimmer and Audrieth.2a Pyrolysis of 2 was reported.2b
+
+14. Benzene (Sigma Aldrich, anhydrous) is used as received.
+
+15. Distilled S-phenyl thioacetate (1) that is prepared by procedure A is used. The crude product or a product contaminated with the first distillate in procedure A should not be used. S-phenyl thioacetate (1) can be purchased from Tokyo Chemical Industry and used without purification.
+
+16. The temperature of an oil bath is 120 ℃. A needle connected to an argon manifold is inserted into a rubber septum placed on the reflux condenser (15/25 joint). The reaction progress is checked by TLC analysis. An eluent of hexane: ethyl acetate 5:1 was used with silica gel 60 F254 plates. The TLC was visualized under UV light (254 nm) to observe the consumption of S-phenyl thioacetate (1) (hexane/ethyl acetate = 5/1) (Figure 10).
+
+Figure 10. TLC analysis after 1.5 h under reflux
+
+17. A polyethylene glove bag with a gas inlet and outlet tubes. The gas inlet tube is connected to a nitrogen gas cylinder. The authors used model AZ ONE, GBU-1, 580 mm x 430 mm x 430 mm (H). The checkers used model Sigma Aldrich AtmosBag 584 mm × 965 mm × 279 mm. The gas outlet tube is connected to a diaphragm pump (vacuubrand, MZ 2C). The filtration must be conducted strictly with avoidance of air since compound 3 is easily hydrolyzed. Hydrolysis of 3 can be recognized by loss of its yellow color.
+
+18. n-Hexane (Fischer Scientific) is freshly distilled in the presence of CaH2 (Oakwood Chemical, ≥90%). Hexane is the most suitable solvent for crystallization of 3 among other solvents including hexane/ether (3:1), ether, and toluene.
+
+19. Finely crushed dry ice is put in a polyethylene bag (280 mm x 270 mm), and the glass filter in the glove bag is cooled by contact from the outside of the glove bag.
+
+20. The yellow solids should be precipitated directly on the cooled glass filter. The process is difficult to control since the 3 solidifies at -78 ℃ in the round-bottomed flask and the yellow solids redissolve during transfer of 3 onto the glass filter.
+
+21. A diaphragm pump is connected to the side arm through a tube.
+
+22. Product 3 is characterized as follows: 1H NMR pdf (400 MHz, CDCl3) δ: 8.16-8.10 (2H, m), 7.66-7.56 (3H, m), 1.58 (9H, s). 13C NMR pdf (100 MHz, CDCl3) δ: 143.0, 133.4, 129.4, 126.2, 64.4, 29.8. NMR sample is prepared by dissolving 3 (25-35 mg) with dry CDCl3 (0.6 mL) that is dried with molecular sieves 4A; m.p. 52.0-54.0 ℃. The sample for the measurement of the melting point is prepared by enclosing it in a glass capillary under a nitrogen atmosphere and the outlet of the capillary is closed by heating it with a burner. IR (film) 2969, 2890, 1512, 1374 cm-1. The purity of compound 3 was determined to 91.8 wt% as determined by qNMR pdf using dimethyl sulfone as an internal standard. A second run on the same scale by the checkers yielded 4.80 g (62% yield, 90 wt% purity by qNMR using dimethyl sulfone as an internal standard).
+
+23. The purity of the product obtained from this procedure (92%) represents an improvement over commercial sources (typically ~80%). The purity of both was determined by qNMR pdf using dimethyl sulfone as an internal standard. It should be noted that the authors report a purity of 96% for the product obtained by this procedure whereas the checkers were unable to surpass 92% purity. The authors report a yield of 70%.
+
+24. We kept compound 3 at 2 ℃ for long-term storage. Compound 3 is moisture-sensitive and must be kept under a nitrogen or an argon atmosphere. Storage of 3 at room temperature (~22 ℃) induces its decomposition even under an inert gas atmosphere.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+N-Tert-butylbenzenesulfinimidoyl chloride (3) is an oxidizing reagent for oxidation of alcohols to aldehydes and ketones3 and for oxidation of amines and N-protected amines to the corresponding imines.4 Also, 3 is a powerful oxidant for dehydrogenation of carbonyl compounds to the corresponding α,β-unsaturated carbonyl compounds5 since the dehydrogenation proceeds in one step even at -78 ℃. It is noteworthy that highly strained phenols are prepared by dehydrogenation of cyclohexenones with 3.6
+
+Polymer-supported 3 is also developed7 for avoiding separation of N-tert-butylbenzenesulfenamide (4) that is formed after oxidation with 3 (Scheme 1). Purification of products after oxidation with 3 is sometimes troublesome since oxidation products have to be separated from 4 and compounds formed by hydrolysis of 3. In addition, the odor of 4 is detected in the crude product of oxidation. Although 3 has these shortcomings, it has been utilized as a special oxidant in organic synthesis, especially in total synthesis of natural products.6a,8
+
+Scheme 1. Oxidation of alcohols, amine, and ketones with 3 with co-formation of sulfenamide 4
+
+Compound 3 was first prepared by Markovskii et al. by a reaction of S-phenyl thiobenzoate and N,N-dichloro-tert-butylamine (2).9 We reported a modified method for preparation of 3 by using S-phenyl thioacetate (1) and 2.3 This method has an advantage of more facile removal of acetyl chloride than removal of benzoyl chloride that is formed by Markovskii's method. After our first report of 3 as an oxidizing agent, 3 has been used without purification since reliable purification of 3 was not developed. Purification by distillation of 3 is not recommended. Here, we describe a reproducible synthesis and purification method for 3.
+
+References and Notes
+
+E-mail: jimatsuo@p.kanazawa-u.ac.jp, ORCID: 0000-0003-3667-7657. The authors are grateful for the financial support from JSPS (KAKENHI Grant Number JP22K06500).
+
+a) Zimmer, H.; Audrieth, L. F., tert-Butyl hypochlorite as an N-chlorinating agent. J. Am. Chem. Soc. 1954, 76, 3856-3857. DOI: 10.1021/ja01643a082; b) Roberts, J. T.; Rittberg, B. R.; Kovacic, P., Chemistry of N-halo compounds. 33. Pyrolytic eliminations from N,N-dichloro derivatives of primary, secondary, and tertiary alkyl primary amines. J. Org. Chem. 1981, 46 (21), 4111-4115, DOI: 10.1021/jo00334a001.
+
+a) Mukaiyama, T.; Matsuo, J.-i.; Yanagisawa, M., A new and efficient method for oxidation of various alcohols by using N-tert-butyl phenylsulfinimidoyl chloride. Chem. Lett. 2000, (9), 1072-1073, DOI: 10.1246/cl.2000.1072; b) Matsuo, J.-i.; Iida, D.; Tatani, K.; Mukaiyama, T., A new method for oxidation of various alcohols to the corresponding carbonyl compounds by using N-t-butylbenzenesulfinimidoyl chloride. Bull. Chem. Soc. Jpn. 2002, 75 (2), 223-234, DOI: 10.1246/bcsj.75.223.
+
+a) Mukaiyama, T.; Kawana, A.; Fukuda, Y.; Matsuo, J.-i., Oxidation of various secondary amines to imines with N-tert-butylphenylsulfinimidoyl chloride. Chem. Lett. 2001, (5), 390-391, DOI: 10.1246/cl.2001.390; b) Matsuo, J.-i.; Tanaki, Y.; Kido, A.; Ishibashi, H., A mild and convenient synthesis of N-carbobenzyloxy ketimines. Chem. Commun. 2006, (27), 2896-2898, DOI: 10.1039/b605882e.
+
+a) Mukaiyama, T.; Matsuo, J.-i.; Kitagawa, H., A new and one-pot synthesis of α,β-unsaturated ketones by dehydrogenation of various ketones with N-tert-butyl phenylsulfinimidoyl chloride. Chem. Lett. 2000, (11), 1250-1252, DOI: 10.1246/cl.2000.1250; b) Matsuo, J.-i.; Aizawa, Y., One-pot dehydrogenation of carboxylic acid derivatives to α,β-unsaturated carbonyl compounds under mild conditions. Tetrahedron Lett. 2005, 46 (3), 407-410, DOI: 10.1016/j.tetlet.2004.11.106.
+
+a) Burns, N. Z.; Krylova, I. N.; Hannoush, R. N.; Baran, P. S., Scalable Total Synthesis and Biological Evaluation of Haouamine A and Its Atropisomer. J. Am. Chem. Soc. 2009, 131 (26), 9172-9173, DOI: 10.1021/ja903745s; b) Guo, R.; Witherspoon, B. P.; Brown, M. K., Stereoselective [2+2]-cycloadditions of chiral allenic ketones and alkenes: applications towards the synthesis of benzocyclobutenes and endiandric acids. Tetrahedron 2022, 122, 132932, DOI: 10.1016/j.tet.2022.132932.
+
+a) Matsuo, J.-i.; Kawana, A.; Yamanaka, H.; Kamiyama, H., Polymer-supported sulfinimidoyl chlorides: A convenient reagent for oxidation of alcohols. Bull. Chem. Soc. Jpn. 2003, 76 (7), 1433-1440, DOI: 10.1246/bcsj.76.1433; b) Lange, H.; Capener, M. J.; Jones, A. X.; Smith, C. J.; Nikbin, N.; Baxendale, I. R.; Ley, S. V., Oxidation reactions in segmented and continuous flow chemical processing using an N-(tert-butyl)phenylsulfinimidoyl chloride monolith. Synlett 2011 (6), 869-873, DOI: 10.1055/s-0030-1259923.
+
+a) Fuwa, H.; Kainuma, N.; Tachibana, K.; Sasaki, M., Total Synthesis of (-)-Gambierol. J. Am. Chem. Soc. 2002, 124 (50), 14983-14992, DOI: 10.1021/ja028167a; b) Ishizaki, M.; Niimi, Y.; Hoshino, O., Formal total synthesis of (±)-magellanine. Tetrahedron Lett. 2003, 44 (32), 6029-6031, DOI: 10.1016/s0040-4039(03)01516-8; c) Nicolaou, K. C.; Koftis, T. V.; Vyskocil, S.; Petrovic, G.; Ling, T.; Yamada, Y. M. A.; Tang, W.; Frederick, M. O., Natural products synthesis: Structural revision and total synthesis of azaspiracid-1. Part 2: Definition of the ABCD domain and total synthesis. Angew. Chem., Int. Ed. 2004, 43 (33), 4318-4324, DOI: 10.1002/anie.200460696; d) Yamashita, S.; Iso, K.; Kitajima, K.; Himuro, M.; Hirama, M., Total Synthesis of Cortistatins A and J. J. Org. Chem. 2011, 76 (8), 2408-2425, DOI: 10.1021/jo2002616; e) Xu, W.; Zhao, J.; Tao, C.; Wang, H.; Li, Y.; Cheng, B.; Zhai, H., Collective Total Synthesis of (-)-Lundurines A-C. Org. Lett. 2018, 20 (6), 1509-1512, DOI: 10.1021/acs.orglett.8b00210; f) Kang, G.; Han, S., Synthesis of Dimeric Securinega Alkaloid Flueggeacosine B: From Pd-Catalyzed Cross-Coupling to Cu-Catalyzed Cross-Dehydrogenative Coupling. J. Am. Chem. Soc. 2022, 144 (20), 8932-8937, DOI: 10.1021/jacs.2c03861.
+
+Markovskii, L. N.; Dubinina, T. N.; Levchenko, E. S.; Kirsanov, A. V., N-Substituted Sulfinimidoyl Chlorides. Synthesis from S-Silylated and Acylated Thiophenols. J. Org. Chem. USSR 1973, 9, 1435-1439, Zh. Org. Khim. 9 (7), 1406-1411.
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+S-Phenyl thioacetate: Ethanethioic acid, S-phenyl ester; (1)(934-87-2)
+
+N,N-Dichloro-tert-butylamine: N,N-Dichloro-2-methyl-2-propanamine; (2)(2156-72-1)
+
+N-tert-Butylbenzenesulfinimidoyl chloride: N-(1,1-Dimethylethylbenzenesulfinimidoyl chloride; (3)(49591-20-0)
+
+Benzenethiol: Thiophenol; (108-98-5)
+
+Teruaki Mukaiyama was born in 1927 and studied chemistry at Tokyo Institute of Technology (TIT) under the guidance of Prof. Toshio Hoshino (1948-1953). After independent research at Gakushuin University (1953-1958), he returned to TIT as Professor, and he moved to University of Tokyo (1975). After his retirement in 1987, he continued his research at Tokyo University of Science (until 2002) and at the Kitasato Institute (until 2009). He received seven honorary degrees (China, Germany, and Japan), membership in four national academies (France, Japan, Poland, and USA), and 16 major awards of the highest rank (in France, Japan, Poland, and the UK). He passed away in 2018.
+
+Yasuo Nakamura was born in Kanazawa, Japan, in 2002. He is currently pursuing his bachelor's degree in the research group of Professor Matsuo.
+
+Jun-ichi Matsuo graduated from University of Tokyo (1994) under the supervision of Prof. Kenji Koga, and received Ph.D. degree from University of Tokyo (1999) under the guidance of Prof. Shū Kobayashi. He became an assistant professor in 2000 at Tokyo University of Science and worked with Prof. Mukaiyama. After he worked as a researcher at the Kitasato Institute for 2002-2005 with Prof. Mukaiyama and Prof. Satoshi Ōmura, he became an associate professor at Kanazawa University in 2005, and became a full professor in 2014.
+
+Daniel Werner Zuschlag was born in New York, USA and earned his BA in chemistry in 2018 from New York University. In 2020, he earned an MS in chemistry from Villanova University, where he worked with Prof. Eduard Casillas on the total synthesis of terpene natural products. From 2020-2022, Daniel worked in the laboratory of Prof. Mark Biscoe at City College of New York on the development of stereospecific cross-coupling reactions. In 2022, he began pursuing a PhD at the University of Pennsylvania under the supervision of Prof. Dirk Trauner. His research combines chemical neuroscience, medicinal chemistry, and organic synthesis.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

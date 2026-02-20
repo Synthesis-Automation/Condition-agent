@@ -1,0 +1,431 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 236-250
+
+DOI: 10.15227/orgsyn.102.0236
+
+Efficient Preparation of Chiral Hydroxylamines via Nickel-Catalyzed Asymmetric Hydrogenation of Oximes
+
+Submitted by Bowen Li§, Jianzhong Chen§, and Wanbin Zhang*1
+
+Checked by Greg Storer and Nathan Ide
+
+1. Procedure (Note 1)
+
+A. (E)-1-Phenylethan-1-one oxime (1). A 250-mL, three-necked (19/22 for each joint, one neck equipped with a reflux condenser, two necks equipped with septa) round-bottomed flask equipped with a Teflon-coated magnetic stir bar (12 x 25 mm, oval) is charged with acetophenone (12.0 g, 100 mmol, 1.0 equiv) (Note 2), hydroxylamine hydrochloride (10.4 g, 150 mmol, 1.5 equiv) (Note 3), sodium acetate (12.3 g, 150 mmol, 1.5 equiv) (Note 4), EtOH (80 mL) (Note 5) and water (40 mL) (Note 6). The mixture is stirred (400 rpm, under air) in an oil bath at 50 ℃ (internal temperature, 41 ℃) (Figure 1A) for 2 h (Note 7). The reaction mixture is cooled to room temperature and slowly poured into a 500-mL separatory funnel (24/40 joint) charged with 150 mL 1M Na2CO3 solution (Note 8). Then the mixed solution is extracted with EtOAc (50 mL x 3) (Note 9). The combined organic phase is washed with 100 mL saturated NaCl solution (Figure 1B) (Note 10), dried with anhydrous Na2SO4 (Note 11), and concentrated under reduced pressure (30 ℃, 100 mm Hg). The resultant white solid is purified via column chromatography (Note 12). The obtained white solid (Figure 1C) is further dissolved in 70 mL petroleum ether at 60 ℃ (Figure 1D) and recrystallized to give a white crystalline solid (11.2 - 12.2 g, 83 - 90% yield) (Figure 1E) (Notes 13, 14 and 15).
+
+Figure 1. A. Reaction setup; B. Extraction setup of organic phase and saturated NaCl solution; C. White solid after purified by column chromatography; D. Recrystallization setup; E. White solid after recrystallization (Photos provided by authors)
+
+B.(S)-N-(1-Phenylethyl)hydroxylamine (2). A flat-bottomed 300-mL stainless steel autoclave with overhead stirring and a four-blade agitator is (Figure 2A) charged with compound 1 (2.70 g, 20.0 mmol, 1.0 equiv), Ni(OAc)2·4H2O (103 mg, 0.41 mmol, 0.02 equiv) (Note 16), and (S,S)-Ph-BPE (208 mg, 0.41 mmol, 0.02 equiv) (Note 17). The stainless steel autoclave is transferred into a nitrogen-filled glovebox (Note 18). Then the degassed solvent 2,2,2-trifluoroethanol (TFE, 100 mL) (Note 19) and acetic acid (10 mL) (Note 20) are added to the autoclave (Figure 2B). The autoclave is then sealed and taken out from the glovebox. The nitrogen gas in the autoclave is displaced with 10 bar H2 three times and charged with 50 bar H2. The autoclave is heated with an electric heating mantle to 50 ℃ (Figure 2C).
+
+Figure 2. A. Reaction vessel (Photo provided by checkers); B. Reaction solution before reaction (Photo provided by authors); C. Reaction vessel in electric heating mantle (Photo provided by checkers)
+
+The reaction is stirred at 500 rpm, 50 ℃ for 24 h and then cooled to room temperature (21-22 ℃). The hydrogen gas is released slowly and the reaction mixture is poured into a 500-mL separatory funnel (24/40 joint). Then 200 mL NaOH (1 M) aqueous solution (Note 21) is slowly added to the separatory funnel and the mixed solution is extracted with CH2Cl2 (50 mL x 3) (Figure 3A) (Note 22). The combined organic phase is dried with a 1:1 mixture of anhydrous of Na2SO4 and MgSO4 (Note 11) and concentrated under reduced pressure (20 ℃, 100 mm Hg). The resultant brown solid is purified via column chromatography using a 40 x 500 mm column of 80 g silica gel (Note 23) and eluted sequentially with 300 mL 2:1 petroleum ether:EtOAc and 500 mL 1:1 petroleum ether:EtOAc to give a white solid (2.03 g, 74% yield) (Figure 3B) (Notes 24, 25 and 26).
+
+Figure 3. A. Extraction setup; B. White solid after purified by column chromatography (Photos provided by authors)
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at  https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with acetophenone, hydroxylamine hydrochloride, sodium acetate, (E)-1-phenylethan-1-one oxime, nickel(II) acetate tetrahydrate, 1,2-bis((2S,5S)-2,5-diphenylphospholan-1-yl)ethane, (S)-N-(1-Phenylethyl)hydroxylamine, ethanol, petroleum ether, n-hexane, i-propanol, ethyl acetate, toluene, 2,2,2-trifluoroethanol, acetic acid, 1,3,5-trimethoxybenzene, mesitylene, sodium carbonate, dichloromethane, sodium sulfate, silica gel, and deuterated chloroform.
+
+2. Acetophenone (98%) was purchased from Aladdin and used as received. Checkers obtained this from Sigma Aldrich (99%).
+
+3. Hydroxylamine hydrochloride (98%) was purchased from Energy Chemical and used as received. Checkers obtained this from Sigma Aldrich (99%).
+
+4. Sodium acetate (99%) was purchased from 3A Materials and used as received. Checkers obtained this from Sigma Aldrich (>99%).
+
+5. EtOH (99.7%) was purchased from Adamdas-beta and used as received. Checkers obtained this from Pharmco (200 proof, 100%).
+
+6. Water was collected from Shanghai standard tap water and used as received. Checkers collected water from the AbbVie deionized water system.
+
+7. Reaction progress was monitored after 2 h using TLC analysis on silica gel with 5:1 petroleum ether:EtOAc as eluent (petroleum ether (60-90 ℃) which were purchased from Sinopharm Chemical Reagent Co., LTD and used as received. Checkers used petroleum ether from Sigma Alrich (60-80℃, >99.5%). Visualization of the TLC plate was performed with UV irradiation (254 nm). The starting ketone material has Rf = 0.54 (left black dot), the desired oxime product has Rf = 0.40 (right black dot).
+
+Figure 4. TLC of the crude reaction mixture (left is the starting material, right is the reaction mixture) (Photos provided by authors)
+
+8. Na2CO3 (99.8%) was purchased from Adamdas-beta and used as received. The aqueous solution (1M) was prepared using 15.9 g Na2CO3 and 150 mL tap water in a 300 mL beaker. Checkers obtained sodium carbonate from Sigma Aldrich (>99.5%)
+
+9. EtOAc (99.5%) was purchased from Sinopharm Chemical Reagent Co., LTD and used as received. Checkers obtained this from Sigma Aldrich (>99.7%)
+
+10. NaCl (99%) was purchased from Adamdas-beta and used as received. Saturated NaCl solution was prepared using tap water. Checkers obtained NaCl from Sigma Aldrich (99%)
+
+11. Anhydrous Na2SO4 (99%) was purchased from Adamdas-beta and used as received. Checkers obtained this from Sigma Aldrich (99%). Checkers obtained anhydrous MgSO4 from Sigma Aldrich (>99.5%).
+
+12. Purification procedure of compound 1 via column chromatography: A column (diameter: 40 mm, height: 500 mm) was charged with 100 g of silica (Yantai Jiangyou Silica gel Development Co., LTD: 200-300 mesh)) and petroleum ether. Sand with 10 mm minimum height (30-50 mesh particle size; purchased from Adamdas-beta) was added to the top of the column (sand was used to assist packing). The crude residue was dissolved in toluene (10 mL) (toluene 99.5% was purchased from Sinopharm Chemical Reagent Co., LTD and used as received. Checkers obtained this from Sigma Aldrich, 99.7% HPLC grade) and transferred to the column with subsequent rinses of the round-bottomed flask using toluene (1 mL x 3) to ensure quantitative transfer. The column was eluted with eluted sequentially with 550 mL 10:1 petroleum ether:EtOAc and 600 mL 5:1 petroleum ether:EtOAc. The product eluted over approximately 16 fractions (25 mL, fractions 5-20).
+
+13. Recrystallization procedure for compound 1: A 250-mL single-necked (24/40 joint) round-bottomed flask was charged with crude solid compound 1 and petroleum ether (70 mL). Then the flask was heated in an oil bath at 60 ℃. Once all of the solid were dissolved (solution temperature raised to 41℃), the flask was transferred to a room temperature bath (16 ℃) for 5 h. The flask was then transferred to a freezer at -18 ℃ for another 2 h. The cold slurry was filtered using a 110-mL filter funnel with a 10µ frit. The resulting white granular crystals were washed with cold petroleum ether (-18 ℃, 15 mL x 2) and dried under vacuum (less than 1 mm Hg).
+
+14. (E)-1-Phenylethan-1-one oxime: mp 59.1-59.8 ℃.1H NMR pdf (400 MHz, chloroform-d) δ 9.43 (br. s, 1H), 7.67-7.57 (m, 2H), 7.44-7.33 (m, 3H), 2.33 (s, 3H);13C NMR pdf(101 MHz, chloroform-d) δ 156.0, 136.5, 129.3, 128.5, 126.1, 12.3; IR (film): 3211, 1447, 1365, 1305, 1007, 927, 763, 694 cm-1; HRMS-ESI (m/z) [M+H]+ calcd for C8H10NO+ 136.0757; found, 136.0756.
+
+15. The purity of 1 was determined to be  99.9 wt% by qNMR pdf using 1,3,5-trimethoxybenzene (Sigma Aldrich, 99.96%) as the internal standard.
+
+16. Ni(OAc)2·4H2O (99.9%) was purchased from Macklin and used as received. Checkers obtained this from Sigma Aldrich (99.995%)
+
+17. (S,S)-Ph-BPE (98%) was purchased from Laajoo and used as received. Checkers obtained this from Sigma Aldrich (98%)
+
+18. The use of nitrogen-filled glovebox for solvent addition was to avoid the existence of oxygen in the reaction solution, which has negative impact via the oxidation of phosphine ligand.
+
+19. 2,2,2-Trifluoroethanol (99%) was purchased from Adamdas-beta (Checkers obtained this from Sigma Aldrich, 99%) and purified by distillation from calcium oxide (General-Reagent, >98%; Checkers used this, 99.99%), followed by degassing. The use of large amount of solvent was to decrease the concentration of the hydroxylamine product, because as the reaction proceeded, high concentration of hydroxylamine was very harmful for the activity of the catalyst. The checkers identified the use of freshly distilled solvent as critically important for reaction performance.
+
+20. Acetic acid (99.5%) was purchased from Sinopharm Chemical Reagent Co., LTD and purified by distilling and degassing. Checkers obtained this from Sigma Aldrich (glacial, >99%). The checkers identified the use of freshly distilled solvent as critically important for reaction performance.
+
+21. NaOH (96%) was purchased from Adamdas-beta and used as received. Checkers obtained this from Sigma Aldrich (97%). The aqueous solution (1M) was prepared using 8.0 g NaOH and 200 mL tap water in a 500 mL beaker.
+
+22. CH2Cl2 (99.5%) was purchased from Adamdas-beta and used as received. Checkers obtained this from Sigma Aldrich (99.8%). TLC analysis was carried out on silica gel with 2:1 petroleum ether:EtOAc as eluent. Visualization of the TLC plate was performed with UV irradiation (254 nm). The starting oxime material has Rf = 0.74 (left black dot), the desired hydroxylamine product has Rf = 0.2 (right light black dot: second dot from top to bottom). The product could also be visualized with KMnO4 stain.
+
+Figure 5. TLC of the crude reaction mixture (left is the starting material, right is the reaction mixture) (Photos provided by authors)
+
+23. Purification procedure of compound 2 via column chromatography: A column (diameter: 40 mm, height: 500 mm) was charged with 25 g of silica (Yantai Jiangyou Silica gel Development Co., LTD) and petroleum ether. Sand with 10 mm minimum height (30-50 mesh particle size; purchased from Adamdas-beta) was added to the top of the column (sand was used to assist packing). The crude residue was dissolved in CH2Cl2 (15 mL) and transferred to the column with subsequent rinses of the round-bottomed flask using CH2Cl2 (2 mL x 3) to ensure quantitative transfer. Product eluted during the 1:1 petroleum ether:EtOAc portion of the elution. The product eluted over approximately 13 fractions (25 mL, fractions 17-29).
+
+24. A second run provided the product (2.11 g) in 77% yield. (S)-N-(1-Phenylethyl)hydroxylamine: mp 95.7-96.7 ℃.1H NMR pdf (400 MHz, chloroform-d) δ 7.29-7.14 (m, 5H), 4.01 (q, J = 6.6 Hz, 1H), 1.31 (d, J = 6.6 Hz, 3H);13C NMR pdf (101 MHz, chloroform-d) δ 142.1, 128.5, 127.6, 127.2, 61.8, 19.3; IR (film): 3255, 2875, 2821, 1426, 1006, 996, 933, 757, 697 cm-1; HRMS-ESI (m/z) [M + H]+ calcd for C8H12NO+ 138.0913; found, 138.0912.
+
+25. HPLC-Conditions: Column: CHIRALPAK OJ-H (5.0 µm, 150 x 4.6 mm). Column temperature: 35 ℃. Wavelength: 210 nm. Pressure: 3.8 MPa. Flow rate: 1.0 mL/min, n-Hexane (Sigma Aldrich HPLC Grade, 95%) /i-PrOH (Sigma Aldrich HPLC Grade, 99.9%) = 95:5 as eluent, tR = 9.8 min (S), tR = 10.9 min (   R  ); [α]20D = -28.4 (c 1.74, CHCl3) for 94% ee.
+
+26.  The purity of compound 2 was determined to be >99 wt% by qNMR pdf using mesitylene (Sigma Aldrich, 99.9%) as the internal standard.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at  http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk.  Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+Hydroxylamines play important roles in chemical synthesis and biological activities because N-OH-containing compounds readily undergo biotransformation in vivo.2,3,4  However, hydroxylamines, especially chiral ones, are sorely lacking due to their difficult synthesis.2,5 Asymmetric hydrogenation using H2 is one of the most attractive methods for the synthesis of such compounds from oximes due to its high efficiency and practicality in the synthesis of optically pure compounds.6
+
+Since the 1960s, great progress has been made in the area of transition metal catalyzed asymmetric hydrogenation.6 However, the efficient asymmetric hydrogenation of oximes (C=N-OH) for the preparation of the corresponding chiral hydroxylamines (C-NH-OH) has not been developed.2,5 Most efforts targeted at the catalytic reduction of oximes to hydroxylamines produce only primary amines as a result of the cleavage of a weak N-O bond.2,7 The critical reason is that the N-O bond can be readily ruptured under reduction conditions mainly due to the repulsion between the lone pairs of both the N and O atoms of the N-OH group.2,7 After developing several metal-catalyzed asymmetric hydrogenations of poorly active unsaturated compounds promoted by weak interactions mechanism,8 we studied the Ni-catalyzed asymmetric hydrogenation of oximes for the preparation of the corresponding chiral hydroxylamines by weak interactions between the catalyst and oximes. This mechanism could reduce the reaction barrier and stabilize the intermediate states in this reaction.9
+
+Scheme 1. aReaction conditions unless otherwise noted: 1 (0.2 mmol), Ni(OAc)2·4H2O (0.004 mmol), (S,S)-Ph-BPE (0.004 mmol), H2 (50 bar), TFE/AcOH (2 mL, v/v = 20:1), 50 °, 24 h; bReaction temperature is 55 °; cTFE:AcOH (v/v = 10:1); dReaction time is 48 h
+
+In summary, a series of chiral hydroxylamines and their ethers were prepared with up to 99% yield, 99% ee, and 1000 S/C (13) by using a readily available bisphosphine nickel catalyst (Scheme 1, representative products).9 Among them, alkyl-protected oximes were more stable than unprotected oximes in the hydrogenation. Additionally, the aryl-alkyl model substrates were more suitable for this catalytic system. The chiral hydroxylamines synthesized via this method provide a sound foundation for their further application. The asymmetric hydrogenation of other substrates with C=N-O structure is in progress.
+
+References and Notes
+
+Shanghai Key Laboratory for Molecular Engineering of Chiral Drugs, Frontiers Science Center for Transformative Molecules, School of Chemistry and Chemical Engineering, Shanghai Jiao Tong University, 800 Dongchuan Road, Shanghai, 200240, China; E-mail: wanbin@sjtu.edu.cn; orcid.org/0000-0002-4788-4195. The authors are grateful to the Shanghai Jiao Tong University. These studies were also supported by National Natural Science Foundation of China (Nos. 21620102003, 21991112), National Key R&D Program of China (No. 2018YFE0126800), and Shanghai Municipal Education Commission (No. 201701070002E00030).
+
+Rappoport, Z.; Lebman, J. F. The chemistry of hydroxylamines, oximes and hydroxamic acids (Wiley-VCH, 2008). DOI:10.1002/9780470741962.
+
+Pattabiraman, V. R.; Bode, J. W. Rethinking Amide Bond Synthesis. Nature 2011, 480, 471-479. DOI: 10.1038/nature10702.
+
+Paudyal, M. P.; Adebesin, A. M.; Burt, S. R.; Ess, D. H.; Ma, Z.; KÜrti, L.; Falck, J. R. Dirhodium-Catalyzed C-H Arene Amination Using Hydroxylamines. Science 2016, 353, 1144-1147. DOI: 10.1126/science.aaf8713.
+
+a) Mohr, J.; Oestreich, M. B(C6F5)3-Catalyzed Hydrogenation of Oxime Ethers Without Cleavage of the N-O Bond.  Angew. Chem. Int. Ed. 2014, 53, 13278-13281. DOI: 10.1002/anie.201407324. b) Mas-Roselló, J.; Smejkal, T.; Cramer, N. Iridium-Catalyzed Acid-Assisted Asymmetric Hydrogenation of Oximes to Hydroxylamines. Science  2020, 368, 1098-1102. DOI: 10.1126/science.abb2559. c) Mas-Roselló, J.; Cope, C. J.; Tan, E.; Pinson, B.; Robinson, A.; Smejkal, T.; Cramer, N. Iridium-Catalyzed Acid-Assisted Hydrogenation of Oximes to Hydroxylamines. Angew. Chem. Int. Ed. 2021,  60, 15524-15532. DOI: 10.1002/anie.202103806. d) Ribeiro, J. L. P.; Alves, C.; Cardoso, A. L.; Lopes, S. M. M.; Pinho e Melo, T. M. V. D. Reduction of Oximes and Hydrazones: Asymmetric and Diastereoselective Approaches.  Curr. Org. Chem. 2021, 25, 2175-2198. DOI: 10.2174/1385272825666210706151631. e) Mas-Roselló, J.; Cramer, N. Catalytic Reduction of Oximes to Hydroxylamines: Current Methods, Challenges and Opportunities.  Chem. Eur. J. 2022, 28, e202103683. DOI: 10.1002/chem.202103683. f) Wang, F.; Chen, Y.; Yu, P.; Chen, G.-Q.; Zhang, X. Asymmetric Hydrogenation of Oximes Synergistically Assisted by Lewis and Brønsted Acids.  J. Am. Chem. Soc. 2022, 144, 17763-17768. DOI: 10.1021/jacs.2c07506.
+
+Rare transition metal catalysts: a) Tang, W.; Zhang, X. New Chiral Phosphorus Ligands for Enantioselective Hydrogenation. Chem. Rev.  2003, 103, 3029-3069. DOI: 10.1021/cr020049i. b) Johnson, N. B.; Lennon, I. C.; Moran, P. H.; Ramsden, J. A. Industrial-Scale Synthesis and Applications of Asymmetric Hydrogenation Catalysts. Acc. Chem. Res. 2007, 40, 1291-1299. DOI: 10.1021/ar700114k. c) Xie, J.-H.; Zhu, S.-F.; Zhou, Q.-L. Transition Metal-Catalyzed Enantioselective Hydrogenation of Enamines and Imines. Chem. Rev. 2011,  111, 1713-1760. DOI: 10.1021/cr100218m. d) Chen, Q.-A.; Ye, Z.-S.; Duan, Y.; Zhou, Y.-G. Homogeneous Palladium-Catalyzed Asymmetric Hydrogenation.  Chem. Soc. Rev. 2013, 42, 497-511. DOI: 10.1039/C2CS35333D. e) Zhang, Z.; Butt, N. A.; Zhang, W. Asymmetric Hydrogenation of Nonaromatic Cyclic Substrates. Chem. Rev. 2016, 116, 14769-14827. DOI: 10.1021/acs.chemrev.6b00564. Earth-abundant transition metal catalysts: f) Chirik, P. J. Iron- and Cobalt-Catalyzed Alkene Hydrogenation: Catalysis with Both Redox-Active and Strong Field Ligands. Acc. Chem. Res. 2015, 48, 1687-1695. DOI: 10.1021/acs.accounts.5b00134. g) Li, Y.-Y.; Yu, S.-L.; Shen, W.-Y.; Gao, J.-X. Iron-, Cobalt-, and Nickel-Catalyzed Asymmetric Transfer Hydrogenation and Asymmetric Hydrogenation of Ketones.  Acc. Chem. Res. 2015, 48, 2587-2598. DOI: 10.1021/acs.accounts.5b00043. h) Morris, R. H. Exploiting Metal-Ligand Bifunctional Reactions in the Design of Iron Asymmetric Hydrogenation Catalysts. Acc. Chem. Res.  2015, 48, 1494-1502. DOI: 10.1021/acs.accounts.5b00045. i) Zhang, Z.; Butt, N. A.; Zhou, M.; Liu, D.; Zhang, W. Asymmetric Transfer and Pressure Hydrogenation with Earth-Abundant Transition Metal Catalysts.  Chin. J. Chem. 2018, 36, 443-454. DOI: 10.1002/cjoc.201800053. j) Ai, W.; Zhong, R.; Liu, X.; Liu, Q. Hydride Transfer Reactions Catalyzed by Cobalt Complexes. Chem. Rev. 2019, 119, 2876-2953. DOI: 10.1021/acs.chemrev.8b00404. k) Wen, J.; Wang, F.; Zhang, X. Asymmetric Hydrogenation Catalyzed by First-Row Transition Metal Complexes.  Chem. Soc. Rev. 2021, 50, 3211-3237. DOI: 10.1039/D0CS00082E.
+
+a) Krasik, P.; Alper, H. The Ruthenium Catalyzed Asymmetric Hydrogenation of Oximes Using Binap as the Chiral Ligand.    Tetrahedron: Asymmetry 1992, 3, 1283-1288. DOI: 10.1016/S0957-4166(00)82086-8.  b) Xie, Y.; Mi, A.; Jiang, Y.; Liu, H. Enantioselective Hydrogenation of Ketone Oxime Catalyzed by Ir-DPAMPP Complex. Synth. Commun.  2001, 31, 2767-2771. DOI: 10.1081/SCC-100105323. c) Huang, K.; Li, S.; Chang, M.; Zhang, X. Rhodium-Catalyzed Enantioselective Hydrogenation of Oxime Acetates. Org. Lett. 2013, 15, 484-487. DOI: 10.1021/ol303282u. d) Maj, A. M.; Suisse, I.; Agbossou-Niedercorn, F. Asymmetric Hydrogenation of 2,3-Dihydro-1H-Inden-1-One Oxime and Derivatives. Tetrahedron: Asymmetry 2016, 27, 268-273. DOI: 10.1016/j.tetasy.2016.02.005.
+
+a) Chen, J.; Zhang, Z.; Li, B.; Li, F.; Wang, Y.; Zhao, M.; Gridnev, I. D.; Imamoto, T.; Zhang, W. Pd(OAc)2-Catalyzed Asymmetric Hydrogenation of Sterically Hindered N-Tosylimines.  Nat. Commun. 2018, 9, 5000. DOI: 10.1038/s41467-018-07462-w. b) Li, B.; Chen, J.; Zhang, Z.; Gridnev, I. D.; Zhang, W. Nickel-Catalyzed Asymmetric Hydrogenation of N-Sulfonyl Imines. Angew. Chem. Int. Ed.  2019, 58, 7329-7334. DOI: 10.1002/anie.201902576. c) Chen, J.; Gridnev, I. D. Size is Important: Artificial Catalyst Mimics Behavior of Natural Enzymes. iScience 2020, 23, 100960. DOI: 10.1016/j.isci.2020.100960. d) Hu, Y.; Chen, J.; Li, B.; Zhang, Z.; Gridnev, I. D.; Zhang, W. Nickel-Catalyzed Asymmetric Hydrogenation of 2-Amidoacrylates. Angew. Chem. Int. Ed. 2020, 59, 5371-5375. DOI: 10.1002/anie.201916534. e) Liu, D.; Li, B.; Chen, J.; Gridnev, I. D.; Yan, D.; Zhang, W. Ni-Catalyzed Asymmetric Hydrogenation of N-Aryl Imino Esters for the Efficient Synthesis of Chiral α-Aryl Glycines. Nat. Commun. 2020, 11, 5935. DOI: 10.1038/s41467-020-19807-5.
+
+Li, B.; Chen, J.; Liu, D.; Gridnev, I. D.; Zhang, W. Nickel-Catalyzed Asymmetric Hydrogenation of Oximes. Nat. Chem.  2022, 14, 920-927. DOI: 10.1038/s41557-022-00971-8.
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+Acetophenone; (98-86-2)
+
+Hydroxylamine hydrochloride; (5470-11-1)
+
+Sodium acetate; (127-09-3)
+
+(E)-1-Phenylethan-1-one oxime; (1) (613-91-2)
+
+Nickel(II) acetate tetrahydrate; (6018-89-9)
+
+(S,S)-Ph-BPE: 1,2-bis((2S,5S)-2,5-diphenylphospholan-1-yl)ethane; (824395-67-7)
+
+(S)-N-(1-Phenylethyl)hydroxylamine; (2) (53933-47-4)
+
+Bowen Li received his PhD from Shanghai Jiao Tong University (SJTU) in  2021 under the supervision of Prof. Wanbin Zhang. He is currently a  postdoctoral fellow in the laboratory of Prof. Wanbin Zhang and Prof. Deyue Yan  at SJTU. His studies primarily focus on developing transition metal-catalyzed asymmetric hydrogenation reactions.
+
+Jianzhong Chen received his PhD from Shanghai Jiao Tong University  (SJTU) in 2013 under the supervision of Prof. Wanbin Zhang. Following his  doctoral studies, he conducted postdoctoral research under the guidance of  Prof. Wanbin Zhang and Prof. Deyue Yan. He then joined SJTU as an assistant professor and was promoted to associate professor in 2019. His research focuses  on the development and application of asymmetric hydrogenation in organic  synthesis.
+
+Prof. Wanbin Zhang received his BS and  MS from East China University of Science and Technology in 1985 and 1988,  respectively. He completed his PhD at Osaka University in 1997 under the  supervision of Prof. Isao Ikeda. He was then an assistant professor at Osaka  University until 2001 and a research fellow at Mitsubishi Chemical Corporation.  Since 2003, he has been a professor in the School of Chemistry and Chemical  Engineering at Shanghai Jiao Tong University. He was promoted to Distinguished  Professor in 2013 and Chair Professor in 2021. His current research interests  include asymmetric catalysis and pharmaceutical process chemistry.
+
+Greg Storer is a Scientist II in the Process Chemistry group at AbbVie. Greg obtained his bachelor's in science from Baldwin-Wallace College (now Baldwin-Wallace University) in 2003 and a master's degree in Organic Chemistry  from Wright State University in 2007, focusing on directed lithiation of  sydnone containing compounds. Following his M.S., Greg joined the medicinal  chemistry team at Pfizer, followed by some time at AMRI. In 2015, Greg joined  the Process Chemistry group at AbbVie, where he has served as a member of the  Center of Catalysis developing a wide range of catalytic chemistry, with an  emphasis on high-pressure reactions, including hydrogenation and carbonylation  reactions, in addition to supporting multiple clinical API campaigns.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

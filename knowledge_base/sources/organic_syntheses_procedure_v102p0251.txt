@@ -1,0 +1,479 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 251-272
+
+DOI: 10.15227/orgsyn.102.0251
+
+Rapid Access to Enantiopure Protected (R)-Paraconyl Alcohol
+
+Submitted by Haylie E. Hennigan, Namuunzul Otgontseren, and Elizabeth I. Parkinson*1
+
+Checked by David A. Petrone and Kevin R. Campos
+
+1. Procedure (Note 1)
+
+A. 4-(Hydroxymethyl)furan-2(5H)-one 1: In an oven-dried (Note 2), 500-mL round-bottom flask equipped with a football-shaped stir-bar, 1,3-dihydroxyacetone dimer (Note 3) (10.0 g, 55.5 mmol, 1.00 equiv) was partially dissolved in anhydrous dichloromethane (Note 4) (150 mL, c = 0.37 M) and the reaction was placed under an atmosphere of dry N2 via a needle and septum. The septum was removed and (carbethoxymethylene)triphenyl phosphorane (Note 5) (46.41 g, 133.2 mmol, 2.4 equiv) was then added to the solution portion-wise (~5 g/min) over ten min, resulting in a cloudy pale-orange color (Figure 1A). The reaction was allowed to stir under nitrogen for 18 h at room temperature (Note 6), as monitored by TLC, (Note 7); wherein, it became amber in color (Figure 1B). At this time, the dichloromethane was removed by rotary evaporator (21 mm Hg, 30 ℃) to afford an opaque orange oil (Figure 1C). The crude material was further concentrated under vacuum (9 mm Hg) (Note 8) while stirring for 12 h at room temperature (Note 9). The triphenylphosphine oxide (TPPO) byproduct was precipitated by adding 100 mL of deionized water to the viscous oil. The oil on the sides of the flask was scraped to the bottom with a long spatula, stirred to break up the chunks, and the dispersion was sonicated for 15 min. The sides of the flask were scraped again, and the contents of the flask were sonicated for an additional 15 min (Figure 1D). The resulting pale-yellow solids were then collected by vacuum filtration (9 mm Hg) with a plastic fritted funnel (500-mL), washed twice with 50 mL portions of room temperature deionized water, and the yellow filtrate was collected into a round bottom flask (Figure 1E). The filtrate was concentrated on a rotary evaporator (3.1 mm Hg, 45 ℃) to afford a yellow oil. This oil was dissolved in 50 mL of warm ethyl acetate (35 ℃) (Note 10), then poured into a 250-mL Erlenmeyer flask containing a 2" cylindrical stir bar. The flask was cooled to 0 ℃ in an ice bath and stirred for 1.5 h resulting in the formation of white crystals which were then quickly vacuum filtered (9 mm Hg) to afford 4-(hydroxymethyl)furan-2(5H)-one 1 as an off-white powder (4.31 g, 34%, 92.9% purity by qNMR) (Note 11) (Figure 1F).
+
+Figure 1. A. The reaction color and turbidity at the beginning of the reaction; B. The reaction color and transparency at the end of the reaction; C. The color and consistency of the concentrated reaction; D. The precipitated TPPO byproduct after sonication; E. The filtration of the TPPO byproduct and pale-yellow aqueous filtrate; F. The final product obtained as an off-white powder
+
+B. 4-(((tert-Butyldimethylsily)oxy)methyl)furan-2(5H)-one 2: In an oven-dried (Note 2), 500-mL round-bottom flask equipped with a football-shaped stir bar, was dissolved 4-(hydroxymethyl)furan-2(5H)-one 1 (7.25 g, 63.5 mmol, 1 equiv) in anhydrous dichloromethane (65 mL, c = 0.98 M) and the reaction was placed under an atmosphere of dry N2 via a needle and septum. The septum was removed and imidazole (Note 12) (8.64 g, 127 mmol, 2 equiv) was then added in one portion and the reaction was allowed to stir for 5 min under nitrogen. During this time, the pale-yellow solution became slightly cloudy (Figure 2A). The septum was again removed and tert-butyldimethylchlorosilane (Note 13) (10.54 g, 69.89 mmol, 1.1 equiv) was then added to the solution, which as a result, turned opaque white (Figure 2B). The reaction was allowed to stir under nitrogen at room temperature for 18 h. Upon completion of the reaction, as indicated by TLC analysis (Note 14), 96 mL of 1 M hydrochloric acid (Note 15) was added to the stirring solution. The mixture was poured into a 250-mL separatory funnel (Figure 2C), and the organic layer was removed. The aqueous phase was further extracted with dichloromethane (2 x 80 mL). The organic layers were combined in a 500-mL separatory funnel, washed with brine (100 mL), dried with magnesium sulfate (5.5 g) (Note 16), filtered using vacuum filtration (9 mm Hg) with a plastic fritted funnel (500 mL), and concentrated under reduced pressure (21 mm Hg, 28 ℃). The resulting pale-yellow oil (Figure 2D) was mostly dissolved in pentane (100 mL, Note 17), leaving a slightly turbid solution which was filtered through a plastic fritted funnel (18 mL) packed with Celite (500 mg, 1 cm). The frit was washed with 10 mL of pentane to yield a clear solution. The mixture was recrystallized by stirring at -20 ℃ for 1.5 h (Note 18). The resulting white crystals were vacuum filtered (9 mm Hg) and washed with 20 mL cold (stored in -20 ℃ freezer) pentane to afford 4-(((tert-butyldimethylsily)oxy)methyl)furan-2(5H)-one 2 (11.5 g, 79% yield, 96.6% purity by qNMR) (Note 19) (Figure 2E).
+
+Figure 2. A. The reaction color after the addition of imidazole; B. The reaction cloudiness after the addition of TBSCl; C. The aqueous and organic phases in the separatory funnel; D. The crude yellow oil after concentration; E. The final product obtained as a white solid after recrystallization
+
+C. (S)-4-(((tert-butyldimethylsily)oxy)methyl)dihydrofuran-2(3H)-one (3): An oven-dried 200-mL glass reaction vessel fitted with a mechanical stirrer and a nitrogen inlet (Note 20) was charged with copper (II) chloride dihydrate (Note 21) (0.19 g, 1.1 mmol, 0.05 equiv), (R)-(-)-DTBM-SEGPHOS (Note 22) (1.29 g, 1.09 mmol, 0.05 equiv), and sodium tert-butoxide (Note 23) (0.42 g, 4.38 mmol, 0.20 equiv). The vessel was purged with nitrogen gas for 15 min before adding anhydrous pentane (Note 24) (29 mL, c = 0.75 M). The dispersion was stirred while polymethylhydrosiloxane (PMHS, Note 25) (3.90 mL, 3.94 g, 65.7 mmol, 3 equiv) was added dropwise via syringe over 5 min. The reaction was allowed to stir at room temperature for 2 h. Over this period, the solution went from white to dark yellowish brown (Figure 3A,B). After 2 h at room temperature, the vessel was brought to -20 ℃, and 20 mL of anhydrous toluene (Note 26) was added to the reaction flask which caused the internal temperature to increase to approximately -12 ℃. Accordingly, the reaction mixture was allowed to return to -20 ℃ before a solution of 4-(((tert-butyldimethylsily)oxy)methyl)furan-2(5H)-1-one (2) (5.00 g, 21.9 mmol, 1 equiv), isopropanol (5.02 mL, 3.95 g, 65.7 mmol, 3 equiv, Note 27), and toluene (10 mL, c = 0.75 M) was added via syringe over 10 min. During the addition of this solution, the reaction color changed from a dark yellow to orangish-brown (Figure 3C). The reaction was stirred under nitrogen at -20 ℃ for 2 h. After consumption of starting material, as observed by NMR (Note 28), the reaction was quenched with 96 mL of 1 M HCl at -20 ℃ (Note 29), then transferred to a 250-mL separatory funnel (Figure 3D). The cloudy orange organic layer was removed. The aqueous phase was extracted with ethyl acetate (2 x 80 mL). The combined organic layers, which were purple in color, were washed with brine (100 mL) in a 500-mL separatory funnel, dried with magnesium sulfate (8.0 g), and vacuum filtered (9.6 mm Hg) with a fritted funnel (250-mL, 20μ) (Note 30). The magnesium sulfate cake was washed with 50 mL of ethyl acetate, and the filtrate was concentrated to afford a deep purple oil (Figure 3E).
+
+Figure 3. A. The reaction color at the start of the reaction; B. The reaction color after 2 hr; C. The color of the reaction after the addition of the butenolide 2; D. The aqueous and organic phases in the separatory funnel; E. The crude purple oil
+
+The crude sample was loaded onto a pre-equilibrated (12% EtOAc in hexanes) (Note 31) plug of silica (Note 32) (3 in, d = 90 mm, flow rate = 2 in/min) in 5 mL of hexanes. The sample was chromatographed using 3 L of 12% EtOAc in hexanes. Collection began after the eluent became pale yellow in color (approximately 500 mL) and fractions 6-36 (50 mL each) were combined (Figure 4A,B) and concentrated to afford a pale purple oil (Figure 4C). The resulting purple oil was transferred to a 10 mL round bottom flask in 2 mL of EtOAc (Note 10) and equipped with a half-inch stir bar, and a short-path distillation apparatus (110 mm width x 115 mm height), which was connected to vacuum and a pre-weighed 10 mL conical receiving flask. Vacuum was slowly introduced until vigorous bubbling ceased (approx. 15 min, 150 mm Hg). The flask containing the oil was then brought to 150 ℃ in an aluminum heating block and full vacuum (5.6 mm Hg) was introduced. The neck of the distillation apparatus was heated with a heat gun to assist in maintaining appropriate temperature of the apparatus. After a clear condensate began to form at the top of the apparatus (approx. 15 min), the temperature was increased to 160 ℃. After another 15 min, the temperature was increased to 170 ℃ where it remained until no more condensate was present, and the heated flask contained a thick tan slurry (Figure 4D). (S)-4-(((tert-butyldimethylsily)oxy)methyl)dihydrofuran-2(3H)-one 3 was collected as a clear oil (3.08 g, 61% yield, 93.4% ee, and 97.9% purity by qNMR) (Note 33) (Figure 4E).
+
+Figure 4. A. TLCs from column chromatography visualized using UV (254 nm). Fractions 6-39 were combined (Rf = 0.4, 4:1 hexanes:EtOAc); B. TLC of the fractions stained with KMnO4 stain; C. Resulting purple oil of the combined fractions; D. The distillation set up after completion of the distillation; E. The pure material as a clear oil
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with 1,3-dihydroxy acetone dimer, (carbethoxymethylene)triphenyl phosphorane, dichloromethane, imidazole, tert-butyldimethylchlorosilane, hydrochloric acid, ethyl acetate, copper(II) chloride dihydrate, sodium tert-butoxide, (R)-DTBM-SEGPHOS, PMHS, pentane, toluene, isopropanol, hexanes, as well as the proper procedures for vacuum distillations.
+
+2. Glassware dried in a vacuum oven set to 170 ℃ at 9 mm Hg for 24 h. The glassware was assembled while hot using heat-resistant gloves, then immediately evacuated and backfilled with nitrogen before allowing it to cool under an inert atmosphere.
+
+3. 1,3-Dihydroxyacetone dimer (97%) was purchased from Thermo Scientific and used as received.
+
+4. Anhydrous dichloromethane (≥99.9%) was purchased from Aldich and used directly.
+
+5. (Carbethoxymethylene)triphenylphosphorane (90%) was purchased from Oakwood Chemical and used as received.
+
+6. Room temperature was monitored at a range from 20-24 ℃.
+
+7. TLC plates, Silica gel 60 F254 (20 cm x 20 cm), were purchased from Supelco. The reaction was monitored in 1:4 hexanes:EtOAc and visualized under UV and in KMnO4 stain (Rf = 0.30). Consumption of the dihydroxyacetone dimer was used to assess reaction completion (Figure 5A,B). KMnO4 stain was prepared by dissolving 1.5 g of potassium permanganate (Oakwood, 97%), 10g of K2CO3 (Thermo Fisher, 99%), and 1.25 mL of 10% NaOH (Thermo Fisher, 99%) in 200 mL of water and stored in a glass jar, with the sides covered in aluminum foil.
+
+Figure 5. A. The reaction progress at 18hrs under UV (254 nm). To TLC 1, a drop of the reaction solution was removed and diluted with 0.5 mL of DCM. D = 1,3-dihydroxyacetone, Y = (carbethoxymethylene) triphenyphosphorane, A = product. The circles in pencil correspond to UV active spots; B. The reaction progress at 18 h in KMnO4 stain
+
+8. A membrane vacuum pump set to 9 mm Hg was used.
+
+9. Excess DCM in the crude oil will solubilize the TPPO in water and can result in more impurities going into the recrystallization.
+
+10. Ethyl acetate (≥99.5%) was purchased from Fisher and used without further purification.
+
+11. A second run provided 1 with 4.58 g, 36% yield with 93.4% purity by qNMR pdf. 4-(hydroxymethyl)furan-2(5H)-one 1 has the following chemical properties: mp: 45-47 ℃; 1H NMR pdf (500 MHz, CDCl3 (Cambridge Isotope, 99%)) δ 6.04 - 5.99 (m, 1H), 4.90 - 4.82 (m, 2H), 4.58 (s, 2H), 3.03 (s (br), 1H); 13C NMR pdf (126 MHz, CDCl3) δ 173.8, 169.5, 115.0, 71.3, 59.0; FTIR (neat), 3395.70 cm-1, 1724.43 cm-1; HRMS (acpi+): m/z [M+H]+ Calc'd for C5H6O3H: 115.0389, Found: 115.0386. The purity of 1 was determined to be 93.4 wt% by qNMR pdf using dimethylsulfone (Sigma Aldrich TraceCERT®, 99.96% wt%, Note 35) as the internal standard. The product could be stored neat in a -20 ℃ freezer for at least 6 months.
+
+12. Imidazole (ACS grade, 99%) was purchased from Oakwood Chemical and used as received. It is used in slight excess (2 equiv) to neutralize any HCl that may have been liberated from the TBSCl reagent.
+
+13. Tert-butyldimethylchlorosilane (99%) was purchased from Oakwood and used without further purification.
+
+14. Reaction progress was monitored in 1:1 hexanes:EtOAc and visualized in KMnO4 stain (Rf = 0.8) (Figure 6).
+
+Figure 6. The reaction progress at 18 h visualized by KMnO4 stain. To TLC 2, a drop of the reaction solution was removed and diluted with 0.5 mL of DCM. A = 1 and the third lane contains the reaction.
+
+15. Hydrochloric acid (ACS grade) was purchased from Fisher Chemical and used without further purification. It was diluted with deionized water to achieve a 1 M concentration.
+
+16. Magnesium sulfate anhydrous (powder/certified) was purchased from Fisher Chemical and used as received.
+
+17. Pentane was purchased from Fisher Chemical and used as received.
+
+18. An internal thermoprobe was used. The authors recrystallized the product from the solution in a -20 ℃ freezer for 1.5 h. However, due to the potential hazard associated with this protocol, the checkers utilized a 200-mL glass reactor in an EasyMax cooling apparatus. Alternatively, an appropriate solvent/cryogen-based cooling bath or an immersion cooler can also be utilized for this purpose.
+
+19. 4-(((tert-butyldimethylsily)oxy)methyl)furan-2(5H)-1-one (2) has the following chemical properties: mp = 29-31 ℃; 1H NMR pdf (500 MHz, CDCl3) δ 5.98 (s, 1H), 4.81 (s, 2H), 4.56 (s, 2H), 0.91 (s, 11H), 0.10 (s, 7H), 13C NMR pdf (126 MHz, CDCl3) δ 173.6, 169.7, 114.7, 71.1, 59.6, 25.7, 18.2, -5.5.; FTIR (neat): 1731.80 cm-1; HRMS (ACPI+): m/z [M+H]+ Calc'd for C11H20O3SiH: 229.1260, Found: 229.1257. It was found to be 96.6% pure by qNMR pdf using dimethylsulfone as a standard. The product could be stored neat in a -20 ℃ freezer for at least 6 months.
+
+20. The authors utilized a flame-dried a 250-mL 3-neck flask, equipped with a stir-bar and an addition funnel to conduct this reaction. The checkers utilized an oven-dried 200-mL glass reactor out of convenience.
+
+21. Copper (II) chloride dihydrate (99%) was purchased from Sigma Aldrich and used as received. In our hands, bottles that had been open for 6 months or longer were found to have diminished reactivity, likely due to the hygroscopic nature of the reagent.
+
+22. (R)-(-)-DTBM-SEGPHOS (98.0%), was purchased from Strem and used as received.
+
+23. Sodium tert-butoxide (99%) was purchased from Thermo Fisher and used as received.
+
+24. Pentane anhydrous (>99%) in a SureSeal bottle was purchased from Sigma Aldrich and used without further purification.
+
+25. Polymethylhydrosiloxane was purchased from Thermo Scientific and used as received. After being open for a period of time, white solids appeared at the bottom of the reagent, likely from further polymerization. The reagent could still be used but resulted in variable yields (38-59%). Excess PMHS was used to ensure efficient formation of the active copper-hydride catalyst.
+
+26. Toluene, HPLC grade (≥99.7%), was purchased from Fisher and dried with a solvent purifying system from Inert.
+
+27. Isopropanol certified ACS Plus (99%) was purchased from Fisher and used as received. Excess reagent was used to ensure efficient turnover of the copper catalyst.
+
+28. A 0.1 mL aliquot was removed via syringe from the reaction and dispensed into a vial containing 0.5 mL 1 M HCl and 0.5 mL EtOAc. The vial was shaken, and the top layer was removed, concentrated, and taken up in 0.4 mL CDCl3 for 1H NMR analysis. The reaction was considered complete when the peak at 5.98 ppm (corresponding to the α proton of the starting material, 2) had disappeared. TLC analysis can be performed (4:1 hexanes:EtOAc, visualized in UV and KMnO4 (Rf = 0.4)); however, the starting material and the product are copolar. Upon treatment of the TLC plate with KMnO4, the starting material spot appears almost immediately and is darker in color; whereas the product takes longer to appear and is lighter in color (Figure 7 A,B,C).
+
+Figure 7. A. The reaction progress at 3hrs in under UV (254 nm). The crude 3hr NMR sample was used as a TLC sample for 3 (P). SM = 2. The circles in pencil correspond to UV active spots; B. The TLC after immediate exposure to KMnO4 stain; C. The TLC after development of the KMnO4 stain
+
+29. The addition of 1 M aq. HCl to the cold solution resulted in the formation of ice which had to be broken up before efficient transfer to the separatory funnel could be made.
+
+30. PMHS and the isopropoxysilane byproducts can clog filter papers and cotton causing a very slow filtration that will ultimately halt.2
+
+31. Hexanes (≥98.5%) was purchased from Aldrich and used as received.
+
+32. SiliaFlash Irregular Silica Gel GE60, 60-200 μm, 60 Å was purchased from SiliCycle and used as purchased.
+
+33. (S)-4-(((tert-butyldimethylsily)oxy)methyl)dihydrofuran-2(3H)-one (3) has the following properties: [α]25D = -26.4 (c = 1.00 CHCl3), lit3 [α]25D = -19.8 (c = 2.4, CHCl3,); bp = 249-253 ℃; 1H NMR pdf (500 MHz, CDCl3) δ 4.36 (dd, J = 9.5, 3.6 Hz, 1H), 4.17 (dt, J = 9.1, 5.2 Hz, 1H), 3.66 - 3.57 (m, 2H), 2.76 - 2.66 (m, 1H), 2.54 (ddd, J = 17.6, 9.1, 2.9 Hz, 1H), 2.38 (dd, J = 17.3, 6.2 Hz, 1H), 0.88 (s, 10H), 0.05 (s, 6H); 13C NMR pdf (126 MHz, CDCl3) δ 177.1, 70.5, 63.3, 37.3, 30.7, 25.8, 18.2, -5.5; FTIR (neat) = 1774.01 cm-1; HRMS (ACPI+) m/z [M+H]+ Calc'd for C11H22O3SiH 231.1416, Found 231.143. Enantiomeric excess was determined by SFC analysis using a Chiralpak IC-3 column and 4% isopropanol (with 25 nM isobutyl amine modifier) as the mobile phase with 2.0 mL/min flow rate at 40 ℃ with detection at 210 nm, tR (major) = 4.48 min and tR (minor) = 4.77 min (Figure 8). Racemic assay was prepared via a NiCl2-NaBH4-mediated conjugate reduction.4 It was found to be 97.9% pure by qNMR pdf using dimethylsulfone as a standard. The product could be stored neat in a -20 ℃ freezer for at least 6 months.
+
+Figure 8. A. chromatogram for racemic compound 3 (showing 93.4% ee).
+
+34. Dimethylsulfone (>99%) was purchased from Sigma Aldrich as TraceCERT® quality.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+Chiral γ-butyrolactones (GBLs) are common motifs in natural products, and have been found to have a variety of bioactivities including anticancer, antimicrobial, and antifungal (Figure 8).5,6,7 Additionally, many species of Streptomyces utilize highly substituted, epimeric GBLs to regulate natural product production.8 Some of these autoregulators include A-Factor from Streptomyces griseus, the Streptomyces coelicolor butanolides (SCBs), and the Streptomyces virginiae butanolides (VBs), which all contain the same anti α,β-substituted lactone motif with variation in oxidation or stereochemistry at the C1' position (Figure 8). These densely substituted, highly stereogenic, and labile lactones have inspired our synthetic endeavors.
+
+Figure 9: Select GBL containing natural products and metabolites
+
+Historically, these hormones have been synthesized through an aldol or acylation reaction with protected (R)-paraconyl alcohol. There has been interest in accessing this enantiopure core, as evidenced by investigations into methods ranging from kinetic resolution to chiral auxiliary to organocatalytic approaches (Figure 10). One of the first reported approaches was from Mori and Yamane which involved performing a kinetic resolution of (+/-) paraconic acid with (R)-(+)-a-phenethylamine; however, multiple recrystallizations were necessary to obtain enantiopure material, resulting in a low yield of 3%.9 Complete reduction of the carboxylic acid followed by protection of the alcohol to a trimethylsilyl (TMS) ether afforded a protected common intermediate; however, they obtained low overall yields. The use of the labile TMS protecting group resulted in epimerization of the hydroxymethyl substituent at the beta position through transesterification. Mori and Chiba later applied commercially available lipase M to selectively desymmetrize allyl diacetate 7 in 83% ee.10 The resulting alcohol was doubly oxidized and cyclized under acidic conditions to afford (R)-paraconic acid in 15% overall yield. Rawlings and coworkers successfully circumvented the issues of low yield and epimerization through the use of the Evans' oxazolidinone chiral auxiliary and a bulkier, less labile 1,1,2-trimethylpropylsilyl ether protecting group. They successfully installed a benzyl-protected hydroxymethyl group alpha to the N-acyloxazolidinone 8 in 94% yield and >99:1 d:r and in seven steps, successfully obtaining a silyl protected (R)-paraconyl alcohol in 11% overall yield.11 Most recently, Appayee et al, reported a short route to the tert-butyldimethylsilyl (TBS) protected (R)-paraconyl alcohol through an organocatalytic hydroxymethylation approach. Starting from expensive methyl 4-oxobutanoate ($510/g from Sigma Aldrich), 9, hydroxymethylation alpha to the methyl ester via a biaryl prolinol catalyst was afforded in 95% ee in 6 days. Subsequent Pinnick oxidation, cyclization, reduction, and deprotection afforded the protected (R)-paraconyl alcohol in 35% overall yield and 95% ee.3 Although this route efficiently produces 2 in high enantiopurity, the route is hindered by long reaction times and expensive starting materials.
+
+The approach reported herein utilizes affordable commercially available starting materials and can be performed on multi-gram scale to afford enantio-enriched TBS-protected (R)-paraconyl alcohol in under a week.12 The route commences via Wittig olefination between dihydroxyacetone ($0.30/g) (carbethoxymethylene)triphenyl phosphorane ($0.47/g) and spontaneous cyclization to form the butenolide 1. This has been previously described by Zutter and coworkers as a potential scalable route to (S)-3-fluoromethyl-γ-butyrolactone; however, they were unsuccessful in isolating the butenolide on kilogram scale due to triphenylphosphine oxide (TPPO) impurities and abandoned this route.13 We utilized the water-soluble nature of 1 and were successfully able to precipitate out the TPPO. Following recrystallization, butenolide 2 was obtained in modest yield and good purity (96%). With 2 in hand, the alcohol moiety was protected as a TBS-ether in 75% yield and 96% purity after recrystallization in cold pentane. To obtain saturated butenolides, the Donate group previously reported a ruthenium-catalyzed hydrogenation of 4-hydroxymethyl furanones, where they successfully hydrogenated both mono- and disubstituted butenolides but with a broad range of enantiomeric excesses (8-100% ee) and conversions (28-100%).14 This method suffers from long reaction times (a minimum of 72 h) and requires elevated pressure (80 atm). To circumvent the long reaction times and need for high pressures, we were inspired by the copper-catalyzed conjugate hydride addition methodology utilizing polymethylhydrosiloxane (PMHS) as a hydride source developed by Buchwald.15 Initially, the ligand (R)-tol-BINAP was utilized with slightly lower equivalencies of PMHS and isopropanol. We believed we had obtained the lactone 3 in 90% ee. However, the checkers were unable to replicate the original chiral HPLC data, inspiring them to investigate chiral separation methods via SFC. Under their newly optimized conditions, it was determined that the enantiopurity was in fact lower than it was initially though thought to be (74% ee). These results caused us to reassess our initially obtained/submitted chiral HPLC conditions, leading us to realize that that we had not appropriately separated the enantiomers. Upon further optimization, we were able to confirm the ee value determined by the checkers. These results, although unfortunate, highlight the value of Org Syn's checking process and the benefit of leveraging state-of-the-art analytical techniques offered by our industrial partners who checked this procedure. These findings inspired us to continue to optimize the conjugate addition for enhanced enantioselectivity. We were delighted to find that switching the ligand to (R)-(-)-DTMB-SEGPHOS provided the lactone 3 in 61% yield and 93%ee This three-step route provides access to the synthetically useful building block 3 from readily available starting materials in 18% overall yield.
+
+Figure 10: An overview of previous methods to access protected (R)-paraconyl alcohol
+
+References and Notes
+
+Corresponding Author: Elizabeth I. Parkinson- James Tarpo Jr. and Margaret Tarpo Department of Chemistry, Purdue University, West Lafayette, Indiana 47907, United States; Borch Department of Medicinal Chemistry and Molecular Pharmacology, Purdue University, West Lafayette, Indiana 47907, United States; https://orcid.org/0000-0002-3665-5522; email: eparkins@purdue.edu. Financial support was provided by an NSF CAREER Award to E.I.P. (CHE 223689). This work was supported in part by the Research Instrument Center in the Department of Chemistry at Purdue University. The authors would like to thank J. S. Harwood for guidance in qNMR spectroscopy.
+
+Lavis, J. M.; Maleczka, R. E.; Chandrasekaran, V.; Collier, S. J. Polymethylhyrdosiloxane. Encylcopedia of Reagents for Organic Synthesis 2016. https://doi.org/10.1002/047084289x.rn00062.pub2
+
+Sarkale, A. M.; Kumar, A.; Appayee, C. Organocatalytic Approach for Short Asymmetric Synthesis of (R)-Parconyl Alcohol: Application to the Total Syntheses of IM-2, SCB2, and A-Factor Gamma-Butyrolactone Autoregulators. J. Org. Chem. 2018, 83 (7), 4167-4172. https://doi.org/10.1021/acs.joc.8b00122.
+
+Shröer, J.; Welzel, P. Asymmetric Synthesis of a Key Synthetic Precursor for (+)-Strigol and Sorgolactone. Tetrahedron, 1994, 50, 6839-6858. https://www.sciencedirect.com/science/article/pii/S0040402001813375
+
+Mazur, M.; Maslowiec, D. Antimicrobial Activity of Lactones. Antibiotics 2022, 11 (10), 1327. https://www.mdpi.com/2079-6382/11/10/1327.
+
+Hur, J.; Jang, J.; Sim, J. A Review of the Recent Pharmacological Activities and Recent Synthetic Advances of Gamma-Butyrolactones. Int. J. Mol. Sci. 2021, 22 (5), 2769. https://doi.org/10.3390/ijms22052769.
+
+Sartori, S. K.; Nogueira Diaz, M. A.; Diaz-Munoz, G. Lactones: Classification, Synthesis, Biological Activities, and Industrial Applications. Tetrahedron 2021, 84, 132001. https://doi.org/10.1016/j.tet.2021.132001.
+
+Niu, G.; Chater, K. F.; Tian, Y.; Zhang, J. Specialised Metabolites Regulating Antibiotic Biosynthesis in Streptomyces Spp. FEMS Microbiol. Rev. 2016, 40 (4), 554-573. https://doi.org/10.1093/femsre/fuw012.
+
+Mori, K. Revision of the Absolute Configuration of A-Factor: The Inducer of Streptomycin Biosynthesis, Basing on the Reconfirmed (R)-Configuration of (+)-Paraconic Acid Tetrahedron 1983, 39 (19), 3107-3109. https://doi.org/10.1016/S0040-4020(01)91552-2.
+
+Mori, K.; Chiba, N. Preparative Bioorganic Chemistry, XI Preparation of the Enantiomers of Paraconic Acid Employing Lipase-Mediated Asymmetric Hydrolysis of Prochiral Diacetates as the Key Step. Liebigs Ann. Chem. 1989, 1989 (10), 957-962. https://doi.org/10.1002/jlac.198919890251.
+
+Crawforth, J. M.; Fawcett, J.; Rawlings, B. J. Asymmetric Synthesis of A-Factor. J. Chem. Soc. Perkin Trans. 1, 1998, 1721-1726. https://doi.org/10.1039/A708638E.
+
+Wilbanks, L. E.; Hennigan, H. E.; Martinez-Brokaw, C. D.; Lakkis, H.; Thormann, S.; Eggly, A. S.; Buechel, G.; Parkinson, E. I. Synthesis of Gamma-Butyrolactone Hormones Enables Understanding of Natural Product Induction. ACS Chem. Biol. 2023, 18 (7), 1624-1631. https://doi.org/10.1021/acschembio.3c00241.
+
+Adam, J.-M.; Foricher, J.; Hanlon, S.; Lohri, B.; Moine, G.; Schmid, R.; Stahr, H.; Weber, M.; Wirz, B.; Zutter, U. Development of a Scalable Synthesis of (S)-3-Fluoromethyl-γ-Butyrolactone, Building Block for Carmegliptin's Lactam Moiety. Org. Process Res. Dev. 2011, 15 (3), 515-526. https://doi.org/10.1021/op200019k.
+
+Bronze-Uhle, E. S.; de Sairre, M. I.; Donate, P. M.; Frederico, D. Enantioselective Hydrogenation of 4-(Hydroxymethyl)Furan-2(5H)-One Derivatives. J. Mol. Catal. Chem. 2006, 259 (1), 103-107. https://doi.org/10.1016/j.molcata.2006.05.066.
+
+Hughes, G.; Kimura, M.; Buchwald, S. L. Catalytic Enantioselective Conjugate Reduction of Lactones and Lactams. J. Am. Chem. Soc. 2003, 125 (37), 11253-11258. https://doi.org/10.1021/ja0351692.
+
+Appendix
+
+Chemistry Abstracts Nomenclature (Registry Number)
+
+1,3-Dihydroxyacetone Dimer (26776-70-5)
+
+(Carbethoxymethylene)triphenylphosphorane (1099-45-2)
+
+Dichloromethane (75-09-2)
+
+tert-Butyldimethylchlorosilane (18162-48-6)
+
+Imidazole (288-32-4)
+
+Copper (II) Chloride Dihydrate (10125-13-0)
+
+(R)-(-)-DTBM-SEGPHOS (566940-03-2)
+
+Sodium tert-Butoxide (865-48-5)
+
+Isopropanol (67-63-0)
+
+Polymethylhydrosiloxane (9004-73-3)
+
+Pentane (109-66-0)
+
+Toluene (108-88-3)
+
+Haylie Hennigan received her B.S. in Biochemistry from Rowan University in Glassboro, NJ in the fall of 2019. She started her graduate career at Purdue University in West Lafayette, IN under the supervision of Professor Elizabeth Parkinson. Her research focuses on developing synthetic routes and enantioselective methodologies to access densely substituted γ-butyrolactones and butenolides.
+
+Namuunzul Otgontseren was born in Ulaanbaatar, Mongolia and raised in Illinois. She received her B.S. in Chemistry: Sciences and Letters from the University of Illinois at Urbana-Champaign in 2021 where she carried out research under the guidance of Professor Jefferson Chan. She is now working towards her PhD. under the supervision of Professor Elizabeth Parkinson at Purdue University with a focus on the synthesis of biologically relevant small molecules.
+
+Elizabeth I. Parkinson was born and raised in Greenville, MS. She obtained her B.S. in chemistry in 2010 from Rhodes College and her Ph.D. in chemistry from the University of Illinois at Urbana-Champaign with Paul Hergenrother in 2015. Afterwards, she was an NIH postdoctoral fellow with William Metcalf in Microbiology at the University of Illinois at Urbana-Champaign. In 2018, she became an assistant professor in the Departments of Chemistry and Medicinal Chemistry and Molecular Pharmacology at Purdue University.
+
+David A. Petrone was born in Ontario, Canada, in 1989. He received his B.Sc. degree with honors in Chemistry from the University of Guelph and his Ph.D. in chemistry at the University of Toronto with Mark Lautens. Afterwards, he was an NSERC postdoctoral fellow at the ETH in Zürich with Professor Erick M. Carreira and later a postdoctoral fellow at the University of Toronto with Professor Doug Stephan. He joined the Department of Process Research & Development at Merck & Co., Inc. in 2020 where he is currently works in the Discovery Process Chemistry Group.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

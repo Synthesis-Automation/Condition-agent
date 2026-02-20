@@ -1,0 +1,389 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 303-314
+
+DOI: 10.15227/orgsyn.102.0303
+
+OS Techniques
+
+Glass Cannula for Bulb-to-Bulb Cold Transfer
+
+Submitted by Kaylin N. Flesch, Tyler J. Fulton, Nathan Hart, and Brian M. Stoltz*1
+
+Checked by Mira Milic and Christopher D. Vanderwal
+
+1. Procedure (Note 1)
+
+A. 3-Phenyl-propionaldehyde (2). A glass cannula apparatus (Note 2, Figure 1A) is secured in place with the stopcock between the two flasks open. The transfer flask is equipped with a septum and connected to an argon/vacuum manifold (Note 3) with a bubbler via a 20G needle. The receiving flask is equipped with a 1.5 cm x 0.5 cm magnetic stir bar and a septum with a temperature probe and an external bubbler connected via a 20G needle. Under vacuum, the glass cannula apparatus is flame dried, and it is placed under an argon atmosphere for the course of the reaction. The receiving flask is charged with 3-phenylpropanoic acid ethyl ester (1) (0.18 mL, 1.0 equiv, 1.0 mmol) and 10 mL dichloromethane to create a homogeneous, colorless solution (Note 4). A flame dried, 25-mL conical flask equipped with a rubber septum and connected to an argon/vacuum manifold with an 18G needle is under an argon atmosphere. The flask is charged with 2.4 mL dichloromethane and diisobutylaluminum hydride (DIBAL) (0.27 mL, 0.798 g/mL, 1.5 mmol, 1.5 equiv) (Note 5) which is thoroughly mixed by swirling the flask. The transfer flask is charged with the DIBAL solution (Figure 1B, 1C). The glass cannula apparatus is immersed in a dry ice-acetone bath for 10 min until the internal temperature stabilizes at -78 ℃ or lower. The solution in the receiving flask is stirred at a rate of 450 rpm (Figure 1D, 1E; Note 6).
+
+Figure 1. A) Glass cannula apparatus. B) and C) Reaction set up prior to cooling. D) and E) Apparatus in the dry ice-acetone bath. F) Transfer of DIBAL solution via glass cannula
+
+The transfer of DIBAL solution is initiated by closing the stopcock connecting the two flasks and the gas outlet of the external bubbler on the argon manifold (the manifold is not open to any additional lines--it may be necessary to slightly increase the flow of argon, to assist pressure buildup in the transfer flask and facilitate transfer of the DIBAL solution) (Figure 1F). The internal temperature of the receiving flask does not exceed -75 ℃ (Note 7) as the solution is transferred. After 2 min the bubbler and stopcock are reopened. The transfer flask is charged with 1.0 mL dichloromethane and cooled for 10 min. The transfer is repeated by closing the stopcock connecting the two flasks and then closing the bubbler on the argon manifold. The receiving flask internal temperature does not exceed -75 ℃ throughout the addition period (Note 7). After 2 min, the bubbler and stopcock are reopened, and the reaction mixture is stirred for an additional 1 h (Note 8).
+
+The reaction is quenched by a dropwise addition of ethyl acetate (0.06 mL, 0.6 mmol, 0.6 equiv). The remaining DIBAL solution in the transfer flask is quenched with a dropwise addition of 0.1 mL ethyl acetate. The reaction solution is then charged with 10 mL of saturated aqueous sodium potassium tartrate solution and stirred vigorously at 900 rpm, and the reaction apparatus is removed from the cooling bath and allowed to warm to ambient temperature. Stirring continues for approximately 4-4.5 h at which point the biphasic mixture separates into two clear layers (Figure 2A). The reaction mixture is then transferred to a separatory funnel with 10 mL of diethyl ether and 10 mL of brine (Figure 2B). The layers are separated, and the aqueous layer is extracted with 10 mL of diethyl ether. The combined organic layers are dried over anhydrous Na2SO4 (16 g), filtered through a funnel with cotton into a 100-mL round bottom flask with 2 x 5 mL diethyl ether rinses. The organics are concentrated by rotary evaporation under vacuum (450 mm Hg, 20 ℃). The crude product is filtered through a plug of silica gel (18 g) in a 60 mL course frit filter with 160 mL of 2:8 diethyl ether/hexanes (Note 9, Figure 2C). Material is loaded onto the plug via pipette by dissolving the residue with a minimal amount of eluent. The first 50 mL to elute contains no product and is discarded. The next 110 mL to elute containing product is collected in a 250 mL round bottom flask, and the organics are concentrated by rotary evaporation under vacuum (637 mm Hg, 20 ℃) and then trace solvent was removed under high-vacuum at 2 Torr (long exposure to vacuum can result in loss of product). The product (2) is obtained (120 mg, 0.89 mmol, 90% yield), and it is a colorless liquid with a pungent, spicy-floral odor (Notes 10, 11). Quantitative NMR analysis found ≥97% product purity (Notes 12, 13).
+
+Figure 2. A) Biphasic mixture after stirring the reaction mixture with aqueous sodium potassium tartrate. B) Separatory funnel with aqueous solution and diethyl ether. C) Silica plug with crude product and diethyl ether/hexanes eluent
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical.) See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with 3-phenylpropanoic acid ethyl ester, diisobutylaluminum hydride (DIBAL), isopropyl alcohol, ethyl acetate, dichloromethane, sodium potassium tartrate, sodium sulfate, diethyl ether, hexanes, 1,3,5-trimethoxybenzene, and d-chloroform. DIBAL is a pyrophoric, air and moisture sensitive regent and should be handled with care. When in use, the regent bottle should be secured with a clamp, and the headspace should be kept under an inert gas atmosphere. All needles used with DIBAL should be flushed with hexanes followed by a 1:9 isopropyl alcohol-hexanes solution.
+
+2. The checkers utilized a modified glass cannula apparatus with the following dimensions that differed from the one used by the authors (schematics of the apparatus used by the authors depicted in Figure 3) : 1) the necks of the round-bottomed flasks were 85 mm vs. 80 mm in length, 2) the glass straw tubing attaching the two round-bottomed flasks was 2.5 mm vs. 5 mm in length, and 3) the round-bottomed flasks had a larger volume capacity of 75 mL vs. 50 mL. Despite the larger size of the glass cannula apparatus used by the checkers compared to the one employed by the authors, the reaction still proceeded successfully when run at the same scale as originally reported by the authors; however, it may explain why a longer reaction time was needed by the checkers (1 h vs. the 20 min originally recommended by the authors, see Note 8) to attain full conversion from 1 to 2.
+
+Figure 3. Schematics of Glass Cannula
+
+3. The authors used a nitrogen/vacuum manifold to keep the reaction under an inert atmosphere, whereas the checkers employed an argon/vacuum manifold (resulting in no discernible effects on the reaction).
+
+4. Ethyl 3-phenylpropionate (Sigma-Aldrich), diisobutylaluminum hydride (reagent grade, Sigma-Aldrich), isopropyl alcohol (certified ACS plus, Fisher Chemical), ethyl acetate (ACS certified, Fisher Chemical), sodium potassium tartrate (Fischer), sodium sulfate (anhydrous, Fisher Chemical), diethyl ether (ACS certified, BHT Stabilized, Fisher Chemical), hexanes (ACS certified, Fisher Chemical), and 1,3,5-trimethoxybenzene (ReagentPlus, ≥99%, Sigma-Aldrich) were purchased and used as received. Dichloromethane (>99.9%) was purchased from Fisher Scientific and dried via filtration through an activated alumina column under argon. Chloroform-D (D 99.8%) was purchased from Cambridge Isotope Laboratories, Inc. to which approx. 5 g oven dried K2CO3/100 mL was added to deacidify the solvent. The checkers used ethyl 3-phenylpropionate (99%, Sigma-Aldrich), ethyl acetate (ACS certified, Sigma-Aldrich), hexanes (HPLC grade, ACS certified, Fisher Chemical), 1,3,5-trimethoxybenzene (ReagentPlus, ≥99%, Sigma-Aldrich, and 99%, Acros Organics), that were used as is with no additional purification. Chloroform-D (99.8%) was also purchased from Cambridge Isotope Laboratories, Inc, but stored over 3Å molecular sieves that were dried in an Isotemp® Vacuum Oven Model 285A at 144 ℃ and 27 mm Hg.
+
+5. When in use, the DIBAL reagent bottle should be secured with a clamp, and the headspace should be kept under an inert gas atmosphere (Figure 4). All needles and syringes used to transfer DIBAL are immediately quenched by thoroughly flushing the syringe with hexane followed by a rinse with a solution of approximately 1:9 isopropyl alcohol-hexane.
+
+Figure 4. Properly secured bottle of DIBAL equipped with a taped septum. The headspace is under an inert gas atmosphere.
+
+6.
+
+Figure 5. Sketch of the reaction set up.
+
+7. Although the authors recommend that the reaction temperature in the receiving flask does not exceed -75 ℃ throughout both addition periods, the checkers have noted that temperature increases by several degrees higher (resulting in an overall temperature no greater than -70 ℃), which can be difficult to control but does not result in overreduction or other adverse effects on the reaction.
+
+8. The reaction is monitored by thin layer chromatography (TLC) analysis using silica gel 60 F254-plates from Millipore Sigma with 2:8 diethyl ether-hexane as an eluent and visualized with UV light and KMnO4 stain followed by gentle heating. Rf = 0.5 for the ester starting material (1) and Rf = 0.3 for 2. The TLC may be misleading as reduction can continue to occur in the spotter. The reaction may appear complete after the second transfer; however, it is stirred for an extra 1 h to ensure full starting material conversion.
+
+Figure 6. A) TLC after first DIBAL addition. B) TLC after second DIBAL addition. C) TLC after 20 min. D) TLC of crude reaction. E) TLC of eluted material from plug
+
+9. Silica gel (SiliaFlash® P60, 40-63 μm) was purchased from SiliCycle.
+
+10. 2 is stored with a headspace of argon at -20 ℃ and is stable to short term storage.
+
+11. Characterization for 2: 1H NMR pdf (400 MHz, CDCl3, 298 K) δ: 9.83 (s, 1H), 7.33 - 7.26 (m, 2H), 7.24 - 7.17 (m, 3H), 2.97 (t, J = 7.5 Hz, 2H), 2.79 (t, J = 7.4 Hz, 2H); 13C NMR pdf (100 MHz, CDCl3, 298 K): δ 201.7, 140.5, 128.8, 128.4, 126.5, 45.4, 28.3; IR (neat film): 3028, 2923, 2824, 2724, 1720, 1603, 1496, 1454, 1056, 1032, 743, 698; HRMS (TOF MS EI+): m/z calc'd for C9H10O [M]+: 134.0732, found 134.0734; Boiling point: 102 ℃ (determined by the authors).
+
+12. Purity was assessed by qNMR pdf of 2 (120.0 mg) in CDCl3 with 1,3,5-trimethyoxybenzene (150.0 mg) as an internal standard, with 16 scans and a relaxation time (D1) set to 60 s. The purity of the product obtained was determined to be 99.7%.
+
+13. A duplicate reaction performed on identical scale furnished 121 mg of product (90%), with a purity of 97.0% (by qNMR) pdf.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+DIBAL has long been used for the selective reduction of esters, nitriles, and amides to aldehydes.2 To address over reduction of the carbonyl to the alcohol, cryogenic temperatures are often used to perform the single hydride reduction to access aldehydes. However, due to variable temperature control during the addition of DIBAL over reduction and other undesired reactivity can still occur.
+
+In the synthesis of (-)-Transtaganolide A, (+)-Transtaganolide B, (+)-Transtaganolide C, and (-)-Transtaganolide D, single hydride reduction of methyl ester 3 could not be selectively achieved due to the many electrophilic carbonyl moieties in the complex molecule.3 Therefore, a glass cannula apparatus was employed to allow for precise temperature control for the addition of reagents as both flasks and the cannula itself can be fully submerged in a bath of the desired temperature.4 It is also advantageous that it does not condense water in the internal canula that could leak into reactions with water sensitive reagents and cause contamination and reagent quenching. Being able to control the temperature of the DIBAL solution during addition via the glass cannula provided a means for selective reduction of methyl ester 3 to aldehyde 4 (Scheme 1). The glass cannula can be applied more generally for reactions necessitating precise temperature control of all reagents during addition including but not limited to the DIBAL reduction to afford 2.
+
+Scheme 1. Selective reduction of methyl ester 3 to aldehyde 4 in the synthesis of Transtaganolide natural products.
+
+References and Notes
+
+The Warren and Katharine Schlinger Laboratory for Chemistry and Chemical Engineering, Division of Chemistry and Chemical Engineering, California Institute of Technology, Pasadena, California 91125, United States; orcid.org/0000-0001-9837-1528; Email: stoltz@caltech.edu. The NIH-NIGMS (R35GM145239), Heritage Medical Research Investigators Program, and Caltech are thanked for the support of our research program. We thank Dr. David VanderVelde (Caltech) for NMR expertise and Dr. Mona Shagholi (Caltech) for mass spectrometry assistance.
+
+L. I. Zakharkin & I. M. Khorlina. Reduction of esters of carboxylic acids into aldehydes with diisobutylaluminium hydride. Tetrahedron Lett. 1962, 3, 619-620.
+
+H. M. Nelson, J. R. Gordon, S. C. Virgil, B. M. Stoltz. Total Syntheses of (-)-Transtaganolide A, (+)-Transtaganolide B, (+)-Transtaganolide C, and (-)-Transtaganolide D and Biosynthetic Implications. Angew. Chem. Int. Ed. 2013, 52, 6699-6703.
+
+The origin of the glass cannula apparatus is unknown. BMS first saw a version of the apparatus in the Corey lab.
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+3-phenylpropanoic acid ethyl ester: Ethyl 3-phenylpropionate; (1) (2021-28-5)
+
+diisobutylaluminum hydride (DIBAL); (1191-15-7)
+
+Kaylin N. Flesch was born in Waukesha, WI in 1998 and obtained her B.S. degree in chemistry in 2019 from University of Wisconsin - Madison with Prof. Shannon Stahl. She is currently a graduate student in the lab of Prof. Brian Stoltz studying the development of asymmetric methods for the construction of bridged cyclic systems and natural product total synthesis.
+
+Tyler J. Fulton was born in Hazelton, PA in 1994 and obtained his B.S. and M.S. degrees in 2016 from Bucknell University studying organozinc chemistry with Prof. Michael Krout. He then earned his Ph.D. at Caltech studying natural product total synthesis and the development of methods for acyclic stereocontrol. He then was a postdoctoral scholar in the lab of Prof. Frances Arnold at Caltech using directed evolution to engineer new biocatalytic transformations. He currently is a process chemist at AbbVie.
+
+Nathan Hart was born in Santa Barbara, CA in 1991 and graduated from Salem Community College with a degree in Scientific Glass Technologies in 2015. While attending school he worked for a local glass business "AMK glass" in Vineland, NJ. After graduating he moved west to work at "Elemental Scientific" in Golden, CO before being hired at Caltech in 2018.
+
+Brian M. Stoltz was born in Philadelphia, PA in 1970 and obtained his B.S. degree from the Indiana University of Pennsylvania in Indiana, PA. After acquiring his Ph.D. at Yale University in the laboratory of John L. Wood, he commenced an NIH postdoctoral fellowship at Harvard under E. J. Corey. In 2000, he accepted a position at Caltech, where he is currently a Professor of Chemistry. His research interests lie in the development of new methodologies with general applications in synthetic chemistry.
+
+Mira Milic was born in San Francisco, CA in 1998 and obtained her B.S. degree from the University of California, Davis in 2021 with Prof. Annaliese Franz. She is currently a graduate student in the lab of Prof. Christopher Vanderwal at the University of California, Irvine, working on natural products total synthesis and SAR studies for medicinal chemistry applications.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

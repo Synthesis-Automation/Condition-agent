@@ -1,0 +1,323 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 273-275
+
+DOI: 10.15227/orgsyn.102.0273
+
+Editorial
+
+Announcing "OS Techniques" - A New Category of Articles in Organic  Syntheses
+
+Rick  L. Danheiser*
+
+The Board of Editors of Organic Syntheses is pleased to announce the launch of a new category of articles for the journal:  "OS Techniques".  In contrast to current Organic  Syntheses articles that illustrate synthetically significant chemical  reactions, the aim of OS Techniques articles is to illustrate important experimental techniques that are employed in the synthesis of organic compounds.
+
+Historical  Perspective
+
+The original purpose of articles published in Organic Syntheses was to provide the research  community with reliable procedures for the preparation of specific compounds of  interest, including compounds that were no longer available from commercial  sources due to exigencies associated with the First World War.  Many of the articles published in Organic  Syntheses continue to have this as their aim, and procedures for the  preparation of important chiral ligands and catalysts, for example, comprise popular subjects for articles submitted to the journal.   As time passed, however, the aim of more and more articles published in Organic  Syntheses has been to provide a representative example of a general  synthetic method, and in fact over 80% of the articles published during the  past two years fall into this category.  In  this case, the aim of the article is to exemplify a general synthetic  transformation by describing its application to a specific substrate, usually a  commercially available compound.  These articles thus provide readers with a validated and very detailed representative procedure that they can use as a model in applying the general synthetic transformation  to a substrate involved in their own research.
+
+OS Techniques
+
+OS Techniques articles differ in that they focus on providing a representative example of the application of an important experimental  technique.  For example, the  inaugural OS Techniques article by Danheiser, Dong, et al.1 provides  two detailed and reliable protocols for carrying out what is perhaps the most  important purification method used in synthetic organic chemistry: flash column  chromatography.  In this OS Techniques  article, a test sample of 1 g of the monoterpene linalool is prepared  containing 100 mg each of farnesol and linalyl acetate as contaminants.  The mixture is then subjected to purification  by flash column chromatography via two alternative protocols.  Linalool is recovered in over 94-95% yield  with 96-99% purity by using either isocratic elution (illustrated in Part A of  the article) or by gradient elution (in Part B). The two protocols illustrate various other aspects  of flash chromatography, such as alternative methods for applying the sample  ("wet loading" vs. "dry-loading"), the use of different grades of silica gel,  and different methods for packing the column. A detailed discussion section provides further guidance on planning a purification and on making decisions with regard to the various alternative techniques.
+
+As is the case with all results published in Organic Syntheses,  the results of the application of OS Techniques will be independently "checked" for reproducibility and verified in the laboratory of a member of the Organic  Syntheses Board of Editors prior to publication.  In the case of this initial OS Techniques  article, the purity and yield (i.e., recovery) of linalool is reported and  provides a benchmark for researchers and students to use as they practice and  perfect their skill with this technique.  The Board of Editors anticipates that these OS  Techniques articles will thus prove to be a valuable resource not only for  experienced researchers but also in the training and education of students of  experimental synthetic organic chemistry.
+
+A Call  for Articles
+
+Effective immediately, the Board of Editors is considering the submission of OS Techniques articles for checking and publication in Organic Syntheses.  Guidance for Authors of OS Techniques  articles is available under the "For Authors" tab on the orgsyn.org  website.  The style and format of OS Techniques articles is essentially the same as for articles describing chemical  reactions, and the same requirements for experimental detail and proof of  purity apply.  Authors are required to  submit a procedure checklist and a characterization checklist as well as NMR  spectra files for all products.
+
+Prospective authors are referred to the inaugural OS Techniques article1 as an example of the style and format of this new category of Organic  Syntheses articles.  An essential  feature of all Organic Syntheses articles is that the reactions and  techniques must be illustrated with examples involving specific compounds and  that all reactants must be commercially available at a cost of less than $500  per run.
+
+The Board of Editors welcomes submissions on any experimental technique with utility in the synthesis of organic compounds.  As an option, authors may gauge the interest  of the Board by initially submitting a proposal http://www.orgsyn.org/instructionspa.aspx that describes the technique  they propose to illustrate and the substrate(s) they propose to employ in the  demonstration of the experimental procedures.   We anticipate that there will be interest from the community in articles  on the most basic techniques (preparative thin layer chromatography,  recrystallization, sublimation, etc.) as well as more advanced techniques.
+
+Prospective authors are invited to contact Rick Danheiser (Editor in Chief) and Rich Taylor (Associate Editor) with any questions that are not answered in  the Guidance and Instructions posted on the OrgSyn website.
+
+References and Notes
+
+Senzer, B. D.;  Varongchayakul, C.; Danheiser, R. L.; Daniels, B.; Dong, V. M. Purification of  Organic Compounds by Flash Column Chromatography. Org. Synth. 2025, 102,  276-302, DOI: 10.152271orgsyn.102.0276.
+
+Rick L. Danheiser received    his undergraduate education at Columbia where he carried out research in the laboratory of Professor Gilbert Stork.  He received his Ph.D. at Harvard in 1978 working under the direction of E. J. Corey on the total synthesis of gibberellic acid.  Dr. Danheiser is the A. C. Cope Professor    of Chemistry at MIT where his research focuses on the design and invention of new annulation and cycloaddition reactions, and their application in the    total synthesis of biologically active compounds.  Danheiser has been Editor-in-Chief of Organic Syntheses  since 2004.
+
+Copyright © 1921-, Organic Syntheses, Inc.  All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

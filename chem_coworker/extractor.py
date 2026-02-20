@@ -195,7 +195,7 @@ class NotesExtractor:
             from .tools.literature import _fetch_webpage
             result = _fetch_webpage(
                 url=source,
-                save_as=self._url_to_filename(source) if save_to_literature else "",
+                save_as="__auto__" if save_to_literature else "",
                 max_chars=40000,  # intake can handle more than query-time
             )
             if not result.get("success"):
@@ -291,6 +291,7 @@ class NotesExtractor:
 
         prompt = build_extract_prompt(note_type).format(
             source_name=source_name,
+            source_url=source_url or "(not available)",
             date=date.today().isoformat(),
             document_text=doc_text,
         )

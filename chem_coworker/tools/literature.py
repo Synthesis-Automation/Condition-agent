@@ -463,10 +463,19 @@ class _TextExtractor(HTMLParser):
         text = "".join(self._parts)
         # Unescape HTML entities (&amp; → &, &lt; → <, etc.)
         text = _html_module.unescape(text)
-        # Collapse runs of whitespace/blank lines
-        text = re.sub(r"[ \t]+", " ", text)
-        text = re.sub(r"\n{3,}", "\n\n", text)
-        return text.strip()
+        # Strip each line; collapse runs of blank lines to at most one
+        lines = [line.strip() for line in text.splitlines()]
+        result: List[str] = []
+        prev_blank = False
+        for line in lines:
+            if not line:
+                if not prev_blank:
+                    result.append("")
+                prev_blank = True
+            else:
+                result.append(line)
+                prev_blank = False
+        return "\n".join(result).strip()
 
 
 def _fetch_webpage(
@@ -578,7 +587,26 @@ def _fetch_webpage(
     else:
         extracted_display = extracted
 
-    # Optionally save to literature folder
+    # Resolve auto filename: title slug + query params for disambiguation
+    if save_as == "__auto__":
+        from urllib.parse import urlparse as _urlparse, parse_qs as _parse_qs
+        _p = _urlparse(url)
+        _qvals = [v for vs in _parse_qs(_p.query).values() for v in vs]
+
+        if page_title:
+            name = re.sub(r"[^\w\s\-]", "", page_title).strip()
+            name = re.sub(r"\s+", "_", name).lower()[:50].strip("_")
+        else:
+            _stem = _p.path.rstrip("/").split("/")[-1]
+            name = re.sub(r"\.[^.]+$", "", _stem) or _p.netloc
+
+        # Append query values so generic titles become specific
+        # e.g. "organic_syntheses_procedure" + ["v92p0195"] → "organic_syntheses_procedure_v92p0195"
+        if _qvals:
+            name = f"{name}_{'_'.join(_qvals)}" if name else "_".join(_qvals)
+        save_as = name
+
+    # Optionally save to knowledge_base/sources/ folder
     saved_as = ""
     if save_as:
         save_as = save_as.strip()

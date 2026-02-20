@@ -1,0 +1,487 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 350-366
+
+DOI: 10.15227/orgsyn.102.0350
+
+Preparation of tBu-MsFluind-Br
+
+Submitted by Lucas Wagner and Josep Cornella*1
+
+Checked by Szymon Maciej Kosc, Katherine Clark, and Darren Dixon
+
+1. Procedure (Note 1)
+
+A. 2,7-Di-tert-butyl-9-methylenfluorene (Note 2). A 1-L two-necked round-bottom flask, equipped with a 5-cm cylindrical Teflon-coated magnetic stirring bar and an argon inlet is charged with 2,7-di-tert-butylfluorene (22 g, 79 mmol) (Note 3) and potassium tert-butoxide (8.9 g, 79 mmol, 1 equiv) (Note 4) and cooled down to 0 ℃ using an ice bath. At this temperature, dry tetrahydrofuran (400 mL) (Note 5) is added via cannula transfer to give an orange suspension which is vigorously stirred (400 rpm) for 20 min at 0 ℃. Then paraformaldehyde (7.10 g, 236 mmol, 3 equiv) (Note 6) is added in one portion and the cooling bath is removed after 5 min stirring at 0 ℃. The argon inlet is replaced with a septum with an argon-filled balloon (Note 7). The red suspension is stirred at room temperature (21 ℃) for 18 h.
+
+Figure 1. A. Setup; B. Mixture of starting material in tetrahydrofuran; C. Aspect after addition of paraformaldehyde; D. Aspect after 18 h; E. chromatography set up; F. Thin layer chromatography (TLC) of product in 100 % cyclohexane; G. Crude TLC; H. Fractions TLC; I. Product. (Photos A-D and H are provided the checkers and photos E-G are provided by the authors)
+
+After this time, the reaction is quenched by carefully adding a saturated aqueous solution of sodium hydrogen carbonate (300 mL) and the mixture is transferred into a 1-L separatory funnel via a glass funnel to separate the two phases. The organic layer is collected and the aqueous layer is transferred back into the separatory funnel and washed with 200 mL ethyl acetate. This step is repeated one more time and the combined organic layers are dried over magnesium sulfate (36 g) (Note 8) and filtered through a paper filter (Note 9). Silica (15 g) (Note 10) is added to the yellow solution and then concentrated by rotary evaporation (270 to 7.5 mm Hg, 40 ℃).
+
+The crude product is purified via a chromatographic column (diameter of 8 cm) using silica gel (315 g) (Note 10) which is prepared by mixing with the eluent system (100% cyclohexane) in an Erlenmeyer flask and then transferred to the column (height of 14 cm). One protective layer of sand is added after flushing out the excess solvent, after which the crude product is added, followed by a second protective layer of sand. The solvent is collected in fractions (250-mL fractions 1-4, 1000-mL fractions 5-7, 500-mL fractions 8-14), monitored by TLC (Note 11) to obtain the desired product in fractions 4 to 13. These fractions are concentrated by rotary evaporation (176 to 7.5 mm Hg, 40 ℃) and dried under vacuum to afford the desired product as a yellow powder (first run: 20.0 g, 68.9 mmol, 87 %; second run: 18.4 g, 63.3 mmol, 80 %) (Note 12).
+
+B. 1-Bromo-3,5-bis(1-hydroxy-1-methylethyl)benzene (2) (Note 2). A 500-mL three-necked round-bottom flask equipped with a 5-cm cylindrical Teflon-coated magnetic stirring bar, a 100-mL dropping funnel, and an argon inlet, is charged with methylmagnesium bromide in diethyl ether (65 mL, 195 mmol, 3.0 mol/L, 5.3 equiv) (Note 13) via syringe. Dry tetrahydrofuran (160 mL) (Note 5) is added via cannula transfer and the solution is cooled down to 0 ℃ in an ice bath while stirring vigorously to give a grey suspension.
+
+A 100-mL beaker is charged with dimethyl 5-bromoisophthalate (10 g, 36.6 mmol) (Note 14) under air and dissolved in dry tetrahydrofuran (50 mL) under air. The resulting solution is transferred to the dropping funnel and then added to the reaction dropwise at 0 ℃ to form a yellow suspension. The cooling bath is removed, the argon inlet is replaced with a septum with an argon filled balloon, and the mixture is stirred at room temperature (21 ℃) for 18 h.
+
+After this time, the reaction is quenched by carefully (Note 15) adding a saturated aqueous solution of ammonium chloride (100 mL) and the mixture is transferred into a 500 mL separatory funnel via a glass funnel to separate the two phases. The organic phase is collected in a 250-mL round-bottom flask and concentrated by rotary evaporation (270 mm Hg to 7.5 mm Hg, 40℃) to form a solid, which is scratched off, mixed with diethyl ether (200 mL) and sonicated for 5 min until most of the solid is solubilized. The resulting suspension is transferred via glass funnel into a 500-mL separatory funnel and washed with a saturated aqueous solution of sodium chloride (100 mL). The organic layer is dried over anhydrous sodium sulfate (25 g) (Note 16), filtered through a paper filter (Note 9), flushed with 30 mL diethyl ether and concentrated by rotary evaporation (176 to 7.5 mm Hg, 40℃). The resulting solid is collected on a 75 mL medium-porosity (size 4) sintered glass filter and washed with n-pentane (first time 20 mL, second time 10 mL) and dichloromethane (2 × 5 mL) to afford the desired product as a white powder (first run: 8.90 g, 32.6 mmol, 89%; second run (half scale): 4.27 g, 15.6 mmol, 85%) (Note 17).
+
+Figure 2. A. Reaction setup; B. Methylmagnesium bromide at 0℃ in tetrahydrofuran; C. Aspect after adding starting material; D. Washing setup; E. Product. (photos provided by the authors)
+
+C. 1-Bromo-3,5-bis(1-chloro-1-methylethyl)benzene (3) (Note 2). A 250-mL two-necked round-bottom flask, equipped with a 5-cm cylindrical Teflon-coated magnetic stirring bar and an argon inlet is charged with 1-bromo-3,5-bis(1-hydroxy-1-methylethyl)benzene (6.0 g, 22 mmol, 1 equiv) and - via cannula transfer - dry dichloromethane (100 mL) (Note 18) to form a white suspension. The suspension is cooled down to 0 ℃ in a water/ice bath while it is vigorously stirred. Thionyl chloride (4.0 mL, 55 mmol, 2.5 equiv) (Note 19) is added slowly dropwise via syringe. The cooling bath is removed, the argon inlet is replaced with a septum with an argon-filled balloon, and the mixture is stirred at room temperature (21 ℃) for 18 h. After this time, the reaction is concentrated by rotary evaporation in a fume hood (350 mm Hg to 7.5 mm Hg, 40℃) to form a brown/grey sticky solid, which is used without further purification (first run: 6.65 g, 21.4 mmol, 97%; second run: 6.50 g, 21.0 mmol, 95%) (Note 20). Of note, the authors removed the volatiles using a vacuum pump (7.5 mm Hg) and a cooling trap filled with liquid nitrogen.
+
+Figure 3. A. Suspension of the starting material in DCM; B. Suspension after adding thionyl chloride; C. Aspect after 18 h; D. Product (Photos provided by the checkers)
+
+D. tBu-MsFluindBr (4) (Note 2). A 1-L three-necked round bottom flask, equipped with a 5-cm cylindrical Teflon-coated magnetic stirring bar and an argon inlet is charged with 1-bromo-3,5-bis(1-chloro-1-methylethyl)benzene (5.00 g, 16.1 mmol), 2,7-di-tert-butyl-9-methylenfluorene (9.40 g, 32.2 mmol, 2 equiv) and dry dichloromethane (300 mL, via cannula transfer) (Note 18). The yellow solution is cooled down to 0 ℃ in a water/ice bath. While the mixture is vigorously stirred at 0 ℃ a boron trichloride solution in dichloromethane (16.1 mL, 16.1 mmol, 1 M, 1 equiv) (Note 21) is added slowly dropwise via syringe to form a dark red to black solution. After 5 min of stirring, the cooling bath is removed, the argon inlet is replaced with a septum with an argon filled balloon, and the mixture is stirred at room temperature (21 ℃) for 18 h.
+
+After this time, the reaction is quenched by carefully adding a 1 M aqueous solution of sodium hydroxide (200 mL) and the mixture is transferred into a 1-L separatory funnel to separate the organic layer. The remaining aqueous layer is washed with dichloromethane (100 mL) and the organic layer is separated. This step is repeated two more times and the combined organic layers are concentrated by rotary evaporation (176 to 7.5 mm Hg, 40 ℃). The formed solid is solubilized in dichloromethane (150 mL) and poured on a 125-ml medium-porosity (size 4) sintered glass filter, which is charged with a 3-cm high silica plug (Note 10) wetted with dichloromethane. The residues in the flask from the previous drying are rinsed with dichloromethane (50 mL) and also poured over the same silica plug as before. The silica plug is then flushed with dichloromethane (250 mL) to collect the crude product as a yellow solution in a 500-mL round-bottom flask and concentrated by rotary evaporation (176 to 7.5 mm Hg, 40 ℃). Pentane (100 mL) is added to the formed solid after scratching from the flask and the slurry is poured over a 75-mL medium-porosity (size 4) sintered glass filter. The round-bottom flask, used for rotary evaporation, is again washed with n-pentane (100 mL) and also poured over the same sintered glass filter, followed by washing the solids with n-pentane (300 mL) to afford the desired product as a white powder. To fully dry the product, the solid is connected to a vacuum pump (7.5 mm Hg) and left in an oil bath at 100 ℃ for 12 h (first run: 10.45 g, 12.77 mmol, 79%; second run: 10.60 g, 12.96 mmol, 80%) (Note 22).
+
+Figure 4. A. Solution of the two starting materials; B. Solution after the addition of BCl3; C. Aspect after quenching; D. Filtering setup; E. Product. (Photos A-C are provided by the checkers and photo D is provided by the authors)
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with 2,7-di-tert-butylfluorene, potassium tert-butoxide, tetrahydrofuran, paraformaldehyde, sodium hydrogen carbonate, ethyl acetate, magnesium sulfate, silica, cyclohexane, methylmagnesium bromide, diethyl ether, dimethyl 5-bromoisophthalate, ammonium chloride, sodium chloride, sodium sulfate, n-pentane, dichloromethane, thionyl chloride, boron trichloride and sodium hydroxide. Caution: boron trichloride and thionyl chloride can form hydrogen chloride in the presence of water.
+
+2. All the glass material used for the preparation was flame dried with a heat gun under high vacuum (4 x 10-3 mm Hg).
+
+3. 2,7-Di-tert-butylfluorene (98 %) was purchased from BLD Pharmatech and used as received.
+
+4. Potassium tert-butoxide (reagent grade, ≥98 %) was purchased from Sigma-Aldrich Chemie GmbH, dried over-night under vacuum (7.5 mmHg), and used directly in the reaction.
+
+5. Anhydrous tetrahydrofuran over molecular sieves was purchased from Fisher Scientific and used as received.
+
+6. Paraformaldehyde (96 %) was purchased from Fisher Scientific and used as received.
+
+7. The balloon was used with a 21 G needle purchased from BD Microlance
+
+8. 'Magnesium sulfate - dried Laboratory reagent grade' was purchased from Thermo Scientific and used as received.
+
+9. A paper filter of QL100 range and with a diameter of 185 mm purchased from Fisher Scientific was used.
+
+10. Silica was purchased from Sigma Aldrich (40 - 63 μm) and used as received.
+
+11. As can be seen at Figure 1H, every fraction of product monitored by TLC also contain a baseline spot. This spot has no influence of the purity and is no longer found after drying (Figure 1F).
+
+12. Analytic data for 2,7-di-tert-butyl-9-methylenfluorene (1) 1H NMR pdf (500 MHz, CDCl3) δ 7.76 (d, J = 1.4 Hz, 2H), 7.58 (d, J = 7.5 Hz, 2H), 7.41 (dd, J = 7.9, 1.8 Hz, 2H), 6.07 (s, 2H), 1.41 (s, 18H); 13C NMR pdf (126 MHz, CDCl3) δ 150.0, 144.2, 138.3, 137.9, 126.1, 119.2, 117.8, 106.6, 35.0, 31.7; IR pdf (ATR): 2960, 1475, 1427, 1362, 1255, 1226, 1103, 897, 824, 740, 685-1 ; mp: 169-170 ℃; HRMS (ESI+): calc'd for C22H27: 291.2027 [M+H]+;  found: 291.2094. Purity was determined to be 99 % and 97 % (for first and second run respectively) wt % by qNMR pdf using 1,3,5-trimethoxybenzene (99 %, Sigma-Aldrich) as an internal standard.
+
+13. Methylmagnesium bromide in diethyl ether (3.0 mol/L) was purchased from Sigma-Aldrich and used as received by using a constant argon flow to ensure the dryness.
+
+14. Dimethyl 5-bromoisophthalate (97 %) was purchased from BLD Pharmatech and used as received.
+
+15. Since CH4 is formed under strong bubble formation, the first 10 mL are added very slowly via a glass pipette, followed by slowly addition of the remaining saturated aqueous solution of ammonium chloride.
+
+16. Sodium sulfate (anhydrous) was purchased from Fisher Scientific and used as received.
+
+17. Analytic data for 1-bromo-3,5-bis(1-hydroxy-1-methylethyl)benzene (2) 1H NMR pdf (500 MHz, CDCl3) δ 7.55 (t, J = 1.7 Hz, 1H), 7.49 (d, J = 1.5 Hz, 2H), 1.91 (s, 2H), 1.57 (s, 12H); 13C NMR pdf (126 MHz, CDCl3) δ 151.5, 126.3, 122.6, 119.4, 72.6, 31.9; IR pdf (ATR): 3318, 2972, 1567, 1409, 1363, 1231, 1167, 959, 875,783,754,624 cm-1; mp: 135-136 ℃; HRMS (ESI+): calc'd for C12H17BrO2Na: 295.0304; found: 295.0298. Purity: Determined to be 99 % and 97 % (for first and second run respectively) wt% by qNMR pdf using 1,3,5-trimethoxybenzene (99 %, Sigma-Aldrich) as an internal standard.
+
+18. Anhydrous dichloromethane over molecular sieves was purchased from Fisher Scientific and used as received.
+
+19. Thionyl chloride was purchased by Sigma-Aldrich Chemie GmbH (reagent Plus, ≥99 %) and is stored and used under argon.
+
+20. Analytic data for 1-bromo-3,5-bis(1-chloro-1-methylethyl)benzene (3) 1H NMR pdf (400 MHz, CDCl3) δ 7.74 (t, J = 1.8 Hz, 1H), 7.62 (d, J = 1.7 Hz, 2H), 1.98 (s, 12H); 13C NMR pdf (101 MHz, CDCl3) δ 148.5, 128.1, 122.3, 122.0, 68.7, 34.4; IR pdf (ATR): 2981, 1692, 1570, 1454, 1369, 1276, 1229, 1134, 1105, 868, 779, 696, 632 cm-1; mp: 83-84 ℃; HRMS (ESI-): calc'd for C12H15Cl2Br: 307.972881; not found. For both of the checkers' runs, determined to be 99 %. Wt% by qNMR pdf using 1,3,5-trimethoxybenzene (99 %, Sigma-Aldrich) as an internal standard. The authors noted differences in purity from batch to batch, according to GC/MS analysis, by following the same procedure. Nevertheless, no impact on the next step was obtained.
+
+21. Boron trichloride solution in dichloromethane (1 M) was purchased by Sigma-Aldrich Chemie GmbH and is stored and used under argon.
+
+22. Analytic data for tBu-MsFluindBr (4) 1H NMR pdf (400 MHz, CDCl3) δ 7.40 (d, J = 7.9 Hz, 4H), 7.24 (s, 1H), 7.18 (dd, J = 8.0, 1.8 Hz, 4H), 7.03 (d, J = 1.4 Hz, 4H), 2.46 (s, 4H), 1.62 (s, 12H), 1.21 (s, 36H); 13C NMR pdf (101 MHz, CDCl3) δ 156.8, 153.2, 150.2, 143.4, 138.3, 123.6, 120.3, 118.6, 118.1, 115.6, 64.0, 57.4, 43.4, 34.9, 32.9, 31.8; IR pdf (ATR): 2957, 2903, 2867, 1474, 1459, 1404, 1362, 1279, 1254, 881, 820, 745 cm-1; mp: 325-326 ℃ (most of the solid sublimed or melted at this temperature); HRMS (ESI-): calc'd for C56H65Br1: 816.426425; not found. Purity: For both of the checkers' runs, the purity was determined to be 100 wt % by qNMR pdf using 1,3,5-trimethoxybenzene (99 %, Sigma-Aldrich) as an internal standard.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+In recent years, our group has become interested in developing catalytic methodologies based on cheap and relatively non-toxic bismuth. We became particularly interested in unlocking the powerful redox couples available for this element.5 In this regard, our group has provided evidences for low-valent Bi(I)/Bi(III),6,7,8 high-valent Bi(III)/Bi(V),9,10 Bi(III) redox neutral catalysis;11 recently, radical Bi(I)/Bi(II)/Bi(III) catalysis has also arisen as a viable platform.12 Within these frameworks, low-valent catalysis based on Bi(I) complexes prevails as one of the most versatile options, due to the dual polar/radical reactivity observed. However, the synthesis of such complexes is challenging, due to the high tendency of Bi(I) to dimerize leading to Bi=Bi structures.13 In 2010 however, Dostál capitalized on the chelating effect of imine-based pincer complexes to report the first monomeric organobismuth(I) complex.14 Since then, numerous reports in the area appeared studying the chemistry15 and electronics of such complexes.16,17,18,19,20,21,22,23,24,25 Despite these advances, the synthesis and isolation of a genuine Lewis-base free and unsupported organobismuthinidene remained a synthetic challenge.
+
+Based on seminal reports from Tamao26 and building upon recent examples where the MsFluind framework has been used to isolate exclusive main group elements in different oxidation states,27,28,29,30,31 we set out to explore the possibility of accessing a genuine organobismuth(I) based on this framework. Indeed, the MsFluind framework is characterized by the remarkable steric protection around the central element, as well as an extreme rigidity on the fluorene wings. Based on these premises, a Br/Li exchange of MsFluind-Br (Ar-Br, 7), followed by a metalation with BiCl3 led to the corresponding Ar-BiCl2 (8) (Figure 1, top). Subsequent reduction with cobaltocene led to the isolation of a dark solid, which corresponded to the dimeric Ar-Bi=Bi-Ar.
+
+Figure 1. Differences between MsFluind-Br vs tBu-MsFluind-Br in bismuth complexes.
+
+Hence, despite the steric encumbrance and rigidity provided by MsFluind, dimerization of the resulting Bi(I) still occurred. A closer look into the XRD of 9 revealed that the fluorene rings experimented a remarkable torsion in order to accommodate the Bi=Bi double bond. At this point, we envisaged that the placement of tBu groups in the fluorene units would increase the steric pressure, impeding an intermolecular encounter to forge a Bi=Bi. Br/Li exchange in tBu-MsFluind-Br (Ar*-Br), followed by BiBr3 led to the formation of the corresponding Ar*-BiBr2 (5). At this point, reduction with cobaltocene resulted in the isolation of 6 as a yellow solid.32 The isolation of 6 validated our initial hypothesis and highlights the dramatic influence of these substituents in providing the required steric encumbrance in occasions where dimerization is enforced.
+
+Compound 6 is monomeric both in solution and in the solid state, as judged by NMR, XRD, EA and HRMS. XAS confirmed the Bi(I) oxidation state. It was surprising to find that compound 6 appears diamagnetic, with no signals observed by EPR or SQUID. Although variable temperature NMR results in sharp peaks across >100 ℃, some chemical shifts of the central aromatic ring are heavily affected. This might be the consequence of the SO-HALA effect exerted by the Bi(I).33 Theoretical analysis in combination with the unusual UV-Vis revealed that the ground state of complex 6 is mainly dominated by a triplet state, with alternative electronic configurations higher in energy. However, these conclusions were initially in conflict with the magnetic measurements: the molecule is an apparent diamagnet as observed by EPR and SQUID. Yet, due to the incredibly large relativistic effects associated to Bi34 SOC (spin-orbit coupling) plays a decisive role in interpreting accurately the electronic structure, spectra and magnetism. Indeed, the ground state is dominated by a triplet state, but due to SOC, the ms=0 remains thermally isolated at ca 4500 cm-1 away from the next ms=+1 and -1. Such a remarkably large axial ZFS (zero-field splitting) is amongst the largest known, and renders thermal population of the above magnetic sublevels unfeasible with regular magnets. Hence, complex 6 appears diamagnetic, despite its triplet ground state.
+
+As aforementioned, the synthesis of tBu-MsFluind-Br was crucial to isolate the first organobismuthinidene complex, and allowed us to discover novel properties for organobismuth. This structure already aided our group in discovering an unusual Ar*-Sb=Sb-Ar* complex, bearing a rather long double bond, which dissociates at higher temperatures leading to a monomeric Sb(I) complex.28 We believe that the multi-gram preparative article reported here will accelerate the discovery of other unusual structures and discover the unique properties that lie behind them.
+
+References and Notes
+
+Max-Planck-Institut für Kohlenforschung, D-45470 Mülheim/Ruhr, Germany. Email: cornella@kofo.mpg.de, ORCID: 0000-0003-4152-7098. Financial support for this work was provided by Max-Planck-Gesellschaft, Max-Planck-Institut für Kohlenforschung and Fonds der Chemischen Industrie (VCI).
+
+Nakano, T.; Yade, T. J. Anionic polymerization of 2,7-di-t-butyldibenzofulvene: Synthesis, structure, and photophysical properties of oligomers with a π-stacked conformation. Polym. Sci. 2005, 44, 561-572. DOI: 10.1002/pola.21164.
+
+Matsuo, T.; Suzuki, K.; Fukawa, T.; Li, B.; Ito, M.; Shoji, Y; Otani, T.; Li, L.; Kobayashi, M.; Hachiya, M.; Tahara, Y.; Hashizume, D.; Fukunaga, T.; Fukazawa, A.; Li, Y.; Tsuji, H.; Tamao, K. Synthesis and structures of a series of bulky "Rind-Br" based on a rigid fused-ring s-hydrindacene skeleton. Bull. Chem. Soc. Jpn 2011, 84, 1178-1191. DOI: 10.1246/bcsj.20110090.
+
+He, Y.; Dai, C.; Wang, D.; Zhu, J.; Tan, G. Phosphine-stabilized germylidenylpnictinidenes as synthetic equivalents of heavier nitrile and isocyanide in cycloaddition reactions with alkynes. J. Am. Chem. Soc. 2022, 144, 5126-5135. DOI: 10.1021/jacs.2c00305.
+
+Moon, H. W.; Cornella, J. Bismuth Redox Catalysis: An Emerging Main-Group Platform for Organic Synthesis. ACS Catal. 2022, 12, 1382-1393. DOI: 10.1021/acscatal.1c04897.
+
+Pang, Y.; Leutzsch, M.; Nöthling, N.; Katzenburg, F.; Cornella, J. Catalytic Hydrodefluorination via Oxidative Addition, Ligand Metathesis, and Reductive Elimination at Bi(I)/Bi(III) Centers. J. Am. Chem. Soc. 2021, 143, 12487-12493. DOI: 10.1021/jacs.1c06735.
+
+Moon, H. W.; Wang, F.; Bhattacharyya, K.; Planas, O.; Leutzsch, M.; Nöthling, N.; Auer, A. A.; Cornella, J. Mechanistic Studies on the Bismuth-Catalyzed Transfer Hydrogenation of Azoarenes. Angew. Chem. Int. Ed. 2023, 62, e202313578. DOI: 10.1002/anie.202313578.
+
+Wang, F.; Planas, O.; Cornella, J. Bi (I)-catalyzed transfer-hydrogenation with ammonia-borane. J. Am. Chem. Soc. 2019, 141, 4235-4240. DOI: 10.1021/jacs.9n00594.
+
+Planas, O.; Wang, W.; Leutzsch, M.; Cornella, J. Fluorination of arylboronic esters enabled by bismuth redox catalysis. Science 2020, 367, 313-317. DOI: 10.1126/science.aaz2258.
+
+Planas, O.; Peciukenas, V.; Cornella, J. Bismuth-Catalyzed Oxidative Coupling of Arylboronic Acids with Triflate and Nonaflates Salts. J. Am. Chem. Soc. 2020, 142, 11382-11387. DOI: 10.1021/jacs.0c05343.
+
+Magre, M.; Cornella, J. Redox-Neutral Organometallic Elementary Steps at Bismuth: Catalytic Synthesis of Aryl Sulfonyl Fluorides J. Am. Chem. Soc. 2021, 143, 21497-21502. DOI: 10.1021/jacs.1c11463.
+
+Mato, M.; Spinnato, D.; Leutzsch, M.; Moon, H. W.; Reijerse, E. J.; Cornella, J. Bismuth radical catalysis in the activation and coupling of redox-active electrophiles. Nat. Chem. 2023, 15, 1138-1145. DOI: 10.1038/s41557-023-01229-7.
+
+Tokitoh, N.; Arai, Y.; Okazaki, R; Nagase, S. Synthesis and Characterization of a Stable Dibismuthene: Evidence for a Bi-Bi Double Bond. Science 1997, 277, 78-80. DOI: 10.1126/science.277.5322.78.
+
+Šimon, P.; de Proft, F.; Jambor, R.; Růžička, A.; Dostál, L. Monomeric Organoantimony(I) and Organobismuth(I) Compounds Stabilized by an NCN Chelating Ligand: Syntheses and Structures. Angew. Chem. Int. Ed. 2010, 49, 5468-5471. DOI: 10.1002/anie.201002209.
+
+Hejda, M.; Jirásko, R.; Růžička, A.; Jambo, R.; Dostál, L. Probing the Limits of Oxidative Addition of C(sp3)-X Bonds toward Selected N,C,N-Chelated Bismuth(I) Compounds. Organometallics 2020, 39, 4320-4328. DOI: 10.1021/acs.organomet.0c00418.
+
+Vránová, I.; DuŠkavá, T.; Erben, M.; Jambor, R.; Růžička, A.; Dostál, L. Trapping of the N, C, N-chelated organobismuth (I) compound, [2,6-(Me2NCH2) 2C6H3] Bi, by its coordination toward selected transition metal fragments. J. Organomet. Chem. 2018, 863, 15-20. DOI: 10.1016/j.jorganchem.2018.03.024.
+
+Šimon, P.; Jambor, R.; Růžička, A.; Dostál, L. Oxidative addition of diphenyldichalcogenides PhEEPh (E= S, Se, Te) to low-valent CN-and NCN-chelated organoantimony and organobismuth compounds. Organometallics 2013, 32, 239-248. DOI: 10.1021/om3010383.
+
+Vránová, I.; Alonso, M.; Lo, R.; Sedlák, R.; Jambor, R.; Růžička, A.; Proft, F. D.; Hobza, P.; Dostál, L. From Dibismuthenes to Three-and Two-Coordinated Bismuthinidenes by Fine Ligand Tuning: Evidence for Aromatic BiC3N Rings through a Combined Experimental and Theoretical Study. Chem. Eur. J. 2015, 21, 16917-16928. DOI: 10.1002/chem.201502724.
+
+Fridrichová, A.; Svoboda, T.; Jambor, R.; Padĕlková, Z.; Růžička, A.; Erben, M.; Jirásko, R.; Dostál, L. Synthesis and structural study on organoantimony (III) and organobismuth (III) hydroxides containing an NCN pincer type ligand. Organometallics 2009, 28, 5522-5528. DOI: 10.1021/om900607n.
+
+Kořenková, M.; Kremláček, V.; Hejda, M.; Turek, J.; Khudaverdyan, R.; Erben, M.; Jambor, R.; Růžička, A.; Dostál, L. Hetero Diels-Alder reactions of masked dienes containing heavy group 15 elements. Chem. Eur. J. 2020, 26, 1144-1154. DOI: 10.1002/chem.201904953.
+
+Kořenková, M.; Hejda, M.; Erben, M.; Jirásko, R.; Jambor, R.; Růžička, A.; Rychagova, E.; Ketkov, S.; Dostál, L. Reversible C=C bond activation by an intramolecularly coordinated Antimony (I) compound. Chem. Eur. J. 2019, 25, 12884-12888. DOI: 10.1002/chem.201902968.
+
+Vránová, I.; Alonso, M.; Jambor, R.; Růžička, A.; Turek, J.; Dostál, L. Different Products of the Reduction of (N), C, N-Chelated Antimony (III) Compounds: Competitive Formation of Monomeric Stibinidenes versus 1H-2, 1-Benzazastiboles. Chem. Eur. J. 2017, 23, 2340-2349. DOI: 10.1002/chem.201604142.
+
+Zechovský, J.; Kertész, E.; Kremláček, V.; Hejda, M.; Mikysek, T.; Erben, M.; Růžička, A.; Jambor, R.; Benkö, Z.; Dostál, L. Exploring Differences between Bis (aldimino)-and amino-aldimino-N, C, N-Pincer-Stabilized Pnictinidenes: Limits of Synthesis, Structure, and Reversible Tautomerization-Controlled Oxidation. Organometallics 2022, 41, 2535-2550. DOI: 10.1021/acs.organomet.2c00236.
+
+Walley, J. E. ; Warring, L. S. ; Wang, G. ; Dickie, D. A. ; Pan, S. ; Frenking, G. ; Gilliard, R. J. J. Carbodicarbene Bismaalkene Cations: Unravelling the Complexities of Carbene versus Carbone in Heavy Pnictogen Chemistry. Angew. Chem. Int. Ed. 2021, 60, 6682-6690. DOI: 10.1002/ange.202014398.
+
+Gimferrer, M.; Danés, S.; Andrada, D. M.; Salvador, P. Unveiling the Electronic Structure of the Bi(+1)/Bi(+3) Redox Couple on NCN and NNN Pincer Complexes. Inorg. Chem. 2021, 60, 17657-17668. DOI: 10.1021/acs.inorgchem.1c02252.
+
+Matsuo, T.; Suzuki, K. ; Fukawa, T.; Li, B.; Ito, M.; Shoji, Y.; Otani, T ; Li, L.; Kobayashi, M.; Hachiya, M.; Tahara, Y.; Hashizume, D.; Fukunaga, T. ; Fukazawa, A. ; Li, Y.; Tsuji, H.; Tamao, K. Synthesis and Structures of a Series of Bulky "Rind-Br" Based on a Rigid Fused-Ring s-Hydrindacene Skeleton. Bull. Chem. Soc. Jpn. 2011, 84, 1178-1191. DOI: 10.1246/bcsj.20110090.
+
+Olaru, M.; Mebs, S.; Beckmann, J. Cationic Carbene Analogues: Donor-Free Phosphenium and Arsenium Ions. Angew. Chem. Int. Ed. 2021 60, 19133-19138. DOI: 10.1002/anie.202107975.
+
+Pang, Y.; Leutzsch, M.; Nöthling, N.; Cornella, J. Dihydrogen and Ethylene Activation by a Sterically Distorted Distibene. Angew. Chem. Int. Ed. 2023, 62, e202302071. DOI: 10.1002/anie.202302071.
+
+Wu, M.; Li, H.; Chen, D. W.; He, W. Y; Xu, L.; Ye, S.; Tan, G. A triplet stibinidene. Chem 2023, 9, 2573-2584. DOI: 10.1016/j.chempr.2023.05.005.
+
+Wang, D.; Zhai, C.; Chen, Y.; He, Y.; Chen, X.-D.; Wang, S.; Zhao, L.; Frenking, G.; Wang, X.; Tan, G. An isolable germylyne radical with a one-coordinate germanium atom. Nat. Chem. 2023, 15, 200-205. DOI: 10.1038/s41557-022-01081-1.
+
+Janssen, M.; Frederichs, T.; Olaru, M.; Lork, E.; Hupf, E.; Beckmann, J. Synthesis of a stable crystalline nitrene. Science 2024, DOI: 10.1126/science.adp4963.
+
+Pang, Y.; Nöthling, N.; Leutzsch, M.; Kang, L.; Bill, E.; van Gastel, M.; Reijerse, E.; Goddard, R.; Wagner, L.; SantaLucia, D.; DeBeer, S.; Neese, F.; Cornella, J. Synthesis and isolation of a triplet bismuthinidene with a quenched magnetic response. Science 2023, 380, 1043-1048. DOI: 10.1126/science.adg2833.
+
+Vicha, J.; Novotný, J.; Komorovsky, S.; Straka, M.; Kaupp, M.; Marek, R.Relativistic Heavy-Neighbor-Atom Effects on NMR Shifts: Concepts and Trends Across the Periodic Table. Chem. Rev. 2020, 120, 7065-7103. DOI: 10.1021/acs.chemrev.9b00785.
+
+Pyykko, P. J. C. R. Relativistic effects in structural chemistry. Chem. Rev. 1988, 88, 563-594. DOI: 10.1021/cr00085a006
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+2,7-di-tert-butylfluorene (1)(58775-05-6)
+
+Potassium tert-butoxide (865-47-4)
+
+Paraformaldehyde (30525-89-4)
+
+Methylmagnesium bromide (75-16-1)
+
+Dimethyl 5-bromoisophthalate (51760-21-5)
+
+Thionyl chloride (7719-09-7)
+
+Boron trichloride (10294-34-5)
+
+Josep Cornella (Pep) obtained his PhD in 2012 from Queen Mary University of London (UK), in the group of Prof. Igor Larrosa. He then pursued postdoctoral studies in the groups of Prof. Ruben Martin at the ICIQ (Spain) and Prof. Phil S. Baran at the Scripps Research Institute (USA). In 2017, he was selected by the Max-Planck-Society to create and lead the Laboratory for Sustainable Catalysis at the Max-Planck-Institut für Kohlenforschung (Germany), as a Max Planck Research Group Leader. In April 2025, he was promoted to Director for the Sustainable Catalysis Department.
+
+Lucas Wagner, born in 1999 in Bochum, completed his apprenticeship in synthetic chemistry in 2021 at the Max-Planck-Institut für Kohlenforschung (Germany). During this time, he worked in the group of Prof. Benjamin List (homogenous catalysis) and in the group of Dr. Josep Cornella (sustainable catalysis), where he is still working as a laboratory technician in the fields of metal catalysis and organic synthesis. Alongside his work, he is studying business administration and business psychology at the FOM Hochschule für Oekonomie & Management (Germany).
+
+Szymon Maciej Kosc was born in Łódź, Poland. He completed his MChem degree at the University of Edinburgh in 2023. He spent the final year of the degree at the University of Chicago, where he worked with Prof. Scott Snyder on the total synthesis of a polyoxygenated natural product. He is currently working towards a DPhil under the supervision of Prof. Darren Dixon at the University of Oxford.
+
+Katherine Clarke is from London, UK. She completed her MSci in Chemistry at the University of Bristol in 2022. For the final year of her degree, she worked on Pd catalysed C-H bond activation, supervised by Prof. Robin Bedford. Currently, Katherine in is a member of the OxICFM 2022 cohort, and is working toward her DPhil under the supervision of Prof. Darren Dixon (co-supervised by Prof. Simon Aldridge) at the University of Oxford.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days

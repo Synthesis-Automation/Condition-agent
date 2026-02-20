@@ -1,0 +1,425 @@
+A Publication
+
+of Reliable
+Methods
+
+for the Preparation
+
+of Organic Compounds
+
+Search Citation
+
+Search Text
+
+Annual Volume
+
+103
+102
+101
+100
+99
+98
+97
+96
+95
+94
+93
+92
+91
+90
+89
+88
+87
+86
+85
+84
+83
+82
+81
+80
+79
+78
+77
+76
+75
+74
+73
+72
+71
+70
+69
+68
+67
+66
+65
+64
+63
+62
+61
+60
+59
+58
+57
+56
+55
+54
+53
+52
+51
+50
+49
+48
+47
+46
+45
+44
+43
+42
+41
+40
+39
+38
+37
+36
+35
+34
+33
+32
+31
+30
+29
+28
+27
+26
+25
+24
+23
+22
+21
+20
+19
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+Page
+
+GO
+
+Anywhere
+Title
+Author
+Checked by
+CAS
+
+GO
+
+?
+
+Home
+
+Search
+
+For Authors
+
+Instructions for Articles
+
+Instructions for Perspectives
+
+Instructions for Discussion Addenda
+
+Instructions for Article Templates
+
+Instructions for Proposing Articles
+
+Google Drive Logo
+
+Guidance for OS Techniques Articles
+
+Article Template
+
+OS Technique Template
+
+OS Perspective Template
+
+Discussion Addenda Template
+
+Ethical Guidelines
+
+Submission
+
+Submit an Article
+
+Submit a Perspective
+
+Submit a Discussion Addendum
+
+Propose an Article
+
+Suggest a Subject for an Article
+
+About OrgSyn
+
+About OrgSyn
+
+DEIR Statement
+
+History of OrgSyn
+
+Board of Editors
+
+Board of Directors
+
+Former Editors
+
+List of Volume Editors
+
+Most Accessed Articles
+
+Most Cited Articles
+
+Safety
+
+Safety and Waste Disposal Information
+
+Safety Notes
+
+Grants/Programs
+
+OS Philanthropy
+
+OS PUI Grants
+
+OS Workshop
+
+Contact OrgSyn
+
+Website related questions
+
+Procedure related questions
+
+^
+
+Top
+
+Org. Synth. 2025, 102, 114-127
+
+DOI: 10.15227/orgsyn.102.0114
+
+Photoexcited Nitroarenes for the Anaerobic Cleavage of Alkenes
+
+Submitted by Lifeng Yin, Ben S. Kozloff, Ning Deng, Preya D. Persaud, Ajay H. Bansode, Dan E. Wise, Jenny S. Martinez,* and Marvin Parasram*1
+
+Checked by Cailean Bonella, Alberto Ristache, and Darren Dixon
+
+1. Procedure (Note 1)
+
+Benzophenone (3). An oven-dried 100-mL (Note 2), single neck (24/29 joint), round-bottomed flask equipped with a 2.5 x 1.0 cm Teflon-coated magnetic stir bar is charged with 1,1-diphenylethene (1) (3.61 g, 20.0 mmol, 1.0 equiv) (Note 3) and 4-nitrobenzonitrile (2) (6.52 g, 44.0 mmol, 2.2 equiv) (Note 4). The flask is purged with nitrogen for 15 min (Figure 1A). After purging, the outlet needle is removed, 16.5 mL of anhydrous acetonitrile (Note 5) is added via syringe with a 21-G needle (120 mm). A N2-filled double-skinned balloon is connected to the flask via needle and the reaction is allowed to stir (1000 rpm), yielding a pale-yellow solution. Four 390 nm Kessil LED lamps (three PR160L-390nm and one PR160-390nm) are placed 3 cm from all four sides of the flask. A strong flow of nitrogen through an inverted funnel directed at the reaction flask was used to maintain an ambient temperature of approximately 30 ℃ (Note 6, Figures 1B and 1C). After continuously stirring (670 rpm) for 20 min to ensure thorough mixing, the LED lamps and strong flow of N2 are turned on, initiating the reaction. A cardboard box is used to cover the reaction. The temperature increased to 35 ℃ over the course of the reaction.
+
+After 36 h, the reaction mixture is dark orange in color (Figure 1D). An aliquot is taken, diluted in ethyl acetate (1 mL) (Note 7) in a 2-dram vial and the reaction is deemed to be complete by TLC analysis (Note 8). The reaction mixture is concentrated using a rotary evaporator (40 ℃, 10 mbar) (Figure 1e).
+
+Figure 1. A. Starting materials (1 and 2) under N2; B. Starting materials (1 and 2) after addition of CH3CN; C. Reaction flask is irradiated with four 390 nm LED lamps; D. Reaction mixture after 36 h; E. Solvent is removed by rotary evaporator (Photo A was provided the checkers and Photos B-E were provided by the authors)
+
+Next, the mixture is dissolved in dichloromethane (50 mL) (Note 9), silica gel (8 g) is added, and the solvent is removed under reduced pressure using a rotary evaporator (40 ℃, 10 mbar) to yield an orange powder (Figure 2A). The dry powder is directly loaded onto a 150 g silica gel column (8 cm x 12 cm) (Figure 2B). Sand is carefully added to the top of the column. The flash column is eluted with a gradient of 500 mL 100% hexanes, 6 L 0.3% ethyl acetate/hexanes (Note 10). The first 3 L of eluent from the column is collected in an Erlenmeyer flask before fraction collection begins. The ketone product (3) elutes in fractions 33-130 (Note 11) as determined by TLC analysis on silica gel with 5% ethyl acetate/hexanes (254 nm UV visualization) (Note 12).
+
+The fractions containing product (3) are transferred to a 1-L round-bottomed flask and concentrated under reduced pressure using a rotary evaporator (40 ℃, 10 mbar). The flask is then connected to a Schlenk line and dried under high vacuum (25 ℃, 1 mm Hg) to afford 2.63 g of benzophenone (3) (72% yield, 99.8% purity determined by qNMR analysis) as a pale-yellow oil (Figure 2C, Note 13). A second run afforded 2.62 g of benzophenone (3) (72% yield, 98.6% purity determined by qNMR analysis) as a pale-yellow oil.
+
+Figure 2. A. Crude reaction mixture concentrated onto 8 g of silica gel; B. Purification by column chromatography; C. Isolated benzophenone product 3 (Photo A was provided by the checkers and Photos B-C were provided by the authors)
+
+2. Notes
+
+1. Prior to performing each reaction, a thorough hazard analysis and risk assessment should be carried out with regard to each chemical substance and experimental operation on the scale planned and in the context of the laboratory where the procedures will be carried out. Guidelines for carrying out risk assessments and for analyzing the hazards associated with chemicals can be found in references such as Chapter 4 of "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at https://www.nap.edu/catalog/12654/prudent-practices-in-the-laboratory-handling-and-management-of-chemical. See also "Identifying and Evaluating Hazards in Research Laboratories" (American Chemical Society, 2015) which is available via the associated website "Hazard Assessment in Research Laboratories" at https://www.acs.org/about/governance/committees/chemical-safety.html. In the case of this procedure, the risk assessment should include (but not necessarily be limited to) an evaluation of the potential hazards associated with Benzophenone, 4-Nitrobenzonitrile, 1,1-Diphenylethene, Acetonitrile, Ethyl Acetate, DCM, Hexanes, CDCl3.
+
+2. All reactions were conducted in oven-dried glassware under an atmosphere of nitrogen.
+
+3. 1,1-Diphenylethylene (98.0%) was purchased from Fluorochem Ltd and used as received.
+
+4. 4-Nitrobenzonitrile (97.0%) was purchased from Fluorochem Ltd and used as received.
+
+5. Acetonitrile (99.9%) extra dry over molecular sieve, AcroSeal® was purchased from Thermo Scientific and used as received.
+
+6. In contrast to the checkers, the authors utilized fans to help maintain ambient temperature.
+
+7.Ethyl acetate (99.7%) was purchased from Sigma-Aldrich and used as received.
+
+8. The sample was dissolved in ethyl acetate in a 2-dram vial and checked for conversion using TLC with starting material and product standards. TLC analysis showed that the starting material was completely consumed.
+
+Figure 3. TLC after 36 h showing crude (left), 4-nitrobenzonitrile (2, center), and Benzophenone (3, right) (5% ethyl acetate/hexanes) (Photos provided by the checkers)
+
+9. Dichloromethane (99.8%) was purchased from Sigma-Aldrich and used as received.
+
+10. Hexanes (97.0%) was purchased from Sigma-Aldrich and used as received.
+
+11. The size of the test tube is 16 mm x 150 mm, with each fraction having a volume of 20 mL.
+
+12. TLC analysis of the column is shown below. The TLC plates were eluted with 5% ethyl acetate/hexanes and visualized using 254 nm UV light.
+
+Figure 4. TLC analysis of column fractions (Photos provided by the checkers)
+
+13. Benzophenone (3) is characterized as follows: pale yellow oil; 1H NMR pdf (400 MHz, CDCl3) (δ, ppm): 7.83-7.79 (m, 4H), 7.62-7.57 (m, 2H), 7.51-7.46 (m, 4H). 13C NMR pdf (101 MHz, CDCl3) (δ, ppm): 196.9, 137.8, 132.6, 130.2, 128.4. IR (film cm-1): 3061, 2919, 2850, 2360, 2341, 1658. [M + H]+ calc'd for C13H10O: 183.0804. Found: 183.0808. The purity of 3 was determined to be 98.6% by qNMR pdf using trimethoxybenzene as an internal standard.
+
+Working with Hazardous Chemicals
+
+The procedures in Organic Syntheses are intended for use only by persons with proper training in experimental organic chemistry. All hazardous materials should be handled using the standard procedures for work with chemicals described in references such as "Prudent Practices in the Laboratory" (The National Academies Press, Washington, D.C., 2011; the full text can be accessed free of charge at http://www.nap.edu/catalog.php?record_id=12654). All chemical waste should be disposed of in accordance with local regulations. For general guidelines for the management of chemical waste, see Chapter 8 of Prudent Practices.
+
+In some articles in Organic Syntheses, chemical-specific hazards are highlighted in red "Caution Notes" within a procedure. It is important to recognize that the absence of a caution note does not imply that no significant hazards are associated with the chemicals involved in that procedure. Prior to performing a reaction, a thorough risk assessment should be carried out that includes a review of the potential hazards associated with each chemical and experimental operation on the scale that is planned for the procedure. Guidelines for carrying out a risk assessment and for analyzing the hazards associated with chemicals can be found in Chapter 4 of Prudent Practices.
+
+The procedures described in Organic Syntheses are provided as published and are conducted at one's own risk. Organic Syntheses, Inc., its Editors, and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures herein.
+
+3. Discussion
+
+Ozonolysis of alkenes remains a primary means of obtaining key carbonyl functional groups found in natural products and drug candidates. The earliest ozone reaction can be traced back to 1840 when Schönbein discovered ozone,2 and he successfully published the first article on ozone-induced oxidative cleavage in 1846.3,4 As ozone cleavage reactions became more widespread, it was gradually realized that they pose several potential risks. Firstly, the highly reactive nature and toxicity of ozone may pose a danger to operators in laboratory and industrial environments. Secondly, the excessive generation of ozone can lead to side reactions and impurities in the products.5,6 Lastly, ozone is not suitable for oxidatively sensitive compounds, leading to limited substrate scope for conventional ozonolysis reactions.
+
+In recent years, the application of transition metals in catalyzing the cleavage of alkenes has become more widespread. SanMartin and co-workers conducted a detailed analysis and discussion of various transition metals for catalyzing the cleavage of alkenes.7 Kroutil's team, in addition to studying common transition metals, also included a discussion on biocatalysis using manganese-containing enzymes, that demonstrated activity towards styrene derivatives, utilizing tert-butyl hydroperoxide as an oxidant in the presence of molecular oxygen.8
+
+However, most transition metal methods suffer from drawbacks such as the use of precious metals, narrow applicability range, and the generation of toxic waste.9,10 Enzymatic catalysis also faces challenges such as enzyme specificity, slow reaction rates, and high costs.11
+
+Owing to the recent advances in photochemical applications, photocatalytic oxidation reactions have become a major area of focus. In 2021, Xiao and colleagues reported a visible-light-induced manganese-catalyzed cleavage reaction of alkenes.12 Many similar photocatalytic alkene cleavage reactions have been successfully developed.13 While practical, the terminal oxidant in these systems is often supplied by oxygen, giving a tendency for overoxidation, leading to limitations in substrate scope. Therefore, there is a need for more stable oxidants to efficiently oxidize alkenes under anaerobic conditions.
+
+Table 1. Selected substrate scope. Isolated yields are reported.
+
+In this work, we employed stable, electron deficient nitroarenes as the oxygen atom source for the cleavage of alkenes under anaerobic conditions and 390 nm light irradiation (Table 1).14 The reaction exhibits broad applicability and is operationally simple. Oxidatively sensitive groups (Table 1, 3g-h) can be tolerated under this protocol, illustrating complementary to existing oxidative cleavage methods. Notably, this reaction is performed under mild and practical conditions without the hazards that are associated with mainstream ozonolysis.
+
+References and Notes
+
+Department of Chemistry, New York University, New York, New York 10003, United States. Email: parasram@nyu.edu. ORCID: 0000-0002-6052-0417. Funding was provided through the generous start-up funds from the Department of Chemistry at New York University (NYU), the American Chemical Society Petroleum Research Fund (65501- DNI1), and the National Institute of General Medical Sciences of the National Institutes of Health (1R35GM150777-01).
+
+Rubin. M. B. The history of ozone. The Schönbein period, 1839-1868. Bull. Hist. Chem. 2001, 26, 40-56.
+
+Schönbein, C. F. Ann. Phys. (Berlin, Ger.) 1840, 126, 616-635. DOI: 10.1002/andp.18401260804.
+
+Schönbein, C. F. Br. Assoc. Adv. Sci., Rep. 1840, 209; available at www.biodiversitylibrary.org.
+
+Fisher, T. J.; Dussault. P. H. Alkene ozonolysis. Tetrahedron 2017, 73, 4233-4258. DOI: 10.1016/j.tet.2017.03.039.
+
+Hida.T.; Kikuchi. J, Kakinuma, M.; Nogusa, H. Risk Assessment and Safety Evaluation Study for Ozonolysis of β-Pinene: Raw Material of a Novel Prostaglandin D2 Receptor Antagonist S-5751. Org. Process Res. Dev. 2010, 14 , 1485-1489. DOI: 10.1021/op100065d.
+
+Urgoitia, G.; SanMartin, R.; Herrero, M. T.; Dominguez, E. Aerobic Cleavage of Alkenes and Alkynes into Carbonyl and Carboxyl Compounds. ACS Catal. 2017, 7, 3050-3060. DOI: 10.1021/acscatal.6b03654.
+
+Rajagopalan, A.; Lara, M.; Kroutil, W. Oxidative Alkene Cleavage by Chemical and Enzymatic Methods. Adv. Synth. Catal. 2013, 355, 3321-3335. DOI: 10.1002/adsc.201300882.
+
+Travis, B. R.; Narayan, R. S.; Borhan, B. Osmium Tetroxide Promoted Catalytic Oxidative Cleavage of Olefins: An Organometallic Ozonolysis. J. Am. Chem. Soc. 2002, 124, 3824-3825. DOI: 10.1021/ja017295g.
+
+Nicolaou, K. C.; Adsool, V. A.; Hale, C. R. H. An Expedient Procedure for the Oxidative Cleavage of Olefinic Bonds with PhI(OAc)2, NMO, and Catalytic OsO4. Org. Lett. 2010, 12, 1552-1555. DOI: 10.1021/ol100290a
+
+Lara, M.; Mutti, F. G.; Glueck, S. M.; Kroutil, W. Oxidative Enzymatic Alkene Cleavage: Indications for a Nonclassical Enzyme Mechanism. J. Am. Chem. Soc. 2009, 131, 5368-5369. DOI: 10.1021/ja8097096.
+
+Huang, Z.; Guan, R.; Shanmugam, M.; Bennett, E. L.; Robertson, C. M.; Brookfield, A.; McInnes, E. J.; Xiao, J. Oxidative Cleavage of Alkenes by O2 with a Non-Heme Manganese Catalyst. J. Am. Chem. Soc. 2021, 143, 10005-10013. DOI: 10.1021/jacs.1c05757.
+
+Hussain, W. A.; Parasram, M. Recent Advances in Photoinduced Oxidative Cleavage of Alkenes. Synthesis. 2024, 56, 1775-1786. DOI: 10.1055/s-0042-1751534.
+
+Wise, D. E.; Gogarnoiu, E. S.; Duke, A. D.; Paolillo, J. M.; Vacala, T. L.; Hussain, W. A.; Parasram, M. Photoinduced Oxygen Transfer Using Nitroarenes for the Anaerobic Cleavage of Alkenes. J. Am. Chem. Soc. 2022, 144, 15437-15442. DOI: 10.1021/jacs.2c05648.
+
+Appendix
+
+Chemical Abstracts Nomenclature (Registry Number)
+
+1,1-Diphenylethene; (1) (530-48-3)
+
+4-Nitrobenzonitrile; (2) (619-72-7)
+
+Benzophenone; (3)(119-61-9)
+
+1,3,5-Trimethoxybenzene; (621-23-8)
+
+Lifeng Yin received his B.S. degree from Lanzhou University in 2023. In his sophomore year, he joined the lab of Associate Professor. Chengshan Yuan, where he engaged in the isolation and extraction of natural organic compounds, cultivated fungi, and studied the chemical activity of their secondary metabolites. In 2023, he conducted research on the secondary metabolites of Pseudocercospora Speg by Associate Prof. Chengshan Yuan. He is currently a Master's student in the laboratory of Professor Marvin Parasram at New York University.
+
+Ben S. Kozloff grew up outside of Philadelphia, Pennsylvania and is a rising junior at Bucknell University. In his first two years at Bucknell, Ben joined the labs of Professor Robert Stockland where he worked on cobalt catalysis, and Professor Hasan Arslan where he explored host-guest chemistry. In the summer of 2023, Ben participated in the REU in Chemical Biology where he joined the Parasram lab. His contributions to synthetic methodology work involving nitroarenes and photochemistry during the REU solidified his passion for research. Post-graduation, Ben aspires to pursue a Ph.D. in organic chemistry, eager to share his experiences and knowledge with those around him.
+
+Ning Deng was born in China. He is currently a senior majoring in biochemistry. His interest in Chemistry was developed during his childhood through observing chemical reactions. The fascination of this drove him to research in the field of Chemistry.
+
+Preya D. Persaud recently graduated from New York University with a B.A. in Biochemistry with minor degrees in Psychology and Physics. In her free time, she enjoys drawing, working under the hood of cars, and listening to music.
+
+Ajay H. Bansode received his Master's degree in Organic Chemistry from the University of Pune. He obtained his doctoral degree (2021) for research conducted on the development of metal-free and visible-light induced transformations under Dr. Gurunath Suryavanshi at the National Chemical Laboratory, Pune, India. He then moved to Virginia Commonwealth University to carry out postdoctoral studies in the group of Prof. Malgorzata Dukat. In 2023, he joined Prof. Marvin Parasram's group at New York University as a Postdoctoral Associate to continue his research in synthetic methodology development and photochemistry.
+
+Dan E. Wise completed his undergraduate and doctoral studies in chemistry at the University of Bristol under the supervision of Prof. Paul Pringle working in the fields of organophosphorus and organometallic chemistry. He then moved to New York University as a postdoctoral associate in the group of Prof. Marvin Parasram where he carried out research in synthetic methodology development and the photochemistry of nitroarenes. Dan is currently a research scientist at Snapdragon Chemistry, Inc.
+
+Jenny S. Martinez earned her Ph.D. in organic chemistry from the University of Illinois at Chicago under the tutelage of Justin T. Mohr. She had previously attained her B.S. in chemistry from the same institution, where she worked as an undergraduate research assistant in Duncan J. Wardrop's group. During her Ph.D. studies, she worked on the development of a regiodivergent method to access halogenated resorcinol derivatives from readily available vinylogous esters using sulfonyl halides as halenium donors. She also developed a methodology to access new sterically demanding halopyridines via the Ciamician-Dennstedt rearrangement. She has taught the undergraduate-level organic chemistry lecture and lab courses at Yale and Princeton University. Currently, she is a Clinical Assistant Professor and the Research Experience for Undergraduates (REU) Coordinator at New York University.
+
+Marvin Parasram earned his BSc in chemistry from Stony Brook University before completing his doctoral studies at the University of Illinois at Chicago supervised by Prof. Vladimir Gevorgyan where he focused on Pd-catalyzed synthetic methods development. He then joined the group of Prof. Abigail Doyle at Princeton University as a National Institutes of Health Ruth L. Kirschstein NRSA Postdoctoral Scholar, where he developed dual Ni/photoredox-catalyzed methods. In 2020, he began his independent career at New York University. His research group is developing sustainable photochemical methods for organic synthesis.
+
+Cailean Bonella grew up in Telford and went on to complete his MChem at the University of York. The final year of his degree was spent on placement at Charles River Laboratories in Saffron Waldon, where he worked as a synthetic chemist on a drug development project during the hit to lead and lead optimisation phases. He joined the Dixon group in 2022, where his current work focuses on developing new synthetic methodology. In his spare time, he enjoys making pizza, feeding ducks, and pole fitness.
+
+Alberto Ristache is originally from Amarastii de Jos, a small town near Craiova in Romania. He obtained his MSci degree in Chemistry from University College London where he undertook an RSC-funded summer research project under the supervision of Dr Bob Schroeder working on the synthesis of novel self-healing organic semiconducting polymers. For his final year, he returned to the Schroeder group where he continued working on the synthesis of new self-healing organic semiconductors that could be used for skin-wearable electronics. He joined the Dixon group in 2023, where his current research is directed towards bifunctional organocatalysis. In his free time, he enjoys playing football, pool, and reading.
+
+Copyright © 1921-, Organic Syntheses, Inc. All Rights Reserved
+
+Notes
+
+References/EndNotes
+
+Article Compounds
+
+Authors
+
+Home
+
+|
+
+About OrgSyn
+
+|
+
+Contact Us
+
+|
+
+Follow Us via
+
+Published by Organic Syntheses, Inc.
+
+ISSN 2333-3553 (online)
+
+ISSN 0078-6209 (print)
+
+We use cookies to help understand how people use our website.
+
+By using our site, you agree to our use of cookies
+
+This site is powered by
+
+VPInformatics
+
+Life Science Data Management
+
+Copyright© 2026 | All Rights Reserved
+
+HAZARD WARNING TO USERS
+
+The procedures on this site are intended for use only by persons with prior training in the field of organic chemistry.
+These procedures must be conducted at one's own risk. Organic Syntheses, Inc., its Editors, who act as checkers,
+and its Board of Directors do not warrant or guarantee the safety of individuals using these procedures
+and hereby disclaim any liability for any injuries or damages claimed to have resulted from or related in any way to the procedures
+herein.
+
+I have read and acknowledge that I have training in the field of organic chemistry
+and that Organic Syntheses does not warrant or guarantee safety in the use of these procedures.
+
+Copyright © 1921-2026 by Organic Syntheses, Inc.
+
+All Rights Reserved.
+
+No part of this Website or Database may be reproduced, stored in a
+retrieval system or transmitted
+in any form or by any means, electronic, mechanical, photocopying,
+recording, scanning or
+otherwise,  except as permitted under Sections 107 or 108 of the 1976
+United States Copyright
+Act.
+
+Remember for 30 days
