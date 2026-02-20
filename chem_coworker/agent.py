@@ -175,7 +175,17 @@ class ChemCoworker:
         if self.verbose:
             logger.info(f"[ChemCoworker] task={task_type} smiles={smiles_list}")
 
-        reason_text = REASON_PROMPT.format(
+        # Route retrosynthesis queries to specialized prompts
+        is_retro = (task_type == "retrosynthesis")
+        if is_retro:
+            from .retro_prompts import RETRO_REASON_PROMPT, RETRO_SYNTHESIZE_PROMPT
+            _reason_prompt = RETRO_REASON_PROMPT
+            _synth_prompt = RETRO_SYNTHESIZE_PROMPT
+        else:
+            _reason_prompt = REASON_PROMPT
+            _synth_prompt = SYNTHESIZE_PROMPT
+
+        reason_text = _reason_prompt.format(
             task_type=task_type.upper(),
             query=query,
             smiles_list=", ".join(smiles_list) if smiles_list else "(none)",
@@ -308,7 +318,7 @@ class ChemCoworker:
         # ── Step 6: Synthesize (final LLM call) ───────────────────────
         tool_results_text = self._format_tool_results(tool_results)
 
-        synth_text = SYNTHESIZE_PROMPT.format(
+        synth_text = _synth_prompt.format(
             query=query,
             task_type=task_type.upper(),
             hypothesis=effective_plan.hypothesis or "(not yet identified)",

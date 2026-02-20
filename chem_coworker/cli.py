@@ -676,7 +676,7 @@ Examples:
     )
     intake_parser.add_argument(
         "--note-type", default="reactions",
-        choices=["reactions", "mechanisms", "substrates", "protocols"],
+        choices=["reactions", "mechanisms", "substrates", "protocols", "routes"],
         help="Which notes subfolder to write to (default: reactions).",
     )
     intake_parser.add_argument(

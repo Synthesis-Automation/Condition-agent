@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional, Set
 
 
 # Note type subfolders to scan
-NOTE_SUBDIRS = ["reactions", "mechanisms", "substrates", "protocols"]
+NOTE_SUBDIRS = ["reactions", "mechanisms", "substrates", "protocols", "routes"]
 
 
 # ---------------------------------------------------------------------------
@@ -139,9 +139,10 @@ def build_index(notes_root: Optional[Path] = None) -> Path:
             if related:
                 entry["related"] = related
 
-            # Add optional fields if present
+            # Add optional fields if present (includes route-specific fields)
             for extra in ("mechanism", "substrates", "applies_to", "used_in",
-                          "variants", "applies_to_reactions", "bond_broken"):
+                          "variants", "applies_to_reactions", "bond_broken",
+                          "target_smiles", "steps", "overall_yield"):
                 if extra in fm:
                     entry[extra] = fm[extra]
 

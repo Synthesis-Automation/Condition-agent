@@ -447,11 +447,37 @@ What goes wrong and how to avoid it.
 Alternative approaches (e.g. Schlenk vs. glovebox, balloon vs. Schlenk line).\
 """
 
+_ROUTE_SECTIONS = """\
+Extract a complete multi-step synthesis route from this document.
+Organize into these sections:
+
+### Target
+Name and SMILES of the final product (if available).
+{metadata_block}
+
+### Overall Route Summary
+Step count, overall yield (if reported), convergent vs. linear strategy.
+
+### Step-by-Step Synthesis
+Number each step. For each step include:
+- Reactants (SMILES or names)
+- Reagents, catalyst, base, solvent, temperature
+- Key observations or yield
+- Purification method
+
+### Key Transformations
+List the named reactions used (e.g., Suzuki coupling, reductive amination).
+
+### Critical Notes
+Yield-determining steps, sensitive intermediates, protecting group strategy, scalability.\
+"""
+
 _SECTION_MAP = {
     "reactions": _REACTION_SECTIONS,
     "mechanisms": _MECHANISM_SECTIONS,
     "substrates": _SUBSTRATE_SECTIONS,
     "protocols": _PROTOCOL_SECTIONS,
+    "routes": _ROUTE_SECTIONS,
 }
 
 
@@ -460,7 +486,7 @@ def build_extract_prompt(note_type: str = "reactions") -> str:
     Build the LLM extraction prompt for a given note type.
 
     Args:
-        note_type: "reactions", "mechanisms", "substrates", or "protocols".
+        note_type: "reactions", "mechanisms", "substrates", "protocols", or "routes".
 
     Returns:
         A format string with {source_name}, {source_url}, {date}, {document_text} placeholders.

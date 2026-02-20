@@ -24,6 +24,7 @@ class TaskType(Enum):
     LOOKUP = "lookup"
     COMPARE = "compare"
     TROUBLESHOOT = "troubleshoot"
+    RETROSYNTHESIS = "retrosynthesis"
     GENERAL = "general"
 
 
@@ -39,6 +40,21 @@ _REACTION_SMILES_PATTERN = re.compile(r"[^\s]+>>[^\s]*")
 
 # Keywords for each task type (order matters — checked top to bottom)
 _TASK_KEYWORDS: List[tuple] = [
+    # Retrosynthesis detected first — "synthesize", "make", "route" are strong signals.
+    # We distinguish from forward: user provides a target (one molecule), not a reaction SMILES.
+    (TaskType.RETROSYNTHESIS, [
+        "retrosynthesis", "retrosynthetic", "retro synthesis", "retro-synthesis",
+        "how to make", "how do i make", "how do i synthesize", "how to synthesize",
+        "how can i make", "how can i prepare", "how can i synthesize",
+        "synthesis of", "synthesize this", "synthesize the",
+        "prepare this compound", "prepare this molecule",
+        "total synthesis", "route to", "synthetic route",
+        "starting material for", "from what starting material",
+        "what precursors", "what starting materials",
+        "build this molecule", "make this compound",
+        "suggest a synthesis", "plan a synthesis", "plan a route",
+        "disconnection", "disconnect", "synthon",
+    ]),
     (TaskType.TROUBLESHOOT, [
         "low yield", "poor yield", "% yield", "side product", "side reaction",
         "didn't work", "did not work", "failed", "problem", "issue",
@@ -131,7 +147,12 @@ class TaskClassifier:
     def _classify_type(self, q_lower: str, has_reaction: bool) -> TaskType:
         """Match keywords in priority order."""
         for task_type, keywords in _TASK_KEYWORDS:
-            if any(kw in q_lower for kw in keywords):
+            matched = any(kw in q_lower for kw in keywords)
+            if matched:
+                # Retrosynthesis requires a TARGET molecule, not a full reaction SMILES.
+                # If the user already provided a reaction (>>), default to ANALYZE instead.
+                if task_type == TaskType.RETROSYNTHESIS and has_reaction:
+                    return TaskType.ANALYZE
                 return task_type
 
         # Default heuristics based on SMILES presence

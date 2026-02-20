@@ -163,8 +163,14 @@ from .conditions import CONDITIONS_TOOLS
 from .reagent import REAGENT_TOOLS
 from .literature import LITERATURE_TOOLS
 from .notes import NOTES_TOOLS
+from .retrosynthesis import RETROSYNTHESIS_TOOLS
+from .name_resolver import NAME_RESOLVER_TOOLS
 
-for _plugin in CHEMISTRY_TOOLS + TAXONOMY_TOOLS + CONDITIONS_TOOLS + REAGENT_TOOLS + LITERATURE_TOOLS + NOTES_TOOLS:
+for _plugin in (
+    CHEMISTRY_TOOLS + TAXONOMY_TOOLS + CONDITIONS_TOOLS
+    + REAGENT_TOOLS + LITERATURE_TOOLS + NOTES_TOOLS
+    + RETROSYNTHESIS_TOOLS + NAME_RESOLVER_TOOLS
+):
     REGISTRY.register(_plugin)
 
 # ---------------------------------------------------------------------------
