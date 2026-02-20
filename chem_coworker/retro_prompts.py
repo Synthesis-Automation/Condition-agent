@@ -79,6 +79,13 @@ CONDITIONAL — add when SMILES found is "(none)":
                              in all subsequent tool calls.
 
 RECOMMENDED (add to plan):
+  • apply_hte_templates    — ALWAYS include in G1; applies 35+ atom-mapped HTE retrosynthetic
+                            SMARTS templates via AllChem.RunReactants(). Covers families NOT
+                            in the 46 standard retrons: SNAr, Chan-Lam, CuAAC triazole, HWE,
+                            Knoevenagel, Wacker, NaBH4/LAH reductions, deoxyfluorination,
+                            Sandmeyer, sulfonamide, urea, carbamate, Giese radical, C–S coupling.
+                            Each hit includes atom-precise precursor SMILES + HTE sample conditions.
+                            Pass reaction_name to filter; leave empty to try all 35+ templates.
   • search_by_product_similarity — ALWAYS include in G1; Morgan FP product-space search
                             across ~231k HTE reactions. No retron patterns needed.
                             Finds "who made something structurally similar to this target
@@ -97,14 +104,16 @@ RECOMMENDED (add to plan):
 
 TOOL GROUP STRUCTURE (SMILES already in query):
   G0 (always):  [normalize_reaction, inspect_target]
-  G1 (always):  [identify_retrons, find_retro_precedent, search_by_product_similarity]  ← parallel
+  G1 (always):  [identify_retrons, find_retro_precedent, search_by_product_similarity,
+                 apply_hte_templates]  ← all parallel
   G2 (always):  [generate_disconnections]
   G3 (recommended): [search_hte_precedent, recommend_conditions, search_notes]  ← parallel
 
 TOOL GROUP STRUCTURE (SMILES found = "(none)" — name-only query):
   G0 (name resolve): [resolve_name_to_smiles]             ← resolve name first
   G1 (always):  [normalize_reaction, inspect_target]      (use SMILES from G0)
-  G2 (always):  [identify_retrons, find_retro_precedent, search_by_product_similarity]  ← parallel
+  G2 (always):  [identify_retrons, find_retro_precedent, search_by_product_similarity,
+                 apply_hte_templates]  ← all parallel
   G3 (always):  [generate_disconnections]
   G4 (recommended): [search_hte_precedent, recommend_conditions, search_notes]  ← parallel
 
@@ -144,7 +153,8 @@ Then output EXACTLY ONE JSON block in this format:
     [
       {{"name": "identify_retrons", "args": {{"smiles": "TARGET_SMILES_HERE"}}}},
       {{"name": "find_retro_precedent", "args": {{"smiles": "TARGET_SMILES_HERE", "reaction_name": ""}}}},
-      {{"name": "search_by_product_similarity", "args": {{"target_smiles": "TARGET_SMILES_HERE", "reaction_name": "", "top_k": 5}}}}
+      {{"name": "search_by_product_similarity", "args": {{"target_smiles": "TARGET_SMILES_HERE", "reaction_name": "", "top_k": 5}}}},
+      {{"name": "apply_hte_templates", "args": {{"target_smiles": "TARGET_SMILES_HERE", "reaction_name": "", "top_k": 5}}}}
     ],
     [
       {{"name": "generate_disconnections", "args": {{"smiles": "TARGET_SMILES_HERE", "top_k": 3}}}}
@@ -296,9 +306,12 @@ Repeat for rank 2 (and rank 3 if notably different).
 
 **CONDITIONS SUMMARY**
 Integrate conditions from ALL available sources:
+- apply_hte_templates: for each template hit, cite template_name, precursor_1/precursor_2,
+  reaction_smiles, and hte_conditions (catalyst, base, solvent, yield from database).
+  These are atom-precise retrosynthetic SMARTS results — the most specific disconnections.
+  Cross-check against generate_disconnections; if both agree, state that explicitly.
 - search_by_product_similarity: cite top hits (product_similarity score, yield, rxn_type,
-  precursor_1/precursor_2). These are data-driven disconnections from real lab data —
-  cross-check against generate_disconnections output. If they agree, say so explicitly.
+  precursor_1/precursor_2). Data-driven from real lab products — validate against templates.
 - search_hte_precedent: cite top 1-2 HTE hits with drfp_similarity score, yield, reference
 - recommend_conditions: summarize the model-recommended catalyst, ligand, base, solvent
 When sources agree, state that. When they differ, note the discrepancy and explain which

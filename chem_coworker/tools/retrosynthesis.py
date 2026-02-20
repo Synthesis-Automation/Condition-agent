@@ -1,7 +1,7 @@
 """
 Retrosynthesis tools for ChemCoworker.
 
-Six ToolPlugin entries for the retrosynthesis pipeline:
+Seven ToolPlugin entries for the retrosynthesis pipeline:
 
   inspect_target              — enhanced molecular analysis for retrosynthesis
   identify_retrons            — SMARTS retron pattern matching
@@ -10,6 +10,9 @@ Six ToolPlugin entries for the retrosynthesis pipeline:
   search_hte_precedent        — DRFP k-NN search in the 231k-reaction HTE database
   search_by_product_similarity — Morgan FP product-space search (data-driven,
                                   no retron patterns; runs before generate_disconnections)
+  apply_hte_templates         — apply 35+ atom-mapped HTE retrosynthetic SMARTS templates
+                                  (SNAr, Chan-Lam, CuAAC, HWE, Knoevenagel, Wacker, etc.)
+                                  via AllChem.RunReactants(); enriched with HTE conditions
 
 All follow the _success() / _error() contract. Registered as ToolPlugins
 so they appear in REASON_PROMPT tool descriptions and can be called by the executor.
@@ -1061,6 +1064,233 @@ search_by_product_similarity_tool = ToolPlugin(
 
 
 # ---------------------------------------------------------------------------
+# Tool G: apply_hte_templates
+# Apply atom-mapped retrosynthetic SMARTS templates from the HTE template library.
+# Covers 35+ HTE reaction families not fully handled by the 46 hardcoded retrons.
+# Uses AllChem.RunReactants() for atom-precise precursor SMILES generation.
+# Enriches each hit with sample HTE conditions from the 231k-reaction database.
+# ---------------------------------------------------------------------------
+
+def _apply_one_template(
+    target_mol: "Any",
+    retro_smarts: str,
+    n_precursors: int,
+) -> "List[tuple]":
+    """Apply a single retrosynthetic SMARTS template to the target molecule.
+
+    Returns a list of precursor SMILES tuples (each with n_precursors entries).
+    Invalid or duplicate results are filtered; at most 8 results returned.
+    """
+    try:
+        from rdkit.Chem import AllChem, Chem, rdBase
+
+        with rdBase.BlockLogs():
+            rxn = AllChem.ReactionFromSmarts(retro_smarts)
+        if rxn is None:
+            return []
+
+        with rdBase.BlockLogs():
+            results = rxn.RunReactants((target_mol,))
+
+        valid_pairs: List[tuple] = []
+        seen: set = set()
+
+        for product_tuple in results:
+            if len(product_tuple) != n_precursors:
+                continue
+            smiles_parts: List[str] = []
+            valid = True
+            for mol in product_tuple:
+                if mol is None:
+                    valid = False
+                    break
+                try:
+                    with rdBase.BlockLogs():
+                        Chem.SanitizeMol(mol)
+                        smi = Chem.MolToSmiles(mol)
+                    if not smi:
+                        valid = False
+                        break
+                    smiles_parts.append(smi)
+                except Exception:
+                    valid = False
+                    break
+            if valid and len(smiles_parts) == n_precursors:
+                key = tuple(sorted(smiles_parts))
+                if key not in seen:
+                    seen.add(key)
+                    valid_pairs.append(tuple(smiles_parts))
+                    if len(valid_pairs) >= 8:
+                        break
+
+        return valid_pairs
+
+    except Exception:
+        return []
+
+
+def _apply_hte_templates(
+    target_smiles: str = "",
+    smiles: str = "",
+    reaction_name: str = "",
+    top_k: int = 5,
+) -> Dict[str, Any]:
+    """Apply HTE-backed retrosynthetic SMARTS templates to generate precursor pairs.
+
+    Unlike identify_retrons (which uses 46 hardcoded retrons) or
+    generate_disconnections (which applies transforms from the retron library),
+    this tool applies the *HTE template library* — 35+ atom-mapped retrosynthetic
+    SMARTS tuned to the HTE reaction families that are NOT fully covered by the
+    existing retron patterns: SNAr, Chan-Lam, CuAAC, HWE, Knoevenagel, Wacker,
+    reductions, deoxyfluorination, Sandmeyer, Giese radical, and more.
+
+    Each successful template application returns:
+    - Validated precursor SMILES from AllChem.RunReactants()
+    - HTE family name(s) cross-referenced to the 231k-reaction database
+    - Sample HTE conditions from the matching family (best-yield row)
+    - Difficulty score and chemistry notes from the template
+
+    Run in G1 (no prerequisites) alongside identify_retrons and
+    search_by_product_similarity for maximum coverage.
+
+    Args:
+        target_smiles: Target molecule SMILES (alias: smiles).
+        smiles: Alias for target_smiles.
+        reaction_name: Optional filter — only apply templates whose hte_families
+                       or name matches this string (e.g. "SNAr_amination",
+                       "CuAAC", "michael_addition"). Leave empty to try all 35+.
+        top_k: Maximum number of template hits to return (default 5).
+
+    Returns:
+        dict with disconnections[]: template_name, hte_families, precursor_1,
+        precursor_2, reaction_smiles, description, difficulty, notes,
+        hte_conditions (sample from database).
+    """
+    try:
+        from rdkit import Chem, rdBase
+
+        mol_smiles = (target_smiles or smiles).strip()
+        if ">" in mol_smiles:
+            mol_smiles = mol_smiles.split(">>")[0].split(">")[0].strip()
+        if not mol_smiles:
+            return _error("target_smiles is required")
+
+        with rdBase.BlockLogs():
+            target_mol = Chem.MolFromSmiles(mol_smiles)
+        if target_mol is None:
+            return _error(f"Cannot parse target SMILES: {mol_smiles!r}")
+
+        from chemtools.retro.hte_templates import HTE_TEMPLATES
+
+        # Optionally filter templates by reaction_name / hte_family
+        templates_to_try = HTE_TEMPLATES
+        if reaction_name:
+            rn_lower = reaction_name.lower()
+            templates_to_try = [
+                t for t in HTE_TEMPLATES
+                if t["name"].lower() == rn_lower
+                or any(rn_lower in f.lower() for f in t.get("hte_families", []))
+            ]
+
+        hits: List[Dict[str, Any]] = []
+
+        for tmpl in templates_to_try:
+            n_prec = tmpl.get("n_precursors", 2)
+            pairs = _apply_one_template(target_mol, tmpl["retro_smarts"], n_prec)
+            if not pairs:
+                continue
+
+            # Take the first (most canonical) precursor pair
+            pair = pairs[0]
+            p1 = pair[0] if pair else ""
+            p2 = pair[1] if n_prec >= 2 and len(pair) >= 2 else ""
+            if p2:
+                rxn_smi = f"{p1}.{p2}>>{mol_smiles}"
+            else:
+                rxn_smi = f"{p1}>>{mol_smiles}"
+
+            # Fetch sample HTE conditions from the database for the first matching family
+            hte_conditions: Optional[Dict[str, Any]] = None
+            for family_name in tmpl.get("hte_families", []):
+                try:
+                    rows = list(_fast_load_hte_family_cached(family_name))
+                    if rows:
+                        best = max(rows, key=lambda r: r.get("yield_value") or 0.0)
+                        cond: Dict[str, Any] = {
+                            "family": family_name,
+                            "catalyst": _extract_catalyst_name(best.get("catalyst")),
+                            "base": best.get("base_uid"),
+                            "solvent": best.get("solvent_uid"),
+                            "reagents": _fmt_reagent_list(best.get("reagents") or []),
+                            "yield": best.get("yield_value"),
+                            "reference": best.get("reference"),
+                            "source_file": best.get("source_file"),
+                        }
+                        hte_conditions = {k: v for k, v in cond.items() if v is not None}
+                        break
+                except Exception:
+                    pass
+
+            hit: Dict[str, Any] = {
+                "template_name": tmpl["name"],
+                "hte_families": tmpl.get("hte_families", []),
+                "precursor_1": p1,
+                "precursor_2": p2,
+                "reaction_smiles": rxn_smi,
+                "description": tmpl.get("description", ""),
+                "difficulty": tmpl.get("difficulty", 0.5),
+                "notes": tmpl.get("notes", ""),
+            }
+            if hte_conditions:
+                hit["hte_conditions"] = hte_conditions
+            hits.append(hit)
+
+            if len(hits) >= top_k:
+                break
+
+        # Sort by difficulty (easiest first)
+        hits.sort(key=lambda h: h["difficulty"])
+
+        has_conditions = any(h.get("hte_conditions") for h in hits)
+        return _success({
+            "smiles": mol_smiles,
+            "templates_tried": len(templates_to_try),
+            "template_hits": len(hits),
+            "disconnections": hits,
+            "message": (
+                f"Applied {len(templates_to_try)} HTE templates: "
+                f"{len(hits)} matched the target structure. "
+                + (
+                    "HTE conditions from database included for each hit."
+                    if has_conditions
+                    else "No HTE family conditions found (families may not exist in database)."
+                )
+            ),
+        })
+
+    except Exception as exc:
+        return _error(f"HTE template application failed: {exc}")
+
+
+apply_hte_templates_tool = ToolPlugin(
+    name="apply_hte_templates",
+    category="retrosynthesis",
+    description=(
+        "Apply the HTE-backed retrosynthetic template library (35+ atom-mapped SMARTS) to "
+        "generate validated precursor SMILES via AllChem.RunReactants(). Covers HTE families "
+        "NOT in the standard 46 retrons: SNAr amination, Chan-Lam N-arylation, CuAAC triazole, "
+        "Knoevenagel, HWE olefination, Wacker oxidation, NaBH4/LAH reductions, deoxyfluorination, "
+        "Sandmeyer, Giese radical addition, sulfonamide, urea, carbamate, C–S coupling, and more. "
+        "Each hit returns precursor_1, precursor_2, reaction_smiles, and sample HTE conditions "
+        "from the database. Run in G1 alongside identify_retrons and search_by_product_similarity "
+        "for maximum coverage. Pass reaction_name to filter to a specific HTE family."
+    ),
+    prerequisites=[],  # Runs in G1 alongside identify_retrons
+    fn=_apply_hte_templates,
+)
+
+
+# ---------------------------------------------------------------------------
 # Module export
 # ---------------------------------------------------------------------------
 
@@ -1071,4 +1301,5 @@ RETROSYNTHESIS_TOOLS = [
     find_retro_precedent_tool,
     search_hte_precedent_tool,
     search_by_product_similarity_tool,
+    apply_hte_templates_tool,
 ]
