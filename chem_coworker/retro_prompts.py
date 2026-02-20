@@ -79,6 +79,11 @@ CONDITIONAL — add when SMILES found is "(none)":
                              in all subsequent tool calls.
 
 RECOMMENDED (add to plan):
+  • search_by_product_similarity — ALWAYS include in G1; Morgan FP product-space search
+                            across ~231k HTE reactions. No retron patterns needed.
+                            Finds "who made something structurally similar to this target
+                            and how?" Returns real reactant pairs as candidate precursors.
+                            Critical for complex/decorated molecules where retrons may miss.
   • find_retro_precedent  — run in parallel with identify_retrons (search
                             knowledge base for similar reactions + routes)
   • search_hte_precedent  — run in G3 after generate_disconnections; uses DRFP k-NN
@@ -92,14 +97,14 @@ RECOMMENDED (add to plan):
 
 TOOL GROUP STRUCTURE (SMILES already in query):
   G0 (always):  [normalize_reaction, inspect_target]
-  G1 (always):  [identify_retrons, find_retro_precedent]  ← parallel
+  G1 (always):  [identify_retrons, find_retro_precedent, search_by_product_similarity]  ← parallel
   G2 (always):  [generate_disconnections]
   G3 (recommended): [search_hte_precedent, recommend_conditions, search_notes]  ← parallel
 
 TOOL GROUP STRUCTURE (SMILES found = "(none)" — name-only query):
   G0 (name resolve): [resolve_name_to_smiles]             ← resolve name first
   G1 (always):  [normalize_reaction, inspect_target]      (use SMILES from G0)
-  G2 (always):  [identify_retrons, find_retro_precedent]  ← parallel
+  G2 (always):  [identify_retrons, find_retro_precedent, search_by_product_similarity]  ← parallel
   G3 (always):  [generate_disconnections]
   G4 (recommended): [search_hte_precedent, recommend_conditions, search_notes]  ← parallel
 
@@ -138,7 +143,8 @@ Then output EXACTLY ONE JSON block in this format:
     ],
     [
       {{"name": "identify_retrons", "args": {{"smiles": "TARGET_SMILES_HERE"}}}},
-      {{"name": "find_retro_precedent", "args": {{"smiles": "TARGET_SMILES_HERE", "reaction_name": ""}}}}
+      {{"name": "find_retro_precedent", "args": {{"smiles": "TARGET_SMILES_HERE", "reaction_name": ""}}}},
+      {{"name": "search_by_product_similarity", "args": {{"target_smiles": "TARGET_SMILES_HERE", "reaction_name": "", "top_k": 5}}}}
     ],
     [
       {{"name": "generate_disconnections", "args": {{"smiles": "TARGET_SMILES_HERE", "top_k": 3}}}}
@@ -289,10 +295,13 @@ Use ⟸ for retrosynthetic arrows. Present top 1-3 disconnections from generate_
 Repeat for rank 2 (and rank 3 if notably different).
 
 **CONDITIONS SUMMARY**
-Integrate conditions from BOTH sources if available:
-- search_hte_precedent: cite the top 1-2 HTE hits with similarity score, yield, and reference
+Integrate conditions from ALL available sources:
+- search_by_product_similarity: cite top hits (product_similarity score, yield, rxn_type,
+  precursor_1/precursor_2). These are data-driven disconnections from real lab data —
+  cross-check against generate_disconnections output. If they agree, say so explicitly.
+- search_hte_precedent: cite top 1-2 HTE hits with drfp_similarity score, yield, reference
 - recommend_conditions: summarize the model-recommended catalyst, ligand, base, solvent
-When results agree, state that. When they differ, note the discrepancy and explain which
+When sources agree, state that. When they differ, note the discrepancy and explain which
 you trust more for this substrate class. Quote references in the form (Author, Journal, Year).
 
 **SYNTHETIC WARNINGS**

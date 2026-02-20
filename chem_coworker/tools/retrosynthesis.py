@@ -1,13 +1,15 @@
 """
 Retrosynthesis tools for ChemCoworker.
 
-Five ToolPlugin entries for the retrosynthesis pipeline:
+Six ToolPlugin entries for the retrosynthesis pipeline:
 
-  inspect_target         — enhanced molecular analysis for retrosynthesis
-  identify_retrons       — SMARTS retron pattern matching
-  generate_disconnections — core retrosynthetic transform engine
-  find_retro_precedent   — search notes + literature for synthesis precedent
-  search_hte_precedent   — DRFP k-NN search in the 231k-reaction HTE database
+  inspect_target              — enhanced molecular analysis for retrosynthesis
+  identify_retrons            — SMARTS retron pattern matching
+  generate_disconnections     — core retrosynthetic transform engine
+  find_retro_precedent        — search notes + literature for synthesis precedent
+  search_hte_precedent        — DRFP k-NN search in the 231k-reaction HTE database
+  search_by_product_similarity — Morgan FP product-space search (data-driven,
+                                  no retron patterns; runs before generate_disconnections)
 
 All follow the _success() / _error() contract. Registered as ToolPlugins
 so they appear in REASON_PROMPT tool descriptions and can be called by the executor.
@@ -832,6 +834,233 @@ search_hte_precedent_tool = ToolPlugin(
 
 
 # ---------------------------------------------------------------------------
+# Tool F: search_by_product_similarity
+# Product-space Morgan fingerprint search — data-driven retrosynthesis
+# Searches HTE products directly: "who made something like this target?"
+# No retron patterns needed; runs before generate_disconnections.
+# ---------------------------------------------------------------------------
+
+# Module-level product FP index: family_key → {"rows": list, "fps": ndarray}
+# Populated lazily on first call; persists for the process lifetime.
+_PRODUCT_FP_INDEX: Dict[str, Any] = {}
+
+
+def _get_morgan_fp(smiles: str) -> "Optional[Any]":
+    """Compute Morgan fingerprint (radius=2, 2048 bits) as a numpy uint8 array."""
+    try:
+        from rdkit import Chem, rdBase
+        from rdkit.Chem import AllChem
+        from rdkit.DataStructs import ConvertToNumpyArray
+        import numpy as np
+        with rdBase.BlockLogs():
+            mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+        arr = np.zeros(2048, dtype=np.uint8)
+        ConvertToNumpyArray(fp, arr)
+        return arr
+    except Exception:
+        return None
+
+
+def _build_product_fp_index(family_key: str) -> Dict[str, Any]:
+    """Build (or retrieve) the product Morgan FP index for a reaction family.
+
+    Parses the product SMILES from each HTE reaction SMILES, computes a Morgan
+    fingerprint, and stacks the results into a (N, 2048) uint8 matrix for fast
+    vectorised Tanimoto computation.  Results are cached in _PRODUCT_FP_INDEX
+    so the expensive build only happens once per family per process.
+
+    For '__ALL__', caps at the top-20k rows by yield to keep memory < ~5 MB
+    and first-call latency < ~3 s.
+    """
+    if family_key in _PRODUCT_FP_INDEX:
+        return _PRODUCT_FP_INDEX[family_key]
+
+    try:
+        import numpy as np
+
+        rows = list(_fast_load_hte_family_cached(family_key))
+
+        # Cap the all-families search so FP matrix stays manageable
+        _ALL_CAP = 20_000
+        if family_key == "__ALL__" and len(rows) > _ALL_CAP:
+            rows = sorted(rows, key=lambda r: r.get("yield_value") or 0.0, reverse=True)
+            rows = rows[:_ALL_CAP]
+
+        valid_rows: List[Dict[str, Any]] = []
+        fp_list = []
+
+        for r in rows:
+            rxn_smi = r.get("reaction_smiles") or ""
+            if ">>" not in rxn_smi:
+                continue
+            # Take only the first listed product (before any "." in the product block)
+            product_smi = rxn_smi.split(">>")[-1].strip().split(".")[0]
+            if not product_smi:
+                continue
+            fp = _get_morgan_fp(product_smi)
+            if fp is not None:
+                valid_rows.append(r)
+                fp_list.append(fp)
+
+        fp_matrix = np.stack(fp_list, axis=0) if fp_list else np.zeros((0, 2048), dtype=np.uint8)
+        index: Dict[str, Any] = {"rows": valid_rows, "fps": fp_matrix}
+        _PRODUCT_FP_INDEX[family_key] = index
+        return index
+    except Exception:
+        return {"rows": [], "fps": None}
+
+
+def _search_by_product_similarity(
+    target_smiles: str = "",
+    smiles: str = "",
+    reaction_name: str = "",
+    top_k: int = 5,
+) -> Dict[str, Any]:
+    """Search HTE reactions by product structural similarity to the target molecule.
+
+    Unlike search_hte_precedent (which needs precursor SMILES from
+    generate_disconnections), this tool searches purely from the target:
+    "who has made something structurally similar to this target, and how?"
+
+    Uses Morgan fingerprint (radius=2, 2048 bits) Tanimoto similarity on the
+    product side of HTE reactions.  The 'precursor_1'/'precursor_2' fields in
+    the results are the actual reactants used — compare them against
+    generate_disconnections output for cross-validation.
+
+    Args:
+        target_smiles: Target molecule SMILES (alias: smiles).
+        smiles: Alias for target_smiles.
+        reaction_name: Optional family filter (e.g. "amide_coupling",
+                       "suzuki_miyaura"). Leave empty to search all families.
+        top_k: Number of results to return (default 5).
+
+    Returns:
+        dict with family, search_mode, support_searched, precedents[].
+        Each precedent has: product_similarity, reaction_smiles,
+        precursor_1, precursor_2, yield, condition_core, catalyst, base,
+        solvent, reagents, solvents, reference, rxn_type.
+    """
+    try:
+        import numpy as np
+
+        mol_smiles = (target_smiles or smiles).strip()
+        if ">" in mol_smiles:
+            mol_smiles = mol_smiles.split(">>")[0].split(">")[0].strip()
+
+        if not mol_smiles:
+            return _error("target_smiles is required")
+
+        query_fp = _get_morgan_fp(mol_smiles)
+        if query_fp is None:
+            return _error(f"Could not parse SMILES: {mol_smiles!r}")
+
+        family = _map_reaction_to_family(reaction_name)
+        family_key = family if family else "__ALL__"
+
+        index = _build_product_fp_index(family_key)
+        rows: List[Dict[str, Any]] = index["rows"]
+        fp_matrix = index.get("fps")
+
+        if not rows or fp_matrix is None or fp_matrix.shape[0] == 0:
+            return _success({
+                "family": family or "all",
+                "search_mode": "product_morgan",
+                "support_searched": 0,
+                "precedent_count": 0,
+                "precedents": [],
+                "message": (
+                    f"No indexed products found for family '{family or 'all'}'. "
+                    "Try a different reaction_name or leave it empty."
+                ),
+            })
+
+        # Vectorised Tanimoto: (N, 2048) & (2048,) → (N,)
+        intersections = np.sum(fp_matrix & query_fp, axis=1).astype(np.float32)
+        unions = np.sum(fp_matrix | query_fp, axis=1).astype(np.float32)
+        tanimotos = intersections / np.maximum(unions, 1.0)
+
+        # Blend with yield (80/20) to prefer high-yield similar reactions
+        yields_norm = np.array(
+            [float(r.get("yield_value") or 0.0) / 100.0 for r in rows],
+            dtype=np.float32,
+        )
+        blended = 0.80 * tanimotos + 0.20 * yields_norm
+
+        top_indices = np.argsort(blended)[::-1][:top_k]
+
+        formatted: List[Dict[str, Any]] = []
+        for idx in top_indices:
+            r = rows[int(idx)]
+            sim = float(tanimotos[idx])
+            rxn_smi = r.get("reaction_smiles") or ""
+
+            # Parse reactants from reaction SMILES (reactants>>product)
+            precursor_1 = ""
+            precursor_2 = ""
+            if ">>" in rxn_smi:
+                reactant_block = rxn_smi.split(">>")[0]
+                parts = [x.strip() for x in reactant_block.split(".") if x.strip()]
+                if parts:
+                    precursor_1 = parts[0]
+                if len(parts) >= 2:
+                    precursor_2 = ".".join(parts[1:])
+
+            entry: Dict[str, Any] = {
+                "product_similarity": round(sim, 4),
+                "reaction_smiles": rxn_smi,
+                "precursor_1": precursor_1,
+                "precursor_2": precursor_2,
+                "yield": r.get("yield_value"),
+                "condition_core": r.get("condition_core"),
+                "catalyst": _extract_catalyst_name(r.get("catalyst")),
+                "base": r.get("base_uid"),
+                "solvent": r.get("solvent_uid"),
+                "reagents": _fmt_reagent_list(r.get("reagents") or []),
+                "solvents": _fmt_solvent_list(r.get("solvents") or []),
+                "reference": r.get("reference"),
+                "rxn_type": r.get("rxn_type"),
+            }
+            formatted.append({k: v for k, v in entry.items() if v is not None})
+
+        return _success({
+            "family": family or "all",
+            "search_mode": "product_morgan",
+            "support_searched": len(rows),
+            "precedent_count": len(formatted),
+            "precedents": formatted,
+            "message": (
+                f"Found {len(formatted)} HTE precedents from {len(rows):,} reactions "
+                f"in '{family or 'all families'}' via Morgan product-similarity search. "
+                "precursor_1/precursor_2 are the actual reactants — use them as "
+                "data-driven disconnection candidates."
+            ),
+        })
+
+    except Exception as exc:
+        return _error(f"Product similarity search failed: {exc}")
+
+
+search_by_product_similarity_tool = ToolPlugin(
+    name="search_by_product_similarity",
+    category="retrosynthesis",
+    description=(
+        "Data-driven retrosynthesis: search the ~231k-reaction HTE database for reactions "
+        "where the PRODUCT is structurally similar to the target molecule (Morgan FP "
+        "Tanimoto, radius=2). No retron patterns needed — runs BEFORE or IN PARALLEL with "
+        "identify_retrons. Returns real precedents with actual reactants as candidate "
+        "precursor pairs, plus conditions and yield. Especially powerful for complex, "
+        "multi-functional molecules where SMARTS retrons may not fire. "
+        "Pass reaction_name to restrict to a family; leave empty to search all 231k reactions."
+    ),
+    prerequisites=[],  # Runs in G1 alongside identify_retrons
+    fn=_search_by_product_similarity,
+)
+
+
+# ---------------------------------------------------------------------------
 # Module export
 # ---------------------------------------------------------------------------
 
@@ -841,4 +1070,5 @@ RETROSYNTHESIS_TOOLS = [
     generate_disconnections_tool,
     find_retro_precedent_tool,
     search_hte_precedent_tool,
+    search_by_product_similarity_tool,
 ]
