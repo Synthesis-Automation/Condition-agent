@@ -81,6 +81,11 @@ CONDITIONAL — add when SMILES found is "(none)":
 RECOMMENDED (add to plan):
   • find_retro_precedent  — run in parallel with identify_retrons (search
                             knowledge base for similar reactions + routes)
+  • search_hte_precedent  — run in G3 after generate_disconnections; uses DRFP k-NN
+                            to find real HTE precedents with conditions from the
+                            ~231k-reaction database. Pass precursor_1, precursor_2
+                            from G2 output (use your best chemistry guess as placeholders
+                            when planning upfront). ALWAYS include for any named reaction.
   • recommend_conditions  — add as final group (conditions for forward reaction)
   • search_notes          — if a specific reaction type is identified (parallel with precedent)
   • inspect_functional_groups — for complex molecules to map all reactive sites
@@ -89,14 +94,14 @@ TOOL GROUP STRUCTURE (SMILES already in query):
   G0 (always):  [normalize_reaction, inspect_target]
   G1 (always):  [identify_retrons, find_retro_precedent]  ← parallel
   G2 (always):  [generate_disconnections]
-  G3 (recommended): [recommend_conditions, search_notes]  ← parallel
+  G3 (recommended): [search_hte_precedent, recommend_conditions, search_notes]  ← parallel
 
 TOOL GROUP STRUCTURE (SMILES found = "(none)" — name-only query):
   G0 (name resolve): [resolve_name_to_smiles]             ← resolve name first
   G1 (always):  [normalize_reaction, inspect_target]      (use SMILES from G0)
   G2 (always):  [identify_retrons, find_retro_precedent]  ← parallel
   G3 (always):  [generate_disconnections]
-  G4 (recommended): [recommend_conditions, search_notes]  ← parallel
+  G4 (recommended): [search_hte_precedent, recommend_conditions, search_notes]  ← parallel
 
 CONFIDENCE RULES:
   HIGH confidence → run all groups as planned
@@ -139,6 +144,13 @@ Then output EXACTLY ONE JSON block in this format:
       {{"name": "generate_disconnections", "args": {{"smiles": "TARGET_SMILES_HERE", "top_k": 3}}}}
     ],
     [
+      {{"name": "search_hte_precedent", "args": {{
+          "target_smiles": "TARGET_SMILES_HERE",
+          "reaction_name": "REACTION_NAME_HERE",
+          "precursor_1": "PRECURSOR_1_GUESS",
+          "precursor_2": "PRECURSOR_2_GUESS",
+          "top_k": 5
+      }}}},
       {{"name": "recommend_conditions", "args": {{"reaction_smiles": "PRECURSOR_1.PRECURSOR_2>>TARGET_SMILES_HERE"}}}},
       {{"name": "search_notes", "args": {{"query": "REACTION_TYPE_KEYWORDS"}}}}
     ]
@@ -148,7 +160,10 @@ Then output EXACTLY ONE JSON block in this format:
 ```
 
 IMPORTANT: Replace TARGET_SMILES_HERE with the actual target SMILES extracted above.
-For recommend_conditions, use format: "precursor1.precursor2>>target" (will be refined after G2 results).
+For search_hte_precedent and recommend_conditions, fill PRECURSOR_1_GUESS / PRECURSOR_2_GUESS
+with your best chemistry prediction of the precursor SMILES (e.g. for a Suzuki: aryl bromide +
+aryl boronic acid). The executor will use these upfront; you can call the tool again after
+observing G2 results if higher-confidence precursor SMILES become available.
 
 If SMILES found is "(none)", prepend a name-resolution group:
 ```json
@@ -271,8 +286,11 @@ Use ⟸ for retrosynthetic arrows. Present top 1-3 disconnections from generate_
 Repeat for rank 2 (and rank 3 if notably different).
 
 **CONDITIONS SUMMARY**
-If recommend_conditions ran, summarize the top 1-2 condition sets for the key step:
-catalyst, ligand, base, solvent, temperature. Quote source if from notes.
+Integrate conditions from BOTH sources if available:
+- search_hte_precedent: cite the top 1-2 HTE hits with similarity score, yield, and reference
+- recommend_conditions: summarize the model-recommended catalyst, ligand, base, solvent
+When results agree, state that. When they differ, note the discrepancy and explain which
+you trust more for this substrate class. Quote references in the form (Author, Journal, Year).
 
 **SYNTHETIC WARNINGS**
 List any challenges, caveats, or protecting group considerations:

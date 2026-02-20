@@ -1,12 +1,13 @@
 """
 Retrosynthesis tools for ChemCoworker.
 
-Four ToolPlugin entries for the retrosynthesis pipeline:
+Five ToolPlugin entries for the retrosynthesis pipeline:
 
   inspect_target         — enhanced molecular analysis for retrosynthesis
   identify_retrons       — SMARTS retron pattern matching
   generate_disconnections — core retrosynthetic transform engine
   find_retro_precedent   — search notes + literature for synthesis precedent
+  search_hte_precedent   — DRFP k-NN search in the 231k-reaction HTE database
 
 All follow the _success() / _error() contract. Registered as ToolPlugins
 so they appear in REASON_PROMPT tool descriptions and can be called by the executor.
@@ -458,6 +459,370 @@ find_retro_precedent_tool = ToolPlugin(
 
 
 # ---------------------------------------------------------------------------
+# Tool E: search_hte_precedent
+# DRFP k-NN search in the HTE reaction database (~231k reactions)
+# ---------------------------------------------------------------------------
+
+# Retron/reaction name → HTE family string (supplements _family_text in core_utils)
+_EXTRA_RETRON_MAP = {
+    "biaryl_suzuki": "Suzuki",
+    "aryl_alkyl_negishi": "Suzuki",          # closest family available
+    "alkyl_alkyl_kumada": "Suzuki",
+    "aryl_alkene_heck": "HeckMizoroki_coupling",
+    "heck_mizoroki": "HeckMizoroki_coupling",
+    "aryl_alkyne_sonogashira": "Sonogashira_coupling",
+    "aryl_amine_buchwald": "C_N_Coupling",
+    "aryl_amine_ullmann": "C_N_Coupling",
+    "alpha_amino_reductive_amination": "Reductive_amination",
+    "reductive_amination": "Reductive_amination",
+    "nitrile_reduction_amine": "C_N_Coupling",
+    "aryl_ether_ullmann_o": "C_O_Coupling",
+    "williamson_ether": "C_O_Coupling",
+    "mitsunobu_inversion": "C_O_Coupling",
+    "ester_from_acid_alcohol": "Amide_formation",   # closest; esterification rare in HTE
+    "amide_direct": "Amide_formation",
+    "sulfonamide_formation": "Amide_formation",
+    "sn2_alkyl_amine": "C_N_Coupling",
+    "heterocycle_buchwald_n_arylation": "C_N_Coupling",
+}
+
+
+def _map_reaction_to_family(reaction_name: str) -> Optional[str]:
+    """Map a retron/reaction name to a canonical HTE family string, or None."""
+    if not reaction_name:
+        return None
+    rl = reaction_name.lower().strip()
+    # Try extra retron map first (most specific)
+    if rl in _EXTRA_RETRON_MAP:
+        return _EXTRA_RETRON_MAP[rl]
+    # Fall back to core_utils normalizer
+    try:
+        from chemtools.precedent.core_utils import _family_text
+        mapped = _family_text(reaction_name)
+        # _family_text returns the input unchanged if it doesn't recognize it
+        if mapped != reaction_name:
+            return mapped
+    except Exception:
+        pass
+    return None
+
+
+def _fmt_reagent_list(reagents: List[Any]) -> Optional[str]:
+    if not reagents:
+        return None
+    parts = []
+    for r in reagents:
+        if isinstance(r, dict):
+            name = r.get("name", "")
+            role = r.get("role", "")
+            if name:
+                parts.append(f"{name} ({role})" if role else name)
+        elif isinstance(r, str) and r:
+            parts.append(r)
+    return ", ".join(parts) if parts else None
+
+
+def _fmt_solvent_list(solvents: List[Any]) -> Optional[str]:
+    if not solvents:
+        return None
+    parts = []
+    for s in solvents:
+        if isinstance(s, dict):
+            name = s.get("name", "")
+            if name:
+                parts.append(name)
+        elif isinstance(s, str) and s:
+            parts.append(s)
+    return "/".join(parts) if parts else None
+
+
+def _extract_catalyst_name(obj: Any) -> Optional[str]:
+    if obj is None:
+        return None
+    if isinstance(obj, dict):
+        return obj.get("name")
+    return str(obj)
+
+
+def _fast_load_hte_family(family: Optional[str]) -> List[Dict[str, Any]]:
+    """Read HTE CSV files directly for a given family, skipping featurization.
+
+    This is a lightweight alternative to _load_selective() that avoids the
+    expensive featurize_pair() / normalize_reaction() calls in _make_row_from_csv().
+    Returns only the fields needed by search_hte_precedent: yield, conditions,
+    reaction_smiles, reference.  Cached per family so the first call is the
+    only slow one.
+    """
+    import csv as _csv
+    import os as _os
+    try:
+        from chemtools.precedent.loader import HTE_DB_DIR, _file_family_from_name, _clean_text, _parse_float, _split_items
+    except ImportError:
+        return []
+
+    rows: List[Dict[str, Any]] = []
+    family_lower = (family or "").lower()
+
+    try:
+        from chemtools.precedent.loader import _dataset_family_map as _dfm
+    except ImportError:
+        _dfm = None  # type: ignore
+
+    for subdir_name in ("literature", "protocols", "rules", "experiments"):
+        subdir = _os.path.join(HTE_DB_DIR, subdir_name)
+        if not _os.path.isdir(subdir):
+            continue
+        for fname in _os.listdir(subdir):
+            if not fname.lower().endswith(".csv"):
+                continue
+            file_family = _file_family_from_name(fname)
+            # Resolve file stem → canonical family name so e.g.
+            # "suzuki_miyaura" (from filename) maps to "Suzuki" (canonical)
+            mapped_family = (_dfm(file_family, fallback=file_family)
+                             if _dfm else file_family)
+            # Apply family filter: match on either the raw stem or the mapped name
+            if family and (file_family.lower() != family_lower
+                           and mapped_family.lower() != family_lower):
+                continue
+            path = _os.path.join(subdir, fname)
+            for enc in ("utf-8", "latin-1"):
+                try:
+                    with open(path, encoding=enc, newline="") as fh:
+                        reader = _csv.DictReader(fh)
+                        for row_rec in reader:
+                            cat = _clean_text(row_rec.get("catalyst"))
+                            lig = _clean_text(row_rec.get("ligand"))
+                            base = _clean_text(row_rec.get("base"))
+                            acid = _clean_text(row_rec.get("acid"))
+                            add = _clean_text(row_rec.get("additive"))
+                            ca = _clean_text(row_rec.get("condensation_agent"))
+                            solv = _clean_text(row_rec.get("solvent"))
+                            reag = [
+                                {"name": n, "role": r}
+                                for n, r in [(base, "BASE"), (acid, "ACID"),
+                                             (add, "ADDITIVE"), (ca, "COUPLING_REAGENT")]
+                                if n
+                            ]
+                            rows.append({
+                                "rxn_type": file_family,
+                                "yield_value": _parse_float(
+                                    row_rec.get("yield") or row_rec.get("yield_pct")
+                                    or row_rec.get("yield_percent")
+                                ),
+                                "reaction_smiles": _clean_text(row_rec.get("reaction_smiles")),
+                                "condition_core": "/".join(p for p in [cat, lig] if p),
+                                "catalyst": {"name": cat} if cat else None,
+                                "base_uid": base or None,
+                                "solvent_uid": _split_items(solv)[0] if solv else None,
+                                "reagents": reag,
+                                "solvents": [{"name": s} for s in _split_items(solv) if s],
+                                "reference": _clean_text(row_rec.get("reference")),
+                                "source_file": fname,
+                            })
+                    break  # successful read
+                except Exception:
+                    continue
+
+    return rows
+
+
+# LRU cache keyed by family name so each family is loaded only once per process.
+from functools import lru_cache as _lru_cache
+
+@_lru_cache(maxsize=16)
+def _fast_load_hte_family_cached(family_key: str) -> tuple:
+    """Cached wrapper around _fast_load_hte_family; returns tuple for hashability."""
+    rows = _fast_load_hte_family(family_key if family_key != "__ALL__" else None)
+    return tuple(rows)   # tuples are hashable → safe for lru_cache key
+
+
+def _search_hte_precedent(
+    target_smiles: str,
+    reaction_name: str = "",
+    precursor_1: str = "",
+    precursor_2: str = "",
+    top_k: int = 5,
+) -> Dict[str, Any]:
+    """Search the HTE reaction database for synthesis precedents via DRFP k-NN.
+
+    Composes a forward reaction SMILES (precursor_1.precursor_2 >> target) and
+    uses DRFP fingerprint similarity to rank ~231k HTE literature reactions.
+    Returns the nearest neighbors with their experimental conditions so the LLM
+    can ground its route recommendations in real data.
+
+    When precursors are not yet known, pass only target_smiles + reaction_name
+    to get the top-yielding precedents for that reaction family (no DRFP ranking).
+
+    Strategy:
+      - Load the reaction family from the HTE database via selective loading.
+      - Pre-rank by yield (descending) so that high-quality reactions are at the top.
+      - If precursor SMILES are available: compute DRFP fingerprint for the proposed
+        forward reaction (p1.p2 >> target) and re-rank the top-N yield candidates
+        by Tanimoto similarity. N defaults to 200, keeping latency ~2 s per call.
+      - If no precursors: return top-K by yield directly.
+
+    Args:
+        target_smiles: Target molecule SMILES (product of the forward step).
+        reaction_name: Reaction family / retron name from identify_retrons or
+                       generate_disconnections (e.g. "suzuki_miyaura",
+                       "aryl_amine_buchwald", "amide_direct").
+        precursor_1: First precursor SMILES from generate_disconnections.
+        precursor_2: Second precursor SMILES from generate_disconnections.
+        top_k: Number of precedents to return (default 5).
+
+    Returns:
+        dict with family, search_mode, support_in_family, precedents[].
+        Each precedent has: reaction_smiles, similarity, yield, condition_core,
+        catalyst, base, solvent, reagents, solvents, reference, source_file.
+    """
+    _DRFP_CANDIDATE_CAP = 300   # max rows to DRFP-score (keeps latency ~2 s)
+
+    try:
+        mol_smiles = (
+            target_smiles.split(">>")[0].split(">")[0].strip()
+            if ">" in target_smiles
+            else target_smiles.strip()
+        )
+
+        # Resolve family string
+        family = _map_reaction_to_family(reaction_name)
+
+        # ── Load family rows (fast path: no featurization) ────────────────
+        try:
+            family_key = family if family else "__ALL__"
+            rows = list(_fast_load_hte_family_cached(family_key))
+        except Exception as load_err:
+            return _error(f"HTE loader failed: {load_err}")
+
+        if not rows:
+            return _success({
+                "family": family,
+                "search_mode": "none",
+                "forward_smiles_used": "",
+                "support_in_family": 0,
+                "precedent_count": 0,
+                "precedents": [],
+                "message": (
+                    f"No HTE rows loaded for family '{family}'. "
+                    "Reaction type may not be in the database."
+                ),
+            })
+
+        # ── Sort by yield descending (high-quality first) ─────────────────
+        rows_sorted = sorted(
+            rows,
+            key=lambda r: (r.get("yield_value") or 0.0),
+            reverse=True,
+        )
+        support = len(rows_sorted)
+
+        # ── Build forward SMILES & decide search mode ──────────────────────
+        p1 = (precursor_1 or "").strip()
+        p2 = (precursor_2 or "").strip()
+        fwd_smiles = ""
+        use_drfp = False
+
+        if mol_smiles and (p1 or p2):
+            parts = [x for x in [p1, p2] if x]
+            fwd_smiles = ".".join(parts) + ">>" + mol_smiles
+            use_drfp = True
+
+        # ── DRFP re-ranking (when precursors available) ───────────────────
+        if use_drfp:
+            try:
+                from chemtools import reaction_similarity as rs
+                if rs and rs.drfp_available():
+                    q_fp = rs.encode_drfp_cached(fwd_smiles)
+                    if q_fp is not None:
+                        # Only DRFP-score the top-N by yield to keep latency low
+                        candidates = rows_sorted[:_DRFP_CANDIDATE_CAP]
+                        scored: List[tuple] = []
+                        for r in candidates:
+                            rsmi = r.get("reaction_smiles") or ""
+                            if rsmi:
+                                r_fp = rs.encode_drfp_cached(rsmi)
+                                if r_fp is not None:
+                                    sim = float(rs.tanimoto(q_fp, r_fp))
+                                    # Blend DRFP sim with yield to prefer high-yield analogs
+                                    y_norm = (r.get("yield_value") or 0.0) / 100.0
+                                    blended = 0.85 * sim + 0.15 * y_norm
+                                    scored.append((blended, sim, r))
+                        if scored:
+                            scored.sort(key=lambda x: -x[0])
+                            rows_sorted = [r for _, _, r in scored]
+                        # else: keep yield-sorted order as fallback
+            except Exception:
+                use_drfp = False   # silently fall back to yield ranking
+
+        # ── Format top-K results ──────────────────────────────────────────
+        formatted = []
+        scored_lookup = (
+            {id(r): sim for _, sim, r in scored}
+            if use_drfp and "scored" in dir() and scored
+            else {}
+        )
+
+        for r in rows_sorted[:top_k]:
+            entry: Dict[str, Any] = {
+                "reaction_smiles": r.get("reaction_smiles") or "",
+                "yield": r.get("yield_value"),
+                "condition_core": r.get("condition_core"),
+                "catalyst": _extract_catalyst_name(r.get("catalyst")),
+                "base": r.get("base_uid"),
+                "solvent": r.get("solvent_uid"),
+                "reagents": _fmt_reagent_list(r.get("reagents") or []),
+                "solvents": _fmt_solvent_list(r.get("solvents") or []),
+                "reference": r.get("reference"),
+                "rxn_type": r.get("rxn_type"),
+                "source_file": r.get("source_file"),
+            }
+            sim_val = scored_lookup.get(id(r))
+            if sim_val is not None:
+                entry["drfp_similarity"] = round(sim_val, 4)
+            formatted.append({k: v for k, v in entry.items() if v is not None})
+
+        search_mode = "drfp_yield_blend" if use_drfp else "family_yield"
+        return _success({
+            "family": family,
+            "search_mode": search_mode,
+            "forward_smiles_used": fwd_smiles or "(family-level only)",
+            "support_in_family": support,
+            "drfp_candidates_scored": min(support, _DRFP_CANDIDATE_CAP) if use_drfp else 0,
+            "precedent_count": len(formatted),
+            "precedents": formatted,
+            "message": (
+                f"Found {len(formatted)} HTE precedents from {support} reactions "
+                f"in '{family}' family. "
+                + (
+                    f"DRFP-ranked (vs top-{min(support, _DRFP_CANDIDATE_CAP)} by yield)."
+                    if use_drfp
+                    else "Ranked by yield (pass precursor_1/precursor_2 for DRFP ranking)."
+                )
+            ),
+        })
+
+    except Exception as exc:
+        return _error(f"HTE precedent search failed: {exc}")
+
+
+search_hte_precedent_tool = ToolPlugin(
+    name="search_hte_precedent",
+    category="retrosynthesis",
+    description=(
+        "Search the ~231k-reaction HTE literature database for synthesis precedents using "
+        "DRFP fingerprint k-NN similarity. Takes the target SMILES plus precursor SMILES "
+        "from generate_disconnections, composes the forward reaction (p1.p2>>target), and "
+        "returns the most similar real reactions with conditions (catalyst, base, solvent, "
+        "yield, reference). Run in G3 alongside recommend_conditions. "
+        "If precursors are not yet known, pass only target_smiles + reaction_name for "
+        "family-level yield ranking."
+    ),
+    prerequisites=["generate_disconnections"],
+    fn=_search_hte_precedent,
+)
+
+
+# ---------------------------------------------------------------------------
 # Module export
 # ---------------------------------------------------------------------------
 
@@ -466,4 +831,5 @@ RETROSYNTHESIS_TOOLS = [
     identify_retrons_tool,
     generate_disconnections_tool,
     find_retro_precedent_tool,
+    search_hte_precedent_tool,
 ]
