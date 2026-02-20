@@ -199,16 +199,23 @@ def _apply_retro_transforms(
         pairs = _generic_bond_fragment(mol, retron)
         results.extend(pairs)
 
-    # Deduplicate and validate
+    # Deduplicate and validate — skip any pair where either SMILES is invalid
+    from rdkit import rdBase
     seen: set = set()
     clean: List[Tuple[str, str]] = []
     for p1, p2 in results:
-        # Canonicalize
+        if not p1 or not p2:
+            continue
         try:
-            canon_1 = Chem.MolToSmiles(Chem.MolFromSmiles(p1)) if p1 else p1
-            canon_2 = Chem.MolToSmiles(Chem.MolFromSmiles(p2)) if p2 else p2
+            with rdBase.BlockLogs():
+                mol1 = Chem.MolFromSmiles(p1)
+                mol2 = Chem.MolFromSmiles(p2)
+            if mol1 is None or mol2 is None:
+                continue
+            canon_1 = Chem.MolToSmiles(mol1)
+            canon_2 = Chem.MolToSmiles(mol2)
         except Exception:
-            canon_1, canon_2 = p1, p2
+            continue
 
         if canon_1 and canon_2 and (canon_1, canon_2) not in seen:
             seen.add((canon_1, canon_2))
