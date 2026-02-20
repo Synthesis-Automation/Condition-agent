@@ -235,16 +235,23 @@ def resolve_smiles(smiles: str) -> Dict:
         (_cactus,  "cactus"),
     ]
 
+    # Also prepare a stereo-stripped fallback SMILES for when exact lookup fails
+    stereo_stripped = re.sub(r"[/@\\]", "", canonical) if canonical else canonical
+
     for backend_fn, _ in backends:
-        try:
-            time.sleep(_RATE_DELAY + random.uniform(0, 0.1))
-            result = backend_fn(canonical)
-            if result and (result.get("iupac_name") or result.get("preferred_name")):
-                result["canonical_smiles"] = canonical
-                _SMILES_CACHE[canonical] = result
-                return result
-        except Exception:
-            continue
+        # Try with canonical SMILES first, then stereo-stripped fallback
+        for query_smiles in dict.fromkeys([canonical, stereo_stripped]):
+            if not query_smiles:
+                continue
+            try:
+                time.sleep(_RATE_DELAY + random.uniform(0, 0.1))
+                result = backend_fn(query_smiles)
+                if result and (result.get("iupac_name") or result.get("preferred_name")):
+                    result["canonical_smiles"] = canonical
+                    _SMILES_CACHE[canonical] = result
+                    return result
+            except Exception:
+                continue
 
     fallback = {
         "iupac_name": "",

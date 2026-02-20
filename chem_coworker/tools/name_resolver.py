@@ -348,6 +348,118 @@ resolve_smiles_to_names_batch_tool = ToolPlugin(
 
 
 # ---------------------------------------------------------------------------
+# Tool E: resolve_cas (CAS number → full compound info)
+# ---------------------------------------------------------------------------
+
+def _resolve_cas(cas: str) -> Dict[str, Any]:
+    """Convert a CAS Registry Number to compound name, SMILES, and identifiers.
+
+    Validates the CAS checksum first (XXXXXXX-YY-Z format with mod-10 check
+    digit), then queries PubChem → CACTUS cascade. Returns the preferred
+    common name, IUPAC name, SMILES, molecular formula, PubChem CID, and
+    a synonym list.
+
+    Args:
+        cas: CAS Registry Number. Format: XXXXXXX-YY-Z
+             Examples: "50-78-2" (aspirin), "58-08-2" (caffeine),
+                       "134523-00-5" (atorvastatin), "73-24-5" (adenine)
+
+    Returns:
+        dict with cas, valid_cas, name, iupac_name, smiles, molecular_formula,
+        pubchem_cid, synonyms, and source.
+    """
+    if not cas or not cas.strip():
+        return _error("CAS number cannot be empty")
+
+    cas = cas.strip()
+
+    try:
+        from chemtools.util.cas_resolver import resolve_cas
+        result = resolve_cas(cas)
+
+        if result.get("source") == "not_found":
+            return _error(
+                result.get("error", f"CAS '{cas}' could not be resolved"),
+                {"cas": cas, "valid_cas": result.get("valid_cas", False)},
+            )
+
+        return _success(result)
+
+    except Exception as exc:
+        return _error(f"CAS resolution failed: {exc}")
+
+
+resolve_cas_tool = ToolPlugin(
+    name="resolve_cas",
+    category="name_resolver",
+    description=(
+        "Convert a CAS Registry Number (e.g. '50-78-2') to compound name, SMILES, "
+        "IUPAC name, molecular formula, PubChem CID, and synonyms. "
+        "Validates the CAS checksum before querying. Uses PubChem → CACTUS cascade. "
+        "Useful when a user provides a CAS number instead of a name or SMILES."
+    ),
+    prerequisites=[],
+    fn=_resolve_cas,
+)
+
+
+# ---------------------------------------------------------------------------
+# Tool F: smiles_to_cas (SMILES → CAS number lookup)
+# ---------------------------------------------------------------------------
+
+def _smiles_to_cas(smiles: str) -> Dict[str, Any]:
+    """Look up the CAS Registry Number(s) for a given SMILES via PubChem.
+
+    Canonicalizes the SMILES, resolves to PubChem CID, then filters the
+    synonym list for strings matching the CAS number pattern.
+
+    Args:
+        smiles: Molecule SMILES string.
+                Example: "CC(=O)Oc1ccccc1C(=O)O"
+
+    Returns:
+        dict with smiles, cas_numbers (list), primary_cas (first match or ""),
+        and a message.
+    """
+    if not smiles or not smiles.strip():
+        return _error("SMILES cannot be empty")
+
+    smiles = smiles.strip()
+
+    try:
+        from chemtools.util.cas_resolver import smiles_to_cas
+        cas_list = smiles_to_cas(smiles)
+
+        return _success({
+            "smiles": smiles,
+            "cas_numbers": cas_list,
+            "primary_cas": cas_list[0] if cas_list else "",
+            "count": len(cas_list),
+            "message": (
+                f"Found {len(cas_list)} CAS number(s): {', '.join(cas_list)}"
+                if cas_list
+                else "No CAS number found in PubChem synonyms for this SMILES."
+            ),
+        })
+
+    except Exception as exc:
+        return _error(f"SMILES-to-CAS lookup failed: {exc}")
+
+
+smiles_to_cas_tool = ToolPlugin(
+    name="smiles_to_cas",
+    category="name_resolver",
+    description=(
+        "Look up the CAS Registry Number(s) for a given SMILES string via PubChem synonyms. "
+        "Useful for annotating retrosynthetic precursors or reaction components with CAS numbers "
+        "for ordering, safety data lookup, or cross-referencing with literature."
+    ),
+    prerequisites=[],
+    fn=_smiles_to_cas,
+)
+
+
+# ---------------------------------------------------------------------------
 # Module export
 # ---------------------------------------------------------------------------
 
@@ -356,4 +468,6 @@ NAME_RESOLVER_TOOLS = [
     resolve_names_to_smiles_tool,
     resolve_smiles_to_name_tool,
     resolve_smiles_to_names_batch_tool,
+    resolve_cas_tool,
+    smiles_to_cas_tool,
 ]
