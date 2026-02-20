@@ -1082,7 +1082,8 @@ def _apply_one_template(
     Invalid or duplicate results are filtered; at most 8 results returned.
     """
     try:
-        from rdkit.Chem import AllChem, Chem, rdBase
+        from rdkit import Chem, rdBase
+        from rdkit.Chem import AllChem
 
         with rdBase.BlockLogs():
             rxn = AllChem.ReactionFromSmarts(retro_smarts)
@@ -1105,10 +1106,18 @@ def _apply_one_template(
                     valid = False
                     break
                 try:
+                    # Use MolToSmiles directly — SanitizeMol can reject valid
+                    # charged species (e.g. azides) produced by RunReactants.
+                    # Round-trip through SMILES parser validates the structure.
                     with rdBase.BlockLogs():
-                        Chem.SanitizeMol(mol)
                         smi = Chem.MolToSmiles(mol)
                     if not smi:
+                        valid = False
+                        break
+                    # Validate round-trip
+                    with rdBase.BlockLogs():
+                        check_mol = Chem.MolFromSmiles(smi)
+                    if check_mol is None:
                         valid = False
                         break
                     smiles_parts.append(smi)
@@ -1167,7 +1176,7 @@ def _apply_hte_templates(
         hte_conditions (sample from database).
     """
     try:
-        from rdkit import Chem, rdBase
+        from rdkit import Chem, rdBase  # noqa: F811
 
         mol_smiles = (target_smiles or smiles).strip()
         if ">" in mol_smiles:
@@ -1192,6 +1201,9 @@ def _apply_hte_templates(
                 or any(rn_lower in f.lower() for f in t.get("hte_families", []))
             ]
 
+        # Collect ALL matching templates first, then sort and cap.
+        # Early stopping by top_k would skip low-difficulty templates that come
+        # later in the library order (e.g. CuAAC at position 31 with difficulty=0.10).
         hits: List[Dict[str, Any]] = []
 
         for tmpl in templates_to_try:
@@ -1245,11 +1257,9 @@ def _apply_hte_templates(
                 hit["hte_conditions"] = hte_conditions
             hits.append(hit)
 
-            if len(hits) >= top_k:
-                break
-
-        # Sort by difficulty (easiest first)
+        # Sort by difficulty (easiest first) and cap to top_k
         hits.sort(key=lambda h: h["difficulty"])
+        hits = hits[:top_k]
 
         has_conditions = any(h.get("hte_conditions") for h in hits)
         return _success({

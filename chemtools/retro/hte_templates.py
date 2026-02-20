@@ -185,7 +185,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "hiyama_coupling",
         "hte_families": ["Hiyama_coupling"],
-        "retro_smarts": "[c:1]-[c:2]>>[c:1][Br].[c:2][Si](OEt)(OEt)OEt",
+        "retro_smarts": "[c:1]-[c:2]>>[c:1][Br].[c:2][Si](OCC)(OCC)OCC",
         "description": "Biaryl bond ← aryl halide + arylsilane (Hiyama)",
         "difficulty": 0.45,
         "n_precursors": 2,
