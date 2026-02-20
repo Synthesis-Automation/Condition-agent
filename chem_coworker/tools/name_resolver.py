@@ -210,10 +210,150 @@ resolve_names_to_smiles_tool = ToolPlugin(
 
 
 # ---------------------------------------------------------------------------
+# Tool C: resolve_smiles_to_name (single SMILES → names)
+# ---------------------------------------------------------------------------
+
+def _resolve_smiles_to_name(smiles: str) -> Dict[str, Any]:
+    """Convert a SMILES string to its chemical names using PubChem → CACTUS.
+
+    Canonicalizes the input SMILES with RDKit before lookup, then queries:
+      1. PubChem — returns IUPAC name, preferred/common name, synonyms,
+                   molecular formula, and PubChem CID
+      2. CACTUS  — fallback for names and IUPAC when PubChem misses
+
+    Useful for labelling precursor SMILES from retrosynthetic disconnections,
+    or identifying unknown molecules by structure.
+
+    Args:
+        smiles: Molecule SMILES. Reaction SMILES (with >>) are stripped to
+                the first component automatically.
+                Example: "CC(=O)Oc1ccccc1C(=O)O"
+
+    Returns:
+        dict with iupac_name, preferred_name, synonyms (up to 8),
+        molecular_formula, pubchem_cid, source, and canonical_smiles.
+    """
+    if not smiles or not smiles.strip():
+        return _error("SMILES cannot be empty")
+
+    smiles = smiles.strip()
+
+    try:
+        from chemtools.util.smiles_to_name import resolve_smiles
+        result = resolve_smiles(smiles)
+
+        if result.get("source") == "not_found":
+            return _error(
+                f"Could not identify names for SMILES '{smiles}'. "
+                "The compound may not be in PubChem or CACTUS databases. "
+                "Try canonicalizing the SMILES or check that it is valid.",
+                {"smiles": smiles, "canonical_smiles": result.get("canonical_smiles", smiles)},
+            )
+
+        return _success(result)
+
+    except Exception as exc:
+        return _error(f"SMILES-to-name resolution failed: {exc}")
+
+
+resolve_smiles_to_name_tool = ToolPlugin(
+    name="resolve_smiles_to_name",
+    category="name_resolver",
+    description=(
+        "Convert a SMILES string to its chemical names (IUPAC name, preferred/common name, "
+        "synonyms, molecular formula, PubChem CID) using PubChem → CACTUS cascade. "
+        "Useful for labelling retrosynthetic precursors, identifying unknown structures, "
+        "or annotating reaction SMILES with human-readable names."
+    ),
+    prerequisites=[],
+    fn=_resolve_smiles_to_name,
+)
+
+
+# ---------------------------------------------------------------------------
+# Tool D: resolve_smiles_to_names_batch (multiple SMILES → names)
+# ---------------------------------------------------------------------------
+
+def _resolve_smiles_to_names_batch(smiles_list: str) -> Dict[str, Any]:
+    """Convert multiple SMILES strings to chemical names in a single call.
+
+    Accepts a comma-separated string of SMILES. Resolves each via the
+    PubChem → CACTUS cascade. Useful for annotating all precursors returned
+    by generate_disconnections in one step.
+
+    Args:
+        smiles_list: Comma-separated SMILES strings.
+                     Example: "Brc1ccccc1, OB(O)c1ccccc1, c1ccc(-c2ccccc2)cc1"
+
+    Returns:
+        dict with results list (smiles, iupac_name, preferred_name, source,
+        resolved: bool), total_count, resolved_count, failed.
+    """
+    if not smiles_list or not smiles_list.strip():
+        return _error("SMILES list cannot be empty")
+
+    items = [s.strip() for s in smiles_list.split(",") if s.strip()]
+    if not items:
+        return _error("No valid SMILES found after splitting on commas")
+
+    try:
+        from chemtools.util.smiles_to_name import resolve_smiles
+        results = []
+        failed = []
+
+        for smi in items:
+            result = resolve_smiles(smi)
+            resolved = result.get("source") != "not_found"
+            entry: Dict[str, Any] = {
+                "smiles": smi,
+                "canonical_smiles": result.get("canonical_smiles", smi),
+                "iupac_name": result.get("iupac_name", ""),
+                "preferred_name": result.get("preferred_name", ""),
+                "molecular_formula": result.get("molecular_formula", ""),
+                "pubchem_cid": result.get("pubchem_cid"),
+                "source": result.get("source", "not_found"),
+                "resolved": resolved,
+            }
+            results.append(entry)
+            if not resolved:
+                failed.append(smi)
+
+        return _success({
+            "total_count": len(items),
+            "resolved_count": len(items) - len(failed),
+            "failed_count": len(failed),
+            "results": results,
+            "failed": failed,
+            "message": (
+                f"Named {len(items) - len(failed)}/{len(items)} SMILES. "
+                + (f"Could not identify: {', '.join(failed)}" if failed else "All SMILES identified.")
+            ),
+        })
+
+    except Exception as exc:
+        return _error(f"Batch SMILES-to-name resolution failed: {exc}")
+
+
+resolve_smiles_to_names_batch_tool = ToolPlugin(
+    name="resolve_smiles_to_names_batch",
+    category="name_resolver",
+    description=(
+        "Convert multiple SMILES strings (comma-separated) to chemical names in batch. "
+        "Returns IUPAC name, preferred name, molecular formula, and PubChem CID for each. "
+        "Use after generate_disconnections to annotate precursor SMILES with human-readable names."
+    ),
+    prerequisites=[],
+    fn=_resolve_smiles_to_names_batch,
+)
+
+
+# ---------------------------------------------------------------------------
 # Module export
 # ---------------------------------------------------------------------------
 
 NAME_RESOLVER_TOOLS = [
     resolve_name_to_smiles_tool,
     resolve_names_to_smiles_tool,
+    resolve_smiles_to_name_tool,
+    resolve_smiles_to_names_batch_tool,
 ]
