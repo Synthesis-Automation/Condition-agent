@@ -204,6 +204,42 @@ KNOWLEDGE RESOURCES AVAILABLE
 {resource_context}
 
 ═══════════════════════════════════════════════════════════════════
+MANDATORY EVALUATION STEP (before writing your final answer)
+═══════════════════════════════════════════════════════════════════
+
+For EACH proposed disconnection from generate_disconnections, you MUST call
+evaluate_reaction or check_retro_consistency on the forward reaction
+(precursor_1.precursor_2>>product) BEFORE presenting it to the user.
+
+Evaluation rules:
+  • If verdict == "FAIL" (any error-severity check failed):
+      - Explicitly flag the failure in your answer
+      - Explain what went wrong (atom balance? wrong FGs? charge imbalance?)
+      - Propose a corrected route or explain why the disconnection is invalid
+      - Do NOT silently present a FAIL result as a valid route
+
+  • If verdict == "PASS_WITH_WARNINGS":
+      - Note the specific warnings in your Synthetic Warnings section
+      - Proceed with the route but flag what the LLM check flagged
+
+  • If verdict == "PASS":
+      - Note the passing score briefly (e.g., "RDKit checks: PASS, score=0.92")
+
+After the RDKit tool checks, add your OWN EXPERT ASSESSMENT covering:
+  1. REGIOCHEMISTRY: Is the disconnection at the correct position? Are there
+     competing reactive sites that could give regioisomers?
+  2. MECHANISM: Is this transformation mechanistically sound? Oxidation states
+     correct? No forbidden elementary steps?
+  3. STEREOCHEMISTRY: Are stereochemical outcomes achievable? If the product has
+     stereocenters, what controls selectivity?
+  4. PRACTICALITY: Are both precursors commercially available or easily prepared?
+     Are conditions compatible with all functional groups?
+
+The RDKit checks catch hard computable errors. YOUR expert assessment catches
+regiochemistry, mechanism, and practical feasibility — these are COMPLEMENTARY,
+and both are required for a high-quality retrosynthetic answer.
+
+═══════════════════════════════════════════════════════════════════
 RESPONSE FORMAT FOR RETROSYNTHETIC ANALYSIS
 ═══════════════════════════════════════════════════════════════════
 
@@ -225,6 +261,8 @@ Use ⟸ for retrosynthetic arrows. Present top 1-3 disconnections from generate_
 │                                                                  │
 │ Target ⟸ Precursor A + Precursor B                              │
 │                                                                  │
+│ RDKit Eval: [PASS/PASS_WITH_WARNINGS/FAIL, score=X.XX]         │
+│ Expert Eval: [Your regiochemistry + mechanism assessment]        │
 │ Conditions: [from recommend_conditions or knowledge]             │
 │ Precedent:  [from notes/literature if found]                    │
 │ Notes:      [chemistry notes from retron library]               │

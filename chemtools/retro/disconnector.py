@@ -340,7 +340,8 @@ def _get_dummy_caps(reaction_class: str) -> Tuple[str, str]:
     """Return (cap1, cap2) SMILES atoms/groups for each fragment dummy position."""
     caps = {
         # aryl-Br + aryl-B(OH)2  (Suzuki)
-        "c_c_coupling": ("Br", "B(O)O"),
+        # OB(O) cap: B bonds directly to ring C. B(O)O would put O between B and ring.
+        "c_c_coupling": ("Br", "OB(O)"),
         # aryl-Br + amine: amine fragment dummy removed → implicit H on N remains
         "c_n_coupling": ("Br", ""),
         # alkyl-Br + alcohol: alcohol dummy removed
@@ -396,8 +397,12 @@ def _transform_biaryl_suzuki(mol: Any, retron: Dict[str, Any]) -> List[Tuple[str
 
         # Fragment 1 → aryl halide (replace dummy with Br)
         p1 = _replace_dummy(frags[0], "Br")
-        # Fragment 2 → aryl boronic acid (replace dummy with B(O)O)
-        p2 = _replace_dummy(frags[1], "B(O)O")
+        # Fragment 2 → aryl boronic acid (replace dummy with OB(O), NOT B(O)O)
+        # OB(O) keeps B as the chain atom that bonds directly to the ring carbon.
+        # B(O)O would insert O between B and the ring, producing a borate ester
+        # (B-O-Ar) instead of a boronic acid (Ar-B(OH)2). This gives OBOc1ccoc1
+        # (B has no C neighbor) vs OB(O)c1ccoc1 (B directly bonded to C). ✓
+        p2 = _replace_dummy(frags[1], "OB(O)")
 
         if p1 and p2:
             results.append((p1, p2))

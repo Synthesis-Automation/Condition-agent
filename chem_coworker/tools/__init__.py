@@ -165,11 +165,12 @@ from .literature import LITERATURE_TOOLS
 from .notes import NOTES_TOOLS
 from .retrosynthesis import RETROSYNTHESIS_TOOLS
 from .name_resolver import NAME_RESOLVER_TOOLS
+from .reaction_eval import EVAL_TOOLS
 
 for _plugin in (
     CHEMISTRY_TOOLS + TAXONOMY_TOOLS + CONDITIONS_TOOLS
     + REAGENT_TOOLS + LITERATURE_TOOLS + NOTES_TOOLS
-    + RETROSYNTHESIS_TOOLS + NAME_RESOLVER_TOOLS
+    + RETROSYNTHESIS_TOOLS + NAME_RESOLVER_TOOLS + EVAL_TOOLS
 ):
     REGISTRY.register(_plugin)
 
