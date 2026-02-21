@@ -201,7 +201,15 @@ def _identify_retrons(smiles: str = "", target_smiles: str = "") -> Dict[str, An
             filled = round(m.difficulty * 5)
             difficulty_display = "●" * filled + "○" * (5 - filled)
 
-            retrons_data.append({
+            # Resolve canonical taxonomy_id for this retron
+            taxonomy_id: Optional[str] = None
+            try:
+                from chemtools.retro.reaction_registry import get_taxonomy_id_for_retron
+                taxonomy_id = get_taxonomy_id_for_retron(m.retron_name)
+            except Exception:
+                pass
+
+            entry: Dict[str, Any] = {
                 "name": m.retron_name,
                 "reaction_name": m.reaction_name,
                 "difficulty": m.difficulty,
@@ -210,7 +218,10 @@ def _identify_retrons(smiles: str = "", target_smiles: str = "") -> Dict[str, An
                 "notes": m.notes,
                 "precursor_hints": m.precursor_hints,
                 "match_count": m.match_count,
-            })
+            }
+            if taxonomy_id:
+                entry["taxonomy_id"] = taxonomy_id
+            retrons_data.append(entry)
 
         return _success({
             "smiles": mol_smiles,
@@ -477,43 +488,42 @@ find_retro_precedent_tool = ToolPlugin(
 # DRFP k-NN search in the HTE reaction database (~231k reactions)
 # ---------------------------------------------------------------------------
 
-# Retron/reaction name → HTE family string (supplements _family_text in core_utils)
-_EXTRA_RETRON_MAP = {
-    "biaryl_suzuki": "Suzuki",
-    "aryl_alkyl_negishi": "Suzuki",          # closest family available
-    "alkyl_alkyl_kumada": "Suzuki",
-    "aryl_alkene_heck": "HeckMizoroki_coupling",
-    "heck_mizoroki": "HeckMizoroki_coupling",
-    "aryl_alkyne_sonogashira": "Sonogashira_coupling",
-    "aryl_amine_buchwald": "C_N_Coupling",
-    "aryl_amine_ullmann": "C_N_Coupling",
-    "alpha_amino_reductive_amination": "Reductive_amination",
-    "reductive_amination": "Reductive_amination",
-    "nitrile_reduction_amine": "C_N_Coupling",
-    "aryl_ether_ullmann_o": "C_O_Coupling",
-    "williamson_ether": "C_O_Coupling",
-    "mitsunobu_inversion": "C_O_Coupling",
-    "ester_from_acid_alcohol": "Amide_formation",   # closest; esterification rare in HTE
-    "amide_direct": "Amide_formation",
-    "sulfonamide_formation": "Amide_formation",
-    "sn2_alkyl_amine": "C_N_Coupling",
-    "heterocycle_buchwald_n_arylation": "C_N_Coupling",
-}
+# Retron/reaction name → HTE family string
+# Resolved via the unified reaction_registry (taxonomy_id → hte_families).
+# The legacy _EXTRA_RETRON_MAP has been removed; all lookups go through the
+# registry which is built from the taxonomy_id fields on each retron/template.
 
 
 def _map_reaction_to_family(reaction_name: str) -> Optional[str]:
-    """Map a retron/reaction name to a canonical HTE family string, or None."""
+    """Map a retron/reaction name to a canonical HTE family string, or None.
+
+    Resolution order:
+    1. Treat *reaction_name* as a retron name → registry → first HTE family.
+    2. Treat *reaction_name* as a template name → registry → first HTE family.
+    3. Fall back to core_utils normaliser (unchanged behaviour).
+    """
     if not reaction_name:
         return None
-    rl = reaction_name.lower().strip()
-    # Try extra retron map first (most specific)
-    if rl in _EXTRA_RETRON_MAP:
-        return _EXTRA_RETRON_MAP[rl]
-    # Fall back to core_utils normalizer
+    # 1. Retron name lookup
+    try:
+        from chemtools.retro.reaction_registry import get_hte_families_for_retron
+        families = get_hte_families_for_retron(reaction_name)
+        if families:
+            return families[0]
+    except Exception:
+        pass
+    # 2. Template name lookup
+    try:
+        from chemtools.retro.reaction_registry import get_hte_families_for_template
+        families = get_hte_families_for_template(reaction_name)
+        if families:
+            return families[0]
+    except Exception:
+        pass
+    # 3. Core-utils normaliser fallback
     try:
         from chemtools.precedent.core_utils import _family_text
         mapped = _family_text(reaction_name)
-        # _family_text returns the input unchanged if it doesn't recognize it
         if mapped != reaction_name:
             return mapped
     except Exception:
@@ -1245,6 +1255,7 @@ def _apply_hte_templates(
 
             hit: Dict[str, Any] = {
                 "template_name": tmpl["name"],
+                "taxonomy_id": tmpl.get("taxonomy_id", ""),
                 "hte_families": tmpl.get("hte_families", []),
                 "precursor_1": p1,
                 "precursor_2": p2,

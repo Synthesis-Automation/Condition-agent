@@ -136,7 +136,11 @@
         "s_nar",
         "Aromatic_Nucleophilic_Substitution",
         "aromatic_nucleophilic_substitution",
-        "SNAr_amination"
+        "SNAr_amination",
+        "buchwald_hartwig_amination",
+        "ullmann_coupling",
+        "n_heterocycle_arylation",
+        "n_arylation"
       ],
       "description": "Aryl amination via C-N cross-coupling; named variants differ mainly by catalyst.",
       "metadata": {
@@ -231,7 +235,10 @@
         "ullmann_co",
         "c_o_coupling",
         "SNAr-CO",
-        "snar_co"
+        "snar_co",
+        "ullmann_ether_synthesis",
+        "williamson_synthesis",
+        "williamson_ether_synthesis"
       ],
       "description": "Aryl ether formation via C-O coupling; named variants differ mainly by catalyst.",
       "metadata": {
@@ -287,7 +294,9 @@
         "chan_lam_cn",
         "chan_lam",
         "Chan-Lam C-N",
-        "Chan Lam C-N"
+        "Chan Lam C-N",
+        "chan_lam_n_arylation",
+        "chan_lam_sulfonamide"
       ],
       "constraints": {
         "include_bond_formed": [
@@ -395,7 +404,9 @@
         "alkyl_substitution",
         "SN2",
         "SN2_substitution",
-        "alkyl_sn2"
+        "alkyl_sn2",
+        "n_alkylation",
+        "sn2_alkyl_amine"
       ],
       "description": "N/O/S nucleophilic substitution on alkyl electrophiles (halides/sulfonates), covering SN2-like alkylation."
     },
@@ -937,7 +948,8 @@
       },
       "aliases": [
         "friedel_crafts_acylation",
-        "fc_acylation"
+        "fc_acylation",
+        "ketone_from_friedel_crafts"
       ],
       "description": "Friedel-Crafts acylation."
     },
@@ -1069,7 +1081,9 @@
       ],
       "aliases": [
         "ar_h_arylation",
-        "c_h_arylation"
+        "c_h_arylation",
+        "c_h_activation",
+        "c_h_functionalization_direct"
       ],
       "constraints": {
         "include_bond_formed": [
@@ -1207,7 +1221,8 @@
         "O=C(O)c1ccccc1.NCc1ccccc1>>O=C(NCc1ccccc1)c1ccccc1"
       ],
       "aliases": [
-        "amide_formation"
+        "amide_formation",
+        "amide_coupling"
       ]
     },
     {
@@ -1320,7 +1335,8 @@
         "Wittig",
         "Wittig reaction",
         "wittig",
-        "wittig_reaction"
+        "wittig_reaction",
+        "horner_wadsworth_emmons"
       ],
       "description": "Wittig/HWE-like olefination of carbonyls to C=C products, supported by C-P bond cleavage evidence.",
       "constraints": {
@@ -1432,7 +1448,9 @@
       ],
       "aliases": [
         "oxidation_primary_alcohol_to_aldehyde",
-        "primary_alcohol_oxidation_to_aldehyde"
+        "primary_alcohol_oxidation_to_aldehyde",
+        "primary_alcohol_oxidation",
+        "aldehyde_from_oxidation"
       ],
       "description": "Selective oxidation of primary alcohols to aldehydes."
     },
@@ -1459,7 +1477,9 @@
       ],
       "aliases": [
         "oxidation_secondary_alcohol_to_ketone",
-        "secondary_alcohol_oxidation_to_ketone"
+        "secondary_alcohol_oxidation_to_ketone",
+        "secondary_alcohol_oxidation",
+        "ketone_from_oxidation"
       ],
       "description": "Oxidation of secondary alcohols to ketones."
     },
@@ -1688,7 +1708,8 @@
         "aldehyde_ketone_to_alcohol",
         "NaBH4_carbonyl_reductions",
         "Reduction_LAH_LiAlH4",
-        "Reduction-Borane"
+        "Reduction-Borane",
+        "carbonyl_reduction"
       ],
       "description": "Reduction of aldehydes and ketones to alcohol products."
     },
@@ -1846,7 +1867,11 @@
         "halogenation",
         "bromination",
         "chlorination",
-        "iodination"
+        "iodination",
+        "electrophilic_aromatic_bromination",
+        "electrophilic_aromatic_chlorination",
+        "nbs_allylic_bromination",
+        "benzylic_bromination"
       ]
     },
     {
@@ -1899,7 +1924,8 @@
         "Appel_halogenation",
         "Appel halogenation",
         "Chlorination_SOCl2_oxalyl_chloride",
-        "alcohol_halogenation"
+        "alcohol_halogenation",
+        "deoxy_fluorination"
       ],
       "description": "Conversion of alcohols to alkyl halides (Appel/SOCl2/oxalyl chloride families)."
     },
@@ -1959,6 +1985,693 @@
         "epoxidation"
       ],
       "description": "Oxidation of alkenes to epoxides."
+    },
+    {
+      "id": "Aldol_addition",
+      "redox_neutral": true,
+      "reactants": {
+        "nucleophile": ["@carbonyls", "@enolates"],
+        "electrophile": ["Alkyl-CHO", "Ar-CHO", "@carbonyls"]
+      },
+      "products": {
+        "product": ["beta-hydroxy-carbonyl", "Alkenyl-COR", "Alkenyl-COOR"]
+      },
+      "examples": [
+        "CC=O.CC=O>>CC(O)CC=O"
+      ],
+      "aliases": [
+        "aldol_condensation",
+        "aldol_addition",
+        "aldol_classic",
+        "aldol_reaction",
+        "Aldol"
+      ],
+      "description": "Aldol addition/condensation forming beta-hydroxy carbonyl or alpha,beta-unsaturated carbonyl products.",
+      "constraints": {
+        "include_bond_formed": ["C-C"]
+      }
+    },
+    {
+      "id": "Grignard_addition",
+      "redox_neutral": false,
+      "reactants": {
+        "reagent": ["Ar-MgX", "Alkyl-MgX", "Alkenyl-MgX"],
+        "electrophile": ["@carbonyls", "Alkyl-CHO", "Ar-CHO"]
+      },
+      "products": {
+        "product": ["@alcohols_oh", "Ar-Alkyl", "Alkyl-Alkyl"]
+      },
+      "examples": [
+        "O=Cc1ccccc1.BrMgCC>>OC(CC)c1ccccc1"
+      ],
+      "aliases": [
+        "grignard_reaction",
+        "grignard_addition",
+        "Grignard",
+        "Grignard_reaction"
+      ],
+      "description": "Grignard reagent addition to carbonyls forming C-C bonds.",
+      "constraints": {
+        "include_bond_formed": ["C-C"]
+      }
+    },
+    {
+      "id": "Diels_Alder",
+      "redox_neutral": true,
+      "reactants": {
+        "diene": ["Alkenyl-Alkenyl", "Ar-Alkenyl"],
+        "dienophile": ["Alkenyl-COR", "Alkenyl-CN", "Alkenyl-COOR"]
+      },
+      "products": {
+        "product": ["Cyclohexene"]
+      },
+      "examples": [
+        "C=CC=C.C=CC(=O)C>>O=C1CC2CC=CC2C1"
+      ],
+      "aliases": [
+        "diels_alder",
+        "Diels-Alder",
+        "Diels_Alder_cycloaddition",
+        "[4+2]"
+      ],
+      "description": "[4+2] cycloaddition of diene and dienophile forming cyclohexene products.",
+      "constraints": {
+        "include_bond_formed": ["C-C"]
+      }
+    },
+    {
+      "id": "Simmons_Smith_cyclopropanation",
+      "redox_neutral": true,
+      "reactants": {
+        "substrate": ["Alkenyl-Alkenyl", "Ar-Alkenyl", "Alkyl-Alkenyl"]
+      },
+      "products": {
+        "product": ["Cyclopropane"]
+      },
+      "examples": [
+        "C=C.IC>>C1CC1"
+      ],
+      "catalysts": ["Zn"],
+      "aliases": [
+        "simmons_smith",
+        "Simmons-Smith",
+        "cyclopropanation",
+        "Simmons_Smith_cyclopropanation"
+      ],
+      "description": "Simmons-Smith cyclopropanation of alkenes using zinc carbenoid reagents.",
+      "constraints": {
+        "include_bond_formed": ["C-C"]
+      }
+    },
+    {
+      "id": "Pauson_Khand",
+      "redox_neutral": false,
+      "reactants": {
+        "alkyne": ["@terminal_alkynes"],
+        "alkene": ["Alkyl-Alkenyl", "Ar-Alkenyl"]
+      },
+      "products": {
+        "product": ["Cyclopentenone"]
+      },
+      "examples": [
+        "C#CC.C=CC>>O=C1CC2CC=C2C1"
+      ],
+      "catalysts": ["Co"],
+      "aliases": [
+        "pauson_khand",
+        "Pauson-Khand",
+        "PKR"
+      ],
+      "description": "Pauson-Khand [2+2+1] cycloaddition of alkyne, alkene and CO forming cyclopentenones.",
+      "constraints": {
+        "include_bond_formed": ["C-C", "C-O"]
+      }
+    },
+    {
+      "id": "Lactam_formation",
+      "redox_neutral": true,
+      "reactants": {
+        "acid": ["@carboxylic_acids", "@acyl_halides"],
+        "amine": "@amines_nh"
+      },
+      "products": {
+        "product": ["Lactam"]
+      },
+      "examples": [
+        "O=C(O)CCCCN>>O=C1CCCCN1"
+      ],
+      "aliases": [
+        "lactam_formation",
+        "lactam_ring_closure",
+        "lactam_cyclization",
+        "beta_lactam_formation"
+      ],
+      "description": "Intramolecular amide bond formation giving cyclic lactam.",
+      "constraints": {
+        "include_bond_formed": ["C-N"]
+      }
+    },
+    {
+      "id": "Lactonization",
+      "redox_neutral": true,
+      "reactants": {
+        "acid": "@carboxylic_acids",
+        "alcohol": "@alcohols_oh"
+      },
+      "products": {
+        "product": ["Lactone", "@esters"]
+      },
+      "examples": [
+        "O=C(O)CCCO>>O=C1CCCO1"
+      ],
+      "aliases": [
+        "lactonization",
+        "lactone_from_hydroxy_acid",
+        "lactone_cyclization",
+        "macrolactonization"
+      ],
+      "description": "Intramolecular esterification forming cyclic lactone.",
+      "constraints": {
+        "include_bond_formed": ["C-O"]
+      }
+    },
+    {
+      "id": "Mitsunobu_reaction",
+      "redox_neutral": false,
+      "reactants": {
+        "alcohol": "@alcohols_oh",
+        "pronucleophile": ["@carboxylic_acids", "@amines_nh", "@thiols_sh"]
+      },
+      "products": {
+        "product": ["@esters", "@aryl_amines", "Alkyl-NHR", "Alkyl-SR"]
+      },
+      "examples": [
+        "CC(O)CCO.O=C(O)c1ccccc1>>CC(OC(=O)c1ccccc1)CCO"
+      ],
+      "catalysts": ["PPh3", "DIAD"],
+      "aliases": [
+        "mitsunobu_reaction",
+        "mitsunobu_inversion",
+        "mitsunobu_etherification",
+        "Mitsunobu",
+        "Mitsunobu_esterification"
+      ],
+      "description": "Mitsunobu reaction: inversion of alcohol configuration under PPh3/DIAD.",
+      "constraints": {
+        "include_bond_formed": ["C-O", "C-N", "C-S"]
+      }
+    },
+    {
+      "id": "Nitrile_hydrolysis",
+      "redox_neutral": false,
+      "reactants": {
+        "substrate": ["Ar-CN", "Alkyl-CN", "HeteroAr-CN"]
+      },
+      "products": {
+        "product": ["Ar-COOH", "Alkyl-COOH", "Ar-CONH2", "Alkyl-CONH2"]
+      },
+      "examples": [
+        "N#Cc1ccccc1>>O=C(O)c1ccccc1"
+      ],
+      "aliases": [
+        "nitrile_hydrolysis",
+        "carboxylic_acid_from_nitrile",
+        "nitrile_to_acid",
+        "nitrile_to_amide"
+      ],
+      "description": "Hydrolysis of nitriles to carboxylic acids or amides.",
+      "constraints": {
+        "include_bond_formed": ["C-O"]
+      }
+    },
+    {
+      "id": "Dihydroxylation",
+      "redox_neutral": false,
+      "reactants": {
+        "substrate": ["Alkyl-Alkenyl", "Ar-Alkenyl", "Alkenyl-Alkenyl"]
+      },
+      "products": {
+        "product": ["Diol"]
+      },
+      "examples": [
+        "C=CC>>OC(O)CC"
+      ],
+      "catalysts": ["OsO4"],
+      "aliases": [
+        "dihydroxylation",
+        "alkene_sharpless",
+        "sharpless_dihydroxylation",
+        "osmium_dihydroxylation"
+      ],
+      "description": "Dihydroxylation of alkenes to syn or anti diols.",
+      "constraints": {
+        "include_bond_formed": ["C-O"]
+      }
+    },
+    {
+      "id": "Boc_protection",
+      "redox_neutral": true,
+      "reactants": {
+        "amine": "@amines_nh"
+      },
+      "products": {
+        "product": ["@aryl_amides", "Alkyl-NHBoc"]
+      },
+      "examples": [
+        "Nc1ccccc1>>O=C(Nc1ccccc1)OC(C)(C)C"
+      ],
+      "aliases": [
+        "boc_protection",
+        "boc_protected_amine",
+        "boc_amine",
+        "tert_butyl_carbamate_formation"
+      ],
+      "description": "Protection of amines as Boc (tert-butoxycarbonyl) carbamates.",
+      "constraints": {
+        "include_bond_formed": ["C-N"]
+      }
+    },
+    {
+      "id": "Cbz_protection",
+      "redox_neutral": true,
+      "reactants": {
+        "amine": "@amines_nh"
+      },
+      "products": {
+        "product": ["@aryl_amides", "Alkyl-NHCbz"]
+      },
+      "examples": [
+        "Nc1ccccc1>>O=C(Nc1ccccc1)OCc1ccccc1"
+      ],
+      "aliases": [
+        "cbz_protection",
+        "cbz_protected_amine",
+        "z_protection",
+        "benzyloxycarbonyl_protection"
+      ],
+      "description": "Protection of amines as Cbz (benzyloxycarbonyl) carbamates.",
+      "constraints": {
+        "include_bond_formed": ["C-N"]
+      }
+    },
+    {
+      "id": "Silyl_ether_protection",
+      "redox_neutral": true,
+      "reactants": {
+        "alcohol": "@alcohols_oh"
+      },
+      "products": {
+        "product": ["Alkyl-OTBS", "Alkyl-OTMS", "Alkyl-OTIPS"]
+      },
+      "examples": [
+        "CCO>>CCO[Si](C)(C)C(C)(C)C"
+      ],
+      "aliases": [
+        "silyl_ether_protection",
+        "silyl_ether",
+        "tbs_protection",
+        "tms_protection",
+        "tips_protection"
+      ],
+      "description": "Protection of alcohols as silyl ethers (TMS, TBS, TIPS, TBDPS).",
+      "constraints": {
+        "include_bond_formed": ["C-O"]
+      }
+    },
+    {
+      "id": "Sulfonamide_synthesis",
+      "redox_neutral": true,
+      "reactants": {
+        "electrophile": ["Ar-SO2Cl", "Alkyl-SO2Cl"],
+        "nucleophile": "@amines_nh"
+      },
+      "products": {
+        "product": "@aryl_sulfonamides"
+      },
+      "examples": [
+        "O=S(=O)(Cl)c1ccccc1.Nc1ccccc1>>O=S(=O)(Nc1ccccc1)c1ccccc1"
+      ],
+      "aliases": [
+        "sulfonamide_synthesis",
+        "sulfonamide_formation",
+        "sulfonamide_from_sulfonyl_chloride",
+        "sulfonylation"
+      ],
+      "description": "Sulfonamide formation from sulfonyl chlorides and amines.",
+      "constraints": {
+        "include_bond_formed": ["N-S"]
+      }
+    },
+    {
+      "id": "Carbamate_formation",
+      "redox_neutral": true,
+      "reactants": {
+        "amine": "@amines_nh",
+        "electrophile": ["Alkyl-OCOCl", "Ar-OCOCl"]
+      },
+      "products": {
+        "product": ["Alkyl-NHR", "@aryl_amides"]
+      },
+      "examples": [
+        "Nc1ccccc1.O=C(Cl)OCC>>O=C(Nc1ccccc1)OCC"
+      ],
+      "aliases": [
+        "carbamate_formation",
+        "carbamate_from_amine_chloroformate",
+        "urethane_formation"
+      ],
+      "description": "Carbamate formation from amines and chloroformates.",
+      "constraints": {
+        "include_bond_formed": ["C-N"]
+      }
+    },
+    {
+      "id": "Gabriel_amine_synthesis",
+      "redox_neutral": false,
+      "reactants": {
+        "electrophile": ["Alkyl-Br", "Alkyl-Cl", "Alkyl-I"],
+        "reagent": ["Phthalimide"]
+      },
+      "products": {
+        "product": ["Alkyl-NH2"]
+      },
+      "examples": [
+        "O=C1NC(=O)c2ccccc21.CCBr>>CCN1C(=O)c2ccccc2C1=O"
+      ],
+      "catalysts": ["K2CO3"],
+      "aliases": [
+        "gabriel_amine",
+        "gabriel_synthesis",
+        "gabriel_amine_synthesis"
+      ],
+      "description": "Gabriel synthesis: phthalimide alkylation then hydrazinolysis giving primary amines.",
+      "constraints": {
+        "include_bond_formed": ["C-N"]
+      }
+    },
+    {
+      "id": "Curtius_Hofmann_rearrangement",
+      "redox_neutral": false,
+      "reactants": {
+        "acid": ["@carboxylic_acids", "@acyl_halides"]
+      },
+      "products": {
+        "product": ["Ar-NH2", "Alkyl-NH2"]
+      },
+      "examples": [
+        "O=C(O)c1ccccc1>>Nc1ccccc1"
+      ],
+      "aliases": [
+        "curtius_rearrangement",
+        "curtius_reaction",
+        "hofmann_rearrangement",
+        "lossen_rearrangement"
+      ],
+      "description": "Curtius or Hofmann rearrangement: carboxylic acid to amine with loss of CO2.",
+      "constraints": {
+        "include_bond_formed": ["C-N"]
+      }
+    },
+    {
+      "id": "Wacker_oxidation",
+      "redox_neutral": false,
+      "reactants": {
+        "substrate": ["Alkyl-Alkenyl", "Ar-Alkenyl"]
+      },
+      "products": {
+        "product": ["Alkyl-COR", "Ar-COR"]
+      },
+      "examples": [
+        "C=CC>>CC(C)=O"
+      ],
+      "catalysts": ["Pd", "Cu"],
+      "aliases": [
+        "wacker_oxidation",
+        "Wacker",
+        "wacker_process"
+      ],
+      "description": "Pd-catalyzed oxidation of terminal alkenes to methyl ketones (Wacker).",
+      "constraints": {
+        "include_bond_formed": ["C-O"]
+      }
+    },
+    {
+      "id": "Diazotransfer",
+      "redox_neutral": false,
+      "reactants": {
+        "amine": ["Alkyl-NH2", "Ar-NH2", "HeteroAr-NH2"]
+      },
+      "products": {
+        "product": ["Alkyl-N3", "Ar-N3"]
+      },
+      "examples": [
+        "Nc1ccccc1>>N=[N+]=[N-]c1ccccc1"
+      ],
+      "aliases": [
+        "diazotransfer_azide",
+        "diazotransfer",
+        "azide_from_amine"
+      ],
+      "description": "Diazotransfer converting primary amines to organic azides.",
+      "constraints": {
+        "include_bond_formed": ["N-N"]
+      }
+    },
+    {
+      "id": "NHK_reaction",
+      "redox_neutral": false,
+      "reactants": {
+        "alkenyl_halide": ["Alkenyl-I", "Alkenyl-Br"],
+        "aldehyde": ["Alkyl-CHO", "Ar-CHO"]
+      },
+      "products": {
+        "product": ["@alcohols_oh"]
+      },
+      "examples": [
+        "IC=CCCCCCC.O=Cc1ccccc1>>OC(C=CCCCCCC)c1ccccc1"
+      ],
+      "catalysts": ["Cr", "Ni"],
+      "aliases": [
+        "nozaki_hiyama_kishi",
+        "nhk",
+        "NHK"
+      ],
+      "description": "Nozaki-Hiyama-Kishi (NHK) reaction: Cr/Ni mediated coupling of vinyl halides with aldehydes.",
+      "constraints": {
+        "include_bond_formed": ["C-C"]
+      }
+    },
+    {
+      "id": "Knoevenagel_condensation",
+      "redox_neutral": true,
+      "reactants": {
+        "aldehyde": ["Alkyl-CHO", "Ar-CHO"],
+        "methylene_compound": "@acidic_ch"
+      },
+      "products": {
+        "product": ["Alkenyl-CN", "Alkenyl-COR", "Alkenyl-COOR"]
+      },
+      "examples": [
+        "O=Cc1ccccc1.CC(=O)CC(=O)C>>CC(=O)/C=C/c1ccccc1"
+      ],
+      "aliases": [
+        "knoevenagel_condensation",
+        "knoevenagel_reaction",
+        "knoevenagel"
+      ],
+      "description": "Knoevenagel condensation of aldehydes with active methylene compounds.",
+      "constraints": {
+        "include_bond_formed": ["C-C"]
+      }
+    },
+    {
+      "id": "Enol_triflate_formation",
+      "redox_neutral": true,
+      "reactants": {
+        "substrate": ["@carbonyls", "Ar-COR", "Alkyl-COR"]
+      },
+      "products": {
+        "product": ["Alkenyl-OTf", "Ar-OTf"]
+      },
+      "examples": [
+        "O=C1CCCCC1>>O=S(=O)(OC1=CCCCC1)C(F)(F)F"
+      ],
+      "aliases": [
+        "enol_triflate_formation",
+        "vinyl_triflate_from_ketone",
+        "triflylation"
+      ],
+      "description": "Conversion of ketones/enolates to vinyl triflates for cross-coupling.",
+      "constraints": {
+        "include_bond_formed": ["C-O"]
+      }
+    },
+    {
+      "id": "Aryltrifluoroborate_synthesis",
+      "redox_neutral": true,
+      "reactants": {
+        "electrophile": "@sp2_electrophiles"
+      },
+      "products": {
+        "product": ["Ar-BF3K", "HeteroAr-BF3K"]
+      },
+      "catalysts": ["Pd"],
+      "aliases": [
+        "pot_aryltrifluoroborate",
+        "organotrifluoroborate_from_halide",
+        "aryltrifluoroborate_synthesis",
+        "molander_borylation"
+      ],
+      "description": "Synthesis of potassium aryltrifluoroborates from aryl halides.",
+      "constraints": {
+        "include_bond_formed": ["C-B"]
+      }
+    },
+    {
+      "id": "Urea_thiourea_formation",
+      "redox_neutral": true,
+      "reactants": {
+        "isocyanate": ["Ar-NCO", "Alkyl-NCO"],
+        "amine": "@amines_nh"
+      },
+      "products": {
+        "product": ["Ar-NHCONHR", "Alkyl-NHCONHR"]
+      },
+      "examples": [
+        "O=C=Nc1ccccc1.Nc1ccccc1>>O=C(Nc1ccccc1)Nc1ccccc1"
+      ],
+      "aliases": [
+        "urea_formation",
+        "urea_thiourea_formation",
+        "isocyanate_addition"
+      ],
+      "description": "Urea or thiourea formation from isocyanates/isothiocyanates and amines.",
+      "constraints": {
+        "include_bond_formed": ["C-N"]
+      }
+    },
+    {
+      "id": "SNAr",
+      "redox_neutral": true,
+      "reactants": {
+        "electrophile": ["Ar-F", "Ar-Cl", "Ar-NO2", "HeteroAr-F", "HeteroAr-Cl"],
+        "nucleophile": ["@amines_nh", "@alcohols_oh", "@thiols_sh"]
+      },
+      "products": {
+        "product": ["@aryl_amines", "@aryl_ethers", "Ar-SR", "Ar-F"]
+      },
+      "examples": [
+        "O=[N+]([O-])c1ccc(F)cc1.Nc1ccccc1>>O=[N+]([O-])c1ccc(Nc2ccccc2)cc1",
+        "Fc1cccnc1.CO>>COc1cccnc1"
+      ],
+      "aliases": [
+        "snar_amination",
+        "snar_co",
+        "nucleophilic_aromatic_fluorination",
+        "aryl_fluorine_snarf",
+        "snarf",
+        "SNAr_fluorination",
+        "SNAr_substitution"
+      ],
+      "description": "Nucleophilic aromatic substitution (SNAr) activated by electron-withdrawing ring substituents.",
+      "constraints": {
+        "include_bond_formed": ["C-N", "C-O", "C-S"]
+      }
+    },
+    {
+      "id": "Electrophilic_fluorination",
+      "redox_neutral": false,
+      "reactants": {
+        "substrate": ["@acidic_ch", "Ar-H", "Alkyl-H"]
+      },
+      "products": {
+        "product": ["Ar-F", "Alkyl-F"]
+      },
+      "examples": [
+        "O=C1CCCCC1>>O=C1CCCCC1F"
+      ],
+      "aliases": [
+        "electrophilic_fluorination",
+        "selectfluor_fluorination",
+        "nfsi_fluorination",
+        "alpha_fluorination"
+      ],
+      "description": "Electrophilic fluorination using Selectfluor, NFSI or similar N-F reagents.",
+      "constraints": {
+        "include_bond_formed": ["C-F"]
+      }
+    },
+    {
+      "id": "Liebeskind_Srogl",
+      "redox_neutral": true,
+      "reactants": {
+        "thioester": ["Alkyl-SR", "Ar-SR"],
+        "boronic_acid": "@organoboron"
+      },
+      "products": {
+        "product": ["Ar-Ar", "Ar-COR", "Alkyl-COR"]
+      },
+      "examples": [
+        "CSc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+      ],
+      "catalysts": ["Pd", "Cu"],
+      "aliases": [
+        "liebeskind_srogl",
+        "liebeskind_srogl_coupling",
+        "thioester_cross_coupling"
+      ],
+      "description": "Pd-catalyzed Liebeskind-Srogl coupling of thioethers with boronic acids.",
+      "constraints": {
+        "include_bond_formed": ["C-C"]
+      }
+    },
+    {
+      "id": "Giese_radical_addition",
+      "redox_neutral": false,
+      "reactants": {
+        "radical_precursor": ["Alkyl-I", "Alkyl-Br"],
+        "acceptor": ["Alkenyl-COR", "Alkenyl-COOR", "Alkenyl-CN"]
+      },
+      "products": {
+        "product": ["Alkyl-COR", "Alkyl-COOR", "Alkyl-CN"]
+      },
+      "examples": [
+        "IC.C=CC(=O)C>>CC(CC)C(C)=O"
+      ],
+      "aliases": [
+        "giese_radical",
+        "giese_reaction",
+        "giese_radical_addition",
+        "radical_conjugate_addition"
+      ],
+      "description": "Giese radical addition to electron-deficient alkenes.",
+      "constraints": {
+        "include_bond_formed": ["C-C"]
+      }
+    },
+    {
+      "id": "Thiol_ene",
+      "redox_neutral": true,
+      "reactants": {
+        "thiol": "@thiols_sh",
+        "alkene": ["Alkyl-Alkenyl", "Ar-Alkenyl"]
+      },
+      "products": {
+        "product": ["Alkyl-SR", "Alkenyl-SR"]
+      },
+      "examples": [
+        "CS.C=C>>CSCC"
+      ],
+      "aliases": [
+        "thiol_ene",
+        "thiol_ene_reaction",
+        "thiol_ene_click",
+        "radical_thiol_ene"
+      ],
+      "description": "Radical or photoredox thiol-ene addition across alkenes.",
+      "constraints": {
+        "include_bond_formed": ["C-S"]
+      }
     }
   ]
 }

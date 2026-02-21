@@ -46,16 +46,18 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {
         "name": "buchwald_hartwig",
         "hte_families": ["C_N_Coupling"],
-        "retro_smarts": "[c:1]-[NX3;!$(NC=O):2]>>[c:1][Br].[N:2]",
-        "description": "Aryl amine ← aryl bromide + amine (Buchwald-Hartwig/Pd)",
+        "taxonomy_id": "C_N_Coupling",
+        "retro_smarts": "[c:1]-[#7X3;!$(NC=O):2]>>[c:1][Br].[#7H:2]",
+        "description": "Aryl amine / N-aryl heterocycle ← aryl bromide + amine/N-H heterocycle (Buchwald-Hartwig/Pd)",
         "difficulty": 0.35,
         "n_precursors": 2,
     },
     {   # ★ not in retrons
         "name": "snar_amination",
         "hte_families": ["SNAr_amination"],
-        "retro_smarts": "[c:1]-[NX3;!$(NC=O):2]>>[c:1][F].[N:2]",
-        "description": "Aryl amine ← electron-poor aryl fluoride + amine (SNAr)",
+        "taxonomy_id": "SNAr",
+        "retro_smarts": "[c:1]-[#7X3;!$(NC=O):2]>>[c:1][F].[#7H:2]",
+        "description": "Aryl amine / N-aryl heterocycle ← electron-poor aryl fluoride + amine (SNAr)",
         "difficulty": 0.20,
         "n_precursors": 2,
         "notes": "Works best on electron-poor arenes (pyridines, nitro-aryls). "
@@ -64,8 +66,9 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "chan_lam_n_arylation",
         "hte_families": ["ChanLam_Narylation"],
-        "retro_smarts": "[c:1]-[NR:2]>>[c:1]B(O)O.[N:2]",
-        "description": "N-aryl amine ← arylboronic acid + amine (Chan-Lam, Cu-catalysed)",
+        "taxonomy_id": "Chan_Lam_C_N_Coupling",
+        "retro_smarts": "[c:1]-[NX3H1:2]>>[c:1]B(O)O.[N:2]",
+        "description": "N-aryl amine ← arylboronic acid + secondary amine (Chan-Lam, Cu-catalysed)",
         "difficulty": 0.30,
         "n_precursors": 2,
         "notes": "Cu(OAc)2, pyridine or Et3N, open air or O2. Mild conditions, room temp. "
@@ -74,6 +77,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "chan_lam_sulfonamide",
         "hte_families": ["ChanLam_sulfonamide_converted"],
+        "taxonomy_id": "Chan_Lam_C_N_Coupling",
         "retro_smarts": "[c:1]-[NX3:2]-[SX4](=O)(=O)>>[c:1]B(O)O.[N:2][S](=O)(=O)",
         "description": "N-aryl sulfonamide ← arylboronic acid + sulfonamide (Chan-Lam)",
         "difficulty": 0.30,
@@ -83,6 +87,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
         "name": "amide_coupling",
         "hte_families": ["Amide_formation", "CDI-mediated_amidation", "Anhydride_coupling",
                          "Weinreb_amide"],
+        "taxonomy_id": "Amide_formation",
         "retro_smarts": "[C:1](=[O:2])-[NX3:3]>>[C:1](=[O:2])O.[N:3]",
         "description": "Amide ← carboxylic acid + amine (HATU/EDC/DIC coupling)",
         "difficulty": 0.15,
@@ -91,8 +96,9 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {
         "name": "reductive_amination",
         "hte_families": ["Reductive_amination", "Reduction_NaBHOAc3_NaBH3CN"],
-        "retro_smarts": "[CH:1]([NX3;!$(NC=O):2])>>[C:1]=O.[N:2]",
-        "description": "Secondary/tertiary amine ← aldehyde/ketone + amine (reductive amination)",
+        "taxonomy_id": "Reductive_amination",
+        "retro_smarts": "[CX4H1,CX4H2:1][NX3;!H0;!$(NC=O):2]>>[C:1]=O.[N:2]",
+        "description": "Secondary amine ← aldehyde/ketone + amine (reductive amination)",
         "difficulty": 0.20,
         "n_precursors": 2,
         "notes": "NaBH(OAc)3 or NaBH3CN as reductant. pH 5–7 (AcOH). Works for primary and "
@@ -101,6 +107,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "urea_formation",
         "hte_families": ["Urea_and_thiourea_formation"],
+        "taxonomy_id": "Urea_thiourea_formation",
         "retro_smarts": "[NX3:1]-[C:2](=[O,S:3])-[NX3:4]>>[N:1].[C:2](=[O,S:3])=[N:4]",
         "description": "Urea/thiourea ← amine + isocyanate/isothiocyanate",
         "difficulty": 0.15,
@@ -110,6 +117,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "sulfonamide_from_sulfonyl_chloride",
         "hte_families": ["Sulfonamide_formation"],
+        "taxonomy_id": "Sulfonamide_synthesis",
         "retro_smarts": "[NX3:1]-[SX4:2](=O)(=O)>>[N:1].[S:2](=O)(=O)Cl",
         "description": "Sulfonamide ← sulfonyl chloride + amine",
         "difficulty": 0.10,
@@ -118,6 +126,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "gabriel_amine",
         "hte_families": ["Gabriel_amine_synthesis"],
+        "taxonomy_id": "Gabriel_amine_synthesis",
         "retro_smarts": "[CX4:1]-[NH2:2]>>[C:1][Br].[N:2]",
         "description": "Primary amine ← alkyl bromide + phthalimide (Gabriel synthesis)",
         "difficulty": 0.25,
@@ -126,6 +135,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "curtius_rearrangement",
         "hte_families": ["Curtius_rearrangement", "Hofmann_rearrangement"],
+        "taxonomy_id": "Curtius_Hofmann_rearrangement",
         "retro_smarts": "[NX3:1][C:2](=O)>>[N:1]=[C:2]=O",
         "description": "Carbamate/amine ← isocyanate intermediate (Curtius/Hofmann)",
         "difficulty": 0.35,
@@ -137,6 +147,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {
         "name": "suzuki_miyaura",
         "hte_families": ["suzuki_miyaura"],
+        "taxonomy_id": "Suzuki_miyaura",
         "retro_smarts": "[c:1]-[c:2]>>[c:1][Br].[c:2]B(O)O",
         "description": "Biaryl bond ← aryl bromide + arylboronic acid (Suzuki)",
         "difficulty": 0.15,
@@ -145,6 +156,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "decarboxylative_arylation",
         "hte_families": ["Decarboxylative_arylation"],
+        "taxonomy_id": "Decarboxylative_Coupling",
         "retro_smarts": "[c:1]-[CX4:2]>>[c:1][Br].[C:2]C(=O)O",
         "description": "Aryl-alkyl bond ← aryl halide + carboxylic acid (decarboxylative)",
         "difficulty": 0.50,
@@ -153,6 +165,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "heck_mizoroki",
         "hte_families": ["HeckMizoroki_coupling"],
+        "taxonomy_id": "Heck",
         "retro_smarts": "[c:1]-[CH:2]=[CH2:3]>>[c:1][Br].[CH2:2]=[CH2:3]",
         "description": "Aryl vinyl ← aryl bromide + alkene (Heck/Mizoroki)",
         "difficulty": 0.30,
@@ -161,6 +174,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "stille_coupling",
         "hte_families": ["Stille_coupling"],
+        "taxonomy_id": "Stille",
         "retro_smarts": "[c:1]-[c:2]>>[c:1][Br].[c:2][Sn](CC)(CC)CC",
         "description": "Biaryl bond ← aryl bromide + arylstannane (Stille)",
         "difficulty": 0.40,
@@ -169,6 +183,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "negishi_coupling",
         "hte_families": ["Negishi_coupling"],
+        "taxonomy_id": "Negishi",
         "retro_smarts": "[c:1]-[CX4:2]>>[c:1][Br].[C:2][Zn]Cl",
         "description": "Aryl–alkyl bond ← aryl bromide + alkylzinc (Negishi)",
         "difficulty": 0.40,
@@ -177,6 +192,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "kumada_coupling",
         "hte_families": ["Kumada_coupling"],
+        "taxonomy_id": "Kumada",
         "retro_smarts": "[c:1]-[c:2]>>[c:1][Br].[c:2][Mg]Br",
         "description": "Biaryl bond ← aryl halide + aryl Grignard (Kumada)",
         "difficulty": 0.45,
@@ -185,6 +201,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "hiyama_coupling",
         "hte_families": ["Hiyama_coupling"],
+        "taxonomy_id": "Hiyama",
         "retro_smarts": "[c:1]-[c:2]>>[c:1][Br].[c:2][Si](OCC)(OCC)OCC",
         "description": "Biaryl bond ← aryl halide + arylsilane (Hiyama)",
         "difficulty": 0.45,
@@ -193,6 +210,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "liebeskind_srogl",
         "hte_families": ["LiebeskindSrogl_coupling"],
+        "taxonomy_id": "Liebeskind_Srogl",
         "retro_smarts": "[C:1](=O)-[c:2]>>[C:1](=O)[S]CC.[c:2]B(O)O",
         "description": "Ketone ← thioester + arylboronic acid (Liebeskind-Srögl)",
         "difficulty": 0.50,
@@ -201,16 +219,18 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "giese_radical",
         "hte_families": ["Giese_radical_additions"],
+        "taxonomy_id": "Giese_radical_addition",
         "retro_smarts": "[C:1]-[CH2:2]-[C:3](=[O:4])>>[C:1][Br].[CH2:2]=[C:3](=[O:4])",
         "description": "Radical addition product ← alkyl bromide + Michael acceptor (Giese)",
         "difficulty": 0.45,
         "n_precursors": 2,
     },
-    {   # ★ — Michael addition
+    {   # ★ — Michael addition (1,4-addition)
         "name": "michael_addition",
         "hte_families": ["Michael_addition"],
-        "retro_smarts": "[#6:1]-[CH2:2]-[CH2:3]-[C:4](=[O:5])>>[#6:1].[C:2]=[C:3]-[C:4]=[O:5]",
-        "description": "Michael adduct ← nucleophile + α,β-unsaturated carbonyl (Michael)",
+        "taxonomy_id": "Michael_addition",
+        "retro_smarts": "[CX4:1]([C:6](=[O,S:7]))-[CH2:2]-[C:3](=[O,S:4])-[#6:5]>>[C:1]=[C:2]-[C:3](=[O,S:4])-[#6:5].[C:6]=[O,S:7]",
+        "description": "Michael adduct ← carbon nucleophile (active methylene) + α,β-unsaturated carbonyl (Michael)",
         "difficulty": 0.30,
         "n_precursors": 2,
         "notes": "Nu must have acidic alpha-H (malonate, nitrile, beta-ketoester). "
@@ -219,6 +239,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "knoevenagel_condensation",
         "hte_families": ["Knoevenagel_condensation"],
+        "taxonomy_id": "Knoevenagel_condensation",
         "retro_smarts": "[CX3:1]=[CX3:2]-[C:3](=[O:4])>>[C:1]=O.[CH:2]-[C:3]=[O:4]",
         "description": "α,β-Unsaturated carbonyl ← aldehyde + active methylene (Knoevenagel)",
         "difficulty": 0.20,
@@ -227,6 +248,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "aldol_classic",
         "hte_families": ["Aldol_classic__Mukaiyama"],
+        "taxonomy_id": "Aldol_addition",
         "retro_smarts": "[C:1]([OH:2])-[CH2:3]-[C:4]=O>>[C:1]=O.[CH2:3]-[C:4]=O",
         "description": "β-Hydroxy carbonyl ← two carbonyls (aldol addition)",
         "difficulty": 0.30,
@@ -235,6 +257,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "horner_wadsworth_emmons",
         "hte_families": ["HornerWadsworthEmmons"],
+        "taxonomy_id": "Wittig_reaction",
         "retro_smarts": "[C:1]=[CH:2]-[C:3](=O)>>[C:1]=O.[CH2:2]-[C:3](=O)",
         "description": "α,β-Unsaturated ester ← aldehyde + phosphonate (HWE)",
         "difficulty": 0.20,
@@ -243,6 +266,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "nozaki_hiyama_kishi",
         "hte_families": ["NozakiHiyamaKishi"],
+        "taxonomy_id": "NHK_reaction",
         "retro_smarts": "[C:1]([OH:2])-[CH:3]=[CH2:4]>>[C:1]=O.[CH:3]=[CH2:4]",
         "description": "Allylic alcohol ← aldehyde + vinyl halide (NHK, Cr/Ni)",
         "difficulty": 0.50,
@@ -254,6 +278,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {
         "name": "c_o_coupling_pd",
         "hte_families": ["C_O_Coupling"],
+        "taxonomy_id": "C_O_Coupling",
         "retro_smarts": "[c:1]-[OX2:2]-[CX4:3]>>[c:1][Br].[O:2][C:3]",
         "description": "Aryl ether ← aryl bromide + alcohol (Pd-catalysed C–O coupling)",
         "difficulty": 0.40,
@@ -262,6 +287,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {
         "name": "williamson_ether",
         "hte_families": ["Williamson_ether_synthesis"],
+        "taxonomy_id": "Alkyl_Nucleophilic_Substitution",
         "retro_smarts": "[CX4:1]-[OX2:2]-[CX4:3]>>[C:1][Br].[O:2][C:3]",
         "description": "Ether ← alkyl halide + alkoxide (Williamson)",
         "difficulty": 0.15,
@@ -270,6 +296,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {
         "name": "fischer_esterification",
         "hte_families": ["Fischer_esterification", "Steglich_esterification"],
+        "taxonomy_id": "Esterification",
         "retro_smarts": "[C:1](=[O:2])-[OX2:3]-[CX4:4]>>[C:1](=[O:2])O.[O:3][C:4]",
         "description": "Ester ← carboxylic acid + alcohol (Fischer/Steglich)",
         "difficulty": 0.10,
@@ -278,6 +305,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "mitsunobu_etherification",
         "hte_families": ["Mitsunobu_etherificationinversion"],
+        "taxonomy_id": "Mitsunobu_reaction",
         "retro_smarts": "[c:1]-[OX2:2]-[CX4:3]>>[c:1][OH].[O:2][C:3]",
         "description": "Aryl ether ← phenol + alcohol with inversion (Mitsunobu)",
         "difficulty": 0.25,
@@ -289,6 +317,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "c_s_coupling",
         "hte_families": ["C_S_Coupling", "Thioether_formation"],
+        "taxonomy_id": "C_S_Coupling",
         "retro_smarts": "[c:1]-[SX2:2]>>[c:1][Br].[S:2]",
         "description": "Aryl thioether ← aryl bromide + thiol (Pd or Cu catalysed)",
         "difficulty": 0.40,
@@ -298,6 +327,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "thiol_ene",
         "hte_families": ["Thiolene_and_thiolyne"],
+        "taxonomy_id": "Thiol_ene",
         "retro_smarts": "[C:1]-[CH2:2]-[SX2:3]>>[C:1]=[CH2:2].[S:3]",
         "description": "Thioether ← alkene + thiol (radical thiol-ene)",
         "difficulty": 0.20,
@@ -309,6 +339,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "cuaac_triazole",
         "hte_families": ["CuAAC_azidealkyne"],
+        "taxonomy_id": "Click_cuaac",
         "retro_smarts": "[n:1]1[n:2][n:3][c:4][c:5]1>>[N-:3]=[N+:2]=[N:1].[C:4]#[C:5]",
         "description": "1,2,3-Triazole ← organic azide + terminal alkyne (CuAAC click)",
         "difficulty": 0.10,
@@ -319,9 +350,10 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
 
     # ── Carbonyl Reductions (1-precursor retro-transforms) ──────────────────
 
-    {   # ★ — retro of NaBH4 reduction
+    {   # ★ — retro of NaBH4 reduction of ketone (secondary alcohol)
         "name": "ketone_from_nabh4",
         "hte_families": ["NaBH4_carbonyl_reductions"],
+        "taxonomy_id": "Reduction_carbonyl_to_alcohol",
         "retro_smarts": "[CH:1]([OH:2])>>[C:1]=O",
         "description": "Secondary alcohol came from NaBH4 reduction of ketone",
         "difficulty": 0.05,
@@ -329,9 +361,31 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
         "notes": "NaBH4 in MeOH/EtOH or THF. Selective for ketones over esters at −78 °C. "
                  "For aldehydes, same conditions at 0 °C.",
     },
+    {   # ★ — retro of NaBH4 reduction of aldehyde (primary alcohol)
+        "name": "aldehyde_from_nabh4",
+        "hte_families": ["NaBH4_carbonyl_reductions"],
+        "taxonomy_id": "Reduction_carbonyl_to_alcohol",
+        "retro_smarts": "[CH2:1][OH1:2]>>[C:1]=O",
+        "description": "Primary alcohol came from NaBH4 reduction of aldehyde",
+        "difficulty": 0.05,
+        "n_precursors": 1,
+        "notes": "NaBH4 in MeOH/EtOH at 0 °C. Chemoselective for aldehydes at low temp.",
+    },
+    {   # ★ — C–O SNAr (oxygen nucleophile attacking electron-poor arene)
+        "name": "snar_co",
+        "hte_families": ["SNAr_amination"],
+        "taxonomy_id": "SNAr",
+        "retro_smarts": "[c:1]-[OX2:2]-[CX4:3]>>[c:1][F].[O:2][C:3]",
+        "description": "Aryl alkyl/aryl ether ← electron-poor aryl fluoride + alcohol (SNAr C-O)",
+        "difficulty": 0.25,
+        "n_precursors": 2,
+        "notes": "Requires electron-poor arene (pyridines, nitroaryls, pyrimidines). "
+                 "Alkoxide or phenoxide nucleophile. K2CO3 or Cs2CO3, DMF/DMSO.",
+    },
     {   # ★ — retro of LAH/DIBAL reduction
         "name": "ester_from_lah_reduction",
         "hte_families": ["Reduction_LAH_LiAlH4", "DIBALH_Partial_reductions"],
+        "taxonomy_id": "Reduction_ester_to_alcohol",
         "retro_smarts": "[CX4:1]([OH:2])-[CX4:3]>>[C:1](=O)-[C:3]",
         "description": "Primary/secondary alcohol came from LAH reduction of ester/acid",
         "difficulty": 0.15,
@@ -345,6 +399,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "deoxy_fluorination",
         "hte_families": ["Deoxy_fluorination"],
+        "taxonomy_id": "Alcohol_to_Alkyl_Halide",
         "retro_smarts": "[CX4:1][F:2]>>[C:1][OH:2]",
         "description": "Alkyl fluoride came from deoxyfluorination of alcohol (DAST/Deoxofluor)",
         "difficulty": 0.30,
@@ -355,6 +410,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "electrophilic_fluorination",
         "hte_families": ["Electrophilic_fluorination"],
+        "taxonomy_id": "Electrophilic_fluorination",
         "retro_smarts": "[c:1][F:2]>>[c:1][H]",
         "description": "Aryl fluoride came from electrophilic fluorination of arene (Selectfluor)",
         "difficulty": 0.40,
@@ -365,6 +421,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "sandmeyer_bromide",
         "hte_families": ["Sandmeyer_reactions"],
+        "taxonomy_id": "Sandmeyer",
         "retro_smarts": "[c:1][Br:2]>>[c:1][NH2]",
         "description": "Aryl bromide came from Sandmeyer reaction on ArNH2 via diazonium",
         "difficulty": 0.35,
@@ -375,6 +432,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "balz_schiemann",
         "hte_families": ["BalzSchiemann"],
+        "taxonomy_id": "Sandmeyer",
         "retro_smarts": "[c:1][F:2]>>[c:1][NH2]",
         "description": "Aryl fluoride came from Balz-Schiemann (ArNH2 → ArF via diazonium BF4)",
         "difficulty": 0.40,
@@ -383,6 +441,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "trifluoromethylation",
         "hte_families": ["Trifluoromethylation", "RuppertPrakash_TMSCF3"],
+        "taxonomy_id": "Trifluoromethylation",
         "retro_smarts": "[c:1][CF3:2]>>[c:1][Br]",
         "description": "Aryl-CF3 ← aryl bromide (Cu-mediated or Togni reagent)",
         "difficulty": 0.50,
@@ -395,6 +454,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
         "name": "aldehyde_from_oxidation",
         "hte_families": ["DessMartin_periodinane_DMP_Alcohols__aldehydesketones",
                          "Swern_oxidation", "IBX", "BAIB"],
+        "taxonomy_id": "Oxidation_primary_alcohol_to_aldehyde",
         "retro_smarts": "[CH:1]=O>>[CH2:1][OH]",
         "description": "Aldehyde came from oxidation of primary alcohol (DMP/Swern/IBX)",
         "difficulty": 0.10,
@@ -405,6 +465,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
         "hte_families": ["Jones_oxidation", "Riley_oxidation",
                          "TPAPNMO_Catalytic_Ru_oxidations",
                          "TEMPObleach_Oxidations_Primary_alcohols__aldehydesacids"],
+        "taxonomy_id": "Oxidation_secondary_alcohol_to_ketone",
         "retro_smarts": "[C:1](=O)-[CX4:2]>>[C:1]([OH])-[C:2]",
         "description": "Ketone came from oxidation of secondary alcohol",
         "difficulty": 0.10,
@@ -416,6 +477,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "carbamate_formation",
         "hte_families": ["Carbamate_formation"],
+        "taxonomy_id": "Carbamate_formation",
         "retro_smarts": "[NX3:1]-[C:2](=O)-[OX2:3]-[CX4:4]>>[N:1].[C:2](=O)=[N:5].[O:3][C:4]",
         "description": "Carbamate ← amine + chloroformate (or isocyanate + alcohol)",
         "difficulty": 0.15,
@@ -426,6 +488,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★ — simplified carbamate (amine + chloroformate)
         "name": "carbamate_from_amine_chloroformate",
         "hte_families": ["Carbamate_formation"],
+        "taxonomy_id": "Carbamate_formation",
         "retro_smarts": "[NX3:1]-[C:2](=O)-[OX2:3]>>[N:1].[C:2](=O)[O:3]Cl",
         "description": "Carbamate ← amine + chloroformate",
         "difficulty": 0.15,
@@ -434,6 +497,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "wacker_oxidation",
         "hte_families": ["Wacker_oxidation", "Wacker_oxidation_Alkene__ketone_PdCl2_CuCl_O2"],
+        "taxonomy_id": "Wacker_oxidation",
         "retro_smarts": "[CH2:1]-[C:2](=O)-[CH3:3]>>[CH2:1]=[CH:2]-[CH3:3]",
         "description": "Methyl ketone ← terminal alkene (Wacker oxidation, Pd/Cu)",
         "difficulty": 0.35,
@@ -442,6 +506,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "diazotransfer_azide",
         "hte_families": ["CH_amination_and_azidation"],
+        "taxonomy_id": "Diazotransfer",
         "retro_smarts": "[CX4:1][N3:2]>>[C:1][NH2]",
         "description": "Alkyl azide came from diazotransfer on primary amine",
         "difficulty": 0.30,
@@ -450,6 +515,7 @@ HTE_TEMPLATES: List[Dict[str, Any]] = [
     {   # ★
         "name": "borylation_miyaura",
         "hte_families": ["Ircatalyzed_CH_borylation"],
+        "taxonomy_id": "Ircatalyzed_CH_borylation",
         "retro_smarts": "[c:1][B:2](O)O>>[c:1][H]",
         "description": "Arylboronic acid from C–H borylation (Ir-catalysed)",
         "difficulty": 0.55,
