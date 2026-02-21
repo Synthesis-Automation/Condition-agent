@@ -51,13 +51,13 @@ Retrain KMN (full build):
   - New reaction families not present in training data
     (e.g. first photocatalysis examples, new catalyst class)
   - Dataset expansion ≥ 5× the original size (distribution shift)
-  - Run:  python scripts/build_kmn_index.py --use-ivf --epochs 50
+  - Run:  python scripts/A_build_kmn_index.py --use-ivf --epochs 50
 
 Rebuild FAISS only (``--index-only``, fast):
   - More examples of already-covered reaction families
   - Data cleaning / deduplication
   - Loads existing ``kmn_weights.pt`` and skips training entirely
-  - Run:  python scripts/build_kmn_index.py --index-only --use-ivf
+  - Run:  python scripts/A_build_kmn_index.py --index-only --use-ivf
 
 Rule of thumb: if ≥ 20 % of new rows map to the ``__rare__`` cluster
 (printed during label encoding), the taxonomy has grown → retrain.
@@ -76,19 +76,19 @@ after cloning or when the dataset changes.
 
 Full build (first time or after new reaction families added)::
 
-    python scripts/build_kmn_index.py --use-ivf [--fp-size 1024]
-                                      [--embed-dim 256] [--epochs 50]
-                                      [--batch-size 128] [--lr 1e-3]
-                                      [--output-dir PATH] [--n-processes N]
-                                      [--min-cluster-size 5]
+    python scripts/A_build_kmn_index.py --use-ivf [--fp-size 1024]
+                                        [--embed-dim 256] [--epochs 50]
+                                        [--batch-size 128] [--lr 1e-3]
+                                        [--output-dir PATH] [--n-processes N]
+                                        [--min-cluster-size 5]
 
 Incremental update (same families, more data)::
 
-    python scripts/build_kmn_index.py --index-only --use-ivf
+    python scripts/A_build_kmn_index.py --index-only --use-ivf
 
 Skip training entirely (random-projection fallback, no torch required)::
 
-    python scripts/build_kmn_index.py --no-train --use-ivf
+    python scripts/A_build_kmn_index.py --no-train --use-ivf
 """
 from __future__ import annotations
 
