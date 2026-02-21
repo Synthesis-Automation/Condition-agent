@@ -380,7 +380,8 @@ Rules:
 **CONDITIONS SUMMARY**
 Integrate conditions from ALL available sources:
 - apply_hte_templates: for each template hit, cite template_name, precursor_1/precursor_2,
-  reaction_smiles, and hte_conditions (catalyst, base, solvent, yield from database).
+  reaction_smiles (MANDATORY line: `Reaction SMILES: precursor_1.precursor_2>>target`),
+  and hte_conditions (catalyst, base, solvent, yield from database).
   These are atom-precise retrosynthetic SMARTS results — the most specific disconnections.
   Cross-check against generate_disconnections; if both agree, state that explicitly.
 - search_by_product_similarity: cite top hits (product_similarity score, yield, rxn_type,

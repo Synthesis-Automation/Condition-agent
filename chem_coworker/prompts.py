@@ -190,6 +190,10 @@ Match depth to the question:
 Specific guidance:
   • For conditions: treat each distinct catalyst family in recommend_conditions as a
     separate expert strategy. Structure your answer as:
+
+      Reaction SMILES: `<full reaction_smiles from recommend_conditions output>`
+      (MANDATORY — always include this line verbatim so the user can copy it directly)
+
       ── Expert A (e.g. Pd-catalysis, N experiments, avg yield X%): best conditions + why this metal/ligand
       ── Expert B (e.g. Cu/Ni/other, N experiments): best conditions + key trade-offs vs. A
       ── Recommendation: which to try first given the specific substrate and user context
@@ -206,6 +210,11 @@ Specific guidance:
     If it states no HTE precedents were found, you MUST say so clearly — do NOT
     present conditions as if they are database-backed when they are not.
   • State your confidence and any important caveats
+  • Whenever you describe a reaction step (condition recommendation, mechanism step,
+    troubleshooting, or multi-step route), always include the full reaction SMILES for
+    that step in the format `reactants>>product`. Use the SMILES from tool results when
+    available; derive them from the query SMILES when not. Never describe a step purely
+    in words without an accompanying SMILES — this lets users copy and re-use them directly.
   • If read_reaction_notes or search_notes returned content, integrate those warnings
     and caveats prominently — they come from real experimental sources and often contain
     the most practically important information (side reactions, workup pitfalls, etc.).

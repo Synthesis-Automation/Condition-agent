@@ -27,6 +27,27 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
+# ---------------------------------------------------------------------------
+# Placeholder pattern — any SMILES arg matching this is a stand-in that should
+# be filled with the actual SMILES (either from query context at parse time, or
+# from a preceding group's resolve_name_to_smiles result at execution time).
+# ---------------------------------------------------------------------------
+_SMILES_PLACEHOLDER_RE = re.compile(
+    r"^("
+    r"\.\.\."
+    r"|\<.*?\>"
+    r"|SMILES_HERE"
+    r"|reaction_smiles_here"
+    r"|YOUR_SMILES"
+    r"|RESOLVED_SMILES"
+    r"|USE_SMILES_FROM_PREV_GROUP"
+    r"|TARGET_SMILES_HERE"
+    r"|USE_RESOLVED_SMILES"
+    r"|SMILES_FROM_G0"
+    r")$",
+    re.IGNORECASE,
+)
+
 
 class PlanRejected(Exception):
     """Raised by a plan_callback to cancel tool execution (A2 — plan approval)."""
@@ -217,11 +238,7 @@ class PlanParser:
     def _fill_smiles_args(self, args: Dict[str, Any], smiles: str) -> Dict[str, Any]:
         """Fill in SMILES arguments that the LLM left as placeholders."""
         result = dict(args)
-        placeholder_pattern = re.compile(
-            r"^(\.\.\.|\<.*?\>|SMILES_HERE|reaction_smiles_here|YOUR_SMILES)$",
-            re.IGNORECASE,
-        )
         for key, val in result.items():
-            if isinstance(val, str) and (placeholder_pattern.match(val) or not val):
+            if isinstance(val, str) and (_SMILES_PLACEHOLDER_RE.match(val) or not val):
                 result[key] = smiles
         return result

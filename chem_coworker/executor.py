@@ -8,8 +8,8 @@ wall-clock time significantly when multiple tools can run in parallel.
 Key design:
   - Groups are sequential (G0 runs to completion before G1 starts)
   - Tools within a group are independent and run in parallel
-  - Results from earlier groups are NOT passed to later groups automatically
-    (the LLM-produced plan should include all args explicitly)
+  - resolve_name_to_smiles is special: its resolved SMILES is automatically
+    substituted into placeholder args of all subsequent groups
   - Failures in one tool don't abort other tools in the same group
 """
 from __future__ import annotations
@@ -19,7 +19,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from .plan import ExecutionPlan, ToolCall
+from .plan import ExecutionPlan, ToolCall, _SMILES_PLACEHOLDER_RE
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +66,47 @@ def _prewarm_tool_imports() -> None:
             __import__(mod)
         except Exception:
             pass  # Missing optional dependency — let the tool handle it
+
+
+# ---------------------------------------------------------------------------
+# Inter-group SMILES propagation helpers
+# ---------------------------------------------------------------------------
+
+def _extract_resolved_smiles(group_results: Dict[str, Any]) -> Optional[str]:
+    """Return the SMILES resolved by resolve_name_to_smiles, or None.
+
+    Called after each group executes. When G0 contains resolve_name_to_smiles
+    and it succeeds, its 'smiles' field is propagated to patch G1+ tool args
+    that still hold a placeholder string.
+    """
+    r = group_results.get("resolve_name_to_smiles")
+    if not isinstance(r, dict) or not r.get("success", False):
+        return None
+    for key in ("smiles", "resolved_smiles", "canonical_smiles"):
+        val = r.get(key)
+        if val and isinstance(val, str) and val.lower() not in ("(none)", "none", ""):
+            return val
+    return None
+
+
+def _substitute_in_remaining_groups(
+    plan: ExecutionPlan,
+    completed_group_idx: int,
+    resolved_smiles: str,
+) -> None:
+    """Replace SMILES placeholder strings in all groups after completed_group_idx.
+
+    Modifies plan.groups in place. Only replaces arg values that match
+    _SMILES_PLACEHOLDER_RE — real SMILES already in args are left untouched.
+    """
+    for group in plan.groups[completed_group_idx + 1 :]:
+        for call in group:
+            call.args = {
+                k: resolved_smiles if (
+                    isinstance(v, str) and _SMILES_PLACEHOLDER_RE.match(v)
+                ) else v
+                for k, v in call.args.items()
+            }
 
 
 class ToolExecutor:
@@ -116,6 +157,18 @@ class ToolExecutor:
             group_start = time.monotonic()
             group_results = self._run_parallel(group, callables)
             results.update(group_results)
+
+            # Propagate resolved SMILES: if resolve_name_to_smiles just ran,
+            # patch placeholder args in all remaining groups so they receive
+            # the real SMILES instead of the literal placeholder string.
+            resolved = _extract_resolved_smiles(group_results)
+            if resolved:
+                _substitute_in_remaining_groups(plan, group_idx, resolved)
+                if self.verbose:
+                    logger.info(
+                        f"[Executor] Propagated resolved SMILES '{resolved}' "
+                        f"to groups {group_idx + 1}+"
+                    )
 
             if self.verbose:
                 elapsed = time.monotonic() - group_start
