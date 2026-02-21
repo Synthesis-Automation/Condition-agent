@@ -167,11 +167,22 @@ def _make_row_from_csv(
     row_index: int,
     file_family: Optional[str] = None,
     source_group: Optional[str] = None,
+    fast: bool = False,
 ) -> Optional[Dict[str, Any]]:
-    """Transform a CSV record into the standardized precedent format."""
+    """Transform a CSV record into the standardized precedent format.
+
+    Args:
+        fast: When True, skip ``normalize_reaction`` and ``featurize_pair``.
+              Produces the same dict but with ``features={}`` and uses the raw
+              reaction SMILES without normalization.  ~10-20x faster per row;
+              sufficient for index-building pipelines that only need
+              ``reaction_smiles``, ``reaction_id``, ``condition_core``, and
+              ``rxn_type``.
+    """
     try:
-        from ..featurizers import reaction_pair as feat_pair
-        from ..smiles import normalize_reaction
+        if not fast:
+            from ..featurizers import reaction_pair as feat_pair
+            from ..smiles import normalize_reaction
 
         raw_reaction_id = _clean_text(rec.get("reaction_id"))
         fam_txt = _dataset_family_map(raw_reaction_id, fallback=file_family)
@@ -222,9 +233,12 @@ def _make_row_from_csv(
             catalytic_system.append({"name": ligand, "role": "LIGAND"})
 
         rxn_smiles = _clean_text(rec.get("reaction_smiles"))
-        normalized = normalize_reaction(rxn_smiles) if rxn_smiles else None
-        if normalized:
-            rxn_smiles = normalized.get("normalized") or rxn_smiles
+        if not fast:
+            normalized = normalize_reaction(rxn_smiles) if rxn_smiles else None
+            if normalized:
+                rxn_smiles = normalized.get("normalized") or rxn_smiles
+        else:
+            normalized = None
 
         features: Dict[str, Any] = {}
         reactant_smiles: List[str] = []
@@ -243,7 +257,7 @@ def _make_row_from_csv(
             ]
             reactant_smiles = [s for s in reactant_smiles if s]
 
-        if reactant_smiles:
+        if reactant_smiles and not fast:
             elec, nuc = _pick_electrophile_nucleophile(reactant_smiles)
             feat_result = feat_pair.featurize_pair(elec, nuc)
             features = feat_result.get("flat", {}) if isinstance(feat_result, dict) else {}
@@ -391,3 +405,51 @@ def _load_selective(families: Optional[List[str]] = None) -> List[Dict[str, Any]
 def _load() -> List[Dict[str, Any]]:
     """Load all datasets. Cached for performance."""
     return _load_selective(families=None)
+
+
+def _load_all_with_progress() -> List[Dict[str, Any]]:
+    """Like ``_load()`` but prints per-file tqdm progress.
+
+    Used by build scripts where a long silent pause is unacceptable.
+    Result is NOT cached (use ``_load()`` for cached access after build).
+    """
+    from .core_utils import _family_text  # noqa: F401 (kept for consistency)
+
+    files = _iter_literature_files()
+    rows: List[Dict[str, Any]] = []
+
+    try:
+        from tqdm import tqdm
+        file_iter = tqdm(files, desc="  Loading CSVs", unit="file", dynamic_ncols=True)
+    except ImportError:
+        import logging as _logging
+        _log = _logging.getLogger(__name__)
+        _total = len(files)
+        _report = max(1, _total // 10)
+
+        def _plain_iter(fs):
+            for _i, _f in enumerate(fs):
+                if _i % _report == 0:
+                    _log.info("  Loading file %d / %d …", _i + 1, _total)
+                yield _f
+
+        file_iter = _plain_iter(files)
+
+    for path in file_iter:
+        file_family = _file_family_from_name(path)
+        source_group = _infer_source_group_from_path(path)
+        try:
+            records = _read_csv_records(path)
+        except Exception:
+            continue
+        for row_index, rec in enumerate(records):
+            row = _make_row_from_csv(
+                rec,
+                row_index=row_index,
+                file_family=file_family,
+                source_group=source_group,
+                fast=True,  # skip normalize_reaction + featurize_pair
+            )
+            if row is not None:
+                rows.append(row)
+    return rows

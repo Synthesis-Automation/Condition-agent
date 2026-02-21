@@ -21,9 +21,12 @@ from __future__ import annotations
 
 import os
 import logging
-from typing import Optional, List, Dict, Any
+from typing import TYPE_CHECKING, Optional, List, Dict, Any
 
 import numpy as np
+
+if TYPE_CHECKING:
+    import torch  # noqa: F401 – import only for type-checker; not required at runtime
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +77,7 @@ class _RPFallback:
 # ── PyTorch model ──────────────────────────────────────────────────────────
 
 def _build_torch_model(input_dim: int, hidden_dim: int, embed_dim: int,
-                       dropout: float) -> "torch.nn.Module":
+                       dropout: float) -> "torch.nn.Module":  # type: ignore[name-defined]
     import torch.nn as nn
     return nn.Sequential(
         nn.Linear(input_dim, hidden_dim),
@@ -229,7 +232,15 @@ class KernelMetricNetwork:
         history: List[Dict[str, float]] = []
         best_acc = 0.0
 
-        for epoch in range(epochs):
+        # tqdm epoch progress (fallback: log every 10 epochs)
+        try:
+            from tqdm import tqdm as _tqdm
+            epoch_iter = _tqdm(range(epochs), desc="  KMN train", unit="epoch",
+                               dynamic_ncols=True)
+        except ImportError:
+            epoch_iter = range(epochs)
+
+        for epoch in epoch_iter:
             # ── train ──
             self._model.train()
             classifier.train()
@@ -268,6 +279,14 @@ class KernelMetricNetwork:
             if (epoch + 1) % 10 == 0 or (epoch + 1) == epochs:
                 val_str = f"  val_acc={entry.get('val_acc', 0):.3f}" if "val_acc" in entry else ""
                 logger.info("Epoch %d/%d  loss=%.4f%s", epoch + 1, epochs, avg_loss, val_str)
+            # update tqdm postfix if available
+            try:
+                postfix = {"loss": f"{avg_loss:.4f}"}
+                if "val_acc" in entry:
+                    postfix["val_acc"] = f"{entry['val_acc']:.3f}"
+                epoch_iter.set_postfix(postfix)
+            except AttributeError:
+                pass
 
         self._model.eval()
         self.is_trained = True

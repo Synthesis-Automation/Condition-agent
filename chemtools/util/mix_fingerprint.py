@@ -22,6 +22,8 @@ from __future__ import annotations
 from typing import Optional, Tuple
 import logging
 
+import numpy as np  # always available; used in annotations and function bodies
+
 logger = logging.getLogger(__name__)
 
 # Default per-molecule dimension (each half is this many bits from each FP type)
@@ -44,12 +46,11 @@ def _rdkit_available() -> bool:
         return False
 
 
-def _mol_fp(mol, fp_size: int, use_chirality: bool) -> "np.ndarray":
+def _mol_fp(mol, fp_size: int, use_chirality: bool) -> np.ndarray:
     """Compute RDKit-path(maxPath=4) + Morgan(r=2) fingerprint for one molecule.
 
     Returns float32 numpy array of shape (2 * fp_size,).
     """
-    import numpy as np
     from rdkit.Chem import AllChem, DataStructs
 
     # RDKit path fingerprint (maxPath=4)
@@ -68,7 +69,7 @@ def create_mix_fp(
     reaction_smiles: str,
     fp_size: int = DEFAULT_FP_SIZE,
     use_chirality: bool = True,
-) -> Optional["np.ndarray"]:
+) -> Optional[np.ndarray]:
     """Create mixed reaction fingerprint [reactant_fp | diff_fp | product_fp].
 
     Args:
@@ -85,7 +86,6 @@ def create_mix_fp(
     if not _rdkit_available():
         return None
     try:
-        import numpy as np
         from rdkit import Chem
 
         # Split reaction: reactants >> products  or  reactants > agents > products
@@ -126,7 +126,8 @@ def create_mix_fp_batch(
     use_chirality: bool = True,
     *,
     n_processes: Optional[int] = None,
-) -> Tuple["np.ndarray", list[int]]:
+    show_progress: bool = False,
+) -> Tuple[np.ndarray, list[int]]:
     """Create mixed fingerprints for a batch of reaction SMILES.
 
     Args:
@@ -145,6 +146,26 @@ def create_mix_fp_batch(
     total = fp_size * 6
     features: list = []
     successful: list[int] = []
+
+    # ── tqdm helper (graceful fallback to periodic logging) ───────────────
+    def _iter_with_progress(iterable, total_n: int):
+        if show_progress:
+            try:
+                from tqdm import tqdm
+                yield from tqdm(iterable, total=total_n, unit="rxn",
+                                desc="  MixFP", dynamic_ncols=True)
+                return
+            except ImportError:
+                pass
+            # fallback: log every 10 %
+            report_every = max(1, total_n // 10)
+            for idx, item in enumerate(iterable):
+                if idx % report_every == 0:
+                    logger.info("  MixFP  %d / %d (%.0f %%)",
+                                idx, total_n, 100.0 * idx / total_n)
+                yield item
+            return
+        yield from iterable
 
     if n_processes is not None and n_processes > 1:
         # Parallel path via multiprocessing (best-effort; fall back on error)
@@ -165,7 +186,8 @@ def create_mix_fp_batch(
             logger.warning("Parallel batch failed (%s); falling back to serial.", exc)
 
     # Serial path
-    for i, rsmi in enumerate(reaction_smiles_list):
+    items = list(enumerate(reaction_smiles_list))
+    for i, rsmi in _iter_with_progress(items, len(items)):
         fp = create_mix_fp(rsmi, fp_size=fp_size, use_chirality=use_chirality)
         if fp is not None and fp.shape == (total,):
             features.append(fp)

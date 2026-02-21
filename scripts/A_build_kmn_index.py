@@ -106,12 +106,13 @@ def build(
     batch_size: int = 128,
     lr: float = 1e-3,
     train_kmn: bool = True,
+    index_only: bool = False,
     output_dir: Optional[str] = None,
     n_processes: Optional[int] = 1,
     min_cluster_size: int = 5,
     use_ivf: bool = False,
 ) -> None:
-    from chemtools.precedent.loader import _load
+    from chemtools.precedent.loader import _load_all_with_progress, _iter_literature_files
     from chemtools.util.mix_fingerprint import create_mix_fp_batch, mix_fp_dim
     from chemtools.util.kernel_metric_net import KernelMetricNetwork
     from chemtools.util.faiss_router import FAISSRouter
@@ -133,8 +134,9 @@ def build(
     logger.info("fp_size=%d  embed_dim=%d  hidden_dim=%d", fp_size, embed_dim, hidden_dim)
 
     # ── 1. load all precedent rows ────────────────────────────────────────
-    logger.info("Loading HTE precedent database …")
-    rows = _load()
+    n_files = sum(1 for _ in _iter_literature_files())
+    logger.info("Loading HTE precedent database (%d CSV files) …", n_files)
+    rows = _load_all_with_progress()
     logger.info("  Loaded %d total rows.", len(rows))
 
     # Filter to rows with a valid reaction SMILES
@@ -154,6 +156,7 @@ def build(
         fp_size=fp_size,
         use_chirality=True,
         n_processes=n_processes,
+        show_progress=True,
     )
 
     if fps.shape[0] == 0:
@@ -186,7 +189,7 @@ def build(
     )
     logger.info("  Label map saved → %s", label_map_path)
 
-    # ── 4. train KMN ──────────────────────────────────────────────────────
+    # ── 4. train / load KMN ──────────────────────────────────────────────
     input_dim = mix_fp_dim(fp_size)  # 6 * fp_size
     kmn = KernelMetricNetwork(
         input_dim=input_dim,
@@ -194,7 +197,23 @@ def build(
         embed_dim=embed_dim,
     )
 
-    if train_kmn:
+    if index_only:
+        # --index-only: reuse existing trained weights; only rebuild FAISS.
+        # This is the correct mode for incremental dataset additions.
+        if not os.path.exists(weights_path):
+            logger.error(
+                "--index-only requires existing weights at %s\n"
+                "Run without --index-only first to train KMN.",
+                weights_path,
+            )
+            sys.exit(1)
+        kmn.load(weights_path)
+        logger.info(
+            "Loaded existing KMN weights (%s backend) from %s",
+            kmn._backend,
+            weights_path,
+        )
+    elif train_kmn:
         if kmn._backend != "torch":
             logger.warning(
                 "PyTorch not available – KMN training skipped. "
@@ -232,10 +251,15 @@ def build(
 
     # ── 5. embed all reactions ────────────────────────────────────────────
     logger.info("Generating KMN embeddings for %d reactions …", len(fps))
-    # Process in chunks to avoid memory spikes with large datasets
     chunk_size = 1024
+    chunks = range(0, len(fps), chunk_size)
+    try:
+        from tqdm import tqdm
+        chunks = tqdm(chunks, desc="  Embed", unit="chunk", dynamic_ncols=True)
+    except ImportError:
+        pass
     embeds_list = []
-    for start in range(0, len(fps), chunk_size):
+    for start in chunks:
         chunk = fps[start : start + chunk_size]
         embeds_list.append(kmn.get_embeddings(chunk))
     embeddings = np.vstack(embeds_list).astype(np.float32)
@@ -289,6 +313,13 @@ def parse_args() -> argparse.Namespace:
                    help="Learning rate (default: 1e-3).")
     p.add_argument("--no-train", action="store_true",
                    help="Skip KMN training; use random projection fallback.")
+    p.add_argument("--index-only", action="store_true",
+                   help="""
+                   Load existing KMN weights (do NOT retrain) and rebuild FAISS only.
+                   Use this for incremental dataset additions when the reaction families
+                   and condition landscape have not fundamentally changed.
+                   Requires a previous full build to exist in --output-dir.
+                   """.strip())
     p.add_argument("--use-ivf", action="store_true",
                    help="Use IVF FAISS index (faster for >10k reactions).")
     p.add_argument("--output-dir", type=str, default=None,
@@ -311,6 +342,7 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
         lr=args.lr,
         train_kmn=not args.no_train,
+        index_only=args.index_only,
         output_dir=args.output_dir,
         n_processes=args.n_processes,
         min_cluster_size=args.min_cluster_size,
