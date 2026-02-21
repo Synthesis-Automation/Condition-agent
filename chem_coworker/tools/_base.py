@@ -41,3 +41,17 @@ class ToolPlugin:
     def call(self, **kwargs: Any) -> Any:
         """Direct invocation — used by ToolExecutor (no LangChain overhead)."""
         return self.fn(**kwargs)
+
+    def to_langchain_tool(self) -> Any:
+        """Create a LangChain StructuredTool from this ToolPlugin.
+
+        Schema is inferred automatically from the underlying function's type
+        annotations and docstring. Used by the native tool-calling loop in
+        ChemCoworker when native_tools=True.
+        """
+        from langchain_core.tools import StructuredTool
+        return StructuredTool.from_function(
+            func=self.fn,
+            name=self.name,
+            description=self.description,
+        )

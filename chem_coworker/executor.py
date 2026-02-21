@@ -73,13 +73,14 @@ def _prewarm_tool_imports() -> None:
 # ---------------------------------------------------------------------------
 
 def _extract_resolved_smiles(group_results: Dict[str, Any]) -> Optional[str]:
-    """Return the SMILES resolved by resolve_name_to_smiles, or None.
+    """Return the SMILES resolved by a name-resolver tool, or None.
 
-    Called after each group executes. When G0 contains resolve_name_to_smiles
-    and it succeeds, its 'smiles' field is propagated to patch G1+ tool args
-    that still hold a placeholder string.
+    Called after each group executes. When G0 contains resolve_to_smiles or
+    resolve_name_to_smiles (legacy) and it succeeds, its 'smiles' field is
+    propagated to patch G1+ tool args that still hold a placeholder string.
     """
-    r = group_results.get("resolve_name_to_smiles")
+    # Check both new consolidated name and old name for backward compat
+    r = group_results.get("resolve_to_smiles") or group_results.get("resolve_name_to_smiles")
     if not isinstance(r, dict) or not r.get("success", False):
         return None
     for key in ("smiles", "resolved_smiles", "canonical_smiles"):

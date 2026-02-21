@@ -357,7 +357,7 @@ generate_disconnections_tool = ToolPlugin(
 # Search notes + literature for existing synthesis routes to similar targets
 # ---------------------------------------------------------------------------
 
-def _find_retro_precedent(smiles: str = "", reaction_name: str = "", target_smiles: str = "") -> Dict[str, Any]:
+def _find_retro_precedent(smiles: str = "", reaction_name: str = "", target_smiles: str = "", reaction_type: str = "") -> Dict[str, Any]:
     """Search the knowledge base for synthesis precedent for this target.
 
     Queries both the reaction notes (for specific reaction-type precedent)
@@ -370,12 +370,14 @@ def _find_retro_precedent(smiles: str = "", reaction_name: str = "", target_smil
         target_smiles: Alias for smiles (accepted for compatibility).
         reaction_name: Optional reaction taxonomy name (e.g., "suzuki_miyaura")
                        to focus the search. Pass empty string for broad search.
+        reaction_type: Alias for reaction_name (accepted for compatibility).
 
     Returns:
         dict with notes_hits, literature_hits, route_hits, search_terms_used.
     """
     try:
         smiles = smiles or target_smiles
+        reaction_name = reaction_name or reaction_type  # alias
         mol_smiles = smiles.split(">>")[0].split(">")[0].strip() if ">" in smiles else smiles
 
         # Build smart search query from FGs + reaction name
@@ -478,8 +480,9 @@ find_retro_precedent_tool = ToolPlugin(
     category="retrosynthesis",
     description=(
         "Search the reaction notes, literature, and route knowledge base for synthesis precedent "
-        "relevant to the target molecule. Uses functional groups and reaction type to build a "
-        "smart search query. Run in parallel with identify_retrons to gather experimental context "
+        "relevant to the target molecule. Uses functional groups and reaction name to build a "
+        "smart search query. Args: smiles (target SMILES), reaction_name (e.g. 'suzuki_miyaura'; "
+        "NOT reaction_type). Run in parallel with identify_retrons to gather experimental context "
         "before generating disconnections."
     ),
     prerequisites=[],

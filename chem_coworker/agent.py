@@ -124,10 +124,13 @@ class ChemCoworker:
         plan_callback: Optional[Callable[["ExecutionPlan"], "ExecutionPlan"]] = None,
         # A1 — pre/post tool hooks
         hooks: Optional[Any] = None,   # HookRegistry
+        # Native tool calling mode (recommended: eliminates placeholder/arg-name bugs)
+        native_tools: bool = True,
     ):
         self.provider = provider or os.getenv("LLM_PROVIDER", "openai")
         self.model_name = model or os.getenv("LLM_MODEL", "o4-mini")
         self.verbose = verbose
+        self.native_tools = native_tools
         self.progress_cb = progress_cb
         self.phase_cb = phase_cb
         self.pre_synth_cb = pre_synth_cb
@@ -185,127 +188,151 @@ class ChemCoworker:
             _reason_prompt = REASON_PROMPT
             _synth_prompt = SYNTHESIZE_PROMPT
 
-        reason_text = _reason_prompt.format(
-            task_type=task_type.upper(),
-            query=query,
-            smiles_list=", ".join(smiles_list) if smiles_list else "(none)",
-            tool_descriptions=self.registry.describe_tools(),
-        )
+        # ── Native vs. text-plan execution ────────────────────────────
+        warnings: List[str] = []
+        tool_results: Dict[str, Any] = {}
+        plan_text = ""
+        plan_revised = False
+        observe_llm_text = ""
+        native_final_answer = ""  # Non-empty when native loop wrote the final answer
 
-        if self.phase_cb: self.phase_cb("reason_start")  # A3
-        try:
-            reason_response = self.llm.invoke([HumanMessage(content=reason_text)])
-            plan_text = self._get_text(reason_response)
-            llm_calls += 1
-        except Exception as exc:
-            logger.error(f"[ChemCoworker] Reasoning LLM call failed: {exc}")
-            return ChemResponse(
-                query=query,
-                task_type=task_type,
-                warnings=[f"Reasoning failed: {exc}"],
-                model=self.model_name,
-                elapsed_s=time.monotonic() - start,
-                llm_calls=llm_calls,
+        if self.native_tools:
+            # ── Native tool calling: LLM calls tools structured via API ──
+            native_tool_results, hypothesis, confidence, tool_warnings, llm_calls_native, native_final_answer = \
+                self._run_native_tool_loop(
+                    query=query,
+                    task_type=task_type,
+                    smiles_list=smiles_list,
+                    is_retro=is_retro,
+                    primary_smiles=primary_smiles,
+                )
+            tool_results = native_tool_results
+            warnings.extend(tool_warnings)
+            llm_calls += llm_calls_native
+
+            effective_plan = ExecutionPlan(
+                hypothesis=hypothesis,
+                confidence=confidence,
+                groups=[],
+                rationale="(native tool calling)",
+                raw_plan_text="",
             )
-        finally:
-            if self.phase_cb: self.phase_cb("reason_done")  # A3
 
-        if self.verbose:
-            logger.info(f"[ChemCoworker] Plan text length: {len(plan_text)} chars")
+        else:
+            # ── Classic text-plan path (JSON plan → PlanParser → ToolExecutor) ──
+            reason_text = _reason_prompt.format(
+                task_type=task_type.upper(),
+                query=query,
+                smiles_list=", ".join(smiles_list) if smiles_list else "(none)",
+                tool_descriptions=self.registry.describe_tools(),
+            )
 
-        # ── Step 3: Parse plan ─────────────────────────────────────────
-        plan = self.parser.parse(
-            plan_text,
-            known_tools=self.registry.names(),
-            smiles_context=primary_smiles,
-        )
-
-        if self.verbose:
-            logger.info(f"[ChemCoworker] {plan}")
-
-        # ── Step 3.5: Plan approval — pause for user confirmation (A2) ─
-        if self.plan_callback and not plan.is_empty:
-            from .plan import PlanRejected
+            if self.phase_cb: self.phase_cb("reason_start")  # A3
             try:
-                plan = self.plan_callback(plan)
-            except PlanRejected as e:
+                reason_response = self.llm.invoke([HumanMessage(content=reason_text)])
+                plan_text = self._get_text(reason_response)
+                llm_calls += 1
+            except Exception as exc:
+                logger.error(f"[ChemCoworker] Reasoning LLM call failed: {exc}")
                 return ChemResponse(
                     query=query,
                     task_type=task_type,
-                    answer=f"Plan cancelled: {e}",
-                    hypothesis=plan.hypothesis,
-                    confidence=plan.confidence,
+                    warnings=[f"Reasoning failed: {exc}"],
                     model=self.model_name,
-                    provider=self.provider,
-                    elapsed_s=round(time.monotonic() - start, 2),
+                    elapsed_s=time.monotonic() - start,
                     llm_calls=llm_calls,
                 )
+            finally:
+                if self.phase_cb: self.phase_cb("reason_done")  # A3
 
-        # ── Step 4: Execute tool groups (observe-then-plan) ───────────
-        warnings: List[str] = []
-        tool_results: Dict[str, Any] = {}
-        plan_revised = False
-        observe_llm_text = ""
-        effective_plan = plan
+            if self.verbose:
+                logger.info(f"[ChemCoworker] Plan text length: {len(plan_text)} chars")
 
-        if not plan.is_empty:
-            callables = self.registry.get_callables()
+            # ── Parse plan ─────────────────────────────────────────────
+            plan = self.parser.parse(
+                plan_text,
+                known_tools=self.registry.names(),
+                smiles_context=primary_smiles,
+            )
 
-            if plan.confidence < _OBSERVE_THRESHOLD and len(plan.groups) > 1:
-                # Uncertain path: run G0 diagnostics first, then let LLM revise G1+
-                if self.verbose:
-                    logger.info(
-                        f"[ChemCoworker] confidence={plan.confidence:.2f} < {_OBSERVE_THRESHOLD} "
-                        f"— triggering observe step"
+            if self.verbose:
+                logger.info(f"[ChemCoworker] {plan}")
+
+            # ── Plan approval (A2) ────────────────────────────────────
+            if self.plan_callback and not plan.is_empty:
+                from .plan import PlanRejected
+                try:
+                    plan = self.plan_callback(plan)
+                except PlanRejected as e:
+                    return ChemResponse(
+                        query=query,
+                        task_type=task_type,
+                        answer=f"Plan cancelled: {e}",
+                        hypothesis=plan.hypothesis,
+                        confidence=plan.confidence,
+                        model=self.model_name,
+                        provider=self.provider,
+                        elapsed_s=round(time.monotonic() - start, 2),
+                        llm_calls=llm_calls,
                     )
 
-                # 4a. Execute only Group 0
-                g0_plan = ExecutionPlan(
-                    hypothesis=plan.hypothesis,
-                    confidence=plan.confidence,
-                    groups=[plan.groups[0]],
-                    rationale="G0 diagnostic run",
-                    raw_plan_text="",
-                )
-                g0_results = self.executor.run_plan(g0_plan, callables)
-                tool_results.update(g0_results)
+            # ── Execute tool groups (observe-then-plan) ───────────────
+            effective_plan = plan
 
-                for name, result in g0_results.items():
-                    if isinstance(result, dict) and not result.get("success", True):
-                        warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
+            if not plan.is_empty:
+                callables = self.registry.get_callables()
 
-                if self.verbose:
-                    logger.info(f"[ChemCoworker] G0 results: {list(g0_results.keys())}")
+                if plan.confidence < _OBSERVE_THRESHOLD and len(plan.groups) > 1:
+                    if self.verbose:
+                        logger.info(
+                            f"[ChemCoworker] confidence={plan.confidence:.2f} < {_OBSERVE_THRESHOLD} "
+                            f"— triggering observe step"
+                        )
 
-                # 4b. Observe step — LLM sees G0 results, produces revised plan for G1+
-                revised_plan, observe_llm_text, plan_revised = self._run_observe_step(
-                    query=query,
-                    plan=plan,
-                    g0_results=g0_results,
-                    primary_smiles=primary_smiles,
-                )
-                llm_calls += 1
+                    g0_plan = ExecutionPlan(
+                        hypothesis=plan.hypothesis,
+                        confidence=plan.confidence,
+                        groups=[plan.groups[0]],
+                        rationale="G0 diagnostic run",
+                        raw_plan_text="",
+                    )
+                    g0_results = self.executor.run_plan(g0_plan, callables)
+                    tool_results.update(g0_results)
 
-                # 4c. Execute revised Groups 1+
-                if not revised_plan.is_empty:
-                    g1plus_results = self.executor.run_plan(revised_plan, callables)
-                    tool_results.update(g1plus_results)
-
-                    for name, result in g1plus_results.items():
+                    for name, result in g0_results.items():
                         if isinstance(result, dict) and not result.get("success", True):
                             warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
 
-                effective_plan = revised_plan if not revised_plan.is_empty else plan
+                    if self.verbose:
+                        logger.info(f"[ChemCoworker] G0 results: {list(g0_results.keys())}")
 
-            else:
-                # Confident path: execute all groups as before (no regression)
-                tool_results = self.executor.run_plan(plan, callables)
+                    revised_plan, observe_llm_text, plan_revised = self._run_observe_step(
+                        query=query,
+                        plan=plan,
+                        g0_results=g0_results,
+                        primary_smiles=primary_smiles,
+                    )
+                    llm_calls += 1
 
-                for name, result in tool_results.items():
-                    if isinstance(result, dict) and not result.get("success", True):
-                        warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
+                    if not revised_plan.is_empty:
+                        g1plus_results = self.executor.run_plan(revised_plan, callables)
+                        tool_results.update(g1plus_results)
 
-                effective_plan = plan
+                        for name, result in g1plus_results.items():
+                            if isinstance(result, dict) and not result.get("success", True):
+                                warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
+
+                    effective_plan = revised_plan if not revised_plan.is_empty else plan
+
+                else:
+                    # Confident path: execute all groups
+                    tool_results = self.executor.run_plan(plan, callables)
+
+                    for name, result in tool_results.items():
+                        if isinstance(result, dict) and not result.get("success", True):
+                            warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
+
+                    effective_plan = plan
 
         # All executed tool names in insertion order (G0 + G1+ for uncertain path)
         tools_called = list(tool_results.keys())
@@ -329,17 +356,6 @@ class ChemCoworker:
         # ── Step 6: Synthesize (final LLM call) ───────────────────────
         tool_results_text = self._format_tool_results(tool_results)
 
-        synth_text = _synth_prompt.format(
-            query=query,
-            task_type=task_type.upper(),
-            hypothesis=effective_plan.hypothesis or "(not yet identified)",
-            confidence=effective_plan.confidence,
-            tool_results_text=tool_results_text,
-            tool_descriptions=self.registry.describe_tools(),
-            resource_context=self._describe_resources(),
-            caveats_text=caveats_text,
-        )
-
         # A5 — notify CLI of plan info so it can print hypothesis/tools before streaming
         if self.pre_synth_cb:
             self.pre_synth_cb(
@@ -351,28 +367,56 @@ class ChemCoworker:
             )
 
         streamed = False
-        if self.phase_cb: self.phase_cb("synth_start")  # A3
-        try:
+        # Native path: model wrote its final answer at the end of the tool loop.
+        # Append any critical caveats (e.g. "no HTE data found") and skip the
+        # extra LLM call — same as how Claude Code produces its answer in-loop.
+        if native_final_answer:
+            answer = native_final_answer
+            if caveats_text and caveats_text != "(none)":
+                answer += f"\n\n---\n⚠ **Validation notes**: {caveats_text}"
             if self.stream_cb:
-                # A5 — stream tokens directly to CLI as they arrive
-                answer_chunks: List[str] = []
-                for chunk in self.llm.stream([HumanMessage(content=synth_text)]):
-                    token = self._get_text(chunk)
-                    if token:
-                        self.stream_cb(token)
-                        answer_chunks.append(token)
-                answer = "".join(answer_chunks)
+                # Emit the native answer token-by-token for streaming UIs
+                for char in answer:
+                    self.stream_cb(char)
                 streamed = True
-            else:
-                synth_response = self.llm.invoke([HumanMessage(content=synth_text)])
-                answer = self._get_text(synth_response)
-            llm_calls += 1
-        except Exception as exc:
-            logger.error(f"[ChemCoworker] Synthesis LLM call failed: {exc}")
-            answer = f"Tool results gathered but synthesis failed: {exc}"
-            warnings.append(f"Synthesis failed: {exc}")
-        finally:
-            if self.phase_cb: self.phase_cb("synth_done")  # A3
+            if self.phase_cb:
+                self.phase_cb("synth_start")
+                self.phase_cb("synth_done")
+        else:
+            # Classic path or native loop returned empty answer: call SYNTHESIZE LLM
+            synth_text = _synth_prompt.format(
+                query=query,
+                task_type=task_type.upper(),
+                hypothesis=effective_plan.hypothesis or "(not yet identified)",
+                confidence=effective_plan.confidence,
+                tool_results_text=tool_results_text,
+                tool_descriptions=self.registry.describe_tools(),
+                resource_context=self._describe_resources(),
+                caveats_text=caveats_text,
+            )
+
+            if self.phase_cb: self.phase_cb("synth_start")  # A3
+            try:
+                if self.stream_cb:
+                    # A5 — stream tokens directly to CLI as they arrive
+                    answer_chunks: List[str] = []
+                    for chunk in self.llm.stream([HumanMessage(content=synth_text)]):
+                        token = self._get_text(chunk)
+                        if token:
+                            self.stream_cb(token)
+                            answer_chunks.append(token)
+                    answer = "".join(answer_chunks)
+                    streamed = True
+                else:
+                    synth_response = self.llm.invoke([HumanMessage(content=synth_text)])
+                    answer = self._get_text(synth_response)
+                llm_calls += 1
+            except Exception as exc:
+                logger.error(f"[ChemCoworker] Synthesis LLM call failed: {exc}")
+                answer = f"Tool results gathered but synthesis failed: {exc}"
+                warnings.append(f"Synthesis failed: {exc}")
+            finally:
+                if self.phase_cb: self.phase_cb("synth_done")  # A3
 
         elapsed = time.monotonic() - start
 
@@ -624,6 +668,171 @@ class ChemCoworker:
             pass
 
         return "\n".join(lines)
+
+    def _build_native_tools(self) -> List[Any]:
+        """Build LangChain StructuredTool objects from all registered ToolPlugins."""
+        tools = []
+        for name, plugin in self.registry._plugins.items():
+            try:
+                tools.append(plugin.to_langchain_tool())
+            except Exception as exc:
+                if self.verbose:
+                    logger.warning(f"[ChemCoworker] Skipping tool '{name}' (schema build failed): {exc}")
+        return tools
+
+    def _run_native_tool_loop(
+        self,
+        query: str,
+        task_type: str,
+        smiles_list: List[str],
+        is_retro: bool,
+        primary_smiles: str,
+        max_iterations: int = 8,
+    ) -> tuple:
+        """
+        Run the reasoning+execution phase via native LangChain tool calling.
+
+        Mirrors how Claude Code works:
+          - SystemMessage carries the chemistry identity + tool usage rules (static,
+            loaded once per session; API can cache it)
+          - HumanMessage contains only the specific task query (minimal, per request)
+          - Tool descriptions live exclusively in the API schema — NOT duplicated in prompts
+          - The model's final turn writes the answer directly, so SYNTHESIZE_PROMPT
+            is typically not needed (saves one LLM call)
+
+        Returns:
+            (tool_results, hypothesis, confidence, warnings, llm_call_count, final_answer)
+            final_answer is non-empty when the model produced a text response after
+            finishing all tool calls — caller can use it directly, skipping SYNTHESIZE.
+        """
+        from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
+        from .plan import ToolCall
+
+        # Select the appropriate native system prompt (no {tool_descriptions}, no JSON plan)
+        if is_retro:
+            from .retro_prompts import NATIVE_RETRO_SYSTEM_PROMPT
+            native_system = NATIVE_RETRO_SYSTEM_PROMPT
+        else:
+            from .prompts import NATIVE_SYSTEM_PROMPT
+            native_system = NATIVE_SYSTEM_PROMPT
+
+        native_tools = self._build_native_tools()
+        if not native_tools:
+            logger.warning("[ChemCoworker] No native tools built — falling back to knowledge-only")
+            return {}, "", 0.5, [], 0, ""
+
+        llm_with_tools = self.llm.bind_tools(native_tools)
+
+        # Build message thread:
+        #   SystemMessage — chemistry identity + tool rules (static, API-cacheable)
+        #   HumanMessage  — just the concrete task (minimal, per request)
+        smiles_str = ", ".join(smiles_list) if smiles_list else "(none)"
+        user_message = (
+            f"Task type: {task_type.upper()}\n"
+            f"Query: {query}\n"
+            f"SMILES found: {smiles_str}"
+        )
+
+        messages: List[Any] = [
+            SystemMessage(content=native_system),
+            HumanMessage(content=user_message),
+        ]
+        tool_results: Dict[str, Any] = {}
+        hypothesis = ""
+        confidence = 0.5
+        warnings: List[str] = []
+        llm_call_count = 0
+        final_answer = ""
+        callables = self.registry.get_callables()
+
+        if self.phase_cb:
+            self.phase_cb("reason_start")
+
+        for iteration in range(max_iterations):
+            try:
+                response = llm_with_tools.invoke(messages)
+                llm_call_count += 1
+            except Exception as exc:
+                logger.error(f"[ChemCoworker] Native tool loop iteration {iteration} failed: {exc}")
+                warnings.append(f"LLM call failed at iteration {iteration}: {exc}")
+                break
+
+            messages.append(response)
+
+            # Extract any reasoning text from this response
+            resp_text = self._get_text(response)
+            if resp_text and not hypothesis:
+                from .plan import PlanParser
+                ph = PlanParser()._extract_hypothesis_text(resp_text)
+                if ph:
+                    hypothesis = ph
+
+            # Check for tool calls
+            response_tool_calls = getattr(response, "tool_calls", []) or []
+            if not response_tool_calls:
+                # No more tool calls — model wrote its final answer
+                if resp_text:
+                    final_answer = resp_text
+                    if not hypothesis:
+                        hypothesis = resp_text[:300]
+                if self.verbose:
+                    logger.info(
+                        f"[ChemCoworker] Native loop finished after {iteration + 1} iteration(s); "
+                        f"tools called: {list(tool_results.keys())}"
+                    )
+                break
+
+            if self.verbose:
+                names = [tc.get("name", "?") for tc in response_tool_calls]
+                logger.info(f"[ChemCoworker] Native loop iter {iteration}: {names}")
+
+            # Progress callbacks — "start" events
+            if self.progress_cb:
+                for tc in response_tool_calls:
+                    self.progress_cb("start", tc.get("name", "?"), 0.0)
+
+            # Execute all tool calls in parallel
+            tc_list = [
+                ToolCall(
+                    name=tc["name"],
+                    args=dict(tc.get("args", {})),
+                )
+                for tc in response_tool_calls
+                if tc.get("name") in callables
+            ]
+
+            if tc_list:
+                import time as _t
+                t0 = _t.monotonic()
+                group_results = self.executor._run_parallel(tc_list, callables)
+                tool_results.update(group_results)
+                elapsed = _t.monotonic() - t0
+
+                for name, result in group_results.items():
+                    if isinstance(result, dict) and not result.get("success", True):
+                        warnings.append(f"Tool '{name}' failed: {result.get('error', '?')}")
+
+                if self.verbose:
+                    logger.info(
+                        f"[ChemCoworker] Native loop iter {iteration}: "
+                        f"{list(group_results.keys())} done in {elapsed:.2f}s"
+                    )
+
+            # Feed results back as ToolMessages (required for structured tool calling API)
+            for tc in response_tool_calls:
+                tool_name = tc.get("name", "")
+                tool_call_id = tc.get("id", f"{tool_name}_{iteration}")
+                result = tool_results.get(tool_name, {"success": False, "error": "not executed"})
+                result_str = json.dumps(result, default=str)[:3000]
+                messages.append(ToolMessage(
+                    content=result_str,
+                    tool_call_id=tool_call_id,
+                ))
+
+        if self.phase_cb:
+            self.phase_cb("reason_done")
+
+        return tool_results, hypothesis, confidence, warnings, llm_call_count, final_answer
 
     def _run_observe_step(
         self,

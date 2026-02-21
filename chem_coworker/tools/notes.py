@@ -580,7 +580,6 @@ list_notes_tool = ToolPlugin(
 
 NOTES_TOOLS = [
     read_notes_tool,
-    read_reaction_notes_tool,
     search_notes_tool,
     list_notes_tool,
 ]
