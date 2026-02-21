@@ -56,31 +56,75 @@ class PromptTemplate:
 CONDITION_RECOMMENDATION = PromptTemplate(
     template="""You are an expert synthetic chemist specializing in reaction optimization.
 
-**Task**: Recommend optimal reaction conditions for the following transformation.
+## Reaction
 
-**Reaction SMILES**: {reaction_smiles}
-**Reaction Type**: {reaction_type}
+**SMILES**: {reaction_smiles}
+**Type**: {reaction_type}
+**Substrate Notes**: {substrate_notes}
+**Scale**: {scale}
 
-**Requirements**:
-1. Suggest appropriate catalyst, ligand (if needed), base, and solvent
-2. Recommend temperature and reaction time
-3. Provide rationale based on literature precedents
-4. Consider functional group compatibility
-5. Highlight potential side reactions or challenges
+## User Constraints
 
-**Additional Context**: {context}
+{context}
 
-Please provide your recommendations in a structured format:
-- Catalyst:
-- Ligand:
-- Base:
-- Solvent:
-- Temperature:
-- Time:
-- Rationale:
-- Potential Issues:
+## Your Task
+
+Recommend optimal reaction conditions for this transformation.
+
+**Chemistry Guidelines**:
+- Electron-poor aryl halides → electron-rich ligands (dppf, XPhos, SPhos)
+- Heteroaryl halides → chelating ligands (caution: Pd coordination)
+- Nitro groups → avoid H₂ reduction; watch proto-dehalogenation
+- Sterically hindered substrates → bidentate/bulky ligands (dppf, SPhos)
+- Aryl chlorides → strong base + high temperature OR bulky ligand
+
+Consider:
+1. Catalyst/ligand choice relative to the substrate electronic and steric profile
+2. Base/solvent compatibility and functional group tolerance
+3. Temperature and time ranges validated by literature precedent
+4. Potential side reactions and how conditions mitigate them
+5. Practical handling (air sensitivity, cost, scalability at requested scale)
+
+## Response Format
+
+Respond with ONLY valid JSON (no markdown fences, no prose outside JSON):
+{{
+  "catalyst": "preferred metal source or pre-formed complex",
+  "ligand": "phosphine / NHC / null if catalyst is pre-ligated",
+  "base": "best base choice",
+  "solvent": "best solvent",
+  "temperature_C": 80,
+  "time_h": 12,
+  "atmosphere": "N2 | Ar | air",
+  "additive": "any additive or null",
+  "yield_estimate": "e.g. 70-85%",
+  "confidence": 0.85,
+  "rationale": "2-3 sentence explanation citing substrate/reagent chemistry",
+  "functional_group_risks": ["list any incompatibilities or cautions"],
+  "backup_conditions": [
+    {{
+      "catalyst": "...",
+      "ligand": "...",
+      "base": "...",
+      "solvent": "...",
+      "temperature_C": 100,
+      "when_to_use": "If main conditions give <30% conversion after 6 h"
+    }}
+  ]
+}}
+
+RULES:
+- All required fields (catalyst, solvent, base, temperature_C, time_h, rationale, confidence) MUST be present.
+- Do NOT use "N/A", "not specified", "unknown", or placeholder strings for required fields.
+- confidence ∈ [0.0, 1.0] — be honest about uncertainty.
+- temperature_C must be a number (integer or float), not a string like "80°C".
+- time_h must be a number.
+- If ligand or additive is truly absent, use null (JSON null), not "None" string.
 """,
-    context="None provided"
+    reaction_type="Not specified",
+    substrate_notes="None provided",
+    scale="1 mmol laboratory scale",
+    context="None specified",
 )
 
 
@@ -531,6 +575,9 @@ def get_template(name: str) -> PromptTemplate:
         "reagent_field_assignment": REAGENT_FIELD_ASSIGNMENT,
         "reagent_entry_verification": REAGENT_ENTRY_VERIFICATION,
         "reaction_featurization_review": REACTION_FEATURIZATION_REVIEW,
+        "multi_source_synthesis": MULTI_SOURCE_SYNTHESIS,
+        "multi_source_synthesis_v2": MULTI_SOURCE_SYNTHESIS_V2,
+        "rule_builder_extraction": RULE_BUILDER_EXTRACTION,
     }
     
     key = name.lower().replace(" ", "_").replace("-", "_")
@@ -549,7 +596,7 @@ def list_templates() -> Dict[str, str]:
         Dict mapping template names to descriptions
     """
     return {
-        "condition_recommendation": "Recommend optimal reaction conditions",
+        "condition_recommendation": "Recommend optimal conditions; returns structured JSON validated by pass_check",
         "retrosynthesis": "Plan retrosynthetic routes",
         "mechanism": "Explain reaction mechanisms",
         "literature": "Search and summarize literature",
@@ -562,6 +609,9 @@ def list_templates() -> Dict[str, str]:
         "reagent_field_assignment": "Assign family and fields for reagent role",
         "reagent_entry_verification": "Verify reagent entry for errors",
         "reaction_featurization_review": "Review uncertain reaction featurization output",
+        "multi_source_synthesis": "Synthesize ML + rule + protocol sources into one recommendation",
+        "multi_source_synthesis_v2": "Optimized synthesis prompt with chemistry decision guidelines",
+        "rule_builder_extraction": "Extract structured rule-DB content from reference reactions",
     }
 
 

@@ -18,6 +18,7 @@ import re
 from llmtools.clients import LLMClient
 from llmtools.prompts import MULTI_SOURCE_SYNTHESIS
 from chemtools.recommend.utils import friendly_family_label
+from chemtools.util.llm_output_validator import pass_check
 
 
 def _strip_markdown_fences(text: str) -> str:
@@ -261,7 +262,18 @@ def synthesize_recommendations_llm(
             "error": f"JSON parse failed: {exc}",
             "raw_response": raw_content
         }
-    
+
+    # Validate structured output (MOSAIC-style pass_check)
+    ok, val_failures, val_warnings = pass_check(synthesis, "multi_source_synthesis")
+    if not ok:
+        return {
+            "status": "error",
+            "error": "LLM output failed structured validation",
+            "validation_failures": val_failures,
+            "validation_warnings": val_warnings,
+            "raw_response": raw_content,
+        }
+
     # Success
     return {
         "status": "success",
@@ -275,7 +287,8 @@ def synthesize_recommendations_llm(
             "model": response.model,
             "tokens": response.total_tokens,
             "latency_ms": response.latency_ms
-        }
+        },
+        "validation_warnings": val_warnings,  # advisory only; non-empty doesn't block
     }
 
 
