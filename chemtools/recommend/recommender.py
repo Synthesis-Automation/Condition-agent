@@ -379,6 +379,9 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         row["_reactant_count"] = len(cleaned)
         return row
 
+    for _col in ["Reactant_A_Type", "Reactant_B_Type", "Reactant_C_Type"]:
+        if _col in df.columns:
+            df[_col] = df[_col].astype(object)
     df = df.apply(_normalize_reactants_row, axis=1)
     df["Intramolecular_Likely"] = df.apply(
         lambda row: _intramolecular_likely_from_fields(
