@@ -163,6 +163,9 @@ Confidence: {confidence:.2f}
 ━━━ TOOL RESULTS ━━━
 {tool_results_text}
 
+━━━ VALIDATION CAVEATS ━━━
+{caveats_text}
+
 ━━━ AVAILABLE TOOLS & LOCAL RESOURCES ━━━
 {tool_descriptions}
 
@@ -185,12 +188,23 @@ Match depth to the question:
     are available, what each does, and what kinds of questions each can answer
 
 Specific guidance:
-  • For conditions: don't just list them — explain the chemistry behind each choice
-    (e.g. "Cs₂CO₃ is used because its mild basicity avoids proto-deborylation...")
+  • For conditions: treat each distinct catalyst family in recommend_conditions as a
+    separate expert strategy. Structure your answer as:
+      ── Expert A (e.g. Pd-catalysis, N experiments, avg yield X%): best conditions + why this metal/ligand
+      ── Expert B (e.g. Cu/Ni/other, N experiments): best conditions + key trade-offs vs. A
+      ── Recommendation: which to try first given the specific substrate and user context
+    If only one catalyst family appears in the data, still name 1-2 alternatives from your
+    chemistry knowledge and explain why the database favors the reported family.
+    Always cite the experiment count and avg_yield when available (from recommend_conditions output).
+    The recommend_conditions output may include a "catalyst_families" list — use it to confirm
+    which metal families are represented.
   • For mechanisms: write numbered steps with reagent roles identified
   • For reagent questions: give options with trade-offs (not just one answer)
   • Always flag: missing conditions (catalyst/base implied but absent from SMILES),
     uncertainty, or cases where experimental verification is needed
+  • If VALIDATION CAVEATS contains a ⚠ VALIDATION WARNING, address it directly.
+    If it states no HTE precedents were found, you MUST say so clearly — do NOT
+    present conditions as if they are database-backed when they are not.
   • State your confidence and any important caveats
   • If read_reaction_notes or search_notes returned content, integrate those warnings
     and caveats prominently — they come from real experimental sources and often contain

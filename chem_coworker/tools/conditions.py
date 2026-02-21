@@ -6,11 +6,50 @@ Wraps the HTE-based condition recommender:
 """
 from __future__ import annotations
 
+import itertools
 import pathlib
-from typing import Any, Dict
+from collections import defaultdict
+from typing import Any, Dict, List
 
 from ._helpers import _error, _success, _to_jsonable
 from ._base import ToolPlugin
+
+
+# ---------------------------------------------------------------------------
+# Diversity helpers
+# ---------------------------------------------------------------------------
+
+_METALS = ["Pd", "Ni", "Cu", "Ir", "Rh", "Ru", "Fe", "Co", "Au", "Zn", "Pt"]
+
+
+def _extract_metal(catalyst_str: str) -> str:
+    """Return the primary metal symbol from a catalyst name, or 'Other'."""
+    s = str(catalyst_str)
+    for m in _METALS:
+        if m in s:
+            return m
+    return "Other"
+
+
+def _diversify(recs: List[Dict], top_k: int) -> List[Dict]:
+    """Round-robin across catalyst-metal families to return diverse top_k results.
+
+    Preserves best (lowest-rank / highest-Z) entry per metal family first,
+    then fills remaining slots in rank order across families.
+    """
+    buckets: dict = defaultdict(list)
+    for rec in recs:
+        metal = _extract_metal(rec.get("catalyst", ""))
+        buckets[metal].append(rec)
+
+    diverse: List[Dict] = []
+    for rec in itertools.chain.from_iterable(
+        itertools.zip_longest(*buckets.values())
+    ):
+        if rec is not None and len(diverse) < top_k:
+            diverse.append(rec)
+    return diverse
+
 
 # Absolute path to HTE_db — resolved from this file's location so it works
 # regardless of the current working directory when the CLI is invoked.
@@ -62,8 +101,9 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
         recs = raw if isinstance(raw, list) else (
             raw.get("recommended_conditions") or raw.get("recommendations", [])
         )
+        diverse_recs = _diversify(recs, top_k)
         cleaned = []
-        for i, rec in enumerate(recs[:top_k], 1):
+        for i, rec in enumerate(diverse_recs, 1):
             if not isinstance(rec, dict):
                 continue
             # Conditions are nested in rec["conditions"] sub-dict
@@ -93,6 +133,7 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
             "reaction_smiles": reaction_smiles,
             "recommendations": cleaned,
             "total_available": len(recs),
+            "catalyst_families": sorted({_extract_metal(r["catalyst"]) for r in cleaned if r.get("catalyst")}),
         })
     except Exception as exc:
         return _error(f"Condition recommendation failed: {exc}")

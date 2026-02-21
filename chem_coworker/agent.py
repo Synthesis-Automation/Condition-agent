@@ -315,6 +315,17 @@ class ChemCoworker:
         if contradiction and self.verbose:
             logger.info(f"[ChemCoworker] Hypothesis may need revision: {contradiction}")
 
+        # Build caveats block: surface contradiction + tool failures to synthesis LLM
+        caveats_parts = []
+        if contradiction:
+            caveats_parts.append(f"⚠ VALIDATION WARNING: {contradiction}")
+            warnings.append(contradiction)
+        for w in warnings:
+            entry = f"• {w}"
+            if entry not in caveats_parts:
+                caveats_parts.append(entry)
+        caveats_text = "\n".join(caveats_parts) if caveats_parts else "(none)"
+
         # ── Step 6: Synthesize (final LLM call) ───────────────────────
         tool_results_text = self._format_tool_results(tool_results)
 
@@ -326,6 +337,7 @@ class ChemCoworker:
             tool_results_text=tool_results_text,
             tool_descriptions=self.registry.describe_tools(),
             resource_context=self._describe_resources(),
+            caveats_text=caveats_text,
         )
 
         # A5 — notify CLI of plan info so it can print hypothesis/tools before streaming
@@ -691,6 +703,25 @@ class ChemCoworker:
                 rt = r.get("reaction_type")
                 if not rt and plan.confidence >= 0.8:
                     return "Deterministic classifier found no reaction type despite HIGH hypothesis confidence"
+
+        # If recommend_conditions ran, validate its output (pass_check)
+        if "recommend_conditions" in results:
+            r = results["recommend_conditions"]
+            if isinstance(r, dict) and r.get("success"):
+                recs = r.get("recommendations", [])
+                if not recs:
+                    return (
+                        "recommend_conditions returned NO HTE precedents. "
+                        "State clearly that no experimental data was found. "
+                        "Do NOT invent conditions."
+                    )
+                top = recs[0]
+                missing = [f for f in ("catalyst", "solvent", "base") if not top.get(f)]
+                if missing:
+                    return (
+                        f"Top HTE recommendation is missing fields: {missing}. "
+                        "Flag this gap explicitly in the answer."
+                    )
 
         return None
 

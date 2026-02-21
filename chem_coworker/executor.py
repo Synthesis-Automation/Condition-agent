@@ -30,6 +30,43 @@ _MAX_WORKERS = 4
 ProgressCallback = Callable[[str, str, float], None]
 # signature: (event: "start"|"done"|"error", tool_name: str, elapsed_s: float) -> None
 
+# ---------------------------------------------------------------------------
+# Import pre-warmer
+# ---------------------------------------------------------------------------
+
+_prewarmed = False
+
+
+def _prewarm_tool_imports() -> None:
+    """Import all chemtools modules used by tools in the main thread.
+
+    Prevents _ModuleLock deadlock: when ThreadPoolExecutor runs tools
+    concurrently, multiple threads race to lazily import the same chemtools
+    submodules. Python's per-module import lock causes a deadlock if two
+    threads each hold a lock the other needs.
+
+    Calling this once in the main thread before any ThreadPoolExecutor
+    ensures all modules are in sys.modules, so thread-side imports are
+    instant no-ops with no lock acquisition.
+    """
+    global _prewarmed
+    if _prewarmed:
+        return
+    _prewarmed = True
+    _mods = [
+        "chemtools.featurizers.analysis.smiles",  # normalize_reaction
+        "chemtools.featurizers.unified",           # detect_reaction_type, featurize_reaction
+        "chemtools._atom_mapping",                 # analyze_bond_changes
+        "chemtools.util.functional_groups",        # inspect_functional_groups
+        "chemtools.recommend.hte_adapter",         # recommend_conditions
+        "chemtools.reagent.lookup",                # lookup_reagent, list_reagents_by_role
+    ]
+    for mod in _mods:
+        try:
+            __import__(mod)
+        except Exception:
+            pass  # Missing optional dependency — let the tool handle it
+
 
 class ToolExecutor:
     """
@@ -66,6 +103,10 @@ class ToolExecutor:
         """
         results: Dict[str, Any] = {}
         total_start = time.monotonic()
+
+        # Pre-warm all tool-side chemtools imports in the main thread so that
+        # concurrent threads inside ThreadPoolExecutor never race on _ModuleLock.
+        _prewarm_tool_imports()
 
         for group_idx, group in enumerate(plan.groups):
             if self.verbose:

@@ -165,3 +165,6 @@ results/hte_cache/
 
 # KMN index files (large ML artifacts — rebuild with scripts/build_kmn_index.py)
 data/kmn_index/
+
+# Claude Code temporary working directories
+tmpclaude-*
