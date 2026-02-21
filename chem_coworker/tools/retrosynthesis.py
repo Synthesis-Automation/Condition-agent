@@ -1,7 +1,7 @@
 """
 Retrosynthesis tools for ChemCoworker.
 
-Seven ToolPlugin entries for the retrosynthesis pipeline:
+Eight ToolPlugin entries for the retrosynthesis pipeline:
 
   inspect_target              — enhanced molecular analysis for retrosynthesis
   identify_retrons            — SMARTS retron pattern matching
@@ -13,6 +13,10 @@ Seven ToolPlugin entries for the retrosynthesis pipeline:
   apply_hte_templates         — apply 35+ atom-mapped HTE retrosynthetic SMARTS templates
                                   (SNAr, Chan-Lam, CuAAC, HWE, Knoevenagel, Wacker, etc.)
                                   via AllChem.RunReactants(); enriched with HTE conditions
+  plan_route                  — multi-step greedy BFS route planner (AiZynthFinder-inspired);
+                                  recursively disconnects complex precursors until all
+                                  fragments are simple building blocks; InChI key cycle
+                                  detection; returns complete route in a single tool call
 
 All follow the _success() / _error() contract. Registered as ToolPlugins
 so they appear in REASON_PROMPT tool descriptions and can be called by the executor.
@@ -1312,6 +1316,227 @@ apply_hte_templates_tool = ToolPlugin(
 
 
 # ---------------------------------------------------------------------------
+# Tool H: plan_route
+# Multi-step greedy BFS retrosynthesis — AiZynthFinder-inspired.
+# Recursively disconnects each complex precursor until all fragments are simple
+# (BertzCT < threshold) or max_depth is reached.
+# Cycle detection via InChI key blacklist prevents infinite loops.
+# ---------------------------------------------------------------------------
+
+
+def _bertz_complexity_fast(smiles: str) -> float:
+    """Compute BertzCT complexity for a SMILES string. Returns 9999.0 on failure."""
+    try:
+        from rdkit import Chem, rdBase
+        from rdkit.Chem import GraphDescriptors
+        with rdBase.BlockLogs():
+            mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return 9999.0
+        return float(GraphDescriptors.BertzCT(mol))
+    except Exception:
+        return 9999.0
+
+
+def _inchi_key(smiles: str) -> Optional[str]:
+    """Return the InChI key for a SMILES, or None on failure."""
+    try:
+        from rdkit import Chem, rdBase
+        with rdBase.BlockLogs():
+            mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None
+        # MolToInchiKey is available directly on Chem in modern RDKit
+        return Chem.MolToInchiKey(mol)
+    except Exception:
+        return None
+
+
+def _plan_route(
+    target_smiles: str = "",
+    smiles: str = "",
+    max_depth: int = 4,
+    max_branches: int = 2,
+    complexity_threshold: float = 100.0,
+    max_difficulty: float = 0.8,
+) -> Dict[str, Any]:
+    """Plan a complete multi-step retrosynthetic route via greedy BFS.
+
+    Recursively applies retrosynthetic disconnections to each complex precursor
+    until all leaf nodes are simple building blocks (BertzCT < complexity_threshold)
+    or max_depth is reached.  InChI key cycle detection prevents infinite loops.
+
+    At each node the best-scored disconnection (from rank_disconnections) is chosen
+    and both precursors are expanded.  The route is returned as an ordered list of
+    single-step dicts so the LLM can summarise or present a forward synthesis plan.
+
+    Inspired by AiZynthFinder's MCTS state expansion heuristic, adapted for a
+    deterministic greedy agent context.
+
+    Args:
+        target_smiles: Target molecule SMILES (alias: smiles).
+        smiles: Alias for target_smiles.
+        max_depth: Maximum retrosynthetic depth (default 4).
+        max_branches: Top-K disconnections considered at each node (default 2;
+                      the best-scored one is always chosen — this controls how
+                      many alternatives rank_disconnections generates).
+        complexity_threshold: BertzCT score below which a fragment is treated as
+                              a simple / purchasable building block and recursion
+                              stops (default 100.0 ≈ simple aromatic or aliphatic
+                              fragment with ≤ ~8 heavy atoms).
+        max_difficulty: Maximum disconnection difficulty passed to
+                        rank_disconnections (default 0.8).
+
+    Returns:
+        dict with route[], total_steps, cumulative_difficulty, all_leaves_simple,
+        leaves[], simple_leaves[], complex_leaves[], route_summary (text).
+    """
+    try:
+        from chemtools.retro.disconnector import rank_disconnections
+
+        mol_smiles = (target_smiles or smiles).strip()
+        if ">" in mol_smiles:
+            mol_smiles = mol_smiles.split(">>")[0].split(">")[0].strip()
+        if not mol_smiles:
+            return _error("target_smiles is required")
+
+        steps: List[Dict[str, Any]] = []
+        leaves: List[str] = []
+        simple_leaves: List[str] = []
+        complex_leaves: List[str] = []
+
+        def _expand(
+            smi: str,
+            depth: int,
+            visited_inchi: set,
+            cumulative_diff: float,
+        ) -> float:
+            """Recursively expand smi; returns updated cumulative difficulty."""
+            complexity = _bertz_complexity_fast(smi)
+
+            # Stop: simple enough or too deep
+            if complexity < complexity_threshold or depth >= max_depth:
+                leaves.append(smi)
+                if complexity < complexity_threshold:
+                    simple_leaves.append(smi)
+                else:
+                    complex_leaves.append(smi)
+                return cumulative_diff
+
+            # Cycle detection via InChI key
+            ik = _inchi_key(smi)
+            if ik and ik in visited_inchi:
+                leaves.append(smi)
+                complex_leaves.append(smi)
+                return cumulative_diff
+            new_visited = visited_inchi | ({ik} if ik else set())
+
+            # Generate disconnections
+            disconnections = rank_disconnections(
+                smi, top_k=max_branches, max_difficulty=max_difficulty
+            )
+            if not disconnections:
+                leaves.append(smi)
+                complex_leaves.append(smi)
+                return cumulative_diff
+
+            # Greedy: pick the best-scored disconnection
+            best = disconnections[0]
+            step: Dict[str, Any] = {
+                "step": len(steps) + 1,
+                "depth": depth,
+                "target": smi,
+                "target_complexity": round(complexity, 1),
+                "reaction_name": best.reaction_name,
+                "retron_name": best.retron_name,
+                "description": best.description,
+                "difficulty": best.difficulty,
+                "precursor_1": best.precursor_1,
+                "precursor_2": best.precursor_2,
+                "complexity_delta": round(best.complexity_delta, 1),
+                "overall_score": round(best.overall_score, 3),
+            }
+            steps.append(step)
+            cumulative_diff += best.difficulty
+
+            # Recurse into both precursors
+            for prec in [best.precursor_1, best.precursor_2]:
+                if prec:
+                    cumulative_diff = _expand(prec, depth + 1, new_visited, cumulative_diff)
+            return cumulative_diff
+
+        # Start with empty visited set — the root is added by _expand itself
+        # (seeding the root would immediately trigger its own cycle check).
+        total_difficulty = _expand(
+            mol_smiles, depth=0, visited_inchi=set(), cumulative_diff=0.0
+        )
+
+        all_simple = len(complex_leaves) == 0
+
+        # Build human-readable route summary
+        if steps:
+            lines = [f"Route to {mol_smiles} — {len(steps)} disconnection step(s):"]
+            for s in steps:
+                p2_part = f" + {s['precursor_2']}" if s.get("precursor_2") else ""
+                lines.append(
+                    f"  Step {s['step']} (depth {s['depth']}): {s['target']}  →"
+                    f"  {s['precursor_1']}{p2_part}"
+                    f"  via {s['reaction_name']} (difficulty={s['difficulty']:.2f})"
+                )
+            bb_list = ", ".join(leaves[:12]) + ("..." if len(leaves) > 12 else "")
+            lines.append(f"Building blocks ({len(leaves)}): {bb_list}")
+            lines.append(
+                f"Cumulative difficulty: {total_difficulty:.2f}  |  "
+                f"All leaves simple: {all_simple}"
+            )
+            route_summary = "\n".join(lines)
+        else:
+            route_summary = (
+                f"{mol_smiles} is already below the complexity threshold "
+                f"(BertzCT < {complexity_threshold}) — treat as a purchasable building block."
+            )
+
+        return _success({
+            "smiles": mol_smiles,
+            "total_steps": len(steps),
+            "cumulative_difficulty": round(total_difficulty, 3),
+            "all_leaves_simple": all_simple,
+            "complexity_threshold": complexity_threshold,
+            "max_depth": max_depth,
+            "leaves": leaves,
+            "simple_leaves": simple_leaves,
+            "complex_leaves": complex_leaves,
+            "route": steps,
+            "route_summary": route_summary,
+        })
+
+    except Exception as exc:
+        return _error(f"Route planning failed: {exc}")
+
+
+plan_route_tool = ToolPlugin(
+    name="plan_route",
+    category="retrosynthesis",
+    description=(
+        "Plan a complete multi-step retrosynthetic route in a single tool call using "
+        "greedy BFS (AiZynthFinder-inspired). Recursively disconnects each complex "
+        "precursor (BertzCT >= complexity_threshold) until all leaf fragments are simple "
+        "building blocks or max_depth is reached. Uses InChI key cycle detection to "
+        "prevent loops. Returns route[] (ordered disconnection steps with reaction_name, "
+        "precursors, difficulty), cumulative_difficulty, all_leaves_simple, simple_leaves[], "
+        "and a human-readable route_summary. "
+        "Use instead of manually chaining identify_retrons + generate_disconnections "
+        "across multiple turns when a full route is needed. "
+        "Key parameters: max_depth (default 4), max_branches (default 2, controls "
+        "disconnection alternatives at each node), complexity_threshold (default 100.0, "
+        "BertzCT below which a fragment is considered purchasable)."
+    ),
+    prerequisites=[],
+    fn=_plan_route,
+)
+
+
+# ---------------------------------------------------------------------------
 # Module export
 # ---------------------------------------------------------------------------
 
@@ -1323,4 +1548,5 @@ RETROSYNTHESIS_TOOLS = [
     search_hte_precedent_tool,
     search_by_product_similarity_tool,
     apply_hte_templates_tool,
+    plan_route_tool,
 ]
