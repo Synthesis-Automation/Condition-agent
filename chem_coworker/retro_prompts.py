@@ -494,13 +494,17 @@ RECOMMENDED (add for thorough analysis):
   • recommend_conditions — final group; conditions for the forward reaction
   • search_notes — parallel with precedent search when reaction type is identified
   • plan_route — for BertzCT > 400 targets; full multi-step BFS route
+  • check_retro_consistency — AFTER generate_disconnections; validates each top
+    disconnection (atom balance, charge, FG patterns, complexity check); use when
+    you want RDKit confirmation before presenting a route to the user
 
 CALL ORDER (dependency rules):
   G0: [resolve_to_smiles]  ← ONLY when no SMILES in query
   G1: [normalize_reaction + inspect_target]
   G2: [identify_retrons + find_retro_precedent + search_by_product_similarity + apply_hte_templates]  ← parallel
   G3: [generate_disconnections]
-  G4: [search_hte_precedent + recommend_conditions + search_notes]  ← parallel
+  G4: [check_retro_consistency + search_hte_precedent + recommend_conditions + search_notes]  ← parallel
+       ↑ call check_retro_consistency for each top-ranked disconnection from G3
 
 Call tools in parallel when they have no dependencies on each other.
 Observe results after each turn before deciding on the next tool calls.
@@ -524,9 +528,18 @@ directly. Structure it as:
   For each disconnection (ranked by confidence):
   Rank N: [Reaction type, confidence %]
     Forward: precursor_1 + precursor_2 → target  (SMILES: `p1.p2>>target`)
+    RDKit eval: [PASS / PASS_WITH_WARNINGS / FAIL, score=X.XX]  ← from check_retro_consistency
     Why: [brief mechanistic rationale]
     Precursor 1: [name/SMILES + availability]
     Precursor 2: [name/SMILES + availability]
+
+  Evaluation rules (apply check_retro_consistency result here):
+  • FAIL — explicitly flag it; explain which check failed (atom balance? wrong FGs?
+    charge imbalance?); propose a corrected SMILES or explain why the disconnection
+    is invalid; do NOT silently present a FAIL as a valid route.
+  • PASS_WITH_WARNINGS — proceed with the route but note the specific warning(s)
+    in your Synthetic Warnings section.
+  • PASS — note the score briefly and proceed.
 
 ## Conditions Summary
   Catalyst, base, solvent, temperature for the key step(s).

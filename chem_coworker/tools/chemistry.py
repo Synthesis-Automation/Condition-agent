@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from ._helpers import _error, _success, _to_jsonable
+from ._helpers import _clean_rxn_smiles, _error, _success, _to_jsonable
 from ._base import ToolPlugin
 
 
@@ -38,6 +38,7 @@ def _normalize_reaction(smiles: str) -> Dict[str, Any]:
     try:
         from chemtools.featurizers.analysis.smiles import normalize, normalize_reaction
 
+        smiles = _clean_rxn_smiles(smiles)
         is_reaction = ">>" in smiles or (">" in smiles and smiles.count(">") >= 1)
 
         if is_reaction:
@@ -96,6 +97,7 @@ def _detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
     try:
         from chemtools.featurizers.unified import featurize_reaction
 
+        reaction_smiles = _clean_rxn_smiles(reaction_smiles)
         result = featurize_reaction(reaction_smiles)
         if not result:
             return _error("Reaction featurization returned no result")
@@ -162,6 +164,7 @@ def _analyze_bond_changes(reaction_smiles: str) -> Dict[str, Any]:
     try:
         from chemtools._atom_mapping import analyze_bond_changes_hybrid
 
+        reaction_smiles = _clean_rxn_smiles(reaction_smiles)
         result = analyze_bond_changes_hybrid(reaction_smiles)
         if not result:
             return _error("Bond change analysis returned no result")

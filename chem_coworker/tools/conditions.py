@@ -11,7 +11,7 @@ import pathlib
 from collections import defaultdict
 from typing import Any, Dict, List
 
-from ._helpers import _error, _success, _to_jsonable
+from ._helpers import _clean_rxn_smiles, _error, _success, _to_jsonable
 from ._base import ToolPlugin
 
 
@@ -84,6 +84,7 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
     try:
         from chemtools.recommend.hte_adapter import recommend_from_reaction
 
+        reaction_smiles = _clean_rxn_smiles(reaction_smiles)
         raw = recommend_from_reaction(
             reaction_smiles,
             k=max(top_k * 2, 25),

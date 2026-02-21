@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from ._helpers import _error, _success
+from ._helpers import _clean_rxn_smiles, _error, _success
 from ._base import ToolPlugin
 
 
@@ -57,6 +57,7 @@ def _evaluate_reaction(reaction_smiles: str, reaction_type: str = "") -> Dict[st
         dict with verdict, overall_score, checks (list), critical_failures,
         warnings, and llm_eval_prompt for LLM follow-up expert assessment.
     """
+    reaction_smiles = _clean_rxn_smiles(reaction_smiles)
     if not reaction_smiles or not reaction_smiles.strip():
         return _error("reaction_smiles cannot be empty")
 

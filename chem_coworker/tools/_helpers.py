@@ -6,8 +6,24 @@ chem_assistant/chemtools_wrapper.py for consistency.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+# Matches whitespace around the >> separator in reaction SMILES
+_RXN_SEP_RE = re.compile(r'\s*>>\s*')
+
+
+def _clean_rxn_smiles(smiles: str) -> str:
+    """Remove whitespace around >> in a reaction SMILES string.
+
+    Valid SMILES strings never contain spaces; this strips any stray
+    whitespace that may have been introduced by LLM output or copy-paste
+    (e.g. "Brc1ccccc1 >> OB(O)c1ccccc1" → "Brc1ccccc1>>OB(O)c1ccccc1").
+    """
+    if not smiles:
+        return smiles
+    return _RXN_SEP_RE.sub('>>', smiles.strip())
 
 
 def _to_jsonable(value: Any) -> Any:
