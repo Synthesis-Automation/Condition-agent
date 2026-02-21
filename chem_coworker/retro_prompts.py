@@ -63,6 +63,35 @@ Apply these steps IN ORDER before proposing any tool calls:
    MEDIUM (0.5–0.84): Moderate clarity; run tools to confirm
    LOW    (<0.5): Complex/unusual scaffold; needs full tool analysis first
 
+6. DEEP ANALYSIS FOR COMPLEX TARGETS  (apply when complexity_tier = complex / highly_complex)
+   Go beyond the 8 standard retrons above.  Consider:
+
+   EXTENDED RETRON LIBRARY
+   • Vinyl triflate / nonaflate → Negishi / Stille / Heck at C=C
+   • Pyrazole / triazole ring   → CuAAC (azide + alkyne) or regioselective N-arylation
+   • Sulfonamide Ar–S(=O)₂–N  → sulfamoylation of amine, or SNAr-based
+   • α-Fluoro carbonyl          → deoxyfluorination (DAST, Deoxofluor) of OH/OH adjacent
+   • N-oxide                    → directed C–H functionalization or oxidation of amine
+   • Macrocycle / lactam        → ring-closing metathesis (RCM) or macrolactonization
+   • Vinyl halide               → B-alkyl Suzuki, Kumada, Hiyama
+   • Tertiary alcohol at chain  → Grignard or organolithium addition to ketone
+   • gem-diol / hemiacetal equiv→ Wittig or HWE olefination
+
+   MULTI-STEP AWARENESS
+   • If target has BertzCT > 600, a single disconnection is rarely enough: plan 2-4 steps.
+   • Use plan_route (multi-step BFS tool) when you need a full route, not just one disconnection.
+   • Identify which intermediate is the "key intermediate" — the most complex step.
+
+   BUILDING BLOCK AVAILABILITY CHECK
+   • Would precursor A and B be commercially available (Sigma-Aldrich, Enamine, ABCR)?
+   • Flag any precursor that is itself complex enough (BertzCT > 100) to need its own route.
+   • If both precursors are simple ring systems + leaving groups → convergent route is viable.
+
+   PROTECTING GROUP STRATEGY
+   • Amine groups near electrophiles: Boc or Cbz protection before coupling, then deprotect.
+   • Alcohol near base-sensitive steps: TBS/TBdps silyl protection.
+   • Name the protecting group and the deprotection conditions explicitly.
+
 ═══════════════════════════════════════════════════════════════════
 TOOL SELECTION RULES (follow these exactly)
 ═══════════════════════════════════════════════════════════════════
@@ -101,6 +130,10 @@ RECOMMENDED (add to plan):
   • recommend_conditions  — add as final group (conditions for forward reaction)
   • search_notes          — if a specific reaction type is identified (parallel with precedent)
   • inspect_functional_groups — for complex molecules to map all reactive sites
+  • plan_route            — for COMPLEX/HIGHLY_COMPLEX targets (BertzCT > 400) when a full
+                            multi-step route is needed in one call. Uses greedy BFS with InChI
+                            key cycle detection. Returns complete route tree with all steps.
+                            Add as standalone group after G2 when complexity_tier ≥ "complex".
 
 TOOL GROUP STRUCTURE (SMILES already in query):
   G0 (always):  [normalize_reaction, inspect_target]
@@ -224,6 +257,29 @@ Hypothesis : {hypothesis}
 Confidence : {confidence:.0%}
 
 ═══════════════════════════════════════════════════════════════════
+STEP 1 — YOUR OWN CHEMICAL ANALYSIS  (before reading tool results)
+═══════════════════════════════════════════════════════════════════
+Reason from YOUR OWN CHEMISTRY KNOWLEDGE first — before the tool data below can
+anchor you.  This "prior analysis" is especially critical when the target is
+complex or when tools returned sparse results.
+
+Answer these questions in 5-10 sentences:
+  a) STRUCTURAL INVENTORY: What ring systems, functional groups, stereocenters,
+     and heteroatom bonds define this molecule? Anything unusual?
+  b) DISCONNECTION CANDIDATES: List every bond you would consider disconnecting,
+     in priority order. Go beyond the standard 8 retrons — name specific
+     reactions for each (including named reactions, protecting group logic,
+     unusual transformations if warranted).
+  c) CONVERGENCE LOGIC: Which single disconnection gives the most balanced,
+     commercially accessible fragment pair?
+  d) ANTICIPATED CHALLENGES: Stereocontrol? Competing reactive sites?
+     Functional group incompatibilities? Protecting groups needed?
+  e) GAPS YOU EXPECT TOOLS TO FILL: What specific evidence are you looking for
+     in the HTE database and retron results below?
+
+Write this analysis now — THEN proceed to integrate the tool results.
+
+═══════════════════════════════════════════════════════════════════
 TOOL RESULTS
 ═══════════════════════════════════════════════════════════════════
 {tool_results_text}
@@ -303,6 +359,23 @@ Use ⟸ for retrosynthetic arrows. Present top 1-3 disconnections from generate_
 └─────────────────────────────────────────────────────────────────┘
 
 Repeat for rank 2 (and rank 3 if notably different).
+
+**CROSS-SOURCE CONVERGENCE**
+After evaluating individual disconnections, do a brief pattern-recognition pass across ALL
+tool sources.  For each reaction type that appeared, tally its sources:
+
+  | Reaction             | retrons | HTE template | Prod. similarity | HTE precedent | Confidence |
+  |----------------------|---------|--------------|------------------|---------------|------------|
+  | Suzuki-Miyaura       |   ✓     |      ✓       |        ✓         |      ✓        |  VERY HIGH |
+  | Buchwald-Hartwig     |   ✓     |      ✗       |        ✓         |      ✗        |  MEDIUM    |
+  | (fill from results)  |  ...    |     ...      |       ...        |     ...       |    ...     |
+
+Rules:
+  • 3–4 sources agree → VERY HIGH CONFIDENCE — lead recommendation
+  • 2 sources agree    → HIGH CONFIDENCE — strong supporting route
+  • 1 source only      → SPECULATIVE — note which source and why it may be artefact vs. genuine
+  • In your analysis above, explicitly flag cases where YOUR OWN KNOWLEDGE added a route
+    that tools missed (these are worth investigating even without database confirmation)
 
 **CONDITIONS SUMMARY**
 Integrate conditions from ALL available sources:

@@ -399,11 +399,13 @@ def map_by_local_environment(reaction_smiles: str, radius: int = 2) -> Dict[str,
         # Generate atom environments using Morgan fingerprints
         def get_atom_environments(mols, radius=2):
             """Generate environment fingerprints for each atom."""
+            from rdkit.Chem import rdFingerprintGenerator
+            gen = rdFingerprintGenerator.GetMorganGenerator(radius=radius)
             environments = []
             for mol_idx, mol in enumerate(mols):
                 for atom_idx, atom in enumerate(mol.GetAtoms()):
                     # Generate Morgan fingerprint for this atom
-                    env = AllChem.GetMorganFingerprint(mol, radius, fromAtoms=[atom_idx])
+                    env = gen.GetSparseCountFingerprint(mol, fromAtoms=[atom_idx])
 
                     # Also store atom properties for matching
                     atom_info = {

@@ -866,14 +866,15 @@ def _get_morgan_fp(smiles: str) -> "Optional[Any]":
     """Compute Morgan fingerprint (radius=2, 2048 bits) as a numpy uint8 array."""
     try:
         from rdkit import Chem, rdBase
-        from rdkit.Chem import AllChem
+        from rdkit.Chem import rdFingerprintGenerator
         from rdkit.DataStructs import ConvertToNumpyArray
         import numpy as np
         with rdBase.BlockLogs():
             mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return None
-        fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+        gen = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
+        fp = gen.GetFingerprint(mol)
         arr = np.zeros(2048, dtype=np.uint8)
         ConvertToNumpyArray(fp, arr)
         return arr
