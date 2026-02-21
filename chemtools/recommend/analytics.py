@@ -283,7 +283,8 @@ class HTEAnalytics:
             frame = _normalize_hte_dataframe(frame, source_path=path)
             frames.append(frame)
 
-        self.df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+        non_empty = [f for f in frames if not f.empty]
+        self.df = pd.concat(non_empty, ignore_index=True) if non_empty else pd.DataFrame()
 
         print(f"馃搳 Loaded HTE database: {len(self.df):,} experiments")
 

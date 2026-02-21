@@ -48,7 +48,7 @@ def _search_reaction_types(query: str) -> Dict[str, Any]:
             })
         return _success({
             "query": query,
-            "matches": results[:10],  # top 10
+            "matches": results,
             "total_found": len(results),
         })
     except Exception as exc:

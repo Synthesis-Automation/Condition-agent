@@ -68,7 +68,7 @@ def _prompt_yes_no(text: str, default: bool = False) -> bool:
 def _run_default_summary(db_path: str) -> int:
     args_reactions = argparse.Namespace(
         db_path=db_path,
-        top=10,
+        top=None,
         compact=True,
         output=None,
     )
