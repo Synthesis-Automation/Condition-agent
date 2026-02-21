@@ -42,12 +42,13 @@ _DRFP_LOADER_CACHE: Dict[str, Any] = {}
 try:
     from ..util.mix_fingerprint import create_mix_fp as _create_mix_fp
     from ..util.kernel_metric_net import get_default_kmn as _get_default_kmn
-    from ..util.faiss_router import get_default_router as _get_default_router
+    from ..util.faiss_router import get_default_router as _get_default_router, is_index_built as _is_index_built
     _MIXFP_AVAILABLE = True
 except Exception:
     _create_mix_fp = None   # type: ignore
     _get_default_kmn = None  # type: ignore
     _get_default_router = None  # type: ignore
+    _is_index_built = None  # type: ignore
     _MIXFP_AVAILABLE = False
 
 # Singleton KMN / FAISS router (loaded lazily on first use)
@@ -237,7 +238,22 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
     # and FAISS index to get an ordered list of similar reaction IDs. These
     # are then used as an additional similarity signal (or, when
     # `mixfp_routing_only=True`, as the sole candidate pool).
-    use_mixfp = bool(relax.get("use_mixfp", False))
+    #
+    # Auto-detection: if the caller did not explicitly set use_mixfp, enable
+    # it automatically whenever (a) the KMN index files exist on disk, and
+    # (b) a reaction_smiles was provided.  Pass use_mixfp=False to opt out.
+    _use_mixfp_explicit = relax.get("use_mixfp")
+    if _use_mixfp_explicit is None:
+        # Auto-detect: enable if index is built + smiles is available
+        _has_smiles = bool(relax.get("reaction_smiles"))
+        use_mixfp = (
+            _MIXFP_AVAILABLE
+            and _has_smiles
+            and _is_index_built is not None
+            and _is_index_built()
+        )
+    else:
+        use_mixfp = bool(_use_mixfp_explicit)
     mixfp_scores: Dict[str, float] = {}   # reaction_id → cosine similarity
     mixfp_routing_only = bool(relax.get("mixfp_routing_only", False))
     mixfp_w = float(relax.get("mixfp_weight", 0.6))

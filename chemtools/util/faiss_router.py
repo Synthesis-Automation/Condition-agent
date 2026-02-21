@@ -58,6 +58,22 @@ _META_PATH = os.path.join(INDEX_DIR, "kmn_metadata.npz")
 _WEIGHTS_PATH = os.path.join(INDEX_DIR, "kmn_weights.pt")
 
 
+def is_index_built(
+    *,
+    index_dir: Optional[str] = None,
+) -> bool:
+    """Return True if the KMN index files exist on disk and are non-empty.
+
+    Does **not** load anything into memory – cheap filesystem check only.
+    Used by :func:`chemtools.precedent.search.knn` to auto-enable MixFP
+    routing without requiring callers to pass ``use_mixfp=True`` explicitly.
+    """
+    d = index_dir or INDEX_DIR
+    meta = os.path.join(d, "kmn_metadata.npz")
+    weights = os.path.join(d, "kmn_weights.pt")
+    return os.path.isfile(meta) and os.path.getsize(meta) > 0 and os.path.isfile(weights)
+
+
 # ── availability helpers ───────────────────────────────────────────────────
 
 def _faiss_available() -> bool:

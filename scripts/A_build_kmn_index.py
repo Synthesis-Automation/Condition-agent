@@ -14,18 +14,81 @@ pipeline (Li et al., Nature 2026):
     6. Build and save a FAISS flat/IVF index from those embeddings.
     7. Write index files to ``data/kmn_index/`` (or CHEMTOOLS_KMN_INDEX_DIR).
 
-Usage::
+── Flat vs IVF index ────────────────────────────────────────────────────────
 
-    python scripts/build_kmn_index.py [--fp-size 1024] [--embed-dim 256]
-                                       [--epochs 50] [--batch-size 128]
-                                       [--lr 1e-3] [--no-train]
-                                       [--output-dir PATH]
-                                       [--n-processes N]
-                                       [--min-cluster-size 5]
+By default the script builds a **flat** (exact brute-force) FAISS index.
+Pass ``--use-ivf`` to build an **IVF** (Inverted File Index) instead.
 
-Pass ``--no-train`` to skip KMN training and use the random-projection
-fallback (fast, no torch required; useful to just build the FAISS index
-for evaluation with random embeddings).
+Flat search:
+  - Scans every vector in the index on every query (exact cosine).
+  - Correct for all dataset sizes; memory usage identical.
+  - At ~230 k reactions, each query takes ~10–50 ms on CPU.
+
+IVF search (``--use-ivf``):
+  - Partitions all vectors into ``nlist`` (default 128) Voronoi cells via
+    k-means at build time.  Each reaction is assigned to its nearest centroid.
+  - At query time, only the ``nprobe`` nearest cells are scanned
+    (~nprobe / nlist fraction of the database) → ~8–50× faster per query.
+  - Accuracy is ~95–99 % of exact (a small number of boundary results may
+    be missed, controllable by raising nprobe).
+  - Also enables soft-Voronoi blending (``FAISSRouter.search_soft_voronoi``)
+    and the full confidence-gated adaptive_search() dial:
+      conf ≥ 0.85  →  hard_filter  (nprobe=4,  tight/fast)
+      conf 0.5–0.85 →  soft_bleed  (nprobe 8–32, cross-cell bleed)
+      conf < 0.5   →  full_voronoi (nprobe ≥ 48, wide cross-family search)
+  - Without IVF, adaptive_search() still works but nprobe is ignored and
+    all three modes fall back to plain flat search.
+
+Recommended: use ``--use-ivf`` for any dataset larger than ~10 k reactions.
+
+── When to retrain KMN vs rebuild FAISS only ────────────────────────────────
+
+The KMN learns the *geometry* of the condition space — which reactions cluster
+together — not individual data points.  You do NOT need to retrain for every
+dataset update.
+
+Retrain KMN (full build):
+  - New reaction families not present in training data
+    (e.g. first photocatalysis examples, new catalyst class)
+  - Dataset expansion ≥ 5× the original size (distribution shift)
+  - Run:  python scripts/build_kmn_index.py --use-ivf --epochs 50
+
+Rebuild FAISS only (``--index-only``, fast):
+  - More examples of already-covered reaction families
+  - Data cleaning / deduplication
+  - Loads existing ``kmn_weights.pt`` and skips training entirely
+  - Run:  python scripts/build_kmn_index.py --index-only --use-ivf
+
+Rule of thumb: if ≥ 20 % of new rows map to the ``__rare__`` cluster
+(printed during label encoding), the taxonomy has grown → retrain.
+
+── Output files ─────────────────────────────────────────────────────────────
+
+    data/kmn_index/kmn_weights.pt       KMN model weights (PyTorch)
+    data/kmn_index/kmn_faiss.index      Serialised FAISS index
+    data/kmn_index/kmn_metadata.npz     Normalised embeddings + reaction IDs
+    data/kmn_index/kmn_label_map.npz    Condition-core cluster → integer map
+
+These files are excluded from git (see .gitignore).  Rebuild them locally
+after cloning or when the dataset changes.
+
+── Usage ─────────────────────────────────────────────────────────────────────
+
+Full build (first time or after new reaction families added)::
+
+    python scripts/build_kmn_index.py --use-ivf [--fp-size 1024]
+                                      [--embed-dim 256] [--epochs 50]
+                                      [--batch-size 128] [--lr 1e-3]
+                                      [--output-dir PATH] [--n-processes N]
+                                      [--min-cluster-size 5]
+
+Incremental update (same families, more data)::
+
+    python scripts/build_kmn_index.py --index-only --use-ivf
+
+Skip training entirely (random-projection fallback, no torch required)::
+
+    python scripts/build_kmn_index.py --no-train --use-ivf
 """
 from __future__ import annotations
 
