@@ -933,6 +933,7 @@ def _build_product_fp_index(family_key: str) -> Dict[str, Any]:
 def _search_by_product_similarity(
     target_smiles: str = "",
     smiles: str = "",
+    product_smiles: str = "",
     reaction_name: str = "",
     top_k: int = 5,
 ) -> Dict[str, Any]:
@@ -948,8 +949,9 @@ def _search_by_product_similarity(
     generate_disconnections output for cross-validation.
 
     Args:
-        target_smiles: Target molecule SMILES (alias: smiles).
+        target_smiles: Target molecule SMILES (aliases: smiles, product_smiles).
         smiles: Alias for target_smiles.
+        product_smiles: Alias for target_smiles.
         reaction_name: Optional family filter (e.g. "amide_coupling",
                        "suzuki_miyaura"). Leave empty to search all families.
         top_k: Number of results to return (default 5).
@@ -963,7 +965,7 @@ def _search_by_product_similarity(
     try:
         import numpy as np
 
-        mol_smiles = (target_smiles or smiles).strip()
+        mol_smiles = (target_smiles or smiles or product_smiles).strip()
         if ">" in mol_smiles:
             mol_smiles = mol_smiles.split(">>")[0].split(">")[0].strip()
 
@@ -976,6 +978,7 @@ def _search_by_product_similarity(
 
         family = _map_reaction_to_family(reaction_name)
         family_key = family if family else "__ALL__"
+
 
         index = _build_product_fp_index(family_key)
         rows: List[Dict[str, Any]] = index["rows"]
@@ -1070,7 +1073,8 @@ search_by_product_similarity_tool = ToolPlugin(
         "identify_retrons. Returns real precedents with actual reactants as candidate "
         "precursor pairs, plus conditions and yield. Especially powerful for complex, "
         "multi-functional molecules where SMARTS retrons may not fire. "
-        "Pass reaction_name to restrict to a family; leave empty to search all 231k reactions."
+        "Pass reaction_name to restrict to a family; leave empty to search all 231k reactions. "
+        "Parameter: target_smiles (also accepted as smiles or product_smiles)."
     ),
     prerequisites=[],  # Runs in G1 alongside identify_retrons
     fn=_search_by_product_similarity,
