@@ -38,6 +38,22 @@ except ImportError:
 # Global cache for DRFP loaders (one per family)
 _DRFP_LOADER_CACHE: Dict[str, Any] = {}
 
+# Import MixFP + KMN + FAISS routing utilities (MOSAIC-style)
+try:
+    from ..util.mix_fingerprint import create_mix_fp as _create_mix_fp
+    from ..util.kernel_metric_net import get_default_kmn as _get_default_kmn
+    from ..util.faiss_router import get_default_router as _get_default_router
+    _MIXFP_AVAILABLE = True
+except Exception:
+    _create_mix_fp = None   # type: ignore
+    _get_default_kmn = None  # type: ignore
+    _get_default_router = None  # type: ignore
+    _MIXFP_AVAILABLE = False
+
+# Singleton KMN / FAISS router (loaded lazily on first use)
+_KMN_INSTANCE: Any = None
+_FAISS_ROUTER_INSTANCE: Any = None
+
 
 def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str, Any], k: int, relax: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Build candidate pool of precedents matching the query family and features.
@@ -215,10 +231,73 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
     
     # ⏱️ TIME: Candidate pool building
     t_start_candidates = time.time()
-    # Build candidate set
-    cands = _candidate_pool(rows, family_txt, features, k, relax)
+
+    # ── MixFP + KMN + FAISS routing (MOSAIC-style) ────────────────────────
+    # When `use_mixfp=True`, route the query fingerprint through the KMN
+    # and FAISS index to get an ordered list of similar reaction IDs. These
+    # are then used as an additional similarity signal (or, when
+    # `mixfp_routing_only=True`, as the sole candidate pool).
+    use_mixfp = bool(relax.get("use_mixfp", False))
+    mixfp_scores: Dict[str, float] = {}   # reaction_id → cosine similarity
+    mixfp_routing_only = bool(relax.get("mixfp_routing_only", False))
+    mixfp_w = float(relax.get("mixfp_weight", 0.6))
+    if mixfp_w < 0.0:
+        mixfp_w = 0.0
+    elif mixfp_w > 1.0:
+        mixfp_w = 1.0
+
+    if use_mixfp and _MIXFP_AVAILABLE and _create_mix_fp is not None:
+        global _KMN_INSTANCE, _FAISS_ROUTER_INSTANCE
+        try:
+            # Lazy-load singletons
+            if _KMN_INSTANCE is None:
+                _KMN_INSTANCE = _get_default_kmn()  # type: ignore[misc]
+            if _FAISS_ROUTER_INSTANCE is None:
+                _FAISS_ROUTER_INSTANCE = _get_default_router()  # type: ignore[misc]
+
+            _rsmi_query = str(relax.get("reaction_smiles") or "")
+            _fp_size = int(relax.get("mixfp_fp_size", 1024))
+            _k_route = max(int(k * 3), 150)  # fetch more candidates for re-ranking
+
+            if _rsmi_query and _FAISS_ROUTER_INSTANCE.is_ready:
+                _fp = _create_mix_fp(_rsmi_query, fp_size=_fp_size)
+                if _fp is not None:
+                    _emb = _KMN_INSTANCE.get_embeddings(_fp.reshape(1, -1))[0]
+                    _ids, _sims = _FAISS_ROUTER_INSTANCE.search(_emb, k=_k_route)
+                    mixfp_scores = {
+                        rid: float(sim)
+                        for rid, sim in zip(_ids, _sims)
+                        if rid
+                    }
+                    if relax.get("debug_timing", False):
+                        logger.info(
+                            "   MixFP routing: %d candidates (top sim=%.3f)",
+                            len(mixfp_scores),
+                            max(mixfp_scores.values(), default=0.0),
+                        )
+        except Exception as _mixfp_exc:
+            logger.debug("MixFP routing error (non-fatal): %s", _mixfp_exc)
+            mixfp_scores = {}
+
+    # ── Build candidate pool ───────────────────────────────────────────────
+    if mixfp_routing_only and mixfp_scores:
+        # Use FAISS routing results directly: keep only rows whose reaction_id
+        # appears in the FAISS top-k (preserving cross-family results when
+        # family=None and mixfp_routing_only=True).
+        _rows_by_id = {r.get("reaction_id"): r for r in rows if r.get("reaction_id")}
+        cands = [
+            _rows_by_id[rid]
+            for rid in mixfp_scores
+            if rid in _rows_by_id
+        ]
+        # Apply any family filter if not routing globally
+        if family_txt is not None:
+            cands = [r for r in cands if (r.get("rxn_type") or "") == family_txt]
+    else:
+        # Standard categorical candidate pool (existing logic)
+        cands = _candidate_pool(rows, family_txt, features, k, relax)
     timing['build_candidates'] = time.time() - t_start_candidates
-    
+
     if not cands:
         proto_family = _proto_family_id(family_txt) if family_txt else "all_families"
         proto = f"proto_{proto_family}_none_0"
@@ -272,6 +351,8 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             # still allow DRFP to rescue a bit if enabled
             pass
         sim_total = sim_cat
+        r_fp = None    # initialise so MixFP blend can always reference safely
+        sim_fp = 0.0   # initialise so MixFP blend can always reference safely
         # DRFP component when available for both; prefer whole-reaction similarity
         if q_fp is not None:
             r_fp = None
@@ -369,6 +450,22 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
                     sim_total = (drfp_w * sim_fp) + ((1.0 - drfp_w) * sim_cat)
                 else:
                     sim_total = sim_fp
+
+        # ── MixFP cosine score blend ──────────────────────────────────────
+        if mixfp_scores:
+            r_id = r.get("reaction_id")
+            sim_mixfp = mixfp_scores.get(r_id, 0.0) if r_id else 0.0
+            sim_mixfp = max(0.0, min(1.0, sim_mixfp))
+            if sim_mixfp > 0.0:
+                # Three-way blend: mixfp | drfp | categorical
+                # mixfp_w controls the MixFP share; remainder split evenly
+                _rem = (1.0 - mixfp_w) / 2.0
+                sim_total = (
+                    mixfp_w * sim_mixfp
+                    + _rem * (sim_fp if q_fp is not None and r_fp is not None else sim_cat)
+                    + _rem * sim_cat
+                )
+
         if sim_total <= 0:
             if sim_cat > 0:
                 sim_total = sim_cat
@@ -528,7 +625,14 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
     
     if use_drfp:
         result["drfp_load_strategy"] = drfp_load_count
-    
+
+    if use_mixfp:
+        result["mixfp_routing"] = {
+            "candidates": len(mixfp_scores),
+            "routing_only": mixfp_routing_only,
+            "weight": mixfp_w,
+        }
+
     return result
 
 
