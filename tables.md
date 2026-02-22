@@ -46,14 +46,15 @@ Atom mapping failed: RXNMapper not installed or failed to initialize
   identify_retrons  →  inspect_target  →  search_by_product_similarity  →  smiles_to_info  →  generate_disconnections  →  search_notes  →  apply_hte_templates  →  find_retro_precedent  →  read_notes  →  search_hte_precedent  →  check_retro_consistency  →  recommend_conditions
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ## Retrosynthetic Route for N-[2-ethyl-6-(1-methylsulfonyl-3,6-dihydro-2H-pyridin-4-yl)imidazo[1,2-a]pyridin-3-yl]-N-methylformamide
+
+## Retrosynthetic Route for N-[2-ethyl-6-(1-methylsulfonyl-3,6-dihydro-2H-pyridin-4-yl)imidazo[1,2-a]pyridin-3-yl]-N-methylformamide
 
   **Target SMILES:** `CCc1nc2ccc(C3=CCN(S(C)(=O)=O)CC3)cn2c1N(C)C=O`
   **MW:** 362.5 g/mol | **Complexity:** 946 (highly complex)
 
   ---
 
-  ### Target Analysis
+### Target Analysis
 
   | Feature | Value | Implication |
   |---------|-------|-------------|
@@ -64,7 +65,7 @@ Atom mapping failed: RXNMapper not installed or failed to initialize
 
   ---
 
-  ### Proposed Retrosynthetic Route (3 Steps)
+### Proposed Retrosynthetic Route (3 Steps)
 
   ```
   TARGET: N-methylformamide-sulfonamide
@@ -89,16 +90,18 @@ Atom mapping failed: RXNMapper not installed or failed to initialize
 
   ---
 
-  ### Step-by-Step Details
+### Step-by-Step Details
 
-  #### **Step 3 (Forward): Suzuki-Miyaura Coupling**
+#### **Step 3 (Forward): Suzuki-Miyaura Coupling**
 
   **Reaction SMILES:**
+
   ```
   CC(C)(C)OC(=O)N1CC=C(B2OC(C)(C)C(C)(C)O2)CC1.CCc1nc2ccc(Br)cn2c1N(C)C=O>>CCc1nc2ccc(C3=CCN(C(=O)OC(C)(C)C)CC3)cn2c1N(C)C=O
   ```
 
   **Precursors:**
+
   | Reagent | Name | CAS | Role |
   |---------|------|-----|------|
   | `CC(C)(C)OC(=O)N1CC=C(B2OC(C)(C)C(C)(C)O2)CC1` | **tert-Butyl 4-(4,4,5,5-tetramethyl-1,3,2-dioxaborolan-2-yl)-3,6-dihydro-2H-pyridine-1-carboxylate** | 286961-14-6 | Alkenyl-Bpin |
@@ -121,44 +124,49 @@ Atom mapping failed: RXNMapper not installed or failed to initialize
 
   ---
 
-  #### **Step 2 (Forward): Boc Deprotection**
+#### **Step 2 (Forward): Boc Deprotection**
 
   **Reaction SMILES:**
+
   ```
   CCc1nc2ccc(C3=CCN(C(=O)OC(C)(C)C)CC3)cn2c1N(C)C=O>>CCc1nc2ccc(C3=CCNCC3)cn2c1N(C)C=O
   ```
 
   **Standard Conditions:**
-  - **TFA/DCM (1:1), rt, 1–2 h** — most common for acid-sensitive substrates
-  - **4 M HCl in dioxane, rt, 1–4 h** — workup involves evaporation + neutralization
-  - The formamide on the imidazopyridine is stable under these acidic conditions
+
+- **TFA/DCM (1:1), rt, 1–2 h** — most common for acid-sensitive substrates
+- **4 M HCl in dioxane, rt, 1–4 h** — workup involves evaporation + neutralization
+- The formamide on the imidazopyridine is stable under these acidic conditions
 
   **Product:** `CCc1nc2ccc(C3=CCNCC3)cn2c1N(C)C=O` — the free secondary amine ready for sulfonylation
 
   ---
 
-  #### **Step 1 (Forward): Sulfonamide Formation**
+#### **Step 1 (Forward): Sulfonamide Formation**
 
   **Reaction SMILES:**
+
   ```
   CCc1nc2ccc(C3=CCNCC3)cn2c1N(C)C=O.CS(=O)(=O)Cl>>CCc1nc2ccc(C3=CCN(S(C)(=O)=O)CC3)cn2c1N(C)C=O
   ```
 
   **Reagents:**
+
   | Reagent | Name | CAS |
   |---------|------|-----|
   | `CS(=O)(=O)Cl` | **Methanesulfonyl chloride** | 124-63-0 |
 
   **Standard Conditions (no HTE data found — textbook protocol):**
-  - **Et₃N (2.0 equiv) or pyridine (3 equiv), DCM, 0°C → rt, 2–4 h**
-  - Very reliable transformation; typically 85–99% yield
-  - Alternative: Na₂CO₃ in acetone/water (HTE precedent shows 99% yield for similar sulfonamides)
+
+- **Et₃N (2.0 equiv) or pyridine (3 equiv), DCM, 0°C → rt, 2–4 h**
+- Very reliable transformation; typically 85–99% yield
+- Alternative: Na₂CO₃ in acetone/water (HTE precedent shows 99% yield for similar sulfonamides)
 
   **Mechanism:** The amine attacks the sulfonyl chloride, displacing chloride. The base scavenges the HCl formed. No over-reaction since the other nitrogen (formamide) is less nucleophilic.
 
   ---
 
-  ### Overall Route Summary
+### Overall Route Summary
 
   | Step | Transformation | Difficulty | Precedent Quality |
   |------|---------------|------------|-------------------|
@@ -170,7 +178,7 @@ Atom mapping failed: RXNMapper not installed or failed to initialize
 
   ---
 
-  ### Key Advantages of This Route
+### Key Advantages of This Route
 
   1. **Direct precedent:** The J. Med. Chem. 2017 paper reports the exact same Suzuki coupling (N-Boc-4-vinylboronate dihydropyridine + bromo-imidazopyridine) at **100% yield**. The substrate is so similar that the product is the N-Boc protected version of your target.
 
@@ -182,7 +190,7 @@ Atom mapping failed: RXNMapper not installed or failed to initialize
 
   ---
 
-  ### Confidence Assessment
+### Confidence Assessment
 
   | Aspect | Confidence | Basis |
   |--------|------------|-------|
@@ -194,7 +202,7 @@ Atom mapping failed: RXNMapper not installed or failed to initialize
 
   ---
 
-  ### Sources
+### Sources
 
   1. **J. Med. Chem. 2017, 60, 7371–7392** — Direct precedent for Suzuki coupling with N-Boc-4-vinylboronate dihydropyridine
   2. **HTE database** — 25 Suzuki experiments for Alkenyl-Bpin + HeteroAr-Br; avg yield 77–92% with Pd catalysts
