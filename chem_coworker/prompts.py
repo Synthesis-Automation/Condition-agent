@@ -610,6 +610,14 @@ Troubleshooting:
 Molecule analysis:
   [inspect_functional_groups + get_molecular_descriptors]
 
+Deep electronic/steric analysis (catalyst/ligand selection):
+  [featurize_molecule(reactant_smiles)]
+  → use electronic score to choose Pd vs Ni, and steric score to select ligand bulk
+
+SNAr vs Pd-catalysed coupling decision:
+  [assess_snar_feasibility(aryl_halide_smiles)]
+  → score ≥ 6.0: SNAr viable; score < 6.0: use Pd/Ni coupling instead
+
 Reagent lookup:
   [lookup_reagent + list_reagents_by_role]
 
@@ -631,6 +639,8 @@ Concept explanation:
 × Do NOT call tools you don't need — HIGH confidence = fewer tool calls
 × OTf⁻, BF₄⁻, PF₆⁻ are spectators; they are NEVER electrophiles
 × Always pair read_notes with recommend_conditions when using both
+× featurize_molecule and assess_snar_feasibility take a SINGLE molecule SMILES,
+  not a full reaction SMILES — strip the reactant of interest before calling
 
 ━━━ WRITING YOUR FINAL ANSWER ━━━
 

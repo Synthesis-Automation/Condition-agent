@@ -925,11 +925,13 @@ class ChemCoworker:
                         "Do NOT invent conditions."
                     )
                 top = recs[0]
-                missing = [f for f in ("catalyst", "solvent", "base") if not top.get(f)]
-                if missing:
+                n_exp = int(top.get("num_experiments", 0))
+                conf  = float(top.get("confidence", 1.0))
+                if n_exp == 0 and conf < 0.3:
                     return (
-                        f"Top HTE recommendation is missing fields: {missing}. "
-                        "Flag this gap explicitly in the answer."
+                        "Top HTE recommendation has no experimental support "
+                        f"(0 experiments, confidence={conf:.2f}). "
+                        "Treat suggested conditions as tentative and state this explicitly."
                     )
 
         return None

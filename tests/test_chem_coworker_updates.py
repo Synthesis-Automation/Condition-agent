@@ -137,19 +137,53 @@ class TestCheckHypothesis:
         assert "Do NOT invent" in msg
 
     def test_missing_catalyst_field_returns_warning(self):
+        """Empty catalyst string with real experimental support should NOT warn.
+        Absent fields in HTE data are legitimate (e.g. uncatalysed reactions);
+        the old field-presence check caused false positives."""
         agent = _make_agent()
         plan = _make_plan()
         results = {
             "recommend_conditions": {
                 "success": True,
                 "recommendations": [
-                    {"rank": 1, "catalyst": "", "solvent": "DMF", "base": "K2CO3"}
+                    {
+                        "rank": 1,
+                        "catalyst": "",
+                        "solvent": "DMF",
+                        "base": "K2CO3",
+                        "num_experiments": 12,
+                        "confidence": 0.75,
+                    }
+                ],
+            }
+        }
+        msg = agent._check_hypothesis(plan, results)
+        # Empty catalyst is fine when real experiments back it up
+        assert msg is None
+
+    def test_zero_experiment_low_confidence_returns_warning(self):
+        """A recommendation with 0 experiments and low confidence should warn."""
+        agent = _make_agent()
+        plan = _make_plan()
+        results = {
+            "recommend_conditions": {
+                "success": True,
+                "recommendations": [
+                    {
+                        "rank": 1,
+                        "catalyst": "Pd(OAc)2",
+                        "solvent": "THF",
+                        "base": "Cs2CO3",
+                        "num_experiments": 0,
+                        "confidence": 0.1,
+                    }
                 ],
             }
         }
         msg = agent._check_hypothesis(plan, results)
         assert msg is not None
-        assert "catalyst" in msg
+        assert "0 experiments" in msg
+        assert "tentative" in msg
 
     def test_complete_recommendation_passes(self):
         agent = _make_agent()

@@ -497,11 +497,19 @@ RECOMMENDED (add for thorough analysis):
   • check_retro_consistency — AFTER generate_disconnections; validates each top
     disconnection (atom balance, charge, FG patterns, complexity check); use when
     you want RDKit confirmation before presenting a route to the user
+  • featurize_molecule — parallel with identify_retrons; get electronic score +
+    steric profile for the target or a key precursor; use when catalyst/ligand
+    selection depends on ring electronics (electron-poor vs electron-rich arene)
+    or steric demand (secondary/tertiary alkyl coupling)
+  • assess_snar_feasibility — parallel with identify_retrons; ONLY when an aryl
+    halide is present; determines if SNAr is viable (score ≥ 6.0) or if Pd/Ni
+    coupling is preferable
 
 CALL ORDER (dependency rules):
   G0: [resolve_to_smiles]  ← ONLY when no SMILES in query
   G1: [normalize_reaction + inspect_target]
-  G2: [identify_retrons + find_retro_precedent + search_by_product_similarity + apply_hte_templates]  ← parallel
+  G2: [identify_retrons + find_retro_precedent + search_by_product_similarity
+       + apply_hte_templates + featurize_molecule + assess_snar_feasibility]  ← parallel
   G3: [generate_disconnections]
   G4: [check_retro_consistency + search_hte_precedent + recommend_conditions + search_notes]  ← parallel
        ↑ call check_retro_consistency for each top-ranked disconnection from G3
