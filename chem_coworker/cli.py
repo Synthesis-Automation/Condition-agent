@@ -36,6 +36,13 @@ from typing import TYPE_CHECKING, Dict, List, Optional
 if TYPE_CHECKING:
     from chem_coworker.response import ChemResponse
 
+# When run directly (python chem_coworker/cli.py) the project root is not on
+# sys.path. Insert it so that `import chem_coworker` resolves correctly.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_ROOT = os.path.dirname(_HERE)
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
+
 from chem_coworker.event_bus import EventBus, ChemEvent
 
 

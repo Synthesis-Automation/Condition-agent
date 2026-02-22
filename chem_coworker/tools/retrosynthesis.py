@@ -55,12 +55,13 @@ def _inspect_target(smiles: str = "", target_smiles: str = "") -> Dict[str, Any]
     """
     try:
         smiles = smiles or target_smiles
-        from rdkit import Chem
+        from rdkit import Chem, rdBase
         from rdkit.Chem import Descriptors, rdMolDescriptors, GraphDescriptors
 
         # Strip reaction component if accidentally passed
         mol_smiles = smiles.split(">>")[0].split(">")[0].strip() if ">" in smiles else smiles
-        mol = Chem.MolFromSmiles(mol_smiles)
+        with rdBase.BlockLogs():
+            mol = Chem.MolFromSmiles(mol_smiles)
         if mol is None:
             return _error(f"Cannot parse target SMILES: {mol_smiles!r}")
 
@@ -1352,10 +1353,10 @@ def _inchi_key(smiles: str) -> Optional[str]:
         from rdkit import Chem, rdBase
         with rdBase.BlockLogs():
             mol = Chem.MolFromSmiles(smiles)
-        if mol is None:
-            return None
-        # MolToInchiKey is available directly on Chem in modern RDKit
-        return Chem.MolToInchiKey(mol)
+            if mol is None:
+                return None
+            # MolToInchiKey is available directly on Chem in modern RDKit
+            return Chem.MolToInchiKey(mol)
     except Exception:
         return None
 

@@ -18,6 +18,16 @@ from typing import Any, Dict
 from ._helpers import _clean_rxn_smiles, _error, _success, _to_jsonable
 from ._base import ToolPlugin
 
+# Pre-warm chemtools to avoid a threading race where parallel tool calls
+# simultaneously trigger the first import of chemtools._atom_mapping (a slow
+# submodule) from different threads, causing "cannot import name '...' from
+# partially initialized module 'chemtools._atom_mapping'".
+# Importing here forces full single-threaded initialization at startup.
+try:
+    import chemtools as _chemtools_warm  # noqa: F401
+except Exception:
+    pass
+
 
 # ---------------------------------------------------------------------------
 # Tool 1: normalize_reaction
