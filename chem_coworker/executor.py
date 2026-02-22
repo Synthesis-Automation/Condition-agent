@@ -19,16 +19,13 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from .plan import ExecutionPlan, ToolCall, _SMILES_PLACEHOLDER_RE
+from .plan import ExecutionPlan, ToolCall
+from .event_bus import ChemEvent as _ChemEvent
 
 logger = logging.getLogger(__name__)
 
 # Maximum parallel threads per group
 _MAX_WORKERS = 4
-
-# Callback types (A3 — streaming, A1 — hooks)
-ProgressCallback = Callable[[str, str, float], None]
-# signature: (event: "start"|"done"|"error", tool_name: str, elapsed_s: float) -> None
 
 # ---------------------------------------------------------------------------
 # Import pre-warmer
@@ -68,46 +65,25 @@ def _prewarm_tool_imports() -> None:
             pass  # Missing optional dependency — let the tool handle it
 
 
-# ---------------------------------------------------------------------------
-# Inter-group SMILES propagation helpers
-# ---------------------------------------------------------------------------
-
-def _extract_resolved_smiles(group_results: Dict[str, Any]) -> Optional[str]:
-    """Return the SMILES resolved by a name-resolver tool, or None.
-
-    Called after each group executes. When G0 contains resolve_to_smiles or
-    resolve_name_to_smiles (legacy) and it succeeds, its 'smiles' field is
-    propagated to patch G1+ tool args that still hold a placeholder string.
+def _extract_provides_smiles(
+    group_results: Dict[str, Any],
+    plugins: Dict[str, Any],  # {name: ToolPlugin}
+) -> Optional[str]:
+    """Data-contract SMILES resolution — finds SMILES from executed tools that
+    declare provides=["resolved_smiles"] (or "smiles" / "canonical_smiles").
     """
-    # Check both new consolidated name and old name for backward compat
-    r = group_results.get("resolve_to_smiles") or group_results.get("resolve_name_to_smiles")
-    if not isinstance(r, dict) or not r.get("success", False):
-        return None
-    for key in ("smiles", "resolved_smiles", "canonical_smiles"):
-        val = r.get(key)
-        if val and isinstance(val, str) and val.lower() not in ("(none)", "none", ""):
-            return val
+    for tool_name, result in group_results.items():
+        if not isinstance(result, dict) or not result.get("success", False):
+            continue
+        plugin = plugins.get(tool_name)
+        if plugin is None:
+            continue
+        for provided_key in plugin.provides:
+            if provided_key in ("resolved_smiles", "smiles", "canonical_smiles"):
+                val = result.get(provided_key)
+                if val and isinstance(val, str) and val.lower() not in ("(none)", "none", ""):
+                    return val
     return None
-
-
-def _substitute_in_remaining_groups(
-    plan: ExecutionPlan,
-    completed_group_idx: int,
-    resolved_smiles: str,
-) -> None:
-    """Replace SMILES placeholder strings in all groups after completed_group_idx.
-
-    Modifies plan.groups in place. Only replaces arg values that match
-    _SMILES_PLACEHOLDER_RE — real SMILES already in args are left untouched.
-    """
-    for group in plan.groups[completed_group_idx + 1 :]:
-        for call in group:
-            call.args = {
-                k: resolved_smiles if (
-                    isinstance(v, str) and _SMILES_PLACEHOLDER_RE.match(v)
-                ) else v
-                for k, v in call.args.items()
-            }
 
 
 class ToolExecutor:
@@ -120,72 +96,15 @@ class ToolExecutor:
         self,
         max_workers: int = _MAX_WORKERS,
         verbose: bool = False,
-        progress_cb: Optional[ProgressCallback] = None,
+        event_bus: Optional[Any] = None,   # EventBus — typed as Any to avoid circular import
         hooks: Optional[Any] = None,   # HookRegistry — typed as Any to avoid circular import
+        registry: Optional[Any] = None,  # ToolRegistry — for data-contract resolution (Phase 1)
     ):
         self.max_workers = max_workers
         self.verbose = verbose
-        self.progress_cb = progress_cb
+        self.event_bus = event_bus
         self.hooks = hooks
-
-    def run_plan(
-        self,
-        plan: ExecutionPlan,
-        callables: Dict[str, Callable[..., Any]],
-    ) -> Dict[str, Any]:
-        """
-        Execute an ExecutionPlan and return all tool results.
-
-        Args:
-            plan: ExecutionPlan from PlanParser.
-            callables: {tool_name: fn} dict from ToolRegistry.get_callables().
-
-        Returns:
-            {tool_name: result_payload} for all tools that were executed.
-        """
-        results: Dict[str, Any] = {}
-        total_start = time.monotonic()
-
-        # Pre-warm all tool-side chemtools imports in the main thread so that
-        # concurrent threads inside ThreadPoolExecutor never race on _ModuleLock.
-        _prewarm_tool_imports()
-
-        for group_idx, group in enumerate(plan.groups):
-            if self.verbose:
-                names = [tc.name for tc in group]
-                logger.info(f"[Executor] Group {group_idx}: {names}")
-
-            group_start = time.monotonic()
-            group_results = self._run_parallel(group, callables)
-            results.update(group_results)
-
-            # Propagate resolved SMILES: if resolve_name_to_smiles just ran,
-            # patch placeholder args in all remaining groups so they receive
-            # the real SMILES instead of the literal placeholder string.
-            resolved = _extract_resolved_smiles(group_results)
-            if resolved:
-                _substitute_in_remaining_groups(plan, group_idx, resolved)
-                if self.verbose:
-                    logger.info(
-                        f"[Executor] Propagated resolved SMILES '{resolved}' "
-                        f"to groups {group_idx + 1}+"
-                    )
-
-            if self.verbose:
-                elapsed = time.monotonic() - group_start
-                logger.info(
-                    f"[Executor] Group {group_idx} done in {elapsed:.2f}s: "
-                    f"{list(group_results.keys())}"
-                )
-
-        if self.verbose:
-            total = time.monotonic() - total_start
-            logger.info(
-                f"[Executor] All {len(plan.all_tool_calls)} tools done in {total:.2f}s. "
-                f"Groups: {len(plan.groups)}"
-            )
-
-        return results
+        self.registry = registry
 
     def _run_parallel(
         self,
@@ -198,18 +117,30 @@ class ToolExecutor:
 
         t0 = time.monotonic()
 
-        # Fire "start" for every tool in the group before submitting (A3)
-        if self.progress_cb:
+        # Fire TOOL_START for every tool in the group before submitting
+        if self.event_bus:
             for call in calls:
-                self.progress_cb("start", call.name, 0.0)
+                self.event_bus.emit(_ChemEvent.TOOL_START, tool_name=call.name)
 
         # Single call — skip thread overhead
         if len(calls) == 1:
             result = self._execute_one(calls[0], callables)
-            if self.progress_cb:
+            if self.event_bus:
                 elapsed = time.monotonic() - t0
                 has_error = isinstance(result, dict) and not result.get("success", True)
-                self.progress_cb("error" if has_error else "done", calls[0].name, elapsed)
+                if has_error:
+                    self.event_bus.emit(
+                        _ChemEvent.TOOL_ERROR,
+                        tool_name=calls[0].name,
+                        elapsed_s=elapsed,
+                        error=str(result.get("error", "")),
+                    )
+                else:
+                    self.event_bus.emit(
+                        _ChemEvent.TOOL_DONE,
+                        tool_name=calls[0].name,
+                        elapsed_s=elapsed,
+                    )
             return {calls[0].name: result}
 
         results: Dict[str, Any] = {}
@@ -226,13 +157,28 @@ class ToolExecutor:
                 try:
                     results[name] = future.result()
                     has_error = isinstance(results[name], dict) and not results[name].get("success", True)
-                    event = "error" if has_error else "done"
+                    if self.event_bus:
+                        if has_error:
+                            self.event_bus.emit(
+                                _ChemEvent.TOOL_ERROR,
+                                tool_name=name,
+                                elapsed_s=elapsed,
+                                error=str(results[name].get("error", "")),
+                            )
+                        else:
+                            self.event_bus.emit(
+                                _ChemEvent.TOOL_DONE, tool_name=name, elapsed_s=elapsed
+                            )
                 except Exception as exc:
                     logger.warning(f"[Executor] Tool '{name}' raised: {exc}")
                     results[name] = {"success": False, "error": str(exc)}
-                    event = "error"
-                if self.progress_cb:
-                    self.progress_cb(event, name, elapsed)
+                    if self.event_bus:
+                        self.event_bus.emit(
+                            _ChemEvent.TOOL_ERROR,
+                            tool_name=name,
+                            elapsed_s=elapsed,
+                            error=str(exc),
+                        )
 
         return results
 
@@ -267,6 +213,17 @@ class ToolExecutor:
                 override = self.hooks.fire_post(ctx)
                 if override is not None:
                     result = override
+
+            # Phase 1: run tool validators registered on ToolPlugin
+            if self.registry and call.name in self.registry._plugins:
+                plugin = self.registry._plugins[call.name]
+                for validator_fn in plugin.validators:
+                    try:
+                        warning = validator_fn(result)
+                        if warning and isinstance(result, dict):
+                            result.setdefault("_warnings", []).append(warning)
+                    except Exception as vexc:
+                        logger.debug(f"[Executor] Validator for {call.name} raised: {vexc}")
 
             return result
 

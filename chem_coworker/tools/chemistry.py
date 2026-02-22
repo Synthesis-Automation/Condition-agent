@@ -139,6 +139,7 @@ detect_reaction_type_tool = ToolPlugin(
     description="Deterministic taxonomy classification of a reaction (Suzuki, Buchwald-Hartwig, etc.). Fast, no atom mapping needed.",
     prerequisites=[],
     fn=_detect_reaction_type,
+    provides=["reaction_type", "reaction_family"],
 )
 
 

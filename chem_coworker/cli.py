@@ -36,6 +36,8 @@ from typing import TYPE_CHECKING, Dict, List, Optional
 if TYPE_CHECKING:
     from chem_coworker.response import ChemResponse
 
+from chem_coworker.event_bus import EventBus, ChemEvent
+
 
 # ---------------------------------------------------------------------------
 # ANSI color / style constants
@@ -234,8 +236,6 @@ def _print_response(response: "ChemResponse", verbose: bool = False) -> None:
                 print(f"  {C.HYPO}{response.hypothesis}{C.R}")
             if response.plan_rationale:
                 print(f"  {C.META}{response.plan_rationale}{C.R}")
-            if response.plan_revised:
-                print(f"  {C.META}↺ Plan revised after Group 0 observation{C.R}")
             print()
 
         # ── Tools called ──────────────────────────────────────────────────
@@ -360,7 +360,6 @@ def _print_pre_answer_chrome(ctx: dict) -> None:
     confidence  = ctx.get("confidence", 0.0)
     rationale   = ctx.get("rationale", "")
     tools_called = ctx.get("tools_called", [])
-    plan_revised = ctx.get("plan_revised", False)
 
     print()
     if hypothesis or rationale:
@@ -370,8 +369,6 @@ def _print_pre_answer_chrome(ctx: dict) -> None:
             print(f"  {C.HYPO}{hypothesis}{C.R}")
         if rationale:
             print(f"  {C.META}{rationale}{C.R}")
-        if plan_revised:
-            print(f"  {C.META}↺ Plan revised after Group 0 observation{C.R}")
         print()
 
     if tools_called:
@@ -389,7 +386,6 @@ def _pre_synth_cb(
     confidence: float,
     rationale: str,
     tools_called: list,
-    plan_revised: bool,
 ) -> None:
     """Called by agent right before synthesis starts — stores plan info for streaming."""
     _stream_state["pre_synth_info"] = {
@@ -397,7 +393,6 @@ def _pre_synth_cb(
         "confidence": confidence,
         "rationale": rationale,
         "tools_called": tools_called,
-        "plan_revised": plan_revised,
     }
 
 
@@ -481,6 +476,31 @@ def _drop_tool_from_plan(plan, name: str):
 # In-session coworker factory
 # ---------------------------------------------------------------------------
 
+def _build_event_bus() -> EventBus:
+    """Wire CLI display functions to a fresh EventBus for one session."""
+    bus = EventBus()
+
+    # Tool progress — TOOL_START shows spinner; TOOL_DONE / TOOL_ERROR prints result
+    bus.subscribe(ChemEvent.TOOL_START, lambda tool_name, **_: _progress("start", tool_name, 0.0))
+    bus.subscribe(ChemEvent.TOOL_DONE, lambda tool_name, elapsed_s, **_: _progress("done", tool_name, elapsed_s))
+    bus.subscribe(ChemEvent.TOOL_ERROR, lambda tool_name, elapsed_s, **_: _progress("error", tool_name, elapsed_s))
+
+    # Phase spinners — reuse the existing _PHASE_LABELS mapping
+    bus.subscribe(ChemEvent.PHASE_START, lambda phase, **_: _phase(f"{phase}_start"))
+    bus.subscribe(ChemEvent.PHASE_END, lambda phase, **_: _phase(f"{phase}_done"))
+
+    # Compact spinners
+    bus.subscribe(ChemEvent.COMPACT_START, lambda **_: _phase("compact_start"))
+    bus.subscribe(ChemEvent.COMPACT_END, lambda **_: _phase("compact_done"))
+
+    # Answer streaming
+    bus.subscribe(ChemEvent.PRE_SYNTH, lambda hypothesis, confidence, rationale, tools_called, **_:
+        _pre_synth_cb(hypothesis, confidence, rationale, tools_called))
+    bus.subscribe(ChemEvent.STREAM_TOKEN, lambda token, **_: _stream_token(token))
+
+    return bus
+
+
 def _init_coworker(model: str, provider: str, verbose: bool, plan_mode: bool):
     """Create a ChemCoworker with the current session settings."""
     from chem_coworker import ChemCoworker
@@ -488,10 +508,7 @@ def _init_coworker(model: str, provider: str, verbose: bool, plan_mode: bool):
         provider=provider,
         model=model,
         verbose=verbose,
-        progress_cb=_progress,
-        phase_cb=_phase,
-        pre_synth_cb=_pre_synth_cb,
-        stream_cb=_stream_token,
+        event_bus=_build_event_bus(),
         plan_callback=_show_plan_and_confirm if plan_mode else None,
     )
 

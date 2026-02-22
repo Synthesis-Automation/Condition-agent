@@ -140,12 +140,43 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
         return _error(f"Condition recommendation failed: {exc}")
 
 
+# ---------------------------------------------------------------------------
+# Validator for recommend_conditions (Phase 1)
+# Moves _check_hypothesis logic onto the tool that owns it.
+# ---------------------------------------------------------------------------
+
+def _validate_recommend_conditions(result: dict) -> object:
+    """Post-execution validator: surfaces no-HTE-data warnings at tool time."""
+    if not result.get("success"):
+        return None
+    recs = result.get("recommendations", [])
+    if not recs:
+        return (
+            "recommend_conditions returned NO HTE precedents. "
+            "State clearly that no experimental data was found. "
+            "Do NOT invent conditions."
+        )
+    top = recs[0]
+    n_exp = int(top.get("num_experiments", 0))
+    conf = float(top.get("confidence", 1.0))
+    if n_exp == 0 and conf < 0.3:
+        return (
+            "Top HTE recommendation has no experimental support "
+            f"(0 experiments, confidence={conf:.2f}). "
+            "Treat suggested conditions as tentative and state this explicitly."
+        )
+    return None
+
+
 recommend_conditions_tool = ToolPlugin(
     name="recommend_conditions",
     category="conditions",
     description="Recommend reaction conditions (catalyst, ligand, base, solvent, temperature) from HTE experimental data.",
     prerequisites=["detect_reaction_type"],
     fn=_recommend_conditions,
+    provides=["conditions", "recommendations"],
+    requires=["reaction_type"],
+    validators=[_validate_recommend_conditions],
 )
 
 

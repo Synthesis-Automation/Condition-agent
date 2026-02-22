@@ -25,6 +25,9 @@ from .agent import ChemCoworker, create_coworker
 from .tools import REGISTRY, COWORKER_TOOLS
 from .response import ChemResponse
 from .classifier import TaskClassifier, TaskType
+from .event_bus import EventBus, ChemEvent
+from .workflow import WorkflowDefinition, WorkflowRegistry, WORKFLOW_REGISTRY, CriticStep
+from .critic import CriticAgent, Finding, Severity, CRITIC_SYSTEM_PROMPT
 
 __all__ = [
     "ChemCoworker",
@@ -34,6 +37,16 @@ __all__ = [
     "TaskType",
     "REGISTRY",
     "COWORKER_TOOLS",
+    "EventBus",
+    "ChemEvent",
+    "WorkflowDefinition",
+    "WorkflowRegistry",
+    "WORKFLOW_REGISTRY",
+    "CriticStep",
+    "CriticAgent",
+    "Finding",
+    "Severity",
+    "CRITIC_SYSTEM_PROMPT",
 ]
 
 __version__ = "0.1.0"

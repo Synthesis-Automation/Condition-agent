@@ -204,6 +204,7 @@ resolve_to_smiles_tool = ToolPlugin(
     ),
     prerequisites=[],
     fn=_resolve_to_smiles,
+    provides=["resolved_smiles", "smiles"],
 )
 
 

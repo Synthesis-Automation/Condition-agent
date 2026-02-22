@@ -9,7 +9,12 @@ Every tool in chem_coworker is a ToolPlugin. This makes the system self-describi
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, Dict, List, Optional
+
+
+# Validator signature: fn(result_dict) -> Optional[warning_string]
+# Return None = pass, return str = warning surfaced in ChemResponse
+ValidatorFn = Callable[[Dict[str, Any]], Optional[str]]
 
 
 @dataclass
@@ -25,6 +30,15 @@ class ToolPlugin:
         fn: The raw callable (Python function, not LangChain tool) for direct execution.
             This is what the ToolExecutor calls — no LangChain overhead.
         langchain_tool: Optional LangChain @tool object, for direct LangGraph use.
+        provides: Keys this tool writes into the shared result context.
+            Examples: ["resolved_smiles"], ["reaction_type"], ["conditions"]
+            Used by executor for data-contract resolution (replaces _SMILES_PLACEHOLDER_RE).
+        requires: Keys from prior results this tool needs (informational; executor
+            logs a warning if missing but does not abort).
+        validators: Post-execution validators run by ToolExecutor after the tool returns.
+            Each fn(result_dict) -> Optional[str]. Non-None return is a warning
+            appended to result["_warnings"] and surfaced in ChemResponse.
+            Replaces hardcoded tool-name checks in agent._check_hypothesis().
     """
     name: str
     category: str
@@ -32,6 +46,10 @@ class ToolPlugin:
     fn: Callable[..., Any]
     prerequisites: List[str] = field(default_factory=list)
     langchain_tool: Optional[Any] = None  # langchain_core.tools.BaseTool
+    # --- Data-contract metadata (Phase 1) ---
+    provides: List[str] = field(default_factory=list)
+    requires: List[str] = field(default_factory=list)
+    validators: List[ValidatorFn] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         # If langchain_tool is provided but fn is not explicitly the wrapped function,

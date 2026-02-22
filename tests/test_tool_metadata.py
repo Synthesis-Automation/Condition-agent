@@ -1,0 +1,310 @@
+"""
+Tests for Phase 1: ToolPlugin metadata fields (provides, requires, validators)
+and data-contract SMILES resolution in ToolExecutor.
+"""
+from __future__ import annotations
+
+import pytest
+from typing import Any, Dict, Optional
+from unittest.mock import MagicMock
+
+
+# ---------------------------------------------------------------------------
+# ToolPlugin dataclass tests
+# ---------------------------------------------------------------------------
+
+class TestToolPluginMetadataDefaults:
+    def test_provides_defaults_to_empty_list(self):
+        from chem_coworker.tools._base import ToolPlugin
+        p = ToolPlugin(name="x", category="c", description="d", fn=lambda: {})
+        assert p.provides == []
+
+    def test_requires_defaults_to_empty_list(self):
+        from chem_coworker.tools._base import ToolPlugin
+        p = ToolPlugin(name="x", category="c", description="d", fn=lambda: {})
+        assert p.requires == []
+
+    def test_validators_defaults_to_empty_list(self):
+        from chem_coworker.tools._base import ToolPlugin
+        p = ToolPlugin(name="x", category="c", description="d", fn=lambda: {})
+        assert p.validators == []
+
+    def test_provides_stored_correctly(self):
+        from chem_coworker.tools._base import ToolPlugin
+        p = ToolPlugin(
+            name="x", category="c", description="d", fn=lambda: {},
+            provides=["resolved_smiles", "smiles"],
+        )
+        assert p.provides == ["resolved_smiles", "smiles"]
+
+    def test_requires_stored_correctly(self):
+        from chem_coworker.tools._base import ToolPlugin
+        p = ToolPlugin(
+            name="x", category="c", description="d", fn=lambda: {},
+            requires=["reaction_type"],
+        )
+        assert p.requires == ["reaction_type"]
+
+    def test_validators_stored_correctly(self):
+        from chem_coworker.tools._base import ToolPlugin
+        v = lambda r: None
+        p = ToolPlugin(
+            name="x", category="c", description="d", fn=lambda: {},
+            validators=[v],
+        )
+        assert p.validators == [v]
+
+
+class TestToolPluginValidatorSemantics:
+    def test_validator_receives_result_dict(self):
+        from chem_coworker.tools._base import ToolPlugin
+        seen = []
+        def v(result):
+            seen.append(result)
+            return None
+        p = ToolPlugin(name="x", category="c", description="d", fn=lambda: {}, validators=[v])
+        result = {"success": True, "data": 42}
+        for fn in p.validators:
+            fn(result)
+        assert seen == [result]
+
+    def test_validator_returning_string_is_warning(self):
+        from chem_coworker.tools._base import ToolPlugin
+        def v(result):
+            return "No precedents found"
+        p = ToolPlugin(name="x", category="c", description="d", fn=lambda: {}, validators=[v])
+        assert p.validators[0]({"success": True}) == "No precedents found"
+
+    def test_validator_returning_none_means_pass(self):
+        from chem_coworker.tools._base import ToolPlugin
+        def v(result):
+            return None
+        p = ToolPlugin(name="x", category="c", description="d", fn=lambda: {}, validators=[v])
+        assert p.validators[0]({"success": True}) is None
+
+
+# ---------------------------------------------------------------------------
+# conditions.py validator tests
+# ---------------------------------------------------------------------------
+
+class TestValidateRecommendConditions:
+    def test_no_recs_returns_warning(self):
+        from chem_coworker.tools.conditions import _validate_recommend_conditions
+        result = {"success": True, "recommendations": []}
+        msg = _validate_recommend_conditions(result)
+        assert msg is not None
+        assert "NO HTE" in msg
+
+    def test_zero_exp_low_conf_returns_warning(self):
+        from chem_coworker.tools.conditions import _validate_recommend_conditions
+        result = {
+            "success": True,
+            "recommendations": [{"num_experiments": 0, "confidence": 0.1}],
+        }
+        msg = _validate_recommend_conditions(result)
+        assert msg is not None
+        assert "tentative" in msg
+
+    def test_good_result_returns_none(self):
+        from chem_coworker.tools.conditions import _validate_recommend_conditions
+        result = {
+            "success": True,
+            "recommendations": [{"num_experiments": 15, "confidence": 0.85}],
+        }
+        assert _validate_recommend_conditions(result) is None
+
+    def test_failed_tool_skipped(self):
+        from chem_coworker.tools.conditions import _validate_recommend_conditions
+        assert _validate_recommend_conditions({"success": False}) is None
+
+    def test_zero_exp_high_conf_no_warning(self):
+        """0 experiments but high confidence should NOT warn (threshold is conf < 0.3)."""
+        from chem_coworker.tools.conditions import _validate_recommend_conditions
+        result = {
+            "success": True,
+            "recommendations": [{"num_experiments": 0, "confidence": 0.7}],
+        }
+        assert _validate_recommend_conditions(result) is None
+
+    def test_validator_registered_on_tool(self):
+        """The validator must be registered on the ToolPlugin itself."""
+        from chem_coworker.tools import REGISTRY
+        plugin = REGISTRY._plugins.get("recommend_conditions")
+        assert plugin is not None
+        assert len(plugin.validators) > 0
+        assert plugin.validators[0] is not None
+
+
+# ---------------------------------------------------------------------------
+# ToolPlugin provides/requires registration checks
+# ---------------------------------------------------------------------------
+
+class TestRegistryAnnotations:
+    def test_detect_reaction_type_provides(self):
+        from chem_coworker.tools import REGISTRY
+        plugin = REGISTRY._plugins.get("detect_reaction_type")
+        assert plugin is not None
+        assert "reaction_type" in plugin.provides
+
+    def test_recommend_conditions_provides(self):
+        from chem_coworker.tools import REGISTRY
+        plugin = REGISTRY._plugins.get("recommend_conditions")
+        assert plugin is not None
+        assert "recommendations" in plugin.provides
+
+    def test_recommend_conditions_requires(self):
+        from chem_coworker.tools import REGISTRY
+        plugin = REGISTRY._plugins.get("recommend_conditions")
+        assert plugin is not None
+        assert "reaction_type" in plugin.requires
+
+    def test_resolve_to_smiles_provides(self):
+        from chem_coworker.tools import REGISTRY
+        plugin = REGISTRY._plugins.get("resolve_to_smiles")
+        assert plugin is not None
+        assert "resolved_smiles" in plugin.provides or "smiles" in plugin.provides
+
+
+# ---------------------------------------------------------------------------
+# _extract_provides_smiles tests
+# ---------------------------------------------------------------------------
+
+class TestExtractProvidesSmiles:
+    def _make_plugin(self, name: str, provides: list):
+        from chem_coworker.tools._base import ToolPlugin
+        return ToolPlugin(name=name, category="c", description="d", fn=lambda: {}, provides=provides)
+
+    def test_finds_resolved_smiles(self):
+        from chem_coworker.executor import _extract_provides_smiles
+        plugin = self._make_plugin("resolve_to_smiles", ["resolved_smiles", "smiles"])
+        plugins = {"resolve_to_smiles": plugin}
+        group_results = {
+            "resolve_to_smiles": {"success": True, "resolved_smiles": "c1ccccc1"}
+        }
+        assert _extract_provides_smiles(group_results, plugins) == "c1ccccc1"
+
+    def test_falls_back_to_smiles_key(self):
+        from chem_coworker.executor import _extract_provides_smiles
+        plugin = self._make_plugin("resolver", ["smiles"])
+        plugins = {"resolver": plugin}
+        group_results = {
+            "resolver": {"success": True, "smiles": "CCO"}
+        }
+        assert _extract_provides_smiles(group_results, plugins) == "CCO"
+
+    def test_skips_failed_tool(self):
+        from chem_coworker.executor import _extract_provides_smiles
+        plugin = self._make_plugin("resolve_to_smiles", ["resolved_smiles"])
+        plugins = {"resolve_to_smiles": plugin}
+        group_results = {
+            "resolve_to_smiles": {"success": False, "resolved_smiles": "c1ccccc1"}
+        }
+        assert _extract_provides_smiles(group_results, plugins) is None
+
+    def test_skips_placeholder_value(self):
+        from chem_coworker.executor import _extract_provides_smiles
+        plugin = self._make_plugin("resolve_to_smiles", ["resolved_smiles"])
+        plugins = {"resolve_to_smiles": plugin}
+        group_results = {
+            "resolve_to_smiles": {"success": True, "resolved_smiles": "(none)"}
+        }
+        assert _extract_provides_smiles(group_results, plugins) is None
+
+    def test_no_matching_provides_key_returns_none(self):
+        from chem_coworker.executor import _extract_provides_smiles
+        plugin = self._make_plugin("detect_reaction_type", ["reaction_type"])
+        plugins = {"detect_reaction_type": plugin}
+        group_results = {
+            "detect_reaction_type": {"success": True, "reaction_type": "Suzuki-Miyaura"}
+        }
+        # reaction_type is not in the SMILES keys — should return None
+        assert _extract_provides_smiles(group_results, plugins) is None
+
+    def test_empty_group_returns_none(self):
+        from chem_coworker.executor import _extract_provides_smiles
+        assert _extract_provides_smiles({}, {}) is None
+
+    def test_plugin_not_in_registry_returns_none(self):
+        from chem_coworker.executor import _extract_provides_smiles
+        group_results = {
+            "unknown_tool": {"success": True, "resolved_smiles": "c1ccccc1"}
+        }
+        assert _extract_provides_smiles(group_results, {}) is None
+
+
+# ---------------------------------------------------------------------------
+# _execute_one validator integration
+# ---------------------------------------------------------------------------
+
+class TestExecuteOneRunsValidators:
+    def _make_executor(self, registry_plugins: dict):
+        from chem_coworker.executor import ToolExecutor
+        executor = ToolExecutor.__new__(ToolExecutor)
+        executor.max_workers = 4
+        executor.verbose = False
+        executor.progress_cb = None
+        executor.hooks = None
+        mock_registry = MagicMock()
+        mock_registry._plugins = registry_plugins
+        executor.registry = mock_registry
+        return executor
+
+    def test_validator_warning_appended_to_warnings(self):
+        from chem_coworker.executor import ToolExecutor
+        from chem_coworker.tools._base import ToolPlugin
+        from chem_coworker.plan import ToolCall
+
+        warning_text = "No HTE precedents found"
+        plugin = ToolPlugin(
+            name="recommend_conditions", category="c", description="d",
+            fn=lambda reaction_smiles: {"success": True, "recommendations": []},
+            validators=[lambda r: warning_text if not r.get("recommendations") else None],
+        )
+        executor = self._make_executor({"recommend_conditions": plugin})
+
+        call = ToolCall(name="recommend_conditions", args={"reaction_smiles": "CCO>>CC=O"})
+        callables = {"recommend_conditions": plugin.fn}
+
+        result = executor._execute_one(call, callables)
+        assert "_warnings" in result
+        assert warning_text in result["_warnings"]
+
+    def test_passing_validator_adds_no_warnings(self):
+        from chem_coworker.executor import ToolExecutor
+        from chem_coworker.tools._base import ToolPlugin
+        from chem_coworker.plan import ToolCall
+
+        plugin = ToolPlugin(
+            name="good_tool", category="c", description="d",
+            fn=lambda: {"success": True, "data": "ok"},
+            validators=[lambda r: None],
+        )
+        executor = self._make_executor({"good_tool": plugin})
+
+        call = ToolCall(name="good_tool", args={})
+        callables = {"good_tool": plugin.fn}
+
+        result = executor._execute_one(call, callables)
+        assert result.get("_warnings", []) == []
+
+    def test_validator_exception_does_not_abort(self):
+        from chem_coworker.executor import ToolExecutor
+        from chem_coworker.tools._base import ToolPlugin
+        from chem_coworker.plan import ToolCall
+
+        def crashing_validator(r):
+            raise RuntimeError("validator exploded")
+
+        plugin = ToolPlugin(
+            name="crashy_tool", category="c", description="d",
+            fn=lambda: {"success": True},
+            validators=[crashing_validator],
+        )
+        executor = self._make_executor({"crashy_tool": plugin})
+
+        call = ToolCall(name="crashy_tool", args={})
+        callables = {"crashy_tool": plugin.fn}
+
+        # Should not raise
+        result = executor._execute_one(call, callables)
+        assert result.get("success") is True

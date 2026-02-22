@@ -1,15 +1,13 @@
 """
-Unit tests for three chem_coworker improvements:
+Unit tests for chem_coworker improvements:
   1. Diversity filter in _recommend_conditions
-  2. pass_check in _check_hypothesis
-  3. caveats_text injection into synthesis prompt
+  2. _collect_caveats (replaced _check_hypothesis in Phase 5)
 """
 import pytest
-from unittest.mock import MagicMock
 
 from chem_coworker.tools.conditions import _extract_metal, _diversify
 from chem_coworker.agent import ChemCoworker
-from chem_coworker.plan import ExecutionPlan
+from chem_coworker.tools import REGISTRY
 
 
 # ---------------------------------------------------------------------------
@@ -91,140 +89,89 @@ class TestDiversify:
 
 
 # ---------------------------------------------------------------------------
-# Improvement 3a: _check_hypothesis pass_check for conditions
+# Improvement 2: _collect_caveats (Phase 5 replacement for _check_hypothesis)
 # ---------------------------------------------------------------------------
-
-def _make_plan(hypothesis="Suzuki-Miyaura", confidence=0.9):
-    return ExecutionPlan(
-        hypothesis=hypothesis,
-        confidence=confidence,
-        groups=[],
-        rationale="test",
-        raw_plan_text="",
-    )
-
 
 def _make_agent():
     """Create a ChemCoworker without an LLM (provider/key not needed for unit tests)."""
     agent = object.__new__(ChemCoworker)
+    agent.registry = REGISTRY
     return agent
 
 
-class TestCheckHypothesis:
-    def test_empty_results_returns_none(self):
+class TestCollectCaveats:
+    def test_empty_results_returns_empty_string(self):
         agent = _make_agent()
-        plan = _make_plan()
-        assert agent._check_hypothesis(plan, {}) is None
+        assert agent._collect_caveats({}, []) == ""
 
-    def test_empty_hypothesis_returns_none(self):
+    def test_no_warnings_in_results_returns_empty_string(self):
         agent = _make_agent()
-        plan = _make_plan(hypothesis="")
         results = {"recommend_conditions": {"success": True, "recommendations": []}}
-        assert agent._check_hypothesis(plan, results) is None
+        assert agent._collect_caveats(results, []) == ""
 
-    def test_no_hte_precedents_returns_warning(self):
+    def test_warnings_from_tool_results_included(self):
         agent = _make_agent()
-        plan = _make_plan()
         results = {
             "recommend_conditions": {
                 "success": True,
                 "recommendations": [],
+                "_warnings": ["NO HTE precedents found — Do NOT invent conditions"],
             }
         }
-        msg = agent._check_hypothesis(plan, results)
-        assert msg is not None
-        assert "NO HTE" in msg
-        assert "Do NOT invent" in msg
+        caveats = agent._collect_caveats(results, [])
+        assert "NO HTE" in caveats
+        assert "recommend_conditions" in caveats
 
-    def test_missing_catalyst_field_returns_warning(self):
-        """Empty catalyst string with real experimental support should NOT warn.
-        Absent fields in HTE data are legitimate (e.g. uncatalysed reactions);
-        the old field-presence check caused false positives."""
+    def test_existing_warnings_included(self):
         agent = _make_agent()
-        plan = _make_plan()
-        results = {
-            "recommend_conditions": {
-                "success": True,
-                "recommendations": [
-                    {
-                        "rank": 1,
-                        "catalyst": "",
-                        "solvent": "DMF",
-                        "base": "K2CO3",
-                        "num_experiments": 12,
-                        "confidence": 0.75,
-                    }
-                ],
-            }
-        }
-        msg = agent._check_hypothesis(plan, results)
-        # Empty catalyst is fine when real experiments back it up
-        assert msg is None
+        caveats = agent._collect_caveats({}, ["Tool X failed: timeout"])
+        assert "Tool X failed: timeout" in caveats
 
-    def test_zero_experiment_low_confidence_returns_warning(self):
-        """A recommendation with 0 experiments and low confidence should warn."""
+    def test_both_sources_combined(self):
         agent = _make_agent()
-        plan = _make_plan()
-        results = {
-            "recommend_conditions": {
-                "success": True,
-                "recommendations": [
-                    {
-                        "rank": 1,
-                        "catalyst": "Pd(OAc)2",
-                        "solvent": "THF",
-                        "base": "Cs2CO3",
-                        "num_experiments": 0,
-                        "confidence": 0.1,
-                    }
-                ],
-            }
-        }
-        msg = agent._check_hypothesis(plan, results)
-        assert msg is not None
-        assert "0 experiments" in msg
-        assert "tentative" in msg
-
-    def test_complete_recommendation_passes(self):
-        agent = _make_agent()
-        plan = _make_plan()
-        results = {
-            "recommend_conditions": {
-                "success": True,
-                "recommendations": [
-                    {
-                        "rank": 1,
-                        "catalyst": "Pd(OAc)2",
-                        "solvent": "DMF",
-                        "base": "K2CO3",
-                    }
-                ],
-            }
-        }
-        assert agent._check_hypothesis(plan, results) is None
-
-    def test_failed_tool_result_skipped(self):
-        """A failed recommend_conditions call (success=False) should not trigger pass_check."""
-        agent = _make_agent()
-        plan = _make_plan()
-        results = {
-            "recommend_conditions": {
-                "success": False,
-                "error": "something broke",
-            }
-        }
-        assert agent._check_hypothesis(plan, results) is None
-
-    def test_detect_reaction_type_contradiction_still_works(self):
-        """Existing detect_reaction_type check should still fire."""
-        agent = _make_agent()
-        plan = _make_plan(confidence=0.9)
         results = {
             "detect_reaction_type": {
                 "success": True,
-                "reaction_type": None,
+                "_warnings": ["no match found"],
             }
         }
-        msg = agent._check_hypothesis(plan, results)
-        assert msg is not None
-        assert "classifier" in msg.lower() or "reaction type" in msg.lower()
+        caveats = agent._collect_caveats(results, ["LLM call failed"])
+        assert "no match found" in caveats
+        assert "LLM call failed" in caveats
+
+    def test_exact_duplicate_lines_deduplicated(self):
+        agent = _make_agent()
+        # Same existing warning passed twice
+        caveats = agent._collect_caveats({}, ["dup warning", "dup warning"])
+        lines = caveats.splitlines()
+        assert lines.count("• dup warning") == 1
+
+    def test_non_dict_tool_result_skipped(self):
+        agent = _make_agent()
+        results = {"weird_tool": "just a string result"}
+        assert agent._collect_caveats(results, []) == ""
+
+    def test_multiple_tools_with_warnings(self):
+        agent = _make_agent()
+        results = {
+            "tool_a": {"_warnings": ["w1"]},
+            "tool_b": {"_warnings": ["w2", "w3"]},
+        }
+        caveats = agent._collect_caveats(results, [])
+        assert "w1" in caveats
+        assert "w2" in caveats
+        assert "w3" in caveats
+
+    def test_zero_experiment_warning_surfaced(self):
+        """Validator-stored zero-experiment warning is surfaced via _collect_caveats."""
+        agent = _make_agent()
+        results = {
+            "recommend_conditions": {
+                "success": True,
+                "recommendations": [{"rank": 1, "num_experiments": 0, "confidence": 0.1}],
+                "_warnings": ["0 experiments backing this recommendation — treat as tentative"],
+            }
+        }
+        caveats = agent._collect_caveats(results, [])
+        assert "0 experiments" in caveats
+        assert "tentative" in caveats

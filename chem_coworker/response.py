@@ -43,9 +43,6 @@ class ChemResponse:
     # Phase 1 — Reasoning
     hypothesis: str = ""
     plan_rationale: str = ""
-    plan_text: str = ""          # Full LLM Phase 1 output (includes reasoning text)
-    plan_revised: bool = False   # True if observe step ran and revised the plan
-    observe_text: str = ""       # Raw LLM output from the observe step
 
     # Phase 3 — Answer
     answer: str = ""
@@ -100,8 +97,6 @@ class ChemResponse:
         if self.hypothesis:
             h = self.hypothesis[:60] + "..." if len(self.hypothesis) > 60 else self.hypothesis
             parts.append(f"hypothesis={h!r}")
-        if self.plan_revised:
-            parts.append("revised=True")
         if self.compacted:
             parts.append("compacted=True")
         if self.tools_called:
