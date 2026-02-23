@@ -488,19 +488,6 @@ def cmd_list_pairs(args):
     if args.output:
         df.to_csv(args.output, index=False)
         print(f"\nSaved results to {args.output}")
-        md_path = _write_markdown_sidecar_for_dataframe(
-            args.output,
-            title="HTE Reactant Pair Analysis",
-            df=df,
-            top=args.top,
-            notes=[
-                f"Reaction filter: {args.reaction or 'None'}",
-                f"Catalyst filter: {args.catalyst or 'None'}",
-                f"Min experiments: {args.min_experiments}",
-                f"Sort by: {args.sort}",
-            ],
-        )
-        print(f"Saved markdown summary to {md_path}")
 
 
 def cmd_catalysts(args):
@@ -556,18 +543,6 @@ def cmd_catalysts(args):
     if args.output:
         df.to_csv(args.output, index=False)
         print(f"\nSaved results to {args.output}")
-        md_path = _write_markdown_sidecar_for_dataframe(
-            args.output,
-            title="HTE Catalyst Analysis",
-            df=df,
-            top=args.top,
-            notes=[
-                f"Reaction filter: {args.reaction or 'None'}",
-                f"Reactant A filter: {args.reactant_a or 'None'}",
-                f"Reactant B filter: {args.reactant_b or 'None'}",
-            ],
-        )
-        print(f"Saved markdown summary to {md_path}")
 
 
 def cmd_reactions(args):
@@ -624,18 +599,6 @@ def cmd_reactions(args):
     if args.output:
         df.to_csv(args.output, index=False)
         print(f"\nSaved results to {args.output}")
-        md_path = _write_markdown_sidecar_for_dataframe(
-            args.output,
-            title="HTE Reaction Type Summary",
-            df=df,
-            top=args.top,
-            notes=[
-                f"Reaction filter: {reaction_filter or 'None'}",
-                f"Detailed map included: {'yes' if include_detailed_map else 'no'}",
-                f"Detailed map top entries: {detail_top}",
-            ],
-        )
-        print(f"Saved markdown summary to {md_path}")
 
 
 def cmd_reaction_map(args):
@@ -698,18 +661,6 @@ def cmd_reaction_map(args):
     if args.output:
         df.to_csv(args.output, index=False)
         print(f"\nSaved results to {args.output}")
-        md_path = _write_markdown_sidecar_for_dataframe(
-            args.output,
-            title="HTE Reaction Subtype Map",
-            df=df,
-            top=top_n,
-            notes=[
-                f"Reaction filter: {reaction_filter or 'None'}",
-                f"Minimum rows per subtype: {min_rows}",
-                "Schema modeled after reaction_type_detailed_map.csv",
-            ],
-        )
-        print(f"Saved markdown summary to {md_path}")
 
 
 def cmd_metals(args):
@@ -752,15 +703,6 @@ def cmd_metals(args):
     if args.output:
         df.to_csv(args.output, index=False)
         print(f"\nSaved metal distribution to {args.output}")
-        notes = [f"Detailed breakdown included in terminal output: {'yes' if args.detailed else 'no'}"]
-        md_path = _write_markdown_sidecar_for_dataframe(
-            args.output,
-            title="HTE Metal Usage Analysis",
-            df=df,
-            top=None,
-            notes=notes,
-        )
-        print(f"Saved markdown summary to {md_path}")
 
 
 def cmd_export(args):
@@ -793,22 +735,6 @@ def cmd_export(args):
     )
     
     print(f"\nExport complete: {count:,} experiments")
-    md_path = _markdown_sidecar_path(args.output)
-    md_lines = [
-        "# HTE Export Summary",
-        "",
-        f"- Output CSV: `{args.output}`",
-        f"- Exported rows: {count:,}",
-        f"- Reaction filter: {args.reaction or 'None'}",
-        f"- Catalyst filter: {args.catalyst or 'None'}",
-        f"- Reactant A filter: {args.reactant_a or 'None'}",
-        f"- Reactant B filter: {args.reactant_b or 'None'}",
-        f"- Minimum yield: {args.min_yield if args.min_yield is not None else 'None'}",
-        "",
-    ]
-    md_path.parent.mkdir(parents=True, exist_ok=True)
-    md_path.write_text("\n".join(md_lines), encoding="utf-8")
-    print(f"Saved markdown summary to {md_path}")
 
 
 def cmd_backtest(args):
@@ -956,7 +882,6 @@ def cmd_backtest(args):
             output_path = Path(args.output)
             output_path.parent.mkdir(parents=True, exist_ok=True)
             output_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
-            md_path = _write_markdown_sidecar_for_backtest_report(args.output, report)
 
         if args.per_row_output and per_row_records:
             per_row_path = Path(args.per_row_output)
@@ -980,7 +905,6 @@ def cmd_backtest(args):
         print(f"Avg matching experiments: {report['diagnostics']['avg_matching_experiments']:.2f}")
         if args.output:
             print(f"\nSaved report to {args.output}")
-            print(f"Saved markdown summary to {md_path}")
         if args.per_row_output and per_row_records:
             print(f"Saved per-row details to {args.per_row_output}")
     finally:
