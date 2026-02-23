@@ -22,7 +22,6 @@ Examples:
 
 
 Notes:
-- CSV/JSON/CSV exports also write a Markdown sidecar summary (`.md`).
 - `reactions --reaction ...` includes a serialized `Detailed_Map` column by default.
 - `reaction-map` writes a flat CSV schema similar to `reaction_type_detailed_map.csv`.
 """
@@ -44,103 +43,6 @@ if str(REPO_ROOT) not in sys.path:
 
 from chemtools.recommend import HTERecommender
 from chemtools.recommend.analytics import HTEAnalytics
-
-
-def _markdown_sidecar_path(output_path: str | Path) -> Path:
-    path = Path(output_path)
-    return path.with_suffix(".md") if path.suffix else Path(f"{path}.md")
-
-
-def _md_escape(value: Any) -> str:
-    text = "" if value is None else str(value)
-    return text.replace("|", r"\|").replace("\n", " ").strip()
-
-
-def _dataframe_to_markdown(df: pd.DataFrame, *, max_rows: Optional[int] = None) -> str:
-    table = df.head(max_rows).copy() if max_rows is not None else df.copy()
-    columns = [str(c) for c in table.columns]
-    if not columns:
-        return "_No columns_"
-
-    rows: List[List[str]] = []
-    for _, row in table.iterrows():
-        rows.append([_md_escape(row[col]) for col in table.columns])
-
-    header = "| " + " | ".join(_md_escape(c) for c in columns) + " |"
-    divider = "| " + " | ".join(["---"] * len(columns)) + " |"
-    body = "\n".join("| " + " | ".join(r) + " |" for r in rows) if rows else ""
-    return "\n".join([header, divider, body]).rstrip()
-
-
-def _write_markdown_sidecar_for_dataframe(
-    output_path: str | Path,
-    *,
-    title: str,
-    df: pd.DataFrame,
-    top: Optional[int] = None,
-    notes: Optional[List[str]] = None,
-) -> Path:
-    md_path = _markdown_sidecar_path(output_path)
-    lines = [f"# {title}", ""]
-    if notes:
-        lines.extend([line for line in notes if line])
-        lines.append("")
-    lines.append(f"Rows: {len(df):,}")
-    if top is not None and len(df) > top:
-        lines.append(f"Showing top {top:,} rows.")
-    lines.append("")
-    lines.append(_dataframe_to_markdown(df, max_rows=top))
-    md_path.parent.mkdir(parents=True, exist_ok=True)
-    md_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
-    return md_path
-
-
-def _write_markdown_sidecar_for_backtest_report(output_path: str | Path, report: Dict[str, Any]) -> Path:
-    md_path = _markdown_sidecar_path(output_path)
-    metrics = report.get("metrics") or {}
-    diag = report.get("diagnostics") or {}
-    settings = report.get("settings") or {}
-    lines = [
-        "# HTE Recommender Backtest",
-        "",
-        "## Dataset",
-        "",
-        f"- Input CSV: `{report.get('input_csv', '')}`",
-        f"- Rows after filters: {int(report.get('rows_after_filters', 0)):,}",
-        f"- Train rows: {int(report.get('train_rows', 0)):,}",
-        f"- Test rows: {int(report.get('test_rows', 0)):,}",
-        f"- Evaluated rows: {int(report.get('evaluated_rows', 0)):,}",
-        "",
-        "## Metrics",
-        "",
-        f"- Query coverage: {100.0 * float(metrics.get('query_coverage', 0.0)):.1f}%",
-        f"- MRR: {float(metrics.get('mrr', 0.0)):.4f}",
-        f"- Avg rank (hits only): {metrics.get('avg_rank') if metrics.get('avg_rank') is not None else 'N/A'}",
-    ]
-    for key in sorted(metrics):
-        if key.startswith("hit@"):
-            lines.append(f"- {key}: {100.0 * float(metrics.get(key, 0.0)):.1f}%")
-    lines.extend(
-        [
-            "",
-            "## Diagnostics",
-            "",
-            f"- Avg DB coverage: {float(diag.get('avg_database_coverage_pct', 0.0)):.2f}%",
-            f"- Avg matching experiments: {float(diag.get('avg_matching_experiments', 0.0)):.2f}",
-            f"- No recommendation count: {int(report.get('no_recommendation_count', 0))}",
-            f"- Skipped invalid query: {int(report.get('skipped_invalid_query', 0))}",
-            f"- Skipped empty condition: {int(report.get('skipped_empty_condition', 0))}",
-            f"- Skipped unseen condition: {int(report.get('skipped_unseen_condition', 0))}",
-            "",
-            "## Settings",
-            "",
-        ]
-    )
-    for key in sorted(settings):
-        lines.append(f"- {key}: `{settings[key]}`")
-    md_path.parent.mkdir(parents=True, exist_ok=True)
-    md_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
-    return md_path
 
 
 def _prompt(text: str, default: str | None = None) -> str:
