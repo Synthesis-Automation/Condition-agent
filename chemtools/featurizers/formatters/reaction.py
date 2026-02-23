@@ -6,6 +6,7 @@ Handles reaction type detection, reactant/product processing, and reaction key g
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from functools import lru_cache
 import json
 import re
@@ -2185,6 +2186,336 @@ def classify_agent_roles(agents: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
         "role_flags": {k: v for k, v in flags.items() if v},
         "flags": flags,
     }
+
+
+@dataclass
+class CrkResult:
+    """Result of the CRK-v1 key generation pipeline."""
+
+    reacted_motifs: List[str]
+    formed_motifs: List[str]
+    spectator_motifs: List[str]
+    reaction_key: str
+    aggregates: Dict[str, Any]
+
+
+def build_crk(
+    reaction_smiles: str,
+    *,
+    registry_paths: Optional[Dict[str, str | Path]] = None,
+) -> CrkResult:
+    """
+    Build the CRK-v1 Condition Recommendation Key for a reaction SMILES.
+
+    Runs only the steps required to produce reacted/formed/spectator motif
+    lists and the reaction_key string.  Skips role classification, agent
+    classification, primary reaction-type detection, and event-signature
+    annotation — those are only needed by the full featurize_reaction() output.
+
+    This is the intended entry point for callers that only need CRK data
+    (e.g. detection.extract_reaction_key).  Use featurize_reaction() for the
+    complete reaction feature bundle.
+    """
+    _options = get_crk_options()
+    strict_product_motif_validation = True
+    include_product_in_crk = True
+    skip_bond_analysis = False
+    quality_warnings: List[str] = []
+    detection_payload: Dict[str, Any] = {}
+    reaction_type: Dict[str, Any] = {
+        "reaction_type": "Unknown",
+        "confidence": 0.0,
+        "slot_evidence": {},
+    }
+
+    # Normalize reaction SMILES
+    normalized = normalize_reaction(reaction_smiles)
+    reaction_record = ReactionRecord.from_payload(normalized)
+    reactant_smiles = reaction_record.reactant_smiles
+    product_smiles = reaction_record.product_smiles
+    analysis_reaction_smiles = str(normalized.get("normalized") or reaction_smiles)
+
+    # Auto-repeat reactants from stoichiometry
+    repeat_info = infer_reactant_repeats_from_stoichiometry(reactant_smiles, product_smiles)
+    if repeat_info.get("applied"):
+        repeat_idx = int(repeat_info.get("reactant_index", -1))
+        repeat_count = int(repeat_info.get("repeat_count", 0))
+        if 0 <= repeat_idx < len(reactant_smiles) and repeat_count > 0:
+            repeated_smiles = reactant_smiles[repeat_idx]
+            reactant_smiles = reactant_smiles + [repeated_smiles] * repeat_count
+            reactant_payloads = list(normalized.get("reactants") or [])
+            if 0 <= repeat_idx < len(reactant_payloads):
+                template_payload = dict(reactant_payloads[repeat_idx])
+                for _ in range(repeat_count):
+                    reactant_payloads.append(dict(template_payload))
+                normalized["reactants"] = reactant_payloads
+                normalized["normalized"] = ReactionRecord.from_payload(normalized).normalized
+            detection_payload["reactant_precheck"] = {
+                "auto_repeat_reactants": True,
+                "applied": True,
+                "reason": str(repeat_info.get("reason") or ""),
+                "reactant_smiles": repeated_smiles,
+                "added_copies": repeat_count,
+                "delta": repeat_info.get("delta") or {},
+            }
+            quality_warnings.append("reactant_stoichiometry_precheck_applied")
+            analysis_reaction_smiles = str(
+                normalized.get("normalized") or analysis_reaction_smiles
+            )
+    elif repeat_info.get("reason"):
+        detection_payload["reactant_precheck"] = {
+            "auto_repeat_reactants": True,
+            "applied": False,
+            "reason": str(repeat_info.get("reason") or ""),
+        }
+
+    # Featurize reactants
+    reactant_bundles = [
+        build_molecule_bundle(smiles, registry_paths=registry_paths, options=_options)
+        for smiles in reactant_smiles
+    ]
+    _ensure_reactant_coverage(reactant_bundles, enabled=True)
+
+    # Featurize products
+    product_bundles: List[Dict[str, Any]] = []
+    product_motif_ids: List[str] = []
+    product_motifs_full: List[Dict[str, Any]] = []
+    for smiles in product_smiles:
+        try:
+            bundle = build_molecule_bundle(smiles, registry_paths=registry_paths, options=_options)
+        except Exception:
+            continue
+        product_bundles.append(bundle)
+        product_motif_ids.extend(
+            extract_motif_ids(bundle.get("motifs", []), bundle.get("context_motifs", []))
+        )
+        product_motifs_full.extend(bundle.get("motifs", []))
+        product_motifs_full.extend(bundle.get("context_motifs", []))
+
+    # Aggregate features without pattern-based filtering
+    aggregates = aggregate_reaction_features(
+        reactant_bundles,
+        product_motif_ids=product_motif_ids,
+        product_motifs=product_motifs_full,
+        reaction_type=None,
+    )
+
+    rt_id = None
+    reaction_key = None
+    product_broad_tags: List[str] = []
+    product_motifs_reactive: List[str] = []
+
+    if product_bundles and reactant_bundles:
+        reacted_full = set(aggregates.get("reacted_motifs", []))
+        spectators = set(aggregates.get("spectator_motifs", []))
+        scaffold_spectators = _scaffold_spectators_from_bundles(reactant_bundles, product_bundles)
+        spectators_for_crk = spectators | scaffold_spectators
+        if scaffold_spectators:
+            group_list = list(aggregates.get("spectator_groups_combined") or [])
+            seen_groups = {str(g).strip() for g in group_list if str(g).strip()}
+            for scaffold_id in sorted(scaffold_spectators):
+                sid = str(scaffold_id).strip()
+                if not sid or sid in seen_groups:
+                    continue
+                seen_groups.add(sid)
+                group_list.append(sid)
+            aggregates["spectator_groups_combined"] = group_list
+            aggregates["spectator_groups_ranked"] = rank_spectator_groups(group_list)
+
+        bond_analysis = None
+        fallback_bond_analysis = None
+        bond_key = None
+        fallback_bond_key = None
+        if not skip_bond_analysis:
+            preferred_bond_analysis, mapping_unreliable, mapping_meta = (
+                _get_bond_change_analysis_with_quality(analysis_reaction_smiles)
+            )
+            if preferred_bond_analysis:
+                if mapping_unreliable:
+                    fallback_bond_analysis = preferred_bond_analysis
+                    agreement_payload = (mapping_meta or {}).get("agreement") or {}
+                    detection_payload["mapping_warning"] = {
+                        "reason": "low_confidence_mapping_disagreement",
+                        "fallback_used_for_product_projection": True,
+                        "combined_confidence": _to_float_or_default(
+                            (mapping_meta or {}).get("combined_confidence"), 0.0
+                        ),
+                        "agreement_rxnmapper_vs_mcs": agreement_payload.get(
+                            "rxnmapper_vs_mcs"
+                        ),
+                        "validation": (mapping_meta or {}).get("validation"),
+                    }
+                else:
+                    bond_analysis = preferred_bond_analysis
+            if bond_analysis:
+                bond_key = format_bond_change_key(reaction_smiles, analysis=bond_analysis)
+            if fallback_bond_analysis:
+                fallback_bond_key = format_bond_change_key(
+                    analysis_reaction_smiles,
+                    analysis=fallback_bond_analysis,
+                )
+        group_element_map = _load_group_element_map()
+        bond_key = _sanitize_bond_key(bond_key, reacted_full, group_element_map=group_element_map)
+        fallback_bond_key = _sanitize_bond_key(
+            fallback_bond_key, reacted_full, group_element_map=group_element_map
+        )
+        projection_bond_key = bond_key or fallback_bond_key
+
+        reacted_for_detection = _filter_reactants_for_crk(
+            reacted_full, bond_key, spectators=spectators_for_crk
+        )
+        if not reacted_for_detection and reacted_full:
+            reacted_for_detection = sorted(
+                normalize_motif_id(str(m)) for m in reacted_full if m
+            )
+        formed_raw = {
+            normalize_motif_id(str(m))
+            for m in (aggregates.get("formed_motifs") or [])
+            if m
+        }
+        formed_inferred = {
+            normalize_motif_id(str(m))
+            for m in _infer_product_motifs_from_logic(reacted_for_detection, bond_key)
+            if m
+        }
+        if not formed_inferred:
+            rescue_formed = _rescue_decarboxylative_product_motifs_without_bond_key(
+                reacted_motifs=reacted_for_detection,
+                product_motif_ids=(
+                    normalize_motif_id(str(m.get("compound_id") or m.get("id")))
+                    for m in product_motifs_full
+                    if isinstance(m, dict) and (m.get("compound_id") or m.get("id"))
+                ),
+            )
+            formed_inferred = {normalize_motif_id(str(m)) for m in rescue_formed if m}
+        formed_all = sorted(formed_raw | formed_inferred)
+        formed_for_validation = (
+            sorted(formed_raw)
+            if (strict_product_motif_validation and formed_raw)
+            else formed_all
+        )
+        bond_key_consistency = _assess_bond_key_consistency(
+            bond_key=bond_key,
+            reacted_motifs=reacted_for_detection,
+            formed_motifs=formed_all,
+            group_element_map=group_element_map,
+        )
+        detection_payload["bond_key_consistency"] = bond_key_consistency
+        if bond_key and _to_float_or_default(bond_key_consistency.get("score_0_1"), 1.0) < 0.45:
+            quality_warnings.append("bond_key_demoted_low_consistency")
+            bond_key = None
+            fallback_bond_key = None
+            projection_bond_key = None
+            formed_inferred = {
+                normalize_motif_id(str(m))
+                for m in _infer_product_motifs_from_logic(reacted_for_detection, bond_key)
+                if m
+            }
+            if not formed_inferred:
+                rescue_formed = _rescue_decarboxylative_product_motifs_without_bond_key(
+                    reacted_motifs=reacted_for_detection,
+                    product_motif_ids=(
+                        normalize_motif_id(str(m.get("compound_id") or m.get("id")))
+                        for m in product_motifs_full
+                        if isinstance(m, dict) and (m.get("compound_id") or m.get("id"))
+                    ),
+                )
+                formed_inferred = {normalize_motif_id(str(m)) for m in rescue_formed if m}
+            formed_all = sorted(formed_raw | formed_inferred)
+            formed_for_validation = (
+                sorted(formed_raw)
+                if (strict_product_motif_validation and formed_raw)
+                else formed_all
+            )
+
+        spectators_for_detection = sorted(
+            normalize_motif_id(str(m))
+            for m in (set(spectators_for_crk) - set(reacted_for_detection))
+            if m
+        )
+        reaction_key_raw = format_crk_key(
+            bond_key=bond_key,
+            reacted=reacted_for_detection,
+            spectators=spectators_for_detection,
+            product_broad_tags=[],
+            product_motifs_reactive=formed_for_validation,
+            include_product=True,
+        )
+        from .detection_validation import validate_detection_with_crk_key
+
+        validated = validate_detection_with_crk_key(
+            initial_detection=(
+                reaction_type.get("reaction_type", "Unknown")
+                if isinstance(reaction_type, dict)
+                else str(reaction_type)
+            ),
+            initial_confidence=(
+                reaction_type.get("confidence", 0.0)
+                if isinstance(reaction_type, dict)
+                else 0.0
+            ),
+            reaction_key=reaction_key_raw,
+        )
+        if validated.get("reaction_type"):
+            if isinstance(reaction_type, dict):
+                reaction_type["reaction_type"] = validated["reaction_type"]
+                reaction_type["name"] = validated["reaction_type"]
+                reaction_type["confidence"] = validated["confidence"]
+            else:
+                reaction_type = validated["reaction_type"]
+        detection_payload["validation"] = {
+            "original_detection": validated.get("corrected_from"),
+            "validated_detection": validated.get("reaction_type"),
+            "validation_method": validated.get("validation_method"),
+            "validation_reason": validated.get("reason"),
+            "validation_confidence": validated.get("confidence"),
+            "reaction_key_raw": reaction_key_raw,
+        }
+        if validated.get("evidence") is not None:
+            detection_payload["evidence"] = validated.get("evidence")
+
+        if isinstance(reaction_type, dict):
+            rt_id = reaction_type.get("reaction_type")
+        elif reaction_type is not None:
+            rt_id = str(reaction_type)
+        if rt_id == "Unknown":
+            rt_id = None
+
+        product_broad_tags = _infer_product_broad_tags_with_validation(
+            bond_key=projection_bond_key,
+            product_smiles=product_smiles,
+        )
+        product_motifs_reactive = _select_reactive_product_motifs(
+            product_motifs_full,
+            bond_key=projection_bond_key,
+            formed_motifs=formed_all,
+            reacted_motifs=reacted_for_detection,
+            reaction_type=rt_id,
+        )
+        formed_center = sorted(set(product_motifs_reactive))
+        formed_center_set = set(formed_center)
+        formed_context = sorted(m for m in formed_all if m not in formed_center_set)
+        aggregates["formed_motifs_all"] = formed_all
+        aggregates["formed_motifs_center"] = formed_center
+        aggregates["formed_motifs_context"] = formed_context
+        reacted_for_crk = list(reacted_for_detection)
+        spectators_for_key = sorted(set(spectators_for_crk) - set(reacted_for_crk))
+        reaction_key = format_crk_key(
+            bond_key=bond_key,
+            reacted=reacted_for_crk,
+            spectators=spectators_for_key,
+            product_broad_tags=product_broad_tags,
+            product_motifs_reactive=product_motifs_reactive,
+            include_product=include_product_in_crk,
+        )
+
+    return CrkResult(
+        reacted_motifs=list(aggregates.get("reacted_motifs") or []),
+        formed_motifs=list(aggregates.get("formed_motifs") or []),
+        spectator_motifs=list(aggregates.get("spectator_motifs") or []),
+        reaction_key=str(reaction_key or ""),
+        aggregates=aggregates,
+    )
 
 
 def featurize_reaction(

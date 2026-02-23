@@ -138,22 +138,14 @@ def _expand_pattern(pattern: Any, motif_sets: Dict[str, Set[str]]) -> Set[str]:
 def extract_reaction_key(reaction_smiles: str) -> Tuple[List[str], List[str], List[str], str]:
     """
     Extract reacted/formed/spectator motifs from reaction SMILES.
-    
+
     Returns:
         Tuple of (reacted, formed, spectator, reaction_key_string). The key is CRK-v1.
     """
-    from .featurizers.formatters.reaction import featurize_reaction, get_crk_options
-    
-    # Skip role classification to avoid circular dependency
-    result = featurize_reaction(reaction_smiles, options=get_crk_options())
-    aggregates = result.get("aggregates", {})
-    
-    reacted = aggregates.get("reacted_motifs", [])
-    formed = aggregates.get("formed_motifs", [])
-    spectator = aggregates.get("spectator_motifs", [])
-    reaction_key = result.get("reaction_key", "")
-    
-    return reacted, formed, spectator, reaction_key
+    from .featurizers.formatters.reaction import build_crk
+
+    result = build_crk(reaction_smiles)
+    return result.reacted_motifs, result.formed_motifs, result.spectator_motifs, result.reaction_key
 
 
 def _extract_reactant_smiles(reaction_smiles: str) -> List[str]:
