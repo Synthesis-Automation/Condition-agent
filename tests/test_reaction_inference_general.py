@@ -127,3 +127,15 @@ def test_general_inference_detects_click_cuaac_with_azide_triple_bond_smiles_for
         str(row.get("reaction_type", "")).lower() == "click_cuaac"
         for row in result.taxonomy_candidates
     )
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_general_inference_detects_reductive_amination_with_diaryl_ketone_and_aniline() -> None:
+    rxn = "O=Cc1ccc2ccccc2c1.Nc1ccccc1>>c1ccc(NCc2ccc3ccccc3c2)cc1"
+    result = analyze_reaction_general(rxn)
+
+    assert result.decision.reaction_type == "Reductive_amination"
+    assert result.decision.source == "deterministic"
+    assert "Ar-CHO" in (result.evidence.get("certain") or {}).get("reacted_motifs", [])
+    assert "Ar-NH2" in (result.evidence.get("certain") or {}).get("reacted_motifs", [])
+    assert "Ar-NHR" in (result.evidence.get("certain") or {}).get("formed_motifs", [])

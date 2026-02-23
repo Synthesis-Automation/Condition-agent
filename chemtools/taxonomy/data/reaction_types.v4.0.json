@@ -1302,6 +1302,9 @@
           "Alkyl-NH2",
           "Alkyl-NHR",
           "Alkyl-NR2",
+          "Ar-NH2",
+          "Ar-NHR",
+          "Ar-NR2",
           "Bn-NH2",
           "Bn-NHR",
           "Bn-NR2"
