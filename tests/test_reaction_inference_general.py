@@ -29,11 +29,12 @@ def test_general_inference_detects_oxidation() -> None:
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
-def test_general_inference_flags_taxonomy_gap_without_forcing_type() -> None:
+def test_general_inference_uses_general_bond_change_fallback_for_taxonomy_gap() -> None:
     rxn = "Clc1ncc(-c2ccccc2)cn1.NN>>NN=c1ncc(-c2ccccc2)c[nH]1"
     result = analyze_reaction_general(rxn)
 
-    assert result.decision.reaction_type == "unknown"
+    assert result.decision.reaction_type == "General C_N bond formation reaction"
+    assert result.decision.source == "general_bond_change_fallback"
     assert result.taxonomy_candidates == []
     assert result.formula_delta["Cl"] == -1
     assert result.formula_delta["N"] == 2
@@ -63,6 +64,16 @@ def test_general_inference_can_emit_mechanism_class_for_taxonomy_gap_annulation(
     assert result.decision.reaction_type == "unknown"
     assert result.decision.mechanism_family == "annulation_cyclization"
     assert "Ann" in (result.evidence.get("certain") or {}).get("event_tokens", [])
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_general_inference_keeps_unknown_when_no_bond_change_detected() -> None:
+    result = analyze_reaction_general("CCO>>CCO")
+
+    assert result.decision.reaction_type == "unknown"
+    assert result.decision.source == "deterministic"
+    assert (result.evidence.get("certain") or {}).get("formed_bonds") == []
+    assert (result.evidence.get("certain") or {}).get("broken_bonds") == []
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
@@ -102,3 +113,17 @@ def test_general_inference_detects_cn_coupling_with_ar_n_wildcard_product() -> N
     assert result.decision.reaction_type == "C_N_Coupling"
     assert result.decision.mechanism_family == "cross_coupling"
     assert "Ar-N*" in (result.evidence.get("certain") or {}).get("formed_motifs", [])
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_general_inference_detects_click_cuaac_with_azide_triple_bond_smiles_form() -> None:
+    rxn = "C#CCO.c1ccc([N-][N+]#N)cc1>>c1ccccc1n1cc(CO)nn1"
+    result = analyze_reaction_general(rxn)
+
+    assert result.decision.reaction_type == "Click_cuaac"
+    assert result.decision.source == "deterministic"
+    assert "Ar-N3" in (result.evidence.get("certain") or {}).get("reacted_motifs", [])
+    assert any(
+        str(row.get("reaction_type", "")).lower() == "click_cuaac"
+        for row in result.taxonomy_candidates
+    )

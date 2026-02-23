@@ -1385,7 +1385,7 @@
       "description": "Catalytic hydrogenation of alkene motifs to saturated products; typing allows reaction SMILES where H2 is omitted but still requires saturated product evidence."
     },
     {
-      "id": "Click_cuaac",
+      "id": "Click_azide_alkyne_cycloaddition",
       "redox_neutral": true,
       "reactants": {
         "alkyne": "@terminal_alkynes",
@@ -2551,34 +2551,6 @@
       "description": "Urea or thiourea formation from isocyanates/isothiocyanates and amines.",
       "constraints": {
         "include_bond_formed": ["C-N"]
-      }
-    },
-    {
-      "id": "SNAr",
-      "redox_neutral": true,
-      "reactants": {
-        "electrophile": ["Ar-F", "Ar-Cl", "Ar-NO2", "HeteroAr-F", "HeteroAr-Cl"],
-        "nucleophile": ["@amines_nh", "@alcohols_oh", "@thiols_sh"]
-      },
-      "products": {
-        "product": ["@aryl_amines", "@aryl_ethers", "Ar-SR", "Ar-F"]
-      },
-      "examples": [
-        "O=[N+]([O-])c1ccc(F)cc1.Nc1ccccc1>>O=[N+]([O-])c1ccc(Nc2ccccc2)cc1",
-        "Fc1cccnc1.CO>>COc1cccnc1"
-      ],
-      "aliases": [
-        "snar_amination",
-        "snar_co",
-        "nucleophilic_aromatic_fluorination",
-        "aryl_fluorine_snarf",
-        "snarf",
-        "SNAr_fluorination",
-        "SNAr_substitution"
-      ],
-      "description": "Nucleophilic aromatic substitution (SNAr) activated by electron-withdrawing ring substituents.",
-      "constraints": {
-        "include_bond_formed": ["C-N", "C-O", "C-S"]
       }
     },
     {

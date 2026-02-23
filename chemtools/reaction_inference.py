@@ -539,6 +539,57 @@ def _infer_mechanism_family(
     return "other"
 
 
+def _carbon_bond_partners(bond_tokens: Sequence[str]) -> List[str]:
+    partners: set[str] = set()
+    for token in bond_tokens or []:
+        text = str(token or "").strip()
+        if "-" not in text:
+            continue
+        left, right = [part.strip() for part in text.split("-", 1)]
+        if left == "C" and right and right != "H":
+            partners.add(right)
+        elif right == "C" and left and left != "H":
+            partners.add(left)
+    priority = {
+        "N": 0,
+        "O": 1,
+        "S": 2,
+        "C": 3,
+        "B": 4,
+        "Si": 5,
+        "Sn": 6,
+        "P": 7,
+    }
+    return sorted(partners, key=lambda el: (priority.get(el, 99), el))
+
+
+def _format_general_bond_change_label(partners: Sequence[str], *, action: str) -> Optional[str]:
+    normalized = [str(el).strip() for el in partners if str(el).strip()]
+    if not normalized:
+        return None
+    pair_labels = [f"C_{el}" if el != "C" else "C_C" for el in normalized]
+    joined = " / ".join(pair_labels)
+    if action == "formation":
+        return f"General {joined} bond formation reaction"
+    if action == "cleavage":
+        return f"General {joined} cleavage reaction"
+    return None
+
+
+def _general_bond_change_fallback_reaction_type(
+    *,
+    formed_bonds: Sequence[str],
+    broken_bonds: Sequence[str],
+) -> Optional[str]:
+    formed_partners = _carbon_bond_partners(formed_bonds)
+    if formed_partners:
+        return _format_general_bond_change_label(formed_partners, action="formation")
+    broken_partners = _carbon_bond_partners(broken_bonds)
+    if broken_partners:
+        return _format_general_bond_change_label(broken_partners, action="cleavage")
+    return None
+
+
 def _detect_tautomer_issue(
     products: Sequence[str],
     principal_product: str,
@@ -641,17 +692,28 @@ def analyze_reaction_general(
 
     taxonomy_candidates = _merge_candidates(candidate_rows)
     top_candidate = taxonomy_candidates[0] if taxonomy_candidates else None
+    decision_source = "deterministic"
     if top_candidate and float(top_candidate.get("deterministic_score", 0.0)) >= float(min_confidence):
         decision_reaction_type = str(top_candidate.get("reaction_type") or "unknown")
         decision_confidence = float(top_candidate.get("deterministic_score", 0.0))
         decision_rationale = "top taxonomy candidate passed deterministic confidence threshold"
     else:
-        decision_reaction_type = "unknown"
-        decision_confidence = 0.0
-        decision_rationale = "no taxonomy candidate cleared deterministic confidence threshold"
+        fallback_reaction_type = _general_bond_change_fallback_reaction_type(
+            formed_bonds=key_parts.get("formed_bonds") or [],
+            broken_bonds=key_parts.get("broken_bonds") or [],
+        )
+        if fallback_reaction_type:
+            decision_reaction_type = fallback_reaction_type
+            decision_confidence = 0.35
+            decision_source = "general_bond_change_fallback"
+            decision_rationale = "no taxonomy candidate passed threshold; assigned bond-change fallback label"
+        else:
+            decision_reaction_type = "unknown"
+            decision_confidence = 0.0
+            decision_rationale = "no taxonomy candidate cleared deterministic confidence threshold"
 
     mechanism_family = _infer_mechanism_family(
-        decision_reaction_type,
+        decision_reaction_type if decision_source == "deterministic" else "unknown",
         formed_bonds=key_parts.get("formed_bonds") or [],
         broken_bonds=key_parts.get("broken_bonds") or [],
         event_tokens=key_parts.get("event_tokens") or [],
@@ -663,13 +725,16 @@ def analyze_reaction_general(
         if halogen_loss and nitrogen_gain and aromatic_n_rich:
             mechanism_family = "nucleophilic_substitution"
     tautomer_issue = _detect_tautomer_issue(products, core_product, formula_delta)
-    consistency_ok, consistency_reason = _taxonomy_consistency_check(
-        decision_reaction_type,
-        reacted_motifs,
-        formed_motifs,
-        key_parts.get("formed_bonds") or [],
-        key_parts.get("broken_bonds") or [],
-    )
+    if decision_source == "general_bond_change_fallback":
+        consistency_ok, consistency_reason = True, "not_applicable_general_bond_change_fallback"
+    else:
+        consistency_ok, consistency_reason = _taxonomy_consistency_check(
+            decision_reaction_type,
+            reacted_motifs,
+            formed_motifs,
+            key_parts.get("formed_bonds") or [],
+            key_parts.get("broken_bonds") or [],
+        )
     checks = [
         {
             "check": "parsed_reaction_components",
@@ -697,7 +762,7 @@ def analyze_reaction_general(
     decision = ReactionDecision(
         reaction_type=decision_reaction_type,
         confidence=round(decision_confidence, 4),
-        source="deterministic",
+        source=decision_source,
         mechanism_family=mechanism_family,
         rationale=decision_rationale,
     )
@@ -707,6 +772,8 @@ def analyze_reaction_general(
     ]
     if tautomer_issue:
         summary_bits.append("Tautomer/representation ambiguity was detected in the product-side core.")
+    if decision.source == "general_bond_change_fallback":
+        summary_bits.append("Applied general bond-change fallback classification because no taxonomy candidate passed threshold.")
     if decision.reaction_type == "unknown":
         summary_bits.append("No taxonomy-consistent candidate passed threshold; treat as potential taxonomy gap.")
 
@@ -744,9 +811,31 @@ def analyze_reaction_general(
     )
 
 
+def classify_reaction(
+    reaction_smiles: str,
+    *,
+    use_llm: bool = False,
+    min_confidence: float = 0.55,
+) -> ReactionDecision:
+    """
+    Canonical reaction classification entry point.
+
+    This wraps ``analyze_reaction_general`` and returns only the final decision so
+    application code can use one unified classification path without duplicating
+    fallback logic.
+    """
+    analysis = analyze_reaction_general(
+        reaction_smiles,
+        use_llm=use_llm,
+        min_confidence=min_confidence,
+    )
+    return analysis.decision
+
+
 __all__ = [
     "ReactionDecision",
     "ReactionValidation",
     "GeneralReactionAnalysis",
     "analyze_reaction_general",
+    "classify_reaction",
 ]

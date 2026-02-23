@@ -67,6 +67,26 @@ def test_iodonium_group_matches_diaryliodonium() -> None:
 
 
 @pytest.mark.skipif(not rdkit_helpers.rdkit_available(), reason="rdkit not available")
+def test_azide_group_matches_both_common_smiles_representations() -> None:
+    groups = _load_groups()
+    assert "-N3" in groups, "Azide group (-N3) missing from organic groups"
+    smarts = groups["-N3"].get("smarts")
+    assert smarts, "Azide group missing SMARTS"
+
+    pattern = compile_smarts(smarts, validate=True)
+    assert pattern is not None, "Azide SMARTS failed to compile"
+
+    azide_triple_bond_form = rdkit_helpers.parse_smiles("c1ccc([N-][N+]#N)cc1")
+    azide_double_bond_form = rdkit_helpers.parse_smiles("c1ccc(N=[N+]=[N-])cc1")
+    aniline = rdkit_helpers.parse_smiles("c1ccccc1N")
+    assert azide_triple_bond_form is not None and azide_double_bond_form is not None and aniline is not None
+
+    assert azide_triple_bond_form.HasSubstructMatch(pattern)
+    assert azide_double_bond_form.HasSubstructMatch(pattern)
+    assert not aniline.HasSubstructMatch(pattern)
+
+
+@pytest.mark.skipif(not rdkit_helpers.rdkit_available(), reason="rdkit not available")
 def test_sulfonylhydrazone_group_matches_n_sulfonylhydrazone() -> None:
     groups = _load_groups()
     assert (

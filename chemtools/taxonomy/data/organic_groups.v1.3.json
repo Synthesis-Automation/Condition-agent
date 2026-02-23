@@ -210,8 +210,8 @@
       "id": "-N3",
       "kind": "substituent",
       "priority": 2,
-      "smarts": "[N:2]=[N+]=[N-]",
-      "description": "Azide substituent (-N3); attach via nitrogen."
+      "smarts": "[$([N:2]=[N+]=[N-]),$([N-:2][N+]#[N])]",
+      "description": "Azide substituent (-N3); attach via nitrogen (supports both common resonance/valence SMILES forms)."
     },
     {
       "id": "-N2+",

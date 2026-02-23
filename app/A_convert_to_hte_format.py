@@ -18,6 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
 from chemtools.featurizers.formatters.reaction import get_crk_options
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
+from chemtools.reaction_inference import classify_reaction
 from chemtools.recommend.reaction_key_utils import (
     build_reaction_events_payload,
     canonicalize_reaction_key_minimal,
@@ -86,45 +87,22 @@ def _detect_reaction_type(
     llm_assist_signature: str = "",
 ) -> str:
     """
-    Detect reaction type using full featurization pipeline with taxonomy-driven validation.
-    
-    This now uses featurize_reaction() which includes:
-    - Slot-based detection
-    - Product-based validation (taxonomy-driven)
-    - Reacted motif pattern matching
-    
-    This ensures accurate detection (e.g., Suzuki_miyaura instead of Arylation_Ar_H
-    when organoboron + aryl halide → biaryl pattern is present).
+    Unified reaction type classification for conversion/export.
+
+    Uses the canonical classifier (taxonomy-first + general bond-change fallback)
+    so all conversion paths share the same reaction type labels.
     """
+    _ = llm_assist_signature  # Reserved for future classifier options.
     if not reaction_smiles:
         return ""
     try:
-        result = featurize_reaction(
-            reaction_smiles,
-            options=_build_reaction_options(llm_assist_signature),
-        )
-        reaction_type = result.get("reaction_type", {})
-        
-        # Extract reaction type from the result (handles both dict and string formats)
-        if isinstance(reaction_type, dict):
-            return reaction_type.get("reaction_type", "")
-        return str(reaction_type) if reaction_type else ""
-        
+        decision = classify_reaction(reaction_smiles)
+        value = str(getattr(decision, "reaction_type", "") or "").strip()
+        if value == "unknown":
+            return "Unknown"
+        return value
     except Exception:
         return ""
-
-
-def _extract_reaction_type_from_bundle(bundle: Dict[str, Any]) -> str:
-    """Extract normalized reaction type string from a featurize_reaction bundle."""
-    if not isinstance(bundle, dict):
-        return ""
-    reaction_type = bundle.get("reaction_type")
-    if isinstance(reaction_type, dict):
-        value = reaction_type.get("reaction_type") or reaction_type.get("name") or ""
-        return str(value).strip()
-    if reaction_type:
-        return str(reaction_type).strip()
-    return ""
 
 
 def _build_taxonomy_gap_entry(
@@ -1123,10 +1101,7 @@ def process_reaction_dataset(
                 spectator_groups = rank_spectator_groups(
                     _collect_spectator_groups(reactant_data, spectators_set)
                 )
-                detected_reaction_type = _extract_reaction_type_from_bundle(rxn_bundle)
-                if not detected_reaction_type:
-                    # Fallback keeps compatibility for any unexpected bundle shape.
-                    detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
+                detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
                 gap_entry = _build_taxonomy_gap_entry(
                     rxn_bundle,
                     source_dataset=source_label,
@@ -1294,10 +1269,7 @@ def process_reaction_dataset(
             spectator_groups = rank_spectator_groups(
                 _collect_spectator_groups(reactant_data, spectators_set)
             )
-            detected_reaction_type = _extract_reaction_type_from_bundle(rxn_bundle)
-            if not detected_reaction_type:
-                # Fallback keeps compatibility for any unexpected bundle shape.
-                detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
+            detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
             gap_entry = _build_taxonomy_gap_entry(
                 rxn_bundle,
                 source_dataset=source_label,
