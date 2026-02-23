@@ -140,6 +140,7 @@ class WorkflowRegistry:
 
 def _build_workflow_registry() -> WorkflowRegistry:
     from .retro_prompts import NATIVE_RETRO_SYSTEM_PROMPT
+    from .forward_prompts import NATIVE_FORWARD_SYSTEM_PROMPT
     from .prompts import NATIVE_SYSTEM_PROMPT
 
     registry = WorkflowRegistry()
@@ -151,6 +152,16 @@ def _build_workflow_registry() -> WorkflowRegistry:
             classifier_predicate=lambda t: t == "retrosynthesis",
             max_iterations=10,
             critic_step=CriticStep(enabled=True, max_findings=5, min_severity="warning"),
+        )
+    )
+
+    registry.register(
+        WorkflowDefinition(
+            name="forward_synthesis",
+            system_prompt=NATIVE_FORWARD_SYSTEM_PROMPT,
+            classifier_predicate=lambda t: t == "forward_synthesis",
+            max_iterations=8,
+            critic_step=None,
         )
     )
 

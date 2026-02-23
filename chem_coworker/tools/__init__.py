@@ -167,12 +167,13 @@ from .retrosynthesis import RETROSYNTHESIS_TOOLS
 from .name_resolver import NAME_RESOLVER_TOOLS
 from .reaction_eval import EVAL_TOOLS
 from .molecular_features import MOLECULAR_FEATURE_TOOLS
+from .forward_synthesis import FORWARD_SYNTHESIS_TOOLS
 
 for _plugin in (
     CHEMISTRY_TOOLS + TAXONOMY_TOOLS + CONDITIONS_TOOLS
     + REAGENT_TOOLS + LITERATURE_TOOLS + NOTES_TOOLS
     + RETROSYNTHESIS_TOOLS + NAME_RESOLVER_TOOLS + EVAL_TOOLS
-    + MOLECULAR_FEATURE_TOOLS
+    + MOLECULAR_FEATURE_TOOLS + FORWARD_SYNTHESIS_TOOLS
 ):
     REGISTRY.register(_plugin)
 
