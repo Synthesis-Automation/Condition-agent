@@ -69,6 +69,38 @@ def test_get_bond_change_analysis_rejects_low_conf_disagreement(
     assert result is None
 
 
+def test_get_bond_change_analysis_keeps_low_conf_when_local_env_agrees(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_hybrid(_reaction_smiles: str, use_mcs: bool = True, **_kwargs):
+        return {
+            "success": True,
+            "method": "hybrid",
+            "agreement": {
+                "rxnmapper_vs_mcs": False,
+                "rxnmapper_vs_local_env": True,
+            },
+            "combined_confidence": 0.4,
+            "recommended_result": {
+                "success": True,
+                "broken_bonds": [(8, "I (leaving group)")],
+                "formed_bonds": [(8, 14)],
+            },
+        }
+
+    monkeypatch.setattr(reaction_formatter.rdkit_helpers, "rdkit_available", lambda: True)
+    monkeypatch.setattr(atom_mapping, "analyze_bond_changes_hybrid", fake_hybrid)
+
+    result = reaction_formatter._get_bond_change_analysis(
+        "Ic1ccccc1.CC(C)(C)OC(=O)NN>>CC(C)(C)OC(=O)N(N)c1ccccc1"
+    )
+
+    assert result is not None
+    assert result.get("success") is True
+    assert len(result.get("broken_bonds") or []) == 1
+    assert len(result.get("formed_bonds") or []) == 1
+
+
 def test_decarboxylative_rescue_without_bond_key_selects_product_motif() -> None:
     product_motifs = [
         {"compound_id": "Ar-COR"},

@@ -134,8 +134,13 @@ def _hybrid_mapping_is_unreliable(analysis: Dict[str, Any]) -> bool:
         return False
     if str(analysis.get("method") or "").strip() != "hybrid":
         return False
-    agreement = (analysis.get("agreement") or {}).get("rxnmapper_vs_mcs")
+    agreement_payload = analysis.get("agreement") or {}
+    agreement = agreement_payload.get("rxnmapper_vs_mcs")
     if agreement is not False:
+        return False
+    # If RXNMapper agrees with the local-environment mapper, treat MCS as a
+    # low-weight approximate validator rather than a hard veto.
+    if agreement_payload.get("rxnmapper_vs_local_env") is True:
         return False
     combined_conf = _to_float_or_default(analysis.get("combined_confidence"), 0.0)
     return combined_conf < _HYBRID_MAPPING_MIN_CONFIDENCE
