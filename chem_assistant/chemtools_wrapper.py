@@ -285,6 +285,22 @@ class FamilyInput(BaseModel):
     family: str = Field(..., description="Reaction family or alias.")
 
 
+class ResolveLabelInput(BaseModel):
+    """Schema for unified taxonomy label resolution."""
+
+    label: str = Field(..., description="The identifier or alias to normalize.")
+    label_type: str = Field(
+        ...,
+        description=(
+            "Kind of label to resolve. One of: "
+            "'reactant_id' (normalize reactant name/alias to canonical category id), "
+            "'reaction_type' (normalize reaction type name/alias to canonical taxonomy id), "
+            "'family_id' (resolve reaction family alias to canonical family id), "
+            "'family_label' (resolve reaction family alias to canonical display label)."
+        ),
+    )
+
+
 class UnifiedFeaturizeMoleculeInput(BaseModel):
     """Schema for unified molecule featurization."""
 
@@ -589,15 +605,6 @@ def analysis_classify_reactant_batch(smiles_list: List[str]) -> Dict[str, Any]:
         return _error_response("Failed to classify reactant batch.", {"details": str(exc)})
 
 
-@tool(args_schema=SmilesInput)
-def analysis_get_reactant_category_matches(smiles: str) -> Dict[str, Any]:
-    """Return all reactant categories matched by the SMILES input."""
-    try:
-        categories = analysis_tools.get_reactant_category_matches(smiles)
-        return _success_response({"categories": categories})
-    except Exception as exc:
-        return _error_response("Failed to read reactant category matches.", {"details": str(exc)})
-
 
 @tool(args_schema=SmilesInput)
 def analysis_get_all_reactant_matches(smiles: str) -> Dict[str, Any]:
@@ -609,44 +616,33 @@ def analysis_get_all_reactant_matches(smiles: str) -> Dict[str, Any]:
         return _error_response("Failed to read reactant matches.", {"details": str(exc)})
 
 
-@tool(args_schema=LabelInput)
-def analysis_normalize_reactant_identifier(label: str) -> Dict[str, Any]:
-    """Normalize a reactant identifier to its canonical category id."""
+@tool(args_schema=ResolveLabelInput)
+def analysis_resolve_label(label: str, label_type: str) -> Dict[str, Any]:
+    """
+    Normalize any taxonomy label or alias to its canonical form.
+
+    Use label_type to specify what kind of label you are resolving:
+      - 'reactant_id'   : normalize a reactant name/alias to its canonical category id
+      - 'reaction_type' : normalize a reaction type name/alias to its canonical taxonomy id
+      - 'family_id'     : resolve a reaction family alias to its canonical family id
+      - 'family_label'  : resolve a reaction family alias to its canonical display label
+    """
+    _dispatch = {
+        "reactant_id":   analysis_tools.normalize_reactant_identifier,
+        "reaction_type": analysis_tools.normalize_reaction_type,
+        "family_id":     analysis_tools.resolve_reaction_family,
+        "family_label":  analysis_tools.canonical_family_label,
+    }
+    fn = _dispatch.get(label_type)
+    if fn is None:
+        return _error_response(
+            f"Unknown label_type '{label_type}'. Choose from: {list(_dispatch)}",
+        )
     try:
-        normalized = analysis_tools.normalize_reactant_identifier(label)
-        return _success_response({"reactant_id": normalized})
+        result = fn(label)
+        return _success_response({"result": result, "label_type": label_type})
     except Exception as exc:
-        return _error_response("Failed to normalize reactant identifier.", {"details": str(exc)})
-
-
-@tool(args_schema=LabelInput)
-def analysis_normalize_reaction_type(label: str) -> Dict[str, Any]:
-    """Normalize a reaction type label to canonical taxonomy id."""
-    try:
-        normalized = analysis_tools.normalize_reaction_type(label)
-        return _success_response({"reaction_type": normalized})
-    except Exception as exc:
-        return _error_response("Failed to normalize reaction type label.", {"details": str(exc)})
-
-
-@tool(args_schema=FamilyInput)
-def analysis_resolve_reaction_family(family: str) -> Dict[str, Any]:
-    """Resolve reaction family aliases to canonical ids."""
-    try:
-        resolved = analysis_tools.resolve_reaction_family(family)
-        return _success_response({"reaction_family": resolved})
-    except Exception as exc:
-        return _error_response("Failed to resolve reaction family.", {"details": str(exc)})
-
-
-@tool(args_schema=FamilyInput)
-def analysis_canonical_family_label(family: str) -> Dict[str, Any]:
-    """Resolve reaction family labels to canonical taxonomy identifiers."""
-    try:
-        resolved = analysis_tools.canonical_family_label(family)
-        return _success_response({"reaction_family": resolved})
-    except Exception as exc:
-        return _error_response("Failed to resolve canonical family label.", {"details": str(exc)})
+        return _error_response("Failed to resolve label.", {"details": str(exc)})
 
 
 @tool(args_schema=ReactionContextInput)
@@ -669,25 +665,6 @@ def analysis_classify_reactants_with_context(
         return _error_response("Failed to classify reactants with context.", {"details": str(exc)})
 
 
-@tool(args_schema=ReactionContextInput)
-def analysis_reactant_summary(
-    reaction_smiles: str,
-    reaction_type: Optional[str] = None,
-    auto_detect: bool = True,
-) -> Dict[str, Any]:
-    """Return a summary of context-aware reactant classification."""
-    try:
-        result = reaction_context_tools.classify_reactants_with_context(
-            reaction_smiles,
-            reaction_type=reaction_type,
-            auto_detect=auto_detect,
-        )
-        summary = reaction_context_tools.get_reactant_summary(result)
-        return _success_response(summary)
-    except Exception as exc:
-        return _error_response("Failed to summarize reactant roles.", {"details": str(exc)})
-
-
 # ============================================================================
 # Reaction detection tools
 # ============================================================================
@@ -706,24 +683,6 @@ def detection_detect_reaction_types(
         return _success_response(result.to_dict())
     except Exception as exc:
         return _error_response("Failed to detect reaction types.", {"details": str(exc)})
-
-
-@tool(args_schema=ReactionListDetectionInput)
-def detection_detect_reaction_types_from_smiles(
-    reactant_smiles: List[str],
-    product_smiles: Optional[List[str]] = None,
-    max_hits_per_compound: Optional[int] = None,
-) -> Dict[str, Any]:
-    """Detect reaction types from reactant/product SMILES lists."""
-    try:
-        result = reaction_detection_tools.detect_reaction_types_from_smiles(
-            reactant_smiles,
-            product_smiles=product_smiles,
-            max_hits_per_compound=max_hits_per_compound,
-        )
-        return _success_response(result.to_dict())
-    except Exception as exc:
-        return _error_response("Failed to detect reaction types from lists.", {"details": str(exc)})
 
 
 @tool(args_schema=ReactionMotifIdsInput)
@@ -1231,17 +1190,11 @@ CHEMTOOLS_TOOLS = [
     analysis_classify_reactant_category,
     analysis_classify_reactant_group,
     analysis_classify_reactant_batch,
-    analysis_get_reactant_category_matches,
     analysis_get_all_reactant_matches,
-    analysis_normalize_reactant_identifier,
-    analysis_normalize_reaction_type,
-    analysis_resolve_reaction_family,
-    analysis_canonical_family_label,
+    analysis_resolve_label,
     analysis_classify_reactants_with_context,
-    analysis_reactant_summary,
     # Reaction detection
     detection_detect_reaction_types,
-    detection_detect_reaction_types_from_smiles,
     detection_detect_motif_ids_from_smiles,
     # Featurizers
     unified_featurize_molecule,
