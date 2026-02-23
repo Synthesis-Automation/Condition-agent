@@ -310,6 +310,34 @@
       "description": "Generic organoboron group (-B*), attach via boron."
     },
     {
+      "id": "-N*",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[N,n:2]",
+      "description": "Generic nitrogen-linked group (-N*), attach via nitrogen (fallback wildcard)."
+    },
+    {
+      "id": "-O*",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[O,o:2]",
+      "description": "Generic oxygen-linked group (-O*), attach via oxygen (fallback wildcard)."
+    },
+    {
+      "id": "-P*",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[P,p:2]",
+      "description": "Generic phosphorus-linked group (-P*), attach via phosphorus (fallback wildcard)."
+    },
+    {
+      "id": "-S*",
+      "kind": "substituent",
+      "priority": 0,
+      "smarts": "[S,s:2]",
+      "description": "Generic sulfur-linked group (-S*), attach via sulfur (fallback wildcard)."
+    },
+    {
       "id": "-Sn*",
       "kind": "substituent",
       "priority": 1,

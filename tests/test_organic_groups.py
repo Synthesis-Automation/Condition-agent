@@ -18,6 +18,17 @@ def _load_groups() -> dict:
     }
 
 
+def _load_compound_pairs() -> set[tuple[str, str]]:
+    repo_root = Path(__file__).resolve().parents[1]
+    compounds_path = repo_root / "chemtools" / "taxonomy" / "data" / "organic_compounds.v1.3.json"
+    payload = json.loads(compounds_path.read_text(encoding="utf-8"))
+    return {
+        (str(entry.get("A") or ""), str(entry.get("B") or ""))
+        for entry in payload.get("compounds", []) or []
+        if isinstance(entry, dict)
+    }
+
+
 @pytest.mark.skipif(not rdkit_helpers.rdkit_available(), reason="rdkit not available")
 def test_isonitrile_group_matches_isocyanide() -> None:
     groups = _load_groups()
@@ -73,3 +84,48 @@ def test_sulfonylhydrazone_group_matches_n_sulfonylhydrazone() -> None:
 
     assert n_sulfonylhydrazone.HasSubstructMatch(pattern)
     assert not plain_hydrazone.HasSubstructMatch(pattern)
+
+
+@pytest.mark.skipif(not rdkit_helpers.rdkit_available(), reason="rdkit not available")
+def test_generic_heteroatom_wildcard_groups_exist_and_compile() -> None:
+    groups = _load_groups()
+    examples = {
+        "-N*": "CN",
+        "-O*": "CO",
+        "-S*": "CS",
+        "-P*": "CP",
+    }
+
+    for group_id, smiles in examples.items():
+        assert group_id in groups, f"{group_id} missing from organic groups"
+        smarts = str(groups[group_id].get("smarts") or "")
+        assert smarts, f"{group_id} missing SMARTS"
+        pattern = compile_smarts(smarts, validate=True)
+        assert pattern is not None, f"{group_id} SMARTS failed to compile"
+        mol = rdkit_helpers.parse_smiles(smiles)
+        assert mol is not None
+        assert mol.HasSubstructMatch(pattern), f"{group_id} did not match {smiles}"
+
+
+def test_starter_generic_heteroatom_compound_motifs_exist() -> None:
+    pairs = _load_compound_pairs()
+    expected = {
+        ("Ar", "-N*"),
+        ("Ar", "-O*"),
+        ("Ar", "-P*"),
+        ("Ar", "-S*"),
+        ("Alkyl", "-N*"),
+        ("Alkyl", "-O*"),
+        ("Alkyl", "-P*"),
+        ("Alkyl", "-S*"),
+        ("Alkenyl", "-N*"),
+        ("Alkenyl", "-O*"),
+        ("Alkenyl", "-P*"),
+        ("Alkenyl", "-S*"),
+        ("Alkynyl", "-N*"),
+        ("Alkynyl", "-O*"),
+        ("Alkynyl", "-P*"),
+        ("Alkynyl", "-S*"),
+    }
+    missing = sorted(expected - pairs)
+    assert not missing, f"Missing starter wildcard compound motifs: {missing}"

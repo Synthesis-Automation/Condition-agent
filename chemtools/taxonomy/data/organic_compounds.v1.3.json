@@ -700,6 +700,150 @@
     },
     {
       "template": "single_bond",
+      "A": "Ar",
+      "B": "-N*",
+      "description": "Aryl generic nitrogen-linked motif (Ar-N*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-O*",
+      "description": "Aryl generic oxygen-linked motif (Ar-O*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-P*",
+      "description": "Aryl generic phosphorus-linked motif (Ar-P*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Ar",
+      "B": "-S*",
+      "description": "Aryl generic sulfur-linked motif (Ar-S*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-N*",
+      "description": "Heteroaryl generic nitrogen-linked motif (HeteroAr-N*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-O*",
+      "description": "Heteroaryl generic oxygen-linked motif (HeteroAr-O*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-P*",
+      "description": "Heteroaryl generic phosphorus-linked motif (HeteroAr-P*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "HeteroAr",
+      "B": "-S*",
+      "description": "Heteroaryl generic sulfur-linked motif (HeteroAr-S*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "-N*",
+      "description": "Aromatic N scaffold generic nitrogen-linked motif (AromN-N*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "-O*",
+      "description": "Aromatic N scaffold generic oxygen-linked motif (AromN-O*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "-P*",
+      "description": "Aromatic N scaffold generic phosphorus-linked motif (AromN-P*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "AromN",
+      "B": "-S*",
+      "description": "Aromatic N scaffold generic sulfur-linked motif (AromN-S*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-N*",
+      "description": "Alkyl generic nitrogen-linked motif (Alkyl-N*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-O*",
+      "description": "Alkyl generic oxygen-linked motif (Alkyl-O*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-P*",
+      "description": "Alkyl generic phosphorus-linked motif (Alkyl-P*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkyl",
+      "B": "-S*",
+      "description": "Alkyl generic sulfur-linked motif (Alkyl-S*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "-N*",
+      "description": "Alkenyl generic nitrogen-linked motif (Alkenyl-N*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "-O*",
+      "description": "Alkenyl generic oxygen-linked motif (Alkenyl-O*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "-P*",
+      "description": "Alkenyl generic phosphorus-linked motif (Alkenyl-P*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkenyl",
+      "B": "-S*",
+      "description": "Alkenyl generic sulfur-linked motif (Alkenyl-S*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "-N*",
+      "description": "Alkynyl generic nitrogen-linked motif (Alkynyl-N*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "-O*",
+      "description": "Alkynyl generic oxygen-linked motif (Alkynyl-O*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "-P*",
+      "description": "Alkynyl generic phosphorus-linked motif (Alkynyl-P*), broad fallback."
+    },
+    {
+      "template": "single_bond",
+      "A": "Alkynyl",
+      "B": "-S*",
+      "description": "Alkynyl generic sulfur-linked motif (Alkynyl-S*), broad fallback."
+    },
+    {
+      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-B(OH)2",
       "description": "Vinyl/alkenyl boronic acid (Alkenyl-B(OH)2)."

@@ -76,3 +76,29 @@ def test_general_inference_detects_stille_with_terminal_alkenyl_product_motif() 
         str(row.get("reaction_type", "")).lower() == "stille"
         for row in result.taxonomy_candidates
     )
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_general_inference_detects_cs_coupling_with_ar_s_wildcard_product() -> None:
+    rxn = (
+        "O=C(S)c1ccccc1.CC(C)(C)OC(=O)Nc1ccccc1I>>"
+        "CC(C)(C)OC(=O)Nc1ccccc1SC(=O)c1ccccc1"
+    )
+    result = analyze_reaction_general(rxn)
+
+    assert result.decision.reaction_type == "C_S_Coupling"
+    assert result.decision.mechanism_family == "cross_coupling"
+    assert "Ar-S*" in (result.evidence.get("certain") or {}).get("formed_motifs", [])
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_general_inference_detects_cn_coupling_with_ar_n_wildcard_product() -> None:
+    rxn = (
+        "NC=O.Cc1cc(Br)c2c(c1)C(C)(C)c1cc(C)cc(Br)c1O2>>"
+        "Cc1cc(NC=O)c2c(c1)C(C)(C)c1cc(C)cc(NC=O)c1O2"
+    )
+    result = analyze_reaction_general(rxn)
+
+    assert result.decision.reaction_type == "C_N_Coupling"
+    assert result.decision.mechanism_family == "cross_coupling"
+    assert "Ar-N*" in (result.evidence.get("certain") or {}).get("formed_motifs", [])

@@ -174,7 +174,8 @@
         "product": [
           "@aryl_amines",
           "@aryl_amides",
-          "@aryl_sulfonamides"
+          "@aryl_sulfonamides",
+          "Ar-N*"
         ]
       },
       "catalysts": [
@@ -326,6 +327,7 @@
       "products": {
         "product": [
           "Ar-SR",
+          "Ar-S*",
           "Alkenyl-SR"
         ]
       },
