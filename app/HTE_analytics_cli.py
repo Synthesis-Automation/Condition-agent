@@ -1,42 +1,30 @@
 """
-CLI for HTE Analytics Tools
+HTE analytics CLI.
 
-Provides command-line access to HTE database analytics:
-- List reactant pairs
-- Analyze catalysts
-- View reaction type summaries
-- Export filtered datasets
-- Backtest deterministic HTE recommender on held-out rows
+Commands:
+- `pairs`: reactant-pair analysis (supports reaction/catalyst filters)
+- `catalysts`: catalyst statistics (supports reaction/reactant filters)
+- `reactions`: reaction-type summary (supports `--reaction` and CSV `Detailed_Map`)
+- `reaction-map`: flat reaction subtype map CSV (like `reaction_type_detailed_map.csv`)
+- `metals`: metal usage summary
+- `export`: export filtered HTE rows to CSV
+- `backtest`: offline recommender backtest on held-out rows
 
-Usage (examples)
-----------------
-Run a reaction-type summary on the default database (`data/HTE_db`):
-
-    python app/HTE_analytics_cli.py reactions --top 30 --compact
-
-Save a CSV result and automatically generate a Markdown sidecar summary:
-
-    python app/HTE_analytics_cli.py reactions --top 50 -o results/reaction_summary.csv
-
-This writes:
-- `results/reaction_summary.csv`
-- `results/reaction_summary.md`  (generated automatically)
-
-List reactant pairs with filters and save CSV + Markdown:
-
-    python app/HTE_analytics_cli.py pairs --reaction C_S_Coupling --catalyst Pd --top 20 -o results/cs_pairs.csv
-
-Export a filtered subset (CSV + Markdown export summary):
-
+Examples:
+    python app/HTE_analytics_cli.py reactions --top 20 --compact
+    python app/HTE_analytics_cli.py reactions --reaction Suzuki -o results/suzuki_summary.csv
+    python app/HTE_analytics_cli.py reactions --reaction C_N_Coupling --detail-top 10 -o results/cn_report.csv
+    python app/HTE_analytics_cli.py reaction-map --reaction Suzuki -o results/suzuki_reaction_type_detailed_map.csv
+    python app/HTE_analytics_cli.py pairs --reaction C_S_Coupling --catalyst Pd -o results/cs_pairs.csv
     python app/HTE_analytics_cli.py export results/pd_cn_subset.csv --reaction C_N_Coupling --catalyst Pd
 
-Backtest the recommender and save JSON + Markdown report:
+    python app/HTE_analytics_cli.py reaction-map -o results/reaction_type_detailed_map.csv
 
-    python app/HTE_analytics_cli.py backtest --input data/HTE_db/experiments/HTE_canonical.csv --output results/backtest.json
 
-This writes:
-- `results/backtest.json`
-- `results/backtest.md`  (generated automatically)
+Notes:
+- CSV/JSON/CSV exports also write a Markdown sidecar summary (`.md`).
+- `reactions --reaction ...` includes a serialized `Detailed_Map` column by default.
+- `reaction-map` writes a flat CSV schema similar to `reaction_type_detailed_map.csv`.
 """
 
 import argparse
@@ -219,9 +207,10 @@ def _run_wizard(db_path: str) -> int:
         "  1) List reactant pairs\n"
         "  2) Analyze catalysts\n"
         "  3) Reaction type summary\n"
-        "  4) Metal usage\n"
-        "  5) Export filtered dataset\n"
-        "  6) Backtest HTE recommender\n"
+        "  4) Reaction subtype map (flat CSV/table)\n"
+        "  5) Metal usage\n"
+        "  6) Export filtered dataset\n"
+        "  7) Backtest HTE recommender\n"
         "  q) Quit\n"
     )
     while True:
@@ -273,13 +262,27 @@ def _run_wizard(db_path: str) -> int:
         elif choice == "4":
             args = argparse.Namespace(
                 db_path=db_path,
+                reaction=_prompt("Reaction type filter (optional)", ""),
+                min_rows=_prompt_int("Minimum rows per subtype", 1),
+                top=_prompt_int("Top N results", 50),
+                compact=_prompt_yes_no("Compact output", True),
+                output=_prompt("Save CSV to (optional)", ""),
+            )
+            if not args.reaction:
+                args.reaction = None
+            if not args.output:
+                args.output = None
+            cmd_reaction_map(args)
+        elif choice == "5":
+            args = argparse.Namespace(
+                db_path=db_path,
                 detailed=_prompt_yes_no("Detailed breakdown", False),
                 output=_prompt("Save CSV to (optional)", ""),
             )
             if not args.output:
                 args.output = None
             cmd_metals(args)
-        elif choice == "5":
+        elif choice == "6":
             output = _prompt("Output CSV path", "")
             if not output:
                 print("Output path is required.")
@@ -294,7 +297,7 @@ def _run_wizard(db_path: str) -> int:
                 min_yield=_prompt_float("Minimum yield", None),
             )
             cmd_export(args)
-        elif choice == "6":
+        elif choice == "7":
             default_input = db_path
             db_path_obj = Path(db_path)
             if db_path_obj.is_dir():
@@ -733,6 +736,80 @@ def cmd_reactions(args):
         print(f"Saved markdown summary to {md_path}")
 
 
+def cmd_reaction_map(args):
+    """Generate flat reaction subtype map (reaction_type_detailed_map-style)."""
+    analytics = HTEAnalytics(args.db_path)
+    reaction_filter = getattr(args, "reaction", None)
+    min_rows = max(1, int(getattr(args, "min_rows", 1)))
+    top_n = max(1, int(getattr(args, "top", 50)))
+
+    print("\n" + "=" * 80)
+    print("REACTION SUBTYPE MAP")
+    print("=" * 80)
+    if reaction_filter:
+        print(f"Reaction Type Filter: {reaction_filter}")
+    if min_rows > 1:
+        print(f"Minimum Rows per Subtype: {min_rows}")
+    print()
+
+    df = analytics.get_reaction_type_detailed_map(
+        reaction_type=reaction_filter,
+        min_rows=min_rows,
+    )
+
+    if len(df) == 0:
+        print("No matching subtype rows found")
+        return
+
+    if reaction_filter:
+        print(f"Found {len(df)} subtype rows matching filter\n")
+    else:
+        print(f"Found {len(df)} subtype rows across all reaction types\n")
+
+    if args.compact:
+        for i, row in df.head(top_n).iterrows():
+            fg1 = row.get("FG1", "") or ""
+            fg2 = row.get("FG2", "") or ""
+            pair_text = f"{fg1} + {fg2}" if fg2 else fg1
+            print(f"{i+1}. {row['Reaction Type']} | {pair_text}")
+            print(f"   n_rows: {row['n_rows']}, n_eln: {row['n_eln']}")
+            print(
+                f"   top catalyst/ligand/base: {row['top_catalyst'] or 'None'} / "
+                f"{row['top_ligand'] or 'None'} / {row['top_base'] or 'None'}"
+            )
+            print(
+                f"   top solvent/additive/coupling reagent: {row['top_solvent'] or 'None'} / "
+                f"{row['top_additive'] or 'None'} / {row['top_coupling_reagent'] or 'None'}"
+            )
+            print()
+    else:
+        import pandas as pd
+        pd_options = {
+            'display.max_rows': top_n,
+            'display.max_columns': None,
+            'display.width': None,
+            'display.max_colwidth': 80,
+        }
+        with pd.option_context(*[item for pair in pd_options.items() for item in pair]):
+            print(df.head(top_n).to_string(index=False))
+
+    if args.output:
+        df.to_csv(args.output, index=False)
+        print(f"\nSaved results to {args.output}")
+        md_path = _write_markdown_sidecar_for_dataframe(
+            args.output,
+            title="HTE Reaction Subtype Map",
+            df=df,
+            top=top_n,
+            notes=[
+                f"Reaction filter: {reaction_filter or 'None'}",
+                f"Minimum rows per subtype: {min_rows}",
+                "Schema modeled after reaction_type_detailed_map.csv",
+            ],
+        )
+        print(f"Saved markdown summary to {md_path}")
+
+
 def cmd_metals(args):
     """Analyze metal usage command"""
     analytics = HTEAnalytics(args.db_path)
@@ -1017,26 +1094,29 @@ def main():
         return _run_default_summary("data/HTE_db")
 
     parser = argparse.ArgumentParser(
-        description="HTE Database Analytics Tools",
+        description="HTE analytics CLI (summaries, filtered exports, and recommender backtests).",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # List all Suzuki reactant pairs with Pd catalysts
-  python -m chemtools.recommend.analytics pairs --reaction Suzuki --catalyst Pd --top 10
-  
-  # Analyze Cu catalysts in C-N coupling
-  python -m chemtools.recommend.analytics catalysts --reaction "C-N" --catalyst Cu --compact
-  
-  # View reaction type summary
-  python -m chemtools.recommend.analytics reactions --top 20
-  
-  # Analyze metal usage
-  python -m chemtools.recommend.analytics metals --detailed
-  
-  # Export Pd-catalyzed Suzuki data
-  python -m chemtools.recommend.analytics export suzuki_pd.csv --reaction Suzuki --catalyst Pd
+  # Reaction-type summary (all types)
+  python app/HTE_analytics_cli.py reactions --top 20 --compact
 
-  # Backtest deterministic HTE recommender on held-out rows
+  # Reaction-specific CSV report (includes Detailed_Map JSON column)
+  python app/HTE_analytics_cli.py reactions --reaction Suzuki -o results/suzuki_summary.csv
+
+  # Reaction-specific CSV report with deeper Detailed_Map (top 10 pairs/catalysts)
+  python app/HTE_analytics_cli.py reactions --reaction C_N_Coupling --detail-top 10 -o results/cn_report.csv
+
+  # Flat subtype map CSV (like reaction_type_detailed_map.csv)
+  python app/HTE_analytics_cli.py reaction-map --reaction Suzuki -o results/suzuki_reaction_type_detailed_map.csv
+
+  # Reactant-pair analysis with filters
+  python app/HTE_analytics_cli.py pairs --reaction C_S_Coupling --catalyst Pd --top 10
+
+  # Filtered dataset export
+  python app/HTE_analytics_cli.py export results/pd_cn_subset.csv --reaction C_N_Coupling --catalyst Pd
+
+  # Offline backtest on held-out rows
   python app/HTE_analytics_cli.py backtest --input data/HTE_db/experiments/HTE_canonical.csv --top-k 10 --hit-ks 1,3,5,10
         """
     )
@@ -1098,7 +1178,25 @@ Examples:
     rxn_parser.add_argument('--compact', action='store_true',
                            help='Use compact output format')
     rxn_parser.add_argument('-o', '--output', help='Save results to CSV')
-    
+
+    # Reaction subtype map command
+    rxn_map_parser = subparsers.add_parser(
+        'reaction-map',
+        help='Generate flat reaction subtype map (reaction_type_detailed_map-style)',
+    )
+    rxn_map_parser.add_argument('--reaction', help='Filter by reaction type')
+    rxn_map_parser.add_argument(
+        '--min-rows',
+        type=int,
+        default=1,
+        help='Minimum experiments per subtype row (default: 1)',
+    )
+    rxn_map_parser.add_argument('--top', type=int, default=50,
+                               help='Number of rows to show in terminal (default: 50)')
+    rxn_map_parser.add_argument('--compact', action='store_true',
+                               help='Use compact output format')
+    rxn_map_parser.add_argument('-o', '--output', help='Save results to CSV')
+
     # Metals command
     metals_parser = subparsers.add_parser('metals', help='Analyze metal usage')
     metals_parser.add_argument('--detailed', action='store_true',
@@ -1196,6 +1294,8 @@ Examples:
             cmd_catalysts(args)
         elif args.command == 'reactions':
             cmd_reactions(args)
+        elif args.command == 'reaction-map':
+            cmd_reaction_map(args)
         elif args.command == 'metals':
             cmd_metals(args)
         elif args.command == 'export':

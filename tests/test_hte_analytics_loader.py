@@ -133,3 +133,87 @@ def test_reaction_type_summary_supports_filter_and_detailed_map(tmp_path: Path) 
     assert detailed["top_reactant_pairs"][0]["top_catalyst"] == "Pd(dppf)Cl2"
     assert detailed["top_catalysts"][0]["catalyst"] == "Pd(dppf)Cl2"
     assert detailed["top_catalysts"][0]["count"] == 2
+
+
+def test_reaction_type_detailed_map_csv_shape(tmp_path: Path) -> None:
+    (tmp_path / "experiments").mkdir()
+
+    pd.DataFrame(
+        [
+            {
+                "reaction_type": "Suzuki",
+                "reactant_1": "Ar-Br",
+                "reactant_2": "Ar-B(OH)2",
+                "yield": 80.0,
+                "catalyst": "Pd(PPh3)4",
+                "ligand": "PPh3",
+                "base": "K2CO3",
+                "solvent": "DMF",
+                "additive": "H2O",
+            },
+            {
+                "reaction_type": "Suzuki",
+                "reactant_1": "Ar-Br",
+                "reactant_2": "Ar-B(OH)2",
+                "yield": 65.0,
+                "catalyst": "Pd(PPh3)4",
+                "ligand": "PPh3",
+                "base": "K2CO3",
+                "solvent": "DMF",
+                "additive": "",
+            },
+            {
+                "reaction_type": "Suzuki",
+                "reactant_1": "Ar-Cl",
+                "reactant_2": "Ar-B(pin)",
+                "yield": 30.0,
+                "catalyst": "Pd(dppf)Cl2",
+                "ligand": "dppf",
+                "base": "Cs2CO3",
+                "solvent": "dioxane",
+                "additive": "H2O",
+            },
+            {
+                "reaction_type": "C_N_Coupling",
+                "reactant_1": "Ar-Br",
+                "reactant_2": "RNH2",
+                "yield": 55.0,
+                "catalyst": "Pd(dppf)Cl2",
+                "ligand": "dppf",
+                "base": "K3PO4",
+                "solvent": "toluene",
+                "additive": "",
+            },
+        ]
+    ).to_csv(tmp_path / "experiments" / "HTE_canonical.csv", index=False)
+
+    analytics = HTEAnalytics(str(tmp_path))
+    detailed_map = analytics.get_reaction_type_detailed_map(reaction_type="Suzuki")
+
+    assert len(detailed_map) == 2
+    expected_columns = [
+        "Reaction Type",
+        "FG1",
+        "FG2",
+        "n_rows",
+        "n_eln",
+        "top_coupling_reagent",
+        "top_catalyst",
+        "top_ligand",
+        "top_base",
+        "top_solvent",
+        "top_additive",
+        "ReactionType_Detailed",
+        "ReactionType_SubtypeTag",
+    ]
+    assert list(detailed_map.columns) == expected_columns
+
+    first = detailed_map.iloc[0]
+    assert first["Reaction Type"] == "Suzuki"
+    assert first["FG1"] == "Ar-Br"
+    assert first["FG2"] == "Ar-B(OH)2"
+    assert int(first["n_rows"]) == 2
+    assert int(first["n_eln"]) == 1
+    assert first["top_catalyst"] == "Pd(PPh3)4"
+    assert first["top_base"] == "K2CO3"
+    assert first["ReactionType_SubtypeTag"] == "Suzuki__Ar-Br + Ar-B(OH)2"

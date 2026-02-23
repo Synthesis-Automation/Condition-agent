@@ -449,6 +449,22 @@ class HTEAnalytics:
         value = modes.iloc[0]
         return None if pd.isna(value) else str(value)
 
+    @staticmethod
+    def _top_nonempty_text(series: pd.Series) -> Optional[str]:
+        if series is None:
+            return None
+        cleaned = series.dropna().astype(str).map(str.strip)
+        cleaned = cleaned[~cleaned.isin(["", "nan", "None"])]
+        if cleaned.empty:
+            return None
+        modes = cleaned.mode()
+        if len(modes) > 0:
+            return str(modes.iloc[0]).strip() or None
+        counts = cleaned.value_counts()
+        if counts.empty:
+            return None
+        return str(counts.index[0]).strip() or None
+
     def _build_reaction_type_detail_map(
         self,
         reaction_type: str,
@@ -517,6 +533,128 @@ class HTEAnalytics:
             "top_reactant_pairs": top_pairs,
             "top_catalysts": top_catalysts,
         }
+
+    def get_reaction_type_detailed_map(
+        self,
+        reaction_type: Optional[str] = None,
+        *,
+        min_rows: int = 1,
+    ) -> pd.DataFrame:
+        """
+        Build a flat reaction-type detailed map similar to
+        `reaction_type_detailed_map.csv`.
+
+        One row corresponds to a reaction type + (FG1, FG2) subtype.
+        `n_eln` is approximated as the count of unique non-empty `Source_File`
+        values contributing to the subtype.
+        """
+        df = self.df.copy()
+        if reaction_type:
+            df = df[df["Reaction_Type_Standardized"].str.contains(reaction_type, case=False, na=False)]
+
+        columns = [
+            "Reaction Type",
+            "FG1",
+            "FG2",
+            "n_rows",
+            "n_eln",
+            "top_coupling_reagent",
+            "top_catalyst",
+            "top_ligand",
+            "top_base",
+            "top_solvent",
+            "top_additive",
+            "ReactionType_Detailed",
+            "ReactionType_SubtypeTag",
+        ]
+        if df.empty:
+            return pd.DataFrame(columns=columns)
+
+        grouped = (
+            df.groupby(["Reaction_Type_Standardized", "Reactant_A_Type", "Reactant_B_Type"], dropna=False)
+            .agg(
+                n_rows=("AREA_TOTAL_REDUCED", "count"),
+                n_eln=(
+                    "Source_File",
+                    lambda s: int(
+                        pd.Series(s)
+                        .dropna()
+                        .astype(str)
+                        .map(str.strip)
+                        .loc[lambda x: x != ""]
+                        .nunique()
+                    )
+                ),
+                top_coupling_reagent=("Coupling Reagent", self._top_nonempty_text),
+                top_catalyst=("Catalyst", self._top_nonempty_text),
+                top_ligand=("Ligand", self._top_nonempty_text),
+                top_base=("Base", self._top_nonempty_text),
+                top_solvent=("Solvent", self._top_nonempty_text),
+                top_additive=("Additive", self._top_nonempty_text),
+            )
+            .reset_index()
+        )
+
+        grouped.columns = [
+            "Reaction Type",
+            "FG1",
+            "FG2",
+            "n_rows",
+            "n_eln",
+            "top_coupling_reagent",
+            "top_catalyst",
+            "top_ligand",
+            "top_base",
+            "top_solvent",
+            "top_additive",
+        ]
+
+        grouped["FG1"] = grouped["FG1"].fillna("").astype(str)
+        grouped["FG2"] = grouped["FG2"].fillna("").astype(str)
+        grouped["Reaction Type"] = grouped["Reaction Type"].fillna("Unknown").astype(str)
+
+        if min_rows > 1:
+            grouped = grouped[grouped["n_rows"] >= int(min_rows)]
+
+        def _detailed_label(row: pd.Series) -> str:
+            rxn = str(row["Reaction Type"]).strip() or "Unknown"
+            fg1 = str(row["FG1"]).strip()
+            fg2 = str(row["FG2"]).strip()
+            if fg1 and fg2:
+                return f"{rxn}: {fg1} + {fg2}"
+            if fg1:
+                return f"{rxn}: {fg1}"
+            return rxn
+
+        def _subtype_tag(row: pd.Series) -> str:
+            rxn = str(row["Reaction Type"]).strip() or "Unknown"
+            fg1 = str(row["FG1"]).strip()
+            fg2 = str(row["FG2"]).strip()
+            if fg1 and fg2:
+                return f"{rxn}__{fg1} + {fg2}"
+            if fg1:
+                return f"{rxn}__{fg1}"
+            return rxn
+
+        grouped["ReactionType_Detailed"] = grouped.apply(_detailed_label, axis=1)
+        grouped["ReactionType_SubtypeTag"] = grouped.apply(_subtype_tag, axis=1)
+
+        for col in (
+            "top_coupling_reagent",
+            "top_catalyst",
+            "top_ligand",
+            "top_base",
+            "top_solvent",
+            "top_additive",
+        ):
+            grouped[col] = grouped[col].where(grouped[col].notna(), "")
+
+        grouped = grouped.sort_values(
+            ["Reaction Type", "n_rows", "FG1", "FG2"],
+            ascending=[True, False, True, True],
+        ).reset_index(drop=True)
+
+        return grouped[columns]
 
     def get_reaction_type_summary(
         self,
