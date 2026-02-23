@@ -441,9 +441,100 @@ class HTEAnalytics:
         
         return grouped.sort_values('Num_Experiments', ascending=False).reset_index(drop=True)
     
-    def get_reaction_type_summary(self) -> pd.DataFrame:
+    @staticmethod
+    def _mode_or_none(series: pd.Series) -> Optional[str]:
+        modes = series.mode()
+        if len(modes) == 0:
+            return None
+        value = modes.iloc[0]
+        return None if pd.isna(value) else str(value)
+
+    def _build_reaction_type_detail_map(
+        self,
+        reaction_type: str,
+        sub_df: pd.DataFrame,
+        *,
+        detail_top_k: int = 5,
+    ) -> Dict[str, Any]:
+        """Build a compact structured summary for a single reaction type."""
+        top_k = max(1, int(detail_top_k))
+        if sub_df.empty:
+            return {
+                "reaction_type": reaction_type,
+                "num_experiments": 0,
+                "top_reactant_pairs": [],
+                "top_catalysts": [],
+            }
+
+        pair_group = sub_df.groupby(["Reactant_A_Type", "Reactant_B_Type"]).agg(
+            Num_Experiments=("AREA_TOTAL_REDUCED", "count"),
+            Avg_Yield=("AREA_TOTAL_REDUCED", "mean"),
+            Success_Rate=("AREA_TOTAL_REDUCED", lambda x: (x > 50).sum() / len(x) * 100),
+            Top_Catalyst=("Catalyst", self._mode_or_none),
+        ).reset_index()
+        pair_group = pair_group.sort_values(
+            ["Num_Experiments", "Avg_Yield"],
+            ascending=[False, False],
+        )
+
+        catalyst_group = sub_df.groupby("Catalyst").agg(
+            Num_Experiments=("AREA_TOTAL_REDUCED", "count"),
+            Avg_Yield=("AREA_TOTAL_REDUCED", "mean"),
+            Success_Rate=("AREA_TOTAL_REDUCED", lambda x: (x > 50).sum() / len(x) * 100),
+        ).reset_index()
+        catalyst_group = catalyst_group.sort_values(
+            ["Num_Experiments", "Avg_Yield"],
+            ascending=[False, False],
+        )
+
+        top_pairs = []
+        for _, row in pair_group.head(top_k).iterrows():
+            top_pairs.append(
+                {
+                    "reactant_a_type": row["Reactant_A_Type"],
+                    "reactant_b_type": row["Reactant_B_Type"],
+                    "count": int(row["Num_Experiments"]),
+                    "avg_yield": round(float(row["Avg_Yield"]), 3) if pd.notna(row["Avg_Yield"]) else None,
+                    "success_rate": round(float(row["Success_Rate"]), 3) if pd.notna(row["Success_Rate"]) else None,
+                    "top_catalyst": row["Top_Catalyst"],
+                }
+            )
+
+        top_catalysts = []
+        for _, row in catalyst_group.head(top_k).iterrows():
+            top_catalysts.append(
+                {
+                    "catalyst": row["Catalyst"],
+                    "count": int(row["Num_Experiments"]),
+                    "avg_yield": round(float(row["Avg_Yield"]), 3) if pd.notna(row["Avg_Yield"]) else None,
+                    "success_rate": round(float(row["Success_Rate"]), 3) if pd.notna(row["Success_Rate"]) else None,
+                }
+            )
+
+        return {
+            "reaction_type": reaction_type,
+            "num_experiments": int(len(sub_df)),
+            "top_reactant_pairs": top_pairs,
+            "top_catalysts": top_catalysts,
+        }
+
+    def get_reaction_type_summary(
+        self,
+        reaction_type: Optional[str] = None,
+        *,
+        include_detailed_map: bool = False,
+        detail_top_k: int = 5,
+    ) -> pd.DataFrame:
         """
-        Get summary statistics for all reaction types in the database.
+        Get summary statistics for reaction types in the database.
+
+        Args:
+            reaction_type: Optional case-insensitive substring filter applied to
+                `Reaction_Type_Standardized`.
+            include_detailed_map: Include a serialized JSON `Detailed_Map`
+                column with top reactant-pair and catalyst breakdowns.
+            detail_top_k: Number of entries to keep in each top list in the
+                detailed map.
         
         Returns:
             DataFrame with columns:
@@ -455,16 +546,30 @@ class HTEAnalytics:
                 - Success_Rate
                 - Top_Catalyst
                 - Top_Reactant_Pair
+                - Detailed_Map (optional JSON string)
         """
-        grouped = self.df.groupby('Reaction_Type_Standardized').agg({
+        df = self.df.copy()
+        if reaction_type:
+            df = df[df['Reaction_Type_Standardized'].str.contains(reaction_type, case=False, na=False)]
+
+        base_columns = [
+            'Reaction_Type', 'Num_Experiments', 'Num_Reactant_Pairs', 'Num_Catalysts',
+            'Avg_Yield', 'Success_Rate', 'Top_Catalyst', 'Top_Reactant_Pair'
+        ]
+        if include_detailed_map:
+            base_columns.append('Detailed_Map')
+        if df.empty:
+            return pd.DataFrame(columns=base_columns)
+
+        grouped = df.groupby('Reaction_Type_Standardized').agg({
             'AREA_TOTAL_REDUCED': ['count', 'mean', lambda x: (x > 50).sum() / len(x) * 100],
-            'Catalyst': ['nunique', lambda x: x.mode().iloc[0] if len(x.mode()) > 0 else None],
-            'Reactant_A_Type': lambda x: len(set(zip(x, self.df.loc[x.index, 'Reactant_B_Type'])))
+            'Catalyst': ['nunique', self._mode_or_none],
+            'Reactant_A_Type': lambda x: len(set(zip(x, df.loc[x.index, 'Reactant_B_Type'])))
         }).reset_index()
         
         # Get top reactant pair for each reaction
         def get_top_pair(reaction_type):
-            sub_df = self.df[self.df['Reaction_Type_Standardized'] == reaction_type]
+            sub_df = df[df['Reaction_Type_Standardized'] == reaction_type]
             pair_counts = sub_df.groupby(['Reactant_A_Type', 'Reactant_B_Type']).size()
             if len(pair_counts) > 0:
                 top_pair = pair_counts.idxmax()
@@ -483,6 +588,19 @@ class HTEAnalytics:
             'Reaction_Type', 'Num_Experiments', 'Num_Reactant_Pairs', 'Num_Catalysts',
             'Avg_Yield', 'Success_Rate', 'Top_Catalyst', 'Top_Reactant_Pair'
         ]]
+
+        if include_detailed_map:
+            grouped['Detailed_Map'] = grouped['Reaction_Type'].apply(
+                lambda rxn_type: json.dumps(
+                    self._build_reaction_type_detail_map(
+                        str(rxn_type),
+                        df[df['Reaction_Type_Standardized'] == rxn_type],
+                        detail_top_k=detail_top_k,
+                    ),
+                    ensure_ascii=True,
+                    separators=(",", ":"),
+                )
+            )
         
         return grouped.sort_values('Num_Experiments', ascending=False).reset_index(drop=True)
     

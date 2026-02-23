@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -74,3 +75,61 @@ def test_hte_analytics_normalizes_detected_reaction_type_from_literature_exports
 
     assert int(row["Num_Experiments"]) == 3
     assert int(row["Num_Reactant_Pairs"]) == 2
+
+
+def test_reaction_type_summary_supports_filter_and_detailed_map(tmp_path: Path) -> None:
+    (tmp_path / "experiments").mkdir()
+
+    pd.DataFrame(
+        [
+            {
+                "reaction_type": "C_N_Coupling",
+                "reactant_1": "Ar-Br",
+                "reactant_2": "amine_primary",
+                "yield": 75.0,
+                "catalyst": "Pd(dppf)Cl2",
+            },
+            {
+                "reaction_type": "C_N_Coupling",
+                "reactant_1": "Ar-Br",
+                "reactant_2": "amine_primary",
+                "yield": 55.0,
+                "catalyst": "Pd(dppf)Cl2",
+            },
+            {
+                "reaction_type": "C_N_Coupling",
+                "reactant_1": "Ar-Cl",
+                "reactant_2": "amine_secondary",
+                "yield": 15.0,
+                "catalyst": "CuI",
+            },
+            {
+                "reaction_type": "Suzuki",
+                "reactant_1": "Ar-Br",
+                "reactant_2": "Ar-B(OH)2",
+                "yield": 80.0,
+                "catalyst": "Pd(PPh3)4",
+            },
+        ]
+    ).to_csv(tmp_path / "experiments" / "HTE_canonical.csv", index=False)
+
+    analytics = HTEAnalytics(str(tmp_path))
+    summary = analytics.get_reaction_type_summary(
+        reaction_type="C_N",
+        include_detailed_map=True,
+        detail_top_k=2,
+    )
+
+    assert len(summary) == 1
+    row = summary.iloc[0]
+    assert row["Reaction_Type"] == "C_N_Coupling"
+    assert int(row["Num_Experiments"]) == 3
+    assert "Detailed_Map" in summary.columns
+
+    detailed = json.loads(row["Detailed_Map"])
+    assert detailed["reaction_type"] == "C_N_Coupling"
+    assert detailed["num_experiments"] == 3
+    assert detailed["top_reactant_pairs"][0]["count"] == 2
+    assert detailed["top_reactant_pairs"][0]["top_catalyst"] == "Pd(dppf)Cl2"
+    assert detailed["top_catalysts"][0]["catalyst"] == "Pd(dppf)Cl2"
+    assert detailed["top_catalysts"][0]["count"] == 2

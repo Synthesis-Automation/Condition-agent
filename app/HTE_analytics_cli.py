@@ -258,10 +258,15 @@ def _run_wizard(db_path: str) -> int:
         elif choice == "3":
             args = argparse.Namespace(
                 db_path=db_path,
+                reaction=_prompt("Reaction type filter (optional)", ""),
+                detailed_map=_prompt_yes_no("Include detailed map in CSV/report", False),
+                detail_top=_prompt_int("Detailed map top N pairs/catalysts", 5),
                 top=_prompt_int("Top N results", 20),
                 compact=_prompt_yes_no("Compact output", True),
                 output=_prompt("Save CSV to (optional)", ""),
             )
+            if not args.reaction:
+                args.reaction = None
             if not args.output:
                 args.output = None
             cmd_reactions(args)
@@ -663,15 +668,30 @@ def cmd_catalysts(args):
 def cmd_reactions(args):
     """Analyze reaction types command"""
     analytics = HTEAnalytics(args.db_path)
+    reaction_filter = getattr(args, "reaction", None)
+    detailed_map_requested = bool(getattr(args, "detailed_map", False))
+    detail_top = max(1, int(getattr(args, "detail_top", 5)))
+    include_detailed_map = detailed_map_requested or bool(reaction_filter)
     
     print("\n" + "="*80)
     print("REACTION TYPE SUMMARY")
     print("="*80)
+    if reaction_filter:
+        print(f"Reaction Type Filter: {reaction_filter}")
+    if include_detailed_map:
+        print(f"Detailed Map: enabled (top {detail_top})")
     print()
     
-    df = analytics.get_reaction_type_summary()
+    df = analytics.get_reaction_type_summary(
+        reaction_type=reaction_filter,
+        include_detailed_map=include_detailed_map,
+        detail_top_k=detail_top,
+    )
     
-    print(f"Found {len(df)} reaction types in database\n")
+    if reaction_filter:
+        print(f"Found {len(df)} reaction types matching filter\n")
+    else:
+        print(f"Found {len(df)} reaction types in database\n")
     
     # Display results
     if args.compact:
@@ -704,6 +724,11 @@ def cmd_reactions(args):
             title="HTE Reaction Type Summary",
             df=df,
             top=args.top,
+            notes=[
+                f"Reaction filter: {reaction_filter or 'None'}",
+                f"Detailed map included: {'yes' if include_detailed_map else 'no'}",
+                f"Detailed map top entries: {detail_top}",
+            ],
         )
         print(f"Saved markdown summary to {md_path}")
 
@@ -1056,6 +1081,18 @@ Examples:
     
     # Reactions command
     rxn_parser = subparsers.add_parser('reactions', help='Analyze reaction types')
+    rxn_parser.add_argument('--reaction', help='Filter by reaction type')
+    rxn_parser.add_argument(
+        '--detailed-map',
+        action='store_true',
+        help='Include serialized Detailed_Map JSON column (top pairs/catalysts) in the report',
+    )
+    rxn_parser.add_argument(
+        '--detail-top',
+        type=int,
+        default=5,
+        help='Top N reactant pairs/catalysts to include in Detailed_Map (default: 5)',
+    )
     rxn_parser.add_argument('--top', type=int, default=20,
                            help='Number of results to show (default: 20)')
     rxn_parser.add_argument('--compact', action='store_true',
