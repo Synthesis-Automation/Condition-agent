@@ -677,6 +677,7 @@
         "product": [
           "Ar-Ar",
           "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
           "Alkenyl-Alkenyl"
         ]
       },

@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from .synthon import classify_reactant_synthons
+from .taxonomy.reaction_catalog import motif_tokens_compatible
 
 
 # =============================================================================
@@ -274,9 +275,20 @@ def _slot_synthon_matches(
     for role in _slot_roles(slot_name):
         role_matches.update(set(role_motifs.get(role, []) or []))
     if role_matches:
-        return slot_set & role_matches
+        return _compatible_observed_matches(role_matches, slot_set)
     all_motifs = set(synthon_context.get("all_motifs", []) or [])
-    return slot_set & all_motifs
+    return _compatible_observed_matches(all_motifs, slot_set)
+
+
+def _compatible_observed_matches(observed: Set[str], allowed: Set[str]) -> Set[str]:
+    """Return observed motif tokens that match an allowed token under scope rules."""
+    if not observed or not allowed:
+        return set()
+    matches: Set[str] = set()
+    for observed_token in observed:
+        if any(motif_tokens_compatible(observed_token, allowed_token) for allowed_token in allowed):
+            matches.add(observed_token)
+    return matches
 
 
 # =============================================================================
@@ -321,7 +333,7 @@ def _match_reaction_type(
             continue
 
         reactant_slot_total += 1
-        motif_matches = reacted & slot_set
+        motif_matches = _compatible_observed_matches(reacted, slot_set)
         synthon_matches = _slot_synthon_matches(
             slot_name,
             slot_set,
@@ -350,7 +362,7 @@ def _match_reaction_type(
         if not slot_set:
             continue
         
-        matches = formed & slot_set
+        matches = _compatible_observed_matches(formed, slot_set)
         if matches:
             product_matches = sorted(matches)
             break  # Only need one product match

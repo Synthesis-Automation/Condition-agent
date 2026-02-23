@@ -63,3 +63,16 @@ def test_general_inference_can_emit_mechanism_class_for_taxonomy_gap_annulation(
     assert result.decision.reaction_type == "unknown"
     assert result.decision.mechanism_family == "annulation_cyclization"
     assert "Ann" in (result.evidence.get("certain") or {}).get("event_tokens", [])
+
+
+@pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")
+def test_general_inference_detects_stille_with_terminal_alkenyl_product_motif() -> None:
+    rxn = "Ic1ccncc1.C=C[Sn](C)(C)C>>C=Cc1ccncc1"
+    result = analyze_reaction_general(rxn)
+
+    assert result.decision.reaction_type.lower() == "stille"
+    assert result.decision.mechanism_family == "cross_coupling"
+    assert any(
+        str(row.get("reaction_type", "")).lower() == "stille"
+        for row in result.taxonomy_candidates
+    )
