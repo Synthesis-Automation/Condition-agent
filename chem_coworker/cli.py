@@ -180,18 +180,19 @@ class Spinner:
         self._stop.set()
         if self._thread:
             self._thread.join()
-        clear_len = len(self._message) + 8
-        sys.stdout.write("\r" + " " * clear_len + "\r")
-        sys.stdout.flush()
+        with _stdout_lock:
+            sys.stdout.write("\r\033[2K")
+            sys.stdout.flush()
 
     def _spin(self) -> None:
         idx = 0
         while not self._stop.is_set():
             frame = self._FRAMES[idx % len(self._FRAMES)]
-            sys.stdout.write(
-                f"\r  {C.YELLOW}{frame}{C.R} {C.DIM}{self._message}…{C.R}"
-            )
-            sys.stdout.flush()
+            with _stdout_lock:
+                sys.stdout.write(
+                    f"\r\033[2K  {C.YELLOW}{frame}{C.R} {C.DIM}{self._message}…{C.R}"
+                )
+                sys.stdout.flush()
             time.sleep(0.1)
             idx += 1
 
@@ -296,6 +297,7 @@ def _print_response(response: "ChemResponse", verbose: bool = False) -> None:
 # A3 — Real-time tool streaming callbacks
 # ---------------------------------------------------------------------------
 
+_stdout_lock: threading.Lock = threading.Lock()   # serialise all terminal writes
 _running_tools: set = set()       # tools currently executing
 _phase_spinner: list = [None]     # mutable container for the active phase spinner
 
@@ -304,15 +306,17 @@ def _progress(event: str, name: str, elapsed: float) -> None:
     """Progress callback: prints one line per tool as it starts/completes."""
     if event == "start":
         _running_tools.add(name)
-        sys.stdout.write(
-            f"\r  {C.YELLOW}⠋{C.R} {C.DIM}{' · '.join(sorted(_running_tools))}…{C.R}   "
-        )
-        sys.stdout.flush()
+        with _stdout_lock:
+            sys.stdout.write(
+                f"\r\033[2K  {C.YELLOW}⠋{C.R} {C.DIM}{' · '.join(sorted(_running_tools))}…{C.R}"
+            )
+            sys.stdout.flush()
     else:
         _running_tools.discard(name)
         icon = f"{C.OK}✓" if event == "done" else f"{C.ERR}✗"
-        # Clear spinner line then print completed tool
-        print(f"\r  {icon}{C.R}  {C.TOOL}{name}{C.R}  {C.META}{elapsed:.1f}s{C.R}     ")
+        with _stdout_lock:
+            sys.stdout.write(f"\r\033[2K  {icon}{C.R}  {C.TOOL}{name}{C.R}  {C.META}{elapsed:.1f}s{C.R}\n")
+            sys.stdout.flush()
 
 
 _PHASE_LABELS = {
