@@ -807,9 +807,8 @@ def _recommend_forward_conditions(
             rxn_smiles = f"{reactants_str}>>"
 
         result = _recommend_conditions(
-            reaction=rxn_smiles,
-            reaction_type=reaction_type,
-            k=top_k,
+            reaction_smiles=rxn_smiles,
+            top_k=top_k,
         )
         return result
 

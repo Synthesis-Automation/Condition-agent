@@ -56,16 +56,11 @@ def _collect_hte_files(db_path: Path) -> List[Path]:
     if not db_path.exists():
         return []
 
+    # Recursively collect all HTE tabular datasets under the DB root so new
+    # dataset folders (for example `protocols/`) are included automatically.
     candidates: List[Path] = []
-    candidates.extend(db_path.glob("*.csv"))
-    candidates.extend(db_path.glob("*.jsonl"))
-
-    for subdir in ("literature", "datasets", "rules", "experiments", "experiment", "experiements"):
-        sub_path = db_path / subdir
-        if not sub_path.exists():
-            continue
-        candidates.extend(sub_path.glob("*.csv"))
-        candidates.extend(sub_path.glob("*.jsonl"))
+    candidates.extend(db_path.rglob("*.csv"))
+    candidates.extend(db_path.rglob("*.jsonl"))
 
     seen = set()
     ordered: List[Path] = []
@@ -87,6 +82,8 @@ def _infer_source_group(source_path: Optional[Path]) -> str:
             return "literature"
         if part == "rules":
             return "rules"
+        if part in ("protocols", "protocol"):
+            return "protocols"
         if part in ("experiments", "experiment", "experiements"):
             return "experiments"
     return "other"
@@ -173,6 +170,9 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
 
     column_mapping = {
         "reaction_type": "Reaction_Type_Standardized",
+        "detected_reaction_type": "Reaction_Type_Standardized",
+        "Detected_Reaction_Type": "Reaction_Type_Standardized",
+        "Reaction_Type": "Reaction_Type_Standardized",
         "reactant_1": "Reactant_A_Type",
         "reactant_2": "Reactant_B_Type",
         "yield": "AREA_TOTAL_REDUCED",
