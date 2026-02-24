@@ -360,7 +360,10 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
             df[reactant_col] = df[reactant_col].astype(object)
 
     def _normalize_reactants_row(row: pd.Series) -> pd.Series:
-        row = row.copy()
+        # `DataFrame.apply(axis=1)` can hand us a float-typed Series for some rows
+        # (e.g. when reactant cells are NaN-heavy). Cast to object before writing
+        # normalized string values to avoid pandas dtype-assignment warnings.
+        row = row.copy().astype(object)
         raw = [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
         cleaned: List[str] = []
         for value in raw:
