@@ -227,6 +227,49 @@ def _read_hte_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+def _looks_like_precanonical_hte_frame(
+    df: pd.DataFrame,
+    source_path: Optional[Path],
+) -> bool:
+    """
+    Heuristic fast-path detector for converter-produced canonical HTE CSVs.
+
+    We only skip expensive key/event canonicalization when the frame already has:
+    - canonical-ish file naming (contains `canonical`), and
+    - populated Reaction_Key + Reaction_Events for rows with reaction_smiles, and
+    - reactant columns already left-packed (no A-empty/B-filled style rows).
+    """
+    if df is None or df.empty:
+        return False
+    file_name = str(getattr(source_path, "name", "") or "").lower()
+    if "canonical" not in file_name:
+        return False
+
+    required = {"reaction_smiles", "Reaction_Key", "Reaction_Events", "Reactant_A_Type", "Reactant_B_Type", "Reactant_C_Type"}
+    if not required.issubset(set(df.columns)):
+        return False
+
+    reaction_smiles = df["reaction_smiles"].fillna("").astype(str).str.strip()
+    reaction_keys = df["Reaction_Key"].fillna("").astype(str).str.strip()
+    reaction_events = df["Reaction_Events"].fillna("").astype(str).str.strip()
+    has_rxn = reaction_smiles.ne("")
+    if has_rxn.any():
+        if (reaction_keys[has_rxn] == "").any():
+            return False
+        if (reaction_events[has_rxn] == "").any():
+            return False
+
+    a = df["Reactant_A_Type"].fillna("").astype(str).str.strip()
+    b = df["Reactant_B_Type"].fillna("").astype(str).str.strip()
+    c = df["Reactant_C_Type"].fillna("").astype(str).str.strip()
+    if ((a == "") & ((b != "") | (c != ""))).any():
+        return False
+    if ((b == "") & (c != "")).any():
+        return False
+
+    return True
+
+
 def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = None) -> pd.DataFrame:
     df = df.copy()
 
@@ -263,8 +306,11 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         if missing_type_mask.any():
             df.loc[missing_type_mask, "Reaction_Type_Standardized"] = fallback_types[missing_type_mask]
 
+    precanonical_fast_path = _looks_like_precanonical_hte_frame(df, source_path)
+
     # Generate Reaction_Key from reaction_smiles when missing/invalid.
-    if "reaction_smiles" in df.columns:
+    # Skip for converter-produced canonical datasets that already carry keys.
+    if (not precanonical_fast_path) and "reaction_smiles" in df.columns:
         if "Reaction_Key" not in df.columns:
             df["Reaction_Key"] = ""
         reaction_smiles_series = df["reaction_smiles"].fillna("").astype(str).str.strip()
@@ -290,24 +336,36 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
             df["Reaction_Events"] = ""
         raw_key_series = df["Reaction_Key"].fillna("").astype(str).str.strip()
         raw_events_series = df["Reaction_Events"].fillna("").astype(str).str.strip()
-        normalized_keys: List[str] = []
-        normalized_events: List[str] = []
-        for raw_key, raw_events in zip(raw_key_series.tolist(), raw_events_series.tolist()):
-            minimal_key = canonicalize_reaction_key_minimal(raw_key)
-            normalized_keys.append(minimal_key)
-            if raw_events and raw_events.lower() != "nan":
-                normalized_text = normalize_reaction_events_text(raw_events)
-                normalized_events.append(normalized_text or raw_events)
-            else:
-                events_payload = build_reaction_events_payload(raw_key)
-                normalized_events.append(
-                    serialize_reaction_events_payload(events_payload)
-                )
+
+        if precanonical_fast_path:
+            # Trust converter output and avoid per-row canonicalization of keys/events.
+            # We still normalize trivial whitespace and derive match keys.
+            normalized_keys = raw_key_series.tolist()
+            normalized_events = raw_events_series.tolist()
+        else:
+            normalized_keys = []
+            normalized_events = []
+            for raw_key, raw_events in zip(raw_key_series.tolist(), raw_events_series.tolist()):
+                minimal_key = canonicalize_reaction_key_minimal(raw_key)
+                normalized_keys.append(minimal_key)
+                if raw_events and raw_events.lower() != "nan":
+                    normalized_text = normalize_reaction_events_text(raw_events)
+                    normalized_events.append(normalized_text or raw_events)
+                else:
+                    events_payload = build_reaction_events_payload(raw_key)
+                    normalized_events.append(
+                        serialize_reaction_events_payload(events_payload)
+                    )
         df["Reaction_Key"] = normalized_keys
         df["Reaction_Events"] = normalized_events
-        df["Reaction_Events_Key"] = [
-            _reaction_events_to_match_key(value) for value in normalized_events
-        ]
+        if "Reaction_Events_Key" not in df.columns or not precanonical_fast_path:
+            df["Reaction_Events_Key"] = [
+                _reaction_events_to_match_key(value) for value in normalized_events
+            ]
+        else:
+            df["Reaction_Events_Key"] = (
+                df["Reaction_Events_Key"].fillna("").astype(str).str.strip()
+            )
         valid_mask = df["Reaction_Key"].fillna("").astype(str).str.contains("->", regex=False)
         if (~valid_mask).any():
             df.loc[~valid_mask, "Reaction_Key"] = ""
@@ -386,8 +444,10 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
 
     for _col in ["Reactant_A_Type", "Reactant_B_Type", "Reactant_C_Type"]:
         if _col in df.columns:
-            df[_col] = df[_col].astype(object)
-    df = df.apply(_normalize_reactants_row, axis=1)
+            df[_col] = df[_col].fillna("").astype(str).replace("nan", "").astype(object)
+            df[_col] = df[_col].astype(str).str.strip().astype(object)
+    if not precanonical_fast_path:
+        df = df.apply(_normalize_reactants_row, axis=1)
     df["Intramolecular_Likely"] = df.apply(
         lambda row: _intramolecular_likely_from_fields(
             row.get("Reactant_A_Type"),
@@ -400,12 +460,26 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
         df["Is_Intramolecular"] = df["Intramolecular_Likely"]
     df = df.drop(columns=["_reactant_count"], errors="ignore")
 
-    df["Reactant_Types_Key"] = df.apply(
-        lambda row: _reactant_key(
-            [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
-        ),
-        axis=1,
+    existing_reactant_types_key = (
+        df["Reactant_Types_Key"].fillna("").astype(str).str.strip()
+        if "Reactant_Types_Key" in df.columns
+        else pd.Series([""] * len(df), index=df.index)
     )
+    if (existing_reactant_types_key == "").any():
+        computed_reactant_types_key = df.apply(
+            lambda row: _reactant_key(
+                [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
+            ),
+            axis=1,
+        )
+        if "Reactant_Types_Key" not in df.columns:
+            df["Reactant_Types_Key"] = computed_reactant_types_key
+        else:
+            missing_rtk_mask = existing_reactant_types_key == ""
+            if missing_rtk_mask.any():
+                df.loc[missing_rtk_mask, "Reactant_Types_Key"] = computed_reactant_types_key[missing_rtk_mask]
+    else:
+        df["Reactant_Types_Key"] = existing_reactant_types_key
 
     if "Reaction_Key" in df.columns:
         keys = df["Reaction_Key"].fillna("").astype(str).str.strip()
