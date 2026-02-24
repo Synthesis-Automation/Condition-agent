@@ -341,7 +341,13 @@ def _get_molecular_descriptors(smiles: str) -> Dict[str, Any]:
             "RingCount": rdMolDescriptors.CalcNumRings(mol),
             "AromaticRings": rdMolDescriptors.CalcNumAromaticRings(mol),
             "HeavyAtomCount": mol.GetNumHeavyAtoms(),
-            "NumStereocenters": len(rdMolDescriptors.FindPotentialStereo(mol)),
+            "NumStereocenters": (
+                rdMolDescriptors.CalcNumAtomStereoCenters(mol)
+                if hasattr(rdMolDescriptors, "CalcNumAtomStereoCenters")
+                else len(rdMolDescriptors.FindPotentialStereo(mol))
+                if hasattr(rdMolDescriptors, "FindPotentialStereo")
+                else len(Chem.FindMolChiralCenters(mol, includeUnassigned=True))
+            ),
         }
 
         # Lipinski Ro5 check
