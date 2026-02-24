@@ -207,8 +207,19 @@ class ChemCoworker:
             for f in critic_findings:
                 warnings.append(f"[critic] {f.message}")
             if critic_findings:
+                # ── Step 5c: Revision pass — revise the answer to address findings
+                if workflow.critic_step.revision_pass:
+                    revised_answer, rev_calls = self._run_revision_pass(
+                        query=query,
+                        original_answer=answer,
+                        findings=critic_findings,
+                        critic_verdict=critic_verdict,
+                    )
+                    llm_calls += rev_calls
+                    answer = revised_answer
+                # Append the critic's findings for transparency
                 finding_lines = "\n".join(str(f) for f in critic_findings)
-                answer += f"\n\n---\n🔍 **Critic review**: {critic_verdict}\n{finding_lines}"
+                answer += f"\n\n---\n🔍 **Critic review** (addressed above): {critic_verdict}\n{finding_lines}"
 
         # ── Step 6: Emit events and stream answer ──────────────────────
         self.event_bus.emit(
@@ -722,6 +733,68 @@ class ChemCoworker:
             return [], "", 0
         finally:
             self.event_bus.emit(ChemEvent.PHASE_END, phase="critic")
+
+
+    def _run_revision_pass(
+        self,
+        query: str,
+        original_answer: str,
+        findings: List[Any],  # List[Finding]
+        critic_verdict: str,
+    ) -> tuple:  # (revised_answer: str, llm_call_count: int)
+        """
+        Phase 6b — Follow-up LLM call that revises the main answer to address
+        the critic's findings.
+
+        Returns:
+            (revised_answer, llm_call_count)
+            On any failure returns (original_answer, 0) so the pipeline is
+            unaffected.
+        """
+        from langchain_core.messages import SystemMessage, HumanMessage
+
+        finding_lines = "\n".join(
+            f"- [{f.severity.value.upper()}] {f.message}"
+            + (f"\n  Suggestion: {f.suggestion}" if f.suggestion else "")
+            for f in findings
+        )
+
+        revision_prompt = (
+            f"You previously proposed the following synthesis answer:\n\n"
+            f"{original_answer}\n\n"
+            f"An adversarial chemistry reviewer has identified the following issues "
+            f"(verdict: {critic_verdict}):\n\n"
+            f"{finding_lines}\n\n"
+            f"Please produce a revised answer that directly addresses each issue above. "
+            f"Keep the overall structure of your original answer; only modify the parts "
+            f"that are affected by the critic's findings. "
+            f"Do not repeat the critic's findings verbatim — integrate the corrections "
+            f"into the answer naturally."
+        )
+
+        self.event_bus.emit(ChemEvent.PHASE_START, phase="revision")
+        try:
+            messages = [
+                SystemMessage(content=(
+                    "You are a chemistry expert revising a synthesis proposal based on "
+                    "peer-review feedback. Produce a corrected, self-contained answer."
+                )),
+                HumanMessage(content=revision_prompt),
+            ]
+            response = self.llm.invoke(messages)
+            content = getattr(response, "content", response)
+            revised = content if isinstance(content, str) else str(content)
+            if self.verbose:
+                logger.info(
+                    f"[ChemCoworker] Revision pass complete "
+                    f"({len(revised)} chars → was {len(original_answer)} chars)"
+                )
+            return revised, 1
+        except Exception as exc:
+            logger.warning(f"[ChemCoworker] Revision pass failed: {exc}")
+            return original_answer, 0
+        finally:
+            self.event_bus.emit(ChemEvent.PHASE_END, phase="revision")
 
 
 def create_coworker(

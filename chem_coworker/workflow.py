@@ -41,10 +41,15 @@ class CriticStep:
     min_severity : str
         Minimum severity level to surface: "info", "warning", or "critical".
         Findings below this level are silently dropped.
+    revision_pass : bool
+        If True, run a follow-up LLM call after the critic to produce a revised
+        answer that addresses the identified findings.  Only fires when at least
+        one finding meets the min_severity threshold.
     """
     enabled: bool = True
     max_findings: int = 5
     min_severity: str = "warning"   # mirrors critic.Severity without a circular import
+    revision_pass: bool = True
 
 
 @dataclass
