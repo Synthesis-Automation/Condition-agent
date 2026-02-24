@@ -2,7 +2,7 @@
 Loader for calculable feature specifications.
 
 This version targets taxonomy v2 data. Reactant type features are generated
-from ``organic_compounds.v1.3.json`` (with group templates) to avoid duplicating
+from the documented compound catalog (with group templates) to avoid duplicating
 SMARTS definitions. Optional property and derived overlays are loaded from
 layered files when present.
 """
@@ -63,6 +63,21 @@ def _load_groups(path: Path) -> Dict[str, Dict[str, Any]]:
 
 
 def _load_compounds(path: Path) -> list[dict[str, Any]]:
+    try:
+        canonical_path = (_resolve_data_root() / _ORGANIC_COMPOUNDS_FILE).resolve()
+    except Exception:
+        canonical_path = None
+
+    if canonical_path is not None and path.resolve() == canonical_path:
+        try:
+            from . import loader as taxonomy_loader
+
+            payload = taxonomy_loader.load_organic_compounds()
+            compounds = payload.get("compounds") or []
+            return [item for item in compounds if isinstance(item, dict)]
+        except Exception:
+            pass
+
     payload = _safe_load_json(path)
     compounds = payload.get("compounds") or []
     return [item for item in compounds if isinstance(item, dict)]
@@ -82,7 +97,7 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
     groups_path = data_root / _ORGANIC_GROUPS_FILE
     group_logic_path = data_root / _GROUP_LOGIC_FILE
 
-    if not compounds_path.exists() or not groups_path.exists():
+    if not groups_path.exists():
         return {
             "version": "empty",
             "description": "Fallback empty calculable feature spec.",
@@ -187,7 +202,7 @@ def _build_reactant_spec(data_root: Path) -> Dict[str, Any]:
 
     return {
         "version": "organic_compounds_generated",
-        "description": "Reactant feature spec generated from organic_compounds.v1.3.json.",
+        "description": "Reactant feature spec generated from documented compound catalog.",
         "features": features,
         "derived_shortcuts": derived_shortcuts,
     }

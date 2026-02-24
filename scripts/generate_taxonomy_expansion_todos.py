@@ -30,6 +30,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from chemtools.taxonomy import loader as taxonomy_loader
 from chemtools.taxonomy.reaction_catalog import load_reaction_catalog
 
 
@@ -116,6 +117,22 @@ def _load_json(path: Path) -> Dict[str, Any]:
 def _load_compound_ids(paths: Sequence[Path]) -> Set[str]:
     motif_ids: Set[str] = set()
     for path in paths:
+        if path == DEFAULT_ORGANIC_COMPOUNDS and not path.exists():
+            payload = taxonomy_loader.load_organic_compounds()
+            compounds = payload.get("compounds")
+            if isinstance(compounds, list):
+                for entry in compounds:
+                    if not isinstance(entry, dict):
+                        continue
+                    comp_id = str(entry.get("id") or "").strip()
+                    if comp_id:
+                        motif_ids.add(comp_id)
+                        continue
+                    a_group = str(entry.get("A") or "").strip()
+                    b_group = str(entry.get("B") or "").strip()
+                    if a_group and b_group:
+                        motif_ids.add(_generated_compound_id(a_group, b_group))
+            continue
         if not path.exists():
             continue
         payload = _load_json(path)

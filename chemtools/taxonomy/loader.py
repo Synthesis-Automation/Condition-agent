@@ -22,6 +22,8 @@ COMPOUND_LOGIC_FILE = _TAXONOMY_DIR / "compound_logic.json"
 GROUP_LOGIC_FILE = _TAXONOMY_DIR / "group_logic.json"
 ORGANIC_GROUPS_FILE = _TAXONOMY_DIR / "organic_groups.v1.3.json"
 ORGANIC_COMPOUNDS_FILE = _TAXONOMY_DIR / "organic_compounds.v1.3.json"
+COMPOUND_GENERATION_RULES_FILE = _TAXONOMY_DIR / "compound_generation_rules.v1.json"
+COMPOUND_OVERRIDES_FILE = _TAXONOMY_DIR / "compound_overrides.v1.json"
 SCAFFOLD_MOTIFS_FILE = _TAXONOMY_DIR / "scaffold_motifs.v1.3.json"
 FEATURIZER_LOGIC_FILE = _TAXONOMY_DIR / "featurizer_logic.json"
 SYNTHON_FILE = _TAXONOMY_DIR / "synthons.v1.json"
@@ -118,13 +120,39 @@ def load_organic_compounds() -> Dict[str, Any]:
     """Load organic compounds taxonomy JSON.
     
     Returns:
-        Dictionary with compound type definitions
+        Dictionary with compound type definitions.
+
+    The canonical payload is generated from ``compound_generation_rules`` +
+    ``compound_overrides``.
     """
-    if not ORGANIC_COMPOUNDS_FILE.exists():
-        return {}
-    
     try:
-        with ORGANIC_COMPOUNDS_FILE.open("r", encoding="utf-8") as f:
+        from .compound_catalog import build_documented_compound_catalog
+
+        payload = build_documented_compound_catalog()
+        return payload if isinstance(payload, dict) else {}
+    except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def load_compound_generation_rules() -> Dict[str, Any]:
+    """Load compound generation rules taxonomy JSON."""
+    if not COMPOUND_GENERATION_RULES_FILE.exists():
+        return {}
+    try:
+        with COMPOUND_GENERATION_RULES_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def load_compound_overrides() -> Dict[str, Any]:
+    """Load explicit compound motif overrides taxonomy JSON."""
+    if not COMPOUND_OVERRIDES_FILE.exists():
+        return {}
+    try:
+        with COMPOUND_OVERRIDES_FILE.open("r", encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return {}
@@ -243,6 +271,8 @@ def clear_taxonomy_cache() -> None:
     load_group_logic.cache_clear()
     load_organic_groups.cache_clear()
     load_organic_compounds.cache_clear()
+    load_compound_generation_rules.cache_clear()
+    load_compound_overrides.cache_clear()
     load_scaffold_motifs.cache_clear()
     load_featurizer_logic.cache_clear()
     load_synthons.cache_clear()
@@ -266,6 +296,8 @@ __all__ = [
     "load_group_logic",
     "load_organic_groups",
     "load_organic_compounds",
+    "load_compound_generation_rules",
+    "load_compound_overrides",
     "load_scaffold_motifs",
     "load_featurizer_logic",
     "load_synthons",

@@ -7,6 +7,7 @@ import pytest
 
 from chemtools.featurizers.motifs.registry import _default_registry_paths, build_compound_registry
 from chemtools.featurizers.nearby_groups import _resolve_group_id
+from chemtools.taxonomy import loader as taxonomy_loader
 from chemtools.taxonomy.substituent_composer import (
     compose_groups_from_fragments,
     load_organic_groups_with_compositions,
@@ -21,9 +22,7 @@ def _taxonomy_data_dir() -> Path:
 
 
 def _load_compounds() -> list[dict]:
-    data_dir = _taxonomy_data_dir()
-    compounds_path = data_dir / "organic_compounds.v1.3.json"
-    payload = json.loads(compounds_path.read_text(encoding="utf-8"))
+    payload = taxonomy_loader.load_organic_compounds()
     return [entry for entry in (payload.get("compounds") or []) if isinstance(entry, dict)]
 
 

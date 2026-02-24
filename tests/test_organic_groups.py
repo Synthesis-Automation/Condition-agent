@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from chemtools.taxonomy import loader as taxonomy_loader
 from chemtools.util import rdkit_helpers
 from chemtools.util.smarts_cache import compile_smarts
 
@@ -19,9 +20,7 @@ def _load_groups() -> dict:
 
 
 def _load_compound_pairs() -> set[tuple[str, str]]:
-    repo_root = Path(__file__).resolve().parents[1]
-    compounds_path = repo_root / "chemtools" / "taxonomy" / "data" / "organic_compounds.v1.3.json"
-    payload = json.loads(compounds_path.read_text(encoding="utf-8"))
+    payload = taxonomy_loader.load_organic_compounds()
     return {
         (str(entry.get("A") or ""), str(entry.get("B") or ""))
         for entry in payload.get("compounds", []) or []

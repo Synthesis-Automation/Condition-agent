@@ -20,6 +20,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Any
 
+from chemtools.taxonomy import loader as taxonomy_loader
 from chemtools.taxonomy.substituent_composer import (
     load_organic_groups_with_compositions,
     validate_substituent_fragments_payload,
@@ -57,7 +58,7 @@ class TaxonomyValidator:
     def __init__(self, taxonomy_dir: Path):
         self.taxonomy_dir = taxonomy_dir
         self.groups_file = taxonomy_dir / "organic_groups.v1.3.json"
-        self.compounds_file = taxonomy_dir / "organic_compounds.v1.3.json"
+        self.compounds_file = taxonomy_dir / "organic_compounds.v1.3.json"  # legacy snapshot (optional)
         
         self.groups: Dict[str, Any] = {}
         self.compounds: Dict[str, Any] = {}
@@ -94,11 +95,10 @@ class TaxonomyValidator:
             return False
             
         try:
-            with open(self.compounds_file, 'r', encoding='utf-8') as f:
-                compounds_data = json.load(f)
-                self.compounds_data = compounds_data
-                self.compounds_list = compounds_data.get('compounds', [])
-                print(f"✓ Loaded {len(self.compounds_list)} organic compounds from {self.compounds_file.name}")
+            compounds_data = taxonomy_loader.load_organic_compounds()
+            self.compounds_data = compounds_data
+            self.compounds_list = compounds_data.get('compounds', [])
+            print(f"✓ Loaded {len(self.compounds_list)} organic compounds from generated catalog")
         except Exception as e:
             self.errors.append(f"Failed to load compounds: {e}")
             return False
@@ -244,6 +244,8 @@ class TaxonomyValidator:
     
     def validate_dependencies(self) -> None:
         """Check version dependencies"""
+        if "depends_on" not in self.compounds_data:
+            return
         depends_on = self.compounds_data.get('depends_on', {})
         groups_version = depends_on.get('organic_groups')
         
@@ -298,13 +300,10 @@ class TaxonomyValidator:
                 f"  ✓ {comp_id}: removed redundant 'name' field"
             )
         
-        # Save the updated compounds file
-        try:
-            with open(self.compounds_file, 'w', encoding='utf-8') as f:
-                json.dump(self.compounds_data, f, indent=2, ensure_ascii=False)
-            print(f"\n✓ Updated {self.compounds_file.name} with {len(issues)} fixes")
-        except Exception as e:
-            self.errors.append(f"Failed to save fixes: {e}")
+        self.warnings.append(
+            "Fix mode is deprecated for generated compound catalog. Update "
+            "compound_generation_rules.v1.json or compound_overrides.v1.json instead."
+        )
     
     def validate_all(self, fix_mode: bool = False) -> bool:
         """Run all validations"""

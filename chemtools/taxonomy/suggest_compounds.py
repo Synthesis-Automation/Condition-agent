@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Any
 
+from chemtools.taxonomy import loader as taxonomy_loader
 from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
 
 
@@ -26,8 +27,6 @@ class CompoundSuggester:
     def __init__(self, taxonomy_dir: Path):
         self.taxonomy_dir = taxonomy_dir
         self.groups_file = taxonomy_dir / "organic_groups.v1.3.json"
-        self.compounds_file = taxonomy_dir / "organic_compounds.v1.3.json"
-        
         self.groups: Dict[str, Any] = {}
         self.scaffolds: Dict[str, Any] = {}
         self.substituents: Dict[str, Any] = {}
@@ -55,18 +54,17 @@ class CompoundSuggester:
             return False
             
         try:
-            with open(self.compounds_file, 'r', encoding='utf-8') as f:
-                compounds_data = json.load(f)
-                self.compounds_list = compounds_data.get('compounds', [])
-                
-                # Track existing A-B pairs
-                for compound in self.compounds_list:
-                    a = compound.get('A')
-                    b = compound.get('B')
-                    if a and b:
-                        self.existing_pairs.add((a, b))
-                        
-            print(f"✓ Loaded {len(self.compounds_list)} existing compounds")
+            compounds_data = taxonomy_loader.load_organic_compounds()
+            self.compounds_list = compounds_data.get('compounds', [])
+
+            # Track existing A-B pairs
+            for compound in self.compounds_list:
+                a = compound.get('A')
+                b = compound.get('B')
+                if a and b:
+                    self.existing_pairs.add((a, b))
+
+            print(f"✓ Loaded {len(self.compounds_list)} existing compounds (generated catalog)")
         except Exception as e:
             print(f"✗ Failed to load compounds: {e}")
             return False

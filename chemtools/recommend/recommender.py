@@ -42,6 +42,7 @@ from chemtools.recommend.reaction_key_utils import (
     normalize_reaction_events_text,
     serialize_reaction_events_payload,
 )
+from chemtools.taxonomy import loader as taxonomy_loader
 from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
 
 try:
@@ -1150,7 +1151,6 @@ def _normalize_reactant_values(values: Iterable[Any]) -> Tuple[str, str, str, Li
 
 _MOTIF_SPLIT_RE = re.compile(r"[|,]")
 _COMPOUND_LOGIC_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "compound_logic.json"
-_COMPOUND_SCOPE_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "organic_compounds.v1.3.json"
 _COMPOUND_GROUPS_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "organic_groups.v1.3.json"
 _SCAFFOLD_MOTIFS_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
 
@@ -1187,6 +1187,15 @@ _RULE_NON_CORE_QUERY_MOTIFS = {
     "R_acidic-H",
     "Inorganic",
 }
+
+
+@lru_cache(maxsize=1)
+def _load_compound_scope_payload() -> Dict[str, Any]:
+    try:
+        payload = taxonomy_loader.load_organic_compounds()
+    except Exception:
+        payload = {}
+    return payload if isinstance(payload, dict) else {}
 _HALIDE_SUFFIXES = {"Cl", "Br", "I", "F"}
 _ARYL_HALIDE_MOTIFS = {"Ar-F", "Ar-Cl", "Ar-Br", "Ar-I", "Ar-X"}
 _SPECTATOR_MATCH_WEIGHT = 0.7
@@ -1261,12 +1270,8 @@ def _load_scope_map() -> Dict[str, List[str]]:
     except Exception:
         pass
 
-    if not _COMPOUND_SCOPE_FILE.exists():
-        return {}
-    try:
-        with _COMPOUND_SCOPE_FILE.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-    except Exception:
+    payload = _load_compound_scope_payload()
+    if not payload:
         return {}
 
     compounds = payload.get("compounds") or []
@@ -1411,12 +1416,8 @@ def _load_aromatic_scaffold_ids() -> Set[str]:
 
 @lru_cache(maxsize=1)
 def _load_motif_compatibility_map() -> Dict[str, Set[str]]:
-    if not _COMPOUND_SCOPE_FILE.exists():
-        return {}
-    try:
-        with _COMPOUND_SCOPE_FILE.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-    except Exception:
+    payload = _load_compound_scope_payload()
+    if not payload:
         return {}
 
     aromatic_scaffolds = _load_aromatic_scaffold_ids()
@@ -1445,12 +1446,8 @@ def _load_motif_compatibility_map() -> Dict[str, Set[str]]:
 
 @lru_cache(maxsize=1)
 def _load_compound_tags() -> Dict[str, Set[str]]:
-    if not _COMPOUND_SCOPE_FILE.exists():
-        return {}
-    try:
-        with _COMPOUND_SCOPE_FILE.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-    except Exception:
+    payload = _load_compound_scope_payload()
+    if not payload:
         return {}
     group_tags = _load_group_tags()
     compounds = payload.get("compounds") or []
@@ -1473,12 +1470,8 @@ def _load_compound_tags() -> Dict[str, Set[str]]:
 
 @lru_cache(maxsize=1)
 def _load_compound_ids() -> Set[str]:
-    if not _COMPOUND_SCOPE_FILE.exists():
-        return set()
-    try:
-        with _COMPOUND_SCOPE_FILE.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-    except Exception:
+    payload = _load_compound_scope_payload()
+    if not payload:
         return set()
     compounds = payload.get("compounds") or []
     ids = set()

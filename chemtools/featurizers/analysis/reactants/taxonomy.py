@@ -12,6 +12,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
+from ....taxonomy import loader as taxonomy_loader
 from .._registry import clear_registry_cache, get_registry
 
 TAXONOMY_DATA_DIR = Path(__file__).resolve().parents[3] / "taxonomy" / "data"
@@ -23,6 +24,12 @@ def _load_reactant_types_raw() -> Dict[str, dict]:
     """Load reactant type definitions from registry or file."""
     registry = get_registry()
     if registry is None:
+        try:
+            payload = taxonomy_loader.load_organic_compounds()
+        except Exception:
+            payload = {}
+        if isinstance(payload, dict) and payload.get("compounds"):
+            return _load_reactant_types_from_compounds(payload.get("compounds") or [])
         return _load_reactant_types_from_file(REACTANT_TYPES_FILE)
 
     definitions: Dict[str, dict] = {}

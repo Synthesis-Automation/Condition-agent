@@ -1,2849 +1,2368 @@
 {
-  "version": "v1.3",
+  "version": "v1",
+  "legacy_version": "v1.3",
   "naming_set": "chemist_style",
-  "notes": "Compound motifs are built from `A` (scaffold) and `B` (substituent) with `template`.\nFor most motifs, `A` is the scaffold side and `B` is the functional group side; therefore `anchors` is optional.\nWhen present, `anchors` may override defaults; if absent, assume anchors.core='A' and anchors.fg='B'.\nAttachpoints are inferred from atom-maps in the referenced group `smarts` (see organic_groups v1.3).",
-  "compounds": [
+  "notes": "Documented A-B motif generation rules split from organic_compounds.v1.3.json. Use include_rules/deny_pairs to expand with blacklist-style controls; include_pairs preserves current parity.",
+  "defaults": {
+    "template": "single_bond"
+  },
+  "include_pairs": [
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-H",
       "description": "Aromatic C-H bond."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-H",
       "description": "Aliphatic sp3 C-H bond."
     },
     {
-      "template": "single_bond",
       "A": "R_acidic",
       "B": "-H",
       "description": "Acidic alkyl C-H bond (alpha to EWG)."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-H",
       "description": "Acetylenic C-H bond."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-H",
       "description": "Vinylic C-H bond."
     },
     {
-      "A": "H",
-      "B": "-NH2",
-      "smarts": "[NX3H3:1]",
-      "description": "Ammonia nucleophile motif (NH3) represented as allowlisted pseudo-scaffold H-NH2."
-    },
-    {
-      "A": "H",
-      "B": "-CONH2",
-      "smarts": "[CX3H1:1](=O)[NX3H2:2]",
-      "description": "Formamide motif (HCONH2) represented as allowlisted pseudo-scaffold H-CONH2."
-    },
-    {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-B(OR)2",
       "description": "Primary alkyl boronate ester (RCH2-B(OR)2)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-B(OR)2",
       "description": "Secondary alkyl boronate ester (R2CH-B(OR)2)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-B(OR)2",
       "description": "Tertiary alkyl boronate ester (R3C-B(OR)2)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-B(OH)2",
       "description": "Primary alkyl boronic acid (RCH2-B(OH)2)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-B(OH)2",
       "description": "Secondary alkyl boronic acid (R2CH-B(OH)2)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-B(OH)2",
       "description": "Tertiary alkyl boronic acid (R3C-B(OH)2)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-Sn*",
       "description": "Primary alkyl stannane (RCH2-Sn)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-Sn*",
       "description": "Secondary alkyl stannane (R2CH-Sn)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-Sn*",
       "description": "Tertiary alkyl stannane (R3C-Sn)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-Zn*",
       "description": "Primary alkyl zincate (RCH2-Zn)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-Zn*",
       "description": "Secondary alkyl zincate (R2CH-Zn)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-Zn*",
       "description": "Tertiary alkyl zincate (R3C-Zn)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-Mg*",
       "description": "Primary alkyl Grignard (RCH2-Mg)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-Mg*",
       "description": "Secondary alkyl Grignard (R2CH-Mg)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-Mg*",
       "description": "Tertiary alkyl Grignard (R3C-Mg)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "Ar",
       "description": "Biaryl (Ar-Ar) bond."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "Ar",
       "description": "Heterobiaryl (HeteroAr-Ar) bond."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "Alkenyl",
       "description": "Aryl-Alkenyl bond (e.g., styrene)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "Alkenyl",
       "description": "Alkyl-substituted alkene motif (Alkyl-Alkenyl)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "Alkenyl",
       "description": "Primary alkyl-substituted alkene motif (RCH2-Alkenyl)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "Alkenyl",
       "description": "Secondary alkyl-substituted alkene motif (R2CH-Alkenyl)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "Alkenyl",
       "description": "Tertiary alkyl-substituted alkene motif (R3C-Alkenyl)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "Alkenyl_terminal",
       "description": "Aryl-terminal alkenyl bond (e.g., styrene with terminal vinyl)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "Alkenyl",
       "description": "Alkenyl-Alkenyl bond (1,3-diene)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "Alkynyl_terminal",
       "description": "Aryl terminal alkyne (Ar-Alkynyl_terminal, e.g., phenylacetylene)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "Alkynyl",
       "description": "Aryl alkyne (Ar-Alkynyl, general)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "Alkyl",
-      "priority": 0,
-      "description": "Aryl-Alkyl bond (e.g., toluene, ethylbenzene)."
+      "description": "Aryl-Alkyl bond (e.g., toluene, ethylbenzene).",
+      "priority": 0
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Cl",
       "description": "Aryl chloride (Ar-Cl).",
       "reactivity_weight": 1.5
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Br",
       "description": "Aryl bromide (Ar-Br).",
       "reactivity_weight": 2.5
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-I",
       "description": "Aryl iodide (Ar-I).",
       "reactivity_weight": 3.0
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Iodonium",
       "description": "Aryl iodonium salt motif (Ar-Iodonium).",
       "reactivity_weight": 3.2
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-Cl",
       "description": "Heteroaryl chloride (HeteroAr-Cl).",
       "reactivity_weight": 1.5
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-Br",
       "description": "Heteroaryl bromide (HeteroAr-Br).",
       "reactivity_weight": 2.5
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-I",
       "description": "Heteroaryl iodide (HeteroAr-I).",
       "reactivity_weight": 3.0
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-Iodonium",
       "description": "Heteroaryl iodonium salt motif (HeteroAr-Iodonium).",
       "reactivity_weight": 3.2
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-F",
       "description": "Heteroaryl fluoride (HeteroAr-F).",
       "reactivity_weight": 1.0
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-OTf",
       "description": "Heteroaryl triflate (HeteroAr-OTf).",
       "reactivity_weight": 2.0
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-OMs",
       "description": "Heteroaryl mesylate (HeteroAr-OMs).",
       "reactivity_weight": 1.5
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-OTs",
       "description": "Heteroaryl tosylate (HeteroAr-OTs).",
       "reactivity_weight": 1.5
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-B(OH)2",
       "description": "Heteroaryl boronic acid (HeteroAr-B(OH)2).",
       "reactivity_weight": 2.0
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-B(OR)2",
       "description": "Heteroaryl boronate ester (HeteroAr-B(OR)2).",
       "reactivity_weight": 2.0
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-BF3K",
       "description": "Heteroaryl trifluoroborate (HeteroAr-BF3K).",
       "reactivity_weight": 2.0
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-H",
       "description": "Heteroaryl C-H bond (HeteroAr-H)."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-NH2",
       "description": "Heteroaryl amine (HeteroAr-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-NC",
       "description": "Heteroaryl isonitrile (HeteroAr-NC)."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-CN",
       "description": "Heteroaryl nitrile (HeteroAr-CN)."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-N2+",
       "description": "Heteroaryl diazonium cation (HeteroAr-N2+), intermediate for Sandmeyer reaction."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-NHR",
       "description": "Heteroaryl secondary amine (HeteroAr-NHR)."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-OH",
       "description": "Heteroaryl alcohol (HeteroAr-OH)."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-OR",
       "description": "Heteroaryl ether (HeteroAr-OR).",
       "reactivity_weight": 1.0
     },
     {
-      "template": "single_bond",
       "A": "AromN",
       "B": "-H",
       "description": "Aromatic N-H (e.g., pyrrole, indole N-H) (AromN-H)."
     },
     {
-      "template": "single_bond",
       "A": "AromN",
       "B": "-OH",
       "description": "Aromatic N-OH (e.g., N-hydroxy azoles) (AromN-OH)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-F",
       "description": "Aryl fluoride (Ar-F).",
       "reactivity_weight": 1.0
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-CF3",
       "description": "Benzotrifluoride (Ar-CF3)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-OCF3",
       "description": "Aryl trifluoromethylether (Ar-OCF3)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-Cl",
       "description": "Vinyl chloride (Alkenyl-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-Br",
       "description": "Vinyl bromide (Alkenyl-Br)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-I",
       "description": "Vinyl iodide (Alkenyl-I)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OTf",
       "description": "Vinyl triflate (Alkenyl-OTf)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-F",
       "description": "Vinyl/alkenyl fluoride (Alkenyl-F)."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-Cl",
       "description": "Benzylic chloride (Bn-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-Br",
       "description": "Benzylic bromide (Bn-Br)."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-I",
       "description": "Benzylic iodide (Bn-I)."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-Cl",
       "description": "Allyl chloride (Allyl-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-Br",
       "description": "Allyl bromide (Allyl-Br)."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-I",
       "description": "Allyl iodide (Allyl-I)."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-Cl",
       "description": "Propargylic chloride (Propargyl-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-Br",
       "description": "Propargylic bromide (Propargyl-Br)."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-I",
       "description": "Propargylic iodide (Propargyl-I)."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-H",
       "description": "Propargylic C-H bond."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-OTf",
       "description": "Propargylic triflate (Propargyl-OTf)."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-OTs",
       "description": "Propargylic tosylate (Propargyl-OTs)."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-OMs",
       "description": "Propargylic mesylate (Propargyl-OMs)."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-OSO2R",
       "description": "Propargylic sulfonate (Propargyl-OSO2R)."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-Cl",
       "description": "Alkynyl chloride (Alkynyl-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-Br",
       "description": "Alkynyl bromide (Alkynyl-Br)."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-I",
       "description": "Alkynyl iodide (Alkynyl-I)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-OTf",
       "description": "Aryl triflate (Ar-OTf); Aryl-O-triflate motif.",
       "reactivity_weight": 2.5
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-OTs",
       "description": "Aryl tosylate (Ar-OTs); Aryl-O-tosylate motif.",
       "reactivity_weight": 2.0
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-OMs",
       "description": "Aryl mesylate (Ar-OMs); Aryl-O-mesylate motif.",
       "reactivity_weight": 1.8
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-OSO2R",
       "description": "Aryl sulfonate (Ar-OSO2R)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-OSO2F",
       "description": "Aryl fluorosulfate (Ar-OSO2F)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OTs",
       "description": "Vinyl/alkenyl tosylate (Alkenyl-OTs); Vinyl/alkenyl-O-tosylate motif."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OMs",
       "description": "Vinyl/alkenyl mesylate (Alkenyl-OMs); Vinyl/alkenyl-O-mesylate motif."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OSO2R",
       "description": "Vinyl/alkenyl sulfonate (Alkenyl-OSO2R)."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-OTf",
       "description": "Benzylic triflate (Bn-OTf); Benzylic-O-triflate motif."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-OTs",
       "description": "Benzylic tosylate (Bn-OTs); Benzylic-O-tosylate motif."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-OMs",
       "description": "Benzylic mesylate (Bn-OMs); Benzylic-O-mesylate motif."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-OTf",
       "description": "Allyl triflate (Allyl-OTf); Allyl-O-triflate motif."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-OTs",
       "description": "Allyl tosylate (Allyl-OTs); Allyl-O-tosylate motif."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-OMs",
       "description": "Allyl mesylate (Allyl-OMs); Allyl-O-mesylate motif."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-B(OH)2",
       "description": "Aryl boronic acid (Ar-B(OH)2).",
       "reactivity_weight": 2.0
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-BF3K",
       "description": "Aryl trifluoroborate (Ar-BF3K).",
       "reactivity_weight": 2.0
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-BF3K",
       "description": "Alkenyl trifluoroborate (Alkenyl-BF3K)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-BF3K",
       "description": "Alkyl trifluoroborate (Alkyl-BF3K)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-B(OH)2",
       "description": "Alkyl boronic acid (Alkyl-B(OH)2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-B*",
       "description": "Alkyl organoboron (Alkyl-B*)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-B(OR)2",
       "description": "Alkyl boronate ester (Alkyl-B(OR)2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Sn*",
       "description": "Alkyl stannane (Alkyl-SnR3)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Si*",
       "description": "Alkyl silane (Alkyl-SiR3)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Zn*",
       "description": "Alkyl zincate (Alkyl-ZnX)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Mg*",
       "description": "Alkyl Grignard (Alkyl-MgX)."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-Si*",
       "description": "Alkynyl silane (Alkynyl-SiR3)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SR",
       "description": "Aryl thioether (Ar-SR)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-B*",
       "description": "Aryl organoboron (generic Ar-B*)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-N*",
       "description": "Aryl generic nitrogen-linked motif (Ar-N*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-O*",
       "description": "Aryl generic oxygen-linked motif (Ar-O*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-P*",
       "description": "Aryl generic phosphorus-linked motif (Ar-P*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-S*",
       "description": "Aryl generic sulfur-linked motif (Ar-S*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-N*",
       "description": "Heteroaryl generic nitrogen-linked motif (HeteroAr-N*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-O*",
       "description": "Heteroaryl generic oxygen-linked motif (HeteroAr-O*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-P*",
       "description": "Heteroaryl generic phosphorus-linked motif (HeteroAr-P*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "HeteroAr",
       "B": "-S*",
       "description": "Heteroaryl generic sulfur-linked motif (HeteroAr-S*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "AromN",
       "B": "-N*",
       "description": "Aromatic N scaffold generic nitrogen-linked motif (AromN-N*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "AromN",
       "B": "-O*",
       "description": "Aromatic N scaffold generic oxygen-linked motif (AromN-O*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "AromN",
       "B": "-P*",
       "description": "Aromatic N scaffold generic phosphorus-linked motif (AromN-P*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "AromN",
       "B": "-S*",
       "description": "Aromatic N scaffold generic sulfur-linked motif (AromN-S*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-N*",
       "description": "Alkyl generic nitrogen-linked motif (Alkyl-N*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-O*",
       "description": "Alkyl generic oxygen-linked motif (Alkyl-O*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-P*",
       "description": "Alkyl generic phosphorus-linked motif (Alkyl-P*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-S*",
       "description": "Alkyl generic sulfur-linked motif (Alkyl-S*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-N*",
       "description": "Alkenyl generic nitrogen-linked motif (Alkenyl-N*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-O*",
       "description": "Alkenyl generic oxygen-linked motif (Alkenyl-O*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-P*",
       "description": "Alkenyl generic phosphorus-linked motif (Alkenyl-P*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-S*",
       "description": "Alkenyl generic sulfur-linked motif (Alkenyl-S*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-N*",
       "description": "Alkynyl generic nitrogen-linked motif (Alkynyl-N*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-O*",
       "description": "Alkynyl generic oxygen-linked motif (Alkynyl-O*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-P*",
       "description": "Alkynyl generic phosphorus-linked motif (Alkynyl-P*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-S*",
       "description": "Alkynyl generic sulfur-linked motif (Alkynyl-S*), broad fallback."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-B(OH)2",
       "description": "Vinyl/alkenyl boronic acid (Alkenyl-B(OH)2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-B*",
       "description": "Vinyl/alkenyl organoboron (Alkenyl-B*)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-B(OR)2",
       "description": "Vinyl/alkenyl boronate ester (Alkenyl-B(OR)2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Sn*",
       "description": "Aryl stannane (generic Ar-SnR3).",
       "reactivity_weight": 2.0
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Si*",
       "description": "Aryl silane (generic Ar-SiR3).",
       "reactivity_weight": 1.5
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Zn*",
       "description": "Aryl zincate (generic Ar-ZnX).",
       "reactivity_weight": 2.5
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Mg*",
       "description": "Aryl Grignard (generic Ar-MgX).",
       "reactivity_weight": 2.5
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-Sn*",
       "description": "Vinyl/alkenyl stannane (Alkenyl-SnR3)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-Si*",
       "description": "Vinyl/alkenyl silane (Alkenyl-SiR3)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-Zn*",
       "description": "Vinyl/alkenyl zincate (Alkenyl-ZnX)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-Mg*",
       "description": "Vinyl/alkenyl Grignard (Alkenyl-MgX)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-CHO",
       "description": "Aryl aldehyde (Ar-CHO).",
       "reactivity_weight": 3.0
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-COR",
       "description": "Aryl ketone (Ar-COR)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-CN",
       "description": "Aryl nitrile (Ar-CN)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-NC",
       "description": "Aryl isonitrile (Ar-NC)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-NO2",
       "description": "Aryl nitro (Ar-NO2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-NH2",
       "description": "Aryl primary amine (Ar-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-N2+",
       "description": "Aryl diazonium cation (Ar-N2+), intermediate for Sandmeyer reaction."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-NHR",
       "description": "Aryl secondary amine (NHR) (Ar-NHR)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-NR2",
       "description": "Aryl tertiary amine (NR2) (Ar-NR2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "AromN",
       "description": "Aryl-substituted aromatic nitrogen (e.g., N-phenylpyrrole)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-OH",
       "description": "Aryl alcohol/phenol (Ar-OH)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-OR",
       "description": "Aryl ether (Ar-OR).",
       "reactivity_weight": 1.0
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SH",
       "description": "Aryl thiol (Ar-SH)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-COOH",
       "description": "Aryl carboxylic acid (Ar-COOH).",
       "reactivity_weight": 1.5
     },
     {
-      "template": "single_bond",
       "A": "Acyl",
       "B": "-COOH",
       "description": "Acyl carboxylic acid (Acyl-COOH), e.g., alpha-keto acids."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-COCl",
       "description": "Aryl acid chloride (Ar-COCl)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-COCl",
-      "priority": 6,
-      "description": "Alkyl acid chloride (Alkyl-COCl)."
+      "description": "Alkyl acid chloride (Alkyl-COCl).",
+      "priority": 6
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-COF",
       "description": "Aryl acid fluoride (Ar-COF)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-COF",
       "description": "Alkenyl acid fluoride (Alkenyl-COF)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-COF",
-      "priority": 6,
-      "description": "Alkyl acid fluoride (Alkyl-COF)."
+      "description": "Alkyl acid fluoride (Alkyl-COF).",
+      "priority": 6
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-COBr",
       "description": "Aryl acid bromide (Ar-COBr)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-COI",
       "description": "Aryl acid iodide (Ar-COI)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-COOR",
       "description": "Aryl ester (Ar-COOR)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-CONH2",
       "description": "Aryl primary amide (Ar-CONH2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-CONHNH2",
       "description": "Aryl acyl hydrazide (Ar-CONHNH2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-CON3",
       "description": "Aryl acyl azide (Ar-CON3)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-CONHR",
       "description": "Aryl secondary amide (Ar-CONHR)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-CONR2",
       "description": "Aryl tertiary amide (Ar-CONR2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SO2NH2",
       "description": "Aryl primary sulfonamide (Ar-SO2NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SO2NHNH2",
       "description": "Aryl sulfonylhydrazide (Ar-SO2NHNH2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SO2NHR",
       "description": "Aryl secondary sulfonamide (Ar-SO2NHR)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SO2NR2",
       "description": "Aryl tertiary sulfonamide (Ar-SO2NR2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SO2Cl",
       "description": "Aryl sulfonyl chloride (Ar-SO2Cl)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SO2F",
       "description": "Aryl sulfonyl fluoride (Ar-SO2F)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SO2Br",
       "description": "Aryl sulfonyl bromide (Ar-SO2Br)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-SO2I",
       "description": "Aryl sulfonyl iodide (Ar-SO2I)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Sulfamide",
       "description": "Aryl sulfamide (Ar-Sulfamide)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Urea",
       "description": "Aryl urea (Ar-Urea)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Thiourea",
       "description": "Aryl thiourea (Ar-Thiourea)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Thiourea",
       "description": "Alkyl thiourea (Alkyl-Thiourea)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-Thiourea",
       "description": "Alkenyl thiourea (Alkenyl-Thiourea)."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-Thiourea",
       "description": "Alkynyl thiourea (Alkynyl-Thiourea)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-NHCOR",
       "description": "N-Aryl amide (Ar-NHCOR)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-NRCOR",
       "description": "N-Aryl amide (Ar-NRCOR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-CHO",
       "description": "Vinyl/alkenyl aldehyde (Alkenyl-CHO)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-COR",
       "description": "Vinyl/alkenyl ketone (Alkenyl-COR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-CN",
       "description": "Vinyl/alkenyl nitrile (Alkenyl-CN)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-NO2",
       "description": "Vinyl/alkenyl nitro (Alkenyl-NO2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-NH2",
       "description": "Vinyl/alkenyl primary amine (Alkenyl-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OH",
       "description": "Vinyl/alkenyl alcohol/enol (Alkenyl-OH)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-COOH",
       "description": "Vinyl/alkenyl carboxylic acid (Alkenyl-COOH)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-COOR",
       "description": "Vinyl/alkenyl ester (Alkenyl-COOR)."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-OH",
       "description": "Benzylic alcohol (Bn-OH)."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-NH2",
       "description": "Benzylic amine (Bn-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-NHR",
       "description": "Benzylic amine (NHR) (Bn-NHR)."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-NR2",
       "description": "Benzylic amine (NR2) (Bn-NR2)."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-CN",
       "description": "Benzylic nitrile (Bn-CN)."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-OH",
       "description": "Allyl alcohol (Allyl-OH)."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-NH2",
       "description": "Allyl amine (Allyl-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-OH",
       "description": "Propargylic alcohol (Propargyl-OH)."
     },
     {
-      "template": "single_bond",
       "A": "Propargyl",
       "B": "-NH2",
       "description": "Propargylic amine (Propargyl-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-NHR",
       "description": "Allyl amine (NHR) (Allyl-NHR)."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-NR2",
       "description": "Allyl amine (NR2) (Allyl-NR2)."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-CN",
       "description": "Allyl nitrile (Allyl-CN)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-CN",
       "description": "Acetonitrile (CH3-CN)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-CN",
       "description": "Primary alkyl nitrile (RCH2-CN)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-CN",
       "description": "Secondary alkyl nitrile (R2CH-CN)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-CN",
       "description": "Tertiary alkyl nitrile (R3C-CN)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-NH2",
       "description": "Methyl primary amine (CH3-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-NHR",
       "description": "Methyl secondary amine (CH3-NHR)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-NR2",
       "description": "Methyl tertiary amine (CH3-NR2)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-NH2",
       "description": "Primary alkyl primary amine (RCH2-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-NH2",
       "description": "Secondary alkyl primary amine (R2CH-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-NH2",
       "description": "Tertiary alkyl primary amine (R3C-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-NHR",
       "description": "Primary alkyl secondary amine (RCH2-NHR)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-NHR",
       "description": "Secondary alkyl secondary amine (R2CH-NHR)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-NHR",
       "description": "Tertiary alkyl secondary amine (R3C-NHR)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-NR2",
       "description": "Primary alkyl tertiary amine (RCH2-NR2)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-NR2",
       "description": "Secondary alkyl tertiary amine (R2CH-NR2)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-NR2",
       "description": "Tertiary alkyl tertiary amine (R3C-NR2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-NH2",
       "description": "Generic alkyl primary amine (Alkyl-NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-NHR",
       "description": "Generic alkyl secondary amine (Alkyl-NHR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-NR2",
       "description": "Generic alkyl tertiary amine (Alkyl-NR2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "AromN",
       "description": "Alkyl-substituted aromatic nitrogen (e.g., N-methylpyrrole)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-OR",
       "description": "Primary alkyl ether (RCH2-OR)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-OR",
       "description": "Secondary alkyl ether (R2CH-OR)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-OR",
       "description": "Tertiary alkyl ether (R3C-OR)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-SH",
       "description": "Methanethiol (CH3-SH)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-SR",
       "description": "Methyl sulfide (CH3-SR)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-SH",
       "description": "Primary alkyl thiol (RCH2-SH)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-SH",
       "description": "Secondary alkyl thiol (R2CH-SH)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-SH",
       "description": "Tertiary alkyl thiol (R3C-SH)."
     },
     {
-      "id": "Thiocarbonyl-SH",
-      "smarts": "[#6;$([#6](=[S,O])[#7,#8,#6]):1]-[S;H1:2]",
-      "description": "Thiocarbonyl thiol (R-C(=S/O)-SH, e.g., dithiocarbamate).",
-      "reactivity_weight": 582.0
-    },
-    {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-OH",
       "description": "Methanol (CH3-OH)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-OR",
       "description": "Methyl ether (CH3-OR)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-OH",
       "description": "Primary alcohol functional group (generic)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-OH",
       "description": "Secondary alcohol functional group (generic)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-OH",
       "description": "Tertiary alcohol functional group (generic)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-COOH",
       "description": "Primary alkyl carboxylic acid (RCH2-COOH)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-COOH",
       "description": "Secondary alkyl carboxylic acid (R2CH-COOH)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-COOH",
       "description": "Tertiary alkyl carboxylic acid (R3C-COOH)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-CHO",
       "description": "Primary alkyl aldehyde (RCH2-CHO)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-CHO",
       "description": "Secondary alkyl aldehyde (R2CH-CHO)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-CHO",
       "description": "Tertiary alkyl aldehyde (R3C-CHO)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-COOR",
       "description": "Primary alkyl ester (RCH2-Ester)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-COOR",
       "description": "Secondary alkyl ester (R2CH-Ester)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-COOR",
       "description": "Tertiary alkyl ester (R3C-Ester)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-Cl",
       "description": "Methyl chloride (CH3-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-Br",
       "description": "Methyl bromide (CH3-Br)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-I",
       "description": "Methyl iodide (CH3-I)."
     },
     {
-      "template": "single_bond",
       "A": "CH3",
       "B": "-F",
       "description": "Methyl fluoride (CH3-F)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-PR3+",
       "description": "Primary alkyl phosphonium salt (RCH2-PR3+)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-Cl",
       "description": "Primary alkyl chloride (RCH2-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-Br",
       "description": "Primary alkyl bromide (RCH2-Br)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-I",
       "description": "Primary alkyl iodide (RCH2-I)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-F",
       "description": "Primary alkyl fluoride (RCH2-F)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-Cl",
       "description": "Secondary alkyl chloride (R2CH-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-Br",
       "description": "Secondary alkyl bromide (R2CH-Br)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-I",
       "description": "Secondary alkyl iodide (R2CH-I)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-F",
       "description": "Secondary alkyl fluoride (R2CH-F)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-Cl",
       "description": "Tertiary alkyl chloride (R3C-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-Br",
       "description": "Tertiary alkyl bromide (R3C-Br)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-I",
       "description": "Tertiary alkyl iodide (R3C-I)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-F",
       "description": "Tertiary alkyl fluoride (R3C-F)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-NO2",
       "description": "Primary alkyl nitro (RCH2-NO2)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-NO2",
       "description": "Secondary alkyl nitro (R2CH-NO2)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-NO2",
       "description": "Tertiary alkyl nitro (R3C-NO2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Hydrazine",
       "description": "Alkyl hydrazine (Alkyl-N-N subunit)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Hydrazine",
       "description": "Aryl hydrazine (Ar-N-N subunit)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Hydrazide",
-      "priority": 6,
-      "description": "Alkyl hydrazide (Alkyl-CONHNH2)."
+      "description": "Alkyl hydrazide (Alkyl-CONHNH2).",
+      "priority": 6
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-Hydrazide",
-      "priority": 8,
-      "description": "Aryl hydrazide (Ar-CONHNH2)."
+      "description": "Aryl hydrazide (Ar-CONHNH2).",
+      "priority": 8
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-NHCOR",
       "description": "Alkyl amide (Alkyl-NHCOR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-NRCOR",
       "description": "Alkyl amide (Alkyl-NRCOR)."
     },
     {
-      "template": "single_bond",
       "A": "Acyl",
       "B": "-Cl",
       "description": "Acyl chloride motif (C(=O)-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "Acyl",
       "B": "-Br",
       "description": "Acyl bromide motif (C(=O)-Br)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Cl",
       "description": "Alkyl chloride (Alkyl-Cl)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-Br",
       "description": "Alkyl bromide (Alkyl-Br)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-I",
       "description": "Alkyl iodide (Alkyl-I)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-F",
       "description": "Alkyl fluoride (Alkyl-F)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-CF3",
       "description": "Alkyl trifluoromethyl (Alkyl-CF3)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-OTf",
       "description": "Alkyl triflate (Alkyl-OTf, i.e., R-O-SO2CF3)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-OTs",
       "description": "Alkyl tosylate (Alkyl-OTs, i.e., R-O-SO2Ar)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-OMs",
       "description": "Alkyl mesylate (Alkyl-OMs, i.e., R-O-SO2Me)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-OSO2R",
       "description": "Alkyl sulfonate (Alkyl-OSO2R)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "Alkynyl_terminal",
       "description": "Alkyl terminal alkyne (Alkyl-Alkynyl_terminal)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "Alkynyl",
       "description": "Alkyl alkyne (Alkyl-Alkynyl, general)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-OH",
       "description": "Alkyl alcohol (Alkyl-OH)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-SH",
       "description": "Alkyl thiol (Alkyl-SH)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-CN",
       "description": "Alkyl nitrile (Alkyl-CN)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-COOH",
       "description": "Alkyl carboxylic acid (Alkyl-COOH)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-CHO",
       "description": "Alkyl aldehyde (Alkyl-CHO)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-COR",
       "description": "Alkyl ketone (Alkyl-COR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-COOR",
       "description": "Alkyl ester (Alkyl-COOR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-CONH2",
       "description": "Alkyl primary amide (Alkyl-CONH2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-OCONH2",
       "description": "Alkyl primary carbamate (Alkyl-OCONH2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-CONHNH2",
       "description": "Alkyl acyl hydrazide (Alkyl-CONHNH2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-CON3",
       "description": "Alkyl acyl azide (Alkyl-CON3)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-CONHR",
       "description": "Alkyl secondary amide (Alkyl-CONHR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-CONR2",
       "description": "Alkyl tertiary amide (Alkyl-CONR2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-LactamN",
       "description": "N-Aryl lactam (Ar-LactamN)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-PR3+",
       "description": "Aryl phosphonium salt (Ar-PR3+)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-PR2",
       "description": "Aryl phosphine (Ar-PR2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-PR2",
       "description": "Alkyl phosphine (Alkyl-PR2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-C=N",
       "description": "Aryl imino group (Ar-Imino)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-B(OR)2",
       "description": "Aryl boronate ester (Ar-B(OR)2).",
       "reactivity_weight": 2.0
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-N3",
       "description": "Aryl azide (Ar-N3)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-OR",
       "description": "Alkyl ether (Alkyl-OR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-SO2Cl",
       "description": "Alkyl sulfonyl chloride (Alkyl-SO2Cl)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-SO2NR2",
       "description": "Alkyl tertiary sulfonamide (Alkyl-SO2NR2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-SO2NHR",
       "description": "Alkyl secondary sulfonamide (Alkyl-SO2NHR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-SO2NH2",
       "description": "Alkyl primary sulfonamide (Alkyl-SO2NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-SO2NHNH2",
       "description": "Alkyl sulfonylhydrazide (Alkyl-SO2NHNH2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-N3",
       "description": "R group paired with N3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-N3",
       "description": "RCH2 group paired with N3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-N3",
       "description": "R2CH group paired with N3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-N3",
       "description": "R3C group paired with N3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-N3",
       "description": "Bn group paired with N3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-N3",
       "description": "Allyl group paired with N3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-N3",
       "description": "Alkenyl group paired with N3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-N3",
       "description": "Alkynyl group paired with N3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-CON3",
       "description": "RCH2 group paired with CON3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-CON3",
       "description": "R2CH group paired with CON3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-CON3",
       "description": "R3C group paired with CON3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-CON3",
       "description": "Bn group paired with CON3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-CON3",
       "description": "Allyl group paired with CON3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-CON3",
       "description": "Alkenyl group paired with CON3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-CON3",
       "description": "Alkynyl group paired with CON3 substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-CONHR",
       "description": "RCH2 group paired with CONHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-CONHR",
       "description": "R2CH group paired with CONHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-CONHR",
       "description": "R3C group paired with CONHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-CONHR",
       "description": "Bn group paired with CONHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-CONHR",
       "description": "Allyl group paired with CONHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-CONHR",
       "description": "Alkenyl group paired with CONHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-CONHR",
       "description": "Alkynyl group paired with CONHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-CONH2",
       "description": "RCH2 group paired with CONH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-CONH2",
       "description": "R2CH group paired with CONH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-CONH2",
       "description": "R3C group paired with CONH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-CONH2",
       "description": "Bn group paired with CONH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-CONH2",
       "description": "Allyl group paired with CONH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-CONH2",
       "description": "Alkenyl group paired with CONH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-CONH2",
       "description": "Alkynyl group paired with CONH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-CONHNH2",
       "description": "RCH2 group paired with CONHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-CONHNH2",
       "description": "R2CH group paired with CONHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-CONHNH2",
       "description": "R3C group paired with CONHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-CONHNH2",
       "description": "Bn group paired with CONHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-CONHNH2",
       "description": "Allyl group paired with CONHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-CONHNH2",
       "description": "Alkenyl group paired with CONHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-CONHNH2",
       "description": "Alkynyl group paired with CONHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-CONR2",
       "description": "RCH2 group paired with CONR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-CONR2",
       "description": "R2CH group paired with CONR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-CONR2",
       "description": "R3C group paired with CONR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-CONR2",
       "description": "Bn group paired with CONR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-CONR2",
       "description": "Allyl group paired with CONR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-CONR2",
       "description": "Alkenyl group paired with CONR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-CONR2",
       "description": "Alkynyl group paired with CONR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-COOR",
       "description": "Bn group paired with COOR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-COOR",
       "description": "Allyl group paired with COOR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-COOR",
       "description": "Alkynyl group paired with COOR substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-COR",
       "description": "RCH2 group paired with COR substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-COR",
       "description": "R2CH group paired with COR substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-COR",
       "description": "R3C group paired with COR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-COR",
       "description": "Bn group paired with COR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-COR",
       "description": "Allyl group paired with COR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-COR",
       "description": "Alkynyl group paired with COR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-CN",
       "description": "Alkynyl group paired with CN substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-NO2",
       "description": "R group paired with NO2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-NO2",
       "description": "Bn group paired with NO2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-NO2",
       "description": "Allyl group paired with NO2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-NO2",
       "description": "Alkynyl group paired with NO2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-OR",
       "description": "Bn group paired with OR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-OR",
       "description": "Allyl group paired with OR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OR",
       "description": "Alkenyl group paired with OR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-OR",
       "description": "Alkynyl group paired with OR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-SR",
       "description": "R group paired with SR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-OCSSR",
       "description": "Aryl O-thiocarbonate (Ar-OCSSR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-OCSSR",
       "description": "Alkyl O-thiocarbonate (Alkyl-OCSSR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-OCSSR",
       "description": "Alkenyl O-thiocarbonate (Alkenyl-OCSSR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-OCSSR",
       "description": "Alkynyl O-thiocarbonate (Alkynyl-OCSSR)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-SR",
       "description": "RCH2 group paired with SR substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-SR",
       "description": "R2CH group paired with SR substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-SR",
       "description": "R3C group paired with SR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-SR",
       "description": "Bn group paired with SR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-SR",
       "description": "Allyl group paired with SR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-SR",
       "description": "Alkenyl group paired with SR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-SR",
       "description": "Alkynyl group paired with SR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-SO2R",
       "description": "R group paired with SO2R substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-SO2R",
       "description": "RCH2 group paired with SO2R substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-SO2R",
       "description": "R2CH group paired with SO2R substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-SO2R",
       "description": "R3C group paired with SO2R substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-SO2R",
       "description": "Bn group paired with SO2R substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-SO2R",
       "description": "Allyl group paired with SO2R substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-SO2R",
       "description": "Alkenyl group paired with SO2R substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-SO2R",
       "description": "Alkynyl group paired with SO2R substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-SO2NHR",
       "description": "RCH2 group paired with SO2NHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-SO2NHR",
       "description": "R2CH group paired with SO2NHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-SO2NHR",
       "description": "R3C group paired with SO2NHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-SO2NHR",
       "description": "Bn group paired with SO2NHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-SO2NHR",
       "description": "Allyl group paired with SO2NHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-SO2NHR",
       "description": "Alkenyl group paired with SO2NHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-SO2NHR",
       "description": "Alkynyl group paired with SO2NHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-SO2NHNH2",
       "description": "RCH2 group paired with SO2NHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-SO2NHNH2",
       "description": "R2CH group paired with SO2NHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-SO2NHNH2",
       "description": "R3C group paired with SO2NHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-SO2NHNH2",
       "description": "Bn group paired with SO2NHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-SO2NHNH2",
       "description": "Allyl group paired with SO2NHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-SO2NHNH2",
       "description": "Alkenyl group paired with SO2NHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-SO2NHNH2",
       "description": "Alkynyl group paired with SO2NHNH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-SO2NR2",
       "description": "RCH2 group paired with SO2NR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-SO2NR2",
       "description": "R2CH group paired with SO2NR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-SO2NR2",
       "description": "R3C group paired with SO2NR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-SO2NR2",
       "description": "Bn group paired with SO2NR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-SO2NR2",
       "description": "Allyl group paired with SO2NR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-SO2NR2",
       "description": "Alkenyl group paired with SO2NR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-SO2NR2",
       "description": "Alkynyl group paired with SO2NR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-NHR",
       "description": "Alkenyl group paired with NHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-NHR",
       "description": "Alkynyl group paired with NHR substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-NH2",
       "description": "Alkynyl group paired with NH2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-NR2",
       "description": "Alkenyl group paired with NR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-NR2",
       "description": "Alkynyl group paired with NR2 substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-OH",
       "description": "Alkynyl group paired with OH substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-SH",
       "description": "Bn group paired with SH substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-SH",
       "description": "Allyl group paired with SH substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-SH",
       "description": "Alkenyl group paired with SH substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-SH",
       "description": "Alkynyl group paired with SH substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-F",
       "description": "Bn group paired with F substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-F",
       "description": "Allyl group paired with F substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-F",
       "description": "Alkynyl group paired with F substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-LactamN",
       "description": "R group paired with LactamN substituent."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-LactamN",
       "description": "RCH2 group paired with LactamN substituent."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-LactamN",
       "description": "R2CH group paired with LactamN substituent."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-LactamN",
       "description": "R3C group paired with LactamN substituent."
     },
     {
-      "template": "single_bond",
       "A": "Bn",
       "B": "-LactamN",
       "description": "Bn group paired with LactamN substituent."
     },
     {
-      "template": "single_bond",
       "A": "Allyl",
       "B": "-LactamN",
       "description": "Allyl group paired with LactamN substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkenyl",
       "B": "-LactamN",
       "description": "Alkenyl group paired with LactamN substituent."
     },
     {
-      "template": "single_bond",
       "A": "Alkynyl",
       "B": "-LactamN",
       "description": "Alkynyl group paired with LactamN substituent."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-PO2OH",
       "description": "Aryl phosphoryl acid motif (Ar-PO2OH)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-PO2OR",
       "description": "Aryl phosphate ester motif (Ar-PO2OR)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-PO2NH2",
       "description": "Aryl phosphoramidate motif (Ar-PO2NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-PO2NHR",
       "description": "Aryl secondary phosphoramidate motif (Ar-PO2NHR)."
     },
     {
-      "template": "single_bond",
       "A": "Ar",
       "B": "-PO2NR2",
       "description": "Aryl tertiary phosphoramidate motif (Ar-PO2NR2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-PO2OH",
       "description": "Alkyl phosphoryl acid motif (Alkyl-PO2OH)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-PO2OR",
       "description": "Alkyl phosphate ester motif (Alkyl-PO2OR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-PO2NH2",
       "description": "Alkyl phosphoramidate motif (Alkyl-PO2NH2)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-PO2NHR",
       "description": "Alkyl secondary phosphoramidate motif (Alkyl-PO2NHR)."
     },
     {
-      "template": "single_bond",
       "A": "Alkyl",
       "B": "-PO2NR2",
       "description": "Alkyl tertiary phosphoramidate motif (Alkyl-PO2NR2)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-PO2OH",
       "description": "Primary alkyl phosphoryl acid motif (RCH2-PO2OH)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-PO2OR",
       "description": "Primary alkyl phosphate ester motif (RCH2-PO2OR)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-PO2NH2",
       "description": "Primary alkyl phosphoramidate motif (RCH2-PO2NH2)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-PO2NHR",
       "description": "Primary alkyl secondary phosphoramidate motif (RCH2-PO2NHR)."
     },
     {
-      "template": "single_bond",
       "A": "RCH2",
       "B": "-PO2NR2",
       "description": "Primary alkyl tertiary phosphoramidate motif (RCH2-PO2NR2)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-PO2OH",
       "description": "Secondary alkyl phosphoryl acid motif (R2CH-PO2OH)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-PO2OR",
       "description": "Secondary alkyl phosphate ester motif (R2CH-PO2OR)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-PO2NH2",
       "description": "Secondary alkyl phosphoramidate motif (R2CH-PO2NH2)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-PO2NHR",
       "description": "Secondary alkyl secondary phosphoramidate motif (R2CH-PO2NHR)."
     },
     {
-      "template": "single_bond",
       "A": "R2CH",
       "B": "-PO2NR2",
       "description": "Secondary alkyl tertiary phosphoramidate motif (R2CH-PO2NR2)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-PO2OH",
       "description": "Tertiary alkyl phosphoryl acid motif (R3C-PO2OH)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-PO2OR",
       "description": "Tertiary alkyl phosphate ester motif (R3C-PO2OR)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-PO2NH2",
       "description": "Tertiary alkyl phosphoramidate motif (R3C-PO2NH2)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-PO2NHR",
       "description": "Tertiary alkyl secondary phosphoramidate motif (R3C-PO2NHR)."
     },
     {
-      "template": "single_bond",
       "A": "R3C",
       "B": "-PO2NR2",
       "description": "Tertiary alkyl tertiary phosphoramidate motif (R3C-PO2NR2)."
     }
   ],
-  "depends_on": {
-    "organic_groups": "v1.3",
-    "smarts_templates": "smarts_templates.v1.json"
-  }
+  "include_rules": [],
+  "deny_pairs": []
 }
-

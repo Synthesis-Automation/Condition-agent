@@ -3,6 +3,7 @@ from pathlib import Path
 
 from chemtools.featurizers.calculable import classify_reactant_smiles, get_reactant_type_features
 from chemtools.featurizers.molecule import featurize_molecule
+from chemtools.taxonomy import loader as taxonomy_loader
 
 
 def _taxonomy_data_dir() -> Path:
@@ -19,8 +20,7 @@ def test_h_scaffold_exists_for_allowlisted_pseudo_motifs() -> None:
 
 
 def test_only_allowlisted_h_compounds_exist() -> None:
-    path = _taxonomy_data_dir() / "organic_compounds.v1.3.json"
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload = taxonomy_loader.load_organic_compounds()
     compounds = [entry for entry in (payload.get("compounds") or []) if isinstance(entry, dict)]
 
     found = set()

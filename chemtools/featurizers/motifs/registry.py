@@ -7,6 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
+from chemtools.taxonomy.compound_catalog import build_documented_compound_catalog
 from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
 from chemtools.util.smarts_cache import compile_smarts
 
@@ -265,7 +266,13 @@ def _load_compounds(path: Path) -> List[Dict[str, Any]]:
     
     Auto-generates compound IDs from A+B if not specified.
     """
-    payload = _load_json(path)
+    canonical_organic_compounds = (
+        Path(__file__).resolve().parents[2] / "taxonomy" / "data" / "organic_compounds.v1.3.json"
+    ).resolve()
+    if path.resolve() == canonical_organic_compounds:
+        payload = build_documented_compound_catalog()
+    else:
+        payload = _load_json(path)
     compounds = list(payload.get("compounds") or [])
     for entry in compounds:
         if not isinstance(entry, dict):
