@@ -12,7 +12,8 @@ un-mapped atoms follow their mapped neighbours automatically.
 Each entry contains:
   name          : unique identifier
   hte_families  : list of HTE CSV family stem(s) this template covers
-  taxonomy_id   : canonical taxonomy cross-reference (reaction_registry.py)
+  taxonomy_family_id : preferred canonical taxonomy family link (v2)
+  taxonomy_id   : legacy compatibility field (normalized to canonical family ID at load)
   retro_smarts  : retrosynthetic SMARTS (product >> precursor(s))
   description   : human-readable
   difficulty    : 0.0–1.0
@@ -20,21 +21,43 @@ Each entry contains:
   notes         : chemistry notes and caveats (optional)
   category      : reaction class grouping (for browsing / filtering)
 
-Data is loaded from chemtools/retro/data/hte_templates.json at import
-time so the library is easy to extend without editing Python source.
+Data is loaded from the taxonomy-owned file
+``chemtools/taxonomy/data/hte_templates.json`` at import time so the library
+is easy to extend without editing Python source.
 """
 from __future__ import annotations
 
-import json
-import pathlib
 from typing import Any, Dict, List, Optional
 
-_DATA_FILE = pathlib.Path(__file__).parent.parent / "taxonomy" / "data" / "hte_templates.json"
+
+def get_template_taxonomy_id(template: Dict[str, Any]) -> str:
+    """Return canonical taxonomy family ID for a template (v2-first, v1 fallback)."""
+    if not isinstance(template, dict):
+        return ""
+    return str(template.get("taxonomy_family_id") or template.get("taxonomy_id") or "")
 
 
 def _load() -> List[Dict[str, Any]]:
-    with open(_DATA_FILE, encoding="utf-8") as fh:
-        return json.load(fh)["templates"]
+    from chemtools.taxonomy import loader as taxonomy_loader
+
+    payload = taxonomy_loader.load_hte_templates()
+    entries = payload.get("templates") if isinstance(payload, dict) else None
+    if not isinstance(entries, list):
+        return []
+
+    normalized: List[Dict[str, Any]] = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        item = dict(entry)
+        canonical_tid = get_template_taxonomy_id(item)
+        if canonical_tid:
+            # Keep legacy field populated with canonical family ID for callers that
+            # still read `taxonomy_id` only during migration.
+            item["taxonomy_family_id"] = canonical_tid
+            item["taxonomy_id"] = canonical_tid
+        normalized.append(item)
+    return normalized
 
 
 HTE_TEMPLATES: List[Dict[str, Any]] = _load()

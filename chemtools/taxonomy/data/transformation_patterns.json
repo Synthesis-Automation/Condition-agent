@@ -55,6 +55,14 @@
       "examples": ["R-CH2-CH2-OH → R-CH=CH2 (+ H2O)", "R-CH2-CH2-Br + base → R-CH=CH2 (+ HBr)"]
     }
   },
+
+  "reaction_pattern_aliases": {
+    "Click_azide_alkyne_cycloaddition": "Click_cuaac",
+    "Wacker_oxidation": [
+      "Wacker_oxidation_terminal_alkene_to_ketone",
+      "Wacker_oxidation_internal_alkene_to_ketone"
+    ]
+  },
   
   "reaction_patterns": {
     "Suzuki_miyaura": {

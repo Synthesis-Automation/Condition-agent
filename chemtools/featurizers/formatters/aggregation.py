@@ -163,14 +163,102 @@ def _broad_fingerprint_changed_ids(
 @lru_cache(maxsize=1)
 def load_transformation_patterns() -> Dict[str, Any]:
     """Load transformation patterns from taxonomy."""
-    path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "transformation_patterns.json"
-    if not path.exists():
-        return {}
     try:
-        with path.open("r", encoding="utf-8", errors="replace") as handle:
-            return json.load(handle)
+        from chemtools.taxonomy import loader as taxonomy_loader
+
+        payload = taxonomy_loader.load_transformation_patterns()
+        return payload if isinstance(payload, dict) else {}
     except Exception:
         return {}
+
+
+def _dedupe_str_list(values: Iterable[Any]) -> List[str]:
+    out: List[str] = []
+    seen: Set[str] = set()
+    for value in values:
+        text = str(value or "").strip()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        out.append(text)
+    return out
+
+
+def _resolve_transformation_pattern_info(
+    reaction_type: Optional[str],
+    patterns_payload: Dict[str, Any],
+) -> Optional[Dict[str, Any]]:
+    if not reaction_type or not isinstance(patterns_payload, dict):
+        return None
+
+    reaction_patterns = patterns_payload.get("reaction_patterns") or {}
+    if not isinstance(reaction_patterns, dict):
+        return None
+
+    direct = reaction_patterns.get(reaction_type)
+    if isinstance(direct, dict):
+        return direct
+
+    alias_map = patterns_payload.get("reaction_pattern_aliases") or {}
+    alias_targets = alias_map.get(reaction_type) if isinstance(alias_map, dict) else None
+
+    canonical_reaction_type: Optional[str] = None
+    try:
+        from chemtools.taxonomy.reaction_catalog import resolve_reaction_type
+
+        canonical_reaction_type = resolve_reaction_type(reaction_type)
+    except Exception:
+        canonical_reaction_type = None
+
+    if canonical_reaction_type and canonical_reaction_type != reaction_type:
+        canonical_direct = reaction_patterns.get(canonical_reaction_type)
+        if isinstance(canonical_direct, dict):
+            return canonical_direct
+        if isinstance(alias_map, dict) and alias_targets is None:
+            alias_targets = alias_map.get(canonical_reaction_type)
+
+    candidates: List[Dict[str, Any]] = []
+    if isinstance(alias_targets, str):
+        alias_targets = [alias_targets]
+    if isinstance(alias_targets, list):
+        for key in alias_targets:
+            info = reaction_patterns.get(str(key))
+            if isinstance(info, dict):
+                candidates.append(info)
+
+    # Prefix fallback for split variants when no explicit alias map exists.
+    if not candidates and canonical_reaction_type:
+        prefix = f"{canonical_reaction_type}_"
+        for key, info in reaction_patterns.items():
+            if isinstance(key, str) and key.startswith(prefix) and isinstance(info, dict):
+                candidates.append(info)
+
+    if not candidates:
+        return None
+    if len(candidates) == 1:
+        return candidates[0]
+
+    # Merge split variants (e.g., Wacker terminal/internal) into one effective rule.
+    merged: Dict[str, Any] = {}
+    pattern_types = _dedupe_str_list(info.get("pattern") for info in candidates)
+    if pattern_types:
+        merged["pattern"] = pattern_types[0]
+    merged["leaving_groups"] = _dedupe_str_list(
+        item
+        for info in candidates
+        for item in (info.get("leaving_groups") or [])
+    )
+    formed_groups = _dedupe_str_list(
+        item
+        for info in candidates
+        for item in (info.get("formed_groups") or [])
+    )
+    if formed_groups:
+        merged["formed_groups"] = formed_groups
+    notes = _dedupe_str_list(info.get("notes") for info in candidates)
+    if notes:
+        merged["notes"] = " | ".join(notes)
+    return merged
 
 
 def get_substituent(motif_id: str) -> str:
@@ -600,9 +688,7 @@ def filter_reacted_by_pattern(
         return reacted_motifs
     
     patterns = load_transformation_patterns()
-    reaction_patterns = patterns.get("reaction_patterns", {})
-    
-    pattern_info = reaction_patterns.get(reaction_type)
+    pattern_info = _resolve_transformation_pattern_info(reaction_type, patterns)
     if not pattern_info:
         return reacted_motifs
     

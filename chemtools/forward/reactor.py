@@ -260,7 +260,7 @@ class ReactantAnalyzer:
 
         # Load templates
         try:
-            from chemtools.retro.hte_templates import HTE_TEMPLATES
+            from chemtools.retro.hte_templates import HTE_TEMPLATES, get_template_taxonomy_id
         except ImportError:
             return []
 
@@ -305,9 +305,10 @@ class ReactantAnalyzer:
                 continue
 
             if match:
+                taxonomy_id = get_template_taxonomy_id(tmpl)
                 results.append(ForwardTemplateMatch(
                     template_name=tmpl["name"],
-                    taxonomy_id=tmpl.get("taxonomy_id", ""),
+                    taxonomy_id=taxonomy_id,
                     category=tmpl.get("category", ""),
                     forward_smarts=fwd_smarts,
                     n_reactants=n_r,
@@ -365,7 +366,7 @@ class ForwardReactor:
 
         # Load templates
         try:
-            from chemtools.retro.hte_templates import HTE_TEMPLATES
+            from chemtools.retro.hte_templates import HTE_TEMPLATES, get_template_taxonomy_id
         except ImportError:
             return []
 
@@ -419,7 +420,7 @@ class ForwardReactor:
                 reactant_a=can_a,
                 reactant_b=can_b,
                 template_name=tmpl["name"],
-                taxonomy_id=tmpl.get("taxonomy_id", ""),
+                taxonomy_id=get_template_taxonomy_id(tmpl),
                 reaction_smiles=rxn_smi,
                 difficulty=tmpl.get("difficulty", 0.5),
                 description=tmpl.get("description", ""),

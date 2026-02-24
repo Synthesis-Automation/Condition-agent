@@ -81,7 +81,7 @@ def test_get_by_taxonomy_id_returns_retron(taxonomy_id, expected_retron):
     ("Suzuki_miyaura", "suzuki_miyaura"),
     ("C_N_Coupling", "buchwald_hartwig"),
     ("Amide_formation", "amide_coupling"),
-    ("SNAr", "snar_amination"),
+    ("Click_azide_alkyne_cycloaddition", "cuaac_triazole"),
 ])
 def test_get_by_taxonomy_id_returns_template(taxonomy_id, expected_template):
     from chemtools.retro.reaction_registry import get_by_taxonomy_id
@@ -133,8 +133,9 @@ def test_get_taxonomy_id_for_retron_returns_none_for_unknown():
 @pytest.mark.parametrize("template_name,expected_tid", [
     ("suzuki_miyaura", "Suzuki_miyaura"),
     ("buchwald_hartwig", "C_N_Coupling"),
-    ("snar_amination", "SNAr"),
-    ("cuaac_triazole", "Click_cuaac"),
+    ("snar_amination", "C_N_Coupling"),
+    ("snar_co", "C_O_Coupling"),
+    ("cuaac_triazole", "Click_azide_alkyne_cycloaddition"),
     ("wacker_oxidation", "Wacker_oxidation"),
     ("liebeskind_srogl", "Liebeskind_Srogl"),
     ("giese_radical", "Giese_radical_addition"),
@@ -215,7 +216,6 @@ def test_new_taxonomy_entries_in_registry():
         "Mitsunobu_reaction",
         "Boc_protection",
         "Sulfonamide_synthesis",
-        "SNAr",
         "Wacker_oxidation",
         "Giese_radical_addition",
         "Thiol_ene",

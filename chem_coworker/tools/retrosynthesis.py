@@ -206,7 +206,8 @@ def _identify_retrons(smiles: str = "", target_smiles: str = "") -> Dict[str, An
             filled = round(m.difficulty * 5)
             difficulty_display = "●" * filled + "○" * (5 - filled)
 
-            # Resolve canonical taxonomy_id for this retron
+            # Resolve canonical taxonomy family ID for this retron via registry.
+            # Output key remains `taxonomy_id` for API compatibility.
             taxonomy_id: Optional[str] = None
             try:
                 from chemtools.retro.reaction_registry import get_taxonomy_id_for_retron
@@ -226,6 +227,7 @@ def _identify_retrons(smiles: str = "", target_smiles: str = "") -> Dict[str, An
             }
             if taxonomy_id:
                 entry["taxonomy_id"] = taxonomy_id
+                entry["taxonomy_family_id"] = taxonomy_id
             retrons_data.append(entry)
 
         return _success({
@@ -497,9 +499,10 @@ find_retro_precedent_tool = ToolPlugin(
 # ---------------------------------------------------------------------------
 
 # Retron/reaction name → HTE family string
-# Resolved via the unified reaction_registry (taxonomy_id → hte_families).
+# Resolved via the unified reaction_registry (canonical taxonomy family ID → hte_families).
 # The legacy _EXTRA_RETRON_MAP has been removed; all lookups go through the
-# registry which is built from the taxonomy_id fields on each retron/template.
+# registry which is built from retron/template taxonomy links
+# (v2 `taxonomy_family_id` preferred, legacy `taxonomy_id` fallback).
 
 
 def _map_reaction_to_family(reaction_name: str) -> Optional[str]:
@@ -1266,9 +1269,14 @@ def _apply_hte_templates(
                 except Exception:
                     pass
 
+            taxonomy_family_id = (
+                tmpl.get("taxonomy_family_id")
+                or tmpl.get("taxonomy_id", "")
+            )
             hit: Dict[str, Any] = {
                 "template_name": tmpl["name"],
-                "taxonomy_id": tmpl.get("taxonomy_id", ""),
+                "taxonomy_id": taxonomy_family_id,
+                "taxonomy_family_id": taxonomy_family_id,
                 "hte_families": tmpl.get("hte_families", []),
                 "precursor_1": p1,
                 "precursor_2": p2,

@@ -8,29 +8,52 @@ retrosynthetic transform — i.e., a bond whose formation defines the
 Each entry contains:
   name            : unique identifier
   product_smarts  : SMARTS that matches the bond/motif in the TARGET molecule
-  reaction_name   : maps to the existing chemtools reaction taxonomy ID
-  taxonomy_id     : canonical taxonomy cross-reference (reaction_registry.py)
+  reaction_name   : legacy retro transform label (kept for compatibility)
+  retro_transform_id : preferred explicit retro transform identifier (v2)
+  taxonomy_family_id : preferred canonical taxonomy family link (v2)
+  taxonomy_id     : legacy compatibility field (normalized to canonical family ID at load)
   difficulty      : 0.0 (trivial) → 1.0 (heroic); guides ranking
   description     : human-readable retrosynthetic description
   notes           : chemistry notes and caveats
   precursor_hints : list of precursor type names (for LLM context)
   category        : reaction class grouping (for browsing / filtering)
 
-Data is loaded from chemtools/retro/data/retron_patterns.json at import
-time so the library is easy to extend without editing Python source.
+Data is loaded from the taxonomy-owned file
+``chemtools/taxonomy/data/retron_patterns.json`` at import time so the library
+is easy to extend without editing Python source.
 """
 from __future__ import annotations
 
-import json
-import pathlib
 from typing import Any, Dict, List
 
-_DATA_FILE = pathlib.Path(__file__).parent.parent / "taxonomy" / "data" / "retron_patterns.json"
+
+def get_retron_taxonomy_id(retron: Dict[str, Any]) -> str:
+    """Return canonical taxonomy family ID for a retron (v2-first, v1 fallback)."""
+    if not isinstance(retron, dict):
+        return ""
+    return str(retron.get("taxonomy_family_id") or retron.get("taxonomy_id") or "")
 
 
 def _load() -> List[Dict[str, Any]]:
-    with open(_DATA_FILE, encoding="utf-8") as fh:
-        return json.load(fh)["retrons"]
+    from chemtools.taxonomy import loader as taxonomy_loader
+
+    payload = taxonomy_loader.load_retron_patterns()
+    entries = payload.get("retrons") if isinstance(payload, dict) else None
+    if not isinstance(entries, list):
+        return []
+
+    normalized: List[Dict[str, Any]] = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        item = dict(entry)
+        canonical_tid = get_retron_taxonomy_id(item)
+        if canonical_tid:
+            # Keep both v2 and legacy link fields aligned during migration.
+            item["taxonomy_family_id"] = canonical_tid
+            item["taxonomy_id"] = canonical_tid
+        normalized.append(item)
+    return normalized
 
 
 RETRONS: List[Dict[str, Any]] = _load()

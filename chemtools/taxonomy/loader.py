@@ -28,6 +28,9 @@ SCAFFOLD_MOTIFS_FILE = _TAXONOMY_DIR / "scaffold_motifs.v1.3.json"
 FEATURIZER_LOGIC_FILE = _TAXONOMY_DIR / "featurizer_logic.json"
 SYNTHON_FILE = _TAXONOMY_DIR / "synthons.v1.json"
 MOTIF_SCOPE_INDEX_FILE = _TAXONOMY_DIR / "motif_scope_index.v1.json"
+RETRON_PATTERNS_FILE = _TAXONOMY_DIR / "retron_patterns.json"
+HTE_TEMPLATES_FILE = _TAXONOMY_DIR / "hte_templates.json"
+TRANSFORMATION_PATTERNS_FILE = _TAXONOMY_DIR / "transformation_patterns.json"
 
 
 @lru_cache(maxsize=1)
@@ -226,6 +229,45 @@ def load_motif_scope_index() -> Dict[str, Any]:
         return {}
 
 
+@lru_cache(maxsize=1)
+def load_retron_patterns() -> Dict[str, Any]:
+    """Load retrosynthesis retron pattern library JSON."""
+    if not RETRON_PATTERNS_FILE.exists():
+        return {}
+
+    try:
+        with RETRON_PATTERNS_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def load_hte_templates() -> Dict[str, Any]:
+    """Load HTE-backed retrosynthesis template library JSON."""
+    if not HTE_TEMPLATES_FILE.exists():
+        return {}
+
+    try:
+        with HTE_TEMPLATES_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+@lru_cache(maxsize=1)
+def load_transformation_patterns() -> Dict[str, Any]:
+    """Load observable transformation/leaving-group pattern definitions JSON."""
+    if not TRANSFORMATION_PATTERNS_FILE.exists():
+        return {}
+
+    try:
+        with TRANSFORMATION_PATTERNS_FILE.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 def get_reaction_by_id(reaction_id: str) -> Dict[str, Any] | None:
     """Get a single reaction definition by ID.
     
@@ -277,6 +319,9 @@ def clear_taxonomy_cache() -> None:
     load_featurizer_logic.cache_clear()
     load_synthons.cache_clear()
     load_motif_scope_index.cache_clear()
+    load_retron_patterns.cache_clear()
+    load_hte_templates.cache_clear()
+    load_transformation_patterns.cache_clear()
 
 
 __all__ = [
@@ -289,6 +334,9 @@ __all__ = [
     "FEATURIZER_LOGIC_FILE",
     "SYNTHON_FILE",
     "MOTIF_SCOPE_INDEX_FILE",
+    "RETRON_PATTERNS_FILE",
+    "HTE_TEMPLATES_FILE",
+    "TRANSFORMATION_PATTERNS_FILE",
     "load_reaction_types_raw",
     "load_reaction_types_list",
     "load_reaction_types_dict",
@@ -302,6 +350,9 @@ __all__ = [
     "load_featurizer_logic",
     "load_synthons",
     "load_motif_scope_index",
+    "load_retron_patterns",
+    "load_hte_templates",
+    "load_transformation_patterns",
     "get_reaction_by_id",
     "get_reaction_metadata",
     "clear_taxonomy_cache",

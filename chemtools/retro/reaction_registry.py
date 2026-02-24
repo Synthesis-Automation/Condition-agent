@@ -7,13 +7,13 @@ Central lookup table linking the three retrosynthesis knowledge systems:
   - HTE templates  (RDKit RunReactants, chemtools/retro/hte_templates.py)
   - Taxonomy       (reaction classification, chemtools/taxonomy/data/)
 
-Every retron and HTE template carries a ``taxonomy_id`` field that maps to a
-canonical taxonomy ID.  This module aggregates those links at import time and
-exposes bidirectional lookups:
+Retro JSONs may carry ``taxonomy_family_id`` (preferred, v2) and/or the legacy
+``taxonomy_id`` compatibility field. This module resolves either to the
+canonical taxonomy reaction-family ID and exposes bidirectional lookups:
 
-  taxonomy_id → retrons, templates, hte_families, difficulty, description
-  retron_name → taxonomy_id
-  template_name → taxonomy_id
+  taxonomy_id (canonical family ID) → retrons, templates, hte_families, difficulty, description
+  retron_name → taxonomy_id (canonical family ID)
+  template_name → taxonomy_id (canonical family ID)
   retron_name → hte_families (for precedent search)
 
 Usage
@@ -82,7 +82,7 @@ def _build_registry() -> Dict[str, ReactionEntry]:
     """
     Build the unified reaction registry at import time.
 
-    1. Load retrons and templates (each now carry a ``taxonomy_id`` field).
+    1. Load retrons and templates (prefer ``taxonomy_family_id``, fallback ``taxonomy_id``).
     2. Group by taxonomy_id.
     3. Resolve difficulty as min(all contributing values).
     4. Optionally enrich description from the taxonomy JSON.
@@ -94,7 +94,7 @@ def _build_registry() -> Dict[str, ReactionEntry]:
 
     # -- Retrons --
     for retron in RETRONS:
-        tid = retron.get("taxonomy_id")
+        tid = retron.get("taxonomy_family_id") or retron.get("taxonomy_id")
         if not tid:
             continue
         if tid not in registry:
@@ -110,7 +110,7 @@ def _build_registry() -> Dict[str, ReactionEntry]:
 
     # -- HTE Templates --
     for tpl in HTE_TEMPLATES:
-        tid = tpl.get("taxonomy_id")
+        tid = tpl.get("taxonomy_family_id") or tpl.get("taxonomy_id")
         if not tid:
             continue
         if tid not in registry:
@@ -127,19 +127,16 @@ def _build_registry() -> Dict[str, ReactionEntry]:
         if not entry.description and tpl.get("description"):
             entry.description = tpl["description"]
 
-    # -- Enrich descriptions from taxonomy loader (best-effort) --
+    # -- Enrich descriptions from canonical taxonomy catalog (best-effort) --
     try:
-        from chemtools.taxonomy.loader import load_reaction_types
-        tax_entries = load_reaction_types()
-        # Build a quick id→description map
-        desc_map: Dict[str, str] = {}
-        for te in tax_entries:
-            desc = getattr(te, "description", None) or ""
-            if te.id:
-                desc_map[te.id] = desc
+        from chemtools.taxonomy.reaction_catalog import get_reaction_type
+
         for tid, entry in registry.items():
-            if not entry.description and desc_map.get(tid):
-                entry.description = desc_map[tid]
+            if entry.description:
+                continue
+            definition = get_reaction_type(tid)
+            if definition and definition.description:
+                entry.description = definition.description
     except Exception as exc:
         logger.debug("Could not enrich registry from taxonomy loader: %s", exc)
 
@@ -240,6 +237,22 @@ def list_all_taxonomy_ids() -> List[str]:
     return sorted(REACTION_REGISTRY.keys())
 
 
+def get_canonical_taxonomy_id(label: str) -> Optional[str]:
+    """
+    Resolve a taxonomy label or alias to the canonical taxonomy reaction-family ID.
+
+    This is useful during cleanup of retro JSONs where ``taxonomy_id`` may
+    currently contain alias/subtype labels (e.g. ``SNAr`` or ``click_cuaac``).
+    The existing registry APIs remain non-breaking and preserve current keys.
+    """
+    try:
+        from chemtools.taxonomy.reaction_catalog import resolve_reaction_type
+
+        return resolve_reaction_type(label)
+    except Exception:
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Validation
 # ---------------------------------------------------------------------------
@@ -249,9 +262,9 @@ def validate_registry() -> List[str]:
     Validate the registry for consistency issues.
 
     Checks:
-    1. All retron taxonomy_id values exist in the registry.
-    2. All HTE template taxonomy_id values exist in the registry.
-    3. No retron or template has a missing taxonomy_id field.
+    1. All retron taxonomy links exist in the registry.
+    2. All HTE template taxonomy links exist in the registry.
+    3. No retron or template is missing both taxonomy link fields.
     4. No registry entry is empty (no retrons AND no templates).
 
     Returns a list of warning strings (empty = all good).
@@ -261,15 +274,16 @@ def validate_registry() -> List[str]:
     try:
         from .retron_patterns import RETRONS
         for retron in RETRONS:
-            tid = retron.get("taxonomy_id")
+            tid = retron.get("taxonomy_family_id") or retron.get("taxonomy_id")
             name = retron.get("name", "?")
             if not tid:
                 warnings.append(
-                    f"Retron '{name}' is missing 'taxonomy_id' field"
+                    f"Retron '{name}' is missing taxonomy link field "
+                    f"(expected taxonomy_family_id or taxonomy_id)"
                 )
             elif tid not in REACTION_REGISTRY:
                 warnings.append(
-                    f"Retron '{name}' has taxonomy_id '{tid}' not found in registry"
+                    f"Retron '{name}' has taxonomy link '{tid}' not found in registry"
                 )
     except Exception as exc:
         warnings.append(f"Could not load retron_patterns: {exc}")
@@ -277,15 +291,16 @@ def validate_registry() -> List[str]:
     try:
         from .hte_templates import HTE_TEMPLATES
         for tpl in HTE_TEMPLATES:
-            tid = tpl.get("taxonomy_id")
+            tid = tpl.get("taxonomy_family_id") or tpl.get("taxonomy_id")
             name = tpl.get("name", "?")
             if not tid:
                 warnings.append(
-                    f"HTE template '{name}' is missing 'taxonomy_id' field"
+                    f"HTE template '{name}' is missing taxonomy link field "
+                    f"(expected taxonomy_family_id or taxonomy_id)"
                 )
             elif tid not in REACTION_REGISTRY:
                 warnings.append(
-                    f"HTE template '{name}' has taxonomy_id '{tid}' not found in registry"
+                    f"HTE template '{name}' has taxonomy link '{tid}' not found in registry"
                 )
     except Exception as exc:
         warnings.append(f"Could not load hte_templates: {exc}")

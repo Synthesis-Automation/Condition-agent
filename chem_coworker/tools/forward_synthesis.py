@@ -232,6 +232,7 @@ def _identify_reactions(
             reactions_data.append({
                 "name": m.template_name,
                 "taxonomy_id": m.taxonomy_id,
+                "taxonomy_family_id": m.taxonomy_id,
                 "category": m.category,
                 "difficulty": m.difficulty,
                 "difficulty_display": difficulty_display,
@@ -348,6 +349,7 @@ def _generate_products(
                 "reaction_smiles": pred.reaction_smiles,
                 "template_name": pred.template_name,
                 "taxonomy_id": pred.taxonomy_id,
+                "taxonomy_family_id": pred.taxonomy_id,
                 "description": pred.description,
                 "difficulty": pred.difficulty,
                 "difficulty_display": difficulty_display,
@@ -939,6 +941,7 @@ def _plan_forward_route(
                 "product_smiles": best.product_smiles,
                 "reaction_name": best.template_name,
                 "taxonomy_id": best.taxonomy_id,
+                "taxonomy_family_id": best.taxonomy_id,
                 "reaction_smiles": best.reaction_smiles,
                 "description": best.description,
                 "difficulty": best.difficulty,
