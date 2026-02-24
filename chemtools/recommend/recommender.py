@@ -360,6 +360,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
             df[reactant_col] = df[reactant_col].astype(object)
 
     def _normalize_reactants_row(row: pd.Series) -> pd.Series:
+        row = row.copy()
         raw = [row.get("Reactant_A_Type"), row.get("Reactant_B_Type"), row.get("Reactant_C_Type")]
         cleaned: List[str] = []
         for value in raw:
