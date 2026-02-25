@@ -8,22 +8,31 @@ using the chemtools.recommend recommender as the primary backend.
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
+import threading
 import time
 
 from .utils import pick_electrophile_nucleophile
 
 _DEFAULT_DB_PATH: Optional[str] = None
 _DEFAULT_RECOMMENDER = None
+_DEFAULT_RECOMMENDER_LOCK = threading.Lock()
 
 
 def _get_default_recommender(hte_db_path: Optional[str] = None):
     global _DEFAULT_RECOMMENDER, _DEFAULT_DB_PATH
     path = hte_db_path or "data/HTE_db"
     if _DEFAULT_RECOMMENDER is None or _DEFAULT_DB_PATH != path:
-        from .recommender import HTERecommender
-        _DEFAULT_RECOMMENDER = HTERecommender(path)
-        _DEFAULT_DB_PATH = path
+        with _DEFAULT_RECOMMENDER_LOCK:
+            if _DEFAULT_RECOMMENDER is None or _DEFAULT_DB_PATH != path:
+                from .recommender import HTERecommender
+                _DEFAULT_RECOMMENDER = HTERecommender(path)
+                _DEFAULT_DB_PATH = path
     return _DEFAULT_RECOMMENDER
+
+
+def _ms(start: float, end: float) -> float:
+    """Convert perf_counter interval to milliseconds with stable rounding."""
+    return round((end - start) * 1000, 2)
 
 
 def _normalize_smiles_list(items: List[Dict[str, Any]]) -> List[str]:
@@ -195,22 +204,32 @@ def recommend_from_reaction(
     use_spectator_groups: bool = True,
     **_: Any,
 ) -> Dict[str, Any]:
-    start = time.perf_counter()
+    t0 = time.perf_counter()
 
+    t_parse_0 = time.perf_counter()
     reactants, products, normalized = _extract_reaction_parts(reaction)
     reactant_a, reactant_b = _select_reactants(
         reactants, reactant_a_smiles, reactant_b_smiles
     )
+    t_parse_1 = time.perf_counter()
     if product_smiles is None and products:
         product_smiles = products[0]
 
     if not reactant_a:
-        processing_time_ms = round((time.perf_counter() - start) * 1000, 2)
+        t_end = time.perf_counter()
+        timing_ms = {
+            "input_parse_ms": _ms(t_parse_0, t_parse_1),
+            "recommender_get_ms": 0.0,
+            "recommend_compute_ms": 0.0,
+            "postprocess_ms": 0.0,
+            "total_ms": _ms(t0, t_end),
+        }
         return {
             "meta": {
                 "model": "hte_recommender",
                 "status": "error",
-                "processing_time_ms": processing_time_ms,
+                "processing_time_ms": timing_ms["total_ms"],
+                "timing_ms": timing_ms,
             },
             "input": {
                 "reaction_smiles": normalized or reaction,
@@ -229,7 +248,11 @@ def recommend_from_reaction(
             "error": "No reactants found in reaction SMILES.",
         }
 
+    t_get_0 = time.perf_counter()
     recommender = _get_default_recommender(hte_db_path)
+    t_get_1 = time.perf_counter()
+
+    t_rec_0 = time.perf_counter()
     result = recommender.recommend(
         reactant_a_smiles=reactant_a,
         reactant_b_smiles=reactant_b,
@@ -243,9 +266,20 @@ def recommend_from_reaction(
         use_aryl_steric_electronic_weighting=use_aryl_steric_electronic_weighting,
         use_spectator_groups=use_spectator_groups,
     )
+    t_rec_1 = time.perf_counter()
 
+    t_post_0 = time.perf_counter()
     recommendations = _build_recommendation_entries(result, reaction_type)
-    processing_time_ms = round((time.perf_counter() - start) * 1000, 2)
+    t_post_1 = time.perf_counter()
+    t_end = time.perf_counter()
+    timing_ms = {
+        "input_parse_ms": _ms(t_parse_0, t_parse_1),
+        "recommender_get_ms": _ms(t_get_0, t_get_1),
+        "recommend_compute_ms": _ms(t_rec_0, t_rec_1),
+        "postprocess_ms": _ms(t_post_0, t_post_1),
+        "total_ms": _ms(t0, t_end),
+    }
+    processing_time_ms = timing_ms["total_ms"]
 
     detected_type = getattr(result, "predicted_reaction_type", None) or reaction_type
     confidence = getattr(result, "reaction_type_confidence", 0.0) or None
@@ -269,6 +303,7 @@ def recommend_from_reaction(
                 str(source): [_serialize_recommendation(rec) for rec in recs]
                 for source, recs in (getattr(result, "recommendations_by_source", {}) or {}).items()
             },
+            "timing_ms": timing_ms,
         }
     }
 
@@ -277,6 +312,7 @@ def recommend_from_reaction(
             "model": "hte_recommender",
             "status": "success",
             "processing_time_ms": processing_time_ms,
+            "timing_ms": timing_ms,
         },
         "input": {
             "reaction_smiles": normalized or reaction,

@@ -21,10 +21,12 @@ class ToolCall:
     """A single tool call specification (name + arguments)."""
     name: str
     args: Dict[str, Any] = field(default_factory=dict)
+    call_id: str = ""
 
     def __repr__(self) -> str:
         args_str = ", ".join(f"{k}={v!r}" for k, v in self.args.items())
-        return f"{self.name}({args_str})"
+        suffix = f" [id={self.call_id}]" if self.call_id else ""
+        return f"{self.name}({args_str}){suffix}"
 
 
 @dataclass

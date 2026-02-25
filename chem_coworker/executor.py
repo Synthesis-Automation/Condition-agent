@@ -113,10 +113,11 @@ class ToolExecutor:
         calls: List[ToolCall],
         callables: Dict[str, Callable[..., Any]],
         runtime_context: Optional[Any] = None,
-    ) -> Dict[str, Any]:
+        return_call_results: bool = False,
+    ) -> Any:
         """Execute a group of ToolCalls concurrently, firing progress events."""
         if not calls:
-            return {}
+            return ({}, {}) if return_call_results else {}
 
         t0 = time.monotonic()
 
@@ -127,7 +128,8 @@ class ToolExecutor:
 
         # Single call — skip thread overhead
         if len(calls) == 1:
-            result = self._execute_one(calls[0], callables, runtime_context=runtime_context)
+            call = calls[0]
+            result = self._execute_one(call, callables, runtime_context=runtime_context)
             if self.event_bus:
                 elapsed = time.monotonic() - t0
                 has_error = isinstance(result, dict) and not result.get("success", True)
@@ -144,29 +146,35 @@ class ToolExecutor:
                         tool_name=calls[0].name,
                         elapsed_s=elapsed,
                     )
-            return {calls[0].name: result}
+            by_name = {call.name: result}
+            by_call_id = {(call.call_id or call.name): result}
+            return (by_name, by_call_id) if return_call_results else by_name
 
         results: Dict[str, Any] = {}
+        results_by_call_id: Dict[str, Any] = {}
         workers = min(len(calls), self.max_workers)
+        future_to_call: Dict[Any, ToolCall] = {}
 
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            future_to_name = {
-                pool.submit(self._execute_one, call, callables, runtime_context): call.name
-                for call in calls
-            }
-            for future in as_completed(future_to_name):
-                name = future_to_name[future]
+            for call in calls:
+                fut = pool.submit(self._execute_one, call, callables, runtime_context)
+                future_to_call[fut] = call
+            for future in as_completed(future_to_call):
+                call = future_to_call[future]
+                name = call.name
                 elapsed = time.monotonic() - t0
                 try:
-                    results[name] = future.result()
-                    has_error = isinstance(results[name], dict) and not results[name].get("success", True)
+                    result_obj = future.result()
+                    results[name] = result_obj
+                    results_by_call_id[call.call_id or name] = result_obj
+                    has_error = isinstance(result_obj, dict) and not result_obj.get("success", True)
                     if self.event_bus:
                         if has_error:
                             self.event_bus.emit(
                                 _ChemEvent.TOOL_ERROR,
                                 tool_name=name,
                                 elapsed_s=elapsed,
-                                error=str(results[name].get("error", "")),
+                                error=str(result_obj.get("error", "")),
                             )
                         else:
                             self.event_bus.emit(
@@ -174,7 +182,9 @@ class ToolExecutor:
                             )
                 except Exception as exc:
                     logger.warning(f"[Executor] Tool '{name}' raised: {exc}")
-                    results[name] = {"success": False, "error": str(exc)}
+                    err = {"success": False, "error": str(exc)}
+                    results[name] = err
+                    results_by_call_id[call.call_id or name] = err
                     if self.event_bus:
                         self.event_bus.emit(
                             _ChemEvent.TOOL_ERROR,
@@ -183,7 +193,7 @@ class ToolExecutor:
                             error=str(exc),
                         )
 
-        return results
+        return (results, results_by_call_id) if return_call_results else results
 
     def _execute_one(
         self,

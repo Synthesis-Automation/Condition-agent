@@ -14,6 +14,7 @@ Typical LLM call count: 1–9 (reasoning iterations) + optional exhaustion-guard
 from __future__ import annotations
 
 import copy
+import inspect
 import json
 import logging
 import os
@@ -29,6 +30,7 @@ from .workflow import WORKFLOW_REGISTRY, WorkflowDefinition
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+_TOOL_CALL_RESULTS_META_KEY = "_tool_call_results_by_id"
 
 # A4 — Conversation compaction: auto-summarize history when it grows too long.
 _COMPACT_THRESHOLD  = 20   # total messages before triggering compaction
@@ -778,6 +780,8 @@ class ChemCoworker:
 
         lines = []
         for name, result in results.items():
+            if name == _TOOL_CALL_RESULTS_META_KEY:
+                continue
             lines.append(f"\n--- {name} ---")
             if isinstance(result, dict):
                 # Omit the success flag and show rest
@@ -803,6 +807,8 @@ class ChemCoworker:
 
         plugins = getattr(self.registry, "_plugins", {})
         for tool_name, result in results.items():
+            if tool_name == _TOOL_CALL_RESULTS_META_KEY:
+                continue
             if not isinstance(result, dict) or not result.get("success"):
                 continue
             plugin = plugins.get(tool_name)
@@ -856,6 +862,8 @@ class ChemCoworker:
         plugins = getattr(self.registry, "_plugins", {})
 
         for tool_name, result in tool_results.items():
+            if tool_name == _TOOL_CALL_RESULTS_META_KEY:
+                continue
             if not isinstance(result, dict) or not result.get("success", False):
                 continue
             completed_tools.add(tool_name)
@@ -867,6 +875,55 @@ class ChemCoworker:
                 if key in result:
                     provided_keys.add(key)
         return completed_tools, provided_keys
+
+    def _infer_prerequisite_args_from_dependent_call(
+        self,
+        prereq_name: str,
+        dependent_args: Dict[str, Any],
+        callables: Dict[str, Callable[..., Any]],
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Best-effort inference of prerequisite args from a dependent tool call.
+
+        Keeps runtime contract enforcement chemistry-safe while avoiding obvious
+        dead-ends like `recommend_conditions` without `detect_reaction_type`.
+        Returns None if required args cannot be inferred.
+        """
+        fn = callables.get(prereq_name)
+        if fn is None:
+            return None
+
+        try:
+            sig = inspect.signature(fn)
+        except Exception:
+            return None
+
+        aliases: Dict[str, List[str]] = {
+            "smiles": ["smiles", "reaction_smiles", "target_smiles"],
+            "reaction_smiles": ["reaction_smiles", "smiles"],
+            "target_smiles": ["target_smiles", "smiles"],
+        }
+        inferred: Dict[str, Any] = {}
+
+        for param_name, param in sig.parameters.items():
+            if param.kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD):
+                continue
+
+            candidates = aliases.get(param_name, [param_name])
+            found = False
+            for key in candidates:
+                if key in dependent_args:
+                    inferred[param_name] = dependent_args[key]
+                    found = True
+                    break
+
+            if found:
+                continue
+
+            if param.default is inspect._empty:
+                return None
+
+        return inferred
 
     def _partition_native_tool_calls_by_contracts(
         self,
@@ -898,6 +955,28 @@ class ChemCoworker:
         executable: List[ToolCall] = []
         blocked_results: Dict[str, Any] = {}
         warnings: List[str] = []
+        warning_seen: set[tuple[Any, ...]] = set()
+        auto_inserted_this_round: set[str] = set()
+        executable_keys: set[tuple[str, str]] = set()
+
+        def _append_executable_once(name: str, args: Dict[str, Any], call_id: str = "") -> Optional[ToolCall]:
+            try:
+                args_key = json.dumps(args, sort_keys=True, default=str)
+            except Exception:
+                args_key = str(sorted(args.items()))
+            dedupe_key = (name, args_key)
+            if dedupe_key in executable_keys:
+                return None
+            executable_keys.add(dedupe_key)
+            tc_obj = ToolCall(name=name, args=dict(args), call_id=call_id or "")
+            executable.append(tc_obj)
+            return tc_obj
+
+        def _warn_once(msg: str, key: tuple[Any, ...]) -> None:
+            if key in warning_seen:
+                return
+            warning_seen.add(key)
+            warnings.append(msg)
 
         for tc in response_tool_calls:
             tool_name = tc.get("name")
@@ -906,18 +985,38 @@ class ChemCoworker:
 
             plugin = plugins.get(tool_name)
             if plugin is None:
-                executable.append(ToolCall(name=tool_name, args=dict(tc.get("args", {}))))
+                _append_executable_once(
+                    tool_name,
+                    dict(tc.get("args", {})),
+                    call_id=str(tc.get("id", "") or ""),
+                )
                 continue
 
+            tc_args = dict(tc.get("args", {}))
+            tc_call_id = str(tc.get("id", "") or "")
             missing_prereqs = [p for p in (plugin.prerequisites or []) if p not in completed_tools]
             missing_requires = [k for k in (plugin.requires or []) if k not in provided_keys]
             if not missing_prereqs and not missing_requires:
-                executable.append(ToolCall(name=tool_name, args=dict(tc.get("args", {}))))
+                _append_executable_once(tool_name, tc_args, call_id=tc_call_id)
                 continue
+
+            auto_inserted_prereqs: List[str] = []
+            for p in list(missing_prereqs):
+                if p in completed_tools or p in requested_names or p in auto_inserted_this_round:
+                    continue
+                prereq_plugin = plugins.get(p)
+                if prereq_plugin is None or p not in callables:
+                    continue
+                inferred_args = self._infer_prerequisite_args_from_dependent_call(p, tc_args, callables)
+                if inferred_args is None:
+                    continue
+                _append_executable_once(p, inferred_args, call_id=f"auto_{p}_for_{tool_name}")
+                auto_inserted_this_round.add(p)
+                auto_inserted_prereqs.append(p)
 
             waiting_on_tools: set[str] = set()
             for p in missing_prereqs:
-                if p in requested_names:
+                if p in requested_names or p in auto_inserted_this_round:
                     waiting_on_tools.add(p)
             for key in missing_requires:
                 for provider_name in providers_by_key.get(key, set()):
@@ -930,6 +1029,8 @@ class ChemCoworker:
                     f"Deferred '{tool_name}' due to unmet tool contracts; wait for: "
                     f"{', '.join(sorted(waiting_on_tools))}."
                 )
+                if auto_inserted_prereqs:
+                    reason += f" Auto-inserted prerequisite(s): {', '.join(sorted(auto_inserted_prereqs))}."
             else:
                 bits: List[str] = []
                 if missing_prereqs:
@@ -938,7 +1039,14 @@ class ChemCoworker:
                     bits.append(f"missing required context keys={missing_requires}")
                 reason = f"Blocked '{tool_name}' due to unmet tool contracts ({'; '.join(bits)})."
 
-            warnings.append(reason)
+            warning_key = (
+                tool_name,
+                bool(deferred),
+                tuple(sorted(waiting_on_tools)),
+                tuple(sorted(missing_prereqs)),
+                tuple(sorted(missing_requires)),
+            )
+            _warn_once(reason, warning_key)
             blocked_results[tool_name] = {
                 "success": False,
                 "error": reason,
@@ -1087,6 +1195,7 @@ class ChemCoworker:
             HumanMessage(content=user_message),
         ]
         tool_results: Dict[str, Any] = {}
+        tool_results_by_call_id: Dict[str, Any] = {}
         hypothesis = ""
         confidence = 0.5
         warnings: List[str] = []
@@ -1145,12 +1254,23 @@ class ChemCoworker:
             if blocked_results:
                 tool_results.update(blocked_results)
                 warnings.extend(contract_warnings)
+                for tc in response_tool_calls:
+                    tool_call_id = str(tc.get("id", "") or "")
+                    tool_name = str(tc.get("name", "") or "")
+                    if tool_call_id and tool_name in blocked_results:
+                        tool_results_by_call_id[tool_call_id] = self._copy_result(blocked_results[tool_name])
 
             if tc_list:
                 import time as _t
                 t0 = _t.monotonic()
-                group_results = self.executor._run_parallel(tc_list, callables, runtime_context=runtime_context)
+                group_results, group_results_by_call_id = self.executor._run_parallel(
+                    tc_list,
+                    callables,
+                    runtime_context=runtime_context,
+                    return_call_results=True,
+                )
                 tool_results.update(group_results)
+                tool_results_by_call_id.update(group_results_by_call_id)
                 elapsed = _t.monotonic() - t0
 
                 for name, result in group_results.items():
@@ -1167,7 +1287,9 @@ class ChemCoworker:
             for tc in response_tool_calls:
                 tool_name = tc.get("name", "")
                 tool_call_id = tc.get("id", f"{tool_name}_{iteration}")
-                result = tool_results.get(tool_name, {"success": False, "error": "not executed"})
+                result = tool_results_by_call_id.get(tool_call_id)
+                if result is None:
+                    result = tool_results.get(tool_name, {"success": False, "error": "not executed"})
                 result_str = json.dumps(result, default=str)[:3000]
                 messages.append(ToolMessage(
                     content=result_str,
@@ -1203,6 +1325,9 @@ class ChemCoworker:
                 logger.error(f"[ChemCoworker] Exhaustion-guard closing call failed: {exc}")
                 warnings.append(f"Closing call failed after loop exhaustion: {exc}")
 
+        if tool_results_by_call_id:
+            tool_results[_TOOL_CALL_RESULTS_META_KEY] = tool_results_by_call_id
+
         return tool_results, hypothesis, confidence, warnings, llm_call_count, final_answer, messages
 
     def _collect_caveats(
@@ -1215,6 +1340,8 @@ class ChemCoworker:
         """
         parts: List[str] = []
         for tool_name, result in tool_results.items():
+            if tool_name == _TOOL_CALL_RESULTS_META_KEY:
+                continue
             if not isinstance(result, dict):
                 continue
             for w in result.get("_warnings", []):

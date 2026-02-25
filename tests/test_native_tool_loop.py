@@ -185,6 +185,103 @@ class TestNativeToolContractEnforcement:
         assert blocked == {}
         assert warnings == []
 
+    def test_auto_inserts_missing_prerequisite_for_recommend_conditions(self):
+        """If detect_reaction_type is missing and inferable, auto-insert it."""
+        agent = _make_agent()
+        callables = agent.registry.get_callables()
+        response_tool_calls = [
+            {"name": "recommend_conditions", "args": {"reaction_smiles": "A>>B"}, "id": "tc1"},
+        ]
+
+        executable, blocked, warnings = agent._partition_native_tool_calls_by_contracts(
+            response_tool_calls=response_tool_calls,
+            callables=callables,
+            tool_results={},
+        )
+
+        assert [c.name for c in executable] == ["detect_reaction_type"]
+        assert executable[0].args["reaction_smiles"] == "A>>B"
+        assert "recommend_conditions" in blocked
+        assert blocked["recommend_conditions"]["deferred"] is True
+        assert any("Auto-inserted prerequisite(s): detect_reaction_type" in w for w in warnings)
+
+    def test_dedupes_repeated_block_warnings_for_duplicate_calls(self):
+        """Duplicate model tool calls should not spam identical contract warnings."""
+        agent = _make_agent()
+        callables = agent.registry.get_callables()
+        response_tool_calls = [
+            {"name": "recommend_conditions", "args": {"reaction_smiles": "A>>B"}, "id": "tc1"},
+            {"name": "recommend_conditions", "args": {"reaction_smiles": "A>>B"}, "id": "tc2"},
+        ]
+
+        executable, blocked, warnings = agent._partition_native_tool_calls_by_contracts(
+            response_tool_calls=response_tool_calls,
+            callables=callables,
+            tool_results={},
+        )
+
+        assert [c.name for c in executable] == ["detect_reaction_type"]
+        assert "recommend_conditions" in blocked
+        assert len(warnings) == 1
+
+
+class TestDuplicateNativeToolCallsPreservePerCallResults:
+    def test_duplicate_same_tool_calls_keep_results_by_call_id(self):
+        agent = _make_agent()
+
+        first_response = MagicMock()
+        first_response.tool_calls = [
+            {"name": "get_molecular_descriptors", "args": {"smiles": "CCO"}, "id": "call_1"},
+            {"name": "get_molecular_descriptors", "args": {"smiles": "CCN"}, "id": "call_2"},
+        ]
+        first_response.content = ""
+
+        final_response = MagicMock()
+        final_response.tool_calls = []
+        final_response.content = "done"
+
+        invoke_state = {"n": 0}
+
+        def _invoke(_messages):
+            invoke_state["n"] += 1
+            return first_response if invoke_state["n"] == 1 else final_response
+
+        mock_bound = MagicMock()
+        mock_bound.invoke = _invoke
+        agent.llm = MagicMock()
+        agent.llm.bind_tools.return_value = mock_bound
+
+        agent.executor._run_parallel.return_value = (
+            {"get_molecular_descriptors": {"success": True, "smiles": "CCN", "descriptors": {"MW": 45.0}}},
+            {
+                "call_1": {"success": True, "smiles": "CCO", "descriptors": {"MW": 46.0}},
+                "call_2": {"success": True, "smiles": "CCN", "descriptors": {"MW": 45.0}},
+            },
+        )
+
+        from chem_coworker.workflow import WORKFLOW_REGISTRY
+        workflow = WORKFLOW_REGISTRY.get_for_task("forward_chemistry")
+
+        tool_results, _, _, _, _, _, messages = agent._run_native_tool_loop(
+            query="descriptor test",
+            task_type="general",
+            smiles_list=[],
+            workflow=workflow,
+            primary_smiles="",
+            chemistry_state=agent._new_chemistry_run_state(),
+        )
+
+        assert "_tool_call_results_by_id" in tool_results
+        by_id = tool_results["_tool_call_results_by_id"]
+        assert by_id["call_1"]["smiles"] == "CCO"
+        assert by_id["call_2"]["smiles"] == "CCN"
+
+        tool_messages = [m for m in messages if m.__class__.__name__ == "ToolMessage"]
+        assert len(tool_messages) >= 2
+        payloads = {m.tool_call_id: m.content for m in tool_messages if getattr(m, "tool_call_id", "") in {"call_1", "call_2"}}
+        assert "\"CCO\"" in payloads["call_1"]
+        assert "\"CCN\"" in payloads["call_2"]
+
 
 class TestStructuredExtractionCanonicalReactionType:
     def test_extract_structured_prefers_reaction_type_id_and_keeps_metadata(self):
