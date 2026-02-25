@@ -153,6 +153,31 @@ class TestValidateRecommendConditions:
         assert len(plugin.validators) > 0
         assert plugin.validators[0] is not None
 
+    def test_recommend_conditions_surfaces_hte_timing(self, monkeypatch):
+        from chem_coworker.tools.conditions import _recommend_conditions
+
+        monkeypatch.setattr(
+            "chemtools.recommend.hte_adapter.recommend_from_reaction",
+            lambda *args, **kwargs: {
+                "meta": {
+                    "processing_time_ms": 1234.5,
+                    "timing_ms": {
+                        "input_parse_ms": 1.0,
+                        "recommender_get_ms": 2.0,
+                        "recommend_compute_ms": 1200.0,
+                        "postprocess_ms": 31.5,
+                        "total_ms": 1234.5,
+                    },
+                },
+                "recommended_conditions": [],
+                "recommendations": [],
+            },
+        )
+        result = _recommend_conditions("CCO>>CC=O", top_k=3)
+        assert result["success"] is True
+        assert result["hte_processing_time_ms"] == 1234.5
+        assert result["hte_timing_ms"]["recommend_compute_ms"] == 1200.0
+
 
 # ---------------------------------------------------------------------------
 # ToolPlugin provides/requires registration checks
@@ -256,6 +281,45 @@ class TestChemistryValidators:
         )
         assert msg is not None
         assert "Low bond-mapping confidence" in msg
+
+
+class TestRetrosynthesisHTETiming:
+    def test_search_hte_precedent_surfaces_timing_breakdown(self, monkeypatch):
+        from chem_coworker.tools.retrosynthesis import _search_hte_precedent
+
+        monkeypatch.setattr(
+            "chem_coworker.tools.retrosynthesis._map_reaction_to_family",
+            lambda name: "suzuki_miyaura",
+        )
+        monkeypatch.setattr(
+            "chem_coworker.tools.retrosynthesis._fast_load_hte_family_cached",
+            lambda key: (
+                {
+                    "yield_value": 78.0,
+                    "reaction_smiles": "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+                    "condition_core": "Pd/base",
+                    "catalyst": {"name": "Pd"},
+                    "base_uid": "K2CO3",
+                    "solvent_uid": "dioxane",
+                    "reagents": [],
+                    "solvents": [],
+                    "reference": "ref",
+                    "rxn_type": "suzuki_miyaura",
+                    "source_file": "demo.csv",
+                },
+            ),
+        )
+
+        result = _search_hte_precedent(
+            target_smiles="c1ccc(-c2ccccc2)cc1",
+            reaction_name="suzuki",
+            top_k=1,
+        )
+        assert result["success"] is True
+        timing = result["hte_search_timing_ms"]
+        for key in ("input_parse_ms", "load_family_ms", "sort_ms", "drfp_rerank_ms", "format_ms", "total_ms"):
+            assert key in timing
+            assert isinstance(timing[key], (int, float))
 
 
 # ---------------------------------------------------------------------------
@@ -461,3 +525,35 @@ class TestToolRuntimeContextInjection:
         assert result["success"] is True
         assert result["cached"] is True
         assert result["top_k"] == 7
+
+
+class TestExecutorHTEHeavyConcurrencyGuard:
+    def test_serializes_batch_when_multiple_hte_heavy_tools_present(self):
+        from chem_coworker.executor import ToolExecutor
+        from chem_coworker.plan import ToolCall
+
+        executor = ToolExecutor.__new__(ToolExecutor)
+        executor.max_workers = 4
+        executor.verbose = False
+
+        calls = [
+            ToolCall(name="recommend_conditions", args={"reaction_smiles": "A>>B"}),
+            ToolCall(name="search_hte_precedent", args={"target_smiles": "C"}),
+            ToolCall(name="read_notes", args={"id": "suzuki"}),
+        ]
+        assert executor._compute_parallel_workers(calls) == 1
+
+    def test_keeps_parallelism_for_non_heavy_batch(self):
+        from chem_coworker.executor import ToolExecutor
+        from chem_coworker.plan import ToolCall
+
+        executor = ToolExecutor.__new__(ToolExecutor)
+        executor.max_workers = 4
+        executor.verbose = False
+
+        calls = [
+            ToolCall(name="read_notes", args={"id": "x"}),
+            ToolCall(name="inspect_target", args={"smiles": "CCO"}),
+            ToolCall(name="detect_reaction_type", args={"reaction_smiles": "A>>B"}),
+        ]
+        assert executor._compute_parallel_workers(calls) == 3

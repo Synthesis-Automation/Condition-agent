@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Maximum parallel threads per group
 _MAX_WORKERS = 4
+_HTE_HEAVY_TOOLS = {"recommend_conditions", "search_hte_precedent"}
 
 # ---------------------------------------------------------------------------
 # Import pre-warmer
@@ -152,7 +153,7 @@ class ToolExecutor:
 
         results: Dict[str, Any] = {}
         results_by_call_id: Dict[str, Any] = {}
-        workers = min(len(calls), self.max_workers)
+        workers = self._compute_parallel_workers(calls)
         future_to_call: Dict[Any, ToolCall] = {}
 
         with ThreadPoolExecutor(max_workers=workers) as pool:
@@ -194,6 +195,28 @@ class ToolExecutor:
                         )
 
         return (results, results_by_call_id) if return_call_results else results
+
+    def _compute_parallel_workers(self, calls: List[ToolCall]) -> int:
+        """
+        Compute effective worker count for a batch.
+
+        Safeguard: if multiple HTE-heavy tools are present in the same batch,
+        serialize the batch to avoid duplicated dataset initialization and heavy
+        contention on the HTE recommender path.
+        """
+        if not calls:
+            return 1
+        base = max(1, min(len(calls), self.max_workers))
+        heavy_count = sum(1 for c in calls if c.name in _HTE_HEAVY_TOOLS)
+        if heavy_count >= 2:
+            if self.verbose:
+                logger.info(
+                    "[Executor] Serializing batch with %d HTE-heavy tool calls: %s",
+                    heavy_count,
+                    [c.name for c in calls],
+                )
+            return 1
+        return base
 
     def _execute_one(
         self,

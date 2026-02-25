@@ -711,8 +711,11 @@ def _search_hte_precedent(
         catalyst, base, solvent, reagents, solvents, reference, source_file.
     """
     _DRFP_CANDIDATE_CAP = 300   # max rows to DRFP-score (keeps latency ~2 s)
+    import time as _time
 
     try:
+        t0 = _time.perf_counter()
+        t_parse_0 = _time.perf_counter()
         mol_smiles = (
             target_smiles.split(">>")[0].split(">")[0].strip()
             if ">" in target_smiles
@@ -721,15 +724,27 @@ def _search_hte_precedent(
 
         # Resolve family string
         family = _map_reaction_to_family(reaction_name)
+        t_parse_1 = _time.perf_counter()
 
         # ── Load family rows (fast path: no featurization) ────────────────
         try:
+            t_load_0 = _time.perf_counter()
             family_key = family if family else "__ALL__"
             rows = list(_fast_load_hte_family_cached(family_key))
+            t_load_1 = _time.perf_counter()
         except Exception as load_err:
             return _error(f"HTE loader failed: {load_err}")
 
         if not rows:
+            t_end = _time.perf_counter()
+            timing_ms = {
+                "input_parse_ms": round((t_parse_1 - t_parse_0) * 1000, 2),
+                "load_family_ms": round((t_load_1 - t_load_0) * 1000, 2),
+                "sort_ms": 0.0,
+                "drfp_rerank_ms": 0.0,
+                "format_ms": 0.0,
+                "total_ms": round((t_end - t0) * 1000, 2),
+            }
             return _success({
                 "family": family,
                 "search_mode": "none",
@@ -737,6 +752,7 @@ def _search_hte_precedent(
                 "support_in_family": 0,
                 "precedent_count": 0,
                 "precedents": [],
+                "hte_search_timing_ms": timing_ms,
                 "message": (
                     f"No HTE rows loaded for family '{family}'. "
                     "Reaction type may not be in the database."
@@ -744,11 +760,13 @@ def _search_hte_precedent(
             })
 
         # ── Sort by yield descending (high-quality first) ─────────────────
+        t_sort_0 = _time.perf_counter()
         rows_sorted = sorted(
             rows,
             key=lambda r: (r.get("yield_value") or 0.0),
             reverse=True,
         )
+        t_sort_1 = _time.perf_counter()
         support = len(rows_sorted)
 
         # ── Build forward SMILES & decide search mode ──────────────────────
@@ -763,6 +781,8 @@ def _search_hte_precedent(
             use_drfp = True
 
         # ── DRFP re-ranking (when precursors available) ───────────────────
+        t_drfp_0 = _time.perf_counter()
+        scored = []
         if use_drfp:
             try:
                 from chemtools import reaction_similarity as rs
@@ -771,7 +791,6 @@ def _search_hte_precedent(
                     if q_fp is not None:
                         # Only DRFP-score the top-N by yield to keep latency low
                         candidates = rows_sorted[:_DRFP_CANDIDATE_CAP]
-                        scored: List[tuple] = []
                         for r in candidates:
                             rsmi = r.get("reaction_smiles") or ""
                             if rsmi:
@@ -788,12 +807,14 @@ def _search_hte_precedent(
                         # else: keep yield-sorted order as fallback
             except Exception:
                 use_drfp = False   # silently fall back to yield ranking
+        t_drfp_1 = _time.perf_counter()
 
         # ── Format top-K results ──────────────────────────────────────────
+        t_fmt_0 = _time.perf_counter()
         formatted = []
         scored_lookup = (
             {id(r): sim for _, sim, r in scored}
-            if use_drfp and "scored" in dir() and scored
+            if use_drfp and scored
             else {}
         )
 
@@ -815,6 +836,16 @@ def _search_hte_precedent(
             if sim_val is not None:
                 entry["drfp_similarity"] = round(sim_val, 4)
             formatted.append({k: v for k, v in entry.items() if v is not None})
+        t_fmt_1 = _time.perf_counter()
+        t_end = _time.perf_counter()
+        timing_ms = {
+            "input_parse_ms": round((t_parse_1 - t_parse_0) * 1000, 2),
+            "load_family_ms": round((t_load_1 - t_load_0) * 1000, 2),
+            "sort_ms": round((t_sort_1 - t_sort_0) * 1000, 2),
+            "drfp_rerank_ms": round((t_drfp_1 - t_drfp_0) * 1000, 2),
+            "format_ms": round((t_fmt_1 - t_fmt_0) * 1000, 2),
+            "total_ms": round((t_end - t0) * 1000, 2),
+        }
 
         search_mode = "drfp_yield_blend" if use_drfp else "family_yield"
         return _success({
@@ -825,6 +856,7 @@ def _search_hte_precedent(
             "drfp_candidates_scored": min(support, _DRFP_CANDIDATE_CAP) if use_drfp else 0,
             "precedent_count": len(formatted),
             "precedents": formatted,
+            "hte_search_timing_ms": timing_ms,
             "message": (
                 f"Found {len(formatted)} HTE precedents from {support} reactions "
                 f"in '{family}' family. "

@@ -112,6 +112,14 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
         recs = raw if isinstance(raw, list) else (
             raw.get("recommended_conditions") or raw.get("recommendations", [])
         )
+        hte_timing_ms = None
+        hte_processing_time_ms = None
+        if isinstance(raw, dict):
+            meta = raw.get("meta") or {}
+            extras = raw.get("extras") or {}
+            hte_extra = extras.get("hte") or {}
+            hte_timing_ms = meta.get("timing_ms") or hte_extra.get("timing_ms")
+            hte_processing_time_ms = meta.get("processing_time_ms")
         diverse_recs = _diversify(recs, top_k)
         cleaned = []
         for i, rec in enumerate(diverse_recs, 1):
@@ -145,6 +153,8 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
             "recommendations": cleaned,
             "total_available": len(recs),
             "catalyst_families": sorted({_extract_metal(r["catalyst"]) for r in cleaned if r.get("catalyst")}),
+            "hte_timing_ms": hte_timing_ms or {},
+            "hte_processing_time_ms": hte_processing_time_ms,
         })
         if _rtx is not None and hasattr(_rtx, "set_cached_conditions"):
             _rtx.set_cached_conditions(reaction_smiles, int(top_k), result)
