@@ -247,6 +247,9 @@ Delivered:
 - Intake mismatch policies (`warn`, `confirm`, `reject`, `force`)
 - `intake --dry-run` support (compute target note files without writing)
 - Machine-readable intake output (`intake --output-format json`)
+- Dedicated quarantine review storage for unknown-label intake records (`knowledge_base/notes/_quarantine/...`)
+- Unknown reaction-label suggestions (taxonomy ID candidates) for intake QA/debugging
+- Structured intake warning details with severity/code metadata for ingestion pipelines
 - Tests for canonicalization, mismatch handling, unknown-label rejection, dry-run, and CLI JSON intake mode
 
 ### I. Taxonomy-validate all intake reaction labels before writing notes
@@ -347,3 +350,4 @@ Expected impact:
 
 - The existing architecture (ToolPlugin metadata, validators, workflow registry, critic pass) is already a strong foundation for these changes.
 - Prioritize moving chemistry constraints into deterministic runtime checks and taxonomy-backed contracts rather than relying on prompt instructions.
+- Follow-up implemented (deeper baseline): shared per-run `ReactionContext` / chemistry state cache in `ChemCoworker`, exposed as a formal tool runtime context so core chemistry and conditions tools can consume cached state directly (not only via agent-side wrappers).

@@ -337,6 +337,7 @@ class TestExecuteOneRunsValidators:
         executor.verbose = False
         executor.progress_cb = None
         executor.hooks = None
+        executor.runtime_context = None
         mock_registry = MagicMock()
         mock_registry._plugins = registry_plugins
         executor.registry = mock_registry
@@ -401,3 +402,62 @@ class TestExecuteOneRunsValidators:
         # Should not raise
         result = executor._execute_one(call, callables)
         assert result.get("success") is True
+
+
+class TestToolRuntimeContextInjection:
+    def _make_executor(self):
+        from chem_coworker.executor import ToolExecutor
+        executor = ToolExecutor.__new__(ToolExecutor)
+        executor.max_workers = 4
+        executor.verbose = False
+        executor.progress_cb = None
+        executor.hooks = None
+        executor.runtime_context = None
+        executor.registry = MagicMock(_plugins={})
+        return executor
+
+    def test_executor_sets_contextvar_for_tool_call(self):
+        from chem_coworker.plan import ToolCall
+        from chem_coworker.tool_runtime import get_current_tool_runtime_context
+
+        marker = object()
+
+        def tool_fn():
+            return {"success": True, "has_ctx": get_current_tool_runtime_context() is marker}
+
+        executor = self._make_executor()
+        call = ToolCall(name="ctx_tool", args={})
+        result = executor._execute_one(call, {"ctx_tool": tool_fn}, runtime_context=marker)
+        assert result["success"] is True
+        assert result["has_ctx"] is True
+
+    def test_chemistry_tool_prefers_runtime_context_short_circuit(self, monkeypatch):
+        from chem_coworker.tools.chemistry import _detect_reaction_type
+
+        class _FakeRuntimeContext:
+            def detect_reaction_type(self, reaction_smiles: str):
+                return {"success": True, "reaction_smiles": reaction_smiles, "cached": True}
+
+        monkeypatch.setattr(
+            "chem_coworker.tool_runtime.get_current_tool_runtime_context",
+            lambda: _FakeRuntimeContext(),
+        )
+        result = _detect_reaction_type("A >> B")
+        assert result["success"] is True
+        assert result["cached"] is True
+
+    def test_conditions_tool_prefers_runtime_context_cache(self, monkeypatch):
+        from chem_coworker.tools.conditions import _recommend_conditions
+
+        class _FakeRuntimeContext:
+            def get_cached_conditions(self, reaction_smiles: str, top_k: int):
+                return {"success": True, "reaction_smiles": reaction_smiles, "top_k": top_k, "cached": True}
+
+        monkeypatch.setattr(
+            "chem_coworker.tool_runtime.get_current_tool_runtime_context",
+            lambda: _FakeRuntimeContext(),
+        )
+        result = _recommend_conditions("A>>B", top_k=7)
+        assert result["success"] is True
+        assert result["cached"] is True
+        assert result["top_k"] == 7

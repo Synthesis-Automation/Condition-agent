@@ -47,6 +47,16 @@ def _normalize_reaction(smiles: str) -> Dict[str, Any]:
         dict with success, is_reaction, normalized_smiles, reactants, products, warnings.
     """
     try:
+        try:
+            from chem_coworker.tool_runtime import get_current_tool_runtime_context
+            _rtx = get_current_tool_runtime_context()
+        except Exception:
+            _rtx = None
+        if _rtx is not None and hasattr(_rtx, "normalize_reaction"):
+            cached = _rtx.normalize_reaction(smiles)
+            if isinstance(cached, dict):
+                return cached
+
         from chemtools.featurizers.analysis.smiles import normalize, normalize_reaction
 
         smiles = _clean_rxn_smiles(smiles)
@@ -106,6 +116,16 @@ def _detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
         dict with success, reaction_type, family_label, confidence.
     """
     try:
+        try:
+            from chem_coworker.tool_runtime import get_current_tool_runtime_context
+            _rtx = get_current_tool_runtime_context()
+        except Exception:
+            _rtx = None
+        if _rtx is not None and hasattr(_rtx, "detect_reaction_type"):
+            cached = _rtx.detect_reaction_type(reaction_smiles)
+            if isinstance(cached, dict):
+                return cached
+
         from chemtools.featurizers.unified import featurize_reaction
         from chemtools.taxonomy.reaction_catalog import get_reaction_type, resolve_reaction_type
 
@@ -188,6 +208,16 @@ def _analyze_bond_changes(reaction_smiles: str) -> Dict[str, Any]:
         dict with bonds_broken, bonds_formed, key_bond_type, leaving_groups.
     """
     try:
+        try:
+            from chem_coworker.tool_runtime import get_current_tool_runtime_context
+            _rtx = get_current_tool_runtime_context()
+        except Exception:
+            _rtx = None
+        if _rtx is not None and hasattr(_rtx, "analyze_bond_changes"):
+            cached = _rtx.analyze_bond_changes(reaction_smiles)
+            if isinstance(cached, dict):
+                return cached
+
         from chemtools._atom_mapping import analyze_bond_changes_hybrid
 
         reaction_smiles = _clean_rxn_smiles(reaction_smiles)
@@ -417,23 +447,34 @@ def _inspect_functional_groups(smiles: str) -> Dict[str, Any]:
         dict with detected_groups, categories, total_groups_detected.
     """
     try:
+        try:
+            from chem_coworker.tool_runtime import get_current_tool_runtime_context
+            _rtx = get_current_tool_runtime_context()
+        except Exception:
+            _rtx = None
         from chemtools.util.functional_groups import (
             get_functional_groups,
             get_group_categories,
         )
         # Strip reaction arrow if accidentally passed full reaction
         mol_smiles = smiles.split(">>")[0].split(">")[0].strip() if ">" in smiles else smiles
+        if _rtx is not None and hasattr(_rtx, "get_cached_molecule_result"):
+            cached = _rtx.get_cached_molecule_result("functional_groups", mol_smiles)
+            if isinstance(cached, dict):
+                return cached
 
         detected = get_functional_groups(mol_smiles)
         categories = get_group_categories(mol_smiles)
         categories_filtered = {cat: grps for cat, grps in categories.items() if grps}
-
-        return _success({
+        result = _success({
             "smiles": mol_smiles,
             "detected_groups": detected,
             "categories": categories_filtered,
             "total_groups_detected": len(detected),
         })
+        if _rtx is not None and hasattr(_rtx, "set_cached_molecule_result"):
+            _rtx.set_cached_molecule_result("functional_groups", mol_smiles, result)
+        return result
     except Exception as exc:
         return _error(f"Functional group detection failed: {exc}")
 
@@ -467,10 +508,19 @@ def _get_molecular_descriptors(smiles: str) -> Dict[str, Any]:
         RingCount, AromaticRings, HeavyAtomCount.
     """
     try:
+        try:
+            from chem_coworker.tool_runtime import get_current_tool_runtime_context
+            _rtx = get_current_tool_runtime_context()
+        except Exception:
+            _rtx = None
         from rdkit import Chem
         from rdkit.Chem import Descriptors, rdMolDescriptors
 
         mol_smiles = smiles.split(">>")[0].strip() if ">" in smiles else smiles
+        if _rtx is not None and hasattr(_rtx, "get_cached_molecule_result"):
+            cached = _rtx.get_cached_molecule_result("descriptors", mol_smiles)
+            if isinstance(cached, dict):
+                return cached
         mol = Chem.MolFromSmiles(mol_smiles)
         if mol is None:
             return _error(f"Could not parse SMILES: {mol_smiles!r}")
@@ -504,12 +554,15 @@ def _get_molecular_descriptors(smiles: str) -> Dict[str, Any]:
             descriptors["HBD"] > 5,
         ])
 
-        return _success({
+        result = _success({
             "smiles": mol_smiles,
             "descriptors": descriptors,
             "lipinski_ro5_violations": ro5_violations,
             "is_drug_like": ro5_violations <= 1,
         })
+        if _rtx is not None and hasattr(_rtx, "set_cached_molecule_result"):
+            _rtx.set_cached_molecule_result("descriptors", mol_smiles, result)
+        return result
     except Exception as exc:
         return _error(f"Descriptor calculation failed: {exc}")
 

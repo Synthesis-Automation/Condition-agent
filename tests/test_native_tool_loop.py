@@ -302,3 +302,75 @@ class TestAggregateConfidence:
             critic_findings=[critic_finding],
         )
         assert score < 0.45
+
+
+class TestSharedReactionContextCaching:
+    def test_context_aware_wrappers_share_one_reaction_context(self):
+        agent = _make_agent()
+        state = agent._new_chemistry_run_state()
+
+        agent._detect_reaction_type_from_context = lambda ctx: {"success": True, "ctx_id": id(ctx)}  # type: ignore[method-assign]
+        agent._analyze_bond_changes_from_context = lambda ctx: {"success": True, "ctx_id": id(ctx)}  # type: ignore[method-assign]
+
+        wrapped = agent._build_context_aware_callables(
+            {
+                "detect_reaction_type": lambda reaction_smiles: {"success": True},  # noqa: ARG005
+                "analyze_bond_changes": lambda reaction_smiles: {"success": True},  # noqa: ARG005
+            },
+            state,
+        )
+
+        r1 = wrapped["detect_reaction_type"](reaction_smiles="A >> B")
+        r2 = wrapped["analyze_bond_changes"](reaction_smiles="A>>B")
+
+        assert len(state.reaction_contexts) == 1
+        assert r1["ctx_id"] == r2["ctx_id"]
+
+    def test_context_aware_wrappers_cache_conditions_by_top_k(self):
+        agent = _make_agent()
+        state = agent._new_chemistry_run_state()
+        calls = {"n": 0}
+
+        def _fake_recommend_conditions(reaction_smiles: str, top_k: int = 5):
+            calls["n"] += 1
+            return {"success": True, "reaction_smiles": reaction_smiles, "top_k": top_k}
+
+        wrapped = agent._build_context_aware_callables(
+            {"recommend_conditions": _fake_recommend_conditions},
+            state,
+        )
+
+        a = wrapped["recommend_conditions"](reaction_smiles="A>>B", top_k=5)
+        b = wrapped["recommend_conditions"](reaction_smiles="A >> B", top_k=5)
+        c = wrapped["recommend_conditions"](reaction_smiles="A>>B", top_k=3)
+
+        assert calls["n"] == 2
+        assert a["top_k"] == 5 and b["top_k"] == 5 and c["top_k"] == 3
+
+    def test_context_aware_wrappers_cache_molecule_tools(self):
+        agent = _make_agent()
+        state = agent._new_chemistry_run_state()
+        counts = {"fg": 0, "desc": 0}
+
+        def _fake_fg(smiles: str):
+            counts["fg"] += 1
+            return {"success": True, "smiles": smiles}
+
+        def _fake_desc(smiles: str):
+            counts["desc"] += 1
+            return {"success": True, "smiles": smiles}
+
+        wrapped = agent._build_context_aware_callables(
+            {
+                "inspect_functional_groups": _fake_fg,
+                "get_molecular_descriptors": _fake_desc,
+            },
+            state,
+        )
+
+        wrapped["inspect_functional_groups"](smiles="c1ccccc1")
+        wrapped["inspect_functional_groups"](smiles="c1ccccc1")
+        wrapped["get_molecular_descriptors"](smiles="CCO")
+        wrapped["get_molecular_descriptors"](smiles="CCO")
+
+        assert counts == {"fg": 1, "desc": 1}

@@ -26,6 +26,7 @@ from __future__ import annotations
 import logging
 import os
 import re
+from difflib import get_close_matches
 from datetime import date
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
@@ -126,11 +127,16 @@ class NotesExtractor:
         """
         # Step 1: Load text
         text, source_name, warnings, saved_filename = self._load_source(source, save_to_literature)
+        warning_details = [
+            self._warning_detail("info", "source_notice", msg)
+            for msg in warnings
+        ]
         if not text:
             return {
                 "success": False,
                 "error": f"Could not load content from: {source!r}",
                 "warnings": warnings,
+                "warning_details": warning_details,
             }
 
         if self.verbose:
@@ -156,12 +162,14 @@ class NotesExtractor:
             confirm_callback=confirm_callback,
         )
         warnings.extend(label_plan["warnings"])
+        warning_details.extend(label_plan.get("warning_details", []))
 
         if label_plan.get("error"):
             return {
                 "success": False,
                 "error": label_plan["error"],
                 "warnings": warnings,
+                "warning_details": warning_details,
                 "source": source_name,
                 "note_type": note_type,
                 "reaction_type_hint_raw": reaction_type or "",
@@ -169,15 +177,22 @@ class NotesExtractor:
                 "reaction_types_detected_raw": label_plan.get("reaction_types_detected_raw", []),
                 "reaction_types_detected_canonical": label_plan.get("reaction_types_detected_canonical", []),
                 "reaction_types_unknown": label_plan.get("reaction_types_unknown", []),
+                "reaction_type_suggestions": label_plan.get("reaction_type_suggestions", {}),
                 "mismatch": bool(label_plan.get("mismatch")),
                 "mismatch_policy": mismatch_policy,
                 "dry_run": dry_run,
             }
 
         types_to_file: List[str] = label_plan["reaction_types"]
+        quarantine_target: Optional[Dict[str, Any]] = label_plan.get("quarantine_target")
 
         # Step 4: Append to notes files (or compute planned target files for dry-run)
-        from .tools.notes import append_notes, get_notes_path
+        from .tools.notes import (
+            append_notes,
+            append_quarantine_notes,
+            get_notes_path,
+            get_quarantine_notes_path,
+        )
         notes_files: List[str] = []
         for rt in types_to_file:
             if dry_run:
@@ -187,6 +202,24 @@ class NotesExtractor:
                 if self.verbose:
                     logger.info(f"[extractor] Appended to {path}")
             notes_files.append(str(path))
+
+        quarantine_file = ""
+        if quarantine_target:
+            quarantine_bucket = str(quarantine_target.get("bucket") or "unknown_reaction_labels")
+            quarantine_labels = list(quarantine_target.get("labels") or [])
+            if dry_run:
+                qpath = get_quarantine_notes_path(note_type=note_type, bucket=quarantine_bucket)
+            else:
+                qpath = append_quarantine_notes(
+                    extracted,
+                    note_type=note_type,
+                    bucket=quarantine_bucket,
+                    labels=quarantine_labels,
+                )
+                if self.verbose:
+                    logger.info(f"[extractor] Quarantined intake to {qpath}")
+            quarantine_file = str(qpath)
+            notes_files.append(quarantine_file)
 
         if not dry_run:
             # Rebuild index so new notes are immediately discoverable
@@ -208,16 +241,46 @@ class NotesExtractor:
             "reaction_types_detected_raw": label_plan.get("reaction_types_detected_raw", []),
             "reaction_types_detected_canonical": label_plan.get("reaction_types_detected_canonical", []),
             "reaction_types_unknown": label_plan.get("reaction_types_unknown", []),
+            "reaction_type_suggestions": label_plan.get("reaction_type_suggestions", {}),
             "mismatch": bool(label_plan.get("mismatch")),
             "mismatch_policy": mismatch_policy,
             "unknown_reaction_policy": unknown_reaction_policy,
             "dry_run": dry_run,
             "write_performed": not dry_run,
+            "quarantined": bool(quarantine_target),
+            "quarantine_file": quarantine_file,
             "notes_files": notes_files,
             "extracted_notes": extracted,
             "char_count": len(extracted),
             "warnings": warnings,
+            "warning_details": warning_details,
         }
+
+    @staticmethod
+    def _warning_detail(
+        severity: str,
+        code: str,
+        message: str,
+        **extra: Any,
+    ) -> Dict[str, Any]:
+        detail: Dict[str, Any] = {
+            "severity": severity,
+            "code": code,
+            "message": message,
+        }
+        if extra:
+            detail.update(extra)
+        return detail
+
+    @staticmethod
+    def _suggest_reaction_type_ids(label: str, limit: int = 5) -> List[str]:
+        from chemtools.taxonomy.reaction_catalog import list_reaction_type_ids
+
+        token = (label or "").strip().lower()
+        if not token:
+            return []
+        ids = [rid.strip().lower() for rid in list_reaction_type_ids()]
+        return get_close_matches(token, ids, n=limit, cutoff=0.45)
 
     def _plan_reaction_type_filing(
         self,
@@ -232,8 +295,9 @@ class NotesExtractor:
 
         Returns a dict containing:
           reaction_types, reaction_type_hint_canonical, reaction_types_detected_raw,
-          reaction_types_detected_canonical, reaction_types_unknown, mismatch, warnings,
-          and optional error.
+          reaction_types_detected_canonical, reaction_types_unknown,
+          reaction_type_suggestions, mismatch, warnings, warning_details,
+          optional quarantine_target, and optional error.
         """
         from chemtools.taxonomy.reaction_catalog import resolve_reaction_type
 
@@ -245,16 +309,30 @@ class NotesExtractor:
             return {
                 "reaction_types": [],
                 "warnings": [],
+                "warning_details": [],
                 "error": f"Invalid mismatch policy: {mismatch_policy!r}",
             }
         if unknown_reaction_policy not in valid_unknown:
             return {
                 "reaction_types": [],
                 "warnings": [],
+                "warning_details": [],
                 "error": f"Invalid unknown reaction policy: {unknown_reaction_policy!r}",
             }
 
         warnings: List[str] = []
+        warning_details: List[Dict[str, Any]] = []
+        reaction_type_suggestions: Dict[str, List[str]] = {}
+
+        def _push_warning(
+            message: str,
+            *,
+            severity: str = "warn",
+            code: str = "intake_warning",
+            **extra: Any,
+        ) -> None:
+            warnings.append(message)
+            warning_details.append(self._warning_detail(severity, code, message, **extra))
 
         def _canonicalize_many(labels: List[str]) -> tuple[List[str], List[str]]:
             canonical: List[str] = []
@@ -292,6 +370,8 @@ class NotesExtractor:
                 "Unknown reaction label(s) not found in taxonomy: "
                 + ", ".join(unknown_labels)
             )
+            for raw in unknown_labels:
+                reaction_type_suggestions[raw] = self._suggest_reaction_type_ids(raw)
             if unknown_reaction_policy == "reject":
                 return {
                     "reaction_types": [],
@@ -299,14 +379,26 @@ class NotesExtractor:
                     "reaction_types_detected_raw": detected_raw,
                     "reaction_types_detected_canonical": detected_canonical,
                     "reaction_types_unknown": unknown_labels,
+                    "reaction_type_suggestions": reaction_type_suggestions,
                     "mismatch": False,
                     "warnings": warnings,
+                    "warning_details": warning_details,
                     "error": msg,
                 }
             if unknown_reaction_policy == "quarantine":
-                warnings.append(msg + " (quarantining to general)")
+                _push_warning(
+                    msg + " (quarantine enabled)",
+                    code="unknown_reaction_type",
+                    labels=unknown_labels,
+                    suggestions=reaction_type_suggestions,
+                )
             else:
-                warnings.append(msg + " (routing unknown labels to general)")
+                _push_warning(
+                    msg + " (routing unknown labels to general)",
+                    code="unknown_reaction_type",
+                    labels=unknown_labels,
+                    suggestions=reaction_type_suggestions,
+                )
 
         mismatch = False
         if hint_canonical and detected_canonical and hint_canonical not in detected_canonical:
@@ -322,8 +414,10 @@ class NotesExtractor:
                     "reaction_types_detected_raw": detected_raw,
                     "reaction_types_detected_canonical": detected_canonical,
                     "reaction_types_unknown": unknown_labels,
+                    "reaction_type_suggestions": reaction_type_suggestions,
                     "mismatch": True,
                     "warnings": warnings,
+                    "warning_details": warning_details,
                     "error": mismatch_msg,
                 }
             if mismatch_policy == "confirm":
@@ -334,8 +428,10 @@ class NotesExtractor:
                         "reaction_types_detected_raw": detected_raw,
                         "reaction_types_detected_canonical": detected_canonical,
                         "reaction_types_unknown": unknown_labels,
+                        "reaction_type_suggestions": reaction_type_suggestions,
                         "mismatch": True,
                         "warnings": warnings,
+                        "warning_details": warning_details,
                         "error": mismatch_msg + " (confirmation required)",
                     }
                 proceed = bool(confirm_callback({
@@ -351,20 +447,35 @@ class NotesExtractor:
                         "reaction_types_detected_raw": detected_raw,
                         "reaction_types_detected_canonical": detected_canonical,
                         "reaction_types_unknown": unknown_labels,
+                        "reaction_type_suggestions": reaction_type_suggestions,
                         "mismatch": True,
                         "warnings": warnings,
+                        "warning_details": warning_details,
                         "error": mismatch_msg + " (user declined confirmation)",
                     }
-                warnings.append(mismatch_msg + " (confirmed)")
+                _push_warning(
+                    mismatch_msg + " (confirmed)",
+                    code="reaction_type_mismatch",
+                    hint=hint_canonical,
+                    detected=detected_canonical,
+                )
             elif mismatch_policy == "warn":
-                warnings.append(mismatch_msg)
+                _push_warning(
+                    mismatch_msg,
+                    code="reaction_type_mismatch",
+                    hint=hint_canonical,
+                    detected=detected_canonical,
+                )
 
         types_to_file: List[str] = []
         if mismatch_policy == "force" and hint_canonical:
             types_to_file = [hint_canonical]
             if mismatch:
-                warnings.append(
-                    "Mismatch policy=force: using hinted reaction type and ignoring detected labels"
+                _push_warning(
+                    "Mismatch policy=force: using hinted reaction type and ignoring detected labels",
+                    code="reaction_type_mismatch_forced",
+                    hint=hint_canonical,
+                    detected=detected_canonical,
                 )
         else:
             if hint_canonical:
@@ -373,9 +484,24 @@ class NotesExtractor:
                 if rt not in types_to_file:
                     types_to_file.append(rt)
 
+        quarantine_target = None
         if not types_to_file:
-            types_to_file = ["general"]
-            warnings.append("No taxonomy-canonical reaction type resolved; filing under general")
+            if unknown_labels and unknown_reaction_policy == "quarantine":
+                quarantine_target = {
+                    "bucket": "unknown_reaction_labels",
+                    "labels": unknown_labels,
+                }
+                _push_warning(
+                    "No taxonomy-canonical reaction type resolved; filing to quarantine review store",
+                    code="quarantine_routing",
+                    labels=unknown_labels,
+                )
+            else:
+                types_to_file = ["general"]
+                _push_warning(
+                    "No taxonomy-canonical reaction type resolved; filing under general",
+                    code="general_fallback",
+                )
 
         return {
             "reaction_types": types_to_file,
@@ -383,8 +509,11 @@ class NotesExtractor:
             "reaction_types_detected_raw": detected_raw,
             "reaction_types_detected_canonical": detected_canonical,
             "reaction_types_unknown": unknown_labels,
+            "reaction_type_suggestions": reaction_type_suggestions,
             "mismatch": mismatch,
             "warnings": warnings,
+            "warning_details": warning_details,
+            "quarantine_target": quarantine_target,
         }
 
     # ------------------------------------------------------------------

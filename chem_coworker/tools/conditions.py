@@ -82,6 +82,16 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
           precedent_count.
     """
     try:
+        try:
+            from chem_coworker.tool_runtime import get_current_tool_runtime_context
+            _rtx = get_current_tool_runtime_context()
+        except Exception:
+            _rtx = None
+        if _rtx is not None and hasattr(_rtx, "get_cached_conditions"):
+            cached = _rtx.get_cached_conditions(reaction_smiles, int(top_k))
+            if isinstance(cached, dict):
+                return cached
+
         from chemtools.recommend.hte_adapter import recommend_from_reaction
 
         reaction_smiles = _clean_rxn_smiles(reaction_smiles)
@@ -130,12 +140,15 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
             }
             cleaned.append(entry)
 
-        return _success({
+        result = _success({
             "reaction_smiles": reaction_smiles,
             "recommendations": cleaned,
             "total_available": len(recs),
             "catalyst_families": sorted({_extract_metal(r["catalyst"]) for r in cleaned if r.get("catalyst")}),
         })
+        if _rtx is not None and hasattr(_rtx, "set_cached_conditions"):
+            _rtx.set_cached_conditions(reaction_smiles, int(top_k), result)
+        return result
     except Exception as exc:
         return _error(f"Condition recommendation failed: {exc}")
 

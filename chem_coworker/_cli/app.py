@@ -280,8 +280,29 @@ def _cmd_setup(args: argparse.Namespace) -> None:  # noqa: ARG001
 
 def _cmd_intake(args: argparse.Namespace) -> None:
     from chem_coworker.extractor import NotesExtractor
+    from chemtools.taxonomy.reaction_catalog import list_reaction_type_ids
 
     output_format = getattr(args, "output_format", "plain")
+    if getattr(args, "list_reaction_types", False):
+        ids = list_reaction_type_ids()
+        if output_format == "json":
+            print(json.dumps({"reaction_type_ids": ids, "count": len(ids)}, ensure_ascii=False, indent=2))
+        else:
+            print()
+            print(f"  {C.LABEL}◆ Reaction Type Taxonomy{C.R}  {C.DIM}{len(ids)} entries{C.R}")
+            print(f"  {SEP}")
+            for rid in ids:
+                print(f"  {C.DIM}{rid}{C.R}")
+            print()
+        return
+
+    if not getattr(args, "source", None):
+        if output_format == "json":
+            print(json.dumps({"success": False, "error": "intake requires SOURCE unless --list-reaction-types is used"}))
+        else:
+            print(f"  {C.ERR}✗{C.R}  intake requires SOURCE unless --list-reaction-types is used")
+        sys.exit(2)
+
     if args.model is not None:
         model = args.model
     else:
@@ -373,17 +394,30 @@ def _cmd_intake(args: argparse.Namespace) -> None:
     print(f"  {C.OK}✓{C.R}  Extracted {result['char_count']:,} chars  {C.META}{elapsed:.1f}s{C.R}")
     print()
 
-    types_str = ", ".join(result["reaction_types"])
-    print(f"  {C.LABEL}◆ Reaction types (canonical){C.R}  {C.TOOL}{types_str}{C.R}")
+    reaction_types = result.get("reaction_types", [])
+    if reaction_types:
+        types_str = ", ".join(reaction_types)
+        print(f"  {C.LABEL}◆ Reaction types (canonical){C.R}  {C.TOOL}{types_str}{C.R}")
+    elif result.get("quarantined"):
+        print(f"  {C.LABEL}◆ Reaction types (canonical){C.R}  {C.DIM}(none resolved; quarantined){C.R}")
+    else:
+        print(f"  {C.LABEL}◆ Reaction types (canonical){C.R}  {C.DIM}(none){C.R}")
     if result.get("reaction_types_detected_raw"):
         raw_detected = ", ".join(result["reaction_types_detected_raw"])
         print(f"  {C.META}Detected raw:{C.R} {C.DIM}{raw_detected}{C.R}")
     if result.get("reaction_types_unknown"):
         unknown = ", ".join(result["reaction_types_unknown"])
         print(f"  {C.META}Unknown labels:{C.R} {C.DIM}{unknown}{C.R}")
+    if result.get("reaction_type_suggestions"):
+        print(f"  {C.META}Suggestions:{C.R}")
+        for raw, suggestions in result["reaction_type_suggestions"].items():
+            if suggestions:
+                print(f"      {C.DIM}{raw} -> {', '.join(suggestions)}{C.R}")
 
     if result.get("dry_run"):
         print(f"  {C.LABEL}◆ Target note files (dry-run){C.R}")
+    elif result.get("quarantined"):
+        print(f"  {C.LABEL}◆ Quarantine file{C.R}")
     else:
         print(f"  {C.LABEL}◆ Notes written to{C.R}")
     for nf in result["notes_files"]:
@@ -460,7 +494,12 @@ Examples:
   python -m chem_coworker._cli.app intake my_notes.txt
         """,
     )
-    intake_parser.add_argument("source", help="URL, file path, or raw text to process")
+    intake_parser.add_argument("source", nargs="?", help="URL, file path, or raw text to process")
+    intake_parser.add_argument(
+        "--list-reaction-types",
+        action="store_true",
+        help="List taxonomy reaction type IDs and exit",
+    )
     intake_parser.add_argument(
         "--reaction-type",
         default="",

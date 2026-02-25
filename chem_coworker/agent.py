@@ -13,10 +13,13 @@ Typical LLM call count: 1–9 (reasoning iterations) + optional exhaustion-guard
 """
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import os
+import threading
 import time
+from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
@@ -34,6 +37,86 @@ _COMPACT_KEEP_RECENT = 6   # most-recent messages kept verbatim (= 3 full turns)
 # Local imports (no circular dependency — these modules don't import agent.py)
 from .response import ChemResponse  # noqa: E402
 from .plan import ExecutionPlan     # noqa: E402
+
+
+@dataclass
+class ReactionContext:
+    """Per-reaction cached chemistry state for a single ChemCoworker run."""
+    input_reaction_smiles: str
+    normalized_reaction_smiles: str
+    normalization_result: Optional[Dict[str, Any]] = None
+    featurization_result: Optional[Dict[str, Any]] = None
+    bond_change_analysis_raw: Optional[Any] = None
+    bond_change_recommended: Optional[Dict[str, Any]] = None
+    detect_reaction_type_result: Optional[Dict[str, Any]] = None
+    analyze_bond_changes_result: Optional[Dict[str, Any]] = None
+    conditions_results_by_top_k: Dict[int, Dict[str, Any]] = field(default_factory=dict)
+    reaction_type_candidates: List[Any] = field(default_factory=list)
+    motif_evidence: Dict[str, Any] = field(default_factory=dict)
+    fg_profile: Dict[str, Any] = field(default_factory=dict)
+    _lock: Any = field(default_factory=threading.RLock, repr=False)
+
+
+@dataclass
+class ChemistryRunState:
+    """Ephemeral per-query cache shared across tool calls in a single run."""
+    reaction_contexts: Dict[str, ReactionContext] = field(default_factory=dict)
+    functional_group_results: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    descriptor_results: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    _lock: Any = field(default_factory=threading.RLock, repr=False)
+
+
+@dataclass
+class _ToolRuntimeContext:
+    """Formal per-run runtime context injected into tool calls via contextvar."""
+    agent: Any
+    chemistry_state: ChemistryRunState
+
+    def normalize_reaction(self, smiles: str) -> Optional[Dict[str, Any]]:
+        if not self.agent._is_reaction_smiles_input(smiles):
+            return None
+        rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, smiles)
+        return self.agent._copy_result(self.agent._hydrate_reaction_normalization(rxn_ctx))
+
+    def detect_reaction_type(self, reaction_smiles: str) -> Dict[str, Any]:
+        rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        return self.agent._detect_reaction_type_from_context(rxn_ctx)
+
+    def analyze_bond_changes(self, reaction_smiles: str) -> Dict[str, Any]:
+        rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        return self.agent._analyze_bond_changes_from_context(rxn_ctx)
+
+    def get_cached_conditions(self, reaction_smiles: str, top_k: int) -> Optional[Dict[str, Any]]:
+        rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        with rxn_ctx._lock:
+            cached = rxn_ctx.conditions_results_by_top_k.get(int(top_k))
+        return self.agent._copy_result(cached) if cached is not None else None
+
+    def set_cached_conditions(self, reaction_smiles: str, top_k: int, result: Dict[str, Any]) -> None:
+        rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        with rxn_ctx._lock:
+            rxn_ctx.conditions_results_by_top_k[int(top_k)] = self.agent._copy_result(result)
+
+    def get_cached_molecule_result(self, cache_name: str, smiles: str) -> Optional[Dict[str, Any]]:
+        key = str(smiles or "").strip()
+        with self.chemistry_state._lock:
+            cache = (
+                self.chemistry_state.functional_group_results
+                if cache_name == "functional_groups"
+                else self.chemistry_state.descriptor_results
+            )
+            cached = cache.get(key)
+        return self.agent._copy_result(cached) if cached is not None else None
+
+    def set_cached_molecule_result(self, cache_name: str, smiles: str, result: Dict[str, Any]) -> None:
+        key = str(smiles or "").strip()
+        with self.chemistry_state._lock:
+            cache = (
+                self.chemistry_state.functional_group_results
+                if cache_name == "functional_groups"
+                else self.chemistry_state.descriptor_results
+            )
+            cache[key] = self.agent._copy_result(result)
 
 
 # ---------------------------------------------------------------------------
@@ -142,6 +225,310 @@ class ChemCoworker:
     # Public API
     # ------------------------------------------------------------------
 
+    def _new_chemistry_run_state(self) -> ChemistryRunState:
+        """Create an ephemeral per-run chemistry cache shared across tool calls."""
+        return ChemistryRunState()
+
+    def _new_tool_runtime_context(self, run_state: ChemistryRunState) -> Any:
+        """Create a formal per-run runtime context object for tool calls."""
+        return _ToolRuntimeContext(agent=self, chemistry_state=run_state)
+
+    def _get_or_create_reaction_context(
+        self,
+        run_state: ChemistryRunState,
+        reaction_smiles: str,
+    ) -> ReactionContext:
+        from .tools._helpers import _clean_rxn_smiles
+
+        key = _clean_rxn_smiles(reaction_smiles or "")
+        with run_state._lock:
+            ctx = run_state.reaction_contexts.get(key)
+            if ctx is None:
+                ctx = ReactionContext(
+                    input_reaction_smiles=reaction_smiles,
+                    normalized_reaction_smiles=key,
+                )
+                run_state.reaction_contexts[key] = ctx
+            return ctx
+
+    def _is_reaction_smiles_input(self, value: Any) -> bool:
+        if not isinstance(value, str):
+            return False
+        return ">>" in value or (">" in value and value.count(">") >= 1)
+
+    def _copy_result(self, value: Any) -> Any:
+        try:
+            return copy.deepcopy(value)
+        except Exception:
+            return value
+
+    def _hydrate_reaction_normalization(self, ctx: ReactionContext) -> Optional[Dict[str, Any]]:
+        from .tools._helpers import _error, _success
+        from chemtools.featurizers.analysis.smiles import normalize_reaction
+
+        with ctx._lock:
+            if ctx.normalization_result is not None:
+                return ctx.normalization_result
+            try:
+                result = normalize_reaction(ctx.normalized_reaction_smiles)
+                if "error" in result:
+                    ctx.normalization_result = _error(f"Invalid reaction SMILES: {result['error']}")
+                else:
+                    ctx.normalization_result = _success({
+                        "is_reaction": True,
+                        "input_smiles": ctx.normalized_reaction_smiles,
+                        "reactants": result.get("reactants", []),
+                        "agents": result.get("agents", []),
+                        "products": result.get("products", []),
+                        "warnings": result.get("warnings", []),
+                    })
+            except Exception as exc:
+                ctx.normalization_result = _error(f"SMILES normalization failed: {exc}")
+            return ctx.normalization_result
+
+    def _hydrate_reaction_featurization(self, ctx: ReactionContext) -> Optional[Dict[str, Any]]:
+        from chemtools.featurizers.unified import featurize_reaction
+
+        with ctx._lock:
+            if ctx.featurization_result is not None:
+                return ctx.featurization_result
+            result = featurize_reaction(ctx.normalized_reaction_smiles)
+            ctx.featurization_result = result if isinstance(result, dict) else None
+            detection = ctx.featurization_result.get("detection", {}) if ctx.featurization_result else {}
+            evidence = detection.get("evidence", {}) if isinstance(detection, dict) else {}
+            candidates = detection.get("candidates") if isinstance(detection, dict) else None
+            if isinstance(candidates, list):
+                ctx.reaction_type_candidates = candidates
+            if isinstance(evidence, dict):
+                ctx.motif_evidence = {
+                    "reacted_motifs": list(evidence.get("reacted_motifs", []) or []),
+                    "formed_motifs": list(evidence.get("formed_motifs", []) or []),
+                }
+            return ctx.featurization_result
+
+    def _hydrate_bond_change_analysis(self, ctx: ReactionContext) -> Optional[Dict[str, Any]]:
+        from chemtools._atom_mapping import analyze_bond_changes_hybrid
+
+        with ctx._lock:
+            if ctx.bond_change_recommended is not None:
+                return ctx.bond_change_recommended
+            result = analyze_bond_changes_hybrid(ctx.normalized_reaction_smiles)
+            ctx.bond_change_analysis_raw = result
+            if isinstance(result, dict) and "recommended_result" in result:
+                ctx.bond_change_recommended = result["recommended_result"]
+            elif isinstance(result, dict):
+                ctx.bond_change_recommended = result
+            else:
+                ctx.bond_change_recommended = None
+            return ctx.bond_change_recommended
+
+    def _hydrate_reaction_fg_profile(self, ctx: ReactionContext) -> Dict[str, Any]:
+        """Lazily compute component-level functional group profile for a reaction."""
+        with ctx._lock:
+            if ctx.fg_profile:
+                return ctx.fg_profile
+        norm = self._hydrate_reaction_normalization(ctx)
+        if not isinstance(norm, dict) or not norm.get("success"):
+            return {}
+
+        try:
+            from chemtools.util.functional_groups import get_functional_groups, get_group_categories
+        except Exception:
+            return {}
+
+        reactants = [r for r in (norm.get("reactants") or []) if isinstance(r, str) and r]
+        products = [p for p in (norm.get("products") or []) if isinstance(p, str) and p]
+
+        def _profile_many(items: List[str]) -> List[Dict[str, Any]]:
+            prof: List[Dict[str, Any]] = []
+            for smi in items:
+                try:
+                    groups = get_functional_groups(smi)
+                    cats = get_group_categories(smi)
+                    prof.append({
+                        "smiles": smi,
+                        "detected_groups": groups,
+                        "categories": {k: v for k, v in (cats or {}).items() if v},
+                    })
+                except Exception:
+                    prof.append({"smiles": smi, "detected_groups": [], "categories": {}})
+            return prof
+
+        fg = {"reactants": _profile_many(reactants), "products": _profile_many(products)}
+        with ctx._lock:
+            if not ctx.fg_profile:
+                ctx.fg_profile = fg
+            return ctx.fg_profile
+
+    def _detect_reaction_type_from_context(self, ctx: ReactionContext) -> Dict[str, Any]:
+        from .tools._helpers import _error, _success
+        from chemtools.taxonomy.reaction_catalog import get_reaction_type, resolve_reaction_type
+
+        with ctx._lock:
+            if ctx.detect_reaction_type_result is not None:
+                return self._copy_result(ctx.detect_reaction_type_result)
+
+        try:
+            result = self._hydrate_reaction_featurization(ctx)
+            if not result:
+                out = _error("Reaction featurization returned no result")
+            else:
+                detection = result.get("detection", {})
+                validation = detection.get("validation", {}) if isinstance(detection, dict) else {}
+                evidence = detection.get("evidence", {}) if isinstance(detection, dict) else {}
+
+                reaction_type_raw = result.get("reaction_type") or validation.get("validated_detection")
+                reaction_type_id = resolve_reaction_type(str(reaction_type_raw)) if reaction_type_raw else None
+                reaction_type = reaction_type_id or reaction_type_raw
+                confidence = (
+                    validation.get("validation_confidence")
+                    or result.get("confidence")
+                    or 0.0
+                )
+                rt_def = get_reaction_type(str(reaction_type)) if reaction_type else None
+                family_label = (
+                    rt_def.name if rt_def else (reaction_type.replace("_", " ") if reaction_type else "")
+                )
+                taxonomy_metadata = {
+                    "id": getattr(rt_def, "id", reaction_type_id or reaction_type or ""),
+                    "name": getattr(rt_def, "name", family_label or ""),
+                    "category": getattr(rt_def, "category", ""),
+                    "aliases": list(getattr(rt_def, "aliases", []) or []),
+                    "has_constraints": bool(getattr(rt_def, "constraints", None)),
+                } if reaction_type else {}
+
+                reacted_motifs = evidence.get("reacted_motifs", []) if isinstance(evidence, dict) else []
+                formed_motifs = evidence.get("formed_motifs", []) if isinstance(evidence, dict) else []
+
+                out = _success({
+                    "reaction_smiles": ctx.normalized_reaction_smiles,
+                    "reaction_type": reaction_type,
+                    "reaction_type_id": reaction_type_id or reaction_type,
+                    "family_label": family_label,
+                    "confidence": float(confidence),
+                    "reacted_motifs": reacted_motifs,
+                    "formed_motifs": formed_motifs,
+                    "reaction_key": result.get("reaction_key"),
+                    "reaction_type_metadata": taxonomy_metadata,
+                })
+        except Exception as exc:
+            out = _error(f"Reaction type detection failed: {exc}")
+
+        with ctx._lock:
+            ctx.detect_reaction_type_result = self._copy_result(out)
+            # Update context summary fields for downstream consistency
+            if isinstance(out, dict) and out.get("success"):
+                ctx.motif_evidence = {
+                    "reacted_motifs": list(out.get("reacted_motifs", []) or []),
+                    "formed_motifs": list(out.get("formed_motifs", []) or []),
+                }
+        return self._copy_result(out)
+
+    def _analyze_bond_changes_from_context(self, ctx: ReactionContext) -> Dict[str, Any]:
+        from .tools._helpers import _error, _success, _to_jsonable
+        from .tools.chemistry import _infer_key_bond_type
+
+        with ctx._lock:
+            if ctx.analyze_bond_changes_result is not None:
+                return self._copy_result(ctx.analyze_bond_changes_result)
+
+        try:
+            rec = self._hydrate_bond_change_analysis(ctx)
+            if not rec:
+                out = _error("Bond change analysis returned no result")
+            else:
+                broken = rec.get("broken_bonds") or rec.get("bonds_broken", [])
+                formed = rec.get("formed_bonds") or rec.get("bonds_formed", [])
+                leaving = rec.get("leaving_groups", [])
+                key_bond = _infer_key_bond_type(broken, leaving)
+                out = _success({
+                    "reaction_smiles": ctx.normalized_reaction_smiles,
+                    "bonds_broken": _to_jsonable(broken),
+                    "bonds_formed": _to_jsonable(formed),
+                    "key_bond_type": key_bond,
+                    "leaving_groups": _to_jsonable(leaving),
+                    "mapping_confidence": rec.get("confidence", rec.get("mapping_confidence", "")),
+                })
+        except Exception as exc:
+            out = _error(f"Bond change analysis failed: {exc}")
+
+        with ctx._lock:
+            ctx.analyze_bond_changes_result = self._copy_result(out)
+        return self._copy_result(out)
+
+    def _build_context_aware_callables(
+        self,
+        base_callables: Dict[str, Callable[..., Any]],
+        run_state: ChemistryRunState,
+    ) -> Dict[str, Callable[..., Any]]:
+        """Wrap chemistry-heavy tools so they share per-run cached reaction state."""
+        wrapped = dict(base_callables)
+
+        def _normalize_wrapper(*, smiles: str) -> Any:
+            if not self._is_reaction_smiles_input(smiles):
+                return base_callables["normalize_reaction"](smiles=smiles)
+            ctx = self._get_or_create_reaction_context(run_state, smiles)
+            result = self._hydrate_reaction_normalization(ctx)
+            return self._copy_result(result)
+
+        def _detect_wrapper(*, reaction_smiles: str) -> Any:
+            ctx = self._get_or_create_reaction_context(run_state, reaction_smiles)
+            return self._detect_reaction_type_from_context(ctx)
+
+        def _bond_wrapper(*, reaction_smiles: str) -> Any:
+            ctx = self._get_or_create_reaction_context(run_state, reaction_smiles)
+            return self._analyze_bond_changes_from_context(ctx)
+
+        def _conditions_wrapper(*, reaction_smiles: str, top_k: int = 5) -> Any:
+            ctx = self._get_or_create_reaction_context(run_state, reaction_smiles)
+            tk = int(top_k)
+            with ctx._lock:
+                if tk in ctx.conditions_results_by_top_k:
+                    return self._copy_result(ctx.conditions_results_by_top_k[tk])
+            result = base_callables["recommend_conditions"](reaction_smiles=reaction_smiles, top_k=top_k)
+            with ctx._lock:
+                ctx.conditions_results_by_top_k[tk] = self._copy_result(result)
+            return self._copy_result(result)
+
+        def _inspect_fg_wrapper(*, smiles: str) -> Any:
+            key = str(smiles or "").strip()
+            with run_state._lock:
+                cached = run_state.functional_group_results.get(key)
+            if cached is not None:
+                return self._copy_result(cached)
+            if self._is_reaction_smiles_input(key):
+                ctx = self._get_or_create_reaction_context(run_state, key)
+                self._hydrate_reaction_fg_profile(ctx)
+            result = base_callables["inspect_functional_groups"](smiles=smiles)
+            with run_state._lock:
+                run_state.functional_group_results[key] = self._copy_result(result)
+            return self._copy_result(result)
+
+        def _descriptor_wrapper(*, smiles: str) -> Any:
+            key = str(smiles or "").strip()
+            with run_state._lock:
+                cached = run_state.descriptor_results.get(key)
+            if cached is not None:
+                return self._copy_result(cached)
+            result = base_callables["get_molecular_descriptors"](smiles=smiles)
+            with run_state._lock:
+                run_state.descriptor_results[key] = self._copy_result(result)
+            return self._copy_result(result)
+
+        if "normalize_reaction" in base_callables:
+            wrapped["normalize_reaction"] = _normalize_wrapper
+        if "detect_reaction_type" in base_callables:
+            wrapped["detect_reaction_type"] = _detect_wrapper
+        if "analyze_bond_changes" in base_callables:
+            wrapped["analyze_bond_changes"] = _bond_wrapper
+        if "recommend_conditions" in base_callables:
+            wrapped["recommend_conditions"] = _conditions_wrapper
+        if "inspect_functional_groups" in base_callables:
+            wrapped["inspect_functional_groups"] = _inspect_fg_wrapper
+        if "get_molecular_descriptors" in base_callables:
+            wrapped["get_molecular_descriptors"] = _descriptor_wrapper
+        return wrapped
+
     def run(self, query: str) -> "ChemResponse":
         """
         Single-turn run. Returns a ChemResponse with tool results and final answer.
@@ -165,6 +552,7 @@ class ChemCoworker:
         # ── Steps 2–4: Native tool calling ─────────────────────────────
         warnings: List[str] = []
         critic_findings: List[Any] = []
+        chemistry_state = self._new_chemistry_run_state()
         tool_results, hypothesis, confidence, tool_warnings, llm_calls_native, answer, _messages = \
             self._run_native_tool_loop(
                 query=query,
@@ -172,6 +560,7 @@ class ChemCoworker:
                 smiles_list=smiles_list,
                 workflow=workflow,
                 primary_smiles=primary_smiles,
+                chemistry_state=chemistry_state,
             )
         warnings.extend(tool_warnings)
         llm_calls += llm_calls_native
@@ -651,6 +1040,7 @@ class ChemCoworker:
         smiles_list: List[str],
         workflow: WorkflowDefinition,
         primary_smiles: str,
+        chemistry_state: Optional[ChemistryRunState] = None,
     ) -> tuple:
         """
         Run the reasoning+execution phase via native LangChain tool calling.
@@ -703,6 +1093,7 @@ class ChemCoworker:
         llm_call_count = 0
         final_answer = ""
         callables = self.registry.get_callables()
+        runtime_context = self._new_tool_runtime_context(chemistry_state) if chemistry_state is not None else None
 
         self.event_bus.emit(ChemEvent.PHASE_START, phase="reason")
 
@@ -758,7 +1149,7 @@ class ChemCoworker:
             if tc_list:
                 import time as _t
                 t0 = _t.monotonic()
-                group_results = self.executor._run_parallel(tc_list, callables)
+                group_results = self.executor._run_parallel(tc_list, callables, runtime_context=runtime_context)
                 tool_results.update(group_results)
                 elapsed = _t.monotonic() - t0
 

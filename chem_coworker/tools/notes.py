@@ -24,6 +24,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import os
@@ -192,6 +193,48 @@ def append_notes(
     else:
         header = f"# {reaction_type.replace('_', ' ').title()} — {note_type.rstrip('s').title()} Notes\n\n"
         path.write_text(header + content.strip() + "\n", encoding="utf-8")
+
+    return path
+
+
+def get_quarantine_notes_path(
+    note_type: str = "reactions",
+    bucket: str = "unknown_reaction_labels",
+) -> Path:
+    """Return a dedicated quarantine file path for intake records requiring review."""
+    bucket_key = re.sub(r"[^a-z0-9_]+", "_", bucket.strip().lower()) or "quarantine"
+    return get_notes_dir() / "_quarantine" / note_type / f"{bucket_key}.md"
+
+
+def append_quarantine_notes(
+    content: str,
+    note_type: str = "reactions",
+    bucket: str = "unknown_reaction_labels",
+    labels: Optional[List[str]] = None,
+) -> Path:
+    """Append intake content to a quarantine review file instead of canonical note files."""
+    path = get_quarantine_notes_path(note_type=note_type, bucket=bucket)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    label_line = ""
+    if labels:
+        clean = [str(x).strip() for x in labels if str(x).strip()]
+        if clean:
+            label_line = f"labels: {', '.join(clean)}\n"
+
+    entry_header = (
+        f"## Quarantine Entry · {date.today().isoformat()}\n"
+        f"reason: {bucket}\n"
+        f"{label_line}\n"
+    )
+    entry_body = entry_header + content.strip() + "\n"
+
+    if path.exists():
+        existing = path.read_text(encoding="utf-8")
+        path.write_text(existing.rstrip() + "\n\n---\n\n" + entry_body, encoding="utf-8")
+    else:
+        title = f"# Quarantine Notes — {note_type.rstrip('s').title()}\n\n"
+        path.write_text(title + entry_body, encoding="utf-8")
 
     return path
 

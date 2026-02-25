@@ -25,6 +25,10 @@ def test_plan_reaction_type_filing_canonicalizes_and_routes_unknown_to_general()
     assert plan["reaction_types"] == ["general"]
     assert plan["reaction_types_unknown"] == ["not_a_real_reaction_label"]
     assert any("Unknown reaction label" in w for w in plan["warnings"])
+    assert plan["warning_details"]
+    assert plan["warning_details"][0]["severity"] == "warn"
+    assert plan["warning_details"][0]["code"] == "unknown_reaction_type"
+    assert "not_a_real_reaction_label" in plan["reaction_type_suggestions"]
 
 
 def test_plan_reaction_type_filing_rejects_hint_detected_mismatch() -> None:
@@ -105,3 +109,29 @@ def test_intake_rejects_unknown_reaction_label(monkeypatch) -> None:
     result = ex.intake("raw text", dry_run=True, unknown_reaction_policy="reject")
     assert result["success"] is False
     assert "Unknown reaction label" in result["error"]
+
+
+def test_intake_quarantine_policy_routes_to_quarantine_store(monkeypatch, tmp_path: Path) -> None:
+    ex = _make_extractor()
+    monkeypatch.setattr(
+        ex,
+        "_load_source",
+        lambda source, save: ("doc text", "demo source", [], ""),
+    )
+    monkeypatch.setattr(
+        ex,
+        "_extract_with_llm",
+        lambda *args, **kwargs: ("## Source: demo\n\nnotes", ["definitely_not_real"]),
+    )
+
+    def _fake_quarantine_path(note_type: str = "reactions", bucket: str = "unknown_reaction_labels"):
+        return tmp_path / "_quarantine" / note_type / f"{bucket}.md"
+
+    monkeypatch.setattr("chem_coworker.tools.notes.get_quarantine_notes_path", _fake_quarantine_path)
+
+    result = ex.intake("raw text", dry_run=True, unknown_reaction_policy="quarantine")
+    assert result["success"] is True
+    assert result["quarantined"] is True
+    assert result["reaction_types"] == []
+    assert "_quarantine" in result["quarantine_file"]
+    assert any(d["code"] == "quarantine_routing" for d in result["warning_details"])

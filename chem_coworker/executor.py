@@ -99,17 +99,20 @@ class ToolExecutor:
         event_bus: Optional[Any] = None,   # EventBus — typed as Any to avoid circular import
         hooks: Optional[Any] = None,   # HookRegistry — typed as Any to avoid circular import
         registry: Optional[Any] = None,  # ToolRegistry — for data-contract resolution (Phase 1)
+        runtime_context: Optional[Any] = None,  # Phase 11: per-run tool runtime context
     ):
         self.max_workers = max_workers
         self.verbose = verbose
         self.event_bus = event_bus
         self.hooks = hooks
         self.registry = registry
+        self.runtime_context = runtime_context
 
     def _run_parallel(
         self,
         calls: List[ToolCall],
         callables: Dict[str, Callable[..., Any]],
+        runtime_context: Optional[Any] = None,
     ) -> Dict[str, Any]:
         """Execute a group of ToolCalls concurrently, firing progress events."""
         if not calls:
@@ -124,7 +127,7 @@ class ToolExecutor:
 
         # Single call — skip thread overhead
         if len(calls) == 1:
-            result = self._execute_one(calls[0], callables)
+            result = self._execute_one(calls[0], callables, runtime_context=runtime_context)
             if self.event_bus:
                 elapsed = time.monotonic() - t0
                 has_error = isinstance(result, dict) and not result.get("success", True)
@@ -148,7 +151,7 @@ class ToolExecutor:
 
         with ThreadPoolExecutor(max_workers=workers) as pool:
             future_to_name = {
-                pool.submit(self._execute_one, call, callables): call.name
+                pool.submit(self._execute_one, call, callables, runtime_context): call.name
                 for call in calls
             }
             for future in as_completed(future_to_name):
@@ -186,6 +189,7 @@ class ToolExecutor:
         self,
         call: ToolCall,
         callables: Dict[str, Callable[..., Any]],
+        runtime_context: Optional[Any] = None,
     ) -> Any:
         """Execute a single ToolCall with error isolation and optional hooks (A1)."""
         fn = callables.get(call.name)
@@ -200,8 +204,25 @@ class ToolExecutor:
             if self.hooks:
                 self.hooks.fire_pre(ctx)
 
+            active_runtime_context = runtime_context if runtime_context is not None else self.runtime_context
+            runtime_token = None
+            if active_runtime_context is not None:
+                try:
+                    from .tool_runtime import set_current_tool_runtime_context
+                    runtime_token = set_current_tool_runtime_context(active_runtime_context)
+                except Exception:
+                    runtime_token = None
+
             start = time.monotonic()
-            result = fn(**call.args)
+            try:
+                result = fn(**call.args)
+            finally:
+                if runtime_token is not None:
+                    try:
+                        from .tool_runtime import reset_current_tool_runtime_context
+                        reset_current_tool_runtime_context(runtime_token)
+                    except Exception:
+                        pass
             ctx.result = result
 
             if self.verbose:

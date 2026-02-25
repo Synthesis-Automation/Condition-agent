@@ -261,15 +261,19 @@ def test_main_intake_json_dry_run_outputs_payload(monkeypatch, capsys) -> None:
                 "reaction_types_detected_raw": ["suzuki"],
                 "reaction_types_detected_canonical": ["suzuki_miyaura"],
                 "reaction_types_unknown": [],
+                "reaction_type_suggestions": {},
                 "mismatch": False,
                 "mismatch_policy": "warn",
                 "unknown_reaction_policy": "general",
                 "dry_run": True,
                 "write_performed": False,
+                "quarantined": False,
+                "quarantine_file": "",
                 "notes_files": ["knowledge_base/notes/reactions/suzuki_miyaura.md"],
                 "extracted_notes": "notes",
                 "char_count": 5,
                 "warnings": [],
+                "warning_details": [],
             }
 
     monkeypatch.setattr("chem_coworker.extractor.NotesExtractor", _FakeExtractor)
@@ -280,6 +284,17 @@ def test_main_intake_json_dry_run_outputs_payload(monkeypatch, capsys) -> None:
     assert payload["success"] is True
     assert payload["dry_run"] is True
     assert payload["reaction_types"] == ["suzuki_miyaura"]
+
+
+def test_main_intake_list_reaction_types_json(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(
+        "chemtools.taxonomy.reaction_catalog.list_reaction_type_ids",
+        lambda: ["suzuki_miyaura", "heck"],
+    )
+    cli_app.main(["intake", "--list-reaction-types", "--output-format", "json"])
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["count"] == 2
+    assert payload["reaction_type_ids"][0] == "suzuki_miyaura"
 
 
 def test_load_batch_queries_supports_jsonl_string_and_object(tmp_path) -> None:
