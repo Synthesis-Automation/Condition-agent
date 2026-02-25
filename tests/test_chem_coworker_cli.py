@@ -243,6 +243,45 @@ def test_main_batch_output_file_requires_jsonl(monkeypatch, tmp_path) -> None:
     assert excinfo.value.code == 2
 
 
+def test_main_intake_json_dry_run_outputs_payload(monkeypatch, capsys) -> None:
+    class _FakeExtractor:
+        def __init__(self, provider=None, model=None, verbose=False):  # noqa: ARG002
+            pass
+
+        def intake(self, **kwargs):
+            assert kwargs["dry_run"] is True
+            assert kwargs["mismatch_policy"] == "warn"
+            return {
+                "success": True,
+                "source": "demo",
+                "note_type": "reactions",
+                "reaction_types": ["suzuki_miyaura"],
+                "reaction_type_hint_raw": "",
+                "reaction_type_hint_canonical": None,
+                "reaction_types_detected_raw": ["suzuki"],
+                "reaction_types_detected_canonical": ["suzuki_miyaura"],
+                "reaction_types_unknown": [],
+                "mismatch": False,
+                "mismatch_policy": "warn",
+                "unknown_reaction_policy": "general",
+                "dry_run": True,
+                "write_performed": False,
+                "notes_files": ["knowledge_base/notes/reactions/suzuki_miyaura.md"],
+                "extracted_notes": "notes",
+                "char_count": 5,
+                "warnings": [],
+            }
+
+    monkeypatch.setattr("chem_coworker.extractor.NotesExtractor", _FakeExtractor)
+    monkeypatch.setattr(cli_app, "load_config", lambda: {"name": "o4-mini", "provider": "openai"})
+
+    cli_app.main(["intake", "demo.txt", "--dry-run", "--output-format", "json"])
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["success"] is True
+    assert payload["dry_run"] is True
+    assert payload["reaction_types"] == ["suzuki_miyaura"]
+
+
 def test_load_batch_queries_supports_jsonl_string_and_object(tmp_path) -> None:
     path = tmp_path / "queries.jsonl"
     path.write_text(

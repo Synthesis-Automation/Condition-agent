@@ -403,39 +403,52 @@ class ChemCoworker:
         return "\n".join(lines)
 
     def _extract_structured(self, results: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract key machine-readable outputs from tool results."""
+        """
+        Extract machine-readable outputs from tool results.
+
+        Primary path uses ToolPlugin.structured_projection so tools declare their
+        own contribution to `ChemResponse.structured`. A small legacy fallback is
+        retained for unannotated tools to avoid breaking older plugins.
+        """
         structured: Dict[str, Any] = {}
 
-        if "detect_reaction_type" in results:
-            r = results["detect_reaction_type"]
-            if isinstance(r, dict) and r.get("success"):
-                structured["reaction_type"] = r.get("reaction_type_id") or r.get("reaction_type")
-                structured["reaction_family"] = r.get("family_label")
-                if r.get("reaction_type_metadata"):
-                    structured["reaction_type_metadata"] = r.get("reaction_type_metadata")
+        plugins = getattr(self.registry, "_plugins", {})
+        for tool_name, result in results.items():
+            if not isinstance(result, dict) or not result.get("success"):
+                continue
+            plugin = plugins.get(tool_name)
+            projector = getattr(plugin, "structured_projection", None) if plugin is not None else None
+            if callable(projector):
+                try:
+                    fragment = projector(result) or {}
+                    if isinstance(fragment, dict):
+                        structured.update(fragment)
+                except Exception as exc:
+                    if self.verbose:
+                        logger.warning(
+                            "[ChemCoworker] structured_projection failed for %s: %s",
+                            tool_name,
+                            exc,
+                        )
+                continue
 
-        if "analyze_bond_changes" in results:
-            r = results["analyze_bond_changes"]
-            if isinstance(r, dict) and r.get("success"):
-                structured["bonds_formed"] = r.get("bonds_formed", [])
-                structured["bonds_broken"] = r.get("bonds_broken", [])
-                structured["key_bond_type"] = r.get("key_bond_type")
-
-        if "recommend_conditions" in results:
-            r = results["recommend_conditions"]
-            if isinstance(r, dict) and r.get("success"):
-                structured["conditions"] = r.get("recommendations", [])
-
-        if "get_molecular_descriptors" in results:
-            r = results["get_molecular_descriptors"]
-            if isinstance(r, dict) and r.get("success"):
-                structured["descriptors"] = r.get("descriptors", {})
-                structured["is_drug_like"] = r.get("is_drug_like")
-
-        if "search_reaction_types" in results:
-            r = results["search_reaction_types"]
-            if isinstance(r, dict) and r.get("success"):
-                structured["taxonomy_matches"] = r.get("matches", [])
+            # Legacy fallback for older/unannotated tools (kept intentionally small)
+            if tool_name == "detect_reaction_type":
+                structured["reaction_type"] = result.get("reaction_type_id") or result.get("reaction_type")
+                structured["reaction_family"] = result.get("family_label")
+                if result.get("reaction_type_metadata"):
+                    structured["reaction_type_metadata"] = result.get("reaction_type_metadata")
+            elif tool_name == "analyze_bond_changes":
+                structured["bonds_formed"] = result.get("bonds_formed", [])
+                structured["bonds_broken"] = result.get("bonds_broken", [])
+                structured["key_bond_type"] = result.get("key_bond_type")
+            elif tool_name == "recommend_conditions":
+                structured["conditions"] = result.get("recommendations", [])
+            elif tool_name == "get_molecular_descriptors":
+                structured["descriptors"] = result.get("descriptors", {})
+                structured["is_drug_like"] = result.get("is_drug_like")
+            elif tool_name == "search_reaction_types":
+                structured["taxonomy_matches"] = result.get("matches", [])
 
         return structured
 

@@ -168,6 +168,15 @@ def _validate_recommend_conditions(result: dict) -> object:
     return None
 
 
+def _project_recommend_conditions(result: dict) -> Dict[str, Any]:
+    """Project condition recommendations into structured output fields."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    return {
+        "conditions": result.get("recommendations", []),
+    }
+
+
 recommend_conditions_tool = ToolPlugin(
     name="recommend_conditions",
     category="conditions",
@@ -178,6 +187,8 @@ recommend_conditions_tool = ToolPlugin(
     requires=["reaction_type"],
     validators=[_validate_recommend_conditions],
 )
+
+recommend_conditions_tool.structured_projection = _project_recommend_conditions
 
 
 # ---------------------------------------------------------------------------

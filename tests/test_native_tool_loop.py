@@ -210,6 +210,35 @@ class TestStructuredExtractionCanonicalReactionType:
         assert structured["reaction_family"] == "Suzuki-Miyaura Cross-Coupling"
         assert structured["reaction_type_metadata"]["category"] == "cross_coupling"
 
+    def test_extract_structured_uses_tool_declared_projection(self):
+        agent = _make_agent()
+        structured = agent._extract_structured(
+            {
+                "search_reaction_types": {
+                    "success": True,
+                    "matches": [{"id": "suzuki_miyaura", "score": 0.9}],
+                }
+            }
+        )
+        assert structured["taxonomy_matches"][0]["id"] == "suzuki_miyaura"
+
+    def test_extract_structured_supports_custom_plugin_projection(self):
+        from chem_coworker.tools._base import ToolPlugin
+
+        agent = object.__new__(ChemCoworker)
+        fake_plugin = ToolPlugin(
+            name="custom_tool",
+            category="test",
+            description="d",
+            fn=lambda: {},
+            structured_projection=lambda result: {"custom_metric": result.get("value")},
+        )
+        agent.registry = type("R", (), {"_plugins": {"custom_tool": fake_plugin}})()
+        agent.verbose = False
+
+        structured = agent._extract_structured({"custom_tool": {"success": True, "value": 7}})
+        assert structured == {"custom_metric": 7}
+
 
 class TestAggregateConfidence:
     def test_aggregate_confidence_increases_with_strong_consistent_evidence(self):

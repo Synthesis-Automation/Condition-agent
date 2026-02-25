@@ -31,6 +31,11 @@ class TestToolPluginMetadataDefaults:
         p = ToolPlugin(name="x", category="c", description="d", fn=lambda: {})
         assert p.validators == []
 
+    def test_structured_projection_defaults_to_none(self):
+        from chem_coworker.tools._base import ToolPlugin
+        p = ToolPlugin(name="x", category="c", description="d", fn=lambda: {})
+        assert p.structured_projection is None
+
     def test_provides_stored_correctly(self):
         from chem_coworker.tools._base import ToolPlugin
         p = ToolPlugin(
@@ -55,6 +60,18 @@ class TestToolPluginMetadataDefaults:
             validators=[v],
         )
         assert p.validators == [v]
+
+    def test_structured_projection_stored_correctly(self):
+        from chem_coworker.tools._base import ToolPlugin
+
+        def proj(result):
+            return {"x": result.get("y")}
+
+        p = ToolPlugin(
+            name="x", category="c", description="d", fn=lambda: {},
+            structured_projection=proj,
+        )
+        assert p.structured_projection is proj
 
 
 class TestToolPluginValidatorSemantics:

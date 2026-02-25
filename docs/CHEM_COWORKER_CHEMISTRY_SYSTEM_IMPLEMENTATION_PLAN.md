@@ -199,6 +199,18 @@ Compute confidence from chemistry evidence, e.g.:
 
 ## Phase 3 (Routing + extensibility)
 
+Status: Implemented (baseline version)
+
+Delivered:
+
+- Fixed practical `forward_synthesis` workflow reachability by adding `forward_synthesis` task classification output
+- Added chemistry-signal-first classifier heuristics for forward product-prediction queries
+  - distinguishes multi-reactant product prediction from retrosynthesis target planning
+  - avoids routing full reaction SMILES (`>>`) to the forward-synthesis workflow
+- Added classifier routing tests and workflow integration assertions
+- Added tool-declared structured output projections (`ToolPlugin.structured_projection`) and made agent structured aggregation projection-first (with small legacy fallback)
+- Added tests covering built-in and custom tool structured projections
+
 ### F. Fix workflow routing / task typing gaps
 
 - Add explicit task-type detection for `forward_synthesis`
@@ -225,6 +237,17 @@ Benefits:
 - more consistent machine-readable chemistry API outputs
 
 ## Phase 4 (Knowledge integrity / intake)
+
+Status: Implemented (baseline version)
+
+Delivered:
+
+- Taxonomy-validated intake filing for hint and detected reaction labels (canonicalized before write)
+- Unknown reaction label handling policy (`general`, `quarantine`, `reject`)
+- Intake mismatch policies (`warn`, `confirm`, `reject`, `force`)
+- `intake --dry-run` support (compute target note files without writing)
+- Machine-readable intake output (`intake --output-format json`)
+- Tests for canonicalization, mismatch handling, unknown-label rejection, dry-run, and CLI JSON intake mode
 
 ### I. Taxonomy-validate all intake reaction labels before writing notes
 
@@ -284,6 +307,8 @@ Expected impact:
 
 ### Milestone 3: Routing + Structured Output Contracts
 
+Status: Completed (baseline)
+
 Deliverables:
 
 - `forward_synthesis` routing fix
@@ -295,6 +320,8 @@ Expected impact:
 - Generality and maintainability
 
 ### Milestone 4: Intake Knowledge Integrity
+
+Status: Completed (baseline)
 
 Deliverables:
 

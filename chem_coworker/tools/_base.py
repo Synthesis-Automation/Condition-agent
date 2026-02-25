@@ -15,6 +15,7 @@ from typing import Any, Callable, Dict, List, Optional
 # Validator signature: fn(result_dict) -> Optional[warning_string]
 # Return None = pass, return str = warning surfaced in ChemResponse
 ValidatorFn = Callable[[Dict[str, Any]], Optional[str]]
+StructuredProjectionFn = Callable[[Dict[str, Any]], Dict[str, Any]]
 
 
 @dataclass
@@ -39,6 +40,9 @@ class ToolPlugin:
             Each fn(result_dict) -> Optional[str]. Non-None return is a warning
             appended to result["_warnings"] and surfaced in ChemResponse.
             Replaces hardcoded tool-name checks in agent._check_hypothesis().
+        structured_projection: Optional projection fn used by agent._extract_structured.
+            Signature: fn(result_dict) -> Dict[str, Any]. Lets tools declare how
+            they contribute machine-readable outputs to ChemResponse.structured.
     """
     name: str
     category: str
@@ -50,6 +54,7 @@ class ToolPlugin:
     provides: List[str] = field(default_factory=list)
     requires: List[str] = field(default_factory=list)
     validators: List[ValidatorFn] = field(default_factory=list)
+    structured_projection: Optional[StructuredProjectionFn] = None
 
     def __post_init__(self) -> None:
         # If langchain_tool is provided but fn is not explicitly the wrapped function,

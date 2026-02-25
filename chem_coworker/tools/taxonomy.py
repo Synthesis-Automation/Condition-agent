@@ -55,6 +55,15 @@ def _search_reaction_types(query: str) -> Dict[str, Any]:
         return _error(f"Reaction type search failed: {exc}")
 
 
+def _project_search_reaction_types(result: dict) -> Dict[str, Any]:
+    """Project taxonomy search matches into structured output fields."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    return {
+        "taxonomy_matches": result.get("matches", []),
+    }
+
+
 search_reaction_types_tool = ToolPlugin(
     name="search_reaction_types",
     category="taxonomy",
@@ -62,6 +71,8 @@ search_reaction_types_tool = ToolPlugin(
     prerequisites=["analyze_bond_changes"],
     fn=_search_reaction_types,
 )
+
+search_reaction_types_tool.structured_projection = _project_search_reaction_types
 
 
 # ---------------------------------------------------------------------------

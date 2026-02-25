@@ -358,9 +358,45 @@ def _validate_analyze_bond_changes(result: dict) -> object:
     return None
 
 
+def _project_detect_reaction_type(result: dict) -> Dict[str, Any]:
+    """Project reaction typing result into ChemResponse.structured fields."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    out: Dict[str, Any] = {
+        "reaction_type": result.get("reaction_type_id") or result.get("reaction_type"),
+        "reaction_family": result.get("family_label"),
+    }
+    if result.get("reaction_type_metadata"):
+        out["reaction_type_metadata"] = result.get("reaction_type_metadata")
+    return {k: v for k, v in out.items() if v is not None}
+
+
+def _project_analyze_bond_changes(result: dict) -> Dict[str, Any]:
+    """Project bond-change analysis into structured output fields."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    return {
+        "bonds_formed": result.get("bonds_formed", []),
+        "bonds_broken": result.get("bonds_broken", []),
+        "key_bond_type": result.get("key_bond_type"),
+    }
+
+
+def _project_get_molecular_descriptors(result: dict) -> Dict[str, Any]:
+    """Project descriptor tool outputs into structured fields."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    return {
+        "descriptors": result.get("descriptors", {}),
+        "is_drug_like": result.get("is_drug_like"),
+    }
+
+
 # Register chemistry validators after function definitions to keep tool declarations readable.
 detect_reaction_type_tool.validators = [_validate_detect_reaction_type]
 analyze_bond_changes_tool.validators = [_validate_analyze_bond_changes]
+detect_reaction_type_tool.structured_projection = _project_detect_reaction_type
+analyze_bond_changes_tool.structured_projection = _project_analyze_bond_changes
 
 
 # ---------------------------------------------------------------------------
@@ -485,6 +521,8 @@ get_molecular_descriptors_tool = ToolPlugin(
     prerequisites=[],
     fn=_get_molecular_descriptors,
 )
+
+get_molecular_descriptors_tool.structured_projection = _project_get_molecular_descriptors
 
 
 # ---------------------------------------------------------------------------

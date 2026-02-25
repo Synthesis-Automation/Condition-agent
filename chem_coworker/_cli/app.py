@@ -281,6 +281,7 @@ def _cmd_setup(args: argparse.Namespace) -> None:  # noqa: ARG001
 def _cmd_intake(args: argparse.Namespace) -> None:
     from chem_coworker.extractor import NotesExtractor
 
+    output_format = getattr(args, "output_format", "plain")
     if args.model is not None:
         model = args.model
     else:
@@ -289,39 +290,79 @@ def _cmd_intake(args: argparse.Namespace) -> None:
     extract_model = args.extract_model or model
     extract_provider = args.extract_provider or infer_provider(extract_model)
 
-    print()
-    print(f"  {C.LABEL}◆ ChemCoworker Intake{C.R}  {C.DIM}Document → Notes{C.R}")
-    print(f"  {SEP}")
-    if extract_model != model:
-        print(f"  {C.META}Extract model:{C.R}  {C.BOLD}{extract_model}{C.R}  {C.META}{extract_provider}{C.R}")
-    else:
-        print(f"  {C.META}Model:{C.R}  {C.BOLD}{extract_model}{C.R}  {C.META}{extract_provider}{C.R}")
-    print(f"  {C.META}Source:{C.R} {C.DIM}{args.source!r}{C.R}")
-    if args.reaction_type:
-        print(f"  {C.META}Hint:{C.R}   {C.DIM}{args.reaction_type}{C.R}")
     note_type = getattr(args, "note_type", "reactions") or "reactions"
-    print(f"  {C.META}Type:{C.R}   {C.DIM}{note_type}{C.R}")
-    print()
 
-    ui = TerminalUI()
-    spinner = ui.spinner("Extracting notes")
-    spinner.start()
+    def _confirm_mismatch(payload: Dict[str, object]) -> bool:
+        if output_format == "json":
+            return False
+        print()
+        print(f"  {C.WARN}⚠{C.R}  {payload.get('message', 'Reaction type mismatch')}")
+        answer = input("  Proceed and write notes anyway? [y/N]: ").strip().lower()
+        return answer in {"y", "yes"}
+
     t0 = time.time()
-    try:
-        extractor = NotesExtractor(provider=extract_provider, model=extract_model, verbose=args.verbose)
-        result = extractor.intake(
-            source=args.source,
-            reaction_type=args.reaction_type or "",
-            note_type=note_type,
-            save_to_literature=not args.no_save,
-        )
-    except Exception as exc:
-        spinner.stop()
-        print(f"  {C.ERR}✗{C.R}  {exc}")
-        sys.exit(1)
+    if output_format == "plain":
+        print()
+        print(f"  {C.LABEL}◆ ChemCoworker Intake{C.R}  {C.DIM}Document → Notes{C.R}")
+        print(f"  {SEP}")
+        if extract_model != model:
+            print(f"  {C.META}Extract model:{C.R}  {C.BOLD}{extract_model}{C.R}  {C.META}{extract_provider}{C.R}")
+        else:
+            print(f"  {C.META}Model:{C.R}  {C.BOLD}{extract_model}{C.R}  {C.META}{extract_provider}{C.R}")
+        print(f"  {C.META}Source:{C.R} {C.DIM}{args.source!r}{C.R}")
+        if args.reaction_type:
+            print(f"  {C.META}Hint:{C.R}   {C.DIM}{args.reaction_type}{C.R}")
+        print(f"  {C.META}Type:{C.R}   {C.DIM}{note_type}{C.R}")
+        if getattr(args, "dry_run", False):
+            print(f"  {C.META}Mode:{C.R}   {C.DIM}dry-run (no writes){C.R}")
+        print()
 
-    spinner.stop()
+        ui = TerminalUI()
+        spinner = ui.spinner("Extracting notes")
+        spinner.start()
+        try:
+            extractor = NotesExtractor(provider=extract_provider, model=extract_model, verbose=args.verbose)
+            result = extractor.intake(
+                source=args.source,
+                reaction_type=args.reaction_type or "",
+                note_type=note_type,
+                save_to_literature=not args.no_save,
+                mismatch_policy=getattr(args, "mismatch_policy", "warn"),
+                dry_run=bool(getattr(args, "dry_run", False)),
+                unknown_reaction_policy=getattr(args, "unknown_reaction_policy", "general"),
+                confirm_callback=_confirm_mismatch if getattr(args, "mismatch_policy", "warn") == "confirm" else None,
+            )
+        except Exception as exc:
+            spinner.stop()
+            print(f"  {C.ERR}✗{C.R}  {exc}")
+            sys.exit(1)
+        spinner.stop()
+    else:
+        try:
+            extractor = NotesExtractor(provider=extract_provider, model=extract_model, verbose=args.verbose)
+            result = extractor.intake(
+                source=args.source,
+                reaction_type=args.reaction_type or "",
+                note_type=note_type,
+                save_to_literature=not args.no_save,
+                mismatch_policy=getattr(args, "mismatch_policy", "warn"),
+                dry_run=bool(getattr(args, "dry_run", False)),
+                unknown_reaction_policy=getattr(args, "unknown_reaction_policy", "general"),
+                confirm_callback=_confirm_mismatch if getattr(args, "mismatch_policy", "warn") == "confirm" else None,
+            )
+        except Exception as exc:
+            print(json.dumps({"success": False, "error": str(exc)}, ensure_ascii=False))
+            sys.exit(1)
+
     elapsed = time.time() - t0
+
+    if output_format == "json":
+        result = dict(result)
+        result["elapsed_s"] = round(elapsed, 3)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        if not result.get("success"):
+            sys.exit(1)
+        return
 
     if not result.get("success"):
         print(f"  {C.ERR}✗{C.R}  {result.get('error', 'Unknown error')}")
@@ -333,9 +374,18 @@ def _cmd_intake(args: argparse.Namespace) -> None:
     print()
 
     types_str = ", ".join(result["reaction_types"])
-    print(f"  {C.LABEL}◆ Reaction types{C.R}  {C.TOOL}{types_str}{C.R}")
+    print(f"  {C.LABEL}◆ Reaction types (canonical){C.R}  {C.TOOL}{types_str}{C.R}")
+    if result.get("reaction_types_detected_raw"):
+        raw_detected = ", ".join(result["reaction_types_detected_raw"])
+        print(f"  {C.META}Detected raw:{C.R} {C.DIM}{raw_detected}{C.R}")
+    if result.get("reaction_types_unknown"):
+        unknown = ", ".join(result["reaction_types_unknown"])
+        print(f"  {C.META}Unknown labels:{C.R} {C.DIM}{unknown}{C.R}")
 
-    print(f"  {C.LABEL}◆ Notes written to{C.R}")
+    if result.get("dry_run"):
+        print(f"  {C.LABEL}◆ Target note files (dry-run){C.R}")
+    else:
+        print(f"  {C.LABEL}◆ Notes written to{C.R}")
     for nf in result["notes_files"]:
         print(f"      {C.DIM}{nf}{C.R}")
 
@@ -417,6 +467,18 @@ Examples:
         help="Hint for reaction type (e.g. suzuki_miyaura). Auto-detected if omitted.",
     )
     intake_parser.add_argument(
+        "--mismatch-policy",
+        default="warn",
+        choices=["warn", "confirm", "reject", "force"],
+        help="How to handle hint vs detected reaction-type mismatch (default: warn).",
+    )
+    intake_parser.add_argument(
+        "--unknown-reaction-policy",
+        default="general",
+        choices=["general", "quarantine", "reject"],
+        help="How to handle non-taxonomy reaction labels (default: general).",
+    )
+    intake_parser.add_argument(
         "--note-type",
         default="reactions",
         choices=["reactions", "mechanisms", "substrates", "protocols", "routes"],
@@ -446,6 +508,22 @@ Examples:
         "-q",
         action="store_true",
         help="Suppress extracted notes preview",
+    )
+    intake_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Extract and validate labels but do not write note files",
+    )
+    intake_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Deprecated alias for --output-format json",
+    )
+    intake_parser.add_argument(
+        "--output-format",
+        default="plain",
+        choices=["plain", "json"],
+        help="Output format (default: plain)",
     )
 
     batch_parser = subparsers.add_parser(
@@ -520,6 +598,8 @@ def main(argv: Optional[List[str]] = None) -> None:
         args.output_format = "json"
     if getattr(args, "command", None) == "batch" and getattr(args, "json", False):
         args.output_format = "jsonl"
+    if getattr(args, "command", None) == "intake" and getattr(args, "json", False):
+        args.output_format = "json"
     if getattr(args, "command", None) == "batch":
         args.continue_on_error = bool(getattr(args, "continue_on_error", False) or not getattr(args, "fail_fast", False))
 

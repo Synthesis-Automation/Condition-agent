@@ -17,9 +17,9 @@ Usage (Python API):
     print(result["extracted_notes"])
 
 Usage (CLI):
-    python chem_coworker/cli.py intake https://www.orgsyn.org/demo.aspx?prep=v102p0086
-    python chem_coworker/cli.py intake my_paper.pdf --reaction-type buchwald_hartwig
-    python chem_coworker/cli.py intake my_notes.txt
+    python -m chem_coworker._cli.app intake https://www.orgsyn.org/demo.aspx?prep=v102p0086
+    python -m chem_coworker._cli.app intake my_paper.pdf --reaction-type buchwald_hartwig
+    python -m chem_coworker._cli.app intake my_notes.txt
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ import os
 import re
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from dotenv import load_dotenv
 
@@ -96,6 +96,10 @@ class NotesExtractor:
         reaction_type: str = "",
         note_type: str = "reactions",
         save_to_literature: bool = True,
+        mismatch_policy: str = "warn",
+        dry_run: bool = False,
+        unknown_reaction_policy: str = "general",
+        confirm_callback: Optional[Callable[[Dict[str, Any]], bool]] = None,
     ) -> Dict[str, Any]:
         """
         Process a source (URL, file path, or raw text) and extract notes.
@@ -108,6 +112,13 @@ class NotesExtractor:
                        "reactions" (default), "mechanisms", "substrates", "protocols".
             save_to_literature: If True and source is a URL/file, also save
                                 the raw text to the literature/ folder.
+            mismatch_policy: How to handle hint vs detected reaction-type mismatch:
+                             warn (default), confirm, reject, force.
+            dry_run: If True, do not write notes files (returns planned targets only).
+            unknown_reaction_policy: How to handle non-taxonomy labels: general,
+                                     quarantine (alias of general), or reject.
+            confirm_callback: Optional callback used when mismatch_policy=confirm.
+                              Receives a mismatch payload and returns True to proceed.
 
         Returns:
             dict with source, reaction_types, notes_files, extracted_notes,
@@ -136,44 +147,243 @@ class NotesExtractor:
         if self.verbose:
             logger.info(f"[extractor] Extracted {len(extracted)} chars, types={detected_types}")
 
-        # Step 3: Append to notes files
-        from .tools.notes import append_notes, _normalize_reaction_type
-
-        # Determine which reaction types to file under
-        types_to_file: List[str] = []
-        if reaction_type:
-            types_to_file.append(_normalize_reaction_type(reaction_type))
-        types_to_file.extend(
-            _normalize_reaction_type(t) for t in detected_types
-            if _normalize_reaction_type(t) not in types_to_file
+        # Step 3: Taxonomy-canonicalize intake labels + apply mismatch policy
+        label_plan = self._plan_reaction_type_filing(
+            reaction_type_hint=reaction_type,
+            detected_types=detected_types,
+            mismatch_policy=mismatch_policy,
+            unknown_reaction_policy=unknown_reaction_policy,
+            confirm_callback=confirm_callback,
         )
-        if not types_to_file:
-            types_to_file = ["general"]
+        warnings.extend(label_plan["warnings"])
 
+        if label_plan.get("error"):
+            return {
+                "success": False,
+                "error": label_plan["error"],
+                "warnings": warnings,
+                "source": source_name,
+                "note_type": note_type,
+                "reaction_type_hint_raw": reaction_type or "",
+                "reaction_type_hint_canonical": label_plan.get("reaction_type_hint_canonical"),
+                "reaction_types_detected_raw": label_plan.get("reaction_types_detected_raw", []),
+                "reaction_types_detected_canonical": label_plan.get("reaction_types_detected_canonical", []),
+                "reaction_types_unknown": label_plan.get("reaction_types_unknown", []),
+                "mismatch": bool(label_plan.get("mismatch")),
+                "mismatch_policy": mismatch_policy,
+                "dry_run": dry_run,
+            }
+
+        types_to_file: List[str] = label_plan["reaction_types"]
+
+        # Step 4: Append to notes files (or compute planned target files for dry-run)
+        from .tools.notes import append_notes, get_notes_path
         notes_files: List[str] = []
         for rt in types_to_file:
-            path = append_notes(rt, extracted, note_type)
+            if dry_run:
+                path = get_notes_path(rt, note_type)
+            else:
+                path = append_notes(rt, extracted, note_type)
+                if self.verbose:
+                    logger.info(f"[extractor] Appended to {path}")
             notes_files.append(str(path))
-            if self.verbose:
-                logger.info(f"[extractor] Appended to {path}")
 
-        # Rebuild index so new notes are immediately discoverable
-        try:
-            from knowledge_base.notes.build_index import build_index
-            build_index()
-            if self.verbose:
-                logger.info("[extractor] Rebuilt knowledge_base/notes/_index.json")
-        except Exception as exc:
-            logger.debug(f"[extractor] Could not rebuild index: {exc}")
+        if not dry_run:
+            # Rebuild index so new notes are immediately discoverable
+            try:
+                from knowledge_base.notes.build_index import build_index
+                build_index()
+                if self.verbose:
+                    logger.info("[extractor] Rebuilt knowledge_base/notes/_index.json")
+            except Exception as exc:
+                logger.debug(f"[extractor] Could not rebuild index: {exc}")
 
         return {
             "success": True,
             "source": source_name,
             "note_type": note_type,
             "reaction_types": types_to_file,
+            "reaction_type_hint_raw": reaction_type or "",
+            "reaction_type_hint_canonical": label_plan.get("reaction_type_hint_canonical"),
+            "reaction_types_detected_raw": label_plan.get("reaction_types_detected_raw", []),
+            "reaction_types_detected_canonical": label_plan.get("reaction_types_detected_canonical", []),
+            "reaction_types_unknown": label_plan.get("reaction_types_unknown", []),
+            "mismatch": bool(label_plan.get("mismatch")),
+            "mismatch_policy": mismatch_policy,
+            "unknown_reaction_policy": unknown_reaction_policy,
+            "dry_run": dry_run,
+            "write_performed": not dry_run,
             "notes_files": notes_files,
             "extracted_notes": extracted,
             "char_count": len(extracted),
+            "warnings": warnings,
+        }
+
+    def _plan_reaction_type_filing(
+        self,
+        reaction_type_hint: str,
+        detected_types: List[str],
+        mismatch_policy: str,
+        unknown_reaction_policy: str,
+        confirm_callback: Optional[Callable[[Dict[str, Any]], bool]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Canonicalize taxonomy labels and compute which reaction-type note IDs to file.
+
+        Returns a dict containing:
+          reaction_types, reaction_type_hint_canonical, reaction_types_detected_raw,
+          reaction_types_detected_canonical, reaction_types_unknown, mismatch, warnings,
+          and optional error.
+        """
+        from chemtools.taxonomy.reaction_catalog import resolve_reaction_type
+
+        mismatch_policy = (mismatch_policy or "warn").strip().lower()
+        unknown_reaction_policy = (unknown_reaction_policy or "general").strip().lower()
+        valid_mismatch = {"warn", "confirm", "reject", "force"}
+        valid_unknown = {"general", "quarantine", "reject"}
+        if mismatch_policy not in valid_mismatch:
+            return {
+                "reaction_types": [],
+                "warnings": [],
+                "error": f"Invalid mismatch policy: {mismatch_policy!r}",
+            }
+        if unknown_reaction_policy not in valid_unknown:
+            return {
+                "reaction_types": [],
+                "warnings": [],
+                "error": f"Invalid unknown reaction policy: {unknown_reaction_policy!r}",
+            }
+
+        warnings: List[str] = []
+
+        def _canonicalize_many(labels: List[str]) -> tuple[List[str], List[str]]:
+            canonical: List[str] = []
+            unknown: List[str] = []
+            for raw in labels:
+                token = (raw or "").strip()
+                if not token:
+                    continue
+                resolved = resolve_reaction_type(token)
+                if resolved:
+                    canonical_id = re.sub(r"[\s\-]+", "_", resolved.strip().lower())
+                    if canonical_id not in canonical:
+                        canonical.append(canonical_id)
+                elif token not in unknown:
+                    unknown.append(token)
+            return canonical, unknown
+
+        hint_raw = (reaction_type_hint or "").strip()
+        hint_canonical = None
+        if hint_raw:
+            resolved_hint = resolve_reaction_type(hint_raw)
+            if resolved_hint:
+                hint_canonical = re.sub(r"[\s\-]+", "_", resolved_hint.strip().lower())
+        hint_unknown = [hint_raw] if hint_raw and not hint_canonical else []
+        detected_raw = [t for t in detected_types if (t or "").strip()]
+        detected_canonical, detected_unknown = _canonicalize_many(detected_raw)
+
+        unknown_labels = []
+        for raw in hint_unknown + detected_unknown:
+            if raw not in unknown_labels:
+                unknown_labels.append(raw)
+
+        if unknown_labels:
+            msg = (
+                "Unknown reaction label(s) not found in taxonomy: "
+                + ", ".join(unknown_labels)
+            )
+            if unknown_reaction_policy == "reject":
+                return {
+                    "reaction_types": [],
+                    "reaction_type_hint_canonical": hint_canonical,
+                    "reaction_types_detected_raw": detected_raw,
+                    "reaction_types_detected_canonical": detected_canonical,
+                    "reaction_types_unknown": unknown_labels,
+                    "mismatch": False,
+                    "warnings": warnings,
+                    "error": msg,
+                }
+            if unknown_reaction_policy == "quarantine":
+                warnings.append(msg + " (quarantining to general)")
+            else:
+                warnings.append(msg + " (routing unknown labels to general)")
+
+        mismatch = False
+        if hint_canonical and detected_canonical and hint_canonical not in detected_canonical:
+            mismatch = True
+            mismatch_msg = (
+                "Reaction type hint mismatch: "
+                f"hint={hint_canonical} vs detected={', '.join(detected_canonical)}"
+            )
+            if mismatch_policy == "reject":
+                return {
+                    "reaction_types": [],
+                    "reaction_type_hint_canonical": hint_canonical,
+                    "reaction_types_detected_raw": detected_raw,
+                    "reaction_types_detected_canonical": detected_canonical,
+                    "reaction_types_unknown": unknown_labels,
+                    "mismatch": True,
+                    "warnings": warnings,
+                    "error": mismatch_msg,
+                }
+            if mismatch_policy == "confirm":
+                if confirm_callback is None:
+                    return {
+                        "reaction_types": [],
+                        "reaction_type_hint_canonical": hint_canonical,
+                        "reaction_types_detected_raw": detected_raw,
+                        "reaction_types_detected_canonical": detected_canonical,
+                        "reaction_types_unknown": unknown_labels,
+                        "mismatch": True,
+                        "warnings": warnings,
+                        "error": mismatch_msg + " (confirmation required)",
+                    }
+                proceed = bool(confirm_callback({
+                    "hint": hint_canonical,
+                    "detected": detected_canonical,
+                    "unknown_labels": unknown_labels,
+                    "message": mismatch_msg,
+                }))
+                if not proceed:
+                    return {
+                        "reaction_types": [],
+                        "reaction_type_hint_canonical": hint_canonical,
+                        "reaction_types_detected_raw": detected_raw,
+                        "reaction_types_detected_canonical": detected_canonical,
+                        "reaction_types_unknown": unknown_labels,
+                        "mismatch": True,
+                        "warnings": warnings,
+                        "error": mismatch_msg + " (user declined confirmation)",
+                    }
+                warnings.append(mismatch_msg + " (confirmed)")
+            elif mismatch_policy == "warn":
+                warnings.append(mismatch_msg)
+
+        types_to_file: List[str] = []
+        if mismatch_policy == "force" and hint_canonical:
+            types_to_file = [hint_canonical]
+            if mismatch:
+                warnings.append(
+                    "Mismatch policy=force: using hinted reaction type and ignoring detected labels"
+                )
+        else:
+            if hint_canonical:
+                types_to_file.append(hint_canonical)
+            for rt in detected_canonical:
+                if rt not in types_to_file:
+                    types_to_file.append(rt)
+
+        if not types_to_file:
+            types_to_file = ["general"]
+            warnings.append("No taxonomy-canonical reaction type resolved; filing under general")
+
+        return {
+            "reaction_types": types_to_file,
+            "reaction_type_hint_canonical": hint_canonical,
+            "reaction_types_detected_raw": detected_raw,
+            "reaction_types_detected_canonical": detected_canonical,
+            "reaction_types_unknown": unknown_labels,
+            "mismatch": mismatch,
             "warnings": warnings,
         }
 
