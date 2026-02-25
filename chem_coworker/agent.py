@@ -620,6 +620,9 @@ class ChemCoworker:
             warnings=warnings,
             critic_findings=critic_findings,
         )
+        perf_summary = self._build_performance_summary(tool_results, task_type=task_type)
+        if answer and perf_summary:
+            answer += f"\n\n---\n{perf_summary}"
 
         # ── Step 6: Emit events and stream answer ──────────────────────
         self.event_bus.emit(
@@ -1350,6 +1353,80 @@ class ChemCoworker:
             parts.append(f"• {w}")
         # Deduplicate while preserving order
         return "\n".join(dict.fromkeys(parts))
+
+    def _build_performance_summary(self, tool_results: Dict[str, Any], task_type: str = "") -> str:
+        """
+        Build a concise HTE-heavy tool timing summary for the final answer.
+
+        Prefers per-call tool results when available so duplicate same-tool calls
+        (e.g., multiple route steps) are aggregated correctly.
+        """
+        raw_calls = tool_results.get(_TOOL_CALL_RESULTS_META_KEY)
+        if isinstance(raw_calls, dict) and raw_calls:
+            call_results = [
+                r for r in raw_calls.values()
+                if isinstance(r, dict)
+            ]
+        else:
+            call_results = [
+                r for name, r in tool_results.items()
+                if name != _TOOL_CALL_RESULTS_META_KEY and isinstance(r, dict)
+            ]
+
+        rec_calls = [r for r in call_results if r.get("success") and ("hte_timing_ms" in r or "hte_processing_time_ms" in r)]
+        precedent_calls = [r for r in call_results if r.get("success") and "hte_search_timing_ms" in r]
+        if not rec_calls and not precedent_calls:
+            return ""
+
+        def _f(x: Any) -> float:
+            try:
+                return float(x)
+            except Exception:
+                return 0.0
+
+        def _sum_timing(items: List[Dict[str, Any]], field: str, key: str) -> float:
+            return round(sum(_f((r.get(key) or {}).get(field)) for r in items), 2)
+
+        def _sum_direct(items: List[Dict[str, Any]], field: str) -> float:
+            return round(sum(_f(r.get(field)) for r in items), 2)
+
+        def _max_direct(items: List[Dict[str, Any]], field: str) -> float:
+            vals = [_f(r.get(field)) for r in items if r.get(field) is not None]
+            return round(max(vals), 2) if vals else 0.0
+
+        is_route_like = ("retro" in (task_type or "").lower()) or ("route" in (task_type or "").lower())
+        title = "Route performance summary" if is_route_like else "Performance summary"
+        lines = [f"⚙ **{title}** (HTE-heavy tools)"]
+
+        rec_total_ms = 0.0
+        if rec_calls:
+            rec_total_ms = _sum_direct(rec_calls, "hte_processing_time_ms") or _sum_timing(rec_calls, "total_ms", "hte_timing_ms")
+            rec_max_ms = _max_direct(rec_calls, "hte_processing_time_ms")
+            if rec_max_ms <= 0:
+                rec_max_ms = max((_f((r.get("hte_timing_ms") or {}).get("total_ms")) for r in rec_calls), default=0.0)
+            rec_compute_ms = _sum_timing(rec_calls, "recommend_compute_ms", "hte_timing_ms")
+            rec_get_ms = _sum_timing(rec_calls, "recommender_get_ms", "hte_timing_ms")
+            lines.append(
+                f"- `recommend_conditions`: {len(rec_calls)} call(s), sum {rec_total_ms/1000:.1f}s, "
+                f"max {rec_max_ms/1000:.1f}s, compute {rec_compute_ms/1000:.1f}s, init/get {rec_get_ms/1000:.1f}s"
+            )
+
+        precedent_total_ms = 0.0
+        if precedent_calls:
+            precedent_total_ms = _sum_timing(precedent_calls, "total_ms", "hte_search_timing_ms")
+            load_ms = _sum_timing(precedent_calls, "load_family_ms", "hte_search_timing_ms")
+            drfp_ms = _sum_timing(precedent_calls, "drfp_rerank_ms", "hte_search_timing_ms")
+            lines.append(
+                f"- `search_hte_precedent`: {len(precedent_calls)} call(s), sum {precedent_total_ms/1000:.1f}s, "
+                f"family-load {load_ms/1000:.1f}s, DRFP {drfp_ms/1000:.1f}s"
+            )
+
+        total_hte_ms = round(rec_total_ms + precedent_total_ms, 2)
+        if total_hte_ms > 0:
+            lines.append(f"- Aggregate HTE tool self-time (sum across calls): {total_hte_ms/1000:.1f}s")
+            lines.append("- Note: summed per-call tool times; wall time differs with batching/overlap.")
+
+        return "\n".join(lines)
 
     def _aggregate_confidence(
         self,

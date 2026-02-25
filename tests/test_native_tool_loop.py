@@ -471,3 +471,59 @@ class TestSharedReactionContextCaching:
         wrapped["get_molecular_descriptors"](smiles="CCO")
 
         assert counts == {"fg": 1, "desc": 1}
+
+
+class TestPerformanceSummary:
+    def test_build_performance_summary_aggregates_per_call_hte_timings(self):
+        agent = _make_agent()
+        tool_results = {
+            "_tool_call_results_by_id": {
+                "rc1": {
+                    "success": True,
+                    "hte_processing_time_ms": 600000.0,
+                    "hte_timing_ms": {
+                        "recommend_compute_ms": 580000.0,
+                        "recommender_get_ms": 15000.0,
+                        "total_ms": 600000.0,
+                    },
+                },
+                "rc2": {
+                    "success": True,
+                    "hte_processing_time_ms": 880000.0,
+                    "hte_timing_ms": {
+                        "recommend_compute_ms": 860000.0,
+                        "recommender_get_ms": 5000.0,
+                        "total_ms": 880000.0,
+                    },
+                },
+                "sp1": {
+                    "success": True,
+                    "hte_search_timing_ms": {
+                        "total_ms": 2300.0,
+                        "load_family_ms": 1200.0,
+                        "drfp_rerank_ms": 800.0,
+                    },
+                },
+                "sp2": {
+                    "success": True,
+                    "hte_search_timing_ms": {
+                        "total_ms": 6700.0,
+                        "load_family_ms": 2200.0,
+                        "drfp_rerank_ms": 3900.0,
+                    },
+                },
+            }
+        }
+
+        summary = agent._build_performance_summary(tool_results, task_type="retrosynthesis")
+        assert "Route performance summary" in summary
+        assert "recommend_conditions" in summary
+        assert "2 call(s), sum 1480.0s" in summary
+        assert "compute 1440.0s" in summary
+        assert "search_hte_precedent" in summary
+        assert "sum 9.0s" in summary
+        assert "Aggregate HTE tool self-time (sum across calls): 1489.0s" in summary
+
+    def test_build_performance_summary_returns_empty_without_timing_fields(self):
+        agent = _make_agent()
+        assert agent._build_performance_summary({"read_notes": {"success": True}}, task_type="general") == ""
