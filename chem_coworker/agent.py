@@ -261,6 +261,19 @@ class ChemCoworker:
             streamed=streamed,
         )
 
+    def set_verbose(self, verbose: bool) -> None:
+        """Update verbosity across the agent and tool executor."""
+        self.verbose = verbose
+        self.executor.verbose = verbose
+
+    def set_plan_callback(self, callback: Optional[Callable[["ExecutionPlan"], "ExecutionPlan"]]) -> None:
+        """Update the optional plan approval callback at runtime."""
+        self.plan_callback = callback
+
+    def compact_history(self, history: List[Dict[str, str]]) -> List[Dict[str, str]]:
+        """Public wrapper for conversation history compaction."""
+        return self._compact_history(history)
+
     def chat(
         self,
         query: str,
