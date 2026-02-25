@@ -97,6 +97,7 @@ SELECTABLE_MODELS: List[Dict[str, str]] = [
     {"name": "glm-4.7",        "provider": "aliyun"},   # 4
     {"name": "MiniMax-M2.1",   "provider": "aliyun"},   # 5
     {"name": "deepseek-v3.2",  "provider": "aliyun"},   # 6
+    {"name": "qwen3-max",      "provider": "aliyun"},   # 7
 ]
 
 _ALIYUN_MODELS = {m["name"] for m in SELECTABLE_MODELS if m["provider"] == "aliyun"}
