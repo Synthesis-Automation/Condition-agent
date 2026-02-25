@@ -57,12 +57,13 @@ AVAILABLE_MODELS = {
         "deepseek-v3.2",
         "deepseek-r1",
         "deepseek-r1-0528",
-        "deepseek-v3",
         "deepseek-r1-distill-llama-70b",
         "kimi-k2.5",
         "glm-4.7",
         "MiniMax-M2.1",
-        "glm-5"
+        "glm-5",
+        "qwen3-max",
+        
     ],
     "openai": [
         "gpt-5.2",
