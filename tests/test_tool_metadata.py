@@ -5,6 +5,8 @@ and data-contract SMILES resolution in ToolExecutor.
 from __future__ import annotations
 
 import pytest
+import sys
+import types
 from typing import Any, Dict, Optional
 from unittest.mock import MagicMock
 
@@ -163,6 +165,80 @@ class TestRegistryAnnotations:
         plugin = REGISTRY._plugins.get("resolve_to_smiles")
         assert plugin is not None
         assert "resolved_smiles" in plugin.provides or "smiles" in plugin.provides
+
+
+class TestDetectReactionTypeCanonicalMetadata:
+    def test_detect_reaction_type_returns_taxonomy_canonical_metadata(self, monkeypatch):
+        from chem_coworker.tools.chemistry import _detect_reaction_type
+
+        fake_unified = types.ModuleType("chemtools.featurizers.unified")
+        fake_unified.featurize_reaction = lambda rxn: {
+            "reaction_type": "Suzuki",
+            "confidence": 0.91,
+            "detection": {"validation": {}, "evidence": {}},
+            "reaction_key": "rk1",
+        }
+
+        fake_catalog = types.ModuleType("chemtools.taxonomy.reaction_catalog")
+        fake_catalog.resolve_reaction_type = lambda label: "suzuki_miyaura" if str(label).lower() == "suzuki" else None
+        fake_catalog.get_reaction_type = lambda rid: types.SimpleNamespace(
+            id="suzuki_miyaura",
+            name="Suzuki-Miyaura",
+            category="cross_coupling",
+            aliases=["Suzuki"],
+            constraints={"bond_formed": "C-C"},
+        )
+
+        monkeypatch.setitem(sys.modules, "chemtools.featurizers.unified", fake_unified)
+        monkeypatch.setitem(sys.modules, "chemtools.taxonomy.reaction_catalog", fake_catalog)
+
+        out = _detect_reaction_type("Brc1ccccc1.B(O)Oc1ccccc1>>c1ccc(-c2ccccc2)cc1")
+        assert out["success"] is True
+        assert out["reaction_type"] == "suzuki_miyaura"
+        assert out["reaction_type_id"] == "suzuki_miyaura"
+        assert out["reaction_type_metadata"]["id"] == "suzuki_miyaura"
+        assert out["reaction_type_metadata"]["category"] == "cross_coupling"
+
+
+class TestChemistryValidators:
+    def test_validate_detect_reaction_type_warns_on_low_confidence(self):
+        from chem_coworker.tools.chemistry import _validate_detect_reaction_type
+
+        msg = _validate_detect_reaction_type(
+            {
+                "success": True,
+                "reaction_type": "C_N_Coupling",
+                "confidence": 0.21,
+                "reaction_type_metadata": {"category": "cross_coupling"},
+            }
+        )
+        assert msg is not None
+        assert "Low reaction-type confidence" in msg
+
+    def test_validate_detect_reaction_type_warns_on_unknown(self):
+        from chem_coworker.tools.chemistry import _validate_detect_reaction_type
+
+        msg = _validate_detect_reaction_type({"success": True, "reaction_type": "Unknown"})
+        assert msg is not None
+        assert "Unknown" in msg
+
+    def test_validate_analyze_bond_changes_warns_on_missing_formed_bonds(self):
+        from chem_coworker.tools.chemistry import _validate_analyze_bond_changes
+
+        msg = _validate_analyze_bond_changes(
+            {"success": True, "bonds_formed": [], "key_bond_type": "C-N", "mapping_confidence": 0.9}
+        )
+        assert msg is not None
+        assert "no formed bonds" in msg.lower()
+
+    def test_validate_analyze_bond_changes_warns_on_low_mapping_confidence(self):
+        from chem_coworker.tools.chemistry import _validate_analyze_bond_changes
+
+        msg = _validate_analyze_bond_changes(
+            {"success": True, "bonds_formed": [[1, 2]], "key_bond_type": "C-C", "mapping_confidence": 0.2}
+        )
+        assert msg is not None
+        assert "Low bond-mapping confidence" in msg
 
 
 # ---------------------------------------------------------------------------

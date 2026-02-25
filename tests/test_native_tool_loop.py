@@ -133,3 +133,143 @@ class TestExhaustionGuard:
 
         assert final_answer == "Normal answer."
         assert invoke_calls["n"] == 1   # only the one loop iteration call, no closing call
+
+
+class TestNativeToolContractEnforcement:
+    def test_partitions_tool_calls_and_defers_requires_until_provider_runs(self):
+        """recommend_conditions should be deferred until detect_reaction_type has run."""
+        agent = _make_agent()
+        from chem_coworker.plan import ToolCall
+
+        callables = agent.registry.get_callables()
+        response_tool_calls = [
+            {"name": "recommend_conditions", "args": {"reaction_smiles": "A>>B"}, "id": "tc1"},
+            {"name": "detect_reaction_type", "args": {"reaction_smiles": "A>>B"}, "id": "tc2"},
+        ]
+
+        executable, blocked, warnings = agent._partition_native_tool_calls_by_contracts(
+            response_tool_calls=response_tool_calls,
+            callables=callables,
+            tool_results={},
+        )
+
+        assert [c.name for c in executable] == ["detect_reaction_type"]
+        assert "recommend_conditions" in blocked
+        assert blocked["recommend_conditions"]["contract_violation"] is True
+        assert blocked["recommend_conditions"]["deferred"] is True
+        assert "reaction_type" in blocked["recommend_conditions"]["missing_requires"]
+        assert any("recommend_conditions" in w for w in warnings)
+
+    def test_allows_tool_when_required_context_key_exists(self):
+        """recommend_conditions may run once reaction_type context is available."""
+        agent = _make_agent()
+        callables = agent.registry.get_callables()
+        response_tool_calls = [
+            {"name": "recommend_conditions", "args": {"reaction_smiles": "A>>B"}, "id": "tc1"},
+        ]
+        prior_results = {
+            "detect_reaction_type": {
+                "success": True,
+                "reaction_type": "suzuki_miyaura",
+                "reaction_type_id": "suzuki_miyaura",
+            }
+        }
+
+        executable, blocked, warnings = agent._partition_native_tool_calls_by_contracts(
+            response_tool_calls=response_tool_calls,
+            callables=callables,
+            tool_results=prior_results,
+        )
+
+        assert [c.name for c in executable] == ["recommend_conditions"]
+        assert blocked == {}
+        assert warnings == []
+
+
+class TestStructuredExtractionCanonicalReactionType:
+    def test_extract_structured_prefers_reaction_type_id_and_keeps_metadata(self):
+        agent = _make_agent()
+        structured = agent._extract_structured(
+            {
+                "detect_reaction_type": {
+                    "success": True,
+                    "reaction_type": "Suzuki",
+                    "reaction_type_id": "suzuki_miyaura",
+                    "family_label": "Suzuki-Miyaura Cross-Coupling",
+                    "reaction_type_metadata": {
+                        "id": "suzuki_miyaura",
+                        "name": "Suzuki-Miyaura",
+                        "category": "cross_coupling",
+                        "aliases": ["Suzuki"],
+                        "has_constraints": True,
+                    },
+                }
+            }
+        )
+        assert structured["reaction_type"] == "suzuki_miyaura"
+        assert structured["reaction_family"] == "Suzuki-Miyaura Cross-Coupling"
+        assert structured["reaction_type_metadata"]["category"] == "cross_coupling"
+
+
+class TestAggregateConfidence:
+    def test_aggregate_confidence_increases_with_strong_consistent_evidence(self):
+        agent = _make_agent()
+        score = agent._aggregate_confidence(
+            tool_results={
+                "detect_reaction_type": {
+                    "success": True,
+                    "reaction_type": "suzuki_miyaura",
+                    "reaction_type_id": "suzuki_miyaura",
+                    "confidence": 0.94,
+                    "reaction_type_metadata": {"category": "cross_coupling"},
+                    "reacted_motifs": ["Ar-Br"],
+                    "formed_motifs": ["Biaryl"],
+                },
+                "analyze_bond_changes": {
+                    "success": True,
+                    "bonds_formed": [[1, 2]],
+                    "key_bond_type": "C-C (Suzuki-type)",
+                    "mapping_confidence": 0.88,
+                },
+                "recommend_conditions": {
+                    "success": True,
+                    "recommendations": [{"num_experiments": 12, "confidence": 0.83}],
+                },
+            },
+            base_confidence=0.5,
+            warnings=[],
+            critic_findings=[],
+        )
+        assert score > 0.75
+
+    def test_aggregate_confidence_decreases_with_unknown_and_warnings(self):
+        agent = _make_agent()
+        critic_finding = type("F", (), {"severity": type("S", (), {"value": "warning"})()})()
+        score = agent._aggregate_confidence(
+            tool_results={
+                "detect_reaction_type": {
+                    "success": True,
+                    "reaction_type": "Unknown",
+                    "confidence": 0.15,
+                    "reaction_type_metadata": {},
+                },
+                "analyze_bond_changes": {
+                    "success": True,
+                    "bonds_formed": [],
+                    "key_bond_type": "unknown",
+                    "mapping_confidence": 0.18,
+                },
+                "recommend_conditions": {
+                    "success": True,
+                    "recommendations": [],
+                },
+                "recommend_conditions_blocked": {
+                    "success": False,
+                    "contract_violation": True,
+                },
+            },
+            base_confidence=0.5,
+            warnings=["Blocked 'recommend_conditions' due to unmet tool contracts.", "Tool 'x' failed: y"],
+            critic_findings=[critic_finding],
+        )
+        assert score < 0.45

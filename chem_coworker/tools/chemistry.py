@@ -13,6 +13,7 @@ as ToolPlugins so the ToolRegistry can build execution groups automatically.
 """
 from __future__ import annotations
 
+import re
 from typing import Any, Dict
 
 from ._helpers import _clean_rxn_smiles, _error, _success, _to_jsonable
@@ -106,6 +107,7 @@ def _detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
     """
     try:
         from chemtools.featurizers.unified import featurize_reaction
+        from chemtools.taxonomy.reaction_catalog import get_reaction_type, resolve_reaction_type
 
         reaction_smiles = _clean_rxn_smiles(reaction_smiles)
         result = featurize_reaction(reaction_smiles)
@@ -117,14 +119,24 @@ def _detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
         validation = detection.get("validation", {})
         evidence = detection.get("evidence", {})
 
-        reaction_type = result.get("reaction_type") or validation.get("validated_detection")
+        reaction_type_raw = result.get("reaction_type") or validation.get("validated_detection")
+        reaction_type_id = resolve_reaction_type(str(reaction_type_raw)) if reaction_type_raw else None
+        reaction_type = reaction_type_id or reaction_type_raw
         confidence = (
             validation.get("validation_confidence")
             or result.get("confidence")
             or 0.0
         )
-        # Human-readable label: replace underscores
-        family_label = reaction_type.replace("_", " ") if reaction_type else ""
+        # Taxonomy-canonical metadata (fallbacks preserve legacy behavior)
+        rt_def = get_reaction_type(str(reaction_type)) if reaction_type else None
+        family_label = (rt_def.name if rt_def else (reaction_type.replace("_", " ") if reaction_type else ""))
+        taxonomy_metadata = {
+            "id": getattr(rt_def, "id", reaction_type_id or reaction_type or ""),
+            "name": getattr(rt_def, "name", family_label or ""),
+            "category": getattr(rt_def, "category", ""),
+            "aliases": list(getattr(rt_def, "aliases", []) or []),
+            "has_constraints": bool(getattr(rt_def, "constraints", None)),
+        } if reaction_type else {}
 
         # Collect matched motifs if available
         reacted_motifs = evidence.get("reacted_motifs", [])
@@ -133,11 +145,13 @@ def _detect_reaction_type(reaction_smiles: str) -> Dict[str, Any]:
         return _success({
             "reaction_smiles": reaction_smiles,
             "reaction_type": reaction_type,
+            "reaction_type_id": reaction_type_id or reaction_type,
             "family_label": family_label,
             "confidence": float(confidence),
             "reacted_motifs": reacted_motifs,
             "formed_motifs": formed_motifs,
             "reaction_key": result.get("reaction_key"),
+            "reaction_type_metadata": taxonomy_metadata,
         })
     except Exception as exc:
         return _error(f"Reaction type detection failed: {exc}")
@@ -149,7 +163,8 @@ detect_reaction_type_tool = ToolPlugin(
     description="Deterministic taxonomy classification of a reaction (Suzuki, Buchwald-Hartwig, etc.). Fast, no atom mapping needed.",
     prerequisites=[],
     fn=_detect_reaction_type,
-    provides=["reaction_type", "reaction_family"],
+    provides=["reaction_type", "reaction_type_id", "reaction_family", "reaction_type_metadata"],
+    validators=[],
 )
 
 
@@ -250,7 +265,102 @@ analyze_bond_changes_tool = ToolPlugin(
     description="Identify bonds broken and formed in a reaction. ALWAYS run this before searching the reaction taxonomy.",
     prerequisites=["normalize_reaction"],
     fn=_analyze_bond_changes,
+    provides=["bonds_broken", "bonds_formed", "key_bond_type", "mapping_confidence"],
+    validators=[],
 )
+
+
+def _coerce_confidence_number(value: Any) -> float | None:
+    """Best-effort conversion of confidence-like values to float."""
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        try:
+            return float(value)
+        except Exception:
+            return None
+    text = str(value).strip()
+    if not text:
+        return None
+    if text.endswith("%"):
+        try:
+            return float(text[:-1]) / 100.0
+        except Exception:
+            return None
+    m = re.search(r"([01](?:\.\d+)?|\d+\.\d+)", text)
+    if not m:
+        return None
+    try:
+        num = float(m.group(1))
+    except Exception:
+        return None
+    if num > 1.0 and num <= 100.0:
+        return num / 100.0
+    return num
+
+
+def _validate_detect_reaction_type(result: dict) -> object:
+    """Surface chemistry-specific caveats for deterministic reaction typing."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return None
+
+    rt = str(result.get("reaction_type") or result.get("reaction_type_id") or "").strip()
+    conf = _coerce_confidence_number(result.get("confidence"))
+    meta = result.get("reaction_type_metadata") or {}
+
+    if not rt:
+        return (
+            "detect_reaction_type did not return a reaction family. "
+            "State uncertainty and avoid family-specific claims or conditions."
+        )
+    if rt.lower() == "unknown":
+        return (
+            "Reaction type classified as Unknown. "
+            "Use bond changes/functional groups and state uncertainty explicitly."
+        )
+    if conf is not None and conf < 0.40:
+        return (
+            f"Low reaction-type confidence ({conf:.2f}) for {rt}. "
+            "Treat family-specific conclusions as tentative."
+        )
+    if conf is not None and conf < 0.60 and not meta.get("category"):
+        return (
+            f"Reaction type {rt} lacks clear taxonomy metadata and confidence is moderate/low ({conf:.2f}). "
+            "Cross-check with bond-change evidence before committing."
+        )
+    return None
+
+
+def _validate_analyze_bond_changes(result: dict) -> object:
+    """Surface chemistry caveats from bond-change/mapping quality."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return None
+
+    formed = result.get("bonds_formed") or []
+    key_bond = str(result.get("key_bond_type") or "").strip().lower()
+    map_conf = _coerce_confidence_number(result.get("mapping_confidence"))
+
+    if not formed:
+        return (
+            "Bond-change analysis returned no formed bonds. "
+            "Reaction family inference may be unreliable; verify mapping and reaction SMILES."
+        )
+    if key_bond in ("", "unknown"):
+        return (
+            "Bond-change analysis could not infer a clear key bond type. "
+            "Taxonomy search and mechanism claims may be ambiguous."
+        )
+    if map_conf is not None and map_conf < 0.50:
+        return (
+            f"Low bond-mapping confidence ({map_conf:.2f}). "
+            "Treat bond-change-derived conclusions as tentative."
+        )
+    return None
+
+
+# Register chemistry validators after function definitions to keep tool declarations readable.
+detect_reaction_type_tool.validators = [_validate_detect_reaction_type]
+analyze_bond_changes_tool.validators = [_validate_analyze_bond_changes]
 
 
 # ---------------------------------------------------------------------------

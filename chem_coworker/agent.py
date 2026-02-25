@@ -164,6 +164,7 @@ class ChemCoworker:
 
         # ── Steps 2–4: Native tool calling ─────────────────────────────
         warnings: List[str] = []
+        critic_findings: List[Any] = []
         tool_results, hypothesis, confidence, tool_warnings, llm_calls_native, answer, _messages = \
             self._run_native_tool_loop(
                 query=query,
@@ -220,6 +221,14 @@ class ChemCoworker:
                 # Append the critic's findings for transparency
                 finding_lines = "\n".join(str(f) for f in critic_findings)
                 answer += f"\n\n---\n🔍 **Critic review** (addressed above): {critic_verdict}\n{finding_lines}"
+
+        # Evidence-based confidence aggregation replaces the placeholder native-loop confidence.
+        effective_plan.confidence = self._aggregate_confidence(
+            tool_results=tool_results,
+            base_confidence=confidence,
+            warnings=warnings,
+            critic_findings=critic_findings,
+        )
 
         # ── Step 6: Emit events and stream answer ──────────────────────
         self.event_bus.emit(
@@ -400,8 +409,10 @@ class ChemCoworker:
         if "detect_reaction_type" in results:
             r = results["detect_reaction_type"]
             if isinstance(r, dict) and r.get("success"):
-                structured["reaction_type"] = r.get("reaction_type")
+                structured["reaction_type"] = r.get("reaction_type_id") or r.get("reaction_type")
                 structured["reaction_family"] = r.get("family_label")
+                if r.get("reaction_type_metadata"):
+                    structured["reaction_type_metadata"] = r.get("reaction_type_metadata")
 
         if "analyze_bond_changes" in results:
             r = results["analyze_bond_changes"]
@@ -427,6 +438,116 @@ class ChemCoworker:
                 structured["taxonomy_matches"] = r.get("matches", [])
 
         return structured
+
+    def _collect_available_context_from_tool_results(
+        self,
+        tool_results: Dict[str, Any],
+    ) -> tuple[set[str], set[str]]:
+        """
+        Return (completed_tool_names, provided_keys) from successful tool results.
+
+        `provided_keys` includes actual dict keys and registered ToolPlugin.provides keys
+        present in the returned payload. This is used to enforce runtime `requires`.
+        """
+        completed_tools: set[str] = set()
+        provided_keys: set[str] = set()
+        plugins = getattr(self.registry, "_plugins", {})
+
+        for tool_name, result in tool_results.items():
+            if not isinstance(result, dict) or not result.get("success", False):
+                continue
+            completed_tools.add(tool_name)
+            provided_keys.update(result.keys())
+            plugin = plugins.get(tool_name)
+            if plugin is None:
+                continue
+            for key in getattr(plugin, "provides", []) or []:
+                if key in result:
+                    provided_keys.add(key)
+        return completed_tools, provided_keys
+
+    def _partition_native_tool_calls_by_contracts(
+        self,
+        response_tool_calls: List[Dict[str, Any]],
+        callables: Dict[str, Callable[..., Any]],
+        tool_results: Dict[str, Any],
+    ) -> tuple[List["ToolCall"], Dict[str, Any], List[str]]:
+        """
+        Partition tool calls into executable vs blocked/deferred by ToolPlugin contracts.
+
+        Returns:
+            (executable_calls, synthetic_results_for_blocked, warnings)
+        """
+        from .plan import ToolCall
+
+        plugins = getattr(self.registry, "_plugins", {})
+        completed_tools, provided_keys = self._collect_available_context_from_tool_results(tool_results)
+
+        requested_names = {
+            str(tc.get("name", ""))
+            for tc in response_tool_calls
+            if isinstance(tc, dict) and tc.get("name")
+        }
+        providers_by_key: Dict[str, set[str]] = {}
+        for name, plugin in plugins.items():
+            for key in getattr(plugin, "provides", []) or []:
+                providers_by_key.setdefault(key, set()).add(name)
+
+        executable: List[ToolCall] = []
+        blocked_results: Dict[str, Any] = {}
+        warnings: List[str] = []
+
+        for tc in response_tool_calls:
+            tool_name = tc.get("name")
+            if tool_name not in callables:
+                continue  # preserve existing behavior; caller will produce "not executed" ToolMessage
+
+            plugin = plugins.get(tool_name)
+            if plugin is None:
+                executable.append(ToolCall(name=tool_name, args=dict(tc.get("args", {}))))
+                continue
+
+            missing_prereqs = [p for p in (plugin.prerequisites or []) if p not in completed_tools]
+            missing_requires = [k for k in (plugin.requires or []) if k not in provided_keys]
+            if not missing_prereqs and not missing_requires:
+                executable.append(ToolCall(name=tool_name, args=dict(tc.get("args", {}))))
+                continue
+
+            waiting_on_tools: set[str] = set()
+            for p in missing_prereqs:
+                if p in requested_names:
+                    waiting_on_tools.add(p)
+            for key in missing_requires:
+                for provider_name in providers_by_key.get(key, set()):
+                    if provider_name in requested_names:
+                        waiting_on_tools.add(provider_name)
+
+            deferred = bool(waiting_on_tools)
+            if deferred:
+                reason = (
+                    f"Deferred '{tool_name}' due to unmet tool contracts; wait for: "
+                    f"{', '.join(sorted(waiting_on_tools))}."
+                )
+            else:
+                bits: List[str] = []
+                if missing_prereqs:
+                    bits.append(f"missing prerequisites={missing_prereqs}")
+                if missing_requires:
+                    bits.append(f"missing required context keys={missing_requires}")
+                reason = f"Blocked '{tool_name}' due to unmet tool contracts ({'; '.join(bits)})."
+
+            warnings.append(reason)
+            blocked_results[tool_name] = {
+                "success": False,
+                "error": reason,
+                "tool": tool_name,
+                "contract_violation": True,
+                "deferred": deferred,
+                "missing_prerequisites": missing_prereqs,
+                "missing_requires": missing_requires,
+            }
+
+        return executable, blocked_results, warnings
 
     def _describe_resources(self) -> str:
         """
@@ -611,19 +732,15 @@ class ChemCoworker:
                 names = [tc.get("name", "?") for tc in response_tool_calls]
                 logger.info(f"[ChemCoworker] Native loop iter {iteration}: {names}")
 
-            # Emit TOOL_START for each tool about to run
-            for tc in response_tool_calls:
-                self.event_bus.emit(ChemEvent.TOOL_START, tool_name=tc.get("name", "?"))
-
             # Execute all tool calls in parallel
-            tc_list = [
-                ToolCall(
-                    name=tc["name"],
-                    args=dict(tc.get("args", {})),
-                )
-                for tc in response_tool_calls
-                if tc.get("name") in callables
-            ]
+            tc_list, blocked_results, contract_warnings = self._partition_native_tool_calls_by_contracts(
+                response_tool_calls=response_tool_calls,
+                callables=callables,
+                tool_results=tool_results,
+            )
+            if blocked_results:
+                tool_results.update(blocked_results)
+                warnings.extend(contract_warnings)
 
             if tc_list:
                 import time as _t
@@ -702,6 +819,127 @@ class ChemCoworker:
             parts.append(f"• {w}")
         # Deduplicate while preserving order
         return "\n".join(dict.fromkeys(parts))
+
+    def _aggregate_confidence(
+        self,
+        tool_results: Dict[str, Any],
+        base_confidence: float = 0.5,
+        warnings: Optional[List[str]] = None,
+        critic_findings: Optional[List[Any]] = None,
+    ) -> float:
+        """
+        Estimate answer confidence from chemistry evidence, support, and caveats.
+
+        Heuristic (deterministic) aggregator; intended to be calibrated later.
+        """
+        warnings = warnings or []
+        critic_findings = critic_findings or []
+
+        def _clip(x: float) -> float:
+            return max(0.05, min(0.99, x))
+
+        def _coerce_num(x: Any) -> Optional[float]:
+            try:
+                if x is None:
+                    return None
+                if isinstance(x, (int, float)):
+                    return float(x)
+                s = str(x).strip()
+                if not s:
+                    return None
+                if s.endswith("%"):
+                    val = float(s[:-1]) / 100.0
+                else:
+                    val = float(s)
+                if val > 1.0 and val <= 100.0:
+                    val = val / 100.0
+                return val
+            except Exception:
+                return None
+
+        score = float(base_confidence or 0.5)
+
+        # Reaction typing confidence and taxonomy grounding
+        rtype = tool_results.get("detect_reaction_type")
+        if isinstance(rtype, dict) and rtype.get("success"):
+            det_conf = _coerce_num(rtype.get("confidence"))
+            if det_conf is not None:
+                score = 0.55 * score + 0.45 * det_conf
+            rt_id = str(rtype.get("reaction_type_id") or rtype.get("reaction_type") or "").strip().lower()
+            meta = rtype.get("reaction_type_metadata") or {}
+            if rt_id and rt_id != "unknown":
+                score += 0.08
+            else:
+                score -= 0.18
+            if meta.get("category"):
+                score += 0.04
+            if rtype.get("reacted_motifs") or rtype.get("formed_motifs"):
+                score += 0.03
+
+        # Bond-change / mapping support
+        bchg = tool_results.get("analyze_bond_changes")
+        if isinstance(bchg, dict) and bchg.get("success"):
+            map_conf = _coerce_num(bchg.get("mapping_confidence"))
+            if map_conf is not None:
+                score = 0.75 * score + 0.25 * map_conf
+            formed = bchg.get("bonds_formed") or []
+            if formed:
+                score += 0.05
+            else:
+                score -= 0.15
+            key_bond = str(bchg.get("key_bond_type") or "").strip().lower()
+            if key_bond and key_bond != "unknown":
+                score += 0.04
+            else:
+                score -= 0.10
+
+        # Condition recommendation support quality (if relevant)
+        cond = tool_results.get("recommend_conditions")
+        if isinstance(cond, dict) and cond.get("success"):
+            recs = cond.get("recommendations") or []
+            if recs:
+                score += 0.04
+                top = recs[0] if isinstance(recs[0], dict) else {}
+                n_exp = int(top.get("num_experiments", 0) or 0)
+                top_conf = _coerce_num(top.get("confidence"))
+                if n_exp > 0:
+                    score += 0.06 if n_exp >= 5 else 0.03
+                if top_conf is not None:
+                    score = 0.85 * score + 0.15 * top_conf
+            else:
+                score -= 0.10
+
+        # Penalize contract violations and warnings
+        contract_violations = 0
+        for result in tool_results.values():
+            if isinstance(result, dict) and result.get("contract_violation"):
+                contract_violations += 1
+        score -= 0.10 * contract_violations
+
+        warning_penalty = 0.0
+        for w in warnings:
+            text = str(w).lower()
+            if "contract" in text:
+                warning_penalty += 0.05
+            elif "failed" in text or "unknown" in text:
+                warning_penalty += 0.03
+            else:
+                warning_penalty += 0.015
+        score -= min(0.25, warning_penalty)
+
+        # Critic findings reduce confidence by severity
+        severity_penalty = 0.0
+        for f in critic_findings:
+            sev = str(getattr(getattr(f, "severity", None), "value", getattr(f, "severity", ""))).lower()
+            if sev == "critical":
+                severity_penalty += 0.20
+            elif sev == "warning":
+                severity_penalty += 0.08
+            elif sev:
+                severity_penalty += 0.03
+        score -= min(0.35, severity_penalty)
+
+        return round(_clip(score), 3)
 
     def _run_critic_loop(
         self,
