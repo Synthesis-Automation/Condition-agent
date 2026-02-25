@@ -477,13 +477,7 @@ class RecommendationWorker(QtCore.QObject):
                 merged_by_source[key] = _dedupe_recommendations(list(items))
 
         source_order = ["literature", "protocols", "rules", "experiments", "precedent"]
-        extras = [k for k in sorted(merged_by_source) if k not in source_order]
-        merged_all: List[Any] = []
-        for key in source_order + extras:
-            merged_all.extend(list(merged_by_source.get(key) or []))
-
         baseline.recommendations_by_source = merged_by_source
-        baseline.recommendations = _dedupe_recommendations(merged_all)
         return baseline
 
     def _run_precedent_only(
@@ -787,8 +781,6 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
     def _initialize_result_tabs(self) -> None:
         self.results_tabs.clear()
-        self.table = self._create_results_table()
-        self.results_tabs.addTab(self.table, "All")
         for label in ("Literature", "Protocols", "Rules", "Experiments", "Precedent"):
             group_table = self._create_results_table()
             self.results_tabs.addTab(group_table, label)
@@ -1095,24 +1087,6 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         base_groups = ["literature", "protocols", "rules", "experiments", "precedent"]
         extra_groups = [g for g in sorted(source_map) if g not in base_groups]
 
-        display_recs = list(recs)
-        source_label = (self._source_group_label or "").strip().lower()
-        if source_label in {"all", "run all recommendation"} and source_map:
-            merged: List[Any] = []
-            seen: set[str] = set()
-            for source_group in base_groups + extra_groups:
-                for rec in list(source_map.get(source_group) or []):
-                    try:
-                        rec_key = json.dumps(asdict(rec), sort_keys=True, default=str)
-                    except Exception:
-                        rec_key = str(id(rec))
-                    if rec_key in seen:
-                        continue
-                    seen.add(rec_key)
-                    merged.append(rec)
-            if merged:
-                display_recs = merged
-
         try:
             from chemtools.formatters import format_hte_output
             reaction_filter = self.reaction_filter_edit.text().strip() or None
@@ -1133,18 +1107,22 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.export_json_button.setEnabled(bool(self._all_json_output))
         self.results_tabs.clear()
 
-        self.table = self._create_results_table()
-        self.results_tabs.addTab(self.table, "All")
-        all_columns = _table_columns_for_type(data_type)
-        self._populate_table(self.table, display_recs, all_columns)
-
+        added_any_tab = False
         for source_group in base_groups + extra_groups:
             group_recs = list(source_map.get(source_group) or [])
+            if not group_recs:
+                continue
             group_table = self._create_results_table()
             group_columns = _table_columns_for_type(source_group)
             self._populate_table(group_table, group_recs, group_columns)
             label = (source_group or "unknown").replace("_", " ").title()
             self.results_tabs.addTab(group_table, label)
+            added_any_tab = True
+
+        if not added_any_tab:
+            fallback_table = self._create_results_table()
+            self._populate_table(fallback_table, recs, _table_columns_for_type(data_type))
+            self.results_tabs.addTab(fallback_table, "Results")
 
     def _export_json_output(self) -> None:
         if not self._all_json_output:
