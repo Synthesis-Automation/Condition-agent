@@ -283,6 +283,7 @@ def recommend_from_reaction(
 
     detected_type = getattr(result, "predicted_reaction_type", None) or reaction_type
     confidence = getattr(result, "reaction_type_confidence", 0.0) or None
+    recommender_stage_timing_ms = getattr(result, "timing_ms", None) or {}
 
     extras = {
         "hte": {
@@ -304,6 +305,7 @@ def recommend_from_reaction(
                 for source, recs in (getattr(result, "recommendations_by_source", {}) or {}).items()
             },
             "timing_ms": timing_ms,
+            "recommender_stage_timing_ms": recommender_stage_timing_ms,
         }
     }
 

@@ -22,6 +22,7 @@ import pickle
 import itertools
 import re
 import logging
+import time
 import pandas as pd
 from pathlib import Path
 import json
@@ -2364,6 +2365,7 @@ class HTERecommendationResult:
     is_fallback_match: bool = False
     is_filtered_by_detected_type: bool = False  # Whether results were filtered by detected reaction type
     matched_motifs: Optional[Tuple[str, str]] = None
+    timing_ms: Dict[str, float] = field(default_factory=dict)
 
 
 class HTERecommender:
@@ -3224,8 +3226,29 @@ class HTERecommender:
             reactant_b_smiles=reactant_b_smiles,
             product_smiles=product_smiles
         )
+        recommend_started_at = time.perf_counter()
+        stage_timings_ms: Dict[str, float] = {}
+        _stage_order = (
+            "query_prep_ms",
+            "match_retrieval_ms",
+            "filtering_and_enforcement_ms",
+            "aggregation_ms",
+            "precedent_merge_ms",
+        )
+
+        def _add_stage_timing(stage_name: str, started_at: float) -> None:
+            elapsed_ms = round((time.perf_counter() - started_at) * 1000.0, 2)
+            stage_timings_ms[stage_name] = round(
+                float(stage_timings_ms.get(stage_name, 0.0)) + elapsed_ms, 2
+            )
+
+        def _finalize_timing_profile() -> None:
+            profile = {name: float(stage_timings_ms.get(name, 0.0)) for name in _stage_order}
+            profile["total_ms"] = round((time.perf_counter() - recommend_started_at) * 1000.0, 2)
+            result.timing_ms = profile
 
         # Normalize source group and adjust min_experiments for protocols/rules
+        _t_query_prep = time.perf_counter()
         if source_group:
             source_group = _normalize_source_group(source_group)
             if source_group in {"protocols", "rules"} and min_experiments > 1:
@@ -3397,6 +3420,8 @@ class HTERecommender:
 
         # If no reaction key and no reactant types, return empty
         if not result.query_reaction_key and not result.query_reaction_events_key and not type_a:
+            _add_stage_timing("query_prep_ms", _t_query_prep)
+            _finalize_timing_profile()
             return result
 
         query_core_signature = ""
@@ -3416,6 +3441,8 @@ class HTERecommender:
             or query_ext_signature
             or result.query_reaction_events_key
         ):
+            _add_stage_timing("query_prep_ms", _t_query_prep)
+            _finalize_timing_profile()
             return result
         
         lookup_type_a = list(type_a)
@@ -3444,7 +3471,10 @@ class HTERecommender:
                 result.predicted_reaction_type
             )
 
+        _add_stage_timing("query_prep_ms", _t_query_prep)
+
         # Step 3: Match against database (reaction-key first)
+        _t_match = time.perf_counter()
         query_motifs = set(type_a) | set(type_b)
         if query_core_signature:
             query_motifs = set(_split_motif_tokens(query_core_signature))
@@ -3745,7 +3775,10 @@ class HTERecommender:
             if not scored_matches and fallback_used:
                 result.is_fallback_match = True
 
+        _add_stage_timing("match_retrieval_ms", _t_match)
+
         if matched_df is None:
+            _t_precedent = time.perf_counter()
             precedent_recs = self._build_precedent_recommendations(
                 reactant_a_smiles,
                 reactant_b_smiles,
@@ -3757,8 +3790,11 @@ class HTERecommender:
             if precedent_recs:
                 result.recommendations_by_source["precedent"] = precedent_recs
                 result.recommendations = precedent_recs[:top_k] if top_k > 0 else precedent_recs
+            _add_stage_timing("precedent_merge_ms", _t_precedent)
+            _finalize_timing_profile()
             return result
 
+        _t_filtering = time.perf_counter()
         if "Source_Group" in matched_df.columns:
             matched_df = matched_df.copy()
             matched_df["Source_Group"] = matched_df["Source_Group"].apply(_normalize_source_group)
@@ -3962,8 +3998,11 @@ class HTERecommender:
             result.database_coverage = (len(matched_df) / len(coverage_df)) * 100.0
         else:
             result.database_coverage = 0.0
-        
+
+        _add_stage_timing("filtering_and_enforcement_ms", _t_filtering)
+
         # Step 4: Aggregate and rank conditions
+        _t_aggregate = time.perf_counter()
         if len(matched_df) > 0:
             # Filter by detected reaction type if available and confidence is high
             if (
@@ -4017,6 +4056,9 @@ class HTERecommender:
                     )
                 else:
                     result.recommendations = candidates
+        _add_stage_timing("aggregation_ms", _t_aggregate)
+
+        _t_precedent = time.perf_counter()
         if (source_group or "").lower() in {"", "literature", "datasets", "dataset"}:
             precedent_recs = self._build_precedent_recommendations(
                 reactant_a_smiles,
@@ -4029,6 +4071,8 @@ class HTERecommender:
             if precedent_recs:
                 result.recommendations_by_source["precedent"] = precedent_recs
 
+        _add_stage_timing("precedent_merge_ms", _t_precedent)
+        _finalize_timing_profile()
         return result
 
     def summarize_conditions(

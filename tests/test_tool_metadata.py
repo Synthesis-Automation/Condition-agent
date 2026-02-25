@@ -169,6 +169,16 @@ class TestValidateRecommendConditions:
                         "total_ms": 1234.5,
                     },
                 },
+                "extras": {
+                    "hte": {
+                        "recommender_stage_timing_ms": {
+                            "query_prep_ms": 30.0,
+                            "match_retrieval_ms": 1100.0,
+                            "aggregation_ms": 70.0,
+                            "total_ms": 1200.0,
+                        }
+                    }
+                },
                 "recommended_conditions": [],
                 "recommendations": [],
             },
@@ -177,6 +187,7 @@ class TestValidateRecommendConditions:
         assert result["success"] is True
         assert result["hte_processing_time_ms"] == 1234.5
         assert result["hte_timing_ms"]["recommend_compute_ms"] == 1200.0
+        assert result["hte_recommender_stage_timing_ms"]["match_retrieval_ms"] == 1100.0
 
 
 # ---------------------------------------------------------------------------
@@ -557,3 +568,41 @@ class TestExecutorHTEHeavyConcurrencyGuard:
             ToolCall(name="detect_reaction_type", args={"reaction_smiles": "A>>B"}),
         ]
         assert executor._compute_parallel_workers(calls) == 3
+
+
+class TestExecutorProgressTiming:
+    def test_run_parallel_emits_true_per_call_elapsed_not_cumulative(self, monkeypatch):
+        from chem_coworker.event_bus import ChemEvent
+        from chem_coworker.executor import ToolExecutor
+        from chem_coworker.plan import ToolCall
+
+        bus = MagicMock()
+        executor = ToolExecutor(max_workers=2, event_bus=bus)
+        calls = [
+            ToolCall(name="tool_a", args={}),
+            ToolCall(name="tool_b", args={}),
+        ]
+
+        elapsed_by_name = {"tool_a": 1.25, "tool_b": 2.5}
+
+        def fake_execute_one_timed(call, callables, runtime_context=None):  # noqa: ARG001
+            return True, {"success": True, "tool": call.name}, elapsed_by_name[call.name]
+
+        monkeypatch.setattr(executor, "_execute_one_timed", fake_execute_one_timed)
+        results = executor._run_parallel(
+            calls,
+            {"tool_a": lambda: {"success": True}, "tool_b": lambda: {"success": True}},
+        )
+
+        assert set(results) == {"tool_a", "tool_b"}
+        done_events = []
+        for call_args in bus.emit.call_args_list:
+            event = call_args.args[0] if call_args.args else None
+            kwargs = call_args.kwargs or {}
+            if event == ChemEvent.TOOL_DONE:
+                done_events.append((kwargs.get("tool_name"), kwargs.get("elapsed_s")))
+
+        assert len(done_events) == 2
+        done_map = dict(done_events)
+        assert done_map["tool_a"] == 1.25
+        assert done_map["tool_b"] == 2.5

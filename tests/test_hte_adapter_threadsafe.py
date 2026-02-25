@@ -65,6 +65,14 @@ def test_recommend_from_reaction_emits_timing_breakdown(monkeypatch):
         reacted_motifs = ()
         formed_motifs = ()
         spectator_motifs = ()
+        timing_ms = {
+            "query_prep_ms": 10.0,
+            "match_retrieval_ms": 30.0,
+            "filtering_and_enforcement_ms": 5.0,
+            "aggregation_ms": 4.0,
+            "precedent_merge_ms": 1.0,
+            "total_ms": 50.0,
+        }
 
     class _FakeRecommender:
         def recommend(self, **kwargs):  # noqa: ARG002
@@ -89,3 +97,4 @@ def test_recommend_from_reaction_emits_timing_breakdown(monkeypatch):
     assert timing["postprocess_ms"] == 10.0
     assert timing["total_ms"] == 100.0
     assert payload["extras"]["hte"]["timing_ms"] == timing
+    assert payload["extras"]["hte"]["recommender_stage_timing_ms"]["match_retrieval_ms"] == 30.0

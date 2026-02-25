@@ -1394,6 +1394,20 @@ class ChemCoworker:
             vals = [_f(r.get(field)) for r in items if r.get(field) is not None]
             return round(max(vals), 2) if vals else 0.0
 
+        def _sum_stage_maps(items: List[Dict[str, Any]], key: str) -> Dict[str, float]:
+            agg: Dict[str, float] = {}
+            for r in items:
+                stage_map = r.get(key) or {}
+                if not isinstance(stage_map, dict):
+                    continue
+                for stage_name, stage_val in stage_map.items():
+                    try:
+                        val = float(stage_val)
+                    except Exception:
+                        continue
+                    agg[stage_name] = round(float(agg.get(stage_name, 0.0)) + val, 2)
+            return agg
+
         is_route_like = ("retro" in (task_type or "").lower()) or ("route" in (task_type or "").lower())
         title = "Route performance summary" if is_route_like else "Performance summary"
         lines = [f"⚙ **{title}** (HTE-heavy tools)"]
@@ -1410,6 +1424,15 @@ class ChemCoworker:
                 f"- `recommend_conditions`: {len(rec_calls)} call(s), sum {rec_total_ms/1000:.1f}s, "
                 f"max {rec_max_ms/1000:.1f}s, compute {rec_compute_ms/1000:.1f}s, init/get {rec_get_ms/1000:.1f}s"
             )
+            rec_stage_ms = _sum_stage_maps(rec_calls, "hte_recommender_stage_timing_ms")
+            if rec_stage_ms:
+                rec_stage_ms.pop("total_ms", None)
+                top_stages = sorted(rec_stage_ms.items(), key=lambda kv: kv[1], reverse=True)[:3]
+                if top_stages:
+                    stage_text = ", ".join(
+                        f"{name.replace('_ms', '')} {val/1000:.1f}s" for name, val in top_stages
+                    )
+                    lines.append(f"- `recommend_conditions` internal stages (sum): {stage_text}")
 
         precedent_total_ms = 0.0
         if precedent_calls:

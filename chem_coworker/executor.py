@@ -120,8 +120,6 @@ class ToolExecutor:
         if not calls:
             return ({}, {}) if return_call_results else {}
 
-        t0 = time.monotonic()
-
         # Fire TOOL_START for every tool in the group before submitting
         if self.event_bus:
             for call in calls:
@@ -130,9 +128,16 @@ class ToolExecutor:
         # Single call — skip thread overhead
         if len(calls) == 1:
             call = calls[0]
-            result = self._execute_one(call, callables, runtime_context=runtime_context)
+            ok, payload, elapsed = self._execute_one_timed(
+                call, callables, runtime_context=runtime_context
+            )
+            if ok:
+                result = payload
+            else:
+                exc = payload
+                logger.warning(f"[Executor] Tool '{call.name}' raised: {exc}")
+                result = {"success": False, "error": str(exc)}
             if self.event_bus:
-                elapsed = time.monotonic() - t0
                 has_error = isinstance(result, dict) and not result.get("success", True)
                 if has_error:
                     self.event_bus.emit(
@@ -158,14 +163,17 @@ class ToolExecutor:
 
         with ThreadPoolExecutor(max_workers=workers) as pool:
             for call in calls:
-                fut = pool.submit(self._execute_one, call, callables, runtime_context)
+                fut = pool.submit(self._execute_one_timed, call, callables, runtime_context)
                 future_to_call[fut] = call
             for future in as_completed(future_to_call):
                 call = future_to_call[future]
                 name = call.name
-                elapsed = time.monotonic() - t0
                 try:
-                    result_obj = future.result()
+                    ok, payload, elapsed = future.result()
+                    if ok:
+                        result_obj = payload
+                    else:
+                        raise payload
                     results[name] = result_obj
                     results_by_call_id[call.call_id or name] = result_obj
                     has_error = isinstance(result_obj, dict) and not result_obj.get("success", True)
@@ -195,6 +203,20 @@ class ToolExecutor:
                         )
 
         return (results, results_by_call_id) if return_call_results else results
+
+    def _execute_one_timed(
+        self,
+        call: ToolCall,
+        callables: Dict[str, Callable[..., Any]],
+        runtime_context: Optional[Any] = None,
+    ) -> Tuple[bool, Any, float]:
+        """Execute one tool and return (ok, result_or_exc, elapsed_s)."""
+        start = time.monotonic()
+        try:
+            result = self._execute_one(call, callables, runtime_context=runtime_context)
+            return True, result, (time.monotonic() - start)
+        except Exception as exc:  # pragma: no cover - defensive; _execute_one usually isolates
+            return False, exc, (time.monotonic() - start)
 
     def _compute_parallel_workers(self, calls: List[ToolCall]) -> int:
         """
