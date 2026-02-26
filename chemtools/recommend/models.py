@@ -103,7 +103,11 @@ class RecommendationRequest:
         return out  # type: ignore[return-value]
 
     def normalized_strategy(self) -> Optional[RecommendationStrategy]:
-        text = str(self.strategy or "").strip()
+        if self.strategy is None:
+            return None
+        if isinstance(self.strategy, RecommendationStrategy):
+            return self.strategy
+        text = str(self.strategy).strip()
         if not text:
             return None
         aliases = {

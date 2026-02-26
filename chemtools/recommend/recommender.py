@@ -910,6 +910,7 @@ def _clean_reaction_label(value: Optional[str]) -> str:
     return text
 
 
+@lru_cache(maxsize=1024)
 def _resolve_reaction_type_label(label: Optional[str]) -> str:
     text = _normalize_reaction_type_value(label)
     if not text:
@@ -1090,7 +1091,7 @@ def _filter_source_group(
 def _iter_motif_ids(motifs: Iterable[Any]) -> Iterable[str]:
     for motif in motifs:
         if isinstance(motif, dict):
-            cid = motif.get("compound_id")
+            cid = motif.get("compound_id") or motif.get("id")
             if cid:
                 yield str(cid)
             for alt in motif.get("alt_compound_ids") or []:
@@ -1780,6 +1781,14 @@ def _expanded_match_tokens(token: str) -> Set[str]:
     expanded.update(_load_motif_compatibility_map().get(text) or set())
     expanded.update(_load_scope_map().get(text) or [])
     expanded.update(_load_scope_parent_map().get(text) or set())
+
+    # Treat boronic acid (-B(OH)2) and boronate ester (-B(OR)2) as equivalent
+    # coupling partners — the dataset stores both under the B(OR)2 label.
+    for member in list(expanded):
+        if member.endswith("-B(OH)2"):
+            expanded.add(member[: -len("-B(OH)2")] + "-B(OR)2")
+        elif member.endswith("-B(OR)2"):
+            expanded.add(member[: -len("-B(OR)2")] + "-B(OH)2")
 
     compound_ids = _load_compound_ids()
     for member in list(expanded):
@@ -2517,7 +2526,7 @@ class HTERecommender:
         # Extract motif IDs (e.g., "Ar-Br") and include alternate IDs when available.
         motifs: List[str] = []
         for hit in analysis.get("motifs", []):
-            compound_id = hit.get("compound_id", "")
+            compound_id = hit.get("compound_id") or hit.get("id", "")
             if compound_id:
                 motifs.append(compound_id)
             for alt_id in hit.get("alt_compound_ids", []) or []:
@@ -2528,7 +2537,7 @@ class HTERecommender:
         context_scaffolds: List[str] = []
         nh_scaffolds = _load_nh_heterocycle_scaffolds()
         for entry in analysis.get("context_motifs", []) or []:
-            cid = entry.get("compound_id")
+            cid = entry.get("compound_id") or entry.get("id")
             if cid and cid in nh_scaffolds:
                 context_scaffolds.append(cid)
 
@@ -2570,7 +2579,7 @@ class HTERecommender:
                 continue
             analysis = featurize_molecule(part)
             motifs.extend(
-                [m.get("compound_id", "") for m in analysis.get("motifs", []) if m.get("compound_id")]
+                [m.get("compound_id") or m.get("id", "") for m in analysis.get("motifs", []) if (m.get("compound_id") or m.get("id"))]
             )
 
         return set(_dedupe_list(motifs))
@@ -3558,6 +3567,24 @@ class HTERecommender:
         lookup_type_b = list(type_b)
         lookup_collapsed_a = collapsed_a
         lookup_collapsed_b = collapsed_b
+
+        # Expand B(OH)2 ↔ B(OR)2 in lookup types so index lookups find
+        # dataset entries that store only one boronate convention.
+        def _expand_boronate(tokens: List[str]) -> List[str]:
+            extra: List[str] = []
+            for t in tokens:
+                if t.endswith("-B(OH)2"):
+                    alt = t[: -len("-B(OH)2")] + "-B(OR)2"
+                    if alt not in tokens:
+                        extra.append(alt)
+                elif t.endswith("-B(OR)2"):
+                    alt = t[: -len("-B(OR)2")] + "-B(OH)2"
+                    if alt not in tokens:
+                        extra.append(alt)
+            return _dedupe_list(tokens + extra)
+
+        lookup_type_a = _expand_boronate(lookup_type_a)
+        lookup_type_b = _expand_boronate(lookup_type_b)
         if not lookup_type_a and not lookup_type_b and query_reacted:
             reacted_seed = _prioritize_motifs(sorted(query_reacted), query_reacted, query_spectators or set())
             if reacted_seed:
