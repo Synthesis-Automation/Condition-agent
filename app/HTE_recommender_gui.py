@@ -18,7 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 RUN_ALL_SOURCE_SENTINEL = "__run_all_recommendation__"
-RUN_ALL_GROUPS: Tuple[str, ...] = ("literature", "experiments", "rules")
+RUN_ALL_GROUPS: Tuple[str, ...] = ("literature", "motif", "rules")
 _RECOMMENDER_CACHE: Dict[str, Any] = {}
 _RECOMMEND_DM_CACHE: Dict[str, Any] = {}
 PUBLIC_STRATEGIES: Tuple[str, ...] = ("motif", "rules", "literature", "similarity")
@@ -82,7 +82,7 @@ def _detect_csv_type(path: Path) -> str:
             if label in ("literature", "datasets"):
                 return "literature"
             if label in ("motif", "experiments", "experiment", "experiements"):
-                return "experiments"
+                return "motif"
             if label == "protocols":
                 return "literature"
             return label
@@ -102,7 +102,7 @@ def _detect_csv_type(path: Path) -> str:
     if "temperature_c" in header_lower:
         return "rules"
     if "reactant_1" in header_lower and "reactant_2" in header_lower:
-        return "experiments"
+        return "motif"
     return "unknown"
 
 
@@ -113,7 +113,7 @@ def _normalize_source_group_label(value: Any) -> str:
     if text in ("literature", "datasets", "dataset", "lit"):
         return "literature"
     if text in ("motif", "motifs", "experiments", "experiment", "experiements"):
-        return "experiments"
+        return "motif"
     if text == "rules":
         return "rules"
     if text in ("protocols", "protocol"):
@@ -172,7 +172,7 @@ def _normalize_recommendations_by_source(source_map: Dict[str, Any]) -> Dict[str
 
 def _resolve_db_path_for_source(db_path: str, source_group: str) -> str:
     normalized = _normalize_source_group_label(source_group)
-    if normalized != "experiments":
+    if normalized != "motif":
         return db_path
     path = Path(db_path)
     if not path.is_dir():
@@ -421,8 +421,6 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
 
 def _tab_label_for_source_group(source_group: str, strategy_label: str) -> str:
     normalized_source = _normalize_source_group_label(source_group)
-    if normalized_source == "experiments":
-        return "Motif"
     if normalized_source == "precedent":
         normalized_source = "similarity"
     return (normalized_source or "unknown").replace("_", " ").title()
@@ -543,7 +541,7 @@ class RecommendationWorker(QtCore.QObject):
             if key not in merged_by_source and items:
                 merged_by_source[key] = _dedupe_recommendations(list(items))
 
-        source_order = ["literature", "rules", "experiments", "precedent"]
+        source_order = ["literature", "rules", "motif", "precedent"]
         baseline.recommendations_by_source = merged_by_source
         return baseline
 
@@ -577,7 +575,7 @@ class RecommendationWorker(QtCore.QObject):
         reactant_b: Optional[str],
         product: Optional[str],
     ) -> Any:
-        narrowed = self.source_override if self.source_override in {"experiments", "rules"} else ""
+        narrowed = self.source_override if self.source_override in {"motif", "rules"} else ""
         if narrowed:
             self.progress.emit(f"Running motif recommendation ({narrowed}) ...")
             result = self._run_single(
@@ -596,7 +594,7 @@ class RecommendationWorker(QtCore.QObject):
         self.progress.emit("Running motif recommendation (motif + rules) ...")
         baseline = self._run_single(recommender, reactant_a, reactant_b, product, None)
         merged_by_source: Dict[str, List[Any]] = {}
-        for group_name in ("experiments", "rules"):
+        for group_name in ("motif", "rules"):
             group_result = self._run_single(
                 recommender,
                 reactant_a,
@@ -613,10 +611,10 @@ class RecommendationWorker(QtCore.QObject):
             merged_by_source[group_name] = _dedupe_recommendations(group_recs)
 
         combined: List[Any] = []
-        indices = {"experiments": 0, "rules": 0}
+        indices = {"motif": 0, "rules": 0}
         while self.top_k <= 0 or len(combined) < self.top_k:
             progressed = False
-            for group_name in ("experiments", "rules"):
+            for group_name in ("motif", "rules"):
                 items = merged_by_source.get(group_name) or []
                 idx = indices[group_name]
                 if idx >= len(items):
@@ -662,7 +660,7 @@ class RecommendationWorker(QtCore.QObject):
             from chemtools.recommend.api import recommend as recommend_facade
 
             normalized_strategy = _normalize_strategy_label(self.strategy)
-            source_override = self.source_override if self.source_override in {"literature", "experiments", "rules"} else ""
+            source_override = self.source_override if self.source_override in {"literature", "motif", "rules"} else ""
             source_group = source_override or "any"
 
             self.progress.emit(
@@ -1018,7 +1016,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
     def _initialize_result_tabs(self) -> None:
         self.results_tabs.clear()
         strategy_label = self.strategy_combo.currentText().strip() if hasattr(self, "strategy_combo") else "motif"
-        for source_group in ("literature", "rules", "experiments", "similarity"):
+        for source_group in ("literature", "rules", "motif", "similarity"):
             group_table = self._create_results_table()
             self.results_tabs.addTab(group_table, _tab_label_for_source_group(source_group, strategy_label))
 
@@ -1129,7 +1127,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         selected_strategy = _normalize_strategy_label(self.strategy_combo.currentText().strip())
         selected_override = self.source_group_combo.currentText().strip()
         normalized_override = _normalize_source_group_label(selected_override)
-        if selected_override != "Auto" and normalized_override in {"literature", "experiments", "rules"}:
+        if selected_override != "Auto" and normalized_override in {"literature", "motif", "rules"}:
             source_group = normalized_override
         elif selected_strategy in {"literature", "similarity"}:
             source_group = "literature"
@@ -1478,7 +1476,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         if "precedent" in normalized_map and "similarity" not in normalized_map:
             normalized_map["similarity"] = list(normalized_map.pop("precedent") or [])
         source_map = normalized_map
-        base_groups = ["literature", "rules", "experiments", "similarity"]
+        base_groups = ["literature", "rules", "motif", "similarity"]
         extra_groups = [g for g in sorted(source_map) if g not in base_groups]
 
         self._all_json_output = None

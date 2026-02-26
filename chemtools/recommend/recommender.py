@@ -3357,7 +3357,7 @@ class HTERecommender:
                 min_experiments: Minimum experiments for a condition to be recommended
                 reaction_type_filter: Optional filter for specific reaction type
                 catalyst_filter: Optional filter by metal type (e.g., 'Pd', 'Cu', 'Ni', 'palladium', 'copper')
-                source_group: Optional source group filter (literature, rules, experiments)
+                source_group: Optional source group filter (literature, rules, motif)
                 reaction_key_only: Only match using reaction_key/signatures; no reactant-type fallback
                 use_aryl_steric_electronic_weighting: Apply aryl steric/electronic weighting when available
                 use_spectator_groups: Whether to apply spectator group weighting when available

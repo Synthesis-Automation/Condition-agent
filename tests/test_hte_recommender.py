@@ -414,7 +414,7 @@ def test_key_match_backfills_rules_and_experiments_with_aromatic_alias(monkeypat
             "Reaction_Category": ["", "", ""],
             "Is_Intramolecular": [False, False, False],
             "Source_File": ["tests", "tests", "tests"],
-            "Source_Group": ["literature", "rules", "experiments"],
+            "Source_Group": ["literature", "rules", "motif"],
             "spectator_groups": ["", "", ""],
             "Reactant_Signature_Core": [
                 "Ar-B(OH)2|HeteroAr-Br",
@@ -476,7 +476,7 @@ def test_key_match_backfills_rules_and_experiments_with_aromatic_alias(monkeypat
 
     assert result.total_matching_experiments >= 3
     assert "rules" in result.recommendations_by_source
-    assert "experiments" in result.recommendations_by_source
+    assert "motif" in result.recommendations_by_source
 
 
 def _make_mixed_reaction_type_key_df() -> tuple[pd.DataFrame, str]:
@@ -618,7 +618,7 @@ def test_best_seller_scoring_beats_single_outlier(monkeypatch) -> None:
             "Reaction_Category": [""] * 6,
             "Is_Intramolecular": [False] * 6,
             "Source_File": ["tests"] * 6,
-            "Source_Group": ["experiments"] * 6,
+            "Source_Group": ["motif"] * 6,
             "spectator_groups": [""] * 6,
             "Reactant_Signature_Core": ["Ar-B(OH)2|Ar-Cl"] * 6,
             "Reactant_Signature_Ext": ["Ar-B(OH)2|Ar-Cl"] * 6,
@@ -652,7 +652,7 @@ def test_best_seller_scoring_beats_single_outlier(monkeypatch) -> None:
         reactant_b_smiles="OB(O)c1ccccc1",
         top_k=2,
         min_experiments=1,
-        source_group="experiments",
+        source_group="motif",
         reaction_type_filter="Suzuki_miyaura",
     )
 
@@ -665,7 +665,7 @@ def test_aggregate_deduplicates_identical_rows_for_support_gate(monkeypatch) -> 
     template = _make_min_hte_df()
     template["Reactant_A_Type"] = ["Ar-Cl"]
     template["Reactant_B_Type"] = ["Ar-B(OH)2"]
-    template["Source_Group"] = ["experiments"]
+    template["Source_Group"] = ["motif"]
     template["Reactant_Signature_Core"] = ["Ar-B(OH)2|Ar-Cl"]
     template["Reactant_Signature_Ext"] = ["Ar-B(OH)2|Ar-Cl"]
 
@@ -702,7 +702,7 @@ def test_aggregate_deduplicates_identical_rows_for_support_gate(monkeypatch) -> 
         reactant_b_smiles="OB(O)c1ccccc1",
         top_k=5,
         min_experiments=2,
-        source_group="experiments",
+        source_group="motif",
         reaction_type_filter="Suzuki_miyaura",
     )
 

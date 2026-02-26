@@ -79,8 +79,8 @@ def _normalize_source_group_label(value: Any) -> str:
         return "unknown"
     if text in ("literature", "datasets", "dataset", "lit"):
         return "literature"
-    if text in ("experiments", "experiment", "experiements"):
-        return "experiments"
+    if text in ("motif", "motifs", "experiments", "experiment", "experiements"):
+        return "motif"
     if text == "rules":
         return "rules"
     return text
