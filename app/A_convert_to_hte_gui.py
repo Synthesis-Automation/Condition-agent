@@ -137,7 +137,9 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.drop_catalyst_check = QtWidgets.QCheckBox("Drop reactions without a catalyst")
         self.drop_catalyst_check.setChecked(True)
         self.skip_cas_check = QtWidgets.QCheckBox("Skip CAS enrichment (faster)")
-        self.protocol_mode_check = QtWidgets.QCheckBox("Protocol CSV mode (skip enrichment, save to HTE_db/protocols)")
+        self.protocol_mode_check = QtWidgets.QCheckBox(
+            "Literature+setup CSV mode (skip enrichment, save to HTE_db/literature)"
+        )
         self.llm_assist_checkbox = QtWidgets.QCheckBox("LLM assist for reaction typing/key")
         self.llm_provider_combo = QtWidgets.QComboBox()
         self.llm_model_combo = QtWidgets.QComboBox()
@@ -339,19 +341,19 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.selected_input_paths = []
 
     def _on_protocol_mode_changed(self):
-        """Update output path when protocol mode is toggled"""
+        """Update output path when literature+setup mode is toggled."""
         if not self.protocol_mode_check.isChecked():
             return
         
-        # Auto-set output to protocols directory
+        # Auto-set output to literature directory (protocol-like datasets are folded into literature)
         input_paths = self._get_input_paths()
         if input_paths:
             if len(input_paths) > 1:
-                output_path = PROJECT_ROOT / "data" / "HTE_db" / "protocols"
+                output_path = PROJECT_ROOT / "data" / "HTE_db" / "literature"
                 self.output_edit.setText(str(output_path))
             else:
                 input_path = Path(input_paths[0])
-                output_path = PROJECT_ROOT / "data" / "HTE_db" / "protocols" / f"{input_path.stem}_hte.csv"
+                output_path = PROJECT_ROOT / "data" / "HTE_db" / "literature" / f"{input_path.stem}_hte.csv"
                 self.output_edit.setText(str(output_path))
         
         # Enable skip CAS enrichment automatically
@@ -485,7 +487,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
             QtWidgets.QMessageBox.critical(self, "Error", str(exc))
             return
 
-        # Check if protocol mode
+        # Check if literature+setup mode
         if self.protocol_mode_check.isChecked():
             self._run_protocol_conversion(jobs, llm_assist_options=llm_assist_options)
             return
@@ -519,10 +521,10 @@ class HTEConverterWindow(QtWidgets.QWidget):
         *,
         llm_assist_options: Optional[Dict[str, Any]],
     ):
-        """Convert protocol CSV to HTE format with full processing"""
+        """Convert literature+setup CSV to HTE format with full processing."""
         try:
             self.log.clear()
-            self.log_msg("Protocol CSV Conversion Mode")
+            self.log_msg("Literature+Setup CSV Conversion Mode")
             self.log_msg("="*50)
             self.log_msg("Running full HTE processing pipeline:")
             self.log_msg("  - Reaction type detection")
@@ -553,9 +555,9 @@ class HTEConverterWindow(QtWidgets.QWidget):
                 for idx, (input_path, output_path) in enumerate(jobs, start=1):
                     print(f"Job {idx}/{total}: {os.path.basename(input_path)} -> {os.path.basename(output_path)}")
                     
-                    # Read protocol CSV and prepare for processing
+                    # Read literature+setup CSV and prepare for processing
                     df_original = pd.read_csv(input_path)
-                    print(f"Loaded {len(df_original)} protocol rows")
+                    print(f"Loaded {len(df_original)} literature/setup rows")
                     
                     # Backup original columns to restore after processing
                     has_reaction_id = 'reaction_id' in df_original.columns
@@ -590,7 +592,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
                     )
                     
                     # Restore original columns
-                    print("Restoring original protocol metadata...")
+                    print("Restoring original setup metadata...")
                     output_df = pd.read_csv(output_path)
                     print(f"Output loaded: {len(output_df)} rows, {len(output_df.columns)} columns")
                     
@@ -645,12 +647,12 @@ class HTEConverterWindow(QtWidgets.QWidget):
             QtWidgets.QMessageBox.information(
                 self, 
                 "Success", 
-                f"Successfully processed {len(jobs)} protocol file(s) with full HTE pipeline"
+                f"Successfully processed {len(jobs)} literature/setup file(s) with full HTE pipeline"
             )
             
         except Exception as e:
             sys.stdout = old_stdout
-            error_msg = f"Error during protocol conversion: {str(e)}"
+            error_msg = f"Error during literature/setup conversion: {str(e)}"
             self.log_msg(f"\n✗ {error_msg}")
             import traceback
             self.log_msg(traceback.format_exc())

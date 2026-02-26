@@ -229,3 +229,117 @@ def test_api_recommend_precedent_only_trims_output(monkeypatch):
     assert out.plan.single_run_source_group == "literature"
     assert out.recommendation.recommendations == ["prec-1", "prec-2"]
     assert list(out.recommendation.recommendations_by_source.keys()) == ["precedent"]
+
+
+def test_plan_sources_motif_strategy_auto_loads_experiments_and_rules():
+    from chemtools.recommend.models import RecommendationRequest
+    from chemtools.recommend.planner import plan_sources
+
+    plan = plan_sources(RecommendationRequest(reaction_smiles="A.B>>P", strategy="motif"))
+    assert plan.recommendation_strategy == "motif"
+    assert plan.run_strategy.value == "per_source"
+    assert plan.sources_to_run == ("experiments", "rules")
+    assert plan.single_run_source_group is None
+
+
+def test_plan_sources_similarity_strategy_pins_literature():
+    from chemtools.recommend.models import RecommendationRequest
+    from chemtools.recommend.planner import plan_sources
+
+    plan = plan_sources(
+        RecommendationRequest(reaction_smiles="A.B>>P", strategy="similarity", source_group="rules")
+    )
+    assert plan.recommendation_strategy == "similarity"
+    assert plan.single_run_source_group == "literature"
+    assert plan.needs_precedent_data is True
+
+
+def test_api_recommend_similarity_strategy_filters_to_similarity(monkeypatch):
+    from chemtools.recommend.api import recommend
+    from chemtools.recommend.data_manager import LoadedResourceInfo
+    from chemtools.recommend.models import RecommendationRequest
+
+    monkeypatch.setattr(
+        "chemtools.recommend.api.analyze_recommendation_query",
+        lambda req: types.SimpleNamespace(reactant_a_smiles="A", reactant_b_smiles="B", product_smiles="P"),
+    )
+
+    class FakeRec:
+        def __init__(self):
+            self.recommendations = ["combined-lit"]
+            self.recommendations_by_source = {
+                "literature": ["lit-1"],
+                "precedent": ["prec-1", "prec-2"],
+            }
+
+    class FakeRecommender:
+        def recommend(self, **kwargs):  # noqa: ARG002
+            return FakeRec()
+
+    class FakeDM:
+        def __init__(self):
+            self.calls = []
+
+        def get_recommender(self, **kwargs):
+            src = kwargs.get("source_group") or "all"
+            self.calls.append(src)
+            return FakeRecommender(), LoadedResourceInfo(
+                cache_key="lit", db_path="/tmp/lit", source_group=str(src), cache_hit=False
+            )
+
+    dm = FakeDM()
+    out = recommend(
+        RecommendationRequest(reaction_smiles="A.B>>P", strategy="similarity"),
+        data_manager=dm,
+    )
+    assert dm.calls == ["literature"]
+    assert list(out.recommendation.recommendations_by_source.keys()) == ["similarity"]
+    assert out.recommendation.recommendations == ["prec-1", "prec-2"]
+
+
+def test_api_recommend_motif_strategy_auto_loads_and_filters_sources(monkeypatch):
+    from chemtools.recommend.api import recommend
+    from chemtools.recommend.data_manager import LoadedResourceInfo
+    from chemtools.recommend.models import RecommendationRequest
+
+    monkeypatch.setattr(
+        "chemtools.recommend.api.analyze_recommendation_query",
+        lambda req: types.SimpleNamespace(reactant_a_smiles="A", reactant_b_smiles="B", product_smiles="P"),
+    )
+
+    class FakeRec:
+        def __init__(self, tag: str):
+            self.recommendations = [f"{tag}-combined"]
+            self.recommendations_by_source = {tag: [f"{tag}-1", f"{tag}-2"]}
+
+    class FakeRecommender:
+        def recommend(self, **kwargs):
+            src = kwargs.get("source_group") or "all"
+            if src == "experiments":
+                return FakeRec("experiments")
+            if src == "rules":
+                rec = FakeRec("rules")
+                rec.recommendations_by_source["precedent"] = ["should-drop"]
+                return rec
+            return FakeRec(str(src))
+
+    class FakeDM:
+        def __init__(self):
+            self.calls = []
+
+        def get_recommender(self, **kwargs):
+            src = kwargs.get("source_group") or "all"
+            self.calls.append(src)
+            return FakeRecommender(), LoadedResourceInfo(
+                cache_key=str(src), db_path=f"/tmp/{src}", source_group=str(src), cache_hit=False
+            )
+
+    dm = FakeDM()
+    out = recommend(
+        RecommendationRequest(reaction_smiles="A.B>>P", strategy="motif", top_k=3),
+        data_manager=dm,
+    )
+    assert dm.calls == ["experiments", "rules"]
+    assert set(out.recommendation.recommendations_by_source.keys()) == {"experiments", "rules"}
+    assert out.recommendation.recommendations[0] == "experiments-1"
+    assert "should-drop" not in out.recommendation.recommendations

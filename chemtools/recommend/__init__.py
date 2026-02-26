@@ -14,6 +14,7 @@ from .data_manager import RecommendationDataManager
 from .models import (
     OutputView,
     QueryAnalysis,
+    RecommendationStrategy,
     RecommendationRequest,
     RecommendationRunResult,
     RunStrategy,
@@ -41,6 +42,7 @@ _API_EXPORTS = {
     "QueryAnalysis",
     "SourcePlan",
     "RecommendationRunResult",
+    "RecommendationStrategy",
     "SourceGroup",
     "RunStrategy",
     "OutputView",
@@ -87,6 +89,7 @@ __all__ = [
     "QueryAnalysis",
     "SourcePlan",
     "RecommendationRunResult",
+    "RecommendationStrategy",
     "SourceGroup",
     "RunStrategy",
     "OutputView",

@@ -10,6 +10,7 @@ from .models import (
     QueryAnalysis,
     RecommendationRequest,
     RecommendationRunResult,
+    RecommendationStrategy,
     SourceGroup,
 )
 from .planner import plan_sources
@@ -60,6 +61,93 @@ def _apply_precedent_only_view(result: Any) -> Any:
     return result
 
 
+def _interleave_recommendation_lists(
+    by_source: Dict[str, List[Any]],
+    *,
+    source_order: Iterable[str],
+    limit: int,
+) -> List[Any]:
+    order = [str(src) for src in source_order if str(src)]
+    if not order:
+        order = [str(k) for k in by_source.keys()]
+    indices = {src: 0 for src in order}
+    combined: List[Any] = []
+    while limit <= 0 or len(combined) < limit:
+        progressed = False
+        for src in order:
+            items = by_source.get(src) or []
+            idx = indices.get(src, 0)
+            if idx >= len(items):
+                continue
+            combined.append(items[idx])
+            indices[src] = idx + 1
+            progressed = True
+            if limit > 0 and len(combined) >= limit:
+                break
+        if not progressed:
+            break
+    return combined
+
+
+def _apply_source_subset_view(
+    result: Any,
+    *,
+    allowed_sources: Iterable[str],
+    rename_map: Optional[Dict[str, str]] = None,
+    top_k: int = 10,
+) -> Any:
+    source_map = _normalize_recommendations_by_source(getattr(result, "recommendations_by_source", {}) or {})
+    rename_map = dict(rename_map or {})
+    filtered: Dict[str, List[Any]] = {}
+    ordered_keys: List[str] = []
+    for raw_key in allowed_sources:
+        key = _normalize_source_group_label(raw_key)
+        if key not in source_map:
+            continue
+        out_key = rename_map.get(key, key)
+        filtered[out_key] = list(source_map.get(key) or [])
+        ordered_keys.append(out_key)
+    result.recommendations_by_source = filtered
+    result.recommendations = _interleave_recommendation_lists(
+        filtered,
+        source_order=ordered_keys,
+        limit=top_k,
+    )
+    return result
+
+
+def _apply_strategy_view(result: Any, req: RecommendationRequest, plan_strategy: Optional[str]) -> Any:
+    strategy = str(plan_strategy or "").strip().lower()
+    if not strategy:
+        return result
+    if strategy == RecommendationStrategy.SIMILARITY.value:
+        return _apply_source_subset_view(
+            result,
+            allowed_sources=("precedent",),
+            rename_map={"precedent": "similarity"},
+            top_k=req.top_k,
+        )
+    if strategy == RecommendationStrategy.LITERATURE.value:
+        return _apply_source_subset_view(
+            result,
+            allowed_sources=(SourceGroup.LITERATURE.value,),
+            top_k=req.top_k,
+        )
+    if strategy == RecommendationStrategy.RULES.value:
+        return _apply_source_subset_view(
+            result,
+            allowed_sources=(SourceGroup.RULES.value,),
+            top_k=req.top_k,
+        )
+    if strategy == RecommendationStrategy.MOTIF.value:
+        return _apply_source_subset_view(
+            result,
+            allowed_sources=(SourceGroup.EXPERIMENTS.value, SourceGroup.RULES.value),
+            top_k=req.top_k,
+        )
+    return result
+
+
 def _run_single_pass(
     req: RecommendationRequest,
     dm: RecommendationDataManager,
@@ -99,7 +187,8 @@ def _run_per_source(
     baseline = None
     loaded: Dict[str, Any] = {"runs": []}
     merged_by_source: Dict[str, List[Any]] = {}
-    for source in sources:
+    source_order = [str(source) for source in sources]
+    for source in source_order:
         recommender, info = dm.get_recommender(source_group=source)
         loaded["runs"].append(
             {
@@ -135,10 +224,15 @@ def _run_per_source(
 
     if baseline is None:
         return None, loaded
-    # Intentionally do not merge recommendation lists across sources.
     baseline.recommendations_by_source = merged_by_source
     if req.normalized_output_view() is OutputView.BY_SOURCE:
         baseline.recommendations = []
+    else:
+        baseline.recommendations = _interleave_recommendation_lists(
+            merged_by_source,
+            source_order=source_order,
+            limit=req.top_k,
+        )
     return baseline, loaded
 
 
@@ -176,6 +270,8 @@ def recommend(
 
     if rec_obj is not None and plan.output_view is OutputView.PRECEDENT_ONLY:
         rec_obj = _apply_precedent_only_view(rec_obj)
+    if rec_obj is not None:
+        rec_obj = _apply_strategy_view(rec_obj, req, plan.recommendation_strategy)
 
     run_result.recommendation = rec_obj
     run_result.loaded_resources = loaded

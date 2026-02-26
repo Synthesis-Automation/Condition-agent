@@ -33,6 +33,15 @@ class OutputView(str, Enum):
     PRECEDENT_ONLY = "precedent_only"
 
 
+class RecommendationStrategy(str, Enum):
+    """Public recommendation strategy (separate from source selection)."""
+
+    LITERATURE = "literature"
+    SIMILARITY = "similarity"
+    MOTIF = "motif"
+    RULES = "rules"
+
+
 def _coerce_enum(value: Any, enum_cls: type[Enum], default: Enum) -> Enum:
     if isinstance(value, enum_cls):
         return value
@@ -51,6 +60,12 @@ def _coerce_enum(value: Any, enum_cls: type[Enum], default: Enum) -> Enum:
         "per_source_merge": "per_source",
         "merge": "per_source",
         "precedent": "precedent_only",
+        "literature-based": "literature",
+        "similarity-based": "similarity",
+        "fingerprint": "similarity",
+        "fingerprint-based": "similarity",
+        "motif-based": "motif",
+        "rule-based": "rules",
     }
     text = aliases.get(text, text)
     for member in enum_cls:  # type: ignore[assignment]
@@ -64,6 +79,7 @@ class RecommendationRequest:
     """High-level recommendation request used by the facade API."""
 
     reaction_smiles: str
+    strategy: Optional[RecommendationStrategy | str] = None
     source_group: SourceGroup | str = SourceGroup.ANY
     run_strategy: RunStrategy | str = RunStrategy.SINGLE_PASS
     output_view: OutputView | str = OutputView.COMBINED
@@ -82,6 +98,26 @@ class RecommendationRequest:
         out = _coerce_enum(self.source_group, SourceGroup, SourceGroup.ANY)  # type: ignore[assignment]
         if out is SourceGroup.PROTOCOLS:
             return SourceGroup.LITERATURE
+        return out  # type: ignore[return-value]
+
+    def normalized_strategy(self) -> Optional[RecommendationStrategy]:
+        text = str(self.strategy or "").strip()
+        if not text:
+            return None
+        aliases = {
+            "precedent": RecommendationStrategy.SIMILARITY.value,
+            "precedent_only": RecommendationStrategy.SIMILARITY.value,
+            "lit": RecommendationStrategy.LITERATURE.value,
+            "experiments": RecommendationStrategy.MOTIF.value,
+            "experiment": RecommendationStrategy.MOTIF.value,
+            "experimental": RecommendationStrategy.MOTIF.value,
+            "experiment-based": RecommendationStrategy.MOTIF.value,
+            "rules-based": RecommendationStrategy.RULES.value,
+            "similarity-based": RecommendationStrategy.SIMILARITY.value,
+            "fingerprint-based": RecommendationStrategy.SIMILARITY.value,
+        }
+        text = aliases.get(text.lower(), text)
+        out = _coerce_enum(text, RecommendationStrategy, RecommendationStrategy.MOTIF)
         return out  # type: ignore[return-value]
 
     def normalized_run_strategy(self) -> RunStrategy:
@@ -132,6 +168,7 @@ class SourcePlan:
     run_strategy: RunStrategy = RunStrategy.SINGLE_PASS
     output_view: OutputView = OutputView.COMBINED
     notes: Tuple[str, ...] = ()
+    recommendation_strategy: Optional[str] = None
 
 
 @dataclass
