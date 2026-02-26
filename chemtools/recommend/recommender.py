@@ -661,6 +661,82 @@ def _resolve_warm_cache_targets(db_path: Path, source_group: Optional[str]) -> L
     return [db_path]
 
 
+def check_hte_cache_status(
+    hte_db_path: str,
+    *,
+    source_group: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Quick validity check for the on-disk HTE index cache — no data is loaded.
+
+    Returns a dict with:
+        ``valid``    – True if all targets have a current disk (or memory) cache.
+        ``targets``  – Per-target status list; each entry has ``status`` which is
+                       one of ``"memory"``, ``"disk"``, ``"missing"``, ``"stale"``,
+                       or ``"no_files"``.
+    """
+    base_path = Path(hte_db_path)
+    if not base_path.exists():
+        return {"valid": False, "reason": "path_not_found", "targets": []}
+
+    normalized_sg = str(source_group or "all").strip().lower()
+    targets = _resolve_warm_cache_targets(base_path, normalized_sg)
+    results: List[Dict[str, Any]] = []
+
+    for target in targets:
+        target_str = str(target)
+        target_key = str(Path(target))
+
+        # --- memory hit? ---
+        last_source = _HTE_CACHE_LAST_LOAD_SOURCE.get(target_key, "")
+        if last_source == "memory":
+            results.append({"target": target_str, "status": "memory"})
+            continue
+
+        # --- disk cache check (manifest only, no pickle load) ---
+        try:
+            file_paths = _collect_hte_files(target)
+        except Exception:
+            results.append({"target": target_str, "status": "no_files"})
+            continue
+        if not file_paths:
+            results.append({"target": target_str, "status": "no_files"})
+            continue
+
+        try:
+            manifest = _compute_hte_manifest(file_paths)
+        except Exception:
+            results.append({"target": target_str, "status": "no_files"})
+            continue
+
+        cache_dir = _hte_cache_dir(Path(target))
+        manifest_path = cache_dir / "manifest.json"
+        payload_path = cache_dir / "hte_cache.pkl"
+
+        if not manifest_path.exists() or not payload_path.exists():
+            results.append({"target": target_str, "status": "missing", "cache_dir": str(cache_dir)})
+            continue
+
+        try:
+            stored_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except Exception:
+            results.append({"target": target_str, "status": "stale", "cache_dir": str(cache_dir)})
+            continue
+
+        if stored_manifest != manifest:
+            results.append({"target": target_str, "status": "stale", "cache_dir": str(cache_dir)})
+            continue
+
+        # If we previously loaded it (disk or rebuilt), treat as memory now
+        if last_source in {"disk", "rebuilt"}:
+            results.append({"target": target_str, "status": "memory", "cache_dir": str(cache_dir)})
+        else:
+            results.append({"target": target_str, "status": "disk", "cache_dir": str(cache_dir)})
+
+    all_valid = all(r["status"] in {"memory", "disk"} for r in results) and bool(results)
+    return {"valid": all_valid, "targets": results}
+
+
 def warm_hte_cache(
     hte_db_path: str = "data/HTE_db",
     *,

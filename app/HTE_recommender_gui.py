@@ -3,6 +3,7 @@ import json
 import html
 import math
 import os
+import subprocess
 import sys
 import tempfile
 import time
@@ -719,6 +720,43 @@ class CacheWarmWorker(QtCore.QObject):
             self.finished.emit(False, None, str(exc))
 
 
+class KMNRebuildWorker(QtCore.QObject):
+    """Run ``scripts/A_build_kmn_index.py`` in a background thread.
+
+    Uses ``--index-only`` by default (fast: re-serialises the FAISS index
+    from existing weights without re-training).  Pass ``train=True`` to
+    trigger a full re-train (takes much longer).
+    """
+
+    finished = QtCore.pyqtSignal(bool, str)  # (success, message)
+    progress = QtCore.pyqtSignal(str)
+
+    def __init__(self, *, train: bool = False) -> None:
+        super().__init__()
+        self._train = train
+
+    def run(self) -> None:
+        script = str(PROJECT_ROOT / "scripts" / "A_build_kmn_index.py")
+        cmd = [sys.executable, script]
+        if not self._train:
+            cmd.append("--index-only")
+        self.progress.emit("Running KMN index build ...")
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                cwd=str(PROJECT_ROOT),
+            )
+            if result.returncode == 0:
+                self.finished.emit(True, (result.stdout or "").strip() or "KMN index rebuilt successfully.")
+            else:
+                err = (result.stderr or result.stdout or "Unknown error").strip()
+                self.finished.emit(False, f"KMN rebuild failed (exit {result.returncode}):\n{err}")
+        except Exception as exc:
+            self.finished.emit(False, f"KMN rebuild error: {exc}")
+
+
 class HTERecommenderWindow(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
@@ -788,13 +826,25 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         )
 
         self.run_button = QtWidgets.QPushButton("Run Recommendation")
-        self.prebuild_cache_button = QtWidgets.QPushButton("Prebuild Cache")
+        self.prebuild_cache_button = QtWidgets.QPushButton("Prebuild HTE Cache")
+        self.rebuild_kmn_button = QtWidgets.QPushButton("Rebuild KMN Index")
         self.clear_button = QtWidgets.QPushButton("Clear Results")
         self.export_json_button = QtWidgets.QPushButton("Export JSON")
         self.run_button.setMinimumSize(160, 34)
-        self.prebuild_cache_button.setMinimumSize(140, 34)
+        self.prebuild_cache_button.setMinimumSize(150, 34)
+        self.rebuild_kmn_button.setMinimumSize(150, 34)
         self.clear_button.setMinimumSize(140, 34)
         self.export_json_button.setMinimumSize(140, 34)
+        self.prebuild_cache_button.setToolTip(
+            "Prebuild the HTE reactant/transformation lookup index.\n"
+            "Saved to: results/hte_cache/ (not data/kmn_index/).\n"
+            "If the index already exists and data has not changed, this is instant."
+        )
+        self.rebuild_kmn_button.setToolTip(
+            "Rebuild the KMN/FAISS similarity index (data/kmn_index/).\n"
+            "Runs: scripts/A_build_kmn_index.py --index-only\n"
+            "Required for similarity-based recommendations after data changes."
+        )
         self.export_json_button.setEnabled(False)
         self.run_button.setStyleSheet(
             "QPushButton {"
@@ -828,6 +878,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.worker: Optional[RecommendationWorker] = None
         self.cache_thread: Optional[QtCore.QThread] = None
         self.cache_worker: Optional[CacheWarmWorker] = None
+        self.kmn_thread: Optional[QtCore.QThread] = None
+        self.kmn_worker: Optional["KMNRebuildWorker"] = None
         self._reaction_dialog: Optional[QtWidgets.QDialog] = None
         self._spectator_groups_summary: str = ""
         self._strategy_label: str = "motif"
@@ -896,6 +948,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         button_row = QtWidgets.QHBoxLayout()
         button_row.addWidget(self.run_button)
         button_row.addWidget(self.prebuild_cache_button)
+        button_row.addWidget(self.rebuild_kmn_button)
         button_row.addWidget(self.clear_button)
         button_row.addWidget(self.export_json_button)
         button_row.addStretch()
@@ -914,6 +967,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
     def _bind_signals(self) -> None:
         self.run_button.clicked.connect(self._run_recommendation)
         self.prebuild_cache_button.clicked.connect(self._run_prebuild_cache)
+        self.rebuild_kmn_button.clicked.connect(self._run_rebuild_kmn_index)
         self.clear_button.clicked.connect(self._clear_results)
         self.export_json_button.clicked.connect(self._export_json_output)
         self.db_path_edit.textChanged.connect(self._update_data_type)
@@ -979,8 +1033,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.export_json_button.setEnabled(False)
         self.run_button.setEnabled(True)
         self.prebuild_cache_button.setEnabled(True)
+        self.rebuild_kmn_button.setEnabled(True)
         self.run_button.setText("Run Recommendation")
-        self.prebuild_cache_button.setText("Prebuild Cache")
+        self.prebuild_cache_button.setText("Prebuild HTE Cache")
+        self.rebuild_kmn_button.setText("Rebuild KMN Index")
         self.progress_bar.setVisible(False)
         if self._reaction_dialog:
             self._reaction_dialog.close()
@@ -1015,6 +1071,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.status.setText("Working...")
         self.run_button.setEnabled(False)
         self.prebuild_cache_button.setEnabled(False)
+        self.rebuild_kmn_button.setEnabled(False)
         self.run_button.setText("Running...")
         self.progress_bar.setRange(0, 0)
         self.progress_bar.setVisible(True)
@@ -1081,11 +1138,40 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         else:
             source_group = "all"
 
-        self.status.setText("Prebuilding cache...")
+        # ── Quick disk-cache validity check (no data load) ────────────────
+        # If the index already exists and data hasn't changed, skip the thread
+        # and just report the status without showing the full rebuild spinner.
+        try:
+            from chemtools.recommend.recommender import check_hte_cache_status
+            cache_status = check_hte_cache_status(db_path, source_group=source_group)
+        except Exception:
+            cache_status = {"valid": False, "targets": []}
+
+        if cache_status.get("valid"):
+            targets = cache_status.get("targets") or []
+            sources = [t.get("status", "unknown") for t in targets]
+            source_summary = ", ".join(f"{s}={sources.count(s)}" for s in dict.fromkeys(sources) if sources.count(s) > 0)
+            reply = QtWidgets.QMessageBox.question(
+                self,
+                "HTE Cache Already Up To Date",
+                (
+                    f"The HTE index cache is already valid ({source_summary}).\n"
+                    "Note: this cache is stored in results/hte_cache/, NOT data/kmn_index/.\n\n"
+                    "Force rebuild anyway?"
+                ),
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+                QtWidgets.QMessageBox.StandardButton.No,
+            )
+            if reply != QtWidgets.QMessageBox.StandardButton.Yes:
+                self.status.setText(f"HTE cache already up to date ({source_summary}).")
+                return
+
+        self.status.setText("Prebuilding HTE cache...")
         self.progress_bar.setRange(0, 0)
         self.progress_bar.setVisible(True)
         self.run_button.setEnabled(False)
         self.prebuild_cache_button.setEnabled(False)
+        self.rebuild_kmn_button.setEnabled(False)
         self.prebuild_cache_button.setText("Prebuilding...")
 
         self.cache_thread = QtCore.QThread()
@@ -1105,7 +1191,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             self.cache_thread.wait()
         self.run_button.setEnabled(True)
         self.prebuild_cache_button.setEnabled(True)
-        self.prebuild_cache_button.setText("Prebuild Cache")
+        self.rebuild_kmn_button.setEnabled(True)
+        self.prebuild_cache_button.setText("Prebuild HTE Cache")
         self.progress_bar.setVisible(False)
 
         if not success:
@@ -1131,18 +1218,116 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         source_parts = [f"{label}={count}" for label, count in source_counts.items() if count > 0]
         source_summary = ", ".join(source_parts) if source_parts else "source=unknown"
         if source_counts.get("rebuilt", 0) == 0 and target_count > 0:
-            self.status.setText(f"Cache already ready ({source_summary}).")
+            self.status.setText(f"HTE cache already ready ({source_summary}).")
         else:
-            self.status.setText(f"Cache ready ({source_summary}).")
+            self.status.setText(f"HTE cache ready ({source_summary}).")
+
+        # ── KMN index status ──────────────────────────────────────────────
+        try:
+            from chemtools.util.faiss_router import is_index_built, INDEX_DIR
+            kmn_built = is_index_built()
+            kmn_dir = INDEX_DIR
+        except Exception:
+            kmn_built = False
+            kmn_dir = str(PROJECT_ROOT / "data" / "kmn_index")
+        kmn_line = (
+            f"KMN index (data/kmn_index/): {'\u2713 exists' if kmn_built else '\u2717 MISSING or empty'}\n"
+            f"  To rebuild: click 'Rebuild KMN Index' or run\n"
+            f"  python scripts/A_build_kmn_index.py --index-only"
+        )
+
         QtWidgets.QMessageBox.information(
             self,
-            "HTE Recommender",
+            "HTE Cache Prebuild Complete",
             (
-                "Cache prebuild completed.\n"
-                f"Targets: {target_count}\n"
-                f"Rows: {total_rows}\n"
-                f"Cache source: {source_summary}\n"
-                f"Elapsed: {total_elapsed:.2f}s"
+                "HTE reactant index rebuilt/verified.\n"
+                f"  Saved to: results/hte_cache/\n"
+                f"  Targets:  {target_count}\n"
+                f"  Rows:     {total_rows}\n"
+                f"  Source:   {source_summary}\n"
+                f"  Elapsed:  {total_elapsed:.2f}s\n\n"
+                + kmn_line
+            ),
+        )
+
+    # ── KMN index rebuild ─────────────────────────────────────────────────
+
+    def _run_rebuild_kmn_index(self) -> None:
+        if self.kmn_thread and self.kmn_thread.isRunning():
+            QtWidgets.QMessageBox.information(
+                self, "HTE Recommender", "KMN rebuild is already running."
+            )
+            return
+        if self.thread and self.thread.isRunning() or self.cache_thread and self.cache_thread.isRunning():
+            QtWidgets.QMessageBox.information(
+                self,
+                "HTE Recommender",
+                "Another operation is running. Please wait for it to finish.",
+            )
+            return
+
+        reply = QtWidgets.QMessageBox.question(
+            self,
+            "Rebuild KMN Index",
+            (
+                "This will run:\n"
+                "  python scripts/A_build_kmn_index.py --index-only\n\n"
+                "This re-serialises the FAISS index from existing KMN weights "
+                "(fast, no re-training).\n"
+                "The index will be saved to:  data/kmn_index/\n\n"
+                "Proceed?"
+            ),
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+            QtWidgets.QMessageBox.StandardButton.Yes,
+        )
+        if reply != QtWidgets.QMessageBox.StandardButton.Yes:
+            return
+
+        self.status.setText("Rebuilding KMN index...")
+        self.progress_bar.setRange(0, 0)
+        self.progress_bar.setVisible(True)
+        self.run_button.setEnabled(False)
+        self.prebuild_cache_button.setEnabled(False)
+        self.rebuild_kmn_button.setEnabled(False)
+        self.rebuild_kmn_button.setText("Rebuilding KMN...")
+
+        self.kmn_thread = QtCore.QThread()
+        self.kmn_worker = KMNRebuildWorker(train=False)
+        self.kmn_worker.moveToThread(self.kmn_thread)
+        self.kmn_thread.started.connect(self.kmn_worker.run)
+        self.kmn_worker.progress.connect(self._append_status)
+        self.kmn_worker.finished.connect(self._on_kmn_rebuild_finished)
+        self.kmn_thread.start()
+
+    def _on_kmn_rebuild_finished(self, success: bool, message: str) -> None:
+        if self.kmn_thread:
+            self.kmn_thread.quit()
+            self.kmn_thread.wait()
+        self.run_button.setEnabled(True)
+        self.prebuild_cache_button.setEnabled(True)
+        self.rebuild_kmn_button.setEnabled(True)
+        self.rebuild_kmn_button.setText("Rebuild KMN Index")
+        self.progress_bar.setVisible(False)
+
+        if not success:
+            self.status.setText("KMN rebuild failed")
+            QtWidgets.QMessageBox.critical(self, "KMN Rebuild Failed", message)
+            return
+
+        try:
+            from chemtools.util.faiss_router import is_index_built
+            kmn_built = is_index_built()
+        except Exception:
+            kmn_built = False
+
+        self.status.setText("KMN index rebuilt." if kmn_built else "KMN rebuild done (verify manually).")
+        QtWidgets.QMessageBox.information(
+            self,
+            "KMN Index Rebuild Complete",
+            (
+                f"{'KMN index exists and is non-empty.' if kmn_built else 'KMN rebuild ran, but index may be empty — check logs.'}\n"
+                f"Saved to: data/kmn_index/\n\n"
+                + (message[:500] if message else "")
             ),
         )
 
@@ -1152,6 +1337,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             self.thread.wait()
         self.run_button.setEnabled(True)
         self.prebuild_cache_button.setEnabled(True)
+        self.rebuild_kmn_button.setEnabled(True)
         self.run_button.setText("Run Recommendation")
         self.progress_bar.setVisible(False)
 
