@@ -672,6 +672,8 @@ def main(argv: Optional[List[str]] = None) -> None:
     print(f"\n  {C.META}Examples:{C.R}")
     examples = [
         "Recommend conditions: Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+        "Recommend motif-screen conditions for my Suzuki coupling",
+        "Find similar precedent conditions for Brc1ccc(F)cc1.OB(O)c1ccncc1>>...",
         "Explain why Pd(0) is needed for Suzuki coupling",
         "What bases work for Buchwald-Hartwig C-N coupling?",
         "What are the properties of c1cccnc1? Is it drug-like?",

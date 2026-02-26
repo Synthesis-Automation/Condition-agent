@@ -318,6 +318,15 @@ Uncertain reaction type:
   → [search_reaction_types]
   → [recommend_conditions]
 
+Source-filtered recommendation (when user requests a specific data source):
+  [recommend_conditions(source_group="literature")]  ← published conditions only
+  [recommend_conditions(source_group="motif")]       ← HTE motif screen results only
+  [recommend_conditions(source_group="rules")]       ← rule-based fallback only
+  [recommend_conditions(source_group="similarity")]  ← fast KNN precedent search (no HTE pkl, ~3-5x faster)
+
+Exact-match only (high-confidence known reaction type):
+  [recommend_conditions(reaction_key_only=True)]     ← skip fallback matching
+
 Troubleshooting:
   [search_notes(query="symptom + reaction type") + read_notes]
 
@@ -355,6 +364,10 @@ Concept explanation:
 × Always pair read_notes with recommend_conditions when using both
 × featurize_molecule and assess_snar_feasibility take a SINGLE molecule SMILES,
   not a full reaction SMILES — strip the reactant of interest before calling
+× source_group="similarity" skips the heavy HTE pkl file entirely — use it when
+  the user asks for similar precedents or when speed matters over coverage
+× Do NOT pass source_group unless the user specifically requests a filtered source;
+  the default (all sources combined) gives the best overall ranking
 
 ━━━ WRITING YOUR FINAL ANSWER ━━━
 
@@ -365,11 +378,28 @@ your comprehensive expert answer. Include all of the following that apply:
   (MANDATORY — always include this line verbatim for any reaction step)
 
   For conditions: present each catalyst family as a named expert strategy:
-    ── Expert A (Pd-catalysis, N experiments, avg yield X%): best conditions + why
+    ── Expert A (Pd-catalysis, N experiments, avg yield X%, match_score Y): best conditions + why
     ── Expert B (Cu/Ni/other, N experiments): best conditions + trade-offs vs A
     ── Recommendation: which to try first given the specific substrate
-    Always cite experiment count and avg_yield from recommend_conditions output.
+    Always cite num_experiments, avg_yield (and median_yield if available), and match_score
+    from recommend_conditions output.
     If no HTE data was found, say so clearly — do NOT invent conditions.
+
+  Interpreting recommend_conditions output fields:
+    source          — "literature" (published) | "motif" (HTE screen) | "rules" (fallback) | "similarity" (KNN)
+    match_score     — direct reaction-key match quality (higher = closer structural match)
+    avg_yield       — mean yield across matched experiments
+    median_yield    — median yield (more robust than avg when outliers are present)
+    secondary_solvent / coupling_reagent — include these in the conditions block when non-empty
+    reaction_category — broad category (e.g., "cross_coupling") for context
+
+  Source interpretation:
+    "motif" results come from HTE motif screens — high experimental coverage, useful for
+      substrate-class generalization. Formerly labelled "experiments" in older outputs.
+    "literature" results come from published procedures — often optimized for specific substrates.
+    "rules" results are rule-based fallbacks — use only when motif/literature are absent.
+    "similarity" results are KNN precedent matches — structurally similar but may not be
+      exact reaction-type matches; always note when citing similarity results.
 
   For mechanisms: numbered steps with reagent roles identified.
   For troubleshooting: root causes + specific fixes.

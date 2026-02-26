@@ -62,12 +62,21 @@ _HTE_DB_PATH = str(
 # Tool: recommend_conditions
 # ---------------------------------------------------------------------------
 
-def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any]:
+def _recommend_conditions(
+    reaction_smiles: str,
+    top_k: int = 5,
+    source_group: str = "",
+    reaction_key_only: bool = False,
+    use_spectator_groups: bool = True,
+    prefer_mixfp_for_similarity: bool = False,
+    similarity_mixfp_weight: float = 0.3,
+) -> Dict[str, Any]:
     """Recommend reaction conditions based on HTE experimental data.
 
     Uses a high-throughput experimentation (HTE) database to find conditions
     that have worked for reactions with similar motifs and bond changes.
-    Ranks by success rate (yield > 50%) and motif similarity.
+    Ranks by Z-score (avg_yield, success_rate, num_experiments) with direct
+    reaction-key matches prioritized before fallback matching.
 
     Call this after detect_reaction_type to ensure the reaction is properly
     classified before condition matching.
@@ -75,11 +84,27 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
     Args:
         reaction_smiles: Reaction SMILES in 'reactants>>products' format.
         top_k: Number of top recommendations to return (default 5).
+        source_group: Filter to a specific data source. One of:
+            "literature" — published literature conditions (default pool),
+            "motif"      — experimental HTE motif screen results,
+            "rules"      — rule-based fallback conditions,
+            "similarity" — precedent KNN similarity search (fastest, no HTE pkl load),
+            ""           — all sources combined (default).
+        reaction_key_only: If True, only return exact reaction-key matches
+            (no fallback to motif/similarity). Use for high-confidence reaction types.
+        use_spectator_groups: Weight recommendations by spectator group match
+            (e.g. steric/electronic groups on arene). Default True.
+        prefer_mixfp_for_similarity: Use mixed-fingerprint (MixFP) for precedent
+            similarity ranking instead of standard FP. Default False.
+        similarity_mixfp_weight: Weight of MixFP component in similarity score
+            (0.0–1.0, default 0.3). Only used when prefer_mixfp_for_similarity=True.
 
     Returns:
         dict with recommendations list, each containing:
-          rank, catalyst, ligand, base, solvent, temperature, confidence,
-          precedent_count.
+          rank, catalyst, ligand, base, solvent, secondary_solvent, additive,
+          coupling_reagent, temperature, atmosphere, confidence,
+          success_rate, avg_yield, median_yield, match_score, num_experiments,
+          reaction_type, source, precedent_ids.
     """
     try:
         try:
@@ -99,6 +124,11 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
             reaction_smiles,
             k=max(top_k * 2, 25),
             hte_db_path=_HTE_DB_PATH,
+            source_group=source_group or None,
+            reaction_key_only=reaction_key_only,
+            use_spectator_groups=use_spectator_groups,
+            prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+            similarity_mixfp_weight=float(similarity_mixfp_weight),
         )
         if not raw:
             return _success({
@@ -131,22 +161,27 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
             cond = rec.get("conditions") or {}
             scores = rec.get("component_scores") or {}
             entry = {
-                "rank": rec.get("rank", i),
-                "catalyst":    cond.get("catalyst")    or rec.get("catalyst")    or "",
-                "ligand":      cond.get("ligand")      or rec.get("ligand")      or "",
-                "base":        cond.get("base")        or rec.get("base")        or "",
-                "solvent":     cond.get("solvent")     or rec.get("solvent")     or "",
-                "additive":    cond.get("additive")    or rec.get("additive")    or "",
-                "temperature": cond.get("temperature") or rec.get("temperature") or "",
-                "atmosphere":  cond.get("atmosphere")  or rec.get("atmosphere")  or "",
-                "confidence":  round(float(rec.get("confidence", 0.0)), 1),
-                "success_rate": scores.get("success_rate"),
-                "avg_yield":    scores.get("avg_yield"),
-                "num_experiments": int(scores.get("num_experiments", 0)),
-                "reaction_type": rec.get("reaction") or "",
-                "reactant_types": rec.get("reactant_types") or [],
-                "source": rec.get("source") or "",
-                "precedent_ids": rec.get("reaction_id") or "",
+                "rank":              rec.get("rank", i),
+                "catalyst":          cond.get("catalyst")          or rec.get("catalyst")          or "",
+                "ligand":            cond.get("ligand")            or rec.get("ligand")            or "",
+                "base":              cond.get("base")              or rec.get("base")              or "",
+                "solvent":           cond.get("solvent")           or rec.get("solvent")           or "",
+                "secondary_solvent": cond.get("secondary_solvent") or rec.get("secondary_solvent") or "",
+                "additive":          cond.get("additive")          or rec.get("additive")          or "",
+                "coupling_reagent":  cond.get("coupling_reagent")  or rec.get("coupling_reagent")  or "",
+                "temperature":       cond.get("temperature")       or rec.get("temperature")       or "",
+                "atmosphere":        cond.get("atmosphere")        or rec.get("atmosphere")        or "",
+                "confidence":        round(float(rec.get("confidence", 0.0)), 2),
+                "success_rate":      scores.get("success_rate"),
+                "avg_yield":         scores.get("avg_yield"),
+                "median_yield":      scores.get("median_yield"),
+                "match_score":       scores.get("match_score"),
+                "num_experiments":   int(scores.get("num_experiments", 0)),
+                "reaction_type":     rec.get("reaction") or "",
+                "reaction_category": rec.get("reaction_category") or "",
+                "reactant_types":    rec.get("reactant_types") or [],
+                "source":            rec.get("source") or "",
+                "precedent_ids":     rec.get("reaction_id") or "",
             }
             cleaned.append(entry)
 
@@ -154,7 +189,9 @@ def _recommend_conditions(reaction_smiles: str, top_k: int = 5) -> Dict[str, Any
             "reaction_smiles": reaction_smiles,
             "recommendations": cleaned,
             "total_available": len(recs),
+            "source_group": source_group or "all",
             "catalyst_families": sorted({_extract_metal(r["catalyst"]) for r in cleaned if r.get("catalyst")}),
+            "detected_reaction_type": (raw.get("detection") or {}).get("detected_reaction_type") if isinstance(raw, dict) else None,
             "hte_timing_ms": hte_timing_ms or {},
             "hte_processing_time_ms": hte_processing_time_ms,
             "hte_recommender_stage_timing_ms": hte_recommender_stage_timing_ms or {},
@@ -206,7 +243,16 @@ def _project_recommend_conditions(result: dict) -> Dict[str, Any]:
 recommend_conditions_tool = ToolPlugin(
     name="recommend_conditions",
     category="conditions",
-    description="Recommend reaction conditions (catalyst, ligand, base, solvent, temperature) from HTE experimental data.",
+    description=(
+        "Recommend reaction conditions (catalyst, ligand, base, solvent, temperature) from HTE experimental data. "
+        "Ranks results by Z-score using success_rate, avg_yield, and num_experiments, with direct reaction-key "
+        "matches prioritized before fallback matching. "
+        "Optional source_group: 'literature' (published conditions), 'motif' (HTE motif screen results), "
+        "'rules' (rule-based fallback), 'similarity' (fast KNN precedent search, no HTE pkl load), "
+        "or '' for all sources combined. "
+        "Use reaction_key_only=True for exact matches only. "
+        "Output includes secondary_solvent, coupling_reagent, match_score, and median_yield."
+    ),
     prerequisites=["detect_reaction_type"],
     fn=_recommend_conditions,
     provides=["conditions", "recommendations"],
