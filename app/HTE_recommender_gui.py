@@ -1119,11 +1119,31 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         target_count = len(targets)
         total_rows = sum(int(item.get("num_rows", 0) or 0) for item in targets if isinstance(item, dict))
         total_elapsed = sum(float(item.get("elapsed_s", 0.0) or 0.0) for item in targets if isinstance(item, dict))
-        self.status.setText(f"Cache ready ({target_count} target(s), {total_rows} rows).")
+        cache_sources = [
+            str(item.get("cache_source") or "").strip().lower()
+            for item in targets
+            if isinstance(item, dict)
+        ]
+        source_counts = {
+            label: sum(1 for src in cache_sources if src == label)
+            for label in ("memory", "disk", "rebuilt")
+        }
+        source_parts = [f"{label}={count}" for label, count in source_counts.items() if count > 0]
+        source_summary = ", ".join(source_parts) if source_parts else "source=unknown"
+        if source_counts.get("rebuilt", 0) == 0 and target_count > 0:
+            self.status.setText(f"Cache already ready ({source_summary}).")
+        else:
+            self.status.setText(f"Cache ready ({source_summary}).")
         QtWidgets.QMessageBox.information(
             self,
             "HTE Recommender",
-            f"Cache prebuild completed.\nTargets: {target_count}\nRows: {total_rows}\nElapsed: {total_elapsed:.2f}s",
+            (
+                "Cache prebuild completed.\n"
+                f"Targets: {target_count}\n"
+                f"Rows: {total_rows}\n"
+                f"Cache source: {source_summary}\n"
+                f"Elapsed: {total_elapsed:.2f}s"
+            ),
         )
 
     def _on_finished(self, success: bool, result: object, message: str, stats: Dict[str, Any]) -> None:

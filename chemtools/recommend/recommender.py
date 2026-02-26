@@ -140,6 +140,12 @@ def _hte_cache_dir(db_path: Path) -> Path:
     return cache_root / _cache_key_for_path(db_path)
 
 
+# Tracks the most recent non-memory source used by `_load_hte_database_cached`
+# for a given target path ("disk" vs "rebuilt"). Memory hits bypass the
+# function body due to `lru_cache`, so warm_hte_cache detects those separately.
+_HTE_CACHE_LAST_LOAD_SOURCE: Dict[str, str] = {}
+
+
 def _compute_hte_manifest(file_paths: List[Path]) -> Dict[str, Any]:
     entries = []
     for path in file_paths:
@@ -528,6 +534,7 @@ def _load_hte_database_cached(
     cache_dir = _hte_cache_dir(db_path)
     cached = _load_hte_cache(cache_dir, manifest)
     if cached is not None:
+        _HTE_CACHE_LAST_LOAD_SOURCE[str(db_path)] = "disk"
         return cached
 
     frames: List[pd.DataFrame] = []
@@ -618,6 +625,7 @@ def _load_hte_database_cached(
         len(transformation_indices),
     )
     _save_hte_cache(cache_dir, manifest, df, indexed_data, reaction_type_patterns, transformation_indices)
+    _HTE_CACHE_LAST_LOAD_SOURCE[str(db_path)] = "rebuilt"
     return df, indexed_data, reaction_type_patterns, transformation_indices
 
 
@@ -676,13 +684,22 @@ def warm_hte_cache(
     summary_targets: List[Dict[str, Any]] = []
 
     for target in targets:
+        target_key = str(Path(target))
+        cache_info_before = _load_hte_database_cached.cache_info()
         start = pd.Timestamp.utcnow()
         df, indexed_data, reaction_type_patterns, transformation_indices = _load_hte_database_cached(str(target))
         elapsed_s = (pd.Timestamp.utcnow() - start).total_seconds()
+        cache_info_after = _load_hte_database_cached.cache_info()
+        if cache_info_after.hits > cache_info_before.hits:
+            cache_source = "memory"
+        else:
+            cache_source = _HTE_CACHE_LAST_LOAD_SOURCE.get(target_key, "unknown")
         summary_targets.append(
             {
                 "target": str(target),
                 "cache_dir": str(_hte_cache_dir(Path(target))),
+                "cache_source": cache_source,
+                "cache_reused": cache_source in {"memory", "disk"},
                 "num_rows": int(len(df)),
                 "reactant_index_keys": int(len(indexed_data)),
                 "reaction_type_pattern_keys": int(len(reaction_type_patterns)),
