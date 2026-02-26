@@ -3317,6 +3317,7 @@ class HTERecommender:
         use_spectator_groups: bool = True,
         prefer_mixfp_for_similarity: bool = True,
         similarity_mixfp_weight: float = 0.75,
+        force_precedent_search: bool = False,
     ) -> HTERecommendationResult:
         """
         Recommend conditions based on reactant SMILES.
@@ -3445,7 +3446,7 @@ class HTERecommender:
             try:
                 rxn_features = _featurize_reaction_for_recommendation(
                     reaction_smiles,
-                    skip_bond_analysis=fast_experiments_mode,
+                    skip_bond_analysis=True,
                 )
                 if isinstance(rxn_features, dict):
                     nested = rxn_features.get("reaction")
@@ -3752,9 +3753,6 @@ class HTERecommender:
                         matched_groups.add(normalized)
             if current_match_count < min_experiments:
                 allow_direct_backfill = True
-            elif not source_group:
-                required_groups = {"rules", "experiments"}
-                allow_direct_backfill = bool(required_groups - matched_groups)
 
         if not has_query_key or allow_direct_backfill:
             if key in self.indexed_data:
@@ -3784,116 +3782,8 @@ class HTERecommender:
                             )
                         else:
                             result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
-            if direct_match is None:
-                list_a = _prioritize_motifs(lookup_type_a, reacted_set, spectator_set) or [""]
-                list_b = _prioritize_motifs(lookup_type_b, reacted_set, spectator_set) or [""]
-                for ma in list_a:
-                    for mb in list_b:
-                        if not ma and not mb:
-                            continue
-                        candidate = _reactant_key([ma, mb])
-                        if candidate in self.indexed_data:
-                            direct_match = self.indexed_data[candidate].copy()
-                            direct_key = candidate
-                            if source_group:
-                                direct_match = _filter_source_group(direct_match, source_group)
-                                if direct_match.empty:
-                                    direct_match = None
-                                    direct_key = None
-                                    continue
-                            direct_match = _filter_target_reaction(direct_match)
-                            if direct_match.empty:
-                                direct_match = None
-                                direct_key = None
-                                continue
-                            direct_match['match_score'] = 1.0
-                            direct_match['match_priority'] = 0
-                            _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
-                            if not result.matched_motifs:
-                                result.matched_motifs = (ma, mb)
-                            fallback_used = True
-                            break
-                    if direct_match is not None:
-                        break
-        
+
         fallback_match: Optional[pd.DataFrame] = None
-        expand_for_coverage = False
-        if not has_query_key or allow_direct_backfill:
-            if (
-                direct_match is not None
-                and self.df is not None
-                and "Source_Group" in direct_match.columns
-                and not source_group
-            ):
-                direct_groups = {g for g in direct_match["Source_Group"].unique() if str(g).strip()}
-                available_groups = {g for g in self.df["Source_Group"].unique() if str(g).strip()}
-                if available_groups and direct_groups and not (available_groups <= direct_groups):
-                    expand_for_coverage = True
-
-            should_expand = direct_match is None or (
-                direct_match is not None and len(direct_match) < min_experiments
-            ) or expand_for_coverage
-            if should_expand:
-                tiers_a = _build_fallback_tiers(lookup_type_a, reacted_set, spectator_set)
-                tiers_b = _build_fallback_tiers(lookup_type_b, reacted_set, spectator_set)
-                tier_pairs: List[Tuple[int, int, int, List[str], List[str]]] = []
-                for idx_a, list_a in enumerate(tiers_a):
-                    for idx_b, list_b in enumerate(tiers_b):
-                        tier_pairs.append((idx_a + idx_b, idx_a, idx_b, list_a, list_b))
-                tier_pairs.sort(key=lambda item: (item[0], item[1], item[2]))
-
-                for _, idx_a, idx_b, list_a, list_b in tier_pairs:
-                    for ma in list_a:
-                        for mb in list_b:
-                            if not ma and not mb:
-                                continue
-                            candidate = _reactant_key([ma, mb])
-                            if direct_key and candidate == direct_key:
-                                continue
-                            if candidate in self.indexed_data:
-                                fallback_match = self.indexed_data[candidate].copy()
-                                if source_group:
-                                    fallback_match = _filter_source_group(fallback_match, source_group)
-                                    if fallback_match.empty:
-                                        fallback_match = None
-                                        continue
-                                fallback_match = _filter_target_reaction(fallback_match)
-                                if fallback_match.empty:
-                                    fallback_match = None
-                                    continue
-                                if (
-                                    expand_for_coverage
-                                    and "Source_Group" in fallback_match.columns
-                                    and direct_match is not None
-                                ):
-                                    direct_groups = {
-                                        g
-                                        for g in direct_match["Source_Group"].unique()
-                                        if str(g).strip()
-                                    }
-                                    candidate_groups = {
-                                        g
-                                        for g in fallback_match["Source_Group"].unique()
-                                        if str(g).strip()
-                                    }
-                                    if not (candidate_groups - direct_groups):
-                                        fallback_match = None
-                                        continue
-                                if direct_match is None:
-                                    fallback_match['match_score'] = 1.0
-                                    fallback_match['match_priority'] = idx_a + idx_b
-                                else:
-                                    fallback_match['match_score'] = 0.85
-                                    fallback_match['match_priority'] = 1 + idx_a + idx_b
-                                _apply_intramolecular_boost(fallback_match, query_intramolecular_likely)
-                                if not result.matched_motifs:
-                                    result.matched_motifs = (ma, mb)
-                                fallback_used = True
-                                break
-                        if fallback_match is not None:
-                            break
-                    if fallback_match is not None:
-                        break
 
         if direct_match is not None:
             match_dfs.append(direct_match)
@@ -3914,21 +3804,6 @@ class HTERecommender:
         _add_stage_timing("match_retrieval_ms", _t_match)
 
         if matched_df is None:
-            _t_precedent = time.perf_counter()
-            precedent_recs = self._build_precedent_recommendations(
-                reactant_a_smiles,
-                reactant_b_smiles,
-                product_smiles,
-                reaction_type_filter or result.predicted_reaction_type,
-                top_k,
-                source_group=source_group,
-                prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
-                similarity_mixfp_weight=similarity_mixfp_weight,
-            )
-            if precedent_recs:
-                result.recommendations_by_source["precedent"] = precedent_recs
-                result.recommendations = precedent_recs[:top_k] if top_k > 0 else precedent_recs
-            _add_stage_timing("precedent_merge_ms", _t_precedent)
             _finalize_timing_profile()
             return result
 
@@ -4197,7 +4072,10 @@ class HTERecommender:
         _add_stage_timing("aggregation_ms", _t_aggregate)
 
         _t_precedent = time.perf_counter()
-        if (source_group or "").lower() in {"", "literature", "datasets", "dataset"}:
+        if (
+            (source_group or "").lower() in {"", "literature", "datasets", "dataset"}
+            and (force_precedent_search or not result.recommendations)
+        ):
             precedent_recs = self._build_precedent_recommendations(
                 reactant_a_smiles,
                 reactant_b_smiles,

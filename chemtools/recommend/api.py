@@ -154,6 +154,7 @@ def _run_single_pass(
     analysis: QueryAnalysis,
     *,
     source_group: Optional[str],
+    force_precedent_search: bool = False,
 ) -> Tuple[Any, Dict[str, Any]]:
     recommender, info = dm.get_recommender(source_group=source_group)
     result = recommender.recommend(
@@ -170,6 +171,7 @@ def _run_single_pass(
         use_spectator_groups=req.use_spectator_groups,
         prefer_mixfp_for_similarity=req.prefer_mixfp_for_similarity,
         similarity_mixfp_weight=req.similarity_mixfp_weight,
+        force_precedent_search=force_precedent_search,
     )
     return result, {
         "hte_recommender": {
@@ -270,7 +272,10 @@ def recommend(
         rec_obj, loaded = _run_per_source(req, dm, analysis, plan.sources_to_run)
     else:
         source_group = plan.single_run_source_group
-        rec_obj, loaded = _run_single_pass(req, dm, analysis, source_group=source_group)
+        _force_precedent = plan.recommendation_strategy == RecommendationStrategy.SIMILARITY.value
+        rec_obj, loaded = _run_single_pass(
+            req, dm, analysis, source_group=source_group, force_precedent_search=_force_precedent
+        )
 
     if rec_obj is not None and plan.output_view is OutputView.PRECEDENT_ONLY:
         rec_obj = _apply_precedent_only_view(rec_obj)
