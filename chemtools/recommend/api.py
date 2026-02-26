@@ -168,6 +168,8 @@ def _run_single_pass(
         reaction_key_only=req.reaction_key_only,
         use_aryl_steric_electronic_weighting=req.use_aryl_steric_electronic_weighting,
         use_spectator_groups=req.use_spectator_groups,
+        prefer_mixfp_for_similarity=req.prefer_mixfp_for_similarity,
+        similarity_mixfp_weight=req.similarity_mixfp_weight,
     )
     return result, {
         "hte_recommender": {
@@ -209,6 +211,8 @@ def _run_per_source(
             reaction_key_only=req.reaction_key_only,
             use_aryl_steric_electronic_weighting=req.use_aryl_steric_electronic_weighting,
             use_spectator_groups=req.use_spectator_groups,
+            prefer_mixfp_for_similarity=req.prefer_mixfp_for_similarity,
+            similarity_mixfp_weight=req.similarity_mixfp_weight,
         )
         if baseline is None:
             baseline = result

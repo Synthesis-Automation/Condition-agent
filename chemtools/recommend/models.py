@@ -91,6 +91,8 @@ class RecommendationRequest:
     reaction_key_only: bool = False
     use_aryl_steric_electronic_weighting: bool = False
     use_spectator_groups: bool = True
+    prefer_mixfp_for_similarity: bool = True
+    similarity_mixfp_weight: float = 0.75
     analysis_only: bool = False
     metadata: Dict[str, Any] = field(default_factory=dict)
 

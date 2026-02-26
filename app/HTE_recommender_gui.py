@@ -461,6 +461,7 @@ class RecommendationWorker(QtCore.QObject):
         strategy: str,
         source_override: str,
         use_aryl_weighting: bool,
+        prefer_mixfp_similarity: bool,
     ) -> None:
         super().__init__()
         self.db_path = db_path
@@ -472,6 +473,7 @@ class RecommendationWorker(QtCore.QObject):
         self.strategy = _normalize_strategy_label(strategy)
         self.source_override = _normalize_source_group_label(source_override) if source_override else ""
         self.use_aryl_weighting = use_aryl_weighting
+        self.prefer_mixfp_similarity = bool(prefer_mixfp_similarity)
 
     def _run_single(
         self,
@@ -676,6 +678,7 @@ class RecommendationWorker(QtCore.QObject):
                 catalyst_filter=self.catalyst_filter or None,
                 hte_db_path=self.db_path,
                 use_aryl_steric_electronic_weighting=self.use_aryl_weighting,
+                prefer_mixfp_for_similarity=self.prefer_mixfp_similarity,
             )
             run_result = recommend_facade(request, data_manager=dm)
             result = getattr(run_result, "recommendation", None)
@@ -777,6 +780,12 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
         self.aryl_weighting_check = QtWidgets.QCheckBox("Aryl steric/electronic weighting")
         self.aryl_weighting_check.setToolTip("Reweight matches by aryl steric/electronic similarity (when available).")
+        self.prefer_mixfp_check = QtWidgets.QCheckBox("Prefer MixFP for similarity")
+        self.prefer_mixfp_check.setChecked(True)
+        self.prefer_mixfp_check.setToolTip(
+            "When similarity/literature precedents are used, prefer MixFP routing/blending when available; "
+            "otherwise rely on DRFP/categorical similarity."
+        )
 
         self.run_button = QtWidgets.QPushButton("Run Recommendation")
         self.prebuild_cache_button = QtWidgets.QPushButton("Prebuild Cache")
@@ -824,6 +833,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self._strategy_label: str = "motif"
         self._source_group_label: str = "Auto"
         self._aryl_weighting_enabled: bool = False
+        self._prefer_mixfp_similarity_enabled: bool = True
         self._all_json_output: Optional[Dict[str, Any]] = None
         self._last_result_obj: Optional[object] = None
         self._last_export_context: Dict[str, Any] = {}
@@ -875,7 +885,12 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         filters_row.addWidget(self.source_group_combo)
         filters_row.addStretch()
         form.addRow("Filters:", filters_row)
-        form.addRow("Weighting:", self.aryl_weighting_check)
+        weighting_row = QtWidgets.QHBoxLayout()
+        weighting_row.addWidget(self.aryl_weighting_check)
+        weighting_row.addSpacing(12)
+        weighting_row.addWidget(self.prefer_mixfp_check)
+        weighting_row.addStretch()
+        form.addRow("Weighting:", weighting_row)
         layout.addLayout(form)
 
         button_row = QtWidgets.QHBoxLayout()
@@ -1006,6 +1021,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self._strategy_label = self.strategy_combo.currentText().strip()
         self._source_group_label = self.source_group_combo.currentText().strip()
         self._aryl_weighting_enabled = bool(self.aryl_weighting_check.isChecked())
+        self._prefer_mixfp_similarity_enabled = bool(self.prefer_mixfp_check.isChecked())
 
         self.thread = QtCore.QThread()
         self.worker = RecommendationWorker(
@@ -1018,6 +1034,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             strategy=self._strategy_label,
             source_override=("" if self._source_group_label == "Auto" else self._source_group_label),
             use_aryl_weighting=self._aryl_weighting_enabled,
+            prefer_mixfp_similarity=self._prefer_mixfp_similarity_enabled,
         )
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)

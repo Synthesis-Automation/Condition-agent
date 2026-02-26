@@ -2921,6 +2921,9 @@ class HTERecommender:
         reaction_type: Optional[str],
         top_k: int,
         source_group: Optional[str] = None,
+        *,
+        prefer_mixfp_for_similarity: bool = True,
+        similarity_mixfp_weight: float = 0.75,
     ) -> List[ConditionRecommendation]:
         try:
             from chemtools import precedent
@@ -2934,7 +2937,8 @@ class HTERecommender:
             reactant_b_smiles,
             product_smiles,
         )
-        use_drfp = bool(product_smiles and reaction_smiles)
+        has_full_reaction = bool(product_smiles and reaction_smiles)
+        use_drfp = has_full_reaction
 
         reactant_pool: List[str] = []
         if ">" in reaction_smiles:
@@ -2950,7 +2954,11 @@ class HTERecommender:
 
         relax = {
             "use_drfp": use_drfp,
-            "reaction_smiles": reaction_smiles if use_drfp else "",
+            # Prefer MixFP routing/blending when a full reaction SMILES is available.
+            # precedent.search degrades safely if the KMN/FAISS MixFP index is absent.
+            "use_mixfp": bool(prefer_mixfp_for_similarity and has_full_reaction),
+            "mixfp_weight": float(similarity_mixfp_weight),
+            "reaction_smiles": reaction_smiles if has_full_reaction else "",
             "filter_by_reagent_database": False,
         }
 
@@ -3205,6 +3213,8 @@ class HTERecommender:
         reaction_key_only: bool = False,
         use_aryl_steric_electronic_weighting: bool = False,
         use_spectator_groups: bool = True,
+        prefer_mixfp_for_similarity: bool = True,
+        similarity_mixfp_weight: float = 0.75,
     ) -> HTERecommendationResult:
         """
         Recommend conditions based on reactant SMILES.
@@ -3221,6 +3231,8 @@ class HTERecommender:
                 reaction_key_only: Only match using reaction_key/signatures; no reactant-type fallback
                 use_aryl_steric_electronic_weighting: Apply aryl steric/electronic weighting when available
                 use_spectator_groups: Whether to apply spectator group weighting when available
+                prefer_mixfp_for_similarity: Prefer MixFP routing/blending for precedent similarity when available
+                similarity_mixfp_weight: MixFP share in similarity blend (0-1) when enabled
         
         Returns:
             HTERecommendationResult with ranked condition recommendations
@@ -3790,6 +3802,8 @@ class HTERecommender:
                 reaction_type_filter or result.predicted_reaction_type,
                 top_k,
                 source_group=source_group,
+                prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+                similarity_mixfp_weight=similarity_mixfp_weight,
             )
             if precedent_recs:
                 result.recommendations_by_source["precedent"] = precedent_recs
@@ -4071,6 +4085,8 @@ class HTERecommender:
                 reaction_type_filter or result.predicted_reaction_type,
                 top_k,
                 source_group=source_group,
+                prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+                similarity_mixfp_weight=similarity_mixfp_weight,
             )
             if precedent_recs:
                 result.recommendations_by_source["precedent"] = precedent_recs
