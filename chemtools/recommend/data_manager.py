@@ -16,7 +16,7 @@ def _normalize_source_group_label(value: Any) -> str:
     if text in {"literature", "dataset", "datasets", "lit"}:
         return "literature"
     if text in {"motif", "motifs", "experiments", "experiment", "experiements"}:
-        return "experiments"
+        return "motif"
     if text in {"protocols", "protocol"}:
         return "literature"
     if text == "rules":
@@ -30,7 +30,7 @@ def _resolve_db_path_for_source(db_path: str, source_group: str) -> str:
     if not path.is_dir():
         return db_path
 
-    if normalized == "experiments":
+    if normalized == "motif":
         for subdir in ("motif", "experiments"):
             candidate = path / subdir / "HTE_canonical.csv"
             if candidate.exists():

@@ -91,7 +91,10 @@ def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str,
 
     strict_bin = relax.get("strict_bin", True)
     min_candidates = int(relax.get("min_candidates", k))
-    fallback_order: List[str] = relax.get("fallback_order", ["nuc_class", "LG", "any"])  # type: ignore
+    # Global cap on the candidate pool to prevent brute-force scoring of huge sets.
+    # Applied after all fallbacks; 0 means unlimited.  Default is 2000 rows.
+    _max_cands = int(relax.get("max_any_candidates", 2000))
+    fallback_order: List[str] = relax.get("fallback_order", ["any"])  # type: ignore
 
     target_bin = (feat.get("bin") or "").strip()
     target_bin_map = _parse_bin(target_bin)
@@ -101,33 +104,40 @@ def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str,
     # Exact bin matches
     cands = [r for r in fam_rows if (r.get("features", {}).get("bin") or "") == target_bin]
     if len(cands) >= min_candidates:
+        if _max_cands > 0 and len(cands) > _max_cands:
+            cands.sort(key=lambda r: float(r.get("yield_value") or 0), reverse=True)
+            return cands[:_max_cands]
         return cands
 
     # Use sets for O(1) lookups instead of O(n) list operations
     # Track reaction IDs to avoid duplicates efficiently
     added_ids = {id(r) for r in cands}
-    
+
     # Fallbacks with optimized set-based tracking
     for fb in fallback_order:
         if len(cands) >= min_candidates:
             break
-            
+
         subset = []
         if fb == "nuc_class" and target_nuc:
-            subset = [r for r in fam_rows 
-                     if id(r) not in added_ids 
+            subset = [r for r in fam_rows
+                     if id(r) not in added_ids
                      and (r.get("features", {}).get("nuc_class") or "").lower() == target_nuc]
         elif fb == "LG" and target_lg:
-            subset = [r for r in fam_rows 
-                     if id(r) not in added_ids 
+            subset = [r for r in fam_rows
+                     if id(r) not in added_ids
                      and (r.get("features", {}).get("LG") or "") == target_lg]
         elif fb == "any":
             subset = [r for r in fam_rows if id(r) not in added_ids]
-        
+
         # Add new candidates and update tracking set
         cands.extend(subset)
         added_ids.update(id(r) for r in subset)
-        
+
+    # Apply global cap: sort by yield desc so the highest-quality precedents are kept
+    if _max_cands > 0 and len(cands) > _max_cands:
+        cands.sort(key=lambda r: float(r.get("yield_value") or 0), reverse=True)
+        return cands[:_max_cands]
     return cands
 
 

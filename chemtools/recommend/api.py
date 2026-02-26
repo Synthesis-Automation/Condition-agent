@@ -24,7 +24,7 @@ def _normalize_source_group_label(value: Any) -> str:
     if text in {"literature", "dataset", "datasets", "lit"}:
         return "literature"
     if text in {"motif", "motifs", "experiments", "experiment", "experiements"}:
-        return "experiments"
+        return "motif"
     if text in {"protocols", "protocol"}:
         return "literature"
     if text == "rules":
@@ -142,7 +142,7 @@ def _apply_strategy_view(result: Any, req: RecommendationRequest, plan_strategy:
     if strategy == RecommendationStrategy.MOTIF.value:
         return _apply_source_subset_view(
             result,
-            allowed_sources=(SourceGroup.EXPERIMENTS.value, SourceGroup.RULES.value),
+            allowed_sources=(SourceGroup.MOTIF.value,),
             top_k=req.top_k,
         )
     return result
@@ -242,6 +242,39 @@ def _run_per_source(
     return baseline, loaded
 
 
+def _run_similarity_fast_pass(
+    req: RecommendationRequest,
+    analysis: QueryAnalysis,
+) -> Tuple[Any, Dict[str, Any]]:
+    """SIMILARITY fast path — skips loading HTE pkl files entirely.
+
+    Calls the precedent KNN search directly (uses the lightweight disk-cached
+    featurized CSV rows, ~5-10s) without touching the 966MB HTE literature pkl.
+    """
+    from .recommender import HTERecommendationResult, _run_precedent_knn
+
+    recs = _run_precedent_knn(
+        analysis.reactant_a_smiles,
+        analysis.reactant_b_smiles,
+        analysis.product_smiles,
+        req.reaction_type_filter or analysis.detected_reaction_type,
+        req.top_k,
+        source_group=None,
+        prefer_mixfp_for_similarity=req.prefer_mixfp_for_similarity,
+        similarity_mixfp_weight=req.similarity_mixfp_weight,
+    )
+
+    rec_obj = HTERecommendationResult(
+        reactant_a_smiles=analysis.reactant_a_smiles,
+        reactant_b_smiles=analysis.reactant_b_smiles,
+        product_smiles=analysis.product_smiles,
+        recommendations=list(recs),
+        recommendations_by_source={"precedent": list(recs)},
+    )
+    loaded = {"similarity_fast_path": True, "precedent_count": len(recs)}
+    return rec_obj, loaded
+
+
 def recommend(
     request: RecommendationRequest | str,
     *,
@@ -268,13 +301,14 @@ def recommend(
 
     dm = data_manager or RecommendationDataManager(base_db_path=req.hte_db_path)
 
-    if plan.run_strategy.value == "per_source":
+    if plan.recommendation_strategy == RecommendationStrategy.SIMILARITY.value:
+        rec_obj, loaded = _run_similarity_fast_pass(req, analysis)
+    elif plan.run_strategy.value == "per_source":
         rec_obj, loaded = _run_per_source(req, dm, analysis, plan.sources_to_run)
     else:
         source_group = plan.single_run_source_group
-        _force_precedent = plan.recommendation_strategy == RecommendationStrategy.SIMILARITY.value
         rec_obj, loaded = _run_single_pass(
-            req, dm, analysis, source_group=source_group, force_precedent_search=_force_precedent
+            req, dm, analysis, source_group=source_group, force_precedent_search=False
         )
 
     if rec_obj is not None and plan.output_view is OutputView.PRECEDENT_ONLY:

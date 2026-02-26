@@ -5,10 +5,18 @@ standardized precedent format.
 """
 from typing import Dict, Any, List, Optional, Tuple
 import csv
+import hashlib
 import os
+import pickle
 from functools import lru_cache
 
 from ..synthon import select_electrophile_nucleophile
+
+# Disk cache directory for featurized precedent rows
+_PRECEDENT_CACHE_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    "results", "precedent_cache",
+)
 
 
 def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
@@ -53,7 +61,7 @@ def _infer_source_group_from_path(path: str) -> str:
     if "rules" in parts or "rule" in parts:
         return "rules"
     if "motif" in parts or "motifs" in parts or "experiments" in parts or "experiment" in parts or "experiements" in parts:
-        return "experiments"
+        return "motif"
     return "unknown"
 
 
@@ -327,8 +335,62 @@ def _family_key(family_filter: Optional[set]) -> Tuple[str, ...]:
     return tuple(sorted(str(item) for item in family_filter))
 
 
+def _precedent_pkl_path(family_key: Tuple[str, ...]) -> str:
+    """Return the pkl path for a given family_key."""
+    key_str = "__".join(sorted(family_key)) if family_key else "__all__"
+    key_hash = hashlib.md5(key_str.encode()).hexdigest()[:16]
+    return os.path.join(_PRECEDENT_CACHE_DIR, f"precedent_{key_hash}.pkl")
+
+
+def _csv_max_mtime() -> float:
+    """Return the latest mtime of any literature CSV file."""
+    latest = 0.0
+    for path in _iter_literature_files():
+        try:
+            mtime = os.path.getmtime(path)
+            if mtime > latest:
+                latest = mtime
+        except OSError:
+            pass
+    return latest
+
+
+def _load_precedent_disk_cache(family_key: Tuple[str, ...]) -> Optional[List[Dict[str, Any]]]:
+    """Load featurized rows from disk cache if still fresh."""
+    pkl_path = _precedent_pkl_path(family_key)
+    if not os.path.exists(pkl_path):
+        return None
+    try:
+        pkl_mtime = os.path.getmtime(pkl_path)
+        if _csv_max_mtime() > pkl_mtime:
+            return None  # a CSV was updated — invalidate
+        with open(pkl_path, "rb") as fh:
+            rows = pickle.load(fh)
+        if isinstance(rows, list):
+            return rows
+    except Exception:
+        pass
+    return None
+
+
+def _save_precedent_disk_cache(family_key: Tuple[str, ...], rows: List[Dict[str, Any]]) -> None:
+    """Persist featurized rows to disk cache (non-fatal on failure)."""
+    try:
+        os.makedirs(_PRECEDENT_CACHE_DIR, exist_ok=True)
+        pkl_path = _precedent_pkl_path(family_key)
+        with open(pkl_path, "wb") as fh:
+            pickle.dump(rows, fh, protocol=pickle.HIGHEST_PROTOCOL)
+    except Exception:
+        pass
+
+
 @lru_cache(maxsize=8)
 def _load_literature_cached(family_key: Tuple[str, ...]) -> List[Dict[str, Any]]:
+    # Fast path: return from disk cache if available and fresh
+    cached = _load_precedent_disk_cache(family_key)
+    if cached is not None:
+        return cached
+
     family_filter = set(family_key) if family_key else None
     family_lower = {f.lower() for f in family_filter} if family_filter else set()
     rows: List[Dict[str, Any]] = []
@@ -366,6 +428,9 @@ def _load_literature_cached(family_key: Tuple[str, ...]) -> List[Dict[str, Any]]
                 if row_family and row_family not in family_filter and row_family.lower() not in family_lower:
                     continue
             rows.append(row)
+
+    # Persist for future processes
+    _save_precedent_disk_cache(family_key, rows)
     return rows
 
 def _load_selective(families: Optional[List[str]] = None) -> List[Dict[str, Any]]:

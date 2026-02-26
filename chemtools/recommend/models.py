@@ -13,7 +13,7 @@ class SourceGroup(str, Enum):
     ANY = "any"
     LITERATURE = "literature"
     PROTOCOLS = "protocols"
-    EXPERIMENTS = "experiments"
+    MOTIF = "motif"
     RULES = "rules"
 
 
@@ -52,8 +52,9 @@ def _coerce_enum(value: Any, enum_cls: type[Enum], default: Enum) -> Enum:
         "all": "any",
         "dataset": "literature",
         "datasets": "literature",
-        "experiment": "experiments",
-        "experiements": "experiments",
+        "experiments": "motif",
+        "experiment": "motif",
+        "experiements": "motif",
         "protocol": "literature",
         "protocols": "literature",
         "run_all": "per_source",

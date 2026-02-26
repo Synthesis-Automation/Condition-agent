@@ -90,7 +90,7 @@ def _infer_source_group(source_path: Optional[Path]) -> str:
         if "rule" in part:      # Matches rules, rule_db
             return "rules"
         if part in ("motif", "motifs", "experiments", "experiment", "experiements"):
-            return "experiments"
+            return "motif"
     return "other"
 
 
@@ -641,12 +641,12 @@ def _resolve_warm_cache_targets(db_path: Path, source_group: Optional[str]) -> L
     elif label in ("protocol", "protocols"):
         label = "literature"
     elif label in ("motif", "motifs", "experiment", "experiements"):
-        label = "experiments"
+        label = "motif"
 
     if not db_path.is_dir():
         return [db_path]
 
-    if label == "experiments":
+    if label == "motif":
         for subdir in ("motif", "experiments"):
             sub_path = db_path / subdir
             canonical = sub_path / "HTE_canonical.csv"
@@ -1026,7 +1026,7 @@ def _normalize_source_group(value: Optional[str]) -> str:
     if label in ("protocols", "protocol"):
         return "literature"
     if label in ("motif", "motifs", "experiments", "experiment", "experiements"):
-        return "experiments"
+        return "motif"
     if label == "rules":
         return "rules"
     return label
@@ -2475,10 +2475,301 @@ class HTERecommendationResult:
     timing_ms: Dict[str, float] = field(default_factory=dict)
 
 
+def _run_precedent_knn(
+    reactant_a_smiles: str,
+    reactant_b_smiles: Optional[str],
+    product_smiles: Optional[str],
+    reaction_type: Optional[str],
+    top_k: int,
+    source_group: Optional[str] = None,
+    *,
+    prefer_mixfp_for_similarity: bool = True,
+    similarity_mixfp_weight: float = 0.75,
+) -> List["ConditionRecommendation"]:
+    """Standalone precedent KNN search — no HTE data needed.
+
+    Calls ``precedent.knn()`` directly (disk-cached featurized CSV rows).
+    Used by the SIMILARITY fast path in ``api.py`` to avoid loading the
+    large HTE pkl files.
+    """
+    try:
+        from chemtools import precedent
+        from chemtools.featurizers import reaction_pair as feat_pair
+        from chemtools.recommend.utils import pick_electrophile_nucleophile
+    except Exception:
+        return []
+
+    reaction_smiles = _build_reaction_smiles(
+        reactant_a_smiles,
+        reactant_b_smiles,
+        product_smiles,
+    )
+    has_full_reaction = bool(product_smiles and reaction_smiles)
+    use_drfp = has_full_reaction
+
+    reactant_pool: List[str] = []
+    if ">" in reaction_smiles:
+        record = ReactionRecord.from_payload(normalize_reaction(reaction_smiles))
+        reactant_pool = record.reactant_smiles
+    if not reactant_pool:
+        reactant_pool = [reactant_a_smiles]
+        if reactant_b_smiles:
+            reactant_pool.append(reactant_b_smiles)
+
+    elec, nuc = pick_electrophile_nucleophile(reactant_pool)
+    features = feat_pair.featurize_pair(elec, nuc).get("flat", {}) if (elec or nuc) else {}
+
+    relax = {
+        "use_drfp": use_drfp,
+        "use_mixfp": bool(prefer_mixfp_for_similarity and has_full_reaction),
+        "mixfp_weight": float(similarity_mixfp_weight),
+        "reaction_smiles": reaction_smiles if has_full_reaction else "",
+        "filter_by_reagent_database": False,
+    }
+
+    family = reaction_type or None
+    pack = precedent.knn(family=family, features=features, k=max(top_k, 10), relax=relax)
+    precedents = list(pack.get("precedents", []) or [])
+    normalized_source = _normalize_source_group(source_group) if source_group else ""
+    precedent_source_filter = ""
+    if normalized_source in {"literature", "datasets", "dataset"}:
+        precedent_source_filter = "literature"
+    elif normalized_source in {"rules", "motif"}:
+        precedent_source_filter = normalized_source
+    if precedent_source_filter:
+        precedents = [
+            prec
+            for prec in precedents
+            if _normalize_source_group(prec.get("source_group")) == precedent_source_filter
+        ]
+
+    reaction_match_cache: Dict[str, Set[str]] = {}
+
+    def _reaction_text_key(rsmi: Any) -> str:
+        text = str(rsmi or "").strip()
+        if not text or ">" not in text:
+            return ""
+        parts = text.split(">")
+        if len(parts) == 2 and ">>" in text:
+            reactants, products = parts[0], parts[1]
+            agents = ""
+        elif len(parts) == 3:
+            reactants, agents, products = parts
+        else:
+            return text
+
+        def _canon_side(side: str) -> str:
+            tokens = [tok.strip() for tok in side.split(".") if tok.strip()]
+            tokens.sort()
+            return ".".join(tokens)
+
+        return ">".join(
+            [
+                _canon_side(reactants),
+                _canon_side(agents),
+                _canon_side(products),
+            ]
+        )
+
+    def _reaction_match_keys(rsmi: Any) -> Set[str]:
+        text = str(rsmi or "").strip()
+        if not text or ">" not in text:
+            return set()
+        cached = reaction_match_cache.get(text)
+        if cached is not None:
+            return cached
+
+        keys: Set[str] = {text}
+        try:
+            record = ReactionRecord.from_payload(normalize_reaction(text))
+        except Exception:
+            reaction_match_cache[text] = keys
+            return keys
+
+        normalized_text = str(record.normalized or "").strip()
+        if normalized_text:
+            keys.add(normalized_text)
+
+        reactants = sorted(record.reactant_smiles)
+        agents = sorted(
+            component.preferred_smiles
+            for component in record.agents
+            if component.preferred_smiles
+        )
+        products = sorted(record.product_smiles)
+        canonical = ">".join(
+            [
+                ".".join(reactants),
+                ".".join(agents),
+                ".".join(products),
+            ]
+        )
+        if canonical:
+            keys.add(canonical)
+
+        reaction_match_cache[text] = keys
+        return keys
+
+    def _row_to_precedent(row: Dict[str, Any], *, similarity: float = 1.0) -> Dict[str, Any]:
+        return {
+            "reaction_id": row.get("reaction_id"),
+            "dataset_reaction_id": row.get("dataset_reaction_id"),
+            "reaction_smiles": row.get("reaction_smiles") or "",
+            "similarity": similarity,
+            "yield": row.get("yield_value"),
+            "base_uid": row.get("base_uid"),
+            "solvent_uid": row.get("solvent_uid"),
+            "rxn_type": row.get("rxn_type"),
+            "source_file": row.get("source_file"),
+            "source_group": row.get("source_group"),
+            "reference": row.get("reference"),
+            "conditions": row.get("conditions"),
+        }
+
+    query_reaction_keys = _reaction_match_keys(reaction_smiles)
+    query_text_key = _reaction_text_key(reaction_smiles)
+    if query_text_key:
+        query_reaction_keys.add(query_text_key)
+    has_exact_precedent = any(
+        query_reaction_keys.intersection(_reaction_match_keys(prec.get("reaction_smiles")))
+        for prec in precedents
+    ) if query_reaction_keys else False
+
+    if query_reaction_keys and not has_exact_precedent:
+        try:
+            from chemtools.precedent.loader import (
+                _file_family_from_name,
+                _infer_source_group_from_path,
+                _iter_literature_files,
+                _make_row_from_csv,
+                _read_csv_records,
+            )
+        except Exception:
+            _iter_literature_files = None  # type: ignore[assignment]
+
+        exact_precedents: List[Dict[str, Any]] = []
+        seen_exact_ids: Set[str] = set()
+        if _iter_literature_files is not None:
+            for path in _iter_literature_files():
+                source_label = _normalize_source_group(_infer_source_group_from_path(path))
+                if precedent_source_filter and source_label != precedent_source_filter:
+                    continue
+                try:
+                    records = _read_csv_records(path)
+                except Exception:
+                    continue
+                file_family = _file_family_from_name(path)
+                for row_index, record in enumerate(records):
+                    row_reaction = str(record.get("reaction_smiles") or "").strip()
+                    if not row_reaction or ">" not in row_reaction:
+                        continue
+                    row_text_key = _reaction_text_key(row_reaction)
+                    if (
+                        row_reaction not in query_reaction_keys
+                        and row_text_key not in query_reaction_keys
+                    ):
+                        continue
+                    row = _make_row_from_csv(
+                        record,
+                        row_index=row_index,
+                        file_family=file_family,
+                        source_group=source_label,
+                    )
+                    if row is None:
+                        continue
+                    row_id = str(row.get("reaction_id") or "").strip()
+                    if row_id and row_id in seen_exact_ids:
+                        continue
+                    if row_id:
+                        seen_exact_ids.add(row_id)
+                    exact_precedents.append(_row_to_precedent(row, similarity=1.0))
+
+        if exact_precedents:
+            existing_ids = {
+                str(prec.get("reaction_id") or "").strip()
+                for prec in precedents
+                if prec.get("reaction_id")
+            }
+
+            def _yield_value(prec: Dict[str, Any]) -> float:
+                value = prec.get("yield")
+                if isinstance(value, (int, float)):
+                    return float(value)
+                try:
+                    return float(str(value).strip())
+                except Exception:
+                    return -1.0
+
+            prepend = [
+                prec
+                for prec in exact_precedents
+                if str(prec.get("reaction_id") or "").strip() not in existing_ids
+            ]
+            prepend.sort(
+                key=lambda prec: (_yield_value(prec), str(prec.get("reaction_id") or "")),
+                reverse=True,
+            )
+            if prepend:
+                precedents = prepend + precedents
+
+    def _condition_value(conditions: Dict[str, Any], key: str, fallback: Optional[str]) -> str:
+        raw = conditions.get(key) if conditions else None
+        if not raw:
+            return fallback or ""
+        return _format_list(raw)
+
+    deduped: Dict[Tuple[str, str, str, str, str], ConditionRecommendation] = {}
+    for prec in precedents:
+        conditions = prec.get("conditions") or {}
+        catalyst = _condition_value(conditions, "catalyst", None)
+        ligand = _condition_value(conditions, "ligand", None)
+        base = _condition_value(conditions, "base", prec.get("base_uid"))
+        solvent = _condition_value(conditions, "solvent", prec.get("solvent_uid"))
+        additive = _condition_value(conditions, "additive", None) or None
+        coupling_reagent = _condition_value(conditions, "condensation_agent", None) or None
+
+        similarity = float(prec.get("similarity") or 0.0)
+        yield_val = prec.get("yield")
+        avg_yield = float(yield_val) if isinstance(yield_val, (int, float)) else 0.0
+        success_rate = 100.0 if avg_yield >= 50.0 else 0.0
+
+        rec = ConditionRecommendation(
+            catalyst=catalyst,
+            ligand=ligand,
+            base=base,
+            solvent=solvent,
+            additive=additive,
+            coupling_reagent=coupling_reagent,
+            spectator_groups=prec.get("spectator_groups") or None,
+            success_rate=success_rate,
+            avg_yield=avg_yield,
+            median_yield=avg_yield,
+            num_experiments=1,
+            avg_z_score=similarity,
+            confidence_score=similarity * 100.0,
+            match_score=similarity,
+            reaction_type=prec.get("dataset_reaction_id") or prec.get("rxn_type"),
+            reaction_id=prec.get("reaction_id"),
+            reactant_types=("", ""),
+            z_score_range=(similarity, similarity),
+        )
+
+        key = (rec.catalyst, rec.ligand, rec.base, rec.solvent, rec.additive or "")
+        existing = deduped.get(key)
+        if existing is None or rec.match_score > existing.match_score:
+            deduped[key] = rec
+
+    results = list(deduped.values())
+    results.sort(key=lambda item: item.match_score, reverse=True)
+    if top_k <= 0:
+        return results
+    return results[:top_k]
+
+
 class HTERecommender:
     """
     HTE-based condition recommender using reactant type matching.
-    
+
     Architecture:
     1. Load and index HTE database by reactant motifs (V2 Taxonomy)
     2. Classify input reactant SMILES to get motifs
@@ -2987,8 +3278,8 @@ class HTERecommender:
         total_available = sum(len(items) for items in by_source.values())
         limit = total_available if top_k <= 0 else min(top_k, total_available)
 
-        weight_map = {"experiments": 3, "literature": 2, "datasets": 2, "rules": 1}
-        priority_map = {"experiments": 0, "literature": 1, "datasets": 1, "rules": 2, "other": 3, "unknown": 4}
+        weight_map = {"motif": 3, "literature": 2, "datasets": 2, "rules": 1}
+        priority_map = {"motif": 0, "literature": 1, "datasets": 1, "rules": 2, "other": 3, "unknown": 4}
         sources = sorted(by_source.keys(), key=lambda s: (priority_map.get(str(s), 5), str(s)))
 
         schedule: List[str] = []
@@ -3027,280 +3318,16 @@ class HTERecommender:
         prefer_mixfp_for_similarity: bool = True,
         similarity_mixfp_weight: float = 0.75,
     ) -> List[ConditionRecommendation]:
-        try:
-            from chemtools import precedent
-            from chemtools.featurizers import reaction_pair as feat_pair
-            from chemtools.recommend.utils import pick_electrophile_nucleophile
-        except Exception:
-            return []
-
-        reaction_smiles = _build_reaction_smiles(
+        return _run_precedent_knn(
             reactant_a_smiles,
             reactant_b_smiles,
             product_smiles,
+            reaction_type,
+            top_k,
+            source_group,
+            prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+            similarity_mixfp_weight=similarity_mixfp_weight,
         )
-        has_full_reaction = bool(product_smiles and reaction_smiles)
-        use_drfp = has_full_reaction
-
-        reactant_pool: List[str] = []
-        if ">" in reaction_smiles:
-            record = ReactionRecord.from_payload(normalize_reaction(reaction_smiles))
-            reactant_pool = record.reactant_smiles
-        if not reactant_pool:
-            reactant_pool = [reactant_a_smiles]
-            if reactant_b_smiles:
-                reactant_pool.append(reactant_b_smiles)
-
-        elec, nuc = pick_electrophile_nucleophile(reactant_pool)
-        features = feat_pair.featurize_pair(elec, nuc).get("flat", {}) if (elec or nuc) else {}
-
-        relax = {
-            "use_drfp": use_drfp,
-            # Prefer MixFP routing/blending when a full reaction SMILES is available.
-            # precedent.search degrades safely if the KMN/FAISS MixFP index is absent.
-            "use_mixfp": bool(prefer_mixfp_for_similarity and has_full_reaction),
-            "mixfp_weight": float(similarity_mixfp_weight),
-            "reaction_smiles": reaction_smiles if has_full_reaction else "",
-            "filter_by_reagent_database": False,
-        }
-
-        family = reaction_type or None
-        pack = precedent.knn(family=family, features=features, k=max(top_k, 10), relax=relax)
-        precedents = list(pack.get("precedents", []) or [])
-        normalized_source = _normalize_source_group(source_group) if source_group else ""
-        precedent_source_filter = ""
-        if normalized_source in {"literature", "datasets", "dataset"}:
-            precedent_source_filter = "literature"
-        elif normalized_source in {"rules", "experiments"}:
-            precedent_source_filter = normalized_source
-        if precedent_source_filter:
-            precedents = [
-                prec
-                for prec in precedents
-                if _normalize_source_group(prec.get("source_group")) == precedent_source_filter
-            ]
-
-        reaction_match_cache: Dict[str, Set[str]] = {}
-
-        def _reaction_text_key(rsmi: Any) -> str:
-            text = str(rsmi or "").strip()
-            if not text or ">" not in text:
-                return ""
-            parts = text.split(">")
-            if len(parts) == 2 and ">>" in text:
-                reactants, products = parts[0], parts[1]
-                agents = ""
-            elif len(parts) == 3:
-                reactants, agents, products = parts
-            else:
-                return text
-
-            def _canon_side(side: str) -> str:
-                tokens = [tok.strip() for tok in side.split(".") if tok.strip()]
-                tokens.sort()
-                return ".".join(tokens)
-
-            return ">".join(
-                [
-                    _canon_side(reactants),
-                    _canon_side(agents),
-                    _canon_side(products),
-                ]
-            )
-
-        def _reaction_match_keys(rsmi: Any) -> Set[str]:
-            text = str(rsmi or "").strip()
-            if not text or ">" not in text:
-                return set()
-            cached = reaction_match_cache.get(text)
-            if cached is not None:
-                return cached
-
-            keys: Set[str] = {text}
-            try:
-                record = ReactionRecord.from_payload(normalize_reaction(text))
-            except Exception:
-                reaction_match_cache[text] = keys
-                return keys
-
-            normalized_text = str(record.normalized or "").strip()
-            if normalized_text:
-                keys.add(normalized_text)
-
-            reactants = sorted(record.reactant_smiles)
-            agents = sorted(
-                component.preferred_smiles
-                for component in record.agents
-                if component.preferred_smiles
-            )
-            products = sorted(record.product_smiles)
-            canonical = ">".join(
-                [
-                    ".".join(reactants),
-                    ".".join(agents),
-                    ".".join(products),
-                ]
-            )
-            if canonical:
-                keys.add(canonical)
-
-            reaction_match_cache[text] = keys
-            return keys
-
-        def _row_to_precedent(row: Dict[str, Any], *, similarity: float = 1.0) -> Dict[str, Any]:
-            return {
-                "reaction_id": row.get("reaction_id"),
-                "dataset_reaction_id": row.get("dataset_reaction_id"),
-                "reaction_smiles": row.get("reaction_smiles") or "",
-                "similarity": similarity,
-                "yield": row.get("yield_value"),
-                "base_uid": row.get("base_uid"),
-                "solvent_uid": row.get("solvent_uid"),
-                "rxn_type": row.get("rxn_type"),
-                "source_file": row.get("source_file"),
-                "source_group": row.get("source_group"),
-                "reference": row.get("reference"),
-                "conditions": row.get("conditions"),
-            }
-
-        query_reaction_keys = _reaction_match_keys(reaction_smiles)
-        query_text_key = _reaction_text_key(reaction_smiles)
-        if query_text_key:
-            query_reaction_keys.add(query_text_key)
-        has_exact_precedent = any(
-            query_reaction_keys.intersection(_reaction_match_keys(prec.get("reaction_smiles")))
-            for prec in precedents
-        ) if query_reaction_keys else False
-
-        if query_reaction_keys and not has_exact_precedent:
-            try:
-                from chemtools.precedent.loader import (
-                    _file_family_from_name,
-                    _infer_source_group_from_path,
-                    _iter_literature_files,
-                    _make_row_from_csv,
-                    _read_csv_records,
-                )
-            except Exception:
-                _iter_literature_files = None  # type: ignore[assignment]
-
-            exact_precedents: List[Dict[str, Any]] = []
-            seen_exact_ids: Set[str] = set()
-            if _iter_literature_files is not None:
-                for path in _iter_literature_files():
-                    source_label = _normalize_source_group(_infer_source_group_from_path(path))
-                    if precedent_source_filter and source_label != precedent_source_filter:
-                        continue
-                    try:
-                        records = _read_csv_records(path)
-                    except Exception:
-                        continue
-                    file_family = _file_family_from_name(path)
-                    for row_index, record in enumerate(records):
-                        row_reaction = str(record.get("reaction_smiles") or "").strip()
-                        if not row_reaction or ">" not in row_reaction:
-                            continue
-                        row_text_key = _reaction_text_key(row_reaction)
-                        if (
-                            row_reaction not in query_reaction_keys
-                            and row_text_key not in query_reaction_keys
-                        ):
-                            continue
-                        row = _make_row_from_csv(
-                            record,
-                            row_index=row_index,
-                            file_family=file_family,
-                            source_group=source_label,
-                        )
-                        if row is None:
-                            continue
-                        row_id = str(row.get("reaction_id") or "").strip()
-                        if row_id and row_id in seen_exact_ids:
-                            continue
-                        if row_id:
-                            seen_exact_ids.add(row_id)
-                        exact_precedents.append(_row_to_precedent(row, similarity=1.0))
-
-            if exact_precedents:
-                existing_ids = {
-                    str(prec.get("reaction_id") or "").strip()
-                    for prec in precedents
-                    if prec.get("reaction_id")
-                }
-
-                def _yield_value(prec: Dict[str, Any]) -> float:
-                    value = prec.get("yield")
-                    if isinstance(value, (int, float)):
-                        return float(value)
-                    try:
-                        return float(str(value).strip())
-                    except Exception:
-                        return -1.0
-
-                prepend = [
-                    prec
-                    for prec in exact_precedents
-                    if str(prec.get("reaction_id") or "").strip() not in existing_ids
-                ]
-                prepend.sort(
-                    key=lambda prec: (_yield_value(prec), str(prec.get("reaction_id") or "")),
-                    reverse=True,
-                )
-                if prepend:
-                    precedents = prepend + precedents
-
-        def _condition_value(conditions: Dict[str, Any], key: str, fallback: Optional[str]) -> str:
-            raw = conditions.get(key) if conditions else None
-            if not raw:
-                return fallback or ""
-            return _format_list(raw)
-
-        deduped: Dict[Tuple[str, str, str, str, str], ConditionRecommendation] = {}
-        for prec in precedents:
-            conditions = prec.get("conditions") or {}
-            catalyst = _condition_value(conditions, "catalyst", None)
-            ligand = _condition_value(conditions, "ligand", None)
-            base = _condition_value(conditions, "base", prec.get("base_uid"))
-            solvent = _condition_value(conditions, "solvent", prec.get("solvent_uid"))
-            additive = _condition_value(conditions, "additive", None) or None
-            coupling_reagent = _condition_value(conditions, "condensation_agent", None) or None
-
-            similarity = float(prec.get("similarity") or 0.0)
-            yield_val = prec.get("yield")
-            avg_yield = float(yield_val) if isinstance(yield_val, (int, float)) else 0.0
-            success_rate = 100.0 if avg_yield >= 50.0 else 0.0
-
-            rec = ConditionRecommendation(
-                catalyst=catalyst,
-                ligand=ligand,
-                base=base,
-                solvent=solvent,
-                additive=additive,
-                coupling_reagent=coupling_reagent,
-                spectator_groups=prec.get("spectator_groups") or None,
-                success_rate=success_rate,
-                avg_yield=avg_yield,
-                median_yield=avg_yield,
-                num_experiments=1,
-                avg_z_score=similarity,
-                confidence_score=similarity * 100.0,
-                match_score=similarity,
-                reaction_type=prec.get("dataset_reaction_id") or prec.get("rxn_type"),
-                reaction_id=prec.get("reaction_id"),
-                reactant_types=("", ""),
-                z_score_range=(similarity, similarity),
-            )
-
-            key = (rec.catalyst, rec.ligand, rec.base, rec.solvent, rec.additive or "")
-            existing = deduped.get(key)
-            if existing is None or rec.match_score > existing.match_score:
-                deduped[key] = rec
-
-        results = list(deduped.values())
-        results.sort(key=lambda item: item.match_score, reverse=True)
-        if top_k <= 0:
-            return results
-        return results[:top_k]
     
     def recommend(
         self,
@@ -3373,7 +3400,7 @@ class HTERecommender:
             if source_group in {"rules"} and min_experiments > 1:
                 min_experiments = 1
         normalized_source_group = _normalize_source_group(source_group) if source_group else ""
-        fast_experiments_mode = normalized_source_group == "experiments"
+        fast_motif_mode = normalized_source_group == "motif"
 
         if reaction_type_filter:
             resolved_filter = _resolve_reaction_type_label(reaction_type_filter)
@@ -3625,7 +3652,7 @@ class HTERecommender:
         key_match_label = ""
         key_match_score = 0.0
         key_match_priority = 0
-        skip_transformation_scan = normalized_source_group == "experiments" and not reaction_key_only
+        skip_transformation_scan = normalized_source_group == "motif" and not reaction_key_only
         if result.query_reaction_key and result.query_reaction_key in self.transformation_indices:
             key_match_df = self.transformation_indices[result.query_reaction_key].copy()
             key_match_label = result.query_reaction_key
@@ -3966,9 +3993,9 @@ class HTERecommender:
         # Rules use a required-core-motif path to avoid over-constraining on
         # helper motifs (e.g., R_acidic-H) that are common in query keys.
         if "Source_Group" in matched_df.columns:
-            enforce_rows_mask = matched_df["Source_Group"].isin({"rules", "experiments"})
+            enforce_rows_mask = matched_df["Source_Group"].isin({"rules", "motif"})
             rules_rows_mask = matched_df["Source_Group"] == "rules"
-            experiments_rows_mask = matched_df["Source_Group"] == "experiments"
+            motif_rows_mask = matched_df["Source_Group"] == "motif"
             if enforce_rows_mask.any():
                 target_reaction = reaction_type_filter
                 if (
@@ -4023,9 +4050,9 @@ class HTERecommender:
                         motif_mask.loc[rules_rows_mask] = (
                             rule_core_mask.loc[rules_rows_mask] | rule_ext_mask.loc[rules_rows_mask]
                         )
-                    if experiments_rows_mask.any():
-                        motif_mask.loc[experiments_rows_mask] = (
-                            exp_core_mask.loc[experiments_rows_mask] | exp_ext_mask.loc[experiments_rows_mask]
+                    if motif_rows_mask.any():
+                        motif_mask.loc[motif_rows_mask] = (
+                            exp_core_mask.loc[motif_rows_mask] | exp_ext_mask.loc[motif_rows_mask]
                         )
                 else:
                     motif_mask = pd.Series([False] * len(matched_df), index=matched_df.index)

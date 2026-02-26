@@ -16,12 +16,7 @@ from .models import (
 
 _CORE_SOURCE_ORDER = (
     SourceGroup.LITERATURE.value,
-    SourceGroup.EXPERIMENTS.value,
-    SourceGroup.RULES.value,
-)
-
-_MOTIF_SOURCE_ORDER = (
-    SourceGroup.EXPERIMENTS.value,
+    SourceGroup.MOTIF.value,
     SourceGroup.RULES.value,
 )
 
@@ -85,7 +80,7 @@ def _strategy_plan(
         )
 
     # Motif strategy (motif-based only): experiments + rules by default.
-    if source in {SourceGroup.EXPERIMENTS, SourceGroup.RULES}:
+    if source in {SourceGroup.MOTIF, SourceGroup.RULES}:
         planned_run_strategy = (
             RunStrategy.PER_SOURCE if run_strategy is RunStrategy.PER_SOURCE else RunStrategy.SINGLE_PASS
         )
@@ -107,16 +102,14 @@ def _strategy_plan(
         )
 
     if source is SourceGroup.LITERATURE:
-        notes.append("motif strategy ignored literature source override and used experiments+rules")
+        notes.append("motif strategy ignores literature source override")
 
-    sources = tuple(_MOTIF_SOURCE_ORDER)
-    if run_strategy is not RunStrategy.PER_SOURCE:
-        notes.append("motif strategy requires per_source execution for experiments+rules auto-loading")
     return SourcePlan(
-        sources_to_run=sources,
+        sources_to_run=(SourceGroup.MOTIF.value,),
+        single_run_source_group=SourceGroup.MOTIF.value,
         needs_hte_data=True,
         needs_precedent_data=False,
-        run_strategy=RunStrategy.PER_SOURCE,
+        run_strategy=RunStrategy.SINGLE_PASS,
         output_view=output_view,
         notes=tuple(notes),
         recommendation_strategy=rec_strategy.value,
@@ -147,7 +140,7 @@ def plan_sources(request: RecommendationRequest) -> SourcePlan:
         )
 
     needs_precedent = output_view is OutputView.PRECEDENT_ONLY
-    if output_view is OutputView.PRECEDENT_ONLY and source in {SourceGroup.ANY, SourceGroup.EXPERIMENTS, SourceGroup.RULES}:
+    if output_view is OutputView.PRECEDENT_ONLY and source in {SourceGroup.ANY, SourceGroup.MOTIF, SourceGroup.RULES}:
         notes.append("precedent_only output requires literature source execution")
 
     if run_strategy is RunStrategy.PER_SOURCE:
