@@ -3782,6 +3782,36 @@ class HTERecommender:
                             )
                         else:
                             result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
+            if direct_match is None:
+                list_a = _prioritize_motifs(lookup_type_a, reacted_set, spectator_set) or [""]
+                list_b = _prioritize_motifs(lookup_type_b, reacted_set, spectator_set) or [""]
+                for ma in list_a:
+                    for mb in list_b:
+                        if not ma and not mb:
+                            continue
+                        candidate = _reactant_key([ma, mb])
+                        if candidate in self.indexed_data:
+                            direct_match = self.indexed_data[candidate].copy()
+                            direct_key = candidate
+                            if source_group:
+                                direct_match = _filter_source_group(direct_match, source_group)
+                                if direct_match.empty:
+                                    direct_match = None
+                                    direct_key = None
+                                    continue
+                            direct_match = _filter_target_reaction(direct_match)
+                            if direct_match.empty:
+                                direct_match = None
+                                direct_key = None
+                                continue
+                            direct_match['match_score'] = 1.0
+                            direct_match['match_priority'] = 0
+                            _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
+                            if not result.matched_motifs:
+                                result.matched_motifs = (ma, mb)
+                            break
+                    if direct_match is not None:
+                        break
 
         fallback_match: Optional[pd.DataFrame] = None
 
