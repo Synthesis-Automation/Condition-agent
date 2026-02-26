@@ -32,7 +32,7 @@ if _ENV_LIT_DIR:
 def _iter_literature_files() -> List[str]:
     """List HTE CSV files across source folders (protocols are treated as literature)."""
     files: List[str] = []
-    subdirs = ["literature", "protocols", "rules", "experiments"]
+    subdirs = ["literature", "protocols", "rules", "motif", "experiments"]
     
     for subdir in subdirs:
         subdir_path = os.path.join(HTE_DB_DIR, subdir)
@@ -52,7 +52,7 @@ def _infer_source_group_from_path(path: str) -> str:
         return "literature"
     if "rules" in parts or "rule" in parts:
         return "rules"
-    if "experiments" in parts or "experiment" in parts or "experiements" in parts:
+    if "motif" in parts or "motifs" in parts or "experiments" in parts or "experiment" in parts or "experiements" in parts:
         return "experiments"
     return "unknown"
 
