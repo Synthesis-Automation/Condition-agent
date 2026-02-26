@@ -83,7 +83,7 @@ def _infer_source_group(source_path: Optional[Path]) -> str:
         if part == "rules":
             return "rules"
         if part in ("protocols", "protocol"):
-            return "protocols"
+            return "literature"
         if part in ("experiments", "experiment", "experiements"):
             return "experiments"
     return "other"

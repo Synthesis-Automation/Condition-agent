@@ -1,6 +1,6 @@
 """Dataset loading and transformation for precedent search.
 
-This module loads HTE literature CSVs and transforms records into the
+This module loads HTE source CSVs and transforms records into the
 standardized precedent format.
 """
 from typing import Dict, Any, List, Optional, Tuple
@@ -30,7 +30,7 @@ if _ENV_LIT_DIR:
 
 
 def _iter_literature_files() -> List[str]:
-    """List all CSV files from HTE database (literature, protocols, rules, experiments)."""
+    """List HTE CSV files across source folders (protocols are treated as literature)."""
     files: List[str] = []
     subdirs = ["literature", "protocols", "rules", "experiments"]
     
@@ -49,7 +49,7 @@ def _infer_source_group_from_path(path: str) -> str:
     if "literature" in parts or "datasets" in parts or "dataset" in parts:
         return "literature"
     if "protocols" in parts or "protocol" in parts:
-        return "protocols"
+        return "literature"
     if "rules" in parts or "rule" in parts:
         return "rules"
     if "experiments" in parts or "experiment" in parts or "experiements" in parts:
@@ -370,7 +370,7 @@ def _load_literature_cached(family_key: Tuple[str, ...]) -> List[Dict[str, Any]]
 
 def _load_selective(families: Optional[List[str]] = None) -> List[Dict[str, Any]]:
     """
-    Load HTE database CSV rows from all sources (literature, protocols, rules, experiments),
+    Load HTE database CSV rows from all sources (protocols folded into literature),
     optionally filtered by reaction family.
     
     Args:

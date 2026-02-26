@@ -85,8 +85,8 @@ def _infer_source_group(source_path: Optional[Path]) -> str:
     for part in parts:
         if part in ("literature", "datasets", "dataset"):
             return "literature"
-        if "protocol" in part:  # Matches protocols, protocol_db, etc.
-            return "protocols"
+        if "protocol" in part:  # Protocol datasets are folded into literature mode.
+            return "literature"
         if "rule" in part:      # Matches rules, rule_db
             return "rules"
         if part in ("experiments", "experiment", "experiements"):
@@ -630,8 +630,8 @@ def _resolve_warm_cache_targets(db_path: Path, source_group: Optional[str]) -> L
 
     if label in ("datasets", "dataset", "lit"):
         label = "literature"
-    elif label in ("protocol",):
-        label = "protocols"
+    elif label in ("protocol", "protocols"):
+        label = "literature"
     elif label in ("experiment", "experiements"):
         label = "experiments"
 
@@ -925,7 +925,7 @@ def _normalize_source_group(value: Optional[str]) -> str:
     if label in ("literature", "datasets", "dataset", "lit"):
         return "literature"
     if label in ("protocols", "protocol"):
-        return "protocols"
+        return "literature"
     if label in ("experiments", "experiment", "experiements"):
         return "experiments"
     if label == "rules":
@@ -2739,15 +2739,14 @@ class HTERecommender:
         grouped = working_df.groupby(condition_cols, dropna=False)
         
         for condition_tuple, group_df in grouped:
-            # Protocol data (single curated conditions) should not need 2 experiments
+            # Rule-derived rows may encode curated single-condition guidance.
             current_min_exp = min_experiments
             if "_source_group_norm" in group_df.columns:
                 source_norm = set(
                     value for value in group_df["_source_group_norm"] if str(value).strip()
                 )
-                is_protocol = "protocols" in source_norm
                 is_rule = "rules" in source_norm
-                if is_protocol or is_rule:
+                if is_rule:
                     current_min_exp = 1
             
             if len(group_df) < current_min_exp:
@@ -2957,7 +2956,7 @@ class HTERecommender:
         precedent_source_filter = ""
         if normalized_source in {"literature", "datasets", "dataset"}:
             precedent_source_filter = "literature"
-        elif normalized_source in {"protocols", "rules", "experiments"}:
+        elif normalized_source in {"rules", "experiments"}:
             precedent_source_filter = normalized_source
         if precedent_source_filter:
             precedents = [
@@ -3247,11 +3246,11 @@ class HTERecommender:
             profile["total_ms"] = round((time.perf_counter() - recommend_started_at) * 1000.0, 2)
             result.timing_ms = profile
 
-        # Normalize source group and adjust min_experiments for protocols/rules
+        # Normalize source group and adjust min_experiments for rule-derived guidance.
         _t_query_prep = time.perf_counter()
         if source_group:
             source_group = _normalize_source_group(source_group)
-            if source_group in {"protocols", "rules"} and min_experiments > 1:
+            if source_group in {"rules"} and min_experiments > 1:
                 min_experiments = 1
         normalized_source_group = _normalize_source_group(source_group) if source_group else ""
         fast_experiments_mode = normalized_source_group == "experiments"

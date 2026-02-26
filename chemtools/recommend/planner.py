@@ -15,7 +15,6 @@ from .models import (
 
 _CORE_SOURCE_ORDER = (
     SourceGroup.LITERATURE.value,
-    SourceGroup.PROTOCOLS.value,
     SourceGroup.EXPERIMENTS.value,
     SourceGroup.RULES.value,
 )
@@ -36,7 +35,7 @@ def plan_sources(request: RecommendationRequest) -> SourcePlan:
         )
 
     needs_precedent = output_view is OutputView.PRECEDENT_ONLY
-    if output_view is OutputView.PRECEDENT_ONLY and source in {SourceGroup.ANY, SourceGroup.PROTOCOLS, SourceGroup.EXPERIMENTS, SourceGroup.RULES}:
+    if output_view is OutputView.PRECEDENT_ONLY and source in {SourceGroup.ANY, SourceGroup.EXPERIMENTS, SourceGroup.RULES}:
         notes.append("precedent_only output requires literature source execution")
 
     if strategy is RunStrategy.PER_SOURCE:
@@ -69,4 +68,3 @@ def plan_sources(request: RecommendationRequest) -> SourcePlan:
         output_view=output_view,
         notes=tuple(notes),
     )
-

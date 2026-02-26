@@ -25,7 +25,7 @@ def _normalize_source_group_label(value: Any) -> str:
     if text in {"experiments", "experiment", "experiements"}:
         return "experiments"
     if text in {"protocols", "protocol"}:
-        return "protocols"
+        return "literature"
     if text == "rules":
         return "rules"
     if text == "precedent":

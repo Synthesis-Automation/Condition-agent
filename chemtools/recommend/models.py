@@ -45,7 +45,8 @@ def _coerce_enum(value: Any, enum_cls: type[Enum], default: Enum) -> Enum:
         "datasets": "literature",
         "experiment": "experiments",
         "experiements": "experiments",
-        "protocol": "protocols",
+        "protocol": "literature",
+        "protocols": "literature",
         "run_all": "per_source",
         "per_source_merge": "per_source",
         "merge": "per_source",
@@ -78,7 +79,10 @@ class RecommendationRequest:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def normalized_source_group(self) -> SourceGroup:
-        return _coerce_enum(self.source_group, SourceGroup, SourceGroup.ANY)  # type: ignore[return-value]
+        out = _coerce_enum(self.source_group, SourceGroup, SourceGroup.ANY)  # type: ignore[assignment]
+        if out is SourceGroup.PROTOCOLS:
+            return SourceGroup.LITERATURE
+        return out  # type: ignore[return-value]
 
     def normalized_run_strategy(self) -> RunStrategy:
         if self.analysis_only:
@@ -139,4 +143,3 @@ class RecommendationRunResult:
     plan: SourcePlan
     recommendation: Any = None
     loaded_resources: Dict[str, Any] = field(default_factory=dict)
-

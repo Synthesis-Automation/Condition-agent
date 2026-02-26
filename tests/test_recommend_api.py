@@ -191,11 +191,10 @@ def test_api_recommend_per_source_keeps_results_by_source_without_merge(monkeypa
     assert out.recommendation.recommendations == []
     source_map = out.recommendation.recommendations_by_source
     assert "literature" in source_map
-    assert "protocols" in source_map
     assert "experiments" in source_map
     assert "rules" in source_map
     assert "precedent" in source_map
-    assert dm.calls[:4] == ["literature", "protocols", "experiments", "rules"]
+    assert dm.calls[:3] == ["literature", "experiments", "rules"]
 
 
 def test_api_recommend_precedent_only_trims_output(monkeypatch):

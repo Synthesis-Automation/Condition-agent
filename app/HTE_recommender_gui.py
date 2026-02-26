@@ -17,7 +17,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 RUN_ALL_SOURCE_SENTINEL = "__run_all_recommendation__"
-RUN_ALL_GROUPS: Tuple[str, ...] = ("literature", "protocols", "experiments", "rules")
+RUN_ALL_GROUPS: Tuple[str, ...] = ("literature", "experiments", "rules")
 _RECOMMENDER_CACHE: Dict[str, Any] = {}
 
 
@@ -81,7 +81,7 @@ def _detect_csv_type(path: Path) -> str:
             if label in ("experiments", "experiment", "experiements"):
                 return "experiments"
             if label == "protocols":
-                return "protocols"
+                return "literature"
             return label
     if path.is_dir():
         return "directory"
@@ -114,7 +114,7 @@ def _normalize_source_group_label(value: Any) -> str:
     if text == "rules":
         return "rules"
     if text in ("protocols", "protocol"):
-        return "protocols"
+        return "literature"
     if text == "precedent":
         return "precedent"
     return text
@@ -476,7 +476,7 @@ class RecommendationWorker(QtCore.QObject):
             if key not in merged_by_source and items:
                 merged_by_source[key] = _dedupe_recommendations(list(items))
 
-        source_order = ["literature", "protocols", "rules", "experiments", "precedent"]
+        source_order = ["literature", "rules", "experiments", "precedent"]
         baseline.recommendations_by_source = merged_by_source
         return baseline
 
@@ -604,14 +604,13 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                 "Run all recommendation",
                 "Precedent",
                 "literature",
-                "protocols",
                 "experiments",
                 "rules",
             ]
         )
         self.source_group_combo.setCurrentText("experiments")
         self.source_group_combo.setToolTip(
-            "Filter results to a specific HTE source group (protocols=curated literature with detailed procedures, rules live in data/HTE_db/rules)."
+            "Filter results to a specific HTE source group (protocol datasets are now treated as literature; rules live in data/HTE_db/rules)."
         )
 
         self.aryl_weighting_check = QtWidgets.QCheckBox("Aryl steric/electronic weighting")
@@ -781,7 +780,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
     def _initialize_result_tabs(self) -> None:
         self.results_tabs.clear()
-        for label in ("Literature", "Protocols", "Rules", "Experiments", "Precedent"):
+        for label in ("Literature", "Rules", "Experiments", "Precedent"):
             group_table = self._create_results_table()
             self.results_tabs.addTab(group_table, label)
 
@@ -1084,7 +1083,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             normalized_key = _normalize_source_group_label(key)
             normalized_map.setdefault(normalized_key, []).extend(items)
         source_map = normalized_map
-        base_groups = ["literature", "protocols", "rules", "experiments", "precedent"]
+        base_groups = ["literature", "rules", "experiments", "precedent"]
         extra_groups = [g for g in sorted(source_map) if g not in base_groups]
 
         try:
