@@ -19,6 +19,8 @@ if str(PROJECT_ROOT) not in sys.path:
 RUN_ALL_SOURCE_SENTINEL = "__run_all_recommendation__"
 RUN_ALL_GROUPS: Tuple[str, ...] = ("literature", "experiments", "rules")
 _RECOMMENDER_CACHE: Dict[str, Any] = {}
+_RECOMMEND_DM_CACHE: Dict[str, Any] = {}
+PUBLIC_STRATEGIES: Tuple[str, ...] = ("motif", "rules", "literature", "similarity")
 
 
 def _parse_reaction_smiles(reaction_smiles: str) -> Tuple[str, Optional[str], Optional[str]]:
@@ -74,11 +76,11 @@ def _validate_reaction_smiles_input(reaction_smiles: str) -> Tuple[bool, str]:
 
 def _detect_csv_type(path: Path) -> str:
     parts = [part.lower() for part in path.parts]
-    for label in ("protocols", "rules", "literature", "datasets", "experiments", "experiment", "experiements"):
+    for label in ("protocols", "rules", "literature", "datasets", "motif", "experiments", "experiment", "experiements"):
         if label in parts:
             if label in ("literature", "datasets"):
                 return "literature"
-            if label in ("experiments", "experiment", "experiements"):
+            if label in ("motif", "experiments", "experiment", "experiements"):
                 return "experiments"
             if label == "protocols":
                 return "literature"
@@ -109,7 +111,7 @@ def _normalize_source_group_label(value: Any) -> str:
         return "unknown"
     if text in ("literature", "datasets", "dataset", "lit"):
         return "literature"
-    if text in ("experiments", "experiment", "experiements"):
+    if text in ("motif", "motifs", "experiments", "experiment", "experiements"):
         return "experiments"
     if text == "rules":
         return "rules"
@@ -118,6 +120,26 @@ def _normalize_source_group_label(value: Any) -> str:
     if text == "precedent":
         return "precedent"
     return text
+
+
+def _normalize_strategy_label(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    if not text:
+        return "motif"
+    aliases = {
+        "experiment": "motif",
+        "experiments": "motif",
+        "experimental": "motif",
+        "experiment-based": "motif",
+        "motif-based": "motif",
+        "rule-based": "rules",
+        "lit": "literature",
+        "precedent": "similarity",
+        "similarity-based": "similarity",
+        "fingerprint": "similarity",
+        "fingerprint-based": "similarity",
+    }
+    return aliases.get(text, text if text in PUBLIC_STRATEGIES else "motif")
 
 
 def _recommendation_fingerprint(rec: Any) -> str:
@@ -154,9 +176,10 @@ def _resolve_db_path_for_source(db_path: str, source_group: str) -> str:
     path = Path(db_path)
     if not path.is_dir():
         return db_path
-    candidate = path / "experiments" / "HTE_canonical.csv"
-    if candidate.exists():
-        return str(candidate)
+    for subdir in ("motif", "experiments"):
+        candidate = path / subdir / "HTE_canonical.csv"
+        if candidate.exists():
+            return str(candidate)
     return db_path
 
 
@@ -176,6 +199,17 @@ def _get_cached_recommender(db_path: str) -> Any:
         recommender = HTERecommender(db_path)
         _RECOMMENDER_CACHE[key] = recommender
     return recommender
+
+
+def _get_cached_data_manager(db_path: str) -> Any:
+    from chemtools.recommend import RecommendationDataManager
+
+    key = _recommender_cache_key(db_path)
+    manager = _RECOMMEND_DM_CACHE.get(key)
+    if manager is None:
+        manager = RecommendationDataManager(base_db_path=db_path)
+        _RECOMMEND_DM_CACHE[key] = manager
+    return manager
 
 
 def _format_float(value: Optional[float]) -> str:
@@ -345,7 +379,7 @@ def _format_matched_key(value: Any) -> str:
 
 
 def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
-    if data_type == "precedent":
+    if data_type in {"precedent", "similarity"}:
         return [
             ("Rank", "rank"),
             ("Similarity", "match_score"),
@@ -384,6 +418,34 @@ def _table_columns_for_type(data_type: str) -> List[Tuple[str, str]]:
     return columns
 
 
+def _tab_label_for_source_group(source_group: str, strategy_label: str) -> str:
+    normalized_source = _normalize_source_group_label(source_group)
+    if normalized_source == "experiments":
+        return "Motif"
+    if normalized_source == "precedent":
+        normalized_source = "similarity"
+    return (normalized_source or "unknown").replace("_", " ").title()
+
+
+def _reaction_info_from_stats(stats: Dict[str, Any]) -> Dict[str, Any]:
+    analysis = stats.get("analysis") if isinstance(stats, dict) else None
+    if not isinstance(analysis, dict):
+        return {}
+    return {
+        "reaction_key": str(analysis.get("reaction_key") or "").strip(),
+        "reacted_motifs": list(analysis.get("reacted_motifs") or []),
+        "formed_motifs": list(analysis.get("formed_motifs") or []),
+        "spectator_motifs": list(analysis.get("spectator_motifs") or []),
+        "spectator_groups": list(analysis.get("spectator_groups") or []),
+        "product_broad_tags": [],
+        "product_motifs_reactive": [],
+        "formed_motifs_center": [],
+        "formed_motifs_context": [],
+        "bond_formed": "",
+        "bond_broken": "",
+    }
+
+
 class RecommendationWorker(QtCore.QObject):
     finished = QtCore.pyqtSignal(bool, object, str, dict)
     progress = QtCore.pyqtSignal(str)
@@ -396,7 +458,8 @@ class RecommendationWorker(QtCore.QObject):
         min_exp: int,
         reaction_filter: str,
         catalyst_filter: str,
-        source_group: str,
+        strategy: str,
+        source_override: str,
         use_aryl_weighting: bool,
     ) -> None:
         super().__init__()
@@ -406,7 +469,8 @@ class RecommendationWorker(QtCore.QObject):
         self.min_exp = min_exp
         self.reaction_filter = reaction_filter
         self.catalyst_filter = catalyst_filter
-        self.source_group = source_group
+        self.strategy = _normalize_strategy_label(strategy)
+        self.source_override = _normalize_source_group_label(source_override) if source_override else ""
         self.use_aryl_weighting = use_aryl_weighting
 
     def _run_single(
@@ -480,14 +544,14 @@ class RecommendationWorker(QtCore.QObject):
         baseline.recommendations_by_source = merged_by_source
         return baseline
 
-    def _run_precedent_only(
+    def _run_similarity_only(
         self,
         recommender: Any,
         reactant_a: str,
         reactant_b: Optional[str],
         product: Optional[str],
     ) -> Any:
-        self.progress.emit("Running precedent recommendation ...")
+        self.progress.emit("Running similarity recommendation ...")
         result = self._run_single(
             recommender,
             reactant_a,
@@ -499,46 +563,129 @@ class RecommendationWorker(QtCore.QObject):
             getattr(result, "recommendations_by_source", {}) or {}
         )
         precedent_recs = _dedupe_recommendations(list(source_map.get("precedent") or []))
-        result.recommendations_by_source = {"precedent": precedent_recs}
+        result.recommendations_by_source = {"similarity": precedent_recs}
         result.recommendations = precedent_recs
+        return result
+
+    def _run_motif_only(
+        self,
+        recommender: Any,
+        reactant_a: str,
+        reactant_b: Optional[str],
+        product: Optional[str],
+    ) -> Any:
+        narrowed = self.source_override if self.source_override in {"experiments", "rules"} else ""
+        if narrowed:
+            self.progress.emit(f"Running motif recommendation ({narrowed}) ...")
+            result = self._run_single(
+                recommender,
+                reactant_a,
+                reactant_b,
+                product,
+                narrowed,
+            )
+            source_map = _normalize_recommendations_by_source(getattr(result, "recommendations_by_source", {}) or {})
+            group_recs = _dedupe_recommendations(list(source_map.get(narrowed) or list(getattr(result, "recommendations", []) or [])))
+            result.recommendations_by_source = {narrowed: group_recs}
+            result.recommendations = group_recs
+            return result
+
+        self.progress.emit("Running motif recommendation (motif + rules) ...")
+        baseline = self._run_single(recommender, reactant_a, reactant_b, product, None)
+        merged_by_source: Dict[str, List[Any]] = {}
+        for group_name in ("experiments", "rules"):
+            group_result = self._run_single(
+                recommender,
+                reactant_a,
+                reactant_b,
+                product,
+                group_name,
+            )
+            group_map = _normalize_recommendations_by_source(
+                getattr(group_result, "recommendations_by_source", {}) or {}
+            )
+            group_recs = list(group_map.get(group_name) or [])
+            if not group_recs:
+                group_recs = list(getattr(group_result, "recommendations", []) or [])
+            merged_by_source[group_name] = _dedupe_recommendations(group_recs)
+
+        combined: List[Any] = []
+        indices = {"experiments": 0, "rules": 0}
+        while self.top_k <= 0 or len(combined) < self.top_k:
+            progressed = False
+            for group_name in ("experiments", "rules"):
+                items = merged_by_source.get(group_name) or []
+                idx = indices[group_name]
+                if idx >= len(items):
+                    continue
+                combined.append(items[idx])
+                indices[group_name] = idx + 1
+                progressed = True
+                if self.top_k > 0 and len(combined) >= self.top_k:
+                    break
+            if not progressed:
+                break
+
+        baseline.recommendations_by_source = merged_by_source
+        baseline.recommendations = combined if combined else _dedupe_recommendations(list(getattr(baseline, "recommendations", []) or []))
+        return baseline
+
+    def _run_literature_only(
+        self,
+        recommender: Any,
+        reactant_a: str,
+        reactant_b: Optional[str],
+        product: Optional[str],
+    ) -> Any:
+        self.progress.emit("Running literature recommendation ...")
+        result = self._run_single(
+            recommender,
+            reactant_a,
+            reactant_b,
+            product,
+            "literature",
+        )
+        source_map = _normalize_recommendations_by_source(
+            getattr(result, "recommendations_by_source", {}) or {}
+        )
+        literature_recs = _dedupe_recommendations(list(source_map.get("literature") or list(getattr(result, "recommendations", []) or [])))
+        result.recommendations_by_source = {"literature": literature_recs}
+        result.recommendations = literature_recs
         return result
 
     def run(self) -> None:
         try:
-            reactant_a, reactant_b, product = _parse_reaction_smiles(self.reaction_smiles)
-            if not reactant_a:
-                raise ValueError("Provide a reaction SMILES with at least one reactant.")
+            from chemtools.recommend import RecommendationRequest
+            from chemtools.recommend.api import recommend as recommend_facade
 
-            effective_db_path = self.db_path
-            if self.source_group != RUN_ALL_SOURCE_SENTINEL:
-                effective_db_path = _resolve_db_path_for_source(self.db_path, self.source_group or "")
+            normalized_strategy = _normalize_strategy_label(self.strategy)
+            source_override = self.source_override if self.source_override in {"literature", "experiments", "rules"} else ""
+            source_group = source_override or "any"
 
-            self.progress.emit(f"Loading HTE data from {effective_db_path} ...")
-            recommender = _get_cached_recommender(effective_db_path)
-            if self.source_group == RUN_ALL_SOURCE_SENTINEL:
-                result = self._run_all_recommendations(
-                    recommender,
-                    reactant_a,
-                    reactant_b,
-                    product,
-                )
-            elif _normalize_source_group_label(self.source_group) == "precedent":
-                result = self._run_precedent_only(
-                    recommender,
-                    reactant_a,
-                    reactant_b,
-                    product,
-                )
-            else:
-                self.progress.emit("Running recommendation ...")
-                result = self._run_single(
-                    recommender,
-                    reactant_a,
-                    reactant_b,
-                    product,
-                    self.source_group or None,
-                )
-            stats = recommender.get_statistics()
+            self.progress.emit(
+                f"Running {normalized_strategy} recommendation (datasets auto-load and reuse cache) ..."
+            )
+            dm = _get_cached_data_manager(self.db_path)
+            request = RecommendationRequest(
+                reaction_smiles=self.reaction_smiles,
+                strategy=normalized_strategy,
+                source_group=source_group,
+                top_k=self.top_k,
+                min_experiments=self.min_exp,
+                reaction_type_filter=self.reaction_filter or None,
+                catalyst_filter=self.catalyst_filter or None,
+                hte_db_path=self.db_path,
+                use_aryl_steric_electronic_weighting=self.use_aryl_weighting,
+            )
+            run_result = recommend_facade(request, data_manager=dm)
+            result = getattr(run_result, "recommendation", None)
+            if result is None:
+                raise RuntimeError("No recommendation result returned by facade.")
+            stats = {
+                "loaded_resources": getattr(run_result, "loaded_resources", {}) or {},
+                "plan": asdict(getattr(run_result, "plan")) if getattr(run_result, "plan", None) else {},
+                "analysis": asdict(getattr(run_result, "analysis")) if getattr(run_result, "analysis", None) else {},
+            }
             self.finished.emit(True, result, "OK", stats)
         except Exception as exc:
             self.finished.emit(False, None, str(exc), {})
@@ -555,12 +702,14 @@ class CacheWarmWorker(QtCore.QObject):
 
     def run(self) -> None:
         try:
-            from chemtools.recommend import warm_hte_cache
+            from chemtools.recommend.api import warm_recommendation_cache
 
             self.progress.emit("Prebuilding HTE cache ...")
-            summary = warm_hte_cache(
-                self.db_path,
+            dm = _get_cached_data_manager(self.db_path)
+            summary = warm_recommendation_cache(
                 source_group=self.source_group or "all",
+                data_manager=dm,
+                hte_db_path=self.db_path,
             )
             self.finished.emit(True, summary, "OK")
         except Exception as exc:
@@ -597,20 +746,33 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.catalyst_filter_edit = QtWidgets.QLineEdit()
         self.catalyst_filter_edit.setPlaceholderText("Optional catalyst filter (e.g., Pd, Cu)")
 
+        self.strategy_combo = QtWidgets.QComboBox()
+        self.strategy_combo.addItems(
+            [
+                "motif",
+                "rules",
+                "literature",
+                "similarity",
+            ]
+        )
+        self.strategy_combo.setCurrentText("motif")
+        self.strategy_combo.setToolTip(
+            "Public recommendation strategy. motif = motif-source + rules by default. "
+            "similarity uses literature precedents ranked by similarity."
+        )
+
         self.source_group_combo = QtWidgets.QComboBox()
         self.source_group_combo.addItems(
             [
-                "All",
-                "Run all recommendation",
-                "Precedent",
+                "Auto",
                 "literature",
-                "experiments",
+                "motif",
                 "rules",
             ]
         )
-        self.source_group_combo.setCurrentText("experiments")
+        self.source_group_combo.setCurrentText("Auto")
         self.source_group_combo.setToolTip(
-            "Filter results to a specific HTE source group (protocol datasets are now treated as literature; rules live in data/HTE_db/rules)."
+            "Optional source override. Leave as Auto for strategy-driven source loading."
         )
 
         self.aryl_weighting_check = QtWidgets.QCheckBox("Aryl steric/electronic weighting")
@@ -659,9 +821,12 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.cache_worker: Optional[CacheWarmWorker] = None
         self._reaction_dialog: Optional[QtWidgets.QDialog] = None
         self._spectator_groups_summary: str = ""
-        self._source_group_label: str = "All"
+        self._strategy_label: str = "motif"
+        self._source_group_label: str = "Auto"
         self._aryl_weighting_enabled: bool = False
         self._all_json_output: Optional[Dict[str, Any]] = None
+        self._last_result_obj: Optional[object] = None
+        self._last_export_context: Dict[str, Any] = {}
 
     def _setup_layout(self) -> None:
         layout = QtWidgets.QVBoxLayout(self)
@@ -703,7 +868,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         filters_row.addWidget(QtWidgets.QLabel("Catalyst:"))
         filters_row.addWidget(self.catalyst_filter_edit)
         filters_row.addSpacing(12)
-        filters_row.addWidget(QtWidgets.QLabel("Source:"))
+        filters_row.addWidget(QtWidgets.QLabel("Strategy:"))
+        filters_row.addWidget(self.strategy_combo)
+        filters_row.addSpacing(12)
+        filters_row.addWidget(QtWidgets.QLabel("Source Override:"))
         filters_row.addWidget(self.source_group_combo)
         filters_row.addStretch()
         form.addRow("Filters:", filters_row)
@@ -780,9 +948,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
 
     def _initialize_result_tabs(self) -> None:
         self.results_tabs.clear()
-        for label in ("Literature", "Rules", "Experiments", "Precedent"):
+        strategy_label = self.strategy_combo.currentText().strip() if hasattr(self, "strategy_combo") else "motif"
+        for source_group in ("literature", "rules", "experiments", "similarity"):
             group_table = self._create_results_table()
-            self.results_tabs.addTab(group_table, label)
+            self.results_tabs.addTab(group_table, _tab_label_for_source_group(source_group, strategy_label))
 
     def _clear_results(self) -> None:
         self.summary.clear()
@@ -790,6 +959,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.status.setText("")
         self._spectator_groups_summary = ""
         self._all_json_output = None
+        self._last_result_obj = None
+        self._last_export_context = {}
         self.export_json_button.setEnabled(False)
         self.run_button.setEnabled(True)
         self.prebuild_cache_button.setEnabled(True)
@@ -832,6 +1003,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.run_button.setText("Running...")
         self.progress_bar.setRange(0, 0)
         self.progress_bar.setVisible(True)
+        self._strategy_label = self.strategy_combo.currentText().strip()
         self._source_group_label = self.source_group_combo.currentText().strip()
         self._aryl_weighting_enabled = bool(self.aryl_weighting_check.isChecked())
 
@@ -843,13 +1015,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             min_exp=self.min_exp_spin.value(),
             reaction_filter=self.reaction_filter_edit.text().strip(),
             catalyst_filter=self.catalyst_filter_edit.text().strip(),
-            source_group=(
-                ""
-                if self._source_group_label == "All"
-                else RUN_ALL_SOURCE_SENTINEL
-                if self._source_group_label == "Run all recommendation"
-                else self._source_group_label
-            ),
+            strategy=self._strategy_label,
+            source_override=("" if self._source_group_label == "Auto" else self._source_group_label),
             use_aryl_weighting=self._aryl_weighting_enabled,
         )
         self.worker.moveToThread(self.thread)
@@ -885,14 +1052,17 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "Invalid path", "The data path does not exist.")
             return
 
-        selected = self.source_group_combo.currentText().strip()
-        normalized = _normalize_source_group_label(selected)
-        if selected in {"All", "Run all recommendation"}:
-            source_group = "all"
-        elif normalized == "precedent":
+        selected_strategy = _normalize_strategy_label(self.strategy_combo.currentText().strip())
+        selected_override = self.source_group_combo.currentText().strip()
+        normalized_override = _normalize_source_group_label(selected_override)
+        if selected_override != "Auto" and normalized_override in {"literature", "experiments", "rules"}:
+            source_group = normalized_override
+        elif selected_strategy in {"literature", "similarity"}:
             source_group = "literature"
+        elif selected_strategy == "rules":
+            source_group = "rules"
         else:
-            source_group = normalized or "all"
+            source_group = "all"
 
         self.status.setText("Prebuilding cache...")
         self.progress_bar.setRange(0, 0)
@@ -994,7 +1164,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         type_a = getattr(result, "reactant_a_type", "")
         type_b = getattr(result, "reactant_b_type", "")
         detected = getattr(result, "matched_motifs", None)
-        reaction_info = _collect_reaction_analysis(reaction_smiles)
+        reaction_info = _reaction_info_from_stats(stats) or _collect_reaction_analysis(reaction_smiles)
         spectator_summary = _format_nearby_groups(list(reaction_info.get("spectator_groups") or []))
         self._spectator_groups_summary = spectator_summary
 
@@ -1082,28 +1252,20 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         for key, items in source_map.items():
             normalized_key = _normalize_source_group_label(key)
             normalized_map.setdefault(normalized_key, []).extend(items)
+        if "precedent" in normalized_map and "similarity" not in normalized_map:
+            normalized_map["similarity"] = list(normalized_map.pop("precedent") or [])
         source_map = normalized_map
-        base_groups = ["literature", "rules", "experiments", "precedent"]
+        base_groups = ["literature", "rules", "experiments", "similarity"]
         extra_groups = [g for g in sorted(source_map) if g not in base_groups]
 
-        try:
-            from chemtools.formatters import format_hte_output
-            reaction_filter = self.reaction_filter_edit.text().strip() or None
-            catalyst_filter = self.catalyst_filter_edit.text().strip() or None
-            literature_recs = list(source_map.get("literature") or [])
-            if not literature_recs:
-                literature_recs = list(recs)
-            self._all_json_output = format_hte_output(
-                result,
-                recommendations=literature_recs,
-                reaction_smiles=reaction_smiles,
-                reaction_type_filter=reaction_filter,
-                catalyst_filter=catalyst_filter,
-                explanation=None,
-            )
-        except Exception:
-            self._all_json_output = None
-        self.export_json_button.setEnabled(bool(self._all_json_output))
+        self._all_json_output = None
+        self._last_result_obj = result
+        self._last_export_context = {
+            "reaction_smiles": reaction_smiles,
+            "reaction_type_filter": self.reaction_filter_edit.text().strip() or None,
+            "catalyst_filter": self.catalyst_filter_edit.text().strip() or None,
+        }
+        self.export_json_button.setEnabled(True)
         self.results_tabs.clear()
 
         added_any_tab = False
@@ -1114,7 +1276,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             group_table = self._create_results_table()
             group_columns = _table_columns_for_type(source_group)
             self._populate_table(group_table, group_recs, group_columns)
-            label = (source_group or "unknown").replace("_", " ").title()
+            label = _tab_label_for_source_group(source_group, self._strategy_label)
             self.results_tabs.addTab(group_table, label)
             added_any_tab = True
 
@@ -1124,9 +1286,33 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             self.results_tabs.addTab(fallback_table, "Results")
 
     def _export_json_output(self) -> None:
-        if not self._all_json_output:
-            QtWidgets.QMessageBox.information(self, "Export JSON", "Run a recommendation first.")
-            return
+        if self._all_json_output is None:
+            if self._last_result_obj is None:
+                QtWidgets.QMessageBox.information(self, "Export JSON", "Run a recommendation first.")
+                return
+            try:
+                from chemtools.formatters import format_hte_output
+
+                result = self._last_result_obj
+                source_map = getattr(result, "recommendations_by_source", {}) or {}
+                normalized_map: Dict[str, List[Any]] = {}
+                for key, items in source_map.items():
+                    normalized_key = _normalize_source_group_label(key)
+                    normalized_map.setdefault(normalized_key, []).extend(list(items or []))
+                literature_recs = list(normalized_map.get("literature") or [])
+                if not literature_recs:
+                    literature_recs = list(getattr(result, "recommendations", []) or [])
+                self._all_json_output = format_hte_output(
+                    result,
+                    recommendations=literature_recs,
+                    reaction_smiles=str(self._last_export_context.get("reaction_smiles") or ""),
+                    reaction_type_filter=self._last_export_context.get("reaction_type_filter"),
+                    catalyst_filter=self._last_export_context.get("catalyst_filter"),
+                    explanation=None,
+                )
+            except Exception as exc:
+                QtWidgets.QMessageBox.critical(self, "Export JSON", f"Failed to build export JSON: {exc}")
+                return
         path, _ = QtWidgets.QFileDialog.getSaveFileName(
             self,
             "Export JSON",

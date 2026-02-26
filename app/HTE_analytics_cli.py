@@ -943,7 +943,7 @@ Examples:
   python app/HTE_analytics_cli.py export results/pd_cn_subset.csv --reaction C_N_Coupling --catalyst Pd
 
   # Offline backtest on held-out rows
-  python app/HTE_analytics_cli.py backtest --input data/HTE_db/experiments/HTE_canonical.csv --top-k 10 --hit-ks 1,3,5,10
+  python app/HTE_analytics_cli.py backtest --input data/HTE_db/motif/HTE_canonical.csv --top-k 10 --hit-ks 1,3,5,10
         """
     )
     
@@ -1042,8 +1042,8 @@ Examples:
     backtest_parser = subparsers.add_parser('backtest', help='Backtest HTE recommender offline')
     backtest_parser.add_argument(
         '--input',
-        default='data/HTE_db/experiments/HTE_canonical.csv',
-        help='Input HTE CSV for train/test backtest (default: data/HTE_db/experiments/HTE_canonical.csv)',
+        default='data/HTE_db/motif/HTE_canonical.csv',
+        help='Input HTE CSV for train/test backtest (default: data/HTE_db/motif/HTE_canonical.csv)',
     )
     backtest_parser.add_argument('--reaction', help='Optional reaction type filter before split')
     backtest_parser.add_argument('--catalyst', help='Optional catalyst filter before split')

@@ -89,7 +89,7 @@ def _infer_source_group(source_path: Optional[Path]) -> str:
             return "literature"
         if "rule" in part:      # Matches rules, rule_db
             return "rules"
-        if part in ("experiments", "experiment", "experiements"):
+        if part in ("motif", "motifs", "experiments", "experiment", "experiements"):
             return "experiments"
     return "other"
 
@@ -112,7 +112,7 @@ def _collect_hte_files(db_path: Path) -> List[Path]:
     candidates: List[Path] = []
     candidates.extend(db_path.glob("*.csv"))
 
-    for subdir in ("literature", "datasets", "protocols", "rules", "experiments", "experiment", "experiements"):
+    for subdir in ("literature", "datasets", "protocols", "rules", "motif", "experiments", "experiment", "experiements"):
         sub_path = db_path / subdir
         if not sub_path.exists():
             continue
@@ -632,17 +632,22 @@ def _resolve_warm_cache_targets(db_path: Path, source_group: Optional[str]) -> L
         label = "literature"
     elif label in ("protocol", "protocols"):
         label = "literature"
-    elif label in ("experiment", "experiements"):
+    elif label in ("motif", "motifs", "experiment", "experiements"):
         label = "experiments"
 
     if not db_path.is_dir():
         return [db_path]
 
-    sub_path = db_path / label
     if label == "experiments":
-        canonical = sub_path / "HTE_canonical.csv"
-        if canonical.exists():
-            return [canonical]
+        for subdir in ("motif", "experiments"):
+            sub_path = db_path / subdir
+            canonical = sub_path / "HTE_canonical.csv"
+            if canonical.exists():
+                return [canonical]
+            if sub_path.exists():
+                return [sub_path]
+        return [db_path]
+    sub_path = db_path / label
     if sub_path.exists():
         return [sub_path]
     return [db_path]
@@ -926,7 +931,7 @@ def _normalize_source_group(value: Optional[str]) -> str:
         return "literature"
     if label in ("protocols", "protocol"):
         return "literature"
-    if label in ("experiments", "experiment", "experiements"):
+    if label in ("motif", "motifs", "experiments", "experiment", "experiements"):
         return "experiments"
     if label == "rules":
         return "rules"
