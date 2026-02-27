@@ -253,11 +253,17 @@ def _run_similarity_fast_pass(
     """
     from .recommender import HTERecommendationResult, _run_precedent_knn
 
+    # Similarity mode should be cross-family by default.
+    # Only honor reaction type when the caller explicitly provides a filter.
+    explicit_reaction_type_filter = (
+        str(req.reaction_type_filter).strip() if req.reaction_type_filter is not None else ""
+    ) or None
+
     recs = _run_precedent_knn(
         analysis.reactant_a_smiles,
         analysis.reactant_b_smiles,
         analysis.product_smiles,
-        req.reaction_type_filter or analysis.detected_reaction_type,
+        explicit_reaction_type_filter,
         req.top_k,
         source_group=None,
         prefer_mixfp_for_similarity=req.prefer_mixfp_for_similarity,
@@ -271,7 +277,11 @@ def _run_similarity_fast_pass(
         recommendations=list(recs),
         recommendations_by_source={"precedent": list(recs)},
     )
-    loaded = {"similarity_fast_path": True, "precedent_count": len(recs)}
+    loaded = {
+        "similarity_fast_path": True,
+        "precedent_count": len(recs),
+        "similarity_family_filter": explicit_reaction_type_filter or "cross_family",
+    }
     return rec_obj, loaded
 
 
