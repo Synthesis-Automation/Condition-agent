@@ -20,6 +20,7 @@ if str(PROJECT_ROOT) not in sys.path:
 RUN_ALL_SOURCE_SENTINEL = "__run_all_recommendation__"
 FAST_SOURCE_SENTINEL = "__fast_similarity_recommendation__"
 RUN_ALL_GROUPS: Tuple[str, ...] = ("literature", "motif", "rules")
+RESULT_TAB_BASE_GROUPS: Tuple[str, ...] = ("literature", "rules", "motif", "similarity")
 _RECOMMENDER_CACHE: Dict[str, Any] = {}
 _RECOMMEND_DM_CACHE: Dict[str, Any] = {}
 PUBLIC_STRATEGIES: Tuple[str, ...] = (
@@ -555,9 +556,38 @@ class RecommendationWorker(QtCore.QObject):
                 if precedent_recs:
                     merged_by_source["precedent"] = _dedupe_recommendations(precedent_recs)
 
+        # Ensure balanced mode includes the exact same similarity retrieval path
+        # as standalone similarity mode.
+        similarity_result = self._run_similarity_only(
+            recommender,
+            reactant_a,
+            reactant_b,
+            product,
+        )
+        similarity_map = _normalize_recommendations_by_source(
+            getattr(similarity_result, "recommendations_by_source", {}) or {}
+        )
+        similarity_recs = list(
+            similarity_map.get("similarity")
+            or similarity_map.get("precedent")
+            or []
+        )
+        if not similarity_recs:
+            similarity_recs = list(getattr(similarity_result, "recommendations", []) or [])
+        merged_by_source["similarity"] = _dedupe_recommendations(similarity_recs)
+
         for key, items in baseline_map.items():
             if key not in merged_by_source and items:
                 merged_by_source[key] = _dedupe_recommendations(list(items))
+
+        if not merged_by_source.get("similarity"):
+            fallback_precedent = list(
+                merged_by_source.get("precedent")
+                or baseline_map.get("precedent")
+                or []
+            )
+            if fallback_precedent:
+                merged_by_source["similarity"] = _dedupe_recommendations(fallback_precedent)
 
         source_order = ["literature", "rules", "motif", "precedent"]
         baseline.recommendations_by_source = merged_by_source
@@ -841,7 +871,6 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.strategy_combo.addItems(
             [
                 "Balanced (all 4 modes)",
-                "Fast (similarity)",
                 "motif",
                 "rules",
                 "literature",
@@ -852,7 +881,6 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.strategy_combo.setToolTip(
             "Recommendation mode / strategy.\n"
             "Balanced (all 4 modes): run literature + motif + rules + similarity and show source-specific tabs.\n"
-            "Fast (similarity): quick precedent-style similarity results.\n"
             "motif/rules/literature/similarity: run a single strategy directly."
         )
 
@@ -868,7 +896,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.source_group_combo.setCurrentText("Auto")
         self.source_group_combo.setToolTip(
             "Optional source override for single-strategy runs. "
-            "Balanced/Fast presets ignore this and use their built-in source plan."
+            "Balanced preset ignores this and uses its built-in source plan."
         )
 
         self.aryl_weighting_check = QtWidgets.QCheckBox("Aryl steric/electronic weighting")
@@ -1070,12 +1098,43 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         table.setAlternatingRowColors(True)
         return table
 
+    def _remove_extra_result_tabs(self) -> None:
+        for source_group in list(self._result_extra_groups):
+            table = self._result_tables_by_group.get(source_group)
+            if table is None:
+                continue
+            index = self.results_tabs.indexOf(table)
+            if index >= 0:
+                self.results_tabs.removeTab(index)
+            self._result_tables_by_group.pop(source_group, None)
+        self._result_extra_groups = []
+
+    def _ensure_result_tab(self, source_group: str, strategy_label: str) -> QtWidgets.QTableWidget:
+        normalized_source = _normalize_source_group_label(source_group)
+        if normalized_source == "precedent":
+            normalized_source = "similarity"
+        table = self._result_tables_by_group.get(normalized_source)
+        if table is not None:
+            return table
+
+        table = self._create_results_table()
+        self._result_tables_by_group[normalized_source] = table
+        self.results_tabs.addTab(
+            table,
+            _tab_label_for_source_group(normalized_source, strategy_label),
+        )
+        if normalized_source not in RESULT_TAB_BASE_GROUPS:
+            self._result_extra_groups.append(normalized_source)
+        return table
+
     def _initialize_result_tabs(self) -> None:
         self.results_tabs.clear()
         strategy_label = self.strategy_combo.currentText().strip() if hasattr(self, "strategy_combo") else "motif"
-        for source_group in ("literature", "rules", "motif", "similarity"):
-            group_table = self._create_results_table()
-            self.results_tabs.addTab(group_table, _tab_label_for_source_group(source_group, strategy_label))
+        self._result_tables_by_group = {}
+        self._result_extra_groups = []
+        for source_group in RESULT_TAB_BASE_GROUPS:
+            group_table = self._ensure_result_tab(source_group, strategy_label)
+            self._populate_table(group_table, [], _table_columns_for_type(source_group))
 
     def _clear_results(self) -> None:
         self.summary.clear()
@@ -1535,8 +1594,17 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         if "precedent" in normalized_map and "similarity" not in normalized_map:
             normalized_map["similarity"] = list(normalized_map.pop("precedent") or [])
         source_map = normalized_map
-        base_groups = ["literature", "rules", "motif", "similarity"]
-        extra_groups = [g for g in sorted(source_map) if g not in base_groups]
+
+        if not source_map and recs:
+            normalized_strategy = _normalize_strategy_label(self._strategy_label)
+            if normalized_strategy == "literature":
+                source_map["literature"] = recs
+            elif normalized_strategy in {"similarity", FAST_SOURCE_SENTINEL}:
+                source_map["similarity"] = recs
+            elif normalized_strategy == "rules":
+                source_map["rules"] = recs
+            else:
+                source_map["motif"] = recs
 
         self._all_json_output = None
         self._last_result_obj = result
@@ -1546,24 +1614,19 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             "catalyst_filter": self.catalyst_filter_edit.text().strip() or None,
         }
         self.export_json_button.setEnabled(True)
-        self.results_tabs.clear()
+        self._remove_extra_result_tabs()
 
-        added_any_tab = False
-        for source_group in base_groups + extra_groups:
+        for source_group in RESULT_TAB_BASE_GROUPS:
+            group_table = self._ensure_result_tab(source_group, self._strategy_label)
             group_recs = list(source_map.get(source_group) or [])
-            if not group_recs:
-                continue
-            group_table = self._create_results_table()
-            group_columns = _table_columns_for_type(source_group)
-            self._populate_table(group_table, group_recs, group_columns)
-            label = _tab_label_for_source_group(source_group, self._strategy_label)
-            self.results_tabs.addTab(group_table, label)
-            added_any_tab = True
+            self._populate_table(group_table, group_recs, _table_columns_for_type(source_group))
 
-        if not added_any_tab:
-            fallback_table = self._create_results_table()
-            self._populate_table(fallback_table, recs, _table_columns_for_type(data_type))
-            self.results_tabs.addTab(fallback_table, "Results")
+        extra_groups = [g for g in sorted(source_map) if g not in RESULT_TAB_BASE_GROUPS]
+        for source_group in extra_groups:
+            group_table = self._ensure_result_tab(source_group, self._strategy_label)
+            group_recs = list(source_map.get(source_group) or [])
+            group_columns = _table_columns_for_type(source_group if source_group else data_type)
+            self._populate_table(group_table, group_recs, group_columns)
 
     def _export_json_output(self) -> None:
         if self._all_json_output is None:

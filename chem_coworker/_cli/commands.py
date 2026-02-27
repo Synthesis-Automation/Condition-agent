@@ -120,7 +120,7 @@ def build_default_command_registry() -> CommandRegistry:
     reg.register(Command("/model", ("/model", "change model", "model"), "Switch model/provider", _cmd_model))
     reg.register(Command("/plan", ("/plan", "toggle plan"), "Toggle plan approval mode", _cmd_plan))
     reg.register(Command("/verbose", ("/verbose", "toggle verbose"), "Toggle verbose tool output", _cmd_verbose))
-    reg.register(Command("/condmode", ("/condmode", "condmode"), "Condition mode: auto|fast|balanced", _cmd_condmode))
+    reg.register(Command("/condmode", ("/condmode", "condmode"), "Condition mode: auto|balanced", _cmd_condmode))
     reg.register(Command("/settings", ("/settings", "settings"), "Show current settings", _cmd_settings))
     reg.register(Command("/compact", ("/compact", "compact"), "Compact conversation history", _cmd_compact))
     reg.register(Command("/history", ("/history", "history"), "Show conversation history stats", _cmd_history))
@@ -213,22 +213,21 @@ def _cmd_settings(session: ReplSession, registry: CommandRegistry, raw: str, arg
 
 
 def _cmd_condmode(session: ReplSession, registry: CommandRegistry, raw: str, args: List[str]) -> str:  # noqa: ARG001
-    valid = {"auto", "fast", "balanced"}
+    valid = {"auto", "balanced"}
     if not args:
         current = session.condition_mode
         print(f"  {C.META}Condition mode:{C.R} {C.BOLD}{current}{C.R}")
-        print(f"  {C.DIM}Usage:{C.R} /condmode auto|fast|balanced")
+        print(f"  {C.DIM}Usage:{C.R} /condmode auto|balanced")
         return COMMAND_HANDLED
 
     mode = str(args[0]).strip().lower()
     if mode not in valid:
-        print(f"  {C.WARN}⚠{C.R}  Invalid mode: {mode}. Use auto, fast, or balanced.")
+        print(f"  {C.WARN}⚠{C.R}  Invalid mode: {mode}. Use auto or balanced.")
         return COMMAND_HANDLED
 
     session.condition_mode = mode
     labels = {
         "auto": "No forced condition strategy (agent default behavior).",
-        "fast": "Bias condition requests toward fast similarity-only condition analysis.",
         "balanced": "Bias condition requests toward balanced 4-mode condition analysis.",
     }
     print(f"  {C.OK}✓{C.R}  Condition mode set to {C.BOLD}{mode}{C.R}")
@@ -322,7 +321,7 @@ def _cmd_session(session: ReplSession, registry: CommandRegistry, raw: str, args
 
         session.history = list(data.get("history", []))
         session.condition_mode = str(data.get("condition_mode") or session.condition_mode or "auto").lower()
-        if session.condition_mode not in {"auto", "fast", "balanced"}:
+        if session.condition_mode not in {"auto", "balanced"}:
             session.condition_mode = "auto"
         print(
             f"  {C.OK}✓{C.R}  Session loaded: {C.DIM}{name}{C.R}  "

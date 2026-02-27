@@ -647,23 +647,16 @@ def _is_condition_like_query(query: str) -> bool:
 
 def _apply_condition_mode_hint(query: str, condition_mode: str) -> str:
     mode = str(condition_mode or "auto").strip().lower()
-    if mode not in {"auto", "fast", "balanced"}:
+    if mode not in {"auto", "balanced"}:
         mode = "auto"
     if mode == "auto" or not _is_condition_like_query(query):
         return query
 
-    if mode == "balanced":
-        hint = (
-            "[REPL condition mode preference: For condition recommendations, use "
-            "condition_strategy='balanced' (cross-source analysis across literature, motif, "
-            "similarity, and rules) unless the user explicitly asks for a single source.]"
-        )
-    else:
-        hint = (
-            "[REPL condition mode preference: For condition recommendations, prefer fast mode by "
-            "using condition_strategy='single' with condition_source_mode='similarity' unless the "
-            "user explicitly asks for balanced/all-source analysis.]"
-        )
+    hint = (
+        "[REPL condition mode preference: For condition recommendations, use "
+        "condition_strategy='balanced' (cross-source analysis across literature, motif, "
+        "similarity, and rules) unless the user explicitly asks for a single source.]"
+    )
     return f"{query}\n\n{hint}"
 
 
