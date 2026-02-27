@@ -43,6 +43,9 @@ class ToolPlugin:
         structured_projection: Optional projection fn used by agent._extract_structured.
             Signature: fn(result_dict) -> Dict[str, Any]. Lets tools declare how
             they contribute machine-readable outputs to ChemResponse.structured.
+        llm_exposed: Whether this tool is exposed to the LLM native tool-calling
+            schema by default. False keeps the tool registered and executable
+            internally, but hidden from the normal LLM-facing tool list.
     """
     name: str
     category: str
@@ -55,6 +58,7 @@ class ToolPlugin:
     requires: List[str] = field(default_factory=list)
     validators: List[ValidatorFn] = field(default_factory=list)
     structured_projection: Optional[StructuredProjectionFn] = None
+    llm_exposed: bool = True
 
     def __post_init__(self) -> None:
         # If langchain_tool is provided but fn is not explicitly the wrapped function,

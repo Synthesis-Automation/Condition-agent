@@ -40,6 +40,7 @@ def save_session(
     provider: str,
     verbose: bool,
     plan_mode: bool,
+    condition_mode: str = "auto",
 ) -> Path:
     """Persist REPL session state to JSON and return file path."""
     SESSIONS_DIR.mkdir(parents=True, exist_ok=True)
@@ -54,6 +55,7 @@ def save_session(
         "provider": provider,
         "verbose": bool(verbose),
         "plan_mode": bool(plan_mode),
+        "condition_mode": str(condition_mode or "auto"),
         "history": history,
     }
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")

@@ -18,10 +18,18 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 RUN_ALL_SOURCE_SENTINEL = "__run_all_recommendation__"
+FAST_SOURCE_SENTINEL = "__fast_similarity_recommendation__"
 RUN_ALL_GROUPS: Tuple[str, ...] = ("literature", "motif", "rules")
 _RECOMMENDER_CACHE: Dict[str, Any] = {}
 _RECOMMEND_DM_CACHE: Dict[str, Any] = {}
-PUBLIC_STRATEGIES: Tuple[str, ...] = ("motif", "rules", "literature", "similarity")
+PUBLIC_STRATEGIES: Tuple[str, ...] = (
+    "motif",
+    "rules",
+    "literature",
+    "similarity",
+    RUN_ALL_SOURCE_SENTINEL,
+    FAST_SOURCE_SENTINEL,
+)
 
 
 def _parse_reaction_smiles(reaction_smiles: str) -> Tuple[str, Optional[str], Optional[str]]:
@@ -128,6 +136,16 @@ def _normalize_strategy_label(value: Any) -> str:
     if not text:
         return "motif"
     aliases = {
+        "balanced": RUN_ALL_SOURCE_SENTINEL,
+        "balanced (all 4 modes)": RUN_ALL_SOURCE_SENTINEL,
+        "all 4 modes": RUN_ALL_SOURCE_SENTINEL,
+        "all modes": RUN_ALL_SOURCE_SENTINEL,
+        "run all": RUN_ALL_SOURCE_SENTINEL,
+        "full analysis": RUN_ALL_SOURCE_SENTINEL,
+        "fast": FAST_SOURCE_SENTINEL,
+        "fast (similarity)": FAST_SOURCE_SENTINEL,
+        "quick": FAST_SOURCE_SENTINEL,
+        "quick (similarity)": FAST_SOURCE_SENTINEL,
         "experiment": "motif",
         "experiments": "motif",
         "experimental": "motif",
@@ -656,10 +674,44 @@ class RecommendationWorker(QtCore.QObject):
 
     def run(self) -> None:
         try:
+            reactant_a, reactant_b, product = _parse_reaction_smiles(self.reaction_smiles)
+            if not reactant_a:
+                raise RuntimeError("Could not parse reactants from reaction SMILES.")
+
             from chemtools.recommend import RecommendationRequest
             from chemtools.recommend.api import recommend as recommend_facade
 
             normalized_strategy = _normalize_strategy_label(self.strategy)
+            if normalized_strategy == RUN_ALL_SOURCE_SENTINEL:
+                if self.source_override:
+                    self.progress.emit(
+                        "Balanced mode ignores Source Override and runs literature + motif + rules + similarity."
+                    )
+                recommender = _get_cached_recommender(self.db_path)
+                result = self._run_all_recommendations(recommender, reactant_a, reactant_b, product)
+                stats = {
+                    "loaded_resources": {},
+                    "plan": {"mode": "balanced_all_4"},
+                    "analysis": _collect_reaction_analysis(self.reaction_smiles),
+                }
+                self.finished.emit(True, result, "OK", stats)
+                return
+
+            if normalized_strategy == FAST_SOURCE_SENTINEL:
+                if self.source_override:
+                    self.progress.emit(
+                        "Fast mode ignores Source Override and runs similarity-only recommendation."
+                    )
+                recommender = _get_cached_recommender(self.db_path)
+                result = self._run_similarity_only(recommender, reactant_a, reactant_b, product)
+                stats = {
+                    "loaded_resources": {},
+                    "plan": {"mode": "fast_similarity_only"},
+                    "analysis": _collect_reaction_analysis(self.reaction_smiles),
+                }
+                self.finished.emit(True, result, "OK", stats)
+                return
+
             source_override = self.source_override if self.source_override in {"literature", "motif", "rules"} else ""
             source_group = source_override or "any"
 
@@ -788,16 +840,20 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.strategy_combo = QtWidgets.QComboBox()
         self.strategy_combo.addItems(
             [
+                "Balanced (all 4 modes)",
+                "Fast (similarity)",
                 "motif",
                 "rules",
                 "literature",
                 "similarity",
             ]
         )
-        self.strategy_combo.setCurrentText("motif")
+        self.strategy_combo.setCurrentText("Balanced (all 4 modes)")
         self.strategy_combo.setToolTip(
-            "Public recommendation strategy. motif = motif-source + rules by default. "
-            "similarity uses literature precedents ranked by similarity."
+            "Recommendation mode / strategy.\n"
+            "Balanced (all 4 modes): run literature + motif + rules + similarity and show source-specific tabs.\n"
+            "Fast (similarity): quick precedent-style similarity results.\n"
+            "motif/rules/literature/similarity: run a single strategy directly."
         )
 
         self.source_group_combo = QtWidgets.QComboBox()
@@ -811,7 +867,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         )
         self.source_group_combo.setCurrentText("Auto")
         self.source_group_combo.setToolTip(
-            "Optional source override. Leave as Auto for strategy-driven source loading."
+            "Optional source override for single-strategy runs. "
+            "Balanced/Fast presets ignore this and use their built-in source plan."
         )
 
         self.aryl_weighting_check = QtWidgets.QCheckBox("Aryl steric/electronic weighting")
@@ -880,7 +937,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.kmn_worker: Optional["KMNRebuildWorker"] = None
         self._reaction_dialog: Optional[QtWidgets.QDialog] = None
         self._spectator_groups_summary: str = ""
-        self._strategy_label: str = "motif"
+        self._strategy_label: str = "Balanced (all 4 modes)"
         self._source_group_label: str = "Auto"
         self._aryl_weighting_enabled: bool = False
         self._prefer_mixfp_similarity_enabled: bool = True
@@ -1129,8 +1186,10 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         normalized_override = _normalize_source_group_label(selected_override)
         if selected_override != "Auto" and normalized_override in {"literature", "motif", "rules"}:
             source_group = normalized_override
-        elif selected_strategy in {"literature", "similarity"}:
+        elif selected_strategy in {"literature", "similarity", FAST_SOURCE_SENTINEL}:
             source_group = "literature"
+        elif selected_strategy == RUN_ALL_SOURCE_SENTINEL:
+            source_group = "all"
         elif selected_strategy == "rules":
             source_group = "rules"
         else:

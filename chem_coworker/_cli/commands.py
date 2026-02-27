@@ -26,6 +26,7 @@ class ReplSession:
     provider: str
     verbose: bool
     plan_mode: bool
+    condition_mode: str
     history: List[Dict]
     tool_registry: Any
     ui: Any
@@ -115,10 +116,11 @@ def build_default_command_registry() -> CommandRegistry:
     reg.register(Command("/help", ("/help", "help", "?"), "Show CLI commands", _cmd_help))
     reg.register(Command("/exit", ("exit", "quit", "q", "/exit"), "Exit the session", _cmd_exit))
     reg.register(Command("/clear", ("clear", "/clear"), "Clear conversation history", _cmd_clear))
-    reg.register(Command("/tools", ("tools", "/tools"), "List registered tools", _cmd_tools))
+    reg.register(Command("/tools", ("tools", "/tools"), "List LLM-visible tools (/tools all for registry)", _cmd_tools))
     reg.register(Command("/model", ("/model", "change model", "model"), "Switch model/provider", _cmd_model))
     reg.register(Command("/plan", ("/plan", "toggle plan"), "Toggle plan approval mode", _cmd_plan))
     reg.register(Command("/verbose", ("/verbose", "toggle verbose"), "Toggle verbose tool output", _cmd_verbose))
+    reg.register(Command("/condmode", ("/condmode", "condmode"), "Condition mode: auto|fast|balanced", _cmd_condmode))
     reg.register(Command("/settings", ("/settings", "settings"), "Show current settings", _cmd_settings))
     reg.register(Command("/compact", ("/compact", "compact"), "Compact conversation history", _cmd_compact))
     reg.register(Command("/history", ("/history", "history"), "Show conversation history stats", _cmd_history))
@@ -147,11 +149,16 @@ def _cmd_clear(session: ReplSession, registry: CommandRegistry, raw: str, args: 
 
 
 def _cmd_tools(session: ReplSession, registry: CommandRegistry, raw: str, args: List[str]) -> str:  # noqa: ARG001
-    if args and args[0].lower() not in {"list"}:
-        print(f"  {C.WARN}⚠{C.R}  Unsupported /tools subcommand. Use `/tools` or `/tools list`.")
+    sub = args[0].lower() if args else "public"
+    if sub not in {"list", "all", "public"}:
+        print(f"  {C.WARN}⚠{C.R}  Unsupported /tools subcommand. Use `/tools`, `/tools public`, or `/tools all`.")
         return COMMAND_HANDLED
+    show_all = sub == "all"
     print()
-    print(session.tool_registry.describe_tools())
+    if show_all:
+        print(session.tool_registry.describe_tools())
+    else:
+        print(session.tool_registry.describe_tools(llm_exposed_only=True))
     return COMMAND_HANDLED
 
 
@@ -195,7 +202,37 @@ def _cmd_verbose(session: ReplSession, registry: CommandRegistry, raw: str, args
 
 
 def _cmd_settings(session: ReplSession, registry: CommandRegistry, raw: str, args: List[str]) -> str:  # noqa: ARG001
-    session.ui.print_settings(session.model, session.provider, session.verbose, session.plan_mode)
+    session.ui.print_settings(
+        session.model,
+        session.provider,
+        session.verbose,
+        session.plan_mode,
+        condition_mode=session.condition_mode,
+    )
+    return COMMAND_HANDLED
+
+
+def _cmd_condmode(session: ReplSession, registry: CommandRegistry, raw: str, args: List[str]) -> str:  # noqa: ARG001
+    valid = {"auto", "fast", "balanced"}
+    if not args:
+        current = session.condition_mode
+        print(f"  {C.META}Condition mode:{C.R} {C.BOLD}{current}{C.R}")
+        print(f"  {C.DIM}Usage:{C.R} /condmode auto|fast|balanced")
+        return COMMAND_HANDLED
+
+    mode = str(args[0]).strip().lower()
+    if mode not in valid:
+        print(f"  {C.WARN}⚠{C.R}  Invalid mode: {mode}. Use auto, fast, or balanced.")
+        return COMMAND_HANDLED
+
+    session.condition_mode = mode
+    labels = {
+        "auto": "No forced condition strategy (agent default behavior).",
+        "fast": "Bias condition requests toward fast similarity-only condition analysis.",
+        "balanced": "Bias condition requests toward balanced 4-mode condition analysis.",
+    }
+    print(f"  {C.OK}✓{C.R}  Condition mode set to {C.BOLD}{mode}{C.R}")
+    print(f"  {C.META}{labels[mode]}{C.R}")
     return COMMAND_HANDLED
 
 
@@ -231,6 +268,7 @@ def _cmd_session(session: ReplSession, registry: CommandRegistry, raw: str, args
                 provider=session.provider,
                 verbose=session.verbose,
                 plan_mode=session.plan_mode,
+                condition_mode=session.condition_mode,
             )
         except Exception as exc:
             print(f"  {C.ERR}✗{C.R}  Failed to save session: {exc}")
@@ -283,10 +321,14 @@ def _cmd_session(session: ReplSession, registry: CommandRegistry, raw: str, args
                 )
 
         session.history = list(data.get("history", []))
+        session.condition_mode = str(data.get("condition_mode") or session.condition_mode or "auto").lower()
+        if session.condition_mode not in {"auto", "fast", "balanced"}:
+            session.condition_mode = "auto"
         print(
             f"  {C.OK}✓{C.R}  Session loaded: {C.DIM}{name}{C.R}  "
             f"{C.META}{len(session.history)} messages{C.R}"
         )
+        print(f"  {C.META}Condition mode:{C.R} {C.BOLD}{session.condition_mode}{C.R}")
         return COMMAND_HANDLED
 
     print(f"  {C.WARN}⚠{C.R}  Unknown /session subcommand: {sub}")

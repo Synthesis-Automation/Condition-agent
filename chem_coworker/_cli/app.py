@@ -620,12 +620,51 @@ def _create_repl_session(
         provider=provider,
         verbose=verbose,
         plan_mode=plan_mode,
+        condition_mode="auto",
         history=[],
         tool_registry=tool_registry,
         ui=ui,
         create_coworker=lambda m, p, v, pm: _init_coworker(m, p, v, pm, ui),
         save_default_config=save_config,
     )
+
+
+def _is_condition_like_query(query: str) -> bool:
+    text = str(query or "").lower()
+    keywords = (
+        "condition",
+        "conditions",
+        "catalyst",
+        "ligand",
+        "base",
+        "solvent",
+        "temperature",
+        "reagent screen",
+        "hte",
+    )
+    return any(k in text for k in keywords)
+
+
+def _apply_condition_mode_hint(query: str, condition_mode: str) -> str:
+    mode = str(condition_mode or "auto").strip().lower()
+    if mode not in {"auto", "fast", "balanced"}:
+        mode = "auto"
+    if mode == "auto" or not _is_condition_like_query(query):
+        return query
+
+    if mode == "balanced":
+        hint = (
+            "[REPL condition mode preference: For condition recommendations, use "
+            "condition_strategy='balanced' (cross-source analysis across literature, motif, "
+            "similarity, and rules) unless the user explicitly asks for a single source.]"
+        )
+    else:
+        hint = (
+            "[REPL condition mode preference: For condition recommendations, prefer fast mode by "
+            "using condition_strategy='single' with condition_source_mode='similarity' unless the "
+            "user explicitly asks for balanced/all-source analysis.]"
+        )
+    return f"{query}\n\n{hint}"
 
 
 def main(argv: Optional[List[str]] = None) -> None:
@@ -667,7 +706,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     plan_mode = args.plan
     provider_color = _provider_color(provider)
     print(f"\n  {C.META}Using{C.R}  {C.BOLD}{model}{C.R}  {provider_color}{provider}{C.R}")
-    print(f"  {C.META}Type{C.R}  {C.DIM}/help · /model · /plan · /verbose · /settings · exit{C.R}")
+    print(f"  {C.META}Type{C.R}  {C.DIM}/help · /model · /plan · /verbose · /condmode · /settings · exit{C.R}")
 
     print(f"\n  {C.META}Examples:{C.R}")
     examples = [
@@ -718,7 +757,8 @@ def main(argv: Optional[List[str]] = None) -> None:
 
         ui.reset_for_query()
         try:
-            response, session.history = session.coworker.chat(query, session.history)
+            query_for_agent = _apply_condition_mode_hint(query, session.condition_mode)
+            response, session.history = session.coworker.chat(query_for_agent, session.history)
         except Exception as exc:
             ui.stop_transient_ui()
             print(f"\n  {C.ERR}✗{C.R}  {exc}")

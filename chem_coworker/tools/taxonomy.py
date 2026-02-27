@@ -70,6 +70,7 @@ search_reaction_types_tool = ToolPlugin(
     description="Search the reaction taxonomy by keyword (e.g. 'C-N coupling amine aryl halide'). Run AFTER analyze_bond_changes.",
     prerequisites=["analyze_bond_changes"],
     fn=_search_reaction_types,
+    llm_exposed=False,
 )
 
 search_reaction_types_tool.structured_projection = _project_search_reaction_types
@@ -112,6 +113,7 @@ search_motifs_tool = ToolPlugin(
     description="Search compound motif labels (e.g. scaffold='Ar', substituent='Br' → 'Ar-Br'). Useful for taxonomy and classification.",
     prerequisites=[],
     fn=_search_motifs,
+    llm_exposed=False,
 )
 
 

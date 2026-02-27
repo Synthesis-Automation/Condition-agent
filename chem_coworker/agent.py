@@ -1133,10 +1133,15 @@ class ChemCoworker:
 
         return "\n".join(lines)
 
-    def _build_native_tools(self) -> List[Any]:
-        """Build LangChain StructuredTool objects from all registered ToolPlugins."""
+    def _build_native_tools(self, workflow: Optional[WorkflowDefinition] = None) -> List[Any]:
+        """Build LangChain StructuredTool objects for the workflow's LLM-visible subset."""
+        include_names = list(workflow.llm_visible_tools) if (workflow and workflow.llm_visible_tools) else None
         tools = []
-        for name, plugin in self.registry._plugins.items():
+        for name in self.registry.filtered_names(
+            llm_exposed_only=True,
+            include_names=include_names,
+        ):
+            plugin = self.registry._plugins[name]
             try:
                 tools.append(plugin.to_langchain_tool())
             except Exception as exc:
@@ -1176,7 +1181,7 @@ class ChemCoworker:
         native_system = workflow.system_prompt
         max_iterations = workflow.max_iterations
 
-        native_tools = self._build_native_tools()
+        native_tools = self._build_native_tools(workflow)
         if not native_tools:
             logger.warning("[ChemCoworker] No native tools built — falling back to knowledge-only")
             return {}, "", 0.5, [], 0, "", []
@@ -1492,6 +1497,11 @@ class ChemCoworker:
 
         # Reaction typing confidence and taxonomy grounding
         rtype = tool_results.get("detect_reaction_type")
+        if not (isinstance(rtype, dict) and rtype.get("success")):
+            ar = tool_results.get("analyze_reaction")
+            nested = (ar or {}).get("reaction_type") if isinstance(ar, dict) else None
+            if isinstance(nested, dict) and nested.get("success"):
+                rtype = nested
         if isinstance(rtype, dict) and rtype.get("success"):
             det_conf = _coerce_num(rtype.get("confidence"))
             if det_conf is not None:
@@ -1509,6 +1519,11 @@ class ChemCoworker:
 
         # Bond-change / mapping support
         bchg = tool_results.get("analyze_bond_changes")
+        if not (isinstance(bchg, dict) and bchg.get("success")):
+            ar = tool_results.get("analyze_reaction")
+            nested = (ar or {}).get("bond_changes") if isinstance(ar, dict) else None
+            if isinstance(nested, dict) and nested.get("success"):
+                bchg = nested
         if isinstance(bchg, dict) and bchg.get("success"):
             map_conf = _coerce_num(bchg.get("mapping_confidence"))
             if map_conf is not None:
@@ -1526,6 +1541,11 @@ class ChemCoworker:
 
         # Condition recommendation support quality (if relevant)
         cond = tool_results.get("recommend_conditions")
+        if not (isinstance(cond, dict) and cond.get("success")):
+            ar = tool_results.get("analyze_reaction")
+            nested = (ar or {}).get("conditions") if isinstance(ar, dict) else None
+            if isinstance(nested, dict) and nested.get("success"):
+                cond = nested
         if isinstance(cond, dict) and cond.get("success"):
             recs = cond.get("recommendations") or []
             if recs:

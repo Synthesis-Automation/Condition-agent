@@ -307,13 +307,24 @@ class TerminalUI:
         new_groups = [g for g in new_groups if g]
         return dataclasses.replace(plan, groups=new_groups)
 
-    def print_settings(self, model: str, provider: str, verbose: bool, plan_mode: bool) -> None:
+    def print_settings(
+        self,
+        model: str,
+        provider: str,
+        verbose: bool,
+        plan_mode: bool,
+        condition_mode: str = "auto",
+    ) -> None:
         provider_color = C.CYAN if provider == "openai" else C.MAGENTA
         print()
         print(label("◆", "Current Settings"))
         print(f"  {C.META}Model   {C.R}  {C.BOLD}{model}{C.R}  {provider_color}{provider}{C.R}")
         print(f"  {C.META}Verbose {C.R}  {C.OK if verbose else C.DIM}{'on' if verbose else 'off'}{C.R}")
         print(f"  {C.META}Plan    {C.R}  {C.OK if plan_mode else C.DIM}{'on' if plan_mode else 'off'}{C.R}")
+        print(f"  {C.META}Cond    {C.R}  {C.BOLD}{condition_mode}{C.R}")
         print(f"  {C.META}Config  {C.R}  {C.DIM}{CONFIG_PATH}{C.R}")
         print()
-        print(f"  {C.DIM}Commands: /help · /model · /plan · /verbose · /tools · /compact · /session · /settings{C.R}")
+        print(
+            f"  {C.DIM}Commands: /help · /model · /plan · /verbose · /condmode · "
+            f"/tools · /compact · /session · /settings{C.R}"
+        )

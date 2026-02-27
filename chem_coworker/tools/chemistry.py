@@ -95,6 +95,7 @@ normalize_reaction_tool = ToolPlugin(
     description="Parse and canonicalize a reaction SMILES or molecule SMILES. Always run this first for any SMILES input.",
     prerequisites=[],
     fn=_normalize_reaction,
+    llm_exposed=False,
 )
 
 
@@ -297,6 +298,7 @@ analyze_bond_changes_tool = ToolPlugin(
     fn=_analyze_bond_changes,
     provides=["bonds_broken", "bonds_formed", "key_bond_type", "mapping_confidence"],
     validators=[],
+    llm_exposed=False,
 )
 
 

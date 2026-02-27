@@ -18,7 +18,7 @@ Adding a new tool:
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Sequence
 
 from ._base import ToolPlugin
 
@@ -47,9 +47,59 @@ class ToolRegistry:
     def names(self) -> List[str]:
         return list(self._plugins.keys())
 
-    def categories(self) -> Dict[str, List[str]]:
+    def filtered_names(
+        self,
+        *,
+        llm_exposed_only: bool = False,
+        include_names: Optional[Sequence[str]] = None,
+        exclude_names: Optional[Sequence[str]] = None,
+    ) -> List[str]:
+        """Return tool names after applying registry-level filters."""
+        return self._select_plugin_names(
+            llm_exposed_only=llm_exposed_only,
+            include_names=include_names,
+            exclude_names=exclude_names,
+        )
+
+    def _select_plugin_names(
+        self,
+        *,
+        llm_exposed_only: bool = False,
+        include_names: Optional[Sequence[str]] = None,
+        exclude_names: Optional[Sequence[str]] = None,
+    ) -> List[str]:
+        include_list = list(include_names or [])
+        include_set = set(include_list)
+        exclude_set = set(exclude_names or [])
+        selected: List[str] = []
+        ordered_names = include_list if include_list else list(self._plugins.keys())
+        for name in ordered_names:
+            plugin = self._plugins.get(name)
+            if plugin is None:
+                continue
+            if llm_exposed_only and not getattr(plugin, "llm_exposed", True):
+                continue
+            if include_set and name not in include_set:
+                continue
+            if name in exclude_set:
+                continue
+            selected.append(name)
+        return selected
+
+    def categories(
+        self,
+        *,
+        llm_exposed_only: bool = False,
+        include_names: Optional[Sequence[str]] = None,
+        exclude_names: Optional[Sequence[str]] = None,
+    ) -> Dict[str, List[str]]:
         cats: Dict[str, List[str]] = defaultdict(list)
-        for name, p in self._plugins.items():
+        for name in self._select_plugin_names(
+            llm_exposed_only=llm_exposed_only,
+            include_names=include_names,
+            exclude_names=exclude_names,
+        ):
+            p = self._plugins[name]
             cats[p.category].append(name)
         return dict(cats)
 
@@ -57,10 +107,21 @@ class ToolRegistry:
         """Return {name: fn} dict for direct tool execution (no LangChain)."""
         return {name: p.fn for name, p in self._plugins.items()}
 
-    def get_langchain_tools(self) -> List[Any]:
-        """Return all LangChain @tool objects (for LangGraph integration)."""
+    def get_langchain_tools(
+        self,
+        *,
+        llm_exposed_only: bool = False,
+        include_names: Optional[Sequence[str]] = None,
+        exclude_names: Optional[Sequence[str]] = None,
+    ) -> List[Any]:
+        """Return LangChain @tool objects, optionally filtered for LLM exposure."""
         tools = []
-        for p in self._plugins.values():
+        for name in self._select_plugin_names(
+            llm_exposed_only=llm_exposed_only,
+            include_names=include_names,
+            exclude_names=exclude_names,
+        ):
+            p = self._plugins[name]
             if p.langchain_tool is not None:
                 tools.append(p.langchain_tool)
         return tools
@@ -125,12 +186,23 @@ class ToolRegistry:
     # Prompt generation
     # ------------------------------------------------------------------
 
-    def describe_tools(self) -> str:
-        """Auto-generate the tool descriptions block for REASON_PROMPT."""
+    def describe_tools(
+        self,
+        *,
+        llm_exposed_only: bool = False,
+        include_names: Optional[Sequence[str]] = None,
+        exclude_names: Optional[Sequence[str]] = None,
+    ) -> str:
+        """Auto-generate a grouped tool-description block, optionally filtered."""
         lines = []
-        for cat, names in sorted(self.categories().items()):
+        categories = self.categories(
+            llm_exposed_only=llm_exposed_only,
+            include_names=include_names,
+            exclude_names=exclude_names,
+        )
+        for cat, names in sorted(categories.items()):
             lines.append(f"\n[{cat.upper()}]")
-            for name in names:
+            for name in sorted(names):
                 p = self._plugins[name]
                 prereq_note = ""
                 if p.prerequisites:
@@ -168,14 +240,63 @@ from .name_resolver import NAME_RESOLVER_TOOLS
 from .reaction_eval import EVAL_TOOLS
 from .molecular_features import MOLECULAR_FEATURE_TOOLS
 from .forward_synthesis import FORWARD_SYNTHESIS_TOOLS
+from .composite import COMPOSITE_TOOLS
 
 for _plugin in (
     CHEMISTRY_TOOLS + TAXONOMY_TOOLS + CONDITIONS_TOOLS
     + REAGENT_TOOLS + LITERATURE_TOOLS + NOTES_TOOLS
     + RETROSYNTHESIS_TOOLS + NAME_RESOLVER_TOOLS + EVAL_TOOLS
-    + MOLECULAR_FEATURE_TOOLS + FORWARD_SYNTHESIS_TOOLS
+    + MOLECULAR_FEATURE_TOOLS + FORWARD_SYNTHESIS_TOOLS + COMPOSITE_TOOLS
 ):
     REGISTRY.register(_plugin)
+
+
+# ---------------------------------------------------------------------------
+# Default LLM exposure profile (facade-first)
+# ---------------------------------------------------------------------------
+#
+# Keep all tools registered and executable, but hide most legacy primitive tools
+# from the default LLM/public view. Workflow-specific allowlists already curate
+# the actual task-time tool surface; this primarily reduces /tools noise and
+# accidental exposure in generic contexts.
+_HIDE_FROM_LLM_BY_DEFAULT = {
+    # Primitive support tools replaced by composite facades
+    "resolve_to_smiles",
+    "smiles_to_info",
+    "lookup_reagent",
+    "list_reagents_by_role",
+    "search_literature",
+    "fetch_webpage",
+    "read_literature_source",
+    "read_notes",
+    "search_notes",
+    "list_notes",
+    # Primitive reaction analysis / validation replaced by facades
+    "detect_reaction_type",
+    "inspect_functional_groups",
+    "get_molecular_descriptors",
+    "recommend_conditions",
+    "evaluate_reaction",
+    "check_retro_consistency",
+    # Primitive retrosynthesis steps replaced by retrosynthesis_step facade
+    "inspect_target",
+    "identify_retrons",
+    "generate_disconnections",
+    "find_retro_precedent",
+    "search_hte_precedent",
+    # Primitive forward synthesis steps replaced by forward_synthesis_step facade
+    "inspect_reactants",
+    "identify_reactions",
+    "generate_products",
+    "rank_products",
+    "find_forward_precedent",
+    "search_reactant_precedent",
+    "recommend_forward_conditions",
+}
+
+for _name in _HIDE_FROM_LLM_BY_DEFAULT:
+    if _name in REGISTRY._plugins:
+        REGISTRY._plugins[_name].llm_exposed = False
 
 # ---------------------------------------------------------------------------
 # Convenience: flat list of all registered ToolPlugin objects

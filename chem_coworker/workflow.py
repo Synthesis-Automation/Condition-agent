@@ -70,12 +70,16 @@ class WorkflowDefinition:
         Hard cap on native tool-loop iterations (default: 8).
     critic_step : optional
         CriticStep dataclass set in Phase 6; None until then.
+    llm_visible_tools : optional
+        Curated subset of registered tools exposed to the LLM for this workflow.
+        None means "all llm_exposed tools".
     """
     name: str
     system_prompt: str
     classifier_predicate: Callable[[str], bool]
     max_iterations: int = 8
     critic_step: Optional[CriticStep] = None  # populated in Phase 6
+    llm_visible_tools: Optional[List[str]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -148,6 +152,36 @@ def _build_workflow_registry() -> WorkflowRegistry:
     from .forward_prompts import NATIVE_FORWARD_SYSTEM_PROMPT
     from .prompts import NATIVE_SYSTEM_PROMPT
 
+    _COMPOSITE_SUPPORT_TOOLS = [
+        "resolve_chemical",
+        "reagent_assistant",
+        "search_knowledge",
+        "read_knowledge",
+    ]
+    _SPECIALIST_ANALYSIS_TOOLS = [
+        "featurize_molecule",
+        "assess_snar_feasibility",
+    ]
+    _RETRO_FACADE_AND_SPECIALISTS = [
+        "retrosynthesis_step",
+        "plan_route",
+        "apply_hte_templates",
+        "search_by_product_similarity",
+        "validate_synthesis_proposal",
+    ]
+    _FORWARD_FACADE_AND_SPECIALISTS = [
+        "forward_synthesis_step",
+        "plan_forward_route",
+        "validate_synthesis_proposal",
+        "featurize_molecule",
+    ]
+    _GENERAL_FACADE_AND_SPECIALISTS = [
+        "analyze_reaction",
+        "validate_synthesis_proposal",
+        "featurize_molecule",
+        "assess_snar_feasibility",
+    ]
+
     registry = WorkflowRegistry()
 
     registry.register(
@@ -157,6 +191,7 @@ def _build_workflow_registry() -> WorkflowRegistry:
             classifier_predicate=lambda t: t == "retrosynthesis",
             max_iterations=10,
             critic_step=CriticStep(enabled=True, max_findings=5, min_severity="warning"),
+            llm_visible_tools=list(dict.fromkeys(_RETRO_FACADE_AND_SPECIALISTS + _COMPOSITE_SUPPORT_TOOLS)),
         )
     )
 
@@ -167,6 +202,7 @@ def _build_workflow_registry() -> WorkflowRegistry:
             classifier_predicate=lambda t: t == "forward_synthesis",
             max_iterations=8,
             critic_step=None,
+            llm_visible_tools=list(dict.fromkeys(_FORWARD_FACADE_AND_SPECIALISTS + _COMPOSITE_SUPPORT_TOOLS)),
         )
     )
 
@@ -177,6 +213,7 @@ def _build_workflow_registry() -> WorkflowRegistry:
             classifier_predicate=lambda t: True,   # catch-all fallback
             max_iterations=8,
             critic_step=None,
+            llm_visible_tools=list(dict.fromkeys(_GENERAL_FACADE_AND_SPECIALISTS + _COMPOSITE_SUPPORT_TOOLS)),
         ),
         is_fallback=True,
     )
