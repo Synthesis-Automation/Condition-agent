@@ -2005,7 +2005,9 @@ def _apply_intramolecular_boost(
         col = "Is_Intramolecular"
     else:
         return
-    mask = df[col].fillna(False).astype(bool)
+    series = df[col]
+    # Avoid fillna() downcast warnings on object dtype while keeping NaN -> False behavior.
+    mask = series.notna() & series.astype(bool)
     if "match_score" in df.columns:
         df.loc[mask, "match_score"] = df.loc[mask, "match_score"] * _INTRAMOLECULAR_MATCH_BOOST
 

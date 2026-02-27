@@ -90,7 +90,7 @@ def _recommend_conditions_with_strategy(
     condition_strategy: str = "auto",
     condition_source_mode: str = "",
 ) -> Dict[str, Any]:
-    """Run recommend_conditions in single-source or balanced multi-source mode."""
+    """Run recommend_conditions in single-source or full multi-source mode."""
     from .conditions import _recommend_conditions
 
     top_k = max(1, min(int(top_k or 5), 10))
@@ -99,14 +99,16 @@ def _recommend_conditions_with_strategy(
     if source_mode == "all":
         source_mode = ""
 
-    if strategy not in {"auto", "single", "balanced"}:
-        return _error("condition_strategy must be one of: auto, single, balanced")
+    if strategy not in {"auto", "single", "full", "balanced"}:
+        return _error("condition_strategy must be one of: auto, single, full")
+    if strategy == "balanced":
+        strategy = "full"
     if source_mode and source_mode not in _CONDITION_SOURCE_MODES:
         return _error("condition_source_mode must be one of: literature, motif, similarity, rules, all")
 
-    # Auto defaults to balanced only when the caller did not pin a single source.
+    # Auto defaults to full only when the caller did not pin a single source.
     if strategy == "auto":
-        strategy = "single" if source_mode else "balanced"
+        strategy = "single" if source_mode else "full"
 
     if strategy == "single":
         result = _recommend_conditions(
@@ -121,7 +123,7 @@ def _recommend_conditions_with_strategy(
             return out
         return _error("Unexpected recommend_conditions result")
 
-    # Balanced mode: run all four sources separately, then merge deterministically.
+    # Full mode: run all four sources separately, then merge deterministically.
     per_source: Dict[str, Dict[str, Any]] = {}
     merged: Dict[str, Dict[str, Any]] = {}
 
@@ -190,7 +192,8 @@ def _recommend_conditions_with_strategy(
         rec["source_consensus"] = list(row["sources"])
         rec["consensus_count"] = len(row["sources"])
         rec["ensemble_score"] = row["ensemble_score"]
-        rec["balanced_support_score"] = row["support_score"]
+        rec["full_support_score"] = row["support_score"]
+        rec["balanced_support_score"] = row["support_score"]  # backward-compatible alias
         recommendations.append(rec)
 
     source_counts = {
@@ -206,9 +209,9 @@ def _recommend_conditions_with_strategy(
     return _success({
         "reaction_smiles": reaction_smiles,
         "recommendations": recommendations,
-        "condition_strategy": "balanced",
-        "condition_source_mode": "balanced",
-        "source_group": "balanced",
+        "condition_strategy": "full",
+        "condition_source_mode": "full",
+        "source_group": "full",
         "per_source_results": per_source,
         "source_counts": source_counts,
         "consensus_summary": {
@@ -768,7 +771,7 @@ analyze_reaction_tool = ToolPlugin(
     description=(
         "High-level reaction analysis in one call: normalize reaction SMILES, detect taxonomy reaction type, "
         "inspect functional groups, analyze bond changes, and optionally recommend HTE-backed conditions. "
-        "For full cross-source condition analysis, set condition_strategy='balanced' to run literature, motif, "
+        "For full cross-source condition analysis, set condition_strategy='full' to run literature, motif, "
         "similarity, and rules modes separately, then merge into a consensus-ranked recommendation list. "
         "Use condition_source_mode to force a single source ('literature'|'motif'|'similarity'|'rules')."
     ),
@@ -783,7 +786,7 @@ retrosynthesis_step_tool = ToolPlugin(
     description=(
         "Single-step retrosynthesis facade: inspect target, identify retrons, generate disconnections, "
         "validate top proposals, and optionally suggest conditions and precedent. "
-        "For robust condition recommendations on the top disconnection, use condition_strategy='balanced' "
+        "For robust condition recommendations on the top disconnection, use condition_strategy='full' "
         "to compare literature/motif/similarity/rules and return a merged consensus ranking."
     ),
     prerequisites=[],
@@ -796,7 +799,7 @@ forward_synthesis_step_tool = ToolPlugin(
     description=(
         "Single-step forward synthesis facade: inspect reactants, identify compatible reactions, generate and rank products, "
         "and optionally suggest conditions and precedent. "
-        "Supports condition_strategy='balanced' for cross-source condition analysis (literature, motif, "
+        "Supports condition_strategy='full' for cross-source condition analysis (literature, motif, "
         "similarity, rules) merged into a consensus-ranked output."
     ),
     prerequisites=[],

@@ -139,6 +139,8 @@ def _normalize_strategy_label(value: Any) -> str:
     aliases = {
         "balanced": RUN_ALL_SOURCE_SENTINEL,
         "balanced (all 4 modes)": RUN_ALL_SOURCE_SENTINEL,
+        "full": RUN_ALL_SOURCE_SENTINEL,
+        "full (all 4 modes)": RUN_ALL_SOURCE_SENTINEL,
         "all 4 modes": RUN_ALL_SOURCE_SENTINEL,
         "all modes": RUN_ALL_SOURCE_SENTINEL,
         "run all": RUN_ALL_SOURCE_SENTINEL,
@@ -556,7 +558,7 @@ class RecommendationWorker(QtCore.QObject):
                 if precedent_recs:
                     merged_by_source["precedent"] = _dedupe_recommendations(precedent_recs)
 
-        # Ensure balanced mode includes the exact same similarity retrieval path
+        # Ensure full mode includes the exact same similarity retrieval path
         # as standalone similarity mode.
         similarity_result = self._run_similarity_only(
             recommender,
@@ -601,6 +603,43 @@ class RecommendationWorker(QtCore.QObject):
         product: Optional[str],
     ) -> Any:
         self.progress.emit("Running similarity recommendation ...")
+        # Keep full-mode similarity behavior aligned with standalone
+        # `strategy="similarity"` by using the same facade request path.
+        try:
+            from chemtools.recommend import RecommendationRequest
+            from chemtools.recommend.api import recommend as recommend_facade
+
+            dm = _get_cached_data_manager(self.db_path)
+            request = RecommendationRequest(
+                reaction_smiles=self.reaction_smiles,
+                strategy="similarity",
+                source_group="any",
+                top_k=self.top_k,
+                min_experiments=self.min_exp,
+                reaction_type_filter=self.reaction_filter or None,
+                catalyst_filter=self.catalyst_filter or None,
+                hte_db_path=self.db_path,
+                use_aryl_steric_electronic_weighting=self.use_aryl_weighting,
+                prefer_mixfp_for_similarity=self.prefer_mixfp_similarity,
+            )
+            run_result = recommend_facade(request, data_manager=dm)
+            result = getattr(run_result, "recommendation", None)
+            if result is not None:
+                source_map = _normalize_recommendations_by_source(
+                    getattr(result, "recommendations_by_source", {}) or {}
+                )
+                similarity_recs = _dedupe_recommendations(
+                    list(source_map.get("similarity") or source_map.get("precedent") or [])
+                )
+                if not similarity_recs:
+                    similarity_recs = _dedupe_recommendations(list(getattr(result, "recommendations", []) or []))
+                result.recommendations_by_source = {"similarity": similarity_recs}
+                result.recommendations = similarity_recs
+                return result
+        except Exception:
+            pass
+
+        # Fallback: direct recommender path.
         result = self._run_single(
             recommender,
             reactant_a,
@@ -715,7 +754,7 @@ class RecommendationWorker(QtCore.QObject):
             if normalized_strategy == RUN_ALL_SOURCE_SENTINEL:
                 if self.source_override:
                     self.progress.emit(
-                        "Balanced mode ignores Source Override and runs literature + motif + rules + similarity."
+                        "Full mode ignores Source Override and runs literature + motif + rules + similarity."
                     )
                 recommender = _get_cached_recommender(self.db_path)
                 result = self._run_all_recommendations(recommender, reactant_a, reactant_b, product)
@@ -870,17 +909,17 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.strategy_combo = QtWidgets.QComboBox()
         self.strategy_combo.addItems(
             [
-                "Balanced (all 4 modes)",
+                "Full (all 4 modes)",
                 "motif",
                 "rules",
                 "literature",
                 "similarity",
             ]
         )
-        self.strategy_combo.setCurrentText("Balanced (all 4 modes)")
+        self.strategy_combo.setCurrentText("Full (all 4 modes)")
         self.strategy_combo.setToolTip(
             "Recommendation mode / strategy.\n"
-            "Balanced (all 4 modes): run literature + motif + rules + similarity and show source-specific tabs.\n"
+            "Full (all 4 modes): run literature + motif + rules + similarity and show source-specific tabs.\n"
             "motif/rules/literature/similarity: run a single strategy directly."
         )
 
@@ -896,7 +935,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.source_group_combo.setCurrentText("Auto")
         self.source_group_combo.setToolTip(
             "Optional source override for single-strategy runs. "
-            "Balanced preset ignores this and uses its built-in source plan."
+            "Full preset ignores this and uses its built-in source plan."
         )
 
         self.aryl_weighting_check = QtWidgets.QCheckBox("Aryl steric/electronic weighting")
@@ -965,7 +1004,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self.kmn_worker: Optional["KMNRebuildWorker"] = None
         self._reaction_dialog: Optional[QtWidgets.QDialog] = None
         self._spectator_groups_summary: str = ""
-        self._strategy_label: str = "Balanced (all 4 modes)"
+        self._strategy_label: str = "Full (all 4 modes)"
         self._source_group_label: str = "Auto"
         self._aryl_weighting_enabled: bool = False
         self._prefer_mixfp_similarity_enabled: bool = True

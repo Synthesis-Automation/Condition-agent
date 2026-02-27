@@ -36,6 +36,25 @@ _TOOL_CALL_RESULTS_META_KEY = "_tool_call_results_by_id"
 _COMPACT_THRESHOLD  = 20   # total messages before triggering compaction
 _COMPACT_KEEP_RECENT = 6   # most-recent messages kept verbatim (= 3 full turns)
 
+
+def _conditions_cache_key(
+    *,
+    top_k: int,
+    source_group: str = "",
+    reaction_key_only: bool = False,
+    use_spectator_groups: bool = True,
+    prefer_mixfp_for_similarity: bool = False,
+    similarity_mixfp_weight: float = 0.3,
+) -> str:
+    return (
+        f"top_k={int(top_k)}"
+        f"|source_group={str(source_group or '').strip().lower()}"
+        f"|reaction_key_only={1 if reaction_key_only else 0}"
+        f"|use_spectator_groups={1 if use_spectator_groups else 0}"
+        f"|prefer_mixfp_for_similarity={1 if prefer_mixfp_for_similarity else 0}"
+        f"|similarity_mixfp_weight={float(similarity_mixfp_weight):.4f}"
+    )
+
 # Local imports (no circular dependency — these modules don't import agent.py)
 from .response import ChemResponse  # noqa: E402
 from .plan import ExecutionPlan     # noqa: E402
@@ -52,7 +71,7 @@ class ReactionContext:
     bond_change_recommended: Optional[Dict[str, Any]] = None
     detect_reaction_type_result: Optional[Dict[str, Any]] = None
     analyze_bond_changes_result: Optional[Dict[str, Any]] = None
-    conditions_results_by_top_k: Dict[int, Dict[str, Any]] = field(default_factory=dict)
+    conditions_results_by_top_k: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     reaction_type_candidates: List[Any] = field(default_factory=list)
     motif_evidence: Dict[str, Any] = field(default_factory=dict)
     fg_profile: Dict[str, Any] = field(default_factory=dict)
@@ -88,16 +107,34 @@ class _ToolRuntimeContext:
         rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
         return self.agent._analyze_bond_changes_from_context(rxn_ctx)
 
-    def get_cached_conditions(self, reaction_smiles: str, top_k: int) -> Optional[Dict[str, Any]]:
+    def get_cached_conditions(
+        self,
+        reaction_smiles: str,
+        top_k: int,
+        cache_key: str = "",
+    ) -> Optional[Dict[str, Any]]:
         rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        key = str(cache_key or "").strip() or _conditions_cache_key(top_k=int(top_k))
         with rxn_ctx._lock:
-            cached = rxn_ctx.conditions_results_by_top_k.get(int(top_k))
+            cached = rxn_ctx.conditions_results_by_top_k.get(key)
+            if cached is None:
+                # Legacy fallback for pre-keyed cache entries within the same run.
+                cached = rxn_ctx.conditions_results_by_top_k.get(str(int(top_k)))
+            if cached is None:
+                cached = rxn_ctx.conditions_results_by_top_k.get(int(top_k))
         return self.agent._copy_result(cached) if cached is not None else None
 
-    def set_cached_conditions(self, reaction_smiles: str, top_k: int, result: Dict[str, Any]) -> None:
+    def set_cached_conditions(
+        self,
+        reaction_smiles: str,
+        top_k: int,
+        result: Dict[str, Any],
+        cache_key: str = "",
+    ) -> None:
         rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        key = str(cache_key or "").strip() or _conditions_cache_key(top_k=int(top_k))
         with rxn_ctx._lock:
-            rxn_ctx.conditions_results_by_top_k[int(top_k)] = self.agent._copy_result(result)
+            rxn_ctx.conditions_results_by_top_k[key] = self.agent._copy_result(result)
 
     def get_cached_molecule_result(self, cache_name: str, smiles: str) -> Optional[Dict[str, Any]]:
         key = str(smiles or "").strip()
@@ -481,15 +518,45 @@ class ChemCoworker:
             ctx = self._get_or_create_reaction_context(run_state, reaction_smiles)
             return self._analyze_bond_changes_from_context(ctx)
 
-        def _conditions_wrapper(*, reaction_smiles: str, top_k: int = 5) -> Any:
+        def _conditions_wrapper(
+            *,
+            reaction_smiles: str,
+            top_k: int = 5,
+            source_group: str = "",
+            reaction_key_only: bool = False,
+            use_spectator_groups: bool = True,
+            prefer_mixfp_for_similarity: bool = False,
+            similarity_mixfp_weight: float = 0.3,
+        ) -> Any:
             ctx = self._get_or_create_reaction_context(run_state, reaction_smiles)
             tk = int(top_k)
+            cache_key = _conditions_cache_key(
+                top_k=tk,
+                source_group=source_group,
+                reaction_key_only=reaction_key_only,
+                use_spectator_groups=use_spectator_groups,
+                prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+                similarity_mixfp_weight=similarity_mixfp_weight,
+            )
             with ctx._lock:
+                if cache_key in ctx.conditions_results_by_top_k:
+                    return self._copy_result(ctx.conditions_results_by_top_k[cache_key])
+                legacy_key = str(tk)
+                if legacy_key in ctx.conditions_results_by_top_k:
+                    return self._copy_result(ctx.conditions_results_by_top_k[legacy_key])
                 if tk in ctx.conditions_results_by_top_k:
                     return self._copy_result(ctx.conditions_results_by_top_k[tk])
-            result = base_callables["recommend_conditions"](reaction_smiles=reaction_smiles, top_k=top_k)
+            result = base_callables["recommend_conditions"](
+                reaction_smiles=reaction_smiles,
+                top_k=top_k,
+                source_group=source_group,
+                reaction_key_only=reaction_key_only,
+                use_spectator_groups=use_spectator_groups,
+                prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+                similarity_mixfp_weight=similarity_mixfp_weight,
+            )
             with ctx._lock:
-                ctx.conditions_results_by_top_k[tk] = self._copy_result(result)
+                ctx.conditions_results_by_top_k[cache_key] = self._copy_result(result)
             return self._copy_result(result)
 
         def _inspect_fg_wrapper(*, smiles: str) -> Any:

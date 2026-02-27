@@ -58,6 +58,25 @@ _HTE_DB_PATH = str(
 )
 
 
+def _conditions_cache_key(
+    *,
+    top_k: int,
+    source_group: str = "",
+    reaction_key_only: bool = False,
+    use_spectator_groups: bool = True,
+    prefer_mixfp_for_similarity: bool = False,
+    similarity_mixfp_weight: float = 0.3,
+) -> str:
+    return (
+        f"top_k={int(top_k)}"
+        f"|source_group={str(source_group or '').strip().lower()}"
+        f"|reaction_key_only={1 if reaction_key_only else 0}"
+        f"|use_spectator_groups={1 if use_spectator_groups else 0}"
+        f"|prefer_mixfp_for_similarity={1 if prefer_mixfp_for_similarity else 0}"
+        f"|similarity_mixfp_weight={float(similarity_mixfp_weight):.4f}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Tool: recommend_conditions
 # ---------------------------------------------------------------------------
@@ -112,24 +131,63 @@ def _recommend_conditions(
             _rtx = get_current_tool_runtime_context()
         except Exception:
             _rtx = None
+        cache_key = _conditions_cache_key(
+            top_k=int(top_k),
+            source_group=source_group,
+            reaction_key_only=bool(reaction_key_only),
+            use_spectator_groups=bool(use_spectator_groups),
+            prefer_mixfp_for_similarity=bool(prefer_mixfp_for_similarity),
+            similarity_mixfp_weight=float(similarity_mixfp_weight),
+        )
         if _rtx is not None and hasattr(_rtx, "get_cached_conditions"):
-            cached = _rtx.get_cached_conditions(reaction_smiles, int(top_k))
+            try:
+                cached = _rtx.get_cached_conditions(reaction_smiles, int(top_k), cache_key=cache_key)
+            except TypeError:
+                cached = _rtx.get_cached_conditions(reaction_smiles, int(top_k))
             if isinstance(cached, dict):
                 return cached
 
         from chemtools.recommend.hte_adapter import recommend_from_reaction
 
         reaction_smiles = _clean_rxn_smiles(reaction_smiles)
-        raw = recommend_from_reaction(
-            reaction_smiles,
-            k=max(top_k * 2, 25),
-            hte_db_path=_HTE_DB_PATH,
-            source_group=source_group or None,
-            reaction_key_only=reaction_key_only,
-            use_spectator_groups=use_spectator_groups,
-            prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
-            similarity_mixfp_weight=float(similarity_mixfp_weight),
-        )
+        normalized_source_group = str(source_group or "").strip().lower()
+        raw: Any = None
+        if normalized_source_group == "similarity":
+            # Align similarity behavior with the recommendation facade used by GUI full-mode.
+            try:
+                from chemtools.recommend import RecommendationRequest
+                from chemtools.recommend.api import recommend as recommend_facade
+
+                req = RecommendationRequest(
+                    reaction_smiles=reaction_smiles,
+                    strategy="similarity",
+                    source_group="any",
+                    top_k=max(top_k * 2, 25),
+                    min_experiments=1,
+                    hte_db_path=_HTE_DB_PATH,
+                    use_spectator_groups=use_spectator_groups,
+                    prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+                    similarity_mixfp_weight=float(similarity_mixfp_weight),
+                )
+                run_result = recommend_facade(req)
+                rec_obj = getattr(run_result, "recommendation", None)
+                facade_recs = [_to_jsonable(item) for item in list(getattr(rec_obj, "recommendations", []) or [])]
+                if facade_recs:
+                    raw = facade_recs
+            except Exception:
+                raw = None
+
+        if raw is None:
+            raw = recommend_from_reaction(
+                reaction_smiles,
+                k=max(top_k * 2, 25),
+                hte_db_path=_HTE_DB_PATH,
+                source_group=source_group or None,
+                reaction_key_only=reaction_key_only,
+                use_spectator_groups=use_spectator_groups,
+                prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+                similarity_mixfp_weight=float(similarity_mixfp_weight),
+            )
         if not raw:
             return _success({
                 "reaction_smiles": reaction_smiles,
@@ -160,6 +218,15 @@ def _recommend_conditions(
             # Conditions are nested in rec["conditions"] sub-dict
             cond = rec.get("conditions") or {}
             scores = rec.get("component_scores") or {}
+            confidence_val = rec.get("confidence")
+            if confidence_val is None:
+                confidence_val = rec.get("confidence_score", 0.0)
+            try:
+                confidence_num = float(confidence_val or 0.0)
+            except Exception:
+                confidence_num = 0.0
+            if confidence_num > 1.0:
+                confidence_num = confidence_num / 100.0
             entry = {
                 "rank":              rec.get("rank", i),
                 "catalyst":          cond.get("catalyst")          or rec.get("catalyst")          or "",
@@ -171,17 +238,17 @@ def _recommend_conditions(
                 "coupling_reagent":  cond.get("coupling_reagent")  or rec.get("coupling_reagent")  or "",
                 "temperature":       cond.get("temperature")       or rec.get("temperature")       or "",
                 "atmosphere":        cond.get("atmosphere")        or rec.get("atmosphere")        or "",
-                "confidence":        round(float(rec.get("confidence", 0.0)), 2),
-                "success_rate":      scores.get("success_rate"),
-                "avg_yield":         scores.get("avg_yield"),
-                "median_yield":      scores.get("median_yield"),
-                "match_score":       scores.get("match_score"),
-                "num_experiments":   int(scores.get("num_experiments", 0)),
-                "reaction_type":     rec.get("reaction") or "",
+                "confidence":        round(confidence_num, 2),
+                "success_rate":      scores.get("success_rate", rec.get("success_rate")),
+                "avg_yield":         scores.get("avg_yield", rec.get("avg_yield")),
+                "median_yield":      scores.get("median_yield", rec.get("median_yield")),
+                "match_score":       scores.get("match_score", rec.get("match_score")),
+                "num_experiments":   int(scores.get("num_experiments", rec.get("num_experiments", 0)) or 0),
+                "reaction_type":     rec.get("reaction") or rec.get("reaction_type") or "",
                 "reaction_category": rec.get("reaction_category") or "",
                 "reactant_types":    rec.get("reactant_types") or [],
-                "source":            rec.get("source") or "",
-                "precedent_ids":     rec.get("reaction_id") or "",
+                "source":            rec.get("source") or rec.get("source_group") or (source_group or ""),
+                "precedent_ids":     rec.get("reaction_id") or rec.get("precedent_ids") or "",
             }
             cleaned.append(entry)
 
@@ -197,7 +264,10 @@ def _recommend_conditions(
             "hte_recommender_stage_timing_ms": hte_recommender_stage_timing_ms or {},
         })
         if _rtx is not None and hasattr(_rtx, "set_cached_conditions"):
-            _rtx.set_cached_conditions(reaction_smiles, int(top_k), result)
+            try:
+                _rtx.set_cached_conditions(reaction_smiles, int(top_k), result, cache_key=cache_key)
+            except TypeError:
+                _rtx.set_cached_conditions(reaction_smiles, int(top_k), result)
         return result
     except Exception as exc:
         return _error(f"Condition recommendation failed: {exc}")
