@@ -102,6 +102,11 @@ class CriticAgent:
 
     def __init__(self, llm: Any):
         self.llm = llm
+        self.last_token_usage: Dict[str, int] = {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        }
 
     def review(
         self,
@@ -128,6 +133,12 @@ class CriticAgent:
             overall is a one-sentence verdict string.
         """
         from langchain_core.messages import SystemMessage, HumanMessage
+
+        self.last_token_usage = {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        }
 
         # Build a concise summary of tool evidence for the critic
         tool_summary_parts: List[str] = []
@@ -158,6 +169,7 @@ class CriticAgent:
 
         try:
             response = self.llm.invoke(messages)
+            self.last_token_usage = _extract_token_usage(response)
             raw = _extract_text(response)
         except Exception as exc:
             logger.warning(f"[CriticAgent] LLM call failed: {exc}")
@@ -181,6 +193,54 @@ def _extract_text(llm_response: Any) -> str:
             for item in content
         )
     return str(content)
+
+
+def _extract_token_usage(llm_response: Any) -> Dict[str, int]:
+    """Extract prompt/completion/total token usage from a LangChain response."""
+    prompt_tokens = 0
+    completion_tokens = 0
+    total_tokens = 0
+
+    candidate_dicts: List[Dict[str, Any]] = []
+    usage_metadata = getattr(llm_response, "usage_metadata", None)
+    if isinstance(usage_metadata, dict):
+        candidate_dicts.append(usage_metadata)
+
+    response_metadata = getattr(llm_response, "response_metadata", None)
+    if isinstance(response_metadata, dict):
+        for key in ("token_usage", "usage"):
+            value = response_metadata.get(key)
+            if isinstance(value, dict):
+                candidate_dicts.append(value)
+        candidate_dicts.append(response_metadata)
+
+    if isinstance(llm_response, dict):
+        candidate_dicts.append(llm_response)
+
+    for payload in candidate_dicts:
+        try:
+            prompt_tokens = max(
+                prompt_tokens,
+                int(payload.get("input_tokens") or 0),
+                int(payload.get("prompt_tokens") or 0),
+            )
+            completion_tokens = max(
+                completion_tokens,
+                int(payload.get("output_tokens") or 0),
+                int(payload.get("completion_tokens") or 0),
+            )
+            total_tokens = max(total_tokens, int(payload.get("total_tokens") or 0))
+        except Exception:
+            continue
+
+    if total_tokens == 0:
+        total_tokens = prompt_tokens + completion_tokens
+
+    return {
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "total_tokens": total_tokens,
+    }
 
 
 def _parse_critic_response(

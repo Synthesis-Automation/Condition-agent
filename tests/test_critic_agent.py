@@ -265,7 +265,7 @@ class TestRunCriticLoop:
         agent = _make_agent_with_mock_llm(response_text)
         critic_step = CriticStep(enabled=True, max_findings=3, min_severity="warning")
 
-        findings, verdict, calls = agent._run_critic_loop(
+        findings, verdict, calls, tokens = agent._run_critic_loop(
             query="target molecule synthesis",
             hypothesis="Wittig route",
             tool_results={},
@@ -275,6 +275,7 @@ class TestRunCriticLoop:
         assert len(findings) == 1
         assert calls == 1
         assert "needs care" in verdict
+        assert tokens["llm_calls"] == 1
 
     def test_critic_loop_llm_failure_returns_empty_findings(self):
         """When the LLM fails inside CriticAgent.review(), findings are empty.
@@ -284,7 +285,7 @@ class TestRunCriticLoop:
         agent.llm.invoke.side_effect = RuntimeError("network error")
         critic_step = CriticStep(enabled=True)
 
-        findings, verdict, calls = agent._run_critic_loop(
+        findings, verdict, calls, tokens = agent._run_critic_loop(
             query="q", hypothesis="h", tool_results={}, answer="a",
             critic_step=critic_step,
         )
@@ -293,6 +294,7 @@ class TestRunCriticLoop:
         assert "unavailable" in verdict.lower()
         # The LLM was invoked (and failed), so count is 1
         assert calls == 1
+        assert tokens["llm_calls"] == 1
 
     def test_critic_loop_emits_phase_events(self):
         from chem_coworker.workflow import CriticStep

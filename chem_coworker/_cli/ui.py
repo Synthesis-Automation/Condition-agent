@@ -209,6 +209,51 @@ class TerminalUI:
             print(f"  {C.META}⎿ (no tools called — answered from LLM knowledge){C.R}")
         print()
 
+    def _format_token_usage(
+        self,
+        *,
+        prompt_tokens: int,
+        completion_tokens: int,
+        total_tokens: int,
+        llm_calls: int,
+    ) -> str:
+        calls_text = f"{llm_calls} call{'s' if llm_calls != 1 else ''}"
+        if total_tokens > 0:
+            return (
+                f"{total_tokens:,} total "
+                f"({prompt_tokens:,} in / {completion_tokens:,} out) · {calls_text}"
+            )
+        return f"tokens unavailable · {calls_text}"
+
+    def _print_token_sections(self, response: "ChemResponse") -> None:
+        sections = [
+            section for section in (response.token_sections or [])
+            if int(section.get("llm_calls", 0) or 0) > 0 or int(section.get("total_tokens", 0) or 0) > 0
+        ]
+        if not sections and response.total_tokens <= 0:
+            return
+
+        print()
+        print(label("◷", "Tokens"))
+        for section in sections:
+            label_text = str(section.get("label") or section.get("name") or "Section")
+            usage_text = self._format_token_usage(
+                prompt_tokens=int(section.get("prompt_tokens", 0) or 0),
+                completion_tokens=int(section.get("completion_tokens", 0) or 0),
+                total_tokens=int(section.get("total_tokens", 0) or 0),
+                llm_calls=int(section.get("llm_calls", 0) or 0),
+            )
+            print(f"  {C.META}{label_text:<10}{C.R} {usage_text}")
+
+        if len(sections) > 1 or response.total_tokens > 0:
+            total_text = self._format_token_usage(
+                prompt_tokens=int(response.prompt_tokens or 0),
+                completion_tokens=int(response.completion_tokens or 0),
+                total_tokens=int(response.total_tokens or 0),
+                llm_calls=int(response.llm_calls or 0),
+            )
+            print(f"  {C.META}{'Total':<10}{C.R} {total_text}")
+
     def render_response(self, response: "ChemResponse", verbose: bool = False) -> None:
         """Render the final response (including streamed or non-streamed modes)."""
         if response.streamed:
@@ -246,12 +291,16 @@ class TerminalUI:
                 print(f"  {line}" if line.strip() else "")
             print(SEP_FAT)
 
+        self._print_token_sections(response)
+
         parts = [
             response.model,
             f"{response.elapsed_s:.1f}s",
             f"{response.llm_calls} LLM calls",
             f"{len(response.tools_called)} tools",
         ]
+        if response.total_tokens > 0:
+            parts.append(f"{response.total_tokens:,} tokens")
         print(f"  {C.META}{' · '.join(parts)}{C.R}")
 
         if response.warnings:

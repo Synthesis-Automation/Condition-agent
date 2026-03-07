@@ -61,6 +61,10 @@ class ChemResponse:
     provider: str = ""
     elapsed_s: float = 0.0
     llm_calls: int = 0
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
+    token_sections: List[Dict[str, Any]] = field(default_factory=list)
     compacted: bool = False   # True if conversation history was compacted this turn (A4)
     streamed: bool = False    # True if answer was written to stdout token-by-token
 
@@ -104,4 +108,6 @@ class ChemResponse:
         parts.append(f"conf={self.confidence:.2f}")
         parts.append(f"t={self.elapsed_s:.1f}s")
         parts.append(f"llm_calls={self.llm_calls}")
+        if self.total_tokens:
+            parts.append(f"tokens={self.total_tokens}")
         return " | ".join(parts)

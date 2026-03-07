@@ -622,7 +622,7 @@ class ChemCoworker:
         warnings: List[str] = []
         critic_findings: List[Any] = []
         chemistry_state = self._new_chemistry_run_state()
-        tool_results, hypothesis, confidence, tool_warnings, llm_calls_native, answer, _messages = \
+        tool_results, hypothesis, confidence, tool_warnings, llm_calls_native, answer, _messages, reason_tokens = \
             self._run_native_tool_loop(
                 query=query,
                 task_type=task_type,
@@ -633,6 +633,9 @@ class ChemCoworker:
             )
         warnings.extend(tool_warnings)
         llm_calls += llm_calls_native
+        token_sections: List[Dict[str, Any]] = []
+        if reason_tokens.get("llm_calls", 0) or reason_tokens.get("total_tokens", 0):
+            token_sections.append(reason_tokens)
 
         effective_plan = ExecutionPlan(
             hypothesis=hypothesis,
@@ -655,7 +658,7 @@ class ChemCoworker:
 
         # ── Step 5b: Critic pass (retrosynthesis only) ─────────────────
         if workflow.critic_step and workflow.critic_step.enabled:
-            critic_findings, critic_verdict, critic_calls = self._run_critic_loop(
+            critic_findings, critic_verdict, critic_calls, critic_tokens = self._run_critic_loop(
                 query=query,
                 hypothesis=hypothesis,
                 tool_results=tool_results,
@@ -663,12 +666,14 @@ class ChemCoworker:
                 critic_step=workflow.critic_step,
             )
             llm_calls += critic_calls
+            if critic_tokens.get("llm_calls", 0) or critic_tokens.get("total_tokens", 0):
+                token_sections.append(critic_tokens)
             for f in critic_findings:
                 warnings.append(f"[critic] {f.message}")
             if critic_findings:
                 # ── Step 5c: Revision pass — revise the answer to address findings
                 if workflow.critic_step.revision_pass:
-                    revised_answer, rev_calls = self._run_revision_pass(
+                    revised_answer, rev_calls, revision_tokens = self._run_revision_pass(
                         query=query,
                         original_answer=answer,
                         findings=critic_findings,
@@ -676,6 +681,8 @@ class ChemCoworker:
                     )
                     llm_calls += rev_calls
                     answer = revised_answer
+                    if revision_tokens.get("llm_calls", 0) or revision_tokens.get("total_tokens", 0):
+                        token_sections.append(revision_tokens)
                 # Append the critic's findings for transparency
                 finding_lines = "\n".join(str(f) for f in critic_findings)
                 answer += f"\n\n---\n🔍 **Critic review** (addressed above): {critic_verdict}\n{finding_lines}"
@@ -712,6 +719,9 @@ class ChemCoworker:
 
         # ── Build structured outputs ───────────────────────────────────
         structured = self._extract_structured(tool_results)
+        prompt_tokens = sum(int(section.get("prompt_tokens", 0) or 0) for section in token_sections)
+        completion_tokens = sum(int(section.get("completion_tokens", 0) or 0) for section in token_sections)
+        total_tokens = sum(int(section.get("total_tokens", 0) or 0) for section in token_sections)
 
         return ChemResponse(
             query=query,
@@ -728,6 +738,10 @@ class ChemCoworker:
             provider=self.provider,
             elapsed_s=round(elapsed, 2),
             llm_calls=llm_calls,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=total_tokens,
+            token_sections=token_sections,
             streamed=streamed,
         )
 
@@ -842,6 +856,84 @@ class ChemCoworker:
                     parts.append(item)
             return "\n".join(parts)
         return str(content)
+
+    @staticmethod
+    def _coerce_token_int(value: Any) -> int:
+        try:
+            return max(0, int(value or 0))
+        except Exception:
+            return 0
+
+    def _extract_token_usage(self, llm_response: Any) -> Dict[str, int]:
+        """Extract prompt/completion/total token usage from a LangChain response."""
+        prompt_tokens = 0
+        completion_tokens = 0
+        total_tokens = 0
+
+        candidate_dicts: List[Dict[str, Any]] = []
+        usage_metadata = getattr(llm_response, "usage_metadata", None)
+        if isinstance(usage_metadata, dict):
+            candidate_dicts.append(usage_metadata)
+
+        response_metadata = getattr(llm_response, "response_metadata", None)
+        if isinstance(response_metadata, dict):
+            for key in ("token_usage", "usage"):
+                value = response_metadata.get(key)
+                if isinstance(value, dict):
+                    candidate_dicts.append(value)
+            candidate_dicts.append(response_metadata)
+
+        if isinstance(llm_response, dict):
+            candidate_dicts.append(llm_response)
+
+        for payload in candidate_dicts:
+            prompt_tokens = max(
+                prompt_tokens,
+                self._coerce_token_int(payload.get("input_tokens")),
+                self._coerce_token_int(payload.get("prompt_tokens")),
+            )
+            completion_tokens = max(
+                completion_tokens,
+                self._coerce_token_int(payload.get("output_tokens")),
+                self._coerce_token_int(payload.get("completion_tokens")),
+            )
+            total_tokens = max(total_tokens, self._coerce_token_int(payload.get("total_tokens")))
+
+        if total_tokens == 0:
+            total_tokens = prompt_tokens + completion_tokens
+
+        return {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+        }
+
+    def _new_token_section(self, name: str, label: str) -> Dict[str, Any]:
+        return {
+            "name": name,
+            "label": label,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+            "llm_calls": 0,
+        }
+
+    def _accumulate_token_usage(
+        self,
+        section: Dict[str, Any],
+        usage_source: Any,
+        *,
+        llm_calls: int = 0,
+    ) -> None:
+        usage = self._extract_token_usage(usage_source) if usage_source is not None else {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        }
+        section["prompt_tokens"] = int(section.get("prompt_tokens", 0) or 0) + usage["prompt_tokens"]
+        section["completion_tokens"] = int(section.get("completion_tokens", 0) or 0) + usage["completion_tokens"]
+        section["total_tokens"] = int(section.get("total_tokens", 0) or 0) + usage["total_tokens"]
+        section["llm_calls"] = int(section.get("llm_calls", 0) or 0) + int(llm_calls or 0)
 
     def _format_tool_results(self, results: Dict[str, Any]) -> str:
         """Format tool results as readable text for the synthesis prompt."""
@@ -1237,7 +1329,7 @@ class ChemCoworker:
             is typically not needed (saves one LLM call)
 
         Returns:
-            (tool_results, hypothesis, confidence, warnings, llm_call_count, final_answer)
+            (tool_results, hypothesis, confidence, warnings, llm_call_count, final_answer, messages, token_usage)
             final_answer is non-empty when the model produced a text response after
             finishing all tool calls — caller can use it directly, skipping SYNTHESIZE.
         """
@@ -1251,7 +1343,7 @@ class ChemCoworker:
         native_tools = self._build_native_tools(workflow)
         if not native_tools:
             logger.warning("[ChemCoworker] No native tools built — falling back to knowledge-only")
-            return {}, "", 0.5, [], 0, "", []
+            return {}, "", 0.5, [], 0, "", [], self._new_token_section("reason", "Reasoning")
 
         llm_with_tools = self.llm.bind_tools(native_tools)
 
@@ -1276,6 +1368,7 @@ class ChemCoworker:
         warnings: List[str] = []
         llm_call_count = 0
         final_answer = ""
+        token_usage = self._new_token_section("reason", "Reasoning")
         callables = self.registry.get_callables()
         runtime_context = self._new_tool_runtime_context(chemistry_state) if chemistry_state is not None else None
 
@@ -1285,6 +1378,7 @@ class ChemCoworker:
             try:
                 response = llm_with_tools.invoke(messages)
                 llm_call_count += 1
+                self._accumulate_token_usage(token_usage, response, llm_calls=1)
             except Exception as exc:
                 logger.error(f"[ChemCoworker] Native tool loop iteration {iteration} failed: {exc}")
                 warnings.append(f"LLM call failed at iteration {iteration}: {exc}")
@@ -1392,6 +1486,7 @@ class ChemCoworker:
             try:
                 closing_response = llm_with_tools.invoke(messages)
                 llm_call_count += 1
+                self._accumulate_token_usage(token_usage, closing_response, llm_calls=1)
                 final_answer = self._get_text(closing_response) or ""
                 messages.append(closing_response)
                 if not hypothesis:
@@ -1403,7 +1498,7 @@ class ChemCoworker:
         if tool_results_by_call_id:
             tool_results[_TOOL_CALL_RESULTS_META_KEY] = tool_results_by_call_id
 
-        return tool_results, hypothesis, confidence, warnings, llm_call_count, final_answer, messages
+        return tool_results, hypothesis, confidence, warnings, llm_call_count, final_answer, messages, token_usage
 
     def _collect_caveats(
         self, tool_results: Dict[str, Any], existing_warnings: List[str]
@@ -1666,7 +1761,7 @@ class ChemCoworker:
         tool_results: Dict[str, Any],
         answer: str,
         critic_step: Any,
-    ) -> tuple:  # (List[Finding], str, int)
+    ) -> tuple:  # (List[Finding], str, int, Dict[str, Any])
         """
         Phase 6 — Run the adversarial critic pass for retrosynthesis workflows.
 
@@ -1674,12 +1769,13 @@ class ChemCoworker:
         structured findings plus a one-sentence verdict.
 
         Returns:
-            (findings, verdict, llm_call_count)
+            (findings, verdict, llm_call_count, token_usage)
             findings is a List[Finding]; verdict is a str; llm_call_count is int.
-            Returns ([], "", 0) on any failure so the main answer is unaffected.
+            Returns ([], "", 0, token_usage) on any failure so the main answer is unaffected.
         """
         from .critic import CriticAgent, Severity
 
+        token_usage = self._new_token_section("critic", "Critic")
         self.event_bus.emit(ChemEvent.PHASE_START, phase="critic")
         try:
             critic = CriticAgent(self.llm)
@@ -1692,14 +1788,19 @@ class ChemCoworker:
                 max_findings=critic_step.max_findings,
                 min_severity=min_sev,
             )
+            self._accumulate_token_usage(
+                token_usage,
+                getattr(critic, "last_token_usage", None),
+                llm_calls=1,
+            )
             if self.verbose:
                 logger.info(
                     f"[ChemCoworker] Critic: {len(findings)} finding(s); verdict={verdict[:80]!r}"
                 )
-            return findings, verdict, 1
+            return findings, verdict, 1, token_usage
         except Exception as exc:
             logger.warning(f"[ChemCoworker] Critic pass failed: {exc}")
-            return [], "", 0
+            return [], "", 0, token_usage
         finally:
             self.event_bus.emit(ChemEvent.PHASE_END, phase="critic")
 
@@ -1710,13 +1811,13 @@ class ChemCoworker:
         original_answer: str,
         findings: List[Any],  # List[Finding]
         critic_verdict: str,
-    ) -> tuple:  # (revised_answer: str, llm_call_count: int)
+    ) -> tuple:  # (revised_answer: str, llm_call_count: int, Dict[str, Any])
         """
         Phase 6b — Follow-up LLM call that revises the main answer to address
         the critic's findings.
 
         Returns:
-            (revised_answer, llm_call_count)
+            (revised_answer, llm_call_count, token_usage)
             On any failure returns (original_answer, 0) so the pipeline is
             unaffected.
         """
@@ -1741,6 +1842,7 @@ class ChemCoworker:
             f"into the answer naturally."
         )
 
+        token_usage = self._new_token_section("revision", "Revision")
         self.event_bus.emit(ChemEvent.PHASE_START, phase="revision")
         try:
             messages = [
@@ -1751,6 +1853,7 @@ class ChemCoworker:
                 HumanMessage(content=revision_prompt),
             ]
             response = self.llm.invoke(messages)
+            self._accumulate_token_usage(token_usage, response, llm_calls=1)
             content = getattr(response, "content", response)
             revised = content if isinstance(content, str) else str(content)
             if self.verbose:
@@ -1758,10 +1861,10 @@ class ChemCoworker:
                     f"[ChemCoworker] Revision pass complete "
                     f"({len(revised)} chars → was {len(original_answer)} chars)"
                 )
-            return revised, 1
+            return revised, 1, token_usage
         except Exception as exc:
             logger.warning(f"[ChemCoworker] Revision pass failed: {exc}")
-            return original_answer, 0
+            return original_answer, 0, token_usage
         finally:
             self.event_bus.emit(ChemEvent.PHASE_END, phase="revision")
 
