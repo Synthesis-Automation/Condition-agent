@@ -418,7 +418,7 @@ def _analyze_reaction(
     reaction_smiles: str,
     include_conditions: bool = True,
     conditions_top_k: int = 5,
-    include_notes: bool = True,
+    include_notes: bool = False,
     include_bond_changes: bool = True,
     condition_strategy: str = "auto",
     condition_source_mode: str = "",

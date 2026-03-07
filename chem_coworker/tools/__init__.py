@@ -271,6 +271,8 @@ _HIDE_FROM_LLM_BY_DEFAULT = {
     "read_notes",
     "search_notes",
     "list_notes",
+    "search_knowledge",
+    "read_knowledge",
     # Primitive reaction analysis / validation replaced by facades
     "detect_reaction_type",
     "inspect_functional_groups",

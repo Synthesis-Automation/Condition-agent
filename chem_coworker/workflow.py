@@ -155,8 +155,6 @@ def _build_workflow_registry() -> WorkflowRegistry:
     _COMPOSITE_SUPPORT_TOOLS = [
         "resolve_chemical",
         "reagent_assistant",
-        "search_knowledge",
-        "read_knowledge",
     ]
     _SPECIALIST_ANALYSIS_TOOLS = [
         "featurize_molecule",

@@ -27,7 +27,7 @@ import sys
 import time
 import warnings
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 warnings.filterwarnings("ignore", message="pkg_resources is deprecated", category=UserWarning)
 
@@ -41,7 +41,7 @@ try:
     from .config import CONFIG_PATH, load_config, save_config
     from .models import infer_provider, select_model_interactive
     from .renderers import render_ask_response, render_batch_failure, render_batch_success, render_batch_summary
-    from .style import C, SEP, SEP_FAT
+    from .style import C, SEP
     from .ui import TerminalUI
 except ImportError:
     # Support direct script execution: `python chem_coworker/_cli/app.py`
@@ -63,7 +63,7 @@ except ImportError:
         render_batch_success,
         render_batch_summary,
     )
-    from chem_coworker._cli.style import C, SEP, SEP_FAT
+    from chem_coworker._cli.style import C, SEP
     from chem_coworker._cli.ui import TerminalUI
 
 
@@ -278,165 +278,6 @@ def _cmd_setup(args: argparse.Namespace) -> None:  # noqa: ARG001
     print()
 
 
-def _cmd_intake(args: argparse.Namespace) -> None:
-    from chem_coworker.extractor import NotesExtractor
-    from chemtools.taxonomy.reaction_catalog import list_reaction_type_ids
-
-    output_format = getattr(args, "output_format", "plain")
-    if getattr(args, "list_reaction_types", False):
-        ids = list_reaction_type_ids()
-        if output_format == "json":
-            print(json.dumps({"reaction_type_ids": ids, "count": len(ids)}, ensure_ascii=False, indent=2))
-        else:
-            print()
-            print(f"  {C.LABEL}◆ Reaction Type Taxonomy{C.R}  {C.DIM}{len(ids)} entries{C.R}")
-            print(f"  {SEP}")
-            for rid in ids:
-                print(f"  {C.DIM}{rid}{C.R}")
-            print()
-        return
-
-    if not getattr(args, "source", None):
-        if output_format == "json":
-            print(json.dumps({"success": False, "error": "intake requires SOURCE unless --list-reaction-types is used"}))
-        else:
-            print(f"  {C.ERR}✗{C.R}  intake requires SOURCE unless --list-reaction-types is used")
-        sys.exit(2)
-
-    if args.model is not None:
-        model = args.model
-    else:
-        model = load_config()["name"]
-
-    extract_model = args.extract_model or model
-    extract_provider = args.extract_provider or infer_provider(extract_model)
-
-    note_type = getattr(args, "note_type", "reactions") or "reactions"
-
-    def _confirm_mismatch(payload: Dict[str, object]) -> bool:
-        if output_format == "json":
-            return False
-        print()
-        print(f"  {C.WARN}⚠{C.R}  {payload.get('message', 'Reaction type mismatch')}")
-        answer = input("  Proceed and write notes anyway? [y/N]: ").strip().lower()
-        return answer in {"y", "yes"}
-
-    t0 = time.time()
-    if output_format == "plain":
-        print()
-        print(f"  {C.LABEL}◆ ChemCoworker Intake{C.R}  {C.DIM}Document → Notes{C.R}")
-        print(f"  {SEP}")
-        if extract_model != model:
-            print(f"  {C.META}Extract model:{C.R}  {C.BOLD}{extract_model}{C.R}  {C.META}{extract_provider}{C.R}")
-        else:
-            print(f"  {C.META}Model:{C.R}  {C.BOLD}{extract_model}{C.R}  {C.META}{extract_provider}{C.R}")
-        print(f"  {C.META}Source:{C.R} {C.DIM}{args.source!r}{C.R}")
-        if args.reaction_type:
-            print(f"  {C.META}Hint:{C.R}   {C.DIM}{args.reaction_type}{C.R}")
-        print(f"  {C.META}Type:{C.R}   {C.DIM}{note_type}{C.R}")
-        if getattr(args, "dry_run", False):
-            print(f"  {C.META}Mode:{C.R}   {C.DIM}dry-run (no writes){C.R}")
-        print()
-
-        ui = TerminalUI()
-        spinner = ui.spinner("Extracting notes")
-        spinner.start()
-        try:
-            extractor = NotesExtractor(provider=extract_provider, model=extract_model, verbose=args.verbose)
-            result = extractor.intake(
-                source=args.source,
-                reaction_type=args.reaction_type or "",
-                note_type=note_type,
-                save_to_literature=not args.no_save,
-                mismatch_policy=getattr(args, "mismatch_policy", "warn"),
-                dry_run=bool(getattr(args, "dry_run", False)),
-                unknown_reaction_policy=getattr(args, "unknown_reaction_policy", "general"),
-                confirm_callback=_confirm_mismatch if getattr(args, "mismatch_policy", "warn") == "confirm" else None,
-            )
-        except Exception as exc:
-            spinner.stop()
-            print(f"  {C.ERR}✗{C.R}  {exc}")
-            sys.exit(1)
-        spinner.stop()
-    else:
-        try:
-            extractor = NotesExtractor(provider=extract_provider, model=extract_model, verbose=args.verbose)
-            result = extractor.intake(
-                source=args.source,
-                reaction_type=args.reaction_type or "",
-                note_type=note_type,
-                save_to_literature=not args.no_save,
-                mismatch_policy=getattr(args, "mismatch_policy", "warn"),
-                dry_run=bool(getattr(args, "dry_run", False)),
-                unknown_reaction_policy=getattr(args, "unknown_reaction_policy", "general"),
-                confirm_callback=_confirm_mismatch if getattr(args, "mismatch_policy", "warn") == "confirm" else None,
-            )
-        except Exception as exc:
-            print(json.dumps({"success": False, "error": str(exc)}, ensure_ascii=False))
-            sys.exit(1)
-
-    elapsed = time.time() - t0
-
-    if output_format == "json":
-        result = dict(result)
-        result["elapsed_s"] = round(elapsed, 3)
-        print(json.dumps(result, ensure_ascii=False, indent=2))
-        if not result.get("success"):
-            sys.exit(1)
-        return
-
-    if not result.get("success"):
-        print(f"  {C.ERR}✗{C.R}  {result.get('error', 'Unknown error')}")
-        for w in result.get("warnings", []):
-            print(f"  {C.WARN}⚠{C.R}  {w}")
-        sys.exit(1)
-
-    print(f"  {C.OK}✓{C.R}  Extracted {result['char_count']:,} chars  {C.META}{elapsed:.1f}s{C.R}")
-    print()
-
-    reaction_types = result.get("reaction_types", [])
-    if reaction_types:
-        types_str = ", ".join(reaction_types)
-        print(f"  {C.LABEL}◆ Reaction types (canonical){C.R}  {C.TOOL}{types_str}{C.R}")
-    elif result.get("quarantined"):
-        print(f"  {C.LABEL}◆ Reaction types (canonical){C.R}  {C.DIM}(none resolved; quarantined){C.R}")
-    else:
-        print(f"  {C.LABEL}◆ Reaction types (canonical){C.R}  {C.DIM}(none){C.R}")
-    if result.get("reaction_types_detected_raw"):
-        raw_detected = ", ".join(result["reaction_types_detected_raw"])
-        print(f"  {C.META}Detected raw:{C.R} {C.DIM}{raw_detected}{C.R}")
-    if result.get("reaction_types_unknown"):
-        unknown = ", ".join(result["reaction_types_unknown"])
-        print(f"  {C.META}Unknown labels:{C.R} {C.DIM}{unknown}{C.R}")
-    if result.get("reaction_type_suggestions"):
-        print(f"  {C.META}Suggestions:{C.R}")
-        for raw, suggestions in result["reaction_type_suggestions"].items():
-            if suggestions:
-                print(f"      {C.DIM}{raw} -> {', '.join(suggestions)}{C.R}")
-
-    if result.get("dry_run"):
-        print(f"  {C.LABEL}◆ Target note files (dry-run){C.R}")
-    elif result.get("quarantined"):
-        print(f"  {C.LABEL}◆ Quarantine file{C.R}")
-    else:
-        print(f"  {C.LABEL}◆ Notes written to{C.R}")
-    for nf in result["notes_files"]:
-        print(f"      {C.DIM}{nf}{C.R}")
-
-    for w in result.get("warnings", []):
-        print(f"  {C.WARN}⚠{C.R}  {w}")
-
-    if not args.quiet:
-        print()
-        print(SEP_FAT)
-        preview = result["extracted_notes"]
-        if len(preview) > 2000:
-            preview = preview[:2000] + f"\n\n{C.DIM}[… {len(result['extracted_notes']) - 2000} more chars …]{C.R}"
-        for line in preview.splitlines():
-            print(f"  {line}" if line.strip() else "")
-        print(SEP_FAT)
-
-
 def _build_parser() -> argparse.ArgumentParser:
     arg_parser = argparse.ArgumentParser(
         description="ChemCoworker — general-purpose chemistry AI agent",
@@ -447,8 +288,6 @@ Examples:
   python -m chem_coworker._cli.app --model gpt-5.2
   python -m chem_coworker._cli.app --model glm-5 --provider aliyun
   python -m chem_coworker._cli.app --verbose
-  python -m chem_coworker._cli.app intake https://www.orgsyn.org/demo.aspx?prep=v102p0086
-  python -m chem_coworker._cli.app intake paper.pdf --reaction-type buchwald_hartwig
         """,
     )
     arg_parser.add_argument("--model", default=None, help="LLM model name (skip selector if set)")
@@ -477,88 +316,6 @@ Examples:
         help="Deprecated alias for --output-format json",
     )
     ask_parser.add_argument(
-        "--output-format",
-        default="plain",
-        choices=["plain", "json"],
-        help="Output format (default: plain)",
-    )
-
-    intake_parser = subparsers.add_parser(
-        "intake",
-        help="Extract chemistry notes from a URL, PDF, or text file",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python -m chem_coworker._cli.app intake https://www.orgsyn.org/demo.aspx?prep=v102p0086
-  python -m chem_coworker._cli.app intake paper.pdf --reaction-type suzuki_miyaura
-  python -m chem_coworker._cli.app intake my_notes.txt
-        """,
-    )
-    intake_parser.add_argument("source", nargs="?", help="URL, file path, or raw text to process")
-    intake_parser.add_argument(
-        "--list-reaction-types",
-        action="store_true",
-        help="List taxonomy reaction type IDs and exit",
-    )
-    intake_parser.add_argument(
-        "--reaction-type",
-        default="",
-        help="Hint for reaction type (e.g. suzuki_miyaura). Auto-detected if omitted.",
-    )
-    intake_parser.add_argument(
-        "--mismatch-policy",
-        default="warn",
-        choices=["warn", "confirm", "reject", "force"],
-        help="How to handle hint vs detected reaction-type mismatch (default: warn).",
-    )
-    intake_parser.add_argument(
-        "--unknown-reaction-policy",
-        default="general",
-        choices=["general", "quarantine", "reject"],
-        help="How to handle non-taxonomy reaction labels (default: general).",
-    )
-    intake_parser.add_argument(
-        "--note-type",
-        default="reactions",
-        choices=["reactions", "mechanisms", "substrates", "protocols", "routes"],
-        help="Which notes subfolder to write to (default: reactions).",
-    )
-    intake_parser.add_argument(
-        "--extract-model",
-        default=None,
-        help=(
-            "Model to use for extraction (overrides --model for this step). "
-            "Useful for a cheaper/faster model: e.g. --extract-model deepseek-v3.2 "
-            "--extract-provider aliyun"
-        ),
-    )
-    intake_parser.add_argument(
-        "--extract-provider",
-        default=None,
-        help="Provider for --extract-model (openai or aliyun). Auto-detected if omitted.",
-    )
-    intake_parser.add_argument(
-        "--no-save",
-        action="store_true",
-        help="Do not save fetched document to literature/ folder",
-    )
-    intake_parser.add_argument(
-        "--quiet",
-        "-q",
-        action="store_true",
-        help="Suppress extracted notes preview",
-    )
-    intake_parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Extract and validate labels but do not write note files",
-    )
-    intake_parser.add_argument(
-        "--json",
-        action="store_true",
-        help="Deprecated alias for --output-format json",
-    )
-    intake_parser.add_argument(
         "--output-format",
         default="plain",
         choices=["plain", "json"],
@@ -671,8 +428,6 @@ def main(argv: Optional[List[str]] = None) -> None:
         args.output_format = "json"
     if getattr(args, "command", None) == "batch" and getattr(args, "json", False):
         args.output_format = "jsonl"
-    if getattr(args, "command", None) == "intake" and getattr(args, "json", False):
-        args.output_format = "json"
     if getattr(args, "command", None) == "batch":
         args.continue_on_error = bool(getattr(args, "continue_on_error", False) or not getattr(args, "fail_fast", False))
 
@@ -685,10 +440,6 @@ def main(argv: Optional[List[str]] = None) -> None:
     if args.command == "batch":
         _cmd_batch(args)
         return
-    if args.command == "intake":
-        _cmd_intake(args)
-        return
-
     print()
     print(f"  {C.LABEL}◆ ChemCoworker{C.R}  {C.DIM}Chemistry AI Agent{C.R}")
     print(f"  {C.META}General-purpose chemistry Q&A, analysis, and prediction{C.R}")
@@ -722,7 +473,8 @@ def main(argv: Optional[List[str]] = None) -> None:
     ui = TerminalUI()
     try:
         coworker = _init_coworker(model, provider, verbose, plan_mode, ui)
-        print(f"  {C.OK}✓{C.R}  Agent ready  {C.META}{len(REGISTRY)} tools registered{C.R}")
+        public_tool_count = len(REGISTRY.filtered_names(llm_exposed_only=True))
+        print(f"  {C.OK}✓{C.R}  Agent ready  {C.META}{public_tool_count} public tools available{C.R}")
         if plan_mode:
             print(f"  {C.META}Plan approval ON{C.R}")
     except Exception as exc:

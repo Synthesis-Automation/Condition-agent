@@ -24,13 +24,13 @@ from typing import Any, Dict, List, Optional, Union
 
 from openai import OpenAI
 
-China = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-US = "https://dashscope-us.aliyuncs.com/compatible-mode/v1"
+China_site = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+US_site = "https://dashscope-us.aliyuncs.com/compatible-mode/v1"
 
 # Default base URLs for supported providers
 DEFAULT_BASE_URLS = {
     # DashScope OpenAI-compatible endpoint
-    "aliyun": US,
+    "aliyun": China_site,
     "openai": "https://api.openai.com/v1",
 }
 

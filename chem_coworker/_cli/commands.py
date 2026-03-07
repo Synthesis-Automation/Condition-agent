@@ -116,7 +116,7 @@ def build_default_command_registry() -> CommandRegistry:
     reg.register(Command("/help", ("/help", "help", "?"), "Show CLI commands", _cmd_help))
     reg.register(Command("/exit", ("exit", "quit", "q", "/exit"), "Exit the session", _cmd_exit))
     reg.register(Command("/clear", ("clear", "/clear"), "Clear conversation history", _cmd_clear))
-    reg.register(Command("/tools", ("tools", "/tools"), "List LLM-visible tools (/tools all for registry)", _cmd_tools))
+    reg.register(Command("/tools", ("tools", "/tools"), "List available tools", _cmd_tools))
     reg.register(Command("/model", ("/model", "change model", "model"), "Switch model/provider", _cmd_model))
     reg.register(Command("/plan", ("/plan", "toggle plan"), "Toggle plan approval mode", _cmd_plan))
     reg.register(Command("/verbose", ("/verbose", "toggle verbose"), "Toggle verbose tool output", _cmd_verbose))
@@ -150,15 +150,11 @@ def _cmd_clear(session: ReplSession, registry: CommandRegistry, raw: str, args: 
 
 def _cmd_tools(session: ReplSession, registry: CommandRegistry, raw: str, args: List[str]) -> str:  # noqa: ARG001
     sub = args[0].lower() if args else "public"
-    if sub not in {"list", "all", "public"}:
-        print(f"  {C.WARN}⚠{C.R}  Unsupported /tools subcommand. Use `/tools`, `/tools public`, or `/tools all`.")
+    if sub not in {"list", "public"}:
+        print(f"  {C.WARN}⚠{C.R}  Unsupported /tools subcommand. Use `/tools` or `/tools public`.")
         return COMMAND_HANDLED
-    show_all = sub == "all"
     print()
-    if show_all:
-        print(session.tool_registry.describe_tools())
-    else:
-        print(session.tool_registry.describe_tools(llm_exposed_only=True))
+    print(session.tool_registry.describe_tools(llm_exposed_only=True))
     return COMMAND_HANDLED
 
 
