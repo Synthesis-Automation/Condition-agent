@@ -7,6 +7,7 @@ Provides two complementary functions:
   smiles_to_cas(smi) → look up the CAS number(s) for a known SMILES
 
 Resolution cascade for resolve_cas:
+  0. Local reagent registry (CSV) — instant, offline, no rate-limit
   1. PubChem   — CAS treated as synonym: CAS → CID → Title + IUPAC + SMILES + formula
   2. NCI CACTUS — CAS directly to SMILES + names
 
@@ -134,6 +135,54 @@ def _validate_smiles(smiles: str) -> bool:
         return Chem.MolFromSmiles(smiles) is not None
     except Exception:
         return bool(smiles and smiles.strip())
+
+
+# ---------------------------------------------------------------------------
+# Backend 0: Local reagent registry (CSV, offline)
+# ---------------------------------------------------------------------------
+
+def _local_cas(cas: str) -> Optional[Dict]:
+    """Search the local CSV reagent registry for a matching CAS number.
+
+    Returns a result dict (same shape as the online backends) or None.
+    """
+    try:
+        from ..reagent.lookup import load_reagent_database
+        for reagent in load_reagent_database("*"):
+            r_cas = normalize_cas((reagent.get("cas") or "").strip())
+            if r_cas and r_cas == cas:
+                smiles = (reagent.get("smiles") or "").strip()
+                if smiles and _validate_smiles(smiles):
+                    smiles = _canonical(smiles)
+                abbrs: List[str] = [
+                    a for a in (reagent.get("abbreviation") or []) if a
+                ]
+                return {
+                    "name": (reagent.get("name") or "").strip(),
+                    "iupac_name": "",
+                    "molecular_formula": "",
+                    "smiles": smiles,
+                    "pubchem_cid": None,
+                    "synonyms": abbrs,
+                    "source": "local",
+                }
+    except Exception:
+        pass
+    return None
+
+
+def _local_smiles_to_cas(smiles: str) -> List[str]:
+    """Search the local registry for all CAS numbers matching a SMILES string."""
+    try:
+        from ..reagent.lookup import get_canonical_smiles_index
+        reagent = get_canonical_smiles_index().get(smiles)
+        if reagent:
+            r_cas = (reagent.get("cas") or "").strip()
+            if r_cas and is_cas(r_cas):
+                return [r_cas]
+    except Exception:
+        pass
+    return []
 
 
 # ---------------------------------------------------------------------------
@@ -355,6 +404,16 @@ def resolve_cas(cas: str) -> Dict:
 
     backends = [(_pubchem_cas, "pubchem"), (_cactus_cas, "cactus")]
 
+    # Check local registry first — instant, no network, no rate-limit
+    try:
+        local_info = _local_cas(normalized)
+        if local_info and (local_info.get("name") or local_info.get("smiles")):
+            result = {**base, **local_info, "cas": normalized}
+            _CAS_CACHE[normalized] = result
+            return result
+    except Exception:
+        pass
+
     for backend_fn, _ in backends:
         try:
             time.sleep(_RATE_DELAY + random.uniform(0, 0.1))
@@ -393,6 +452,11 @@ def smiles_to_cas(smiles: str) -> List[str]:
     canonical = _canonical(smiles)
     if not canonical:
         return []
+
+    # Check local registry first (instant, no network)
+    local_hits = _local_smiles_to_cas(canonical)
+    if local_hits:
+        return local_hits
 
     try:
         encoded = quote_plus(canonical)

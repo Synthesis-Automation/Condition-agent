@@ -2,6 +2,7 @@
 Chemical name → SMILES resolution utility.
 
 Resolution chain (tried in priority order):
+  0. Local reagent registry (CSV) — instant, offline, no rate-limit
   1. PubChem REST API   — most comprehensive; supports IUPAC, trivial, CAS, trade names
   2. OPSIN (Cambridge)  — excellent for systematic IUPAC names, free parser
   3. NCI CACTUS         — broad fallback for names not in PubChem/OPSIN
@@ -101,6 +102,24 @@ def _canonical(smiles: str) -> str:
 # Individual resolution backends
 # ---------------------------------------------------------------------------
 
+def _local(name: str) -> Optional[str]:
+    """Search the local CSV reagent registry via a pre-built name index.
+
+    Uses a plain case-insensitive comparison (NOT normalize_name) to avoid
+    false positives from entries like '(Piperidinyl)aniline' whose
+    normalize_name result collapses to 'aniline'.
+    """
+    try:
+        from ..reagent.lookup import get_name_index
+        reagent = get_name_index().get(name.strip().lower())
+        if reagent:
+            smiles = (reagent.get("smiles") or "").strip()
+            return smiles if smiles and _validate_smiles(smiles) else None
+    except Exception:
+        pass
+    return None
+
+
 def _pubchem(name: str) -> Optional[str]:
     """PubChem compound name → IsomericSMILES."""
     encoded = quote_plus(name)
@@ -176,6 +195,13 @@ def resolve_name(name: str) -> Tuple[Optional[str], str]:
     cache_key = cleaned.lower()
     if cache_key in _NAME_CACHE:
         return _NAME_CACHE[cache_key]
+
+    # Check local registry first — instant, no network, no rate-limit
+    local_smiles = _local(cleaned)
+    if local_smiles and _validate_smiles(local_smiles):
+        result: Tuple[Optional[str], str] = (_canonical(local_smiles), "local")
+        _NAME_CACHE[cache_key] = result
+        return result
 
     backends = [
         (_pubchem, "pubchem"),

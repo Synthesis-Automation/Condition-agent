@@ -131,6 +131,60 @@ def _load_all_reagents() -> List[Dict[str, Any]]:
         return []
 
 
+def _rdkit_canonical(smiles: str) -> str:
+    """Return RDKit canonical SMILES, or the original string if RDKit is unavailable."""
+    try:
+        from rdkit import Chem
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Chem.MolToSmiles(mol)
+    except Exception:
+        pass
+    return smiles
+
+
+@lru_cache(maxsize=1)
+def get_canonical_smiles_index() -> Dict[str, Any]:
+    """Return a {canonical_smiles: reagent_dict} mapping for O(1) SMILES lookup.
+
+    Built once from all loaded reagents and then cached for the session.
+    Only reagents that have a non-empty, parseable SMILES are indexed.
+    """
+    index: Dict[str, Any] = {}
+    for reagent in _load_all_reagents():
+        raw = (reagent.get("smiles") or "").strip()
+        if not raw:
+            continue
+        canonical = _rdkit_canonical(raw)
+        if canonical and canonical not in index:
+            index[canonical] = reagent
+    return index
+
+
+@lru_cache(maxsize=1)
+def get_name_index() -> Dict[str, Any]:
+    """Return a {lowercase_name_or_abbreviation: reagent_dict} mapping for O(1) name lookup.
+
+    Built once from all loaded reagents and then cached for the session.
+    Uses plain case-insensitive comparison (no normalization) to avoid
+    false matches from entries like '(Piperidinyl)aniline'.
+    """
+    index: Dict[str, Any] = {}
+    for reagent in _load_all_reagents():
+        name = (reagent.get("name") or "").strip()
+        if name:
+            key = name.lower()
+            if key not in index:
+                index[key] = reagent
+        for abbr in (reagent.get("abbreviation") or []):
+            abbr = abbr.strip()
+            if abbr:
+                key = abbr.lower()
+                if key not in index:
+                    index[key] = reagent
+    return index
+
+
 @lru_cache(maxsize=32)
 def load_reagent_database(reagent_type: str) -> List[Dict[str, Any]]:
     """

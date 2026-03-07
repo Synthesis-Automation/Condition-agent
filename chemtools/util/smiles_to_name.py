@@ -2,6 +2,7 @@
 SMILES → chemical name resolution utility.
 
 Resolution chain (tried in priority order):
+  0. Local reagent registry (CSV) — instant, offline, no rate-limit
   1. PubChem REST API  — returns IUPAC name, preferred name, and synonyms
   2. NCI CACTUS        — fallback IUPAC name and common name list
 
@@ -77,6 +78,29 @@ def _get(url: str) -> Optional[str]:
 # ---------------------------------------------------------------------------
 # Individual backends
 # ---------------------------------------------------------------------------
+
+def _local(smiles: str) -> Optional[Dict]:
+    """Search the local CSV reagent registry via a pre-built canonical SMILES index."""
+    try:
+        from ..reagent.lookup import get_canonical_smiles_index
+        reagent = get_canonical_smiles_index().get(smiles)
+        if reagent:
+            name = (reagent.get("name") or "").strip()
+            cas = (reagent.get("cas") or "").strip()
+            abbrs: List[str] = [a for a in (reagent.get("abbreviation") or []) if a]
+            synonyms = ([cas] if cas else []) + abbrs
+            return {
+                "iupac_name": "",
+                "preferred_name": name,
+                "synonyms": synonyms,
+                "molecular_formula": "",
+                "pubchem_cid": None,
+                "source": "local",
+            }
+    except Exception:
+        pass
+    return None
+
 
 def _pubchem(smiles: str) -> Optional[Dict]:
     """PubChem SMILES → CID → Title (common name) + IUPACName + synonyms.
@@ -229,6 +253,13 @@ def resolve_smiles(smiles: str) -> Dict:
 
     if canonical in _SMILES_CACHE:
         return _SMILES_CACHE[canonical]
+
+    # Check local registry first — instant, no network, no rate-limit
+    local_result = _local(canonical)
+    if local_result and (local_result.get("preferred_name") or local_result.get("iupac_name")):
+        local_result["canonical_smiles"] = canonical
+        _SMILES_CACHE[canonical] = local_result
+        return local_result
 
     backends = [
         (_pubchem, "pubchem"),
