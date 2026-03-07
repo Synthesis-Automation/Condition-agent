@@ -694,12 +694,34 @@ class ChemCoworker:
 
         post_verification_penalty = 0.0
         if answer:
-            answer, verification_warnings, post_verification_penalty = self._apply_output_verification_gate(
+            raw_answer_for_repair = str(answer)
+            answer, verification_warnings, post_verification_penalty, gate_report = self._apply_output_verification_gate(
                 answer=answer,
                 tool_results=tool_results,
                 task_type=task_type,
             )
+            (
+                answer,
+                verification_warnings,
+                post_verification_penalty,
+                repair_warnings,
+                repair_calls,
+                repair_tokens,
+            ) = self._attempt_auto_repair_after_verification(
+                query=query,
+                raw_answer=raw_answer_for_repair,
+                verified_answer=answer,
+                verification_warnings=verification_warnings,
+                verification_penalty=post_verification_penalty,
+                verification_report=gate_report,
+                tool_results=tool_results,
+                task_type=task_type,
+            )
             warnings.extend(verification_warnings)
+            warnings.extend(repair_warnings)
+            llm_calls += repair_calls
+            if repair_tokens.get("llm_calls", 0) or repair_tokens.get("total_tokens", 0):
+                token_sections.append(repair_tokens)
 
         # Evidence-based confidence aggregation replaces the placeholder native-loop confidence.
         effective_plan.confidence = self._aggregate_confidence(
@@ -1746,7 +1768,7 @@ class ChemCoworker:
         answer: str,
         tool_results: Dict[str, Any],
         task_type: str,
-    ) -> Tuple[str, List[str], float]:
+    ) -> Tuple[str, List[str], float, Dict[str, Any]]:
         """Run post-answer validation gate and append explicit verification notes."""
         gate_warnings: List[str] = []
         gate_lines: List[str] = []
@@ -1834,7 +1856,195 @@ class ChemCoworker:
         if gate_lines:
             safe_answer += "\n\n---\n⚠ **Output verification gate**\n" + "\n".join(gate_lines)
 
-        return safe_answer, gate_warnings, confidence_penalty
+        report = {
+            "invalid_reactions": [
+                {"reaction_smiles": rxn, "reason": reason}
+                for rxn, reason in invalid_reactions
+            ],
+            "condition_claim_without_evidence": any(
+                "condition recommendations without successful condition-tool evidence" in str(w).lower()
+                for w in gate_warnings
+            ),
+            "unverified_route_steps": any(
+                "multiple explicit reaction steps" in str(w).lower()
+                for w in gate_warnings
+            ),
+        }
+        return safe_answer, gate_warnings, confidence_penalty, report
+
+    def _build_repair_tool_evidence_summary(
+        self,
+        tool_results: Dict[str, Any],
+        max_chars: int = 3000,
+    ) -> str:
+        """Build a compact tool-evidence summary for repair prompting."""
+        if not isinstance(tool_results, dict) or not tool_results:
+            return "(no tool results)"
+        parts: List[str] = []
+        used = 0
+        for tool_name, result in tool_results.items():
+            if tool_name == _TOOL_CALL_RESULTS_META_KEY:
+                continue
+            if not isinstance(result, dict):
+                continue
+            display = {
+                k: v
+                for k, v in result.items()
+                if k not in ("_warnings",) and v is not None
+            }
+            try:
+                snippet = json.dumps(display, default=str)[:700]
+            except Exception:
+                snippet = str(display)[:700]
+            block = f"[{tool_name}]\n{snippet}"
+            if used + len(block) > max_chars:
+                break
+            parts.append(block)
+            used += len(block)
+        return "\n\n".join(parts) if parts else "(no usable tool results)"
+
+    def _run_output_repair_pass(
+        self,
+        *,
+        query: str,
+        raw_answer: str,
+        invalid_reactions: List[Dict[str, str]],
+        tool_results: Dict[str, Any],
+    ) -> Tuple[str, int, Dict[str, Any], str]:
+        """Run a single LLM repair pass and return revised answer + token usage."""
+        from langchain_core.messages import HumanMessage, SystemMessage
+
+        token_usage = self._new_token_section("repair", "Repair")
+        if not invalid_reactions:
+            return raw_answer, 0, token_usage, ""
+
+        invalid_lines = []
+        for idx, row in enumerate(invalid_reactions[:6], 1):
+            rxn = str(row.get("reaction_smiles") or "")
+            reason = str(row.get("reason") or "")
+            invalid_lines.append(f"{idx}. {rxn}  | reason: {reason}")
+        invalid_block = "\n".join(invalid_lines) if invalid_lines else "(none)"
+        tool_evidence = self._build_repair_tool_evidence_summary(tool_results)
+
+        prompt = (
+            "The previous chemistry answer contains invalid reaction SMILES and must be repaired.\n\n"
+            "Constraints:\n"
+            "1) Use ONLY the tool evidence below.\n"
+            "2) If a reaction SMILES cannot be made valid from evidence, remove it.\n"
+            "3) Do NOT invent precursors, products, or conditions.\n"
+            "4) Keep the answer concise and preserve the original intent.\n\n"
+            f"Original user query:\n{query}\n\n"
+            f"Original answer:\n{raw_answer[:4500]}\n\n"
+            f"Invalid reaction SMILES detected:\n{invalid_block}\n\n"
+            f"Tool evidence:\n{tool_evidence}\n\n"
+            "Return only the revised final answer text."
+        )
+
+        try:
+            response = self.llm.invoke(
+                [
+                    SystemMessage(
+                        content=(
+                            "You are a chemistry assistant repairing an answer after strict structure validation failures."
+                        )
+                    ),
+                    HumanMessage(content=prompt),
+                ]
+            )
+            self._accumulate_token_usage(token_usage, response, llm_calls=1)
+            revised = str(self._get_text(response) or "").strip()
+            if not revised:
+                return raw_answer, 1, token_usage, "Auto-repair returned an empty answer."
+            return revised, 1, token_usage, ""
+        except Exception as exc:
+            return raw_answer, 0, token_usage, f"Auto-repair pass failed: {exc}"
+
+    def _attempt_auto_repair_after_verification(
+        self,
+        *,
+        query: str,
+        raw_answer: str,
+        verified_answer: str,
+        verification_warnings: List[str],
+        verification_penalty: float,
+        verification_report: Dict[str, Any],
+        tool_results: Dict[str, Any],
+        task_type: str,
+    ) -> Tuple[str, List[str], float, List[str], int, Dict[str, Any]]:
+        """Try one bounded repair pass after eval failure; keep only improved output."""
+        repair_warnings: List[str] = []
+        token_usage = self._new_token_section("repair", "Repair")
+        invalid_reactions = list((verification_report or {}).get("invalid_reactions") or [])
+        if not invalid_reactions:
+            return (
+                verified_answer,
+                list(verification_warnings),
+                float(verification_penalty),
+                repair_warnings,
+                0,
+                token_usage,
+            )
+
+        revised_answer, repair_calls, repair_token_usage, repair_error = self._run_output_repair_pass(
+            query=query,
+            raw_answer=raw_answer,
+            invalid_reactions=invalid_reactions,
+            tool_results=tool_results,
+        )
+        token_usage = repair_token_usage
+        if repair_error:
+            repair_warnings.append(repair_error)
+        if repair_calls <= 0:
+            return (
+                verified_answer,
+                list(verification_warnings),
+                float(verification_penalty),
+                repair_warnings,
+                repair_calls,
+                token_usage,
+            )
+
+        (
+            repaired_checked_answer,
+            repaired_warnings,
+            repaired_penalty,
+            repaired_report,
+        ) = self._apply_output_verification_gate(
+            answer=revised_answer,
+            tool_results=tool_results,
+            task_type=task_type,
+        )
+
+        old_invalid = len(invalid_reactions)
+        new_invalid = len(list((repaired_report or {}).get("invalid_reactions") or []))
+        improved = (
+            (new_invalid < old_invalid and repaired_penalty <= float(verification_penalty))
+            or (repaired_penalty + 1e-9 < float(verification_penalty))
+        )
+        if improved:
+            repair_warnings.append(
+                f"Auto-repair applied: validation improved (invalid reactions {old_invalid} -> {new_invalid})."
+            )
+            return (
+                repaired_checked_answer,
+                repaired_warnings,
+                float(repaired_penalty),
+                repair_warnings,
+                repair_calls,
+                token_usage,
+            )
+
+        repair_warnings.append(
+            "Auto-repair attempted but did not improve validation; kept conservative verified output."
+        )
+        return (
+            verified_answer,
+            list(verification_warnings),
+            float(verification_penalty),
+            repair_warnings,
+            repair_calls,
+            token_usage,
+        )
 
     def _build_performance_summary(self, tool_results: Dict[str, Any], task_type: str = "") -> str:
         """
