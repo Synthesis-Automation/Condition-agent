@@ -45,3 +45,17 @@ def test_reaction_smiles_with_synthesize_word_still_analyze_not_retro() -> None:
     result = clf.classify(q)
     assert result.has_reaction is True
     assert result.task_type == TaskType.ANALYZE
+
+
+def test_name_only_product_prediction_routes_to_forward_synthesis() -> None:
+    clf = TaskClassifier()
+    q = "Predict product of bromobenzene and aniline"
+    result = clf.classify(q)
+    assert result.task_type == TaskType.FORWARD_SYNTHESIS
+
+
+def test_name_only_product_forms_when_reacts_with_routes_to_forward_synthesis() -> None:
+    clf = TaskClassifier()
+    q = "What product forms when bromobenzene reacts with phenylboronic acid?"
+    result = clf.classify(q)
+    assert result.task_type == TaskType.FORWARD_SYNTHESIS

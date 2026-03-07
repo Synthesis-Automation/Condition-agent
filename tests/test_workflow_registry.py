@@ -124,3 +124,23 @@ class TestGlobalWorkflowRegistry:
         names = WORKFLOW_REGISTRY.names()
         assert "retrosynthesis" in names
         assert "forward_chemistry" in names
+
+    def test_retrosynthesis_workflow_exposes_specialist_analysis_tools(self):
+        w = WORKFLOW_REGISTRY.get_for_task("retrosynthesis")
+        visible = set(w.llm_visible_tools or [])
+        assert "featurize_molecule" in visible
+        assert "assess_snar_feasibility" in visible
+        assert "recommend_reaction_conditions" in visible
+
+    def test_forward_synthesis_workflow_exposes_specialist_analysis_tools(self):
+        w = WORKFLOW_REGISTRY.get_for_task("forward_synthesis")
+        visible = set(w.llm_visible_tools or [])
+        assert "featurize_molecule" in visible
+        assert "assess_snar_feasibility" in visible
+        assert "recommend_reaction_conditions" in visible
+
+    def test_fallback_workflow_exposes_forward_and_retro_facades(self):
+        w = WORKFLOW_REGISTRY.get_for_task("anything_else")
+        visible = set(w.llm_visible_tools or [])
+        assert "retrosynthesis_step" in visible
+        assert "forward_synthesis_step" in visible

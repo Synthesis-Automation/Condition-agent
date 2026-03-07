@@ -228,17 +228,47 @@ class TaskClassifier:
 
         explicit_forward = any(cue in q_lower for cue in _FORWARD_EXPLICIT_CUES)
         product_prediction_cue = any(
-            cue in q_lower for cue in ("what will happen", "what happens", "forms when", "gives what")
+            cue in q_lower for cue in (
+                "what will happen",
+                "what happens",
+                "forms when",
+                "gives what",
+                "what product forms",
+                "what products form",
+            )
+        )
+        condition_prediction_cue = any(
+            cue in q_lower
+            for cue in (
+                "what condition",
+                "recommend condition",
+                "suggest condition",
+                "which conditions",
+                "best conditions",
+                "what catalyst",
+                "what solvent",
+                "what base",
+                "what ligand",
+            )
+        )
+        text_pair_signal = bool(
+            re.search(r"\breact(?:s|ed|ing)?\s+with\b", q_lower)
+            or re.search(r"\bcouple(?:s|d|ing)?\s+with\b", q_lower)
+            or re.search(r"\b(?:of|from|between)\b.{0,120}\band\b.{0,120}", q_lower)
+            or re.search(r"\bwith\b.{0,120}\band\b", q_lower)
+            or " + " in q_lower
         )
         multi_reactant_signal = (
             len(molecule_smiles) >= 2
             or any(cue in q_lower for cue in _FORWARD_REACTANT_CUES)
-            or " + " in q_lower
+            or text_pair_signal
         )
 
         if explicit_forward and (multi_reactant_signal or len(molecule_smiles) >= 1):
             return True
-        if product_prediction_cue and len(molecule_smiles) >= 2:
+        if product_prediction_cue and (len(molecule_smiles) >= 2 or text_pair_signal):
+            return True
+        if condition_prediction_cue and multi_reactant_signal:
             return True
         return False
 

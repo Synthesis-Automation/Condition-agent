@@ -1421,7 +1421,18 @@ class ChemCoworker:
                 tool_results=tool_results,
             )
             if blocked_results:
-                tool_results.update(blocked_results)
+                for _name, _blocked in blocked_results.items():
+                    _prev = tool_results.get(_name)
+                    # Preserve previously successful evidence; only replace if there
+                    # is no prior result or the prior result was unsuccessful.
+                    if (
+                        isinstance(_prev, dict)
+                        and _prev.get("success", True)
+                        and isinstance(_blocked, dict)
+                        and not _blocked.get("success", True)
+                    ):
+                        continue
+                    tool_results[_name] = _blocked
                 warnings.extend(contract_warnings)
                 for tc in response_tool_calls:
                     tool_call_id = str(tc.get("id", "") or "")
@@ -1438,7 +1449,19 @@ class ChemCoworker:
                     runtime_context=runtime_context,
                     return_call_results=True,
                 )
-                tool_results.update(group_results)
+                for _name, _new in group_results.items():
+                    _prev = tool_results.get(_name)
+                    if not isinstance(_prev, dict) or not isinstance(_new, dict):
+                        tool_results[_name] = _new
+                        continue
+                    _prev_ok = bool(_prev.get("success", True))
+                    _new_ok = bool(_new.get("success", True))
+                    # Prefer preserving a successful prior result over a later failure.
+                    if _prev_ok and not _new_ok:
+                        continue
+                    # Prefer newer successful result over older failure.
+                    if (not _prev_ok and _new_ok) or (_prev_ok == _new_ok):
+                        tool_results[_name] = _new
                 tool_results_by_call_id.update(group_results_by_call_id)
                 elapsed = _t.monotonic() - t0
 

@@ -69,40 +69,34 @@ TOOL SELECTION RULES
 ═══════════════════════════════════════════════════════════════════
 
 MANDATORY (always call):
-  normalize_reaction, inspect_target, identify_retrons, generate_disconnections
+  retrosynthesis_step
 
 CONDITIONAL (add when no SMILES in query):
-  resolve_to_smiles — call FIRST before everything else
+  resolve_chemical(mode="to_smiles") — call FIRST before everything else
 
 RECOMMENDED (add for thorough analysis):
-  • apply_hte_templates — parallel with identify_retrons; covers 35+ SMARTS templates
+  • apply_hte_templates — run alongside retrosynthesis_step; covers 35+ SMARTS templates
     (SNAr, Chan-Lam, CuAAC, HWE, Wacker, sulfonamide, urea, etc.)
-  • search_by_product_similarity — parallel with identify_retrons; Morgan FP search
+  • search_by_product_similarity — run alongside retrosynthesis_step; Morgan FP search
     across ~231k HTE reactions ("who made something similar and how?")
-  • find_retro_precedent — parallel with identify_retrons; knowledge base search
-  • search_hte_precedent — after generate_disconnections; DRFP k-NN precedent search
-  • recommend_conditions — final group; conditions for the forward reaction
-  • search_notes — parallel with precedent search when reaction type is identified
+  • validate_synthesis_proposal(mode='retro') — explicit RDKit + complexity validation
+    for a candidate disconnection (product + precursor_1 + precursor_2)
   • plan_route — for BertzCT > 400 targets; full multi-step BFS route
-  • check_retro_consistency — AFTER generate_disconnections; validates each top
-    disconnection (atom balance, charge, FG patterns, complexity check); use when
-    you want RDKit confirmation before presenting a route to the user
-  • featurize_molecule — parallel with identify_retrons; get electronic score +
+  • featurize_molecule — parallel with retrosynthesis_step; get electronic score +
     steric profile for the target or a key precursor; use when catalyst/ligand
     selection depends on ring electronics (electron-poor vs electron-rich arene)
     or steric demand (secondary/tertiary alkyl coupling)
-  • assess_snar_feasibility — parallel with identify_retrons; ONLY when an aryl
+  • assess_snar_feasibility — parallel with retrosynthesis_step; ONLY when an aryl
     halide is present; determines if SNAr is viable (score ≥ 6.0) or if Pd/Ni
     coupling is preferable
 
 CALL ORDER (dependency rules):
-  G0: [resolve_to_smiles]  ← ONLY when no SMILES in query
-  G1: [normalize_reaction + inspect_target]
-  G2: [identify_retrons + find_retro_precedent + search_by_product_similarity
-       + apply_hte_templates + featurize_molecule + assess_snar_feasibility]  ← parallel
-  G3: [generate_disconnections]
-  G4: [check_retro_consistency + search_hte_precedent + recommend_conditions + search_notes]  ← parallel
-       ↑ call check_retro_consistency for each top-ranked disconnection from G3
+  G0: [resolve_chemical(mode="to_smiles")]  ← ONLY when no SMILES in query
+  G1: [retrosynthesis_step]
+  G2: [apply_hte_templates + search_by_product_similarity
+       + featurize_molecule + assess_snar_feasibility]  ← parallel as needed
+  G3: [validate_synthesis_proposal(mode='retro') for top disconnections]
+  G4: [plan_route]  ← when a full multi-step route is requested
 
 Call tools in parallel when they have no dependencies on each other.
 Observe results after each turn before deciding on the next tool calls.
@@ -126,12 +120,12 @@ directly. Structure it as:
   For each disconnection (ranked by confidence):
   Rank N: [Reaction type, confidence %]
     Forward: precursor_1 + precursor_2 → target  (SMILES: `p1.p2>>target`)
-    RDKit eval: [PASS / PASS_WITH_WARNINGS / FAIL, score=X.XX]  ← from check_retro_consistency
+    RDKit eval: [PASS / PASS_WITH_WARNINGS / FAIL, score=X.XX]  ← from validate_synthesis_proposal(mode='retro')
     Why: [brief mechanistic rationale]
     Precursor 1: [name/SMILES + availability]
     Precursor 2: [name/SMILES + availability]
 
-  Evaluation rules (apply check_retro_consistency result here):
+  Evaluation rules (apply validate_synthesis_proposal(mode='retro') result here):
   • FAIL — explicitly flag it; explain which check failed (atom balance? wrong FGs?
     charge imbalance?); propose a corrected SMILES or explain why the disconnection
     is invalid; do NOT silently present a FAIL as a valid route.
@@ -141,8 +135,9 @@ directly. Structure it as:
 
 ## Conditions Summary
   Catalyst, base, solvent, temperature for the key step(s).
-  Cite experiment count and avg_yield from search_hte_precedent /
-  recommend_conditions. If no experimental data found, say so explicitly.
+  Cite experiment count and avg_yield from retrosynthesis_step condition/predecessor
+  evidence (and any additional specialist tools you called). If no experimental
+  data found, say so explicitly.
 
 ## Synthetic Warnings
   Compatibility issues, side reactions, protecting group needs, scalability.

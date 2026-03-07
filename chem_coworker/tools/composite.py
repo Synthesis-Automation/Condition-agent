@@ -106,9 +106,10 @@ def _recommend_conditions_with_strategy(
     if source_mode and source_mode not in _CONDITION_SOURCE_MODES:
         return _error("condition_source_mode must be one of: literature, motif, similarity, rules, all")
 
-    # Auto defaults to full only when the caller did not pin a single source.
+    # Auto defaults to a single recommend_conditions call; callers can opt into
+    # cross-source full ensemble mode explicitly via condition_strategy='full'.
     if strategy == "auto":
-        strategy = "single" if source_mode else "full"
+        strategy = "single"
 
     if strategy == "single":
         result = _recommend_conditions(
@@ -416,7 +417,7 @@ def _read_knowledge(
 
 def _analyze_reaction(
     reaction_smiles: str,
-    include_conditions: bool = True,
+    include_conditions: bool = False,
     conditions_top_k: int = 5,
     include_notes: bool = False,
     include_bond_changes: bool = True,
@@ -494,6 +495,26 @@ def _analyze_reaction(
             "top_condition_count": len((conditions_result or {}).get("recommendations", []) or []),
         },
     })
+
+
+def _recommend_reaction_conditions(
+    reaction_smiles: str,
+    top_k: int = 5,
+    condition_strategy: str = "auto",
+    condition_source_mode: str = "",
+) -> Dict[str, Any]:
+    """Explicit facade for reaction-condition recommendation."""
+    rxn = str(reaction_smiles or "").strip()
+    if ">>" not in rxn:
+        return _error(
+            "recommend_reaction_conditions expects reaction SMILES in 'reactants>>products' format"
+        )
+    return _recommend_conditions_with_strategy(
+        reaction_smiles=rxn,
+        top_k=max(1, min(int(top_k or 5), 10)),
+        condition_strategy=condition_strategy,
+        condition_source_mode=condition_source_mode,
+    )
 
 
 def _retrosynthesis_step(
@@ -780,6 +801,19 @@ analyze_reaction_tool = ToolPlugin(
     provides=["reaction_type", "reaction_family", "conditions"],
 )
 
+recommend_reaction_conditions_tool = ToolPlugin(
+    name="recommend_reaction_conditions",
+    category="composite",
+    description=(
+        "Explicit condition-recommendation facade for reaction SMILES. "
+        "Returns ranked catalyst/ligand/base/solvent/temperature options from HTE-backed evidence. "
+        "Set condition_strategy='full' to compare literature/motif/similarity/rules and merge consensus."
+    ),
+    prerequisites=[],
+    fn=_recommend_reaction_conditions,
+    provides=["conditions", "recommendations"],
+)
+
 retrosynthesis_step_tool = ToolPlugin(
     name="retrosynthesis_step",
     category="composite",
@@ -840,7 +874,17 @@ def _project_analyze_reaction(result: dict) -> Dict[str, Any]:
     return {k: v for k, v in out.items() if v is not None}
 
 
+def _project_recommend_reaction_conditions(result: dict) -> Dict[str, Any]:
+    """Project recommendation output into structured conditions."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    return {
+        "conditions": result.get("recommendations", []),
+    }
+
+
 analyze_reaction_tool.structured_projection = _project_analyze_reaction
+recommend_reaction_conditions_tool.structured_projection = _project_recommend_reaction_conditions
 
 
 COMPOSITE_TOOLS = [
@@ -849,6 +893,7 @@ COMPOSITE_TOOLS = [
     search_knowledge_tool,
     read_knowledge_tool,
     analyze_reaction_tool,
+    recommend_reaction_conditions_tool,
     retrosynthesis_step_tool,
     forward_synthesis_step_tool,
     validate_synthesis_proposal_tool,

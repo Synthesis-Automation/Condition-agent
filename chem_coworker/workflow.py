@@ -155,6 +155,7 @@ def _build_workflow_registry() -> WorkflowRegistry:
     _COMPOSITE_SUPPORT_TOOLS = [
         "resolve_chemical",
         "reagent_assistant",
+        "recommend_reaction_conditions",
     ]
     _SPECIALIST_ANALYSIS_TOOLS = [
         "featurize_molecule",
@@ -175,6 +176,10 @@ def _build_workflow_registry() -> WorkflowRegistry:
     ]
     _GENERAL_FACADE_AND_SPECIALISTS = [
         "analyze_reaction",
+        "retrosynthesis_step",
+        "forward_synthesis_step",
+        "plan_route",
+        "plan_forward_route",
         "validate_synthesis_proposal",
         "featurize_molecule",
         "assess_snar_feasibility",
@@ -189,7 +194,13 @@ def _build_workflow_registry() -> WorkflowRegistry:
             classifier_predicate=lambda t: t == "retrosynthesis",
             max_iterations=10,
             critic_step=CriticStep(enabled=True, max_findings=5, min_severity="warning"),
-            llm_visible_tools=list(dict.fromkeys(_RETRO_FACADE_AND_SPECIALISTS + _COMPOSITE_SUPPORT_TOOLS)),
+            llm_visible_tools=list(
+                dict.fromkeys(
+                    _RETRO_FACADE_AND_SPECIALISTS
+                    + _SPECIALIST_ANALYSIS_TOOLS
+                    + _COMPOSITE_SUPPORT_TOOLS
+                )
+            ),
         )
     )
 
@@ -200,7 +211,13 @@ def _build_workflow_registry() -> WorkflowRegistry:
             classifier_predicate=lambda t: t == "forward_synthesis",
             max_iterations=8,
             critic_step=None,
-            llm_visible_tools=list(dict.fromkeys(_FORWARD_FACADE_AND_SPECIALISTS + _COMPOSITE_SUPPORT_TOOLS)),
+            llm_visible_tools=list(
+                dict.fromkeys(
+                    _FORWARD_FACADE_AND_SPECIALISTS
+                    + _SPECIALIST_ANALYSIS_TOOLS
+                    + _COMPOSITE_SUPPORT_TOOLS
+                )
+            ),
         )
     )
 
