@@ -76,6 +76,16 @@ _EVENT_SIGNATURE_CODE = {
     "c_s_bond_formation": "C-S",
     "c_c_bond_formation": "C-C",
 }
+_PRECEDENT_REACTION_EVENT_BLEND_WEIGHT = 0.7
+_REACTION_EVENT_COMPONENT_WEIGHTS = {
+    "formed": 0.35,
+    "broken": 0.20,
+    "signature": 0.10,
+    "event_kinds": 0.05,
+    "redox": 0.05,
+    "reacted_context": 0.20,
+    "formed_context": 0.05,
+}
 
 
 def _infer_source_group(source_path: Optional[Path]) -> str:
@@ -2355,6 +2365,198 @@ def _reaction_events_to_match_key(value: Any) -> str:
     return _EVENT_MATCH_PREFIX + "|".join(token_chunks)
 
 
+def _reaction_event_match_parts(match_key: Any) -> Dict[str, Any]:
+    text = str(match_key or "").strip()
+    if not text:
+        return {
+            "signature": set(),
+            "formed": set(),
+            "broken": set(),
+            "event_kinds": set(),
+            "redox": "",
+            "reacted_context": set(),
+            "formed_context": set(),
+        }
+    if text.startswith(_EVENT_MATCH_PREFIX):
+        text = text[len(_EVENT_MATCH_PREFIX) :]
+    chunks = [chunk.strip() for chunk in text.split("|") if chunk.strip()]
+    out: Dict[str, Any] = {
+        "signature": set(),
+        "formed": set(),
+        "broken": set(),
+        "event_kinds": set(),
+        "redox": "",
+        "reacted_context": set(),
+        "formed_context": set(),
+    }
+    for chunk in chunks:
+        if "=" not in chunk:
+            continue
+        key, value = chunk.split("=", 1)
+        key = key.strip().lower()
+        value = value.strip()
+        if not value:
+            continue
+        if key == "sig":
+            out["signature"] = {token for token in value.split("+") if token}
+        elif key == "kinds":
+            out["event_kinds"] = {token for token in value.split("+") if token}
+        elif key == "form":
+            out["formed"] = {token for token in value.split(";") if token}
+        elif key == "break":
+            out["broken"] = {token for token in value.split(";") if token}
+        elif key == "redox":
+            out["redox"] = value
+        elif key == "ctx_reacted":
+            out["reacted_context"] = {token for token in value.split(";") if token}
+        elif key == "ctx_formed":
+            out["formed_context"] = {token for token in value.split(";") if token}
+    return out
+
+
+def _jaccard_similarity(left: Set[str], right: Set[str]) -> float:
+    if not left and not right:
+        return 1.0
+    if not left or not right:
+        return 0.0
+    union = left | right
+    if not union:
+        return 0.0
+    return len(left & right) / len(union)
+
+
+def _reaction_event_similarity(query_match_key: Any, row_match_key: Any) -> Optional[float]:
+    query_parts = _reaction_event_match_parts(query_match_key)
+    row_parts = _reaction_event_match_parts(row_match_key)
+    total_weight = 0.0
+    weighted_score = 0.0
+
+    query_formed = set(query_parts.get("formed") or set())
+    if query_formed:
+        weight = float(_REACTION_EVENT_COMPONENT_WEIGHTS["formed"])
+        total_weight += weight
+        weighted_score += weight * _jaccard_similarity(query_formed, set(row_parts.get("formed") or set()))
+
+    query_broken = set(query_parts.get("broken") or set())
+    if query_broken:
+        weight = float(_REACTION_EVENT_COMPONENT_WEIGHTS["broken"])
+        total_weight += weight
+        weighted_score += weight * _jaccard_similarity(query_broken, set(row_parts.get("broken") or set()))
+
+    query_signature = set(query_parts.get("signature") or set())
+    if query_signature:
+        weight = float(_REACTION_EVENT_COMPONENT_WEIGHTS["signature"])
+        total_weight += weight
+        weighted_score += weight * _jaccard_similarity(
+            query_signature,
+            set(row_parts.get("signature") or set()),
+        )
+
+    query_event_kinds = set(query_parts.get("event_kinds") or set())
+    if query_event_kinds:
+        weight = float(_REACTION_EVENT_COMPONENT_WEIGHTS["event_kinds"])
+        total_weight += weight
+        weighted_score += weight * _jaccard_similarity(
+            query_event_kinds,
+            set(row_parts.get("event_kinds") or set()),
+        )
+
+    query_redox = str(query_parts.get("redox") or "").strip()
+    if query_redox:
+        weight = float(_REACTION_EVENT_COMPONENT_WEIGHTS["redox"])
+        total_weight += weight
+        row_redox = str(row_parts.get("redox") or "").strip()
+        weighted_score += weight * (1.0 if row_redox and row_redox == query_redox else 0.0)
+
+    query_reacted_context = set(query_parts.get("reacted_context") or set())
+    if query_reacted_context:
+        weight = float(_REACTION_EVENT_COMPONENT_WEIGHTS["reacted_context"])
+        total_weight += weight
+        weighted_score += weight * _jaccard_similarity(
+            query_reacted_context,
+            set(row_parts.get("reacted_context") or set()),
+        )
+
+    query_formed_context = set(query_parts.get("formed_context") or set())
+    if query_formed_context:
+        weight = float(_REACTION_EVENT_COMPONENT_WEIGHTS["formed_context"])
+        total_weight += weight
+        weighted_score += weight * _jaccard_similarity(
+            query_formed_context,
+            set(row_parts.get("formed_context") or set()),
+        )
+
+    if total_weight <= 0.0:
+        return None
+    return max(0.0, min(1.0, weighted_score / total_weight))
+
+
+@lru_cache(maxsize=4096)
+def _reaction_event_key_from_reaction_smiles(reaction_smiles: str) -> str:
+    text = str(reaction_smiles or "").strip()
+    if not text or ">" not in text:
+        return ""
+    try:
+        rxn_features = _featurize_reaction_for_recommendation(
+            text,
+            skip_bond_analysis=False,
+        )
+    except Exception:
+        return ""
+    if not isinstance(rxn_features, dict):
+        return ""
+    reaction_data = rxn_features.get("reaction")
+    if not isinstance(reaction_data, dict):
+        reaction_data = rxn_features
+    if not isinstance(reaction_data, dict):
+        return ""
+    query_events_payload = (
+        reaction_data.get("reaction_events")
+        if isinstance(reaction_data.get("reaction_events"), dict)
+        else None
+    )
+    match_key = _reaction_events_to_match_key(query_events_payload or {})
+    if not match_key:
+        match_key = _reaction_events_to_match_key(
+            build_reaction_events_payload(
+                reaction_data.get("reaction_key") or "",
+                query_events_payload,
+            )
+        )
+    if not match_key:
+        return ""
+
+    base_text = match_key[len(_EVENT_MATCH_PREFIX) :] if match_key.startswith(_EVENT_MATCH_PREFIX) else match_key
+    chunks = [chunk for chunk in base_text.split("|") if chunk]
+
+    aggregates = reaction_data.get("aggregates") if isinstance(reaction_data, dict) else None
+    if isinstance(aggregates, dict):
+        reacted_context = sorted(
+            {
+                normalize_motif_id(str(token).strip())
+                for token in (aggregates.get("reacted_motifs") or [])
+                if str(token).strip()
+            }
+        )
+        formed_context = sorted(
+            {
+                normalize_motif_id(str(token).strip())
+                for token in (aggregates.get("formed_motifs") or [])
+                if str(token).strip()
+            }
+        )
+        reacted_context = [token for token in reacted_context if token]
+        formed_context = [token for token in formed_context if token]
+        if reacted_context:
+            chunks.append("ctx_reacted=" + ";".join(reacted_context))
+        if formed_context:
+            chunks.append("ctx_formed=" + ";".join(formed_context))
+
+    if not chunks:
+        return ""
+    return _EVENT_MATCH_PREFIX + "|".join(chunks)
+
+
 def _derive_query_sets(
     reactant_motifs: Set[str],
     product_motifs: Set[str],
@@ -2527,10 +2729,17 @@ def _run_precedent_knn(
         "mixfp_weight": float(similarity_mixfp_weight),
         "reaction_smiles": reaction_smiles if has_full_reaction else "",
         "filter_by_reagent_database": False,
+        "precedent_limit": max(top_k, 10),
     }
+    knn_k = max(top_k, 10)
+    if has_full_reaction:
+        # Reaction-centric reranking needs a deeper candidate pool than the
+        # final UI list size.
+        knn_k = max(knn_k, 200)
+        relax["precedent_limit"] = max(int(relax.get("precedent_limit", 10)), 200)
 
     family = reaction_type or None
-    pack = precedent.knn(family=family, features=features, k=max(top_k, 10), relax=relax)
+    pack = precedent.knn(family=family, features=features, k=knn_k, relax=relax)
     precedents = list(pack.get("precedents", []) or [])
     normalized_source = _normalize_source_group(source_group) if source_group else ""
     precedent_source_filter = ""
@@ -2632,6 +2841,8 @@ def _run_precedent_knn(
     query_text_key = _reaction_text_key(reaction_smiles)
     if query_text_key:
         query_reaction_keys.add(query_text_key)
+    query_event_key = _reaction_event_key_from_reaction_smiles(reaction_smiles) if has_full_reaction else ""
+    require_reaction_smiles = bool(has_full_reaction and query_event_key)
     has_exact_precedent = any(
         query_reaction_keys.intersection(_reaction_match_keys(prec.get("reaction_smiles")))
         for prec in precedents
@@ -2714,6 +2925,46 @@ def _run_precedent_knn(
             if prepend:
                 precedents = prepend + precedents
 
+    if require_reaction_smiles:
+        precedents = [
+            prec
+            for prec in precedents
+            if str(prec.get("reaction_smiles") or "").strip()
+        ]
+
+    reaction_event_similarity_cache: Dict[str, Optional[float]] = {}
+
+    def _blend_similarity(row: Dict[str, Any], base_similarity: float) -> float:
+        base = max(0.0, min(1.0, float(base_similarity)))
+        if not query_event_key:
+            return base
+        row_reaction_smiles = str(row.get("reaction_smiles") or "").strip()
+        if not row_reaction_smiles:
+            return base
+        cached = reaction_event_similarity_cache.get(row_reaction_smiles)
+        if cached is None and row_reaction_smiles in reaction_event_similarity_cache:
+            return base
+        if row_reaction_smiles not in reaction_event_similarity_cache:
+            row_event_key = _reaction_event_key_from_reaction_smiles(row_reaction_smiles)
+            reaction_event_similarity_cache[row_reaction_smiles] = _reaction_event_similarity(
+                query_event_key,
+                row_event_key,
+            )
+        event_similarity = reaction_event_similarity_cache.get(row_reaction_smiles)
+        if event_similarity is None:
+            return base
+
+        blend_weight = float(_PRECEDENT_REACTION_EVENT_BLEND_WEIGHT)
+        if blend_weight < 0.0:
+            blend_weight = 0.0
+        elif blend_weight > 1.0:
+            blend_weight = 1.0
+        blended = ((1.0 - blend_weight) * base) + (blend_weight * float(event_similarity))
+        # Keep exact reaction-smiles matches from being penalized by event fallback noise.
+        if query_reaction_keys and query_reaction_keys.intersection(_reaction_match_keys(row_reaction_smiles)):
+            blended = max(blended, base)
+        return max(0.0, min(1.0, blended))
+
     def _condition_value(conditions: Dict[str, Any], key: str, fallback: Optional[str]) -> str:
         raw = conditions.get(key) if conditions else None
         if not raw:
@@ -2730,7 +2981,7 @@ def _run_precedent_knn(
         additive = _condition_value(conditions, "additive", None) or None
         coupling_reagent = _condition_value(conditions, "condensation_agent", None) or None
 
-        similarity = float(prec.get("similarity") or 0.0)
+        similarity = _blend_similarity(prec, float(prec.get("similarity") or 0.0))
         yield_val = prec.get("yield")
         avg_yield = float(yield_val) if isinstance(yield_val, (int, float)) else 0.0
         success_rate = 100.0 if avg_yield >= 50.0 else 0.0
@@ -3863,6 +4114,28 @@ class HTERecommender:
         _add_stage_timing("match_retrieval_ms", _t_match)
 
         if matched_df is None:
+            _t_precedent = time.perf_counter()
+            if (
+                (source_group or "").lower() in {"", "literature", "datasets", "dataset"}
+                and (force_precedent_search or not result.recommendations)
+            ):
+                precedent_recs = self._build_precedent_recommendations(
+                    reactant_a_smiles,
+                    reactant_b_smiles,
+                    product_smiles,
+                    reaction_type_filter or result.predicted_reaction_type,
+                    top_k,
+                    source_group=source_group,
+                    prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+                    similarity_mixfp_weight=similarity_mixfp_weight,
+                )
+                if precedent_recs:
+                    result.recommendations_by_source["precedent"] = precedent_recs
+                    if not result.recommendations:
+                        result.recommendations = (
+                            precedent_recs[:top_k] if top_k > 0 else list(precedent_recs)
+                        )
+            _add_stage_timing("precedent_merge_ms", _t_precedent)
             _finalize_timing_profile()
             return result
 
@@ -4147,6 +4420,10 @@ class HTERecommender:
             )
             if precedent_recs:
                 result.recommendations_by_source["precedent"] = precedent_recs
+                if not result.recommendations:
+                    result.recommendations = (
+                        precedent_recs[:top_k] if top_k > 0 else list(precedent_recs)
+                    )
 
         _add_stage_timing("precedent_merge_ms", _t_precedent)
         _finalize_timing_profile()

@@ -256,7 +256,6 @@ def test_plan_sources_similarity_strategy_pins_literature():
 
 def test_api_recommend_similarity_strategy_filters_to_similarity(monkeypatch):
     from chemtools.recommend.api import recommend
-    from chemtools.recommend.data_manager import LoadedResourceInfo
     from chemtools.recommend.models import RecommendationRequest
 
     monkeypatch.setattr(
@@ -272,10 +271,6 @@ def test_api_recommend_similarity_strategy_filters_to_similarity(monkeypatch):
                 "precedent": ["prec-1", "prec-2"],
             }
 
-    class FakeRecommender:
-        def recommend(self, **kwargs):  # noqa: ARG002
-            return FakeRec()
-
     class FakeDM:
         def __init__(self):
             self.calls = []
@@ -283,16 +278,19 @@ def test_api_recommend_similarity_strategy_filters_to_similarity(monkeypatch):
         def get_recommender(self, **kwargs):
             src = kwargs.get("source_group") or "all"
             self.calls.append(src)
-            return FakeRecommender(), LoadedResourceInfo(
-                cache_key="lit", db_path="/tmp/lit", source_group=str(src), cache_hit=False
-            )
+            raise AssertionError("similarity strategy should use fast path and skip data-manager loads")
+
+    monkeypatch.setattr(
+        "chemtools.recommend.api._run_similarity_fast_pass",
+        lambda req, analysis: (FakeRec(), {"similarity_fast_path": True}),
+    )
 
     dm = FakeDM()
     out = recommend(
         RecommendationRequest(reaction_smiles="A.B>>P", strategy="similarity"),
         data_manager=dm,
     )
-    assert dm.calls == ["literature"]
+    assert dm.calls == []
     assert list(out.recommendation.recommendations_by_source.keys()) == ["similarity"]
     assert out.recommendation.recommendations == ["prec-1", "prec-2"]
 

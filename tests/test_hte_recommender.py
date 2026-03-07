@@ -858,6 +858,7 @@ def test_precedent_recommendations_respect_source_group_filter(monkeypatch) -> N
                     "dataset_reaction_id": "Suzuki_miyaura",
                     "rxn_type": "Suzuki",
                     "reaction_id": "lit:1",
+                    "reaction_smiles": "Clc1ccccc1.B(O)Oc1ccccc1>>c1ccccc1-c1ccccc1",
                     "source_group": "literature",
                 },
                 {
@@ -872,6 +873,7 @@ def test_precedent_recommendations_respect_source_group_filter(monkeypatch) -> N
                     "dataset_reaction_id": "Suzuki_miyaura",
                     "rxn_type": "Suzuki",
                     "reaction_id": "rules:1",
+                    "reaction_smiles": "Clc1ccccc1.B(O)Oc1ccccc1>>c1ccccc1-c1ccccc1",
                     "source_group": "rules",
                 },
             ]
@@ -1107,3 +1109,158 @@ def test_precedent_exact_reaction_rescue_works_across_family_filter(monkeypatch)
     assert recs[0].reaction_id == "C_O_Coupling:0"
     assert recs[0].reaction_type == "C_O_Coupling"
     assert recs[0].match_score == 1.0
+
+
+def test_reaction_event_similarity_scores_bond_change_overlap() -> None:
+    query_key = hte._reaction_events_to_match_key("sig:LGDisp+C-N | form:C-N | break:C-Br")
+    similar_key = hte._reaction_events_to_match_key("sig:LGDisp+C-N | form:C-N | break:C-Cl")
+    dissimilar_key = hte._reaction_events_to_match_key("sig:C-C | form:C-C | break:C-O")
+
+    similar_score = hte._reaction_event_similarity(query_key, similar_key)
+    dissimilar_score = hte._reaction_event_similarity(query_key, dissimilar_key)
+
+    assert similar_score is not None
+    assert dissimilar_score is not None
+    assert similar_score > dissimilar_score
+
+
+def test_precedent_similarity_blends_reaction_events(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    indexed_data = {"Ar-X": df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_knn(*args, **kwargs):
+        return {
+            "precedents": [
+                {
+                    "conditions": {
+                        "catalyst": ["Pd(OAc)2"],
+                        "ligand": ["SPhos"],
+                        "base": ["K3PO4"],
+                        "solvent": ["THF"],
+                    },
+                    "similarity": 0.60,
+                    "yield": 82.0,
+                    "dataset_reaction_id": "C_N_Coupling",
+                    "rxn_type": "C_N_Coupling",
+                    "reaction_id": "good:1",
+                    "reaction_smiles": "Clc1ccccc1.NCC>>NCCc1ccccc1",
+                    "source_group": "literature",
+                },
+                {
+                    "conditions": {
+                        "catalyst": ["PdCl2"],
+                        "ligand": ["PPh3"],
+                        "base": ["K2CO3"],
+                        "solvent": ["DMF"],
+                    },
+                    "similarity": 0.95,
+                    "yield": 74.0,
+                    "dataset_reaction_id": "C_C_Coupling",
+                    "rxn_type": "C_C_Coupling",
+                    "reaction_id": "bad:1",
+                    "reaction_smiles": "CCO.CCBr>>CCOC",
+                    "source_group": "literature",
+                },
+            ]
+        }
+
+    def fake_event_key(reaction_smiles: str) -> str:
+        mapping = {
+            "Brc1ccccc1.NCC>>NCCc1ccccc1": "RXNEVT|sig=LGDisp+C-N|form=C-N|break=C-Br",
+            "Clc1ccccc1.NCC>>NCCc1ccccc1": "RXNEVT|sig=LGDisp+C-N|form=C-N|break=C-Cl",
+            "CCO.CCBr>>CCOC": "RXNEVT|sig=C-C|form=C-C|break=C-O",
+        }
+        return mapping.get(str(reaction_smiles or "").strip(), "")
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr("chemtools.precedent.knn", fake_knn)
+    monkeypatch.setattr(hte, "_reaction_event_key_from_reaction_smiles", fake_event_key)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    recs = recommender._build_precedent_recommendations(
+        reactant_a_smiles="Brc1ccccc1",
+        reactant_b_smiles="NCC",
+        product_smiles="NCCc1ccccc1",
+        reaction_type=None,
+        top_k=5,
+        source_group="literature",
+    )
+
+    assert recs
+    assert recs[0].reaction_id == "good:1"
+    assert recs[0].match_score > recs[1].match_score
+
+
+def test_precedent_reaction_centric_mode_excludes_empty_reaction_smiles(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    indexed_data = {"Ar-X": df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_knn(*args, **kwargs):
+        return {
+            "precedents": [
+                {
+                    "conditions": {
+                        "catalyst": ["Pd(OAc)2"],
+                        "ligand": ["SPhos"],
+                        "base": ["K3PO4"],
+                        "solvent": ["THF"],
+                    },
+                    "similarity": 0.99,
+                    "yield": 90.0,
+                    "dataset_reaction_id": "HTE",
+                    "rxn_type": "HTE",
+                    "reaction_id": "empty:1",
+                    "reaction_smiles": "",
+                    "source_group": "literature",
+                },
+                {
+                    "conditions": {
+                        "catalyst": ["PdCl2"],
+                        "ligand": ["PPh3"],
+                        "base": ["K2CO3"],
+                        "solvent": ["DMF"],
+                    },
+                    "similarity": 0.80,
+                    "yield": 70.0,
+                    "dataset_reaction_id": "C_N_Coupling",
+                    "rxn_type": "C_N_Coupling",
+                    "reaction_id": "full:1",
+                    "reaction_smiles": "Brc1ccccc1.NCC>>NCCc1ccccc1",
+                    "source_group": "literature",
+                },
+            ]
+        }
+
+    def fake_event_key(reaction_smiles: str) -> str:
+        text = str(reaction_smiles or "").strip()
+        if ">>" not in text:
+            return ""
+        return "RXNEVT|sig=LGDisp+C-N|form=C-N|break=Br-C"
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr("chemtools.precedent.knn", fake_knn)
+    monkeypatch.setattr(hte, "_reaction_event_key_from_reaction_smiles", fake_event_key)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    recs = recommender._build_precedent_recommendations(
+        reactant_a_smiles="Brc1ccccc1",
+        reactant_b_smiles="NCC",
+        product_smiles="NCCc1ccccc1",
+        reaction_type=None,
+        top_k=5,
+        source_group="literature",
+    )
+
+    assert recs
+    assert len(recs) == 1
+    assert recs[0].reaction_id == "full:1"

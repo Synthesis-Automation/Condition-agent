@@ -17,6 +17,7 @@ _PRECEDENT_CACHE_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
     "results", "precedent_cache",
 )
+_PRECEDENT_CACHE_SCHEMA_VERSION = "v2"
 
 
 def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
@@ -169,6 +170,31 @@ def _dataset_family_map(raw: Optional[str], fallback: Optional[str] = None) -> s
     return t
 
 
+def _family_seed_from_record(rec: Dict[str, Any], fallback: Optional[str] = None) -> str:
+    """
+    Pick the most specific reaction-family label available in a CSV row.
+
+    Prefer featurizer/detection columns over coarse dataset `reaction_id`.
+    """
+    family_fields = (
+        "detected_reaction_type",
+        "Reaction_Type_Standardized",
+        "reaction_type_standardized",
+        "reaction_type",
+        "Reaction_Type",
+        "reaction_family",
+        "family",
+    )
+    for field in family_fields:
+        value = _clean_text(rec.get(field))
+        if value and value.lower() not in {"unknown", "none", "nan"}:
+            return value
+    reaction_id = _clean_text(rec.get("reaction_id"))
+    if reaction_id:
+        return reaction_id
+    return _clean_text(fallback)
+
+
 def _make_row_from_csv(
     rec: Dict[str, Any],
     *,
@@ -193,7 +219,8 @@ def _make_row_from_csv(
             from ..smiles import normalize_reaction
 
         raw_reaction_id = _clean_text(rec.get("reaction_id"))
-        fam_txt = _dataset_family_map(raw_reaction_id, fallback=file_family)
+        family_seed = _family_seed_from_record(rec, fallback=file_family)
+        fam_txt = _dataset_family_map(family_seed, fallback=raw_reaction_id or file_family)
         row_id = _clean_text(file_family) or fam_txt or "reaction"
         rxn_id = f"{row_id}:{row_index}"
 
@@ -289,7 +316,8 @@ def _make_row_from_csv(
 
         return {
             "reaction_id": rxn_id,
-            "dataset_reaction_id": raw_reaction_id,
+            "dataset_reaction_id": fam_txt or family_seed or raw_reaction_id,
+            "dataset_reaction_id_raw": raw_reaction_id,
             "source_file": _clean_text(file_family),
             "source_group": _clean_text(source_group),
             "rxn_type": fam_txt,
@@ -338,6 +366,7 @@ def _family_key(family_filter: Optional[set]) -> Tuple[str, ...]:
 def _precedent_pkl_path(family_key: Tuple[str, ...]) -> str:
     """Return the pkl path for a given family_key."""
     key_str = "__".join(sorted(family_key)) if family_key else "__all__"
+    key_str = f"{_PRECEDENT_CACHE_SCHEMA_VERSION}::{key_str}"
     key_hash = hashlib.md5(key_str.encode()).hexdigest()[:16]
     return os.path.join(_PRECEDENT_CACHE_DIR, f"precedent_{key_hash}.pkl")
 
@@ -398,16 +427,9 @@ def _load_literature_cached(family_key: Tuple[str, ...]) -> List[Dict[str, Any]]
     for path in _iter_literature_files():
         file_family = _file_family_from_name(path)
         source_group = _infer_source_group_from_path(path)
-        mapped_family = _dataset_family_map(file_family, fallback=file_family)
-        if family_filter:
-            candidates = {
-                file_family,
-                mapped_family,
-                file_family.lower(),
-                mapped_family.lower(),
-            }
-            if not any(c in family_filter or c in family_lower for c in candidates):
-                continue
+        # Do not pre-filter by filename family: a canonical CSV can contain
+        # mixed per-row detected reaction types (for example, azide-specific
+        # rows inside broader C_N_Coupling exports).
 
         try:
             records = _read_csv_records(path)
@@ -415,6 +437,18 @@ def _load_literature_cached(family_key: Tuple[str, ...]) -> List[Dict[str, Any]]
             continue
 
         for row_index, rec in enumerate(records):
+            if family_filter:
+                seed = _family_seed_from_record(rec, fallback=file_family)
+                mapped = _dataset_family_map(seed, fallback=file_family)
+                candidates = {
+                    seed,
+                    mapped,
+                    seed.lower(),
+                    mapped.lower(),
+                }
+                if not any(c in family_filter or c in family_lower for c in candidates):
+                    continue
+
             row = _make_row_from_csv(
                 rec,
                 row_index=row_index,

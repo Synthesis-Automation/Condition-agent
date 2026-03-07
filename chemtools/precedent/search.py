@@ -174,6 +174,7 @@ def knn(family: str | None, features: Dict[str, Any], k: int = 50, relax: Dict[s
             - selective_loading (bool): Load only requested family (default: True)
               Note: Automatically set to False when family=None/"All"
             - debug_timing (bool): Log timing information (default: False)
+            - precedent_limit (int): Max precedents to return (default: 10)
         
     Returns:
         Dict with keys: prototype_id, support, precedents, (optional) error
@@ -511,7 +512,12 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
     
     # ⏱️ TIME: Result preparation
     t_start_prep = time.time()
-    top = scored[: max(1, k)]  # Keep (score, row) tuples
+    return_limit = int(relax.get("precedent_limit", 10))
+    if return_limit <= 0:
+        return_limit = max(1, int(k))
+
+    # Keep enough scored rows so output limiting can exceed k when requested.
+    top = scored[: max(1, max(int(k), return_limit))]
     support = len(scored)
 
     # Prototype id is a stable-ish hash of family+bin
@@ -532,7 +538,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             return rsmi, "", ""
 
     precedents = []
-    for score, r in top[:10]:
+    for score, r in top[:return_limit]:
         rsmi = r.get("reaction_smiles") or ""
         reactants_smi, _agents_smi, products_smi = _split_rxn(rsmi)
         precedents.append({
@@ -580,7 +586,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             
             # Rebuild precedents list from filtered results with scores
             precedents = []
-            for score, r in filtered_with_scores[:10]:  # Still limit to top 10
+            for score, r in filtered_with_scores[:return_limit]:
                 rsmi = r.get("reaction_smiles") or ""
                 reactants_smi, _agents_smi, products_smi = _split_rxn(rsmi)
                 precedents.append({
