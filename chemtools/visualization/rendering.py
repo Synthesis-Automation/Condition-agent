@@ -146,17 +146,41 @@ def _prepare_reaction_for_drawing(
     return rxn
 
 
+def _apply_heteroatom_palette(opts: "rdMolDraw2D.MolDrawOptions") -> None:
+    """Apply CPK-like colours for heteroatoms so they stand out from carbon."""
+    # Restore RDKit's built-in colour scheme first (undoes any prior BW call)
+    if hasattr(opts, "useDefaultAtomPalette"):
+        opts.useDefaultAtomPalette()
+
+    # Fine-tune individual element colours: (R, G, B) in [0, 1]
+    PALETTE: dict[int, tuple[float, float, float]] = {
+        7:  (0.00, 0.00, 0.90),   # N  – vivid blue
+        8:  (0.85, 0.05, 0.05),   # O  – vivid red
+        9:  (0.15, 0.75, 0.15),   # F  – green
+        15: (1.00, 0.45, 0.00),   # P  – orange
+        16: (0.75, 0.60, 0.00),   # S  – gold / dark yellow
+        17: (0.00, 0.65, 0.00),   # Cl – medium green
+        35: (0.55, 0.10, 0.10),   # Br – dark red / brown
+        53: (0.45, 0.00, 0.55),   # I  – purple
+        14: (0.50, 0.35, 0.05),   # Si – brown
+        5:  (0.85, 0.35, 0.10),   # B  – brick orange
+    }
+    if hasattr(opts, "atomColourPalette"):
+        opts.atomColourPalette.update(PALETTE)
+
+
 def _style_draw_options(opts: "rdMolDraw2D.MolDrawOptions") -> None:
-    opts.padding = 0.04
-    opts.bondLineWidth = 2.5
+    opts.padding = 0.08
+    opts.bondLineWidth = 2.0
     if hasattr(opts, "explicitMethyl"):
         opts.explicitMethyl = False
     if hasattr(opts, "addStereoAnnotation"):
-        opts.addStereoAnnotation = False
+        opts.addStereoAnnotation = True
     if hasattr(opts, "minFontSize"):
         opts.minFontSize = 14
-    if hasattr(opts, "useBWAtomPalette"):
-        opts.useBWAtomPalette()
+    if hasattr(opts, "maxFontSize"):
+        opts.maxFontSize = 36
+    _apply_heteroatom_palette(opts)
 
 
 def _configure_draw_options(drawer: "rdMolDraw2D.MolDraw2D") -> None:
