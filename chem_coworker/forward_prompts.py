@@ -65,8 +65,8 @@ CONDITIONAL (add when no SMILES in query):
 
 RECOMMENDED (add for thorough analysis):
   • plan_forward_route — for multi-step sequences (scaffold + multiple reagents)
-  • validate_synthesis_proposal(mode='reaction') — explicit RDKit validation
-    of a candidate reaction SMILES (reactants>>product)
+  • evaluate_synthesis_proposal(mode='reaction') — dedicated eval with RDKit
+    checks + taxonomy-consistency + overall score/grade
   • featurize_molecule — parallel with forward_synthesis_step; electronic score for
     catalyst/ligand selection (electron-poor vs electron-rich arene)
   • assess_snar_feasibility — when aryl fluoride/chloride is present and amine
@@ -76,7 +76,7 @@ CALL ORDER (dependency rules):
   G0: [resolve_chemical(mode="to_smiles")]  ← ONLY when no SMILES in query
   G1: [forward_synthesis_step]
   G2: [featurize_molecule + assess_snar_feasibility]  ← parallel as needed
-  G3: [validate_synthesis_proposal(mode='reaction')]  ← verify top candidate reaction
+  G3: [evaluate_synthesis_proposal(mode='reaction')]  ← verify top candidate reaction
   G4: [plan_forward_route]  ← when a multi-step build-up is requested
 
 Call tools in parallel when they have no dependencies.

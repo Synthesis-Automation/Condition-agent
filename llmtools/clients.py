@@ -47,7 +47,7 @@ RECOMMENDED_MODELS = {
         "reasoning": "o3-mini",  # Best reasoning
         "fast": "gpt-4o",  # GPT-4o (default)
         "balanced": "gpt-4o",  # Balanced quality/speed
-        "advanced": "gpt-5-mini",  # GPT-5 series
+        "advanced": "gpt-5.4",  # GPT-5 series
     },
 }
 
@@ -64,6 +64,7 @@ AVAILABLE_MODELS = {
         
     ],
     "openai": [
+        "gpt-5.4",
         "gpt-5.2",
         "gpt-5-mini",
         "gpt-5-nano",

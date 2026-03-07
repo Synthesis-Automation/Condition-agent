@@ -303,18 +303,18 @@ deciding whether to call more tools.
 
 Reaction analysis (single-step, most common):
   [analyze_reaction(reaction_smiles, include_conditions=True as needed)]
-  → optionally [validate_synthesis_proposal(mode="reaction", reaction_smiles=...)]
+  → optionally [evaluate_synthesis_proposal(mode="reaction", reaction_smiles=...)]
 
 Direct condition recommendation (conditions-focused query):
   [recommend_reaction_conditions(reaction_smiles, ...)]
 
 Forward prediction:
   [forward_synthesis_step(smiles_a, smiles_b, ...)]
-  → optionally [validate_synthesis_proposal(mode="reaction", reaction_smiles=...)]
+  → optionally [evaluate_synthesis_proposal(mode="reaction", reaction_smiles=...)]
 
 Retrosynthesis:
   [retrosynthesis_step(target_smiles, ...)]
-  → optionally [validate_synthesis_proposal(mode="retro", product_smiles, precursor_1, precursor_2)]
+  → optionally [evaluate_synthesis_proposal(mode="retro", product_smiles, precursor_1, precursor_2)]
 
 Full-route planning:
   [plan_route(...)] for retrosynthesis

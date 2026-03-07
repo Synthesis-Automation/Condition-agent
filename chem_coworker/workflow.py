@@ -166,11 +166,13 @@ def _build_workflow_registry() -> WorkflowRegistry:
         "plan_route",
         "apply_hte_templates",
         "search_by_product_similarity",
+        "evaluate_synthesis_proposal",
         "validate_synthesis_proposal",
     ]
     _FORWARD_FACADE_AND_SPECIALISTS = [
         "forward_synthesis_step",
         "plan_forward_route",
+        "evaluate_synthesis_proposal",
         "validate_synthesis_proposal",
         "featurize_molecule",
     ]
@@ -180,6 +182,7 @@ def _build_workflow_registry() -> WorkflowRegistry:
         "forward_synthesis_step",
         "plan_route",
         "plan_forward_route",
+        "evaluate_synthesis_proposal",
         "validate_synthesis_proposal",
         "featurize_molecule",
         "assess_snar_feasibility",

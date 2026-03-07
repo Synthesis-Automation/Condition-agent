@@ -79,7 +79,8 @@ RECOMMENDED (add for thorough analysis):
     (SNAr, Chan-Lam, CuAAC, HWE, Wacker, sulfonamide, urea, etc.)
   • search_by_product_similarity — run alongside retrosynthesis_step; Morgan FP search
     across ~231k HTE reactions ("who made something similar and how?")
-  • validate_synthesis_proposal(mode='retro') — explicit RDKit + complexity validation
+  • evaluate_synthesis_proposal(mode='retro') — dedicated eval with RDKit + complexity
+    checks plus overall score/grade for each disconnection
     for a candidate disconnection (product + precursor_1 + precursor_2)
   • plan_route — for BertzCT > 400 targets; full multi-step BFS route
   • featurize_molecule — parallel with retrosynthesis_step; get electronic score +
@@ -95,7 +96,7 @@ CALL ORDER (dependency rules):
   G1: [retrosynthesis_step]
   G2: [apply_hte_templates + search_by_product_similarity
        + featurize_molecule + assess_snar_feasibility]  ← parallel as needed
-  G3: [validate_synthesis_proposal(mode='retro') for top disconnections]
+  G3: [evaluate_synthesis_proposal(mode='retro') for top disconnections]
   G4: [plan_route]  ← when a full multi-step route is requested
 
 Call tools in parallel when they have no dependencies on each other.
@@ -120,12 +121,12 @@ directly. Structure it as:
   For each disconnection (ranked by confidence):
   Rank N: [Reaction type, confidence %]
     Forward: precursor_1 + precursor_2 → target  (SMILES: `p1.p2>>target`)
-    RDKit eval: [PASS / PASS_WITH_WARNINGS / FAIL, score=X.XX]  ← from validate_synthesis_proposal(mode='retro')
+    RDKit eval: [PASS / PASS_WITH_WARNINGS / FAIL, score=X.XX]  ← from evaluate_synthesis_proposal(mode='retro')
     Why: [brief mechanistic rationale]
     Precursor 1: [name/SMILES + availability]
     Precursor 2: [name/SMILES + availability]
 
-  Evaluation rules (apply validate_synthesis_proposal(mode='retro') result here):
+  Evaluation rules (apply evaluate_synthesis_proposal(mode='retro') result here):
   • FAIL — explicitly flag it; explain which check failed (atom balance? wrong FGs?
     charge imbalance?); propose a corrected SMILES or explain why the disconnection
     is invalid; do NOT silently present a FAIL as a valid route.

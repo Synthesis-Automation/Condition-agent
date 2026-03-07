@@ -18,6 +18,7 @@ import inspect
 import json
 import logging
 import os
+import re
 import threading
 import time
 from dataclasses import dataclass, field
@@ -31,6 +32,10 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 _TOOL_CALL_RESULTS_META_KEY = "_tool_call_results_by_id"
+_REACTION_SMILES_IN_TEXT_RE = re.compile(
+    r"([A-Za-z0-9@+\-\[\]\(\)\\\/%=#$:.*]+(?:\.[A-Za-z0-9@+\-\[\]\(\)\\\/%=#$:.*]+)*)\s*>>\s*"
+    r"([A-Za-z0-9@+\-\[\]\(\)\\\/%=#$:.*]+(?:\.[A-Za-z0-9@+\-\[\]\(\)\\\/%=#$:.*]+)*)"
+)
 
 # A4 — Conversation compaction: auto-summarize history when it grows too long.
 _COMPACT_THRESHOLD  = 20   # total messages before triggering compaction
@@ -687,6 +692,15 @@ class ChemCoworker:
                 finding_lines = "\n".join(str(f) for f in critic_findings)
                 answer += f"\n\n---\n🔍 **Critic review** (addressed above): {critic_verdict}\n{finding_lines}"
 
+        post_verification_penalty = 0.0
+        if answer:
+            answer, verification_warnings, post_verification_penalty = self._apply_output_verification_gate(
+                answer=answer,
+                tool_results=tool_results,
+                task_type=task_type,
+            )
+            warnings.extend(verification_warnings)
+
         # Evidence-based confidence aggregation replaces the placeholder native-loop confidence.
         effective_plan.confidence = self._aggregate_confidence(
             tool_results=tool_results,
@@ -694,6 +708,11 @@ class ChemCoworker:
             warnings=warnings,
             critic_findings=critic_findings,
         )
+        if post_verification_penalty > 0.0:
+            effective_plan.confidence = round(
+                max(0.05, min(0.99, float(effective_plan.confidence) - float(post_verification_penalty))),
+                3,
+            )
         perf_summary = self._build_performance_summary(tool_results, task_type=task_type)
         if answer and perf_summary:
             answer += f"\n\n---\n{perf_summary}"
@@ -1543,6 +1562,279 @@ class ChemCoworker:
             parts.append(f"• {w}")
         # Deduplicate while preserving order
         return "\n".join(dict.fromkeys(parts))
+
+    def _extract_reaction_smiles_candidates_from_text(
+        self,
+        text: str,
+        max_candidates: int = 24,
+    ) -> List[str]:
+        """Extract likely reaction SMILES candidates from free-form answer text."""
+        if not text:
+            return []
+        candidates: List[str] = []
+        for match in _REACTION_SMILES_IN_TEXT_RE.finditer(str(text)):
+            left = str(match.group(1) or "").strip().strip("`")
+            right = str(match.group(2) or "").strip().strip("`")
+            if not left or not right:
+                continue
+            candidate = f"{left}>>{right}".strip().strip("`'\"")
+            candidate = candidate.rstrip(".,;:")
+            lower = candidate.lower()
+            if "http://" in lower or "https://" in lower:
+                continue
+            candidates.append(candidate)
+            if len(candidates) >= max_candidates:
+                break
+        return list(dict.fromkeys(candidates))
+
+    def _redact_invalid_reaction_smiles(self, answer: str, invalid_smiles: List[str]) -> str:
+        """Redact invalid reaction SMILES so they are not presented as valid chemistry."""
+        redacted = str(answer or "")
+        for rxn in sorted({str(x) for x in invalid_smiles if str(x)}, key=len, reverse=True):
+            redacted = redacted.replace(f"`{rxn}`", "`[INVALID_REACTION_SMILES]`")
+            redacted = redacted.replace(rxn, "[INVALID_REACTION_SMILES]")
+        return redacted
+
+    def _iter_tool_payloads(self, tool_results: Dict[str, Any]) -> List[Tuple[str, Dict[str, Any]]]:
+        """Flatten top-level and per-call tool payloads for evidence checks."""
+        payloads: List[Tuple[str, Dict[str, Any]]] = []
+        for tool_name, result in (tool_results or {}).items():
+            if tool_name == _TOOL_CALL_RESULTS_META_KEY:
+                continue
+            if isinstance(result, dict):
+                payloads.append((str(tool_name), result))
+        per_call = tool_results.get(_TOOL_CALL_RESULTS_META_KEY)
+        if isinstance(per_call, dict):
+            for call_id, result in per_call.items():
+                if isinstance(result, dict):
+                    payloads.append((f"{_TOOL_CALL_RESULTS_META_KEY}:{call_id}", result))
+        return payloads
+
+    @staticmethod
+    def _payload_has_condition_recommendations(payload: Dict[str, Any]) -> bool:
+        recs = payload.get("recommendations")
+        if not isinstance(recs, list) or not recs:
+            return False
+        key_fields = (
+            "catalyst",
+            "ligand",
+            "base",
+            "solvent",
+            "secondary_solvent",
+            "additive",
+            "coupling_reagent",
+            "temperature",
+            "atmosphere",
+        )
+        for rec in recs:
+            if not isinstance(rec, dict):
+                continue
+            if any(str(rec.get(k) or "").strip() for k in key_fields):
+                return True
+        return bool(recs)
+
+    def _has_condition_recommendation_evidence(self, tool_results: Dict[str, Any]) -> bool:
+        """Return True if any successful tool payload provides concrete condition recommendations."""
+        direct_tools = (
+            "recommend_conditions",
+            "recommend_reaction_conditions",
+            "recommend_forward_conditions",
+        )
+        for name in direct_tools:
+            payload = tool_results.get(name)
+            if isinstance(payload, dict) and payload.get("success") and self._payload_has_condition_recommendations(payload):
+                return True
+
+        analyze = tool_results.get("analyze_reaction")
+        nested = (analyze or {}).get("conditions") if isinstance(analyze, dict) else None
+        if isinstance(nested, dict) and nested.get("success") and self._payload_has_condition_recommendations(nested):
+            return True
+
+        for _, payload in self._iter_tool_payloads(tool_results):
+            if not payload.get("success", False):
+                continue
+            if self._payload_has_condition_recommendations(payload):
+                return True
+            for nested_key in ("conditions", "conditions_for_top_disconnection", "conditions_for_top_product"):
+                nested_payload = payload.get(nested_key)
+                if isinstance(nested_payload, dict) and nested_payload.get("success") and self._payload_has_condition_recommendations(nested_payload):
+                    return True
+        return False
+
+    def _answer_claims_condition_recommendations(self, answer: str) -> bool:
+        """Detect whether the final answer makes concrete condition recommendations."""
+        text = str(answer or "").lower()
+        if not text:
+            return False
+        if ("condition" not in text) and not any(k in text for k in ("catalyst", "ligand", "base", "solvent", "temperature")):
+            return False
+
+        negative_markers = (
+            "cannot recommend conditions",
+            "unable to recommend conditions",
+            "no condition recommendation",
+            "no condition data",
+            "conditions not available",
+            "did not return conditions",
+            "no reliable condition evidence",
+        )
+        if any(marker in text for marker in negative_markers):
+            return False
+
+        direct_claim_markers = (
+            "recommended conditions",
+            "condition recommendations",
+            "recommend conditions",
+            "condition recommendation",
+            "suggested conditions",
+            "optimal conditions",
+        )
+        if any(marker in text for marker in direct_claim_markers):
+            return True
+
+        slot_hits = sum(1 for k in ("catalyst", "ligand", "base", "solvent", "temperature") if k in text)
+        return ("condition" in text) and (slot_hits >= 2)
+
+    def _has_explicit_route_evidence(self, tool_results: Dict[str, Any]) -> bool:
+        """Return True when tools produced explicit precursor/product structures for a route."""
+        def _has_precursor_pair(row: Dict[str, Any]) -> bool:
+            p1 = str(row.get("precursor_1") or "").strip()
+            p2 = str(row.get("precursor_2") or "").strip()
+            return bool(p1 and p2)
+
+        for _, payload in self._iter_tool_payloads(tool_results):
+            if not payload.get("success", False):
+                continue
+
+            route = payload.get("route")
+            if isinstance(route, list):
+                for step in route:
+                    if isinstance(step, dict) and _has_precursor_pair(step):
+                        return True
+
+            top_disconnection = payload.get("top_disconnection")
+            if isinstance(top_disconnection, dict) and _has_precursor_pair(top_disconnection):
+                return True
+
+            disconnections = payload.get("disconnections")
+            if isinstance(disconnections, dict):
+                disconnections = disconnections.get("disconnections")
+            if isinstance(disconnections, list):
+                for row in disconnections:
+                    if isinstance(row, dict) and _has_precursor_pair(row):
+                        return True
+
+            products = payload.get("products")
+            if isinstance(products, dict):
+                products = products.get("products")
+            if isinstance(products, list):
+                for row in products:
+                    if not isinstance(row, dict):
+                        continue
+                    if str(row.get("product_smiles") or "").strip():
+                        return True
+
+            top_product = payload.get("top_product")
+            if isinstance(top_product, dict) and str(top_product.get("product_smiles") or "").strip():
+                return True
+
+        return False
+
+    def _apply_output_verification_gate(
+        self,
+        *,
+        answer: str,
+        tool_results: Dict[str, Any],
+        task_type: str,
+    ) -> Tuple[str, List[str], float]:
+        """Run post-answer validation gate and append explicit verification notes."""
+        gate_warnings: List[str] = []
+        gate_lines: List[str] = []
+        confidence_penalty = 0.0
+        safe_answer = str(answer or "")
+
+        reaction_candidates = self._extract_reaction_smiles_candidates_from_text(safe_answer)
+        invalid_reactions: List[Tuple[str, str]] = []
+        if reaction_candidates:
+            from .tools._helpers import _validate_reaction_smiles
+            from .tools.composite import _evaluate_synthesis_proposal
+
+            for rxn in reaction_candidates:
+                cleaned, basic_err = _validate_reaction_smiles(rxn, require_product=True)
+                if basic_err:
+                    invalid_reactions.append((rxn, basic_err))
+                    continue
+
+                try:
+                    eval_result = _evaluate_synthesis_proposal(
+                        mode="reaction",
+                        reaction_smiles=cleaned,
+                        include_consistency_checks=False,
+                    )
+                except Exception as exc:
+                    invalid_reactions.append((rxn, f"evaluation failed: {exc}"))
+                    continue
+
+                if not isinstance(eval_result, dict) or not eval_result.get("success", False):
+                    err = ""
+                    if isinstance(eval_result, dict):
+                        err = str(eval_result.get("error") or "").strip()
+                    invalid_reactions.append((rxn, err or "evaluation returned unsuccessful result"))
+                    continue
+
+                verdict = str(eval_result.get("verdict") or "").upper()
+                if verdict == "FAIL":
+                    critical = list(eval_result.get("critical_failures", []) or [])
+                    warns = list(eval_result.get("warnings", []) or [])
+                    reason = str(critical[0] if critical else (warns[0] if warns else "evaluator verdict=FAIL"))
+                    invalid_reactions.append((rxn, reason))
+
+        if invalid_reactions:
+            invalid_smiles = [rxn for rxn, _ in invalid_reactions]
+            safe_answer = self._redact_invalid_reaction_smiles(safe_answer, invalid_smiles)
+            msg = (
+                "Output verification gate removed invalid reaction SMILES from the final answer. "
+                f"Count={len(invalid_reactions)}."
+            )
+            gate_warnings.append(msg)
+            confidence_penalty += min(0.30, 0.06 * float(len(invalid_reactions)))
+            gate_lines.append(f"- Removed `{len(invalid_reactions)}` invalid reaction SMILES (redacted above).")
+            for idx, (rxn, reason) in enumerate(invalid_reactions[:3], 1):
+                short_rxn = rxn if len(rxn) <= 80 else f"{rxn[:77]}..."
+                gate_lines.append(f"- Invalid reaction {idx}: `{short_rxn}` ({reason}).")
+            if len(invalid_reactions) > 3:
+                gate_lines.append(f"- Additional invalid reactions omitted: {len(invalid_reactions) - 3}.")
+
+        if self._answer_claims_condition_recommendations(safe_answer):
+            if not self._has_condition_recommendation_evidence(tool_results):
+                gate_warnings.append(
+                    "Output verification: final answer contains condition recommendations without successful condition-tool evidence."
+                )
+                confidence_penalty += 0.08
+                gate_lines.append(
+                    "- Condition recommendations in this answer are not backed by successful condition-tool outputs."
+                )
+
+        task_type_norm = str(task_type or "").strip().lower()
+        if (
+            reaction_candidates
+            and len(reaction_candidates) >= 2
+            and (("retro" in task_type_norm) or ("route" in task_type_norm))
+            and (not self._has_explicit_route_evidence(tool_results))
+        ):
+            gate_warnings.append(
+                "Output verification: answer presents multiple explicit reaction steps, "
+                "but tools did not return explicit precursor/product route evidence."
+            )
+            confidence_penalty += 0.10
+            gate_lines.append(
+                "- Route details include unverified explicit reaction steps; use tool outputs as authoritative."
+            )
+
+        if gate_lines:
+            safe_answer += "\n\n---\n⚠ **Output verification gate**\n" + "\n".join(gate_lines)
+
+        return safe_answer, gate_warnings, confidence_penalty
 
     def _build_performance_summary(self, tool_results: Dict[str, Any], task_type: str = "") -> str:
         """

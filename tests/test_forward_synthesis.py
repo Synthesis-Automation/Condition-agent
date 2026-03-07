@@ -10,6 +10,7 @@ Covers:
   6. hte_templates.json — forward_smarts field presence and validity
 """
 import pytest
+from types import SimpleNamespace
 
 from chemtools.forward import ForwardReactor, ReactantAnalyzer, score_products
 from chemtools.forward.contracts import ProductPrediction
@@ -24,6 +25,7 @@ from chem_coworker.tools.forward_synthesis import (
     _plan_forward_route,
     FORWARD_SYNTHESIS_TOOLS,
 )
+from chem_coworker.tools._helpers import _validate_reaction_smiles
 
 
 # ---------------------------------------------------------------------------
@@ -385,6 +387,8 @@ class TestGenerateProducts:
         r = _generate_products(smiles_a="Brc1ccccc1", smiles_b="OB(O)c1cccnc1")
         for p in r.get("products", []):
             assert ">>" in p["reaction_smiles"]
+            _, err = _validate_reaction_smiles(p["reaction_smiles"], require_product=True)
+            assert err is None
 
     def test_missing_smiles_a_returns_error(self):
         r = _generate_products()
@@ -407,6 +411,68 @@ class TestGenerateProducts:
         )
         for p in r.get("products", []):
             assert p["template_name"] == "suzuki_miyaura"
+
+    def test_filters_invalid_generated_reaction_smiles(self, monkeypatch):
+        bad = SimpleNamespace(
+            product_smiles="c1ccccc1",
+            reaction_smiles="Brc1ccccc1.Nc1ccccc1>>",
+            template_name="buchwald_hartwig",
+            taxonomy_id="buchwald_hartwig",
+            description="bad",
+            difficulty=0.2,
+            hte_yield_proxy=55.0,
+            overall_score=90.0,
+            confidence_label="high",
+            new_stereocenters=0,
+            all_product_smiles=["c1ccccc1"],
+            competing_templates=[],
+            notes="",
+            hte_families=["buchwald_hartwig"],
+        )
+        good = SimpleNamespace(
+            product_smiles="Nc1ccccc1c1ccccc1",
+            reaction_smiles="Brc1ccccc1.Nc1ccccc1>>Nc1ccccc1c1ccccc1",
+            template_name="buchwald_hartwig",
+            taxonomy_id="buchwald_hartwig",
+            description="good",
+            difficulty=0.3,
+            hte_yield_proxy=50.0,
+            overall_score=80.0,
+            confidence_label="medium",
+            new_stereocenters=0,
+            all_product_smiles=["Nc1ccccc1c1ccccc1"],
+            competing_templates=[],
+            notes="",
+            hte_families=["buchwald_hartwig"],
+        )
+
+        class _FakeReactor:
+            def generate(self, *args, **kwargs):  # noqa: ANN002, ANN003
+                return [bad, good]
+
+        monkeypatch.setattr("chemtools.forward.reactor.ForwardReactor", _FakeReactor)
+        monkeypatch.setattr(
+            "chemtools.forward.scoring.score_products",
+            lambda preds, smiles_a="", smiles_b="": preds,  # noqa: ARG005
+        )
+
+        r = _generate_products(smiles_a="Brc1ccccc1", smiles_b="Nc1ccccc1", top_k=5)
+        assert r["success"]
+        assert r.get("invalid_reaction_smiles_filtered", 0) == 1
+        assert r.get("total_products", 0) == 1
+        _, err = _validate_reaction_smiles(r["products"][0]["reaction_smiles"], require_product=True)
+        assert err is None
+
+
+class TestRecommendForwardConditions:
+    def test_requires_product_smiles(self):
+        r = _recommend_forward_conditions(
+            smiles_a="Brc1ccccc1",
+            smiles_b="Nc1ccccc1",
+            product_smiles="",
+        )
+        assert not r["success"]
+        assert "product_smiles is required" in r["error"]
 
 
 # ---------------------------------------------------------------------------

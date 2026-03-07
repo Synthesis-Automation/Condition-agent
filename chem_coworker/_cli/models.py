@@ -9,6 +9,7 @@ from .style import C
 
 _FALLBACK_MODELS: List[Dict[str, str]] = [
     {"name": "o4-mini", "provider": "openai"},
+    {"name": "gpt-5.4", "provider": "openai"},
     {"name": "gpt-5.2", "provider": "openai"},
     {"name": "glm-5", "provider": "aliyun"},
     {"name": "glm-4.7", "provider": "aliyun"},

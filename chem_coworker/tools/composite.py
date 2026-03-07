@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from ._base import ToolPlugin
-from ._helpers import _error, _success
+from ._helpers import _error, _success, _validate_reaction_smiles
 
 
 _CONDITION_SOURCE_MODES = ("literature", "motif", "similarity", "rules")
@@ -92,6 +92,10 @@ def _recommend_conditions_with_strategy(
 ) -> Dict[str, Any]:
     """Run recommend_conditions in single-source or full multi-source mode."""
     from .conditions import _recommend_conditions
+
+    reaction_smiles, rxn_err = _validate_reaction_smiles(reaction_smiles, require_product=True)
+    if rxn_err:
+        return _error(f"Invalid reaction_smiles: {rxn_err}")
 
     top_k = max(1, min(int(top_k or 5), 10))
     strategy = (condition_strategy or "auto").strip().lower()
@@ -504,11 +508,9 @@ def _recommend_reaction_conditions(
     condition_source_mode: str = "",
 ) -> Dict[str, Any]:
     """Explicit facade for reaction-condition recommendation."""
-    rxn = str(reaction_smiles or "").strip()
-    if ">>" not in rxn:
-        return _error(
-            "recommend_reaction_conditions expects reaction SMILES in 'reactants>>products' format"
-        )
+    rxn, rxn_err = _validate_reaction_smiles(reaction_smiles, require_product=True)
+    if rxn_err:
+        return _error(f"Invalid reaction_smiles: {rxn_err}")
     return _recommend_conditions_with_strategy(
         reaction_smiles=rxn,
         top_k=max(1, min(int(top_k or 5), 10)),
@@ -654,13 +656,23 @@ def _forward_synthesis_step(
     conditions: Dict[str, Any] = {}
     if include_conditions:
         reactants_str = f"{smiles_a}.{smiles_b}" if smiles_b else smiles_a
-        rxn_smiles = f"{reactants_str}>>{product_smiles}" if product_smiles else f"{reactants_str}>>"
-        conditions = _recommend_conditions_with_strategy(
-            reaction_smiles=rxn_smiles,
-            top_k=5,
-            condition_strategy=condition_strategy,
-            condition_source_mode=condition_source_mode,
-        )
+        if product_smiles:
+            rxn_smiles_raw = f"{reactants_str}>>{product_smiles}"
+            rxn_smiles, rxn_err = _validate_reaction_smiles(rxn_smiles_raw, require_product=True)
+            if rxn_err:
+                conditions = _error(f"Invalid top-product reaction SMILES: {rxn_err}")
+            else:
+                conditions = _recommend_conditions_with_strategy(
+                    reaction_smiles=rxn_smiles,
+                    top_k=5,
+                    condition_strategy=condition_strategy,
+                    condition_source_mode=condition_source_mode,
+                )
+        else:
+            conditions = _success({
+                "recommendations": [],
+                "note": "Skipped condition recommendation: no valid top product was generated.",
+            })
 
     precedent: Dict[str, Any] = {}
     hte_precedent: Dict[str, Any] = {}
@@ -706,7 +718,49 @@ def _validate_synthesis_proposal(
     precursor_2: str = "",
     reaction_name: str = "",
 ) -> Dict[str, Any]:
-    """Unified validator for reaction SMILES or retrosynthetic disconnections."""
+    """Backward-compatible validator alias.
+
+    Prefer `evaluate_synthesis_proposal` for richer scoring and consistency checks.
+    """
+    return _evaluate_synthesis_proposal(
+        mode=mode,
+        reaction_smiles=reaction_smiles,
+        product_smiles=product_smiles,
+        precursor_1=precursor_1,
+        precursor_2=precursor_2,
+        reaction_name=reaction_name,
+        include_consistency_checks=True,
+    )
+
+
+def _grade_from_score(score: float) -> str:
+    if score >= 85:
+        return "A"
+    if score >= 70:
+        return "B"
+    if score >= 55:
+        return "C"
+    if score >= 40:
+        return "D"
+    return "F"
+
+
+def _evaluate_synthesis_proposal(
+    mode: str = "auto",
+    reaction_smiles: str = "",
+    product_smiles: str = "",
+    precursor_1: str = "",
+    precursor_2: str = "",
+    reaction_name: str = "",
+    include_consistency_checks: bool = True,
+) -> Dict[str, Any]:
+    """Dedicated synthesis evaluator with multi-dimensional scoring.
+
+    Dimensions:
+      1) Structural validity and chemistry sanity (reaction_eval verdict/checks)
+      2) Retrosynthesis complexity sanity (retro mode)
+      3) Taxonomy consistency (reaction mode, optional)
+    """
     from .reaction_eval import _check_retro_consistency, _evaluate_reaction
 
     mode_norm = (mode or "auto").strip().lower()
@@ -733,12 +787,77 @@ def _validate_synthesis_proposal(
         result = _evaluate_reaction(reaction_smiles=reaction_smiles, reaction_type=reaction_name)
         tool_used = "evaluate_reaction"
 
-    if isinstance(result, dict):
-        out = dict(result)
-        out["mode_used"] = mode_norm
-        out["tool_used"] = tool_used
-        return out
-    return _error("Unexpected validation result")
+    if not isinstance(result, dict):
+        return _error("Unexpected evaluation result")
+    if not result.get("success"):
+        return result
+
+    out = dict(result)
+    out["mode_used"] = mode_norm
+    out["tool_used"] = tool_used
+
+    # Base score from evaluator verdict
+    verdict = str(result.get("verdict") or "").upper()
+    verdict_base = {
+        "PASS": 90.0,
+        "PASS_WITH_WARNINGS": 72.0,
+        "FAIL": 35.0,
+    }.get(verdict, 50.0)
+
+    critical = len(list(result.get("critical_failures", []) or []))
+    warns = len(list(result.get("warnings", []) or []))
+    score = verdict_base - (critical * 8.0) - (warns * 2.0)
+
+    consistency: Dict[str, Any] = {
+        "checked": False,
+        "matches_expected_reaction": None,
+        "expected_reaction": reaction_name or "",
+        "detected_reaction": "",
+        "detected_reaction_id": "",
+        "confidence": None,
+    }
+    if mode_norm == "reaction" and include_consistency_checks:
+        consistency["checked"] = True
+        try:
+            from .chemistry import _detect_reaction_type
+            from chemtools.taxonomy.reaction_catalog import resolve_reaction_type
+
+            detected = _detect_reaction_type(reaction_smiles=reaction_smiles)
+            if isinstance(detected, dict) and detected.get("success"):
+                detected_id = str(detected.get("reaction_type_id") or detected.get("reaction_type") or "")
+                consistency["detected_reaction"] = str(detected.get("reaction_type") or "")
+                consistency["detected_reaction_id"] = detected_id
+                consistency["confidence"] = detected.get("confidence")
+                expected_norm = resolve_reaction_type(str(reaction_name)) if reaction_name else ""
+                if expected_norm:
+                    matches = (expected_norm == detected_id)
+                    consistency["matches_expected_reaction"] = bool(matches)
+                    if not matches:
+                        score -= 15.0
+                else:
+                    consistency["matches_expected_reaction"] = None
+            else:
+                score -= 8.0
+        except Exception as exc:
+            consistency["error"] = str(exc)
+            score -= 6.0
+
+    if mode_norm == "retro":
+        cx = result.get("complexity_check") if isinstance(result, dict) else {}
+        simplified = bool((cx or {}).get("simplification_achieved", True))
+        if not simplified:
+            score -= 20.0
+
+    score = max(0.0, min(100.0, round(score, 1)))
+    out["evaluation_score"] = score
+    out["evaluation_grade"] = _grade_from_score(score)
+    out["evaluation_summary"] = {
+        "verdict": verdict,
+        "critical_failures": critical,
+        "warnings": warns,
+        "consistency": consistency,
+    }
+    return out
 
 
 resolve_chemical_tool = ToolPlugin(
@@ -851,6 +970,18 @@ validate_synthesis_proposal_tool = ToolPlugin(
     fn=_validate_synthesis_proposal,
 )
 
+evaluate_synthesis_proposal_tool = ToolPlugin(
+    name="evaluate_synthesis_proposal",
+    category="composite",
+    description=(
+        "Dedicated synthesis evaluator. Beyond SMILES validity, it combines RDKit reaction sanity checks, "
+        "retrosynthesis complexity sanity, optional taxonomy-consistency checks, and returns an overall "
+        "evaluation_score (0-100) plus evaluation_grade."
+    ),
+    prerequisites=[],
+    fn=_evaluate_synthesis_proposal,
+)
+
 
 def _project_analyze_reaction(result: dict) -> Dict[str, Any]:
     """Project nested analyze_reaction outputs into top-level structured fields."""
@@ -896,5 +1027,6 @@ COMPOSITE_TOOLS = [
     recommend_reaction_conditions_tool,
     retrosynthesis_step_tool,
     forward_synthesis_step_tool,
+    evaluate_synthesis_proposal_tool,
     validate_synthesis_proposal_tool,
 ]

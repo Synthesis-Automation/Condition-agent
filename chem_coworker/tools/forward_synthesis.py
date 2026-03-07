@@ -31,7 +31,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from ._helpers import _error, _success, _to_jsonable
+from ._helpers import _error, _success, _to_jsonable, _validate_reaction_smiles
 from ._base import ToolPlugin
 
 
@@ -339,14 +339,20 @@ def _generate_products(
         ranked = ranked[:top_k]
 
         products_out = []
+        invalid_rxn_filtered = 0
         for rank, pred in enumerate(ranked, 1):
+            rxn_smiles_raw = str(pred.reaction_smiles or "")
+            rxn_smiles, rxn_err = _validate_reaction_smiles(rxn_smiles_raw, require_product=True)
+            if rxn_err:
+                invalid_rxn_filtered += 1
+                continue
             filled = round(pred.difficulty * 5)
             difficulty_display = "●" * filled + "○" * (5 - filled)
 
             products_out.append({
-                "rank": rank,
+                "rank": len(products_out) + 1,
                 "product_smiles": pred.product_smiles,
-                "reaction_smiles": pred.reaction_smiles,
+                "reaction_smiles": rxn_smiles,
                 "template_name": pred.template_name,
                 "taxonomy_id": pred.taxonomy_id,
                 "taxonomy_family_id": pred.taxonomy_id,
@@ -363,12 +369,20 @@ def _generate_products(
                 "hte_families": pred.hte_families,
             })
 
-        return _success({
+        payload: Dict[str, Any] = {
             "smiles_a": smiles_a,
             "smiles_b": smiles_b,
             "total_products": len(products_out),
             "products": products_out,
-        })
+        }
+        if invalid_rxn_filtered:
+            payload["invalid_reaction_smiles_filtered"] = int(invalid_rxn_filtered)
+            if not products_out:
+                payload["message"] = (
+                    "Generated product candidates were filtered because their reaction SMILES "
+                    "failed validity checks."
+                )
+        return _success(payload)
 
     except Exception as exc:
         return _error(f"Product generation failed: {exc}")
@@ -774,7 +788,7 @@ def _recommend_forward_conditions(
         smiles_b: Second reactant SMILES.
         reactant_a: Alias for smiles_a.
         reactant_b: Alias for smiles_b.
-        product_smiles: Optional product SMILES for a more precise recommendation.
+        product_smiles: Required product SMILES for valid forward reaction construction.
         reaction_type: Reaction taxonomy name (e.g. "suzuki_miyaura",
                        "C_N_Coupling", "Amide_formation"). If empty, the
                        recommender will auto-detect from the reactants.
@@ -790,7 +804,7 @@ def _recommend_forward_conditions(
         if not smiles_a:
             return _error("smiles_a is required")
 
-        # Build a reaction SMILES and delegate to the existing recommend_conditions tool
+        # Build a validated forward reaction SMILES and delegate to recommend_conditions
         from chem_coworker.tools.conditions import _recommend_conditions
 
         # Compose forward reaction SMILES: reactants >> product (or empty placeholder)
@@ -801,12 +815,15 @@ def _recommend_forward_conditions(
         else:
             reactants_str = can_a
 
-        if product_smiles:
-            rxn_smiles = f"{reactants_str}>>{product_smiles}"
-        else:
-            # Without product, compose a minimal reaction SMILES and let the
-            # recommender infer from reactant FGs + reaction_type
-            rxn_smiles = f"{reactants_str}>>"
+        if not str(product_smiles or "").strip():
+            return _error(
+                "product_smiles is required for recommend_forward_conditions; "
+                "cannot build a valid reaction SMILES without a product."
+            )
+        rxn_smiles_raw = f"{reactants_str}>>{product_smiles}"
+        rxn_smiles, rxn_err = _validate_reaction_smiles(rxn_smiles_raw, require_product=True)
+        if rxn_err:
+            return _error(f"Invalid reaction SMILES for condition recommendation: {rxn_err}")
 
         result = _recommend_conditions(
             reaction_smiles=rxn_smiles,
@@ -824,9 +841,9 @@ recommend_forward_conditions_tool = ToolPlugin(
     description=(
         "Recommend optimal catalyst, ligand, base, and solvent for the predicted forward "
         "reaction. Uses the HTE-backed condition ranker (66k experiments, Z-score ranked). "
-        "Args: smiles_a (required), smiles_b (optional), product_smiles (optional but "
-        "improves accuracy), reaction_type (e.g. 'suzuki_miyaura', 'C_N_Coupling'; "
-        "leave empty for auto-detection), top_k (default 5). "
+        "Args: smiles_a (required), smiles_b (optional), product_smiles (required), "
+        "reaction_type (e.g. 'suzuki_miyaura', 'C_N_Coupling'; leave empty for "
+        "auto-detection), top_k (default 5). "
         "Run in the final group after generate_products and search_reactant_precedent."
     ),
     prerequisites=["generate_products"],
@@ -915,6 +932,17 @@ def _plan_forward_route(
 
             ranked = score_products(preds)
             best = ranked[0]
+            rxn_smiles, rxn_err = _validate_reaction_smiles(str(best.reaction_smiles or ""), require_product=True)
+            if rxn_err:
+                steps.append({
+                    "step_number": step_idx + 1,
+                    "reactant": current_smiles,
+                    "reagent": reagent,
+                    "product_smiles": best.product_smiles,
+                    "reaction_name": best.template_name or (rxn_name or "unknown"),
+                    "error": f"Generated invalid reaction SMILES for step: {rxn_err}",
+                })
+                break
 
             # Attempt to get top conditions hint from HTE
             conditions_hint: Optional[str] = None
@@ -942,7 +970,7 @@ def _plan_forward_route(
                 "reaction_name": best.template_name,
                 "taxonomy_id": best.taxonomy_id,
                 "taxonomy_family_id": best.taxonomy_id,
-                "reaction_smiles": best.reaction_smiles,
+                "reaction_smiles": rxn_smiles,
                 "description": best.description,
                 "difficulty": best.difficulty,
                 "overall_score": best.overall_score,

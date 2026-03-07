@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 # Matches whitespace around the >> separator in reaction SMILES
 _RXN_SEP_RE = re.compile(r'\s*>>\s*')
@@ -24,6 +24,61 @@ def _clean_rxn_smiles(smiles: str) -> str:
     if not smiles:
         return smiles
     return _RXN_SEP_RE.sub('>>', smiles.strip())
+
+
+def _validate_reaction_smiles(
+    reaction_smiles: str,
+    *,
+    require_product: bool = True,
+) -> Tuple[str, Optional[str]]:
+    """Validate a reaction SMILES string at a basic chemistry-sanity level.
+
+    Validation rules:
+    - Must contain a reaction arrow `>>`
+    - Reactant side must be non-empty and parseable
+    - Product side must be non-empty and parseable when `require_product=True`
+    - Dot-separated components on each side must each parse as valid SMILES
+
+    Returns:
+        (cleaned_reaction_smiles, error_message_or_None)
+    """
+    rxn = _clean_rxn_smiles(str(reaction_smiles or ""))
+    if not rxn:
+        return rxn, "reaction_smiles cannot be empty"
+    if ">>" not in rxn:
+        return rxn, "reaction_smiles must be in 'reactants>>products' format"
+
+    left, right = rxn.split(">>", 1)
+    left = left.strip()
+    right = right.strip()
+    if not left:
+        return rxn, "reaction_smiles is missing reactants before '>>'"
+    if require_product and not right:
+        return rxn, "reaction_smiles is missing product after '>>'"
+
+    try:
+        from rdkit import Chem, rdBase
+    except Exception:
+        # RDKit is required in this project; if import fails, keep structural checks only.
+        return rxn, None
+
+    def _side_ok(side: str) -> bool:
+        parts = [p.strip() for p in side.split(".") if p.strip()]
+        if not parts:
+            return False
+        for part in parts:
+            with rdBase.BlockLogs():
+                mol = Chem.MolFromSmiles(part)
+            if mol is None:
+                return False
+        return True
+
+    if not _side_ok(left):
+        return rxn, "reaction_smiles has invalid reactant component(s)"
+    if right and not _side_ok(right):
+        return rxn, "reaction_smiles has invalid product component(s)"
+
+    return rxn, None
 
 
 def _to_jsonable(value: Any) -> Any:

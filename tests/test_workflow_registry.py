@@ -131,6 +131,7 @@ class TestGlobalWorkflowRegistry:
         assert "featurize_molecule" in visible
         assert "assess_snar_feasibility" in visible
         assert "recommend_reaction_conditions" in visible
+        assert "evaluate_synthesis_proposal" in visible
 
     def test_forward_synthesis_workflow_exposes_specialist_analysis_tools(self):
         w = WORKFLOW_REGISTRY.get_for_task("forward_synthesis")
@@ -138,6 +139,7 @@ class TestGlobalWorkflowRegistry:
         assert "featurize_molecule" in visible
         assert "assess_snar_feasibility" in visible
         assert "recommend_reaction_conditions" in visible
+        assert "evaluate_synthesis_proposal" in visible
 
     def test_fallback_workflow_exposes_forward_and_retro_facades(self):
         w = WORKFLOW_REGISTRY.get_for_task("anything_else")
