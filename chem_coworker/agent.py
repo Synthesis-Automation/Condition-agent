@@ -27,6 +27,12 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from dotenv import load_dotenv
 from .event_bus import EventBus, ChemEvent
 from .workflow import WORKFLOW_REGISTRY, WorkflowDefinition
+from .skills import (
+    SkillRecord,
+    build_default_skill_registry,
+    format_skill_instruction_block,
+    format_skill_prompt_catalog,
+)
 
 load_dotenv()
 
@@ -40,6 +46,7 @@ _REACTION_SMILES_IN_TEXT_RE = re.compile(
 # A4 — Conversation compaction: auto-summarize history when it grows too long.
 _COMPACT_THRESHOLD  = 20   # total messages before triggering compaction
 _COMPACT_KEEP_RECENT = 6   # most-recent messages kept verbatim (= 3 full turns)
+_MAX_REPEATED_TOOL_SIGNATURES_WITHOUT_PROGRESS = 2
 
 
 def _conditions_cache_key(
@@ -257,6 +264,7 @@ class ChemCoworker:
         from .executor import ToolExecutor
 
         self.registry = REGISTRY
+        self.skill_registry = build_default_skill_registry()
         self.classifier = TaskClassifier()
         self.executor = ToolExecutor(
             verbose=verbose,
@@ -1333,12 +1341,19 @@ class ChemCoworker:
 
         return "\n".join(lines)
 
-    def _build_native_tools(self, workflow: Optional[WorkflowDefinition] = None) -> List[Any]:
+    def _build_native_tools(
+        self,
+        workflow: Optional[WorkflowDefinition] = None,
+        active_skill_records: Optional[List[SkillRecord]] = None,
+    ) -> List[Any]:
         """Build LangChain StructuredTool objects for the workflow's LLM-visible subset."""
-        include_names = list(workflow.llm_visible_tools) if (workflow and workflow.llm_visible_tools) else None
+        include_names = self._resolve_native_tool_names(
+            workflow=workflow,
+            active_skill_records=active_skill_records,
+        )
         tools = []
         for name in self.registry.filtered_names(
-            llm_exposed_only=True,
+            llm_exposed_only=False,
             include_names=include_names,
         ):
             plugin = self.registry._plugins[name]
@@ -1348,6 +1363,217 @@ class ChemCoworker:
                 if self.verbose:
                     logger.warning(f"[ChemCoworker] Skipping tool '{name}' (schema build failed): {exc}")
         return tools
+
+    def _resolve_native_tool_names(
+        self,
+        workflow: Optional[WorkflowDefinition] = None,
+        active_skill_records: Optional[List[SkillRecord]] = None,
+    ) -> List[str]:
+        """Resolve the LLM-visible tool surface from workflow policy and active skills."""
+        ordered: List[str] = []
+        seen: set[str] = set()
+
+        def _append_names(names: List[str]) -> None:
+            for name in names:
+                if name in seen:
+                    continue
+                seen.add(name)
+                ordered.append(name)
+
+        if workflow and getattr(workflow, "tool_policy", None):
+            _append_names(
+                self.registry.filtered_names_for_policy(
+                    workflow.tool_policy,
+                    llm_exposed_only=True,
+                )
+            )
+        if workflow and workflow.llm_visible_tools:
+            _append_names(
+                self.registry.filtered_names(
+                    llm_exposed_only=False,
+                    include_names=list(workflow.llm_visible_tools),
+                )
+            )
+        if active_skill_records:
+            for record in active_skill_records:
+                tool_policy = getattr(record.manifest, "tool_policy", None)
+                if tool_policy:
+                    _append_names(
+                        self.registry.filtered_names_for_policy(
+                            tool_policy,
+                            llm_exposed_only=False,
+                        )
+                    )
+                _append_names(
+                    self.registry.filtered_names(
+                        llm_exposed_only=False,
+                        include_names=list(record.manifest.tool_allowlist),
+                    )
+                )
+        if not ordered:
+            _append_names(self.registry.filtered_names(llm_exposed_only=True))
+        return ordered
+
+    def _get_skill_catalog_records(self, workflow: WorkflowDefinition) -> List[SkillRecord]:
+        records: List[SkillRecord] = []
+        record_by_id = {record.manifest.id: record for record in self.skill_registry.eligible_records()}
+        for manifest in self.skill_registry.catalog_for_workflow(workflow.name):
+            record = record_by_id.get(manifest.id)
+            if record is not None:
+                records.append(record)
+        return records
+
+    def _resolve_active_skill_records(
+        self,
+        *,
+        query: str,
+        task_type: str,
+        workflow: WorkflowDefinition,
+        smiles_present: bool,
+    ) -> List[SkillRecord]:
+        selected: List[SkillRecord] = []
+        seen: set[str] = set()
+
+        def _append_record(record: Optional[SkillRecord]) -> None:
+            if record is None:
+                return
+            skill_id = str(record.manifest.id)
+            if skill_id in seen:
+                return
+            seen.add(skill_id)
+            selected.append(record)
+
+        for skill_id in list(getattr(workflow, "default_skill_ids", None) or []):
+            _append_record(self.skill_registry.get_record(skill_id))
+        for manifest in self.skill_registry.match_for_query(
+            query=query,
+            task_type=task_type,
+            smiles_present=smiles_present,
+            workflow_name=workflow.name,
+        ):
+            _append_record(self.skill_registry.get_record(manifest.id))
+        return selected
+
+    def _build_skill_system_messages(
+        self,
+        workflow: WorkflowDefinition,
+        active_skill_records: List[SkillRecord],
+    ) -> List[Any]:
+        from langchain_core.messages import SystemMessage
+
+        messages: List[Any] = []
+        catalog_text = format_skill_prompt_catalog(self._get_skill_catalog_records(workflow))
+        if catalog_text:
+            messages.append(SystemMessage(content=catalog_text))
+        active_text = format_skill_instruction_block(active_skill_records)
+        if active_text:
+            messages.append(SystemMessage(content=active_text))
+        return messages
+
+    def _build_incremental_skill_instruction_message(
+        self,
+        activated_skill_records: List[SkillRecord],
+        *,
+        reason: str = "",
+    ) -> Optional[Any]:
+        from langchain_core.messages import SystemMessage
+
+        if not activated_skill_records:
+            return None
+        body = format_skill_instruction_block(activated_skill_records).strip()
+        if not body:
+            return None
+        prefix = "Additional skills have become relevant."
+        if reason:
+            prefix = f"{prefix} Reason: {reason}"
+        return SystemMessage(content=f"{prefix}\n\n{body}")
+
+    def _tool_progress_marker(self, tool_results: Dict[str, Any]) -> Tuple[int, int, int]:
+        completed_tools, provided_keys = self._collect_available_context_from_tool_results(tool_results)
+        per_call = tool_results.get(_TOOL_CALL_RESULTS_META_KEY)
+        by_call_count = len(per_call) if isinstance(per_call, dict) else 0
+        return (len(completed_tools), len(provided_keys), by_call_count)
+
+    def _tool_call_signature(self, response_tool_calls: List[Dict[str, Any]]) -> str:
+        normalized: List[Dict[str, Any]] = []
+        for tc in response_tool_calls or []:
+            normalized.append(
+                {
+                    "name": str(tc.get("name", "")),
+                    "args": dict(tc.get("args", {})),
+                }
+            )
+        try:
+            return json.dumps(normalized, sort_keys=True, default=str)
+        except Exception:
+            return str(normalized)
+
+    def _maybe_activate_additional_skills(
+        self,
+        *,
+        query: str,
+        task_type: str,
+        workflow: WorkflowDefinition,
+        smiles_present: bool,
+        response_text: str,
+        response_tool_calls: List[Dict[str, Any]],
+        tool_results: Dict[str, Any],
+        active_skill_records: List[SkillRecord],
+    ) -> Tuple[List[SkillRecord], List[SkillRecord], str]:
+        """Activate additional skills mid-loop when new context suggests they are useful."""
+        active_ids = {record.manifest.id for record in active_skill_records}
+        pending_records = [
+            record
+            for record in self._get_skill_catalog_records(workflow)
+            if record.manifest.id not in active_ids
+        ]
+        if not pending_records:
+            return active_skill_records, [], ""
+
+        completed_tools, provided_keys = self._collect_available_context_from_tool_results(tool_results)
+        query_lc = str(query or "").lower()
+        response_text_lc = str(response_text or "").lower()
+        called_names = {
+            str(tc.get("name", "")).strip()
+            for tc in (response_tool_calls or [])
+            if isinstance(tc, dict) and tc.get("name")
+        }
+        activated: List[SkillRecord] = []
+        activation_reasons: List[str] = []
+
+        for record in pending_records:
+            manifest = record.manifest
+            keywords = [kw.lower() for kw in (manifest.triggers.keywords or []) if kw]
+            keyword_hit = any(kw in response_text_lc or kw in query_lc for kw in keywords)
+
+            tool_names: set[str] = set(manifest.tool_allowlist or [])
+            tool_policy = getattr(manifest, "tool_policy", None)
+            if tool_policy:
+                tool_names.update(
+                    self.registry.filtered_names_for_policy(tool_policy, llm_exposed_only=True)
+                )
+            tool_hit = bool(tool_names.intersection(called_names))
+
+            requires_context = list(getattr(manifest, "requires_context", []) or [])
+            context_hit = bool(requires_context) and all(key in provided_keys for key in requires_context)
+
+            if keyword_hit or tool_hit or context_hit:
+                reason_bits: List[str] = []
+                if keyword_hit:
+                    reason_bits.append("keyword match")
+                if tool_hit:
+                    reason_bits.append("tool usage match")
+                if context_hit:
+                    reason_bits.append("required context became available")
+                activated.append(record)
+                activation_reasons.append(f"{manifest.id} ({', '.join(reason_bits)})")
+
+        if not activated:
+            return active_skill_records, [], ""
+
+        updated = list(active_skill_records) + activated
+        reason = "; ".join(activation_reasons)
+        return updated, activated, reason
 
     def _run_native_tool_loop(
         self,
@@ -1381,7 +1607,13 @@ class ChemCoworker:
         native_system = workflow.system_prompt
         max_iterations = workflow.max_iterations
 
-        native_tools = self._build_native_tools(workflow)
+        active_skill_records = self._resolve_active_skill_records(
+            query=query,
+            task_type=task_type,
+            workflow=workflow,
+            smiles_present=bool(smiles_list),
+        )
+        native_tools = self._build_native_tools(workflow=workflow, active_skill_records=active_skill_records)
         if not native_tools:
             logger.warning("[ChemCoworker] No native tools built — falling back to knowledge-only")
             return {}, "", 0.5, [], 0, "", [], self._new_token_section("reason", "Reasoning")
@@ -1400,8 +1632,9 @@ class ChemCoworker:
 
         messages: List[Any] = [
             SystemMessage(content=native_system),
-            HumanMessage(content=user_message),
         ]
+        messages.extend(self._build_skill_system_messages(workflow, active_skill_records))
+        messages.append(HumanMessage(content=user_message))
         tool_results: Dict[str, Any] = {}
         tool_results_by_call_id: Dict[str, Any] = {}
         hypothesis = ""
@@ -1412,6 +1645,9 @@ class ChemCoworker:
         token_usage = self._new_token_section("reason", "Reasoning")
         callables = self.registry.get_callables()
         runtime_context = self._new_tool_runtime_context(chemistry_state) if chemistry_state is not None else None
+        last_tool_signature = ""
+        last_progress_marker = (-1, -1, -1)
+        repeated_without_progress = 0
 
         self.event_bus.emit(ChemEvent.PHASE_START, phase="reason")
 
@@ -1454,6 +1690,51 @@ class ChemCoworker:
             if self.verbose:
                 names = [tc.get("name", "?") for tc in response_tool_calls]
                 logger.info(f"[ChemCoworker] Native loop iter {iteration}: {names}")
+
+            tool_signature = self._tool_call_signature(response_tool_calls)
+            progress_marker = self._tool_progress_marker(tool_results)
+            if tool_signature == last_tool_signature and progress_marker == last_progress_marker:
+                repeated_without_progress += 1
+            else:
+                repeated_without_progress = 0
+            if repeated_without_progress >= _MAX_REPEATED_TOOL_SIGNATURES_WITHOUT_PROGRESS:
+                warnings.append(
+                    "Stopped repeated tool loop after identical tool requests produced no new evidence."
+                )
+                if self.verbose:
+                    logger.info(
+                        "[ChemCoworker] Breaking repeated tool loop at iteration %d due to no progress.",
+                        iteration,
+                    )
+                break
+
+            active_skill_records, newly_activated_skills, activation_reason = self._maybe_activate_additional_skills(
+                query=query,
+                task_type=task_type,
+                workflow=workflow,
+                smiles_present=bool(smiles_list),
+                response_text=resp_text,
+                response_tool_calls=response_tool_calls,
+                tool_results=tool_results,
+                active_skill_records=active_skill_records,
+            )
+            if newly_activated_skills:
+                skill_msg = self._build_incremental_skill_instruction_message(
+                    newly_activated_skills,
+                    reason=activation_reason,
+                )
+                if skill_msg is not None:
+                    messages.append(skill_msg)
+                native_tools = self._build_native_tools(
+                    workflow=workflow,
+                    active_skill_records=active_skill_records,
+                )
+                llm_with_tools = self.llm.bind_tools(native_tools)
+                if self.verbose:
+                    logger.info(
+                        "[ChemCoworker] Activated skills mid-loop: %s",
+                        [record.manifest.id for record in newly_activated_skills],
+                    )
 
             # Execute all tool calls in parallel
             tc_list, blocked_results, contract_warnings = self._partition_native_tool_calls_by_contracts(
@@ -1528,6 +1809,9 @@ class ChemCoworker:
                     content=result_str,
                     tool_call_id=tool_call_id,
                 ))
+
+            last_tool_signature = tool_signature
+            last_progress_marker = self._tool_progress_marker(tool_results)
 
         self.event_bus.emit(ChemEvent.PHASE_END, phase="reason")
 

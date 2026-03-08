@@ -28,6 +28,7 @@ from .classifier import TaskClassifier, TaskType
 from .event_bus import EventBus, ChemEvent
 from .workflow import WorkflowDefinition, WorkflowRegistry, WORKFLOW_REGISTRY, CriticStep
 from .critic import CriticAgent, Finding, Severity, CRITIC_SYSTEM_PROMPT
+from .skills import SkillManifest, SkillRegistry, build_default_skill_registry
 
 __all__ = [
     "ChemCoworker",
@@ -47,6 +48,9 @@ __all__ = [
     "Finding",
     "Severity",
     "CRITIC_SYSTEM_PROMPT",
+    "SkillManifest",
+    "SkillRegistry",
+    "build_default_skill_registry",
 ]
 
 __version__ = "0.1.0"

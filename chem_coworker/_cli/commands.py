@@ -33,9 +33,17 @@ class ReplSession:
     create_coworker: Callable[[str, str, bool, bool], Any]
     save_default_config: Callable[[str, str], None] | None = None
     command_registry: "CommandRegistry | None" = None
+    skill_registry: Any | None = None
 
 
 CommandHandler = Callable[[ReplSession, "CommandRegistry", str, List[str]], str]
+
+
+def _command_args(args: List[str]) -> List[str]:
+    """Drop the leading slash-command token when dispatch passed the raw split input."""
+    if args and str(args[0]).startswith("/"):
+        return args[1:]
+    return args
 
 
 @dataclass(frozen=True)
@@ -122,6 +130,7 @@ def build_default_command_registry() -> CommandRegistry:
     reg.register(Command("/verbose", ("/verbose", "toggle verbose"), "Toggle verbose tool output", _cmd_verbose))
     reg.register(Command("/condmode", ("/condmode", "condmode"), "Condition mode: auto|full", _cmd_condmode))
     reg.register(Command("/settings", ("/settings", "settings"), "Show current settings", _cmd_settings))
+    reg.register(Command("/skills", ("/skills", "skills"), "List or inspect skills", _cmd_skills))
     reg.register(Command("/compact", ("/compact", "compact"), "Compact conversation history", _cmd_compact))
     reg.register(Command("/history", ("/history", "history"), "Show conversation history stats", _cmd_history))
     reg.register(Command("/session", ("/session",), "Session save/load/list/new", _cmd_session))
@@ -149,12 +158,58 @@ def _cmd_clear(session: ReplSession, registry: CommandRegistry, raw: str, args: 
 
 
 def _cmd_tools(session: ReplSession, registry: CommandRegistry, raw: str, args: List[str]) -> str:  # noqa: ARG001
+    args = _command_args(args)
     sub = args[0].lower() if args else "public"
     if sub not in {"list", "public"}:
         print(f"  {C.WARN}⚠{C.R}  Unsupported /tools subcommand. Use `/tools` or `/tools public`.")
         return COMMAND_HANDLED
     print()
     print(session.tool_registry.describe_tools(llm_exposed_only=True))
+    return COMMAND_HANDLED
+
+
+def _cmd_skills(session: ReplSession, registry: CommandRegistry, raw: str, args: List[str]) -> str:  # noqa: ARG001
+    from chem_coworker.skills import format_skill_catalog, format_skill_detail, skill_registry_payload
+
+    args = _command_args(args)
+    if session.skill_registry is None:
+        print(f"  {C.WARN}⚠{C.R}  Skills are not available in this session.")
+        return COMMAND_HANDLED
+
+    if not args:
+        sub = "list"
+    else:
+        sub = str(args[0]).strip().lower()
+
+    if sub == "list":
+        print()
+        print(format_skill_catalog(session.skill_registry.eligible_records()))
+        return COMMAND_HANDLED
+
+    if sub == "doctor":
+        payload = skill_registry_payload(session.skill_registry)
+        print()
+        print(f"  {C.LABEL}◆ Skills Doctor{C.R}")
+        print(f"  {C.META}Eligible:{C.R} {payload['eligible_count']}")
+        print(f"  {C.META}Suppressed:{C.R} {payload['suppressed_count']}")
+        for item in payload["suppressed"]:
+            reasons = "; ".join(item["reasons"]) if item["reasons"] else "unknown"
+            print(f"  {C.DIM}{item['id']}{C.R}  {C.WARN}{reasons}{C.R}")
+        return COMMAND_HANDLED
+
+    if sub == "show":
+        if len(args) < 2:
+            print(f"  {C.DIM}Usage:{C.R} /skills show <id>")
+            return COMMAND_HANDLED
+        record = session.skill_registry.get_record(args[1])
+        if record is None:
+            print(f"  {C.ERR}✗{C.R}  Skill not found: {args[1]}")
+            return COMMAND_HANDLED
+        print()
+        print(format_skill_detail(record))
+        return COMMAND_HANDLED
+
+    print(f"  {C.WARN}⚠{C.R}  Unsupported /skills subcommand. Use list, show, or doctor.")
     return COMMAND_HANDLED
 
 
@@ -209,6 +264,7 @@ def _cmd_settings(session: ReplSession, registry: CommandRegistry, raw: str, arg
 
 
 def _cmd_condmode(session: ReplSession, registry: CommandRegistry, raw: str, args: List[str]) -> str:  # noqa: ARG001
+    args = _command_args(args)
     accepted = {"auto", "full", "balanced"}
     if not args:
         current = session.condition_mode
@@ -249,6 +305,7 @@ def _cmd_history(session: ReplSession, registry: CommandRegistry, raw: str, args
 
 
 def _cmd_session(session: ReplSession, registry: CommandRegistry, raw: str, args: List[str]) -> str:  # noqa: ARG001
+    args = _command_args(args)
     if not args:
         print(f"  {C.DIM}Usage:{C.R} /session save [name] | load <name> | list | new")
         return COMMAND_HANDLED

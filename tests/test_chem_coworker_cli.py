@@ -51,8 +51,62 @@ class _FakeCoworker:
 
 
 class _FakeToolRegistry:
-    def describe_tools(self) -> str:
+    def describe_tools(self, **kwargs) -> str:  # noqa: ARG002
         return "fake tools"
+
+
+class _FakeSkillRecord:
+    def __init__(self, skill_id: str, summary: str, *, eligible: bool = True, reasons=None) -> None:
+        self.manifest = type(
+            "Manifest",
+            (),
+            {
+                "id": skill_id,
+                "name": skill_id.replace("_", " ").title(),
+                "version": 1,
+                "summary": summary,
+                "category": "chemistry",
+                "workflow_targets": ["forward_chemistry"],
+                "tool_policy": "general_chemistry",
+                "tool_allowlist": ["analyze_reaction"],
+                "instructions_md": "Instruction body.",
+                "priority": 50,
+            },
+        )()
+        self.source_label = "bundled"
+        self.eligibility = type(
+            "Eligibility",
+            (),
+            {
+                "eligible": eligible,
+                "reasons": list(reasons or []),
+            },
+        )()
+
+
+class _FakeSkillRegistry:
+    def __init__(self) -> None:
+        self._eligible = [_FakeSkillRecord("reaction_analysis", "Taxonomy-backed reaction analysis.")]
+        self._suppressed = [
+            _FakeSkillRecord(
+                "condition_recommendation",
+                "HTE-backed condition selection.",
+                eligible=False,
+                reasons=["missing data file: data/HTE_db"],
+            )
+        ]
+
+    def eligible_records(self):
+        return list(self._eligible)
+
+    def suppressed_records(self):
+        return list(self._suppressed)
+
+    def get_record(self, skill_id: str):
+        for record in self._eligible + self._suppressed:
+            if record.manifest.id == skill_id:
+                return record
+        return None
 
 
 class _FakeUI:
@@ -75,10 +129,12 @@ def _make_session() -> ReplSession:
         provider="openai",
         verbose=False,
         plan_mode=False,
+        condition_mode="auto",
         history=[{"role": "user", "content": "x"}, {"role": "assistant", "content": "y"}],
         tool_registry=_FakeToolRegistry(),
         ui=ui,
         create_coworker=lambda m, p, v, pm: coworker,
+        skill_registry=_FakeSkillRegistry(),
     )
 
 
@@ -97,6 +153,23 @@ def test_command_registry_toggles_verbose_and_plan(capsys) -> None:
     assert reg.dispatch("/history", session) == COMMAND_HANDLED
     out = capsys.readouterr().out
     assert "History:" in out
+
+
+def test_command_registry_skills_commands(capsys) -> None:
+    reg = build_default_command_registry()
+    session = _make_session()
+
+    assert reg.dispatch("/skills", session) == COMMAND_HANDLED
+    out = capsys.readouterr().out
+    assert "reaction_analysis" in out
+
+    assert reg.dispatch("/skills show reaction_analysis", session) == COMMAND_HANDLED
+    out = capsys.readouterr().out
+    assert "Instruction body." in out
+
+    assert reg.dispatch("/skills doctor", session) == COMMAND_HANDLED
+    out = capsys.readouterr().out
+    assert "condition_recommendation" in out
 
 
 def test_command_registry_compact_and_exit() -> None:
@@ -139,6 +212,24 @@ def test_parser_help_includes_ask_and_batch() -> None:
     help_text = parser.format_help()
     assert "ask" in help_text
     assert "batch" in help_text
+    assert "skills" in help_text
+
+
+def test_main_skills_list_json(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(cli_app, "_build_skill_registry", lambda workspace_root=None: _FakeSkillRegistry())
+
+    cli_app.main(["skills", "list", "--output-format", "json"])
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["eligible_count"] == 1
+    assert payload["eligible"][0]["id"] == "reaction_analysis"
+
+
+def test_main_skills_show_plain(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(cli_app, "_build_skill_registry", lambda workspace_root=None: _FakeSkillRegistry())
+
+    cli_app.main(["skills", "show", "reaction_analysis"])
+    out = capsys.readouterr().out
+    assert "Reaction Analysis" in out
 
 
 def test_main_ask_json_outputs_chemresponse(monkeypatch, capsys) -> None:

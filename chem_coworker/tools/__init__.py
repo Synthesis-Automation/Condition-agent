@@ -126,6 +126,48 @@ class ToolRegistry:
                 tools.append(p.langchain_tool)
         return tools
 
+    def policy_names(self) -> List[str]:
+        return sorted(_TOOL_POLICIES.keys())
+
+    def filtered_names_for_policy(
+        self,
+        policy_name: str,
+        *,
+        llm_exposed_only: bool = False,
+        include_names: Optional[Sequence[str]] = None,
+        exclude_names: Optional[Sequence[str]] = None,
+    ) -> List[str]:
+        base_names = list(_TOOL_POLICIES.get(str(policy_name or "").strip(), []))
+        if include_names:
+            for name in include_names:
+                if name not in base_names:
+                    base_names.append(name)
+        return self._select_plugin_names(
+            llm_exposed_only=llm_exposed_only,
+            include_names=base_names,
+            exclude_names=exclude_names,
+        )
+
+    def describe_tools_for_policy(
+        self,
+        policy_name: str,
+        *,
+        llm_exposed_only: bool = False,
+        include_names: Optional[Sequence[str]] = None,
+        exclude_names: Optional[Sequence[str]] = None,
+    ) -> str:
+        names = self.filtered_names_for_policy(
+            policy_name,
+            llm_exposed_only=llm_exposed_only,
+            include_names=include_names,
+            exclude_names=exclude_names,
+        )
+        return self.describe_tools(
+            llm_exposed_only=llm_exposed_only,
+            include_names=names,
+            exclude_names=exclude_names,
+        )
+
     # ------------------------------------------------------------------
     # Execution group builder (topological sort)
     # ------------------------------------------------------------------
@@ -300,6 +342,66 @@ for _name in _HIDE_FROM_LLM_BY_DEFAULT:
     if _name in REGISTRY._plugins:
         REGISTRY._plugins[_name].llm_exposed = False
 
+
+# ---------------------------------------------------------------------------
+# Named tool policies
+# ---------------------------------------------------------------------------
+
+_TOOL_POLICIES: Dict[str, List[str]] = {
+    "general_chemistry": [
+        "analyze_reaction",
+        "retrosynthesis_step",
+        "forward_synthesis_step",
+        "plan_route",
+        "plan_forward_route",
+        "evaluate_synthesis_proposal",
+        "validate_synthesis_proposal",
+        "featurize_molecule",
+        "assess_snar_feasibility",
+        "resolve_chemical",
+        "reagent_assistant",
+        "recommend_reaction_conditions",
+    ],
+    "retro_specialist": [
+        "retrosynthesis_step",
+        "plan_route",
+        "apply_hte_templates",
+        "search_by_product_similarity",
+        "evaluate_synthesis_proposal",
+        "validate_synthesis_proposal",
+        "featurize_molecule",
+        "assess_snar_feasibility",
+        "resolve_chemical",
+        "reagent_assistant",
+        "recommend_reaction_conditions",
+    ],
+    "forward_specialist": [
+        "forward_synthesis_step",
+        "plan_forward_route",
+        "evaluate_synthesis_proposal",
+        "validate_synthesis_proposal",
+        "featurize_molecule",
+        "assess_snar_feasibility",
+        "resolve_chemical",
+        "reagent_assistant",
+        "recommend_reaction_conditions",
+    ],
+    "conditions_specialist": [
+        "analyze_reaction",
+        "recommend_reaction_conditions",
+        "reagent_assistant",
+        "featurize_molecule",
+        "resolve_chemical",
+    ],
+    "literature_curator": [
+        "search_notes",
+        "read_notes",
+        "search_knowledge",
+        "read_knowledge",
+    ],
+    "internal_debug": REGISTRY.names(),
+}
+
 # ---------------------------------------------------------------------------
 # Convenience: flat list of all registered ToolPlugin objects
 # ---------------------------------------------------------------------------
@@ -310,4 +412,5 @@ __all__ = [
     "ToolRegistry",
     "REGISTRY",
     "COWORKER_TOOLS",
+    "_TOOL_POLICIES",
 ]

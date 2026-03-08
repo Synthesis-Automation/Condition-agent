@@ -97,6 +97,12 @@ def _resolve_model_provider(args: argparse.Namespace) -> tuple[str, str]:
     return model, provider
 
 
+def _build_skill_registry(workspace_root: Optional[Path] = None):
+    from chem_coworker.skills import build_default_skill_registry
+
+    return build_default_skill_registry(workspace_root=workspace_root or Path.cwd())
+
+
 def _provider_color(provider: str) -> str:
     return C.CYAN if provider == "openai" else C.MAGENTA
 
@@ -254,6 +260,118 @@ def _cmd_batch(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+def _cmd_skills(args: argparse.Namespace) -> None:
+    from chem_coworker.skills import format_skill_catalog, format_skill_detail, skill_registry_payload
+
+    registry = _build_skill_registry(Path.cwd())
+    output_format = getattr(args, "output_format", "plain")
+    action = getattr(args, "skills_action", None) or "list"
+
+    if output_format == "json":
+        payload = skill_registry_payload(registry)
+        if action == "show":
+            record = registry.get_record(args.skill_id)
+            if record is None:
+                print(json.dumps({"success": False, "error": f"Skill not found: {args.skill_id}"}))
+                sys.exit(1)
+            payload = {
+                "success": True,
+                "skill": {
+                    "id": record.manifest.id,
+                    "name": record.manifest.name,
+                    "version": record.manifest.version,
+                    "summary": record.manifest.summary,
+                    "category": record.manifest.category,
+                    "source": record.source_label,
+                    "eligible": record.eligibility.eligible,
+                    "reasons": list(record.eligibility.reasons),
+                    "workflow_targets": list(record.manifest.workflow_targets),
+                    "tool_allowlist": list(record.manifest.tool_allowlist),
+                    "instructions_md": record.manifest.instructions_md,
+                },
+            }
+        print(json.dumps(payload, indent=2))
+        return
+
+    if action == "list":
+        print()
+        print(format_skill_catalog(registry.eligible_records()))
+        return
+
+    if action == "doctor":
+        payload = skill_registry_payload(registry)
+        print()
+        print(f"  {C.LABEL}◆ Skills Doctor{C.R}")
+        print(f"  {C.META}Eligible:{C.R} {payload['eligible_count']}")
+        for item in payload["eligible"]:
+            print(f"  {C.OK}✓{C.R}  {item['id']}  {C.META}{item['source']}{C.R}")
+        print(f"  {C.META}Suppressed:{C.R} {payload['suppressed_count']}")
+        for item in payload["suppressed"]:
+            reasons = "; ".join(item["reasons"]) if item["reasons"] else "unknown"
+            print(f"  {C.WARN}⚠{C.R}  {item['id']}  {reasons}")
+        return
+
+    if action == "show":
+        record = registry.get_record(args.skill_id)
+        if record is None:
+            print(f"  {C.ERR}✗{C.R}  Skill not found: {args.skill_id}")
+            sys.exit(1)
+        print()
+        print(format_skill_detail(record))
+        return
+
+    print(f"  {C.ERR}✗{C.R}  Unsupported skills action: {action}")
+    sys.exit(2)
+
+
+def _cmd_intake(args: argparse.Namespace) -> None:
+    if getattr(args, "list_reaction_types", False):
+        from chemtools.taxonomy.reaction_catalog import list_reaction_type_ids
+
+        reaction_type_ids = list(list_reaction_type_ids())
+        if args.output_format == "json":
+            print(json.dumps({"count": len(reaction_type_ids), "reaction_type_ids": reaction_type_ids}, indent=2))
+        else:
+            print()
+            print(f"  {C.LABEL}◆ Reaction Types{C.R}")
+            for item in reaction_type_ids:
+                print(f"  {C.DIM}{item}{C.R}")
+        return
+
+    source = str(getattr(args, "source", "") or "").strip()
+    if not source:
+        print(f"  {C.ERR}✗{C.R}  Source is required unless --list-reaction-types is used.")
+        sys.exit(2)
+
+    from chem_coworker.extractor import NotesExtractor
+
+    model, provider = _resolve_model_provider(args)
+    extractor = NotesExtractor(provider=provider, model=model, verbose=args.verbose)
+    result = extractor.intake(
+        source=source,
+        reaction_type=args.reaction_type,
+        note_type=args.note_type,
+        mismatch_policy=args.mismatch_policy,
+        dry_run=args.dry_run,
+        unknown_reaction_policy=args.unknown_reaction_policy,
+    )
+
+    if args.output_format == "json":
+        print(json.dumps(result, indent=2, default=str))
+        return
+
+    print()
+    if result.get("success"):
+        print(f"  {C.OK}✓{C.R}  Intake complete")
+        print(f"  {C.META}Source:{C.R} {result.get('source', source)}")
+        print(f"  {C.META}Reaction types:{C.R} {', '.join(result.get('reaction_types', [])) or '(none)'}")
+        for path in result.get("notes_files", []):
+            print(f"  {C.DIM}{path}{C.R}")
+    else:
+        print(f"  {C.ERR}✗{C.R}  {result.get('error', 'Intake failed')}")
+        sys.exit(1)
+
+
 def _cmd_setup(args: argparse.Namespace) -> None:  # noqa: ARG001
     print()
     print(f"  {C.LABEL}◆ ChemCoworker Setup{C.R}  {C.DIM}Choose your default model{C.R}")
@@ -359,6 +477,77 @@ Examples:
         action="store_true",
         help="Continue processing after errors (explicit CI-friendly mode; default behavior)",
     )
+
+    intake_parser = subparsers.add_parser(
+        "intake",
+        help="Extract chemistry notes from a file, URL, or raw text",
+    )
+    intake_parser.add_argument("source", nargs="?", default="", help="File path, URL, or raw text")
+    intake_parser.add_argument("--reaction-type", default="", help="Optional reaction type hint")
+    intake_parser.add_argument(
+        "--note-type",
+        default="reactions",
+        choices=["reactions", "mechanisms", "substrates", "protocols", "routes"],
+        help="Notes bucket (default: reactions)",
+    )
+    intake_parser.add_argument(
+        "--mismatch-policy",
+        default="warn",
+        choices=["warn", "confirm", "reject", "force"],
+        help="Hint-vs-detection mismatch handling",
+    )
+    intake_parser.add_argument(
+        "--unknown-reaction-policy",
+        default="general",
+        choices=["general", "quarantine", "reject"],
+        help="How to handle non-taxonomy labels",
+    )
+    intake_parser.add_argument("--dry-run", action="store_true", help="Do not write notes files")
+    intake_parser.add_argument(
+        "--list-reaction-types",
+        action="store_true",
+        help="List canonical taxonomy reaction type ids and exit",
+    )
+    intake_parser.add_argument(
+        "--output-format",
+        default="plain",
+        choices=["plain", "json"],
+        help="Output format (default: plain)",
+    )
+
+    skills_parser = subparsers.add_parser(
+        "skills",
+        help="Inspect local bundled/user/workspace skills",
+    )
+    skills_parser.add_argument(
+        "--output-format",
+        default="plain",
+        choices=["plain", "json"],
+        help="Output format (default: plain)",
+    )
+    skills_subparsers = skills_parser.add_subparsers(dest="skills_action")
+    list_parser = skills_subparsers.add_parser("list", help="List eligible skills")
+    list_parser.add_argument(
+        "--output-format",
+        default="plain",
+        choices=["plain", "json"],
+        help=argparse.SUPPRESS,
+    )
+    show_parser = skills_subparsers.add_parser("show", help="Show one skill")
+    show_parser.add_argument(
+        "--output-format",
+        default="plain",
+        choices=["plain", "json"],
+        help=argparse.SUPPRESS,
+    )
+    show_parser.add_argument("skill_id", help="Skill id")
+    doctor_parser = skills_subparsers.add_parser("doctor", help="Report eligible and suppressed skills")
+    doctor_parser.add_argument(
+        "--output-format",
+        default="plain",
+        choices=["plain", "json"],
+        help=argparse.SUPPRESS,
+    )
     return arg_parser
 
 
@@ -370,6 +559,7 @@ def _create_repl_session(
     plan_mode: bool,
     ui: TerminalUI,
     tool_registry,
+    skill_registry,
 ):
     return ReplSession(
         coworker=coworker,
@@ -383,6 +573,7 @@ def _create_repl_session(
         ui=ui,
         create_coworker=lambda m, p, v, pm: _init_coworker(m, p, v, pm, ui),
         save_default_config=save_config,
+        skill_registry=skill_registry,
     )
 
 
@@ -440,6 +631,12 @@ def main(argv: Optional[List[str]] = None) -> None:
     if args.command == "batch":
         _cmd_batch(args)
         return
+    if args.command == "intake":
+        _cmd_intake(args)
+        return
+    if args.command == "skills":
+        _cmd_skills(args)
+        return
     print()
     print(f"  {C.LABEL}◆ ChemCoworker{C.R}  {C.DIM}Chemistry AI Agent{C.R}")
     print(f"  {C.META}General-purpose chemistry Q&A, analysis, and prediction{C.R}")
@@ -473,15 +670,29 @@ def main(argv: Optional[List[str]] = None) -> None:
     ui = TerminalUI()
     try:
         coworker = _init_coworker(model, provider, verbose, plan_mode, ui)
+        skill_registry = _build_skill_registry(Path.cwd())
         public_tool_count = len(REGISTRY.filtered_names(llm_exposed_only=True))
-        print(f"  {C.OK}✓{C.R}  Agent ready  {C.META}{public_tool_count} public tools available{C.R}")
+        eligible_skill_count = len(skill_registry.eligible_records())
+        print(
+            f"  {C.OK}✓{C.R}  Agent ready  "
+            f"{C.META}{public_tool_count} public tools · {eligible_skill_count} skills{C.R}"
+        )
         if plan_mode:
             print(f"  {C.META}Plan approval ON{C.R}")
     except Exception as exc:
         print(f"  {C.ERR}✗{C.R}  Failed to initialize: {exc}")
         sys.exit(1)
 
-    session = _create_repl_session(coworker, model, provider, verbose, plan_mode, ui, REGISTRY)
+    session = _create_repl_session(
+        coworker,
+        model,
+        provider,
+        verbose,
+        plan_mode,
+        ui,
+        REGISTRY,
+        skill_registry,
+    )
     command_registry = build_default_command_registry()
     session.command_registry = command_registry
 
