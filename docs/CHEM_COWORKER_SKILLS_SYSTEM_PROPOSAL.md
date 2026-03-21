@@ -4,6 +4,9 @@
 
 This document turns the OpenClaw skills/runtime research into a concrete design for `chem_coworker`.
 
+For the current implemented runtime flow after this proposal was applied, see
+`docs/CHEM_COWORKER_RUNTIME_WORKFLOW.md`.
+
 The goal is not to copy OpenClaw mechanically. The goal is to add the parts that improve capability isolation, environment-aware loading, and prompt efficiency while preserving this project's core rule:
 
 - chemistry logic stays in `chemtools/taxonomy`, deterministic tools, and validators
