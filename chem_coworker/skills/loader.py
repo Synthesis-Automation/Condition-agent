@@ -9,6 +9,8 @@ from pathlib import Path
 
 from .manifest import SkillManifest, parse_skill_markdown
 
+SKILL_MANIFEST_FILENAME = "CHEMCOWORKER_SKILL.md"
+
 
 @dataclass
 class LoadedSkill:
@@ -44,7 +46,7 @@ class SkillLoader:
         files: list[Path] = []
         for child in sorted(root.iterdir(), key=lambda p: p.name.lower()):
             if child.is_dir():
-                skill_file = child / "SKILL.md"
+                skill_file = child / SKILL_MANIFEST_FILENAME
                 if skill_file.exists():
                     files.append(skill_file)
         return files

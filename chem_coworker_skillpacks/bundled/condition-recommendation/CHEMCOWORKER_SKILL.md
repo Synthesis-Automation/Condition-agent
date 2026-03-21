@@ -20,14 +20,6 @@ tool_allowlist:
   - analyze_reaction
   - recommend_reaction_conditions
   - reagent_assistant
-tool_preferred_order:
-  - analyze_reaction
-  - recommend_reaction_conditions
-provides_context:
-  - reaction_type
-  - recommendations
-requires_context:
-  - reaction_type
 eligibility:
   rdkit: true
   python_modules:
@@ -36,14 +28,6 @@ eligibility:
     - data/HTE_db
   env_vars: []
   taxonomy_ids: []
-prompting:
-  inject_mode: on_demand
-  max_tokens_hint: 700
-answer_contract:
-  require_tool_evidence: true
-  require_taxonomy_alignment: true
-  must_surface_warnings: true
-  forbid_knowledge_only_conditions: true
 priority: 90
 ---
 
@@ -53,6 +37,6 @@ Use this skill for catalyst, ligand, solvent, base, additive, and temperature re
 
 ## Required behavior
 
-1. Establish reaction identity from taxonomy-backed evidence before recommending conditions.
-2. Prefer HTE-backed output over unaudited model knowledge.
-3. If evidence is thin or missing, say so and lower confidence.
+1. Confirm taxonomy-backed reaction identity before recommending conditions.
+2. Prefer tool-backed condition evidence over model-only suggestions.
+3. Surface uncertainty when evidence is weak, sparse, or absent.

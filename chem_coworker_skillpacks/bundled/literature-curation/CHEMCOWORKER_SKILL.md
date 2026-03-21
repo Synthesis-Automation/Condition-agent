@@ -23,13 +23,6 @@ eligibility:
     - knowledge_base
   env_vars: []
   taxonomy_ids: []
-prompting:
-  inject_mode: on_demand
-  max_tokens_hint: 600
-answer_contract:
-  require_tool_evidence: true
-  require_taxonomy_alignment: true
-  must_surface_warnings: true
 priority: 60
 ---
 
@@ -41,3 +34,4 @@ Use this skill for document-to-notes workflows and knowledge-base curation tasks
 
 1. Keep extracted notes generalizable and concise.
 2. Preserve taxonomy alignment when writing reaction-type labels.
+3. Prefer structured notes over broad narrative summaries.

@@ -26,13 +26,6 @@ eligibility:
   data_files: []
   env_vars: []
   taxonomy_ids: []
-prompting:
-  inject_mode: on_demand
-  max_tokens_hint: 800
-answer_contract:
-  require_tool_evidence: true
-  require_taxonomy_alignment: true
-  must_surface_warnings: true
 priority: 85
 ---
 
@@ -44,3 +37,4 @@ Use this skill for target-first route planning, disconnection analysis, and prec
 
 1. Keep route proposals grounded in explicit step or validation tool evidence.
 2. Surface weak points, protecting group risk, and uncertain disconnections.
+3. Avoid presenting unverified routes as settled.

@@ -24,13 +24,6 @@ eligibility:
   data_files: []
   env_vars: []
   taxonomy_ids: []
-prompting:
-  inject_mode: on_demand
-  max_tokens_hint: 500
-answer_contract:
-  require_tool_evidence: true
-  require_taxonomy_alignment: true
-  must_surface_warnings: true
 priority: 70
 ---
 

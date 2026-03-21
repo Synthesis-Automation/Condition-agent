@@ -25,13 +25,6 @@ eligibility:
   data_files: []
   env_vars: []
   taxonomy_ids: []
-prompting:
-  inject_mode: on_demand
-  max_tokens_hint: 650
-answer_contract:
-  require_tool_evidence: true
-  require_taxonomy_alignment: true
-  must_surface_warnings: true
 priority: 75
 ---
 
@@ -41,5 +34,6 @@ Use this skill for reactant-first forward prediction or when ranking plausible p
 
 ## Required behavior
 
-1. Distinguish prediction from explanation.
+1. Distinguish product prediction from explanation or retrosynthesis.
 2. Prefer validated proposals over unsupported product guesses.
+3. Say when multiple outcomes remain plausible.

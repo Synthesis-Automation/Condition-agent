@@ -20,7 +20,7 @@ def _make_manifest(tmp_path: Path) -> SkillManifest:
             env_vars=[],
             taxonomy_ids=[],
         ),
-        source_path=str(tmp_path / "skills" / "eligibility_test" / "SKILL.md"),
+        source_path=str(tmp_path / "skills" / "eligibility_test" / "CHEMCOWORKER_SKILL.md"),
     )
 
 

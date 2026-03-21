@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from chem_coworker.skills.loader import SkillLoader
+from chem_coworker.skills.loader import SKILL_MANIFEST_FILENAME, SkillLoader
 from chem_coworker.skills.manifest import parse_skill_markdown
 
 
 def _write_skill(root: Path, folder: str, *, skill_id: str, summary: str) -> None:
     target = root / folder
     target.mkdir(parents=True, exist_ok=True)
-    (target / "SKILL.md").write_text(
+    (target / SKILL_MANIFEST_FILENAME).write_text(
         f"""---
 id: {skill_id}
 name: Demo Skill
@@ -72,7 +72,7 @@ priority: 51
 
 Use evidence first.
 """,
-        source_path="demo/SKILL.md",
+        source_path="demo/CHEMCOWORKER_SKILL.md",
     )
 
     assert manifest.id == "test_skill"

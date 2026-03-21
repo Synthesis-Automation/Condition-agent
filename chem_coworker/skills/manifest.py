@@ -135,7 +135,7 @@ def _as_str_list(value: Any, field_name: str, source_path: str) -> list[str]:
 
 
 def parse_skill_markdown(text: str, *, source_path: str = "") -> SkillManifest:
-    """Parse one `SKILL.md` file into a typed manifest."""
+    """Parse one ChemCoworker skill manifest markdown file into a typed manifest."""
     data, instructions_md = _split_frontmatter(text, source_path)
 
     triggers_data = data.get("triggers") or {}
