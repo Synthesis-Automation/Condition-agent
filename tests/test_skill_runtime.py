@@ -36,6 +36,7 @@ def test_workflow_defaults_expose_policy_and_default_skills() -> None:
     fwd = WORKFLOW_REGISTRY.get_for_task("forward_synthesis")
     assert fwd.tool_policy == "forward_specialist"
     assert "forward_prediction" in (fwd.default_skill_ids or [])
+    assert "condition_recommendation" not in (fwd.default_skill_ids or [])
 
 
 def test_agent_resolves_active_skills_from_defaults_and_query() -> None:
@@ -54,7 +55,7 @@ def test_agent_resolves_active_skills_from_defaults_and_query() -> None:
     assert "condition_recommendation" in active_ids
 
 
-def test_build_skill_system_messages_includes_catalog_and_active_instructions() -> None:
+def test_build_skill_system_messages_only_include_active_instructions() -> None:
     agent = _make_runtime_agent()
     workflow = WORKFLOW_REGISTRY.get_for_task("forward_chemistry")
     active = agent._resolve_active_skill_records(
@@ -67,7 +68,6 @@ def test_build_skill_system_messages_includes_catalog_and_active_instructions() 
     messages = agent._build_skill_system_messages(workflow, active)
     contents = "\n".join(str(getattr(msg, "content", "")) for msg in messages)
 
-    assert "Available skills:" in contents
     assert "Active skill instructions:" in contents
     assert "Condition Recommendation" in contents
 
@@ -102,30 +102,17 @@ def test_active_skill_tool_policy_can_expand_workflow_tool_surface() -> None:
     assert "read_notes" in names
 
 
-def test_mid_loop_skill_activation_hydrates_additional_instructions() -> None:
+def test_agent_only_adds_one_query_matched_skill() -> None:
     agent = _make_runtime_agent()
-    literature_record = agent.skill_registry.get_record("literature_curation")
-    assert literature_record is not None
-
-    active, activated, reason = agent._maybe_activate_additional_skills(
-        query="Analyze this route",
-        task_type="general",
+    active = agent._resolve_active_skill_records(
+        query="Recommend conditions and prepare a literature summary for A>>B",
+        task_type="predict",
         workflow=WORKFLOW_REGISTRY.get_for_task("forward_chemistry"),
-        smiles_present=False,
-        response_text="I should review literature summary and notes before concluding.",
-        response_tool_calls=[],
-        tool_results={},
-        active_skill_records=[agent.skill_registry.get_record("reaction_analysis")],
+        smiles_present=True,
     )
+    active_ids = [record.manifest.id for record in active]
 
-    activated_ids = [record.manifest.id for record in activated]
-    assert "literature_curation" in activated_ids
-    assert "keyword match" in reason
-
-    msg = agent._build_incremental_skill_instruction_message(activated, reason=reason)
-    assert msg is not None
-    assert "Additional skills have become relevant." in str(msg.content)
-    assert "Literature Curation" in str(msg.content)
+    assert active_ids == ["reaction_analysis", "condition_recommendation"]
 
 
 def test_repetition_guard_stops_identical_tool_loop_without_progress() -> None:
@@ -179,7 +166,7 @@ def test_repetition_guard_stops_identical_tool_loop_without_progress() -> None:
     assert llm_calls == 4
 
 
-def test_mid_loop_skill_activation_rebinds_tools_for_next_iteration() -> None:
+def test_native_tool_loop_binds_tools_once_when_skills_are_static() -> None:
     agent = _make_runtime_agent()
     agent._accumulate_token_usage = lambda *args, **kwargs: None
 
@@ -202,11 +189,8 @@ def test_mid_loop_skill_activation_rebinds_tools_for_next_iteration() -> None:
 
     bound_initial = MagicMock()
     bound_initial.invoke.side_effect = [first_response]
-    bound_after = MagicMock()
-    bound_after.invoke.side_effect = [second_response]
-
     agent.llm = MagicMock()
-    agent.llm.bind_tools.side_effect = [bound_initial, bound_after]
+    agent.llm.bind_tools.return_value = bound_initial
     agent.executor._run_parallel.return_value = (
         {"analyze_reaction": {"success": True, "reaction_type": "suzuki_miyaura"}},
         {"tc1": {"success": True, "reaction_type": "suzuki_miyaura"}},
@@ -238,6 +222,6 @@ def test_mid_loop_skill_activation_rebinds_tools_for_next_iteration() -> None:
         if msg.__class__.__name__ == "SystemMessage"
     ]
 
-    assert agent.llm.bind_tools.call_count == 2
-    assert any("search_notes" in names for names in calls_seen)
-    assert any("Additional skills have become relevant." in content for content in system_contents)
+    assert agent.llm.bind_tools.call_count == 1
+    assert all("search_notes" not in names for names in calls_seen)
+    assert not any("Additional skills have become relevant." in content for content in system_contents)

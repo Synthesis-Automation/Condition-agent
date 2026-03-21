@@ -183,7 +183,7 @@ def _build_workflow_registry() -> WorkflowRegistry:
             max_iterations=8,
             critic_step=None,
             llm_visible_tools=REGISTRY.filtered_names_for_policy("forward_specialist", llm_exposed_only=True),
-            default_skill_ids=["forward_prediction", "condition_recommendation"],
+            default_skill_ids=["forward_prediction"],
             tool_policy="forward_specialist",
         )
     )

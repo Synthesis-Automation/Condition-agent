@@ -108,12 +108,13 @@ class TestChemCoworkerNativeOnly:
         from chem_coworker.agent import ChemCoworker
         assert callable(ChemCoworker.run)
 
-    def test_native_tool_loop_returns_7_tuple(self):
-        """Early-exit guard in _run_native_tool_loop must return 7-tuple (fixed Phase 4 regression)."""
+    def test_native_tool_loop_returns_8_tuple(self):
+        """Early-exit guard in _run_native_tool_loop must return 8-tuple including token usage."""
         from chem_coworker.agent import ChemCoworker
         src = inspect.getsource(ChemCoworker._run_native_tool_loop)
-        # The guard return must include 7 elements (the last being `[]` for messages)
-        assert '[], 0, "", []' in src, "Early-exit must return 7-tuple ending with `[]` for messages"
+        assert '[], self._new_token_section("reason", "Reasoning")' in src, (
+            "Early-exit must return messages plus a token-usage section."
+        )
 
 
 # ---------------------------------------------------------------------------

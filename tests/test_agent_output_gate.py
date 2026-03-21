@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 from chem_coworker.agent import ChemCoworker
 from chem_coworker.tools import REGISTRY
 
@@ -43,6 +45,38 @@ def test_output_gate_flags_unbacked_condition_claims() -> None:
     assert "output verification gate" in answer.lower()
     assert penalty > 0.0
     assert report.get("condition_claim_without_evidence") is True
+
+
+def test_output_gate_requires_taxonomy_alignment_for_condition_skill() -> None:
+    agent = _make_agent()
+    active_skill = SimpleNamespace(manifest=SimpleNamespace(id="condition_recommendation"))
+
+    answer, warnings, penalty, report = agent._apply_output_verification_gate(
+        answer=(
+            "Recommended conditions: catalyst Pd(OAc)2, ligand XPhos, "
+            "base Cs2CO3, solvent dioxane, temperature 90 C."
+        ),
+        tool_results={
+            "recommend_reaction_conditions": {
+                "success": True,
+                "recommendations": [
+                    {
+                        "catalyst": "Pd(OAc)2",
+                        "ligand": "XPhos",
+                        "base": "Cs2CO3",
+                        "solvent": "dioxane",
+                    }
+                ],
+            },
+        },
+        task_type="forward_synthesis",
+        active_skill_records=[active_skill],
+    )
+
+    assert any("taxonomy-aligned reaction identity" in w.lower() for w in warnings)
+    assert "taxonomy-backed reaction identity evidence" in answer.lower()
+    assert penalty > 0.0
+    assert report.get("condition_skill_missing_taxonomy_alignment") is True
 
 
 def test_output_gate_flags_unproven_route_steps(monkeypatch) -> None:

@@ -1,4 +1,4 @@
-"""Phase 4: Message thread cleanup tests — exhaustion guard and 7-tuple return."""
+"""Phase 4: Message thread cleanup tests — exhaustion guard and 8-tuple return."""
 
 import pytest
 from unittest.mock import MagicMock, patch
@@ -17,7 +17,7 @@ def _make_agent():
 
 class TestNativeToolLoopReturns7Tuple:
     def test_successful_loop_returns_7_elements(self):
-        """Verify the return tuple has exactly 7 elements (adds messages)."""
+        """Verify the return tuple has exactly 8 elements including token usage."""
         agent = _make_agent()
 
         # Build a minimal mock LLM that writes a final answer immediately
@@ -38,10 +38,11 @@ class TestNativeToolLoopReturns7Tuple:
             workflow=workflow,
             primary_smiles="",
         )
-        assert len(result) == 7, f"Expected 7-tuple, got {len(result)}-tuple"
-        tool_results, hypothesis, confidence, warnings, llm_count, final_answer, messages = result
+        assert len(result) == 8, f"Expected 8-tuple, got {len(result)}-tuple"
+        tool_results, hypothesis, confidence, warnings, llm_count, final_answer, messages, token_usage = result
         assert final_answer == "The answer is 42."
         assert isinstance(messages, list)
+        assert isinstance(token_usage, dict)
         assert len(messages) >= 2  # at least SystemMessage + HumanMessage + response
 
 
@@ -84,7 +85,7 @@ class TestExhaustionGuard:
         # Executor returns empty result for unknown tool
         agent.executor._run_parallel.return_value = {}
 
-        _, _, _, warnings_out, llm_count, final_answer, messages = agent._run_native_tool_loop(
+        _, _, _, warnings_out, llm_count, final_answer, messages, _token_usage = agent._run_native_tool_loop(
             query="test query",
             task_type="test",
             smiles_list=[],
@@ -123,7 +124,7 @@ class TestExhaustionGuard:
         mock_llm.bind_tools.return_value = mock_llm_bound
         agent.llm = mock_llm
 
-        _, _, _, _, llm_count, final_answer, _ = agent._run_native_tool_loop(
+        _, _, _, _, llm_count, final_answer, _, _token_usage = agent._run_native_tool_loop(
             query="test query",
             task_type="test",
             smiles_list=[],
@@ -262,7 +263,7 @@ class TestDuplicateNativeToolCallsPreservePerCallResults:
         from chem_coworker.workflow import WORKFLOW_REGISTRY
         workflow = WORKFLOW_REGISTRY.get_for_task("forward_chemistry")
 
-        tool_results, _, _, _, _, _, messages = agent._run_native_tool_loop(
+        tool_results, _, _, _, _, _, messages, _token_usage = agent._run_native_tool_loop(
             query="descriptor test",
             task_type="general",
             smiles_list=[],

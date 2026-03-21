@@ -64,9 +64,8 @@ class SkillRegistry:
         matched: list[SkillManifest] = []
         for record in self.eligible_records():
             manifest = record.manifest
-            if manifest.workflow_targets and task_type not in manifest.workflow_targets:
-                if workflow_name not in set(manifest.workflow_targets):
-                    continue
+            if manifest.workflow_targets and workflow_name not in set(manifest.workflow_targets):
+                continue
             requires_any_ok = not manifest.triggers.requires_any or (
                 smiles_present and any(
                     item in {"reaction_smiles", "reaction_context", "molecule_smiles"}

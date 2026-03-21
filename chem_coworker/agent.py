@@ -31,7 +31,6 @@ from .skills import (
     SkillRecord,
     build_default_skill_registry,
     format_skill_instruction_block,
-    format_skill_prompt_catalog,
 )
 
 load_dotenv()
@@ -559,15 +558,30 @@ class ChemCoworker:
                     return self._copy_result(ctx.conditions_results_by_top_k[legacy_key])
                 if tk in ctx.conditions_results_by_top_k:
                     return self._copy_result(ctx.conditions_results_by_top_k[tk])
-            result = base_callables["recommend_conditions"](
-                reaction_smiles=reaction_smiles,
-                top_k=top_k,
-                source_group=source_group,
-                reaction_key_only=reaction_key_only,
-                use_spectator_groups=use_spectator_groups,
-                prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
-                similarity_mixfp_weight=similarity_mixfp_weight,
-            )
+            call_kwargs = {
+                "reaction_smiles": reaction_smiles,
+                "top_k": top_k,
+                "source_group": source_group,
+                "reaction_key_only": reaction_key_only,
+                "use_spectator_groups": use_spectator_groups,
+                "prefer_mixfp_for_similarity": prefer_mixfp_for_similarity,
+                "similarity_mixfp_weight": similarity_mixfp_weight,
+            }
+            try:
+                sig = inspect.signature(base_callables["recommend_conditions"])
+                accepts_var_kwargs = any(
+                    param.kind == inspect.Parameter.VAR_KEYWORD
+                    for param in sig.parameters.values()
+                )
+                if not accepts_var_kwargs:
+                    call_kwargs = {
+                        key: value
+                        for key, value in call_kwargs.items()
+                        if key in sig.parameters
+                    }
+            except Exception:
+                pass
+            result = base_callables["recommend_conditions"](**call_kwargs)
             with ctx._lock:
                 ctx.conditions_results_by_top_k[cache_key] = self._copy_result(result)
             return self._copy_result(result)
@@ -630,6 +644,12 @@ class ChemCoworker:
 
         # Route to the appropriate workflow
         workflow = WORKFLOW_REGISTRY.get_for_task(task_type)
+        active_skill_records = self._resolve_active_skill_records(
+            query=query,
+            task_type=task_type,
+            workflow=workflow,
+            smiles_present=bool(smiles_list),
+        )
 
         # ── Steps 2–4: Native tool calling ─────────────────────────────
         warnings: List[str] = []
@@ -643,6 +663,7 @@ class ChemCoworker:
                 workflow=workflow,
                 primary_smiles=primary_smiles,
                 chemistry_state=chemistry_state,
+                active_skill_records=active_skill_records,
             )
         warnings.extend(tool_warnings)
         llm_calls += llm_calls_native
@@ -707,6 +728,7 @@ class ChemCoworker:
                 answer=answer,
                 tool_results=tool_results,
                 task_type=task_type,
+                active_skill_records=active_skill_records,
             )
             (
                 answer,
@@ -724,6 +746,7 @@ class ChemCoworker:
                 verification_report=gate_report,
                 tool_results=tool_results,
                 task_type=task_type,
+                active_skill_records=active_skill_records,
             )
             warnings.extend(verification_warnings)
             warnings.extend(repair_warnings)
@@ -1414,15 +1437,6 @@ class ChemCoworker:
             _append_names(self.registry.filtered_names(llm_exposed_only=True))
         return ordered
 
-    def _get_skill_catalog_records(self, workflow: WorkflowDefinition) -> List[SkillRecord]:
-        records: List[SkillRecord] = []
-        record_by_id = {record.manifest.id: record for record in self.skill_registry.eligible_records()}
-        for manifest in self.skill_registry.catalog_for_workflow(workflow.name):
-            record = record_by_id.get(manifest.id)
-            if record is not None:
-                records.append(record)
-        return records
-
     def _resolve_active_skill_records(
         self,
         *,
@@ -1431,8 +1445,12 @@ class ChemCoworker:
         workflow: WorkflowDefinition,
         smiles_present: bool,
     ) -> List[SkillRecord]:
+        """Select workflow defaults plus at most one query-matched specialist skill."""
         selected: List[SkillRecord] = []
         seen: set[str] = set()
+        skill_registry = getattr(self, "skill_registry", None)
+        if skill_registry is None:
+            return selected
 
         def _append_record(record: Optional[SkillRecord]) -> None:
             if record is None:
@@ -1444,14 +1462,18 @@ class ChemCoworker:
             selected.append(record)
 
         for skill_id in list(getattr(workflow, "default_skill_ids", None) or []):
-            _append_record(self.skill_registry.get_record(skill_id))
-        for manifest in self.skill_registry.match_for_query(
+            _append_record(skill_registry.get_record(skill_id))
+        for manifest in skill_registry.match_for_query(
             query=query,
             task_type=task_type,
             smiles_present=smiles_present,
             workflow_name=workflow.name,
         ):
-            _append_record(self.skill_registry.get_record(manifest.id))
+            record = skill_registry.get_record(manifest.id)
+            if record is None or record.manifest.id in seen:
+                continue
+            _append_record(record)
+            break
         return selected
 
     def _build_skill_system_messages(
@@ -1462,31 +1484,10 @@ class ChemCoworker:
         from langchain_core.messages import SystemMessage
 
         messages: List[Any] = []
-        catalog_text = format_skill_prompt_catalog(self._get_skill_catalog_records(workflow))
-        if catalog_text:
-            messages.append(SystemMessage(content=catalog_text))
         active_text = format_skill_instruction_block(active_skill_records)
         if active_text:
             messages.append(SystemMessage(content=active_text))
         return messages
-
-    def _build_incremental_skill_instruction_message(
-        self,
-        activated_skill_records: List[SkillRecord],
-        *,
-        reason: str = "",
-    ) -> Optional[Any]:
-        from langchain_core.messages import SystemMessage
-
-        if not activated_skill_records:
-            return None
-        body = format_skill_instruction_block(activated_skill_records).strip()
-        if not body:
-            return None
-        prefix = "Additional skills have become relevant."
-        if reason:
-            prefix = f"{prefix} Reason: {reason}"
-        return SystemMessage(content=f"{prefix}\n\n{body}")
 
     def _tool_progress_marker(self, tool_results: Dict[str, Any]) -> Tuple[int, int, int]:
         completed_tools, provided_keys = self._collect_available_context_from_tool_results(tool_results)
@@ -1508,73 +1509,6 @@ class ChemCoworker:
         except Exception:
             return str(normalized)
 
-    def _maybe_activate_additional_skills(
-        self,
-        *,
-        query: str,
-        task_type: str,
-        workflow: WorkflowDefinition,
-        smiles_present: bool,
-        response_text: str,
-        response_tool_calls: List[Dict[str, Any]],
-        tool_results: Dict[str, Any],
-        active_skill_records: List[SkillRecord],
-    ) -> Tuple[List[SkillRecord], List[SkillRecord], str]:
-        """Activate additional skills mid-loop when new context suggests they are useful."""
-        active_ids = {record.manifest.id for record in active_skill_records}
-        pending_records = [
-            record
-            for record in self._get_skill_catalog_records(workflow)
-            if record.manifest.id not in active_ids
-        ]
-        if not pending_records:
-            return active_skill_records, [], ""
-
-        completed_tools, provided_keys = self._collect_available_context_from_tool_results(tool_results)
-        query_lc = str(query or "").lower()
-        response_text_lc = str(response_text or "").lower()
-        called_names = {
-            str(tc.get("name", "")).strip()
-            for tc in (response_tool_calls or [])
-            if isinstance(tc, dict) and tc.get("name")
-        }
-        activated: List[SkillRecord] = []
-        activation_reasons: List[str] = []
-
-        for record in pending_records:
-            manifest = record.manifest
-            keywords = [kw.lower() for kw in (manifest.triggers.keywords or []) if kw]
-            keyword_hit = any(kw in response_text_lc or kw in query_lc for kw in keywords)
-
-            tool_names: set[str] = set(manifest.tool_allowlist or [])
-            tool_policy = getattr(manifest, "tool_policy", None)
-            if tool_policy:
-                tool_names.update(
-                    self.registry.filtered_names_for_policy(tool_policy, llm_exposed_only=True)
-                )
-            tool_hit = bool(tool_names.intersection(called_names))
-
-            requires_context = list(getattr(manifest, "requires_context", []) or [])
-            context_hit = bool(requires_context) and all(key in provided_keys for key in requires_context)
-
-            if keyword_hit or tool_hit or context_hit:
-                reason_bits: List[str] = []
-                if keyword_hit:
-                    reason_bits.append("keyword match")
-                if tool_hit:
-                    reason_bits.append("tool usage match")
-                if context_hit:
-                    reason_bits.append("required context became available")
-                activated.append(record)
-                activation_reasons.append(f"{manifest.id} ({', '.join(reason_bits)})")
-
-        if not activated:
-            return active_skill_records, [], ""
-
-        updated = list(active_skill_records) + activated
-        reason = "; ".join(activation_reasons)
-        return updated, activated, reason
-
     def _run_native_tool_loop(
         self,
         query: str,
@@ -1583,6 +1517,7 @@ class ChemCoworker:
         workflow: WorkflowDefinition,
         primary_smiles: str,
         chemistry_state: Optional[ChemistryRunState] = None,
+        active_skill_records: Optional[List[SkillRecord]] = None,
     ) -> tuple:
         """
         Run the reasoning+execution phase via native LangChain tool calling.
@@ -1607,12 +1542,13 @@ class ChemCoworker:
         native_system = workflow.system_prompt
         max_iterations = workflow.max_iterations
 
-        active_skill_records = self._resolve_active_skill_records(
-            query=query,
-            task_type=task_type,
-            workflow=workflow,
-            smiles_present=bool(smiles_list),
-        )
+        if active_skill_records is None:
+            active_skill_records = self._resolve_active_skill_records(
+                query=query,
+                task_type=task_type,
+                workflow=workflow,
+                smiles_present=bool(smiles_list),
+            )
         native_tools = self._build_native_tools(workflow=workflow, active_skill_records=active_skill_records)
         if not native_tools:
             logger.warning("[ChemCoworker] No native tools built — falling back to knowledge-only")
@@ -1707,34 +1643,6 @@ class ChemCoworker:
                         iteration,
                     )
                 break
-
-            active_skill_records, newly_activated_skills, activation_reason = self._maybe_activate_additional_skills(
-                query=query,
-                task_type=task_type,
-                workflow=workflow,
-                smiles_present=bool(smiles_list),
-                response_text=resp_text,
-                response_tool_calls=response_tool_calls,
-                tool_results=tool_results,
-                active_skill_records=active_skill_records,
-            )
-            if newly_activated_skills:
-                skill_msg = self._build_incremental_skill_instruction_message(
-                    newly_activated_skills,
-                    reason=activation_reason,
-                )
-                if skill_msg is not None:
-                    messages.append(skill_msg)
-                native_tools = self._build_native_tools(
-                    workflow=workflow,
-                    active_skill_records=active_skill_records,
-                )
-                llm_with_tools = self.llm.bind_tools(native_tools)
-                if self.verbose:
-                    logger.info(
-                        "[ChemCoworker] Activated skills mid-loop: %s",
-                        [record.manifest.id for record in newly_activated_skills],
-                    )
 
             # Execute all tool calls in parallel
             tc_list, blocked_results, contract_warnings = self._partition_native_tool_calls_by_contracts(
@@ -1967,6 +1875,26 @@ class ChemCoworker:
                     return True
         return False
 
+    def _has_taxonomy_alignment_evidence(self, tool_results: Dict[str, Any]) -> bool:
+        """Return True when successful tool outputs include a concrete taxonomy reaction type."""
+        def _is_known_reaction_type(value: Any) -> bool:
+            text = str(value or "").strip()
+            return bool(text) and text.lower() not in {"unknown", "none", "null"}
+
+        for _, payload in self._iter_tool_payloads(tool_results):
+            if not payload.get("success", False):
+                continue
+            if _is_known_reaction_type(payload.get("reaction_type_id")):
+                return True
+            if _is_known_reaction_type(payload.get("reaction_type")):
+                return True
+            if _is_known_reaction_type(payload.get("detected_reaction_type")):
+                return True
+            metadata = payload.get("reaction_type_metadata")
+            if isinstance(metadata, dict) and _is_known_reaction_type(metadata.get("id")):
+                return True
+        return False
+
     def _answer_claims_condition_recommendations(self, answer: str) -> bool:
         """Detect whether the final answer makes concrete condition recommendations."""
         text = str(answer or "").lower()
@@ -2052,12 +1980,18 @@ class ChemCoworker:
         answer: str,
         tool_results: Dict[str, Any],
         task_type: str,
+        active_skill_records: Optional[List[SkillRecord]] = None,
     ) -> Tuple[str, List[str], float, Dict[str, Any]]:
         """Run post-answer validation gate and append explicit verification notes."""
         gate_warnings: List[str] = []
         gate_lines: List[str] = []
         confidence_penalty = 0.0
         safe_answer = str(answer or "")
+        active_skill_records = list(active_skill_records or [])
+        condition_skill_active = any(
+            str(record.manifest.id) == "condition_recommendation"
+            for record in active_skill_records
+        )
 
         reaction_candidates = self._extract_reaction_smiles_candidates_from_text(safe_answer)
         invalid_reactions: List[Tuple[str, str]] = []
@@ -2113,12 +2047,26 @@ class ChemCoworker:
 
         if self._answer_claims_condition_recommendations(safe_answer):
             if not self._has_condition_recommendation_evidence(tool_results):
+                if condition_skill_active:
+                    gate_warnings.append(
+                        "Output verification: active condition skill requires successful condition-tool evidence before recommending conditions."
+                    )
+                    confidence_penalty += 0.12
+                else:
+                    gate_warnings.append(
+                        "Output verification: final answer contains condition recommendations without successful condition-tool evidence."
+                    )
+                    confidence_penalty += 0.08
+                gate_lines.append(
+                    "- Condition recommendations in this answer are not backed by successful condition-tool outputs."
+                )
+            if condition_skill_active and not self._has_taxonomy_alignment_evidence(tool_results):
                 gate_warnings.append(
-                    "Output verification: final answer contains condition recommendations without successful condition-tool evidence."
+                    "Output verification: active condition skill requires taxonomy-aligned reaction identity before recommending conditions."
                 )
                 confidence_penalty += 0.08
                 gate_lines.append(
-                    "- Condition recommendations in this answer are not backed by successful condition-tool outputs."
+                    "- Condition recommendations are missing taxonomy-backed reaction identity evidence."
                 )
 
         task_type_norm = str(task_type or "").strip().lower()
@@ -2146,7 +2094,11 @@ class ChemCoworker:
                 for rxn, reason in invalid_reactions
             ],
             "condition_claim_without_evidence": any(
-                "condition recommendations without successful condition-tool evidence" in str(w).lower()
+                ("condition-tool evidence" in str(w).lower()) and ("condition" in str(w).lower())
+                for w in gate_warnings
+            ),
+            "condition_skill_missing_taxonomy_alignment": any(
+                "taxonomy-aligned reaction identity" in str(w).lower()
                 for w in gate_warnings
             ),
             "unverified_route_steps": any(
@@ -2254,6 +2206,7 @@ class ChemCoworker:
         verification_report: Dict[str, Any],
         tool_results: Dict[str, Any],
         task_type: str,
+        active_skill_records: Optional[List[SkillRecord]] = None,
     ) -> Tuple[str, List[str], float, List[str], int, Dict[str, Any]]:
         """Try one bounded repair pass after eval failure; keep only improved output."""
         repair_warnings: List[str] = []
@@ -2297,6 +2250,7 @@ class ChemCoworker:
             answer=revised_answer,
             tool_results=tool_results,
             task_type=task_type,
+            active_skill_records=active_skill_records,
         )
 
         old_invalid = len(invalid_reactions)
