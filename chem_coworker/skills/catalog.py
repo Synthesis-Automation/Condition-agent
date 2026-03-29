@@ -43,6 +43,29 @@ def format_skill_instruction_block(records: list[SkillRecord]) -> str:
         manifest = record.manifest
         lines.append(f"## {manifest.name} [{manifest.id}]")
         lines.append(manifest.instructions_md.strip() or "(no additional instructions)")
+        # Surface answer_contract constraints so the LLM knows the rules
+        contract = manifest.answer_contract
+        contract_lines: list[str] = []
+        if contract.require_tool_evidence:
+            contract_lines.append("- All claims MUST be backed by tool output evidence.")
+        if contract.require_taxonomy_alignment:
+            contract_lines.append("- Confirm taxonomy-backed reaction identity before recommending.")
+        if contract.forbid_knowledge_only_conditions:
+            contract_lines.append("- Do NOT fabricate conditions from general knowledge; only report tool-returned results.")
+        if contract.must_surface_warnings:
+            contract_lines.append("- Surface all tool warnings and caveats explicitly in the answer.")
+        if contract_lines:
+            lines.append("\n**Answer contract (enforced):**")
+            lines.extend(contract_lines)
+        # Surface tool_default_args so the LLM uses the right parameters
+        if manifest.tool_default_args:
+            default_lines: list[str] = []
+            for tool_name, defaults in manifest.tool_default_args.items():
+                parts = ", ".join(f"{k}={v!r}" for k, v in defaults.items())
+                default_lines.append(f"- {tool_name}: use {parts}")
+            if default_lines:
+                lines.append("\n**Recommended tool parameters:**")
+                lines.extend(default_lines)
     return "\n\n".join(lines)
 
 

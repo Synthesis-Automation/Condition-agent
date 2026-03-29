@@ -1164,6 +1164,7 @@ class ChemCoworker:
         response_tool_calls: List[Dict[str, Any]],
         callables: Dict[str, Callable[..., Any]],
         tool_results: Dict[str, Any],
+        active_skill_records: Optional[List[SkillRecord]] = None,
     ) -> tuple[List["ToolCall"], Dict[str, Any], List[str]]:
         """
         Partition tool calls into executable vs blocked/deferred by ToolPlugin contracts.
@@ -1185,6 +1186,14 @@ class ChemCoworker:
         for name, plugin in plugins.items():
             for key in getattr(plugin, "provides", []) or []:
                 providers_by_key.setdefault(key, set()).add(name)
+
+        # Build merged tool_default_args from active skills (last skill wins per-key).
+        skill_tool_defaults: Dict[str, Dict[str, Any]] = {}
+        for record in (active_skill_records or []):
+            for tool_name, defaults in (getattr(record.manifest, "tool_default_args", None) or {}).items():
+                merged = skill_tool_defaults.get(tool_name, {})
+                merged.update(defaults)
+                skill_tool_defaults[tool_name] = merged
 
         executable: List[ToolCall] = []
         blocked_results: Dict[str, Any] = {}
@@ -1228,6 +1237,11 @@ class ChemCoworker:
 
             tc_args = dict(tc.get("args", {}))
             tc_call_id = str(tc.get("id", "") or "")
+            # Merge skill-declared default args (skill defaults < LLM-provided args).
+            if tool_name in skill_tool_defaults:
+                merged_args = dict(skill_tool_defaults[tool_name])
+                merged_args.update(tc_args)
+                tc_args = merged_args
             missing_prereqs = [p for p in (plugin.prerequisites or []) if p not in completed_tools]
             missing_requires = [k for k in (plugin.requires or []) if k not in provided_keys]
             if not missing_prereqs and not missing_requires:
@@ -1649,6 +1663,7 @@ class ChemCoworker:
                 response_tool_calls=response_tool_calls,
                 callables=callables,
                 tool_results=tool_results,
+                active_skill_records=active_skill_records,
             )
             if blocked_results:
                 for _name, _blocked in blocked_results.items():
@@ -1988,8 +2003,18 @@ class ChemCoworker:
         confidence_penalty = 0.0
         safe_answer = str(answer or "")
         active_skill_records = list(active_skill_records or [])
-        condition_skill_active = any(
-            str(record.manifest.id) == "condition_recommendation"
+
+        # Derive contract flags from active skills' answer_contract manifests.
+        require_tool_evidence = any(
+            getattr(getattr(record.manifest, "answer_contract", None), "require_tool_evidence", False)
+            for record in active_skill_records
+        )
+        require_taxonomy_alignment = any(
+            getattr(getattr(record.manifest, "answer_contract", None), "require_taxonomy_alignment", False)
+            for record in active_skill_records
+        )
+        forbid_knowledge_only = any(
+            getattr(getattr(record.manifest, "answer_contract", None), "forbid_knowledge_only_conditions", False)
             for record in active_skill_records
         )
 
@@ -2047,9 +2072,9 @@ class ChemCoworker:
 
         if self._answer_claims_condition_recommendations(safe_answer):
             if not self._has_condition_recommendation_evidence(tool_results):
-                if condition_skill_active:
+                if require_tool_evidence or forbid_knowledge_only:
                     gate_warnings.append(
-                        "Output verification: active condition skill requires successful condition-tool evidence before recommending conditions."
+                        "Output verification: active skill answer_contract requires successful condition-tool evidence before recommending conditions."
                     )
                     confidence_penalty += 0.12
                 else:
@@ -2060,9 +2085,9 @@ class ChemCoworker:
                 gate_lines.append(
                     "- Condition recommendations in this answer are not backed by successful condition-tool outputs."
                 )
-            if condition_skill_active and not self._has_taxonomy_alignment_evidence(tool_results):
+            if require_taxonomy_alignment and not self._has_taxonomy_alignment_evidence(tool_results):
                 gate_warnings.append(
-                    "Output verification: active condition skill requires taxonomy-aligned reaction identity before recommending conditions."
+                    "Output verification: active skill answer_contract requires taxonomy-aligned reaction identity before recommending conditions."
                 )
                 confidence_penalty += 0.08
                 gate_lines.append(

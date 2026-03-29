@@ -58,6 +58,7 @@ class SkillManifest:
     triggers: SkillTriggers = field(default_factory=SkillTriggers)
     tool_allowlist: list[str] = field(default_factory=list)
     tool_preferred_order: list[str] = field(default_factory=list)
+    tool_default_args: dict[str, dict[str, Any]] = field(default_factory=dict)
     provides_context: list[str] = field(default_factory=list)
     requires_context: list[str] = field(default_factory=list)
     eligibility: SkillEligibility = field(default_factory=SkillEligibility)
@@ -150,6 +151,17 @@ def parse_skill_markdown(text: str, *, source_path: str = "") -> SkillManifest:
     if not isinstance(prompting_data, dict):
         raise ValueError(f"Skill file '{source_path}' field 'prompting' must be a mapping.")
 
+    tool_default_args_raw = data.get("tool_default_args") or {}
+    if not isinstance(tool_default_args_raw, dict):
+        raise ValueError(f"Skill file '{source_path}' field 'tool_default_args' must be a mapping.")
+    tool_default_args: dict[str, dict[str, Any]] = {}
+    for tool_name, args in tool_default_args_raw.items():
+        if not isinstance(args, dict):
+            raise ValueError(
+                f"Skill file '{source_path}' field 'tool_default_args.{tool_name}' must be a mapping."
+            )
+        tool_default_args[str(tool_name)] = dict(args)
+
     contract_data = data.get("answer_contract") or {}
     if not isinstance(contract_data, dict):
         raise ValueError(f"Skill file '{source_path}' field 'answer_contract' must be a mapping.")
@@ -172,6 +184,7 @@ def parse_skill_markdown(text: str, *, source_path: str = "") -> SkillManifest:
         tool_preferred_order=_as_str_list(
             data.get("tool_preferred_order"), "tool_preferred_order", source_path
         ),
+        tool_default_args=tool_default_args,
         provides_context=_as_str_list(data.get("provides_context"), "provides_context", source_path),
         requires_context=_as_str_list(data.get("requires_context"), "requires_context", source_path),
         eligibility=SkillEligibility(

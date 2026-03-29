@@ -49,7 +49,17 @@ def test_output_gate_flags_unbacked_condition_claims() -> None:
 
 def test_output_gate_requires_taxonomy_alignment_for_condition_skill() -> None:
     agent = _make_agent()
-    active_skill = SimpleNamespace(manifest=SimpleNamespace(id="condition_recommendation"))
+    active_skill = SimpleNamespace(
+        manifest=SimpleNamespace(
+            id="condition_recommendation",
+            answer_contract=SimpleNamespace(
+                require_tool_evidence=True,
+                require_taxonomy_alignment=True,
+                must_surface_warnings=True,
+                forbid_knowledge_only_conditions=True,
+            ),
+        ),
+    )
 
     answer, warnings, penalty, report = agent._apply_output_verification_gate(
         answer=(

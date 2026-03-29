@@ -4,12 +4,26 @@ Registry for loaded ChemCoworker skills.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 
 from .eligibility import SkillEligibilityChecker, SkillEligibilityResult
 from .loader import SkillLoader
 from .manifest import SkillManifest
+
+
+@lru_cache(maxsize=256)
+def _keyword_pattern(keyword: str) -> re.Pattern[str]:
+    """Compile a word-start-boundary regex for a skill keyword (cached).
+
+    Uses a word boundary at the START of the keyword to prevent false positives
+    like "catalytic" matching "catalyst", but allows plural/suffix variations
+    at the end (e.g. "condition" matches "conditions").
+    """
+    escaped = re.escape(keyword.lower())
+    return re.compile(r"\b" + escaped, re.IGNORECASE)
 
 
 @dataclass
@@ -74,7 +88,7 @@ class SkillRegistry:
             )
             if not requires_any_ok:
                 continue
-            keyword_match = any(keyword.lower() in query_lc for keyword in manifest.triggers.keywords)
+            keyword_match = any(_keyword_pattern(keyword).search(query_lc) for keyword in manifest.triggers.keywords)
             if manifest.triggers.keywords:
                 if keyword_match:
                     matched.append(manifest)
