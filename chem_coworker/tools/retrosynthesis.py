@@ -1545,10 +1545,52 @@ def _plan_route(
                 f"(BertzCT < {complexity_threshold}) — treat as a purchasable building block."
             )
 
+        # ── Route-level composite score (0..1, higher = better) ───────
+        if steps:
+            n_steps = len(steps)
+            # 1. Average step difficulty (inverted: low difficulty = high score)
+            avg_diff = total_difficulty / n_steps
+            diff_score = max(0.0, 1.0 - avg_diff)
+            # 2. Max single-step difficulty penalty
+            max_step_diff = max(s["difficulty"] for s in steps)
+            bottleneck_score = max(0.0, 1.0 - max_step_diff)
+            # 3. Completeness: fraction of leaves that are simple
+            completeness = len(simple_leaves) / max(len(leaves), 1)
+            # 4. Step efficiency: penalize long routes (>5 steps starts to hurt)
+            step_penalty = max(0.0, 1.0 - max(0, n_steps - 3) * 0.15)
+            # 5. Convergence bonus: depth < steps means branching (convergent)
+            max_depth_actual = max(s["depth"] for s in steps) + 1
+            convergence = min(1.0, n_steps / max(max_depth_actual, 1)) * 0.1
+
+            route_score = round(
+                0.30 * diff_score
+                + 0.20 * bottleneck_score
+                + 0.30 * completeness
+                + 0.15 * step_penalty
+                + 0.05 + convergence,  # base + convergence bonus
+                3,
+            )
+            # Grade for quick LLM interpretation
+            if route_score >= 0.80:
+                route_grade = "A"
+            elif route_score >= 0.65:
+                route_grade = "B"
+            elif route_score >= 0.50:
+                route_grade = "C"
+            elif route_score >= 0.35:
+                route_grade = "D"
+            else:
+                route_grade = "F"
+        else:
+            route_score = 1.0
+            route_grade = "A"
+
         return _success({
             "smiles": mol_smiles,
             "total_steps": len(steps),
             "cumulative_difficulty": round(total_difficulty, 3),
+            "route_score": route_score,
+            "route_grade": route_grade,
             "all_leaves_simple": all_simple,
             "complexity_threshold": complexity_threshold,
             "max_depth": max_depth,
@@ -1572,7 +1614,9 @@ plan_route_tool = ToolPlugin(
         "precursor (BertzCT >= complexity_threshold) until all leaf fragments are simple "
         "building blocks or max_depth is reached. Uses InChI key cycle detection to "
         "prevent loops. Returns route[] (ordered disconnection steps with reaction_name, "
-        "precursors, difficulty), cumulative_difficulty, all_leaves_simple, simple_leaves[], "
+        "precursors, difficulty), cumulative_difficulty, route_score (0-1 composite "
+        "quality metric blending difficulty, completeness, step count, convergence), "
+        "route_grade (A-F), all_leaves_simple, simple_leaves[], "
         "and a human-readable route_summary. "
         "Use instead of manually chaining identify_retrons + generate_disconnections "
         "across multiple turns when a full route is needed. "

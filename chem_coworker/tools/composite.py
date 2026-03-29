@@ -528,13 +528,25 @@ def _retrosynthesis_step(
     condition_strategy: str = "auto",
     condition_source_mode: str = "",
 ) -> Dict[str, Any]:
-    """Single-call retrosynthesis pass: inspect -> retrons -> disconnections (+ optional validation/conditions)."""
+    """Single-call retrosynthesis pass with automatic fallback cascade.
+
+    Pipeline: inspect → retrons → disconnections → (fallback: HTE templates,
+    product similarity) → validation → conditions → precedent.
+
+    When standard retrons yield 0 disconnections the cascade fires:
+      1. apply_hte_templates (35+ atom-mapped SMARTS)
+      2. search_by_product_similarity (Morgan FP against 231k HTE reactions)
+    The best data-driven disconnection from templates or product-similarity
+    is promoted to `top_disconnection` so conditions are always grounded.
+    """
     from .reaction_eval import _check_retro_consistency
     from .retrosynthesis import (
+        _apply_hte_templates,
         _find_retro_precedent,
         _generate_disconnections,
         _identify_retrons,
         _inspect_target,
+        _search_by_product_similarity,
     )
 
     top_k = max(1, min(int(top_k or 3), 10))
@@ -543,15 +555,86 @@ def _retrosynthesis_step(
     inspect = _inspect_target(smiles=target_smiles)
     retrons = _identify_retrons(smiles=target_smiles)
     disconn = _generate_disconnections(smiles=target_smiles, top_k=top_k)
-    if not disconn.get("success"):
+
+    disconnections = list((disconn or {}).get("disconnections", []) or [])
+
+    # ── Fallback cascade: HTE templates + product similarity ──────────
+    hte_template_hits: Dict[str, Any] = {}
+    product_similarity_hits: Dict[str, Any] = {}
+    fallback_used = False
+
+    if not disconnections:
+        # Standard retrons found nothing — try HTE templates
+        hte_template_hits = _apply_hte_templates(target_smiles=target_smiles, top_k=top_k)
+        template_disconnections = list(
+            (hte_template_hits or {}).get("disconnections", []) or []
+        )
+        if template_disconnections:
+            # Promote template hits into the disconnections list
+            for rank, td in enumerate(template_disconnections, 1):
+                disconnections.append({
+                    "rank": rank,
+                    "reaction_name": td.get("template_name", ""),
+                    "retron_name": td.get("template_name", ""),
+                    "precursor_1": td.get("precursor_1", ""),
+                    "precursor_2": td.get("precursor_2", ""),
+                    "description": td.get("description", ""),
+                    "difficulty": td.get("difficulty", 0.5),
+                    "overall_score": 1.0 - td.get("difficulty", 0.5),
+                    "notes": td.get("notes", ""),
+                    "source": "hte_template",
+                    "hte_conditions": td.get("hte_conditions"),
+                })
+            fallback_used = True
+
+        if not disconnections:
+            # HTE templates also found nothing — try product similarity
+            product_similarity_hits = _search_by_product_similarity(
+                target_smiles=target_smiles, top_k=top_k,
+            )
+            sim_precedents = list(
+                (product_similarity_hits or {}).get("precedents", []) or []
+            )
+            if sim_precedents:
+                for rank, sp in enumerate(sim_precedents, 1):
+                    disconnections.append({
+                        "rank": rank,
+                        "reaction_name": sp.get("rxn_type", ""),
+                        "retron_name": "",
+                        "precursor_1": sp.get("precursor_1", ""),
+                        "precursor_2": sp.get("precursor_2", ""),
+                        "description": f"Data-driven: {sp.get('product_similarity', 0):.0%} product similarity",
+                        "difficulty": round(1.0 - (sp.get("product_similarity") or 0.5), 2),
+                        "overall_score": sp.get("product_similarity", 0.5),
+                        "notes": f"From HTE {sp.get('rxn_type', 'unknown')} family, yield {sp.get('yield', '?')}%",
+                        "source": "product_similarity",
+                    })
+                fallback_used = True
+    else:
+        # Retrons succeeded — still run HTE templates in the background
+        # for supplementary coverage (cheap call, cached templates)
+        hte_template_hits = _apply_hte_templates(target_smiles=target_smiles, top_k=top_k)
+
+    # Rebuild disconn dict if fallback injected results
+    if fallback_used:
+        disconn = {
+            "success": True,
+            "smiles": target_smiles,
+            "total_disconnections": len(disconnections),
+            "disconnections": disconnections,
+            "fallback_used": True,
+        }
+
+    if not disconn.get("success") and not disconnections:
         return _success({
             "target_smiles": target_smiles,
             "inspection": inspect,
             "retrons": retrons,
             "disconnections": disconn,
+            "hte_template_hits": hte_template_hits,
+            "product_similarity_hits": product_similarity_hits,
         })
 
-    disconnections = list(disconn.get("disconnections", []) or [])
     top = disconnections[0] if disconnections else {}
     top_reaction_name = str(top.get("reaction_name") or "")
 
@@ -585,7 +668,7 @@ def _retrosynthesis_step(
     if include_precedent:
         precedent = _find_retro_precedent(smiles=target_smiles, reaction_name=top_reaction_name)
 
-    return _success({
+    result: Dict[str, Any] = {
         "target_smiles": target_smiles,
         "inspection": inspect,
         "retrons": retrons,
@@ -594,12 +677,16 @@ def _retrosynthesis_step(
         "validation": validations,
         "conditions_for_top_disconnection": conditions,
         "precedent": precedent,
+        "hte_template_hits": hte_template_hits,
+        "product_similarity_hits": product_similarity_hits,
         "summary": {
             "total_retrons": int((retrons or {}).get("total_matched", 0) or 0),
-            "total_disconnections": int((disconn or {}).get("total_disconnections", 0) or 0),
+            "total_disconnections": len(disconnections),
             "top_reaction_name": top_reaction_name,
+            "fallback_used": fallback_used,
         },
-    })
+    }
+    return _success(result)
 
 
 def _forward_synthesis_step(
@@ -937,8 +1024,11 @@ retrosynthesis_step_tool = ToolPlugin(
     name="retrosynthesis_step",
     category="composite",
     description=(
-        "Single-step retrosynthesis facade: inspect target, identify retrons, generate disconnections, "
-        "validate top proposals, and optionally suggest conditions and precedent. "
+        "Single-step retrosynthesis facade with automatic fallback cascade: "
+        "inspect target → identify retrons → generate disconnections → "
+        "(fallback: HTE templates → product similarity when retrons find nothing) → "
+        "validate top proposals → suggest conditions and precedent. "
+        "Always returns hte_template_hits alongside standard retrons for supplementary coverage. "
         "For robust condition recommendations on the top disconnection, use condition_strategy='full' "
         "to compare literature/motif/similarity/rules and return a merged consensus ranking."
     ),

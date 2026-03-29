@@ -1,7 +1,7 @@
 ---
 id: retrosynthesis_route_planning
 name: Retrosynthesis Route Planning
-version: 1
+version: 2
 summary: Route planning and proposal validation for target-oriented synthesis questions.
 category: chemistry
 tool_policy: retro_specialist
@@ -13,17 +13,44 @@ triggers:
     - plan a route
     - how to make
     - route to
+    - synthesize
+    - synthesis of
+    - how would you prepare
+    - starting materials
+    - disconnection
+    - precursors for
+    - synthetic route
   requires_any:
     - molecule_smiles
 tool_allowlist:
   - retrosynthesis_step
   - plan_route
   - validate_synthesis_proposal
+  - identify_retrons
+  - generate_disconnections
+  - search_hte_precedent
+  - search_by_product_similarity
+  - apply_hte_templates
+  - inspect_target
+tool_default_args:
+  retrosynthesis_step:
+    condition_strategy: full
+    include_precedent: true
+    include_conditions: true
+  plan_route:
+    max_depth: 4
+    max_branches: 2
+answer_contract:
+  require_tool_evidence: true
+  require_taxonomy_alignment: false
+  must_surface_warnings: true
+  forbid_knowledge_only_conditions: true
 eligibility:
   rdkit: true
   python_modules:
     - rdkit
-  data_files: []
+  data_files:
+    - data/HTE_db
   env_vars: []
   taxonomy_ids: []
 priority: 85
@@ -38,3 +65,4 @@ Use this skill for target-first route planning, disconnection analysis, and prec
 1. Keep route proposals grounded in explicit step or validation tool evidence.
 2. Surface weak points, protecting group risk, and uncertain disconnections.
 3. Avoid presenting unverified routes as settled.
+4. Never fabricate routes from general knowledge alone — all disconnections and conditions must be backed by tool output.
