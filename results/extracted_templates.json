@@ -1,0 +1,19 @@
+{
+  "extraction_meta": {
+    "csv_files": [
+      "Amide_formation_canonical.csv",
+      "C_N_Coupling_canonical.csv",
+      "Sulfonamide_formation_canonical.csv",
+      "suzuki_miyaura_canonical.csv"
+    ],
+    "limit_per_file": 50,
+    "total": 191,
+    "mapped_ok": 191,
+    "mapped_fail": 0,
+    "template_ok": 0,
+    "template_fail": 191,
+    "unique_templates": 0,
+    "elapsed_seconds": 2.04
+  },
+  "templates": []
+}
