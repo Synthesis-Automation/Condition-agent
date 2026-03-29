@@ -928,7 +928,7 @@ recommend_reaction_conditions_tool = ToolPlugin(
         "Returns ranked catalyst/ligand/base/solvent/temperature options from HTE-backed evidence. "
         "Set condition_strategy='full' to compare literature/motif/similarity/rules and merge consensus."
     ),
-    prerequisites=["detect_reaction_type"],
+    prerequisites=[],
     fn=_recommend_reaction_conditions,
     provides=["conditions", "recommendations"],
 )
