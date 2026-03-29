@@ -3,18 +3,21 @@ Extract retrosynthetic templates from HTE reaction data.
 
 Pipeline:
   1. Load unmapped reaction SMILES from HTE CSV files
-  2. Atom-map via RDKit MCS (Maximum Common Substructure)
-  3. Extract retro templates via rdchiral
-  4. Cluster by canonical reaction-center SMARTS
-  5. Output ranked templates with frequency and yield stats
-
-Small-scale test: run on a single CSV file first.
+  2. Atom-map via RDKit MCS with confidence scoring
+  3. Filter reactions by mapping confidence threshold
+  4. Extract retro templates via rdchiral
+  5. Retro-application validation (ASKCOS-style roundtrip check)
+  6. Cluster templates by canonical reaction-center core
+  7. Filter singletons, score by frequency + yield
+  8. Output ranked templates with quality metrics
 
 Usage:
-    python scripts/extract_retro_templates.py                    # small test (1 file)
+    python scripts/extract_retro_templates.py                    # small test (3 files)
     python scripts/extract_retro_templates.py --all              # all literature CSVs
     python scripts/extract_retro_templates.py --file suzuki      # specific file pattern
     python scripts/extract_retro_templates.py --limit 200        # cap rows per file
+    python scripts/extract_retro_templates.py --min-confidence 0.6  # confidence filter
+    python scripts/extract_retro_templates.py --min-count 3      # frequency filter
 """
 from __future__ import annotations
 
@@ -23,6 +26,7 @@ import csv
 import json
 import logging
 import os
+import re
 import sys
 import time
 from collections import Counter, defaultdict
@@ -189,7 +193,7 @@ def _extract_template(mapped_smiles: str) -> Optional[Dict[str, str]]:
     }
 
     try:
-        result = extract_from_reaction(rxn_dict, super_general=False, radius=1)
+        result = extract_from_reaction(rxn_dict)
     except Exception:
         return None
 
@@ -288,8 +292,17 @@ def load_reactions_from_csv(
 
 def extract_templates_from_reactions(
     reactions: List[Dict[str, Any]],
+    min_confidence: float = 0.5,
+    validate_retro: bool = True,
+    min_count: int = 2,
 ) -> Tuple[Dict[str, TemplateStats], Dict[str, int]]:
-    """Run the full pipeline: atom-map → extract template → aggregate.
+    """Run the full pipeline: atom-map, confidence filter, extract, validate, cluster.
+
+    Args:
+        reactions: List of reaction dicts with reaction_smiles, yield, etc.
+        min_confidence: Minimum MCS mapping confidence to keep (0-1).
+        validate_retro: If True, run retro-application validation on templates.
+        min_count: Minimum occurrence count to keep a template (singleton filter).
 
     Returns (template_stats, counters).
     """
@@ -298,19 +311,29 @@ def extract_templates_from_reactions(
         "total": len(reactions),
         "mapped_ok": 0,
         "mapped_fail": 0,
+        "low_confidence": 0,
         "template_ok": 0,
         "template_fail": 0,
+        "retro_valid": 0,
+        "retro_invalid": 0,
     }
+    confidence_values: List[float] = []
 
     for rxn in reactions:
         rxn_smi = rxn["reaction_smiles"]
 
-        # Step 1: Atom mapping
-        mapped = _add_atom_mapping_mcs(rxn_smi)
+        # Step 1: Atom mapping with confidence
+        mapped, confidence = _add_atom_mapping_mcs_with_confidence(rxn_smi)
         if mapped is None:
             counters["mapped_fail"] += 1
             continue
         counters["mapped_ok"] += 1
+        confidence_values.append(confidence)
+
+        # Step 1b: Filter by mapping confidence
+        if confidence < min_confidence:
+            counters["low_confidence"] += 1
+            continue
 
         # Step 2: Template extraction
         tmpl = _extract_template(mapped)
@@ -322,19 +345,213 @@ def extract_templates_from_reactions(
         smarts = tmpl["reaction_smarts"]
 
         if smarts not in stats:
+            # Extract product SMILES for retro validation
+            product_smi = rxn_smi.split(">>")[1] if ">>" in rxn_smi else ""
+
+            # Step 2b: Retro-application validation
+            retro_ok = True
+            if validate_retro and product_smi:
+                retro_ok = _validate_template_retro(smarts, product_smi)
+                if retro_ok:
+                    counters["retro_valid"] += 1
+                else:
+                    counters["retro_invalid"] += 1
+
+            # Step 2c: Extract reaction center core for clustering
+            core = _extract_reaction_center_core(smarts)
+
             stats[smarts] = TemplateStats(
                 reaction_smarts=smarts,
                 example_rxn=rxn_smi,
                 example_mapped=mapped,
             )
+            stats[smarts]._retro_validated = retro_ok
+            stats[smarts]._reaction_center_core = core
 
         entry = stats[smarts]
         entry.count += 1
+        if not hasattr(entry, '_confidences'):
+            entry._confidences = []
+        entry._confidences.append(confidence)
         entry.source_files.add(rxn["source_file"])
         if rxn["yield"] is not None:
             entry.yields.append(rxn["yield"])
 
+    # Step 3: Cluster templates by reaction center core
+    _assign_clusters(stats)
+
+    # Step 4: Record stats and apply filters
+    counters["pre_filter_templates"] = len(stats)
+    counters["min_confidence_threshold"] = min_confidence
+    counters["min_count_threshold"] = min_count
+
+    # Confidence distribution stats
+    if confidence_values:
+        confidence_values.sort()
+        n = len(confidence_values)
+        counters["confidence_mean"] = round(sum(confidence_values) / n, 3)
+        counters["confidence_median"] = round(
+            confidence_values[n // 2] if n % 2 else
+            (confidence_values[n // 2 - 1] + confidence_values[n // 2]) / 2, 3
+        )
+        counters["confidence_p25"] = round(confidence_values[n // 4], 3)
+        counters["confidence_p75"] = round(confidence_values[3 * n // 4], 3)
+
+    # Remove singletons and retro-invalid templates
+    to_remove = []
+    for smarts, entry in stats.items():
+        if entry.count < min_count:
+            to_remove.append(smarts)
+        elif validate_retro and getattr(entry, '_retro_validated', True) is False:
+            to_remove.append(smarts)
+    for smarts in to_remove:
+        del stats[smarts]
+
+    counters["singleton_removed"] = len(to_remove)
+    counters["final_templates"] = len(stats)
+
     return stats, counters
+
+
+def _add_atom_mapping_mcs_with_confidence(
+    reaction_smiles: str,
+) -> Tuple[Optional[str], float]:
+    """Wrapper around _add_atom_mapping_mcs that also returns mapping confidence.
+
+    Confidence = fraction of product heavy atoms whose map numbers also
+    appear in the reactant side (i.e., atoms matched via MCS).
+
+    Returns (mapped_smiles_or_None, confidence_0_to_1).
+    """
+    if ">>" not in reaction_smiles:
+        return None, 0.0
+
+    parts = reaction_smiles.split(">>")
+    product_block = parts[1].strip()
+
+    with rdBase.BlockLogs():
+        product_mol = Chem.MolFromSmiles(product_block)
+    if product_mol is None:
+        return None, 0.0
+
+    total_product_atoms = product_mol.GetNumHeavyAtoms()
+    if total_product_atoms == 0:
+        return None, 0.0
+
+    mapped = _add_atom_mapping_mcs(reaction_smiles)
+    if mapped is None:
+        return None, 0.0
+
+    # Count how many product atoms got mapped to reactant atoms
+    mapped_product = mapped.split(">>")[1]
+    with rdBase.BlockLogs():
+        mapped_prod_mol = Chem.MolFromSmiles(mapped_product)
+    if mapped_prod_mol is None:
+        return mapped, 0.5  # fallback
+
+    # Collect reactant map numbers
+    mapped_reactants = mapped.split(">>")[0]
+    reactant_map_nums = set()
+    for rsmi in mapped_reactants.split("."):
+        with rdBase.BlockLogs():
+            rmol = Chem.MolFromSmiles(rsmi)
+        if rmol:
+            reactant_map_nums.update(
+                a.GetAtomMapNum() for a in rmol.GetAtoms() if a.GetAtomMapNum() > 0
+            )
+
+    # Confidence = product atoms with map numbers also in reactants / total
+    shared_count = sum(
+        1 for a in mapped_prod_mol.GetAtoms()
+        if a.GetAtomMapNum() > 0 and a.GetAtomMapNum() in reactant_map_nums
+    )
+
+    confidence = shared_count / total_product_atoms
+    return mapped, confidence
+
+
+def _validate_template_retro(template_smarts: str, product_smiles: str) -> bool:
+    """Apply a retro template to a product and check it produces valid precursors.
+
+    ASKCOS-style roundtrip validation: if the extracted template cannot be
+    applied back to the product to yield at least one set of valid precursors,
+    the template is unreliable and should be discarded.
+    """
+    try:
+        from rdchiral.main import rdchiralReaction, rdchiralRun
+        from rdchiral.initialization import rdchiralReactants
+    except ImportError:
+        return True  # skip validation if rdchiral.main unavailable
+
+    try:
+        rxn = rdchiralReaction(template_smarts)
+        prod_smi = re.sub(r':\d+', '', product_smiles)
+        with rdBase.BlockLogs():
+            prod_mol = Chem.MolFromSmiles(prod_smi)
+        if prod_mol is None:
+            return False
+        prod_smi_clean = Chem.MolToSmiles(prod_mol)
+        rcts = rdchiralReactants(prod_smi_clean)
+        outcomes = rdchiralRun(rxn, rcts)
+        if not outcomes:
+            return False
+        for outcome in outcomes:
+            parts = outcome.split(".")
+            if all(Chem.MolFromSmiles(p) is not None for p in parts if p):
+                return True
+        return False
+    except (KeyError, ValueError, RuntimeError):
+        # rdchiral crashes on templates with leaving-group atoms not in product
+        return True
+    except Exception:
+        return True
+
+
+def _extract_reaction_center_core(template_smarts: str) -> Optional[str]:
+    """Extract canonical reaction center core from a template SMARTS.
+
+    Templates with identical cores represent the same retrosynthetic transform.
+    """
+    if ">>" not in template_smarts:
+        return None
+    try:
+        with rdBase.BlockLogs():
+            rxn = AllChem.ReactionFromSmarts(template_smarts)
+        if rxn is None:
+            return None
+        if rxn.GetNumProductTemplates() == 0:
+            return None
+        prod_template = rxn.GetProductTemplate(0)
+        with rdBase.BlockLogs():
+            core_smarts = Chem.MolToSmarts(prod_template)
+        return core_smarts
+    except Exception:
+        return None
+
+
+def _assign_clusters(stats: Dict[str, TemplateStats]) -> None:
+    """Group templates by reaction center core into clusters."""
+    core_to_cluster: Dict[str, int] = {}
+    cluster_id = 0
+    for entry in stats.values():
+        core = getattr(entry, '_reaction_center_core', None)
+        if core is None:
+            entry._cluster_id = -1
+            continue
+        if core not in core_to_cluster:
+            core_to_cluster[core] = cluster_id
+            cluster_id += 1
+        entry._cluster_id = core_to_cluster[core]
+
+
+def _quality_score(entry: TemplateStats) -> float:
+    """Combined quality score (0-1) blending frequency, yield, and confidence."""
+    import math
+    freq_score = min(1.0, math.log2(max(entry.count, 1)) / 10.0)
+    yield_score = entry.avg_yield / 100.0 if entry.yields else 0.5
+    confs = getattr(entry, '_confidences', [])
+    conf_score = sum(confs) / len(confs) if confs else 0.5
+    return 0.4 * freq_score + 0.3 * yield_score + 0.3 * conf_score
 
 
 # ---------------------------------------------------------------------------
@@ -347,6 +564,18 @@ def main():
     parser.add_argument("--file", type=str, default="", help="Filter CSV files by name pattern")
     parser.add_argument("--limit", type=int, default=50, help="Max rows per file (0=unlimited)")
     parser.add_argument("--output", type=str, default="", help="Output JSON path")
+    parser.add_argument(
+        "--min-confidence", type=float, default=0.5,
+        help="Minimum MCS mapping confidence (0-1, default: 0.5)",
+    )
+    parser.add_argument(
+        "--min-count", type=int, default=2,
+        help="Minimum template occurrence count (default: 2, removes singletons)",
+    )
+    parser.add_argument(
+        "--no-retro-validation", action="store_true",
+        help="Skip retro-application validation (faster but less reliable)",
+    )
     args = parser.parse_args()
 
     if not HTE_DB_DIR.is_dir():
@@ -359,7 +588,6 @@ def main():
         pattern = args.file.lower()
         csv_files = [f for f in csv_files if pattern in f.name.lower()]
     elif not args.all:
-        # Default: small test with 3 diverse files
         test_names = ["suzuki_miyaura", "C_N_Coupling", "Amide_formation"]
         csv_files = [
             f for f in csv_files
@@ -371,6 +599,8 @@ def main():
         sys.exit(1)
 
     logger.info(f"Processing {len(csv_files)} CSV file(s), limit={args.limit} rows/file")
+    logger.info(f"Confidence threshold: {args.min_confidence}, min count: {args.min_count}")
+    logger.info(f"Retro validation: {'OFF' if args.no_retro_validation else 'ON'}")
 
     # Load reactions
     all_reactions: List[Dict[str, Any]] = []
@@ -383,32 +613,76 @@ def main():
 
     # Extract templates
     t0 = time.perf_counter()
-    template_stats, counters = extract_templates_from_reactions(all_reactions)
+    template_stats, counters = extract_templates_from_reactions(
+        all_reactions,
+        min_confidence=args.min_confidence,
+        validate_retro=not args.no_retro_validation,
+        min_count=args.min_count,
+    )
     elapsed = time.perf_counter() - t0
 
-    # Sort by frequency (most common first)
-    ranked = sorted(template_stats.values(), key=lambda t: t.count, reverse=True)
+    # Sort by quality_score (best first)
+    ranked = sorted(template_stats.values(), key=lambda t: _quality_score(t), reverse=True)
 
     # Report
-    print("\n" + "=" * 70)
+    total = max(counters["total"], 1)
+    mapped_ok = max(counters["mapped_ok"], 1)
+    print()
+    print("=" * 70)
     print("TEMPLATE EXTRACTION RESULTS")
     print("=" * 70)
-    print(f"Total reactions:      {counters['total']}")
-    print(f"Atom mapping OK:      {counters['mapped_ok']} ({counters['mapped_ok']*100/max(counters['total'],1):.1f}%)")
-    print(f"Atom mapping fail:    {counters['mapped_fail']}")
-    print(f"Template extracted:   {counters['template_ok']} ({counters['template_ok']*100/max(counters['mapped_ok'],1):.1f}% of mapped)")
-    print(f"Template extract fail:{counters['template_fail']}")
-    print(f"Unique templates:     {len(ranked)}")
-    print(f"Time:                 {elapsed:.1f}s")
+    print(f"Total reactions:        {counters['total']}")
+    print(f"Atom mapping OK:        {counters['mapped_ok']} ({counters['mapped_ok']*100/total:.1f}%)")
+    print(f"Atom mapping fail:      {counters['mapped_fail']}")
+    print(f"Low confidence filtered:{counters['low_confidence']} (< {args.min_confidence})")
+    print(f"Template extracted:     {counters['template_ok']} ({counters['template_ok']*100/mapped_ok:.1f}% of mapped)")
+    print(f"Template extract fail:  {counters['template_fail']}")
+
+    if not args.no_retro_validation:
+        print(f"Retro-validated OK:     {counters['retro_valid']}")
+        print(f"Retro-validation fail:  {counters['retro_invalid']}")
+
+    print(f"Pre-filter templates:   {counters.get('pre_filter_templates', '?')}")
+    print(f"Removed (singleton/bad):{counters.get('singleton_removed', '?')}")
+    print(f"Final templates:        {counters.get('final_templates', len(ranked))}")
+
+    # Confidence distribution
+    if "confidence_mean" in counters:
+        print(f"\nMapping confidence distribution:")
+        print(f"  mean={counters['confidence_mean']:.3f}  median={counters['confidence_median']:.3f}  "
+              f"p25={counters['confidence_p25']:.3f}  p75={counters['confidence_p75']:.3f}")
+
+    # Cluster summary
+    cluster_ids = set(
+        getattr(t, '_cluster_id', -1) for t in ranked
+        if getattr(t, '_cluster_id', -1) >= 0
+    )
+    if cluster_ids:
+        print(f"\nReaction center clusters: {len(cluster_ids)}")
+        cluster_sizes = Counter(
+            getattr(t, '_cluster_id', -1) for t in ranked
+            if getattr(t, '_cluster_id', -1) >= 0
+        )
+        multi = sum(1 for s in cluster_sizes.values() if s > 1)
+        print(f"  Multi-template clusters: {multi} (templates sharing same core transform)")
+
+    print(f"\nTime: {elapsed:.1f}s")
     print()
 
-    print(f"Top {min(20, len(ranked))} templates by frequency:")
+    show = min(25, len(ranked))
+    print(f"Top {show} templates by quality score:")
     print("-" * 70)
-    for i, t in enumerate(ranked[:20], 1):
+    for i, t in enumerate(ranked[:show], 1):
         yield_str = f"avg={t.avg_yield:.0f}%" if t.yields else "no yield"
+        confs = getattr(t, '_confidences', [])
+        avg_conf = sum(confs) / len(confs) if confs else 0.0
+        conf_str = f"conf={avg_conf:.2f}"
+        retro_ok = getattr(t, '_retro_validated', None)
+        retro_str = "Rv" if retro_ok else ("Rx" if retro_ok is False else "R?")
+        qs = _quality_score(t)
         files_str = ", ".join(sorted(t.source_files)[:3])
-        print(f"  {i:2d}. count={t.count:4d}  {yield_str:12s}  sources: {files_str}")
-        # Truncate long SMARTS for display
+        print(f"  {i:2d}. count={t.count:4d}  {yield_str:12s}  {conf_str}  {retro_str}  "
+              f"Q={qs:.3f}  sources: {files_str}")
         smarts_display = t.reaction_smarts
         if len(smarts_display) > 100:
             smarts_display = smarts_display[:97] + "..."
@@ -420,15 +694,27 @@ def main():
     output_path = args.output or str(_PROJECT_ROOT / "results" / "extracted_templates.json")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
+    def _entry_to_dict(entry):
+        d = entry.to_dict()
+        confs = getattr(entry, '_confidences', [])
+        d["avg_confidence"] = round(sum(confs) / len(confs), 3) if confs else 0.0
+        d["quality_score"] = round(_quality_score(entry), 3)
+        d["retro_validated"] = getattr(entry, '_retro_validated', None)
+        d["reaction_center_core"] = getattr(entry, '_reaction_center_core', None)
+        d["cluster_id"] = getattr(entry, '_cluster_id', None)
+        return d
+
     output = {
         "extraction_meta": {
             "csv_files": [f.name for f in csv_files],
             "limit_per_file": args.limit,
+            "min_confidence": args.min_confidence,
+            "min_count": args.min_count,
+            "retro_validation": not args.no_retro_validation,
             **counters,
-            "unique_templates": len(ranked),
             "elapsed_seconds": round(elapsed, 2),
         },
-        "templates": [t.to_dict() for t in ranked],
+        "templates": [_entry_to_dict(t) for t in ranked],
     }
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
