@@ -529,10 +529,10 @@ def main():
     args = parser.parse_args()
 
     # Import extraction functions
-    from extract_retro_templates import (
+    from chemtools.retro.extract_templates import (
         load_reactions_from_csv,
         extract_templates_from_reactions,
-        _quality_score,
+        quality_score as _quality_score,
     )
 
     # Select CSV files
