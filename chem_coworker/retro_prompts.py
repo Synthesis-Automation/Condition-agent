@@ -148,6 +148,9 @@ directly. Structure it as:
   What to do if this route fails; alternative disconnections; complexity scale.
 
 ALWAYS include reaction SMILES in format `reactants>>product` for each step.
+If a tool already returned `reaction_smiles` or an evaluation for that step, copy
+that exact reaction SMILES and cite the tool-backed verdict instead of
+reconstructing it from prose.
 NEVER invent conditions not supported by tool results or known chemistry.
 If tools return sparse results, acknowledge this and rely on expert reasoning.
 Difficulty scale: ●○○○○ trivial → ●●●●● heroic

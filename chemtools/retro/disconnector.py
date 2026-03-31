@@ -442,6 +442,18 @@ def _transform_aryl_amine_buchwald(mol: Any, retron: Dict[str, Any]) -> List[Tup
     matches = mol.GetSubstructMatches(pattern)
     results = []
 
+    def _fragment_role(frag: Any) -> str:
+        """Classify the cleavage-site fragment as aryl-electrophile or amine partner."""
+        for atom in frag.GetAtoms():
+            if atom.GetAtomicNum() != 0:
+                continue
+            for nbr in atom.GetNeighbors():
+                if nbr.GetAtomicNum() == 7:
+                    return "amine"
+                if nbr.GetAtomicNum() == 6 and nbr.GetIsAromatic():
+                    return "aryl"
+        return "other"
+
     for match in matches[:2]:
         atom_c, atom_n = match[0], match[1]
         bond = mol.GetBondBetweenAtoms(atom_c, atom_n)
@@ -458,24 +470,27 @@ def _transform_aryl_amine_buchwald(mol: Any, retron: Dict[str, Any]) -> List[Tup
         if len(frags) != 2:
             continue
 
-        # Identify which frag has the arene vs the amine
-        # Arene fragment gets Br cap; amine fragment: remove dummy (N keeps implicit H)
-        p_arene = _replace_dummy(frags[0], "Br")
-        p_amine = _replace_dummy(frags[1], "")  # remove dummy; N retains implicit H
+        role0 = _fragment_role(frags[0])
+        role1 = _fragment_role(frags[1])
 
-        if not p_arene:
+        if role0 == "aryl" and role1 == "amine":
+            aryl_frag, amine_frag = frags[0], frags[1]
+        elif role0 == "amine" and role1 == "aryl":
+            aryl_frag, amine_frag = frags[1], frags[0]
+        else:
+            # Fallback for ambiguous fragments: prefer the fragment whose
+            # cleavage atom is an aromatic carbon as the electrophile.
+            aryl_frag, amine_frag = frags[0], frags[1]
+
+        p_arene = _replace_dummy(aryl_frag, "Br")
+        p_amine = _replace_dummy(amine_frag, "")  # remove dummy; N retains implicit H
+
+        if not p_arene or not p_amine:
             continue
 
-        # Check the amine fragment contains N; if not, try swapped assignment
-        p_amine_mol = Chem.MolFromSmiles(p_amine) if p_amine else None
+        p_amine_mol = Chem.MolFromSmiles(p_amine)
         if p_amine_mol and any(a.GetAtomicNum() == 7 for a in p_amine_mol.GetAtoms()):
             results.append((p_arene, p_amine))
-        else:
-            # Swap: amine might be in frag0
-            p_arene2 = _replace_dummy(frags[1], "Br")
-            p_amine2 = _replace_dummy(frags[0], "")
-            if p_arene2:
-                results.append((p_arene2, p_amine2))
 
     return results
 
@@ -681,7 +696,8 @@ def rank_disconnections(
 
     from .retron_patterns import get_retron_by_name
 
-    results: List[DisconnectionResult] = []
+    concrete_results: List[DisconnectionResult] = []
+    conceptual_results: List[DisconnectionResult] = []
 
     for match in retron_matches:
         retron_def = get_retron_by_name(match.retron_name)
@@ -692,8 +708,23 @@ def rank_disconnections(
         precursor_pairs = _apply_retro_transforms(mol, retron_def)
 
         if not precursor_pairs:
-            # Still include as a "conceptual" disconnection with no SMILES
-            precursor_pairs = [("", "")]
+            # Keep conceptual matches only as a low-priority fallback so they do
+            # not outrank concrete precursor pairs elsewhere in the route.
+            conceptual_results.append(DisconnectionResult(
+                target_smiles=target_smiles,
+                precursor_1="",
+                precursor_2="",
+                reaction_name=match.reaction_name,
+                retron_name=match.retron_name,
+                difficulty=match.difficulty,
+                complexity_delta=0.0,
+                fragment_balance=0.0,
+                overall_score=0.0,
+                description=match.description,
+                notes=match.notes,
+                precursor_hints=match.precursor_hints,
+            ))
+            continue
 
         for p1_smi, p2_smi in precursor_pairs:
             # Step 3: Score
@@ -701,7 +732,7 @@ def rank_disconnections(
                 mol, p1_smi, p2_smi, match
             )
 
-            results.append(DisconnectionResult(
+            concrete_results.append(DisconnectionResult(
                 target_smiles=target_smiles,
                 precursor_1=p1_smi,
                 precursor_2=p2_smi,
@@ -716,8 +747,10 @@ def rank_disconnections(
                 precursor_hints=match.precursor_hints,
             ))
 
-    # Sort by overall score, descending
-    results.sort(key=lambda r: r.overall_score, reverse=True)
+    # Sort concrete results by chemical score; conceptual-only matches stay last.
+    concrete_results.sort(key=lambda r: r.overall_score, reverse=True)
+    conceptual_results.sort(key=lambda r: r.difficulty)
+    results = concrete_results + conceptual_results
 
     # Deduplicate by reaction_name (keep top score per reaction class)
     seen_rxn: set = set()

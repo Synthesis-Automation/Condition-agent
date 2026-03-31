@@ -552,32 +552,45 @@ def _retrosynthesis_step(
     top_k = max(1, min(int(top_k or 3), 10))
     validate_top_n = max(0, min(int(validate_top_n or 0), 3))
 
+    def _has_concrete_precursors(row: Dict[str, Any]) -> bool:
+        return bool(str(row.get("precursor_1") or "").strip() and str(row.get("precursor_2") or "").strip())
+
+    def _with_reaction_smiles(row: Dict[str, Any]) -> Dict[str, Any]:
+        out = dict(row or {})
+        if not str(out.get("reaction_smiles") or "").strip() and _has_concrete_precursors(out):
+            p1 = str(out.get("precursor_1") or "").strip()
+            p2 = str(out.get("precursor_2") or "").strip()
+            out["reaction_smiles"] = f"{p1}.{p2}>>{target_smiles}"
+        return out
+
     inspect = _inspect_target(smiles=target_smiles)
     retrons = _identify_retrons(smiles=target_smiles)
     disconn = _generate_disconnections(smiles=target_smiles, top_k=top_k)
 
-    disconnections = list((disconn or {}).get("disconnections", []) or [])
+    disconnections = [_with_reaction_smiles(row) for row in list((disconn or {}).get("disconnections", []) or [])]
 
     # ── Fallback cascade: HTE templates + product similarity ──────────
     hte_template_hits: Dict[str, Any] = {}
     product_similarity_hits: Dict[str, Any] = {}
     fallback_used = False
 
-    if not disconnections:
-        # Standard retrons found nothing — try HTE templates
+    if not any(_has_concrete_precursors(row) for row in disconnections):
+        # Standard retrons found nothing concrete — try HTE templates.
         hte_template_hits = _apply_hte_templates(target_smiles=target_smiles, top_k=top_k)
         template_disconnections = list(
             (hte_template_hits or {}).get("disconnections", []) or []
         )
         if template_disconnections:
+            promoted_rows: List[Dict[str, Any]] = []
             # Promote template hits into the disconnections list
             for rank, td in enumerate(template_disconnections, 1):
-                disconnections.append({
+                promoted_rows.append({
                     "rank": rank,
                     "reaction_name": td.get("template_name", ""),
                     "retron_name": td.get("template_name", ""),
                     "precursor_1": td.get("precursor_1", ""),
                     "precursor_2": td.get("precursor_2", ""),
+                    "reaction_smiles": td.get("reaction_smiles", ""),
                     "description": td.get("description", ""),
                     "difficulty": td.get("difficulty", 0.5),
                     "overall_score": 1.0 - td.get("difficulty", 0.5),
@@ -585,9 +598,10 @@ def _retrosynthesis_step(
                     "source": "hte_template",
                     "hte_conditions": td.get("hte_conditions"),
                 })
+            disconnections = [_with_reaction_smiles(row) for row in promoted_rows] + disconnections
             fallback_used = True
 
-        if not disconnections:
+        if not any(_has_concrete_precursors(row) for row in disconnections):
             # HTE templates also found nothing — try product similarity
             product_similarity_hits = _search_by_product_similarity(
                 target_smiles=target_smiles, top_k=top_k,
@@ -596,24 +610,33 @@ def _retrosynthesis_step(
                 (product_similarity_hits or {}).get("precedents", []) or []
             )
             if sim_precedents:
+                promoted_rows = []
                 for rank, sp in enumerate(sim_precedents, 1):
-                    disconnections.append({
+                    promoted_rows.append({
                         "rank": rank,
                         "reaction_name": sp.get("rxn_type", ""),
                         "retron_name": "",
                         "precursor_1": sp.get("precursor_1", ""),
                         "precursor_2": sp.get("precursor_2", ""),
+                        "reaction_smiles": sp.get("reaction_smiles", ""),
                         "description": f"Data-driven: {sp.get('product_similarity', 0):.0%} product similarity",
                         "difficulty": round(1.0 - (sp.get("product_similarity") or 0.5), 2),
                         "overall_score": sp.get("product_similarity", 0.5),
                         "notes": f"From HTE {sp.get('rxn_type', 'unknown')} family, yield {sp.get('yield', '?')}%",
                         "source": "product_similarity",
                     })
+                disconnections = [_with_reaction_smiles(row) for row in promoted_rows] + disconnections
                 fallback_used = True
     else:
         # Retrons succeeded — still run HTE templates in the background
         # for supplementary coverage (cheap call, cached templates)
         hte_template_hits = _apply_hte_templates(target_smiles=target_smiles, top_k=top_k)
+
+    # Keep the facade payload aligned with the locally enriched disconnection rows.
+    if disconn.get("success"):
+        disconn = dict(disconn)
+        disconn["disconnections"] = disconnections
+        disconn["total_disconnections"] = len(disconnections)
 
     # Rebuild disconn dict if fallback injected results
     if fallback_used:
@@ -635,10 +658,11 @@ def _retrosynthesis_step(
             "product_similarity_hits": product_similarity_hits,
         })
 
-    top = disconnections[0] if disconnections else {}
+    top = next((row for row in disconnections if _has_concrete_precursors(row)), disconnections[0] if disconnections else {})
     top_reaction_name = str(top.get("reaction_name") or "")
 
     validations: List[Dict[str, Any]] = []
+    reaction_smiles_evaluations: List[Dict[str, Any]] = []
     for entry in disconnections[:validate_top_n]:
         p1 = str(entry.get("precursor_1") or "")
         p2 = str(entry.get("precursor_2") or "")
@@ -650,13 +674,32 @@ def _retrosynthesis_step(
             precursor_2=p2,
             reaction_name=str(entry.get("reaction_name") or ""),
         ))
+        rxn_smiles = str(entry.get("reaction_smiles") or "").strip()
+        if rxn_smiles:
+            reaction_smiles_evaluations.append(_evaluate_synthesis_proposal(
+                mode="reaction",
+                reaction_smiles=rxn_smiles,
+                reaction_name=str(entry.get("reaction_name") or ""),
+            ))
+
+    top_reaction_smiles_evaluation: Dict[str, Any] = {}
+    top_rxn_smiles = str(top.get("reaction_smiles") or "").strip()
+    if top_rxn_smiles:
+        top_reaction_smiles_evaluation = _evaluate_synthesis_proposal(
+            mode="reaction",
+            reaction_smiles=top_rxn_smiles,
+            reaction_name=top_reaction_name,
+        )
 
     conditions: Dict[str, Any] = {}
     if include_conditions and top:
-        p1 = str(top.get("precursor_1") or "")
-        p2 = str(top.get("precursor_2") or "")
-        if p1 and p2:
-            rxn_smiles = f"{p1}.{p2}>>{target_smiles}"
+        rxn_smiles = str(top.get("reaction_smiles") or "").strip()
+        if not rxn_smiles:
+            p1 = str(top.get("precursor_1") or "")
+            p2 = str(top.get("precursor_2") or "")
+            if p1 and p2:
+                rxn_smiles = f"{p1}.{p2}>>{target_smiles}"
+        if rxn_smiles:
             conditions = _recommend_conditions_with_strategy(
                 reaction_smiles=rxn_smiles,
                 top_k=5,
@@ -675,6 +718,13 @@ def _retrosynthesis_step(
         "disconnections": disconn,
         "top_disconnection": top,
         "validation": validations,
+        "reaction_smiles_candidates": [
+            str(row.get("reaction_smiles") or "").strip()
+            for row in disconnections
+            if str(row.get("reaction_smiles") or "").strip()
+        ],
+        "reaction_smiles_evaluations": reaction_smiles_evaluations,
+        "top_reaction_smiles_evaluation": top_reaction_smiles_evaluation,
         "conditions_for_top_disconnection": conditions,
         "precedent": precedent,
         "hte_template_hits": hte_template_hits,
@@ -683,6 +733,7 @@ def _retrosynthesis_step(
             "total_retrons": int((retrons or {}).get("total_matched", 0) or 0),
             "total_disconnections": len(disconnections),
             "top_reaction_name": top_reaction_name,
+            "top_reaction_smiles": top_rxn_smiles,
             "fallback_used": fallback_used,
         },
     }
@@ -1104,8 +1155,43 @@ def _project_recommend_reaction_conditions(result: dict) -> Dict[str, Any]:
     }
 
 
+def _project_retrosynthesis_step(result: dict) -> Dict[str, Any]:
+    """Project top retrosynthesis route details into structured output."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+
+    out: Dict[str, Any] = {}
+    top = result.get("top_disconnection") or {}
+    if isinstance(top, dict):
+        if top.get("reaction_smiles"):
+            out["reaction_smiles"] = top.get("reaction_smiles")
+        if top.get("reaction_name"):
+            out["reaction_type"] = top.get("reaction_name")
+        if top.get("precursor_1") and top.get("precursor_2"):
+            out["top_precursors"] = [
+                top.get("precursor_1"),
+                top.get("precursor_2"),
+            ]
+
+    top_eval = result.get("top_reaction_smiles_evaluation") or {}
+    if isinstance(top_eval, dict) and top_eval.get("success"):
+        out["reaction_smiles_evaluation"] = {
+            "verdict": top_eval.get("verdict"),
+            "evaluation_score": top_eval.get("evaluation_score"),
+            "evaluation_grade": top_eval.get("evaluation_grade"),
+            "summary": top_eval.get("evaluation_summary"),
+        }
+
+    cond = result.get("conditions_for_top_disconnection") or {}
+    if isinstance(cond, dict) and cond.get("success"):
+        out["conditions"] = cond.get("recommendations", [])
+
+    return {k: v for k, v in out.items() if v is not None}
+
+
 analyze_reaction_tool.structured_projection = _project_analyze_reaction
 recommend_reaction_conditions_tool.structured_projection = _project_recommend_reaction_conditions
+retrosynthesis_step_tool.structured_projection = _project_retrosynthesis_step
 
 
 COMPOSITE_TOOLS = [
