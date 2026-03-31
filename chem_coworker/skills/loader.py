@@ -29,7 +29,7 @@ class SkillLoader:
     ) -> None:
         repo_root = Path(__file__).resolve().parents[2]
         self.workspace_root = Path(workspace_root).resolve() if workspace_root else Path.cwd().resolve()
-        self.bundled_dir = bundled_dir or (repo_root / "chem_coworker_skillpacks" / "bundled")
+        self.bundled_dir = bundled_dir or (repo_root / "chem_coworker" / "chem_coworker_skillpacks" / "bundled")
         self.user_dir = user_dir or (Path.home() / ".chem_coworker" / "skills")
         self.workspace_dir = workspace_dir or (self.workspace_root / "skills")
 
