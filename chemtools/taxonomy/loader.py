@@ -17,6 +17,8 @@ from .substituent_composer import load_organic_groups_with_compositions
 
 # Taxonomy file paths (relative to this module)
 _TAXONOMY_DIR = Path(__file__).resolve().parent / "data"
+_CHEMTOOLS_DIR = Path(__file__).resolve().parents[1]
+_RETRO_DATA_DIR = _CHEMTOOLS_DIR / "retro" / "data"
 REACTION_TYPES_FILE = _TAXONOMY_DIR / "reaction_types.v4.0.json"
 COMPOUND_LOGIC_FILE = _TAXONOMY_DIR / "compound_logic.json"
 GROUP_LOGIC_FILE = _TAXONOMY_DIR / "group_logic.json"
@@ -28,8 +30,8 @@ SCAFFOLD_MOTIFS_FILE = _TAXONOMY_DIR / "scaffold_motifs.v1.3.json"
 FEATURIZER_LOGIC_FILE = _TAXONOMY_DIR / "featurizer_logic.json"
 SYNTHON_FILE = _TAXONOMY_DIR / "synthons.v1.json"
 MOTIF_SCOPE_INDEX_FILE = _TAXONOMY_DIR / "motif_scope_index.v1.json"
-RETRON_PATTERNS_FILE = _TAXONOMY_DIR / "retron_patterns.json"
-HTE_TEMPLATES_FILE = _TAXONOMY_DIR / "hte_templates.json"
+RETRON_PATTERNS_FILE = _RETRO_DATA_DIR / "retron_patterns.json"
+HTE_TEMPLATES_FILE = _RETRO_DATA_DIR / "hte_templates.json"
 TRANSFORMATION_PATTERNS_FILE = _TAXONOMY_DIR / "transformation_patterns.json"
 
 

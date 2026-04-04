@@ -21,8 +21,8 @@ Each entry contains:
   notes         : chemistry notes and caveats (optional)
   category      : reaction class grouping (for browsing / filtering)
 
-Data is loaded from the taxonomy-owned file
-``chemtools/taxonomy/data/hte_templates.json`` at import time so the library
+Data is loaded from the retro-owned file
+``chemtools/retro/data/hte_templates.json`` at import time so the library
 is easy to extend without editing Python source.
 """
 from __future__ import annotations

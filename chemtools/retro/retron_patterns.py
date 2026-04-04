@@ -18,8 +18,8 @@ Each entry contains:
   precursor_hints : list of precursor type names (for LLM context)
   category        : reaction class grouping (for browsing / filtering)
 
-Data is loaded from the taxonomy-owned file
-``chemtools/taxonomy/data/retron_patterns.json`` at import time so the library
+Data is loaded from the retro-owned file
+``chemtools/retro/data/retron_patterns.json`` at import time so the library
 is easy to extend without editing Python source.
 """
 from __future__ import annotations

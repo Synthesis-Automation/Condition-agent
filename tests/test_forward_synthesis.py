@@ -7,7 +7,7 @@ Covers:
   3. chemtools.forward.scoring.score_products()
   4. chem_coworker.tools.forward_synthesis — all 8 agent tools
   5. chem_coworker.workflow — forward_synthesis workflow registration
-  6. hte_templates.json — forward_smarts field presence and validity
+  6. retro hte_templates.json — forward_smarts field presence and validity
 """
 import pytest
 from types import SimpleNamespace
@@ -29,13 +29,13 @@ from chem_coworker.tools._helpers import _validate_reaction_smiles
 
 
 # ---------------------------------------------------------------------------
-# 1. hte_templates.json — forward_smarts field
+# 1. retro hte_templates.json — forward_smarts field
 # ---------------------------------------------------------------------------
 
 class TestHTETemplatesForwardSmarts:
     def setup_method(self):
         import json, pathlib
-        p = pathlib.Path("chemtools/taxonomy/data/hte_templates.json")
+        p = pathlib.Path("chemtools/retro/data/hte_templates.json")
         self.templates = json.loads(p.read_text(encoding="utf-8"))["templates"]
 
     def test_all_templates_have_forward_smarts(self):

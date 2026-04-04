@@ -1,6 +1,6 @@
 """
 Integrate high-quality extracted retro templates into the production
-hte_templates.json and retron_patterns.json files.
+retro data files.
 
 This module takes the output of ``extract_templates`` and merges the
 best templates into the production taxonomy data files used by the
@@ -17,8 +17,8 @@ Mapping:
   - reaction_smarts (forward) → retro_smarts (reversed) + forward_smarts
 
 Output:
-  - Updated chemtools/taxonomy/data/hte_templates.json  (backup created)
-  - Updated chemtools/taxonomy/data/retron_patterns.json (backup created)
+  - Updated chemtools/retro/data/hte_templates.json  (backup created)
+  - Updated chemtools/retro/data/retron_patterns.json (backup created)
 
 Usage (as CLI):
     # After running extraction (Step 1):
@@ -69,8 +69,8 @@ from pathlib import Path
 _MODULE_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _MODULE_DIR.parent.parent
 EXTRACTED_FILE = _PROJECT_ROOT / "results" / "extracted_templates.json"
-HTE_FILE = _PROJECT_ROOT / "chemtools" / "taxonomy" / "data" / "hte_templates.json"
-RETRON_FILE = _PROJECT_ROOT / "chemtools" / "taxonomy" / "data" / "retron_patterns.json"
+HTE_FILE = _PROJECT_ROOT / "chemtools" / "retro" / "data" / "hte_templates.json"
+RETRON_FILE = _PROJECT_ROOT / "chemtools" / "retro" / "data" / "retron_patterns.json"
 
 # ---------------------------------------------------------------------------
 # Source-file stem → (taxonomy_family_id, category, description, difficulty)

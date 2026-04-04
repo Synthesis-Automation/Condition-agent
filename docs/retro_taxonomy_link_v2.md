@@ -10,7 +10,9 @@ Separate three concepts that are currently conflated in retro JSONs:
 
 ## Problem in v1
 
-`taxonomy_id` in `retron_patterns.json` / `hte_templates.json` currently mixes:
+`taxonomy_id` in the retro data files
+`chemtools/retro/data/retron_patterns.json` /
+`chemtools/retro/data/hte_templates.json` currently mixes:
 
 - canonical taxonomy IDs (`Suzuki_miyaura`)
 - taxonomy aliases (`Click_cuaac`)
