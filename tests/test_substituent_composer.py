@@ -27,17 +27,10 @@ def _load_compounds() -> list[dict]:
 
 
 def _load_compound_logic_sets() -> dict[str, set[str]]:
-    data_dir = _taxonomy_data_dir()
-    logic_path = data_dir / "compound_logic.json"
-    payload = json.loads(logic_path.read_text(encoding="utf-8"))
-    motif_sets = payload.get("motif_sets", {}) or {}
-    out: dict[str, set[str]] = {}
-    for set_name, entry in motif_sets.items():
-        if not isinstance(entry, dict):
-            continue
-        members = entry.get("members") or []
-        out[str(set_name)] = {str(m) for m in members if str(m).strip()}
-    return out
+    return {
+        set_name: set(members)
+        for set_name, members in taxonomy_loader.load_compound_logic_sets().items()
+    }
 
 
 def _load_raw_groups() -> list[dict]:
@@ -197,14 +190,11 @@ def test_compound_logic_sets_include_composed_compounds() -> None:
     assert "Ar-CONHNH2" in sets["amines_nh"]
     assert "Alkyl-CONHNH2" in sets["amines_nh"]
     assert "Alkyl-OCONH2" in sets["amines_nh"]
-    assert "H-NH2" in sets["amines_nh"]
-    assert "H-CONH2" in sets["amines_nh"]
     assert "Ar-SO2NHNH2" in sets["amines_nh"]
     assert "Alkyl-SO2NHNH2" in sets["amines_nh"]
 
     assert "Ar-CONHNH2" in sets["amides"]
     assert "RCH2-CONHNH2" in sets["amides"]
-    assert "H-CONH2" in sets["amides"]
 
     assert "Ar-SO2NHNH2" in sets["aryl_sulfonamides"]
     assert "Alkyl-SO2NHNH2" in sets["aryl_sulfonamides"]

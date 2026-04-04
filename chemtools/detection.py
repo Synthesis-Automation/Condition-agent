@@ -11,13 +11,12 @@ No backward compatibility baggage - just clean, focused logic.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
 from functools import lru_cache
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from .synthon import classify_reactant_synthons
+from .taxonomy import loader as taxonomy_loader
 from .taxonomy.reaction_catalog import motif_tokens_compatible
 
 
@@ -88,28 +87,17 @@ class DetectionResult:
 @lru_cache(maxsize=1)
 def _load_reaction_types() -> List[Dict[str, Any]]:
     """Load reaction type definitions."""
-    path = Path(__file__).resolve().parent / "taxonomy" / "data" / "reaction_types.v4.0.json"
-    if not path.exists():
-        return []
-    with path.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data.get("reaction_types", [])
+    payload = taxonomy_loader.load_reaction_types_raw()
+    return payload.get("reaction_types", []) if isinstance(payload, dict) else []
 
 
 @lru_cache(maxsize=1)
 def _load_motif_sets() -> Dict[str, Set[str]]:
-    """Load and expand motif sets from compound_logic.json."""
-    path = Path(__file__).resolve().parent / "taxonomy" / "data" / "compound_logic.json"
-    if not path.exists():
-        return {}
-    with path.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-    
-    motif_sets = {}
-    for set_name, set_data in data.get("motif_sets", {}).items():
-        members = set_data.get("members", [])
-        motif_sets[set_name] = set(members)
-    return motif_sets
+    """Load expanded motif sets from the centralized taxonomy loader."""
+    return {
+        set_name: set(members)
+        for set_name, members in taxonomy_loader.load_compound_logic_sets().items()
+    }
 
 
 def _expand_pattern(pattern: Any, motif_sets: Dict[str, Set[str]]) -> Set[str]:

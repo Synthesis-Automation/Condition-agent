@@ -3,8 +3,8 @@ Loader for calculable feature specifications.
 
 This version targets taxonomy v2 data. Reactant type features are generated
 from the documented compound catalog (with group templates) to avoid duplicating
-SMARTS definitions. Optional property and derived overlays are loaded from
-layered files when present.
+SMARTS definitions. Additional chemistry overlays are loaded from canonical
+taxonomy logic files when present.
 """
 
 from __future__ import annotations
@@ -17,8 +17,6 @@ from typing import Any, Dict, Optional
 from .substituent_composer import load_organic_groups_with_compositions
 
 _BASE_FILE = "calculable_features.json"
-_PROPERTIES_FILE = "calculable_features_properties.json"
-_DERIVED_FILE = "calculable_features_derived.json"
 _GROUP_LOGIC_FILE = "group_logic.json"
 _COMPOUND_LOGIC_FILE = "compound_logic.json"
 _ORGANIC_COMPOUNDS_FILE = "organic_compounds.v1.3.json"
@@ -229,7 +227,7 @@ def load_calculable_feature_spec(root: Optional[Path] = None) -> Dict[str, Any]:
             item for item in (base.get("derived_shortcuts") or []) if isinstance(item, dict)
         ]
 
-    for overlay_path in (data_root / _PROPERTIES_FILE, data_root / _DERIVED_FILE, data_root / _GROUP_LOGIC_FILE, data_root / _COMPOUND_LOGIC_FILE):
+    for overlay_path in (data_root / _GROUP_LOGIC_FILE, data_root / _COMPOUND_LOGIC_FILE):
         if not overlay_path.exists():
             continue
         overlay = _safe_load_json(overlay_path)

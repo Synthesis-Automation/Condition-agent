@@ -48,12 +48,6 @@ _GENERATED_ONLY_GROUP_IDS = {
     "-PO2NR2",
 }
 
-_H_PSEUDO_ALLOWED_COMPOUND_IDS = {
-    "H-NH2",
-    "H-CONH2",
-}
-
-
 class TaxonomyValidator:
     def __init__(self, taxonomy_dir: Path):
         self.taxonomy_dir = taxonomy_dir
@@ -188,7 +182,7 @@ class TaxonomyValidator:
             )
 
     def validate_h_pseudo_scaffold_policy(self) -> None:
-        """Allow only tightly controlled H-* pseudo-scaffold compounds."""
+        """Disallow pseudo-scaffold H compound motifs."""
         for compound in self.compounds_list:
             if not isinstance(compound, dict):
                 continue
@@ -200,20 +194,8 @@ class TaxonomyValidator:
                 compound_id = f"{a_ref}{b_ref}" if b_ref.startswith("-") else f"{a_ref}-{b_ref}"
 
             if a_ref == "H":
-                if compound_id not in _H_PSEUDO_ALLOWED_COMPOUND_IDS:
-                    self.errors.append(
-                        f"Compound '{compound_id or '<missing-id>'}' uses pseudo-scaffold A='H' "
-                        "but is not in the allowlist."
-                    )
-                has_direct_smarts = bool(compound.get("smarts") or compound.get("smarts_any"))
-                if not has_direct_smarts:
-                    self.errors.append(
-                        f"Compound '{compound_id or '<missing-id>'}' with A='H' must define explicit SMARTS."
-                    )
-
-            if compound_id in _H_PSEUDO_ALLOWED_COMPOUND_IDS and a_ref != "H":
                 self.errors.append(
-                    f"Compound '{compound_id}' is allowlisted as pseudo-scaffold but does not use A='H'."
+                    f"Compound '{compound_id or '<missing-id>'}' uses deprecated pseudo-scaffold A='H'."
                 )
     
     def check_explicit_id_fields(self) -> int:
@@ -302,7 +284,7 @@ class TaxonomyValidator:
         
         self.warnings.append(
             "Fix mode is deprecated for generated compound catalog. Update "
-            "compound_generation_rules.v1.json or compound_overrides.v1.json instead."
+            "compound_generation_rules.v1.json instead."
         )
     
     def validate_all(self, fix_mode: bool = False) -> bool:
@@ -344,8 +326,8 @@ class TaxonomyValidator:
         print("\n5. Enforcing generated-only group policy...")
         self.validate_generated_only_groups()
 
-        # 6. Enforce pseudo-scaffold H policy
-        print("\n6. Enforcing pseudo-scaffold H policy...")
+        # 6. Reject deprecated pseudo-scaffold H motifs
+        print("\n6. Checking deprecated pseudo-scaffold H motifs...")
         self.validate_h_pseudo_scaffold_policy()
 
         # 7. Validate substituent fragments schema

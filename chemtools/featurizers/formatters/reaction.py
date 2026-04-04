@@ -354,19 +354,14 @@ def _get_bond_change_analysis(
 
 @lru_cache(maxsize=1)
 def _load_compound_logic_sets() -> Dict[str, Set[str]]:
-    path = Path(__file__).resolve().parent.parent.parent / "taxonomy" / "data" / "compound_logic.json"
-    if not path.exists():
-        return {}
     try:
-        with path.open("r", encoding="utf-8", errors="replace") as handle:
-            payload = json.load(handle)
+        from chemtools.taxonomy import loader as taxonomy_loader
     except Exception:
         return {}
-    motif_sets: Dict[str, Set[str]] = {}
-    for set_name, set_data in (payload.get("motif_sets", {}) or {}).items():
-        members = set_data.get("members", []) or []
-        motif_sets[set_name] = set(str(m) for m in members if m)
-    return motif_sets
+    return {
+        set_name: set(members)
+        for set_name, members in taxonomy_loader.load_compound_logic_sets().items()
+    }
 
 
 @lru_cache(maxsize=1)

@@ -10,9 +10,10 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Set, Tuple
 
+from . import loader as taxonomy_loader
+
 
 REACTION_TYPES_FILE = Path(__file__).resolve().parent / "data" / "reaction_types.v4.0.json"
-COMPOUND_LOGIC_FILE = Path(__file__).resolve().parent / "data" / "compound_logic.json"
 SYNTHON_FILE = Path(__file__).resolve().parent / "data" / "synthons.v1.json"
 _DEFAULT_SLOTS = ("electrophiles", "nucleophiles", "acids", "activators", "substrate", "reagent")
 REACTION_CONSTRAINT_KEYS = (
@@ -464,20 +465,10 @@ def load_reaction_catalog(
     payload = _load_payload(path or REACTION_TYPES_FILE)
     reactions = payload.get("reaction_types") or []
     motif_sets = payload.get("motif_sets") or {}
-
-    # Load centralized compound logic if available
-    logic_path = COMPOUND_LOGIC_FILE
-    if logic_path.exists():
-        try:
-            with logic_path.open("r", encoding="utf-8") as h:
-                logic_payload = json.load(h)
-                logic_motif_sets = logic_payload.get("motif_sets") or {}
-                # Merge logic_motif_sets into motif_sets (logic supplements)
-                for k, v in logic_motif_sets.items():
-                    if k not in motif_sets:
-                        motif_sets[k] = v
-        except Exception:
-            pass
+    if not isinstance(motif_sets, dict):
+        motif_sets = {}
+    for set_name, members in taxonomy_loader.load_compound_logic_sets().items():
+        motif_sets.setdefault(set_name, members)
     synthon_sets = _load_synthon_sets()
 
     definitions: Dict[str, ReactionTypeDefinition] = {}

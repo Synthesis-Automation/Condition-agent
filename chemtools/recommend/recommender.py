@@ -1338,7 +1338,6 @@ def _normalize_reactant_values(values: Iterable[Any]) -> Tuple[str, str, str, Li
 
 
 _MOTIF_SPLIT_RE = re.compile(r"[|,]")
-_COMPOUND_LOGIC_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "compound_logic.json"
 _COMPOUND_GROUPS_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "organic_groups.v1.3.json"
 _SCAFFOLD_MOTIFS_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
 
@@ -1414,23 +1413,7 @@ def _compound_entry_id(entry: Dict[str, Any]) -> str:
 
 @lru_cache(maxsize=1)
 def _load_motif_sets() -> Dict[str, List[str]]:
-    if not _COMPOUND_LOGIC_FILE.exists():
-        return {}
-    try:
-        with _COMPOUND_LOGIC_FILE.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-    except Exception:
-        return {}
-    raw_sets = payload.get("motif_sets") or {}
-    motif_sets: Dict[str, List[str]] = {}
-    for name, entry in raw_sets.items():
-        members: List[str] = []
-        if isinstance(entry, dict):
-            members = entry.get("members") or []
-        elif isinstance(entry, list):
-            members = entry
-        motif_sets[name] = [str(m).strip() for m in members if str(m).strip()]
-    return motif_sets
+    return taxonomy_loader.load_compound_logic_sets()
 
 
 @lru_cache(maxsize=1)
@@ -4016,23 +3999,7 @@ class HTERecommender:
             or query_ext_signature
             or result.query_reaction_events_key
         )
-        allow_direct_backfill = False
-        if has_query_key and not reaction_key_only:
-            matched_groups: Set[str] = set()
-            current_match_count = 0
-            for frame in match_dfs:
-                if frame is None or frame.empty:
-                    continue
-                current_match_count += len(frame)
-                if "Source_Group" not in frame.columns:
-                    continue
-                labels = frame["Source_Group"].fillna("").astype(str).str.strip()
-                for label in labels:
-                    normalized = _normalize_source_group(label)
-                    if normalized:
-                        matched_groups.add(normalized)
-            if current_match_count < min_experiments:
-                allow_direct_backfill = True
+        allow_direct_backfill = not reaction_key_only
 
         if not has_query_key or allow_direct_backfill:
             if key in self.indexed_data:
@@ -4063,32 +4030,44 @@ class HTERecommender:
                         else:
                             result.matched_motifs = (result.reactant_a_type, result.reactant_b_type)
             if direct_match is None:
-                list_a = _prioritize_motifs(lookup_type_a, reacted_set, spectator_set) or [""]
-                list_b = _prioritize_motifs(lookup_type_b, reacted_set, spectator_set) or [""]
-                for ma in list_a:
-                    for mb in list_b:
-                        if not ma and not mb:
-                            continue
-                        candidate = _reactant_key([ma, mb])
-                        if candidate in self.indexed_data:
-                            direct_match = self.indexed_data[candidate].copy()
-                            direct_key = candidate
-                            if source_group:
-                                direct_match = _filter_source_group(direct_match, source_group)
-                                if direct_match.empty:
-                                    direct_match = None
-                                    direct_key = None
+                tiers_a = _build_fallback_tiers(lookup_type_a, reacted_set, spectator_set)
+                tiers_b = _build_fallback_tiers(lookup_type_b, reacted_set, spectator_set)
+                for tier_idx_a, list_a in enumerate(tiers_a):
+                    for tier_idx_b, list_b in enumerate(tiers_b):
+                        for ma in list_a:
+                            for mb in list_b:
+                                if not ma and not mb:
                                     continue
-                            direct_match = _filter_target_reaction(direct_match)
-                            if direct_match.empty:
-                                direct_match = None
-                                direct_key = None
-                                continue
-                            direct_match['match_score'] = 1.0
-                            direct_match['match_priority'] = 0
-                            _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
-                            if not result.matched_motifs:
-                                result.matched_motifs = (ma, mb)
+                                candidate = _reactant_key([ma, mb])
+                                if candidate in self.indexed_data:
+                                    direct_match = self.indexed_data[candidate].copy()
+                                    direct_key = candidate
+                                    if source_group:
+                                        direct_match = _filter_source_group(direct_match, source_group)
+                                        if direct_match.empty:
+                                            direct_match = None
+                                            direct_key = None
+                                            continue
+                                    direct_match = _filter_target_reaction(direct_match)
+                                    if direct_match.empty:
+                                        direct_match = None
+                                        direct_key = None
+                                        continue
+                                    direct_match['match_score'] = 1.0
+                                    direct_match['match_priority'] = 0
+                                    _apply_intramolecular_boost(direct_match, query_intramolecular_likely)
+                                    fallback_used = (
+                                        fallback_used
+                                        or candidate != key
+                                        or tier_idx_a > 0
+                                        or tier_idx_b > 0
+                                    )
+                                    if not result.matched_motifs:
+                                        result.matched_motifs = (ma, mb)
+                                    break
+                            if direct_match is not None:
+                                break
+                        if direct_match is not None:
                             break
                     if direct_match is not None:
                         break

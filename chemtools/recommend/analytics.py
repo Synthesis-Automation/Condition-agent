@@ -11,10 +11,11 @@ Provides analytical functions to explore and understand the HTE database:
 from typing import List, Dict, Optional, Tuple, Any, Iterable, Set
 from collections import defaultdict, Counter
 from functools import lru_cache
-import json
 import pandas as pd
 from pathlib import Path
 import re
+
+from chemtools.taxonomy import loader as taxonomy_loader
 
 
 def _ensure_list(values: Any) -> List[str]:
@@ -99,28 +100,9 @@ def _format_source_path(source_path: Optional[Path]) -> str:
 
 
 _MOTIF_SPLIT_RE = re.compile(r"[|,]")
-_COMPOUND_LOGIC_FILE = Path(__file__).resolve().parents[1] / "taxonomy" / "data" / "compound_logic.json"
-
-
 @lru_cache(maxsize=1)
 def _load_motif_sets() -> Dict[str, List[str]]:
-    if not _COMPOUND_LOGIC_FILE.exists():
-        return {}
-    try:
-        with _COMPOUND_LOGIC_FILE.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
-    except Exception:
-        return {}
-    raw_sets = payload.get("motif_sets") or {}
-    motif_sets: Dict[str, List[str]] = {}
-    for name, entry in raw_sets.items():
-        members: List[str] = []
-        if isinstance(entry, dict):
-            members = entry.get("members") or []
-        elif isinstance(entry, list):
-            members = entry
-        motif_sets[name] = [str(m).strip() for m in members if str(m).strip()]
-    return motif_sets
+    return taxonomy_loader.load_compound_logic_sets()
 
 
 def _split_motif_tokens(value: Any) -> List[str]:

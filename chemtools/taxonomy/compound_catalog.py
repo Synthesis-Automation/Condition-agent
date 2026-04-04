@@ -1,10 +1,9 @@
-"""Build canonical documented compound motifs from taxonomy rules and overrides.
+"""Build canonical documented compound motifs from taxonomy generation rules.
 
 This module is the migration path away from hand-maintained
-``organic_compounds.v1.3.json``. It supports a hybrid model:
+``organic_compounds.v1.3.json``. It supports a rule-driven model:
 
 - composable A/B motif entries from generation rules
-- explicit SMARTS overrides for special cases
 - denylist filtering for unwanted combinations
 
 The resulting payload intentionally matches the legacy compounds-style schema
@@ -21,7 +20,6 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set, 
 
 _TAXONOMY_DIR = Path(__file__).resolve().parent / "data"
 _GENERATION_RULES_FILE = _TAXONOMY_DIR / "compound_generation_rules.v1.json"
-_OVERRIDES_FILE = _TAXONOMY_DIR / "compound_overrides.v1.json"
 _GROUP_LOGIC_FILE = _TAXONOMY_DIR / "group_logic.json"
 
 
@@ -209,7 +207,6 @@ def _expand_rule_pairs(
 
 def _build_from_rules(
     generation_rules: Mapping[str, Any],
-    overrides_payload: Mapping[str, Any],
     *,
     emit_ids: bool,
 ) -> Dict[str, Any]:
@@ -262,30 +259,12 @@ def _build_from_rules(
         seen_keys.add(ident_key)
         filtered_entries.append(_clean_entry(entry, default_template=default_template, emit_ids=emit_ids))
 
-    overrides = overrides_payload.get("compounds") or []
-    if not isinstance(overrides, list):
-        overrides = []
-    for entry in overrides:
-        if not isinstance(entry, dict):
-            continue
-        cleaned = _clean_entry(entry, default_template=default_template, emit_ids=emit_ids)
-        compound_id = _normalize_compound_id(cleaned)
-        ident_key = _compound_identity_key(cleaned, default_template=default_template)
-        if compound_id and compound_id in seen_ids:
-            continue
-        if ident_key in seen_keys and not (cleaned.get("smarts") or cleaned.get("smarts_any")):
-            continue
-        if compound_id:
-            seen_ids.add(compound_id)
-        seen_keys.add(ident_key)
-        filtered_entries.append(cleaned)
-
     return {
         "version": str(generation_rules.get("legacy_version") or "v1.3"),
         "naming_set": str(generation_rules.get("naming_set") or "chemist_style"),
         "notes": str(
             generation_rules.get("notes")
-            or "Generated documented compound motifs from compound_generation_rules + compound_overrides."
+            or "Generated documented compound motifs from compound_generation_rules."
         ),
         "compounds": filtered_entries,
     }
@@ -293,7 +272,7 @@ def _build_from_rules(
 
 def has_compound_catalog_rules() -> bool:
     """Return True when the split catalog files are present."""
-    return _GENERATION_RULES_FILE.exists() and _OVERRIDES_FILE.exists()
+    return _GENERATION_RULES_FILE.exists()
 
 
 def build_documented_compound_catalog(
@@ -307,9 +286,8 @@ def build_documented_compound_catalog(
             consumers that previously depended on explicit IDs.
     """
     generation_rules = _load_json(_GENERATION_RULES_FILE)
-    overrides_payload = _load_json(_OVERRIDES_FILE)
-    if generation_rules and overrides_payload:
-        return _build_from_rules(generation_rules, overrides_payload, emit_ids=emit_ids)
+    if generation_rules:
+        return _build_from_rules(generation_rules, emit_ids=emit_ids)
     return {}
 
 

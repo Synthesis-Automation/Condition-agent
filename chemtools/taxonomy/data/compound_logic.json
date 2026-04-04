@@ -6,373 +6,312 @@
     "sp2_electrophiles": {
       "name": "sp2 Electrophiles",
       "description": "Aryl and vinyl halides/sulfonates for cross-coupling.",
-      "members": [
-        "Ar-I",
-        "Ar-Br",
-        "Ar-Cl",
-        "Ar-F",
-        "Ar-OTf",
-        "Ar-OMs",
-        "Ar-OTs",
-        "HeteroAr-I",
-        "HeteroAr-Br",
-        "HeteroAr-Cl",
-        "HeteroAr-F",
-        "HeteroAr-OTf",
-        "HeteroAr-OMs",
-        "HeteroAr-OTs",
-        "Alkenyl-I",
-        "Alkenyl-Br",
-        "Alkenyl-Cl",
-        "Alkenyl-F",
-        "Alkenyl-OTf",
-        "Alkenyl-OMs",
-        "Alkenyl-OTs"
-      ],
       "usage": [
         "Suzuki_miyaura",
         "C_N_Coupling",
         "C_O_Coupling",
         "C_S_Coupling",
         "Sonogashira"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "HeteroAr",
+            "Alkenyl"
+          ],
+          "B": [
+            "-I",
+            "-Br",
+            "-Cl",
+            "-F",
+            "-OTf",
+            "-OMs",
+            "-OTs"
+          ]
+        }
       ]
     },
     "organoboron": {
       "name": "Organoboron Reagents",
       "description": "Boronic acids, esters, trifluoroborates for Suzuki coupling.",
-      "members": [
-        "Alkenyl-B(OH)2",
-        "Alkenyl-B(OR)2",
-        "Alkenyl-B*",
-        "Alkenyl-BF3K",
-        "Alkyl-B(OH)2",
-        "Alkyl-B(OR)2",
-        "Alkyl-B*",
-        "Alkyl-BF3K",
-        "Ar-B(OH)2",
-        "Ar-B(OR)2",
-        "Ar-B*",
-        "Ar-BF3K",
-        "HeteroAr-B(OH)2",
-        "HeteroAr-B(OR)2",
-        "HeteroAr-BF3K",
-        "R2CH-B(OH)2",
-        "R2CH-B(OR)2",
-        "R3C-B(OH)2",
-        "R3C-B(OR)2",
-        "RCH2-B(OH)2",
-        "RCH2-B(OR)2"
-      ],
       "usage": [
         "Suzuki_miyaura",
         "Chan_lam_cn"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Ar",
+            "HeteroAr",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-B(OH)2",
+            "-B(OR)2",
+            "-B*",
+            "-BF3K"
+          ]
+        }
       ]
     },
     "acidic_ch": {
       "name": "C-H Acidic Compounds",
       "description": "Compounds with acidic C-H bonds (alpha to EWG) for alpha-arylation reactions.",
-      "members": [
-        "R_acidic-H",
-        "Alkyl-COR",
-        "RCH2-COR",
-        "R2CH-COR",
-        "R3C-COR",
-        "Alkyl-CN",
-        "RCH2-CN",
-        "R2CH-CN",
-        "Alkyl-SO2R",
-        "RCH2-SO2R",
-        "Alkyl-NO2"
-      ],
       "usage": [
         "Arylation_acidic_C_H",
         "Michael_addition"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "R_acidic",
+            "Alkyl",
+            "RCH2",
+            "R2CH",
+            "R3C"
+          ],
+          "B": [
+            "-H",
+            "-COR",
+            "-CN",
+            "-SO2R",
+            "-NO2"
+          ],
+          "exclude": [
+            "Alkyl-H",
+            "R2CH-NO2",
+            "R2CH-SO2R",
+            "R3C-CN",
+            "R3C-NO2",
+            "R3C-SO2R",
+            "RCH2-NO2"
+          ]
+        }
       ]
     },
     "amines_nh": {
       "name": "N-H Nitrogen Nucleophiles",
       "description": "Primary/secondary amines, N-H heterocycles, and N-H amide/sulfonamide nucleophiles for C-N coupling.",
-      "members": [
-        "Ar-NH2",
-        "Ar-NHR",
-        "Alkenyl-NH2",
-        "Alkenyl-NHR",
-        "Alkyl-NH2",
-        "Alkyl-NHR",
-        "Alkynyl-NH2",
-        "Alkynyl-NHR",
-        "Allyl-NH2",
-        "Allyl-NHR",
-        "Bn-NH2",
-        "Bn-NHR",
-        "CH3-NH2",
-        "CH3-NHR",
-        "H-NH2",
-        "Propargyl-NH2",
-        "RCH2-NH2",
-        "RCH2-NHR",
-        "R2CH-NH2",
-        "R2CH-NHR",
-        "R3C-NH2",
-        "R3C-NHR",
-        "Alkyl-Hydrazide",
-        "Ar-Hydrazide",
-        "Alkyl-Hydrazine",
-        "Ar-Hydrazine",
-        "AromN-H",
-        "Alkenyl-CONH2",
-        "Alkenyl-CONHR",
-        "Alkenyl-CONHNH2",
-        "Alkyl-CONH2",
-        "Alkyl-OCONH2",
-        "Alkyl-CONHR",
-        "Alkyl-CONHNH2",
-        "Alkynyl-CONH2",
-        "Alkynyl-CONHR",
-        "Alkynyl-CONHNH2",
-        "Allyl-CONH2",
-        "Allyl-CONHR",
-        "Allyl-CONHNH2",
-        "Ar-CONH2",
-        "Ar-CONHR",
-        "Ar-CONHNH2",
-        "H-CONH2",
-        "Bn-CONH2",
-        "Bn-CONHR",
-        "Bn-CONHNH2",
-        "HeteroAr-CONH2",
-        "HeteroAr-CONHR",
-        "RCH2-CONH2",
-        "RCH2-CONHR",
-        "RCH2-CONHNH2",
-        "R2CH-CONH2",
-        "R2CH-CONHR",
-        "R2CH-CONHNH2",
-        "R3C-CONH2",
-        "R3C-CONHR",
-        "R3C-CONHNH2",
-        "Alkyl-SO2NH2",
-        "Alkyl-SO2NHR",
-        "Alkyl-SO2NHNH2",
-        "Ar-SO2NH2",
-        "Ar-SO2NHR",
-        "Ar-SO2NHNH2",
-        "Ar-PO2NH2",
-        "Ar-PO2NHR",
-        "Ar-NHCOR",
-        "Alkyl-NHCOR",
-        "Alkyl-PO2NH2",
-        "Alkyl-PO2NHR",
-        "RCH2-PO2NH2",
-        "RCH2-PO2NHR",
-        "R2CH-PO2NH2",
-        "R2CH-PO2NHR",
-        "R3C-PO2NH2",
-        "R3C-PO2NHR"
-      ],
       "usage": [
         "C_N_Coupling",
         "Chan_lam_cn",
         "Alkyl_Nucleophilic_Substitution",
         "Michael_addition"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "Alkenyl",
+            "Alkyl",
+            "Alkynyl",
+            "Allyl",
+            "Bn",
+            "CH3",
+            "Propargyl",
+            "RCH2",
+            "R2CH",
+            "R3C",
+            "AromN"
+          ],
+          "B": [
+            "-NH2",
+            "-NHR",
+            "-Hydrazide",
+            "-Hydrazine",
+            "-H",
+            "-CONH2",
+            "-CONHR",
+            "-CONHNH2",
+            "-OCONH2",
+            "-SO2NH2",
+            "-SO2NHR",
+            "-SO2NHNH2",
+            "-PO2NH2",
+            "-PO2NHR",
+            "-NHCOR"
+          ],
+          "exclude": [
+            "Alkenyl-H",
+            "Alkenyl-SO2NHNH2",
+            "Alkenyl-SO2NHR",
+            "Alkyl-H",
+            "Alkynyl-H",
+            "Alkynyl-SO2NHNH2",
+            "Alkynyl-SO2NHR",
+            "Allyl-SO2NHNH2",
+            "Allyl-SO2NHR",
+            "Ar-H",
+            "Bn-SO2NHNH2",
+            "Bn-SO2NHR",
+            "Propargyl-H",
+            "R2CH-SO2NHNH2",
+            "R2CH-SO2NHR",
+            "R3C-SO2NHNH2",
+            "R3C-SO2NHR",
+            "RCH2-SO2NHNH2",
+            "RCH2-SO2NHR"
+          ]
+        }
+      ],
+      "members": [
+        "HeteroAr-CONH2",
+        "HeteroAr-CONHR"
       ]
     },
     "alcohols_oh": {
       "name": "Alcohols & Phenols",
       "description": "O-H nucleophiles for C-O coupling.",
-      "members": [
-        "Ar-OH",
-        "AromN-OH",
-        "Alkenyl-OH",
-        "Alkyl-OH",
-        "Alkynyl-OH",
-        "Allyl-OH",
-        "Bn-OH",
-        "CH3-OH",
-        "Propargyl-OH",
-        "RCH2-OH",
-        "R2CH-OH",
-        "R3C-OH",
-        "Ar-PO2OH",
-        "Alkyl-PO2OH",
-        "RCH2-PO2OH",
-        "R2CH-PO2OH",
-        "R3C-PO2OH"
-      ],
       "usage": [
         "C_O_Coupling",
         "Alkyl_Nucleophilic_Substitution",
         "Oxidation_primary_alcohol_to_aldehyde",
         "Oxidation_secondary_alcohol_to_ketone",
         "Oxidation_primary_alcohol_to_carboxylic_acid"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "AromN",
+            "Alkenyl",
+            "Alkyl",
+            "Alkynyl",
+            "Allyl",
+            "Bn",
+            "CH3",
+            "Propargyl",
+            "RCH2",
+            "R2CH",
+            "R3C"
+          ],
+          "B": [
+            "-OH",
+            "-PO2OH"
+          ]
+        }
       ]
     },
     "thiols_sh": {
       "name": "Thiols",
       "description": "S-H nucleophiles for C-S coupling.",
-      "members": [
-        "Ar-SH",
-        "Alkenyl-SH",
-        "Alkyl-SH",
-        "Alkynyl-SH",
-        "Allyl-SH",
-        "Bn-SH",
-        "CH3-SH",
-        "RCH2-SH",
-        "R2CH-SH",
-        "R3C-SH",
-        "Thiocarbonyl-SH"
-      ],
       "usage": [
         "C_S_Coupling",
         "Alkyl_Nucleophilic_Substitution",
         "Michael_addition"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "Alkenyl",
+            "Alkyl",
+            "Alkynyl",
+            "Allyl",
+            "Bn",
+            "CH3",
+            "RCH2",
+            "R2CH",
+            "R3C"
+          ],
+          "B": [
+            "-SH"
+          ]
+        }
+      ],
+      "members": [
       ]
     },
     "alkyl_electrophiles": {
       "name": "Alkyl Electrophiles",
       "description": "Alkyl/benzylic/allylic/propargylic halides and sulfonates used in nucleophilic substitution.",
-      "members": [
-        "Alkyl-I",
-        "Alkyl-Br",
-        "Alkyl-Cl",
-        "Alkyl-F",
-        "Alkyl-OTf",
-        "Alkyl-OMs",
-        "Alkyl-OTs",
-        "RCH2-I",
-        "RCH2-Br",
-        "RCH2-Cl",
-        "RCH2-F",
-        "R2CH-I",
-        "R2CH-Br",
-        "R2CH-Cl",
-        "R2CH-F",
-        "R3C-I",
-        "R3C-Br",
-        "R3C-Cl",
-        "R3C-F",
-        "CH3-I",
-        "CH3-Br",
-        "CH3-Cl",
-        "CH3-F",
-        "Bn-I",
-        "Bn-Br",
-        "Bn-Cl",
-        "Bn-F",
-        "Bn-OTf",
-        "Bn-OMs",
-        "Bn-OTs",
-        "Allyl-I",
-        "Allyl-Br",
-        "Allyl-Cl",
-        "Allyl-F",
-        "Allyl-OTf",
-        "Allyl-OMs",
-        "Allyl-OTs",
-        "Propargyl-I",
-        "Propargyl-Br",
-        "Propargyl-Cl",
-        "Propargyl-OTf",
-        "Propargyl-OMs",
-        "Propargyl-OTs"
-      ],
       "usage": [
         "Alkyl_Nucleophilic_Substitution"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkyl",
+            "RCH2",
+            "R2CH",
+            "R3C",
+            "CH3",
+            "Bn",
+            "Allyl",
+            "Propargyl"
+          ],
+          "B": [
+            "-I",
+            "-Br",
+            "-Cl",
+            "-F",
+            "-OTf",
+            "-OMs",
+            "-OTs"
+          ]
+        }
       ]
     },
     "alkyl_substitution_products": {
       "name": "Alkyl Substitution Products",
       "description": "Products formed by N/O/S nucleophilic substitution on alkyl electrophiles.",
-      "members": [
-        "Alkyl-NH2",
-        "Alkyl-NHR",
-        "Alkyl-NR2",
-        "RCH2-NH2",
-        "RCH2-NHR",
-        "RCH2-NR2",
-        "R2CH-NH2",
-        "R2CH-NHR",
-        "R2CH-NR2",
-        "R3C-NH2",
-        "R3C-NHR",
-        "R3C-NR2",
-        "CH3-NH2",
-        "CH3-NHR",
-        "CH3-NR2",
-        "Bn-NH2",
-        "Bn-NHR",
-        "Bn-NR2",
-        "Allyl-NH2",
-        "Allyl-NHR",
-        "Allyl-NR2",
-        "Propargyl-NH2",
-        "Alkyl-OR",
-        "RCH2-OR",
-        "R2CH-OR",
-        "R3C-OR",
-        "CH3-OR",
-        "Bn-OR",
-        "Allyl-OR",
-        "Ar-OR",
-        "Alkyl-SR",
-        "RCH2-SR",
-        "R2CH-SR",
-        "R3C-SR",
-        "CH3-SR",
-        "Bn-SR",
-        "Allyl-SR",
-        "Ar-SR",
-        "Alkyl-AromN",
-        "Ar-AromN",
-        "Ar-NH2",
-        "Ar-NHR",
-        "Ar-NR2",
-        "HeteroAr-NH2",
-        "HeteroAr-NHR",
-        "Alkyl-NHCOR",
-        "Alkyl-NRCOR",
-        "Ar-NHCOR",
-        "Ar-NRCOR",
-        "Ar-SO2NH2",
-        "Ar-SO2NHR",
-        "Ar-SO2NR2",
-        "Alkyl-SO2NH2",
-        "Alkyl-SO2NHR",
-        "Alkyl-SO2NR2",
-        "Ar-PO2OR",
-        "Alkyl-PO2OR",
-        "RCH2-PO2OR",
-        "R2CH-PO2OR",
-        "R3C-PO2OR",
-        "Ar-PO2NHR",
-        "Ar-PO2NR2",
-        "Alkyl-PO2NHR",
-        "Alkyl-PO2NR2",
-        "RCH2-PO2NHR",
-        "RCH2-PO2NR2",
-        "R2CH-PO2NHR",
-        "R2CH-PO2NR2",
-        "R3C-PO2NHR",
-        "R3C-PO2NR2"
-      ],
       "usage": [
         "Alkyl_Nucleophilic_Substitution"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkyl",
+            "RCH2",
+            "R2CH",
+            "R3C",
+            "CH3",
+            "Bn",
+            "Allyl",
+            "Propargyl",
+            "Ar",
+            "HeteroAr"
+          ],
+          "B": [
+            "-NH2",
+            "-NHR",
+            "-NR2",
+            "-OR",
+            "-SR",
+            "AromN",
+            "-NHCOR",
+            "-NRCOR",
+            "-SO2NH2",
+            "-SO2NHR",
+            "-SO2NR2",
+            "-PO2OR",
+            "-PO2NHR",
+            "-PO2NR2"
+          ],
+          "exclude": [
+            "Allyl-SO2NHR",
+            "Allyl-SO2NR2",
+            "Bn-SO2NHR",
+            "Bn-SO2NR2",
+            "HeteroAr-OR",
+            "R2CH-SO2NHR",
+            "R2CH-SO2NR2",
+            "R3C-SO2NHR",
+            "R3C-SO2NR2",
+            "RCH2-SO2NHR",
+            "RCH2-SO2NR2"
+          ]
+        }
       ]
     },
     "carboxylic_acids": {
       "name": "Carboxylic Acids",
       "description": "Carboxylic acid reactants and products.",
-      "members": [
-        "Acyl-COOH",
-        "Alkenyl-COOH",
-        "Alkyl-COOH",
-        "Ar-COOH",
-        "HeteroAr-COOH",
-        "R2CH-COOH",
-        "R3C-COOH",
-        "RCH2-COOH"
-      ],
       "usage": [
         "Acyl_Halides_formation",
         "Amide_formation",
@@ -381,239 +320,281 @@
         "Benzylic_CH_oxidation_to_carboxylic_acid",
         "Oxidation_aldehyde_to_carboxylic_acid",
         "Alkene_oxidative_cleavage_to_carboxylic_acid"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Acyl",
+            "Alkenyl",
+            "Alkyl",
+            "Ar",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-COOH"
+          ]
+        }
+      ],
+      "members": [
+        "HeteroAr-COOH"
       ]
     },
     "amides": {
       "name": "Amides",
       "description": "Amide products (primary/secondary/tertiary).",
+      "usage": [
+        "Amide_formation",
+        "Acylation_amide"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Alkynyl",
+            "Allyl",
+            "Ar",
+            "Bn",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-CONH2",
+            "-CONHR",
+            "-CONHNH2",
+            "-CONR2",
+            "-NHCOR",
+            "-NRCOR"
+          ]
+        }
+      ],
       "members": [
-        "Alkenyl-CONH2",
-        "Alkenyl-CONHR",
-        "Alkenyl-CONHNH2",
-        "Alkenyl-CONR2",
-        "Alkyl-CONH2",
-        "Alkyl-CONHR",
-        "Alkyl-CONHNH2",
-        "Alkyl-CONR2",
-        "Alkyl-NHCOR",
-        "Alkyl-NRCOR",
-        "Alkynyl-CONH2",
-        "Alkynyl-CONHR",
-        "Alkynyl-CONHNH2",
-        "Alkynyl-CONR2",
-        "Allyl-CONH2",
-        "Allyl-CONHR",
-        "Allyl-CONHNH2",
-        "Allyl-CONR2",
         "Allyl-NHCOR",
         "Allyl-NRCOR",
-        "Ar-CONH2",
-        "Ar-CONHR",
-        "Ar-CONHNH2",
-        "H-CONH2",
-        "Ar-CONR2",
-        "Ar-NHCOR",
-        "Ar-NRCOR",
-        "Bn-CONH2",
-        "Bn-CONHR",
-        "Bn-CONHNH2",
-        "Bn-CONR2",
         "Bn-NHCOR",
         "Bn-NRCOR",
         "HeteroAr-CONH2",
         "HeteroAr-CONHR",
         "HeteroAr-CONR2",
         "HeteroAr-NHCOR",
-        "HeteroAr-NRCOR",
-        "R2CH-CONH2",
-        "R2CH-CONHR",
-        "R2CH-CONHNH2",
-        "R2CH-CONR2",
-        "R3C-CONH2",
-        "R3C-CONHR",
-        "R3C-CONHNH2",
-        "R3C-CONR2",
-        "RCH2-CONH2",
-        "RCH2-CONHR",
-        "RCH2-CONHNH2",
-        "RCH2-CONR2"
-      ],
-      "usage": [
-        "Amide_formation",
-        "Acylation_amide"
+        "HeteroAr-NRCOR"
       ]
     },
     "terminal_alkynes": {
       "name": "Terminal Alkynes",
       "description": "Terminal alkynes (C≡C-H) for Sonogashira coupling.",
-      "members": [
-        "Ar-Alkynyl_terminal",
-        "Alkyl-Alkynyl_terminal"
-      ],
       "usage": [
         "Sonogashira"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "Alkyl"
+          ],
+          "B": [
+            "Alkynyl_terminal"
+          ]
+        }
       ]
     },
     "aryl_amines": {
       "name": "Aryl Amines",
       "description": "C-N coupling products (including heteroaryl).",
-      "members": [
-        "Ar-NH2",
-        "Ar-NHR",
-        "Ar-NR2",
-        "Ar-AromN",
-        "Ar-Hydrazine",
-        "HeteroAr-NH2",
-        "HeteroAr-NHR",
-        "HeteroAr-NR2"
-      ],
       "usage": [
         "C_N_Coupling"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "HeteroAr"
+          ],
+          "B": [
+            "-NH2",
+            "-NHR",
+            "-NR2",
+            "AromN",
+            "-Hydrazine"
+          ]
+        }
+      ],
+      "members": [
+        "HeteroAr-NR2"
       ]
     },
     "aryl_ethers": {
       "name": "Aryl Ethers",
       "description": "C-O coupling products.",
-      "members": [
-        "Ar-OR",
-        "HeteroAr-OR",
-        "AromN-OR"
-      ],
       "usage": [
         "C_O_Coupling",
         "Alkyl_Nucleophilic_Substitution"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "HeteroAr"
+          ],
+          "B": [
+            "-OR"
+          ]
+        }
+      ],
+      "members": [
+        "AromN-OR"
       ]
     },
     "aryl_thioethers": {
       "name": "Aryl Thioethers",
       "description": "C-S coupling products (aryl thioethers).",
-      "members": [
-        "Ar-SR"
-      ],
       "usage": [
         "C_S_Coupling",
         "Alkyl_Nucleophilic_Substitution"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar"
+          ],
+          "B": [
+            "-SR"
+          ]
+        }
       ]
     },
     "aryl_amides": {
       "name": "Aryl Amides",
       "description": "N-aryl amide products (N-acyl anilides).",
-      "members": [
-        "Ar-NHCOR",
-        "HeteroAr-NHCOR",
-        "Ar-NRCOR"
-      ],
       "usage": [
         "C_N_Coupling"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar"
+          ],
+          "B": [
+            "-NHCOR",
+            "-NRCOR"
+          ]
+        }
+      ],
+      "members": [
+        "HeteroAr-NHCOR"
       ]
     },
     "aryl_sulfonamides": {
       "name": "Sulfonamides",
       "description": "Sulfonamide products tracked via explicit SO2NHx motifs.",
-      "members": [
-        "Ar-SO2NH2",
-        "Ar-SO2NHR",
-        "Ar-SO2NHNH2",
-        "Ar-SO2NR2",
-        "Alkyl-SO2NH2",
-        "Alkyl-SO2NHR",
-        "Alkyl-SO2NHNH2",
-        "Alkyl-SO2NR2"
-      ],
       "usage": [
         "C_N_Coupling",
         "Chan_lam_cn",
         "Alkyl_Nucleophilic_Substitution"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "Alkyl"
+          ],
+          "B": [
+            "-SO2NH2",
+            "-SO2NHR",
+            "-SO2NHNH2",
+            "-SO2NR2"
+          ]
+        }
       ]
     },
     "acyl_halides": {
       "name": "Acyl Halides",
       "description": "Acyl halides (acid chlorides/bromides/iodides/fluorides) for acylation.",
-      "members": [
-        "Acyl-Cl",
-        "Alkenyl-COF",
-        "Ar-COBr",
-        "Ar-COCl",
-        "Ar-COF",
-        "Ar-COI",
-        "Alkyl-COCl",
-        "Alkyl-COF"
-      ],
       "usage": [
         "Acyl_Halides_formation",
         "Acylation_amide",
         "Acylation_ester",
         "Acylation_friedel_crafts",
         "Amide_formation"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Acyl",
+            "Alkenyl",
+            "Ar",
+            "Alkyl"
+          ],
+          "B": [
+            "-Cl",
+            "-COF",
+            "-COBr",
+            "-COCl",
+            "-COI"
+          ],
+          "exclude": [
+            "Alkenyl-Cl",
+            "Alkyl-Cl",
+            "Ar-Cl"
+          ]
+        }
       ]
     },
     "aromatic_halides": {
       "name": "Aromatic Halides",
       "description": "Aryl/heteroaryl halides for halogenation.",
-      "members": [
-        "Ar-Br",
-        "Ar-Cl",
-        "Ar-F",
-        "Ar-I",
-        "HeteroAr-Br",
-        "HeteroAr-Cl",
-        "HeteroAr-F",
-        "HeteroAr-I"
-      ],
       "usage": [
         "Halogenation_aromatic",
         "Aromatic_Halogen_Exchange"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "HeteroAr"
+          ],
+          "B": [
+            "-Br",
+            "-Cl",
+            "-F",
+            "-I"
+          ]
+        }
       ]
     },
     "azides": {
       "name": "Azides",
       "description": "Organic azides for coupling/click reactions.",
-      "members": [
-        "Alkenyl-N3",
-        "Alkenyl-CON3",
-        "Alkyl-N3",
-        "Alkyl-CON3",
-        "Alkynyl-N3",
-        "Alkynyl-CON3",
-        "Allyl-N3",
-        "Allyl-CON3",
-        "Ar-N3",
-        "Ar-CON3",
-        "Bn-N3",
-        "Bn-CON3",
-        "R2CH-N3",
-        "R2CH-CON3",
-        "R3C-N3",
-        "R3C-CON3",
-        "RCH2-N3",
-        "RCH2-CON3"
-      ],
       "usage": [
         "Azide_coupling",
         "Click_cuaac"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Alkynyl",
+            "Allyl",
+            "Ar",
+            "Bn",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-N3",
+            "-CON3"
+          ]
+        }
       ]
     },
     "carbonyls": {
       "name": "Carbonyls",
       "description": "Aldehydes and ketones (carbonyl substrates).",
-      "members": [
-        "Alkenyl-CHO",
-        "Alkenyl-COR",
-        "Alkyl-CHO",
-        "Alkyl-COR",
-        "Alkynyl-COR",
-        "Allyl-COR",
-        "Ar-CHO",
-        "Ar-COR",
-        "HeteroAr-COR",
-        "Bn-COR",
-        "R2CH-CHO",
-        "R2CH-COR",
-        "R3C-CHO",
-        "R3C-COR",
-        "RCH2-CHO",
-        "RCH2-COR"
-      ],
       "usage": [
         "Reductive_amination",
         "Oxidation_primary_alcohol_to_aldehyde",
@@ -622,36 +603,72 @@
         "Alkene_oxidative_cleavage_to_carbonyl",
         "Wacker_oxidation_terminal_alkene_to_ketone",
         "Wacker_oxidation_internal_alkene_to_ketone"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Alkynyl",
+            "Allyl",
+            "Ar",
+            "Bn",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-CHO",
+            "-COR"
+          ]
+        }
+      ],
+      "members": [
+        "HeteroAr-COR"
       ]
     },
     "imines": {
       "name": "Imines",
       "description": "Imine substrates used as preformed electrophiles or hydrogenation substrates.",
-      "members": [
-        "Ar-C=N"
-      ],
       "usage": [
         "Reduction_imine_to_amine"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Ar"
+          ],
+          "B": [
+            "-C=N"
+          ]
+        }
       ]
     },
     "esters": {
       "name": "Esters",
       "description": "Ester products and substrates (R-COOR).",
-      "members": [
-        "Alkenyl-COOR",
-        "Alkyl-COOR",
-        "Alkynyl-COOR",
-        "Allyl-COOR",
-        "Ar-COOR",
-        "Bn-COOR",
-        "R2CH-COOR",
-        "R3C-COOR",
-        "RCH2-COOR"
-      ],
       "usage": [
         "Esterification",
         "Acylation_ester",
         "Baeyer_villiger_oxidation"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Alkynyl",
+            "Allyl",
+            "Ar",
+            "Bn",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-COOR"
+          ]
+        }
       ]
     },
     "hydrogenation_substrates": {
@@ -745,121 +762,153 @@
     "nitro_compounds": {
       "name": "Nitro Compounds",
       "description": "Nitro substrates for reduction.",
-      "members": [
-        "Alkenyl-NO2",
-        "Alkyl-NO2",
-        "Alkynyl-NO2",
-        "Allyl-NO2",
-        "Ar-NO2",
-        "Bn-NO2",
-        "R2CH-NO2",
-        "R3C-NO2",
-        "RCH2-NO2"
-      ],
       "usage": [
         "Reduction_nitro"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Alkynyl",
+            "Allyl",
+            "Ar",
+            "Bn",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-NO2"
+          ]
+        }
       ]
     },
     "organomagnesium": {
       "name": "Organomagnesium",
       "description": "Grignard reagents for Kumada coupling.",
-      "members": [
-        "Alkenyl-Mg*",
-        "Alkyl-Mg*",
-        "Ar-Mg*",
-        "R2CH-Mg*",
-        "R3C-Mg*",
-        "RCH2-Mg*"
-      ],
       "usage": [
         "Kumada"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Ar",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-Mg*"
+          ]
+        }
       ]
     },
     "organosilicon": {
       "name": "Organosilicon",
       "description": "Organosilicon reagents for Hiyama coupling.",
-      "members": [
-        "Alkenyl-Si*",
-        "Alkyl-Si*",
-        "Alkynyl-Si*",
-        "Ar-Si*"
-      ],
       "usage": [
         "Hiyama"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Alkynyl",
+            "Ar"
+          ],
+          "B": [
+            "-Si*"
+          ]
+        }
       ]
     },
     "organotin": {
       "name": "Organotin",
       "description": "Organotin reagents for Stille coupling.",
-      "members": [
-        "Alkenyl-Sn*",
-        "Alkyl-Sn*",
-        "Ar-Sn*",
-        "R2CH-Sn*",
-        "R3C-Sn*",
-        "RCH2-Sn*"
-      ],
       "usage": [
         "Stille"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Ar",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-Sn*"
+          ]
+        }
       ]
     },
     "organozinc": {
       "name": "Organozinc",
       "description": "Organozinc reagents for Negishi coupling.",
-      "members": [
-        "Alkenyl-Zn*",
-        "Alkyl-Zn*",
-        "Ar-Zn*",
-        "R2CH-Zn*",
-        "R3C-Zn*",
-        "RCH2-Zn*"
-      ],
       "usage": [
         "Negishi"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl",
+            "Alkyl",
+            "Ar",
+            "R2CH",
+            "R3C",
+            "RCH2"
+          ],
+          "B": [
+            "-Zn*"
+          ]
+        }
       ]
     },
     "phosphoryl_derivatives": {
       "name": "Phosphoryl Derivatives",
       "description": "Composite phosphoryl substituent motifs generated via PO2 linker.",
-      "members": [
-        "Ar-PO2OH",
-        "Ar-PO2OR",
-        "Ar-PO2NH2",
-        "Ar-PO2NHR",
-        "Ar-PO2NR2",
-        "Alkyl-PO2OH",
-        "Alkyl-PO2OR",
-        "Alkyl-PO2NH2",
-        "Alkyl-PO2NHR",
-        "Alkyl-PO2NR2",
-        "RCH2-PO2OH",
-        "RCH2-PO2OR",
-        "RCH2-PO2NH2",
-        "RCH2-PO2NHR",
-        "RCH2-PO2NR2",
-        "R2CH-PO2OH",
-        "R2CH-PO2OR",
-        "R2CH-PO2NH2",
-        "R2CH-PO2NHR",
-        "R2CH-PO2NR2",
-        "R3C-PO2OH",
-        "R3C-PO2OR",
-        "R3C-PO2NH2",
-        "R3C-PO2NHR",
-        "R3C-PO2NR2"
-      ],
-      "usage": []
+      "usage": [],
+      "member_rules": [
+        {
+          "A": [
+            "Ar",
+            "Alkyl",
+            "RCH2",
+            "R2CH",
+            "R3C"
+          ],
+          "B": [
+            "-PO2OH",
+            "-PO2OR",
+            "-PO2NH2",
+            "-PO2NHR",
+            "-PO2NR2"
+          ]
+        }
+      ]
     },
     "terminal_alkenes": {
       "name": "Terminal Alkenes",
       "description": "Terminal alkenes for Heck coupling.",
-      "members": [
-        "Alkenyl-H"
-      ],
       "usage": [
         "Heck"
+      ],
+      "member_rules": [
+        {
+          "A": [
+            "Alkenyl"
+          ],
+          "B": [
+            "-H"
+          ]
+        }
       ]
     }
   }
 }
-
