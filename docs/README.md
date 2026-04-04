@@ -7,7 +7,6 @@ This folder collects product docs, API notes, and developer references. This REA
 - API entry: `app/main.py` (FastAPI, OpenAPI at `/docs`)
 - Core deterministic library: `chemtools/`
 - LLM integration: `llmtools/`
-- Agent wrapper and UX helpers: `chem_assistant/`
 - HTE recommender docs: `docs/HTE_RECOMMENDER.md`
 - API usage notes: `docs/HTE_RECOMMENDER_API.md`
 
@@ -36,11 +35,6 @@ chemtools/
   reagent/                        Reagent registry + taxonomy tools
   taxonomy/                       Reaction taxonomy + specs
   util/                           SMARTS cache, RDKit helpers, etc.
-chem_assistant/
-  chemtools_agent.py              LLM-based agent entry
-  chemtools_wrapper.py            Tooling surface for agents
-  rag.py                          Lightweight RAG utilities
-  gui/                            Local UI helpers
 llmtools/
   clients.py                      Multi-provider LLM clients
   agents.py                       LLM agent utilities
@@ -62,7 +56,6 @@ scripts/
   check_substituent_fragments.py  Substituent fragment edit checklist
   rag_eval.py                     RAG evaluation
   eval_spectator_groups.py        Spectator group scoring
-  check_kb_conditions.py          KB sanity checks
 data/
   protocol_db_v2/                 Protocol database (schema-validated)
   rule_db_v2/                     Rule database (9 reaction families)
@@ -99,12 +92,12 @@ chemtools/util/functional_groups.py  80+ functional group SMARTS
 - **FastAPI server**: `app/main.py` exposes the REST API and OpenAPI docs
 - **GUIs and CLIs**: `HTE_recommender_gui.py`, `HTE_analytics_cli.py`, and format conversion tools
 
-### 3) LLM integrations (`llmtools/` + `chem_assistant/`)
+### 3) LLM integrations (`llmtools/`)
 
 - **Provider clients**: `llmtools/clients.py` (OpenAI + Aliyun/DeepSeek)
-- **Agent logic**: `llmtools/agents.py` and `chem_assistant/chemtools_agent.py`
-- **Tool surface**: `chem_assistant/chemtools_wrapper.py` exposes deterministic tools to LLMs
-- **RAG**: `chem_assistant/rag.py` + `scripts/index_knowledge_base.py` for indexing
+- **Agent logic**: `llmtools/agents.py` and `llmtools/recommendation_llm.py`
+- **Prompting**: `llmtools/prompts.py` centralizes reusable LLM prompts
+- **Examples and setup**: `llmtools/README.md` and `llmtools/QUICKSTART.md`
 
 ### 4) Data, results, and examples
 

@@ -19,7 +19,6 @@
   - Multi-provider support (OpenAI, Aliyun/DeepSeek).
   - Chemistry-specific agents combining LLM reasoning with chemtools.
   - See `llmtools/README.md` for details.
-- `chem_assistant/`: Assistant workflows and orchestration logic.
 - `data-processor/`: ETL and data preparation utilities.
 - `data/`: Curated datasets (HTE, protocols, reaction datasets, reagent DB, knowledge base).
   - `HTE_db/`, `protocol_db_v2/`, `reaction_dataset/`, `reagent_db/`, `knowledge_base/`.

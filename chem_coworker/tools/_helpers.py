@@ -1,8 +1,8 @@
 """
 Shared helper utilities for all ChemCoworker tool wrappers.
 
-Follows the same pattern as reaction_agent/reasoning_tools.py and
-chem_assistant/chemtools_wrapper.py for consistency.
+Follows the same pattern as reaction_agent/reasoning_tools.py and the
+repository's LLM-facing tool wrappers for consistency.
 """
 from __future__ import annotations
 

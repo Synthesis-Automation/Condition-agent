@@ -355,7 +355,7 @@ Advanced analysis for specialized needs:
 
 1. **Update consumers**:
    - `app/Cpd_rxn_featurization_cli.py` → use core output by default
-   - `chem_assistant/chemtools_wrapper.py` → add `detailed` parameter to tools
+   - LLM-facing tool wrappers → add a `detailed` parameter to featurization tools
    - `chemtools/recommend/recommender.py` → use core motifs/properties
    - `app/A_convert_to_hte_format.py` → use core output
 
