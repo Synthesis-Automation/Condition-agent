@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-Benchmark legacy vs specificity-aware reaction type validation.
+Benchmark taxonomy-specific reaction type validation.
 
-The script runs reaction featurization to produce CRK keys, then evaluates:
-- Legacy matcher (first-hit taxonomy order)
-- New matcher (specificity-aware ranked taxonomy match)
+The script runs reaction featurization to produce CRK keys, then evaluates the
+specificity-aware taxonomy matcher against dataset labels.
 
 Usage:
     python scripts/benchmark_reaction_type_detection.py
@@ -114,8 +113,7 @@ def _benchmark_file(
     rows_out: List[Dict[str, Any]] = []
     total = 0
     usable = 0
-    legacy_correct = 0
-    new_correct = 0
+    correct = 0
     routed_excluded = 0
     route_counts: Counter[str] = Counter()
 
@@ -130,8 +128,7 @@ def _benchmark_file(
                 "rows": rows_out,
                 "total": 0,
                 "usable": 0,
-                "legacy_correct": 0,
-                "new_correct": 0,
+                "correct": 0,
             }
 
         for idx, row in enumerate(reader, start=1):
@@ -156,31 +153,19 @@ def _benchmark_file(
             if not crk_raw:
                 continue
 
-            legacy = validate_detection_with_crk_key(
+            prediction = validate_detection_with_crk_key(
                 initial_detection="Unknown",
                 initial_confidence=0.0,
                 reaction_key=crk_raw,
-                use_legacy=True,
-                include_evidence=False,
-            ).get("reaction_type")
-            new = validate_detection_with_crk_key(
-                initial_detection="Unknown",
-                initial_confidence=0.0,
-                reaction_key=crk_raw,
-                use_legacy=False,
                 include_evidence=False,
             ).get("reaction_type")
 
-            legacy_norm = _normalize_type(legacy)
-            new_norm = _normalize_type(new)
-            legacy_hit = legacy_norm == truth
-            new_hit = new_norm == truth
+            prediction_norm = _normalize_type(prediction)
+            hit = prediction_norm == truth
 
             usable += 1
-            if legacy_hit:
-                legacy_correct += 1
-            if new_hit:
-                new_correct += 1
+            if hit:
+                correct += 1
 
             rows_out.append(
                 {
@@ -188,10 +173,8 @@ def _benchmark_file(
                     "row_index": idx,
                     "reaction_smiles": reaction_smiles,
                     "truth": truth,
-                    "legacy_prediction": legacy_norm,
-                    "new_prediction": new_norm,
-                    "legacy_correct": legacy_hit,
-                    "new_correct": new_hit,
+                    "prediction": prediction_norm,
+                    "correct": hit,
                 }
             )
 
@@ -202,8 +185,7 @@ def _benchmark_file(
         "usable": usable,
         "routed_excluded": routed_excluded,
         "routing_route_counts": route_counts.most_common(),
-        "legacy_correct": legacy_correct,
-        "new_correct": new_correct,
+        "correct": correct,
     }
 
 
@@ -213,7 +195,7 @@ def _ratio(num: int, den: int) -> float:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Benchmark legacy vs specificity-aware reaction type matching.",
+        description="Benchmark specificity-aware taxonomy reaction type matching.",
     )
     parser.add_argument(
         "--input",
@@ -246,8 +228,7 @@ def main() -> int:
     grand_total = 0
     grand_usable = 0
     grand_routed_excluded = 0
-    grand_legacy = 0
-    grand_new = 0
+    grand_correct = 0
 
     print(f"Benchmarking {len(files)} file(s)...")
     for path in files:
@@ -262,37 +243,30 @@ def main() -> int:
 
         usable = int(result["usable"])
         routed_excluded = int(result.get("routed_excluded") or 0)
-        legacy_correct = int(result["legacy_correct"])
-        new_correct = int(result["new_correct"])
-        legacy_acc = _ratio(legacy_correct, usable)
-        new_acc = _ratio(new_correct, usable)
-        delta = new_acc - legacy_acc
+        correct = int(result["correct"])
+        accuracy = _ratio(correct, usable)
 
         print(
             f"- {path.name}: usable={usable}, routed_excluded={routed_excluded}, "
-            f"legacy={legacy_acc:.3f}, new={new_acc:.3f}, delta={delta:+.3f}"
+            f"accuracy={accuracy:.3f}"
         )
 
         grand_total += int(result["total"])
         grand_usable += usable
         grand_routed_excluded += routed_excluded
-        grand_legacy += legacy_correct
-        grand_new += new_correct
+        grand_correct += correct
         all_rows.extend(result["rows"])
 
     if grand_usable == 0:
         print("No usable rows were evaluated.")
         return 1
 
-    grand_legacy_acc = _ratio(grand_legacy, grand_usable)
-    grand_new_acc = _ratio(grand_new, grand_usable)
+    grand_accuracy = _ratio(grand_correct, grand_usable)
     print("\nOverall:")
     print(f"  total rows scanned: {grand_total}")
     print(f"  routed excluded rows: {grand_routed_excluded}")
     print(f"  usable rows: {grand_usable}")
-    print(f"  legacy accuracy: {grand_legacy_acc:.4f}")
-    print(f"  new accuracy:    {grand_new_acc:.4f}")
-    print(f"  delta:           {grand_new_acc - grand_legacy_acc:+.4f}")
+    print(f"  accuracy:        {grand_accuracy:.4f}")
 
     if args.out_csv:
         out_path = Path(args.out_csv)
@@ -302,10 +276,8 @@ def main() -> int:
             "row_index",
             "reaction_smiles",
             "truth",
-            "legacy_prediction",
-            "new_prediction",
-            "legacy_correct",
-            "new_correct",
+            "prediction",
+            "correct",
         ]
         with out_path.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=fieldnames)
@@ -321,9 +293,7 @@ def main() -> int:
                 "routing_policy": str(args.routing_policy),
                 "usable": grand_usable,
                 "routed_excluded": grand_routed_excluded,
-                "legacy_accuracy": grand_legacy_acc,
-                "new_accuracy": grand_new_acc,
-                "delta": grand_new_acc - grand_legacy_acc,
+                "accuracy": grand_accuracy,
             },
             sort_keys=True,
         )

@@ -1,5 +1,8 @@
+import pytest
+
 from chemtools.precedent.loader import _pick_electrophile_nucleophile
 from chemtools.recommend.utils import pick_electrophile_nucleophile
+import chemtools.synthon as synthon
 from chemtools.synthon import classify_reactant_synthons, select_electrophile_nucleophile
 
 
@@ -44,3 +47,12 @@ def test_wrapper_functions_delegate_to_synthon_selector() -> None:
     expected = select_electrophile_nucleophile(reactants)
     assert pick_electrophile_nucleophile(reactants) == expected
     assert _pick_electrophile_nucleophile(reactants) == expected
+
+
+def test_select_pair_uses_functional_group_fallback_when_synthon_taxonomy_is_empty(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(synthon, "classify_reactant_synthons", lambda _smiles: tuple())
+    elec, nuc = select_electrophile_nucleophile(["Nc1ccccc1", "Brc1ccccc1"])
+    assert elec == "Brc1ccccc1"
+    assert nuc == "Nc1ccccc1"

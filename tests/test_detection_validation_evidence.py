@@ -74,20 +74,12 @@ def test_specificity_matcher_can_outrank_legacy_first_hit(
     monkeypatch.setattr(dv, "_get_catalog", lambda: (definitions, {}))
     crk = "|Ar-NH2|Ar-NHCOR|CH3-OH -> HeteroAr-Cl|Pyrimidine"
 
-    legacy = dv.validate_detection_with_crk_key(
-        initial_detection="Unknown",
-        initial_confidence=0.0,
-        reaction_key=crk,
-        use_legacy=True,
-    )
     improved = dv.validate_detection_with_crk_key(
         initial_detection="Unknown",
         initial_confidence=0.0,
         reaction_key=crk,
-        use_legacy=False,
     )
 
-    assert legacy["reaction_type"] == "Broad_class"
     assert improved["reaction_type"] == "Specific_class"
     assert improved["evidence"]["matcher"] == "taxonomy_specificity_v2"
 
@@ -115,7 +107,6 @@ def test_crk_validation_can_use_bond_change_constraints(
         initial_detection="Unknown",
         initial_confidence=0.0,
         reaction_key=crk,
-        use_legacy=False,
     )
     assert result["reaction_type"] == "Wittig_like"
 
@@ -135,6 +126,5 @@ def test_scope_aware_slot_matching_accepts_child_motif_tokens(
         initial_detection="Unknown",
         initial_confidence=0.0,
         reaction_key="|RCH2-Alkenyl -> Epoxide | bond_formed: C-O",
-        use_legacy=False,
     )
     assert result["reaction_type"] == "Epoxidation_like"

@@ -210,7 +210,7 @@ def pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
     """
     Pick electrophile and nucleophile from reactant list.
     
-    Uses taxonomy-driven synthon assignment with a legacy heuristic fallback.
+    Uses taxonomy-driven synthon assignment with functional-group fallback.
     
     Args:
         reactants: List of reactant SMILES

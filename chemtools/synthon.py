@@ -178,15 +178,45 @@ def _best_role_hit(assignments: Sequence[SynthonAssignment], role: str) -> Optio
     return None
 
 
-def _legacy_is_electrophile(smiles: str) -> bool:
-    text = str(smiles or "").lower()
-    return (
-        ("br" in text)
-        or ("cl" in text)
-        or (" i" in text)
-        or ("os(=o)(=o)c(f)(f)f" in text)
-        or ("otf" in text)
-    )
+_ROLE_FALLBACK_GROUPS: Dict[str, Tuple[str, ...]] = {
+    "electrophile": (
+        "acyl_halide",
+        "aryl_halide",
+        "vinyl_halide",
+        "alkyl_halide",
+        "triflate",
+        "mesylate",
+        "tosylate",
+        "aryl_sulfonate",
+    ),
+    "nucleophile": (
+        "boron",
+        "nucleophile_n",
+        "nucleophile_o",
+        "nucleophile_s",
+    ),
+}
+
+
+def _fallback_role_matches(smiles: str, role: str) -> Tuple[str, ...]:
+    """Use shared functional-group detection as the chemistry-first fallback."""
+    groups = _ROLE_FALLBACK_GROUPS.get(role)
+    if not groups:
+        return tuple()
+    try:
+        from .util import functional_groups as _functional_groups
+    except Exception:
+        return tuple()
+
+    detections = _functional_groups.detect_any([smiles], group_subset=groups)
+    matches: List[str] = []
+    for group_name in groups:
+        definition = _functional_groups.get_group_definition(group_name)
+        if not definition:
+            continue
+        if detections.get(definition.token):
+            matches.append(group_name)
+    return tuple(matches)
 
 
 def _best_role_candidates(
@@ -197,11 +227,15 @@ def _best_role_candidates(
     for idx, smiles in enumerate(reactants):
         assignments = classify_reactant_synthons(smiles)
         best = _best_role_hit(assignments, role)
-        if best is None:
+        if best is not None:
+            # Taxonomy synthons remain authoritative. Boost their score above
+            # any functional-group fallback evidence.
+            candidates.append((1000 + best.priority, len(best.matched_motifs), -idx))
             continue
-        # Prefer higher synthon priority, then stronger motif evidence,
-        # then earlier reactant position for determinism.
-        candidates.append((best.priority, len(best.matched_motifs), -idx))
+
+        fallback_matches = _fallback_role_matches(smiles, role)
+        if fallback_matches:
+            candidates.append((len(fallback_matches), len(fallback_matches), -idx))
     candidates.sort(reverse=True)
     return candidates
 
@@ -209,8 +243,8 @@ def _best_role_candidates(
 def select_electrophile_nucleophile(reactants: Sequence[str]) -> Tuple[str, str]:
     """Select electrophile and nucleophile from a reactant list.
 
-    Selection is taxonomy-driven via synthon classes; legacy text heuristics
-    are retained only as a final fallback when no synthon evidence exists.
+    Selection is taxonomy-driven via synthon classes with centralized
+    functional-group detection as the chemistry-first fallback.
     """
     normalized = [str(value).strip() for value in reactants if str(value).strip()]
     if not normalized:
@@ -240,12 +274,7 @@ def select_electrophile_nucleophile(reactants: Sequence[str]) -> Tuple[str, str]
         e_idx = next((idx for idx in range(len(normalized)) if idx != n_idx), None)
         return (normalized[e_idx] if e_idx is not None else normalized[0]), normalized[n_idx]
 
-    r0, r1 = normalized[0], normalized[1]
-    if _legacy_is_electrophile(r0):
-        return r0, r1
-    if _legacy_is_electrophile(r1):
-        return r1, r0
-    return r0, r1
+    return normalized[0], normalized[1]
 
 
 __all__ = [

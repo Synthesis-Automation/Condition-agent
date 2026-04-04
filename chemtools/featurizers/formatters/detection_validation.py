@@ -317,79 +317,15 @@ def _match_reaction_catalog_specificity(
     )
 
 
-def _match_reaction_catalog_legacy(
-    reacted_set: Set[str],
-    formed_set: Set[str],
-    spectators_set: Optional[Set[str]] = None,
-    *,
-    formed_bond_tokens: Optional[Set[str]] = None,
-    broken_bond_tokens: Optional[Set[str]] = None,
-) -> Optional[Tuple[str, List[str], str]]:
-    """Return first taxonomy match (legacy pre-specificity behavior)."""
-    definitions, _ = _get_catalog()
-    for reaction_id, defn in definitions.items():
-        has_reactant_slots = bool(defn.reactants)
-        has_product_slots = bool(defn.products)
-        if not has_reactant_slots and not has_product_slots:
-            continue
-
-        all_slots_match = True
-        matched_slots: List[str] = []
-        for slot_name, slot_req in defn.reactants.items():
-            if not slot_req.allowed:
-                continue
-            if _motifs_match_slot(reacted_set, slot_req.allowed):
-                matched_slots.append(slot_name)
-            else:
-                all_slots_match = False
-                break
-
-        if not all_slots_match:
-            continue
-        if has_reactant_slots and len(matched_slots) < 1:
-            continue
-
-        product_match = True
-        if defn.products:
-            product_match = False
-            for slot_req in defn.products.values():
-                if slot_req.allowed and _motifs_match_slot(formed_set, slot_req.allowed):
-                    product_match = True
-                    break
-        if not product_match:
-            continue
-        if not _constraints_match(
-            defn.constraints or {},
-            reacted_set,
-            formed_set,
-            formed_bond_tokens=formed_bond_tokens,
-            broken_bond_tokens=broken_bond_tokens,
-            reactant_slot_matches=len(matched_slots),
-            product_slot_matches=1 if product_match else 0,
-        ):
-            continue
-        return reaction_id, matched_slots, defn.name
-    return None
-
-
 def _match_reaction_catalog(
     reacted_set: Set[str],
     formed_set: Set[str],
     spectators_set: Optional[Set[str]] = None,
     *,
-    use_legacy: bool = False,
     formed_bond_tokens: Optional[Set[str]] = None,
     broken_bond_tokens: Optional[Set[str]] = None,
 ) -> Optional[Tuple[str, List[str], str]]:
     """Return best taxonomy match as (reaction_id, matched_slots, display_name)."""
-    if use_legacy:
-        return _match_reaction_catalog_legacy(
-            reacted_set,
-            formed_set,
-            spectators_set=spectators_set,
-            formed_bond_tokens=formed_bond_tokens,
-            broken_bond_tokens=broken_bond_tokens,
-        )
     return _match_reaction_catalog_specificity(
         reacted_set,
         formed_set,
@@ -405,10 +341,8 @@ def _build_match_evidence(
     formed_set: Set[str],
     spectators_set: Optional[Set[str]] = None,
     selected_match: Optional[Tuple[str, List[str], str]],
-    use_legacy: bool,
     max_candidates: int = 5,
 ) -> Dict[str, Any]:
-    matcher = "taxonomy_legacy_v1" if use_legacy else "taxonomy_specificity_v2"
     candidates = _collect_ranked_catalog_candidates(
         reacted_set,
         formed_set,
@@ -443,7 +377,7 @@ def _build_match_evidence(
             selected_payload["score"] = list(candidate.get("score") or [])
 
     return {
-        "matcher": matcher,
+        "matcher": "taxonomy_specificity_v2",
         "reacted_motifs": sorted(reacted_set),
         "formed_motifs": sorted(formed_set),
         "selected": selected_payload,
@@ -519,7 +453,6 @@ def validate_detection_with_crk_key(
     initial_confidence: float,
     reaction_key: str,
     *,
-    use_legacy: bool = False,
     include_evidence: bool = True,
     max_candidates: int = 5,
 ) -> Dict[str, Any]:
@@ -543,7 +476,6 @@ def validate_detection_with_crk_key(
         reacted_set,
         formed_set,
         spectators_set=_spectators,
-        use_legacy=use_legacy,
         formed_bond_tokens=formed_bond_tokens,
         broken_bond_tokens=broken_bond_tokens,
     )
@@ -553,7 +485,6 @@ def validate_detection_with_crk_key(
             formed_set=formed_set,
             spectators_set=_spectators,
             selected_match=match,
-            use_legacy=use_legacy,
             max_candidates=max_candidates,
         )
         if include_evidence
@@ -576,7 +507,6 @@ def validate_detection_with_reacted_motifs(
     formed_motifs: List[str],
     spectator_motifs: Optional[List[str]] = None,
     *,
-    use_legacy: bool = False,
     include_evidence: bool = True,
     max_candidates: int = 5,
 ) -> Dict[str, Any]:
@@ -606,7 +536,6 @@ def validate_detection_with_reacted_motifs(
         reacted_set,
         formed_set,
         spectators_set=spectator_set,
-        use_legacy=use_legacy,
     )
     evidence = (
         _build_match_evidence(
@@ -614,7 +543,6 @@ def validate_detection_with_reacted_motifs(
             formed_set=formed_set,
             spectators_set=spectator_set,
             selected_match=match,
-            use_legacy=use_legacy,
             max_candidates=max_candidates,
         )
         if include_evidence
