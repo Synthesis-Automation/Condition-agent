@@ -50,7 +50,7 @@ Sonogashira,Diphenylacetylene,Brc1ccccc1.C#Cc1ccccc1>>C(#Cc1ccccc1)c1ccccc1,Brc1
 Sonogashira,Pyridine acetylene,Ic1ccncc1.C#CC>>C#Cc1ccncc1,Ic1ccncc1.C#CC,C#Cc1ccncc1,
 Sonogashira,tert-butyl,Clc1ccc(C#N)cc1.C#CC(C)(C)C>>CC(C)(C)C#Cc1ccc(C#N)cc1,Clc1ccc(C#N)cc1.C#CC(C)(C)C,CC(C)(C)C#Cc1ccc(C#N)cc1,
 Sonogashira,Electron-rich ArBr,Brc1ccc(OC)cc1.C#Cc1ccccc1>>COc1ccc(C#Cc2ccccc2)cc1,Brc1ccc(OC)cc1.C#Cc1ccccc1,COc1ccc(C#Cc2ccccc2)cc1,
-Sonogashira,TMS-acetylene,Ic1ccc(C(F)(F)F)cc1.C#C[Si](C)(C)C>>CC(C)(C)[Si]C#Cc1ccc(C(F)(F)F)cc1,Ic1ccc(C(F)(F)F)cc1.C#C[Si](C)(C)C,CC(C)(C)[Si]C#Cc1ccc(C(F)(F)F)cc1,
+Sonogashira,TMS-acetylene,Ic1ccc(C(F)(F)F)cc1.C#C[Si](C)(C)C>>C[Si](C)(C)C#Cc2ccc(C(F)(F)F)cc2,Ic1ccc(C(F)(F)F)cc1.C#C[Si](C)(C)C,CC(C)(C)[Si]C#Cc1ccc(C(F)(F)F)cc1,
 Sonogashira,Thiophene coupling,Brc1cccs1.C#Cc1ccccc1>>c1cc(C#Cc2ccccc2)sc1,Brc1cccs1.C#Cc1ccccc1,c1cc(C#Cc2ccccc2)sc1,
 Sonogashira,Ether-substituted alkyne,Clc1ccncc1.C#CCOC>>COC(C)C#Cc1ccncc1,Clc1ccncc1.C#CCOC,COC(C)C#Cc1ccncc1,
 Sonogashira,Indole substrate,Brc1ccc2[nH]ccc2c1.C#CC>>C#Cc1ccc2[nH]ccc2c1,Brc1ccc2[nH]ccc2c1.C#CC,C#Cc1ccc2[nH]ccc2c1,
