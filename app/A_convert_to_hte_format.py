@@ -1,6 +1,8 @@
 import csv
 import json
+import os
 import re
+import time
 import pandas as pd
 from pathlib import Path
 from typing import List, Dict, Any, Tuple, Iterable, Optional, Set, Mapping
@@ -8,6 +10,7 @@ from functools import lru_cache
 from collections import Counter
 import argparse
 import sys
+from concurrent.futures import ProcessPoolExecutor
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -424,6 +427,325 @@ def _write_new_reagents(path: Path, cas_values: set[str]) -> None:
         for cas in merged:
             writer.writerow({"cas": cas})
 
+
+def _csv_row_to_record(row: Dict[str, Any]) -> Dict[str, Any]:
+    def _entries(cas_value: Any, amd_value: Any) -> List[Dict[str, str]]:
+        entries: List[Dict[str, str]] = []
+        for cas in _split_csv_list(cas_value):
+            entries.append({"name": cas, "cas": cas})
+        for name in _split_csv_list(amd_value):
+            entries.append({"name": name})
+        return entries
+
+    catalyst_amd = _split_csv_list(row.get("catalyst_amd", ""))
+    catalyst_cas = _split_csv_list(row.get("catalyst_cas", ""))
+    catalyst_parts = catalyst_amd or catalyst_cas
+    catalytic_system = ", ".join(catalyst_parts)
+
+    return {
+        "smiles": row.get("reaction_smiles") or row.get("smiles") or "",
+        "yield": row.get("yield_pct") or row.get("yield") or "",
+        "reagents": _entries(row.get("reagent_cas", ""), row.get("reagent_amd", "")),
+        "solvents": _entries(row.get("solvent_cas", ""), row.get("solvent_amd", "")),
+        "catalytic_system": catalytic_system,
+        "condition_core": "",
+    }
+
+
+def _resolve_worker_count(num_workers: int) -> int:
+    if num_workers > 0:
+        return num_workers
+    cpu_total = os.cpu_count() or 1
+    if cpu_total <= 2:
+        return 1
+    auto_target = max(1, int(cpu_total * 0.6))
+    if cpu_total >= 6:
+        auto_target = min(auto_target, cpu_total - 2)
+    return max(1, min(8, auto_target))
+
+
+def _empty_stage_timings() -> Dict[str, float]:
+    return {
+        "record_prep_s": 0.0,
+        "cleanup_s": 0.0,
+        "routing_s": 0.0,
+        "reagent_precheck_s": 0.0,
+        "reaction_featurize_s": 0.0,
+        "scope_check_s": 0.0,
+        "reactant_projection_s": 0.0,
+        "reagent_finalize_s": 0.0,
+        "row_build_s": 0.0,
+        "total_row_s": 0.0,
+    }
+
+
+def _process_reaction_row(
+    *,
+    row: Dict[str, Any],
+    row_index: int,
+    source_label: str,
+    reaction_options_sig: str,
+    drop_no_catalyst: bool,
+) -> Dict[str, Any]:
+    timings = _empty_stage_timings()
+    row_started = time.perf_counter()
+    try:
+        started = time.perf_counter()
+        record = _csv_row_to_record(row)
+        timings["record_prep_s"] += time.perf_counter() - started
+        if not record.get("smiles"):
+            timings["total_row_s"] = time.perf_counter() - row_started
+            return {
+                "status": "skipped_no_smiles",
+                "timings": timings,
+                "cleanup_stats": {"cleanup_applied": 0, "coordination_removed": 0, "counterion_removed": 0},
+                "row_out": None,
+                "gap_entry": None,
+                "unknown_cas": [],
+            }
+
+        started = time.perf_counter()
+        raw_smiles = record.get("smiles", "")
+        smiles, cleanup_stats = _cleanup_reaction_smiles_for_featurization(raw_smiles)
+        timings["cleanup_s"] += time.perf_counter() - started
+        if ">>" not in smiles:
+            timings["total_row_s"] = time.perf_counter() - row_started
+            return {
+                "status": "skipped_no_arrow",
+                "timings": timings,
+                "cleanup_stats": cleanup_stats,
+                "row_out": None,
+                "gap_entry": None,
+                "unknown_cas": [],
+            }
+
+        started = time.perf_counter()
+        routing = classify_reaction_for_taxonomy_benchmark(smiles)
+        timings["routing_s"] += time.perf_counter() - started
+        if routing.get("excluded"):
+            timings["total_row_s"] = time.perf_counter() - row_started
+            return {
+                "status": "skipped_routing_excluded",
+                "timings": timings,
+                "cleanup_stats": cleanup_stats,
+                "row_out": None,
+                "gap_entry": None,
+                "unknown_cas": [],
+            }
+
+        reactants_part, _ = smiles.split(">>")
+        reactants = reactants_part.split(".")
+
+        reagents: Optional[Dict[str, str]] = None
+        if drop_no_catalyst:
+            started = time.perf_counter()
+            reagents = extract_reagents(record, csv_row=row)
+            timings["reagent_precheck_s"] += time.perf_counter() - started
+            if not reagents.get("catalyst"):
+                timings["total_row_s"] = time.perf_counter() - row_started
+                return {
+                    "status": "skipped_no_catalyst",
+                    "timings": timings,
+                    "cleanup_stats": cleanup_stats,
+                    "row_out": None,
+                    "gap_entry": None,
+                    "unknown_cas": [],
+                }
+
+        started = time.perf_counter()
+        rxn_bundle = cached_featurize_reaction(smiles, reaction_options_sig)
+        timings["reaction_featurize_s"] += time.perf_counter() - started
+        aggregates = rxn_bundle.get("aggregates") or {}
+        reacted_set = set(aggregates.get("reacted_motifs") or [])
+        formed_set = set(aggregates.get("formed_motifs") or [])
+        spectators_set = set(aggregates.get("spectator_motifs") or [])
+        reaction_key_raw = str(rxn_bundle.get("reaction_key") or "")
+        reaction_key = canonicalize_reaction_key_minimal(reaction_key_raw) or reaction_key_raw
+
+        started = time.perf_counter()
+        reaction_events_payload = build_reaction_events_payload(
+            reaction_key_raw,
+            rxn_bundle.get("reaction_events")
+            if isinstance(rxn_bundle.get("reaction_events"), dict)
+            else None,
+        )
+        is_out_of_scope, scope_reason = _is_out_of_scope_for_dataset(
+            source_label,
+            reaction_events_payload,
+            formed_set,
+        )
+        timings["scope_check_s"] += time.perf_counter() - started
+        if is_out_of_scope:
+            timings["total_row_s"] = time.perf_counter() - row_started
+            return {
+                "status": "skipped_out_of_scope",
+                "scope_reason": scope_reason,
+                "timings": timings,
+                "cleanup_stats": cleanup_stats,
+                "row_out": None,
+                "gap_entry": None,
+                "unknown_cas": [],
+            }
+
+        reaction_events_text = serialize_reaction_events_payload(reaction_events_payload)
+
+        started = time.perf_counter()
+        reactant_data = _build_reactant_data_from_reaction_bundle(
+            reactants,
+            rxn_bundle,
+        )
+        timings["reactant_projection_s"] += time.perf_counter() - started
+        if not reactant_data:
+            timings["total_row_s"] = time.perf_counter() - row_started
+            return {
+                "status": "skipped_no_reactant_data",
+                "timings": timings,
+                "cleanup_stats": cleanup_stats,
+                "row_out": None,
+                "gap_entry": None,
+                "unknown_cas": [],
+            }
+
+        unknown_cas_local: set[str] = set()
+        started = time.perf_counter()
+        if reagents is None:
+            reagents = extract_reagents(record, csv_row=row)
+        _collect_reagent_smiles(record, None, unknown_cas_local)
+        timings["reagent_finalize_s"] += time.perf_counter() - started
+
+        started = time.perf_counter()
+        formed_motifs_str = _reactant_key(list(formed_set)) or "None"
+        primary_reactant_motifs = _select_primary_reactant_motifs(
+            reactant_data,
+            reacted_set,
+        )
+        if len(reactants) == 1:
+            primary_reactant_motifs = primary_reactant_motifs[:1]
+
+        type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
+        type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
+        type_c = primary_reactant_motifs[2] if len(primary_reactant_motifs) > 2 else ""
+        spectator_groups = rank_spectator_groups(
+            _collect_spectator_groups(reactant_data, spectators_set)
+        )
+        detected_reaction_type = reaction_type_from_bundle(rxn_bundle)
+        gap_entry = _build_taxonomy_gap_entry(
+            rxn_bundle,
+            source_dataset=source_label,
+            source_format="csv",
+            source_row_index=row_index + 1,
+            reaction_smiles=smiles,
+            reaction_key=reaction_key,
+            detected_reaction_type=detected_reaction_type,
+            reference=str(row.get("reference", "") or ""),
+        )
+        row_out = {
+            "reaction_id": source_label,
+            "detected_reaction_type": detected_reaction_type,
+            "yield": record.get("yield", 0.0),
+            "z_score": 0.0,
+            "reactant_1": type_a,
+            "reactant_2": type_b,
+            "reactant_3": type_c,
+            "catalyst": reagents.get("catalyst", ""),
+            "ligand": reagents.get("ligand", ""),
+            "base": reagents.get("base", ""),
+            "acid": reagents.get("acid", ""),
+            "oxidant": reagents.get("oxidant", ""),
+            "reductant": reagents.get("reductant", ""),
+            "additive": reagents.get("additive", ""),
+            "condensation_agent": reagents.get("condensation_agent", ""),
+            "other_reagent": reagents.get("other_reagent", ""),
+            "solvent": reagents.get("solvent", ""),
+            "reaction_smiles": smiles,
+            "formed_motifs": formed_motifs_str,
+            "spectator_groups": " / ".join(spectator_groups),
+            "reference": row.get("reference", ""),
+            "Reaction_Key": reaction_key,
+            "Reaction_Events": reaction_events_text,
+            "_reaction_key": reaction_key,
+        }
+        timings["row_build_s"] += time.perf_counter() - started
+        timings["total_row_s"] = time.perf_counter() - row_started
+        return {
+            "status": "processed",
+            "timings": timings,
+            "cleanup_stats": cleanup_stats,
+            "row_out": row_out,
+            "gap_entry": gap_entry,
+            "unknown_cas": sorted(unknown_cas_local),
+        }
+    except Exception as exc:
+        timings["total_row_s"] = time.perf_counter() - row_started
+        return {
+            "status": "error",
+            "error": str(exc),
+            "timings": timings,
+            "cleanup_stats": {"cleanup_applied": 0, "coordination_removed": 0, "counterion_removed": 0},
+            "row_out": None,
+            "gap_entry": None,
+            "unknown_cas": [],
+        }
+
+
+def _iter_processed_rows(
+    rows: List[Dict[str, Any]],
+    *,
+    source_label: str,
+    reaction_options_sig: str,
+    drop_no_catalyst: bool,
+    num_workers: int,
+):
+    if num_workers <= 1:
+        for row_index, row in enumerate(rows, start=1):
+            yield _process_reaction_row(
+                row=row,
+                row_index=row_index,
+                source_label=source_label,
+                reaction_options_sig=reaction_options_sig,
+                drop_no_catalyst=drop_no_catalyst,
+            )
+        return
+
+    tasks = [
+        {
+            "row": row,
+            "row_index": row_index,
+            "source_label": source_label,
+            "reaction_options_sig": reaction_options_sig,
+            "drop_no_catalyst": drop_no_catalyst,
+        }
+        for row_index, row in enumerate(rows, start=1)
+    ]
+
+    with ProcessPoolExecutor(max_workers=num_workers) as executor:
+        yield from executor.map(_run_reaction_row_task, tasks, chunksize=16)
+
+
+def _print_timing_summary(
+    *,
+    wall_time_s: float,
+    stage_totals: Dict[str, float],
+    row_count: int,
+    processed_count: int,
+    worker_count: int,
+) -> None:
+    print("Timing summary:")
+    print(f"  Wall time: {wall_time_s:.2f}s")
+    print(f"  Worker processes: {worker_count}")
+    print(f"  Rows scanned: {row_count}")
+    print(f"  Rows processed: {processed_count}")
+    for key, total in sorted(stage_totals.items(), key=lambda item: item[1], reverse=True):
+        avg_all = total / row_count if row_count else 0.0
+        avg_processed = total / processed_count if processed_count else 0.0
+        print(
+            f"  {key}: total={total:.2f}s avg/row={avg_all:.4f}s avg/processed={avg_processed:.4f}s"
+        )
+
+
+def _run_reaction_row_task(task: Dict[str, Any]) -> Dict[str, Any]:
+    return _process_reaction_row(**task)
+
 @lru_cache(maxsize=1)
 def _load_scaffold_motif_ids() -> set[str]:
     path = PROJECT_ROOT / "chemtools" / "taxonomy" / "data" / "scaffold_motifs.v1.3.json"
@@ -502,6 +824,40 @@ def _extract_context_scaffolds(analysis: Dict[str, Any]) -> List[str]:
     if isinstance(extended, dict):
         context_ids.extend(_extract_motif_ids(extended.get("context_motifs", [])))
     return _dedupe_list(context_ids)
+
+
+def _build_reactant_data_from_reaction_bundle(
+    reactants: List[str],
+    rxn_bundle: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    reactant_entries = rxn_bundle.get("reactants") or []
+    reactant_data: List[Dict[str, Any]] = []
+
+    if isinstance(reactant_entries, list) and len(reactant_entries) == len(reactants):
+        for entry in reactant_entries:
+            if not isinstance(entry, dict):
+                continue
+            motifs = _extract_motif_ids(entry.get("motifs", []))
+            context_scaffolds = _extract_context_scaffolds(entry)
+            motifs = _apply_aromn_scaffold_override(motifs, context_scaffolds)
+            reactant_data.append({"motifs": _dedupe_list(motifs)})
+        if reactant_data:
+            return reactant_data
+
+    for r_smiles in reactants:
+        try:
+            analysis = cached_featurize(r_smiles)
+            motifs = analysis.get("motifs", [])
+            current_r_motifs = _extract_motif_ids(motifs)
+            context_scaffolds = _extract_context_scaffolds(analysis)
+            current_r_motifs = _apply_aromn_scaffold_override(
+                current_r_motifs,
+                context_scaffolds,
+            )
+            reactant_data.append({"motifs": _dedupe_list(current_r_motifs)})
+        except Exception:
+            continue
+    return reactant_data
 
 def _dedupe_list(values: Iterable[str]) -> List[str]:
     seen = set()
@@ -785,6 +1141,7 @@ def process_reaction_dataset(
     reagent_csv_path: Optional[str | Path] = None,
     new_reagents_path: Optional[str | Path] = None,
     llm_assist_options: Optional[Dict[str, Any]] = None,
+    num_workers: int = 1,
 ):
     """Convert reaction dataset to a minimal HTE recommender CSV."""
     input_path = Path(input_path)
@@ -810,6 +1167,9 @@ def process_reaction_dataset(
     )
     if llm_assist_enabled:
         print("LLM assist enabled for reaction featurization.")
+    resolved_workers = _resolve_worker_count(num_workers)
+    if resolved_workers > 1:
+        print(f"Parallel row processing enabled with {resolved_workers} worker processes.")
     
     rows = []
     taxonomy_gap_entries: List[Dict[str, Any]] = []
@@ -818,362 +1178,99 @@ def process_reaction_dataset(
         print(f"Error: Input file {input_path} not found.")
         return
 
-    def _csv_row_to_record(row: Dict[str, Any]) -> Dict[str, Any]:
-        def _entries(cas_value: Any, amd_value: Any) -> List[Dict[str, str]]:
-            entries: List[Dict[str, str]] = []
-            for cas in _split_csv_list(cas_value):
-                entries.append({"name": cas, "cas": cas})
-            for name in _split_csv_list(amd_value):
-                entries.append({"name": name})
-            return entries
-
-        catalyst_amd = _split_csv_list(row.get("catalyst_amd", ""))
-        catalyst_cas = _split_csv_list(row.get("catalyst_cas", ""))
-        catalyst_parts = catalyst_amd or catalyst_cas
-        catalytic_system = ", ".join(catalyst_parts)
-
-        return {
-            "smiles": row.get("reaction_smiles") or row.get("smiles") or "",
-            "yield": row.get("yield_pct") or row.get("yield") or "",
-            "reagents": _entries(row.get("reagent_cas", ""), row.get("reagent_amd", "")),
-            "solvents": _entries(row.get("solvent_cas", ""), row.get("solvent_amd", "")),
-            "catalytic_system": catalytic_system,
-            "condition_core": "",
-        }
-
     input_suffix = input_path.suffix.lower()
-    if input_suffix == ".csv":
-        with open(input_path, "r", encoding="utf-8", errors="replace", newline="") as f:
-            total = max(sum(1 for _ in f) - 1, 0)
-        print(f"Processing {total} reactions...")
-        with open(input_path, "r", encoding="utf-8", errors="replace", newline="") as f:
-            reader = csv.DictReader(f)
-            processed_count = 0
-            skipped_no_smiles = 0
-            skipped_no_arrow = 0
-            skipped_no_catalyst = 0
-            skipped_routing_excluded = 0
-            skipped_out_of_scope = 0
-            cleanup_rows = 0
-            cleanup_coord_components = 0
-            cleanup_counterion_components = 0
-            out_of_scope_reasons: Counter[str] = Counter()
-            
-            for i, row in enumerate(reader):
-                if total and i % 500 == 0:
-                    print(f"Progress: {i}/{total} ({(i/total)*100:.1f}%)")
-                record = _csv_row_to_record(row)
-                if not record.get("smiles"):
-                    skipped_no_smiles += 1
-                    continue
-                raw_smiles = record.get("smiles", "")
-                smiles, cleanup_stats = _cleanup_reaction_smiles_for_featurization(raw_smiles)
-                cleanup_rows += int(cleanup_stats.get("cleanup_applied", 0))
-                cleanup_coord_components += int(cleanup_stats.get("coordination_removed", 0))
-                cleanup_counterion_components += int(cleanup_stats.get("counterion_removed", 0))
-                if ">>" not in smiles:
-                    skipped_no_arrow += 1
-                    continue
-                routing = classify_reaction_for_taxonomy_benchmark(smiles)
-                if routing.get("excluded"):
-                    skipped_routing_excluded += 1
-                    continue
-                reactants_part, _ = smiles.split(">>")
-                reactants = reactants_part.split(".")
-                reagents = extract_reagents(record, csv_row=row)
-                if drop_no_catalyst and not reagents.get("catalyst"):
-                    skipped_no_catalyst += 1
-                    continue
-                _collect_reagent_smiles(record, None, unknown_cas)
+    if input_suffix != ".csv":
+        raise ValueError(
+            f"Unsupported input format: {input_path.suffix or '<none>'}. "
+            "HTE conversion is CSV-only."
+        )
 
-                reactant_data = []
+    print("Processing CSV reactions...")
+    wall_started = time.perf_counter()
+    stage_totals = _empty_stage_timings()
+    scanned_rows = 0
+    skipped_no_smiles = 0
+    skipped_no_arrow = 0
+    skipped_no_catalyst = 0
+    skipped_routing_excluded = 0
+    skipped_out_of_scope = 0
+    row_errors = 0
+    cleanup_rows = 0
+    cleanup_coord_components = 0
+    cleanup_counterion_components = 0
+    out_of_scope_reasons: Counter[str] = Counter()
 
-                for r_smiles in reactants:
-                    try:
-                        analysis = cached_featurize(r_smiles)
-                        motifs = analysis.get("motifs", [])
-                        current_r_motifs = _extract_motif_ids(motifs)
-                        context_scaffolds = _extract_context_scaffolds(analysis)
+    with open(input_path, "r", encoding="utf-8", errors="replace", newline="") as f:
+        input_rows = list(csv.DictReader(f))
+        print(f"Loaded {len(input_rows)} input rows")
+        for result in _iter_processed_rows(
+            input_rows,
+            source_label=source_label,
+            reaction_options_sig=reaction_options_sig,
+            drop_no_catalyst=drop_no_catalyst,
+            num_workers=resolved_workers,
+        ):
+            scanned_rows += 1
+            if scanned_rows % 500 == 0:
+                print(f"Progress: {scanned_rows} rows scanned")
 
-                        current_r_motifs = _apply_aromn_scaffold_override(
-                            current_r_motifs,
-                            context_scaffolds,
-                        )
-                        reactant_data.append({
-                            "motifs": _dedupe_list(current_r_motifs),
-                        })
-                    except Exception:
-                        continue
-
-                if not reactant_data:
-                    continue
-
-                rxn_bundle = cached_featurize_reaction(smiles, reaction_options_sig)
-                aggregates = rxn_bundle.get("aggregates") or {}
-                reacted_set = set(aggregates.get("reacted_motifs") or [])
-                formed_set = set(aggregates.get("formed_motifs") or [])
-                spectators_set = set(aggregates.get("spectator_motifs") or [])
-                reaction_key_raw = str(rxn_bundle.get("reaction_key") or "")
-                reaction_key = canonicalize_reaction_key_minimal(reaction_key_raw) or reaction_key_raw
-                reaction_events_payload = build_reaction_events_payload(
-                    reaction_key_raw,
-                    rxn_bundle.get("reaction_events")
-                    if isinstance(rxn_bundle.get("reaction_events"), dict)
-                    else None,
-                )
-                is_out_of_scope, scope_reason = _is_out_of_scope_for_dataset(
-                    source_label,
-                    reaction_events_payload,
-                    formed_set,
-                )
-                if is_out_of_scope:
-                    skipped_out_of_scope += 1
-                    out_of_scope_reasons[scope_reason] += 1
-                    continue
-                reaction_events_text = serialize_reaction_events_payload(reaction_events_payload)
-
-                formed_motifs_str = _reactant_key(list(formed_set)) or "None"
-
-                primary_reactant_motifs = _select_primary_reactant_motifs(
-                    reactant_data,
-                    reacted_set,
-                )
-
-                if len(reactants) == 1:
-                    primary_reactant_motifs = primary_reactant_motifs[:1]
-
-                type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
-                type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
-                type_c = primary_reactant_motifs[2] if len(primary_reactant_motifs) > 2 else ""
-
-                spectator_groups = rank_spectator_groups(
-                    _collect_spectator_groups(reactant_data, spectators_set)
-                )
-                detected_reaction_type = reaction_type_from_bundle(rxn_bundle)
-                gap_entry = _build_taxonomy_gap_entry(
-                    rxn_bundle,
-                    source_dataset=source_label,
-                    source_format="csv",
-                    source_row_index=i + 2,
-                    reaction_smiles=smiles,
-                    reaction_key=reaction_key,
-                    detected_reaction_type=detected_reaction_type,
-                    reference=str(row.get("reference", "") or ""),
-                )
-                if gap_entry:
-                    taxonomy_gap_entries.append(gap_entry)
-
-                row_out = {
-                    "reaction_id": source_label,
-                    "detected_reaction_type": detected_reaction_type,
-                    "yield": record.get("yield", 0.0),
-                    "z_score": 0.0,
-                    "reactant_1": type_a,
-                    "reactant_2": type_b,
-                    "reactant_3": type_c,
-                    "catalyst": reagents.get("catalyst", ""),
-                    "ligand": reagents.get("ligand", ""),
-                    "base": reagents.get("base", ""),
-                    "acid": reagents.get("acid", ""),
-                    "oxidant": reagents.get("oxidant", ""),
-                    "reductant": reagents.get("reductant", ""),
-                    "additive": reagents.get("additive", ""),
-                    "condensation_agent": reagents.get("condensation_agent", ""),
-                    "other_reagent": reagents.get("other_reagent", ""),
-                    "solvent": reagents.get("solvent", ""),
-                    "reaction_smiles": smiles,
-                    "formed_motifs": formed_motifs_str,
-                    "spectator_groups": " / ".join(spectator_groups),
-                    "reference": row.get("reference", ""),
-                    "Reaction_Key": reaction_key,
-                    "Reaction_Events": reaction_events_text,
-                    "_reaction_key": reaction_key,
-                }
-                rows.append(row_out)
-                processed_count += 1
-            
-            print(f"Processing summary:")
-            print(f"  Processed: {processed_count}")
-            print(f"  Skipped - no SMILES: {skipped_no_smiles}")
-            print(f"  Skipped - no >>: {skipped_no_arrow}")
-            print(f"  Skipped - no catalyst: {skipped_no_catalyst}")
-            print(f"  Skipped - routing excluded: {skipped_routing_excluded}")
-            print(f"  Skipped - out of dataset scope: {skipped_out_of_scope}")
-            print(
-                "  Cleanup - rows touched:"
-                f" {cleanup_rows} (coordination fragments removed: {cleanup_coord_components},"
-                f" counterions removed: {cleanup_counterion_components})"
-            )
-            if out_of_scope_reasons:
-                print(f"  Out-of-scope reasons: {dict(out_of_scope_reasons)}")
-    else:
-        with open(input_path, "r", encoding="utf-8", errors="replace") as f:
-            lines = f.readlines()
-
-        total = len(lines)
-        print(f"Processing {total} reactions...")
-        
-        processed_count = 0
-        skipped_no_smiles = 0
-        skipped_no_arrow = 0
-        skipped_no_catalyst = 0
-        skipped_routing_excluded = 0
-        skipped_out_of_scope = 0
-        cleanup_rows = 0
-        cleanup_coord_components = 0
-        cleanup_counterion_components = 0
-        out_of_scope_reasons: Counter[str] = Counter()
-
-        for i, line in enumerate(lines):
-            if i % 500 == 0:
-                print(f"Progress: {i}/{total} ({(i/total)*100:.1f}%)")
-
-            try:
-                record = json.loads(line)
-            except:
-                continue
-            
-            raw_smiles = record.get("smiles", "")
-            smiles, cleanup_stats = _cleanup_reaction_smiles_for_featurization(raw_smiles)
+            cleanup_stats = result.get("cleanup_stats") or {}
             cleanup_rows += int(cleanup_stats.get("cleanup_applied", 0))
             cleanup_coord_components += int(cleanup_stats.get("coordination_removed", 0))
             cleanup_counterion_components += int(cleanup_stats.get("counterion_removed", 0))
-            if ">>" not in smiles:
+
+            timings = result.get("timings") or {}
+            for key in stage_totals:
+                stage_totals[key] += float(timings.get(key, 0.0) or 0.0)
+
+            status = str(result.get("status") or "")
+            if status == "processed":
+                row_out = result.get("row_out")
+                if row_out:
+                    rows.append(row_out)
+                gap_entry = result.get("gap_entry")
+                if gap_entry:
+                    taxonomy_gap_entries.append(gap_entry)
+                unknown_cas.update(str(cas).strip() for cas in (result.get("unknown_cas") or []) if str(cas).strip())
+            elif status == "skipped_no_smiles":
+                skipped_no_smiles += 1
+            elif status == "skipped_no_arrow":
                 skipped_no_arrow += 1
-                continue
-            routing = classify_reaction_for_taxonomy_benchmark(smiles)
-            if routing.get("excluded"):
-                skipped_routing_excluded += 1
-                continue
-
-            reactants_part, _ = smiles.split(">>")
-            reactants = reactants_part.split(".")
-            reagents = extract_reagents(record)
-            if drop_no_catalyst and not reagents.get("catalyst"):
+            elif status == "skipped_no_catalyst":
                 skipped_no_catalyst += 1
-                continue
-            _collect_reagent_smiles(record, None, unknown_cas)
-
-            reactant_data = []
-
-            for r_smiles in reactants:
-                try:
-                    analysis = cached_featurize(r_smiles)
-                    motifs = analysis.get("motifs", [])
-                    current_r_motifs = _extract_motif_ids(motifs)
-                    context_scaffolds = _extract_context_scaffolds(analysis)
-
-                    current_r_motifs = _apply_aromn_scaffold_override(
-                        current_r_motifs,
-                        context_scaffolds,
-                    )
-                    reactant_data.append({
-                        "motifs": _dedupe_list(current_r_motifs),
-                    })
-                except Exception:
-                    continue
-
-            if not reactant_data:
-                continue
-
-            rxn_bundle = cached_featurize_reaction(smiles, reaction_options_sig)
-            aggregates = rxn_bundle.get("aggregates") or {}
-            reacted_set = set(aggregates.get("reacted_motifs") or [])
-            formed_set = set(aggregates.get("formed_motifs") or [])
-            spectators_set = set(aggregates.get("spectator_motifs") or [])
-            reaction_key_raw = str(rxn_bundle.get("reaction_key") or "")
-            reaction_key = canonicalize_reaction_key_minimal(reaction_key_raw) or reaction_key_raw
-            reaction_events_payload = build_reaction_events_payload(
-                reaction_key_raw,
-                rxn_bundle.get("reaction_events")
-                if isinstance(rxn_bundle.get("reaction_events"), dict)
-                else None,
-            )
-            is_out_of_scope, scope_reason = _is_out_of_scope_for_dataset(
-                source_label,
-                reaction_events_payload,
-                formed_set,
-            )
-            if is_out_of_scope:
+            elif status == "skipped_routing_excluded":
+                skipped_routing_excluded += 1
+            elif status == "skipped_out_of_scope":
                 skipped_out_of_scope += 1
+                scope_reason = str(result.get("scope_reason") or "unknown")
                 out_of_scope_reasons[scope_reason] += 1
-                continue
-            reaction_events_text = serialize_reaction_events_payload(reaction_events_payload)
+            elif status == "error":
+                row_errors += 1
+                print(f"Row processing error: {result.get('error')}")
 
-            formed_motifs_str = _reactant_key(list(formed_set)) or "None"
-
-            primary_reactant_motifs = _select_primary_reactant_motifs(
-                reactant_data,
-                reacted_set,
-            )
-
-            if len(reactants) == 1:
-                primary_reactant_motifs = primary_reactant_motifs[:1]
-
-            type_a = primary_reactant_motifs[0] if len(primary_reactant_motifs) > 0 else ""
-            type_b = primary_reactant_motifs[1] if len(primary_reactant_motifs) > 1 else ""
-            type_c = primary_reactant_motifs[2] if len(primary_reactant_motifs) > 2 else ""
-
-            spectator_groups = rank_spectator_groups(
-                _collect_spectator_groups(reactant_data, spectators_set)
-            )
-            detected_reaction_type = reaction_type_from_bundle(rxn_bundle)
-            gap_entry = _build_taxonomy_gap_entry(
-                rxn_bundle,
-                source_dataset=source_label,
-                source_format="jsonl",
-                source_row_index=i + 1,
-                reaction_smiles=smiles,
-                reaction_key=reaction_key,
-                detected_reaction_type=detected_reaction_type,
-                reference=str(record.get("reference", "") or ""),
-            )
-            if gap_entry:
-                taxonomy_gap_entries.append(gap_entry)
-
-            row = {
-                "reaction_id": source_label,
-                "detected_reaction_type": detected_reaction_type,
-                "yield": record.get("yield", 0.0),
-                "z_score": 0.0,
-                "reactant_1": type_a,
-                "reactant_2": type_b,
-                "reactant_3": type_c,
-                "catalyst": reagents.get("catalyst", ""),
-                "ligand": reagents.get("ligand", ""),
-                "base": reagents.get("base", ""),
-                "acid": reagents.get("acid", ""),
-                "oxidant": reagents.get("oxidant", ""),
-                "reductant": reagents.get("reductant", ""),
-                "additive": reagents.get("additive", ""),
-                "condensation_agent": reagents.get("condensation_agent", ""),
-                "other_reagent": reagents.get("other_reagent", ""),
-                "solvent": reagents.get("solvent", ""),
-                "reaction_smiles": smiles,
-                "formed_motifs": formed_motifs_str,
-                "spectator_groups": " / ".join(spectator_groups),
-                "reference": record.get("reference", ""),
-                "Reaction_Key": reaction_key,
-                "Reaction_Events": reaction_events_text,
-                "_reaction_key": reaction_key,
-            }
-            rows.append(row)
-            processed_count += 1
-        
-        print(f"Processing summary:")
-        print(f"  Processed: {processed_count}")
-        print(f"  Skipped - no SMILES: {skipped_no_smiles}")
-        print(f"  Skipped - no >>: {skipped_no_arrow}")
-        print(f"  Skipped - no catalyst: {skipped_no_catalyst}")
-        print(f"  Skipped - routing excluded: {skipped_routing_excluded}")
-        print(f"  Skipped - out of dataset scope: {skipped_out_of_scope}")
-        print(
-            "  Cleanup - rows touched:"
-            f" {cleanup_rows} (coordination fragments removed: {cleanup_coord_components},"
-            f" counterions removed: {cleanup_counterion_components})"
-        )
-        if out_of_scope_reasons:
-            print(f"  Out-of-scope reasons: {dict(out_of_scope_reasons)}")
+    processed_count = len(rows)
+    print("Processing summary:")
+    print(f"  Processed: {processed_count}")
+    print(f"  Skipped - no SMILES: {skipped_no_smiles}")
+    print(f"  Skipped - no >>: {skipped_no_arrow}")
+    print(f"  Skipped - no catalyst: {skipped_no_catalyst}")
+    print(f"  Skipped - routing excluded: {skipped_routing_excluded}")
+    print(f"  Skipped - out of dataset scope: {skipped_out_of_scope}")
+    print(f"  Row errors: {row_errors}")
+    print(
+        "  Cleanup - rows touched:"
+        f" {cleanup_rows} (coordination fragments removed: {cleanup_coord_components},"
+        f" counterions removed: {cleanup_counterion_components})"
+    )
+    if out_of_scope_reasons:
+        print(f"  Out-of-scope reasons: {dict(out_of_scope_reasons)}")
+    _print_timing_summary(
+        wall_time_s=time.perf_counter() - wall_started,
+        stage_totals=stage_totals,
+        row_count=scanned_rows,
+        processed_count=processed_count,
+        worker_count=resolved_workers,
+    )
         
     if not rows:
         print("Warning: No valid reactions were processed.")
@@ -1235,8 +1332,16 @@ def process_reaction_dataset(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert reaction dataset to HTE-canonical CSV format.")
-    parser.add_argument("--dataset", "-d", help="Name of the dataset (e.g., C_N_Coupling). If provided, processes 'data/reaction_dataset/{dataset}.jsonl' to 'data/HTE_db/{dataset}_canonical.csv'.")
-    parser.add_argument("--input", "-i", help="Direct path to input JSONL file.")
+    parser.add_argument(
+        "--dataset",
+        "-d",
+        help=(
+            "Name of the dataset (e.g., C_N_Coupling). "
+            "If provided, processes 'data/reaction_dataset/{dataset}.csv' "
+            "to 'data/HTE_db/{dataset}_canonical.csv'."
+        ),
+    )
+    parser.add_argument("--input", "-i", help="Direct path to input CSV file.")
     parser.add_argument("--output", "-o", help="Direct path to output CSV file.")
     parser.add_argument(
         "--reagent-csv",
@@ -1251,11 +1356,17 @@ if __name__ == "__main__":
         action="store_true",
         help="Keep reactions without a catalyst (by default, they are dropped).",
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Worker processes for row conversion. Use 0 for auto. Default: 1",
+    )
     
     args = parser.parse_args()
     
     if args.dataset:
-        input_file = f"data/reaction_dataset/{args.dataset}.jsonl"
+        input_file = f"data/reaction_dataset/{args.dataset}.csv"
         output_file = f"data/HTE_db/{args.dataset}_canonical.csv"
         process_reaction_dataset(
             input_file,
@@ -1263,6 +1374,7 @@ if __name__ == "__main__":
             drop_no_catalyst=not args.keep_no_catalyst,
             reagent_csv_path=args.reagent_csv,
             new_reagents_path=args.new_reagents,
+            num_workers=args.workers,
         )
     elif args.input and args.output:
         process_reaction_dataset(
@@ -1271,16 +1383,18 @@ if __name__ == "__main__":
             drop_no_catalyst=not args.keep_no_catalyst,
             reagent_csv_path=args.reagent_csv,
             new_reagents_path=args.new_reagents,
+            num_workers=args.workers,
         )
     else:
         # Default: Process known core datasets
         datasets = ["C_N_Coupling", "C_O_Coupling", "C_S_Coupling"]
         for ds in datasets:
-            input_file = f"data/reaction_dataset/{ds}.jsonl"
+            input_file = f"data/reaction_dataset/{ds}.csv"
             output_file = f"data/HTE_db/{ds}_canonical.csv"
             process_reaction_dataset(
                 input_file,
                 output_file,
                 reagent_csv_path=args.reagent_csv,
                 new_reagents_path=args.new_reagents,
+                num_workers=args.workers,
             )

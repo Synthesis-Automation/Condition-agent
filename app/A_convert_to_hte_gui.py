@@ -45,6 +45,7 @@ class ConversionWorker(QtCore.QObject):
         reagent_csv_path: str,
         new_reagents_path: str,
         skip_cas_enrichment: bool,
+        num_workers: int,
         llm_assist_options: Optional[Dict[str, Any]] = None,
     ):
         super().__init__()
@@ -53,6 +54,7 @@ class ConversionWorker(QtCore.QObject):
         self.reagent_csv_path = reagent_csv_path
         self.new_reagents_path = new_reagents_path
         self.skip_cas_enrichment = skip_cas_enrichment
+        self.num_workers = num_workers
         self.llm_assist_options = llm_assist_options or None
 
     def run(self):
@@ -92,6 +94,7 @@ class ConversionWorker(QtCore.QObject):
                         drop_no_catalyst=self.drop_no_catalyst,
                         reagent_csv_path=self.reagent_csv_path,
                         new_reagents_path=self.new_reagents_path,
+                        num_workers=self.num_workers,
                         llm_assist_options=self.llm_assist_options,
                     )
                     print("")
@@ -140,6 +143,11 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.protocol_mode_check = QtWidgets.QCheckBox(
             "Literature+setup CSV mode (skip enrichment, save to HTE_db/literature)"
         )
+        self.worker_count_spin = QtWidgets.QSpinBox()
+        self.worker_count_spin.setRange(0, 64)
+        self.worker_count_spin.setValue(0)
+        self.worker_count_spin.setSpecialValueText("Auto")
+        self.worker_count_spin.setToolTip("0 = auto (uses a moderate fraction of CPU cores), otherwise use a fixed number of worker processes.")
         self.llm_assist_checkbox = QtWidgets.QCheckBox("LLM assist for reaction typing/key")
         self.llm_provider_combo = QtWidgets.QComboBox()
         self.llm_model_combo = QtWidgets.QComboBox()
@@ -231,6 +239,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
         form.addRow("", self.drop_catalyst_check)
         form.addRow("", self.skip_cas_check)
         form.addRow("", self.protocol_mode_check)
+        form.addRow("Workers:", self.worker_count_spin)
 
         llm_toggle_row = QtWidgets.QHBoxLayout()
         llm_toggle_row.addWidget(self.llm_assist_checkbox)
@@ -505,6 +514,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
             str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
             str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
             self.skip_cas_check.isChecked(),
+            self.worker_count_spin.value(),
             llm_assist_options=llm_assist_options,
         )
         self.worker.moveToThread(self.thread)
@@ -530,6 +540,10 @@ class HTEConverterWindow(QtWidgets.QWidget):
             self.log_msg("  - Reaction type detection")
             self.log_msg("  - Motif extraction")
             self.log_msg("  - Spectator group ranking")
+            worker_setting = self.worker_count_spin.value()
+            self.log_msg(
+                f"  - Worker processes: {'auto' if worker_setting == 0 else worker_setting}"
+            )
             if llm_assist_options:
                 self.log_msg(
                     "  - LLM assist: "
@@ -588,6 +602,7 @@ class HTEConverterWindow(QtWidgets.QWidget):
                         drop_no_catalyst=self.drop_catalyst_check.isChecked(),
                         reagent_csv_path=str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
                         new_reagents_path=str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
+                        num_workers=self.worker_count_spin.value(),
                         llm_assist_options=llm_assist_options,
                     )
                     

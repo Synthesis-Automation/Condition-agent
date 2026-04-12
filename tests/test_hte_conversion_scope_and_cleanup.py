@@ -196,3 +196,20 @@ def test_scope_filter_keeps_suzuki_cc_in_scope() -> None:
     )
     assert kept is False
     assert reason in {"expected_product_motif_present", "expected_bond_class_present"}
+
+
+def test_process_dataset_rejects_non_csv_input(tmp_path) -> None:
+    input_path = tmp_path / "input.jsonl"
+    input_path.write_text('{"smiles":"A>>B"}\n', encoding="utf-8")
+    output_path = tmp_path / "output.csv"
+
+    try:
+        hte_convert.process_reaction_dataset(
+            str(input_path),
+            str(output_path),
+            drop_no_catalyst=False,
+        )
+    except ValueError as exc:
+        assert "CSV-only" in str(exc)
+    else:
+        raise AssertionError("Expected ValueError for non-CSV input")
