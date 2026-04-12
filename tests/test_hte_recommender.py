@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from chemtools.recommend import recommender as hte
@@ -66,6 +67,71 @@ def test_fallback_tiers_order() -> None:
     assert "Ar-R" not in tiers[0]
     if len(tiers) > 1:
         assert "Ar-R" in tiers[1]
+
+
+def test_hte_cache_roundtrip_uses_row_index_maps(tmp_path) -> None:
+    df = _make_min_hte_df()
+    manifest = {"version": 6, "files": []}
+    indexed_data = {"Ar-X": np.array([0], dtype=np.int64)}
+    reaction_type_patterns = {"Ar-X": hte.Counter({"Suzuki_miyaura": 1})}
+    transformation_indices = {"Suzuki_miyaura": np.array([0], dtype=np.int64)}
+
+    hte._save_hte_cache(
+        tmp_path,
+        manifest,
+        df,
+        indexed_data,
+        reaction_type_patterns,
+        transformation_indices,
+    )
+    loaded = hte._load_hte_cache(tmp_path, manifest)
+
+    assert loaded is not None
+    loaded_df, loaded_indexed, loaded_patterns, loaded_transforms = loaded
+    assert loaded_df.equals(df)
+    assert set(loaded_indexed) == {"Ar-X"}
+    assert set(loaded_transforms) == {"Suzuki_miyaura"}
+    assert isinstance(loaded_indexed["Ar-X"], np.ndarray)
+    assert isinstance(loaded_transforms["Suzuki_miyaura"], np.ndarray)
+    assert loaded_patterns["Ar-X"]["Suzuki_miyaura"] == 1
+
+
+def test_coerce_frame_lookup_materializes_rows_lazily() -> None:
+    df = _make_source_group_df()
+    lookup = hte._coerce_frame_lookup(
+        df,
+        {"literature": np.array([0], dtype=np.int64), "rules": np.array([1], dtype=np.int64)},
+        cache_size=4,
+    )
+
+    literature = lookup["literature"]
+    rules = lookup["rules"]
+
+    assert literature["Source_Group"].tolist() == ["literature"]
+    assert rules["Source_Group"].tolist() == ["rules"]
+    assert len(list(lookup.items())) == 2
+
+
+def test_recommender_accepts_row_index_mappings(monkeypatch) -> None:
+    df = _make_min_hte_df()
+    indexed_data = {"Ar-X": np.array([0], dtype=np.int64)}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        return (["Ar-X"], "aryl_halide")
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend("Brc1ccccc1", top_k=5)
+
+    assert result.total_matching_experiments == 1
+    assert result.recommendations
 
 
 def test_recommend_falls_back_when_direct_key_missing(monkeypatch) -> None:

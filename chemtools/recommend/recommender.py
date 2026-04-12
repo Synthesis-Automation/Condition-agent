@@ -14,8 +14,8 @@ Key Features:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Tuple, Any, Iterable, Set
-from collections import defaultdict, Counter
+from typing import List, Dict, Optional, Tuple, Any, Iterable, Set, Iterator, Mapping
+from collections import defaultdict, Counter, OrderedDict
 from functools import lru_cache
 import hashlib
 import pickle
@@ -24,6 +24,7 @@ import re
 import logging
 import time
 import pandas as pd
+import numpy as np
 from pathlib import Path
 import json
 
@@ -171,14 +172,97 @@ def _compute_hte_manifest(file_paths: List[Path]) -> Dict[str, Any]:
             }
         )
     entries.sort(key=lambda item: item["path"])
-    return {"version": 5, "files": entries}
+    return {"version": 6, "files": entries}
+
+
+def _to_row_index_array(indexer: Any) -> np.ndarray:
+    if isinstance(indexer, np.ndarray):
+        return indexer.astype(np.int64, copy=False)
+    if isinstance(indexer, pd.Index):
+        return indexer.to_numpy(dtype=np.int64, copy=True)
+    if isinstance(indexer, range):
+        return np.fromiter(indexer, dtype=np.int64)
+    if isinstance(indexer, (list, tuple, set)):
+        return np.asarray(list(indexer), dtype=np.int64)
+    raise TypeError(f"Unsupported row index payload: {type(indexer)!r}")
+
+
+def _materialize_group_frame(df: pd.DataFrame, indexer: np.ndarray) -> pd.DataFrame:
+    if len(indexer) == 0:
+        return df.iloc[0:0]
+    return df.loc[indexer]
+
+
+class _IndexedFrameLookup(Mapping[str, pd.DataFrame]):
+    """Lazy DataFrame materialization backed by cached row-index arrays."""
+
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        row_map: Dict[str, Any],
+        *,
+        cache_size: int = 256,
+    ) -> None:
+        self._df = df
+        self._row_map: Dict[str, np.ndarray] = {
+            str(key): _to_row_index_array(value)
+            for key, value in dict(row_map).items()
+        }
+        self._cache_size = max(1, int(cache_size))
+        self._frame_cache: OrderedDict[str, pd.DataFrame] = OrderedDict()
+
+    def __getitem__(self, key: str) -> pd.DataFrame:
+        normalized_key = str(key)
+        cached = self._frame_cache.get(normalized_key)
+        if cached is not None:
+            self._frame_cache.move_to_end(normalized_key)
+            return cached
+        indexer = self._row_map[normalized_key]
+        frame = _materialize_group_frame(self._df, indexer)
+        self._frame_cache[normalized_key] = frame
+        if len(self._frame_cache) > self._cache_size:
+            self._frame_cache.popitem(last=False)
+        return frame
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._row_map)
+
+    def __len__(self) -> int:
+        return len(self._row_map)
+
+    def items(self) -> Iterator[Tuple[str, pd.DataFrame]]:
+        for key in self._row_map:
+            yield key, self[key]
+
+    def row_map(self) -> Dict[str, np.ndarray]:
+        return dict(self._row_map)
+
+
+def _is_frame_mapping(mapping: Any) -> bool:
+    if not isinstance(mapping, dict) or not mapping:
+        return False
+    sample = next(iter(mapping.values()))
+    return isinstance(sample, pd.DataFrame)
+
+
+def _coerce_frame_lookup(
+    df: pd.DataFrame,
+    mapping: Any,
+    *,
+    cache_size: int,
+) -> Any:
+    if isinstance(mapping, _IndexedFrameLookup):
+        return mapping
+    if _is_frame_mapping(mapping):
+        return dict(mapping)
+    return _IndexedFrameLookup(df, dict(mapping or {}), cache_size=cache_size)
 
 
 def _load_hte_cache(
     cache_dir: Path,
     manifest: Dict[str, Any],
 ) -> Optional[
-    Tuple[pd.DataFrame, Dict[str, pd.DataFrame], Dict[str, Counter], Dict[str, pd.DataFrame]]
+    Tuple[pd.DataFrame, Dict[str, np.ndarray], Dict[str, Counter], Dict[str, np.ndarray]]
 ]:
     manifest_path = cache_dir / "manifest.json"
     payload_path = cache_dir / "hte_cache.pkl"
@@ -198,29 +282,40 @@ def _load_hte_cache(
     if not isinstance(payload, dict):
         return None
     df = payload.get("df")
-    indexed_data = payload.get("indexed_data")
+    indexed_data = payload.get("indexed_row_map")
     reaction_type_patterns = payload.get("reaction_type_patterns")
-    transformation_indices = payload.get("transformation_indices")
+    transformation_indices = payload.get("transformation_row_map")
     if df is None or indexed_data is None or reaction_type_patterns is None or transformation_indices is None:
         return None
-    return df, indexed_data, reaction_type_patterns, transformation_indices
+    try:
+        normalized_indexed = {
+            str(key): _to_row_index_array(value)
+            for key, value in dict(indexed_data).items()
+        }
+        normalized_transformations = {
+            str(key): _to_row_index_array(value)
+            for key, value in dict(transformation_indices).items()
+        }
+    except Exception:
+        return None
+    return df, normalized_indexed, reaction_type_patterns, normalized_transformations
 
 
 def _save_hte_cache(
     cache_dir: Path,
     manifest: Dict[str, Any],
     df: pd.DataFrame,
-    indexed_data: Dict[str, pd.DataFrame],
+    indexed_data: Dict[str, np.ndarray],
     reaction_type_patterns: Dict[str, Counter],
-    transformation_indices: Dict[str, pd.DataFrame],
+    transformation_indices: Dict[str, np.ndarray],
 ) -> None:
     try:
         cache_dir.mkdir(parents=True, exist_ok=True)
         payload = {
             "df": df,
-            "indexed_data": indexed_data,
+            "indexed_row_map": indexed_data,
             "reaction_type_patterns": reaction_type_patterns,
-            "transformation_indices": transformation_indices,
+            "transformation_row_map": transformation_indices,
         }
         payload_path = cache_dir / "hte_cache.pkl"
         with payload_path.open("wb") as handle:
@@ -530,7 +625,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
 @lru_cache(maxsize=4)
 def _load_hte_database_cached(
     hte_db_path: str,
-) -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame], Dict[str, Counter], Dict[str, pd.DataFrame]]:
+) -> Tuple[pd.DataFrame, Dict[str, np.ndarray], Dict[str, Counter], Dict[str, np.ndarray]]:
     """Load and index the HTE database once per path (cached)."""
     db_path = Path(hte_db_path)
     if not db_path.exists():
@@ -554,11 +649,12 @@ def _load_hte_database_cached(
         frames.append(frame)
 
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+    df = _ensure_rule_tier_column(df)
     LOGGER.info("Loaded HTE database: %s experiments from %s files", len(df), len(file_paths))
 
-    indexed_data: Dict[str, pd.DataFrame] = {}
+    indexed_data: Dict[str, np.ndarray] = {}
     reaction_type_patterns: Dict[str, Counter] = {}
-    transformation_indices: Dict[str, pd.DataFrame] = {}
+    transformation_indices: Dict[str, np.ndarray] = {}
 
     LOGGER.info("Building reactant type indices...")
 
@@ -583,7 +679,7 @@ def _load_hte_database_cached(
         if not indices:
             continue
         group_df = df.loc[sorted(indices)]
-        indexed_data[key] = group_df
+        indexed_data[key] = group_df.index.to_numpy(dtype=np.int64, copy=True)
 
         rxn_types = group_df["Reaction_Type_Standardized"].value_counts()
         reaction_type_patterns[key] = Counter(rxn_types.to_dict())
@@ -594,32 +690,32 @@ def _load_hte_database_cached(
         df["Reaction_Key"] = df["Reaction_Key"].fillna("").astype(str).str.strip()
         keyed_df = df[df["Reaction_Key"] != ""]
         for key, group_df in keyed_df.groupby("Reaction_Key"):
-            transformation_indices[key] = group_df
+            transformation_indices[key] = group_df.index.to_numpy(dtype=np.int64, copy=True)
         unkeyed_df = df[df["Reaction_Key"] == ""]
         if not unkeyed_df.empty:
             if "Reactant_Signature_Core" in unkeyed_df.columns:
                 sig_series = unkeyed_df["Reactant_Signature_Core"].fillna("").astype(str).str.strip()
                 sig_df = unkeyed_df[sig_series != ""]
                 for key, group_df in sig_df.groupby("Reactant_Signature_Core"):
-                    transformation_indices[key] = group_df
+                    transformation_indices[key] = group_df.index.to_numpy(dtype=np.int64, copy=True)
                 unkeyed_df = unkeyed_df[sig_series == ""]
             if not unkeyed_df.empty:
                 for key, group_df in unkeyed_df.groupby("Reaction_Type_Standardized"):
-                    transformation_indices[key] = group_df
+                    transformation_indices[key] = group_df.index.to_numpy(dtype=np.int64, copy=True)
     else:
         if "Reactant_Signature_Core" in df.columns:
             sig_series = df["Reactant_Signature_Core"].fillna("").astype(str).str.strip()
             sig_df = df[sig_series != ""]
             for key, group_df in sig_df.groupby("Reactant_Signature_Core"):
-                transformation_indices[key] = group_df
+                transformation_indices[key] = group_df.index.to_numpy(dtype=np.int64, copy=True)
             remaining = df[sig_series == ""]
             if not remaining.empty:
                 for key, group_df in remaining.groupby("Reaction_Type_Standardized"):
-                    transformation_indices[key] = group_df
+                    transformation_indices[key] = group_df.index.to_numpy(dtype=np.int64, copy=True)
         else:
             grouped_rxn = df.groupby("Reaction_Type_Standardized")
             for key, group_df in grouped_rxn:
-                transformation_indices[key] = group_df
+                transformation_indices[key] = group_df.index.to_numpy(dtype=np.int64, copy=True)
 
     # Add event-aware indices so noisy/missing Reaction_Key values can still match.
     if "Reaction_Events_Key" in df.columns:
@@ -627,7 +723,7 @@ def _load_hte_database_cached(
         event_df = df[event_key_series != ""]
         for key, group_df in event_df.groupby("Reaction_Events_Key"):
             if key and key not in transformation_indices:
-                transformation_indices[key] = group_df
+                transformation_indices[key] = group_df.index.to_numpy(dtype=np.int64, copy=True)
 
     LOGGER.info(
         "Indexed %s reactant combinations and %s transformation types",
@@ -3022,21 +3118,15 @@ class HTERecommender:
         """
         self.db_path = Path(hte_db_path)
         self.df: Optional[pd.DataFrame] = None
-        self.indexed_data: Dict[Tuple[str, str], pd.DataFrame] = {}
+        self.indexed_data: Any = {}
         self.reaction_type_patterns: Dict[Tuple[str, str], Counter] = {}
-        self.transformation_indices: Dict[str, pd.DataFrame] = {}
+        self.transformation_indices: Any = {}
 
         df, indexed_data, patterns, trans_indices = _load_hte_database_cached(str(self.db_path))
         self.df = _ensure_rule_tier_column(df)
-        self.indexed_data = {
-            key: _ensure_rule_tier_column(group_df)
-            for key, group_df in dict(indexed_data).items()
-        }
+        self.indexed_data = _coerce_frame_lookup(self.df, indexed_data, cache_size=256)
         self.reaction_type_patterns = dict(patterns)
-        self.transformation_indices = {
-            key: _ensure_rule_tier_column(group_df)
-            for key, group_df in dict(trans_indices).items()
-        }
+        self.transformation_indices = _coerce_frame_lookup(self.df, trans_indices, cache_size=512)
     
     def _detect_reactant_types(self, smiles: str) -> Tuple[List[str], Optional[str]]:
         """
