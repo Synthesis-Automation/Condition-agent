@@ -18,6 +18,8 @@ _PRECEDENT_CACHE_DIR = os.path.join(
     "results", "precedent_cache",
 )
 _PRECEDENT_CACHE_SCHEMA_VERSION = "v2"
+_PRECEDENT_DRFP_BITS = 4096
+_PRECEDENT_DRFP_RADIUS = 3
 
 
 def _pick_electrophile_nucleophile(reactants: List[str]) -> Tuple[str, str]:
@@ -363,12 +365,28 @@ def _family_key(family_filter: Optional[set]) -> Tuple[str, ...]:
     return tuple(sorted(str(item) for item in family_filter))
 
 
-def _precedent_pkl_path(family_key: Tuple[str, ...]) -> str:
-    """Return the pkl path for a given family_key."""
+def _precedent_cache_key_hash(family_key: Tuple[str, ...]) -> str:
+    """Return the stable cache-key hash shared by precedent cache artifacts."""
     key_str = "__".join(sorted(family_key)) if family_key else "__all__"
     key_str = f"{_PRECEDENT_CACHE_SCHEMA_VERSION}::{key_str}"
-    key_hash = hashlib.md5(key_str.encode()).hexdigest()[:16]
+    return hashlib.md5(key_str.encode()).hexdigest()[:16]
+
+
+def _precedent_pkl_path(family_key: Tuple[str, ...]) -> str:
+    """Return the pkl path for a given family_key."""
+    key_hash = _precedent_cache_key_hash(family_key)
     return os.path.join(_PRECEDENT_CACHE_DIR, f"precedent_{key_hash}.pkl")
+
+
+def _precedent_drfp_path(family_key: Tuple[str, ...]) -> str:
+    """Return the DRFP NPZ path for a given family_key."""
+    key_hash = _precedent_cache_key_hash(family_key)
+    return os.path.join(_PRECEDENT_CACHE_DIR, f"precedent_{key_hash}_drfp.npz")
+
+
+def get_precedent_drfp_cache_path(family_key: Tuple[str, ...]) -> str:
+    """Public helper used by precedent search to resolve persisted DRFP assets."""
+    return _precedent_drfp_path(family_key)
 
 
 def _csv_max_mtime() -> float:
@@ -384,6 +402,79 @@ def _csv_max_mtime() -> float:
     return latest
 
 
+def _is_precedent_drfp_cache_fresh(family_key: Tuple[str, ...]) -> bool:
+    """Return True when the DRFP asset is newer than its precedent inputs."""
+    npz_path = _precedent_drfp_path(family_key)
+    if not os.path.exists(npz_path):
+        return False
+    try:
+        npz_mtime = os.path.getmtime(npz_path)
+    except OSError:
+        return False
+    try:
+        pkl_mtime = os.path.getmtime(_precedent_pkl_path(family_key))
+    except OSError:
+        pkl_mtime = 0.0
+    return npz_mtime >= max(pkl_mtime, _csv_max_mtime())
+
+
+def ensure_precedent_drfp_cache(
+    family_key: Tuple[str, ...],
+    rows: List[Dict[str, Any]],
+    *,
+    force: bool = False,
+) -> Optional[str]:
+    """Persist DRFP fingerprints for a cached precedent row-set when available."""
+    if not rows:
+        return None
+    if not force and _is_precedent_drfp_cache_fresh(family_key):
+        return _precedent_drfp_path(family_key)
+
+    try:
+        from .. import reaction_similarity as rs
+        from ..util.drfp_storage import save_drfp_index
+    except Exception:
+        return None
+    if not rs or not rs.drfp_available():
+        return None
+
+    fingerprints: List[Any] = []
+    reaction_ids: List[str] = []
+    seen_ids: set[str] = set()
+    for row in rows:
+        reaction_id = _clean_text(row.get("reaction_id"))
+        reaction_smiles = _clean_text(row.get("reaction_smiles"))
+        if not reaction_id or not reaction_smiles or reaction_id in seen_ids:
+            continue
+        fp = rs.encode_drfp_cached(
+            reaction_smiles,
+            n_bits=_PRECEDENT_DRFP_BITS,
+            radius=_PRECEDENT_DRFP_RADIUS,
+        )
+        if fp is None:
+            continue
+        reaction_ids.append(reaction_id)
+        fingerprints.append(fp)
+        seen_ids.add(reaction_id)
+
+    if not reaction_ids:
+        return None
+
+    npz_path = _precedent_drfp_path(family_key)
+    try:
+        os.makedirs(_PRECEDENT_CACHE_DIR, exist_ok=True)
+        save_drfp_index(
+            fingerprints,
+            reaction_ids,
+            npz_path,
+            n_bits=_PRECEDENT_DRFP_BITS,
+            radius=_PRECEDENT_DRFP_RADIUS,
+        )
+        return npz_path
+    except Exception:
+        return None
+
+
 def _load_precedent_disk_cache(family_key: Tuple[str, ...]) -> Optional[List[Dict[str, Any]]]:
     """Load featurized rows from disk cache if still fresh."""
     pkl_path = _precedent_pkl_path(family_key)
@@ -396,6 +487,7 @@ def _load_precedent_disk_cache(family_key: Tuple[str, ...]) -> Optional[List[Dic
         with open(pkl_path, "rb") as fh:
             rows = pickle.load(fh)
         if isinstance(rows, list):
+            ensure_precedent_drfp_cache(family_key, rows)
             return rows
     except Exception:
         pass
@@ -409,6 +501,7 @@ def _save_precedent_disk_cache(family_key: Tuple[str, ...], rows: List[Dict[str,
         pkl_path = _precedent_pkl_path(family_key)
         with open(pkl_path, "wb") as fh:
             pickle.dump(rows, fh, protocol=pickle.HIGHEST_PROTOCOL)
+        ensure_precedent_drfp_cache(family_key, rows, force=True)
     except Exception:
         pass
 

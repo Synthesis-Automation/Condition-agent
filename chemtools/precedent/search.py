@@ -11,7 +11,12 @@ import os
 import time
 import logging
 
-from .loader import _load, _load_selective
+from .loader import (
+    _load,
+    _load_selective,
+    ensure_precedent_drfp_cache,
+    get_precedent_drfp_cache_path,
+)
 from .core_utils import _family_text, _proto_family_id, _parse_bin, _parse_core_tokens, _norm_family
 from .catalyst import _row_catalyst_class, _match_catalyst_class
 from .similarity import _similarity
@@ -55,6 +60,18 @@ except Exception:
 _KMN_INSTANCE: Any = None
 _FAISS_ROUTER_INSTANCE: Any = None
 _DEFAULT_ON_DEMAND_DRFP_RERANK_LIMIT = 400
+
+
+def _drfp_cache_key(family_txt: Optional[str]) -> str:
+    return "__UNIFIED__" if family_txt is None else family_txt
+
+
+def _precedent_drfp_family_key(family_txt: Optional[str]) -> Tuple[str, ...]:
+    return tuple() if family_txt is None else (family_txt,)
+
+
+def _invalidate_drfp_loader(family_txt: Optional[str]) -> None:
+    _DRFP_LOADER_CACHE.pop(_drfp_cache_key(family_txt), None)
 
 
 def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str, Any], k: int, relax: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -145,30 +162,28 @@ def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str,
 def _resolve_drfp_loader(family_txt: Optional[str]) -> Any:
     if not _drfp_storage_available or DRFPLoader is None:
         return None
-    if family_txt is None:
-        if "__UNIFIED__" not in _DRFP_LOADER_CACHE and get_unified_drfp_path is not None:
-            unified_path = get_unified_drfp_path()
-            if os.path.exists(unified_path):
-                try:
-                    _DRFP_LOADER_CACHE["__UNIFIED__"] = DRFPLoader(unified_path)
-                except Exception:
-                    _DRFP_LOADER_CACHE["__UNIFIED__"] = None
-            else:
-                _DRFP_LOADER_CACHE["__UNIFIED__"] = None
-        return _DRFP_LOADER_CACHE.get("__UNIFIED__")
+    cache_key = _drfp_cache_key(family_txt)
+    if cache_key not in _DRFP_LOADER_CACHE:
+        npz_candidates: List[str] = [
+            get_precedent_drfp_cache_path(_precedent_drfp_family_key(family_txt))
+        ]
+        if family_txt is None:
+            if get_unified_drfp_path is not None:
+                npz_candidates.append(get_unified_drfp_path())
+        elif get_drfp_path_for_family is not None:
+            npz_candidates.append(get_drfp_path_for_family(family_txt))
 
-    if get_drfp_path_for_family is None:
-        return None
-    if family_txt not in _DRFP_LOADER_CACHE:
-        npz_path = get_drfp_path_for_family(family_txt)
-        if os.path.exists(npz_path):
+        loader = None
+        for npz_path in npz_candidates:
+            if not npz_path or not os.path.exists(npz_path):
+                continue
             try:
-                _DRFP_LOADER_CACHE[family_txt] = DRFPLoader(npz_path)
+                loader = DRFPLoader(npz_path)
+                break
             except Exception:
-                _DRFP_LOADER_CACHE[family_txt] = None
-        else:
-            _DRFP_LOADER_CACHE[family_txt] = None
-    return _DRFP_LOADER_CACHE.get(family_txt)
+                loader = None
+        _DRFP_LOADER_CACHE[cache_key] = loader
+    return _DRFP_LOADER_CACHE.get(cache_key)
 
 
 def _as_kv(obj: Dict[str, Any] | None) -> Tuple[Tuple[str, Any], ...]:
@@ -380,6 +395,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
     drfp_radius = int(relax.get("drfp_radius", 3))
     q_fp = None
     drfp_loader = None
+    drfp_cache_generated = False
     on_demand_drfp_limit = int(
         relax.get(
             "drfp_rerank_limit",
@@ -404,6 +420,22 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
                 pass
         q_fp = rs.encode_drfp_cached(rsmi_query, n_bits=drfp_bits, radius=drfp_radius)
         drfp_loader = _resolve_drfp_loader(family_txt)
+        if (
+            q_fp is not None
+            and drfp_loader is None
+            and bool(relax.get("persist_drfp_cache", True))
+        ):
+            cache_rows = rows if family_txt is None else [
+                row for row in rows if (row.get("rxn_type") or "") == family_txt
+            ]
+            built_path = ensure_precedent_drfp_cache(
+                _precedent_drfp_family_key(family_txt),
+                cache_rows,
+            )
+            if built_path:
+                drfp_cache_generated = True
+                _invalidate_drfp_loader(family_txt)
+                drfp_loader = _resolve_drfp_loader(family_txt)
     timing['drfp_query_encode'] = time.time() - t_start_drfp_query
 
     # ⏱️ TIME: Similarity scoring
@@ -674,6 +706,7 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
         result["drfp_rerank_limit"] = on_demand_drfp_limit
         result["drfp_rerank_candidates"] = len(candidate_rows)
         result["drfp_loader_available"] = drfp_loader is not None
+        result["drfp_cache_generated"] = drfp_cache_generated
 
     if use_mixfp:
         result["mixfp_routing"] = {
