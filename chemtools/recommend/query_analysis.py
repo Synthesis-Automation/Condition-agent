@@ -97,7 +97,10 @@ def analyze_recommendation_query(request: RecommendationRequest | str) -> QueryA
 
         feat_payload = featurize_reaction(
             normalized,
-            options={"confirm_coupling_products": True},
+            options={
+                "confirm_coupling_products": True,
+                "skip_bond_analysis": True,
+            },
         )
         reaction = feat_payload.get("reaction") if isinstance(feat_payload, dict) and isinstance(feat_payload.get("reaction"), dict) else feat_payload
         if not isinstance(reaction, dict):

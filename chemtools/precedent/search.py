@@ -54,6 +54,7 @@ except Exception:
 # Singleton KMN / FAISS router (loaded lazily on first use)
 _KMN_INSTANCE: Any = None
 _FAISS_ROUTER_INSTANCE: Any = None
+_DEFAULT_ON_DEMAND_DRFP_RERANK_LIMIT = 400
 
 
 def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str, Any], k: int, relax: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -139,6 +140,35 @@ def _candidate_pool(rows: List[Dict[str, Any]], family_txt: str, feat: Dict[str,
         cands.sort(key=lambda r: float(r.get("yield_value") or 0), reverse=True)
         return cands[:_max_cands]
     return cands
+
+
+def _resolve_drfp_loader(family_txt: Optional[str]) -> Any:
+    if not _drfp_storage_available or DRFPLoader is None:
+        return None
+    if family_txt is None:
+        if "__UNIFIED__" not in _DRFP_LOADER_CACHE and get_unified_drfp_path is not None:
+            unified_path = get_unified_drfp_path()
+            if os.path.exists(unified_path):
+                try:
+                    _DRFP_LOADER_CACHE["__UNIFIED__"] = DRFPLoader(unified_path)
+                except Exception:
+                    _DRFP_LOADER_CACHE["__UNIFIED__"] = None
+            else:
+                _DRFP_LOADER_CACHE["__UNIFIED__"] = None
+        return _DRFP_LOADER_CACHE.get("__UNIFIED__")
+
+    if get_drfp_path_for_family is None:
+        return None
+    if family_txt not in _DRFP_LOADER_CACHE:
+        npz_path = get_drfp_path_for_family(family_txt)
+        if os.path.exists(npz_path):
+            try:
+                _DRFP_LOADER_CACHE[family_txt] = DRFPLoader(npz_path)
+            except Exception:
+                _DRFP_LOADER_CACHE[family_txt] = None
+        else:
+            _DRFP_LOADER_CACHE[family_txt] = None
+    return _DRFP_LOADER_CACHE.get(family_txt)
 
 
 def _as_kv(obj: Dict[str, Any] | None) -> Tuple[Tuple[str, Any], ...]:
@@ -349,6 +379,15 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
     drfp_bits = int(relax.get("drfp_n_bits", 4096))
     drfp_radius = int(relax.get("drfp_radius", 3))
     q_fp = None
+    drfp_loader = None
+    on_demand_drfp_limit = int(
+        relax.get(
+            "drfp_rerank_limit",
+            max(_DEFAULT_ON_DEMAND_DRFP_RERANK_LIMIT, max(int(k) * 8, 0)),
+        )
+    )
+    if on_demand_drfp_limit <= 0:
+        on_demand_drfp_limit = len(cands)
     
     # ⏱️ TIME: Query DRFP encoding
     t_start_drfp_query = time.time()
@@ -364,16 +403,34 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             except Exception:
                 pass
         q_fp = rs.encode_drfp_cached(rsmi_query, n_bits=drfp_bits, radius=drfp_radius)
+        drfp_loader = _resolve_drfp_loader(family_txt)
     timing['drfp_query_encode'] = time.time() - t_start_drfp_query
 
     # ⏱️ TIME: Similarity scoring
     t_start_scoring = time.time()
     drfp_load_count = {'binary': 0, 'jsonl': 0, 'computed': 0}
-    
-    scored: List[Tuple[float, Dict[str, Any]]] = []
+    candidate_rows: List[Tuple[Dict[str, Any], Dict[str, Any], float, float]] = []
     for r in cands:
         f = r.get("features", {})
         sim_cat = _similarity(target_feat, f)
+        y = r.get("yield_value")
+        y_norm = (float(y) / 100.0) if isinstance(y, (int, float)) else 0.0
+        candidate_rows.append((r, f, sim_cat, y_norm))
+
+    allowed_on_demand_ids = None
+    if q_fp is not None and drfp_loader is None and len(candidate_rows) > on_demand_drfp_limit:
+        ranked_for_drfp = sorted(
+            candidate_rows,
+            key=lambda item: (item[2], item[3]),
+            reverse=True,
+        )
+        allowed_on_demand_ids = {
+            id(item[0])
+            for item in ranked_for_drfp[:on_demand_drfp_limit]
+        }
+
+    scored: List[Tuple[float, Dict[str, Any]]] = []
+    for r, f, sim_cat, y_norm in candidate_rows:
         if sim_cat <= 0:
             # still allow DRFP to rescue a bit if enabled
             pass
@@ -385,58 +442,15 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             r_fp = None
             
             # STRATEGY 1: Try to load from binary NPZ file (fastest, most space-efficient)
-            if _drfp_storage_available and DRFPLoader is not None:
+            if drfp_loader is not None:
                 reaction_id = r.get("reaction_id")
                 if reaction_id:
-                    # For cross-family search, use unified NPZ file
-                    if family_txt is None:
-                        # Use unified cross-family index
-                        if "__UNIFIED__" not in _DRFP_LOADER_CACHE and get_unified_drfp_path is not None:
-                            unified_path = get_unified_drfp_path()
-                            if os.path.exists(unified_path):
-                                try:
-                                    _DRFP_LOADER_CACHE["__UNIFIED__"] = DRFPLoader(unified_path)
-                                    if relax.get("debug_timing", False):
-                                        logger.info(f"   Loaded unified DRFP index: {unified_path}")
-                                except Exception as e:
-                                    _DRFP_LOADER_CACHE["__UNIFIED__"] = None
-                                    if relax.get("debug_timing", False):
-                                        logger.warning(f"   Failed to load unified DRFP index: {e}")
-                            else:
-                                _DRFP_LOADER_CACHE["__UNIFIED__"] = None
-                        
-                        # Load fingerprint from unified index
-                        loader = _DRFP_LOADER_CACHE.get("__UNIFIED__")
-                        if loader is not None:
-                            try:
-                                r_fp = loader.get_fingerprint(reaction_id)
-                                if r_fp is not None:
-                                    drfp_load_count['binary'] += 1
-                            except Exception:
-                                pass
-                    
-                    # For family-specific search, use family NPZ file
-                    elif get_drfp_path_for_family is not None:
-                        # Get or create loader for this family
-                        if family_txt not in _DRFP_LOADER_CACHE:
-                            npz_path = get_drfp_path_for_family(family_txt)
-                            if os.path.exists(npz_path):
-                                try:
-                                    _DRFP_LOADER_CACHE[family_txt] = DRFPLoader(npz_path)
-                                except Exception:
-                                    _DRFP_LOADER_CACHE[family_txt] = None
-                            else:
-                                _DRFP_LOADER_CACHE[family_txt] = None
-                        
-                        # Load fingerprint if loader available
-                        loader = _DRFP_LOADER_CACHE.get(family_txt)
-                        if loader is not None:
-                            try:
-                                r_fp = loader.get_fingerprint(reaction_id)
-                                if r_fp is not None:
-                                    drfp_load_count['binary'] += 1
-                            except Exception:
-                                pass
+                    try:
+                        r_fp = drfp_loader.get_fingerprint(reaction_id)
+                        if r_fp is not None:
+                            drfp_load_count['binary'] += 1
+                    except Exception:
+                        pass
             
             # STRATEGY 2: Try to load precomputed DRFP from JSONL (legacy fallback)
             if r_fp is None:
@@ -460,11 +474,13 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
             
             # STRATEGY 3: Fall back to computing on-demand if not precomputed
             if r_fp is None:
-                r_rsmi = r.get("reaction_smiles")
-                if r_rsmi:
-                    r_fp = rs.encode_drfp_cached(r_rsmi, n_bits=drfp_bits, radius=drfp_radius)
-                    if r_fp is not None:
-                        drfp_load_count['computed'] += 1
+                allow_compute = allowed_on_demand_ids is None or id(r) in allowed_on_demand_ids
+                if allow_compute:
+                    r_rsmi = r.get("reaction_smiles")
+                    if r_rsmi:
+                        r_fp = rs.encode_drfp_cached(r_rsmi, n_bits=drfp_bits, radius=drfp_radius)
+                        if r_fp is not None:
+                            drfp_load_count['computed'] += 1
             
             if r_fp is not None:
                 sim_fp = rs.tanimoto(q_fp, r_fp)
@@ -498,8 +514,6 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
                 sim_total = sim_cat
             else:
                 continue
-        y = r.get("yield_value")
-        y_norm = (float(y) / 100.0) if isinstance(y, (int, float)) else 0.0
         neighbor_score = sim_total * (0.5 + 0.5 * y_norm)
         scored.append((neighbor_score, r))
 
@@ -657,6 +671,9 @@ def _knn_impl(family: str | None, features: Dict[str, Any], k: int = 50, relax: 
     
     if use_drfp:
         result["drfp_load_strategy"] = drfp_load_count
+        result["drfp_rerank_limit"] = on_demand_drfp_limit
+        result["drfp_rerank_candidates"] = len(candidate_rows)
+        result["drfp_loader_available"] = drfp_loader is not None
 
     if use_mixfp:
         result["mixfp_routing"] = {

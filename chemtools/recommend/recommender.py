@@ -2578,7 +2578,7 @@ def _reaction_event_key_from_reaction_smiles(reaction_smiles: str) -> str:
     try:
         rxn_features = _featurize_reaction_for_recommendation(
             text,
-            skip_bond_analysis=False,
+            skip_bond_analysis=True,
         )
     except Exception:
         return ""
