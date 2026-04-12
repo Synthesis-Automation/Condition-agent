@@ -16,6 +16,8 @@ from .models import (
 from .planner import plan_sources
 from .query_analysis import analyze_recommendation_query
 
+_AUTO_SIMILARITY_REACTION_TYPE_CONFIDENCE = 0.5
+
 
 def _normalize_source_group_label(value: Any) -> str:
     text = str(value or "").strip().lower()
@@ -253,17 +255,34 @@ def _run_similarity_fast_pass(
     """
     from .recommender import HTERecommendationResult, _run_precedent_knn
 
-    # Similarity mode should be cross-family by default.
-    # Only honor reaction type when the caller explicitly provides a filter.
+    # Similarity mode is cross-family by default, but when query analysis
+    # confidently resolves a reaction family we can use that narrower family
+    # to avoid scanning the full precedent corpus.
     explicit_reaction_type_filter = (
         str(req.reaction_type_filter).strip() if req.reaction_type_filter is not None else ""
     ) or None
+    resolved_explicit_filter = (
+        analysis.requested_reaction_type_filter_canonical
+        or explicit_reaction_type_filter
+    )
+    auto_detected_filter = None
+    if (
+        not resolved_explicit_filter
+        and float(getattr(analysis, "reaction_type_confidence", 0.0) or 0.0)
+        >= _AUTO_SIMILARITY_REACTION_TYPE_CONFIDENCE
+    ):
+        auto_detected_filter = (
+            analysis.detected_reaction_type_id
+            or analysis.detected_reaction_type
+            or analysis.detected_reaction_type_name
+        )
+    effective_reaction_type_filter = resolved_explicit_filter or auto_detected_filter
 
     recs = _run_precedent_knn(
         analysis.reactant_a_smiles,
         analysis.reactant_b_smiles,
         analysis.product_smiles,
-        explicit_reaction_type_filter,
+        effective_reaction_type_filter,
         req.top_k,
         source_group=None,
         prefer_mixfp_for_similarity=req.prefer_mixfp_for_similarity,
@@ -280,7 +299,14 @@ def _run_similarity_fast_pass(
     loaded = {
         "similarity_fast_path": True,
         "precedent_count": len(recs),
-        "similarity_family_filter": explicit_reaction_type_filter or "cross_family",
+        "similarity_family_filter": effective_reaction_type_filter or "cross_family",
+        "similarity_family_filter_source": (
+            "explicit"
+            if resolved_explicit_filter
+            else "detected"
+            if auto_detected_filter
+            else "cross_family"
+        ),
     }
     return rec_obj, loaded
 

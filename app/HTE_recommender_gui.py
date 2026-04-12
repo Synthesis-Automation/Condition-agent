@@ -31,6 +31,8 @@ PUBLIC_STRATEGIES: Tuple[str, ...] = (
     RUN_ALL_SOURCE_SENTINEL,
     FAST_SOURCE_SENTINEL,
 )
+_AUTO_CACHE_WARM_DELAY_MS = 2500
+_AUTO_SIMILARITY_REACTION_TYPE_CONFIDENCE = 0.5
 
 
 def _parse_reaction_smiles(reaction_smiles: str) -> Tuple[str, Optional[str], Optional[str]]:
@@ -232,6 +234,31 @@ def _get_cached_data_manager(db_path: str) -> Any:
         manager = RecommendationDataManager(base_db_path=db_path)
         _RECOMMEND_DM_CACHE[key] = manager
     return manager
+
+
+def _kmn_index_built() -> bool:
+    try:
+        from chemtools.util.faiss_router import is_index_built
+
+        return bool(is_index_built())
+    except Exception:
+        return False
+
+
+def _similarity_hint_from_result(result: Any) -> Optional[str]:
+    confidence = getattr(result, "reaction_type_confidence", None)
+    try:
+        confidence_value = float(confidence or 0.0)
+    except Exception:
+        confidence_value = 0.0
+    if confidence_value < _AUTO_SIMILARITY_REACTION_TYPE_CONFIDENCE:
+        return None
+    hinted = (
+        getattr(result, "predicted_reaction_type", None)
+        or getattr(result, "reaction_type", None)
+    )
+    text = str(hinted or "").strip()
+    return text or None
 
 
 def _format_float(value: Optional[float]) -> str:
@@ -558,25 +585,35 @@ class RecommendationWorker(QtCore.QObject):
                 if precedent_recs:
                     merged_by_source["precedent"] = _dedupe_recommendations(precedent_recs)
 
-        # Ensure full mode includes the exact same similarity retrieval path
-        # as standalone similarity mode.
-        similarity_result = self._run_similarity_only(
-            recommender,
-            reactant_a,
-            reactant_b,
-            product,
-        )
-        similarity_map = _normalize_recommendations_by_source(
-            getattr(similarity_result, "recommendations_by_source", {}) or {}
-        )
-        similarity_recs = list(
-            similarity_map.get("similarity")
-            or similarity_map.get("precedent")
+        reusable_precedent = list(
+            merged_by_source.get("precedent")
+            or baseline_map.get("precedent")
             or []
         )
-        if not similarity_recs:
-            similarity_recs = list(getattr(similarity_result, "recommendations", []) or [])
-        merged_by_source["similarity"] = _dedupe_recommendations(similarity_recs)
+        if reusable_precedent and not _kmn_index_built():
+            self.progress.emit(
+                "Skipping dedicated similarity pass because KMN index is missing; reusing literature precedents."
+            )
+            merged_by_source["similarity"] = _dedupe_recommendations(reusable_precedent)
+        else:
+            similarity_result = self._run_similarity_only(
+                recommender,
+                reactant_a,
+                reactant_b,
+                product,
+                reaction_type_hint=_similarity_hint_from_result(baseline),
+            )
+            similarity_map = _normalize_recommendations_by_source(
+                getattr(similarity_result, "recommendations_by_source", {}) or {}
+            )
+            similarity_recs = list(
+                similarity_map.get("similarity")
+                or similarity_map.get("precedent")
+                or []
+            )
+            if not similarity_recs:
+                similarity_recs = list(getattr(similarity_result, "recommendations", []) or [])
+            merged_by_source["similarity"] = _dedupe_recommendations(similarity_recs)
 
         for key, items in baseline_map.items():
             if key not in merged_by_source and items:
@@ -601,6 +638,7 @@ class RecommendationWorker(QtCore.QObject):
         reactant_a: str,
         reactant_b: Optional[str],
         product: Optional[str],
+        reaction_type_hint: Optional[str] = None,
     ) -> Any:
         self.progress.emit("Running similarity recommendation ...")
         # Keep full-mode similarity behavior aligned with standalone
@@ -616,7 +654,7 @@ class RecommendationWorker(QtCore.QObject):
                 source_group="any",
                 top_k=self.top_k,
                 min_experiments=self.min_exp,
-                reaction_type_filter=self.reaction_filter or None,
+                reaction_type_filter=self.reaction_filter or reaction_type_hint or None,
                 catalyst_filter=self.catalyst_filter or None,
                 hte_db_path=self.db_path,
                 use_aryl_steric_electronic_weighting=self.use_aryl_weighting,
@@ -1011,6 +1049,9 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         self._all_json_output: Optional[Dict[str, Any]] = None
         self._last_result_obj: Optional[object] = None
         self._last_export_context: Dict[str, Any] = {}
+        self._cache_warm_silent: bool = False
+        self._auto_cache_warm_attempted: bool = False
+        QtCore.QTimer.singleShot(_AUTO_CACHE_WARM_DELAY_MS, self._maybe_start_background_cache_warm)
 
     def _setup_layout(self) -> None:
         layout = QtWidgets.QVBoxLayout(self)
@@ -1255,6 +1296,67 @@ class HTERecommenderWindow(QtWidgets.QWidget):
     def _append_status(self, message: str) -> None:
         self.status.setText(message)
 
+    def _selected_cache_source_group(self) -> str:
+        selected_strategy = _normalize_strategy_label(self.strategy_combo.currentText().strip())
+        selected_override = self.source_group_combo.currentText().strip()
+        normalized_override = _normalize_source_group_label(selected_override)
+        if selected_override != "Auto" and normalized_override in {"literature", "motif", "rules"}:
+            return normalized_override
+        if selected_strategy in {"literature", "similarity", FAST_SOURCE_SENTINEL}:
+            return "literature"
+        if selected_strategy == RUN_ALL_SOURCE_SENTINEL:
+            return "all"
+        if selected_strategy == "rules":
+            return "rules"
+        return "all"
+
+    def _start_cache_warm(self, *, db_path: str, source_group: str, silent: bool) -> None:
+        self._cache_warm_silent = bool(silent)
+        if silent:
+            self.status.setText("Warming HTE cache in background ...")
+        else:
+            self.status.setText("Prebuilding HTE cache...")
+            self.progress_bar.setRange(0, 0)
+            self.progress_bar.setVisible(True)
+            self.run_button.setEnabled(False)
+            self.prebuild_cache_button.setEnabled(False)
+            self.rebuild_kmn_button.setEnabled(False)
+            self.prebuild_cache_button.setText("Prebuilding...")
+
+        self.cache_thread = QtCore.QThread()
+        self.cache_worker = CacheWarmWorker(
+            db_path=db_path,
+            source_group=source_group,
+        )
+        self.cache_worker.moveToThread(self.cache_thread)
+        self.cache_thread.started.connect(self.cache_worker.run)
+        self.cache_worker.progress.connect(self._append_status)
+        self.cache_worker.finished.connect(self._on_prebuild_finished)
+        self.cache_thread.start()
+
+    def _maybe_start_background_cache_warm(self) -> None:
+        if self._auto_cache_warm_attempted:
+            return
+        self._auto_cache_warm_attempted = True
+        if not self.isVisible():
+            return
+        if (self.thread and self.thread.isRunning()) or (self.cache_thread and self.cache_thread.isRunning()):
+            return
+
+        db_path = self.db_path_edit.text().strip()
+        if not db_path or not Path(db_path).exists():
+            return
+        source_group = self._selected_cache_source_group()
+        try:
+            from chemtools.recommend.recommender import check_hte_cache_status
+
+            cache_status = check_hte_cache_status(db_path, source_group=source_group)
+        except Exception:
+            cache_status = {"valid": False}
+        if cache_status.get("valid"):
+            return
+        self._start_cache_warm(db_path=db_path, source_group=source_group, silent=True)
+
     def _run_prebuild_cache(self) -> None:
         if self.thread and self.thread.isRunning():
             QtWidgets.QMessageBox.information(
@@ -1279,19 +1381,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "Invalid path", "The data path does not exist.")
             return
 
-        selected_strategy = _normalize_strategy_label(self.strategy_combo.currentText().strip())
-        selected_override = self.source_group_combo.currentText().strip()
-        normalized_override = _normalize_source_group_label(selected_override)
-        if selected_override != "Auto" and normalized_override in {"literature", "motif", "rules"}:
-            source_group = normalized_override
-        elif selected_strategy in {"literature", "similarity", FAST_SOURCE_SENTINEL}:
-            source_group = "literature"
-        elif selected_strategy == RUN_ALL_SOURCE_SENTINEL:
-            source_group = "all"
-        elif selected_strategy == "rules":
-            source_group = "rules"
-        else:
-            source_group = "all"
+        source_group = self._selected_cache_source_group()
 
         # ── Quick disk-cache validity check (no data load) ────────────────
         # If the index already exists and data hasn't changed, skip the thread
@@ -1321,38 +1411,25 @@ class HTERecommenderWindow(QtWidgets.QWidget):
                 self.status.setText(f"HTE cache already up to date ({source_summary}).")
                 return
 
-        self.status.setText("Prebuilding HTE cache...")
-        self.progress_bar.setRange(0, 0)
-        self.progress_bar.setVisible(True)
-        self.run_button.setEnabled(False)
-        self.prebuild_cache_button.setEnabled(False)
-        self.rebuild_kmn_button.setEnabled(False)
-        self.prebuild_cache_button.setText("Prebuilding...")
-
-        self.cache_thread = QtCore.QThread()
-        self.cache_worker = CacheWarmWorker(
-            db_path=db_path,
-            source_group=source_group,
-        )
-        self.cache_worker.moveToThread(self.cache_thread)
-        self.cache_thread.started.connect(self.cache_worker.run)
-        self.cache_worker.progress.connect(self._append_status)
-        self.cache_worker.finished.connect(self._on_prebuild_finished)
-        self.cache_thread.start()
+        self._start_cache_warm(db_path=db_path, source_group=source_group, silent=False)
 
     def _on_prebuild_finished(self, success: bool, summary: object, message: str) -> None:
+        silent = self._cache_warm_silent
+        self._cache_warm_silent = False
         if self.cache_thread:
             self.cache_thread.quit()
             self.cache_thread.wait()
-        self.run_button.setEnabled(True)
-        self.prebuild_cache_button.setEnabled(True)
-        self.rebuild_kmn_button.setEnabled(True)
-        self.prebuild_cache_button.setText("Prebuild HTE Cache")
-        self.progress_bar.setVisible(False)
+        if not silent:
+            self.run_button.setEnabled(True)
+            self.prebuild_cache_button.setEnabled(True)
+            self.rebuild_kmn_button.setEnabled(True)
+            self.prebuild_cache_button.setText("Prebuild HTE Cache")
+            self.progress_bar.setVisible(False)
 
         if not success:
-            self.status.setText("Error")
-            QtWidgets.QMessageBox.critical(self, "HTE Recommender", message)
+            self.status.setText("Background cache warm failed." if silent else "Error")
+            if not silent:
+                QtWidgets.QMessageBox.critical(self, "HTE Recommender", message)
             return
 
         targets = []
@@ -1375,7 +1452,8 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         if source_counts.get("rebuilt", 0) == 0 and target_count > 0:
             self.status.setText(f"HTE cache already ready ({source_summary}).")
         else:
-            self.status.setText(f"HTE cache ready ({source_summary}).")
+            prefix = "Background HTE cache ready" if silent else "HTE cache ready"
+            self.status.setText(f"{prefix} ({source_summary}).")
 
         # ── KMN index status ──────────────────────────────────────────────
         try:
@@ -1391,19 +1469,20 @@ class HTERecommenderWindow(QtWidgets.QWidget):
             f"  python scripts/A_build_kmn_index.py --index-only"
         )
 
-        QtWidgets.QMessageBox.information(
-            self,
-            "HTE Cache Prebuild Complete",
-            (
-                "HTE reactant index rebuilt/verified.\n"
-                f"  Saved to: results/hte_cache/\n"
-                f"  Targets:  {target_count}\n"
-                f"  Rows:     {total_rows}\n"
-                f"  Source:   {source_summary}\n"
-                f"  Elapsed:  {total_elapsed:.2f}s\n\n"
-                + kmn_line
-            ),
-        )
+        if not silent:
+            QtWidgets.QMessageBox.information(
+                self,
+                "HTE Cache Prebuild Complete",
+                (
+                    "HTE reactant index rebuilt/verified.\n"
+                    f"  Saved to: results/hte_cache/\n"
+                    f"  Targets:  {target_count}\n"
+                    f"  Rows:     {total_rows}\n"
+                    f"  Source:   {source_summary}\n"
+                    f"  Elapsed:  {total_elapsed:.2f}s\n\n"
+                    + kmn_line
+                ),
+            )
 
     # ── KMN index rebuild ─────────────────────────────────────────────────
 
