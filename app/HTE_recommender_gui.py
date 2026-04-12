@@ -316,15 +316,17 @@ def _collect_reaction_analysis(reaction_smiles: str) -> Dict[str, Any]:
     if not reaction_smiles:
         return info
     try:
-        from chemtools.featurizers.unified import featurize_reaction
+        from app.reaction_featurization import analyze_reaction_featurization
     except Exception:
         return info
 
     try:
-        payload = featurize_reaction(
+        analysis = analyze_reaction_featurization(
             reaction_smiles,
-            options={"confirm_coupling_products": True},
+            base_options={"confirm_coupling_products": True},
+            cleanup=True,
         )
+        payload = analysis.bundle
     except Exception:
         return info
 

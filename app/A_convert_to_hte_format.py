@@ -15,10 +15,14 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # Import chemtools components
-from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
-from chemtools.featurizers.formatters.reaction import get_crk_options
+from chemtools.featurizers.unified import featurize_molecule
+from chemtools.featurizers.reaction_path import (
+    cached_featurize_reaction,
+    cleanup_reaction_smiles_for_featurization as _cleanup_reaction_smiles_for_featurization,
+    reaction_options_signature,
+    reaction_type_from_bundle,
+)
 from chemtools.featurizers.spectator_rank import rank_spectator_groups
-from chemtools.reaction_inference import classify_reaction
 from chemtools.recommend.reaction_key_utils import (
     build_reaction_events_payload,
     canonicalize_reaction_key_minimal,
@@ -36,73 +40,6 @@ def cached_featurize(smiles: str):
     # also ensures that Aromatic scaffolds win over Aliphatic ones due to updated priorities.
     options = {"motif_site_filter": "substituent", "detailed": True}
     return featurize_molecule(smiles, options=options)
-
-
-@lru_cache(maxsize=20000)
-def cached_featurize_reaction(
-    smiles: str,
-    llm_assist_signature: str = "",
-) -> Dict[str, Any]:
-    """Cache reaction featurization to keep Reaction_Key generation consistent."""
-    if not smiles:
-        return {}
-    try:
-        return featurize_reaction(
-            smiles,
-            options=_build_reaction_options(llm_assist_signature),
-        )
-    except Exception:
-        return {}
-
-
-def _build_reaction_options(llm_assist_signature: str = "") -> Dict[str, Any]:
-    options = get_crk_options()
-    if not llm_assist_signature:
-        return options
-    try:
-        llm_assist_cfg = json.loads(llm_assist_signature)
-    except Exception:
-        return options
-    if isinstance(llm_assist_cfg, dict):
-        options["llm_assist"] = llm_assist_cfg
-    return options
-
-
-def _llm_assist_signature(llm_assist_options: Optional[Dict[str, Any]]) -> str:
-    if not isinstance(llm_assist_options, dict):
-        return ""
-    payload = dict(llm_assist_options)
-    if not payload.get("enabled", True):
-        return ""
-    payload["enabled"] = True
-    try:
-        return json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    except Exception:
-        return ""
-
-
-@lru_cache(maxsize=20000)
-def _detect_reaction_type(
-    reaction_smiles: str,
-    llm_assist_signature: str = "",
-) -> str:
-    """
-    Unified reaction type classification for conversion/export.
-
-    Uses the canonical classifier (taxonomy-first + general bond-change fallback)
-    so all conversion paths share the same reaction type labels.
-    """
-    _ = llm_assist_signature  # Reserved for future classifier options.
-    if not reaction_smiles:
-        return ""
-    try:
-        decision = classify_reaction(reaction_smiles)
-        value = str(getattr(decision, "reaction_type", "") or "").strip()
-        if value == "unknown":
-            return "Unknown"
-        return value
-    except Exception:
-        return ""
 
 
 def _build_taxonomy_gap_entry(
@@ -193,25 +130,6 @@ def _write_taxonomy_gap_exports(
 
 CAS_PATTERN = re.compile(r"^\d{2,7}-\d{2}-\d$")
 CAS_INLINE_PATTERN = re.compile(r"\b\d{2,7}-\d{2}-\d\b")
-_TRANSITION_OR_HEAVY_METALS: Set[str] = {
-    "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn",
-    "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd",
-    "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg",
-    "Ga", "In", "Sn", "Sb", "Bi",
-    "La", "Ce", "Pr", "Nd", "Sm", "Eu", "Gd", "Tb", "Dy",
-    "Ho", "Er", "Tm", "Yb", "Lu",
-}
-_METAL_TOKEN_RE = re.compile(r"\[([A-Z][a-z]?)(?:[^\]]*)\]")
-_SIMPLE_COUNTERION_COMPONENTS = {
-    "Cl", "Br", "I", "F",
-    "[Cl-]", "[Br-]", "[I-]", "[F-]",
-    "[Na+]", "[K+]", "[Li+]", "[Cs+]", "[Rb+]",
-    "[NH4+]",
-}
-_COMPLEX_COUNTERION_RE = (
-    re.compile(r"\[B\+3\]\(\[F-\]\)\(\[F-\]\)\[F-\]"),
-    re.compile(r"\[P\+5\]\(\[F-\]\)\(\[F-\]\)\(\[F-\]\)\(\[F-\]\)\[F-\]"),
-)
 _EVENT_KIND_BY_BOND_CLASS = {
     "C-N": "c_n_bond_formation",
     "C-O": "c_o_bond_formation",
@@ -222,82 +140,6 @@ _SCOPE_SOURCE_SUFFIX_RE = re.compile(
     r"(?:_(?:canonical|subset|sample(?:_input|_output)?|fix\d+|input|output))+$",
     re.IGNORECASE,
 )
-
-
-def _split_reaction_sides(reaction_smiles: str) -> Tuple[List[str], List[str]]:
-    text = str(reaction_smiles or "").strip()
-    if not text or ">>" not in text:
-        return [], []
-    left, right = text.split(">>", 1)
-    reactants = [part for part in left.split(".") if part]
-    products = [part for part in right.split(".") if part]
-    return reactants, products
-
-
-def _contains_heavy_metal_token(text: str) -> bool:
-    tokens = {m for m in _METAL_TOKEN_RE.findall(str(text or "")) if m}
-    return bool(tokens & _TRANSITION_OR_HEAVY_METALS)
-
-
-def _is_coordination_component(smiles: str) -> bool:
-    token = str(smiles or "").strip()
-    return bool(token) and ("->" in token or "<-" in token) and _contains_heavy_metal_token(token)
-
-
-def _is_counterion_component(smiles: str) -> bool:
-    token = str(smiles or "").strip()
-    if not token:
-        return False
-    if token in _SIMPLE_COUNTERION_COMPONENTS:
-        return True
-    return any(pattern.search(token) for pattern in _COMPLEX_COUNTERION_RE)
-
-
-def _cleanup_reaction_smiles_for_featurization(reaction_smiles: str) -> Tuple[str, Dict[str, int]]:
-    """
-    Remove common spectator artifacts that break deterministic featurization:
-    - dative metal-complex components using -> / <- notation
-    - trivial counterion-only fragments (e.g., Cl, [Na+], BF4-, PF6-)
-    """
-    text = str(reaction_smiles or "").strip()
-    stats = {
-        "coordination_removed": 0,
-        "counterion_removed": 0,
-        "cleanup_applied": 0,
-    }
-    reactants, products = _split_reaction_sides(text)
-    if not reactants or not products:
-        return text, stats
-
-    def _filter_side(parts: List[str]) -> Tuple[List[str], int, int]:
-        kept: List[str] = []
-        removed_coord = 0
-        removed_counter = 0
-        multi_component = len(parts) > 1
-        for token in parts:
-            if _is_coordination_component(token):
-                removed_coord += 1
-                continue
-            if multi_component and _is_counterion_component(token):
-                removed_counter += 1
-                continue
-            kept.append(token)
-        return kept, removed_coord, removed_counter
-
-    cleaned_reactants, left_coord, left_counter = _filter_side(reactants)
-    cleaned_products, right_coord, right_counter = _filter_side(products)
-    removed_coord = left_coord + right_coord
-    removed_counter = left_counter + right_counter
-
-    if not cleaned_reactants or not cleaned_products:
-        return text, stats
-
-    cleaned = f"{'.'.join(cleaned_reactants)}>>{'.'.join(cleaned_products)}"
-    if cleaned != text:
-        stats["coordination_removed"] = removed_coord
-        stats["counterion_removed"] = removed_counter
-        stats["cleanup_applied"] = 1
-    return cleaned, stats
 
 
 def _candidate_scope_labels(source_label: str) -> List[str]:
@@ -959,8 +801,14 @@ def process_reaction_dataset(
     new_reagents_csv = Path(new_reagents_path) if new_reagents_path else (
         PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"
     )
-    llm_signature = _llm_assist_signature(llm_assist_options)
-    if llm_signature:
+    reaction_options_sig = reaction_options_signature(
+        llm_assist_options=llm_assist_options,
+    )
+    llm_assist_enabled = bool(
+        isinstance(llm_assist_options, dict)
+        and llm_assist_options.get("enabled", True)
+    )
+    if llm_assist_enabled:
         print("LLM assist enabled for reaction featurization.")
     
     rows = []
@@ -1060,7 +908,7 @@ def process_reaction_dataset(
                 if not reactant_data:
                     continue
 
-                rxn_bundle = cached_featurize_reaction(smiles, llm_signature)
+                rxn_bundle = cached_featurize_reaction(smiles, reaction_options_sig)
                 aggregates = rxn_bundle.get("aggregates") or {}
                 reacted_set = set(aggregates.get("reacted_motifs") or [])
                 formed_set = set(aggregates.get("formed_motifs") or [])
@@ -1101,7 +949,7 @@ def process_reaction_dataset(
                 spectator_groups = rank_spectator_groups(
                     _collect_spectator_groups(reactant_data, spectators_set)
                 )
-                detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
+                detected_reaction_type = reaction_type_from_bundle(rxn_bundle)
                 gap_entry = _build_taxonomy_gap_entry(
                     rxn_bundle,
                     source_dataset=source_label,
@@ -1228,7 +1076,7 @@ def process_reaction_dataset(
             if not reactant_data:
                 continue
 
-            rxn_bundle = cached_featurize_reaction(smiles, llm_signature)
+            rxn_bundle = cached_featurize_reaction(smiles, reaction_options_sig)
             aggregates = rxn_bundle.get("aggregates") or {}
             reacted_set = set(aggregates.get("reacted_motifs") or [])
             formed_set = set(aggregates.get("formed_motifs") or [])
@@ -1269,7 +1117,7 @@ def process_reaction_dataset(
             spectator_groups = rank_spectator_groups(
                 _collect_spectator_groups(reactant_data, spectators_set)
             )
-            detected_reaction_type = _detect_reaction_type(smiles, llm_signature)
+            detected_reaction_type = reaction_type_from_bundle(rxn_bundle)
             gap_entry = _build_taxonomy_gap_entry(
                 rxn_bundle,
                 source_dataset=source_label,
@@ -1376,7 +1224,7 @@ def process_reaction_dataset(
 
     df.to_csv(output_path, index=False)
     print(f"Successfully saved {len(df)} reactions to {output_path}")
-    if llm_signature:
+    if llm_assist_enabled:
         if taxonomy_gap_entries:
             _write_taxonomy_gap_exports(output_path, taxonomy_gap_entries)
         else:

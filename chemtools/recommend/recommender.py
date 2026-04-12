@@ -28,8 +28,14 @@ import numpy as np
 from pathlib import Path
 import json
 
-from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
-from chemtools.featurizers.formatters.reaction import get_crk_options
+from chemtools.featurizers.reaction_path import (
+    build_reaction_featurization_options,
+    cleanup_reaction_smiles_for_featurization,
+)
+from chemtools.featurizers.unified import (
+    featurize_molecule,
+    featurize_reaction as _unified_featurize_reaction,
+)
 from chemtools.featurizers.analysis.reaction_record import ReactionRecord
 from chemtools.featurizers.formatters.utils import normalize_motif_id
 from chemtools.featurizers.spectator_rank import (
@@ -78,6 +84,17 @@ _EVENT_SIGNATURE_CODE = {
     "c_c_bond_formation": "C-C",
 }
 _PRECEDENT_REACTION_EVENT_BLEND_WEIGHT = 0.7
+
+
+def featurize_reaction(
+    reaction_smiles: str,
+    options: Optional[Mapping[str, Any]] = None,
+) -> Dict[str, Any]:
+    cleaned_smiles, _ = cleanup_reaction_smiles_for_featurization(reaction_smiles)
+    return _unified_featurize_reaction(
+        cleaned_smiles,
+        options=build_reaction_featurization_options(base_options=options),
+    )
 _REACTION_EVENT_COMPONENT_WEIGHTS = {
     "formed": 0.35,
     "broken": 0.20,
@@ -436,7 +453,7 @@ def _normalize_hte_dataframe(df: pd.DataFrame, source_path: Optional[Path] = Non
                 if not s or s.lower() == "nan":
                     return ""
                 try:
-                    context = featurize_reaction(s, options=get_crk_options())
+                    context = featurize_reaction(s)
                     return str(context.get("reaction_key") or "")
                 except Exception:
                     return ""
@@ -2056,16 +2073,11 @@ def _featurize_reaction_for_recommendation(
     *,
     skip_bond_analysis: bool,
 ) -> Dict[str, Any]:
-    options = dict(get_crk_options())
-    if skip_bond_analysis:
-        options["skip_bond_analysis"] = True
     payload = featurize_reaction(
         reaction_smiles,
-        options=options,
+        options={"skip_bond_analysis": bool(skip_bond_analysis)},
     )
-    if not isinstance(payload, dict):
-        return {}
-    return payload
+    return payload if isinstance(payload, dict) else {}
 
 
 def _intramolecular_likely_from_fields(

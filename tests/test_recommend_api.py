@@ -47,8 +47,14 @@ def test_analyze_recommendation_query_uses_featurizers(monkeypatch):
             "products": [{"smiles_norm": "P"}],
         }
     )
-    fake_unified = types.SimpleNamespace(
-        featurize_reaction=lambda *args, **kwargs: {
+    monkeypatch.setitem(sys.modules, "chemtools.smiles", fake_smiles)
+    monkeypatch.setattr(
+        "chemtools.recommend.query_analysis.pick_electrophile_nucleophile",
+        lambda reactants: (reactants[0], reactants[1]),
+    )
+    monkeypatch.setattr(
+        "chemtools.recommend.query_analysis._featurize_query_reaction",
+        lambda _reaction_smiles: {
             "reaction": {
                 "reaction_key": "CRK-demo",
                 "aggregates": {
@@ -62,13 +68,7 @@ def test_analyze_recommendation_query_uses_featurizers(monkeypatch):
                     "confidence": 0.91,
                 },
             }
-        }
-    )
-    monkeypatch.setitem(sys.modules, "chemtools.smiles", fake_smiles)
-    monkeypatch.setitem(sys.modules, "chemtools.featurizers.unified", fake_unified)
-    monkeypatch.setattr(
-        "chemtools.recommend.query_analysis.pick_electrophile_nucleophile",
-        lambda reactants: (reactants[0], reactants[1]),
+        },
     )
     monkeypatch.setattr(
         "chemtools.recommend.query_analysis._resolve_reaction_type",

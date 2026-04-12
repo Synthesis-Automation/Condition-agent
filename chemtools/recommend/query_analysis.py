@@ -36,6 +36,19 @@ def _resolve_reaction_type(label: Optional[str]) -> Tuple[Optional[str], Optiona
         return text, None, None, None
 
 
+def _featurize_query_reaction(reaction_smiles: str) -> Dict[str, Any]:
+    from chemtools.featurizers.reaction_path import analyze_reaction_featurization
+
+    return analyze_reaction_featurization(
+        reaction_smiles,
+        base_options={
+            "confirm_coupling_products": True,
+            "skip_bond_analysis": True,
+        },
+        cleanup=True,
+    ).bundle
+
+
 def analyze_recommendation_query(request: RecommendationRequest | str) -> QueryAnalysis:
     """Analyze a recommendation query without loading HTE datasets."""
     if isinstance(request, RecommendationRequest):
@@ -93,15 +106,7 @@ def analyze_recommendation_query(request: RecommendationRequest | str) -> QueryA
         analysis.requested_reaction_type_filter_canonical = resolved_filter
 
     try:
-        from chemtools.featurizers.unified import featurize_reaction
-
-        feat_payload = featurize_reaction(
-            normalized,
-            options={
-                "confirm_coupling_products": True,
-                "skip_bond_analysis": True,
-            },
-        )
+        feat_payload = _featurize_query_reaction(normalized)
         reaction = feat_payload.get("reaction") if isinstance(feat_payload, dict) and isinstance(feat_payload.get("reaction"), dict) else feat_payload
         if not isinstance(reaction, dict):
             raise ValueError("featurize_reaction returned non-dict payload")

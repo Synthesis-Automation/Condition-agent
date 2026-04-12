@@ -17,7 +17,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
+from app.reaction_featurization import analyze_reaction_featurization
+from chemtools.featurizers.unified import featurize_molecule
 
 
 def _print_json(payload: Dict[str, Any]) -> None:
@@ -1003,10 +1004,14 @@ def main() -> int:
 
         try:
             if mode in {"reaction", "r"} or (mode == "auto" and is_reaction):
-                reaction_options = dict(current_options)
-                reaction_options.setdefault("motif_site_filter", "substituent")
-                reaction_options["detailed"] = True  # Enable extended output
-                payload = featurize_reaction(smiles, options=reaction_options)
+                analysis = analyze_reaction_featurization(
+                    smiles,
+                    base_options=current_options,
+                    cleanup=True,
+                )
+                payload = analysis.bundle
+                if analysis.cleanup_stats.get("cleanup_applied"):
+                    print(f"Normalized reaction for featurization: {analysis.reaction_smiles}")
             else:
                 molecule_options = dict(current_options)
                 molecule_options.pop("llm_assist", None)
