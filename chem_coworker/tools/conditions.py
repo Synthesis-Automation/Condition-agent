@@ -260,10 +260,12 @@ def _recommend_conditions(
                 "avg_yield":         scores.get("avg_yield", rec.get("avg_yield")),
                 "median_yield":      scores.get("median_yield", rec.get("median_yield")),
                 "match_score":       scores.get("match_score", rec.get("match_score")),
+                "condition_quality_score": scores.get("condition_quality_score", rec.get("condition_quality_score", 1.0)),
                 "num_experiments":   int(scores.get("num_experiments", rec.get("num_experiments", 0)) or 0),
                 "reaction_type":     rec.get("reaction") or rec.get("reaction_type") or "",
                 "reaction_category": rec.get("reaction_category") or "",
                 "reactant_types":    rec.get("reactant_types") or [],
+                "missing_required_fields": rec.get("missing_required_fields") or [],
                 "source":            rec.get("source") or rec.get("source_group") or (source_group or ""),
                 "precedent_ids":     rec.get("reaction_id") or rec.get("precedent_ids") or "",
             }
@@ -292,6 +294,20 @@ def _recommend_conditions(
         except Exception:
             database_coverage = None
         is_fallback_match = bool(hte_extra.get("is_fallback_match", False))
+        catalyst_requirement_enforced = bool(hte_extra.get("catalyst_requirement_enforced", False))
+        required_catalyst_family = str(hte_extra.get("required_catalyst_family") or "").strip() or None
+        required_catalyst_classes = [
+            str(value).strip()
+            for value in (hte_extra.get("required_catalyst_classes") or [])
+            if str(value).strip()
+        ]
+        filtered_missing_catalyst_rows = int(hte_extra.get("filtered_missing_catalyst_rows") or 0)
+        retained_missing_catalyst_rows = int(hte_extra.get("retained_missing_catalyst_rows") or 0)
+        condition_quality_family = str(hte_extra.get("condition_quality_family") or "").strip() or None
+        penalized_incomplete_condition_rows = int(hte_extra.get("penalized_incomplete_condition_rows") or 0)
+        missing_required_condition_fields = hte_extra.get("missing_required_condition_fields") or {}
+        if not isinstance(missing_required_condition_fields, dict):
+            missing_required_condition_fields = {}
 
         warnings: List[str] = []
         if reaction_type_confidence is not None and reaction_type_confidence < 0.5:
@@ -305,6 +321,31 @@ def _recommend_conditions(
         if cleaned and int(cleaned[0].get("num_experiments", 0) or 0) < 2:
             warnings.append(
                 "Top condition recommendation has limited experimental support (<2 experiments)."
+            )
+        if retained_missing_catalyst_rows > 0 and catalyst_requirement_enforced:
+            catalyst_desc = ", ".join(required_catalyst_classes) if required_catalyst_classes else "a catalyst"
+            family_desc = required_catalyst_family or "the detected reaction family"
+            warnings.append(
+                f"Matched source rows for {family_desc} are missing required catalyst annotations ({catalyst_desc}); source data is incomplete."
+            )
+        elif filtered_missing_catalyst_rows > 0 and catalyst_requirement_enforced:
+            warnings.append(
+                f"Filtered {filtered_missing_catalyst_rows} matched rows with missing catalyst annotations for a catalyst-required reaction family."
+            )
+        if penalized_incomplete_condition_rows > 0:
+            field_bits = ", ".join(
+                f"{field}={count}" for field, count in sorted(missing_required_condition_fields.items())
+            )
+            family_desc = condition_quality_family or required_catalyst_family or "the detected reaction family"
+            suffix = f" ({field_bits})" if field_bits else ""
+            warnings.append(
+                f"Penalized {penalized_incomplete_condition_rows} matched rows with incomplete reaction-critical conditions for {family_desc}{suffix}."
+            )
+        if cleaned and cleaned[0].get("missing_required_fields"):
+            family_desc = condition_quality_family or required_catalyst_family or "this reaction family"
+            missing_desc = ", ".join(str(value) for value in cleaned[0]["missing_required_fields"] if str(value).strip())
+            warnings.append(
+                f"Top condition recommendation is still missing required fields for {family_desc}: {missing_desc}."
             )
 
         result = _success({
@@ -322,6 +363,14 @@ def _recommend_conditions(
                 "matched_transformation": matched_transformation,
                 "total_matching_experiments": total_matching_experiments,
                 "database_coverage": database_coverage,
+                "catalyst_requirement_enforced": catalyst_requirement_enforced,
+                "required_catalyst_family": required_catalyst_family,
+                "required_catalyst_classes": required_catalyst_classes,
+                "filtered_missing_catalyst_rows": filtered_missing_catalyst_rows,
+                "retained_missing_catalyst_rows": retained_missing_catalyst_rows,
+                "condition_quality_family": condition_quality_family,
+                "penalized_incomplete_condition_rows": penalized_incomplete_condition_rows,
+                "missing_required_condition_fields": missing_required_condition_fields,
             },
             "hte_timing_ms": hte_timing_ms or {},
             "hte_processing_time_ms": hte_processing_time_ms,

@@ -100,6 +100,14 @@ class TestRecommendConditionsSelectionMode:
                     "matched_motifs": ["RXNEVT|sig=LGDisp+C-C|form=C-C"],
                     "total_matching_experiments": 3,
                     "database_coverage": 0.12,
+                    "catalyst_requirement_enforced": True,
+                    "required_catalyst_family": "Suzuki_miyaura",
+                    "required_catalyst_classes": ["Pd"],
+                    "filtered_missing_catalyst_rows": 1,
+                    "retained_missing_catalyst_rows": 0,
+                    "condition_quality_family": "Suzuki_miyaura",
+                    "penalized_incomplete_condition_rows": 1,
+                    "missing_required_condition_fields": {"base": 1},
                 }
             },
             "recommended_conditions": [
@@ -107,21 +115,21 @@ class TestRecommendConditionsSelectionMode:
                     "rank": 1,
                     "conditions": {"catalyst": "Pd(OAc)2", "ligand": "SPhos", "base": "K3PO4", "solvent": "dioxane"},
                     "confidence": 0.91,
-                    "component_scores": {"success_rate": 0.9, "avg_yield": 88.0, "median_yield": 89.0, "match_score": 0.95, "num_experiments": 6},
+                    "component_scores": {"success_rate": 0.9, "avg_yield": 88.0, "median_yield": 89.0, "match_score": 0.95, "num_experiments": 6, "condition_quality_score": 1.0},
                     "reaction": "Suzuki_miyaura",
                 },
                 {
                     "rank": 2,
                     "conditions": {"catalyst": "Pd2(dba)3", "ligand": "XPhos", "base": "K3PO4", "solvent": "dioxane"},
                     "confidence": 0.84,
-                    "component_scores": {"success_rate": 0.82, "avg_yield": 81.0, "median_yield": 82.0, "match_score": 0.92, "num_experiments": 5},
+                    "component_scores": {"success_rate": 0.82, "avg_yield": 81.0, "median_yield": 82.0, "match_score": 0.92, "num_experiments": 5, "condition_quality_score": 1.0},
                     "reaction": "Suzuki_miyaura",
                 },
                 {
                     "rank": 3,
                     "conditions": {"catalyst": "CuI", "ligand": "phen", "base": "Cs2CO3", "solvent": "DMSO"},
                     "confidence": 0.66,
-                    "component_scores": {"success_rate": 0.7, "avg_yield": 67.0, "median_yield": 66.0, "match_score": 0.75, "num_experiments": 1},
+                    "component_scores": {"success_rate": 0.7, "avg_yield": 67.0, "median_yield": 66.0, "match_score": 0.75, "num_experiments": 1, "condition_quality_score": 1.0},
                     "reaction": "Suzuki_miyaura",
                 },
             ],
@@ -153,8 +161,43 @@ class TestRecommendConditionsSelectionMode:
         assert result["selection_mode"] == "diverse"
         assert result["reaction_type_confidence"] == pytest.approx(0.42)
         assert result["evidence"]["is_fallback_match"] is True
+        assert result["evidence"]["filtered_missing_catalyst_rows"] == 1
+        assert result["evidence"]["penalized_incomplete_condition_rows"] == 1
         assert "RXNEVT|" in result["evidence"]["matched_transformation"]
         assert result["_warnings"]
+
+    def test_best_mode_warns_when_only_incomplete_catalyst_rows_exist(self, monkeypatch):
+        payload = self._payload()
+        payload["extras"]["hte"]["filtered_missing_catalyst_rows"] = 0
+        payload["extras"]["hte"]["retained_missing_catalyst_rows"] = 2
+
+        monkeypatch.setattr(
+            "chemtools.recommend.hte_adapter.recommend_from_reaction",
+            lambda *args, **kwargs: payload,
+        )
+
+        result = _recommend_conditions("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1-c1ccccc1", top_k=2, selection_mode="best")
+
+        assert result["success"] is True
+        assert result["evidence"]["retained_missing_catalyst_rows"] == 2
+        assert any("missing required catalyst annotations" in warning for warning in result["_warnings"])
+
+    def test_best_mode_warns_when_top_recommendation_is_incomplete(self, monkeypatch):
+        payload = self._payload()
+        payload["recommended_conditions"][0]["conditions"]["base"] = ""
+        payload["recommended_conditions"][0]["missing_required_fields"] = ["base"]
+        payload["recommended_conditions"][0]["component_scores"]["condition_quality_score"] = 0.55
+
+        monkeypatch.setattr(
+            "chemtools.recommend.hte_adapter.recommend_from_reaction",
+            lambda *args, **kwargs: payload,
+        )
+
+        result = _recommend_conditions("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1-c1ccccc1", top_k=2, selection_mode="best")
+
+        assert result["success"] is True
+        assert result["recommendations"][0]["missing_required_fields"] == ["base"]
+        assert any("Top condition recommendation is still missing required fields" in warning for warning in result["_warnings"])
 
 
 # ---------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from chemtools.recommend import recommender as hte
 from chemtools.recommend.recommender import HTERecommender
@@ -344,12 +345,16 @@ def test_recommend_keeps_distinct_optional_condition_regimes(monkeypatch) -> Non
         return df, indexed_data, reaction_type_patterns, transformation_indices
 
     def fake_detect(self, smiles: str):
-        if "B" in smiles:
+        if "B(" in smiles:
             return ["Ar-B(OH)2"], "Aryl Boronate"
         return ["Ar-X"], "Aryl Halide"
 
+    def fake_precedent(self, *args, **kwargs):
+        return []
+
     monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
     monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
 
     recommender = HTERecommender(hte_db_path="data/HTE_db")
     result = recommender.recommend(
@@ -720,6 +725,214 @@ def test_detected_type_filter_applies_even_when_query_key_matches(monkeypatch) -
 
 def test_resolve_reaction_type_label_handles_sample_suffix() -> None:
     assert hte._resolve_reaction_type_label("suzuki_miyaura_sample500") == "Suzuki_miyaura"
+
+
+def test_required_catalyst_family_filters_missing_catalyst_rows(monkeypatch) -> None:
+    incomplete = _make_min_hte_df()
+    incomplete["Reactant_A_Type"] = ["Ar-Cl"]
+    incomplete["Reactant_B_Type"] = ["Ar-B(OH)2"]
+    incomplete["Catalyst"] = [""]
+    incomplete["Ligand"] = ["missing_entry"]
+    incomplete["z-Score"] = [4.5]
+    incomplete["AREA_TOTAL_REDUCED"] = [92.0]
+
+    complete = incomplete.copy()
+    complete["Catalyst"] = ["Pd(dppf)Cl2"]
+    complete["Ligand"] = ["dppf"]
+    complete["z-Score"] = [1.6]
+    complete["AREA_TOTAL_REDUCED"] = [78.0]
+
+    df = pd.concat([incomplete, complete], ignore_index=True)
+    key = hte._reactant_key(["Ar-B(OH)2", "Ar-Cl"])
+    indexed_data = {key: df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "B(" in smiles:
+            return ["Ar-B(OH)2"], "Aryl Boronate"
+        return ["Ar-Cl"], "Aryl Halide"
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="OB(O)c1ccccc1",
+        top_k=5,
+        min_experiments=1,
+        source_group="literature",
+        reaction_type_filter="Suzuki_miyaura",
+    )
+
+    assert result.recommendations
+    assert [rec.catalyst for rec in result.recommendations] == ["Pd(dppf)Cl2"]
+    assert result.catalyst_requirement_enforced is True
+    assert result.required_catalyst_family == "Suzuki_miyaura"
+    assert result.required_catalyst_classes == ("Pd",)
+    assert result.filtered_missing_catalyst_rows == 1
+    assert result.retained_missing_catalyst_rows == 0
+
+
+def test_required_catalyst_family_retains_sparse_incomplete_rows(monkeypatch) -> None:
+    sparse = _make_min_hte_df()
+    sparse["Reactant_A_Type"] = ["Ar-Cl"]
+    sparse["Reactant_B_Type"] = ["Ar-B(OH)2"]
+    sparse["Catalyst"] = [""]
+    sparse["Ligand"] = ["entry_a"]
+    sparse["z-Score"] = [2.4]
+    sparse["AREA_TOTAL_REDUCED"] = [66.0]
+
+    alt = sparse.copy()
+    alt["Ligand"] = ["entry_b"]
+    alt["z-Score"] = [1.9]
+    alt["AREA_TOTAL_REDUCED"] = [61.0]
+
+    df = pd.concat([sparse, alt], ignore_index=True)
+    key = hte._reactant_key(["Ar-B(OH)2", "Ar-Cl"])
+    indexed_data = {key: df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "B(" in smiles:
+            return ["Ar-B(OH)2"], "Aryl Boronate"
+        return ["Ar-Cl"], "Aryl Halide"
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="OB(O)c1ccccc1",
+        top_k=5,
+        min_experiments=1,
+        source_group="literature",
+        reaction_type_filter="Suzuki_miyaura",
+    )
+
+    assert result.recommendations
+    assert all((rec.catalyst or "") == "" for rec in result.recommendations)
+    assert result.catalyst_requirement_enforced is True
+    assert result.filtered_missing_catalyst_rows == 0
+    assert result.retained_missing_catalyst_rows == 2
+
+
+def test_suzuki_missing_base_is_penalized(monkeypatch) -> None:
+    incomplete = _make_min_hte_df()
+    incomplete["Reactant_A_Type"] = ["Ar-Cl"]
+    incomplete["Reactant_B_Type"] = ["Ar-B(OH)2"]
+    incomplete["Catalyst"] = ["Pd(OAc)2"]
+    incomplete["Ligand"] = ["SPhos"]
+    incomplete["Base"] = [""]
+    incomplete["z-Score"] = [4.2]
+    incomplete["AREA_TOTAL_REDUCED"] = [90.0]
+
+    complete = incomplete.copy()
+    complete["Base"] = ["K3PO4"]
+    complete["z-Score"] = [1.5]
+    complete["AREA_TOTAL_REDUCED"] = [76.0]
+
+    df = pd.concat([incomplete, complete], ignore_index=True)
+    key = hte._reactant_key(["Ar-B(OH)2", "Ar-Cl"])
+    indexed_data = {key: df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "B(" in smiles:
+            return ["Ar-B(OH)2"], "Aryl Boronate"
+        return ["Ar-Cl"], "Aryl Halide"
+
+    def fake_precedent(self, *args, **kwargs):
+        return []
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="OB(O)c1ccccc1",
+        top_k=5,
+        min_experiments=1,
+        source_group="literature",
+        reaction_type_filter="Suzuki_miyaura",
+    )
+
+    assert len(result.recommendations) == 2
+    assert result.recommendations[0].base == "K3PO4"
+    assert result.recommendations[0].condition_quality_score == pytest.approx(1.0)
+    assert result.recommendations[1].missing_required_fields == ("base",)
+    assert result.penalized_incomplete_condition_rows == 1
+    assert result.missing_required_condition_fields == {"base": 1}
+
+
+def test_pd_c_n_coupling_missing_ligand_is_penalized(monkeypatch) -> None:
+    incomplete = _make_min_hte_df()
+    incomplete["Reaction_Type_Standardized"] = ["C_N_Coupling"]
+    incomplete["Reactant_A_Type"] = ["Ar-Cl"]
+    incomplete["Reactant_B_Type"] = ["Alkyl-NH2"]
+    incomplete["Catalyst"] = ["Pd(OAc)2"]
+    incomplete["Ligand"] = [""]
+    incomplete["Base"] = ["NaOtBu"]
+    incomplete["Solvent"] = ["toluene"]
+    incomplete["z-Score"] = [4.0]
+    incomplete["AREA_TOTAL_REDUCED"] = [88.0]
+
+    complete = incomplete.copy()
+    complete["Ligand"] = ["BrettPhos"]
+    complete["z-Score"] = [1.7]
+    complete["AREA_TOTAL_REDUCED"] = [73.0]
+
+    df = pd.concat([incomplete, complete], ignore_index=True)
+    key = hte._reactant_key(["Alkyl-NH2", "Ar-Cl"])
+    indexed_data = {key: df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "N" in smiles and "Cl" not in smiles:
+            return ["Alkyl-NH2"], "Amine"
+        return ["Ar-Cl"], "Aryl Halide"
+
+    def fake_precedent(self, *args, **kwargs):
+        return []
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+    monkeypatch.setattr(HTERecommender, "_build_precedent_recommendations", fake_precedent)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="Clc1ccccc1",
+        reactant_b_smiles="CN",
+        top_k=5,
+        min_experiments=1,
+        source_group="literature",
+        reaction_type_filter="C_N_Coupling",
+    )
+
+    assert len(result.recommendations) == 2
+    assert result.recommendations[0].ligand == "BrettPhos"
+    assert result.recommendations[1].missing_required_fields == ("ligand",)
+    assert result.penalized_incomplete_condition_rows == 1
+    assert result.missing_required_condition_fields == {"ligand": 1}
 
 
 def test_best_seller_scoring_beats_single_outlier(monkeypatch) -> None:

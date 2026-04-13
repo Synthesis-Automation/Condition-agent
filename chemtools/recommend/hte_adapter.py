@@ -118,6 +118,8 @@ def _serialize_recommendation(rec: Any) -> Dict[str, Any]:
         "avg_z_score": rec.avg_z_score,
         "confidence_score": rec.confidence_score,
         "match_score": rec.match_score,
+        "condition_quality_score": rec.condition_quality_score,
+        "missing_required_fields": list(rec.missing_required_fields) if rec.missing_required_fields else [],
         "reaction_type": rec.reaction_type,
         "reaction_category": rec.reaction_category,
         "reaction_id": rec.reaction_id,
@@ -173,6 +175,7 @@ def _build_recommendation_entries(result: Any, requested_type: Optional[str]) ->
             "median_yield": rec.median_yield,
             "num_experiments": rec.num_experiments,
             "spectator_score": rec.spectator_score,
+            "condition_quality_score": rec.condition_quality_score,
         }
 
         entry: Dict[str, Any] = {
@@ -185,6 +188,7 @@ def _build_recommendation_entries(result: Any, requested_type: Optional[str]) ->
             "reaction_category": rec.reaction_category,
             "reaction_id": rec.reaction_id,
             "reactant_types": list(rec.reactant_types) if rec.reactant_types else [],
+            "missing_required_fields": list(rec.missing_required_fields) if rec.missing_required_fields else [],
             "z_score_range": list(rec.z_score_range) if rec.z_score_range else [],
         }
 
@@ -302,6 +306,14 @@ def recommend_from_reaction(
             "total_matching_experiments": getattr(result, "total_matching_experiments", 0),
             "database_coverage": getattr(result, "database_coverage", 0.0),
             "is_fallback_match": getattr(result, "is_fallback_match", False),
+            "catalyst_requirement_enforced": getattr(result, "catalyst_requirement_enforced", False),
+            "required_catalyst_family": getattr(result, "required_catalyst_family", None),
+            "required_catalyst_classes": list(getattr(result, "required_catalyst_classes", ()) or ()),
+            "filtered_missing_catalyst_rows": getattr(result, "filtered_missing_catalyst_rows", 0),
+            "retained_missing_catalyst_rows": getattr(result, "retained_missing_catalyst_rows", 0),
+            "condition_quality_family": getattr(result, "condition_quality_family", None),
+            "penalized_incomplete_condition_rows": getattr(result, "penalized_incomplete_condition_rows", 0),
+            "missing_required_condition_fields": dict(getattr(result, "missing_required_condition_fields", {}) or {}),
             "matched_motifs": list(getattr(result, "matched_motifs", ()) or ()),
             "reacted_motifs": list(getattr(result, "reacted_motifs", ()) or ()),
             "formed_motifs": list(getattr(result, "formed_motifs", ()) or ()),

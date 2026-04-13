@@ -1085,6 +1085,285 @@ def _resolve_reaction_type_label(label: Optional[str]) -> str:
     return text
 
 
+@lru_cache(maxsize=256)
+def _required_catalyst_classes_for_reaction_type(label: Optional[str]) -> Tuple[str, ...]:
+    resolved = _resolve_reaction_type_label(label)
+    if not resolved or _reaction_catalog is None:
+        return ()
+    definition = _reaction_catalog.get_reaction_type(resolved)
+    if definition is None:
+        return ()
+    catalysts = [str(value).strip() for value in getattr(definition, "catalysts", []) or []]
+    return tuple(value for value in catalysts if value)
+
+
+def _series_has_text(values: pd.Series) -> pd.Series:
+    text = values.fillna("").astype(str).str.strip()
+    return (text != "") & (text.str.lower() != "nan")
+
+
+def _row_has_catalyst_evidence(df: pd.DataFrame) -> pd.Series:
+    mask = pd.Series([False] * len(df), index=df.index)
+    if "Catalyst" in df.columns:
+        mask = mask | _series_has_text(df["Catalyst"])
+    if "Catalyst_Type" in df.columns:
+        mask = mask | _series_has_text(df["Catalyst_Type"])
+    return mask
+
+
+def _enforce_required_catalyst_quality(
+    matched_df: pd.DataFrame,
+    *,
+    reaction_type_filter: Optional[str],
+    predicted_reaction_type: Optional[str],
+    reaction_type_confidence: float,
+) -> Tuple[pd.DataFrame, Optional[str], Tuple[str, ...], int, int]:
+    if matched_df.empty or "Reaction_Type_Standardized" not in matched_df.columns:
+        return matched_df, None, (), 0, 0
+
+    target_reaction = reaction_type_filter
+    if (
+        not target_reaction
+        and predicted_reaction_type
+        and predicted_reaction_type != "Unknown"
+        and reaction_type_confidence >= 0.5
+    ):
+        target_reaction = predicted_reaction_type
+    target_reaction = _resolve_reaction_type_label(target_reaction)
+    required_catalysts = _required_catalyst_classes_for_reaction_type(target_reaction)
+    if not target_reaction or not required_catalysts:
+        return matched_df, None, (), 0, 0
+
+    type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+    family_mask = type_series.apply(
+        lambda value: _resolve_reaction_type_label(value) == target_reaction if value else False
+    )
+    if not family_mask.any():
+        return matched_df, target_reaction, required_catalysts, 0, 0
+
+    catalyst_evidence_mask = _row_has_catalyst_evidence(matched_df)
+    missing_required_catalyst_mask = family_mask & ~catalyst_evidence_mask
+    if not missing_required_catalyst_mask.any():
+        return matched_df, target_reaction, required_catalysts, 0, 0
+
+    complete_family_mask = family_mask & catalyst_evidence_mask
+    if complete_family_mask.any():
+        filtered_rows = int(missing_required_catalyst_mask.sum())
+        return (
+            matched_df.loc[~missing_required_catalyst_mask].copy(),
+            target_reaction,
+            required_catalysts,
+            filtered_rows,
+            0,
+        )
+
+    return matched_df, target_reaction, required_catalysts, 0, int(missing_required_catalyst_mask.sum())
+
+
+_CONDITION_FIELD_COLUMNS: Dict[str, Tuple[str, ...]] = {
+    "catalyst": ("Catalyst", "Catalyst_Type"),
+    "ligand": ("Ligand",),
+    "base": ("Base",),
+    "solvent": ("Solvent",),
+}
+
+_FAMILY_CONDITION_COMPLETENESS_RULES: Dict[str, Dict[str, Any]] = {
+    "Suzuki_miyaura": {
+        "default": ("catalyst", "base", "solvent"),
+        "penalties": {"catalyst": 0.15, "base": 0.55, "solvent": 0.70},
+    },
+    "Miyaura_borylation": {
+        "default": ("catalyst", "base", "solvent"),
+        "penalties": {"catalyst": 0.15, "base": 0.60, "solvent": 0.70},
+    },
+    "C_N_Coupling": {
+        "default": ("catalyst", "base", "solvent"),
+        "by_catalyst": {
+            "Pd": ("catalyst", "ligand", "base", "solvent"),
+            "Ni": ("catalyst", "ligand", "base", "solvent"),
+            "Cu": ("catalyst", "base", "solvent"),
+        },
+        "penalties": {"catalyst": 0.15, "ligand": 0.50, "base": 0.60, "solvent": 0.75},
+    },
+    "C_O_Coupling": {
+        "default": ("catalyst", "base", "solvent"),
+        "by_catalyst": {
+            "Pd": ("catalyst", "ligand", "base", "solvent"),
+            "Ni": ("catalyst", "ligand", "base", "solvent"),
+            "Cu": ("catalyst", "base", "solvent"),
+        },
+        "penalties": {"catalyst": 0.15, "ligand": 0.55, "base": 0.60, "solvent": 0.75},
+    },
+    "C_S_Coupling": {
+        "default": ("catalyst", "base", "solvent"),
+        "by_catalyst": {
+            "Pd": ("catalyst", "ligand", "base", "solvent"),
+            "Ni": ("catalyst", "ligand", "base", "solvent"),
+            "Cu": ("catalyst", "base", "solvent"),
+        },
+        "penalties": {"catalyst": 0.15, "ligand": 0.55, "base": 0.60, "solvent": 0.75},
+    },
+    "Chan_Lam_C_N_Coupling": {
+        "default": ("catalyst", "solvent"),
+        "penalties": {"catalyst": 0.20, "solvent": 0.75},
+    },
+}
+
+
+def _condition_text_present(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, float) and pd.isna(value):
+        return False
+    text = str(value).strip()
+    if not text:
+        return False
+    return text.lower() != "nan"
+
+
+def _row_condition_field_present(row: Mapping[str, Any], field_name: str) -> bool:
+    for column in _CONDITION_FIELD_COLUMNS.get(field_name, ()):
+        if column in row and _condition_text_present(row[column]):
+            return True
+    return False
+
+
+def _infer_catalyst_class(
+    catalyst_value: Any,
+    catalyst_type_value: Any,
+    allowed_classes: Tuple[str, ...],
+) -> Optional[str]:
+    candidates = [catalyst_type_value, catalyst_value]
+    normalized_allowed = [str(value).strip() for value in allowed_classes if str(value).strip()]
+    if not normalized_allowed:
+        return None
+
+    for candidate in candidates:
+        if not _condition_text_present(candidate):
+            continue
+        text = str(candidate).strip()
+        text_upper = text.upper()
+        text_tokens = set(re.findall(r"[A-Z][a-z]?|[A-Z]{2,}", text))
+        compact_tokens = set(re.findall(r"[A-Z]{1,3}", re.sub(r"[^A-Za-z]", " ", text_upper)))
+        for catalyst_class in normalized_allowed:
+            cls_upper = catalyst_class.upper()
+            if (
+                text_upper.startswith(cls_upper)
+                or f" {cls_upper}" in f" {text_upper}"
+                or cls_upper in text_tokens
+                or cls_upper in compact_tokens
+            ):
+                return catalyst_class
+    return None
+
+
+def _required_condition_fields_for_reaction_type(
+    reaction_type: Optional[str],
+    catalyst_class: Optional[str] = None,
+) -> Tuple[Tuple[str, ...], Dict[str, float]]:
+    resolved = _resolve_reaction_type_label(reaction_type)
+    profile = _FAMILY_CONDITION_COMPLETENESS_RULES.get(resolved)
+    if not profile:
+        return (), {}
+    penalties = {
+        str(key): float(value)
+        for key, value in (profile.get("penalties") or {}).items()
+    }
+    required = tuple(str(value) for value in (profile.get("default") or ()) if str(value))
+    by_catalyst = profile.get("by_catalyst") or {}
+    if catalyst_class:
+        required = tuple(str(value) for value in (by_catalyst.get(catalyst_class) or required) if str(value))
+    return required, penalties
+
+
+def _apply_required_condition_quality_penalties(
+    matched_df: pd.DataFrame,
+    *,
+    reaction_type_filter: Optional[str],
+    predicted_reaction_type: Optional[str],
+    reaction_type_confidence: float,
+) -> Tuple[pd.DataFrame, Optional[str], Dict[str, int], int]:
+    if matched_df.empty or "Reaction_Type_Standardized" not in matched_df.columns:
+        return matched_df, None, {}, 0
+
+    target_reaction = reaction_type_filter
+    if (
+        not target_reaction
+        and predicted_reaction_type
+        and predicted_reaction_type != "Unknown"
+        and reaction_type_confidence >= 0.5
+    ):
+        target_reaction = predicted_reaction_type
+    target_reaction = _resolve_reaction_type_label(target_reaction)
+    required_catalysts = _required_catalyst_classes_for_reaction_type(target_reaction)
+    default_required_fields, _ = _required_condition_fields_for_reaction_type(target_reaction)
+    if not target_reaction or not default_required_fields:
+        return matched_df, None, {}, 0
+
+    type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+    family_mask = type_series.apply(
+        lambda value: _resolve_reaction_type_label(value) == target_reaction if value else False
+    )
+    if not family_mask.any():
+        return matched_df, target_reaction, {}, 0
+
+    working_df = matched_df.copy()
+    existing_match_scores = (
+        pd.to_numeric(working_df["match_score"], errors="coerce").fillna(1.0)
+        if "match_score" in working_df.columns
+        else pd.Series([1.0] * len(working_df), index=working_df.index, dtype=float)
+    )
+    quality_multiplier = pd.Series([1.0] * len(working_df), index=working_df.index, dtype=float)
+    missing_field_labels = pd.Series([""] * len(working_df), index=working_df.index, dtype=object)
+    missing_field_counts: Counter[str] = Counter()
+    penalized_rows = 0
+
+    source_series = (
+        working_df["Source_Group"].apply(_normalize_source_group)
+        if "Source_Group" in working_df.columns
+        else pd.Series([""] * len(working_df), index=working_df.index)
+    )
+    catalyst_series = (
+        working_df["Catalyst"] if "Catalyst" in working_df.columns else pd.Series([""] * len(working_df), index=working_df.index)
+    )
+    catalyst_type_series = (
+        working_df["Catalyst_Type"] if "Catalyst_Type" in working_df.columns else pd.Series([""] * len(working_df), index=working_df.index)
+    )
+
+    for idx in working_df.index[family_mask]:
+        if source_series.loc[idx] == "rules":
+            continue
+        catalyst_class = _infer_catalyst_class(
+            catalyst_series.loc[idx],
+            catalyst_type_series.loc[idx],
+            required_catalysts,
+        )
+        required_fields, penalty_map = _required_condition_fields_for_reaction_type(target_reaction, catalyst_class)
+        if not required_fields:
+            continue
+
+        row = working_df.loc[idx]
+        missing_fields = [field for field in required_fields if not _row_condition_field_present(row, field)]
+        if not missing_fields:
+            continue
+
+        penalized_rows += 1
+        multiplier = 1.0
+        for field in missing_fields:
+            missing_field_counts[field] += 1
+            multiplier *= float(penalty_map.get(field, 0.75))
+        quality_multiplier.loc[idx] = max(0.0, min(1.0, multiplier))
+        missing_field_labels.loc[idx] = "|".join(sorted(missing_fields))
+
+    if penalized_rows == 0:
+        return matched_df, target_reaction, {}, 0
+
+    working_df["match_score"] = existing_match_scores * quality_multiplier
+    working_df["_condition_quality_multiplier"] = quality_multiplier
+    working_df["_missing_required_condition_fields"] = missing_field_labels
+    return working_df, target_reaction, dict(sorted(missing_field_counts.items())), penalized_rows
+
+
 def _format_source_reaction_ids(
     group_df: pd.DataFrame,
     *,
@@ -2717,6 +2996,8 @@ class ConditionRecommendation:
     avg_z_score: float = 0.0  # Average z-score (PRIMARY ranking metric for condition success)
     confidence_score: float = 0.0  # Secondary score considering z-score and sample size
     match_score: float = 1.0  # How well the transformation matched the query
+    condition_quality_score: float = 1.0
+    missing_required_fields: Tuple[str, ...] = ()
     
     # Metadata
     reaction_type: Optional[str] = None
@@ -2768,6 +3049,14 @@ class HTERecommendationResult:
     database_coverage: float = 0.0  # % of database that matches this query
     is_fallback_match: bool = False
     is_filtered_by_detected_type: bool = False  # Whether results were filtered by detected reaction type
+    catalyst_requirement_enforced: bool = False
+    required_catalyst_family: Optional[str] = None
+    required_catalyst_classes: Tuple[str, ...] = ()
+    filtered_missing_catalyst_rows: int = 0
+    retained_missing_catalyst_rows: int = 0
+    condition_quality_family: Optional[str] = None
+    penalized_incomplete_condition_rows: int = 0
+    missing_required_condition_fields: Dict[str, int] = field(default_factory=dict)
     matched_motifs: Optional[Tuple[str, str]] = None
     timing_ms: Dict[str, float] = field(default_factory=dict)
 
@@ -3458,6 +3747,13 @@ class HTERecommender:
             working_df["_match_numeric"] = pd.to_numeric(working_df["match_score"], errors="coerce").fillna(0.0)
         else:
             working_df["_match_numeric"] = 1.0
+        if "_condition_quality_multiplier" in working_df.columns:
+            working_df["_quality_numeric"] = pd.to_numeric(
+                working_df["_condition_quality_multiplier"],
+                errors="coerce",
+            ).fillna(1.0)
+        else:
+            working_df["_quality_numeric"] = 1.0
         if "spectator_score" in working_df.columns:
             working_df["_spectator_numeric"] = pd.to_numeric(
                 working_df["spectator_score"],
@@ -3628,6 +3924,18 @@ class HTERecommender:
                 spectator_score = float(group_df["_spectator_numeric"].mean())
             
             match_score = float(group_df["_match_numeric"].mean()) if "_match_numeric" in group_df.columns else 1.0
+            condition_quality_score = float(group_df["_quality_numeric"].mean()) if "_quality_numeric" in group_df.columns else 1.0
+            missing_required_fields: Tuple[str, ...] = ()
+            if "_missing_required_condition_fields" in group_df.columns:
+                tokens = []
+                for value in group_df["_missing_required_condition_fields"]:
+                    text = str(value or "").strip()
+                    if not text:
+                        continue
+                    tokens.extend(token.strip() for token in text.split("|") if token.strip())
+                if tokens:
+                    missing_required_fields = tuple(sorted(set(tokens)))
+                    confidence = confidence * condition_quality_score
             
             rec = ConditionRecommendation(
                 catalyst=catalyst if pd.notna(catalyst) else "",
@@ -3646,6 +3954,8 @@ class HTERecommender:
                 avg_z_score=avg_z_score,
                 confidence_score=confidence,
                 match_score=match_score,
+                condition_quality_score=condition_quality_score,
+                missing_required_fields=missing_required_fields,
                 reaction_type=reaction_type,
                 reaction_category=reaction_category,
                 reaction_id=reaction_id,
@@ -3663,6 +3973,7 @@ class HTERecommender:
         recommendations.sort(
             key=lambda x: (
                 x.match_score,
+                x.condition_quality_score,
                 x.avg_z_score,
                 x.num_experiments,
                 x.confidence_score,
@@ -4490,6 +4801,38 @@ class HTERecommender:
 
                 enforce_mask = enforce_rows_mask & type_mask & motif_mask
                 matched_df = matched_df[~enforce_rows_mask | enforce_mask]
+
+        (
+            matched_df,
+            required_catalyst_family,
+            required_catalyst_classes,
+            filtered_missing_catalyst_rows,
+            retained_missing_catalyst_rows,
+        ) = _enforce_required_catalyst_quality(
+            matched_df,
+            reaction_type_filter=reaction_type_filter,
+            predicted_reaction_type=result.predicted_reaction_type,
+            reaction_type_confidence=result.reaction_type_confidence,
+        )
+        result.required_catalyst_family = required_catalyst_family
+        result.required_catalyst_classes = required_catalyst_classes
+        result.catalyst_requirement_enforced = bool(required_catalyst_classes)
+        result.filtered_missing_catalyst_rows = filtered_missing_catalyst_rows
+        result.retained_missing_catalyst_rows = retained_missing_catalyst_rows
+        (
+            matched_df,
+            condition_quality_family,
+            missing_required_condition_fields,
+            penalized_incomplete_condition_rows,
+        ) = _apply_required_condition_quality_penalties(
+            matched_df,
+            reaction_type_filter=reaction_type_filter,
+            predicted_reaction_type=result.predicted_reaction_type,
+            reaction_type_confidence=result.reaction_type_confidence,
+        )
+        result.condition_quality_family = condition_quality_family
+        result.missing_required_condition_fields = missing_required_condition_fields
+        result.penalized_incomplete_condition_rows = penalized_incomplete_condition_rows
         
         result.total_matching_experiments = len(matched_df)
         coverage_df = self.df
