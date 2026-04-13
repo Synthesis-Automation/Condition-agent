@@ -84,7 +84,7 @@ def _select_reactants(
     return reactant_a, reactant_b
 
 
-def _rec_key(rec: Any) -> Tuple[str, str, str, str, str, str, str]:
+def _rec_key(rec: Any) -> Tuple[str, str, str, str, str, str, str, str, str]:
     return (
         rec.catalyst or "",
         rec.ligand or "",
@@ -93,6 +93,8 @@ def _rec_key(rec: Any) -> Tuple[str, str, str, str, str, str, str]:
         rec.secondary_solvent or "",
         rec.additive or "",
         rec.coupling_reagent or "",
+        "" if rec.temperature is None else str(rec.temperature),
+        rec.atmosphere or "",
     )
 
 
@@ -105,6 +107,8 @@ def _serialize_recommendation(rec: Any) -> Dict[str, Any]:
         "secondary_solvent": rec.secondary_solvent,
         "additive": rec.additive,
         "coupling_reagent": rec.coupling_reagent,
+        "temperature": rec.temperature,
+        "atmosphere": rec.atmosphere,
         "spectator_groups": rec.spectator_groups,
         "spectator_score": rec.spectator_score,
         "success_rate": rec.success_rate,
@@ -124,8 +128,8 @@ def _serialize_recommendation(rec: Any) -> Dict[str, Any]:
     }
 
 
-def _build_source_lookup(result: Any) -> Dict[Tuple[str, str, str, str, str, str, str], str]:
-    source_lookup: Dict[Tuple[str, str, str, str, str, str, str], str] = {}
+def _build_source_lookup(result: Any) -> Dict[Tuple[str, str, str, str, str, str, str, str, str], str]:
+    source_lookup: Dict[Tuple[str, str, str, str, str, str, str, str, str], str] = {}
     by_source = getattr(result, "recommendations_by_source", {}) or {}
     if not isinstance(by_source, dict):
         return source_lookup
@@ -150,6 +154,8 @@ def _build_recommendation_entries(result: Any, requested_type: Optional[str]) ->
             "secondary_solvent": rec.secondary_solvent,
             "additive": rec.additive,
             "coupling_reagent": rec.coupling_reagent,
+            "temperature": rec.temperature,
+            "atmosphere": rec.atmosphere,
         }
         if rec.spectator_groups:
             conditions["spectator_groups"] = rec.spectator_groups

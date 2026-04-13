@@ -39,7 +39,11 @@ def _diversify(recs: List[Dict], top_k: int) -> List[Dict]:
     """
     buckets: dict = defaultdict(list)
     for rec in recs:
-        metal = _extract_metal(rec.get("catalyst", ""))
+        cond = rec.get("conditions") if isinstance(rec, dict) else {}
+        catalyst = rec.get("catalyst", "") if isinstance(rec, dict) else ""
+        if isinstance(cond, dict) and not catalyst:
+            catalyst = cond.get("catalyst", "")
+        metal = _extract_metal(catalyst)
         buckets[metal].append(rec)
 
     diverse: List[Dict] = []
@@ -66,6 +70,7 @@ def _conditions_cache_key(
     use_spectator_groups: bool = True,
     prefer_mixfp_for_similarity: bool = False,
     similarity_mixfp_weight: float = 0.3,
+    selection_mode: str = "best",
 ) -> str:
     return (
         f"top_k={int(top_k)}"
@@ -74,6 +79,7 @@ def _conditions_cache_key(
         f"|use_spectator_groups={1 if use_spectator_groups else 0}"
         f"|prefer_mixfp_for_similarity={1 if prefer_mixfp_for_similarity else 0}"
         f"|similarity_mixfp_weight={float(similarity_mixfp_weight):.4f}"
+        f"|selection_mode={str(selection_mode or 'best').strip().lower()}"
     )
 
 
@@ -89,6 +95,7 @@ def _recommend_conditions(
     use_spectator_groups: bool = True,
     prefer_mixfp_for_similarity: bool = False,
     similarity_mixfp_weight: float = 0.3,
+    selection_mode: str = "best",
 ) -> Dict[str, Any]:
     """Recommend reaction conditions based on HTE experimental data.
 
@@ -117,6 +124,8 @@ def _recommend_conditions(
             similarity ranking instead of standard FP. Default False.
         similarity_mixfp_weight: Weight of MixFP component in similarity score
             (0.0–1.0, default 0.3). Only used when prefer_mixfp_for_similarity=True.
+        selection_mode: "best" keeps evidence-ranked recommendations as-is.
+            "diverse" round-robins by catalyst metal for screening-style output.
 
     Returns:
         dict with recommendations list, each containing:
@@ -138,6 +147,7 @@ def _recommend_conditions(
             use_spectator_groups=bool(use_spectator_groups),
             prefer_mixfp_for_similarity=bool(prefer_mixfp_for_similarity),
             similarity_mixfp_weight=float(similarity_mixfp_weight),
+            selection_mode=selection_mode,
         )
         if _rtx is not None and hasattr(_rtx, "get_cached_conditions"):
             try:
@@ -151,6 +161,9 @@ def _recommend_conditions(
 
         reaction_smiles = _clean_rxn_smiles(reaction_smiles)
         normalized_source_group = str(source_group or "").strip().lower()
+        normalized_selection_mode = str(selection_mode or "best").strip().lower()
+        if normalized_selection_mode not in {"best", "diverse"}:
+            return _error("selection_mode must be one of: best, diverse")
         raw: Any = None
         if normalized_source_group == "similarity":
             # Align similarity behavior with the recommendation facade used by GUI full-mode.
@@ -210,9 +223,13 @@ def _recommend_conditions(
             hte_timing_ms = meta.get("timing_ms") or hte_extra.get("timing_ms")
             hte_processing_time_ms = meta.get("processing_time_ms")
             hte_recommender_stage_timing_ms = hte_extra.get("recommender_stage_timing_ms")
-        diverse_recs = _diversify(recs, top_k)
+        selected_recs = (
+            _diversify(recs, top_k)
+            if normalized_selection_mode == "diverse"
+            else list(recs[:top_k])
+        )
         cleaned = []
-        for i, rec in enumerate(diverse_recs, 1):
+        for i, rec in enumerate(selected_recs, 1):
             if not isinstance(rec, dict):
                 continue
             # Conditions are nested in rec["conditions"] sub-dict
@@ -252,17 +269,66 @@ def _recommend_conditions(
             }
             cleaned.append(entry)
 
+        detection = raw.get("detection") or {} if isinstance(raw, dict) else {}
+        extras = raw.get("extras") or {} if isinstance(raw, dict) else {}
+        hte_extra = extras.get("hte") or {} if isinstance(extras, dict) else {}
+        matched_motifs = hte_extra.get("matched_motifs") or []
+        matched_transformation = ""
+        if isinstance(matched_motifs, list) and matched_motifs:
+            matched_transformation = str(matched_motifs[0] or "").strip()
+        reaction_type_confidence = detection.get("confidence")
+        if reaction_type_confidence in (None, ""):
+            reaction_type_confidence = hte_extra.get("reaction_type_confidence")
+        try:
+            reaction_type_confidence = (
+                None if reaction_type_confidence in (None, "") else float(reaction_type_confidence)
+            )
+        except Exception:
+            reaction_type_confidence = None
+        total_matching_experiments = int(hte_extra.get("total_matching_experiments") or 0)
+        database_coverage = hte_extra.get("database_coverage")
+        try:
+            database_coverage = None if database_coverage is None else float(database_coverage)
+        except Exception:
+            database_coverage = None
+        is_fallback_match = bool(hte_extra.get("is_fallback_match", False))
+
+        warnings: List[str] = []
+        if reaction_type_confidence is not None and reaction_type_confidence < 0.5:
+            warnings.append(
+                f"Low reaction-type confidence for condition retrieval ({reaction_type_confidence:.2f}); treat recommendations as tentative."
+            )
+        if is_fallback_match:
+            warnings.append(
+                "Condition retrieval used fallback transformation matching rather than a stronger exact structured match."
+            )
+        if cleaned and int(cleaned[0].get("num_experiments", 0) or 0) < 2:
+            warnings.append(
+                "Top condition recommendation has limited experimental support (<2 experiments)."
+            )
+
         result = _success({
             "reaction_smiles": reaction_smiles,
             "recommendations": cleaned,
             "total_available": len(recs),
             "source_group": source_group or "all",
+            "selection_mode": normalized_selection_mode,
             "catalyst_families": sorted({_extract_metal(r["catalyst"]) for r in cleaned if r.get("catalyst")}),
-            "detected_reaction_type": (raw.get("detection") or {}).get("detected_reaction_type") if isinstance(raw, dict) else None,
+            "detected_reaction_type": detection.get("detected_reaction_type") if isinstance(detection, dict) else None,
+            "reaction_type_confidence": reaction_type_confidence,
+            "evidence": {
+                "reaction_type_confidence": reaction_type_confidence,
+                "is_fallback_match": is_fallback_match,
+                "matched_transformation": matched_transformation,
+                "total_matching_experiments": total_matching_experiments,
+                "database_coverage": database_coverage,
+            },
             "hte_timing_ms": hte_timing_ms or {},
             "hte_processing_time_ms": hte_processing_time_ms,
             "hte_recommender_stage_timing_ms": hte_recommender_stage_timing_ms or {},
         })
+        if warnings:
+            result["_warnings"] = warnings
         if _rtx is not None and hasattr(_rtx, "set_cached_conditions"):
             try:
                 _rtx.set_cached_conditions(reaction_smiles, int(top_k), result, cache_key=cache_key)

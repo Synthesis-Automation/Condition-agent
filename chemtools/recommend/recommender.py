@@ -2704,6 +2704,8 @@ class ConditionRecommendation:
     secondary_solvent: Optional[str] = None
     additive: Optional[str] = None
     coupling_reagent: Optional[str] = None
+    temperature: Optional[float] = None
+    atmosphere: Optional[str] = None
     spectator_groups: Optional[str] = None
     spectator_score: float = 0.0
     
@@ -3427,6 +3429,8 @@ class HTERecommender:
                 "Additive",
                 "Secondary Solvent",
                 "Coupling Reagent",
+                "temperature_C",
+                "atmosphere",
                 "AREA_TOTAL_REDUCED",
                 "z-Score",
                 "Source_File",
@@ -3469,8 +3473,32 @@ class HTERecommender:
         # Define success threshold
         SUCCESS_THRESHOLD = 50.0
         
-        # Group by condition combination
+        # Group by the core condition set, then preserve optional fields when
+        # they vary meaningfully so distinct regimes do not collapse together.
         condition_cols = ['Catalyst', 'Ligand', 'Base', 'Solvent']
+        optional_condition_specs = [
+            (("Secondary Solvent",), "_cond_secondary_solvent", "text"),
+            (("Additive",), "_cond_additive", "text"),
+            (("Coupling Reagent",), "_cond_coupling_reagent", "text"),
+            (("temperature_C", "Temperature"), "_cond_temperature", "numeric"),
+            (("atmosphere", "Atmosphere"), "_cond_atmosphere", "text"),
+        ]
+        resolved_optional_cols: Dict[str, str] = {}
+        for candidates, temp_col, value_kind in optional_condition_specs:
+            source_col = next((name for name in candidates if name in working_df.columns), "")
+            if not source_col:
+                continue
+            resolved_optional_cols[temp_col] = source_col
+            if value_kind == "numeric":
+                numeric_series = pd.to_numeric(working_df[source_col], errors="coerce").round(3)
+                normalized = numeric_series.astype(object).where(numeric_series.notna(), "")
+            else:
+                text_series = working_df[source_col].fillna("").astype(str).str.strip()
+                normalized = text_series.where(~text_series.str.lower().eq("nan"), "")
+            working_df[temp_col] = normalized
+            distinct_values = {str(value).strip() for value in normalized.tolist()}
+            if len(distinct_values) > 1:
+                condition_cols.append(temp_col)
         
         grouped = working_df.groupby(condition_cols, dropna=False)
         
@@ -3488,13 +3516,58 @@ class HTERecommender:
             if len(group_df) < current_min_exp:
                 continue
             
-            # Extract condition components
-            catalyst, ligand, base, solvent = condition_tuple
-            
-            # Get optional components (most common values)
-            sec_solvent = _first_nonempty_text(group_df["Secondary Solvent"]) if "Secondary Solvent" in group_df.columns else None
-            additive = _first_nonempty_text(group_df["Additive"]) if "Additive" in group_df.columns else None
-            coupling_reagent = _first_nonempty_text(group_df["Coupling Reagent"]) if "Coupling Reagent" in group_df.columns else None
+            # Extract condition components from the grouped regime.
+            if not isinstance(condition_tuple, tuple):
+                condition_tuple = (condition_tuple,)
+            group_values = dict(zip(condition_cols, condition_tuple))
+            catalyst = group_values.get("Catalyst")
+            ligand = group_values.get("Ligand")
+            base = group_values.get("Base")
+            solvent = group_values.get("Solvent")
+
+            def _group_text(source_col: str) -> Optional[str]:
+                if source_col in group_values:
+                    value = str(group_values[source_col] or "").strip()
+                    return value or None
+                if source_col not in group_df.columns:
+                    return None
+                value = _first_nonempty_text(group_df[source_col])
+                return value or None
+
+            def _group_float(source_col: str) -> Optional[float]:
+                if source_col in group_values:
+                    value = group_values[source_col]
+                    if value in ("", None) or pd.isna(value):
+                        return None
+                    try:
+                        return float(value)
+                    except Exception:
+                        return None
+                if source_col not in group_df.columns:
+                    return None
+                numeric = pd.to_numeric(group_df[source_col], errors="coerce").dropna()
+                if numeric.empty:
+                    return None
+                try:
+                    return float(numeric.iloc[0])
+                except Exception:
+                    return None
+
+            sec_solvent = _group_text("_cond_secondary_solvent")
+            if sec_solvent is None and "_cond_secondary_solvent" not in resolved_optional_cols:
+                sec_solvent = _group_text("Secondary Solvent")
+            additive = _group_text("_cond_additive")
+            if additive is None and "_cond_additive" not in resolved_optional_cols:
+                additive = _group_text("Additive")
+            coupling_reagent = _group_text("_cond_coupling_reagent")
+            if coupling_reagent is None and "_cond_coupling_reagent" not in resolved_optional_cols:
+                coupling_reagent = _group_text("Coupling Reagent")
+            temperature = _group_float("_cond_temperature")
+            if temperature is None and "_cond_temperature" not in resolved_optional_cols:
+                temperature = _group_float("temperature_C")
+            atmosphere = _group_text("_cond_atmosphere")
+            if atmosphere is None and "_cond_atmosphere" not in resolved_optional_cols:
+                atmosphere = _group_text("atmosphere")
             
             # Calculate statistics
             yields = group_df["_yield_numeric"]
@@ -3564,6 +3637,8 @@ class HTERecommender:
                 secondary_solvent=sec_solvent if pd.notna(sec_solvent) else None,
                 additive=additive if pd.notna(additive) else None,
                 coupling_reagent=coupling_reagent if pd.notna(coupling_reagent) else None,
+                temperature=temperature,
+                atmosphere=atmosphere if pd.notna(atmosphere) else None,
                 success_rate=success_rate,
                 avg_yield=avg_yield,
                 median_yield=median_yield,
@@ -4781,6 +4856,10 @@ def format_recommendation(rec: ConditionRecommendation, rank: int = 1) -> str:
         lines.append(f"  Additive: {rec.additive}")
     if rec.coupling_reagent:
         lines.append(f"  Coupling Reagent: {rec.coupling_reagent}")
+    if rec.temperature is not None:
+        lines.append(f"  Temperature (C): {rec.temperature:g}")
+    if rec.atmosphere:
+        lines.append(f"  Atmosphere: {rec.atmosphere}")
     
     lines.extend([
         "",

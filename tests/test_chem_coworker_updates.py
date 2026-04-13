@@ -5,7 +5,7 @@ Unit tests for chem_coworker improvements:
 """
 import pytest
 
-from chem_coworker.tools.conditions import _extract_metal, _diversify
+from chem_coworker.tools.conditions import _diversify, _extract_metal, _recommend_conditions
 from chem_coworker.agent import ChemCoworker
 from chem_coworker.tools import REGISTRY
 
@@ -86,6 +86,75 @@ class TestDiversify:
         recs = [{"rank": 1, "avg_yield": 70.0}]  # no "catalyst" key
         result = _diversify(recs, top_k=3)
         assert len(result) == 1
+
+
+class TestRecommendConditionsSelectionMode:
+    @staticmethod
+    def _payload():
+        return {
+            "detection": {"detected_reaction_type": "Suzuki_miyaura", "confidence": 0.42},
+            "extras": {
+                "hte": {
+                    "reaction_type_confidence": 0.42,
+                    "is_fallback_match": True,
+                    "matched_motifs": ["RXNEVT|sig=LGDisp+C-C|form=C-C"],
+                    "total_matching_experiments": 3,
+                    "database_coverage": 0.12,
+                }
+            },
+            "recommended_conditions": [
+                {
+                    "rank": 1,
+                    "conditions": {"catalyst": "Pd(OAc)2", "ligand": "SPhos", "base": "K3PO4", "solvent": "dioxane"},
+                    "confidence": 0.91,
+                    "component_scores": {"success_rate": 0.9, "avg_yield": 88.0, "median_yield": 89.0, "match_score": 0.95, "num_experiments": 6},
+                    "reaction": "Suzuki_miyaura",
+                },
+                {
+                    "rank": 2,
+                    "conditions": {"catalyst": "Pd2(dba)3", "ligand": "XPhos", "base": "K3PO4", "solvent": "dioxane"},
+                    "confidence": 0.84,
+                    "component_scores": {"success_rate": 0.82, "avg_yield": 81.0, "median_yield": 82.0, "match_score": 0.92, "num_experiments": 5},
+                    "reaction": "Suzuki_miyaura",
+                },
+                {
+                    "rank": 3,
+                    "conditions": {"catalyst": "CuI", "ligand": "phen", "base": "Cs2CO3", "solvent": "DMSO"},
+                    "confidence": 0.66,
+                    "component_scores": {"success_rate": 0.7, "avg_yield": 67.0, "median_yield": 66.0, "match_score": 0.75, "num_experiments": 1},
+                    "reaction": "Suzuki_miyaura",
+                },
+            ],
+            "recommendations": [],
+        }
+
+    def test_best_mode_preserves_rank_order(self, monkeypatch):
+        monkeypatch.setattr(
+            "chemtools.recommend.hte_adapter.recommend_from_reaction",
+            lambda *args, **kwargs: self._payload(),
+        )
+
+        result = _recommend_conditions("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1-c1ccccc1", top_k=2, selection_mode="best")
+
+        assert result["success"] is True
+        assert [rec["catalyst"] for rec in result["recommendations"]] == ["Pd(OAc)2", "Pd2(dba)3"]
+        assert result["selection_mode"] == "best"
+
+    def test_diverse_mode_interleaves_metals_and_surfaces_evidence(self, monkeypatch):
+        monkeypatch.setattr(
+            "chemtools.recommend.hte_adapter.recommend_from_reaction",
+            lambda *args, **kwargs: self._payload(),
+        )
+
+        result = _recommend_conditions("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1-c1ccccc1", top_k=2, selection_mode="diverse")
+
+        assert result["success"] is True
+        assert [rec["catalyst"] for rec in result["recommendations"]] == ["Pd(OAc)2", "CuI"]
+        assert result["selection_mode"] == "diverse"
+        assert result["reaction_type_confidence"] == pytest.approx(0.42)
+        assert result["evidence"]["is_fallback_match"] is True
+        assert "RXNEVT|" in result["evidence"]["matched_transformation"]
+        assert result["_warnings"]
 
 
 # ---------------------------------------------------------------------------

@@ -317,7 +317,9 @@ def result_to_dict(result) -> dict:
                     'solvent': rec.solvent,
                     'secondary_solvent': rec.secondary_solvent,
                     'additive': rec.additive,
-                    'coupling_reagent': rec.coupling_reagent
+                    'coupling_reagent': rec.coupling_reagent,
+                    'temperature': rec.temperature,
+                    'atmosphere': rec.atmosphere,
                 },
                 'metadata': {
                     'reaction_type': rec.reaction_type,

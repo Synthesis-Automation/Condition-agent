@@ -89,6 +89,7 @@ def _recommend_conditions_with_strategy(
     top_k: int = 5,
     condition_strategy: str = "auto",
     condition_source_mode: str = "",
+    condition_selection_mode: str = "best",
 ) -> Dict[str, Any]:
     """Run recommend_conditions in single-source or full multi-source mode."""
     from .conditions import _recommend_conditions
@@ -120,6 +121,7 @@ def _recommend_conditions_with_strategy(
             reaction_smiles=reaction_smiles,
             top_k=top_k,
             source_group=source_mode or "",
+            selection_mode=condition_selection_mode,
         )
         if isinstance(result, dict):
             out = dict(result)
@@ -137,6 +139,7 @@ def _recommend_conditions_with_strategy(
             reaction_smiles=reaction_smiles,
             top_k=top_k,
             source_group=mode,
+            selection_mode=condition_selection_mode,
         )
         per_source[mode] = res if isinstance(res, dict) else _error("Unexpected recommend_conditions result")
         if not isinstance(res, dict) or not res.get("success"):
@@ -427,6 +430,7 @@ def _analyze_reaction(
     include_bond_changes: bool = True,
     condition_strategy: str = "auto",
     condition_source_mode: str = "",
+    condition_selection_mode: str = "best",
 ) -> Dict[str, Any]:
     """High-level reaction analysis: normalize, classify, inspect, and optionally rank conditions."""
     from .chemistry import (
@@ -470,6 +474,7 @@ def _analyze_reaction(
             top_k=max(1, min(int(conditions_top_k or 5), 10)),
             condition_strategy=condition_strategy,
             condition_source_mode=condition_source_mode,
+            condition_selection_mode=condition_selection_mode,
         )
 
     reaction_note: Dict[str, Any] = {}
@@ -506,6 +511,7 @@ def _recommend_reaction_conditions(
     top_k: int = 5,
     condition_strategy: str = "auto",
     condition_source_mode: str = "",
+    condition_selection_mode: str = "best",
 ) -> Dict[str, Any]:
     """Explicit facade for reaction-condition recommendation."""
     rxn, rxn_err = _validate_reaction_smiles(reaction_smiles, require_product=True)
@@ -516,6 +522,7 @@ def _recommend_reaction_conditions(
         top_k=max(1, min(int(top_k or 5), 10)),
         condition_strategy=condition_strategy,
         condition_source_mode=condition_source_mode,
+        condition_selection_mode=condition_selection_mode,
     )
 
 
@@ -527,6 +534,7 @@ def _retrosynthesis_step(
     validate_top_n: int = 1,
     condition_strategy: str = "auto",
     condition_source_mode: str = "",
+    condition_selection_mode: str = "best",
 ) -> Dict[str, Any]:
     """Single-call retrosynthesis pass with automatic fallback cascade.
 
@@ -705,6 +713,7 @@ def _retrosynthesis_step(
                 top_k=5,
                 condition_strategy=condition_strategy,
                 condition_source_mode=condition_source_mode,
+                condition_selection_mode=condition_selection_mode,
             )
 
     precedent: Dict[str, Any] = {}
@@ -749,6 +758,7 @@ def _forward_synthesis_step(
     include_conditions: bool = True,
     condition_strategy: str = "auto",
     condition_source_mode: str = "",
+    condition_selection_mode: str = "best",
 ) -> Dict[str, Any]:
     """Single-call forward synthesis pass: inspect -> identify -> generate -> rank (+ optional precedent/conditions)."""
     from .forward_synthesis import (
@@ -805,6 +815,7 @@ def _forward_synthesis_step(
                     top_k=5,
                     condition_strategy=condition_strategy,
                     condition_source_mode=condition_source_mode,
+                    condition_selection_mode=condition_selection_mode,
                 )
         else:
             conditions = _success({

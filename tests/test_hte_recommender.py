@@ -309,6 +309,65 @@ def test_summarize_conditions_filters(monkeypatch) -> None:
     assert recs[0].catalyst == "Ni"
 
 
+def test_recommend_keeps_distinct_optional_condition_regimes(monkeypatch) -> None:
+    df = pd.DataFrame(
+        {
+            "Reaction_Type_Standardized": ["Suzuki_miyaura", "Suzuki_miyaura"],
+            "Reactant_A_Type": ["Ar-X", "Ar-X"],
+            "Reactant_B_Type": ["Ar-B(OH)2", "Ar-B(OH)2"],
+            "Reactant_C_Type": ["", ""],
+            "Catalyst": ["Pd(OAc)2", "Pd(OAc)2"],
+            "Ligand": ["SPhos", "SPhos"],
+            "Base": ["K3PO4", "K3PO4"],
+            "Solvent": ["Dioxane", "Dioxane"],
+            "Secondary Solvent": ["", ""],
+            "Additive": ["", "CsF"],
+            "Coupling Reagent": ["", ""],
+            "temperature_C": [80.0, 100.0],
+            "atmosphere": ["N2", "N2"],
+            "AREA_TOTAL_REDUCED": [72.0, 91.0],
+            "z-Score": [1.2, 2.5],
+            "Reactant_A_Category": ["", ""],
+            "Reactant_B_Category": ["", ""],
+            "Reaction_Category": ["", ""],
+            "Is_Intramolecular": [False, False],
+            "Source_File": ["tests", "tests"],
+            "Source_Group": ["literature", "literature"],
+            "spectator_groups": ["", ""],
+        }
+    )
+    indexed_data = {hte._reactant_key(["Ar-B(OH)2", "Ar-X"]): df}
+    reaction_type_patterns = {}
+    transformation_indices = {}
+
+    def fake_load_db(path: str):
+        return df, indexed_data, reaction_type_patterns, transformation_indices
+
+    def fake_detect(self, smiles: str):
+        if "B" in smiles:
+            return ["Ar-B(OH)2"], "Aryl Boronate"
+        return ["Ar-X"], "Aryl Halide"
+
+    monkeypatch.setattr(hte, "_load_hte_database_cached", fake_load_db)
+    monkeypatch.setattr(HTERecommender, "_detect_reactant_types", fake_detect)
+
+    recommender = HTERecommender(hte_db_path="data/HTE_db")
+    result = recommender.recommend(
+        reactant_a_smiles="B(O)(O)c1ccccc1",
+        reactant_b_smiles="Brc1ccccc1",
+        top_k=5,
+        min_experiments=1,
+    )
+
+    assert len(result.recommendations) == 2
+    regimes = {
+        (rec.additive or "", rec.temperature, rec.atmosphere or "")
+        for rec in result.recommendations
+    }
+    assert ("", 80.0, "N2") in regimes
+    assert ("CsF", 100.0, "N2") in regimes
+
+
 def test_aryl_weighting_adjusts_match_score(monkeypatch) -> None:
     df = _make_weighted_df()
     key = hte._reactant_key(["Ar-B(OH)2", "Ar-Cl"])
