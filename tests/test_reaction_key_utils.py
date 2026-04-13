@@ -98,20 +98,35 @@ def test_build_reaction_events_payload_includes_redox_and_event_details() -> Non
 
     text = serialize_reaction_events_payload(payload)
     assert "sig:LGDisp+C-N" in text
-    assert "form:C(ar)-N" in text
-    assert "break:Br-C(ar)" in text
-    assert "redox:redox_neutral" in text
-    assert "fam:substitution" in text
-    assert "mol:intermolecular_or_multi_component" in text
-    assert "form_cls:C-N" in text
-    assert "lg:Br" in text
-    assert "nuc:N" in text
-    assert "mech:SNAr+oa_based_coupling" in text
-    assert "risk:ambident_site_selectivity" in text
-    assert "ehyb:sp2_aromatic" in text
-    assert "nclass:amine" in text
+    assert "bonds:+C(ar)-N / -Br-C(ar)" in text
+    assert "context:LG=Br, Nu=N, mech=SNAr+oa_based_coupling" in text
+    assert "summary:fam=substitution, redox=neutral, q=high(0.85)" in text
+    assert "alerts:risk=ambident_site_selectivity" in text
 
     parsed = deserialize_reaction_events_text(text)
+    assert parsed["bond_formed"] == ["C(ar)-N"]
+    assert parsed["bond_broken"] == ["Br-C(ar)"]
+    assert parsed["event_families"] == ["substitution"]
+    assert parsed["redox_classification"] == "redox_neutral"
     assert parsed["mechanism_shortlist"] == ["SNAr", "oa_based_coupling"]
     assert parsed["selectivity_risks"] == ["ambident_site_selectivity"]
-    assert parsed["electrophile_hybridization"] == "sp2_aromatic"
+    assert parsed["reaction_key_quality"]["level"] == "high"
+
+
+def test_deserialize_reaction_events_text_keeps_legacy_compact_format() -> None:
+    text = (
+        "sig:LGDisp+C-N | form:C(ar)-N | break:Br-C(ar) | redox:redox_neutral "
+        "| q:high(0.85) | fam:substitution | lg:Br | nuc:N | mech:SNAr"
+    )
+
+    parsed = deserialize_reaction_events_text(text)
+
+    assert parsed["event_signature"] == "LGDisp+C-N"
+    assert parsed["bond_formed"] == ["C(ar)-N"]
+    assert parsed["bond_broken"] == ["Br-C(ar)"]
+    assert parsed["redox_classification"] == "redox_neutral"
+    assert parsed["event_families"] == ["substitution"]
+    assert parsed["leaving_groups"] == ["Br"]
+    assert parsed["nucleophile_elements"] == ["N"]
+    assert parsed["mechanism_shortlist"] == ["SNAr"]
+    assert parsed["reaction_key_quality"]["score_0_1"] == 0.85

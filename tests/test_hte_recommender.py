@@ -1093,7 +1093,7 @@ def test_normalize_hte_dataframe_prefers_detected_type_and_backfills_reaction_ke
     assert "bond_formed:" not in str(normalized.loc[0, "Reaction_Key"])
     assert "events:" not in str(normalized.loc[0, "Reaction_Key"])
     events_text = str(normalized.loc[0, "Reaction_Events"])
-    assert "form:" in events_text
+    assert "bonds:" in events_text
     assert "sig:" in events_text
 
 

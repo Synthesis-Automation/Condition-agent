@@ -48,6 +48,40 @@ def _split_csv_tokens(value: str) -> List[str]:
     return [tok.strip() for tok in re.split(r"[,+]", str(value)) if tok.strip()]
 
 
+def _parse_assignment_tokens(value: str) -> Dict[str, str]:
+    out: Dict[str, str] = {}
+    for chunk in [part.strip() for part in str(value or "").split(",") if part.strip()]:
+        if "=" not in chunk:
+            continue
+        key, raw_value = chunk.split("=", 1)
+        key = str(key).strip().lower()
+        data = str(raw_value).strip()
+        if key and data:
+            out[key] = data
+    return out
+
+
+def _compact_redox_label(value: Any) -> str:
+    label = str(value or "").strip().lower()
+    mapping = {
+        "redox_neutral": "neutral",
+        "oxidation": "oxidation",
+        "reduction": "reduction",
+    }
+    return mapping.get(label, str(value or "").strip())
+
+
+def _expand_redox_label(value: Any) -> str:
+    label = str(value or "").strip().lower()
+    mapping = {
+        "neutral": "redox_neutral",
+        "redox_neutral": "redox_neutral",
+        "oxidation": "oxidation",
+        "reduction": "reduction",
+    }
+    return mapping.get(label, str(value or "").strip())
+
+
 def _canonical_bond_class_token(value: Any) -> str:
     token = str(value or "").strip()
     if "-" not in token:
@@ -387,10 +421,11 @@ def build_reaction_events_payload(
 
 def serialize_reaction_events_payload(payload: Mapping[str, Any]) -> str:
     """
-    Serialize standardized event payload to a concise single-line format.
+    Serialize standardized event payload to a grouped single-line format.
 
     Format:
-      sig:<...> | form:<...> | break:<...> | redox:<...> | q:<level>(<score>)
+      sig:<...> | bonds:+<...> / -<...> | context:LG=<...>, Nu=<...>, mech=<...>
+      | summary:fam=<...>, redox=<...>, q=<level>(<score>) | alerts:risk=<...>
     """
     if not payload:
         return ""
@@ -398,32 +433,46 @@ def serialize_reaction_events_payload(payload: Mapping[str, Any]) -> str:
     event_sig = str(payload.get("event_signature") or "").strip()
     if event_sig:
         parts.append(f"sig:{event_sig}")
+    else:
+        kinds = _dedupe_sorted(payload.get("event_kinds") or [])
+        if kinds:
+            parts.append("kinds:" + "+".join(kinds))
 
     formed = _dedupe_sorted(payload.get("bond_formed") or [])
-    if formed:
-        parts.append("form:" + ";".join(formed))
-
-    formed_labeled = _dedupe_sorted(payload.get("bond_formed_labeled") or [])
-    if formed_labeled:
-        parts.append("form_labeled:" + ";".join(formed_labeled))
-
+    if not formed:
+        formed = _dedupe_sorted(payload.get("formed_bond_classes") or [])
     broken = _dedupe_sorted(payload.get("bond_broken") or [])
+    if not broken:
+        broken = _dedupe_sorted(payload.get("broken_bond_classes") or [])
+    bond_parts: List[str] = []
+    if formed:
+        bond_parts.append(";".join(f"+{token}" for token in formed))
     if broken:
-        parts.append("break:" + ";".join(broken))
+        bond_parts.append(";".join(f"-{token}" for token in broken))
+    if bond_parts:
+        parts.append("bonds:" + " / ".join(bond_parts))
 
-    reaction_types = _dedupe_sorted(payload.get("reaction_types") or [])
-    if reaction_types:
-        parts.append("types:" + "+".join(reaction_types))
+    context_parts: List[str] = []
+    leaving_groups = _dedupe_sorted(payload.get("leaving_groups") or [])
+    if leaving_groups:
+        context_parts.append("LG=" + "+".join(leaving_groups))
+    nucleophile_elements = _dedupe_sorted(payload.get("nucleophile_elements") or [])
+    if nucleophile_elements:
+        context_parts.append("Nu=" + "+".join(nucleophile_elements))
+    mechanisms = _dedupe_sorted(payload.get("mechanism_shortlist") or [])
+    if mechanisms:
+        context_parts.append("mech=" + "+".join(mechanisms))
+    if context_parts:
+        parts.append("context:" + ", ".join(context_parts))
+
+    summary_parts: List[str] = []
+    families = _dedupe_sorted(payload.get("event_families") or [])
+    if families:
+        summary_parts.append("fam=" + "+".join(families))
 
     redox = str(payload.get("redox_classification") or "").strip()
     if redox:
-        parts.append(f"redox:{redox}")
-    redox_conf = payload.get("redox_confidence")
-    try:
-        if redox_conf is not None:
-            parts.append(f"redox_conf:{float(redox_conf):.2f}")
-    except Exception:
-        pass
+        summary_parts.append("redox=" + _compact_redox_label(redox))
 
     quality = payload.get("reaction_key_quality")
     if isinstance(quality, Mapping):
@@ -431,80 +480,37 @@ def serialize_reaction_events_payload(payload: Mapping[str, Any]) -> str:
         q_score = quality.get("score_0_1")
         q_chunk = ""
         if q_level:
-            q_chunk = f"q:{q_level}"
+            q_chunk = q_level
         if q_score is not None:
             try:
-                q_chunk = f"{q_chunk}({float(q_score):.2f})" if q_chunk else f"q:({float(q_score):.2f})"
+                q_chunk = f"{q_chunk}({float(q_score):.2f})" if q_chunk else f"({float(q_score):.2f})"
             except Exception:
                 pass
         if q_chunk:
-            parts.append(q_chunk)
-        reasons = _dedupe_sorted(quality.get("reasons") or [])
-        if reasons:
-            parts.append("q_reason:" + ",".join(reasons))
-
-    kinds = _dedupe_sorted(payload.get("event_kinds") or [])
-    if kinds:
-        parts.append("kinds:" + "+".join(kinds))
-
-    families = _dedupe_sorted(payload.get("event_families") or [])
-    if families:
-        parts.append("fam:" + "+".join(families))
+            summary_parts.append("q=" + q_chunk)
 
     molecularity = str(payload.get("molecularity") or "").strip()
-    if molecularity:
-        parts.append(f"mol:{molecularity}")
-
-    formed_classes = _dedupe_sorted(payload.get("formed_bond_classes") or [])
-    if formed_classes:
-        parts.append("form_cls:" + ";".join(formed_classes))
-
-    broken_classes = _dedupe_sorted(payload.get("broken_bond_classes") or [])
-    if broken_classes:
-        parts.append("break_cls:" + ";".join(broken_classes))
-
-    leaving_groups = _dedupe_sorted(payload.get("leaving_groups") or [])
-    if leaving_groups:
-        parts.append("lg:" + "+".join(leaving_groups))
-
-    nucleophile_elements = _dedupe_sorted(payload.get("nucleophile_elements") or [])
-    if nucleophile_elements:
-        parts.append("nuc:" + "+".join(nucleophile_elements))
+    if molecularity and molecularity != "intermolecular_or_multi_component":
+        summary_parts.append("mol=" + molecularity)
 
     ring_delta = payload.get("ring_delta")
     try:
-        if ring_delta is not None:
-            parts.append(f"ringd:{int(ring_delta)}")
+        if ring_delta is not None and int(ring_delta) != 0:
+            summary_parts.append(f"ring={int(ring_delta):+d}")
     except Exception:
         pass
+    if summary_parts:
+        parts.append("summary:" + ", ".join(summary_parts))
 
-    anomalies = _dedupe_sorted(payload.get("anomalies") or [])
-    if anomalies:
-        parts.append("anom:" + ",".join(anomalies))
-
-    mechanisms = _dedupe_sorted(payload.get("mechanism_shortlist") or [])
-    if mechanisms:
-        parts.append("mech:" + "+".join(mechanisms))
-
+    alert_parts: List[str] = []
     risks = _dedupe_sorted(payload.get("selectivity_risks") or [])
     if risks:
-        parts.append("risk:" + ",".join(risks))
-
-    electrophile_hyb = str(payload.get("electrophile_hybridization") or "").strip()
-    if electrophile_hyb:
-        parts.append(f"ehyb:{electrophile_hyb}")
-
-    electrophile_env = _dedupe_sorted(payload.get("electrophile_environment_tags") or [])
-    if electrophile_env:
-        parts.append("eenv:" + "+".join(electrophile_env))
-
-    nucleophile_classes = _dedupe_sorted(payload.get("nucleophile_candidate_classes") or [])
-    if nucleophile_classes:
-        parts.append("nclass:" + "+".join(nucleophile_classes))
-
-    ambident_possible = payload.get("ambident_possible")
-    if isinstance(ambident_possible, bool):
-        parts.append("amb:1" if ambident_possible else "amb:0")
+        alert_parts.append("risk=" + "+".join(risks))
+    anomalies = _dedupe_sorted(payload.get("anomalies") or [])
+    if anomalies:
+        alert_parts.append("anom=" + "+".join(anomalies))
+    if alert_parts:
+        parts.append("alerts:" + ", ".join(alert_parts))
 
     return " | ".join(parts)
 
@@ -535,6 +541,71 @@ def deserialize_reaction_events_text(text: Any) -> Dict[str, Any]:
             continue
         if label == "sig":
             payload["event_signature"] = data
+        elif label == "bonds":
+            formed_tokens: List[str] = []
+            broken_tokens: List[str] = []
+            for section in [chunk.strip() for chunk in data.split("/") if chunk.strip()]:
+                for token in [item.strip() for item in section.split(";") if item.strip()]:
+                    sign = token[0]
+                    bond = token[1:].strip() if len(token) > 1 else ""
+                    if sign == "+" and bond:
+                        formed_tokens.append(bond)
+                    elif sign == "-" and bond:
+                        broken_tokens.append(bond)
+            if formed_tokens:
+                payload["bond_formed"] = _dedupe_sorted(formed_tokens)
+                payload["formed_bond_classes"] = _dedupe_sorted(
+                    _canonical_bond_class_token(token) for token in formed_tokens
+                )
+            if broken_tokens:
+                payload["bond_broken"] = _dedupe_sorted(broken_tokens)
+                payload["broken_bond_classes"] = _dedupe_sorted(
+                    _canonical_bond_class_token(token) for token in broken_tokens
+                )
+        elif label == "context":
+            assignments = _parse_assignment_tokens(data)
+            if "lg" in assignments:
+                payload["leaving_groups"] = _split_event_tokens(assignments["lg"])
+            if "nu" in assignments:
+                payload["nucleophile_elements"] = _split_event_tokens(assignments["nu"])
+            if "mech" in assignments:
+                payload["mechanism_shortlist"] = _split_event_tokens(assignments["mech"])
+        elif label == "summary":
+            assignments = _parse_assignment_tokens(data)
+            if "fam" in assignments:
+                payload["event_families"] = _split_event_tokens(assignments["fam"])
+            if "redox" in assignments:
+                redox_value = _expand_redox_label(assignments["redox"])
+                payload["redox_classification"] = redox_value
+                payload["redox_neutral"] = redox_value == "redox_neutral"
+            if "mol" in assignments:
+                payload["molecularity"] = assignments["mol"]
+            if "ring" in assignments:
+                try:
+                    payload["ring_delta"] = int(assignments["ring"])
+                except Exception:
+                    pass
+            if "q" in assignments:
+                match = re.match(r"(?P<level>[a-zA-Z_]+)?(?:\((?P<score>[^)]+)\))?$", assignments["q"])
+                q_payload: Dict[str, Any] = {}
+                if match:
+                    level = str(match.group("level") or "").strip()
+                    score = str(match.group("score") or "").strip()
+                    if level:
+                        q_payload["level"] = level
+                    if score:
+                        try:
+                            q_payload["score_0_1"] = float(score)
+                        except Exception:
+                            pass
+                if q_payload:
+                    payload["reaction_key_quality"] = q_payload
+        elif label == "alerts":
+            assignments = _parse_assignment_tokens(data)
+            if "risk" in assignments:
+                payload["selectivity_risks"] = _split_event_tokens(assignments["risk"])
+            if "anom" in assignments:
+                payload["anomalies"] = _split_event_tokens(assignments["anom"])
         elif label == "form":
             payload["bond_formed"] = _split_bond_tokens(data)
         elif label == "form_labeled":
@@ -544,8 +615,9 @@ def deserialize_reaction_events_text(text: Any) -> Dict[str, Any]:
         elif label == "types":
             payload["reaction_types"] = _split_event_tokens(data)
         elif label == "redox":
-            payload["redox_classification"] = data
-            payload["redox_neutral"] = data == "redox_neutral"
+            redox_value = _expand_redox_label(data)
+            payload["redox_classification"] = redox_value
+            payload["redox_neutral"] = redox_value == "redox_neutral"
         elif label == "redox_conf":
             try:
                 payload["redox_confidence"] = float(data)
