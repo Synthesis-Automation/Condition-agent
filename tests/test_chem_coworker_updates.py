@@ -3,11 +3,18 @@ Unit tests for chem_coworker improvements:
   1. Diversity filter in _recommend_conditions
   2. _collect_caveats (replaced _check_hypothesis in Phase 5)
 """
+import pandas as pd
 import pytest
 
 from chem_coworker.tools.conditions import _diversify, _extract_metal, _recommend_conditions
 from chem_coworker.agent import ChemCoworker
 from chem_coworker.tools import REGISTRY
+from chemtools.recommend.recommender import (
+    _apply_condition_plausibility_penalties,
+    _extract_catalyst_metal_tokens,
+    _row_contains_unexpected_catalyst_metals,
+    _row_has_implausible_snar_annotation,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -198,6 +205,94 @@ class TestRecommendConditionsSelectionMode:
         assert result["success"] is True
         assert result["recommendations"][0]["missing_required_fields"] == ["base"]
         assert any("Top condition recommendation is still missing required fields" in warning for warning in result["_warnings"])
+
+    def test_best_mode_surfaces_plausibility_warnings(self, monkeypatch):
+        payload = self._payload()
+        payload["extras"]["hte"]["plausibility_family"] = "C_N_Coupling"
+        payload["extras"]["hte"]["filtered_implausible_catalyst_rows"] = 2
+        payload["extras"]["hte"]["penalized_implausible_mechanism_rows"] = 3
+        payload["extras"]["hte"]["plausibility_issue_counts"] = {
+            "unexpected_catalyst_metals": 2,
+            "implausible_snar_annotation": 3,
+        }
+
+        monkeypatch.setattr(
+            "chemtools.recommend.hte_adapter.recommend_from_reaction",
+            lambda *args, **kwargs: payload,
+        )
+
+        result = _recommend_conditions("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1-c1ccccc1", top_k=2, selection_mode="best")
+
+        assert result["success"] is True
+        assert result["evidence"]["filtered_implausible_catalyst_rows"] == 2
+        assert result["evidence"]["penalized_implausible_mechanism_rows"] == 3
+        assert any("chemically implausible" in warning for warning in result["_warnings"])
+        assert any("SNAr-style mechanism labels" in warning for warning in result["_warnings"])
+
+
+class TestPlausibilityFilters:
+    def test_extract_catalyst_metal_tokens_detects_mixed_system(self):
+        assert _extract_catalyst_metal_tokens("Cu/[(S,S)-Teth-MsDPEN-RuCl]") == ("Cu", "Ru")
+
+    def test_row_contains_unexpected_catalyst_metals(self):
+        row = {"Catalyst": "Cu/[(S,S)-Teth-MsDPEN-RuCl]", "Catalyst_Type": ""}
+        assert _row_contains_unexpected_catalyst_metals(row, allowed_classes=("Cu", "Pd", "Ni")) is True
+
+    def test_row_has_implausible_snar_annotation_for_aryl_iodide(self):
+        row = {
+            "Reaction_Events": "context:LG=I, Nu=N, mech=SNAr | summary:fam=substitution",
+            "Reaction_Key": "|Ar-I|AromN-H -> Ar-AromN | spectators: Ar-OR",
+        }
+        assert _row_has_implausible_snar_annotation(row) is True
+
+    def test_apply_condition_plausibility_penalties_filters_and_penalizes(self):
+        df = pd.DataFrame(
+            [
+                {
+                    "Reaction_Type_Standardized": "C_N_Coupling",
+                    "Source_Group": "literature",
+                    "Catalyst": "Cu/[(S,S)-Teth-MsDPEN-RuCl]",
+                    "Catalyst_Type": "",
+                    "Reaction_Events": "context:LG=I, Nu=N, mech=SNAr | summary:fam=substitution",
+                    "Reaction_Key": "|Ar-I|AromN-H -> Ar-AromN | spectators: Ar-OR",
+                    "match_score": 1.0,
+                },
+                {
+                    "Reaction_Type_Standardized": "C_N_Coupling",
+                    "Source_Group": "literature",
+                    "Catalyst": "CuI",
+                    "Catalyst_Type": "",
+                    "Reaction_Events": "context:LG=I, Nu=N, mech=SNAr | summary:fam=substitution",
+                    "Reaction_Key": "|Ar-I|AromN-H -> Ar-AromN | spectators: Ar-OR",
+                    "match_score": 1.0,
+                },
+                {
+                    "Reaction_Type_Standardized": "C_N_Coupling",
+                    "Source_Group": "literature",
+                    "Catalyst": "CuI",
+                    "Catalyst_Type": "",
+                    "Reaction_Events": "context:LG=Br, Nu=N, mech=oa_based_coupling | summary:fam=substitution",
+                    "Reaction_Key": "|Ar-Br|AromN-H -> Ar-AromN",
+                    "match_score": 1.0,
+                },
+            ]
+        )
+
+        out_df, family, filtered_rows, penalized_rows, issue_counts = _apply_condition_plausibility_penalties(
+            df,
+            reaction_type_filter="C_N_Coupling",
+            predicted_reaction_type="C_N_Coupling",
+            reaction_type_confidence=0.95,
+        )
+
+        assert family == "C_N_Coupling"
+        assert filtered_rows == 1
+        assert penalized_rows == 1
+        assert issue_counts["unexpected_catalyst_metals"] == 1
+        assert issue_counts["implausible_snar_annotation"] == 1
+        assert len(out_df) == 2
+        assert out_df.iloc[0]["match_score"] == pytest.approx(0.35)
+        assert out_df.iloc[1]["match_score"] == pytest.approx(1.0)
 
 
 # ---------------------------------------------------------------------------

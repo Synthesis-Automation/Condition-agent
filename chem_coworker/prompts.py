@@ -345,13 +345,17 @@ your comprehensive expert answer. Include all of the following that apply:
   Reaction SMILES: `reactants>>product`
   (MANDATORY — always include this line verbatim for any reaction step)
 
-  For conditions: present each catalyst family as a named expert strategy:
-    ── Expert A (Pd-catalysis, N experiments, avg yield X%, match_score Y): best conditions + why
-    ── Expert B (Cu/Ni/other, N experiments): best conditions + trade-offs vs A
-    ── Recommendation: which to try first given the specific substrate
-    Always cite num_experiments, avg_yield (and median_yield if available), and match_score
-    when those fields are present in tool output.
-    If no HTE data was found, say so clearly — do NOT invent conditions.
+  For conditions: keep the output compact and evidence-first.
+    - State the canonical reaction identity once.
+    - Then give up to 3 ranked condition sets in a flat list.
+    - For each set, include catalyst / ligand / base / solvent [/ temperature] plus
+      source, num_experiments, avg_yield, median_yield if available, and match_score.
+    - End with one short "Start with:" line naming the best initial screen.
+    - Do NOT add separate "Expert A/B", "Trade-offs", and "Bottom line" sections that
+      repeat the same information.
+    - If a retrieved condition set looks chemically inconsistent or data-contaminated,
+      omit it or flag it briefly.
+    - If no HTE data was found, say so clearly — do NOT invent conditions.
 
   Interpreting recommend_conditions output fields:
     source          — "literature" (published) | "motif" (HTE screen) | "rules" (fallback) | "similarity" (KNN)

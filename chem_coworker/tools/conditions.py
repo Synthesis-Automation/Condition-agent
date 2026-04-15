@@ -308,6 +308,12 @@ def _recommend_conditions(
         missing_required_condition_fields = hte_extra.get("missing_required_condition_fields") or {}
         if not isinstance(missing_required_condition_fields, dict):
             missing_required_condition_fields = {}
+        plausibility_family = str(hte_extra.get("plausibility_family") or "").strip() or None
+        filtered_implausible_catalyst_rows = int(hte_extra.get("filtered_implausible_catalyst_rows") or 0)
+        penalized_implausible_mechanism_rows = int(hte_extra.get("penalized_implausible_mechanism_rows") or 0)
+        plausibility_issue_counts = hte_extra.get("plausibility_issue_counts") or {}
+        if not isinstance(plausibility_issue_counts, dict):
+            plausibility_issue_counts = {}
 
         warnings: List[str] = []
         if reaction_type_confidence is not None and reaction_type_confidence < 0.5:
@@ -341,6 +347,16 @@ def _recommend_conditions(
             warnings.append(
                 f"Penalized {penalized_incomplete_condition_rows} matched rows with incomplete reaction-critical conditions for {family_desc}{suffix}."
             )
+        if filtered_implausible_catalyst_rows > 0:
+            family_desc = plausibility_family or condition_quality_family or required_catalyst_family or "the detected reaction family"
+            warnings.append(
+                f"Filtered {filtered_implausible_catalyst_rows} matched rows with catalyst annotations that were chemically implausible for {family_desc}."
+            )
+        if penalized_implausible_mechanism_rows > 0:
+            family_desc = plausibility_family or condition_quality_family or required_catalyst_family or "the detected reaction family"
+            warnings.append(
+                f"Penalized {penalized_implausible_mechanism_rows} matched rows whose SNAr-style mechanism labels were not plausible for the matched leaving-group pattern in {family_desc}."
+            )
         if cleaned and cleaned[0].get("missing_required_fields"):
             family_desc = condition_quality_family or required_catalyst_family or "this reaction family"
             missing_desc = ", ".join(str(value) for value in cleaned[0]["missing_required_fields"] if str(value).strip())
@@ -371,6 +387,10 @@ def _recommend_conditions(
                 "condition_quality_family": condition_quality_family,
                 "penalized_incomplete_condition_rows": penalized_incomplete_condition_rows,
                 "missing_required_condition_fields": missing_required_condition_fields,
+                "plausibility_family": plausibility_family,
+                "filtered_implausible_catalyst_rows": filtered_implausible_catalyst_rows,
+                "penalized_implausible_mechanism_rows": penalized_implausible_mechanism_rows,
+                "plausibility_issue_counts": plausibility_issue_counts,
             },
             "hte_timing_ms": hte_timing_ms or {},
             "hte_processing_time_ms": hte_processing_time_ms,

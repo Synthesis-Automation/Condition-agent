@@ -1209,6 +1209,25 @@ _FAMILY_CONDITION_COMPLETENESS_RULES: Dict[str, Dict[str, Any]] = {
     },
 }
 
+_METAL_SYMBOL_ALIASES: Dict[str, Tuple[str, ...]] = {
+    "Pd": ("palladium",),
+    "Ni": ("nickel",),
+    "Cu": ("copper",),
+    "Ru": ("ruthenium",),
+    "Rh": ("rhodium",),
+    "Ir": ("iridium",),
+    "Fe": ("iron",),
+    "Co": ("cobalt",),
+    "Ag": ("silver",),
+    "Au": ("gold",),
+    "Pt": ("platinum",),
+    "Zn": ("zinc",),
+    "Sc": ("scandium",),
+}
+
+_PLAUSIBILITY_MECHANISM_PENALTY = 0.35
+_PLAUSIBILITY_SOURCE_EXEMPTIONS = {"rules"}
+
 
 def _condition_text_present(value: Any) -> bool:
     if value is None:
@@ -1219,6 +1238,63 @@ def _condition_text_present(value: Any) -> bool:
     if not text:
         return False
     return text.lower() != "nan"
+
+
+def _extract_catalyst_metal_tokens(value: Any) -> Tuple[str, ...]:
+    if not _condition_text_present(value):
+        return ()
+
+    text = str(value)
+    lower_text = text.lower()
+    found: List[str] = []
+    for symbol, aliases in _METAL_SYMBOL_ALIASES.items():
+        symbol_pattern = re.compile(rf"(?<![A-Za-z]){re.escape(symbol)}(?=[^a-z]|$)")
+        if symbol_pattern.search(text) or any(alias in lower_text for alias in aliases):
+            found.append(symbol)
+    return tuple(sorted(set(found)))
+
+
+def _row_contains_unexpected_catalyst_metals(
+    row: Mapping[str, Any],
+    *,
+    allowed_classes: Tuple[str, ...],
+) -> bool:
+    allowed = {str(value).strip() for value in allowed_classes if str(value).strip()}
+    if not allowed:
+        return False
+
+    tokens = set(_extract_catalyst_metal_tokens(row.get("Catalyst")))
+    tokens.update(_extract_catalyst_metal_tokens(row.get("Catalyst_Type")))
+    if not tokens:
+        return False
+
+    return bool(tokens - allowed)
+
+
+def _row_has_implausible_snar_annotation(row: Mapping[str, Any]) -> bool:
+    events_text = str(row.get("Reaction_Events") or "").strip()
+    if "mech=snar" not in events_text.lower():
+        return False
+
+    evidence_text = " ".join(
+        str(row.get(field) or "")
+        for field in (
+            "Reaction_Key",
+            "Reaction_Events",
+            "reactant_1",
+            "reactant_2",
+            "reactant_3",
+            "formed_motifs",
+            "spectator_groups",
+        )
+    ).upper()
+
+    has_fluoride_site = any(token in evidence_text for token in ("AR-F", "HETEROAR-F", "LG=F"))
+    has_iodide_or_bromide_site = any(
+        token in evidence_text
+        for token in ("AR-I", "HETEROAR-I", "AR-BR", "HETEROAR-BR", "LG=I", "LG=BR")
+    )
+    return has_iodide_or_bromide_site and not has_fluoride_site
 
 
 def _row_condition_field_present(row: Mapping[str, Any], field_name: str) -> bool:
@@ -1362,6 +1438,79 @@ def _apply_required_condition_quality_penalties(
     working_df["_condition_quality_multiplier"] = quality_multiplier
     working_df["_missing_required_condition_fields"] = missing_field_labels
     return working_df, target_reaction, dict(sorted(missing_field_counts.items())), penalized_rows
+
+
+def _apply_condition_plausibility_penalties(
+    matched_df: pd.DataFrame,
+    *,
+    reaction_type_filter: Optional[str],
+    predicted_reaction_type: Optional[str],
+    reaction_type_confidence: float,
+) -> Tuple[pd.DataFrame, Optional[str], int, int, Dict[str, int]]:
+    if matched_df.empty or "Reaction_Type_Standardized" not in matched_df.columns:
+        return matched_df, None, 0, 0, {}
+
+    target_reaction = reaction_type_filter
+    if (
+        not target_reaction
+        and predicted_reaction_type
+        and predicted_reaction_type != "Unknown"
+        and reaction_type_confidence >= 0.5
+    ):
+        target_reaction = predicted_reaction_type
+    target_reaction = _resolve_reaction_type_label(target_reaction)
+    if not target_reaction:
+        return matched_df, None, 0, 0, {}
+
+    required_catalysts = _required_catalyst_classes_for_reaction_type(target_reaction)
+    if not required_catalysts:
+        return matched_df, target_reaction, 0, 0, {}
+
+    type_series = matched_df["Reaction_Type_Standardized"].fillna("").astype(str).str.strip()
+    family_mask = type_series.apply(
+        lambda value: _resolve_reaction_type_label(value) == target_reaction if value else False
+    )
+    if not family_mask.any():
+        return matched_df, target_reaction, 0, 0, {}
+
+    working_df = matched_df.copy()
+    source_series = (
+        working_df["Source_Group"].apply(_normalize_source_group)
+        if "Source_Group" in working_df.columns
+        else pd.Series([""] * len(working_df), index=working_df.index)
+    )
+    existing_match_scores = (
+        pd.to_numeric(working_df["match_score"], errors="coerce").fillna(1.0)
+        if "match_score" in working_df.columns
+        else pd.Series([1.0] * len(working_df), index=working_df.index, dtype=float)
+    )
+
+    filtered_rows = 0
+    penalized_rows = 0
+    issue_counts: Counter[str] = Counter()
+    rows_to_drop: List[Any] = []
+
+    for idx in working_df.index[family_mask]:
+        source_group = str(source_series.loc[idx] or "").strip().lower()
+        if source_group in _PLAUSIBILITY_SOURCE_EXEMPTIONS:
+            continue
+
+        row = working_df.loc[idx]
+        if _row_contains_unexpected_catalyst_metals(row, allowed_classes=required_catalysts):
+            rows_to_drop.append(idx)
+            filtered_rows += 1
+            issue_counts["unexpected_catalyst_metals"] += 1
+            continue
+
+        if _row_has_implausible_snar_annotation(row):
+            penalized_rows += 1
+            issue_counts["implausible_snar_annotation"] += 1
+            working_df.at[idx, "match_score"] = float(existing_match_scores.loc[idx]) * _PLAUSIBILITY_MECHANISM_PENALTY
+
+    if rows_to_drop:
+        working_df = working_df.drop(index=rows_to_drop)
+
+    return working_df, target_reaction, filtered_rows, penalized_rows, dict(sorted(issue_counts.items()))
 
 
 def _format_source_reaction_ids(
@@ -3057,6 +3206,10 @@ class HTERecommendationResult:
     condition_quality_family: Optional[str] = None
     penalized_incomplete_condition_rows: int = 0
     missing_required_condition_fields: Dict[str, int] = field(default_factory=dict)
+    plausibility_family: Optional[str] = None
+    filtered_implausible_catalyst_rows: int = 0
+    penalized_implausible_mechanism_rows: int = 0
+    plausibility_issue_counts: Dict[str, int] = field(default_factory=dict)
     matched_motifs: Optional[Tuple[str, str]] = None
     timing_ms: Dict[str, float] = field(default_factory=dict)
 
@@ -4833,7 +4986,23 @@ class HTERecommender:
         result.condition_quality_family = condition_quality_family
         result.missing_required_condition_fields = missing_required_condition_fields
         result.penalized_incomplete_condition_rows = penalized_incomplete_condition_rows
-        
+        (
+            matched_df,
+            plausibility_family,
+            filtered_implausible_catalyst_rows,
+            penalized_implausible_mechanism_rows,
+            plausibility_issue_counts,
+        ) = _apply_condition_plausibility_penalties(
+            matched_df,
+            reaction_type_filter=reaction_type_filter,
+            predicted_reaction_type=result.predicted_reaction_type,
+            reaction_type_confidence=result.reaction_type_confidence,
+        )
+        result.plausibility_family = plausibility_family
+        result.filtered_implausible_catalyst_rows = filtered_implausible_catalyst_rows
+        result.penalized_implausible_mechanism_rows = penalized_implausible_mechanism_rows
+        result.plausibility_issue_counts = plausibility_issue_counts
+
         result.total_matching_experiments = len(matched_df)
         coverage_df = self.df
         if source_group and self.df is not None and "Source_Group" in self.df.columns:
