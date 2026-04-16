@@ -195,6 +195,12 @@ class TestValidateRecommendConditions:
 # ---------------------------------------------------------------------------
 
 class TestRegistryAnnotations:
+    def test_build_reaction_context_provides_reaction_type(self):
+        from chem_coworker.tools import REGISTRY
+        plugin = REGISTRY._plugins.get("build_reaction_context")
+        assert plugin is not None
+        assert "reaction_type" in plugin.provides
+
     def test_detect_reaction_type_provides(self):
         from chem_coworker.tools import REGISTRY
         plugin = REGISTRY._plugins.get("detect_reaction_type")
@@ -212,6 +218,20 @@ class TestRegistryAnnotations:
         plugin = REGISTRY._plugins.get("recommend_conditions")
         assert plugin is not None
         assert "reaction_type" in plugin.requires
+
+    def test_source_specific_condition_evidence_requires_context(self):
+        from chem_coworker.tools import REGISTRY
+        plugin = REGISTRY._plugins.get("get_literature_condition_evidence")
+        assert plugin is not None
+        assert "reaction_type" in plugin.requires
+        assert "condition_evidence" in plugin.provides
+
+    def test_compose_condition_candidates_requires_evidence(self):
+        from chem_coworker.tools import REGISTRY
+        plugin = REGISTRY._plugins.get("compose_condition_candidates")
+        assert plugin is not None
+        assert "condition_evidence" in plugin.requires
+        assert "recommendations" in plugin.provides
 
     def test_resolve_to_smiles_provides(self):
         from chem_coworker.tools import REGISTRY
@@ -537,6 +557,48 @@ class TestToolRuntimeContextInjection:
         assert result["cached"] is True
         assert result["top_k"] == 7
 
+    def test_condition_context_tool_prefers_runtime_context_cache(self, monkeypatch):
+        from chem_coworker.tools.conditions import _build_condition_reaction_context
+        rxn = "CCBr.N>>CCN"
+
+        class _FakeRuntimeContext:
+            def get_cached_condition_context(self, reaction_smiles: str, cache_key: str = ""):
+                return {
+                    "success": True,
+                    "reaction_smiles": reaction_smiles,
+                    "cache_key": cache_key,
+                    "cached": True,
+                }
+
+        monkeypatch.setattr(
+            "chem_coworker.tool_runtime.get_current_tool_runtime_context",
+            lambda: _FakeRuntimeContext(),
+        )
+        result = _build_condition_reaction_context(rxn)
+        assert result["success"] is True
+        assert result["cached"] is True
+
+    def test_condition_evidence_tool_prefers_runtime_context_cache(self, monkeypatch):
+        from chem_coworker.tools.conditions import _get_literature_condition_evidence
+        rxn = "CCBr.N>>CCN"
+
+        class _FakeRuntimeContext:
+            def get_cached_condition_evidence(self, reaction_smiles: str, cache_key: str = ""):
+                return {
+                    "success": True,
+                    "reaction_smiles": reaction_smiles,
+                    "cache_key": cache_key,
+                    "cached": True,
+                }
+
+        monkeypatch.setattr(
+            "chem_coworker.tool_runtime.get_current_tool_runtime_context",
+            lambda: _FakeRuntimeContext(),
+        )
+        result = _get_literature_condition_evidence(rxn)
+        assert result["success"] is True
+        assert result["cached"] is True
+
 
 class TestExecutorHTEHeavyConcurrencyGuard:
     def test_serializes_batch_when_multiple_hte_heavy_tools_present(self):
@@ -548,7 +610,7 @@ class TestExecutorHTEHeavyConcurrencyGuard:
         executor.verbose = False
 
         calls = [
-            ToolCall(name="recommend_conditions", args={"reaction_smiles": "A>>B"}),
+            ToolCall(name="get_literature_condition_evidence", args={"reaction_smiles": "A>>B"}),
             ToolCall(name="search_hte_precedent", args={"target_smiles": "C"}),
             ToolCall(name="read_notes", args={"id": "suzuki"}),
         ]

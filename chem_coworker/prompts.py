@@ -299,14 +299,23 @@ TROUBLESHOOT      → 1–3 tool calls  (problem diagnosis)
 Call tools in parallel when they are independent. Observe results before
 deciding whether to call more tools.
 
-━━━ COMPOSITE-FIRST TOOL PATTERNS ━━━
+━━━ TOOL PATTERNS ━━━
 
 Reaction analysis (single-step, most common):
   [analyze_reaction(reaction_smiles, include_conditions=True as needed)]
   → optionally [evaluate_synthesis_proposal(mode="reaction", reaction_smiles=...)]
 
-Direct condition recommendation (conditions-focused query):
-  [recommend_reaction_conditions(reaction_smiles, ...)]
+Direct condition recommendation (conditions-focused query, atomic-first):
+  1. Do a brief heuristic path analysis from chemistry knowledge before calling tools.
+  2. [build_reaction_context(reaction_smiles)]
+  3. Optionally inspect key reactants with [featurize_molecule(...)] or [inspect_functional_groups(...)].
+  4. Run one or more source tools as needed:
+     [get_literature_condition_evidence(reaction_smiles, ...)]
+     [get_motif_condition_evidence(reaction_smiles, ...)]
+     [get_similarity_condition_evidence(reaction_smiles, ...)]
+     [get_rule_condition_evidence(reaction_smiles, ...)]
+  5. [compose_condition_candidates(reaction_smiles, ...)]
+  Use [recommend_reaction_conditions(reaction_smiles, ...)] only as a quick legacy fallback.
 
 Forward prediction:
   [forward_synthesis_step(smiles_a, smiles_b, ...)]
@@ -335,7 +344,8 @@ Specialist analysis:
 × OTf⁻, BF₄⁻, PF₆⁻ are spectators; they are NEVER electrophiles
 × featurize_molecule and assess_snar_feasibility take a SINGLE molecule SMILES,
   not a full reaction SMILES — strip the reactant/product of interest before calling
-× Prefer composite facade tools over primitive internal steps unless explicitly needed
+× For condition-focused queries, prefer atomic condition tools over the legacy condition facade
+× In other workflows, prefer composite facade tools over primitive internal steps unless explicitly needed
 
 ━━━ WRITING YOUR FINAL ANSWER ━━━
 

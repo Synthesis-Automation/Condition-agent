@@ -83,6 +83,8 @@ class ReactionContext:
     detect_reaction_type_result: Optional[Dict[str, Any]] = None
     analyze_bond_changes_result: Optional[Dict[str, Any]] = None
     conditions_results_by_top_k: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    condition_context_results: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    condition_evidence_results: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     reaction_type_candidates: List[Any] = field(default_factory=list)
     motif_evidence: Dict[str, Any] = field(default_factory=dict)
     fg_profile: Dict[str, Any] = field(default_factory=dict)
@@ -146,6 +148,54 @@ class _ToolRuntimeContext:
         key = str(cache_key or "").strip() or _conditions_cache_key(top_k=int(top_k))
         with rxn_ctx._lock:
             rxn_ctx.conditions_results_by_top_k[key] = self.agent._copy_result(result)
+
+    def get_cached_condition_context(
+        self,
+        reaction_smiles: str,
+        cache_key: str = "",
+    ) -> Optional[Dict[str, Any]]:
+        rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        key = str(cache_key or "").strip() or "condition_context:v1"
+        with rxn_ctx._lock:
+            cached = rxn_ctx.condition_context_results.get(key)
+        return self.agent._copy_result(cached) if cached is not None else None
+
+    def set_cached_condition_context(
+        self,
+        reaction_smiles: str,
+        result: Dict[str, Any],
+        cache_key: str = "",
+    ) -> None:
+        rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        key = str(cache_key or "").strip() or "condition_context:v1"
+        with rxn_ctx._lock:
+            rxn_ctx.condition_context_results[key] = self.agent._copy_result(result)
+
+    def get_cached_condition_evidence(
+        self,
+        reaction_smiles: str,
+        cache_key: str = "",
+    ) -> Optional[Dict[str, Any]]:
+        rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        key = str(cache_key or "").strip()
+        if not key:
+            return None
+        with rxn_ctx._lock:
+            cached = rxn_ctx.condition_evidence_results.get(key)
+        return self.agent._copy_result(cached) if cached is not None else None
+
+    def set_cached_condition_evidence(
+        self,
+        reaction_smiles: str,
+        result: Dict[str, Any],
+        cache_key: str = "",
+    ) -> None:
+        rxn_ctx = self.agent._get_or_create_reaction_context(self.chemistry_state, reaction_smiles)
+        key = str(cache_key or "").strip()
+        if not key:
+            return
+        with rxn_ctx._lock:
+            rxn_ctx.condition_evidence_results[key] = self.agent._copy_result(result)
 
     def get_cached_molecule_result(self, cache_name: str, smiles: str) -> Optional[Dict[str, Any]]:
         key = str(smiles or "").strip()

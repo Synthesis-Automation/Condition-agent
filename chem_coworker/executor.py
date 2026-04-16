@@ -26,7 +26,14 @@ logger = logging.getLogger(__name__)
 
 # Maximum parallel threads per group
 _MAX_WORKERS = 4
-_HTE_HEAVY_TOOLS = {"recommend_conditions", "search_hte_precedent"}
+_HTE_HEAVY_TOOLS = {
+    "recommend_conditions",
+    "get_literature_condition_evidence",
+    "get_motif_condition_evidence",
+    "get_rule_condition_evidence",
+    "get_similarity_condition_evidence",
+    "search_hte_precedent",
+}
 
 # ---------------------------------------------------------------------------
 # Import pre-warmer

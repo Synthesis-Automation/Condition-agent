@@ -22,16 +22,28 @@ triggers:
   requires_any:
     - reaction_smiles
 tool_allowlist:
-  - analyze_reaction
+  - build_reaction_context
+  - detect_reaction_type
+  - inspect_functional_groups
+  - featurize_molecule
+  - get_literature_condition_evidence
+  - get_motif_condition_evidence
+  - get_similarity_condition_evidence
+  - get_rule_condition_evidence
+  - compose_condition_candidates
   - recommend_reaction_conditions
   - reagent_assistant
 tool_default_args:
-  recommend_reaction_conditions:
-    condition_strategy: full
+  compose_condition_candidates:
     top_k: 5
-  analyze_reaction:
-    include_conditions: true
-    condition_strategy: full
+  get_literature_condition_evidence:
+    top_k: 5
+  get_motif_condition_evidence:
+    top_k: 5
+  get_similarity_condition_evidence:
+    top_k: 5
+  get_rule_condition_evidence:
+    top_k: 5
 answer_contract:
   require_tool_evidence: true
   require_taxonomy_alignment: true
@@ -54,7 +66,8 @@ Use this skill for catalyst, ligand, solvent, base, additive, and temperature re
 
 ## Required behavior
 
-1. Confirm taxonomy-backed reaction identity before recommending conditions.
-2. Prefer tool-backed condition evidence over model-only suggestions.
-3. Surface uncertainty when evidence is weak, sparse, or absent.
-4. Never fabricate conditions from general knowledge alone — all recommendations must be backed by tool output.
+1. Start with a short heuristic chemistry analysis before tool use.
+2. Build reaction context first, then gather source-specific evidence, then compose final candidates.
+3. Prefer atomic condition tools over the legacy one-shot condition facade.
+4. Surface uncertainty when evidence is weak, sparse, or absent.
+5. Never fabricate conditions from general knowledge alone — all recommendations must be backed by tool output.

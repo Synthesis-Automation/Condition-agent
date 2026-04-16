@@ -9,9 +9,9 @@ from __future__ import annotations
 import itertools
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Sequence
 
-from ._helpers import _clean_rxn_smiles, _error, _success, _to_jsonable
+from ._helpers import _clean_rxn_smiles, _error, _success, _to_jsonable, _validate_reaction_smiles
 from ._base import ToolPlugin
 
 
@@ -20,6 +20,13 @@ from ._base import ToolPlugin
 # ---------------------------------------------------------------------------
 
 _METALS = ["Pd", "Ni", "Cu", "Ir", "Rh", "Ru", "Fe", "Co", "Au", "Zn", "Pt"]
+_CONDITION_SOURCE_ORDER = ("literature", "motif", "similarity", "rules")
+_CONDITION_SOURCE_WEIGHTS: Dict[str, float] = {
+    "literature": 1.00,
+    "motif": 0.95,
+    "similarity": 0.75,
+    "rules": 0.45,
+}
 
 
 def _extract_metal(catalyst_str: str) -> str:
@@ -81,6 +88,551 @@ def _conditions_cache_key(
         f"|similarity_mixfp_weight={float(similarity_mixfp_weight):.4f}"
         f"|selection_mode={str(selection_mode or 'best').strip().lower()}"
     )
+
+
+def _condition_context_cache_key() -> str:
+    return "condition_context:v1"
+
+
+def _condition_evidence_cache_key(
+    *,
+    source: str,
+    top_k: int,
+    reaction_key_only: bool = False,
+    use_spectator_groups: bool = True,
+    prefer_mixfp_for_similarity: bool = False,
+    similarity_mixfp_weight: float = 0.3,
+    selection_mode: str = "best",
+) -> str:
+    suffix = _conditions_cache_key(
+        top_k=int(top_k),
+        source_group=source,
+        reaction_key_only=reaction_key_only,
+        use_spectator_groups=use_spectator_groups,
+        prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+        similarity_mixfp_weight=similarity_mixfp_weight,
+        selection_mode=selection_mode,
+    )
+    return (
+        f"condition_evidence:v1|source={str(source or '').strip().lower()}"
+        f"|{suffix}"
+    )
+
+
+def _as_float(value: Any, default: float = 0.0) -> float:
+    try:
+        if value is None:
+            return default
+        return float(value)
+    except Exception:
+        return default
+
+
+def _as_int(value: Any, default: int = 0) -> int:
+    try:
+        if value is None:
+            return default
+        return int(value)
+    except Exception:
+        return default
+
+
+def _condition_fingerprint(rec: Dict[str, Any]) -> str:
+    """Stable fingerprint for deduplicating condition sets across sources."""
+    fields = [
+        "catalyst",
+        "ligand",
+        "base",
+        "solvent",
+        "secondary_solvent",
+        "additive",
+        "coupling_reagent",
+        "temperature",
+        "atmosphere",
+    ]
+    parts = []
+    for key in fields:
+        val = str(rec.get(key) or "").strip().lower()
+        parts.append(f"{key}={val}")
+    return "|".join(parts)
+
+
+def _condition_support_score(rec: Dict[str, Any]) -> float:
+    """Deterministic support score from recommendation quality metrics."""
+    confidence = max(0.0, min(1.0, _as_float(rec.get("confidence"), 0.0)))
+    success_rate = max(0.0, min(1.0, _as_float(rec.get("success_rate"), 0.0)))
+    avg_yield = _as_float(rec.get("avg_yield"), 0.0)
+    if avg_yield > 1.0:
+        avg_yield = avg_yield / 100.0
+    avg_yield = max(0.0, min(1.0, avg_yield))
+    median_yield = _as_float(rec.get("median_yield"), 0.0)
+    if median_yield > 1.0:
+        median_yield = median_yield / 100.0
+    median_yield = max(0.0, min(1.0, median_yield))
+    n_exp = _as_int(rec.get("num_experiments"), 0)
+    n_exp_norm = max(0.0, min(1.0, n_exp / 20.0))
+    return round(
+        0.35 * confidence
+        + 0.20 * success_rate
+        + 0.20 * avg_yield
+        + 0.10 * median_yield
+        + 0.15 * n_exp_norm,
+        4,
+    )
+
+
+def _dedupe_warnings(warnings: Sequence[Any]) -> List[str]:
+    seen: set[str] = set()
+    out: List[str] = []
+    for warning in warnings:
+        text = str(warning or "").strip()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        out.append(text)
+    return out
+
+
+def _build_condition_reaction_context(reaction_smiles: str) -> Dict[str, Any]:
+    """Build reusable taxonomy/feature context for condition recommendation."""
+    try:
+        reaction_smiles, rxn_err = _validate_reaction_smiles(reaction_smiles, require_product=True)
+        if rxn_err:
+            return _error(f"Invalid reaction_smiles: {rxn_err}")
+
+        try:
+            from chem_coworker.tool_runtime import get_current_tool_runtime_context
+            _rtx = get_current_tool_runtime_context()
+        except Exception:
+            _rtx = None
+
+        cache_key = _condition_context_cache_key()
+        if _rtx is not None and hasattr(_rtx, "get_cached_condition_context"):
+            cached = _rtx.get_cached_condition_context(reaction_smiles, cache_key=cache_key)
+            if isinstance(cached, dict):
+                return cached
+
+        from chemtools.recommend import RecommendationRequest
+        from chemtools.recommend.query_analysis import analyze_recommendation_query
+
+        analysis = analyze_recommendation_query(
+            RecommendationRequest(
+                reaction_smiles=reaction_smiles,
+                analysis_only=True,
+            )
+        )
+        detected_reaction_type = (
+            analysis.detected_reaction_type_id
+            or analysis.detected_reaction_type
+            or analysis.detected_reaction_type_name
+            or ""
+        )
+        result = _success({
+            "reaction_smiles": reaction_smiles,
+            "normalized_reaction_smiles": analysis.reaction_smiles_normalized or reaction_smiles,
+            "reactants": list(analysis.reactants),
+            "agents": list(analysis.agents),
+            "products": list(analysis.products),
+            "reactant_a_smiles": analysis.reactant_a_smiles,
+            "reactant_b_smiles": analysis.reactant_b_smiles or "",
+            "product_smiles": analysis.product_smiles or "",
+            "reaction_type": detected_reaction_type,
+            "reaction_type_id": analysis.detected_reaction_type_id or detected_reaction_type,
+            "reaction_type_name": analysis.detected_reaction_type_name or detected_reaction_type,
+            "reaction_type_category": analysis.detected_reaction_type_category or "",
+            "reaction_type_confidence": float(analysis.reaction_type_confidence or 0.0),
+            "reaction_key": analysis.reaction_key or "",
+            "reacted_motifs": list(analysis.reacted_motifs),
+            "formed_motifs": list(analysis.formed_motifs),
+            "spectator_motifs": list(analysis.spectator_motifs),
+            "spectator_groups": list(analysis.spectator_groups),
+            "requested_reaction_type_filter": analysis.requested_reaction_type_filter or "",
+            "requested_reaction_type_filter_canonical": analysis.requested_reaction_type_filter_canonical or "",
+            "feature_summary": dict(analysis.raw_feature_summary or {}),
+            "warnings": list(analysis.warnings),
+        })
+        if analysis.warnings:
+            result["_warnings"] = list(analysis.warnings)
+        if _rtx is not None and hasattr(_rtx, "set_cached_condition_context"):
+            _rtx.set_cached_condition_context(reaction_smiles, result, cache_key=cache_key)
+        return result
+    except Exception as exc:
+        return _error(f"Condition reaction context build failed: {exc}")
+
+
+def _project_condition_reaction_context(result: dict) -> Dict[str, Any]:
+    """Project condition-context output into structured fields."""
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    out = {
+        "reaction_type": result.get("reaction_type_id") or result.get("reaction_type"),
+        "reaction_family": result.get("reaction_type_name") or result.get("reaction_type"),
+    }
+    return {k: v for k, v in out.items() if v is not None}
+
+
+def _condition_slot_fragments(rec: Dict[str, Any]) -> Dict[str, Any]:
+    keys = (
+        "catalyst",
+        "ligand",
+        "base",
+        "solvent",
+        "secondary_solvent",
+        "additive",
+        "coupling_reagent",
+        "temperature",
+        "atmosphere",
+    )
+    return {key: rec.get(key) for key in keys if str(rec.get(key) or "").strip()}
+
+
+def _condition_evidence_hits_from_result(source: str, payload: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Normalize source-specific recommendations into a common evidence schema."""
+    recommendations = list(payload.get("recommendations", []) or [])
+    top_level_warnings = list(payload.get("_warnings", []) or [])
+    payload_evidence = payload.get("evidence") or {}
+    hits: List[Dict[str, Any]] = []
+    for rec in recommendations:
+        if not isinstance(rec, dict):
+            continue
+        rec_warnings = list(top_level_warnings)
+        missing_required_fields = [
+            str(value).strip()
+            for value in (rec.get("missing_required_fields") or [])
+            if str(value).strip()
+        ]
+        if missing_required_fields:
+            rec_warnings.append(
+                "Missing required condition fields: " + ", ".join(missing_required_fields)
+            )
+        num_experiments = _as_int(rec.get("num_experiments"), 0)
+        avg_yield = rec.get("avg_yield")
+        match_score = rec.get("match_score")
+        summary_bits = []
+        if num_experiments:
+            summary_bits.append(f"{num_experiments} experiments")
+        if avg_yield not in (None, ""):
+            summary_bits.append(f"avg_yield={avg_yield}")
+        if match_score not in (None, ""):
+            summary_bits.append(f"match_score={match_score}")
+        if not summary_bits:
+            summary_bits.append("condition evidence")
+        hits.append({
+            "source": source,
+            "rank": _as_int(rec.get("rank"), len(hits) + 1),
+            "score": round(
+                _condition_support_score(rec) * _CONDITION_SOURCE_WEIGHTS.get(source, 0.5),
+                4,
+            ),
+            "confidence": _as_float(rec.get("confidence"), 0.0),
+            "match_summary": "; ".join(summary_bits),
+            "matched_features": {
+                "reaction_type": payload.get("detected_reaction_type") or rec.get("reaction_type") or "",
+                "reaction_category": rec.get("reaction_category") or "",
+                "reactant_types": list(rec.get("reactant_types") or []),
+                "matched_transformation": payload_evidence.get("matched_transformation") or "",
+            },
+            "proposed_fragments": _condition_slot_fragments(rec),
+            "warnings": _dedupe_warnings(rec_warnings),
+            "provenance": {
+                "precedent_ids": rec.get("precedent_ids") or "",
+                "num_experiments": num_experiments,
+                "success_rate": rec.get("success_rate"),
+                "avg_yield": avg_yield,
+                "median_yield": rec.get("median_yield"),
+                "database_coverage": payload_evidence.get("database_coverage"),
+                "reaction_type_confidence": payload.get("reaction_type_confidence"),
+            },
+        })
+    return hits
+
+
+def _get_condition_evidence(
+    reaction_smiles: str,
+    *,
+    source: str,
+    top_k: int = 5,
+    reaction_key_only: bool = False,
+    use_spectator_groups: bool = True,
+    prefer_mixfp_for_similarity: bool = False,
+    similarity_mixfp_weight: float = 0.3,
+    selection_mode: str = "best",
+) -> Dict[str, Any]:
+    """Internal source-specific evidence adapter for condition recommendation."""
+    normalized_source = str(source or "").strip().lower()
+    if normalized_source not in _CONDITION_SOURCE_ORDER:
+        return _error(
+            "source must be one of: literature, motif, similarity, rules"
+        )
+
+    reaction_smiles, rxn_err = _validate_reaction_smiles(reaction_smiles, require_product=True)
+    if rxn_err:
+        return _error(f"Invalid reaction_smiles: {rxn_err}")
+
+    try:
+        from chem_coworker.tool_runtime import get_current_tool_runtime_context
+        _rtx = get_current_tool_runtime_context()
+    except Exception:
+        _rtx = None
+
+    cache_key = _condition_evidence_cache_key(
+        source=normalized_source,
+        top_k=int(top_k),
+        reaction_key_only=bool(reaction_key_only),
+        use_spectator_groups=bool(use_spectator_groups),
+        prefer_mixfp_for_similarity=bool(prefer_mixfp_for_similarity),
+        similarity_mixfp_weight=float(similarity_mixfp_weight),
+        selection_mode=selection_mode,
+    )
+    if _rtx is not None and hasattr(_rtx, "get_cached_condition_evidence"):
+        cached = _rtx.get_cached_condition_evidence(reaction_smiles, cache_key=cache_key)
+        if isinstance(cached, dict):
+            return cached
+
+    result = _recommend_conditions(
+        reaction_smiles=reaction_smiles,
+        top_k=top_k,
+        source_group=normalized_source,
+        reaction_key_only=reaction_key_only,
+        use_spectator_groups=use_spectator_groups,
+        prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+        similarity_mixfp_weight=similarity_mixfp_weight,
+        selection_mode=selection_mode,
+    )
+    if not isinstance(result, dict) or not result.get("success"):
+        return result
+
+    out = _success({
+        "reaction_smiles": reaction_smiles,
+        "source": normalized_source,
+        "recommendations": list(result.get("recommendations", []) or []),
+        "condition_evidence": _condition_evidence_hits_from_result(normalized_source, result),
+        "detected_reaction_type": result.get("detected_reaction_type") or "",
+        "reaction_type_confidence": result.get("reaction_type_confidence"),
+        "evidence": dict(result.get("evidence") or {}),
+        "source_group": normalized_source,
+        "selection_mode": result.get("selection_mode") or selection_mode,
+        "total_available": _as_int(result.get("total_available"), 0),
+        "hte_timing_ms": dict(result.get("hte_timing_ms") or {}),
+        "hte_processing_time_ms": result.get("hte_processing_time_ms"),
+        "hte_recommender_stage_timing_ms": dict(result.get("hte_recommender_stage_timing_ms") or {}),
+    })
+    warnings = _dedupe_warnings(result.get("_warnings", []))
+    if warnings:
+        out["_warnings"] = warnings
+    if _rtx is not None and hasattr(_rtx, "set_cached_condition_evidence"):
+        _rtx.set_cached_condition_evidence(reaction_smiles, out, cache_key=cache_key)
+    return out
+
+
+def _get_literature_condition_evidence(
+    reaction_smiles: str,
+    top_k: int = 5,
+    reaction_key_only: bool = False,
+    use_spectator_groups: bool = True,
+    selection_mode: str = "best",
+) -> Dict[str, Any]:
+    return _get_condition_evidence(
+        reaction_smiles,
+        source="literature",
+        top_k=top_k,
+        reaction_key_only=reaction_key_only,
+        use_spectator_groups=use_spectator_groups,
+        selection_mode=selection_mode,
+    )
+
+
+def _get_motif_condition_evidence(
+    reaction_smiles: str,
+    top_k: int = 5,
+    reaction_key_only: bool = False,
+    use_spectator_groups: bool = True,
+    selection_mode: str = "best",
+) -> Dict[str, Any]:
+    return _get_condition_evidence(
+        reaction_smiles,
+        source="motif",
+        top_k=top_k,
+        reaction_key_only=reaction_key_only,
+        use_spectator_groups=use_spectator_groups,
+        selection_mode=selection_mode,
+    )
+
+
+def _get_similarity_condition_evidence(
+    reaction_smiles: str,
+    top_k: int = 5,
+    use_spectator_groups: bool = True,
+    prefer_mixfp_for_similarity: bool = False,
+    similarity_mixfp_weight: float = 0.3,
+    selection_mode: str = "best",
+) -> Dict[str, Any]:
+    return _get_condition_evidence(
+        reaction_smiles,
+        source="similarity",
+        top_k=top_k,
+        reaction_key_only=False,
+        use_spectator_groups=use_spectator_groups,
+        prefer_mixfp_for_similarity=prefer_mixfp_for_similarity,
+        similarity_mixfp_weight=similarity_mixfp_weight,
+        selection_mode=selection_mode,
+    )
+
+
+def _get_rule_condition_evidence(
+    reaction_smiles: str,
+    top_k: int = 5,
+    reaction_key_only: bool = False,
+    use_spectator_groups: bool = True,
+    selection_mode: str = "best",
+) -> Dict[str, Any]:
+    return _get_condition_evidence(
+        reaction_smiles,
+        source="rules",
+        top_k=top_k,
+        reaction_key_only=reaction_key_only,
+        use_spectator_groups=use_spectator_groups,
+        selection_mode=selection_mode,
+    )
+
+
+def _compose_condition_candidates(
+    reaction_smiles: str,
+    top_k: int = 5,
+    sources: Optional[List[str]] = None,
+    selection_mode: str = "best",
+) -> Dict[str, Any]:
+    """Deterministically merge cached/source-specific condition evidence into ranked candidates."""
+    reaction_smiles, rxn_err = _validate_reaction_smiles(reaction_smiles, require_product=True)
+    if rxn_err:
+        return _error(f"Invalid reaction_smiles: {rxn_err}")
+
+    requested_sources = [
+        str(source).strip().lower()
+        for source in (sources or list(_CONDITION_SOURCE_ORDER))
+        if str(source).strip()
+    ]
+    if not requested_sources:
+        requested_sources = list(_CONDITION_SOURCE_ORDER)
+    normalized_sources: List[str] = []
+    for source in requested_sources:
+        if source not in _CONDITION_SOURCE_ORDER:
+            return _error("sources must be chosen from: literature, motif, similarity, rules")
+        if source not in normalized_sources:
+            normalized_sources.append(source)
+
+    per_source: Dict[str, Dict[str, Any]] = {}
+    merged: Dict[str, Dict[str, Any]] = {}
+    warnings: List[str] = []
+
+    for source in normalized_sources:
+        payload = _get_condition_evidence(
+            reaction_smiles,
+            source=source,
+            top_k=top_k,
+            selection_mode=selection_mode,
+        )
+        per_source[source] = payload if isinstance(payload, dict) else _error("Unexpected evidence result")
+        if not isinstance(payload, dict):
+            continue
+        warnings.extend(payload.get("_warnings", []) or [])
+        if not payload.get("success"):
+            continue
+        for rec in list(payload.get("recommendations", []) or []):
+            if not isinstance(rec, dict):
+                continue
+            fp = _condition_fingerprint(rec)
+            bucket = merged.get(fp)
+            if bucket is None:
+                bucket = {
+                    "fingerprint": fp,
+                    "condition": dict(rec),
+                    "sources": [],
+                    "source_scores": {},
+                    "support_score": 0.0,
+                    "ensemble_score": 0.0,
+                }
+                merged[fp] = bucket
+
+            if source in bucket["sources"]:
+                continue
+
+            source_weight = _CONDITION_SOURCE_WEIGHTS.get(source, 0.5)
+            support_score = _condition_support_score(rec)
+            bucket["sources"].append(source)
+            bucket["source_scores"][source] = {
+                "source_weight": source_weight,
+                "support_score": support_score,
+            }
+            bucket["support_score"] = round(max(float(bucket["support_score"]), support_score), 4)
+
+            current_best = _condition_support_score(bucket["condition"])
+            if support_score > current_best:
+                bucket["condition"] = dict(rec)
+
+    ranked_rows: List[Dict[str, Any]] = []
+    for row in merged.values():
+        weighted_sum = 0.0
+        for source in row["sources"]:
+            meta = row["source_scores"].get(source) or {}
+            weighted_sum += _as_float(meta.get("support_score"), 0.0) * _as_float(meta.get("source_weight"), 0.0)
+        consensus_bonus = 0.10 * max(0, len(row["sources"]) - 1)
+        row["ensemble_score"] = round(weighted_sum + consensus_bonus, 4)
+        ranked_rows.append(row)
+
+    ranked_rows.sort(
+        key=lambda row: (
+            row.get("ensemble_score", 0.0),
+            len(row.get("sources", [])),
+            row.get("support_score", 0.0),
+        ),
+        reverse=True,
+    )
+
+    recommendations: List[Dict[str, Any]] = []
+    for rank, row in enumerate(ranked_rows[: max(1, min(int(top_k or 5), 10))], 1):
+        rec = dict(row["condition"])
+        rec["rank"] = rank
+        rec["source_consensus"] = list(row["sources"])
+        rec["consensus_count"] = len(row["sources"])
+        rec["ensemble_score"] = row["ensemble_score"]
+        rec["full_support_score"] = row["support_score"]
+        rec["balanced_support_score"] = row["support_score"]
+        recommendations.append(rec)
+
+    source_counts = {
+        source: len((per_source.get(source) or {}).get("recommendations", []) or [])
+        for source in normalized_sources
+    }
+    failed_sources = [
+        source for source in normalized_sources
+        if not (per_source.get(source) or {}).get("success", False)
+    ]
+
+    result = _success({
+        "reaction_smiles": reaction_smiles,
+        "recommendations": recommendations,
+        "sources_run": normalized_sources,
+        "source_counts": source_counts,
+        "per_source_results": per_source,
+        "consensus_summary": {
+            "unique_condition_sets": len(ranked_rows),
+            "failed_sources": failed_sources,
+            "sources_run": normalized_sources,
+        },
+    })
+    deduped_warnings = _dedupe_warnings(warnings)
+    if deduped_warnings:
+        result["_warnings"] = deduped_warnings
+    return result
+
+
+def _project_compose_condition_candidates(result: dict) -> Dict[str, Any]:
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    return {
+        "conditions": result.get("recommendations", []),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -468,10 +1020,106 @@ recommend_conditions_tool = ToolPlugin(
 recommend_conditions_tool.structured_projection = _project_recommend_conditions
 
 
+build_reaction_context_tool = ToolPlugin(
+    name="build_reaction_context",
+    category="conditions",
+    description=(
+        "Build reusable reaction context for condition recommendation: normalized reaction SMILES, "
+        "electrophile/nucleophile assignment, taxonomy reaction type guess, reaction key, reacted/formed motifs, "
+        "and spectator groups. Use this before source-specific condition evidence tools."
+    ),
+    prerequisites=[],
+    fn=_build_condition_reaction_context,
+    provides=["reaction_type", "reaction_type_id", "reaction_key", "reacted_motifs", "formed_motifs"],
+)
+build_reaction_context_tool.structured_projection = _project_condition_reaction_context
+
+
+get_literature_condition_evidence_tool = ToolPlugin(
+    name="get_literature_condition_evidence",
+    category="conditions",
+    description=(
+        "Get literature-backed condition evidence only. Returns source-specific condition recommendations plus a "
+        "normalized condition_evidence list with provenance, matched features, and warnings."
+    ),
+    prerequisites=["build_reaction_context"],
+    fn=_get_literature_condition_evidence,
+    provides=["condition_evidence", "recommendations"],
+    requires=["reaction_type"],
+)
+
+
+get_motif_condition_evidence_tool = ToolPlugin(
+    name="get_motif_condition_evidence",
+    category="conditions",
+    description=(
+        "Get motif-screen/HTE condition evidence only. Returns source-specific recommendations plus normalized "
+        "condition_evidence for substrate-class and motif-level matches."
+    ),
+    prerequisites=["build_reaction_context"],
+    fn=_get_motif_condition_evidence,
+    provides=["condition_evidence", "recommendations"],
+    requires=["reaction_type"],
+)
+
+
+get_similarity_condition_evidence_tool = ToolPlugin(
+    name="get_similarity_condition_evidence",
+    category="conditions",
+    description=(
+        "Get similarity/predecessent-based condition evidence only. Uses structurally similar precedents and returns "
+        "normalized condition_evidence with provenance and match summaries."
+    ),
+    prerequisites=["build_reaction_context"],
+    fn=_get_similarity_condition_evidence,
+    provides=["condition_evidence", "recommendations"],
+    requires=["reaction_type"],
+)
+
+
+get_rule_condition_evidence_tool = ToolPlugin(
+    name="get_rule_condition_evidence",
+    category="conditions",
+    description=(
+        "Get rule-based condition evidence only. Use as a fast deterministic fallback when motif or literature data is sparse."
+    ),
+    prerequisites=["build_reaction_context"],
+    fn=_get_rule_condition_evidence,
+    provides=["condition_evidence", "recommendations"],
+    requires=["reaction_type"],
+)
+
+
+compose_condition_candidates_tool = ToolPlugin(
+    name="compose_condition_candidates",
+    category="conditions",
+    description=(
+        "Merge cached/source-specific condition_evidence from literature, motif, similarity, and rules into a "
+        "consensus-ranked recommendation list. Run after one or more source-specific condition evidence tools."
+    ),
+    prerequisites=[
+        "get_literature_condition_evidence",
+        "get_motif_condition_evidence",
+        "get_similarity_condition_evidence",
+        "get_rule_condition_evidence",
+    ],
+    fn=_compose_condition_candidates,
+    provides=["conditions", "recommendations"],
+    requires=["condition_evidence"],
+)
+compose_condition_candidates_tool.structured_projection = _project_compose_condition_candidates
+
+
 # ---------------------------------------------------------------------------
 # All tools in this module
 # ---------------------------------------------------------------------------
 
 CONDITIONS_TOOLS = [
+    build_reaction_context_tool,
+    get_literature_condition_evidence_tool,
+    get_motif_condition_evidence_tool,
+    get_similarity_condition_evidence_tool,
+    get_rule_condition_evidence_tool,
+    compose_condition_candidates_tool,
     recommend_conditions_tool,
 ]

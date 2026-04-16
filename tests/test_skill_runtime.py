@@ -28,6 +28,16 @@ def test_tool_registry_policy_resolves_expected_public_tools() -> None:
     assert "recommend_reaction_conditions" in names
 
 
+def test_conditions_specialist_policy_exposes_atomic_condition_tools() -> None:
+    names = REGISTRY.filtered_names_for_policy("conditions_specialist", llm_exposed_only=False)
+    assert "build_reaction_context" in names
+    assert "get_literature_condition_evidence" in names
+    assert "get_motif_condition_evidence" in names
+    assert "get_similarity_condition_evidence" in names
+    assert "get_rule_condition_evidence" in names
+    assert "compose_condition_candidates" in names
+
+
 def test_workflow_defaults_expose_policy_and_default_skills() -> None:
     retro = WORKFLOW_REGISTRY.get_for_task("retrosynthesis")
     assert retro.tool_policy == "retro_specialist"

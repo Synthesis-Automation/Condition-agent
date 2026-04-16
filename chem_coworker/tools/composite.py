@@ -92,7 +92,7 @@ def _recommend_conditions_with_strategy(
     condition_selection_mode: str = "best",
 ) -> Dict[str, Any]:
     """Run recommend_conditions in single-source or full multi-source mode."""
-    from .conditions import _recommend_conditions
+    from .conditions import _compose_condition_candidates, _recommend_conditions
 
     reaction_smiles, rxn_err = _validate_reaction_smiles(reaction_smiles, require_product=True)
     if rxn_err:
@@ -130,104 +130,19 @@ def _recommend_conditions_with_strategy(
             return out
         return _error("Unexpected recommend_conditions result")
 
-    # Full mode: run all four sources separately, then merge deterministically.
-    per_source: Dict[str, Dict[str, Any]] = {}
-    merged: Dict[str, Dict[str, Any]] = {}
-
-    for mode in _CONDITION_SOURCE_MODES:
-        res = _recommend_conditions(
-            reaction_smiles=reaction_smiles,
-            top_k=top_k,
-            source_group=mode,
-            selection_mode=condition_selection_mode,
-        )
-        per_source[mode] = res if isinstance(res, dict) else _error("Unexpected recommend_conditions result")
-        if not isinstance(res, dict) or not res.get("success"):
-            continue
-        for rec in list(res.get("recommendations", []) or []):
-            if not isinstance(rec, dict):
-                continue
-            fp = _condition_fingerprint(rec)
-            bucket = merged.get(fp)
-            if bucket is None:
-                bucket = {
-                    "fingerprint": fp,
-                    "condition": dict(rec),
-                    "sources": [],
-                    "source_scores": {},
-                    "support_score": 0.0,
-                    "ensemble_score": 0.0,
-                }
-                merged[fp] = bucket
-
-            if mode in bucket["sources"]:
-                continue
-
-            source_weight = _CONDITION_SOURCE_WEIGHTS.get(mode, 0.5)
-            support_score = _entry_support_score(rec)
-            bucket["sources"].append(mode)
-            bucket["source_scores"][mode] = {
-                "source_weight": source_weight,
-                "support_score": support_score,
-            }
-            bucket["support_score"] = round(max(float(bucket["support_score"]), support_score), 4)
-
-            # Keep strongest version of the condition record.
-            current_best = _entry_support_score(bucket["condition"])
-            if support_score > current_best:
-                bucket["condition"] = dict(rec)
-
-    ranked_rows: List[Dict[str, Any]] = []
-    for row in merged.values():
-        weighted_sum = 0.0
-        for mode in row["sources"]:
-            ss = _as_float((row["source_scores"].get(mode) or {}).get("support_score"), 0.0)
-            sw = _as_float((row["source_scores"].get(mode) or {}).get("source_weight"), 0.0)
-            weighted_sum += ss * sw
-        consensus_bonus = 0.10 * max(0, len(row["sources"]) - 1)
-        row["ensemble_score"] = round(weighted_sum + consensus_bonus, 4)
-        ranked_rows.append(row)
-
-    ranked_rows.sort(
-        key=lambda r: (r.get("ensemble_score", 0.0), len(r.get("sources", [])), r.get("support_score", 0.0)),
-        reverse=True,
+    composed = _compose_condition_candidates(
+        reaction_smiles=reaction_smiles,
+        top_k=top_k,
+        sources=list(_CONDITION_SOURCE_MODES),
+        selection_mode=condition_selection_mode,
     )
-
-    recommendations: List[Dict[str, Any]] = []
-    for rank, row in enumerate(ranked_rows[:top_k], 1):
-        rec = dict(row["condition"])
-        rec["rank"] = rank
-        rec["source_consensus"] = list(row["sources"])
-        rec["consensus_count"] = len(row["sources"])
-        rec["ensemble_score"] = row["ensemble_score"]
-        rec["full_support_score"] = row["support_score"]
-        rec["balanced_support_score"] = row["support_score"]  # backward-compatible alias
-        recommendations.append(rec)
-
-    source_counts = {
-        mode: len((per_source.get(mode) or {}).get("recommendations", []) or [])
-        for mode in _CONDITION_SOURCE_MODES
-    }
-    failed_sources = [
-        mode for mode in _CONDITION_SOURCE_MODES
-        if not (per_source.get(mode) or {}).get("success", False)
-    ]
-
-    # Reuse top-level shape of recommend_conditions so downstream projections continue to work.
-    return _success({
-        "reaction_smiles": reaction_smiles,
-        "recommendations": recommendations,
-        "condition_strategy": "full",
-        "condition_source_mode": "full",
-        "source_group": "full",
-        "per_source_results": per_source,
-        "source_counts": source_counts,
-        "consensus_summary": {
-            "unique_condition_sets": len(ranked_rows),
-            "failed_sources": failed_sources,
-            "sources_run": list(_CONDITION_SOURCE_MODES),
-        },
-    })
+    if isinstance(composed, dict):
+        out = dict(composed)
+        out["condition_strategy"] = "full"
+        out["condition_source_mode"] = "full"
+        out["source_group"] = "full"
+        return out
+    return _error("Unexpected compose_condition_candidates result")
 
 
 def _resolve_chemical(
