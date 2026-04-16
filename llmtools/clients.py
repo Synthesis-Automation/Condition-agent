@@ -65,13 +65,9 @@ AVAILABLE_MODELS = {
     ],
     "openai": [
         "gpt-5.4",
-        "gpt-5.2",
-        "gpt-5-mini",
+        "gpt-5.4-mini",
         "gpt-5-nano",
-        "gpt-5-codex",
         "o3",
-        "o3-pro",
-        "o3-mini",
         "o4-mini",
         "gpt-4o",
         "gpt-4.1"
