@@ -31,10 +31,13 @@ tool_allowlist:
   - get_similarity_condition_evidence
   - get_rule_condition_evidence
   - compose_condition_candidates
+  - score_condition_candidates
   - recommend_reaction_conditions
   - reagent_assistant
 tool_default_args:
   compose_condition_candidates:
+    top_k: 5
+  score_condition_candidates:
     top_k: 5
   get_literature_condition_evidence:
     top_k: 5
@@ -67,7 +70,8 @@ Use this skill for catalyst, ligand, solvent, base, additive, and temperature re
 ## Required behavior
 
 1. Start with a short heuristic chemistry analysis before tool use.
-2. Build reaction context first, then gather source-specific evidence, then compose final candidates.
+2. Build reaction context first, then gather source-specific evidence, compose candidates, then score candidates against evidence and the user's stated constraints.
 3. Prefer atomic condition tools over the legacy one-shot condition facade.
-4. Surface uncertainty when evidence is weak, sparse, or absent.
-5. Never fabricate conditions from general knowledge alone — all recommendations must be backed by tool output.
+4. Use `score_condition_candidates` for mild, cheap, metal-free, green, scale-up, HTE-only, literature-only, or substrate-compatibility preferences.
+5. Surface uncertainty when evidence is weak, sparse, or absent.
+6. Never fabricate conditions from general knowledge alone — all recommendations must be backed by tool output.

@@ -353,6 +353,7 @@ _TOOL_POLICIES: Dict[str, List[str]] = {
         "retrosynthesis_step",
         "forward_synthesis_step",
         "plan_route",
+        "plan_route_candidates",
         "plan_forward_route",
         "evaluate_synthesis_proposal",
         "validate_synthesis_proposal",
@@ -365,6 +366,7 @@ _TOOL_POLICIES: Dict[str, List[str]] = {
     "retro_specialist": [
         "retrosynthesis_step",
         "plan_route",
+        "plan_route_candidates",
         "apply_hte_templates",
         "search_by_product_similarity",
         "evaluate_synthesis_proposal",
@@ -395,6 +397,7 @@ _TOOL_POLICIES: Dict[str, List[str]] = {
         "get_similarity_condition_evidence",
         "get_rule_condition_evidence",
         "compose_condition_candidates",
+        "score_condition_candidates",
         "analyze_reaction",
         "recommend_reaction_conditions",
         "reagent_assistant",

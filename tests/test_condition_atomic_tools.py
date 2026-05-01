@@ -7,6 +7,7 @@ from chem_coworker.tools.conditions import (
     _build_condition_reaction_context,
     _compose_condition_candidates,
     _get_literature_condition_evidence,
+    _score_condition_candidates,
 )
 
 
@@ -186,3 +187,144 @@ def test_legacy_full_strategy_delegates_to_atomic_composer(monkeypatch) -> None:
     assert seen["sources"] == ["literature", "motif", "similarity", "rules"]
     assert seen["selection_mode"] == "diverse"
     assert result["condition_strategy"] == "full"
+
+
+def test_score_condition_candidates_reranks_against_user_constraints(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "chem_coworker.tools.conditions._build_condition_reaction_context",
+        lambda reaction_smiles: {
+            "success": True,
+            "reaction_smiles": reaction_smiles,
+            "reaction_type": "suzuki_miyaura",
+            "reaction_type_id": "suzuki_miyaura",
+            "reaction_type_name": "Suzuki-Miyaura",
+            "reaction_type_category": "cross_coupling",
+            "reaction_type_confidence": 0.91,
+            "reaction_key": "rk-demo",
+            "reacted_motifs": ["aryl_halide", "aryl_boron"],
+            "formed_motifs": ["biaryl"],
+            "spectator_groups": [],
+            "feature_summary": {},
+        },
+    )
+    monkeypatch.setattr(
+        "chem_coworker.tools.conditions._compose_condition_candidates",
+        lambda reaction_smiles, top_k=5, sources=None, selection_mode="best": {
+            "success": True,
+            "reaction_smiles": reaction_smiles,
+            "recommendations": [
+                {
+                    "rank": 1,
+                    "catalyst": "Pd(OAc)2",
+                    "ligand": "XPhos",
+                    "base": "K3PO4",
+                    "solvent": "dioxane",
+                    "temperature": "90 C",
+                    "confidence": 0.94,
+                    "success_rate": 0.91,
+                    "avg_yield": 88.0,
+                    "median_yield": 89.0,
+                    "num_experiments": 10,
+                    "ensemble_score": 0.95,
+                    "consensus_count": 2,
+                    "source_consensus": ["literature", "motif"],
+                    "reaction_type": "suzuki_miyaura",
+                },
+                {
+                    "rank": 2,
+                    "catalyst": "",
+                    "ligand": "",
+                    "base": "K2CO3",
+                    "solvent": "ethanol/water",
+                    "temperature": "50 C",
+                    "confidence": 0.72,
+                    "success_rate": 0.70,
+                    "avg_yield": 62.0,
+                    "median_yield": 63.0,
+                    "num_experiments": 4,
+                    "ensemble_score": 0.70,
+                    "consensus_count": 1,
+                    "source_consensus": ["motif"],
+                    "reaction_type": "suzuki_miyaura",
+                },
+            ],
+            "source_counts": {"literature": 1, "motif": 2},
+            "consensus_summary": {
+                "unique_condition_sets": 2,
+                "failed_sources": [],
+                "sources_run": ["literature", "motif"],
+            },
+        },
+    )
+
+    result = _score_condition_candidates(
+        _VALID_RXN,
+        strategy_query="Recommend a mild metal-free condition if possible",
+        top_k=2,
+    )
+
+    assert result["success"] is True
+    assert result["constraints_detected"]["mild"] is True
+    assert result["constraints_detected"]["metal_free"] is True
+    assert result["recommendations"][0]["solvent"] == "ethanol/water"
+    assert result["recommendations"][0]["scorecard"]["user_constraint_alignment_score"] > result["recommendations"][1]["scorecard"]["user_constraint_alignment_score"]
+    assert "violates_metal_free_preference" in result["recommendations"][1]["risk_flags"]
+
+
+def test_score_condition_candidates_preserves_evidence_when_no_strategy(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "chem_coworker.tools.conditions._build_condition_reaction_context",
+        lambda reaction_smiles: {
+            "success": True,
+            "reaction_smiles": reaction_smiles,
+            "reaction_type": "suzuki_miyaura",
+            "reaction_type_id": "suzuki_miyaura",
+            "reaction_type_name": "Suzuki-Miyaura",
+            "reaction_type_category": "cross_coupling",
+            "reaction_type_confidence": 0.95,
+            "reaction_key": "rk-demo",
+            "reacted_motifs": [],
+            "formed_motifs": [],
+            "spectator_groups": [],
+            "feature_summary": {},
+        },
+    )
+    monkeypatch.setattr(
+        "chem_coworker.tools.conditions._compose_condition_candidates",
+        lambda reaction_smiles, top_k=5, sources=None, selection_mode="best": {
+            "success": True,
+            "reaction_smiles": reaction_smiles,
+            "recommendations": [
+                {
+                    "rank": 1,
+                    "catalyst": "Pd(OAc)2",
+                    "ligand": "SPhos",
+                    "base": "K3PO4",
+                    "solvent": "dioxane",
+                    "temperature": "90 C",
+                    "confidence": 0.9,
+                    "success_rate": 0.85,
+                    "avg_yield": 86.0,
+                    "median_yield": 87.0,
+                    "num_experiments": 6,
+                    "ensemble_score": 0.91,
+                    "consensus_count": 2,
+                    "source_consensus": ["literature", "motif"],
+                    "reaction_type": "suzuki_miyaura",
+                }
+            ],
+            "source_counts": {"literature": 1, "motif": 1},
+            "consensus_summary": {
+                "unique_condition_sets": 1,
+                "failed_sources": [],
+                "sources_run": ["literature", "motif"],
+            },
+        },
+    )
+
+    result = _score_condition_candidates(_VALID_RXN, top_k=1)
+
+    assert result["success"] is True
+    assert result["recommendations"][0]["scorecard"]["evidence_score"] > 0.8
+    assert result["recommendations"][0]["final_score"] > 0.7
+    assert any("No strategy_query" in warning for warning in result["_warnings"])

@@ -14,6 +14,8 @@ Coverage:
 """
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
 
@@ -25,10 +27,12 @@ def test_plan_route_imports():
     """plan_route_tool is importable and registered in RETROSYNTHESIS_TOOLS."""
     from chem_coworker.tools.retrosynthesis import (  # noqa: F401
         plan_route_tool,
+        plan_route_candidates_tool,
         RETROSYNTHESIS_TOOLS,
     )
     names = [t.name for t in RETROSYNTHESIS_TOOLS]
     assert "plan_route" in names
+    assert "plan_route_candidates" in names
 
 
 def test_helper_imports():
@@ -305,3 +309,97 @@ def test_plan_route_cumulative_difficulty_matches_steps():
         f"cumulative_difficulty {result['cumulative_difficulty']} "
         f"!= sum of steps {expected}"
     )
+
+
+# ---------------------------------------------------------------------------
+# plan_route_candidates: strategy-aware candidate generation
+# ---------------------------------------------------------------------------
+
+def _fake_disconnection(name, p1, p2, difficulty=0.25, score=0.8, description=""):
+    return SimpleNamespace(
+        reaction_name=name,
+        retron_name=name.lower().replace(" ", "_"),
+        description=description or name,
+        difficulty=difficulty,
+        precursor_1=p1,
+        precursor_2=p2,
+        complexity_delta=100.0,
+        overall_score=score,
+    )
+
+
+def test_plan_route_candidates_ranks_strategy_aligned_route(monkeypatch):
+    import chem_coworker.tools.retrosynthesis as retro
+    import chemtools.retro.disconnector as disconnector
+
+    monkeypatch.setattr(
+        retro,
+        "_bertz_complexity_fast",
+        lambda smi: 500.0 if smi == "TARGET" else 10.0,
+    )
+    monkeypatch.setattr(retro, "_inchi_key", lambda smi: f"IK-{smi}")
+
+    def fake_rank(smiles, top_k=4, max_difficulty=0.9):  # noqa: ARG001
+        if smiles != "TARGET":
+            return []
+        return [
+            _fake_disconnection(
+                "Suzuki coupling",
+                "ArBr",
+                "ArB(OH)2",
+                difficulty=0.20,
+                description="palladium cross-coupling",
+            ),
+            _fake_disconnection(
+                "Aldol addition",
+                "CC=O",
+                "CC(=O)C",
+                difficulty=0.25,
+                description="metal-free carbonyl coupling",
+            ),
+        ]
+
+    monkeypatch.setattr(disconnector, "rank_disconnections", fake_rank)
+
+    result = retro.plan_route_candidates_tool.fn(
+        target_smiles="TARGET",
+        strategy_query="Find a metal-free concise route",
+        max_depth=2,
+        max_branches=2,
+        beam_width=4,
+        top_k=2,
+    )
+
+    assert result.get("success") is True
+    assert result["candidate_count"] == 2
+    assert result["candidates"][0]["route"][0]["reaction_name"] == "Aldol addition"
+    assert result["candidates"][0]["combined_score"] >= result["candidates"][1]["combined_score"]
+
+
+def test_plan_route_candidates_exposes_structured_projection(monkeypatch):
+    import chem_coworker.tools.retrosynthesis as retro
+    import chemtools.retro.disconnector as disconnector
+
+    monkeypatch.setattr(
+        retro,
+        "_bertz_complexity_fast",
+        lambda smi: 500.0 if smi == "TARGET" else 10.0,
+    )
+    monkeypatch.setattr(retro, "_inchi_key", lambda smi: f"IK-{smi}")
+    monkeypatch.setattr(
+        disconnector,
+        "rank_disconnections",
+        lambda *args, **kwargs: [_fake_disconnection("Wittig olefination", "A", "B")],
+    )
+
+    result = retro.plan_route_candidates_tool.fn(
+        target_smiles="TARGET",
+        strategy_query="concise feasible route",
+        max_depth=1,
+        top_k=1,
+    )
+    projection = retro.plan_route_candidates_tool.structured_projection(result)
+
+    assert result.get("success") is True
+    assert "route_candidates" in projection
+    assert projection["best_route_candidate"]["route"][0]["reaction_name"] == "Wittig olefination"

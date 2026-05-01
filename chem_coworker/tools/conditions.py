@@ -181,6 +181,141 @@ def _condition_support_score(rec: Dict[str, Any]) -> float:
     )
 
 
+def _contains_any(text: str, terms: Sequence[str]) -> bool:
+    haystack = str(text or "").lower()
+    return any(term.lower() in haystack for term in terms)
+
+
+def _condition_text(rec: Dict[str, Any]) -> str:
+    fields = (
+        "catalyst",
+        "ligand",
+        "base",
+        "solvent",
+        "secondary_solvent",
+        "additive",
+        "coupling_reagent",
+        "temperature",
+        "atmosphere",
+    )
+    return " ".join(str(rec.get(field) or "") for field in fields).lower()
+
+
+def _condition_mentions_transition_metal(text: str) -> bool:
+    """Detect common transition-metal catalyst mentions without broad substring hits."""
+    raw = str(text or "")
+    lowered = raw.lower()
+    if _contains_any(
+        lowered,
+        (
+            "palladium",
+            "nickel",
+            "copper",
+            "iridium",
+            "rhodium",
+            "ruthenium",
+            "iron",
+            "cobalt",
+            "gold",
+            "zinc",
+            "platinum",
+        ),
+    ):
+        return True
+    import re
+    return bool(re.search(r"\b(?:pd|ni|cu|ir|rh|ru|fe|co|au|zn|pt)(?:\b|[a-z0-9(\[])", lowered))
+
+
+def _parse_temperature_celsius(value: Any) -> Optional[float]:
+    text = str(value or "").strip().lower()
+    if not text:
+        return None
+    if "rt" in text or "room" in text or "ambient" in text:
+        return 25.0
+    import re
+    match = re.search(r"-?\d+(?:\.\d+)?", text)
+    if not match:
+        return None
+    try:
+        return float(match.group(0))
+    except Exception:
+        return None
+
+
+def _condition_constraint_profile(strategy_query: str) -> Dict[str, bool]:
+    query = str(strategy_query or "").lower()
+    return {
+        "mild": _contains_any(query, ("mild", "room temperature", "rt", "ambient", "low temperature")),
+        "metal_free": _contains_any(query, ("metal-free", "no metal", "avoid metal", "without metal")),
+        "cheap": _contains_any(query, ("cheap", "low cost", "inexpensive", "commodity")),
+        "avoid_air_sensitive": _contains_any(query, ("avoid air-sensitive", "air tolerant", "air-stable", "open flask")),
+        "scale_up": _contains_any(query, ("scale-up", "scale up", "scalable", "gram scale", "kilogram")),
+        "green": _contains_any(query, ("green", "benign solvent", "avoid toxic", "sustainable")),
+        "hte_only": _contains_any(query, ("hte only", "screen only", "motif only")),
+        "literature_only": _contains_any(query, ("literature only", "published only", "precedent only")),
+    }
+
+
+def _condition_context_text(context: Dict[str, Any]) -> str:
+    chunks: List[str] = []
+    for key in (
+        "reacted_motifs",
+        "formed_motifs",
+        "spectator_motifs",
+        "spectator_groups",
+        "warnings",
+    ):
+        value = context.get(key)
+        if isinstance(value, (list, tuple)):
+            chunks.extend(str(item) for item in value)
+        else:
+            chunks.append(str(value or ""))
+    feature_summary = context.get("feature_summary")
+    if isinstance(feature_summary, dict):
+        chunks.extend(f"{k}:{v}" for k, v in feature_summary.items())
+    return " ".join(chunks).lower()
+
+
+def _condition_risk_flags(rec: Dict[str, Any], context: Dict[str, Any], constraints: Dict[str, bool]) -> List[str]:
+    text = _condition_text(rec)
+    context_text = _condition_context_text(context)
+    flags: List[str] = []
+
+    strong_base_terms = ("kotbu", "t-buok", "naotbu", "naoh", "koh", "nah", "lihmds", "khmds", "lda", "dbu")
+    phosphine_terms = ("xphos", "sphos", "ruphos", "brettphos", "johnphos", "binap", "dppf", "pph3", "phosphine")
+    problematic_solvents = ("dioxane", "dmf", "nmp", "dcm", "dichloromethane", "chloroform")
+    polar_aprotic_high_bp = ("dmf", "nmp", "dmso")
+
+    if _contains_any(text, strong_base_terms):
+        flags.append("strong_base")
+        if _contains_any(context_text, ("ester", "aldehyde", "ketone", "amide", "acid", "nitrile")):
+            flags.append("strong_base_substrate_sensitivity")
+    if _condition_mentions_transition_metal(text):
+        flags.append("transition_metal_catalyst")
+    if _contains_any(text, phosphine_terms):
+        flags.append("phosphine_ligand_air_sensitivity")
+    if _contains_any(text, problematic_solvents):
+        flags.append("problematic_solvent")
+    if _contains_any(text, polar_aprotic_high_bp):
+        flags.append("high_boiling_polar_solvent")
+    if _contains_any(context_text, ("amine", "free_amine", "aniline")) and _condition_mentions_transition_metal(text):
+        flags.append("free_amine_may_bind_metal")
+
+    temp_c = _parse_temperature_celsius(rec.get("temperature"))
+    if temp_c is not None and temp_c >= 100:
+        flags.append("high_temperature")
+    if constraints.get("mild") and temp_c is not None and temp_c > 60:
+        flags.append("violates_mild_temperature_preference")
+    if constraints.get("metal_free") and _condition_mentions_transition_metal(text):
+        flags.append("violates_metal_free_preference")
+    if constraints.get("green") and _contains_any(text, problematic_solvents):
+        flags.append("violates_green_solvent_preference")
+    if constraints.get("scale_up") and _contains_any(text, ("nah", "lihmds", "lda", "n-buli", "nbuli", "azide", "diazomethane")):
+        flags.append("scale_up_hazard")
+
+    return _dedupe_warnings(flags)
+
+
 def _dedupe_warnings(warnings: Sequence[Any]) -> List[str]:
     seen: set[str] = set()
     out: List[str] = []
@@ -632,6 +767,250 @@ def _project_compose_condition_candidates(result: dict) -> Dict[str, Any]:
         return {}
     return {
         "conditions": result.get("recommendations", []),
+    }
+
+
+def _score_condition_record(
+    rec: Dict[str, Any],
+    *,
+    context: Dict[str, Any],
+    constraints: Dict[str, bool],
+) -> Dict[str, Any]:
+    """Build a Synthegy-style scorecard for one generated condition candidate."""
+    support_score = _condition_support_score(rec)
+    ensemble_score = max(0.0, min(1.0, _as_float(rec.get("ensemble_score"), support_score)))
+    consensus_count = _as_int(rec.get("consensus_count"), 0)
+    source_consensus = [
+        str(source).strip().lower()
+        for source in (rec.get("source_consensus") or [rec.get("source") or ""])
+        if str(source).strip()
+    ]
+    source_quality = max(
+        [_CONDITION_SOURCE_WEIGHTS.get(source, 0.5) for source in source_consensus] or [0.5]
+    )
+    evidence_score = round(
+        max(
+            0.0,
+            min(
+                1.0,
+                0.45 * support_score
+                + 0.25 * ensemble_score
+                + 0.20 * source_quality
+                + 0.10 * min(1.0, consensus_count / 3.0),
+            ),
+        ),
+        3,
+    )
+
+    reaction_type_conf = _as_float(context.get("reaction_type_confidence"), 0.0)
+    taxonomy_alignment_score = 0.45 + 0.45 * max(0.0, min(1.0, reaction_type_conf))
+    rec_type = str(rec.get("reaction_type") or rec.get("detected_reaction_type") or "").lower()
+    ctx_type = str(context.get("reaction_type_id") or context.get("reaction_type") or "").lower()
+    if rec_type and ctx_type and (rec_type == ctx_type or rec_type in ctx_type or ctx_type in rec_type):
+        taxonomy_alignment_score += 0.10
+    if rec.get("source") == "rules" or source_consensus == ["rules"]:
+        taxonomy_alignment_score -= 0.08
+    taxonomy_alignment_score = round(max(0.0, min(1.0, taxonomy_alignment_score)), 3)
+
+    risk_flags = _condition_risk_flags(rec, context, constraints)
+    substrate_risk_penalty = 0.0
+    for flag in risk_flags:
+        if flag in {
+            "strong_base_substrate_sensitivity",
+            "free_amine_may_bind_metal",
+            "scale_up_hazard",
+        }:
+            substrate_risk_penalty += 0.16
+        elif flag.startswith("violates_"):
+            substrate_risk_penalty += 0.12
+        else:
+            substrate_risk_penalty += 0.05
+    substrate_compatibility_score = round(max(0.0, min(1.0, 0.90 - substrate_risk_penalty)), 3)
+
+    missing_required = list(rec.get("missing_required_fields") or [])
+    required_fields_present = 1.0
+    if missing_required:
+        required_fields_present -= min(0.45, 0.15 * len(missing_required))
+    if not str(rec.get("solvent") or "").strip():
+        required_fields_present -= 0.10
+    if (
+        str(context.get("reaction_type_category") or "").lower() == "cross_coupling"
+        and _condition_mentions_transition_metal(_condition_text(rec))
+        and not str(rec.get("ligand") or "").strip()
+        and not _contains_any(_condition_text(rec), ("pph3", "dppf", "xphos", "sphos", "ruphos"))
+    ):
+        required_fields_present -= 0.08
+        risk_flags.append("missing_explicit_ligand_for_cross_coupling")
+    temp_c = _parse_temperature_celsius(rec.get("temperature"))
+    temperature_penalty = 0.08 if temp_c is not None and temp_c >= 120 else 0.0
+    condition_feasibility_score = round(
+        max(0.0, min(1.0, 0.55 + 0.30 * required_fields_present + 0.15 * support_score - temperature_penalty)),
+        3,
+    )
+
+    alignment = 0.75
+    text = _condition_text(rec)
+    if constraints.get("mild"):
+        temp_c = _parse_temperature_celsius(rec.get("temperature"))
+        if temp_c is None or temp_c <= 60:
+            alignment += 0.08
+        else:
+            alignment -= 0.22
+        if _contains_any(text, ("kotbu", "t-buok", "naotbu", "nah", "lihmds", "lda")):
+            alignment -= 0.10
+    if constraints.get("metal_free"):
+        alignment += 0.10 if not _condition_mentions_transition_metal(text) else -0.35
+    if constraints.get("cheap"):
+        expensive_ligand = _contains_any(text, ("xphos", "sphos", "ruphos", "brettphos"))
+        alignment += 0.06 if not (_condition_mentions_transition_metal(text) or expensive_ligand) else -0.18
+    if constraints.get("avoid_air_sensitive"):
+        alignment += 0.05 if not _contains_any(text, ("phosphine", "xphos", "sphos", "pph3", "nah", "nbuli", "n-buli")) else -0.16
+    if constraints.get("scale_up"):
+        alignment += 0.05
+        if _contains_any(text, ("nah", "nbuli", "n-buli", "diazomethane", "azide")):
+            alignment -= 0.25
+        if _contains_any(text, ("dmf", "nmp", "dmso", "dioxane")):
+            alignment -= 0.08
+    if constraints.get("green"):
+        alignment += 0.08 if not _contains_any(text, ("dioxane", "dmf", "nmp", "dcm", "chloroform")) else -0.22
+    if constraints.get("hte_only"):
+        alignment += 0.12 if "motif" in source_consensus else -0.18
+    if constraints.get("literature_only"):
+        alignment += 0.12 if "literature" in source_consensus else -0.18
+    user_constraint_alignment_score = round(max(0.0, min(1.0, alignment)), 3)
+
+    final_score = round(
+        0.30 * evidence_score
+        + 0.20 * taxonomy_alignment_score
+        + 0.20 * substrate_compatibility_score
+        + 0.15 * condition_feasibility_score
+        + 0.15 * user_constraint_alignment_score,
+        3,
+    )
+
+    scorecard = {
+        "evidence_score": evidence_score,
+        "taxonomy_alignment_score": taxonomy_alignment_score,
+        "substrate_compatibility_score": substrate_compatibility_score,
+        "condition_feasibility_score": condition_feasibility_score,
+        "user_constraint_alignment_score": user_constraint_alignment_score,
+        "final_score": final_score,
+        "risk_flags": _dedupe_warnings(risk_flags),
+    }
+    scored = dict(rec)
+    scored["scorecard"] = scorecard
+    scored["final_score"] = final_score
+    scored["risk_flags"] = scorecard["risk_flags"]
+    return scored
+
+
+def _score_condition_candidates(
+    reaction_smiles: str,
+    strategy_query: str = "",
+    top_k: int = 5,
+    sources: Optional[List[str]] = None,
+    selection_mode: str = "best",
+) -> Dict[str, Any]:
+    """Score and rerank generated condition candidates against evidence and user strategy.
+
+    This tool intentionally does not invent new conditions. It calls the atomic
+    composer, then adds a scorecard to each generated candidate so the LLM can
+    present the best-supported and best-aligned options.
+    """
+    reaction_smiles, rxn_err = _validate_reaction_smiles(reaction_smiles, require_product=True)
+    if rxn_err:
+        return _error(f"Invalid reaction_smiles: {rxn_err}")
+
+    top_k = max(1, min(int(top_k or 5), 10))
+    context = _build_condition_reaction_context(reaction_smiles)
+    if not isinstance(context, dict) or not context.get("success"):
+        return context if isinstance(context, dict) else _error("Could not build condition reaction context")
+
+    composed = _compose_condition_candidates(
+        reaction_smiles,
+        top_k=top_k,
+        sources=sources,
+        selection_mode=selection_mode,
+    )
+    if not isinstance(composed, dict) or not composed.get("success"):
+        return composed if isinstance(composed, dict) else _error("Could not compose condition candidates")
+
+    constraints = _condition_constraint_profile(strategy_query)
+    scored: List[Dict[str, Any]] = []
+    for idx, rec in enumerate(list(composed.get("recommendations", []) or []), 1):
+        if not isinstance(rec, dict):
+            continue
+        candidate = _score_condition_record(rec, context=context, constraints=constraints)
+        candidate["candidate_id"] = candidate.get("candidate_id") or f"condition_{idx}"
+        scored.append(candidate)
+
+    scored.sort(
+        key=lambda rec: (
+            _as_float(rec.get("final_score"), 0.0),
+            _as_float((rec.get("scorecard") or {}).get("evidence_score"), 0.0),
+            _as_float(rec.get("ensemble_score"), 0.0),
+        ),
+        reverse=True,
+    )
+    for rank, rec in enumerate(scored, 1):
+        rec["rank"] = rank
+
+    warnings = _dedupe_warnings(
+        list(context.get("_warnings", []) or [])
+        + list(composed.get("_warnings", []) or [])
+        + [
+            "No strategy_query supplied; user_constraint_alignment_score reflects generic feasibility only."
+            if not str(strategy_query or "").strip()
+            else ""
+        ]
+    )
+
+    result = _success({
+        "reaction_smiles": reaction_smiles,
+        "strategy_query": strategy_query,
+        "reaction_context": {
+            "reaction_type": context.get("reaction_type"),
+            "reaction_type_id": context.get("reaction_type_id"),
+            "reaction_type_name": context.get("reaction_type_name"),
+            "reaction_type_category": context.get("reaction_type_category"),
+            "reaction_type_confidence": context.get("reaction_type_confidence"),
+            "reaction_key": context.get("reaction_key"),
+            "reacted_motifs": context.get("reacted_motifs", []),
+            "formed_motifs": context.get("formed_motifs", []),
+            "spectator_groups": context.get("spectator_groups", []),
+        },
+        "constraints_detected": constraints,
+        "recommendations": scored[:top_k],
+        "scored_recommendations": scored[:top_k],
+        "best_candidate": scored[0] if scored else None,
+        "candidate_count": len(scored[:top_k]),
+        "composer_summary": {
+            "sources_run": (composed.get("consensus_summary") or {}).get("sources_run", []),
+            "source_counts": composed.get("source_counts", {}),
+            "unique_condition_sets": (composed.get("consensus_summary") or {}).get("unique_condition_sets"),
+            "failed_sources": (composed.get("consensus_summary") or {}).get("failed_sources", []),
+        },
+    })
+    if warnings:
+        result["_warnings"] = warnings
+    return result
+
+
+def _project_score_condition_candidates(result: dict) -> Dict[str, Any]:
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    return {
+        "conditions": result.get("recommendations", []),
+        "condition_scorecards": [
+            {
+                "candidate_id": rec.get("candidate_id"),
+                "rank": rec.get("rank"),
+                "scorecard": rec.get("scorecard"),
+                "risk_flags": rec.get("risk_flags", []),
+            }
+            for rec in result.get("recommendations", [])
+            if isinstance(rec, dict)
+        ],
     }
 
 
@@ -1110,6 +1489,25 @@ compose_condition_candidates_tool = ToolPlugin(
 compose_condition_candidates_tool.structured_projection = _project_compose_condition_candidates
 
 
+score_condition_candidates_tool = ToolPlugin(
+    name="score_condition_candidates",
+    category="conditions",
+    description=(
+        "Score and rerank generated condition candidates against evidence, taxonomy alignment, "
+        "substrate compatibility, feasibility, and user constraints. This tool only evaluates "
+        "condition sets produced by the atomic condition evidence/composition pipeline; it does "
+        "not invent new catalysts, bases, ligands, solvents, or additives. Pass strategy_query "
+        "as the full user request when preferences such as mild, metal-free, cheap, green, "
+        "scale-up friendly, HTE-only, or literature-only are stated."
+    ),
+    prerequisites=["compose_condition_candidates"],
+    fn=_score_condition_candidates,
+    provides=["conditions", "recommendations", "condition_scorecards"],
+    requires=["condition_evidence"],
+)
+score_condition_candidates_tool.structured_projection = _project_score_condition_candidates
+
+
 # ---------------------------------------------------------------------------
 # All tools in this module
 # ---------------------------------------------------------------------------
@@ -1121,5 +1519,6 @@ CONDITIONS_TOOLS = [
     get_similarity_condition_evidence_tool,
     get_rule_condition_evidence_tool,
     compose_condition_candidates_tool,
+    score_condition_candidates_tool,
     recommend_conditions_tool,
 ]

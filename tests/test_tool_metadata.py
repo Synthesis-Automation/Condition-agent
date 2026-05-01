@@ -233,6 +233,13 @@ class TestRegistryAnnotations:
         assert "condition_evidence" in plugin.requires
         assert "recommendations" in plugin.provides
 
+    def test_score_condition_candidates_requires_evidence(self):
+        from chem_coworker.tools import REGISTRY
+        plugin = REGISTRY._plugins.get("score_condition_candidates")
+        assert plugin is not None
+        assert "condition_evidence" in plugin.requires
+        assert "condition_scorecards" in plugin.provides
+
     def test_resolve_to_smiles_provides(self):
         from chem_coworker.tools import REGISTRY
         plugin = REGISTRY._plugins.get("resolve_to_smiles")

@@ -36,6 +36,7 @@ def test_conditions_specialist_policy_exposes_atomic_condition_tools() -> None:
     assert "get_similarity_condition_evidence" in names
     assert "get_rule_condition_evidence" in names
     assert "compose_condition_candidates" in names
+    assert "score_condition_candidates" in names
 
 
 def test_workflow_defaults_expose_policy_and_default_skills() -> None:

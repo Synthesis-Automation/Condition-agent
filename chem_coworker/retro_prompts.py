@@ -82,7 +82,11 @@ RECOMMENDED (add for thorough analysis):
   • evaluate_synthesis_proposal(mode='retro') — dedicated eval with RDKit + complexity
     checks plus overall score/grade for each disconnection
     for a candidate disconnection (product + precursor_1 + precursor_2)
-  • plan_route — for BertzCT > 400 targets; full multi-step BFS route
+  • plan_route_candidates — for full-route planning; generate several routes
+    so you can compare feasibility, protecting-group economy, convergence, and
+    alignment with the user's strategy before choosing a final answer
+  • plan_route — quick single-route fallback for simple targets or when the user
+    explicitly asks for one route only
   • featurize_molecule — parallel with retrosynthesis_step; get electronic score +
     steric profile for the target or a key precursor; use when catalyst/ligand
     selection depends on ring electronics (electron-poor vs electron-rich arene)
@@ -97,7 +101,8 @@ CALL ORDER (dependency rules):
   G2: [apply_hte_templates + search_by_product_similarity
        + featurize_molecule + assess_snar_feasibility]  ← parallel as needed
   G3: [evaluate_synthesis_proposal(mode='retro') for top disconnections]
-  G4: [plan_route]  ← when a full multi-step route is requested
+  G4: [plan_route_candidates(strategy_query=<full user query>)]  ← when a full multi-step route is requested
+      Use [plan_route] only as a quick single-route fallback.
 
 Call tools in parallel when they have no dependencies on each other.
 Observe results after each turn before deciding on the next tool calls.
@@ -116,6 +121,10 @@ directly. Structure it as:
 ## Retrosynthetic Strategy
   Named reaction(s) proposed, your hypothesis, confidence, and why this approach
   was chosen over alternatives. State overall yield estimate if possible.
+  If plan_route_candidates was used, explicitly compare the top 2-3 candidates
+  by route_score, strategy_alignment_score, bottleneck risks, and complex leaves.
+  Pick the route that best satisfies the user's stated strategy, not just the
+  first generated route.
 
 ## Disconnection Scheme
   For each disconnection (ranked by confidence):

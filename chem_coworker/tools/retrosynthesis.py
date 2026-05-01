@@ -1,7 +1,7 @@
 """
 Retrosynthesis tools for ChemCoworker.
 
-Eight ToolPlugin entries for the retrosynthesis pipeline:
+Nine ToolPlugin entries for the retrosynthesis pipeline:
 
   inspect_target              — enhanced molecular analysis for retrosynthesis
   identify_retrons            — SMARTS retron pattern matching
@@ -17,6 +17,8 @@ Eight ToolPlugin entries for the retrosynthesis pipeline:
                                   recursively disconnects complex precursors until all
                                   fragments are simple building blocks; InChI key cycle
                                   detection; returns complete route in a single tool call
+  plan_route_candidates       — beam-search route candidate generator for strategy-aware
+                                  comparison before the LLM presents a final route
 
 All follow the _success() / _error() contract. Registered as ToolPlugins
 so they appear in REASON_PROMPT tool descriptions and can be called by the executor.
@@ -1236,9 +1238,7 @@ def _apply_hte_templates(
     try:
         from rdkit import Chem, rdBase  # noqa: F811
 
-        mol_smiles = (target_smiles or smiles).strip()
-        if ">" in mol_smiles:
-            mol_smiles = mol_smiles.split(">>")[0].split(">")[0].strip()
+        mol_smiles = _normalize_target_smiles_for_route(target_smiles=target_smiles, smiles=smiles)
         if not mol_smiles:
             return _error("target_smiles is required")
 
@@ -1401,6 +1401,142 @@ def _inchi_key(smiles: str) -> Optional[str]:
         return None
 
 
+def _normalize_target_smiles_for_route(target_smiles: str = "", smiles: str = "") -> str:
+    """Normalize route-planning target input while preserving existing tool behavior."""
+    mol_smiles = (target_smiles or smiles).strip()
+    if ">" in mol_smiles:
+        mol_smiles = mol_smiles.split(">>")[0].split(">")[0].strip()
+    return mol_smiles
+
+
+def _route_score_and_grade(
+    *,
+    steps: List[Dict[str, Any]],
+    leaves: List[str],
+    simple_leaves: List[str],
+    total_difficulty: float,
+) -> tuple[float, str]:
+    """Compute the shared route-level score used by single and candidate planners."""
+    if not steps:
+        return 1.0, "A"
+
+    n_steps = len(steps)
+    avg_diff = total_difficulty / max(n_steps, 1)
+    diff_score = max(0.0, 1.0 - avg_diff)
+    max_step_diff = max(float(s.get("difficulty", 1.0) or 1.0) for s in steps)
+    bottleneck_score = max(0.0, 1.0 - max_step_diff)
+    completeness = len(simple_leaves) / max(len(leaves), 1)
+    step_penalty = max(0.0, 1.0 - max(0, n_steps - 3) * 0.15)
+    max_depth_actual = max(int(s.get("depth", 0) or 0) for s in steps) + 1
+    convergence = min(1.0, n_steps / max(max_depth_actual, 1)) * 0.1
+
+    route_score = round(
+        0.30 * diff_score
+        + 0.20 * bottleneck_score
+        + 0.30 * completeness
+        + 0.15 * step_penalty
+        + 0.05 + convergence,
+        3,
+    )
+    if route_score >= 0.80:
+        route_grade = "A"
+    elif route_score >= 0.65:
+        route_grade = "B"
+    elif route_score >= 0.50:
+        route_grade = "C"
+    elif route_score >= 0.35:
+        route_grade = "D"
+    else:
+        route_grade = "F"
+    return route_score, route_grade
+
+
+def _route_candidate_signature(steps: List[Dict[str, Any]]) -> str:
+    """Stable signature for de-duplicating equivalent route candidates."""
+    parts: List[str] = []
+    for step in steps:
+        parts.append(
+            "|".join(
+                [
+                    str(step.get("target", "")),
+                    str(step.get("reaction_name", "")),
+                    str(step.get("precursor_1", "")),
+                    str(step.get("precursor_2", "")),
+                ]
+            )
+        )
+    return "||".join(parts)
+
+
+def _route_strategy_flags(route: List[Dict[str, Any]]) -> Dict[str, int]:
+    """Extract route-level strategic flags from generated disconnection metadata."""
+    text = " ".join(
+        str(step.get(key, ""))
+        for step in route
+        for key in ("reaction_name", "retron_name", "description")
+    ).lower()
+    metal_terms = (
+        "suzuki", "buchwald", "heck", "negishi", "stille", "kumada",
+        "sonogashira", "ullmann", "chan-lam", "pd", "palladium",
+        "nickel", "copper",
+    )
+    protection_terms = (
+        "protect", "deprotect", "boc", "cbz", "fmoc", "tbs", "tbdms",
+        "benzyl protecting", "silyl",
+    )
+    ring_terms = ("cyclization", "annulation", "ring", "macrocycl", "lactam")
+    return {
+        "metal_steps": sum(1 for term in metal_terms if term in text),
+        "protecting_group_steps": sum(1 for term in protection_terms if term in text),
+        "ring_forming_steps": sum(1 for term in ring_terms if term in text),
+    }
+
+
+def _strategy_alignment_score(strategy_query: str, route: List[Dict[str, Any]], route_score: float) -> Dict[str, Any]:
+    """Lightweight route-to-query scoring for pre-ranking candidates before LLM review."""
+    query = str(strategy_query or "").lower()
+    flags = _route_strategy_flags(route)
+    score = 0.5
+    notes: List[str] = []
+
+    if any(term in query for term in ("feasible", "robust", "high yield", "high-yield", "scalable")):
+        score += 0.25 * route_score
+        notes.append("query asks for feasibility/robustness; deterministic route score weighted")
+    if any(term in query for term in ("short", "concise", "few step", "few-step", "minimum step")):
+        step_count = len(route)
+        score += 0.18 if step_count <= 3 else -0.10
+        notes.append("query asks for a concise route")
+    if any(term in query for term in ("convergent", "convergence")):
+        max_depth = max((int(s.get("depth", 0) or 0) for s in route), default=0) + 1
+        convergence_ratio = len(route) / max(max_depth, 1)
+        score += min(0.16, 0.08 * convergence_ratio)
+        notes.append("query asks for convergent disconnections")
+    if any(term in query for term in ("avoid protecting", "no protecting", "without protecting", "protecting group free")):
+        penalty = min(0.25, 0.08 * flags["protecting_group_steps"])
+        score -= penalty
+        notes.append("query discourages protecting-group operations")
+    if any(term in query for term in ("avoid metal", "metal-free", "no metal", "without metal")):
+        penalty = min(0.25, 0.05 * flags["metal_steps"])
+        score -= penalty
+        notes.append("query discourages transition-metal chemistry")
+    if any(term in query for term in ("ring early", "early ring", "form ring early", "construct ring early")):
+        first_ring_depth = None
+        for step in route:
+            if _route_strategy_flags([step])["ring_forming_steps"]:
+                first_ring_depth = int(step.get("depth", 99) or 99)
+                break
+        if first_ring_depth is not None:
+            score += 0.14 if first_ring_depth <= 1 else -0.06
+            notes.append("query asks about early ring construction")
+
+    score = round(max(0.0, min(1.0, score)), 3)
+    return {
+        "strategy_alignment_score": score,
+        "strategy_flags": flags,
+        "strategy_notes": notes,
+    }
+
+
 def _plan_route(
     target_smiles: str = "",
     smiles: str = "",
@@ -1546,44 +1682,12 @@ def _plan_route(
             )
 
         # ── Route-level composite score (0..1, higher = better) ───────
-        if steps:
-            n_steps = len(steps)
-            # 1. Average step difficulty (inverted: low difficulty = high score)
-            avg_diff = total_difficulty / n_steps
-            diff_score = max(0.0, 1.0 - avg_diff)
-            # 2. Max single-step difficulty penalty
-            max_step_diff = max(s["difficulty"] for s in steps)
-            bottleneck_score = max(0.0, 1.0 - max_step_diff)
-            # 3. Completeness: fraction of leaves that are simple
-            completeness = len(simple_leaves) / max(len(leaves), 1)
-            # 4. Step efficiency: penalize long routes (>5 steps starts to hurt)
-            step_penalty = max(0.0, 1.0 - max(0, n_steps - 3) * 0.15)
-            # 5. Convergence bonus: depth < steps means branching (convergent)
-            max_depth_actual = max(s["depth"] for s in steps) + 1
-            convergence = min(1.0, n_steps / max(max_depth_actual, 1)) * 0.1
-
-            route_score = round(
-                0.30 * diff_score
-                + 0.20 * bottleneck_score
-                + 0.30 * completeness
-                + 0.15 * step_penalty
-                + 0.05 + convergence,  # base + convergence bonus
-                3,
-            )
-            # Grade for quick LLM interpretation
-            if route_score >= 0.80:
-                route_grade = "A"
-            elif route_score >= 0.65:
-                route_grade = "B"
-            elif route_score >= 0.50:
-                route_grade = "C"
-            elif route_score >= 0.35:
-                route_grade = "D"
-            else:
-                route_grade = "F"
-        else:
-            route_score = 1.0
-            route_grade = "A"
+        route_score, route_grade = _route_score_and_grade(
+            steps=steps,
+            leaves=leaves,
+            simple_leaves=simple_leaves,
+            total_difficulty=total_difficulty,
+        )
 
         return _success({
             "smiles": mol_smiles,
@@ -1603,6 +1707,250 @@ def _plan_route(
 
     except Exception as exc:
         return _error(f"Route planning failed: {exc}")
+
+
+def _plan_route_candidates(
+    target_smiles: str = "",
+    smiles: str = "",
+    strategy_query: str = "",
+    max_depth: int = 4,
+    max_branches: int = 4,
+    beam_width: int = 8,
+    top_k: int = 5,
+    complexity_threshold: float = 100.0,
+    max_difficulty: float = 0.9,
+) -> Dict[str, Any]:
+    """Generate multiple route candidates for strategy-aware LLM evaluation.
+
+    Unlike plan_route, which greedily follows the top-ranked disconnection at
+    each node, this tool keeps a beam of plausible partial routes and returns
+    several complete candidate routes.  The LLM should compare these candidates
+    against the user's synthesis strategy before presenting a final answer.
+
+    Args:
+        target_smiles: Target molecule SMILES (alias: smiles).
+        smiles: Alias for target_smiles.
+        strategy_query: User's natural-language route preference or full query.
+        max_depth: Maximum retrosynthetic depth.
+        max_branches: Number of disconnections retained at each expansion.
+        beam_width: Number of partial routes retained during search.
+        top_k: Number of final candidates returned.
+        complexity_threshold: BertzCT below which a fragment is treated as simple.
+        max_difficulty: Maximum disconnection difficulty passed to rank_disconnections.
+
+    Returns:
+        dict with candidates[], best_candidate, and search metadata.
+    """
+    try:
+        from chemtools.retro.disconnector import rank_disconnections
+
+        mol_smiles = _normalize_target_smiles_for_route(target_smiles=target_smiles, smiles=smiles)
+        if not mol_smiles:
+            return _error("target_smiles is required")
+
+        max_depth = max(0, min(int(max_depth or 4), 8))
+        max_branches = max(1, min(int(max_branches or 4), 8))
+        beam_width = max(1, min(int(beam_width or 8), 24))
+        top_k = max(1, min(int(top_k or 5), 12))
+        complexity_threshold = float(complexity_threshold or 100.0)
+        max_difficulty = max(0.0, min(float(max_difficulty or 0.9), 1.0))
+
+        root_state = {
+            "route": [],
+            "pending": [{"smiles": mol_smiles, "depth": 0}],
+            "leaves": [],
+            "simple_leaves": [],
+            "complex_leaves": [],
+            "visited_inchi": set(),
+            "cumulative_difficulty": 0.0,
+        }
+        states: List[Dict[str, Any]] = [root_state]
+        expansions = 0
+        max_expansions = max(1, beam_width * max(1, max_depth + 1) * 2)
+
+        def _copy_state(state: Dict[str, Any]) -> Dict[str, Any]:
+            return {
+                "route": [dict(step) for step in state["route"]],
+                "pending": [dict(item) for item in state["pending"]],
+                "leaves": list(state["leaves"]),
+                "simple_leaves": list(state["simple_leaves"]),
+                "complex_leaves": list(state["complex_leaves"]),
+                "visited_inchi": set(state["visited_inchi"]),
+                "cumulative_difficulty": float(state["cumulative_difficulty"]),
+            }
+
+        def _interim_sort_key(state: Dict[str, Any]) -> tuple[float, float, int]:
+            score, _grade = _route_score_and_grade(
+                steps=state["route"],
+                leaves=state["leaves"] + [p["smiles"] for p in state["pending"]],
+                simple_leaves=state["simple_leaves"],
+                total_difficulty=float(state["cumulative_difficulty"]),
+            )
+            return (score, -float(state["cumulative_difficulty"]), -len(state["pending"]))
+
+        while states and expansions < max_expansions:
+            if all(not state["pending"] for state in states):
+                break
+
+            next_states: List[Dict[str, Any]] = []
+            for state in states:
+                if not state["pending"]:
+                    next_states.append(state)
+                    continue
+
+                work = _copy_state(state)
+                current = work["pending"].pop(0)
+                smi = str(current.get("smiles", "") or "").strip()
+                depth = int(current.get("depth", 0) or 0)
+                complexity = _bertz_complexity_fast(smi)
+
+                if complexity < complexity_threshold or depth >= max_depth:
+                    work["leaves"].append(smi)
+                    if complexity < complexity_threshold:
+                        work["simple_leaves"].append(smi)
+                    else:
+                        work["complex_leaves"].append(smi)
+                    next_states.append(work)
+                    continue
+
+                ik = _inchi_key(smi)
+                if ik and ik in work["visited_inchi"]:
+                    work["leaves"].append(smi)
+                    work["complex_leaves"].append(smi)
+                    next_states.append(work)
+                    continue
+                if ik:
+                    work["visited_inchi"].add(ik)
+
+                disconnections = rank_disconnections(
+                    smi,
+                    top_k=max_branches,
+                    max_difficulty=max_difficulty,
+                )
+                expansions += 1
+                if not disconnections:
+                    work["leaves"].append(smi)
+                    work["complex_leaves"].append(smi)
+                    next_states.append(work)
+                    continue
+
+                for disconnection in disconnections[:max_branches]:
+                    branch = _copy_state(work)
+                    step = {
+                        "step": len(branch["route"]) + 1,
+                        "depth": depth,
+                        "target": smi,
+                        "target_complexity": round(complexity, 1),
+                        "reaction_name": disconnection.reaction_name,
+                        "retron_name": disconnection.retron_name,
+                        "description": disconnection.description,
+                        "difficulty": float(disconnection.difficulty),
+                        "precursor_1": disconnection.precursor_1,
+                        "precursor_2": disconnection.precursor_2,
+                        "complexity_delta": round(disconnection.complexity_delta, 1),
+                        "overall_score": round(disconnection.overall_score, 3),
+                    }
+                    branch["route"].append(step)
+                    branch["cumulative_difficulty"] += float(disconnection.difficulty)
+                    for precursor in (disconnection.precursor_1, disconnection.precursor_2):
+                        if precursor:
+                            branch["pending"].append({"smiles": precursor, "depth": depth + 1})
+                    next_states.append(branch)
+
+            states = sorted(next_states, key=_interim_sort_key, reverse=True)[:beam_width]
+
+        # Any unfinished pending fragments are complex leaves for transparent completeness scoring.
+        finalized: List[Dict[str, Any]] = []
+        for state in states:
+            final_state = _copy_state(state)
+            for pending in final_state["pending"]:
+                smi = str(pending.get("smiles", "") or "").strip()
+                if smi:
+                    final_state["leaves"].append(smi)
+                    final_state["complex_leaves"].append(smi)
+            final_state["pending"] = []
+            finalized.append(final_state)
+
+        candidates: List[Dict[str, Any]] = []
+        seen_signatures = set()
+        for state in finalized:
+            route = state["route"]
+            signature = _route_candidate_signature(route) or mol_smiles
+            if signature in seen_signatures:
+                continue
+            seen_signatures.add(signature)
+
+            leaves = state["leaves"]
+            simple_leaves = state["simple_leaves"]
+            complex_leaves = state["complex_leaves"]
+            cumulative_difficulty = float(state["cumulative_difficulty"])
+            route_score, route_grade = _route_score_and_grade(
+                steps=route,
+                leaves=leaves,
+                simple_leaves=simple_leaves,
+                total_difficulty=cumulative_difficulty,
+            )
+            strategy_eval = _strategy_alignment_score(strategy_query, route, route_score)
+            combined_score = round(
+                0.70 * route_score + 0.30 * float(strategy_eval["strategy_alignment_score"]),
+                3,
+            )
+            candidates.append({
+                "candidate_id": f"route_{len(candidates) + 1}",
+                "smiles": mol_smiles,
+                "total_steps": len(route),
+                "cumulative_difficulty": round(cumulative_difficulty, 3),
+                "route_score": route_score,
+                "route_grade": route_grade,
+                "strategy_alignment_score": strategy_eval["strategy_alignment_score"],
+                "combined_score": combined_score,
+                "strategy_flags": strategy_eval["strategy_flags"],
+                "strategy_notes": strategy_eval["strategy_notes"],
+                "all_leaves_simple": len(complex_leaves) == 0,
+                "leaves": leaves,
+                "simple_leaves": simple_leaves,
+                "complex_leaves": complex_leaves,
+                "route": route,
+            })
+
+        candidates.sort(
+            key=lambda item: (
+                item.get("combined_score", 0.0),
+                item.get("route_score", 0.0),
+                -item.get("cumulative_difficulty", 999.0),
+            ),
+            reverse=True,
+        )
+        for idx, candidate in enumerate(candidates, 1):
+            candidate["rank"] = idx
+
+        best = candidates[0] if candidates else None
+        result = _success({
+            "smiles": mol_smiles,
+            "strategy_query": strategy_query,
+            "candidate_count": len(candidates[:top_k]),
+            "candidates": candidates[:top_k],
+            "best_candidate": best,
+            "search": {
+                "max_depth": max_depth,
+                "max_branches": max_branches,
+                "beam_width": beam_width,
+                "top_k": top_k,
+                "complexity_threshold": complexity_threshold,
+                "max_difficulty": max_difficulty,
+                "expansions": expansions,
+                "finalized_states": len(finalized),
+            },
+        })
+        if not strategy_query.strip():
+            result["_warnings"] = [
+                "No strategy_query was supplied; strategy_alignment_score is generic. "
+                "Pass the user's route preferences for route-to-query reranking."
+            ]
+        return result
+
+    except Exception as exc:
+        return _error(f"Route candidate planning failed: {exc}")
 
 
 plan_route_tool = ToolPlugin(
@@ -1629,6 +1977,36 @@ plan_route_tool = ToolPlugin(
 )
 
 
+plan_route_candidates_tool = ToolPlugin(
+    name="plan_route_candidates",
+    category="retrosynthesis",
+    description=(
+        "Generate multiple retrosynthetic route candidates with beam search for "
+        "strategy-aware comparison. Returns candidates[] with route_score, "
+        "strategy_alignment_score, combined_score, leaves, warnings, and route[] "
+        "steps. Use for full-route planning when the user specifies preferences "
+        "such as feasible, concise, convergent, metal-free, no protecting groups, "
+        "or early ring construction; the LLM should compare candidates before "
+        "choosing a final route."
+    ),
+    prerequisites=[],
+    fn=_plan_route_candidates,
+    provides=["route_candidates"],
+)
+
+
+def _project_plan_route_candidates(result: dict) -> Dict[str, Any]:
+    if not isinstance(result, dict) or not result.get("success"):
+        return {}
+    return {
+        "route_candidates": result.get("candidates", []),
+        "best_route_candidate": result.get("best_candidate"),
+    }
+
+
+plan_route_candidates_tool.structured_projection = _project_plan_route_candidates
+
+
 # ---------------------------------------------------------------------------
 # Module export
 # ---------------------------------------------------------------------------
@@ -1642,4 +2020,5 @@ RETROSYNTHESIS_TOOLS = [
     search_by_product_similarity_tool,
     apply_hte_templates_tool,
     plan_route_tool,
+    plan_route_candidates_tool,
 ]

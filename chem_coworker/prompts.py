@@ -315,6 +315,8 @@ Direct condition recommendation (conditions-focused query, atomic-first):
      [get_similarity_condition_evidence(reaction_smiles, ...)]
      [get_rule_condition_evidence(reaction_smiles, ...)]
   5. [compose_condition_candidates(reaction_smiles, ...)]
+  6. [score_condition_candidates(reaction_smiles, strategy_query=<full user query>, ...)]
+     when user preferences or substrate risks matter; compare scorecards before presenting.
   Use [recommend_reaction_conditions(reaction_smiles, ...)] only as a quick legacy fallback.
 
 Forward prediction:
@@ -326,7 +328,9 @@ Retrosynthesis:
   → optionally [evaluate_synthesis_proposal(mode="retro", product_smiles, precursor_1, precursor_2)]
 
 Full-route planning:
-  [plan_route(...)] for retrosynthesis
+  [plan_route_candidates(strategy_query=<full user query>, ...)] for retrosynthesis
+  → compare candidate route_score + strategy_alignment_score before presenting
+  [plan_route(...)] only as a quick single-route fallback
   [plan_forward_route(...)] for scaffold build-up
 
 Identifier and reagent support:
@@ -360,6 +364,8 @@ your comprehensive expert answer. Include all of the following that apply:
     - Then give up to 3 ranked condition sets in a flat list.
     - For each set, include catalyst / ligand / base / solvent [/ temperature] plus
       source, num_experiments, avg_yield, median_yield if available, and match_score.
+    - If score_condition_candidates was used, cite final_score and the main risk_flags
+      when selecting the starting condition.
     - End with one short "Start with:" line naming the best initial screen.
     - Do NOT add separate "Expert A/B", "Trade-offs", and "Bottom line" sections that
       repeat the same information.

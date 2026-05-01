@@ -25,6 +25,7 @@ triggers:
 tool_allowlist:
   - retrosynthesis_step
   - plan_route
+  - plan_route_candidates
   - validate_synthesis_proposal
   - identify_retrons
   - generate_disconnections
@@ -40,6 +41,9 @@ tool_default_args:
   plan_route:
     max_depth: 4
     max_branches: 2
+  plan_route_candidates:
+    top_k: 5
+    beam_width: 8
 answer_contract:
   require_tool_evidence: true
   require_taxonomy_alignment: false
@@ -62,7 +66,8 @@ Use this skill for target-first route planning, disconnection analysis, and prec
 
 ## Required behavior
 
-1. Keep route proposals grounded in explicit step or validation tool evidence.
-2. Surface weak points, protecting group risk, and uncertain disconnections.
-3. Avoid presenting unverified routes as settled.
-4. Never fabricate routes from general knowledge alone — all disconnections and conditions must be backed by tool output.
+1. For full-route tasks, prefer `plan_route_candidates` over a single greedy route, then compare the top candidates against the user's stated strategy.
+2. Keep route proposals grounded in explicit step or validation tool evidence.
+3. Surface weak points, protecting group risk, and uncertain disconnections.
+4. Avoid presenting unverified routes as settled.
+5. Never fabricate routes from general knowledge alone — all disconnections and conditions must be backed by tool output.
