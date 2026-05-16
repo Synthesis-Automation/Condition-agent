@@ -143,33 +143,29 @@ def extract_cas_matches_from_file(path: str | Path, base_folder: str | Path | No
 def write_matches_to_csv(matches: Sequence[CASMatch], output_path: str | Path) -> None:
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    existing_cas_numbers = _read_existing_cas_numbers(path)
-    ordered_new_cas_numbers: List[str] = []
-    seen_in_batch: set[str] = set()
+    ordered_cas_numbers = _read_existing_cas_numbers_in_order(path)
+    seen_cas_numbers = set(ordered_cas_numbers)
 
     for match in matches:
         cas_number = match.cas_number
-        if cas_number in existing_cas_numbers or cas_number in seen_in_batch:
+        if cas_number in seen_cas_numbers:
             continue
-        seen_in_batch.add(cas_number)
-        ordered_new_cas_numbers.append(cas_number)
+        seen_cas_numbers.add(cas_number)
+        ordered_cas_numbers.append(cas_number)
 
-    file_exists = path.exists()
-    needs_header = not file_exists or path.stat().st_size == 0
-    mode = "a" if file_exists else "w"
-    with path.open(mode, newline="", encoding="utf-8") as handle:
+    with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        if needs_header:
-            writer.writerow(["cas_number"])
-        for cas_number in ordered_new_cas_numbers:
+        writer.writerow(["cas_number"])
+        for cas_number in ordered_cas_numbers:
             writer.writerow([cas_number])
 
 
-def _read_existing_cas_numbers(path: Path) -> set[str]:
+def _read_existing_cas_numbers_in_order(path: Path) -> List[str]:
     if not path.exists() or path.stat().st_size == 0:
-        return set()
+        return []
 
-    existing: set[str] = set()
+    existing: List[str] = []
+    seen: set[str] = set()
     with path.open("r", newline="", encoding="utf-8") as handle:
         reader = csv.reader(handle)
         header_checked = False
@@ -188,8 +184,9 @@ def _read_existing_cas_numbers(path: Path) -> set[str]:
             if cas_column_index >= len(row):
                 continue
             cas_number = str(row[cas_column_index]).strip()
-            if is_valid_cas_number(cas_number):
-                existing.add(cas_number)
+            if is_valid_cas_number(cas_number) and cas_number not in seen:
+                seen.add(cas_number)
+                existing.append(cas_number)
     return existing
 
 

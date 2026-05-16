@@ -153,7 +153,7 @@ def test_write_matches_to_markdown_groups_results(tmp_path: Path) -> None:
 
 def test_write_matches_to_csv_appends_only_new_unique_cas_numbers(tmp_path: Path) -> None:
     output_path = tmp_path / "cas_no_all.csv"
-    output_path.write_text("cas_number\n7732-18-5\n", encoding="utf-8")
+    output_path.write_text("cas_number\n7732-18-5\n7732-18-5\n", encoding="utf-8")
 
     matches = [
         CASMatch(
