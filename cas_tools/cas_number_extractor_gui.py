@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import csv
 import os
-import re
 import sys
 import traceback
 from pathlib import Path
@@ -14,7 +14,11 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from cas_tools.cas_number_extractor import discover_candidate_files, extract_cas_matches_from_file, write_matches_to_csv
+from cas_tools.cas_number_extractor import (
+    discover_candidate_files,
+    extract_cas_matches_from_file,
+    write_matches_to_csv,
+)
 
 
 if hasattr(QtCore, "Signal") and hasattr(QtCore, "Slot"):
@@ -28,15 +32,8 @@ else:  # pragma: no cover
     Slot = None  # type: ignore
 
 
-def _safe_name(value: str) -> str:
-    cleaned = re.sub(r"\s+", "_", str(value or "").strip())
-    cleaned = re.sub(r"[^A-Za-z0-9_-]+", "", cleaned)
-    return cleaned or "cas_numbers"
-
-
 def default_output_path(folder_path: str) -> str:
-    folder = Path(folder_path)
-    return str(folder / f"{_safe_name(folder.name)}_cas_numbers.csv")
+    return str(SCRIPT_DIR / "cas_no_all.csv")
 
 
 class CASExtractorWorker(QtCore.QObject):
@@ -60,7 +57,10 @@ class CASExtractorWorker(QtCore.QObject):
     def run(self) -> None:
         try:
             self._emit("Scanning folder for supported files...")
-            files = discover_candidate_files(self.folder_path, excluded_paths=[self.output_csv_path])
+            files = discover_candidate_files(
+                self.folder_path,
+                excluded_paths=[self.output_csv_path],
+            )
             if not files:
                 if self.finished:
                     self.finished.emit(False, "No supported files found in the selected folder.")
@@ -81,12 +81,16 @@ class CASExtractorWorker(QtCore.QObject):
                     self._emit(f"      Warning: {warning}")
 
             self._emit("Writing CSV output...")
+            existing_rows = _count_existing_cas_numbers(self.output_csv_path)
             write_matches_to_csv(all_matches, self.output_csv_path)
-            self._emit(f"Saved {len(all_matches)} CAS match(es) to {self.output_csv_path}")
+            updated_rows = _count_existing_cas_numbers(self.output_csv_path)
+            added_rows = max(updated_rows - existing_rows, 0)
+            self._emit(f"Saved {added_rows} new CAS number(s) to {self.output_csv_path}")
 
             summary = (
                 f"Processed {len(files)} file(s).\n"
                 f"CAS matches: {len(all_matches)}\n"
+                f"New CAS numbers added: {added_rows}\n"
                 f"Warnings: {len(warnings)}\n\n"
                 f"Output CSV: {self.output_csv_path}"
             )
@@ -145,7 +149,7 @@ class CASExtractorWindow(QtWidgets.QWidget):
 
         note_label = QtWidgets.QLabel(
             "Supported inputs: PDF (text-based), text-like files, CSV/TSV, Word .docx/.docm, Excel .xlsx/.xlsm/.xls\n"
-            "Output: <selected-folder>/<folder_name>_cas_numbers.csv"
+            f"Output: {default_output_path('')} (append-only, unique CAS numbers only)"
         )
         note_label.setStyleSheet("font-style: italic; color: #666; font-size: 10px;")
         form.addRow("", note_label)
@@ -237,7 +241,10 @@ class CASExtractorWindow(QtWidgets.QWidget):
         folder_path = self.folder_edit.text().strip()
         output_csv = default_output_path(folder_path)
 
-        self.worker = CASExtractorWorker(folder_path=folder_path, output_csv_path=output_csv)
+        self.worker = CASExtractorWorker(
+            folder_path=folder_path,
+            output_csv_path=output_csv,
+        )
         self.thread = QtCore.QThread(self)
         self.worker.moveToThread(self.thread)
 
@@ -266,6 +273,26 @@ class CASExtractorWindow(QtWidgets.QWidget):
             QtWidgets.QMessageBox.information(self, "Extraction Complete", message)
         else:
             QtWidgets.QMessageBox.critical(self, "Extraction Error", message)
+
+
+def _count_existing_cas_numbers(output_csv_path: str) -> int:
+    path = Path(output_csv_path)
+    if not path.exists() or path.stat().st_size == 0:
+        return 0
+
+    count = 0
+    try:
+        with path.open("r", newline="", encoding="utf-8") as handle:
+            reader = csv.reader(handle)
+            for row in reader:
+                if not row:
+                    continue
+                value = str(row[0]).strip()
+                if value and value.lower() != "cas_number":
+                    count += 1
+    except Exception:
+        return 0
+    return count
 
 
 def main() -> None:

@@ -5,6 +5,7 @@ from .cas_number_extractor import (
     find_cas_numbers_in_text,
     is_valid_cas_number,
     write_matches_to_csv,
+    write_matches_to_markdown,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "find_cas_numbers_in_text",
     "is_valid_cas_number",
     "write_matches_to_csv",
+    "write_matches_to_markdown",
 ]

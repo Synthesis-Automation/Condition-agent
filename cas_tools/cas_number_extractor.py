@@ -4,9 +4,10 @@ import csv
 import io
 import re
 import zipfile
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple
 from xml.etree import ElementTree as ET
 
 
@@ -142,21 +143,122 @@ def extract_cas_matches_from_file(path: str | Path, base_folder: str | Path | No
 def write_matches_to_csv(matches: Sequence[CASMatch], output_path: str | Path) -> None:
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(
-            handle,
-            fieldnames=[
-                "source_file",
-                "relative_path",
-                "file_type",
-                "location",
-                "cas_number",
-                "context",
-            ],
-        )
-        writer.writeheader()
-        for match in matches:
-            writer.writerow(match.to_row())
+    existing_cas_numbers = _read_existing_cas_numbers(path)
+    ordered_new_cas_numbers: List[str] = []
+    seen_in_batch: set[str] = set()
+
+    for match in matches:
+        cas_number = match.cas_number
+        if cas_number in existing_cas_numbers or cas_number in seen_in_batch:
+            continue
+        seen_in_batch.add(cas_number)
+        ordered_new_cas_numbers.append(cas_number)
+
+    file_exists = path.exists()
+    needs_header = not file_exists or path.stat().st_size == 0
+    mode = "a" if file_exists else "w"
+    with path.open(mode, newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        if needs_header:
+            writer.writerow(["cas_number"])
+        for cas_number in ordered_new_cas_numbers:
+            writer.writerow([cas_number])
+
+
+def _read_existing_cas_numbers(path: Path) -> set[str]:
+    if not path.exists() or path.stat().st_size == 0:
+        return set()
+
+    existing: set[str] = set()
+    with path.open("r", newline="", encoding="utf-8") as handle:
+        reader = csv.reader(handle)
+        header_checked = False
+        cas_column_index = 0
+        for row in reader:
+            if not row:
+                continue
+            if not header_checked:
+                header_checked = True
+                normalized_header = [cell.strip() for cell in row]
+                if "cas_number" in normalized_header:
+                    cas_column_index = normalized_header.index("cas_number")
+                    continue
+                if len(normalized_header) == 1 and normalized_header[0].lower() == "cas_number":
+                    continue
+            if cas_column_index >= len(row):
+                continue
+            cas_number = str(row[cas_column_index]).strip()
+            if is_valid_cas_number(cas_number):
+                existing.add(cas_number)
+    return existing
+
+
+def write_matches_to_markdown(
+    matches: Sequence[CASMatch],
+    output_path: str | Path,
+    *,
+    source_folder: str = "",
+    processed_files: Optional[Sequence[str]] = None,
+    warnings: Optional[Sequence[str]] = None,
+) -> None:
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    sorted_matches = sorted(
+        matches,
+        key=lambda item: (item.relative_path.lower(), item.location.lower(), item.cas_number),
+    )
+    unique_cas = []
+    seen_cas: set[str] = set()
+    for match in sorted_matches:
+        if match.cas_number in seen_cas:
+            continue
+        seen_cas.add(match.cas_number)
+        unique_cas.append(match.cas_number)
+
+    grouped_matches: dict[str, List[CASMatch]] = defaultdict(list)
+    for match in sorted_matches:
+        grouped_matches[match.relative_path].append(match)
+
+    with path.open("w", encoding="utf-8") as handle:
+        report_name = source_folder or path.stem
+        handle.write(f"# CAS Number Extraction Report ({report_name})\n\n")
+        if processed_files is not None:
+            handle.write(f"Total files processed: {len(processed_files)}\n\n")
+        handle.write(f"Total CAS matches: {len(sorted_matches)}\n\n")
+        handle.write(f"Unique CAS numbers: {len(unique_cas)}\n\n")
+
+        if unique_cas:
+            handle.write("## Unique CAS Numbers\n\n")
+            for cas_number in unique_cas:
+                handle.write(f"- {cas_number}\n")
+            handle.write("\n")
+
+        warning_list = [warning for warning in (warnings or []) if str(warning).strip()]
+        if warning_list:
+            handle.write("## Warnings\n\n")
+            for warning in warning_list:
+                handle.write(f"- {_escape_markdown_text(str(warning))}\n")
+            handle.write("\n")
+
+        handle.write("## File Details\n\n")
+        if not grouped_matches:
+            handle.write("No CAS numbers were found.\n")
+            return
+
+        for relative_path, file_matches in grouped_matches.items():
+            first_match = file_matches[0]
+            handle.write(f"### {_escape_markdown_text(relative_path)}\n\n")
+            handle.write(f"- File type: {first_match.file_type}\n")
+            handle.write(f"- Matches: {len(file_matches)}\n\n")
+            for match in file_matches:
+                context = _escape_markdown_text(match.context)
+                handle.write(f"- {match.location}: {match.cas_number} | {context}\n")
+            handle.write("\n")
+
+
+def _escape_markdown_text(text: str) -> str:
+    return str(text or "").replace("\r", " ").replace("\n", " ").strip()
 
 
 def _is_candidate_file(path: Path) -> bool:
