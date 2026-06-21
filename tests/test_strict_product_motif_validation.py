@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from chemtools.featurizers.unified import featurize_reaction
-from chemtools.util.rdkit_helpers import rdkit_available
+from chemtools.reaction import featurize_reaction
+from chemtools.core.rdkit import rdkit_available
 
 
 RXN_MISSING_ALKYNE_PRODUCT = (

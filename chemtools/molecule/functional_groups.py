@@ -13,9 +13,9 @@ from functools import lru_cache
 from types import MappingProxyType
 from typing import Dict, Iterable, List, Optional, Tuple, Mapping
 
-from ..taxonomy.calculable_spec import load_calculable_feature_spec
-from .rdkit_helpers import rdkit_available, parse_smiles
-from .smarts_cache import compile_smarts
+from chemtools.core.rdkit import parse_smiles, rdkit_available
+from chemtools.core.smarts import compile_smarts
+from chemtools.taxonomy.calculable_spec import load_calculable_feature_spec
 
 
 @dataclass(frozen=True)

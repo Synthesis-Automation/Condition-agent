@@ -11,13 +11,13 @@ This service handles:
 
 from typing import Dict, Any, Optional
 from chemtools import chem
-from chemtools.contracts import (
+from chemtools.core.contracts import (
     PrecedentKNNRequest,
     ConstraintsFilterRequest,
     ExplainPrecedentsRequest,
     CoreSearchRequest,
 )
-from chemtools.exceptions import ValidationError
+from chemtools.core.errors import ValidationError
 
 
 def knn_search(req: PrecedentKNNRequest) -> Dict[str, Any]:

@@ -10,10 +10,10 @@ from typing import Any, Dict, Iterable, List, Optional
 
 from . import reactions as _reactions
 from . import reactants as _reactants
-from . import reaction_record as _reaction_record
-from . import smiles as _smiles
+from chemtools.core import smiles as _smiles
+from chemtools.core import reactions as _reaction_record
 from ...taxonomy import reaction_catalog as _reaction_catalog
-from ...detection import detect_reaction_type
+from chemtools.reaction.typing import detect_reaction_type
 
 __all__ = [
     "normalize",

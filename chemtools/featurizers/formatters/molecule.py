@@ -9,8 +9,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from chemtools.util import rdkit_helpers
-from ..molecule import featurize_molecule as _featurize_molecule
+from chemtools.core import rdkit as rdkit_helpers
+from chemtools.molecule import featurize_molecule as _featurize_molecule
 from ..analysis.feasibility import analyze_molecule_snar_feasibility
 from .simplified import build_core_molecule, build_extended_molecule
 

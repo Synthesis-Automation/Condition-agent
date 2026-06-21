@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 
 from chemtools.taxonomy import loader as taxonomy_loader
-from chemtools.util import rdkit_helpers
-from chemtools.util.smarts_cache import compile_smarts
+from chemtools.core import rdkit as rdkit_helpers
+from chemtools.core.smarts import compile_smarts
 
 
 def _load_groups() -> dict:

@@ -15,9 +15,9 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from .synthon import classify_reactant_synthons
-from .taxonomy import loader as taxonomy_loader
-from .taxonomy.reaction_catalog import motif_tokens_compatible
+from chemtools.synthon import classify_reactant_synthons
+from chemtools.taxonomy import loader as taxonomy_loader
+from chemtools.taxonomy.reaction_catalog import motif_tokens_compatible
 
 
 # =============================================================================
@@ -130,7 +130,7 @@ def extract_reaction_key(reaction_smiles: str) -> Tuple[List[str], List[str], Li
     Returns:
         Tuple of (reacted, formed, spectator, reaction_key_string). The key is CRK-v1.
     """
-    from .featurizers.formatters.reaction import build_crk
+    from chemtools.reaction import build_crk
 
     result = build_crk(reaction_smiles)
     return result.reacted_motifs, result.formed_motifs, result.spectator_motifs, result.reaction_key
@@ -140,7 +140,7 @@ def _extract_reactant_smiles(reaction_smiles: str) -> List[str]:
     if not reaction_smiles or ">>" not in reaction_smiles:
         return []
     try:
-        from .smiles import normalize_reaction
+        from chemtools.core.smiles import normalize_reaction
     except Exception:
         normalize_reaction = None  # type: ignore[assignment]
     if normalize_reaction is None:

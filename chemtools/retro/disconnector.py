@@ -88,7 +88,7 @@ def find_retrons(mol_or_smiles: Any, max_difficulty: float = 1.0) -> List[Retron
     else:
         mol = mol_or_smiles
 
-    from chemtools.util.smarts_cache import compile_smarts
+    from chemtools.core.smarts import compile_smarts
     from .retron_patterns import RETRONS
 
     matches: List[RetronMatch] = []
@@ -233,7 +233,7 @@ def _generic_bond_fragment(mol: Any, retron: Dict[str, Any]) -> List[Tuple[str, 
     try:
         from rdkit import Chem
         from rdkit.Chem import rdmolops
-        from chemtools.util.smarts_cache import compile_smarts
+        from chemtools.core.smarts import compile_smarts
     except ImportError:
         return []
 
@@ -383,7 +383,7 @@ def _transform_biaryl_suzuki(mol: Any, retron: Dict[str, Any]) -> List[Tuple[str
     try:
         from rdkit import Chem
         from rdkit.Chem import rdmolops
-        from chemtools.util.smarts_cache import compile_smarts
+        from chemtools.core.smarts import compile_smarts
     except ImportError:
         return []
 
@@ -430,7 +430,7 @@ def _transform_aryl_amine_buchwald(mol: Any, retron: Dict[str, Any]) -> List[Tup
     try:
         from rdkit import Chem
         from rdkit.Chem import rdmolops
-        from chemtools.util.smarts_cache import compile_smarts
+        from chemtools.core.smarts import compile_smarts
     except ImportError:
         return []
 
@@ -500,7 +500,7 @@ def _transform_alkene_wittig(mol: Any, retron: Dict[str, Any]) -> List[Tuple[str
     try:
         from rdkit import Chem
         from rdkit.Chem import rdmolops
-        from chemtools.util.smarts_cache import compile_smarts
+        from chemtools.core.smarts import compile_smarts
     except ImportError:
         return []
 
@@ -543,7 +543,7 @@ def _transform_amide(mol: Any, retron: Dict[str, Any]) -> List[Tuple[str, str]]:
     try:
         from rdkit import Chem
         from rdkit.Chem import rdmolops
-        from chemtools.util.smarts_cache import compile_smarts
+        from chemtools.core.smarts import compile_smarts
     except ImportError:
         return []
 

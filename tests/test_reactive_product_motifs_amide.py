@@ -1,8 +1,8 @@
 import pytest
 
-from chemtools.featurizers.formatters.reaction import _select_reactive_product_motifs
-from chemtools.featurizers.unified import featurize_reaction
-from chemtools.util.rdkit_helpers import rdkit_available
+from chemtools.reaction.featurize import _select_reactive_product_motifs
+from chemtools.reaction import featurize_reaction
+from chemtools.core.rdkit import rdkit_available
 
 
 def test_select_reactive_product_motifs_collapses_duplicate_group_representations() -> None:

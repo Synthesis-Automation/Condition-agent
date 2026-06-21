@@ -20,7 +20,7 @@ import re
 logger = logging.getLogger(__name__)
 
 # Import the low-level analysis function
-from .util.reaction_center_detector import identify_changed_atoms_from_mapped_smiles
+from chemtools.util.reaction_center_detector import identify_changed_atoms_from_mapped_smiles
 
 # Lazy-loaded RXNMapper instance (expensive to initialize)
 _MAPPER_INSTANCE: Optional[Any] = None
@@ -291,7 +291,7 @@ def analyze_bond_changes(reaction_smiles: str, auto_map: bool = True) -> Dict[st
         - success: True if analysis succeeded
         - error: Error message if failed
     """
-    from .util.reaction_center_detector import identify_changed_atoms_from_mapped_smiles
+    from chemtools.util.reaction_center_detector import identify_changed_atoms_from_mapped_smiles
     
     mapped_smiles = reaction_smiles
     mapping_confidence = None

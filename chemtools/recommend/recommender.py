@@ -32,17 +32,15 @@ from chemtools.featurizers.reaction_path import (
     build_reaction_featurization_options,
     cleanup_reaction_smiles_for_featurization,
 )
-from chemtools.featurizers.unified import (
-    featurize_molecule,
-    featurize_reaction as _unified_featurize_reaction,
-)
-from chemtools.featurizers.analysis.reaction_record import ReactionRecord
+from chemtools.reaction import featurize_reaction as _unified_featurize_reaction
+from chemtools.molecule import featurize_molecule
+from chemtools.core.reactions import ReactionRecord
 from chemtools.featurizers.formatters.utils import normalize_motif_id
 from chemtools.featurizers.spectator_rank import (
     spectator_group_weight,
     weighted_spectator_similarity,
 )
-from chemtools.smiles import normalize_reaction
+from chemtools.core.smiles import normalize_reaction
 from chemtools.recommend.reaction_key_utils import (
     build_reaction_events_payload,
     canonicalize_reaction_key_minimal,

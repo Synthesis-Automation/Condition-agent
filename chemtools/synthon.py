@@ -204,7 +204,7 @@ def _fallback_role_matches(smiles: str, role: str) -> Tuple[str, ...]:
     if not groups:
         return tuple()
     try:
-        from .util import functional_groups as _functional_groups
+        from chemtools.molecule import functional_groups as _functional_groups
     except Exception:
         return tuple()
 

@@ -5,7 +5,7 @@ Provides a single source of truth for SMARTS compilation across chemtools.
 Eliminates redundant compilation and provides consistent error handling.
 
 Usage:
-    from chemtools.util.smarts_cache import compile_smarts, compile_smarts_batch
+    from chemtools.core.smarts import compile_smarts, compile_smarts_batch
     
     # Compile single pattern
     pattern = compile_smarts("[CX4][Cl,Br,I]")
@@ -39,7 +39,7 @@ from functools import lru_cache
 from typing import Dict, Optional, Any
 import logging
 
-from .rdkit_helpers import rdkit_available
+from .rdkit import rdkit_available
 
 logger = logging.getLogger(__name__)
 

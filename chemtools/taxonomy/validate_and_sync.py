@@ -25,8 +25,8 @@ from chemtools.taxonomy.substituent_composer import (
     load_organic_groups_with_compositions,
     validate_substituent_fragments_payload,
 )
-from chemtools.util.rdkit_helpers import rdkit_available
-from chemtools.util.smarts_cache import compile_smarts
+from chemtools.core.rdkit import rdkit_available
+from chemtools.core.smarts import compile_smarts
 
 _GENERATED_ONLY_GROUP_IDS = {
     "-COOH",

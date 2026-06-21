@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from chemtools.util.rdkit_helpers import rdkit_available
+from chemtools.core.rdkit import rdkit_available
 
 
 pytestmark = pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")

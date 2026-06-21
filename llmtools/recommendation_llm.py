@@ -41,7 +41,7 @@ def _starting_material_entries(reaction_smiles: str) -> List[Dict[str, Any]]:
     """
     Build starting material entries from reaction SMILES.
     """
-    from chemtools.smiles import normalize_reaction
+    from chemtools.core.smiles import normalize_reaction
     from chemtools.formatters import normalize_chemical_entry
 
     normalized = normalize_reaction(reaction_smiles or "")

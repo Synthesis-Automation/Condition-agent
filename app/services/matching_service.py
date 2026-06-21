@@ -9,10 +9,10 @@ This service handles:
 
 from typing import Dict, Any, List
 from chemtools import chem
-from chemtools import detect_reaction  # New unified API
+from chemtools.reaction import detect_reaction
 from chemtools.recommend.utils import friendly_family_label
-from chemtools.contracts import NormalizeRequest, DetectFamilyRequest, DetectTypeRequest
-from chemtools.exceptions import ValidationError
+from chemtools.core.contracts import NormalizeRequest, DetectFamilyRequest, DetectTypeRequest
+from chemtools.core.errors import ValidationError
 
 
 def normalize_smiles(req: NormalizeRequest) -> str:

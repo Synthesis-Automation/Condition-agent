@@ -8,7 +8,7 @@ Tests and older callers import ``chemtools.featurizers.detection`` and expect:
 - coupling product confirmation helpers
 
 This module provides that interface while delegating motif-based detection to
-``chemtools.detection``.
+``chemtools.reaction.typing``.
 """
 
 from __future__ import annotations
@@ -17,11 +17,11 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
-from chemtools.detection import detect_reaction_types as _detect_motif_reaction_types
+from chemtools.reaction.typing import detect_reaction_types as _detect_motif_reaction_types
 from chemtools.taxonomy.reaction_catalog import load_reaction_catalog
-from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
-from chemtools.util.smarts_cache import compile_smarts
-from chemtools.featurizers.formatters.reaction import format_bond_change_key
+from chemtools.core.rdkit import parse_smiles, rdkit_available
+from chemtools.core.smarts import compile_smarts
+from chemtools.reaction.featurize import format_bond_change_key
 
 
 @dataclass

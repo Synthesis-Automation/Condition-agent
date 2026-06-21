@@ -10,12 +10,12 @@ from typing import Dict, Any, Optional
 import time
 from chemtools import chem
 from chemtools.formatters import ensure_standard_output
-from chemtools.contracts import (
+from chemtools.core.contracts import (
     RecommendConditionsRequest,
     RecommendFromReactionRequest,
     PlateDesignRequest,
 )
-from chemtools.exceptions import ValidationError
+from chemtools.core.errors import ValidationError
 
 
 def recommend_conditions(req: RecommendConditionsRequest) -> Dict[str, Any]:

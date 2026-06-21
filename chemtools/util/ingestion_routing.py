@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from . import rdkit_helpers
+from chemtools.core import rdkit as rdkit_helpers
 
 
 _TRANSITION_OR_HEAVY_METALS: Set[str] = {

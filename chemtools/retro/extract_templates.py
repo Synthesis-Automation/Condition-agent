@@ -77,6 +77,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem, rdFMCS
 
+from chemtools.core.smarts import compile_smarts
+
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -153,8 +155,7 @@ def _add_atom_mapping_mcs(reaction_smiles: str) -> Optional[str]:
         if mcs_result.canceled or not mcs_result.smartsString:
             continue
 
-        with rdBase.BlockLogs():
-            mcs_mol = Chem.MolFromSmarts(mcs_result.smartsString)
+        mcs_mol = compile_smarts(mcs_result.smartsString, validate=False)
         if mcs_mol is None:
             continue
 

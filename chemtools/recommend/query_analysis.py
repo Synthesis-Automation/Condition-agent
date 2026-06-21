@@ -68,7 +68,7 @@ def analyze_recommendation_query(request: RecommendationRequest | str) -> QueryA
         return analysis
 
     try:
-        from chemtools.smiles import normalize_reaction
+        from chemtools.core.smiles import normalize_reaction
 
         payload = normalize_reaction(reaction_input)
     except Exception as exc:

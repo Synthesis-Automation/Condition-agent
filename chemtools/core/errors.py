@@ -5,7 +5,7 @@ This module provides a consistent exception structure for all ChemTools operatio
 making error handling more predictable and easier to manage.
 
 Usage:
-    from chemtools.exceptions import ValidationError, DatabaseNotFoundError
+    from chemtools.core.errors import ValidationError, DatabaseNotFoundError
     
     if not smiles:
         raise ValidationError("SMILES string cannot be empty")

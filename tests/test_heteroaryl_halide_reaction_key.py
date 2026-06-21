@@ -1,7 +1,8 @@
 import pytest
 
-from chemtools.featurizers.unified import featurize_molecule, featurize_reaction
-from chemtools.util.rdkit_helpers import rdkit_available
+from chemtools.molecule import featurize_molecule
+from chemtools.reaction import featurize_reaction
+from chemtools.core.rdkit import rdkit_available
 
 
 def _motif_ids(payload: dict) -> set[str]:

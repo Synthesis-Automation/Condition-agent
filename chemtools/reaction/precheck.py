@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from chemtools.util import rdkit_helpers
+from chemtools.core import rdkit as rdkit_helpers
 
 _HALOGEN_ELEMENTS = {"F", "Cl", "Br", "I"}
 

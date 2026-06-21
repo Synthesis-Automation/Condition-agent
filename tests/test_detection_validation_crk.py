@@ -1,4 +1,4 @@
-from chemtools.featurizers.formatters.detection_validation import (
+from chemtools.reaction.feasibility import (
     validate_detection_with_crk_key,
 )
 

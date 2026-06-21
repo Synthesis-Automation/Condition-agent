@@ -13,6 +13,7 @@ from collections import defaultdict, Counter
 from functools import lru_cache
 import pandas as pd
 from pathlib import Path
+import json
 import re
 
 from chemtools.taxonomy import loader as taxonomy_loader

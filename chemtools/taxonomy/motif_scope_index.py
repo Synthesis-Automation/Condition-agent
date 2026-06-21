@@ -13,8 +13,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set, Tuple
 
-from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
-from chemtools.util.smarts_cache import compile_smarts
+from chemtools.core.rdkit import parse_smiles, rdkit_available
+from chemtools.core.smarts import compile_smarts
 
 from . import loader
 

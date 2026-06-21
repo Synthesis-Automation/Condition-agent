@@ -10,13 +10,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from .formatters import featurize_molecule as _featurize_molecule
-from .formatters import featurize_reaction as _featurize_reaction
+from chemtools.reaction import featurize_reaction as _featurize_reaction
 from .reaction_assist import apply_llm_reaction_assist
-
-
-def featurize_molecule(smiles: str, *args: Any, **kwargs: Any) -> Dict[str, Any]:
-    return _featurize_molecule(smiles, *args, **kwargs)
 
 
 def featurize_reaction(
@@ -42,4 +37,4 @@ def featurize_reaction(
     return payload
 
 
-__all__ = ["featurize_molecule", "featurize_reaction"]
+__all__ = ["featurize_reaction"]

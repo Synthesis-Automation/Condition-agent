@@ -8,12 +8,12 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Optional, List
 
-from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
-from chemtools.util.smarts_cache import compile_smarts
+from chemtools.core.rdkit import parse_smiles, rdkit_available
+from chemtools.core.smarts import compile_smarts
 
-from .alkyl_steric import analyze_alkyl_steric
-from .aryl_electronics import analyze_aryl_electronics
-from .aryl_steric import analyze_aryl_steric
+from .electronics import analyze_aryl_electronics
+from .sterics_alkyl import analyze_alkyl_steric
+from .sterics_aryl import analyze_aryl_steric
 from .nearby_groups import analyze_nearby_groups
 from .motifs.detection import detect_motifs
 from .motifs.registry import build_compound_registry, _default_registry_paths

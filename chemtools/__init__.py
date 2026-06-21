@@ -41,19 +41,19 @@ See CHEMTOOLS_QUICKSTART.md for more examples.
 """
 
 from .context import ChemTools, chem, ResourceConfig
-from .detection import detect_reaction_type, detect_reaction_types, DetectionResult, ReactionMatch
-from .reaction_inference import (
+from .reaction import detect_reaction_type, detect_reaction_types, DetectionResult, ReactionMatch
+from .reaction import (
     analyze_reaction_general,
     GeneralReactionAnalysis,
     ReactionDecision,
     ReactionValidation,
 )
-from ._atom_mapping import (
+from .reaction import (
     add_atom_mapping,
     analyze_bond_changes,
     analyze_with_mcs,
     analyze_bond_changes_hybrid,
-    is_available as rxnmapper_available,
+    rxnmapper_available,
 )
 from .util.reaction_center_detector import (
     identify_changed_atoms_from_mapped_smiles,

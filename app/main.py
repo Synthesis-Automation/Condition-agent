@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
-from chemtools.exceptions import ValidationError
+from chemtools.core.errors import ValidationError
 from chemtools.formatters import format_hte_output
 from chemtools.recommend import HTERecommender
 from app.services.error_handlers import register_error_handlers

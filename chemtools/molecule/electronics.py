@@ -7,7 +7,7 @@ from __future__ import annotations
 from collections import deque
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from chemtools.util.smarts_cache import compile_smarts
+from chemtools.core.smarts import compile_smarts
 
 from ._ring_utils import find_aryl_ring
 

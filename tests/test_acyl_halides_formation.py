@@ -1,10 +1,10 @@
 import pytest
 
-from chemtools.featurizers.formatters.detection_validation import (
+from chemtools.reaction.feasibility import (
     validate_detection_with_crk_key,
 )
-from chemtools.featurizers.unified import featurize_reaction
-from chemtools.util.rdkit_helpers import rdkit_available
+from chemtools.reaction import featurize_reaction
+from chemtools.core.rdkit import rdkit_available
 
 
 @pytest.mark.skipif(not rdkit_available(), reason="rdkit not available")

@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import pytest
 
-from chemtools.featurizers.formatters.reaction_events import (
+from chemtools.reaction.events import (
     format_multi_event_signature,
     summarize_reaction_events,
 )
-from chemtools.featurizers.unified import featurize_reaction
-from chemtools.util.rdkit_helpers import rdkit_available
+from chemtools.reaction import featurize_reaction
+from chemtools.core.rdkit import rdkit_available
 
 
 def _event_kinds(payload: dict) -> set[str]:

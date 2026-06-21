@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Tuple, Union
 
-from ..util.rdkit_helpers import parse_smiles, rdkit_available
+from chemtools.core.rdkit import parse_smiles, rdkit_available
 
 try:  # pragma: no cover - import guarded in tests
     from rdkit import Chem

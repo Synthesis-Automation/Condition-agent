@@ -5,16 +5,16 @@ from pathlib import Path
 
 import pytest
 
-from chemtools.featurizers.motifs.registry import _default_registry_paths, build_compound_registry
-from chemtools.featurizers.nearby_groups import _resolve_group_id
+from chemtools.molecule.motifs.registry import _default_registry_paths, build_compound_registry
+from chemtools.molecule.nearby_groups import _resolve_group_id
 from chemtools.taxonomy import loader as taxonomy_loader
 from chemtools.taxonomy.substituent_composer import (
     compose_groups_from_fragments,
     load_organic_groups_with_compositions,
     validate_substituent_fragments_payload,
 )
-from chemtools.util.rdkit_helpers import rdkit_available
-from chemtools.util.smarts_cache import compile_smarts
+from chemtools.core.rdkit import rdkit_available
+from chemtools.core.smarts import compile_smarts
 
 
 def _taxonomy_data_dir() -> Path:

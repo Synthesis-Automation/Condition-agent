@@ -12,7 +12,7 @@ from collections import Counter
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple
 
-from chemtools.util import rdkit_helpers
+from chemtools.core import rdkit as rdkit_helpers
 
 from .formatters.molecule import to_bool
 

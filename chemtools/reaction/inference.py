@@ -16,11 +16,11 @@ from dataclasses import dataclass, field
 import re
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-from .detection import detect_reaction_type
-from .featurizers.formatters.detection_validation import validate_detection_with_crk_key
-from .smiles import normalize_reaction
-from .taxonomy.reaction_catalog import get_reaction_type, motif_tokens_compatible
-from .util.rdkit_helpers import parse_smiles, rdkit_available
+from chemtools.core.smiles import normalize_reaction
+from chemtools.core.rdkit import parse_smiles, rdkit_available
+from chemtools.reaction.feasibility import validate_detection_with_crk_key
+from chemtools.reaction.typing import detect_reaction_type
+from chemtools.taxonomy.reaction_catalog import get_reaction_type, motif_tokens_compatible
 
 
 @dataclass(frozen=True)

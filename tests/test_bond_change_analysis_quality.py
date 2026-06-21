@@ -1,8 +1,8 @@
 import pytest
 
-import chemtools._atom_mapping as atom_mapping
-from chemtools.featurizers.formatters import reaction as reaction_formatter
-from chemtools.util.rdkit_helpers import rdkit_available
+import chemtools.reaction.atom_mapping as atom_mapping
+from chemtools.reaction import featurize as reaction_formatter
+from chemtools.core.rdkit import rdkit_available
 from chemtools.util.reaction_center_detector import identify_changed_atoms_from_mapped_smiles
 
 

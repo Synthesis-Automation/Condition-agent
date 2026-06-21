@@ -1,4 +1,4 @@
-﻿"""
+"""
 Chemistry-Specific Prompt Templates
 ====================================
 

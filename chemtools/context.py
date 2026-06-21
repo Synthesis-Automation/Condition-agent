@@ -204,7 +204,7 @@ class FunctionalGroupsNamespace:
             >>> chem.functional_groups.detect("CC(=O)O")
             {'carboxylic_acid': True, 'carbonyl': True, ...}
         """
-        from .util import functional_groups as _fg
+        from chemtools.molecule import functional_groups as _fg
         return _fg.detect_all(smiles)
     
     @staticmethod
@@ -221,7 +221,7 @@ class FunctionalGroupsNamespace:
             >>> chem.functional_groups.get_groups("c1ccc(Br)cc1N")
             ['aniline', 'amine_primary', 'aryl_bromide', 'aromatic']
         """
-        from .util import functional_groups as _fg
+        from chemtools.molecule import functional_groups as _fg
         return _fg.get_functional_groups(smiles)
     
     @staticmethod
@@ -239,7 +239,7 @@ class FunctionalGroupsNamespace:
             >>> chem.functional_groups.has("CC(=O)O", "carboxylic_acid")
             True
         """
-        from .util import functional_groups as _fg
+        from chemtools.molecule import functional_groups as _fg
         return _fg.has_functional_group(smiles, group_name)
     
     @staticmethod
@@ -257,7 +257,7 @@ class FunctionalGroupsNamespace:
             >>> chem.functional_groups.count("O=C(O)CC(=O)O", "carboxylic_acid")
             2
         """
-        from .util import functional_groups as _fg
+        from chemtools.molecule import functional_groups as _fg
         return _fg.count_functional_groups(smiles, group_name)
     
     @staticmethod
@@ -274,7 +274,7 @@ class FunctionalGroupsNamespace:
             >>> chem.functional_groups.categorize("CC(=O)Oc1ccccc1")
             {'oxygen': ['ester', 'carbonyl', 'phenol'], 'aromatic': [...]}
         """
-        from .util import functional_groups as _fg
+        from chemtools.molecule import functional_groups as _fg
         return _fg.get_group_categories(smiles)
     
     @staticmethod
@@ -292,7 +292,7 @@ class FunctionalGroupsNamespace:
             Oxygen: ester, carbonyl, phenol
             Aromatic: aromatic, phenol
         """
-        from .util import functional_groups as _fg
+        from chemtools.molecule import functional_groups as _fg
         return _fg.summarize_functional_groups(smiles)
     
     @staticmethod
@@ -302,7 +302,7 @@ class FunctionalGroupsNamespace:
         Returns:
             List of functional group names that can be detected
         """
-        from .util import functional_groups as _fg
+        from chemtools.molecule import functional_groups as _fg
         return sorted(_fg.FUNCTIONAL_GROUP_SMARTS.keys())
 
 

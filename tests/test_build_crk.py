@@ -1,13 +1,13 @@
-"""Tests for build_crk() and CrkResult in chemtools.featurizers.formatters.reaction."""
+"""Tests for build_crk() and CrkResult in chemtools.reaction.featurize."""
 import pytest
 
-from chemtools.featurizers.formatters.reaction import (
+from chemtools.reaction.featurize import (
     CrkResult,
     build_crk,
     featurize_reaction,
     get_crk_options,
 )
-from chemtools.detection import extract_reaction_key
+from chemtools.reaction.typing import extract_reaction_key
 
 # Standard Suzuki coupling: bromobenzene + phenylboronic acid → biphenyl
 _SUZUKI = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"

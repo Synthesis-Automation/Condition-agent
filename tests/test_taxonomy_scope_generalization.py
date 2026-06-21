@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from chemtools.featurizers.formatters.reaction import _project_formed_motifs_by_taxonomy
-from chemtools.reaction_inference import _taxonomy_consistency_check
+from chemtools.reaction.featurize import _project_formed_motifs_by_taxonomy
+from chemtools.reaction.inference import _taxonomy_consistency_check
 
 
 def test_taxonomy_consistency_check_accepts_scope_child_reactant() -> None:

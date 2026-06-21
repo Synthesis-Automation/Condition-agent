@@ -6,9 +6,9 @@ from functools import lru_cache
 from typing import Any, Dict, List, Optional
 
 from ..taxonomy.calculable_spec import load_calculable_feature_spec
-from ..util import rdkit_helpers
+from chemtools.core import rdkit as rdkit_helpers
 from ..util.boolean_expr import evaluate as evaluate_rule
-from ..util.smarts_cache import compile_smarts
+from chemtools.core.smarts import compile_smarts
 
 logger = logging.getLogger(__name__)
 

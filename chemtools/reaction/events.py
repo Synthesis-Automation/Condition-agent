@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
-from chemtools.util import rdkit_helpers
+from chemtools.core import rdkit as rdkit_helpers
 
 
 _HALOGENS = {"F", "Cl", "Br", "I"}
@@ -480,7 +480,7 @@ def _count_molecules_matching_smarts(
     if not rdkit_helpers.rdkit_available():
         return 0
     try:
-        from chemtools.util.smarts_cache import compile_smarts
+        from chemtools.core.smarts import compile_smarts
     except Exception:
         return 0
     patterns = []

@@ -47,7 +47,7 @@ def test_analyze_recommendation_query_uses_featurizers(monkeypatch):
             "products": [{"smiles_norm": "P"}],
         }
     )
-    monkeypatch.setitem(sys.modules, "chemtools.smiles", fake_smiles)
+    monkeypatch.setitem(sys.modules, "chemtools.core.smiles", fake_smiles)
     monkeypatch.setattr(
         "chemtools.recommend.query_analysis.pick_electrophile_nucleophile",
         lambda reactants: (reactants[0], reactants[1]),

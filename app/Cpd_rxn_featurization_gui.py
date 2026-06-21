@@ -15,7 +15,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from chemtools.featurizers.unified import featurize_molecule, featurize_reaction  # noqa: E402
+from chemtools.molecule import featurize_molecule
+from chemtools.reaction import featurize_reaction  # noqa: E402
 from app.Cpd_rxn_featurization_cli import _print_readable  # noqa: E402
 
 DEFAULT_LLM_PROVIDER = (

@@ -16,9 +16,9 @@ from .featurizers.analysis.reactions import (
     canonical_family_label,
     resolve_reaction_family as _resolve_reaction_family,
 )
-from .util import functional_groups as _functional_groups
-from .util.rdkit_helpers import parse_smiles
-from .smiles import normalize_reaction as _normalize_reaction
+from chemtools.molecule import functional_groups as _functional_groups
+from chemtools.core.rdkit import parse_smiles
+from .core.smiles import normalize_reaction as _normalize_reaction
 
 
 _ROUTER_GROUPS = (

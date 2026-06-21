@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import chemtools.detection as detection
+import chemtools.reaction.typing as detection
 from chemtools.featurizers import detection as legacy_detection
 
 

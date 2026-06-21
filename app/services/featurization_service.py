@@ -10,8 +10,8 @@ This service handles:
 
 from typing import Dict, Any, List, Optional
 from chemtools import featurizers
-from chemtools.contracts import FeaturizeUllmannRequest, RoleAwareMolRequest, RoleAwareReactionRequest
-from chemtools.exceptions import ValidationError, ResourceNotAvailableError
+from chemtools.core.contracts import FeaturizeUllmannRequest, RoleAwareMolRequest, RoleAwareReactionRequest
+from chemtools.core.errors import ValidationError, ResourceNotAvailableError
 
 try:
     from chemtools.features.role import (

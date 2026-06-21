@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 from chemtools.taxonomy.compound_catalog import build_documented_compound_catalog
 from chemtools.taxonomy.substituent_composer import load_organic_groups_with_compositions
-from chemtools.util.smarts_cache import compile_smarts
+from chemtools.core.smarts import compile_smarts
 
 from .models import CompoundPattern, _DEFAULT_TEMPLATES
 from .utils import (

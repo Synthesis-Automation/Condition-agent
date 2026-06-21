@@ -33,7 +33,7 @@ DEFAULT_FP_SIZE: int = 1024
 
 # ── SMARTS cache (avoid repeated compilation) ──────────────────────────────
 try:
-    from .smarts_cache import compile_smarts  # noqa: F401 (optional)
+    from chemtools.core.smarts import compile_smarts  # noqa: F401 (optional)
 except Exception:
     pass
 

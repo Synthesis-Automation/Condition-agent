@@ -58,7 +58,7 @@ def _validate_reaction_smiles_input(reaction_smiles: str) -> Tuple[bool, str]:
         return False, "Reaction SMILES is empty."
 
     try:
-        from chemtools.smiles import normalize_reaction
+        from chemtools.core.smiles import normalize_reaction
 
         payload = normalize_reaction(text)
     except Exception as exc:

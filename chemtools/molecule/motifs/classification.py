@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
-from chemtools.util.rdkit_helpers import parse_smiles, rdkit_available
+from chemtools.core.rdkit import parse_smiles, rdkit_available
 
 from .models import CompoundPattern
 from .registry import _default_registry_paths, build_compound_registry

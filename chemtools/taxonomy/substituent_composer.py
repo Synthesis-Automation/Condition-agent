@@ -11,8 +11,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from chemtools.util.rdkit_helpers import rdkit_available
-from chemtools.util.smarts_cache import compile_smarts
+from chemtools.core.rdkit import rdkit_available
+from chemtools.core.smarts import compile_smarts
 
 SUBSTITUENT_FRAGMENTS_FILE = "substituent_fragments.v1.json"
 _MAP_RE = re.compile(r":\d+(?=\])")

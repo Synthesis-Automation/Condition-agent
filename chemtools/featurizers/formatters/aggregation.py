@@ -1027,7 +1027,7 @@ def aggregate_reaction_features(
 
 def count_elements(smiles_list: Iterable[str]) -> Optional[Counter[str]]:
     """Count element occurrences across multiple SMILES strings."""
-    from chemtools.util.rdkit_helpers import parse_smiles
+    from chemtools.core.rdkit import parse_smiles
     
     combined = Counter()
     for smiles in smiles_list or []:

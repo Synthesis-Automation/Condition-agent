@@ -18,7 +18,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from app.reaction_featurization import analyze_reaction_featurization
-from chemtools.featurizers.unified import featurize_molecule
+from chemtools.molecule import featurize_molecule
 
 
 def _print_json(payload: Dict[str, Any]) -> None:
@@ -159,7 +159,7 @@ def _format_primary_compound_id(entry: Dict[str, Any]) -> str:
 
 @lru_cache(maxsize=1)
 def _load_compound_registry() -> Dict[str, Any]:
-    from chemtools.featurizers.motifs import registry
+    from chemtools.molecule.motifs import registry
 
     return registry.build_compound_registry(registry._default_registry_paths())
 

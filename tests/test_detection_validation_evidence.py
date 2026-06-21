@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from chemtools.featurizers.formatters import detection_validation as dv
+from chemtools.reaction import feasibility as dv
 from chemtools.taxonomy.reaction_catalog import ReactionTypeDefinition, SlotRequirement
 
 

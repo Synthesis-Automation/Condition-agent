@@ -14,6 +14,8 @@ import logging
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple
 
+from chemtools.core.smarts import compile_smarts
+
 from .contracts import ForwardTemplateMatch, ProductPrediction, ReactantProfile
 
 logger = logging.getLogger(__name__)
@@ -22,15 +24,9 @@ logger = logging.getLogger(__name__)
 # Module-level SMARTS cache — avoids recompiling the same pattern repeatedly
 # ---------------------------------------------------------------------------
 
-@lru_cache(maxsize=256)
 def _compile_smarts(smarts: str) -> Optional[Any]:
-    """Compile and cache a SMARTS pattern (returns RDKit Mol or None)."""
-    try:
-        from rdkit import Chem, rdBase
-        with rdBase.BlockLogs():
-            return Chem.MolFromSmarts(smarts)
-    except Exception:
-        return None
+    """Compile a SMARTS pattern through the shared chemtools cache."""
+    return compile_smarts(smarts, validate=False)
 
 
 @lru_cache(maxsize=256)

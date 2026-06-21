@@ -5,8 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
-from .detection import detect_reaction_type
-from .reaction_inference import analyze_reaction_general
+from .reaction import analyze_reaction_general, detect_reaction_type
 
 
 @dataclass(frozen=True)
@@ -93,4 +92,3 @@ def run_benchmark() -> Dict[str, Any]:
 
 
 __all__ = ["run_benchmark"]
-

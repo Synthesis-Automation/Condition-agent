@@ -14,8 +14,8 @@ from functools import lru_cache
 import os
 import re
 
-from ..util.rdkit_helpers import rdkit_available, parse_smiles
-from ..util.smarts_cache import compile_smarts
+from chemtools.core.rdkit import rdkit_available, parse_smiles
+from chemtools.core.smarts import compile_smarts
 
 try:  # Optional role-aware vectors
     from chemtools.features.role import featurize_mol as _role_feat  # type: ignore

@@ -18,7 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # Import chemtools components
-from chemtools.featurizers.unified import featurize_molecule
+from chemtools.molecule import featurize_molecule
 from chemtools.featurizers.reaction_path import (
     cached_featurize_reaction,
     cleanup_reaction_smiles_for_featurization as _cleanup_reaction_smiles_for_featurization,
@@ -32,7 +32,7 @@ from chemtools.recommend.reaction_key_utils import (
     serialize_reaction_events_payload,
 )
 from chemtools.taxonomy import reaction_catalog
-from chemtools.smiles import normalize
+from chemtools.core.smiles import normalize
 from chemtools.reagent.lookup import find_reagent
 from chemtools.util.ingestion_routing import classify_reaction_for_taxonomy_benchmark
 

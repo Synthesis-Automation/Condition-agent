@@ -1,5 +1,5 @@
-from chemtools.featurizers.formatters.reaction import featurize_reaction
-from chemtools.featurizers.molecule import featurize_molecule
+from chemtools.reaction.featurize import featurize_reaction
+from chemtools.molecule.featurize import featurize_molecule
 
 
 def test_boc_amine_detects_alkyl_oconh2_motif() -> None:

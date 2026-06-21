@@ -251,13 +251,14 @@ def _ring_count(smiles: str) -> int:
 def _smarts_match(smiles: str, smarts_list: List[str]) -> bool:
     """Return True if the molecule matches ANY SMARTS in the list."""
     try:
-        from rdkit import Chem
+        from chemtools.core.smarts import compile_smarts
+
         mol = _mol(smiles)
         if mol is None:
             return False
         for sma in smarts_list:
             try:
-                patt = Chem.MolFromSmarts(sma)
+                patt = compile_smarts(sma, validate=False)
                 if patt and mol.HasSubstructMatch(patt):
                     return True
             except Exception:

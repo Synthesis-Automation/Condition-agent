@@ -17,7 +17,7 @@ from chemtools.taxonomy.reaction_catalog import (
     ReactionTypeDefinition,
     motif_tokens_compatible,
 )
-from .utils import normalize_motif_id
+from chemtools.featurizers.formatters.utils import normalize_motif_id
 
 
 # Cache the taxonomy for performance

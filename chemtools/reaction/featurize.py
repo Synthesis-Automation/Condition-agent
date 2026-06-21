@@ -13,20 +13,20 @@ import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
-from chemtools.util import rdkit_helpers
-from chemtools.smiles import normalize_reaction
+from chemtools.core import rdkit as rdkit_helpers
+from chemtools.core.smiles import normalize_reaction
 
-from ..analysis.reaction_context import classify_reactants_with_context, get_reactant_summary
-from ..analysis.feasibility import analyze_snar_feasibility
-from ..analysis.reaction_record import ReactionRecord
+from chemtools.featurizers.analysis.reaction_context import classify_reactants_with_context, get_reactant_summary
+from chemtools.featurizers.analysis.feasibility import analyze_snar_feasibility
+from chemtools.core.reactions import ReactionRecord
 
-from .molecule import build_molecule_bundle, to_bool
-from .aggregation import aggregate_reaction_features, infer_intramolecular
-from .utils import extract_motif_ids, normalize_motif_id
-from .simplified import build_core_reaction, build_extended_reaction
-from .reaction_events import format_multi_event_signature, summarize_reaction_events
-from .reaction_precheck import infer_reactant_repeats_from_stoichiometry
-from ..spectator_rank import rank_spectator_groups
+from chemtools.featurizers.formatters.molecule import build_molecule_bundle, to_bool
+from chemtools.featurizers.formatters.aggregation import aggregate_reaction_features, infer_intramolecular
+from chemtools.featurizers.formatters.utils import extract_motif_ids, normalize_motif_id
+from chemtools.featurizers.formatters.simplified import build_core_reaction, build_extended_reaction
+from chemtools.featurizers.spectator_rank import rank_spectator_groups
+from chemtools.reaction.events import format_multi_event_signature, summarize_reaction_events
+from chemtools.reaction.precheck import infer_reactant_repeats_from_stoichiometry
 
 
 _UNCLASSIFIED_REACTANT_MOTIF = "Unclassified-Reactant"
@@ -70,7 +70,7 @@ def _run_primary_reaction_type_detection(
     This is optional because it can be more expensive than local validation.
     """
     try:
-        from chemtools.detection import detect_reaction_type
+        from chemtools.reaction.typing import detect_reaction_type
     except Exception as exc:
         return {
             "status": "error",
@@ -169,7 +169,7 @@ def _get_bond_change_analysis_with_quality(
     if not reaction_smiles or not rdkit_helpers.rdkit_available():
         return None, False, None
     try:
-        from chemtools._atom_mapping import analyze_bond_changes_hybrid
+        from chemtools.reaction.atom_mapping import analyze_bond_changes_hybrid
     except Exception:
         return None, False, None
     try:
@@ -818,7 +818,7 @@ def _filter_reactants_for_crk(
 ) -> List[str]:
     scaffold_ids: Set[str] = set()
     try:
-        from .aggregation import load_scaffold_motif_ids
+        from chemtools.featurizers.formatters.aggregation import load_scaffold_motif_ids
         scaffold_ids = load_scaffold_motif_ids()
     except Exception:
         scaffold_ids = set()
@@ -1266,7 +1266,7 @@ def _detect_aryl_s_from_product_smiles(product_smiles: Iterable[str]) -> bool:
     # Matches c-S- and c-S(=O)- variants loosely.
     smarts = "[c][S]"
     try:
-        from chemtools.util.smarts_cache import compile_smarts
+        from chemtools.core.smarts import compile_smarts
     except Exception:
         return False
     patt = compile_smarts(smarts, validate=False)
@@ -2094,7 +2094,7 @@ def _scaffold_spectators_from_bundles(
 ) -> Set[str]:
     """Identify scaffold motifs present on both sides to treat as spectators in CRK."""
     try:
-        from .aggregation import load_scaffold_motif_ids
+        from chemtools.featurizers.formatters.aggregation import load_scaffold_motif_ids
     except Exception:
         return set()
     scaffold_ids = load_scaffold_motif_ids()
@@ -2436,7 +2436,7 @@ def build_crk(
             product_motifs_reactive=formed_for_validation,
             include_product=True,
         )
-        from .detection_validation import validate_detection_with_crk_key
+        from chemtools.reaction.feasibility import validate_detection_with_crk_key
 
         validated = validate_detection_with_crk_key(
             initial_detection=(
@@ -2833,7 +2833,7 @@ def featurize_reaction(
             product_motifs_reactive=formed_for_validation,
             include_product=True,
         )
-        from .detection_validation import validate_detection_with_crk_key
+        from chemtools.reaction.feasibility import validate_detection_with_crk_key
 
         validated = validate_detection_with_crk_key(
             initial_detection=(

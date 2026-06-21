@@ -50,7 +50,7 @@ def _extract_reaction_parts(reaction: str) -> Tuple[List[str], List[str], str]:
     if not reaction:
         return [], [], ""
     try:
-        from chemtools.smiles import normalize_reaction
+        from chemtools.core.smiles import normalize_reaction
         norm = normalize_reaction(reaction)
     except Exception:
         return [], [], reaction

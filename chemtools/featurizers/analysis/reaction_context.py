@@ -17,10 +17,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-from .reaction_record import ReactionRecord
+from chemtools.core.reactions import ReactionRecord
 from .reactants import ReactantMatch, iter_reactant_matches
-from .smiles import normalize_reaction
-from ...detection import detect_reaction_type
+from chemtools.core.smiles import normalize_reaction
+from chemtools.reaction.typing import detect_reaction_type
 
 
 @dataclass

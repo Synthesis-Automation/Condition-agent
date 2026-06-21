@@ -1,7 +1,7 @@
 import pytest
 
-from chemtools.featurizers.unified import featurize_reaction
-from chemtools.util.rdkit_helpers import rdkit_available
+from chemtools.reaction import featurize_reaction
+from chemtools.core.rdkit import rdkit_available
 
 
 _RXN_MISSING_EQUIV = (

@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any, Dict, List, Mapping, Optional, Set, Tuple
 
-from .formatters.reaction import get_crk_options
-from .unified import featurize_reaction
+from chemtools.reaction import get_crk_options
+from chemtools.reaction import featurize_reaction
 
 _TRANSITION_OR_HEAVY_METALS: Set[str] = {
     "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn",
