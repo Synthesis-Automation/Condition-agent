@@ -50,6 +50,7 @@ llmtools/
 ## 🚀 Key Innovations
 
 ### 1. **Hybrid Intelligence**
+
 Combines LLM reasoning with deterministic chemtools functions:
 
 ```
@@ -83,6 +84,7 @@ Combines LLM reasoning with deterministic chemtools functions:
 ```
 
 ### 2. **Multi-Provider Support**
+
 Single interface, multiple backends:
 
 ```python
@@ -96,6 +98,7 @@ client = LLMClient(provider="aliyun", model="deepseek-r1")
 ```
 
 ### 3. **Chemistry-Specific Templates**
+
 Pre-built prompts for common tasks:
 
 ```python
@@ -111,6 +114,7 @@ prompt = template(reaction_smiles="...", reaction_type="Suzuki")
 ## 💡 Usage Examples
 
 ### Example 1: Simple Query
+
 ```python
 from llmtools import LLMClient
 
@@ -120,6 +124,7 @@ print(response.content)
 ```
 
 ### Example 2: Condition Recommendation (with ChemTools)
+
 ```python
 from llmtools import LLMClient, ChemistryAgent
 
@@ -139,6 +144,7 @@ result = agent.suggest_conditions(
 ```
 
 ### Example 3: Full Workflow
+
 ```python
 # 1. Get recommendations
 conditions = agent.suggest_conditions(rxn, type)
@@ -191,6 +197,7 @@ analysis = agent.analyze(rxn, type, include_all=True)
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```bash
 # OpenAI
 export OPENAI_API_KEY="sk-..."
@@ -202,6 +209,7 @@ export ALIYUN_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"  # Op
 ```
 
 ### Model Selection Strategy
+
 ```python
 # Auto-select by task
 client = LLMClient.from_env(
@@ -223,6 +231,7 @@ client = LLMClient(
 ## 📈 Next Steps
 
 ### Phase 2: Advanced Features
+
 - [ ] Structured output parsing (JSON schemas, Pydantic)
 - [ ] Multi-step reasoning chains
 - [ ] Response caching (Redis/local)
@@ -230,6 +239,7 @@ client = LLMClient(
 - [ ] Streaming responses
 
 ### Phase 3: Specialized Capabilities
+
 - [ ] RAG for literature search
 - [ ] Fine-tuned chemistry models
 - [ ] Automated experiment design
@@ -250,6 +260,7 @@ client = LLMClient(
 ## ✅ Status: PRODUCTION READY
 
 **What's working:**
+
 - ✅ Multi-provider LLM client
 - ✅ Chemistry prompt templates
 - ✅ Intelligent agents
@@ -259,6 +270,7 @@ client = LLMClient(
 - ✅ Working examples
 
 **Ready to use for:**
+
 - Condition recommendations
 - Mechanism explanations
 - Reaction troubleshooting
