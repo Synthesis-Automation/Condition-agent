@@ -1490,11 +1490,13 @@ class RDFWorker(QtCore.QObject):
         return combined_rdf_map
 
     def _generate_outputs(self, rows: List[Dict[str, Any]], rdf_map: Optional[Dict[str, Dict[str, Any]]] = None) -> None:
-        """Generate CSV output using ReactionMarkdownGenerator."""
+        """Generate CSV and Markdown output using ReactionMarkdownGenerator."""
         generator = ReactionMarkdownGenerator()
         source_name = f"RDF_Folder_{os.path.basename(self.folder_path)}"
 
-        # Generate CSV export only (Markdown disabled)
+        if self.output_md_path:
+            self._emit("Generating Markdown report...")
+            generator.generate_markdown_report(rows, self.output_md_path, source_name)
         self._emit("Generating CSV export...")
         generator.generate_csv_export(rows, self.output_csv_path, source_name, rdf_map=rdf_map)
         
@@ -1683,7 +1685,7 @@ class RDFProcessorWindow(QtWidgets.QWidget):
         note_label = QtWidgets.QLabel(
             "Note: All RDF files in folder and subfolders will be combined\n"
             "      CSV ->data-processor/reaction_dataset/{category}.csv\n"
-            "      Markdown output is disabled"
+            "      Markdown -> <selected-folder>/<selected-folder>.md"
         )
         note_label.setStyleSheet("font-style: italic; color: #666; font-size: 10px;")
         form.addRow("", note_label)
@@ -1817,17 +1819,17 @@ class RDFProcessorWindow(QtWidgets.QWidget):
             
             final_name = _safe(category_name) or "dataset"
             output_csv = os.path.join(dataset_dir, final_name + ".csv")
-            
-            # Markdown output disabled.
-            output_md = ""
+
+            md_name = _safe(os.path.basename(norm_folder)) or "dataset"
+            output_md = os.path.join(folder_path, md_name + ".md")
         except Exception:
             # Fallback: use default paths
             repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             dataset_dir = os.path.join(repo_root, "data-processor", "reaction_dataset")
             os.makedirs(dataset_dir, exist_ok=True)
             output_csv = os.path.join(dataset_dir, "dataset.csv")
-            
-            output_md = ""
+
+            output_md = os.path.join(self.folder_edit.text().strip() or os.getcwd(), "dataset.md")
         
         # Create worker and thread
         self.worker = RDFWorker(
