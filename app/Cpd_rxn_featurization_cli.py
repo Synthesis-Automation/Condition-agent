@@ -7,10 +7,11 @@ from __future__ import annotations
 import json
 import os
 import sys
+import csv
 from pathlib import Path
 import argparse
 from functools import lru_cache
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional
 
 # Ensure repo root is on sys.path for direct execution.
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -243,12 +244,13 @@ def _print_motifs(motifs: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
         return
     prefix = " " * indent
     print(f"{prefix}Motifs ({len(motifs_list)}):")
-    lines = []
+    grouped: Dict[str, Dict[str, Any]] = {}
     for motif in motifs_list:
         # v2 molecule payloads use compound_id; older payloads may use id.
         motif_id = motif.get("id") or motif.get("compound_id") or "unknown"
         display_name = _clean_compound_id(str(motif_id))
-        rank = motif.get("rank", motif.get("score", 0))
+        entry = grouped.setdefault(display_name, {"count": 0, "examples": [], "rank": motif.get("rank", motif.get("score", 0))})
+        entry["count"] += 1
         
         a_idx = motif.get("a_atom_idx")
         b_idx = motif.get("b_atom_idx")
@@ -261,13 +263,22 @@ def _print_motifs(motifs: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
             details.append(f"b={b_idx}")
         if bond is not None:
             details.append(f"bond={bond}")
+        if details and len(entry["examples"]) < 2:
+            entry["examples"].append(", ".join(details))
+
+    lines = []
+    for display_name, entry in grouped.items():
+        count = int(entry.get("count") or 0)
+        rank = entry.get("rank", 0)
+        details = []
+        if count > 1:
+            details.append(f"count={count}")
+        examples = entry.get("examples") or []
+        if examples:
+            details.append(f"sites={'; '.join(examples)}")
         if isinstance(rank, (int, float)) and rank > 0:
             details.append(f"rank={float(rank):.2f}")
-        
-        if details:
-            lines.append(f"{display_name} ({', '.join(details)})")
-        else:
-            lines.append(display_name)
+        lines.append(f"{display_name} ({', '.join(details)})" if details else display_name)
     print(_format_list(lines, indent=indent + 2))
 
 
@@ -425,6 +436,23 @@ def _print_molecule_detail(
         extended = molecule.get("extended")
         if extended:
             _print_extended_section(extended, indent=indent)
+        else:
+            _print_motif_analyses(molecule.get("analyses") or [], indent=indent)
+            aryl_analysis = molecule.get("aryl_analysis") or {}
+            if aryl_analysis:
+                summary = {
+                    key: aryl_analysis.get(key)
+                    for key in (
+                        "is_heterocycle",
+                        "aromatic_ring_count",
+                        "heteroaromatic",
+                        "ring_sizes",
+                        "hetero_counts",
+                    )
+                    if aryl_analysis.get(key) not in (None, "", [], {})
+                }
+                if summary:
+                    print(f"{' ' * indent}Aryl Analysis: {_format_kv_inline(summary)}")
 
 
 def _print_molecule_summary(payload: Dict[str, Any], *, show_rdkit: bool = False, show_extended: bool = True) -> None:
@@ -826,6 +854,125 @@ def _print_readable(
         print(f"Kind: {kind or 'unknown'}")
 
 
+def _csv_molecule_row(
+    source_row: Dict[str, Any],
+    *,
+    smiles_column: str,
+    options: Dict[str, Any],
+) -> Dict[str, Any]:
+    smiles = str(source_row.get(smiles_column) or "").strip()
+    out = dict(source_row)
+    out["input_smiles"] = smiles
+    if not smiles:
+        out.update(
+            {
+                "featurization_success": False,
+                "featurization_error": "EMPTY_SMILES",
+                "canonical_smiles": "",
+                "motif_count": 0,
+                "motifs": "",
+                "ranked_motifs": "",
+                "analysis_count": 0,
+            }
+        )
+        return out
+
+    try:
+        from chemtools.molecule import parse_molecule
+
+        parsed = parse_molecule(smiles)
+        payload = featurize_molecule(smiles, options=options)
+        motifs = payload.get("motifs") or []
+        motif_ids = [
+            _clean_compound_id(str(motif.get("compound_id") or motif.get("id") or ""))
+            for motif in motifs
+            if isinstance(motif, dict) and (motif.get("compound_id") or motif.get("id"))
+        ]
+        unique_motif_ids = list(dict.fromkeys(motif_ids))
+        ranked_motifs = [_clean_compound_id(str(item)) for item in payload.get("ranked_motifs") or []]
+        out.update(
+            {
+                "featurization_success": True,
+                "featurization_error": (payload.get("meta") or {}).get("error") or "",
+                "canonical_smiles": parsed.canonical_smiles or "",
+                "valid_smiles": parsed.valid,
+                "motif_count": len(motifs),
+                "motifs": ";".join(motif_ids),
+                "unique_motif_count": len(unique_motif_ids),
+                "unique_motifs": ";".join(unique_motif_ids),
+                "ranked_motifs": ";".join(ranked_motifs),
+                "analysis_count": len(payload.get("analyses") or []),
+                "aryl_analysis_json": json.dumps(payload.get("aryl_analysis") or {}, sort_keys=True, default=str),
+            }
+        )
+    except Exception as exc:
+        out.update(
+            {
+                "featurization_success": False,
+                "featurization_error": repr(exc),
+                "canonical_smiles": "",
+                "valid_smiles": False,
+                "motif_count": 0,
+                "motifs": "",
+                "ranked_motifs": "",
+                "analysis_count": 0,
+                "aryl_analysis_json": "{}",
+            }
+        )
+    return out
+
+
+def _run_csv_mode(args: argparse.Namespace, options: Dict[str, Any]) -> int:
+    input_path = Path(args.input_csv)
+    if not input_path.exists():
+        print(f"Error: input CSV not found: {input_path}")
+        return 2
+
+    output_path = Path(args.output_csv) if args.output_csv else (
+        Path("results") / "featurization_cli" / f"{input_path.stem}_featurized.csv"
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with input_path.open("r", encoding="utf-8", errors="replace", newline="") as handle:
+        reader = csv.DictReader(handle)
+        if not reader.fieldnames:
+            print(f"Error: input CSV has no header: {input_path}")
+            return 2
+        if args.smiles_column not in reader.fieldnames:
+            print(
+                f"Error: SMILES column {args.smiles_column!r} not found. "
+                f"Available columns: {', '.join(reader.fieldnames)}"
+            )
+            return 2
+        rows = list(reader)
+
+    molecule_options = dict(options)
+    molecule_options.pop("llm_assist", None)
+    molecule_options["detailed"] = True
+
+    output_rows = [
+        _csv_molecule_row(row, smiles_column=args.smiles_column, options=molecule_options)
+        for row in rows
+    ]
+    fieldnames: List[str] = []
+    for row in output_rows:
+        for key in row:
+            if key not in fieldnames:
+                fieldnames.append(key)
+
+    with output_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(output_rows)
+
+    success_count = sum(1 for row in output_rows if row.get("featurization_success") is True)
+    no_motif_count = sum(1 for row in output_rows if int(row.get("motif_count") or 0) == 0)
+    print(f"Featurized {len(output_rows)} rows from {input_path}")
+    print(f"Success: {success_count}; no motifs: {no_motif_count}")
+    print(f"Saved CSV: {output_path}")
+    return 0
+
+
 def _prompt(text: str) -> str:
     try:
         return input(text)
@@ -849,6 +996,19 @@ def _parse_args() -> argparse.Namespace:
         default="summary",
         choices=["summary", "full-json", "both"],
         help="Output format (default: summary).",
+    )
+    parser.add_argument(
+        "--input-csv",
+        help="Batch featurize molecules from a CSV file instead of starting interactive mode.",
+    )
+    parser.add_argument(
+        "--output-csv",
+        help="Output CSV path for --input-csv mode (default: results/featurization_cli/<stem>_featurized.csv).",
+    )
+    parser.add_argument(
+        "--smiles-column",
+        default="smiles",
+        help="SMILES column name for --input-csv mode (default: smiles).",
     )
     parser.add_argument(
         "--include-ar-h",
@@ -976,6 +1136,8 @@ def main() -> int:
             "confidence_threshold": float(args.llm_confidence_threshold),
             "require_crk_validation": not bool(args.llm_no_crk_validation),
         }
+    if args.input_csv:
+        return _run_csv_mode(args, options)
     print("ChemTools Featurization CLI")
     print("Enter 'q' to quit.")
     if args.llm_assist:
