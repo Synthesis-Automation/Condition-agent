@@ -209,6 +209,14 @@ def _get_reaction_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
     return payload
 
 
+def _looks_like_molecule_payload(payload: Dict[str, Any]) -> bool:
+    return "smiles" in payload and ("motifs" in payload or "ranked_motifs" in payload)
+
+
+def _looks_like_reaction_payload(payload: Dict[str, Any]) -> bool:
+    return "reaction_smiles" in payload or "reaction_key" in payload or "reactants" in payload
+
+
 def _print_meta_section(title: str, meta: Dict[str, Any], *, indent: int = 0) -> None:
     if not meta:
         return
@@ -237,9 +245,10 @@ def _print_motifs(motifs: Iterable[Dict[str, Any]], *, indent: int = 0) -> None:
     print(f"{prefix}Motifs ({len(motifs_list)}):")
     lines = []
     for motif in motifs_list:
-        # v2 format: {"id": "Ar-Br", "rank": 450, "a_atom_idx": 5}
-        display_name = _clean_compound_id(motif.get("id", "unknown"))
-        rank = motif.get("rank", 0)
+        # v2 molecule payloads use compound_id; older payloads may use id.
+        motif_id = motif.get("id") or motif.get("compound_id") or "unknown"
+        display_name = _clean_compound_id(str(motif_id))
+        rank = motif.get("rank", motif.get("score", 0))
         
         a_idx = motif.get("a_atom_idx")
         b_idx = motif.get("b_atom_idx")
@@ -807,9 +816,9 @@ def _print_readable(
     show_extended: bool = True,
 ) -> None:
     kind = payload.get("kind")
-    if kind == "molecule":
+    if kind == "molecule" or (kind is None and _looks_like_molecule_payload(payload)):
         _print_molecule_summary(payload, show_rdkit=show_rdkit, show_extended=show_extended)
-    elif kind == "reaction":
+    elif kind == "reaction" or (kind is None and _looks_like_reaction_payload(payload)):
         _print_reaction_summary(payload, show_roles=show_roles, show_rdkit=show_rdkit, show_extended=show_extended)
     else:
         print("\nSummary")
