@@ -4,9 +4,10 @@ Motif-based steric and electronic analysis using organic compound motifs.
 
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Iterable, Optional, List
 
 from chemtools.core.rdkit import parse_smiles, rdkit_available
 from chemtools.core.smarts import compile_smarts
@@ -68,6 +69,7 @@ _DEFAULT_ORGANOMETAL_B_GROUPS = {
 }
 _DEFAULT_ORGANOMETAL_REACTIVITY_BONUS = 4.0
 _DEFAULT_REACTANT_MOTIF_BONUS = 2.0
+_ORGANOMETAL_HALIDE_REWRITE_RE = re.compile(r"^\[(Mg|Zn)\](Cl|Br|I)(.+)$")
 
 
 @lru_cache(maxsize=1)
@@ -166,12 +168,16 @@ def _build_payload(
     aryl_analysis: Optional[Dict[str, Any]] = None,
     analyses: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
+    motif_list = motifs or []
+    grouped_motifs = _group_motif_hits(motif_list)
     return {
         "schema_version": "v2",
         "smiles": smiles,
-        "motifs": motifs or [],
+        "motifs": motif_list,
         "context_motifs": context_motifs or [],
         "ranked_motifs": ranked_motifs or [],
+        "unique_motifs": [entry["compound_id"] for entry in grouped_motifs],
+        "grouped_motifs": grouped_motifs,
         "steric": steric or {"aryl": [], "alkyl": []},
         "electronics": electronics or {"aryl": []},
         "nearby": nearby or [],
@@ -179,6 +185,71 @@ def _build_payload(
         "analyses": analyses or [],
         "meta": meta,
     }
+
+
+def _group_motif_hits(motifs: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    grouped: Dict[str, Dict[str, Any]] = {}
+    for motif in motifs or []:
+        if not isinstance(motif, dict):
+            continue
+        compound_id = str(motif.get("compound_id") or motif.get("id") or "").strip()
+        if not compound_id:
+            continue
+        entry = grouped.setdefault(
+            compound_id,
+            {
+                "compound_id": compound_id,
+                "count": 0,
+                "sites": [],
+                "rank_score": motif.get("rank_score", 0.0),
+                "undocumented": bool(motif.get("undocumented", False)),
+            },
+        )
+        entry["count"] += 1
+        if motif.get("rank_score", 0.0) > entry.get("rank_score", 0.0):
+            entry["rank_score"] = motif.get("rank_score", 0.0)
+        site = {
+            key: motif.get(key)
+            for key in ("a_atom_idx", "b_atom_idx", "bond")
+            if motif.get(key) is not None
+        }
+        if site:
+            entry["sites"].append(site)
+        alt_ids = _normalize_alt_ids(motif.get("alt_compound_ids"))
+        if alt_ids:
+            existing = set(entry.get("alt_compound_ids") or [])
+            entry["alt_compound_ids"] = sorted(existing | set(alt_ids))
+
+    return sorted(
+        grouped.values(),
+        key=lambda item: (float(item.get("rank_score") or 0.0), item.get("compound_id", "")),
+        reverse=True,
+    )
+
+
+def _organometal_rescue_smiles(smiles: str) -> Optional[str]:
+    """Rewrite bracketed metal-halide-carbon notation into R-M-X connectivity."""
+    stripped = (smiles or "").strip()
+    match = _ORGANOMETAL_HALIDE_REWRITE_RE.match(stripped)
+    if not match:
+        return None
+    metal, halide, remainder = match.groups()
+    if not remainder:
+        return None
+    return f"{halide}[{metal}]{remainder}"
+
+
+def _has_organometal_motif(motifs: Iterable[Dict[str, Any]]) -> bool:
+    for motif in motifs or []:
+        if not isinstance(motif, dict):
+            continue
+        group_b = str(motif.get("group_b") or "")
+        compound_id = str(motif.get("compound_id") or motif.get("id") or "")
+        if group_b in {"-Mg*", "-Zn*", "Mg", "Zn"}:
+            return True
+        if "-Mg*" in compound_id or "-Zn*" in compound_id:
+            return True
+    return False
 
 
 def _normalize_alt_ids(alt_ids: Any) -> List[str]:
@@ -564,6 +635,29 @@ def featurize_molecule(
         site_filter=site_filter,
     )
     motifs = list(all_motifs)
+    rescue_smiles = _organometal_rescue_smiles(smiles)
+    if rescue_smiles and not _has_organometal_motif(motifs):
+        rescue_mol = parse_smiles(rescue_smiles)
+        if rescue_mol is not None:
+            rescue_mol = Chem.AddHs(rescue_mol)
+            rescue_motifs = list(
+                detect_motifs(
+                    rescue_mol,
+                    compiled,
+                    max_hits_per_compound=max_hits,
+                    registry=registry,
+                    discovery_mode=discovery_mode,
+                    site_filter=site_filter,
+                )
+            )
+            if _has_organometal_motif(rescue_motifs):
+                mol = rescue_mol
+                motifs = rescue_motifs
+                meta["organometal_rescue"] = {
+                    "input_smiles": smiles,
+                    "normalized_smiles": rescue_smiles,
+                    "reason": "rewrote leading [Mg/Zn]X-C notation to X-[Mg/Zn]-C connectivity",
+                }
     context_motifs: List[Dict[str, Any]] = []
     if options.get("include_scaffold_motifs", True):
         scaffold_paths = _scaffold_only_registry_paths(registry_paths)

@@ -14,6 +14,8 @@ class MoleculeFeatures:
     motifs: List[Mapping[str, Any]] = field(default_factory=list)
     context_motifs: List[Mapping[str, Any]] = field(default_factory=list)
     ranked_motifs: List[str] = field(default_factory=list)
+    unique_motifs: List[str] = field(default_factory=list)
+    grouped_motifs: List[Mapping[str, Any]] = field(default_factory=list)
     steric: Mapping[str, Any] = field(default_factory=dict)
     electronics: Mapping[str, Any] = field(default_factory=dict)
     nearby: List[Mapping[str, Any]] = field(default_factory=list)
@@ -31,6 +33,8 @@ class MoleculeFeatures:
             motifs=list(payload.get("motifs") or []),
             context_motifs=list(payload.get("context_motifs") or []),
             ranked_motifs=[str(item) for item in payload.get("ranked_motifs") or []],
+            unique_motifs=[str(item) for item in payload.get("unique_motifs") or []],
+            grouped_motifs=list(payload.get("grouped_motifs") or []),
             steric=payload.get("steric") or {},
             electronics=payload.get("electronics") or {},
             nearby=list(payload.get("nearby") or []),
@@ -47,6 +51,8 @@ class MoleculeFeatures:
             "motifs": list(self.motifs),
             "context_motifs": list(self.context_motifs),
             "ranked_motifs": list(self.ranked_motifs),
+            "unique_motifs": list(self.unique_motifs),
+            "grouped_motifs": list(self.grouped_motifs),
             "steric": dict(self.steric),
             "electronics": dict(self.electronics),
             "nearby": list(self.nearby),

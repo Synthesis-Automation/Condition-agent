@@ -871,6 +871,9 @@ def _csv_molecule_row(
                 "canonical_smiles": "",
                 "motif_count": 0,
                 "motifs": "",
+                "unique_motif_count": 0,
+                "unique_motifs": "",
+                "grouped_motifs_json": "[]",
                 "ranked_motifs": "",
                 "analysis_count": 0,
             }
@@ -888,7 +891,11 @@ def _csv_molecule_row(
             for motif in motifs
             if isinstance(motif, dict) and (motif.get("compound_id") or motif.get("id"))
         ]
-        unique_motif_ids = list(dict.fromkeys(motif_ids))
+        unique_motif_ids = [
+            _clean_compound_id(str(item))
+            for item in (payload.get("unique_motifs") or list(dict.fromkeys(motif_ids)))
+        ]
+        grouped_motifs = payload.get("grouped_motifs") or []
         ranked_motifs = [_clean_compound_id(str(item)) for item in payload.get("ranked_motifs") or []]
         out.update(
             {
@@ -900,6 +907,7 @@ def _csv_molecule_row(
                 "motifs": ";".join(motif_ids),
                 "unique_motif_count": len(unique_motif_ids),
                 "unique_motifs": ";".join(unique_motif_ids),
+                "grouped_motifs_json": json.dumps(grouped_motifs, sort_keys=True, default=str),
                 "ranked_motifs": ";".join(ranked_motifs),
                 "analysis_count": len(payload.get("analyses") or []),
                 "aryl_analysis_json": json.dumps(payload.get("aryl_analysis") or {}, sort_keys=True, default=str),
@@ -914,6 +922,9 @@ def _csv_molecule_row(
                 "valid_smiles": False,
                 "motif_count": 0,
                 "motifs": "",
+                "unique_motif_count": 0,
+                "unique_motifs": "",
+                "grouped_motifs_json": "[]",
                 "ranked_motifs": "",
                 "analysis_count": 0,
                 "aryl_analysis_json": "{}",
