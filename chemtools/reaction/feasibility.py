@@ -202,6 +202,9 @@ def _collect_ranked_catalog_candidates(
     """Collect and rank taxonomy candidates using specificity-aware scoring."""
     definitions, _ = _get_catalog()
     candidates: List[Dict[str, Any]] = []
+    reactant_evidence_set = set(reacted_set)
+    if spectators_set:
+        reactant_evidence_set.update(spectators_set)
 
     for catalog_index, (reaction_id, defn) in enumerate(definitions.items()):
         has_reactant_slots = bool(defn.reactants)
@@ -219,7 +222,7 @@ def _collect_ranked_catalog_candidates(
             allowed = set(slot_req.allowed)
             reactant_allowed_union.update(allowed)
             reactant_allowed_total += len(allowed)
-            if _motifs_match_slot(reacted_set, slot_req.allowed):
+            if _motifs_match_slot(reactant_evidence_set, slot_req.allowed):
                 matched_slots.append(slot_name)
             else:
                 all_slots_match = False
@@ -259,7 +262,7 @@ def _collect_ranked_catalog_candidates(
         ):
             continue
 
-        reactant_support = len(reacted_set & reactant_allowed_union)
+        reactant_support = len(reactant_evidence_set & reactant_allowed_union)
         product_support = len(formed_set & product_allowed_union)
         score = _score_specificity_candidate(
             reaction_id=reaction_id,
@@ -343,6 +346,9 @@ def _build_match_evidence(
     selected_match: Optional[Tuple[str, List[str], str]],
     max_candidates: int = 5,
 ) -> Dict[str, Any]:
+    reactant_evidence_set = set(reacted_set)
+    if spectators_set:
+        reactant_evidence_set.update(spectators_set)
     candidates = _collect_ranked_catalog_candidates(
         reacted_set,
         formed_set,
@@ -379,6 +385,8 @@ def _build_match_evidence(
     return {
         "matcher": "taxonomy_specificity_v2",
         "reacted_motifs": sorted(reacted_set),
+        "spectator_motifs": sorted(spectators_set or set()),
+        "reactant_slot_evidence_motifs": sorted(reactant_evidence_set),
         "formed_motifs": sorted(formed_set),
         "selected": selected_payload,
         "top_candidates": top_candidates,

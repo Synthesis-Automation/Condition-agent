@@ -24,7 +24,10 @@
       "products": {
         "product": [
           "Ar-Ar",
+          "Ar-Alkynyl",
+          "Ar-Alkynyl_terminal",
           "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
           "Alkenyl-Alkenyl",
           "Ar-Alkyl"
         ]
@@ -525,6 +528,7 @@
       "products": {
         "product": [
           "Ar-Alkynyl",
+          "Ar-Alkynyl_terminal",
           "Alkenyl-Alkynyl"
         ]
       },
@@ -568,6 +572,7 @@
       "products": {
         "product": [
           "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
           "Alkenyl-Alkenyl"
         ]
       },
@@ -636,6 +641,8 @@
         "product": [
           "Ar-Ar",
           "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
+          "Ar-Alkyl",
           "Alkenyl-Alkenyl"
         ]
       },
@@ -723,6 +730,7 @@
           "Ar-Ar",
           "Ar-Alkyl",
           "Ar-Alkenyl",
+          "Ar-Alkenyl_terminal",
           "Alkenyl-Alkenyl"
         ]
       },

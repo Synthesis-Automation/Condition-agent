@@ -35,8 +35,6 @@ _CRK_BACKGROUND_REACTANT_MOTIFS = {
     "R-H",
     "Any-H",
     "Alkyl-H",
-    "Alkenyl-H",
-    "Alkynyl-H",
 }
 
 

@@ -28,6 +28,26 @@
       "description": "Acetylenic C-H bond."
     },
     {
+      "A": "Alkynyl",
+      "B": "-B(OH)2",
+      "description": "Alkynyl boronic acid (Alkynyl-B(OH)2)."
+    },
+    {
+      "A": "Alkynyl",
+      "B": "-B(OR)2",
+      "description": "Alkynyl boronate ester (Alkynyl-B(OR)2)."
+    },
+    {
+      "A": "Alkynyl",
+      "B": "-BF3K",
+      "description": "Alkynyl trifluoroborate (Alkynyl-BF3K)."
+    },
+    {
+      "A": "Alkynyl",
+      "B": "-B*",
+      "description": "Generic alkynyl organoboron (Alkynyl-B*)."
+    },
+    {
       "A": "Alkenyl",
       "B": "-H",
       "description": "Vinylic C-H bond."

@@ -43,6 +43,7 @@
         {
           "A": [
             "Alkenyl",
+            "Alkynyl",
             "Alkyl",
             "Ar",
             "HeteroAr",
@@ -396,7 +397,8 @@
             "Alkyl"
           ],
           "B": [
-            "Alkynyl_terminal"
+            "Alkynyl_terminal",
+            "-Si*"
           ]
         }
       ]
@@ -905,7 +907,13 @@
             "Alkenyl"
           ],
           "B": [
-            "-H"
+            "-H",
+            "-CN",
+            "-COOR",
+            "-CONH2",
+            "-CONHR",
+            "-CONR2",
+            "-COR"
           ]
         }
       ]
