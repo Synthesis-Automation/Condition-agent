@@ -8,13 +8,13 @@ ChemTools provides **multiple methods** for detecting and classifying reaction t
 
 ## 🔍 Detection Methods Summary
 
-| Method | Module | Type | Accuracy | Speed | Dependencies |
-|--------|--------|------|----------|-------|--------------|
-| **Rule-Based SMARTS** | `router.detect_family()` | Deterministic | High | Fast | RDKit (optional) |
-| **Full Reaction Analysis** | `router.detect_family_from_reaction()` | Hybrid | Very High | Fast | RDKit (optional) |
-| **ML-Based (rxn-insight)** | `reaction_type_detector.detect_reaction_type()` | ML | Very High | Medium | rxn-insight |
-| **Reactant Classification** | `featurizers.analysis.reactants` | Taxonomy | High | Fast | RDKit |
-| **Context-Aware Classification** | `featurizers.analysis.reaction_context` | Advanced | Very High | Medium | RDKit |
+| Method                           | Module                                          | Type          | Accuracy  | Speed  | Dependencies     |
+| -------------------------------- | ----------------------------------------------- | ------------- | --------- | ------ | ---------------- |
+| **Rule-Based SMARTS**            | `router.detect_family()`                        | Deterministic | High      | Fast   | RDKit (optional) |
+| **Full Reaction Analysis**       | `router.detect_family_from_reaction()`          | Hybrid        | Very High | Fast   | RDKit (optional) |
+| **ML-Based (rxn-insight)**       | `reaction_type_detector.detect_reaction_type()` | ML            | Very High | Medium | rxn-insight      |
+| **Reactant Classification**      | `featurizers.analysis.reactants`                | Taxonomy      | High      | Fast   | RDKit            |
+| **Context-Aware Classification** | `featurizers.analysis.reaction_context`         | Advanced      | Very High | Medium | RDKit            |
 
 ---
 
@@ -25,6 +25,7 @@ ChemTools provides **multiple methods** for detecting and classifying reaction t
 **Primary deterministic method** using SMARTS patterns to detect reaction families.
 
 #### Features
+
 - ✅ Fast and deterministic
 - ✅ No ML dependencies
 - ✅ Works offline
@@ -34,11 +35,13 @@ ChemTools provides **multiple methods** for detecting and classifying reaction t
 #### Supported Reactions
 
 **Priority 1: Organometallic Addition to Carbonyl**
+
 - Grignard addition
 - Organolithium addition
 - Organozinc addition
 
 **Priority 2: C-C Couplings**
+
 - Suzuki-Miyaura coupling
 - Sonogashira coupling
 - Kumada coupling
@@ -46,21 +49,25 @@ ChemTools provides **multiple methods** for detecting and classifying reaction t
 - Heck coupling
 
 **Priority 3: Heteroatom Couplings**
+
 - C-N coupling (unified Buchwald/Ullmann)
 - C-O coupling (Ullmann-type)
 - C-S coupling (Ullmann-type)
 
 **Priority 4: Amide/Ester Formation**
+
 - Amide coupling
 - Esterification
 
 **Priority 5: SN2 & Substitutions**
+
 - Hydroboration
 - Nitrile formation
 - Finkelstein reaction
 - Williamson ether synthesis
 
 **Phase 2 Additions:**
+
 - Hydrogenation
 - Carbonyl reduction
 - Alcohol oxidation
@@ -126,6 +133,7 @@ result = detect_family(reactants)
 **Main entry point** - combines rule-based + ML detection with catalyst analysis.
 
 #### Features
+
 - ✅ Accepts full reaction SMILES
 - ✅ Normalizes reaction first
 - ✅ Detects catalyst metals from agents
@@ -158,6 +166,7 @@ Output: Final family + confidence
 #### Catalyst Override Logic
 
 For **C-N coupling** reactions:
+
 - `Pd` catalyst → `buchwald_cn` (conf: 0.95)
 - `Cu` catalyst → `ullmann_cn` (conf: 0.90)
 - No catalyst or Ni/Co → `cn_coupling` (generic)
@@ -203,6 +212,7 @@ result = detect_family_from_reaction(reaction, use_rxn_insight=False)
 **Advanced ML method** using the optional `rxn-insight` package.
 
 #### Features
+
 - ✅ Deep learning-based classification
 - ✅ Trained on large reaction database
 - ✅ Provides reaction class and specific name
@@ -210,6 +220,7 @@ result = detect_family_from_reaction(reaction, use_rxn_insight=False)
 - ✅ Graceful fallback if unavailable
 
 #### Requirements
+
 ```bash
 pip install rxn-insight
 ```
@@ -217,6 +228,7 @@ pip install rxn-insight
 #### Detection Capabilities
 
 The ML model can detect:
+
 - Reaction class (broad category)
 - Reaction name (specific type)
 - Confidence score
@@ -229,7 +241,7 @@ from chemtools.reaction_type_detector import detect_reaction_type, is_available
 
 if is_available():
     result = detect_reaction_type("Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1")
-    
+
     # Result:
     {
         "available": True,
@@ -247,14 +259,14 @@ if is_available():
 
 The ML detector maps rxn-insight classes to ChemTools families:
 
-| rxn-insight Class | ChemTools Family |
-|-------------------|------------------|
-| "C-C Coupling" + boron | `suzuki_miyaura` |
-| "C-N Coupling" + Pd | `buchwald_cn` |
-| "C-N Coupling" + Cu | `ullmann_cn` |
-| "Heteroatom Alkylation" | `ullmann_cn` |
-| "Acylation" | `amide_coupling` |
-| ... | ... |
+| rxn-insight Class       | ChemTools Family |
+| ----------------------- | ---------------- |
+| "C-C Coupling" + boron  | `suzuki_miyaura` |
+| "C-N Coupling" + Pd     | `buchwald_cn`    |
+| "C-N Coupling" + Cu     | `ullmann_cn`     |
+| "Heteroatom Alkylation" | `ullmann_cn`     |
+| "Acylation"             | `amide_coupling` |
+| ...                     | ...              |
 
 ---
 
@@ -265,6 +277,7 @@ The ML detector maps rxn-insight classes to ChemTools families:
 **Taxonomy-based reactant classification** for identifying reactant types.
 
 #### Features
+
 - ✅ Classifies individual reactants
 - ✅ Multi-category matching
 - ✅ Hierarchical taxonomy (category → group → specific)
@@ -314,6 +327,7 @@ result = classify_reactant_smiles("Brc1ccccc1")
 **Advanced method** combining SMILES normalization, reactant classification, and reaction family detection.
 
 #### Features
+
 - ✅ Full reaction context analysis
 - ✅ Normalized SMILES for each component
 - ✅ Reactant role assignment
@@ -359,6 +373,7 @@ result = classify_reactants_with_context("Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc
 ### Quick Decision Guide
 
 **For most use cases:**
+
 ```python
 from chemtools.router import detect_family_from_reaction
 
@@ -366,6 +381,7 @@ result = detect_family_from_reaction(reaction_smiles)
 ```
 
 **For reactant analysis only:**
+
 ```python
 from chemtools.router import detect_family
 
@@ -373,6 +389,7 @@ result = detect_family(["Brc1ccccc1", "Nc1ccccc1"])
 ```
 
 **For ML-based detection:**
+
 ```python
 from chemtools.reaction_type_detector import detect_reaction_type
 
@@ -380,6 +397,7 @@ result = detect_reaction_type(reaction_smiles)
 ```
 
 **For complete context analysis:**
+
 ```python
 from chemtools.featurizers.analysis.reaction_context import classify_reactants_with_context
 
@@ -387,6 +405,7 @@ result = classify_reactants_with_context(reaction_smiles)
 ```
 
 **For individual reactants:**
+
 ```python
 from chemtools.reagent import classify_reactant_smiles
 
@@ -397,14 +416,14 @@ result = classify_reactant_smiles(smiles)
 
 ## 📊 Method Comparison
 
-| Use Case | Recommended Method | Why |
-|----------|-------------------|-----|
-| **Production API** | `detect_family_from_reaction()` | Best accuracy, hybrid approach |
-| **Offline/No network** | `detect_family_from_reaction(use_rxn_insight=False)` | Rule-based, no ML needed |
-| **Reactant lists only** | `detect_family()` | Fast, no normalization needed |
-| **Highest accuracy** | `detect_family_from_reaction(use_rxn_insight=True)` | Combines all methods |
-| **Individual reactants** | `classify_reactant_smiles()` | Taxonomy-based classification |
-| **Full analysis** | `classify_reactants_with_context()` | Comprehensive metadata |
+| Use Case                 | Recommended Method                                   | Why                            |
+| ------------------------ | ---------------------------------------------------- | ------------------------------ |
+| **Production API**       | `detect_family_from_reaction()`                      | Best accuracy, hybrid approach |
+| **Offline/No network**   | `detect_family_from_reaction(use_rxn_insight=False)` | Rule-based, no ML needed       |
+| **Reactant lists only**  | `detect_family()`                                    | Fast, no normalization needed  |
+| **Highest accuracy**     | `detect_family_from_reaction(use_rxn_insight=True)`  | Combines all methods           |
+| **Individual reactants** | `classify_reactant_smiles()`                         | Taxonomy-based classification  |
+| **Full analysis**        | `classify_reactants_with_context()`                  | Comprehensive metadata         |
 
 ---
 
@@ -490,6 +509,7 @@ All methods return confidence scores:
 ### rxn-insight not available
 
 If ML detection fails:
+
 ```python
 result = detect_family_from_reaction(reaction, use_rxn_insight=False)
 ```

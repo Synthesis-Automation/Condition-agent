@@ -1,21 +1,17 @@
-
-
-
 ## Reaction ID (what this is)
 
 Your input matches a **known transformation**: **α,β-unsaturated N-tosylhydrazone + diaryliodonium salt (often with Cu catalysis)** → **N-aryl pyrazole + diaryl sulfone**. ([RSC出版社][1])
 
 In your case:
 
-* **Reactants**
-
+- **Reactants**
   1. `p-Ts–NH–N=CH–CH=CH–Ph` (α,β-unsat **N-tosylhydrazone**)
   2. **triflate** counterion (`OTf−`)
   3. **diphenyliodonium** (`Ph2I+`)
-* **Products**
 
-  * `p-Ts–SO2–Ph` (**diaryl sulfone**)
-  * `N-phenyl, C-phenyl pyrazole` (**N-aryl pyrazole**)
+- **Products**
+  - `p-Ts–SO2–Ph` (**diaryl sulfone**)
+  - `N-phenyl, C-phenyl pyrazole` (**N-aryl pyrazole**)
 
 This “co-generation” of pyrazole + sulfone is explicitly described: **both the p-toluenesulfinate and the pyrazole intermediate arise in situ from the N-tosylhydrazone, then aryl groups are delivered from the diaryliodonium salt**. ([RSC出版社][1])
 (Separately, arylation of sulfinates by diaryliodonium salts to make sulfones is well-precedented.) ([美国化学学会出版物][2])
@@ -30,12 +26,11 @@ This “co-generation” of pyrazole + sulfone is explicitly described: **both t
 
 **Role assignment heuristics (works well in agents):**
 
-* **Iodonium (`[I+]`) fragment** → *aryl donor / electrophile*
-* **Triflate anion** → *spectator counterion*
-* **N-tosylhydrazone** → *precursor that splits into two reactive streams*:
-
-  * **pyrazole-forming stream** (keeps N–N + C3 chain)
-  * **tosyl stream** (becomes **p-toluenesulfinate**, then **sulfone**)
+- **Iodonium (`[I+]`) fragment** → _aryl donor / electrophile_
+- **Triflate anion** → _spectator counterion_
+- **N-tosylhydrazone** → _precursor that splits into two reactive streams_:
+  - **pyrazole-forming stream** (keeps N–N + C3 chain)
+  - **tosyl stream** (becomes **p-toluenesulfinate**, then **sulfone**)
 
 ### 2) Motif detection (SMARTS triggers)
 
@@ -43,28 +38,24 @@ Use substructure matches to trigger this reaction class:
 
 **A. α,β-unsaturated N-sulfonylhydrazone**
 
-* Core idea: `S(=O)(=O)–N–N= C–C= C` (conjugated)
-* Practical SMARTS (starter, tune later):
-
-  * `[$([S](=O)(=O)[N][N]=[C][C]=[C])]`
+- Core idea: `S(=O)(=O)–N–N= C–C= C` (conjugated)
+- Practical SMARTS (starter, tune later):
+  - `[$([S](=O)(=O)[N][N]=[C][C]=[C])]`
 
 **B. Diaryliodonium**
 
-* Starter SMARTS:
-
-  * `[$([I+](a)a)]`  (iodonium bound to two aromatic atoms)
+- Starter SMARTS:
+  - `[$([I+](a)a)]` (iodonium bound to two aromatic atoms)
 
 **C. Diaryl sulfone product**
 
-* Starter SMARTS:
-
-  * `[$([S](=O)(=O)(a)a)]`
+- Starter SMARTS:
+  - `[$([S](=O)(=O)(a)a)]`
 
 **D. Pyrazole product**
 
-* Starter SMARTS (aromatic 5-member with N–N):
-
-  * `[$(n1nccc1),$(n1ncc(c1)),$(c1cnn[nH]1)]` (keep a small library)
+- Starter SMARTS (aromatic 5-member with N–N):
+  - `[$(n1nccc1),$(n1ncc(c1)),$(c1cnn[nH]1)]` (keep a small library)
 
 If A+B present in reactants and C+D present in products → very strong classification signal for this transformation. ([RSC出版社][1])
 
@@ -76,21 +67,21 @@ Once you atom-map, you should see **three key “centers”**:
 
 ### Center 1 — **N–S cleavage** (tosyl leaves)
 
-* **Broken:** `Ts–SO2–N` (sulfonamide bond)
-* Interpretation: generates **p-toluenesulfinate** in situ ([RSC出版社][1])
+- **Broken:** `Ts–SO2–N` (sulfonamide bond)
+- Interpretation: generates **p-toluenesulfinate** in situ ([RSC出版社][1])
 
 ### Center 2 — **S–Ar formation** (sulfone)
 
-* **Formed:** `Ts–SO2–Ph`
-* Mechanistic family: **arylation of sulfinate by diaryliodonium** ([美国化学学会出版物][2])
+- **Formed:** `Ts–SO2–Ph`
+- Mechanistic family: **arylation of sulfinate by diaryliodonium** ([美国化学学会出版物][2])
 
 ### Center 3 — **pyrazole construction + N-arylation**
 
 From the unsaturated hydrazone backbone:
 
-* **Formed (cyclization):** a new **C–N** bond closing the 5-member ring (pyrazole)
-* **Bond-order rearrangements:** aromatization within the 5-member ring
-* **Formed:** **N( pyrazole )–Ph** (N-arylation by iodonium)
+- **Formed (cyclization):** a new **C–N** bond closing the 5-member ring (pyrazole)
+- **Bond-order rearrangements:** aromatization within the 5-member ring
+- **Formed:** **N( pyrazole )–Ph** (N-arylation by iodonium)
 
 This overall “build pyrazole + N-arylate it” is the headline transformation with diaryliodonium salts (often Cu-catalyzed). ([RSC出版社][1])
 
@@ -102,12 +93,12 @@ This overall “build pyrazole + N-arylate it” is the headline transformation 
 
 **Reaction class (suggested):**
 
-* `N-arylpyrazole synthesis from α,β-unsaturated N-tosylhydrazone + diaryliodonium (Cu-catalyzed oxidative cyclization/arylation)` ([RSC出版社][1])
-* plus side/co-product: `diaryl sulfone via sulfinate arylation by diaryliodonium` ([美国化学学会出版物][2])
+- `N-arylpyrazole synthesis from α,β-unsaturated N-tosylhydrazone + diaryliodonium (Cu-catalyzed oxidative cyclization/arylation)` ([RSC出版社][1])
+- plus side/co-product: `diaryl sulfone via sulfinate arylation by diaryliodonium` ([美国化学学会出版物][2])
 
 If your input SMILES omits catalyst/base/solvent, store this as:
 
-* `conditions_missing: ["catalyst/base/solvent may be required (literature often uses Cu)"]` ([RSC出版社][1])
+- `conditions_missing: ["catalyst/base/solvent may be required (literature often uses Cu)"]` ([RSC出版社][1])
 
 ---
 
@@ -115,25 +106,21 @@ If your input SMILES omits catalyst/base/solvent, store this as:
 
 1. **Map atoms** (external mapper) → **bond_changes**
 2. If reactants contain **N-sulfonylhydrazone (A)** + **iodonium (B)**:
+   - search products for **pyrazole (D)** and **diaryl sulfone (C)**
 
-   * search products for **pyrazole (D)** and **diaryl sulfone (C)**
 3. Score evidence:
+   - +3 if sulfone detected
+   - +3 if pyrazole detected
+   - +2 if N-aryl bond formed (new bond between pyrazole N and aryl from iodonium)
+   - +2 if sulfonamide S–N bond broken
 
-   * +3 if sulfone detected
-   * +3 if pyrazole detected
-   * +2 if N-aryl bond formed (new bond between pyrazole N and aryl from iodonium)
-   * +2 if sulfonamide S–N bond broken
 4. Emit:
-
-   * `reaction_type = "iodonium-enabled N-arylpyrazole + diaryl sulfone (from N-tosylhydrazone)"` ([RSC出版社][1])
+   - `reaction_type = "iodonium-enabled N-arylpyrazole + diaryl sulfone (from N-tosylhydrazone)"` ([RSC出版社][1])
 
 If you want, I can format this into your earlier **JSON report schema** for this exact reaction (roles, centers, ranked mechanisms, selectivity risks) using the same “high-impact-first” style.
 
 [1]: https://pubs.rsc.org/en/content/articlelanding/2022/ob/d2ob01338j?utm_source=chatgpt.com "Copper-catalyzed reactions of α,β-unsaturated N- ..."
 [2]: https://pubs.acs.org/doi/10.1021/ol402235v?utm_source=chatgpt.com "Arylation of Lithium Sulfinates with Diaryliodonium Salts"
-
-
-
 
 思考
 分析可能的反应机理
@@ -181,9 +168,9 @@ prod_mols=[Chem.MolFromSmiles(s) for s in products.split(".")]
 [Chem.MolToSmiles(m) for m in react_mols], [Chem.MolToSmiles(m) for m in prod_mols]
 
 (['Cc1ccc(S(=O)(=O)NN=CC=Cc2ccccc2)cc1',
-  'O=S(=O)([O-])C(F)(F)F',
-  'c1ccc([I+]c2ccccc2)cc1'],
- ['Cc1ccc(S(=O)(=O)c2ccccc2)cc1', 'c1ccc(-c2ccn(-c3ccccc3)n2)cc1'])
+'O=S(=O)([O-])C(F)(F)F',
+'c1ccc([I+]c2ccccc2)cc1'],
+['Cc1ccc(S(=O)(=O)c2ccccc2)cc1', 'c1ccc(-c2ccn(-c3ccccc3)n2)cc1'])
 识别和获取pyrazole环信息
 现在，我可以尝试识别pyrazole环。通过分析化学结构，寻找到环的特征信息。接下来，我会查看相关的键和位点，确保准确获取每个环的信息。这将有助于进一步分析反应路径和产物的形成。
 
@@ -191,7 +178,9 @@ prod_mols=[Chem.MolFromSmiles(s) for s in products.split(".")]
 始终显示详情
 
 m=prod_mols[1]
+
 # count atoms, ring size etc
+
 m.GetNumAtoms(), m.GetRingInfo().NumRings(), m.GetRingInfo().AtomRings()
 
 (17, 3, ((0, 16, 15, 3, 2, 1), (5, 4, 14, 7, 6), (9, 10, 11, 12, 13, 8)))
@@ -204,10 +193,10 @@ m.GetNumAtoms(), m.GetRingInfo().NumRings(), m.GetRingInfo().AtomRings()
 [(i, m.GetAtomWithIdx(i).GetSymbol(), m.GetAtomWithIdx(i).GetIsAromatic()) for i in (5,4,14,7,6)]
 
 [(5, 'C', True),
- (4, 'C', True),
- (14, 'N', True),
- (7, 'N', True),
- (6, 'C', True)]
+(4, 'C', True),
+(14, 'N', True),
+(7, 'N', True),
+(6, 'C', True)]
 确认pyrazole结构和命名
 是的，这是一个类似芳香的吡唑环（C,C,N,N,C）。所以它确实是一个吡唑。接下来我可以计算它的标准名称：可能是1,3-二苯基-1H-吡唑？不过，实际上是N-苯基，C-苯基。我要检查环的连通性，找出哪个氮原子与苯基取代。
 
@@ -215,9 +204,9 @@ m.GetNumAtoms(), m.GetRingInfo().NumRings(), m.GetRingInfo().AtomRings()
 始终显示详情
 
 for atom in m.GetAtoms():
-    if atom.GetSymbol()=='N':
-        nbrs=[n.GetIdx() for n in atom.GetNeighbors()]
-        print(atom.GetIdx(), "arom", atom.GetIsAromatic(), "neighbors", nbrs, "degree", atom.GetDegree())
+if atom.GetSymbol()=='N':
+nbrs=[n.GetIdx() for n in atom.GetNeighbors()]
+print(atom.GetIdx(), "arom", atom.GetIsAromatic(), "neighbors", nbrs, "degree", atom.GetDegree())
 
 7 arom True neighbors [6, 8, 14] degree 3
 14 arom True neighbors [7, 4] degree 2
@@ -228,12 +217,13 @@ for atom in m.GetAtoms():
 始终显示详情
 
 # find ring atoms with neighbors outside ring
+
 pyraz_ring=set((5,4,14,7,6))
 for i in pyraz_ring:
-    atom=m.GetAtomWithIdx(i)
-    outside=[n.GetIdx() for n in atom.GetNeighbors() if n.GetIdx() not in pyraz_ring]
-    if outside:
-        print(i, atom.GetSymbol(), outside)
+atom=m.GetAtomWithIdx(i)
+outside=[n.GetIdx() for n in atom.GetNeighbors() if n.GetIdx() not in pyraz_ring]
+if outside:
+print(i, atom.GetSymbol(), outside)
 
 4 C [3]
 7 N [8]
@@ -392,4 +382,3 @@ Aug 20, 2017 — The organic chemistry of hypervalent organoiodine compounds has
 karger.com
 Theilheimer's of Organic Chemistry
 ... synthesis (Synth. Meth. 55, 337) will note from p. 553 that additional ... diaryliodonium triflates with dialkyl phosphonates or phosphoramidates
-
