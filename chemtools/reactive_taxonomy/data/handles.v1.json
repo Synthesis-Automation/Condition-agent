@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "site_families": {
+    "leaving_group": ["F", "Cl", "Br", "I", "OTf", "OTs", "OMs", "OSO2R"],
+    "pronucleophile_XH": ["N", "O", "S", "Csp"],
+    "transfer_group": ["B(OH)2", "B(OR)2", "BF3K", "BPin", "ZnX", "MgX", "SnR3", "SiR3"],
+    "electrophilic_center": ["Acyl", "Sulfonyl"]
+  }
+}

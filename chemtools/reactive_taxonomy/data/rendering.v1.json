@@ -1,0 +1,5 @@
+{
+  "schema_version": "1.0",
+  "dash": "–",
+  "context_labels": {"Ar": "Ar", "HeteroAr": "HeteroAr", "Alkenyl": "Alkenyl", "Alkynyl": "Alkynyl", "Alkyl": "R"}
+}
