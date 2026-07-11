@@ -35,6 +35,7 @@ def _owned_atoms(item: Dict[str, Any], role: str) -> Set[int]:
         "center": "center_atom_index",
         "anchor": "anchor_atom_index",
         "connector": "connector_atom_index",
+        "leaving_or_activatable": "leaving_or_activatable_atom_index",
     }
     value = details.get(role_fields.get(role, ""))
     if value is None:

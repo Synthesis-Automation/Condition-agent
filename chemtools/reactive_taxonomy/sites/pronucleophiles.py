@@ -18,6 +18,7 @@ def _derived_family(center: str, h_count: int, contexts: List[str], aromatic: bo
     if any(c.startswith("C(O)") for c in contexts): return "amide_like"
     if "N" in contexts: return "hydrazine"
     if center == "N":
+        if h_count == 3 and not contexts: return "ammonia"
         return "primary_amine" if h_count == 2 else "secondary_amine"
     return "pronucleophile"
 

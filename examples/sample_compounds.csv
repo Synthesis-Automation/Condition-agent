@@ -153,3 +153,50 @@ Spiro[5.5]undecane,C1CCC2(CC1)CCCC2,reference,,Spirocyclic aliphatic system
 "2,4,5,6-Tetrachlorobromobenzene",Clc1cc(Cl)c(Br)c(Cl)c1,electrophile,Suzuki-Miyaura,Highly polyhalogenated; halogen_count=5
 4-Bromo-N-benzoylaniline,Brc1ccc(NC(=O)c2ccccc2)cc1,electrophile,Suzuki-Miyaura,Amide-protected aniline derivative
 "(1S,2R,5S)-1,2,5-Trimethylcyclohexane",C[C@@H]1CCC[C@@H](C)[C@@H]1C,reference,,Multiple stereogenic centers; chiral_center_count=3
+Acetic acid,CC(=O)O,electrophile,Amide formation; Esterification,Simple aliphatic carboxylic acid
+Benzoic acid,O=C(O)c1ccccc1,electrophile,Amide formation; Esterification,Aromatic carboxylic acid
+Picolinic acid,O=C(O)c1ccccn1,electrophile,Amide formation; Esterification,Heteroaromatic carboxylic acid with coordinating nitrogen
+Acrylic acid,C=CC(=O)O,electrophile,Amide formation; Esterification,Unsaturated carboxylic acid
+Cyclohexanecarboxylic acid,O=C(O)C1CCCCC1,electrophile,Amide formation; Esterification,Cycloalkyl carboxylic acid
+Oxalic acid,O=C(O)C(=O)O,di-electrophile,Amide formation; Esterification,Dicarboxylic acid with two acyl centers
+Succinic acid,O=C(O)CCC(=O)O,di-electrophile,Amide formation; Esterification,Aliphatic dicarboxylic acid
+Acetyl chloride,CC(=O)Cl,electrophile,Acylation; Amide formation; Ester formation,Simple aliphatic acyl chloride
+Benzoyl chloride,O=C(Cl)c1ccccc1,electrophile,Acylation; Amide formation; Ester formation,Aromatic acyl chloride
+Nicotinoyl chloride,O=C(Cl)c1cccnc1,electrophile,Acylation; Amide formation,Heteroaromatic acyl chloride
+Acetyl bromide,CC(=O)Br,electrophile,Acylation; Amide formation,Acyl bromide example
+Acetyl fluoride,CC(=O)F,electrophile,Acylation; Amide formation,Acyl fluoride example
+Methyl chloroformate,COC(=O)Cl,electrophile,Carbamoylation; Acylation,Carbonochloridate electrophile
+Methanesulfonyl chloride,CS(=O)(=O)Cl,electrophile,Sulfonamide formation; Mesylation,Alkyl sulfonyl chloride
+Benzenesulfonyl chloride,O=S(=O)(Cl)c1ccccc1,electrophile,Sulfonamide formation; Sulfonylation,Aryl sulfonyl chloride
+4-Toluenesulfonyl chloride,Cc1ccc(S(=O)(=O)Cl)cc1,electrophile,Sulfonamide formation; Tosylation,Tosyl chloride
+2-Pyridinesulfonyl chloride,O=S(=O)(Cl)c1ccccn1,electrophile,Sulfonamide formation,Heteroaryl sulfonyl chloride
+Methanesulfonyl fluoride,CS(=O)(=O)F,electrophile,Sulfonylation; SuFEx,Sulfonyl fluoride example
+Methylamine,CN,nucleophile,C-N coupling; Amide formation,Primary alkylamine
+Diethylamine,CCNCC,nucleophile,C-N coupling; Amide formation,Secondary dialkylamine
+Pyrrolidine,C1CCNC1,nucleophile,C-N coupling; Amide formation,Five-membered cyclic secondary amine
+Piperidine,C1CCNCC1,nucleophile,C-N coupling; Amide formation,Six-membered cyclic secondary amine
+Morpholine,O1CCNCC1,nucleophile,C-N coupling; Amide formation,Heterocyclic secondary amine containing oxygen
+Diphenylamine,c1ccc(Nc2ccccc2)cc1,nucleophile,C-N coupling,Secondary diarylamine
+2-Aminopyridine,Nc1ccccn1,nucleophile,C-N coupling; Amide formation,Aminated heteroarene
+Ammonia,N,nucleophile,C-N coupling; Amide formation,Unsubstituted nitrogen nucleophile
+Acetamide,CC(=O)N,nucleophile,C-N coupling,Primary amide
+N-Methylacetamide,CC(=O)NC,nucleophile,C-N coupling,Secondary amide
+Benzamide,NC(=O)c1ccccc1,nucleophile,C-N coupling,Primary aromatic amide
+2-Pyrrolidone,O=C1CCCN1,nucleophile,C-N coupling,Cyclic secondary amide lactam
+Urea,NC(=O)N,di-nucleophile,C-N coupling; Condensation,Urea with two N-H sites
+Methylurea,CNC(=O)N,di-nucleophile,C-N coupling,Unsymmetrical substituted urea
+Methyl carbamate,COC(=O)N,nucleophile,C-N coupling,Primary carbamate
+Methanesulfonamide,CS(=O)(=O)N,nucleophile,C-N coupling,Primary sulfonamide
+N-Methylmethanesulfonamide,CS(=O)(=O)NC,nucleophile,C-N coupling,Secondary sulfonamide
+Benzenesulfonamide,NS(=O)(=O)c1ccccc1,nucleophile,C-N coupling,Aryl sulfonamide
+Hydrazine,NN,di-nucleophile,C-N coupling; Acylation,Unsubstituted hydrazine with two reactive nitrogen sites
+Methylhydrazine,CNN,di-nucleophile,C-N coupling; Acylation,Unsymmetrical alkyl hydrazine
+"1,2-Dimethylhydrazine",CNNC,di-nucleophile,C-N coupling; Acylation,Symmetrically substituted hydrazine
+Phenylhydrazine,NNc1ccccc1,di-nucleophile,C-N coupling; Acylation,Aryl hydrazine
+Acetohydrazide,CC(=O)NN,di-nucleophile,Acylation; Condensation,Aliphatic acyl hydrazide
+Benzohydrazide,NNC(=O)c1ccccc1,di-nucleophile,Acylation; Condensation,Aromatic acyl hydrazide
+Ethylene glycol,OCCO,di-nucleophile,C-O coupling; Esterification,Diol with two O-H sites
+Catechol,Oc1ccccc1O,di-nucleophile,C-O coupling; Esterification,Ortho aromatic diol
+"1,2-Ethanedithiol",SCCS,di-nucleophile,C-S coupling,Dithiol with two S-H sites
+Ethyl mesylate,CCOS(=O)(=O)C,electrophile,Alkyl nucleophilic substitution,Alkyl mesylate leaving group
+Methyl tosylate,COS(=O)(=O)c1ccc(C)cc1,electrophile,Alkyl nucleophilic substitution,Alkyl tosylate leaving group

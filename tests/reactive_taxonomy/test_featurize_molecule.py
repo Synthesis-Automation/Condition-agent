@@ -1,4 +1,5 @@
 from chemtools.reactive_taxonomy import featurize_molecule, load_handle_patterns, validate_taxonomy
+from chemtools.reactive_taxonomy.context import load_context_taxonomy
 
 
 def signatures(smiles: str) -> set[str]:
@@ -24,6 +25,15 @@ def test_site_reports_pattern_provenance() -> None:
     site = featurize_molecule("Brc1ccccc1").sites[0]
     assert site.details["matched_pattern"] == "terminal_carbon_halogen"
     assert site.details["alternative_patterns"] == []
+
+
+def test_context_taxonomy_declares_classification_methods() -> None:
+    payload = load_context_taxonomy()
+    records = {record["id"]: record for record in payload["contexts"]}
+    assert records["HeteroAr"]["classification_method"] == "aromatic_ring_system"
+    assert records["Alkyl"]["classification_method"] == "atom_property"
+    assert records["C(O)NR"]["classification_method"] == "mapped_smarts"
+    assert records["C(O)NR"]["atom_roles"]["context_anchor"] == 1
 
 
 def test_leaving_groups() -> None:
@@ -98,3 +108,28 @@ def test_silyl_ether_is_not_a_transfer_group() -> None:
 
 def test_bridging_metal_halogen_is_not_a_leaving_group() -> None:
     assert "LG|Ar|Br" not in signatures("[Mg]Brc1ccccc1")
+
+
+def test_acyl_halide_owns_halogen_site() -> None:
+    result = featurize_molecule("CC(=O)Cl")
+    assert [site.canonical_signature for site in result.sites] == [
+        "EC|Acyl|Alkyl|Cl|activated"
+    ]
+
+
+def test_ammonia_is_supported_nh_pronucleophile() -> None:
+    result = featurize_molecule("N")
+    assert [site.canonical_signature for site in result.sites] == ["XH|N|H3|"]
+    assert result.sites[0].chemist_label == "NH3"
+
+
+def test_expanded_condensation_and_nitrogen_classes() -> None:
+    expected = {
+        "O=C(O)c1ccccc1": "EC|Acyl|Ar|OH|latent",
+        "CS(=O)(=O)Cl": "EC|Sulfonyl|Alkyl|Cl|activated",
+        "NC(=O)N": "XH|N|H2|C(O)NR",
+        "CS(=O)(=O)NC": "XH|N|H1|SO2R,Alkyl",
+        "NNC(=O)c1ccccc1": "XH|N|H1|C(O)R,N",
+    }
+    for smiles, signature in expected.items():
+        assert signature in signatures(smiles)

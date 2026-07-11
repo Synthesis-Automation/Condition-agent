@@ -21,6 +21,8 @@ def render_xh(center: str, h_count: int, contexts: List[str]) -> str:
         return f"{_PREFIX.get(contexts[0], contexts[0]) if contexts else 'H'}–SH"
     if center != "N":
         return f"{center}–H"
+    if h_count == 3 and not contexts:
+        return "NH3"
     if h_count == 2:
         prefix = _PREFIX.get(contexts[0], contexts[0]) if contexts else "H"
         return f"{prefix}–NH2"

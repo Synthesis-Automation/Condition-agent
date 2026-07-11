@@ -28,7 +28,7 @@
       "site_type": "pronucleophile_XH",
       "tokens": ["N"],
       "priority": 50,
-      "smarts": "[N,n;+0;H1,H2:1]",
+      "smarts": "[N,n;+0;H1,H2,H3:1]",
       "atom_roles": {"center": 1}
     },
     {
@@ -118,7 +118,8 @@
       "tokens": ["Acyl"],
       "priority": 70,
       "smarts": "[CX3:1](=[O:2])-[O,Cl,Br,F:3]",
-      "atom_roles": {"center": 1, "oxo": 2, "leaving_or_activatable": 3}
+      "atom_roles": {"center": 1, "oxo": 2, "leaving_or_activatable": 3},
+      "suppresses": [{"site_type": "leaving_group", "owned_role": "leaving_or_activatable"}]
     },
     {
       "id": "sulfonyl_halide",

@@ -34,12 +34,32 @@ def validate_taxonomy() -> List[str]:
         errors.append(f"missing_taxonomy_files:{','.join(sorted(missing))}")
         return errors
     contexts = payload["contexts.v1"]
-    tokens = contexts.get("tokens") or []
+    context_records = contexts.get("contexts") or []
+    tokens = [str(record.get("id") or "") for record in context_records]
     precedence = contexts.get("precedence") or []
     if len(tokens) != len(set(tokens)):
         errors.append("duplicate_context_tokens")
     if set(tokens) != set(precedence):
         errors.append("context_precedence_mismatch")
+    allowed_methods = {"mapped_smarts", "aromatic_ring_system", "atom_property", "element", "fallback"}
+    for record in context_records:
+        context_id = str(record.get("id") or "<missing>")
+        method = str(record.get("classification_method") or "")
+        if method not in allowed_methods:
+            errors.append(f"invalid_context_method:{context_id}")
+        if method == "mapped_smarts":
+            compiled = compile_smarts(str(record.get("smarts") or ""), validate=False)
+            if compiled is None:
+                errors.append(f"invalid_context_smarts:{context_id}")
+                continue
+            available_maps = {int(atom.GetAtomMapNum()) for atom in compiled.GetAtoms() if atom.GetAtomMapNum()}
+            roles = record.get("atom_roles") or {}
+            if "context_anchor" not in roles:
+                errors.append(f"missing_context_anchor:{context_id}")
+            for role, raw_maps in roles.items():
+                role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
+                if {int(value) for value in role_maps} - available_maps:
+                    errors.append(f"unknown_context_atom_map:{context_id}:{role}")
     families = payload["handles.v1"].get("site_families") or {}
     required = {"leaving_group", "pronucleophile_XH", "transfer_group", "electrophilic_center"}
     if set(families) != required:
