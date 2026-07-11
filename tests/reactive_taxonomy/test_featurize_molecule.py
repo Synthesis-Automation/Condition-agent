@@ -133,3 +133,23 @@ def test_expanded_condensation_and_nitrogen_classes() -> None:
     }
     for smiles, signature in expected.items():
         assert signature in signatures(smiles)
+
+
+def test_aromatic_nh_is_one_ring_context() -> None:
+    for smiles in ("c1cc[nH]c1", "c1ccc2[nH]ccc2c1"):
+        sites = [
+            site for site in featurize_molecule(smiles).sites
+            if site.site_type == "pronucleophile_XH"
+        ]
+        assert len(sites) == 1
+        assert sites[0].canonical_signature == "XH|N_aromatic|H1|HeteroAr"
+        assert sites[0].chemist_label == "AromN–H"
+        assert sites[0].details["center_element"] == "N"
+        assert sites[0].details["derived_family"] == "aromatic_nh"
+
+
+def test_bromopyrrole_keeps_both_distinct_sites() -> None:
+    assert signatures("Brc1cc[nH]c1") == {
+        "LG|HeteroAr|Br",
+        "XH|N_aromatic|H1|HeteroAr",
+    }

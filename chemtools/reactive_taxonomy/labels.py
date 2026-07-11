@@ -13,6 +13,8 @@ def render_edge(context: str, handle: str) -> str:
 
 
 def render_xh(center: str, h_count: int, contexts: List[str]) -> str:
+    if center == "N_aromatic":
+        return "AromN–H"
     if center == "Csp":
         return "R–C≡C–H"
     if center == "O":
