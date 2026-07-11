@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 
 from ..context import classify_context
 from ..labels import render_edge
+from ..patterns import matched_patterns_for_atom, matched_role_atoms
 from .common import bond_index, unique_indices
 
 
@@ -36,9 +37,12 @@ def _boron_token(boron: Any) -> str:
 
 def detect(mol: Any) -> List[Dict[str, Any]]:
     sites: List[Dict[str, Any]] = []
+    candidate_centers = matched_role_atoms(mol, "transfer_group", "center")
     for handle in mol.GetAtoms():
         symbol = handle.GetSymbol()
         if symbol != "B" and symbol not in _METAL_TOKENS:
+            continue
+        if handle.GetIdx() not in candidate_centers:
             continue
         token = _boron_token(handle) if symbol == "B" else _METAL_TOKENS[symbol]
         carbon_anchors = [neighbor for neighbor in handle.GetNeighbors() if neighbor.GetSymbol() == "C"]
@@ -68,5 +72,6 @@ def detect(mol: Any) -> List[Dict[str, Any]]:
                 "bond_indices": [bond_index(mol, anchor.GetIdx(), handle.GetIdx())],
                 "signature": f"TM|{context}|{token}", "label": render_edge(context, token),
                 "details": {"anchor_atom_index": anchor.GetIdx(), "handle_atom_indices": handle_atoms, "anchor_context": context, "handle_token": token},
+                "matched_patterns": [item["id"] for item in matched_patterns_for_atom(mol, "transfer_group", "center", handle.GetIdx())],
             })
     return sites

@@ -7,6 +7,7 @@ from typing import Any, Iterable, List, Optional, Set
 from chemtools.core.rdkit import mol_to_canonical_smiles, parse_smiles, rdkit_available
 
 from .models import ComponentAnalysis, CompoundAnalysis, ReactiveSite, SiteType
+from .resolution import resolve_candidates
 from .sites import DETECTORS
 
 
@@ -48,7 +49,7 @@ def featurize_molecule(
         for site_type, detector in DETECTORS.items():
             if site_type in selected:
                 raw_sites.extend((site_type, item) for item in detector(component_mol))
-        raw_sites.sort(key=lambda pair: (pair[1]["atom_indices"], pair[0], pair[1]["signature"]))
+        raw_sites = resolve_candidates(raw_sites)
         component_sites: List[ReactiveSite] = []
         for site_number, (site_type, item) in enumerate(raw_sites):
             site = ReactiveSite(

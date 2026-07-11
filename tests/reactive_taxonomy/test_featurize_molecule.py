@@ -1,4 +1,4 @@
-from chemtools.reactive_taxonomy import featurize_molecule, validate_taxonomy
+from chemtools.reactive_taxonomy import featurize_molecule, load_handle_patterns, validate_taxonomy
 
 
 def signatures(smiles: str) -> set[str]:
@@ -9,6 +9,21 @@ def signatures(smiles: str) -> set[str]:
 
 def test_taxonomy_bundle_validates() -> None:
     assert validate_taxonomy() == []
+
+
+def test_handle_smarts_are_independent_and_mapped() -> None:
+    patterns = load_handle_patterns()
+    assert len(patterns) >= 12
+    assert {pattern["site_type"] for pattern in patterns} == {
+        "leaving_group", "pronucleophile_XH", "transfer_group", "electrophilic_center"
+    }
+    assert all(pattern.get("atom_roles") for pattern in patterns)
+
+
+def test_site_reports_pattern_provenance() -> None:
+    site = featurize_molecule("Brc1ccccc1").sites[0]
+    assert site.details["matched_pattern"] == "terminal_carbon_halogen"
+    assert site.details["alternative_patterns"] == []
 
 
 def test_leaving_groups() -> None:

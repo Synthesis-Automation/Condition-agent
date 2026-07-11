@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
+from chemtools.core.smarts import compile_smarts
+
 
 DATA_DIR = Path(__file__).with_name("data")
 
@@ -42,6 +44,32 @@ def validate_taxonomy() -> List[str]:
     required = {"leaving_group", "pronucleophile_XH", "transfer_group", "electrophilic_center"}
     if set(families) != required:
         errors.append("site_family_mismatch")
+    patterns = payload["handles.v1"].get("patterns") or []
+    pattern_ids = [str(pattern.get("id") or "") for pattern in patterns]
+    if not patterns:
+        errors.append("missing_handle_patterns")
+    if len(pattern_ids) != len(set(pattern_ids)):
+        errors.append("duplicate_handle_pattern_ids")
+    for pattern in patterns:
+        pattern_id = str(pattern.get("id") or "<missing>")
+        if pattern.get("site_type") not in required:
+            errors.append(f"invalid_pattern_site_type:{pattern_id}")
+        smarts = str(pattern.get("smarts") or "")
+        compiled = compile_smarts(smarts, validate=False)
+        if compiled is None:
+            errors.append(f"invalid_pattern_smarts:{pattern_id}")
+            continue
+        available_maps = {int(atom.GetAtomMapNum()) for atom in compiled.GetAtoms() if atom.GetAtomMapNum()}
+        for role, raw_maps in (pattern.get("atom_roles") or {}).items():
+            role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
+            unknown_maps = {int(value) for value in role_maps} - available_maps
+            if unknown_maps:
+                errors.append(f"unknown_atom_map:{pattern_id}:{role}")
+        for rule in pattern.get("suppresses") or []:
+            if rule.get("site_type") not in required:
+                errors.append(f"invalid_suppression_site_type:{pattern_id}")
+            if rule.get("owned_role") not in (pattern.get("atom_roles") or {}):
+                errors.append(f"invalid_suppression_role:{pattern_id}")
     return errors
 
 

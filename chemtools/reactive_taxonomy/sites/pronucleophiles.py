@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 
 from ..context import classify_neighbor_contexts
 from ..labels import render_xh
+from ..patterns import matched_patterns_for_atom, matched_role_atoms
 
 
 def _derived_family(center: str, h_count: int, contexts: List[str], aromatic: bool) -> str:
@@ -23,6 +24,7 @@ def _derived_family(center: str, h_count: int, contexts: List[str], aromatic: bo
 
 def detect(mol: Any) -> List[Dict[str, Any]]:
     sites: List[Dict[str, Any]] = []
+    candidate_centers = matched_role_atoms(mol, "pronucleophile_XH", "center")
     for atom in mol.GetAtoms():
         symbol = atom.GetSymbol()
         h_count = int(atom.GetTotalNumHs(includeNeighbors=True))
@@ -30,13 +32,9 @@ def detect(mol: Any) -> List[Dict[str, Any]]:
         supported = symbol in {"N", "O", "S"}
         if symbol == "C" and str(atom.GetHybridization()) == "SP" and h_count == 1:
             supported, center = True, "Csp"
-        if not supported or h_count < 1 or atom.GetFormalCharge() != 0:
+        if atom.GetIdx() not in candidate_centers:
             continue
-        # O-H atoms belonging to a composite transfer handle are internal to
-        # that handle; they are not free alcohol/phenol pronucleophile sites.
-        if symbol == "O" and any(
-            neighbor.GetSymbol() in {"B"} for neighbor in atom.GetNeighbors()
-        ):
+        if not supported or h_count < 1 or atom.GetFormalCharge() != 0:
             continue
         contexts_data = classify_neighbor_contexts(mol, atom.GetIdx())
         # ``classify_neighbor_contexts`` already applies the taxonomy's
@@ -47,5 +45,6 @@ def detect(mol: Any) -> List[Dict[str, Any]]:
             "topology": "atom", "atom_indices": [atom.GetIdx()], "bond_indices": [],
             "signature": signature, "label": render_xh(center, h_count, contexts),
             "details": {"center_atom_index": atom.GetIdx(), "center_element": center, "formal_charge": atom.GetFormalCharge(), "aromatic": atom.GetIsAromatic(), "h_count": h_count, "contexts": contexts, "derived_family": _derived_family(center, h_count, contexts, atom.GetIsAromatic())},
+            "matched_patterns": [item["id"] for item in matched_patterns_for_atom(mol, "pronucleophile_XH", "center", atom.GetIdx())],
         })
     return sites

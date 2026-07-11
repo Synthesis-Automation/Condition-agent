@@ -1,5 +1,35 @@
 {
   "schema_version": "1.0",
-  "tokens": ["SO2R", "P(O)R2", "C(O)NR", "C(O)OR", "C(O)R", "HeteroAr", "Ar", "Alkenyl", "Alkynyl", "Alkyl", "N", "O", "S", "Other"],
-  "precedence": ["SO2R", "P(O)R2", "C(O)NR", "C(O)OR", "C(O)R", "HeteroAr", "Ar", "Alkenyl", "Alkynyl", "Alkyl", "N", "O", "S", "Other"]
+  "tokens": [
+    "SO2R",
+    "P(O)R2",
+    "C(O)NR",
+    "C(O)OR",
+    "C(O)R",
+    "HeteroAr",
+    "Ar",
+    "Alkenyl",
+    "Alkynyl",
+    "Alkyl",
+    "N",
+    "O",
+    "S",
+    "Other"
+  ],
+  "precedence": [
+    "SO2R",
+    "P(O)R2",
+    "C(O)NR",
+    "C(O)OR",
+    "C(O)R",
+    "HeteroAr",
+    "Ar",
+    "Alkenyl",
+    "Alkynyl",
+    "Alkyl",
+    "N",
+    "O",
+    "S",
+    "Other"
+  ]
 }
