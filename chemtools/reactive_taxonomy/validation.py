@@ -28,7 +28,7 @@ def validate_taxonomy() -> List[str]:
         payload = load_taxonomy_data()
     except (OSError, json.JSONDecodeError) as exc:
         return [f"taxonomy_load_failed:{exc}"]
-    expected = {"contexts.v1", "handles.v1", "rendering.v1"}
+    expected = {"contexts.v1", "handles.v1", "rendering.v1", "reaction_grammars.v1", "reaction_rendering.v1"}
     missing = expected - set(payload)
     if missing:
         errors.append(f"missing_taxonomy_files:{','.join(sorted(missing))}")
@@ -106,6 +106,35 @@ def validate_taxonomy() -> List[str]:
         errors.append("duplicate_rendering_rule_ids")
     if any(not rule.get("template") for rule in rendering_rules):
         errors.append("missing_rendering_template")
+    grammar_ids: List[str] = []
+    allowed_operators = {"join_two_anchors", "replace_handle_with_center"}
+    known_roles: Dict[str, set[str]] = {site_type: set() for site_type in required}
+    for pattern in patterns:
+        known_roles.get(str(pattern.get("site_type")), set()).update((pattern.get("atom_roles") or {}).keys())
+    for grammar in payload["reaction_grammars.v1"].get("grammars") or []:
+        grammar_id = str(grammar.get("id") or "<missing>")
+        grammar_ids.append(grammar_id)
+        roles = grammar.get("roles") or {}
+        if not roles:
+            errors.append(f"missing_reaction_roles:{grammar_id}")
+        for role_name, constraint in roles.items():
+            if constraint.get("site_type") not in required:
+                errors.append(f"invalid_reaction_site_type:{grammar_id}:{role_name}")
+        operator = grammar.get("operator") or {}
+        if operator.get("id") not in allowed_operators:
+            errors.append(f"invalid_reaction_operator:{grammar_id}")
+        for pair in grammar.get("distinct_components") or []:
+            if len(pair) != 2 or any(role not in roles for role in pair):
+                errors.append(f"invalid_distinct_component_rule:{grammar_id}")
+    if len(grammar_ids) != len(set(grammar_ids)):
+        errors.append("duplicate_reaction_grammar_ids")
+    reaction_rendering = payload["reaction_rendering.v1"].get("rules") or {}
+    if set(reaction_rendering) != set(grammar_ids):
+        errors.append("reaction_rendering_coverage_mismatch")
+    allowed_product_kinds = {"join_contexts", "nitrogen_substitution", "heteroatom_substitution", "terminal_alkyne", "chan_lam", "amide", "acyl_heteroatom", "sulfonamide"}
+    for grammar_id, rule in reaction_rendering.items():
+        if rule.get("product_kind") not in allowed_product_kinds:
+            errors.append(f"invalid_reaction_product_renderer:{grammar_id}")
     return errors
 
 

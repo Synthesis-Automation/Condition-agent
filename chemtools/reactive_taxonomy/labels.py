@@ -33,6 +33,10 @@ def _context_label(token: str, bond: str) -> str:
     return str(template).format(bond=bond)
 
 
+def render_context(token: str, *, style: str = "unicode") -> str:
+    return _context_label(token, _style(style)["bond"])
+
+
 def render_edge(context: str, handle: str, *, style: str = "unicode") -> str:
     bond = _style(style)["bond"]
     template = load_rendering_taxonomy().get("edge_template", "{context}{bond}{handle}")
@@ -74,4 +78,4 @@ def render_xh(center: str, h_count: int, contexts: List[str], *, style: str = "u
     )
 
 
-__all__ = ["available_styles", "load_rendering_taxonomy", "render_edge", "render_xh"]
+__all__ = ["available_styles", "load_rendering_taxonomy", "render_context", "render_edge", "render_xh"]

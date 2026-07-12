@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "rules": {
+    "boron_transfer_coupling": {"product_kind": "join_contexts", "left_role": "electrophile", "right_role": "transfer_partner"},
+    "other_metal_transfer_coupling": {"product_kind": "join_contexts", "left_role": "electrophile", "right_role": "transfer_partner"},
+    "sp2_c_n_substitution": {"product_kind": "nitrogen_substitution", "anchor_role": "electrophile", "nitrogen_role": "nucleophile"},
+    "sp2_c_o_substitution": {"product_kind": "heteroatom_substitution", "anchor_role": "electrophile", "partner_role": "nucleophile", "element": "O"},
+    "sp2_c_s_substitution": {"product_kind": "heteroatom_substitution", "anchor_role": "electrophile", "partner_role": "nucleophile", "element": "S"},
+    "sonogashira_coupling": {"product_kind": "terminal_alkyne", "anchor_role": "electrophile"},
+    "chan_lam_heteroatom_coupling": {"product_kind": "chan_lam", "anchor_role": "transfer_partner", "partner_role": "nucleophile"},
+    "amide_formation": {"product_kind": "amide", "nitrogen_role": "nitrogen_partner"},
+    "ester_formation": {"product_kind": "acyl_heteroatom", "acyl_role": "acyl_partner", "partner_role": "oxygen_partner", "element": "O"},
+    "thioester_formation": {"product_kind": "acyl_heteroatom", "acyl_role": "acyl_partner", "partner_role": "sulfur_partner", "element": "S"},
+    "sulfonamide_formation": {"product_kind": "sulfonamide", "sulfonyl_role": "sulfonyl_partner", "nitrogen_role": "nitrogen_partner"}
+  }
+}

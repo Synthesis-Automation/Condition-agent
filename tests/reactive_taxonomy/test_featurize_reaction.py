@@ -1,0 +1,69 @@
+from chemtools.reactive_taxonomy import featurize_reaction, validate_taxonomy
+
+
+def test_reaction_grammar_taxonomy_validates() -> None:
+    assert validate_taxonomy() == []
+
+
+def test_suzuki_exact_product_reconstruction() -> None:
+    reaction = "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
+    result = featurize_reaction(reaction)
+    assert result.valid
+    assert result.transformation_class == "c_c_transfer_coupling"
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.reaction_label == "Ar–Br + Ar–B(OH)2 → Ar–Ar"
+    assert [change.change_type for change in result.selected_candidate.predicted_bond_changes] == ["broken", "broken", "formed"]
+
+
+def test_cn_exact_product_reconstruction() -> None:
+    reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
+    result = featurize_reaction(reaction)
+    assert result.transformation_class == "sp2_c_n_substitution"
+    assert result.reaction_label == "Ar–Br + Ar–NH2 → Ar1Ar2–NH"
+
+
+def test_amide_exact_product_reconstruction() -> None:
+    reaction = "CC(=O)Cl.CN>>CC(=O)NC"
+    result = featurize_reaction(reaction)
+    assert result.transformation_class == "amide_formation"
+    assert result.reaction_label == "R–C(O)Cl + R–NH2 → R–C(O)–NHR"
+
+
+def test_wrong_product_is_not_confirmed() -> None:
+    result = featurize_reaction("Brc1ccccc1.Nc1ccccc1>>c1ccccc1")
+    assert result.valid
+    assert result.selected_candidate is None
+    assert result.evidence_quality == "reactant_grammar_only"
+    assert result.candidates[0].verification == "product_mismatch"
+
+
+def test_supplied_mapping_yields_exact_bond_differences() -> None:
+    reaction = "[CH3:1][Br:2].[NH2:3][CH3:4]>>[CH3:1][NH:3][CH3:4]"
+    result = featurize_reaction(reaction)
+    changes = {(change["change_type"], tuple(change["atom_maps"])) for change in result.mapped_bond_changes}
+    assert ("broken", (1, 2)) in changes
+    assert ("formed", (1, 3)) in changes
+
+
+def test_three_part_reaction_smiles_preserves_agents() -> None:
+    result = featurize_reaction("Brc1ccccc1.Nc1ccccc1>CCN>c1ccc(Nc2ccccc2)cc1")
+    assert result.valid
+    assert len(result.agents) == 1
+    assert result.transformation_class == "sp2_c_n_substitution"
+
+
+def test_additional_v1_grammars_reconstruct_products() -> None:
+    cases = {
+        "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1": "sp2_c_o_substitution",
+        "Brc1ccccc1.Sc1ccccc1>>c1ccc(Sc2ccccc2)cc1": "sp2_c_s_substitution",
+        "Brc1ccccc1.C#Cc1ccccc1>>c1ccc(C#Cc2ccccc2)cc1": "sonogashira_coupling",
+        "Brc1ccccc1.Cl[Zn]c1ccccc1>>c1ccc(-c2ccccc2)cc1": "other_metal_transfer_coupling",
+        "OB(O)c1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1": "chan_lam_heteroatom_coupling",
+        "CC(=O)Cl.CCO>>CCOC(C)=O": "ester_formation",
+        "CC(=O)Cl.CCS>>CCSC(C)=O": "thioester_formation",
+        "CS(=O)(=O)Cl.CN>>CS(=O)(=O)NC": "sulfonamide_formation",
+    }
+    for reaction, grammar_id in cases.items():
+        result = featurize_reaction(reaction)
+        assert result.evidence_quality == "exact_product_reconstruction", reaction
+        assert result.selected_candidate.grammar_id == grammar_id

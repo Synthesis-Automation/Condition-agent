@@ -29,6 +29,8 @@
     {"id": "dialkylamine", "center": "N", "h_count": 1, "contexts_exact": ["Alkyl", "Alkyl"], "template": "R1R2{bond}NH", "priority": 90},
     {"id": "diarylamine", "center": "N", "h_count": 1, "contexts_exact": ["Ar", "Ar"], "template": "Ar1Ar2{bond}NH", "priority": 90},
     {"id": "aryl_alkylamine", "center": "N", "h_count": 1, "contexts_set": ["Ar", "Alkyl"], "template": "Ar{bond}NH{bond}R", "priority": 90},
+    {"id": "tertiary_amide", "center": "N", "h_count": 0, "context_first_prefix": "C(O)", "template": "{context}{bond}NR2", "priority": 95},
+    {"id": "tertiary_sulfonamide", "center": "N", "h_count": 0, "context_first": "SO2R", "template": "R{bond}S(O)2{bond}NR2", "priority": 95},
     {"id": "sulfonamide", "center": "N", "context_first": "SO2R", "template": "R{bond}S(O)2{bond}NH{suffix}", "priority": 85},
     {"id": "carbonyl_nitrogen", "center": "N", "context_first_prefix": "C(O)", "template": "{context}{bond}NH{suffix}", "priority": 80},
     {"id": "hydrazine_terminal", "center": "N", "h_count": 2, "contexts_contains": "N", "template": "N{bond}NH2", "priority": 95},

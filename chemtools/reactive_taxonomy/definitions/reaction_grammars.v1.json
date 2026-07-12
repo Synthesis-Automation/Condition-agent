@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0",
+  "grammars": [
+    {
+      "id": "boron_transfer_coupling",
+      "transformation_class": "c_c_transfer_coupling",
+      "display_name": "Boron transfer C–C coupling",
+      "generic_label": "Ar–X + C–B → Ar–C",
+      "roles": {
+        "electrophile": {"site_type": "leaving_group", "anchor_context_any": ["Ar", "HeteroAr", "Alkenyl"]},
+        "transfer_partner": {"site_type": "transfer_group", "handle_token_any": ["B(OH)2", "B(OR)2", "BPin", "BF3K"]}
+      },
+      "distinct_components": [["electrophile", "transfer_partner"]],
+      "operator": {"id": "join_two_anchors"},
+      "compatible_named_families": ["suzuki_miyaura"],
+      "priority": 100
+    },
+    {
+      "id": "sp2_c_n_substitution",
+      "transformation_class": "sp2_c_n_substitution",
+      "display_name": "sp2 C–N substitution or coupling",
+      "generic_label": "Ar–X + N–H → Ar–N",
+      "roles": {
+        "electrophile": {"site_type": "leaving_group", "anchor_context_any": ["Ar", "HeteroAr", "Alkenyl"]},
+        "nucleophile": {"site_type": "pronucleophile_XH", "center_any": ["N", "N_aromatic"], "h_count_min": 1, "availability_any": ["free", "deactivated"]}
+      },
+      "distinct_components": [["electrophile", "nucleophile"]],
+      "operator": {"id": "replace_handle_with_center", "electrophile_role": "electrophile", "partner_role": "nucleophile"},
+      "compatible_named_families": ["buchwald_hartwig", "ullmann_goldberg", "snar"],
+      "priority": 90
+    },
+    {
+      "id": "amide_formation",
+      "transformation_class": "amide_formation",
+      "display_name": "Amide formation",
+      "generic_label": "R–C(O)Y + N–H → R–C(O)–N",
+      "roles": {
+        "acyl_partner": {"site_type": "electrophilic_center", "center_family": "Acyl", "activation_state_any": ["activated", "latent"]},
+        "nitrogen_partner": {"site_type": "pronucleophile_XH", "center_any": ["N"], "h_count_min": 1, "availability_any": ["free"]}
+      },
+      "distinct_components": [["acyl_partner", "nitrogen_partner"]],
+      "operator": {"id": "replace_handle_with_center", "electrophile_role": "acyl_partner", "partner_role": "nitrogen_partner"},
+      "compatible_named_families": ["amide_coupling", "acylation"],
+      "priority": 95
+    },
+    {
+      "id": "sp2_c_o_substitution",
+      "transformation_class": "sp2_c_o_substitution",
+      "display_name": "sp2 C–O substitution or coupling",
+      "generic_label": "Ar–X + O–H → Ar–O",
+      "roles": {
+        "electrophile": {"site_type": "leaving_group", "anchor_context_any": ["Ar", "HeteroAr", "Alkenyl"]},
+        "nucleophile": {"site_type": "pronucleophile_XH", "center_any": ["O"], "h_count_min": 1, "availability_any": ["free"]}
+      },
+      "distinct_components": [["electrophile", "nucleophile"]],
+      "operator": {"id": "replace_handle_with_center", "electrophile_role": "electrophile", "partner_role": "nucleophile"},
+      "compatible_named_families": ["ullmann_c_o", "nucleophilic_aromatic_substitution"],
+      "priority": 85
+    },
+    {
+      "id": "sp2_c_s_substitution",
+      "transformation_class": "sp2_c_s_substitution",
+      "display_name": "sp2 C–S substitution or coupling",
+      "generic_label": "Ar–X + S–H → Ar–S",
+      "roles": {
+        "electrophile": {"site_type": "leaving_group", "anchor_context_any": ["Ar", "HeteroAr", "Alkenyl"]},
+        "nucleophile": {"site_type": "pronucleophile_XH", "center_any": ["S"], "h_count_min": 1, "availability_any": ["free"]}
+      },
+      "distinct_components": [["electrophile", "nucleophile"]],
+      "operator": {"id": "replace_handle_with_center", "electrophile_role": "electrophile", "partner_role": "nucleophile"},
+      "compatible_named_families": ["c_s_coupling"],
+      "priority": 85
+    },
+    {
+      "id": "sonogashira_coupling",
+      "transformation_class": "terminal_alkyne_coupling",
+      "display_name": "Terminal alkyne coupling",
+      "generic_label": "Ar–X + C(sp)–H → Ar–C≡C–R",
+      "roles": {
+        "electrophile": {"site_type": "leaving_group", "anchor_context_any": ["Ar", "HeteroAr", "Alkenyl"]},
+        "alkyne_partner": {"site_type": "pronucleophile_XH", "center_any": ["Csp"], "h_count_min": 1, "availability_any": ["free"]}
+      },
+      "distinct_components": [["electrophile", "alkyne_partner"]],
+      "operator": {"id": "replace_handle_with_center", "electrophile_role": "electrophile", "partner_role": "alkyne_partner"},
+      "compatible_named_families": ["sonogashira"],
+      "priority": 95
+    },
+    {
+      "id": "other_metal_transfer_coupling",
+      "transformation_class": "c_c_transfer_coupling",
+      "display_name": "Organometallic C–C transfer coupling",
+      "generic_label": "Ar–X + C–M → Ar–C",
+      "roles": {
+        "electrophile": {"site_type": "leaving_group", "anchor_context_any": ["Ar", "HeteroAr", "Alkenyl"]},
+        "transfer_partner": {"site_type": "transfer_group", "handle_token_any": ["ZnX", "MgX", "SnR3", "SiR3"]}
+      },
+      "distinct_components": [["electrophile", "transfer_partner"]],
+      "operator": {"id": "join_two_anchors"},
+      "compatible_named_families": ["negishi", "kumada", "stille", "hiyama"],
+      "priority": 90
+    },
+    {
+      "id": "chan_lam_heteroatom_coupling",
+      "transformation_class": "chan_lam_heteroatom_coupling",
+      "display_name": "Boron-to-heteroatom coupling",
+      "generic_label": "C–B + N/O/S–H → C–N/O/S",
+      "roles": {
+        "transfer_partner": {"site_type": "transfer_group", "handle_token_any": ["B(OH)2", "B(OR)2", "BPin", "BF3K"]},
+        "nucleophile": {"site_type": "pronucleophile_XH", "center_any": ["N", "N_aromatic", "O", "S"], "h_count_min": 1, "availability_any": ["free", "deactivated"]}
+      },
+      "distinct_components": [["transfer_partner", "nucleophile"]],
+      "operator": {"id": "replace_handle_with_center", "electrophile_role": "transfer_partner", "partner_role": "nucleophile"},
+      "compatible_named_families": ["chan_lam"],
+      "priority": 80
+    },
+    {
+      "id": "ester_formation",
+      "transformation_class": "ester_formation",
+      "display_name": "Ester formation",
+      "generic_label": "R–C(O)Y + O–H → R–C(O)–O",
+      "roles": {
+        "acyl_partner": {"site_type": "electrophilic_center", "center_family": "Acyl", "activation_state_any": ["activated", "latent"]},
+        "oxygen_partner": {"site_type": "pronucleophile_XH", "center_any": ["O"], "h_count_min": 1, "availability_any": ["free"]}
+      },
+      "distinct_components": [["acyl_partner", "oxygen_partner"]],
+      "operator": {"id": "replace_handle_with_center", "electrophile_role": "acyl_partner", "partner_role": "oxygen_partner"},
+      "compatible_named_families": ["esterification", "acylation"],
+      "priority": 90
+    },
+    {
+      "id": "thioester_formation",
+      "transformation_class": "thioester_formation",
+      "display_name": "Thioester formation",
+      "generic_label": "R–C(O)Y + S–H → R–C(O)–S",
+      "roles": {
+        "acyl_partner": {"site_type": "electrophilic_center", "center_family": "Acyl", "activation_state_any": ["activated", "latent"]},
+        "sulfur_partner": {"site_type": "pronucleophile_XH", "center_any": ["S"], "h_count_min": 1, "availability_any": ["free"]}
+      },
+      "distinct_components": [["acyl_partner", "sulfur_partner"]],
+      "operator": {"id": "replace_handle_with_center", "electrophile_role": "acyl_partner", "partner_role": "sulfur_partner"},
+      "compatible_named_families": ["thioesterification", "acylation"],
+      "priority": 90
+    },
+    {
+      "id": "sulfonamide_formation",
+      "transformation_class": "sulfonamide_formation",
+      "display_name": "Sulfonamide formation",
+      "generic_label": "R–S(O)2X + N–H → R–S(O)2–N",
+      "roles": {
+        "sulfonyl_partner": {"site_type": "electrophilic_center", "center_family": "Sulfonyl", "activation_state_any": ["activated"]},
+        "nitrogen_partner": {"site_type": "pronucleophile_XH", "center_any": ["N"], "h_count_min": 1, "availability_any": ["free"]}
+      },
+      "distinct_components": [["sulfonyl_partner", "nitrogen_partner"]],
+      "operator": {"id": "replace_handle_with_center", "electrophile_role": "sulfonyl_partner", "partner_role": "nitrogen_partner"},
+      "compatible_named_families": ["sulfonylation"],
+      "priority": 95
+    }
+  ]
+}
