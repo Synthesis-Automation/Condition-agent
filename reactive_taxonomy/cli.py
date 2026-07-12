@@ -58,6 +58,13 @@ def _molecule_summary(result: Any) -> str:
             f"  {site.site_id}: {site.chemist_label} [{site.site_type}; "
             f"availability={site.availability}; steric={steric}; electronic={electronic}]"
         )
+        if site.details.get("anchor_subtype") in {"benzylic", "allylic", "propargylic"}:
+            lines.append(f"    attachment context: {site.details['anchor_subtype']}")
+        attached = (environment.get("steric") or {}).get("attached_groups") or []
+        for group in attached:
+            group_class = group.get("attachment_carbon_class") or group.get("context") or "Other"
+            branching = ", alpha-branched" if group.get("alpha_branched") else ""
+            lines.append(f"    attached group: {group.get('context', 'Other')} ({group_class}{branching})")
     lines.append(f"functional groups: {len(result.functional_groups)}")
     for group in result.functional_groups:
         lines.append(
@@ -129,6 +136,11 @@ def _molecule_concise_summary(result: Any) -> str:
             lines.append(
                 f"  {site.chemist_label} — {site.site_type}, {site.availability}"
             )
+            environment = (site.context_features or {}).get("environment") or {}
+            attached = (environment.get("steric") or {}).get("attached_groups") or []
+            for group in attached:
+                group_class = group.get("attachment_carbon_class") or group.get("context") or "Other"
+                lines.append(f"    attached {group.get('context', 'group')}: {group_class}")
     else:
         lines.append("Reactive sites: none")
     if result.functional_groups:

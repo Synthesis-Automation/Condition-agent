@@ -28,6 +28,16 @@ python -m reactive_taxonomy.cli molecule "Brc1ccc(N)cc1C#N" --concise
 python -m reactive_taxonomy.cli reaction "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1" --concise
 ```
 
+For reactive sites bearing alkyl groups, the readable output separates the
+substitution at the reactive center from attachment-carbon sterics. For
+example, tert-butylamine remains a primary amine (`R–NH2`) but its attached
+alkyl group is reported as `tertiary` and alpha-branched.
+
+Alkyl reactive centers retain `Alkyl` as their broad machine context while
+recording synthetically important attachment subtypes. Benzylic, allylic, and
+propargylic leaving groups are rendered as labels such as `Benzyl–Cl`,
+`Allyl–Br`, and `Propargyl–OMs`.
+
 Add `--format json` to the single-record and validation commands for the full
 typed result. Batch mode prints a coverage summary and optionally writes one
 complete, source-traceable result per line as JSONL. Use `--column NAME` when a

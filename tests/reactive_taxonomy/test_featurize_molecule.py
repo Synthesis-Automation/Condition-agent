@@ -187,6 +187,27 @@ def test_rich_context_record_is_exposed() -> None:
     assert len(context["fragment_atom_indices"]) == 6
 
 
+def test_alkyl_leaving_groups_preserve_benzylic_allylic_and_propargylic_subtypes() -> None:
+    examples = {
+        "ClCc1ccccc1": ("benzylic", "Benzyl–Cl"),
+        "ClCC=C": ("allylic", "Allyl–Cl"),
+        "ClCC#C": ("propargylic", "Propargyl–Cl"),
+        "CCCCl": ("simple_alkyl", "R–Cl"),
+    }
+    for smiles, (subtype, label) in examples.items():
+        site = featurize_molecule(smiles).sites[0]
+        context = site.context_features["contexts"][0]
+        assert site.details["anchor_context"] == "Alkyl"
+        assert site.details["anchor_subtype"] == subtype
+        assert context["subtype"] == subtype
+        assert site.chemist_label == label
+
+
+def test_benzyl_chloride_and_aryl_bromide_are_separate_sites() -> None:
+    result = featurize_molecule("ClCc1ccccc1Br")
+    assert {site.chemist_label for site in result.sites} == {"Benzyl–Cl", "Ar–Br"}
+
+
 def test_detector_emits_typed_candidates_from_shared_match_index() -> None:
     from rdkit import Chem
     mol = Chem.MolFromSmiles("CCN")

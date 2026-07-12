@@ -68,3 +68,22 @@ def test_suzuki_site_descriptors_distinguish_ortho_bulk_and_electronics() -> Non
     environment = next(item for item in result.site_environments if item.site_id == leaving_site.site_id)
     assert environment.steric["ortho_substituent_count"] >= 1
     assert environment.electronic["class"] == "electron_poor"
+
+
+def test_alkyl_attachment_sterics_are_distinct_from_amine_substitution() -> None:
+    examples = {
+        "CN": "methyl",
+        "CCN": "primary",
+        "CC(C)N": "secondary",
+        "CC(C)(C)N": "tertiary",
+    }
+    for smiles, expected in examples.items():
+        result = featurize_molecule(smiles)
+        site = next(item for item in result.sites if item.site_type == "pronucleophile_XH")
+        environment = next(item for item in result.site_environments if item.site_id == site.site_id)
+        assert environment.steric["center_substitution_class"] == "primary"
+        alkyl = next(group for group in environment.steric["attached_groups"] if group["context"] == "Alkyl")
+        assert alkyl["attachment_carbon_class"] == expected
+
+    tert_butyl = featurize_molecule("CC(C)(C)N").site_environments[0].steric["attached_groups"][0]
+    assert tert_butyl["alpha_branched"] is True

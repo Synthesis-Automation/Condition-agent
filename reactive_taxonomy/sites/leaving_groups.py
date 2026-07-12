@@ -41,15 +41,20 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 continue
             context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()}, match_index=match_index)
             token = handle.GetSymbol()
+            display_context = {
+                "benzylic": "Benzyl",
+                "allylic": "Allyl",
+                "propargylic": "Propargyl",
+            }.get(context.subtype, context.token)
             sites.append(SiteCandidate(
                 site_type="leaving_group", topology="edge",
                 atom_roles={"anchor": (anchor.GetIdx(),), "handle": (handle.GetIdx(),)},
                 atom_indices=(anchor.GetIdx(), handle.GetIdx()),
                 bond_indices=(bond_index(mol, anchor.GetIdx(), handle.GetIdx()),),
                 canonical_signature=f"LG|{context.token}|{token}",
-                render_kind="edge", render_data={"context": context.token, "handle": token},
+                render_kind="edge", render_data={"context": display_context, "handle": token},
                 matched_patterns=tuple(item["id"] for item in match_index.patterns_for_atom("leaving_group", "handle", handle.GetIdx())),
-                details={"anchor_context": context.token, "handle_token": token},
+                details={"anchor_context": context.token, "anchor_subtype": context.subtype, "handle_token": token},
                 context_records=(context,), availability="available",
             ))
         if handle.GetSymbol() != "O" or handle.GetDegree() != 2 or handle.GetIdx() not in candidate_connectors:
@@ -64,6 +69,11 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             continue
         token = _sulfonate_token(sulfur)
         context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()}, match_index=match_index)
+        display_context = {
+            "benzylic": "Benzyl",
+            "allylic": "Allyl",
+            "propargylic": "Propargyl",
+        }.get(context.subtype, context.token)
         handle_atoms = tuple(unique_indices([handle.GetIdx(), sulfur.GetIdx(), *(n.GetIdx() for n in sulfur.GetNeighbors() if n.GetIdx() != handle.GetIdx())]))
         sites.append(SiteCandidate(
             site_type="leaving_group", topology="edge",
@@ -71,9 +81,9 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             atom_indices=tuple(unique_indices([anchor.GetIdx(), *handle_atoms])),
             bond_indices=(bond_index(mol, anchor.GetIdx(), handle.GetIdx()),),
             canonical_signature=f"LG|{context.token}|{token}",
-            render_kind="edge", render_data={"context": context.token, "handle": token},
+            render_kind="edge", render_data={"context": display_context, "handle": token},
             matched_patterns=tuple(item["id"] for item in match_index.patterns_for_atom("leaving_group", "connector", handle.GetIdx())),
-            details={"anchor_context": context.token, "handle_token": token},
+            details={"anchor_context": context.token, "anchor_subtype": context.subtype, "handle_token": token},
             context_records=(context,), availability="available",
         ))
     return sites

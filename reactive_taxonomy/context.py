@@ -50,6 +50,51 @@ def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
     )
 
 
+def _sp3_carbon_context(mol: Any, atom: Any, excluded: Set[int]) -> ContextClassification:
+    """Classify high-value environments adjacent to an sp3 carbon anchor."""
+    neighbors = [
+        neighbor for neighbor in atom.GetNeighbors()
+        if neighbor.GetIdx() not in excluded and neighbor.GetAtomicNum() > 1
+    ]
+    benzylic = any(neighbor.GetIsAromatic() for neighbor in neighbors)
+    allylic = any(
+        not neighbor.GetIsAromatic()
+        and any(
+            bond.GetBondTypeAsDouble() == 2.0
+            and bond.GetOtherAtom(neighbor).GetIdx() != atom.GetIdx()
+            for bond in neighbor.GetBonds()
+        )
+        for neighbor in neighbors
+    )
+    propargylic = any(
+        any(
+            bond.GetBondTypeAsDouble() == 3.0
+            and bond.GetOtherAtom(neighbor).GetIdx() != atom.GetIdx()
+            for bond in neighbor.GetBonds()
+        )
+        for neighbor in neighbors
+    )
+    subtype = "benzylic" if benzylic else ("allylic" if allylic else ("propargylic" if propargylic else "simple_alkyl"))
+    carbon_neighbors = sum(neighbor.GetAtomicNum() == 6 for neighbor in neighbors)
+    attachment_classes = {0: "methyl", 1: "primary", 2: "secondary", 3: "tertiary"}
+    return ContextClassification(
+        token="Alkyl",
+        attachment_atom_index=atom.GetIdx(),
+        fragment_atom_indices=tuple(sorted({atom.GetIdx(), *(neighbor.GetIdx() for neighbor in neighbors)})),
+        classification_method="sp3_attachment_environment",
+        subtype=subtype,
+        features={
+            "element": "C",
+            "hybridization": str(atom.GetHybridization()),
+            "aromatic": False,
+            "attachment_carbon_class": attachment_classes.get(carbon_neighbors, "quaternary_or_complex"),
+            "benzylic": benzylic,
+            "allylic": allylic,
+            "propargylic": propargylic,
+        },
+    )
+
+
 def classify_context(
     mol: Any,
     atom_index: int,
@@ -89,7 +134,7 @@ def classify_context(
             elif str(atom.GetHybridization()) == "SP2":
                 token = "Alkenyl"
             else:
-                token = "Alkyl"
+                return _sp3_carbon_context(mol, atom, excluded_set)
         elif symbol in {"N", "O", "S"}:
             token = symbol
 

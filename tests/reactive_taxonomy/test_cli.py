@@ -38,6 +38,10 @@ def test_concise_molecule_and_reaction_output(capsys) -> None:
     assert "Product connection: Ar–Ar (C_C)" in reaction_output
     assert "selected grammar" not in reaction_output
 
+    assert main(["molecule", "CC(C)(C)N", "--concise"]) == 0
+    tert_butylamine_output = capsys.readouterr().out
+    assert "attached Alkyl: tertiary" in tert_butylamine_output
+
 
 def test_batch_autodetects_column_and_writes_jsonl(tmp_path, capsys) -> None:
     source = tmp_path / "molecules.csv"

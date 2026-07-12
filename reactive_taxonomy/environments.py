@@ -56,6 +56,60 @@ def _steric(mol: Any, center: int) -> Dict[str, Any]:
     return {"class": classes.get(carbon_neighbors, "tertiary"), "carbon_neighbor_count": carbon_neighbors, "local_heavy_atoms_r2": len(local), "method": "graph_local_v1"}
 
 
+def _attached_group_sterics(mol: Any, site: ReactiveSite, center: int) -> Tuple[Dict[str, Any], ...]:
+    """Describe groups directly attached to a reactive heteroatom or center.
+
+    For an alkyl group, classification is based on the number of carbon atoms
+    bonded to its attachment carbon after the reactive center is excluded.
+    Thus Me, Et, i-Pr, and t-Bu report methyl, primary, secondary, and tertiary
+    attachment carbons, respectively.
+    """
+    center_atom = mol.GetAtomWithIdx(center)
+    if center_atom.GetAtomicNum() not in {7, 8, 16}:
+        return ()
+    contexts = {
+        int(record.get("attachment_atom_index")): str(record.get("token") or "Other")
+        for record in site.details.get("context_records") or ()
+        if record.get("attachment_atom_index") is not None
+    }
+    records: List[Dict[str, Any]] = []
+    for neighbor in center_atom.GetNeighbors():
+        if neighbor.GetAtomicNum() <= 1:
+            continue
+        index = neighbor.GetIdx()
+        token = contexts.get(index)
+        if token is None:
+            if neighbor.GetIsAromatic():
+                token = "Ar"
+            elif neighbor.GetAtomicNum() == 6 and str(neighbor.GetHybridization()) == "SP3":
+                token = "Alkyl"
+            else:
+                token = neighbor.GetSymbol()
+        record: Dict[str, Any] = {
+            "attachment_atom_index": index,
+            "context": token,
+            "element": neighbor.GetSymbol(),
+        }
+        if token == "Alkyl" and neighbor.GetAtomicNum() == 6:
+            carbon_neighbors = sum(
+                adjacent.GetAtomicNum() == 6 and adjacent.GetIdx() != center
+                for adjacent in neighbor.GetNeighbors()
+            )
+            classes = {0: "methyl", 1: "primary", 2: "secondary", 3: "tertiary"}
+            record.update({
+                "attachment_carbon_class": classes.get(carbon_neighbors, "quaternary_or_complex"),
+                "alpha_carbon_neighbor_count": carbon_neighbors,
+                "alpha_branched": carbon_neighbors >= 2,
+                "beta_branch_count": sum(
+                    max(0, sum(atom.GetAtomicNum() == 6 for atom in adjacent.GetNeighbors()) - 1)
+                    for adjacent in neighbor.GetNeighbors()
+                    if adjacent.GetAtomicNum() == 6 and adjacent.GetIdx() != center
+                ),
+            })
+        records.append(record)
+    return tuple(sorted(records, key=lambda item: int(item["attachment_atom_index"])))
+
+
 def build_site_environment(mol: Any, site: ReactiveSite, groups: Iterable[FunctionalGroup]) -> SiteEnvironment:
     """Build raw local descriptors without assuming a reaction mechanism."""
     roles = site.details.get("atom_roles") or {}
@@ -78,12 +132,17 @@ def build_site_environment(mol: Any, site: ReactiveSite, groups: Iterable[Functi
     threshold = float(rules.get("electronic_threshold", 0.35))
     electronic_class = "electron_poor" if electronic_sum > threshold else ("electron_rich" if electronic_sum < -threshold else "neutral")
     atom = mol.GetAtomWithIdx(center)
+    steric = _steric(mol, center)
+    attached_groups = _attached_group_sterics(mol, site, center)
+    if attached_groups:
+        steric["attached_groups"] = list(attached_groups)
+        steric["center_substitution_class"] = steric["class"]
     return SiteEnvironment(
         site_id=site.site_id,
         center_atom_index=center,
         first_shell=tuple(sorted(n.GetSymbol() for n in atom.GetNeighbors())),
         nearby_groups=tuple(sorted(nearby, key=lambda item: (item["distance"], item["group_id"]))),
-        steric=_steric(mol, center),
+        steric=steric,
         electronic={"class": electronic_class, "qualitative_sum": round(electronic_sum, 3), "method": "tag_distance_v1"},
     )
 
