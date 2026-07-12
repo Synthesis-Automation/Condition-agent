@@ -17,6 +17,11 @@
       "label": "SO2NR2",
       "smarts": "[S:1](=[O:2])(=[O:3])[N:4]",
       "priority": 98,
+      "suppresses_on_overlap": [
+        "primary_amine",
+        "secondary_amine",
+        "tertiary_amine"
+      ],
       "tags": [
         "acid_sensitive",
         "metal_binding"
@@ -27,6 +32,11 @@
       "label": "CONR2",
       "smarts": "[C:1](=[O:2])[N:3]",
       "priority": 96,
+      "suppresses_on_overlap": [
+        "primary_amine",
+        "secondary_amine",
+        "tertiary_amine"
+      ],
       "tags": [
         "metal_binding",
         "hydrogen_bond_acceptor"
@@ -129,6 +139,7 @@
         "nucleophilic",
         "unprotected_XH",
         "metal_binding",
+        "palladium_poisoning",
         "oxidation_sensitive"
       ]
     },
@@ -141,7 +152,8 @@
         "basic",
         "nucleophilic",
         "unprotected_XH",
-        "metal_binding"
+        "metal_binding",
+        "strong_metal_binding"
       ]
     },
     {
@@ -153,7 +165,8 @@
         "basic",
         "nucleophilic",
         "unprotected_XH",
-        "metal_binding"
+        "metal_binding",
+        "strong_metal_binding"
       ]
     },
     {
@@ -164,7 +177,8 @@
       "tags": [
         "basic",
         "nucleophilic",
-        "metal_binding"
+        "metal_binding",
+        "strong_metal_binding"
       ]
     },
     {
@@ -175,6 +189,7 @@
       "tags": [
         "basic",
         "metal_binding",
+        "strong_metal_binding",
         "electron_withdrawing"
       ]
     },

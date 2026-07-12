@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "input_file": "examples\\reaction_dataset_300\\suzuki_miyaura.csv",
+  "total_rows": 300,
+  "tier_counts": {
+    "verified": 181,
+    "review": 90,
+    "rejected": 29
+  },
+  "reason_counts": {
+    "exact_single_event_suzuki_with_conditions": 181,
+    "incomplete_condition_identity": 6,
+    "invalid_reaction_smiles": 2,
+    "missing_suzuki_family_environment": 83,
+    "multiple_products": 5,
+    "not_verified_as_suzuki_miyaura": 83,
+    "reaction_not_exactly_verified": 82,
+    "unresolved_transformation": 27
+  },
+  "verified_yield_mean": 80.42,
+  "temperature_coverage": 0,
+  "time_coverage": 3
+}

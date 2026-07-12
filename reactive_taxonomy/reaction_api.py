@@ -10,6 +10,7 @@ from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_candidates import enumerate_reaction_candidates
 from .reaction_labels import render_reaction_label
+from .reaction_environments import build_reaction_family_environment
 from .reaction_models import ReactionAnalysis, ReactionCandidate
 from .reaction_operators import apply_operator
 from .reaction_parser import parse_reaction_smiles
@@ -77,15 +78,18 @@ def featurize_reaction(
             warnings.append("AMBIGUOUS_PARTICIPATING_SITES")
     mapped_changes = tuple(supplied_map_bond_changes(reaction_smiles))
     spectators = derive_spectator_groups(parsed.reactants, selected, evidence)
+    family_environment = build_reaction_family_environment(parsed.reactants, selected, spectators, evidence)
     return ReactionAnalysis(
         input_reaction_smiles=reaction_smiles, valid=True,
         reactants=parsed.reactants, agents=parsed.agents, products=parsed.products,
         candidates=tuple(candidates), selected_candidate=selected,
         transformation_class=selected.transformation_class if selected else None,
         compatible_named_families=selected.compatible_named_families if selected else (),
+        named_family=selected.compatible_named_families[0] if selected and len(selected.compatible_named_families) == 1 else None,
         reaction_label=selected.reaction_label if selected else None,
         evidence_quality=evidence, mapped_bond_changes=mapped_changes,
         spectator_groups=spectators,
+        family_environment=family_environment,
         warnings=tuple(warnings),
     )
 

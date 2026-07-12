@@ -9,5 +9,16 @@
       "basic": -0.35,
       "nucleophilic": -0.25
     }
+  },
+  "reaction_families": {
+    "suzuki_miyaura": {
+      "roles": ["electrophile", "transfer_partner"],
+      "coordination_tags": ["strong_metal_binding", "palladium_poisoning"],
+      "unprotected_xh_tags": ["unprotected_XH"],
+      "competing_site_types": ["leaving_group", "transfer_group"],
+      "challenging_leaving_groups": ["Cl", "F"],
+      "protodeboronation_contexts": ["HeteroAr"],
+      "protodeboronation_handles": ["B(OH)2"]
+    }
   }
 }

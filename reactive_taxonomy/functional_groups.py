@@ -26,7 +26,7 @@ def load_functional_group_definitions() -> Tuple[Dict[str, Any], ...]:
 
 def detect_functional_groups(mol: Any, component_index: int) -> List[FunctionalGroup]:
     """Detect deduplicated functional groups in one molecular component."""
-    found: List[FunctionalGroup] = []
+    candidates: List[Tuple[Dict[str, Any], FunctionalGroup]] = []
     seen = set()
     for definition in load_functional_group_definitions():
         query = compile_smarts(str(definition.get("smarts") or ""), validate=False)
@@ -43,7 +43,7 @@ def detect_functional_groups(mol: Any, component_index: int) -> List[FunctionalG
                 continue
             seen.add(key)
             anchor_position = map_positions.get(1, 0)
-            found.append(FunctionalGroup(
+            candidates.append((definition, FunctionalGroup(
                 group_id=str(definition["id"]),
                 chemist_label=str(definition.get("label") or definition["id"]),
                 component_index=component_index,
@@ -51,8 +51,18 @@ def detect_functional_groups(mol: Any, component_index: int) -> List[FunctionalG
                 anchor_atom_index=int(match[anchor_position]),
                 tags=tuple(str(tag) for tag in definition.get("tags", [])),
                 matched_pattern=str(definition.get("smarts") or ""),
-            ))
-    return found
+            )))
+    retained: List[Tuple[Dict[str, Any], FunctionalGroup]] = []
+    for definition, candidate in candidates:
+        candidate_atoms = set(candidate.atom_indices)
+        suppressed = any(
+            candidate.group_id in set(owner_definition.get("suppresses_on_overlap") or [])
+            and bool(candidate_atoms.intersection(owner.atom_indices))
+            for owner_definition, owner in retained
+        )
+        if not suppressed:
+            retained.append((definition, candidate))
+    return [group for _, group in retained]
 
 
 __all__ = ["detect_functional_groups", "load_functional_group_definitions"]

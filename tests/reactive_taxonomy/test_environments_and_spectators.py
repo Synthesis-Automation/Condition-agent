@@ -28,3 +28,43 @@ def test_reaction_spectators_exclude_consumed_handle_and_keep_nitrile() -> None:
 
 def test_functional_group_registry_is_validated() -> None:
     assert validate_taxonomy() == []
+
+
+def test_functional_group_ownership_suppresses_generic_sulfonamide_amine() -> None:
+    result = featurize_molecule("CS(=O)(=O)NC")
+    ids = [group.group_id for group in result.functional_groups]
+    assert "sulfonamide" in ids
+    assert "secondary_amine" not in ids
+
+
+def test_suzuki_family_environment_separates_partner_roles() -> None:
+    reaction = "Brc1ccccc1.OB(O)c1ccccn1>>c1ccc(-c2ccccn2)cc1"
+    result = featurize_reaction(reaction)
+    assert result.named_family == "suzuki_miyaura"
+    assert result.family_environment is not None
+    partners = {partner.role: partner for partner in result.family_environment.partners}
+    assert partners["electrophile"].handle_token == "Br"
+    assert partners["electrophile"].anchor_context == "Ar"
+    assert partners["transfer_partner"].handle_token == "B(OH)2"
+    assert partners["transfer_partner"].anchor_context == "HeteroAr"
+    assert "protodeboronation_risk" in partners["transfer_partner"].flags
+
+
+def test_suzuki_environment_reports_competing_halide() -> None:
+    reaction = "Brc1ccc(Br)cc1.OB(O)c1ccccc1>>Brc1ccc(-c2ccccc2)cc1"
+    result = featurize_reaction(reaction)
+    assert result.family_environment is not None
+    electrophile = next(
+        partner for partner in result.family_environment.partners
+        if partner.role == "electrophile"
+    )
+    assert electrophile.competing_site_labels == ("Ar–Br",)
+    assert "competing_reactive_handle" in electrophile.flags
+
+
+def test_suzuki_site_descriptors_distinguish_ortho_bulk_and_electronics() -> None:
+    result = featurize_molecule("Brc1c(C)cccc1C#N")
+    leaving_site = next(site for site in result.sites if site.site_type == "leaving_group")
+    environment = next(item for item in result.site_environments if item.site_id == leaving_site.site_id)
+    assert environment.steric["ortho_substituent_count"] >= 1
+    assert environment.electronic["class"] == "electron_poor"

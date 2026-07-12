@@ -71,6 +71,12 @@ def validate_taxonomy() -> List[str]:
         errors.append("invalid_steric_radius")
     if not isinstance(descriptor_rules.get("electronic_tag_weights"), dict):
         errors.append("invalid_electronic_tag_weights")
+    family_rules = payload["descriptor_rules.v1"].get("reaction_families") or {}
+    suzuki_rules = family_rules.get("suzuki_miyaura") or {}
+    if set(suzuki_rules.get("roles") or []) != {"electrophile", "transfer_partner"}:
+        errors.append("invalid_suzuki_environment_roles")
+    if not suzuki_rules.get("competing_site_types"):
+        errors.append("missing_suzuki_competing_site_types")
     group_records = payload["functional_groups.v1"].get("groups") or []
     group_ids = [str(record.get("id") or "") for record in group_records]
     if not group_records:
@@ -83,6 +89,9 @@ def validate_taxonomy() -> List[str]:
             errors.append(f"missing_functional_group_label:{group_id}")
         if compile_smarts(str(record.get("smarts") or ""), validate=False) is None:
             errors.append(f"invalid_functional_group_smarts:{group_id}")
+        unknown_suppressed = set(record.get("suppresses_on_overlap") or []) - set(group_ids)
+        if unknown_suppressed:
+            errors.append(f"unknown_suppressed_functional_group:{group_id}")
     patterns = payload["handles.v1"].get("patterns") or []
     pattern_ids = [str(pattern.get("id") or "") for pattern in patterns]
     if not patterns:

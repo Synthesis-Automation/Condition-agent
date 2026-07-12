@@ -56,6 +56,37 @@ class ReactionSpectatorGroup:
 
 
 @dataclass(frozen=True)
+class ReactionPartnerEnvironment:
+    """Reaction-family interpretation of one selected substrate role."""
+
+    role: str
+    component_index: int
+    site_id: str
+    handle_token: Optional[str]
+    anchor_context: Optional[str]
+    chemist_label: str
+    steric: Dict[str, Any] = field(default_factory=dict)
+    electronic: Dict[str, Any] = field(default_factory=dict)
+    nearby_groups: Tuple[Dict[str, Any], ...] = ()
+    spectator_group_ids: Tuple[str, ...] = ()
+    competing_site_labels: Tuple[str, ...] = ()
+    coordination_group_ids: Tuple[str, ...] = ()
+    unprotected_xh_group_ids: Tuple[str, ...] = ()
+    flags: Tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ReactionFamilyEnvironment:
+    """Family overlay assembled from mechanism-neutral observations."""
+
+    family_id: str
+    partners: Tuple[ReactionPartnerEnvironment, ...]
+    flags: Tuple[str, ...] = ()
+    evidence: str = "selected_candidate"
+    feature_version: str = "1.0"
+
+
+@dataclass(frozen=True)
 class ReactionCandidate:
     grammar_id: str
     transformation_class: str
@@ -84,6 +115,7 @@ class ReactionAnalysis:
     evidence_quality: str = "unresolved"
     mapped_bond_changes: Tuple[Dict[str, Any], ...] = ()
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
+    family_environment: Optional[ReactionFamilyEnvironment] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
     schema_version: str = "1.1"
@@ -92,4 +124,4 @@ class ReactionAnalysis:
         return asdict(self)
 
 
-__all__ = ["BondChange", "ReactionAnalysis", "ReactionCandidate", "ReactionComponent", "ReactionSiteReference", "ReactionSpectatorGroup"]
+__all__ = ["BondChange", "ReactionAnalysis", "ReactionCandidate", "ReactionComponent", "ReactionFamilyEnvironment", "ReactionPartnerEnvironment", "ReactionSiteReference", "ReactionSpectatorGroup"]
