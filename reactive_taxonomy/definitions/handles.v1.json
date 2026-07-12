@@ -1,133 +1,277 @@
 {
   "schema_version": "1.0",
   "site_families": {
-    "leaving_group": ["F", "Cl", "Br", "I", "OTf", "OTs", "OMs", "OSO2R"],
-    "pronucleophile_XH": ["N", "O", "S", "Csp"],
-    "transfer_group": ["B(OH)2", "B(OR)2", "BF3K", "BPin", "ZnX", "MgX", "SnR3", "SiR3"],
-    "electrophilic_center": ["Acyl", "Sulfonyl"]
+    "leaving_group": [
+      "F",
+      "Cl",
+      "Br",
+      "I",
+      "OTf",
+      "OTs",
+      "OMs",
+      "OSO2R"
+    ],
+    "pronucleophile_XH": [
+      "N",
+      "O",
+      "S",
+      "Csp"
+    ],
+    "transfer_group": [
+      "B(OH)2",
+      "B(OR)2",
+      "BF3K",
+      "BPin",
+      "ZnX",
+      "MgX",
+      "SnR3",
+      "SiR3"
+    ],
+    "electrophilic_center": [
+      "Acyl",
+      "Sulfonyl"
+    ]
   },
   "patterns": [
     {
       "id": "terminal_carbon_halogen",
       "site_type": "leaving_group",
-      "tokens": ["F", "Cl", "Br", "I"],
+      "tokens": [
+        "F",
+        "Cl",
+        "Br",
+        "I"
+      ],
       "priority": 50,
       "smarts": "[#6:1]-[F,Cl,Br,I;D1:2]",
-      "atom_roles": {"anchor": 1, "handle": 2}
+      "atom_roles": {
+        "anchor": 1,
+        "handle": 2
+      }
     },
     {
       "id": "carbon_sulfonate",
       "site_type": "leaving_group",
-      "tokens": ["OTf", "OTs", "OMs", "OSO2R"],
+      "tokens": [
+        "OTf",
+        "OTs",
+        "OMs",
+        "OSO2R"
+      ],
       "priority": 70,
       "smarts": "[#6:1]-[O:2]-[S:3](=[O:4])(=[O:5])-[#6:6]",
-      "atom_roles": {"anchor": 1, "connector": 2, "center": 3, "handle": [2, 3, 4, 5, 6]}
+      "atom_roles": {
+        "anchor": 1,
+        "connector": 2,
+        "center": 3,
+        "handle": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      }
     },
     {
       "id": "neutral_nh",
       "site_type": "pronucleophile_XH",
-      "tokens": ["N"],
+      "tokens": [
+        "N"
+      ],
       "priority": 50,
       "smarts": "[N,n;+0;H1,H2,H3:1]",
-      "atom_roles": {"center": 1}
+      "atom_roles": {
+        "center": 1
+      }
     },
     {
       "id": "neutral_oh",
       "site_type": "pronucleophile_XH",
-      "tokens": ["O"],
+      "tokens": [
+        "O"
+      ],
       "priority": 50,
       "smarts": "[O;+0;H1:1]",
-      "atom_roles": {"center": 1}
+      "atom_roles": {
+        "center": 1
+      }
     },
     {
       "id": "neutral_sh",
       "site_type": "pronucleophile_XH",
-      "tokens": ["S"],
+      "tokens": [
+        "S"
+      ],
       "priority": 50,
       "smarts": "[S;+0;H1:1]",
-      "atom_roles": {"center": 1}
+      "atom_roles": {
+        "center": 1
+      }
     },
     {
       "id": "terminal_alkyne",
       "site_type": "pronucleophile_XH",
-      "tokens": ["Csp"],
+      "tokens": [
+        "Csp"
+      ],
       "priority": 60,
       "smarts": "[C;H1:1]#[C:2]",
-      "atom_roles": {"center": 1, "context": 2}
+      "atom_roles": {
+        "center": 1,
+        "context": 2
+      }
     },
     {
       "id": "carbon_boronic_acid",
       "site_type": "transfer_group",
-      "tokens": ["B(OH)2"],
+      "tokens": [
+        "B(OH)2"
+      ],
       "priority": 80,
       "smarts": "[#6:1]-[B:2]([O;H1:3])[O;H1:4]",
-      "atom_roles": {"anchor": 1, "center": 2, "handle": [2, 3, 4]},
-      "suppresses": [{"site_type": "pronucleophile_XH", "owned_role": "handle"}]
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2,
+        "handle": [
+          2,
+          3,
+          4
+        ]
+      },
+      "suppresses": [
+        {
+          "site_type": "pronucleophile_XH",
+          "owned_role": "handle"
+        }
+      ]
     },
     {
       "id": "carbon_boronate",
       "site_type": "transfer_group",
-      "tokens": ["B(OR)2", "BPin"],
+      "tokens": [
+        "B(OR)2",
+        "BPin"
+      ],
       "priority": 70,
       "smarts": "[#6:1]-[B:2]([O:3][#6])[O:4][#6]",
-      "atom_roles": {"anchor": 1, "center": 2, "handle": [2, 3, 4]}
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2,
+        "handle": [
+          2,
+          3,
+          4
+        ]
+      }
     },
     {
       "id": "carbon_trifluoroborate",
       "site_type": "transfer_group",
-      "tokens": ["BF3K"],
+      "tokens": [
+        "BF3K"
+      ],
       "priority": 90,
       "smarts": "[#6:1]-[B-:2]([F:3])([F:4])[F:5]",
-      "atom_roles": {"anchor": 1, "center": 2, "handle": [2, 3, 4, 5]}
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2,
+        "handle": [
+          2,
+          3,
+          4,
+          5
+        ]
+      }
     },
     {
       "id": "carbon_zinc",
       "site_type": "transfer_group",
-      "tokens": ["ZnX"],
+      "tokens": [
+        "ZnX"
+      ],
       "priority": 60,
       "smarts": "[#6:1]-[Zn:2]",
-      "atom_roles": {"anchor": 1, "center": 2}
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2
+      }
     },
     {
       "id": "carbon_magnesium",
       "site_type": "transfer_group",
-      "tokens": ["MgX"],
+      "tokens": [
+        "MgX"
+      ],
       "priority": 60,
       "smarts": "[#6:1]-[Mg:2]",
-      "atom_roles": {"anchor": 1, "center": 2}
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2
+      }
     },
     {
       "id": "carbon_tin",
       "site_type": "transfer_group",
-      "tokens": ["SnR3"],
+      "tokens": [
+        "SnR3"
+      ],
       "priority": 60,
       "smarts": "[#6:1]-[Sn:2]",
-      "atom_roles": {"anchor": 1, "center": 2}
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2
+      }
     },
     {
       "id": "carbon_silicon",
       "site_type": "transfer_group",
-      "tokens": ["SiR3"],
+      "tokens": [
+        "SiR3"
+      ],
       "priority": 60,
       "smarts": "[#6:1]-[Si:2]",
-      "atom_roles": {"anchor": 1, "center": 2}
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2
+      }
     },
     {
       "id": "acyl_oxygen_or_halide",
       "site_type": "electrophilic_center",
-      "tokens": ["Acyl"],
+      "tokens": [
+        "Acyl"
+      ],
       "priority": 70,
       "smarts": "[CX3:1](=[O:2])-[O,Cl,Br,F:3]",
-      "atom_roles": {"center": 1, "oxo": 2, "leaving_or_activatable": 3},
-      "suppresses": [{"site_type": "leaving_group", "owned_role": "leaving_or_activatable"}]
+      "atom_roles": {
+        "center": 1,
+        "oxo": 2,
+        "leaving_or_activatable": 3
+      },
+      "suppresses": [
+        {
+          "site_type": "leaving_group",
+          "owned_role": "leaving_or_activatable"
+        }
+      ]
     },
     {
       "id": "sulfonyl_halide",
       "site_type": "electrophilic_center",
-      "tokens": ["Sulfonyl"],
+      "tokens": [
+        "Sulfonyl"
+      ],
       "priority": 80,
       "smarts": "[SX4:1](=[O:2])(=[O:3])-[Cl,Br,F:4]",
-      "atom_roles": {"center": 1, "oxo": [2, 3], "leaving_or_activatable": 4}
+      "atom_roles": {
+        "center": 1,
+        "oxo": [
+          2,
+          3
+        ],
+        "leaving_or_activatable": 4
+      }
     }
   ]
 }

@@ -1,65 +1,142 @@
 {
   "schema_version": "1.0",
-  "precedence": ["SO2R", "P(O)R2", "C(O)NR", "C(O)OR", "C(O)R", "HeteroAr", "Ar", "Alkenyl", "Alkynyl", "Alkyl", "N", "O", "S", "Other"],
+  "precedence": [
+    "SO2R",
+    "P(O)R2",
+    "C(O)NR",
+    "C(O)OR",
+    "C(O)R",
+    "HeteroAr",
+    "Ar",
+    "Alkenyl",
+    "Alkynyl",
+    "Alkyl",
+    "N",
+    "O",
+    "S",
+    "Other"
+  ],
   "contexts": [
     {
       "id": "SO2R",
       "classification_method": "mapped_smarts",
       "smarts": "[S:1](=[O:2])(=[O:3])",
-      "atom_roles": {"context_anchor": 1, "oxo": [2, 3]}
+      "atom_roles": {
+        "context_anchor": 1,
+        "oxo": [
+          2,
+          3
+        ]
+      }
     },
     {
       "id": "P(O)R2",
       "classification_method": "mapped_smarts",
       "smarts": "[P:1](=[O:2])",
-      "atom_roles": {"context_anchor": 1, "oxo": 2}
+      "atom_roles": {
+        "context_anchor": 1,
+        "oxo": 2
+      }
     },
     {
       "id": "C(O)NR",
       "classification_method": "mapped_smarts",
       "smarts": "[C:1](=[O:2])-[N:3]",
-      "atom_roles": {"context_anchor": 1, "oxo": 2, "substituent": 3}
+      "atom_roles": {
+        "context_anchor": 1,
+        "oxo": 2,
+        "substituent": 3
+      }
     },
     {
       "id": "C(O)OR",
       "classification_method": "mapped_smarts",
       "smarts": "[C:1](=[O:2])-[O:3]",
-      "atom_roles": {"context_anchor": 1, "oxo": 2, "substituent": 3}
+      "atom_roles": {
+        "context_anchor": 1,
+        "oxo": 2,
+        "substituent": 3
+      }
     },
     {
       "id": "C(O)R",
       "classification_method": "mapped_smarts",
       "smarts": "[C:1]=[O:2]",
-      "atom_roles": {"context_anchor": 1, "oxo": 2}
+      "atom_roles": {
+        "context_anchor": 1,
+        "oxo": 2
+      }
     },
     {
       "id": "HeteroAr",
       "classification_method": "aromatic_ring_system",
-      "constraints": {"anchor_element": "C", "ring_contains_heteroatom": true}
+      "constraints": {
+        "anchor_element": "C",
+        "ring_contains_heteroatom": true
+      }
     },
     {
       "id": "Ar",
       "classification_method": "aromatic_ring_system",
-      "constraints": {"anchor_element": "C", "ring_contains_heteroatom": false}
+      "constraints": {
+        "anchor_element": "C",
+        "ring_contains_heteroatom": false
+      }
     },
     {
       "id": "Alkenyl",
       "classification_method": "atom_property",
-      "constraints": {"anchor_element": "C", "aromatic": false, "hybridization": "SP2"}
+      "constraints": {
+        "anchor_element": "C",
+        "aromatic": false,
+        "hybridization": "SP2"
+      }
     },
     {
       "id": "Alkynyl",
       "classification_method": "atom_property",
-      "constraints": {"anchor_element": "C", "aromatic": false, "hybridization": "SP"}
+      "constraints": {
+        "anchor_element": "C",
+        "aromatic": false,
+        "hybridization": "SP"
+      }
     },
     {
       "id": "Alkyl",
       "classification_method": "atom_property",
-      "constraints": {"anchor_element": "C", "aromatic": false, "hybridization_any": ["SP3", "S"]}
+      "constraints": {
+        "anchor_element": "C",
+        "aromatic": false,
+        "hybridization_any": [
+          "SP3",
+          "S"
+        ]
+      }
     },
-    {"id": "N", "classification_method": "element", "constraints": {"anchor_element": "N"}},
-    {"id": "O", "classification_method": "element", "constraints": {"anchor_element": "O"}},
-    {"id": "S", "classification_method": "element", "constraints": {"anchor_element": "S"}},
-    {"id": "Other", "classification_method": "fallback"}
+    {
+      "id": "N",
+      "classification_method": "element",
+      "constraints": {
+        "anchor_element": "N"
+      }
+    },
+    {
+      "id": "O",
+      "classification_method": "element",
+      "constraints": {
+        "anchor_element": "O"
+      }
+    },
+    {
+      "id": "S",
+      "classification_method": "element",
+      "constraints": {
+        "anchor_element": "S"
+      }
+    },
+    {
+      "id": "Other",
+      "classification_method": "fallback"
+    }
   ]
 }
