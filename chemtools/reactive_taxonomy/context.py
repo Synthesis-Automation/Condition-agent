@@ -11,7 +11,7 @@ from .models import ContextClassification
 from .patterns import MatchIndex
 
 
-_CONTEXTS_PATH = Path(__file__).with_name("data") / "contexts.v1.json"
+_CONTEXTS_PATH = Path(__file__).with_name("definitions") / "contexts.v1.json"
 
 
 @lru_cache(maxsize=1)

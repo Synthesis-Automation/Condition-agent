@@ -9,13 +9,13 @@ from typing import Any, Dict, List
 from chemtools.core.smarts import compile_smarts
 
 
-DATA_DIR = Path(__file__).with_name("data")
+DEFINITIONS_DIR = Path(__file__).with_name("definitions")
 
 
 def load_taxonomy_data() -> Dict[str, Any]:
     """Load all v1 taxonomy documents."""
     payload: Dict[str, Any] = {}
-    for path in sorted(DATA_DIR.glob("*.v1.json")):
+    for path in sorted(DEFINITIONS_DIR.glob("*.v1.json")):
         with path.open("r", encoding="utf-8") as handle:
             payload[path.stem] = json.load(handle)
     return payload

@@ -10,8 +10,8 @@ from typing import Any, Dict, Iterable, List, Set, Tuple
 from chemtools.core.smarts import compile_smarts
 
 
-_HANDLES_PATH = Path(__file__).with_name("data") / "handles.v1.json"
-_CONTEXTS_PATH = Path(__file__).with_name("data") / "contexts.v1.json"
+_HANDLES_PATH = Path(__file__).with_name("definitions") / "handles.v1.json"
+_CONTEXTS_PATH = Path(__file__).with_name("definitions") / "contexts.v1.json"
 
 
 @lru_cache(maxsize=1)

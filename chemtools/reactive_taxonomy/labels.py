@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 
-_RENDERING_PATH = Path(__file__).with_name("data") / "rendering.v1.json"
+_RENDERING_PATH = Path(__file__).with_name("definitions") / "rendering.v1.json"
 
 
 @lru_cache(maxsize=1)
