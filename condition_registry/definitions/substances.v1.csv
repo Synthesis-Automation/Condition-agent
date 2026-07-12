@@ -996,7 +996,7 @@ Copper(I) selenide,,20405-64-5,[Cu].[Cu].[Se],Cu2Se,liquid,,206.05,,,0,0,metal_c
 Copper(I) thiocyanate,,1111-67-7,N#C[S-].[Cu+],CCuNS,liquid,,121.628,146,,0,0,metal_catalyst,,,,,
 Copper(I) thiophene-2-carboxylate,CuTC,68986-76-5,O=C([O-])c1cccs1.[Cu+],,powder,0.87,191,115,,0,0,metal_catalyst,,,,,
 Copper(I) thiophenolate,,1192-40-1,[Cu+].[S-]c1ccccc1,C6H5SCu,liquid,,172.71,,,0,0,metal_catalyst,,,,,
-copper(I) trifluoromethanesulfonate toluene complex,(CuOTf)2  toluene,48209-28-5,Cc1ccccc1.O=S(=O)([O-])C(F)(F)F.O=S(=O)([O-])C(F)(F)F.[Cu+].[Cu+],C9H8Cu2F6O6S2,liquid,,517.369,162,,0,0,metal_catalyst,,,,,
+copper(I) trifluoromethanesulfonate toluene complex,(CuOTf)2-toluene,48209-28-5,Cc1ccccc1.O=S(=O)([O-])C(F)(F)F.O=S(=O)([O-])C(F)(F)F.[Cu+].[Cu+],C9H8Cu2F6O6S2,liquid,,517.369,162,,0,0,metal_catalyst,,,,,
 Copper(I)trifluoromethanesulfonatebenzenecomplex(2:1),,37234-97-2,C1=CC=CC=C1.C(F)(F)(F)S(=O)(=O)[O-].C(F)(F)(F)S(=O)(=O)[O-].[Cu+].[Cu+],CCuF3O3S,powder,,212.615,,,,,metal_catalyst,,,,,
 "Copper(II) 2,2-Difluoro-2-(fluorosulfonyl)acetate",,1629684-53-2,,C4CuF6O8S2,powder,,417.7,,,0,0,metal_catalyst,copper_salt,,,,
 Copper(II) acetate,Cu(OAc)2,142-71-2,[Cu+2],C4H6CuO4,powder,1.2,181.63,,115,0,0,metal_catalyst,cu_ii_salts,Cu(2) catalyst,oxidant,metal_salt_reoxidants,high oxidant

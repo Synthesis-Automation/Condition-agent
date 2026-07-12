@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "datasets": {
+    "suzuki_miyaura": "examples/reaction_dataset_300/suzuki_miyaura.csv",
+    "c_n_coupling": "examples/reaction_dataset_300/C_N_Coupling.csv",
+    "c_o_coupling": "examples/reaction_dataset_300/C_O_Coupling.csv",
+    "c_s_coupling": "examples/reaction_dataset_300/C_S_Coupling.csv",
+    "amide_formation": "examples/reaction_dataset_300/Amide_formation.csv"
+  },
+  "source_rows": 1500,
+  "unique_identifier_source_pairs": 602,
+  "unique_identifiers": 539,
+  "category_counts": {
+    "resolved": 271,
+    "multiple_roles": 26,
+    "generic_only": 99,
+    "role_conflict": 20,
+    "missing_substance": 186,
+    "invalid_identifier": 0
+  },
+  "occurrence_counts": {
+    "generic_only": 209,
+    "missing_substance": 267,
+    "multiple_roles": 408,
+    "resolved": 4361,
+    "role_conflict": 44
+  },
+  "by_dataset_occurrence_counts": {
+    "amide_formation": {
+      "generic_only": 31,
+      "missing_substance": 15,
+      "multiple_roles": 131,
+      "resolved": 924,
+      "role_conflict": 21
+    },
+    "c_n_coupling": {
+      "generic_only": 34,
+      "missing_substance": 67,
+      "multiple_roles": 64,
+      "resolved": 826,
+      "role_conflict": 8
+    },
+    "c_o_coupling": {
+      "generic_only": 42,
+      "missing_substance": 59,
+      "multiple_roles": 28,
+      "resolved": 802,
+      "role_conflict": 6
+    },
+    "c_s_coupling": {
+      "generic_only": 28,
+      "missing_substance": 73,
+      "multiple_roles": 49,
+      "resolved": 723,
+      "role_conflict": 8
+    },
+    "suzuki_miyaura": {
+      "generic_only": 74,
+      "missing_substance": 53,
+      "multiple_roles": 136,
+      "resolved": 1086,
+      "role_conflict": 1
+    }
+  },
+  "by_source_field_occurrence_counts": {
+    "catalyst_cas": {
+      "generic_only": 81,
+      "missing_substance": 211,
+      "multiple_roles": 153,
+      "resolved": 636,
+      "role_conflict": 43
+    },
+    "reagent_cas": {
+      "generic_only": 116,
+      "missing_substance": 49,
+      "multiple_roles": 218,
+      "resolved": 1735
+    },
+    "solvent_cas": {
+      "generic_only": 12,
+      "missing_substance": 7,
+      "multiple_roles": 37,
+      "resolved": 1990,
+      "role_conflict": 1
+    }
+  },
+  "identity_resolution_rate": 0.949518,
+  "recommendation_ready_role_rate": 0.824542
+}
