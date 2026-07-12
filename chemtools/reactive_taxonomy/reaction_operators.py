@@ -13,6 +13,35 @@ def _component_by_index(components: Tuple[ReactionComponent, ...], index: int) -
     return next(component for component in components if component.component_index == index)
 
 
+def _fragment_to_remove(
+    components: Tuple[ReactionComponent, ...],
+    component_index: int,
+    anchor_index: int,
+    handle_index: int,
+) -> set[int]:
+    """Return the complete handle-side fragment after cutting its anchor bond."""
+    from rdkit import Chem
+    mol = parse_smiles(_component_by_index(components, component_index).input_smiles)
+    if mol is None or mol.GetBondBetweenAtoms(anchor_index, handle_index) is None:
+        return {handle_index}
+    rw = Chem.RWMol(mol)
+    rw.RemoveBond(anchor_index, handle_index)
+    for fragment in Chem.GetMolFrags(rw.GetMol(), asMols=False, sanitizeFrags=False):
+        atoms = set(int(index) for index in fragment)
+        if handle_index in atoms and anchor_index not in atoms:
+            return atoms
+    return {handle_index}
+
+
+def _bonded_role_atom(mol: Any, site: ReactionSiteReference, anchor_role: str, candidate_roles: Iterable[str]) -> int:
+    anchor = site.atom_roles[anchor_role][0]
+    for role in candidate_roles:
+        for atom_index in site.atom_roles.get(role, ()):
+            if mol.GetBondBetweenAtoms(anchor, atom_index) is not None:
+                return atom_index
+    raise ValueError("No handle atom bonded to reactive anchor")
+
+
 def _build_product(
     components: Tuple[ReactionComponent, ...],
     participants: List[ReactionSiteReference],
@@ -63,9 +92,14 @@ def apply_operator(
     operator = grammar["operator"]
     if operator["id"] == "join_two_anchors":
         left, right = assignment["electrophile"], assignment["transfer_partner"]
+        left_mol = parse_smiles(_component_by_index(components, left.component_index).input_smiles)
+        right_mol = parse_smiles(_component_by_index(components, right.component_index).input_smiles)
+        if left_mol is None or right_mol is None: return None, ()
+        left_handle = _bonded_role_atom(left_mol, left, "anchor", ("connector", "handle", "center"))
+        right_handle = _bonded_role_atom(right_mol, right, "anchor", ("center", "handle"))
         removals = {
-            left.component_index: set(left.atom_roles["handle"]),
-            right.component_index: set(right.atom_roles["handle"]),
+            left.component_index: _fragment_to_remove(components, left.component_index, left.atom_roles["anchor"][0], left_handle),
+            right.component_index: _fragment_to_remove(components, right.component_index, right.atom_roles["anchor"][0], right_handle),
         }
         predicted = _build_product(components, [left, right], removals, ((left.component_index, left.atom_roles["anchor"][0]), (right.component_index, right.atom_roles["anchor"][0])))
         changes = (
@@ -79,7 +113,10 @@ def apply_operator(
         electrophile, partner = assignment[e_role], assignment[p_role]
         e_anchor_role = "anchor" if "anchor" in electrophile.atom_roles else "center"
         leaving_role = "handle" if "handle" in electrophile.atom_roles else "leaving_or_activatable"
-        removals = {electrophile.component_index: set(electrophile.atom_roles[leaving_role])}
+        electrophile_mol = parse_smiles(_component_by_index(components, electrophile.component_index).input_smiles)
+        if electrophile_mol is None: return None, ()
+        leaving_atom = _bonded_role_atom(electrophile_mol, electrophile, e_anchor_role, ("connector", leaving_role, "center"))
+        removals = {electrophile.component_index: _fragment_to_remove(components, electrophile.component_index, electrophile.atom_roles[e_anchor_role][0], leaving_atom)}
         predicted = _build_product(
             components, [electrophile, partner], removals,
             ((electrophile.component_index, electrophile.atom_roles[e_anchor_role][0]), (partner.component_index, partner.atom_roles["center"][0])),

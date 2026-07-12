@@ -67,3 +67,11 @@ def test_additional_v1_grammars_reconstruct_products() -> None:
         result = featurize_reaction(reaction)
         assert result.evidence_quality == "exact_product_reconstruction", reaction
         assert result.selected_candidate.grammar_id == grammar_id
+
+
+def test_composite_triflate_handle_is_removed_as_complete_fragment() -> None:
+    reaction = "Fc1ccc(OS(=O)(=O)C(F)(F)F)cc1.c1ccc(B(O)O)cc1>>Fc1ccc(-c2ccccc2)cc1"
+    result = featurize_reaction(reaction)
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.selected_candidate.grammar_id == "boron_transfer_coupling"
+    assert result.selected_candidate.predicted_product_smiles == "Fc1ccc(-c2ccccc2)cc1"
