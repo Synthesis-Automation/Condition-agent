@@ -157,6 +157,11 @@ def validate_taxonomy() -> List[str]:
     if len(grammar_ids) != len(set(grammar_ids)):
         errors.append("duplicate_reaction_grammar_ids")
     reaction_rendering = payload["reaction_rendering.v1"].get("rules") or {}
+    product_precedence = payload["reaction_rendering.v1"].get("product_context_precedence") or []
+    if len(product_precedence) != len(set(product_precedence)) or not product_precedence:
+        errors.append("invalid_product_context_precedence")
+    if "Other" not in product_precedence:
+        errors.append("missing_product_context_fallback")
     if set(reaction_rendering) != set(grammar_ids):
         errors.append("reaction_rendering_coverage_mismatch")
     allowed_product_kinds = {"join_contexts", "nitrogen_substitution", "heteroatom_substitution", "terminal_alkyne", "chan_lam", "amide", "acyl_heteroatom", "sulfonamide"}

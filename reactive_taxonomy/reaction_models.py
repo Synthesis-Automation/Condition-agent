@@ -87,6 +87,29 @@ class ReactionFamilyEnvironment:
 
 
 @dataclass(frozen=True)
+class ProductConnectionEndpoint:
+    """One reactant-derived endpoint of a newly formed product bond."""
+
+    role: str
+    component_index: int
+    atom_index: int
+    context: str
+    source_site_id: str
+
+
+@dataclass(frozen=True)
+class ProductConnection:
+    """Verified product bond with reactant-role and atom provenance."""
+
+    endpoint_1: ProductConnectionEndpoint
+    endpoint_2: ProductConnectionEndpoint
+    bond_order: str
+    concise_label: str
+    evidence: str
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
 class ReactionCandidate:
     grammar_id: str
     transformation_class: str
@@ -117,12 +140,13 @@ class ReactionAnalysis:
     mapped_bond_changes: Tuple[Dict[str, Any], ...] = ()
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
     family_environment: Optional[ReactionFamilyEnvironment] = None
+    product_connection: Optional[ProductConnection] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.1"
+    schema_version: str = "1.2"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
 
-__all__ = ["BondChange", "ReactionAnalysis", "ReactionCandidate", "ReactionComponent", "ReactionFamilyEnvironment", "ReactionPartnerEnvironment", "ReactionSiteReference", "ReactionSpectatorGroup"]
+__all__ = ["BondChange", "ProductConnection", "ProductConnectionEndpoint", "ReactionAnalysis", "ReactionCandidate", "ReactionComponent", "ReactionFamilyEnvironment", "ReactionPartnerEnvironment", "ReactionSiteReference", "ReactionSpectatorGroup"]

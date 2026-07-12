@@ -97,6 +97,7 @@ def convert_row(row: Dict[str, Any], source_row_number: int) -> RecommendationRe
         time_h=optional_float(row.get("time_h")),
         conditions=conditions,
         family_environment=family_environment,
+        product_connection=asdict(analysis.product_connection) if analysis.product_connection else None,
         spectator_groups=tuple(asdict(group) for group in analysis.spectator_groups),
         source={
             "reaction_type": str(row.get("reaction_type") or ""),
@@ -151,6 +152,8 @@ def flatten_record(record: RecommendationRecord) -> Dict[str, Any]:
         "transfer_steric_class": (transfer.get("steric") or {}).get("class", ""),
         "transfer_electronic_class": (transfer.get("electronic") or {}).get("class", ""),
         "transfer_flags": joined(transfer.get("flags") or []),
+        "product_connection_label": (record.product_connection or {}).get("concise_label", ""),
+        "product_connection_json": json.dumps(record.product_connection, ensure_ascii=False, sort_keys=True) if record.product_connection else "",
         "spectator_group_ids": joined(sorted({item["group_id"] for item in record.spectator_groups})),
         "family_environment_json": json.dumps(record.family_environment, ensure_ascii=False, sort_keys=True) if record.family_environment else "",
         "spectator_groups_json": json.dumps(record.spectator_groups, ensure_ascii=False, sort_keys=True),
@@ -189,7 +192,7 @@ def convert_file(input_path: str | Path, output_dir: str | Path) -> Dict[str, An
         _write_csv(output_dir / f"{tier.value}.csv", tier_records)
     reason_counts = Counter(reason for record in records for reason in record.admission_reasons)
     report = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "input_file": str(input_path),
         "total_rows": len(records),
         "tier_counts": {tier.value: len(by_tier[tier]) for tier in AdmissionTier},

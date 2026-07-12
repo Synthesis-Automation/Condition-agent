@@ -21,6 +21,23 @@ def load_reaction_rendering() -> Dict[str, Dict[str, Any]]:
         return json.load(handle).get("rules") or {}
 
 
+@lru_cache(maxsize=1)
+def load_product_context_precedence() -> tuple[str, ...]:
+    with _PATH.open("r", encoding="utf-8") as handle:
+        return tuple(json.load(handle).get("product_context_precedence") or ())
+
+
+def render_context_connection(left_context: str, right_context: str, *, style: str = "unicode") -> str:
+    """Render a symmetric C–C connection in canonical display order."""
+    bond = "–" if style == "unicode" else "-"
+    precedence = {token: index for index, token in enumerate(load_product_context_precedence())}
+    contexts = sorted(
+        (left_context, right_context),
+        key=lambda token: (precedence.get(token, 999), token),
+    )
+    return bond.join(render_context(context, style=style) for context in contexts)
+
+
 def _nitrogen_product(anchor_context: str, nitrogen: ReactionSiteReference, bond: str, style: str) -> str:
     if nitrogen.details.get("center_token") == "N_aromatic":
         return f"{render_context(anchor_context, style=style)}{bond}AromN"
@@ -42,7 +59,9 @@ def render_reaction_label(grammar: Dict[str, Any], assignment: Dict[str, Reactio
     kind = rule.get("product_kind")
     if kind == "join_contexts":
         left, right = assignment[rule["left_role"]], assignment[rule["right_role"]]
-        product = f"{render_context(left.details['anchor_context'], style=style)}{bond}{render_context(right.details['anchor_context'], style=style)}"
+        product = render_context_connection(
+            left.details["anchor_context"], right.details["anchor_context"], style=style
+        )
     elif kind == "nitrogen_substitution":
         product = _nitrogen_product(assignment[rule["anchor_role"]].details["anchor_context"], assignment[rule["nitrogen_role"]], bond, style)
     elif kind == "heteroatom_substitution":
@@ -79,4 +98,4 @@ def render_reaction_label(grammar: Dict[str, Any], assignment: Dict[str, Reactio
     return f"{reactant_labels} → {product}"
 
 
-__all__ = ["load_reaction_rendering", "render_reactant_label", "render_reaction_label"]
+__all__ = ["load_product_context_precedence", "load_reaction_rendering", "render_context_connection", "render_reactant_label", "render_reaction_label"]

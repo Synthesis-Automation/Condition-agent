@@ -1,5 +1,13 @@
 {
   "schema_version": "1.0",
+  "product_context_precedence": [
+    "HeteroAr",
+    "Ar",
+    "Alkenyl",
+    "Alkynyl",
+    "Alkyl",
+    "Other"
+  ],
   "rules": {
     "boron_transfer_coupling": {
       "product_kind": "join_contexts",

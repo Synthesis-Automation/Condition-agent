@@ -14,6 +14,7 @@ from .reaction_environments import build_reaction_family_environment
 from .reaction_models import ReactionAnalysis, ReactionCandidate
 from .reaction_operators import apply_operator
 from .reaction_parser import parse_reaction_smiles
+from .reaction_products import build_product_connection
 from .reaction_spectators import derive_spectator_groups
 
 
@@ -79,6 +80,7 @@ def featurize_reaction(
     mapped_changes = tuple(supplied_map_bond_changes(reaction_smiles))
     spectators = derive_spectator_groups(parsed.reactants, selected, evidence)
     family_environment = build_reaction_family_environment(parsed.reactants, selected, spectators, evidence)
+    product_connection = build_product_connection(selected, evidence, style=label_style)
     reaction_label = selected.reaction_label if selected else None
     reaction_label_status = "exact_product" if selected else "unavailable"
     if selected is None and candidates:
@@ -92,6 +94,9 @@ def featurize_reaction(
         elif reactant_labels:
             reaction_label = " OR ".join(f"({label})" for label in reactant_labels) + " →"
             reaction_label_status = "ambiguous_reactants"
+    elif selected is not None and product_connection is not None:
+        reactants_label = render_reactant_label(selected.role_assignments, style=label_style)
+        reaction_label = f"{reactants_label} → {product_connection.concise_label}"
     return ReactionAnalysis(
         input_reaction_smiles=reaction_smiles, valid=True,
         reactants=parsed.reactants, agents=parsed.agents, products=parsed.products,
@@ -104,6 +109,7 @@ def featurize_reaction(
         evidence_quality=evidence, mapped_bond_changes=mapped_changes,
         spectator_groups=spectators,
         family_environment=family_environment,
+        product_connection=product_connection,
         warnings=tuple(warnings),
     )
 

@@ -37,6 +37,8 @@ def test_exact_suzuki_with_complete_conditions_is_verified() -> None:
     ), 2)
     assert record.admission_tier == AdmissionTier.VERIFIED
     assert record.family_environment is not None
+    assert record.product_connection is not None
+    assert record.product_connection["concise_label"] == "Ar–Ar"
     assert record.conditions.complete
 
 

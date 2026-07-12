@@ -13,6 +13,21 @@ def test_suzuki_exact_product_reconstruction() -> None:
     assert result.evidence_quality == "exact_product_reconstruction"
     assert result.reaction_label == "Ar–Br + Ar–B(OH)2 → Ar–Ar"
     assert [change.change_type for change in result.selected_candidate.predicted_bond_changes] == ["broken", "broken", "formed"]
+    assert result.product_connection is not None
+    assert result.product_connection.endpoint_1.role == "electrophile"
+    assert result.product_connection.endpoint_2.role == "transfer_partner"
+
+
+def test_product_connection_canonicalizes_display_without_swapping_provenance() -> None:
+    result = featurize_reaction("ClC=C.OB(O)c1ccccc1>>C=Cc1ccccc1")
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.reaction_label == "Alkenyl–Cl + Ar–B(OH)2 → Ar–Alkenyl"
+    connection = result.product_connection
+    assert connection.concise_label == "Ar–Alkenyl"
+    assert connection.endpoint_1.role == "electrophile"
+    assert connection.endpoint_1.context == "Alkenyl"
+    assert connection.endpoint_2.role == "transfer_partner"
+    assert connection.endpoint_2.context == "Ar"
 
 
 def test_cn_exact_product_reconstruction() -> None:

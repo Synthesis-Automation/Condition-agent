@@ -54,9 +54,10 @@ class RecommendationRecord:
     time_h: Optional[float]
     conditions: ConditionIdentity
     family_environment: Optional[Dict[str, Any]] = None
+    product_connection: Optional[Dict[str, Any]] = None
     spectator_groups: Tuple[Dict[str, Any], ...] = ()
     source: Dict[str, Any] = field(default_factory=dict)
-    schema_version: str = "1.0"
+    schema_version: str = "1.1"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
