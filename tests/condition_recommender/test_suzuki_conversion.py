@@ -44,6 +44,17 @@ def test_unverified_product_is_sent_to_review() -> None:
     record = convert_row(_row("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1"), 2)
     assert record.admission_tier == AdmissionTier.REVIEW
     assert "reaction_not_exactly_verified" in record.admission_reasons
+    assert record.reaction_label == "Ar–Br + Ar–B(OH)2 →"
+    assert record.reaction_label_status == "source_family_reactant_only"
+
+
+def test_source_family_removes_non_suzuki_partial_label_alternatives() -> None:
+    record = convert_row(_row(
+        "Nc1ccccc1N.OCc1ccc(Br)cc1.OB(O)c1cccc2ccccc12>>c1ccccc1"
+    ), 2)
+    assert record.admission_tier == AdmissionTier.REVIEW
+    assert record.reaction_label == "Ar–Br + Ar–B(OH)2 →"
+    assert record.reaction_label_status == "source_family_reactant_only"
 
 
 def test_missing_yield_is_rejected() -> None:

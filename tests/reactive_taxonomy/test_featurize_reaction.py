@@ -35,6 +35,8 @@ def test_wrong_product_is_not_confirmed() -> None:
     assert result.selected_candidate is None
     assert result.evidence_quality == "reactant_grammar_only"
     assert result.candidates[0].verification == "product_mismatch"
+    assert result.reaction_label == "Ar–Br + Ar–NH2 →"
+    assert result.reaction_label_status == "reactant_only"
 
 
 def test_supplied_mapping_yields_exact_bond_differences() -> None:

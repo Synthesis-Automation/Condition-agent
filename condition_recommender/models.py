@@ -48,6 +48,7 @@ class RecommendationRecord:
     evidence_quality: str
     named_family: Optional[str]
     reaction_label: Optional[str]
+    reaction_label_status: str
     yield_pct: Optional[float]
     temperature_c: Optional[float]
     time_h: Optional[float]

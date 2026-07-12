@@ -112,6 +112,7 @@ class ReactionAnalysis:
     compatible_named_families: Tuple[str, ...] = ()
     named_family: Optional[str] = None
     reaction_label: Optional[str] = None
+    reaction_label_status: str = "unavailable"
     evidence_quality: str = "unresolved"
     mapped_bond_changes: Tuple[Dict[str, Any], ...] = ()
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()

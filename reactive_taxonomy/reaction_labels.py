@@ -29,9 +29,15 @@ def _nitrogen_product(anchor_context: str, nitrogen: ReactionSiteReference, bond
     return render_xh("N", max(0, int(nitrogen.details["h_count"]) - 1), contexts, style=style)
 
 
+def render_reactant_label(assignment: Dict[str, ReactionSiteReference], *, style: str = "unicode") -> str:
+    """Render only the observed reactant handles for a candidate assignment."""
+    bond = "–" if style == "unicode" else "-"
+    return " + ".join(site.chemist_label.replace("–", bond) for site in assignment.values())
+
+
 def render_reaction_label(grammar: Dict[str, Any], assignment: Dict[str, ReactionSiteReference], *, style: str = "unicode") -> str:
     bond = "–" if style == "unicode" else "-"
-    reactant_labels = " + ".join(site.chemist_label.replace("–", bond) for site in assignment.values())
+    reactant_labels = render_reactant_label(assignment, style=style)
     rule = load_reaction_rendering().get(str(grammar["id"]), {})
     kind = rule.get("product_kind")
     if kind == "join_contexts":
@@ -73,4 +79,4 @@ def render_reaction_label(grammar: Dict[str, Any], assignment: Dict[str, Reactio
     return f"{reactant_labels} → {product}"
 
 
-__all__ = ["load_reaction_rendering", "render_reaction_label"]
+__all__ = ["load_reaction_rendering", "render_reactant_label", "render_reaction_label"]

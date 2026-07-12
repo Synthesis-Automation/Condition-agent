@@ -19,5 +19,17 @@
   },
   "verified_yield_mean": 80.42,
   "temperature_coverage": 0,
-  "time_coverage": 3
+  "time_coverage": 3,
+  "reaction_label_coverage": {
+    "verified": 181,
+    "review": 90,
+    "rejected": 0
+  },
+  "reaction_label_status_counts": {
+    "exact_product": 189,
+    "reactant_only": 2,
+    "source_family_ambiguous_reactants": 11,
+    "source_family_reactant_only": 69,
+    "unavailable": 29
+  }
 }
