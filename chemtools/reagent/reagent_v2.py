@@ -13,8 +13,8 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 from chemtools.core.rdkit import parse_smiles
 from chemtools.core.smarts import compile_smarts
 
-DEFAULT_REAGENT_V2_DIR = Path(__file__).resolve().parents[1] / "taxonomy" / "data"
-_ROLES_FILE = "reagent_roles.v2.json"
+DEFAULT_REAGENT_V2_DIR = Path(__file__).resolve().parents[2] / "condition_registry" / "definitions"
+_ROLES_FILE = "roles_families.v1.json"
 
 _NAME_SANITIZE = re.compile(r"[^a-z0-9]+")
 

@@ -29,7 +29,7 @@ def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[s
     Get comprehensive statistics about the reagent database.
     
     Args:
-        registry_dir: Path to reagent registry (default: data/reagent_db)
+        registry_dir: Path to registry (default: condition_registry/definitions)
         
     Returns:
         Dictionary with statistics:
@@ -44,7 +44,8 @@ def get_database_statistics(registry_dir: Optional[str | Path] = None) -> Dict[s
         }
     """
     if registry_dir is None:
-        registry_dir = get_data_dir() / "reagent_db"
+        from condition_registry.loader import DEFINITIONS_DIR
+        registry_dir = DEFINITIONS_DIR
     else:
         registry_dir = Path(registry_dir)
     
@@ -156,7 +157,8 @@ def get_family_statistics(role: str, registry_dir: Optional[str | Path] = None) 
         }
     """
     if registry_dir is None:
-        registry_dir = get_data_dir() / "reagent_db"
+        from condition_registry.loader import DEFINITIONS_DIR
+        registry_dir = DEFINITIONS_DIR
     else:
         registry_dir = Path(registry_dir)
     
@@ -228,7 +230,8 @@ def get_missing_data_report(registry_dir: Optional[str | Path] = None) -> Dict[s
         }
     """
     if registry_dir is None:
-        registry_dir = get_data_dir() / "reagent_db"
+        from condition_registry.loader import DEFINITIONS_DIR
+        registry_dir = DEFINITIONS_DIR
     else:
         registry_dir = Path(registry_dir)
     

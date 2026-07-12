@@ -107,8 +107,8 @@ def show_database_statistics():
     print_section("REAGENT DATABASE STATISTICS")
     
     # Get statistics from analytics module  
-    from chemtools.reagent.lookup import get_data_dir
-    reagent_db_dir = get_data_dir() / "reagent_db"
+    from condition_registry.loader import DEFINITIONS_DIR
+    reagent_db_dir = DEFINITIONS_DIR
     stats = reagent.get_database_statistics(registry_dir=reagent_db_dir)
     
     print(f"{Fore.CYAN}Database Path:{Style.RESET_ALL} {Fore.WHITE}{stats.get('registry_dir', 'N/A')}{Style.RESET_ALL}")

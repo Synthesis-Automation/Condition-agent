@@ -1,5 +1,5 @@
 """
-Lightweight registry store for the flattened reagent database (data/reagent_db/reagents.csv).
+Legacy-compatible store backed by condition_registry/definitions/substances.v1.csv.
 
 This mirrors the logic used by the reagent addition GUI but without any GUI
 dependencies so it can be reused by backend services and LangChain tools.
@@ -407,12 +407,12 @@ class RegistryStore:
 
     def __init__(self, base_dir: Optional[Path] = None) -> None:
         if base_dir is None:
-            base_dir = Path("data/reagent_db")
+            base_dir = Path("condition_registry/definitions")
         self.base_dir = Path(base_dir)
         if not self.base_dir.exists():
             raise FileNotFoundError(f"Registry directory '{self.base_dir}' does not exist.")
 
-        self.registry_file = self.base_dir / "reagents.csv"
+        self.registry_file = self.base_dir / "substances.v1.csv"
         self.entries: List[Dict[str, Any]] = []
         self.role_entries: Dict[str, List[Dict[str, Any]]] = {}
         self.family_lookup: Dict[str, Tuple[str, Dict[str, Any]]] = {}

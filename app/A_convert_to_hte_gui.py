@@ -511,8 +511,8 @@ class HTEConverterWindow(QtWidgets.QWidget):
         self.worker = ConversionWorker(
             jobs,
             self.drop_catalyst_check.isChecked(),
-            str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
-            str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
+            str(PROJECT_ROOT / "condition_registry" / "definitions" / "substances.v1.csv"),
+            str(PROJECT_ROOT / "condition_registry" / "definitions" / "pending_substances.csv"),
             self.skip_cas_check.isChecked(),
             self.worker_count_spin.value(),
             llm_assist_options=llm_assist_options,
@@ -600,8 +600,8 @@ class HTEConverterWindow(QtWidgets.QWidget):
                         input_path,
                         output_path,
                         drop_no_catalyst=self.drop_catalyst_check.isChecked(),
-                        reagent_csv_path=str(PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"),
-                        new_reagents_path=str(PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"),
+                        reagent_csv_path=str(PROJECT_ROOT / "condition_registry" / "definitions" / "substances.v1.csv"),
+                        new_reagents_path=str(PROJECT_ROOT / "condition_registry" / "definitions" / "pending_substances.csv"),
                         num_workers=self.worker_count_spin.value(),
                         llm_assist_options=llm_assist_options,
                     )

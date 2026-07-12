@@ -58,7 +58,7 @@ class ReagentAdditionService:
         registry_dir: Optional[str | Path] = None,
         taxonomy_dir: Optional[str | Path] = None,
     ) -> None:
-        self.registry_dir = _coerce_path(registry_dir) or Path("data/reagent_db")
+        self.registry_dir = _coerce_path(registry_dir) or Path("condition_registry/definitions")
         self.taxonomy_dir = _coerce_path(taxonomy_dir)
         self.taxonomy = TaxonomyStore(self.taxonomy_dir)
 

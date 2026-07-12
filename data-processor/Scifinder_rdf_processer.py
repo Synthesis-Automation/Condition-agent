@@ -148,9 +148,9 @@ class _TaxonomyIndex:
         return data if isinstance(data, list) else []
 
     def _iter_registry_files(self) -> List[str]:
-        csv_path = os.path.join(self.base_dir, "reagents.csv")
+        csv_path = os.path.join(self.base_dir, "substances.v1.csv")
         if os.path.exists(csv_path):
-            return ["reagents.csv"]
+            return ["substances.v1.csv"]
         return []
 
     def _index_member(
@@ -749,7 +749,8 @@ class ReactionMarkdownGenerator:  # taxonomy-aware local generator
                         break
                 try:
                     from conditioncore_pairing_helper_for_ref_only import PairingHelper  # type: ignore
-                    cat_path = os.path.join(self.taxonomy.base_dir, "reagent_roles.v2.json")
+                    from condition_registry.loader import TAXONOMY_PATH
+                    cat_path = str(TAXONOMY_PATH)
                     ph = PairingHelper(cat_path)
                     if fam_id:
                         hint = (row.get("ReactionType") or "").strip() or None

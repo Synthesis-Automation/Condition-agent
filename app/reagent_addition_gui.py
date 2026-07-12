@@ -177,7 +177,7 @@ class ReagentAdditionWindow(QtWidgets.QWidget):
         layout.addWidget(self.status_label)
 
     def _set_defaults(self) -> None:
-        default_registry = PROJECT_ROOT / "data" / "reagent_db"
+        default_registry = PROJECT_ROOT / "condition_registry" / "definitions"
         self.registry_dir_input.setText(str(default_registry))
         self.save_button.setEnabled(False)
         self._populate_llm_providers()

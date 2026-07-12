@@ -26,7 +26,7 @@ from .taxonomy_utils import (
 )
 import re
 
-DEFAULT_FLAT_REGISTRY_DIR = Path("data/reagent_db")
+DEFAULT_FLAT_REGISTRY_DIR = Path("condition_registry/definitions")
 
 
 class ReagentAdditionError(RuntimeError):
@@ -166,7 +166,7 @@ def add_reagent_entry(
         taxonomy_dir: Optional path to the reagent taxonomy v2 directory. When not supplied,
             the packaged v2 taxonomy is used.
         registry_dir: Optional path to the flattened reagent registry directory. When not supplied,
-            the default data/reagent_db registry is used.
+            the standalone condition_registry definitions directory is used.
         name: Preferred reagent name. If omitted, an online resolver is used when permitted.
         formula: Molecular formula override (e.g., C6H6).
         molecular_weight: Molecular weight override (e.g., 78.11).

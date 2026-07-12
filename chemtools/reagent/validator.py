@@ -175,7 +175,7 @@ def validate_database(
     Validate entire reagent database (CSV).
     """
     registry_dir = Path(registry_dir)
-    csv_path = registry_dir / "reagents.csv"
+    csv_path = registry_dir / "substances.v1.csv"
 
     if not registry_dir.exists():
         return {

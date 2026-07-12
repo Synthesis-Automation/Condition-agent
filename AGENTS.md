@@ -20,8 +20,9 @@
   - Chemistry-specific agents combining LLM reasoning with chemtools.
   - See `llmtools/README.md` for details.
 - `data-processor/`: ETL and data preparation utilities.
-- `data/`: Curated datasets (HTE, protocols, reaction datasets, reagent DB, knowledge base).
-  - `HTE_db/`, `protocol_db_v2/`, `reaction_dataset/`, `reagent_db/`, `knowledge_base/`.
+- `data/`: Curated datasets (HTE, protocols, reaction datasets, knowledge base).
+  - `HTE_db/`, `protocol_db_v2/`, `reaction_dataset/`, `knowledge_base/`.
+- `condition_registry/`: Standalone condition-substance identities, roles, families, validation, and migration data.
 - `tests/`: Pytest suite (`test_*.py`, fixtures in `conftest.py`).
 - `scripts/`: Lightweight dev helpers and CLI tools.
 - `docs/`: Documentation for features and usage.

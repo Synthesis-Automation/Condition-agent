@@ -5,20 +5,13 @@ from __future__ import annotations
 import re
 from typing import Any, Optional, Tuple
 
+from condition_registry.normalization import normalize_cas
+
 from .models import ConditionIdentity
-
-_CAS_RE = re.compile(r"^\d{2,7}-\d{2}-\d$")
-
 
 def is_valid_cas(value: str) -> bool:
     """Validate CAS syntax and check digit."""
-    match = _CAS_RE.fullmatch(str(value or "").strip())
-    if match is None:
-        return False
-    body, check = value.rsplit("-", 1)
-    digits = body.replace("-", "")
-    checksum = sum(position * int(digit) for position, digit in enumerate(reversed(digits), start=1))
-    return checksum % 10 == int(check)
+    return normalize_cas(value) is not None
 
 
 def split_identifiers(value: Any) -> Tuple[str, ...]:

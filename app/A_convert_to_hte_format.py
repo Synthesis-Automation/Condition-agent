@@ -1150,13 +1150,13 @@ def process_reaction_dataset(
     source_label = input_path.stem
 
     reagent_csv = Path(reagent_csv_path) if reagent_csv_path else (
-        PROJECT_ROOT / "data" / "reagent_db" / "reagents.csv"
+        PROJECT_ROOT / "condition_registry" / "definitions" / "substances.v1.csv"
     )
     # The new system uses a centralized registry, so we don't need to load it here
     # but we keep the variable for compatibility with the record collection
     unknown_cas: set[str] = set()
     new_reagents_csv = Path(new_reagents_path) if new_reagents_path else (
-        PROJECT_ROOT / "data" / "reagent_db" / "new_reagents.csv"
+        PROJECT_ROOT / "condition_registry" / "definitions" / "pending_substances.csv"
     )
     reaction_options_sig = reaction_options_signature(
         llm_assist_options=llm_assist_options,
@@ -1345,11 +1345,11 @@ if __name__ == "__main__":
     parser.add_argument("--output", "-o", help="Direct path to output CSV file.")
     parser.add_argument(
         "--reagent-csv",
-        help="Path to reagent registry CSV (default: data/reagent_db/reagents.csv).",
+        help="Path to condition registry CSV (default: condition_registry/definitions/substances.v1.csv).",
     )
     parser.add_argument(
         "--new-reagents",
-        help="Path to write missing reagent CAS list (default: data/reagent_db/new_reagents.csv).",
+        help="Path to write pending substance CAS list (default: condition_registry/definitions/pending_substances.csv).",
     )
     parser.add_argument(
         "--keep-no-catalyst",

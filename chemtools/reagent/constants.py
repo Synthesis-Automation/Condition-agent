@@ -8,7 +8,7 @@ reagent management system.
 from typing import Dict, Tuple
 
 # Registry CSV filename (single source for all roles)
-REGISTRY_CSV = "reagents.csv"
+REGISTRY_CSV = "substances.v1.csv"
 
 # Mapping of reagent roles to the shared registry CSV
 ROLE_FILES: Dict[str, str] = {
@@ -58,7 +58,7 @@ ROLE_PRIORITY: Dict[str, int] = {
 DEFAULT_TAXONOMY_DIR = "compound_taxonomy"
 
 # Registry directory path relative to data folder  
-DEFAULT_REGISTRY_DIR = "reagent_db"
+DEFAULT_REGISTRY_DIR = "condition_registry/definitions"
 
 # Legacy role aliases that should normalize to the canonical role keys
 ROLE_ALIASES: Dict[str, str] = {

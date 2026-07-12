@@ -2,7 +2,7 @@
 Reagent database lookup utilities.
 
 Provides functions to enrich condition recommendations with detailed reagent information
-from the CSV registry in data/reagent_db/reagents.csv.
+from the standalone condition_registry package-owned substance CSV.
 """
 
 import csv
@@ -52,7 +52,8 @@ def get_data_dir() -> Path:
 
 
 def _reagent_csv_path() -> Path:
-    return get_data_dir() / "reagent_db" / "reagents.csv"
+    from condition_registry.loader import SUBSTANCES_PATH
+    return SUBSTANCES_PATH
 
 
 def _row_to_reagent(row: Dict[str, str]) -> Dict[str, Any]:
