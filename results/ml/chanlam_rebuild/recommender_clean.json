@@ -1,8 +1,0 @@
-{
-  "artifact": "results\\ml\\chanlam_rebuild\\recommender_clean.joblib",
-  "rows": 3892,
-  "feature_profile": "core_full",
-  "with_condition_props": true,
-  "stage2_model_type": "rf_reg",
-  "condition_library_size": 110
-}

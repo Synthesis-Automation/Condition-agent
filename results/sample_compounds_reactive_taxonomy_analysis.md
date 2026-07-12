@@ -2,6 +2,7 @@
 
 - Source: `examples/sample_compounds.csv`
 - Rows: 201
+- Unique compound names: 190 (11 repeated rows across 9 names)
 - Valid structures: 201/201
 - Total sites: 261
 - Runtime: 0.443 s (454.1 molecules/s)
@@ -138,3 +139,7 @@
 - Rows without sites are mostly intentional v1 negatives: tertiary amines without N-H, ligands, hydrocarbons, and reference scaffolds.
 - `Phenylmagnesium bromide` remains a fixture-quality issue because `[Mg]Brc1ccccc1` encodes an Mg-Br-C chain rather than a C-Mg bond.
 - The output is site-complete, not reaction-role-selected: multifunctional compounds intentionally return every supported candidate site.
+- Carboxylic acids intentionally emit both an acyl electrophilic center and a deactivated acidic O-H site; downstream role selection must distinguish these.
+- Polyfluoroarenes emit every aryl C-F handle. Structural detection is correct, but reaction-aware ranking will be needed to identify the participating site.
+- The absence of warnings reflects the curated corpus and current warning policy; it should not be interpreted as validation over tautomeric, protonation, or ambiguous-anchor edge cases.
+- The source CSV contains repeated benchmark compounds, so aggregate counts are row-weighted rather than unique-structure counts.
