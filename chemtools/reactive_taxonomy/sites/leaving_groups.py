@@ -2,21 +2,20 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, List
 
 from ..context import classify_context
-from ..labels import render_edge
-from ..patterns import matched_patterns_for_atom, matched_role_atoms
+from ..models import SiteCandidate
+from ..patterns import MatchIndex
 from .common import bond_index, unique_indices
 
 
-def _sulfonate_token(mol: Any, sulfur: Any, connector_o: Any) -> str:
-    carbon_neighbors = [n for n in sulfur.GetNeighbors() if n.GetSymbol() == "C"]
+def _sulfonate_token(sulfur: Any) -> str:
+    carbon_neighbors = [neighbor for neighbor in sulfur.GetNeighbors() if neighbor.GetSymbol() == "C"]
     if not carbon_neighbors:
         return "OSO2R"
     carbon = carbon_neighbors[0]
-    fluorines = sum(1 for n in carbon.GetNeighbors() if n.GetSymbol() == "F")
-    if fluorines == 3:
+    if sum(neighbor.GetSymbol() == "F" for neighbor in carbon.GetNeighbors()) == 3:
         return "OTf"
     if carbon.GetIsAromatic():
         return "OTs"
@@ -25,42 +24,35 @@ def _sulfonate_token(mol: Any, sulfur: Any, connector_o: Any) -> str:
     return "OSO2R"
 
 
-def detect(mol: Any) -> List[Dict[str, Any]]:
-    sites: List[Dict[str, Any]] = []
-    candidate_handles = matched_role_atoms(mol, "leaving_group", "handle")
-    candidate_connectors = matched_role_atoms(mol, "leaving_group", "connector")
+def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+    sites: List[SiteCandidate] = []
+    candidate_handles = match_index.role_atoms("leaving_group", "handle")
+    candidate_connectors = match_index.role_atoms("leaving_group", "connector")
     for handle in mol.GetAtoms():
         if handle.GetSymbol() in {"F", "Cl", "Br", "I"}:
-            if handle.GetIdx() not in candidate_handles:
+            if handle.GetIdx() not in candidate_handles or handle.GetDegree() != 1:
                 continue
-            # A leaving-group halogen is terminal. This excludes metal-halogen
-            # bridges and malformed organometallic strings such as Mg-Br-Ar.
-            if handle.GetDegree() != 1:
+            anchor = next(iter(handle.GetNeighbors()))
+            if anchor.GetSymbol() != "C":
                 continue
-            for anchor in handle.GetNeighbors():
-                if anchor.GetSymbol() != "C":
-                    continue
-                # Fluorines in retained polyfluoroalkyl groups (CF2/CF3) are
-                # context, not individual alkyl-fluoride reactive handles.
-                if handle.GetSymbol() == "F":
-                    attached_halogen_count = sum(
-                        neighbor.GetSymbol() in {"F", "Cl", "Br", "I"}
-                        for neighbor in anchor.GetNeighbors()
-                    )
-                    if attached_halogen_count >= 2:
-                        continue
-                context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()})["token"]
-                sites.append({
-                    "topology": "edge", "atom_indices": [anchor.GetIdx(), handle.GetIdx()],
-                    "bond_indices": [bond_index(mol, anchor.GetIdx(), handle.GetIdx())],
-                    "signature": f"LG|{context}|{handle.GetSymbol()}",
-                    "label": render_edge(context, handle.GetSymbol()),
-                    "details": {"anchor_atom_index": anchor.GetIdx(), "handle_atom_indices": [handle.GetIdx()], "anchor_context": context, "handle_token": handle.GetSymbol()},
-                    "matched_patterns": [item["id"] for item in matched_patterns_for_atom(mol, "leaving_group", "handle", handle.GetIdx())],
-                })
-        if handle.GetSymbol() != "O" or handle.GetDegree() != 2:
-            continue
-        if handle.GetIdx() not in candidate_connectors:
+            if handle.GetSymbol() == "F" and sum(
+                neighbor.GetSymbol() in {"F", "Cl", "Br", "I"} for neighbor in anchor.GetNeighbors()
+            ) >= 2:
+                continue
+            context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()}, match_index=match_index)
+            token = handle.GetSymbol()
+            sites.append(SiteCandidate(
+                site_type="leaving_group", topology="edge",
+                atom_roles={"anchor": (anchor.GetIdx(),), "handle": (handle.GetIdx(),)},
+                atom_indices=(anchor.GetIdx(), handle.GetIdx()),
+                bond_indices=(bond_index(mol, anchor.GetIdx(), handle.GetIdx()),),
+                canonical_signature=f"LG|{context.token}|{token}",
+                render_kind="edge", render_data={"context": context.token, "handle": token},
+                matched_patterns=tuple(item["id"] for item in match_index.patterns_for_atom("leaving_group", "handle", handle.GetIdx())),
+                details={"anchor_context": context.token, "handle_token": token},
+                context_records=(context,), availability="available",
+            ))
+        if handle.GetSymbol() != "O" or handle.GetDegree() != 2 or handle.GetIdx() not in candidate_connectors:
             continue
         sulfur_neighbors = [n for n in handle.GetNeighbors() if n.GetSymbol() == "S"]
         carbon_neighbors = [n for n in handle.GetNeighbors() if n.GetSymbol() == "C"]
@@ -70,14 +62,18 @@ def detect(mol: Any) -> List[Dict[str, Any]]:
         oxo = [n for n in sulfur.GetNeighbors() if n.GetSymbol() == "O" and str(mol.GetBondBetweenAtoms(sulfur.GetIdx(), n.GetIdx()).GetBondType()) == "DOUBLE"]
         if len(oxo) < 2:
             continue
-        token = _sulfonate_token(mol, sulfur, handle)
-        context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()})["token"]
-        handle_atoms = unique_indices([handle.GetIdx(), sulfur.GetIdx(), *(n.GetIdx() for n in sulfur.GetNeighbors() if n.GetIdx() != handle.GetIdx())])
-        sites.append({
-            "topology": "edge", "atom_indices": unique_indices([anchor.GetIdx(), *handle_atoms]),
-            "bond_indices": [bond_index(mol, anchor.GetIdx(), handle.GetIdx())],
-            "signature": f"LG|{context}|{token}", "label": render_edge(context, token),
-            "details": {"anchor_atom_index": anchor.GetIdx(), "handle_atom_indices": handle_atoms, "anchor_context": context, "handle_token": token},
-            "matched_patterns": [item["id"] for item in matched_patterns_for_atom(mol, "leaving_group", "connector", handle.GetIdx())],
-        })
+        token = _sulfonate_token(sulfur)
+        context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()}, match_index=match_index)
+        handle_atoms = tuple(unique_indices([handle.GetIdx(), sulfur.GetIdx(), *(n.GetIdx() for n in sulfur.GetNeighbors() if n.GetIdx() != handle.GetIdx())]))
+        sites.append(SiteCandidate(
+            site_type="leaving_group", topology="edge",
+            atom_roles={"anchor": (anchor.GetIdx(),), "connector": (handle.GetIdx(),), "center": (sulfur.GetIdx(),), "handle": handle_atoms},
+            atom_indices=tuple(unique_indices([anchor.GetIdx(), *handle_atoms])),
+            bond_indices=(bond_index(mol, anchor.GetIdx(), handle.GetIdx()),),
+            canonical_signature=f"LG|{context.token}|{token}",
+            render_kind="edge", render_data={"context": context.token, "handle": token},
+            matched_patterns=tuple(item["id"] for item in match_index.patterns_for_atom("leaving_group", "connector", handle.GetIdx())),
+            details={"anchor_context": context.token, "handle_token": token},
+            context_records=(context,), availability="available",
+        ))
     return sites

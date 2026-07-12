@@ -5,12 +5,13 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Set
+from typing import Any, Dict, Iterable, List, Set, Tuple
 
 from chemtools.core.smarts import compile_smarts
 
 
 _HANDLES_PATH = Path(__file__).with_name("data") / "handles.v1.json"
+_CONTEXTS_PATH = Path(__file__).with_name("data") / "contexts.v1.json"
 
 
 @lru_cache(maxsize=1)
@@ -34,6 +35,85 @@ def _query_map_positions(pattern: Any) -> Dict[int, int]:
         for atom in pattern.GetAtoms()
         if atom.GetAtomMapNum()
     }
+
+
+class MatchIndex:
+    """All taxonomy SMARTS matches for one molecule, calculated once."""
+
+    def __init__(self, mol: Any) -> None:
+        self.mol = mol
+        self._handle_matches: List[Tuple[Dict[str, Any], Dict[int, int], Tuple[Tuple[int, ...], ...]]] = []
+        self._context_matches: Dict[str, Tuple[Dict[int, int], Tuple[Tuple[int, ...], ...]]] = {}
+        for definition in load_handle_patterns():
+            query = compile_smarts(str(definition.get("smarts") or ""), validate=False)
+            if query is None:
+                continue
+            matches = tuple(tuple(int(i) for i in match) for match in mol.GetSubstructMatches(query, uniquify=True))
+            self._handle_matches.append((definition, _query_map_positions(query), matches))
+        with _CONTEXTS_PATH.open("r", encoding="utf-8") as handle:
+            contexts = json.load(handle).get("contexts") or []
+        for definition in contexts:
+            if definition.get("classification_method") != "mapped_smarts":
+                continue
+            query = compile_smarts(str(definition.get("smarts") or ""), validate=False)
+            if query is None:
+                continue
+            matches = tuple(tuple(int(i) for i in match) for match in mol.GetSubstructMatches(query, uniquify=True))
+            self._context_matches[str(definition["id"])] = (_query_map_positions(query), matches)
+
+    def role_atoms(self, site_type: str, role: str) -> Set[int]:
+        indices: Set[int] = set()
+        for definition, positions, matches in self._handle_matches:
+            if definition.get("site_type") != site_type:
+                continue
+            raw_maps = (definition.get("atom_roles") or {}).get(role)
+            if raw_maps is None:
+                continue
+            role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
+            for match in matches:
+                for map_number in role_maps:
+                    position = positions.get(int(map_number))
+                    if position is not None:
+                        indices.add(match[position])
+        return indices
+
+    def patterns_for_atom(self, site_type: str, role: str, atom_index: int) -> List[Dict[str, Any]]:
+        found: List[Dict[str, Any]] = []
+        for definition, positions, matches in self._handle_matches:
+            if definition.get("site_type") != site_type:
+                continue
+            raw_maps = (definition.get("atom_roles") or {}).get(role)
+            if raw_maps is None:
+                continue
+            role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
+            role_positions = [positions[int(value)] for value in role_maps if int(value) in positions]
+            if any(any(match[position] == atom_index for position in role_positions) for match in matches):
+                found.append(definition)
+        return found
+
+    def context_match(
+        self,
+        definition: Dict[str, Any],
+        atom_index: int,
+        excluded: Set[int],
+    ) -> Tuple[int, ...] | None:
+        indexed = self._context_matches.get(str(definition["id"]))
+        if indexed is None:
+            return None
+        positions, matches = indexed
+        roles = definition.get("atom_roles") or {}
+        anchor_position = positions.get(int(roles.get("context_anchor", -1)))
+        if anchor_position is None:
+            return None
+        raw_substituents = roles.get("substituent") or []
+        if not isinstance(raw_substituents, list):
+            raw_substituents = [raw_substituents]
+        substituent_positions = [positions[int(value)] for value in raw_substituents if int(value) in positions]
+        return next((
+            match for match in matches
+            if match[anchor_position] == atom_index
+            and not any(match[position] in excluded for position in substituent_positions)
+        ), None)
 
 
 def matched_role_atoms(mol: Any, site_type: str, role: str) -> Set[int]:
@@ -99,4 +179,4 @@ def matched_patterns_for_atom(
     return matched
 
 
-__all__ = ["load_handle_patterns", "matched_pattern_ids", "matched_patterns_for_atom", "matched_role_atoms", "patterns_for"]
+__all__ = ["MatchIndex", "load_handle_patterns", "matched_pattern_ids", "matched_patterns_for_atom", "matched_role_atoms", "patterns_for"]

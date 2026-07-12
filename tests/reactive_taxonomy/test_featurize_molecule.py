@@ -1,5 +1,6 @@
-from chemtools.reactive_taxonomy import featurize_molecule, load_handle_patterns, validate_taxonomy
+from chemtools.reactive_taxonomy import MatchIndex, SiteCandidate, available_styles, featurize_molecule, load_handle_patterns, validate_taxonomy
 from chemtools.reactive_taxonomy.context import load_context_taxonomy
+from chemtools.reactive_taxonomy.sites import pronucleophiles
 
 
 def signatures(smiles: str) -> set[str]:
@@ -153,3 +154,43 @@ def test_bromopyrrole_keeps_both_distinct_sites() -> None:
         "LG|HeteroAr|Br",
         "XH|N_aromatic|H1|HeteroAr",
     }
+
+
+def test_rendering_styles_preserve_signature() -> None:
+    unicode_site = featurize_molecule("Nc1ccccc1").sites[0]
+    ascii_site = featurize_molecule("Nc1ccccc1", label_style="ascii").sites[0]
+    hte_site = featurize_molecule("Nc1ccccc1", label_style="hte_legacy").sites[0]
+    assert available_styles() == ("unicode", "ascii", "hte_legacy")
+    assert unicode_site.chemist_label == "Ar–NH2"
+    assert ascii_site.chemist_label == "Ar-NH2"
+    assert hte_site.chemist_label == "Ar-NH2"
+    assert len({unicode_site.canonical_signature, ascii_site.canonical_signature, hte_site.canonical_signature}) == 1
+    assert featurize_molecule("CC(=O)NC").sites[0].chemist_label == "R–C(O)–NHR"
+    assert featurize_molecule("CS(=O)(=O)NC").sites[0].chemist_label == "R–S(O)2–NHR"
+
+
+def test_availability_distinguishes_chemical_site_state() -> None:
+    assert featurize_molecule("CCN").sites[0].availability == "free"
+    assert next(site for site in featurize_molecule("CC(=O)NC").sites if site.site_type == "pronucleophile_XH").availability == "deactivated"
+    assert next(site for site in featurize_molecule("CC(=O)O").sites if site.site_type == "electrophilic_center").availability == "latent"
+    assert featurize_molecule("CC(=O)Cl").sites[0].availability == "activated"
+    assert featurize_molecule("OB(O)c1ccccc1").sites[0].availability == "transferable"
+
+
+def test_rich_context_record_is_exposed() -> None:
+    site = featurize_molecule("Nc1ccccn1").sites[0]
+    context = site.context_features["contexts"][0]
+    assert context["token"] == "HeteroAr"
+    assert context["classification_method"] == "aromatic_ring_system"
+    assert context["subtype"] == "heteroaromatic_ring"
+    assert context["features"]["heteroatoms"] == ["N"]
+    assert len(context["fragment_atom_indices"]) == 6
+
+
+def test_detector_emits_typed_candidates_from_shared_match_index() -> None:
+    from rdkit import Chem
+    mol = Chem.MolFromSmiles("CCN")
+    candidates = pronucleophiles.detect(mol, MatchIndex(mol))
+    assert len(candidates) == 1
+    assert isinstance(candidates[0], SiteCandidate)
+    assert candidates[0].atom_roles["center"] == (2,)

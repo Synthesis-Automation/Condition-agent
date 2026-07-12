@@ -90,6 +90,22 @@ def validate_taxonomy() -> List[str]:
                 errors.append(f"invalid_suppression_site_type:{pattern_id}")
             if rule.get("owned_role") not in (pattern.get("atom_roles") or {}):
                 errors.append(f"invalid_suppression_role:{pattern_id}")
+    rendering = payload["rendering.v1"]
+    styles = rendering.get("styles") or {}
+    if rendering.get("default_style") not in styles:
+        errors.append("invalid_default_rendering_style")
+    for style_id, style in styles.items():
+        if not isinstance(style, dict) or not style.get("bond"):
+            errors.append(f"invalid_rendering_style:{style_id}")
+    rendering_contexts = set((rendering.get("context_labels") or {}).keys())
+    if not rendering_contexts <= set(tokens):
+        errors.append("unknown_rendering_context")
+    rendering_rules = rendering.get("xh_rules") or []
+    rendering_rule_ids = [str(rule.get("id") or "") for rule in rendering_rules]
+    if len(rendering_rule_ids) != len(set(rendering_rule_ids)):
+        errors.append("duplicate_rendering_rule_ids")
+    if any(not rule.get("template") for rule in rendering_rules):
+        errors.append("missing_rendering_template")
     return errors
 
 

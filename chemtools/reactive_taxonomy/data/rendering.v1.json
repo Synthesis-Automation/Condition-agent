@@ -1,11 +1,38 @@
 {
   "schema_version": "1.0",
-  "dash": "–",
+  "default_style": "unicode",
+  "styles": {
+    "unicode": {"bond": "–"},
+    "ascii": {"bond": "-"},
+    "hte_legacy": {"bond": "-"}
+  },
   "context_labels": {
     "Ar": "Ar",
     "HeteroAr": "HeteroAr",
     "Alkenyl": "Alkenyl",
     "Alkynyl": "Alkynyl",
-    "Alkyl": "R"
-  }
+    "Alkyl": "R",
+    "C(O)R": "R{bond}C(O)",
+    "C(O)OR": "RO{bond}C(O)",
+    "C(O)NR": "R2N{bond}C(O)",
+    "SO2R": "R{bond}S(O)2",
+    "P(O)R2": "R2P(O)"
+  },
+  "edge_template": "{context}{bond}{handle}",
+  "xh_rules": [
+    {"id": "aromatic_nh", "center": "N_aromatic", "template": "AromN{bond}H", "priority": 100},
+    {"id": "terminal_alkyne", "center": "Csp", "template": "R{bond}C≡C{bond}H", "priority": 100},
+    {"id": "alcohol", "center": "O", "template": "{context}{bond}OH", "priority": 50},
+    {"id": "thiol", "center": "S", "template": "{context}{bond}SH", "priority": 50},
+    {"id": "ammonia", "center": "N", "h_count": 3, "contexts_exact": [], "template": "NH3", "priority": 100},
+    {"id": "primary_nitrogen", "center": "N", "h_count": 2, "template": "{context}{bond}NH2", "priority": 40},
+    {"id": "dialkylamine", "center": "N", "h_count": 1, "contexts_exact": ["Alkyl", "Alkyl"], "template": "R1R2{bond}NH", "priority": 90},
+    {"id": "diarylamine", "center": "N", "h_count": 1, "contexts_exact": ["Ar", "Ar"], "template": "Ar1Ar2{bond}NH", "priority": 90},
+    {"id": "aryl_alkylamine", "center": "N", "h_count": 1, "contexts_set": ["Ar", "Alkyl"], "template": "Ar{bond}NH{bond}R", "priority": 90},
+    {"id": "sulfonamide", "center": "N", "context_first": "SO2R", "template": "R{bond}S(O)2{bond}NH{suffix}", "priority": 85},
+    {"id": "carbonyl_nitrogen", "center": "N", "context_first_prefix": "C(O)", "template": "{context}{bond}NH{suffix}", "priority": 80},
+    {"id": "hydrazine_terminal", "center": "N", "h_count": 2, "contexts_contains": "N", "template": "N{bond}NH2", "priority": 95},
+    {"id": "hydrazine_substituted", "center": "N", "h_count": 1, "contexts_contains": "N", "template": "R{bond}NH{bond}NH", "priority": 75},
+    {"id": "generic_nh", "center": "N", "template": "{contexts}{bond}NH", "priority": 0}
+  ]
 }

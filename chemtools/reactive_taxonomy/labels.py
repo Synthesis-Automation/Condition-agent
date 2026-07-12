@@ -1,46 +1,77 @@
-"""Deterministic chemist-facing label rendering."""
+"""Taxonomy-driven deterministic chemist-facing label rendering."""
 
 from __future__ import annotations
 
-from typing import List
+import json
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Dict, List
 
 
-_PREFIX = {"Ar": "Ar", "HeteroAr": "HeteroAr", "Alkenyl": "Alkenyl", "Alkynyl": "Alkynyl", "Alkyl": "R"}
+_RENDERING_PATH = Path(__file__).with_name("data") / "rendering.v1.json"
 
 
-def render_edge(context: str, handle: str) -> str:
-    return f"{_PREFIX.get(context, context)}–{handle}"
+@lru_cache(maxsize=1)
+def load_rendering_taxonomy() -> Dict[str, Any]:
+    with _RENDERING_PATH.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
 
 
-def render_xh(center: str, h_count: int, contexts: List[str]) -> str:
-    if center == "N_aromatic":
-        return "AromN–H"
-    if center == "Csp":
-        return "R–C≡C–H"
-    if center == "O":
-        return f"{_PREFIX.get(contexts[0], contexts[0]) if contexts else 'H'}–OH"
-    if center == "S":
-        return f"{_PREFIX.get(contexts[0], contexts[0]) if contexts else 'H'}–SH"
-    if center != "N":
-        return f"{center}–H"
-    if h_count == 3 and not contexts:
-        return "NH3"
-    if h_count == 2:
-        prefix = _PREFIX.get(contexts[0], contexts[0]) if contexts else "H"
-        return f"{prefix}–NH2"
-    if contexts == ["Alkyl", "Alkyl"]:
-        return "R1R2–NH"
-    if contexts == ["Ar", "Ar"]:
-        return "Ar1Ar2–NH"
-    if sorted(contexts) == ["Alkyl", "Ar"]:
-        return "Ar–NH–R"
-    if contexts and contexts[0] == "SO2R":
-        return "RSO2–NHR" if len(contexts) > 1 else "RSO2–NH2"
-    if contexts and contexts[0].startswith("C(O)"):
-        return "RC(O)–NHR" if len(contexts) > 1 else "RC(O)–NH2"
-    if contexts == ["N"]:
-        return "N–NH2" if h_count == 2 else "N–NH–R"
-    return "–".join([*(_PREFIX.get(c, c) for c in contexts), "NH"])
+def available_styles() -> tuple[str, ...]:
+    return tuple(load_rendering_taxonomy()["styles"])
 
 
-__all__ = ["render_edge", "render_xh"]
+def _style(style: str) -> Dict[str, str]:
+    payload = load_rendering_taxonomy()
+    if style not in payload["styles"]:
+        raise ValueError(f"Unknown rendering style: {style}")
+    return payload["styles"][style]
+
+
+def _context_label(token: str, bond: str) -> str:
+    template = load_rendering_taxonomy().get("context_labels", {}).get(token, token)
+    return str(template).format(bond=bond)
+
+
+def render_edge(context: str, handle: str, *, style: str = "unicode") -> str:
+    bond = _style(style)["bond"]
+    template = load_rendering_taxonomy().get("edge_template", "{context}{bond}{handle}")
+    return str(template).format(context=_context_label(context, bond), bond=bond, handle=handle)
+
+
+def _rule_matches(rule: Dict[str, Any], center: str, h_count: int, contexts: List[str]) -> bool:
+    if rule.get("center") != center:
+        return False
+    if "h_count" in rule and int(rule["h_count"]) != h_count:
+        return False
+    if "contexts_exact" in rule and list(rule["contexts_exact"]) != contexts:
+        return False
+    if "contexts_set" in rule and sorted(rule["contexts_set"]) != sorted(contexts):
+        return False
+    if "contexts_contains" in rule and rule["contexts_contains"] not in contexts:
+        return False
+    if "context_first" in rule and (not contexts or contexts[0] != rule["context_first"]):
+        return False
+    if "context_first_prefix" in rule and (not contexts or not contexts[0].startswith(rule["context_first_prefix"])):
+        return False
+    return True
+
+
+def render_xh(center: str, h_count: int, contexts: List[str], *, style: str = "unicode") -> str:
+    bond = _style(style)["bond"]
+    rules = sorted(load_rendering_taxonomy().get("xh_rules", []), key=lambda item: -int(item.get("priority", 0)))
+    rule = next((item for item in rules if _rule_matches(item, center, h_count, contexts)), None)
+    if rule is None:
+        return f"{center}{bond}H"
+    rendered_contexts = [_context_label(token, bond) for token in contexts]
+    context = rendered_contexts[0] if rendered_contexts else "H"
+    suffix = "2" if h_count == 2 else ("R" if h_count == 1 and len(contexts) > 1 else ("" if h_count == 1 else str(h_count)))
+    return str(rule["template"]).format(
+        bond=bond,
+        context=context,
+        contexts=bond.join(rendered_contexts) if rendered_contexts else "H",
+        suffix=suffix,
+    )
+
+
+__all__ = ["available_styles", "load_rendering_taxonomy", "render_edge", "render_xh"]

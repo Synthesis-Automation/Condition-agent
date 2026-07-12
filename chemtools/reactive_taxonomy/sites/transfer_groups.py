@@ -2,76 +2,66 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, List
 
 from ..context import classify_context
-from ..labels import render_edge
-from ..patterns import matched_patterns_for_atom, matched_role_atoms
+from ..models import SiteCandidate
+from ..patterns import MatchIndex
 from .common import bond_index, unique_indices
 
 
 _METAL_TOKENS = {"Zn": "ZnX", "Mg": "MgX", "Sn": "SnR3", "Si": "SiR3"}
-
-_ANCHOR_CONTEXT_RANK = {
-    "HeteroAr": 50,
-    "Ar": 45,
-    "Alkenyl": 40,
-    "Alkynyl": 35,
-    "Alkyl": 10,
-}
+_ANCHOR_CONTEXT_RANK = {"HeteroAr": 50, "Ar": 45, "Alkenyl": 40, "Alkynyl": 35, "Alkyl": 10}
 
 
 def _boron_token(boron: Any) -> str:
     neighbors = list(boron.GetNeighbors())
-    f_count = sum(n.GetSymbol() == "F" for n in neighbors)
-    oxygens = [n for n in neighbors if n.GetSymbol() == "O"]
-    if f_count >= 3: return "BF3K"
+    if sum(neighbor.GetSymbol() == "F" for neighbor in neighbors) >= 3:
+        return "BF3K"
+    oxygens = [neighbor for neighbor in neighbors if neighbor.GetSymbol() == "O"]
     if len(oxygens) >= 2:
-        oh_count = sum(int(o.GetTotalNumHs(includeNeighbors=True)) > 0 or o.GetFormalCharge() < 0 for o in oxygens)
-        if oh_count >= 2: return "B(OH)2"
-        carbon_neighbors = [n for o in oxygens for n in o.GetNeighbors() if n.GetSymbol() == "C"]
-        if len({n.GetIdx() for n in carbon_neighbors}) == 2 and all(n.GetDegree() >= 3 for n in carbon_neighbors): return "BPin"
+        if sum(int(oxygen.GetTotalNumHs(includeNeighbors=True)) > 0 or oxygen.GetFormalCharge() < 0 for oxygen in oxygens) >= 2:
+            return "B(OH)2"
+        carbon_neighbors = [neighbor for oxygen in oxygens for neighbor in oxygen.GetNeighbors() if neighbor.GetSymbol() == "C"]
+        if len({neighbor.GetIdx() for neighbor in carbon_neighbors}) == 2 and all(neighbor.GetDegree() >= 3 for neighbor in carbon_neighbors):
+            return "BPin"
         return "B(OR)2"
     return "B"
 
 
-def detect(mol: Any) -> List[Dict[str, Any]]:
-    sites: List[Dict[str, Any]] = []
-    candidate_centers = matched_role_atoms(mol, "transfer_group", "center")
+def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+    sites: List[SiteCandidate] = []
+    candidate_centers = match_index.role_atoms("transfer_group", "center")
     for handle in mol.GetAtoms():
         symbol = handle.GetSymbol()
-        if symbol != "B" and symbol not in _METAL_TOKENS:
-            continue
-        if handle.GetIdx() not in candidate_centers:
+        if (symbol != "B" and symbol not in _METAL_TOKENS) or handle.GetIdx() not in candidate_centers:
             continue
         token = _boron_token(handle) if symbol == "B" else _METAL_TOKENS[symbol]
         carbon_anchors = [neighbor for neighbor in handle.GetNeighbors() if neighbor.GetSymbol() == "C"]
         if symbol in {"Si", "Sn"}:
-            # V1 covers carbon-transfer silanes/stannanes, not silyl ethers or
-            # other heteroatom-bound protecting groups.
-            if any(neighbor.GetSymbol() not in {"C"} for neighbor in handle.GetNeighbors()):
+            if any(neighbor.GetSymbol() != "C" for neighbor in handle.GetNeighbors()):
                 continue
             ranked = []
             for candidate in carbon_anchors:
-                context = classify_context(mol, candidate.GetIdx(), {handle.GetIdx()})["token"]
-                non_methyl_bonus = 5 if candidate.GetTotalNumHs(includeNeighbors=True) < 3 else 0
-                ranked.append((_ANCHOR_CONTEXT_RANK.get(context, 0) + non_methyl_bonus, candidate.GetIdx(), candidate))
+                context = classify_context(mol, candidate.GetIdx(), {handle.GetIdx()}, match_index=match_index)
+                bonus = 5 if candidate.GetTotalNumHs(includeNeighbors=True) < 3 else 0
+                ranked.append((_ANCHOR_CONTEXT_RANK.get(context.token, 0) + bonus, candidate.GetIdx(), candidate))
             ranked.sort(key=lambda item: (-item[0], item[1]))
-            if not ranked or ranked[0][0] <= 10:
-                continue
-            # A tie between top non-identical ligands has no uniquely
-            # identifiable transferable carbon in this compact v1 model.
-            if len(ranked) > 1 and ranked[0][0] == ranked[1][0]:
+            if not ranked or ranked[0][0] <= 10 or (len(ranked) > 1 and ranked[0][0] == ranked[1][0]):
                 continue
             carbon_anchors = [ranked[0][2]]
         for anchor in carbon_anchors:
-            context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()})["token"]
-            handle_atoms = unique_indices([handle.GetIdx(), *(n.GetIdx() for n in handle.GetNeighbors() if n.GetIdx() != anchor.GetIdx())])
-            sites.append({
-                "topology": "edge", "atom_indices": unique_indices([anchor.GetIdx(), *handle_atoms]),
-                "bond_indices": [bond_index(mol, anchor.GetIdx(), handle.GetIdx())],
-                "signature": f"TM|{context}|{token}", "label": render_edge(context, token),
-                "details": {"anchor_atom_index": anchor.GetIdx(), "handle_atom_indices": handle_atoms, "anchor_context": context, "handle_token": token},
-                "matched_patterns": [item["id"] for item in matched_patterns_for_atom(mol, "transfer_group", "center", handle.GetIdx())],
-            })
+            context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()}, match_index=match_index)
+            handle_atoms = tuple(unique_indices([handle.GetIdx(), *(n.GetIdx() for n in handle.GetNeighbors() if n.GetIdx() != anchor.GetIdx())]))
+            sites.append(SiteCandidate(
+                site_type="transfer_group", topology="edge",
+                atom_roles={"anchor": (anchor.GetIdx(),), "center": (handle.GetIdx(),), "handle": handle_atoms},
+                atom_indices=tuple(unique_indices([anchor.GetIdx(), *handle_atoms])),
+                bond_indices=(bond_index(mol, anchor.GetIdx(), handle.GetIdx()),),
+                canonical_signature=f"TM|{context.token}|{token}", render_kind="edge",
+                render_data={"context": context.token, "handle": token},
+                matched_patterns=tuple(item["id"] for item in match_index.patterns_for_atom("transfer_group", "center", handle.GetIdx())),
+                details={"anchor_context": context.token, "handle_token": token},
+                context_records=(context,), availability="transferable",
+            ))
     return sites

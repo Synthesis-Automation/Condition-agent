@@ -7,7 +7,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Set
 
-from chemtools.core.smarts import compile_smarts
+from .models import ContextClassification
+from .patterns import MatchIndex
 
 
 _CONTEXTS_PATH = Path(__file__).with_name("data") / "contexts.v1.json"
@@ -28,61 +29,34 @@ def _context_definitions() -> Dict[str, Dict[str, Any]]:
     return {item["id"]: item for item in load_context_taxonomy()["contexts"]}
 
 
-def _bond_is_double(bond: Any) -> bool:
-    return str(bond.GetBondType()) == "DOUBLE"
-
-
-def _aromatic_ring_token(mol: Any, atom: Any) -> str:
+def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
     rings = [ring for ring in mol.GetRingInfo().AtomRings() if atom.GetIdx() in ring]
     if not rings:
-        return "Ar"
+        return ContextClassification("Ar", atom.GetIdx(), (atom.GetIdx(),), "aromatic_ring_system")
     ring_atoms: Set[int] = set().union(*(set(ring) for ring in rings))
-    return "HeteroAr" if any(mol.GetAtomWithIdx(i).GetAtomicNum() != 6 for i in ring_atoms) else "Ar"
+    heteroatoms = sorted({mol.GetAtomWithIdx(i).GetSymbol() for i in ring_atoms if mol.GetAtomWithIdx(i).GetAtomicNum() != 6})
+    token = "HeteroAr" if heteroatoms else "Ar"
+    return ContextClassification(
+        token=token,
+        attachment_atom_index=atom.GetIdx(),
+        fragment_atom_indices=tuple(sorted(ring_atoms)),
+        classification_method="aromatic_ring_system",
+        subtype="heteroaromatic_ring" if heteroatoms else "carbocyclic_aromatic_ring",
+        features={
+            "heteroatoms": heteroatoms,
+            "ring_sizes": sorted({len(ring) for ring in rings}),
+            "fused": len(rings) > 1,
+        },
+    )
 
 
-def _query_map_position(query: Any, map_number: int) -> int | None:
-    for atom in query.GetAtoms():
-        if int(atom.GetAtomMapNum()) == int(map_number):
-            return int(atom.GetIdx())
-    return None
-
-
-def _matches_mapped_context(
+def classify_context(
     mol: Any,
     atom_index: int,
-    definition: Dict[str, Any],
-    excluded: Set[int],
-) -> bool:
-    query = compile_smarts(str(definition.get("smarts") or ""), validate=False)
-    if query is None:
-        return False
-    anchor_map = (definition.get("atom_roles") or {}).get("context_anchor")
-    if anchor_map is None or isinstance(anchor_map, list):
-        return False
-    position = _query_map_position(query, int(anchor_map))
-    if position is None:
-        return False
-    role_maps = definition.get("atom_roles") or {}
-    substituent_maps = role_maps.get("substituent")
-    if substituent_maps is None:
-        substituent_maps = []
-    elif not isinstance(substituent_maps, list):
-        substituent_maps = [substituent_maps]
-    substituent_positions = [
-        mapped_position
-        for map_number in substituent_maps
-        if (mapped_position := _query_map_position(query, int(map_number))) is not None
-    ]
-    for match in mol.GetSubstructMatches(query, uniquify=True):
-        if int(match[position]) != int(atom_index):
-            continue
-        if any(int(match[sub_position]) in excluded for sub_position in substituent_positions):
-            continue
-        return True
-    return False
-
-
-def classify_context(mol: Any, atom_index: int, excluded: Iterable[int] = ()) -> Dict[str, Any]:
+    excluded: Iterable[int] = (),
+    *,
+    match_index: MatchIndex | None = None,
+) -> ContextClassification:
     """Classify the retained fragment beginning at ``atom_index``."""
     atom = mol.GetAtomWithIdx(atom_index)
     excluded_set = set(excluded)
@@ -90,18 +64,26 @@ def classify_context(mol: Any, atom_index: int, excluded: Iterable[int] = ()) ->
     token = "Other"
 
     definitions = _context_definitions()
+    index = match_index or MatchIndex(mol)
     composite_tokens = [
         candidate for candidate in CONTEXT_PRECEDENCE
         if definitions[candidate].get("classification_method") == "mapped_smarts"
     ]
     for candidate in composite_tokens:
-        if _matches_mapped_context(mol, atom_index, definitions[candidate], excluded_set):
-            token = candidate
-            break
+        matched_atoms = index.context_match(definitions[candidate], atom_index, excluded_set)
+        if matched_atoms is not None:
+            return ContextClassification(
+                token=candidate,
+                attachment_atom_index=atom_index,
+                fragment_atom_indices=tuple(sorted(set(matched_atoms))),
+                classification_method="mapped_smarts",
+                matched_pattern=candidate,
+                features={"excluded_atom_indices": sorted(excluded_set)},
+            )
     else:
         if symbol == "C":
             if atom.GetIsAromatic():
-                token = _aromatic_ring_token(mol, atom)
+                return _aromatic_ring_context(mol, atom)
             elif str(atom.GetHybridization()) == "SP":
                 token = "Alkynyl"
             elif str(atom.GetHybridization()) == "SP2":
@@ -111,20 +93,33 @@ def classify_context(mol: Any, atom_index: int, excluded: Iterable[int] = ()) ->
         elif symbol in {"N", "O", "S"}:
             token = symbol
 
-    return {"token": token, "atom_indices": [atom_index], "features": {}}
+    method = "element" if symbol in {"N", "O", "S"} else ("fallback" if token == "Other" else "atom_property")
+    return ContextClassification(
+        token=token,
+        attachment_atom_index=atom_index,
+        fragment_atom_indices=(atom_index,),
+        classification_method=method,
+        features={"element": symbol, "hybridization": str(atom.GetHybridization()), "aromatic": atom.GetIsAromatic()},
+    )
 
 
-def classify_neighbor_contexts(mol: Any, center_index: int, excluded: Iterable[int] = ()) -> List[Dict[str, Any]]:
+def classify_neighbor_contexts(
+    mol: Any,
+    center_index: int,
+    excluded: Iterable[int] = (),
+    *,
+    match_index: MatchIndex | None = None,
+) -> List[ContextClassification]:
     """Return retained heavy-atom contexts directly attached to a center."""
     excluded_set = set(excluded) | {center_index}
     center = mol.GetAtomWithIdx(center_index)
     contexts = [
-        classify_context(mol, neighbor.GetIdx(), excluded_set)
+        classify_context(mol, neighbor.GetIdx(), excluded_set, match_index=match_index)
         for neighbor in center.GetNeighbors()
         if neighbor.GetAtomicNum() > 1 and neighbor.GetIdx() not in excluded_set
     ]
     rank = {token: i for i, token in enumerate(CONTEXT_PRECEDENCE)}
-    return sorted(contexts, key=lambda item: (rank.get(item["token"], 999), item["token"], item["atom_indices"]))
+    return sorted(contexts, key=lambda item: (rank.get(item.token, 999), item.token, item.attachment_atom_index))
 
 
 __all__ = ["CONTEXT_PRECEDENCE", "classify_context", "classify_neighbor_contexts", "load_context_taxonomy"]

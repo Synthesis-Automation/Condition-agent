@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 
 SiteType = Literal[
@@ -12,6 +12,41 @@ SiteType = Literal[
     "transfer_group",
     "electrophilic_center",
 ]
+
+
+@dataclass(frozen=True)
+class ContextClassification:
+    """One retained local context attached to a reactive center."""
+
+    token: str
+    attachment_atom_index: int
+    fragment_atom_indices: Tuple[int, ...]
+    classification_method: str
+    subtype: Optional[str] = None
+    matched_pattern: Optional[str] = None
+    features: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class SiteCandidate:
+    """Typed internal candidate passed from detection to resolution."""
+
+    site_type: SiteType
+    topology: Literal["edge", "atom", "center"]
+    atom_roles: Dict[str, Tuple[int, ...]]
+    atom_indices: Tuple[int, ...]
+    bond_indices: Tuple[int, ...]
+    canonical_signature: str
+    render_kind: str
+    render_data: Dict[str, Any]
+    matched_patterns: Tuple[str, ...]
+    details: Dict[str, Any] = field(default_factory=dict)
+    context_records: Tuple[ContextClassification, ...] = ()
+    availability: str = "available"
+    warnings: Tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -26,6 +61,7 @@ class ReactiveSite:
     bond_indices: List[int]
     canonical_signature: str
     chemist_label: str
+    availability: str = "available"
     details: Dict[str, Any] = field(default_factory=dict)
     context_features: Dict[str, Any] = field(default_factory=dict)
     confidence: float = 1.0
@@ -83,4 +119,4 @@ class CompoundAnalysis:
         }
 
 
-__all__ = ["ComponentAnalysis", "CompoundAnalysis", "ReactiveSite", "SiteType"]
+__all__ = ["ComponentAnalysis", "CompoundAnalysis", "ContextClassification", "ReactiveSite", "SiteCandidate", "SiteType"]
