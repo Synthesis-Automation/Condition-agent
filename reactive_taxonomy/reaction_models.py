@@ -73,6 +73,7 @@ class ReactionPartnerEnvironment:
     coordination_group_ids: Tuple[str, ...] = ()
     unprotected_xh_group_ids: Tuple[str, ...] = ()
     flags: Tuple[str, ...] = ()
+    features: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -104,6 +105,7 @@ class ProductConnection:
     endpoint_1: ProductConnectionEndpoint
     endpoint_2: ProductConnectionEndpoint
     bond_order: str
+    connection_type: str
     concise_label: str
     evidence: str
     schema_version: str = "1.0"

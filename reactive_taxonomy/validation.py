@@ -77,6 +77,12 @@ def validate_taxonomy() -> List[str]:
         errors.append("invalid_suzuki_environment_roles")
     if not suzuki_rules.get("competing_site_types"):
         errors.append("missing_suzuki_competing_site_types")
+    cn_rules = family_rules.get("c_n_coupling") or {}
+    if set(cn_rules.get("roles") or []) != {"electrophile", "nucleophile"}:
+        errors.append("invalid_cn_environment_roles")
+    for family_id in ("c_o_coupling", "c_s_coupling"):
+        if set((family_rules.get(family_id) or {}).get("roles") or []) != {"electrophile", "nucleophile"}:
+            errors.append(f"invalid_heteroatom_environment_roles:{family_id}")
     group_records = payload["functional_groups.v1"].get("groups") or []
     group_ids = [str(record.get("id") or "") for record in group_records]
     if not group_records:

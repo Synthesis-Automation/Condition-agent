@@ -19,6 +19,22 @@
       "challenging_leaving_groups": ["Cl", "F"],
       "protodeboronation_contexts": ["HeteroAr"],
       "protodeboronation_handles": ["B(OH)2"]
+    },
+    "c_n_coupling": {
+      "roles": ["electrophile", "nucleophile"],
+      "coordination_tags": ["strong_metal_binding", "palladium_poisoning"],
+      "competing_site_types": ["leaving_group", "pronucleophile_XH"],
+      "challenging_leaving_groups": ["Cl", "F"]
+    },
+    "c_o_coupling": {
+      "roles": ["electrophile", "nucleophile"],
+      "competing_site_types": ["leaving_group", "pronucleophile_XH"],
+      "challenging_leaving_groups": ["Cl", "F"]
+    },
+    "c_s_coupling": {
+      "roles": ["electrophile", "nucleophile"],
+      "competing_site_types": ["leaving_group", "pronucleophile_XH"],
+      "challenging_leaving_groups": ["Cl", "F"]
     }
   }
 }

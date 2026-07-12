@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "element": "O",
+  "transformation": "C_O",
+  "total_rows": 300,
+  "tier_counts": {
+    "verified": 78,
+    "review": 198,
+    "rejected": 24
+  },
+  "reason_counts": {
+    "exact_single_event_c_o_with_conditions": 78,
+    "incomplete_condition_identity": 182,
+    "invalid_reaction_smiles": 2,
+    "missing_c_o_coupling_environment": 49,
+    "missing_c_o_product_connection": 49,
+    "multiple_products": 7,
+    "not_verified_as_sp2_c_o_substitution": 49,
+    "reaction_not_exactly_verified": 49,
+    "unresolved_transformation": 22
+  },
+  "label_coverage": {
+    "verified": 78,
+    "review": 198,
+    "rejected": 0
+  },
+  "product_connection_coverage": {
+    "verified": 78,
+    "review": 149,
+    "rejected": 0
+  }
+}

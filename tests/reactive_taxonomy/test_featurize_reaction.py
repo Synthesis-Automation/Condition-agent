@@ -34,7 +34,22 @@ def test_cn_exact_product_reconstruction() -> None:
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
     result = featurize_reaction(reaction)
     assert result.transformation_class == "sp2_c_n_substitution"
-    assert result.reaction_label == "Ar–Br + Ar–NH2 → Ar1Ar2–NH"
+    assert result.reaction_label == "Ar–Br + Ar–NH2 → Ar–NH–Ar"
+    assert result.product_connection.connection_type == "C_N"
+    assert result.family_environment.family_id == "c_n_coupling"
+
+
+def test_secondary_amine_product_consumes_nitrogen_hydrogen() -> None:
+    result = featurize_reaction("Brc1ccccc1.CNC>>CN(C)c1ccccc1")
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.product_connection.connection_type == "C_N"
+    assert "NH" not in result.product_connection.concise_label
+
+
+def test_amide_nitrogen_context_is_rendered_from_attachment_atom() -> None:
+    result = featurize_reaction("Brc1ccccc1.CC(=O)NC>>CC(=O)N(C)c1ccccc1")
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert "N(C(O)–R)(R)" in result.product_connection.concise_label
 
 
 def test_amide_exact_product_reconstruction() -> None:
@@ -84,6 +99,19 @@ def test_additional_v1_grammars_reconstruct_products() -> None:
         result = featurize_reaction(reaction)
         assert result.evidence_quality == "exact_product_reconstruction", reaction
         assert result.selected_candidate.grammar_id == grammar_id
+
+
+def test_oxygen_and_sulfur_products_have_typed_connections_and_environments() -> None:
+    cases = {
+        "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1": ("C_O", "c_o_coupling", "Ar–O–Ar"),
+        "Brc1ccccc1.CCS>>CCSc1ccccc1": ("C_S", "c_s_coupling", "Ar–S–R"),
+    }
+    for reaction, (connection_type, family_id, label) in cases.items():
+        result = featurize_reaction(reaction)
+        assert result.evidence_quality == "exact_product_reconstruction"
+        assert result.product_connection.connection_type == connection_type
+        assert result.product_connection.concise_label == label
+        assert result.family_environment.family_id == family_id
 
 
 def test_composite_triflate_handle_is_removed_as_complete_fragment() -> None:

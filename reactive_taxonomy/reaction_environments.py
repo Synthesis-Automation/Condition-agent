@@ -39,7 +39,14 @@ def build_reaction_family_environment(
     evidence_quality: str,
 ) -> ReactionFamilyEnvironment | None:
     """Build an interpretable family feature overlay for a selected event."""
-    if selected is None or "suzuki_miyaura" not in selected.compatible_named_families:
+    if selected is None:
+        return None
+    if selected.grammar_id == "sp2_c_n_substitution":
+        return _build_cn_environment(components, selected, spectators, evidence_quality)
+    if selected.grammar_id in {"sp2_c_o_substitution", "sp2_c_s_substitution"}:
+        element = "O" if selected.grammar_id == "sp2_c_o_substitution" else "S"
+        return _build_heteroatom_environment(components, selected, spectators, evidence_quality, element)
+    if "suzuki_miyaura" not in selected.compatible_named_families:
         return None
     family_id = "suzuki_miyaura"
     rules = _family_rules().get(family_id) or {}
@@ -122,6 +129,123 @@ def build_reaction_family_environment(
         partners=tuple(partners),
         flags=_unique(family_flags),
         evidence=evidence_quality,
+    )
+
+
+def _build_cn_environment(
+    components: Tuple[ReactionComponent, ...],
+    selected: ReactionCandidate,
+    spectators: Tuple[ReactionSpectatorGroup, ...],
+    evidence_quality: str,
+) -> ReactionFamilyEnvironment:
+    rules = _family_rules().get("c_n_coupling") or {}
+    partners: List[ReactionPartnerEnvironment] = []
+    family_flags: List[str] = []
+    for role in ("electrophile", "nucleophile"):
+        reference = selected.role_assignments[role]
+        component = _component(components, reference.component_index)
+        environment = next((item for item in component.compound_analysis.site_environments if item.site_id == reference.site_id), None) if component else None
+        role_spectators = [group for group in spectators if group.component_index == reference.component_index]
+        competing = [
+            site.chemist_label for site in (component.compound_analysis.sites if component else [])
+            if site.site_id != reference.site_id and site.site_type in set(rules.get("competing_site_types") or [])
+        ]
+        coordination = _unique(
+            group.group_id for group in role_spectators
+            if set(rules.get("coordination_tags") or []).intersection(group.tags)
+        )
+        flags: List[str] = []
+        features: Dict[str, Any] = {}
+        if role == "electrophile":
+            anchor_context = reference.details.get("anchor_context")
+            handle_token = reference.details.get("handle_token")
+            if anchor_context == "HeteroAr": flags.append("heteroaryl_electrophile")
+            if handle_token in set(rules.get("challenging_leaving_groups") or []): flags.append("challenging_c_n_activation")
+        else:
+            anchor_context = None
+            handle_token = reference.details.get("center_token")
+            features = {
+                "center_token": reference.details.get("center_token"),
+                "initial_h_count": int(reference.details.get("h_count", 0)),
+                "retained_contexts": tuple(reference.details.get("contexts") or ()),
+                "derived_family": reference.details.get("derived_family"),
+                "availability": reference.availability,
+            }
+            if reference.availability == "deactivated": flags.append("deactivated_nucleophile")
+            if reference.details.get("center_token") == "N_aromatic": flags.append("aromatic_nh")
+            if reference.details.get("derived_family") == "hydrazine": flags.append("hydrazine_partner")
+        if competing: flags.append("competing_reactive_handle")
+        if coordination: flags.append("coordination_risk")
+        family_flags.extend(f"{role}:{flag}" for flag in flags)
+        partners.append(ReactionPartnerEnvironment(
+            role=role, component_index=reference.component_index, site_id=reference.site_id,
+            handle_token=str(handle_token) if handle_token else None,
+            anchor_context=str(anchor_context) if anchor_context else None,
+            chemist_label=reference.chemist_label,
+            steric=dict(environment.steric) if environment else {},
+            electronic=dict(environment.electronic) if environment else {},
+            nearby_groups=environment.nearby_groups if environment else (),
+            spectator_group_ids=_unique(group.group_id for group in role_spectators),
+            competing_site_labels=_unique(competing), coordination_group_ids=coordination,
+            flags=_unique(flags), features=features,
+        ))
+    return ReactionFamilyEnvironment(
+        family_id="c_n_coupling", partners=tuple(partners), flags=_unique(family_flags),
+        evidence=evidence_quality,
+    )
+
+
+def _build_heteroatom_environment(
+    components: Tuple[ReactionComponent, ...],
+    selected: ReactionCandidate,
+    spectators: Tuple[ReactionSpectatorGroup, ...],
+    evidence_quality: str,
+    element: str,
+) -> ReactionFamilyEnvironment:
+    family_id = "c_o_coupling" if element == "O" else "c_s_coupling"
+    rules = _family_rules().get(family_id) or {}
+    partners: List[ReactionPartnerEnvironment] = []
+    family_flags: List[str] = []
+    for role in ("electrophile", "nucleophile"):
+        reference = selected.role_assignments[role]
+        component = _component(components, reference.component_index)
+        environment = next((item for item in component.compound_analysis.site_environments if item.site_id == reference.site_id), None) if component else None
+        role_spectators = [group for group in spectators if group.component_index == reference.component_index]
+        competing = [site.chemist_label for site in (component.compound_analysis.sites if component else []) if site.site_id != reference.site_id and site.site_type in set(rules.get("competing_site_types") or [])]
+        flags: List[str] = []
+        features: Dict[str, Any] = {}
+        if role == "electrophile":
+            anchor_context = reference.details.get("anchor_context")
+            handle_token = reference.details.get("handle_token")
+            if anchor_context == "HeteroAr": flags.append("heteroaryl_electrophile")
+            if handle_token in set(rules.get("challenging_leaving_groups") or []): flags.append("challenging_heteroatom_activation")
+        else:
+            anchor_context = None
+            handle_token = reference.details.get("center_token")
+            features = {
+                "element": element,
+                "initial_h_count": int(reference.details.get("h_count", 0)),
+                "retained_contexts": tuple(reference.details.get("contexts") or ()),
+                "derived_family": reference.details.get("derived_family"),
+                "availability": reference.availability,
+            }
+            if reference.availability == "deactivated": flags.append("deactivated_nucleophile")
+            if element == "S": flags.append("sulfur_coordination_risk")
+        if competing: flags.append("competing_reactive_handle")
+        family_flags.extend(f"{role}:{flag}" for flag in flags)
+        partners.append(ReactionPartnerEnvironment(
+            role=role, component_index=reference.component_index, site_id=reference.site_id,
+            handle_token=str(handle_token) if handle_token else None,
+            anchor_context=str(anchor_context) if anchor_context else None,
+            chemist_label=reference.chemist_label,
+            steric=dict(environment.steric) if environment else {},
+            electronic=dict(environment.electronic) if environment else {},
+            nearby_groups=environment.nearby_groups if environment else (),
+            spectator_group_ids=_unique(group.group_id for group in role_spectators),
+            competing_site_labels=_unique(competing), flags=_unique(flags), features=features,
+        ))
+    return ReactionFamilyEnvironment(
+        family_id=family_id, partners=tuple(partners), flags=_unique(family_flags), evidence=evidence_quality,
     )
 
 

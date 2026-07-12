@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .reaction_labels import load_reaction_rendering, render_context_connection
+from .reaction_labels import _nitrogen_product, load_reaction_rendering, render_context_connection, render_heteroatom_product
 from .reaction_models import ProductConnection, ProductConnectionEndpoint, ReactionCandidate
 
 
@@ -16,12 +16,35 @@ def build_product_connection(
     if selected is None or evidence_quality != "exact_product_reconstruction":
         return None
     rule = load_reaction_rendering().get(selected.grammar_id) or {}
-    if rule.get("product_kind") != "join_contexts":
+    kind = rule.get("product_kind")
+    if kind == "join_contexts":
+        left_role, right_role = str(rule["left_role"]), str(rule["right_role"])
+        right_atom_role = "anchor"
+        right_context_key = "anchor_context"
+        connection_type = "C_C"
+    elif kind == "nitrogen_substitution":
+        left_role, right_role = str(rule["anchor_role"]), str(rule["nitrogen_role"])
+        right_atom_role = "center"
+        right_context_key = "center_token"
+        connection_type = "C_N"
+    elif kind == "heteroatom_substitution":
+        left_role, right_role = str(rule["anchor_role"]), str(rule["partner_role"])
+        right_atom_role = "center"
+        right_context_key = "center_token"
+        connection_type = f"C_{rule['element']}"
+    else:
         return None
-    left_role, right_role = str(rule["left_role"]), str(rule["right_role"])
     left, right = selected.role_assignments[left_role], selected.role_assignments[right_role]
     left_context = str(left.details.get("anchor_context") or "Other")
-    right_context = str(right.details.get("anchor_context") or "Other")
+    right_context = str(right.details.get(right_context_key) or "N")
+    if connection_type == "C_C":
+        concise_label = render_context_connection(left_context, right_context, style=style)
+    elif connection_type == "C_N":
+        concise_label = _nitrogen_product(left_context, right, "–" if style == "unicode" else "-", style)
+    else:
+        concise_label = render_heteroatom_product(
+            left_context, right, connection_type[-1], style=style
+        )
     return ProductConnection(
         endpoint_1=ProductConnectionEndpoint(
             role=left_role,
@@ -33,12 +56,13 @@ def build_product_connection(
         endpoint_2=ProductConnectionEndpoint(
             role=right_role,
             component_index=right.component_index,
-            atom_index=int(right.atom_roles["anchor"][0]),
+            atom_index=int(right.atom_roles[right_atom_role][0]),
             context=right_context,
             source_site_id=right.site_id,
         ),
         bond_order="single",
-        concise_label=render_context_connection(left_context, right_context, style=style),
+        connection_type=connection_type,
+        concise_label=concise_label,
         evidence=evidence_quality,
     )
 
