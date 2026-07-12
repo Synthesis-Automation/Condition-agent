@@ -1,6 +1,6 @@
-from chemtools.reactive_taxonomy import MatchIndex, SiteCandidate, available_styles, featurize_molecule, load_handle_patterns, validate_taxonomy
-from chemtools.reactive_taxonomy.context import load_context_taxonomy
-from chemtools.reactive_taxonomy.sites import pronucleophiles
+from reactive_taxonomy import MatchIndex, SiteCandidate, available_styles, featurize_molecule, load_handle_patterns, validate_taxonomy
+from reactive_taxonomy.context import load_context_taxonomy
+from reactive_taxonomy.sites import pronucleophiles
 
 
 def signatures(smiles: str) -> set[str]:

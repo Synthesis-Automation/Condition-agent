@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "groups": [
+    {"id":"carboxylic_acid","label":"CO2H","smarts":"[C:1](=[O:2])[O;H1:3]","priority":100,"tags":["acidic","hydrogen_bond_donor","metal_binding"]},
+    {"id":"sulfonamide","label":"SO2NR2","smarts":"[S:1](=[O:2])(=[O:3])[N:4]","priority":98,"tags":["acid_sensitive","metal_binding"]},
+    {"id":"amide","label":"CONR2","smarts":"[C:1](=[O:2])[N:3]","priority":96,"tags":["metal_binding","hydrogen_bond_acceptor"]},
+    {"id":"ester","label":"CO2R","smarts":"[C:1](=[O:2])[O;H0:3]","priority":94,"tags":["hydrolysis_sensitive","hydrogen_bond_acceptor"]},
+    {"id":"aldehyde","label":"CHO","smarts":"[C;H1:1](=[O:2])","priority":92,"tags":["electrophilic","oxidation_sensitive","reduction_sensitive","electron_withdrawing"]},
+    {"id":"ketone","label":"C(O)R2","smarts":"[C;H0:1](=[O:2])([#6:3])[#6:4]","priority":90,"tags":["electrophilic","reduction_sensitive","electron_withdrawing"]},
+    {"id":"nitrile","label":"C≡N","smarts":"[C:1]#[N:2]","priority":88,"tags":["electron_withdrawing","metal_binding"]},
+    {"id":"nitro","label":"NO2","smarts":"[N+:1](=[O:2])[O-:3]","priority":88,"tags":["electron_withdrawing","reduction_sensitive"]},
+    {"id":"sulfone","label":"SO2R2","smarts":"[S;X4:1](=[O:2])(=[O:3])([#6:4])[#6:5]","priority":86,"tags":["electron_withdrawing","reduction_sensitive"]},
+    {"id":"phenol","label":"Ar–OH","smarts":"[c:1][O;H1:2]","priority":84,"tags":["acidic","nucleophilic","unprotected_XH","metal_binding"]},
+    {"id":"alcohol","label":"R–OH","smarts":"[C;!$(C=O):1][O;H1:2]","priority":82,"tags":["nucleophilic","unprotected_XH","oxidation_sensitive","metal_binding"]},
+    {"id":"thiol","label":"R–SH","smarts":"[#6:1][S;H1:2]","priority":82,"tags":["acidic","nucleophilic","unprotected_XH","metal_binding","oxidation_sensitive"]},
+    {"id":"primary_amine","label":"R–NH2","smarts":"[N;X3;H2;!$(N-C=O):1]","priority":80,"tags":["basic","nucleophilic","unprotected_XH","metal_binding"]},
+    {"id":"secondary_amine","label":"R2NH","smarts":"[N;X3;H1;!$(N-C=O):1]","priority":79,"tags":["basic","nucleophilic","unprotected_XH","metal_binding"]},
+    {"id":"tertiary_amine","label":"R3N","smarts":"[N;X3;H0;!$(N-C=O):1]","priority":78,"tags":["basic","nucleophilic","metal_binding"]},
+    {"id":"heteroaryl_nitrogen","label":"HetAr–N","smarts":"[n;H0:1]","priority":76,"tags":["basic","metal_binding","electron_withdrawing"]},
+    {"id":"ether","label":"R–O–R","smarts":"[O;X2;H0;!$([O]-[C,S,P]=O):1]","priority":60,"tags":["hydrogen_bond_acceptor","metal_binding"]},
+    {"id":"aryl_halide","label":"Ar–X","smarts":"[c:1]-[F,Cl,Br,I:2]","priority":58,"tags":["competing_coupling_handle"]},
+    {"id":"alkene","label":"C=C","smarts":"[C:1]=[C:2]","priority":40,"tags":["oxidation_sensitive","reduction_sensitive"]},
+    {"id":"alkyne","label":"C≡C","smarts":"[C:1]#[C:2]","priority":40,"tags":["oxidation_sensitive","reduction_sensitive"]}
+  ]
+}

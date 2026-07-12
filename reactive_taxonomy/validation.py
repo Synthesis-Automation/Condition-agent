@@ -1,0 +1,160 @@
+"""Validation for the isolated reactive-taxonomy data bundle."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Dict, List
+
+from .chemistry.smarts_cache import compile_smarts
+
+
+DEFINITIONS_DIR = Path(__file__).with_name("definitions")
+
+
+def load_taxonomy_data() -> Dict[str, Any]:
+    """Load all v1 taxonomy documents."""
+    payload: Dict[str, Any] = {}
+    for path in sorted(DEFINITIONS_DIR.glob("*.v1.json")):
+        with path.open("r", encoding="utf-8") as handle:
+            payload[path.stem] = json.load(handle)
+    return payload
+
+
+def validate_taxonomy() -> List[str]:
+    """Return validation errors; an empty list means the bundle is valid."""
+    errors: List[str] = []
+    try:
+        payload = load_taxonomy_data()
+    except (OSError, json.JSONDecodeError) as exc:
+        return [f"taxonomy_load_failed:{exc}"]
+    expected = {"contexts.v1", "descriptor_rules.v1", "functional_groups.v1", "handles.v1", "rendering.v1", "reaction_grammars.v1", "reaction_rendering.v1"}
+    missing = expected - set(payload)
+    if missing:
+        errors.append(f"missing_taxonomy_files:{','.join(sorted(missing))}")
+        return errors
+    contexts = payload["contexts.v1"]
+    context_records = contexts.get("contexts") or []
+    tokens = [str(record.get("id") or "") for record in context_records]
+    precedence = contexts.get("precedence") or []
+    if len(tokens) != len(set(tokens)):
+        errors.append("duplicate_context_tokens")
+    if set(tokens) != set(precedence):
+        errors.append("context_precedence_mismatch")
+    allowed_methods = {"mapped_smarts", "aromatic_ring_system", "atom_property", "element", "fallback"}
+    for record in context_records:
+        context_id = str(record.get("id") or "<missing>")
+        method = str(record.get("classification_method") or "")
+        if method not in allowed_methods:
+            errors.append(f"invalid_context_method:{context_id}")
+        if method == "mapped_smarts":
+            compiled = compile_smarts(str(record.get("smarts") or ""), validate=False)
+            if compiled is None:
+                errors.append(f"invalid_context_smarts:{context_id}")
+                continue
+            available_maps = {int(atom.GetAtomMapNum()) for atom in compiled.GetAtoms() if atom.GetAtomMapNum()}
+            roles = record.get("atom_roles") or {}
+            if "context_anchor" not in roles:
+                errors.append(f"missing_context_anchor:{context_id}")
+            for role, raw_maps in roles.items():
+                role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
+                if {int(value) for value in role_maps} - available_maps:
+                    errors.append(f"unknown_context_atom_map:{context_id}:{role}")
+    families = payload["handles.v1"].get("site_families") or {}
+    required = {"leaving_group", "pronucleophile_XH", "transfer_group", "electrophilic_center"}
+    if set(families) != required:
+        errors.append("site_family_mismatch")
+    descriptor_rules = payload["descriptor_rules.v1"].get("site_environment") or {}
+    if int(descriptor_rules.get("local_group_radius", 0)) < 1:
+        errors.append("invalid_local_group_radius")
+    if int(descriptor_rules.get("steric_radius", 0)) < 1:
+        errors.append("invalid_steric_radius")
+    if not isinstance(descriptor_rules.get("electronic_tag_weights"), dict):
+        errors.append("invalid_electronic_tag_weights")
+    group_records = payload["functional_groups.v1"].get("groups") or []
+    group_ids = [str(record.get("id") or "") for record in group_records]
+    if not group_records:
+        errors.append("missing_functional_groups")
+    if len(group_ids) != len(set(group_ids)):
+        errors.append("duplicate_functional_group_ids")
+    for record in group_records:
+        group_id = str(record.get("id") or "<missing>")
+        if not record.get("label"):
+            errors.append(f"missing_functional_group_label:{group_id}")
+        if compile_smarts(str(record.get("smarts") or ""), validate=False) is None:
+            errors.append(f"invalid_functional_group_smarts:{group_id}")
+    patterns = payload["handles.v1"].get("patterns") or []
+    pattern_ids = [str(pattern.get("id") or "") for pattern in patterns]
+    if not patterns:
+        errors.append("missing_handle_patterns")
+    if len(pattern_ids) != len(set(pattern_ids)):
+        errors.append("duplicate_handle_pattern_ids")
+    for pattern in patterns:
+        pattern_id = str(pattern.get("id") or "<missing>")
+        if pattern.get("site_type") not in required:
+            errors.append(f"invalid_pattern_site_type:{pattern_id}")
+        smarts = str(pattern.get("smarts") or "")
+        compiled = compile_smarts(smarts, validate=False)
+        if compiled is None:
+            errors.append(f"invalid_pattern_smarts:{pattern_id}")
+            continue
+        available_maps = {int(atom.GetAtomMapNum()) for atom in compiled.GetAtoms() if atom.GetAtomMapNum()}
+        for role, raw_maps in (pattern.get("atom_roles") or {}).items():
+            role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
+            unknown_maps = {int(value) for value in role_maps} - available_maps
+            if unknown_maps:
+                errors.append(f"unknown_atom_map:{pattern_id}:{role}")
+        for rule in pattern.get("suppresses") or []:
+            if rule.get("site_type") not in required:
+                errors.append(f"invalid_suppression_site_type:{pattern_id}")
+            if rule.get("owned_role") not in (pattern.get("atom_roles") or {}):
+                errors.append(f"invalid_suppression_role:{pattern_id}")
+    rendering = payload["rendering.v1"]
+    styles = rendering.get("styles") or {}
+    if rendering.get("default_style") not in styles:
+        errors.append("invalid_default_rendering_style")
+    for style_id, style in styles.items():
+        if not isinstance(style, dict) or not style.get("bond"):
+            errors.append(f"invalid_rendering_style:{style_id}")
+    rendering_contexts = set((rendering.get("context_labels") or {}).keys())
+    if not rendering_contexts <= set(tokens):
+        errors.append("unknown_rendering_context")
+    rendering_rules = rendering.get("xh_rules") or []
+    rendering_rule_ids = [str(rule.get("id") or "") for rule in rendering_rules]
+    if len(rendering_rule_ids) != len(set(rendering_rule_ids)):
+        errors.append("duplicate_rendering_rule_ids")
+    if any(not rule.get("template") for rule in rendering_rules):
+        errors.append("missing_rendering_template")
+    grammar_ids: List[str] = []
+    allowed_operators = {"join_two_anchors", "replace_handle_with_center"}
+    known_roles: Dict[str, set[str]] = {site_type: set() for site_type in required}
+    for pattern in patterns:
+        known_roles.get(str(pattern.get("site_type")), set()).update((pattern.get("atom_roles") or {}).keys())
+    for grammar in payload["reaction_grammars.v1"].get("grammars") or []:
+        grammar_id = str(grammar.get("id") or "<missing>")
+        grammar_ids.append(grammar_id)
+        roles = grammar.get("roles") or {}
+        if not roles:
+            errors.append(f"missing_reaction_roles:{grammar_id}")
+        for role_name, constraint in roles.items():
+            if constraint.get("site_type") not in required:
+                errors.append(f"invalid_reaction_site_type:{grammar_id}:{role_name}")
+        operator = grammar.get("operator") or {}
+        if operator.get("id") not in allowed_operators:
+            errors.append(f"invalid_reaction_operator:{grammar_id}")
+        for pair in grammar.get("distinct_components") or []:
+            if len(pair) != 2 or any(role not in roles for role in pair):
+                errors.append(f"invalid_distinct_component_rule:{grammar_id}")
+    if len(grammar_ids) != len(set(grammar_ids)):
+        errors.append("duplicate_reaction_grammar_ids")
+    reaction_rendering = payload["reaction_rendering.v1"].get("rules") or {}
+    if set(reaction_rendering) != set(grammar_ids):
+        errors.append("reaction_rendering_coverage_mismatch")
+    allowed_product_kinds = {"join_contexts", "nitrogen_substitution", "heteroatom_substitution", "terminal_alkyne", "chan_lam", "amide", "acyl_heteroatom", "sulfonamide"}
+    for grammar_id, rule in reaction_rendering.items():
+        if rule.get("product_kind") not in allowed_product_kinds:
+            errors.append(f"invalid_reaction_product_renderer:{grammar_id}")
+    return errors
+
+
+__all__ = ["load_taxonomy_data", "validate_taxonomy"]

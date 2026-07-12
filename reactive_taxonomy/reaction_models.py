@@ -1,0 +1,95 @@
+"""Typed models for reactive-taxonomy reaction analysis."""
+
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List, Literal, Optional, Tuple
+
+from .models import CompoundAnalysis
+
+
+@dataclass(frozen=True)
+class ReactionComponent:
+    side: Literal["reactant", "agent", "product"]
+    component_index: int
+    input_smiles: str
+    canonical_smiles: str
+    atom_mapped: bool
+    compound_analysis: CompoundAnalysis
+
+
+@dataclass(frozen=True)
+class ReactionSiteReference:
+    side: str
+    component_index: int
+    site_id: str
+    site_type: str
+    canonical_signature: str
+    chemist_label: str
+    availability: str
+    atom_roles: Dict[str, Tuple[int, ...]]
+    details: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class BondChange:
+    change_type: Literal["formed", "broken", "order_changed"]
+    atom_1_role: str
+    atom_2_role: str
+    old_order: Optional[str]
+    new_order: Optional[str]
+    evidence: str
+
+
+@dataclass(frozen=True)
+class ReactionSpectatorGroup:
+    """Functional group retained outside the selected reaction event."""
+
+    group_id: str
+    chemist_label: str
+    component_index: int
+    atom_indices: Tuple[int, ...]
+    nearest_reactive_site_id: Optional[str]
+    graph_distance: Optional[int]
+    tags: Tuple[str, ...] = ()
+    unchanged_evidence: str = "selected_event_exclusion"
+
+
+@dataclass(frozen=True)
+class ReactionCandidate:
+    grammar_id: str
+    transformation_class: str
+    role_assignments: Dict[str, ReactionSiteReference]
+    predicted_bond_changes: Tuple[BondChange, ...]
+    predicted_product_smiles: Optional[str]
+    verification: str
+    reaction_label: Optional[str]
+    compatible_named_families: Tuple[str, ...] = ()
+    warnings: Tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ReactionAnalysis:
+    input_reaction_smiles: str
+    valid: bool
+    reactants: Tuple[ReactionComponent, ...] = ()
+    agents: Tuple[ReactionComponent, ...] = ()
+    products: Tuple[ReactionComponent, ...] = ()
+    candidates: Tuple[ReactionCandidate, ...] = ()
+    selected_candidate: Optional[ReactionCandidate] = None
+    transformation_class: Optional[str] = None
+    compatible_named_families: Tuple[str, ...] = ()
+    named_family: Optional[str] = None
+    reaction_label: Optional[str] = None
+    evidence_quality: str = "unresolved"
+    mapped_bond_changes: Tuple[Dict[str, Any], ...] = ()
+    spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
+    warnings: Tuple[str, ...] = ()
+    error: Optional[str] = None
+    schema_version: str = "1.1"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+__all__ = ["BondChange", "ReactionAnalysis", "ReactionCandidate", "ReactionComponent", "ReactionSiteReference", "ReactionSpectatorGroup"]

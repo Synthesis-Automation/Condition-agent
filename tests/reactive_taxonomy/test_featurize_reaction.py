@@ -1,4 +1,4 @@
-from chemtools.reactive_taxonomy import featurize_reaction, validate_taxonomy
+from reactive_taxonomy import featurize_reaction, validate_taxonomy
 
 
 def test_reaction_grammar_taxonomy_validates() -> None:
