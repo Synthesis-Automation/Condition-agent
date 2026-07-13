@@ -29,7 +29,16 @@
     ],
     "electrophilic_center": [
       "Acyl",
-      "Sulfonyl"
+      "Sulfonyl",
+      "Carbonyl"
+    ],
+    "aromatic_CH": [
+      "ArH",
+      "HetArH"
+    ],
+    "unsaturated_bond": [
+      "Alkene",
+      "Alkyne"
     ]
   },
   "patterns": [
@@ -237,6 +246,40 @@
       }
     },
     {
+      "id": "aldehyde_carbonyl",
+      "site_type": "electrophilic_center",
+      "tokens": [
+        "Carbonyl"
+      ],
+      "subtype": "aldehyde",
+      "reaction_mode": "addition",
+      "priority": 75,
+      "smarts": "[CX3;H1,H2;!$([C](-[O,N,S,F,Cl,Br,I])=O):1](=[O:2])",
+      "atom_roles": {
+        "center": 1,
+        "heteroatom": 2
+      }
+    },
+    {
+      "id": "ketone_carbonyl",
+      "site_type": "electrophilic_center",
+      "tokens": [
+        "Carbonyl"
+      ],
+      "subtype": "ketone",
+      "reaction_mode": "addition",
+      "priority": 70,
+      "smarts": "[#6:3]-[CX3H0:1](=[O:2])-[#6:4]",
+      "atom_roles": {
+        "center": 1,
+        "heteroatom": 2,
+        "substituents": [
+          3,
+          4
+        ]
+      }
+    },
+    {
       "id": "acyl_oxygen_or_halide",
       "site_type": "electrophilic_center",
       "tokens": [
@@ -271,6 +314,45 @@
           3
         ],
         "leaving_or_activatable": 4
+      }
+    },
+    {
+      "id": "aromatic_carbon_hydrogen",
+      "site_type": "aromatic_CH",
+      "tokens": [
+        "ArH",
+        "HetArH"
+      ],
+      "priority": 40,
+      "smarts": "[cH1:1]",
+      "atom_roles": {
+        "center": 1
+      }
+    },
+    {
+      "id": "carbon_carbon_alkene",
+      "site_type": "unsaturated_bond",
+      "tokens": [
+        "Alkene"
+      ],
+      "priority": 50,
+      "smarts": "[C:1]=[C:2]",
+      "atom_roles": {
+        "endpoint_a": 1,
+        "endpoint_b": 2
+      }
+    },
+    {
+      "id": "carbon_carbon_alkyne",
+      "site_type": "unsaturated_bond",
+      "tokens": [
+        "Alkyne"
+      ],
+      "priority": 50,
+      "smarts": "[C:1]#[C:2]",
+      "atom_roles": {
+        "endpoint_a": 1,
+        "endpoint_b": 2
       }
     }
   ]

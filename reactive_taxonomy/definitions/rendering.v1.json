@@ -25,6 +25,14 @@
     "P(O)R2": "R2P(O)"
   },
   "edge_template": "{context}{bond}{handle}",
+  "named_handle_templates": {
+    "carbonyl_formaldehyde": "H2C=O",
+    "carbonyl_aldehyde": "R{bond}CH=O",
+    "carbonyl_ketone": "R2C=O",
+    "aromatic_ch": "{context}{bond}H",
+    "alkene": "C=C",
+    "alkyne": "C≡C"
+  },
   "xh_rules": [
     {
       "id": "aromatic_nh",

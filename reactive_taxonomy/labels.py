@@ -43,6 +43,19 @@ def render_edge(context: str, handle: str, *, style: str = "unicode") -> str:
     return str(template).format(context=_context_label(context, bond), bond=bond, handle=handle)
 
 
+def render_named_handle(template_id: str, *, context: str = "", style: str = "unicode") -> str:
+    """Render a taxonomy-owned label for a center-, atom-, or bond-site."""
+    bond = _style(style)["bond"]
+    templates = load_rendering_taxonomy().get("named_handle_templates", {})
+    template = templates.get(template_id)
+    if template is None:
+        raise ValueError(f"Unknown named handle template: {template_id}")
+    return str(template).format(
+        bond=bond,
+        context=_context_label(context, bond) if context else "",
+    )
+
+
 def _rule_matches(rule: Dict[str, Any], center: str, h_count: int, contexts: List[str]) -> bool:
     if rule.get("center") != center:
         return False
@@ -78,4 +91,4 @@ def render_xh(center: str, h_count: int, contexts: List[str], *, style: str = "u
     )
 
 
-__all__ = ["available_styles", "load_rendering_taxonomy", "render_context", "render_edge", "render_xh"]
+__all__ = ["available_styles", "load_rendering_taxonomy", "render_context", "render_edge", "render_named_handle", "render_xh"]

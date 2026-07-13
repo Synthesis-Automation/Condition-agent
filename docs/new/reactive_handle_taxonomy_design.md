@@ -94,21 +94,21 @@ Do not use display labels as the only machine identity.
 
 ## 3. Version 1 Scope
 
-Version 1 should support four site families.
+Version 1 supports six site families.
 
 ```text
 reactive_site
 ├── leaving_group
 ├── pronucleophile_XH
 ├── transfer_group
-└── electrophilic_center
+├── electrophilic_center
+├── aromatic_CH
+└── unsaturated_bond
 ```
-
-A fifth family, `pi_partner`, is defined as an extension point but may be deferred.
 
 ### 3.1 Leaving-group sites
 
-General form:
+General forms:
 
 ```text
 Context–X
@@ -180,6 +180,7 @@ General form:
 
 ```text
 retained context–electrophilic center–leaving/activatable group
+retained context–polarized multiple bond
 ```
 
 Initial focus:
@@ -187,6 +188,7 @@ Initial focus:
 ```text
 acyl centers
 sulfonyl centers
+aldehyde and ketone carbonyl centers
 ```
 
 Examples:
@@ -196,9 +198,19 @@ R–C(O)OH
 R–C(O)Cl
 R–C(O)OR*
 R–S(O)2Cl
+R–CH=O
+R2C=O
 ```
 
-This family is needed for condensation and substitution reactions such as amide and sulfonamide formation.
+This family supports both substitution at acyl/sulfonyl centers and addition to aldehyde/ketone carbonyls. The `reaction_mode` field distinguishes those mechanisms.
+
+### 3.5 Aromatic C–H sites
+
+An aromatic C–H site is localized on an aromatic carbon bearing an implicit or explicit hydrogen. The detector emits `ArH` for carbocyclic aromatic systems and `HetArH` for heteroaromatic systems. Regioselectivity belongs to reaction-family descriptors rather than the generic SMARTS definition.
+
+### 3.6 Unsaturated carbon–carbon bonds
+
+Alkenes and alkynes are bond-localized sites with two retained endpoints. Their `bond` topology is distinct from an `edge`, where an anchor is connected to a removable or transferred handle. A terminal alkyne may validly emit both an `unsaturated_bond` site and a `pronucleophile_XH` site because the two records represent different reaction modes.
 
 ---
 
@@ -352,7 +364,7 @@ Required fields:
 | `schema_version` | Site schema version |
 | `site_id` | Stable identifier within the analyzed molecule/reaction |
 | `site_type` | One of the supported site families |
-| `topology` | `edge`, `atom`, or `center` |
+| `topology` | `edge`, `atom`, `center`, or `bond` |
 | `component_index` | Reactant/product component index |
 | `atom_indices` | Atoms defining the site |
 | `bond_indices` | Bonds defining the site |
@@ -487,6 +499,41 @@ EC|Acyl|Alkyl|OH|latent
 EC|Acyl|Ar|Cl|activated
 EC|Acyl|Ar|OR|ester
 EC|Sulfonyl|Ar|Cl|activated
+EC|Carbonyl|aldehyde|Alkyl|addition
+EC|Carbonyl|ketone|Alkyl,Alkyl|addition
+```
+
+Acyl and sulfonyl centers use `reaction_mode: substitution`. Aldehyde and ketone carbonyl centers use `reaction_mode: addition` and expose `center` and `heteroatom` atom roles.
+
+## 6.5 Aromatic C–H site
+
+```json
+{
+  "site_type": "aromatic_CH",
+  "topology": "atom",
+  "atom_roles": {"center": [3]},
+  "handle_token": "HetArH",
+  "ring_context": "HeteroAr",
+  "h_count": 1,
+  "canonical_signature": "CH|HetArH",
+  "chemist_label": "HeteroAr–H"
+}
+```
+
+## 6.6 Unsaturated-bond site
+
+```json
+{
+  "site_type": "unsaturated_bond",
+  "topology": "bond",
+  "atom_indices": [2, 3],
+  "bond_indices": [2],
+  "atom_roles": {"endpoint_a": [2], "endpoint_b": [3]},
+  "handle_token": "Alkene",
+  "bond_order": 2,
+  "canonical_signature": "PI|Alkene",
+  "chemist_label": "C=C"
+}
 ```
 
 ---
@@ -1298,6 +1345,8 @@ SiteType = Literal[
     "pronucleophile_XH",
     "transfer_group",
     "electrophilic_center",
+    "aromatic_CH",
+    "unsaturated_bond",
 ]
 
 
@@ -1305,7 +1354,7 @@ class ReactiveSite(BaseModel):
     schema_version: str = "1.0"
     site_id: str
     site_type: SiteType
-    topology: Literal["edge", "atom", "center"]
+    topology: Literal["edge", "atom", "center", "bond"]
     component_index: int
     atom_indices: list[int]
     bond_indices: list[int]

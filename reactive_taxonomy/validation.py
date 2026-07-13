@@ -61,7 +61,10 @@ def validate_taxonomy() -> List[str]:
                 if {int(value) for value in role_maps} - available_maps:
                     errors.append(f"unknown_context_atom_map:{context_id}:{role}")
     families = payload["handles.v1"].get("site_families") or {}
-    required = {"leaving_group", "pronucleophile_XH", "transfer_group", "electrophilic_center"}
+    required = {
+        "leaving_group", "pronucleophile_XH", "transfer_group",
+        "electrophilic_center", "aromatic_CH", "unsaturated_bond",
+    }
     if set(families) != required:
         errors.append("site_family_mismatch")
     descriptor_rules = payload["descriptor_rules.v1"].get("site_environment") or {}
@@ -131,6 +134,12 @@ def validate_taxonomy() -> List[str]:
     for style_id, style in styles.items():
         if not isinstance(style, dict) or not style.get("bond"):
             errors.append(f"invalid_rendering_style:{style_id}")
+    required_handle_templates = {
+        "carbonyl_formaldehyde", "carbonyl_aldehyde", "carbonyl_ketone",
+        "aromatic_ch", "alkene", "alkyne",
+    }
+    if not required_handle_templates <= set(rendering.get("named_handle_templates") or {}):
+        errors.append("missing_named_handle_templates")
     rendering_contexts = set((rendering.get("context_labels") or {}).keys())
     if not rendering_contexts <= set(tokens):
         errors.append("unknown_rendering_context")

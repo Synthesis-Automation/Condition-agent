@@ -17,7 +17,8 @@ def test_handle_smarts_are_independent_and_mapped() -> None:
     patterns = load_handle_patterns()
     assert len(patterns) >= 12
     assert {pattern["site_type"] for pattern in patterns} == {
-        "leaving_group", "pronucleophile_XH", "transfer_group", "electrophilic_center"
+        "leaving_group", "pronucleophile_XH", "transfer_group",
+        "electrophilic_center", "aromatic_CH", "unsaturated_bond",
     }
     assert all(pattern.get("atom_roles") for pattern in patterns)
 
@@ -89,22 +90,35 @@ def test_components_are_preserved() -> None:
 
 def test_composite_handles_do_not_emit_internal_sites() -> None:
     result = featurize_molecule("c1ccc(B(O)O)cc1")
-    assert [site.canonical_signature for site in result.sites] == ["TM|Ar|B(OH)2"]
+    non_aromatic_ch = [site for site in result.sites if site.site_type != "aromatic_CH"]
+    assert [site.canonical_signature for site in non_aromatic_ch] == ["TM|Ar|B(OH)2"]
 
 
 def test_retained_fluorines_are_not_leaving_groups() -> None:
-    sigs = signatures("Brc1ccc(C(F)(F)F)cc1")
+    sigs = {
+        site.canonical_signature for site in featurize_molecule("Brc1ccc(C(F)(F)F)cc1").sites
+        if site.site_type == "leaving_group"
+    }
     assert sigs == {"LG|Ar|Br"}
 
 
 def test_sn_and_si_emit_only_transferable_carbon_site() -> None:
-    assert signatures("c1ccc([Sn](C)(C)C)cc1") == {"TM|Ar|SnR3"}
-    assert signatures("C#C[Si](C)(C)C") == {"XH|Csp|H1|Alkynyl", "TM|Alkynyl|SiR3"}
+    tin_sites = [
+        site.canonical_signature for site in featurize_molecule("c1ccc([Sn](C)(C)C)cc1").sites
+        if site.site_type == "transfer_group"
+    ]
+    assert tin_sites == ["TM|Ar|SnR3"]
+    silicon_sites = {
+        site.canonical_signature for site in featurize_molecule("C#C[Si](C)(C)C").sites
+        if site.site_type in {"pronucleophile_XH", "transfer_group"}
+    }
+    assert silicon_sites == {"XH|Csp|H1|Alkynyl", "TM|Alkynyl|SiR3"}
 
 
 def test_silyl_ether_is_not_a_transfer_group() -> None:
-    sigs = signatures("Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1")
-    assert sigs == {"LG|Ar|Br"}
+    result = featurize_molecule("Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1")
+    assert not [site for site in result.sites if site.site_type == "transfer_group"]
+    assert {site.canonical_signature for site in result.sites if site.site_type == "leaving_group"} == {"LG|Ar|Br"}
 
 
 def test_bridging_metal_halogen_is_not_a_leaving_group() -> None:
@@ -150,7 +164,11 @@ def test_aromatic_nh_is_one_ring_context() -> None:
 
 
 def test_bromopyrrole_keeps_both_distinct_sites() -> None:
-    assert signatures("Brc1cc[nH]c1") == {
+    legacy_sites = {
+        site.canonical_signature for site in featurize_molecule("Brc1cc[nH]c1").sites
+        if site.site_type in {"leaving_group", "pronucleophile_XH"}
+    }
+    assert legacy_sites == {
         "LG|HeteroAr|Br",
         "XH|N_aromatic|H1|HeteroAr",
     }
@@ -205,7 +223,54 @@ def test_alkyl_leaving_groups_preserve_benzylic_allylic_and_propargylic_subtypes
 
 def test_benzyl_chloride_and_aryl_bromide_are_separate_sites() -> None:
     result = featurize_molecule("ClCc1ccccc1Br")
-    assert {site.chemist_label for site in result.sites} == {"Benzyl–Cl", "Ar–Br"}
+    assert {
+        site.chemist_label for site in result.sites if site.site_type == "leaving_group"
+    } == {"Benzyl–Cl", "Ar–Br"}
+
+
+def test_aldehydes_and_ketones_are_carbonyl_addition_centers() -> None:
+    aldehyde = next(site for site in featurize_molecule("CC=O").sites if site.site_type == "electrophilic_center")
+    assert aldehyde.canonical_signature == "EC|Carbonyl|aldehyde|Alkyl|addition"
+    assert aldehyde.details["reaction_mode"] == "addition"
+    assert aldehyde.details["atom_roles"] == {"center": [1], "heteroatom": [2], "substituents": [0]}
+    assert aldehyde.chemist_label == "R–CH=O"
+
+    ketone = next(site for site in featurize_molecule("CC(=O)C").sites if site.site_type == "electrophilic_center")
+    assert ketone.canonical_signature == "EC|Carbonyl|ketone|Alkyl,Alkyl|addition"
+    assert ketone.chemist_label == "R2C=O"
+
+
+def test_acyl_substitution_and_carbonyl_addition_are_distinct() -> None:
+    acid_sites = [site for site in featurize_molecule("CC(=O)O").sites if site.site_type == "electrophilic_center"]
+    assert [site.details["center_family"] for site in acid_sites] == ["Acyl"]
+    assert acid_sites[0].details["reaction_mode"] == "substitution"
+    assert not [site for site in featurize_molecule("CC(=O)N").sites if site.site_type == "electrophilic_center"]
+
+
+def test_aromatic_ch_sites_are_atom_localized_and_ring_classified() -> None:
+    benzene_sites = [site for site in featurize_molecule("c1ccccc1").sites if site.site_type == "aromatic_CH"]
+    assert len(benzene_sites) == 6
+    assert {site.canonical_signature for site in benzene_sites} == {"CH|ArH"}
+    assert {site.topology for site in benzene_sites} == {"atom"}
+    assert {site.chemist_label for site in benzene_sites} == {"Ar–H"}
+
+    pyridine_sites = [site for site in featurize_molecule("c1ccncc1").sites if site.site_type == "aromatic_CH"]
+    assert len(pyridine_sites) == 5
+    assert {site.details["handle_token"] for site in pyridine_sites} == {"HetArH"}
+    assert {site.chemist_label for site in pyridine_sites} == {"HeteroAr–H"}
+
+
+def test_unsaturated_carbon_bonds_are_bond_localized() -> None:
+    alkene = next(site for site in featurize_molecule("CC=C").sites if site.site_type == "unsaturated_bond")
+    assert alkene.topology == "bond"
+    assert alkene.canonical_signature == "PI|Alkene"
+    assert alkene.details["bond_order"] == 2
+    assert set(alkene.details["atom_roles"]) == {"endpoint_a", "endpoint_b"}
+    assert alkene.chemist_label == "C=C"
+
+    alkyne_sites = featurize_molecule("CC#C").sites
+    assert {site.site_type for site in alkyne_sites} == {"unsaturated_bond", "pronucleophile_XH"}
+    assert next(site for site in alkyne_sites if site.site_type == "unsaturated_bond").chemist_label == "C≡C"
 
 
 def test_detector_emits_typed_candidates_from_shared_match_index() -> None:

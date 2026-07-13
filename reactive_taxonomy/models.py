@@ -11,7 +11,11 @@ SiteType = Literal[
     "pronucleophile_XH",
     "transfer_group",
     "electrophilic_center",
+    "aromatic_CH",
+    "unsaturated_bond",
 ]
+
+SiteTopology = Literal["edge", "atom", "center", "bond"]
 
 
 @dataclass(frozen=True)
@@ -35,7 +39,7 @@ class SiteCandidate:
     """Typed internal candidate passed from detection to resolution."""
 
     site_type: SiteType
-    topology: Literal["edge", "atom", "center"]
+    topology: SiteTopology
     atom_roles: Dict[str, Tuple[int, ...]]
     atom_indices: Tuple[int, ...]
     bond_indices: Tuple[int, ...]
@@ -55,7 +59,7 @@ class ReactiveSite:
 
     site_id: str
     site_type: SiteType
-    topology: Literal["edge", "atom", "center"]
+    topology: SiteTopology
     component_index: int
     atom_indices: List[int]
     bond_indices: List[int]
@@ -159,4 +163,4 @@ class CompoundAnalysis:
         }
 
 
-__all__ = ["ComponentAnalysis", "CompoundAnalysis", "ContextClassification", "FunctionalGroup", "ReactiveSite", "SiteCandidate", "SiteEnvironment", "SiteType"]
+__all__ = ["ComponentAnalysis", "CompoundAnalysis", "ContextClassification", "FunctionalGroup", "ReactiveSite", "SiteCandidate", "SiteEnvironment", "SiteTopology", "SiteType"]
