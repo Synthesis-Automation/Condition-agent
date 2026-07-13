@@ -7,7 +7,9 @@ Public entry points:
 
 - `featurize_molecule(smiles)`
 - `featurize_reaction(reaction_smiles)`
+- `resolve_source_label(source_label)`
 - `validate_taxonomy()`
+- `validate_source_label_mappings()`
 
 Integrated CLI tester:
 
@@ -54,3 +56,12 @@ applications and recommenders -> reactive_taxonomy -> RDKit
 ```
 
 The recommender and dataset conversion layers belong outside this package.
+
+## Source-label normalization
+
+Legacy dataset labels are resolved through the versioned
+`definitions/source_label_crosswalk.v1.json` file. Resolution separates a
+stable machine label from a chemist-facing display and optional environment
+constraints. For example, `RNH2 a-branch` resolves to machine label `R-NH2`,
+display label `R–NH₂ (α-C branched)`, and an `alpha_branched=true` qualifier.
+Unsupported labels are returned unchanged with `mapping_status=unresolved`.

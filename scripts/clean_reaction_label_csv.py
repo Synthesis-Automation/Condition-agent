@@ -5,90 +5,42 @@ from __future__ import annotations
 import argparse
 import csv
 from collections import Counter
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Mapping
+from typing import Iterable
 
-from reactive_taxonomy import featurize_molecule, validate_taxonomy
-
-
-@dataclass(frozen=True)
-class ReactiveLabelRule:
-    """One source-label crosswalk verified by a representative molecule."""
-
-    target: str
-    representative_smiles: str
-    canonical_signature: str
+from reactive_taxonomy import resolve_source_label, validate_source_label_mappings
 
 
-FG_LABEL_RULES: dict[str, ReactiveLabelRule] = {
-    "ArBr": ReactiveLabelRule("Ar-Br", "Brc1ccccc1", "LG|Ar|Br"),
-    "ArCl": ReactiveLabelRule("Ar-Cl", "Clc1ccccc1", "LG|Ar|Cl"),
-    "ArI": ReactiveLabelRule("Ar-I", "Ic1ccccc1", "LG|Ar|I"),
-    "ArF": ReactiveLabelRule("Ar-F", "Fc1ccccc1", "LG|Ar|F"),
-    "ArNH2": ReactiveLabelRule("Ar-NH2", "Nc1ccccc1", "XH|N|H2|Ar"),
-    "ArNHR": ReactiveLabelRule("Ar-NH-R", "CNc1ccccc1", "XH|N|H1|Ar,Alkyl"),
-    "Ar2NH": ReactiveLabelRule("Ar1Ar2-NH", "c1ccccc1Nc2ccccc2", "XH|N|H1|Ar,Ar"),
-    "ArB(OR)2": ReactiveLabelRule("Ar-B(OR)2", "COB(OC)c1ccccc1", "TM|Ar|B(OR)2"),
-    "ArB(OH)2": ReactiveLabelRule("Ar-B(OH)2", "OB(O)c1ccccc1", "TM|Ar|B(OH)2"),
-    "ArBF3K": ReactiveLabelRule("Ar-BF3K", "[K+].[B-](F)(F)(F)c1ccccc1", "TM|Ar|BF3K"),
-    "ArOH": ReactiveLabelRule("Ar-OH", "Oc1ccccc1", "XH|O|H1|Ar"),
-    "ArOSO2R": ReactiveLabelRule("Ar-OSO2R", "CCS(=O)(=O)Oc1ccccc1", "LG|Ar|OSO2R"),
-    "arom. NH": ReactiveLabelRule("AromN-H", "c1cc[nH]c1", "XH|N_aromatic|H1|HeteroAr"),
-    "alkeneB(OR)2": ReactiveLabelRule("Alkenyl-B(OR)2", "C=CB(OC)OC", "TM|Alkenyl|B(OR)2"),
-    "alkene-Br": ReactiveLabelRule("Alkenyl-Br", "BrC=C", "LG|Alkenyl|Br"),
-    "alkene-I": ReactiveLabelRule("Alkenyl-I", "IC=C", "LG|Alkenyl|I"),
-    "RNH2": ReactiveLabelRule("R-NH2", "CN", "XH|N|H2|Alkyl"),
-    "R2NH": ReactiveLabelRule("R1R2-NH", "CCNCC", "XH|N|H1|Alkyl,Alkyl"),
-    "RCONH2": ReactiveLabelRule("R-C(O)-NH2", "CC(N)=O", "XH|N|H2|C(O)R"),
-    "RCONHR": ReactiveLabelRule("R-C(O)-NHR", "CC(=O)NC", "XH|N|H1|C(O)R,Alkyl"),
-    "RCO2R": ReactiveLabelRule("R-C(O)OR", "CC(=O)OC", "EC|Acyl|Alkyl|OR|ester"),
-    "RSO2Cl": ReactiveLabelRule("R-S(O)2Cl", "CS(=O)(=O)Cl", "EC|Sulfonyl|Alkyl|Cl|activated"),
-    "RSO2F": ReactiveLabelRule("R-S(O)2F", "CS(=O)(=O)F", "EC|Sulfonyl|Alkyl|F|activated"),
-    "RSO2NHR": ReactiveLabelRule("R-S(O)2-NHR", "CS(=O)(=O)NC", "XH|N|H1|SO2R,Alkyl"),
-    "RSH": ReactiveLabelRule("R-SH", "CCS", "XH|S|H1|Alkyl"),
-    "Alkyl-Br": ReactiveLabelRule("R-Br", "CCCBr", "LG|Alkyl|Br"),
-    "Alkyl-Cl": ReactiveLabelRule("R-Cl", "CCCCl", "LG|Alkyl|Cl"),
-    "Alkyl-I": ReactiveLabelRule("R-I", "CCCI", "LG|Alkyl|I"),
-    "Alkyl-OSO2R": ReactiveLabelRule("R-OSO2R", "CCOS(=O)(=O)CC", "LG|Alkyl|OSO2R"),
-    "Alkyl-B(OH)2": ReactiveLabelRule("R-B(OH)2", "CCB(O)O", "TM|Alkyl|B(OH)2"),
-    "Alkyl-B(OR)2": ReactiveLabelRule("R-B(OR)2", "CCB(OC)OC", "TM|Alkyl|B(OR)2"),
-    "Alkyl-BF3K": ReactiveLabelRule("R-BF3K", "[K+].CC[B-](F)(F)F", "TM|Alkyl|BF3K"),
-}
+FG_COLUMNS = (
+    "Source",
+    "Display",
+    "Signature",
+    "Center Class",
+    "Attachment Class",
+    "Alpha Branched",
+    "Qualifier Scope",
+    "Mapping Status",
+)
 
-FG_LABEL_MAP: dict[str, str] = {
-    source: rule.target for source, rule in FG_LABEL_RULES.items()
-}
 
-def validate_label_rules(label_rules: Mapping[str, ReactiveLabelRule]) -> None:
-    """Verify crosswalk targets against actual reactive-taxonomy output."""
-    taxonomy_errors = validate_taxonomy()
-    if taxonomy_errors:
-        raise ValueError(f"Reactive taxonomy is invalid: {taxonomy_errors}")
-    failures: list[str] = []
-    for source, rule in label_rules.items():
-        analysis = featurize_molecule(rule.representative_smiles, label_style="hte_legacy")
-        matching_sites = [
-            site
-            for site in analysis.sites
-            if site.canonical_signature == rule.canonical_signature
-        ]
-        if not analysis.valid or len(matching_sites) != 1:
-            failures.append(f"{source}: expected one {rule.canonical_signature}")
-        elif matching_sites[0].chemist_label != rule.target:
-            failures.append(
-                f"{source}: expected {rule.target!r}, got {matching_sites[0].chemist_label!r}"
+def _output_fieldnames(source_fieldnames: list[str]) -> list[str]:
+    fieldnames: list[str] = []
+    for fieldname in source_fieldnames:
+        if fieldname in {"FG A", "FG B"}:
+            fieldnames.append(f"{fieldname} Source")
+            fieldnames.append(fieldname)
+            fieldnames.extend(
+                f"{fieldname} {suffix}" for suffix in FG_COLUMNS if suffix != "Source"
             )
-    if failures:
-        raise ValueError("Invalid reactive-label mappings: " + "; ".join(failures))
+        else:
+            fieldnames.append(fieldname)
+    return fieldnames
 
 
 def clean_rows(
     rows: Iterable[dict[str, str]],
-    *,
-    label_map: Mapping[str, str] = FG_LABEL_MAP,
 ) -> tuple[list[dict[str, str]], Counter[str]]:
-    """Filter requested rows and replace only explicitly mapped FG labels."""
+    """Filter requested rows and attach normalized FG fields."""
     cleaned: list[dict[str, str]] = []
     stats: Counter[str] = Counter()
 
@@ -113,10 +65,11 @@ def clean_rows(
 
         for column in ("FG A", "FG B"):
             source = (row.get(column) or "").strip()
-            replacement = label_map.get(source)
-            if replacement:
-                row[column] = replacement
-                stats[f"replaced:{source}->{replacement}"] += 1
+            mapping = resolve_source_label(source)
+            row.update(mapping.to_columns(column))
+            stats[f"mapping_status:{mapping.mapping_status}"] += 1
+            if mapping.base_label != source:
+                stats[f"replaced:{source}->{mapping.base_label}"] += 1
 
         cleaned.append(row)
         stats["output_rows"] += 1
@@ -126,13 +79,16 @@ def clean_rows(
 
 def clean_csv(source: Path, destination: Path) -> Counter[str]:
     """Clean ``source`` and write a new CSV to ``destination``."""
-    validate_label_rules(FG_LABEL_RULES)
+    validation_errors = validate_source_label_mappings()
+    if validation_errors:
+        raise ValueError(f"Invalid source-label mappings: {validation_errors}")
+
     with source.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
         if not reader.fieldnames:
             raise ValueError(f"CSV has no header: {source}")
         rows, stats = clean_rows(dict(row) for row in reader)
-        fieldnames = list(reader.fieldnames)
+        fieldnames = _output_fieldnames(list(reader.fieldnames))
 
     destination.parent.mkdir(parents=True, exist_ok=True)
     with destination.open("w", encoding="utf-8", newline="") as handle:

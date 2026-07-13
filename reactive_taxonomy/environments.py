@@ -110,6 +110,16 @@ def _attached_group_sterics(mol: Any, site: ReactiveSite, center: int) -> Tuple[
     return tuple(sorted(records, key=lambda item: int(item["attachment_atom_index"])))
 
 
+def _reactive_center_substitution_class(site: ReactiveSite) -> str | None:
+    """Classify nitrogen substitution independently of attached-carbon sterics."""
+    if site.details.get("center_element") != "N":
+        return None
+    h_count = int(site.details.get("h_count", 0))
+    if h_count >= 3:
+        return "ammonia"
+    return {2: "primary", 1: "secondary", 0: "tertiary"}.get(h_count)
+
+
 def build_site_environment(mol: Any, site: ReactiveSite, groups: Iterable[FunctionalGroup]) -> SiteEnvironment:
     """Build raw local descriptors without assuming a reaction mechanism."""
     roles = site.details.get("atom_roles") or {}
@@ -136,7 +146,9 @@ def build_site_environment(mol: Any, site: ReactiveSite, groups: Iterable[Functi
     attached_groups = _attached_group_sterics(mol, site, center)
     if attached_groups:
         steric["attached_groups"] = list(attached_groups)
-        steric["center_substitution_class"] = steric["class"]
+    center_substitution_class = _reactive_center_substitution_class(site)
+    if center_substitution_class:
+        steric["center_substitution_class"] = center_substitution_class
     return SiteEnvironment(
         site_id=site.site_id,
         center_atom_index=center,

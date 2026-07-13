@@ -87,3 +87,8 @@ def test_alkyl_attachment_sterics_are_distinct_from_amine_substitution() -> None
 
     tert_butyl = featurize_molecule("CC(C)(C)N").site_environments[0].steric["attached_groups"][0]
     assert tert_butyl["alpha_branched"] is True
+
+
+def test_nitrogen_substitution_class_does_not_count_sulfur_as_carbon() -> None:
+    environment = featurize_molecule("CS(=O)(=O)NC").site_environments[0]
+    assert environment.steric["center_substitution_class"] == "secondary"
