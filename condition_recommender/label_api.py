@@ -322,7 +322,7 @@ def recommend_conditions_from_labels(
         recommendations=recommendations,
         warnings=(
             "WEAK_LABEL_PRECEDENTS_NOT_STRUCTURE_VERIFIED",
-            "FG_A_B_MATCHED_AS_UNORDERED_PARTICIPANTS",
+            "REACTIVE_SITES_MATCHED_AS_UNORDERED_PARTICIPANTS",
             "CONDITION_NAMES_NOT_REGISTRY_NORMALIZED",
         ),
     )

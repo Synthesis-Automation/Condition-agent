@@ -37,17 +37,17 @@ def test_cleanup_maps_supported_labels_and_preserves_unsolved_labels() -> None:
     cleaned, stats = clean_rows(rows)
 
     assert len(cleaned) == 2
-    assert cleaned[0]["FG A Source"] == "ArBr"
-    assert cleaned[0]["FG A"] == "Ar-Br"
-    assert cleaned[0]["FG A Display"] == "Ar–Br"
-    assert cleaned[0]["FG B"] == "R-NH2"
-    assert cleaned[0]["FG B Center Class"] == "primary"
+    assert cleaned[0]["reactive_site_1_source_label"] == "ArBr"
+    assert cleaned[0]["reactive_site_1_normalized_label"] == "Ar-Br"
+    assert cleaned[0]["reactive_site_1_display_label"] == "Ar–Br"
+    assert cleaned[0]["reactive_site_2_normalized_label"] == "R-NH2"
+    assert cleaned[0]["reactive_site_2_center_class"] == "primary"
 
-    assert cleaned[1]["FG A"] == "RCO2H or M"
-    assert cleaned[1]["FG A Mapping Status"] == "unresolved"
-    assert cleaned[1]["FG B"] == "R-NH2"
-    assert cleaned[1]["FG B Alpha Branched"] == "true"
-    assert cleaned[1]["FG B Mapping Status"] == "qualified"
+    assert cleaned[1]["reactive_site_1_normalized_label"] == "RCO2H or M"
+    assert cleaned[1]["reactive_site_1_mapping_status"] == "unresolved"
+    assert cleaned[1]["reactive_site_2_normalized_label"] == "R-NH2"
+    assert cleaned[1]["reactive_site_2_alpha_branched"] == "true"
+    assert cleaned[1]["reactive_site_2_mapping_status"] == "qualified"
 
     assert stats["matched_both_blank"] == 1
     assert stats["matched_identical"] == 2

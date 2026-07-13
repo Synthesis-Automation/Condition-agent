@@ -17,21 +17,21 @@ def _row(
     z_score: float = 0.0,
 ) -> dict[str, str]:
     row = {
-        "yield%": str(yield_pct),
-        "Reaction Type": reaction_type,
-        "z-Score": str(z_score),
-        "Base": "K2CO3",
-        "Catalyst": catalyst,
-        "Solvent": "dioxane",
-        "Ligand": "",
-        "Additive": "",
-        "Coupling Reagent": "",
-        "Secondary Solvent": "water",
-        "Tertiary Solvent": "",
-        "conditions": "2 h at 80 °C",
+        "yield_pct": str(yield_pct),
+        "source_reaction_type": reaction_type,
+        "z_score": str(z_score),
+        "base": "K2CO3",
+        "catalyst": catalyst,
+        "primary_solvent": "dioxane",
+        "ligand": "",
+        "additive": "",
+        "coupling_reagent": "",
+        "secondary_solvent": "water",
+        "tertiary_solvent": "",
+        "procedure_text": "2 h at 80 °C",
     }
-    row.update(resolve_source_label(fg_a).to_columns("FG A"))
-    row.update(resolve_source_label(fg_b).to_columns("FG B"))
+    row.update(resolve_source_label(fg_a).to_columns("reactive_site_1"))
+    row.update(resolve_source_label(fg_b).to_columns("reactive_site_2"))
     return row
 
 
@@ -62,9 +62,9 @@ def test_label_recommender_uses_family_and_unordered_signature_pair(tmp_path: Pa
     assert result.grammar_id == "boron_transfer_coupling"
     assert result.candidate_count == 3
     assert len(result.recommendations) == 3
-    assert result.recommendations[0].conditions["Catalyst"] == "exact-a"
+    assert result.recommendations[0].conditions["catalyst"] == "exact-a"
     assert result.recommendations[0].signature_similarity == 1.0
-    assert result.recommendations[1].conditions["Catalyst"] == "exact-reversed"
+    assert result.recommendations[1].conditions["catalyst"] == "exact-reversed"
     assert result.recommendations[1].signature_similarity == 1.0
     assert all("wrong-family" not in item.conditions.values() for item in result.recommendations)
 
@@ -83,7 +83,7 @@ def test_label_recommender_rewards_matching_alpha_branch_qualifier(tmp_path: Pat
     )
 
     assert result.valid
-    assert result.recommendations[0].conditions["Catalyst"] == "qualified"
+    assert result.recommendations[0].conditions["catalyst"] == "qualified"
     assert (
         result.recommendations[0].qualifier_similarity
         > result.recommendations[1].qualifier_similarity

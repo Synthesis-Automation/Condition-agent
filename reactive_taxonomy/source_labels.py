@@ -32,20 +32,20 @@ class SourceLabelMapping:
     qualifier_scope: Optional[str] = None
 
     def to_columns(self, prefix: str) -> Dict[str, str]:
-        """Return flat CSV fields while retaining unknown values as blanks."""
+        """Return consistently named flat-CSV fields for one reactive site."""
         alpha_branched = (
             "" if self.alpha_branched is None else str(self.alpha_branched).lower()
         )
         return {
-            f"{prefix} Source": self.source_label,
-            prefix: self.base_label,
-            f"{prefix} Display": self.display_label,
-            f"{prefix} Signature": self.canonical_signature,
-            f"{prefix} Center Class": self.center_substitution_class or "",
-            f"{prefix} Attachment Class": self.attachment_carbon_class or "",
-            f"{prefix} Alpha Branched": alpha_branched,
-            f"{prefix} Qualifier Scope": self.qualifier_scope or "",
-            f"{prefix} Mapping Status": self.mapping_status,
+            f"{prefix}_source_label": self.source_label,
+            f"{prefix}_normalized_label": self.base_label,
+            f"{prefix}_display_label": self.display_label,
+            f"{prefix}_signature": self.canonical_signature,
+            f"{prefix}_center_class": self.center_substitution_class or "",
+            f"{prefix}_attachment_class": self.attachment_carbon_class or "",
+            f"{prefix}_alpha_branched": alpha_branched,
+            f"{prefix}_qualifier_scope": self.qualifier_scope or "",
+            f"{prefix}_mapping_status": self.mapping_status,
         }
 
 

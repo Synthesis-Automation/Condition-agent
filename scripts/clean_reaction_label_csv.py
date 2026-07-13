@@ -11,30 +11,53 @@ from typing import Iterable
 from reactive_taxonomy import resolve_source_label, validate_source_label_mappings
 
 
-FG_COLUMNS = (
-    "Source",
-    "Display",
-    "Signature",
-    "Center Class",
-    "Attachment Class",
-    "Alpha Branched",
-    "Qualifier Scope",
-    "Mapping Status",
+SOURCE_TO_OUTPUT = {
+    "yield%": "yield_pct",
+    "Base": "base",
+    "Catalyst": "catalyst",
+    "Solvent": "primary_solvent",
+    "Ligand": "ligand",
+    "Additive": "additive",
+    "Coupling Reagent": "coupling_reagent",
+    "Secondary Solvent": "secondary_solvent",
+    "Tertiary Solvent": "tertiary_solvent",
+    "Reaction Type": "source_reaction_type",
+    "z-Score": "z_score",
+    "conditions": "procedure_text",
+}
+
+SITE_SUFFIXES = (
+    "source_label",
+    "normalized_label",
+    "display_label",
+    "signature",
+    "center_class",
+    "attachment_class",
+    "alpha_branched",
+    "qualifier_scope",
+    "mapping_status",
 )
 
-
-def _output_fieldnames(source_fieldnames: list[str]) -> list[str]:
-    fieldnames: list[str] = []
-    for fieldname in source_fieldnames:
-        if fieldname in {"FG A", "FG B"}:
-            fieldnames.append(f"{fieldname} Source")
-            fieldnames.append(fieldname)
-            fieldnames.extend(
-                f"{fieldname} {suffix}" for suffix in FG_COLUMNS if suffix != "Source"
-            )
-        else:
-            fieldnames.append(fieldname)
-    return fieldnames
+OUTPUT_FIELDNAMES = (
+    "source_reaction_type",
+    "reactive_site_1_normalized_label",
+    "reactive_site_2_normalized_label",
+    "reactive_site_1_display_label",
+    "reactive_site_2_display_label",
+    "yield_pct",
+    "z_score",
+    "catalyst",
+    "ligand",
+    "base",
+    "primary_solvent",
+    "secondary_solvent",
+    "tertiary_solvent",
+    "additive",
+    "coupling_reagent",
+    "procedure_text",
+    *(f"reactive_site_1_{suffix}" for suffix in SITE_SUFFIXES if suffix not in {"normalized_label", "display_label"}),
+    *(f"reactive_site_2_{suffix}" for suffix in SITE_SUFFIXES if suffix not in {"normalized_label", "display_label"}),
+)
 
 
 def clean_rows(
@@ -63,15 +86,22 @@ def clean_rows(
             stats["removed_union"] += 1
             continue
 
-        for column in ("FG A", "FG B"):
-            source = (row.get(column) or "").strip()
+        output = {
+            destination: (row.get(source) or "").strip()
+            for source, destination in SOURCE_TO_OUTPUT.items()
+        }
+        for source_column, prefix in (
+            ("FG A", "reactive_site_1"),
+            ("FG B", "reactive_site_2"),
+        ):
+            source = (row.get(source_column) or "").strip()
             mapping = resolve_source_label(source)
-            row.update(mapping.to_columns(column))
+            output.update(mapping.to_columns(prefix))
             stats[f"mapping_status:{mapping.mapping_status}"] += 1
             if mapping.base_label != source:
                 stats[f"replaced:{source}->{mapping.base_label}"] += 1
 
-        cleaned.append(row)
+        cleaned.append(output)
         stats["output_rows"] += 1
 
     return cleaned, stats
@@ -88,11 +118,18 @@ def clean_csv(source: Path, destination: Path) -> Counter[str]:
         if not reader.fieldnames:
             raise ValueError(f"CSV has no header: {source}")
         rows, stats = clean_rows(dict(row) for row in reader)
-        fieldnames = _output_fieldnames(list(reader.fieldnames))
+        required = set(SOURCE_TO_OUTPUT) | {"FG A", "FG B"}
+        missing = sorted(required - set(reader.fieldnames))
+        if missing:
+            raise ValueError(f"Missing source columns: {missing}")
 
     destination.parent.mkdir(parents=True, exist_ok=True)
     with destination.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, lineterminator="\n")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=OUTPUT_FIELDNAMES,
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
     return stats

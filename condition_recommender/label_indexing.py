@@ -11,15 +11,15 @@ from typing import Dict, Optional, Tuple
 
 
 CONDITION_COLUMNS = (
-    "Base",
-    "Catalyst",
-    "Solvent",
-    "Ligand",
-    "Additive",
-    "Coupling Reagent",
-    "Secondary Solvent",
-    "Tertiary Solvent",
-    "conditions",
+    "base",
+    "catalyst",
+    "primary_solvent",
+    "ligand",
+    "additive",
+    "coupling_reagent",
+    "secondary_solvent",
+    "tertiary_solvent",
+    "procedure_text",
 )
 
 
@@ -58,15 +58,15 @@ def _optional_bool(value: str) -> Optional[bool]:
 
 def _participant(row: Dict[str, str], prefix: str) -> LabelParticipant:
     return LabelParticipant(
-        source_label=str(row.get(f"{prefix} Source") or "").strip(),
-        base_label=str(row.get(prefix) or "").strip(),
-        display_label=str(row.get(f"{prefix} Display") or "").strip(),
-        signature=str(row.get(f"{prefix} Signature") or "").strip(),
-        center_class=str(row.get(f"{prefix} Center Class") or "").strip() or None,
-        attachment_class=str(row.get(f"{prefix} Attachment Class") or "").strip() or None,
-        alpha_branched=_optional_bool(str(row.get(f"{prefix} Alpha Branched") or "")),
-        qualifier_scope=str(row.get(f"{prefix} Qualifier Scope") or "").strip() or None,
-        mapping_status=str(row.get(f"{prefix} Mapping Status") or "unresolved").strip(),
+        source_label=str(row.get(f"{prefix}_source_label") or "").strip(),
+        base_label=str(row.get(f"{prefix}_normalized_label") or "").strip(),
+        display_label=str(row.get(f"{prefix}_display_label") or "").strip(),
+        signature=str(row.get(f"{prefix}_signature") or "").strip(),
+        center_class=str(row.get(f"{prefix}_center_class") or "").strip() or None,
+        attachment_class=str(row.get(f"{prefix}_attachment_class") or "").strip() or None,
+        alpha_branched=_optional_bool(str(row.get(f"{prefix}_alpha_branched") or "")),
+        qualifier_scope=str(row.get(f"{prefix}_qualifier_scope") or "").strip() or None,
+        mapping_status=str(row.get(f"{prefix}_mapping_status") or "unresolved").strip(),
     )
 
 
@@ -81,12 +81,12 @@ def load_label_index(path: str | Path) -> Tuple[LabelIndexedReaction, ...]:
     with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
         required = {
-            "yield%",
-            "Reaction Type",
-            "FG A Signature",
-            "FG B Signature",
-            "FG A Mapping Status",
-            "FG B Mapping Status",
+            "yield_pct",
+            "source_reaction_type",
+            "reactive_site_1_signature",
+            "reactive_site_2_signature",
+            "reactive_site_1_mapping_status",
+            "reactive_site_2_mapping_status",
         }
         missing = sorted(required - set(reader.fieldnames or ()))
         if missing:
@@ -96,21 +96,24 @@ def load_label_index(path: str | Path) -> Tuple[LabelIndexedReaction, ...]:
     indexed = []
     for row_number, row in enumerate(rows, start=2):
         try:
-            yield_pct = float(row.get("yield%") or "")
+            yield_pct = float(row.get("yield_pct") or "")
         except (TypeError, ValueError):
             continue
         if not 0.0 <= yield_pct <= 100.0:
             continue
         try:
-            z_score = float(row.get("z-Score") or 0.0)
+            z_score = float(row.get("z_score") or 0.0)
         except (TypeError, ValueError):
             z_score = 0.0
         conditions = {name: str(row.get(name) or "").strip() for name in CONDITION_COLUMNS}
         indexed.append(
             LabelIndexedReaction(
                 source_row_number=row_number,
-                reaction_type=str(row.get("Reaction Type") or "").strip(),
-                participants=(_participant(row, "FG A"), _participant(row, "FG B")),
+                reaction_type=str(row.get("source_reaction_type") or "").strip(),
+                participants=(
+                    _participant(row, "reactive_site_1"),
+                    _participant(row, "reactive_site_2"),
+                ),
                 yield_pct=yield_pct,
                 z_score=z_score,
                 conditions=conditions,
