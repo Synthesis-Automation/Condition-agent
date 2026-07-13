@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "description": "Weak-label retrieval policy for the cleaned HTE reaction-label dataset.",
+  "grammar_source_reaction_types": {
+    "boron_transfer_coupling": ["Suzuki-Miyaura"],
+    "sp2_c_n_substitution": ["Buchwald-Hartwig", "CN-Coupling", "SNAr"],
+    "amide_formation": ["Amide coupling"],
+    "sp2_c_o_substitution": ["CO-Coupling", "SNAr"],
+    "sp2_c_s_substitution": ["CS-Coupling"],
+    "sonogashira_coupling": ["Sonogashira"],
+    "other_metal_transfer_coupling": ["Negishi"]
+  },
+  "participant_similarity_weights": {
+    "signature": 0.85,
+    "qualifier": 0.15
+  },
+  "ranking_weights": {
+    "label_similarity": 0.75,
+    "yield": 0.15,
+    "z_score": 0.05,
+    "support": 0.05
+  },
+  "maximum_precedents_per_recipe": 5
+}

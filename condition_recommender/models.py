@@ -96,3 +96,45 @@ class RecommendationResult:
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class LabelConditionRecommendation:
+    """One condition recipe retrieved from weak reaction-label precedents."""
+
+    rank: int
+    recipe_id: str
+    score: float
+    label_similarity: float
+    signature_similarity: float
+    qualifier_similarity: float
+    expected_yield_pct: float
+    mean_z_score: float
+    support: int
+    source_reaction_types: Tuple[str, ...]
+    source_row_numbers: Tuple[int, ...]
+    conditions: Dict[str, str]
+    explanation: Tuple[str, ...]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class LabelRecommendationResult:
+    """Top condition recipes for a structurally verified reaction query."""
+
+    query_reaction_smiles: str
+    valid: bool
+    query_label: Optional[str] = None
+    grammar_id: Optional[str] = None
+    query_signatures: Tuple[str, ...] = ()
+    candidate_count: int = 0
+    recipe_count: int = 0
+    recommendations: Tuple[LabelConditionRecommendation, ...] = ()
+    warnings: Tuple[str, ...] = ()
+    error: Optional[str] = None
+    schema_version: str = "1.0"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
