@@ -13,6 +13,15 @@ from typing import Any, Iterable, Sequence
 from . import featurize_molecule, featurize_reaction, validate_taxonomy
 
 
+_MOLECULE_SITE_TYPES = (
+    "leaving_group",
+    "pronucleophile_XH",
+    "transfer_group",
+    "electrophilic_center",
+    "aromatic_CH",
+    "unsaturated_bond",
+)
+
 _SELF_TEST_MOLECULES = (
     "Brc1ccc(N)cc1C#N",
     "CC(=O)Cl",
@@ -275,6 +284,85 @@ def _batch_summary(records: Sequence[dict[str, Any]], mode: str) -> dict[str, An
     return summary
 
 
+def _molecule_csv_columns(source_fields: Sequence[str]) -> list[str]:
+    columns = ["source_row", *[field for field in source_fields if field != "source_row"]]
+    columns.extend(["valid", "canonical_smiles", "component_count", "reactive_site_count"])
+    for site_type in _MOLECULE_SITE_TYPES:
+        columns.extend((f"{site_type}_count", f"{site_type}_labels"))
+    columns.extend((
+        "reactive_site_labels", "canonical_signatures", "functional_group_count",
+        "functional_group_ids", "functional_group_labels", "warnings", "error",
+    ))
+    return columns
+
+
+def _molecule_csv_row(record: dict[str, Any]) -> dict[str, Any]:
+    analysis = record["analysis"]
+    sites = list(analysis.get("sites") or [])
+    groups = list(analysis.get("functional_groups") or [])
+    row: dict[str, Any] = {
+        "source_row": record["source_row"],
+        **record["source"],
+        "valid": bool(analysis.get("valid")),
+        "canonical_smiles": analysis.get("canonical_smiles") or "",
+        "component_count": len(analysis.get("components") or []),
+        "reactive_site_count": len(sites),
+        "reactive_site_labels": "; ".join(str(site.get("chemist_label") or "") for site in sites),
+        "canonical_signatures": "; ".join(str(site.get("canonical_signature") or "") for site in sites),
+        "functional_group_count": len(groups),
+        "functional_group_ids": "; ".join(str(group.get("group_id") or "") for group in groups),
+        "functional_group_labels": "; ".join(str(group.get("chemist_label") or "") for group in groups),
+        "warnings": "; ".join(str(value) for value in analysis.get("warnings") or []),
+        "error": analysis.get("error") or "",
+    }
+    for site_type in _MOLECULE_SITE_TYPES:
+        selected = [site for site in sites if site.get("site_type") == site_type]
+        row[f"{site_type}_count"] = len(selected)
+        row[f"{site_type}_labels"] = "; ".join(str(site.get("chemist_label") or "") for site in selected)
+    return row
+
+
+def _reaction_csv_columns(source_fields: Sequence[str]) -> list[str]:
+    return [
+        "source_row", *[field for field in source_fields if field != "source_row"],
+        "valid", "evidence_quality", "transformation_class", "named_family",
+        "reaction_label", "reaction_label_status", "candidate_count", "warnings",
+        "error",
+    ]
+
+
+def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
+    analysis = record["analysis"]
+    return {
+        "source_row": record["source_row"],
+        **record["source"],
+        "valid": bool(analysis.get("valid")),
+        "evidence_quality": analysis.get("evidence_quality") or "",
+        "transformation_class": analysis.get("transformation_class") or "",
+        "named_family": analysis.get("named_family") or "",
+        "reaction_label": analysis.get("reaction_label") or "",
+        "reaction_label_status": analysis.get("reaction_label_status") or "",
+        "candidate_count": len(analysis.get("candidates") or []),
+        "warnings": "; ".join(str(value) for value in analysis.get("warnings") or []),
+        "error": analysis.get("error") or "",
+    }
+
+
+def _write_batch_csv(
+    records: Sequence[dict[str, Any]],
+    output_path: Path,
+    mode: str,
+    source_fields: Sequence[str],
+) -> None:
+    columns = _molecule_csv_columns(source_fields) if mode == "molecule" else _reaction_csv_columns(source_fields)
+    row_builder = _molecule_csv_row if mode == "molecule" else _reaction_csv_row
+    with output_path.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=columns)
+        writer.writeheader()
+        for record in records:
+            writer.writerow(row_builder(record))
+
+
 def _command_batch(args: argparse.Namespace) -> int:
     input_path = Path(args.input)
     with input_path.open("r", encoding="utf-8-sig", newline="") as handle:
@@ -308,10 +396,15 @@ def _command_batch(args: argparse.Namespace) -> int:
     if args.output:
         output_path = Path(args.output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        with output_path.open("w", encoding="utf-8", newline="") as handle:
-            for record in records:
-                handle.write(_json_dump(record, compact=True) + "\n")
+        output_format = args.output_format or ("csv" if output_path.suffix.lower() == ".csv" else "jsonl")
+        if output_format == "csv":
+            _write_batch_csv(records, output_path, args.mode, fieldnames)
+        else:
+            with output_path.open("w", encoding="utf-8", newline="") as handle:
+                for record in records:
+                    handle.write(_json_dump(record, compact=True) + "\n")
         summary["output"] = str(output_path)
+        summary["output_format"] = output_format
     if args.format == "json":
         print(_json_dump(summary))
     else:
@@ -320,10 +413,10 @@ def _command_batch(args: argparse.Namespace) -> int:
         print(f"valid: {summary['valid']}")
         print(f"invalid: {summary['invalid']}")
         for key, value in summary.items():
-            if key not in {"mode", "total", "valid", "invalid", "output"}:
+            if key not in {"mode", "total", "valid", "invalid", "output", "output_format"}:
                 print(f"{key}: {_json_dump(value, compact=True)}")
         if "output" in summary:
-            print(f"JSONL output: {summary['output']}")
+            print(f"{str(summary['output_format']).upper()} output: {summary['output']}")
     return 0 if summary["invalid"] == 0 else 1
 
 
@@ -367,9 +460,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     molecule_parser = subparsers.add_parser("molecule", help="featurize one molecule SMILES")
     molecule_parser.add_argument("smiles")
-    molecule_parser.add_argument("--site-type", action="append", choices=(
-        "leaving_group", "pronucleophile_XH", "transfer_group", "electrophilic_center",
-    ))
+    molecule_parser.add_argument("--site-type", action="append", choices=_MOLECULE_SITE_TYPES)
     molecule_parser.add_argument("--no-context", action="store_true")
     molecule_parser.add_argument("--concise", action="store_true", help="show only key chemist-readable features")
     molecule_parser.add_argument("--label-style", choices=("unicode", "ascii", "hte_legacy"), default="unicode")
@@ -388,7 +479,8 @@ def build_parser() -> argparse.ArgumentParser:
     batch_parser.add_argument("input")
     batch_parser.add_argument("--mode", choices=("molecule", "reaction"), required=True)
     batch_parser.add_argument("--column", help="input column; auto-detected when omitted")
-    batch_parser.add_argument("--output", help="optional full JSONL result path")
+    batch_parser.add_argument("--output", help="optional JSONL or CSV result path")
+    batch_parser.add_argument("--output-format", choices=("jsonl", "csv"), help="infer from --output suffix when omitted")
     batch_parser.add_argument("--max-candidates", type=int, default=500)
     batch_parser.add_argument("--label-style", choices=("unicode", "ascii", "hte_legacy"), default="unicode")
     batch_parser.add_argument("--format", choices=("text", "json"), default="text")

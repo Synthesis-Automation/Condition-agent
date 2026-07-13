@@ -21,6 +21,17 @@ def _component_molecules(mol: Any) -> List[Any]:
     return list(Chem.GetMolFrags(mol, asMols=True, sanitizeFrags=True))
 
 
+def _site_id(component_index: int, site_number: int, candidate: SiteCandidate) -> str:
+    """Build an identifier from the topology's chemically meaningful locus."""
+    if candidate.topology == "bond" and candidate.bond_indices:
+        return f"mol{component_index}:bond{candidate.bond_indices[0]}:site{site_number}"
+    preferred_role = "anchor" if candidate.topology == "edge" else "center"
+    locus = candidate.atom_roles.get(preferred_role)
+    if not locus:
+        locus = candidate.atom_roles.get("endpoint_a") or candidate.atom_indices
+    return f"mol{component_index}:atom{locus[0]}:site{site_number}"
+
+
 def featurize_molecule(
     smiles: str,
     *,
@@ -79,7 +90,7 @@ def featurize_molecule(
             else:
                 label = candidate.canonical_signature
             site = ReactiveSite(
-                site_id=f"mol{component_index}:atom{candidate.atom_indices[0]}:site{site_number}",
+                site_id=_site_id(component_index, site_number, candidate),
                 site_type=candidate.site_type, topology=candidate.topology, component_index=component_index,
                 atom_indices=list(candidate.atom_indices), bond_indices=[i for i in candidate.bond_indices if i >= 0],
                 canonical_signature=candidate.canonical_signature, chemist_label=label,

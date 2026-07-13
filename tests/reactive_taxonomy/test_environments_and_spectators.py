@@ -37,6 +37,67 @@ def test_functional_group_ownership_suppresses_generic_sulfonamide_amine() -> No
     assert "secondary_amine" not in ids
 
 
+def test_aldehyde_definition_includes_formaldehyde_but_excludes_formamides() -> None:
+    assert [group.group_id for group in featurize_molecule("C=O").functional_groups] == ["aldehyde"]
+    assert [group.group_id for group in featurize_molecule("CC=O").functional_groups] == ["aldehyde"]
+    assert [group.group_id for group in featurize_molecule("CN(C)C=O").functional_groups] == ["amide"]
+    assert [group.group_id for group in featurize_molecule("NC=O").functional_groups] == ["amide"]
+
+
+def test_specific_carbonyl_groups_own_generic_overlaps() -> None:
+    examples = {
+        "CC(=O)OC(=O)C": {"acid_anhydride"},
+        "COC(=O)NC": {"carbamate"},
+        "O=C1C=CC(=O)N1c1ccccc1": {"imide", "alkene"},
+    }
+    for smiles, expected in examples.items():
+        ids = {group.group_id for group in featurize_molecule(smiles).functional_groups}
+        assert ids == expected
+    anhydride_sites = [
+        site for site in featurize_molecule("CC(=O)OC(=O)C").sites
+        if site.site_type == "electrophilic_center"
+    ]
+    assert len(anhydride_sites) == 2
+    assert {site.availability for site in anhydride_sites} == {"activated"}
+    assert {site.details["acyl_subtype"] for site in anhydride_sites} == {"acid_anhydride"}
+    protected_aniline = featurize_molecule("Brc1ccc(NC(=O)OC(C)(C)C)cc1")
+    assert not [
+        site for site in protected_aniline.sites
+        if site.site_type == "electrophilic_center"
+    ]
+
+
+def test_common_synthesis_functional_group_pack() -> None:
+    examples = {
+        "c1ccccc1C1CO1": "epoxide",
+        "C(=Nc1ccccc1)c1ccccc1": "imine",
+        "[N-]=[N+]=Nc1ccccc1": "azide",
+        "O=C=Nc1ccccc1": "isocyanate",
+        "S=C=Nc1ccccc1": "isothiocyanate",
+        "CS(C)=O": "sulfoxide",
+        "CSSC": "disulfide",
+        "CCOP(=O)(CC(=O)OCC)OCC": "phosphonate",
+    }
+    for smiles, expected in examples.items():
+        assert expected in {group.group_id for group in featurize_molecule(smiles).functional_groups}
+
+
+def test_site_ids_use_the_reactive_locus() -> None:
+    aldehyde = next(
+        site for site in featurize_molecule("CC=O").sites
+        if site.site_type == "electrophilic_center"
+    )
+    assert aldehyde.details["center_atom_index"] == 1
+    assert aldehyde.site_id.startswith("mol0:atom1:")
+
+    alkene = next(
+        site for site in featurize_molecule("CC=C").sites
+        if site.site_type == "unsaturated_bond"
+    )
+    assert alkene.bond_indices == [1]
+    assert alkene.site_id.startswith("mol0:bond1:")
+
+
 def test_suzuki_family_environment_separates_partner_roles() -> None:
     reaction = "Brc1ccccc1.OB(O)c1ccccn1>>c1ccc(-c2ccccn2)cc1"
     result = featurize_reaction(reaction)

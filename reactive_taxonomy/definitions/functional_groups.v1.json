@@ -2,6 +2,74 @@
   "schema_version": "1.0",
   "groups": [
     {
+      "id": "acid_anhydride",
+      "label": "(CO)2O",
+      "smarts": "[#6:6][CX3:1](=[O:2])[O:3][CX3:4](=[O:5])[#6:7]",
+      "priority": 106,
+      "suppresses_on_overlap": [
+        "ester"
+      ],
+      "tags": [
+        "electrophilic",
+        "hydrolysis_sensitive",
+        "reduction_sensitive"
+      ]
+    },
+    {
+      "id": "imide",
+      "label": "CO–N–CO",
+      "smarts": "[NX3:1]([CX3:2](=[O:3]))[CX3:4](=[O:5])",
+      "priority": 105,
+      "suppresses_on_overlap": [
+        "amide"
+      ],
+      "tags": [
+        "acidic",
+        "electron_withdrawing",
+        "hydrogen_bond_acceptor"
+      ]
+    },
+    {
+      "id": "carbamate",
+      "label": "NCO2R",
+      "smarts": "[N:2][CX3:1](=[O:3])[O:4]",
+      "priority": 104,
+      "suppresses_on_overlap": [
+        "amide",
+        "ester"
+      ],
+      "tags": [
+        "hydrolysis_sensitive",
+        "hydrogen_bond_acceptor"
+      ]
+    },
+    {
+      "id": "carbonate",
+      "label": "OCO2R",
+      "smarts": "[O:2][CX3:1](=[O:3])[O:4]",
+      "priority": 103,
+      "suppresses_on_overlap": [
+        "ester"
+      ],
+      "tags": [
+        "hydrolysis_sensitive",
+        "hydrogen_bond_acceptor"
+      ]
+    },
+    {
+      "id": "epoxide",
+      "label": "epoxide",
+      "smarts": "[O;r3:1]1[C;r3:2][C;r3:3]1",
+      "priority": 102,
+      "suppresses_on_overlap": [
+        "ether"
+      ],
+      "tags": [
+        "electrophilic",
+        "ring_strained"
+      ]
+    },
+    {
       "id": "carboxylic_acid",
       "label": "CO2H",
       "smarts": "[C:1](=[O:2])[O;H1:3]",
@@ -55,7 +123,7 @@
     {
       "id": "aldehyde",
       "label": "CHO",
-      "smarts": "[C;H1:1](=[O:2])",
+      "smarts": "[CX3;H1,H2;!$([C](=O)[N,O,S,F,Cl,Br,I]):1](=[O:2])",
       "priority": 92,
       "tags": [
         "electrophilic",
@@ -103,6 +171,77 @@
       "tags": [
         "electron_withdrawing",
         "reduction_sensitive"
+      ]
+    },
+    {
+      "id": "sulfoxide",
+      "label": "S(O)R2",
+      "smarts": "[S;X3:1](=[O:2])([#6:3])[#6:4]",
+      "priority": 86,
+      "tags": [
+        "oxidation_sensitive",
+        "reduction_sensitive",
+        "metal_binding"
+      ]
+    },
+    {
+      "id": "isocyanate",
+      "label": "N=C=O",
+      "smarts": "[N:1]=[C:2]=[O:3]",
+      "priority": 85,
+      "tags": [
+        "electrophilic",
+        "moisture_sensitive"
+      ]
+    },
+    {
+      "id": "isothiocyanate",
+      "label": "N=C=S",
+      "smarts": "[N:1]=[C:2]=[S:3]",
+      "priority": 85,
+      "tags": [
+        "electrophilic",
+        "moisture_sensitive"
+      ]
+    },
+    {
+      "id": "azide",
+      "label": "N3",
+      "smarts": "[N-:1]=[N+:2]=[N:3]",
+      "priority": 85,
+      "tags": [
+        "reduction_sensitive",
+        "cycloaddition_partner"
+      ]
+    },
+    {
+      "id": "imine",
+      "label": "C=N",
+      "smarts": "[CX3;!$(C=O);!$(C=S):1]=[NX2:2]",
+      "priority": 84,
+      "tags": [
+        "electrophilic",
+        "reduction_sensitive"
+      ]
+    },
+    {
+      "id": "disulfide",
+      "label": "S–S",
+      "smarts": "[#6:1][S;H0:2][S;H0:3][#6:4]",
+      "priority": 83,
+      "tags": [
+        "reduction_sensitive",
+        "palladium_poisoning"
+      ]
+    },
+    {
+      "id": "phosphonate",
+      "label": "P(O)(OR)2",
+      "smarts": "[P:1](=[O:2])([O:3])([O:4])[#6:5]",
+      "priority": 83,
+      "tags": [
+        "electron_withdrawing",
+        "metal_binding"
       ]
     },
     {

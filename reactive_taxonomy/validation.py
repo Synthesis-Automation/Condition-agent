@@ -117,7 +117,18 @@ def validate_taxonomy() -> List[str]:
             errors.append(f"invalid_pattern_smarts:{pattern_id}")
             continue
         available_maps = {int(atom.GetAtomMapNum()) for atom in compiled.GetAtoms() if atom.GetAtomMapNum()}
-        for role, raw_maps in (pattern.get("atom_roles") or {}).items():
+        atom_roles = pattern.get("atom_roles") or {}
+        required_roles = {
+            "leaving_group": {"anchor", "handle"},
+            "pronucleophile_XH": {"center"},
+            "transfer_group": {"anchor", "center"},
+            "electrophilic_center": {"center"},
+            "aromatic_CH": {"center"},
+            "unsaturated_bond": {"endpoint_a", "endpoint_b"},
+        }.get(str(pattern.get("site_type")), set())
+        if not required_roles <= set(atom_roles):
+            errors.append(f"missing_required_atom_role:{pattern_id}")
+        for role, raw_maps in atom_roles.items():
             role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
             unknown_maps = {int(value) for value in role_maps} - available_maps
             if unknown_maps:

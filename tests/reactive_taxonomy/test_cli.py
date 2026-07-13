@@ -59,6 +59,25 @@ def test_batch_autodetects_column_and_writes_jsonl(tmp_path, capsys) -> None:
     assert records[0]["source"]["name"] == "bromobenzene"
 
 
+def test_batch_writes_molecule_summary_csv(tmp_path, capsys) -> None:
+    source = tmp_path / "molecules.csv"
+    output = tmp_path / "results.csv"
+    with source.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["name", "smiles"])
+        writer.writeheader()
+        writer.writerow({"name": "acetaldehyde", "smiles": "CC=O"})
+        writer.writerow({"name": "styrene", "smiles": "C=Cc1ccccc1"})
+
+    assert main(["batch", str(source), "--mode", "molecule", "--output", str(output)]) == 0
+    assert "CSV output:" in capsys.readouterr().out
+    with output.open("r", encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    assert len(rows) == 2
+    assert rows[0]["electrophilic_center_count"] == "1"
+    assert rows[1]["unsaturated_bond_count"] == "1"
+    assert "analysis_json" not in rows[1]
+
+
 def test_batch_autodetects_clean_reaction_column(tmp_path, capsys) -> None:
     source = tmp_path / "reactions.csv"
     reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"

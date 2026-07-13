@@ -362,7 +362,7 @@ Required fields:
 | Field | Description |
 |---|---|
 | `schema_version` | Site schema version |
-| `site_id` | Stable identifier within the analyzed molecule/reaction |
+| `site_id` | Stable identifier using the reactive center/anchor atom or bond locus |
 | `site_type` | One of the supported site families |
 | `topology` | `edge`, `atom`, `center`, or `bond` |
 | `component_index` | Reactant/product component index |

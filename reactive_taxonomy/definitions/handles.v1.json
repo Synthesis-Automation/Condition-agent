@@ -280,13 +280,39 @@
       }
     },
     {
+      "id": "acyl_anhydride",
+      "site_type": "electrophilic_center",
+      "tokens": [
+        "Acyl"
+      ],
+      "subtype": "acid_anhydride",
+      "reaction_mode": "substitution",
+      "priority": 85,
+      "smarts": "[#6:6][CX3:1](=[O:2])[O:3][CX3:4](=[O:5])[#6:7]",
+      "atom_roles": {
+        "center": [
+          1,
+          4
+        ],
+        "oxo": [
+          2,
+          5
+        ],
+        "leaving_or_activatable": 3,
+        "retained": [
+          6,
+          7
+        ]
+      }
+    },
+    {
       "id": "acyl_oxygen_or_halide",
       "site_type": "electrophilic_center",
       "tokens": [
         "Acyl"
       ],
       "priority": 70,
-      "smarts": "[CX3:1](=[O:2])-[O,Cl,Br,F:3]",
+      "smarts": "[CX3;!$([C](=O)([N])[O]):1](=[O:2])-[O,Cl,Br,F:3]",
       "atom_roles": {
         "center": 1,
         "oxo": 2,
