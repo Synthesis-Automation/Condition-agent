@@ -35,6 +35,34 @@ JSON/Markdown coverage reports. Exact reconstructed signatures and valid mapped
 signatures can be verified even when `named_family` is absent. Source family
 labels are retained only as provenance.
 
+## Type-agnostic recommendation
+
+Recommend canonical resolved recipes directly from converted JSONL records:
+
+```powershell
+python -m condition_recommender.generic_recommend_cli `
+  "c1ccc2[nH]cnc2c1.COc1ccc(B(O)O)cc1>>COc1ccc(-n2cnc3ccccc32)cc1" `
+  --records results/generic_conversion_chan_lam_pilot/records.jsonl
+```
+
+Retrieval uses the first signature tier with adequate support: exact signature,
+relaxed handle signature, high-confidence named family, generic transformation,
+or compatible bond edits and environments. A hard bond-edit gate prevents
+fallback to precedents with incompatible net chemistry. Results aggregate by
+canonical `RCR1` recipe and report support, dataset diversity, expected yield,
+precedent IDs, explanations, and condition-identity cautions.
+
+Before ranking, `compatibility.v1.json` compares unchanged spectator-group tags
+from `reactive_taxonomy` with contextual role buckets and curated family IDs in
+the resolved recipe. Explicit oxidation, reduction, acid, and moisture conflicts
+are excluded. Hydrolysis, acid/base, metal-coordination, and catalyst-poisoning
+risks remain eligible with auditable penalties and cautions. Overlapping risks
+within one category use only the strongest penalty. The same definition checks
+oxidative or hydrogen atmospheres, strengthens hydrolysis penalties for hot
+aqueous recipes, and validates mandatory catalyst roles for named metal-coupling
+regimes. Unresolved condition identities turn a missing-role decision into a
+penalty rather than an unsupported hard rejection.
+
 This CLI recommends reaction conditions from the cleaned HTE label dataset.
 It uses `reactive_taxonomy` to identify the reaction grammar and reactive
 functional-group signatures, then returns the five highest-ranked condition

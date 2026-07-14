@@ -1,11 +1,15 @@
 """Standalone condition-recommendation data and modeling package."""
 
 from .api import recommend_conditions
+from .compatibility import CompatibilityAssessment, assess_recipe_compatibility
+from .generic_api import recommend_generic_conditions
 from .label_api import recommend_conditions_from_labels
 from .models import (
     AdmissionTier,
     ConditionIdentity,
     ConditionRecommendation,
+    GenericConditionRecommendation,
+    GenericRecommendationResult,
     LabelConditionRecommendation,
     LabelRecommendationResult,
     RecommendationRecord,
@@ -16,10 +20,15 @@ __all__ = [
     "AdmissionTier",
     "ConditionIdentity",
     "ConditionRecommendation",
+    "CompatibilityAssessment",
+    "GenericConditionRecommendation",
+    "GenericRecommendationResult",
     "LabelConditionRecommendation",
     "LabelRecommendationResult",
     "RecommendationRecord",
     "RecommendationResult",
     "recommend_conditions",
+    "recommend_generic_conditions",
     "recommend_conditions_from_labels",
+    "assess_recipe_compatibility",
 ]

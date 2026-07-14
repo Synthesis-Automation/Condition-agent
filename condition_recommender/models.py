@@ -115,6 +115,51 @@ class RecommendationResult:
 
 
 @dataclass(frozen=True)
+class GenericConditionRecommendation:
+    """One canonical recipe aggregated from structure-verified precedents."""
+
+    rank: int
+    recipe_id: str
+    resolved_recipe: Dict[str, Any]
+    score: float
+    similarity_score: float
+    compatibility_score: float
+    expected_yield_pct: float
+    support: int
+    dataset_support: int
+    retrieval_level: str
+    precedent_reaction_ids: Tuple[str, ...]
+    explanation: Tuple[str, ...]
+    compatibility_evidence: Tuple[str, ...] = ()
+    cautions: Tuple[str, ...] = ()
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class GenericRecommendationResult:
+    """Type-agnostic recommendation result over generic converted records."""
+
+    query_reaction_smiles: str
+    valid: bool
+    query_signature_id: Optional[str] = None
+    named_family: Optional[str] = None
+    transformation_class: Optional[str] = None
+    retrieval_level: Optional[str] = None
+    candidate_count: int = 0
+    compatible_candidate_count: int = 0
+    excluded_candidate_count: int = 0
+    recommendations: Tuple[GenericConditionRecommendation, ...] = ()
+    warnings: Tuple[str, ...] = ()
+    error: Optional[str] = None
+    schema_version: str = "1.1"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class LabelConditionRecommendation:
     """One condition recipe retrieved from weak reaction-label precedents."""
 

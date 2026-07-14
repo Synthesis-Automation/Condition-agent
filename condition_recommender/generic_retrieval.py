@@ -1,0 +1,255 @@
+"""Type-agnostic hierarchical retrieval over generic reaction signatures."""
+
+from __future__ import annotations
+
+import json
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Dict, Iterable, Mapping, Tuple
+
+from .compatibility import CompatibilityAssessment, filter_compatible_precedents
+from .generic_indexing import GenericIndexedReaction, GenericReactionIndex
+
+_RULES_PATH = Path(__file__).with_name("definitions") / "generic_retrieval.v1.json"
+
+
+@lru_cache(maxsize=1)
+def load_generic_retrieval_rules() -> Dict[str, Any]:
+    with _RULES_PATH.open("r", encoding="utf-8") as handle:
+        return dict(json.load(handle))
+
+
+def _positions(mapping: Mapping[str, Tuple[int, ...]], key: Any) -> set[int]:
+    return set(mapping.get(str(key or ""), ()))
+
+
+def _compatible_edit_positions(
+    signature: Mapping[str, Any], index: GenericReactionIndex
+) -> set[int]:
+    """Enforce the net bond-edit compatibility gate before similarity."""
+    return _positions(index.bond_edits, signature.get("bond_edit_signature_key"))
+
+
+def _candidate_levels(
+    signature: Mapping[str, Any], index: GenericReactionIndex
+) -> list[tuple[str, set[int]]]:
+    compatible = _compatible_edit_positions(signature, index)
+    if not compatible:
+        return []
+    rules = load_generic_retrieval_rules()
+    levels: list[tuple[str, set[int]]] = [
+        (
+            "exact_signature",
+            _positions(index.exact, signature.get("exact_signature_key"))
+            & compatible,
+        ),
+        (
+            "handle_signature",
+            _positions(index.handles, signature.get("handle_signature_key"))
+            & compatible,
+        ),
+    ]
+    family = str(signature.get("named_family") or "")
+    family_confidence = float(signature.get("family_confidence") or 0.0)
+    threshold = float(rules["high_confidence_family_threshold"])
+    family_positions = (
+        _positions(index.families, family) & compatible
+        if family and family_confidence >= threshold
+        else set()
+    )
+    levels.extend(
+        (
+            ("named_family", family_positions),
+            (
+                "transformation_signature",
+                _positions(
+                    index.transformations,
+                    signature.get("transformation_signature_key"),
+                )
+                & compatible,
+            ),
+            ("bond_edit_signature", compatible),
+            (
+                "environment_signature",
+                _positions(
+                    index.environments,
+                    signature.get("environment_signature_key"),
+                )
+                & compatible,
+            ),
+        )
+    )
+    return levels
+
+
+def _minimum_support(minimum_pool_size: int | None) -> int:
+    rules = load_generic_retrieval_rules()
+    minimum = (
+        int(minimum_pool_size)
+        if minimum_pool_size is not None
+        else int(rules["minimum_pool_size"])
+    )
+    if minimum < 1:
+        raise ValueError("minimum_pool_size must be positive")
+    return minimum
+
+
+def retrieve_generic_pool(
+    signature: Mapping[str, Any],
+    index: GenericReactionIndex,
+    *,
+    minimum_pool_size: int | None = None,
+) -> Tuple[str, Tuple[GenericIndexedReaction, ...]]:
+    """Select the first adequately supported chemistry-compatible tier."""
+    minimum = _minimum_support(minimum_pool_size)
+    compatible = _compatible_edit_positions(signature, index)
+    if not compatible:
+        return "no_compatible_bond_edit", ()
+    levels = _candidate_levels(signature, index)
+    fallback: tuple[str, set[int]] | None = None
+    for level, positions in levels:
+        if not positions:
+            continue
+        if fallback is None or len(positions) > len(fallback[1]):
+            fallback = (level, positions)
+        if len(positions) >= minimum:
+            return level, index.select(sorted(positions))
+    if fallback is None:
+        return "no_compatible_precedent", ()
+    level, positions = fallback
+    return f"{level}_limited_support", index.select(sorted(positions))
+
+
+def retrieve_compatible_generic_pool(
+    signature: Mapping[str, Any],
+    index: GenericReactionIndex,
+    *,
+    minimum_pool_size: int | None = None,
+) -> tuple[
+    str,
+    tuple[tuple[GenericIndexedReaction, CompatibilityAssessment], ...],
+    int,
+    int,
+]:
+    """Apply hard recipe compatibility at every level before support checks."""
+    minimum = _minimum_support(minimum_pool_size)
+    levels = _candidate_levels(signature, index)
+    if not levels:
+        return "no_compatible_bond_edit", (), 0, 0
+    fallback = None
+    for level, positions in levels:
+        if not positions:
+            continue
+        rows = index.select(sorted(positions))
+        accepted, excluded = filter_compatible_precedents(signature, rows)
+        if not accepted:
+            continue
+        candidate = (level, accepted, len(rows), len(excluded))
+        if fallback is None or len(accepted) > len(fallback[1]):
+            fallback = candidate
+        if len(accepted) >= minimum:
+            return candidate
+    if fallback is None:
+        bond_rows = index.select(
+            sorted(_compatible_edit_positions(signature, index))
+        )
+        _, excluded = filter_compatible_precedents(signature, bond_rows)
+        return "no_compatible_condition_precedent", (), len(bond_rows), len(excluded)
+    level, accepted, raw_count, excluded_count = fallback
+    return f"{level}_limited_support", accepted, raw_count, excluded_count
+
+
+def _jaccard(left: Iterable[str], right: Iterable[str]) -> float:
+    a, b = set(left), set(right)
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def _partner_tokens(signature: Mapping[str, Any], field: str) -> Tuple[str, ...]:
+    return tuple(
+        sorted(
+            str(value)
+            for partner in signature.get("partners") or ()
+            for value in partner.get(field) or ()
+        )
+    )
+
+
+def _environment_tokens(signature: Mapping[str, Any]) -> Tuple[str, ...]:
+    tokens = []
+    for partner in signature.get("partners") or ():
+        for category in ("steric", "electronic"):
+            value = (partner.get(category) or {}).get("class")
+            if value:
+                tokens.append(f"{category}:{value}")
+        for group in partner.get("nearby_groups") or ():
+            group_id = group.get("group_id")
+            if group_id:
+                tokens.append(f"nearby:{group_id}")
+    return tuple(sorted(tokens))
+
+
+def _spectator_tokens(signature: Mapping[str, Any]) -> Tuple[str, ...]:
+    return tuple(
+        sorted(
+            str(group.get("group_id"))
+            for group in signature.get("spectator_groups") or ()
+            if group.get("group_id")
+        )
+    )
+
+
+def generic_signature_similarity(
+    query: Mapping[str, Any],
+    precedent: Mapping[str, Any],
+) -> Tuple[float, Dict[str, float]]:
+    """Return an interpretable score; absent features never count as matches."""
+    edit_fields = ("formed_bond_types", "broken_bond_types", "order_changes")
+    query_edits = tuple(
+        f"{field}:{value}"
+        for field in edit_fields
+        for value in query.get(field) or ()
+    )
+    precedent_edits = tuple(
+        f"{field}:{value}"
+        for field in edit_fields
+        for value in precedent.get(field) or ()
+    )
+    query_transformation = str(query.get("transformation_class") or "")
+    precedent_transformation = str(precedent.get("transformation_class") or "")
+    query_family = str(query.get("named_family") or "")
+    precedent_family = str(precedent.get("named_family") or "")
+    components = {
+        "edit_topology": _jaccard(query_edits, precedent_edits),
+        "handles": _jaccard(
+            _partner_tokens(query, "handle_tokens"),
+            _partner_tokens(precedent, "handle_tokens"),
+        ),
+        "contexts": _jaccard(
+            _partner_tokens(query, "anchor_contexts"),
+            _partner_tokens(precedent, "anchor_contexts"),
+        ),
+        "environment": _jaccard(
+            _environment_tokens(query), _environment_tokens(precedent)
+        ),
+        "spectators": _jaccard(
+            _spectator_tokens(query), _spectator_tokens(precedent)
+        ),
+        "transformation": float(
+            bool(query_transformation)
+            and query_transformation == precedent_transformation
+        ),
+        "family": float(bool(query_family) and query_family == precedent_family),
+    }
+    weights = load_generic_retrieval_rules()["similarity_weights"]
+    score = sum(float(weights[name]) * components[name] for name in weights)
+    return round(score, 6), components
+
+
+__all__ = [
+    "generic_signature_similarity",
+    "load_generic_retrieval_rules",
+    "retrieve_compatible_generic_pool",
+    "retrieve_generic_pool",
+]

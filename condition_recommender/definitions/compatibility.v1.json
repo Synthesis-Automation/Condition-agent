@@ -1,0 +1,123 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "compatibility.v1",
+  "hard_conflicts": [
+    {
+      "id": "oxidation_sensitive_with_oxidant",
+      "query_tags_any": ["oxidation_sensitive"],
+      "recipe_buckets_any": ["oxidants"],
+      "message": "An unchanged oxidation-sensitive group conflicts with the recipe oxidant"
+    },
+    {
+      "id": "reduction_sensitive_with_reductant",
+      "query_tags_any": ["reduction_sensitive"],
+      "recipe_buckets_any": ["reductants"],
+      "message": "An unchanged reduction-sensitive group conflicts with the recipe reductant"
+    },
+    {
+      "id": "acid_sensitive_with_acid",
+      "query_tags_any": ["acid_sensitive"],
+      "recipe_buckets_any": ["acids"],
+      "message": "An unchanged acid-sensitive group conflicts with the recipe acid"
+    },
+    {
+      "id": "moisture_sensitive_with_water",
+      "query_tags_any": ["moisture_sensitive"],
+      "recipe_family_ids_any": ["water"],
+      "message": "An unchanged moisture-sensitive group conflicts with water in the recipe"
+    },
+    {
+      "id": "oxidation_sensitive_in_oxidative_atmosphere",
+      "query_tags_any": ["oxidation_sensitive"],
+      "recipe_atmospheres_any": ["air", "aerobic", "oxygen", "o2"],
+      "message": "An unchanged oxidation-sensitive group conflicts with the oxidative atmosphere"
+    },
+    {
+      "id": "reduction_sensitive_in_hydrogen_atmosphere",
+      "query_tags_any": ["reduction_sensitive"],
+      "recipe_atmospheres_any": ["hydrogen", "h2"],
+      "message": "An unchanged reduction-sensitive group conflicts with the hydrogen atmosphere"
+    }
+  ],
+  "regime_requirements": [
+    {
+      "id": "metal_coupling_requires_catalyst",
+      "named_families_any": [
+        "suzuki_miyaura",
+        "buchwald_hartwig",
+        "ullmann_goldberg",
+        "ullmann_c_o",
+        "c_s_coupling",
+        "sonogashira",
+        "negishi",
+        "kumada",
+        "stille",
+        "hiyama",
+        "chan_lam"
+      ],
+      "minimum_family_confidence": 0.9,
+      "required_all_buckets": ["catalysts"],
+      "unresolved_penalty": 0.12,
+      "message": "The named reaction regime requires a catalyst component"
+    }
+  ],
+  "soft_penalties": [
+    {
+      "id": "hydrolysis_sensitive_with_hot_water",
+      "query_tags_any": ["hydrolysis_sensitive"],
+      "recipe_family_ids_any": ["water"],
+      "minimum_temperature_c": 60.0,
+      "penalty_group": "hydrolysis",
+      "penalty": 0.4,
+      "message": "Hot aqueous conditions may compromise an unchanged hydrolysis-sensitive group"
+    },
+    {
+      "id": "hydrolysis_sensitive_with_water",
+      "query_tags_any": ["hydrolysis_sensitive"],
+      "recipe_family_ids_any": ["water"],
+      "penalty_group": "hydrolysis",
+      "penalty": 0.25,
+      "message": "Water may compromise an unchanged hydrolysis-sensitive group"
+    },
+    {
+      "id": "palladium_poisoning_with_pd_catalyst",
+      "query_tags_any": ["palladium_poisoning"],
+      "recipe_family_prefixes_any": ["pd_"],
+      "penalty_group": "catalyst_coordination",
+      "penalty": 0.25,
+      "message": "A spectator group may poison the palladium catalyst"
+    },
+    {
+      "id": "strong_metal_binding_with_catalyst",
+      "query_tags_any": ["strong_metal_binding"],
+      "recipe_buckets_any": ["catalysts"],
+      "penalty_group": "catalyst_coordination",
+      "penalty": 0.15,
+      "message": "A spectator group may strongly coordinate the catalyst"
+    },
+    {
+      "id": "metal_binding_with_catalyst",
+      "query_tags_any": ["metal_binding"],
+      "recipe_buckets_any": ["catalysts"],
+      "penalty_group": "catalyst_coordination",
+      "penalty": 0.08,
+      "message": "A spectator group may coordinate the catalyst"
+    },
+    {
+      "id": "acidic_group_with_base",
+      "query_tags_any": ["acidic"],
+      "recipe_buckets_any": ["bases"],
+      "penalty_group": "acid_base",
+      "penalty": 0.08,
+      "message": "The base may alter an unchanged acidic group"
+    },
+    {
+      "id": "basic_group_with_acid",
+      "query_tags_any": ["basic"],
+      "recipe_buckets_any": ["acids"],
+      "penalty_group": "acid_base",
+      "penalty": 0.08,
+      "message": "The acid may protonate an unchanged basic group"
+    }
+  ]
+}
