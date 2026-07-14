@@ -1,125 +1,269 @@
 # Repository Guidelines
 
-## System Principles
+## Mission
 
-- **Taxonomy-driven**: Reaction typing, reactant classification, and recommendation logic must flow from `chemtools/taxonomy` and chemistry rules, not ad-hoc heuristics.
-- **Chemistry-first**: Validate transformations against known reaction families and functional group constraints before scoring or ranking.
-- **Keep it clean**: Remove legacy code paths and deprecated modules when refactoring; backward compatibility is not a goal unless explicitly requested.
+Build a clean, deterministic, type-agnostic reaction-condition recommendation
+system. The new system is founded on `reactive_taxonomy`; named reaction families
+are optional chemistry annotations, not mandatory routing keys.
 
-## Project Structure & Module Organization
+The molecular graph is the source of truth. Reaction observations must come from
+parsed structures, reactive sites, atom correspondence, bond edits, and local
+environments. Source labels and reaction names may contribute evidence, but they
+must never override contradictory structural evidence.
 
-- `app/`: FastAPI app (`app/main.py`) plus GUI/CLI entry scripts and service wiring.
-- `chemtools/`: Core deterministic libraries (routing, detection, constraints, explainers).
-  - `taxonomy/`: Reaction taxonomy data, loaders, validation, and catalog logic.
-  - `recommend/`: HTE-based recommendation engine and CLI.
-  - `formatters/`: Output normalization and protocol/rule formatting.
-  - `precedent/`, `protocol/`, `reagent/`, `featurizers/`, `util/`, `visualization/`.
-  - `util/functional_groups.py`: Comprehensive functional group detection using SMARTS patterns.
-- `llmtools/`: LLM integration for advanced operations (`clients.py`, `agents.py`, `prompts.py`).
-  - Multi-provider support (OpenAI, Aliyun/DeepSeek).
-  - Chemistry-specific agents combining LLM reasoning with chemtools.
-  - See `llmtools/README.md` for details.
-- `data-processor/`: ETL and data preparation utilities.
-- `data/`: Curated datasets (HTE, protocols, reaction datasets, knowledge base).
-  - `HTE_db/`, `protocol_db_v2/`, `reaction_dataset/`, `knowledge_base/`.
-- `condition_registry/`: Standalone condition-substance identities, roles, families, validation, and migration data.
-- `tests/`: Pytest suite (`test_*.py`, fixtures in `conftest.py`).
-- `scripts/`: Lightweight dev helpers and CLI tools.
-- `docs/`: Documentation for features and usage.
-- `results/`: Local analysis outputs (do not commit large artifacts).
+The implementation plan in
+`docs/new/type_agnostic_reaction_recommendation_implementation.md` is the primary
+design reference for this work.
 
-## Build, Test, and Development Commands
+## New-System Architecture
 
-- Create env and install:
-  - macOS/Linux: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`
-  - Windows (PowerShell): `python -m venv .venv; .\.venv\Scripts\Activate.ps1; pip install -r requirements.txt`
-- Run API (dev): `uvicorn app.main:app --reload --port 8000`
-- Run tests: `pytest -q`
-- HTE CLI:
-  - `python -m chemtools.recommend.cli --help`
+The clean system consists of three standalone packages:
 
-## Coding Style & Naming Conventions
+- `reactive_taxonomy/`: molecular and reaction chemistry, including parsing,
+  functional groups, reactive sites, reaction grammars, graph operators, bond
+  edits, environments, spectators, family evidence, and reaction signatures.
+- `condition_registry/`: condition-substance identity, aliases, families,
+  contextual roles, provenance, validation, and canonical condition recipes.
+- `condition_recommender/`: dataset conversion, admission, indexing, chemistry
+  compatibility, retrieval, scoring, recipe aggregation, and explanations.
 
-- Python >= 3.10, PEP 8, 4-space indents; keep modules deterministic (no global state).
-- Type hints for all public functions; docstrings for modules and complex functions.
-- Naming: `snake_case` (functions/vars), `PascalCase` (classes), `UPPER_SNAKE` (constants).
-- Keep API contracts in sync with `chemtools/contracts.py`; prefer simple, explicit data models.
-- Align any new reaction rules, labels, or schemas with `chemtools/taxonomy` and its validation tools.
+The dependency direction is:
 
-### SMARTS Pattern Compilation
+```text
+reactive_taxonomy       condition_registry
+          \                 /
+           condition_recommender
+                    |
+               app / CLI / API
+```
 
-**Always use the centralized cache** for SMARTS pattern compilation:
+Package ownership is strict:
+
+- `reactive_taxonomy` must not import `condition_registry`,
+  `condition_recommender`, or legacy `chemtools`.
+- `condition_registry` must not import `condition_recommender` or legacy
+  `chemtools`. It may consume a narrow, typed reaction context without owning
+  reaction chemistry.
+- `condition_recommender` may import `reactive_taxonomy` and
+  `condition_registry`.
+- Application layers may compose all three packages but must not contain core
+  chemistry or recommendation rules.
+
+## Legacy Boundary
+
+`chemtools/` and its existing application paths are legacy code. They may be read
+to understand prior behavior or to migrate deterministic chemistry ideas, but the
+new standalone packages must not depend on them.
+
+- Do not add imports from `chemtools` to any new-system package.
+- Do not add adapters that make legacy models part of the new public contracts.
+- Do not preserve duplicate recommendation or conversion paths permanently.
+- When parity is established, remove migrated legacy paths instead of maintaining
+  backward compatibility, unless compatibility is explicitly requested.
+- New features belong in the standalone package that owns the responsibility,
+  not in `chemtools`.
+
+## Core System Principles
+
+### Chemistry first
+
+- Validate graph transformations, valence, reactive handles, functional-group
+  constraints, and condition compatibility before similarity scoring.
+- Use hard chemistry filters before ranking or aggregation.
+- Do not replace deterministic chemistry with reaction-name matching, string
+  heuristics, or opaque embeddings.
+
+### Type agnostic, not chemistry agnostic
+
+- Every usable reaction should receive a generic `ReactionSignature` when exact
+  reconstruction or valid mapped edits provide sufficient evidence.
+- `named_family` is optional and must carry confidence and evidence.
+- Missing or ambiguous family identity must not by itself reject a chemically
+  verified record.
+- High-confidence family evidence may narrow the first retrieval tier; lower
+  confidence may affect scoring but must not block generic fallback.
+
+### Separate system layers
+
+Keep these stages explicit:
+
+1. Observation: components, functional groups, sites, atom correspondence, edits,
+   environments, and spectators.
+2. Interpretation: transformation class, partner roles, product transformation,
+   family candidates, confidence, and evidence.
+3. Recommendation: admission, compatibility filtering, retrieval, similarity,
+   recipe aggregation, ranking, and explanation.
+
+An interpretation failure must not erase valid observations.
+
+### Evidence and uncertainty
+
+Use evidence in this order:
+
+1. validated supplied atom mapping and observed bond edits;
+2. exact product reconstruction from a registered taxonomy operator;
+3. uniquely supported reactive-site grammar;
+4. unresolved or conflicting candidates retained for review.
+
+Never invent atom correspondence, force a named family, or present a predicted
+product as observed fact. Preserve ambiguity, conflicts, warnings, confidence,
+and provenance in typed outputs.
+
+### Declarative definitions
+
+- Put handles, grammars, rendering rules, feature vocabularies, compatibility
+  rules, and scoring weights in validated, versioned definitions.
+- Keep graph edits, descriptor calculations, validation, and other executable
+  behavior in explicit Python registries.
+- Never dynamically import executable code named by arbitrary JSON.
+- Include schema and definition versions in serialized analyses and records.
+
+## Current Implementation Priority
+
+Implement the plan in phases. Do not skip ahead when a later phase depends on an
+unfinished contract.
+
+The current priority is Phase A: the generic reaction-signature foundation.
+
+1. Add `ReactionAtomReference`, `ReactionEdit`, `ReactionPartner`,
+   `ProductTransformation`, and `ReactionSignature`.
+2. Normalize selected candidates, mapped bond changes, family environments,
+   product connections, and spectators into the generic schema.
+3. Generate deterministic, versioned L0-L4 signature keys and `signature_id`.
+4. Attach `reaction_signature` to `ReactionAnalysis` without changing current
+   family results.
+5. Support a valid mapped unknown-family reaction with `named_family=None`.
+6. Serialize the nested signature into recommendation records and review output
+   without changing admission or retrieval behavior yet.
+7. Establish parity tests before starting the family registry or unified
+   converter phases.
+
+Temporary compatibility fields are allowed only when they have clear removal
+criteria and regression tests.
+
+## Reaction-Signature Requirements
+
+- Signature identity must use normalized chemistry fields, schema versions, and
+  definition versions—not display labels or source reaction names.
+- Signatures must be invariant to irrelevant reactant ordering and serialization
+  details.
+- Atom references must retain side, component index, atom index, atom-map number,
+  element, charge, aromaticity, hybridization, and local-environment identity.
+- Support formed, broken, order-changed, and schema-level hydrogen changes.
+- `ProductConnection` may remain temporarily as a single-bond compatibility view;
+  `ProductTransformation` is the general contract.
+- Partner roles are optional interpretations. The base schema must not assume
+  every reaction has an electrophile, nucleophile, or transfer partner.
+- Mapped evidence and operator reconstruction must be reconciled. Contradictions
+  must produce review evidence rather than silent precedence.
+
+## Condition and Recommendation Requirements
+
+- Normalize conditions through `condition_registry`; do not infer identities or
+  roles from source column names alone.
+- Preserve raw condition identifiers, resolved substance IDs, contextual roles,
+  role confidence, and provenance.
+- Use canonical nested JSON or Parquet as the primary converted artifact. CSV is
+  a review/export view.
+- Run compatibility rules before similarity.
+- Retrieval must follow an explicit family-to-generic fallback ladder and report
+  the level used.
+- Aggregate precedents by canonical resolved recipe, not raw condition strings.
+- Recommendations must cite precedent IDs and explain matching edits, handles,
+  environments, mismatches, cautions, fallback level, and uncertainty.
+
+## Project Structure
+
+- `reactive_taxonomy/`: foundation of the new chemistry system.
+- `condition_registry/`: standalone condition identity and recipe system.
+- `condition_recommender/`: standalone conversion and recommendation system.
+- `tests/reactive_taxonomy/`, `tests/condition_registry/`, and
+  `tests/condition_recommender/`: new-system tests.
+- `docs/new/`: current architecture and implementation documents.
+- `app/`: application integration; keep domain logic out of this layer.
+- `data/` and `datasets/`: curated or source datasets; avoid committing large or
+  proprietary artifacts.
+- `results/`: local generated analysis; do not commit large outputs.
+- `chemtools/`: legacy system, outside the dependency graph of new packages.
+
+## Coding Standards
+
+- Python 3.10 or newer, PEP 8, four-space indentation.
+- Type hints on all public functions and dataclass fields.
+- Module docstrings and docstrings for public or chemically complex behavior.
+- Use `snake_case` for functions and variables, `PascalCase` for classes, and
+  `UPPER_SNAKE_CASE` for constants.
+- Prefer immutable typed dataclasses for public contracts.
+- Keep deterministic libraries free of mutable global state and network calls.
+- Keep functions focused; put shared behavior in the owning package rather than
+  copying it between family-specific modules.
+- Remove obsolete paths during refactors after parity tests pass.
+
+## SMARTS Compilation
+
+All new-system SMARTS compilation must use the standalone centralized cache:
 
 ```python
-from chemtools.util.smarts_cache import compile_smarts
+from reactive_taxonomy.chemistry.smarts_cache import compile_smarts
 
-# Compile a single pattern (cached automatically)
 pattern = compile_smarts("[CX4][Cl,Br,I]", validate=False)
-if pattern and mol.HasSubstructMatch(pattern):
-    # Match found
+if pattern is not None and molecule.HasSubstructMatch(pattern):
     pass
 ```
 
-**Best Practices:**
+Rules:
 
-1. **Module-level pattern definitions**: Define SMARTS strings as module-level constants:
+- Never call `Chem.MolFromSmarts()` directly outside the cache implementation.
+- Store SMARTS strings in versioned definitions or module-level constants.
+- Compile lazily through `compile_smarts()`.
+- Use `validate=True` when validating new or critical definitions.
+- Use `compile_smarts_batch()` when validating or warming a collection.
+- RDKit is required for molecular operations; do not implement chemistry-free
+  fallbacks unless explicitly requested.
 
-   ```python
-   _MY_PATTERNS = {
-       "aryl_halide": "[$(c[Cl,Br,I]),$(c-[Cl,Br,I])]",
-       "alcohol": "[OX2H]",
-   }
-   ```
+## Testing and Validation
 
-2. **Lazy compilation**: Compile patterns only when needed, not at module import:
+- Run the complete suite with `pytest -q` before handing off a change.
+- Keep test module names import-safe across subdirectories; use package markers or
+  importlib mode so the full suite collects in one invocation.
+- Add fast deterministic unit tests for every changed chemistry contract.
+- For reaction changes, include positive, negative, ambiguous, and conflicting
+  evidence cases.
+- Required signature regressions include Suzuki, C-N, C-O, C-S, partner-order
+  invariance, mapped unknown-family reactions, invalid maps, and deterministic
+  IDs.
+- Treat dataset snapshot changes as chemistry changes. Explain changes in
+  coverage, admission tiers, labels, or rejection reasons.
+- Verify definition loaders and schemas whenever JSON definitions change.
+- Do not accept updated snapshots merely because the code changed.
 
-   ```python
-   # Good: Lazy compilation via centralized cache
-   def detect_feature(mol):
-       pattern = compile_smarts(_MY_PATTERNS["aryl_halide"], validate=False)
-       return mol.HasSubstructMatch(pattern) if pattern else False
-   
-   # Bad: Eager compilation at module load
-   _PATTERN = Chem.MolFromSmarts("[CX4][Cl,Br,I]")  # Don't do this
-   ```
+Useful commands:
 
-3. **Validation**: Use `validate=True` for critical patterns, `validate=False` for speed:
+```powershell
+pytest -q
+pytest -q tests/reactive_taxonomy
+pytest -q tests/condition_registry
+pytest -q tests/condition_recommender
+```
 
-   ```python
-   # Development: Validate new patterns
-   pattern = compile_smarts(smarts, validate=True)
-   
-   # Production: Skip validation for known-good patterns
-   pattern = compile_smarts(smarts, validate=False)
-   ```
+## Commit and Review Guidelines
 
-4. **Never call `Chem.MolFromSmarts()` directly** - always use `compile_smarts()` to benefit from global caching.
+- Use Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, or
+  `chore:` with an optional package scope.
+- Keep subjects imperative and at most 72 characters.
+- PRs should state the chemistry motivation, contract/schema impact, definition
+  version changes, migration/removal impact, and test results.
+- If API routes change, verify the application boots and document the API impact.
+- Do not commit secrets. Use environment variables for configuration.
 
-5. **Batch compilation**: For multiple patterns at startup:
+## Definition of Clean-System Progress
 
-   ```python
-   from chemtools.util.smarts_cache import compile_smarts_batch
-   
-   patterns = compile_smarts_batch(_MY_PATTERNS, skip_invalid=True)
-   ```
+A change advances the new system only when it:
 
-**Benefits**: 1024-entry global LRU cache provides 10-100x speedup for repeated patterns, shared across all modules.
-
-## Testing Guidelines
-
-- Framework: `pytest`; tests live in `tests/test_*.py` mirroring module names.
-- Add unit tests with meaningful edge cases; use fixtures from `tests/conftest.py`.
-- Keep tests fast and deterministic; aim to maintain or improve coverage for changed code.
-
-## Commit & Pull Request Guidelines
-
-- Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`; scopes like `api`, `cli`, `chemtools` are encouraged.
-- Subject in imperative mood (<=72 chars) with optional body for context.
-- PRs must include: summary, motivation, linked issues, testing notes, and API impact (screenshots of `/docs` if routes change).
-- Ensure `pytest -q` passes and `uvicorn app.main:app --reload --port 8000` boots locally before request for review.
-
-## Security & Configuration Tips
-
-- Do not commit secrets; prefer environment variables if configuration is introduced.
-- RDKit is required whenever molecular operations are needed; do not implement optional fallbacks unless explicitly requested.
-- Sample data in `data/` is for demos only - avoid adding large/proprietary datasets.
+- strengthens the standalone package contracts;
+- derives behavior from molecular evidence and versioned chemistry definitions;
+- preserves uncertainty and provenance;
+- adds or improves chemistry regression coverage;
+- avoids new dependencies on legacy `chemtools`; and
+- moves toward one canonical conversion and recommendation path rather than
+  maintaining parallel family-specific systems.
