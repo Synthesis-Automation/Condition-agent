@@ -61,8 +61,17 @@ class RecommendationRecord:
     transformation_confidence: float = 0.0
     family_confidence: float = 0.0
     taxonomy_definition_versions: Dict[str, str] = field(default_factory=dict)
+    source_dataset: str = ""
+    source_path: str = ""
+    source_declared_family: str = ""
+    observation_id: str = ""
+    canonical_reaction_id: Optional[str] = None
+    canonical_reaction_smiles: Optional[str] = None
+    raw_recipe_id: str = ""
+    condition_resolution: Dict[str, Any] = field(default_factory=dict)
+    converter_definition_version: str = "generic_conversion.v1"
     source: Dict[str, Any] = field(default_factory=dict)
-    schema_version: str = "1.2"
+    schema_version: str = "1.3"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

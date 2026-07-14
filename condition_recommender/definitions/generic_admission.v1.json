@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "generic_admission.v1",
+  "valid_yield_range": [0.0, 100.0],
+  "verified_evidence": [
+    "exact_product_reconstruction",
+    "validated_atom_mapping",
+    "validated_mapping_and_exact_reconstruction"
+  ],
+  "review_warnings": ["MULTIPLE_PRODUCTS"]
+}

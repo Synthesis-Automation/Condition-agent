@@ -1,5 +1,40 @@
 # Reaction-Label Condition Recommender
 
+## Mixed dataset audit
+
+Audit a CSV file or directory before conversion without modifying the source
+data:
+
+```powershell
+python -m condition_recommender.audit_cli `
+  data-processor/reaction_dataset `
+  results/reaction_dataset_audit `
+  --chemistry-sample-per-file 100
+```
+
+Metadata, canonical reaction identities, duplicate groups, yields, and condition
+registry coverage are computed over every row. Full reaction featurization uses
+a deterministic per-file sample so large corpora remain practical. The command
+writes `audit_report.json` and `audit_report.md`.
+
+## Generic mixed-dataset conversion
+
+Convert a single CSV or an entire directory without selecting a named reaction
+family:
+
+```powershell
+python -m condition_recommender.generic_conversion_cli `
+  data-processor/reaction_dataset `
+  results/generic_conversion
+```
+
+For a bounded smoke test, add `--max-rows 1000`. This limit reads source rows in
+file order and is not a statistically representative sample. The converter
+writes canonical nested records to `records.jsonl`, tiered CSV review views, and
+JSON/Markdown coverage reports. Exact reconstructed signatures and valid mapped
+signatures can be verified even when `named_family` is absent. Source family
+labels are retained only as provenance.
+
 This CLI recommends reaction conditions from the cleaned HTE label dataset.
 It uses `reactive_taxonomy` to identify the reaction grammar and reactive
 functional-group signatures, then returns the five highest-ranked condition
