@@ -55,6 +55,10 @@ def convert_datasets(
     source_counts = Counter()
     source_tiers: Dict[str, Counter[str]] = defaultdict(Counter)
     condition_status_counts = Counter()
+    recipe_warning_counts = Counter()
+    resolved_recipe_counts = Counter()
+    role_bucket_counts = Counter()
+    role_confidence_counts = Counter()
     canonical_groups: Counter[str] = Counter()
     group_recipes: Dict[str, set[str]] = defaultdict(set)
     row_count = signature_count = 0
@@ -100,10 +104,38 @@ def convert_datasets(
                 condition_status_counts.update(
                     record.condition_resolution.get("status_counts") or {}
                 )
+                recipe_warning_counts.update(
+                    record.condition_resolution.get("recipe_warnings") or ()
+                )
+                if record.resolved_recipe_id:
+                    resolved_recipe_counts[record.resolved_recipe_id] += 1
+                for bucket in (
+                    "catalysts",
+                    "ligands",
+                    "bases",
+                    "acids",
+                    "condensation_agents",
+                    "oxidants",
+                    "reductants",
+                    "additives",
+                    "solvents",
+                    "other_components",
+                ):
+                    for component in (record.resolved_recipe or {}).get(bucket, ()):
+                        role_bucket_counts[bucket] += 1
+                        confidence = float(
+                            component.get("primary_role_confidence", 0.0)
+                        )
+                        if confidence >= 0.9:
+                            role_confidence_counts["high"] += 1
+                        elif confidence >= 0.7:
+                            role_confidence_counts["medium"] += 1
+                        else:
+                            role_confidence_counts["low"] += 1
                 if record.canonical_reaction_id:
                     canonical_groups[record.canonical_reaction_id] += 1
                     group_recipes[record.canonical_reaction_id].add(
-                        record.raw_recipe_id
+                        record.resolved_recipe_id or record.raw_recipe_id
                     )
     repeated_groups = sum(count > 1 for count in canonical_groups.values())
     multi_recipe_groups = sum(
@@ -131,6 +163,10 @@ def convert_datasets(
         "condition_resolution_status_counts": dict(
             sorted(condition_status_counts.items())
         ),
+        "resolved_recipe_count": len(resolved_recipe_counts),
+        "recipe_warning_counts": dict(sorted(recipe_warning_counts.items())),
+        "resolved_role_bucket_counts": dict(sorted(role_bucket_counts.items())),
+        "role_confidence_counts": dict(sorted(role_confidence_counts.items())),
         "source_row_counts": dict(sorted(source_counts.items())),
         "source_tier_counts": {
             source: {

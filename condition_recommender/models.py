@@ -69,9 +69,11 @@ class RecommendationRecord:
     canonical_reaction_smiles: Optional[str] = None
     raw_recipe_id: str = ""
     condition_resolution: Dict[str, Any] = field(default_factory=dict)
+    resolved_recipe_id: str = ""
+    resolved_recipe: Optional[Dict[str, Any]] = None
     converter_definition_version: str = "generic_conversion.v1"
     source: Dict[str, Any] = field(default_factory=dict)
-    schema_version: str = "1.3"
+    schema_version: str = "1.4"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

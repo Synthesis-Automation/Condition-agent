@@ -8,6 +8,28 @@ Data ownership:
 - `definitions/substances.v1.csv`: migrated flat substance registry
 - `definitions/pending_substances.csv`: unresolved additions awaiting curation
 - `definitions/roles_families.v1.json`: role and family taxonomy
+- `definitions/role_resolution.v1.json`: contextual role and recipe-bucket rules
+
+## Contextual recipes
+
+Build role-aware recipes without collapsing multi-role substances:
+
+```python
+from condition_registry import build_resolved_recipe
+
+recipe = build_resolved_recipe(
+    {
+        "catalyst_cas": ("14221-01-3",),
+        "reagent_cas": ("584-08-7",),
+        "solvent_cas": ("7732-18-5",),
+    },
+    transformation_class="c_c_transfer_coupling",
+)
+```
+
+The resulting `RCR1` identity is based on resolved substances, contextual roles,
+operating conditions, and definition versions. Unresolved identities remain in
+`other_components` with provenance and uncertainty warnings.
 
 ## CLI tester
 

@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "role_resolution.v1",
+  "generic_roles": ["organic_compound", "inorganic_compound", "other_reagent"],
+  "source_role_preferences": {
+    "catalyst_cas": ["metal_catalyst", "organo_catalyst", "enzyme", "ligand"],
+    "reagent_cas": ["base", "acid", "condensation_agent", "oxidant", "reductant", "additive", "ligand", "metal_catalyst", "solvent"],
+    "solvent_cas": ["solvent"]
+  },
+  "source_fallback_roles": {
+    "catalyst_cas": "other_reagent",
+    "reagent_cas": "other_reagent",
+    "solvent_cas": "solvent"
+  },
+  "transformation_role_preferences": {
+    "c_c_transfer_coupling": ["metal_catalyst", "ligand", "base"],
+    "sp2_c_n_substitution": ["metal_catalyst", "ligand", "base"],
+    "sp2_c_o_substitution": ["metal_catalyst", "ligand", "base"],
+    "sp2_c_s_substitution": ["metal_catalyst", "ligand", "base"],
+    "amide_formation": ["condensation_agent", "base", "acid"],
+    "ester_formation": ["acid", "condensation_agent", "base"],
+    "thioester_formation": ["condensation_agent", "base"],
+    "sulfonamide_formation": ["base", "acid"],
+    "chan_lam_heteroatom_coupling": ["metal_catalyst", "base", "oxidant"]
+  },
+  "role_buckets": {
+    "metal_catalyst": "catalysts",
+    "organo_catalyst": "catalysts",
+    "enzyme": "catalysts",
+    "ligand": "ligands",
+    "base": "bases",
+    "acid": "acids",
+    "condensation_agent": "condensation_agents",
+    "oxidant": "oxidants",
+    "reductant": "reductants",
+    "additive": "additives",
+    "solvent": "solvents",
+    "organic_compound": "other_components",
+    "inorganic_compound": "other_components",
+    "other_reagent": "other_components"
+  }
+}

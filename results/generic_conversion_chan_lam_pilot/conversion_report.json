@@ -37,6 +37,25 @@
     "resolved": 359,
     "unresolved": 46
   },
+  "resolved_recipe_count": 22,
+  "recipe_warning_counts": {
+    "CONDITION_IDENTITY_UNCERTAINTY": 46,
+    "MULTIPLE_POSSIBLE_ROLES": 83,
+    "SOURCE_FIELD_ROLE_MISMATCH": 25
+  },
+  "resolved_role_bucket_counts": {
+    "additives": 2,
+    "bases": 98,
+    "catalysts": 91,
+    "other_components": 79,
+    "oxidants": 22,
+    "solvents": 113
+  },
+  "role_confidence_counts": {
+    "high": 320,
+    "low": 79,
+    "medium": 6
+  },
   "source_row_counts": {
     "ChanLam_Narylation": 100
   },

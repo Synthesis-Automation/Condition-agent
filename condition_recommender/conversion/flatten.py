@@ -30,6 +30,7 @@ GENERIC_REVIEW_FIELDS = (
     "temperature_c",
     "time_h",
     "condition_recipe_id",
+    "legacy_condition_recipe_id",
     "raw_recipe_id",
     "catalyst_cas",
     "reagent_cas",
@@ -80,7 +81,8 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
             record.temperature_c if record.temperature_c is not None else ""
         ),
         "time_h": record.time_h if record.time_h is not None else "",
-        "condition_recipe_id": record.conditions.recipe_id,
+        "condition_recipe_id": record.resolved_recipe_id or record.conditions.recipe_id,
+        "legacy_condition_recipe_id": record.conditions.recipe_id,
         "raw_recipe_id": record.raw_recipe_id,
         "catalyst_cas": _joined(record.conditions.catalyst_cas),
         "reagent_cas": _joined(record.conditions.reagent_cas),

@@ -73,6 +73,11 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.canonical_reaction_id.startswith("CRX1:")
     assert record.observation_id.startswith("OBS1:")
     assert record.raw_recipe_id.startswith("RAWCOND1:")
+    assert record.resolved_recipe_id.startswith("RCR1:")
+    assert record.resolved_recipe["catalysts"][0]["primary_role"] == (
+        "metal_catalyst"
+    )
+    assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
 
 
@@ -90,6 +95,7 @@ def test_mapped_unknown_family_signature_is_verified() -> None:
     assert record.reaction_signature["order_changes"] == (
         "C-C:DOUBLE>SINGLE",
     )
+    assert record.resolved_recipe_id.startswith("RCR1:")
 
 
 def test_grammar_only_record_is_review_not_rejected() -> None:
@@ -170,6 +176,8 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
         "rejected": 1,
     }
     assert report["signature_count"] == 2
+    assert report["resolved_recipe_count"] > 0
+    assert sum(report["role_confidence_counts"].values()) > 0
     records = [
         json.loads(line)
         for line in (output / "records.jsonl").read_text().splitlines()
@@ -179,6 +187,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     assert records[1]["reaction_signature"]["order_changes"] == [
         "C-C:DOUBLE>SINGLE"
     ]
+    assert records[1]["resolved_recipe_id"].startswith("RCR1:")
     with (output / "verified.csv").open(
         encoding="utf-8-sig", newline=""
     ) as handle:
@@ -187,4 +196,3 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     assert all(row["reaction_signature_id"].startswith("RS1:") for row in verified)
     assert json.loads((output / "conversion_report.json").read_text()) == report
     assert (output / "conversion_report.md").exists()
-
