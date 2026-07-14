@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import List
 
 from .chemistry.rdkit_utils import parse_smiles
 
 from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_candidates import enumerate_reaction_candidates
+from .reaction_edits import normalize_reaction_edits
 from .reaction_labels import render_reactant_label, render_reaction_label
 from .reaction_environments import build_reaction_family_environment
 from .reaction_models import ReactionAnalysis, ReactionCandidate
@@ -16,15 +17,20 @@ from .reaction_operators import apply_operator
 from .reaction_parser import parse_reaction_smiles
 from .reaction_products import build_product_connection
 from .reaction_spectators import derive_spectator_groups
+from .reaction_signatures import build_reaction_signature
 
 
 def _canonical_without_maps(smiles: str) -> str | None:
     from rdkit import Chem
     mol = parse_smiles(smiles)
-    if mol is None: return None
-    for atom in mol.GetAtoms(): atom.SetAtomMapNum(0)
-    try: return Chem.MolToSmiles(mol, canonical=True, isomericSmiles=True)
-    except Exception: return None
+    if mol is None:
+        return None
+    for atom in mol.GetAtoms():
+        atom.SetAtomMapNum(0)
+    try:
+        return Chem.MolToSmiles(mol, canonical=True, isomericSmiles=True)
+    except Exception:
+        return None
 
 
 def featurize_reaction(
@@ -61,7 +67,8 @@ def featurize_reaction(
             compatible_named_families=tuple(grammar.get("compatible_named_families") or []),
         )
         candidates.append(candidate)
-        if verification == "exact_product_reconstruction": exact.append(candidate)
+        if verification == "exact_product_reconstruction":
+            exact.append(candidate)
     selected = None
     evidence = "reactant_grammar_only" if candidates else "unresolved"
     if len(exact) == 1:
@@ -81,6 +88,32 @@ def featurize_reaction(
     spectators = derive_spectator_groups(parsed.reactants, selected, evidence)
     family_environment = build_reaction_family_environment(parsed.reactants, selected, spectators, evidence)
     product_connection = build_product_connection(selected, evidence, style=label_style)
+    named_family = (
+        selected.compatible_named_families[0]
+        if selected and len(selected.compatible_named_families) == 1
+        else None
+    )
+    compatible_named_families = selected.compatible_named_families if selected else ()
+    edit_result = normalize_reaction_edits(
+        parsed.reactants, parsed.products, selected
+    )
+    warnings.extend(edit_result.warnings)
+    effective_evidence = evidence
+    if edit_result.evidence == "conflicting_edit_evidence":
+        effective_evidence = edit_result.evidence
+    elif selected is None and edit_result.valid:
+        effective_evidence = edit_result.evidence
+    reaction_signature = build_reaction_signature(
+        reactants=parsed.reactants,
+        selected=selected,
+        edit_result=edit_result,
+        family_environment=family_environment,
+        product_connection=product_connection,
+        spectators=spectators,
+        named_family=named_family,
+        compatible_named_families=compatible_named_families,
+        warnings=warnings,
+    )
     reaction_label = selected.reaction_label if selected else None
     reaction_label_status = "exact_product" if selected else "unavailable"
     if selected is None and candidates:
@@ -102,15 +135,16 @@ def featurize_reaction(
         reactants=parsed.reactants, agents=parsed.agents, products=parsed.products,
         candidates=tuple(candidates), selected_candidate=selected,
         transformation_class=selected.transformation_class if selected else None,
-        compatible_named_families=selected.compatible_named_families if selected else (),
-        named_family=selected.compatible_named_families[0] if selected and len(selected.compatible_named_families) == 1 else None,
+        compatible_named_families=compatible_named_families,
+        named_family=named_family,
         reaction_label=reaction_label,
         reaction_label_status=reaction_label_status,
-        evidence_quality=evidence, mapped_bond_changes=mapped_changes,
+        evidence_quality=effective_evidence, mapped_bond_changes=mapped_changes,
         spectator_groups=spectators,
         family_environment=family_environment,
         product_connection=product_connection,
-        warnings=tuple(warnings),
+        reaction_signature=reaction_signature,
+        warnings=tuple(sorted(set(warnings))),
     )
 
 

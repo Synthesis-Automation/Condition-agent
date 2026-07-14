@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "signature_schema_version": "1.0",
+  "levels": {
+    "L0": ["edit_topology", "handles", "anchor_contexts", "local_environments"],
+    "L1": ["edit_topology", "handles"],
+    "L2": ["bond_changes", "transformation_class"],
+    "L3": ["bond_changes"],
+    "L4": ["local_environments", "spectator_groups"]
+  }
+}

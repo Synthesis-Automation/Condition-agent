@@ -2,7 +2,7 @@ import csv
 import json
 
 from condition_recommender.condition_normalization import is_valid_cas, normalize_cas_list
-from condition_recommender.conversion.suzuki import convert_file, convert_row
+from condition_recommender.conversion.suzuki import convert_file, convert_row, flatten_record
 from condition_recommender.models import AdmissionTier
 
 
@@ -40,6 +40,15 @@ def test_exact_suzuki_with_complete_conditions_is_verified() -> None:
     assert record.product_connection is not None
     assert record.product_connection["concise_label"] == "Ar–Ar"
     assert record.conditions.complete
+    assert record.reaction_signature is not None
+    assert record.reaction_signature["signature_id"].startswith("RS1:")
+    assert record.transformation_class == "c_c_transfer_coupling"
+    assert record.transformation_confidence == 1.0
+    flat = flatten_record(record)
+    assert flat["signature_l0_exact"].startswith("L0:")
+    assert json.loads(flat["reaction_signature_json"])["signature_id"] == (
+        record.reaction_signature["signature_id"]
+    )
 
 
 def test_unverified_product_is_sent_to_review() -> None:
@@ -85,3 +94,9 @@ def test_convert_file_writes_three_tiers_and_report(tmp_path) -> None:
     assert (tmp_path / "out" / "conversion_report.md").exists()
     for tier in ("verified", "review", "rejected"):
         assert (tmp_path / "out" / f"{tier}.csv").exists()
+    with (tmp_path / "out" / "verified.csv").open(
+        encoding="utf-8-sig", newline=""
+    ) as handle:
+        verified = next(csv.DictReader(handle))
+    assert verified["reaction_signature_id"].startswith("RS1:")
+    assert verified["signature_l3_bond_edit"].startswith("L3:")

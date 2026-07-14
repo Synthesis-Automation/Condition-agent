@@ -14,6 +14,8 @@ def test_exact_co_record_is_verified() -> None:
     assert record.admission_tier == AdmissionTier.VERIFIED
     assert record.product_connection["connection_type"] == "C_O"
     assert record.family_environment["family_id"] == "c_o_coupling"
+    assert record.reaction_signature is not None
+    assert record.reaction_signature["formed_bond_types"] == ("C-O:SINGLE",)
 
 
 def test_exact_cs_record_is_verified() -> None:

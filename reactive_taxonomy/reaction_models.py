@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Literal, Optional, Tuple
+from typing import Any, Dict, Literal, Optional, Tuple
 
 from .models import CompoundAnalysis
 
@@ -39,6 +39,34 @@ class BondChange:
     old_order: Optional[str]
     new_order: Optional[str]
     evidence: str
+
+
+@dataclass(frozen=True)
+class ReactionAtomReference:
+    """One atom participating in an observed or reconstructed reaction edit."""
+
+    side: str
+    component_index: int
+    atom_index: int
+    atom_map_number: Optional[int]
+    element: str
+    formal_charge: int
+    aromatic: bool
+    hybridization: str
+    local_environment_id: str
+
+
+@dataclass(frozen=True)
+class ReactionEdit:
+    """Normalized graph change with atom provenance and evidence."""
+
+    edit_type: Literal["formed", "broken", "order_changed", "hydrogen_change"]
+    atom_1: ReactionAtomReference
+    atom_2: Optional[ReactionAtomReference]
+    old_order: Optional[str]
+    new_order: Optional[str]
+    evidence: str
+    confidence: float
 
 
 @dataclass(frozen=True)
@@ -88,6 +116,25 @@ class ReactionFamilyEnvironment:
 
 
 @dataclass(frozen=True)
+class ReactionPartner:
+    """Mechanism-neutral reaction partner with an optional interpreted role."""
+
+    partner_id: str
+    component_index: int
+    role: Optional[str]
+    role_confidence: float
+    reactive_site_ids: Tuple[str, ...]
+    handle_tokens: Tuple[str, ...]
+    anchor_contexts: Tuple[str, ...]
+    chemist_label: str
+    steric: Dict[str, Any] = field(default_factory=dict)
+    electronic: Dict[str, Any] = field(default_factory=dict)
+    nearby_groups: Tuple[Dict[str, Any], ...] = ()
+    spectator_group_ids: Tuple[str, ...] = ()
+    flags: Tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
 class ProductConnectionEndpoint:
     """One reactant-derived endpoint of a newly formed product bond."""
 
@@ -108,6 +155,47 @@ class ProductConnection:
     connection_type: str
     concise_label: str
     evidence: str
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
+class ProductTransformation:
+    """General product transformation supporting one or more graph edits."""
+
+    edits: Tuple[ReactionEdit, ...]
+    formed_connection_labels: Tuple[str, ...]
+    concise_label: Optional[str]
+    exact_product_verified: bool
+    evidence: str
+
+
+@dataclass(frozen=True)
+class ReactionSignature:
+    """Versioned chemistry identity used by conversion and recommendation."""
+
+    signature_id: str
+    exact_signature_key: str
+    handle_signature_key: str
+    transformation_signature_key: str
+    bond_edit_signature_key: str
+    environment_signature_key: str
+    edit_signature: str
+    formed_bond_types: Tuple[str, ...]
+    broken_bond_types: Tuple[str, ...]
+    order_changes: Tuple[str, ...]
+    edits: Tuple[ReactionEdit, ...]
+    partners: Tuple[ReactionPartner, ...]
+    product_transformation: Optional[ProductTransformation]
+    transformation_class: Optional[str]
+    transformation_confidence: float
+    named_family: Optional[str]
+    family_confidence: float
+    compatible_named_families: Tuple[str, ...]
+    spectator_groups: Tuple[ReactionSpectatorGroup, ...]
+    global_descriptors: Dict[str, Any]
+    warnings: Tuple[str, ...]
+    evidence_quality: str
+    definition_versions: Dict[str, str]
     schema_version: str = "1.0"
 
 
@@ -143,12 +231,13 @@ class ReactionAnalysis:
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
     family_environment: Optional[ReactionFamilyEnvironment] = None
     product_connection: Optional[ProductConnection] = None
+    reaction_signature: Optional[ReactionSignature] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.2"
+    schema_version: str = "1.3"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
 
-__all__ = ["BondChange", "ProductConnection", "ProductConnectionEndpoint", "ReactionAnalysis", "ReactionCandidate", "ReactionComponent", "ReactionFamilyEnvironment", "ReactionPartnerEnvironment", "ReactionSiteReference", "ReactionSpectatorGroup"]
+__all__ = ["BondChange", "ProductConnection", "ProductConnectionEndpoint", "ProductTransformation", "ReactionAnalysis", "ReactionAtomReference", "ReactionCandidate", "ReactionComponent", "ReactionEdit", "ReactionFamilyEnvironment", "ReactionPartner", "ReactionPartnerEnvironment", "ReactionSignature", "ReactionSiteReference", "ReactionSpectatorGroup"]

@@ -56,8 +56,13 @@ class RecommendationRecord:
     family_environment: Optional[Dict[str, Any]] = None
     product_connection: Optional[Dict[str, Any]] = None
     spectator_groups: Tuple[Dict[str, Any], ...] = ()
+    reaction_signature: Optional[Dict[str, Any]] = None
+    transformation_class: Optional[str] = None
+    transformation_confidence: float = 0.0
+    family_confidence: float = 0.0
+    taxonomy_definition_versions: Dict[str, str] = field(default_factory=dict)
     source: Dict[str, Any] = field(default_factory=dict)
-    schema_version: str = "1.1"
+    schema_version: str = "1.2"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

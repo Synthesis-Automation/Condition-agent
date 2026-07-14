@@ -13,6 +13,7 @@ from reactive_taxonomy import featurize_reaction
 
 from ..condition_normalization import normalize_conditions, optional_float
 from ..models import AdmissionTier, RecommendationRecord
+from .signature_serialization import flattened_signature_fields, signature_record_fields
 
 
 def _admission(
@@ -99,6 +100,7 @@ def convert_row(row: Dict[str, Any], source_row_number: int) -> RecommendationRe
         family_environment=family_environment,
         product_connection=asdict(analysis.product_connection) if analysis.product_connection else None,
         spectator_groups=tuple(asdict(group) for group in analysis.spectator_groups),
+        **signature_record_fields(analysis),
         source={
             "reaction_type": str(row.get("reaction_type") or ""),
             "reference": str(row.get("reference") or ""),
@@ -157,6 +159,10 @@ def flatten_record(record: RecommendationRecord) -> Dict[str, Any]:
         "spectator_group_ids": joined(sorted({item["group_id"] for item in record.spectator_groups})),
         "family_environment_json": json.dumps(record.family_environment, ensure_ascii=False, sort_keys=True) if record.family_environment else "",
         "spectator_groups_json": json.dumps(record.spectator_groups, ensure_ascii=False, sort_keys=True),
+        "transformation_class": record.transformation_class or "",
+        "transformation_confidence": record.transformation_confidence,
+        "family_confidence": record.family_confidence,
+        **flattened_signature_fields(record.reaction_signature),
         "reference": record.source.get("reference", ""),
         "notes": record.source.get("notes", ""),
     }

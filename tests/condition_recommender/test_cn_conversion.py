@@ -18,6 +18,8 @@ def test_exact_cn_record_is_verified() -> None:
     assert record.product_connection["connection_type"] == "C_N"
     assert record.product_connection["concise_label"] == "Ar–NR1R2"
     assert record.family_environment["family_id"] == "c_n_coupling"
+    assert record.reaction_signature is not None
+    assert record.reaction_signature["formed_bond_types"] == ("C-N:SINGLE",)
 
 
 def test_partial_cn_record_keeps_product_empty() -> None:
