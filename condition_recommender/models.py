@@ -57,6 +57,7 @@ class RecommendationRecord:
     product_connection: Optional[Dict[str, Any]] = None
     spectator_groups: Tuple[Dict[str, Any], ...] = ()
     reaction_signature: Optional[Dict[str, Any]] = None
+    reaction_display_label: Optional[Dict[str, Any]] = None
     transformation_class: Optional[str] = None
     transformation_confidence: float = 0.0
     family_confidence: float = 0.0
@@ -73,7 +74,7 @@ class RecommendationRecord:
     resolved_recipe: Optional[Dict[str, Any]] = None
     converter_definition_version: str = "generic_conversion.v1"
     source: Dict[str, Any] = field(default_factory=dict)
-    schema_version: str = "1.4"
+    schema_version: str = "1.5"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

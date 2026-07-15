@@ -1,0 +1,240 @@
+"""Deterministic observation-first reaction display-label rendering."""
+
+from __future__ import annotations
+
+import json
+from collections import Counter
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Iterable, Optional, Sequence, Tuple
+
+from .reaction_models import ReactionDisplayLabel, ReactionEdit, ReactionLabelClause
+
+_PATH = Path(__file__).with_name("definitions") / "reaction_label_rendering.v1.json"
+
+
+@lru_cache(maxsize=1)
+def load_reaction_label_rendering() -> dict[str, Any]:
+    """Load the versioned declarative edit-label rendering rules."""
+    with _PATH.open("r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+    if payload.get("schema_version") != "1.0":
+        raise ValueError("Unsupported reaction-label rendering schema")
+    return dict(payload)
+
+
+def _style(name: str) -> dict[str, str]:
+    styles = load_reaction_label_rendering()["styles"]
+    if name not in styles:
+        raise ValueError(f"Unknown reaction-label style: {name}")
+    return dict(styles[name])
+
+
+def _bond(order: Optional[str], style: dict[str, str]) -> str:
+    return {
+        "SINGLE": style["single"],
+        "DOUBLE": style["double"],
+        "TRIPLE": style["triple"],
+        "AROMATIC": style["aromatic"],
+    }.get(str(order or "SINGLE").upper(), style["single"])
+
+
+def _ordered_atoms(edit: ReactionEdit) -> Tuple[Any, ...]:
+    atoms = tuple(atom for atom in (edit.atom_1, edit.atom_2) if atom is not None)
+    precedence = {
+        element: index
+        for index, element in enumerate(
+            load_reaction_label_rendering()["element_precedence"]
+        )
+    }
+    return tuple(
+        sorted(
+            atoms,
+            key=lambda atom: (
+                precedence.get(atom.element, 999),
+                atom.element,
+                atom.atom_map_number if atom.atom_map_number is not None else -1,
+                atom.component_index,
+                atom.atom_index,
+            ),
+        )
+    )
+
+
+def _mapped_atom(atom: Any) -> str:
+    template = load_reaction_label_rendering()["templates"]["mapped_atom"]
+    if atom.atom_map_number is None:
+        return str(atom.element)
+    return str(template).format(
+        element=atom.element, map_number=atom.atom_map_number
+    )
+
+
+def render_reaction_label_clause(
+    edit: ReactionEdit,
+    *,
+    style: str = "unicode",
+) -> ReactionLabelClause:
+    """Render one normalized edit without inferring a reaction family."""
+    styling = _style(style)
+    templates = load_reaction_label_rendering()["templates"]
+    atoms = _ordered_atoms(edit)
+    elements = tuple(atom.element for atom in atoms)
+    maps = tuple(
+        int(atom.atom_map_number)
+        for atom in atoms
+        if atom.atom_map_number is not None
+    )
+    if edit.edit_type == "hydrogen_change":
+        center = edit.atom_1.element
+        detailed_center = _mapped_atom(edit.atom_1)
+        gained = bool(edit.new_order and not edit.old_order)
+        key = "hydrogen_gain" if gained else "hydrogen_loss"
+        concise = str(templates[key]).format(
+            center=center, bond=styling["single"]
+        )
+        detailed = str(templates[key]).format(
+            center=detailed_center, bond=styling["single"]
+        )
+        elements = (edit.atom_1.element, "H")
+    else:
+        left, right = atoms
+        concise_values = {"left": left.element, "right": right.element}
+        detailed_values = {"left": _mapped_atom(left), "right": _mapped_atom(right)}
+        if edit.edit_type == "formed":
+            values = {"bond": _bond(edit.new_order, styling)}
+        elif edit.edit_type == "broken":
+            values = {"bond": _bond(edit.old_order, styling)}
+        else:
+            values = {
+                "old_bond": _bond(edit.old_order, styling),
+                "new_bond": _bond(edit.new_order, styling),
+                "arrow": styling["arrow"],
+            }
+        concise = str(templates[edit.edit_type]).format(**concise_values, **values)
+        detailed = str(templates[edit.edit_type]).format(**detailed_values, **values)
+    return ReactionLabelClause(
+        edit_type=edit.edit_type,
+        concise=concise,
+        detailed=detailed,
+        elements=elements,
+        atom_map_numbers=maps,
+        old_order=edit.old_order,
+        new_order=edit.new_order,
+        evidence=edit.evidence,
+        confidence=edit.confidence,
+    )
+
+
+def _ordered_clauses(clauses: Iterable[ReactionLabelClause]) -> tuple[ReactionLabelClause, ...]:
+    order = {
+        edit_type: index
+        for index, edit_type in enumerate(
+            load_reaction_label_rendering()["clause_order"]
+        )
+    }
+    return tuple(
+        sorted(
+            clauses,
+            key=lambda clause: (
+                order.get(clause.edit_type, 999),
+                clause.concise,
+                clause.detailed,
+            ),
+        )
+    )
+
+
+def _compose_concise(
+    clauses: Sequence[ReactionLabelClause], *, style: str
+) -> str:
+    rendering = load_reaction_label_rendering()
+    styling = _style(style)
+    template = rendering["templates"]["counted_clause"]
+    counts = Counter(clause.concise for clause in clauses)
+    first_position = {
+        clause.concise: index for index, clause in reversed(list(enumerate(clauses)))
+    }
+    parts = []
+    for concise in sorted(counts, key=first_position.get):
+        count = counts[concise]
+        parts.append(
+            str(template).format(
+                count=count, times=styling["times"], clause=concise
+            )
+            if count > 1
+            else concise
+        )
+    return styling["separator"].join(parts)
+
+
+def build_reaction_display_label(
+    *,
+    edits: Sequence[ReactionEdit],
+    selected_label: Optional[str],
+    selected_exact: bool,
+    named_family: Optional[str],
+    fallback_label: Optional[str],
+    fallback_status: str,
+    evidence: str,
+    confidence: float,
+    warnings: Iterable[str] = (),
+    style: str = "unicode",
+) -> Optional[ReactionDisplayLabel]:
+    """Build the best display label while retaining its evidence and clauses."""
+    rendering = load_reaction_label_rendering()
+    styling = _style(style)
+    clauses = _ordered_clauses(
+        render_reaction_label_clause(edit, style=style) for edit in edits
+    )
+    concise_clauses = _compose_concise(clauses, style=style) if clauses else ""
+    detailed_clauses = styling["separator"].join(
+        clause.detailed for clause in clauses
+    )
+    warning_tuple = tuple(sorted(set(str(warning) for warning in warnings)))
+    if evidence == "conflicting_edit_evidence" and clauses:
+        concise = str(rendering["templates"]["conflict"]).format(
+            clauses=concise_clauses
+        )
+        detailed = str(rendering["templates"]["conflict"]).format(
+            clauses=detailed_clauses
+        )
+        status = "conflicting_evidence"
+    elif selected_exact and selected_label:
+        concise = selected_label
+        detailed = str(rendering["templates"]["exact_detail"]).format(
+            label=selected_label,
+            clauses=detailed_clauses or "none",
+        )
+        status = "family_overlay" if named_family else "exact_reconstruction"
+    elif clauses:
+        concise = concise_clauses
+        detailed = detailed_clauses
+        status = "observed_edits"
+    elif fallback_label:
+        concise = detailed = fallback_label
+        status = (
+            fallback_status
+            if fallback_status in {"reactant_only", "ambiguous_reactants"}
+            else "unavailable"
+        )
+    else:
+        return None
+    return ReactionDisplayLabel(
+        concise=concise,
+        detailed=detailed,
+        status=status,
+        clauses=clauses,
+        evidence=evidence,
+        confidence=confidence,
+        warnings=warning_tuple,
+        style=style,
+        definition_version=str(rendering["label_schema_version"]),
+    )
+
+
+__all__ = [
+    "build_reaction_display_label",
+    "load_reaction_label_rendering",
+    "render_reaction_label_clause",
+]

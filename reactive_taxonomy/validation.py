@@ -28,7 +28,7 @@ def validate_taxonomy() -> List[str]:
         payload = load_taxonomy_data()
     except (OSError, json.JSONDecodeError) as exc:
         return [f"taxonomy_load_failed:{exc}"]
-    expected = {"contexts.v1", "descriptor_rules.v1", "functional_groups.v1", "handles.v1", "rendering.v1", "reaction_grammars.v1", "reaction_rendering.v1"}
+    expected = {"contexts.v1", "descriptor_rules.v1", "functional_groups.v1", "handles.v1", "rendering.v1", "reaction_grammars.v1", "reaction_label_rendering.v1", "reaction_rendering.v1"}
     missing = expected - set(payload)
     if missing:
         errors.append(f"missing_taxonomy_files:{','.join(sorted(missing))}")
@@ -194,6 +194,23 @@ def validate_taxonomy() -> List[str]:
     for grammar_id, rule in reaction_rendering.items():
         if rule.get("product_kind") not in allowed_product_kinds:
             errors.append(f"invalid_reaction_product_renderer:{grammar_id}")
+    label_rendering = payload["reaction_label_rendering.v1"]
+    label_styles = label_rendering.get("styles") or {}
+    if label_rendering.get("default_style") not in label_styles:
+        errors.append("invalid_default_reaction_label_style")
+    if set(label_styles) != set(styles):
+        errors.append("reaction_label_style_mismatch")
+    edit_types = {"formed", "broken", "order_changed", "hydrogen_change"}
+    clause_order = label_rendering.get("clause_order") or []
+    if set(clause_order) != edit_types or len(clause_order) != len(edit_types):
+        errors.append("invalid_reaction_label_clause_order")
+    required_label_templates = {
+        "formed", "broken", "order_changed", "hydrogen_gain",
+        "hydrogen_loss", "counted_clause", "mapped_atom", "conflict",
+        "exact_detail",
+    }
+    if not required_label_templates <= set(label_rendering.get("templates") or {}):
+        errors.append("missing_reaction_label_templates")
     return errors
 
 

@@ -65,8 +65,8 @@ def test_phase2_review_packet_is_blind_and_readable(tmp_path: Path) -> None:
     hydrogenation = next(
         row for row in rows if row["case_id"] == "mapped_alkene_hydrogenation"
     )
-    assert "change C:1–C:2: double→single" in hydrogenation["edit_descriptions"]
-    assert "H gain at C:1" in hydrogenation["edit_descriptions"]
+    assert "C(map 1)=C(map 2) → C(map 1)–C(map 2)" in hydrogenation["edit_descriptions"]
+    assert "H gain at C(map 1)" in hydrogenation["edit_descriptions"]
     review_html = (tmp_path / "review_structures.html").read_text(encoding="utf-8")
     assert review_html.count("<section>") == len(rows)
     assert "benchmark expectations" in review_html

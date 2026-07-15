@@ -96,29 +96,6 @@ def _records_equal(expected: Sequence[Mapping[str, Any]], observed: Sequence[Any
     return expected_tokens == observed_tokens
 
 
-def _atom_label(atom: Any | None) -> str:
-    if atom is None:
-        return "H"
-    mapping = f":{atom.atom_map_number}" if atom.atom_map_number is not None else ""
-    return f"{atom.element}{mapping}"
-
-
-def _edit_description(edit: Any) -> str:
-    left = _atom_label(edit.atom_1)
-    right = _atom_label(edit.atom_2)
-    if edit.edit_type == "hydrogen_change":
-        direction = "gain" if edit.new_order and not edit.old_order else "loss"
-        return f"H {direction} at {left}"
-    if edit.edit_type == "formed":
-        return f"form {left}–{right} ({str(edit.new_order).lower()})"
-    if edit.edit_type == "broken":
-        return f"break {left}–{right} ({str(edit.old_order).lower()})"
-    return (
-        f"change {left}–{right}: {str(edit.old_order).lower()}"
-        f"→{str(edit.new_order).lower()}"
-    )
-
-
 def _parity_fingerprint(result: Any) -> tuple[tuple[Any, ...], ...]:
     tokens = []
     for edit in _edits(result):
@@ -240,6 +217,8 @@ def _review_html(rows: Sequence[Mapping[str, Any]]) -> str:
             + "<p><b>Orange:</b> reactant edit atoms; <b>green:</b> mapped product atoms.</p>"
             + "<p><b>Reaction label:</b> "
             + html.escape(str(row["reaction_label"]))
+            + "</p><p><b>Structured-label status:</b> "
+            + html.escape(str(row["display_label_status"]))
             + "</p><p><b>Observed edits:</b> "
             + html.escape(str(row["edit_descriptions"]))
             + "</p><p><b>Edit evidence:</b> "
@@ -358,7 +337,13 @@ def evaluate_reaction_edits(
         partition = partition_by_case[str(case["case_id"])]
         partition_counts[partition]["total"] += 1
         partition_counts[partition]["passed"] += int(case_passed)
-        descriptions = "; ".join(_edit_description(edit) for edit in edits) or "none"
+        descriptions = (
+            "; ".join(
+                clause.detailed for clause in result.display_label.clauses
+            )
+            if result.display_label is not None and result.display_label.clauses
+            else "none"
+        )
         case_results.append(
             {
                 "case_id": case["case_id"],
@@ -383,6 +368,9 @@ def evaluate_reaction_edits(
                 "partition": partition,
                 "reaction_smiles": reaction_smiles,
                 "reaction_label": result.reaction_label or "",
+                "display_label_status": (
+                    result.display_label.status if result.display_label else "unavailable"
+                ),
                 "edit_descriptions": descriptions,
                 "edit_evidence": observed_evidence,
                 "warnings": "; ".join(result.warnings),

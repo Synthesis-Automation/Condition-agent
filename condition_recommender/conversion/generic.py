@@ -119,6 +119,9 @@ def convert_record(record: RawReactionRecord) -> RecommendationRecord:
         if analysis.product_connection
         else None,
         spectator_groups=tuple(asdict(group) for group in analysis.spectator_groups),
+        reaction_display_label=asdict(analysis.display_label)
+        if analysis.display_label
+        else None,
         **signature_record_fields(analysis),
         source_dataset=record.source_dataset,
         source_path=record.source_path,

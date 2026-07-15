@@ -11,6 +11,12 @@ Public entry points:
 - `validate_taxonomy()`
 - `validate_source_label_mappings()`
 
+Every reaction with normalized edit evidence also receives a structured
+`display_label`. Exact grammar labels remain available as overlays, while
+mapped unknown-family reactions fall back to deterministic labels such as
+`C–N bond formation` or `C=C → C–C; 2 × H gain at C`. Display style is
+explicitly excluded from reaction-signature identity.
+
 Integrated CLI tester:
 
 ```powershell

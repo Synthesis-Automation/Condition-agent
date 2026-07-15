@@ -70,6 +70,45 @@ class ReactionEdit:
 
 
 @dataclass(frozen=True)
+class ReactionLabelClause:
+    """One deterministic, evidence-backed human-readable edit clause."""
+
+    edit_type: Literal["formed", "broken", "order_changed", "hydrogen_change"]
+    concise: str
+    detailed: str
+    elements: Tuple[str, ...]
+    atom_map_numbers: Tuple[int, ...]
+    old_order: Optional[str]
+    new_order: Optional[str]
+    evidence: str
+    confidence: float
+
+
+@dataclass(frozen=True)
+class ReactionDisplayLabel:
+    """Structured display label that never participates in signature identity."""
+
+    concise: str
+    detailed: str
+    status: Literal[
+        "observed_edits",
+        "exact_reconstruction",
+        "family_overlay",
+        "conflicting_evidence",
+        "reactant_only",
+        "ambiguous_reactants",
+        "unavailable",
+    ]
+    clauses: Tuple[ReactionLabelClause, ...]
+    evidence: str
+    confidence: float
+    warnings: Tuple[str, ...]
+    style: str
+    definition_version: str
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
 class ReactionSpectatorGroup:
     """Functional group retained outside the selected reaction event."""
 
@@ -226,6 +265,7 @@ class ReactionAnalysis:
     named_family: Optional[str] = None
     reaction_label: Optional[str] = None
     reaction_label_status: str = "unavailable"
+    display_label: Optional[ReactionDisplayLabel] = None
     evidence_quality: str = "unresolved"
     mapped_bond_changes: Tuple[Dict[str, Any], ...] = ()
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
@@ -234,10 +274,10 @@ class ReactionAnalysis:
     reaction_signature: Optional[ReactionSignature] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.3"
+    schema_version: str = "1.4"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
 
-__all__ = ["BondChange", "ProductConnection", "ProductConnectionEndpoint", "ProductTransformation", "ReactionAnalysis", "ReactionAtomReference", "ReactionCandidate", "ReactionComponent", "ReactionEdit", "ReactionFamilyEnvironment", "ReactionPartner", "ReactionPartnerEnvironment", "ReactionSignature", "ReactionSiteReference", "ReactionSpectatorGroup"]
+__all__ = ["BondChange", "ProductConnection", "ProductConnectionEndpoint", "ProductTransformation", "ReactionAnalysis", "ReactionAtomReference", "ReactionCandidate", "ReactionComponent", "ReactionDisplayLabel", "ReactionEdit", "ReactionFamilyEnvironment", "ReactionLabelClause", "ReactionPartner", "ReactionPartnerEnvironment", "ReactionSignature", "ReactionSiteReference", "ReactionSpectatorGroup"]

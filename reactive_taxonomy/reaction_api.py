@@ -9,6 +9,7 @@ from .chemistry.rdkit_utils import parse_smiles
 from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_candidates import enumerate_reaction_candidates
+from .reaction_display_labels import build_reaction_display_label
 from .reaction_edits import normalize_reaction_edits
 from .reaction_labels import render_reactant_label, render_reaction_label
 from .reaction_environments import build_reaction_family_environment
@@ -130,6 +131,30 @@ def featurize_reaction(
     elif selected is not None and product_connection is not None:
         reactants_label = render_reactant_label(selected.role_assignments, style=label_style)
         reaction_label = f"{reactants_label} → {product_connection.concise_label}"
+    display_label = build_reaction_display_label(
+        edits=edit_result.edits,
+        selected_label=reaction_label if selected is not None else None,
+        selected_exact=bool(
+            selected and selected.verification == "exact_product_reconstruction"
+        ),
+        named_family=named_family,
+        fallback_label=reaction_label,
+        fallback_status=reaction_label_status,
+        evidence=edit_result.evidence,
+        confidence=edit_result.confidence,
+        warnings=warnings,
+        style=label_style,
+    )
+    if display_label is not None:
+        reaction_label = display_label.concise
+        if display_label.status == "observed_edits":
+            reaction_label_status = (
+                "mapped_edit_summary"
+                if "mapping" in edit_result.evidence
+                else "observed_edit_summary"
+            )
+        elif display_label.status == "conflicting_evidence":
+            reaction_label_status = "conflicting_edit_summary"
     return ReactionAnalysis(
         input_reaction_smiles=reaction_smiles, valid=True,
         reactants=parsed.reactants, agents=parsed.agents, products=parsed.products,
@@ -139,6 +164,7 @@ def featurize_reaction(
         named_family=named_family,
         reaction_label=reaction_label,
         reaction_label_status=reaction_label_status,
+        display_label=display_label,
         evidence_quality=effective_evidence, mapped_bond_changes=mapped_changes,
         spectator_groups=spectators,
         family_environment=family_environment,

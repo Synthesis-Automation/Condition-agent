@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any, Dict, Iterable
 
 from ..models import RecommendationRecord
@@ -26,6 +27,9 @@ GENERIC_REVIEW_FIELDS = (
     "family_confidence",
     "reaction_label",
     "reaction_label_status",
+    "reaction_display_label_status",
+    "reaction_display_label_detailed",
+    "reaction_display_label_json",
     "yield_pct",
     "temperature_c",
     "time_h",
@@ -76,6 +80,26 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "family_confidence": record.family_confidence,
         "reaction_label": record.reaction_label or "",
         "reaction_label_status": record.reaction_label_status,
+        "reaction_display_label_status": (
+            record.reaction_display_label.get("status", "")
+            if record.reaction_display_label
+            else ""
+        ),
+        "reaction_display_label_detailed": (
+            record.reaction_display_label.get("detailed", "")
+            if record.reaction_display_label
+            else ""
+        ),
+        "reaction_display_label_json": (
+            json.dumps(
+                record.reaction_display_label,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            if record.reaction_display_label
+            else ""
+        ),
         "yield_pct": record.yield_pct if record.yield_pct is not None else "",
         "temperature_c": (
             record.temperature_c if record.temperature_c is not None else ""

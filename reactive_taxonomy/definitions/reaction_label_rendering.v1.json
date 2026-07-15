@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "label_schema_version": "1.0",
+  "default_style": "unicode",
+  "clause_order": ["broken", "order_changed", "formed", "hydrogen_change"],
+  "element_precedence": ["C", "N", "O", "S", "P", "B", "Si", "H", "F", "Cl", "Br", "I"],
+  "styles": {
+    "unicode": {
+      "single": "–",
+      "double": "=",
+      "triple": "≡",
+      "aromatic": ":",
+      "arrow": "→",
+      "times": "×",
+      "separator": "; "
+    },
+    "ascii": {
+      "single": "-",
+      "double": "=",
+      "triple": "#",
+      "aromatic": ":",
+      "arrow": "->",
+      "times": "x",
+      "separator": "; "
+    },
+    "hte_legacy": {
+      "single": "-",
+      "double": "=",
+      "triple": "#",
+      "aromatic": ":",
+      "arrow": "->",
+      "times": "x",
+      "separator": "; "
+    }
+  },
+  "templates": {
+    "formed": "{left}{bond}{right} bond formation",
+    "broken": "{left}{bond}{right} bond cleavage",
+    "order_changed": "{left}{old_bond}{right} {arrow} {left}{new_bond}{right}",
+    "hydrogen_gain": "H gain at {center}",
+    "hydrogen_loss": "{center}{bond}H loss",
+    "counted_clause": "{count} {times} {clause}",
+    "mapped_atom": "{element}(map {map_number})",
+    "conflict": "Conflicting evidence: {clauses}",
+    "exact_detail": "{label}; edits: {clauses}"
+  }
+}

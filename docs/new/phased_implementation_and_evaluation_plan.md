@@ -163,6 +163,20 @@ green. Complete the blank fields in `chemist_review.csv`, record every
 disagreement in `disagreements.csv`, and convert confirmed defects into code or
 definition changes with named regression tests.
 
+### Structured display-label foundation
+
+The Phase 2 output now exposes a versioned, observation-first display-label
+contract for Phase 3. Normalized edits produce deterministic clauses for bond
+formation, cleavage, order changes, and hydrogen gain or loss. Exact grammar
+labels remain optional higher-specificity overlays; unknown-family mapped
+reactions receive generic labels without inventing a family. Conflicting edit
+evidence is stated in the label rather than hidden. Display labels are serialized
+into generic conversion records but never contribute to signature identity.
+
+This presentation foundation does not complete the Phase 3 signature gate;
+partner, spectator, transformation-class, L0-L4, and optional-family review is
+still required after the Phase 2 human gate.
+
 ## Implementation phases
 
 | Phase | Implementation | Automated evaluation | Human chemist evaluation |
