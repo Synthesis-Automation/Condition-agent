@@ -244,7 +244,7 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
     expected = _index_payload(index)
     if expected["index_id"] != payload.get("index_id"):
         raise ValueError("Generic reaction index integrity check failed")
-    if int(payload.get("row_count") or -1) != len(rows):
+    if int(payload.get("row_count", -1)) != len(rows):
         raise ValueError("Generic reaction index row count mismatch")
     return index
 

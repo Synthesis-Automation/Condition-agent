@@ -16,7 +16,7 @@ def main() -> None:
     parser.add_argument(
         "--records",
         default="results/generic_conversion/records.jsonl",
-        help="Canonical records.jsonl from generic conversion",
+        help="Canonical records.jsonl or persisted generic index JSON",
     )
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--minimum-pool-size", type=int)

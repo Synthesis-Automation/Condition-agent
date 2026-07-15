@@ -63,6 +63,35 @@ aqueous recipes, and validates mandatory catalyst roles for named metal-coupling
 regimes. Unresolved condition identities turn a missing-role decision into a
 penalty rather than an unsupported hard rejection.
 
+## Persisted index and held-out evaluation
+
+Build a deterministic, integrity-checked index once and reuse it for queries:
+
+```powershell
+python -m condition_recommender.generic_index_cli `
+  results/generic_conversion_chan_lam_pilot/records.jsonl `
+  results/generic_conversion_chan_lam_pilot/generic_index.json
+```
+
+The index stores only admitted signature/recipe precedents and has a content-based
+`GRI1` identity. Both `records.jsonl` and the persisted index are accepted by the
+generic recommendation CLI.
+
+Run a canonical-reaction-group held-out benchmark:
+
+```powershell
+python -m condition_recommender.evaluation_cli `
+  results/generic_conversion_chan_lam_pilot/generic_index.json `
+  results/generic_conversion_chan_lam_evaluation `
+  --test-fraction 0.2 --seed 17 --top-k 5
+```
+
+Every `CRX1` group is assigned wholly to train or test, preventing duplicate
+observations and alternate recipes for the same reaction from leaking across the
+boundary. The report includes retrieval coverage, fallback levels, top-1/top-k
+recipe recovery, recipe-seen conditional recovery, yield MAE, compatibility
+exclusions, and a zero-tolerance count of hard-incompatible recommendations.
+
 This CLI recommends reaction conditions from the cleaned HTE label dataset.
 It uses `reactive_taxonomy` to identify the reaction grammar and reactive
 functional-group signatures, then returns the five highest-ranked condition

@@ -11,7 +11,11 @@ from typing import Any, Dict, List, Tuple
 from reactive_taxonomy import featurize_reaction
 
 from .compatibility import CompatibilityAssessment
-from .generic_indexing import GenericIndexedReaction, load_generic_index
+from .generic_indexing import (
+    GenericIndexedReaction,
+    GenericReactionIndex,
+    load_generic_index,
+)
 from .generic_retrieval import (
     generic_signature_similarity,
     load_generic_retrieval_rules,
@@ -169,36 +173,22 @@ def _aggregate(
     return tuple(recommendations)
 
 
-def recommend_generic_conditions(
-    reaction_smiles: str,
+def recommend_indexed_signature(
+    signature: Dict[str, Any],
+    index: GenericReactionIndex,
     *,
-    records_path: str | Path = "results/generic_conversion/records.jsonl",
+    query_reaction_smiles: str = "",
     top_k: int = 5,
     minimum_pool_size: int | None = None,
 ) -> GenericRecommendationResult:
-    """Recommend canonical recipes without requiring a named reaction family."""
+    """Recommend from an existing signature and index without re-featurization."""
     if top_k < 1:
         return GenericRecommendationResult(
-            reaction_smiles, False, error="TOP_K_MUST_BE_POSITIVE"
+            query_reaction_smiles, False, error="TOP_K_MUST_BE_POSITIVE"
         )
-    analysis = featurize_reaction(reaction_smiles)
-    if not analysis.valid:
-        return GenericRecommendationResult(
-            reaction_smiles,
-            False,
-            error=analysis.error or "INVALID_REACTION",
-        )
-    if analysis.reaction_signature is None:
-        return GenericRecommendationResult(
-            reaction_smiles,
-            False,
-            error="QUERY_HAS_NO_USABLE_REACTION_SIGNATURE",
-        )
-    signature = asdict(analysis.reaction_signature)
-    index = load_generic_index(records_path)
     if not index.rows:
         return GenericRecommendationResult(
-            reaction_smiles, False, error="EMPTY_GENERIC_INDEX"
+            query_reaction_smiles, False, error="EMPTY_GENERIC_INDEX"
         )
     level, compatible_pool, candidate_count, excluded_count = (
         retrieve_compatible_generic_pool(
@@ -208,7 +198,7 @@ def recommend_generic_conditions(
     if not compatible_pool:
         compatibility_failure = level == "no_compatible_condition_precedent"
         return GenericRecommendationResult(
-            query_reaction_smiles=reaction_smiles,
+            query_reaction_smiles=query_reaction_smiles,
             valid=False,
             query_signature_id=str(signature.get("signature_id") or ""),
             named_family=signature.get("named_family"),
@@ -231,7 +221,7 @@ def recommend_generic_conditions(
     if excluded_count:
         warnings.append(f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{excluded_count}")
     return GenericRecommendationResult(
-        query_reaction_smiles=reaction_smiles,
+        query_reaction_smiles=query_reaction_smiles,
         valid=True,
         query_signature_id=str(signature.get("signature_id") or ""),
         named_family=signature.get("named_family"),
@@ -245,4 +235,40 @@ def recommend_generic_conditions(
     )
 
 
-__all__ = ["recommend_generic_conditions"]
+def recommend_generic_conditions(
+    reaction_smiles: str,
+    *,
+    records_path: str | Path = "results/generic_conversion/records.jsonl",
+    top_k: int = 5,
+    minimum_pool_size: int | None = None,
+) -> GenericRecommendationResult:
+    """Featurize a reaction and recommend canonical resolved recipes."""
+    if top_k < 1:
+        return GenericRecommendationResult(
+            reaction_smiles, False, error="TOP_K_MUST_BE_POSITIVE"
+        )
+    analysis = featurize_reaction(reaction_smiles)
+    if not analysis.valid:
+        return GenericRecommendationResult(
+            reaction_smiles,
+            False,
+            error=analysis.error or "INVALID_REACTION",
+        )
+    if analysis.reaction_signature is None:
+        return GenericRecommendationResult(
+            reaction_smiles,
+            False,
+            error="QUERY_HAS_NO_USABLE_REACTION_SIGNATURE",
+        )
+    signature = asdict(analysis.reaction_signature)
+    index = load_generic_index(records_path)
+    return recommend_indexed_signature(
+        signature,
+        index,
+        query_reaction_smiles=reaction_smiles,
+        top_k=top_k,
+        minimum_pool_size=minimum_pool_size,
+    )
+
+
+__all__ = ["recommend_generic_conditions", "recommend_indexed_signature"]
