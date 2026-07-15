@@ -1,0 +1,291 @@
+{
+  "schema_version": "1.0",
+  "benchmark_id": "molecular_features.v1",
+  "description": "Curated mechanism-neutral molecular reactivity benchmark for Phase 1.",
+  "thresholds": {
+    "critical_case_pass_rate": 1.0,
+    "functional_group_precision": 0.95,
+    "functional_group_recall": 0.95,
+    "reactive_site_precision": 0.95,
+    "reactive_site_recall": 0.95,
+    "reactive_atom_accuracy": 0.95,
+    "environment_check_accuracy": 0.9,
+    "determinism_rate": 1.0,
+    "equivalent_smiles_invariance_rate": 1.0,
+    "taxonomy_error_count": 0
+  },
+  "partitions": {
+    "development": [
+      "primary_methylamine",
+      "primary_aniline",
+      "benzyl_chloride",
+      "aryl_boronic_acid",
+      "acetic_acid",
+      "phenol",
+      "terminal_alkene"
+    ],
+    "validation": [
+      "secondary_dimethylamine",
+      "heteroaryl_chloride",
+      "aryl_bpin",
+      "acetyl_chloride",
+      "acetaldehyde",
+      "ethyl_thiol",
+      "aryl_epoxide",
+      "negative_ethane"
+    ],
+    "test": [
+      "primary_tert_butylamine",
+      "aryl_bromide_with_nitrile",
+      "acetone",
+      "secondary_sulfonamide",
+      "terminal_alkyne",
+      "aminopyridine",
+      "hindered_electron_poor_aryl_bromide",
+      "invalid_smiles"
+    ]
+  },
+  "reactive_atom_expectations": {
+    "primary_methylamine": {"XH|N|H2|Alkyl": [[1]]},
+    "secondary_dimethylamine": {"XH|N|H1|Alkyl,Alkyl": [[1]]},
+    "primary_tert_butylamine": {"XH|N|H2|Alkyl": [[4]]},
+    "primary_aniline": {"XH|N|H2|Ar": [[0]]},
+    "benzyl_chloride": {"LG|Alkyl|Cl": [[0, 1]]},
+    "aryl_bromide_with_nitrile": {"LG|Ar|Br": [[0, 1]]},
+    "heteroaryl_chloride": {"LG|HeteroAr|Cl": [[0, 1]]},
+    "aryl_boronic_acid": {"TM|Ar|B(OH)2": [[0, 1, 2, 3]]},
+    "acetyl_chloride": {"EC|Acyl|Alkyl|Cl|activated": [[0, 1, 2, 3]]},
+    "acetic_acid": {
+      "EC|Acyl|Alkyl|OH|latent": [[0, 1, 2, 3]],
+      "XH|O|H1|C(O)R": [[3]]
+    },
+    "acetaldehyde": {"EC|Carbonyl|aldehyde|Alkyl|addition": [[0, 1, 2]]},
+    "acetone": {"EC|Carbonyl|ketone|Alkyl,Alkyl|addition": [[0, 1, 2, 3]]},
+    "phenol": {"XH|O|H1|Ar": [[0]]},
+    "ethyl_thiol": {"XH|S|H1|Alkyl": [[2]]},
+    "secondary_sulfonamide": {"XH|N|H1|SO2R,Alkyl": [[4]]},
+    "terminal_alkene": {"PI|Alkene": [[1, 2]]},
+    "terminal_alkyne": {"PI|Alkyne": [[1, 2]], "XH|Csp|H1|Alkynyl": [[2]]},
+    "aminopyridine": {"XH|N|H2|HeteroAr": [[0]]},
+    "hindered_electron_poor_aryl_bromide": {"LG|Ar|Br": [[0, 1]]}
+  },
+  "cases": [
+    {
+      "case_id": "primary_methylamine",
+      "smiles": "CN",
+      "equivalent_smiles": ["NC"],
+      "expected_valid": true,
+      "expected_group_counts": {"primary_amine": 1},
+      "expected_site_counts": {"XH|N|H2|Alkyl": 1},
+      "environment_expectations": [
+        {
+          "site_signature": "XH|N|H2|Alkyl",
+          "steric_equals": {"center_substitution_class": "primary"},
+          "attached_group_classes": ["methyl"],
+          "electronic_class": "neutral",
+          "nearby_group_ids_present": ["primary_amine"]
+        }
+      ]
+    },
+    {
+      "case_id": "secondary_dimethylamine",
+      "smiles": "CNC",
+      "equivalent_smiles": ["C[NH]C"],
+      "expected_valid": true,
+      "expected_group_counts": {"secondary_amine": 1},
+      "expected_site_counts": {"XH|N|H1|Alkyl,Alkyl": 1},
+      "environment_expectations": [
+        {
+          "site_signature": "XH|N|H1|Alkyl,Alkyl",
+          "steric_equals": {"center_substitution_class": "secondary"},
+          "attached_group_classes": ["methyl", "methyl"],
+          "electronic_class": "neutral"
+        }
+      ]
+    },
+    {
+      "case_id": "primary_tert_butylamine",
+      "smiles": "CC(C)(C)N",
+      "equivalent_smiles": ["NC(C)(C)C"],
+      "expected_valid": true,
+      "expected_group_counts": {"primary_amine": 1},
+      "expected_site_counts": {"XH|N|H2|Alkyl": 1},
+      "environment_expectations": [
+        {
+          "site_signature": "XH|N|H2|Alkyl",
+          "steric_equals": {"center_substitution_class": "primary"},
+          "attached_group_classes": ["tertiary"],
+          "attached_alpha_branched": true,
+          "electronic_class": "neutral"
+        }
+      ]
+    },
+    {
+      "case_id": "primary_aniline",
+      "smiles": "Nc1ccccc1",
+      "expected_valid": true,
+      "expected_group_counts": {"primary_amine": 1},
+      "expected_site_counts": {"CH|ArH": 5, "XH|N|H2|Ar": 1}
+    },
+    {
+      "case_id": "benzyl_chloride",
+      "smiles": "ClCc1ccccc1",
+      "expected_valid": true,
+      "expected_group_counts": {},
+      "expected_site_counts": {"CH|ArH": 5, "LG|Alkyl|Cl": 1}
+    },
+    {
+      "case_id": "aryl_bromide_with_nitrile",
+      "smiles": "Brc1ccc(C#N)cc1",
+      "expected_valid": true,
+      "expected_group_counts": {"aryl_halide": 1, "nitrile": 1},
+      "expected_site_counts": {"CH|ArH": 4, "LG|Ar|Br": 1}
+    },
+    {
+      "case_id": "heteroaryl_chloride",
+      "smiles": "Clc1ncccc1",
+      "expected_valid": true,
+      "expected_group_counts": {"aryl_halide": 1, "heteroaryl_nitrogen": 1},
+      "expected_site_counts": {"CH|HetArH": 4, "LG|HeteroAr|Cl": 1}
+    },
+    {
+      "case_id": "aryl_boronic_acid",
+      "smiles": "OB(O)c1ccccc1",
+      "expected_valid": true,
+      "expected_group_counts": {},
+      "expected_site_counts": {"CH|ArH": 5, "TM|Ar|B(OH)2": 1}
+    },
+    {
+      "case_id": "aryl_bpin",
+      "smiles": "CC1(C)OB(c2ccccc2)OC1(C)C",
+      "expected_valid": true,
+      "expected_group_counts": {"ether": 2},
+      "expected_site_counts": {"CH|ArH": 5, "TM|Ar|BPin": 1}
+    },
+    {
+      "case_id": "acetyl_chloride",
+      "smiles": "CC(=O)Cl",
+      "expected_valid": true,
+      "expected_group_counts": {},
+      "expected_site_counts": {"EC|Acyl|Alkyl|Cl|activated": 1}
+    },
+    {
+      "case_id": "acetic_acid",
+      "smiles": "CC(=O)O",
+      "expected_valid": true,
+      "expected_group_counts": {"carboxylic_acid": 1},
+      "expected_site_counts": {"EC|Acyl|Alkyl|OH|latent": 1, "XH|O|H1|C(O)R": 1}
+    },
+    {
+      "case_id": "acetaldehyde",
+      "smiles": "CC=O",
+      "expected_valid": true,
+      "expected_group_counts": {"aldehyde": 1},
+      "expected_site_counts": {"EC|Carbonyl|aldehyde|Alkyl|addition": 1}
+    },
+    {
+      "case_id": "acetone",
+      "smiles": "CC(=O)C",
+      "expected_valid": true,
+      "expected_group_counts": {"ketone": 1},
+      "expected_site_counts": {"EC|Carbonyl|ketone|Alkyl,Alkyl|addition": 1}
+    },
+    {
+      "case_id": "phenol",
+      "smiles": "Oc1ccccc1",
+      "expected_valid": true,
+      "expected_group_counts": {"phenol": 1},
+      "expected_site_counts": {"CH|ArH": 5, "XH|O|H1|Ar": 1}
+    },
+    {
+      "case_id": "ethyl_thiol",
+      "smiles": "CCS",
+      "expected_valid": true,
+      "expected_group_counts": {"thiol": 1},
+      "expected_site_counts": {"XH|S|H1|Alkyl": 1}
+    },
+    {
+      "case_id": "secondary_sulfonamide",
+      "smiles": "CS(=O)(=O)NC",
+      "expected_valid": true,
+      "expected_group_counts": {"sulfonamide": 1},
+      "expected_site_counts": {"XH|N|H1|SO2R,Alkyl": 1},
+      "environment_expectations": [
+        {
+          "site_signature": "XH|N|H1|SO2R,Alkyl",
+          "steric_equals": {"center_substitution_class": "secondary"},
+          "attached_group_classes": ["methyl"],
+          "electronic_class": "neutral",
+          "nearby_group_ids_present": ["sulfonamide"]
+        }
+      ]
+    },
+    {
+      "case_id": "aryl_epoxide",
+      "smiles": "c1ccccc1C1CO1",
+      "expected_valid": true,
+      "expected_group_counts": {"epoxide": 1},
+      "expected_site_counts": {"CH|ArH": 5}
+    },
+    {
+      "case_id": "terminal_alkene",
+      "smiles": "CC=C",
+      "expected_valid": true,
+      "expected_group_counts": {"alkene": 1},
+      "expected_site_counts": {"PI|Alkene": 1}
+    },
+    {
+      "case_id": "terminal_alkyne",
+      "smiles": "CC#C",
+      "expected_valid": true,
+      "expected_group_counts": {"alkyne": 1},
+      "expected_site_counts": {"PI|Alkyne": 1, "XH|Csp|H1|Alkynyl": 1}
+    },
+    {
+      "case_id": "aminopyridine",
+      "smiles": "Nc1ccccn1",
+      "expected_valid": true,
+      "expected_group_counts": {"heteroaryl_nitrogen": 1, "primary_amine": 1},
+      "expected_site_counts": {"CH|HetArH": 4, "XH|N|H2|HeteroAr": 1},
+      "environment_expectations": [
+        {
+          "site_signature": "XH|N|H2|HeteroAr",
+          "steric_equals": {"center_substitution_class": "primary"},
+          "electronic_class": "neutral",
+          "nearby_group_ids_present": ["heteroaryl_nitrogen", "primary_amine"]
+        }
+      ]
+    },
+    {
+      "case_id": "hindered_electron_poor_aryl_bromide",
+      "smiles": "Brc1c(C)cccc1C#N",
+      "expected_valid": true,
+      "expected_group_counts": {"aryl_halide": 1, "nitrile": 1},
+      "expected_site_counts": {"CH|ArH": 3, "LG|Ar|Br": 1},
+      "environment_expectations": [
+        {
+          "site_signature": "LG|Ar|Br",
+          "steric_equals": {"class": "ortho_hindered"},
+          "steric_minimum": {"ortho_substituent_count": 2},
+          "electronic_class": "electron_poor",
+          "nearby_group_ids_present": ["nitrile"]
+        }
+      ]
+    },
+    {
+      "case_id": "negative_ethane",
+      "smiles": "CC",
+      "expected_valid": true,
+      "expected_group_counts": {},
+      "expected_site_counts": {}
+    },
+    {
+      "case_id": "invalid_smiles",
+      "smiles": "not-a-smiles",
+      "expected_valid": false,
+      "expected_error": "INVALID_SMILES",
+      "expected_group_counts": {},
+      "expected_site_counts": {}
+    }
+  ]
+}

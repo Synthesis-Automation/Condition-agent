@@ -23,6 +23,20 @@ python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molec
 python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --output results/reaction_features.jsonl
 ```
 
+Phase 1 molecular-feature evaluation, including machine metrics and a blind
+chemist-review packet:
+
+```powershell
+python -m reactive_taxonomy.molecular_feature_evaluation_cli `
+  results/molecular_feature_evaluation
+```
+
+The versioned answer key is
+`benchmarks/molecular_features/benchmark_manifest.v1.json`. Generated artifacts
+include `machine_report.json`, detailed case results, `chemist_review.csv`,
+highlighted `review_structures.html`, and `disagreements.csv`. The machine gate
+does not complete the separate human chemist gate.
+
 Use concise mode for a chemist-readable view containing only the primary
 labels and interpretation:
 
