@@ -33,9 +33,9 @@ class ReactionSiteReference:
 
 @dataclass(frozen=True)
 class BondChange:
-    change_type: Literal["formed", "broken", "order_changed"]
+    change_type: Literal["formed", "broken", "order_changed", "hydrogen_change"]
     atom_1_role: str
-    atom_2_role: str
+    atom_2_role: Optional[str]
     old_order: Optional[str]
     new_order: Optional[str]
     evidence: str

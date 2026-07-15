@@ -220,7 +220,11 @@ def _review_html(rows: Sequence[Mapping[str, Any]]) -> str:
             + "<b>blue:</b> other functional-group atoms.</p>"
             + "<p><b>Detected groups:</b> "
             + html.escape(str(row["detected_groups"]))
-            + "</p><p><b>Detected sites:</b> "
+            + "</p><p><b>Functional-group labels:</b> "
+            + html.escape(str(row["detected_group_labels"]))
+            + "</p><p><b>Reactive-site labels:</b> "
+            + html.escape(str(row["detected_site_labels"]))
+            + "</p><p><b>Canonical site signatures:</b> "
             + html.escape(str(row["detected_sites"]))
             + "</p><p><b>Environments:</b> "
             + html.escape(str(row["detected_environments"]))
@@ -385,8 +389,22 @@ def evaluate_molecular_features(
                 "detected_groups": "; ".join(
                     f"{key} ({count})" for key, count in sorted(observed_groups.items())
                 ),
+                "detected_group_labels": "; ".join(
+                    f"{key} ({count})"
+                    for key, count in sorted(
+                        _counter(
+                            group.chemist_label for group in result.functional_groups
+                        ).items()
+                    )
+                ),
                 "detected_sites": "; ".join(
                     f"{key} ({count})" for key, count in sorted(observed_sites.items())
+                ),
+                "detected_site_labels": "; ".join(
+                    f"{key} ({count})"
+                    for key, count in sorted(
+                        _counter(site.chemist_label for site in result.sites).items()
+                    )
                 ),
                 "detected_environments": json.dumps(
                     environments_summary, ensure_ascii=False, sort_keys=True

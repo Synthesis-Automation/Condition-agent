@@ -125,6 +125,14 @@ def apply_operator(
         changes = (
             BondChange("broken", f"{e_role}.{e_anchor_role}", f"{e_role}.{leaving_role}", "SINGLE", None, "grammar_operator"),
             BondChange("formed", f"{e_role}.{e_anchor_role}", f"{p_role}.center", None, "SINGLE", "grammar_operator"),
+            BondChange(
+                "hydrogen_change",
+                f"{p_role}.center",
+                None,
+                "SINGLE",
+                None,
+                "grammar_operator",
+            ),
         )
         return predicted, changes
     return None, ()

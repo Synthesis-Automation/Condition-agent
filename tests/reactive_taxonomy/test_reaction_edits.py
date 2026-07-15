@@ -7,14 +7,41 @@ def test_valid_mapping_produces_typed_order_change() -> None:
     assert result.evidence_quality == "validated_atom_mapping"
     assert result.reaction_signature is not None
     assert result.reaction_signature.named_family is None
-    assert len(result.reaction_signature.edits) == 1
-    edit = result.reaction_signature.edits[0]
+    assert len(result.reaction_signature.edits) == 3
+    edit = next(
+        edit
+        for edit in result.reaction_signature.edits
+        if edit.edit_type == "order_changed"
+    )
     assert edit.edit_type == "order_changed"
     assert edit.old_order == "DOUBLE"
     assert edit.new_order == "SINGLE"
     assert edit.atom_1.atom_map_number == 1
     assert edit.atom_2 is not None
     assert edit.atom_2.atom_map_number == 2
+    hydrogen_edits = [
+        edit
+        for edit in result.reaction_signature.edits
+        if edit.edit_type == "hydrogen_change"
+    ]
+    assert len(hydrogen_edits) == 2
+    assert {edit.atom_1.atom_map_number for edit in hydrogen_edits} == {1, 2}
+    assert all(edit.old_order is None for edit in hydrogen_edits)
+    assert all(edit.new_order == "SINGLE" for edit in hydrogen_edits)
+
+
+def test_mapped_dehydrogenation_produces_hydrogen_changes() -> None:
+    result = featurize_reaction("[CH3:1][CH3:2]>>[CH2:1]=[CH2:2]")
+
+    assert result.reaction_signature is not None
+    hydrogen_edits = [
+        edit
+        for edit in result.reaction_signature.edits
+        if edit.edit_type == "hydrogen_change"
+    ]
+    assert len(hydrogen_edits) == 2
+    assert all(edit.old_order == "SINGLE" for edit in hydrogen_edits)
+    assert all(edit.new_order is None for edit in hydrogen_edits)
 
 
 def test_duplicate_atom_map_does_not_upgrade_evidence() -> None:
@@ -66,4 +93,3 @@ def test_mapping_and_reconstruction_agreement_keeps_exact_compatibility_view() -
         == "validated_mapping_and_exact_reconstruction"
     )
     assert result.product_connection is not None
-

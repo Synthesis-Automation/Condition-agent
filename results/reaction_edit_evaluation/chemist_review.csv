@@ -1,0 +1,13 @@
+﻿case_id,partition,reaction_smiles,reaction_label,edit_descriptions,edit_evidence,warnings,reviewer_id,reaction_center_correct,bond_edits_correct,hydrogen_changes_correct,evidence_assessment_correct,missing_edits,incorrect_edits,comments
+mapped_formed_bond,development,[CH3:1].[NH2:2]>>[CH3:1][NH2:2],,form C:1–N:2 (single),validated_atom_mapping,,,,,,,,,
+mapped_broken_bond,development,[CH3:1][Br:2]>>[CH3:1].[Br-:2],,break C:1–Br:2 (single),validated_atom_mapping,MULTIPLE_PRODUCTS,,,,,,,,
+mapped_alkene_hydrogenation,development,[CH2:1]=[CH2:2]>>[CH3:1][CH3:2],,change C:1–C:2: double→single; H gain at C:1; H gain at C:2,validated_atom_mapping,,,,,,,,,
+unmapped_cn_exact,development,Brc1ccccc1.CN>>CNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,break C–Br (single); form C–N (single); H loss at N,exact_product_reconstruction,,,,,,,,,
+mapped_alkane_dehydrogenation,validation,[CH3:1][CH3:2]>>[CH2:1]=[CH2:2],,change C:1–C:2: single→double; H loss at C:1; H loss at C:2,validated_atom_mapping,,,,,,,,,
+mapped_multi_alkene_hydrogenation,validation,[CH2:1]=[CH:2][CH:3]=[CH2:4]>>[CH3:1][CH2:2][CH2:3][CH3:4],,change C:1–C:2: double→single; change C:3–C:4: double→single; H gain at C:1; H gain at C:2; H gain at C:3; H gain at C:4,validated_atom_mapping,,,,,,,,,
+mapped_cn_exact_agreement,validation,[Br:1][c:2]1[cH:3][cH:4][cH:5][cH:6][cH:7]1.[NH2:8][CH3:9]>>[c:2]1([NH:8][CH3:9])[cH:3][cH:4][cH:5][cH:6][cH:7]1,Ar–Br + R–NH2 → Ar–NH–R,break Br:1–C:2 (single); form C:2–N:8 (single); H loss at N:8,validated_mapping_and_exact_reconstruction,,,,,,,,,
+mapped_no_edit,validation,[CH3:1][CH3:2]>>[CH3:1][CH3:2],,none,unresolved,NO_MAPPED_BOND_EDITS,,,,,,,,
+mapping_reconstruction_conflict,test,[Br:1][c:2]1[cH:3][cH:4][cH:5][cH:6][cH:7]1.[NH2:8][CH3:9]>>[cH:2]1[c:3]([NH:8][CH3:9])[cH:4][cH:5][cH:6][cH:7]1,Ar–Br + R–NH2 → Ar–NH–R,break Br:1–C:2 (single); form C:3–N:8 (single); H gain at C:2; H loss at C:3; H loss at N:8,conflicting_edit_evidence,MAPPING_RECONSTRUCTION_CONFLICT,,,,,,,,
+duplicate_atom_map,test,[CH3:1][Br:1].[NH2:2]C>>[CH3:1][NH:2]C,,none,unresolved,DUPLICATE_ATOM_MAP:reactant:1,,,,,,,,
+atom_map_element_mismatch,test,[CH3:1]Br>>[NH3:1],,none,unresolved,ATOM_MAP_ELEMENT_MISMATCH:1:C:N,,,,,,,,
+invalid_valence_product,test,[CH3:1].[CH3:2]>>[CH3:1]([CH3:2])(C)(C)C,,none,unresolved,INVALID_PRODUCT_COMPONENT:0,,,,,,,,

@@ -8,7 +8,14 @@ chemist-readable review packet. Do not advance until both evaluation gates pass.
 
 ## Phase 1 implementation status
 
-**Machine implementation: complete. Human chemist gate: pending review.**
+**Machine implementation: complete. Human review gate: accepted for progression
+on 2026-07-16.**
+
+The project-owner review found the current outputs chemically reasonable for
+the 23 simple curated compounds and reported no systematic disagreement. This
+acceptance permits Phase 2 work; it does not remove the stated need for broader,
+independent chemist-authored cases before freezing the feature vocabulary for
+production.
 
 ### Major achievements
 
@@ -108,6 +115,53 @@ and observed values for debugging but must not be given to blind reviewers.
   because they cannot be determined from a molecule alone.
 - More chemist-authored external cases are required before freezing the feature
   vocabulary as a broad production contract.
+
+## Phase 2 implementation status
+
+**Machine implementation: complete. Human chemist gate: pending review.**
+
+Phase 2 adds schema-level hydrogen-change extraction to the existing typed
+formed, broken, and order-changed edits. Mapped evidence and exact operator
+reconstruction are reconciled; contradictions remain explicit review evidence.
+
+The versioned `reaction_edits.v1` benchmark contains 12 cases split equally
+between development, validation, and untouched test partitions. It covers
+single and multi-edit reactions, hydrogen gain and loss, exact reconstruction,
+mapped/unmapped parity, mapping defects, a no-edit negative, invalid product
+valence, and conflicting mapping/reconstruction evidence.
+
+### Current Phase 2 machine results
+
+| Metric | Result |
+| --- | ---: |
+| Curated cases | 12 |
+| Critical case pass rate | 100% |
+| Edit precision | 100% |
+| Edit recall | 100% |
+| Edit detail accuracy | 100% |
+| Evidence accuracy | 100% |
+| Edit-resolution accuracy | 100% |
+| Product-reconstruction accuracy | 100% |
+| Invalid-valence rejection | 100% |
+| Mapped/unmapped parity | 100% |
+| Conflict retention | 100% |
+| Repeat-run determinism | 100% |
+
+These metrics establish consistency against the curated v1 answer key, not
+broad reaction-space accuracy.
+
+### Run the Phase 2 evaluation
+
+```powershell
+python -m reactive_taxonomy.reaction_edit_evaluation_cli `
+  results/reaction_edit_evaluation
+```
+
+Review `review_structures.html` without consulting `case_results.jsonl`.
+Reactant edit atoms are orange and corresponding mapped product atoms are
+green. Complete the blank fields in `chemist_review.csv`, record every
+disagreement in `disagreements.csv`, and convert confirmed defects into code or
+definition changes with named regression tests.
 
 ## Implementation phases
 

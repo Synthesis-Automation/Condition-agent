@@ -1,0 +1,175 @@
+{
+  "schema_version": "1.0",
+  "benchmark_id": "reaction_edits.v1",
+  "description": "Curated mechanism-neutral benchmark for Phase 2 reaction-edit extraction and evidence reconciliation.",
+  "thresholds": {
+    "critical_case_pass_rate": 1.0,
+    "edit_precision": 1.0,
+    "edit_recall": 1.0,
+    "edit_detail_accuracy": 1.0,
+    "evidence_accuracy": 1.0,
+    "edit_resolution_accuracy": 1.0,
+    "product_reconstruction_accuracy": 1.0,
+    "valence_rejection_accuracy": 1.0,
+    "mapped_unmapped_parity_rate": 1.0,
+    "conflict_retention_rate": 1.0,
+    "determinism_rate": 1.0
+  },
+  "partitions": {
+    "development": [
+      "mapped_formed_bond",
+      "mapped_broken_bond",
+      "mapped_alkene_hydrogenation",
+      "unmapped_cn_exact"
+    ],
+    "validation": [
+      "mapped_alkane_dehydrogenation",
+      "mapped_multi_alkene_hydrogenation",
+      "mapped_cn_exact_agreement",
+      "mapped_no_edit"
+    ],
+    "test": [
+      "mapping_reconstruction_conflict",
+      "duplicate_atom_map",
+      "atom_map_element_mismatch",
+      "invalid_valence_product"
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "mapped_formed_bond",
+      "reaction_smiles": "[CH3:1].[NH2:2]>>[CH3:1][NH2:2]",
+      "expected_valid": true,
+      "expected_edit_resolved": true,
+      "expected_evidence": "validated_atom_mapping",
+      "expected_exact_reconstruction": false,
+      "expected_edits": [
+        {"edit_type": "formed", "atom_1_map": 1, "atom_2_map": 2, "atom_1_element": "C", "atom_2_element": "N", "old_order": null, "new_order": "SINGLE"}
+      ]
+    },
+    {
+      "case_id": "mapped_broken_bond",
+      "reaction_smiles": "[CH3:1][Br:2]>>[CH3:1].[Br-:2]",
+      "expected_valid": true,
+      "expected_edit_resolved": true,
+      "expected_evidence": "validated_atom_mapping",
+      "expected_exact_reconstruction": false,
+      "expected_edits": [
+        {"edit_type": "broken", "atom_1_map": 1, "atom_2_map": 2, "atom_1_element": "C", "atom_2_element": "Br", "old_order": "SINGLE", "new_order": null}
+      ]
+    },
+    {
+      "case_id": "mapped_alkene_hydrogenation",
+      "reaction_smiles": "[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]",
+      "expected_valid": true,
+      "expected_edit_resolved": true,
+      "expected_evidence": "validated_atom_mapping",
+      "expected_exact_reconstruction": false,
+      "expected_edits": [
+        {"edit_type": "order_changed", "atom_1_map": 1, "atom_2_map": 2, "atom_1_element": "C", "atom_2_element": "C", "old_order": "DOUBLE", "new_order": "SINGLE"},
+        {"edit_type": "hydrogen_change", "atom_1_map": 1, "atom_2_map": null, "atom_1_element": "C", "atom_2_element": "H", "old_order": null, "new_order": "SINGLE"},
+        {"edit_type": "hydrogen_change", "atom_1_map": 2, "atom_2_map": null, "atom_1_element": "C", "atom_2_element": "H", "old_order": null, "new_order": "SINGLE"}
+      ]
+    },
+    {
+      "case_id": "unmapped_cn_exact",
+      "reaction_smiles": "Brc1ccccc1.CN>>CNc1ccccc1",
+      "expected_valid": true,
+      "expected_edit_resolved": true,
+      "expected_evidence": "exact_product_reconstruction",
+      "expected_exact_reconstruction": true,
+      "parity_group": "aryl_cn_substitution",
+      "expected_edits": [
+        {"edit_type": "broken", "atom_1_map": null, "atom_2_map": null, "atom_1_element": "C", "atom_2_element": "Br", "old_order": "SINGLE", "new_order": null},
+        {"edit_type": "formed", "atom_1_map": null, "atom_2_map": null, "atom_1_element": "C", "atom_2_element": "N", "old_order": null, "new_order": "SINGLE"},
+        {"edit_type": "hydrogen_change", "atom_1_map": null, "atom_2_map": null, "atom_1_element": "N", "atom_2_element": "H", "old_order": "SINGLE", "new_order": null}
+      ]
+    },
+    {
+      "case_id": "mapped_alkane_dehydrogenation",
+      "reaction_smiles": "[CH3:1][CH3:2]>>[CH2:1]=[CH2:2]",
+      "expected_valid": true,
+      "expected_edit_resolved": true,
+      "expected_evidence": "validated_atom_mapping",
+      "expected_exact_reconstruction": false,
+      "expected_edits": [
+        {"edit_type": "order_changed", "atom_1_map": 1, "atom_2_map": 2, "atom_1_element": "C", "atom_2_element": "C", "old_order": "SINGLE", "new_order": "DOUBLE"},
+        {"edit_type": "hydrogen_change", "atom_1_map": 1, "atom_2_map": null, "atom_1_element": "C", "atom_2_element": "H", "old_order": "SINGLE", "new_order": null},
+        {"edit_type": "hydrogen_change", "atom_1_map": 2, "atom_2_map": null, "atom_1_element": "C", "atom_2_element": "H", "old_order": "SINGLE", "new_order": null}
+      ]
+    },
+    {
+      "case_id": "mapped_multi_alkene_hydrogenation",
+      "reaction_smiles": "[CH2:1]=[CH:2][CH:3]=[CH2:4]>>[CH3:1][CH2:2][CH2:3][CH3:4]",
+      "expected_valid": true,
+      "expected_edit_resolved": true,
+      "expected_evidence": "validated_atom_mapping",
+      "expected_exact_reconstruction": false,
+      "expected_edit_counts": {"order_changed": 2, "hydrogen_change": 4}
+    },
+    {
+      "case_id": "mapped_cn_exact_agreement",
+      "reaction_smiles": "[Br:1][c:2]1[cH:3][cH:4][cH:5][cH:6][cH:7]1.[NH2:8][CH3:9]>>[c:2]1([NH:8][CH3:9])[cH:3][cH:4][cH:5][cH:6][cH:7]1",
+      "expected_valid": true,
+      "expected_edit_resolved": true,
+      "expected_evidence": "validated_mapping_and_exact_reconstruction",
+      "expected_exact_reconstruction": true,
+      "parity_group": "aryl_cn_substitution",
+      "expected_edits": [
+        {"edit_type": "broken", "atom_1_map": 1, "atom_2_map": 2, "atom_1_element": "Br", "atom_2_element": "C", "old_order": "SINGLE", "new_order": null},
+        {"edit_type": "formed", "atom_1_map": 2, "atom_2_map": 8, "atom_1_element": "C", "atom_2_element": "N", "old_order": null, "new_order": "SINGLE"},
+        {"edit_type": "hydrogen_change", "atom_1_map": 8, "atom_2_map": null, "atom_1_element": "N", "atom_2_element": "H", "old_order": "SINGLE", "new_order": null}
+      ]
+    },
+    {
+      "case_id": "mapped_no_edit",
+      "reaction_smiles": "[CH3:1][CH3:2]>>[CH3:1][CH3:2]",
+      "expected_valid": true,
+      "expected_edit_resolved": false,
+      "expected_evidence": "unresolved",
+      "expected_exact_reconstruction": false,
+      "expected_warning_contains": ["NO_MAPPED_BOND_EDITS"],
+      "expected_edits": []
+    },
+    {
+      "case_id": "mapping_reconstruction_conflict",
+      "reaction_smiles": "[Br:1][c:2]1[cH:3][cH:4][cH:5][cH:6][cH:7]1.[NH2:8][CH3:9]>>[cH:2]1[c:3]([NH:8][CH3:9])[cH:4][cH:5][cH:6][cH:7]1",
+      "expected_valid": true,
+      "expected_edit_resolved": true,
+      "expected_evidence": "conflicting_edit_evidence",
+      "expected_exact_reconstruction": true,
+      "expected_warning_contains": ["MAPPING_RECONSTRUCTION_CONFLICT"],
+      "expected_edit_counts": {"broken": 1, "formed": 1, "hydrogen_change": 3}
+    },
+    {
+      "case_id": "duplicate_atom_map",
+      "reaction_smiles": "[CH3:1][Br:1].[NH2:2]C>>[CH3:1][NH:2]C",
+      "expected_valid": true,
+      "expected_edit_resolved": false,
+      "expected_evidence": "unresolved",
+      "expected_exact_reconstruction": false,
+      "expected_warning_contains": ["DUPLICATE_ATOM_MAP:reactant:1"],
+      "expected_edits": []
+    },
+    {
+      "case_id": "atom_map_element_mismatch",
+      "reaction_smiles": "[CH3:1]Br>>[NH3:1]",
+      "expected_valid": true,
+      "expected_edit_resolved": false,
+      "expected_evidence": "unresolved",
+      "expected_exact_reconstruction": false,
+      "expected_warning_contains": ["ATOM_MAP_ELEMENT_MISMATCH:1:C:N"],
+      "expected_edits": []
+    },
+    {
+      "case_id": "invalid_valence_product",
+      "reaction_smiles": "[CH3:1].[CH3:2]>>[CH3:1]([CH3:2])(C)(C)C",
+      "expected_valid": false,
+      "expected_edit_resolved": false,
+      "expected_evidence": "unresolved",
+      "expected_exact_reconstruction": false,
+      "expected_warning_contains": ["INVALID_PRODUCT_COMPONENT:0"],
+      "expected_edits": []
+    }
+  ]
+}

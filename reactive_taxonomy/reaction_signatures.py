@@ -81,7 +81,12 @@ def _edit_token(edit: Any, *, include_environment: bool) -> Tuple[Any, ...]:
         return (atom.element, atom.formal_charge, atom.aromatic, atom.hybridization)
 
     endpoints = tuple(sorted((endpoint(edit.atom_1), endpoint(edit.atom_2))))
-    return (edit.edit_type, endpoints, edit.old_order, edit.new_order)
+    return (
+        edit.edit_type,
+        endpoints,
+        edit.old_order or "NONE",
+        edit.new_order or "NONE",
+    )
 
 
 def _bond_type(edit: Any, order: Optional[str]) -> str:

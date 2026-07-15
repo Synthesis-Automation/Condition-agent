@@ -32,6 +32,7 @@ class EditNormalizationResult:
 class _MappedSide:
     atoms: Dict[int, ReactionAtomReference]
     bonds: Dict[Tuple[int, int], str]
+    hydrogen_counts: Dict[int, int]
     warnings: Tuple[str, ...]
     mapped_atom_count: int
 
@@ -84,6 +85,7 @@ def _atom_reference(
 def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
     atoms: Dict[int, ReactionAtomReference] = {}
     bonds: Dict[Tuple[int, int], str] = {}
+    hydrogen_counts: Dict[int, int] = {}
     warnings = []
     mapped_atom_count = 0
     for component in components:
@@ -101,6 +103,10 @@ def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
                 )
                 continue
             atoms[map_number] = _atom_reference(component, atom.GetIdx())
+            if atom.GetSymbol() != "H":
+                hydrogen_counts[map_number] = int(
+                    atom.GetTotalNumHs(includeNeighbors=True)
+                )
         for bond in mol.GetBonds():
             left = int(bond.GetBeginAtom().GetAtomMapNum())
             right = int(bond.GetEndAtom().GetAtomMapNum())
@@ -113,7 +119,13 @@ def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
                     f"CONTRADICTORY_MAPPED_BOND:{component.side}:{left}:{right}"
                 )
             bonds[pair] = order
-    return _MappedSide(atoms, bonds, tuple(sorted(set(warnings))), mapped_atom_count)
+    return _MappedSide(
+        atoms,
+        bonds,
+        hydrogen_counts,
+        tuple(sorted(set(warnings))),
+        mapped_atom_count,
+    )
 
 
 def normalize_mapped_edits(
@@ -173,6 +185,27 @@ def normalize_mapped_edits(
                 confidence=1.0,
             )
         )
+    for map_number in sorted(
+        set(left.hydrogen_counts).intersection(right.hydrogen_counts)
+    ):
+        old_count = left.hydrogen_counts[map_number]
+        new_count = right.hydrogen_counts[map_number]
+        delta = new_count - old_count
+        if not delta:
+            continue
+        center = left.atoms[map_number]
+        for _ in range(abs(delta)):
+            edits.append(
+                ReactionEdit(
+                    edit_type="hydrogen_change",
+                    atom_1=center,
+                    atom_2=None,
+                    old_order="SINGLE" if delta < 0 else None,
+                    new_order="SINGLE" if delta > 0 else None,
+                    evidence="supplied_atom_mapping",
+                    confidence=1.0,
+                )
+            )
     if not edits:
         warnings.append("NO_MAPPED_BOND_EDITS")
     return EditNormalizationResult(
@@ -225,8 +258,10 @@ def normalize_predicted_edits(
             atom_1 = _role_atom(
                 change.atom_1_role, selected.role_assignments, reactants
             )
-            atom_2 = _role_atom(
-                change.atom_2_role, selected.role_assignments, reactants
+            atom_2 = (
+                _role_atom(change.atom_2_role, selected.role_assignments, reactants)
+                if change.atom_2_role is not None
+                else None
             )
         except (KeyError, StopIteration, ValueError) as exc:
             warnings.append(f"PREDICTED_EDIT_PROVENANCE_ERROR:{exc}")

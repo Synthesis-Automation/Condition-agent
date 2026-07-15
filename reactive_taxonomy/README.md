@@ -37,6 +37,18 @@ include `machine_report.json`, detailed case results, `chemist_review.csv`,
 highlighted `review_structures.html`, and `disagreements.csv`. The machine gate
 does not complete the separate human chemist gate.
 
+Phase 2 reaction-edit evaluation, including mapped edits, exact reconstruction,
+hydrogen changes, evidence conflicts, and a blind reaction-center review packet:
+
+```powershell
+python -m reactive_taxonomy.reaction_edit_evaluation_cli `
+  results/reaction_edit_evaluation
+```
+
+Its versioned answer key is
+`benchmarks/reaction_edits/benchmark_manifest.v1.json`, and it writes the same
+five evaluation artifacts under `results/reaction_edit_evaluation/`.
+
 Use concise mode for a chemist-readable view containing only the primary
 labels and interpretation:
 
