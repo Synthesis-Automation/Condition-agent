@@ -254,4 +254,6 @@ Imidazole,c1ncc[nH]1,nucleophile,N-alkylation; N-arylation; Acylation,Heteroaren
 Phenyl isocyanate,O=C=Nc1ccccc1,electrophile,Urea formation; Carbamate formation,Common heterocumulene electrophile
 Phenyl isothiocyanate,S=C=Nc1ccccc1,electrophile,Thiourea formation,Common sulfur heterocumulene electrophile
 Dimethyl disulfide,CSSC,electrophile,Disulfide exchange; Thiolation,Representative disulfide linkage
+Azobenzene,c1ccc(N=Nc2ccccc2)cc1,pi_partner,Azo reduction; Photoisomerization,Representative organic azo linkage
+Dimethyl peroxide,COOC,oxidant,Peroxide reduction; Radical initiation,Representative organic peroxide linkage
 Diethyl phosphonoacetate,CCOP(=O)(CC(=O)OCC)OCC,nucleophile,Horner-Wadsworth-Emmons; Alkylation,Phosphonate-stabilized carbon nucleophile for olefination

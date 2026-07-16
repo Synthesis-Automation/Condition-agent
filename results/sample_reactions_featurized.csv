@@ -609,3 +609,6 @@
 609,minisci_alkylation,,CCC(=O)O.Cc1ccc2cc(F)ccc2n1>>CCc1cc(C)nc2ccc(F)cc12,,,,True,unresolved,,,,unavailable,0,,
 610,minisci_alkylation,,CC(=O)O.Cc1ccc2cc(F)ccc2n1>>Cc1cc(C)c2cc(F)ccc2n1,,,,True,unresolved,,,,unavailable,0,,
 611,minisci_alkylation,,O=C(O)CCc1ccccc1.Cc1ccc2cc(F)ccc2n1>>Cc1cc(CCc2ccccc2)c2cc(F)ccc2n1,,,,True,unresolved,,,,unavailable,0,,
+612,Azo reduction,Azobenzene hydrogenation,c1ccc([N:1]=[N:2]c2ccccc2)cc1>>[NH2:1]c1ccccc1.[NH2:2]c1ccccc1,c1ccc([N:1]=[N:2]c2ccccc2)cc1,[NH2:1]c1ccccc1.[NH2:2]c1ccccc1,"H2, Pd/C",True,validated_atom_mapping,,,N=N bond cleavage; 4 × H gain at N,mapped_edit_summary,0,MULTIPLE_PRODUCTS,
+613,Disulfide reduction,Dimethyl disulfide cleavage,C[S:1][S:2]C>>C[SH:1].C[SH:2],C[S:1][S:2]C,C[SH:1].C[SH:2],DTT,True,validated_atom_mapping,,,S–S bond cleavage; 2 × H gain at S,mapped_edit_summary,0,MULTIPLE_PRODUCTS,
+614,Peroxide reduction,Dimethyl peroxide cleavage,C[O:1][O:2]C>>C[OH:1].C[OH:2],C[O:1][O:2]C,C[OH:1].C[OH:2],LiAlH4,True,validated_atom_mapping,,,O–O bond cleavage; 2 × H gain at O,mapped_edit_summary,0,MULTIPLE_PRODUCTS,

@@ -19,7 +19,7 @@ def test_handle_smarts_are_independent_and_mapped() -> None:
     assert {pattern["site_type"] for pattern in patterns} == {
         "leaving_group", "pronucleophile_XH", "transfer_group",
         "electrophilic_center", "aromatic_CH", "unsaturated_bond",
-        "dipolar_group",
+        "dipolar_group", "heteroatom_bond",
     }
     assert all(pattern.get("atom_roles") for pattern in patterns)
 
@@ -438,6 +438,73 @@ def test_inorganic_azide_is_not_an_organic_dipolar_handle() -> None:
 
     assert result.valid
     assert all(site.site_type != "dipolar_group" for site in result.sites)
+
+
+def test_organic_heteroatom_pair_bonds_are_typed_handles() -> None:
+    examples = {
+        "CN=NC": (
+            "HB|Azo",
+            "R1–N=N–R2",
+            ["isomerization", "reduction"],
+            "azo",
+        ),
+        "CSSC": (
+            "HB|Disulfide",
+            "R1–S–S–R2",
+            ["exchange", "reduction"],
+            "disulfide",
+        ),
+        "COOC": (
+            "HB|Peroxide",
+            "R1–O–O–R2",
+            ["homolysis", "reduction"],
+            "peroxide",
+        ),
+    }
+
+    for smiles, (signature, label, modes, group_id) in examples.items():
+        result = featurize_molecule(smiles)
+        sites = [site for site in result.sites if site.site_type == "heteroatom_bond"]
+        assert len(sites) == 1
+        site = sites[0]
+        assert site.canonical_signature == signature
+        assert site.chemist_label == label
+        assert site.topology == "bond"
+        assert site.details["reaction_modes"] == modes
+        assert set(site.details["atom_roles"]) == {
+            "attachment_a", "endpoint_a", "endpoint_b", "attachment_b"
+        }
+        group = next(
+            group for group in result.functional_groups if group.group_id == group_id
+        )
+        assert group.chemist_label == label
+        if group_id == "peroxide":
+            assert all(
+                candidate.group_id != "ether"
+                for candidate in result.functional_groups
+            )
+
+
+def test_heteroatom_pair_handles_require_two_organic_attachments() -> None:
+    for smiles in ("NN", "N=N", "SS", "CSC", "OO", "COO", "COC"):
+        result = featurize_molecule(smiles)
+        assert result.valid, smiles
+        assert all(site.site_type != "heteroatom_bond" for site in result.sites)
+
+
+def test_heteroatom_pair_labels_support_ascii_style() -> None:
+    expected = {
+        "CN=NC": "R1-N=N-R2",
+        "CSSC": "R1-S-S-R2",
+        "COOC": "R1-O-O-R2",
+    }
+    for smiles, label in expected.items():
+        site = next(
+            site
+            for site in featurize_molecule(smiles, label_style="ascii").sites
+            if site.site_type == "heteroatom_bond"
+        )
+        assert site.chemist_label == label
 
 
 def test_detector_emits_typed_candidates_from_shared_match_index() -> None:

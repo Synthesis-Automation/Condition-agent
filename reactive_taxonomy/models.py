@@ -14,6 +14,7 @@ SiteType = Literal[
     "aromatic_CH",
     "unsaturated_bond",
     "dipolar_group",
+    "heteroatom_bond",
 ]
 
 SiteTopology = Literal["edge", "atom", "center", "bond"]

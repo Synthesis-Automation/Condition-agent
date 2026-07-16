@@ -37,7 +37,10 @@
     "carbonyl_ketone": "R2C=O",
     "aromatic_ch": "{context}{bond}H",
     "nitrile": "R{bond}C{triple}N",
-    "organic_azide": "R{bond}N3"
+    "organic_azide": "R{bond}N3",
+    "azo_bond": "R1{bond}N{double}N{bond}R2",
+    "disulfide_bond": "R1{bond}S{bond}S{bond}R2",
+    "peroxide_bond": "R1{bond}O{bond}O{bond}R2"
   },
   "unsaturated_bond_templates": {
     "alkene": {

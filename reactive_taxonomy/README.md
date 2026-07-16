@@ -82,6 +82,13 @@ reduction, or cycloaddition modes describe possible chemistry only; a reaction
 interpretation still requires product/edit evidence. Cyanide salts, isocyanides,
 and inorganic azide are not promoted to these organic-handle contracts.
 
+Organic heteroatom-pair bonds share a bond-localized handle family with two
+typed attachments: `HB|Azo` (`R1–N=N–R2`), `HB|Disulfide`
+(`R1–S–S–R2`), and `HB|Peroxide` (`R1–O–O–R2`). Hydroperoxides,
+hydrogen peroxide, thiols, ordinary ethers, and unattached diazene are excluded.
+Mapped reductions can therefore report the observed central-bond cleavage and
+the corresponding hydrogen gains without requiring a named reaction family.
+
 Alkyl reactive centers retain `Alkyl` as their broad machine context while
 recording synthetically important attachment subtypes. Benzylic, allylic, and
 propargylic leaving groups are rendered as labels such as `Benzyl–Cl`,

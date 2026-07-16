@@ -21,6 +21,7 @@ _MOLECULE_SITE_TYPES = (
     "aromatic_CH",
     "unsaturated_bond",
     "dipolar_group",
+    "heteroatom_bond",
 )
 
 _SELF_TEST_MOLECULES = (

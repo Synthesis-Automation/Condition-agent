@@ -609,3 +609,6 @@ minisci_alkylation,,CC(=O)O.Cc1ccc2cc(C(F)(F)F)ccc2n1>>Cc1cc(C)c2cc(C(F)(F)F)ccc
 minisci_alkylation,,CCC(=O)O.Cc1ccc2cc(F)ccc2n1>>CCc1cc(C)nc2ccc(F)cc12,,,
 minisci_alkylation,,CC(=O)O.Cc1ccc2cc(F)ccc2n1>>Cc1cc(C)c2cc(F)ccc2n1,,,
 minisci_alkylation,,O=C(O)CCc1ccccc1.Cc1ccc2cc(F)ccc2n1>>Cc1cc(CCc2ccccc2)c2cc(F)ccc2n1,,,
+Azo reduction,Azobenzene hydrogenation,c1ccc([N:1]=[N:2]c2ccccc2)cc1>>[NH2:1]c1ccccc1.[NH2:2]c1ccccc1,c1ccc([N:1]=[N:2]c2ccccc2)cc1,[NH2:1]c1ccccc1.[NH2:2]c1ccccc1,"H2, Pd/C"
+Disulfide reduction,Dimethyl disulfide cleavage,C[S:1][S:2]C>>C[SH:1].C[SH:2],C[S:1][S:2]C,C[SH:1].C[SH:2],DTT
+Peroxide reduction,Dimethyl peroxide cleavage,C[O:1][O:2]C>>C[OH:1].C[OH:2],C[O:1][O:2]C,C[OH:1].C[OH:2],LiAlH4

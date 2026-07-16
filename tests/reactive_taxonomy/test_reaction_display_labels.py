@@ -100,3 +100,32 @@ def test_reaction_label_definition_is_versioned() -> None:
         "order_changed",
         "hydrogen_change",
     }
+
+
+def test_mapped_heteroatom_bond_reductions_receive_generic_labels() -> None:
+    examples = {
+        "c1ccc([N:1]=[N:2]c2ccccc2)cc1>>"
+        "[NH2:1]c1ccccc1.[NH2:2]c1ccccc1": (
+            "N=N bond cleavage; 4 × H gain at N",
+            "HB|Azo",
+        ),
+        "C[S:1][S:2]C>>C[SH:1].C[SH:2]": (
+            "S–S bond cleavage; 2 × H gain at S",
+            "HB|Disulfide",
+        ),
+        "C[O:1][O:2]C>>C[OH:1].C[OH:2]": (
+            "O–O bond cleavage; 2 × H gain at O",
+            "HB|Peroxide",
+        ),
+    }
+
+    for reaction, (label, handle_signature) in examples.items():
+        result = featurize_reaction(reaction)
+        assert result.valid
+        assert result.reaction_label == label
+        assert result.reaction_label_status == "mapped_edit_summary"
+        assert any(
+            site.canonical_signature == handle_signature
+            for component in result.reactants
+            for site in component.compound_analysis.sites
+        )

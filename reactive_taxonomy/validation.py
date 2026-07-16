@@ -64,7 +64,7 @@ def validate_taxonomy() -> List[str]:
     required = {
         "leaving_group", "pronucleophile_XH", "transfer_group",
         "electrophilic_center", "aromatic_CH", "unsaturated_bond",
-        "dipolar_group",
+        "dipolar_group", "heteroatom_bond",
     }
     if set(families) != required:
         errors.append("site_family_mismatch")
@@ -139,6 +139,9 @@ def validate_taxonomy() -> List[str]:
                 "attachment", "proximal_nitrogen", "central_nitrogen",
                 "terminal_nitrogen",
             },
+            "heteroatom_bond": {
+                "attachment_a", "endpoint_a", "endpoint_b", "attachment_b",
+            },
         }.get(str(pattern.get("site_type")), set())
         if not required_roles <= set(atom_roles):
             errors.append(f"missing_required_atom_role:{pattern_id}")
@@ -163,7 +166,8 @@ def validate_taxonomy() -> List[str]:
             errors.append(f"missing_unsaturated_bond_style:{style_id}")
     required_handle_templates = {
         "carbonyl_formaldehyde", "carbonyl_aldehyde", "carbonyl_ketone",
-        "aromatic_ch", "nitrile", "organic_azide",
+        "aromatic_ch", "nitrile", "organic_azide", "azo_bond",
+        "disulfide_bond", "peroxide_bond",
     }
     if not required_handle_templates <= set(rendering.get("named_handle_templates") or {}):
         errors.append("missing_named_handle_templates")
