@@ -266,11 +266,94 @@ def test_unsaturated_carbon_bonds_are_bond_localized() -> None:
     assert alkene.canonical_signature == "PI|Alkene"
     assert alkene.details["bond_order"] == 2
     assert set(alkene.details["atom_roles"]) == {"endpoint_a", "endpoint_b"}
-    assert alkene.chemist_label == "C=C"
+    assert alkene.chemist_label == "H2C=CHR1"
+    assert alkene.details["endpoint_h_counts"] == [2, 1]
+    assert alkene.details["endpoint_substituent_counts"] == [0, 1]
 
     alkyne_sites = featurize_molecule("CC#C").sites
     assert {site.site_type for site in alkyne_sites} == {"unsaturated_bond", "pronucleophile_XH"}
-    assert next(site for site in alkyne_sites if site.site_type == "unsaturated_bond").chemist_label == "C≡C"
+    assert next(
+        site for site in alkyne_sites if site.site_type == "unsaturated_bond"
+    ).chemist_label == "R1–C≡C–H"
+
+
+def test_alkene_labels_expose_all_hydrogen_and_substituent_positions() -> None:
+    examples = {
+        "C=C": "H2C=CH2",
+        "CC=C": "H2C=CHR1",
+        "CC=CC": "R1HC=CHR2",
+        "C=C(C)c1ccccc1": "H2C=CR1R2",
+        "CC(C)=C(C)C": "R1R2C=CR3R4",
+    }
+
+    for smiles, expected in examples.items():
+        site = next(
+            site
+            for site in featurize_molecule(smiles).sites
+            if site.site_type == "unsaturated_bond"
+        )
+        assert site.chemist_label == expected
+        assert sum(site.details["endpoint_h_counts"]) + sum(
+            site.details["endpoint_substituent_counts"]
+        ) == 4
+
+
+def test_alkene_labels_retain_defined_e_z_stereochemistry() -> None:
+    trans = next(
+        site
+        for site in featurize_molecule("c1ccc(/C=C/c2ccccc2)cc1").sites
+        if site.site_type == "unsaturated_bond"
+    )
+    cis = next(
+        site
+        for site in featurize_molecule("c1ccc(/C=C\\c2ccccc2)cc1").sites
+        if site.site_type == "unsaturated_bond"
+    )
+
+    assert trans.chemist_label == "R1HC=CHR2 (E)"
+    assert cis.chemist_label == "R1HC=CHR2 (Z)"
+
+
+def test_alkyne_labels_distinguish_acetylene_terminal_and_internal() -> None:
+    examples = {
+        "C#C": "H–C≡C–H",
+        "CC#C": "R1–C≡C–H",
+        "CC#CC": "R1–C≡C–R2",
+        "c1ccccc1C#Cc1ccccc1": "R1–C≡C–R2",
+    }
+
+    for smiles, expected in examples.items():
+        site = next(
+            site
+            for site in featurize_molecule(smiles).sites
+            if site.site_type == "unsaturated_bond"
+        )
+        assert site.chemist_label == expected
+
+    acetylene_xh = next(
+        site
+        for site in featurize_molecule("C#C").sites
+        if site.site_type == "pronucleophile_XH"
+    )
+    assert acetylene_xh.chemist_label == "H–C≡C–H"
+    assert acetylene_xh.details["opposite_endpoint_substituent_count"] == 0
+
+
+def test_unsaturated_labels_support_ascii_style_without_changing_signature() -> None:
+    unicode_site = next(
+        site
+        for site in featurize_molecule("CC#C").sites
+        if site.site_type == "unsaturated_bond"
+    )
+    ascii_site = next(
+        site
+        for site in featurize_molecule("CC#C", label_style="ascii").sites
+        if site.site_type == "unsaturated_bond"
+    )
+
+    assert unicode_site.chemist_label == "R1–C≡C–H"
+    assert ascii_site.chemist_label == "R1-C#C-H"
+    assert unicode_site.canonical_signature == ascii_site.canonical_signature
 
 
 def test_detector_emits_typed_candidates_from_shared_match_index() -> None:

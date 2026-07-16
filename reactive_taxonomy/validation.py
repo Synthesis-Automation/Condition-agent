@@ -145,12 +145,27 @@ def validate_taxonomy() -> List[str]:
     for style_id, style in styles.items():
         if not isinstance(style, dict) or not style.get("bond"):
             errors.append(f"invalid_rendering_style:{style_id}")
+        elif not style.get("double") or not style.get("triple"):
+            errors.append(f"missing_unsaturated_bond_style:{style_id}")
     required_handle_templates = {
         "carbonyl_formaldehyde", "carbonyl_aldehyde", "carbonyl_ketone",
-        "aromatic_ch", "alkene", "alkyne",
+        "aromatic_ch",
     }
     if not required_handle_templates <= set(rendering.get("named_handle_templates") or {}):
         errors.append("missing_named_handle_templates")
+    unsaturated_templates = rendering.get("unsaturated_bond_templates") or {}
+    if set(unsaturated_templates) != {"alkene", "alkyne"}:
+        errors.append("missing_unsaturated_bond_templates")
+    else:
+        alkene_templates = unsaturated_templates["alkene"]
+        if set(alkene_templates.get("left_endpoints") or {}) != {"0", "1", "2"}:
+            errors.append("invalid_alkene_left_endpoint_templates")
+        if set(alkene_templates.get("right_endpoints") or {}) != {"0", "1", "2"}:
+            errors.append("invalid_alkene_right_endpoint_templates")
+        if set(unsaturated_templates["alkyne"]) != {
+            "acetylene", "terminal", "internal"
+        }:
+            errors.append("invalid_alkyne_templates")
     rendering_contexts = set((rendering.get("context_labels") or {}).keys())
     if not rendering_contexts <= set(tokens):
         errors.append("unknown_rendering_context")

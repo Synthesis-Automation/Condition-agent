@@ -3,13 +3,19 @@
   "default_style": "unicode",
   "styles": {
     "unicode": {
-      "bond": "–"
+      "bond": "–",
+      "double": "=",
+      "triple": "≡"
     },
     "ascii": {
-      "bond": "-"
+      "bond": "-",
+      "double": "=",
+      "triple": "#"
     },
     "hte_legacy": {
-      "bond": "-"
+      "bond": "-",
+      "double": "=",
+      "triple": "#"
     }
   },
   "context_labels": {
@@ -29,9 +35,27 @@
     "carbonyl_formaldehyde": "H2C=O",
     "carbonyl_aldehyde": "R{bond}CH=O",
     "carbonyl_ketone": "R2C=O",
-    "aromatic_ch": "{context}{bond}H",
-    "alkene": "C=C",
-    "alkyne": "C≡C"
+    "aromatic_ch": "{context}{bond}H"
+  },
+  "unsaturated_bond_templates": {
+    "alkene": {
+      "template": "{left}{double}{right}{stereo_suffix}",
+      "left_endpoints": {
+        "2": "H2C",
+        "1": "R{r1}HC",
+        "0": "R{r1}R{r2}C"
+      },
+      "right_endpoints": {
+        "2": "CH2",
+        "1": "CHR{r1}",
+        "0": "CR{r1}R{r2}"
+      }
+    },
+    "alkyne": {
+      "acetylene": "H{bond}C{triple}C{bond}H",
+      "terminal": "R{r1}{bond}C{triple}C{bond}H",
+      "internal": "R{r1}{bond}C{triple}C{bond}R{r2}"
+    }
   },
   "xh_rules": [
     {
@@ -41,9 +65,18 @@
       "priority": 100
     },
     {
+      "id": "acetylene_terminal_h",
+      "center": "Csp",
+      "feature_equals": {
+        "opposite_endpoint_substituent_count": 0
+      },
+      "template": "H{bond}C{triple}C{bond}H",
+      "priority": 110
+    },
+    {
       "id": "terminal_alkyne",
       "center": "Csp",
-      "template": "R{bond}C≡C{bond}H",
+      "template": "R{bond}C{triple}C{bond}H",
       "priority": 100
     },
     {

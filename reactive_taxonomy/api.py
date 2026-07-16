@@ -7,7 +7,7 @@ from typing import Any, Iterable, List, Optional, Set
 
 from .chemistry.rdkit_utils import mol_to_canonical_smiles, parse_smiles, rdkit_available
 
-from .labels import available_styles, render_edge, render_named_handle, render_xh
+from .labels import available_styles, render_edge, render_named_handle, render_unsaturated_bond, render_xh
 from .environments import build_site_environment
 from .functional_groups import detect_functional_groups
 from .models import ComponentAnalysis, CompoundAnalysis, ReactiveSite, SiteCandidate, SiteType
@@ -87,6 +87,10 @@ def featurize_molecule(
                 label = render_xh(style=label_style, **candidate.render_data)
             elif candidate.render_kind == "named_handle":
                 label = render_named_handle(style=label_style, **candidate.render_data)
+            elif candidate.render_kind == "unsaturated_bond":
+                label = render_unsaturated_bond(
+                    style=label_style, **candidate.render_data
+                )
             else:
                 label = candidate.canonical_signature
             site = ReactiveSite(

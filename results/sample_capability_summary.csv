@@ -1,0 +1,3 @@
+"dataset","records","valid","invalid","exact_reconstruction","grammar_only","unresolved","labeled","named_family","with_reactive_sites","with_functional_groups"
+"sample_compounds","256","256","0","","","","","","243","211"
+"sample_reactions","610","607","3","201","54","355","255","45","",""

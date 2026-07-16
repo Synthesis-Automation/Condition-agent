@@ -68,6 +68,12 @@ substitution at the reactive center from attachment-carbon sterics. For
 example, tert-butylamine remains a primary amine (`R–NH2`) but its attached
 alkyl group is reported as `tertiary` and alpha-branched.
 
+Unsaturated-bond labels expose endpoint substitution rather than collapsing all
+sites to `C=C` or `C≡C`. Examples include `H2C=CH2`, `H2C=CHR1`,
+`R1R2C=CR3R4`, `R1–C≡C–H`, and `R1–C≡C–R2`; defined alkene E/Z
+stereochemistry is retained. Canonical `PI|Alkene` and `PI|Alkyne` signatures
+remain display-independent.
+
 Alkyl reactive centers retain `Alkyl` as their broad machine context while
 recording synthetically important attachment subtypes. Benzylic, allylic, and
 propargylic leaving groups are rendered as labels such as `Benzyl–Cl`,

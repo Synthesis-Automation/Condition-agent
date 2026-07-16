@@ -8,11 +8,27 @@ from ..models import SiteCandidate
 from ..patterns import MatchIndex
 
 
-def _substitution_degree(atom: Any, other_index: int) -> int:
+def _carbon_substitution_degree(atom: Any, other_index: int) -> int:
     return sum(
         neighbor.GetAtomicNum() == 6 and neighbor.GetIdx() != other_index
         for neighbor in atom.GetNeighbors()
     )
+
+
+def _heavy_substitution_degree(atom: Any, other_index: int) -> int:
+    return sum(
+        neighbor.GetAtomicNum() > 1 and neighbor.GetIdx() != other_index
+        for neighbor in atom.GetNeighbors()
+    )
+
+
+def _stereochemistry(bond: Any) -> str:
+    value = str(bond.GetStereo()).upper()
+    if value.endswith("STEREOE"):
+        return "E"
+    if value.endswith("STEREOZ"):
+        return "Z"
+    return ""
 
 
 def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
@@ -31,24 +47,61 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             continue
         if left.GetIdx() not in candidate_atoms or right.GetIdx() not in candidate_atoms:
             continue
-        endpoint_a, endpoint_b = sorted((left.GetIdx(), right.GetIdx()))
         token = "Alkene" if order == 2.0 else "Alkyne"
         pattern_id = "carbon_carbon_alkene" if order == 2.0 else "carbon_carbon_alkyne"
-        substitution = (
-            _substitution_degree(left, right.GetIdx())
-            + _substitution_degree(right, left.GetIdx())
+        endpoint_records = [
+            {
+                "atom": atom,
+                "h_count": int(atom.GetTotalNumHs(includeNeighbors=True)),
+                "heavy_substituents": _heavy_substitution_degree(
+                    atom, other.GetIdx()
+                ),
+                "carbon_substituents": _carbon_substitution_degree(
+                    atom, other.GetIdx()
+                ),
+            }
+            for atom, other in ((left, right), (right, left))
+        ]
+        endpoint_records.sort(
+            key=lambda record: (
+                -record["h_count"] if order == 2.0 else record["h_count"],
+                record["heavy_substituents"],
+                record["atom"].GetIdx(),
+            )
         )
+        endpoint_a = int(endpoint_records[0]["atom"].GetIdx())
+        endpoint_b = int(endpoint_records[1]["atom"].GetIdx())
+        endpoint_h_counts = [
+            int(record["h_count"]) for record in endpoint_records
+        ]
+        endpoint_substituent_counts = [
+            int(record["heavy_substituents"]) for record in endpoint_records
+        ]
+        substitution = sum(
+            int(record["carbon_substituents"]) for record in endpoint_records
+        )
+        heavy_substitution = sum(endpoint_substituent_counts)
+        stereo = _stereochemistry(bond)
         sites.append(SiteCandidate(
             site_type="unsaturated_bond", topology="bond",
             atom_roles={"endpoint_a": (endpoint_a,), "endpoint_b": (endpoint_b,)},
             atom_indices=(endpoint_a, endpoint_b), bond_indices=(bond.GetIdx(),),
             canonical_signature=f"PI|{token}",
-            render_kind="named_handle",
-            render_data={"template_id": token.lower()},
+            render_kind="unsaturated_bond",
+            render_data={
+                "bond_order": int(order),
+                "endpoint_h_counts": endpoint_h_counts,
+                "endpoint_substituent_counts": endpoint_substituent_counts,
+                "stereochemistry": stereo,
+            },
             matched_patterns=(pattern_id,),
             details={
                 "handle_token": token, "bond_order": int(order),
                 "substitution_degree": substitution,
+                "heavy_atom_substitution_degree": heavy_substitution,
+                "endpoint_h_counts": endpoint_h_counts,
+                "endpoint_substituent_counts": endpoint_substituent_counts,
+                "stereochemistry": stereo or None,
             },
             availability="available",
         ))

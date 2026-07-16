@@ -57,13 +57,35 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 )]
         signature = f"XH|{center}|H{h_count}|{','.join(contexts)}"
         family = _derived_family(center, h_count, contexts)
+        render_features = {}
+        if center == "Csp":
+            opposite = next(
+                (
+                    neighbor
+                    for neighbor in atom.GetNeighbors()
+                    if neighbor.GetAtomicNum() == 6
+                    and str(neighbor.GetHybridization()) == "SP"
+                ),
+                None,
+            )
+            if opposite is not None:
+                render_features["opposite_endpoint_substituent_count"] = sum(
+                    neighbor.GetAtomicNum() > 1
+                    and neighbor.GetIdx() != atom.GetIdx()
+                    for neighbor in opposite.GetNeighbors()
+                )
         sites.append(SiteCandidate(
             site_type="pronucleophile_XH", topology="atom",
             atom_roles={"center": (atom.GetIdx(),)}, atom_indices=(atom.GetIdx(),), bond_indices=(),
             canonical_signature=signature, render_kind="xh",
-            render_data={"center": center, "h_count": h_count, "contexts": contexts},
+            render_data={
+                "center": center,
+                "h_count": h_count,
+                "contexts": contexts,
+                "features": render_features,
+            },
             matched_patterns=tuple(item["id"] for item in match_index.patterns_for_atom("pronucleophile_XH", "center", atom.GetIdx())),
-            details={"center_element": symbol, "center_token": center, "formal_charge": atom.GetFormalCharge(), "aromatic": atom.GetIsAromatic(), "h_count": h_count, "contexts": contexts, "derived_family": family},
+            details={"center_element": symbol, "center_token": center, "formal_charge": atom.GetFormalCharge(), "aromatic": atom.GetIsAromatic(), "h_count": h_count, "contexts": contexts, "derived_family": family, **render_features},
             context_records=tuple(context_records), availability=_availability(center, contexts),
         ))
     return sites
