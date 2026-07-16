@@ -52,6 +52,8 @@ def render_named_handle(template_id: str, *, context: str = "", style: str = "un
         raise ValueError(f"Unknown named handle template: {template_id}")
     return str(template).format(
         bond=bond,
+        double=_style(style)["double"],
+        triple=_style(style)["triple"],
         context=_context_label(context, bond) if context else "",
     )
 

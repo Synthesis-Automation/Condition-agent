@@ -145,12 +145,14 @@
     },
     {
       "id": "nitrile",
-      "label": "C≡N",
-      "smarts": "[C:1]#[N:2]",
+      "label": "R–C≡N",
+      "smarts": "[C+0;$([C]([!#1])#[N]):1]#[N+0:2]",
       "priority": 88,
       "tags": [
+        "electrophilic",
         "electron_withdrawing",
-        "metal_binding"
+        "metal_binding",
+        "reduction_sensitive"
       ]
     },
     {
@@ -207,7 +209,10 @@
     {
       "id": "azide",
       "label": "N3",
-      "smarts": "[N-:1]=[N+:2]=[N:3]",
+      "smarts": [
+        "[N-:1]=[N+:2]=[N:3]",
+        "[N-:1]-[N+:2]#[N:3]"
+      ],
       "priority": 85,
       "tags": [
         "reduction_sensitive",

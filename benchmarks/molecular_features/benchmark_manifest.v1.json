@@ -51,7 +51,10 @@
     "primary_tert_butylamine": {"XH|N|H2|Alkyl": [[4]]},
     "primary_aniline": {"XH|N|H2|Ar": [[0]]},
     "benzyl_chloride": {"LG|Alkyl|Cl": [[0, 1]]},
-    "aryl_bromide_with_nitrile": {"LG|Ar|Br": [[0, 1]]},
+    "aryl_bromide_with_nitrile": {
+      "LG|Ar|Br": [[0, 1]],
+      "PI|Nitrile": [[5, 6]]
+    },
     "heteroaryl_chloride": {"LG|HeteroAr|Cl": [[0, 1]]},
     "aryl_boronic_acid": {"TM|Ar|B(OH)2": [[0, 1, 2, 3]]},
     "acetyl_chloride": {"EC|Acyl|Alkyl|Cl|activated": [[0, 1, 2, 3]]},
@@ -67,7 +70,10 @@
     "terminal_alkene": {"PI|Alkene": [[1, 2]]},
     "terminal_alkyne": {"PI|Alkyne": [[1, 2]], "XH|Csp|H1|Alkynyl": [[2]]},
     "aminopyridine": {"XH|N|H2|HeteroAr": [[0]]},
-    "hindered_electron_poor_aryl_bromide": {"LG|Ar|Br": [[0, 1]]}
+    "hindered_electron_poor_aryl_bromide": {
+      "LG|Ar|Br": [[0, 1]],
+      "PI|Nitrile": [[8, 9]]
+    }
   },
   "cases": [
     {
@@ -139,7 +145,7 @@
       "smiles": "Brc1ccc(C#N)cc1",
       "expected_valid": true,
       "expected_group_counts": {"aryl_halide": 1, "nitrile": 1},
-      "expected_site_counts": {"CH|ArH": 4, "LG|Ar|Br": 1}
+      "expected_site_counts": {"CH|ArH": 4, "LG|Ar|Br": 1, "PI|Nitrile": 1}
     },
     {
       "case_id": "heteroaryl_chloride",
@@ -261,7 +267,7 @@
       "smiles": "Brc1c(C)cccc1C#N",
       "expected_valid": true,
       "expected_group_counts": {"aryl_halide": 1, "nitrile": 1},
-      "expected_site_counts": {"CH|ArH": 3, "LG|Ar|Br": 1},
+      "expected_site_counts": {"CH|ArH": 3, "LG|Ar|Br": 1, "PI|Nitrile": 1},
       "environment_expectations": [
         {
           "site_signature": "LG|Ar|Br",

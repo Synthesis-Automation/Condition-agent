@@ -74,6 +74,14 @@ sites to `C=C` or `C≡C`. Examples include `H2C=CH2`, `H2C=CHR1`,
 stereochemistry is retained. Canonical `PI|Alkene` and `PI|Alkyne` signatures
 remain display-independent.
 
+Organic nitriles are also bond-localized π handles with typed carbon and
+nitrogen endpoints (`PI|Nitrile`, `R–C≡N`). Organic azides are separate
+multi-atom dipolar handles with attachment, proximal-, central-, and
+terminal-nitrogen roles (`DG|Azide|Organic`, `R–N3`). Their declared addition,
+reduction, or cycloaddition modes describe possible chemistry only; a reaction
+interpretation still requires product/edit evidence. Cyanide salts, isocyanides,
+and inorganic azide are not promoted to these organic-handle contracts.
+
 Alkyl reactive centers retain `Alkyl` as their broad machine context while
 recording synthetically important attachment subtypes. Benzylic, allylic, and
 propargylic leaving groups are rendered as labels such as `Benzyl–Cl`,

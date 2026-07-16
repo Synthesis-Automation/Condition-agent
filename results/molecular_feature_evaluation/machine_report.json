@@ -11,7 +11,7 @@
     "reactive_site_precision": 1.0,
     "reactive_site_recall": 1.0,
     "reactive_atom_accuracy": 1.0,
-    "reactive_atom_check_count": 21,
+    "reactive_atom_check_count": 23,
     "environment_check_count": 6,
     "environment_check_accuracy": 1.0,
     "determinism_rate": 1.0,

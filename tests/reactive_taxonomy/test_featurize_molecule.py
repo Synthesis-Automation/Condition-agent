@@ -19,6 +19,7 @@ def test_handle_smarts_are_independent_and_mapped() -> None:
     assert {pattern["site_type"] for pattern in patterns} == {
         "leaving_group", "pronucleophile_XH", "transfer_group",
         "electrophilic_center", "aromatic_CH", "unsaturated_bond",
+        "dipolar_group",
     }
     assert all(pattern.get("atom_roles") for pattern in patterns)
 
@@ -354,6 +355,89 @@ def test_unsaturated_labels_support_ascii_style_without_changing_signature() -> 
     assert unicode_site.chemist_label == "R1–C≡C–H"
     assert ascii_site.chemist_label == "R1-C#C-H"
     assert unicode_site.canonical_signature == ascii_site.canonical_signature
+
+
+def test_organic_nitriles_are_typed_pi_handles() -> None:
+    for smiles in ("CC#N", "N#Cc1ccccc1"):
+        result = featurize_molecule(smiles)
+        site = next(
+            site
+            for site in result.sites
+            if site.canonical_signature == "PI|Nitrile"
+        )
+        assert site.site_type == "unsaturated_bond"
+        assert site.topology == "bond"
+        assert site.chemist_label == "R–C≡N"
+        assert set(site.details["atom_roles"]) >= {
+            "attachment",
+            "carbon_endpoint",
+            "nitrogen_endpoint",
+        }
+        assert site.details["endpoint_elements"] == ["C", "N"]
+        assert site.details["reaction_modes"] == ["addition", "reduction"]
+        assert site.details["electrophilic_endpoint_atom_index"] == (
+            site.details["carbon_endpoint_atom_index"]
+        )
+        group = next(group for group in result.functional_groups if group.group_id == "nitrile")
+        assert group.chemist_label == "R–C≡N"
+        assert {"electrophilic", "reduction_sensitive"} <= set(group.tags)
+
+    ascii_site = next(
+        site
+        for site in featurize_molecule("CC#N", label_style="ascii").sites
+        if site.canonical_signature == "PI|Nitrile"
+    )
+    assert ascii_site.chemist_label == "R-C#N"
+
+
+def test_cyanide_and_isocyanide_are_not_organic_nitrile_handles() -> None:
+    for smiles in ("[Na+].[C-]#N", "C[N+]#[C-]"):
+        assert "PI|Nitrile" not in signatures(smiles)
+        assert all(
+            group.group_id != "nitrile"
+            for group in featurize_molecule(smiles).functional_groups
+        )
+
+
+def test_organic_azide_resonance_forms_share_one_dipolar_handle() -> None:
+    examples = {
+        "CN=[N+]=[N-]": "organic_azide_double_bond_resonance",
+        "[N-]=[N+]=Nc1ccccc1": "organic_azide_double_bond_resonance",
+        "C[N-][N+]#N": "organic_azide_triple_bond_resonance",
+    }
+    for smiles, matched_pattern in examples.items():
+        result = featurize_molecule(smiles)
+        sites = [site for site in result.sites if site.site_type == "dipolar_group"]
+        assert len(sites) == 1
+        site = sites[0]
+        assert site.canonical_signature == "DG|Azide|Organic"
+        assert site.chemist_label == "R–N3"
+        assert site.details["matched_pattern"] == matched_pattern
+        assert site.details["net_group_charge"] == 0
+        assert site.details["reaction_modes"] == ["cycloaddition", "reduction"]
+        assert set(site.details["atom_roles"]) >= {
+            "attachment",
+            "proximal_nitrogen",
+            "central_nitrogen",
+            "terminal_nitrogen",
+        }
+        assert any(group.group_id == "azide" for group in result.functional_groups)
+
+    ascii_site = next(
+        site
+        for site in featurize_molecule(
+            "CN=[N+]=[N-]", label_style="ascii"
+        ).sites
+        if site.site_type == "dipolar_group"
+    )
+    assert ascii_site.chemist_label == "R-N3"
+
+
+def test_inorganic_azide_is_not_an_organic_dipolar_handle() -> None:
+    result = featurize_molecule("[Na+].[N-]=[N+]=[N-]")
+
+    assert result.valid
+    assert all(site.site_type != "dipolar_group" for site in result.sites)
 
 
 def test_detector_emits_typed_candidates_from_shared_match_index() -> None:

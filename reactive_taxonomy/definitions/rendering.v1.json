@@ -35,7 +35,9 @@
     "carbonyl_formaldehyde": "H2C=O",
     "carbonyl_aldehyde": "R{bond}CH=O",
     "carbonyl_ketone": "R2C=O",
-    "aromatic_ch": "{context}{bond}H"
+    "aromatic_ch": "{context}{bond}H",
+    "nitrile": "R{bond}C{triple}N",
+    "organic_azide": "R{bond}N3"
   },
   "unsaturated_bond_templates": {
     "alkene": {

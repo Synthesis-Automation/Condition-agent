@@ -64,6 +64,7 @@ def validate_taxonomy() -> List[str]:
     required = {
         "leaving_group", "pronucleophile_XH", "transfer_group",
         "electrophilic_center", "aromatic_CH", "unsaturated_bond",
+        "dipolar_group",
     }
     if set(families) != required:
         errors.append("site_family_mismatch")
@@ -96,7 +97,16 @@ def validate_taxonomy() -> List[str]:
         group_id = str(record.get("id") or "<missing>")
         if not record.get("label"):
             errors.append(f"missing_functional_group_label:{group_id}")
-        if compile_smarts(str(record.get("smarts") or ""), validate=False) is None:
+        raw_group_patterns = record.get("smarts") or ""
+        group_patterns = (
+            raw_group_patterns
+            if isinstance(raw_group_patterns, list)
+            else [raw_group_patterns]
+        )
+        if not group_patterns or any(
+            compile_smarts(str(smarts), validate=False) is None
+            for smarts in group_patterns
+        ):
             errors.append(f"invalid_functional_group_smarts:{group_id}")
         unknown_suppressed = set(record.get("suppresses_on_overlap") or []) - set(group_ids)
         if unknown_suppressed:
@@ -125,6 +135,10 @@ def validate_taxonomy() -> List[str]:
             "electrophilic_center": {"center"},
             "aromatic_CH": {"center"},
             "unsaturated_bond": {"endpoint_a", "endpoint_b"},
+            "dipolar_group": {
+                "attachment", "proximal_nitrogen", "central_nitrogen",
+                "terminal_nitrogen",
+            },
         }.get(str(pattern.get("site_type")), set())
         if not required_roles <= set(atom_roles):
             errors.append(f"missing_required_atom_role:{pattern_id}")
@@ -149,7 +163,7 @@ def validate_taxonomy() -> List[str]:
             errors.append(f"missing_unsaturated_bond_style:{style_id}")
     required_handle_templates = {
         "carbonyl_formaldehyde", "carbonyl_aldehyde", "carbonyl_ketone",
-        "aromatic_ch",
+        "aromatic_ch", "nitrile", "organic_azide",
     }
     if not required_handle_templates <= set(rendering.get("named_handle_templates") or {}):
         errors.append("missing_named_handle_templates")

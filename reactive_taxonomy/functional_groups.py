@@ -29,29 +29,32 @@ def detect_functional_groups(mol: Any, component_index: int) -> List[FunctionalG
     candidates: List[Tuple[Dict[str, Any], FunctionalGroup]] = []
     seen = set()
     for definition in load_functional_group_definitions():
-        query = compile_smarts(str(definition.get("smarts") or ""), validate=False)
-        if query is None:
-            continue
-        map_positions = {
-            atom.GetAtomMapNum(): atom.GetIdx()
-            for atom in query.GetAtoms() if atom.GetAtomMapNum()
-        }
-        for match in mol.GetSubstructMatches(query, uniquify=True):
-            atoms = tuple(sorted(int(index) for index in match))
-            key = (str(definition["id"]), atoms)
-            if key in seen:
+        raw_patterns = definition.get("smarts") or ""
+        patterns = raw_patterns if isinstance(raw_patterns, list) else [raw_patterns]
+        for smarts in patterns:
+            query = compile_smarts(str(smarts), validate=False)
+            if query is None:
                 continue
-            seen.add(key)
-            anchor_position = map_positions.get(1, 0)
-            candidates.append((definition, FunctionalGroup(
-                group_id=str(definition["id"]),
-                chemist_label=str(definition.get("label") or definition["id"]),
-                component_index=component_index,
-                atom_indices=atoms,
-                anchor_atom_index=int(match[anchor_position]),
-                tags=tuple(str(tag) for tag in definition.get("tags", [])),
-                matched_pattern=str(definition.get("smarts") or ""),
-            )))
+            map_positions = {
+                atom.GetAtomMapNum(): atom.GetIdx()
+                for atom in query.GetAtoms() if atom.GetAtomMapNum()
+            }
+            for match in mol.GetSubstructMatches(query, uniquify=True):
+                atoms = tuple(sorted(int(index) for index in match))
+                key = (str(definition["id"]), atoms)
+                if key in seen:
+                    continue
+                seen.add(key)
+                anchor_position = map_positions.get(1, 0)
+                candidates.append((definition, FunctionalGroup(
+                    group_id=str(definition["id"]),
+                    chemist_label=str(definition.get("label") or definition["id"]),
+                    component_index=component_index,
+                    atom_indices=atoms,
+                    anchor_atom_index=int(match[anchor_position]),
+                    tags=tuple(str(tag) for tag in definition.get("tags", [])),
+                    matched_pattern=str(smarts),
+                )))
     retained: List[Tuple[Dict[str, Any], FunctionalGroup]] = []
     for definition, candidate in candidates:
         candidate_atoms = set(candidate.atom_indices)

@@ -34,18 +34,77 @@ def _stereochemistry(bond: Any) -> str:
 def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
     """Return non-aromatic C=C and C#C bonds as two-endpoint sites."""
     sites: List[SiteCandidate] = []
-    candidate_atoms = (
-        match_index.role_atoms("unsaturated_bond", "endpoint_a")
-        | match_index.role_atoms("unsaturated_bond", "endpoint_b")
-    )
+    candidate_endpoint_a = match_index.role_atoms("unsaturated_bond", "endpoint_a")
+    candidate_endpoint_b = match_index.role_atoms("unsaturated_bond", "endpoint_b")
     for bond in mol.GetBonds():
         order = float(bond.GetBondTypeAsDouble())
         if order not in {2.0, 3.0} or bond.GetIsAromatic():
             continue
         left, right = bond.GetBeginAtom(), bond.GetEndAtom()
-        if left.GetAtomicNum() != 6 or right.GetAtomicNum() != 6:
+        matched_endpoints = (
+            left.GetIdx() in candidate_endpoint_a
+            and right.GetIdx() in candidate_endpoint_b
+        ) or (
+            right.GetIdx() in candidate_endpoint_a
+            and left.GetIdx() in candidate_endpoint_b
+        )
+        if not matched_endpoints:
             continue
-        if left.GetIdx() not in candidate_atoms or right.GetIdx() not in candidate_atoms:
+        if order == 3.0 and {left.GetAtomicNum(), right.GetAtomicNum()} == {6, 7}:
+            carbon = left if left.GetAtomicNum() == 6 else right
+            nitrogen = right if carbon is left else left
+            if (
+                carbon.GetIdx() not in candidate_endpoint_a
+                or nitrogen.GetIdx() not in candidate_endpoint_b
+            ):
+                continue
+            attachment = next(
+                (
+                    neighbor
+                    for neighbor in carbon.GetNeighbors()
+                    if neighbor.GetIdx() != nitrogen.GetIdx()
+                    and neighbor.GetAtomicNum() > 1
+                ),
+                None,
+            )
+            if attachment is None:
+                continue
+            patterns = tuple(
+                definition["id"]
+                for definition in match_index.patterns_for_atom(
+                    "unsaturated_bond", "carbon_endpoint", carbon.GetIdx()
+                )
+            )
+            sites.append(
+                SiteCandidate(
+                    site_type="unsaturated_bond",
+                    topology="bond",
+                    atom_roles={
+                        "endpoint_a": (carbon.GetIdx(),),
+                        "endpoint_b": (nitrogen.GetIdx(),),
+                        "carbon_endpoint": (carbon.GetIdx(),),
+                        "nitrogen_endpoint": (nitrogen.GetIdx(),),
+                        "attachment": (attachment.GetIdx(),),
+                    },
+                    atom_indices=(carbon.GetIdx(), nitrogen.GetIdx()),
+                    bond_indices=(bond.GetIdx(),),
+                    canonical_signature="PI|Nitrile",
+                    render_kind="named_handle",
+                    render_data={"template_id": "nitrile"},
+                    matched_patterns=patterns,
+                    details={
+                        "handle_token": "Nitrile",
+                        "bond_order": 3,
+                        "endpoint_elements": ["C", "N"],
+                        "attachment_element": attachment.GetSymbol(),
+                        "electrophilic_endpoint_atom_index": carbon.GetIdx(),
+                        "reaction_modes": ["addition", "reduction"],
+                    },
+                    availability="available",
+                )
+            )
+            continue
+        if left.GetAtomicNum() != 6 or right.GetAtomicNum() != 6:
             continue
         token = "Alkene" if order == 2.0 else "Alkyne"
         pattern_id = "carbon_carbon_alkene" if order == 2.0 else "carbon_carbon_alkyne"

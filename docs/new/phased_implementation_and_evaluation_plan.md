@@ -51,7 +51,7 @@ The current `molecular_features.v1` run reports:
 | Functional-group recall | 100% |
 | Reactive-site precision | 100% |
 | Reactive-site recall | 100% |
-| Reactive-atom localization | 21/21 |
+| Reactive-atom localization | 23/23 |
 | Targeted environment checks | 6/6 |
 | Repeat-run determinism | 100% |
 | Equivalent-SMILES invariance | 3/3 |

@@ -38,7 +38,11 @@
     ],
     "unsaturated_bond": [
       "Alkene",
-      "Alkyne"
+      "Alkyne",
+      "Nitrile"
+    ],
+    "dipolar_group": [
+      "Azide"
     ]
   },
   "patterns": [
@@ -379,6 +383,52 @@
       "atom_roles": {
         "endpoint_a": 1,
         "endpoint_b": 2
+      }
+    },
+    {
+      "id": "carbon_nitrogen_nitrile",
+      "site_type": "unsaturated_bond",
+      "tokens": [
+        "Nitrile"
+      ],
+      "priority": 55,
+      "smarts": "[*;!#1:3]-[C+0:1]#[N+0:2]",
+      "atom_roles": {
+        "endpoint_a": 1,
+        "endpoint_b": 2,
+        "carbon_endpoint": 1,
+        "nitrogen_endpoint": 2,
+        "attachment": 3
+      }
+    },
+    {
+      "id": "organic_azide_double_bond_resonance",
+      "site_type": "dipolar_group",
+      "tokens": [
+        "Azide"
+      ],
+      "priority": 60,
+      "smarts": "[#6,#14:1]-[N+0:2]=[N+:3]=[N-:4]",
+      "atom_roles": {
+        "attachment": 1,
+        "proximal_nitrogen": 2,
+        "central_nitrogen": 3,
+        "terminal_nitrogen": 4
+      }
+    },
+    {
+      "id": "organic_azide_triple_bond_resonance",
+      "site_type": "dipolar_group",
+      "tokens": [
+        "Azide"
+      ],
+      "priority": 60,
+      "smarts": "[#6,#14:1]-[N-:2]-[N+:3]#[N+0:4]",
+      "atom_roles": {
+        "attachment": 1,
+        "proximal_nitrogen": 2,
+        "central_nitrogen": 3,
+        "terminal_nitrogen": 4
       }
     }
   ]

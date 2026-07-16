@@ -434,7 +434,7 @@
 434,Electrophilic nitration,Benzene nitrobenzene,c1ccccc1>>O=[N+]([O-])c1ccccc1,c1ccccc1,O=[N+]([O-])c1ccccc1,HNO3/H2SO4,True,unresolved,,,,unavailable,0,,
 435,Electrophilic bromination,Benzene bromobenzene,c1ccccc1>>Brc1ccccc1,c1ccccc1,Brc1ccccc1,Br2/FeBr3,True,unresolved,,,,unavailable,0,,
 436,Heck,Bromobenzene + ethene styrene,Brc1ccccc1.C=C>>C=CC1=CC=CC=C1,Brc1ccccc1.C=C,C=CC1=CC=CC=C1,"Pd, base",True,unresolved,,,,unavailable,0,,
-437,Sonogashira,Bromobenzene + acetylene phenylacetylene,Brc1ccccc1.C#C>>C#Cc1ccccc1,Brc1ccccc1.C#C,C#Cc1ccccc1,"Pd/Cu, base",True,exact_product_reconstruction,terminal_alkyne_coupling,sonogashira,Ar–Br + R–C≡C–H → Ar–C≡C–R,exact_product,1,,
+437,Sonogashira,Bromobenzene + acetylene phenylacetylene,Brc1ccccc1.C#C>>C#Cc1ccccc1,Brc1ccccc1.C#C,C#Cc1ccccc1,"Pd/Cu, base",True,exact_product_reconstruction,terminal_alkyne_coupling,sonogashira,Ar–Br + H–C≡C–H → Ar–C≡C–R,exact_product,1,,
 438,Buchwald-Hartwig amination,Bromobenzene + morpholine,Brc1ccccc1.O1CCNCC1>>c1ccc(N2CCOCC2)cc1,Brc1ccccc1.O1CCNCC1,c1ccc(N2CCOCC2)cc1,"Pd, ligand, base",True,exact_product_reconstruction,sp2_c_n_substitution,,Ar–Br + R1R2–NH → Ar–NR1R2,exact_product,1,,
 439,Suzuki,Bromobenzene + phenylboronic acid,Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1,Brc1ccccc1.c1ccc(B(O)O)cc1,c1ccc(-c2ccccc2)cc1,"Pd, base",True,exact_product_reconstruction,c_c_transfer_coupling,suzuki_miyaura,Ar–Br + Ar–B(OH)2 → Ar–Ar,exact_product,1,,
 440,Negishi,Bromobenzene + ethylzinc bromide,Brc1ccccc1.CC[Zn]Br>>CCc1ccccc1,Brc1ccccc1.CC[Zn]Br,CCc1ccccc1,Pd or Ni,True,exact_product_reconstruction,c_c_transfer_coupling,,Ar–Br + R–ZnX → Ar–R,exact_product,1,,

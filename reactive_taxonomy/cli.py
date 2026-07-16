@@ -20,6 +20,7 @@ _MOLECULE_SITE_TYPES = (
     "electrophilic_center",
     "aromatic_CH",
     "unsaturated_bond",
+    "dipolar_group",
 )
 
 _SELF_TEST_MOLECULES = (
