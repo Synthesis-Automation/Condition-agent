@@ -19,6 +19,7 @@ from .generic_indexing import (
 from .generic_retrieval import (
     generic_signature_similarity,
     load_generic_retrieval_rules,
+    reaction_scope,
     retrieve_compatible_generic_pool,
 )
 from .models import GenericConditionRecommendation, GenericRecommendationResult
@@ -30,10 +31,13 @@ def _explanation(
     support: int,
     datasets: int,
     compatibility_score: float,
+    query_scope: str,
+    precedent_scope: str,
 ) -> Tuple[str, ...]:
     notes = [f"Retrieved at {level.replace('_', ' ')} level"]
     labels = {
         "edit_topology": "bond edits",
+        "reaction_topology": "reaction topology",
         "handles": "reactive handles",
         "contexts": "attachment contexts",
         "environment": "local environments",
@@ -44,6 +48,10 @@ def _explanation(
     matches = [labels[name] for name, score in components.items() if score >= 0.999]
     if matches:
         notes.append("Exact match: " + ", ".join(matches))
+    if query_scope and precedent_scope and query_scope != precedent_scope:
+        notes.append(
+            f"Reaction-scope mismatch: query {query_scope}; precedent {precedent_scope}"
+        )
     notes.append(f"Recipe compatibility score: {compatibility_score:.2f}")
     notes.append(f"Supported by {support} precedent(s) from {datasets} dataset(s)")
     return tuple(notes)
@@ -51,9 +59,7 @@ def _explanation(
 
 def _aggregate(
     query: Dict[str, Any],
-    assessed_pool: Tuple[
-        Tuple[GenericIndexedReaction, CompatibilityAssessment], ...
-    ],
+    assessed_pool: Tuple[Tuple[GenericIndexedReaction, CompatibilityAssessment], ...],
     level: str,
     top_k: int,
 ) -> Tuple[GenericConditionRecommendation, ...]:
@@ -63,9 +69,7 @@ def _aggregate(
     for row, assessment in assessed_pool:
         similarity, components = generic_signature_similarity(query, row.signature)
         scored.append((similarity, row, components, assessment))
-    scored.sort(
-        key=lambda item: (-item[0], -item[1].yield_pct, item[1].reaction_id)
-    )
+    scored.sort(key=lambda item: (-item[0], -item[1].yield_pct, item[1].reaction_id))
     groups: Dict[
         str,
         List[
@@ -86,16 +90,17 @@ def _aggregate(
     for recipe_id, members in groups.items():
         similarity_weight = sum(max(item[0], 0.05) for item in members)
         weighted_yield = sum(
-            max(similarity, 0.05) * row.yield_pct
-            for similarity, row, _, _ in members
+            max(similarity, 0.05) * row.yield_pct for similarity, row, _, _ in members
         )
-        expected_yield = (
-            weighted_yield + prior_strength * pool_mean
-        ) / (similarity_weight + prior_strength)
+        expected_yield = (weighted_yield + prior_strength * pool_mean) / (
+            similarity_weight + prior_strength
+        )
         similarity_score = sum(item[0] for item in members) / len(members)
         compatibility_score = sum(item[3].score for item in members) / len(members)
         support_score = min(1.0, math.log1p(len(members)) / math.log1p(10))
-        datasets = {item[1].source_dataset for item in members if item[1].source_dataset}
+        datasets = {
+            item[1].source_dataset for item in members if item[1].source_dataset
+        }
         diversity_score = min(1.0, len(datasets) / 3.0)
         score = (
             float(ranking["similarity"]) * similarity_score
@@ -134,14 +139,22 @@ def _aggregate(
             cautions.append("Condition identity or contextual role is uncertain")
         if level.endswith("limited_support"):
             cautions.append("Retrieval pool is below the configured support threshold")
-        compatibility_evidence = tuple(
-            sorted(
-                {
-                    message
-                    for member in members
-                    for message in member[3].evidence
-                }
+        query_scope = reaction_scope(query)
+        precedent_scopes = {
+            reaction_scope(member[1].signature)
+            for member in members
+            if reaction_scope(member[1].signature)
+        }
+        mismatched_scopes = sorted(
+            scope for scope in precedent_scopes if query_scope and scope != query_scope
+        )
+        if mismatched_scopes:
+            cautions.append(
+                "Reaction-scope mismatch: query "
+                f"{query_scope}; precedent {', '.join(mismatched_scopes)}"
             )
+        compatibility_evidence = tuple(
+            sorted({message for member in members for message in member[3].evidence})
         )
         cautions.extend(compatibility_evidence)
         recommendations.append(
@@ -165,6 +178,8 @@ def _aggregate(
                     len(members),
                     datasets,
                     compatibility_score,
+                    query_scope,
+                    reaction_scope(best[1].signature),
                 ),
                 compatibility_evidence=compatibility_evidence,
                 cautions=tuple(cautions),
@@ -189,6 +204,27 @@ def recommend_indexed_signature(
     if not index.rows:
         return GenericRecommendationResult(
             query_reaction_smiles, False, error="EMPTY_GENERIC_INDEX"
+        )
+    if str(signature.get("schema_version") or "") != (
+        index.reaction_signature_schema_version
+    ):
+        return GenericRecommendationResult(
+            query_reaction_smiles,
+            False,
+            error="INCOMPATIBLE_REACTION_SIGNATURE_SCHEMA",
+        )
+    query_definitions = signature.get("definition_versions") or {}
+    if (
+        not isinstance(query_definitions, dict)
+        or tuple(
+            sorted((str(key), str(value)) for key, value in query_definitions.items())
+        )
+        != index.taxonomy_definition_versions
+    ):
+        return GenericRecommendationResult(
+            query_reaction_smiles,
+            False,
+            error="INCOMPATIBLE_REACTION_TAXONOMY_DEFINITIONS",
         )
     level, compatible_pool, candidate_count, excluded_count = (
         retrieve_compatible_generic_pool(
@@ -220,6 +256,13 @@ def recommend_indexed_signature(
         warnings.append("TYPE_AGNOSTIC_FALLBACK_USED")
     if excluded_count:
         warnings.append(f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{excluded_count}")
+    recommendations = _aggregate(signature, compatible_pool, level, top_k)
+    if any(
+        caution.startswith("Reaction-scope mismatch:")
+        for recommendation in recommendations
+        for caution in recommendation.cautions
+    ):
+        warnings.append("REACTION_TOPOLOGY_FALLBACK_USED")
     return GenericRecommendationResult(
         query_reaction_smiles=query_reaction_smiles,
         valid=True,
@@ -230,7 +273,7 @@ def recommend_indexed_signature(
         candidate_count=candidate_count,
         compatible_candidate_count=len(compatible_pool),
         excluded_candidate_count=excluded_count,
-        recommendations=_aggregate(signature, compatible_pool, level, top_k),
+        recommendations=recommendations,
         warnings=tuple(warnings),
     )
 

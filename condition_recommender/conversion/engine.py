@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from ..models import AdmissionTier
+from ..models import GENERIC_CONVERTER_DEFINITION_VERSION
+from reactive_taxonomy import REACTION_SIGNATURE_SCHEMA_VERSION
 from .flatten import GENERIC_REVIEW_FIELDS, flatten_generic_record
 from .generic import convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
@@ -138,26 +140,21 @@ def convert_datasets(
                         record.resolved_recipe_id or record.raw_recipe_id
                     )
     repeated_groups = sum(count > 1 for count in canonical_groups.values())
-    multi_recipe_groups = sum(
-        len(recipes) > 1 for recipes in group_recipes.values()
-    )
+    multi_recipe_groups = sum(len(recipes) > 1 for recipes in group_recipes.values())
     report: Dict[str, Any] = {
-        "schema_version": "1.0",
-        "converter_version": "generic_conversion.v1",
+        "schema_version": "1.1",
+        "converter_version": GENERIC_CONVERTER_DEFINITION_VERSION,
+        "reaction_signature_schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
         "dataset_path": str(Path(dataset_path)),
         "input_files": [str(path) for path in paths],
         "file_count": len(paths),
         "max_rows": max_rows,
         "row_count": row_count,
-        "tier_counts": {
-            tier.value: tier_counts[tier.value] for tier in AdmissionTier
-        },
+        "tier_counts": {tier.value: tier_counts[tier.value] for tier in AdmissionTier},
         "reason_counts": dict(sorted(reason_counts.items())),
         "evidence_quality_counts": dict(sorted(evidence_counts.items())),
         "signature_count": signature_count,
-        "signature_rate": round(signature_count / row_count, 6)
-        if row_count
-        else 0.0,
+        "signature_rate": round(signature_count / row_count, 6) if row_count else 0.0,
         "transformation_class_counts": dict(sorted(transformation_counts.items())),
         "named_family_counts": dict(sorted(family_counts.items())),
         "condition_resolution_status_counts": dict(
@@ -169,9 +166,7 @@ def convert_datasets(
         "role_confidence_counts": dict(sorted(role_confidence_counts.items())),
         "source_row_counts": dict(sorted(source_counts.items())),
         "source_tier_counts": {
-            source: {
-                tier.value: counts[tier.value] for tier in AdmissionTier
-            }
+            source: {tier.value: counts[tier.value] for tier in AdmissionTier}
             for source, counts in sorted(source_tiers.items())
         },
         "duplicate_summary": {

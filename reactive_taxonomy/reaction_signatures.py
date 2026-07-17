@@ -52,6 +52,11 @@ def _definition_versions() -> Dict[str, str]:
     return versions
 
 
+def reaction_signature_definition_versions() -> Dict[str, str]:
+    """Return the definition versions that participate in signature identity."""
+    return dict(_definition_versions())
+
+
 def _unmapped_canonical(component: ReactionComponent) -> str:
     from rdkit import Chem
 
@@ -121,12 +126,12 @@ def _component(
     )
 
 
-def _family_partner(
-    environment: Optional[ReactionFamilyEnvironment], role: str
-) -> Any:
+def _family_partner(environment: Optional[ReactionFamilyEnvironment], role: str) -> Any:
     if environment is None:
         return None
-    return next((partner for partner in environment.partners if partner.role == role), None)
+    return next(
+        (partner for partner in environment.partners if partner.role == role), None
+    )
 
 
 def _selected_partners(
@@ -189,15 +194,15 @@ def _selected_partners(
                 handle_tokens=handles,
                 anchor_contexts=contexts,
                 chemist_label=site.chemist_label,
-                steric=dict(overlay.steric) if overlay else (
-                    dict(environment.steric) if environment else {}
-                ),
-                electronic=dict(overlay.electronic) if overlay else (
-                    dict(environment.electronic) if environment else {}
-                ),
-                nearby_groups=overlay.nearby_groups if overlay else (
-                    environment.nearby_groups if environment else ()
-                ),
+                steric=dict(overlay.steric)
+                if overlay
+                else (dict(environment.steric) if environment else {}),
+                electronic=dict(overlay.electronic)
+                if overlay
+                else (dict(environment.electronic) if environment else {}),
+                nearby_groups=overlay.nearby_groups
+                if overlay
+                else (environment.nearby_groups if environment else ()),
                 spectator_group_ids=role_spectators,
                 flags=tuple(overlay.flags) if overlay else (),
             )
@@ -214,7 +219,9 @@ def _mapped_partners(
     for edit in edit_result.edits:
         for atom in (edit.atom_1, edit.atom_2):
             if atom is not None and atom.side == "reactant":
-                atom_indices.setdefault(atom.component_index, set()).add(atom.atom_index)
+                atom_indices.setdefault(atom.component_index, set()).add(
+                    atom.atom_index
+                )
     partners = []
     for component_index, indices in atom_indices.items():
         component = _component(components, component_index)
@@ -334,10 +341,14 @@ def build_reaction_signature(
         else _mapped_partners(reactants, edit_result, spectators)
     )
     edit_tokens = tuple(
-        sorted(_edit_token(edit, include_environment=False) for edit in edit_result.edits)
+        sorted(
+            _edit_token(edit, include_environment=False) for edit in edit_result.edits
+        )
     )
     environment_edit_tokens = tuple(
-        sorted(_edit_token(edit, include_environment=True) for edit in edit_result.edits)
+        sorted(
+            _edit_token(edit, include_environment=True) for edit in edit_result.edits
+        )
     )
     formed = tuple(
         sorted(
@@ -361,18 +372,21 @@ def build_reaction_signature(
         )
     )
     transformation_class = selected.transformation_class if selected else None
-    partner_handles = tuple(sorted(
-        (_partner_token(partner, environment=False) for partner in partners),
-        key=_canonical_json,
-    ))
-    partner_environments = tuple(sorted(
-        (_partner_token(partner, environment=True) for partner in partners),
-        key=_canonical_json,
-    ))
+    partner_handles = tuple(
+        sorted(
+            (_partner_token(partner, environment=False) for partner in partners),
+            key=_canonical_json,
+        )
+    )
+    partner_environments = tuple(
+        sorted(
+            (_partner_token(partner, environment=True) for partner in partners),
+            key=_canonical_json,
+        )
+    )
     spectator_tokens = tuple(
         sorted(
-            (group.group_id, group.graph_distance, group.tags)
-            for group in spectators
+            (group.group_id, group.graph_distance, group.tags) for group in spectators
         )
     )
     topology_token = {
@@ -420,7 +434,13 @@ def build_reaction_signature(
     signature_id = _digest(
         "RS1",
         {
-            "keys": (exact_key, handle_key, transformation_key, bond_key, environment_key),
+            "keys": (
+                exact_key,
+                handle_key,
+                transformation_key,
+                bond_key,
+                environment_key,
+            ),
             "definitions": definition_versions,
             "schema_version": "1.1",
         },
@@ -473,4 +493,4 @@ def build_reaction_signature(
     )
 
 
-__all__ = ["build_reaction_signature"]
+__all__ = ["build_reaction_signature", "reaction_signature_definition_versions"]

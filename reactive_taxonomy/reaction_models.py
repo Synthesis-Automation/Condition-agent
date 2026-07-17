@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Literal, Optional, Tuple
 
+
+REACTION_SIGNATURE_SCHEMA_VERSION = "1.1"
+
 from .models import CompoundAnalysis
 
 
@@ -266,7 +269,7 @@ class ReactionSignature:
     warnings: Tuple[str, ...]
     evidence_quality: str
     definition_versions: Dict[str, str]
-    schema_version: str = "1.1"
+    schema_version: str = REACTION_SIGNATURE_SCHEMA_VERSION
 
 
 @dataclass(frozen=True)
@@ -312,4 +315,24 @@ class ReactionAnalysis:
         return asdict(self)
 
 
-__all__ = ["BondChange", "ProductConnection", "ProductConnectionEndpoint", "ProductTransformation", "ReactionAnalysis", "ReactionAtomReference", "ReactionCandidate", "ReactionComponent", "ReactionDisplayLabel", "ReactionEdit", "ReactionFamilyEnvironment", "ReactionLabelClause", "ReactionPartner", "ReactionPartnerEnvironment", "ReactionSignature", "ReactionSiteReference", "ReactionSpectatorGroup", "ReactionTopology"]
+__all__ = [
+    "BondChange",
+    "ProductConnection",
+    "ProductConnectionEndpoint",
+    "ProductTransformation",
+    "REACTION_SIGNATURE_SCHEMA_VERSION",
+    "ReactionAnalysis",
+    "ReactionAtomReference",
+    "ReactionCandidate",
+    "ReactionComponent",
+    "ReactionDisplayLabel",
+    "ReactionEdit",
+    "ReactionFamilyEnvironment",
+    "ReactionLabelClause",
+    "ReactionPartner",
+    "ReactionPartnerEnvironment",
+    "ReactionSignature",
+    "ReactionSiteReference",
+    "ReactionSpectatorGroup",
+    "ReactionTopology",
+]

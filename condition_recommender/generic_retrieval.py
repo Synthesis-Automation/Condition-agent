@@ -40,8 +40,7 @@ def _candidate_levels(
     levels: list[tuple[str, set[int]]] = [
         (
             "exact_signature",
-            _positions(index.exact, signature.get("exact_signature_key"))
-            & compatible,
+            _positions(index.exact, signature.get("exact_signature_key")) & compatible,
         ),
         (
             "handle_signature",
@@ -150,9 +149,7 @@ def retrieve_compatible_generic_pool(
         if len(accepted) >= minimum:
             return candidate
     if fallback is None:
-        bond_rows = index.select(
-            sorted(_compatible_edit_positions(signature, index))
-        )
+        bond_rows = index.select(sorted(_compatible_edit_positions(signature, index)))
         _, excluded = filter_compatible_precedents(signature, bond_rows)
         return "no_compatible_condition_precedent", (), len(bond_rows), len(excluded)
     level, accepted, raw_count, excluded_count = fallback
@@ -200,6 +197,53 @@ def _spectator_tokens(signature: Mapping[str, Any]) -> Tuple[str, ...]:
     )
 
 
+def reaction_scope(signature: Mapping[str, Any]) -> str:
+    """Return the structurally observed reaction scope, when available."""
+    topology = signature.get("topology") or {}
+    if not isinstance(topology, Mapping):
+        return ""
+    return str(topology.get("reaction_scope") or "")
+
+
+def _reaction_topology_similarity(
+    query: Mapping[str, Any], precedent: Mapping[str, Any]
+) -> float:
+    query_topology = query.get("topology") or {}
+    precedent_topology = precedent.get("topology") or {}
+    if not isinstance(query_topology, Mapping) or not isinstance(
+        precedent_topology, Mapping
+    ):
+        return 0.0
+    query_scope = reaction_scope(query)
+    precedent_scope = reaction_scope(precedent)
+    if not query_scope or not precedent_scope or query_scope != precedent_scope:
+        return 0.0
+
+    score = 0.6
+    query_bond_scopes = tuple(query_topology.get("formed_bond_scopes") or ())
+    precedent_bond_scopes = tuple(precedent_topology.get("formed_bond_scopes") or ())
+    if query_bond_scopes or precedent_bond_scopes:
+        score += 0.15 * _jaccard(query_bond_scopes, precedent_bond_scopes)
+
+    query_delta = query_topology.get("ring_count_delta")
+    precedent_delta = precedent_topology.get("ring_count_delta")
+    if query_delta is not None and precedent_delta is not None:
+        score += 0.1 * float(int(query_delta) == int(precedent_delta))
+
+    query_rings = tuple(
+        int(value) for value in query_topology.get("formed_ring_sizes") or ()
+    )
+    precedent_rings = tuple(
+        int(value) for value in precedent_topology.get("formed_ring_sizes") or ()
+    )
+    if not query_rings and not precedent_rings:
+        score += 0.15
+    elif query_rings and precedent_rings:
+        distance = abs(min(query_rings) - min(precedent_rings))
+        score += 0.15 * max(0.0, 1.0 - distance / 4.0)
+    return round(min(score, 1.0), 6)
+
+
 def generic_signature_similarity(
     query: Mapping[str, Any],
     precedent: Mapping[str, Any],
@@ -207,9 +251,7 @@ def generic_signature_similarity(
     """Return an interpretable score; absent features never count as matches."""
     edit_fields = ("formed_bond_types", "broken_bond_types", "order_changes")
     query_edits = tuple(
-        f"{field}:{value}"
-        for field in edit_fields
-        for value in query.get(field) or ()
+        f"{field}:{value}" for field in edit_fields for value in query.get(field) or ()
     )
     precedent_edits = tuple(
         f"{field}:{value}"
@@ -233,9 +275,8 @@ def generic_signature_similarity(
         "environment": _jaccard(
             _environment_tokens(query), _environment_tokens(precedent)
         ),
-        "spectators": _jaccard(
-            _spectator_tokens(query), _spectator_tokens(precedent)
-        ),
+        "spectators": _jaccard(_spectator_tokens(query), _spectator_tokens(precedent)),
+        "reaction_topology": _reaction_topology_similarity(query, precedent),
         "transformation": float(
             bool(query_transformation)
             and query_transformation == precedent_transformation
@@ -250,6 +291,7 @@ def generic_signature_similarity(
 __all__ = [
     "generic_signature_similarity",
     "load_generic_retrieval_rules",
+    "reaction_scope",
     "retrieve_compatible_generic_pool",
     "retrieve_generic_pool",
 ]

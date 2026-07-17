@@ -7,6 +7,10 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "1.6"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v1.1"
+
+
 class AdmissionTier(str, Enum):
     VERIFIED = "verified"
     REVIEW = "review"
@@ -29,11 +33,14 @@ class ConditionIdentity:
     def recipe_id(self) -> str:
         def token(name: str, values: Tuple[str, ...]) -> str:
             return f"{name}={'+'.join(values) if values else 'unknown'}"
-        return "COND1:" + "|".join((
-            token("catalyst", self.catalyst_cas),
-            token("reagent", self.reagent_cas),
-            token("solvent", self.solvent_cas),
-        ))
+
+        return "COND1:" + "|".join(
+            (
+                token("catalyst", self.catalyst_cas),
+                token("reagent", self.reagent_cas),
+                token("solvent", self.solvent_cas),
+            )
+        )
 
 
 @dataclass(frozen=True)
@@ -72,9 +79,9 @@ class RecommendationRecord:
     condition_resolution: Dict[str, Any] = field(default_factory=dict)
     resolved_recipe_id: str = ""
     resolved_recipe: Optional[Dict[str, Any]] = None
-    converter_definition_version: str = "generic_conversion.v1"
+    converter_definition_version: str = GENERIC_CONVERTER_DEFINITION_VERSION
     source: Dict[str, Any] = field(default_factory=dict)
-    schema_version: str = "1.5"
+    schema_version: str = RECOMMENDATION_RECORD_SCHEMA_VERSION
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

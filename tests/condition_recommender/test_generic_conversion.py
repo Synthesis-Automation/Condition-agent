@@ -62,9 +62,7 @@ def _csv_row(
 
 
 def test_exact_signature_is_verified_without_trusting_source_family() -> None:
-    record = convert_record(
-        _raw("Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1")
-    )
+    record = convert_record(_raw("Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"))
 
     assert record.admission_tier == AdmissionTier.VERIFIED
     assert record.source_declared_family == "untrusted-source-label"
@@ -74,11 +72,13 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.observation_id.startswith("OBS1:")
     assert record.raw_recipe_id.startswith("RAWCOND1:")
     assert record.resolved_recipe_id.startswith("RCR1:")
-    assert record.resolved_recipe["catalysts"][0]["primary_role"] == (
-        "metal_catalyst"
-    )
+    assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
+    assert record.schema_version == "1.6"
+    assert record.converter_definition_version == "generic_conversion.v1.1"
+    assert record.reaction_signature["schema_version"] == "1.1"
+    assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
 
 
 def test_mapped_unknown_family_signature_is_verified() -> None:
@@ -105,16 +105,12 @@ def test_mapped_unknown_family_signature_is_verified() -> None:
         "C=C → C–C; 2 × H gain at C"
     )
     assert len(record.reaction_display_label["clauses"]) == 3
-    assert record.reaction_signature["order_changes"] == (
-        "C-C:DOUBLE>SINGLE",
-    )
+    assert record.reaction_signature["order_changes"] == ("C-C:DOUBLE>SINGLE",)
     assert record.resolved_recipe_id.startswith("RCR1:")
 
 
 def test_grammar_only_record_is_review_not_rejected() -> None:
-    record = convert_record(
-        _raw("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1")
-    )
+    record = convert_record(_raw("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1"))
 
     assert record.admission_tier == AdmissionTier.REVIEW
     assert record.admission_reasons == ("missing_verified_reaction_signature",)
@@ -193,19 +189,19 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     assert sum(report["role_confidence_counts"].values()) > 0
     records = [
         json.loads(line)
-        for line in (output / "records.jsonl").read_text().splitlines()
+        for line in (output / "records.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
     ]
     assert len(records) == 4
     assert records[1]["named_family"] is None
-    assert records[1]["reaction_signature"]["order_changes"] == [
-        "C-C:DOUBLE>SINGLE"
-    ]
+    assert records[1]["reaction_signature"]["order_changes"] == ["C-C:DOUBLE>SINGLE"]
     assert records[1]["resolved_recipe_id"].startswith("RCR1:")
-    with (output / "verified.csv").open(
-        encoding="utf-8-sig", newline=""
-    ) as handle:
+    with (output / "verified.csv").open(encoding="utf-8-sig", newline="") as handle:
         verified = list(csv.DictReader(handle))
     assert len(verified) == 2
     assert all(row["reaction_signature_id"].startswith("RS1:") for row in verified)
     assert json.loads((output / "conversion_report.json").read_text()) == report
+    assert report["schema_version"] == "1.1"
+    assert report["reaction_signature_schema_version"] == "1.1"
     assert (output / "conversion_report.md").exists()

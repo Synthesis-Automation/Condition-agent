@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "definition_id": "generic_retrieval.v1",
   "minimum_pool_size": 3,
   "maximum_neighbors": 50,
@@ -14,13 +14,14 @@
     "environment_signature"
   ],
   "similarity_weights": {
-    "edit_topology": 0.27,
-    "handles": 0.2,
-    "contexts": 0.14,
-    "environment": 0.14,
-    "spectators": 0.08,
-    "transformation": 0.1,
-    "family": 0.07
+    "edit_topology": 0.24,
+    "reaction_topology": 0.11,
+    "handles": 0.18,
+    "contexts": 0.13,
+    "environment": 0.12,
+    "spectators": 0.07,
+    "transformation": 0.09,
+    "family": 0.06
   },
   "ranking_weights": {
     "similarity": 0.52,

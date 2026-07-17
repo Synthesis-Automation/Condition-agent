@@ -43,14 +43,35 @@ def _write(path: Path, rows: list[dict[str, str]]) -> None:
         writer.writerows(rows)
 
 
-def test_label_recommender_uses_family_and_unordered_signature_pair(tmp_path: Path) -> None:
+def test_label_recommender_uses_family_and_unordered_signature_pair(
+    tmp_path: Path,
+) -> None:
     path = tmp_path / "labels.csv"
-    _write(path, [
-        _row("Suzuki-Miyaura", "ArBr", "ArB(OH)2", yield_pct=80, catalyst="exact-a"),
-        _row("Suzuki-Miyaura", "ArB(OH)2", "ArBr", yield_pct=75, catalyst="exact-reversed"),
-        _row("Suzuki-Miyaura", "ArCl", "ArB(OH)2", yield_pct=100, catalyst="partial"),
-        _row("Buchwald-Hartwig", "ArBr", "ArB(OH)2", yield_pct=100, catalyst="wrong-family"),
-    ])
+    _write(
+        path,
+        [
+            _row(
+                "Suzuki-Miyaura", "ArBr", "ArB(OH)2", yield_pct=80, catalyst="exact-a"
+            ),
+            _row(
+                "Suzuki-Miyaura",
+                "ArB(OH)2",
+                "ArBr",
+                yield_pct=75,
+                catalyst="exact-reversed",
+            ),
+            _row(
+                "Suzuki-Miyaura", "ArCl", "ArB(OH)2", yield_pct=100, catalyst="partial"
+            ),
+            _row(
+                "Buchwald-Hartwig",
+                "ArBr",
+                "ArB(OH)2",
+                yield_pct=100,
+                catalyst="wrong-family",
+            ),
+        ],
+    )
 
     result = recommend_conditions_from_labels(
         "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
@@ -66,15 +87,29 @@ def test_label_recommender_uses_family_and_unordered_signature_pair(tmp_path: Pa
     assert result.recommendations[0].signature_similarity == 1.0
     assert result.recommendations[1].conditions["catalyst"] == "exact-reversed"
     assert result.recommendations[1].signature_similarity == 1.0
-    assert all("wrong-family" not in item.conditions.values() for item in result.recommendations)
+    assert all(
+        "wrong-family" not in item.conditions.values()
+        for item in result.recommendations
+    )
 
 
-def test_label_recommender_rewards_matching_alpha_branch_qualifier(tmp_path: Path) -> None:
+def test_label_recommender_rewards_matching_alpha_branch_qualifier(
+    tmp_path: Path,
+) -> None:
     path = tmp_path / "labels.csv"
-    _write(path, [
-        _row("Buchwald-Hartwig", "ArBr", "RNH2 a-branch", yield_pct=80, catalyst="qualified"),
-        _row("Buchwald-Hartwig", "ArBr", "RNH2", yield_pct=80, catalyst="generic"),
-    ])
+    _write(
+        path,
+        [
+            _row(
+                "Buchwald-Hartwig",
+                "ArBr",
+                "RNH2 a-branch",
+                yield_pct=80,
+                catalyst="qualified",
+            ),
+            _row("Buchwald-Hartwig", "ArBr", "RNH2", yield_pct=80, catalyst="generic"),
+        ],
+    )
 
     result = recommend_conditions_from_labels(
         "Brc1ccccc1.CC(C)N>>CC(C)Nc1ccccc1",
@@ -96,16 +131,28 @@ def test_label_recommender_requires_positive_top_k() -> None:
     assert result.error == "TOP_K_MUST_BE_POSITIVE"
 
 
+def test_label_recommender_rejects_unrepresented_intramolecular_topology() -> None:
+    result = recommend_conditions_from_labels("NCCc1ccccc1Br>>c1ccc2c(c1)CCN2")
+
+    assert not result.valid
+    assert result.grammar_id == "sp2_c_n_substitution"
+    assert result.error == "QUERY_TOPOLOGY_NOT_SUPPORTED_BY_LABEL_DATASET"
+    assert result.warnings == ("LABEL_DATASET_HAS_NO_REACTION_TOPOLOGY",)
+
+
 def test_recommend_cli_returns_requested_top_k(
     tmp_path: Path,
     monkeypatch,
     capsys,
 ) -> None:
     path = tmp_path / "labels.csv"
-    _write(path, [
-        _row("Suzuki-Miyaura", "ArBr", "ArB(OH)2", yield_pct=80, catalyst="one"),
-        _row("Suzuki-Miyaura", "ArBr", "ArB(OH)2", yield_pct=70, catalyst="two"),
-    ])
+    _write(
+        path,
+        [
+            _row("Suzuki-Miyaura", "ArBr", "ArB(OH)2", yield_pct=80, catalyst="one"),
+            _row("Suzuki-Miyaura", "ArBr", "ArB(OH)2", yield_pct=70, catalyst="two"),
+        ],
+    )
     reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
     monkeypatch.setattr(
         "sys.argv",

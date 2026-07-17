@@ -1,6 +1,7 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "description": "Weak-label retrieval policy for the cleaned HTE reaction-label dataset.",
+  "supported_reaction_scopes": ["intermolecular"],
   "grammar_source_reaction_types": {
     "boron_transfer_coupling": ["Suzuki-Miyaura"],
     "sp2_c_n_substitution": ["Buchwald-Hartwig", "CN-Coupling", "SNAr"],

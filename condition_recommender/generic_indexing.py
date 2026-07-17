@@ -9,6 +9,19 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Tuple
 
+from reactive_taxonomy import (
+    REACTION_SIGNATURE_SCHEMA_VERSION,
+    reaction_signature_definition_versions,
+)
+
+from .models import (
+    GENERIC_CONVERTER_DEFINITION_VERSION,
+    RECOMMENDATION_RECORD_SCHEMA_VERSION,
+)
+
+
+GENERIC_INDEX_SCHEMA_VERSION = "1.1"
+
 
 @dataclass(frozen=True)
 class GenericIndexedReaction:
@@ -24,6 +37,8 @@ class GenericIndexedReaction:
     recipe_id: str
     resolved_recipe: Dict[str, Any]
     condition_uncertain: bool
+    record_schema_version: str
+    converter_definition_version: str
 
     @property
     def named_family(self) -> str:
@@ -49,6 +64,10 @@ class GenericReactionIndex:
     bond_edits: Mapping[str, Tuple[int, ...]]
     environments: Mapping[str, Tuple[int, ...]]
     families: Mapping[str, Tuple[int, ...]]
+    reaction_signature_schema_version: str
+    taxonomy_definition_versions: Tuple[Tuple[str, str], ...]
+    record_schema_versions: Tuple[str, ...]
+    converter_definition_versions: Tuple[str, ...]
 
     def select(self, positions: Iterable[int]) -> Tuple[GenericIndexedReaction, ...]:
         return tuple(self.rows[position] for position in positions)
@@ -67,6 +86,61 @@ def _freeze(mapping: Dict[str, list[int]]) -> Dict[str, Tuple[int, ...]]:
     return {key: tuple(values) for key, values in sorted(mapping.items())}
 
 
+def _definition_version_tuple(
+    signature: Mapping[str, Any],
+) -> Tuple[Tuple[str, str], ...]:
+    values = signature.get("definition_versions") or {}
+    if not isinstance(values, Mapping):
+        raise ValueError("Reaction signature definition_versions must be an object")
+    return tuple(sorted((str(key), str(value)) for key, value in values.items()))
+
+
+def _validate_index_rows(
+    rows: Iterable[GenericIndexedReaction],
+) -> tuple[
+    str,
+    Tuple[Tuple[str, str], ...],
+    Tuple[str, ...],
+    Tuple[str, ...],
+]:
+    values = tuple(rows)
+    signature_schemas = {
+        str(row.signature.get("schema_version") or "") for row in values
+    }
+    if signature_schemas and signature_schemas != {REACTION_SIGNATURE_SCHEMA_VERSION}:
+        raise ValueError(
+            "Incompatible reaction signature schema; regenerate converted records"
+        )
+    definition_sets = {_definition_version_tuple(row.signature) for row in values}
+    current_definitions = tuple(
+        sorted(reaction_signature_definition_versions().items())
+    )
+    if definition_sets and definition_sets != {current_definitions}:
+        raise ValueError(
+            "Incompatible reaction taxonomy definitions; regenerate converted records"
+        )
+    record_schemas = tuple(sorted({row.record_schema_version for row in values}))
+    if record_schemas and record_schemas != (RECOMMENDATION_RECORD_SCHEMA_VERSION,):
+        raise ValueError(
+            "Incompatible recommendation record schema; regenerate converted records"
+        )
+    converter_versions = tuple(
+        sorted({row.converter_definition_version for row in values})
+    )
+    if converter_versions and converter_versions != (
+        GENERIC_CONVERTER_DEFINITION_VERSION,
+    ):
+        raise ValueError(
+            "Incompatible generic converter version; regenerate converted records"
+        )
+    return (
+        REACTION_SIGNATURE_SCHEMA_VERSION,
+        current_definitions,
+        record_schemas or (RECOMMENDATION_RECORD_SCHEMA_VERSION,),
+        converter_versions or (GENERIC_CONVERTER_DEFINITION_VERSION,),
+    )
+
+
 def build_generic_index_from_rows(
     rows: Iterable[GenericIndexedReaction],
 ) -> GenericReactionIndex:
@@ -80,6 +154,12 @@ def build_generic_index_from_rows(
             row.recipe_id,
         ),
     )
+    (
+        signature_schema,
+        definition_versions,
+        record_schemas,
+        converter_versions,
+    ) = _validate_index_rows(ordered)
     maps: Dict[str, Dict[str, list[int]]] = {
         name: defaultdict(list) for name in _KEY_FIELDS
     }
@@ -99,6 +179,10 @@ def build_generic_index_from_rows(
         bond_edits=_freeze(maps["bond_edits"]),
         environments=_freeze(maps["environments"]),
         families=_freeze(families),
+        reaction_signature_schema_version=signature_schema,
+        taxonomy_definition_versions=definition_versions,
+        record_schema_versions=record_schemas,
+        converter_definition_versions=converter_versions,
     )
 
 
@@ -145,6 +229,10 @@ def build_generic_index(
                 condition_uncertain=bool(
                     (record.get("condition_resolution") or {}).get("has_uncertainty")
                 ),
+                record_schema_version=str(record.get("schema_version") or ""),
+                converter_definition_version=str(
+                    record.get("converter_definition_version") or ""
+                ),
             )
         )
     return build_generic_index_from_rows(rows)
@@ -163,6 +251,8 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "recipe_id": row.recipe_id,
             "resolved_recipe": row.resolved_recipe,
             "condition_uncertain": row.condition_uncertain,
+            "record_schema_version": row.record_schema_version,
+            "converter_definition_version": row.converter_definition_version,
         }
         for row in index.rows
     ]
@@ -175,14 +265,27 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
         "families": dict(index.families),
     }
     identity = json.dumps(
-        {"rows": rows, "maps": maps},
+        {
+            "rows": rows,
+            "maps": maps,
+            "reaction_signature_schema_version": (
+                index.reaction_signature_schema_version
+            ),
+            "taxonomy_definition_versions": dict(index.taxonomy_definition_versions),
+            "record_schema_versions": index.record_schema_versions,
+            "converter_definition_versions": index.converter_definition_versions,
+        },
         ensure_ascii=True,
         sort_keys=True,
         separators=(",", ":"),
     )
     return {
-        "schema_version": "1.0",
+        "schema_version": GENERIC_INDEX_SCHEMA_VERSION,
         "artifact_type": "generic_reaction_index",
+        "reaction_signature_schema_version": (index.reaction_signature_schema_version),
+        "taxonomy_definition_versions": dict(index.taxonomy_definition_versions),
+        "record_schema_versions": index.record_schema_versions,
+        "converter_definition_versions": index.converter_definition_versions,
         "index_id": "GRI1:" + hashlib.sha256(identity.encode("utf-8")).hexdigest(),
         "row_count": len(rows),
         "rows": rows,
@@ -214,8 +317,26 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
         payload = json.load(handle)
     if payload.get("artifact_type") != "generic_reaction_index":
         raise ValueError("Not a generic reaction index artifact")
-    if payload.get("schema_version") != "1.0":
-        raise ValueError("Unsupported generic reaction index schema")
+    if payload.get("schema_version") != GENERIC_INDEX_SCHEMA_VERSION:
+        raise ValueError("Unsupported generic reaction index schema; rebuild the index")
+    if (
+        payload.get("reaction_signature_schema_version")
+        != REACTION_SIGNATURE_SCHEMA_VERSION
+    ):
+        raise ValueError("Incompatible reaction signature schema; rebuild the index")
+    current_definitions = reaction_signature_definition_versions()
+    if payload.get("taxonomy_definition_versions") != current_definitions:
+        raise ValueError(
+            "Incompatible reaction taxonomy definitions; rebuild the index"
+        )
+    if tuple(payload.get("record_schema_versions") or ()) != (
+        RECOMMENDATION_RECORD_SCHEMA_VERSION,
+    ):
+        raise ValueError("Incompatible recommendation record schema; rebuild the index")
+    if tuple(payload.get("converter_definition_versions") or ()) != (
+        GENERIC_CONVERTER_DEFINITION_VERSION,
+    ):
+        raise ValueError("Incompatible generic converter version; rebuild the index")
     rows = tuple(
         GenericIndexedReaction(
             reaction_id=str(row["reaction_id"]),
@@ -228,6 +349,8 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             recipe_id=str(row["recipe_id"]),
             resolved_recipe=dict(row["resolved_recipe"]),
             condition_uncertain=bool(row["condition_uncertain"]),
+            record_schema_version=str(row["record_schema_version"]),
+            converter_definition_version=str(row["converter_definition_version"]),
         )
         for row in payload.get("rows") or ()
     )
@@ -235,11 +358,33 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
     index = GenericReactionIndex(
         rows=rows,
         exact={key: tuple(value) for key, value in (maps.get("exact") or {}).items()},
-        handles={key: tuple(value) for key, value in (maps.get("handles") or {}).items()},
-        transformations={key: tuple(value) for key, value in (maps.get("transformations") or {}).items()},
-        bond_edits={key: tuple(value) for key, value in (maps.get("bond_edits") or {}).items()},
-        environments={key: tuple(value) for key, value in (maps.get("environments") or {}).items()},
-        families={key: tuple(value) for key, value in (maps.get("families") or {}).items()},
+        handles={
+            key: tuple(value) for key, value in (maps.get("handles") or {}).items()
+        },
+        transformations={
+            key: tuple(value)
+            for key, value in (maps.get("transformations") or {}).items()
+        },
+        bond_edits={
+            key: tuple(value) for key, value in (maps.get("bond_edits") or {}).items()
+        },
+        environments={
+            key: tuple(value) for key, value in (maps.get("environments") or {}).items()
+        },
+        families={
+            key: tuple(value) for key, value in (maps.get("families") or {}).items()
+        },
+        reaction_signature_schema_version=str(
+            payload["reaction_signature_schema_version"]
+        ),
+        taxonomy_definition_versions=tuple(
+            sorted(
+                (str(key), str(value))
+                for key, value in payload["taxonomy_definition_versions"].items()
+            )
+        ),
+        record_schema_versions=tuple(payload["record_schema_versions"]),
+        converter_definition_versions=tuple(payload["converter_definition_versions"]),
     )
     expected = _index_payload(index)
     if expected["index_id"] != payload.get("index_id"):
@@ -266,7 +411,9 @@ def load_generic_index(
             try:
                 value = json.loads(line)
             except json.JSONDecodeError as exc:
-                raise ValueError(f"Invalid JSONL at line {line_number}: {exc.msg}") from exc
+                raise ValueError(
+                    f"Invalid JSONL at line {line_number}: {exc.msg}"
+                ) from exc
             if not isinstance(value, dict):
                 raise ValueError(f"JSONL line {line_number} is not an object")
             records.append(value)

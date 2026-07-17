@@ -2,6 +2,10 @@ import json
 from pathlib import Path
 
 import pytest
+from reactive_taxonomy import (
+    REACTION_SIGNATURE_SCHEMA_VERSION,
+    reaction_signature_definition_versions,
+)
 
 from condition_recommender.evaluation import (
     evaluate_generic_index,
@@ -17,6 +21,8 @@ from condition_recommender.generic_indexing import (
 
 def _signature(index: int) -> dict:
     return {
+        "schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
+        "definition_versions": reaction_signature_definition_versions(),
         "signature_id": f"RS1:{index}",
         "exact_signature_key": f"L0:{index}",
         "handle_signature_key": "L1:shared",
@@ -39,12 +45,20 @@ def _signature(index: int) -> dict:
         "transformation_class": "generic_c_n_coupling",
         "named_family": None,
         "family_confidence": 0.0,
+        "topology": {
+            "reaction_scope": "intermolecular",
+            "formed_bond_scopes": ["intermolecular"],
+            "formed_ring_sizes": [],
+            "ring_count_delta": 0,
+        },
     }
 
 
 def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     return {
+        "schema_version": "1.6",
+        "converter_definition_version": "generic_conversion.v1.1",
         "admission_tier": "verified",
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
@@ -70,6 +84,30 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert first_path.read_bytes() == second_path.read_bytes()
     assert loaded == index
     assert load_generic_index(first_path) == index
+    payload = json.loads(first_path.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == "1.1"
+    assert payload["reaction_signature_schema_version"] == "1.1"
+    assert payload["record_schema_versions"] == ["1.6"]
+
+
+def test_index_rejects_stale_converted_records() -> None:
+    stale = _record(1)
+    stale["reaction_signature"] = {
+        **stale["reaction_signature"],
+        "schema_version": "1.0",
+    }
+    with pytest.raises(ValueError, match="regenerate converted records"):
+        build_generic_index([stale])
+
+
+def test_loader_rejects_stale_index_schema(tmp_path: Path) -> None:
+    path = tmp_path / "index.json"
+    save_generic_index(build_generic_index([_record(1)]), path)
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload["schema_version"] = "1.0"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="rebuild the index"):
+        load_persisted_generic_index(path)
 
 
 def test_persisted_index_detects_tampering(tmp_path: Path) -> None:
