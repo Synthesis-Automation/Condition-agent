@@ -411,7 +411,7 @@
 411,Aldol addition,Acetone + formaldehyde,CC(=O)C.C=O>>CC(=O)CCO,,True,unresolved,,,unavailable,0,SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE,
 412,Aldol condensation,Acetone self-condensation,CC(=O)C.CC(=O)C>>CC(=O)C=C(C)C,,True,unresolved,,,unavailable,0,SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE,
 413,Grignard addition,Benzaldehyde + MeMgBr,O=CC1=CC=CC=C1.C[Mg]Br>>CC(O)c1ccccc1,,True,unresolved,,,unavailable,0,SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE,
-414,Reductive amination,Cyclohexanone + methylamine,O=C1CCCCC1.CNC>>CNC1CCCCC1,R2C=O + R1R2–NH →,True,reactant_grammar_only,,,reactant_only,1,SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE,
+414,Reductive amination,Cyclohexanone + methylamine,O=C1CCCCC1.CNC>>CN(C)C2CCCCC2,R–C(R)=O + R1R2–NH → R–CH(R)–NR2,True,exact_product_reconstruction,carbonyl_c_n_reductive_coupling,reductive_amination,exact_product,1,,
 415,Imine formation,Benzaldehyde + aniline,O=CC1=CC=CC=C1.Nc1ccccc1>>c1ccc(/C=N\c2ccccc2)cc1,R–CH=O + Ar–NH2 →,True,reactant_grammar_only,,,reactant_only,1,SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE,
 416,Wittig,Benzaldehyde styrene,O=CC1=CC=CC=C1.C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>C=CC1=CC=CC=C1,,True,unresolved,,,unavailable,0,SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE,
 417,HWE olefination,Benzaldehyde cinnamate,O=CC1=CC=CC=C1.CCOP(=O)(OCC)C=C(C(=O)OCC)[O-]>>CCOC(=O)C=CC1=CC=CC=C1,,True,unresolved,,,unavailable,0,SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE,

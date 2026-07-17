@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "product_context_precedence": [
     "HeteroAr",
     "Ar",
@@ -81,6 +81,11 @@
       "acyl_role": "acyl_partner",
       "partner_role": "oxygen_partner",
       "element": "O"
+    },
+    "friedel_crafts_acylation": {
+      "product_kind": "aryl_acylation",
+      "acyl_role": "acyl_partner",
+      "aromatic_role": "aromatic_partner"
     },
     "thioester_formation": {
       "product_kind": "acyl_heteroatom",

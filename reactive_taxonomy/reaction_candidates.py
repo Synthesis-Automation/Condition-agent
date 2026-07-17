@@ -45,6 +45,11 @@ def _matches(site: ReactionSiteReference, constraint: Dict[str, Any]) -> bool:
     ):
         return False
     if (
+        constraint.get("ring_context_any")
+        and details.get("ring_context") not in constraint["ring_context_any"]
+    ):
+        return False
+    if (
         constraint.get("handle_token_any")
         and details.get("handle_token") not in constraint["handle_token_any"]
     ):

@@ -411,7 +411,7 @@ Dihydroxylation,"Cyclohexene cis-1,2-diol",C1=CCCCC1>>OC1CCCCC1O
 Aldol addition,Acetone + formaldehyde,CC(=O)C.C=O>>CC(=O)CCO
 Aldol condensation,Acetone self-condensation,CC(=O)C.CC(=O)C>>CC(=O)C=C(C)C
 Grignard addition,Benzaldehyde + MeMgBr,O=CC1=CC=CC=C1.C[Mg]Br>>CC(O)c1ccccc1
-Reductive amination,Cyclohexanone + methylamine,O=C1CCCCC1.CNC>>CNC1CCCCC1
+Reductive amination,Cyclohexanone + methylamine,O=C1CCCCC1.CNC>>CN(C)C2CCCCC2
 Imine formation,Benzaldehyde + aniline,O=CC1=CC=CC=C1.Nc1ccccc1>>c1ccc(/C=N\c2ccccc2)cc1
 Wittig,Benzaldehyde styrene,O=CC1=CC=CC=C1.C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>C=CC1=CC=CC=C1
 HWE olefination,Benzaldehyde cinnamate,O=CC1=CC=CC=C1.CCOP(=O)(OCC)C=C(C(=O)OCC)[O-]>>CCOC(=O)C=CC1=CC=CC=C1

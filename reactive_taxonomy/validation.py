@@ -294,6 +294,7 @@ def validate_taxonomy() -> List[str]:
         "reductive_amination",
         "amide",
         "acyl_heteroatom",
+        "aryl_acylation",
         "sulfonamide",
     }
     for grammar_id, rule in reaction_rendering.items():

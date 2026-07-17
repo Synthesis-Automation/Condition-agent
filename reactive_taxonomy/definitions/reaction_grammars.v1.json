@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "grammars": [
     {
       "id": "boron_transfer_coupling",
@@ -574,6 +574,47 @@
         "acylation"
       ],
       "priority": 90
+    },
+    {
+      "id": "friedel_crafts_acylation",
+      "transformation_class": "aromatic_c_h_acylation",
+      "display_name": "Friedel–Crafts acylation",
+      "generic_label": "Ar–H + R–C(O)X → Ar–C(O)–R",
+      "roles": {
+        "acyl_partner": {
+          "site_type": "electrophilic_center",
+          "center_family": "Acyl",
+          "activation_state_any": [
+            "activated"
+          ]
+        },
+        "aromatic_partner": {
+          "site_type": "aromatic_CH",
+          "ring_context_any": [
+            "Ar",
+            "HeteroAr"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "available"
+          ]
+        }
+      },
+      "distinct_components": [
+        [
+          "acyl_partner",
+          "aromatic_partner"
+        ]
+      ],
+      "operator": {
+        "id": "replace_handle_with_center",
+        "electrophile_role": "acyl_partner",
+        "partner_role": "aromatic_partner"
+      },
+      "compatible_named_families": [
+        "friedel_crafts_acylation"
+      ],
+      "priority": 94
     },
     {
       "id": "thioester_formation",

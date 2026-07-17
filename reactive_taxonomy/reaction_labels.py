@@ -232,6 +232,14 @@ def render_reaction_label(
         retained = list(partner.details.get("contexts") or [])
         right = render_context(retained[0], style=style) if retained else "H"
         product = f"{render_context(acyl.details['retained_context'], style=style)}{bond}C(O){bond}{rule['element']}{bond}{right}"
+    elif kind == "aryl_acylation":
+        acyl = assignment[rule["acyl_role"]]
+        aromatic = assignment[rule["aromatic_role"]]
+        product = (
+            f"{render_context(aromatic.details['ring_context'], style=style)}"
+            f"{bond}C(O){bond}"
+            f"{render_context(acyl.details['retained_context'], style=style)}"
+        )
     elif kind == "sulfonamide":
         sulfonyl, nitrogen = (
             assignment[rule["sulfonyl_role"]],
