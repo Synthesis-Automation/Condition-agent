@@ -26,7 +26,7 @@ python -m reactive_taxonomy.cli molecule "Brc1ccc(N)cc1C#N"
 python -m reactive_taxonomy.cli reaction "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/molecule_features.jsonl
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/sample_compounds_featurized.csv
-python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --output results/reaction_features.jsonl
+python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --output results/reaction_features.csv
 ```
 
 Phase 1 molecular-feature evaluation, including machine metrics and a blind
