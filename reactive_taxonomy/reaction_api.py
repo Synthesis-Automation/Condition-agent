@@ -20,6 +20,7 @@ from .reaction_parser import parse_reaction_smiles
 from .reaction_products import build_product_connection
 from .reaction_spectators import derive_spectator_groups
 from .reaction_signatures import build_reaction_signature
+from .reaction_topology import build_reaction_topology
 
 
 def _canonical_without_maps(smiles: str) -> str | None:
@@ -141,6 +142,12 @@ def featurize_reaction(
         )
     )
     warnings.extend(edit_result.warnings)
+    reaction_topology = build_reaction_topology(
+        reactants=parsed.reactants,
+        products=parsed.products,
+        selected=selected,
+        edit_result=edit_result,
+    )
     effective_evidence = evidence
     if edit_result.evidence == "conflicting_edit_evidence":
         effective_evidence = edit_result.evidence
@@ -156,21 +163,26 @@ def featurize_reaction(
         and "→" in selected.reaction_label
     ):
         selected_product_label = selected.reaction_label.split("→", 1)[1].strip()
-    reaction_signature = build_reaction_signature(
-        reactants=parsed.reactants,
-        selected=selected,
-        edit_result=edit_result,
-        family_environment=family_environment,
-        product_connection=product_connection,
-        spectators=spectators,
-        named_family=named_family,
-        compatible_named_families=compatible_named_families,
-        contextual_product_label=(
-            contextual_label.after
-            if contextual_label is not None
-            else selected_product_label
-        ),
-        warnings=warnings,
+    reaction_signature = (
+        build_reaction_signature(
+            reactants=parsed.reactants,
+            selected=selected,
+            edit_result=edit_result,
+            family_environment=family_environment,
+            product_connection=product_connection,
+            spectators=spectators,
+            named_family=named_family,
+            compatible_named_families=compatible_named_families,
+            topology=reaction_topology,
+            contextual_product_label=(
+                contextual_label.after
+                if contextual_label is not None
+                else selected_product_label
+            ),
+            warnings=warnings,
+        )
+        if reaction_topology is not None
+        else None
     )
     reaction_label = selected.reaction_label if selected else None
     reaction_label_status = "exact_product" if selected else "unavailable"
@@ -207,6 +219,7 @@ def featurize_reaction(
         fallback_status=reaction_label_status,
         evidence=edit_result.evidence,
         confidence=edit_result.confidence,
+        topology=reaction_topology,
         warnings=warnings,
         style=label_style,
     )
@@ -245,6 +258,7 @@ def featurize_reaction(
         spectator_groups=spectators,
         family_environment=family_environment,
         product_connection=product_connection,
+        reaction_topology=reaction_topology,
         reaction_signature=reaction_signature,
         warnings=tuple(sorted(set(warnings))),
     )

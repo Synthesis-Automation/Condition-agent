@@ -180,7 +180,35 @@ class ProductTransformation:
 
 This supports substitutions and couplings now, and later supports hydrogenation, oxidation, elimination, cyclization, rearrangement, and multi-bond transformations.
 
-### 4.4 `ReactionSignature`
+### 4.4 `ReactionTopology`
+
+Intramolecularity is an orthogonal topology dimension, not a named reaction
+family. It is derived from atom-provenanced formed bonds and observed reactant
+and product graphs.
+
+```python
+@dataclass(frozen=True)
+class ReactionTopology:
+    reaction_scope: Literal[
+        "intramolecular", "intermolecular", "mixed", "unimolecular", "unresolved"
+    ]
+    participating_component_indices: tuple[int, ...]
+    role_component_indices: dict[str, int]
+    same_component_role_groups: tuple[tuple[str, ...], ...]
+    formed_bond_scopes: tuple[str, ...]
+    reactant_tether_distances: tuple[int, ...]
+    formed_ring_sizes: tuple[int, ...]
+    ring_count_delta: int | None
+    evidence: str
+    confidence: float
+```
+
+Grammar definitions use typed role relationships with `same`, `different`, or
+`same_or_different`. This lets one chemistry grammar and one operator represent
+both intermolecular reactions and intramolecular closures. Unknown mapped
+reactions receive topology directly from their observed edits.
+
+### 4.5 `ReactionSignature`
 
 This is the stable interface between featurization, dataset conversion, and recommendation.
 
@@ -194,6 +222,7 @@ class ReactionSignature:
     order_changes: tuple[str, ...]
     partners: tuple[ReactionPartner, ...]
     product_transformation: ProductTransformation | None
+    topology: ReactionTopology
     transformation_class: str | None
     transformation_confidence: float
     named_family: str | None
@@ -209,9 +238,13 @@ class ReactionSignature:
 
 The `signature_id` must be deterministic and generated from normalized, versioned chemistry fields—not display labels or source reaction names.
 
-### 4.5 Signature levels
+### 4.6 Signature levels
 
 Precompute several keys for hierarchical retrieval:
+
+Reaction topology participates in L0–L2 so ring closures do not collide with
+intermolecular assembly at chemistry-specific retrieval tiers. L3 deliberately
+retains only normalized bond edits, providing a topology-agnostic fallback.
 
 - **L0 exact signature:** edit topology + handle tokens + anchor contexts + key local features.
 - **L1 handle signature:** edit topology + handle families.
@@ -553,7 +586,8 @@ Every recommendation should report:
 
 ### Phase A: Generic signature foundation
 
-1. Add `ReactionAtomReference`, `ReactionEdit`, `ReactionPartner`, `ProductTransformation`, and `ReactionSignature` models.
+1. Add `ReactionAtomReference`, `ReactionEdit`, `ReactionPartner`,
+   `ProductTransformation`, `ReactionTopology`, and `ReactionSignature` models.
 2. Normalize the current `BondChange`, `ProductConnection`, family environment, and spectator output into this schema.
 3. Generate deterministic L0-L4 signature keys.
 4. Add family confidence/evidence without changing current family results.

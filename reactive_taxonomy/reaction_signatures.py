@@ -20,6 +20,7 @@ from .reaction_models import (
     ReactionPartner,
     ReactionSignature,
     ReactionSpectatorGroup,
+    ReactionTopology,
 )
 
 _DEFINITIONS = Path(__file__).with_name("definitions")
@@ -320,6 +321,7 @@ def build_reaction_signature(
     spectators: Tuple[ReactionSpectatorGroup, ...],
     named_family: Optional[str],
     compatible_named_families: Tuple[str, ...],
+    topology: ReactionTopology,
     contextual_product_label: Optional[str] = None,
     warnings: Iterable[str] = (),
 ) -> Optional[ReactionSignature]:
@@ -373,15 +375,29 @@ def build_reaction_signature(
             for group in spectators
         )
     )
+    topology_token = {
+        "reaction_scope": topology.reaction_scope,
+        "same_component_role_groups": topology.same_component_role_groups,
+        "formed_bond_scopes": topology.formed_bond_scopes,
+        "reactant_tether_distances": topology.reactant_tether_distances,
+        "formed_ring_sizes": topology.formed_ring_sizes,
+        "ring_count_delta": topology.ring_count_delta,
+    }
     exact_key = _digest(
         "L0",
         {
             "edits": environment_edit_tokens,
             "partners": partner_environments,
+            "topology": topology_token,
         },
     )
     handle_key = _digest(
-        "L1", {"edits": edit_tokens, "partners": partner_handles}
+        "L1",
+        {
+            "edits": edit_tokens,
+            "partners": partner_handles,
+            "topology": topology_token,
+        },
     )
     transformation_key = _digest(
         "L2",
@@ -390,6 +406,7 @@ def build_reaction_signature(
             "broken": broken,
             "order_changes": order_changes,
             "transformation_class": transformation_class,
+            "topology": topology_token,
         },
     )
     bond_key = _digest(
@@ -405,7 +422,7 @@ def build_reaction_signature(
         {
             "keys": (exact_key, handle_key, transformation_key, bond_key, environment_key),
             "definitions": definition_versions,
-            "schema_version": "1.0",
+            "schema_version": "1.1",
         },
         length=64,
     )
@@ -438,6 +455,7 @@ def build_reaction_signature(
         edits=edit_result.edits,
         partners=partners,
         product_transformation=product_transformation,
+        topology=topology,
         transformation_class=transformation_class,
         transformation_confidence=edit_result.confidence,
         named_family=named_family,

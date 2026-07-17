@@ -220,6 +220,25 @@ class ProductTransformation:
 
 
 @dataclass(frozen=True)
+class ReactionTopology:
+    """Component and ring topology of an observed or reconstructed event."""
+
+    reaction_scope: Literal[
+        "intramolecular", "intermolecular", "mixed", "unimolecular", "unresolved"
+    ]
+    participating_component_indices: Tuple[int, ...]
+    role_component_indices: Dict[str, int]
+    same_component_role_groups: Tuple[Tuple[str, ...], ...]
+    formed_bond_scopes: Tuple[Literal["intramolecular", "intermolecular"], ...]
+    reactant_tether_distances: Tuple[int, ...]
+    formed_ring_sizes: Tuple[int, ...]
+    ring_count_delta: Optional[int]
+    evidence: str
+    confidence: float
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
 class ReactionSignature:
     """Versioned chemistry identity used by conversion and recommendation."""
 
@@ -236,6 +255,7 @@ class ReactionSignature:
     edits: Tuple[ReactionEdit, ...]
     partners: Tuple[ReactionPartner, ...]
     product_transformation: Optional[ProductTransformation]
+    topology: ReactionTopology
     transformation_class: Optional[str]
     transformation_confidence: float
     named_family: Optional[str]
@@ -246,7 +266,7 @@ class ReactionSignature:
     warnings: Tuple[str, ...]
     evidence_quality: str
     definition_versions: Dict[str, str]
-    schema_version: str = "1.0"
+    schema_version: str = "1.1"
 
 
 @dataclass(frozen=True)
@@ -282,13 +302,14 @@ class ReactionAnalysis:
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
     family_environment: Optional[ReactionFamilyEnvironment] = None
     product_connection: Optional[ProductConnection] = None
+    reaction_topology: Optional[ReactionTopology] = None
     reaction_signature: Optional[ReactionSignature] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.4"
+    schema_version: str = "1.5"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
 
-__all__ = ["BondChange", "ProductConnection", "ProductConnectionEndpoint", "ProductTransformation", "ReactionAnalysis", "ReactionAtomReference", "ReactionCandidate", "ReactionComponent", "ReactionDisplayLabel", "ReactionEdit", "ReactionFamilyEnvironment", "ReactionLabelClause", "ReactionPartner", "ReactionPartnerEnvironment", "ReactionSignature", "ReactionSiteReference", "ReactionSpectatorGroup"]
+__all__ = ["BondChange", "ProductConnection", "ProductConnectionEndpoint", "ProductTransformation", "ReactionAnalysis", "ReactionAtomReference", "ReactionCandidate", "ReactionComponent", "ReactionDisplayLabel", "ReactionEdit", "ReactionFamilyEnvironment", "ReactionLabelClause", "ReactionPartner", "ReactionPartnerEnvironment", "ReactionSignature", "ReactionSiteReference", "ReactionSpectatorGroup", "ReactionTopology"]

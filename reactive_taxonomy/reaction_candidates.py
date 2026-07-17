@@ -110,13 +110,30 @@ def enumerate_role_assignments(
         ):
             continue
         valid = True
-        for left_role, right_role in grammar.get("distinct_components") or []:
-            if (
-                assignment[left_role].component_index
-                == assignment[right_role].component_index
-            ):
-                valid = False
-                break
+        relationships = grammar.get("role_relationships") or []
+        if relationships:
+            for relationship in relationships:
+                roles = tuple(str(role) for role in relationship.get("roles") or ())
+                component_indices = [
+                    assignment[role].component_index for role in roles
+                ]
+                relation = str(relationship.get("component_relation"))
+                if relation == "same" and len(set(component_indices)) != 1:
+                    valid = False
+                    break
+                if relation == "different" and len(set(component_indices)) != len(
+                    component_indices
+                ):
+                    valid = False
+                    break
+        else:
+            for left_role, right_role in grammar.get("distinct_components") or []:
+                if (
+                    assignment[left_role].component_index
+                    == assignment[right_role].component_index
+                ):
+                    valid = False
+                    break
         if valid:
             assignments.append(assignment)
     return assignments

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.3",
+  "schema_version": "1.4",
   "grammars": [
     {
       "id": "boron_transfer_coupling",
@@ -25,11 +25,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "transfer_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "transfer_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "join_two_anchors"
@@ -66,11 +66,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "nucleophile"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "nucleophile"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -113,11 +113,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "carbonyl_partner",
-          "amine_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["carbonyl_partner", "amine_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_carbonyl_oxygen_with_amine",
@@ -154,11 +154,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "acyl_partner",
-          "nitrogen_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["acyl_partner", "nitrogen_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -196,11 +196,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "nucleophile"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "nucleophile"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -238,11 +238,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "nucleophile"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "nucleophile"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -277,11 +277,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "nucleophile"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "nucleophile"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -314,11 +314,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "nucleophile"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "nucleophile"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -351,11 +351,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "nucleophile"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "nucleophile"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -389,11 +389,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "alkene_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "alkene_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_alkene_endpoint",
@@ -430,11 +430,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "alkyne_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "alkyne_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -470,11 +470,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "electrophile",
-          "transfer_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "transfer_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "join_two_anchors"
@@ -517,11 +517,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "transfer_partner",
-          "nucleophile"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["transfer_partner", "nucleophile"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -558,11 +558,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "acyl_partner",
-          "oxygen_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["acyl_partner", "oxygen_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -600,11 +600,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "acyl_partner",
-          "aromatic_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["acyl_partner", "aromatic_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -641,11 +641,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "acyl_partner",
-          "sulfur_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["acyl_partner", "sulfur_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",
@@ -682,11 +682,11 @@
           ]
         }
       },
-      "distinct_components": [
-        [
-          "sulfonyl_partner",
-          "nitrogen_partner"
-        ]
+      "role_relationships": [
+        {
+          "roles": ["sulfonyl_partner", "nitrogen_partner"],
+          "component_relation": "same_or_different"
+        }
       ],
       "operator": {
         "id": "replace_handle_with_center",

@@ -931,6 +931,25 @@ Reaction families are defined by minimal site requirements plus expected bond ch
 
 ## 12.1 Common grammar schema
 
+Component organization is declared independently of the chemical roles:
+
+```json
+{
+  "role_relationships": [
+    {
+      "roles": ["electrophile", "nucleophile"],
+      "component_relation": "same_or_different"
+    }
+  ]
+}
+```
+
+`same` restricts a grammar to intramolecular assignments, `different` requires
+separate reactant components, and `same_or_different` lets one grammar support
+both. Operators must merge removals safely when roles share a component and
+must validate the resulting graph normally. `distinct_components` is retained
+only as a legacy loader contract and is not used by current definitions.
+
 ```json
 {
   "id": "buchwald_hartwig_cn",

@@ -54,6 +54,20 @@ aromatic C–H loss. Carboxylic acids are excluded because their acyl sites are
 latent rather than activated. Regioisomers are selected only by exact product
 reconstruction; unresolved sites and mapping conflicts remain visible.
 
+Intramolecularity is a shared reaction-topology dimension rather than a second
+set of family grammars. Grammar roles declare `same`, `different`, or
+`same_or_different` component relationships. The same graph operators therefore
+handle intermolecular joining and same-component ring closure. Every normalized
+edit signature now carries `ReactionTopology`, including reaction scope, role
+component membership, formed-bond scope, reactant tether distance, formed ring
+size, and graph cycle-rank delta. Topology contributes to L0–L2 identity while
+L3 remains a topology-agnostic bond-edit fallback. Mapped unknown reactions get
+the same topology analysis without requiring a named family.
+
+For example, `NCCc1ccccc1Br>>c1ccc2c(c1)CCN2` is rendered as
+`intramolecular (5-membered ring) Ar–Br / R–NH2 → Ar–NH–R` using the same
+`sp2_c_n_substitution` grammar as the corresponding intermolecular reaction.
+
 When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
 product, a conservative correspondence fallback may supply edit evidence after
 registered grammar reconstruction has failed. It accepts only mappings whose
@@ -72,6 +86,10 @@ python -m reactive_taxonomy.cli reaction "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccc
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/molecule_features.jsonl
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/sample_compounds_featurized.csv
 python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --output results/sample_reaction_featurized.csv
+
+python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --output results/data_300.csv
+
+
 ```
 
 Phase 1 molecular-feature evaluation, including machine metrics and a blind

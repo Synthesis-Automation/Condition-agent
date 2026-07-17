@@ -10,7 +10,13 @@ from typing import Any, Iterable, Optional, Sequence, Tuple
 
 from .reaction_contextual_labels import ContextualTransformationLabel
 from .reaction_label_patterns import match_reaction_label_pattern
-from .reaction_models import ReactionDisplayLabel, ReactionEdit, ReactionLabelClause
+from .reaction_models import (
+    ReactionDisplayLabel,
+    ReactionEdit,
+    ReactionLabelClause,
+    ReactionTopology,
+)
+from .reaction_topology import topology_label_prefix
 
 _PATH = Path(__file__).with_name("definitions") / "reaction_label_rendering.v1.json"
 
@@ -182,6 +188,7 @@ def build_reaction_display_label(
     fallback_status: str,
     evidence: str,
     confidence: float,
+    topology: Optional[ReactionTopology] = None,
     warnings: Iterable[str] = (),
     style: str = "unicode",
 ) -> Optional[ReactionDisplayLabel]:
@@ -248,6 +255,19 @@ def build_reaction_display_label(
         )
     else:
         return None
+    prefix = topology_label_prefix(topology)
+    if prefix:
+        scope_prefix = "intramolecular "
+        concise = (
+            prefix + concise[len(scope_prefix) :]
+            if concise.startswith(scope_prefix)
+            else prefix + concise
+        )
+        detailed = (
+            prefix + detailed[len(scope_prefix) :]
+            if detailed.startswith(scope_prefix)
+            else prefix + detailed
+        )
     return ReactionDisplayLabel(
         concise=concise,
         detailed=detailed,

@@ -38,6 +38,7 @@ def validate_taxonomy() -> List[str]:
         "reaction_label_patterns.v1",
         "reaction_label_rendering.v1",
         "reaction_rendering.v1",
+        "signature_features.v1",
     }
     missing = expected - set(payload)
     if missing:
@@ -266,6 +267,17 @@ def validate_taxonomy() -> List[str]:
         operator = grammar.get("operator") or {}
         if operator.get("id") not in allowed_operators:
             errors.append(f"invalid_reaction_operator:{grammar_id}")
+        if grammar.get("role_relationships") and grammar.get("distinct_components"):
+            errors.append(f"conflicting_component_relationship_rules:{grammar_id}")
+        for relationship in grammar.get("role_relationships") or []:
+            relationship_roles = relationship.get("roles") or []
+            if (
+                len(relationship_roles) < 2
+                or any(role not in roles for role in relationship_roles)
+                or relationship.get("component_relation")
+                not in {"same", "different", "same_or_different"}
+            ):
+                errors.append(f"invalid_role_relationship:{grammar_id}")
         for pair in grammar.get("distinct_components") or []:
             if len(pair) != 2 or any(role not in roles for role in pair):
                 errors.append(f"invalid_distinct_component_rule:{grammar_id}")
@@ -284,6 +296,15 @@ def validate_taxonomy() -> List[str]:
         errors.append("missing_product_context_fallback")
     if set(reaction_rendering) != set(grammar_ids):
         errors.append("reaction_rendering_coverage_mismatch")
+    signature_features = payload["signature_features.v1"]
+    if signature_features.get("signature_schema_version") != "1.1":
+        errors.append("invalid_signature_schema_version")
+    signature_levels = signature_features.get("levels") or {}
+    if any(
+        "reaction_topology" not in (signature_levels.get(level) or [])
+        for level in ("L0", "L1", "L2")
+    ):
+        errors.append("missing_signature_reaction_topology")
     allowed_product_kinds = {
         "join_contexts",
         "nitrogen_substitution",

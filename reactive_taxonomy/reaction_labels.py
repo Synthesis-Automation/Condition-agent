@@ -9,6 +9,7 @@ from typing import Any, Dict
 
 from .labels import render_context, render_xh
 from .reaction_models import ReactionSiteReference
+from .reaction_topology import assignment_component_scope
 
 
 _PATH = Path(__file__).with_name("definitions") / "reaction_rendering.v1.json"
@@ -89,9 +90,12 @@ def render_reactant_label(
 ) -> str:
     """Render only the observed reactant handles for a candidate assignment."""
     bond = "–" if style == "unicode" else "-"
-    return " + ".join(
+    scope = assignment_component_scope(assignment)
+    separator = " / " if scope == "intramolecular" else " + "
+    rendered = separator.join(
         site.chemist_label.replace("–", bond) for site in assignment.values()
     )
+    return f"intramolecular {rendered}" if scope == "intramolecular" else rendered
 
 
 def render_heteroatom_product(

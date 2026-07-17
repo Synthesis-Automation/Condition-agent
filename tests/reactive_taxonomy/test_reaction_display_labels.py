@@ -137,7 +137,9 @@ def test_unknown_intramolecular_formation_receives_ring_closure_pattern() -> Non
     )
 
     assert result.named_family is None
-    assert result.reaction_label == "intramolecular C–N bond formation"
+    assert result.reaction_label == (
+        "intramolecular (3-membered ring) C–N bond formation"
+    )
     assert result.display_label is not None
     assert result.display_label.pattern_id == "intramolecular_bond_formation"
     assert result.display_label.structural_label == (

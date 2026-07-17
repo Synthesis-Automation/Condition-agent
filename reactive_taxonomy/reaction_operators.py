@@ -136,20 +136,23 @@ def apply_operator(
         right_handle = _bonded_role_atom(
             right_mol, right, "anchor", ("center", "handle")
         )
-        removals = {
-            left.component_index: _fragment_to_remove(
+        removals: Dict[int, set[int]] = {}
+        removals.setdefault(left.component_index, set()).update(
+            _fragment_to_remove(
                 components,
                 left.component_index,
                 left.atom_roles["anchor"][0],
                 left_handle,
-            ),
-            right.component_index: _fragment_to_remove(
+            )
+        )
+        removals.setdefault(right.component_index, set()).update(
+            _fragment_to_remove(
                 components,
                 right.component_index,
                 right.atom_roles["anchor"][0],
                 right_handle,
-            ),
-        }
+            )
+        )
         predicted = _build_product(
             components,
             [left, right],
