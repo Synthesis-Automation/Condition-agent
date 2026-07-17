@@ -52,6 +52,13 @@ fallback to precedents with incompatible net chemistry. Results aggregate by
 canonical `RCR1` recipe and report support, dataset diversity, expected yield,
 precedent IDs, explanations, and condition-identity cautions.
 
+Reaction topology is part of the L0-L2 signature tiers and of fallback
+similarity. Intramolecular precedents are preferred for intramolecular queries;
+ring-size proximity refines cyclization matches. L3 remains a deliberately
+topology-agnostic bond-edit fallback. If that fallback crosses reaction scope,
+the result reports `REACTION_TOPOLOGY_FALLBACK_USED` and identifies the mismatch
+in each affected recommendation.
+
 Before ranking, `compatibility.v1.json` compares unchanged spectator-group tags
 from `reactive_taxonomy` with contextual role buckets and curated family IDs in
 the resolved recipe. Explicit oxidation, reduction, acid, and moisture conflicts
@@ -76,6 +83,12 @@ python -m condition_recommender.generic_index_cli `
 The index stores only admitted signature/recipe precedents and has a content-based
 `GRI1` identity. Both `records.jsonl` and the persisted index are accepted by the
 generic recommendation CLI.
+
+Generic index schema 1.1 records the reaction-signature schema, taxonomy
+definition versions, recommendation-record schema, and converter version. Stale
+or mixed converted records are rejected instead of silently falling through to
+less-specific keys. Re-run generic conversion and rebuild the index after any
+signature schema or identity-definition change.
 
 Run a canonical-reaction-group held-out benchmark:
 
@@ -207,4 +220,9 @@ The source CSV contains reaction labels rather than reaction structures for
 its precedent rows. Recommendations are therefore weak-label precedents, not
 structure-verified literature matches. Reactive-site order in the source data
 is not reliable and is treated as unordered. Condition names have also not yet
-been normalized to condition-registry identities.
+been normalized to condition-registry identities. Because reaction scope and
+ring formation cannot be reconstructed from these rows, the weak-label
+recommender accepts only structurally verified intermolecular queries and returns
+`QUERY_TOPOLOGY_NOT_SUPPORTED_BY_LABEL_DATASET` for intramolecular, mixed,
+unimolecular, or unresolved topology. Use the generic structure-backed path for
+those reactions.

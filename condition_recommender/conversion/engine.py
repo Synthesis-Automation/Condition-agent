@@ -9,9 +9,9 @@ from contextlib import ExitStack
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from ..models import AdmissionTier
-from ..models import GENERIC_CONVERTER_DEFINITION_VERSION
 from reactive_taxonomy import REACTION_SIGNATURE_SCHEMA_VERSION
+
+from ..models import AdmissionTier, GENERIC_CONVERTER_DEFINITION_VERSION
 from .flatten import GENERIC_REVIEW_FIELDS, flatten_generic_record
 from .generic import convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
@@ -54,6 +54,7 @@ def convert_datasets(
     evidence_counts = Counter()
     transformation_counts = Counter()
     family_counts = Counter()
+    reaction_scope_counts = Counter()
     source_counts = Counter()
     source_tiers: Dict[str, Counter[str]] = defaultdict(Counter)
     condition_status_counts = Counter()
@@ -103,6 +104,10 @@ def convert_datasets(
                     transformation_counts[record.transformation_class] += 1
                 if record.named_family:
                     family_counts[record.named_family] += 1
+                topology = (record.reaction_signature or {}).get("topology") or {}
+                reaction_scope = str(topology.get("reaction_scope") or "")
+                if reaction_scope:
+                    reaction_scope_counts[reaction_scope] += 1
                 condition_status_counts.update(
                     record.condition_resolution.get("status_counts") or {}
                 )
@@ -157,6 +162,7 @@ def convert_datasets(
         "signature_rate": round(signature_count / row_count, 6) if row_count else 0.0,
         "transformation_class_counts": dict(sorted(transformation_counts.items())),
         "named_family_counts": dict(sorted(family_counts.items())),
+        "reaction_scope_counts": dict(sorted(reaction_scope_counts.items())),
         "condition_resolution_status_counts": dict(
             sorted(condition_status_counts.items())
         ),

@@ -245,6 +245,9 @@ Precompute several keys for hierarchical retrieval:
 Reaction topology participates in L0–L2 so ring closures do not collide with
 intermolecular assembly at chemistry-specific retrieval tiers. L3 deliberately
 retains only normalized bond edits, providing a topology-agnostic fallback.
+Fallback ranking must therefore score reaction scope, ring formation, and ring
+size, and explanations must disclose any intra/intermolecular mismatch rather
+than presenting the precedent as topology-equivalent.
 
 - **L0 exact signature:** edit topology + handle tokens + anchor contexts + key local features.
 - **L1 handle signature:** edit topology + handle families.
@@ -445,6 +448,11 @@ Evolve `RecommendationRecord` to contain:
 - taxonomy, registry, and converter definition versions.
 
 Keep nested JSON or Parquet as the canonical data artifact. CSV should be a review/export view because it cannot naturally represent multiple edits, partners, roles, or family candidates.
+
+Persisted recommendation indices must record and validate the reaction-signature
+schema, taxonomy definition versions, converted-record schema, and converter
+version. A stale or mixed artifact must fail with a regeneration instruction;
+it must not silently miss L0-L2 keys and degrade to a generic fallback.
 
 ### 7.3 Admission policy
 

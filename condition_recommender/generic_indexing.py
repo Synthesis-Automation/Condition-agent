@@ -305,6 +305,12 @@ def save_generic_index(index: GenericReactionIndex, path: str | Path) -> Dict[st
     )
     return {
         "schema_version": payload["schema_version"],
+        "reaction_signature_schema_version": payload[
+            "reaction_signature_schema_version"
+        ],
+        "taxonomy_definition_versions": payload["taxonomy_definition_versions"],
+        "record_schema_versions": payload["record_schema_versions"],
+        "converter_definition_versions": payload["converter_definition_versions"],
         "index_id": payload["index_id"],
         "row_count": payload["row_count"],
         "path": str(destination),

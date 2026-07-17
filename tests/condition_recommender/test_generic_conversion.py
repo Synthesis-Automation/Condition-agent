@@ -189,9 +189,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     assert sum(report["role_confidence_counts"].values()) > 0
     records = [
         json.loads(line)
-        for line in (output / "records.jsonl")
-        .read_text(encoding="utf-8")
-        .splitlines()
+        for line in (output / "records.jsonl").read_text(encoding="utf-8").splitlines()
     ]
     assert len(records) == 4
     assert records[1]["named_family"] is None
@@ -201,7 +199,16 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
         verified = list(csv.DictReader(handle))
     assert len(verified) == 2
     assert all(row["reaction_signature_id"].startswith("RS1:") for row in verified)
+    assert verified[0]["reaction_scope"] == "intermolecular"
+    assert {row["reaction_scope"] for row in verified} == {
+        "intermolecular",
+        "unimolecular",
+    }
     assert json.loads((output / "conversion_report.json").read_text()) == report
     assert report["schema_version"] == "1.1"
     assert report["reaction_signature_schema_version"] == "1.1"
+    assert report["reaction_scope_counts"] == {
+        "intermolecular": 1,
+        "unimolecular": 1,
+    }
     assert (output / "conversion_report.md").exists()

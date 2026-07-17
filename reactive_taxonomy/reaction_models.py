@@ -5,10 +5,10 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Literal, Optional, Tuple
 
+from .models import CompoundAnalysis
+
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "1.1"
-
-from .models import CompoundAnalysis
 
 
 @dataclass(frozen=True)

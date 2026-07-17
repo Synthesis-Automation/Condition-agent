@@ -43,6 +43,9 @@ GENERIC_REVIEW_FIELDS = (
     "condition_unresolved_count",
     "condition_invalid_count",
     "condition_identity_uncertainty",
+    "reaction_scope",
+    "formed_ring_sizes",
+    "ring_count_delta",
     "reaction_signature_id",
     "signature_l0_exact",
     "signature_l1_handle",
@@ -61,6 +64,7 @@ def _joined(values: Iterable[Any]) -> str:
 def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
     """Flatten high-value review fields while retaining nested JSONL as canonical."""
     status_counts = record.condition_resolution.get("status_counts") or {}
+    topology = (record.reaction_signature or {}).get("topology") or {}
     return {
         "schema_version": record.schema_version,
         "observation_id": record.observation_id,
@@ -116,6 +120,13 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "condition_invalid_count": status_counts.get("invalid_identifier", 0),
         "condition_identity_uncertainty": record.condition_resolution.get(
             "has_uncertainty", False
+        ),
+        "reaction_scope": topology.get("reaction_scope", ""),
+        "formed_ring_sizes": _joined(topology.get("formed_ring_sizes") or ()),
+        "ring_count_delta": (
+            topology["ring_count_delta"]
+            if topology.get("ring_count_delta") is not None
+            else ""
         ),
         **flattened_signature_fields(record.reaction_signature),
         "reference": record.source.get("reference", ""),
