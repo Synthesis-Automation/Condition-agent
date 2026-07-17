@@ -28,7 +28,7 @@ def validate_taxonomy() -> List[str]:
         payload = load_taxonomy_data()
     except (OSError, json.JSONDecodeError) as exc:
         return [f"taxonomy_load_failed:{exc}"]
-    expected = {"contexts.v1", "descriptor_rules.v1", "functional_groups.v1", "handles.v1", "rendering.v1", "reaction_grammars.v1", "reaction_label_rendering.v1", "reaction_rendering.v1"}
+    expected = {"contexts.v1", "descriptor_rules.v1", "functional_groups.v1", "handles.v1", "rendering.v1", "reaction_grammars.v1", "reaction_label_patterns.v1", "reaction_label_rendering.v1", "reaction_rendering.v1"}
     missing = expected - set(payload)
     if missing:
         errors.append(f"missing_taxonomy_files:{','.join(sorted(missing))}")
@@ -244,6 +244,22 @@ def validate_taxonomy() -> List[str]:
     }
     if not required_label_templates <= set(label_rendering.get("templates") or {}):
         errors.append("missing_reaction_label_templates")
+    label_patterns = payload["reaction_label_patterns.v1"].get("patterns") or []
+    pattern_ids = [str(pattern.get("id") or "") for pattern in label_patterns]
+    allowed_pattern_matchers = {
+        "substitution", "hydrogenation", "dehydrogenation",
+        "reductive_bond_cleavage", "intramolecular_bond_formation",
+    }
+    if not pattern_ids or any(not pattern_id for pattern_id in pattern_ids):
+        errors.append("missing_reaction_label_pattern_id")
+    if len(pattern_ids) != len(set(pattern_ids)):
+        errors.append("duplicate_reaction_label_pattern_ids")
+    for pattern in label_patterns:
+        pattern_id = str(pattern.get("id") or "<missing>")
+        if pattern.get("matcher") not in allowed_pattern_matchers:
+            errors.append(f"invalid_reaction_label_pattern_matcher:{pattern_id}")
+        if set(pattern.get("templates") or {}) != set(label_styles):
+            errors.append(f"reaction_label_pattern_style_mismatch:{pattern_id}")
     return errors
 
 

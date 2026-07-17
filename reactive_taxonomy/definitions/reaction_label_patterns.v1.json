@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "patterns": [
+    {
+      "id": "substitution",
+      "priority": 100,
+      "matcher": "substitution",
+      "templates": {
+        "unicode": "{formed_pair} substitution",
+        "ascii": "{formed_pair} substitution",
+        "hte_legacy": "{formed_pair} substitution"
+      }
+    },
+    {
+      "id": "hydrogenation",
+      "priority": 90,
+      "matcher": "hydrogenation",
+      "templates": {
+        "unicode": "{old_bond_pair} hydrogenation",
+        "ascii": "{old_bond_pair} hydrogenation",
+        "hte_legacy": "{old_bond_pair} hydrogenation"
+      }
+    },
+    {
+      "id": "dehydrogenation",
+      "priority": 90,
+      "matcher": "dehydrogenation",
+      "templates": {
+        "unicode": "{new_bond_pair} formation by dehydrogenation",
+        "ascii": "{new_bond_pair} formation by dehydrogenation",
+        "hte_legacy": "{new_bond_pair} formation by dehydrogenation"
+      }
+    },
+    {
+      "id": "reductive_bond_cleavage",
+      "priority": 80,
+      "matcher": "reductive_bond_cleavage",
+      "templates": {
+        "unicode": "{broken_pair} reductive cleavage",
+        "ascii": "{broken_pair} reductive cleavage",
+        "hte_legacy": "{broken_pair} reductive cleavage"
+      }
+    },
+    {
+      "id": "intramolecular_bond_formation",
+      "priority": 50,
+      "matcher": "intramolecular_bond_formation",
+      "templates": {
+        "unicode": "intramolecular {formed_pair} bond formation",
+        "ascii": "intramolecular {formed_pair} bond formation",
+        "hte_legacy": "intramolecular {formed_pair} bond formation"
+      }
+    }
+  ]
+}

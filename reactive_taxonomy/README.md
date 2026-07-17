@@ -12,10 +12,13 @@ Public entry points:
 - `validate_source_label_mappings()`
 
 Every reaction with normalized edit evidence also receives a structured
-`display_label`. Exact grammar labels remain available as overlays, while
-mapped unknown-family reactions fall back to deterministic labels such as
-`C–N bond formation` or `C=C → C–C; 2 × H gain at C`. Display style is
-explicitly excluded from reaction-signature identity.
+`display_label`. An exact, edit-consistent grammar label is preferred when one
+is available. Otherwise, versioned generic edit patterns render transformations
+such as `C–N substitution`, `C=C hydrogenation`, or `N=N reductive cleavage`.
+Any unmatched edit set still receives a deterministic literal summary such as
+`C–N bond formation`. The structured result retains the grammar or pattern ID,
+the literal structural label, evidence, and confidence. Display style and label
+definitions are explicitly excluded from reaction-signature identity.
 
 Integrated CLI tester:
 

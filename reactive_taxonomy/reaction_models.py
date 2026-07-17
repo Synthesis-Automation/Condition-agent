@@ -94,6 +94,7 @@ class ReactionDisplayLabel:
         "observed_edits",
         "exact_reconstruction",
         "family_overlay",
+        "generic_pattern",
         "conflicting_evidence",
         "reactant_only",
         "ambiguous_reactants",
@@ -105,7 +106,14 @@ class ReactionDisplayLabel:
     warnings: Tuple[str, ...]
     style: str
     definition_version: str
-    schema_version: str = "1.0"
+    structural_label: Optional[str] = None
+    transformation_label: Optional[str] = None
+    grammar_label: Optional[str] = None
+    family_label: Optional[str] = None
+    pattern_id: Optional[str] = None
+    pattern_definition_version: Optional[str] = None
+    grammar_id: Optional[str] = None
+    schema_version: str = "1.1"
 
 
 @dataclass(frozen=True)

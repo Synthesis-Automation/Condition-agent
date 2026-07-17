@@ -1,4 +1,8 @@
-from reactive_taxonomy import featurize_reaction, load_reaction_label_rendering
+from reactive_taxonomy import (
+    featurize_reaction,
+    load_reaction_label_patterns,
+    load_reaction_label_rendering,
+)
 
 
 def test_mapped_unknown_reaction_receives_observed_edit_label() -> None:
@@ -17,8 +21,13 @@ def test_mapped_unknown_reaction_receives_observed_edit_label() -> None:
 def test_multiple_edits_compose_and_collapse_repeated_generic_clauses() -> None:
     result = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
 
-    assert result.reaction_label == "C=C → C–C; 2 × H gain at C"
+    assert result.reaction_label == "C=C hydrogenation"
+    assert result.reaction_label_status == "mapped_generic_pattern"
     assert result.display_label is not None
+    assert result.display_label.status == "generic_pattern"
+    assert result.display_label.pattern_id == "hydrogenation"
+    assert result.display_label.structural_label == "C=C → C–C; 2 × H gain at C"
+    assert result.display_label.transformation_label == "C=C hydrogenation"
     assert len(result.display_label.clauses) == 3
     assert "H gain at C(map 1)" in result.display_label.detailed
     assert "H gain at C(map 2)" in result.display_label.detailed
@@ -84,16 +93,74 @@ def test_display_label_serializes_as_nested_evidence() -> None:
         "[CH3:1].[NH2:2]>>[CH3:1][NH2:2]"
     ).to_dict()
 
-    assert payload["display_label"]["schema_version"] == "1.0"
+    assert payload["display_label"]["schema_version"] == "1.1"
     assert payload["display_label"]["clauses"][0]["edit_type"] == "formed"
     assert payload["display_label"]["clauses"][0]["atom_map_numbers"] == (1, 2)
 
 
+def test_unknown_mapped_substitution_receives_generic_pattern_label() -> None:
+    result = featurize_reaction(
+        "[CH3:1][Br:2].[NH2:3]>>[CH3:1][NH:3]"
+    )
+
+    assert result.named_family is None
+    assert result.selected_candidate is None
+    assert result.reaction_label == "C–N substitution"
+    assert result.reaction_label_status == "mapped_generic_pattern"
+    assert result.display_label is not None
+    assert result.display_label.pattern_id == "substitution"
+    assert result.display_label.grammar_id is None
+    assert result.display_label.structural_label == (
+        "C–Br bond cleavage; C–N bond formation; N–H loss"
+    )
+
+
+def test_unknown_mapped_dehydrogenation_receives_generic_pattern_label() -> None:
+    result = featurize_reaction("[CH3:1][CH3:2]>>[CH2:1]=[CH2:2]")
+
+    assert result.named_family is None
+    assert result.reaction_label == "C=C formation by dehydrogenation"
+    assert result.display_label is not None
+    assert result.display_label.pattern_id == "dehydrogenation"
+
+
+def test_unknown_intramolecular_formation_receives_ring_closure_pattern() -> None:
+    result = featurize_reaction(
+        "[CH3:1][CH2:2][NH2:3]>>[CH2:1]1[CH2:2][NH:3]1"
+    )
+
+    assert result.named_family is None
+    assert result.reaction_label == "intramolecular C–N bond formation"
+    assert result.display_label is not None
+    assert result.display_label.pattern_id == "intramolecular_bond_formation"
+    assert result.display_label.structural_label == (
+        "C–N bond formation; C–H loss; N–H loss"
+    )
+
+
+def test_exact_grammar_label_records_grammar_overlay_provenance() -> None:
+    result = featurize_reaction("Brc1ccccc1.CN>>CNc1ccccc1")
+
+    assert result.display_label is not None
+    assert result.display_label.grammar_id == "sp2_c_n_substitution"
+    assert result.display_label.grammar_label == result.reaction_label
+    assert result.display_label.pattern_id == "substitution"
+
+
 def test_reaction_label_definition_is_versioned() -> None:
     rendering = load_reaction_label_rendering()
+    patterns = load_reaction_label_patterns()
 
     assert rendering["schema_version"] == "1.0"
     assert rendering["label_schema_version"] == "1.0"
+    assert patterns["schema_version"] == "1.0"
+    assert {pattern["id"] for pattern in patterns["patterns"]} >= {
+        "substitution",
+        "hydrogenation",
+        "dehydrogenation",
+        "reductive_bond_cleavage",
+        "intramolecular_bond_formation",
+    }
     assert set(rendering["clause_order"]) == {
         "formed",
         "broken",
@@ -106,15 +173,15 @@ def test_mapped_heteroatom_bond_reductions_receive_generic_labels() -> None:
     examples = {
         "c1ccc([N:1]=[N:2]c2ccccc2)cc1>>"
         "[NH2:1]c1ccccc1.[NH2:2]c1ccccc1": (
-            "N=N bond cleavage; 4 × H gain at N",
+            "N=N reductive cleavage",
             "HB|Azo",
         ),
         "C[S:1][S:2]C>>C[SH:1].C[SH:2]": (
-            "S–S bond cleavage; 2 × H gain at S",
+            "S–S reductive cleavage",
             "HB|Disulfide",
         ),
         "C[O:1][O:2]C>>C[OH:1].C[OH:2]": (
-            "O–O bond cleavage; 2 × H gain at O",
+            "O–O reductive cleavage",
             "HB|Peroxide",
         ),
     }
@@ -123,7 +190,9 @@ def test_mapped_heteroatom_bond_reductions_receive_generic_labels() -> None:
         result = featurize_reaction(reaction)
         assert result.valid
         assert result.reaction_label == label
-        assert result.reaction_label_status == "mapped_edit_summary"
+        assert result.reaction_label_status == "mapped_generic_pattern"
+        assert result.display_label is not None
+        assert result.display_label.pattern_id == "reductive_bond_cleavage"
         assert any(
             site.canonical_signature == handle_signature
             for component in result.reactants

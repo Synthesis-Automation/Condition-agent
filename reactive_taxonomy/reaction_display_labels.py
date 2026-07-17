@@ -8,6 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Optional, Sequence, Tuple
 
+from .reaction_label_patterns import match_reaction_label_pattern
 from .reaction_models import ReactionDisplayLabel, ReactionEdit, ReactionLabelClause
 
 _PATH = Path(__file__).with_name("definitions") / "reaction_label_rendering.v1.json"
@@ -173,6 +174,7 @@ def build_reaction_display_label(
     edits: Sequence[ReactionEdit],
     selected_label: Optional[str],
     selected_exact: bool,
+    grammar_id: Optional[str],
     named_family: Optional[str],
     fallback_label: Optional[str],
     fallback_status: str,
@@ -192,6 +194,10 @@ def build_reaction_display_label(
         clause.detailed for clause in clauses
     )
     warning_tuple = tuple(sorted(set(str(warning) for warning in warnings)))
+    pattern = match_reaction_label_pattern(edits, style=style) if clauses else None
+    structural_label = concise_clauses or None
+    transformation_label = pattern.label if pattern else None
+    grammar_label = selected_label if selected_exact and selected_label else None
     if evidence == "conflicting_edit_evidence" and clauses:
         concise = str(rendering["templates"]["conflict"]).format(
             clauses=concise_clauses
@@ -207,6 +213,13 @@ def build_reaction_display_label(
             clauses=detailed_clauses or "none",
         )
         status = "family_overlay" if named_family else "exact_reconstruction"
+    elif pattern is not None:
+        concise = pattern.label
+        detailed = str(rendering["templates"]["exact_detail"]).format(
+            label=pattern.label,
+            clauses=detailed_clauses,
+        )
+        status = "generic_pattern"
     elif clauses:
         concise = concise_clauses
         detailed = detailed_clauses
@@ -230,6 +243,13 @@ def build_reaction_display_label(
         warnings=warning_tuple,
         style=style,
         definition_version=str(rendering["label_schema_version"]),
+        structural_label=structural_label,
+        transformation_label=transformation_label,
+        grammar_label=grammar_label,
+        family_label=named_family,
+        pattern_id=pattern.pattern_id if pattern else None,
+        pattern_definition_version=pattern.definition_version if pattern else None,
+        grammar_id=grammar_id if grammar_label else None,
     )
 
 

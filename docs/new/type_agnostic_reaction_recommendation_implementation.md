@@ -312,13 +312,32 @@ Spectators must be derived relative to the selected or observed edits, not treat
 
 ### 6.5 Chemist-facing labels
 
-Labels are rendered after the structured transformation is built:
+Labels are rendered after the structured transformation is built. Selection
+uses an evidence-ordered ladder:
+
+1. expose conflicts when supplied mapping and grammar reconstruction disagree;
+2. use an exact grammar label only when reconstruction and normalized edits
+   agree;
+3. otherwise match a versioned generic edit pattern;
+4. otherwise render the normalized edits literally;
+5. use a reactant-only grammar label only when no verified edit evidence exists;
+6. report the transformation as unresolved when neither edits nor exact
+   reconstruction are available.
+
+Generic label patterns are declarative and identify reusable edit combinations,
+not named reaction families. A pattern such as C–X cleavage plus C–N formation
+may support `C–N substitution`, but it does not distinguish Buchwald–Hartwig,
+Ullmann, or SNAr chemistry. Named-family labels remain optional overlays.
+
+Examples:
 
 ```text
 Ar-Cl + Ar-B(OH)2 -> Ar-Ar
 Alkenyl-Cl + Ar-B(OH)2 -> Ar-Alkenyl
 HeteroAr-Br + R-NH2 -> HeteroAr-NH-R
-unknown family: sp2 C-X + N-H -> sp2 C-N
+unknown family: C-N substitution
+unknown family: C=C hydrogenation
+unmatched edit pattern: C-O bond cleavage; C-N bond formation
 ```
 
 When the product connection is not verified, leave the product label empty:

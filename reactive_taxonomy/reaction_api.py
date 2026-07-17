@@ -137,6 +137,7 @@ def featurize_reaction(
         selected_exact=bool(
             selected and selected.verification == "exact_product_reconstruction"
         ),
+        grammar_id=selected.grammar_id if selected is not None else None,
         named_family=named_family,
         fallback_label=reaction_label,
         fallback_status=reaction_label_status,
@@ -152,6 +153,12 @@ def featurize_reaction(
                 "mapped_edit_summary"
                 if "mapping" in edit_result.evidence
                 else "observed_edit_summary"
+            )
+        elif display_label.status == "generic_pattern":
+            reaction_label_status = (
+                "mapped_generic_pattern"
+                if "mapping" in edit_result.evidence
+                else "generic_pattern"
             )
         elif display_label.status == "conflicting_evidence":
             reaction_label_status = "conflicting_edit_summary"
