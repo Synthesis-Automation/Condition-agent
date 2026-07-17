@@ -631,9 +631,12 @@ Implemented high-ROI foundation:
 - terminal-alkene Heck coupling uses endpoint hydrogen counts for deterministic
   regioselection and requires exact product reconstruction before assigning
   `heck`;
+- Friedel–Crafts acylation combines an activated acyl electrophile with an
+  aromatic C–H site and resolves regioisomers by exact reconstruction;
 - unspecified alkene stereochemistry is never promoted to an E/Z claim;
-- the 450-row sample evaluation now has 242 exact-product labels, including six
-  new alkyl substitutions and four exactly reconstructed Heck reactions.
+- the 450-row sample evaluation now has 244 exact-product labels, including the
+  Friedel–Crafts acylation example, six alkyl substitutions, and four exactly
+  reconstructed Heck reactions.
 
 The remaining Wittig, aldol, Minisci, Grignard, cycloaddition, and protection
 gaps should be added only after their missing partner-site or multi-edit

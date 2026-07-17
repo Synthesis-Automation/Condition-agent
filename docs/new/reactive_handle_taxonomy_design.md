@@ -1104,6 +1104,20 @@ aryl anchor at that endpoint and records loss of one endpoint hydrogen. Exact
 stereochemical verification remains separate from constitutional matching; the
 operator must not invent E/Z geometry.
 
+## 12.15 Friedel–Crafts acylation
+
+```text
+Ar/HeteroAr–H + R–C(O)X → Ar/HeteroAr–C(O)–R
+```
+
+Required site types are
+`electrophilic_center(center_family=Acyl, activation_state=activated)` and
+`aromatic_CH`. The operator removes the acyl leaving fragment, joins the acyl
+center to the aromatic carbon, and records loss of aromatic hydrogen. Latent
+carboxylic acids are excluded. For substituted rings, exact observed-product
+reconstruction must resolve the participating aromatic site before the named
+family is assigned.
+
 ---
 
 ## 13. Example: Buchwald C–N Reaction

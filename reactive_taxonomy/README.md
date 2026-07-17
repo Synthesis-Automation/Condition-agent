@@ -47,6 +47,13 @@ attachment site, removes Ar–X, forms Ar–C, and records alkene C–H loss. It
 not invent E/Z stereochemistry: a stereospecified product is exact only when
 that stereochemistry is supported by the input/operator result.
 
+Friedel–Crafts acylation is represented by an activated acyl electrophile and
+an available aromatic C–H site. It reuses the generic handle-replacement
+operator to remove the acyl leaving group, form the acyl-C–aryl bond, and record
+aromatic C–H loss. Carboxylic acids are excluded because their acyl sites are
+latent rather than activated. Regioisomers are selected only by exact product
+reconstruction; unresolved sites and mapping conflicts remain visible.
+
 When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
 product, a conservative correspondence fallback may supply edit evidence after
 registered grammar reconstruction has failed. It accepts only mappings whose
