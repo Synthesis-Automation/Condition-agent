@@ -15,6 +15,7 @@ from .reaction_models import (
     ReactionEdit,
     ReactionSiteReference,
 )
+from .reaction_correspondence import infer_scaffold_correspondence_candidates
 
 
 @dataclass(frozen=True)
@@ -286,6 +287,202 @@ def normalize_predicted_edits(
     )
 
 
+def _correspondence_edits(
+    mapping: Tuple[Tuple[int, int, int, int], ...],
+    reactants: Tuple[ReactionComponent, ...],
+    products: Tuple[ReactionComponent, ...],
+) -> Tuple[ReactionEdit, ...]:
+    reactant_components = {
+        component.component_index: component for component in reactants
+    }
+    product_components = {
+        component.component_index: component for component in products
+    }
+    forward = {
+        (reactant_component, reactant_atom): (product_component, product_atom)
+        for reactant_component, reactant_atom, product_component, product_atom
+        in mapping
+    }
+    reverse = {product: reactant for reactant, product in forward.items()}
+    edits = []
+    for component in reactants:
+        mol = parse_smiles(component.input_smiles)
+        if mol is None:
+            continue
+        for bond in mol.GetBonds():
+            left = (component.component_index, bond.GetBeginAtomIdx())
+            right = (component.component_index, bond.GetEndAtomIdx())
+            mapped_left = forward.get(left)
+            mapped_right = forward.get(right)
+            old_order = str(bond.GetBondType()).upper()
+            if mapped_left is not None and mapped_right is not None:
+                if mapped_left[0] != mapped_right[0]:
+                    continue
+                product_component = product_components[mapped_left[0]]
+                product_mol = parse_smiles(product_component.input_smiles)
+                if product_mol is None:
+                    continue
+                product_bond = product_mol.GetBondBetweenAtoms(
+                    mapped_left[1], mapped_right[1]
+                )
+                new_order = (
+                    str(product_bond.GetBondType()).upper()
+                    if product_bond is not None
+                    else None
+                )
+                if new_order == old_order:
+                    continue
+                edit_type = "broken" if new_order is None else "order_changed"
+            elif (mapped_left is None) == (mapped_right is None):
+                continue
+            else:
+                unmapped_index = right[1] if mapped_left is not None else left[1]
+                if mol.GetAtomWithIdx(unmapped_index).GetAtomicNum() <= 1:
+                    continue
+                new_order = None
+                edit_type = "broken"
+            edits.append(
+                ReactionEdit(
+                    edit_type=edit_type,
+                    atom_1=_atom_reference(component, left[1]),
+                    atom_2=_atom_reference(component, right[1]),
+                    old_order=old_order,
+                    new_order=new_order,
+                    evidence="unique_scaffold_correspondence",
+                    confidence=0.85,
+                )
+            )
+    for component in products:
+        mol = parse_smiles(component.input_smiles)
+        if mol is None:
+            continue
+        for bond in mol.GetBonds():
+            left = (component.component_index, bond.GetBeginAtomIdx())
+            right = (component.component_index, bond.GetEndAtomIdx())
+            reactant_left = reverse.get(left)
+            reactant_right = reverse.get(right)
+            if reactant_left is None or reactant_right is None:
+                continue
+            if reactant_left[0] != reactant_right[0]:
+                old_bond = None
+            else:
+                reactant_component = reactant_components[reactant_left[0]]
+                reactant_mol = parse_smiles(reactant_component.input_smiles)
+                old_bond = (
+                    reactant_mol.GetBondBetweenAtoms(
+                        reactant_left[1], reactant_right[1]
+                    )
+                    if reactant_mol is not None
+                    else None
+                )
+            if old_bond is not None:
+                continue
+            reactant_component = reactant_components[reactant_left[0]]
+            edits.append(
+                ReactionEdit(
+                    edit_type="formed",
+                    atom_1=_atom_reference(reactant_component, reactant_left[1]),
+                    atom_2=_atom_reference(
+                        reactant_components[reactant_right[0]], reactant_right[1]
+                    ),
+                    old_order=None,
+                    new_order=str(bond.GetBondType()).upper(),
+                    evidence="unique_scaffold_correspondence",
+                    confidence=0.85,
+                )
+            )
+    for reactant_key, product_key in sorted(forward.items()):
+        reactant_component = reactant_components[reactant_key[0]]
+        product_component = product_components[product_key[0]]
+        reactant_mol = parse_smiles(reactant_component.input_smiles)
+        product_mol = parse_smiles(product_component.input_smiles)
+        if reactant_mol is None or product_mol is None:
+            continue
+        before = reactant_mol.GetAtomWithIdx(reactant_key[1])
+        after = product_mol.GetAtomWithIdx(product_key[1])
+        old_count = int(before.GetTotalNumHs(includeNeighbors=True))
+        new_count = int(after.GetTotalNumHs(includeNeighbors=True))
+        delta = new_count - old_count
+        for _ in range(abs(delta)):
+            edits.append(
+                ReactionEdit(
+                    edit_type="hydrogen_change",
+                    atom_1=_atom_reference(reactant_component, reactant_key[1]),
+                    atom_2=None,
+                    old_order="SINGLE" if delta < 0 else None,
+                    new_order="SINGLE" if delta > 0 else None,
+                    evidence="unique_scaffold_correspondence",
+                    confidence=0.85,
+                )
+            )
+    return tuple(edits)
+
+
+def _chemistry_edit_key(edit: ReactionEdit) -> Tuple[Any, ...]:
+    endpoints = tuple(
+        sorted(
+            (
+                atom.element,
+                atom.formal_charge,
+                atom.aromatic,
+                atom.hybridization,
+                atom.local_environment_id,
+            )
+            for atom in (edit.atom_1, edit.atom_2)
+            if atom is not None
+        )
+    )
+    return edit.edit_type, endpoints, edit.old_order, edit.new_order
+
+
+def normalize_inferred_scaffold_edits(
+    reactants: Tuple[ReactionComponent, ...],
+    products: Tuple[ReactionComponent, ...],
+) -> EditNormalizationResult:
+    """Infer edits only when all best scaffold mappings imply one chemistry."""
+    correspondence = infer_scaffold_correspondence_candidates(reactants, products)
+    if not correspondence.valid:
+        return EditNormalizationResult(
+            (), "unresolved", 0.0, correspondence.warnings, False
+        )
+    candidate_results = tuple(
+        _correspondence_edits(mapping, reactants, products)
+        for mapping in correspondence.candidates
+    )
+    nonempty = tuple(edits for edits in candidate_results if edits)
+    if not nonempty:
+        return EditNormalizationResult(
+            (),
+            "unresolved",
+            0.0,
+            ("SCAFFOLD_CORRESPONDENCE_WITHOUT_EDITS",),
+            False,
+        )
+    edit_sets = {
+        tuple(sorted(_chemistry_edit_key(edit) for edit in edits))
+        for edits in nonempty
+    }
+    if len(edit_sets) != 1 or len(nonempty) != len(candidate_results):
+        return EditNormalizationResult(
+            (),
+            "ambiguous_atom_correspondence",
+            0.0,
+            (f"AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:{len(edit_sets)}",),
+            False,
+        )
+    selected = min(
+        nonempty,
+        key=lambda edits: tuple(sorted(_comparison_key(edit) for edit in edits)),
+    )
+    return EditNormalizationResult(
+        selected,
+        "unique_scaffold_correspondence",
+        0.85,
+        ("INFERRED_ATOM_CORRESPONDENCE",),
+        True,
+    )
+
+
 def _comparison_key(edit: ReactionEdit) -> Tuple[Any, ...]:
     endpoints = []
     for atom in (edit.atom_1, edit.atom_2):
@@ -338,11 +535,14 @@ def normalize_reaction_edits(
         return EditNormalizationResult(
             predicted.edits, predicted.evidence, predicted.confidence, warnings
         )
+    inferred = normalize_inferred_scaffold_edits(reactants, products)
+    if inferred.valid:
+        return inferred
     return EditNormalizationResult(
         (),
-        "unresolved",
+        inferred.evidence,
         0.0,
-        warnings,
+        tuple(sorted(set(warnings + inferred.warnings))),
         False,
     )
 
@@ -350,6 +550,7 @@ def normalize_reaction_edits(
 __all__ = [
     "EditNormalizationResult",
     "normalize_mapped_edits",
+    "normalize_inferred_scaffold_edits",
     "normalize_predicted_edits",
     "normalize_reaction_edits",
 ]

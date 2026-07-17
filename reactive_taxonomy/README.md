@@ -20,6 +20,14 @@ Any unmatched edit set still receives a deterministic literal summary such as
 the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
+When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
+product, a conservative correspondence fallback may supply edit evidence after
+registered grammar reconstruction has failed. It accepts only mappings whose
+best alternatives imply the same normalized chemistry, requires every product
+heavy atom to be accounted for, and reports chemically distinct alternatives as
+`ambiguous_atom_correspondence`. Multi-substrate assembly remains grammar- or
+mapping-dependent rather than being guessed by this fallback.
+
 Integrated CLI tester:
 
 ```powershell
@@ -29,7 +37,7 @@ python -m reactive_taxonomy.cli molecule "Brc1ccc(N)cc1C#N"
 python -m reactive_taxonomy.cli reaction "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/molecule_features.jsonl
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/sample_compounds_featurized.csv
-python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --output results/reaction_features.csv
+python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --output results/sample_reaction_featurized.csv
 ```
 
 Phase 1 molecular-feature evaluation, including machine metrics and a blind

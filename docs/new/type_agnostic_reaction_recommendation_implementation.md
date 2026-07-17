@@ -287,9 +287,18 @@ Use this order:
 1. Validate and use supplied atom maps when present.
 2. Run taxonomy grammar candidates and exact product reconstruction.
 3. Reconcile mapped edits with operator-predicted edits when both exist.
-4. Preserve unresolved or conflicting evidence for review.
+4. When neither source is usable, allow a narrow conserved-scaffold
+   correspondence fallback: exactly one substantial reactant scaffold, exactly
+   one product, every product heavy atom accounted for, and all best mappings
+   producing the same normalized edit set.
+5. Preserve ambiguous, unresolved, or conflicting evidence for review.
 
 The initial release should borrow deterministic mapping validation and graph-comparison ideas from the old system where useful, but it must not depend on RXNMapper or legacy modules. A future optional mapper may implement a narrow interface and record its provenance.
+
+The conserved-scaffold fallback is not a general reaction mapper. It rejects
+multi-substrate assembly, insufficient scaffold conservation, candidate-limit
+overflow, and chemically distinct minimal correspondences. Symmetry-equivalent
+atom assignments may be accepted only when their normalized edit sets agree.
 
 ### 6.3 Reactive-site and environment features
 

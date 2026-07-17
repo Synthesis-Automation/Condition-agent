@@ -22,6 +22,36 @@
       }
     },
     {
+      "id": "complete_alkyne_hydrogenation",
+      "priority": 90,
+      "matcher": "complete_alkyne_hydrogenation",
+      "templates": {
+        "unicode": "{old_bond_pair} hydrogenation",
+        "ascii": "{old_bond_pair} hydrogenation",
+        "hte_legacy": "{old_bond_pair} hydrogenation"
+      }
+    },
+    {
+      "id": "partial_alkyne_hydrogenation",
+      "priority": 90,
+      "matcher": "partial_alkyne_hydrogenation",
+      "templates": {
+        "unicode": "{old_bond_pair} partial hydrogenation",
+        "ascii": "{old_bond_pair} partial hydrogenation",
+        "hte_legacy": "{old_bond_pair} partial hydrogenation"
+      }
+    },
+    {
+      "id": "heteroatom_bond_reduction",
+      "priority": 90,
+      "matcher": "heteroatom_bond_reduction",
+      "templates": {
+        "unicode": "{old_bond_pair} reduction",
+        "ascii": "{old_bond_pair} reduction",
+        "hte_legacy": "{old_bond_pair} reduction"
+      }
+    },
+    {
       "id": "dehydrogenation",
       "priority": 90,
       "matcher": "dehydrogenation",
@@ -29,6 +59,16 @@
         "unicode": "{new_bond_pair} formation by dehydrogenation",
         "ascii": "{new_bond_pair} formation by dehydrogenation",
         "hte_legacy": "{new_bond_pair} formation by dehydrogenation"
+      }
+    },
+    {
+      "id": "heteroatom_bond_oxidation",
+      "priority": 90,
+      "matcher": "heteroatom_bond_oxidation",
+      "templates": {
+        "unicode": "{new_bond_pair} oxidation",
+        "ascii": "{new_bond_pair} oxidation",
+        "hte_legacy": "{new_bond_pair} oxidation"
       }
     },
     {

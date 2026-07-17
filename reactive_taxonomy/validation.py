@@ -247,7 +247,9 @@ def validate_taxonomy() -> List[str]:
     label_patterns = payload["reaction_label_patterns.v1"].get("patterns") or []
     pattern_ids = [str(pattern.get("id") or "") for pattern in label_patterns]
     allowed_pattern_matchers = {
-        "substitution", "hydrogenation", "dehydrogenation",
+        "substitution", "hydrogenation", "complete_alkyne_hydrogenation",
+        "partial_alkyne_hydrogenation", "heteroatom_bond_reduction",
+        "dehydrogenation", "heteroatom_bond_oxidation",
         "reductive_bond_cleavage", "intramolecular_bond_formation",
     }
     if not pattern_ids or any(not pattern_id for pattern_id in pattern_ids):

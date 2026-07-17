@@ -65,6 +65,8 @@ def _hydrogenation(edits: Sequence[ReactionEdit]) -> Optional[dict[str, Reaction
     hydrogen = _edits_of_type(edits, "hydrogen_change")
     if len(changed) != 1 or changed[0].old_order != "DOUBLE" or changed[0].new_order != "SINGLE":
         return None
+    if {changed[0].atom_1.element, changed[0].atom_2.element} != {"C"}:
+        return None
     gains = [edit for edit in hydrogen if edit.old_order is None and edit.new_order == "SINGLE"]
     if len(gains) != 2 or any(edit.edit_type in {"formed", "broken"} for edit in edits):
         return None
@@ -74,16 +76,113 @@ def _hydrogenation(edits: Sequence[ReactionEdit]) -> Optional[dict[str, Reaction
     return {"changed": changed[0]}
 
 
+def _alkyne_hydrogenation(
+    edits: Sequence[ReactionEdit], *, partial: bool
+) -> Optional[dict[str, ReactionEdit]]:
+    changed = _edits_of_type(edits, "order_changed")
+    hydrogen = _edits_of_type(edits, "hydrogen_change")
+    expected_order = "DOUBLE" if partial else "SINGLE"
+    expected_gains = 2 if partial else 4
+    if (
+        len(changed) != 1
+        or changed[0].old_order != "TRIPLE"
+        or changed[0].new_order != expected_order
+        or {changed[0].atom_1.element, changed[0].atom_2.element} != {"C"}
+    ):
+        return None
+    gains = [
+        edit
+        for edit in hydrogen
+        if edit.old_order is None and edit.new_order == "SINGLE"
+    ]
+    endpoints = _edit_atom_keys(changed[0])
+    if (
+        len(gains) != expected_gains
+        or any(edit.edit_type in {"formed", "broken"} for edit in edits)
+        or any(_atom_key(edit.atom_1) not in endpoints for edit in gains)
+    ):
+        return None
+    return {"changed": changed[0]}
+
+
+def _complete_alkyne_hydrogenation(
+    edits: Sequence[ReactionEdit],
+) -> Optional[dict[str, ReactionEdit]]:
+    return _alkyne_hydrogenation(edits, partial=False)
+
+
+def _partial_alkyne_hydrogenation(
+    edits: Sequence[ReactionEdit],
+) -> Optional[dict[str, ReactionEdit]]:
+    return _alkyne_hydrogenation(edits, partial=True)
+
+
+def _heteroatom_bond_reduction(
+    edits: Sequence[ReactionEdit],
+) -> Optional[dict[str, ReactionEdit]]:
+    changed = _edits_of_type(edits, "order_changed")
+    hydrogen = _edits_of_type(edits, "hydrogen_change")
+    if (
+        len(changed) != 1
+        or changed[0].old_order != "DOUBLE"
+        or changed[0].new_order != "SINGLE"
+        or changed[0].atom_1.element == changed[0].atom_2.element == "C"
+    ):
+        return None
+    gains = [
+        edit
+        for edit in hydrogen
+        if edit.old_order is None and edit.new_order == "SINGLE"
+    ]
+    endpoints = _edit_atom_keys(changed[0])
+    if (
+        len(gains) != 2
+        or any(edit.edit_type in {"formed", "broken"} for edit in edits)
+        or any(_atom_key(edit.atom_1) not in endpoints for edit in gains)
+    ):
+        return None
+    return {"changed": changed[0]}
+
+
 def _dehydrogenation(edits: Sequence[ReactionEdit]) -> Optional[dict[str, ReactionEdit]]:
     changed = _edits_of_type(edits, "order_changed")
     hydrogen = _edits_of_type(edits, "hydrogen_change")
     if len(changed) != 1 or changed[0].old_order != "SINGLE" or changed[0].new_order != "DOUBLE":
+        return None
+    if {changed[0].atom_1.element, changed[0].atom_2.element} != {"C"}:
         return None
     losses = [edit for edit in hydrogen if edit.old_order == "SINGLE" and edit.new_order is None]
     if len(losses) != 2 or any(edit.edit_type in {"formed", "broken"} for edit in edits):
         return None
     endpoints = _edit_atom_keys(changed[0])
     if any(_atom_key(edit.atom_1) not in endpoints for edit in losses):
+        return None
+    return {"changed": changed[0]}
+
+
+def _heteroatom_bond_oxidation(
+    edits: Sequence[ReactionEdit],
+) -> Optional[dict[str, ReactionEdit]]:
+    changed = _edits_of_type(edits, "order_changed")
+    hydrogen = _edits_of_type(edits, "hydrogen_change")
+    if (
+        len(changed) != 1
+        or changed[0].old_order != "SINGLE"
+        or changed[0].new_order != "DOUBLE"
+        or changed[0].atom_1.element == changed[0].atom_2.element == "C"
+    ):
+        return None
+    losses = [
+        edit
+        for edit in hydrogen
+        if edit.old_order == "SINGLE" and edit.new_order is None
+    ]
+    endpoints = _edit_atom_keys(changed[0])
+    if (
+        len(losses) != 2
+        or any(edit.edit_type in {"formed", "broken"} for edit in edits)
+        or any(_atom_key(edit.atom_1) not in endpoints for edit in losses)
+    ):
         return None
     return {"changed": changed[0]}
 
@@ -127,7 +226,11 @@ _MATCHERS: dict[
 ] = {
     "substitution": _substitution,
     "hydrogenation": _hydrogenation,
+    "complete_alkyne_hydrogenation": _complete_alkyne_hydrogenation,
+    "partial_alkyne_hydrogenation": _partial_alkyne_hydrogenation,
+    "heteroatom_bond_reduction": _heteroatom_bond_reduction,
     "dehydrogenation": _dehydrogenation,
+    "heteroatom_bond_oxidation": _heteroatom_bond_oxidation,
     "reductive_bond_cleavage": _reductive_bond_cleavage,
     "intramolecular_bond_formation": _intramolecular_bond_formation,
 }

@@ -102,7 +102,10 @@ def featurize_reaction(
     effective_evidence = evidence
     if edit_result.evidence == "conflicting_edit_evidence":
         effective_evidence = edit_result.evidence
-    elif selected is None and edit_result.valid:
+    elif selected is None and (
+        edit_result.valid
+        or edit_result.evidence == "ambiguous_atom_correspondence"
+    ):
         effective_evidence = edit_result.evidence
     reaction_signature = build_reaction_signature(
         reactants=parsed.reactants,

@@ -9,7 +9,7 @@ Suzuki,Sterically hindered,Brc1cc(C)ccc1C.c1ccc(B(O)O)cc1>>Cc1ccc(C)c(-c2ccccc2)
 Suzuki,Aryl triflate electrophile,Fc1ccc(OS(=O)(=O)C(F)(F)F)cc1.c1ccc(B(O)O)cc1>>Fc1ccc(-c2ccccc2)cc1
 Suzuki,Vinyl bromide + vinyl boronic acid,C/C=C/Br.C=CB(O)O>>C/C=C/C=C
 Suzuki,Potassium aryltrifluoroborate,Brc1ccc(OC)cc1.[K+].[B-](F)(F)(F)c2ccccc2>>COc1ccc(-c2ccccc2)cc1
-Suzuki,2-pyridyl MIDA slow-release,Clc1ccncc1.c1ccncc1B1OC(=O)CN(CC(=O)O)C(=O)CN(CC(=O)O)C(=O)O1>>c1ccc(-c2ccccn2)nc1
+Suzuki,2-pyridyl MIDA slow-release,Clc1ccncc1.O=C(CN(C(CN(C(O2)=O)CC(O)=O)=O)CC(O)=O)OB2c3cccnc3>>c4(c5cccnc5)ccncc4
 Suzuki,Dichloropyridine,Brc1ccc(Cl)nc1.c2ccc(B(O)O)cc2>>c1ccc(-c2ccc(Cl)nc2)cc1
 Suzuki,Mixed halide pyridine,Brc1cc(Cl)nc(Cl)c1.c2ccc(B(O)O)nc2>>c1ccc(-c2cc(Cl)nc(Cl)c2)nc1
 Suzuki,Indole heterobiaryl,Brc1cccc2[nH]ccc12.c3ccc(B(O)O)cc3>>c1ccc(-c2ccc3[nH]ccc3c2)cc1
@@ -53,7 +53,7 @@ Sonogashira,Electron-rich ArBr,Brc1ccc(OC)cc1.C#Cc1ccccc1>>COc1ccc(C#Cc2ccccc2)c
 Sonogashira,TMS-acetylene,Ic1ccc(C(F)(F)F)cc1.C#C[Si](C)(C)C>>C[Si](C)(C)C#Cc2ccc(C(F)(F)F)cc2
 Sonogashira,Thiophene coupling,Brc1cccs1.C#Cc1ccccc1>>c1cc(C#Cc2ccccc2)sc1
 Sonogashira,Ether-substituted alkyne,Clc1ccncc1.C#CCOC>>COC(C)C#Cc1ccncc1
-Sonogashira,Indole substrate,Brc1ccc2[nH]ccc2c1.C#CC>>C#Cc1ccc2[nH]ccc2c1
+Sonogashira,Indole substrate,Brc(cc1)cc2c1[nH]cc2.C#CC>>CC#Cc(cc3)cc4c3[nH]cc4
 Heck,Simple styrene,Brc1ccccc1.C=C>>C(=Cc1ccccc1)
 Heck,Acrylate,Ic1ccc(C=O)cc1.C=CC(=O)OCC>>CCOC(=O)/C=C/c1ccc(C=O)cc1
 Heck,Acrylonitrile,Brc1ccncc1.C=CC#N>>N#C/C=C/c1ccncc1
@@ -133,30 +133,20 @@ Buchwald-Hartwig amination,4-bromotoluene + pyrrole,Brc1ccc(C)cc1.c1cc[nH]c1>>Cc
 Buchwald-Hartwig amination,4-chlorobenzonitrile + pyrrole,Clc1ccc(C#N)cc1.c1cc[nH]c1>>N#Cc1ccc(n2cccc2)cc1
 Buchwald-Hartwig amination,Ph-Br + indole -> N-phenylindole,Brc1ccccc1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1ccccc1
 Buchwald-Hartwig amination,4-bromoanisole + indole,Brc1ccc(OC)cc1.c1ccc2[nH]ccc2c1>>COc1ccc(n2ccc3ccccc32)cc1
-Buchwald-Hartwig amination,4-chloropyridine + indole,Clc1ccncc1.c1ccc2[nH]ccc2c1>>c1ccncc1n1ccc2ccccc21
+Buchwald-Hartwig amination,4-chloropyridine + indole,Clc1ccncc1.c2([nH]cc3)c3cccc2>>c4(n(cc5)c6c5cccc6)ccncc4
 Buchwald-Hartwig amination,4-bromobenzotrifluoride + indole,Brc1ccc(C(F)(F)F)cc1.c1ccc2[nH]ccc2c1>>FC(F)(F)c1ccc(n2ccc3ccccc32)cc1
-Buchwald-Hartwig amination,4-iodopyridine + indole,Ic1ccncc1.c1ccc2[nH]ccc2c1>>c1ccncc1n1ccc2ccccc21
-Buchwald-Hartwig amination,Ph-Br + pyrazole -> N-phenylpyrazole,Brc1ccccc1.c1c[nH]nc1>>c1ccccc1n1ccnc1
-Buchwald-Hartwig amination,4-bromochlorobenzene + pyrazole,Brc1ccc(Cl)cc1.c1c[nH]nc1>>Clc1ccc(n2ccnc2)cc1
-Buchwald-Hartwig amination,4-bromopyridine + pyrazole,Brc1ccncc1.c1c[nH]nc1>>c1ccncc1n1ccnc1
-Buchwald-Hartwig amination,4-bromonitrobenzene + pyrazole,Brc1ccc([N+](=O)[O-])cc1.c1c[nH]nc1>>[O-][N+](=O)c1ccc(n2ccnc2)cc1
 Buchwald-Hartwig amination,Ph-Br + 3-methylpyrazole,Brc1ccccc1.c1c[nH]nc1C>>Cc1nn(c2ccccc2)cc1
 Buchwald-Hartwig amination,4-chloroanisole + 3-methylpyrazole,Clc1ccc(OC)cc1.c1c[nH]nc1C>>Cc1nn(c2ccc(OC)cc2)cc1
 Buchwald-Hartwig amination,Ph-Br + imidazole -> N-phenylimidazole,Brc1ccccc1.c1cnc[nH]1>>c1ccccc1n1cncc1
 Buchwald-Hartwig amination,4-bromofluorobenzene + imidazole,Brc1ccc(F)cc1.c1cnc[nH]1>>Fc1ccc(n2cncc2)cc1
-Buchwald-Hartwig amination,4-chloropyridine + imidazole,Clc1ccncc1.c1cnc[nH]1>>c1ccncc1n1cncc1
 Buchwald-Hartwig amination,Ph-Br + carbazole -> N-phenylcarbazole,Brc1ccccc1.c1ccc2c(c1)c1ccccc1[nH]2>>c1ccc2c(c1)c1ccccc1n2c1ccccc1
 Buchwald-Hartwig amination,4-bromotoluene + carbazole,Brc1ccc(C)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>Cc1ccc(n2c3ccccc3c3ccccc32)cc1
 Buchwald-Hartwig amination,4-iodoanisole + carbazole,Ic1ccc(OC)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>COc1ccc(n2c3ccccc3c3ccccc32)cc1
 Buchwald-Hartwig amination,"Ph-Br + 1,2,4-triazole N-phenyltriazole",Brc1ccccc1.c1nc[nH]n1>>c1ccccc1n1ncnc1
 Buchwald-Hartwig amination,"4-bromobenzonitrile + 1,2,4-triazole",Brc1ccc(C#N)cc1.c1nc[nH]n1>>N#Cc1ccc(n2ncnc2)cc1
-Buchwald-Hartwig amination,Ph-Br + 2-aminopyrimidine,Brc1ccccc1.c1ncncc1N>>Nc1cnccn1c1ccccc1
-Buchwald-Hartwig amination,4-chloropyridine + 2-aminopyrimidine,Clc1ccncc1.c1ncncc1N>>Nc1cnccn1c1ccncc1
-Buchwald-Hartwig amination,"4-bromoanisole + 1,2,4-triazole",Brc1ccc(OC)cc1.c1cn[nH]c1>>COc1ccc(n2nccn2)cc1
 Buchwald-Hartwig amination,"2-bromotoluene + indole, ortho-substituted",Brc1ccccc1C.c1ccc2[nH]ccc2c1>>Cc1ccccc1n1ccc2ccccc21
 Buchwald-Hartwig amination,"2,6-dimethylbromobenzene + indole, sterically hindered",Brc1c(C)cccc1C.c1ccc2[nH]ccc2c1>>Cc1cccc(C)c1n1ccc2ccccc21
 Buchwald-Hartwig amination,"2-bromoanisole + pyrrole, ortho-substituted",Brc1ccccc1OC.c1cc[nH]c1>>COc1ccccc1n1cccc1
-Buchwald-Hartwig amination,"2-bromonaphthalene + indole, fused ring",Ic1ccc2ccccc2c1.c1ccc2[nH]ccc2c1>>c1ccc(n2ccc3ccccc32)c2ccccc12
 Buchwald-Hartwig amination,"1,4-dibromobenzene + indole, bis-coupling",Brc1ccc(Br)cc1.c1ccc2[nH]ccc2c1>>c1ccc(n2ccc3ccccc32)cc1n1ccc2ccccc21
 Buchwald-Hartwig amination,"1,3-dibromobenzene + pyrrole, bis-coupling",Brc1cccc(Br)c1.c1cc[nH]c1>>c1cccc(n2cccc2)c1n1cccc1
 Buchwald-Hartwig amination,3-bromoquinoxaline + indole,Brc1cnc2ccccc2n1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1cnc2ccccc2n1
