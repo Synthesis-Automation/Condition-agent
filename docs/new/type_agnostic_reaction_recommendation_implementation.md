@@ -622,6 +622,24 @@ Add families in increasing structural complexity:
 
 Each family must add a test pack, not a separate conversion architecture.
 
+Implemented high-ROI foundation:
+
+- acyl N/O/S formation and reductive amination use dedicated verified graph
+  operators;
+- alkyl C–N/O/S substitution reuses one handle-replacement operator and does
+  not infer SN1 versus SN2 from connectivity alone;
+- terminal-alkene Heck coupling uses endpoint hydrogen counts for deterministic
+  regioselection and requires exact product reconstruction before assigning
+  `heck`;
+- unspecified alkene stereochemistry is never promoted to an E/Z claim;
+- the 450-row sample evaluation now has 242 exact-product labels, including six
+  new alkyl substitutions and four exactly reconstructed Heck reactions.
+
+The remaining Wittig, aldol, Minisci, Grignard, cycloaddition, and protection
+gaps should be added only after their missing partner-site or multi-edit
+contracts are defined. Source reaction names are insufficient evidence for
+those grammars.
+
 ---
 
 ## 11. Proposed File Changes

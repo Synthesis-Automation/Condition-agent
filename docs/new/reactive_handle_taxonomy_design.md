@@ -1080,6 +1080,30 @@ acyl electrophilic center + S–H → acyl-C–S
 sulfonyl electrophilic center + N–H → S–N
 ```
 
+## 12.13 Alkyl C–N/O/S substitution
+
+```text
+Alkyl–X + N–H/O–H/S–H → Alkyl–N/O/S
+```
+
+Required site types are `leaving_group(anchor_context=Alkyl)` and
+`pronucleophile_XH`. This grammar identifies a structural substitution class;
+it must not select SN1, SN2, Mitsunobu, or a protection family without separate
+condition or mechanistic evidence.
+
+## 12.14 Terminal-alkene Heck coupling
+
+```text
+Ar/HeteroAr–X + H2C=CHR → Ar/HeteroAr–CH=CHR
+```
+
+Required site types are `leaving_group` and
+`unsaturated_bond(handle_token=Alkene)`. At least one alkene endpoint must have
+two hydrogens in the initial conservative grammar. The operator attaches the
+aryl anchor at that endpoint and records loss of one endpoint hydrogen. Exact
+stereochemical verification remains separate from constitutional matching; the
+operator must not invent E/Z geometry.
+
 ---
 
 ## 13. Example: Buchwald C–N Reaction

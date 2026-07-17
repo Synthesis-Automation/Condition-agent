@@ -78,6 +78,11 @@ def _matches(site: ReactionSiteReference, constraint: Dict[str, Any]) -> bool:
         and details.get("activation_state") not in constraint["activation_state_any"]
     ):
         return False
+    if constraint.get("endpoint_h_count_max_min") is not None and max(
+        (int(value) for value in details.get("endpoint_h_counts") or (0,)),
+        default=0,
+    ) < int(constraint["endpoint_h_count_max_min"]):
+        return False
     return True
 
 

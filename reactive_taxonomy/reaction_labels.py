@@ -182,6 +182,18 @@ def render_reaction_label(
     elif kind == "terminal_alkyne":
         anchor = assignment[rule["anchor_role"]]
         product = f"{render_context(anchor.details['anchor_context'], style=style)}{bond}C≡C{bond}R"
+    elif kind == "heck_alkene":
+        anchor = assignment[rule["anchor_role"]]
+        alkene = assignment[rule["alkene_role"]]
+        right = (
+            "CH2"
+            if int(alkene.details.get("substitution_degree", 0)) == 0
+            else "CHR1"
+        )
+        product = (
+            f"{render_context(anchor.details['anchor_context'], style=style)}"
+            f"{bond}CH={right}"
+        )
     elif kind == "chan_lam":
         anchor, partner = (
             assignment[rule["anchor_role"]],

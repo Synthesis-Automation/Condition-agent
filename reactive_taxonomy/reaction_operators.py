@@ -186,6 +186,84 @@ def apply_operator(
             ),
         )
         return predicted, changes
+    if operator["id"] == "replace_handle_with_alkene_endpoint":
+        electrophile_role = str(operator["electrophile_role"])
+        alkene_role = str(operator["alkene_role"])
+        electrophile = assignment[electrophile_role]
+        alkene = assignment[alkene_role]
+        electrophile_mol = parse_smiles(
+            _component_by_index(
+                components, electrophile.component_index
+            ).input_smiles
+        )
+        if electrophile_mol is None:
+            return None, ()
+        leaving_atom = _bonded_role_atom(
+            electrophile_mol,
+            electrophile,
+            "anchor",
+            ("connector", "handle", "center"),
+        )
+        endpoint_roles = ("endpoint_a", "endpoint_b")
+        endpoint_h_counts = tuple(
+            int(value) for value in alkene.details.get("endpoint_h_counts") or ()
+        )
+        if len(endpoint_h_counts) != 2 or max(endpoint_h_counts) < 1:
+            return None, ()
+        endpoint_role = min(
+            endpoint_roles,
+            key=lambda role: (
+                -endpoint_h_counts[endpoint_roles.index(role)],
+                int(alkene.atom_roles[role][0]),
+            ),
+        )
+        predicted = _build_product(
+            components,
+            [electrophile, alkene],
+            {
+                electrophile.component_index: _fragment_to_remove(
+                    components,
+                    electrophile.component_index,
+                    int(electrophile.atom_roles["anchor"][0]),
+                    leaving_atom,
+                )
+            },
+            (
+                (
+                    electrophile.component_index,
+                    int(electrophile.atom_roles["anchor"][0]),
+                ),
+                (alkene.component_index, int(alkene.atom_roles[endpoint_role][0])),
+            ),
+            consume_hydrogen_on_right=True,
+        )
+        changes = (
+            BondChange(
+                "broken",
+                f"{electrophile_role}.anchor",
+                f"{electrophile_role}.handle",
+                "SINGLE",
+                None,
+                "grammar_operator",
+            ),
+            BondChange(
+                "formed",
+                f"{electrophile_role}.anchor",
+                f"{alkene_role}.{endpoint_role}",
+                None,
+                "SINGLE",
+                "grammar_operator",
+            ),
+            BondChange(
+                "hydrogen_change",
+                f"{alkene_role}.{endpoint_role}",
+                None,
+                "SINGLE",
+                None,
+                "grammar_operator",
+            ),
+        )
+        return predicted, changes
     if operator["id"] == "replace_handle_with_center":
         e_role, p_role = operator["electrophile_role"], operator["partner_role"]
         electrophile, partner = assignment[e_role], assignment[p_role]

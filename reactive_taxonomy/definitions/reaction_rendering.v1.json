@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "product_context_precedence": [
     "HeteroAr",
     "Ar",
@@ -35,6 +35,28 @@
       "anchor_role": "electrophile",
       "partner_role": "nucleophile",
       "element": "S"
+    },
+    "sp3_c_n_substitution": {
+      "product_kind": "nitrogen_substitution",
+      "anchor_role": "electrophile",
+      "nitrogen_role": "nucleophile"
+    },
+    "sp3_c_o_substitution": {
+      "product_kind": "heteroatom_substitution",
+      "anchor_role": "electrophile",
+      "partner_role": "nucleophile",
+      "element": "O"
+    },
+    "sp3_c_s_substitution": {
+      "product_kind": "heteroatom_substitution",
+      "anchor_role": "electrophile",
+      "partner_role": "nucleophile",
+      "element": "S"
+    },
+    "terminal_alkene_heck_coupling": {
+      "product_kind": "heck_alkene",
+      "anchor_role": "electrophile",
+      "alkene_role": "alkene_partner"
     },
     "sonogashira_coupling": {
       "product_kind": "terminal_alkyne",

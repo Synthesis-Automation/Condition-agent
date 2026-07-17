@@ -37,6 +37,16 @@ therefore render labels such as
 `HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar`; product mismatches remain
 unverified, and multiple indistinguishable assignments remain unselected.
 
+The high-ROI common-reaction layer also includes explicit alkyl C–N, C–O, and
+C–S substitution plus terminal-alkene Heck coupling. Alkyl substitution uses
+the shared leaving-group and X–H site contracts and the existing
+handle-replacement operator. It intentionally leaves `named_family` unset
+because the graph alone does not distinguish SN1, SN2, or protection chemistry.
+The Heck grammar uses alkene endpoint hydrogen counts to select a terminal
+attachment site, removes Ar–X, forms Ar–C, and records alkene C–H loss. It does
+not invent E/Z stereochemistry: a stereospecified product is exact only when
+that stereochemistry is supported by the input/operator result.
+
 When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
 product, a conservative correspondence fallback may supply edit evidence after
 registered grammar reconstruction has failed. It accepts only mappings whose

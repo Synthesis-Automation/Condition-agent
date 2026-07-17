@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "grammars": [
     {
       "id": "boron_transfer_coupling",
@@ -253,6 +253,157 @@
         "c_s_coupling"
       ],
       "priority": 85
+    },
+    {
+      "id": "sp3_c_n_substitution",
+      "transformation_class": "sp3_c_n_substitution",
+      "display_name": "Alkyl C–N substitution",
+      "generic_label": "R–X + N–H → R–N",
+      "roles": {
+        "electrophile": {
+          "site_type": "leaving_group",
+          "anchor_context_any": [
+            "Alkyl"
+          ]
+        },
+        "nucleophile": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "N"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        }
+      },
+      "distinct_components": [
+        [
+          "electrophile",
+          "nucleophile"
+        ]
+      ],
+      "operator": {
+        "id": "replace_handle_with_center",
+        "electrophile_role": "electrophile",
+        "partner_role": "nucleophile"
+      },
+      "compatible_named_families": [],
+      "priority": 88
+    },
+    {
+      "id": "sp3_c_o_substitution",
+      "transformation_class": "sp3_c_o_substitution",
+      "display_name": "Alkyl C–O substitution",
+      "generic_label": "R–X + O–H → R–O",
+      "roles": {
+        "electrophile": {
+          "site_type": "leaving_group",
+          "anchor_context_any": [
+            "Alkyl"
+          ]
+        },
+        "nucleophile": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "O"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        }
+      },
+      "distinct_components": [
+        [
+          "electrophile",
+          "nucleophile"
+        ]
+      ],
+      "operator": {
+        "id": "replace_handle_with_center",
+        "electrophile_role": "electrophile",
+        "partner_role": "nucleophile"
+      },
+      "compatible_named_families": [],
+      "priority": 88
+    },
+    {
+      "id": "sp3_c_s_substitution",
+      "transformation_class": "sp3_c_s_substitution",
+      "display_name": "Alkyl C–S substitution",
+      "generic_label": "R–X + S–H → R–S",
+      "roles": {
+        "electrophile": {
+          "site_type": "leaving_group",
+          "anchor_context_any": [
+            "Alkyl"
+          ]
+        },
+        "nucleophile": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "S"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        }
+      },
+      "distinct_components": [
+        [
+          "electrophile",
+          "nucleophile"
+        ]
+      ],
+      "operator": {
+        "id": "replace_handle_with_center",
+        "electrophile_role": "electrophile",
+        "partner_role": "nucleophile"
+      },
+      "compatible_named_families": [],
+      "priority": 88
+    },
+    {
+      "id": "terminal_alkene_heck_coupling",
+      "transformation_class": "alkene_c_c_substitution",
+      "display_name": "Terminal-alkene C–C coupling",
+      "generic_label": "Ar–X + H2C=CHR → Ar–CH=CHR",
+      "roles": {
+        "electrophile": {
+          "site_type": "leaving_group",
+          "anchor_context_any": [
+            "Ar",
+            "HeteroAr"
+          ]
+        },
+        "alkene_partner": {
+          "site_type": "unsaturated_bond",
+          "handle_token_any": [
+            "Alkene"
+          ],
+          "endpoint_h_count_max_min": 2,
+          "availability_any": [
+            "available"
+          ]
+        }
+      },
+      "distinct_components": [
+        [
+          "electrophile",
+          "alkene_partner"
+        ]
+      ],
+      "operator": {
+        "id": "replace_handle_with_alkene_endpoint",
+        "electrophile_role": "electrophile",
+        "alkene_role": "alkene_partner"
+      },
+      "compatible_named_families": [
+        "heck"
+      ],
+      "priority": 92
     },
     {
       "id": "sonogashira_coupling",

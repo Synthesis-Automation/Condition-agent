@@ -102,7 +102,8 @@ def test_display_label_serializes_as_nested_evidence() -> None:
 
 def test_unknown_mapped_substitution_receives_generic_pattern_label() -> None:
     result = featurize_reaction(
-        "[CH3:1][Br:2].[NH2:3]>>[CH3:1][NH:3]"
+        "[CH3:1][O:2][CH3:5].[NH2:3]>>"
+        "[CH3:1][NH:3].[O-:2][CH3:5]"
     )
 
     assert result.named_family is None
@@ -114,7 +115,7 @@ def test_unknown_mapped_substitution_receives_generic_pattern_label() -> None:
     assert result.display_label.grammar_id is None
     assert result.display_label.contextual_label is None
     assert result.display_label.structural_label == (
-        "C–Br bond cleavage; C–N bond formation; N–H loss"
+        "C–O bond cleavage; C–N bond formation; N–H loss"
     )
 
 

@@ -246,6 +246,7 @@ def validate_taxonomy() -> List[str]:
     allowed_operators = {
         "join_two_anchors",
         "replace_handle_with_center",
+        "replace_handle_with_alkene_endpoint",
         "replace_carbonyl_oxygen_with_amine",
     }
     known_roles: Dict[str, set[str]] = {site_type: set() for site_type in required}
@@ -288,6 +289,7 @@ def validate_taxonomy() -> List[str]:
         "nitrogen_substitution",
         "heteroatom_substitution",
         "terminal_alkyne",
+        "heck_alkene",
         "chan_lam",
         "reductive_amination",
         "amide",

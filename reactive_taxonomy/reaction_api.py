@@ -11,7 +11,7 @@ from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_candidates import enumerate_reaction_candidates
 from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_display_labels import build_reaction_display_label
-from .reaction_edits import normalize_reaction_edits
+from .reaction_edits import normalize_mapped_edits, normalize_reaction_edits
 from .reaction_labels import render_reactant_label, render_reaction_label
 from .reaction_environments import build_reaction_family_environment
 from .reaction_models import ReactionAnalysis, ReactionCandidate
@@ -64,6 +64,8 @@ def featurize_reaction(
     observed_products.discard(None)
     raw = enumerate_reaction_candidates(parsed.reactants)
     warnings = list(parsed.warnings)
+    supplied_mapping = normalize_mapped_edits(parsed.reactants, parsed.products)
+    invalid_supplied_mapping = supplied_mapping.evidence == "invalid_atom_mapping"
     if len(raw) > max_candidates:
         raw = raw[:max_candidates]
         warnings.append("CANDIDATE_LIMIT_REACHED")
@@ -95,7 +97,9 @@ def featurize_reaction(
             exact.append(candidate)
     selected = None
     evidence = "reactant_grammar_only" if candidates else "unresolved"
-    if len(exact) == 1:
+    if invalid_supplied_mapping:
+        evidence = "unresolved"
+    elif len(exact) == 1:
         selected, evidence = exact[0], "exact_product_reconstruction"
     elif len(exact) > 1:
         signatures = {

@@ -511,6 +511,14 @@ def normalize_reaction_edits(
     mapped = normalize_mapped_edits(reactants, products)
     predicted = normalize_predicted_edits(selected, reactants)
     warnings = tuple(sorted(set(mapped.warnings + predicted.warnings)))
+    if mapped.evidence == "invalid_atom_mapping":
+        return EditNormalizationResult(
+            (),
+            "unresolved",
+            0.0,
+            warnings,
+            False,
+        )
     if mapped.valid and predicted.valid:
         mapped_keys = {_comparison_key(edit) for edit in mapped.edits}
         predicted_keys = {_comparison_key(edit) for edit in predicted.edits}
