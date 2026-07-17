@@ -286,14 +286,23 @@ def _batch_summary(records: Sequence[dict[str, Any]], mode: str) -> dict[str, An
     return summary
 
 
-def _molecule_csv_columns(source_fields: Sequence[str]) -> list[str]:
-    columns = ["source_row", *[field for field in source_fields if field != "source_row"]]
+def _molecule_csv_columns(
+    source_fields: Sequence[str],
+    smiles_column: str,
+) -> list[str]:
+    columns = ["source_row"]
+    for field in source_fields:
+        if field == "source_row":
+            continue
+        columns.append(field)
+        if field == smiles_column:
+            columns.extend(("reactive_site_labels", "functional_group_labels"))
     columns.extend(["valid", "canonical_smiles", "component_count", "reactive_site_count"])
     for site_type in _MOLECULE_SITE_TYPES:
         columns.extend((f"{site_type}_count", f"{site_type}_labels"))
     columns.extend((
-        "reactive_site_labels", "canonical_signatures", "functional_group_count",
-        "functional_group_ids", "functional_group_labels", "warnings", "error",
+        "canonical_signatures", "functional_group_count", "functional_group_ids",
+        "warnings", "error",
     ))
     return columns
 
@@ -355,8 +364,13 @@ def _write_batch_csv(
     output_path: Path,
     mode: str,
     source_fields: Sequence[str],
+    input_column: str,
 ) -> None:
-    columns = _molecule_csv_columns(source_fields) if mode == "molecule" else _reaction_csv_columns(source_fields)
+    columns = (
+        _molecule_csv_columns(source_fields, input_column)
+        if mode == "molecule"
+        else _reaction_csv_columns(source_fields)
+    )
     row_builder = _molecule_csv_row if mode == "molecule" else _reaction_csv_row
     with output_path.open("w", encoding="utf-8-sig", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=columns)
@@ -400,7 +414,7 @@ def _command_batch(args: argparse.Namespace) -> int:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_format = args.output_format or ("csv" if output_path.suffix.lower() == ".csv" else "jsonl")
         if output_format == "csv":
-            _write_batch_csv(records, output_path, args.mode, fieldnames)
+            _write_batch_csv(records, output_path, args.mode, fieldnames, column)
         else:
             with output_path.open("w", encoding="utf-8", newline="") as handle:
                 for record in records:

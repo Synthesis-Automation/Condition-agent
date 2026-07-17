@@ -1,259 +1,490 @@
-name,smiles,role,reaction_types,notes
-Bromobenzene,Brc1ccccc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Ullmann; Sonogashira; Heck; Stille; Negishi; Kumada,Standard aryl bromide for all cross-coupling reactions
-Chlorobenzene,Clc1ccccc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Ullmann; Sonogashira; Heck,Less reactive; requires activated catalyst systems
-Iodobenzene,Ic1ccccc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira; Heck; Stille; Negishi; Kumada,Most reactive aryl halide
-Fluorobenzene,Fc1ccccc1,electrophile,SNAr,Requires strong nucleophiles for SNAr; not for standard cross-coupling
-4-Bromobenzonitrile,Brc1ccc(C#N)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Electron-poor aryl bromide; more reactive
-4-Bromoanisole,Brc1ccc(OC)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira; Heck,Electron-rich aryl bromide; standard substrate
-4-Bromonitrobenzene,Brc1ccc([N+](=O)[O-])cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; SNAr,Highly electron-poor nitro substrate; very reactive in SNAr
-4-Bromobenzotrifluoride,Brc1ccc(C(F)(F)F)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Electron-poor CF3 substituent
-"1,3,5-Tribromobenzene",Brc1cc(Br)cc(Br)c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Polyhalogenated substrate with three coupling sites; sp2_halide_site_count = 3
-"1,4-Dichlorobenzene",Clc1ccc(Cl)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Di-functionalization substrate
-2-Bromotoluene,Brc1ccccc1C,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Ortho-substituted; sterically hindered
-"3,5-Dimethylbromobenzene",Brc1cc(C)cc(C)c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Meta-substituted; moderate sterics
-Pentamethylbromobenzene,Brc1c(C)c(C)c(C)c(C)c1C,electrophile,Suzuki-Miyaura,Extremely sterically hindered; all aryl positions substituted; may require bulky ligands
-2-Bromonaphthalene,Brc1ccc2ccccc2c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Fused bicyclic aromatic system
-2-Chloronaphthalene,Clc1ccc2ccccc2c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Activated chloride on naphthalene
-1-Bromonaphthalene,Brc1cccc2c1cccc2,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Peri-position naphthyl bromide
-4-Bromopyridine,Brc1ccncc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira; Stille; Negishi,Heteroaryl halide; pyridine can poison some catalysts
-3-Bromopyridine,Brc1cccnc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Meta-bromo pyridine
-2-Bromopyridine,Brc1ccccn1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Ortho-bromo pyridine; strong chelation
-4-Chloropyridine,Clc1ccncc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Activated heterocyclic chloride
-5-Bromopyrimidine,Brc1cnccn1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Diazine substrate
-2-Bromothiophene,Brc1cccs1,electrophile,Suzuki-Miyaura; Sonogashira; Stille,Five-membered heterocycle
-2-Bromofuran,Brc1ccco1,electrophile,Suzuki-Miyaura; Sonogashira,Oxygen heterocycle
-3-Bromopyrrole,Brc1cc[nH]c1,electrophile,Suzuki-Miyaura,NH heterocycle; acidic proton
-5-Bromoindole,Brc1ccc2[nH]ccc2c1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Indole scaffold; NH can coordinate
-2-Bromobenzothiazole,Brc1nc2ccccc2s1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Fused bicyclic heterocycle
-2-Iodobenzoxazole,Ic1nc2ccccc2o1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Oxygen-containing fused heterocycle
-3-Bromoquinoline,Brc1ccnc2ccccc12,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Quinoline scaffold
-3-Bromoquinoxaline,Brc1cnc2ccccc2n1,electrophile,Suzuki-Miyaura,Diaza-naphthalene
-"2,5-Dichloropyridine",Clc1ccc(Cl)nc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Polyhalogenated heteroaryl with two sites and possible selective coupling
-Phenyl triflate,c1ccc(OS(=O)(=O)C(F)(F)F)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira; Heck,Excellent leaving group; very reactive
-4-Methoxyphenyl triflate,COc1ccc(OS(=O)(=O)C(F)(F)F)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Electron-rich triflate
-Phenyl tosylate,c1ccc(OS(=O)(=O)c2ccc(C)cc2)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Good leaving group; cheaper than triflate
-Phenyl mesylate,c1ccc(OS(=O)(=O)C)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Mesylate leaving group
-4-Cyanophenyl triflate,N#Cc1ccc(OS(=O)(=O)C(F)(F)F)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Electron-poor triflate; highly reactive
-Vinyl bromide,C=CBr,electrophile,Suzuki-Miyaura; Sonogashira; Heck; Stille; Negishi; Kumada,Simple vinyl halide
-Vinyl chloride,C=CCl,electrophile,Suzuki-Miyaura; Heck,Less reactive vinyl halide
-Vinyl iodide,C=CI,electrophile,Suzuki-Miyaura; Sonogashira; Heck; Stille,Most reactive vinyl halide
-(E)-1-Bromopropene,C/C=C/Br,electrophile,Suzuki-Miyaura; Sonogashira; Heck,Stereodefined vinyl bromide
-2-Bromopropene,C=C(Br)C,electrophile,Suzuki-Miyaura; Sonogashira,Geminal disubstituted vinyl bromide
-α-Bromostyrene,BrC(=C)c1ccccc1,electrophile,Suzuki-Miyaura; Sonogashira,Aryl-substituted vinyl bromide
-Ethyl bromide,CCBr,electrophile,Suzuki-Miyaura; Negishi; Kumada; SN2,Simple primary alkyl bromide; β-hydride elimination risk
-Ethyl chloride,CCCl,electrophile,Negishi; Kumada; SN2,Primary alkyl chloride
-Ethyl iodide,CCI,electrophile,Suzuki-Miyaura; Negishi; Kumada; SN2,Most reactive primary alkyl halide
-Isopropyl bromide,CC(C)Br,electrophile,Negishi; Kumada,Secondary alkyl bromide; high β-hydride risk
-tert-Butyl bromide,CC(C)(C)Br,electrophile,SN1,Tertiary alkyl bromide; no β-hydride; SN1 mechanism
-Benzyl bromide,BrCc1ccccc1,electrophile,Suzuki-Miyaura; SN2; Negishi,Benzylic position; activated sp3 halide
-2-Phenylethyl bromide,C(Br)Cc1ccccc1,electrophile,SN2; Negishi; Kumada,Primary alkyl bromide with aryl substituent
-4-Bromo-1-butene,C=CCCBr,electrophile,SN2; Negishi,Homoallylic bromide
-3-Bromo-2-methylpropene (allylic),C=C(C)CBr,electrophile,SN2; Allylic-substitution,Allylic bromide; can undergo allylic substitution
-Neopentyl bromide,CC(C)(C)CBr,electrophile,Suzuki-Miyaura; Negishi,No β-hydrogens; minimal elimination risk
-Phenylboronic acid,c1ccc(B(O)O)cc1,nucleophile,Suzuki-Miyaura,Standard boronic acid coupling partner
-4-Methoxyphenylboronic acid,COc1ccc(B(O)O)cc1,nucleophile,Suzuki-Miyaura,Electron-rich boronic acid
-4-Cyanophenylboronic acid,N#Cc1ccc(B(O)O)cc1,nucleophile,Suzuki-Miyaura,Electron-poor boronic acid
-Phenylboronic acid pinacol ester,c1ccc(B2OC(C)(C)C(C)(C)O2)cc1,nucleophile,Suzuki-Miyaura,Protected boronic acid; more stable
-Potassium phenyltrifluoroborate,c1ccc([B-](F)(F)F)cc1.[K+],nucleophile,Suzuki-Miyaura,BF3K salt; air-stable boronate
-Vinylboronic acid,C=CB(O)O,nucleophile,Suzuki-Miyaura,Vinyl boronic acid
-(E)-Propenylboronic acid,C/C=C/B(O)O,nucleophile,Suzuki-Miyaura,Stereodefined vinyl boronic acid
-Ethylboronic acid,CCB(O)O,nucleophile,Suzuki-Miyaura,Alkyl boronic acid; prone to β-hydride issues
-Pyridine-4-boronic acid,c1ccncc1B(O)O,nucleophile,Suzuki-Miyaura,Heteroaryl boronic acid; pyridine coordination risk
-Furan-2-boronic acid,c1coc(B(O)O)c1,nucleophile,Suzuki-Miyaura,Five-membered heterocyclic boronic acid
-Thiophene-2-boronic acid,c1csc(B(O)O)c1,nucleophile,Suzuki-Miyaura,Thiophene boronic acid; sulfur can coordinate
-Aniline,c1ccc(N)cc1,nucleophile,Buchwald-Hartwig; Ullmann; SNAr,Aromatic primary amine; standard C-N coupling partner
-Ethylamine,CCN,nucleophile,Buchwald-Hartwig; Ullmann; SNAr,Primary aliphatic amine
-Isopropylamine,CC(C)N,nucleophile,Buchwald-Hartwig; Ullmann,Branched primary amine; α-branching
-tert-Butylamine,CC(C)(C)N,nucleophile,Buchwald-Hartwig,Highly hindered primary amine and challenging coupling substrate
-N-Methylethylamine,CCNC,nucleophile,Buchwald-Hartwig; Ullmann,Secondary aliphatic amine
-N-Methylaniline,c1ccc(NC)cc1,nucleophile,Buchwald-Hartwig; Ullmann,Secondary aromatic amine
-"N,N-Dimethylaniline",c1ccc(N(C)C)cc1,nucleophile,,Tertiary amine; not reactive in C-N coupling
-4-Methoxyaniline,COc1ccc(N)cc1,nucleophile,Buchwald-Hartwig; Ullmann,Electron-rich aniline
-4-Aminobenzonitrile,N#Cc1ccc(N)cc1,nucleophile,Buchwald-Hartwig; Ullmann,Electron-poor aniline; less nucleophilic
-4-Aminopyridine,Nc1ccncc1,nucleophile,Buchwald-Hartwig,Heteroaryl amine; pyridine coordination
-Indole,c1ccc2[nH]ccc2c1,nucleophile,Buchwald-Hartwig; C-H activation,NH heterocycle; can act as nucleophile
-3-Aminopyrrole,c1c[nH]c(N)c1,nucleophile,Buchwald-Hartwig,Heteroaryl amine with NH
-2-Methylaniline,Nc1ccccc1C,nucleophile,Buchwald-Hartwig; Ullmann,Ortho-substituted aniline; sterically hindered
-"3,5-Dimethylaniline",Nc1cc(C)cc(C)c1,nucleophile,Buchwald-Hartwig,Meta-substituted aniline
-Benzylamine,NCc1ccccc1,nucleophile,Buchwald-Hartwig; Ullmann,Benzylic amine; aliphatic but stabilized
-Phenol,c1ccc(O)cc1,nucleophile,Ullmann; SNAr; Mitsunobu,Aromatic alcohol; C-O coupling partner
-Ethanol,CCO,nucleophile,Ullmann; Mitsunobu,Simple aliphatic alcohol
-Isopropanol,CC(C)O,nucleophile,Ullmann; Mitsunobu,Secondary alcohol
-tert-Butanol,CC(C)(C)O,nucleophile,Ullmann,Tertiary alcohol; sterically hindered
-4-Methoxyphenol,COc1ccc(O)cc1,nucleophile,Ullmann; SNAr,Electron-rich phenol
-4-Hydroxybenzonitrile,N#Cc1ccc(O)cc1,nucleophile,Ullmann; SNAr,Electron-poor phenol; more acidic
-Benzyl alcohol,OCc1ccccc1,nucleophile,Ullmann; Mitsunobu,Benzylic alcohol
-4-Hydroxypyridine,Oc1ccncc1,nucleophile,Ullmann,Heteroaryl phenol
-Thiophenol,c1ccc(S)cc1,nucleophile,Ullmann; SNAr,Aromatic thiol; strong nucleophile; catalyst poison risk
-Ethanethiol,CCS,nucleophile,Ullmann; SNAr,Aliphatic thiol; catalyst poison
-2-Propanethiol,CC(C)S,nucleophile,Ullmann,Secondary thiol
-Thioanisole,CSc1ccccc1,none,,Sulfide; not nucleophilic but can poison catalysts
-Acetylene,C#C,nucleophile,Sonogashira,Simplest terminal alkyne
-Phenylacetylene,C#Cc1ccccc1,nucleophile,Sonogashira,Aryl-substituted terminal alkyne
-"3,3-Dimethylbut-1-yne",C#CC(C)(C)C,nucleophile,Sonogashira,Sterically hindered terminal alkyne
-Trimethylsilylacetylene,C#C[Si](C)(C)C,nucleophile,Sonogashira,TMS-protected alkyne; deprotectable
-Methyl propargyl ether,C#CCOC,nucleophile,Sonogashira,Ether-substituted alkyne
-4-Ethynylpyridine,C#Cc1ccncc1,nucleophile,Sonogashira,Heteroaryl terminal alkyne
-Phenylmagnesium bromide,[Mg]Brc1ccccc1,nucleophile,Kumada,Grignard reagent for Kumada coupling
-Ethylmagnesium bromide,CC[Mg]Br,nucleophile,Kumada,Alkyl Grignard
-Phenylzinc chloride,Cl[Zn]c1ccccc1,nucleophile,Negishi,Organozinc for Negishi coupling
-Ethylzinc bromide,CC[Zn]Br,nucleophile,Negishi,Alkylzinc reagent
-Phenyltrimethylstannane,c1ccc([Sn](C)(C)C)cc1,nucleophile,Stille,Organotin for Stille coupling
-Vinyltrimethylstannane,C=C[Sn](C)(C)C,nucleophile,Stille,Vinyl stannane
-4-Bromophenylboronic acid,Brc1ccc(B(O)O)cc1,bifunctional,Suzuki-Miyaura,Can act as both electrophile and nucleophile; selective coupling
-4-Bromoaniline,Brc1ccc(N)cc1,bifunctional,Buchwald-Hartwig; Suzuki-Miyaura,Both electrophile (Br) and nucleophile (NH2); orthogonal protection needed
-4-Bromophenol,Brc1ccc(O)cc1,bifunctional,Ullmann; Suzuki-Miyaura,Both electrophile (Br) and nucleophile (OH)
-4-Bromophenylacetylene,Brc1ccc(C#C)cc1,bifunctional,Sonogashira; Suzuki-Miyaura,Both electrophile (Br) and nucleophile (alkyne)
-"1,4-Dibromobenzene",Brc1ccc(Br)cc1,di-electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Two identical electrophilic sites; sp2_halide_site_count = 2
-"1,4-Phenylenediamine",Nc1ccc(N)cc1,di-nucleophile,Buchwald-Hartwig; Ullmann,Two identical nucleophilic sites
-4-Bromo-N-Boc-aniline,Brc1ccc(NC(=O)OC(C)(C)C)cc1,electrophile,Suzuki-Miyaura; Sonogashira,Boc-protected amine; prevents C-N coupling
-4-Bromo-TBS-phenol,Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1,electrophile,Suzuki-Miyaura; Sonogashira,TBS-protected phenol
-Methyl 4-bromobenzoate,Brc1ccc(C(=O)OC)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Ester-protected carboxylic acid
-4-Bromobenzaldehyde,Brc1ccc(C=O)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig; Sonogashira,Aldehyde functional group; can be reduced/oxidized
-4-Bromo-tert-butylbenzene,Brc1ccc(C(C)(C)C)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Para-tert-butyl substituent
-4-tert-Butylaniline,CC(C)(C)c1ccc(N)cc1,nucleophile,Buchwald-Hartwig; Ullmann,Sterically hindered aniline
-"4-Bromo-N,N-dimethylaniline",Brc1ccc(N(C)C)cc1,electrophile,Suzuki-Miyaura; Sonogashira,Highly electron-rich aryl bromide with a strong dialkylamino donor
-"1-Bromo-2,3,4,5-tetramethoxybenzene",COc1cc(OC)c(Br)c(OC)c1OC,electrophile,Suzuki-Miyaura,Extremely electron-rich; multiple methoxy groups
-Pentafluorobromobenzene,Fc1c(F)c(F)c(Br)c(F)c1F,electrophile,Suzuki-Miyaura; SNAr,Extremely electron-poor polyhalogenated substrate; halogen_count = 6
-"2,6-Dichloro-iodobenzene",Ic1c(Cl)cccc1Cl,electrophile,Suzuki-Miyaura,Mixed halides with ortho substitution; halogen_count=3
-2-tert-Butylbromobenzene,Brc1ccccc1C(C)(C)C,electrophile,Suzuki-Miyaura,Sterically hindered ortho-tert-butyl
-"3,5-Diisopropylchlorobenzene",Clc1cc(C(C)C)ccc1C(C)C,electrophile,Suzuki-Miyaura,Multiple isopropyl substituents
-"2,6-Dimethoxyiodobenzene",Ic1c(OC)cccc1OC,electrophile,Suzuki-Miyaura,Ortho-disubstituted with electron-donating groups
-4-Iodo-N-Boc-aniline,Ic1ccc(NC(=O)OC(C)(C)C)cc1,electrophile,Suzuki-Miyaura,BOC-protected aniline
-4-Bromo-N-Cbz-aniline,Brc1ccc(NC(=O)OCc2ccccc2)cc1,electrophile,Suzuki-Miyaura,CBZ-protected aniline
-4-Chloro-N-Fmoc-aniline,Clc1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1,electrophile,Suzuki-Miyaura,FMOC-protected aniline with fluorenyl group
-4-Iodo-TIPS-phenol,Ic1ccc(O[Si](C(C)C)(C(C)C)C(C)C)cc1,electrophile,Suzuki-Miyaura,TIPS-protected phenol
-4-Chlorobenzonitrile,Clc1ccc(C#N)cc1,electrophile,Suzuki-Miyaura; Buchwald-Hartwig,Strong electron-withdrawing nitrile group
-4-Iodoanisole,Ic1ccc(OC)cc1,electrophile,Suzuki-Miyaura,Strong electron-donating methoxy group
-2-Bromophenyl diphenylphosphine,Brc1ccccc1P(c2ccccc2)c2ccccc2,bifunctional,Suzuki-Miyaura,Ortho-phosphine for ligand synthesis; note: not itself a bidentate chelator
-Phenylalanine,NC(Cc1ccccc1)C(=O)O,nucleophile,Peptide coupling,Amino acid with bidentate chelating ability; chiral_center_count=1
-Triphenylphosphine,c1ccc(P(c2ccccc2)c2ccccc2)cc1,ligand,Various cross-couplings,Common phosphine ligand
-"1,8-Bis(dimethylphosphino)naphthalene",c1ccc2c(c1)c(P(C)C)ccc2P(C)C,ligand,Various cross-couplings,Bidentate phosphine ligand (note: current SMARTS doesn't capture P-P bidentate pattern)
-Ethane,CC,reference,,MW=30; low molecular weight test
-Anthracene,c1ccc2cc3ccccc3cc2c1,reference,,MW=178; medium molecular weight; fused rings
-Coronene,c1ccc2cc3ccc4ccc5ccc6ccc1c7c2c3c4c5c67,reference,,MW=300; large polycyclic aromatic (note: not high_molecular_weight which requires MW>500)
-9-Chloroanthracene,Clc1ccc2c3ccccc3ccc2c1,electrophile,Suzuki-Miyaura,Tricyclic fused aromatic system
-Spiro[5.5]undecane,C1CCC2(CC1)CCCC2,reference,,Spirocyclic aliphatic system
-"6-Bromo-spiro[chroman-2,1'-cyclohexane]",Brc1ccc2c(c1)C1(CCCC1)CCCC2,electrophile,Suzuki-Miyaura,Spirocyclic with aryl bromide
-(S)-Alanine,C[C@H](N)C(=O)O,nucleophile,Peptide coupling,Chiral amino acid; chiral_center_count=1
-"(2R,3R)-Butane-2,3-diol",C[C@H](O)[C@H](C)O,reference,,Two chiral centers; chiral_center_count=2
-"(1R,3R,5S)-1,3,5-Trimethylcyclohexane",C[C@H]1CC[C@@H](C)C[C@H]1C,reference,,Three chiral centers; chiral_center_count=3
-(R)-Bromochlorofluoromethane,Br[C@H](Cl)F,reference,,Chiral halomethane; chiral_center_count=1; halogen_count=3
-"2,4,5,6-Tetrachlorobromobenzene",Clc1cc(Cl)c(Br)c(Cl)c1,electrophile,Suzuki-Miyaura,Highly polyhalogenated; halogen_count=5
-4-Bromo-N-benzoylaniline,Brc1ccc(NC(=O)c2ccccc2)cc1,electrophile,Suzuki-Miyaura,Amide-protected aniline derivative
-"(1S,2R,5S)-1,2,5-Trimethylcyclohexane",C[C@@H]1CCC[C@@H](C)[C@@H]1C,reference,,Multiple stereogenic centers; chiral_center_count=3
-Acetic acid,CC(=O)O,electrophile,Amide formation; Esterification,Simple aliphatic carboxylic acid
-Benzoic acid,O=C(O)c1ccccc1,electrophile,Amide formation; Esterification,Aromatic carboxylic acid
-Picolinic acid,O=C(O)c1ccccn1,electrophile,Amide formation; Esterification,Heteroaromatic carboxylic acid with coordinating nitrogen
-Acrylic acid,C=CC(=O)O,electrophile,Amide formation; Esterification,Unsaturated carboxylic acid
-Cyclohexanecarboxylic acid,O=C(O)C1CCCCC1,electrophile,Amide formation; Esterification,Cycloalkyl carboxylic acid
-Oxalic acid,O=C(O)C(=O)O,di-electrophile,Amide formation; Esterification,Dicarboxylic acid with two acyl centers
-Succinic acid,O=C(O)CCC(=O)O,di-electrophile,Amide formation; Esterification,Aliphatic dicarboxylic acid
-Acetyl chloride,CC(=O)Cl,electrophile,Acylation; Amide formation; Ester formation,Simple aliphatic acyl chloride
-Benzoyl chloride,O=C(Cl)c1ccccc1,electrophile,Acylation; Amide formation; Ester formation,Aromatic acyl chloride
-Nicotinoyl chloride,O=C(Cl)c1cccnc1,electrophile,Acylation; Amide formation,Heteroaromatic acyl chloride
-Acetyl bromide,CC(=O)Br,electrophile,Acylation; Amide formation,Acyl bromide example
-Acetyl fluoride,CC(=O)F,electrophile,Acylation; Amide formation,Acyl fluoride example
-Methyl chloroformate,COC(=O)Cl,electrophile,Carbamoylation; Acylation,Carbonochloridate electrophile
-Methanesulfonyl chloride,CS(=O)(=O)Cl,electrophile,Sulfonamide formation; Mesylation,Alkyl sulfonyl chloride
-Benzenesulfonyl chloride,O=S(=O)(Cl)c1ccccc1,electrophile,Sulfonamide formation; Sulfonylation,Aryl sulfonyl chloride
-4-Toluenesulfonyl chloride,Cc1ccc(S(=O)(=O)Cl)cc1,electrophile,Sulfonamide formation; Tosylation,Tosyl chloride
-2-Pyridinesulfonyl chloride,O=S(=O)(Cl)c1ccccn1,electrophile,Sulfonamide formation,Heteroaryl sulfonyl chloride
-Methanesulfonyl fluoride,CS(=O)(=O)F,electrophile,Sulfonylation; SuFEx,Sulfonyl fluoride example
-Methylamine,CN,nucleophile,C-N coupling; Amide formation,Primary alkylamine
-Diethylamine,CCNCC,nucleophile,C-N coupling; Amide formation,Secondary dialkylamine
-Pyrrolidine,C1CCNC1,nucleophile,C-N coupling; Amide formation,Five-membered cyclic secondary amine
-Piperidine,C1CCNCC1,nucleophile,C-N coupling; Amide formation,Six-membered cyclic secondary amine
-Morpholine,O1CCNCC1,nucleophile,C-N coupling; Amide formation,Heterocyclic secondary amine containing oxygen
-Diphenylamine,c1ccc(Nc2ccccc2)cc1,nucleophile,C-N coupling,Secondary diarylamine
-2-Aminopyridine,Nc1ccccn1,nucleophile,C-N coupling; Amide formation,Aminated heteroarene
-Ammonia,N,nucleophile,C-N coupling; Amide formation,Unsubstituted nitrogen nucleophile
-Acetamide,CC(=O)N,nucleophile,C-N coupling,Primary amide
-N-Methylacetamide,CC(=O)NC,nucleophile,C-N coupling,Secondary amide
-Benzamide,NC(=O)c1ccccc1,nucleophile,C-N coupling,Primary aromatic amide
-2-Pyrrolidone,O=C1CCCN1,nucleophile,C-N coupling,Cyclic secondary amide lactam
-Urea,NC(=O)N,di-nucleophile,C-N coupling; Condensation,Urea with two N-H sites
-Methylurea,CNC(=O)N,di-nucleophile,C-N coupling,Unsymmetrical substituted urea
-Methyl carbamate,COC(=O)N,nucleophile,C-N coupling,Primary carbamate
-Methanesulfonamide,CS(=O)(=O)N,nucleophile,C-N coupling,Primary sulfonamide
-N-Methylmethanesulfonamide,CS(=O)(=O)NC,nucleophile,C-N coupling,Secondary sulfonamide
-Benzenesulfonamide,NS(=O)(=O)c1ccccc1,nucleophile,C-N coupling,Aryl sulfonamide
-Hydrazine,NN,di-nucleophile,C-N coupling; Acylation,Unsubstituted hydrazine with two reactive nitrogen sites
-Methylhydrazine,CNN,di-nucleophile,C-N coupling; Acylation,Unsymmetrical alkyl hydrazine
-"1,2-Dimethylhydrazine",CNNC,di-nucleophile,C-N coupling; Acylation,Symmetrically substituted hydrazine
-Phenylhydrazine,NNc1ccccc1,di-nucleophile,C-N coupling; Acylation,Aryl hydrazine
-Acetohydrazide,CC(=O)NN,di-nucleophile,Acylation; Condensation,Aliphatic acyl hydrazide
-Benzohydrazide,NNC(=O)c1ccccc1,di-nucleophile,Acylation; Condensation,Aromatic acyl hydrazide
-Ethylene glycol,OCCO,di-nucleophile,C-O coupling; Esterification,Diol with two O-H sites
-Catechol,Oc1ccccc1O,di-nucleophile,C-O coupling; Esterification,Ortho aromatic diol
-"1,2-Ethanedithiol",SCCS,di-nucleophile,C-S coupling,Dithiol with two S-H sites
-Ethyl mesylate,CCOS(=O)(=O)C,electrophile,Alkyl nucleophilic substitution,Alkyl mesylate leaving group
-Methyl tosylate,COS(=O)(=O)c1ccc(C)cc1,electrophile,Alkyl nucleophilic substitution,Alkyl tosylate leaving group
-Formaldehyde,C=O,electrophile,Carbonyl addition; Reductive amination; Acetal formation,Simplest aldehyde with two carbonyl hydrogens
-Acetaldehyde,CC=O,electrophile,Carbonyl addition; Reductive amination; Acetal formation,Simple aliphatic aldehyde
-Benzaldehyde,O=Cc1ccccc1,electrophile,Carbonyl addition; Reductive amination; Wittig olefination,Aromatic aldehyde and standard carbonyl substrate
-Cyclohexanecarbaldehyde,O=CC1CCCCC1,electrophile,Carbonyl addition; Reductive amination,Aliphatic aldehyde attached to a ring
-Furfural,O=Cc1ccco1,electrophile,Carbonyl addition; Reductive amination,Heteroaryl aldehyde with an electron-rich furan
-Glyoxal,O=CC=O,di-electrophile,Carbonyl addition; Condensation; Heterocycle formation,Dialdehyde with two carbonyl addition sites
-Cinnamaldehyde,O=C/C=C/c1ccccc1,bifunctional,Carbonyl addition; Michael addition; Reductive amination,Conjugated aldehyde containing both C=O and C=C handles
-Acetone,CC(=O)C,electrophile,Carbonyl addition; Reductive amination; Ketal formation,Simple symmetrical ketone
-2-Butanone,CCC(=O)C,electrophile,Carbonyl addition; Reductive amination,Unsymmetrical aliphatic ketone
-Cyclohexanone,O=C1CCCCC1,electrophile,Carbonyl addition; Reductive amination; Oxime formation,Cyclic ketone widely used in synthesis
-Acetophenone,CC(=O)c1ccccc1,electrophile,Carbonyl addition; Reductive amination; Enolate chemistry,Aryl alkyl ketone
-Benzophenone,O=C(c1ccccc1)c1ccccc1,electrophile,Carbonyl addition; Photochemistry,Sterically hindered diaryl ketone
-Methyl vinyl ketone,C=CC(=O)C,bifunctional,Michael addition; Carbonyl addition; Robinson annulation,Activated alkene conjugated to a ketone
-Ethyl pyruvate,CCOC(=O)C(=O)C,electrophile,Carbonyl addition; Reductive amination; Enolate chemistry,Alpha-keto ester with differentiated carbonyl groups
-Ethylene,C=C,pi_partner,Hydrogenation; Hydroboration; Epoxidation; Dihydroxylation,Simplest alkene bond site
-Propene,CC=C,pi_partner,Hydrogenation; Hydroboration; Wacker oxidation,Monosubstituted terminal alkene
-1-Hexene,C=CCCCC,pi_partner,Hydrogenation; Hydroboration; Olefin metathesis,Unactivated terminal alkene
-Cyclohexene,C1=CCCCC1,pi_partner,Hydrogenation; Epoxidation; Dihydroxylation,Cyclic disubstituted alkene
-Styrene,C=Cc1ccccc1,pi_partner,Hydrogenation; Epoxidation; Hydroformylation,Benzylic alkene with conjugation to an arene
-alpha-Methylstyrene,C=C(C)c1ccccc1,pi_partner,Hydrogenation; Epoxidation; Hydrofunctionalization,Branched geminally substituted alkene
-(E)-Stilbene,c1ccc(/C=C/c2ccccc2)cc1,pi_partner,Hydrogenation; Epoxidation; Photochemistry,Internal diaryl alkene with defined geometry
-Norbornene,C1=CC2CCC1C2,pi_partner,Olefin metathesis; Hydrogenation; Cycloaddition,Strained bicyclic alkene
-Methyl acrylate,COC(=O)C=C,bifunctional,Michael addition; Polymerization; Hydrogenation,Electron-poor alkene conjugated to an ester
-Acrylonitrile,C=CC#N,bifunctional,Michael addition; Polymerization; Hydrogenation,Electron-poor alkene bearing a nitrile
-N-Phenylmaleimide,O=C1C=CC(=O)N1c1ccccc1,pi_partner,Diels-Alder; Michael addition,Electron-poor cyclic alkene with two imide carbonyls
-"1,3-Butadiene",C=CC=C,pi_partner,Diels-Alder; Polymerization; Hydrofunctionalization,Conjugated diene with two alkene sites
-Isoprene,C=C(C)C=C,pi_partner,Diels-Alder; Polymerization; Hydrofunctionalization,Unsymmetrical substituted conjugated diene
-Allyl alcohol,C=CCO,bifunctional,Olefin metathesis; Epoxidation; Oxidation,Contains an alkene and a primary alcohol
-2-Butyne,CC#CC,pi_partner,Hydrogenation; Hydrofunctionalization; Cycloaddition,Simple symmetrical internal alkyne
-Diphenylacetylene,c1ccc(C#Cc2ccccc2)cc1,pi_partner,Hydrogenation; Cycloaddition; Hydrofunctionalization,Internal diaryl alkyne
-1-Phenyl-1-propyne,CC#Cc1ccccc1,pi_partner,Hydrogenation; Hydrofunctionalization,Unsymmetrical internal aryl alkyne
-Dimethyl acetylenedicarboxylate,COC(=O)C#CC(=O)OC,pi_partner,Cycloaddition; Michael addition; Hydrogenation,Strongly electron-poor internal alkyne
-Propargyl alcohol,C#CCO,bifunctional,Sonogashira; Click chemistry; Oxidation,Terminal alkyne combined with a primary alcohol
-Ethyl acetate,CCOC(=O)C,electrophile,Hydrolysis; Claisen condensation; Reduction,Simple ester carbonyl
-Methyl benzoate,COC(=O)c1ccccc1,electrophile,Hydrolysis; Nucleophilic acyl substitution; Reduction,Aromatic ester carbonyl
-gamma-Butyrolactone,O=C1OCCC1,electrophile,Ring opening; Reduction; Hydrolysis,Cyclic ester and common polar scaffold
-Acetic anhydride,CC(=O)OC(=O)C,di-electrophile,Acylation; Amide formation; Ester formation,Symmetrical acid anhydride with two acyl centers
-Di-tert-butyl dicarbonate,CC(C)(C)OC(=O)OC(=O)OC(C)(C)C,di-electrophile,Boc protection; Carbamate formation,Common amine-protection reagent with two carbonyl groups
-"N,N-Dimethylformamide",CN(C)C=O,reference,Amide activation; Vilsmeier-Haack; Solvent,Tertiary formamide and common synthesis solvent
-N-Methyl-2-pyrrolidone,CN1CCCC1=O,reference,Solvent,Cyclic tertiary amide and common polar aprotic solvent
-Diethyl malonate,CCOC(=O)CC(=O)OCC,nucleophile,Alkylation; Knoevenagel condensation; Decarboxylation,Activated methylene between two ester groups
-Ethyl acetoacetate,CCOC(=O)CC(=O)C,bifunctional,Alkylation; Michael addition; Heterocycle formation,Beta-keto ester with ketone and ester carbonyls
-Acetonitrile,CC#N,reference,Alpha functionalization; Solvent,Simple aliphatic nitrile
-Benzonitrile,N#Cc1ccccc1,reference,Nitrile hydration; Reduction; Organometallic addition,Aromatic nitrile
-Malononitrile,N#CCC#N,nucleophile,Knoevenagel condensation; Michael addition,Activated methylene flanked by two nitriles
-Nitrobenzene,[O-][N+](=O)c1ccccc1,reference,Reduction; Nucleophilic aromatic chemistry,Common aromatic nitro compound
-Dimethyl sulfone,CS(=O)(=O)C,reference,Alpha functionalization; Julia-type chemistry,Simple sulfone with acidic alpha hydrogens
-Dimethyl sulfoxide,CS(C)=O,reference,Swern oxidation; Solvent; Oxidation,Common sulfoxide reagent and polar solvent
-Tetrahydrofuran,C1CCOC1,reference,Solvent; Ring opening,Common cyclic ether solvent
-"1,4-Dioxane",O1CCOCC1,reference,Solvent,Common diether solvent and coordinating additive
-Anisole,COc1ccccc1,reference,Friedel-Crafts; Electrophilic aromatic substitution,Electron-rich arene and aromatic ether
-Toluene,Cc1ccccc1,reference,Friedel-Crafts; Electrophilic aromatic substitution; Benzylic oxidation,Simple alkyl arene with aromatic C-H sites
-"1,3-Dimethoxybenzene",COc1cccc(OC)c1,reference,Friedel-Crafts; Electrophilic aromatic substitution,Strongly activated arene with multiple aromatic C-H sites
-Styrene oxide,c1ccccc1C1CO1,electrophile,Epoxide ring opening; Rearrangement,Benzylic epoxide with regioselective ring-opening chemistry
-N-Benzylideneaniline,C(=Nc1ccccc1)c1ccccc1,electrophile,Imine reduction; Nucleophilic addition; Aza reactions,Representative Schiff-base imine
-Acetone oxime,CC(=NO)C,nucleophile,Beckmann rearrangement; Oxime reduction,Representative ketoxime with an N-OH group
-Benzaldehyde hydrazone,NN=Cc1ccccc1,nucleophile,Hydrazone reduction; Wolff-Kishner; Condensation,Representative C=N derivative with a terminal N-H site
-Phenyl azide,[N-]=[N+]=Nc1ccccc1,pi_partner,CuAAC; SPAAC; Staudinger reduction,Organic azide used in click chemistry
-Pyridine,n1ccccc1,reference,C-H functionalization; Coordination; SNAr,Electron-poor heteroarene with five aromatic C-H sites
-Furan,c1ccoc1,pi_partner,Friedel-Crafts; Diels-Alder; C-H functionalization,Electron-rich oxygen heteroarene
-Thiophene,c1ccsc1,pi_partner,Friedel-Crafts; C-H functionalization; Oxidation,Electron-rich sulfur heteroarene
-Imidazole,c1ncc[nH]1,nucleophile,N-alkylation; N-arylation; Acylation,Heteroarene containing pyridine-like and pyrrole-like nitrogens
-Phenyl isocyanate,O=C=Nc1ccccc1,electrophile,Urea formation; Carbamate formation,Common heterocumulene electrophile
-Phenyl isothiocyanate,S=C=Nc1ccccc1,electrophile,Thiourea formation,Common sulfur heterocumulene electrophile
-Dimethyl disulfide,CSSC,electrophile,Disulfide exchange; Thiolation,Representative disulfide linkage
-Azobenzene,c1ccc(N=Nc2ccccc2)cc1,pi_partner,Azo reduction; Photoisomerization,Representative organic azo linkage
-Dimethyl peroxide,COOC,oxidant,Peroxide reduction; Radical initiation,Representative organic peroxide linkage
-Diethyl phosphonoacetate,CCOP(=O)(CC(=O)OCC)OCC,nucleophile,Horner-Wadsworth-Emmons; Alkylation,Phosphonate-stabilized carbon nucleophile for olefination
+﻿name,smiles,notes
+Bromobenzene,Brc1ccccc1,Standard aryl bromide for all cross-coupling reactions
+Chlorobenzene,Clc1ccccc1,Less reactive; requires activated catalyst systems
+Iodobenzene,Ic1ccccc1,Most reactive aryl halide
+Fluorobenzene,Fc1ccccc1,Requires strong nucleophiles for SNAr; not for standard cross-coupling
+4-Bromobenzonitrile,Brc1ccc(C#N)cc1,Electron-poor aryl bromide; more reactive
+4-Bromoanisole,Brc1ccc(OC)cc1,Electron-rich aryl bromide; standard substrate
+4-Bromonitrobenzene,Brc1ccc([N+](=O)[O-])cc1,Highly electron-poor nitro substrate; very reactive in SNAr
+4-Bromobenzotrifluoride,Brc1ccc(C(F)(F)F)cc1,Electron-poor CF3 substituent
+"1,3,5-Tribromobenzene",Brc1cc(Br)cc(Br)c1,Polyhalogenated substrate with three coupling sites; sp2_halide_site_count = 3
+"1,4-Dichlorobenzene",Clc1ccc(Cl)cc1,Di-functionalization substrate
+2-Bromotoluene,Brc1ccccc1C,Ortho-substituted; sterically hindered
+"3,5-Dimethylbromobenzene",Brc1cc(C)cc(C)c1,Meta-substituted; moderate sterics
+Pentamethylbromobenzene,Brc1c(C)c(C)c(C)c(C)c1C,Extremely sterically hindered; all aryl positions substituted; may require bulky ligands
+2-Bromonaphthalene,Brc1ccc2ccccc2c1,Fused bicyclic aromatic system
+2-Chloronaphthalene,Clc1ccc2ccccc2c1,Activated chloride on naphthalene
+1-Bromonaphthalene,Brc1cccc2c1cccc2,Peri-position naphthyl bromide
+4-Bromopyridine,Brc1ccncc1,Heteroaryl halide; pyridine can poison some catalysts
+3-Bromopyridine,Brc1cccnc1,Meta-bromo pyridine
+2-Bromopyridine,Brc1ccccn1,Ortho-bromo pyridine; strong chelation
+4-Chloropyridine,Clc1ccncc1,Activated heterocyclic chloride
+5-Bromopyrimidine,Brc1cnccn1,Diazine substrate
+2-Bromothiophene,Brc1cccs1,Five-membered heterocycle
+2-Bromofuran,Brc1ccco1,Oxygen heterocycle
+3-Bromopyrrole,Brc1cc[nH]c1,NH heterocycle; acidic proton
+5-Bromoindole,Brc1ccc2[nH]ccc2c1,Indole scaffold; NH can coordinate
+2-Bromobenzothiazole,Brc1nc2ccccc2s1,Fused bicyclic heterocycle
+2-Iodobenzoxazole,Ic1nc2ccccc2o1,Oxygen-containing fused heterocycle
+3-Bromoquinoline,Brc1ccnc2ccccc12,Quinoline scaffold
+3-Bromoquinoxaline,Brc1cnc2ccccc2n1,Diaza-naphthalene
+"2,5-Dichloropyridine",Clc1ccc(Cl)nc1,Polyhalogenated heteroaryl with two sites and possible selective coupling
+Phenyl triflate,c1ccc(OS(=O)(=O)C(F)(F)F)cc1,Excellent leaving group; very reactive
+4-Methoxyphenyl triflate,COc1ccc(OS(=O)(=O)C(F)(F)F)cc1,Electron-rich triflate
+Phenyl tosylate,c1ccc(OS(=O)(=O)c2ccc(C)cc2)cc1,Good leaving group; cheaper than triflate
+Phenyl mesylate,c1ccc(OS(=O)(=O)C)cc1,Mesylate leaving group
+4-Cyanophenyl triflate,N#Cc1ccc(OS(=O)(=O)C(F)(F)F)cc1,Electron-poor triflate; highly reactive
+Vinyl bromide,C=CBr,Simple vinyl halide
+Vinyl chloride,C=CCl,Less reactive vinyl halide
+Vinyl iodide,C=CI,Most reactive vinyl halide
+(E)-1-Bromopropene,C/C=C/Br,Stereodefined vinyl bromide
+2-Bromopropene,C=C(Br)C,Geminal disubstituted vinyl bromide
+α-Bromostyrene,BrC(=C)c1ccccc1,Aryl-substituted vinyl bromide
+Ethyl bromide,CCBr,Simple primary alkyl bromide; β-hydride elimination risk
+Ethyl chloride,CCCl,Primary alkyl chloride
+Ethyl iodide,CCI,Most reactive primary alkyl halide
+Isopropyl bromide,CC(C)Br,Secondary alkyl bromide; high β-hydride risk
+tert-Butyl bromide,CC(C)(C)Br,Tertiary alkyl bromide; no β-hydride; SN1 mechanism
+Benzyl bromide,BrCc1ccccc1,Benzylic position; activated sp3 halide
+2-Phenylethyl bromide,C(Br)Cc1ccccc1,Primary alkyl bromide with aryl substituent
+4-Bromo-1-butene,C=CCCBr,Homoallylic bromide
+3-Bromo-2-methylpropene (allylic),C=C(C)CBr,Allylic bromide; can undergo allylic substitution
+Neopentyl bromide,CC(C)(C)CBr,No β-hydrogens; minimal elimination risk
+Phenylboronic acid,c1ccc(B(O)O)cc1,Standard boronic acid coupling partner
+4-Methoxyphenylboronic acid,COc1ccc(B(O)O)cc1,Electron-rich boronic acid
+4-Cyanophenylboronic acid,N#Cc1ccc(B(O)O)cc1,Electron-poor boronic acid
+Phenylboronic acid pinacol ester,c1ccc(B2OC(C)(C)C(C)(C)O2)cc1,Protected boronic acid; more stable
+Potassium phenyltrifluoroborate,c1ccc([B-](F)(F)F)cc1.[K+],BF3K salt; air-stable boronate
+Vinylboronic acid,C=CB(O)O,Vinyl boronic acid
+(E)-Propenylboronic acid,C/C=C/B(O)O,Stereodefined vinyl boronic acid
+Ethylboronic acid,CCB(O)O,Alkyl boronic acid; prone to β-hydride issues
+Pyridine-4-boronic acid,c1ccncc1B(O)O,Heteroaryl boronic acid; pyridine coordination risk
+Furan-2-boronic acid,c1coc(B(O)O)c1,Five-membered heterocyclic boronic acid
+Thiophene-2-boronic acid,c1csc(B(O)O)c1,Thiophene boronic acid; sulfur can coordinate
+Aniline,c1ccc(N)cc1,Aromatic primary amine; standard C-N coupling partner
+Ethylamine,CCN,Primary aliphatic amine
+Isopropylamine,CC(C)N,Branched primary amine; α-branching
+tert-Butylamine,CC(C)(C)N,Highly hindered primary amine and challenging coupling substrate
+N-Methylethylamine,CCNC,Secondary aliphatic amine
+N-Methylaniline,c1ccc(NC)cc1,Secondary aromatic amine
+"N,N-Dimethylaniline",c1ccc(N(C)C)cc1,Tertiary amine; not reactive in C-N coupling
+4-Methoxyaniline,COc1ccc(N)cc1,Electron-rich aniline
+4-Aminobenzonitrile,N#Cc1ccc(N)cc1,Electron-poor aniline; less nucleophilic
+4-Aminopyridine,Nc1ccncc1,Heteroaryl amine; pyridine coordination
+Indole,c1ccc2[nH]ccc2c1,NH heterocycle; can act as nucleophile
+3-Aminopyrrole,c1c[nH]c(N)c1,Heteroaryl amine with NH
+2-Methylaniline,Nc1ccccc1C,Ortho-substituted aniline; sterically hindered
+"3,5-Dimethylaniline",Nc1cc(C)cc(C)c1,Meta-substituted aniline
+Benzylamine,NCc1ccccc1,Benzylic amine; aliphatic but stabilized
+Phenol,c1ccc(O)cc1,Aromatic alcohol; C-O coupling partner
+Ethanol,CCO,Simple aliphatic alcohol
+Isopropanol,CC(C)O,Secondary alcohol
+tert-Butanol,CC(C)(C)O,Tertiary alcohol; sterically hindered
+4-Methoxyphenol,COc1ccc(O)cc1,Electron-rich phenol
+4-Hydroxybenzonitrile,N#Cc1ccc(O)cc1,Electron-poor phenol; more acidic
+Benzyl alcohol,OCc1ccccc1,Benzylic alcohol
+4-Hydroxypyridine,Oc1ccncc1,Heteroaryl phenol
+Thiophenol,c1ccc(S)cc1,Aromatic thiol; strong nucleophile; catalyst poison risk
+Ethanethiol,CCS,Aliphatic thiol; catalyst poison
+2-Propanethiol,CC(C)S,Secondary thiol
+Thioanisole,CSc1ccccc1,Sulfide; not nucleophilic but can poison catalysts
+Acetylene,C#C,Simplest terminal alkyne
+Phenylacetylene,C#Cc1ccccc1,Aryl-substituted terminal alkyne
+"3,3-Dimethylbut-1-yne",C#CC(C)(C)C,Sterically hindered terminal alkyne
+Trimethylsilylacetylene,C#C[Si](C)(C)C,TMS-protected alkyne; deprotectable
+Methyl propargyl ether,C#CCOC,Ether-substituted alkyne
+4-Ethynylpyridine,C#Cc1ccncc1,Heteroaryl terminal alkyne
+Phenylmagnesium bromide,[Mg]Brc1ccccc1,Grignard reagent for Kumada coupling
+Ethylmagnesium bromide,CC[Mg]Br,Alkyl Grignard
+Phenylzinc chloride,Cl[Zn]c1ccccc1,Organozinc for Negishi coupling
+Ethylzinc bromide,CC[Zn]Br,Alkylzinc reagent
+Phenyltrimethylstannane,c1ccc([Sn](C)(C)C)cc1,Organotin for Stille coupling
+Vinyltrimethylstannane,C=C[Sn](C)(C)C,Vinyl stannane
+4-Bromophenylboronic acid,Brc1ccc(B(O)O)cc1,Can act as both electrophile and nucleophile; selective coupling
+4-Bromoaniline,Brc1ccc(N)cc1,Both electrophile (Br) and nucleophile (NH2); orthogonal protection needed
+4-Bromophenol,Brc1ccc(O)cc1,Both electrophile (Br) and nucleophile (OH)
+4-Bromophenylacetylene,Brc1ccc(C#C)cc1,Both electrophile (Br) and nucleophile (alkyne)
+"1,4-Dibromobenzene",Brc1ccc(Br)cc1,Two identical electrophilic sites; sp2_halide_site_count = 2
+"1,4-Phenylenediamine",Nc1ccc(N)cc1,Two identical nucleophilic sites
+4-Bromo-N-Boc-aniline,Brc1ccc(NC(=O)OC(C)(C)C)cc1,Boc-protected amine; prevents C-N coupling
+4-Bromo-TBS-phenol,Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1,TBS-protected phenol
+Methyl 4-bromobenzoate,Brc1ccc(C(=O)OC)cc1,Ester-protected carboxylic acid
+4-Bromobenzaldehyde,Brc1ccc(C=O)cc1,Aldehyde functional group; can be reduced/oxidized
+4-Bromo-tert-butylbenzene,Brc1ccc(C(C)(C)C)cc1,Para-tert-butyl substituent
+4-tert-Butylaniline,CC(C)(C)c1ccc(N)cc1,Sterically hindered aniline
+"4-Bromo-N,N-dimethylaniline",Brc1ccc(N(C)C)cc1,Highly electron-rich aryl bromide with a strong dialkylamino donor
+"1-Bromo-2,3,4,5-tetramethoxybenzene",COc1cc(OC)c(Br)c(OC)c1OC,Extremely electron-rich; multiple methoxy groups
+Pentafluorobromobenzene,Fc1c(F)c(F)c(Br)c(F)c1F,Extremely electron-poor polyhalogenated substrate; halogen_count = 6
+"2,6-Dichloro-iodobenzene",Ic1c(Cl)cccc1Cl,Mixed halides with ortho substitution; halogen_count=3
+2-tert-Butylbromobenzene,Brc1ccccc1C(C)(C)C,Sterically hindered ortho-tert-butyl
+"3,5-Diisopropylchlorobenzene",Clc1cc(C(C)C)ccc1C(C)C,Multiple isopropyl substituents
+"2,6-Dimethoxyiodobenzene",Ic1c(OC)cccc1OC,Ortho-disubstituted with electron-donating groups
+4-Iodo-N-Boc-aniline,Ic1ccc(NC(=O)OC(C)(C)C)cc1,BOC-protected aniline
+4-Bromo-N-Cbz-aniline,Brc1ccc(NC(=O)OCc2ccccc2)cc1,CBZ-protected aniline
+4-Chloro-N-Fmoc-aniline,Clc1ccc(NC(=O)OCC2c3ccccc3-c3ccccc32)cc1,FMOC-protected aniline with fluorenyl group
+4-Iodo-TIPS-phenol,Ic1ccc(O[Si](C(C)C)(C(C)C)C(C)C)cc1,TIPS-protected phenol
+4-Chlorobenzonitrile,Clc1ccc(C#N)cc1,Strong electron-withdrawing nitrile group
+4-Iodoanisole,Ic1ccc(OC)cc1,Strong electron-donating methoxy group
+2-Bromophenyl diphenylphosphine,Brc1ccccc1P(c2ccccc2)c2ccccc2,Ortho-phosphine for ligand synthesis; note: not itself a bidentate chelator
+Phenylalanine,NC(Cc1ccccc1)C(=O)O,Amino acid with bidentate chelating ability; chiral_center_count=1
+Triphenylphosphine,c1ccc(P(c2ccccc2)c2ccccc2)cc1,Common phosphine ligand
+"1,8-Bis(dimethylphosphino)naphthalene",c1ccc2c(c1)c(P(C)C)ccc2P(C)C,Bidentate phosphine ligand (note: current SMARTS doesn't capture P-P bidentate pattern)
+Ethane,CC,MW=30; low molecular weight test
+Anthracene,c1ccc2cc3ccccc3cc2c1,MW=178; medium molecular weight; fused rings
+Coronene,c1ccc2cc3ccc4ccc5ccc6ccc1c7c2c3c4c5c67,MW=300; large polycyclic aromatic (note: not high_molecular_weight which requires MW>500)
+9-Chloroanthracene,Clc1ccc2c3ccccc3ccc2c1,Tricyclic fused aromatic system
+Spiro[5.5]undecane,C1CCC2(CC1)CCCC2,Spirocyclic aliphatic system
+"6-Bromo-spiro[chroman-2,1'-cyclohexane]",Brc1ccc2c(c1)C1(CCCC1)CCCC2,Spirocyclic with aryl bromide
+(S)-Alanine,C[C@H](N)C(=O)O,Chiral amino acid; chiral_center_count=1
+"(2R,3R)-Butane-2,3-diol",C[C@H](O)[C@H](C)O,Two chiral centers; chiral_center_count=2
+"(1R,3R,5S)-1,3,5-Trimethylcyclohexane",C[C@H]1CC[C@@H](C)C[C@H]1C,Three chiral centers; chiral_center_count=3
+(R)-Bromochlorofluoromethane,Br[C@H](Cl)F,Chiral halomethane; chiral_center_count=1; halogen_count=3
+"2,4,5,6-Tetrachlorobromobenzene",Clc1cc(Cl)c(Br)c(Cl)c1,Highly polyhalogenated; halogen_count=5
+4-Bromo-N-benzoylaniline,Brc1ccc(NC(=O)c2ccccc2)cc1,Amide-protected aniline derivative
+"(1S,2R,5S)-1,2,5-Trimethylcyclohexane",C[C@@H]1CCC[C@@H](C)[C@@H]1C,Multiple stereogenic centers; chiral_center_count=3
+Acetic acid,CC(=O)O,Simple aliphatic carboxylic acid
+Benzoic acid,O=C(O)c1ccccc1,Aromatic carboxylic acid
+Picolinic acid,O=C(O)c1ccccn1,Heteroaromatic carboxylic acid with coordinating nitrogen
+Acrylic acid,C=CC(=O)O,Unsaturated carboxylic acid
+Cyclohexanecarboxylic acid,O=C(O)C1CCCCC1,Cycloalkyl carboxylic acid
+Oxalic acid,O=C(O)C(=O)O,Dicarboxylic acid with two acyl centers
+Succinic acid,O=C(O)CCC(=O)O,Aliphatic dicarboxylic acid
+Acetyl chloride,CC(=O)Cl,Simple aliphatic acyl chloride
+Benzoyl chloride,O=C(Cl)c1ccccc1,Aromatic acyl chloride
+Nicotinoyl chloride,O=C(Cl)c1cccnc1,Heteroaromatic acyl chloride
+Acetyl bromide,CC(=O)Br,Acyl bromide example
+Acetyl fluoride,CC(=O)F,Acyl fluoride example
+Methyl chloroformate,COC(=O)Cl,Carbonochloridate electrophile
+Methanesulfonyl chloride,CS(=O)(=O)Cl,Alkyl sulfonyl chloride
+Benzenesulfonyl chloride,O=S(=O)(Cl)c1ccccc1,Aryl sulfonyl chloride
+4-Toluenesulfonyl chloride,Cc1ccc(S(=O)(=O)Cl)cc1,Tosyl chloride
+2-Pyridinesulfonyl chloride,O=S(=O)(Cl)c1ccccn1,Heteroaryl sulfonyl chloride
+Methanesulfonyl fluoride,CS(=O)(=O)F,Sulfonyl fluoride example
+Methylamine,CN,Primary alkylamine
+Diethylamine,CCNCC,Secondary dialkylamine
+Pyrrolidine,C1CCNC1,Five-membered cyclic secondary amine
+Piperidine,C1CCNCC1,Six-membered cyclic secondary amine
+Morpholine,O1CCNCC1,Heterocyclic secondary amine containing oxygen
+Diphenylamine,c1ccc(Nc2ccccc2)cc1,Secondary diarylamine
+2-Aminopyridine,Nc1ccccn1,Aminated heteroarene
+Ammonia,N,Unsubstituted nitrogen nucleophile
+Acetamide,CC(=O)N,Primary amide
+N-Methylacetamide,CC(=O)NC,Secondary amide
+Benzamide,NC(=O)c1ccccc1,Primary aromatic amide
+2-Pyrrolidone,O=C1CCCN1,Cyclic secondary amide lactam
+Urea,NC(=O)N,Urea with two N-H sites
+Methylurea,CNC(=O)N,Unsymmetrical substituted urea
+Methyl carbamate,COC(=O)N,Primary carbamate
+Methanesulfonamide,CS(=O)(=O)N,Primary sulfonamide
+N-Methylmethanesulfonamide,CS(=O)(=O)NC,Secondary sulfonamide
+Benzenesulfonamide,NS(=O)(=O)c1ccccc1,Aryl sulfonamide
+Hydrazine,NN,Unsubstituted hydrazine with two reactive nitrogen sites
+Methylhydrazine,CNN,Unsymmetrical alkyl hydrazine
+"1,2-Dimethylhydrazine",CNNC,Symmetrically substituted hydrazine
+Phenylhydrazine,NNc1ccccc1,Aryl hydrazine
+Acetohydrazide,CC(=O)NN,Aliphatic acyl hydrazide
+Benzohydrazide,NNC(=O)c1ccccc1,Aromatic acyl hydrazide
+Ethylene glycol,OCCO,Diol with two O-H sites
+Catechol,Oc1ccccc1O,Ortho aromatic diol
+"1,2-Ethanedithiol",SCCS,Dithiol with two S-H sites
+Ethyl mesylate,CCOS(=O)(=O)C,Alkyl mesylate leaving group
+Methyl tosylate,COS(=O)(=O)c1ccc(C)cc1,Alkyl tosylate leaving group
+Formaldehyde,C=O,Simplest aldehyde with two carbonyl hydrogens
+Acetaldehyde,CC=O,Simple aliphatic aldehyde
+Benzaldehyde,O=Cc1ccccc1,Aromatic aldehyde and standard carbonyl substrate
+Cyclohexanecarbaldehyde,O=CC1CCCCC1,Aliphatic aldehyde attached to a ring
+Furfural,O=Cc1ccco1,Heteroaryl aldehyde with an electron-rich furan
+Glyoxal,O=CC=O,Dialdehyde with two carbonyl addition sites
+Cinnamaldehyde,O=C/C=C/c1ccccc1,Conjugated aldehyde containing both C=O and C=C handles
+Acetone,CC(=O)C,Simple symmetrical ketone
+2-Butanone,CCC(=O)C,Unsymmetrical aliphatic ketone
+Cyclohexanone,O=C1CCCCC1,Cyclic ketone widely used in synthesis
+Acetophenone,CC(=O)c1ccccc1,Aryl alkyl ketone
+Benzophenone,O=C(c1ccccc1)c1ccccc1,Sterically hindered diaryl ketone
+Methyl vinyl ketone,C=CC(=O)C,Activated alkene conjugated to a ketone
+Ethyl pyruvate,CCOC(=O)C(=O)C,Alpha-keto ester with differentiated carbonyl groups
+Ethylene,C=C,Simplest alkene bond site
+Propene,CC=C,Monosubstituted terminal alkene
+1-Hexene,C=CCCCC,Unactivated terminal alkene
+Cyclohexene,C1=CCCCC1,Cyclic disubstituted alkene
+Styrene,C=Cc1ccccc1,Benzylic alkene with conjugation to an arene
+alpha-Methylstyrene,C=C(C)c1ccccc1,Branched geminally substituted alkene
+(E)-Stilbene,c1ccc(/C=C/c2ccccc2)cc1,Internal diaryl alkene with defined geometry
+Norbornene,C1=CC2CCC1C2,Strained bicyclic alkene
+Methyl acrylate,COC(=O)C=C,Electron-poor alkene conjugated to an ester
+Acrylonitrile,C=CC#N,Electron-poor alkene bearing a nitrile
+N-Phenylmaleimide,O=C1C=CC(=O)N1c1ccccc1,Electron-poor cyclic alkene with two imide carbonyls
+"1,3-Butadiene",C=CC=C,Conjugated diene with two alkene sites
+Isoprene,C=C(C)C=C,Unsymmetrical substituted conjugated diene
+Allyl alcohol,C=CCO,Contains an alkene and a primary alcohol
+2-Butyne,CC#CC,Simple symmetrical internal alkyne
+Diphenylacetylene,c1ccc(C#Cc2ccccc2)cc1,Internal diaryl alkyne
+1-Phenyl-1-propyne,CC#Cc1ccccc1,Unsymmetrical internal aryl alkyne
+Dimethyl acetylenedicarboxylate,COC(=O)C#CC(=O)OC,Strongly electron-poor internal alkyne
+Propargyl alcohol,C#CCO,Terminal alkyne combined with a primary alcohol
+Ethyl acetate,CCOC(=O)C,Simple ester carbonyl
+Methyl benzoate,COC(=O)c1ccccc1,Aromatic ester carbonyl
+gamma-Butyrolactone,O=C1OCCC1,Cyclic ester and common polar scaffold
+Acetic anhydride,CC(=O)OC(=O)C,Symmetrical acid anhydride with two acyl centers
+Di-tert-butyl dicarbonate,CC(C)(C)OC(=O)OC(=O)OC(C)(C)C,Common amine-protection reagent with two carbonyl groups
+"N,N-Dimethylformamide",CN(C)C=O,Tertiary formamide and common synthesis solvent
+N-Methyl-2-pyrrolidone,CN1CCCC1=O,Cyclic tertiary amide and common polar aprotic solvent
+Diethyl malonate,CCOC(=O)CC(=O)OCC,Activated methylene between two ester groups
+Ethyl acetoacetate,CCOC(=O)CC(=O)C,Beta-keto ester with ketone and ester carbonyls
+Acetonitrile,CC#N,Simple aliphatic nitrile
+Benzonitrile,N#Cc1ccccc1,Aromatic nitrile
+Malononitrile,N#CCC#N,Activated methylene flanked by two nitriles
+Nitrobenzene,[O-][N+](=O)c1ccccc1,Common aromatic nitro compound
+Dimethyl sulfone,CS(=O)(=O)C,Simple sulfone with acidic alpha hydrogens
+Dimethyl sulfoxide,CS(C)=O,Common sulfoxide reagent and polar solvent
+Tetrahydrofuran,C1CCOC1,Common cyclic ether solvent
+"1,4-Dioxane",O1CCOCC1,Common diether solvent and coordinating additive
+Anisole,COc1ccccc1,Electron-rich arene and aromatic ether
+Toluene,Cc1ccccc1,Simple alkyl arene with aromatic C-H sites
+"1,3-Dimethoxybenzene",COc1cccc(OC)c1,Strongly activated arene with multiple aromatic C-H sites
+Styrene oxide,c1ccccc1C1CO1,Benzylic epoxide with regioselective ring-opening chemistry
+N-Benzylideneaniline,C(=Nc1ccccc1)c1ccccc1,Representative Schiff-base imine
+Acetone oxime,CC(=NO)C,Representative ketoxime with an N-OH group
+Benzaldehyde hydrazone,NN=Cc1ccccc1,Representative C=N derivative with a terminal N-H site
+Phenyl azide,[N-]=[N+]=Nc1ccccc1,Organic azide used in click chemistry
+Pyridine,n1ccccc1,Electron-poor heteroarene with five aromatic C-H sites
+Furan,c1ccoc1,Electron-rich oxygen heteroarene
+Thiophene,c1ccsc1,Electron-rich sulfur heteroarene
+Imidazole,c1ncc[nH]1,Heteroarene containing pyridine-like and pyrrole-like nitrogens
+Phenyl isocyanate,O=C=Nc1ccccc1,Common heterocumulene electrophile
+Phenyl isothiocyanate,S=C=Nc1ccccc1,Common sulfur heterocumulene electrophile
+Dimethyl disulfide,CSSC,Representative disulfide linkage
+Azobenzene,c1ccc(N=Nc2ccccc2)cc1,Representative organic azo linkage
+Dimethyl peroxide,COOC,Representative organic peroxide linkage
+Diethyl phosphonoacetate,CCOP(=O)(CC(=O)OCC)OCC,Phosphonate-stabilized carbon nucleophile for olefination
+Methane,C,Smallest hydrocarbon; zero heteroatoms
+Propane,CCC,Linear alkane
+n-Butane,CCCC,Linear alkane conformational reference
+Isobutane,CC(C)C,Branched alkane
+Cyclopropane,C1CC1,Strained three-membered carbocycle
+Cyclobutane,C1CCC1,Strained four-membered carbocycle
+Cyclopentane,C1CCCC1,Five-membered carbocycle
+Cyclohexane,C1CCCCC1,Chair-conformation reference
+Adamantane,C1C2CC3CC1CC(C2)C3,Rigid cage hydrocarbon
+Benzene,c1ccccc1,Parent aromatic hydrocarbon
+Naphthalene,c1ccc2ccccc2c1,Two fused aromatic rings
+Phenanthrene,c1ccc2c(c1)ccc1ccccc12,Angular three-ring PAH
+Pyrene,c1cc2ccc3cccc4ccc(c1)c2c34,Four-ring PAH fluorescence reference
+Biphenyl,c1ccc(-c2ccccc2)cc1,Simple biaryl scaffold
+Fluorene,c1ccc2c(c1)Cc1ccccc1-2,Benzylic CH2 in rigid fused system
+Azulene,[cH-]1cccc2cccc[c+]12,Nonalternant aromatic hydrocarbon
+Allene,C=C=C,Parent cumulene
+"1,3-Cyclopentadiene",C1C=CCC=1,Reactive cyclic diene
+Cyclooctatetraene,C1=CC=CC=CC=C1,Nonplanar eight-membered polyene
+Methanol,CO,Smallest alcohol
+1-Butanol,CCCCO,Primary aliphatic alcohol
+2-Butanol,CC(O)CC,Secondary alcohol and stereocenter precursor
+Cyclohexanol,OC1CCCCC1,Cyclic secondary alcohol
+Glycerol,OCC(O)CO,Triol and biomass-derived platform molecule
+Neopentyl glycol,CC(C)(CO)CO,Sterically hindered diol used in polyesters
+Resorcinol,Oc1cccc(O)c1,"1,3-Dihydroxybenzene"
+Hydroquinone,Oc1ccc(O)cc1,Redox-active para-diphenol
+1-Naphthol,Oc1cccc2ccccc12,Fused aromatic phenol
+Dimethyl ether,COC,Simple ether
+Diethyl ether,CCOCC,Common ethereal solvent
+Methyl tert-butyl ether,COC(C)(C)C,Branched ether
+Diphenyl ether,c1ccc(Oc2ccccc2)cc1,Aryl ether scaffold
+Ethylene oxide,C1CO1,Parent epoxide
+Propylene oxide,CC1CO1,Substituted epoxide
+Formic acid,O=CO,Smallest carboxylic acid
+Propionic acid,CCC(=O)O,Aliphatic carboxylic acid
+Butyric acid,CCCC(=O)O,Short-chain fatty acid
+Lactic acid,C[C@H](O)C(=O)O,Chiral hydroxy acid and PLA monomer precursor
+Mandelic acid,O=C(O)[C@H](O)c1ccccc1,Chiral aromatic alpha-hydroxy acid
+Citric acid,O=C(O)CC(O)(CC(=O)O)C(=O)O,Tricarboxylic acid with tertiary alcohol
+Maleic acid,O=C(O)/C=C\C(=O)O,Cis alkene diacid
+Fumaric acid,O=C(O)/C=C/C(=O)O,Trans alkene diacid
+Tartaric acid,O=C(O)[C@@H](O)[C@@H](O)C(=O)O,Stereochemically rich diacid
+Salicylic acid,O=C(O)c1ccccc1O,Ortho-hydroxy aromatic acid
+Terephthalic acid,O=C(O)c1ccc(C(=O)O)cc1,PET and MOF linker
+Trimesic acid,O=C(O)c1cc(C(=O)O)cc(C(=O)O)c1,Common MOF linker
+Maleic anhydride,O=C1OC(=O)C=C1,Electron-poor dienophile and acylating agent
+Phthalic anhydride,O=C1OC(=O)c2ccccc12,Common polyester and plasticizer precursor
+Dimethyl carbonate,COC(=O)OC,Green carbonylating and methylating reagent
+Acrolein,C=CC=O,Conjugated aldehyde
+Crotonaldehyde,C/C=C/C=O,Substituted enal
+p-Benzoquinone,O=C1C=CC(=O)C=C1,Redox-active conjugated diketone
+Anthraquinone,O=C1c2ccccc2C(=O)c2ccccc12,Fused aromatic diketone
+Nitromethane,C[N+](=O)[O-],Acidic nitroalkane
+Trimethylamine,CN(C)C,Small tertiary amine
+Triethylamine,CCN(CC)CC,Common non-nucleophilic-enough base
+Ethylenediamine,NCCN,Bifunctional diamine
+Piperazine,C1CNCCN1,Common medicinal chemistry linker
+Pyrazole,c1n[nH]cc1,Five-membered diazole
+"1,2,4-Triazole",c1nnc[nH]1,Nitrogen-rich aromatic heterocycle
+Tetrazole,c1nnn[nH]1,Carboxylate bioisostere
+Oxazole,c1ocnc1,"O,N heteroaromatic"
+Thiazole,c1cscn1,"S,N heteroaromatic"
+Pyrimidine,n1ccnc(n1),Medicinal-chemistry diazine core
+Pyrazine,n1ccncc1,Symmetric diazine
+Pyridazine,n1ncccc1,Adjacent-nitrogen diazine
+Quinoline,c1ccc2ncccc2c1,Fused pyridine scaffold
+Isoquinoline,c1ccc2cnccc2c1,Fused N-heterocycle regioisomer
+Benzimidazole,c1ccc2[nH]cnc2c1,Privileged medicinal scaffold
+Indazole,c1ccc2[nH]ncc2c1,Fused pyrazole scaffold
+Benzofuran,c1ccc2occc2c1,Fused oxygen heteroaromatic
+Benzothiophene,c1ccc2sccc2c1,Fused sulfur heteroaromatic
+Carbazole,c1ccc2c(c1)[nH]c1ccccc12,Rigid electron-rich heterocycle
+"1,10-Phenanthroline",c1cc2c(cc1)ncc1cccnc12,"Bidentate N,N ligand"
+"2,2-Bipyridine",n1ccccc1-c1ccccn1,Common bidentate ligand
+Glycine,NCC(=O)O,Achiral proteinogenic amino acid
+L-Valine,CC(C)[C@H](N)C(=O)O,Branched-chain amino acid
+L-Leucine,CC(C)C[C@H](N)C(=O)O,Branched hydrophobic amino acid
+L-Isoleucine,CC[C@H](C)[C@H](N)C(=O)O,Two-stereocenter amino acid
+L-Serine,N[C@@H](CO)C(=O)O,Hydroxyl-containing amino acid
+L-Threonine,C[C@@H](O)[C@@H](N)C(=O)O,Two-stereocenter hydroxy amino acid
+L-Cysteine,N[C@@H](CS)C(=O)O,Thiol-containing amino acid
+L-Methionine,CSCC[C@H](N)C(=O)O,Thioether-containing amino acid
+L-Aspartic acid,N[C@@H](CC(=O)O)C(=O)O,Acidic amino acid
+L-Glutamic acid,N[C@@H](CCC(=O)O)C(=O)O,Acidic amino acid
+L-Asparagine,N[C@@H](CC(N)=O)C(=O)O,Carboxamide side chain
+L-Glutamine,N[C@@H](CCC(N)=O)C(=O)O,Carboxamide side chain
+L-Lysine,NCCCC[C@H](N)C(=O)O,Diamino amino acid
+L-Arginine,N=C(N)NCCC[C@H](N)C(=O)O,Guanidinium precursor and basic amino acid
+L-Histidine,N[C@@H](Cc1cnc[nH]1)C(=O)O,Imidazole-containing amino acid
+L-Tyrosine,N[C@@H](Cc1ccc(O)cc1)C(=O)O,Phenolic amino acid
+L-Tryptophan,N[C@@H](Cc1c[nH]c2ccccc12)C(=O)O,Indole-containing amino acid
+L-Proline,O=C(O)[C@@H]1CCCN1,Cyclic secondary amino acid
+D-Glucose,OC[C@H]1O[C@@H](O)[C@H](O)[C@@H](O)[C@@H]1O,Polyhydroxylated hexose
+D-Fructose,OCC(=O)[C@@H](O)[C@@H](O)[C@@H](O)CO,Open-chain ketohexose representation
+D-Ribose,O=C[C@H](O)[C@H](O)[C@H](O)CO,Open-chain pentose representation
+2-Deoxy-D-ribose,O=C[C@H](O)C[C@H](O)CO,Deoxy sugar
+Adenine,Nc1ncnc2[nH]cnc12,Purine nucleobase
+Guanine,Nc1nc2[nH]cnc2c(=O)[nH]1,Oxo-purine nucleobase
+Cytosine,Nc1nccc(=O)[nH]1,Pyrimidine nucleobase
+Uracil,O=c1cc[nH]c(=O)[nH]1,Pyrimidinedione nucleobase
+Thymine,Cc1c[nH]c(=O)[nH]c1=O,Methylated pyrimidinedione
+Adenosine,Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO)[C@@H](O)[C@H]1O,Purine nucleoside with multiple stereocenters
+Thymidine,Cc1cn([C@H]2C[C@H](O)[C@@H](CO)O2)c(=O)[nH]c1=O,Deoxynucleoside
+Palmitic acid,CCCCCCCCCCCCCCCC(=O)O,Saturated C16 fatty acid
+Stearic acid,CCCCCCCCCCCCCCCCCC(=O)O,Saturated C18 fatty acid
+Oleic acid,CCCCCCCC/C=C\CCCCCCCC(=O)O,Monounsaturated C18 fatty acid
+Linoleic acid,CCCCC/C=C\C/C=C\CCCCCCCC(=O)O,Polyunsaturated C18 fatty acid
+Creatinine,CN1C(=O)N=C(N)C1,Cyclic guanidine metabolite
+Uric acid,O=c1[nH]c(=O)c2[nH]c(=O)[nH]c2[nH]1,Purine oxidation product
+Glutathione,N[C@@H](CCC(=O)N[C@@H](CS)C(=O)NCC(=O)O)C(=O)O,Tripeptide redox benchmark
+Vanillin,COc1cc(C=O)ccc1O,"Flavor compound with phenol, ether, and aldehyde"
+Eugenol,COc1cc(CC=C)ccc1O,Clove oil component
+trans-Anethole,COc1ccc(/C=C/C)cc1,Anise flavor compound
+Thymol,Cc1cc(C(C)C)ccc1O,Phenolic monoterpenoid
+Carvacrol,Cc1ccc(C(C)C)cc1O,Regioisomeric phenolic monoterpenoid
+Limonene,CC1=CCC(CC1)C(=C)C,Cyclic diene terpene
+Menthol,CC(C)[C@@H]1CC[C@@H](C)C[C@H]1O,Three-stereocenter terpene alcohol
+Camphor,CC1(C)C2CCC1(C)C(=O)C2,Rigid bicyclic monoterpene ketone
+Carvone,CC1=CCC(CC1=O)C(=C)C,Conjugated cyclic ketone terpene
+Borneol,CC1(C)C2CCC1(C)C(O)C2,Rigid bicyclic alcohol
+Cinnamic acid,O=C(O)/C=C/c1ccccc1,Conjugated aromatic acid
+Gallic acid,O=C(O)c1cc(O)c(O)c(O)c1,Trihydroxybenzoic acid
+Shikimic acid,O=C(O)[C@H]1C=C[C@@H](O)[C@@H](O)[C@@H]1O,Stereochemically rich biosynthetic intermediate
+Ascorbic acid,O=C1OC([C@@H](O)CO)=C(O)[C@@H]1O,Vitamin C and redox-active lactone
+Coumarin,O=c1ccc2ccccc2o1,Fused lactone chromophore
+Umbelliferone,O=c1ccc2cc(O)ccc2o1,Fluorescent coumarin natural product
+Resveratrol,Oc1ccc(/C=C/c2cc(O)cc(O)c2)cc1,Polyphenolic stilbene
+Curcumin,COc1cc(/C=C/C(=O)CC(=O)/C=C/c2ccc(O)c(OC)c2)ccc1O,Conjugated polyphenolic natural product
+Quercetin,O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12,Polycyclic polyphenolic flavonoid
+Capsaicin,COc1cc(CNC(=O)CCCC/C=C/C(C)C)ccc1O,Multifunctional natural product
+Piperine,O=C(/C=C/C=C/c1ccc2OCOc2c1)N1CCCCC1,Conjugated piperidine amide
+Melatonin,COc1ccc2[nH]cc(CCNC(C)=O)c2c1,Indole-containing hormone
+Serotonin,NCCc1c[nH]c2ccc(O)cc12,Biogenic indoleamine
+Indole-3-acetic acid,O=C(O)Cc1c[nH]c2ccccc12,Auxin plant hormone
+Estradiol,C[C@]12CC[C@H]3[C@@H]([C@@H]1CC[C@@H]2O)CCC1=CC(=CC=C31)O,Polycyclic steroid with two hydroxyl groups
+Testosterone,CC12CCC3C(C1CCC2O)CCC1=CC(=O)CCC31C,Polycyclic androgen steroid
+Progesterone,CC(=O)C1CCC2C3CCC4=CC(=O)CCC4(C)C3CCC12C,Polycyclic diketone steroid
+Artemisinin,CC1CCC2C(C(=O)OC3C24C1CCC(O3)(OO4)C)C,Stereochemically rich endoperoxide natural product
+Theobromine,CN1C=NC2=C1C(=O)NC(=O)N2C,Caffeine-related purine alkaloid
+Aspirin,CC(=O)Oc1ccccc1C(=O)O,Aromatic ester and carboxylic acid drug
+Acetaminophen,CC(=O)Nc1ccc(O)cc1,Phenol-acetanilide drug
+Ibuprofen,CC(C)Cc1ccc([C@@H](C)C(=O)O)cc1,Chiral arylpropionic acid drug
+Naproxen,COc1ccc2cc([C@@H](C)C(=O)O)ccc2c1,Fused aromatic chiral acid drug
+Diclofenac,O=C(O)Cc1ccccc1Nc1c(Cl)cccc1Cl,Dichloro diarylamine drug
+Ketoprofen,CC(C(=O)O)c1cccc(C(=O)c2ccccc2)c1,Benzophenone-containing arylpropionic acid
+Caffeine,CN1C(=O)N(C)c2ncn(C)c2C1=O,Fused heterocyclic trimethylxanthine
+Nicotine,CN1CCC[C@H]1c1cccnc1,Chiral bicyclic amine-pyridine compound
+Lidocaine,CCN(CC)C(=O)c1c(C)cccc1C,Tertiary amine amide drug
+Benzocaine,CCOC(=O)c1ccc(N)cc1,Amino benzoate ester
+Procaine,CCN(CC)CCOC(=O)c1ccc(N)cc1,Flexible amino ester drug
+Metformin,CN(C)C(=N)NC(=N)N,Highly polar biguanide drug
+Warfarin,CC(=O)CC(c1ccccc1)c1c(O)c2ccccc2oc1=O,Coumarin-derived chiral anticoagulant
+Fluoxetine,CNCCC(c1ccccc1)Oc1ccc(C(F)(F)F)cc1,Trifluoromethyl diaryl ether amine drug
+Diphenhydramine,CN(C)CCOC(c1ccccc1)c1ccccc1,Flexible diarylmethoxy tertiary amine
+Gabapentin,NCC1(CCCCC1)CC(=O)O,Amino acid analogue with cyclohexane
+Pregabalin,CC(C)C[C@H](CN)CC(=O)O,Chiral amino acid analogue
+Levodopa,N[C@@H](Cc1ccc(O)c(O)c1)C(=O)O,Catechol amino acid drug
+Dopamine,NCCc1ccc(O)c(O)c1,Catecholamine benchmark
+Epinephrine,CNC[C@H](O)c1ccc(O)c(O)c1,Chiral catecholamine with three OH groups
+Salbutamol,CC(C)(C)NCC(O)c1ccc(O)c(CO)c1,Multifunctional beta-amino alcohol drug
+Metronidazole,OCCn1c([N+](=O)[O-])cnc1C,Nitroimidazole drug
+Sulfamethoxazole,Cc1noc(NS(=O)(=O)c2ccc(N)cc2)n1,Heteroaryl sulfonamide drug
+Trimethoprim,COc1cc(Cc2cnc(N)nc2N)cc(OC)c1OC,Diaminopyrimidine trimethoxybenzyl drug
+Isoniazid,NNC(=O)c1ccncc1,Pyridyl hydrazide drug
+Ciprofloxacin,O=C(O)c1cn(C2CC2)c2cc(N3CCNCC3)c(F)cc2c1=O,Fused heterocycle with acid and amine
+Allopurinol,C1=NNC2=C1C(=O)NC=N2,Fused nitrogen heterocycle drug
+Carbamazepine,NC(=O)N1c2ccccc2C=Cc2ccccc21,Dibenzazepine carboxamide drug
+Phenytoin,O=C1NC(=O)N(C1(c1ccccc1)c1ccccc1),Hydantoin with two phenyl groups
+Diazepam,CN1C(=O)CN=C(c2ccccc2)c2cc(Cl)ccc21,Fused seven-membered heterocyclic drug
+Propranolol,CC(C)NCC(O)COc1cccc2ccccc12,Naphthoxy amino alcohol drug
+Atenolol,CC(C)NCC(O)COc1ccc(CC(N)=O)cc1,Polar amino alcohol amide drug
+Valproic acid,CCCC(CCC)C(=O)O,Branched aliphatic carboxylic acid drug
+Methyl methacrylate,C=C(C)C(=O)OC,PMMA monomer
+Vinyl acetate,C=COC(C)=O,Poly(vinyl acetate) monomer
+n-Butyl acrylate,CCCCOC(=O)C=C,Soft acrylic polymer monomer
+Acrylamide,NC(=O)C=C,Polyacrylamide monomer
+N-Isopropylacrylamide,CC(C)NC(=O)C=C,Thermoresponsive PNIPAM monomer
+2-Hydroxyethyl methacrylate,C=C(C)C(=O)OCCO,HEMA hydrogel monomer
+Ethylene glycol dimethacrylate,C=C(C)C(=O)OCCOC(=O)C(=C)C,Difunctional methacrylate crosslinker
+Divinylbenzene,C=Cc1ccc(C=C)cc1,Aromatic difunctional crosslinker
+Bisphenol A,CC(C)(c1ccc(O)cc1)c1ccc(O)cc1,Common epoxy and polycarbonate precursor
+Epichlorohydrin,ClCC1CO1,Halohydrin-epoxide bifunctional reagent
+Bisphenol A diglycidyl ether,CC(C)(c1ccc(OCC2CO2)cc1)c1ccc(OCC2CO2)cc1,DGEBA model compound
+epsilon-Caprolactam,O=C1CCCCCN1,Nylon-6 monomer
+Adipic acid,O=C(O)CCCCC(=O)O,"Nylon-6,6 diacid monomer"
+Hexamethylenediamine,NCCCCCCN,"Nylon-6,6 diamine monomer"
+Dimethyl terephthalate,COC(=O)c1ccc(C(=O)OC)cc1,PET precursor
+Bis(2-hydroxyethyl) terephthalate,OCCOC(=O)c1ccc(C(=O)OCCO)cc1,PET repeat-unit precursor model
+epsilon-Caprolactone,O=C1OCCCCC1,PCL monomer
+Lactide,CC1OC(=O)C(C)OC1=O,PLA cyclic dimer monomer
+"4,4-Methylenediphenyl diisocyanate",O=C=Nc1ccc(Cc2ccc(N=C=O)cc2)cc1,MDI aromatic diisocyanate
+"2,4-Toluene diisocyanate",Cc1ccc(N=C=O)c(N=C=O)c1,TDI aromatic diisocyanate
+Dimethyl phthalate,COC(=O)c1ccccc1C(=O)OC,Small phthalate ester
+Dibutyl phthalate,CCCCOC(=O)c1ccccc1C(=O)OCCCC,Common flexible phthalate plasticizer
+Bis(2-ethylhexyl) phthalate,CCCCC(CC)COC(=O)c1ccccc1C(=O)OCC(CC)CCCC,High-molecular-weight phthalate plasticizer
+Butylated hydroxytoluene,CC(C)(C)c1cc(C)c(O)c(C)c1C(C)(C)C,Hindered phenolic antioxidant
+Triphenyl phosphate,O=P(Oc1ccccc1)(Oc1ccccc1)Oc1ccccc1,Aryl phosphate additive
+"3,4-Ethylenedioxythiophene",C1COc2ccsc2O1,EDOT monomer for PEDOT
+3-Hexylthiophene,CCCCCCc1ccsc1,P3HT monomer
+"2,2-Bithiophene",c1cc(sc1)-c1cccs1,Conjugated oligothiophene
+Benzothiadiazole,c1ccc2nsnc2c1,Electron-deficient organic semiconductor building block
+Triphenylamine,c1ccc(N(c2ccccc2)c2ccccc2)cc1,Electron-rich triarylamine
+Tetracene,c1ccc2cc3cc4ccccc4cc3cc2c1,Four-ring acene
+Pentacene,c1ccc2cc3cc4cc5ccccc5cc4cc3cc2c1,Five-ring acene
+4-Cyano-4-pentylbiphenyl,CCCCCc1ccc(-c2ccc(C#N)cc2)cc1,5CB nematic liquid crystal
+4-Cyano-4-octylbiphenyl,CCCCCCCCc1ccc(-c2ccc(C#N)cc2)cc1,8CB liquid-crystal compound
+Alizarin,O=C1c2ccccc2C(=O)c2cc(O)c(O)cc12,Anthraquinone dye scaffold
+Indigo,O=C1NC(=C2NC(=O)c3ccccc32)c2ccccc21,Conjugated bis-indole pigment
+Methyl orange,CN(C)c1ccc(N=Nc2ccc(S(=O)(=O)[O-])cc2)cc1.[Na+],Ionic azo dye benchmark
+Crystal violet,CN(C)c1ccc([C+](c2ccc(N(C)C)cc2)c2ccc(N(C)C)cc2)cc1.[Cl-],Highly conjugated cationic dye
+"N,N-Diisopropylethylamine",CCN(C(C)C)C(C)C,Huenig base; hindered tertiary amine
+DABCO,C1CN2CCN1CC2,Rigid bicyclic tertiary diamine
+DBU,C1CCC2=NCCCN2CC1,Amidine-type non-nucleophilic base
+4-Dimethylaminopyridine,CN(C)c1ccncc1,DMAP nucleophilic catalyst
+TEMPO,CC1(C)CCCC(C)(C)N1[O],Persistent radical oxidation catalyst
+AIBN,N#CC(C)(C)N=NC(C)(C)C#N,Azo radical initiator
+Benzoyl peroxide,O=C(OOC(=O)c1ccccc1)c1ccccc1,Organic peroxide initiator
+N-Bromosuccinimide,O=C1CCC(=O)N1Br,NBS electrophilic bromine source
+N-Chlorosuccinimide,O=C1CCC(=O)N1Cl,NCS electrophilic chlorine source
+N-Iodosuccinimide,O=C1CCC(=O)N1I,NIS electrophilic iodine source
+m-Chloroperbenzoic acid,O=C(OO)c1cccc(Cl)c1,Common peracid oxidant
+Dicyclohexylcarbodiimide,C1CCC(CC1)N=C=NC1CCCCC1,DCC dehydrative coupling reagent
+Carbonyldiimidazole,O=C(n1ccnc1)n1ccnc1,CDI carbonyl-transfer reagent
+Bis(pinacolato)diboron,CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C,B2pin2 diboron reagent
+Trimethylsilyl chloride,C[Si](C)(C)Cl,Common TMS protecting reagent
+tert-Butyldimethylsilyl chloride,CC(C)(C)[Si](C)(C)Cl,TBS protecting reagent
+Triethylsilane,CC[SiH](CC)CC,Common mild hydride donor
+Tetramethylsilane,C[Si](C)(C)C,TMS chemical-shift standard
+Hexamethyldisiloxane,C[Si](C)(C)O[Si](C)(C)C,Small siloxane model compound
+Ethyl diazoacetate,CCOC(=O)C=[N+]=[N-],Common stabilized diazo reagent
