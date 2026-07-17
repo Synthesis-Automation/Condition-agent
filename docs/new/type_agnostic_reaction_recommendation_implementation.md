@@ -348,8 +348,17 @@ Alkenyl-Cl + Ar-B(OH)2 -> Ar-Alkenyl
 HeteroAr-Br + R-NH2 -> HeteroAr-NH-R
 unknown family: C-N substitution
 unknown family: Ar-CH=CH2 -> Ar-CH2-CH3
+reductive amination: HeteroAr-CH=O + Ar-NH2 -> HeteroAr-CH2-NH-Ar
 unmatched edit pattern: C-O bond cleavage; C-N bond formation
 ```
+
+The initial reductive-amination implementation follows the same evidence
+ladder. A declarative grammar identifies an available aldehyde, ketone, or
+formaldehyde carbonyl and a free primary or secondary amine. A registered
+operator predicts carbonyl-oxygen removal, C–N formation, carbon hydrogen gain,
+and nitrogen hydrogen loss. `reductive_amination` is assigned only after exact
+product reconstruction; a reactant-only candidate is retained without forcing
+the family when the product disagrees or does not resolve the assignment.
 
 Contextual text is a display overlay, not reaction identity. Store the generic
 interpretation (`C=C hydrogenation`), literal structural edits, contextual

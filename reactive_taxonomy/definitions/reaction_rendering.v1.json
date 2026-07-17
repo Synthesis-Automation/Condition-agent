@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "product_context_precedence": [
     "HeteroAr",
     "Ar",
@@ -44,6 +44,11 @@
       "product_kind": "chan_lam",
       "anchor_role": "transfer_partner",
       "partner_role": "nucleophile"
+    },
+    "carbonyl_amine_reductive_coupling": {
+      "product_kind": "reductive_amination",
+      "carbonyl_role": "carbonyl_partner",
+      "amine_role": "amine_partner"
     },
     "amide_formation": {
       "product_kind": "amide",

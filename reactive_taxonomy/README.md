@@ -28,6 +28,15 @@ retains `structural_label`, `reactant_context_label`, and
 `product_context_label`. Multi-edit cases that cannot be rendered safely keep
 their literal edit summary.
 
+Reductive amination is represented as one declarative two-partner grammar plus
+one registered graph operator, rather than a reaction-name special case. The
+grammar accepts available aldehyde, ketone, or formaldehyde carbonyl sites and
+free primary or secondary amines. The operator removes the carbonyl oxygen,
+forms C–N, adds H at carbon, and consumes N–H. Exact product reconstruction can
+therefore render labels such as
+`HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar`; product mismatches remain
+unverified, and multiple indistinguishable assignments remain unselected.
+
 When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
 product, a conservative correspondence fallback may supply edit evidence after
 registered grammar reconstruction has failed. It accepts only mappings whose

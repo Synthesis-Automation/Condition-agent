@@ -28,7 +28,17 @@ def validate_taxonomy() -> List[str]:
         payload = load_taxonomy_data()
     except (OSError, json.JSONDecodeError) as exc:
         return [f"taxonomy_load_failed:{exc}"]
-    expected = {"contexts.v1", "descriptor_rules.v1", "functional_groups.v1", "handles.v1", "rendering.v1", "reaction_grammars.v1", "reaction_label_patterns.v1", "reaction_label_rendering.v1", "reaction_rendering.v1"}
+    expected = {
+        "contexts.v1",
+        "descriptor_rules.v1",
+        "functional_groups.v1",
+        "handles.v1",
+        "rendering.v1",
+        "reaction_grammars.v1",
+        "reaction_label_patterns.v1",
+        "reaction_label_rendering.v1",
+        "reaction_rendering.v1",
+    }
     missing = expected - set(payload)
     if missing:
         errors.append(f"missing_taxonomy_files:{','.join(sorted(missing))}")
@@ -41,7 +51,13 @@ def validate_taxonomy() -> List[str]:
         errors.append("duplicate_context_tokens")
     if set(tokens) != set(precedence):
         errors.append("context_precedence_mismatch")
-    allowed_methods = {"mapped_smarts", "aromatic_ring_system", "atom_property", "element", "fallback"}
+    allowed_methods = {
+        "mapped_smarts",
+        "aromatic_ring_system",
+        "atom_property",
+        "element",
+        "fallback",
+    }
     for record in context_records:
         context_id = str(record.get("id") or "<missing>")
         method = str(record.get("classification_method") or "")
@@ -52,7 +68,11 @@ def validate_taxonomy() -> List[str]:
             if compiled is None:
                 errors.append(f"invalid_context_smarts:{context_id}")
                 continue
-            available_maps = {int(atom.GetAtomMapNum()) for atom in compiled.GetAtoms() if atom.GetAtomMapNum()}
+            available_maps = {
+                int(atom.GetAtomMapNum())
+                for atom in compiled.GetAtoms()
+                if atom.GetAtomMapNum()
+            }
             roles = record.get("atom_roles") or {}
             if "context_anchor" not in roles:
                 errors.append(f"missing_context_anchor:{context_id}")
@@ -62,9 +82,14 @@ def validate_taxonomy() -> List[str]:
                     errors.append(f"unknown_context_atom_map:{context_id}:{role}")
     families = payload["handles.v1"].get("site_families") or {}
     required = {
-        "leaving_group", "pronucleophile_XH", "transfer_group",
-        "electrophilic_center", "aromatic_CH", "unsaturated_bond",
-        "dipolar_group", "heteroatom_bond",
+        "leaving_group",
+        "pronucleophile_XH",
+        "transfer_group",
+        "electrophilic_center",
+        "aromatic_CH",
+        "unsaturated_bond",
+        "dipolar_group",
+        "heteroatom_bond",
     }
     if set(families) != required:
         errors.append("site_family_mismatch")
@@ -85,7 +110,10 @@ def validate_taxonomy() -> List[str]:
     if set(cn_rules.get("roles") or []) != {"electrophile", "nucleophile"}:
         errors.append("invalid_cn_environment_roles")
     for family_id in ("c_o_coupling", "c_s_coupling"):
-        if set((family_rules.get(family_id) or {}).get("roles") or []) != {"electrophile", "nucleophile"}:
+        if set((family_rules.get(family_id) or {}).get("roles") or []) != {
+            "electrophile",
+            "nucleophile",
+        }:
             errors.append(f"invalid_heteroatom_environment_roles:{family_id}")
     group_records = payload["functional_groups.v1"].get("groups") or []
     group_ids = [str(record.get("id") or "") for record in group_records]
@@ -108,7 +136,9 @@ def validate_taxonomy() -> List[str]:
             for smarts in group_patterns
         ):
             errors.append(f"invalid_functional_group_smarts:{group_id}")
-        unknown_suppressed = set(record.get("suppresses_on_overlap") or []) - set(group_ids)
+        unknown_suppressed = set(record.get("suppresses_on_overlap") or []) - set(
+            group_ids
+        )
         if unknown_suppressed:
             errors.append(f"unknown_suppressed_functional_group:{group_id}")
     patterns = payload["handles.v1"].get("patterns") or []
@@ -126,7 +156,11 @@ def validate_taxonomy() -> List[str]:
         if compiled is None:
             errors.append(f"invalid_pattern_smarts:{pattern_id}")
             continue
-        available_maps = {int(atom.GetAtomMapNum()) for atom in compiled.GetAtoms() if atom.GetAtomMapNum()}
+        available_maps = {
+            int(atom.GetAtomMapNum())
+            for atom in compiled.GetAtoms()
+            if atom.GetAtomMapNum()
+        }
         atom_roles = pattern.get("atom_roles") or {}
         required_roles = {
             "leaving_group": {"anchor", "handle"},
@@ -136,11 +170,16 @@ def validate_taxonomy() -> List[str]:
             "aromatic_CH": {"center"},
             "unsaturated_bond": {"endpoint_a", "endpoint_b"},
             "dipolar_group": {
-                "attachment", "proximal_nitrogen", "central_nitrogen",
+                "attachment",
+                "proximal_nitrogen",
+                "central_nitrogen",
                 "terminal_nitrogen",
             },
             "heteroatom_bond": {
-                "attachment_a", "endpoint_a", "endpoint_b", "attachment_b",
+                "attachment_a",
+                "endpoint_a",
+                "endpoint_b",
+                "attachment_b",
             },
         }.get(str(pattern.get("site_type")), set())
         if not required_roles <= set(atom_roles):
@@ -165,11 +204,19 @@ def validate_taxonomy() -> List[str]:
         elif not style.get("double") or not style.get("triple"):
             errors.append(f"missing_unsaturated_bond_style:{style_id}")
     required_handle_templates = {
-        "carbonyl_formaldehyde", "carbonyl_aldehyde", "carbonyl_ketone",
-        "aromatic_ch", "nitrile", "organic_azide", "azo_bond",
-        "disulfide_bond", "peroxide_bond",
+        "carbonyl_formaldehyde",
+        "carbonyl_aldehyde",
+        "carbonyl_ketone",
+        "aromatic_ch",
+        "nitrile",
+        "organic_azide",
+        "azo_bond",
+        "disulfide_bond",
+        "peroxide_bond",
     }
-    if not required_handle_templates <= set(rendering.get("named_handle_templates") or {}):
+    if not required_handle_templates <= set(
+        rendering.get("named_handle_templates") or {}
+    ):
         errors.append("missing_named_handle_templates")
     unsaturated_templates = rendering.get("unsaturated_bond_templates") or {}
     if set(unsaturated_templates) != {"alkene", "alkyne"}:
@@ -181,7 +228,9 @@ def validate_taxonomy() -> List[str]:
         if set(alkene_templates.get("right_endpoints") or {}) != {"0", "1", "2"}:
             errors.append("invalid_alkene_right_endpoint_templates")
         if set(unsaturated_templates["alkyne"]) != {
-            "acetylene", "terminal", "internal"
+            "acetylene",
+            "terminal",
+            "internal",
         }:
             errors.append("invalid_alkyne_templates")
     rendering_contexts = set((rendering.get("context_labels") or {}).keys())
@@ -194,10 +243,16 @@ def validate_taxonomy() -> List[str]:
     if any(not rule.get("template") for rule in rendering_rules):
         errors.append("missing_rendering_template")
     grammar_ids: List[str] = []
-    allowed_operators = {"join_two_anchors", "replace_handle_with_center"}
+    allowed_operators = {
+        "join_two_anchors",
+        "replace_handle_with_center",
+        "replace_carbonyl_oxygen_with_amine",
+    }
     known_roles: Dict[str, set[str]] = {site_type: set() for site_type in required}
     for pattern in patterns:
-        known_roles.get(str(pattern.get("site_type")), set()).update((pattern.get("atom_roles") or {}).keys())
+        known_roles.get(str(pattern.get("site_type")), set()).update(
+            (pattern.get("atom_roles") or {}).keys()
+        )
     for grammar in payload["reaction_grammars.v1"].get("grammars") or []:
         grammar_id = str(grammar.get("id") or "<missing>")
         grammar_ids.append(grammar_id)
@@ -216,14 +271,29 @@ def validate_taxonomy() -> List[str]:
     if len(grammar_ids) != len(set(grammar_ids)):
         errors.append("duplicate_reaction_grammar_ids")
     reaction_rendering = payload["reaction_rendering.v1"].get("rules") or {}
-    product_precedence = payload["reaction_rendering.v1"].get("product_context_precedence") or []
-    if len(product_precedence) != len(set(product_precedence)) or not product_precedence:
+    product_precedence = (
+        payload["reaction_rendering.v1"].get("product_context_precedence") or []
+    )
+    if (
+        len(product_precedence) != len(set(product_precedence))
+        or not product_precedence
+    ):
         errors.append("invalid_product_context_precedence")
     if "Other" not in product_precedence:
         errors.append("missing_product_context_fallback")
     if set(reaction_rendering) != set(grammar_ids):
         errors.append("reaction_rendering_coverage_mismatch")
-    allowed_product_kinds = {"join_contexts", "nitrogen_substitution", "heteroatom_substitution", "terminal_alkyne", "chan_lam", "amide", "acyl_heteroatom", "sulfonamide"}
+    allowed_product_kinds = {
+        "join_contexts",
+        "nitrogen_substitution",
+        "heteroatom_substitution",
+        "terminal_alkyne",
+        "chan_lam",
+        "reductive_amination",
+        "amide",
+        "acyl_heteroatom",
+        "sulfonamide",
+    }
     for grammar_id, rule in reaction_rendering.items():
         if rule.get("product_kind") not in allowed_product_kinds:
             errors.append(f"invalid_reaction_product_renderer:{grammar_id}")
@@ -238,8 +308,14 @@ def validate_taxonomy() -> List[str]:
     if set(clause_order) != edit_types or len(clause_order) != len(edit_types):
         errors.append("invalid_reaction_label_clause_order")
     required_label_templates = {
-        "formed", "broken", "order_changed", "hydrogen_gain",
-        "hydrogen_loss", "counted_clause", "mapped_atom", "conflict",
+        "formed",
+        "broken",
+        "order_changed",
+        "hydrogen_gain",
+        "hydrogen_loss",
+        "counted_clause",
+        "mapped_atom",
+        "conflict",
         "exact_detail",
         "contextual_detail",
     }
@@ -248,10 +324,15 @@ def validate_taxonomy() -> List[str]:
     label_patterns = payload["reaction_label_patterns.v1"].get("patterns") or []
     pattern_ids = [str(pattern.get("id") or "") for pattern in label_patterns]
     allowed_pattern_matchers = {
-        "substitution", "hydrogenation", "complete_alkyne_hydrogenation",
-        "partial_alkyne_hydrogenation", "heteroatom_bond_reduction",
-        "dehydrogenation", "heteroatom_bond_oxidation",
-        "reductive_bond_cleavage", "intramolecular_bond_formation",
+        "substitution",
+        "hydrogenation",
+        "complete_alkyne_hydrogenation",
+        "partial_alkyne_hydrogenation",
+        "heteroatom_bond_reduction",
+        "dehydrogenation",
+        "heteroatom_bond_oxidation",
+        "reductive_bond_cleavage",
+        "intramolecular_bond_formation",
     }
     if not pattern_ids or any(not pattern_id for pattern_id in pattern_ids):
         errors.append("missing_reaction_label_pattern_id")

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "grammars": [
     {
       "id": "boron_transfer_coupling",
@@ -83,6 +83,51 @@
         "snar"
       ],
       "priority": 90
+    },
+    {
+      "id": "carbonyl_amine_reductive_coupling",
+      "transformation_class": "carbonyl_c_n_reductive_coupling",
+      "display_name": "Carbonyl–amine reductive coupling",
+      "generic_label": "R–C(O)R + N–H → R–CH(N)R",
+      "roles": {
+        "carbonyl_partner": {
+          "site_type": "electrophilic_center",
+          "center_family": "Carbonyl",
+          "carbonyl_subtype_any": [
+            "formaldehyde",
+            "aldehyde",
+            "ketone"
+          ],
+          "availability_any": [
+            "available"
+          ]
+        },
+        "amine_partner": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "N"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        }
+      },
+      "distinct_components": [
+        [
+          "carbonyl_partner",
+          "amine_partner"
+        ]
+      ],
+      "operator": {
+        "id": "replace_carbonyl_oxygen_with_amine",
+        "carbonyl_role": "carbonyl_partner",
+        "amine_role": "amine_partner"
+      },
+      "compatible_named_families": [
+        "reductive_amination"
+      ],
+      "priority": 98
     },
     {
       "id": "amide_formation",
