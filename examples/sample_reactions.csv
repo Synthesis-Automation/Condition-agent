@@ -8,7 +8,7 @@ Suzuki,Naphthyl chloride,Clc1ccc2ccccc2c1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccc3ccccc3c2
 Suzuki,Sterically hindered,Brc1cc(C)ccc1C.c1ccc(B(O)O)cc1>>Cc1ccc(C)c(-c2ccccc2)c1
 Suzuki,Aryl triflate electrophile,Fc1ccc(OS(=O)(=O)C(F)(F)F)cc1.c1ccc(B(O)O)cc1>>Fc1ccc(-c2ccccc2)cc1
 Suzuki,Vinyl bromide + vinyl boronic acid,C/C=C/Br.C=CB(O)O>>C/C=C/C=C
-Suzuki,Potassium aryltrifluoroborate,Brc1ccc(OC)cc1.[K+].[B-](F)(F)c2ccccc2>>COc1ccc(-c2ccccc2)cc1
+Suzuki,Potassium aryltrifluoroborate,Brc1ccc(OC)cc1.[K+].[B-](F)(F)(F)c2ccccc2>>COc1ccc(-c2ccccc2)cc1
 Suzuki,2-pyridyl MIDA slow-release,Clc1ccncc1.c1ccncc1B1OC(=O)CN(CC(=O)O)C(=O)CN(CC(=O)O)C(=O)O1>>c1ccc(-c2ccccn2)nc1
 Suzuki,Dichloropyridine,Brc1ccc(Cl)nc1.c2ccc(B(O)O)cc2>>c1ccc(-c2ccc(Cl)nc2)cc1
 Suzuki,Mixed halide pyridine,Brc1cc(Cl)nc(Cl)c1.c2ccc(B(O)O)nc2>>c1ccc(-c2cc(Cl)nc(Cl)c2)nc1

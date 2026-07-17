@@ -333,13 +333,22 @@ def _molecule_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     return row
 
 
-def _reaction_csv_columns(source_fields: Sequence[str]) -> list[str]:
-    return [
-        "source_row", *[field for field in source_fields if field != "source_row"],
+def _reaction_csv_columns(
+    source_fields: Sequence[str],
+    reaction_smiles_column: str,
+) -> list[str]:
+    columns = ["source_row"]
+    for field in source_fields:
+        if field == "source_row":
+            continue
+        columns.append(field)
+        if field == reaction_smiles_column:
+            columns.append("reaction_label")
+    columns.extend((
         "valid", "evidence_quality", "transformation_class", "named_family",
-        "reaction_label", "reaction_label_status", "candidate_count", "warnings",
-        "error",
-    ]
+        "reaction_label_status", "candidate_count", "warnings", "error",
+    ))
+    return columns
 
 
 def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
@@ -369,7 +378,7 @@ def _write_batch_csv(
     columns = (
         _molecule_csv_columns(source_fields, input_column)
         if mode == "molecule"
-        else _reaction_csv_columns(source_fields)
+        else _reaction_csv_columns(source_fields, input_column)
     )
     row_builder = _molecule_csv_row if mode == "molecule" else _reaction_csv_row
     with output_path.open("w", encoding="utf-8-sig", newline="") as handle:
