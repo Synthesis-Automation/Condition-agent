@@ -241,6 +241,7 @@ def validate_taxonomy() -> List[str]:
         "formed", "broken", "order_changed", "hydrogen_gain",
         "hydrogen_loss", "counted_clause", "mapped_atom", "conflict",
         "exact_detail",
+        "contextual_detail",
     }
     if not required_label_templates <= set(label_rendering.get("templates") or {}):
         errors.append("missing_reaction_label_templates")

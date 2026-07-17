@@ -20,6 +20,14 @@ Any unmatched edit set still receives a deterministic literal summary such as
 the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
+For a single validated bond-order transformation, the preferred display adds
+retained-neighbor and endpoint-hydrogen context. For example, the generic
+interpretation `C=C hydrogenation` is retained in `transformation_label`, while
+`reaction_label` becomes `Ar–CH=CH2 → Ar–CH2–CH3`. The nested display also
+retains `structural_label`, `reactant_context_label`, and
+`product_context_label`. Multi-edit cases that cannot be rendered safely keep
+their literal edit summary.
+
 When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
 product, a conservative correspondence fallback may supply edit evidence after
 registered grammar reconstruction has failed. It accepts only mappings whose

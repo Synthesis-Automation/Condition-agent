@@ -9,6 +9,7 @@ from .chemistry.rdkit_utils import parse_smiles
 from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_candidates import enumerate_reaction_candidates
+from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_display_labels import build_reaction_display_label
 from .reaction_edits import normalize_reaction_edits
 from .reaction_labels import render_reactant_label, render_reaction_label
@@ -98,6 +99,13 @@ def featurize_reaction(
     edit_result = normalize_reaction_edits(
         parsed.reactants, parsed.products, selected
     )
+    contextual_label = (
+        None
+        if edit_result.evidence == "conflicting_edit_evidence"
+        else build_contextual_transformation_label(
+            parsed.reactants, edit_result.edits, style=label_style
+        )
+    )
     warnings.extend(edit_result.warnings)
     effective_evidence = evidence
     if edit_result.evidence == "conflicting_edit_evidence":
@@ -116,6 +124,9 @@ def featurize_reaction(
         spectators=spectators,
         named_family=named_family,
         compatible_named_families=compatible_named_families,
+        contextual_product_label=(
+            contextual_label.after if contextual_label is not None else None
+        ),
         warnings=warnings,
     )
     reaction_label = selected.reaction_label if selected else None
@@ -141,6 +152,7 @@ def featurize_reaction(
             selected and selected.verification == "exact_product_reconstruction"
         ),
         grammar_id=selected.grammar_id if selected is not None else None,
+        contextual_label=contextual_label,
         named_family=named_family,
         fallback_label=reaction_label,
         fallback_status=reaction_label_status,

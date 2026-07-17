@@ -113,7 +113,10 @@ class ReactionDisplayLabel:
     pattern_id: Optional[str] = None
     pattern_definition_version: Optional[str] = None
     grammar_id: Optional[str] = None
-    schema_version: str = "1.1"
+    contextual_label: Optional[str] = None
+    reactant_context_label: Optional[str] = None
+    product_context_label: Optional[str] = None
+    schema_version: str = "1.2"
 
 
 @dataclass(frozen=True)

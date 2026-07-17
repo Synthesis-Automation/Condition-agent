@@ -328,9 +328,11 @@ uses an evidence-ordered ladder:
 2. use an exact grammar label only when reconstruction and normalized edits
    agree;
 3. otherwise match a versioned generic edit pattern;
-4. otherwise render the normalized edits literally;
-5. use a reactant-only grammar label only when no verified edit evidence exists;
-6. report the transformation as unresolved when neither edits nor exact
+4. when one validated bond-order event has sufficient local context, render a
+   contextual before/after overlay while retaining the generic pattern label;
+5. otherwise render the normalized edits literally;
+6. use a reactant-only grammar label only when no verified edit evidence exists;
+7. report the transformation as unresolved when neither edits nor exact
    reconstruction are available.
 
 Generic label patterns are declarative and identify reusable edit combinations,
@@ -345,9 +347,14 @@ Ar-Cl + Ar-B(OH)2 -> Ar-Ar
 Alkenyl-Cl + Ar-B(OH)2 -> Ar-Alkenyl
 HeteroAr-Br + R-NH2 -> HeteroAr-NH-R
 unknown family: C-N substitution
-unknown family: C=C hydrogenation
+unknown family: Ar-CH=CH2 -> Ar-CH2-CH3
 unmatched edit pattern: C-O bond cleavage; C-N bond formation
 ```
+
+Contextual text is a display overlay, not reaction identity. Store the generic
+interpretation (`C=C hydrogenation`), literal structural edits, contextual
+reactant motif, and contextual product motif separately. Rendering definitions
+and display style must not affect `signature_id`.
 
 When the product connection is not verified, leave the product label empty:
 

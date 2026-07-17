@@ -21,13 +21,15 @@ def test_mapped_unknown_reaction_receives_observed_edit_label() -> None:
 def test_multiple_edits_compose_and_collapse_repeated_generic_clauses() -> None:
     result = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
 
-    assert result.reaction_label == "C=C hydrogenation"
+    assert result.reaction_label == "H2C=CH2 → H3C–CH3"
     assert result.reaction_label_status == "mapped_generic_pattern"
     assert result.display_label is not None
     assert result.display_label.status == "generic_pattern"
     assert result.display_label.pattern_id == "hydrogenation"
     assert result.display_label.structural_label == "C=C → C–C; 2 × H gain at C"
     assert result.display_label.transformation_label == "C=C hydrogenation"
+    assert result.display_label.contextual_label == "H2C=CH2 → H3C–CH3"
+    assert result.display_label.product_context_label == "H3C–CH3"
     assert len(result.display_label.clauses) == 3
     assert "H gain at C(map 1)" in result.display_label.detailed
     assert "H gain at C(map 2)" in result.display_label.detailed
@@ -93,7 +95,7 @@ def test_display_label_serializes_as_nested_evidence() -> None:
         "[CH3:1].[NH2:2]>>[CH3:1][NH2:2]"
     ).to_dict()
 
-    assert payload["display_label"]["schema_version"] == "1.1"
+    assert payload["display_label"]["schema_version"] == "1.2"
     assert payload["display_label"]["clauses"][0]["edit_type"] == "formed"
     assert payload["display_label"]["clauses"][0]["atom_map_numbers"] == (1, 2)
 
@@ -110,6 +112,7 @@ def test_unknown_mapped_substitution_receives_generic_pattern_label() -> None:
     assert result.display_label is not None
     assert result.display_label.pattern_id == "substitution"
     assert result.display_label.grammar_id is None
+    assert result.display_label.contextual_label is None
     assert result.display_label.structural_label == (
         "C–Br bond cleavage; C–N bond formation; N–H loss"
     )
@@ -119,9 +122,12 @@ def test_unknown_mapped_dehydrogenation_receives_generic_pattern_label() -> None
     result = featurize_reaction("[CH3:1][CH3:2]>>[CH2:1]=[CH2:2]")
 
     assert result.named_family is None
-    assert result.reaction_label == "C=C formation by dehydrogenation"
+    assert result.reaction_label == "H3C–CH3 → H2C=CH2"
     assert result.display_label is not None
     assert result.display_label.pattern_id == "dehydrogenation"
+    assert result.display_label.transformation_label == (
+        "C=C formation by dehydrogenation"
+    )
 
 
 def test_unknown_intramolecular_formation_receives_ring_closure_pattern() -> None:

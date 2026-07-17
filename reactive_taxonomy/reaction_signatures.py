@@ -320,6 +320,7 @@ def build_reaction_signature(
     spectators: Tuple[ReactionSpectatorGroup, ...],
     named_family: Optional[str],
     compatible_named_families: Tuple[str, ...],
+    contextual_product_label: Optional[str] = None,
     warnings: Iterable[str] = (),
 ) -> Optional[ReactionSignature]:
     """Build a versioned signature when verified edit evidence is available."""
@@ -413,7 +414,11 @@ def build_reaction_signature(
         formed_connection_labels=(product_connection.concise_label,)
         if product_connection
         else (),
-        concise_label=product_connection.concise_label if product_connection else None,
+        concise_label=(
+            product_connection.concise_label
+            if product_connection
+            else contextual_product_label
+        ),
         exact_product_verified=bool(
             selected and selected.verification == "exact_product_reconstruction"
         ),

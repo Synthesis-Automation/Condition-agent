@@ -8,6 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Optional, Sequence, Tuple
 
+from .reaction_contextual_labels import ContextualTransformationLabel
 from .reaction_label_patterns import match_reaction_label_pattern
 from .reaction_models import ReactionDisplayLabel, ReactionEdit, ReactionLabelClause
 
@@ -175,6 +176,7 @@ def build_reaction_display_label(
     selected_label: Optional[str],
     selected_exact: bool,
     grammar_id: Optional[str],
+    contextual_label: Optional[ContextualTransformationLabel],
     named_family: Optional[str],
     fallback_label: Optional[str],
     fallback_status: str,
@@ -214,15 +216,28 @@ def build_reaction_display_label(
         )
         status = "family_overlay" if named_family else "exact_reconstruction"
     elif pattern is not None:
-        concise = pattern.label
-        detailed = str(rendering["templates"]["exact_detail"]).format(
-            label=pattern.label,
+        concise = contextual_label.concise if contextual_label else pattern.label
+        detail_template = (
+            rendering["templates"]["contextual_detail"]
+            if contextual_label
+            else rendering["templates"]["exact_detail"]
+        )
+        detailed = str(detail_template).format(
+            label=concise,
+            transformation=pattern.label,
             clauses=detailed_clauses,
         )
         status = "generic_pattern"
     elif clauses:
-        concise = concise_clauses
-        detailed = detailed_clauses
+        concise = contextual_label.concise if contextual_label else concise_clauses
+        detailed = (
+            str(rendering["templates"]["exact_detail"]).format(
+                label=contextual_label.concise,
+                clauses=detailed_clauses,
+            )
+            if contextual_label
+            else detailed_clauses
+        )
         status = "observed_edits"
     elif fallback_label:
         concise = detailed = fallback_label
@@ -250,6 +265,9 @@ def build_reaction_display_label(
         pattern_id=pattern.pattern_id if pattern else None,
         pattern_definition_version=pattern.definition_version if pattern else None,
         grammar_id=grammar_id if grammar_label else None,
+        contextual_label=contextual_label.concise if contextual_label else None,
+        reactant_context_label=contextual_label.before if contextual_label else None,
+        product_context_label=contextual_label.after if contextual_label else None,
     )
 
 

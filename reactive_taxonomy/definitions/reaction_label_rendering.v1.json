@@ -42,6 +42,7 @@
     "counted_clause": "{count} {times} {clause}",
     "mapped_atom": "{element}(map {map_number})",
     "conflict": "Conflicting evidence: {clauses}",
-    "exact_detail": "{label}; edits: {clauses}"
+    "exact_detail": "{label}; edits: {clauses}",
+    "contextual_detail": "{label}; transformation: {transformation}; edits: {clauses}"
   }
 }
