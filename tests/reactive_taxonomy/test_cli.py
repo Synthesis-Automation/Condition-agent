@@ -88,7 +88,10 @@ def test_batch_writes_molecule_summary_csv(tmp_path, capsys) -> None:
 def test_batch_autodetects_clean_reaction_column(tmp_path, capsys) -> None:
     source = tmp_path / "reactions.csv"
     output = tmp_path / "results.csv"
-    reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+    reaction = (
+        "Brc1ccc(C#N)cc1.OB(O)c1ccccc1"
+        ">>N#Cc1ccc(-c2ccccc2)cc1"
+    )
     with source.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=["rxn_smiles_clean", "source_id"])
         writer.writeheader()
@@ -105,5 +108,10 @@ def test_batch_autodetects_clean_reaction_column(tmp_path, capsys) -> None:
         reader = csv.DictReader(handle)
         assert reader.fieldnames is not None
         smiles_index = reader.fieldnames.index("rxn_smiles_clean")
-        assert reader.fieldnames[smiles_index + 1] == "reaction_label"
-        assert len(list(reader)) == 1
+        assert reader.fieldnames[smiles_index + 1:smiles_index + 3] == [
+            "reaction_label",
+            "spectator_groups",
+        ]
+        rows = list(reader)
+        assert len(rows) == 1
+        assert rows[0]["spectator_groups"] == "nitrile"

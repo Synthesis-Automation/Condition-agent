@@ -92,6 +92,10 @@ python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mo
 
 ```
 
+Reaction-mode CSV output places a semicolon-separated `spectator_groups`
+column immediately after `reaction_label`. Values are stable functional-group
+IDs such as `nitrile`.
+
 Phase 1 molecular-feature evaluation, including machine metrics and a blind
 chemist-review packet:
 

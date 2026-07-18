@@ -343,7 +343,7 @@ def _reaction_csv_columns(
             continue
         columns.append(field)
         if field == reaction_smiles_column:
-            columns.append("reaction_label")
+            columns.extend(("reaction_label", "spectator_groups"))
     columns.extend((
         "valid", "evidence_quality", "transformation_class", "named_family",
         "reaction_label_status", "candidate_count", "warnings", "error",
@@ -353,6 +353,7 @@ def _reaction_csv_columns(
 
 def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     analysis = record["analysis"]
+    spectator_groups = analysis.get("spectator_groups") or []
     return {
         "source_row": record["source_row"],
         **record["source"],
@@ -361,6 +362,9 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         "transformation_class": analysis.get("transformation_class") or "",
         "named_family": analysis.get("named_family") or "",
         "reaction_label": analysis.get("reaction_label") or "",
+        "spectator_groups": "; ".join(
+            str(group.get("group_id") or "") for group in spectator_groups
+        ),
         "reaction_label_status": analysis.get("reaction_label_status") or "",
         "candidate_count": len(analysis.get("candidates") or []),
         "warnings": "; ".join(str(value) for value in analysis.get("warnings") or []),
