@@ -37,6 +37,24 @@ def test_functional_group_ownership_suppresses_generic_sulfonamide_amine() -> No
     assert "secondary_amine" not in ids
 
 
+def test_nitro_nitrogen_is_not_classified_as_a_tertiary_amine() -> None:
+    result = featurize_molecule("O=[N+]([O-])c1ccccc1")
+    ids = {group.group_id for group in result.functional_groups}
+    assert "nitro" in ids
+    assert "tertiary_amine" not in ids
+
+
+def test_nitro_spectator_is_not_reported_as_a_tertiary_amine() -> None:
+    reaction = (
+        "Sc1ccccc1.Sc1ccccc1.O=[N+]([O-])c1c(F)cccc1F"
+        ">>O=[N+]([O-])c1c(Sc2ccccc2)cccc1Sc1ccccc1"
+    )
+    result = featurize_reaction(reaction)
+    ids = [group.group_id for group in result.spectator_groups]
+    assert ids.count("nitro") == 1
+    assert "tertiary_amine" not in ids
+
+
 def test_aldehyde_definition_includes_formaldehyde_but_excludes_formamides() -> None:
     assert [group.group_id for group in featurize_molecule("C=O").functional_groups] == ["aldehyde"]
     assert [group.group_id for group in featurize_molecule("CC=O").functional_groups] == ["aldehyde"]

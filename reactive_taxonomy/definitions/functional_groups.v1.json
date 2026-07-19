@@ -340,7 +340,7 @@
     {
       "id": "tertiary_amine",
       "label": "R3N",
-      "smarts": "[N;X3;H0;!$(N-C=O):1]",
+      "smarts": "[N;+0;X3;H0;!$(N-C=O):1]",
       "priority": 78,
       "tags": [
         "basic",

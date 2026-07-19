@@ -101,7 +101,7 @@ python -m reactive_taxonomy.cli self-test
 python -m reactive_taxonomy.cli molecule "Brc1ccc(N)cc1C#N"
 python -m reactive_taxonomy.cli reaction "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
 
-python -m reactive_taxonomy.cli reaction "Sc1ccccc1.Sc1ccccc1.O=[N+]([O-])c1c(F)cccc1F>>O=[N+]([O-])c1c(Sc2ccccc2)cccc1Sc1ccccc1"
+python -m reactive_taxonomy.cli reaction "Oc1cccc(C(F)(F)F)c1.Oc1cccc(C(F)(F)F)c1.N#Cc1c(F)c(F)c(Oc2cccc(Oc3ccccc3)c2)c(F)c1F>>N#Cc1c(Oc2cccc(C(F)(F)F)c2)c(F)c(Oc2cccc(Oc3ccccc3)c2)c(F)c1Oc1cccc(C(F)(F)F)c1"
 
 
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/molecule_features.jsonl
