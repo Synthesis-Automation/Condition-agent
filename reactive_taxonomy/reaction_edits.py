@@ -250,7 +250,10 @@ def normalize_predicted_edits(
     reactants: Tuple[ReactionComponent, ...],
 ) -> EditNormalizationResult:
     """Convert operator changes for an exact selected candidate to typed edits."""
-    if selected is None or selected.verification != "exact_product_reconstruction":
+    if selected is None or selected.verification not in {
+        "exact_product_reconstruction",
+        "exact_multi_event_reconstruction",
+    }:
         return EditNormalizationResult((), "no_exact_reconstruction", 0.0, valid=False)
     edits = []
     warnings = []
@@ -284,6 +287,34 @@ def normalize_predicted_edits(
         1.0 if edits else 0.0,
         tuple(sorted(set(warnings))),
         bool(edits),
+    )
+
+
+def normalize_predicted_multi_event_edits(
+    selected_events: Tuple[ReactionCandidate, ...],
+    reactants: Tuple[ReactionComponent, ...],
+) -> EditNormalizationResult:
+    """Normalize an exactly reconstructed collection of reaction events."""
+    if len(selected_events) < 2:
+        return EditNormalizationResult((), "no_exact_multi_event_reconstruction", 0.0, valid=False)
+    normalized = tuple(
+        normalize_predicted_edits(candidate, reactants)
+        for candidate in selected_events
+    )
+    warnings = tuple(
+        sorted({warning for result in normalized for warning in result.warnings})
+    )
+    if not all(result.valid for result in normalized):
+        return EditNormalizationResult(
+            (), "multi_event_edit_normalization_failed", 0.0, warnings, False
+        )
+    edits = tuple(edit for result in normalized for edit in result.edits)
+    return EditNormalizationResult(
+        edits,
+        "exact_multi_event_reconstruction",
+        1.0,
+        warnings,
+        True,
     )
 
 
@@ -506,11 +537,19 @@ def normalize_reaction_edits(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
     selected: Optional[ReactionCandidate],
+    selected_events: Tuple[ReactionCandidate, ...] = (),
 ) -> EditNormalizationResult:
     """Choose observed edits when valid and reconcile exact operator evidence."""
     mapped = normalize_mapped_edits(reactants, products)
     predicted = normalize_predicted_edits(selected, reactants)
-    warnings = tuple(sorted(set(mapped.warnings + predicted.warnings)))
+    predicted_multi = normalize_predicted_multi_event_edits(
+        selected_events, reactants
+    )
+    warnings = tuple(
+        sorted(
+            set(mapped.warnings + predicted.warnings + predicted_multi.warnings)
+        )
+    )
     if mapped.evidence == "invalid_atom_mapping":
         return EditNormalizationResult(
             (),
@@ -535,6 +574,22 @@ def normalize_reaction_edits(
             0.5,
             tuple(sorted(set(warnings + ("MAPPING_RECONSTRUCTION_CONFLICT",)))),
         )
+    if mapped.valid and predicted_multi.valid:
+        mapped_keys = {_comparison_key(edit) for edit in mapped.edits}
+        predicted_keys = {_comparison_key(edit) for edit in predicted_multi.edits}
+        if mapped_keys == predicted_keys:
+            return EditNormalizationResult(
+                mapped.edits,
+                "validated_mapping_and_exact_multi_event_reconstruction",
+                1.0,
+                warnings,
+            )
+        return EditNormalizationResult(
+            mapped.edits,
+            "conflicting_edit_evidence",
+            0.5,
+            tuple(sorted(set(warnings + ("MAPPING_RECONSTRUCTION_CONFLICT",)))),
+        )
     if mapped.valid:
         return EditNormalizationResult(
             mapped.edits, mapped.evidence, mapped.confidence, warnings
@@ -542,6 +597,13 @@ def normalize_reaction_edits(
     if predicted.valid:
         return EditNormalizationResult(
             predicted.edits, predicted.evidence, predicted.confidence, warnings
+        )
+    if predicted_multi.valid:
+        return EditNormalizationResult(
+            predicted_multi.edits,
+            predicted_multi.evidence,
+            predicted_multi.confidence,
+            warnings,
         )
     inferred = normalize_inferred_scaffold_edits(reactants, products)
     if inferred.valid:
@@ -560,5 +622,6 @@ __all__ = [
     "normalize_mapped_edits",
     "normalize_inferred_scaffold_edits",
     "normalize_predicted_edits",
+    "normalize_predicted_multi_event_edits",
     "normalize_reaction_edits",
 ]

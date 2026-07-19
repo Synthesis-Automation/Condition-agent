@@ -99,6 +99,7 @@ class ReactionDisplayLabel:
         "family_overlay",
         "generic_pattern",
         "conflicting_evidence",
+        "multi_event",
         "reactant_only",
         "ambiguous_reactants",
         "unavailable",
@@ -119,7 +120,9 @@ class ReactionDisplayLabel:
     contextual_label: Optional[str] = None
     reactant_context_label: Optional[str] = None
     product_context_label: Optional[str] = None
-    schema_version: str = "1.2"
+    event_labels: Tuple[str, ...] = ()
+    event_count: int = 0
+    schema_version: str = "1.3"
 
 
 @dataclass(frozen=True)
@@ -298,7 +301,7 @@ class ReactionSignature:
     edits: Tuple[ReactionEdit, ...]
     events: Tuple[ReactionEvent, ...]
     event_count: int
-    reaction_scope: Literal["single_event", "multi_event", "unresolved"]
+    event_scope: Literal["single_event", "multi_event", "unresolved"]
     event_relations: Tuple[ReactionEventRelation, ...]
     partners: Tuple[ReactionPartner, ...]
     product_transformation: Optional[ProductTransformation]
@@ -338,6 +341,7 @@ class ReactionAnalysis:
     products: Tuple[ReactionComponent, ...] = ()
     candidates: Tuple[ReactionCandidate, ...] = ()
     selected_candidate: Optional[ReactionCandidate] = None
+    selected_events: Tuple[ReactionCandidate, ...] = ()
     transformation_class: Optional[str] = None
     compatible_named_families: Tuple[str, ...] = ()
     named_family: Optional[str] = None

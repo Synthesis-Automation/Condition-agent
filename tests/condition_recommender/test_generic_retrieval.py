@@ -41,6 +41,17 @@ def _signature(
         "formed_bond_types": ["C-N:SINGLE"],
         "broken_bond_types": ["B-C:SINGLE"],
         "order_changes": [],
+        "event_count": 1,
+        "event_scope": "single_event",
+        "events": [
+            {
+                "formed_bond_types": ["C-N:SINGLE"],
+                "broken_bond_types": ["B-C:SINGLE"],
+                "order_changes": [],
+                "transformation_class": "generic_c_n_coupling",
+                "topology": {"reaction_scope": reaction_scope},
+            }
+        ],
         "partners": [
             {
                 "handle_tokens": ["B(OH)2"],
@@ -74,8 +85,8 @@ def _signature(
 
 def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     return {
-        "schema_version": "1.6",
-        "converter_definition_version": "generic_conversion.v1.1",
+        "schema_version": "1.7",
+        "converter_definition_version": "generic_conversion.v1.2",
         "admission_tier": tier,
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
@@ -245,6 +256,22 @@ def test_similarity_prefers_matching_reaction_topology() -> None:
     assert 0.0 < ring_components["reaction_topology"] < 1.0
     assert intermolecular_components["reaction_topology"] == 0.0
     assert matched_score > ring_score > intermolecular_score
+
+
+def test_similarity_preserves_reaction_event_multiplicity() -> None:
+    query = _signature("query")
+    query["events"] = [*query["events"], *query["events"]]
+    query["event_count"] = 2
+    query["event_scope"] = "multi_event"
+    exact = {**_signature("exact"), "events": list(query["events"])}
+    partial = _signature("partial")
+
+    exact_score, exact_components = generic_signature_similarity(query, exact)
+    partial_score, partial_components = generic_signature_similarity(query, partial)
+
+    assert exact_components["reaction_events"] == 1.0
+    assert partial_components["reaction_events"] == 0.5
+    assert exact_score > partial_score
 
 
 def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:

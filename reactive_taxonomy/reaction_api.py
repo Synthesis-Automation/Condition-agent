@@ -15,7 +15,11 @@ from .reaction_edits import normalize_mapped_edits, normalize_reaction_edits
 from .reaction_labels import render_reactant_label, render_reaction_label
 from .reaction_environments import build_reaction_family_environment
 from .reaction_models import ReactionAnalysis, ReactionCandidate
-from .reaction_operators import apply_operator
+from .reaction_multi_events import (
+    equivalent_multi_event_interpretations,
+    exact_multi_event_reconstructions,
+)
+from .reaction_operators import apply_operator, apply_operator_sequence
 from .reaction_parser import parse_reaction_smiles
 from .reaction_products import build_product_connection
 from .reaction_spectators import derive_spectator_groups
@@ -97,6 +101,7 @@ def featurize_reaction(
         if verification == "exact_product_reconstruction":
             exact.append(candidate)
     selected = None
+    selected_events: tuple[ReactionCandidate, ...] = ()
     evidence = "reactant_grammar_only" if candidates else "unresolved"
     if invalid_supplied_mapping:
         evidence = "unresolved"
@@ -121,8 +126,47 @@ def featurize_reaction(
         else:
             evidence = "ambiguous"
             warnings.append("AMBIGUOUS_PARTICIPATING_SITES")
+    elif candidates and not invalid_supplied_mapping:
+        multi_exact = exact_multi_event_reconstructions(
+            raw,
+            parsed.reactants,
+            {str(product) for product in observed_products},
+        )
+        if multi_exact and equivalent_multi_event_interpretations(multi_exact):
+            chosen = multi_exact[0]
+            composite_product = apply_operator_sequence(chosen, parsed.reactants)
+            selected_events = tuple(
+                ReactionCandidate(
+                    grammar_id=str(grammar["id"]),
+                    transformation_class=str(grammar["transformation_class"]),
+                    role_assignments=assignment,
+                    predicted_bond_changes=apply_operator(
+                        grammar, assignment, parsed.reactants
+                    )[1],
+                    predicted_product_smiles=composite_product,
+                    verification="exact_multi_event_reconstruction",
+                    reaction_label=render_reaction_label(
+                        grammar, assignment, style=label_style
+                    ),
+                    compatible_named_families=tuple(
+                        grammar.get("compatible_named_families") or []
+                    ),
+                )
+                for grammar, assignment in chosen
+            )
+            evidence = "exact_multi_event_reconstruction"
+            if len(multi_exact) > 1:
+                warnings.append("SYMMETRY_EQUIVALENT_MULTI_EVENT_ASSIGNMENTS")
+        elif multi_exact:
+            evidence = "ambiguous"
+            warnings.append("AMBIGUOUS_MULTI_EVENT_ASSIGNMENTS")
     mapped_changes = tuple(supplied_map_bond_changes(reaction_smiles))
-    spectators = derive_spectator_groups(parsed.reactants, selected, evidence)
+    spectators = derive_spectator_groups(
+        parsed.reactants,
+        selected,
+        evidence,
+        selected_events,
+    )
     family_environment = build_reaction_family_environment(
         parsed.reactants, selected, spectators, evidence
     )
@@ -132,8 +176,25 @@ def featurize_reaction(
         if selected and len(selected.compatible_named_families) == 1
         else None
     )
-    compatible_named_families = selected.compatible_named_families if selected else ()
-    edit_result = normalize_reaction_edits(parsed.reactants, parsed.products, selected)
+    compatible_named_families = (
+        selected.compatible_named_families
+        if selected
+        else tuple(
+            sorted(
+                {
+                    family
+                    for event in selected_events
+                    for family in event.compatible_named_families
+                }
+            )
+        )
+    )
+    edit_result = normalize_reaction_edits(
+        parsed.reactants,
+        parsed.products,
+        selected,
+        selected_events,
+    )
     contextual_label = (
         None
         if edit_result.evidence == "conflicting_edit_evidence"
@@ -155,18 +216,22 @@ def featurize_reaction(
         edit_result.valid or edit_result.evidence == "ambiguous_atom_correspondence"
     ):
         effective_evidence = edit_result.evidence
+    display_arrow = "→" if label_style == "unicode" else "->"
     selected_product_label = None
     if (
         selected is not None
         and selected.verification == "exact_product_reconstruction"
         and selected.reaction_label
-        and "→" in selected.reaction_label
+        and display_arrow in selected.reaction_label
     ):
-        selected_product_label = selected.reaction_label.split("→", 1)[1].strip()
+        selected_product_label = selected.reaction_label.split(
+            display_arrow, 1
+        )[1].strip()
     reaction_signature = (
         build_reaction_signature(
             reactants=parsed.reactants,
             selected=selected,
+            selected_events=selected_events,
             edit_result=edit_result,
             family_environment=family_environment,
             product_connection=product_connection,
@@ -194,18 +259,22 @@ def featurize_reaction(
             }
         )
         if len(reactant_labels) == 1:
-            reaction_label = f"{reactant_labels[0]} →"
+            reaction_label = f"{reactant_labels[0]} {display_arrow}"
             reaction_label_status = "reactant_only"
         elif reactant_labels:
             reaction_label = (
-                " OR ".join(f"({label})" for label in reactant_labels) + " →"
+                " OR ".join(f"({label})" for label in reactant_labels)
+                + f" {display_arrow}"
             )
             reaction_label_status = "ambiguous_reactants"
     elif selected is not None and product_connection is not None:
         reactants_label = render_reactant_label(
             selected.role_assignments, style=label_style
         )
-        reaction_label = f"{reactants_label} → {product_connection.concise_label}"
+        reaction_label = (
+            f"{reactants_label} {display_arrow} "
+            f"{product_connection.concise_label}"
+        )
     display_label = build_reaction_display_label(
         edits=edit_result.edits,
         selected_label=reaction_label if selected is not None else None,
@@ -219,6 +288,7 @@ def featurize_reaction(
         fallback_status=reaction_label_status,
         evidence=edit_result.evidence,
         confidence=edit_result.confidence,
+        events=(reaction_signature.events if reaction_signature is not None else ()),
         topology=reaction_topology,
         warnings=warnings,
         style=label_style,
@@ -239,6 +309,8 @@ def featurize_reaction(
             )
         elif display_label.status == "conflicting_evidence":
             reaction_label_status = "conflicting_edit_summary"
+        elif display_label.status == "multi_event":
+            reaction_label_status = "multi_event_edit_summary"
     return ReactionAnalysis(
         input_reaction_smiles=reaction_smiles,
         valid=True,
@@ -247,6 +319,7 @@ def featurize_reaction(
         products=parsed.products,
         candidates=tuple(candidates),
         selected_candidate=selected,
+        selected_events=selected_events,
         transformation_class=selected.transformation_class if selected else None,
         compatible_named_families=compatible_named_families,
         named_family=named_family,

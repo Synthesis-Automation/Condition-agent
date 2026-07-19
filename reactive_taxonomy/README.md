@@ -68,6 +68,23 @@ For example, `NCCc1ccccc1Br>>c1ccc2c(c1)CCN2` is rendered as
 `intramolecular (5-membered ring) Ar–Br / R–NH2 → Ar–NH–R` using the same
 `sp2_c_n_substitution` grammar as the corresponding intermolecular reaction.
 
+Normalized edits are also partitioned into deterministic `ReactionEvent`
+objects. Edits that share atom provenance form one event; disconnected edit
+groups form a multi-event reaction. This represents mixed chemistry without
+forcing one family label. For example, validated C-O and C-S substitutions at
+different sites are rendered as `C-O substitution + C-S substitution`, while
+two equivalent substitutions are counted as `2 x C-S substitution` in ASCII
+style. Each event retains its edits, partners, sites, topology, evidence, and
+optional interpretation. The reaction signature stores the ordered event
+multiset and cross-event relations such as `shared_component`.
+
+Multi-event inference still follows the normal evidence hierarchy. Valid atom
+mapping is preferred. For balanced unmapped substitutions, distinct grammar
+assignments may be composed and accepted only when the combined graph operators
+exactly reconstruct the observed product. An atom-unbalanced record is not
+assigned invented partner copies or atom correspondence merely to explain its
+product.
+
 When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
 product, a conservative correspondence fallback may supply edit evidence after
 registered grammar reconstruction has failed. It accepts only mappings whose
@@ -83,6 +100,10 @@ python -m reactive_taxonomy.cli validate
 python -m reactive_taxonomy.cli self-test
 python -m reactive_taxonomy.cli molecule "Brc1ccc(N)cc1C#N"
 python -m reactive_taxonomy.cli reaction "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+
+python -m reactive_taxonomy.cli reaction "Sc1ccccc1.Sc1ccccc1.O=[N+]([O-])c1c(F)cccc1F>>O=[N+]([O-])c1c(Sc2ccccc2)cccc1Sc1ccccc1"
+
+
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/molecule_features.jsonl
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/sample_compounds_featurized.csv
 python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --output results/sample_reaction_featurized.csv

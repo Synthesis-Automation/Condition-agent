@@ -13,6 +13,7 @@ from .reaction_label_patterns import match_reaction_label_pattern
 from .reaction_models import (
     ReactionDisplayLabel,
     ReactionEdit,
+    ReactionEvent,
     ReactionLabelClause,
     ReactionTopology,
 )
@@ -26,7 +27,7 @@ def load_reaction_label_rendering() -> dict[str, Any]:
     """Load the versioned declarative edit-label rendering rules."""
     with _PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    if payload.get("schema_version") != "1.0":
+    if payload.get("schema_version") != "1.1":
         raise ValueError("Unsupported reaction-label rendering schema")
     return dict(payload)
 
@@ -176,6 +177,57 @@ def _compose_concise(
     return styling["separator"].join(parts)
 
 
+def _event_labels(
+    events: Sequence[ReactionEvent], *, style: str
+) -> tuple[tuple[str, ...], str, str]:
+    """Render and aggregate event-local labels without changing identity."""
+    rendering = load_reaction_label_rendering()
+    styling = _style(style)
+    labels = []
+    details = []
+    for number, event in enumerate(events, start=1):
+        event_clauses = _ordered_clauses(
+            render_reaction_label_clause(edit, style=style) for edit in event.edits
+        )
+        pattern = match_reaction_label_pattern(event.edits, style=style)
+        label = (
+            pattern.label
+            if pattern
+            else _compose_concise(event_clauses, style=style)
+        )
+        labels.append(label)
+        details.append(
+            str(rendering["templates"]["event_detail"]).format(
+                number=number,
+                label=label,
+                clauses=styling["separator"].join(
+                    clause.detailed for clause in event_clauses
+                ),
+            )
+        )
+    counts = Counter(labels)
+    first_position = {
+        label: index for index, label in reversed(list(enumerate(labels)))
+    }
+    concise_parts = []
+    for label in sorted(counts, key=first_position.get):
+        count = counts[label]
+        concise_parts.append(
+            str(rendering["templates"]["counted_clause"]).format(
+                count=count,
+                times=styling["times"],
+                clause=label,
+            )
+            if count > 1
+            else label
+        )
+    return (
+        tuple(labels),
+        styling["event_separator"].join(concise_parts),
+        styling["event_detail_separator"].join(details),
+    )
+
+
 def build_reaction_display_label(
     *,
     edits: Sequence[ReactionEdit],
@@ -188,6 +240,7 @@ def build_reaction_display_label(
     fallback_status: str,
     evidence: str,
     confidence: float,
+    events: Sequence[ReactionEvent] = (),
     topology: Optional[ReactionTopology] = None,
     warnings: Iterable[str] = (),
     style: str = "unicode",
@@ -207,6 +260,7 @@ def build_reaction_display_label(
     structural_label = concise_clauses or None
     transformation_label = pattern.label if pattern else None
     grammar_label = selected_label if selected_exact and selected_label else None
+    rendered_event_labels: tuple[str, ...] = ()
     if evidence == "conflicting_edit_evidence" and clauses:
         concise = str(rendering["templates"]["conflict"]).format(
             clauses=concise_clauses
@@ -215,6 +269,12 @@ def build_reaction_display_label(
             clauses=detailed_clauses
         )
         status = "conflicting_evidence"
+    elif len(events) > 1 and clauses:
+        rendered_event_labels, concise, detailed = _event_labels(
+            events, style=style
+        )
+        transformation_label = concise
+        status = "multi_event"
     elif selected_exact and selected_label:
         concise = selected_label
         detailed = str(rendering["templates"]["exact_detail"]).format(
@@ -288,6 +348,8 @@ def build_reaction_display_label(
         contextual_label=contextual_label.concise if contextual_label else None,
         reactant_context_label=contextual_label.before if contextual_label else None,
         product_context_label=contextual_label.after if contextual_label else None,
+        event_labels=rendered_event_labels,
+        event_count=len(events),
     )
 
 

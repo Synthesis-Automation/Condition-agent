@@ -75,9 +75,9 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "1.6"
-    assert record.converter_definition_version == "generic_conversion.v1.1"
-    assert record.reaction_signature["schema_version"] == "1.1"
+    assert record.schema_version == "1.7"
+    assert record.converter_definition_version == "generic_conversion.v1.2"
+    assert record.reaction_signature["schema_version"] == "1.2"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
 
 
@@ -107,6 +107,22 @@ def test_mapped_unknown_family_signature_is_verified() -> None:
     assert len(record.reaction_display_label["clauses"]) == 3
     assert record.reaction_signature["order_changes"] == ("C-C:DOUBLE>SINGLE",)
     assert record.resolved_recipe_id.startswith("RCR1:")
+
+
+def test_exact_multi_event_signature_is_verified() -> None:
+    record = convert_record(
+        _raw("CO.CS.Fc1ccc(F)cc1>>COc1ccc(SC)cc1")
+    )
+
+    assert record.admission_tier == AdmissionTier.VERIFIED
+    assert record.evidence_quality == "exact_multi_event_reconstruction"
+    assert record.named_family is None
+    assert record.reaction_signature is not None
+    assert record.reaction_signature["event_count"] == 2
+    assert record.reaction_signature["event_scope"] == "multi_event"
+    assert record.reaction_label is not None
+    assert record.reaction_label.count("substitution") == 2
+    assert " + " in record.reaction_label
 
 
 def test_grammar_only_record_is_review_not_rejected() -> None:
@@ -199,6 +215,8 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
         verified = list(csv.DictReader(handle))
     assert len(verified) == 2
     assert all(row["reaction_signature_id"].startswith("RS1:") for row in verified)
+    assert {row["reaction_event_count"] for row in verified} == {"1"}
+    assert {row["reaction_event_scope"] for row in verified} == {"single_event"}
     assert verified[0]["reaction_scope"] == "intermolecular"
     assert {row["reaction_scope"] for row in verified} == {
         "intermolecular",
@@ -206,7 +224,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     }
     assert json.loads((output / "conversion_report.json").read_text()) == report
     assert report["schema_version"] == "1.1"
-    assert report["reaction_signature_schema_version"] == "1.1"
+    assert report["reaction_signature_schema_version"] == "1.2"
     assert report["reaction_scope_counts"] == {
         "intermolecular": 1,
         "unimolecular": 1,

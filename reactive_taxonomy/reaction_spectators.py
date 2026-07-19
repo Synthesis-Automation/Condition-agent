@@ -12,17 +12,33 @@ def derive_spectator_groups(
     components: Tuple[ReactionComponent, ...],
     selected: ReactionCandidate | None,
     evidence_quality: str,
+    selected_events: Tuple[ReactionCandidate, ...] = (),
 ) -> Tuple[ReactionSpectatorGroup, ...]:
     """Return substrate groups that do not intersect the selected site atoms."""
-    if selected is None:
+    selections = (selected,) if selected is not None else selected_events
+    if not selections:
         return ()
+    multi_event = len(selections) > 1
     reactive_by_component: Dict[int, Dict[str, set[int]]] = {}
-    for site in selected.role_assignments.values():
-        site_atoms = {index for indices in site.atom_roles.values() for index in indices}
-        reactive_by_component.setdefault(site.component_index, {})[site.site_id] = site_atoms
+    for candidate in selections:
+        for site in candidate.role_assignments.values():
+            site_atoms = {
+                index for indices in site.atom_roles.values() for index in indices
+            }
+            key = (
+                f"r{site.component_index}:{site.site_id}"
+                if multi_event
+                else site.site_id
+            )
+            reactive_by_component.setdefault(site.component_index, {})[key] = (
+                site_atoms
+            )
     evidence = (
         "exact_product_reconstruction_event_exclusion"
-        if evidence_quality == "exact_product_reconstruction"
+        if evidence_quality in {
+            "exact_product_reconstruction",
+            "exact_multi_event_reconstruction",
+        }
         else "selected_event_exclusion"
     )
     spectators: List[ReactionSpectatorGroup] = []

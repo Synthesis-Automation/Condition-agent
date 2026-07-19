@@ -159,3 +159,26 @@ def test_compatibility_definition_has_unique_rule_ids() -> None:
     ids = [rule["id"] for rule in all_rules]
     assert len(ids) == len(set(ids))
     assert all(0.0 < rule["penalty"] < 1.0 for rule in rules["soft_penalties"])
+
+
+def test_multi_event_family_requirements_apply_to_every_event() -> None:
+    query = {
+        **_signature(),
+        "events": [
+            {
+                "named_family": "c_s_coupling",
+                "family_confidence": 1.0,
+            },
+            {
+                "named_family": None,
+                "family_confidence": 0.0,
+            },
+        ],
+    }
+
+    missing = assess_recipe_compatibility(query, {})
+    supplied = assess_recipe_compatibility(query, {"catalysts": [{}]})
+
+    assert not missing.compatible
+    assert missing.hard_conflicts == ("metal_coupling_requires_catalyst",)
+    assert supplied.compatible

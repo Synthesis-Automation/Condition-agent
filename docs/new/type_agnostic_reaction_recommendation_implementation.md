@@ -180,6 +180,41 @@ class ProductTransformation:
 
 This supports substitutions and couplings now, and later supports hydrogenation, oxidation, elimination, cyclization, rearrangement, and multi-bond transformations.
 
+### 4.3.1 `ReactionEvent` and multi-event reactions
+
+`ProductTransformation.edits` remains the aggregate observed transformation.
+The edits are additionally partitioned into connected `ReactionEvent` objects:
+
+```python
+@dataclass(frozen=True)
+class ReactionEvent:
+    event_id: str
+    event_signature_key: str
+    edits: tuple[ReactionEdit, ...]
+    partner_ids: tuple[str, ...]
+    reactive_site_ids: tuple[str, ...]
+    formed_bond_types: tuple[str, ...]
+    broken_bond_types: tuple[str, ...]
+    order_changes: tuple[str, ...]
+    topology: ReactionTopology
+    transformation_class: str | None
+    named_family: str | None
+    evidence: str
+    confidence: float
+```
+
+Edits sharing an atom reference belong to the same event. Disconnected groups
+are separate events, even when they occur on one substrate. Event order is
+canonical and does not depend on reactant serialization. A signature with two
+or more events has `event_scope="multi_event"`; equivalent event labels may
+be grouped by multiplicity for display. Cross-event relations record shared
+components without inferring an unsupported temporal sequence.
+
+Balanced unmapped handle substitutions may use exact composite reconstruction:
+operators must consume distinct reactive sites and distinct partner instances,
+and the combined product must exactly match an observed product. Missing
+stoichiometric partner copies are never synthesized in memory to force a match.
+
 ### 4.4 `ReactionTopology`
 
 Intramolecularity is an orthogonal topology dimension, not a named reaction
@@ -220,6 +255,10 @@ class ReactionSignature:
     formed_bond_types: tuple[str, ...]
     broken_bond_types: tuple[str, ...]
     order_changes: tuple[str, ...]
+    events: tuple[ReactionEvent, ...]
+    event_count: int
+    event_scope: str
+    event_relations: tuple[ReactionEventRelation, ...]
     partners: tuple[ReactionPartner, ...]
     product_transformation: ProductTransformation | None
     topology: ReactionTopology

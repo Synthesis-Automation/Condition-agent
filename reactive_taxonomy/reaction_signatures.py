@@ -10,9 +10,11 @@ from typing import Any, Dict, Iterable, Optional, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_edits import EditNormalizationResult
+from .reaction_events import build_reaction_events
 from .reaction_models import (
     ProductConnection,
     ProductTransformation,
+    REACTION_SIGNATURE_SCHEMA_VERSION,
     ReactionAtomReference,
     ReactionCandidate,
     ReactionComponent,
@@ -322,6 +324,7 @@ def build_reaction_signature(
     *,
     reactants: Tuple[ReactionComponent, ...],
     selected: Optional[ReactionCandidate],
+    selected_events: Tuple[ReactionCandidate, ...],
     edit_result: EditNormalizationResult,
     family_environment: Optional[ReactionFamilyEnvironment],
     product_connection: Optional[ProductConnection],
@@ -397,10 +400,39 @@ def build_reaction_signature(
         "formed_ring_sizes": topology.formed_ring_sizes,
         "ring_count_delta": topology.ring_count_delta,
     }
+    events, event_relations = build_reaction_events(
+        reactants=reactants,
+        edits=edit_result.edits,
+        partners=partners,
+        selected=selected,
+        selected_events=selected_events,
+        named_family=named_family,
+        compatible_named_families=compatible_named_families,
+        evidence=edit_result.evidence,
+        confidence=edit_result.confidence,
+    )
+    exact_event_tokens = tuple(event.event_signature_key for event in events)
+    handle_event_tokens = tuple(
+        tuple(
+            sorted(_edit_token(edit, include_environment=False) for edit in event.edits)
+        )
+        for event in events
+    )
+    transformation_event_tokens = tuple(
+        (
+            event.formed_bond_types,
+            event.broken_bond_types,
+            event.order_changes,
+            event.transformation_class,
+            event.topology.reaction_scope,
+        )
+        for event in events
+    )
     exact_key = _digest(
         "L0",
         {
             "edits": environment_edit_tokens,
+            "events": exact_event_tokens,
             "partners": partner_environments,
             "topology": topology_token,
         },
@@ -409,6 +441,7 @@ def build_reaction_signature(
         "L1",
         {
             "edits": edit_tokens,
+            "events": handle_event_tokens,
             "partners": partner_handles,
             "topology": topology_token,
         },
@@ -420,6 +453,7 @@ def build_reaction_signature(
             "broken": broken,
             "order_changes": order_changes,
             "transformation_class": transformation_class,
+            "events": transformation_event_tokens,
             "topology": topology_token,
         },
     )
@@ -442,22 +476,31 @@ def build_reaction_signature(
                 environment_key,
             ),
             "definitions": definition_versions,
-            "schema_version": "1.1",
+            "schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
         },
         length=64,
     )
     product_transformation = ProductTransformation(
         edits=edit_result.edits,
-        formed_connection_labels=(product_connection.concise_label,)
-        if product_connection
-        else (),
+        formed_connection_labels=(
+            (product_connection.concise_label,)
+            if product_connection
+            else tuple(
+                label
+                for event in events
+                for label in event.formed_connection_labels
+            )
+        ),
         concise_label=(
             product_connection.concise_label
             if product_connection
             else contextual_product_label
         ),
         exact_product_verified=bool(
-            selected and selected.verification == "exact_product_reconstruction"
+            (selected and selected.verification == "exact_product_reconstruction")
+            or edit_result.evidence.startswith("validated_atom_mapping")
+            or edit_result.evidence.startswith("validated_mapping")
+            or edit_result.evidence == "exact_multi_event_reconstruction"
         ),
         evidence=edit_result.evidence,
     )
@@ -473,6 +516,16 @@ def build_reaction_signature(
         broken_bond_types=broken,
         order_changes=order_changes,
         edits=edit_result.edits,
+        events=events,
+        event_count=len(events),
+        event_scope=(
+            "single_event"
+            if len(events) == 1
+            else "multi_event"
+            if len(events) > 1
+            else "unresolved"
+        ),
+        event_relations=event_relations,
         partners=partners,
         product_transformation=product_transformation,
         topology=topology,
@@ -480,10 +533,19 @@ def build_reaction_signature(
         transformation_confidence=edit_result.confidence,
         named_family=named_family,
         family_confidence=1.0 if named_family else 0.0,
-        compatible_named_families=tuple(sorted(set(compatible_named_families))),
+        compatible_named_families=tuple(
+            sorted(
+                set(compatible_named_families).union(
+                    family
+                    for event in events
+                    for family in event.compatible_named_families
+                )
+            )
+        ),
         spectator_groups=spectators,
         global_descriptors={
             "edit_count": len(edit_result.edits),
+            "event_count": len(events),
             "partner_count": len(partners),
             "spectator_count": len(spectators),
         },

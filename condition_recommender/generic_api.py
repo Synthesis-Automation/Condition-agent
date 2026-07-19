@@ -37,6 +37,7 @@ def _explanation(
     notes = [f"Retrieved at {level.replace('_', ' ')} level"]
     labels = {
         "edit_topology": "bond edits",
+        "reaction_events": "reaction-event multiset",
         "reaction_topology": "reaction topology",
         "handles": "reactive handles",
         "contexts": "attachment contexts",

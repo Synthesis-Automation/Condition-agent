@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0",
-  "label_schema_version": "1.0",
+  "schema_version": "1.1",
+  "label_schema_version": "1.1",
   "default_style": "unicode",
   "clause_order": ["broken", "order_changed", "formed", "hydrogen_change"],
   "element_precedence": ["C", "N", "O", "S", "P", "B", "Si", "H", "F", "Cl", "Br", "I"],
@@ -12,7 +12,9 @@
       "aromatic": ":",
       "arrow": "→",
       "times": "×",
-      "separator": "; "
+      "separator": "; ",
+      "event_separator": " + ",
+      "event_detail_separator": " | "
     },
     "ascii": {
       "single": "-",
@@ -21,7 +23,9 @@
       "aromatic": ":",
       "arrow": "->",
       "times": "x",
-      "separator": "; "
+      "separator": "; ",
+      "event_separator": " + ",
+      "event_detail_separator": " | "
     },
     "hte_legacy": {
       "single": "-",
@@ -30,7 +34,9 @@
       "aromatic": ":",
       "arrow": "->",
       "times": "x",
-      "separator": "; "
+      "separator": "; ",
+      "event_separator": " + ",
+      "event_detail_separator": " | "
     }
   },
   "templates": {
@@ -43,6 +49,7 @@
     "mapped_atom": "{element}(map {map_number})",
     "conflict": "Conflicting evidence: {clauses}",
     "exact_detail": "{label}; edits: {clauses}",
-    "contextual_detail": "{label}; transformation: {transformation}; edits: {clauses}"
+    "contextual_detail": "{label}; transformation: {transformation}; edits: {clauses}",
+    "event_detail": "Event {number}: {label}; edits: {clauses}"
   }
 }

@@ -59,6 +59,13 @@ topology-agnostic bond-edit fallback. If that fallback crosses reaction scope,
 the result reports `REACTION_TOPOLOGY_FALLBACK_USED` and identifies the mismatch
 in each affected recommendation.
 
+Multi-event reactions are indexed by their complete deterministic event
+multiset at L0-L2. The L3 hard gate continues to compare the complete net bond
+edits, so a precedent covering only one event cannot silently stand in for a
+mixed transformation. Canonical JSONL records retain nested events and event
+relations; CSV review output exposes `reaction_event_count` and
+`reaction_event_scope`.
+
 Before ranking, `compatibility.v1.json` compares unchanged spectator-group tags
 from `reactive_taxonomy` with contextual role buckets and curated family IDs in
 the resolved recipe. Explicit oxidation, reduction, acid, and moisture conflicts

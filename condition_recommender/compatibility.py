@@ -37,6 +37,27 @@ def _query_tags(signature: Mapping[str, Any]) -> set[str]:
     }
 
 
+def _query_family_evidence(
+    signature: Mapping[str, Any],
+) -> tuple[tuple[str, float], ...]:
+    values = []
+    family = str(signature.get("named_family") or "")
+    if family:
+        values.append((family, float(signature.get("family_confidence") or 0.0)))
+    for event in signature.get("events") or ():
+        if not isinstance(event, Mapping):
+            continue
+        event_family = str(event.get("named_family") or "")
+        if event_family:
+            values.append(
+                (
+                    event_family,
+                    float(event.get("family_confidence") or 0.0),
+                )
+            )
+    return tuple(sorted(set(values)))
+
+
 def _recipe_facts(
     recipe: Mapping[str, Any]
 ) -> tuple[set[str], set[str], bool, str, float | None]:
@@ -156,13 +177,14 @@ def assess_recipe_compatibility(
             hard.append(str(rule["id"]))
             evidence.append(str(rule["message"]))
     requirement_penalties = []
-    family = str(signature.get("named_family") or "")
-    family_confidence = float(signature.get("family_confidence") or 0.0)
+    family_evidence = _query_family_evidence(signature)
     for rule in rules.get("regime_requirements") or ():
         families = set(rule.get("named_families_any") or ())
-        if families and family not in families:
-            continue
-        if family_confidence < float(rule.get("minimum_family_confidence") or 0.0):
+        minimum_confidence = float(rule.get("minimum_family_confidence") or 0.0)
+        if families and not any(
+            family in families and confidence >= minimum_confidence
+            for family, confidence in family_evidence
+        ):
             continue
         required = set(rule.get("required_all_buckets") or ())
         missing = sorted(required - buckets)

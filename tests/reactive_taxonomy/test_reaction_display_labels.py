@@ -95,7 +95,7 @@ def test_display_label_serializes_as_nested_evidence() -> None:
         "[CH3:1].[NH2:2]>>[CH3:1][NH2:2]"
     ).to_dict()
 
-    assert payload["display_label"]["schema_version"] == "1.2"
+    assert payload["display_label"]["schema_version"] == "1.3"
     assert payload["display_label"]["clauses"][0]["edit_type"] == "formed"
     assert payload["display_label"]["clauses"][0]["atom_map_numbers"] == (1, 2)
 
@@ -160,8 +160,8 @@ def test_reaction_label_definition_is_versioned() -> None:
     rendering = load_reaction_label_rendering()
     patterns = load_reaction_label_patterns()
 
-    assert rendering["schema_version"] == "1.0"
-    assert rendering["label_schema_version"] == "1.0"
+    assert rendering["schema_version"] == "1.1"
+    assert rendering["label_schema_version"] == "1.1"
     assert patterns["schema_version"] == "1.0"
     assert {pattern["id"] for pattern in patterns["patterns"]} >= {
         "substitution",

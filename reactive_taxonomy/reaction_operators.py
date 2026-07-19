@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Sequence, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 
@@ -392,4 +392,123 @@ def apply_operator(
     return None, ()
 
 
-__all__ = ["apply_operator"]
+def apply_operator_sequence(
+    operations: Sequence[
+        Tuple[Dict[str, Any], Dict[str, ReactionSiteReference]]
+    ],
+    components: Tuple[ReactionComponent, ...],
+) -> str | None:
+    """Apply distinct handle-replacement events as one composite graph edit."""
+    from rdkit import Chem
+
+    if len(operations) < 2 or any(
+        grammar.get("operator", {}).get("id") != "replace_handle_with_center"
+        for grammar, _ in operations
+    ):
+        return None
+    participants: dict[int, ReactionSiteReference] = {}
+    removals: Dict[int, set[int]] = {}
+    joins: list[Tuple[Tuple[int, int], Tuple[int, int]]] = []
+    used_electrophiles: set[Tuple[int, int]] = set()
+    used_partners: set[Tuple[int, int]] = set()
+    for grammar, assignment in operations:
+        operator = grammar["operator"]
+        e_role = str(operator["electrophile_role"])
+        p_role = str(operator["partner_role"])
+        electrophile = assignment[e_role]
+        partner = assignment[p_role]
+        e_anchor_role = (
+            "anchor" if "anchor" in electrophile.atom_roles else "center"
+        )
+        leaving_role = (
+            "handle"
+            if "handle" in electrophile.atom_roles
+            else "leaving_or_activatable"
+        )
+        anchor_index = int(electrophile.atom_roles[e_anchor_role][0])
+        partner_index = int(partner.atom_roles["center"][0])
+        electrophile_key = (electrophile.component_index, anchor_index)
+        partner_key = (partner.component_index, partner_index)
+        if electrophile_key in used_electrophiles or partner_key in used_partners:
+            return None
+        used_electrophiles.add(electrophile_key)
+        used_partners.add(partner_key)
+        electrophile_mol = parse_smiles(
+            _component_by_index(
+                components, electrophile.component_index
+            ).input_smiles
+        )
+        if electrophile_mol is None:
+            return None
+        leaving_atom = _bonded_role_atom(
+            electrophile_mol,
+            electrophile,
+            e_anchor_role,
+            ("connector", leaving_role, "center"),
+        )
+        removals.setdefault(electrophile.component_index, set()).update(
+            _fragment_to_remove(
+                components,
+                electrophile.component_index,
+                anchor_index,
+                leaving_atom,
+            )
+        )
+        joins.append((electrophile_key, partner_key))
+        participants[electrophile.component_index] = electrophile
+        participants[partner.component_index] = partner
+
+    used_indices = sorted(participants)
+    molecules = []
+    offsets: Dict[int, int] = {}
+    total = 0
+    for component_index in used_indices:
+        molecule = parse_smiles(
+            _component_by_index(components, component_index).input_smiles
+        )
+        if molecule is None:
+            return None
+        offsets[component_index] = total
+        total += molecule.GetNumAtoms()
+        molecules.append(molecule)
+    combined = molecules[0]
+    for molecule in molecules[1:]:
+        combined = Chem.CombineMols(combined, molecule)
+    remove_global = sorted(
+        {
+            offsets[component_index] + atom_index
+            for component_index, atom_indices in removals.items()
+            for atom_index in atom_indices
+        },
+        reverse=True,
+    )
+    global_joins = [
+        (
+            offsets[left_component] + left_atom,
+            offsets[right_component] + right_atom,
+        )
+        for (left_component, left_atom), (right_component, right_atom) in joins
+    ]
+    rw = Chem.RWMol(combined)
+    for atom_index in remove_global:
+        rw.RemoveAtom(atom_index)
+
+    def shifted(index: int) -> int:
+        return index - sum(removed < index for removed in remove_global)
+
+    for left_global, right_global in global_joins:
+        left = shifted(left_global)
+        right = shifted(right_global)
+        if left == right or rw.GetBondBetweenAtoms(left, right) is not None:
+            return None
+        rw.AddBond(left, right, Chem.BondType.SINGLE)
+    product = rw.GetMol()
+    try:
+        product.UpdatePropertyCache(strict=False)
+        Chem.SanitizeMol(product)
+        return Chem.MolToSmiles(product, canonical=True, isomericSmiles=True)
+    except Exception:
+        return None
+
+
+__all__ = ["apply_operator", "apply_operator_sequence"]

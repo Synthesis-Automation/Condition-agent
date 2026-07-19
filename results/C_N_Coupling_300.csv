@@ -182,7 +182,7 @@ Nc1ccccc1Br.Clc1ccccc1I>>Clc1ccccc1Nc1ccccc1Br,Ar–I + Ar–NH2 → Ar–NH–A
 FC(F)(F)c1ccc(Cl)cc1.C1CC[C@H]2NCCC[C@@H]2C1>>FC(F)(F)c1ccc(N2CCC[C@@H]3CCCC[C@H]32)cc1,Ar–Cl + R1R2–NH → Ar–NR1R2,
 Clc1ncnc2nc[nH]c12.NCc1ccccc1>>c1ccc(CNc2ncnc3nc[nH]c23)cc1,HeteroAr–Cl + R–NH2 → HeteroAr–NH–R,heteroaryl_nitrogen; heteroaryl_nitrogen; heteroaryl_nitrogen
 NCCN1CCOCC1.COc1ccc(-c2nc(Cl)c3ccccc3n2)cc1>>COc1ccc(-c2nc(NCCN3CCOCC3)c3ccccc3n2)cc1,HeteroAr–Cl + R–NH2 → HeteroAr–NH–R,tertiary_amine; ether; heteroaryl_nitrogen; heteroaryl_nitrogen; ether
-Cl.NCc1nc2ccc(F)c(F)c2[nH]1.Clc1nc(Cl)c2ncn(CCc3ccoc3)c2n1.C1COCCN1>>Fc1ccc2nc(CNc3nc(N4CCOCC4)nc4c3ncn4CCc3ccoc3)[nH]c2c1F,(Ar–F + R1R2–NH) OR (HeteroAr–Cl + AromN–H) OR (HeteroAr–Cl + R1R2–NH) OR (HeteroAr–Cl + R–NH2) OR (intramolecular Ar–F / AromN–H) OR (intramolecular Ar–F / R–NH2) →,
+Cl.NCc1nc2ccc(F)c(F)c2[nH]1.Clc1nc(Cl)c2ncn(CCc3ccoc3)c2n1.C1COCCN1>>Fc1ccc2nc(CNc3nc(N4CCOCC4)nc4c3ncn4CCc3ccoc3)[nH]c2c1F,2 × C–N substitution,heteroaryl_nitrogen; aryl_halide; aryl_halide; heteroaryl_nitrogen; heteroaryl_nitrogen; heteroaryl_nitrogen; heteroaryl_nitrogen; ether
 CC1(C)C(=O)Nc2cc(Br)cnc21.COC(=O)C12C3C4C1C1C2C3C41C(=O)OI(OC(=O)C12C3C4C1C1C2C3C41C(=O)OC)c1c(C)cc(C)cc1C>>COC(=O)C12C3C4C1C1C2C3C41N1C(=O)C(C)(C)c2ncc(Br)cc21,intramolecular HeteroAr–Br / R–C(O)–NHR →,
 COc1ccc([I+]c2c(C)cc(C)cc2C)cc1.O=S(=O)([O-])C(F)(F)F>>COc1ccc(/N=N/c2ccc(OC)cc2)cc1,,
 N#Cc1ccc([N+](=O)[O-])cc1F>>Nc1n[nH]c2cc([N+](=O)[O-])ccc12,,
@@ -235,7 +235,7 @@ c1ccc2c(c1)Nc1ccccc1O2.Brc1ccc(-c2nc(-c3ccccc3)c(-c3ccccc3)n2-c2ccccc2)cc1>>c1cc
 Brc1ccccn1.c1ccc(-c2cc(-c3ccccc3)c(-c3c(-c4ccccc4)[nH]c4ccccc34)o2)cc1>>c1ccc(-c2cc(-c3ccccc3)c(-c3c(-c4ccccc4)n(-c4ccccn4)c4ccccc34)o2)cc1,HeteroAr–Br + AromN–H → HeteroAr–AromN,heteroaryl_nitrogen
 Brc1ccccc1I.CC(C)(C)c1ccccc1N>>CC(C)(C)c1ccccc1Nc1ccccc1Br,Ar–I + Ar–NH2 → Ar–NH–Ar,aryl_halide
 C[C@@H]1CNCCO1.Cc1nc(Cl)sc1S(=O)(=O)F>>Cc1nc(N2CCO[C@H](C)C2)sc1S(=O)(=O)F,HeteroAr–Cl + R1R2–NH → HeteroAr–NR1R2,ether; heteroaryl_nitrogen
-O=S(=O)(Cl)c1ccc(F)c(Cl)c1.COCCN(CCOC)C1CNC1.Cl.Cn1cc(Cl)c(CN)n1>>COCCN(CCOC)C1CN(S(=O)(=O)c2ccc(NCc3nn(C)cc3Cl)c(Cl)c2)C1,(Ar–Cl + R1R2–NH) OR (Ar–Cl + R–NH2) OR (Ar–F + R1R2–NH) OR (Ar–F + R–NH2) OR (Ar–S(O)2Cl + R1R2–NH) OR (Ar–S(O)2Cl + R–NH2) OR (HeteroAr–Cl + R1R2–NH) OR (intramolecular HeteroAr–Cl / R–NH2) →,
+O=S(=O)(Cl)c1ccc(F)c(Cl)c1.COCCN(CCOC)C1CNC1.Cl.Cn1cc(Cl)c(CN)n1>>COCCN(CCOC)C1CN(S(=O)(=O)c2ccc(NCc3nn(C)cc3Cl)c(Cl)c2)C1,C–N substitution + N–S substitution,aryl_halide; tertiary_amine; ether; ether; aryl_halide; heteroaryl_nitrogen; heteroaryl_nitrogen
 CC1CCN(CCN)C1.O=S(=O)(Cl)c1ccc(F)c(Cl)c1.c1ccc(CC2CNCCO2)cc1>>C[C@H]1CCN(CCNS(=O)(=O)c2ccc(N3CCO[C@@H](Cc4ccccc4)C3)c(Cl)c2)C1,(Ar–Cl + R1R2–NH) OR (Ar–Cl + R–NH2) OR (Ar–F + R1R2–NH) OR (Ar–F + R–NH2) OR (Ar–S(O)2Cl + R1R2–NH) OR (Ar–S(O)2Cl + R–NH2) →,
 Cc1cc(C)cc(OCC2CNC(=O)O2)c1.OB(O)c1ccc(F)cc1>>Cc1cc(C)cc(OCC2CN(c3ccc(F)cc3)C(=O)O2)c1,Ar–B(OH)2 + RO–C(O)–NHR → Ar–N(C(O)–OR)(R),ether; aryl_halide
 COC(=O)c1ccccc1Br.Cc1cc([C@@H](C)N)c2nc(N3CCCCC3)cc(=O)n2c1>>COC(=O)c1ccccc1N[C@H](C)c1cc(C)cn2c(=O)cc(N3CCCCC3)nc12,Ar–Br + R–NH2 → Ar–NH–R,ester; heteroaryl_nitrogen; heteroaryl_nitrogen; tertiary_amine

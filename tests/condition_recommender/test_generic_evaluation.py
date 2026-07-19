@@ -57,8 +57,8 @@ def _signature(index: int) -> dict:
 def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     return {
-        "schema_version": "1.6",
-        "converter_definition_version": "generic_conversion.v1.1",
+        "schema_version": "1.7",
+        "converter_definition_version": "generic_conversion.v1.2",
         "admission_tier": "verified",
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
@@ -86,8 +86,8 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "1.1"
-    assert payload["reaction_signature_schema_version"] == "1.1"
-    assert payload["record_schema_versions"] == ["1.6"]
+    assert payload["reaction_signature_schema_version"] == "1.2"
+    assert payload["record_schema_versions"] == ["1.7"]
 
 
 def test_index_rejects_stale_converted_records() -> None:

@@ -1,5 +1,5 @@
 ﻿reaction_smiles,reaction_label,spectator_groups
-Oc1ccccc1Cl.Oc1ccc(F)cc1.CCOC(=O)CCl>>CCOC(=O)COc1ccccc1Oc1ccc(F)cc1,(Allyl–Cl + Ar–OH) OR (Ar–Cl + Ar–OH) OR (Ar–F + Ar–OH) OR (intramolecular Ar–Cl / Ar–OH) OR (intramolecular Ar–F / Ar–OH) →,
+Oc1ccccc1Cl.Oc1ccc(F)cc1.CCOC(=O)CCl>>CCOC(=O)COc1ccccc1Oc1ccc(F)cc1,2 × C–O substitution,aryl_halide; ester
 Nc1ccccc1Br.COc1ccccc1O>>COc1ccccc1Oc1ccccc1N=[N+]=[N-],(Ar–Br + Ar–OH) OR (intramolecular Ar–Br / Ar–NH2) →,
 CO.[Na].Clc1cncc(Cl)c1>>COc1cc(OC)c(Br)nc1Br,HeteroAr–Cl + R–OH →,
 CCCCC(CC)CO.Brc1cccnc1>>Brc1ccncc1.CCCCC(CC)COc1cccnc1.CCCCC(CC)COc1ccncc1,HeteroAr–Br + R–OH → HeteroAr–O–R,heteroaryl_nitrogen
@@ -29,7 +29,7 @@ COc1ccc(O)cc1.COc1ccc(C=O)c(F)c1>>COc1ccc(Oc2cc(OC)ccc2C=O)cc1,Ar–F + Ar–OH 
 FC(F)(F)c1ccc(Cl)cc1.Oc1ccc(O)cc1>>Oc1ccc(Oc2ccc(C(F)(F)F)cc2)cc1,Ar–Cl + Ar–OH → Ar–O–Ar,phenol
 O=[N+]([O-])c1ccc(I)cc1.N#Cc1ccc(O)cc1>>N#Cc1ccc(Oc2ccc([N+](=O)[O-])cc2)cc1,Ar–I + Ar–OH → Ar–O–Ar,nitro; tertiary_amine; nitrile
 Nc1ccc(C(c2ccc(N)cc2)c2ccc(O)cc2)cc1.CN(C)c1ccc(-c2nnc(-c3ccc(F)cc3)o2)cc1>>CN(C)c1ccc(-c2nnc(-c3ccc(Oc4ccc(C(c5ccc(N)cc5)c5ccc(N)cc5)cc4)cc3)o2)cc1,Ar–F + Ar–OH → Ar–O–Ar,primary_amine; primary_amine; heteroaryl_nitrogen; heteroaryl_nitrogen; tertiary_amine
-Oc1cccc(O)c1O.OCCc1c(O)c2c(c(O)c1CO)Oc1nc3c(CCO)c(Cl)c(Cl)c(C(O)CCO)c3nc1O2>>OCCc1c(CO)c(O)c2oc3nc4c(CCO)c5oc6cccc(O)c6oc5c(C(O)CCO)c4nc3oc2c1O,(Ar–Cl + Ar–OH) OR (intramolecular Ar–Cl / Ar–OH) OR (intramolecular Ar–Cl / R–OH) →,
+Oc1cccc(O)c1O.OCCc1c(O)c2c(c(O)c1CO)Oc1nc3c(CCO)c(Cl)c(Cl)c(C(O)CCO)c3nc1O2>>OCCc1c(CO)c(O)c2oc3nc4c(CCO)c5oc6cccc(O)c6oc5c(C(O)CCO)c4nc3oc2c1O,2 × C–O substitution,phenol; alcohol; alcohol; heteroaryl_nitrogen; heteroaryl_nitrogen; alcohol; ether; ether; phenol; phenol; alcohol; alcohol
 CCN(CC)c1cccc(O)c1.N#Cc1cc(Cl)c(Cl)cc1C#N>>CCN(CC)c1cccc(Oc2cc(C#N)c(C#N)cc2Oc2cccc(N(CC)CC)c2)c1,Ar–Cl + Ar–OH →,
 Oc1ccc(Br)cc1.Fc1cc(F)c(F)c(F)c1F>>Fc1cc(F)c(F)c(Oc2ccc(Br)cc2)c1F,Ar–F + Ar–OH → Ar–O–Ar,aryl_halide; aryl_halide; aryl_halide; aryl_halide; aryl_halide
 CC(=O)c1ccc(Cl)cc1.Oc1ccc(Br)cc1>>CC(=O)c1ccc(Oc2ccc(Br)cc2)cc1,Ar–Cl + Ar–OH → Ar–O–Ar,ketone; aryl_halide

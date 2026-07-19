@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Tuple
@@ -163,6 +164,17 @@ def _jaccard(left: Iterable[str], right: Iterable[str]) -> float:
     return len(a & b) / len(a | b)
 
 
+def _multiset_jaccard(left: Iterable[str], right: Iterable[str]) -> float:
+    left_counts = Counter(left)
+    right_counts = Counter(right)
+    if not left_counts or not right_counts:
+        return 0.0
+    keys = set(left_counts).union(right_counts)
+    intersection = sum(min(left_counts[key], right_counts[key]) for key in keys)
+    union = sum(max(left_counts[key], right_counts[key]) for key in keys)
+    return intersection / union if union else 0.0
+
+
 def _partner_tokens(signature: Mapping[str, Any], field: str) -> Tuple[str, ...]:
     return tuple(
         sorted(
@@ -195,6 +207,25 @@ def _spectator_tokens(signature: Mapping[str, Any]) -> Tuple[str, ...]:
             if group.get("group_id")
         )
     )
+
+
+def _event_tokens(signature: Mapping[str, Any]) -> Tuple[str, ...]:
+    """Return multiplicity-preserving, environment-neutral event tokens."""
+    tokens = []
+    for event in signature.get("events") or ():
+        if not isinstance(event, Mapping):
+            continue
+        token = {
+            "formed": tuple(event.get("formed_bond_types") or ()),
+            "broken": tuple(event.get("broken_bond_types") or ()),
+            "order_changes": tuple(event.get("order_changes") or ()),
+            "transformation_class": str(event.get("transformation_class") or ""),
+            "reaction_scope": str(
+                (event.get("topology") or {}).get("reaction_scope") or ""
+            ),
+        }
+        tokens.append(json.dumps(token, sort_keys=True, separators=(",", ":")))
+    return tuple(sorted(tokens))
 
 
 def reaction_scope(signature: Mapping[str, Any]) -> str:
@@ -264,6 +295,9 @@ def generic_signature_similarity(
     precedent_family = str(precedent.get("named_family") or "")
     components = {
         "edit_topology": _jaccard(query_edits, precedent_edits),
+        "reaction_events": _multiset_jaccard(
+            _event_tokens(query), _event_tokens(precedent)
+        ),
         "handles": _jaccard(
             _partner_tokens(query, "handle_tokens"),
             _partner_tokens(precedent, "handle_tokens"),

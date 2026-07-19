@@ -90,7 +90,7 @@ def test_contextual_label_style_changes_display_only() -> None:
     )
 
 
-def test_multiple_order_changes_keep_literal_edit_fallback() -> None:
+def test_multiple_order_changes_render_as_repeated_events() -> None:
     result = featurize_reaction(
         "[CH2:1]=[CH:2][CH:3]=[CH2:4]>>"
         "[CH3:1][CH2:2][CH2:3][CH3:4]"
@@ -99,7 +99,10 @@ def test_multiple_order_changes_keep_literal_edit_fallback() -> None:
     assert result.display_label is not None
     assert result.display_label.contextual_label is None
     assert result.display_label.pattern_id is None
-    assert result.reaction_label == "2 × C=C → C–C; 4 × H gain at C"
+    assert result.reaction_signature is not None
+    assert result.reaction_signature.event_count == 2
+    assert result.reaction_label == "2 × C=C hydrogenation"
+    assert result.reaction_label_status == "multi_event_edit_summary"
 
 
 def test_chemically_distinct_correspondences_remain_ambiguous() -> None:
