@@ -474,14 +474,12 @@ def apply_operator_sequence(
     combined = molecules[0]
     for molecule in molecules[1:]:
         combined = Chem.CombineMols(combined, molecule)
-    remove_global = sorted(
-        {
-            offsets[component_index] + atom_index
-            for component_index, atom_indices in removals.items()
-            for atom_index in atom_indices
-        },
-        reverse=True,
-    )
+    removed_global = {
+        offsets[component_index] + atom_index
+        for component_index, atom_indices in removals.items()
+        for atom_index in atom_indices
+    }
+    remove_global = sorted(removed_global, reverse=True)
     global_joins = [
         (
             offsets[left_component] + left_atom,
@@ -489,6 +487,16 @@ def apply_operator_sequence(
         )
         for (left_component, left_atom), (right_component, right_atom) in joins
     ]
+    # Candidate events can overlap even when their anchors are individually
+    # distinct.  In particular, one event's leaving fragment may contain the
+    # partner center (or anchor) used by another event.  Such a sequence is not
+    # a coherent simultaneous graph edit and its atom indices cannot be
+    # remapped after removal.
+    if any(
+        left in removed_global or right in removed_global
+        for left, right in global_joins
+    ):
+        return None
     rw = Chem.RWMol(combined)
     for atom_index in remove_global:
         rw.RemoveAtom(atom_index)
@@ -499,7 +507,13 @@ def apply_operator_sequence(
     for left_global, right_global in global_joins:
         left = shifted(left_global)
         right = shifted(right_global)
-        if left == right or rw.GetBondBetweenAtoms(left, right) is not None:
+        atom_count = rw.GetNumAtoms()
+        if (
+            not 0 <= left < atom_count
+            or not 0 <= right < atom_count
+            or left == right
+            or rw.GetBondBetweenAtoms(left, right) is not None
+        ):
             return None
         rw.AddBond(left, right, Chem.BondType.SINGLE)
     product = rw.GetMol()

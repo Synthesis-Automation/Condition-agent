@@ -112,6 +112,11 @@ python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mo
 python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --concise --output results/data_300.csv
 
 python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --concise --output results/C_N_Coupling_300.csv
+
+python -m reactive_taxonomy.cli batch data-processor/reaction_dataset/Amide_formation.csv --mode reaction --concise --output results/Amide_formation.csv
+
+
+
 ```
 
 Reaction-mode CSV output places a semicolon-separated `spectator_groups`

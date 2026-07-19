@@ -166,6 +166,23 @@ def test_balanced_unmapped_multi_event_reaction_is_exactly_reconstructed() -> No
     ]
 
 
+def test_overlapping_multi_event_candidates_do_not_use_removed_join_atoms() -> None:
+    reaction = (
+        "O=C(O)c1ccccc1."
+        "CN(C)c1ccncc1[C@H](O)[C@@H](N)C(C)(C)C."
+        "CC(=O)OC(C)=O"
+        ">>CC(=O)O[C@@H](c1cnccc1N(C)C)"
+        "[C@@H](NC(=O)c1ccccc1)C(C)(C)C"
+    )
+
+    result = featurize_reaction(reaction, label_style="ascii")
+
+    assert result.valid
+    assert result.evidence_quality == "exact_multi_event_reconstruction"
+    assert result.reaction_label == "C-O substitution + C-N substitution"
+    assert len(result.selected_events) == 2
+
+
 def test_unbalanced_multi_event_reaction_does_not_invent_partner_copy() -> None:
     reaction = (
         "Sc1ccccc1.O=[N+]([O-])c1c(F)cccc1F"
