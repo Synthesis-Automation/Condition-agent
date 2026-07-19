@@ -115,3 +115,41 @@ def test_batch_autodetects_clean_reaction_column(tmp_path, capsys) -> None:
         rows = list(reader)
         assert len(rows) == 1
         assert rows[0]["spectator_groups"] == "nitrile"
+
+
+def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
+    source = tmp_path / "reactions.csv"
+    output = tmp_path / "results.csv"
+    reaction = (
+        "Brc1ccc(C#N)cc1.OB(O)c1ccccc1"
+        ">>N#Cc1ccc(-c2ccccc2)cc1"
+    )
+    with source.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=["reaction_smiles", "source_id", "yield_pct"],
+        )
+        writer.writeheader()
+        writer.writerow({
+            "reaction_smiles": reaction,
+            "source_id": "rxn-1",
+            "yield_pct": "91",
+        })
+
+    assert main([
+        "batch", str(source), "--mode", "reaction", "--concise",
+        "--output", str(output),
+    ]) == 0
+    assert "CSV output:" in capsys.readouterr().out
+    with output.open("r", encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle)
+        assert reader.fieldnames == [
+            "reaction_smiles",
+            "reaction_label",
+            "spectator_groups",
+        ]
+        rows = list(reader)
+
+    assert len(rows) == 1
+    assert rows[0]["reaction_smiles"] == reaction
+    assert rows[0]["spectator_groups"] == "nitrile"

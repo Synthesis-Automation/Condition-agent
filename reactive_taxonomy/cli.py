@@ -378,18 +378,28 @@ def _write_batch_csv(
     mode: str,
     source_fields: Sequence[str],
     input_column: str,
+    *,
+    concise: bool = False,
 ) -> None:
-    columns = (
-        _molecule_csv_columns(source_fields, input_column)
-        if mode == "molecule"
-        else _reaction_csv_columns(source_fields, input_column)
-    )
-    row_builder = _molecule_csv_row if mode == "molecule" else _reaction_csv_row
+    if concise:
+        columns = ["reaction_smiles", "reaction_label", "spectator_groups"]
+        row_builder = _reaction_csv_row
+    else:
+        columns = (
+            _molecule_csv_columns(source_fields, input_column)
+            if mode == "molecule"
+            else _reaction_csv_columns(source_fields, input_column)
+        )
+        row_builder = _molecule_csv_row if mode == "molecule" else _reaction_csv_row
     with output_path.open("w", encoding="utf-8-sig", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=columns)
         writer.writeheader()
         for record in records:
-            writer.writerow(row_builder(record))
+            row = row_builder(record)
+            if concise:
+                row["reaction_smiles"] = record["source"].get(input_column) or ""
+                row = {column: row[column] for column in columns}
+            writer.writerow(row)
 
 
 def _command_batch(args: argparse.Namespace) -> int:
@@ -426,8 +436,18 @@ def _command_batch(args: argparse.Namespace) -> int:
         output_path = Path(args.output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_format = args.output_format or ("csv" if output_path.suffix.lower() == ".csv" else "jsonl")
+        if args.concise and (args.mode != "reaction" or output_format != "csv"):
+            print("error: --concise requires reaction mode and CSV output", file=sys.stderr)
+            return 2
         if output_format == "csv":
-            _write_batch_csv(records, output_path, args.mode, fieldnames, column)
+            _write_batch_csv(
+                records,
+                output_path,
+                args.mode,
+                fieldnames,
+                column,
+                concise=args.concise,
+            )
         else:
             with output_path.open("w", encoding="utf-8", newline="") as handle:
                 for record in records:
@@ -511,6 +531,14 @@ def build_parser() -> argparse.ArgumentParser:
     batch_parser.add_argument("--output", help="optional JSONL or CSV result path")
     batch_parser.add_argument("--output-format", choices=("jsonl", "csv"), help="infer from --output suffix when omitted")
     batch_parser.add_argument("--max-candidates", type=int, default=500)
+    batch_parser.add_argument(
+        "--concise",
+        action="store_true",
+        help=(
+            "for reaction CSV output, write only reaction_smiles, "
+            "reaction_label, and spectator_groups"
+        ),
+    )
     batch_parser.add_argument("--label-style", choices=("unicode", "ascii", "hte_legacy"), default="unicode")
     batch_parser.add_argument("--format", choices=("text", "json"), default="text")
     batch_parser.set_defaults(func=_command_batch)

@@ -8,7 +8,7 @@ from typing import Any, Dict, Literal, Optional, Tuple
 from .models import CompoundAnalysis
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "1.1"
+REACTION_SIGNATURE_SCHEMA_VERSION = "1.2"
 
 
 @dataclass(frozen=True)
@@ -242,6 +242,46 @@ class ReactionTopology:
 
 
 @dataclass(frozen=True)
+class ReactionEvent:
+    """One connected, atom-provenanced transformation within a reaction."""
+
+    event_id: str
+    event_signature_key: str
+    edits: Tuple[ReactionEdit, ...]
+    partner_ids: Tuple[str, ...]
+    reactive_site_ids: Tuple[str, ...]
+    formed_bond_types: Tuple[str, ...]
+    broken_bond_types: Tuple[str, ...]
+    order_changes: Tuple[str, ...]
+    formed_connection_labels: Tuple[str, ...]
+    topology: ReactionTopology
+    transformation_class: Optional[str]
+    transformation_confidence: float
+    named_family: Optional[str]
+    family_confidence: float
+    compatible_named_families: Tuple[str, ...]
+    evidence: str
+    confidence: float
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
+class ReactionEventRelation:
+    """Observed structural relationship between two reaction events."""
+
+    event_id_1: str
+    event_id_2: str
+    relation_type: Literal[
+        "independent_sites", "shared_component", "shared_atom", "unresolved"
+    ]
+    shared_component_indices: Tuple[int, ...]
+    shared_atom_map_numbers: Tuple[int, ...]
+    evidence: str
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
 class ReactionSignature:
     """Versioned chemistry identity used by conversion and recommendation."""
 
@@ -256,6 +296,10 @@ class ReactionSignature:
     broken_bond_types: Tuple[str, ...]
     order_changes: Tuple[str, ...]
     edits: Tuple[ReactionEdit, ...]
+    events: Tuple[ReactionEvent, ...]
+    event_count: int
+    reaction_scope: Literal["single_event", "multi_event", "unresolved"]
+    event_relations: Tuple[ReactionEventRelation, ...]
     partners: Tuple[ReactionPartner, ...]
     product_transformation: Optional[ProductTransformation]
     topology: ReactionTopology
@@ -309,7 +353,7 @@ class ReactionAnalysis:
     reaction_signature: Optional[ReactionSignature] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.5"
+    schema_version: str = "1.6"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -327,6 +371,8 @@ __all__ = [
     "ReactionComponent",
     "ReactionDisplayLabel",
     "ReactionEdit",
+    "ReactionEvent",
+    "ReactionEventRelation",
     "ReactionFamilyEnvironment",
     "ReactionLabelClause",
     "ReactionPartner",

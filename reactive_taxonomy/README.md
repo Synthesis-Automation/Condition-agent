@@ -88,13 +88,15 @@ python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molec
 python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --output results/sample_reaction_featurized.csv
 
 python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --output results/data_300.csv
+python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --concise --output results/data_300.csv
 
-
+python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --concise --output results/C_N_Coupling_300.csv
 ```
 
 Reaction-mode CSV output places a semicolon-separated `spectator_groups`
 column immediately after `reaction_label`. Values are stable functional-group
-IDs such as `nitrile`.
+IDs such as `nitrile`. Add `--concise` to write only `reaction_smiles`,
+`reaction_label`, and `spectator_groups`, in that order.
 
 Phase 1 molecular-feature evaluation, including machine metrics and a blind
 chemist-review packet:
