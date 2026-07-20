@@ -120,3 +120,19 @@ def test_composite_triflate_handle_is_removed_as_complete_fragment() -> None:
     assert result.evidence_quality == "exact_product_reconstruction"
     assert result.selected_candidate.grammar_id == "boron_transfer_coupling"
     assert result.selected_candidate.predicted_product_smiles == "Fc1ccc(-c2ccccc2)cc1"
+
+
+def test_overlapping_join_endpoint_fails_candidate_without_rdkit_range_error() -> None:
+    reaction = (
+        "O=C(OC(=O)c1ccccc1)c1ccccc1.O=C(O)C(F)(F)F."
+        "O=C(c1ccc(Br)nc1)N1CCNCC1.C#CCN1CCOCC1>>"
+        "O=C(c1ccccc1)N1CCN(C(=O)c2ccc3ccc(N4CCOCC4)n3c2)CC1"
+    )
+
+    result = featurize_reaction(reaction)
+
+    assert result.valid
+    assert any(
+        candidate.verification == "construction_failed"
+        for candidate in result.candidates
+    )

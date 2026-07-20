@@ -84,6 +84,12 @@ def _build_product(
         reverse=True,
     )
     join_global = [offsets[ci] + ai for ci, ai in join]
+    # A broadly matched candidate can place one join endpoint inside the
+    # leaving fragment selected by the other site. Removing that fragment
+    # makes the endpoint impossible to remap and can otherwise send an
+    # out-of-range atom index into RDKit.
+    if any(endpoint in remove_global for endpoint in join_global):
+        return None
     left_hydrogen_count = int(combined.GetAtomWithIdx(join_global[0]).GetTotalNumHs())
     rw = Chem.RWMol(combined)
     for atom_index in remove_global:
@@ -93,7 +99,13 @@ def _build_product(
         return index - sum(removed < index for removed in remove_global)
 
     left, right = shifted(join_global[0]), shifted(join_global[1])
-    if left == right or rw.GetBondBetweenAtoms(left, right) is not None:
+    atom_count = rw.GetNumAtoms()
+    if (
+        not 0 <= left < atom_count
+        or not 0 <= right < atom_count
+        or left == right
+        or rw.GetBondBetweenAtoms(left, right) is not None
+    ):
         return None
     if add_hydrogen_on_left:
         product_atom = rw.GetAtomWithIdx(left)
