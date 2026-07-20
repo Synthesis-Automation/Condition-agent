@@ -389,7 +389,11 @@ def build_reaction_signature(
     )
     spectator_tokens = tuple(
         sorted(
-            (group.group_id, group.graph_distance, group.tags) for group in spectators
+            (
+                (group.group_id, group.graph_distance, group.tags)
+                for group in spectators
+            ),
+            key=_canonical_json,
         )
     )
     topology_token = {
