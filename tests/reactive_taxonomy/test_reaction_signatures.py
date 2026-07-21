@@ -68,6 +68,33 @@ def test_signature_contains_versioned_hierarchical_keys() -> None:
     assert "signature_features.v1.json" in signature.definition_versions
 
 
+def test_signature_partners_retain_context_steric_and_electronic_analysis() -> None:
+    cases = {
+        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1": (
+            "Ar", "open", "neutral"
+        ),
+        "Brc1ccccn1.Nc1ccccc1>>c1ccc(Nc2ccccn2)cc1": (
+            "HeteroAr", "open", "electron_poor"
+        ),
+        "CCBr.Nc1ccccc1>>CCNc1ccccc1": (
+            "Alkyl", "primary", "neutral"
+        ),
+        "CC(C)Br.N>>CC(C)N": ("Alkyl", "secondary", "neutral"),
+    }
+
+    for reaction, expected in cases.items():
+        result = featurize_reaction(reaction)
+        assert result.reaction_signature is not None
+        electrophile = next(
+            partner
+            for partner in result.reaction_signature.partners
+            if partner.role == "electrophile"
+        )
+        assert electrophile.anchor_contexts == (expected[0],)
+        assert electrophile.steric["class"] == expected[1]
+        assert electrophile.electronic["class"] == expected[2]
+
+
 def test_signature_serializes_with_analysis() -> None:
     result = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
     payload = result.to_dict()

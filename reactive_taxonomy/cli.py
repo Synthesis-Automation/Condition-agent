@@ -8,7 +8,7 @@ import json
 import sys
 from collections import Counter
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 from . import featurize_molecule, featurize_reaction, validate_taxonomy
 
@@ -51,6 +51,91 @@ def _json_dump(value: Any, *, compact: bool = False) -> str:
 
 def _joined(values: Iterable[Any]) -> str:
     return ", ".join(str(value) for value in values) or "none"
+
+
+def _reaction_partners(result: Any) -> tuple[Any, ...]:
+    """Return type-agnostic partners, with the family overlay as a fallback."""
+    signature = getattr(result, "reaction_signature", None)
+    if signature and signature.partners:
+        partners = signature.partners
+    else:
+        environment = getattr(result, "family_environment", None)
+        partners = environment.partners if environment else ()
+    role_order = {"electrophile": 0, "nucleophile": 1, "transfer_partner": 2}
+    return tuple(sorted(
+        partners,
+        key=lambda partner: (
+            role_order.get(getattr(partner, "role", None), 99),
+            getattr(partner, "role", None) or "unassigned",
+            int(getattr(partner, "component_index", -1)),
+        ),
+    ))
+
+
+def _partner_value(partner: Any, name: str, default: Any = None) -> Any:
+    if isinstance(partner, Mapping):
+        return partner.get(name, default)
+    return getattr(partner, name, default)
+
+
+def _partner_context(partner: Any) -> str:
+    """Render Ar, HeteroAr, or an alkyl substitution class for one partner."""
+    contexts = tuple(_partner_value(partner, "anchor_contexts", ()) or ())
+    if not contexts:
+        context = _partner_value(partner, "anchor_context")
+        contexts = (str(context),) if context else ()
+    steric = _partner_value(partner, "steric", {}) or {}
+    rendered = []
+    for context in contexts:
+        if context == "Alkyl":
+            substitution = str(steric.get("class") or "unclassified")
+            rendered.append(f"R-{substitution}")
+        else:
+            rendered.append(str(context))
+    return "/".join(rendered) or "unclassified"
+
+
+def _partner_steric_summary(partner: Any) -> str:
+    steric = _partner_value(partner, "steric", {}) or {}
+    details = []
+    if steric.get("center_substitution_class"):
+        details.append(f"{steric['center_substitution_class']} center")
+    ortho_count = steric.get("ortho_substituent_count")
+    if ortho_count:
+        details.append(f"ortho:{ortho_count}")
+    attached = steric.get("attached_groups") or ()
+    if attached:
+        groups = []
+        for group in attached:
+            context = str(group.get("context") or "group")
+            attachment_class = group.get("attachment_carbon_class")
+            groups.append(f"{attachment_class} R" if attachment_class else context)
+        details.append(f"attached:{'+'.join(groups)}")
+    steric_class = str(steric.get("class") or "unclassified")
+    if details and details[0] == f"{steric_class} center":
+        details = details[1:]
+        steric_class = f"{steric_class} center"
+    return steric_class + (f"/{'/'.join(details)}" if details else "")
+
+
+def _partner_electronic_summary(partner: Any) -> str:
+    electronic = _partner_value(partner, "electronic", {}) or {}
+    return str(electronic.get("class") or "unclassified")
+
+
+def _partner_analysis(result: Any) -> str:
+    """Render context, sterics, and electronics in one compact field."""
+    partners = _reaction_partners(result)
+
+    def role(partner: Any) -> str:
+        return str(_partner_value(partner, "role") or "unassigned")
+
+    return "; ".join(
+        f"{role(partner)}={_partner_context(partner)} "
+        f"[S:{_partner_steric_summary(partner)}, "
+        f"E:{_partner_electronic_summary(partner)}]"
+        for partner in partners
+    )
 
 
 def _molecule_summary(result: Any) -> str:
@@ -129,6 +214,9 @@ def _reaction_summary(result: Any) -> str:
                 f"[handle={partner.handle_token or '-'}; context={partner.anchor_context or '-'}; "
                 f"flags={_joined(partner.flags)}]"
             )
+    partner_analysis = _partner_analysis(result)
+    if partner_analysis:
+        lines.append(f"partner analysis: {partner_analysis}")
     if result.warnings:
         lines.append(f"warnings: {_joined(result.warnings)}")
     if result.error:
@@ -181,12 +269,14 @@ def _reaction_concise_summary(result: Any) -> str:
         )
     else:
         lines.append("Product connection: not verified")
-    if result.family_environment:
-        partners = [
-            f"{partner.role}={partner.chemist_label}"
-            for partner in result.family_environment.partners
+    partners = _reaction_partners(result)
+    if partners:
+        partner_labels = [
+            f"{getattr(partner, 'role', None) or 'unassigned'}={partner.chemist_label}"
+            for partner in partners
         ]
-        lines.append(f"Reactive partners: {_joined(partners)}")
+        lines.append(f"Reactive partners: {_joined(partner_labels)}")
+        lines.append(f"Partner analysis: {_partner_analysis(result)}")
     if result.spectator_groups:
         spectators = sorted({group.chemist_label for group in result.spectator_groups})
         lines.append(f"Spectator groups: {_joined(spectators)}")
@@ -346,6 +436,7 @@ def _reaction_csv_columns(
             columns.extend(("reaction_label", "spectator_groups"))
     columns.extend((
         "valid", "evidence_quality", "transformation_class", "named_family",
+        "partner_analysis",
         "reaction_label_status", "candidate_count", "warnings", "error",
     ))
     return columns
@@ -354,6 +445,21 @@ def _reaction_csv_columns(
 def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     analysis = record["analysis"]
     spectator_groups = analysis.get("spectator_groups") or []
+    signature_partners = (analysis.get("reaction_signature") or {}).get("partners") or []
+
+    def dict_role(partner: dict[str, Any]) -> str:
+        return str(partner.get("role") or "unassigned")
+
+    role_order = {"electrophile": 0, "nucleophile": 1, "transfer_partner": 2}
+    signature_partners = sorted(
+        signature_partners,
+        key=lambda partner: (
+            role_order.get(partner.get("role"), 99),
+            dict_role(partner),
+            int(partner.get("component_index", -1)),
+        ),
+    )
+
     return {
         "source_row": record["source_row"],
         **record["source"],
@@ -364,6 +470,12 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         "reaction_label": analysis.get("reaction_label") or "",
         "spectator_groups": "; ".join(
             str(group.get("group_id") or "") for group in spectator_groups
+        ),
+        "partner_analysis": "; ".join(
+            f"{dict_role(partner)}={_partner_context(partner)} "
+            f"[S:{_partner_steric_summary(partner)}, "
+            f"E:{_partner_electronic_summary(partner)}]"
+            for partner in signature_partners
         ),
         "reaction_label_status": analysis.get("reaction_label_status") or "",
         "candidate_count": len(analysis.get("candidates") or []),
@@ -382,7 +494,12 @@ def _write_batch_csv(
     concise: bool = False,
 ) -> None:
     if concise:
-        columns = ["reaction_smiles", "reaction_label", "spectator_groups"]
+        columns = [
+            "reaction_smiles",
+            "reaction_label",
+            "partner_analysis",
+            "spectator_groups",
+        ]
         row_builder = _reaction_csv_row
     else:
         columns = (
