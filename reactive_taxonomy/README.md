@@ -106,7 +106,7 @@ python -m reactive_taxonomy.cli reaction "Oc1cccc(C(F)(F)F)c1.Oc1cccc(C(F)(F)F)c
 
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/molecule_features.jsonl
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/sample_compounds_featurized.csv
-python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --output results/sample_reaction_featurized.csv
+python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --concise --output results/sample_reaction_featurized.csv
 
 python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --output results/data_300.csv
 python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --concise --output results/data_300.csv
