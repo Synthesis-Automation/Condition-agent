@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Tuple
 
 from condition_registry import load_recipe_template_set
+from reactive_taxonomy import load_handle_patterns
 from reactive_taxonomy.reaction_grammars import load_reaction_grammars
 
 from .models import (
@@ -44,6 +45,7 @@ _PARTNER_KEYS = {
     "role",
     "site_type",
     "anchor_contexts_any",
+    "handle_tokens_any",
     "center_tokens_any",
     "derived_families_any",
     "h_count_min",
@@ -74,6 +76,7 @@ def _partner(payload: Mapping[str, Any]) -> PartnerConstraint:
         anchor_contexts_any=_tuple_strings(
             payload.get("anchor_contexts_any") or ()
         ),
+        handle_tokens_any=_tuple_strings(payload.get("handle_tokens_any") or ()),
         center_tokens_any=_tuple_strings(payload.get("center_tokens_any") or ()),
         derived_families_any=_tuple_strings(
             payload.get("derived_families_any") or ()
@@ -134,7 +137,7 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
     for key in _unknown_keys(payload, _ROOT_KEYS):
         errors.append(f"unknown_root_key:{key}")
     schema_version = str(payload.get("schema_version") or "")
-    if schema_version != "1.0":
+    if schema_version != "1.1":
         errors.append(f"unsupported_schema_version:{schema_version}")
     if not str(payload.get("definition_id") or ""):
         errors.append("missing_definition_id")
@@ -159,6 +162,11 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
                 for role, constraint in (grammar.get("roles") or {}).items()
             }
         )
+    handle_tokens_by_site = {}
+    for pattern in load_handle_patterns():
+        handle_tokens_by_site.setdefault(
+            str(pattern.get("site_type") or ""), set()
+        ).update(str(value) for value in pattern.get("tokens") or ())
     templates = {
         template.template_id: template for template in load_recipe_template_set().templates
     }
@@ -245,6 +253,14 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
                                 f"{partner_prefix}:site_type_mismatch:"
                                 f"{transformation}:{role}:{site_type}"
                             )
+                    for token in partner.get("handle_tokens_any") or ():
+                        if str(token) not in handle_tokens_by_site.get(
+                            site_type, set()
+                        ):
+                            errors.append(
+                                f"{partner_prefix}:unknown_handle_token:"
+                                f"{site_type}:{token}"
+                            )
                     minimum = partner.get("h_count_min")
                     maximum = partner.get("h_count_max")
                     minimum_valid = minimum is None or (
@@ -311,6 +327,18 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
                     )
         if not str(rule.get("rationale") or ""):
             errors.append(f"{prefix}:missing_rationale")
+        if status == "active":
+            provenance = rule.get("provenance")
+            if not isinstance(provenance, Mapping):
+                errors.append(f"{prefix}:active_rule_missing_provenance")
+            else:
+                if provenance.get("review_required") is not False:
+                    errors.append(f"{prefix}:active_rule_must_be_reviewed")
+                for field in ("doi", "procedure_locator"):
+                    if not str(provenance.get(field) or ""):
+                        errors.append(
+                            f"{prefix}:active_rule_missing_provenance:{field}"
+                        )
     if len(rule_ids) != len(set(rule_ids)):
         errors.append("duplicate_rule_ids")
     return tuple(sorted(errors))

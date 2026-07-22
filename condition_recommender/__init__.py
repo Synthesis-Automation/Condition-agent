@@ -15,6 +15,7 @@ from .models import (
     RecommendationRecord,
     RecommendationResult,
 )
+from .rules import RuleRecommendationResult, recommend_rule_conditions
 
 __all__ = [
     "AdmissionTier",
@@ -27,9 +28,11 @@ __all__ = [
     "LabelRecommendationResult",
     "RecommendationRecord",
     "RecommendationResult",
+    "RuleRecommendationResult",
     "recommend_conditions",
     "recommend_generic_conditions",
     "recommend_indexed_signature",
+    "recommend_rule_conditions",
     "recommend_conditions_from_labels",
     "assess_recipe_compatibility",
 ]

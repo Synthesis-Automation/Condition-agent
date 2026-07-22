@@ -16,20 +16,32 @@ Data ownership:
 Rule-based recommendation definitions reference registry-owned recipe templates
 by stable ID. Every template option is an exact `substance_id`; free-text and
 unresolved alternatives are rejected by validation. Alternatives are retained
-as choices and are never implicitly expanded into a Cartesian product.
+as choices and are never implicitly expanded into a Cartesian product. Only
+explicitly authored `variants` can be materialized as recipes.
 
 ```python
-from condition_registry import get_recipe_template
+from condition_registry import get_recipe_template, materialize_recipe_variant
 
 template = get_recipe_template("pd_sp2_cn.primary_alkyl_amine.v1")
 assert template is not None
 assert template.identity_complete
+
+recipe = materialize_recipe_variant(
+    template,
+    "tbu_brettphos_k3po4_mecn.v1",
+    transformation_class="sp2_c_n_substitution",
+    include_draft=True,
+)
+assert recipe.recipe_id.startswith("RCR1:")
 ```
 
-New templates remain `draft` until their quantities and operating parameters
-have been chemically reviewed. Draft status is distinct from identity
-resolution: a draft may contain only valid registry identities while still
-lacking enough detail for activation.
+Template schema 1.2 stores catalyst loading and reagent equivalents on each
+explicit selection, plus partner stoichiometry and operating parameters.
+Activation validation requires all of those fields and a located primary
+procedure. The primary-amide template is the first active protocol; the other
+templates remain `draft`. Draft status is distinct from identity resolution: a
+draft may contain only valid registry identities while still lacking enough
+detail for activation.
 
 ## Contextual recipes
 

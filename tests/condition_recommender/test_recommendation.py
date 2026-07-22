@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from condition_recommender import recommend_conditions
+from condition_recommender.conversion.suzuki import convert_file
 from condition_recommender.indexing import IndexedReaction
 from condition_recommender.models import ConditionIdentity
 from condition_recommender.retrieval import load_retrieval_rules, retrieve_pool, structured_similarity
@@ -50,15 +51,17 @@ def test_retrieval_uses_exact_signature_when_supported() -> None:
     assert len(pool) == 12
 
 
-def test_pilot_recommendation_returns_ranked_recipes() -> None:
-    path = Path("results/suzuki_recommendation_pilot/verified.csv")
+def test_pilot_recommendation_returns_ranked_recipes(tmp_path: Path) -> None:
+    output = tmp_path / "suzuki_recommendation_pilot"
+    convert_file("examples/dataset_300/suzuki_miyaura.csv", output)
+    path = output / "verified.csv"
     result = recommend_conditions(
         "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
         records_path=path,
         top_k=3,
     )
     assert result.valid
-    assert result.product_connection_label == "Ar–Ar"
+    assert result.product_connection_label == "Ar1–Ar2"
     assert len(result.recommendations) == 3
     assert [item.rank for item in result.recommendations] == [1, 2, 3]
     assert all(item.conditions.complete for item in result.recommendations)

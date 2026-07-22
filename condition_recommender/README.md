@@ -16,9 +16,41 @@ rule_set = load_condition_rule_set()
 
 Loading performs strict shape, taxonomy-vocabulary, role, substance-identity,
 and cross-package template validation. The definitions use a deterministic
-`specific` then `fallback` selection policy. They remain `draft` until the
-condition quantities and operating details have been reviewed; draft rules are
-not yet part of the public recommendation API.
+`specific` then `fallback` selection policy. The narrow primary-amide/aryl-
+chloride rule is active with a complete, primary-literature protocol. Broader
+amine, aromatic N-H, and fallback rules remain review-only drafts.
+
+The production API excludes drafts by default:
+
+```python
+from condition_recommender import recommend_rule_conditions
+
+result = recommend_rule_conditions(
+    "Clc1ccccc1.CC(N)=O>>CC(=O)Nc1ccccc1"
+)
+```
+
+It returns the reviewed tBuBrettPhos Pd G3/K3PO4/t-BuOH protocol with catalyst
+loading, equivalents, partner stoichiometry, temperature, time, concentration,
+atmosphere, compatibility evidence, and source provenance. The active rule is
+restricted to primary amides and aryl chlorides; it does not extrapolate to
+bromides or secondary amides.
+
+Structurally evaluate the draft rules during review with an explicit opt-in:
+
+```powershell
+python -m condition_recommender.rule_recommend_cli `
+  "Brc1ccccc1.CN>>CNc1ccccc1" `
+  --include-draft
+```
+
+The review result contains the selected specificity tier, structural match evidence,
+failed predicates for every nonmatching rule, the referenced recipe template,
+canonical recipes for its explicit variants, compatibility scores and evidence,
+hard-excluded variants, and a draft warning. Without `--include-draft`,
+structural matches are reported in the trace but draft recipes are excluded from
+recommendations. Template alternatives that are not part of an explicit variant
+are never materialized implicitly.
 
 ## Mixed dataset audit
 

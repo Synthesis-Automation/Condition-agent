@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.2",
   "definition_id": "condition_recipe_templates.v1",
   "templates": [
     {
@@ -34,6 +34,28 @@
           "selection_policy": "select_one",
           "alternatives": [
             {"substance_id": "cas:75-05-8", "preference": 100}
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "variant_id": "tbu_brettphos_k3po4_mecn.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
+            {"slot_id": "base", "substance_id": "cas:7778-53-2"},
+            {"slot_id": "solvent", "substance_id": "cas:75-05-8"}
+          ]
+        },
+        {
+          "variant_id": "tbu_brettphos_cs2co3_mecn.v1",
+          "status": "draft",
+          "priority": 90,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
+            {"slot_id": "base", "substance_id": "cas:534-17-8"},
+            {"slot_id": "solvent", "substance_id": "cas:75-05-8"}
           ]
         }
       ],
@@ -83,6 +105,28 @@
           ]
         }
       ],
+      "variants": [
+        {
+          "variant_id": "tbu_brettphos_cs2co3_dioxane.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
+            {"slot_id": "base", "substance_id": "cas:534-17-8"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        },
+        {
+          "variant_id": "xantphos_pd_khmds_dioxane.v1",
+          "status": "draft",
+          "priority": 90,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1375325-77-1"},
+            {"slot_id": "base", "substance_id": "cas:40949-94-8"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        }
+      ],
       "atmosphere": "N2",
       "notes": [
         "Temperature, time, loadings, and concentration require curation before activation."
@@ -128,6 +172,28 @@
           ]
         }
       ],
+      "variants": [
+        {
+          "variant_id": "josiphos_pd_k3po4_dioxane.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1702311-34-9"},
+            {"slot_id": "base", "substance_id": "cas:7778-53-2"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        },
+        {
+          "variant_id": "tbu_brettphos_cs2co3_dioxane.v1",
+          "status": "draft",
+          "priority": 90,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
+            {"slot_id": "base", "substance_id": "cas:534-17-8"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        }
+      ],
       "atmosphere": "N2",
       "notes": [
         "Temperature, time, loadings, and concentration require curation before activation."
@@ -139,7 +205,7 @@
     },
     {
       "template_id": "pd_sp2_cn.amide_nh.v1",
-      "status": "draft",
+      "status": "active",
       "slots": [
         {
           "slot_id": "precatalyst",
@@ -147,7 +213,7 @@
           "required": true,
           "selection_policy": "select_one",
           "alternatives": [
-            {"substance_id": "cas:1447963-75-8", "preference": 100}
+            {"substance_id": "cas:1536473-72-9", "preference": 100}
           ]
         },
         {
@@ -156,9 +222,7 @@
           "required": true,
           "selection_policy": "present_alternatives",
           "alternatives": [
-            {"substance_id": "cas:7778-53-2", "preference": 100},
-            {"substance_id": "cas:534-17-8", "preference": 90},
-            {"substance_id": "cas:865-48-5", "preference": 80}
+            {"substance_id": "cas:7778-53-2", "preference": 100}
           ]
         },
         {
@@ -167,17 +231,64 @@
           "required": true,
           "selection_policy": "select_one",
           "alternatives": [
-            {"substance_id": "cas:123-91-1", "preference": 100}
+            {"substance_id": "cas:75-65-0", "preference": 100}
           ]
         }
       ],
-      "atmosphere": "N2",
+      "variants": [
+        {
+          "variant_id": "tbu_brettphos_pd_k3po4_tbuoh.v1",
+          "status": "active",
+          "priority": 100,
+          "selections": [
+            {
+              "slot_id": "precatalyst",
+              "substance_id": "cas:1536473-72-9",
+              "amount": 1.0,
+              "amount_unit": "mol_percent"
+            },
+            {
+              "slot_id": "base",
+              "substance_id": "cas:7778-53-2",
+              "amount": 1.4,
+              "amount_unit": "equivalent"
+            },
+            {"slot_id": "solvent", "substance_id": "cas:75-65-0"}
+          ]
+        }
+      ],
+      "temperature_c": 110.0,
+      "time_h": 1.5,
+      "concentration_m": 0.5,
+      "atmosphere": "Ar",
+      "partner_amounts": [
+        {
+          "role": "electrophile",
+          "minimum": 1.0,
+          "maximum": 1.0,
+          "unit": "equivalent"
+        },
+        {
+          "role": "nucleophile",
+          "minimum": 1.05,
+          "maximum": 1.2,
+          "unit": "equivalent"
+        }
+      ],
       "notes": [
-        "Temperature, time, loadings, and concentration require curation before activation."
+        "Primary-amide starter protocol for aryl chlorides; substrate-specific optimization remains necessary.",
+        "The reported procedure evacuates and backfills with argon three times."
       ],
       "provenance": {
-        "basis": "initial_expert_definition",
-        "review_required": true
+        "basis": "primary_literature_general_procedure",
+        "review_required": false,
+        "sources": [
+          {
+            "doi": "10.1021/ol401208t",
+            "url": "https://pstorage-acs-6854636.s3.amazonaws.com/4048054/ol401208t_si_001.pdf",
+            "procedure_locator": "Supporting Information, General Procedure B, pages S-4 to S-5"
+          }
+        ]
       }
     },
     {
@@ -210,6 +321,18 @@
           "selection_policy": "select_one",
           "alternatives": [
             {"substance_id": "cas:75-05-8", "preference": 100}
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "variant_id": "tbu_brettphos_k3po4_mecn.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
+            {"slot_id": "base", "substance_id": "cas:7778-53-2"},
+            {"slot_id": "solvent", "substance_id": "cas:75-05-8"}
           ]
         }
       ],

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "definition_id": "pd_sp2_cn_condition_rules.v1",
   "selection_policy": {
     "mode": "first_nonempty_tier",
@@ -128,7 +128,7 @@
     },
     {
       "rule_id": "pd_sp2_cn.amide_nh.v1",
-      "status": "draft",
+      "status": "active",
       "scope": {
         "transformation_classes_any": ["sp2_c_n_substitution"],
         "event_scopes_any": ["single_event"]
@@ -138,14 +138,16 @@
           {
             "role": "electrophile",
             "site_type": "leaving_group",
-            "anchor_contexts_any": ["Ar", "HeteroAr", "Alkenyl"]
+            "anchor_contexts_any": ["Ar", "HeteroAr"],
+            "handle_tokens_any": ["Cl"]
           },
           {
             "role": "nucleophile",
             "site_type": "pronucleophile_XH",
             "center_tokens_any": ["N"],
             "derived_families_any": ["amide_like"],
-            "h_count_min": 1,
+            "h_count_min": 2,
+            "h_count_max": 2,
             "availability_any": ["deactivated"]
           }
         ]
@@ -160,8 +162,10 @@
       ],
       "rationale": "Verified sp2 C-N substitution with an amide-like N-H partner.",
       "provenance": {
-        "basis": "initial_expert_definition",
-        "review_required": true
+        "basis": "primary_literature_general_procedure",
+        "review_required": false,
+        "doi": "10.1021/ol401208t",
+        "procedure_locator": "Supporting Information, General Procedure B, pages S-4 to S-5"
       }
     },
     {

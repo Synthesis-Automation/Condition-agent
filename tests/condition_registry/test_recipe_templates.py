@@ -1,9 +1,13 @@
 import copy
 import json
 
+import pytest
+
 from condition_registry import (
+    build_resolved_recipe,
     get_recipe_template,
     load_recipe_template_set,
+    materialize_recipe_variant,
     resolve_substance_id,
 )
 from condition_registry.template_loader import (
@@ -20,9 +24,12 @@ def test_clean_recipe_templates_are_typed_and_registry_backed() -> None:
     template_set = load_recipe_template_set()
 
     assert template_set.definition_id == "condition_recipe_templates.v1"
+    assert template_set.schema_version == "1.2"
     assert len(template_set.templates) == 5
     assert all(template.identity_complete for template in template_set.templates)
-    assert all(template.status == "draft" for template in template_set.templates)
+    statuses = {template.template_id: template.status for template in template_set.templates}
+    assert statuses["pd_sp2_cn.amide_nh.v1"] == "active"
+    assert sum(status == "active" for status in statuses.values()) == 1
     for template in template_set.templates:
         for slot in template.slots:
             for option in slot.alternatives:
@@ -85,3 +92,112 @@ def test_template_validation_rejects_legacy_or_unknown_fields() -> None:
     assert "templates[0]:unknown_key:yield" in validate_recipe_template_payload(
         payload
     )
+
+
+def test_explicit_variant_materializes_one_canonical_recipe() -> None:
+    template = get_recipe_template("pd_sp2_cn.primary_alkyl_amine.v1")
+    assert template is not None
+
+    recipe = materialize_recipe_variant(
+        template,
+        "tbu_brettphos_k3po4_mecn.v1",
+        transformation_class="sp2_c_n_substitution",
+        include_draft=True,
+    )
+
+    assert recipe.recipe_id.startswith("RCR1:")
+    assert len(recipe.components) == 3
+    assert recipe.catalysts[0].substance_id == "cas:1536473-72-9"
+    assert recipe.bases[0].substance_id == "cas:7778-53-2"
+    assert recipe.solvents[0].substance_id == "cas:75-05-8"
+    assert all(
+        component.provenance["recipe_variant_id"]
+        == "tbu_brettphos_k3po4_mecn.v1"
+        for component in recipe.components
+    )
+    assert len(template.variants) == 2
+    assert len(next(slot for slot in template.slots if slot.slot_id == "base").alternatives) == 4
+
+    observed_recipe = build_resolved_recipe(
+        {
+            "catalyst_cas": ("1536473-72-9",),
+            "reagent_cas": ("7778-53-2",),
+            "solvent_cas": ("75-05-8",),
+        },
+        transformation_class="sp2_c_n_substitution",
+        temperature_c=100.0,
+        atmosphere="N2",
+    )
+    assert recipe.recipe_id == observed_recipe.recipe_id
+
+
+def test_draft_variant_materialization_requires_explicit_opt_in() -> None:
+    template = get_recipe_template("pd_sp2_cn.primary_alkyl_amine.v1")
+    assert template is not None
+
+    with pytest.raises(ValueError, match="explicit opt-in"):
+        materialize_recipe_variant(
+            template,
+            "tbu_brettphos_k3po4_mecn.v1",
+            transformation_class="sp2_c_n_substitution",
+        )
+
+
+def test_template_validation_rejects_implicit_or_invalid_variant_choices() -> None:
+    payload = _payload()
+    variant = payload["templates"][0]["variants"][0]
+    base = next(
+        selection
+        for selection in variant["selections"]
+        if selection["slot_id"] == "base"
+    )
+    base["substance_id"] = "cas:123-91-1"
+
+    assert any(
+        "selection_not_in_slot_alternatives:base:cas:123-91-1" in error
+        for error in validate_recipe_template_payload(payload)
+    )
+
+
+def test_active_template_is_complete_and_materializes_quantities() -> None:
+    template = get_recipe_template("pd_sp2_cn.amide_nh.v1")
+    assert template is not None
+
+    recipe = materialize_recipe_variant(
+        template,
+        "tbu_brettphos_pd_k3po4_tbuoh.v1",
+        transformation_class="sp2_c_n_substitution",
+    )
+
+    assert recipe.temperature_c == 110.0
+    assert recipe.time_h == 1.5
+    assert recipe.concentration_m == 0.5
+    assert recipe.atmosphere == "Ar"
+    assert recipe.catalysts[0].amount == 1.0
+    assert recipe.catalysts[0].amount_unit == "mol_percent"
+    assert recipe.bases[0].amount == 1.4
+    assert recipe.bases[0].amount_unit == "equivalent"
+    assert recipe.solvents[0].substance_id == "cas:75-65-0"
+    assert tuple(amount.role for amount in template.partner_amounts) == (
+        "electrophile",
+        "nucleophile",
+    )
+
+
+def test_activation_validation_rejects_incomplete_production_protocol() -> None:
+    payload = _payload()
+    amide = next(
+        template
+        for template in payload["templates"]
+        if template["template_id"] == "pd_sp2_cn.amide_nh.v1"
+    )
+    del amide["time_h"]
+    amide["variants"][0]["selections"][0].pop("amount")
+    amide["variants"][0]["selections"][0].pop("amount_unit")
+    amide["provenance"]["sources"] = []
+
+    errors = validate_recipe_template_payload(payload)
+
+    assert any("active_template_missing:time_h" in error for error in errors)
+    assert any("active_variant_missing_quantity:metal_catalyst" in error for error in errors)
+    assert any("active_template_missing:provenance_sources" in error for error in errors)

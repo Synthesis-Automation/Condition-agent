@@ -21,7 +21,8 @@ def test_clean_pd_sp2_cn_rules_load_with_explicit_fallback() -> None:
     assert len(rule_set.rules) == 5
     assert sum(rule.selection.tier == "specific" for rule in rule_set.rules) == 4
     assert sum(rule.selection.tier == "fallback" for rule in rule_set.rules) == 1
-    assert all(rule.status == "draft" for rule in rule_set.rules)
+    active = tuple(rule.rule_id for rule in rule_set.rules if rule.status == "active")
+    assert active == ("pd_sp2_cn.amide_nh.v1",)
 
 
 def test_rules_use_taxonomy_facts_instead_of_names_or_legacy_labels() -> None:
@@ -99,3 +100,35 @@ def test_active_rule_cannot_reference_a_draft_recipe_template() -> None:
         "active_rule_references_draft_template" in error
         for error in validate_condition_rule_payload(payload)
     )
+
+
+def test_rule_validation_rejects_unknown_handle_tokens() -> None:
+    payload = _payload()
+    amide = next(
+        rule
+        for rule in payload["rules"]
+        if rule["rule_id"] == "pd_sp2_cn.amide_nh.v1"
+    )
+    amide["match"]["partner_constraints"][0]["handle_tokens_any"] = [
+        "NotALeavingGroup"
+    ]
+
+    assert any(
+        "unknown_handle_token:leaving_group:NotALeavingGroup" in error
+        for error in validate_condition_rule_payload(payload)
+    )
+
+
+def test_active_rule_requires_reviewed_primary_provenance() -> None:
+    payload = _payload()
+    amide = next(
+        rule
+        for rule in payload["rules"]
+        if rule["rule_id"] == "pd_sp2_cn.amide_nh.v1"
+    )
+    amide["provenance"] = {"review_required": True}
+
+    errors = validate_condition_rule_payload(payload)
+
+    assert any("active_rule_must_be_reviewed" in error for error in errors)
+    assert any("active_rule_missing_provenance:doi" in error for error in errors)

@@ -6,6 +6,7 @@ from reactive_taxonomy import (
 )
 
 from condition_recommender import recommend_generic_conditions
+from condition_recommender.conversion.engine import convert_datasets
 from condition_recommender.generic_api import recommend_indexed_signature
 from condition_recommender.generic_indexing import build_generic_index
 from condition_recommender.generic_retrieval import (
@@ -320,8 +321,14 @@ def test_generic_retrieval_weights_are_normalized() -> None:
     assert round(sum(rules["ranking_weights"].values()), 10) == 1.0
 
 
-def test_real_pilot_returns_resolved_recipe() -> None:
-    path = Path("results/generic_conversion_chan_lam_pilot/records.jsonl")
+def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
+    output = tmp_path / "generic_conversion_chan_lam_pilot"
+    convert_datasets(
+        "data-processor/reaction_dataset/ChanLam_Narylation.csv",
+        output,
+        max_rows=100,
+    )
+    path = output / "records.jsonl"
     result = recommend_generic_conditions(
         "c1ccc2[nH]cnc2c1.COc1ccc(B(O)O)cc1>>COc1ccc(-n2cnc3ccccc32)cc1",
         records_path=path,

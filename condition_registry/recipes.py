@@ -94,40 +94,22 @@ def _merge_duplicate_components(
     return tuple(merged)
 
 
-def build_resolved_recipe(
-    source_components: Mapping[str, Iterable[str]],
+def build_resolved_recipe_from_components(
+    components: Iterable[ResolvedConditionComponent],
     *,
-    transformation_class: Optional[str] = None,
-    named_family: Optional[str] = None,
     temperature_c: Optional[float] = None,
     time_h: Optional[float] = None,
     concentration_m: Optional[float] = None,
     atmosphere: Optional[str] = None,
 ) -> ResolvedConditionRecipe:
-    """Resolve identities and contextual roles into stable recipe buckets."""
+    """Build a canonical recipe from already resolved, role-aware components."""
     rules = load_role_resolution_rules()
     bucket_names = tuple(sorted(set(rules["role_buckets"].values())))
     buckets: Dict[str, list[ResolvedConditionComponent]] = {
         name: [] for name in bucket_names
     }
     warnings = []
-    resolved_components = []
-    seen = set()
-    for source_field in ("catalyst_cas", "reagent_cas", "solvent_cas"):
-        for identifier in source_components.get(source_field, ()):
-            raw = str(identifier).strip()
-            source_identity = (source_field, raw)
-            if not raw or source_identity in seen:
-                continue
-            seen.add(source_identity)
-            component = resolve_contextual_component(
-                raw,
-                source_field=source_field,
-                transformation_class=transformation_class,
-                named_family=named_family,
-            )
-            resolved_components.append(component)
-    for component in _merge_duplicate_components(resolved_components):
+    for component in _merge_duplicate_components(components):
         bucket = str(
             rules["role_buckets"].get(
                 component.primary_role, "other_components"
@@ -177,4 +159,40 @@ def build_resolved_recipe(
     )
 
 
-__all__ = ["build_resolved_recipe"]
+def build_resolved_recipe(
+    source_components: Mapping[str, Iterable[str]],
+    *,
+    transformation_class: Optional[str] = None,
+    named_family: Optional[str] = None,
+    temperature_c: Optional[float] = None,
+    time_h: Optional[float] = None,
+    concentration_m: Optional[float] = None,
+    atmosphere: Optional[str] = None,
+) -> ResolvedConditionRecipe:
+    """Resolve identities and contextual roles into stable recipe buckets."""
+    resolved_components = []
+    seen = set()
+    for source_field in ("catalyst_cas", "reagent_cas", "solvent_cas"):
+        for identifier in source_components.get(source_field, ()):
+            raw = str(identifier).strip()
+            source_identity = (source_field, raw)
+            if not raw or source_identity in seen:
+                continue
+            seen.add(source_identity)
+            component = resolve_contextual_component(
+                raw,
+                source_field=source_field,
+                transformation_class=transformation_class,
+                named_family=named_family,
+            )
+            resolved_components.append(component)
+    return build_resolved_recipe_from_components(
+        resolved_components,
+        temperature_c=temperature_c,
+        time_h=time_h,
+        concentration_m=concentration_m,
+        atmosphere=atmosphere,
+    )
+
+
+__all__ = ["build_resolved_recipe", "build_resolved_recipe_from_components"]
