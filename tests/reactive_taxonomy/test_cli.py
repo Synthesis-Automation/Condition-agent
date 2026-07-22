@@ -36,7 +36,23 @@ def test_concise_molecule_and_reaction_output(capsys) -> None:
     assert "Reaction: Ar–Br + Ar–B(OH)2 → Ar–Ar" in reaction_output
     assert "Evidence: exact_product_reconstruction" in reaction_output
     assert "Product connection: Ar–Ar (C_C)" in reaction_output
+    assert "Partner analysis: electrophile=Ar [S:open, E:neutral]" in reaction_output
+    assert "transfer_partner=Ar [S:open, E:neutral]" in reaction_output
     assert "selected grammar" not in reaction_output
+
+    cn_reaction = "Brc1ccccn1.Nc1ccccc1>>c1ccc(Nc2ccccn2)cc1"
+    assert main(["reaction", cn_reaction, "--concise"]) == 0
+    cn_output = capsys.readouterr().out
+    assert (
+        "Partner analysis: electrophile=HeteroAr [S:open, E:electron_poor]"
+        in cn_output
+    )
+    assert "nucleophile=Ar [S:primary center/attached:Ar, E:neutral]" in cn_output
+
+    alkyl_reaction = "CC(C)Br.N>>CC(C)N"
+    assert main(["reaction", alkyl_reaction, "--concise"]) == 0
+    alkyl_output = capsys.readouterr().out
+    assert "Partner analysis: electrophile=R-secondary [S:secondary" in alkyl_output
 
     assert main(["molecule", "CC(C)(C)N", "--concise"]) == 0
     tert_butylamine_output = capsys.readouterr().out
@@ -146,10 +162,15 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
         assert reader.fieldnames == [
             "reaction_smiles",
             "reaction_label",
+            "partner_analysis",
             "spectator_groups",
         ]
         rows = list(reader)
 
     assert len(rows) == 1
     assert rows[0]["reaction_smiles"] == reaction
+    assert rows[0]["partner_analysis"] == (
+        "electrophile=Ar [S:open, E:neutral]; "
+        "transfer_partner=Ar [S:open, E:neutral]"
+    )
     assert rows[0]["spectator_groups"] == "nitrile"

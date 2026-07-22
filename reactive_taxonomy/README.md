@@ -150,8 +150,8 @@ Its versioned answer key is
 `benchmarks/reaction_edits/benchmark_manifest.v1.json`, and it writes the same
 five evaluation artifacts under `results/reaction_edit_evaluation/`.
 
-Use concise mode for a chemist-readable view containing only the primary
-labels and interpretation:
+Use concise mode for a chemist-readable view containing the primary labels,
+partner context, and local steric and electronic analyses:
 
 ```powershell
 python -m reactive_taxonomy.cli molecule "Brc1ccc(N)cc1C#N" --concise
@@ -162,6 +162,14 @@ For reactive sites bearing alkyl groups, the readable output separates the
 substitution at the reactive center from attachment-carbon sterics. For
 example, tert-butylamine remains a primary amine (`R–NH2`) but its attached
 alkyl group is reported as `tertiary` and alpha-branched.
+
+Reaction partner contexts retain `Ar` and `HeteroAr` explicitly. Alkyl
+electrophiles are rendered as `R (methyl)`, `R (primary)`, `R (secondary)`, or
+`R (tertiary)` from the reactive carbon's graph-local substitution. Concise
+reaction CSV exports combine these descriptors in one compact
+`partner_analysis` column, for example `electrophile=Ar [S:open, E:neutral]`.
+This remains a readable projection of the structured
+`reaction_signature.partners` descriptors.
 
 Unsaturated-bond labels expose endpoint substitution rather than collapsing all
 sites to `C=C` or `C≡C`. Examples include `H2C=CH2`, `H2C=CHR1`,
