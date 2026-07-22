@@ -1,4 +1,10 @@
-from condition_registry import get_registry, resolve_condition_components, resolve_substance, validate_registry
+from condition_registry import (
+    get_registry,
+    resolve_condition_components,
+    resolve_substance,
+    resolve_substance_id,
+    validate_registry,
+)
 from condition_registry.normalization import normalize_cas
 
 
@@ -14,6 +20,15 @@ def test_invalid_cas_is_not_silently_resolved() -> None:
     assert normalize_cas("7732-18-4") is None
     result = resolve_substance(cas="7732-18-4")
     assert result.status == "invalid_identifier"
+
+
+def test_exact_substance_id_resolution_is_available_to_definitions() -> None:
+    result = resolve_substance_id("cas:1536473-72-9")
+
+    assert result.status == "resolved"
+    assert result.match_kind == "exact_substance_id"
+    assert result.substance is not None
+    assert result.substance.canonical_name == "t-BuBrettPhos Palladacycle Gen. 3"
 
 
 def test_condition_component_resolution_keeps_source_fields() -> None:

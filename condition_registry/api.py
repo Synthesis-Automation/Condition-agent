@@ -18,6 +18,11 @@ def resolve_substance(*, cas: Optional[str] = None, name: Optional[str] = None) 
     return get_registry().resolve(cas=cas, name=name)
 
 
+def resolve_substance_id(substance_id: str) -> ResolutionResult:
+    """Resolve a stable registry identity."""
+    return get_registry().resolve_id(substance_id)
+
+
 def resolve_condition_components(**source_fields: Iterable[str]) -> Dict[str, Tuple[ResolutionResult, ...]]:
     return {
         field: tuple(resolve_substance(cas=value) for value in values if str(value).strip())
@@ -25,4 +30,9 @@ def resolve_condition_components(**source_fields: Iterable[str]) -> Dict[str, Tu
     }
 
 
-__all__ = ["get_registry", "resolve_condition_components", "resolve_substance"]
+__all__ = [
+    "get_registry",
+    "resolve_condition_components",
+    "resolve_substance",
+    "resolve_substance_id",
+]

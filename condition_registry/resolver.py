@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, Optional, Tuple
+from typing import DefaultDict, Dict, List, Optional
 
 from .loader import iter_substance_rows, row_to_substance
 from .models import ResolutionResult, Substance
@@ -43,6 +43,16 @@ class ConditionRegistry:
         if len(unique) > 1:
             return ResolutionResult(name or "", "ambiguous", candidates=tuple(sorted(unique)))
         return ResolutionResult(name or "", "unresolved")
+
+    def resolve_id(self, substance_id: str) -> ResolutionResult:
+        """Resolve an exact stable registry identity without alias inference."""
+        query = str(substance_id or "").strip()
+        if not query:
+            return ResolutionResult(query, "empty_query")
+        substance = self._by_id.get(query)
+        if substance is None:
+            return ResolutionResult(query, "unresolved")
+        return ResolutionResult(query, "resolved", substance, "exact_substance_id")
 
     @property
     def size(self) -> int:

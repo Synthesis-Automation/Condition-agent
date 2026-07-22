@@ -9,6 +9,27 @@ Data ownership:
 - `definitions/pending_substances.csv`: unresolved additions awaiting curation
 - `definitions/roles_families.v1.json`: role and family taxonomy
 - `definitions/role_resolution.v1.json`: contextual role and recipe-bucket rules
+- `definitions/recipe_templates.v1.json`: typed expert recipe templates
+
+## Expert recipe templates
+
+Rule-based recommendation definitions reference registry-owned recipe templates
+by stable ID. Every template option is an exact `substance_id`; free-text and
+unresolved alternatives are rejected by validation. Alternatives are retained
+as choices and are never implicitly expanded into a Cartesian product.
+
+```python
+from condition_registry import get_recipe_template
+
+template = get_recipe_template("pd_sp2_cn.primary_alkyl_amine.v1")
+assert template is not None
+assert template.identity_complete
+```
+
+New templates remain `draft` until their quantities and operating parameters
+have been chemically reviewed. Draft status is distinct from identity
+resolution: a draft may contain only valid registry identities while still
+lacking enough detail for activation.
 
 ## Contextual recipes
 

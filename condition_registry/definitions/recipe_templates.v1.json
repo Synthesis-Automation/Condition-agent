@@ -1,0 +1,228 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "condition_recipe_templates.v1",
+  "templates": [
+    {
+      "template_id": "pd_sp2_cn.primary_alkyl_amine.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:1536473-72-9", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "present_alternatives",
+          "alternatives": [
+            {"substance_id": "cas:7778-53-2", "preference": 100},
+            {"substance_id": "cas:534-17-8", "preference": 90},
+            {"substance_id": "cas:865-48-5", "preference": 80},
+            {"substance_id": "cas:40949-94-8", "preference": 70}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:75-05-8", "preference": 100}
+          ]
+        }
+      ],
+      "temperature_c": 100.0,
+      "atmosphere": "N2",
+      "notes": [
+        "Catalyst loading, base equivalents, concentration, and time require curation before activation.",
+        "Alternative bases are presented as choices and are not expanded combinatorially."
+      ],
+      "provenance": {
+        "basis": "initial_expert_definition",
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.secondary_alkyl_amine.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "present_alternatives",
+          "alternatives": [
+            {"substance_id": "cas:1536473-72-9", "preference": 100},
+            {"substance_id": "cas:1375325-77-1", "preference": 90}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "present_alternatives",
+          "alternatives": [
+            {"substance_id": "cas:534-17-8", "preference": 100},
+            {"substance_id": "cas:40949-94-8", "preference": 90},
+            {"substance_id": "cas:865-48-5", "preference": 80}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:123-91-1", "preference": 100}
+          ]
+        }
+      ],
+      "atmosphere": "N2",
+      "notes": [
+        "Temperature, time, loadings, and concentration require curation before activation."
+      ],
+      "provenance": {
+        "basis": "initial_expert_definition",
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.aromatic_nh.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "present_alternatives",
+          "alternatives": [
+            {"substance_id": "cas:1702311-34-9", "preference": 100},
+            {"substance_id": "cas:1536473-72-9", "preference": 90},
+            {"substance_id": "cas:1375325-77-1", "preference": 80}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "present_alternatives",
+          "alternatives": [
+            {"substance_id": "cas:7778-53-2", "preference": 100},
+            {"substance_id": "cas:534-17-8", "preference": 90},
+            {"substance_id": "cas:865-48-5", "preference": 80}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:123-91-1", "preference": 100}
+          ]
+        }
+      ],
+      "atmosphere": "N2",
+      "notes": [
+        "Temperature, time, loadings, and concentration require curation before activation."
+      ],
+      "provenance": {
+        "basis": "initial_expert_definition",
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.amide_nh.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:1447963-75-8", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "present_alternatives",
+          "alternatives": [
+            {"substance_id": "cas:7778-53-2", "preference": 100},
+            {"substance_id": "cas:534-17-8", "preference": 90},
+            {"substance_id": "cas:865-48-5", "preference": 80}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:123-91-1", "preference": 100}
+          ]
+        }
+      ],
+      "atmosphere": "N2",
+      "notes": [
+        "Temperature, time, loadings, and concentration require curation before activation."
+      ],
+      "provenance": {
+        "basis": "initial_expert_definition",
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.general_nh_fallback.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:1536473-72-9", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "present_alternatives",
+          "alternatives": [
+            {"substance_id": "cas:7778-53-2", "preference": 100},
+            {"substance_id": "cas:534-17-8", "preference": 90}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:75-05-8", "preference": 100}
+          ]
+        }
+      ],
+      "atmosphere": "N2",
+      "forbidden_substance_ids": ["cas:51364-51-3"],
+      "notes": [
+        "Fallback only; more specific nucleophile rules take precedence.",
+        "Temperature, time, loadings, and concentration require curation before activation."
+      ],
+      "provenance": {
+        "basis": "initial_expert_definition",
+        "review_required": true
+      }
+    }
+  ]
+}

@@ -1,5 +1,25 @@
 # Reaction-Label Condition Recommender
 
+## Declarative expert rules
+
+The clean expert-rule definitions live under `definitions/rule_sets/`. They
+match allowlisted structural facts from `reactive_taxonomy`, reference recipe
+templates owned by `condition_registry`, and do not match source reaction names
+or display labels. The first definition set covers palladium condition proposals
+for verified `sp2_c_n_substitution` events.
+
+```python
+from condition_recommender.rules import load_condition_rule_set
+
+rule_set = load_condition_rule_set()
+```
+
+Loading performs strict shape, taxonomy-vocabulary, role, substance-identity,
+and cross-package template validation. The definitions use a deterministic
+`specific` then `fallback` selection policy. They remain `draft` until the
+condition quantities and operating details have been reviewed; draft rules are
+not yet part of the public recommendation API.
+
 ## Mixed dataset audit
 
 Audit a CSV file or directory before conversion without modifying the source
