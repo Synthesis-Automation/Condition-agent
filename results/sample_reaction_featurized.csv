@@ -1,451 +1,451 @@
-﻿reaction_smiles,reaction_label,spectator_groups
-Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1,Ar–Br + Ar–B(OH)2 → Ar–Ar,
-Clc1ccc(C#N)cc1.c1ccc(B(O)O)cc1>>N#Cc1ccc(-c2ccccc2)cc1,Ar–Cl + Ar–B(OH)2 → Ar–Ar,nitrile
-Brc1ccc(OC)cc1.c1ccc(B(O)O)cc1>>COc1ccc(-c2ccccc2)cc1,Ar–Br + Ar–B(OH)2 → Ar–Ar,ether
-Ic1ccncc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccncc2)cc1,HeteroAr–I + Ar–B(OH)2 → HeteroAr–Ar,heteroaryl_nitrogen
-Brc1ccc(C(F)(F)F)cc1.c1ccc(B(O)O)cc1>>FC(F)(F)c1ccc(-c2ccccc2)cc1,Ar–Br + Ar–B(OH)2 → Ar–Ar,
-Clc1ccc2ccccc2c1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccc3ccccc3c2)cc1,Ar–Cl + Ar–B(OH)2 → Ar–Ar,
-Brc1cc(C)ccc1C.c1ccc(B(O)O)cc1>>Cc1ccc(C)c(-c2ccccc2)c1,Ar–Br + Ar–B(OH)2 → Ar–Ar,
-Fc1ccc(OS(=O)(=O)C(F)(F)F)cc1.c1ccc(B(O)O)cc1>>Fc1ccc(-c2ccccc2)cc1,Ar–OTf + Ar–B(OH)2 → Ar–Ar,aryl_halide
-C/C=C/Br.C=CB(O)O>>C/C=C/C=C,Alkenyl–Br + Alkenyl–B(OH)2 →,
-Brc1ccc(OC)cc1.[K+].[B-](F)(F)(F)c2ccccc2>>COc1ccc(-c2ccccc2)cc1,Ar–Br + Ar–BF3K → Ar–Ar,ether
-Clc1ccncc1.O=C(CN(C(CN(C(O2)=O)CC(O)=O)=O)CC(O)=O)OB2c3cccnc3>>c4(c5cccnc5)ccncc4,HeteroAr–Cl + HeteroAr–BPin → HeteroAr–HeteroAr,heteroaryl_nitrogen; heteroaryl_nitrogen; amide; carboxylic_acid; carboxylic_acid
-Brc1ccc(Cl)nc1.c2ccc(B(O)O)cc2>>c1ccc(-c2ccc(Cl)nc2)cc1,HeteroAr–Br + Ar–B(OH)2 → HeteroAr–Ar,heteroaryl_nitrogen; aryl_halide
-Brc1cc(Cl)nc(Cl)c1.c2ccc(B(O)O)nc2>>c1ccc(-c2cc(Cl)nc(Cl)c2)nc1,HeteroAr–Br + HeteroAr–B(OH)2 → HeteroAr–HeteroAr,aryl_halide; aryl_halide; heteroaryl_nitrogen; heteroaryl_nitrogen
-Brc1cccc2[nH]ccc12.c3ccc(B(O)O)cc3>>c1ccc(-c2ccc3[nH]ccc3c2)cc1,(Ar–B(OH)2 + AromN–H) OR (Ar–Br + Ar–B(OH)2) OR (intramolecular Ar–Br / AromN–H) →,
-FC(F)(F)c1ccc(Cl)cc1.Nc1ccnc(B(O)O)n1>>FC(F)(F)c1ccc(-c2cc(N)ncn2)cc1,(Ar–Cl + HeteroAr–B(OH)2) OR (Ar–Cl + HeteroAr–NH2) OR (intramolecular HeteroAr–B(OH)2 / HeteroAr–NH2) →,
-Clc1cncc(B(O)O)c1.Brc2ccc(F)cc2>>Fc1ccc(-c2cc(Cl)cnc2)cc1,Ar–Br + HeteroAr–B(OH)2 → HeteroAr–Ar,aryl_halide; heteroaryl_nitrogen; aryl_halide
-Brc1ccc(Br)cc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1,Ar–Br + Ar–B(OH)2 →,
-Brc1cccc(Br)c1.c1ccc(B(O)O)cc1>>c1ccc(-c2cccc(-c3ccccc3)c2)cc1,Ar–Br + Ar–B(OH)2 →,
-Brc1ccccc1.c1ncc(B(O)O)cn1>>c1ccc(-c2cnccn2)cc1,Ar–Br + HeteroAr–B(OH)2 →,
-Clc1ccc(C#N)cc1.c1coc(B(O)O)c1>>N#Cc1ccc(-c2ccoc2)cc1,Ar–Cl + HeteroAr–B(OH)2 →,
-Brc1ccncc1.c1csc(B(O)O)c1>>c1cc(-c2cccs2)ccn1,HeteroAr–Br + HeteroAr–B(OH)2 → HeteroAr–HeteroAr,heteroaryl_nitrogen
-Ic1ccc(C(=O)OC)cc1.c1c[nH]c(B(O)O)c1>>COC(=O)c1ccc(-c2cc[nH]c2)cc1,(Ar–I + AromN–H) OR (Ar–I + HeteroAr–B(OH)2) OR (intramolecular HeteroAr–B(OH)2 / AromN–H) →,
-Brc1cnc2ccccc2n1.c1ccc(B(O)O)cc1>>c1ccc(-c2cnc3ccccc3n2)cc1,HeteroAr–Br + Ar–B(OH)2 → HeteroAr–Ar,heteroaryl_nitrogen; heteroaryl_nitrogen
-Clc1cccc2c1cc[nH]2.c1ccc(B(O)O)nc1>>c1ccc(-c2cccc3[nH]ccc23)nc1,Ar–Cl + HeteroAr–B(OH)2 → HeteroAr–Ar,heteroaryl_nitrogen
-Brc1nc2ccccc2s1.Cc1ccc(B(O)O)cc1>>Cc1ccc(-c2nc3ccccc3s2)cc1,HeteroAr–Br + Ar–B(OH)2 → HeteroAr–Ar,heteroaryl_nitrogen
-Ic1nc2ccccc2o1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2nc3ccccc3o2)cc1,HeteroAr–I + Ar–B(OH)2 → HeteroAr–Ar,heteroaryl_nitrogen; ether
-Brc1cccc2nsnc12.c1ccc(B(O)O)cc1>>c1ccc(-c2cccc3nsnc23)cc1,Ar–Br + Ar–B(OH)2 → Ar–Ar,heteroaryl_nitrogen; heteroaryl_nitrogen
-Brc1ccccc1C(C)C.c1ccc(B(O)O)cc1>>CC(C)c1ccccc1-c1ccccc1,Ar–Br + Ar–B(OH)2 → Ar–Ar,
-Clc1c(C)cccc1C.COc1ccc(B(O)O)cc1>>Cc1cccc(C)c1-c1ccc(OC)cc1,Ar–Cl + Ar–B(OH)2 → Ar–Ar,ether
-Brc1ccccc1OCC.c1ccc(B(O)O)cc1C>>CCOc1ccccc1-c1ccccc1C,Ar–Br + Ar–B(OH)2 →,
-Fc1c(F)c(F)c(Br)c(F)c1F.c1ccc(B(O)O)cc1>>Fc1c(F)c(F)c(-c2ccccc2)c(F)c1F,Ar–Br + Ar–B(OH)2 → Ar–Ar,aryl_halide; aryl_halide; aryl_halide; aryl_halide; aryl_halide
-Clc1cc(Cl)cc(Br)c1.c1ccc(B(O)O)cc1>>Clc1cc(Cl)cc(-c2ccccc2)c1,Ar–Br + Ar–B(OH)2 → Ar–Ar,aryl_halide; aryl_halide
-Brc1ccc([N+](=O)[O-])cc1[N+](=O)[O-].c1ccc(B(O)O)cc1>>c1ccc(-c2ccc([N+](=O)[O-])cc2[N+](=O)[O-])cc1,Ar–Br + Ar–B(OH)2 → Ar–Ar,nitro; nitro
-Brc1ccc(C(=O)OCC)cc1.c1ccc(B(O)O)cc1>>CCOC(=O)c1ccc(-c2ccccc2)cc1,Ar–Br + Ar–B(OH)2 → Ar–Ar,ester
-Ic1ccc(NC(=O)OC(C)(C)C)cc1.c1ccc(B(O)O)cc1>>CC(C)(C)OC(=O)Nc1ccc(-c2ccccc2)cc1,Ar–I + Ar–B(OH)2 → Ar–Ar,carbamate
-Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1.c1ccc(B(O)O)cc1>>CC(C)(C)[Si](C)(C)Oc1ccc(-c2ccccc2)cc1,Ar–Br + Ar–B(OH)2 → Ar–Ar,ether
-Brc1ccccc1.C=CB(O)O>>C=Cc1ccccc1,Ar–Br + Alkenyl–B(OH)2 → Ar–Alkenyl,
-Ic1ccc(C=O)cc1.C/C=C/B(O)O>>C/C=C/c1ccc(C=O)cc1,Ar–I + Alkenyl–B(OH)2 →,
-Brc1ccncc1.C=C(C)B(O)O>>C=C(C)c1ccncc1,HeteroAr–Br + Alkenyl–B(OH)2 → HeteroAr–Alkenyl,heteroaryl_nitrogen
-Brc1ccc(OC)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1,Ar–Br + Alkynyl–B(OH)2 → Ar–Alkynyl,ether
-Brc1ccc(Br)cc1CCCCCCCC(=O)O.c1ccc(B(O)O)cc1>>O=C(O)CCCCCCCc1ccc(-c2ccccc2)cc1-c1ccccc1,(Ar–B(OH)2 + R–C(O)–OH) OR (Ar–Br + Ar–B(OH)2) →,
-Brc1ccccc1.[K+].[B-](F)(F)(F)c1ccccc1>>c1ccc(-c2ccccc2)cc1,Ar–Br + Ar–BF3K → Ar–Ar,
-Clc1ccc(C(F)(F)F)cc1.[K+].[B-](F)(F)(F)c1ccc(OC)cc1>>COc1ccc(-c2ccc(C(F)(F)F)cc2)cc1,Ar–Cl + Ar–BF3K → Ar–Ar,ether
-[O-][n+]1ccccc1Br.c1ccc(B(O)O)cc1>>[O-][n+]1ccccc1-c1ccccc1,HeteroAr–Br + Ar–B(OH)2 → HeteroAr–Ar,heteroaryl_nitrogen
-BrC1(c2ccccc2)CC1.c1ccc(B(O)O)cc1>>c1ccc(C2(c3ccccc3)CC2)cc1,,
-Brc1ccccc1.c1ccc([Sn](C)(C)C)cc1>>c1ccc(-c2ccccc2)cc1,Ar–Br + Ar–SnR3 → Ar–Ar,
-Ic1ccncc1.C=C[Sn](C)(C)C>>C=Cc1ccncc1,HeteroAr–I + Alkenyl–SnR3 → HeteroAr–Alkenyl,heteroaryl_nitrogen
-Brc1ccccc1.C#Cc1ccccc1>>C(#Cc1ccccc1)c1ccccc1,Ar–Br + R–C≡C–H → Ar–C≡C–R,
-Ic1ccncc1.C#CC>>C#Cc1ccncc1,HeteroAr–I + R–C≡C–H →,
-Clc1ccc(C#N)cc1.C#CC(C)(C)C>>CC(C)(C)C#Cc1ccc(C#N)cc1,Ar–Cl + R–C≡C–H → Ar–C≡C–R,nitrile
-Brc1ccc(OC)cc1.C#Cc1ccccc1>>COc1ccc(C#Cc2ccccc2)cc1,Ar–Br + R–C≡C–H → Ar–C≡C–R,ether
-Ic1ccc(C(F)(F)F)cc1.C#C[Si](C)(C)C>>C[Si](C)(C)C#Cc2ccc(C(F)(F)F)cc2,Ar–I + R–C≡C–H → Ar–C≡C–R,
-Brc1cccs1.C#Cc1ccccc1>>c1cc(C#Cc2ccccc2)sc1,HeteroAr–Br + R–C≡C–H → HeteroAr–C≡C–R,
-Clc1ccncc1.C#CCOC>>COC(C)C#Cc1ccncc1,HeteroAr–Cl + R–C≡C–H →,
-Brc(cc1)cc2c1[nH]cc2.C#CC>>CC#Cc(cc3)cc4c3[nH]cc4,Ar–Br + R–C≡C–H → Ar–C≡C–R,
-Brc1ccccc1.C=C>>C(=Cc1ccccc1),Ar–Br + H2C=CH2 → Ar–CH=CH2,
-Ic1ccc(C=O)cc1.C=CC(=O)OCC>>CCOC(=O)/C=C/c1ccc(C=O)cc1,Ar–I + H2C=CHR1 →,
-Brc1ccncc1.C=CC#N>>N#C/C=C/c1ccncc1,HeteroAr–Br + H2C=CHR1 →,
-Brc1ccc(OC)cc1.C=CC(=O)OC>>COc1ccc(/C=C/C(=O)OC)cc1,Ar–Br + H2C=CHR1 →,
-Ic1ccc2ccccc2c1.C=C>>C(=Cc1ccc2ccccc2c1),Ar–I + H2C=CH2 → Ar–CH=CH2,
-Brc1cccs1.C=CC(=O)N>>NC(=O)/C=C/c1cccs1,(HeteroAr–Br + H2C=CHR1) OR (HeteroAr–Br + R–C(O)–NH2) →,
-Clc1ccc(C#N)cc1.C=C>>C=Cc1ccc(C#N)cc1,Ar–Cl + H2C=CH2 → Ar–CH=CH2,nitrile
-Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1,Ar–Br + Ar–ZnX → Ar–Ar,
-Ic1ccncc1.C=C[Zn]Br>>C=Cc1ccncc1,HeteroAr–I + Alkenyl–ZnX → HeteroAr–Alkenyl,heteroaryl_nitrogen
-Brc1ccc(C(F)(F)F)cc1.c1ccc([Zn]Cl)cc1>>FC(F)(F)c1ccc(-c2ccccc2)cc1,Ar–Br + Ar–ZnX → Ar–Ar,
-Clc1ccc(C#N)cc1.CC[Zn]Br>>CCc1ccc(C#N)cc1,Ar–Cl + R–ZnX → Ar–R,nitrile
-Brc1ccccc1.c1ccc([Mg]Br)cc1>>c1ccc(-c2ccccc2)cc1,Ar–Br + Ar–MgX → Ar–Ar,
-Ic1ccncc1.C=C[Mg]Cl>>C=Cc1ccncc1,HeteroAr–I + Alkenyl–MgX → HeteroAr–Alkenyl,heteroaryl_nitrogen
-Brc1ccc(OC)cc1.CC[Mg]Br>>CCc1ccc(OC)cc1,Ar–Br + R–MgX → Ar–R,ether
-Clc1ccc(C#N)cc1.c1ccc([Mg]Br)cc1>>N#Cc1ccc(-c2ccccc2)cc1,Ar–Cl + Ar–MgX → Ar–Ar,nitrile
-Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Clc1ccncc1.NCC>>CCNc1ccncc1,HeteroAr–Cl + R–NH2 → HeteroAr–NH–R,heteroaryl_nitrogen
-Brc1ccc(C(F)(F)F)cc1.NC1CCCCC1>>FC(F)(F)c1ccc(NC2CCCCC2)cc1,Ar–Br + R–NH2 → Ar–NH–R,
-Ic1ccc(C=O)cc1.Nc1ccccc1>>O=Cc1ccc(Nc2ccccc2)cc1,Ar–I + Ar–NH2 → Ar–NH–Ar,aldehyde
-Brc1ccc2ccccc2c1.NCC>>CCNc1ccc2ccccc2c1,Ar–Br + R–NH2 → Ar–NH–R,
-Clc1nc2ccccc2[nH]1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2[nH]1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,heteroaryl_nitrogen
-Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Clc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1,Ar–Cl + Ar–NH2 → Ar–NH–Ar,
-Ic1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1,Ar–I + Ar–NH2 → Ar–NH–Ar,
-Brc1ccc(OC)cc1.Nc1ccccc1>>COc1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,ether
-Brc1ccc(C)cc1.Nc1ccccc1>>Cc1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Brc1ccc(C(F)(F)F)cc1.Nc1ccccc1>>FC(F)(F)c1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Brc1ccc(C#N)cc1.Nc1ccccc1>>N#Cc1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,nitrile
-Brc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>[O-][N+](=O)c1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,nitro
-Brc1ccc(C(=O)C)cc1.Nc1ccccc1>>CC(=O)c1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,ketone
-Brc1ccc(F)cc1.Nc1ccccc1>>Fc1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,aryl_halide
-Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,heteroaryl_nitrogen
-Brc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,heteroaryl_nitrogen
-Clc1cccnc1.Nc1ccccc1>>c1ccccc1Nc1cccnc1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,heteroaryl_nitrogen
-Brc1cnccn1.Nc1ccccc1>>c1ccccc1Nc1cnccn1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,heteroaryl_nitrogen; heteroaryl_nitrogen
-Clc1cccc2ncccc12.Nc1ccccc1>>c1ccccc1Nc1cccc2ncccc12,Ar–Cl + Ar–NH2 → Ar–NH–Ar,heteroaryl_nitrogen
-Brc1ccc2[nH]ccc2c1.Nc1ccccc1>>c1ccccc1Nc1ccc2[nH]ccc2c1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Brc1ccco1.Nc1ccccc1>>c1ccccc1Nc1ccco1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,
-Clc1cccs1.Nc1ccccc1>>c1ccccc1Nc1cccs1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,
-Brc1cnc(C)cn1.Nc1ccccc1>>Cc1cnc(Nc2ccccc2)cn1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,heteroaryl_nitrogen; heteroaryl_nitrogen
-Brc1ccccc1.Nc1ccc(C)cc1>>Cc1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Brc1ccccc1.Nc1ccc(OC)cc1>>COc1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,ether
-Brc1ccccc1.Nc1ccc(F)cc1>>Fc1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,aryl_halide
-Brc1ccccc1.Nc1ccc(C(F)(F)F)cc1>>FC(F)(F)c1ccc(Nc2ccccc2)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Brc1ccccc1.Nc1cccc(C)c1>>Cc1cccc(Nc2ccccc2)c1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Brc1ccccc1.Nc1cc(C)cc(C)c1>>Cc1cc(C)cc(Nc2ccccc2)c1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Brc1ccccc1.CN>>CNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,
-Brc1ccccc1.CCN>>CCNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,
-Brc1ccccc1.CCCN>>CCCNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,
-Brc1ccccc1.CC(C)N>>CC(C)Nc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,
-Brc1ccccc1.CC(C)(C)N>>CC(C)(C)Nc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,
-Brc1ccccc1.NCc1ccccc1>>c1ccccc1CNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,
-Brc1ccccc1.NCCOC>>COCCNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,ether
-Brc1ccncc1.NCCC>>CCCNc1ccncc1,HeteroAr–Br + R–NH2 → HeteroAr–NH–R,heteroaryl_nitrogen
-Clc1ccc(C#N)cc1.CC(C)N>>CC(C)Nc1ccc(C#N)cc1,Ar–Cl + R–NH2 → Ar–NH–R,nitrile
-Brc1ccccc1.CCNCC>>CCN(CC)c1ccccc1,Ar–Br + R1R2–NH → Ar–NR1R2,
-Brc1ccccc1.N1CCCC1>>c1ccccc1N1CCCC1,Ar–Br + R1R2–NH → Ar–NR1R2,
-Brc1ccccc1.N1CCCCC1>>c1ccccc1N1CCCCC1,Ar–Br + R1R2–NH → Ar–NR1R2,
-Brc1ccccc1.N1CCOCC1>>c1ccccc1N1CCOCC1,Ar–Br + R1R2–NH → Ar–NR1R2,ether
-Brc1ccccc1.N1CCN(C)CC1>>CN1CCN(c2ccccc2)CC1,Ar–Br + R1R2–NH → Ar–NR1R2,tertiary_amine
-Brc1ccccc1.N1CCC(O)CC1>>OC1CCN(c2ccccc2)CC1,Ar–Br + R1R2–NH → Ar–NR1R2,alcohol
-Brc1ccccc1.N1Cc2ccccc2C1>>c1ccccc1N1Cc2ccccc2C1,Ar–Br + R1R2–NH → Ar–NR1R2,
-Brc1ccncc1.N1CCCC1>>c1ccncc1N1CCCC1,HeteroAr–Br + R1R2–NH →,
-Clc1ccc(C(F)(F)F)cc1.N1CCOCC1>>FC(F)(F)c1ccc(N2CCOCC2)cc1,Ar–Cl + R1R2–NH → Ar–NR1R2,ether
-Brc1ccc(OC)cc1.N1CCCCC1>>COc1ccc(N2CCCCC2)cc1,Ar–Br + R1R2–NH → Ar–NR1R2,ether
-Brc1ccc(Br)cc1.Nc1ccccc1>>c1ccc(Nc2ccc(Nc3ccccc3)cc2)cc1,Ar–Br + Ar–NH2 →,
-Brc1ccccc1C.Nc1ccccc1>>Cc1ccccc1Nc1ccccc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,
-Brc1ccccc1OC.Nc1ccccc1>>COc1ccccc1Nc1ccccc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,ether
-Brc1ccccc1C(=O)C.Nc1ccccc1>>CC(=O)c1ccccc1Nc1ccccc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,ketone
-Clc1ccc2nc(Cl)ccc2c1.Nc1ccccc1>>c1ccc(Nc2ccc3cc(Nc4ccccc4)ccc3n2)cc1,(Ar–Cl + Ar–NH2) OR (HeteroAr–Cl + Ar–NH2) →,
-Brc1ccc2c(c1)OCO2.Nc1ccccc1>>c1ccc(Nc2ccc3c(c2)OCO3)cc1,Ar–Br + Ar–NH2 → Ar–NH–Ar,ether; ether
-Clc1nc2ccccc2s1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2s1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,heteroaryl_nitrogen
-Brc1nc2ccccc2o1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2o1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,heteroaryl_nitrogen
-Clc1cnc2ccccc2n1.Nc1ccccc1>>c1ccccc1Nc1cnc2ccccc2n1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,heteroaryl_nitrogen; heteroaryl_nitrogen
-Brc1ccccc1.c1cc[nH]c1>>c1ccccc1n1cccc1,Ar–Br + AromN–H → Ar–AromN,
-Brc1ccc(C)cc1.c1cc[nH]c1>>Cc1ccc(n2cccc2)cc1,Ar–Br + AromN–H → Ar–AromN,
-Clc1ccc(C#N)cc1.c1cc[nH]c1>>N#Cc1ccc(n2cccc2)cc1,Ar–Cl + AromN–H → Ar–AromN,nitrile
-Brc1ccccc1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1ccccc1,Ar–Br + AromN–H → Ar–AromN,
-Brc1ccc(OC)cc1.c1ccc2[nH]ccc2c1>>COc1ccc(n2ccc3ccccc32)cc1,Ar–Br + AromN–H → Ar–AromN,ether
-Clc1ccncc1.c2([nH]cc3)c3cccc2>>c4(n(cc5)c6c5cccc6)ccncc4,HeteroAr–Cl + AromN–H → HeteroAr–AromN,heteroaryl_nitrogen
-Brc1ccc(C(F)(F)F)cc1.c1ccc2[nH]ccc2c1>>FC(F)(F)c1ccc(n2ccc3ccccc32)cc1,Ar–Br + AromN–H → Ar–AromN,
-Brc1ccccc1.c1c[nH]nc1C>>Cc1nn(c2ccccc2)cc1,Ar–Br + AromN–H → Ar–AromN,heteroaryl_nitrogen
-Clc1ccc(OC)cc1.c1c[nH]nc1C>>Cc1nn(c2ccc(OC)cc2)cc1,Ar–Cl + AromN–H → Ar–AromN,ether; heteroaryl_nitrogen
-Brc1ccccc1.c1cnc[nH]1>>c1ccccc1n1cncc1,Ar–Br + AromN–H → Ar–AromN,heteroaryl_nitrogen
-Brc1ccc(F)cc1.c1cnc[nH]1>>Fc1ccc(n2cncc2)cc1,Ar–Br + AromN–H → Ar–AromN,aryl_halide; heteroaryl_nitrogen
-Brc1ccccc1.c1ccc2c(c1)c1ccccc1[nH]2>>c1ccc2c(c1)c1ccccc1n2c1ccccc1,Ar–Br + AromN–H → Ar–AromN,
-Brc1ccc(C)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>Cc1ccc(n2c3ccccc3c3ccccc32)cc1,Ar–Br + AromN–H → Ar–AromN,
-Ic1ccc(OC)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>COc1ccc(n2c3ccccc3c3ccccc32)cc1,Ar–I + AromN–H → Ar–AromN,ether
-Brc1ccccc1.c1nc[nH]n1>>c1ccccc1n1ncnc1,Ar–Br + AromN–H → Ar–AromN,heteroaryl_nitrogen; heteroaryl_nitrogen
-Brc1ccc(C#N)cc1.c1nc[nH]n1>>N#Cc1ccc(n2ncnc2)cc1,Ar–Br + AromN–H → Ar–AromN,nitrile; heteroaryl_nitrogen; heteroaryl_nitrogen
-Brc1ccccc1C.c1ccc2[nH]ccc2c1>>Cc1ccccc1n1ccc2ccccc21,Ar–Br + AromN–H → Ar–AromN,
-Brc1c(C)cccc1C.c1ccc2[nH]ccc2c1>>Cc1cccc(C)c1n1ccc2ccccc21,Ar–Br + AromN–H → Ar–AromN,
-Brc1ccccc1OC.c1cc[nH]c1>>COc1ccccc1n1cccc1,Ar–Br + AromN–H → Ar–AromN,ether
-Brc1ccc(Br)cc1.c1ccc2[nH]ccc2c1>>c1ccc(n2ccc3ccccc32)cc1n1ccc2ccccc21,Ar–Br + AromN–H →,
-Brc1cccc(Br)c1.c1cc[nH]c1>>c1cccc(n2cccc2)c1n1cccc1,Ar–Br + AromN–H →,
-Brc1cnc2ccccc2n1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1cnc2ccccc2n1,HeteroAr–Br + AromN–H → HeteroAr–AromN,heteroaryl_nitrogen; heteroaryl_nitrogen
-Clc1cccc2c1cc[nH]2.c1ccccc1Br>>c1ccccc1n1ccc2c(Cl)cccc21,Ar–Br + AromN–H → Ar–AromN,aryl_halide
-Brc1ccccc1.NC(=O)C>>CC(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccc(C)cc1.NC(=O)C>>CC(=O)Nc1ccc(C)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Clc1ccc(OC)cc1.NC(=O)C>>CC(=O)Nc1ccc(OC)cc1,Ar–Cl + R–C(O)–NH2 → Ar–NH–C(O)–R,ether
-Brc1ccncc1.NC(=O)C>>CC(=O)Nc1ccncc1,HeteroAr–Br + R–C(O)–NH2 → HeteroAr–NH–C(O)–R,heteroaryl_nitrogen
-Ic1ccc(C(F)(F)F)cc1.NC(=O)C>>CC(=O)Nc1ccc(C(F)(F)F)cc1,Ar–I + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccccc1.NC(=O)CC>>CCC(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccc(Cl)cc1.NC(=O)CC>>CCC(=O)Nc1ccc(Cl)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,aryl_halide
-Brc1ccccc1.NC(=O)c1ccccc1>>O=C(Nc1ccccc1)c1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccc(OC)cc1.NC(=O)c1ccccc1>>COc1ccc(NC(=O)c2ccccc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,ether
-Clc1ccncc1.NC(=O)c1ccccc1>>O=C(Nc1ccncc1)c1ccccc1,HeteroAr–Cl + R–C(O)–NH2 → HeteroAr–NH–C(O)–R,heteroaryl_nitrogen
-Brc1ccc(C#N)cc1.NC(=O)c1ccccc1>>N#Cc1ccc(NC(=O)c2ccccc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,nitrile
-Brc1ccccc1.NC(=O)c1ccc(OC)cc1>>COc1ccc(C(=O)Nc2ccccc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,ether
-Brc1ccc(F)cc1.NC(=O)c1ccc(F)cc1>>Fc1ccc(C(=O)Nc2ccc(F)cc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,aryl_halide; aryl_halide
-Brc1ccccc1.NC(=O)CC(C)C>>CC(C)CC(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccccc1.NC(=O)C(C)(C)C>>CC(C)(C)C(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Clc1ccc(C(F)(F)F)cc1.NC(=O)CC(C)C>>CC(C)CC(=O)Nc1ccc(C(F)(F)F)cc1,Ar–Cl + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccccc1.NC(=O)CCc1ccccc1>>O=C(CCc1ccccc1)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccc(OC)cc1.NC(=O)CCc1ccccc1>>COc1ccc(NC(=O)CCc2ccccc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,ether
-Brc1ccccc1.C1CCNC1=O>>O=C1CCCN1c1ccccc1,Ar–Br + R–C(O)–NHR → Ar–N(C(O)–R)(R),
-Brc1ccc(C)cc1.C1CCNC1=O>>Cc1ccc(N2CCCC2=O)cc1,Ar–Br + R–C(O)–NHR → Ar–N(C(O)–R)(R),
-Clc1ccncc1.C1CCNC1=O>>O=C1CCCN1c1ccncc1,HeteroAr–Cl + R–C(O)–NHR → HeteroAr–N(C(O)–R)(R),heteroaryl_nitrogen
-Brc1ccccc1.NC(C)=O>>CC(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccccc1.NC(=O)c1ccncc1>>O=C(Nc1ccccc1)c1ccncc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,heteroaryl_nitrogen
-Clc1ccc(C#N)cc1.NC(=O)c1ccncc1>>N#Cc1ccc(NC(=O)c2ccncc2)cc1,Ar–Cl + R–C(O)–NH2 → Ar–NH–C(O)–R,nitrile; heteroaryl_nitrogen
-Brc1ccccc1.NC(=O)c1cccs1>>O=C(Nc1ccccc1)c1cccs1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccc(OC)cc1.NC(=O)c1cccs1>>COc1ccc(NC(=O)c2cccs2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,ether
-Brc1ccccc1.NC(=O)c1ccco1>>O=C(Nc1ccccc1)c1ccco1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccccc1C.NC(=O)C>>CC(=O)Nc1ccccc1C,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1c(C)cccc1C.NC(=O)c1ccccc1>>Cc1cccc(C)c1NC(=O)c1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Ic1ccc2ccccc2c1.NC(=O)C>>CC(=O)Nc1ccc2ccccc2c1,Ar–I + R–C(O)–NH2 → Ar–NH–C(O)–R,
-Brc1ccc(Br)cc1.NC(=O)C>>CC(=O)Nc1ccc(NC(C)=O)cc1,Ar–Br + R–C(O)–NH2 →,
-c1ccccc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccccc1,Ar–B(OH)2 + Ar–NH2 → Ar–NH–Ar,
-COc1cc(B(O)O)ccc1.Nc2ccccc2>>COc3cc(Nc4ccccc4)ccc3,Ar–B(OH)2 + Ar–NH2 → Ar–NH–Ar,ether
-c1ccncc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccncc1,HeteroAr–B(OH)2 + Ar–NH2 →,
-Brc1ccccc1.Oc1ccccc1>>c1ccccc1Oc1ccccc1,Ar–Br + Ar–OH → Ar–O–Ar,
-Ic1ccncc1.OCC>>CCOc1ccncc1,HeteroAr–I + R–OH → HeteroAr–O–R,heteroaryl_nitrogen
-Brc1ccc(C(F)(F)F)cc1.Oc1ccccc1>>FC(F)(F)c1ccc(Oc2ccccc2)cc1,Ar–Br + Ar–OH → Ar–O–Ar,
-Clc1ccc(C#N)cc1.OC>>COc1ccc(C#N)cc1,Ar–Cl + R–OH → Ar–O–R,nitrile
-Brc1cccs1.Oc1ccccc1>>c1cc(Oc2ccccc2)sc1,HeteroAr–Br + Ar–OH → HeteroAr–O–Ar,
-CC(=O)O.CCO>>CC(=O)OCC,R–C(O)OH + R–OH → R–C(O)–O–R,
-c1ccc(C(=O)O)cc1.OCC>>c1ccc(C(=O)OCC)cc1,Ar–C(O)OH + R–OH → Ar–C(O)–O–R,
-CC(=O)Cl.CCO>>CC(=O)OCC,R–C(O)Cl + R–OH → R–C(O)–O–R,
-CC(=O)O.Nc1ccccc1>>CC(=O)Nc1ccccc1,R–C(O)OH + Ar–NH2 → R–C(O)–NHR,
-c1ccc(C(=O)O)cc1.NCC>>c1ccc(C(=O)NCC)cc1,Ar–C(O)OH + R–NH2 → R–C(O)–NHR,
-C=Cc1ccccc1.[H][H]>>CCc1ccccc1,Ar–CH=CH2 → Ar–CH2–CH3,
-c1ccc(C=O)cc1.[H][H]>>c1ccc(CO)cc1,Ar–CH=O → Ar–CH2–OH,
-C#Cc1ccccc1.[H][H]>>CCc1ccccc1,Ar–C≡CH → Ar–CH2–CH3,
-c1ccc([N+](=O)[O-])cc1.[H][H]>>c1ccc(N)cc1,N=O bond cleavage; N–O bond cleavage; 2 × H gain at N,
-C=CC=C.[H][H]>>CCCC,2 × C=C hydrogenation,
-c1ccc(C#N)cc1.[H][H]>>c1ccc(CN)cc1,Ar–C≡N → Ar–CH2–NH2,
-O=C1CCCCC1.[H][H]>>OC1CCCCC1,R–C(R)=O → R–CH(R)–OH,
-C1=CC=C(C=C1)C=CC(=O)O.[H][H]>>c1ccc(CCC(=O)O)cc1,Ar–CH=CH–RO–C(O) → Ar–CH2–CH2–RO–C(O),
-c1ccc(C=O)cc1.[Na+]>>c1ccc(CO)cc1,Ar–CH=O → Ar–CH2–OH,
-CC(=O)c1ccccc1.[Na+]>>CC(O)c1ccccc1,Ar–C(R)=O → Ar–CH(R)–OH,
-c1ccc(C(=O)C)cc1.[Li+]>>c1ccc(C(O)C)cc1,Ar–C(R)=O → Ar–CH(R)–OH,
-CC(=O)OCC.[Li+]>>CCO,,
-c1ccc(C#N)cc1.[Li+]>>c1ccc(CN)cc1,Ar–C≡N → Ar–CH2–NH2,
-c1ccc(C(=O)Nc2ccccc2)cc1.[Li+]>>c1ccccc1CNc1ccccc1,C=O reductive cleavage,
-O=C1CCC(=O)O1.[Li+]>>OCCCO,,
-CC(=O)OC(=O)C.[Na+]>>CC(=O)CO,,
-CC(=O)c1ccccc1.C1CCNC1>>CC(O)c1ccccc1,R2C=O + R1R2–NH →,
-c1ccc(C=O)cc1.CCOC(=O)C=O>>c1ccc(CO)cc1,,
-c1ccc([N+](=O)[O-])cc1.[Zn]>>c1ccc(N)cc1,N=O bond cleavage; N–O bond cleavage; 2 × H gain at N,
-C1=CC=CC=C1>>C1CCC=CC1,C:C → C=C; 5 × C:C → C–C; 4 × H gain at C,
-c1ccc(OC)cc1>>COC1C=CCC=C1,2 × C:C → C=C; 4 × C:C → C–C; 2 × H gain at C,
-c1ccc(C(=O)C=C)cc1>>c1ccc(C(O)C=C)cc1,Alkenyl–C(Ar)=O → Alkenyl–CH(Ar)–OH,
-CC(=O)CC=C>>CC(O)CC=C,R–C(R)=O → R–CH(R)–OH,
-CC(=O)OCC>>CC=O,,
-c1ccc(CO)cc1.[O]>>c1ccc(C=O)cc1,Ar–CH2–OH → Ar–CH=O,
-CC(O)c1ccccc1.[O]>>CC(=O)c1ccccc1,Ar–CH(R)–OH → Ar–C(R)=O,
-CCO.[O]>>CC=O,R–CH2–OH → R–CH=O,
-c1ccc(CO)cc1.Cl[Cr](=O)(=O)OC(C)(C)C>>c1ccc(C=O)cc1,,
-CCO.OS(=O)(=O)O>>CC=O,,
-c1ccc(CO)cc1>>c1ccc(C=O)cc1,Ar–CH2–OH → Ar–CH=O,
-CC(O)C>>CC(=O)C,R–CH(R)–OH → R–C(R)=O,
-c1ccc(C(O)C)cc1>>c1ccc(C(=O)C)cc1,Ar–CH(R)–OH → Ar–C(R)=O,
-CC(O)CCO>>CC(=O)CC=O,2 × C=O oxidation,
-c1ccc(CO)cc1>>c1ccc(C(=O)O)cc1,,
-C1CCC(CO)CC1>>C1CCC(C=O)CC1,R–CH2–OH → R–CH=O,
-C=Cc1ccccc1.[O]>>C1OC1c1ccccc1,,
-C=C(C)C.[O]>>CC1(C)CO1,,
-C=CCCCCC=C.[O]>>C1OC1CCCCC1CO1,,
-CC(=O)c1ccccc1.[O]>>CC(=O)Oc1ccccc1,,
-O=C1CCCCC1.[O]>>O=C1OCCCC1,,
-CSc1ccccc1.[O]>>CS(=O)c1ccccc1,,
-CSc1ccccc1.[O]>>CS(=O)(=O)c1ccccc1,,
-C=CC=C.C=C>>C1C=CCC1,,
-C=CC(=C)C.C=CC(=O)OCC>>CC1=CC(C(=O)OCC)CC(C)=C1,,
-c1ccc2ccccc2c1C=CC=C.C=CC(=O)C>>O=C1CCc2c(ccc3ccccc23)C1,,
-C#CCO.c1ccc([N-][N+]#N)cc1>>c1ccccc1n1cc(CO)nn1,,
-C#Cc1ccccc1.C[N-][N+]#N>>Cc1nnn(-c2ccccc2)c1,,
-C#CCCOC.CC[N-][N+]#N>>CCn1ncc(CCOC)n1,,
-C#CC(C)(C)O.c1ccc(C[N-][N+]#N)cc1>>CC(C)(O)Cn1cc(Cc2ccccc2)nn1,,
-CCCCBr>>CCCCO,,
-CC(Br)C>>CC(O)C,,
-CCBr.N#C>>CCC#N,,
-CCCCBr.Oc1ccccc1>>CCCCOc1ccccc1,R–Br + Ar–OH → R–O–Ar,
-CI.SC>>CSC,R–I + R–SH → R–S–R,
-CCCBr.[I-]>>CCCI,,
-BrCCCCCl.[C-]#N>>N#CCCCCCN,,
-ICc1ccccc1>>OCc1ccccc1,,
-BrCC(=O)OC.[N-]=[N+]=[N-]>>[N-]=[N+]=[N-]CC(=O)OC,,
-Brc1ccccc1.Sc1ccccc1>>c1ccccc1Sc1ccccc1,Ar–Br + Ar–SH → Ar–S–Ar,
-Clc1ccc(C)cc1.Sc1ccccc1>>Cc1ccc(Sc2ccccc2)cc1,Ar–Cl + Ar–SH → Ar–S–Ar,
-Brc1ccncc1.SCC>>CCSc1ccncc1,HeteroAr–Br + R–SH → HeteroAr–S–R,heteroaryl_nitrogen
-Ic1ccc(C(F)(F)F)cc1.SCc1ccccc1>>FC(F)(F)c1ccc(SCc2ccccc2)cc1,Ar–I + R–SH → Ar–S–R,
-Brc1ccc(OC)cc1.SC>>CSc1ccc(OC)cc1,Ar–Br + R–SH → Ar–S–R,ether
-CC(C)(C)Br.O>>CC(C)(C)O,,
-c1ccc(C(C)(C)Cl)cc1.O>>c1ccc(C(C)(C)O)cc1,,
-Fc1ccc([N+](=O)[O-])cc1>>[O-][N+](=O)c1ccc(O)cc1,,
-Clc1nc(Cl)nc(Cl)n1.OC>>COc1nc(Cl)nc(Cl)n1,HeteroAr–Cl + R–OH → HeteroAr–O–R,heteroaryl_nitrogen; heteroaryl_nitrogen; aryl_halide; aryl_halide; heteroaryl_nitrogen
-Fc1cc([N+](=O)[O-])cc([N+](=O)[O-])c1.NC>>[O-][N+](=O)c1cc([N+](=O)[O-])cc(NC)c1,Ar–F + R–NH2 → Ar–NH–R,nitro; nitro
-Fc1ccc(C(F)(F)F)cc1.Oc1ccccc1>>FC(F)(F)c1ccc(Oc2ccccc2)cc1,Ar–F + Ar–OH → Ar–O–Ar,
-Clc1ccncc1.OC>>COc1ccncc1,HeteroAr–Cl + R–OH → HeteroAr–O–R,heteroaryl_nitrogen
-C=CCC(Br)C>>C=CCC(C)O,,
-C=CCCC(Cl)C.SC>>C=CCCC(C)SC,R–Cl + R–SH → R–S–R,alkene
-CCCCBr.[I-]>>CCCCI,,
-c1ccc(CCl)cc1.[I-]>>c1ccc(CI)cc1,,
-c1ccc(CO)cc1.ClP(c1ccccc1)(c1ccccc1)c1ccccc1.C(Cl)(Cl)(Cl)Cl>>c1ccc(CCl)cc1,R–Cl + R–OH →,
-CCCCO.BrP(c1ccccc1)(c1ccccc1)c1ccccc1>>CCCCBr,,
-c1ccc(CO)cc1.Oc1ccccc1.N=NC(C(=O)OCC)C(=O)OCC.P(c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(COc2ccccc2)cc1,,
-CCCO.NC(=O)c1ccccc1.N=NC(C(=O)OCC)C(=O)OCC.P(c1ccccc1)(c1ccccc1)c1ccccc1>>CCCNC(=O)c1ccccc1,,
-CC(Br)C>>CC=C,C–Br bond cleavage; C–C → C=C; C–H loss,
-CC(Br)C(C)C>>CC=C(C)C,C–Br bond cleavage; C–C → C=C; C–H loss,
-c1ccc(C(C)Br)cc1>>C=Cc1ccccc1,C–Br bond cleavage; C–C → C=C; C–H loss,
-CCCBr>>CC=C,,
-CC(C)(C)Br>>CC(C)=C,C–Br bond cleavage; C–C → C=C; C–H loss,
-CC=O.CC=O>>CC(O)CC=O,,
-CC(=O)C.CC=O>>CC(O)C(C)C=O,,
-c1ccc(C=O)cc1.CC(=O)C>>c1ccc(C(O)C(C)C=O)cc1,,
-CCC=O.CC(=O)C>>CCC(O)C(C)C=O,,
-c1ccc(C=O)cc1.CC=O>>c1ccc(/C=C/C=O)cc1,,
-CC=O.C[P+](c1ccccc1)(c1ccccc1)c1ccccc1>>C=CC,,
-c1ccc(C=O)cc1.C=C[P+](c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(/C=C/C=C)cc1,,
-CC(=O)C.CCOC(=O)C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>CCOC(=O)C=C(C)C,,
-c1ccc(C=O)cc1.C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(C=CC)cc1,,
-CC=O.NC.C=O>>CC(=O)CN,(H2C=O + R–NH2) OR (R–CH=O + R–NH2) →,
-c1ccc(C=O)cc1.C1CCNC1.C=O>>c1ccc(C(=O)CN1CCCC1)cc1,(H2C=O + R1R2–NH) OR (R–CH=O + R1R2–NH) →,
-O=Cc1ccccc1.Nc1ccccc1>>c1ccc(CNc2ccccc2)cc1,Ar–CH=O + Ar–NH2 → Ar–CH2–NH–Ar,
-CC=O.NC>>CCNC,R–CH=O + R–NH2 → R–CH2–NH–R,
-c1ccc(C=O)cc1.NCC>>c1ccc(CNCC)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,
-O=Cc1ccc(OC)cc1.NC>>COc1ccc(CNC)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,ether
-O=Cc1ccccc1.NCCCC>>c1ccc(CNCCCC)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,
-CC(=O)c1ccccc1.Nc1ccccc1>>c1ccc(NC(C)c2ccccc2)cc1,Ar–C(R)=O + Ar–NH2 → Ar–CH(R)–NH–Ar,
-CC(=O)C.NC>>CC(C)NC,R–C(R)=O + R–NH2 → R–CH(R)–NH–R,
-O=C1CCCCC1.Nc1ccccc1>>C1CCC(Nc2ccccc2)CC1,R–C(R)=O + Ar–NH2 → R–CH(R)–NH–Ar,
-O=Cc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>[O-][N+](=O)c1ccc(CNc2ccccc2)cc1,Ar–CH=O + Ar–NH2 → Ar–CH2–NH–Ar,nitro
-O=Cc1ccc(Cl)cc1.NCCC>>Clc1ccc(CNCCC)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,aryl_halide
-O=Cc1ccncc1.Nc1ccccc1>>c1ccc(NCc2ccncc2)cc1,HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar,heteroaryl_nitrogen
-O=Cc1cnccn1.NC>>CNc1cnccn1,R–CH=O + R–NH2 →,
-c1ccc(C=O)cc1.NCC(=O)O>>O=C(O)CNCc1ccccc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,carboxylic_acid
-O=Cc1ccccc1.NC(C)C>>c1ccc(CNC(C)C)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,
-CC=O.C1CCNCC1>>CCN1CCCCC1,R–CH=O + R1R2–NH → R–CH2–NR2,
-c1ccc(C=O)cc1.Nc1ccc(OC)cc1>>COc1ccc(NCc2ccccc2)cc1,Ar–CH=O + Ar–NH2 → Ar–CH2–NH–Ar,ether
-O=Cc1ccc(C(F)(F)F)cc1.Nc1ccccc1>>FC(F)(F)c1ccc(CNc2ccccc2)cc1,Ar–CH=O + Ar–NH2 → Ar–CH2–NH–Ar,
-CC(=O)CC.Nc1ccccc1>>CCC(C)Nc1ccccc1,R–C(R)=O + Ar–NH2 → R–CH(R)–NH–Ar,
-O=C1CCCC1.NC>>CC1CCCNC1,R2C=O + R–NH2 →,
-O=Cc1c[nH]c2ccccc12.Nc1ccccc1>>c1ccc(NCc2c[nH]c3ccccc23)cc1,HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar,
-O=Cc1coc2ccccc12.NC>>CNc1coc2ccccc12,R–CH=O + R–NH2 →,
-O=Cc1csc2ccccc12.Nc1ccccc1>>c1ccc(NCc2csc3ccccc23)cc1,HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar,
-CC(C)C=O.Nc1ccccc1>>CC(C)CNc1ccccc1,R–CH=O + Ar–NH2 → R–CH2–NH–Ar,
-c1ccc(C=O)cc1.NCc1ccccc1>>c1ccc(CNCc2ccccc2)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,
-O=CCc1ccccc1.Nc1ccccc1>>c1ccc(CCCNc2ccccc2)cc1,R–CH=O + Ar–NH2 →,
-CCCC=O.NC(C)C(=O)O>>CCCCNC(C)C(=O)O,R–CH=O + R–NH2 → R–CH2–NH–R,carboxylic_acid
-O=Cc1ccc2ccccc2c1.Nc1ccccc1>>c1ccc(NCc2ccc3ccccc3c2)cc1,Ar–CH=O + Ar–NH2 → Ar–CH2–NH–Ar,
-CC(=O)c1ccc(OC)cc1.NC>>COc1ccc(C(C)NC)cc1,Ar–C(R)=O + R–NH2 → Ar–CH(R)–NH–R,ether
-O=Cc1ccc(N(C)C)cc1.Nc1ccccc1>>CN(C)c1ccc(CNc2ccccc2)cc1,Ar–CH=O + Ar–NH2 → Ar–CH2–NH–Ar,tertiary_amine
-C=CC(=O)C.CC(=O)CC(=O)C>>CC(=O)C(CC(=O)C)CC(=O)C,,
-C=CC(=O)OCC.CC(=O)CC(=O)OCC>>CCOC(=O)C(CC(=O)OCC)CC(=O)OCC,,
-c1ccc(C=CC(=O)C)cc1.CC(=O)CC>>c1ccc(C(CC(C)=O)CC(=O)CC)cc1,,
-CC(=O)OCC.CC(=O)OCC>>CC(=O)CC(=O)OCC,,
-c1ccc(C(=O)OC)cc1.CC(=O)OC>>c1ccc(C(=O)CC(=O)OC)cc1,,
-c1ccc(C=O)cc1.CC(C#N)C#N>>c1ccc(/C=C(C#N)C#N)cc1,,
-CC=O.CC(C(=O)OCC)C(=O)OCC>>C/C=C(C(=O)OCC)C(=O)OCC,,
-c1ccc(C=O)cc1.C[N+](=O)[O-]>>c1ccc(C(O)C[N+](=O)[O-])cc1,,
-CC=O.CC[N+](=O)[O-]>>CC(O)CC[N+](=O)[O-],,
-c1ccc(C=O)cc1.BrCC(=O)OCC.[Zn]>>c1ccc(C(O)CC(=O)OCC)cc1,,
-CC=O.BrCC(=O)OCC.[Zn]>>CC(O)CC(=O)OCC,,
-c1ccc(C=O)cc1.CCOP(=O)(OCC)CC(=O)OCC>>c1ccc(/C=C/C(=O)OCC)cc1,,
-CC=O.CCOP(=O)(OCC)CC(=O)OCC>>C/C=C/C(=O)OCC,,
-CC=O.[Mg]Br.CC>>CC(O)(C)C,,
-c1ccc(C=O)cc1.[Mg]Br.C>>c1ccc(C(O)C)cc1,,
-CC(=O)C.[Mg]Br.c1ccccc1>>CC(O)(c1ccccc1)C,,
-C=CCCCC=C>>C=C.C1CCC=CC1,,
-C=CC=C.C=C>>C=CCC=C,,
-CC(C)C(C([O-])=O)C(C)C>>CC(C)CC(C)(C)C(=O)O,,
-CC=O.NC.CC(=O)O>>CC1=C(C)OC(=O)C(C)(N)C1,(R–C(O)OH + R–NH2) OR (R–CH=O + R–NH2) →,
-c1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>c1ccc2[nH]c3ccccc3c2c1,,
-Nc1ccccc1.c1ccc(C=O)cc1>>c1ccc2nc(-c3ccccc3)cc(-c3ccccc3)c2c1,R–CH=O + Ar–NH2 →,
-CC(=O)CC(=O)C.NC>>Cc1ccc(C)n1C,R2C=O + R–NH2 →,
-CC(=O)CCC(=O)C.N>>Cc1ccc(C)[nH]1,R2C=O + NH3 →,
-c1ccc(C(=O)CCC(=O)c2ccccc2)cc1.NC>>c1ccc(-c2ccc(-c3ccccc3)n2C)cc1,R2C=O + R–NH2 →,
-CC(=O)CC(=O)OCC.CC(=O)CC(=O)OCC.CC=O.N>>CCOC(=O)C1=C(C)NC(C)=C(C(=O)OCC)C1,(R2C=O + NH3) OR (R–CH=O + NH3) →,
-O=C(N)N.CC(=O)CC(=O)OCC.c1ccc(C=O)cc1>>CCOC(=O)C1=C(C)NC(=O)NC1c1ccccc1,,
-O=C(N)N.CC(=O)CC(=O)OCC.CC=O>>CCOC(=O)C1=C(C)NC(=O)NC1C,,
-c1ccc(C(C)=O)cc1.c1ccc(NN)cc1>>Cc1c2ccccc2[nH]c1-c1ccccc1,(R2C=O + N–NH2) OR (R2C=O + R–NH–NH) →,
-CC(=O)CC.c1ccccc1NN>>CCc1c2ccccc2[nH]c1C,(R2C=O + N–NH2) OR (R2C=O + R–NH–NH) →,
-NCCc1ccc(O)cc1.CC=O>>Cc1nccc2ccc(O)cc12,R–CH=O + R–NH2 →,
-NCCc1c[nH]c2ccccc12.C=O>>c1ccc2[nH]cc3c2c1CCN3,H2C=O + R–NH2 →,
-c1ccc(c(N)c1)N.c1ccc(C=O)cc1>>c1ccc(-c2nc3ccccc3[nH]2)cc1,R–CH=O + Ar–NH2 →,
-c1ccc(c(N)c1)N.CC(=O)O>>Cc1nc2ccccc2[nH]1,R–C(O)OH + Ar–NH2 →,
-c1ccc(c(N)c1)O.c1ccc(C=O)cc1>>c1ccc(-c2nc3ccccc3o2)cc1,R–CH=O + Ar–NH2 →,
-c1ccc(c(N)c1)O.CC(=O)O>>Cc1nc2ccccc2o1,(R–C(O)OH + Ar–NH2) OR (R–C(O)OH + Ar–OH) →,
-c1ccc(c(N)c1)S.c1ccc(C=O)cc1>>c1ccc(-c2nc3ccccc3s2)cc1,R–CH=O + Ar–NH2 →,
-CC(=O)C=O.NC=O.N>>Cc1nccn1C,(R2C=O + NH3) OR (R–CH=O + NH3) →,
-c1ccc(N)cc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)Nc1ccccc1,,
-NCCc1ccccc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NCCc1ccccc1,,
-CC(C)(C)OC(=O)Nc1ccccc1>>c1ccc(N)cc1,,
-c1ccc(N)cc1.O=C(OCc1ccccc1)OCc1ccccc1>>O=C(Nc1ccccc1)OCc1ccccc1,,
-NCC(=O)O.O=C(OCc1ccccc1)OCc1ccccc1>>O=C(NCC(=O)O)OCc1ccccc1,intramolecular R–C(O)OH / R–NH2 →,
-O=C(Nc1ccccc1)OCc1ccccc1.[H][H].[Pd]>>c1ccc(N)cc1,,
-c1ccc(N)cc1.O=C1OC(=O)c2ccccc21>>O=C(Nc1ccccc1)OCC1c2ccccc2-c2ccccc21,(HeteroAr–C(O)OC(O)R + Ar–H) OR (HeteroAr–C(O)OC(O)R + Ar–NH2) OR (intramolecular HeteroAr–C(O)OC(O)R / Ar–H) →,
-O=C(Nc1ccccc1)OCC1c2ccccc2-c2ccccc21>>c1ccc(N)cc1,,
-c1ccc(CO)cc1.CC(C)(C)[Si](C)(C)Cl>>CC(C)(C)[Si](C)(C)OCc1ccccc1,,
-OCCO.CC(C)(C)[Si](C)(C)Cl>>CC(C)(C)[Si](C)(C)OCCO[Si](C)(C)C(C)(C)C,,
-CC(C)(C)[Si](C)(C)OCc1ccccc1.[F-]>>c1ccc(CO)cc1,,
-c1ccc(CO)cc1.BrCc1ccc(OC)cc1>>COc1ccc(COCc2ccccc2)cc1,Benzyl–Br + R–OH → R–O–R,ether
-COc1ccc(COCc2ccccc2)cc1>>c1ccc(CO)cc1,,
-OCC(O)CO.CC(=O)C>>CC1(C)OCC(CO)O1,,
-CC1(C)OCC(CO)O1.[H+]>>OCC(O)CO,,
-c1ccc(CO)cc1.BrCc1ccccc1>>c1ccc(COCc2ccccc2)cc1,Benzyl–Br + R–OH → R–O–R,
-c1ccc(COCc2ccccc2)cc1.[H][H].[Pd]>>c1ccc(CO)cc1,,
-c1ccc(CO)cc1.ClC(c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(COC(c2ccccc2)(c2ccccc2)c2ccccc2)cc1,Benzyl–Cl + R–OH → R–O–R,
-c1ccc(COC(c2ccccc2)(c2ccccc2)c2ccccc2)cc1.[H+]>>c1ccc(CO)cc1,,
-O=C(O)c1ccccc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccccc1,Ar–C(O)OH + Ar–NH2 → R–C(O)–NHR,
-CC(=O)O.NCc1ccccc1>>CC(=O)NCc1ccccc1,R–C(O)OH + R–NH2 → R–C(O)–NHR,
-O=C(O)CCc1ccccc1.NC1CCCCC1>>O=C(N1CCCCC1)CCc1ccccc1,R–C(O)OH + R–NH2 →,
-CC(C)(C)C(=O)O.Nc1ccc(C)cc1>>CC(C)(C)C(=O)Nc1ccc(C)cc1,R–C(O)OH + Ar–NH2 → R–C(O)–NHR,
-O=C(O)c1ccc(F)cc1.NCCc1ccccc1>>O=C(NCCc1ccccc1)c1ccc(F)cc1,Ar–C(O)OH + R–NH2 → R–C(O)–NHR,aryl_halide
-O=C(O)c1ccc(OC)cc1.NC1CC1>>COc1ccc(C(=O)NC2CC2)cc1,Ar–C(O)OH + R–NH2 → R–C(O)–NHR,ether
-O=C(O)c1ccc(C#N)cc1.NCCCC>>N#Cc1ccc(C(=O)NCCCC)cc1,Ar–C(O)OH + R–NH2 → R–C(O)–NHR,nitrile
-O=C(O)c1ccc([N+](=O)[O-])cc1.NC(C)(C)C>>CC(C)(C)NC(=O)c1ccc([N+](=O)[O-])cc1,Ar–C(O)OH + R–NH2 → R–C(O)–NHR,nitro
-O=C(O)c1cccc(Cl)c1.NCc1ccncc1>>O=C(NCc1ccncc1)c1cccc(Cl)c1,Ar–C(O)OH + R–NH2 → R–C(O)–NHR,aryl_halide; heteroaryl_nitrogen
-O=C(O)c1ccc2ccccc2c1.NC1CCNCC1>>O=C(N1CCC(N)CC1)c1ccc2ccccc2c1,Ar–C(O)OH + R1R2–NH → R–C(O)–NR2,primary_amine
-O=C(O)c1ccncc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccncc1,HeteroAr–C(O)OH + Ar–NH2 → R–C(O)–NHR,heteroaryl_nitrogen
-O=C(O)c1cnccn1.NCc1ccc(F)cc1>>O=C(NCc1ccc(F)cc1)c1cnccn1,HeteroAr–C(O)OH + R–NH2 → R–C(O)–NHR,heteroaryl_nitrogen; heteroaryl_nitrogen; aryl_halide
-O=C(c1sccc1)O.NC2CCOCC2>>O=C(NC3CCOCC3)c4sccc4,HeteroAr–C(O)OH + R–NH2 → R–C(O)–NHR,ether
-O=C(O)c1cc[nH]c1.NCCOc1ccccc1>>O=C(NCCOc1ccccc1)c1cc[nH]c1,HeteroAr–C(O)OH + R–NH2 → R–C(O)–NHR,ether
-O=C(O)c1ccc[nH]1.NC1CCC(C)(C)CC1>>O=C(NC1CCC(C)(C)CC1)c1ccc[nH]1,HeteroAr–C(O)OH + R–NH2 → R–C(O)–NHR,
-CCCCCCCC(=O)O.Nc1ccc(OC)cc1>>CCCCCCCC(=O)Nc1ccc(OC)cc1,R–C(O)OH + Ar–NH2 → R–C(O)–NHR,ether
-CC(C)CC(=O)O.NCc1ccc(Cl)cc1>>CC(C)CC(=O)NCc1ccc(Cl)cc1,R–C(O)OH + R–NH2 → R–C(O)–NHR,aryl_halide
-CCC(C)C(=O)O.NC1CCN(C)CC1>>CCC(C)C(=O)N1CCN(C)CC1,R–C(O)OH + R–NH2 →,
-O=C(O)C1CCCCC1.NCCc1ccc[nH]1>>O=C(NCCc1ccc[nH]1)C1CCCCC1,R–C(O)OH + R–NH2 → R–C(O)–NHR,
-CC(C)CC(N)C(=O)O.NCc1ccccc1>>CC(C)CC(N)C(=O)NCc1ccccc1,R–C(O)OH + R–NH2 → R–C(O)–NHR,primary_amine
-N[C@@H](Cc1ccccc1)C(=O)O.NC1CCCCC1>>N[C@@H](Cc1ccccc1)C(=O)N1CCCCC1,(R–C(O)OH + R–NH2) OR (intramolecular R–C(O)OH / R–NH2) →,
-O=C(O)c1ccccc1.CN(C)c1ccccc1>>CN(C)c1ccccc1.O=C(N(C)c1ccccc1)c1ccccc1,,
-CC(=O)O.N1CCCC1>>CC(=O)N1CCCC1,R–C(O)OH + R1R2–NH → R–C(O)–NR2,
-O=C(O)c1ccc(Br)cc1.N1CCOCC1>>O=C(N1CCOCC1)c1ccc(Br)cc1,Ar–C(O)OH + R1R2–NH → R–C(O)–NR2,aryl_halide; ether
-O=C(O)c1ccccc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccccc1,Ar–C(O)OH + Ar–NH2 → R–C(O)–NHR,
-CC(C)(C)C(=O)O.NCc1ccccc1>>CC(C)(C)C(=O)NCc1ccccc1,R–C(O)OH + R–NH2 → R–C(O)–NHR,
-CCBr.[C-]#N>>CCC#N,,
-CC(C)(C)Cl.O>>CC(C)(C)O,,
-CCC(Br)C.CC(C)(C)[O-]>>CC=CC,,
-C=CC1=CC=CC=C1>>CCc1ccccc1,Ar–CH=CH2 → Ar–CH2–CH3,
-CCCCCC=C>>CCCCCCO,,
-C1=CCCCC1>>O1CCCCC1,,
-C1=CCCCC1>>OC1CCCCC1O,,
-CC(=O)C.C=O>>CC(=O)CCO,,
-CC(=O)C.CC(=O)C>>CC(=O)C=C(C)C,,
-O=CC1=CC=CC=C1.C[Mg]Br>>CC(O)c1ccccc1,,
-O=C1CCCCC1.CNC>>CN(C)C2CCCCC2,R–C(R)=O + R1R2–NH → R–CH(R)–NR2,
-O=CC1=CC=CC=C1.Nc1ccccc1>>c1ccc(/C=N\c2ccccc2)cc1,R–CH=O + Ar–NH2 →,
-O=CC1=CC=CC=C1.C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>C=CC1=CC=CC=C1,,
-O=CC1=CC=CC=C1.CCOP(=O)(OCC)C=C(C(=O)OCC)[O-]>>CCOC(=O)C=CC1=CC=CC=C1,,
-c1ccccc1.CC(C)(C)Cl>>CC(C)(C)c1ccccc1,,
-c1ccccc1.CC(=O)Cl>>CC(=O)c1ccccc1,R–C(O)Cl + Ar–H → Ar–C(O)–R,
-c1ccccc1>>O=[N+]([O-])c1ccccc1,,
-c1ccccc1>>Brc1ccccc1,,
-Brc1ccccc1.C=C>>C=CC1=CC=CC=C1,Ar–Br + H2C=CH2 → Ar–CH=CH2,
-Brc1ccccc1.C#C>>C#Cc1ccccc1,Ar–Br + H–C≡C–H → Ar–C≡C–R,
-Brc1ccccc1.O1CCNCC1>>c1ccc(N2CCOCC2)cc1,Ar–Br + R1R2–NH → Ar–NR1R2,ether
-Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1,Ar–Br + Ar–B(OH)2 → Ar–Ar,
-Brc1ccccc1.CC[Zn]Br>>CCc1ccccc1,Ar–Br + R–ZnX → Ar–R,
-Brc1ccccc1.CC[Mg]Br>>CCc1ccccc1,Ar–Br + R–MgX → Ar–R,
-Brc1ccccc1.C=C[Sn](C)(C)C>>C=CC1=CC=CC=C1,Ar–Br + Alkenyl–SnR3 → Ar–Alkenyl,
-Nc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(Nc2ccccc2)cc1,Ar–B(OH)2 + Ar–NH2 → Ar–NH–Ar,
-Ic1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1,Ar–I + Ar–NH2 → Ar–NH–Ar,
-C1=CC=CC1.C1(=O)OC(=O)C=CC1=O>>O=C1OC(=O)C2C=CC1C2,,
-C=CCOCC=C>>C1=CCOCC1,,
-CCCCO>>CCCC=O,R–CH2–OH → R–CH=O,
-CC(=O)c1ccccc1>>CC(O)c1ccccc1,Ar–C(R)=O → Ar–CH(R)–OH,
-CCOC(=O)c1ccccc1>>OCCc1ccccc1,,
-C=CC1=CC=CC=C1>>O=CC1=CC=CC=C1.C=O,,
-c1ccc2cnccc2c1.CC(C)CC(=O)C(=O)O>>CC(C)CC(=O)c1ncc(Br)c2ccccc12,,
-CC(=O)Oc1ccc(C)cc1.CC(C)C(=O)O.N#Cc1ccncc1>>CC(C)c1cc(C#N)ccn1.CC(=O)Oc1ccc(CF)cc1,,
-O=Cc1ccccc1.c1ccc(-c2cncc3ccccc23)cc1>>O=C(c1ccccc1)c1ncc(-c2ccccc2)c2ccccc12,,
-Cc1ccccc1C=O.c1ccc(-c2cncc3ccccc23)cc1>>Cc1ccccc1C(=O)c1ncc(-c2ccccc2)c2ccccc12,,
-c1ccc2cnccc2c1.CC(C)CC=O>>CC(C)CC(=O)c1nccc2ccccc12,,
-CCC(=O)O.Cc1ccc2cc(Cl)ccc2n1>>CCc1cc(C)nc2ccc(Cl)cc12,,
-CC(=O)O.Cc1ccc2ccccc2n1>>Cc1cc(C)c2ccccc2n1,,
-CC(=O)O.Cc1ccc2cccc([N+](=O)[O-])c2n1>>Cc1cc(C)c2cccc([N+](=O)[O-])c2n1,,
-CC(=O)O.Cc1ccc2cc(C(F)(F)F)ccc2n1>>Cc1cc(C)c2cc(C(F)(F)F)ccc2n1,,
-CCC(=O)O.Cc1ccc2cc(F)ccc2n1>>CCc1cc(C)nc2ccc(F)cc12,,
-CC(=O)O.Cc1ccc2cc(F)ccc2n1>>Cc1cc(C)c2cc(F)ccc2n1,,
-O=C(O)CCc1ccccc1.Cc1ccc2cc(F)ccc2n1>>Cc1cc(CCc2ccccc2)c2cc(F)ccc2n1,,
-c1ccc([N:1]=[N:2]c2ccccc2)cc1>>[NH2:1]c1ccccc1.[NH2:2]c1ccccc1,N=N reductive cleavage,
-C[S:1][S:2]C>>C[SH:1].C[SH:2],S–S reductive cleavage,
-C[O:1][O:2]C>>C[OH:1].C[OH:2],O–O reductive cleavage,
+﻿reaction_smiles,reaction_label,partner_analysis,spectator_groups
+Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Clc1ccc(C#N)cc1.c1ccc(B(O)O)cc1>>N#Cc1ccc(-c2ccccc2)cc1,Ar1–Cl + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",nitrile
+Brc1ccc(OC)cc1.c1ccc(B(O)O)cc1>>COc1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",ether
+Ic1ccncc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccncc2)cc1,HeteroAr–I + Ar–B(OH)2 → HeteroAr–Ar,"electrophile=HeteroAr [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",heteroaryl_nitrogen
+Brc1ccc(C(F)(F)F)cc1.c1ccc(B(O)O)cc1>>FC(F)(F)c1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Clc1ccc2ccccc2c1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccc3ccccc3c2)cc1,Ar1–Cl + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Brc1cc(C)ccc1C.c1ccc(B(O)O)cc1>>Cc1ccc(C)c(-c2ccccc2)c1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:ortho_substituted/ortho:1, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Fc1ccc(OS(=O)(=O)C(F)(F)F)cc1.c1ccc(B(O)O)cc1>>Fc1ccc(-c2ccccc2)cc1,Ar1–OTf + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",aryl_halide
+C/C=C/Br.C=CB(O)O>>C/C=C/C=C,Alkenyl–Br + Alkenyl–B(OH)2 →,,
+Brc1ccc(OC)cc1.[K+].[B-](F)(F)(F)c2ccccc2>>COc1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–BF3K → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",ether
+Clc1ccncc1.O=C(CN(C(CN(C(O2)=O)CC(O)=O)=O)CC(O)=O)OB2c3cccnc3>>c4(c5cccnc5)ccncc4,HeteroAr1–Cl + HeteroAr2–BPin → HeteroAr1–HeteroAr2,"electrophile=HeteroAr [S:open, E:neutral]; transfer_partner=HeteroAr [S:open, E:neutral]",heteroaryl_nitrogen; heteroaryl_nitrogen; amide; carboxylic_acid; carboxylic_acid
+Brc1ccc(Cl)nc1.c2ccc(B(O)O)cc2>>c1ccc(-c2ccc(Cl)nc2)cc1,HeteroAr–Br + Ar–B(OH)2 → HeteroAr–Ar,"electrophile=HeteroAr [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",heteroaryl_nitrogen; aryl_halide
+Brc1cc(Cl)nc(Cl)c1.c2ccc(B(O)O)nc2>>c1ccc(-c2cc(Cl)nc(Cl)c2)nc1,HeteroAr1–Br + HeteroAr2–B(OH)2 → HeteroAr1–HeteroAr2,"electrophile=HeteroAr [S:open, E:neutral]; transfer_partner=HeteroAr [S:open, E:electron_poor]",aryl_halide; aryl_halide; heteroaryl_nitrogen; heteroaryl_nitrogen
+Brc1cccc2[nH]ccc12.c3ccc(B(O)O)cc3>>c1ccc(-c2ccc3[nH]ccc3c2)cc1,(Ar1–Br + Ar2–B(OH)2) OR (Ar–B(OH)2 + AromN–H) OR (intramolecular Ar–Br / AromN–H) →,,
+FC(F)(F)c1ccc(Cl)cc1.Nc1ccnc(B(O)O)n1>>FC(F)(F)c1ccc(-c2cc(N)ncn2)cc1,(Ar–Cl + HeteroAr–B(OH)2) OR (Ar–Cl + HeteroAr–NH2) OR (intramolecular HeteroAr–B(OH)2 / HeteroAr–NH2) →,,
+Clc1cncc(B(O)O)c1.Brc2ccc(F)cc2>>Fc1ccc(-c2cc(Cl)cnc2)cc1,Ar–Br + HeteroAr–B(OH)2 → HeteroAr–Ar,"electrophile=Ar [S:open, E:neutral]; transfer_partner=HeteroAr [S:open, E:neutral]",aryl_halide; heteroaryl_nitrogen; aryl_halide
+Brc1ccc(Br)cc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1,Ar1–Br + Ar2–B(OH)2 →,,
+Brc1cccc(Br)c1.c1ccc(B(O)O)cc1>>c1ccc(-c2cccc(-c3ccccc3)c2)cc1,Ar1–Br + Ar2–B(OH)2 →,,
+Brc1ccccc1.c1ncc(B(O)O)cn1>>c1ccc(-c2cnccn2)cc1,Ar–Br + HeteroAr–B(OH)2 →,,
+Clc1ccc(C#N)cc1.c1coc(B(O)O)c1>>N#Cc1ccc(-c2ccoc2)cc1,Ar–Cl + HeteroAr–B(OH)2 →,,
+Brc1ccncc1.c1csc(B(O)O)c1>>c1cc(-c2cccs2)ccn1,HeteroAr1–Br + HeteroAr2–B(OH)2 → HeteroAr1–HeteroAr2,"electrophile=HeteroAr [S:open, E:neutral]; transfer_partner=HeteroAr [S:open, E:neutral]",heteroaryl_nitrogen
+Ic1ccc(C(=O)OC)cc1.c1c[nH]c(B(O)O)c1>>COC(=O)c1ccc(-c2cc[nH]c2)cc1,(Ar–I + AromN–H) OR (Ar–I + HeteroAr–B(OH)2) OR (intramolecular HeteroAr–B(OH)2 / AromN–H) →,,
+Brc1cnc2ccccc2n1.c1ccc(B(O)O)cc1>>c1ccc(-c2cnc3ccccc3n2)cc1,HeteroAr–Br + Ar–B(OH)2 → HeteroAr–Ar,"electrophile=HeteroAr [S:open, E:electron_poor]; transfer_partner=Ar [S:open, E:neutral]",heteroaryl_nitrogen; heteroaryl_nitrogen
+Clc1cccc2c1cc[nH]2.c1ccc(B(O)O)nc1>>c1ccc(-c2cccc3[nH]ccc23)nc1,Ar–Cl + HeteroAr–B(OH)2 → HeteroAr–Ar,"electrophile=Ar [S:open, E:neutral]; transfer_partner=HeteroAr [S:open, E:electron_poor]",heteroaryl_nitrogen
+Brc1nc2ccccc2s1.Cc1ccc(B(O)O)cc1>>Cc1ccc(-c2nc3ccccc3s2)cc1,HeteroAr–Br + Ar–B(OH)2 → HeteroAr–Ar,"electrophile=HeteroAr [S:open, E:electron_poor]; transfer_partner=Ar [S:open, E:neutral]",heteroaryl_nitrogen
+Ic1nc2ccccc2o1.COc1ccc(B(O)O)cc1>>COc1ccc(-c2nc3ccccc3o2)cc1,HeteroAr–I + Ar–B(OH)2 → HeteroAr–Ar,"electrophile=HeteroAr [S:open, E:electron_poor]; transfer_partner=Ar [S:open, E:neutral]",heteroaryl_nitrogen; ether
+Brc1cccc2nsnc12.c1ccc(B(O)O)cc1>>c1ccc(-c2cccc3nsnc23)cc1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:electron_poor]; transfer_partner=Ar [S:open, E:neutral]",heteroaryl_nitrogen; heteroaryl_nitrogen
+Brc1ccccc1C(C)C.c1ccc(B(O)O)cc1>>CC(C)c1ccccc1-c1ccccc1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:ortho_substituted/ortho:1, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Clc1c(C)cccc1C.COc1ccc(B(O)O)cc1>>Cc1cccc(C)c1-c1ccc(OC)cc1,Ar1–Cl + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:ortho_hindered/ortho:2, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",ether
+Brc1ccccc1OCC.c1ccc(B(O)O)cc1C>>CCOc1ccccc1-c1ccccc1C,Ar1–Br + Ar2–B(OH)2 →,,
+Fc1c(F)c(F)c(Br)c(F)c1F.c1ccc(B(O)O)cc1>>Fc1c(F)c(F)c(-c2ccccc2)c(F)c1F,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:ortho_hindered/ortho:2, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",aryl_halide; aryl_halide; aryl_halide; aryl_halide; aryl_halide
+Clc1cc(Cl)cc(Br)c1.c1ccc(B(O)O)cc1>>Clc1cc(Cl)cc(-c2ccccc2)c1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",aryl_halide; aryl_halide
+Brc1ccc([N+](=O)[O-])cc1[N+](=O)[O-].c1ccc(B(O)O)cc1>>c1ccc(-c2ccc([N+](=O)[O-])cc2[N+](=O)[O-])cc1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:ortho_substituted/ortho:1, E:electron_poor]; transfer_partner=Ar [S:open, E:neutral]",nitro; nitro
+Brc1ccc(C(=O)OCC)cc1.c1ccc(B(O)O)cc1>>CCOC(=O)c1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",ester
+Ic1ccc(NC(=O)OC(C)(C)C)cc1.c1ccc(B(O)O)cc1>>CC(C)(C)OC(=O)Nc1ccc(-c2ccccc2)cc1,Ar1–I + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",carbamate
+Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1.c1ccc(B(O)O)cc1>>CC(C)(C)[Si](C)(C)Oc1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",ether
+Brc1ccccc1.C=CB(O)O>>C=Cc1ccccc1,Ar–Br + Alkenyl–B(OH)2 → Ar–Alkenyl,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Alkenyl [S:primary, E:neutral]",
+Ic1ccc(C=O)cc1.C/C=C/B(O)O>>C/C=C/c1ccc(C=O)cc1,Ar–I + Alkenyl–B(OH)2 →,,
+Brc1ccncc1.C=C(C)B(O)O>>C=C(C)c1ccncc1,HeteroAr–Br + Alkenyl–B(OH)2 → HeteroAr–Alkenyl,"electrophile=HeteroAr [S:open, E:neutral]; transfer_partner=Alkenyl [S:secondary, E:neutral]",heteroaryl_nitrogen
+Brc1ccc(OC)cc1.C#CB(O)O>>C#Cc1ccc(OC)cc1,Ar–Br + Alkynyl–B(OH)2 → Ar–Alkynyl,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Alkynyl [S:primary, E:neutral]",ether
+Brc1ccc(Br)cc1CCCCCCCC(=O)O.c1ccc(B(O)O)cc1>>O=C(O)CCCCCCCc1ccc(-c2ccccc2)cc1-c1ccccc1,(Ar1–Br + Ar2–B(OH)2) OR (Ar–B(OH)2 + R–C(O)–OH) →,,
+Brc1ccccc1.[K+].[B-](F)(F)(F)c1ccccc1>>c1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–BF3K → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Clc1ccc(C(F)(F)F)cc1.[K+].[B-](F)(F)(F)c1ccc(OC)cc1>>COc1ccc(-c2ccc(C(F)(F)F)cc2)cc1,Ar1–Cl + Ar2–BF3K → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",ether
+[O-][n+]1ccccc1Br.c1ccc(B(O)O)cc1>>[O-][n+]1ccccc1-c1ccccc1,HeteroAr–Br + Ar–B(OH)2 → HeteroAr–Ar,"electrophile=HeteroAr [S:ortho_substituted/ortho:1, E:electron_poor]; transfer_partner=Ar [S:open, E:neutral]",heteroaryl_nitrogen
+BrC1(c2ccccc2)CC1.c1ccc(B(O)O)cc1>>c1ccc(C2(c3ccccc3)CC2)cc1,,,
+Brc1ccccc1.c1ccc([Sn](C)(C)C)cc1>>c1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–SnR3 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Ic1ccncc1.C=C[Sn](C)(C)C>>C=Cc1ccncc1,HeteroAr–I + Alkenyl–SnR3 → HeteroAr–Alkenyl,"electrophile=HeteroAr [S:open, E:neutral]; transfer_partner=Alkenyl [S:primary, E:neutral]",heteroaryl_nitrogen
+Brc1ccccc1.C#Cc1ccccc1>>C(#Cc1ccccc1)c1ccccc1,Ar–Br + R–C≡C–H → Ar–C≡C–R,"electrophile=Ar [S:open, E:neutral]; alkyne_partner=Alkynyl [S:primary, E:neutral]",
+Ic1ccncc1.C#CC>>C#Cc1ccncc1,HeteroAr–I + R–C≡C–H →,,
+Clc1ccc(C#N)cc1.C#CC(C)(C)C>>CC(C)(C)C#Cc1ccc(C#N)cc1,Ar–Cl + R–C≡C–H → Ar–C≡C–R,"electrophile=Ar [S:open, E:neutral]; alkyne_partner=Alkynyl [S:primary, E:neutral]",nitrile
+Brc1ccc(OC)cc1.C#Cc1ccccc1>>COc1ccc(C#Cc2ccccc2)cc1,Ar–Br + R–C≡C–H → Ar–C≡C–R,"electrophile=Ar [S:open, E:neutral]; alkyne_partner=Alkynyl [S:primary, E:neutral]",ether
+Ic1ccc(C(F)(F)F)cc1.C#C[Si](C)(C)C>>C[Si](C)(C)C#Cc2ccc(C(F)(F)F)cc2,Ar–I + R–C≡C–H → Ar–C≡C–R,"electrophile=Ar [S:open, E:neutral]; alkyne_partner=Alkynyl [S:primary, E:neutral]",
+Brc1cccs1.C#Cc1ccccc1>>c1cc(C#Cc2ccccc2)sc1,HeteroAr–Br + R–C≡C–H → HeteroAr–C≡C–R,"electrophile=HeteroAr [S:open, E:neutral]; alkyne_partner=Alkynyl [S:primary, E:neutral]",
+Clc1ccncc1.C#CCOC>>COC(C)C#Cc1ccncc1,HeteroAr–Cl + R–C≡C–H →,,
+Brc(cc1)cc2c1[nH]cc2.C#CC>>CC#Cc(cc3)cc4c3[nH]cc4,Ar–Br + R–C≡C–H → Ar–C≡C–R,"electrophile=Ar [S:open, E:neutral]; alkyne_partner=Alkynyl [S:primary, E:neutral]",
+Brc1ccccc1.C=C>>C(=Cc1ccccc1),Ar–Br + H2C=CH2 → Ar–CH=CH2,"electrophile=Ar [S:open, E:neutral]; alkene_partner=unclassified [S:primary, E:neutral]",
+Ic1ccc(C=O)cc1.C=CC(=O)OCC>>CCOC(=O)/C=C/c1ccc(C=O)cc1,Ar–I + H2C=CHR1 →,,
+Brc1ccncc1.C=CC#N>>N#C/C=C/c1ccncc1,HeteroAr–Br + H2C=CHR1 →,,
+Brc1ccc(OC)cc1.C=CC(=O)OC>>COc1ccc(/C=C/C(=O)OC)cc1,Ar–Br + H2C=CHR1 →,,
+Ic1ccc2ccccc2c1.C=C>>C(=Cc1ccc2ccccc2c1),Ar–I + H2C=CH2 → Ar–CH=CH2,"electrophile=Ar [S:open, E:neutral]; alkene_partner=unclassified [S:primary, E:neutral]",
+Brc1cccs1.C=CC(=O)N>>NC(=O)/C=C/c1cccs1,(HeteroAr–Br + H2C=CHR1) OR (HeteroAr–Br + R–C(O)–NH2) →,,
+Clc1ccc(C#N)cc1.C=C>>C=Cc1ccc(C#N)cc1,Ar–Cl + H2C=CH2 → Ar–CH=CH2,"electrophile=Ar [S:open, E:neutral]; alkene_partner=unclassified [S:primary, E:neutral]",nitrile
+Brc1ccccc1.c1ccc([Zn]Cl)cc1>>c1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–ZnX → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Ic1ccncc1.C=C[Zn]Br>>C=Cc1ccncc1,HeteroAr–I + Alkenyl–ZnX → HeteroAr–Alkenyl,"electrophile=HeteroAr [S:open, E:neutral]; transfer_partner=Alkenyl [S:primary, E:neutral]",heteroaryl_nitrogen
+Brc1ccc(C(F)(F)F)cc1.c1ccc([Zn]Cl)cc1>>FC(F)(F)c1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–ZnX → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Clc1ccc(C#N)cc1.CC[Zn]Br>>CCc1ccc(C#N)cc1,Ar–Cl + R–ZnX → Ar–R,"electrophile=Ar [S:open, E:neutral]; transfer_partner=R-primary [S:primary, E:neutral]",nitrile
+Brc1ccccc1.c1ccc([Mg]Br)cc1>>c1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–MgX → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Ic1ccncc1.C=C[Mg]Cl>>C=Cc1ccncc1,HeteroAr–I + Alkenyl–MgX → HeteroAr–Alkenyl,"electrophile=HeteroAr [S:open, E:neutral]; transfer_partner=Alkenyl [S:primary, E:neutral]",heteroaryl_nitrogen
+Brc1ccc(OC)cc1.CC[Mg]Br>>CCc1ccc(OC)cc1,Ar–Br + R–MgX → Ar–R,"electrophile=Ar [S:open, E:neutral]; transfer_partner=R-primary [S:primary, E:neutral]",ether
+Clc1ccc(C#N)cc1.c1ccc([Mg]Br)cc1>>N#Cc1ccc(-c2ccccc2)cc1,Ar1–Cl + Ar2–MgX → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",nitrile
+Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Clc1ccncc1.NCC>>CCNc1ccncc1,HeteroAr–Cl + R–NH2 → HeteroAr–NH–R,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:primary R, E:neutral]",heteroaryl_nitrogen
+Brc1ccc(C(F)(F)F)cc1.NC1CCCCC1>>FC(F)(F)c1ccc(NC2CCCCC2)cc1,Ar–Br + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:secondary R, E:neutral]",
+Ic1ccc(C=O)cc1.Nc1ccccc1>>O=Cc1ccc(Nc2ccccc2)cc1,Ar1–I + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",aldehyde
+Brc1ccc2ccccc2c1.NCC>>CCNc1ccc2ccccc2c1,Ar–Br + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:primary R, E:neutral]",
+Clc1nc2ccccc2[nH]1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2[nH]1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:electron_poor]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen
+Brc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Clc1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1,Ar1–Cl + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Ic1ccccc1.Nc1ccccc1>>c1ccccc1Nc1ccccc1,Ar1–I + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1ccc(OC)cc1.Nc1ccccc1>>COc1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",ether
+Brc1ccc(C)cc1.Nc1ccccc1>>Cc1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1ccc(C(F)(F)F)cc1.Nc1ccccc1>>FC(F)(F)c1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1ccc(C#N)cc1.Nc1ccccc1>>N#Cc1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",nitrile
+Brc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>[O-][N+](=O)c1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",nitro
+Brc1ccc(C(=O)C)cc1.Nc1ccccc1>>CC(=O)c1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",ketone
+Brc1ccc(F)cc1.Nc1ccccc1>>Fc1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",aryl_halide
+Clc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen
+Brc1ccncc1.Nc1ccccc1>>c1ccccc1Nc1ccncc1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen
+Clc1cccnc1.Nc1ccccc1>>c1ccccc1Nc1cccnc1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen
+Brc1cnccn1.Nc1ccccc1>>c1ccccc1Nc1cnccn1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:electron_poor]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen; heteroaryl_nitrogen
+Clc1cccc2ncccc12.Nc1ccccc1>>c1ccccc1Nc1cccc2ncccc12,Ar1–Cl + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen
+Brc1ccc2[nH]ccc2c1.Nc1ccccc1>>c1ccccc1Nc1ccc2[nH]ccc2c1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1ccco1.Nc1ccccc1>>c1ccccc1Nc1ccco1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Clc1cccs1.Nc1ccccc1>>c1ccccc1Nc1cccs1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1cnc(C)cn1.Nc1ccccc1>>Cc1cnc(Nc2ccccc2)cn1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:electron_poor]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen; heteroaryl_nitrogen
+Brc1ccccc1.Nc1ccc(C)cc1>>Cc1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1ccccc1.Nc1ccc(OC)cc1>>COc1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",ether
+Brc1ccccc1.Nc1ccc(F)cc1>>Fc1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",aryl_halide
+Brc1ccccc1.Nc1ccc(C(F)(F)F)cc1>>FC(F)(F)c1ccc(Nc2ccccc2)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1ccccc1.Nc1cccc(C)c1>>Cc1cccc(Nc2ccccc2)c1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1ccccc1.Nc1cc(C)cc(C)c1>>Cc1cc(C)cc(Nc2ccccc2)c1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1ccccc1.CN>>CNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:methyl R, E:neutral]",
+Brc1ccccc1.CCN>>CCNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:primary R, E:neutral]",
+Brc1ccccc1.CCCN>>CCCNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:primary R, E:neutral]",
+Brc1ccccc1.CC(C)N>>CC(C)Nc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:secondary R, E:neutral]",
+Brc1ccccc1.CC(C)(C)N>>CC(C)(C)Nc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:tertiary R, E:neutral]",
+Brc1ccccc1.NCc1ccccc1>>c1ccccc1CNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:primary R, E:neutral]",
+Brc1ccccc1.NCCOC>>COCCNc1ccccc1,Ar–Br + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:primary R, E:neutral]",ether
+Brc1ccncc1.NCCC>>CCCNc1ccncc1,HeteroAr–Br + R–NH2 → HeteroAr–NH–R,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:primary R, E:neutral]",heteroaryl_nitrogen
+Clc1ccc(C#N)cc1.CC(C)N>>CC(C)Nc1ccc(C#N)cc1,Ar–Cl + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary center/attached:secondary R, E:neutral]",nitrile
+Brc1ccccc1.CCNCC>>CCN(CC)c1ccccc1,Ar–Br + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",
+Brc1ccccc1.N1CCCC1>>c1ccccc1N1CCCC1,Ar–Br + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",
+Brc1ccccc1.N1CCCCC1>>c1ccccc1N1CCCCC1,Ar–Br + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",
+Brc1ccccc1.N1CCOCC1>>c1ccccc1N1CCOCC1,Ar–Br + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",ether
+Brc1ccccc1.N1CCN(C)CC1>>CN1CCN(c2ccccc2)CC1,Ar–Br + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",tertiary_amine
+Brc1ccccc1.N1CCC(O)CC1>>OC1CCN(c2ccccc2)CC1,Ar–Br + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",alcohol
+Brc1ccccc1.N1Cc2ccccc2C1>>c1ccccc1N1Cc2ccccc2C1,Ar–Br + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",
+Brc1ccncc1.N1CCCC1>>c1ccncc1N1CCCC1,HeteroAr–Br + R1R2–NH →,,
+Clc1ccc(C(F)(F)F)cc1.N1CCOCC1>>FC(F)(F)c1ccc(N2CCOCC2)cc1,Ar–Cl + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",ether
+Brc1ccc(OC)cc1.N1CCCCC1>>COc1ccc(N2CCCCC2)cc1,Ar–Br + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",ether
+Brc1ccc(Br)cc1.Nc1ccccc1>>c1ccc(Nc2ccc(Nc3ccccc3)cc2)cc1,Ar1–Br + Ar2–NH2 →,,
+Brc1ccccc1C.Nc1ccccc1>>Cc1ccccc1Nc1ccccc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:ortho_substituted/ortho:1, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+Brc1ccccc1OC.Nc1ccccc1>>COc1ccccc1Nc1ccccc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:ortho_substituted/ortho:1, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",ether
+Brc1ccccc1C(=O)C.Nc1ccccc1>>CC(=O)c1ccccc1Nc1ccccc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:ortho_substituted/ortho:1, E:electron_poor]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",ketone
+Clc1ccc2nc(Cl)ccc2c1.Nc1ccccc1>>c1ccc(Nc2ccc3cc(Nc4ccccc4)ccc3n2)cc1,(Ar1–Cl + Ar2–NH2) OR (HeteroAr–Cl + Ar–NH2) →,,
+Brc1ccc2c(c1)OCO2.Nc1ccccc1>>c1ccc(Nc2ccc3c(c2)OCO3)cc1,Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",ether; ether
+Clc1nc2ccccc2s1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2s1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:electron_poor]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen
+Brc1nc2ccccc2o1.Nc1ccccc1>>c1ccccc1Nc1nc2ccccc2o1,HeteroAr–Br + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:electron_poor]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen
+Clc1cnc2ccccc2n1.Nc1ccccc1>>c1ccccc1Nc1cnc2ccccc2n1,HeteroAr–Cl + Ar–NH2 → HeteroAr–NH–Ar,"electrophile=HeteroAr [S:open, E:electron_poor]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen; heteroaryl_nitrogen
+Brc1ccccc1.c1cc[nH]c1>>c1ccccc1n1cccc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",
+Brc1ccc(C)cc1.c1cc[nH]c1>>Cc1ccc(n2cccc2)cc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",
+Clc1ccc(C#N)cc1.c1cc[nH]c1>>N#Cc1ccc(n2cccc2)cc1,Ar–Cl + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",nitrile
+Brc1ccccc1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1ccccc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",
+Brc1ccc(OC)cc1.c1ccc2[nH]ccc2c1>>COc1ccc(n2ccc3ccccc32)cc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",ether
+Clc1ccncc1.c2([nH]cc3)c3cccc2>>c4(n(cc5)c6c5cccc6)ccncc4,HeteroAr1–Cl + AromN–H → HeteroAr1–AromN,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",heteroaryl_nitrogen
+Brc1ccc(C(F)(F)F)cc1.c1ccc2[nH]ccc2c1>>FC(F)(F)c1ccc(n2ccc3ccccc32)cc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",
+Brc1ccccc1.c1c[nH]nc1C>>Cc1nn(c2ccccc2)cc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:electron_poor]",heteroaryl_nitrogen
+Clc1ccc(OC)cc1.c1c[nH]nc1C>>Cc1nn(c2ccc(OC)cc2)cc1,Ar–Cl + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:electron_poor]",ether; heteroaryl_nitrogen
+Brc1ccccc1.c1cnc[nH]1>>c1ccccc1n1cncc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",heteroaryl_nitrogen
+Brc1ccc(F)cc1.c1cnc[nH]1>>Fc1ccc(n2cncc2)cc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",aryl_halide; heteroaryl_nitrogen
+Brc1ccccc1.c1ccc2c(c1)c1ccccc1[nH]2>>c1ccc2c(c1)c1ccccc1n2c1ccccc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",
+Brc1ccc(C)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>Cc1ccc(n2c3ccccc3c3ccccc32)cc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",
+Ic1ccc(OC)cc1.c1ccc2c(c1)c1ccccc1[nH]2>>COc1ccc(n2c3ccccc3c3ccccc32)cc1,Ar–I + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",ether
+Brc1ccccc1.c1nc[nH]n1>>c1ccccc1n1ncnc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:electron_poor]",heteroaryl_nitrogen; heteroaryl_nitrogen
+Brc1ccc(C#N)cc1.c1nc[nH]n1>>N#Cc1ccc(n2ncnc2)cc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:electron_poor]",nitrile; heteroaryl_nitrogen; heteroaryl_nitrogen
+Brc1ccccc1C.c1ccc2[nH]ccc2c1>>Cc1ccccc1n1ccc2ccccc21,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:ortho_substituted/ortho:1, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",
+Brc1c(C)cccc1C.c1ccc2[nH]ccc2c1>>Cc1cccc(C)c1n1ccc2ccccc21,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:ortho_hindered/ortho:2, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",
+Brc1ccccc1OC.c1cc[nH]c1>>COc1ccccc1n1cccc1,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:ortho_substituted/ortho:1, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",ether
+Brc1ccc(Br)cc1.c1ccc2[nH]ccc2c1>>c1ccc(n2ccc3ccccc32)cc1n1ccc2ccccc21,Ar–Br + AromN–H →,,
+Brc1cccc(Br)c1.c1cc[nH]c1>>c1cccc(n2cccc2)c1n1cccc1,Ar–Br + AromN–H →,,
+Brc1cnc2ccccc2n1.c1ccc2[nH]ccc2c1>>c1ccc2c(c1)ccn2c1cnc2ccccc2n1,HeteroAr1–Br + AromN–H → HeteroAr1–AromN,"electrophile=HeteroAr [S:open, E:electron_poor]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",heteroaryl_nitrogen; heteroaryl_nitrogen
+Clc1cccc2c1cc[nH]2.c1ccccc1Br>>c1ccccc1n1ccc2c(Cl)cccc21,Ar–Br + AromN–H → Ar–AromN,"electrophile=Ar [S:open, E:neutral]; nucleophile=HeteroAr [S:open/secondary center/attached:Ar+Ar, E:neutral]",aryl_halide
+Brc1ccccc1.NC(=O)C>>CC(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccc(C)cc1.NC(=O)C>>CC(=O)Nc1ccc(C)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Clc1ccc(OC)cc1.NC(=O)C>>CC(=O)Nc1ccc(OC)cc1,Ar–Cl + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",ether
+Brc1ccncc1.NC(=O)C>>CC(=O)Nc1ccncc1,HeteroAr–Br + R–C(O)–NH2 → HeteroAr–NH–C(O)–R,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",heteroaryl_nitrogen
+Ic1ccc(C(F)(F)F)cc1.NC(=O)C>>CC(=O)Nc1ccc(C(F)(F)F)cc1,Ar–I + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccccc1.NC(=O)CC>>CCC(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccc(Cl)cc1.NC(=O)CC>>CCC(=O)Nc1ccc(Cl)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",aryl_halide
+Brc1ccccc1.NC(=O)c1ccccc1>>O=C(Nc1ccccc1)c1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccc(OC)cc1.NC(=O)c1ccccc1>>COc1ccc(NC(=O)c2ccccc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",ether
+Clc1ccncc1.NC(=O)c1ccccc1>>O=C(Nc1ccncc1)c1ccccc1,HeteroAr–Cl + R–C(O)–NH2 → HeteroAr–NH–C(O)–R,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",heteroaryl_nitrogen
+Brc1ccc(C#N)cc1.NC(=O)c1ccccc1>>N#Cc1ccc(NC(=O)c2ccccc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",nitrile
+Brc1ccccc1.NC(=O)c1ccc(OC)cc1>>COc1ccc(C(=O)Nc2ccccc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",ether
+Brc1ccc(F)cc1.NC(=O)c1ccc(F)cc1>>Fc1ccc(C(=O)Nc2ccc(F)cc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",aryl_halide; aryl_halide
+Brc1ccccc1.NC(=O)CC(C)C>>CC(C)CC(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccccc1.NC(=O)C(C)(C)C>>CC(C)(C)C(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Clc1ccc(C(F)(F)F)cc1.NC(=O)CC(C)C>>CC(C)CC(=O)Nc1ccc(C(F)(F)F)cc1,Ar–Cl + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccccc1.NC(=O)CCc1ccccc1>>O=C(CCc1ccccc1)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccc(OC)cc1.NC(=O)CCc1ccccc1>>COc1ccc(NC(=O)CCc2ccccc2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",ether
+Brc1ccccc1.C1CCNC1=O>>O=C1CCCN1c1ccccc1,Ar–Br + R–C(O)–NHR → Ar–N(C(O)–R)(R),"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary/C(O)R [S:secondary center/attached:primary R+C(O)R, E:neutral]",
+Brc1ccc(C)cc1.C1CCNC1=O>>Cc1ccc(N2CCCC2=O)cc1,Ar–Br + R–C(O)–NHR → Ar–N(C(O)–R)(R),"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary/C(O)R [S:secondary center/attached:primary R+C(O)R, E:neutral]",
+Clc1ccncc1.C1CCNC1=O>>O=C1CCCN1c1ccncc1,HeteroAr–Cl + R–C(O)–NHR → HeteroAr–N(C(O)–R)(R),"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=R-secondary/C(O)R [S:secondary center/attached:primary R+C(O)R, E:neutral]",heteroaryl_nitrogen
+Brc1ccccc1.NC(C)=O>>CC(=O)Nc1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccccc1.NC(=O)c1ccncc1>>O=C(Nc1ccccc1)c1ccncc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",heteroaryl_nitrogen
+Clc1ccc(C#N)cc1.NC(=O)c1ccncc1>>N#Cc1ccc(NC(=O)c2ccncc2)cc1,Ar–Cl + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",nitrile; heteroaryl_nitrogen
+Brc1ccccc1.NC(=O)c1cccs1>>O=C(Nc1ccccc1)c1cccs1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccc(OC)cc1.NC(=O)c1cccs1>>COc1ccc(NC(=O)c2cccs2)cc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",ether
+Brc1ccccc1.NC(=O)c1ccco1>>O=C(Nc1ccccc1)c1ccco1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccccc1C.NC(=O)C>>CC(=O)Nc1ccccc1C,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:ortho_substituted/ortho:1, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1c(C)cccc1C.NC(=O)c1ccccc1>>Cc1cccc(C)c1NC(=O)c1ccccc1,Ar–Br + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:ortho_hindered/ortho:2, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Ic1ccc2ccccc2c1.NC(=O)C>>CC(=O)Nc1ccc2ccccc2c1,Ar–I + R–C(O)–NH2 → Ar–NH–C(O)–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=C(O)R [S:primary center/attached:C(O)R, E:neutral]",
+Brc1ccc(Br)cc1.NC(=O)C>>CC(=O)Nc1ccc(NC(C)=O)cc1,Ar–Br + R–C(O)–NH2 →,,
+c1ccccc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccccc1,Ar1–B(OH)2 + Ar2–NH2 → Ar1–NH–Ar2,"nucleophile=Ar [S:primary center/attached:Ar, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+COc1cc(B(O)O)ccc1.Nc2ccccc2>>COc3cc(Nc4ccccc4)ccc3,Ar1–B(OH)2 + Ar2–NH2 → Ar1–NH–Ar2,"nucleophile=Ar [S:primary center/attached:Ar, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",ether
+c1ccncc1B(O)O.Nc1ccccc1.[O]>>c1ccccc1Nc1ccncc1,HeteroAr–B(OH)2 + Ar–NH2 →,,
+Brc1ccccc1.Oc1ccccc1>>c1ccccc1Oc1ccccc1,Ar1–Br + Ar2–OH → Ar1–O–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary/attached:Ar, E:neutral]",
+Ic1ccncc1.OCC>>CCOc1ccncc1,HeteroAr–I + R–OH → HeteroAr–O–R,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=R-primary [S:primary/attached:primary R, E:neutral]",heteroaryl_nitrogen
+Brc1ccc(C(F)(F)F)cc1.Oc1ccccc1>>FC(F)(F)c1ccc(Oc2ccccc2)cc1,Ar1–Br + Ar2–OH → Ar1–O–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary/attached:Ar, E:neutral]",
+Clc1ccc(C#N)cc1.OC>>COc1ccc(C#N)cc1,Ar–Cl + R–OH → Ar–O–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary/attached:methyl R, E:neutral]",nitrile
+Brc1cccs1.Oc1ccccc1>>c1cc(Oc2ccccc2)sc1,HeteroAr–Br + Ar–OH → HeteroAr–O–Ar,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=Ar [S:primary/attached:Ar, E:neutral]",
+CC(=O)O.CCO>>CC(=O)OCC,R1–C(O)OH + R2–OH → R1–C(O)–O–R2,"acyl_partner=unclassified [S:primary, E:neutral]; oxygen_partner=R-primary [S:primary/attached:primary R, E:neutral]",
+c1ccc(C(=O)O)cc1.OCC>>c1ccc(C(=O)OCC)cc1,Ar–C(O)OH + R–OH → Ar–C(O)–O–R,"acyl_partner=unclassified [S:primary, E:neutral]; oxygen_partner=R-primary [S:primary/attached:primary R, E:neutral]",
+CC(=O)Cl.CCO>>CC(=O)OCC,R1–C(O)Cl + R2–OH → R1–C(O)–O–R2,"acyl_partner=unclassified [S:primary, E:neutral]; oxygen_partner=R-primary [S:primary/attached:primary R, E:neutral]",
+CC(=O)O.Nc1ccccc1>>CC(=O)Nc1ccccc1,R–C(O)OH + Ar–NH2 → R–C(O)–NH–Ar,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=Ar [S:primary center/attached:Ar, E:neutral]",
+c1ccc(C(=O)O)cc1.NCC>>c1ccc(C(=O)NCC)cc1,Ar–C(O)OH + R–NH2 → Ar–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",
+C=Cc1ccccc1.[H][H]>>CCc1ccccc1,Ar–CH=CH2 → Ar–CH2–CH3,"unassigned=unclassified [S:primary, E:neutral]",
+c1ccc(C=O)cc1.[H][H]>>c1ccc(CO)cc1,Ar–CH=O → Ar–CH2–OH,"unassigned=Ar [S:primary, E:neutral]",
+C#Cc1ccccc1.[H][H]>>CCc1ccccc1,Ar–C≡CH → Ar–CH2–CH3,"unassigned=Alkynyl [S:primary, E:neutral]",
+c1ccc([N+](=O)[O-])cc1.[H][H]>>c1ccc(N)cc1,N=O bond cleavage; N–O bond cleavage; 2 × H gain at N,"unassigned=unclassified [S:unclassified, E:unclassified]",
+C=CC=C.[H][H]>>CCCC,2 × C=C hydrogenation,"unassigned=unclassified [S:primary, E:neutral]",
+c1ccc(C#N)cc1.[H][H]>>c1ccc(CN)cc1,Ar–C≡N → Ar–CH2–NH2,"unassigned=unclassified [S:primary, E:neutral]",
+O=C1CCCCC1.[H][H]>>OC1CCCCC1,R–C(R)=O → R–CH(R)–OH,"unassigned=R-secondary [S:secondary, E:neutral]",
+C1=CC=C(C=C1)C=CC(=O)O.[H][H]>>c1ccc(CCC(=O)O)cc1,Ar–CH=CH–RO–C(O) → Ar–CH2–CH2–RO–C(O),"unassigned=unclassified [S:primary, E:neutral]",
+c1ccc(C=O)cc1.[Na+]>>c1ccc(CO)cc1,Ar–CH=O → Ar–CH2–OH,"unassigned=Ar [S:primary, E:neutral]",
+CC(=O)c1ccccc1.[Na+]>>CC(O)c1ccccc1,Ar–C(R)=O → Ar–CH(R)–OH,"unassigned=R-secondary/Ar [S:secondary, E:neutral]",
+c1ccc(C(=O)C)cc1.[Li+]>>c1ccc(C(O)C)cc1,Ar–C(R)=O → Ar–CH(R)–OH,"unassigned=R-secondary/Ar [S:secondary, E:neutral]",
+CC(=O)OCC.[Li+]>>CCO,,,
+c1ccc(C#N)cc1.[Li+]>>c1ccc(CN)cc1,Ar–C≡N → Ar–CH2–NH2,"unassigned=unclassified [S:primary, E:neutral]",
+c1ccc(C(=O)Nc2ccccc2)cc1.[Li+]>>c1ccccc1CNc1ccccc1,C=O reductive cleavage,"unassigned=unclassified [S:unclassified, E:unclassified]",
+O=C1CCC(=O)O1.[Li+]>>OCCCO,,,
+CC(=O)OC(=O)C.[Na+]>>CC(=O)CO,,,
+CC(=O)c1ccccc1.C1CCNC1>>CC(O)c1ccccc1,Ar–C(R1)=O + R2R3–NH →,,
+c1ccc(C=O)cc1.CCOC(=O)C=O>>c1ccc(CO)cc1,,,
+c1ccc([N+](=O)[O-])cc1.[Zn]>>c1ccc(N)cc1,N=O bond cleavage; N–O bond cleavage; 2 × H gain at N,"unassigned=unclassified [S:unclassified, E:unclassified]",
+C1=CC=CC=C1>>C1CCC=CC1,C:C → C=C; 5 × C:C → C–C; 4 × H gain at C,"unassigned=unclassified [S:open, E:neutral]",
+c1ccc(OC)cc1>>COC1C=CCC=C1,2 × C:C → C=C; 4 × C:C → C–C; 2 × H gain at C,"unassigned=unclassified [S:open, E:neutral]",
+c1ccc(C(=O)C=C)cc1>>c1ccc(C(O)C=C)cc1,Alkenyl–C(Ar)=O → Alkenyl–CH(Ar)–OH,"unassigned=Alkenyl/Ar [S:secondary, E:neutral]",
+CC(=O)CC=C>>CC(O)CC=C,R–C(R)=O → R–CH(R)–OH,"unassigned=R-secondary [S:secondary, E:neutral]",
+CC(=O)OCC>>CC=O,,,
+c1ccc(CO)cc1.[O]>>c1ccc(C=O)cc1,Ar–CH2–OH → Ar–CH=O,"unassigned=R-primary [S:primary/attached:primary R, E:neutral]",
+CC(O)c1ccccc1.[O]>>CC(=O)c1ccccc1,Ar–CH(R)–OH → Ar–C(R)=O,"unassigned=R-primary [S:primary/attached:secondary R, E:neutral]",
+CCO.[O]>>CC=O,R–CH2–OH → R–CH=O,"unassigned=R-primary [S:primary/attached:primary R, E:neutral]",
+c1ccc(CO)cc1.Cl[Cr](=O)(=O)OC(C)(C)C>>c1ccc(C=O)cc1,,,
+CCO.OS(=O)(=O)O>>CC=O,,,
+c1ccc(CO)cc1>>c1ccc(C=O)cc1,Ar–CH2–OH → Ar–CH=O,"unassigned=R-primary [S:primary/attached:primary R, E:neutral]",
+CC(O)C>>CC(=O)C,R–CH(R)–OH → R–C(R)=O,"unassigned=R-primary [S:primary/attached:secondary R, E:neutral]",
+c1ccc(C(O)C)cc1>>c1ccc(C(=O)C)cc1,Ar–CH(R)–OH → Ar–C(R)=O,"unassigned=R-primary [S:primary/attached:secondary R, E:neutral]",
+CC(O)CCO>>CC(=O)CC=O,2 × C=O oxidation,"unassigned=R-primary [S:primary/attached:secondary R, E:neutral]",
+c1ccc(CO)cc1>>c1ccc(C(=O)O)cc1,,,
+C1CCC(CO)CC1>>C1CCC(C=O)CC1,R–CH2–OH → R–CH=O,"unassigned=R-primary [S:primary/attached:primary R, E:neutral]",
+C=Cc1ccccc1.[O]>>C1OC1c1ccccc1,,,
+C=C(C)C.[O]>>CC1(C)CO1,,,
+C=CCCCCC=C.[O]>>C1OC1CCCCC1CO1,,,
+CC(=O)c1ccccc1.[O]>>CC(=O)Oc1ccccc1,,,
+O=C1CCCCC1.[O]>>O=C1OCCCC1,,,
+CSc1ccccc1.[O]>>CS(=O)c1ccccc1,,,
+CSc1ccccc1.[O]>>CS(=O)(=O)c1ccccc1,,,
+C=CC=C.C=C>>C1C=CCC1,,,
+C=CC(=C)C.C=CC(=O)OCC>>CC1=CC(C(=O)OCC)CC(C)=C1,,,
+c1ccc2ccccc2c1C=CC=C.C=CC(=O)C>>O=C1CCc2c(ccc3ccccc23)C1,,,
+C#CCO.c1ccc([N-][N+]#N)cc1>>c1ccccc1n1cc(CO)nn1,,,
+C#Cc1ccccc1.C[N-][N+]#N>>Cc1nnn(-c2ccccc2)c1,,,
+C#CCCOC.CC[N-][N+]#N>>CCn1ncc(CCOC)n1,,,
+C#CC(C)(C)O.c1ccc(C[N-][N+]#N)cc1>>CC(C)(O)Cn1cc(Cc2ccccc2)nn1,,,
+CCCCBr>>CCCCO,,,
+CC(Br)C>>CC(O)C,,,
+CCBr.N#C>>CCC#N,,,
+CCCCBr.Oc1ccccc1>>CCCCOc1ccccc1,R–Br + Ar–OH → R–O–Ar,"electrophile=R-primary [S:primary, E:neutral]; nucleophile=Ar [S:primary/attached:Ar, E:neutral]",
+CI.SC>>CSC,R1–I + R2–SH → R1–S–R2,"electrophile=R-methyl [S:methyl, E:neutral]; nucleophile=R-primary [S:primary/attached:methyl R, E:neutral]",
+CCCBr.[I-]>>CCCI,,,
+BrCCCCCl.[C-]#N>>N#CCCCCCN,,,
+ICc1ccccc1>>OCc1ccccc1,,,
+BrCC(=O)OC.[N-]=[N+]=[N-]>>[N-]=[N+]=[N-]CC(=O)OC,,,
+Brc1ccccc1.Sc1ccccc1>>c1ccccc1Sc1ccccc1,Ar1–Br + Ar2–SH → Ar1–S–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary/attached:Ar, E:neutral]",
+Clc1ccc(C)cc1.Sc1ccccc1>>Cc1ccc(Sc2ccccc2)cc1,Ar1–Cl + Ar2–SH → Ar1–S–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary/attached:Ar, E:neutral]",
+Brc1ccncc1.SCC>>CCSc1ccncc1,HeteroAr–Br + R–SH → HeteroAr–S–R,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=R-primary [S:primary/attached:primary R, E:neutral]",heteroaryl_nitrogen
+Ic1ccc(C(F)(F)F)cc1.SCc1ccccc1>>FC(F)(F)c1ccc(SCc2ccccc2)cc1,Ar–I + R–SH → Ar–S–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary/attached:primary R, E:neutral]",
+Brc1ccc(OC)cc1.SC>>CSc1ccc(OC)cc1,Ar–Br + R–SH → Ar–S–R,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-primary [S:primary/attached:methyl R, E:neutral]",ether
+CC(C)(C)Br.O>>CC(C)(C)O,,,
+c1ccc(C(C)(C)Cl)cc1.O>>c1ccc(C(C)(C)O)cc1,,,
+Fc1ccc([N+](=O)[O-])cc1>>[O-][N+](=O)c1ccc(O)cc1,,,
+Clc1nc(Cl)nc(Cl)n1.OC>>COc1nc(Cl)nc(Cl)n1,HeteroAr–Cl + R–OH → HeteroAr–O–R,"electrophile=HeteroAr [S:open, E:electron_poor]; nucleophile=R-primary [S:primary/attached:methyl R, E:neutral]",heteroaryl_nitrogen; heteroaryl_nitrogen; aryl_halide; aryl_halide; heteroaryl_nitrogen
+Fc1cc([N+](=O)[O-])cc([N+](=O)[O-])c1.NC>>[O-][N+](=O)c1cc([N+](=O)[O-])cc(NC)c1,Ar–F + R–NH2 → Ar–NH–R,"electrophile=Ar [S:open, E:electron_poor]; nucleophile=R-primary [S:primary center/attached:methyl R, E:neutral]",nitro; nitro
+Fc1ccc(C(F)(F)F)cc1.Oc1ccccc1>>FC(F)(F)c1ccc(Oc2ccccc2)cc1,Ar1–F + Ar2–OH → Ar1–O–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary/attached:Ar, E:neutral]",
+Clc1ccncc1.OC>>COc1ccncc1,HeteroAr–Cl + R–OH → HeteroAr–O–R,"electrophile=HeteroAr [S:open, E:neutral]; nucleophile=R-primary [S:primary/attached:methyl R, E:neutral]",heteroaryl_nitrogen
+C=CCC(Br)C>>C=CCC(C)O,,,
+C=CCCC(Cl)C.SC>>C=CCCC(C)SC,R1–Cl + R2–SH → R1–S–R2,"electrophile=R-secondary [S:secondary, E:neutral]; nucleophile=R-primary [S:primary/attached:methyl R, E:neutral]",alkene
+CCCCBr.[I-]>>CCCCI,,,
+c1ccc(CCl)cc1.[I-]>>c1ccc(CI)cc1,,,
+c1ccc(CO)cc1.ClP(c1ccccc1)(c1ccccc1)c1ccccc1.C(Cl)(Cl)(Cl)Cl>>c1ccc(CCl)cc1,R1–Cl + R2–OH →,,
+CCCCO.BrP(c1ccccc1)(c1ccccc1)c1ccccc1>>CCCCBr,,,
+c1ccc(CO)cc1.Oc1ccccc1.N=NC(C(=O)OCC)C(=O)OCC.P(c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(COc2ccccc2)cc1,,,
+CCCO.NC(=O)c1ccccc1.N=NC(C(=O)OCC)C(=O)OCC.P(c1ccccc1)(c1ccccc1)c1ccccc1>>CCCNC(=O)c1ccccc1,,,
+CC(Br)C>>CC=C,C–Br bond cleavage; C–C → C=C; C–H loss,"unassigned=R-secondary [S:secondary, E:neutral]",
+CC(Br)C(C)C>>CC=C(C)C,C–Br bond cleavage; C–C → C=C; C–H loss,"unassigned=R-secondary [S:secondary, E:neutral]",
+c1ccc(C(C)Br)cc1>>C=Cc1ccccc1,C–Br bond cleavage; C–C → C=C; C–H loss,"unassigned=R-secondary [S:secondary, E:neutral]",
+CCCBr>>CC=C,,,
+CC(C)(C)Br>>CC(C)=C,C–Br bond cleavage; C–C → C=C; C–H loss,"unassigned=R-tertiary [S:tertiary, E:neutral]",
+CC=O.CC=O>>CC(O)CC=O,,,
+CC(=O)C.CC=O>>CC(O)C(C)C=O,,,
+c1ccc(C=O)cc1.CC(=O)C>>c1ccc(C(O)C(C)C=O)cc1,,,
+CCC=O.CC(=O)C>>CCC(O)C(C)C=O,,,
+c1ccc(C=O)cc1.CC=O>>c1ccc(/C=C/C=O)cc1,,,
+CC=O.C[P+](c1ccccc1)(c1ccccc1)c1ccccc1>>C=CC,,,
+c1ccc(C=O)cc1.C=C[P+](c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(/C=C/C=C)cc1,,,
+CC(=O)C.CCOC(=O)C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>CCOC(=O)C=C(C)C,,,
+c1ccc(C=O)cc1.C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(C=CC)cc1,,,
+CC=O.NC.C=O>>CC(=O)CN,(H2C=O + R–NH2) OR (R1–CH=O + R2–NH2) →,,
+c1ccc(C=O)cc1.C1CCNC1.C=O>>c1ccc(C(=O)CN1CCCC1)cc1,(Ar–CH=O + R1R2–NH) OR (H2C=O + R1R2–NH) →,,
+O=Cc1ccccc1.Nc1ccccc1>>c1ccc(CNc2ccccc2)cc1,Ar1–CH=O + Ar2–NH2 → Ar1–CH2–NH–Ar2,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",
+CC=O.NC>>CCNC,R1–CH=O + R2–NH2 → R1–CH2–NH–R2,"amine_partner=R-primary [S:primary center/attached:methyl R, E:neutral]; carbonyl_partner=R-primary [S:primary, E:neutral]",
+c1ccc(C=O)cc1.NCC>>c1ccc(CNCC)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,"amine_partner=R-primary [S:primary center/attached:primary R, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",
+O=Cc1ccc(OC)cc1.NC>>COc1ccc(CNC)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,"amine_partner=R-primary [S:primary center/attached:methyl R, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",ether
+O=Cc1ccccc1.NCCCC>>c1ccc(CNCCCC)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,"amine_partner=R-primary [S:primary center/attached:primary R, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",
+CC(=O)c1ccccc1.Nc1ccccc1>>c1ccc(NC(C)c2ccccc2)cc1,Ar1–C(R)=O + Ar2–NH2 → Ar1–CH(R)–NH–Ar2,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=R-secondary/Ar [S:secondary, E:neutral]",
+CC(=O)C.NC>>CC(C)NC,R1–C(R2)=O + R3–NH2 → R1–CH(R2)–NH–R3,"amine_partner=R-primary [S:primary center/attached:methyl R, E:neutral]; carbonyl_partner=R-secondary [S:secondary, E:neutral]",
+O=C1CCCCC1.Nc1ccccc1>>C1CCC(Nc2ccccc2)CC1,R1–C(R2)=O + Ar–NH2 → R1–CH(R2)–NH–Ar,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=R-secondary [S:secondary, E:neutral]",
+O=Cc1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>[O-][N+](=O)c1ccc(CNc2ccccc2)cc1,Ar1–CH=O + Ar2–NH2 → Ar1–CH2–NH–Ar2,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",nitro
+O=Cc1ccc(Cl)cc1.NCCC>>Clc1ccc(CNCCC)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,"amine_partner=R-primary [S:primary center/attached:primary R, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",aryl_halide
+O=Cc1ccncc1.Nc1ccccc1>>c1ccc(NCc2ccncc2)cc1,HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=HeteroAr [S:primary, E:neutral]",heteroaryl_nitrogen
+O=Cc1cnccn1.NC>>CNc1cnccn1,HeteroAr–CH=O + R–NH2 →,,
+c1ccc(C=O)cc1.NCC(=O)O>>O=C(O)CNCc1ccccc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,"amine_partner=R-primary [S:primary center/attached:primary R, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",carboxylic_acid
+O=Cc1ccccc1.NC(C)C>>c1ccc(CNC(C)C)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,"amine_partner=R-primary [S:primary center/attached:secondary R, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",
+CC=O.C1CCNCC1>>CCN1CCCCC1,R1–CH=O + R2R3–NH → R1–CH2–NR2R3,"amine_partner=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]; carbonyl_partner=R-primary [S:primary, E:neutral]",
+c1ccc(C=O)cc1.Nc1ccc(OC)cc1>>COc1ccc(NCc2ccccc2)cc1,Ar1–CH=O + Ar2–NH2 → Ar1–CH2–NH–Ar2,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",ether
+O=Cc1ccc(C(F)(F)F)cc1.Nc1ccccc1>>FC(F)(F)c1ccc(CNc2ccccc2)cc1,Ar1–CH=O + Ar2–NH2 → Ar1–CH2–NH–Ar2,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",
+CC(=O)CC.Nc1ccccc1>>CCC(C)Nc1ccccc1,R1–C(R2)=O + Ar–NH2 → R1–CH(R2)–NH–Ar,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=R-secondary [S:secondary, E:neutral]",
+O=C1CCCC1.NC>>CC1CCCNC1,R1–C(R2)=O + R3–NH2 →,,
+O=Cc1c[nH]c2ccccc12.Nc1ccccc1>>c1ccc(NCc2c[nH]c3ccccc23)cc1,HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=HeteroAr [S:primary, E:neutral]",
+O=Cc1coc2ccccc12.NC>>CNc1coc2ccccc12,HeteroAr–CH=O + R–NH2 →,,
+O=Cc1csc2ccccc12.Nc1ccccc1>>c1ccc(NCc2csc3ccccc23)cc1,HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=HeteroAr [S:primary, E:neutral]",
+CC(C)C=O.Nc1ccccc1>>CC(C)CNc1ccccc1,R–CH=O + Ar–NH2 → R–CH2–NH–Ar,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=R-primary [S:primary, E:neutral]",
+c1ccc(C=O)cc1.NCc1ccccc1>>c1ccc(CNCc2ccccc2)cc1,Ar–CH=O + R–NH2 → Ar–CH2–NH–R,"amine_partner=R-primary [S:primary center/attached:primary R, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",
+O=CCc1ccccc1.Nc1ccccc1>>c1ccc(CCCNc2ccccc2)cc1,R–CH=O + Ar–NH2 →,,
+CCCC=O.NC(C)C(=O)O>>CCCCNC(C)C(=O)O,R1–CH=O + R2–NH2 → R1–CH2–NH–R2,"amine_partner=R-primary [S:primary center/attached:secondary R, E:neutral]; carbonyl_partner=R-primary [S:primary, E:neutral]",carboxylic_acid
+O=Cc1ccc2ccccc2c1.Nc1ccccc1>>c1ccc(NCc2ccc3ccccc3c2)cc1,Ar1–CH=O + Ar2–NH2 → Ar1–CH2–NH–Ar2,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",
+CC(=O)c1ccc(OC)cc1.NC>>COc1ccc(C(C)NC)cc1,Ar–C(R1)=O + R2–NH2 → Ar–CH(R1)–NH–R2,"amine_partner=R-primary [S:primary center/attached:methyl R, E:neutral]; carbonyl_partner=R-secondary/Ar [S:secondary, E:neutral]",ether
+O=Cc1ccc(N(C)C)cc1.Nc1ccccc1>>CN(C)c1ccc(CNc2ccccc2)cc1,Ar1–CH=O + Ar2–NH2 → Ar1–CH2–NH–Ar2,"amine_partner=Ar [S:primary center/attached:Ar, E:neutral]; carbonyl_partner=Ar [S:primary, E:neutral]",tertiary_amine
+C=CC(=O)C.CC(=O)CC(=O)C>>CC(=O)C(CC(=O)C)CC(=O)C,,,
+C=CC(=O)OCC.CC(=O)CC(=O)OCC>>CCOC(=O)C(CC(=O)OCC)CC(=O)OCC,,,
+c1ccc(C=CC(=O)C)cc1.CC(=O)CC>>c1ccc(C(CC(C)=O)CC(=O)CC)cc1,,,
+CC(=O)OCC.CC(=O)OCC>>CC(=O)CC(=O)OCC,,,
+c1ccc(C(=O)OC)cc1.CC(=O)OC>>c1ccc(C(=O)CC(=O)OC)cc1,,,
+c1ccc(C=O)cc1.CC(C#N)C#N>>c1ccc(/C=C(C#N)C#N)cc1,,,
+CC=O.CC(C(=O)OCC)C(=O)OCC>>C/C=C(C(=O)OCC)C(=O)OCC,,,
+c1ccc(C=O)cc1.C[N+](=O)[O-]>>c1ccc(C(O)C[N+](=O)[O-])cc1,,,
+CC=O.CC[N+](=O)[O-]>>CC(O)CC[N+](=O)[O-],,,
+c1ccc(C=O)cc1.BrCC(=O)OCC.[Zn]>>c1ccc(C(O)CC(=O)OCC)cc1,,,
+CC=O.BrCC(=O)OCC.[Zn]>>CC(O)CC(=O)OCC,,,
+c1ccc(C=O)cc1.CCOP(=O)(OCC)CC(=O)OCC>>c1ccc(/C=C/C(=O)OCC)cc1,,,
+CC=O.CCOP(=O)(OCC)CC(=O)OCC>>C/C=C/C(=O)OCC,,,
+CC=O.[Mg]Br.CC>>CC(O)(C)C,,,
+c1ccc(C=O)cc1.[Mg]Br.C>>c1ccc(C(O)C)cc1,,,
+CC(=O)C.[Mg]Br.c1ccccc1>>CC(O)(c1ccccc1)C,,,
+C=CCCCC=C>>C=C.C1CCC=CC1,,,
+C=CC=C.C=C>>C=CCC=C,,,
+CC(C)C(C([O-])=O)C(C)C>>CC(C)CC(C)(C)C(=O)O,,,
+CC=O.NC.CC(=O)O>>CC1=C(C)OC(=O)C(C)(N)C1,(R1–C(O)OH + R2–NH2) OR (R1–CH=O + R2–NH2) →,,
+c1ccc([N+](=O)[O-])cc1.Nc1ccccc1>>c1ccc2[nH]c3ccccc3c2c1,,,
+Nc1ccccc1.c1ccc(C=O)cc1>>c1ccc2nc(-c3ccccc3)cc(-c3ccccc3)c2c1,Ar1–CH=O + Ar2–NH2 →,,
+CC(=O)CC(=O)C.NC>>Cc1ccc(C)n1C,R1–C(R2)=O + R3–NH2 →,,
+CC(=O)CCC(=O)C.N>>Cc1ccc(C)[nH]1,R1–C(R2)=O + NH3 →,,
+c1ccc(C(=O)CCC(=O)c2ccccc2)cc1.NC>>c1ccc(-c2ccc(-c3ccccc3)n2C)cc1,Ar–C(R1)=O + R2–NH2 →,,
+CC(=O)CC(=O)OCC.CC(=O)CC(=O)OCC.CC=O.N>>CCOC(=O)C1=C(C)NC(C)=C(C(=O)OCC)C1,(R1–C(R2)=O + NH3) OR (R–CH=O + NH3) →,,
+O=C(N)N.CC(=O)CC(=O)OCC.c1ccc(C=O)cc1>>CCOC(=O)C1=C(C)NC(=O)NC1c1ccccc1,,,
+O=C(N)N.CC(=O)CC(=O)OCC.CC=O>>CCOC(=O)C1=C(C)NC(=O)NC1C,,,
+c1ccc(C(C)=O)cc1.c1ccc(NN)cc1>>Cc1c2ccccc2[nH]c1-c1ccccc1,(Ar1–C(R)=O + R–NH–NH) OR (Ar–C(R)=O + N–NH2) →,,
+CC(=O)CC.c1ccccc1NN>>CCc1c2ccccc2[nH]c1C,(R1–C(R2)=O + N–NH2) OR (R1–C(R2)=O + R–NH–NH) →,,
+NCCc1ccc(O)cc1.CC=O>>Cc1nccc2ccc(O)cc12,R1–CH=O + R2–NH2 →,,
+NCCc1c[nH]c2ccccc12.C=O>>c1ccc2[nH]cc3c2c1CCN3,H2C=O + R–NH2 →,,
+c1ccc(c(N)c1)N.c1ccc(C=O)cc1>>c1ccc(-c2nc3ccccc3[nH]2)cc1,Ar1–CH=O + Ar2–NH2 →,,
+c1ccc(c(N)c1)N.CC(=O)O>>Cc1nc2ccccc2[nH]1,R–C(O)OH + Ar–NH2 →,,
+c1ccc(c(N)c1)O.c1ccc(C=O)cc1>>c1ccc(-c2nc3ccccc3o2)cc1,Ar1–CH=O + Ar2–NH2 →,,
+c1ccc(c(N)c1)O.CC(=O)O>>Cc1nc2ccccc2o1,(R–C(O)OH + Ar–NH2) OR (R–C(O)OH + Ar–OH) →,,
+c1ccc(c(N)c1)S.c1ccc(C=O)cc1>>c1ccc(-c2nc3ccccc3s2)cc1,Ar1–CH=O + Ar2–NH2 →,,
+CC(=O)C=O.NC=O.N>>Cc1nccn1C,(R–C(O)–C(R)=O + NH3) OR (R–C(O)–CH=O + NH3) →,,
+c1ccc(N)cc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)Nc1ccccc1,,,
+NCCc1ccccc1.CC(C)(C)OC(=O)OC(=O)OC(C)(C)C>>CC(C)(C)OC(=O)NCCc1ccccc1,,,
+CC(C)(C)OC(=O)Nc1ccccc1>>c1ccc(N)cc1,,,
+c1ccc(N)cc1.O=C(OCc1ccccc1)OCc1ccccc1>>O=C(Nc1ccccc1)OCc1ccccc1,,,
+NCC(=O)O.O=C(OCc1ccccc1)OCc1ccccc1>>O=C(NCC(=O)O)OCc1ccccc1,intramolecular R1–C(O)OH / R2–NH2 →,,
+O=C(Nc1ccccc1)OCc1ccccc1.[H][H].[Pd]>>c1ccc(N)cc1,,,
+c1ccc(N)cc1.O=C1OC(=O)c2ccccc21>>O=C(Nc1ccccc1)OCC1c2ccccc2-c2ccccc21,(HeteroAr–C(O)OC(O)R + Ar–H) OR (HeteroAr–C(O)OC(O)R + Ar–NH2) OR (intramolecular HeteroAr–C(O)OC(O)R / Ar–H) →,,
+O=C(Nc1ccccc1)OCC1c2ccccc2-c2ccccc21>>c1ccc(N)cc1,,,
+c1ccc(CO)cc1.CC(C)(C)[Si](C)(C)Cl>>CC(C)(C)[Si](C)(C)OCc1ccccc1,,,
+OCCO.CC(C)(C)[Si](C)(C)Cl>>CC(C)(C)[Si](C)(C)OCCO[Si](C)(C)C(C)(C)C,,,
+CC(C)(C)[Si](C)(C)OCc1ccccc1.[F-]>>c1ccc(CO)cc1,,,
+c1ccc(CO)cc1.BrCc1ccc(OC)cc1>>COc1ccc(COCc2ccccc2)cc1,Benzyl–Br + R2–OH → R1–O–R2,"electrophile=R-primary [S:primary, E:neutral]; nucleophile=R-primary [S:primary/attached:primary R, E:neutral]",ether
+COc1ccc(COCc2ccccc2)cc1>>c1ccc(CO)cc1,,,
+OCC(O)CO.CC(=O)C>>CC1(C)OCC(CO)O1,,,
+CC1(C)OCC(CO)O1.[H+]>>OCC(O)CO,,,
+c1ccc(CO)cc1.BrCc1ccccc1>>c1ccc(COCc2ccccc2)cc1,Benzyl–Br + R2–OH → R1–O–R2,"electrophile=R-primary [S:primary, E:neutral]; nucleophile=R-primary [S:primary/attached:primary R, E:neutral]",
+c1ccc(COCc2ccccc2)cc1.[H][H].[Pd]>>c1ccc(CO)cc1,,,
+c1ccc(CO)cc1.ClC(c1ccccc1)(c1ccccc1)c1ccccc1>>c1ccc(COC(c2ccccc2)(c2ccccc2)c2ccccc2)cc1,Benzyl–Cl + R2–OH → R1–O–R2,"electrophile=R-tertiary [S:tertiary, E:neutral]; nucleophile=R-primary [S:primary/attached:primary R, E:neutral]",
+c1ccc(COC(c2ccccc2)(c2ccccc2)c2ccccc2)cc1.[H+]>>c1ccc(CO)cc1,,,
+O=C(O)c1ccccc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccccc1,Ar1–C(O)OH + Ar2–NH2 → Ar1–C(O)–NH–Ar2,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=Ar [S:primary center/attached:Ar, E:neutral]",
+CC(=O)O.NCc1ccccc1>>CC(=O)NCc1ccccc1,R1–C(O)OH + R2–NH2 → R1–C(O)–NH–R2,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",
+O=C(O)CCc1ccccc1.NC1CCCCC1>>O=C(N1CCCCC1)CCc1ccccc1,R1–C(O)OH + R2–NH2 →,,
+CC(C)(C)C(=O)O.Nc1ccc(C)cc1>>CC(C)(C)C(=O)Nc1ccc(C)cc1,R–C(O)OH + Ar–NH2 → R–C(O)–NH–Ar,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=Ar [S:primary center/attached:Ar, E:neutral]",
+O=C(O)c1ccc(F)cc1.NCCc1ccccc1>>O=C(NCCc1ccccc1)c1ccc(F)cc1,Ar–C(O)OH + R–NH2 → Ar–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",aryl_halide
+O=C(O)c1ccc(OC)cc1.NC1CC1>>COc1ccc(C(=O)NC2CC2)cc1,Ar–C(O)OH + R–NH2 → Ar–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:secondary R, E:neutral]",ether
+O=C(O)c1ccc(C#N)cc1.NCCCC>>N#Cc1ccc(C(=O)NCCCC)cc1,Ar–C(O)OH + R–NH2 → Ar–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",nitrile
+O=C(O)c1ccc([N+](=O)[O-])cc1.NC(C)(C)C>>CC(C)(C)NC(=O)c1ccc([N+](=O)[O-])cc1,Ar–C(O)OH + R–NH2 → Ar–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:tertiary R, E:neutral]",nitro
+O=C(O)c1cccc(Cl)c1.NCc1ccncc1>>O=C(NCc1ccncc1)c1cccc(Cl)c1,Ar–C(O)OH + R–NH2 → Ar–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",aryl_halide; heteroaryl_nitrogen
+O=C(O)c1ccc2ccccc2c1.NC1CCNCC1>>O=C(N1CCC(N)CC1)c1ccc2ccccc2c1,Ar–C(O)OH + R1R2–NH → Ar–C(O)–NR1R2,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",primary_amine
+O=C(O)c1ccncc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccncc1,HeteroAr–C(O)OH + Ar–NH2 → HeteroAr–C(O)–NH–Ar,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=Ar [S:primary center/attached:Ar, E:neutral]",heteroaryl_nitrogen
+O=C(O)c1cnccn1.NCc1ccc(F)cc1>>O=C(NCc1ccc(F)cc1)c1cnccn1,HeteroAr–C(O)OH + R–NH2 → HeteroAr–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:electron_poor]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",heteroaryl_nitrogen; heteroaryl_nitrogen; aryl_halide
+O=C(c1sccc1)O.NC2CCOCC2>>O=C(NC3CCOCC3)c4sccc4,HeteroAr–C(O)OH + R–NH2 → HeteroAr–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:secondary R, E:neutral]",ether
+O=C(O)c1cc[nH]c1.NCCOc1ccccc1>>O=C(NCCOc1ccccc1)c1cc[nH]c1,HeteroAr–C(O)OH + R–NH2 → HeteroAr–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",ether
+O=C(O)c1ccc[nH]1.NC1CCC(C)(C)CC1>>O=C(NC1CCC(C)(C)CC1)c1ccc[nH]1,HeteroAr–C(O)OH + R–NH2 → HeteroAr–C(O)–NH–R,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:secondary R, E:neutral]",
+CCCCCCCC(=O)O.Nc1ccc(OC)cc1>>CCCCCCCC(=O)Nc1ccc(OC)cc1,R–C(O)OH + Ar–NH2 → R–C(O)–NH–Ar,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=Ar [S:primary center/attached:Ar, E:neutral]",ether
+CC(C)CC(=O)O.NCc1ccc(Cl)cc1>>CC(C)CC(=O)NCc1ccc(Cl)cc1,R1–C(O)OH + R2–NH2 → R1–C(O)–NH–R2,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",aryl_halide
+CCC(C)C(=O)O.NC1CCN(C)CC1>>CCC(C)C(=O)N1CCN(C)CC1,R1–C(O)OH + R2–NH2 →,,
+O=C(O)C1CCCCC1.NCCc1ccc[nH]1>>O=C(NCCc1ccc[nH]1)C1CCCCC1,R1–C(O)OH + R2–NH2 → R1–C(O)–NH–R2,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",
+CC(C)CC(N)C(=O)O.NCc1ccccc1>>CC(C)CC(N)C(=O)NCc1ccccc1,R1–C(O)OH + R2–NH2 → R1–C(O)–NH–R2,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",primary_amine
+N[C@@H](Cc1ccccc1)C(=O)O.NC1CCCCC1>>N[C@@H](Cc1ccccc1)C(=O)N1CCCCC1,(R1–C(O)OH + R2–NH2) OR (intramolecular R1–C(O)OH / R2–NH2) →,,
+O=C(O)c1ccccc1.CN(C)c1ccccc1>>CN(C)c1ccccc1.O=C(N(C)c1ccccc1)c1ccccc1,,,
+CC(=O)O.N1CCCC1>>CC(=O)N1CCCC1,R1–C(O)OH + R2R3–NH → R1–C(O)–NR2R3,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",
+O=C(O)c1ccc(Br)cc1.N1CCOCC1>>O=C(N1CCOCC1)c1ccc(Br)cc1,Ar–C(O)OH + R1R2–NH → Ar–C(O)–NR1R2,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",aryl_halide; ether
+O=C(O)c1ccccc1.Nc1ccccc1>>O=C(Nc1ccccc1)c1ccccc1,Ar1–C(O)OH + Ar2–NH2 → Ar1–C(O)–NH–Ar2,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=Ar [S:primary center/attached:Ar, E:neutral]",
+CC(C)(C)C(=O)O.NCc1ccccc1>>CC(C)(C)C(=O)NCc1ccccc1,R1–C(O)OH + R2–NH2 → R1–C(O)–NH–R2,"acyl_partner=unclassified [S:primary, E:neutral]; nitrogen_partner=R-primary [S:primary center/attached:primary R, E:neutral]",
+CCBr.[C-]#N>>CCC#N,,,
+CC(C)(C)Cl.O>>CC(C)(C)O,,,
+CCC(Br)C.CC(C)(C)[O-]>>CC=CC,,,
+C=CC1=CC=CC=C1>>CCc1ccccc1,Ar–CH=CH2 → Ar–CH2–CH3,"unassigned=unclassified [S:primary, E:neutral]",
+CCCCCC=C>>CCCCCCO,,,
+C1=CCCCC1>>O1CCCCC1,,,
+C1=CCCCC1>>OC1CCCCC1O,,,
+CC(=O)C.C=O>>CC(=O)CCO,,,
+CC(=O)C.CC(=O)C>>CC(=O)C=C(C)C,,,
+O=CC1=CC=CC=C1.C[Mg]Br>>CC(O)c1ccccc1,,,
+O=C1CCCCC1.CNC>>CN(C)C2CCCCC2,R1–C(R2)=O + R3R4–NH → R1–CH(R2)–NR3R4,"amine_partner=R-secondary [S:secondary center/attached:methyl R+methyl R, E:neutral]; carbonyl_partner=R-secondary [S:secondary, E:neutral]",
+O=CC1=CC=CC=C1.Nc1ccccc1>>c1ccc(/C=N\c2ccccc2)cc1,Ar1–CH=O + Ar2–NH2 →,,
+O=CC1=CC=CC=C1.C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>C=CC1=CC=CC=C1,,,
+O=CC1=CC=CC=C1.CCOP(=O)(OCC)C=C(C(=O)OCC)[O-]>>CCOC(=O)C=CC1=CC=CC=C1,,,
+c1ccccc1.CC(C)(C)Cl>>CC(C)(C)c1ccccc1,,,
+c1ccccc1.CC(=O)Cl>>CC(=O)c1ccccc1,R–C(O)Cl + Ar–H → Ar–C(O)–R,"acyl_partner=unclassified [S:primary, E:neutral]; aromatic_partner=unclassified [S:open, E:neutral]",
+c1ccccc1>>O=[N+]([O-])c1ccccc1,,,
+c1ccccc1>>Brc1ccccc1,,,
+Brc1ccccc1.C=C>>C=CC1=CC=CC=C1,Ar–Br + H2C=CH2 → Ar–CH=CH2,"electrophile=Ar [S:open, E:neutral]; alkene_partner=unclassified [S:primary, E:neutral]",
+Brc1ccccc1.C#C>>C#Cc1ccccc1,Ar–Br + H–C≡C–H → Ar–C≡C–R,"electrophile=Ar [S:open, E:neutral]; alkyne_partner=Alkynyl [S:primary, E:neutral]",
+Brc1ccccc1.O1CCNCC1>>c1ccc(N2CCOCC2)cc1,Ar–Br + R1R2–NH → Ar–NR1R2,"electrophile=Ar [S:open, E:neutral]; nucleophile=R-secondary [S:secondary center/attached:primary R+primary R, E:neutral]",ether
+Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1,Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Brc1ccccc1.CC[Zn]Br>>CCc1ccccc1,Ar–Br + R–ZnX → Ar–R,"electrophile=Ar [S:open, E:neutral]; transfer_partner=R-primary [S:primary, E:neutral]",
+Brc1ccccc1.CC[Mg]Br>>CCc1ccccc1,Ar–Br + R–MgX → Ar–R,"electrophile=Ar [S:open, E:neutral]; transfer_partner=R-primary [S:primary, E:neutral]",
+Brc1ccccc1.C=C[Sn](C)(C)C>>C=CC1=CC=CC=C1,Ar–Br + Alkenyl–SnR3 → Ar–Alkenyl,"electrophile=Ar [S:open, E:neutral]; transfer_partner=Alkenyl [S:primary, E:neutral]",
+Nc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(Nc2ccccc2)cc1,Ar1–B(OH)2 + Ar2–NH2 → Ar1–NH–Ar2,"nucleophile=Ar [S:primary center/attached:Ar, E:neutral]; transfer_partner=Ar [S:open, E:neutral]",
+Ic1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1,Ar1–I + Ar2–NH2 → Ar1–NH–Ar2,"electrophile=Ar [S:open, E:neutral]; nucleophile=Ar [S:primary center/attached:Ar, E:neutral]",
+C1=CC=CC1.C1(=O)OC(=O)C=CC1=O>>O=C1OC(=O)C2C=CC1C2,,,
+C=CCOCC=C>>C1=CCOCC1,,,
+CCCCO>>CCCC=O,R–CH2–OH → R–CH=O,"unassigned=R-primary [S:primary/attached:primary R, E:neutral]",
+CC(=O)c1ccccc1>>CC(O)c1ccccc1,Ar–C(R)=O → Ar–CH(R)–OH,"unassigned=R-secondary/Ar [S:secondary, E:neutral]",
+CCOC(=O)c1ccccc1>>OCCc1ccccc1,,,
+C=CC1=CC=CC=C1>>O=CC1=CC=CC=C1.C=O,,,
+c1ccc2cnccc2c1.CC(C)CC(=O)C(=O)O>>CC(C)CC(=O)c1ncc(Br)c2ccccc12,,,
+CC(=O)Oc1ccc(C)cc1.CC(C)C(=O)O.N#Cc1ccncc1>>CC(C)c1cc(C#N)ccn1.CC(=O)Oc1ccc(CF)cc1,,,
+O=Cc1ccccc1.c1ccc(-c2cncc3ccccc23)cc1>>O=C(c1ccccc1)c1ncc(-c2ccccc2)c2ccccc12,,,
+Cc1ccccc1C=O.c1ccc(-c2cncc3ccccc23)cc1>>Cc1ccccc1C(=O)c1ncc(-c2ccccc2)c2ccccc12,,,
+c1ccc2cnccc2c1.CC(C)CC=O>>CC(C)CC(=O)c1nccc2ccccc12,,,
+CCC(=O)O.Cc1ccc2cc(Cl)ccc2n1>>CCc1cc(C)nc2ccc(Cl)cc12,,,
+CC(=O)O.Cc1ccc2ccccc2n1>>Cc1cc(C)c2ccccc2n1,,,
+CC(=O)O.Cc1ccc2cccc([N+](=O)[O-])c2n1>>Cc1cc(C)c2cccc([N+](=O)[O-])c2n1,,,
+CC(=O)O.Cc1ccc2cc(C(F)(F)F)ccc2n1>>Cc1cc(C)c2cc(C(F)(F)F)ccc2n1,,,
+CCC(=O)O.Cc1ccc2cc(F)ccc2n1>>CCc1cc(C)nc2ccc(F)cc12,,,
+CC(=O)O.Cc1ccc2cc(F)ccc2n1>>Cc1cc(C)c2cc(F)ccc2n1,,,
+O=C(O)CCc1ccccc1.Cc1ccc2cc(F)ccc2n1>>Cc1cc(CCc2ccccc2)c2cc(F)ccc2n1,,,
+c1ccc([N:1]=[N:2]c2ccccc2)cc1>>[NH2:1]c1ccccc1.[NH2:2]c1ccccc1,N=N reductive cleavage,"unassigned=unclassified [S:open, E:neutral]",
+C[S:1][S:2]C>>C[SH:1].C[SH:2],S–S reductive cleavage,"unassigned=unclassified [S:methyl, E:neutral]",
+C[O:1][O:2]C>>C[OH:1].C[OH:2],O–O reductive cleavage,"unassigned=unclassified [S:methyl, E:neutral]",
