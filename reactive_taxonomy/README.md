@@ -20,6 +20,15 @@ Any unmatched edit set still receives a deterministic literal summary such as
 the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
+Exact grammar labels use one reaction-wide namespace for repeated generic
+fragments. Distinct graph-derived fragments are numbered by semantic role and
+retain the same alias across the arrow, for example
+`Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2`. Existing site-local notation is reconciled
+with that namespace, so `R–Br + R1R2–NH` becomes
+`R1–Br + R2R3–NH → R1–NR2R3`. A symbol remains unnumbered when only one
+distinct fragment of that kind participates, and standalone molecule labels
+remain unchanged.
+
 For a single validated bond-order transformation, the preferred display adds
 retained-neighbor and endpoint-hydrogen context. For example, the generic
 interpretation `C=C hydrogenation` is retained in `transformation_label`, while

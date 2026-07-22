@@ -19,9 +19,7 @@ def test_supported_exact_families_produce_signatures() -> None:
 
 
 def test_signature_is_stable_across_reactant_order() -> None:
-    forward = featurize_reaction(
-        "Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1"
-    )
+    forward = featurize_reaction("Brc1ccccc1.c1ccc(B(O)O)cc1>>c1ccc(-c2ccccc2)cc1")
     reversed_order = featurize_reaction(
         "c1ccc(B(O)O)cc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1"
     )
@@ -53,9 +51,7 @@ def test_signature_identity_is_display_style_independent() -> None:
 
 
 def test_signature_contains_versioned_hierarchical_keys() -> None:
-    result = featurize_reaction(
-        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
-    )
+    result = featurize_reaction("Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1")
     signature = result.reaction_signature
 
     assert signature is not None
@@ -70,15 +66,13 @@ def test_signature_contains_versioned_hierarchical_keys() -> None:
 
 def test_signature_partners_retain_context_steric_and_electronic_analysis() -> None:
     cases = {
-        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1": (
-            "Ar", "open", "neutral"
-        ),
+        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1": ("Ar", "open", "neutral"),
         "Brc1ccccn1.Nc1ccccc1>>c1ccc(Nc2ccccn2)cc1": (
-            "HeteroAr", "open", "electron_poor"
+            "HeteroAr",
+            "open",
+            "electron_poor",
         ),
-        "CCBr.Nc1ccccc1>>CCNc1ccccc1": (
-            "Alkyl", "primary", "neutral"
-        ),
+        "CCBr.Nc1ccccc1>>CCNc1ccccc1": ("Alkyl", "primary", "neutral"),
         "CC(C)Br.N>>CC(C)N": ("Alkyl", "secondary", "neutral"),
     }
 
@@ -100,9 +94,7 @@ def test_signature_serializes_with_analysis() -> None:
     payload = result.to_dict()
 
     assert payload["reaction_signature"]["named_family"] is None
-    assert payload["reaction_signature"]["order_changes"] == (
-        "C-C:DOUBLE>SINGLE",
-    )
+    assert payload["reaction_signature"]["order_changes"] == ("C-C:DOUBLE>SINGLE",)
     assert payload["schema_version"] == "1.6"
     assert payload["reaction_signature"]["schema_version"] == "1.2"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
@@ -142,13 +134,8 @@ def test_mixed_c_o_c_s_reaction_is_partitioned_into_two_events() -> None:
 
 def test_multi_event_signature_is_reactant_order_invariant() -> None:
     substrate = "[c:5]1([F:6])[cH:7][cH:8][c:9]([F:10])[cH:11][cH:12]1"
-    product = (
-        "[c:5]1([O:1][CH3:2])[cH:7][cH:8]"
-        "[c:9]([S:3][CH3:4])[cH:11][cH:12]1"
-    )
-    forward = featurize_reaction(
-        f"[OH:1][CH3:2].[SH:3][CH3:4].{substrate}>>{product}"
-    )
+    product = "[c:5]1([O:1][CH3:2])[cH:7][cH:8][c:9]([S:3][CH3:4])[cH:11][cH:12]1"
+    forward = featurize_reaction(f"[OH:1][CH3:2].[SH:3][CH3:4].{substrate}>>{product}")
     reversed_order = featurize_reaction(
         f"{substrate}.[SH:3][CH3:4].[OH:1][CH3:2]>>{product}"
     )
@@ -187,7 +174,9 @@ def test_balanced_unmapped_multi_event_reaction_is_exactly_reconstructed() -> No
     assert result.reaction_signature.product_transformation is not None
     assert result.reaction_signature.product_transformation.exact_product_verified
     assert result.reaction_label == "C-O substitution + C-S substitution"
-    assert [event.transformation_class for event in result.reaction_signature.events] == [
+    assert [
+        event.transformation_class for event in result.reaction_signature.events
+    ] == [
         "sp2_c_o_substitution",
         "sp2_c_s_substitution",
     ]
@@ -212,12 +201,11 @@ def test_overlapping_multi_event_candidates_do_not_use_removed_join_atoms() -> N
 
 def test_unbalanced_multi_event_reaction_does_not_invent_partner_copy() -> None:
     reaction = (
-        "Sc1ccccc1.O=[N+]([O-])c1c(F)cccc1F"
-        ">>O=[N+]([O-])c1c(Sc2ccccc2)cccc1Sc1ccccc1"
+        "Sc1ccccc1.O=[N+]([O-])c1c(F)cccc1F>>O=[N+]([O-])c1c(Sc2ccccc2)cccc1Sc1ccccc1"
     )
     result = featurize_reaction(reaction, label_style="ascii")
 
     assert result.evidence_quality == "reactant_grammar_only"
     assert result.selected_events == ()
     assert result.reaction_signature is None
-    assert result.reaction_label == "Ar-F + Ar-SH ->"
+    assert result.reaction_label == "Ar1-F + Ar2-SH ->"

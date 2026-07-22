@@ -17,15 +17,14 @@ def test_sp3_nitrogen_and_sulfur_substitutions_reconstruct_products() -> None:
     sulfur = featurize_reaction("CI.SC>>CSC")
 
     assert nitrogen.transformation_class == "sp3_c_n_substitution"
-    assert nitrogen.reaction_label == "R–Br + R–NH2 → R–NH–R"
+    assert nitrogen.reaction_label == "R1–Br + R2–NH2 → R1–NH–R2"
     assert sulfur.transformation_class == "sp3_c_s_substitution"
-    assert sulfur.reaction_label == "R–I + R–SH → R–S–R"
+    assert sulfur.reaction_label == "R1–I + R2–SH → R1–S–R2"
 
 
 def test_sp3_substitution_does_not_force_a_mechanistic_family() -> None:
     result = featurize_reaction(
-        "ClC(c1ccccc1)(c1ccccc1)c1ccccc1.OCC>>"
-        "CCOC(c1ccccc1)(c1ccccc1)c1ccccc1"
+        "ClC(c1ccccc1)(c1ccccc1)c1ccccc1.OCC>>CCOC(c1ccccc1)(c1ccccc1)c1ccccc1"
     )
 
     assert result.reaction_label_status == "exact_product"
@@ -60,9 +59,7 @@ def test_multiple_sp3_assignments_remain_unselected_when_product_disagrees() -> 
 
 
 def test_mapped_sp3_substitution_agrees_with_operator() -> None:
-    result = featurize_reaction(
-        "[CH3:1][Br:2].[NH2:3][CH3:4]>>[CH3:1][NH:3][CH3:4]"
-    )
+    result = featurize_reaction("[CH3:1][Br:2].[NH2:3][CH3:4]>>[CH3:1][NH:3][CH3:4]")
 
     assert result.reaction_label_status == "exact_product"
     assert result.reaction_signature is not None
@@ -73,8 +70,7 @@ def test_mapped_sp3_substitution_agrees_with_operator() -> None:
 
 def test_mapped_sp3_conflict_is_preserved() -> None:
     result = featurize_reaction(
-        "[CH3:5][CH2:2][Br:1].[NH2:3][CH3:4]>>"
-        "[CH3:2][CH2:5][NH:3][CH3:4]"
+        "[CH3:5][CH2:2][Br:1].[NH2:3][CH3:4]>>[CH3:2][CH2:5][NH:3][CH3:4]"
     )
 
     assert result.reaction_label_status == "conflicting_edit_summary"
@@ -92,21 +88,14 @@ def test_terminal_alkene_heck_reconstructs_product() -> None:
 
 
 def test_terminal_alkene_heck_handles_unsymmetrical_partner() -> None:
-    result = featurize_reaction(
-        "Brc1ccncc1.C=CC#N>>N#CC=Cc1ccncc1"
-    )
+    result = featurize_reaction("Brc1ccncc1.C=CC#N>>N#CC=Cc1ccncc1")
 
-    assert result.reaction_label == (
-        "HeteroAr–Br + H2C=CHR1 → HeteroAr–CH=CHR1"
-    )
+    assert result.reaction_label == ("HeteroAr–Br + H2C=CHR1 → HeteroAr–CH=CHR1")
     assert result.named_family == "heck"
 
 
 def test_heck_stereochemistry_is_not_invented() -> None:
-    result = featurize_reaction(
-        "Ic1ccc(C=O)cc1.C=CC(=O)OC>>"
-        "COC(=O)/C=C/c1ccc(C=O)cc1"
-    )
+    result = featurize_reaction("Ic1ccc(C=O)cc1.C=CC(=O)OC>>COC(=O)/C=C/c1ccc(C=O)cc1")
 
     candidate = next(
         candidate
@@ -119,9 +108,7 @@ def test_heck_stereochemistry_is_not_invented() -> None:
 
 
 def test_fully_substituted_alkene_is_not_terminal_heck_partner() -> None:
-    result = featurize_reaction(
-        "Brc1ccccc1.CC(C)=C(C)C>>c1ccc(C2(C)C(C)(C)C2)cc1"
-    )
+    result = featurize_reaction("Brc1ccccc1.CC(C)=C(C)C>>c1ccc(C2(C)C(C)(C)C2)cc1")
 
     assert all(
         candidate.grammar_id != "terminal_alkene_heck_coupling"

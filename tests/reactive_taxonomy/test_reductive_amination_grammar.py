@@ -23,7 +23,7 @@ def test_aldehyde_primary_amine_exact_reconstruction() -> None:
 def test_ketone_primary_amine_exact_reconstruction() -> None:
     result = featurize_reaction("CC(=O)c1ccccc1.Nc1ccccc1>>CC(Nc1ccccc1)c1ccccc1")
 
-    assert result.reaction_label == ("Ar–C(R)=O + Ar–NH2 → Ar–CH(R)–NH–Ar")
+    assert result.reaction_label == ("Ar1–C(R)=O + Ar2–NH2 → Ar1–CH(R)–NH–Ar2")
     assert result.evidence_quality == "exact_product_reconstruction"
 
 
@@ -37,7 +37,7 @@ def test_formaldehyde_primary_amine_exact_reconstruction() -> None:
 def test_aldehyde_secondary_amine_exact_reconstruction() -> None:
     result = featurize_reaction("O=Cc1ccccc1.CNC>>CN(C)Cc1ccccc1")
 
-    assert result.reaction_label == "Ar–CH=O + R1R2–NH → Ar–CH2–NR2"
+    assert result.reaction_label == "Ar–CH=O + R1R2–NH → Ar–CH2–NR1R2"
     assert result.named_family == "reductive_amination"
 
 
@@ -84,7 +84,7 @@ def test_multiple_carbonyl_partners_remain_unselected_without_verification() -> 
     ]
     assert len(reductive_candidates) == 2
     assert result.selected_candidate is None
-    assert result.reaction_label_status == "reactant_only"
+    assert result.reaction_label_status == "ambiguous_reactants"
 
 
 def test_mapped_reductive_amination_agrees_with_operator() -> None:

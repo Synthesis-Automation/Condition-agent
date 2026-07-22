@@ -294,6 +294,13 @@ def validate_taxonomy() -> List[str]:
         errors.append("invalid_product_context_precedence")
     if "Other" not in product_precedence:
         errors.append("missing_product_context_fallback")
+    fragment_indexing = payload["reaction_rendering.v1"].get("fragment_indexing") or {}
+    context_symbols = fragment_indexing.get("context_symbols") or {}
+    if not isinstance(context_symbols, dict) or not context_symbols:
+        errors.append("invalid_reaction_fragment_context_symbols")
+    alias_template = str(fragment_indexing.get("alias_template") or "")
+    if "{symbol}" not in alias_template or "{index}" not in alias_template:
+        errors.append("invalid_reaction_fragment_alias_template")
     if set(reaction_rendering) != set(grammar_ids):
         errors.append("reaction_rendering_coverage_mismatch")
     signature_features = payload["signature_features.v1"]

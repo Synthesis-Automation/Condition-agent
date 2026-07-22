@@ -14,14 +14,16 @@ def test_acyl_chloride_and_benzene_reconstruct_aryl_ketone() -> None:
     assert "SYMMETRY_EQUIVALENT_ASSIGNMENTS" in result.warnings
 
 
-def test_acid_anhydride_is_an_activated_acyl_partner() -> None:
-    result = featurize_reaction(
-        "CC(=O)OC(=O)C.c1ccccc1>>CC(=O)c1ccccc1"
-    )
+def test_two_aryl_fragments_keep_role_provenance_in_product_label() -> None:
+    result = featurize_reaction("O=C(Cl)c1ccccc1.c1ccccc1>>O=C(c1ccccc1)c1ccccc1")
 
-    assert result.reaction_label == (
-        "R–C(O)OC(O)R + Ar–H → Ar–C(O)–R"
-    )
+    assert result.reaction_label == ("Ar1–C(O)Cl + Ar2–H → Ar2–C(O)–Ar1")
+
+
+def test_acid_anhydride_is_an_activated_acyl_partner() -> None:
+    result = featurize_reaction("CC(=O)OC(=O)C.c1ccccc1>>CC(=O)c1ccccc1")
+
+    assert result.reaction_label == ("R–C(O)OC(O)R + Ar–H → Ar–C(O)–R")
     assert result.named_family == "friedel_crafts_acylation"
 
 
@@ -51,9 +53,7 @@ def test_non_acylated_product_does_not_verify() -> None:
 
 
 def test_product_reconstruction_resolves_aromatic_regioisomer() -> None:
-    result = featurize_reaction(
-        "Cc1ccc(cc1).CC(=O)Cl>>CC(=O)c1ccc(C)cc1"
-    )
+    result = featurize_reaction("Cc1ccc(cc1).CC(=O)Cl>>CC(=O)c1ccc(C)cc1")
 
     exact = [
         candidate
