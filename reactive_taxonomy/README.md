@@ -117,6 +117,10 @@ python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molec
 python -m reactive_taxonomy.cli batch examples/sample_compounds.csv --mode molecule --output results/sample_compounds_featurized.csv
 python -m reactive_taxonomy.cli batch examples/sample_reactions.csv --mode reaction --concise --output results/sample_reaction_featurized.csv
 
+
+python -m reactive_taxonomy.cli batch examples/test_reactions.csv --mode reaction --concise --output results/test_reactions_featurized.csv
+
+
 python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --output results/data_300.csv
 python -m reactive_taxonomy.cli batch examples/dataset_300/C_N_Coupling.csv --mode reaction --concise --output results/data_300.csv
 
