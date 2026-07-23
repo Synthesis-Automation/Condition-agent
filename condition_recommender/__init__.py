@@ -16,6 +16,7 @@ from .models import (
     RecommendationResult,
 )
 from .rules import RuleRecommendationResult, recommend_rule_conditions
+from .rule_review import build_rule_review_rows, export_rule_review_csv
 
 __all__ = [
     "AdmissionTier",
@@ -29,10 +30,12 @@ __all__ = [
     "RecommendationRecord",
     "RecommendationResult",
     "RuleRecommendationResult",
+    "build_rule_review_rows",
     "recommend_conditions",
     "recommend_generic_conditions",
     "recommend_indexed_signature",
     "recommend_rule_conditions",
     "recommend_conditions_from_labels",
     "assess_recipe_compatibility",
+    "export_rule_review_csv",
 ]

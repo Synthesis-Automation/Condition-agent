@@ -106,6 +106,38 @@ refinement. Their identities, loadings, equivalents, partner stoichiometry,
 temperature, time, concentration, and atmosphere are complete, but they remain
 drafts until checked against located primary procedures.
 
+For chemistry review, export the complete rulebook to one flat CSV:
+
+```powershell
+python -m condition_recommender.rule_review_cli export `
+  results/rule_review/pd_sp2_cn_rulebook.csv
+```
+
+The export has one row per rule and explicit recipe variant. It puts the
+structural match criteria, resolved condition names and registry IDs,
+quantities, operating parameters, rationale, cautions, DOI, procedure locator,
+definition versions, and provenance in the same row. Alternative condition
+sets are separate rows; slash-separated combinations are not generated.
+
+The final columns are blank review fields:
+
+- `review_decision`;
+- `reviewer`;
+- `review_date`;
+- `review_notes`;
+- `proposed_rule_change`;
+- `proposed_recipe_change`.
+
+The CSV is a generated review view, not a runtime definition. Editing it does
+not change recommendations. Record chemistry feedback in those columns, then
+curate and validate the canonical rule JSON and registry recipe-template JSON.
+Regenerate the CSV after canonical changes so every row remains traceable to
+its definition IDs, schema versions, and canonical `recipe_id`.
+
+The exporter includes both active and draft definitions because its purpose is
+review. It does not need `--include-draft`. That flag belongs to reaction
+recommendation, where it explicitly opts into returning unreviewed recipes.
+
 Enable them only for review:
 
 ```powershell
@@ -161,7 +193,7 @@ The following work is still required before the C-N drafts can be activated:
 
 - verify every draft against a located primary procedure;
 - complete an independent C-N applicability and recipe benchmark;
-- add blind chemist review artifacts and disagreement tracking;
+- use the generated rulebook in blind chemist review and track disagreements;
 - calibrate which coordination and functional-group risks should be hard
   exclusions rather than cautions;
 - add separately reviewed regimes for currently unsupported handles,
