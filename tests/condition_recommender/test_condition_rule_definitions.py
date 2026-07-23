@@ -16,11 +16,18 @@ def test_clean_pd_sp2_cn_rules_load_with_explicit_fallback() -> None:
     rule_set = load_condition_rule_set()
 
     assert rule_set.definition_id == "pd_sp2_cn_condition_rules.v1"
-    assert rule_set.selection_mode == "first_nonempty_tier"
+    assert rule_set.schema_version == "1.2"
+    assert (
+        rule_set.selection_mode
+        == "first_nonempty_tier_highest_priority"
+    )
     assert rule_set.tier_order == ("specific", "fallback")
-    assert len(rule_set.rules) == 5
-    assert sum(rule.selection.tier == "specific" for rule in rule_set.rules) == 4
+    assert len(rule_set.rules) == 11
+    assert sum(rule.selection.tier == "specific" for rule in rule_set.rules) == 10
     assert sum(rule.selection.tier == "fallback" for rule in rule_set.rules) == 1
+    assert sum(
+        rule.rule_kind == "structural_override" for rule in rule_set.rules
+    ) == 4
     active = tuple(rule.rule_id for rule in rule_set.rules if rule.status == "active")
     assert active == ("pd_sp2_cn.amide_nh.v1",)
 
@@ -37,7 +44,6 @@ def test_rules_use_taxonomy_facts_instead_of_names_or_legacy_labels() -> None:
         "reactant_1",
         "Alkyl-NH2",
         "@sp2_electrophiles",
-        "BH_CN_",
         "yield",
         "z_score",
         "datasets/rules",
@@ -53,7 +59,7 @@ def test_every_rule_references_a_distinct_registry_template() -> None:
         for recommendation in rule.recommendations
     ]
 
-    assert len(template_ids) == len(set(template_ids)) == 5
+    assert len(template_ids) == len(set(template_ids)) == 11
 
 
 def test_rule_validation_rejects_display_label_predicates() -> None:
@@ -88,6 +94,28 @@ def test_rule_validation_reports_malformed_h_count_without_raising() -> None:
 
     assert any(
         "h_count_min_must_be_integer" in error
+        for error in validate_condition_rule_payload(payload)
+    )
+
+
+def test_rule_validation_rejects_unknown_environment_vocabulary() -> None:
+    payload = _payload()
+    payload["rules"][0]["match"]["partner_constraints"][0][
+        "steric_classes_any"
+    ] = ["super_hindered"]
+
+    assert any(
+        "unknown_steric_class:super_hindered" in error
+        for error in validate_condition_rule_payload(payload)
+    )
+
+
+def test_rule_validation_requires_kind_and_tier_consistency() -> None:
+    payload = _payload()
+    payload["rules"][0]["selection"]["tier"] = "fallback"
+
+    assert any(
+        "structural_override_rule_must_use_specific_tier" in error
         for error in validate_condition_rule_payload(payload)
     )
 

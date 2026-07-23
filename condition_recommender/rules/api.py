@@ -143,6 +143,7 @@ def recommend_rule_conditions(
                     rank=len(recommendations) + 1,
                     rule_id=rule.rule_id,
                     rule_status=rule.status,
+                    rule_kind=rule.rule_kind,
                     recipe_template_id=template_id,
                     recipe_template=template.to_dict(),
                     compatible_variants=tuple(compatible_variants),
@@ -166,6 +167,21 @@ def recommend_rule_conditions(
         for recommendation in recommendations
     ):
         warnings.append("DRAFT_RULES_INCLUDED")
+    if any(
+        recommendation.rule_kind == "structural_override"
+        for recommendation in recommendations
+    ):
+        warnings.append("STRUCTURAL_OVERRIDE_APPLIED")
+    elif any(
+        recommendation.rule_kind == "default"
+        for recommendation in recommendations
+    ):
+        warnings.append("DEFAULT_RULE_APPLIED")
+    elif any(
+        recommendation.rule_kind == "fallback"
+        for recommendation in recommendations
+    ):
+        warnings.append("FALLBACK_RULE_APPLIED")
     if excluded_variants:
         warnings.append(
             f"INCOMPATIBLE_RULE_VARIANTS_EXCLUDED:{len(excluded_variants)}"

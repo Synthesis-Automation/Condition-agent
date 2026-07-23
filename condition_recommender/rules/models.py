@@ -8,6 +8,7 @@ from typing import Any, Dict, Literal, Optional, Tuple
 
 RuleStatus = Literal["draft", "active", "retired"]
 RuleTier = Literal["specific", "fallback"]
+RuleKind = Literal["default", "structural_override", "fallback"]
 RecipeVariantStatus = Literal["draft", "active", "retired"]
 
 
@@ -23,9 +24,16 @@ class PartnerConstraint:
     derived_families_any: Tuple[str, ...] = ()
     h_count_min: Optional[int] = None
     h_count_max: Optional[int] = None
+    retained_contexts_any: Tuple[str, ...] = ()
     retained_contexts_all: Tuple[str, ...] = ()
     retained_contexts_allowed: Tuple[str, ...] = ()
     availability_any: Tuple[str, ...] = ()
+    steric_classes_any: Tuple[str, ...] = ()
+    electronic_classes_any: Tuple[str, ...] = ()
+    ortho_substituent_count_min: Optional[int] = None
+    ortho_substituent_count_max: Optional[int] = None
+    alpha_branched_group_count_min: Optional[int] = None
+    alpha_branched_group_count_max: Optional[int] = None
 
     def to_dict(self) -> Dict[str, object]:
         return asdict(self)
@@ -37,6 +45,10 @@ class RuleScope:
 
     transformation_classes_any: Tuple[str, ...]
     event_scopes_any: Tuple[str, ...] = ("single_event",)
+    evidence_qualities_any: Tuple[str, ...] = (
+        "exact_product_reconstruction",
+    )
+    reaction_scopes_any: Tuple[str, ...] = ("intermolecular",)
 
 
 @dataclass(frozen=True)
@@ -61,6 +73,7 @@ class ConditionRule:
 
     rule_id: str
     status: RuleStatus
+    rule_kind: RuleKind
     scope: RuleScope
     partner_constraints: Tuple[PartnerConstraint, ...]
     selection: RuleSelection
@@ -68,7 +81,7 @@ class ConditionRule:
     rationale: str
     cautions: Tuple[str, ...] = ()
     provenance: Dict[str, object] = None  # type: ignore[assignment]
-    schema_version: str = "1.1"
+    schema_version: str = "1.2"
 
     def __post_init__(self) -> None:
         if self.provenance is None:
@@ -83,10 +96,10 @@ class ConditionRuleSet:
     """Versioned rules plus their deterministic tier-selection policy."""
 
     definition_id: str
-    selection_mode: Literal["first_nonempty_tier"]
+    selection_mode: Literal["first_nonempty_tier_highest_priority"]
     tier_order: Tuple[RuleTier, ...]
     rules: Tuple[ConditionRule, ...]
-    schema_version: str = "1.1"
+    schema_version: str = "1.2"
 
     def to_dict(self) -> Dict[str, object]:
         return asdict(self)
@@ -107,6 +120,11 @@ class PartnerRuleFacts:
     derived_family: Optional[str]
     h_count: Optional[int]
     retained_contexts: Tuple[str, ...]
+    steric_class: Optional[str] = None
+    electronic_class: Optional[str] = None
+    ortho_substituent_count: Optional[int] = None
+    alpha_branched_group_count: int = 0
+    environment_flags: Tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -118,6 +136,7 @@ class RuleQueryFacts:
     transformation_class: str
     event_scope: str
     evidence_quality: str
+    reaction_scope: str
     partners: Tuple[PartnerRuleFacts, ...]
     taxonomy_definition_versions: Tuple[Tuple[str, str], ...]
 
@@ -128,6 +147,7 @@ class RuleMatchTrace:
 
     rule_id: str
     rule_status: RuleStatus
+    rule_kind: RuleKind
     matched: bool
     eligible: bool
     selection_group: str
@@ -147,6 +167,7 @@ class RuleConditionRecommendation:
     rank: int
     rule_id: str
     rule_status: RuleStatus
+    rule_kind: RuleKind
     recipe_template_id: str
     recipe_template: Dict[str, Any]
     compatible_variants: Tuple["RuleRecipeVariantAssessment", ...]
@@ -179,7 +200,7 @@ class RuleRecipeVariantAssessment:
     compatibility_evidence: Tuple[str, ...] = ()
     cautions: Tuple[str, ...] = ()
     compatibility_definition_id: str = "compatibility.v1"
-    schema_version: str = "1.1"
+    schema_version: str = "1.2"
 
     def to_dict(self) -> Dict[str, object]:
         return asdict(self)
@@ -205,7 +226,7 @@ class RuleRecommendationResult:
     rule_definition_schema_version: Optional[str] = None
     recipe_template_definition_id: Optional[str] = None
     recipe_template_schema_version: Optional[str] = None
-    schema_version: str = "1.1"
+    schema_version: str = "1.2"
 
     def to_dict(self) -> Dict[str, object]:
         return asdict(self)
@@ -217,6 +238,7 @@ __all__ = [
     "PartnerConstraint",
     "PartnerRuleFacts",
     "RuleConditionRecommendation",
+    "RuleKind",
     "RuleMatchTrace",
     "RuleQueryFacts",
     "RuleRecipeVariantAssessment",

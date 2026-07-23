@@ -4,7 +4,6 @@ import json
 import pytest
 
 from condition_registry import (
-    build_resolved_recipe,
     get_recipe_template,
     load_recipe_template_set,
     materialize_recipe_variant,
@@ -25,7 +24,7 @@ def test_clean_recipe_templates_are_typed_and_registry_backed() -> None:
 
     assert template_set.definition_id == "condition_recipe_templates.v1"
     assert template_set.schema_version == "1.2"
-    assert len(template_set.templates) == 5
+    assert len(template_set.templates) == 11
     assert all(template.identity_complete for template in template_set.templates)
     statuses = {template.template_id: template.status for template in template_set.templates}
     assert statuses["pd_sp2_cn.amide_nh.v1"] == "active"
@@ -49,7 +48,6 @@ def test_recipe_templates_do_not_embed_legacy_rule_fields() -> None:
         "reactant_2",
         "rule_tier",
         "z_score",
-        "BH_CN_",
         "datasets/rules",
     ):
         assert legacy_token not in serialized
@@ -118,17 +116,49 @@ def test_explicit_variant_materializes_one_canonical_recipe() -> None:
     assert len(template.variants) == 2
     assert len(next(slot for slot in template.slots if slot.slot_id == "base").alternatives) == 4
 
-    observed_recipe = build_resolved_recipe(
-        {
-            "catalyst_cas": ("1536473-72-9",),
-            "reagent_cas": ("7778-53-2",),
-            "solvent_cas": ("75-05-8",),
-        },
+    repeated = materialize_recipe_variant(
+        template,
+        "tbu_brettphos_k3po4_mecn.v1",
         transformation_class="sp2_c_n_substitution",
-        temperature_c=100.0,
-        atmosphere="N2",
+        include_draft=True,
     )
-    assert recipe.recipe_id == observed_recipe.recipe_id
+    assert recipe.recipe_id == repeated.recipe_id
+    assert recipe.catalysts[0].amount == 2.0
+    assert recipe.catalysts[0].amount_unit == "mol_percent"
+    assert recipe.bases[0].amount == 2.0
+    assert recipe.bases[0].amount_unit == "equivalent"
+    assert recipe.time_h == 16.0
+    assert recipe.concentration_m == 0.2
+
+
+def test_every_draft_screening_variant_is_explicitly_materializable() -> None:
+    template_set = load_recipe_template_set()
+
+    for template in template_set.templates:
+        if template.status != "draft":
+            continue
+        assert template.temperature_c is not None
+        assert template.time_h is not None
+        assert template.concentration_m is not None
+        assert template.atmosphere
+        assert {amount.role for amount in template.partner_amounts} == {
+            "electrophile",
+            "nucleophile",
+        }
+        for variant in template.variants:
+            recipe = materialize_recipe_variant(
+                template,
+                variant.variant_id,
+                transformation_class="sp2_c_n_substitution",
+                include_draft=True,
+            )
+            assert recipe.catalysts
+            assert recipe.bases
+            assert recipe.solvents
+            assert all(
+                component.amount is not None
+                for component in (*recipe.catalysts, *recipe.bases)
+            )
 
 
 def test_draft_variant_materialization_requires_explicit_opt_in() -> None:

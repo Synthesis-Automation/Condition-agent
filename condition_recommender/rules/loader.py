@@ -31,6 +31,7 @@ _ROOT_KEYS = {"schema_version", "definition_id", "selection_policy", "rules"}
 _RULE_KEYS = {
     "rule_id",
     "status",
+    "rule_kind",
     "scope",
     "match",
     "selection",
@@ -39,7 +40,12 @@ _RULE_KEYS = {
     "cautions",
     "provenance",
 }
-_SCOPE_KEYS = {"transformation_classes_any", "event_scopes_any"}
+_SCOPE_KEYS = {
+    "transformation_classes_any",
+    "event_scopes_any",
+    "evidence_qualities_any",
+    "reaction_scopes_any",
+}
 _MATCH_KEYS = {"partner_constraints"}
 _PARTNER_KEYS = {
     "role",
@@ -50,15 +56,43 @@ _PARTNER_KEYS = {
     "derived_families_any",
     "h_count_min",
     "h_count_max",
+    "retained_contexts_any",
     "retained_contexts_all",
     "retained_contexts_allowed",
     "availability_any",
+    "steric_classes_any",
+    "electronic_classes_any",
+    "ortho_substituent_count_min",
+    "ortho_substituent_count_max",
+    "alpha_branched_group_count_min",
+    "alpha_branched_group_count_max",
 }
 _SELECTION_KEYS = {"group", "tier", "priority"}
 _RECOMMENDATION_KEYS = {"recipe_template_id"}
 _ALLOWED_STATUSES = {"draft", "active", "retired"}
+_ALLOWED_RULE_KINDS = {"default", "structural_override", "fallback"}
 _ALLOWED_TIERS = {"specific", "fallback"}
 _ALLOWED_EVENT_SCOPES = {"single_event", "multi_event", "unresolved"}
+_ALLOWED_EVIDENCE_QUALITIES = {
+    "exact_product_reconstruction",
+    "validated_atom_mapping",
+}
+_ALLOWED_REACTION_SCOPES = {"intermolecular", "intramolecular", "mixed"}
+_ALLOWED_STERIC_CLASSES = {
+    "open",
+    "ortho_substituted",
+    "ortho_hindered",
+    "primary",
+    "secondary",
+    "tertiary",
+    "unclassified",
+}
+_ALLOWED_ELECTRONIC_CLASSES = {
+    "electron_poor",
+    "neutral",
+    "electron_rich",
+    "unclassified",
+}
 
 
 def _tuple_strings(values: Iterable[Any]) -> Tuple[str, ...]:
@@ -87,6 +121,9 @@ def _partner(payload: Mapping[str, Any]) -> PartnerConstraint:
         h_count_max=int(payload["h_count_max"])
         if payload.get("h_count_max") is not None
         else None,
+        retained_contexts_any=_tuple_strings(
+            payload.get("retained_contexts_any") or ()
+        ),
         retained_contexts_all=_tuple_strings(
             payload.get("retained_contexts_all") or ()
         ),
@@ -94,6 +131,32 @@ def _partner(payload: Mapping[str, Any]) -> PartnerConstraint:
             payload.get("retained_contexts_allowed") or ()
         ),
         availability_any=_tuple_strings(payload.get("availability_any") or ()),
+        steric_classes_any=_tuple_strings(
+            payload.get("steric_classes_any") or ()
+        ),
+        electronic_classes_any=_tuple_strings(
+            payload.get("electronic_classes_any") or ()
+        ),
+        ortho_substituent_count_min=int(
+            payload["ortho_substituent_count_min"]
+        )
+        if payload.get("ortho_substituent_count_min") is not None
+        else None,
+        ortho_substituent_count_max=int(
+            payload["ortho_substituent_count_max"]
+        )
+        if payload.get("ortho_substituent_count_max") is not None
+        else None,
+        alpha_branched_group_count_min=int(
+            payload["alpha_branched_group_count_min"]
+        )
+        if payload.get("alpha_branched_group_count_min") is not None
+        else None,
+        alpha_branched_group_count_max=int(
+            payload["alpha_branched_group_count_max"]
+        )
+        if payload.get("alpha_branched_group_count_max") is not None
+        else None,
     )
 
 
@@ -104,12 +167,20 @@ def _rule(payload: Mapping[str, Any], schema_version: str) -> ConditionRule:
     return ConditionRule(
         rule_id=str(payload["rule_id"]),
         status=str(payload["status"]),  # type: ignore[arg-type]
+        rule_kind=str(payload["rule_kind"]),  # type: ignore[arg-type]
         scope=RuleScope(
             transformation_classes_any=_tuple_strings(
                 scope["transformation_classes_any"]
             ),
             event_scopes_any=_tuple_strings(
                 scope.get("event_scopes_any") or ("single_event",)
+            ),
+            evidence_qualities_any=_tuple_strings(
+                scope.get("evidence_qualities_any")
+                or ("exact_product_reconstruction",)
+            ),
+            reaction_scopes_any=_tuple_strings(
+                scope.get("reaction_scopes_any") or ("intermolecular",)
             ),
         ),
         partner_constraints=tuple(
@@ -137,7 +208,7 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
     for key in _unknown_keys(payload, _ROOT_KEYS):
         errors.append(f"unknown_root_key:{key}")
     schema_version = str(payload.get("schema_version") or "")
-    if schema_version != "1.1":
+    if schema_version != "1.2":
         errors.append(f"unsupported_schema_version:{schema_version}")
     if not str(payload.get("definition_id") or ""):
         errors.append("missing_definition_id")
@@ -147,7 +218,7 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
     else:
         if set(policy) - {"mode", "tier_order"}:
             errors.append("selection_policy_has_unknown_keys")
-        if policy.get("mode") != "first_nonempty_tier":
+        if policy.get("mode") != "first_nonempty_tier_highest_priority":
             errors.append("unsupported_selection_mode")
         if tuple(policy.get("tier_order") or ()) != ("specific", "fallback"):
             errors.append("tier_order_must_be_specific_then_fallback")
@@ -188,6 +259,9 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
         status = str(rule.get("status") or "")
         if status not in _ALLOWED_STATUSES:
             errors.append(f"{prefix}:invalid_status:{status}")
+        rule_kind = str(rule.get("rule_kind") or "")
+        if rule_kind not in _ALLOWED_RULE_KINDS:
+            errors.append(f"{prefix}:invalid_rule_kind:{rule_kind}")
         scope = rule.get("scope")
         transformations: Tuple[str, ...] = ()
         if not isinstance(scope, Mapping):
@@ -214,6 +288,40 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
                 for value in event_scopes:
                     if str(value) not in _ALLOWED_EVENT_SCOPES:
                         errors.append(f"{prefix}.scope:unknown_event_scope:{value}")
+            evidence_qualities = (
+                scope.get("evidence_qualities_any")
+                or ("exact_product_reconstruction",)
+            )
+            if (
+                not isinstance(evidence_qualities, list)
+                or not evidence_qualities
+            ):
+                errors.append(
+                    f"{prefix}.scope:"
+                    "evidence_qualities_must_be_nonempty_array"
+                )
+            else:
+                for value in evidence_qualities:
+                    if str(value) not in _ALLOWED_EVIDENCE_QUALITIES:
+                        errors.append(
+                            f"{prefix}.scope:"
+                            f"unknown_evidence_quality:{value}"
+                        )
+            reaction_scopes = (
+                scope.get("reaction_scopes_any") or ("intermolecular",)
+            )
+            if not isinstance(reaction_scopes, list) or not reaction_scopes:
+                errors.append(
+                    f"{prefix}.scope:"
+                    "reaction_scopes_must_be_nonempty_array"
+                )
+            else:
+                for value in reaction_scopes:
+                    if str(value) not in _ALLOWED_REACTION_SCOPES:
+                        errors.append(
+                            f"{prefix}.scope:"
+                            f"unknown_reaction_scope:{value}"
+                        )
         match = rule.get("match")
         if not isinstance(match, Mapping):
             errors.append(f"{prefix}:match_must_be_object")
@@ -285,6 +393,108 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
                         and minimum > maximum
                     ):
                         errors.append(f"{partner_prefix}:invalid_h_count_range")
+                    for value in partner.get("steric_classes_any") or ():
+                        if str(value) not in _ALLOWED_STERIC_CLASSES:
+                            errors.append(
+                                f"{partner_prefix}:"
+                                f"unknown_steric_class:{value}"
+                            )
+                    for value in partner.get("electronic_classes_any") or ():
+                        if str(value) not in _ALLOWED_ELECTRONIC_CLASSES:
+                            errors.append(
+                                f"{partner_prefix}:"
+                                f"unknown_electronic_class:{value}"
+                            )
+                    ortho_minimum = partner.get(
+                        "ortho_substituent_count_min"
+                    )
+                    ortho_maximum = partner.get(
+                        "ortho_substituent_count_max"
+                    )
+                    ortho_minimum_valid = ortho_minimum is None or (
+                        isinstance(ortho_minimum, int)
+                        and not isinstance(ortho_minimum, bool)
+                    )
+                    ortho_maximum_valid = ortho_maximum is None or (
+                        isinstance(ortho_maximum, int)
+                        and not isinstance(ortho_maximum, bool)
+                    )
+                    if not ortho_minimum_valid:
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "ortho_substituent_count_min_must_be_integer"
+                        )
+                    elif ortho_minimum is not None and ortho_minimum < 0:
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "negative_ortho_substituent_count_min"
+                        )
+                    if not ortho_maximum_valid:
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "ortho_substituent_count_max_must_be_integer"
+                        )
+                    elif ortho_maximum is not None and ortho_maximum < 0:
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "negative_ortho_substituent_count_max"
+                        )
+                    if (
+                        ortho_minimum_valid
+                        and ortho_maximum_valid
+                        and ortho_minimum is not None
+                        and ortho_maximum is not None
+                        and ortho_minimum > ortho_maximum
+                    ):
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "invalid_ortho_substituent_count_range"
+                        )
+                    alpha_minimum = partner.get(
+                        "alpha_branched_group_count_min"
+                    )
+                    alpha_maximum = partner.get(
+                        "alpha_branched_group_count_max"
+                    )
+                    alpha_minimum_valid = alpha_minimum is None or (
+                        isinstance(alpha_minimum, int)
+                        and not isinstance(alpha_minimum, bool)
+                    )
+                    alpha_maximum_valid = alpha_maximum is None or (
+                        isinstance(alpha_maximum, int)
+                        and not isinstance(alpha_maximum, bool)
+                    )
+                    if not alpha_minimum_valid:
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "alpha_branched_group_count_min_must_be_integer"
+                        )
+                    elif alpha_minimum is not None and alpha_minimum < 0:
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "negative_alpha_branched_group_count_min"
+                        )
+                    if not alpha_maximum_valid:
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "alpha_branched_group_count_max_must_be_integer"
+                        )
+                    elif alpha_maximum is not None and alpha_maximum < 0:
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "negative_alpha_branched_group_count_max"
+                        )
+                    if (
+                        alpha_minimum_valid
+                        and alpha_maximum_valid
+                        and alpha_minimum is not None
+                        and alpha_maximum is not None
+                        and alpha_minimum > alpha_maximum
+                    ):
+                        errors.append(
+                            f"{partner_prefix}:"
+                            "invalid_alpha_branched_group_count_range"
+                        )
                 if len(constrained_roles) != len(set(constrained_roles)):
                     errors.append(f"{prefix}.match:duplicate_partner_roles")
         selection = rule.get("selection")
@@ -298,6 +508,18 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
             tier = str(selection.get("tier") or "")
             if tier not in _ALLOWED_TIERS:
                 errors.append(f"{prefix}.selection:invalid_tier:{tier}")
+            if rule_kind == "fallback" and tier != "fallback":
+                errors.append(
+                    f"{prefix}.selection:fallback_rule_must_use_fallback_tier"
+                )
+            if (
+                rule_kind in {"default", "structural_override"}
+                and tier != "specific"
+            ):
+                errors.append(
+                    f"{prefix}.selection:"
+                    f"{rule_kind}_rule_must_use_specific_tier"
+                )
             priority = selection.get("priority")
             if isinstance(priority, bool) or not isinstance(priority, int):
                 errors.append(f"{prefix}.selection:priority_must_be_integer")

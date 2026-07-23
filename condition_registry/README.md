@@ -39,9 +39,12 @@ Template schema 1.2 stores catalyst loading and reagent equivalents on each
 explicit selection, plus partner stoichiometry and operating parameters.
 Activation validation requires all of those fields and a located primary
 procedure. The primary-amide template is the first active protocol; the other
-templates remain `draft`. Draft status is distinct from identity resolution: a
-draft may contain only valid registry identities while still lacking enough
-detail for activation.
+templates remain `draft`. The Phase I C-N drafts now contain explicit loadings,
+equivalents, partner stoichiometry, time, concentration, temperature, and
+atmosphere so they can be evaluated as complete screening recipes. They remain
+inactive because their legacy-rulebook/expert basis still requires review
+against located primary procedures. Draft status is therefore distinct from
+both identity resolution and recipe-field completeness.
 
 ## Contextual recipes
 

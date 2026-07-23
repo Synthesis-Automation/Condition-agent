@@ -14,11 +14,30 @@ from condition_recommender.rules import load_condition_rule_set
 rule_set = load_condition_rule_set()
 ```
 
-Loading performs strict shape, taxonomy-vocabulary, role, substance-identity,
-and cross-package template validation. The definitions use a deterministic
-`specific` then `fallback` selection policy. The narrow primary-amide/aryl-
-chloride rule is active with a complete, primary-literature protocol. Broader
-amine, aromatic N-H, and fallback rules remain review-only drafts.
+Loading performs strict shape, taxonomy-vocabulary, role, environment,
+substance-identity, and cross-package template validation. The Phase I C-N
+rules cover bounded intermolecular Ar/HeteroAr substitution and use a
+deterministic hierarchy:
+
+1. combined hindered-Ar-Cl structural override;
+2. Ar-Cl, hindered-Ar-Br, or alpha-branched-amine structural override;
+3. primary/secondary alkyl amine, primary/secondary aryl amine, aromatic N-H,
+   or primary-amide class default;
+4. bounded free-amine Ar-Br fallback.
+
+Within the first matching tier, only the highest-priority rule is selected.
+A matching draft override blocks a lower-priority production default, avoiding
+unsafe fallback around a known special case. Ar-F, uncurated leaving groups,
+intramolecular reactions, and unsupported nitrogen classes abstain. The rule
+engine proposes a palladium condition regime from structural evidence; it does
+not claim that a generic `sp2_c_n_substitution` product proves a
+Buchwald-Hartwig mechanism.
+
+The narrow primary-amide/aryl-chloride rule remains the only active rule and
+has a complete primary-literature protocol. The other defaults and overrides
+are complete, explicitly materializable screening drafts derived from the
+legacy Buchwald-Hartwig rulebook plus expert refinement. They require
+primary-procedure review before activation.
 
 The production API excludes drafts by default:
 
@@ -44,7 +63,8 @@ python -m condition_recommender.rule_recommend_cli `
   --include-draft
 ```
 
-The review result contains the selected specificity tier, structural match evidence,
+The review result contains the selected specificity tier and rule kind
+(`default`, `structural_override`, or `fallback`), structural match evidence,
 failed predicates for every nonmatching rule, the referenced recipe template,
 canonical recipes for its explicit variants, compatibility scores and evidence,
 hard-excluded variants, and a draft warning. Without `--include-draft`,

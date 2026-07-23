@@ -29,6 +29,14 @@ from condition_recommender.rule_recommend_cli import main as rule_cli_main
             "Clc1ccccc1.CC(N)=O>>CC(=O)Nc1ccccc1",
             "pd_sp2_cn.amide_nh.v1",
         ),
+        (
+            "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1",
+            "pd_sp2_cn.primary_aryl_amine.v1",
+        ),
+        (
+            "Brc1ccccc1.CNc1ccccc1>>CN(c1ccccc1)c1ccccc1",
+            "pd_sp2_cn.secondary_aryl_amine.v1",
+        ),
     ),
 )
 def test_specific_structural_rules_match_without_named_family(
@@ -40,15 +48,15 @@ def test_specific_structural_rules_match_without_named_family(
     assert analysis.named_family is None
     assert result.valid
     assert result.reaction_signature_schema_version == "1.2"
-    assert result.schema_version == "1.1"
-    assert result.rule_definition_schema_version == "1.1"
+    assert result.schema_version == "1.2"
+    assert result.rule_definition_schema_version == "1.2"
     assert result.recipe_template_schema_version == "1.2"
     assert result.transformation_class == "sp2_c_n_substitution"
     assert dict(result.taxonomy_definition_versions)[
         "reaction_grammars.v1.json"
     ] == "1.4"
     assert result.selected_tiers == (
-        ("pd_sp2_cn.nucleophile_class", "specific"),
+        ("pd_sp2_cn.condition_regime", "specific"),
     )
     assert tuple(item.rule_id for item in result.recommendations) == (
         expected_rule,
@@ -69,23 +77,139 @@ def test_specific_rule_suppresses_matching_fallback() -> None:
     assert tuple(item.rule_id for item in result.recommendations) == (
         "pd_sp2_cn.primary_alkyl_amine.v1",
     )
+    assert result.recommendations[0].rule_kind == "default"
 
 
-def test_aniline_uses_generic_nh_fallback_not_alkyl_amine_rule() -> None:
+@pytest.mark.parametrize(
+    ("reaction", "expected_rule", "temperature_c", "time_h"),
+    (
+        (
+            "Clc1ccccc1.CN>>CNc1ccccc1",
+            "pd_sp2_cn.free_amine.ar_cl.v1",
+            100.0,
+            16.0,
+        ),
+        (
+            "Cc1cccc(C)c1Br.CN>>Cc1cccc(C)c1NC",
+            "pd_sp2_cn.free_amine.hindered_ar_br.v1",
+            110.0,
+            18.0,
+        ),
+        (
+            "Cc1cccc(C)c1Cl.CN>>Cc1cccc(C)c1NC",
+            "pd_sp2_cn.free_amine.hindered_ar_cl.v1",
+            110.0,
+            24.0,
+        ),
+        (
+            "Brc1ccccc1.CC(C)(C)N>>CC(C)(C)Nc1ccccc1",
+            "pd_sp2_cn.free_amine.hindered_nucleophile_ar_br.v1",
+            110.0,
+            18.0,
+        ),
+    ),
+)
+def test_structural_overrides_suppress_class_defaults(
+    reaction: str,
+    expected_rule: str,
+    temperature_c: float,
+    time_h: float,
+) -> None:
+    result = recommend_rule_conditions(reaction, include_draft=True)
+
+    assert tuple(item.rule_id for item in result.recommendations) == (
+        expected_rule,
+    )
+    recommendation = result.recommendations[0]
+    assert recommendation.rule_kind == "structural_override"
+    assert "STRUCTURAL_OVERRIDE_APPLIED" in result.warnings
+    assert "DEFAULT_RULE_APPLIED" not in result.warnings
+    variant = recommendation.compatible_variants[0]
+    assert variant.resolved_recipe["temperature_c"] == temperature_c
+    assert variant.resolved_recipe["time_h"] == time_h
+
+
+def test_combined_hindered_ar_cl_has_highest_priority() -> None:
+    reaction = "Cc1cccc(C)c1Cl.CN>>Cc1cccc(C)c1NC"
+    result = recommend_rule_conditions(reaction, include_draft=True)
+    traces = {trace.rule_id: trace for trace in result.match_traces}
+
+    assert traces["pd_sp2_cn.free_amine.ar_cl.v1"].matched
+    assert traces["pd_sp2_cn.free_amine.hindered_ar_cl.v1"].matched
+    assert result.recommendations[0].rule_id == (
+        "pd_sp2_cn.free_amine.hindered_ar_cl.v1"
+    )
+
+
+def test_draft_override_blocks_unsafe_production_default_fallback() -> None:
+    result = recommend_rule_conditions(
+        "Clc1ccccc1.CN>>CNc1ccccc1"
+    )
+
+    assert result.valid
+    assert result.recommendations == ()
+    assert result.selected_tiers == ()
+    assert "DRAFT_RULE_MATCHES_EXCLUDED" in result.warnings
+
+
+def test_unsupported_aryl_fluoride_abstains() -> None:
+    result = recommend_rule_conditions(
+        "Fc1ccccc1.CN>>CNc1ccccc1",
+        include_draft=True,
+    )
+
+    assert result.valid
+    assert result.recommendations == ()
+    assert "NO_STRUCTURAL_RULE_MATCH" in result.warnings
+
+
+def test_intramolecular_cn_cyclization_is_outside_phase_one_scope() -> None:
+    result = recommend_rule_conditions(
+        "NCCCc1ccccc1Br>>c1ccc2c(c1)CCCN2",
+        include_draft=True,
+    )
+
+    assert result.valid
+    assert result.transformation_class == "sp2_c_n_substitution"
+    assert result.recommendations == ()
+    assert "NO_STRUCTURAL_RULE_MATCH" in result.warnings
+    assert all(
+        "reaction_scope:intramolecular" in trace.failures
+        for trace in result.match_traces
+    )
+
+
+def test_aniline_uses_primary_aryl_amine_default() -> None:
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
     result = recommend_rule_conditions(reaction, include_draft=True)
     traces = {trace.rule_id: trace for trace in result.match_traces}
 
     assert result.selected_tiers == (
-        ("pd_sp2_cn.nucleophile_class", "fallback"),
+        ("pd_sp2_cn.condition_regime", "specific"),
     )
     assert tuple(item.rule_id for item in result.recommendations) == (
-        "pd_sp2_cn.general_nh_fallback.v1",
+        "pd_sp2_cn.primary_aryl_amine.v1",
     )
+    assert result.recommendations[0].rule_kind == "default"
     primary = traces["pd_sp2_cn.primary_alkyl_amine.v1"]
     assert not primary.matched
     assert "nucleophile:missing_retained_contexts:Alkyl" in primary.failures
     assert "nucleophile:disallowed_retained_contexts:Ar" in primary.failures
+
+
+def test_heteroaryl_primary_amine_uses_aryl_amine_default() -> None:
+    result = recommend_rule_conditions(
+        "Brc1ccccc1.Nc1ccccn1>>c1ccc(Nc2ccccn2)cc1",
+        include_draft=True,
+    )
+
+    assert result.recommendations[0].rule_id == (
+        "pd_sp2_cn.primary_aryl_amine.v1"
+    )
+    assert any(
+        "retained_contexts=HeteroAr" in evidence
+        for evidence in result.recommendations[0].match_evidence
+    )
 
 
 def test_draft_rules_are_excluded_by_default() -> None:
@@ -106,9 +230,9 @@ def test_reviewed_primary_amide_protocol_is_available_in_production() -> None:
     )
 
     assert result.valid
-    assert result.warnings == ()
+    assert result.warnings == ("DEFAULT_RULE_APPLIED",)
     assert result.selected_tiers == (
-        ("pd_sp2_cn.nucleophile_class", "specific"),
+        ("pd_sp2_cn.condition_regime", "specific"),
     )
     recommendation = result.recommendations[0]
     assert recommendation.rule_status == "active"
@@ -134,7 +258,7 @@ def test_primary_amide_protocol_does_not_expand_beyond_aryl_chlorides() -> None:
     traces = {trace.rule_id: trace for trace in result.match_traces}
 
     assert result.recommendations == ()
-    assert "DRAFT_RULE_MATCHES_EXCLUDED" in result.warnings
+    assert "NO_STRUCTURAL_RULE_MATCH" in result.warnings
     assert "electrophile:handle_token:Br" in traces[
         "pd_sp2_cn.amide_nh.v1"
     ].failures

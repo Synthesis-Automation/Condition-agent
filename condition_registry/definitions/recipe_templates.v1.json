@@ -43,8 +43,8 @@
           "status": "draft",
           "priority": 100,
           "selections": [
-            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
-            {"slot_id": "base", "substance_id": "cas:7778-53-2"},
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:7778-53-2", "amount": 2.0, "amount_unit": "equivalent"},
             {"slot_id": "solvent", "substance_id": "cas:75-05-8"}
           ]
         },
@@ -53,16 +53,22 @@
           "status": "draft",
           "priority": 90,
           "selections": [
-            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
-            {"slot_id": "base", "substance_id": "cas:534-17-8"},
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:534-17-8", "amount": 2.0, "amount_unit": "equivalent"},
             {"slot_id": "solvent", "substance_id": "cas:75-05-8"}
           ]
         }
       ],
       "temperature_c": 100.0,
+      "time_h": 16.0,
+      "concentration_m": 0.2,
       "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.1, "maximum": 1.2, "unit": "equivalent"}
+      ],
       "notes": [
-        "Catalyst loading, base equivalents, concentration, and time require curation before activation.",
+        "Complete draft screening recipe derived from the legacy BH_CN_01 rule; primary-procedure review is required before activation.",
         "Alternative bases are presented as choices and are not expanded combinatorially."
       ],
       "provenance": {
@@ -111,8 +117,8 @@
           "status": "draft",
           "priority": 100,
           "selections": [
-            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
-            {"slot_id": "base", "substance_id": "cas:534-17-8"},
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:534-17-8", "amount": 2.0, "amount_unit": "equivalent"},
             {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
           ]
         },
@@ -121,15 +127,22 @@
           "status": "draft",
           "priority": 90,
           "selections": [
-            {"slot_id": "precatalyst", "substance_id": "cas:1375325-77-1"},
-            {"slot_id": "base", "substance_id": "cas:40949-94-8"},
+            {"slot_id": "precatalyst", "substance_id": "cas:1375325-77-1", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:40949-94-8", "amount": 1.5, "amount_unit": "equivalent"},
             {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
           ]
         }
       ],
+      "temperature_c": 100.0,
+      "time_h": 16.0,
+      "concentration_m": 0.2,
       "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.1, "maximum": 1.2, "unit": "equivalent"}
+      ],
       "notes": [
-        "Temperature, time, loadings, and concentration require curation before activation."
+        "Complete draft screening recipes derived from the legacy BH_CN_02 rule; primary-procedure review is required before activation."
       ],
       "provenance": {
         "basis": "initial_expert_definition",
@@ -178,8 +191,8 @@
           "status": "draft",
           "priority": 100,
           "selections": [
-            {"slot_id": "precatalyst", "substance_id": "cas:1702311-34-9"},
-            {"slot_id": "base", "substance_id": "cas:7778-53-2"},
+            {"slot_id": "precatalyst", "substance_id": "cas:1702311-34-9", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:7778-53-2", "amount": 2.0, "amount_unit": "equivalent"},
             {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
           ]
         },
@@ -188,15 +201,22 @@
           "status": "draft",
           "priority": 90,
           "selections": [
-            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
-            {"slot_id": "base", "substance_id": "cas:534-17-8"},
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:534-17-8", "amount": 2.0, "amount_unit": "equivalent"},
             {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
           ]
         }
       ],
+      "temperature_c": 100.0,
+      "time_h": 18.0,
+      "concentration_m": 0.2,
       "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.1, "maximum": 1.2, "unit": "equivalent"}
+      ],
       "notes": [
-        "Temperature, time, loadings, and concentration require curation before activation."
+        "Complete draft screening recipes derived from the legacy BH_CN_03 rule; primary-procedure review is required before activation."
       ],
       "provenance": {
         "basis": "initial_expert_definition",
@@ -330,20 +350,405 @@
           "status": "draft",
           "priority": 100,
           "selections": [
-            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9"},
-            {"slot_id": "base", "substance_id": "cas:7778-53-2"},
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:7778-53-2", "amount": 2.0, "amount_unit": "equivalent"},
             {"slot_id": "solvent", "substance_id": "cas:75-05-8"}
           ]
         }
       ],
+      "temperature_c": 100.0,
+      "time_h": 18.0,
+      "concentration_m": 0.2,
       "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.1, "maximum": 1.2, "unit": "equivalent"}
+      ],
       "forbidden_substance_ids": ["cas:51364-51-3"],
       "notes": [
         "Fallback only; more specific nucleophile rules take precedence.",
-        "Temperature, time, loadings, and concentration require curation before activation."
+        "Complete draft fallback derived from BH_CN_05; primary-procedure review is required before activation."
       ],
       "provenance": {
         "basis": "initial_expert_definition",
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.primary_aryl_amine.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "present_alternatives",
+          "alternatives": [
+            {"substance_id": "cas:1470372-59-8", "preference": 100},
+            {"substance_id": "cas:1536473-72-9", "preference": 90}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "present_alternatives",
+          "alternatives": [
+            {"substance_id": "cas:7778-53-2", "preference": 100},
+            {"substance_id": "cas:534-17-8", "preference": 90}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:123-91-1", "preference": 100}
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "variant_id": "brettphos_pd_k3po4_dioxane.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1470372-59-8", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:7778-53-2", "amount": 2.0, "amount_unit": "equivalent"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        },
+        {
+          "variant_id": "tbu_brettphos_cs2co3_dioxane.v1",
+          "status": "draft",
+          "priority": 90,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1536473-72-9", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:534-17-8", "amount": 2.0, "amount_unit": "equivalent"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        }
+      ],
+      "temperature_c": 100.0,
+      "time_h": 16.0,
+      "concentration_m": 0.2,
+      "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.1, "maximum": 1.2, "unit": "equivalent"}
+      ],
+      "notes": [
+        "Aniline-class screening default derived from the bounded free-amine fallback; primary-procedure review is required before activation."
+      ],
+      "provenance": {
+        "basis": "legacy_buchwald_hartwig_cn_rulebook_plus_expert_review",
+        "source_rule_ids": ["BH_CN_05"],
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.secondary_aryl_amine.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:1375325-77-1", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:534-17-8", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:123-91-1", "preference": 100}
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "variant_id": "xantphos_pd_cs2co3_dioxane.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1375325-77-1", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:534-17-8", "amount": 2.0, "amount_unit": "equivalent"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        }
+      ],
+      "temperature_c": 100.0,
+      "time_h": 18.0,
+      "concentration_m": 0.2,
+      "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.1, "maximum": 1.2, "unit": "equivalent"}
+      ],
+      "notes": [
+        "Secondary aryl-containing amine screening default; primary-procedure review is required before activation."
+      ],
+      "provenance": {
+        "basis": "legacy_buchwald_hartwig_cn_rulebook_plus_expert_review",
+        "source_rule_ids": ["BH_CN_02", "BH_CN_05"],
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.free_amine.ar_cl.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:1445972-29-1", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:865-48-5", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:123-91-1", "preference": 100}
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "variant_id": "ad_brettphos_pd_naotbu_dioxane.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1445972-29-1", "amount": 2.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:865-48-5", "amount": 1.5, "amount_unit": "equivalent"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        }
+      ],
+      "temperature_c": 100.0,
+      "time_h": 16.0,
+      "concentration_m": 0.2,
+      "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.1, "maximum": 1.2, "unit": "equivalent"}
+      ],
+      "notes": [
+        "Aryl-chloride activation screening override for free amines; primary-procedure review is required before activation."
+      ],
+      "provenance": {
+        "basis": "legacy_buchwald_hartwig_cn_rulebook_plus_expert_review",
+        "source_rule_ids": ["BH_CN_01", "BH_CN_02", "BH_CN_05"],
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.free_amine.hindered_ar_br.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:1445972-29-1", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:865-48-5", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:123-91-1", "preference": 100}
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "variant_id": "ad_brettphos_pd_naotbu_dioxane.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1445972-29-1", "amount": 3.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:865-48-5", "amount": 2.0, "amount_unit": "equivalent"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        }
+      ],
+      "temperature_c": 110.0,
+      "time_h": 18.0,
+      "concentration_m": 0.15,
+      "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.2, "maximum": 1.5, "unit": "equivalent"}
+      ],
+      "notes": [
+        "Highly ortho-hindered aryl-bromide screening override; primary-procedure review is required before activation."
+      ],
+      "provenance": {
+        "basis": "legacy_buchwald_hartwig_cn_rulebook_plus_expert_review",
+        "source_rule_ids": ["BH_CN_01", "BH_CN_02", "BH_CN_05"],
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.free_amine.hindered_nucleophile_ar_br.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:1445972-29-1", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:865-48-5", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:123-91-1", "preference": 100}
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "variant_id": "ad_brettphos_pd_naotbu_dioxane.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1445972-29-1", "amount": 3.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:865-48-5", "amount": 2.0, "amount_unit": "equivalent"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        }
+      ],
+      "temperature_c": 110.0,
+      "time_h": 18.0,
+      "concentration_m": 0.15,
+      "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.2, "maximum": 1.5, "unit": "equivalent"}
+      ],
+      "notes": [
+        "Alpha-branched free-amine screening override for aryl bromides; primary-procedure review is required before activation."
+      ],
+      "provenance": {
+        "basis": "legacy_buchwald_hartwig_cn_rulebook_plus_expert_review",
+        "source_rule_ids": ["BH_CN_01", "BH_CN_02", "BH_CN_05"],
+        "review_required": true
+      }
+    },
+    {
+      "template_id": "pd_sp2_cn.free_amine.hindered_ar_cl.v1",
+      "status": "draft",
+      "slots": [
+        {
+          "slot_id": "precatalyst",
+          "role_id": "metal_catalyst",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:1445972-29-1", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "base",
+          "role_id": "base",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:865-48-5", "preference": 100}
+          ]
+        },
+        {
+          "slot_id": "solvent",
+          "role_id": "solvent",
+          "required": true,
+          "selection_policy": "select_one",
+          "alternatives": [
+            {"substance_id": "cas:123-91-1", "preference": 100}
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "variant_id": "ad_brettphos_pd_naotbu_dioxane.v1",
+          "status": "draft",
+          "priority": 100,
+          "selections": [
+            {"slot_id": "precatalyst", "substance_id": "cas:1445972-29-1", "amount": 4.0, "amount_unit": "mol_percent"},
+            {"slot_id": "base", "substance_id": "cas:865-48-5", "amount": 2.0, "amount_unit": "equivalent"},
+            {"slot_id": "solvent", "substance_id": "cas:123-91-1"}
+          ]
+        }
+      ],
+      "temperature_c": 110.0,
+      "time_h": 24.0,
+      "concentration_m": 0.15,
+      "atmosphere": "N2",
+      "partner_amounts": [
+        {"role": "electrophile", "minimum": 1.0, "maximum": 1.0, "unit": "equivalent"},
+        {"role": "nucleophile", "minimum": 1.2, "maximum": 1.5, "unit": "equivalent"}
+      ],
+      "notes": [
+        "Combined aryl-chloride and severe-steric-demand screening override; primary-procedure review is required before activation."
+      ],
+      "provenance": {
+        "basis": "legacy_buchwald_hartwig_cn_rulebook_plus_expert_review",
+        "source_rule_ids": ["BH_CN_01", "BH_CN_02", "BH_CN_05"],
         "review_required": true
       }
     }
