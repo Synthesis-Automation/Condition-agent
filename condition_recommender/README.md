@@ -1,45 +1,92 @@
-# Reaction-Label Condition Recommender
+# Condition Recommender
 
-## Declarative expert rules
+`condition_recommender` contains several condition-recommendation approaches at
+different stages of maturity. They share reaction observations from
+`reactive_taxonomy` and canonical condition identities and recipes from
+`condition_registry`, but they are not interchangeable.
 
-The clean expert-rule definitions live under `definitions/rule_sets/`. They
-match allowlisted structural facts from `reactive_taxonomy`, reference recipe
-templates owned by `condition_registry`, and do not match source reaction names
-or display labels. The first definition set covers palladium condition proposals
-for verified `sp2_c_n_substitution` events.
+There is currently no automatic fallback from one recommendation path to
+another. Callers must choose the path explicitly and preserve its provenance,
+warnings, and uncertainty.
 
-```python
-from condition_recommender.rules import load_condition_rule_set
+## Recommendation paths and status
 
-rule_set = load_condition_rule_set()
-```
+| Path | Public entry point | Current status | Intended use |
+| --- | --- | --- | --- |
+| Expert structural rules | `recommend_rule_conditions()` | Phase I C-N engine and definitions implemented; one production rule and multiple review-only drafts | Auditable starter protocols selected from explicit molecular facts |
+| Generic structure-backed retrieval | `recommend_generic_conditions()` | Functional pilot; coverage and calibration depend on converted structure-rich records | Type-agnostic precedent retrieval and canonical recipe aggregation |
+| Suzuki-specific structural retrieval | `recommend_conditions()` | Narrow earlier pilot; not the intended long-term general path | Existing verified Suzuki pilot datasets |
+| Weak-label retrieval | `recommend_conditions_from_labels()` | Functional transitional path with important data limitations | Datasets that contain reaction labels but not precedent structures |
 
-Loading performs strict shape, taxonomy-vocabulary, role, environment,
-substance-identity, and cross-package template validation. The Phase I C-N
-rules cover bounded intermolecular Ar/HeteroAr substitution and use a
-deterministic hierarchy:
+Supporting audit, conversion, indexing, and evaluation commands prepare data for
+these paths; they do not recommend conditions by themselves.
 
-1. combined hindered-Ar-Cl structural override;
-2. Ar-Cl, hindered-Ar-Br, or alpha-branched-amine structural override;
-3. primary/secondary alkyl amine, primary/secondary aryl amine, aromatic N-H,
-   or primary-amide class default;
-4. bounded free-amine Ar-Br fallback.
+## Which path should I use?
 
-Within the first matching tier, only the highest-priority rule is selected.
-A matching draft override blocks a lower-priority production default, avoiding
-unsafe fallback around a known special case. Ar-F, uncurated leaving groups,
-intramolecular reactions, and unsupported nitrogen classes abstain. The rule
-engine proposes a palladium condition regime from structural evidence; it does
-not claim that a generic `sp2_c_n_substitution` product proves a
-Buchwald-Hartwig mechanism.
+- Use expert rules when the reaction is inside a reviewed rule scope and an
+  explicit starter protocol is desired.
+- Use generic structure-backed retrieval when a compatible converted record set
+  or persisted generic index is available.
+- Use the Suzuki-specific path only for the existing Suzuki pilot.
+- Use weak-label retrieval only when structure-rich precedents are unavailable,
+  and retain its uncertainty warnings.
+- Abstain when the selected path cannot support the query. Do not silently call
+  a weaker path and present the result as equivalent evidence.
 
-The narrow primary-amide/aryl-chloride rule remains the only active rule and
-has a complete primary-literature protocol. The other defaults and overrides
-are complete, explicitly materializable screening drafts derived from the
-legacy Buchwald-Hartwig rulebook plus expert refinement. They require
-primary-procedure review before activation.
+## Expert rule-based recommendation
 
-The production API excludes drafts by default:
+### Design
+
+Expert rules live under `definitions/rule_sets/`. They:
+
+- match allowlisted structural facts from `reactive_taxonomy`;
+- never route using source reaction names, display labels, or legacy rule IDs;
+- reference explicit recipe templates owned by `condition_registry`;
+- apply chemistry scope and compatibility checks before returning a recipe;
+- report complete match evidence and failed predicates;
+- distinguish reviewed production rules from review-only drafts.
+
+Legacy rulebook identifiers may appear only in provenance. They do not determine
+whether a rule matches.
+
+### Phase I C-N scope
+
+The first rule set proposes palladium conditions for verified, single-event,
+intermolecular `sp2_c_n_substitution` reactions.
+
+The current hierarchy is:
+
+1. combined hindered-Ar-Cl override;
+2. Ar-Cl, hindered-Ar-Br, or alpha-branched-amine override;
+3. nucleophile-class default;
+4. bounded free-amine Ar-Br fallback;
+5. typed abstention when no supported rule matches.
+
+Defaults currently distinguish:
+
+- primary alkyl amines;
+- secondary alkyl amines, including cyclic secondary amines;
+- primary aryl and heteroaryl amines;
+- secondary aryl-containing amines;
+- aromatic N-H partners;
+- primary carboxamides.
+
+Structural overrides and defaults are selected deterministically. Within the
+first matching tier, only the highest-priority rule is selected. A matching
+draft override blocks a lower-priority production default, preventing unsafe
+fallback around a recognized special case.
+
+The Phase I rules abstain from unsupported handles and chemistry, including
+Ar-F, uncurated pseudohalides, intramolecular reactions, multi-event reactions,
+and unsupported nitrogen classes. An electron-poor heteroaryl halide may also
+support SNAr; proposing palladium conditions does not assert that the product
+proves a Buchwald-Hartwig mechanism.
+
+### Production status
+
+The primary-amide/aryl-chloride rule is currently the only active rule. It uses
+a located primary-literature protocol and returns a fully specified
+tBuBrettPhos Pd G3/K3PO4/t-BuOH recipe.
 
 ```python
 from condition_recommender import recommend_rule_conditions
@@ -49,33 +96,85 @@ result = recommend_rule_conditions(
 )
 ```
 
-It returns the reviewed tBuBrettPhos Pd G3/K3PO4/t-BuOH protocol with catalyst
-loading, equivalents, partner stoichiometry, temperature, time, concentration,
-atmosphere, compatibility evidence, and source provenance. The active rule is
-restricted to primary amides and aryl chlorides; it does not extrapolate to
-bromides or secondary amides.
+Production mode excludes every draft rule and draft recipe variant.
 
-Structurally evaluate the draft rules during review with an explicit opt-in:
+### Review the draft C-N rules
+
+The remaining C-N defaults and structural overrides contain explicit screening
+recipes derived from the legacy Buchwald-Hartwig rulebook plus expert
+refinement. Their identities, loadings, equivalents, partner stoichiometry,
+temperature, time, concentration, and atmosphere are complete, but they remain
+drafts until checked against located primary procedures.
+
+Enable them only for review:
 
 ```powershell
+# Primary-alkyl-amine Ar-Br default
 python -m condition_recommender.rule_recommend_cli `
   "Brc1ccccc1.CN>>CNc1ccccc1" `
   --include-draft
+
+# Ar-Cl structural override
+python -m condition_recommender.rule_recommend_cli `
+  "Clc1ccccc1.CN>>CNc1ccccc1" `
+  --include-draft
+
+# Ortho-hindered Ar-Br structural override
+python -m condition_recommender.rule_recommend_cli `
+  "Cc1cccc(C)c1Br.CN>>Cc1cccc(C)c1NC" `
+  --include-draft
+
+# Alpha-branched-amine structural override
+python -m condition_recommender.rule_recommend_cli `
+  "Brc1ccccc1.CC(C)(C)N>>CC(C)(C)Nc1ccccc1" `
+  --include-draft
 ```
 
-The review result contains the selected specificity tier and rule kind
-(`default`, `structural_override`, or `fallback`), structural match evidence,
-failed predicates for every nonmatching rule, the referenced recipe template,
-canonical recipes for its explicit variants, compatibility scores and evidence,
-hard-excluded variants, and a draft warning. Without `--include-draft`,
-structural matches are reported in the trace but draft recipes are excluded from
-recommendations. Template alternatives that are not part of an explicit variant
-are never materialized implicitly.
+The result reports:
 
-## Mixed dataset audit
+- `rule_kind`: `default`, `structural_override`, or `fallback`;
+- selected tier and priority;
+- structural match evidence;
+- failures for every nonmatching rule;
+- explicit canonical recipe variants;
+- compatibility scores, penalties, and hard exclusions;
+- draft and fallback warnings;
+- rule, taxonomy, template, and recipe definition versions.
 
-Audit a CSV file or directory before conversion without modifying the source
-data:
+Without `--include-draft`, structural draft matches remain visible in
+`match_traces`, but their recipes are not returned.
+
+Load and validate the rule definitions directly:
+
+```python
+from condition_recommender.rules import load_condition_rule_set
+
+rule_set = load_condition_rule_set()
+```
+
+Loading performs strict schema, taxonomy-vocabulary, environment, role,
+substance-identity, template-reference, status, and provenance validation.
+
+### Rule path limitations and remaining work
+
+The following work is still required before the C-N drafts can be activated:
+
+- verify every draft against a located primary procedure;
+- complete an independent C-N applicability and recipe benchmark;
+- add blind chemist review artifacts and disagreement tracking;
+- calibrate which coordination and functional-group risks should be hard
+  exclusions rather than cautions;
+- add separately reviewed regimes for currently unsupported handles,
+  intramolecular C-N formation, and additional deactivated nitrogen classes.
+
+## Generic structure-backed recommendation
+
+This is the intended type-agnostic precedent path. It operates on canonical
+converted records rather than reaction-name partitions.
+
+### Audit and convert a structure-rich dataset
+
+Audit source data without modifying it:
 
 ```powershell
 python -m condition_recommender.audit_cli `
@@ -84,15 +183,7 @@ python -m condition_recommender.audit_cli `
   --chemistry-sample-per-file 100
 ```
 
-Metadata, canonical reaction identities, duplicate groups, yields, and condition
-registry coverage are computed over every row. Full reaction featurization uses
-a deterministic per-file sample so large corpora remain practical. The command
-writes `audit_report.json` and `audit_report.md`.
-
-## Generic mixed-dataset conversion
-
-Convert a single CSV or an entire directory without selecting a named reaction
-family:
+Convert a CSV file or directory:
 
 ```powershell
 python -m condition_recommender.generic_conversion_cli `
@@ -100,150 +191,125 @@ python -m condition_recommender.generic_conversion_cli `
   results/generic_conversion
 ```
 
-For a bounded smoke test, add `--max-rows 1000`. This limit reads source rows in
-file order and is not a statistically representative sample. The converter
-writes canonical nested records to `records.jsonl`, tiered CSV review views, and
-JSON/Markdown coverage reports. Exact reconstructed signatures and valid mapped
-signatures can be verified even when `named_family` is absent. Source family
-labels are retained only as provenance.
+The converter writes canonical nested `records.jsonl`, tiered CSV review views,
+and JSON/Markdown coverage reports. Exact reconstructed signatures and valid
+mapped signatures may be admitted even when `named_family` is absent. Source
+family labels are provenance only.
 
-## Type-agnostic recommendation
-
-Recommend canonical resolved recipes directly from converted JSONL records:
-
-```powershell
-python -m condition_recommender.generic_recommend_cli `
-  "c1ccc2[nH]cnc2c1.COc1ccc(B(O)O)cc1>>COc1ccc(-n2cnc3ccccc32)cc1" `
-  --records results/generic_conversion_chan_lam_pilot/records.jsonl
-```
-
-Retrieval uses the first signature tier with adequate support: exact signature,
-relaxed handle signature, high-confidence named family, generic transformation,
-or compatible bond edits and environments. A hard bond-edit gate prevents
-fallback to precedents with incompatible net chemistry. Results aggregate by
-canonical `RCR1` recipe and report support, dataset diversity, expected yield,
-precedent IDs, explanations, and condition-identity cautions.
-
-Reaction topology is part of the L0-L2 signature tiers and of fallback
-similarity. Intramolecular precedents are preferred for intramolecular queries;
-ring-size proximity refines cyclization matches. L3 remains a deliberately
-topology-agnostic bond-edit fallback. If that fallback crosses reaction scope,
-the result reports `REACTION_TOPOLOGY_FALLBACK_USED` and identifies the mismatch
-in each affected recommendation.
-
-Multi-event reactions are indexed by their complete deterministic event
-multiset at L0-L2. The L3 hard gate continues to compare the complete net bond
-edits, so a precedent covering only one event cannot silently stand in for a
-mixed transformation. Canonical JSONL records retain nested events and event
-relations; CSV review output exposes `reaction_event_count` and
-`reaction_event_scope`.
-
-Before ranking, `compatibility.v1.json` compares unchanged spectator-group tags
-from `reactive_taxonomy` with contextual role buckets and curated family IDs in
-the resolved recipe. Explicit oxidation, reduction, acid, and moisture conflicts
-are excluded. Hydrolysis, acid/base, metal-coordination, and catalyst-poisoning
-risks remain eligible with auditable penalties and cautions. Overlapping risks
-within one category use only the strongest penalty. The same definition checks
-oxidative or hydrogen atmospheres, strengthens hydrolysis penalties for hot
-aqueous recipes, and validates mandatory catalyst roles for named metal-coupling
-regimes. Unresolved condition identities turn a missing-role decision into a
-penalty rather than an unsupported hard rejection.
-
-## Persisted index and held-out evaluation
-
-Build a deterministic, integrity-checked index once and reuse it for queries:
+### Build an index and recommend
 
 ```powershell
 python -m condition_recommender.generic_index_cli `
-  results/generic_conversion_chan_lam_pilot/records.jsonl `
-  results/generic_conversion_chan_lam_pilot/generic_index.json
+  results/generic_conversion/records.jsonl `
+  results/generic_conversion/generic_index.json
+
+python -m condition_recommender.generic_recommend_cli `
+  "<reaction_smiles>" `
+  --records results/generic_conversion/generic_index.json
 ```
 
-The index stores only admitted signature/recipe precedents and has a content-based
-`GRI1` identity. Both `records.jsonl` and the persisted index are accepted by the
-generic recommendation CLI.
+Retrieval follows a chemistry hierarchy: exact signature, relaxed handle
+signature, high-confidence family, generic transformation, then compatible bond
+edits and environments. Hard bond-edit and recipe-compatibility gates run before
+similarity and aggregation.
 
-Generic index schema 1.1 records the reaction-signature schema, taxonomy
-definition versions, recommendation-record schema, and converter version. Stale
-or mixed converted records are rejected instead of silently falling through to
-less-specific keys. Re-run generic conversion and rebuild the index after any
-signature schema or identity-definition change.
+Results aggregate by canonical `RCR1` recipe and report retrieval level,
+support, dataset diversity, expected yield, precedent IDs, compatibility
+evidence, explanations, and cautions.
 
-Run a canonical-reaction-group held-out benchmark:
+Reaction topology participates in the more specific signature tiers. A
+topology-agnostic fallback is allowed only with an explicit
+`REACTION_TOPOLOGY_FALLBACK_USED` warning. Multi-event queries and precedents
+are compared using their complete event and net-edit sets.
+
+### Held-out evaluation
 
 ```powershell
 python -m condition_recommender.evaluation_cli `
-  results/generic_conversion_chan_lam_pilot/generic_index.json `
-  results/generic_conversion_chan_lam_evaluation `
+  results/generic_conversion/generic_index.json `
+  results/generic_conversion_evaluation `
   --test-fraction 0.2 --seed 17 --top-k 5
 ```
 
-Every `CRX1` group is assigned wholly to train or test, preventing duplicate
-observations and alternate recipes for the same reaction from leaking across the
-boundary. The report includes retrieval coverage, fallback levels, top-1/top-k
-recipe recovery, recipe-seen conditional recovery, yield MAE, compatibility
-exclusions, and a zero-tolerance count of hard-incompatible recommendations.
+Canonical reaction groups remain wholly in train or test. The report includes
+coverage, fallback levels, top-1/top-k recipe recovery, conditional recovery
+when the recipe was observed in training, yield MAE, compatibility exclusions,
+and the count of hard-incompatible recommendations.
 
-This CLI recommends reaction conditions from the cleaned HTE label dataset.
-It uses `reactive_taxonomy` to identify the reaction grammar and reactive
-functional-group signatures, then returns the five highest-ranked condition
-recipes from compatible precedents.
+### Generic path limitations
 
-## Basic usage
+- Performance depends on the quality and coverage of the supplied converted
+  records.
+- Current evaluation datasets are pilots and do not establish broad production
+  validity.
+- Registry coverage and role normalization are still incomplete for some
+  source datasets.
+- Retrieval calibration across all supported transformation classes is not
+  finished.
 
-Run the command from the repository root:
+## Suzuki-specific structural pilot
+
+`recommend_conditions()` is an earlier, Suzuki-only structural precedent path:
+
+```python
+from condition_recommender import recommend_conditions
+
+result = recommend_conditions(
+    "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+    records_path="results/suzuki_recommendation_pilot/verified.csv",
+)
+```
+
+It requires an exactly verified Suzuki reaction and a verified pilot CSV. It
+does not support general reaction classes, and temperature and time are not
+modeled. New cross-family work should target the generic structure-backed path
+instead of expanding this specialized implementation.
+
+## Weak-label recommendation
+
+The weak-label path uses a cleaned flat CSV whose precedent rows contain source
+reaction labels and reactive-site labels rather than reaction structures.
 
 ```powershell
-python -m condition_recommender.recommend_cli "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+python -m condition_recommender.recommend_cli `
+  "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
 ```
 
-The input must be a complete reaction SMILES containing reactants and a
-product:
-
-```text
-reactant1.reactant2>>product
-```
-
-The CLI returns JSON containing the detected reaction grammar, query FG
-signatures, candidate count, and ranked condition recommendations.
-
-## Options
-
-Return a different number of recommendations:
+Options:
 
 ```powershell
 python -m condition_recommender.recommend_cli "<reaction_smiles>" --top-k 10
-```
 
-Use another cleaned dataset:
-
-```powershell
 python -m condition_recommender.recommend_cli "<reaction_smiles>" `
   --records datasets/reaction_label/v2.1_cleaned.csv
 ```
 
-Show all options:
+The query reaction is structure-verified with `reactive_taxonomy`, but precedent
+rows are not. The implementation:
 
-```powershell
-python -m condition_recommender.recommend_cli --help
-```
+1. assigns a query reaction grammar;
+2. restricts source reaction types through a declarative crosswalk;
+3. matches two reactive participants as an unordered pair;
+4. ranks by functional-group signature and structural qualifiers;
+5. uses yield, z-score, and support as lower-weight signals;
+6. aggregates identical raw condition recipes.
 
-## Cleaned CSV schema
+Weights live in `definitions/label_retrieval.v1.json`.
 
-The recommender uses one flat CSV. Its main columns are ordered for convenient
-filtering and manual review:
+Important limitations:
 
-- `source_reaction_type`
-- `reactive_site_1_normalized_label` and `reactive_site_2_normalized_label`
-- `reactive_site_1_display_label` and `reactive_site_2_display_label`
-- `yield_pct` and `z_score`
-- catalyst, ligand, base, solvent, additive, and procedure columns
+- precedent reactions are not structure-verified;
+- source reactive-site order is unreliable and treated as unordered;
+- condition names are not yet normalized through `condition_registry`;
+- reaction topology cannot be recovered from the precedent rows;
+- only structurally verified intermolecular queries are accepted;
+- recommendations are weak-label precedents, not verified literature matches.
 
-Additional `reactive_site_1_*` and `reactive_site_2_*` columns preserve the
-original source labels, taxonomy signatures, qualifiers, and mapping status.
-An unresolved label is retained verbatim and has `mapping_status=unresolved`.
+The path returns explicit warnings including
+`WEAK_LABEL_PRECEDENTS_NOT_STRUCTURE_VERIFIED` and
+`CONDITION_NAMES_NOT_REGISTRY_NORMALIZED`.
 
-Regenerate the cleaned CSV from the repository root with:
+Regenerate the cleaned CSV with:
 
 ```powershell
 python -m scripts.clean_reaction_label_csv `
@@ -251,57 +317,39 @@ python -m scripts.clean_reaction_label_csv `
   datasets/reaction_label/v2.1_cleaned.csv
 ```
 
-## Ranking logic
+## Shared compatibility behavior
 
-The recommender:
+`definitions/compatibility.v1.json` compares unchanged query spectator groups
+with contextual recipe roles and condition families.
 
-1. Verifies the reaction and assigns a grammar with `reactive_taxonomy`.
-2. Filters the dataset to compatible source reaction families.
-3. Matches `reactive_site_1` and `reactive_site_2` as an unordered pair.
-4. Ranks primarily by FG-signature similarity.
-5. Uses attachment and branching qualifiers to refine close matches.
-6. Uses yield, z-score, and precedent support as lower-weight signals.
-7. Aggregates identical condition recipes and returns distinct results.
+Hard conflicts currently include explicit oxidation, reduction, acid, moisture,
+and atmosphere conflicts. Hydrolysis, acid/base, metal coordination, and
+catalyst-poisoning risks generally remain eligible with auditable penalties and
+cautions. Within one penalty category, only the strongest matching penalty is
+applied.
 
-The ranking weights are configured in
-`condition_recommender/definitions/label_retrieval.v1.json`.
+Compatibility evidence does not repair an unsupported transformation or make a
+draft recipe production-ready.
 
-## Supported reaction grammars
+## Input contract
 
-The cleaned dataset currently supports:
+Recommendation APIs require a complete product-specified reaction SMILES:
 
-- Suzuki–Miyaura coupling
-- C–N substitution and coupling
-- Amide formation
-- C–O substitution and coupling
-- C–S substitution and coupling
-- Sonogashira coupling
-- Negishi coupling
+```text
+reactant1.reactant2>>product
+```
 
-Unsupported or structurally ambiguous reactions return an error instead of
-falling back to an unrelated reaction family.
+Invalid, unsupported, ambiguous, or chemically conflicting inputs return a
+typed error or abstention rather than an unrelated recommendation.
 
-## Output
+## Development status
 
-Each recommendation includes:
+The package is moving toward one canonical structure-backed recommendation
+workflow. Until parity and evaluation gates are complete:
 
-- rank and overall score;
-- signature and qualifier similarity;
-- expected yield and mean z-score;
-- number of supporting precedents;
-- source row numbers;
-- base, catalyst, solvents, ligand, additives, and procedure text;
-- a short explanation of the match.
-
-## Important limitations
-
-The source CSV contains reaction labels rather than reaction structures for
-its precedent rows. Recommendations are therefore weak-label precedents, not
-structure-verified literature matches. Reactive-site order in the source data
-is not reliable and is treated as unordered. Condition names have also not yet
-been normalized to condition-registry identities. Because reaction scope and
-ring formation cannot be reconstructed from these rows, the weak-label
-recommender accepts only structurally verified intermolecular queries and returns
-`QUERY_TOPOLOGY_NOT_SUPPORTED_BY_LABEL_DATASET` for intramolecular, mixed,
-unimolecular, or unresolved topology. Use the generic structure-backed path for
-those reactions.
+- expert C-N rules remain a separate explicit path;
+- generic retrieval remains the preferred cross-family direction;
+- the Suzuki-specific pilot remains narrow;
+- weak-label retrieval remains transitional;
+- application code must not merge results from these paths without preserving
+  their evidence level and provenance.
