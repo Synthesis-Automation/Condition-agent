@@ -164,17 +164,25 @@ python -m condition_recommender.rule_recommend_cli `
 
 The result reports:
 
-- `rule_kind`: `default`, `structural_override`, or `fallback`;
-- selected tier and priority;
-- structural match evidence;
-- failures for every nonmatching rule;
-- explicit canonical recipe variants;
-- compatibility scores, penalties, and hard exclusions;
-- draft and fallback warnings;
-- rule, taxonomy, template, and recipe definition versions.
+- the selected rule and whether it is a default, structural override, or
+  fallback;
+- canonical recipe components with quantities;
+- temperature, time, concentration, atmosphere, and partner stoichiometry;
+- compatibility score, rationale, cautions, and review flags.
 
-Without `--include-draft`, structural draft matches remain visible in
-`match_traces`, but their recipes are not returned.
+This concise review view is the default. Add `--json` to emit the complete
+audit payload, including structural match evidence, failures for nonmatching
+rules, excluded variants, provenance, and definition versions:
+
+```powershell
+python -m condition_recommender.rule_recommend_cli `
+  "Clc1ccccc1.CN>>CNc1ccccc1" `
+  --include-draft `
+  --json
+```
+
+Without `--include-draft`, structural draft matches remain visible in the
+complete JSON `match_traces`, but their recipes are not returned.
 
 Load and validate the rule definitions directly:
 

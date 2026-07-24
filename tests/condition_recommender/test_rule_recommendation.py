@@ -394,6 +394,7 @@ def test_rule_cli_requires_explicit_draft_opt_in(
             "rule-recommend",
             "Brc1ccccc1.CN>>CNc1ccccc1",
             "--include-draft",
+            "--json",
         ],
     )
 
@@ -404,3 +405,28 @@ def test_rule_cli_requires_explicit_draft_opt_in(
         "pd_sp2_cn.primary_alkyl_amine.v1"
     )
     assert "DRAFT_RULES_INCLUDED" in payload["warnings"]
+
+
+def test_rule_cli_defaults_to_concise_review_output(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "rule-recommend",
+            "Clc1ccccc1.CN>>CNc1ccccc1",
+            "--include-draft",
+        ],
+    )
+
+    rule_cli_main()
+
+    output = capsys.readouterr().out
+    assert "Transformation: sp2_c_n_substitution" in output
+    assert "AdBrettPhos Pd G3, 2 mol%" in output
+    assert "Sodium tert-butoxide, 1.5 equiv" in output
+    assert "Conditions: 100 C; 16 h; 0.2 M; N2" in output
+    assert "Stoichiometry: electrophile 1 equiv; nucleophile 1.1-1.2 equiv" in output
+    assert "match_traces" not in output
+    assert '"recipe_template"' not in output
