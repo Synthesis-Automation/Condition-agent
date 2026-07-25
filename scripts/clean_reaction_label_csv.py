@@ -26,24 +26,18 @@ SOURCE_TO_OUTPUT = {
     "conditions": "procedure_text",
 }
 
-SITE_SUFFIXES = (
-    "source_label",
-    "normalized_label",
+OUTPUT_SITE_SUFFIXES = (
     "display_label",
     "signature",
     "center_class",
     "attachment_class",
     "alpha_branched",
-    "qualifier_scope",
-    "mapping_status",
 )
 
 OUTPUT_FIELDNAMES = (
     "source_reaction_type",
-    "reactive_site_1_normalized_label",
-    "reactive_site_2_normalized_label",
-    "reactive_site_1_display_label",
-    "reactive_site_2_display_label",
+    *(f"reactive_site_1_{suffix}" for suffix in OUTPUT_SITE_SUFFIXES),
+    *(f"reactive_site_2_{suffix}" for suffix in OUTPUT_SITE_SUFFIXES),
     "yield_pct",
     "z_score",
     "catalyst",
@@ -55,8 +49,6 @@ OUTPUT_FIELDNAMES = (
     "additive",
     "coupling_reagent",
     "procedure_text",
-    *(f"reactive_site_1_{suffix}" for suffix in SITE_SUFFIXES if suffix not in {"normalized_label", "display_label"}),
-    *(f"reactive_site_2_{suffix}" for suffix in SITE_SUFFIXES if suffix not in {"normalized_label", "display_label"}),
 )
 
 
@@ -96,7 +88,13 @@ def clean_rows(
         ):
             source = (row.get(source_column) or "").strip()
             mapping = resolve_source_label(source)
-            output.update(mapping.to_columns(prefix))
+            mapping_columns = mapping.to_columns(prefix)
+            output.update(
+                {
+                    f"{prefix}_{suffix}": mapping_columns[f"{prefix}_{suffix}"]
+                    for suffix in OUTPUT_SITE_SUFFIXES
+                }
+            )
             stats[f"mapping_status:{mapping.mapping_status}"] += 1
             if mapping.base_label != source:
                 stats[f"replaced:{source}->{mapping.base_label}"] += 1

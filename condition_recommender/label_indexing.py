@@ -25,15 +25,10 @@ CONDITION_COLUMNS = (
 
 @dataclass(frozen=True)
 class LabelParticipant:
-    source_label: str
-    base_label: str
-    display_label: str
     signature: str
     center_class: Optional[str]
     attachment_class: Optional[str]
     alpha_branched: Optional[bool]
-    qualifier_scope: Optional[str]
-    mapping_status: str
 
 
 @dataclass(frozen=True)
@@ -58,15 +53,10 @@ def _optional_bool(value: str) -> Optional[bool]:
 
 def _participant(row: Dict[str, str], prefix: str) -> LabelParticipant:
     return LabelParticipant(
-        source_label=str(row.get(f"{prefix}_source_label") or "").strip(),
-        base_label=str(row.get(f"{prefix}_normalized_label") or "").strip(),
-        display_label=str(row.get(f"{prefix}_display_label") or "").strip(),
         signature=str(row.get(f"{prefix}_signature") or "").strip(),
         center_class=str(row.get(f"{prefix}_center_class") or "").strip() or None,
         attachment_class=str(row.get(f"{prefix}_attachment_class") or "").strip() or None,
         alpha_branched=_optional_bool(str(row.get(f"{prefix}_alpha_branched") or "")),
-        qualifier_scope=str(row.get(f"{prefix}_qualifier_scope") or "").strip() or None,
-        mapping_status=str(row.get(f"{prefix}_mapping_status") or "unresolved").strip(),
     )
 
 
@@ -85,8 +75,6 @@ def load_label_index(path: str | Path) -> Tuple[LabelIndexedReaction, ...]:
             "source_reaction_type",
             "reactive_site_1_signature",
             "reactive_site_2_signature",
-            "reactive_site_1_mapping_status",
-            "reactive_site_2_mapping_status",
         }
         missing = sorted(required - set(reader.fieldnames or ()))
         if missing:

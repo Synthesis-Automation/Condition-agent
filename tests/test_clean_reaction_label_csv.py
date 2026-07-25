@@ -1,5 +1,5 @@
 from reactive_taxonomy import resolve_source_label, validate_source_label_mappings
-from scripts.clean_reaction_label_csv import clean_rows
+from scripts.clean_reaction_label_csv import OUTPUT_FIELDNAMES, clean_rows
 
 
 def test_reactive_source_label_crosswalk_matches_taxonomy_output() -> None:
@@ -33,7 +33,17 @@ def test_alkene_source_label_maps_to_generic_pi_handle() -> None:
     assert alkene.mapping_status == "canonical"
 
 
-def test_cleanup_maps_supported_labels_and_preserves_unsolved_labels() -> None:
+def test_acid_or_carboxylate_source_label_maps_to_latent_acyl_donor() -> None:
+    acid = resolve_source_label("RCO2H or M")
+
+    assert acid.base_label == "R-C(O)OH"
+    assert acid.display_label == "R–C(O)OH"
+    assert acid.canonical_signature == "EC|Acyl|Alkyl|OH|latent"
+    assert acid.mapping_status == "qualified"
+    assert acid.qualifier_scope == "acid_or_carboxylate_collapsed_to_acid"
+
+
+def test_cleanup_maps_supported_labels_and_filters_invalid_rows() -> None:
     rows = [
         {"FG A": "ArBr", "FG B": "RNH2"},
         {"FG A": "RCO2H or M", "FG B": "RNH2 a-branch"},
@@ -45,19 +55,35 @@ def test_cleanup_maps_supported_labels_and_preserves_unsolved_labels() -> None:
     cleaned, stats = clean_rows(rows)
 
     assert len(cleaned) == 2
-    assert cleaned[0]["reactive_site_1_source_label"] == "ArBr"
-    assert cleaned[0]["reactive_site_1_normalized_label"] == "Ar-Br"
+    assert set(cleaned[0]) == set(OUTPUT_FIELDNAMES)
     assert cleaned[0]["reactive_site_1_display_label"] == "Ar–Br"
-    assert cleaned[0]["reactive_site_2_normalized_label"] == "R-NH2"
+    assert cleaned[0]["reactive_site_2_display_label"] == "R–NH₂"
+    assert cleaned[0]["reactive_site_1_signature"] == "LG|Ar|Br"
+    assert cleaned[0]["reactive_site_2_signature"] == "XH|N|H2|Alkyl"
     assert cleaned[0]["reactive_site_2_center_class"] == "primary"
 
-    assert cleaned[1]["reactive_site_1_normalized_label"] == "RCO2H or M"
-    assert cleaned[1]["reactive_site_1_mapping_status"] == "unresolved"
-    assert cleaned[1]["reactive_site_2_normalized_label"] == "R-NH2"
+    assert cleaned[1]["reactive_site_1_signature"] == "EC|Acyl|Alkyl|OH|latent"
     assert cleaned[1]["reactive_site_2_alpha_branched"] == "true"
-    assert cleaned[1]["reactive_site_2_mapping_status"] == "qualified"
 
     assert stats["matched_both_blank"] == 1
     assert stats["matched_identical"] == 2
     assert stats["matched_protecting_group"] == 1
     assert stats["removed_union"] == 3
+
+
+def test_output_schema_keeps_display_labels_but_excludes_dead_metadata() -> None:
+    excluded = {
+        f"reactive_site_{index}_{suffix}"
+        for index in (1, 2)
+        for suffix in (
+            "source_label",
+            "normalized_label",
+            "qualifier_scope",
+            "mapping_status",
+        )
+    }
+
+    assert len(OUTPUT_FIELDNAMES) == 22
+    assert "reactive_site_1_display_label" in OUTPUT_FIELDNAMES
+    assert "reactive_site_2_display_label" in OUTPUT_FIELDNAMES
+    assert excluded.isdisjoint(OUTPUT_FIELDNAMES)

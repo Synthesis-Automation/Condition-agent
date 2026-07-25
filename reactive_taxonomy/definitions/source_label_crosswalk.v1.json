@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "description": "Source-label mappings to reactive handles and source-asserted environment qualifiers.",
   "mappings": [
     {"source_label": "ArBr", "base_label": "Ar-Br", "display_label": "Ar–Br", "representative_smiles": "Brc1ccccc1", "canonical_signature": "LG|Ar|Br", "mapping_status": "canonical"},
@@ -23,6 +23,7 @@
     {"source_label": "R2NH", "base_label": "R1R2-NH", "display_label": "R¹R²–NH", "representative_smiles": "CCNCC", "canonical_signature": "XH|N|H1|Alkyl,Alkyl", "center_substitution_class": "secondary", "mapping_status": "canonical"},
     {"source_label": "RCONH2", "base_label": "R-C(O)-NH2", "display_label": "R–C(O)–NH₂", "representative_smiles": "CC(N)=O", "canonical_signature": "XH|N|H2|C(O)R", "center_substitution_class": "primary", "mapping_status": "canonical"},
     {"source_label": "RCONHR", "base_label": "R-C(O)-NHR", "display_label": "R–C(O)–NHR", "representative_smiles": "CC(=O)NC", "canonical_signature": "XH|N|H1|C(O)R,Alkyl", "center_substitution_class": "secondary", "mapping_status": "canonical"},
+    {"source_label": "RCO2H or M", "base_label": "R-C(O)OH", "display_label": "R–C(O)OH", "representative_smiles": "CC(=O)O", "canonical_signature": "EC|Acyl|Alkyl|OH|latent", "qualifier_scope": "acid_or_carboxylate_collapsed_to_acid", "mapping_status": "qualified"},
     {"source_label": "RCO2R", "base_label": "R-C(O)OR", "display_label": "R–C(O)OR", "representative_smiles": "CC(=O)OC", "canonical_signature": "EC|Acyl|Alkyl|OR|ester", "mapping_status": "canonical"},
     {"source_label": "RSO2Cl", "base_label": "R-S(O)2Cl", "display_label": "R–S(O)₂Cl", "representative_smiles": "CS(=O)(=O)Cl", "canonical_signature": "EC|Sulfonyl|Alkyl|Cl|activated", "mapping_status": "canonical"},
     {"source_label": "RSO2F", "base_label": "R-S(O)2F", "display_label": "R–S(O)₂F", "representative_smiles": "CS(=O)(=O)F", "canonical_signature": "EC|Sulfonyl|Alkyl|F|activated", "mapping_status": "canonical"},

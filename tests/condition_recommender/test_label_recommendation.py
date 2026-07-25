@@ -30,8 +30,22 @@ def _row(
         "tertiary_solvent": "",
         "procedure_text": "2 h at 80 °C",
     }
-    row.update(resolve_source_label(fg_a).to_columns("reactive_site_1"))
-    row.update(resolve_source_label(fg_b).to_columns("reactive_site_2"))
+    for label, prefix in (
+        (fg_a, "reactive_site_1"),
+        (fg_b, "reactive_site_2"),
+    ):
+        columns = resolve_source_label(label).to_columns(prefix)
+        row.update(
+            {
+                f"{prefix}_{suffix}": columns[f"{prefix}_{suffix}"]
+                for suffix in (
+                    "signature",
+                    "center_class",
+                    "attachment_class",
+                    "alpha_branched",
+                )
+            }
+        )
     return row
 
 
@@ -191,6 +205,36 @@ def test_label_recommender_supports_heck_with_alkene_label(
     assert result.candidate_count == 1
     assert result.recommendations[0].signature_similarity == 1.0
     assert result.recommendations[0].conditions["catalyst"] == "heck"
+
+
+def test_label_recommender_supports_acid_or_carboxylate_amide_label(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "labels.csv"
+    _write(
+        path,
+        [
+            _row(
+                "Amide coupling",
+                "RCO2H or M",
+                "RNH2",
+                yield_pct=84,
+                catalyst="amide",
+            ),
+        ],
+    )
+
+    result = recommend_conditions_from_labels(
+        "CC(=O)O.CN>>CNC(C)=O",
+        records_path=path,
+        top_k=1,
+    )
+
+    assert result.valid
+    assert result.grammar_id == "amide_formation"
+    assert result.candidate_count == 1
+    assert result.recommendations[0].signature_similarity == 1.0
+    assert result.recommendations[0].conditions["catalyst"] == "amide"
 
 
 def test_label_recommender_requires_positive_top_k() -> None:
