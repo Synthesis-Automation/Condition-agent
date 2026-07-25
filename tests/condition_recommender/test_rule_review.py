@@ -32,7 +32,6 @@ def test_rule_review_has_one_row_per_explicit_referenced_variant() -> None:
         {
             (
                 row["rule_id"],
-                row["recipe_template_id"],
                 row["recipe_variant_id"],
             )
             for row in rows
@@ -41,31 +40,28 @@ def test_rule_review_has_one_row_per_explicit_referenced_variant() -> None:
     assert all(tuple(row) == RULE_REVIEW_COLUMNS for row in rows)
 
 
-def test_rule_review_resolves_conditions_and_preserves_definition_ids() -> None:
+def test_rule_review_resolves_conditions_for_chemist_review() -> None:
     rows = build_rule_review_rows()
-    active = next(row for row in rows if row["rule_status"] == "active")
+    active = next(row for row in rows if row["status"] == "active")
 
     assert active["rule_id"] == "pd_sp2_cn.amide_nh.v1"
     assert active["recipe_variant_id"] == (
         "tbu_brettphos_pd_k3po4_tbuoh.v1"
     )
-    assert (
-        "t-BuBrettPhos Palladacycle Gen. 3 "
-        "[cas:1536473-72-9] (1 mol_percent)"
-        == active["catalyst"]
+    assert active["catalyst"] == (
+        "t-BuBrettPhos Palladacycle Gen. 3 (1 mol%)"
     )
     assert "Tripotassium phosphate" in active["base"]
-    assert active["temperature_c"] == "110.0"
-    assert active["nucleophile_equiv_min"] == "1.05"
-    assert active["doi"] == "10.1021/ol401208t"
-    assert active["recipe_id"].startswith("RCR1:")
-    assert active["rule_definition_id"] == "pd_sp2_cn_condition_rules.v1"
-    assert active["template_definition_id"] == (
-        "condition_recipe_templates.v1"
+    assert active["process_conditions"] == "110 C | 1.5 h | 0.5 M | Ar"
+    assert active["stoichiometry"] == (
+        "electrophile 1 equiv | nucleophile 1.05-1.2 equiv"
     )
+    assert "DOI: 10.1021/ol401208t" in active["source"]
+    assert "rule_definition_id" not in active
+    assert "recipe_id" not in active
 
 
-def test_rule_review_exposes_structural_constraints_and_blank_review_fields() -> None:
+def test_rule_review_summarizes_constraints_and_has_blank_review_fields() -> None:
     rows = build_rule_review_rows()
     hindered = next(
         row
@@ -73,16 +69,11 @@ def test_rule_review_exposes_structural_constraints_and_blank_review_fields() ->
         if row["rule_id"] == "pd_sp2_cn.free_amine.hindered_ar_cl.v1"
     )
 
-    assert hindered["rule_kind"] == "structural_override"
-    assert hindered["electrophile_handle_tokens"] == "Cl"
-    assert hindered["electrophile_steric_classes"] == "ortho_hindered"
-    assert hindered["electrophile_ortho_substituent_count_min"] == "2"
-    assert hindered["nucleophile_families"] == (
-        "primary_amine | secondary_amine"
-    )
-    assert hindered["legacy_source_rule_ids"] == (
-        "BH_CN_01 | BH_CN_02 | BH_CN_05"
-    )
+    assert hindered["rule_kind"] == "structural override"
+    assert "electrophile: leaving_group" in hindered["match_summary"]
+    assert "Cl" in hindered["match_summary"]
+    assert "ortho >= 2" in hindered["match_summary"]
+    assert "primary_amine, secondary_amine" in hindered["match_summary"]
     assert hindered["review_decision"] == ""
     assert hindered["review_notes"] == ""
 
@@ -99,6 +90,7 @@ def test_export_rule_review_csv_is_excel_friendly_and_source_consistent(
         reader = csv.DictReader(handle)
         exported_rows = list(reader)
     assert tuple(reader.fieldnames or ()) == RULE_REVIEW_COLUMNS
+    assert len(RULE_REVIEW_COLUMNS) == 20
     assert exported_rows == list(built_rows)
 
 
@@ -117,4 +109,4 @@ def test_rule_review_cli_exports_rows(
     rule_review_cli_main()
 
     assert output.exists()
-    assert "Wrote 15 rule-variant rows" in capsys.readouterr().out
+    assert "Wrote 15 rule-variant rows with 20 columns" in capsys.readouterr().out

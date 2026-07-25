@@ -23,7 +23,11 @@ def main() -> None:
     args = parser.parse_args()
     if args.command == "export":
         rows = export_rule_review_csv(args.output)
-        print(f"Wrote {len(rows)} rule-variant rows to {args.output}")
+        column_count = len(rows[0]) if rows else 0
+        print(
+            f"Wrote {len(rows)} rule-variant rows with {column_count} "
+            f"columns to {args.output}"
+        )
 
 
 if __name__ == "__main__":

@@ -100,24 +100,29 @@ Production mode excludes every draft rule and draft recipe variant.
 
 ### Review the draft C-N rules
 
-The remaining C-N defaults and structural overrides contain explicit screening
-recipes derived from the legacy Buchwald-Hartwig rulebook plus expert
-refinement. Their identities, loadings, equivalents, partner stoichiometry,
-temperature, time, concentration, and atmosphere are complete, but they remain
-drafts until checked against located primary procedures.
+The draft C-N defaults and structural overrides are standalone clean-system
+rules driven by structural taxonomy facts. Their screening recipes specify
+identities, loadings, equivalents, partner stoichiometry, temperature, time,
+concentration, and atmosphere, but remain drafts until checked against located
+primary procedures.
 
-For chemistry review, export the complete rulebook to one flat CSV:
+For chemistry review, export the concise rulebook CSV:
 
 ```powershell
 python -m condition_recommender.rule_review_cli export `
   results/rule_review/pd_sp2_cn_rulebook.csv
 ```
 
-The export has one row per rule and explicit recipe variant. It puts the
-structural match criteria, resolved condition names and registry IDs,
-quantities, operating parameters, rationale, cautions, DOI, procedure locator,
-definition versions, and provenance in the same row. Alternative condition
-sets are separate rows; slash-separated combinations are not generated.
+The export has one row per rule and explicit recipe variant, with 20 columns
+chosen for chemistry review. It includes a readable structural-match summary,
+condition names and quantities, operating parameters, rationale, cautions,
+source locator, and editable review fields. Alternative condition sets are
+separate rows; slash-separated combinations are not generated.
+
+Internal schema fields, individual structural predicates, registry IDs,
+definition versions, and provenance JSON are deliberately not flattened into
+this sheet. Those belong to the validated canonical rule and recipe-template
+definitions, not the chemist review view.
 
 The final columns are blank review fields:
 
@@ -125,14 +130,13 @@ The final columns are blank review fields:
 - `reviewer`;
 - `review_date`;
 - `review_notes`;
-- `proposed_rule_change`;
-- `proposed_recipe_change`.
+- `proposed_change`.
 
 The CSV is a generated review view, not a runtime definition. Editing it does
 not change recommendations. Record chemistry feedback in those columns, then
 curate and validate the canonical rule JSON and registry recipe-template JSON.
-Regenerate the CSV after canonical changes so every row remains traceable to
-its definition IDs, schema versions, and canonical `recipe_id`.
+Regenerate the CSV after canonical changes. The `rule_id` and
+`recipe_variant_id` link each review row back to those canonical definitions.
 
 The exporter includes both active and draft definitions because its purpose is
 review. It does not need `--include-draft`. That flag belongs to reaction
