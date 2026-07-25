@@ -54,7 +54,7 @@ def test_specific_structural_rules_match_without_named_family(
     assert result.transformation_class == "sp2_c_n_substitution"
     assert dict(result.taxonomy_definition_versions)[
         "reaction_grammars.v1.json"
-    ] == "1.5"
+    ] == "1.6"
     assert result.selected_tiers == (
         ("pd_sp2_cn.condition_regime", "specific"),
     )

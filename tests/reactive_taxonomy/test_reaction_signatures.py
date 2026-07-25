@@ -208,4 +208,7 @@ def test_unbalanced_multi_event_reaction_does_not_invent_partner_copy() -> None:
     assert result.evidence_quality == "reactant_grammar_only"
     assert result.selected_events == ()
     assert result.reaction_signature is None
-    assert result.reaction_label == "Ar1-F + Ar2-SH ->"
+    assert result.reaction_label == (
+        "(Ar1-F + Ar2-H) OR (Ar1-F + Ar2-SH) OR "
+        "(intramolecular Ar-F / Ar-H) ->"
+    )

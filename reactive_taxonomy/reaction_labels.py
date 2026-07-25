@@ -498,6 +498,47 @@ def render_product_label(
         product = (
             f"{anchor_label}{bond}{carbon_label}{bond}{activation_label}"
         )
+    elif kind == "aromatic_ch_substitution":
+        anchor_role = str(rule["anchor_role"])
+        aromatic_role = str(rule["aromatic_role"])
+        anchor = assignment[anchor_role]
+        aromatic = assignment[aromatic_role]
+        pairs = [
+            (
+                str(anchor.details["anchor_context"]),
+                _context_label(
+                    anchor_role,
+                    anchor,
+                    0,
+                    str(anchor.details["anchor_context"]),
+                    aliases,
+                    style=style,
+                ),
+            ),
+            (
+                str(aromatic.details["ring_context"]),
+                _context_label(
+                    aromatic_role,
+                    aromatic,
+                    0,
+                    str(aromatic.details["ring_context"]),
+                    aliases,
+                    style=style,
+                ),
+            ),
+        ]
+        precedence = {
+            token: index
+            for index, token in enumerate(load_product_context_precedence())
+        }
+        pairs.sort(
+            key=lambda pair: (
+                precedence.get(pair[0], 999),
+                pair[0],
+                pair[1],
+            )
+        )
+        product = bond.join(label for _, label in pairs)
     elif kind == "heck_alkene":
         anchor = assignment[rule["anchor_role"]]
         alkene = assignment[rule["alkene_role"]]

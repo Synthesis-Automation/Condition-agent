@@ -244,3 +244,9 @@ does not identify the activating group or hydrogen count. Structure-derived
 sites remain exact, such as `XH|Csp3|H3|alpha_to:nitrile`. The taxonomy emits
 these sites only for explicit alpha-to-aldehyde, ketone, ester, amide, nitrile,
 sulfone, or nitro rules; ordinary alkane C–H sites remain excluded.
+
+The source aliases `ArH` and `Ar-H` both resolve canonically to the
+atom-localized aromatic C–H signature `CH|ArH` and display label `Ar–H`.
+This handle is shared by structurally distinct grammars, including
+intermolecular direct arylation and Friedel–Crafts acylation; the handle alone
+does not imply either reaction.

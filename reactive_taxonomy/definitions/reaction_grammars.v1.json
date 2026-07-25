@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.5",
+  "schema_version": "1.6",
   "grammars": [
     {
       "id": "boron_transfer_coupling",
@@ -614,6 +614,45 @@
         "acylation"
       ],
       "priority": 90
+    },
+    {
+      "id": "sp2_c_aromatic_ch_substitution",
+      "transformation_class": "sp2_c_c_substitution",
+      "display_name": "sp2 C–C substitution with an aromatic C–H partner",
+      "generic_label": "Ar–X + Ar–H → Ar–Ar",
+      "roles": {
+        "electrophile": {
+          "site_type": "leaving_group",
+          "anchor_context_any": [
+            "Ar",
+            "HeteroAr"
+          ]
+        },
+        "aromatic_partner": {
+          "site_type": "aromatic_CH",
+          "ring_context_any": [
+            "Ar",
+            "HeteroAr"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "available"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "aromatic_partner"],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "operator": {
+        "id": "replace_handle_with_center",
+        "electrophile_role": "electrophile",
+        "partner_role": "aromatic_partner"
+      },
+      "compatible_named_families": [],
+      "priority": 93
     },
     {
       "id": "friedel_crafts_acylation",

@@ -92,9 +92,20 @@ def test_wrong_product_is_not_confirmed() -> None:
     assert result.valid
     assert result.selected_candidate is None
     assert result.evidence_quality == "reactant_grammar_only"
-    assert result.candidates[0].verification == "product_mismatch"
-    assert result.reaction_label == "Ar1–Br + Ar2–NH2 →"
-    assert result.reaction_label_status == "reactant_only"
+    assert all(
+        candidate.verification != "exact_product_reconstruction"
+        for candidate in result.candidates
+    )
+    assert any(
+        candidate.grammar_id == "sp2_c_n_substitution"
+        and candidate.verification == "product_mismatch"
+        for candidate in result.candidates
+    )
+    assert result.reaction_label == (
+        "(Ar1–Br + Ar2–H) OR (Ar1–Br + Ar2–NH2) OR "
+        "(intramolecular Ar–Br / Ar–H) →"
+    )
+    assert result.reaction_label_status == "ambiguous_reactants"
 
 
 def test_supplied_mapping_yields_exact_bond_differences() -> None:

@@ -104,7 +104,7 @@ def test_heck_stereochemistry_is_not_invented() -> None:
     )
     assert candidate.verification == "product_mismatch"
     assert result.named_family is None
-    assert result.reaction_label_status == "reactant_only"
+    assert result.reaction_label_status == "ambiguous_reactants"
 
 
 def test_fully_substituted_alkene_is_not_terminal_heck_partner() -> None:
@@ -161,3 +161,53 @@ def test_activated_carbon_grammar_rejects_unactivated_alkane() -> None:
         candidate.grammar_id != "sp2_c_activated_c_substitution"
         for candidate in result.candidates
     )
+
+
+def test_aromatic_ch_arylation_reconstructs_biaryl_product() -> None:
+    result = featurize_reaction(
+        "Brc1ccccc1.c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+    )
+
+    assert result.transformation_class == "sp2_c_c_substitution"
+    assert result.named_family is None
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.selected_candidate is not None
+    assert result.selected_candidate.grammar_id == (
+        "sp2_c_aromatic_ch_substitution"
+    )
+    assert result.reaction_label == "Ar1–Br + Ar2–H → Ar1–Ar2"
+    assert result.product_connection is not None
+    assert result.product_connection.connection_type == "C_C"
+
+
+def test_aromatic_ch_arylation_is_reactant_order_invariant() -> None:
+    forward = featurize_reaction(
+        "Brc1ccccc1.c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+    )
+    reversed_order = featurize_reaction(
+        "c1ccccc1.Brc1ccccc1>>c1ccc(-c2ccccc2)cc1"
+    )
+
+    assert forward.reaction_signature is not None
+    assert reversed_order.reaction_signature is not None
+    assert forward.reaction_signature.signature_id == (
+        reversed_order.reaction_signature.signature_id
+    )
+
+
+def test_aromatic_ch_arylation_does_not_select_product_mismatch() -> None:
+    result = featurize_reaction(
+        "Brc1ccccc1.c1ccccc1>>c1ccccc1"
+    )
+
+    direct_arylation = [
+        candidate
+        for candidate in result.candidates
+        if candidate.grammar_id == "sp2_c_aromatic_ch_substitution"
+    ]
+    assert direct_arylation
+    assert all(
+        candidate.verification != "exact_product_reconstruction"
+        for candidate in direct_arylation
+    )
+    assert result.selected_candidate is None

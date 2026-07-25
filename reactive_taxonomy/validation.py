@@ -326,6 +326,7 @@ def validate_taxonomy() -> List[str]:
         "heteroatom_substitution",
         "terminal_alkyne",
         "activated_carbon_substitution",
+        "aromatic_ch_substitution",
         "heck_alkene",
         "chan_lam",
         "reductive_amination",

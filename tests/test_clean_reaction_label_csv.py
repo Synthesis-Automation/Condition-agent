@@ -33,6 +33,21 @@ def test_alkene_source_label_maps_to_generic_pi_handle() -> None:
     assert alkene.mapping_status == "canonical"
 
 
+def test_aromatic_ch_aliases_and_alkyne_map_to_structural_handles() -> None:
+    for source_label in ("ArH", "Ar-H"):
+        aromatic_ch = resolve_source_label(source_label)
+        assert aromatic_ch.base_label == "Ar-H"
+        assert aromatic_ch.display_label == "Ar–H"
+        assert aromatic_ch.canonical_signature == "CH|ArH"
+        assert aromatic_ch.mapping_status == "canonical"
+
+    alkyne = resolve_source_label("alkyne")
+    assert alkyne.base_label == "H-C#C-H"
+    assert alkyne.display_label == "alkyne"
+    assert alkyne.canonical_signature == "PI|Alkyne"
+    assert alkyne.mapping_status == "canonical"
+
+
 def test_acid_or_carboxylate_source_label_maps_to_latent_acyl_donor() -> None:
     acid = resolve_source_label("RCO2H or M")
 

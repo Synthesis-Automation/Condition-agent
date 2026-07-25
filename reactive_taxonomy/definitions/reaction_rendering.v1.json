@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.5",
+  "schema_version": "1.6",
   "fragment_indexing": {
     "context_symbols": {
       "Ar": "Ar",
@@ -104,6 +104,11 @@
       "acyl_role": "acyl_partner",
       "partner_role": "oxygen_partner",
       "element": "O"
+    },
+    "sp2_c_aromatic_ch_substitution": {
+      "product_kind": "aromatic_ch_substitution",
+      "anchor_role": "electrophile",
+      "aromatic_role": "aromatic_partner"
     },
     "friedel_crafts_acylation": {
       "product_kind": "aryl_acylation",

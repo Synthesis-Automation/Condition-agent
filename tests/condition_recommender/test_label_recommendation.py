@@ -277,6 +277,46 @@ def test_label_recommender_supports_activated_carbon_arylation(
     assert 0.0 < result.recommendations[0].signature_similarity < 1.0
 
 
+def test_label_recommender_supports_aromatic_ch_arylation_without_alkyne_leakage(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "labels.csv"
+    _write(
+        path,
+        [
+            _row(
+                "CH-Activation",
+                "ArBr",
+                "ArH",
+                yield_pct=81,
+                catalyst="direct-arylation",
+            ),
+            _row(
+                "CH-Activation",
+                "ArH",
+                "alkyne",
+                yield_pct=99,
+                catalyst="incompatible-alkyne",
+            ),
+        ],
+    )
+
+    result = recommend_conditions_from_labels(
+        "Brc1ccccc1.c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+        records_path=path,
+        top_k=2,
+    )
+
+    assert result.valid
+    assert result.grammar_id == "sp2_c_aromatic_ch_substitution"
+    assert result.candidate_count == 2
+    assert len(result.recommendations) == 1
+    assert result.recommendations[0].signature_similarity == 1.0
+    assert result.recommendations[0].conditions["catalyst"] == (
+        "direct-arylation"
+    )
+
+
 def test_label_recommender_requires_positive_top_k() -> None:
     result = recommend_conditions_from_labels("not-used", top_k=0)
     assert not result.valid

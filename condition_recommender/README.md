@@ -327,6 +327,14 @@ partial match through the other participant. This allows `XH|Csp3` precedents
 to support an exact activated-carbon query without allowing N–H or O–H rows to
 leak into the candidate recipes.
 
+For the cleaned HTE data, `CH-Activation` is routed to the intermolecular
+`Ar–X + Ar–H → Ar–Ar` grammar. The same source reaction type also contains
+`Ar–H + alkyne` records, so the generic `alkyne` label is normalized to
+`PI|Alkyne`; those records then fail participant compatibility instead of
+entering direct-arylation recommendations. Friedel–Crafts remains a separate
+structure grammar and is not backed by this CSV because the dataset has no
+corresponding acylation source type.
+
 Important limitations:
 
 - precedent reactions are not structure-verified;

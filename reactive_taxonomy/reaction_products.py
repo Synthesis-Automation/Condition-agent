@@ -41,6 +41,11 @@ def build_product_connection(
         right_atom_role = "center"
         right_context_key = "center_token"
         connection_type = "C_C"
+    elif kind == "aromatic_ch_substitution":
+        left_role, right_role = str(rule["anchor_role"]), str(rule["aromatic_role"])
+        right_atom_role = "center"
+        right_context_key = "ring_context"
+        connection_type = "C_C"
     else:
         return None
     left, right = (
