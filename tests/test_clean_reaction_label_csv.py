@@ -25,6 +25,14 @@ def test_qualified_labels_separate_handle_from_attachment_sterics() -> None:
     assert primary_alcohol.attachment_carbon_class == "primary"
 
 
+def test_alkene_source_label_maps_to_generic_pi_handle() -> None:
+    alkene = resolve_source_label("alkene")
+
+    assert alkene.base_label == "H2C=CH2"
+    assert alkene.canonical_signature == "PI|Alkene"
+    assert alkene.mapping_status == "canonical"
+
+
 def test_cleanup_maps_supported_labels_and_preserves_unsolved_labels() -> None:
     rows = [
         {"FG A": "ArBr", "FG B": "RNH2"},

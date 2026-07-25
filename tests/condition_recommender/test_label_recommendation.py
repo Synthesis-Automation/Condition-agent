@@ -125,6 +125,74 @@ def test_label_recommender_rewards_matching_alpha_branch_qualifier(
     )
 
 
+def test_label_recommender_supports_alkylation_as_sp3_c_n_substitution(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "labels.csv"
+    _write(
+        path,
+        [
+            _row(
+                "Alkylation",
+                "Alkyl-Br",
+                "RNH2",
+                yield_pct=82,
+                catalyst="sp3-cn",
+            ),
+            _row(
+                "Buchwald-Hartwig",
+                "Alkyl-Br",
+                "RNH2",
+                yield_pct=99,
+                catalyst="wrong-source-type",
+            ),
+        ],
+    )
+
+    result = recommend_conditions_from_labels(
+        "CCBr.CN>>CCNC",
+        records_path=path,
+        top_k=2,
+    )
+
+    assert result.valid
+    assert result.grammar_id == "sp3_c_n_substitution"
+    assert result.candidate_count == 1
+    assert result.recommendations[0].signature_similarity == 1.0
+    assert result.recommendations[0].conditions["catalyst"] == "sp3-cn"
+
+
+def test_label_recommender_supports_heck_with_alkene_label(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "labels.csv"
+    _write(
+        path,
+        [
+            _row("Heck", "ArBr", "alkene", yield_pct=78, catalyst="heck"),
+            _row(
+                "Suzuki-Miyaura",
+                "ArBr",
+                "alkene",
+                yield_pct=99,
+                catalyst="wrong-source-type",
+            ),
+        ],
+    )
+
+    result = recommend_conditions_from_labels(
+        "Brc1ccccc1.C=C>>C=Cc1ccccc1",
+        records_path=path,
+        top_k=2,
+    )
+
+    assert result.valid
+    assert result.grammar_id == "terminal_alkene_heck_coupling"
+    assert result.candidate_count == 1
+    assert result.recommendations[0].signature_similarity == 1.0
+    assert result.recommendations[0].conditions["catalyst"] == "heck"
+
+
 def test_label_recommender_requires_positive_top_k() -> None:
     result = recommend_conditions_from_labels("not-used", top_k=0)
     assert not result.valid

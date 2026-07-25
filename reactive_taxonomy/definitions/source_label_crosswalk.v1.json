@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "description": "Source-label mappings to reactive handles and source-asserted environment qualifiers.",
   "mappings": [
     {"source_label": "ArBr", "base_label": "Ar-Br", "display_label": "Ar–Br", "representative_smiles": "Brc1ccccc1", "canonical_signature": "LG|Ar|Br", "mapping_status": "canonical"},
@@ -18,6 +18,7 @@
     {"source_label": "alkeneB(OR)2", "base_label": "Alkenyl-B(OR)2", "display_label": "Alkenyl–B(OR)₂", "representative_smiles": "C=CB(OC)OC", "canonical_signature": "TM|Alkenyl|B(OR)2", "mapping_status": "canonical"},
     {"source_label": "alkene-Br", "base_label": "Alkenyl-Br", "display_label": "Alkenyl–Br", "representative_smiles": "BrC=C", "canonical_signature": "LG|Alkenyl|Br", "mapping_status": "canonical"},
     {"source_label": "alkene-I", "base_label": "Alkenyl-I", "display_label": "Alkenyl–I", "representative_smiles": "IC=C", "canonical_signature": "LG|Alkenyl|I", "mapping_status": "canonical"},
+    {"source_label": "alkene", "base_label": "H2C=CH2", "display_label": "alkene", "representative_smiles": "C=C", "canonical_signature": "PI|Alkene", "mapping_status": "canonical"},
     {"source_label": "RNH2", "base_label": "R-NH2", "display_label": "R–NH₂", "representative_smiles": "CN", "canonical_signature": "XH|N|H2|Alkyl", "center_substitution_class": "primary", "mapping_status": "canonical"},
     {"source_label": "R2NH", "base_label": "R1R2-NH", "display_label": "R¹R²–NH", "representative_smiles": "CCNCC", "canonical_signature": "XH|N|H1|Alkyl,Alkyl", "center_substitution_class": "secondary", "mapping_status": "canonical"},
     {"source_label": "RCONH2", "base_label": "R-C(O)-NH2", "display_label": "R–C(O)–NH₂", "representative_smiles": "CC(N)=O", "canonical_signature": "XH|N|H2|C(O)R", "center_substitution_class": "primary", "mapping_status": "canonical"},
