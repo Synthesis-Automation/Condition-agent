@@ -6,6 +6,7 @@ import csv
 import gzip
 import json
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
@@ -90,8 +91,28 @@ def _participant(row: Dict[str, str], prefix: str) -> LabelParticipant:
 
 
 def load_label_index(path: str | Path) -> Tuple[LabelIndexedReaction, ...]:
-    """Load cleaned rows with valid yield and the structured FG schema."""
-    with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
+    """Load a file-version-aware cached weak-label index."""
+    csv_path = Path(path).resolve()
+    catalog_path = condition_recipe_catalog_path(csv_path)
+    return _load_label_index_cached(
+        str(csv_path),
+        csv_path.stat().st_mtime_ns,
+        str(catalog_path),
+        catalog_path.stat().st_mtime_ns,
+    )
+
+
+@lru_cache(maxsize=4)
+def _load_label_index_cached(
+    csv_path_text: str,
+    csv_mtime_ns: int,
+    catalog_path_text: str,
+    catalog_mtime_ns: int,
+) -> Tuple[LabelIndexedReaction, ...]:
+    """Load one immutable dataset version; mtimes form part of the cache key."""
+    del csv_mtime_ns, catalog_mtime_ns
+    csv_path = Path(csv_path_text)
+    with csv_path.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
         required = {
             "yield_pct",
@@ -105,7 +126,7 @@ def load_label_index(path: str | Path) -> Tuple[LabelIndexedReaction, ...]:
             raise ValueError(f"Missing cleaned label columns: {missing}")
         rows = list(reader)
     recipe_catalog = load_condition_recipe_catalog(
-        condition_recipe_catalog_path(path)
+        catalog_path_text
     )
 
     indexed = []
