@@ -7,6 +7,34 @@ from typing import Any, Dict, Optional, Tuple
 
 
 @dataclass(frozen=True)
+class ConditionComponentInput:
+    """Raw condition component awaiting registry identity resolution."""
+
+    raw_identifier: str
+    source_field: str
+    identifier_type: str = "auto"
+    source_role_hint: Optional[str] = None
+    amount: Optional[float] = None
+    amount_unit: Optional[str] = None
+    provenance: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if self.identifier_type not in {"auto", "cas", "name", "substance_id"}:
+            raise ValueError(f"Unsupported condition identifier type: {self.identifier_type}")
+
+
+@dataclass(frozen=True)
+class ConditionProcessStage:
+    """One explicit temperature/time segment in a condition procedure."""
+
+    stage_index: int
+    temperature_c: Optional[float] = None
+    time_h: Optional[float] = None
+    atmosphere: Optional[str] = None
+    provenance: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class RoleAssignment:
     role_id: str
     family_id: Optional[str]
@@ -70,6 +98,7 @@ class ResolvedConditionComponent:
     primary_role_confidence: float
     amount: Optional[float] = None
     amount_unit: Optional[str] = None
+    source_role_hint: Optional[str] = None
     warnings: Tuple[str, ...] = ()
     provenance: Dict[str, Any] = field(default_factory=dict)
     schema_version: str = "1.0"
@@ -97,9 +126,11 @@ class ResolvedConditionRecipe:
     time_h: Optional[float] = None
     concentration_m: Optional[float] = None
     atmosphere: Optional[str] = None
+    stages: Tuple[ConditionProcessStage, ...] = ()
+    declared_absences: Tuple[str, ...] = ()
     warnings: Tuple[str, ...] = ()
     definition_versions: Dict[str, str] = field(default_factory=dict)
-    schema_version: str = "1.0"
+    schema_version: str = "1.1"
 
     @property
     def components(self) -> Tuple[ResolvedConditionComponent, ...]:

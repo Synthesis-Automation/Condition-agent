@@ -3,22 +3,21 @@
 from __future__ import annotations
 
 import csv
-import hashlib
+import gzip
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
+from .label_conditions import condition_recipe_catalog_path
 
 CONDITION_COLUMNS = (
-    "base",
-    "catalyst",
-    "primary_solvent",
-    "ligand",
-    "additive",
-    "coupling_reagent",
-    "secondary_solvent",
-    "tertiary_solvent",
+    "condition_display",
+    "temperature_c",
+    "time_h",
+    "concentration_m",
+    "atmosphere",
+    "condition_identity_uncertainty",
     "procedure_text",
 )
 
@@ -40,6 +39,36 @@ class LabelIndexedReaction:
     z_score: float
     conditions: Dict[str, str]
     recipe_id: str
+    resolved_recipe: Dict[str, Any]
+
+
+def load_condition_recipe_catalog(
+    path: str | Path,
+) -> Dict[str, Dict[str, Any]]:
+    """Load and validate the deduplicated nested condition recipes."""
+    catalog_path = Path(path)
+    if not catalog_path.exists():
+        raise ValueError(f"Missing condition recipe catalog: {catalog_path}")
+    recipes: Dict[str, Dict[str, Any]] = {}
+    with gzip.open(catalog_path, "rt", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            try:
+                recipe = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise ValueError(
+                    f"Invalid condition recipe JSONL line {line_number}"
+                ) from exc
+            recipe_id = str(recipe.get("recipe_id") or "")
+            if not recipe_id.startswith("RCR1:"):
+                raise ValueError(
+                    f"Invalid condition recipe ID at JSONL line {line_number}"
+                )
+            if recipe_id in recipes:
+                raise ValueError(f"Duplicate condition recipe ID: {recipe_id}")
+            recipes[recipe_id] = recipe
+    return recipes
 
 
 def _optional_bool(value: str) -> Optional[bool]:
@@ -60,12 +89,6 @@ def _participant(row: Dict[str, str], prefix: str) -> LabelParticipant:
     )
 
 
-def _recipe_id(conditions: Dict[str, str]) -> str:
-    payload = json.dumps(conditions, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:20]
-    return f"LABELCOND1:{digest}"
-
-
 def load_label_index(path: str | Path) -> Tuple[LabelIndexedReaction, ...]:
     """Load cleaned rows with valid yield and the structured FG schema."""
     with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
@@ -75,11 +98,15 @@ def load_label_index(path: str | Path) -> Tuple[LabelIndexedReaction, ...]:
             "source_reaction_type",
             "reactive_site_1_signature",
             "reactive_site_2_signature",
+            "condition_recipe_id",
         }
         missing = sorted(required - set(reader.fieldnames or ()))
         if missing:
             raise ValueError(f"Missing cleaned label columns: {missing}")
         rows = list(reader)
+    recipe_catalog = load_condition_recipe_catalog(
+        condition_recipe_catalog_path(path)
+    )
 
     indexed = []
     for row_number, row in enumerate(rows, start=2):
@@ -94,6 +121,16 @@ def load_label_index(path: str | Path) -> Tuple[LabelIndexedReaction, ...]:
         except (TypeError, ValueError):
             z_score = 0.0
         conditions = {name: str(row.get(name) or "").strip() for name in CONDITION_COLUMNS}
+        recipe_id = str(row.get("condition_recipe_id") or "").strip()
+        if not recipe_id.startswith("RCR1:"):
+            raise ValueError(
+                f"Invalid canonical condition recipe ID at CSV row {row_number}"
+            )
+        resolved_recipe = recipe_catalog.get(recipe_id)
+        if resolved_recipe is None:
+            raise ValueError(
+                f"Condition recipe ID missing from catalog at CSV row {row_number}"
+            )
         indexed.append(
             LabelIndexedReaction(
                 source_row_number=row_number,
@@ -105,7 +142,8 @@ def load_label_index(path: str | Path) -> Tuple[LabelIndexedReaction, ...]:
                 yield_pct=yield_pct,
                 z_score=z_score,
                 conditions=conditions,
-                recipe_id=_recipe_id(conditions),
+                recipe_id=recipe_id,
+                resolved_recipe=resolved_recipe,
             )
         )
     return tuple(indexed)
@@ -115,5 +153,7 @@ __all__ = [
     "CONDITION_COLUMNS",
     "LabelIndexedReaction",
     "LabelParticipant",
+    "condition_recipe_catalog_path",
+    "load_condition_recipe_catalog",
     "load_label_index",
 ]

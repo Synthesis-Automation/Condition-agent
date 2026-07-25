@@ -1,8 +1,11 @@
 import csv
+import gzip
 import json
 from pathlib import Path
 
 from condition_recommender import recommend_conditions_from_labels
+from condition_recommender.label_conditions import convert_label_conditions
+from condition_recommender.label_indexing import condition_recipe_catalog_path
 from condition_recommender.recommend_cli import main as recommend_cli_main
 from reactive_taxonomy import resolve_source_label
 
@@ -16,19 +19,26 @@ def _row(
     catalyst: str,
     z_score: float = 0.0,
 ) -> dict[str, str]:
+    converted_conditions = convert_label_conditions(
+        {
+            "base": "K2CO3",
+            "catalyst": catalyst,
+            "primary_solvent": "dioxane",
+            "secondary_solvent": "water",
+            "procedure_text": "2 h at 80 °C",
+        }
+    )
+    condition_columns = converted_conditions.to_columns()
+    condition_columns["_condition_recipe_json"] = json.dumps(
+        converted_conditions.recipe.to_dict(),
+        sort_keys=True,
+        separators=(",", ":"),
+    )
     row = {
         "yield_pct": str(yield_pct),
         "source_reaction_type": reaction_type,
         "z_score": str(z_score),
-        "base": "K2CO3",
-        "catalyst": catalyst,
-        "primary_solvent": "dioxane",
-        "ligand": "",
-        "additive": "",
-        "coupling_reagent": "",
-        "secondary_solvent": "water",
-        "tertiary_solvent": "",
-        "procedure_text": "2 h at 80 °C",
+        **condition_columns,
     }
     for label, prefix in (
         (fg_a, "reactive_site_1"),
@@ -49,12 +59,48 @@ def _row(
     return row
 
 
+def _raw_identifiers(recommendation: object) -> set[str]:
+    recipe = recommendation.resolved_recipe
+    return {
+        component["raw_identifier"]
+        for bucket_name in (
+            "catalysts",
+            "ligands",
+            "bases",
+            "acids",
+            "condensation_agents",
+            "oxidants",
+            "reductants",
+            "additives",
+            "solvents",
+            "other_components",
+        )
+        for component in recipe[bucket_name]
+    }
+
+
 def _write(path: Path, rows: list[dict[str, str]]) -> None:
-    fieldnames = list(rows[0])
+    csv_rows = []
+    recipes = {}
+    for source_row in rows:
+        row = dict(source_row)
+        recipe = json.loads(row.pop("_condition_recipe_json"))
+        recipes[recipe["recipe_id"]] = recipe
+        csv_rows.append(row)
+    fieldnames = list(csv_rows[0])
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(csv_rows)
+    with gzip.open(
+        condition_recipe_catalog_path(path),
+        "wt",
+        encoding="utf-8",
+        newline="\n",
+    ) as handle:
+        for recipe_id in sorted(recipes):
+            handle.write(json.dumps(recipes[recipe_id], sort_keys=True))
+            handle.write("\n")
 
 
 def test_label_recommender_uses_family_and_unordered_signature_pair(
@@ -97,9 +143,9 @@ def test_label_recommender_uses_family_and_unordered_signature_pair(
     assert result.grammar_id == "boron_transfer_coupling"
     assert result.candidate_count == 3
     assert len(result.recommendations) == 3
-    assert result.recommendations[0].conditions["catalyst"] == "exact-a"
+    assert "exact-a" in _raw_identifiers(result.recommendations[0])
     assert result.recommendations[0].signature_similarity == 1.0
-    assert result.recommendations[1].conditions["catalyst"] == "exact-reversed"
+    assert "exact-reversed" in _raw_identifiers(result.recommendations[1])
     assert result.recommendations[1].signature_similarity == 1.0
     assert all(
         "wrong-family" not in item.conditions.values()
@@ -132,7 +178,7 @@ def test_label_recommender_rewards_matching_alpha_branch_qualifier(
     )
 
     assert result.valid
-    assert result.recommendations[0].conditions["catalyst"] == "qualified"
+    assert "qualified" in _raw_identifiers(result.recommendations[0])
     assert (
         result.recommendations[0].qualifier_similarity
         > result.recommendations[1].qualifier_similarity
@@ -173,7 +219,7 @@ def test_label_recommender_supports_alkylation_as_sp3_c_n_substitution(
     assert result.grammar_id == "sp3_c_n_substitution"
     assert result.candidate_count == 1
     assert result.recommendations[0].signature_similarity == 1.0
-    assert result.recommendations[0].conditions["catalyst"] == "sp3-cn"
+    assert "sp3-cn" in _raw_identifiers(result.recommendations[0])
 
 
 def test_label_recommender_supports_heck_with_alkene_label(
@@ -204,7 +250,7 @@ def test_label_recommender_supports_heck_with_alkene_label(
     assert result.grammar_id == "terminal_alkene_heck_coupling"
     assert result.candidate_count == 1
     assert result.recommendations[0].signature_similarity == 1.0
-    assert result.recommendations[0].conditions["catalyst"] == "heck"
+    assert "heck" in _raw_identifiers(result.recommendations[0])
 
 
 def test_label_recommender_supports_acid_or_carboxylate_amide_label(
@@ -234,7 +280,7 @@ def test_label_recommender_supports_acid_or_carboxylate_amide_label(
     assert result.grammar_id == "amide_formation"
     assert result.candidate_count == 1
     assert result.recommendations[0].signature_similarity == 1.0
-    assert result.recommendations[0].conditions["catalyst"] == "amide"
+    assert "amide" in _raw_identifiers(result.recommendations[0])
 
 
 def test_label_recommender_supports_activated_carbon_arylation(
@@ -271,9 +317,7 @@ def test_label_recommender_supports_activated_carbon_arylation(
     assert result.grammar_id == "sp2_c_activated_c_substitution"
     assert result.candidate_count == 2
     assert len(result.recommendations) == 1
-    assert result.recommendations[0].conditions["catalyst"] == (
-        "activated-carbon"
-    )
+    assert "activated-carbon" in _raw_identifiers(result.recommendations[0])
     assert 0.0 < result.recommendations[0].signature_similarity < 1.0
 
 
@@ -312,9 +356,7 @@ def test_label_recommender_supports_aromatic_ch_arylation_without_alkyne_leakage
     assert result.candidate_count == 2
     assert len(result.recommendations) == 1
     assert result.recommendations[0].signature_similarity == 1.0
-    assert result.recommendations[0].conditions["catalyst"] == (
-        "direct-arylation"
-    )
+    assert "direct-arylation" in _raw_identifiers(result.recommendations[0])
 
 
 def test_label_recommender_requires_positive_top_k() -> None:

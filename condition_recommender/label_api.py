@@ -294,6 +294,7 @@ def _rank_recipes(
                 ),
                 conditions=dict(best_row.conditions),
                 explanation=tuple(explanation),
+                resolved_recipe=dict(best_row.resolved_recipe),
             )
         )
     return tuple(recommendations)
@@ -401,7 +402,7 @@ def recommend_conditions_from_labels(
         warnings=(
             "WEAK_LABEL_PRECEDENTS_NOT_STRUCTURE_VERIFIED",
             "REACTIVE_SITES_MATCHED_AS_UNORDERED_PARTICIPANTS",
-            "CONDITION_NAMES_NOT_REGISTRY_NORMALIZED",
+            "UNRESOLVED_CONDITION_IDENTITIES_RETAINED_WITH_UNCERTAINTY",
         ),
     )
 

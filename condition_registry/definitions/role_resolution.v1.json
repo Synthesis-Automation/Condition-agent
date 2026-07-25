@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "definition_id": "role_resolution.v1",
   "generic_roles": ["organic_compound", "inorganic_compound", "other_reagent"],
   "source_role_preferences": {
@@ -11,6 +11,22 @@
     "catalyst_cas": "other_reagent",
     "reagent_cas": "other_reagent",
     "solvent_cas": "solvent"
+  },
+  "source_role_hint_preferences": {
+    "catalyst": ["metal_catalyst", "organo_catalyst", "enzyme"],
+    "ligand": ["ligand"],
+    "base": ["base"],
+    "solvent": ["solvent"],
+    "additive": ["additive"],
+    "coupling_reagent": ["condensation_agent", "additive"]
+  },
+  "source_role_hint_fallbacks": {
+    "catalyst": "other_reagent",
+    "ligand": "ligand",
+    "base": "base",
+    "solvent": "solvent",
+    "additive": "additive",
+    "coupling_reagent": "condensation_agent"
   },
   "transformation_role_preferences": {
     "c_c_transfer_coupling": ["metal_catalyst", "ligand", "base"],

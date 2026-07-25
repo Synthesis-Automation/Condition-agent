@@ -8,6 +8,8 @@ from .api import (
 )
 from .contextual_roles import resolve_contextual_component
 from .models import (
+    ConditionComponentInput,
+    ConditionProcessStage,
     ContextualRoleAssignment,
     ResolutionResult,
     ResolvedConditionComponent,
@@ -15,7 +17,11 @@ from .models import (
     RoleAssignment,
     Substance,
 )
-from .recipes import build_resolved_recipe, build_resolved_recipe_from_components
+from .recipes import (
+    build_resolved_recipe,
+    build_resolved_recipe_from_components,
+    build_resolved_recipe_from_inputs,
+)
 from .template_loader import (
     get_recipe_template,
     load_recipe_template_set,
@@ -35,6 +41,8 @@ from .validation import validate_registry
 
 __all__ = [
     "ContextualRoleAssignment",
+    "ConditionComponentInput",
+    "ConditionProcessStage",
     "ConditionRecipeTemplate",
     "ConditionRecipeTemplateSet",
     "ResolutionResult",
@@ -49,6 +57,7 @@ __all__ = [
     "Substance",
     "build_resolved_recipe",
     "build_resolved_recipe_from_components",
+    "build_resolved_recipe_from_inputs",
     "get_registry",
     "get_recipe_template",
     "load_recipe_template_set",

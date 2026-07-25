@@ -316,7 +316,7 @@ rows are not. The implementation:
 3. matches two reactive participants as an unordered pair;
 4. ranks by functional-group signature and structural qualifiers;
 5. uses yield, z-score, and support as lower-weight signals;
-6. aggregates identical raw condition recipes.
+6. aggregates canonical `condition_registry` recipes.
 
 Weights live in `definitions/label_retrieval.v1.json`.
 
@@ -339,14 +339,35 @@ Important limitations:
 
 - precedent reactions are not structure-verified;
 - source reactive-site order is unreliable and treated as unordered;
-- condition names are not yet normalized through `condition_registry`;
+- unresolved condition names remain explicit with identity uncertainty;
 - reaction topology cannot be recovered from the precedent rows;
 - only structurally verified intermolecular queries are accepted;
 - recommendations are weak-label precedents, not verified literature matches.
 
 The path returns explicit warnings including
 `WEAK_LABEL_PRECEDENTS_NOT_STRUCTURE_VERIFIED` and
-`CONDITION_NAMES_NOT_REGISTRY_NORMALIZED`.
+`UNRESOLVED_CONDITION_IDENTITIES_RETAINED_WITH_UNCERTAINTY`.
+
+The cleaned CSV uses a component-oriented condition contract instead of fixed
+`catalyst`/`base`/`solvent` slots:
+
+- `condition_recipe_id` is the canonical `RCR1` aggregation key;
+- `condition_display` is a compact human-review label;
+- `temperature_c`, `time_h`, `concentration_m`, and `atmosphere` are convenient
+  single-stage review fields;
+- `procedure_text` preserves source text and never contributes opaque text to
+  recipe identity.
+
+The paired `<csv-stem>.condition_recipes.jsonl.gz` catalog stores each unique
+full recipe exactly once, including resolved identities, contextual roles,
+provenance, stages, declared absences, and uncertainty. It is losslessly
+compressed and read transparently by the recommender. This keeps the CSV small
+without making the recommendation path parse display strings.
+
+Multi-stage procedures remain ordered in the recipe catalog; their
+top-level temperature/time cells stay blank rather than collapsing multiple
+stages. Source columns are role hints only and cannot override contradictory
+registry chemistry.
 
 Regenerate the cleaned CSV with:
 

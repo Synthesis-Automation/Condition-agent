@@ -149,6 +149,7 @@ class LabelConditionRecommendation:
     source_row_numbers: Tuple[int, ...]
     conditions: Dict[str, str]
     explanation: Tuple[str, ...]
+    resolved_recipe: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

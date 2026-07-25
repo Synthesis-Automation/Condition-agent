@@ -8,6 +8,8 @@ from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
 
 from .contextual_roles import load_role_resolution_rules, resolve_contextual_component
 from .models import (
+    ConditionComponentInput,
+    ConditionProcessStage,
     ContextualRoleAssignment,
     ResolvedConditionComponent,
     ResolvedConditionRecipe,
@@ -87,6 +89,7 @@ def _merge_duplicate_components(
                 primary_role_confidence=primary.primary_role_confidence,
                 amount=primary.amount,
                 amount_unit=primary.amount_unit,
+                source_role_hint=primary.source_role_hint,
                 warnings=tuple(sorted(warnings)),
                 provenance=provenance,
             )
@@ -101,6 +104,8 @@ def build_resolved_recipe_from_components(
     time_h: Optional[float] = None,
     concentration_m: Optional[float] = None,
     atmosphere: Optional[str] = None,
+    stages: Iterable[ConditionProcessStage] = (),
+    declared_absences: Iterable[str] = (),
 ) -> ResolvedConditionRecipe:
     """Build a canonical recipe from already resolved, role-aware components."""
     rules = load_role_resolution_rules()
@@ -123,6 +128,10 @@ def build_resolved_recipe_from_components(
     definition_versions = {
         "role_resolution.v1.json": str(rules["schema_version"]),
     }
+    normalized_stages = tuple(sorted(stages, key=lambda item: item.stage_index))
+    normalized_absences = tuple(
+        sorted({str(value).strip().lower() for value in declared_absences if str(value).strip()})
+    )
     identity_payload = {
         "buckets": {
             name: tuple(_component_token(component) for component in values)
@@ -132,8 +141,18 @@ def build_resolved_recipe_from_components(
         "time_h": time_h,
         "concentration_m": concentration_m,
         "atmosphere": atmosphere,
+        "stages": tuple(
+            (
+                stage.stage_index,
+                stage.temperature_c,
+                stage.time_h,
+                stage.atmosphere,
+            )
+            for stage in normalized_stages
+        ),
+        "declared_absences": normalized_absences,
         "definition_versions": definition_versions,
-        "schema_version": "1.0",
+        "schema_version": "1.1",
     }
     recipe_id = "RCR1:" + hashlib.sha256(
         _canonical_json(identity_payload).encode("utf-8")
@@ -154,8 +173,49 @@ def build_resolved_recipe_from_components(
         time_h=time_h,
         concentration_m=concentration_m,
         atmosphere=atmosphere,
+        stages=normalized_stages,
+        declared_absences=normalized_absences,
         warnings=tuple(sorted(set(warnings))),
         definition_versions=definition_versions,
+    )
+
+
+def build_resolved_recipe_from_inputs(
+    inputs: Iterable[ConditionComponentInput],
+    *,
+    transformation_class: Optional[str] = None,
+    named_family: Optional[str] = None,
+    temperature_c: Optional[float] = None,
+    time_h: Optional[float] = None,
+    concentration_m: Optional[float] = None,
+    atmosphere: Optional[str] = None,
+    stages: Iterable[ConditionProcessStage] = (),
+    declared_absences: Iterable[str] = (),
+) -> ResolvedConditionRecipe:
+    """Resolve typed raw inputs and build one canonical condition recipe."""
+    components = (
+        resolve_contextual_component(
+            item.raw_identifier,
+            source_field=item.source_field,
+            identifier_type=item.identifier_type,
+            source_role_hint=item.source_role_hint,
+            transformation_class=transformation_class,
+            named_family=named_family,
+            amount=item.amount,
+            amount_unit=item.amount_unit,
+            provenance=item.provenance,
+        )
+        for item in inputs
+        if item.raw_identifier.strip()
+    )
+    return build_resolved_recipe_from_components(
+        components,
+        temperature_c=temperature_c,
+        time_h=time_h,
+        concentration_m=concentration_m,
+        atmosphere=atmosphere,
+        stages=stages,
+        declared_absences=declared_absences,
     )
 
 
@@ -182,6 +242,7 @@ def build_resolved_recipe(
             component = resolve_contextual_component(
                 raw,
                 source_field=source_field,
+                identifier_type="cas",
                 transformation_class=transformation_class,
                 named_family=named_family,
             )
@@ -195,4 +256,8 @@ def build_resolved_recipe(
     )
 
 
-__all__ = ["build_resolved_recipe", "build_resolved_recipe_from_components"]
+__all__ = [
+    "build_resolved_recipe",
+    "build_resolved_recipe_from_components",
+    "build_resolved_recipe_from_inputs",
+]

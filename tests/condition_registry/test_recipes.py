@@ -1,4 +1,10 @@
-from condition_registry import build_resolved_recipe, resolve_contextual_component
+from condition_registry import (
+    ConditionComponentInput,
+    ConditionProcessStage,
+    build_resolved_recipe,
+    build_resolved_recipe_from_inputs,
+    resolve_contextual_component,
+)
 from condition_registry.contextual_roles import load_role_resolution_rules
 from condition_registry.loader import load_taxonomy
 
@@ -109,6 +115,7 @@ def test_role_resolution_definition_references_known_roles_and_buckets() -> None
 
     assert set(rules["role_buckets"]) <= taxonomy_roles
     assert set(rules["source_fallback_roles"].values()) <= taxonomy_roles
+    assert set(rules["source_role_hint_fallbacks"].values()) <= taxonomy_roles
     assert set(rules["role_buckets"].values()) == {
         "catalysts",
         "ligands",
@@ -121,3 +128,76 @@ def test_role_resolution_definition_references_known_roles_and_buckets() -> None
         "solvents",
         "other_components",
     }
+
+
+def test_contextual_component_resolves_name_and_retains_role_hint() -> None:
+    component = resolve_contextual_component(
+        "K2CO3",
+        source_field="base",
+        identifier_type="name",
+        source_role_hint="base",
+    )
+
+    assert component.substance_id == "cas:584-08-7"
+    assert component.canonical_name == "Potassium carbonate"
+    assert component.primary_role == "base"
+    assert component.source_role_hint == "base"
+    assert component.provenance["identifier_type"] == "name"
+
+
+def test_source_role_hint_does_not_override_registry_chemistry() -> None:
+    component = resolve_contextual_component(
+        "water",
+        source_field="base",
+        identifier_type="name",
+        source_role_hint="base",
+    )
+
+    assert component.primary_role == "solvent"
+    assert "SOURCE_FIELD_ROLE_MISMATCH" in component.warnings
+
+
+def test_unresolved_name_uses_explicit_hint_fallback_with_uncertainty() -> None:
+    component = resolve_contextual_component(
+        "unknown ligand",
+        source_field="ligand",
+        identifier_type="name",
+        source_role_hint="ligand",
+    )
+
+    assert component.identity_status == "unresolved"
+    assert component.primary_role == "ligand"
+    assert component.primary_role_confidence < 0.7
+    assert component.roles[0].evidence[0] == "source_role_hint_fallback"
+
+
+def test_recipe_identity_includes_stages_and_declared_absences() -> None:
+    inputs = (
+        ConditionComponentInput(
+            "water",
+            source_field="primary_solvent",
+            identifier_type="name",
+            source_role_hint="solvent",
+        ),
+    )
+    one_stage = build_resolved_recipe_from_inputs(
+        inputs,
+        stages=(ConditionProcessStage(1, temperature_c=25.0, time_h=1.0),),
+        declared_absences=("ligand",),
+    )
+    two_stage = build_resolved_recipe_from_inputs(
+        inputs,
+        stages=(
+            ConditionProcessStage(1, temperature_c=25.0, time_h=1.0),
+            ConditionProcessStage(2, temperature_c=80.0, time_h=2.0),
+        ),
+        declared_absences=("ligand",),
+    )
+    ligand_present_or_unspecified = build_resolved_recipe_from_inputs(
+        inputs,
+        stages=(ConditionProcessStage(1, temperature_c=25.0, time_h=1.0),),
+    )
+
+    assert one_stage.recipe_id != two_stage.recipe_id
+    assert one_stage.recipe_id != ligand_present_or_unspecified.recipe_id
+    assert one_stage.declared_absences == ("ligand",)

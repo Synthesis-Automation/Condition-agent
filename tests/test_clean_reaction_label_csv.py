@@ -70,7 +70,14 @@ def test_acidic_alkyl_h_maps_to_qualified_activated_carbon_family() -> None:
 
 def test_cleanup_maps_supported_labels_and_filters_invalid_rows() -> None:
     rows = [
-        {"FG A": "ArBr", "FG B": "RNH2"},
+        {
+            "FG A": "ArBr",
+            "FG B": "RNH2",
+            "Base": "K2CO3",
+            "Solvent": "dioxane",
+            "Ligand": "No Ligand",
+            "conditions": "2 h at 80 °C",
+        },
         {"FG A": "RCO2H or M", "FG B": "RNH2 a-branch"},
         {"FG A": "ArBr", "FG B": "ArBr"},
         {"FG A": "", "FG B": ""},
@@ -86,6 +93,11 @@ def test_cleanup_maps_supported_labels_and_filters_invalid_rows() -> None:
     assert cleaned[0]["reactive_site_1_signature"] == "LG|Ar|Br"
     assert cleaned[0]["reactive_site_2_signature"] == "XH|N|H2|Alkyl"
     assert cleaned[0]["reactive_site_2_center_class"] == "primary"
+    assert cleaned[0]["condition_recipe_id"].startswith("RCR1:")
+    assert cleaned[0]["condition_display"] == (
+        "No ligand; K2CO3 [base]; dioxane [solvent]"
+    )
+    assert cleaned[0]["condition_identity_uncertainty"] == "false"
 
     assert cleaned[1]["reactive_site_1_signature"] == "EC|Acyl|Alkyl|OH|latent"
     assert cleaned[1]["reactive_site_2_alpha_branched"] == "true"
@@ -108,7 +120,19 @@ def test_output_schema_keeps_display_labels_but_excludes_dead_metadata() -> None
         )
     }
 
-    assert len(OUTPUT_FIELDNAMES) == 22
+    assert len(OUTPUT_FIELDNAMES) == 21
     assert "reactive_site_1_display_label" in OUTPUT_FIELDNAMES
     assert "reactive_site_2_display_label" in OUTPUT_FIELDNAMES
+    assert "condition_display" in OUTPUT_FIELDNAMES
+    assert "condition_recipe_json" not in OUTPUT_FIELDNAMES
+    assert {
+        "catalyst",
+        "ligand",
+        "base",
+        "primary_solvent",
+        "secondary_solvent",
+        "tertiary_solvent",
+        "additive",
+        "coupling_reagent",
+    }.isdisjoint(OUTPUT_FIELDNAMES)
     assert excluded.isdisjoint(OUTPUT_FIELDNAMES)

@@ -4,15 +4,27 @@ from __future__ import annotations
 
 import argparse
 import csv
+import gzip
+import json
 from collections import Counter
 from pathlib import Path
-from typing import Iterable
+from typing import Any, Iterable, MutableMapping, Optional
 
+from condition_recommender.label_conditions import (
+    condition_recipe_catalog_path,
+    convert_label_conditions,
+)
 from reactive_taxonomy import resolve_source_label, validate_source_label_mappings
 
 
 SOURCE_TO_OUTPUT = {
     "yield%": "yield_pct",
+    "Reaction Type": "source_reaction_type",
+    "z-Score": "z_score",
+    "conditions": "procedure_text",
+}
+
+CONDITION_SOURCE_TO_INPUT = {
     "Base": "base",
     "Catalyst": "catalyst",
     "Solvent": "primary_solvent",
@@ -21,9 +33,6 @@ SOURCE_TO_OUTPUT = {
     "Coupling Reagent": "coupling_reagent",
     "Secondary Solvent": "secondary_solvent",
     "Tertiary Solvent": "tertiary_solvent",
-    "Reaction Type": "source_reaction_type",
-    "z-Score": "z_score",
-    "conditions": "procedure_text",
 }
 
 OUTPUT_SITE_SUFFIXES = (
@@ -40,20 +49,21 @@ OUTPUT_FIELDNAMES = (
     *(f"reactive_site_2_{suffix}" for suffix in OUTPUT_SITE_SUFFIXES),
     "yield_pct",
     "z_score",
-    "catalyst",
-    "ligand",
-    "base",
-    "primary_solvent",
-    "secondary_solvent",
-    "tertiary_solvent",
-    "additive",
-    "coupling_reagent",
+    "condition_recipe_id",
+    "condition_display",
+    "temperature_c",
+    "time_h",
+    "concentration_m",
+    "atmosphere",
+    "condition_identity_uncertainty",
     "procedure_text",
 )
 
 
 def clean_rows(
     rows: Iterable[dict[str, str]],
+    *,
+    recipe_catalog: Optional[MutableMapping[str, dict[str, Any]]] = None,
 ) -> tuple[list[dict[str, str]], Counter[str]]:
     """Filter requested rows and attach normalized FG fields."""
     cleaned: list[dict[str, str]] = []
@@ -82,6 +92,17 @@ def clean_rows(
             destination: (row.get(source) or "").strip()
             for source, destination in SOURCE_TO_OUTPUT.items()
         }
+        flat_conditions = {
+            destination: (row.get(source) or "").strip()
+            for source, destination in CONDITION_SOURCE_TO_INPUT.items()
+        }
+        flat_conditions["procedure_text"] = output["procedure_text"]
+        converted_conditions = convert_label_conditions(flat_conditions)
+        output.update(converted_conditions.to_columns())
+        if recipe_catalog is not None:
+            recipe_catalog[converted_conditions.recipe.recipe_id] = (
+                converted_conditions.recipe.to_dict()
+            )
         for source_column, prefix in (
             ("FG A", "reactive_site_1"),
             ("FG B", "reactive_site_2"),
@@ -115,8 +136,16 @@ def clean_csv(source: Path, destination: Path) -> Counter[str]:
         reader = csv.DictReader(handle)
         if not reader.fieldnames:
             raise ValueError(f"CSV has no header: {source}")
-        rows, stats = clean_rows(dict(row) for row in reader)
-        required = set(SOURCE_TO_OUTPUT) | {"FG A", "FG B"}
+        recipe_catalog: dict[str, dict[str, Any]] = {}
+        rows, stats = clean_rows(
+            (dict(row) for row in reader),
+            recipe_catalog=recipe_catalog,
+        )
+        required = (
+            set(SOURCE_TO_OUTPUT)
+            | set(CONDITION_SOURCE_TO_INPUT)
+            | {"FG A", "FG B"}
+        )
         missing = sorted(required - set(reader.fieldnames))
         if missing:
             raise ValueError(f"Missing source columns: {missing}")
@@ -130,9 +159,26 @@ def clean_csv(source: Path, destination: Path) -> Counter[str]:
         )
         writer.writeheader()
         writer.writerows(rows)
+    catalog_destination = condition_recipe_catalog_path(destination)
+    with gzip.open(
+        catalog_destination,
+        "wt",
+        encoding="utf-8",
+        newline="\n",
+        compresslevel=9,
+    ) as handle:
+        for recipe_id in sorted(recipe_catalog):
+            handle.write(
+                json.dumps(
+                    recipe_catalog[recipe_id],
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+            )
+            handle.write("\n")
+    stats["unique_condition_recipes"] = len(recipe_catalog)
     return stats
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
