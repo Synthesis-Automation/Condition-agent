@@ -88,41 +88,6 @@ class RecommendationRecord:
 
 
 @dataclass(frozen=True)
-class ConditionRecommendation:
-    rank: int
-    conditions: ConditionIdentity
-    recipe_id: str
-    score: float
-    similarity_score: float
-    expected_yield_pct: float
-    support: int
-    retrieval_level: str
-    precedent_reaction_ids: Tuple[str, ...]
-    explanation: Tuple[str, ...]
-    cautions: Tuple[str, ...] = ()
-
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
-
-
-@dataclass(frozen=True)
-class RecommendationResult:
-    query_reaction_smiles: str
-    valid: bool
-    query_label: Optional[str] = None
-    product_connection_label: Optional[str] = None
-    retrieval_level: Optional[str] = None
-    candidate_count: int = 0
-    recommendations: Tuple[ConditionRecommendation, ...] = ()
-    warnings: Tuple[str, ...] = ()
-    error: Optional[str] = None
-    schema_version: str = "1.0"
-
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
-
-
-@dataclass(frozen=True)
 class GenericConditionRecommendation:
     """One canonical recipe aggregated from structure-verified precedents."""
 

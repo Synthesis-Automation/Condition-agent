@@ -15,7 +15,6 @@ warnings, and uncertainty.
 | --- | --- | --- | --- |
 | Expert structural rules | `recommend_rule_conditions()` | Phase I C-N engine and definitions implemented; one production rule and multiple review-only drafts | Auditable starter protocols selected from explicit molecular facts |
 | Generic structure-backed retrieval | `recommend_generic_conditions()` | Functional pilot; coverage and calibration depend on converted structure-rich records | Type-agnostic precedent retrieval and canonical recipe aggregation |
-| Suzuki-specific structural retrieval | `recommend_conditions()` | Narrow earlier pilot; not the intended long-term general path | Existing verified Suzuki pilot datasets |
 | Weak-label retrieval | `recommend_conditions_from_labels()` | Functional transitional path with important data limitations | Datasets that contain reaction labels but not precedent structures |
 
 Supporting audit, conversion, indexing, and evaluation commands prepare data for
@@ -27,7 +26,6 @@ these paths; they do not recommend conditions by themselves.
   explicit starter protocol is desired.
 - Use generic structure-backed retrieval when a compatible converted record set
   or persisted generic index is available.
-- Use the Suzuki-specific path only for the existing Suzuki pilot.
 - Use weak-label retrieval only when structure-rich precedents are unavailable,
   and retain its uncertainty warnings.
 - Abstain when the selected path cannot support the query. Do not silently call
@@ -291,24 +289,6 @@ and the count of hard-incompatible recommendations.
 - Retrieval calibration across all supported transformation classes is not
   finished.
 
-## Suzuki-specific structural pilot
-
-`recommend_conditions()` is an earlier, Suzuki-only structural precedent path:
-
-```python
-from condition_recommender import recommend_conditions
-
-result = recommend_conditions(
-    "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
-    records_path="results/suzuki_recommendation_pilot/verified.csv",
-)
-```
-
-It requires an exactly verified Suzuki reaction and a verified pilot CSV. It
-does not support general reaction classes, and temperature and time are not
-modeled. New cross-family work should target the generic structure-backed path
-instead of expanding this specialized implementation.
-
 ## Weak-label recommendation
 
 The weak-label path uses a cleaned flat CSV whose precedent rows contain source
@@ -393,7 +373,6 @@ workflow. Until parity and evaluation gates are complete:
 
 - expert C-N rules remain a separate explicit path;
 - generic retrieval remains the preferred cross-family direction;
-- the Suzuki-specific pilot remains narrow;
 - weak-label retrieval remains transitional;
 - application code must not merge results from these paths without preserving
   their evidence level and provenance.
