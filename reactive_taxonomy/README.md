@@ -237,3 +237,10 @@ stable machine label from a chemist-facing display and optional environment
 constraints. For example, `RNH2 a-branch` resolves to machine label `R-NH2`,
 display label `R–NH₂ (α-C branched)`, and an `alpha_branched=true` qualifier.
 Unsupported labels are returned unchanged with `mapping_status=unresolved`.
+
+Qualified mappings may deliberately stop at a validated handle-family prefix.
+`Alkyl-H acidic`, for example, resolves to `XH|Csp3` because the source label
+does not identify the activating group or hydrogen count. Structure-derived
+sites remain exact, such as `XH|Csp3|H3|alpha_to:nitrile`. The taxonomy emits
+these sites only for explicit alpha-to-aldehyde, ketone, ester, amide, nitrile,
+sulfone, or nitro rules; ordinary alkane C–H sites remain excluded.

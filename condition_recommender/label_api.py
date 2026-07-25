@@ -110,6 +110,13 @@ def _signature_similarity(query: str, precedent: str) -> float:
     query_parts, precedent_parts = query.split("|"), precedent.split("|")
     if not query_parts or not precedent_parts or query_parts[0] != precedent_parts[0]:
         return 0.0
+    if (
+        query_parts[0] == "XH"
+        and len(query_parts) > 1
+        and len(precedent_parts) > 1
+        and query_parts[1] != precedent_parts[1]
+    ):
+        return 0.0
     width = max(len(query_parts), len(precedent_parts)) - 1
     if width <= 0:
         return 0.35
@@ -117,6 +124,11 @@ def _signature_similarity(query: str, precedent: str) -> float:
         left == right for left, right in zip(query_parts[1:], precedent_parts[1:])
     )
     return round(0.35 + 0.65 * matches / width, 6)
+
+
+def _known_signature_incompatible(query: str, precedent: str) -> bool:
+    """Treat an explicit zero match as incompatible, not merely incomplete."""
+    return bool(query and precedent) and _signature_similarity(query, precedent) == 0.0
 
 
 def _qualifier_similarity(
@@ -142,6 +154,15 @@ def _pair_similarity(
     weights = load_label_retrieval_rules()["participant_similarity_weights"]
     alternatives = []
     for order in ((0, 1), (1, 0)):
+        if any(
+            _known_signature_incompatible(
+                query[index].signature,
+                precedent[order[index]].signature,
+            )
+            for index in range(2)
+        ):
+            alternatives.append((0.0, 0.0, 0.0))
+            continue
         signatures = [
             _signature_similarity(
                 query[index].signature, precedent[order[index]].signature

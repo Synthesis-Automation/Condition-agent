@@ -134,3 +134,30 @@ def test_mapped_heck_agrees_and_reactant_order_is_invariant() -> None:
     assert forward.reaction_signature.signature_id == (
         reversed_order.reaction_signature.signature_id
     )
+
+
+def test_activated_sp3_carbon_arylation_reconstructs_product() -> None:
+    result = featurize_reaction(
+        "Brc1ccccc1.CC#N>>N#CCc1ccccc1"
+    )
+
+    assert result.transformation_class == "sp2_c_c_substitution"
+    assert result.named_family is None
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.selected_candidate is not None
+    assert result.selected_candidate.grammar_id == (
+        "sp2_c_activated_c_substitution"
+    )
+    assert result.product_connection is not None
+    assert result.product_connection.connection_type == "C_C"
+
+
+def test_activated_carbon_grammar_rejects_unactivated_alkane() -> None:
+    result = featurize_reaction(
+        "Brc1ccccc1.CC>>CCc1ccccc1"
+    )
+
+    assert all(
+        candidate.grammar_id != "sp2_c_activated_c_substitution"
+        for candidate in result.candidates
+    )

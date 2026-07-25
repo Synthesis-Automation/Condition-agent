@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "default_style": "unicode",
   "styles": {
     "unicode": {
@@ -63,6 +63,12 @@
     }
   },
   "xh_rules": [
+    {
+      "id": "activated_sp3_carbon",
+      "center": "Csp3",
+      "template": "activated C{bond}H",
+      "priority": 120
+    },
     {
       "id": "aromatic_nh",
       "center": "N_aromatic",

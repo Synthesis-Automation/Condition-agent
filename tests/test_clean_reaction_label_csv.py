@@ -43,6 +43,16 @@ def test_acid_or_carboxylate_source_label_maps_to_latent_acyl_donor() -> None:
     assert acid.qualifier_scope == "acid_or_carboxylate_collapsed_to_acid"
 
 
+def test_acidic_alkyl_h_maps_to_qualified_activated_carbon_family() -> None:
+    acidic_carbon = resolve_source_label("Alkyl-H acidic")
+
+    assert acidic_carbon.base_label == "activated C-H"
+    assert acidic_carbon.display_label == "Activated alkyl C–H"
+    assert acidic_carbon.canonical_signature == "XH|Csp3"
+    assert acidic_carbon.signature_scope == "family"
+    assert acidic_carbon.mapping_status == "qualified"
+
+
 def test_cleanup_maps_supported_labels_and_filters_invalid_rows() -> None:
     rows = [
         {"FG A": "ArBr", "FG B": "RNH2"},

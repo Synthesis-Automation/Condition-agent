@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.4",
+  "schema_version": "1.5",
   "grammars": [
     {
       "id": "boron_transfer_coupling",
@@ -445,6 +445,46 @@
         "sonogashira"
       ],
       "priority": 95
+    },
+    {
+      "id": "sp2_c_activated_c_substitution",
+      "transformation_class": "sp2_c_c_substitution",
+      "display_name": "sp2 C–C substitution with an activated carbon",
+      "generic_label": "Ar–X + EWG–C(sp3)–H → Ar–C(sp3)–EWG",
+      "roles": {
+        "electrophile": {
+          "site_type": "leaving_group",
+          "anchor_context_any": [
+            "Ar",
+            "HeteroAr",
+            "Alkenyl"
+          ]
+        },
+        "carbon_partner": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "Csp3"
+          ],
+          "h_count_min": 1,
+          "activation_relationship": "alpha_to",
+          "availability_any": [
+            "activated"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "carbon_partner"],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "operator": {
+        "id": "replace_handle_with_center",
+        "electrophile_role": "electrophile",
+        "partner_role": "carbon_partner"
+      },
+      "compatible_named_families": [],
+      "priority": 94
     },
     {
       "id": "other_metal_transfer_coupling",

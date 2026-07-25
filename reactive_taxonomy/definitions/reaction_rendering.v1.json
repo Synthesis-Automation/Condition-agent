@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.4",
+  "schema_version": "1.5",
   "fragment_indexing": {
     "context_symbols": {
       "Ar": "Ar",
@@ -69,6 +69,20 @@
     "sonogashira_coupling": {
       "product_kind": "terminal_alkyne",
       "anchor_role": "electrophile"
+    },
+    "sp2_c_activated_c_substitution": {
+      "product_kind": "activated_carbon_substitution",
+      "anchor_role": "electrophile",
+      "carbon_role": "carbon_partner",
+      "activation_labels": {
+        "aldehyde": "CHO",
+        "ketone": "C(O)R",
+        "ester": "C(O)OR",
+        "amide": "C(O)NR2",
+        "nitrile": "C≡N",
+        "sulfone": "S(O)2R",
+        "nitro": "NO2"
+      }
     },
     "chan_lam_heteroatom_coupling": {
       "product_kind": "chan_lam",

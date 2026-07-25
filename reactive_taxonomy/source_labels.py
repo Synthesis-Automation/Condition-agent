@@ -14,6 +14,7 @@ from .validation import validate_taxonomy
 
 _PATH = Path(__file__).with_name("definitions") / "source_label_crosswalk.v1.json"
 MappingStatus = Literal["canonical", "qualified", "unresolved"]
+SignatureScope = Literal["exact", "family"]
 
 
 @dataclass(frozen=True)
@@ -26,6 +27,7 @@ class SourceLabelMapping:
     representative_smiles: str
     canonical_signature: str
     mapping_status: MappingStatus
+    signature_scope: SignatureScope = "exact"
     center_substitution_class: Optional[str] = None
     attachment_carbon_class: Optional[str] = None
     alpha_branched: Optional[bool] = None
@@ -94,7 +96,13 @@ def validate_source_label_mappings() -> list[str]:
         matches = [
             (site, environments[site.site_id])
             for site in analysis.sites
-            if site.canonical_signature == mapping.canonical_signature
+            if (
+                site.canonical_signature == mapping.canonical_signature
+                if mapping.signature_scope == "exact"
+                else site.canonical_signature.startswith(
+                    f"{mapping.canonical_signature}|"
+                )
+            )
             and site.site_id in environments
         ]
         if not analysis.valid or len(matches) != 1:
@@ -122,12 +130,18 @@ def validate_source_label_mappings() -> list[str]:
             errors.append(f"{source}:alpha_branched")
         if mapping.mapping_status == "qualified" and not mapping.qualifier_scope:
             errors.append(f"{source}:qualifier_scope")
+        if (
+            mapping.signature_scope == "family"
+            and len(mapping.canonical_signature.split("|")) < 2
+        ):
+            errors.append(f"{source}:signature_scope")
     return errors
 
 
 __all__ = [
     "MappingStatus",
     "SourceLabelMapping",
+    "SignatureScope",
     "load_source_label_mappings",
     "resolve_source_label",
     "validate_source_label_mappings",

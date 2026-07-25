@@ -184,13 +184,27 @@ def test_rendering_styles_preserve_signature() -> None:
     assert ascii_site.chemist_label == "Ar-NH2"
     assert hte_site.chemist_label == "Ar-NH2"
     assert len({unicode_site.canonical_signature, ascii_site.canonical_signature, hte_site.canonical_signature}) == 1
-    assert featurize_molecule("CC(=O)NC").sites[0].chemist_label == "R–C(O)–NHR"
-    assert featurize_molecule("CS(=O)(=O)NC").sites[0].chemist_label == "R–S(O)2–NHR"
+    amide_nh = next(
+        site
+        for site in featurize_molecule("CC(=O)NC").sites
+        if site.details.get("center_token") == "N"
+    )
+    sulfonamide_nh = next(
+        site
+        for site in featurize_molecule("CS(=O)(=O)NC").sites
+        if site.details.get("center_token") == "N"
+    )
+    assert amide_nh.chemist_label == "R–C(O)–NHR"
+    assert sulfonamide_nh.chemist_label == "R–S(O)2–NHR"
 
 
 def test_availability_distinguishes_chemical_site_state() -> None:
     assert featurize_molecule("CCN").sites[0].availability == "free"
-    assert next(site for site in featurize_molecule("CC(=O)NC").sites if site.site_type == "pronucleophile_XH").availability == "deactivated"
+    assert next(
+        site
+        for site in featurize_molecule("CC(=O)NC").sites
+        if site.details.get("center_token") == "N"
+    ).availability == "deactivated"
     assert next(site for site in featurize_molecule("CC(=O)O").sites if site.site_type == "electrophilic_center").availability == "latent"
     assert featurize_molecule("CC(=O)Cl").sites[0].availability == "activated"
     assert featurize_molecule("OB(O)c1ccccc1").sites[0].availability == "transferable"

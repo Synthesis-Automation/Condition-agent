@@ -464,6 +464,40 @@ def render_product_label(
             style=style,
         )
         product = f"{anchor_label}{bond}C≡C{bond}R"
+    elif kind == "activated_carbon_substitution":
+        anchor_role = str(rule["anchor_role"])
+        carbon_role = str(rule["carbon_role"])
+        anchor = assignment[anchor_role]
+        carbon = assignment[carbon_role]
+        anchor_label = _context_label(
+            anchor_role,
+            anchor,
+            0,
+            str(anchor.details["anchor_context"]),
+            aliases,
+            style=style,
+        )
+        activation_labels = {
+            str(key): str(value)
+            for key, value in (rule.get("activation_labels") or {}).items()
+        }
+        activators = [
+            activation_labels.get(
+                str(record.get("activator") or ""),
+                str(record.get("activator") or "EWG"),
+            )
+            for record in carbon.details.get("activation_records") or ()
+        ]
+        activation_label = "/".join(activators) if activators else "EWG"
+        remaining_h = max(0, int(carbon.details.get("h_count", 0)) - 1)
+        carbon_label = {
+            2: "CH2",
+            1: "CH(R)",
+            0: "C(R)2",
+        }.get(remaining_h, "C(sp3)")
+        product = (
+            f"{anchor_label}{bond}{carbon_label}{bond}{activation_label}"
+        )
     elif kind == "heck_alkene":
         anchor = assignment[rule["anchor_role"]]
         alkene = assignment[rule["alkene_role"]]

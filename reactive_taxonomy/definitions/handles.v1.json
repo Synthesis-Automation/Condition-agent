@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "site_families": {
     "leaving_group": [
       "F",
@@ -15,7 +15,8 @@
       "N",
       "O",
       "S",
-      "Csp"
+      "Csp",
+      "Csp3"
     ],
     "transfer_group": [
       "B(OH)2",
@@ -138,6 +139,145 @@
       "atom_roles": {
         "center": 1,
         "context": 2
+      }
+    },
+    {
+      "id": "acidic_c_h_alpha_to_aldehyde",
+      "site_type": "pronucleophile_XH",
+      "tokens": [
+        "Csp3"
+      ],
+      "activation_token": "aldehyde",
+      "activation_relationship": "alpha_to",
+      "priority": 65,
+      "smarts": "[C;X4;+0;H1,H2,H3:1]-[C;X3;H1:2]=[O:3]",
+      "atom_roles": {
+        "center": 1,
+        "activation_anchor": 2,
+        "activation_fragment": [
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "id": "acidic_c_h_alpha_to_ketone",
+      "site_type": "pronucleophile_XH",
+      "tokens": [
+        "Csp3"
+      ],
+      "activation_token": "ketone",
+      "activation_relationship": "alpha_to",
+      "priority": 65,
+      "smarts": "[C;X4;+0;H1,H2,H3:1]-[C;X3;H0:2](=[O:3])-[#6:4]",
+      "atom_roles": {
+        "center": 1,
+        "activation_anchor": 2,
+        "activation_fragment": [
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "id": "acidic_c_h_alpha_to_ester",
+      "site_type": "pronucleophile_XH",
+      "tokens": [
+        "Csp3"
+      ],
+      "activation_token": "ester",
+      "activation_relationship": "alpha_to",
+      "priority": 65,
+      "smarts": "[C;X4;+0;H1,H2,H3:1]-[C;X3:2](=[O:3])-[O;H0;+0:4]",
+      "atom_roles": {
+        "center": 1,
+        "activation_anchor": 2,
+        "activation_fragment": [
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "id": "acidic_c_h_alpha_to_amide",
+      "site_type": "pronucleophile_XH",
+      "tokens": [
+        "Csp3"
+      ],
+      "activation_token": "amide",
+      "activation_relationship": "alpha_to",
+      "priority": 65,
+      "smarts": "[C;X4;+0;H1,H2,H3:1]-[C;X3:2](=[O:3])-[N:4]",
+      "atom_roles": {
+        "center": 1,
+        "activation_anchor": 2,
+        "activation_fragment": [
+          2,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "id": "acidic_c_h_alpha_to_nitrile",
+      "site_type": "pronucleophile_XH",
+      "tokens": [
+        "Csp3"
+      ],
+      "activation_token": "nitrile",
+      "activation_relationship": "alpha_to",
+      "priority": 65,
+      "smarts": "[C;X4;+0;H1,H2,H3:1]-[C;X2:2]#[N:3]",
+      "atom_roles": {
+        "center": 1,
+        "activation_anchor": 2,
+        "activation_fragment": [
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "id": "acidic_c_h_alpha_to_sulfone",
+      "site_type": "pronucleophile_XH",
+      "tokens": [
+        "Csp3"
+      ],
+      "activation_token": "sulfone",
+      "activation_relationship": "alpha_to",
+      "priority": 65,
+      "smarts": "[C;X4;+0;H1,H2,H3:1]-[S;X4:2](=[O:3])(=[O:4])-[#6:5]",
+      "atom_roles": {
+        "center": 1,
+        "activation_anchor": 2,
+        "activation_fragment": [
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "id": "acidic_c_h_alpha_to_nitro",
+      "site_type": "pronucleophile_XH",
+      "tokens": [
+        "Csp3"
+      ],
+      "activation_token": "nitro",
+      "activation_relationship": "alpha_to",
+      "priority": 65,
+      "smarts": "[C;X4;+0;H1,H2,H3:1]-[N+:2](=[O:3])[O-:4]",
+      "atom_roles": {
+        "center": 1,
+        "activation_anchor": 2,
+        "activation_fragment": [
+          2,
+          3,
+          4
+        ]
       }
     },
     {

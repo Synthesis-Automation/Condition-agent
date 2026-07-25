@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "description": "Weak-label retrieval policy for the cleaned HTE reaction-label dataset.",
   "supported_reaction_scopes": ["intermolecular"],
   "grammar_source_reaction_types": {
@@ -10,6 +10,7 @@
     "sp2_c_s_substitution": ["CS-Coupling"],
     "sp3_c_n_substitution": ["Alkylation"],
     "terminal_alkene_heck_coupling": ["Heck"],
+    "sp2_c_activated_c_substitution": ["Arylation, acidic C-H"],
     "sonogashira_coupling": ["Sonogashira"],
     "other_metal_transfer_coupling": ["Negishi"]
   },

@@ -320,6 +320,13 @@ rows are not. The implementation:
 
 Weights live in `definitions/label_retrieval.v1.json`.
 
+Weak handle signatures may be family-level prefixes when the source label lacks
+structural detail. Known incompatible handle families or `XH` center classes
+are hard mismatches; an unknown/blank participant may still contribute a
+partial match through the other participant. This allows `XH|Csp3` precedents
+to support an exact activated-carbon query without allowing N–H or O–H rows to
+leak into the candidate recipes.
+
 Important limitations:
 
 - precedent reactions are not structure-verified;

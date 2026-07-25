@@ -48,7 +48,13 @@ class MatchIndex:
             query = compile_smarts(str(definition.get("smarts") or ""), validate=False)
             if query is None:
                 continue
-            matches = tuple(tuple(int(i) for i in match) for match in mol.GetSubstructMatches(query, uniquify=True))
+            matches = tuple(
+                tuple(int(i) for i in match)
+                for match in mol.GetSubstructMatches(
+                    query,
+                    uniquify=not bool(definition.get("activation_token")),
+                )
+            )
             self._handle_matches.append((definition, _query_map_positions(query), matches))
         with _CONTEXTS_PATH.open("r", encoding="utf-8") as handle:
             contexts = json.load(handle).get("contexts") or []
@@ -89,6 +95,51 @@ class MatchIndex:
             role_positions = [positions[int(value)] for value in role_maps if int(value) in positions]
             if any(any(match[position] == atom_index for position in role_positions) for match in matches):
                 found.append(definition)
+        return found
+
+    def role_matches_for_atom(
+        self,
+        site_type: str,
+        role: str,
+        atom_index: int,
+    ) -> List[Tuple[Dict[str, Any], Dict[str, Tuple[int, ...]]]]:
+        """Return each pattern match assigning ``role`` to ``atom_index``.
+
+        Unlike :meth:`patterns_for_atom`, this preserves distinct matches of the
+        same definition. That is required when one carbon is activated by two
+        separate electron-withdrawing groups.
+        """
+        found: List[Tuple[Dict[str, Any], Dict[str, Tuple[int, ...]]]] = []
+        for definition, positions, matches in self._handle_matches:
+            if definition.get("site_type") != site_type:
+                continue
+            raw_target_maps = (definition.get("atom_roles") or {}).get(role)
+            if raw_target_maps is None:
+                continue
+            target_maps = (
+                raw_target_maps
+                if isinstance(raw_target_maps, list)
+                else [raw_target_maps]
+            )
+            target_positions = [
+                positions[int(value)]
+                for value in target_maps
+                if int(value) in positions
+            ]
+            for match in matches:
+                if not any(match[position] == atom_index for position in target_positions):
+                    continue
+                assignments: Dict[str, Tuple[int, ...]] = {}
+                for role_name, raw_maps in (
+                    definition.get("atom_roles") or {}
+                ).items():
+                    role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
+                    assignments[str(role_name)] = tuple(
+                        int(match[positions[int(value)]])
+                        for value in role_maps
+                        if int(value) in positions
+                    )
+                found.append((definition, assignments))
         return found
 
     def context_match(

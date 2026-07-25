@@ -185,6 +185,14 @@ def validate_taxonomy() -> List[str]:
         }.get(str(pattern.get("site_type")), set())
         if not required_roles <= set(atom_roles):
             errors.append(f"missing_required_atom_role:{pattern_id}")
+        if "Csp3" in (pattern.get("tokens") or []):
+            if (
+                pattern.get("site_type") != "pronucleophile_XH"
+                or not pattern.get("activation_token")
+                or pattern.get("activation_relationship") != "alpha_to"
+                or "activation_anchor" not in atom_roles
+            ):
+                errors.append(f"invalid_activated_c_h_pattern:{pattern_id}")
         for role, raw_maps in atom_roles.items():
             role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
             unknown_maps = {int(value) for value in role_maps} - available_maps
@@ -317,6 +325,7 @@ def validate_taxonomy() -> List[str]:
         "nitrogen_substitution",
         "heteroatom_substitution",
         "terminal_alkyne",
+        "activated_carbon_substitution",
         "heck_alkene",
         "chan_lam",
         "reductive_amination",

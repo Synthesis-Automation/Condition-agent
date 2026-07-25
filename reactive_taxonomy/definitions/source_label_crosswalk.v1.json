@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "description": "Source-label mappings to reactive handles and source-asserted environment qualifiers.",
   "mappings": [
     {"source_label": "ArBr", "base_label": "Ar-Br", "display_label": "Ar–Br", "representative_smiles": "Brc1ccccc1", "canonical_signature": "LG|Ar|Br", "mapping_status": "canonical"},
@@ -29,6 +29,7 @@
     {"source_label": "RSO2F", "base_label": "R-S(O)2F", "display_label": "R–S(O)₂F", "representative_smiles": "CS(=O)(=O)F", "canonical_signature": "EC|Sulfonyl|Alkyl|F|activated", "mapping_status": "canonical"},
     {"source_label": "RSO2NHR", "base_label": "R-S(O)2-NHR", "display_label": "R–S(O)₂–NHR", "representative_smiles": "CS(=O)(=O)NC", "canonical_signature": "XH|N|H1|SO2R,Alkyl", "center_substitution_class": "secondary", "mapping_status": "canonical"},
     {"source_label": "RSH", "base_label": "R-SH", "display_label": "R–SH", "representative_smiles": "CCS", "canonical_signature": "XH|S|H1|Alkyl", "mapping_status": "canonical"},
+    {"source_label": "Alkyl-H acidic", "base_label": "activated C-H", "display_label": "Activated alkyl C–H", "representative_smiles": "CC(=O)c1ccccc1", "canonical_signature": "XH|Csp3", "signature_scope": "family", "qualifier_scope": "electron_withdrawing_group_and_hydrogen_count_unspecified", "mapping_status": "qualified"},
     {"source_label": "Alkyl-Br", "base_label": "R-Br", "display_label": "R–Br", "representative_smiles": "CCCBr", "canonical_signature": "LG|Alkyl|Br", "mapping_status": "canonical"},
     {"source_label": "Alkyl-Cl", "base_label": "R-Cl", "display_label": "R–Cl", "representative_smiles": "CCCCl", "canonical_signature": "LG|Alkyl|Cl", "mapping_status": "canonical"},
     {"source_label": "Alkyl-I", "base_label": "R-I", "display_label": "R–I", "representative_smiles": "CCCI", "canonical_signature": "LG|Alkyl|I", "mapping_status": "canonical"},

@@ -187,14 +187,20 @@
       "smiles": "CC=O",
       "expected_valid": true,
       "expected_group_counts": {"aldehyde": 1},
-      "expected_site_counts": {"EC|Carbonyl|aldehyde|Alkyl|addition": 1}
+      "expected_site_counts": {
+        "EC|Carbonyl|aldehyde|Alkyl|addition": 1,
+        "XH|Csp3|H3|alpha_to:aldehyde": 1
+      }
     },
     {
       "case_id": "acetone",
       "smiles": "CC(=O)C",
       "expected_valid": true,
       "expected_group_counts": {"ketone": 1},
-      "expected_site_counts": {"EC|Carbonyl|ketone|Alkyl,Alkyl|addition": 1}
+      "expected_site_counts": {
+        "EC|Carbonyl|ketone|Alkyl,Alkyl|addition": 1,
+        "XH|Csp3|H3|alpha_to:ketone": 2
+      }
     },
     {
       "case_id": "phenol",

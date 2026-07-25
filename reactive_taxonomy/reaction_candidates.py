@@ -64,6 +64,12 @@ def _matches(site: ReactionSiteReference, constraint: Dict[str, Any]) -> bool:
     ) < int(constraint["h_count_min"]):
         return False
     if (
+        constraint.get("activation_relationship")
+        and details.get("activation_relationship")
+        != constraint["activation_relationship"]
+    ):
+        return False
+    if (
         constraint.get("availability_any")
         and site.availability not in constraint["availability_any"]
     ):

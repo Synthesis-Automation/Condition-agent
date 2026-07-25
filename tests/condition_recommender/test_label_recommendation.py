@@ -237,6 +237,46 @@ def test_label_recommender_supports_acid_or_carboxylate_amide_label(
     assert result.recommendations[0].conditions["catalyst"] == "amide"
 
 
+def test_label_recommender_supports_activated_carbon_arylation(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "labels.csv"
+    _write(
+        path,
+        [
+            _row(
+                "Arylation, acidic C-H",
+                "ArBr",
+                "Alkyl-H acidic",
+                yield_pct=84,
+                catalyst="activated-carbon",
+            ),
+            _row(
+                "Arylation, acidic C-H",
+                "ArBr",
+                "RNH2",
+                yield_pct=99,
+                catalyst="incompatible-nitrogen",
+            ),
+        ],
+    )
+
+    result = recommend_conditions_from_labels(
+        "Brc1ccccc1.CC#N>>N#CCc1ccccc1",
+        records_path=path,
+        top_k=2,
+    )
+
+    assert result.valid
+    assert result.grammar_id == "sp2_c_activated_c_substitution"
+    assert result.candidate_count == 2
+    assert len(result.recommendations) == 1
+    assert result.recommendations[0].conditions["catalyst"] == (
+        "activated-carbon"
+    )
+    assert 0.0 < result.recommendations[0].signature_similarity < 1.0
+
+
 def test_label_recommender_requires_positive_top_k() -> None:
     result = recommend_conditions_from_labels("not-used", top_k=0)
     assert not result.valid

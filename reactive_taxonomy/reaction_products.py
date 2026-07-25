@@ -36,6 +36,11 @@ def build_product_connection(
         right_atom_role = "center"
         right_context_key = "center_token"
         connection_type = f"C_{rule['element']}"
+    elif kind == "activated_carbon_substitution":
+        left_role, right_role = str(rule["anchor_role"]), str(rule["carbon_role"])
+        right_atom_role = "center"
+        right_context_key = "center_token"
+        connection_type = "C_C"
     else:
         return None
     left, right = (

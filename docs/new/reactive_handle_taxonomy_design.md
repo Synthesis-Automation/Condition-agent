@@ -312,9 +312,22 @@ N
 O
 S
 Csp
+Csp3
 ```
 
-Do not include arbitrary C–H sites in v1. Carbon pronucleophiles should be added by explicit supported classes.
+Do not include arbitrary C–H sites. `Csp3` is emitted only for a neutral,
+hydrogen-bearing sp3 carbon matched by an explicit activation rule. The first
+supported rules require an alpha relationship to an aldehyde, ketone, ester,
+amide, nitrile, sulfone, or nitro group. Each site retains the activating atom,
+fragment, rule ID, and all independently matched activators.
+
+Examples:
+
+```text
+XH|Csp3|H3|alpha_to:ketone
+XH|Csp3|H3|alpha_to:nitrile
+XH|Csp3|H2|alpha_to:ester*2
+```
 
 ## 4.5 Electrophilic-center families
 
