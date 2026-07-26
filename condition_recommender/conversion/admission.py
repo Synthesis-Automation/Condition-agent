@@ -8,16 +8,29 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Optional, Tuple
 
+from condition_registry import ResolvedConditionRecipe
+
 from .identities import CanonicalReactionIdentity
 from .input_schema import RawReactionRecord
-from ..models import AdmissionTier, ConditionIdentity
+from ..models import (
+    AdmissionTier,
+    ChemistryStatus,
+    ConditionIdentity,
+    ConditionStatus,
+    IndexEligibility,
+    OutcomeStatus,
+)
 
 
 @dataclass(frozen=True)
 class AdmissionDecision:
     tier: AdmissionTier
     reasons: Tuple[str, ...]
-    policy_version: str = "generic_admission.v1"
+    chemistry_status: ChemistryStatus
+    condition_status: ConditionStatus
+    outcome_status: OutcomeStatus
+    index_eligibility: IndexEligibility
+    policy_version: str = "generic_admission.v1.2"
 
 
 @lru_cache(maxsize=1)
@@ -33,55 +46,75 @@ def decide_admission(
     analysis: Any,
     canonical_identity: Optional[CanonicalReactionIdentity],
     conditions: ConditionIdentity,
+    resolved_recipe: ResolvedConditionRecipe,
 ) -> AdmissionDecision:
-    """Classify a row without requiring a named reaction family."""
+    """Assess independent evidence dimensions and derive the legacy tier."""
     policy = load_admission_policy()
     minimum_yield, maximum_yield = policy["valid_yield_range"]
+
+    chemistry_status = ChemistryStatus.VERIFIED
+    chemistry_reasons: list[str] = []
     if not analysis.valid or canonical_identity is None:
-        return AdmissionDecision(
-            AdmissionTier.REJECTED, ("invalid_reaction_or_product",)
-        )
-    if record.yield_pct is None or not minimum_yield <= record.yield_pct <= maximum_yield:
-        return AdmissionDecision(
-            AdmissionTier.REJECTED, ("missing_or_invalid_yield",)
-        )
-    raw_conditions_present = bool(
-        record.catalyst_cas or record.reagent_cas or record.solvent_cas
-    )
-    if not raw_conditions_present:
-        return AdmissionDecision(
-            AdmissionTier.REJECTED, ("no_condition_identifiers",)
-        )
-    signature = analysis.reaction_signature
-    if signature is None:
+        chemistry_status = ChemistryStatus.REJECTED
+        chemistry_reasons.append("invalid_reaction_or_product")
+    elif analysis.reaction_signature is None:
         if analysis.candidates or analysis.evidence_quality in {
             "reactant_grammar_only",
             "ambiguous",
         }:
-            return AdmissionDecision(
-                AdmissionTier.REVIEW,
-                ("missing_verified_reaction_signature",),
-            )
-        return AdmissionDecision(
-            AdmissionTier.REJECTED,
-            ("no_usable_transformation_evidence",),
-        )
-    reasons = []
-    if analysis.evidence_quality == "conflicting_edit_evidence":
-        reasons.append("conflicting_edit_evidence")
-    if any(
-        warning in analysis.warnings for warning in policy["review_warnings"]
-    ):
-        reasons.append("multiple_products")
-    if analysis.evidence_quality not in set(policy["verified_evidence"]):
-        reasons.append("insufficient_edit_evidence")
-    normalized_conditions_present = bool(
-        conditions.catalyst_cas
-        or conditions.reagent_cas
-        or conditions.solvent_cas
+            chemistry_status = ChemistryStatus.REVIEW
+            chemistry_reasons.append("missing_verified_reaction_signature")
+        else:
+            chemistry_status = ChemistryStatus.REJECTED
+            chemistry_reasons.append("no_usable_transformation_evidence")
+    else:
+        if analysis.evidence_quality == "conflicting_edit_evidence":
+            chemistry_reasons.append("conflicting_edit_evidence")
+        if any(
+            warning in analysis.warnings for warning in policy["review_warnings"]
+        ):
+            chemistry_reasons.append("multiple_products")
+        if analysis.evidence_quality not in set(policy["verified_evidence"]):
+            chemistry_reasons.append("insufficient_edit_evidence")
+        if chemistry_reasons:
+            chemistry_status = ChemistryStatus.REVIEW
+
+    if record.yield_pct is None:
+        outcome_status = OutcomeStatus.MISSING
+        outcome_reasons = ["missing_yield"]
+    elif minimum_yield <= record.yield_pct <= maximum_yield:
+        outcome_status = OutcomeStatus.USABLE
+        outcome_reasons = []
+    else:
+        outcome_status = OutcomeStatus.INVALID
+        outcome_reasons = ["invalid_yield"]
+
+    raw_conditions_present = bool(
+        record.catalyst_cas or record.reagent_cas or record.solvent_cas
     )
-    if not normalized_conditions_present:
-        reasons.append("unresolved_condition_identifiers")
+    condition_reasons: list[str] = []
+    if not raw_conditions_present:
+        condition_status = ConditionStatus.UNUSABLE
+        condition_reasons.append("no_condition_identifiers")
+    elif _has_ambiguous_stages(record.stages):
+        condition_status = ConditionStatus.MULTISTAGE_AMBIGUOUS
+        condition_reasons.append("multistage_conditions_not_structured")
+    elif not _has_non_solvent_component(resolved_recipe):
+        condition_status = ConditionStatus.UNUSABLE
+        condition_reasons.append("solvent_only_recipe")
+    else:
+        statuses = {component.identity_status for component in resolved_recipe.components}
+        if "invalid_identifier" in statuses:
+            condition_status = ConditionStatus.RESOLVED_PARTIAL
+            condition_reasons.extend(
+                ("condition_identifier_uncertainty", "unresolved_condition_identifiers")
+            )
+        elif any(status != "resolved" for status in statuses):
+            condition_status = ConditionStatus.UNRESOLVED_RETAINED
+            condition_reasons.append("condition_identifier_uncertainty")
+        else:
+            condition_status = ConditionStatus.RESOLVED_COMPLETE
+
     raw_identifier_count = sum(
         len(values)
         for values in (
@@ -98,15 +131,68 @@ def decide_admission(
             conditions.solvent_cas,
         )
     )
-    if normalized_identifier_count < raw_identifier_count:
-        reasons.append("condition_identifier_uncertainty")
-    if reasons:
-        return AdmissionDecision(
-            AdmissionTier.REVIEW, tuple(sorted(set(reasons)))
-        )
+    if (
+        raw_conditions_present
+        and normalized_identifier_count < raw_identifier_count
+        and "condition_identifier_uncertainty" not in condition_reasons
+    ):
+        condition_reasons.append("condition_identifier_uncertainty")
+        if condition_status == ConditionStatus.RESOLVED_COMPLETE:
+            condition_status = ConditionStatus.RESOLVED_PARTIAL
+
+    if chemistry_status == ChemistryStatus.REJECTED or (
+        condition_status == ConditionStatus.UNUSABLE
+    ):
+        index_eligibility = IndexEligibility.INELIGIBLE
+    elif chemistry_status == ChemistryStatus.VERIFIED and condition_status in {
+        ConditionStatus.RESOLVED_COMPLETE,
+        ConditionStatus.UNRESOLVED_RETAINED,
+    }:
+        index_eligibility = IndexEligibility.ELIGIBLE
+    else:
+        index_eligibility = IndexEligibility.REVIEW_ONLY
+
+    if index_eligibility == IndexEligibility.INELIGIBLE:
+        tier = AdmissionTier.REJECTED
+    elif (
+        chemistry_status == ChemistryStatus.VERIFIED
+        and condition_status == ConditionStatus.RESOLVED_COMPLETE
+        and outcome_status == OutcomeStatus.USABLE
+        and index_eligibility == IndexEligibility.ELIGIBLE
+    ):
+        tier = AdmissionTier.VERIFIED
+    else:
+        tier = AdmissionTier.REVIEW
+
+    reasons = sorted(
+        set(chemistry_reasons + condition_reasons + outcome_reasons)
+    )
+    if tier == AdmissionTier.VERIFIED:
+        reasons = ["verified_reaction_signature_with_conditions"]
     return AdmissionDecision(
-        AdmissionTier.VERIFIED,
-        ("verified_reaction_signature_with_conditions",),
+        tier=tier,
+        reasons=tuple(reasons),
+        chemistry_status=chemistry_status,
+        condition_status=condition_status,
+        outcome_status=outcome_status,
+        index_eligibility=index_eligibility,
+    )
+
+
+def _has_ambiguous_stages(raw_stages: str) -> bool:
+    value = str(raw_stages or "").strip()
+    if not value:
+        return False
+    try:
+        stage_count = int(value)
+    except ValueError:
+        return True
+    return stage_count != 1
+
+
+def _has_non_solvent_component(recipe: ResolvedConditionRecipe) -> bool:
+    return any(
+        component.primary_role != "solvent" for component in recipe.components
     )
 
 

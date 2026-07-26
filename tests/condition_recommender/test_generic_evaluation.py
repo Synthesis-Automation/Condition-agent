@@ -56,10 +56,15 @@ def _signature(index: int) -> dict:
 
 def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
+    recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "1.8",
-        "converter_definition_version": "generic_conversion.v1.3",
+        "schema_version": "1.9",
+        "converter_definition_version": "generic_conversion.v1.4",
         "admission_tier": "verified",
+        "index_eligibility": "eligible",
+        "chemistry_status": "verified",
+        "condition_status": "resolved_complete",
+        "outcome_status": "usable",
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
         "canonical_reaction_id": canonical_group or f"CRX1:{index}",
@@ -67,9 +72,14 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
         "yield_pct": 50.0 + index,
         "source_dataset": f"dataset-{index % 2}",
         "reference_id": f"REF1:{index}",
+        "reference_condition_series_id": f"RCS1:{index}",
         "reaction_signature": _signature(index),
         "resolved_recipe_id": recipe_id,
-        "resolved_recipe": {"recipe_id": recipe_id},
+        "resolved_recipe_core_id": recipe_core_id,
+        "resolved_recipe": {
+            "recipe_id": recipe_id,
+            "recipe_core_id": recipe_core_id,
+        },
         "condition_resolution": {"has_uncertainty": False},
     }
 
@@ -86,9 +96,9 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.2"
+    assert payload["schema_version"] == "1.3"
     assert payload["reaction_signature_schema_version"] == "1.3"
-    assert payload["record_schema_versions"] == ["1.8"]
+    assert payload["record_schema_versions"] == ["1.9"]
 
 
 def test_index_rejects_stale_converted_records() -> None:

@@ -85,10 +85,16 @@ def _signature(
 
 
 def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
+    recipe_id = f"RCR1:{index % 2}"
+    recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "1.8",
-        "converter_definition_version": "generic_conversion.v1.3",
+        "schema_version": "1.9",
+        "converter_definition_version": "generic_conversion.v1.4",
         "admission_tier": tier,
+        "index_eligibility": "eligible" if tier == "verified" else "review_only",
+        "chemistry_status": "verified",
+        "condition_status": "resolved_complete",
+        "outcome_status": "usable",
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
         "reaction_smiles": "C.N>>CN",
@@ -96,18 +102,26 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
         "source_dataset": f"dataset-{index % 2}",
         "reference_id": f"REF1:{index}",
         "reaction_signature": signature,
-        "resolved_recipe_id": f"RCR1:{index % 2}",
-        "resolved_recipe": {"recipe_id": f"RCR1:{index % 2}"},
+        "reference_condition_series_id": f"RCS1:{index}",
+        "resolved_recipe_id": recipe_id,
+        "resolved_recipe_core_id": recipe_core_id,
+        "resolved_recipe": {
+            "recipe_id": recipe_id,
+            "recipe_core_id": recipe_core_id,
+        },
         "condition_resolution": {"has_uncertainty": False},
     }
 
 
 def test_generic_index_admits_only_usable_verified_records() -> None:
+    tier_only = _record(4, _signature("four"))
+    tier_only.pop("index_eligibility")
     index = build_generic_index(
         [
             _record(1, _signature("one")),
             _record(2, _signature("two"), tier="review"),
             {**_record(3, _signature("three")), "resolved_recipe": None},
+            tier_only,
         ]
     )
     assert len(index.rows) == 1
@@ -314,6 +328,52 @@ def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:
         caution.startswith("Reaction-scope mismatch:")
         for caution in result.recommendations[0].cautions
     )
+
+
+def test_aggregation_counts_references_as_independent_evidence() -> None:
+    query = _signature("query")
+    records = [_record(index, _signature(str(index))) for index in range(4)]
+    for record in records:
+        record["resolved_recipe_id"] = "RCR1:shared"
+        record["resolved_recipe_core_id"] = "RCORE1:shared"
+        record["resolved_recipe"] = {
+            "recipe_id": "RCR1:shared",
+            "recipe_core_id": "RCORE1:shared",
+        }
+    for record in records[:3]:
+        record["reference_id"] = "REF1:shared"
+        record["reference_condition_series_id"] = "RCS1:shared"
+
+    result = recommend_indexed_signature(
+        query,
+        build_generic_index(records),
+        minimum_pool_size=1,
+    )
+
+    recommendation = result.recommendations[0]
+    assert recommendation.observation_support == 4
+    assert recommendation.reference_support == 2
+    assert recommendation.condition_series_support == 2
+    assert any(
+        "one independent evidence unit" in caution
+        for caution in recommendation.cautions
+    )
+
+
+def test_recommendation_can_report_unknown_expected_yield() -> None:
+    records = [_record(index, _signature(str(index))) for index in range(3)]
+    for record in records:
+        record["yield_pct"] = None
+        record["outcome_status"] = "missing"
+
+    result = recommend_indexed_signature(
+        _signature("query"),
+        build_generic_index(records),
+        minimum_pool_size=1,
+    )
+
+    assert result.valid
+    assert result.recommendations[0].expected_yield_pct is None
 
 
 def test_generic_retrieval_weights_are_normalized() -> None:

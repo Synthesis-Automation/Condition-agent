@@ -14,6 +14,7 @@ from .admission import decide_admission
 from .identities import canonical_reaction_identity, observation_id, raw_recipe_id
 from .input_schema import RawReactionRecord
 from .references import normalize_reference
+from .reference_series import reference_condition_series_id
 from .signature_serialization import signature_record_fields
 
 
@@ -78,6 +79,20 @@ def convert_record(record: RawReactionRecord) -> RecommendationRecord:
         analysis=analysis,
         canonical_identity=canonical_identity,
         conditions=conditions,
+        resolved_recipe=resolved_recipe,
+    )
+    condition_series_id = reference_condition_series_id(
+        reference_id=reference_identity.reference_id,
+        recipe_core_id=resolved_recipe.recipe_core_id,
+        chemistry_key=(
+            analysis.reaction_signature.transformation_signature_key
+            if analysis.reaction_signature
+            else ""
+        ),
+        stages=record.stages,
+        steps=record.steps,
+        temperature_c=record.temperature_c,
+        time_h=record.time_h,
     )
     source = {
         "source_dataset": record.source_dataset,
@@ -114,6 +129,10 @@ def convert_record(record: RawReactionRecord) -> RecommendationRecord:
         temperature_c=record.temperature_c,
         time_h=record.time_h,
         conditions=conditions,
+        chemistry_status=decision.chemistry_status,
+        condition_status=decision.condition_status,
+        outcome_status=decision.outcome_status,
+        index_eligibility=decision.index_eligibility,
         family_environment=asdict(analysis.family_environment)
         if analysis.family_environment
         else None,
@@ -138,9 +157,11 @@ def convert_record(record: RawReactionRecord) -> RecommendationRecord:
         if canonical_identity
         else None,
         raw_recipe_id=raw_recipe_id(record),
+        resolved_recipe_core_id=resolved_recipe.recipe_core_id,
         condition_resolution=_condition_resolution(resolved_recipe),
         resolved_recipe_id=resolved_recipe.recipe_id,
         resolved_recipe=resolved_recipe.to_dict(),
+        reference_condition_series_id=condition_series_id,
         source=source,
     )
 

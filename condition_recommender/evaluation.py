@@ -169,7 +169,7 @@ def evaluate_generic_index(
         full_index.rows, test_fraction=test_fraction, seed=seed
     )
     train_index = build_generic_index_from_rows(split.train_rows)
-    train_recipe_ids = {row.recipe_id for row in split.train_rows}
+    train_recipe_core_ids = {row.recipe_core_id for row in split.train_rows}
     retrieval_levels = Counter()
     errors = Counter()
     cases = []
@@ -188,20 +188,26 @@ def evaluate_generic_index(
         retrieval_levels[result.retrieval_level or "none"] += 1
         excluded_candidates += result.excluded_candidate_count
         recommended_ids = tuple(item.recipe_id for item in result.recommendations)
-        recipe_seen = row.recipe_id in train_recipe_ids
+        recommended_core_ids = tuple(
+            item.recipe_core_id for item in result.recommendations
+        )
+        recipe_seen = row.recipe_core_id in train_recipe_core_ids
         if recipe_seen:
             seen_recipe_queries += 1
-        top1_match = bool(recommended_ids and recommended_ids[0] == row.recipe_id)
-        topk_match = row.recipe_id in recommended_ids
+        top1_match = bool(
+            recommended_core_ids
+            and recommended_core_ids[0] == row.recipe_core_id
+        )
+        topk_match = row.recipe_core_id in recommended_core_ids
         if result.valid and result.recommendations:
             covered += 1
             top1_matches += int(top1_match)
             topk_matches += int(topk_match)
             seen_top1_matches += int(recipe_seen and top1_match)
             seen_topk_matches += int(recipe_seen and topk_match)
-            yield_errors.append(
-                abs(result.recommendations[0].expected_yield_pct - row.yield_pct)
-            )
+            predicted_yield = result.recommendations[0].expected_yield_pct
+            if predicted_yield is not None and row.yield_pct is not None:
+                yield_errors.append(abs(predicted_yield - row.yield_pct))
             for recommendation in result.recommendations:
                 assessment = assess_recipe_compatibility(
                     row.signature, recommendation.resolved_recipe
@@ -215,6 +221,7 @@ def evaluate_generic_index(
                 "reaction_id": row.reaction_id,
                 "observation_id": row.observation_id,
                 "actual_recipe_id": row.recipe_id,
+                "actual_recipe_core_id": row.recipe_core_id,
                 "actual_yield_pct": row.yield_pct,
                 "recipe_seen_in_training": recipe_seen,
                 "valid": result.valid,
@@ -223,6 +230,7 @@ def evaluate_generic_index(
                 "compatible_candidate_count": result.compatible_candidate_count,
                 "excluded_candidate_count": result.excluded_candidate_count,
                 "recommended_recipe_ids": recommended_ids,
+                "recommended_recipe_core_ids": recommended_core_ids,
                 "top1_recipe_match": top1_match,
                 "topk_recipe_match": topk_match,
                 "predicted_yield_pct": result.recommendations[0].expected_yield_pct

@@ -5,11 +5,15 @@ from .generic_api import recommend_generic_conditions, recommend_indexed_signatu
 from .label_api import recommend_conditions_from_labels
 from .models import (
     AdmissionTier,
+    ChemistryStatus,
     ConditionIdentity,
+    ConditionStatus,
     GenericConditionRecommendation,
     GenericRecommendationResult,
+    IndexEligibility,
     LabelConditionRecommendation,
     LabelRecommendationResult,
+    OutcomeStatus,
     ReferenceIdentity,
     RecommendationRecord,
 )
@@ -18,12 +22,16 @@ from .rule_review import build_rule_review_rows, export_rule_review_csv
 
 __all__ = [
     "AdmissionTier",
+    "ChemistryStatus",
+    "ConditionStatus",
     "ConditionIdentity",
     "CompatibilityAssessment",
     "GenericConditionRecommendation",
     "GenericRecommendationResult",
+    "IndexEligibility",
     "LabelConditionRecommendation",
     "LabelRecommendationResult",
+    "OutcomeStatus",
     "ReferenceIdentity",
     "RecommendationRecord",
     "RuleRecommendationResult",

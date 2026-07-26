@@ -29,6 +29,7 @@ def _explanation(
     level: str,
     components: Dict[str, float],
     support: int,
+    references: int,
     datasets: int,
     compatibility_score: float,
     query_scope: str,
@@ -54,8 +55,50 @@ def _explanation(
             f"Reaction-scope mismatch: query {query_scope}; precedent {precedent_scope}"
         )
     notes.append(f"Recipe compatibility score: {compatibility_score:.2f}")
-    notes.append(f"Supported by {support} precedent(s) from {datasets} dataset(s)")
+    notes.append(
+        f"Supported by {support} distinct reaction(s), "
+        f"{references} independent reference(s), and {datasets} dataset(s)"
+    )
     return tuple(notes)
+
+
+def _evidence_unit(row: GenericIndexedReaction) -> str:
+    """Return the publication-level unit used to limit correlated evidence."""
+    if row.reference_id:
+        return f"reference:{row.reference_id}"
+    return "reaction:" + (
+        row.canonical_reaction_id or row.observation_id or row.reaction_id
+    )
+
+
+def _best_by_evidence_unit(
+    members: List[
+        Tuple[
+            float,
+            GenericIndexedReaction,
+            Dict[str, float],
+            CompatibilityAssessment,
+        ]
+    ],
+) -> list[
+    Tuple[
+        float,
+        GenericIndexedReaction,
+        Dict[str, float],
+        CompatibilityAssessment,
+    ]
+]:
+    selected = {}
+    for member in sorted(
+        members,
+        key=lambda item: (
+            -item[0],
+            -(item[1].yield_pct if item[1].yield_pct is not None else -1.0),
+            item[1].reaction_id,
+        ),
+    ):
+        selected.setdefault(_evidence_unit(member[1]), member)
+    return list(selected.values())
 
 
 def _aggregate(
@@ -70,7 +113,13 @@ def _aggregate(
     for row, assessment in assessed_pool:
         similarity, components = generic_signature_similarity(query, row.signature)
         scored.append((similarity, row, components, assessment))
-    scored.sort(key=lambda item: (-item[0], -item[1].yield_pct, item[1].reaction_id))
+    scored.sort(
+        key=lambda item: (
+            -item[0],
+            -(item[1].yield_pct if item[1].yield_pct is not None else -1.0),
+            item[1].reaction_id,
+        )
+    )
     groups: Dict[
         str,
         List[
@@ -82,30 +131,83 @@ def _aggregate(
             ]
         ],
     ] = defaultdict(list)
-    for item in scored[:maximum]:
-        groups[item[1].recipe_id].append(item)
-    pool_mean = sum(row.yield_pct for row, _ in assessed_pool) / len(assessed_pool)
+    selected_units = set()
+    for item in scored:
+        unit = (item[1].recipe_core_id, _evidence_unit(item[1]))
+        if unit not in selected_units and len(selected_units) >= maximum:
+            continue
+        selected_units.add(unit)
+        groups[item[1].recipe_core_id].append(item)
+    pool_yields = [
+        member[1].yield_pct
+        for member in _best_by_evidence_unit(
+            [
+                (
+                    generic_signature_similarity(query, row.signature)[0],
+                    row,
+                    {},
+                    assessment,
+                )
+                for row, assessment in assessed_pool
+                if row.yield_pct is not None
+            ]
+        )
+    ]
+    pool_mean = (
+        sum(value for value in pool_yields if value is not None) / len(pool_yields)
+        if pool_yields
+        else None
+    )
     prior_strength = float(rules["yield_prior_strength"])
     ranking = rules["ranking_weights"]
     ranked = []
-    for recipe_id, members in groups.items():
-        similarity_weight = sum(max(item[0], 0.05) for item in members)
-        weighted_yield = sum(
-            max(similarity, 0.05) * row.yield_pct for similarity, row, _, _ in members
+    for recipe_core_id, members in groups.items():
+        independent_members = _best_by_evidence_unit(members)
+        outcome_members = _best_by_evidence_unit(
+            [member for member in members if member[1].yield_pct is not None]
         )
-        expected_yield = (weighted_yield + prior_strength * pool_mean) / (
-            similarity_weight + prior_strength
+        if outcome_members and pool_mean is not None:
+            similarity_weight = sum(max(item[0], 0.05) for item in outcome_members)
+            weighted_yield = sum(
+                max(similarity, 0.05) * float(row.yield_pct)
+                for similarity, row, _, _ in outcome_members
+            )
+            expected_yield = (weighted_yield + prior_strength * pool_mean) / (
+                similarity_weight + prior_strength
+            )
+        else:
+            expected_yield = None
+        similarity_score = sum(item[0] for item in independent_members) / len(
+            independent_members
         )
-        similarity_score = sum(item[0] for item in members) / len(members)
-        compatibility_score = sum(item[3].score for item in members) / len(members)
-        support_score = min(1.0, math.log1p(len(members)) / math.log1p(10))
+        compatibility_score = sum(
+            item[3].score for item in independent_members
+        ) / len(independent_members)
+        canonical_reactions = {
+            item[1].canonical_reaction_id
+            or item[1].observation_id
+            or item[1].reaction_id
+            for item in members
+        }
+        support = len(canonical_reactions)
+        support_score = min(1.0, math.log1p(support) / math.log1p(10))
         datasets = {
             item[1].source_dataset for item in members if item[1].source_dataset
         }
+        references = {
+            item[1].reference_id for item in members if item[1].reference_id
+        }
+        condition_series = {
+            item[1].reference_condition_series_id
+            for item in members
+            if item[1].reference_condition_series_id
+        }
+        recipe_variants = {item[1].recipe_id for item in members}
         diversity_score = min(1.0, len(datasets) / 3.0)
         score = (
             float(ranking["similarity"]) * similarity_score
-            + float(ranking["yield"]) * expected_yield / 100.0
+            + float(ranking["yield"])
+            * ((expected_yield or 0.0) / 100.0)
             + float(ranking["support"]) * support_score
             + float(ranking["dataset_diversity"]) * diversity_score
             + float(ranking["compatibility"]) * compatibility_score
@@ -115,23 +217,37 @@ def _aggregate(
                 score,
                 expected_yield,
                 similarity_score,
-                recipe_id,
+                recipe_core_id,
                 members,
                 len(datasets),
                 compatibility_score,
+                support,
+                len(references),
+                len(condition_series),
+                tuple(sorted(recipe_variants)),
             )
         )
-    ranked.sort(key=lambda item: (-item[0], -item[1], item[3]))
+    ranked.sort(
+        key=lambda item: (
+            -item[0],
+            -(item[1] if item[1] is not None else -1.0),
+            item[3],
+        )
+    )
     recommendations = []
     for rank, item in enumerate(ranked[:top_k], start=1):
         (
             score,
             expected_yield,
             similarity_score,
-            recipe_id,
+            recipe_core_id,
             members,
             datasets,
             compatibility_score,
+            support,
+            reference_support,
+            condition_series_support,
+            recipe_variants,
         ) = item
         best = members[0]
         uncertain = any(member[1].condition_uncertain for member in members)
@@ -140,6 +256,15 @@ def _aggregate(
             cautions.append("Condition identity or contextual role is uncertain")
         if level.endswith("limited_support"):
             cautions.append("Retrieval pool is below the configured support threshold")
+        if len(recipe_variants) > 1:
+            cautions.append(
+                f"Recipe core has {len(recipe_variants)} operating-condition variants"
+            )
+        if len(members) > len(_best_by_evidence_unit(members)):
+            cautions.append(
+                "Repeated observations from the same reference count as one "
+                "independent evidence unit"
+            )
         query_scope = reaction_scope(query)
         precedent_scopes = {
             reaction_scope(member[1].signature)
@@ -161,13 +286,20 @@ def _aggregate(
         recommendations.append(
             GenericConditionRecommendation(
                 rank=rank,
-                recipe_id=recipe_id,
+                recipe_id=best[1].recipe_id,
+                recipe_core_id=recipe_core_id,
+                recipe_variant_ids=recipe_variants,
                 resolved_recipe=best[1].resolved_recipe,
                 score=round(score, 6),
                 similarity_score=round(similarity_score, 6),
                 compatibility_score=round(compatibility_score, 6),
-                expected_yield_pct=round(expected_yield, 2),
-                support=len(members),
+                expected_yield_pct=(
+                    round(expected_yield, 2) if expected_yield is not None else None
+                ),
+                support=support,
+                observation_support=len(members),
+                reference_support=reference_support,
+                condition_series_support=condition_series_support,
                 dataset_support=datasets,
                 retrieval_level=level,
                 precedent_reaction_ids=tuple(
@@ -176,7 +308,8 @@ def _aggregate(
                 explanation=_explanation(
                     level,
                     best[2],
-                    len(members),
+                    support,
+                    reference_support,
                     datasets,
                     compatibility_score,
                     query_scope,

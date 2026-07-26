@@ -32,6 +32,19 @@ def _component_token(component: ResolvedConditionComponent) -> Tuple[Any, ...]:
     )
 
 
+def _component_core_token(
+    component: ResolvedConditionComponent,
+) -> Tuple[Any, ...]:
+    """Identify a role-aware substance without variant-level quantities."""
+    primary = component.roles[0] if component.roles else None
+    identity = component.substance_id or f"raw:{component.raw_identifier.strip().lower()}"
+    return (
+        identity,
+        component.primary_role,
+        primary.family_id if primary else None,
+    )
+
+
 def _sorted_components(
     values: Iterable[ResolvedConditionComponent],
 ) -> Tuple[ResolvedConditionComponent, ...]:
@@ -152,13 +165,25 @@ def build_resolved_recipe_from_components(
         ),
         "declared_absences": normalized_absences,
         "definition_versions": definition_versions,
-        "schema_version": "1.1",
+        "schema_version": "1.2",
     }
+    core_identity_payload = {
+        "buckets": {
+            name: tuple(_component_core_token(component) for component in values)
+            for name, values in sorted(sorted_buckets.items())
+        },
+        "definition_versions": definition_versions,
+        "schema_version": "1.0",
+    }
+    recipe_core_id = "RCORE1:" + hashlib.sha256(
+        _canonical_json(core_identity_payload).encode("utf-8")
+    ).hexdigest()
     recipe_id = "RCR1:" + hashlib.sha256(
         _canonical_json(identity_payload).encode("utf-8")
     ).hexdigest()
     return ResolvedConditionRecipe(
         recipe_id=recipe_id,
+        recipe_core_id=recipe_core_id,
         catalysts=sorted_buckets.get("catalysts", ()),
         ligands=sorted_buckets.get("ligands", ()),
         bases=sorted_buckets.get("bases", ()),

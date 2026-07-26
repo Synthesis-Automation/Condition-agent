@@ -4,7 +4,14 @@ import json
 from condition_recommender.conversion.engine import convert_datasets
 from condition_recommender.conversion.generic import convert_record
 from condition_recommender.conversion.input_schema import adapt_row
-from condition_recommender.models import AdmissionTier
+from condition_recommender.generic_indexing import build_generic_index
+from condition_recommender.models import (
+    AdmissionTier,
+    ChemistryStatus,
+    ConditionStatus,
+    IndexEligibility,
+    OutcomeStatus,
+)
 
 
 def _raw(
@@ -15,6 +22,7 @@ def _raw(
     catalyst_cas: str = "14221-01-3",
     reagent_cas: str = "584-08-7",
     solvent_cas: str = "108-88-3",
+    stages: str = "1",
 ):
     row = {
         "reaction_id": reaction_id,
@@ -25,6 +33,7 @@ def _raw(
         "reagent_cas": reagent_cas,
         "solvent_cas": solvent_cas,
         "reference": "reference",
+        "stages": stages,
     }
     return adapt_row(
         row,
@@ -75,12 +84,18 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "1.8"
-    assert record.converter_definition_version == "generic_conversion.v1.3"
+    assert record.schema_version == "1.9"
+    assert record.converter_definition_version == "generic_conversion.v1.4"
     assert record.reaction_signature["schema_version"] == "1.3"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
     assert record.reference_identity["resolution_status"] == "bibliographic_text"
+    assert record.chemistry_status == ChemistryStatus.VERIFIED
+    assert record.condition_status == ConditionStatus.RESOLVED_COMPLETE
+    assert record.outcome_status == OutcomeStatus.USABLE
+    assert record.index_eligibility == IndexEligibility.ELIGIBLE
+    assert record.resolved_recipe_core_id.startswith("RCORE1:")
+    assert record.reference_condition_series_id.startswith("RCS1:")
 
 
 def test_mapped_unknown_family_signature_is_verified() -> None:
@@ -167,6 +182,56 @@ def test_unresolved_condition_identifier_is_retained_for_review() -> None:
     component = record.condition_resolution["components"][0]
     assert component["raw_identifier"] == "not-a-cas"
     assert component["status"] == "invalid_identifier"
+    assert record.chemistry_status == ChemistryStatus.VERIFIED
+    assert record.condition_status == ConditionStatus.RESOLVED_PARTIAL
+    assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
+
+
+def test_missing_yield_does_not_discard_a_usable_condition_precedent() -> None:
+    record = convert_record(
+        _raw(
+            "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            yield_pct="",
+        )
+    )
+
+    assert record.admission_tier == AdmissionTier.REVIEW
+    assert record.chemistry_status == ChemistryStatus.VERIFIED
+    assert record.condition_status == ConditionStatus.RESOLVED_COMPLETE
+    assert record.outcome_status == OutcomeStatus.MISSING
+    assert record.index_eligibility == IndexEligibility.ELIGIBLE
+    index = build_generic_index([record.to_dict()])
+    assert len(index.rows) == 1
+    assert index.rows[0].yield_pct is None
+
+
+def test_valid_unknown_condition_identity_is_retained_for_retrieval() -> None:
+    record = convert_record(
+        _raw(
+            "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            catalyst_cas="999999-99-4",
+            reagent_cas="",
+            solvent_cas="",
+        )
+    )
+
+    assert record.condition_status == ConditionStatus.UNRESOLVED_RETAINED
+    assert record.admission_tier == AdmissionTier.REVIEW
+    assert record.index_eligibility == IndexEligibility.ELIGIBLE
+    assert len(build_generic_index([record.to_dict()]).rows) == 1
+
+
+def test_unstructured_multistage_conditions_are_review_only() -> None:
+    record = convert_record(
+        _raw(
+            "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            stages="2",
+        )
+    )
+
+    assert record.condition_status == ConditionStatus.MULTISTAGE_AMBIGUOUS
+    assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
+    assert len(build_generic_index([record.to_dict()]).rows) == 0
 
 
 def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
@@ -225,7 +290,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
         "unimolecular",
     }
     assert json.loads((output / "conversion_report.json").read_text()) == report
-    assert report["schema_version"] == "1.1"
+    assert report["schema_version"] == "1.2"
     assert report["reaction_signature_schema_version"] == "1.3"
     assert report["reaction_scope_counts"] == {
         "intermolecular": 1,

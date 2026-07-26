@@ -11,7 +11,14 @@ from typing import Any, Dict, Optional
 
 from reactive_taxonomy import REACTION_SIGNATURE_SCHEMA_VERSION
 
-from ..models import AdmissionTier, GENERIC_CONVERTER_DEFINITION_VERSION
+from ..models import (
+    AdmissionTier,
+    ChemistryStatus,
+    ConditionStatus,
+    GENERIC_CONVERTER_DEFINITION_VERSION,
+    IndexEligibility,
+    OutcomeStatus,
+)
 from .flatten import GENERIC_REVIEW_FIELDS, flatten_generic_record
 from .generic import convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
@@ -27,6 +34,7 @@ def _markdown(report: Dict[str, Any]) -> str:
             f"- Verified: {report['tier_counts']['verified']}",
             f"- Review: {report['tier_counts']['review']}",
             f"- Rejected: {report['tier_counts']['rejected']}",
+            f"- Index eligible: {report['index_eligibility_counts']['eligible']}",
             f"- Signature coverage: {report['signature_count']}/{report['row_count']}",
             f"- Unique canonical reactions: {report['duplicate_summary']['unique_canonical_reactions']}",
             f"- Multi-recipe groups: {report['duplicate_summary']['multi_recipe_groups']}",
@@ -50,6 +58,10 @@ def convert_datasets(
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
     tier_counts = Counter()
+    chemistry_quality_counts = Counter()
+    condition_quality_counts = Counter()
+    outcome_quality_counts = Counter()
+    index_eligibility_counts = Counter()
     reason_counts = Counter()
     evidence_counts = Counter()
     transformation_counts = Counter()
@@ -95,6 +107,10 @@ def convert_datasets(
                 row_count += 1
                 tier = record.admission_tier.value
                 tier_counts[tier] += 1
+                chemistry_quality_counts[record.chemistry_status.value] += 1
+                condition_quality_counts[record.condition_status.value] += 1
+                outcome_quality_counts[record.outcome_status.value] += 1
+                index_eligibility_counts[record.index_eligibility.value] += 1
                 reason_counts.update(record.admission_reasons)
                 evidence_counts[record.evidence_quality] += 1
                 source_counts[record.source_dataset] += 1
@@ -147,7 +163,7 @@ def convert_datasets(
     repeated_groups = sum(count > 1 for count in canonical_groups.values())
     multi_recipe_groups = sum(len(recipes) > 1 for recipes in group_recipes.values())
     report: Dict[str, Any] = {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "converter_version": GENERIC_CONVERTER_DEFINITION_VERSION,
         "reaction_signature_schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
         "dataset_path": str(Path(dataset_path)),
@@ -156,6 +172,22 @@ def convert_datasets(
         "max_rows": max_rows,
         "row_count": row_count,
         "tier_counts": {tier.value: tier_counts[tier.value] for tier in AdmissionTier},
+        "chemistry_status_counts": {
+            status.value: chemistry_quality_counts[status.value]
+            for status in ChemistryStatus
+        },
+        "condition_status_counts": {
+            status.value: condition_quality_counts[status.value]
+            for status in ConditionStatus
+        },
+        "outcome_status_counts": {
+            status.value: outcome_quality_counts[status.value]
+            for status in OutcomeStatus
+        },
+        "index_eligibility_counts": {
+            status.value: index_eligibility_counts[status.value]
+            for status in IndexEligibility
+        },
         "reason_counts": dict(sorted(reason_counts.items())),
         "evidence_quality_counts": dict(sorted(evidence_counts.items())),
         "signature_count": signature_count,

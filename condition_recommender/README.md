@@ -261,7 +261,9 @@ python -m condition_recommender.generic_conversion_cli `
 The converter writes canonical nested `records.jsonl`, tiered CSV review views,
 and JSON/Markdown coverage reports. Exact reconstructed signatures and valid
 mapped signatures may be admitted even when `named_family` is absent. Source
-family labels are provenance only.
+family labels are provenance only. Chemistry, condition, outcome, and index
+eligibility are assessed independently. The legacy verified/review/rejected
+tier remains a compatibility summary, not the indexing contract.
 
 ### Build an index and recommend
 
@@ -280,9 +282,12 @@ signature, high-confidence family, generic transformation, then compatible bond
 edits and environments. Hard bond-edit and recipe-compatibility gates run before
 similarity and aggregation.
 
-Results aggregate by canonical `RCR1` recipe and report retrieval level,
-support, dataset diversity, expected yield, precedent IDs, compatibility
-evidence, explanations, and cautions.
+Results aggregate by canonical `RCORE1` recipe core and expose the observed
+`RCR1` operating-condition variants. Support distinguishes raw observations,
+canonical reactions, reference-local condition series, independent references,
+and datasets. Repeated rows from one publication contribute one evidence unit
+to similarity and yield aggregation. Expected yield is omitted when no usable
+outcomes support the recipe; it is never invented from missing values.
 
 Reaction topology participates in the more specific signature tiers. A
 topology-agnostic fallback is allowed only with an explicit

@@ -7,14 +7,44 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "1.8"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v1.3"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "1.9"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v1.4"
 
 
 class AdmissionTier(str, Enum):
     VERIFIED = "verified"
     REVIEW = "review"
     REJECTED = "rejected"
+
+
+class ChemistryStatus(str, Enum):
+    UNCLASSIFIED = "unclassified"
+    VERIFIED = "verified"
+    REVIEW = "review"
+    REJECTED = "rejected"
+
+
+class ConditionStatus(str, Enum):
+    UNCLASSIFIED = "unclassified"
+    RESOLVED_COMPLETE = "resolved_complete"
+    RESOLVED_PARTIAL = "resolved_partial"
+    UNRESOLVED_RETAINED = "unresolved_retained"
+    MULTISTAGE_AMBIGUOUS = "multistage_ambiguous"
+    UNUSABLE = "unusable"
+
+
+class OutcomeStatus(str, Enum):
+    UNCLASSIFIED = "unclassified"
+    USABLE = "usable"
+    MISSING = "missing"
+    INVALID = "invalid"
+
+
+class IndexEligibility(str, Enum):
+    UNCLASSIFIED = "unclassified"
+    ELIGIBLE = "eligible"
+    REVIEW_ONLY = "review_only"
+    INELIGIBLE = "ineligible"
 
 
 @dataclass(frozen=True)
@@ -78,6 +108,10 @@ class RecommendationRecord:
     temperature_c: Optional[float]
     time_h: Optional[float]
     conditions: ConditionIdentity
+    chemistry_status: ChemistryStatus = ChemistryStatus.UNCLASSIFIED
+    condition_status: ConditionStatus = ConditionStatus.UNCLASSIFIED
+    outcome_status: OutcomeStatus = OutcomeStatus.UNCLASSIFIED
+    index_eligibility: IndexEligibility = IndexEligibility.UNCLASSIFIED
     family_environment: Optional[Dict[str, Any]] = None
     product_connection: Optional[Dict[str, Any]] = None
     spectator_groups: Tuple[Dict[str, Any], ...] = ()
@@ -96,9 +130,11 @@ class RecommendationRecord:
     canonical_reaction_id: Optional[str] = None
     canonical_reaction_smiles: Optional[str] = None
     raw_recipe_id: str = ""
+    resolved_recipe_core_id: str = ""
     condition_resolution: Dict[str, Any] = field(default_factory=dict)
     resolved_recipe_id: str = ""
     resolved_recipe: Optional[Dict[str, Any]] = None
+    reference_condition_series_id: str = ""
     converter_definition_version: str = GENERIC_CONVERTER_DEFINITION_VERSION
     source: Dict[str, Any] = field(default_factory=dict)
     schema_version: str = RECOMMENDATION_RECORD_SCHEMA_VERSION
@@ -113,12 +149,17 @@ class GenericConditionRecommendation:
 
     rank: int
     recipe_id: str
+    recipe_core_id: str
+    recipe_variant_ids: Tuple[str, ...]
     resolved_recipe: Dict[str, Any]
     score: float
     similarity_score: float
     compatibility_score: float
-    expected_yield_pct: float
+    expected_yield_pct: Optional[float]
     support: int
+    observation_support: int
+    reference_support: int
+    condition_series_support: int
     dataset_support: int
     retrieval_level: str
     precedent_reaction_ids: Tuple[str, ...]

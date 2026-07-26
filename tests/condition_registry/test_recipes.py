@@ -41,6 +41,7 @@ def test_resolved_recipe_groups_components_by_contextual_role() -> None:
     )
 
     assert recipe.recipe_id.startswith("RCR1:")
+    assert recipe.recipe_core_id.startswith("RCORE1:")
     assert recipe.catalysts[0].primary_role == "metal_catalyst"
     assert recipe.bases[0].primary_role == "base"
     assert recipe.solvents[0].primary_role == "solvent"
@@ -90,6 +91,35 @@ def test_operating_conditions_are_part_of_recipe_identity() -> None:
     )
 
     assert ambient.recipe_id != heated.recipe_id
+    assert ambient.recipe_core_id == heated.recipe_core_id
+
+
+def test_component_amount_changes_variant_but_not_recipe_core() -> None:
+    first = build_resolved_recipe_from_inputs(
+        (
+            ConditionComponentInput(
+                "K2CO3",
+                source_field="base",
+                identifier_type="name",
+                amount=1.0,
+                amount_unit="equiv",
+            ),
+        )
+    )
+    second = build_resolved_recipe_from_inputs(
+        (
+            ConditionComponentInput(
+                "K2CO3",
+                source_field="base",
+                identifier_type="name",
+                amount=2.0,
+                amount_unit="equiv",
+            ),
+        )
+    )
+
+    assert first.recipe_id != second.recipe_id
+    assert first.recipe_core_id == second.recipe_core_id
 
 
 def test_duplicate_identity_across_source_fields_is_not_double_counted() -> None:

@@ -63,12 +63,15 @@ recipe = build_resolved_recipe(
 )
 ```
 
-The resulting `RCR1` identity is based on resolved substances, contextual roles,
-operating conditions, and definition versions. Unresolved identities remain in
-the role-hint bucket (or `other_components` when no useful hint exists) with
-provenance and uncertainty warnings. Typed `ConditionComponentInput` values can
-use exact CAS, name, or stable substance-ID resolution; `ConditionProcessStage`
-preserves ordered multi-stage time/temperature programs.
+The resulting `RCR1` variant identity is based on resolved substances,
+contextual roles, amounts, operating conditions, stages, and definition
+versions. Its companion `RCORE1` identity contains only the role-aware
+substances, so amounts and operating parameters do not fragment the underlying
+condition regime. Unresolved identities remain in the role-hint bucket (or
+`other_components` when no useful hint exists) with provenance and uncertainty
+warnings. Typed `ConditionComponentInput` values can use exact CAS, name, or
+stable substance-ID resolution; `ConditionProcessStage` preserves ordered
+multi-stage time/temperature programs.
 
 ## CLI tester
 

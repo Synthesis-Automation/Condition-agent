@@ -6,8 +6,9 @@ import json
 import hashlib
 from collections import defaultdict
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Tuple
+from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
 
 from reactive_taxonomy import (
     REACTION_SIGNATURE_SCHEMA_VERSION,
@@ -20,7 +21,7 @@ from .models import (
 )
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "1.2"
+GENERIC_INDEX_SCHEMA_VERSION = "1.3"
 
 
 @dataclass(frozen=True)
@@ -31,13 +32,18 @@ class GenericIndexedReaction:
     observation_id: str
     canonical_reaction_id: str
     reaction_smiles: str
-    yield_pct: float
+    yield_pct: Optional[float]
     source_dataset: str
     reference_id: str
+    reference_condition_series_id: str
     signature: Dict[str, Any]
     recipe_id: str
+    recipe_core_id: str
     resolved_recipe: Dict[str, Any]
     condition_uncertain: bool
+    chemistry_status: str
+    condition_status: str
+    outcome_status: str
     record_schema_version: str
     converter_definition_version: str
 
@@ -195,21 +201,29 @@ def build_generic_index(
     """Build lookup maps, admitting only records with signatures and recipes."""
     rows = []
     for record in records:
-        tier = str(record.get("admission_tier") or "")
-        if tier != "verified" and not (include_review and tier == "review"):
+        eligibility = _enum_value(record.get("index_eligibility"))
+        if eligibility != "eligible" and not (
+            include_review and eligibility == "review_only"
+        ):
             continue
         signature = record.get("reaction_signature")
         recipe = record.get("resolved_recipe")
         recipe_id = str(record.get("resolved_recipe_id") or "")
+        recipe_core_id = str(
+            record.get("resolved_recipe_core_id")
+            or (recipe or {}).get("recipe_core_id")
+            or recipe_id
+        )
         outcome = record.get("yield_pct")
         if not isinstance(signature, Mapping) or not isinstance(recipe, Mapping):
             continue
-        if not recipe_id or outcome is None:
+        if not recipe_id or not recipe_core_id:
             continue
-        yield_pct = float(outcome)
-        if not 0.0 <= yield_pct <= 100.0:
-            continue
+        yield_pct = _valid_yield(outcome)
         if str(recipe.get("recipe_id") or "") != recipe_id:
+            continue
+        embedded_core_id = str(recipe.get("recipe_core_id") or recipe_core_id)
+        if embedded_core_id != recipe_core_id:
             continue
         rows.append(
             GenericIndexedReaction(
@@ -225,12 +239,19 @@ def build_generic_index(
                 yield_pct=yield_pct,
                 source_dataset=str(record.get("source_dataset") or ""),
                 reference_id=str(record.get("reference_id") or ""),
+                reference_condition_series_id=str(
+                    record.get("reference_condition_series_id") or ""
+                ),
                 signature=dict(signature),
                 recipe_id=recipe_id,
+                recipe_core_id=recipe_core_id,
                 resolved_recipe=dict(recipe),
                 condition_uncertain=bool(
                     (record.get("condition_resolution") or {}).get("has_uncertainty")
                 ),
+                chemistry_status=_enum_value(record.get("chemistry_status")),
+                condition_status=_enum_value(record.get("condition_status")),
+                outcome_status=_enum_value(record.get("outcome_status")),
                 record_schema_version=str(record.get("schema_version") or ""),
                 converter_definition_version=str(
                     record.get("converter_definition_version") or ""
@@ -238,6 +259,20 @@ def build_generic_index(
             )
         )
     return build_generic_index_from_rows(rows)
+
+
+def _enum_value(value: Any) -> str:
+    return str(value.value if isinstance(value, Enum) else value or "")
+
+
+def _valid_yield(value: Any) -> Optional[float]:
+    if value is None or value == "":
+        return None
+    try:
+        outcome = float(value)
+    except (TypeError, ValueError):
+        return None
+    return outcome if 0.0 <= outcome <= 100.0 else None
 
 
 def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
@@ -250,10 +285,15 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "yield_pct": row.yield_pct,
             "source_dataset": row.source_dataset,
             "reference_id": row.reference_id,
+            "reference_condition_series_id": row.reference_condition_series_id,
             "signature": row.signature,
             "recipe_id": row.recipe_id,
+            "recipe_core_id": row.recipe_core_id,
             "resolved_recipe": row.resolved_recipe,
             "condition_uncertain": row.condition_uncertain,
+            "chemistry_status": row.chemistry_status,
+            "condition_status": row.condition_status,
+            "outcome_status": row.outcome_status,
             "record_schema_version": row.record_schema_version,
             "converter_definition_version": row.converter_definition_version,
         }
@@ -352,13 +392,22 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             observation_id=str(row["observation_id"]),
             canonical_reaction_id=str(row["canonical_reaction_id"]),
             reaction_smiles=str(row["reaction_smiles"]),
-            yield_pct=float(row["yield_pct"]),
+            yield_pct=(
+                float(row["yield_pct"]) if row.get("yield_pct") is not None else None
+            ),
             source_dataset=str(row["source_dataset"]),
             reference_id=str(row.get("reference_id") or ""),
+            reference_condition_series_id=str(
+                row.get("reference_condition_series_id") or ""
+            ),
             signature=dict(row["signature"]),
             recipe_id=str(row["recipe_id"]),
+            recipe_core_id=str(row.get("recipe_core_id") or row["recipe_id"]),
             resolved_recipe=dict(row["resolved_recipe"]),
             condition_uncertain=bool(row["condition_uncertain"]),
+            chemistry_status=str(row.get("chemistry_status") or ""),
+            condition_status=str(row.get("condition_status") or ""),
+            outcome_status=str(row.get("outcome_status") or ""),
             record_schema_version=str(row["record_schema_version"]),
             converter_definition_version=str(row["converter_definition_version"]),
         )

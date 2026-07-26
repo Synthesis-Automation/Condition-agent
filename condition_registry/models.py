@@ -112,6 +112,7 @@ class ResolvedConditionRecipe:
     """Canonical role-aware recipe used to group equivalent precedents."""
 
     recipe_id: str
+    recipe_core_id: str
     catalysts: Tuple[ResolvedConditionComponent, ...] = ()
     ligands: Tuple[ResolvedConditionComponent, ...] = ()
     bases: Tuple[ResolvedConditionComponent, ...] = ()
@@ -130,7 +131,7 @@ class ResolvedConditionRecipe:
     declared_absences: Tuple[str, ...] = ()
     warnings: Tuple[str, ...] = ()
     definition_versions: Dict[str, str] = field(default_factory=dict)
-    schema_version: str = "1.1"
+    schema_version: str = "1.2"
 
     @property
     def components(self) -> Tuple[ResolvedConditionComponent, ...]:
