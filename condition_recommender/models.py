@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "1.7"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v1.2"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "1.8"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v1.3"
 
 
 class AdmissionTier(str, Enum):
@@ -44,6 +44,24 @@ class ConditionIdentity:
 
 
 @dataclass(frozen=True)
+class ReferenceIdentity:
+    """Deterministic publication identity with source-faithful provenance."""
+
+    reference_id: str
+    raw_reference: str
+    normalized_citation: str
+    doi: Optional[str] = None
+    patent_number: Optional[str] = None
+    publication_year: Optional[int] = None
+    resolution_status: str = "missing"
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class RecommendationRecord:
     """One converted reaction observation with admission provenance."""
 
@@ -72,6 +90,8 @@ class RecommendationRecord:
     source_dataset: str = ""
     source_path: str = ""
     source_declared_family: str = ""
+    reference_id: str = ""
+    reference_identity: Optional[Dict[str, Any]] = None
     observation_id: str = ""
     canonical_reaction_id: Optional[str] = None
     canonical_reaction_smiles: Optional[str] = None

@@ -93,3 +93,18 @@ def test_mapping_and_reconstruction_agreement_keeps_exact_compatibility_view() -
         == "validated_mapping_and_exact_reconstruction"
     )
     assert result.product_connection is not None
+
+
+def test_scaffold_fallback_sorts_mixed_edit_orders_deterministically() -> None:
+    reaction = (
+        "C[C@@H]1CN2C(=O)[C@H]3[C@@H]4C=C5CCc6cccc(c65)"
+        "[C@@]43[C@H]2CC1=O"
+        ">>C[C@@H]1CN2C(=O)C3=C(c4cccc5c4[C@@H](CC3)CC5)"
+        "[C@H]2C[C@H]1O"
+    )
+
+    first = featurize_reaction(reaction)
+    second = featurize_reaction(reaction)
+
+    assert first.valid
+    assert first.to_dict() == second.to_dict()

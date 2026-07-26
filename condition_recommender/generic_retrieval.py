@@ -219,6 +219,7 @@ def _event_tokens(signature: Mapping[str, Any]) -> Tuple[str, ...]:
             "formed": tuple(event.get("formed_bond_types") or ()),
             "broken": tuple(event.get("broken_bond_types") or ()),
             "order_changes": tuple(event.get("order_changes") or ()),
+            "hydrogen_changes": tuple(event.get("hydrogen_changes") or ()),
             "transformation_class": str(event.get("transformation_class") or ""),
             "reaction_scope": str(
                 (event.get("topology") or {}).get("reaction_scope") or ""
@@ -280,7 +281,12 @@ def generic_signature_similarity(
     precedent: Mapping[str, Any],
 ) -> Tuple[float, Dict[str, float]]:
     """Return an interpretable score; absent features never count as matches."""
-    edit_fields = ("formed_bond_types", "broken_bond_types", "order_changes")
+    edit_fields = (
+        "formed_bond_types",
+        "broken_bond_types",
+        "order_changes",
+        "hydrogen_changes",
+    )
     query_edits = tuple(
         f"{field}:{value}" for field in edit_fields for value in query.get(field) or ()
     )

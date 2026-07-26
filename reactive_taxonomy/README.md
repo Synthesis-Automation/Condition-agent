@@ -70,7 +70,10 @@ handle intermolecular joining and same-component ring closure. Every normalized
 edit signature now carries `ReactionTopology`, including reaction scope, role
 component membership, formed-bond scope, reactant tether distance, formed ring
 size, and graph cycle-rank delta. Topology contributes to L0–L2 identity while
-L3 remains a topology-agnostic bond-edit fallback. Mapped unknown reactions get
+L3 remains a topology-agnostic edit fallback. L2 and L3 include schema-level
+hydrogen gain or loss as well as formed, broken, and order-changed heavy-atom
+bonds, so reactions with the same heavy-atom order change but different
+hydrogen balance do not collapse to one identity. Mapped unknown reactions get
 the same topology analysis without requiring a named family.
 
 For example, `NCCc1ccccc1Br>>c1ccc2c(c1)CCN2` is rendered as

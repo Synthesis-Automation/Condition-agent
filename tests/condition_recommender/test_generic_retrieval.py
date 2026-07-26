@@ -86,14 +86,15 @@ def _signature(
 
 def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     return {
-        "schema_version": "1.7",
-        "converter_definition_version": "generic_conversion.v1.2",
+        "schema_version": "1.8",
+        "converter_definition_version": "generic_conversion.v1.3",
         "admission_tier": tier,
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
         "reaction_smiles": "C.N>>CN",
         "yield_pct": 60.0 + index,
         "source_dataset": f"dataset-{index % 2}",
+        "reference_id": f"REF1:{index}",
         "reaction_signature": signature,
         "resolved_recipe_id": f"RCR1:{index % 2}",
         "resolved_recipe": {"recipe_id": f"RCR1:{index % 2}"},

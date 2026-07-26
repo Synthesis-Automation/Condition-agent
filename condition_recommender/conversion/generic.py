@@ -13,6 +13,7 @@ from ..models import ConditionIdentity, RecommendationRecord
 from .admission import decide_admission
 from .identities import canonical_reaction_identity, observation_id, raw_recipe_id
 from .input_schema import RawReactionRecord
+from .references import normalize_reference
 from .signature_serialization import signature_record_fields
 
 
@@ -59,6 +60,7 @@ def convert_record(record: RawReactionRecord) -> RecommendationRecord:
     """Convert one source-faithful row without a declared-family requirement."""
     analysis = featurize_reaction(record.reaction_smiles)
     canonical_identity = canonical_reaction_identity(record.reaction_smiles)
+    reference_identity = normalize_reference(record.reference)
     conditions = _normalized_conditions(record)
     resolved_recipe = build_resolved_recipe(
         {
@@ -126,6 +128,8 @@ def convert_record(record: RawReactionRecord) -> RecommendationRecord:
         source_dataset=record.source_dataset,
         source_path=record.source_path,
         source_declared_family=record.source_declared_family,
+        reference_id=reference_identity.reference_id,
+        reference_identity=reference_identity.to_dict(),
         observation_id=observation_id(record),
         canonical_reaction_id=canonical_identity.reaction_id
         if canonical_identity

@@ -28,8 +28,57 @@ class GroupedHoldoutSplit:
     test_group_ids: Tuple[str, ...]
 
 
-def _group_id(row: GenericIndexedReaction) -> str:
-    return row.canonical_reaction_id or row.reaction_id or row.observation_id
+def _evaluation_groups(
+    rows: Tuple[GenericIndexedReaction, ...],
+) -> Dict[str, list[GenericIndexedReaction]]:
+    """Join rows connected by either publication or canonical reaction."""
+    parents = list(range(len(rows)))
+
+    def find(index: int) -> int:
+        while parents[index] != index:
+            parents[index] = parents[parents[index]]
+            index = parents[index]
+        return index
+
+    def union(left: int, right: int) -> None:
+        left_root = find(left)
+        right_root = find(right)
+        if left_root != right_root:
+            parents[right_root] = left_root
+
+    owners: Dict[tuple[str, str], int] = {}
+    row_tokens: list[tuple[str, ...]] = []
+    for index, row in enumerate(rows):
+        tokens = []
+        if row.reference_id:
+            tokens.append(f"reference:{row.reference_id}")
+        if row.canonical_reaction_id:
+            tokens.append(f"reaction:{row.canonical_reaction_id}")
+        if not tokens:
+            tokens.append(
+                "observation:"
+                + (row.observation_id or row.reaction_id or f"row-{index}")
+            )
+        row_tokens.append(tuple(tokens))
+        for token in tokens:
+            key = tuple(token.split(":", maxsplit=1))
+            previous = owners.setdefault(key, index)
+            union(index, previous)
+
+    component_tokens: Dict[int, set[str]] = {}
+    for index, tokens in enumerate(row_tokens):
+        component_tokens.setdefault(find(index), set()).update(tokens)
+    component_ids = {
+        root: "EG1:"
+        + hashlib.sha256(
+            "\0".join(sorted(tokens)).encode("utf-8")
+        ).hexdigest()
+        for root, tokens in component_tokens.items()
+    }
+    groups: Dict[str, list[GenericIndexedReaction]] = {}
+    for index, row in enumerate(rows):
+        groups.setdefault(component_ids[find(index)], []).append(row)
+    return groups
 
 
 def grouped_holdout_split(
@@ -41,9 +90,8 @@ def grouped_holdout_split(
     """Split whole canonical reactions so duplicates cannot cross the boundary."""
     if not 0.0 < test_fraction < 1.0:
         raise ValueError("test_fraction must be between zero and one")
-    groups: Dict[str, list[GenericIndexedReaction]] = {}
-    for row in rows:
-        groups.setdefault(_group_id(row), []).append(row)
+    row_values = tuple(rows)
+    groups = _evaluation_groups(row_values)
     if len(groups) < 2:
         raise ValueError("At least two canonical reaction groups are required")
 
@@ -64,7 +112,7 @@ def grouped_holdout_split(
         target.extend(groups[group_id])
     def row_key(row: GenericIndexedReaction) -> tuple[str, str, str, str]:
         return (
-            _group_id(row),
+            row.reference_id or row.canonical_reaction_id,
             row.reaction_id,
             row.observation_id,
             row.recipe_id,

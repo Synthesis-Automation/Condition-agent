@@ -8,7 +8,7 @@ from typing import Any, Dict, Literal, Optional, Tuple
 from .models import CompoundAnalysis
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "1.2"
+REACTION_SIGNATURE_SCHEMA_VERSION = "1.3"
 
 
 @dataclass(frozen=True)
@@ -256,6 +256,7 @@ class ReactionEvent:
     formed_bond_types: Tuple[str, ...]
     broken_bond_types: Tuple[str, ...]
     order_changes: Tuple[str, ...]
+    hydrogen_changes: Tuple[str, ...]
     formed_connection_labels: Tuple[str, ...]
     topology: ReactionTopology
     transformation_class: Optional[str]
@@ -266,7 +267,7 @@ class ReactionEvent:
     evidence: str
     confidence: float
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "1.0"
+    schema_version: str = "1.1"
 
 
 @dataclass(frozen=True)
@@ -298,6 +299,7 @@ class ReactionSignature:
     formed_bond_types: Tuple[str, ...]
     broken_bond_types: Tuple[str, ...]
     order_changes: Tuple[str, ...]
+    hydrogen_changes: Tuple[str, ...]
     edits: Tuple[ReactionEdit, ...]
     events: Tuple[ReactionEvent, ...]
     event_count: int

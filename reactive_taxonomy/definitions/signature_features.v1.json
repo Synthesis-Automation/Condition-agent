@@ -1,11 +1,11 @@
 {
-  "schema_version": "1.2",
-  "signature_schema_version": "1.2",
+  "schema_version": "1.3",
+  "signature_schema_version": "1.3",
   "levels": {
     "L0": ["edit_topology", "reaction_events", "reaction_topology", "handles", "anchor_contexts", "local_environments"],
     "L1": ["edit_topology", "reaction_events", "reaction_topology", "handles"],
-    "L2": ["bond_changes", "reaction_events", "reaction_topology", "transformation_class"],
-    "L3": ["bond_changes"],
+    "L2": ["bond_changes", "hydrogen_changes", "reaction_events", "reaction_topology", "transformation_class"],
+    "L3": ["bond_changes", "hydrogen_changes"],
     "L4": ["local_environments", "spectator_groups"]
   }
 }

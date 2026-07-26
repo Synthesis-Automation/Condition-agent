@@ -95,8 +95,12 @@ def test_signature_serializes_with_analysis() -> None:
 
     assert payload["reaction_signature"]["named_family"] is None
     assert payload["reaction_signature"]["order_changes"] == ("C-C:DOUBLE>SINGLE",)
+    assert payload["reaction_signature"]["hydrogen_changes"] == (
+        "C-H:NONE>SINGLE",
+        "C-H:NONE>SINGLE",
+    )
     assert payload["schema_version"] == "1.6"
-    assert payload["reaction_signature"]["schema_version"] == "1.2"
+    assert payload["reaction_signature"]["schema_version"] == "1.3"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
     )
@@ -211,4 +215,21 @@ def test_unbalanced_multi_event_reaction_does_not_invent_partner_copy() -> None:
     assert result.reaction_label == (
         "(Ar1-F + Ar2-H) OR (Ar1-F + Ar2-SH) OR "
         "(intramolecular Ar-F / Ar-H) ->"
+    )
+
+
+def test_l3_identity_includes_schema_level_hydrogen_changes() -> None:
+    hydrogenation = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
+    order_change_only = featurize_reaction("[CH2:1]=[CH2:2]>>[CH2:1][CH2:2]")
+
+    assert hydrogenation.reaction_signature is not None
+    assert order_change_only.reaction_signature is not None
+    assert hydrogenation.reaction_signature.order_changes == (
+        order_change_only.reaction_signature.order_changes
+    )
+    assert hydrogenation.reaction_signature.hydrogen_changes
+    assert not order_change_only.reaction_signature.hydrogen_changes
+    assert (
+        hydrogenation.reaction_signature.bond_edit_signature_key
+        != order_change_only.reaction_signature.bond_edit_signature_key
     )

@@ -10,6 +10,7 @@ from .models import (
     GenericRecommendationResult,
     LabelConditionRecommendation,
     LabelRecommendationResult,
+    ReferenceIdentity,
     RecommendationRecord,
 )
 from .rules import RuleRecommendationResult, recommend_rule_conditions
@@ -23,6 +24,7 @@ __all__ = [
     "GenericRecommendationResult",
     "LabelConditionRecommendation",
     "LabelRecommendationResult",
+    "ReferenceIdentity",
     "RecommendationRecord",
     "RuleRecommendationResult",
     "build_rule_review_rows",

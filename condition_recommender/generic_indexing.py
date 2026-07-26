@@ -20,7 +20,7 @@ from .models import (
 )
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "1.1"
+GENERIC_INDEX_SCHEMA_VERSION = "1.2"
 
 
 @dataclass(frozen=True)
@@ -33,6 +33,7 @@ class GenericIndexedReaction:
     reaction_smiles: str
     yield_pct: float
     source_dataset: str
+    reference_id: str
     signature: Dict[str, Any]
     recipe_id: str
     resolved_recipe: Dict[str, Any]
@@ -223,6 +224,7 @@ def build_generic_index(
                 reaction_smiles=str(record.get("reaction_smiles") or ""),
                 yield_pct=yield_pct,
                 source_dataset=str(record.get("source_dataset") or ""),
+                reference_id=str(record.get("reference_id") or ""),
                 signature=dict(signature),
                 recipe_id=recipe_id,
                 resolved_recipe=dict(recipe),
@@ -247,6 +249,7 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "reaction_smiles": row.reaction_smiles,
             "yield_pct": row.yield_pct,
             "source_dataset": row.source_dataset,
+            "reference_id": row.reference_id,
             "signature": row.signature,
             "recipe_id": row.recipe_id,
             "resolved_recipe": row.resolved_recipe,
@@ -351,6 +354,7 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             reaction_smiles=str(row["reaction_smiles"]),
             yield_pct=float(row["yield_pct"]),
             source_dataset=str(row["source_dataset"]),
+            reference_id=str(row.get("reference_id") or ""),
             signature=dict(row["signature"]),
             recipe_id=str(row["recipe_id"]),
             resolved_recipe=dict(row["resolved_recipe"]),

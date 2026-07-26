@@ -214,6 +214,31 @@ The following work is still required before the C-N drafts can be activated:
 This is the intended type-agnostic precedent path. It operates on canonical
 converted records rather than reaction-name partitions.
 
+### Build reference-safe pilot samples
+
+Develop and calibrate against deterministic samples before converting the full
+corpus:
+
+```powershell
+python -m condition_recommender.sample_cli `
+  data-processor/reaction_dataset `
+  results/generic_sampling/v1
+```
+
+The sampler writes smoke, development, validation, and untouched-test CSVs plus
+a versioned manifest. Rows connected by the same normalized publication
+reference or exact normalized reaction text remain in one primary partition.
+The smoke sample is a subset of development. Original source file and row
+provenance survive conversion of the sampled CSVs.
+
+Convert the smoke sample while developing:
+
+```powershell
+python -m condition_recommender.generic_conversion_cli `
+  results/generic_sampling/v1/smoke.csv `
+  results/generic_conversion/smoke_v1
+```
+
 ### Audit and convert a structure-rich dataset
 
 Audit source data without modifying it:
@@ -273,10 +298,11 @@ python -m condition_recommender.evaluation_cli `
   --test-fraction 0.2 --seed 17 --top-k 5
 ```
 
-Canonical reaction groups remain wholly in train or test. The report includes
-coverage, fallback levels, top-1/top-k recipe recovery, conditional recovery
-when the recipe was observed in training, yield MAE, compatibility exclusions,
-and the count of hard-incompatible recommendations.
+Rows connected by a normalized publication reference or canonical reaction
+remain wholly in train or test. The report includes coverage, fallback levels,
+top-1/top-k recipe recovery, conditional recovery when the recipe was observed
+in training, yield MAE, compatibility exclusions, and the count of
+hard-incompatible recommendations.
 
 ### Generic path limitations
 

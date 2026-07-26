@@ -57,8 +57,8 @@ def _signature(index: int) -> dict:
 def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     return {
-        "schema_version": "1.7",
-        "converter_definition_version": "generic_conversion.v1.2",
+        "schema_version": "1.8",
+        "converter_definition_version": "generic_conversion.v1.3",
         "admission_tier": "verified",
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
@@ -66,6 +66,7 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
         "reaction_smiles": "C.N>>CN",
         "yield_pct": 50.0 + index,
         "source_dataset": f"dataset-{index % 2}",
+        "reference_id": f"REF1:{index}",
         "reaction_signature": _signature(index),
         "resolved_recipe_id": recipe_id,
         "resolved_recipe": {"recipe_id": recipe_id},
@@ -85,9 +86,9 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.1"
-    assert payload["reaction_signature_schema_version"] == "1.2"
-    assert payload["record_schema_versions"] == ["1.7"]
+    assert payload["schema_version"] == "1.2"
+    assert payload["reaction_signature_schema_version"] == "1.3"
+    assert payload["record_schema_versions"] == ["1.8"]
 
 
 def test_index_rejects_stale_converted_records() -> None:
@@ -139,6 +140,22 @@ def test_grouped_split_keeps_duplicate_reactions_together() -> None:
         if row.canonical_reaction_id == "CRX1:duplicate"
     }
     assert len(duplicate_locations) == 1
+
+
+def test_grouped_split_keeps_publication_references_together() -> None:
+    records = [_record(index) for index in range(1, 5)]
+    records[0]["reference_id"] = "REF1:shared"
+    records[1]["reference_id"] = "REF1:shared"
+    index = build_generic_index(records)
+
+    split = grouped_holdout_split(index.rows, test_fraction=0.5, seed=7)
+    locations = {
+        "train" if row in split.train_rows else "test"
+        for row in index.rows
+        if row.reference_id == "REF1:shared"
+    }
+
+    assert len(locations) == 1
 
 
 def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:

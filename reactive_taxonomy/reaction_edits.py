@@ -463,7 +463,12 @@ def _chemistry_edit_key(edit: ReactionEdit) -> Tuple[Any, ...]:
             if atom is not None
         )
     )
-    return edit.edit_type, endpoints, edit.old_order, edit.new_order
+    return (
+        edit.edit_type,
+        endpoints,
+        edit.old_order or "NONE",
+        edit.new_order or "NONE",
+    )
 
 
 def normalize_inferred_scaffold_edits(
@@ -528,8 +533,8 @@ def _comparison_key(edit: ReactionEdit) -> Tuple[Any, ...]:
     return (
         edit.edit_type,
         tuple(sorted(endpoints)),
-        edit.old_order,
-        edit.new_order,
+        edit.old_order or "NONE",
+        edit.new_order or "NONE",
     )
 
 

@@ -1,6 +1,6 @@
 # Generic Condition Recommendation Implementation Plan
 
-**Status:** Proposed implementation plan  
+**Status:** In progress
 **Primary entry point:** `condition_recommender.recommend_generic_conditions()`  
 **Source corpus:** `data-processor/reaction_dataset/`  
 **Scope:** sample-first conversion, reference-aware precedent modeling, generic
@@ -99,6 +99,34 @@ implementation. The following gaps must be addressed before full conversion:
 - add reference- and scaffold-safe evaluation;
 - preload or cache the runtime index rather than rebuilding it per request;
 - calibrate retrieval and ranking by transformation class.
+
+### 3.1 Implemented first slice
+
+The initial implementation slice now provides:
+
+- reaction-signature schema 1.3, with schema-level hydrogen changes included in
+  event, L2, and L3 identity;
+- deterministic DOI, patent, and normalized bibliographic reference identity;
+- reference provenance in canonical converted records and persisted indices;
+- deterministic source-balanced smoke, development, validation, and
+  untouched-test sampling;
+- connected partition groups for shared references and exact normalized
+  reaction text;
+- original source provenance in sampled CSV conversion;
+- reference- and canonical-reaction-connected held-out evaluation groups.
+
+Reference condition-series modeling, separate admission dimensions, recipe core
+identity, corrected environment retrieval, and reference-aware aggregation
+remain pending.
+
+The first local pilot artifacts use the documented default sizes: 500 smoke,
+5,000 development, 2,000 validation, and 2,000 untouched-test rows. Reference
+and exact-reaction-text leakage are both zero. The balanced 500-row smoke
+conversion currently yields 69 verified, 230 review, and 201 rejected records;
+145 rows have signatures and 69 enter the verified generic index. These are
+diagnostic coverage measurements, not production performance claims. The smoke
+run also exposed and fixed a mixed-edit sorting defect in the conserved-scaffold
+fallback, now covered by a deterministic regression.
 
 ## 4. Source Corpus Profile
 

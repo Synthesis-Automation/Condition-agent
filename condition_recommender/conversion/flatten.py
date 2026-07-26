@@ -16,6 +16,8 @@ GENERIC_REVIEW_FIELDS = (
     "source_dataset",
     "source_row_number",
     "source_declared_family",
+    "reference_id",
+    "reference_resolution_status",
     "admission_tier",
     "admission_reasons",
     "reaction_smiles",
@@ -76,6 +78,10 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "source_dataset": record.source_dataset,
         "source_row_number": record.source_row_number,
         "source_declared_family": record.source_declared_family,
+        "reference_id": record.reference_id,
+        "reference_resolution_status": (
+            (record.reference_identity or {}).get("resolution_status", "")
+        ),
         "admission_tier": record.admission_tier.value,
         "admission_reasons": _joined(record.admission_reasons),
         "reaction_smiles": record.reaction_smiles,

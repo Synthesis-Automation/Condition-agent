@@ -296,7 +296,7 @@ def build_reaction_events(
     for ordinal, group in enumerate(groups, start=1):
         chemistry = tuple(sorted(_edit_chemistry(edit) for edit in group))
         event_key = _digest(
-            "E0", {"edits": chemistry, "event_schema_version": "1.0"}
+            "E0", {"edits": chemistry, "event_schema_version": "1.1"}
         )
         event_id = f"{_digest('RE1', event_key)}:{ordinal}"
         component_indices = {
@@ -333,6 +333,13 @@ def build_reaction_events(
                 if edit.edit_type == "order_changed"
             )
         )
+        hydrogen_changes = tuple(
+            sorted(
+                f"{_bond_type(edit, edit.old_order)}>{edit.new_order or 'NONE'}"
+                for edit in group
+                if edit.edit_type == "hydrogen_change"
+            )
+        )
         pattern = match_reaction_label_pattern(group, style="ascii")
         single_event = len(groups) == 1
         event_site_ids = _event_sites(reactants, group)
@@ -364,6 +371,7 @@ def build_reaction_events(
                 formed_bond_types=formed,
                 broken_bond_types=broken,
                 order_changes=order_changes,
+                hydrogen_changes=hydrogen_changes,
                 formed_connection_labels=formed,
                 topology=_event_topology(
                     reactants,

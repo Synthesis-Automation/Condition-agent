@@ -10,6 +10,9 @@ from typing import Any, Dict, Iterator, Mapping, Optional, Tuple
 from ..condition_normalization import optional_float, split_identifiers
 
 _COLUMN_ALIASES: Dict[str, Tuple[str, ...]] = {
+    "source_dataset": ("source_dataset",),
+    "source_path": ("source_path",),
+    "source_row_number": ("source_row_number",),
     "reaction_id": ("reaction_id", "reactionid", "id"),
     "reaction_type": ("reaction_type", "reactiontype", "family"),
     "reaction_smiles": ("reaction_smiles", "reactionsmiles", "rxn_smiles"),
@@ -79,13 +82,24 @@ def adapt_row(
 ) -> RawReactionRecord:
     """Adapt one source row without performing chemistry classification."""
     headers = _normalized_headers(row)
+    preserved_row_number = _value(row, "source_row_number", headers)
+    try:
+        effective_row_number = (
+            int(preserved_row_number) if preserved_row_number else source_row_number
+        )
+    except ValueError:
+        effective_row_number = source_row_number
+    effective_dataset = (
+        _value(row, "source_dataset", headers) or source_dataset
+    )
+    effective_source_path = _value(row, "source_path", headers) or source_path
     reaction_id = _value(
         row, "reaction_id", headers
-    ) or f"{source_dataset}:row-{source_row_number}"
+    ) or f"{effective_dataset}:row-{effective_row_number}"
     return RawReactionRecord(
-        source_dataset=source_dataset,
-        source_path=source_path,
-        source_row_number=source_row_number,
+        source_dataset=effective_dataset,
+        source_path=effective_source_path,
+        source_row_number=effective_row_number,
         reaction_id=reaction_id,
         source_declared_family=_value(row, "reaction_type", headers),
         reaction_smiles=_value(row, "reaction_smiles", headers),

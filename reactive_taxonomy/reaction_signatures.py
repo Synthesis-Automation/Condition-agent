@@ -374,6 +374,13 @@ def build_reaction_signature(
             if edit.edit_type == "order_changed"
         )
     )
+    hydrogen_changes = tuple(
+        sorted(
+            f"{_bond_type(edit, edit.old_order)}>{edit.new_order or 'NONE'}"
+            for edit in edit_result.edits
+            if edit.edit_type == "hydrogen_change"
+        )
+    )
     transformation_class = selected.transformation_class if selected else None
     partner_handles = tuple(
         sorted(
@@ -427,6 +434,7 @@ def build_reaction_signature(
             event.formed_bond_types,
             event.broken_bond_types,
             event.order_changes,
+            event.hydrogen_changes,
             event.transformation_class,
             event.topology.reaction_scope,
         )
@@ -456,13 +464,20 @@ def build_reaction_signature(
             "formed": formed,
             "broken": broken,
             "order_changes": order_changes,
+            "hydrogen_changes": hydrogen_changes,
             "transformation_class": transformation_class,
             "events": transformation_event_tokens,
             "topology": topology_token,
         },
     )
     bond_key = _digest(
-        "L3", {"formed": formed, "broken": broken, "order_changes": order_changes}
+        "L3",
+        {
+            "formed": formed,
+            "broken": broken,
+            "order_changes": order_changes,
+            "hydrogen_changes": hydrogen_changes,
+        },
     )
     environment_key = _digest(
         "L4",
@@ -519,6 +534,7 @@ def build_reaction_signature(
         formed_bond_types=formed,
         broken_bond_types=broken,
         order_changes=order_changes,
+        hydrogen_changes=hydrogen_changes,
         edits=edit_result.edits,
         events=events,
         event_count=len(events),
