@@ -78,6 +78,7 @@ def test_window_uses_literature_recommendation_data_by_default(
         gui.default_recommendation_data_path()
     )
     assert window.top_k_spin.value() == 5
+    assert window.reaction_edit.metaObject().className() == "QLineEdit"
     assert window.results_table.columnCount() == 9
     assert not window.export_button.isEnabled()
 

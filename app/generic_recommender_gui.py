@@ -204,13 +204,12 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.data_summary.setObjectName("dataSummary")
         self.data_summary.setStyleSheet("color: #52606d;")
 
-        self.reaction_edit = QtWidgets.QPlainTextEdit()
+        self.reaction_edit = QtWidgets.QLineEdit()
         self.reaction_edit.setObjectName("reactionSmiles")
         self.reaction_edit.setPlaceholderText(
-            "Enter reaction SMILES with product, for example:\n"
+            "Enter reaction SMILES with product, for example: "
             "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
         )
-        self.reaction_edit.setMaximumHeight(90)
 
         self.top_k_spin = QtWidgets.QSpinBox()
         self.top_k_spin.setObjectName("topK")
@@ -420,7 +419,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     def load_example(self) -> None:
-        self.reaction_edit.setPlainText(
+        self.reaction_edit.setText(
             "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
         )
 
@@ -440,7 +439,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         if self.thread is not None:
             return
         data_path = Path(self.data_path_edit.text().strip())
-        reaction_smiles = self.reaction_edit.toPlainText().strip()
+        reaction_smiles = self.reaction_edit.text().strip()
         if not data_path.is_file():
             QtWidgets.QMessageBox.warning(
                 self,
