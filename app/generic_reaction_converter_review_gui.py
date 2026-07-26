@@ -215,7 +215,8 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         outputs = QtWidgets.QLabel(
             "Outputs: shard_manifest.json + compressed shards (canonical "
             "recommendation data and restart checkpoints) • "
-            "reaction_review.csv (five-column human review) • "
+            "reaction_review.csv (concise human review, including spectator "
+            "and local steric/electronic context) • "
             "generic_index.json.gz (optional fast lookup). A duplicate merged "
             "records file is not stored."
         )

@@ -12,13 +12,18 @@ from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.1"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
     "original_reaction_type",
     "detected_reaction_family",
     "detection_status",
+    "spectators",
+    "steric_electronic_factors",
 )
+
+_SUBSCRIPT_TRANSLATION = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
 
 @dataclass(frozen=True)
@@ -35,6 +40,125 @@ class ConciseReviewProgress:
 
 class ConciseReviewConversionCancelled(RuntimeError):
     """Raised when a caller cancels a folder conversion between records."""
+
+
+def _readable_token(value: Any) -> str:
+    return str(value or "").replace("_", " ").strip()
+
+
+def _formula_text(value: Any) -> str:
+    return str(value or "").translate(_SUBSCRIPT_TRANSLATION)
+
+
+def _spectator_summary(signature: Mapping[str, Any]) -> str:
+    grouped: Dict[tuple[str, str], list[int]] = {}
+    for group in signature.get("spectator_groups") or ():
+        if not isinstance(group, Mapping):
+            continue
+        group_id = str(group.get("group_id") or "")
+        label = str(group.get("chemist_label") or "")
+        key = (label, group_id)
+        distance = group.get("graph_distance")
+        distances = grouped.setdefault(key, [])
+        if distance is not None:
+            distances.append(int(distance))
+    values = []
+    for (label, group_id), distances in sorted(grouped.items()):
+        readable_group = _readable_token(group_id)
+        display = _formula_text(label) or readable_group
+        if readable_group and readable_group.casefold() != display.casefold():
+            display += f" [{readable_group}]"
+        count = max(1, len(distances))
+        if count > 1:
+            display = f"{count}× {display}"
+        if distances:
+            distance_text = "/".join(
+                str(value) for value in sorted(set(distances))
+            )
+            display += f" (d={distance_text})"
+        values.append(display)
+    return "; ".join(values)
+
+
+def _partner_label(partner: Mapping[str, Any]) -> str:
+    role = _readable_token(partner.get("role"))
+    if role:
+        return role
+    component = int(partner.get("component_index") or 0) + 1
+    chemist_label = _formula_text(partner.get("chemist_label"))
+    return f"P{component} ({chemist_label})" if chemist_label else f"P{component}"
+
+
+def _steric_summary(steric: Mapping[str, Any]) -> str:
+    steric_class = _readable_token(steric.get("class"))
+    center_class = _readable_token(steric.get("center_substitution_class"))
+    values = []
+    if center_class and center_class == steric_class:
+        values.append(f"{center_class} N center")
+    else:
+        if steric_class:
+            values.append(steric_class)
+        if center_class:
+            values.append(f"{center_class} N center")
+    ortho_count = steric.get("ortho_substituent_count")
+    if ortho_count:
+        values.append(f"ortho={int(ortho_count)}")
+    attached = []
+    for group in steric.get("attached_groups") or ():
+        if not isinstance(group, Mapping):
+            continue
+        context = _readable_token(group.get("context")) or "group"
+        attachment_class = _readable_token(
+            group.get("attachment_carbon_class")
+        )
+        if attachment_class:
+            text = f"{context} α-C {attachment_class}"
+            if group.get("alpha_branched"):
+                text += ", branched"
+        else:
+            text = context
+        attached.append(text)
+    values.extend(sorted(set(attached)))
+    return ", ".join(values) or "unclassified"
+
+
+def _electronic_summary(electronic: Mapping[str, Any]) -> str:
+    electronic_class = _readable_token(electronic.get("class"))
+    qualitative_sum = electronic.get("qualitative_sum")
+    if qualitative_sum is None:
+        return electronic_class or "unclassified"
+    return f"{electronic_class or 'unclassified'} (q={float(qualitative_sum):+.2f})"
+
+
+def _partner_environment_summary(signature: Mapping[str, Any]) -> str:
+    values = []
+    partners = sorted(
+        (
+            partner
+            for partner in signature.get("partners") or ()
+            if isinstance(partner, Mapping)
+        ),
+        key=lambda partner: (
+            int(partner.get("component_index") or 0),
+            str(partner.get("role") or ""),
+            str(partner.get("partner_id") or ""),
+        ),
+    )
+    for partner in partners:
+        steric = partner.get("steric")
+        electronic = partner.get("electronic")
+        steric_value = steric if isinstance(steric, Mapping) else {}
+        electronic_value = (
+            electronic if isinstance(electronic, Mapping) else {}
+        )
+        if not steric_value and not electronic_value:
+            continue
+        values.append(
+            f"{_partner_label(partner)}: "
+            f"S={_steric_summary(steric_value)}; "
+            f"E={_electronic_summary(electronic_value)}"
+        )
+    return " | ".join(values)
 
 
 def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
@@ -74,9 +198,11 @@ def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
 
 
 def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
-    """Select the five fields needed for rapid reaction-family review."""
+    """Select compact chemistry fields needed for rapid structural review."""
     display = record.get("reaction_display_label")
     display_value = display if isinstance(display, Mapping) else {}
+    signature = record.get("reaction_signature")
+    signature_value = signature if isinstance(signature, Mapping) else {}
     return {
         "canonical_reaction_smiles": str(
             record.get("canonical_reaction_smiles")
@@ -94,6 +220,10 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             display_value.get("status")
             or record.get("reaction_label_status")
             or "unavailable"
+        ),
+        "spectators": _spectator_summary(signature_value),
+        "steric_electronic_factors": _partner_environment_summary(
+            signature_value
         ),
     }
 
@@ -164,7 +294,7 @@ def export_concise_reaction_review_csv(
             )
         )
     return {
-        "schema_version": "1.0",
+        "schema_version": CONCISE_REACTION_REVIEW_SCHEMA_VERSION,
         "artifact_type": "concise_reaction_review_csv",
         "records_path": str(source),
         "output_path": str(destination),
@@ -293,7 +423,7 @@ def convert_dataset_folder_to_concise_review_csv(
         message=f"Finished {row_count} reaction(s).",
     )
     return {
-        "schema_version": "1.0",
+        "schema_version": CONCISE_REACTION_REVIEW_SCHEMA_VERSION,
         "artifact_type": "concise_reaction_review_csv",
         "dataset_path": str(source),
         "output_path": str(destination),
@@ -305,6 +435,7 @@ def convert_dataset_folder_to_concise_review_csv(
 
 __all__ = [
     "CONCISE_REACTION_REVIEW_FIELDS",
+    "CONCISE_REACTION_REVIEW_SCHEMA_VERSION",
     "ConciseReviewConversionCancelled",
     "ConciseReviewProgress",
     "concise_reaction_review_row",

@@ -81,7 +81,7 @@
     "intramolecular": 13,
     "unknown": 366
   },
-  "reused_shard_count": 0,
+  "reused_shard_count": 5,
   "schema_version": "1.0",
   "shard_count": 5,
   "signature_count": 1134,

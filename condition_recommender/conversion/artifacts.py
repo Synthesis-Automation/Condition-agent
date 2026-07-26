@@ -157,7 +157,7 @@ def build_recommendation_artifacts(
     review_path = destination / "reaction_review.csv"
     notify(
         "review_started",
-        "Writing the concise five-column review CSV…",
+        "Writing the concise chemistry review CSV…",
         row_count=0,
     )
 

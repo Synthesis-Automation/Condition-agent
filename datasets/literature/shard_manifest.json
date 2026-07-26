@@ -102,7 +102,7 @@
         "intramolecular": 1,
         "unknown": 41
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "Amide_formation.10fc686263.part-00000",
       "signature_count": 259,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\Amide_formation.csv",
@@ -195,7 +195,7 @@
         "intramolecular": 6,
         "unknown": 91
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "C_N_Coupling.ae2f9c200f.part-00000",
       "signature_count": 209,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\C_N_Coupling.csv",
@@ -288,7 +288,7 @@
         "intramolecular": 6,
         "unknown": 65
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "C_O_Coupling.9cc55782e6.part-00000",
       "signature_count": 235,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\C_O_Coupling.csv",
@@ -380,7 +380,7 @@
         "intermolecular": 232,
         "unknown": 68
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "C_S_Coupling.3cb18fffa4.part-00000",
       "signature_count": 232,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\C_S_Coupling.csv",
@@ -467,7 +467,7 @@
         "intermolecular": 199,
         "unknown": 101
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "suzuki_miyaura.a3f1754db2.part-00000",
       "signature_count": 199,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\suzuki_miyaura.csv",

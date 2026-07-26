@@ -392,8 +392,7 @@ family labels are provenance only. Chemistry, condition, outcome, and index
 eligibility are assessed independently. The legacy verified/review/rejected
 tier remains a compatibility summary, not the indexing contract.
 
-For rapid reaction-family review, export only the five chemistry-facing
-columns:
+For rapid reaction-family review, export the compact chemistry-facing columns:
 
 ```powershell
 python -m condition_recommender.concise_review_cli `
@@ -402,15 +401,19 @@ python -m condition_recommender.concise_review_cli `
 ```
 
 The output contains canonical reaction SMILES, the detailed structural label,
-the original source reaction type, the detected optional reaction family, and
-the structural-label detection status. Blank detected families are retained
-and are not treated as errors.
+the original source reaction type, the detected optional reaction family, the
+structural-label detection status, unchanged spectator groups, and a compact
+steric/electronic summary for each reactive partner. In the compact fields,
+`d` is graph-bond distance from the nearest reactive site, `S` means steric
+context, `E` means electronic context, and `q` is the qualitative local
+electronic index—not a measured physical quantity. Blank detected families are
+retained and are not treated as errors.
 
 The desktop app can now build both recommendation-ready data and the simple
 review CSV:
 
 ```powershell
-python -m app.generic_reaction_review_gui
+python -m app.generic_reaction_converter_review_gui
 ```
 
 Choose the source dataset folder. The output defaults to
@@ -420,8 +423,9 @@ subfolders and creates:
 - `shard_manifest.json` and `shards/*.jsonl.gz`: the complete canonical
   recommendation data. Shards are compressed and completed shards are reused
   after cancellation or restart.
-- `reaction_review.csv`: the five-column file for quick human review. It is not
-  used as recommendation input.
+- `reaction_review.csv`: the compact file for quick human review, including
+  spectators and reactive-partner steric/electronic context. It is not used as
+  recommendation input.
 - `generic_index.json.gz`: a compressed, ready-to-load recommendation index.
   This is enabled by default because it makes repeated recommendations start
   faster.

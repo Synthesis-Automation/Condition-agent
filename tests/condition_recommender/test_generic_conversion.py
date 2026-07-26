@@ -7,6 +7,7 @@ import pytest
 from condition_recommender.conversion.concise_review import (
     CONCISE_REACTION_REVIEW_FIELDS,
     ConciseReviewConversionCancelled,
+    concise_reaction_review_row,
     convert_dataset_folder_to_concise_review_csv,
     export_concise_reaction_review_csv,
 )
@@ -367,6 +368,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
+    assert report["schema_version"] == "1.1"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]
@@ -374,6 +376,55 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["original_reaction_type"] == "Original Suzuki Label"
     assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
     assert review_rows[0]["detection_status"] == "family_overlay"
+    assert review_rows[0]["steric_electronic_factors"]
+
+
+def test_concise_review_formats_spectators_and_partner_environment() -> None:
+    row = concise_reaction_review_row(
+        {
+            "reaction_signature": {
+                "spectator_groups": [
+                    {
+                        "group_id": "ether",
+                        "chemist_label": "R–O–R",
+                        "graph_distance": 1,
+                    },
+                    {
+                        "group_id": "ether",
+                        "chemist_label": "R–O–R",
+                        "graph_distance": 3,
+                    },
+                ],
+                "partners": [
+                    {
+                        "component_index": 0,
+                        "role": "nitrogen_partner",
+                        "steric": {
+                            "class": "primary",
+                            "center_substitution_class": "primary",
+                            "attached_groups": [
+                                {
+                                    "context": "Alkyl",
+                                    "attachment_carbon_class": "secondary",
+                                    "alpha_branched": True,
+                                }
+                            ],
+                        },
+                        "electronic": {
+                            "class": "electron_poor",
+                            "qualitative_sum": 0.4,
+                        },
+                    }
+                ],
+            }
+        }
+    )
+
+    assert row["spectators"] == "2× R–O–R [ether] (d=1/3)"
+    assert row["steric_electronic_factors"] == (
+        "nitrogen partner: S=primary N center, "
+        "Alkyl α-C secondary, branched; E=electron poor (q=+0.40)"
+    )
 
 
 def test_recursive_dataset_folder_converts_to_one_concise_review_csv(
