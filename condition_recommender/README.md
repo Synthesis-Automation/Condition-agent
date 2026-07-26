@@ -474,6 +474,30 @@ python -m condition_recommender.generic_recommend_cli `
   --records datasets/literature/shard_manifest.json
 ```
 
+### Desktop recommender
+
+Launch the simpler Qt6 interface:
+
+```powershell
+python -m app.generic_recommender_gui
+```
+
+It automatically selects `datasets/literature/generic_index.json.gz` when the
+fast index exists, with `shard_manifest.json` as a fallback. Paste a complete
+`reactants>>product` reaction SMILES and choose how many recipes to return.
+
+The window shows:
+
+- the detected optional reaction family and generic transformation;
+- the retrieval fallback level and compatible precedent counts;
+- ranked catalysts, ligands, bases, solvents, additives, temperature, and time;
+- similarity, compatibility, expected yield, and independent support;
+- explanations, cautions, and precedent IDs for the selected recipe.
+
+Recommendation runs in a background thread. The validated index is cached in
+memory after its first load and is automatically reloaded if the selected file
+changes. Results can be exported as the complete typed JSON response.
+
 Retrieval follows a chemistry hierarchy: exact signature, relaxed handle
 signature, high-confidence family, generic transformation, then compatible bond
 edits narrowed by local-environment neighbors, followed by a broad compatible
