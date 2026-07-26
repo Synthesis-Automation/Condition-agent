@@ -406,16 +406,45 @@ the original source reaction type, the detected optional reaction family, and
 the structural-label detection status. Blank detected families are retained
 and are not treated as errors.
 
-The same workflow is available as a simple PyQt6 desktop app:
+The desktop app can now build both recommendation-ready data and the simple
+review CSV:
 
 ```powershell
 python -m app.generic_reaction_review_gui
 ```
 
-Choose a dataset folder and an output CSV. The app discovers CSV files
-recursively, performs conversion in a background thread, reports file and
-reaction progress in the status box, and supports cancellation between
-reactions.
+Choose the source dataset folder. The output defaults to
+`datasets/literature`, but it remains editable. The app finds CSV files in all
+subfolders and creates:
+
+- `shard_manifest.json` and `shards/*.jsonl.gz`: the complete canonical
+  recommendation data. Shards are compressed and completed shards are reused
+  after cancellation or restart.
+- `reaction_review.csv`: the five-column file for quick human review. It is not
+  used as recommendation input.
+- `generic_index.json.gz`: a compressed, ready-to-load recommendation index.
+  This is enabled by default because it makes repeated recommendations start
+  faster.
+- `recommendation_artifacts_report.json`: row counts, output paths, settings,
+  reuse counts, and file sizes.
+
+The app does not keep an additional merged copy of all canonical records. This
+avoids duplicating the largest data on disk. If the fast index is disabled, the
+recommender can still use `shard_manifest.json`, but it must rebuild lookup maps
+when loading.
+
+The default settings are intended for large datasets:
+
+- `1,000` rows per shard gives useful restart points without creating too many
+  small files.
+- Up to `4` workers convert independent shards in parallel. Reduce this when
+  memory is limited.
+- Keep the fast index enabled for routine recommendation. Disable it only when
+  conversion size matters more than startup speed.
+
+Cancellation is safe: the active shard finishes, the manifest is checkpointed,
+and choosing the same source and output folders later resumes by reusing valid
+completed shards.
 
 ### Build an index and recommend
 
@@ -427,6 +456,22 @@ python -m condition_recommender.generic_index_cli `
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
   --records results/generic_conversion/generic_index.json
+```
+
+For output made by the desktop app, use the fast index directly:
+
+```powershell
+python -m condition_recommender.generic_recommend_cli `
+  "<reaction_smiles>" `
+  --records datasets/literature/generic_index.json.gz
+```
+
+If the fast index was not built, use the canonical manifest instead:
+
+```powershell
+python -m condition_recommender.generic_recommend_cli `
+  "<reaction_smiles>" `
+  --records datasets/literature/shard_manifest.json
 ```
 
 Retrieval follows a chemistry hierarchy: exact signature, relaxed handle

@@ -1,5 +1,10 @@
 """Dataset converters for recommendation-ready records."""
 
+from .artifacts import (
+    RecommendationArtifactBuildCancelled,
+    RecommendationArtifactProgress,
+    build_recommendation_artifacts,
+)
 from .concise_review import (
     convert_dataset_folder_to_concise_review_csv,
     export_concise_reaction_review_csv,
@@ -12,6 +17,9 @@ from .sampling import build_reference_safe_samples
 from .suzuki import convert_file, convert_row
 
 __all__ = [
+    "build_recommendation_artifacts",
+    "RecommendationArtifactBuildCancelled",
+    "RecommendationArtifactProgress",
     "convert_datasets",
     "convert_dataset_folder_to_concise_review_csv",
     "convert_file",

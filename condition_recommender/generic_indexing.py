@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import hashlib
 import gzip
+import io
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from enum import Enum
@@ -372,11 +373,45 @@ def save_generic_index(index: GenericReactionIndex, path: str | Path) -> Dict[st
     payload = _index_payload(index)
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(
-        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n",
-        encoding="utf-8",
-    )
+    temporary = destination.with_suffix(destination.suffix + ".tmp")
+    completed = False
+    try:
+        if destination.suffix.casefold() == ".gz":
+            with temporary.open("wb") as raw:
+                with gzip.GzipFile(
+                    filename="",
+                    mode="wb",
+                    fileobj=raw,
+                    compresslevel=6,
+                    mtime=0,
+                ) as compressed:
+                    with io.TextIOWrapper(
+                        compressed,
+                        encoding="utf-8",
+                    ) as handle:
+                        json.dump(
+                            payload,
+                            handle,
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        )
+                        handle.write("\n")
+        else:
+            with temporary.open("w", encoding="utf-8") as handle:
+                json.dump(
+                    payload,
+                    handle,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+                handle.write("\n")
+        temporary.replace(destination)
+        completed = True
+    finally:
+        if not completed and temporary.is_file():
+            temporary.unlink()
     return {
         "schema_version": payload["schema_version"],
         "reaction_signature_schema_version": payload[
@@ -393,7 +428,14 @@ def save_generic_index(index: GenericReactionIndex, path: str | Path) -> Dict[st
 
 def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
     """Load and validate a persisted generic index without rebuilding maps."""
-    with Path(path).open("r", encoding="utf-8") as handle:
+    source = Path(path)
+    opener = gzip.open if source.suffix.casefold() == ".gz" else Path.open
+    arguments = (
+        {"mode": "rt", "encoding": "utf-8"}
+        if source.suffix.casefold() == ".gz"
+        else {"mode": "r", "encoding": "utf-8"}
+    )
+    with opener(source, **arguments) as handle:
         payload = json.load(handle)
     if payload.get("artifact_type") != "generic_reaction_index":
         raise ValueError("Not a generic reaction index artifact")
@@ -504,6 +546,8 @@ def load_generic_index(
 ) -> GenericReactionIndex:
     """Load canonical JSONL output from the generic conversion engine."""
     source = Path(path)
+    if source.name.casefold().endswith(".json.gz"):
+        return load_persisted_generic_index(source)
     if source.suffix.casefold() == ".json":
         if source.name == "shard_manifest.json":
             from .conversion.sharded import (
@@ -589,7 +633,14 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
             row.resolved_recipe.get("recipe_core_id") or row.recipe_core_id
         ) != row.recipe_core_id:
             issues.append("recipe_core_identity_mismatch")
-    payload = json.loads(source.read_text(encoding="utf-8"))
+    opener = gzip.open if source.suffix.casefold() == ".gz" else Path.open
+    arguments = (
+        {"mode": "rt", "encoding": "utf-8"}
+        if source.suffix.casefold() == ".gz"
+        else {"mode": "r", "encoding": "utf-8"}
+    )
+    with opener(source, **arguments) as handle:
+        payload = json.load(handle)
     report = {
         "schema_version": "1.0",
         "artifact_type": "generic_index_integrity",

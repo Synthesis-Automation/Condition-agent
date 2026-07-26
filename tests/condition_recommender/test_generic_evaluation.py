@@ -122,6 +122,19 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert integrity["row_count"] == 2
 
 
+def test_compressed_persisted_index_round_trip(tmp_path: Path) -> None:
+    index = build_generic_index([_record(1), _record(2)])
+    path = tmp_path / "generic_index.json.gz"
+
+    report = save_generic_index(index, path)
+
+    assert path.read_bytes().startswith(b"\x1f\x8b")
+    assert report["row_count"] == 2
+    assert load_persisted_generic_index(path) == index
+    assert load_generic_index(path) == index
+    assert validate_generic_index_artifact(path)["valid"]
+
+
 def test_index_rejects_stale_converted_records() -> None:
     stale = _record(1)
     stale["reaction_signature"] = {

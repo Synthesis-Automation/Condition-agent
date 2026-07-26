@@ -37,11 +37,24 @@ class ConciseReviewConversionCancelled(RuntimeError):
     """Raised when a caller cancels a folder conversion between records."""
 
 
-def _iter_records(path: Path) -> Iterator[Dict[str, Any]]:
+def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
+    """Stream records from canonical JSONL or a sharded manifest."""
+    source = Path(path)
+    if source.name.casefold() == "shard_manifest.json":
+        payload = json.loads(source.read_text(encoding="utf-8"))
+        if payload.get("artifact_type") != "generic_sharded_conversion":
+            raise ValueError(f"Not a sharded conversion manifest: {source}")
+        for entry in payload.get("shards") or ():
+            if entry.get("status") != "complete":
+                continue
+            yield from iter_canonical_records(
+                source.parent / str(entry["output_path"])
+            )
+        return
     handle = (
-        gzip.open(path, mode="rt", encoding="utf-8")
-        if path.suffix.casefold() == ".gz"
-        else path.open(mode="r", encoding="utf-8")
+        gzip.open(source, mode="rt", encoding="utf-8")
+        if source.suffix.casefold() == ".gz"
+        else source.open(mode="r", encoding="utf-8")
     )
     with handle:
         for line_number, line in enumerate(handle, start=1):
@@ -51,11 +64,11 @@ def _iter_records(path: Path) -> Iterator[Dict[str, Any]]:
                 value = json.loads(line)
             except json.JSONDecodeError as exc:
                 raise ValueError(
-                    f"Invalid record JSONL at {path}:{line_number}: {exc.msg}"
+                    f"Invalid record JSONL at {source}:{line_number}: {exc.msg}"
                 ) from exc
             if not isinstance(value, dict):
                 raise ValueError(
-                    f"Record is not a JSON object at {path}:{line_number}"
+                    f"Record is not a JSON object at {source}:{line_number}"
                 )
             yield value
 
@@ -88,23 +101,68 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
 def export_concise_reaction_review_csv(
     records_path: str | Path,
     output_path: str | Path,
+    *,
+    progress_callback: Optional[Callable[[ConciseReviewProgress], None]] = None,
+    cancel_check: Optional[Callable[[], bool]] = None,
+    progress_interval: int = 1_000,
 ) -> Dict[str, Any]:
     """Write an Excel-friendly concise review CSV from canonical JSONL records."""
+    if progress_interval < 1:
+        raise ValueError("progress_interval must be positive")
     source = Path(records_path)
     if not source.is_file():
         raise ValueError(f"Canonical records file does not exist: {source}")
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_suffix(destination.suffix + ".tmp")
     row_count = 0
-    with destination.open("w", encoding="utf-8-sig", newline="") as handle:
-        writer = csv.DictWriter(
-            handle,
-            fieldnames=CONCISE_REACTION_REVIEW_FIELDS,
+    completed = False
+    try:
+        with temporary.open("w", encoding="utf-8-sig", newline="") as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=CONCISE_REACTION_REVIEW_FIELDS,
+            )
+            writer.writeheader()
+            for record in iter_canonical_records(source):
+                if cancel_check is not None and cancel_check():
+                    raise ConciseReviewConversionCancelled(
+                        "Review export cancelled"
+                    )
+                writer.writerow(concise_reaction_review_row(record))
+                row_count += 1
+                if (
+                    progress_callback is not None
+                    and row_count % progress_interval == 0
+                ):
+                    progress_callback(
+                        ConciseReviewProgress(
+                            phase="rows_exported",
+                            file_index=1,
+                            file_count=1,
+                            row_count=row_count,
+                            current_file=source.name,
+                            message=(
+                                f"Exported {row_count} review row(s)."
+                            ),
+                        )
+                    )
+        temporary.replace(destination)
+        completed = True
+    finally:
+        if not completed and temporary.is_file():
+            temporary.unlink()
+    if progress_callback is not None:
+        progress_callback(
+            ConciseReviewProgress(
+                phase="completed",
+                file_index=1,
+                file_count=1,
+                row_count=row_count,
+                current_file=source.name,
+                message=f"Review CSV complete: {row_count} row(s).",
+            )
         )
-        writer.writeheader()
-        for record in _iter_records(source):
-            writer.writerow(concise_reaction_review_row(record))
-            row_count += 1
     return {
         "schema_version": "1.0",
         "artifact_type": "concise_reaction_review_csv",
@@ -252,4 +310,5 @@ __all__ = [
     "concise_reaction_review_row",
     "convert_dataset_folder_to_concise_review_csv",
     "export_concise_reaction_review_csv",
+    "iter_canonical_records",
 ]

@@ -20,6 +20,7 @@ from condition_recommender.conversion.input_schema import (
     discover_csv_datasets,
 )
 from condition_recommender.conversion.sharded import (
+    ShardedConversionCancelled,
     convert_datasets_sharded,
     validate_sharded_conversion,
 )
@@ -490,3 +491,46 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
         issue.startswith("output_checksum_mismatch")
         for issue in integrity["issues"]
     )
+
+
+def test_cancelled_sharded_conversion_checkpoints_and_resumes(
+    tmp_path: Path,
+) -> None:
+    dataset = tmp_path / "mixed.csv"
+    reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+    rows = [
+        _csv_row(
+            f"reaction-{index}",
+            reaction,
+            reaction_type="untrusted",
+        )
+        for index in range(3)
+    ]
+    with dataset.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    output = tmp_path / "sharded"
+    cancel = {"requested": False}
+
+    def on_progress(progress) -> None:
+        if progress.phase == "shard_completed":
+            cancel["requested"] = True
+
+    with pytest.raises(ShardedConversionCancelled):
+        convert_datasets_sharded(
+            dataset,
+            output,
+            shard_size=1,
+            checkpoint_interval=1,
+            progress_callback=on_progress,
+            cancel_check=lambda: cancel["requested"],
+        )
+
+    partial_manifest = json.loads(
+        (output / "shard_manifest.json").read_text(encoding="utf-8")
+    )
+    assert len(partial_manifest["shards"]) == 1
+    resumed = convert_datasets_sharded(dataset, output, shard_size=1)
+    assert resumed["reused_shard_count"] == 1
+    assert resumed["output_row_count"] == 3

@@ -9,10 +9,20 @@ import json
 import shutil
 from collections import Counter
 from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
+from dataclasses import dataclass
 from enum import Enum
 from itertools import islice
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, Mapping, Optional, Sequence
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    Mapping,
+    Optional,
+    Sequence,
+)
 
 from condition_registry import condition_registry_definition_versions
 from reactive_taxonomy import (
@@ -30,6 +40,21 @@ from .input_schema import RawReactionRecord, discover_csv_datasets, iter_csv_rec
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
 SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v1.2"
+
+
+@dataclass(frozen=True)
+class ShardedConversionProgress:
+    """One progress update from restartable sharded conversion."""
+
+    phase: str
+    source_file_count: int
+    shard_count: int
+    row_count: int
+    message: str
+
+
+class ShardedConversionCancelled(RuntimeError):
+    """Raised after completed shards are checkpointed for a cancelled run."""
 
 
 def _sha256(path: Path) -> str:
@@ -488,7 +513,12 @@ def convert_datasets_sharded(
     mode: str = "full",
     workers: int = 1,
     checkpoint_interval: int = 10,
+    merge_records: bool = True,
     progress: bool = False,
+    progress_callback: Optional[
+        Callable[[ShardedConversionProgress], None]
+    ] = None,
+    cancel_check: Optional[Callable[[], bool]] = None,
 ) -> Dict[str, Any]:
     """Convert a corpus into deterministic, restartable canonical shards."""
     if shard_size < 1:
@@ -502,6 +532,29 @@ def convert_datasets_sharded(
     paths = discover_csv_datasets(dataset_path)
     if not paths:
         raise ValueError(f"No CSV datasets found at {dataset_path}")
+
+    def notify(
+        phase: str,
+        message: str,
+        *,
+        shard_count: int = 0,
+        row_count: int = 0,
+    ) -> None:
+        if progress_callback is not None:
+            progress_callback(
+                ShardedConversionProgress(
+                    phase=phase,
+                    source_file_count=len(paths),
+                    shard_count=shard_count,
+                    row_count=row_count,
+                    message=message,
+                )
+            )
+
+    notify(
+        "discovered",
+        f"Found {len(paths)} CSV dataset file(s).",
+    )
     destination = Path(output_dir)
     shards_dir = destination / "shards"
     shards_dir.mkdir(parents=True, exist_ok=True)
@@ -518,12 +571,22 @@ def convert_datasets_sharded(
     contract = _definition_contract()
     entries = []
     source_row_counts = Counter()
-    source_checksums = {
-        str(path.resolve()): _sha256(path) for path in paths
-    }
+    source_checksums = {}
+    for file_number, path in enumerate(paths, start=1):
+        if cancel_check is not None and cancel_check():
+            raise ShardedConversionCancelled(
+                "Conversion cancelled before shard processing"
+            )
+        notify(
+            "hashing",
+            f"Checking source file {file_number}/{len(paths)}: {path.name}",
+        )
+        source_checksums[str(path.resolve())] = _sha256(path)
     processed_shards = 0
     accepted_since_checkpoint = 0
+    accepted_row_count = 0
     stop = False
+    cancelled = False
 
     def checkpoint(*, coverage_complete: bool = False) -> None:
         _atomic_json(
@@ -543,9 +606,10 @@ def convert_datasets_sharded(
         )
 
     def accept(entry: Mapping[str, Any]) -> None:
-        nonlocal accepted_since_checkpoint
+        nonlocal accepted_row_count, accepted_since_checkpoint
         entries.append(dict(entry))
         accepted_since_checkpoint += 1
+        accepted_row_count += int(entry.get("input_row_count") or 0)
         if accepted_since_checkpoint >= checkpoint_interval:
             checkpoint()
             accepted_since_checkpoint = 0
@@ -561,6 +625,15 @@ def convert_datasets_sharded(
                 ),
                 flush=True,
             )
+        notify(
+            "shard_completed",
+            (
+                f"{'Reused' if entry.get('reused') else 'Converted'} "
+                f"{entry['shard_id']}: {entry['input_row_count']} row(s)."
+            ),
+            shard_count=len(entries),
+            row_count=accepted_row_count,
+        )
 
     executor = ProcessPoolExecutor(max_workers=workers) if workers > 1 else None
     pending = set()
@@ -571,6 +644,10 @@ def convert_datasets_sharded(
             for part_number, raw_records in enumerate(
                 _chunks(iter_csv_records(path), shard_size)
             ):
+                if cancel_check is not None and cancel_check():
+                    cancelled = True
+                    stop = True
+                    break
                 if max_shards is not None and processed_shards >= max_shards:
                     stop = True
                     break
@@ -623,6 +700,20 @@ def convert_datasets_sharded(
     finally:
         if executor is not None:
             executor.shutdown(wait=True, cancel_futures=False)
+    if cancelled:
+        checkpoint()
+        notify(
+            "cancelled",
+            (
+                f"Cancellation saved {len(entries)} completed shard(s); "
+                "run again with the same output folder to resume."
+            ),
+            shard_count=len(entries),
+            row_count=accepted_row_count,
+        )
+        raise ShardedConversionCancelled(
+            "Conversion cancelled; completed shards were saved for resume"
+        )
     manifest = _manifest_payload(
         dataset_path=dataset_path,
         mode=mode,
@@ -645,13 +736,35 @@ def convert_datasets_sharded(
     catalogs = {}
     merged = None
     if not failed_entries:
+        notify(
+            "catalogs",
+            "Building compressed recipe and reference catalogs…",
+            shard_count=len(entries),
+            row_count=sum(
+                int(entry.get("input_row_count") or 0) for entry in entries
+            ),
+        )
         catalogs = _write_catalogs(manifest, destination)
-        merged = _merge_shards(manifest, destination)
+        if merge_records:
+            notify(
+                "merging",
+                "Merging canonical shards into records.jsonl.gz…",
+                shard_count=len(entries),
+                row_count=sum(
+                    int(entry.get("input_row_count") or 0) for entry in entries
+                ),
+            )
+            merged = _merge_shards(manifest, destination)
+        else:
+            previous_merged = destination / "records.jsonl.gz"
+            if previous_merged.is_file():
+                previous_merged.unlink()
     report: Dict[str, Any] = {
         "schema_version": "1.0",
         "artifact_type": "generic_sharded_conversion_report",
         "manifest_path": str(manifest_path),
         "mode": mode,
+        "merge_records": merge_records,
         "source_file_count": len(paths),
         "shard_count": len(entries),
         "complete_shard_count": len(complete_entries),
@@ -701,12 +814,23 @@ def convert_datasets_sharded(
     )
     report["integrity"] = integrity
     _atomic_json(destination / "conversion_report.json", report)
+    notify(
+        "completed",
+        (
+            f"Canonical conversion complete: "
+            f"{report['output_row_count']} record(s)."
+        ),
+        shard_count=len(entries),
+        row_count=int(report["output_row_count"]),
+    )
     return report
 
 
 __all__ = [
     "SHARDED_CONVERSION_DEFINITION_VERSION",
     "SHARD_MANIFEST_SCHEMA_VERSION",
+    "ShardedConversionCancelled",
+    "ShardedConversionProgress",
     "convert_datasets_sharded",
     "iter_gzip_jsonl",
     "validate_sharded_conversion",

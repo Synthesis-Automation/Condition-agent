@@ -1,7 +1,9 @@
 from pathlib import Path
 
 from app import generic_reaction_review_gui as gui
-from condition_recommender.conversion.concise_review import ConciseReviewProgress
+from condition_recommender.conversion.artifacts import (
+    RecommendationArtifactProgress,
+)
 
 
 def test_review_window_reports_recursive_csv_count(qtbot, tmp_path: Path) -> None:
@@ -19,31 +21,51 @@ def test_review_window_reports_recursive_csv_count(qtbot, tmp_path: Path) -> Non
     assert "Found 2 CSV file(s)" in window.source_summary.text()
     assert window.status_box.isReadOnly()
     assert not window.cancel_button.isEnabled()
+    assert Path(window.output_edit.text()) == gui.DEFAULT_OUTPUT_FOLDER
+    assert window.shard_size_spin.value() == 1_000
+    assert window.build_index_check.isChecked()
 
 
 def test_review_worker_forwards_progress_and_result(monkeypatch) -> None:
-    progress = ConciseReviewProgress(
-        phase="completed",
-        file_index=2,
-        file_count=2,
+    progress = RecommendationArtifactProgress(
+        phase="canonical_completed",
+        source_file_count=2,
+        shard_count=2,
         row_count=10,
-        current_file="",
         message="Finished 10 reaction(s).",
     )
 
-    def fake_conversion(source, output, *, progress_callback, cancel_check):
+    def fake_conversion(
+        source,
+        output,
+        *,
+        shard_size,
+        workers,
+        build_fast_index,
+        progress_callback,
+        cancel_check,
+    ):
         assert source == "source"
-        assert output == "review.csv"
+        assert output == "output"
+        assert shard_size == 500
+        assert workers == 2
+        assert build_fast_index
         assert not cancel_check()
         progress_callback(progress)
-        return {"row_count": 10, "output_path": output}
+        return {"record_count": 10, "output_dir": output}
 
     monkeypatch.setattr(
         gui,
-        "convert_dataset_folder_to_concise_review_csv",
+        "build_recommendation_artifacts",
         fake_conversion,
     )
-    worker = gui.ReviewConversionWorker("source", "review.csv")
+    worker = gui.ReviewConversionWorker(
+        "source",
+        "output",
+        shard_size=500,
+        workers=2,
+        build_fast_index=True,
+    )
     updates = []
     results = []
     worker.progress.connect(updates.append)
@@ -57,5 +79,5 @@ def test_review_worker_forwards_progress_and_result(monkeypatch) -> None:
 
     assert updates == [progress]
     assert results == [
-        (True, {"row_count": 10, "output_path": "review.csv"}, "")
+        (True, {"record_count": 10, "output_dir": "output"}, "")
     ]
