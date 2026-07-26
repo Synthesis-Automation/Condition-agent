@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import csv
 import gzip
+import io
 import json
 from collections import Counter
 from pathlib import Path
@@ -108,7 +109,10 @@ def clean_rows(
             ("FG B", "reactive_site_2"),
         ):
             source = (row.get(source_column) or "").strip()
-            mapping = resolve_source_label(source)
+            mapping = resolve_source_label(
+                source,
+                source_reaction_type=output["source_reaction_type"],
+            )
             mapping_columns = mapping.to_columns(prefix)
             output.update(
                 {
@@ -160,23 +164,28 @@ def clean_csv(source: Path, destination: Path) -> Counter[str]:
         writer.writeheader()
         writer.writerows(rows)
     catalog_destination = condition_recipe_catalog_path(destination)
-    with gzip.open(
-        catalog_destination,
-        "wt",
-        encoding="utf-8",
-        newline="\n",
-        compresslevel=9,
-    ) as handle:
-        for recipe_id in sorted(recipe_catalog):
-            handle.write(
-                json.dumps(
-                    recipe_catalog[recipe_id],
-                    ensure_ascii=False,
-                    sort_keys=True,
-                    separators=(",", ":"),
-                )
-            )
-            handle.write("\n")
+    with catalog_destination.open("wb") as raw_handle:
+        with gzip.GzipFile(
+            fileobj=raw_handle,
+            mode="wb",
+            compresslevel=9,
+            mtime=0,
+        ) as compressed_handle:
+            with io.TextIOWrapper(
+                compressed_handle,
+                encoding="utf-8",
+                newline="\n",
+            ) as handle:
+                for recipe_id in sorted(recipe_catalog):
+                    handle.write(
+                        json.dumps(
+                            recipe_catalog[recipe_id],
+                            ensure_ascii=False,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        )
+                    )
+                    handle.write("\n")
     stats["unique_condition_recipes"] = len(recipe_catalog)
     return stats
 def main() -> None:

@@ -1,6 +1,18 @@
 {
-  "schema_version": "1.4",
+  "schema_version": "1.5",
   "description": "Source-label mappings to reactive handles and source-asserted environment qualifiers.",
+  "contextual_mappings": [
+    {
+      "source_reaction_type": "Sonogashira",
+      "source_label": "alkyne",
+      "base_label": "H-C#C-H",
+      "display_label": "terminal alkyne",
+      "representative_smiles": "C#C",
+      "canonical_signature": "XH|Csp|H1|Alkynyl",
+      "mapping_status": "qualified",
+      "qualifier_scope": "sonogashira_terminal_alkyne_context"
+    }
+  ],
   "mappings": [
     {"source_label": "ArBr", "base_label": "Ar-Br", "display_label": "Ar–Br", "representative_smiles": "Brc1ccccc1", "canonical_signature": "LG|Ar|Br", "mapping_status": "canonical"},
     {"source_label": "ArCl", "base_label": "Ar-Cl", "display_label": "Ar–Cl", "representative_smiles": "Clc1ccccc1", "canonical_signature": "LG|Ar|Cl", "mapping_status": "canonical"},

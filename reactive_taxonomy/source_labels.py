@@ -52,12 +52,16 @@ class SourceLabelMapping:
 
 
 @lru_cache(maxsize=1)
-def load_source_label_mappings() -> Dict[str, SourceLabelMapping]:
-    """Load the versioned source-label crosswalk keyed by source label."""
+def _load_source_label_payload() -> Dict[str, Any]:
     with _PATH.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+        return dict(json.load(handle))
+
+
+@lru_cache(maxsize=1)
+def load_source_label_mappings() -> Dict[str, SourceLabelMapping]:
+    """Load the default crosswalk keyed by source label."""
     mappings: Dict[str, SourceLabelMapping] = {}
-    for raw in payload.get("mappings") or []:
+    for raw in _load_source_label_payload().get("mappings") or []:
         mapping = SourceLabelMapping(**raw)
         if mapping.source_label in mappings:
             raise ValueError(f"Duplicate source label: {mapping.source_label}")
@@ -65,9 +69,33 @@ def load_source_label_mappings() -> Dict[str, SourceLabelMapping]:
     return mappings
 
 
-def resolve_source_label(source_label: str) -> SourceLabelMapping:
+@lru_cache(maxsize=1)
+def load_contextual_source_label_mappings(
+) -> Dict[tuple[str, str], SourceLabelMapping]:
+    """Load source-reaction-type overrides for ambiguous source labels."""
+    mappings: Dict[tuple[str, str], SourceLabelMapping] = {}
+    for raw in _load_source_label_payload().get("contextual_mappings") or []:
+        values = dict(raw)
+        source_reaction_type = str(values.pop("source_reaction_type"))
+        mapping = SourceLabelMapping(**values)
+        key = (source_reaction_type, mapping.source_label)
+        if key in mappings:
+            raise ValueError(f"Duplicate contextual source label: {key}")
+        mappings[key] = mapping
+    return mappings
+
+
+def resolve_source_label(
+    source_label: str,
+    *,
+    source_reaction_type: Optional[str] = None,
+) -> SourceLabelMapping:
     """Resolve a source label, preserving unsupported labels without inference."""
     source = str(source_label or "").strip()
+    context = str(source_reaction_type or "").strip()
+    mapping = load_contextual_source_label_mappings().get((context, source))
+    if mapping is not None:
+        return mapping
     mapping = load_source_label_mappings().get(source)
     if mapping is not None:
         return mapping
@@ -84,7 +112,13 @@ def resolve_source_label(source_label: str) -> SourceLabelMapping:
 def validate_source_label_mappings() -> list[str]:
     """Validate mapping signatures, labels, and declared qualifiers."""
     errors = [f"taxonomy:{error}" for error in validate_taxonomy()]
-    for source, mapping in load_source_label_mappings().items():
+    mappings = list(load_source_label_mappings().items())
+    mappings.extend(
+        (f"{context}:{source}", mapping)
+        for (context, source), mapping
+        in load_contextual_source_label_mappings().items()
+    )
+    for source, mapping in mappings:
         analysis = featurize_molecule(
             mapping.representative_smiles,
             label_style="hte_legacy",
@@ -142,6 +176,7 @@ __all__ = [
     "MappingStatus",
     "SourceLabelMapping",
     "SignatureScope",
+    "load_contextual_source_label_mappings",
     "load_source_label_mappings",
     "resolve_source_label",
     "validate_source_label_mappings",

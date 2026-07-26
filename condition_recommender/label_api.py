@@ -57,6 +57,10 @@ def load_label_retrieval_rules() -> Dict[str, Any]:
             or abs(sum(float(value) for value in weights.values()) - 1.0) > 1e-9
         ):
             raise ValueError(f"Weights must sum to one: {key}")
+    if rules.get("require_complete_participant_signatures") is not True:
+        raise ValueError("Complete participant signatures must be required")
+    if not rules.get("transfer_handle_token_families"):
+        raise ValueError("Transfer-handle token families must be configured")
     return rules
 
 
@@ -128,7 +132,18 @@ def _signature_similarity(query: str, precedent: str) -> float:
 
 def _known_signature_incompatible(query: str, precedent: str) -> bool:
     """Treat an explicit zero match as incompatible, not merely incomplete."""
-    return bool(query and precedent) and _signature_similarity(query, precedent) == 0.0
+    if not query or not precedent:
+        return False
+    if _signature_similarity(query, precedent) == 0.0:
+        return True
+    query_parts = query.split("|")
+    precedent_parts = precedent.split("|")
+    if query_parts[0] != "TM" or precedent_parts[0] != "TM":
+        return False
+    families = load_label_retrieval_rules()["transfer_handle_token_families"]
+    query_family = families.get(query_parts[-1], query_parts[-1])
+    precedent_family = families.get(precedent_parts[-1], precedent_parts[-1])
+    return query_family != precedent_family
 
 
 def _qualifier_similarity(
@@ -152,8 +167,16 @@ def _pair_similarity(
     precedent: Tuple[LabelParticipant, LabelParticipant],
 ) -> Tuple[float, float, float]:
     weights = load_label_retrieval_rules()["participant_similarity_weights"]
+    require_complete = bool(
+        load_label_retrieval_rules()["require_complete_participant_signatures"]
+    )
     alternatives = []
     for order in ((0, 1), (1, 0)):
+        if require_complete and any(
+            not precedent[order[index]].signature for index in range(2)
+        ):
+            alternatives.append((0.0, 0.0, 0.0))
+            continue
         if any(
             _known_signature_incompatible(
                 query[index].signature,

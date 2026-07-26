@@ -47,6 +47,20 @@ def test_aromatic_ch_aliases_and_alkyne_map_to_structural_handles() -> None:
     assert alkyne.canonical_signature == "PI|Alkyne"
     assert alkyne.mapping_status == "canonical"
 
+    sonogashira_alkyne = resolve_source_label(
+        "alkyne",
+        source_reaction_type="Sonogashira",
+    )
+    assert sonogashira_alkyne.display_label == "terminal alkyne"
+    assert sonogashira_alkyne.canonical_signature == "XH|Csp|H1|Alkynyl"
+    assert sonogashira_alkyne.mapping_status == "qualified"
+
+    ch_activation_alkyne = resolve_source_label(
+        "alkyne",
+        source_reaction_type="CH-Activation",
+    )
+    assert ch_activation_alkyne.canonical_signature == "PI|Alkyne"
+
 
 def test_acid_or_carboxylate_source_label_maps_to_latent_acyl_donor() -> None:
     acid = resolve_source_label("RCO2H or M")
@@ -106,6 +120,26 @@ def test_cleanup_maps_supported_labels_and_filters_invalid_rows() -> None:
     assert stats["matched_identical"] == 2
     assert stats["matched_protecting_group"] == 1
     assert stats["removed_union"] == 3
+
+
+def test_cleanup_uses_reaction_context_for_sonogashira_alkyne() -> None:
+    cleaned, _ = clean_rows(
+        [
+            {
+                "Reaction Type": "Sonogashira",
+                "FG A": "ArBr",
+                "FG B": "alkyne",
+            },
+            {
+                "Reaction Type": "CH-Activation",
+                "FG A": "ArH",
+                "FG B": "alkyne",
+            },
+        ]
+    )
+
+    assert cleaned[0]["reactive_site_2_signature"] == "XH|Csp|H1|Alkynyl"
+    assert cleaned[1]["reactive_site_2_signature"] == "PI|Alkyne"
 
 
 def test_output_schema_keeps_display_labels_but_excludes_dead_metadata() -> None:

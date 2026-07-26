@@ -57,6 +57,7 @@ from .patterns import MatchIndex, load_handle_patterns
 from .validation import validate_taxonomy
 from .source_labels import (
     SourceLabelMapping,
+    load_contextual_source_label_mappings,
     load_source_label_mappings,
     resolve_source_label,
     validate_source_label_mappings,
@@ -117,6 +118,7 @@ __all__ = [
     "load_reaction_edit_benchmark",
     "load_reaction_label_patterns",
     "load_reaction_label_rendering",
+    "load_contextual_source_label_mappings",
     "load_source_label_mappings",
     "match_reaction_label_pattern",
     "reaction_signature_definition_versions",

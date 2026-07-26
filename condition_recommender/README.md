@@ -335,6 +335,12 @@ entering direct-arylation recommendations. Friedel–Crafts remains a separate
 structure grammar and is not backed by this CSV because the dataset has no
 corresponding acylation source type.
 
+Source reaction context disambiguates the same `alkyne` label in Sonogashira
+rows as the terminal reactive handle `XH|Csp|H1|Alkynyl`. Two-partner
+retrieval requires both precedent signatures, and transfer handles from
+different element families (for example Zn, Mg, Sn, and B) are hard
+incompatible even when the generic transformation grammar is shared.
+
 Important limitations:
 
 - precedent reactions are not structure-verified;

@@ -44,7 +44,10 @@ def _row(
         (fg_a, "reactive_site_1"),
         (fg_b, "reactive_site_2"),
     ):
-        columns = resolve_source_label(label).to_columns(prefix)
+        columns = resolve_source_label(
+            label,
+            source_reaction_type=reaction_type,
+        ).to_columns(prefix)
         row.update(
             {
                 f"{prefix}_{suffix}": columns[f"{prefix}_{suffix}"]
@@ -357,6 +360,94 @@ def test_label_recommender_supports_aromatic_ch_arylation_without_alkyne_leakage
     assert len(result.recommendations) == 1
     assert result.recommendations[0].signature_similarity == 1.0
     assert "direct-arylation" in _raw_identifiers(result.recommendations[0])
+
+
+def test_label_recommender_supports_contextual_terminal_alkyne_signature(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "labels.csv"
+    _write(
+        path,
+        [
+            _row(
+                "Sonogashira",
+                "ArBr",
+                "alkyne",
+                yield_pct=82,
+                catalyst="sonogashira",
+            )
+        ],
+    )
+
+    result = recommend_conditions_from_labels(
+        "Brc1ccccc1.C#Cc1ccccc1>>C(#Cc1ccccc1)c1ccccc1",
+        records_path=path,
+        top_k=1,
+    )
+
+    assert result.valid
+    assert result.grammar_id == "sonogashira_coupling"
+    assert result.recommendations[0].signature_similarity == 1.0
+    assert "sonogashira" in _raw_identifiers(result.recommendations[0])
+
+
+def test_label_recommender_rejects_incomplete_two_partner_precedent(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "labels.csv"
+    _write(
+        path,
+        [
+            _row(
+                "Negishi",
+                "ArBr",
+                "",
+                yield_pct=99,
+                catalyst="incomplete-negishi",
+            )
+        ],
+    )
+
+    result = recommend_conditions_from_labels(
+        "Brc1ccccc1.Cl[Zn]c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+        records_path=path,
+        top_k=1,
+    )
+
+    assert not result.valid
+    assert result.grammar_id == "other_metal_transfer_coupling"
+    assert result.error == "NO_SIGNATURE_COMPATIBLE_PRECEDENTS"
+
+
+def test_label_recommender_rejects_wrong_transfer_handle_family(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "labels.csv"
+    row = _row(
+        "Negishi",
+        "ArBr",
+        "",
+        yield_pct=91,
+        catalyst="zinc-only",
+    )
+    row["reactive_site_2_signature"] = "TM|Ar|ZnX"
+    _write(path, [row])
+
+    matching = recommend_conditions_from_labels(
+        "Brc1ccccc1.Cl[Zn]c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+        records_path=path,
+        top_k=1,
+    )
+    wrong_family = recommend_conditions_from_labels(
+        "Brc1ccccc1.C[Sn](C)(C)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+        records_path=path,
+        top_k=1,
+    )
+
+    assert matching.valid
+    assert matching.recommendations[0].signature_similarity == 1.0
+    assert not wrong_family.valid
+    assert wrong_family.error == "NO_SIGNATURE_COMPATIBLE_PRECEDENTS"
 
 
 def test_label_recommender_requires_positive_top_k() -> None:
