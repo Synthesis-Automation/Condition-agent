@@ -392,6 +392,20 @@ family labels are provenance only. Chemistry, condition, outcome, and index
 eligibility are assessed independently. The legacy verified/review/rejected
 tier remains a compatibility summary, not the indexing contract.
 
+For rapid reaction-family review, export only the five chemistry-facing
+columns:
+
+```powershell
+python -m condition_recommender.concise_review_cli `
+  results/generic_conversion/smoke/records.jsonl.gz `
+  results/generic_conversion/smoke/concise_reaction_review.csv
+```
+
+The output contains canonical reaction SMILES, the detailed structural label,
+the original source reaction type, the detected optional reaction family, and
+the structural-label detection status. Blank detected families are retained
+and are not treated as errors.
+
 ### Build an index and recommend
 
 ```powershell

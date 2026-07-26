@@ -1,7 +1,12 @@
 import csv
 import json
+from pathlib import Path
 
 import condition_recommender.conversion.generic as generic_module
+from condition_recommender.conversion.concise_review import (
+    CONCISE_REACTION_REVIEW_FIELDS,
+    export_concise_reaction_review_csv,
+)
 from condition_recommender.conversion.engine import convert_datasets
 from condition_recommender.conversion.generic import (
     GenericConversionCache,
@@ -327,6 +332,41 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
         "unimolecular": 1,
     }
     assert (output / "conversion_report.md").exists()
+
+
+def test_concise_reaction_review_export_has_only_requested_columns(
+    tmp_path: Path,
+) -> None:
+    dataset = tmp_path / "mixed.csv"
+    rows = [
+        _csv_row(
+            "exact",
+            "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            reaction_type="Original Suzuki Label",
+        )
+    ]
+    with dataset.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    converted = tmp_path / "converted"
+    convert_datasets(dataset, converted)
+    output = tmp_path / "concise_review.csv"
+
+    report = export_concise_reaction_review_csv(
+        converted / "records.jsonl",
+        output,
+    )
+
+    with output.open("r", encoding="utf-8-sig", newline="") as handle:
+        review_rows = list(csv.DictReader(handle))
+    assert report["row_count"] == 1
+    assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
+    assert review_rows[0]["canonical_reaction_smiles"]
+    assert review_rows[0]["reaction_display_label_detailed"]
+    assert review_rows[0]["original_reaction_type"] == "Original Suzuki Label"
+    assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
+    assert review_rows[0]["detection_status"] == "family_overlay"
 
 
 def test_sharded_conversion_is_restartable_and_integrity_checked(
