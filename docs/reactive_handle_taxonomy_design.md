@@ -243,7 +243,7 @@ Other
 ### Definitions
 
 | Token | Meaning |
-|---|---|
+| --- | --- |
 | `Ar` | Aromatic carbocyclic context |
 | `HeteroAr` | Aromatic heterocyclic context |
 | `Alkenyl` | Non-aromatic sp2 carbon context |
@@ -373,7 +373,7 @@ All detected sites use a common envelope.
 Required fields:
 
 | Field | Description |
-|---|---|
+| --- | --- |
 | `schema_version` | Site schema version |
 | `site_id` | Stable identifier using the reactive center/anchor atom or bond locus |
 | `site_type` | One of the supported site families |
