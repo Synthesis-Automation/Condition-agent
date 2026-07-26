@@ -37,6 +37,24 @@ def render_context(token: str, *, style: str = "unicode") -> str:
     return _context_label(token, _style(style)["bond"])
 
 
+def render_anion(
+    center: str,
+    contexts: List[str],
+    charge: int,
+    *,
+    style: str = "unicode",
+) -> str:
+    """Render an explicitly charged heteroatom nucleophile."""
+    styling = _style(style)
+    bond = styling["bond"]
+    context = _context_label(contexts[0], bond) if contexts else ""
+    magnitude = abs(int(charge))
+    sign = styling["negative_charge"] if charge < 0 else styling["positive_charge"]
+    charge_label = (str(magnitude) if magnitude > 1 else "") + sign
+    prefix = f"{context}{bond}" if context else ""
+    return f"{prefix}{center}{charge_label}"
+
+
 def render_edge(context: str, handle: str, *, style: str = "unicode") -> str:
     bond = _style(style)["bond"]
     template = load_rendering_taxonomy().get("edge_template", "{context}{bond}{handle}")

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "site_families": {
     "leaving_group": [
       "F",
@@ -17,6 +17,9 @@
       "S",
       "Csp",
       "Csp3"
+    ],
+    "nucleophile_anion": [
+      "S"
     ],
     "transfer_group": [
       "B(OH)2",
@@ -124,6 +127,18 @@
       ],
       "priority": 50,
       "smarts": "[S;+0;H1:1]",
+      "atom_roles": {
+        "center": 1
+      }
+    },
+    {
+      "id": "anionic_sulfur",
+      "site_type": "nucleophile_anion",
+      "tokens": [
+        "S"
+      ],
+      "priority": 60,
+      "smarts": "[S;-1:1]",
       "atom_roles": {
         "center": 1
       }

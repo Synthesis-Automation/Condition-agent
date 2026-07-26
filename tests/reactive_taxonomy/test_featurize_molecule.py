@@ -19,7 +19,7 @@ def test_handle_smarts_are_independent_and_mapped() -> None:
     assert {pattern["site_type"] for pattern in patterns} == {
         "leaving_group", "pronucleophile_XH", "transfer_group",
         "electrophilic_center", "aromatic_CH", "unsaturated_bond",
-        "dipolar_group", "heteroatom_bond",
+        "dipolar_group", "heteroatom_bond", "nucleophile_anion",
     }
     assert all(pattern.get("atom_roles") for pattern in patterns)
 
@@ -58,6 +58,24 @@ def test_pronucleophiles() -> None:
     }
     for smiles, expected in cases.items():
         assert expected in signatures(smiles)
+
+
+def test_explicit_sulfur_anions_are_separate_nucleophile_sites() -> None:
+    thioacetate = featurize_molecule("CC(=O)[S-]")
+    methylthiolate = featurize_molecule("C[S-]")
+
+    assert {
+        (site.site_type, site.canonical_signature, site.chemist_label)
+        for site in thioacetate.sites
+    } == {
+        ("nucleophile_anion", "NU-|S|-1|C(O)R", "R–C(O)–S⁻")
+    }
+    assert {
+        (site.site_type, site.canonical_signature, site.chemist_label)
+        for site in methylthiolate.sites
+    } == {
+        ("nucleophile_anion", "NU-|S|-1|Alkyl", "R–S⁻")
+    }
 
 
 def test_hydrazine_has_two_sites() -> None:

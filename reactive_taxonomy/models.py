@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple
 SiteType = Literal[
     "leaving_group",
     "pronucleophile_XH",
+    "nucleophile_anion",
     "transfer_group",
     "electrophilic_center",
     "aromatic_CH",

@@ -75,6 +75,12 @@ def _matches(site: ReactionSiteReference, constraint: Dict[str, Any]) -> bool:
     ):
         return False
     if (
+        constraint.get("contexts_any")
+        and not set(details.get("contexts") or ())
+        & set(constraint["contexts_any"])
+    ):
+        return False
+    if (
         constraint.get("center_family")
         and details.get("center_family") != constraint["center_family"]
     ):

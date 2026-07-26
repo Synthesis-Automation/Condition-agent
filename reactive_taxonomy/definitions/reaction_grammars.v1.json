@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.6",
+  "schema_version": "1.7",
   "grammars": [
     {
       "id": "boron_transfer_coupling",
@@ -253,6 +253,90 @@
         "c_s_coupling"
       ],
       "priority": 85
+    },
+    {
+      "id": "sp2_c_s_acyl_substitution",
+      "transformation_class": "sp2_c_s_substitution",
+      "display_name": "sp2 C–S coupling with an acyl sulfur donor",
+      "generic_label": "Ar–X + R–C(O)–SH → Ar–S–C(O)–R",
+      "roles": {
+        "electrophile": {
+          "site_type": "leaving_group",
+          "anchor_context_any": [
+            "Ar",
+            "HeteroAr",
+            "Alkenyl"
+          ]
+        },
+        "nucleophile": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "S"
+          ],
+          "h_count_min": 1,
+          "contexts_any": [
+            "C(O)R"
+          ],
+          "availability_any": [
+            "deactivated"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "nucleophile"],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "operator": {
+        "id": "replace_handle_with_center",
+        "electrophile_role": "electrophile",
+        "partner_role": "nucleophile"
+      },
+      "compatible_named_families": [
+        "c_s_coupling"
+      ],
+      "priority": 86
+    },
+    {
+      "id": "sp2_c_s_anion_substitution",
+      "transformation_class": "sp2_c_s_substitution",
+      "display_name": "sp2 C–S coupling with an anionic sulfur donor",
+      "generic_label": "Ar–X + S⁻ → Ar–S",
+      "roles": {
+        "electrophile": {
+          "site_type": "leaving_group",
+          "anchor_context_any": [
+            "Ar",
+            "HeteroAr",
+            "Alkenyl"
+          ]
+        },
+        "nucleophile": {
+          "site_type": "nucleophile_anion",
+          "center_any": [
+            "S"
+          ],
+          "availability_any": [
+            "ionic"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": ["electrophile", "nucleophile"],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "operator": {
+        "id": "replace_handle_with_center",
+        "electrophile_role": "electrophile",
+        "partner_role": "nucleophile"
+      },
+      "compatible_named_families": [
+        "c_s_coupling"
+      ],
+      "priority": 87
     },
     {
       "id": "sp3_c_n_substitution",

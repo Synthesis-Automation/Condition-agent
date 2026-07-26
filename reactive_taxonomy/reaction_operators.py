@@ -144,6 +144,7 @@ def _build_product(
     *,
     add_hydrogen_on_left: bool = False,
     consume_hydrogen_on_right: bool = False,
+    neutralize_negative_charge_on_right: bool = False,
 ) -> str | None:
     from rdkit import Chem
 
@@ -205,6 +206,10 @@ def _build_product(
         explicit_h = int(partner_atom.GetNumExplicitHs())
         if explicit_h > 0:
             partner_atom.SetNumExplicitHs(explicit_h - 1)
+    if neutralize_negative_charge_on_right:
+        partner_atom = rw.GetAtomWithIdx(right)
+        if partner_atom.GetFormalCharge() < 0:
+            partner_atom.SetFormalCharge(partner_atom.GetFormalCharge() + 1)
     rw.AddBond(left, right, Chem.BondType.SINGLE)
     product = rw.GetMol()
     try:
@@ -401,6 +406,8 @@ def apply_operator(
                 leaving_atom,
             )
         }
+        partner_h_count = int(partner.details.get("h_count", 0))
+        partner_charge = int(partner.details.get("formal_charge", 0))
         predicted = _build_product(
             components,
             [electrophile, partner],
@@ -412,7 +419,8 @@ def apply_operator(
                 ),
                 (partner.component_index, partner.atom_roles["center"][0]),
             ),
-            consume_hydrogen_on_right=True,
+            consume_hydrogen_on_right=partner_h_count > 0,
+            neutralize_negative_charge_on_right=partner_charge < 0,
         )
         changes = (
             BondChange(
@@ -431,15 +439,18 @@ def apply_operator(
                 "SINGLE",
                 "grammar_operator",
             ),
-            BondChange(
-                "hydrogen_change",
-                f"{p_role}.center",
-                None,
-                "SINGLE",
-                None,
-                "grammar_operator",
-            ),
         )
+        if partner_h_count > 0:
+            changes += (
+                BondChange(
+                    "hydrogen_change",
+                    f"{p_role}.center",
+                    None,
+                    "SINGLE",
+                    None,
+                    "grammar_operator",
+                ),
+            )
         return predicted, changes
     if operator["id"] == "replace_carbonyl_oxygen_with_amine":
         carbonyl_role = str(operator["carbonyl_role"])

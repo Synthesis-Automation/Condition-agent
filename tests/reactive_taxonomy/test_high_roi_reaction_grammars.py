@@ -3,6 +3,12 @@
 from reactive_taxonomy import featurize_reaction
 
 
+ACYL_SULFUR_COUPLING = (
+    "CC(=O)S.CC(=O)SCc1cccc(I)c1.[K]>>"
+    "CC(=O)SCc1cccc(SC(C)=O)c1"
+)
+
+
 def test_sp3_oxygen_substitution_reconstructs_product() -> None:
     result = featurize_reaction("CCCCBr.Oc1ccccc1>>CCCCOc1ccccc1")
 
@@ -20,6 +26,79 @@ def test_sp3_nitrogen_and_sulfur_substitutions_reconstruct_products() -> None:
     assert nitrogen.reaction_label == "R1–Br + R2–NH2 → R1–NH–R2"
     assert sulfur.transformation_class == "sp3_c_s_substitution"
     assert sulfur.reaction_label == "R1–I + R2–SH → R1–S–R2"
+
+
+def test_acyl_sulfur_donor_reconstructs_sp2_c_s_coupling() -> None:
+    result = featurize_reaction(ACYL_SULFUR_COUPLING)
+
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.transformation_class == "sp2_c_s_substitution"
+    assert result.named_family == "c_s_coupling"
+    assert result.selected_candidate is not None
+    assert result.selected_candidate.grammar_id == "sp2_c_s_acyl_substitution"
+    assert result.reaction_label == (
+        "Ar–I + R–C(O)–SH → Ar–S–C(O)–R"
+    )
+    assert result.display_label is not None
+    assert result.display_label.detailed == (
+        "Ar–I + R–C(O)–SH → Ar–S–C(O)–R; edits: "
+        "C–I bond cleavage; C–S bond formation; S–H loss"
+    )
+    sulfur_site = result.selected_candidate.role_assignments["nucleophile"]
+    assert sulfur_site.availability == "deactivated"
+    assert sulfur_site.canonical_signature == "XH|S|H1|C(O)R"
+
+
+def test_acyl_sulfur_coupling_is_reactant_order_invariant() -> None:
+    forward = featurize_reaction(ACYL_SULFUR_COUPLING)
+    reversed_order = featurize_reaction(
+        "CC(=O)SCc1cccc(I)c1.CC(=O)S.[K]>>"
+        "CC(=O)SCc1cccc(SC(C)=O)c1"
+    )
+
+    assert forward.evidence_quality == "exact_product_reconstruction"
+    assert reversed_order.evidence_quality == "exact_product_reconstruction"
+    assert forward.reaction_signature is not None
+    assert reversed_order.reaction_signature is not None
+    assert (
+        forward.reaction_signature.signature_id
+        == reversed_order.reaction_signature.signature_id
+    )
+
+
+def test_explicit_potassium_thioacetate_reconstructs_without_h_loss() -> None:
+    result = featurize_reaction(
+        "CC(=O)[S-].[K+].Ic1ccccc1>>CC(=O)Sc1ccccc1"
+    )
+
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.named_family == "c_s_coupling"
+    assert result.selected_candidate is not None
+    assert result.selected_candidate.grammar_id == "sp2_c_s_anion_substitution"
+    assert result.reaction_label == (
+        "Ar–I + R–C(O)–S⁻ → Ar–S–C(O)–R"
+    )
+    assert result.display_label is not None
+    assert "S–H loss" not in result.display_label.detailed
+    assert [
+        change.change_type
+        for change in result.selected_candidate.predicted_bond_changes
+    ] == ["broken", "formed"]
+
+
+def test_acyl_sulfur_candidate_is_not_selected_for_wrong_product() -> None:
+    result = featurize_reaction(
+        "CC(=O)S.Ic1ccccc1>>c1ccccc1"
+    )
+
+    candidates = [
+        candidate
+        for candidate in result.candidates
+        if candidate.grammar_id == "sp2_c_s_acyl_substitution"
+    ]
+    assert len(candidates) == 1
+    assert candidates[0].verification == "product_mismatch"
+    assert result.selected_candidate is None
 
 
 def test_sp3_substitution_does_not_force_a_mechanistic_family() -> None:

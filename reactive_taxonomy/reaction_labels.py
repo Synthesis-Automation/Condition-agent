@@ -156,6 +156,18 @@ def _context_label(
     return aliases.alias_for(role, context_index) or render_context(token, style=style)
 
 
+def _attachment_oriented_context_label(token: str, *, style: str) -> str:
+    """Render a retained context outward from its reactive attachment atom."""
+    definition = _load_reaction_rendering_definition()
+    template = (
+        definition.get("attachment_oriented_context_labels") or {}
+    ).get(token)
+    if template is None:
+        return render_context(token, style=style)
+    bond = "–" if style == "unicode" else "-"
+    return str(template).format(bond=bond)
+
+
 def _nitrogen_retained_labels(
     role: str,
     nitrogen: ReactionSiteReference,
@@ -454,12 +466,9 @@ def render_product_label(
                 style=style,
             ),
             retained_label=(
-                _context_label(
-                    partner_role,
-                    partner,
-                    0,
+                aliases.alias_for(partner_role, 0)
+                or _attachment_oriented_context_label(
                     str(retained[0]),
-                    aliases,
                     style=style,
                 )
                 if retained

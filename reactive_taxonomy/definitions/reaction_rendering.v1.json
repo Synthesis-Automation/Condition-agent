@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.6",
+  "schema_version": "1.7",
   "fragment_indexing": {
     "context_symbols": {
       "Ar": "Ar",
@@ -16,6 +16,13 @@
     "Alkyl",
     "Other"
   ],
+  "attachment_oriented_context_labels": {
+    "C(O)R": "C(O){bond}R",
+    "C(O)OR": "C(O){bond}OR",
+    "C(O)NR": "C(O){bond}NR2",
+    "SO2R": "S(O)2{bond}R",
+    "P(O)R2": "P(O)R2"
+  },
   "rules": {
     "boron_transfer_coupling": {
       "product_kind": "join_contexts",
@@ -39,6 +46,18 @@
       "element": "O"
     },
     "sp2_c_s_substitution": {
+      "product_kind": "heteroatom_substitution",
+      "anchor_role": "electrophile",
+      "partner_role": "nucleophile",
+      "element": "S"
+    },
+    "sp2_c_s_acyl_substitution": {
+      "product_kind": "heteroatom_substitution",
+      "anchor_role": "electrophile",
+      "partner_role": "nucleophile",
+      "element": "S"
+    },
+    "sp2_c_s_anion_substitution": {
       "product_kind": "heteroatom_substitution",
       "anchor_role": "electrophile",
       "partner_role": "nucleophile",

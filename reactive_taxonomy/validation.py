@@ -85,6 +85,7 @@ def validate_taxonomy() -> List[str]:
     required = {
         "leaving_group",
         "pronucleophile_XH",
+        "nucleophile_anion",
         "transfer_group",
         "electrophilic_center",
         "aromatic_CH",
@@ -166,6 +167,7 @@ def validate_taxonomy() -> List[str]:
         required_roles = {
             "leaving_group": {"anchor", "handle"},
             "pronucleophile_XH": {"center"},
+            "nucleophile_anion": {"center"},
             "transfer_group": {"anchor", "center"},
             "electrophilic_center": {"center"},
             "aromatic_CH": {"center"},
@@ -212,6 +214,10 @@ def validate_taxonomy() -> List[str]:
             errors.append(f"invalid_rendering_style:{style_id}")
         elif not style.get("double") or not style.get("triple"):
             errors.append(f"missing_unsaturated_bond_style:{style_id}")
+        elif not style.get("negative_charge") or not style.get(
+            "positive_charge"
+        ):
+            errors.append(f"missing_charge_rendering_style:{style_id}")
     required_handle_templates = {
         "carbonyl_formaldehyde",
         "carbonyl_aldehyde",
@@ -272,6 +278,13 @@ def validate_taxonomy() -> List[str]:
         for role_name, constraint in roles.items():
             if constraint.get("site_type") not in required:
                 errors.append(f"invalid_reaction_site_type:{grammar_id}:{role_name}")
+            unknown_contexts = set(constraint.get("contexts_any") or ()) - set(
+                tokens
+            )
+            if unknown_contexts:
+                errors.append(
+                    f"invalid_reaction_context:{grammar_id}:{role_name}"
+                )
         operator = grammar.get("operator") or {}
         if operator.get("id") not in allowed_operators:
             errors.append(f"invalid_reaction_operator:{grammar_id}")
@@ -302,6 +315,16 @@ def validate_taxonomy() -> List[str]:
         errors.append("invalid_product_context_precedence")
     if "Other" not in product_precedence:
         errors.append("missing_product_context_fallback")
+    attachment_labels = (
+        payload["reaction_rendering.v1"].get(
+            "attachment_oriented_context_labels"
+        )
+        or {}
+    )
+    if set(attachment_labels) - set(tokens):
+        errors.append("unknown_attachment_oriented_context")
+    if any(not str(template).strip() for template in attachment_labels.values()):
+        errors.append("invalid_attachment_oriented_context_template")
     fragment_indexing = payload["reaction_rendering.v1"].get("fragment_indexing") or {}
     context_symbols = fragment_indexing.get("context_symbols") or {}
     if not isinstance(context_symbols, dict) or not context_symbols:
