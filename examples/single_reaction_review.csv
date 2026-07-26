@@ -1,2 +1,2 @@
 ﻿canonical_reaction_smiles,reaction_display_label_detailed,original_reaction_type,detected_reaction_family,detection_status
-CC(C)(C)OC(=O)OC(=O)c1ccc(F)cc1.Sc1ccc(Sc2ccc(S)cc2)cc1>>CC(C)(C)OC(=O)OC(=O)c1ccc(Sc2ccc(Sc3ccc(Sc4ccc(C(=O)OC(=O)OC(C)(C)C)cc4)cc3)cc2)cc1,(Ar¹–F + Ar²–H) OR (Ar¹–F + Ar²–SH) OR (intramolecular Ar–F / Ar–H) →,C_S_Coupling,,ambiguous_reactants
+CC(C)(C)OC(=O)OC(=O)c1ccc(F)cc1.Sc1ccc(Sc2ccc(S)cc2)cc1.Sc1ccc(Sc2ccc(S)cc2)cc1>>CC(C)(C)OC(=O)OC(=O)c1ccc(Sc2ccc(Sc3ccc(Sc4ccc(C(=O)OC(=O)OC(C)(C)C)cc4)cc3)cc2)cc1,(Ar¹–F + Ar²–H) OR (Ar¹–F + Ar²–SH) OR (intramolecular Ar–F / Ar–H) →,C_S_Coupling,,ambiguous_reactants
