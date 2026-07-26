@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Sequence, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Sequence, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 
@@ -52,6 +52,90 @@ def _bonded_role_atom(
     raise ValueError("No handle atom bonded to reactive anchor")
 
 
+def _captured_join_stereochemistry(
+    molecule: Any,
+    *,
+    removed_indices: set[int],
+    join_indices: Sequence[int],
+) -> tuple[tuple[int, int, int, int, Any], ...]:
+    """Capture defined alkene stereo whose leaving substituent is replaced."""
+    from rdkit import Chem
+
+    if len(join_indices) != 2:
+        return ()
+    replacement_pairs = (
+        (int(join_indices[0]), int(join_indices[1])),
+        (int(join_indices[1]), int(join_indices[0])),
+    )
+    captured = []
+    for bond in molecule.GetBonds():
+        stereo = bond.GetStereo()
+        stereo_atoms = tuple(int(index) for index in bond.GetStereoAtoms())
+        if (
+            bond.GetBondType() != Chem.BondType.DOUBLE
+            or stereo == Chem.BondStereo.STEREONONE
+            or len(stereo_atoms) != 2
+            or not any(index in removed_indices for index in stereo_atoms)
+        ):
+            continue
+        endpoints = (bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
+        remapped_stereo_atoms = []
+        valid = True
+        for stereo_atom in stereo_atoms:
+            if stereo_atom not in removed_indices:
+                remapped_stereo_atoms.append(stereo_atom)
+                continue
+            replacements = [
+                replacement
+                for endpoint, replacement in replacement_pairs
+                if endpoint in endpoints
+                and molecule.GetBondBetweenAtoms(endpoint, stereo_atom) is not None
+                and replacement not in removed_indices
+            ]
+            if len(replacements) != 1:
+                valid = False
+                break
+            remapped_stereo_atoms.append(replacements[0])
+        if valid and not any(index in removed_indices for index in endpoints):
+            captured.append(
+                (
+                    int(endpoints[0]),
+                    int(endpoints[1]),
+                    int(remapped_stereo_atoms[0]),
+                    int(remapped_stereo_atoms[1]),
+                    stereo,
+                )
+            )
+    return tuple(captured)
+
+
+def _restore_join_stereochemistry(
+    molecule: Any,
+    *,
+    captured: Sequence[tuple[int, int, int, int, Any]],
+    shifted: Callable[[int], int],
+) -> None:
+    """Restore captured alkene stereo after atom deletion and bond formation."""
+    from rdkit import Chem
+
+    restored = False
+    for endpoint_1, endpoint_2, stereo_atom_1, stereo_atom_2, stereo in captured:
+        bond = molecule.GetBondBetweenAtoms(
+            shifted(endpoint_1), shifted(endpoint_2)
+        )
+        if bond is None or bond.GetBondType() != Chem.BondType.DOUBLE:
+            continue
+        bond.SetStereoAtoms(
+            shifted(stereo_atom_1),
+            shifted(stereo_atom_2),
+        )
+        bond.SetStereo(stereo)
+        restored = True
+    if restored:
+        Chem.SetDoubleBondNeighborDirections(molecule)
+        Chem.AssignStereochemistry(molecule, cleanIt=False, force=True)
+
+
 def _build_product(
     components: Tuple[ReactionComponent, ...],
     participants: List[ReactionSiteReference],
@@ -90,6 +174,11 @@ def _build_product(
     # out-of-range atom index into RDKit.
     if any(endpoint in remove_global for endpoint in join_global):
         return None
+    captured_stereochemistry = _captured_join_stereochemistry(
+        combined,
+        removed_indices=set(remove_global),
+        join_indices=join_global,
+    )
     left_hydrogen_count = int(combined.GetAtomWithIdx(join_global[0]).GetTotalNumHs())
     rw = Chem.RWMol(combined)
     for atom_index in remove_global:
@@ -121,6 +210,11 @@ def _build_product(
     try:
         product.UpdatePropertyCache(strict=False)
         Chem.SanitizeMol(product)
+        _restore_join_stereochemistry(
+            product,
+            captured=captured_stereochemistry,
+            shifted=shifted,
+        )
         return Chem.MolToSmiles(product, canonical=True, isomericSmiles=True)
     except Exception:
         return None

@@ -107,7 +107,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "1.9"
-    assert record.converter_definition_version == "generic_conversion.v1.6"
+    assert record.converter_definition_version == "generic_conversion.v1.7"
     assert record.reaction_signature["schema_version"] == "1.3"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")

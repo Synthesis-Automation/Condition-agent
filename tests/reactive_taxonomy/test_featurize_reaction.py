@@ -33,6 +33,60 @@ def test_product_connection_canonicalizes_display_without_swapping_provenance() 
     assert connection.endpoint_2.context == "Ar"
 
 
+def test_vinyl_suzuki_preserves_defined_alkene_stereochemistry() -> None:
+    reaction = (
+        "COc1ccc(C)cc1B(O)O."
+        "O=C1c2ccccc2C(=O)N1C/C=C(/Br)c1ccccc1>>"
+        "COc1ccc(C)cc1/C(=C/CN1C(=O)c2ccccc2C1=O)c1ccccc1"
+    )
+    result = featurize_reaction(reaction)
+
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.transformation_class == "c_c_transfer_coupling"
+    assert result.named_family == "suzuki_miyaura"
+    assert result.reaction_label == (
+        "Alkenyl–Br + Ar–B(OH)2 → Ar–Alkenyl"
+    )
+    assert result.selected_candidate is not None
+    assert "/C(=C/" in result.selected_candidate.predicted_product_smiles
+
+
+def test_vinyl_suzuki_stereo_retention_is_reactant_order_invariant() -> None:
+    electrophile = "O=C1c2ccccc2C(=O)N1C/C=C(/Br)c1ccccc1"
+    transfer_partner = "COc1ccc(C)cc1B(O)O"
+    product = "COc1ccc(C)cc1/C(=C/CN1C(=O)c2ccccc2C1=O)c1ccccc1"
+
+    forward = featurize_reaction(
+        f"{transfer_partner}.{electrophile}>>{product}"
+    )
+    reversed_order = featurize_reaction(
+        f"{electrophile}.{transfer_partner}>>{product}"
+    )
+
+    assert forward.evidence_quality == "exact_product_reconstruction"
+    assert reversed_order.evidence_quality == "exact_product_reconstruction"
+    assert forward.reaction_signature is not None
+    assert reversed_order.reaction_signature is not None
+    assert (
+        forward.reaction_signature.signature_id
+        == reversed_order.reaction_signature.signature_id
+    )
+
+
+def test_vinyl_suzuki_rejects_opposite_product_stereoisomer() -> None:
+    reaction = (
+        "COc1ccc(C)cc1B(O)O."
+        "O=C1c2ccccc2C(=O)N1C/C=C(/Br)c1ccccc1>>"
+        "COc1ccc(C)cc1/C(=C\\CN1C(=O)c2ccccc2C1=O)c1ccccc1"
+    )
+    result = featurize_reaction(reaction)
+
+    assert result.selected_candidate is None
+    assert result.evidence_quality == "reactant_grammar_only"
+    assert result.candidates
+    assert result.candidates[0].verification == "product_mismatch"
+
+
 def test_cn_exact_product_reconstruction() -> None:
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
     result = featurize_reaction(reaction)
