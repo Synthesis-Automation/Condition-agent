@@ -1,0 +1,10 @@
+{
+  "artifact_type": "sharded_conversion_integrity",
+  "duplicate_observation_count": 0,
+  "issues": [],
+  "manifest_path": "results\\generic_demo_conversion\\shard_manifest.json",
+  "schema_version": "1.0",
+  "shard_count": 1,
+  "valid": true,
+  "verified_row_count": 100
+}

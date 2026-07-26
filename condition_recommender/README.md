@@ -20,6 +20,10 @@ warnings, and uncertainty.
 Supporting audit, conversion, indexing, and evaluation commands prepare data for
 these paths; they do not recommend conditions by themselves.
 
+If you only want to try the new generic system, read **New generic system:
+quick start** and **Evaluate recommendations**. The expert-rule and weak-label
+sections describe separate paths and can be skipped.
+
 ## Which path should I use?
 
 - Use expert rules when the reaction is inside a reviewed rule scope and an
@@ -456,23 +460,64 @@ topology-agnostic fallback is allowed only with an explicit
 `REACTION_TOPOLOGY_FALLBACK_USED` warning. Multi-event queries and precedents
 are compared using their complete event and net-edit sets.
 
-### Held-out evaluation
+### Evaluate recommendations
+
+Think of evaluation as a closed-book test:
+
+1. The system receives 80% of the reactions as examples.
+2. The other 20% are hidden.
+3. The system recommends conditions for each hidden reaction.
+4. We compare its suggestions with the conditions actually reported.
+
+Reactions from the same paper are always kept on the same side. Otherwise the
+system could see a nearly identical example from the same paper and the score
+would look better than it really is.
+
+Run the basic test:
 
 ```powershell
 python -m condition_recommender.evaluation_cli `
   results/generic_conversion/v2/development/generic_index.json `
-  results/generic_evaluation/v2/development/grouped `
+  results/generic_evaluation/v2/development/basic `
   --test-fraction 0.2 --seed 17 --top-k 5
 ```
 
-Rows connected by a normalized publication reference or canonical reaction
-remain wholly in train or test. The report includes coverage, fallback levels,
-top-1/top-k recipe recovery, conditional recovery when the recipe was observed
-in training, yield MAE, compatibility exclusions, and the count of
-hard-incompatible recommendations.
+Read `evaluation_report.md` for the short report or
+`evaluation_report.json` for all details. Start with these numbers:
 
-Use `--split-mode scaffold_disjoint`, `source_disjoint`, or `forward_time` for
-the stricter leakage diagnostics. Compare chemistry-gated baselines with:
+| Result | Plain meaning | What we want |
+| --- | --- | --- |
+| Coverage | How often the system returned any suggestion | Higher is useful, but not at the cost of unsafe chemistry |
+| Seen-recipe top-1 | How often the first suggestion matched a known recipe that was available in the examples | Higher is better |
+| Seen-recipe top-5 | How often the known recipe appeared anywhere in the first five suggestions | Higher is better |
+| Hard-incompatible count | Suggestions that violate a chemistry compatibility rule | Must be zero |
+| Yield error | Average difference between predicted and reported yield, in percentage points | Lower is better; use only when enough yields are available |
+| Abstention | Cases where the system correctly said it had insufficient support | Review these; abstaining can be safer than guessing |
+
+Always check `seen_recipe_query_count` beside the top-1 and top-5 values. A high
+percentage based on only a few reactions is weak evidence. Also compare a new
+version with the current version on exactly the same split and seed.
+
+Recipe recovery is deliberately strict: a chemically reasonable alternative
+still counts as a miss when it differs from the recorded recipe. This is why
+the numerical test and independent chemist check are both needed.
+
+A simple acceptance checklist is:
+
+- no paper or reaction appears in both the example and hidden sets;
+- no hard-incompatible recipe is returned;
+- top-1 or top-5 recovery improves without a large loss of coverage;
+- errors and abstentions have understandable explanations;
+- an independent chemist finds no repeated chemistry problem.
+
+There is no single “good accuracy” threshold for every reaction class. Report
+the number of tested reactions and results by transformation class instead of
+only one overall percentage.
+
+#### Optional stronger tests
+
+After the basic test works, test reactions with different scaffolds, different
+source datasets, and newer publication years:
 
 ```powershell
 python -m condition_recommender.evaluation_cli `
@@ -489,14 +534,19 @@ python -m condition_recommender.evaluation_cli `
   results/generic_conversion/v2/validation/generic_index.json `
   results/generic_evaluation/v2/validation/time `
   --split-mode forward_time
+```
 
+Compare the available retrieval approaches on the same hidden reactions:
+
+```powershell
 python -m condition_recommender.baseline_cli `
   results/generic_conversion/v2/validation/generic_index.json `
   results/generic_evaluation/v2/validation/baselines `
   --seed 71
 ```
 
-Calibrate only from development and validation indices:
+Calibration uses development data to choose settings and validation data only
+to decide whether those settings are safe to promote:
 
 ```powershell
 python -m condition_recommender.calibration_cli `
@@ -505,27 +555,20 @@ python -m condition_recommender.calibration_cli `
   results/generic_evaluation/v2/calibration
 ```
 
-Do not tune definitions directly from validation results. The calibration
-command selects candidates using internal development splits and uses
-validation only as a promotion gate. A passing evaluation must report zero
-reference and canonical-reaction overlap, zero scaffold overlap for the strict
-scaffold split, and zero hard-incompatible recommendations. Recovery and yield
-metrics must be interpreted with their observed-recipe and usable-outcome
-denominators.
+#### Chemist check
 
-Generate the blind review gate before opening the untouched test:
+Generate a blind review packet before using the untouched test:
 
 ```powershell
 python -m condition_recommender.chemist_review_cli <index> <output>
 ```
 
-An independent chemist reviews the self-contained `review_packet.html` and
-records decisions in `review_form.csv` without opening `answer_key.jsonl`.
-The JSONL packet and highlighted SVGs remain available for programmatic or
-individual-case inspection. Every candidate decision must be one of
-`compatible`, `compatible_with_caution`, `incompatible`, or `uncertain`. After
-the form is complete, unblind and bind the signed review to the exact packet
-artifacts:
+The chemist opens `review_packet.html`, judges each condition set, and records
+the answer in `review_form.csv`. They must not open `answer_key.jsonl` first.
+Allowed answers are `compatible`, `compatible_with_caution`, `incompatible`,
+and `uncertain`.
+
+After every row is complete, create the signed review summary:
 
 ```powershell
 python -m condition_recommender.chemist_review_adjudication_cli `
@@ -533,10 +576,7 @@ python -m condition_recommender.chemist_review_adjudication_cli `
   --reviewer "<name>" --independent-reviewer --sign-off
 ```
 
-Use one `--unresolved-defect "<description>"` argument per unresolved
-systematic issue and omit `--sign-off` until those issues have been addressed.
-Adjudication refuses to read the answer key while any review decision is blank
-or invalid.
+Do not sign off while a repeated chemistry problem remains unresolved.
 
 ### Restartable full conversion
 

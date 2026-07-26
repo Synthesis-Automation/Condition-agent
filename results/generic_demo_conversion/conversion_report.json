@@ -1,0 +1,99 @@
+{
+  "admission_reason_counts": {
+    "condition_identifier_uncertainty": 7,
+    "insufficient_edit_evidence": 6,
+    "missing_verified_reaction_signature": 36,
+    "multiple_products": 3,
+    "multistage_conditions_not_structured": 68,
+    "no_condition_identifiers": 2,
+    "no_usable_transformation_evidence": 38,
+    "solvent_only_recipe": 2,
+    "verified_reaction_signature_with_conditions": 3
+  },
+  "admission_tier_counts": {
+    "rejected": 40,
+    "review": 57,
+    "verified": 3
+  },
+  "artifact_type": "generic_sharded_conversion_report",
+  "catalogs": {
+    "recipe_catalog": {
+      "path": "recipe_catalog.jsonl.gz",
+      "row_count": 89,
+      "sha256": "8c1dd883799ef17fec89a5cf373631a1406b93f2439a16f4e82b2de13d20f468"
+    },
+    "reference_catalog": {
+      "path": "reference_catalog.jsonl.gz",
+      "row_count": 86,
+      "sha256": "9534e9e25020aeed30254143e927c2ba577cb81696f48a05ddd4b0c70d134838"
+    },
+    "reference_condition_series_catalog": {
+      "path": "reference_condition_series.jsonl.gz",
+      "row_count": 25,
+      "sha256": "89722db67b470f409c523ad83b107141b5b97cab86ff9652b2ec167d44668378"
+    }
+  },
+  "chemistry_status_counts": {
+    "rejected": 38,
+    "review": 45,
+    "verified": 17
+  },
+  "complete_shard_count": 1,
+  "condition_status_counts": {
+    "multistage_ambiguous": 68,
+    "resolved_complete": 21,
+    "unresolved_retained": 7,
+    "unusable": 4
+  },
+  "failed_shard_count": 0,
+  "index_eligibility_counts": {
+    "eligible": 4,
+    "ineligible": 40,
+    "review_only": 56
+  },
+  "input_row_count": 100,
+  "integrity": {
+    "artifact_type": "sharded_conversion_integrity",
+    "duplicate_observation_count": 0,
+    "issues": [],
+    "manifest_path": "results\\generic_demo_conversion\\shard_manifest.json",
+    "schema_version": "1.0",
+    "shard_count": 1,
+    "valid": true,
+    "verified_row_count": 100
+  },
+  "manifest_path": "results\\generic_demo_conversion\\shard_manifest.json",
+  "merged_records": {
+    "path": "records.jsonl.gz",
+    "row_count": 100,
+    "sha256": "35d2a5fef03244b9a7e0955e6320d6c1d86927477aa10ac2e36f7d681c02d573"
+  },
+  "mode": "smoke",
+  "named_family_counts": {
+    "suzuki_miyaura": 1,
+    "unnamed": 99
+  },
+  "outcome_status_counts": {
+    "usable": 100
+  },
+  "output_row_count": 100,
+  "reaction_scope_counts": {
+    "intermolecular": 18,
+    "intramolecular": 2,
+    "unimolecular": 6,
+    "unknown": 74
+  },
+  "reused_shard_count": 0,
+  "schema_version": "1.0",
+  "shard_count": 1,
+  "signature_count": 26,
+  "source_file_count": 1,
+  "transformation_class_counts": {
+    "amide_formation": 10,
+    "c_c_transfer_coupling": 1,
+    "sp2_c_c_substitution": 1,
+    "sp2_c_n_substitution": 4,
+    "sp2_c_o_substitution": 3,
+    "unknown": 81
+  }
+}
