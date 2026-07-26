@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app import generic_reaction_review_gui as gui
+from app import generic_reaction_converter_review_gui as gui
 from condition_recommender.conversion.artifacts import (
     RecommendationArtifactProgress,
 )
