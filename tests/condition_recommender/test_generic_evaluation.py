@@ -76,7 +76,7 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
         "schema_version": "1.9",
-        "converter_definition_version": "generic_conversion.v1.5",
+        "converter_definition_version": "generic_conversion.v1.6",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "chemistry_status": "verified",

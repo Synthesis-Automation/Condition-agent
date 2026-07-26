@@ -86,6 +86,32 @@ def test_detailed_label_uses_superscript_fragment_indices() -> None:
     )
 
 
+def test_detailed_label_uses_subscripts_for_molecular_formula_counts() -> None:
+    result = featurize_reaction("CC(=O)O.CN>>CC(=O)NC")
+
+    assert result.reaction_label == (
+        "R1–C(O)OH + R2–NH2 → R1–C(O)–NH–R2"
+    )
+    assert result.display_label is not None
+    assert result.display_label.detailed == (
+        "R¹–C(O)OH + R²–NH₂ → R¹–C(O)–NH–R²; edits: "
+        "C–O bond cleavage; C–N bond formation; N–H loss"
+    )
+
+
+def test_formula_subscripts_do_not_change_maps_ring_sizes_or_edit_counts() -> None:
+    mapped = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
+    ring = featurize_reaction(
+        "OCCCCc1ccccc1Br>>c1ccc2c(c1)CCCCO2"
+    )
+
+    assert mapped.display_label is not None
+    assert mapped.display_label.detailed.startswith("H₂C=CH₂ → H₃C–CH₃")
+    assert "C(map 1)=C(map 2)" in mapped.display_label.detailed
+    assert ring.display_label is not None
+    assert "(7-membered ring)" in ring.display_label.detailed
+
+
 def test_detailed_label_puts_seven_membered_ring_context_after_transformation() -> None:
     result = featurize_reaction(
         "OCCCCc1ccccc1Br>>c1ccc2c(c1)CCCCO2"
@@ -200,8 +226,8 @@ def test_reaction_label_definition_is_versioned() -> None:
     rendering = load_reaction_label_rendering()
     patterns = load_reaction_label_patterns()
 
-    assert rendering["schema_version"] == "1.2"
-    assert rendering["label_schema_version"] == "1.2"
+    assert rendering["schema_version"] == "1.3"
+    assert rendering["label_schema_version"] == "1.3"
     assert patterns["schema_version"] == "1.0"
     assert {pattern["id"] for pattern in patterns["patterns"]} >= {
         "substitution",

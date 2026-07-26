@@ -27,8 +27,8 @@ CC(=O)c1ccccc1.c1ccc(C2CO2)cc1>>CC1(c2ccccc2)OCC(c2ccccc2)O1,,Acetal ketal forma
 C1CCC2OC2C1.CC(C)=O>>CC1(C)OC2CCCCC2O1,,Acetal ketal formation,,unavailable
 CC(C)=O.c1ccc(OCC2CO2)cc1>>CC1(C)OCC(COc2ccccc2)O1,,Acetal ketal formation,,unavailable
 CC(C)=O.c1ccc(C2CO2)cc1>>CC1(C)OCC(c2ccccc2)O1,,Acetal ketal formation,,unavailable
-COC(OC)OC.Cc1ccc(N)c(Cl)c1.O=C(CCCl)CCCl>>COC1(OC)CCN(c2ccc(C)cc2Cl)CC1,(Ar–Cl + activated C–H) OR (R¹–C(R²)=O + Ar–NH2) OR (R–Cl + Ar–NH2) OR (intramolecular Ar–Cl / Ar–H) OR (intramolecular Ar–Cl / Ar–NH2) →,Acetal ketal formation,,ambiguous_reactants
-COC(OC)OC.Nc1ccccc1F.O=C(CCCl)CCCl>>COC1(OC)CCN(c2ccccc2F)CC1,(Ar–F + activated C–H) OR (R¹–C(R²)=O + Ar–NH2) OR (R–Cl + Ar–NH2) OR (intramolecular Ar–F / Ar–H) OR (intramolecular Ar–F / Ar–NH2) →,Acetal ketal formation,,ambiguous_reactants
+COC(OC)OC.Cc1ccc(N)c(Cl)c1.O=C(CCCl)CCCl>>COC1(OC)CCN(c2ccc(C)cc2Cl)CC1,(Ar–Cl + activated C–H) OR (R¹–C(R²)=O + Ar–NH₂) OR (R–Cl + Ar–NH₂) OR (intramolecular Ar–Cl / Ar–H) OR (intramolecular Ar–Cl / Ar–NH₂) →,Acetal ketal formation,,ambiguous_reactants
+COC(OC)OC.Nc1ccccc1F.O=C(CCCl)CCCl>>COC1(OC)CCN(c2ccccc2F)CC1,(Ar–F + activated C–H) OR (R¹–C(R²)=O + Ar–NH₂) OR (R–Cl + Ar–NH₂) OR (intramolecular Ar–F / Ar–H) OR (intramolecular Ar–F / Ar–NH₂) →,Acetal ketal formation,,ambiguous_reactants
 O=Cc1ccccc1.OCCO>>O=C(OCCI)c1ccccc1.c1ccc(C2OCCO2)cc1,,Acetal ketal formation,,unavailable
 CCC(=O)c1ccc(OC)cc1.COC(=O)[C@H](O)[C@@H](O)C(=O)OC>>COC(=O)[C@@H]1OC(c2ccc(OC)c(Br)c2)([C@H](C)Br)O[C@H]1C(=O)OC,,Acetal ketal formation,,unavailable
 COc1ccc(C(C)=O)cc1.OCCO>>COc1ccc(C2(CBr)OCCO2)cc1Br,,Acetal ketal formation,,unavailable

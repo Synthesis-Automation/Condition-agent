@@ -29,7 +29,7 @@ def load_reaction_label_rendering() -> dict[str, Any]:
     """Load the versioned declarative edit-label rendering rules."""
     with _PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    if payload.get("schema_version") != "1.2":
+    if payload.get("schema_version") != "1.3":
         raise ValueError("Unsupported reaction-label rendering schema")
     return dict(payload)
 
@@ -232,7 +232,7 @@ def _event_labels(
 
 def _render_fragment_indices(text: str, *, style: str) -> str:
     """Render reaction-local generic fragment indices as Unicode superscripts."""
-    if style != "unicode":
+    if _style(style).get("fragment_index_format") != "superscript":
         return text
     symbols = load_fragment_context_symbols()
     if not symbols:
@@ -244,6 +244,18 @@ def _render_fragment_indices(text: str, *, style: str) -> str:
         return match.group(1) + match.group(2).translate(superscript_digits)
 
     return re.sub(rf"({symbol_pattern})([0-9]+)", replace, text)
+
+
+def _render_formula_counts(text: str, *, style: str) -> str:
+    """Render molecular-formula counts without changing other numeric context."""
+    if _style(style).get("formula_count_format") != "subscript":
+        return text
+    subscript_digits = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+
+    def replace(match: re.Match[str]) -> str:
+        return match.group(1) + match.group(2).translate(subscript_digits)
+
+    return re.sub(r"([A-Z][a-z]?|\))([0-9]+)", replace, text)
 
 
 def _topology_context(
@@ -285,7 +297,8 @@ def _make_detailed_label_readable(
             )
         else:
             detailed = f"{core}{_style(style)['separator']}{context}"
-    return _render_fragment_indices(detailed, style=style)
+    detailed = _render_fragment_indices(detailed, style=style)
+    return _render_formula_counts(detailed, style=style)
 
 
 def build_reaction_display_label(

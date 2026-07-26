@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "converter_version": "generic_conversion.v1.5",
+  "converter_version": "generic_conversion.v1.6",
   "reaction_signature_schema_version": "1.3",
   "dataset_path": "data-processor\\reaction_dataset",
   "input_files": [

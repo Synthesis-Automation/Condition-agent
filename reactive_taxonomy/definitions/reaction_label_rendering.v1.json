@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.2",
-  "label_schema_version": "1.2",
+  "schema_version": "1.3",
+  "label_schema_version": "1.3",
   "default_style": "unicode",
   "clause_order": ["broken", "order_changed", "formed", "hydrogen_change"],
   "element_precedence": ["C", "N", "O", "S", "P", "B", "Si", "H", "F", "Cl", "Br", "I"],
@@ -14,7 +14,9 @@
       "times": "×",
       "separator": "; ",
       "event_separator": " + ",
-      "event_detail_separator": " | "
+      "event_detail_separator": " | ",
+      "fragment_index_format": "superscript",
+      "formula_count_format": "subscript"
     },
     "ascii": {
       "single": "-",
@@ -25,7 +27,9 @@
       "times": "x",
       "separator": "; ",
       "event_separator": " + ",
-      "event_detail_separator": " | "
+      "event_detail_separator": " | ",
+      "fragment_index_format": "plain",
+      "formula_count_format": "plain"
     },
     "hte_legacy": {
       "single": "-",
@@ -36,7 +40,9 @@
       "times": "x",
       "separator": "; ",
       "event_separator": " + ",
-      "event_detail_separator": " | "
+      "event_detail_separator": " | ",
+      "fragment_index_format": "plain",
+      "formula_count_format": "plain"
     }
   },
   "templates": {
