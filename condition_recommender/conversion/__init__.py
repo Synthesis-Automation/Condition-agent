@@ -1,5 +1,9 @@
 """Dataset converters for recommendation-ready records."""
 
+from .concise_review import (
+    convert_dataset_folder_to_concise_review_csv,
+    export_concise_reaction_review_csv,
+)
 from .engine import convert_datasets
 from .generic import convert_record as convert_generic_record
 from .references import normalize_reference
@@ -9,10 +13,12 @@ from .suzuki import convert_file, convert_row
 
 __all__ = [
     "convert_datasets",
+    "convert_dataset_folder_to_concise_review_csv",
     "convert_file",
     "convert_generic_record",
     "convert_row",
     "build_reference_safe_samples",
+    "export_concise_reaction_review_csv",
     "normalize_reference",
     "reference_condition_series_id",
 ]

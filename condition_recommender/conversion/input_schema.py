@@ -138,13 +138,22 @@ def iter_csv_records(path: str | Path) -> Iterator[RawReactionRecord]:
 
 
 def discover_csv_datasets(path: str | Path) -> Tuple[Path, ...]:
-    """Return deterministic CSV paths for a file or directory input."""
+    """Return deterministic CSV paths for a file or recursive directory input."""
     source = Path(path)
     if source.is_file():
         return (source,) if source.suffix.lower() == ".csv" else ()
     if not source.is_dir():
         return ()
-    return tuple(sorted(source.glob("*.csv"), key=lambda item: item.name.lower()))
+    return tuple(
+        sorted(
+            (
+                item
+                for item in source.rglob("*")
+                if item.is_file() and item.suffix.lower() == ".csv"
+            ),
+            key=lambda item: item.relative_to(source).as_posix().casefold(),
+        )
+    )
 
 
 __all__ = [

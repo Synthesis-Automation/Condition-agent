@@ -3,8 +3,11 @@ import json
 from pathlib import Path
 
 import condition_recommender.conversion.generic as generic_module
+import pytest
 from condition_recommender.conversion.concise_review import (
     CONCISE_REACTION_REVIEW_FIELDS,
+    ConciseReviewConversionCancelled,
+    convert_dataset_folder_to_concise_review_csv,
     export_concise_reaction_review_csv,
 )
 from condition_recommender.conversion.engine import convert_datasets
@@ -12,7 +15,10 @@ from condition_recommender.conversion.generic import (
     GenericConversionCache,
     convert_record,
 )
-from condition_recommender.conversion.input_schema import adapt_row
+from condition_recommender.conversion.input_schema import (
+    adapt_row,
+    discover_csv_datasets,
+)
 from condition_recommender.conversion.sharded import (
     convert_datasets_sharded,
     validate_sharded_conversion,
@@ -367,6 +373,67 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["original_reaction_type"] == "Original Suzuki Label"
     assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
     assert review_rows[0]["detection_status"] == "family_overlay"
+
+
+def test_recursive_dataset_folder_converts_to_one_concise_review_csv(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "datasets"
+    nested = source / "nested"
+    nested.mkdir(parents=True)
+    reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+    for path, reaction_id in (
+        (source / "root.csv", "root"),
+        (nested / "child.csv", "child"),
+    ):
+        row = _csv_row(reaction_id, reaction, reaction_type="Suzuki source")
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(row))
+            writer.writeheader()
+            writer.writerow(row)
+    progress = []
+    output = source / "concise_review.csv"
+
+    report = convert_dataset_folder_to_concise_review_csv(
+        source,
+        output,
+        progress_callback=progress.append,
+        progress_interval=1,
+    )
+
+    assert [
+        path.relative_to(source).as_posix()
+        for path in discover_csv_datasets(source)
+        if path != output
+    ] == ["nested/child.csv", "root.csv"]
+    assert report["source_file_count"] == 2
+    assert report["row_count"] == 2
+    with output.open("r", encoding="utf-8-sig", newline="") as handle:
+        assert len(list(csv.DictReader(handle))) == 2
+    assert progress[0].phase == "discovered"
+    assert progress[-1].phase == "completed"
+
+
+def test_recursive_concise_review_cancellation_removes_temporary_file(
+    tmp_path: Path,
+) -> None:
+    dataset = tmp_path / "dataset.csv"
+    row = _csv_row("cancel", "CC>>CC", reaction_type="Unknown")
+    with dataset.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(row))
+        writer.writeheader()
+        writer.writerow(row)
+    output = tmp_path / "review.csv"
+
+    with pytest.raises(ConciseReviewConversionCancelled):
+        convert_dataset_folder_to_concise_review_csv(
+            tmp_path,
+            output,
+            cancel_check=lambda: True,
+        )
+
+    assert not output.exists()
+    assert not output.with_suffix(".csv.tmp").exists()
 
 
 def test_sharded_conversion_is_restartable_and_integrity_checked(

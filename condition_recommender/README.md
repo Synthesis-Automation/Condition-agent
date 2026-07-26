@@ -406,6 +406,17 @@ the original source reaction type, the detected optional reaction family, and
 the structural-label detection status. Blank detected families are retained
 and are not treated as errors.
 
+The same workflow is available as a simple PyQt6 desktop app:
+
+```powershell
+python -m app.generic_reaction_review_gui
+```
+
+Choose a dataset folder and an output CSV. The app discovers CSV files
+recursively, performs conversion in a background thread, reports file and
+reaction progress in the status box, and supports cancellation between
+reactions.
+
 ### Build an index and recommend
 
 ```powershell
