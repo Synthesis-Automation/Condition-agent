@@ -243,7 +243,10 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.summary_box = QtWidgets.QPlainTextEdit()
         self.summary_box.setObjectName("recommendationSummary")
         self.summary_box.setReadOnly(True)
-        self.summary_box.setMaximumHeight(130)
+        self.summary_box.setFixedHeight(58)
+        self.summary_box.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
 
         self.results_table = QtWidgets.QTableWidget()
         self.results_table.setObjectName("recommendationTable")
@@ -515,25 +518,21 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.summary_box.setPlainText(
             "\n".join(
                 (
-                    f"Detected family: {_display_name(result.named_family)}",
                     (
+                        f"Family: {_display_name(result.named_family)}  •  "
                         "Transformation: "
-                        f"{_display_name(result.transformation_class)}"
-                    ),
-                    (
-                        "Retrieval level: "
+                        f"{_display_name(result.transformation_class)}  •  "
+                        "Retrieval: "
                         f"{_display_name(result.retrieval_level)}"
                     ),
                     (
-                        f"Candidates: {result.candidate_count}; "
-                        f"compatible: {result.compatible_candidate_count}; "
-                        f"excluded: {result.excluded_candidate_count}"
+                        f"Candidates: {result.candidate_count}  •  "
+                        f"Compatible: {result.compatible_candidate_count}  •  "
+                        f"Independent: "
+                        f"{result.independent_compatible_candidate_count}  •  "
+                        f"Excluded: {result.excluded_candidate_count}  •  "
+                        f"Warnings: {warnings}"
                     ),
-                    (
-                        "Independent compatible precedents: "
-                        f"{result.independent_compatible_candidate_count}"
-                    ),
-                    f"Warnings: {warnings}",
                 )
             )
         )

@@ -79,6 +79,7 @@ def test_window_uses_literature_recommendation_data_by_default(
     )
     assert window.top_k_spin.value() == 5
     assert window.reaction_edit.metaObject().className() == "QLineEdit"
+    assert window.summary_box.height() == 58
     assert window.results_table.columnCount() == 9
     assert not window.export_button.isEnabled()
 
@@ -126,6 +127,7 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     window._render_result(_result())
 
     assert "Suzuki Miyaura" in window.summary_box.toPlainText()
+    assert window.summary_box.toPlainText().count("\n") == 1
     assert window.results_table.rowCount() == 1
     assert "Palladium catalyst" in window.results_table.item(0, 7).text()
     assert "Potassium carbonate" in window.details_box.toPlainText()
