@@ -1,0 +1,134 @@
+{
+  "artifact_type": "generic_sharded_conversion",
+  "dataset_path": "C:\\Git-softwares\\Condition-agent\\results\\generic_sampling\\v1\\smoke.csv",
+  "definition_contract": {
+    "condition_registry_definition_versions": {
+      "recipe_templates.v1.json": "sha256:ad8a6838bc1bedc8a3d0410ec80495ae0f4f0d3e6f7a9c8bfe20da00a1633cac",
+      "role_resolution.v1.json": "sha256:be916c23ca19714df941885e60500d545fa239183352a15fc1e7dfdc454bd391",
+      "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+      "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+    },
+    "converter_definition_version": "generic_conversion.v1.4",
+    "reaction_signature_schema_version": "1.3",
+    "record_schema_version": "1.9",
+    "sharded_conversion_definition_version": "generic_sharded_conversion.v1.2",
+    "taxonomy_definition_versions": {
+      "descriptor_rules.v1.json": "1.0",
+      "handles.v1.json": "1.1",
+      "reaction_grammars.v1.json": "1.6",
+      "signature_features.v1.json": "1.3"
+    }
+  },
+  "max_shards": 1,
+  "mode": "smoke",
+  "schema_version": "1.0",
+  "shard_size": 100,
+  "shards": [
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 7,
+        "insufficient_edit_evidence": 6,
+        "missing_verified_reaction_signature": 36,
+        "multiple_products": 3,
+        "multistage_conditions_not_structured": 68,
+        "no_condition_identifiers": 2,
+        "no_usable_transformation_evidence": 38,
+        "solvent_only_recipe": 2,
+        "verified_reaction_signature_with_conditions": 3
+      },
+      "admission_tier_counts": {
+        "rejected": 40,
+        "review": 57,
+        "verified": 3
+      },
+      "chemistry_status_counts": {
+        "rejected": 38,
+        "review": 45,
+        "verified": 17
+      },
+      "condition_status_counts": {
+        "multistage_ambiguous": 68,
+        "resolved_complete": 21,
+        "unresolved_retained": 7,
+        "unusable": 4
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:ad8a6838bc1bedc8a3d0410ec80495ae0f4f0d3e6f7a9c8bfe20da00a1633cac",
+          "role_resolution.v1.json": "sha256:be916c23ca19714df941885e60500d545fa239183352a15fc1e7dfdc454bd391",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v1.4",
+        "reaction_signature_schema_version": "1.3",
+        "record_schema_version": "1.9",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v1.2",
+        "taxonomy_definition_versions": {
+          "descriptor_rules.v1.json": "1.0",
+          "handles.v1.json": "1.1",
+          "reaction_grammars.v1.json": "1.6",
+          "signature_features.v1.json": "1.3"
+        }
+      },
+      "evidence_quality_counts": {
+        "exact_multi_event_reconstruction": 1,
+        "exact_product_reconstruction": 19,
+        "reactant_grammar_only": 36,
+        "unique_scaffold_correspondence": 6,
+        "unresolved": 38
+      },
+      "failure_count": 0,
+      "failures": [],
+      "index_eligibility_counts": {
+        "eligible": 4,
+        "ineligible": 40,
+        "review_only": 56
+      },
+      "input_position_end": 99,
+      "input_position_start": 0,
+      "input_row_count": 100,
+      "mode": "smoke",
+      "named_family_counts": {
+        "suzuki_miyaura": 1,
+        "unnamed": 99
+      },
+      "outcome_status_counts": {
+        "usable": 100
+      },
+      "output_path": "shards\\smoke.03e3ec4a3a.part-00000.jsonl.gz",
+      "output_row_count": 100,
+      "output_sha256": "35d2a5fef03244b9a7e0955e6320d6c1d86927477aa10ac2e36f7d681c02d573",
+      "part_number": 0,
+      "reaction_scope_counts": {
+        "intermolecular": 18,
+        "intramolecular": 2,
+        "unimolecular": 6,
+        "unknown": 74
+      },
+      "reused": false,
+      "shard_id": "smoke.03e3ec4a3a.part-00000",
+      "signature_count": 26,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\generic_sampling\\v1\\smoke.csv",
+      "source_row_number_end": 10369,
+      "source_row_number_start": 603,
+      "source_sha256": "014a6cacf09a9ac7bf2a8afb02fa15fcc3f96ed567accb9f434a8d3056d7d2a7",
+      "status": "complete",
+      "transformation_class_counts": {
+        "amide_formation": 10,
+        "c_c_transfer_coupling": 1,
+        "sp2_c_c_substitution": 1,
+        "sp2_c_n_substitution": 4,
+        "sp2_c_o_substitution": 3,
+        "unknown": 81
+      }
+    }
+  ],
+  "source_files": [
+    {
+      "coverage_complete": false,
+      "covered_row_count": 100,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\generic_sampling\\v1\\smoke.csv",
+      "sha256": "014a6cacf09a9ac7bf2a8afb02fa15fcc3f96ed567accb9f434a8d3056d7d2a7"
+    }
+  ]
+}

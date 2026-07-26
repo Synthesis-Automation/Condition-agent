@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "generic_index_integrity",
+  "path": "results\\readme_quickstart_check\\generic_index.json",
+  "valid": true,
+  "issues": [],
+  "index_id": "GRI1:69f904fb3ece74e765f29c8def8983cc0affb151d08979509d7aa17460cccec7",
+  "index_schema_version": "1.5",
+  "row_count": 0,
+  "file_size_bytes": 596,
+  "duplicate_observation_count": 0,
+  "key_counts": {
+    "exact": 0,
+    "handles": 0,
+    "transformations": 0,
+    "bond_edits": 0,
+    "environments": 0,
+    "environment_features": 0,
+    "families": 0
+  },
+  "transformation_class_counts": {},
+  "named_family_counts": {},
+  "reaction_scope_counts": {},
+  "unique_reference_count": 0,
+  "unique_recipe_core_count": 0
+}

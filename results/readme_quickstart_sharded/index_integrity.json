@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "generic_index_integrity",
+  "path": "results\\readme_quickstart_sharded\\generic_index.json",
+  "valid": true,
+  "issues": [],
+  "index_id": "GRI1:468adc2c905bc6a9908b78bb2565f5c9cf304a7189965a5408e2e00cbcce016d",
+  "index_schema_version": "1.5",
+  "row_count": 4,
+  "file_size_bytes": 57611,
+  "duplicate_observation_count": 0,
+  "key_counts": {
+    "exact": 4,
+    "handles": 4,
+    "transformations": 3,
+    "bond_edits": 3,
+    "environments": 4,
+    "environment_features": 12,
+    "families": 1
+  },
+  "transformation_class_counts": {
+    "amide_formation": 1,
+    "c_c_transfer_coupling": 1,
+    "sp2_c_n_substitution": 2
+  },
+  "named_family_counts": {
+    "suzuki_miyaura": 1,
+    "unnamed": 3
+  },
+  "reaction_scope_counts": {
+    "intermolecular": 4
+  },
+  "unique_reference_count": 4,
+  "unique_recipe_core_count": 4
+}

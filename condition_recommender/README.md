@@ -31,6 +31,101 @@ these paths; they do not recommend conditions by themselves.
 - Abstain when the selected path cannot support the query. Do not silently call
   a weaker path and present the result as equivalent evidence.
 
+## New generic system: quick start
+
+Run commands from the repository root with Python 3.10 or newer and RDKit
+available. The generic system is composed of three standalone packages:
+
+```text
+reactive_taxonomy + condition_registry -> condition_recommender
+```
+
+`reactive_taxonomy` determines what changed in the molecular graph,
+`condition_registry` resolves condition identities and canonical recipes, and
+`condition_recommender` retrieves compatible precedents and ranks recipes.
+
+### 1. Create a small local index
+
+First create reference-safe samples, then convert only one 100-row shard for a
+mechanical smoke test. The sampler prevents a smoke test from accidentally
+consisting only of the first source file. This bounded index is deliberately
+small and is not an accuracy benchmark:
+
+```powershell
+python -m condition_recommender.sample_cli `
+  data-processor/reaction_dataset `
+  results/quickstart/samples
+
+python -m condition_recommender.sharded_conversion_cli `
+  results/quickstart/samples/smoke.csv `
+  results/quickstart/conversion `
+  --mode smoke --shard-size 100 --max-shards 1
+
+python -m condition_recommender.generic_index_cli `
+  results/quickstart/conversion/records.jsonl.gz `
+  results/quickstart/generic_index.json
+
+python -m condition_recommender.generic_index_integrity_cli `
+  results/quickstart/generic_index.json `
+  --output-path results/quickstart/index_integrity.json
+```
+
+The integrity command exits with a nonzero status when the index is stale,
+internally inconsistent, or contains duplicate observations. Because
+`--max-shards 1` intentionally covers only part of `smoke.csv`, use this
+artifact only to exercise the software path.
+
+### 2. Request conditions
+
+The CLI accepts reaction SMILES and returns JSON:
+
+```powershell
+python -m condition_recommender.generic_recommend_cli `
+  "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1" `
+  --records results/quickstart/generic_index.json `
+  --top-k 5
+```
+
+For repeated recommendations, load the validated index once:
+
+```python
+from condition_recommender import GenericConditionRecommender
+
+recommender = GenericConditionRecommender.from_path(
+    "results/quickstart/generic_index.json"
+)
+result = recommender.recommend(
+    "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+    top_k=5,
+)
+
+if not result.valid:
+    print(result.error)
+else:
+    print("retrieval level:", result.retrieval_level)
+    for recommendation in result.recommendations:
+        print(
+            recommendation.rank,
+            recommendation.recipe_core_id,
+            recommendation.score,
+            recommendation.resolved_recipe,
+        )
+```
+
+Use `result.to_dict()` when a JSON-serializable audit payload is needed.
+Applications should inspect:
+
+- `valid`, `error`, and `warnings` before using any recommendation;
+- `retrieval_level` and `retrieval_trace` to see which fallback was required;
+- `resolved_recipe` for canonical condition components and operating variants;
+- independent `reference_support` and `precedent_reference_ids`, not only raw
+  observation counts;
+- `compatibility_evidence`, `cautions`, `explanation`, and `score_trace`;
+- `expected_yield_pct`, which is `None` when no usable outcome evidence exists.
+
+An empty recommendation list or typed error is a valid abstention. It must not
+be replaced by a reaction-name guess.
+
 ## Expert rule-based recommendation
 
 ### Design
@@ -239,6 +334,34 @@ python -m condition_recommender.generic_conversion_cli `
   results/generic_conversion/smoke_v1
 ```
 
+Once the smoke path works, use the same restartable converter intended for the
+full corpus to prepare development and validation artifacts:
+
+```powershell
+python -m condition_recommender.sharded_conversion_cli `
+  results/generic_sampling/v1/development.csv `
+  results/generic_conversion/v2/development `
+  --mode development --shard-size 100 --workers 4
+
+python -m condition_recommender.sharded_conversion_cli `
+  results/generic_sampling/v1/validation.csv `
+  results/generic_conversion/v2/validation `
+  --mode validation --shard-size 100 --workers 4
+
+python -m condition_recommender.generic_index_cli `
+  results/generic_conversion/v2/development/records.jsonl.gz `
+  results/generic_conversion/v2/development/generic_index.json
+
+python -m condition_recommender.generic_index_cli `
+  results/generic_conversion/v2/validation/records.jsonl.gz `
+  results/generic_conversion/v2/validation/generic_index.json
+```
+
+Rerunning a sharded conversion with unchanged sources and definitions reuses
+checksum-valid completed shards. A source, schema, taxonomy, registry, or
+converter-definition change invalidates reuse instead of silently mixing
+versions.
+
 ### Audit and convert a structure-rich dataset
 
 Audit source data without modifying it:
@@ -337,8 +460,8 @@ are compared using their complete event and net-edit sets.
 
 ```powershell
 python -m condition_recommender.evaluation_cli `
-  results/generic_conversion/generic_index.json `
-  results/generic_conversion_evaluation `
+  results/generic_conversion/v2/development/generic_index.json `
+  results/generic_evaluation/v2/development/grouped `
   --test-fraction 0.2 --seed 17 --top-k 5
 ```
 
@@ -352,15 +475,43 @@ Use `--split-mode scaffold_disjoint`, `source_disjoint`, or `forward_time` for
 the stricter leakage diagnostics. Compare chemistry-gated baselines with:
 
 ```powershell
-python -m condition_recommender.baseline_cli <index> <output>
+python -m condition_recommender.evaluation_cli `
+  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_evaluation/v2/validation/scaffold `
+  --split-mode scaffold_disjoint --seed 71
+
+python -m condition_recommender.evaluation_cli `
+  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_evaluation/v2/validation/source `
+  --split-mode source_disjoint --seed 71
+
+python -m condition_recommender.evaluation_cli `
+  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_evaluation/v2/validation/time `
+  --split-mode forward_time
+
+python -m condition_recommender.baseline_cli `
+  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_evaluation/v2/validation/baselines `
+  --seed 71
 ```
 
 Calibrate only from development and validation indices:
 
 ```powershell
 python -m condition_recommender.calibration_cli `
-  <development-index> <validation-index> <output>
+  results/generic_conversion/v2/development/generic_index.json `
+  results/generic_conversion/v2/validation/generic_index.json `
+  results/generic_evaluation/v2/calibration
 ```
+
+Do not tune definitions directly from validation results. The calibration
+command selects candidates using internal development splits and uses
+validation only as a promotion gate. A passing evaluation must report zero
+reference and canonical-reaction overlap, zero scaffold overlap for the strict
+scaffold split, and zero hard-incompatible recommendations. Recovery and yield
+metrics must be interpreted with their observed-recipe and usable-outcome
+denominators.
 
 Generate the blind review gate before opening the untouched test:
 
@@ -416,6 +567,76 @@ Compose the final machine and independent-human gates with
 only when it has the adjudication schema, independent reviewer sign-off, no
 unresolved systematic defect, and hashes for the packet, form, report, and
 answer key.
+
+### Test and validate the new system
+
+Run the complete deterministic test suite before handing off any change:
+
+```powershell
+pytest -q
+```
+
+Run package-focused suites while developing:
+
+```powershell
+# Molecular observations, edits, environments, and reaction signatures
+pytest -q tests/reactive_taxonomy
+
+# Condition identities, roles, compatibility vocabulary, and recipes
+pytest -q tests/condition_registry
+
+# Conversion, indexing, retrieval, ranking, evaluation, and release gates
+pytest -q tests/condition_recommender
+```
+
+Useful focused regressions for the generic path are:
+
+```powershell
+pytest -q tests/condition_recommender/test_generic_conversion.py
+pytest -q tests/condition_recommender/test_generic_retrieval.py
+pytest -q tests/condition_recommender/test_generic_evaluation.py
+pytest -q tests/reactive_taxonomy/test_reaction_signatures.py
+```
+
+Dataset testing has four distinct levels:
+
+1. **Mechanical smoke:** convert one 100-row shard, build an index, run index
+   integrity, and request at least one recommendation using the quick-start
+   commands.
+2. **Development:** use the reference-safe development sample for
+   implementation, baseline comparison, and candidate selection.
+3. **Validation:** run grouped, scaffold-disjoint, source-disjoint, and
+   forward-time reports without tuning directly against them.
+4. **Untouched and full corpus:** run only after independent chemist review and
+   adjudication pass.
+
+Validate sharded artifacts and their persisted indices independently:
+
+```powershell
+python -m condition_recommender.conversion_integrity_cli `
+  results/generic_conversion/v2/development/shard_manifest.json
+
+python -m condition_recommender.generic_index_integrity_cli `
+  results/generic_conversion/v2/development/generic_index.json `
+  --output-path results/generic_conversion/v2/development/index_integrity.json
+```
+
+A machine-valid sampled run should satisfy all of the following:
+
+- shard input and output row counts agree and no shard failed;
+- source and output checksums match the manifest;
+- index schema and all chemistry/registry definition versions are current;
+- duplicate observation count is zero;
+- reference and canonical-reaction overlap counts are zero;
+- strict scaffold overlap is zero in the scaffold-disjoint report;
+- hard-incompatible recommendation count is zero;
+- recovery metrics state their seen-recipe denominator and yield metrics state
+  their usable-outcome count;
+- invalid or unsupported query chemistry returns a typed error or abstention.
+
+Do not treat successful unit tests, high coverage, or a checksum-valid index as
+evidence that a recipe is chemically suitable. Chemistry review and held-out
+metrics are separate required gates.
 
 ### Generic path limitations
 
