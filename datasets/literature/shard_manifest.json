@@ -1,0 +1,516 @@
+{
+  "artifact_type": "generic_sharded_conversion",
+  "dataset_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300",
+  "definition_contract": {
+    "condition_registry_definition_versions": {
+      "recipe_templates.v1.json": "sha256:ad8a6838bc1bedc8a3d0410ec80495ae0f4f0d3e6f7a9c8bfe20da00a1633cac",
+      "role_resolution.v1.json": "sha256:be916c23ca19714df941885e60500d545fa239183352a15fc1e7dfdc454bd391",
+      "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+      "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+    },
+    "converter_definition_version": "generic_conversion.v1.8",
+    "reaction_signature_schema_version": "1.3",
+    "record_schema_version": "1.9",
+    "sharded_conversion_definition_version": "generic_sharded_conversion.v1.2",
+    "taxonomy_definition_versions": {
+      "descriptor_rules.v1.json": "1.0",
+      "handles.v1.json": "1.2",
+      "reaction_grammars.v1.json": "1.7",
+      "signature_features.v1.json": "1.3"
+    }
+  },
+  "max_shards": null,
+  "mode": "full",
+  "schema_version": "1.0",
+  "shard_size": 1000,
+  "shards": [
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 4,
+        "invalid_reaction_or_product": 1,
+        "missing_verified_reaction_signature": 36,
+        "multiple_products": 2,
+        "multistage_conditions_not_structured": 184,
+        "no_condition_identifiers": 1,
+        "no_usable_transformation_evidence": 4,
+        "solvent_only_recipe": 3,
+        "verified_reaction_signature_with_conditions": 97
+      },
+      "admission_tier_counts": {
+        "rejected": 8,
+        "review": 195,
+        "verified": 97
+      },
+      "chemistry_status_counts": {
+        "rejected": 5,
+        "review": 38,
+        "verified": 257
+      },
+      "condition_status_counts": {
+        "multistage_ambiguous": 184,
+        "resolved_complete": 108,
+        "unresolved_retained": 4,
+        "unusable": 4
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:ad8a6838bc1bedc8a3d0410ec80495ae0f4f0d3e6f7a9c8bfe20da00a1633cac",
+          "role_resolution.v1.json": "sha256:be916c23ca19714df941885e60500d545fa239183352a15fc1e7dfdc454bd391",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v1.8",
+        "reaction_signature_schema_version": "1.3",
+        "record_schema_version": "1.9",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v1.2",
+        "taxonomy_definition_versions": {
+          "descriptor_rules.v1.json": "1.0",
+          "handles.v1.json": "1.2",
+          "reaction_grammars.v1.json": "1.7",
+          "signature_features.v1.json": "1.3"
+        }
+      },
+      "evidence_quality_counts": {
+        "exact_multi_event_reconstruction": 1,
+        "exact_product_reconstruction": 258,
+        "reactant_grammar_only": 36,
+        "unresolved": 5
+      },
+      "failure_count": 0,
+      "failures": [],
+      "index_eligibility_counts": {
+        "eligible": 100,
+        "ineligible": 8,
+        "review_only": 192
+      },
+      "input_position_end": 299,
+      "input_position_start": 0,
+      "input_row_count": 300,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 300
+      },
+      "outcome_status_counts": {
+        "usable": 300
+      },
+      "output_path": "shards\\Amide_formation.10fc686263.part-00000.jsonl.gz",
+      "output_row_count": 300,
+      "output_sha256": "328bd432de87c9e678b5fe48ae5cfa6c8777d98c4018bead75a802fe6e18832e",
+      "part_number": 0,
+      "reaction_scope_counts": {
+        "intermolecular": 258,
+        "intramolecular": 1,
+        "unknown": 41
+      },
+      "reused": false,
+      "shard_id": "Amide_formation.10fc686263.part-00000",
+      "signature_count": 259,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\Amide_formation.csv",
+      "source_row_number_end": 301,
+      "source_row_number_start": 2,
+      "source_sha256": "21fb0c082ff56994a71eeacc86ac25a08b540b0f9557183e905b279e07116670",
+      "status": "complete",
+      "transformation_class_counts": {
+        "amide_formation": 258,
+        "unknown": 42
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 43,
+        "invalid_reaction_or_product": 3,
+        "missing_verified_reaction_signature": 78,
+        "multiple_products": 4,
+        "multistage_conditions_not_structured": 82,
+        "no_condition_identifiers": 3,
+        "no_usable_transformation_evidence": 10,
+        "solvent_only_recipe": 19,
+        "verified_reaction_signature_with_conditions": 113
+      },
+      "admission_tier_counts": {
+        "rejected": 32,
+        "review": 155,
+        "verified": 113
+      },
+      "chemistry_status_counts": {
+        "rejected": 13,
+        "review": 82,
+        "verified": 205
+      },
+      "condition_status_counts": {
+        "multistage_ambiguous": 82,
+        "resolved_complete": 153,
+        "unresolved_retained": 43,
+        "unusable": 22
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:ad8a6838bc1bedc8a3d0410ec80495ae0f4f0d3e6f7a9c8bfe20da00a1633cac",
+          "role_resolution.v1.json": "sha256:be916c23ca19714df941885e60500d545fa239183352a15fc1e7dfdc454bd391",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v1.8",
+        "reaction_signature_schema_version": "1.3",
+        "record_schema_version": "1.9",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v1.2",
+        "taxonomy_definition_versions": {
+          "descriptor_rules.v1.json": "1.0",
+          "handles.v1.json": "1.2",
+          "reaction_grammars.v1.json": "1.7",
+          "signature_features.v1.json": "1.3"
+        }
+      },
+      "evidence_quality_counts": {
+        "exact_multi_event_reconstruction": 2,
+        "exact_product_reconstruction": 207,
+        "reactant_grammar_only": 78,
+        "unresolved": 13
+      },
+      "failure_count": 0,
+      "failures": [],
+      "index_eligibility_counts": {
+        "eligible": 142,
+        "ineligible": 32,
+        "review_only": 126
+      },
+      "input_position_end": 299,
+      "input_position_start": 0,
+      "input_row_count": 300,
+      "mode": "full",
+      "named_family_counts": {
+        "c_s_coupling": 1,
+        "chan_lam": 4,
+        "unnamed": 295
+      },
+      "outcome_status_counts": {
+        "usable": 300
+      },
+      "output_path": "shards\\C_N_Coupling.ae2f9c200f.part-00000.jsonl.gz",
+      "output_row_count": 300,
+      "output_sha256": "f61df135bb45013ccb374a37ee4a7e2d08c1a10a6cb5ccefeffa8bfc1b3add5a",
+      "part_number": 0,
+      "reaction_scope_counts": {
+        "intermolecular": 203,
+        "intramolecular": 6,
+        "unknown": 91
+      },
+      "reused": false,
+      "shard_id": "C_N_Coupling.ae2f9c200f.part-00000",
+      "signature_count": 209,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\C_N_Coupling.csv",
+      "source_row_number_end": 301,
+      "source_row_number_start": 2,
+      "source_sha256": "19c58f769a9ffa77fd54707a9b62b23b0fa626ccf0475886ca26f8b036161b99",
+      "status": "complete",
+      "transformation_class_counts": {
+        "chan_lam_heteroatom_coupling": 4,
+        "sp2_c_n_substitution": 202,
+        "sp2_c_s_substitution": 1,
+        "unknown": 93
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 41,
+        "invalid_reaction_or_product": 2,
+        "missing_verified_reaction_signature": 56,
+        "multiple_products": 4,
+        "multistage_conditions_not_structured": 103,
+        "no_condition_identifiers": 3,
+        "no_usable_transformation_evidence": 7,
+        "solvent_only_recipe": 4,
+        "verified_reaction_signature_with_conditions": 125
+      },
+      "admission_tier_counts": {
+        "rejected": 16,
+        "review": 159,
+        "verified": 125
+      },
+      "chemistry_status_counts": {
+        "rejected": 9,
+        "review": 60,
+        "verified": 231
+      },
+      "condition_status_counts": {
+        "multistage_ambiguous": 103,
+        "resolved_complete": 149,
+        "unresolved_retained": 41,
+        "unusable": 7
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:ad8a6838bc1bedc8a3d0410ec80495ae0f4f0d3e6f7a9c8bfe20da00a1633cac",
+          "role_resolution.v1.json": "sha256:be916c23ca19714df941885e60500d545fa239183352a15fc1e7dfdc454bd391",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v1.8",
+        "reaction_signature_schema_version": "1.3",
+        "record_schema_version": "1.9",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v1.2",
+        "taxonomy_definition_versions": {
+          "descriptor_rules.v1.json": "1.0",
+          "handles.v1.json": "1.2",
+          "reaction_grammars.v1.json": "1.7",
+          "signature_features.v1.json": "1.3"
+        }
+      },
+      "evidence_quality_counts": {
+        "exact_multi_event_reconstruction": 2,
+        "exact_product_reconstruction": 233,
+        "reactant_grammar_only": 56,
+        "unresolved": 9
+      },
+      "failure_count": 0,
+      "failures": [],
+      "index_eligibility_counts": {
+        "eligible": 156,
+        "ineligible": 16,
+        "review_only": 128
+      },
+      "input_position_end": 299,
+      "input_position_start": 0,
+      "input_row_count": 300,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 300
+      },
+      "outcome_status_counts": {
+        "usable": 300
+      },
+      "output_path": "shards\\C_O_Coupling.9cc55782e6.part-00000.jsonl.gz",
+      "output_row_count": 300,
+      "output_sha256": "e574f6e174cce55513c044a69b68ac35702a7256e25e2526af594d2b1d392650",
+      "part_number": 0,
+      "reaction_scope_counts": {
+        "intermolecular": 229,
+        "intramolecular": 6,
+        "unknown": 65
+      },
+      "reused": false,
+      "shard_id": "C_O_Coupling.9cc55782e6.part-00000",
+      "signature_count": 235,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\C_O_Coupling.csv",
+      "source_row_number_end": 301,
+      "source_row_number_start": 2,
+      "source_sha256": "26c6980827148d147c5d4b03c3109a99c9008cdae65cc8b0c5332ff78fc8bb8b",
+      "status": "complete",
+      "transformation_class_counts": {
+        "sp2_c_o_substitution": 233,
+        "unknown": 67
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 39,
+        "invalid_reaction_or_product": 2,
+        "missing_verified_reaction_signature": 58,
+        "multiple_products": 5,
+        "multistage_conditions_not_structured": 86,
+        "no_condition_identifiers": 8,
+        "no_usable_transformation_evidence": 8,
+        "solvent_only_recipe": 28,
+        "verified_reaction_signature_with_conditions": 113
+      },
+      "admission_tier_counts": {
+        "rejected": 43,
+        "review": 144,
+        "verified": 113
+      },
+      "chemistry_status_counts": {
+        "rejected": 10,
+        "review": 63,
+        "verified": 227
+      },
+      "condition_status_counts": {
+        "multistage_ambiguous": 86,
+        "resolved_complete": 139,
+        "unresolved_retained": 39,
+        "unusable": 36
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:ad8a6838bc1bedc8a3d0410ec80495ae0f4f0d3e6f7a9c8bfe20da00a1633cac",
+          "role_resolution.v1.json": "sha256:be916c23ca19714df941885e60500d545fa239183352a15fc1e7dfdc454bd391",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v1.8",
+        "reaction_signature_schema_version": "1.3",
+        "record_schema_version": "1.9",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v1.2",
+        "taxonomy_definition_versions": {
+          "descriptor_rules.v1.json": "1.0",
+          "handles.v1.json": "1.2",
+          "reaction_grammars.v1.json": "1.7",
+          "signature_features.v1.json": "1.3"
+        }
+      },
+      "evidence_quality_counts": {
+        "ambiguous": 1,
+        "exact_multi_event_reconstruction": 6,
+        "exact_product_reconstruction": 226,
+        "reactant_grammar_only": 57,
+        "unresolved": 10
+      },
+      "failure_count": 0,
+      "failures": [],
+      "index_eligibility_counts": {
+        "eligible": 146,
+        "ineligible": 43,
+        "review_only": 111
+      },
+      "input_position_end": 299,
+      "input_position_start": 0,
+      "input_row_count": 300,
+      "mode": "full",
+      "named_family_counts": {
+        "c_s_coupling": 226,
+        "unnamed": 74
+      },
+      "outcome_status_counts": {
+        "usable": 300
+      },
+      "output_path": "shards\\C_S_Coupling.3cb18fffa4.part-00000.jsonl.gz",
+      "output_row_count": 300,
+      "output_sha256": "179c8dab6f3f165d4b6dbf9e488a31b51a7987523c6ff9613259aa5b714bd009",
+      "part_number": 0,
+      "reaction_scope_counts": {
+        "intermolecular": 232,
+        "unknown": 68
+      },
+      "reused": false,
+      "shard_id": "C_S_Coupling.3cb18fffa4.part-00000",
+      "signature_count": 232,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\C_S_Coupling.csv",
+      "source_row_number_end": 301,
+      "source_row_number_start": 2,
+      "source_sha256": "014000240246fe4c91ed71054559e73c558ff7128e4231a474d0cbd73ccda5a0",
+      "status": "complete",
+      "transformation_class_counts": {
+        "sp2_c_s_substitution": 226,
+        "unknown": 74
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 30,
+        "invalid_reaction_or_product": 2,
+        "missing_verified_reaction_signature": 86,
+        "multiple_products": 5,
+        "multistage_conditions_not_structured": 72,
+        "no_usable_transformation_evidence": 13,
+        "verified_reaction_signature_with_conditions": 142
+      },
+      "admission_tier_counts": {
+        "rejected": 15,
+        "review": 143,
+        "verified": 142
+      },
+      "chemistry_status_counts": {
+        "rejected": 15,
+        "review": 91,
+        "verified": 194
+      },
+      "condition_status_counts": {
+        "multistage_ambiguous": 72,
+        "resolved_complete": 198,
+        "unresolved_retained": 30
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:ad8a6838bc1bedc8a3d0410ec80495ae0f4f0d3e6f7a9c8bfe20da00a1633cac",
+          "role_resolution.v1.json": "sha256:be916c23ca19714df941885e60500d545fa239183352a15fc1e7dfdc454bd391",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v1.8",
+        "reaction_signature_schema_version": "1.3",
+        "record_schema_version": "1.9",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v1.2",
+        "taxonomy_definition_versions": {
+          "descriptor_rules.v1.json": "1.0",
+          "handles.v1.json": "1.2",
+          "reaction_grammars.v1.json": "1.7",
+          "signature_features.v1.json": "1.3"
+        }
+      },
+      "evidence_quality_counts": {
+        "exact_product_reconstruction": 199,
+        "reactant_grammar_only": 86,
+        "unresolved": 15
+      },
+      "failure_count": 0,
+      "failures": [],
+      "index_eligibility_counts": {
+        "eligible": 158,
+        "ineligible": 15,
+        "review_only": 127
+      },
+      "input_position_end": 299,
+      "input_position_start": 0,
+      "input_row_count": 300,
+      "mode": "full",
+      "named_family_counts": {
+        "suzuki_miyaura": 198,
+        "unnamed": 102
+      },
+      "outcome_status_counts": {
+        "usable": 300
+      },
+      "output_path": "shards\\suzuki_miyaura.a3f1754db2.part-00000.jsonl.gz",
+      "output_row_count": 300,
+      "output_sha256": "31cd2d5ba4eec2e45469df0045774d0d639d432dbc569a016c039dabe96f40b7",
+      "part_number": 0,
+      "reaction_scope_counts": {
+        "intermolecular": 199,
+        "unknown": 101
+      },
+      "reused": false,
+      "shard_id": "suzuki_miyaura.a3f1754db2.part-00000",
+      "signature_count": 199,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\suzuki_miyaura.csv",
+      "source_row_number_end": 301,
+      "source_row_number_start": 2,
+      "source_sha256": "b18ed38f59d7000adee13f808b7de8135d47a8a0bb4c7cc81a9b07ea00c66f49",
+      "status": "complete",
+      "transformation_class_counts": {
+        "c_c_transfer_coupling": 199,
+        "unknown": 101
+      }
+    }
+  ],
+  "source_files": [
+    {
+      "coverage_complete": true,
+      "covered_row_count": 300,
+      "path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\Amide_formation.csv",
+      "sha256": "21fb0c082ff56994a71eeacc86ac25a08b540b0f9557183e905b279e07116670"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 300,
+      "path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\C_N_Coupling.csv",
+      "sha256": "19c58f769a9ffa77fd54707a9b62b23b0fa626ccf0475886ca26f8b036161b99"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 300,
+      "path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\C_O_Coupling.csv",
+      "sha256": "26c6980827148d147c5d4b03c3109a99c9008cdae65cc8b0c5332ff78fc8bb8b"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 300,
+      "path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\C_S_Coupling.csv",
+      "sha256": "014000240246fe4c91ed71054559e73c558ff7128e4231a474d0cbd73ccda5a0"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 300,
+      "path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300\\suzuki_miyaura.csv",
+      "sha256": "b18ed38f59d7000adee13f808b7de8135d47a8a0bb4c7cc81a9b07ea00c66f49"
+    }
+  ]
+}

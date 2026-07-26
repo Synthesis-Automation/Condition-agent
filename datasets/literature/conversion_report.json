@@ -1,0 +1,98 @@
+{
+  "admission_reason_counts": {
+    "condition_identifier_uncertainty": 157,
+    "invalid_reaction_or_product": 10,
+    "missing_verified_reaction_signature": 314,
+    "multiple_products": 20,
+    "multistage_conditions_not_structured": 527,
+    "no_condition_identifiers": 15,
+    "no_usable_transformation_evidence": 42,
+    "solvent_only_recipe": 54,
+    "verified_reaction_signature_with_conditions": 590
+  },
+  "admission_tier_counts": {
+    "rejected": 114,
+    "review": 796,
+    "verified": 590
+  },
+  "artifact_type": "generic_sharded_conversion_report",
+  "catalogs": {
+    "recipe_catalog": {
+      "path": "recipe_catalog.jsonl.gz",
+      "row_count": 947,
+      "sha256": "1a07e44ca6f12ab8ea5c97a78bd47d6a0dd4da30a61a2349baa6feb961b01d75"
+    },
+    "reference_catalog": {
+      "path": "reference_catalog.jsonl.gz",
+      "row_count": 1318,
+      "sha256": "a64baa7a6811b878df8121512aa735df953f7e923dba05011f4c18b427a98018"
+    },
+    "reference_condition_series_catalog": {
+      "path": "reference_condition_series.jsonl.gz",
+      "row_count": 1036,
+      "sha256": "12b6f646b2f85fe10e2e83f0aaf32f630d56a149a85fce029323608bb663ef79"
+    }
+  },
+  "chemistry_status_counts": {
+    "rejected": 52,
+    "review": 334,
+    "verified": 1114
+  },
+  "complete_shard_count": 5,
+  "condition_status_counts": {
+    "multistage_ambiguous": 527,
+    "resolved_complete": 747,
+    "unresolved_retained": 157,
+    "unusable": 69
+  },
+  "failed_shard_count": 0,
+  "index_eligibility_counts": {
+    "eligible": 702,
+    "ineligible": 114,
+    "review_only": 684
+  },
+  "input_row_count": 1500,
+  "integrity": {
+    "artifact_type": "sharded_conversion_integrity",
+    "duplicate_observation_count": 0,
+    "issues": [],
+    "manifest_path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\shard_manifest.json",
+    "schema_version": "1.0",
+    "shard_count": 5,
+    "valid": true,
+    "verified_row_count": 1500
+  },
+  "manifest_path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\shard_manifest.json",
+  "merge_records": false,
+  "merged_records": null,
+  "mode": "full",
+  "named_family_counts": {
+    "c_s_coupling": 227,
+    "chan_lam": 4,
+    "suzuki_miyaura": 198,
+    "unnamed": 1071
+  },
+  "outcome_status_counts": {
+    "usable": 1500
+  },
+  "output_row_count": 1500,
+  "reaction_scope_counts": {
+    "intermolecular": 1121,
+    "intramolecular": 13,
+    "unknown": 366
+  },
+  "reused_shard_count": 0,
+  "schema_version": "1.0",
+  "shard_count": 5,
+  "signature_count": 1134,
+  "source_file_count": 5,
+  "transformation_class_counts": {
+    "amide_formation": 258,
+    "c_c_transfer_coupling": 199,
+    "chan_lam_heteroatom_coupling": 4,
+    "sp2_c_n_substitution": 202,
+    "sp2_c_o_substitution": 233,
+    "sp2_c_s_substitution": 227,
+    "unknown": 377
+  }
+}
