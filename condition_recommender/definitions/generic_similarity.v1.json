@@ -1,6 +1,7 @@
 {
   "schema_version": "1.0",
   "definition_id": "generic_similarity.v1",
+  "calibration_status": "chemistry_prior_not_statistically_calibrated",
   "weights": {
     "edit_topology": 0.20,
     "reaction_events": 0.12,

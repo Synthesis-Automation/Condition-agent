@@ -303,8 +303,9 @@ Generic configuration is split by responsibility:
 - `definitions/generic_ranking.v1.json` combines similarity, compatibility,
   condition certainty, outcome evidence, and reference-aware support.
 
-The ranking definition is currently marked `uncalibrated_pilot`. Its weights
-are explicit and testable, but they are not production calibration claims.
+Ranking and retrieval parameters are selected on development splits and
+promoted only after a separate validation gate. Similarity weights remain an
+explicit chemistry prior rather than a statistical fit.
 
 Every result includes a typed retrieval trace. Each attempted tier reports raw
 rows, independent support units, compatibility-filtered rows, exclusions, the
@@ -347,6 +348,75 @@ top-1/top-k recipe recovery, conditional recovery when the recipe was observed
 in training, yield MAE, compatibility exclusions, and the count of
 hard-incompatible recommendations.
 
+Use `--split-mode scaffold_disjoint`, `source_disjoint`, or `forward_time` for
+the stricter leakage diagnostics. Compare chemistry-gated baselines with:
+
+```powershell
+python -m condition_recommender.baseline_cli <index> <output>
+```
+
+Calibrate only from development and validation indices:
+
+```powershell
+python -m condition_recommender.calibration_cli `
+  <development-index> <validation-index> <output>
+```
+
+Generate the blind review gate before opening the untouched test:
+
+```powershell
+python -m condition_recommender.chemist_review_cli <index> <output>
+```
+
+An independent chemist reviews the self-contained `review_packet.html` and
+records decisions in `review_form.csv` without opening `answer_key.jsonl`.
+The JSONL packet and highlighted SVGs remain available for programmatic or
+individual-case inspection. Every candidate decision must be one of
+`compatible`, `compatible_with_caution`, `incompatible`, or `uncertain`. After
+the form is complete, unblind and bind the signed review to the exact packet
+artifacts:
+
+```powershell
+python -m condition_recommender.chemist_review_adjudication_cli `
+  <review-output> <review-output>/review_summary.json `
+  --reviewer "<name>" --independent-reviewer --sign-off
+```
+
+Use one `--unresolved-defect "<description>"` argument per unresolved
+systematic issue and omit `--sign-off` until those issues have been addressed.
+Adjudication refuses to read the answer key while any review decision is blank
+or invalid.
+
+### Restartable full conversion
+
+After chemist review and untouched-test gates pass:
+
+```powershell
+python -m condition_recommender.sharded_conversion_cli `
+  data-processor/reaction_dataset results/generic_conversion/v2/full `
+  --shard-size 100 --workers 6
+
+python -m condition_recommender.conversion_integrity_cli `
+  results/generic_conversion/v2/full/shard_manifest.json
+
+python -m condition_recommender.generic_index_cli `
+  results/generic_conversion/v2/full/records.jsonl.gz `
+  results/generic_conversion/v2/full/generic_index.json
+
+python -m condition_recommender.generic_index_integrity_cli `
+  results/generic_conversion/v2/full/generic_index.json
+```
+
+Canonical shards and catalogs are deterministic compressed nested JSONL. The
+manifest binds each shard to source and output checksums plus every
+participating schema and chemistry/registry definition.
+
+Compose the final machine and independent-human gates with
+`condition_recommender.release_validation_cli`. A review summary is accepted
+only when it has the adjudication schema, independent reviewer sign-off, no
+unresolved systematic defect, and hashes for the packet, form, report, and
+answer key.
+
 ### Generic path limitations
 
 - Performance depends on the quality and coverage of the supplied converted
@@ -355,8 +425,9 @@ hard-incompatible recommendations.
   validity.
 - Registry coverage and role normalization are still incomplete for some
   source datasets.
-- Retrieval calibration across all supported transformation classes is not
-  finished.
+- Calibration is sample-level and is not broad production-accuracy evidence.
+- Production release remains gated by independent chemist review and the
+  untouched-test report.
 
 ## Weak-label recommendation
 

@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import asdict
-from typing import Any, Dict
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, Hashable, TypeVar
 
 from condition_registry import ResolvedConditionRecipe, build_resolved_recipe
 from reactive_taxonomy import featurize_reaction
@@ -16,6 +17,34 @@ from .input_schema import RawReactionRecord
 from .references import normalize_reference
 from .reference_series import reference_condition_series_id
 from .signature_serialization import signature_record_fields
+
+_T = TypeVar("_T")
+
+
+@dataclass
+class GenericConversionCache:
+    """Bounded, invocation-owned cache for deterministic conversion work."""
+
+    max_entries: int = 100_000
+    analyses: Dict[Hashable, Any] = field(default_factory=dict)
+    canonical_reactions: Dict[Hashable, Any] = field(default_factory=dict)
+    references: Dict[Hashable, Any] = field(default_factory=dict)
+    recipes: Dict[Hashable, Any] = field(default_factory=dict)
+
+    def get(
+        self,
+        values: Dict[Hashable, _T],
+        key: Hashable,
+        factory: Callable[[], _T],
+    ) -> _T:
+        """Return a cached deterministic result without unbounded growth."""
+        if key in values:
+            return values[key]
+        value = factory()
+        if len(values) >= self.max_entries:
+            values.clear()
+        values[key] = value
+        return value
 
 
 def _normalized_conditions(record: RawReactionRecord) -> ConditionIdentity:
@@ -57,22 +86,60 @@ def _condition_resolution(recipe: ResolvedConditionRecipe) -> Dict[str, Any]:
     }
 
 
-def convert_record(record: RawReactionRecord) -> RecommendationRecord:
+def convert_record(
+    record: RawReactionRecord,
+    *,
+    cache: GenericConversionCache | None = None,
+) -> RecommendationRecord:
     """Convert one source-faithful row without a declared-family requirement."""
-    analysis = featurize_reaction(record.reaction_smiles)
-    canonical_identity = canonical_reaction_identity(record.reaction_smiles)
-    reference_identity = normalize_reference(record.reference)
+    if cache is None:
+        analysis = featurize_reaction(record.reaction_smiles)
+        canonical_identity = canonical_reaction_identity(record.reaction_smiles)
+        reference_identity = normalize_reference(record.reference)
+    else:
+        analysis = cache.get(
+            cache.analyses,
+            record.reaction_smiles,
+            lambda: featurize_reaction(record.reaction_smiles),
+        )
+        canonical_identity = cache.get(
+            cache.canonical_reactions,
+            record.reaction_smiles,
+            lambda: canonical_reaction_identity(record.reaction_smiles),
+        )
+        reference_identity = cache.get(
+            cache.references,
+            record.reference,
+            lambda: normalize_reference(record.reference),
+        )
     conditions = _normalized_conditions(record)
-    resolved_recipe = build_resolved_recipe(
-        {
-            "catalyst_cas": record.catalyst_cas,
-            "reagent_cas": record.reagent_cas,
-            "solvent_cas": record.solvent_cas,
-        },
-        transformation_class=analysis.transformation_class,
-        named_family=analysis.named_family,
-        temperature_c=record.temperature_c,
-        time_h=record.time_h,
+    recipe_key = (
+        record.catalyst_cas,
+        record.reagent_cas,
+        record.solvent_cas,
+        analysis.transformation_class,
+        analysis.named_family,
+        record.temperature_c,
+        record.time_h,
+    )
+
+    def build_recipe() -> ResolvedConditionRecipe:
+        return build_resolved_recipe(
+            {
+                "catalyst_cas": record.catalyst_cas,
+                "reagent_cas": record.reagent_cas,
+                "solvent_cas": record.solvent_cas,
+            },
+            transformation_class=analysis.transformation_class,
+            named_family=analysis.named_family,
+            temperature_c=record.temperature_c,
+            time_h=record.time_h,
+        )
+
+    resolved_recipe = (
+        build_recipe()
+        if cache is None
+        else cache.get(cache.recipes, recipe_key, build_recipe)
     )
     decision = decide_admission(
         record=record,
@@ -166,4 +233,4 @@ def convert_record(record: RawReactionRecord) -> RecommendationRecord:
     )
 
 
-__all__ = ["convert_record"]
+__all__ = ["GenericConversionCache", "convert_record"]

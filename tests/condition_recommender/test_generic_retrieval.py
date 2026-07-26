@@ -469,7 +469,7 @@ def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:
 
     assert result.valid
     assert result.retrieval_level == "environment_neighbors"
-    assert result.retrieval_definition_version == "1.4"
+    assert result.retrieval_definition_version == "1.5"
     assert "REACTION_TOPOLOGY_FALLBACK_USED" in result.warnings
     assert any(
         caution.startswith("Reaction-scope mismatch:")
@@ -500,6 +500,10 @@ def test_aggregation_counts_references_as_independent_evidence() -> None:
     recommendation = result.recommendations[0]
     assert recommendation.observation_support == 4
     assert recommendation.reference_support == 2
+    assert recommendation.precedent_reference_ids == (
+        "REF1:3",
+        "REF1:shared",
+    )
     assert recommendation.condition_series_support == 2
     assert any(
         "one independent evidence unit" in caution
@@ -628,7 +632,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "1.3"
+    assert result.schema_version == "1.5"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Mapping
 
 from reactive_taxonomy import featurize_reaction
 
@@ -13,6 +13,7 @@ from .generic_indexing import (
     load_generic_index,
 )
 from .generic_retrieval import (
+    RetrievalStrategy,
     load_generic_retrieval_rules,
     retrieve_compatible_generic_pool_with_trace,
 )
@@ -27,6 +28,8 @@ def recommend_indexed_signature(
     query_reaction_smiles: str = "",
     top_k: int = 5,
     minimum_pool_size: int | None = None,
+    retrieval_strategy: RetrievalStrategy = "hybrid",
+    ranking_weights: Mapping[str, float] | None = None,
 ) -> GenericRecommendationResult:
     """Recommend from an existing signature and index without re-featurization."""
     retrieval_definition_version = str(
@@ -62,7 +65,10 @@ def recommend_indexed_signature(
             error="INCOMPATIBLE_REACTION_TAXONOMY_DEFINITIONS",
         )
     retrieval = retrieve_compatible_generic_pool_with_trace(
-        signature, index, minimum_pool_size=minimum_pool_size
+        signature,
+        index,
+        minimum_pool_size=minimum_pool_size,
+        strategy=retrieval_strategy,
     )
     level = retrieval.level
     compatible_pool = retrieval.pool
@@ -75,6 +81,7 @@ def recommend_indexed_signature(
             named_family=signature.get("named_family"),
             transformation_class=signature.get("transformation_class"),
             retrieval_definition_version=retrieval_definition_version,
+            retrieval_strategy=retrieval_strategy,
             retrieval_level=level,
             candidate_count=retrieval.candidate_count,
             independent_candidate_count=retrieval.independent_candidate_count,
@@ -102,6 +109,14 @@ def recommend_indexed_signature(
         compatible_pool,
         retrieval_level=level,
         top_k=top_k,
+        ranking_profile=(
+            "calibration_candidate"
+            if ranking_weights is not None
+            else retrieval_strategy
+            if retrieval_strategy in {"transformation_prior", "legacy_pilot"}
+            else "default"
+        ),
+        ranking_weights=ranking_weights,
     )
     if any(
         caution.startswith("Reaction-scope mismatch:")
@@ -116,6 +131,7 @@ def recommend_indexed_signature(
         named_family=signature.get("named_family"),
         transformation_class=signature.get("transformation_class"),
         retrieval_definition_version=retrieval_definition_version,
+        retrieval_strategy=retrieval_strategy,
         retrieval_level=level,
         candidate_count=retrieval.candidate_count,
         independent_candidate_count=retrieval.independent_candidate_count,

@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "generic_calibration.v1",
+  "development_seeds": [17, 29, 43],
+  "validation_seed": 71,
+  "test_fraction": 0.2,
+  "top_k": 5,
+  "split_mode": "grouped_random",
+  "minimum_seen_recipe_queries": 5,
+  "maximum_coverage_drop": 0.05,
+  "maximum_seen_top1_drop": 0.02,
+  "candidates": [
+    {
+      "candidate_id": "current_min3",
+      "minimum_pool_size": 3,
+      "weights": {
+        "similarity": 0.50,
+        "yield": 0.20,
+        "independent_support": 0.08,
+        "reaction_breadth": 0.04,
+        "dataset_diversity": 0.03,
+        "compatibility": 0.10,
+        "condition_certainty": 0.05
+      }
+    },
+    {
+      "candidate_id": "current_min1",
+      "minimum_pool_size": 1,
+      "weights": {
+        "similarity": 0.50,
+        "yield": 0.20,
+        "independent_support": 0.08,
+        "reaction_breadth": 0.04,
+        "dataset_diversity": 0.03,
+        "compatibility": 0.10,
+        "condition_certainty": 0.05
+      }
+    },
+    {
+      "candidate_id": "structure_heavy_min2",
+      "minimum_pool_size": 2,
+      "weights": {
+        "similarity": 0.65,
+        "yield": 0.12,
+        "independent_support": 0.06,
+        "reaction_breadth": 0.03,
+        "dataset_diversity": 0.02,
+        "compatibility": 0.08,
+        "condition_certainty": 0.04
+      }
+    },
+    {
+      "candidate_id": "support_heavy_min2",
+      "minimum_pool_size": 2,
+      "weights": {
+        "similarity": 0.45,
+        "yield": 0.15,
+        "independent_support": 0.15,
+        "reaction_breadth": 0.08,
+        "dataset_diversity": 0.05,
+        "compatibility": 0.08,
+        "condition_certainty": 0.04
+      }
+    },
+    {
+      "candidate_id": "compatibility_heavy_min2",
+      "minimum_pool_size": 2,
+      "weights": {
+        "similarity": 0.45,
+        "yield": 0.15,
+        "independent_support": 0.08,
+        "reaction_breadth": 0.04,
+        "dataset_diversity": 0.03,
+        "compatibility": 0.18,
+        "condition_certainty": 0.07
+      }
+    }
+  ]
+}

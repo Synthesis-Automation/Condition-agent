@@ -163,6 +163,7 @@ class GenericConditionRecommendation:
     dataset_support: int
     retrieval_level: str
     precedent_reaction_ids: Tuple[str, ...]
+    precedent_reference_ids: Tuple[str, ...]
     explanation: Tuple[str, ...]
     score_trace: "RecommendationScoreTrace"
     compatibility_evidence: Tuple[str, ...] = ()
@@ -199,6 +200,7 @@ class RecommendationScoreTrace:
     observed_outcome_count: int
     pool_yield_prior_pct: Optional[float]
     definition_versions: Dict[str, str]
+    ranking_profile: str = "default"
 
 
 @dataclass(frozen=True)
@@ -211,6 +213,7 @@ class GenericRecommendationResult:
     named_family: Optional[str] = None
     transformation_class: Optional[str] = None
     retrieval_definition_version: str = ""
+    retrieval_strategy: str = "hybrid"
     retrieval_level: Optional[str] = None
     candidate_count: int = 0
     independent_candidate_count: int = 0
@@ -221,7 +224,7 @@ class GenericRecommendationResult:
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.3"
+    schema_version: str = "1.5"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

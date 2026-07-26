@@ -1,10 +1,21 @@
 import csv
 import json
 
+import condition_recommender.conversion.generic as generic_module
 from condition_recommender.conversion.engine import convert_datasets
-from condition_recommender.conversion.generic import convert_record
+from condition_recommender.conversion.generic import (
+    GenericConversionCache,
+    convert_record,
+)
 from condition_recommender.conversion.input_schema import adapt_row
-from condition_recommender.generic_indexing import build_generic_index
+from condition_recommender.conversion.sharded import (
+    convert_datasets_sharded,
+    validate_sharded_conversion,
+)
+from condition_recommender.generic_indexing import (
+    build_generic_index,
+    load_generic_index,
+)
 from condition_recommender.models import (
     AdmissionTier,
     ChemistryStatus,
@@ -96,6 +107,25 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
     assert record.resolved_recipe_core_id.startswith("RCORE1:")
     assert record.reference_condition_series_id.startswith("RCS1:")
+
+
+def test_conversion_cache_reuses_deterministic_reaction_analysis(
+    monkeypatch,
+) -> None:
+    reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+    original = generic_module.featurize_reaction
+    calls = []
+
+    def counted(value):
+        calls.append(value)
+        return original(value)
+
+    monkeypatch.setattr(generic_module, "featurize_reaction", counted)
+    cache = GenericConversionCache()
+    convert_record(_raw(reaction, reaction_id="first"), cache=cache)
+    convert_record(_raw(reaction, reaction_id="second"), cache=cache)
+
+    assert calls == [reaction]
 
 
 def test_mapped_unknown_family_signature_is_verified() -> None:
@@ -297,3 +327,59 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
         "unimolecular": 1,
     }
     assert (output / "conversion_report.md").exists()
+
+
+def test_sharded_conversion_is_restartable_and_integrity_checked(
+    tmp_path,
+) -> None:
+    dataset = tmp_path / "mixed.csv"
+    reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+    rows = [
+        _csv_row(
+            f"reaction-{index}",
+            reaction,
+            reaction_type="untrusted",
+        )
+        for index in range(4)
+    ]
+    with dataset.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    output = tmp_path / "sharded"
+
+    first = convert_datasets_sharded(
+        dataset,
+        output,
+        shard_size=2,
+        mode="test",
+        workers=2,
+    )
+    first_catalog = (output / "recipe_catalog.jsonl.gz").read_bytes()
+    second = convert_datasets_sharded(dataset, output, shard_size=2, mode="test")
+
+    assert first["shard_count"] == 2
+    assert first["output_row_count"] == 4
+    assert first["index_eligibility_counts"] == {"eligible": 4}
+    assert first["transformation_class_counts"] == {
+        "c_c_transfer_coupling": 4
+    }
+    assert first["named_family_counts"] == {"suzuki_miyaura": 4}
+    assert first["integrity"]["valid"]
+    assert second["reused_shard_count"] == 2
+    assert (output / "recipe_catalog.jsonl.gz").read_bytes() == first_catalog
+    assert len(load_generic_index(output / "records.jsonl.gz").rows) == 4
+    assert len(load_generic_index(output / "shard_manifest.json").rows) == 4
+
+    manifest = json.loads((output / "shard_manifest.json").read_text())
+    first_shard = output / manifest["shards"][0]["output_path"]
+    first_shard.write_bytes(first_shard.read_bytes() + b"tamper")
+    integrity = validate_sharded_conversion(
+        output / "shard_manifest.json",
+        verify_rows=False,
+    )
+    assert not integrity["valid"]
+    assert any(
+        issue.startswith("output_checksum_mismatch")
+        for issue in integrity["issues"]
+    )

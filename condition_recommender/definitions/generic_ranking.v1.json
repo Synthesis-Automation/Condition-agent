@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "definition_id": "generic_ranking.v1",
-  "calibration_status": "uncalibrated_pilot",
+  "calibration_status": "calibrated_sample_v1",
   "maximum_independent_neighbors": 50,
   "yield_prior_strength": 3.0,
   "minimum_similarity_yield_weight": 0.05,
@@ -12,12 +12,37 @@
   },
   "missing_yield_policy": "renormalize_available_components",
   "weights": {
-    "similarity": 0.50,
-    "yield": 0.20,
-    "independent_support": 0.08,
-    "reaction_breadth": 0.04,
-    "dataset_diversity": 0.03,
-    "compatibility": 0.10,
-    "condition_certainty": 0.05
+    "similarity": 0.45,
+    "yield": 0.15,
+    "independent_support": 0.15,
+    "reaction_breadth": 0.08,
+    "dataset_diversity": 0.05,
+    "compatibility": 0.08,
+    "condition_certainty": 0.04
+  },
+  "evaluation_baseline_weights": {
+    "transformation_prior": {
+      "similarity": 0.00,
+      "yield": 0.10,
+      "independent_support": 0.35,
+      "reaction_breadth": 0.20,
+      "dataset_diversity": 0.10,
+      "compatibility": 0.15,
+      "condition_certainty": 0.10
+    },
+    "legacy_pilot": {
+      "similarity": 0.65,
+      "yield": 0.20,
+      "independent_support": 0.10,
+      "reaction_breadth": 0.00,
+      "dataset_diversity": 0.00,
+      "compatibility": 0.05,
+      "condition_certainty": 0.00
+    }
+  },
+  "calibrated_minimum_pool_size": 2,
+  "calibration_provenance": {
+    "definition_id": "generic_calibration.v1",
+    "selected_candidate_id": "support_heavy_min2"
   }
 }

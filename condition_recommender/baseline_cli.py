@@ -1,21 +1,19 @@
-"""CLI for canonical-reaction-group held-out recommendation evaluation."""
+"""CLI for leakage-safe generic recommendation baseline comparisons."""
 
 from __future__ import annotations
 
 import argparse
 import json
 
-from .evaluation import evaluate_generic_index
+from .evaluation import compare_generic_baselines
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Evaluate generic recommendation without reaction leakage"
+        description="Compare generic retrieval baselines on one held-out split"
     )
-    parser.add_argument(
-        "records_path", help="Canonical records.jsonl or persisted generic index"
-    )
-    parser.add_argument("output_dir", help="Destination for evaluation artifacts")
+    parser.add_argument("records_path")
+    parser.add_argument("output_dir")
     parser.add_argument("--test-fraction", type=float, default=0.2)
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--top-k", type=int, default=5)
@@ -30,19 +28,8 @@ def main() -> None:
         ),
         default="grouped_random",
     )
-    parser.add_argument(
-        "--retrieval-strategy",
-        choices=(
-            "hybrid",
-            "family_only",
-            "generic_only",
-            "transformation_prior",
-            "legacy_pilot",
-        ),
-        default="hybrid",
-    )
     args = parser.parse_args()
-    report = evaluate_generic_index(
+    report = compare_generic_baselines(
         args.records_path,
         args.output_dir,
         test_fraction=args.test_fraction,
@@ -50,7 +37,6 @@ def main() -> None:
         top_k=args.top_k,
         minimum_pool_size=args.minimum_pool_size,
         split_mode=args.split_mode,
-        retrieval_strategy=args.retrieval_strategy,
     )
     print(json.dumps(report, indent=2, ensure_ascii=False))
 

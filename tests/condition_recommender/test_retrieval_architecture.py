@@ -16,3 +16,7 @@ def test_suzuki_specific_structural_retrieval_is_removed() -> None:
     assert find_spec("condition_recommender.retrieval") is None
     assert find_spec("condition_recommender.similarity") is not None
     assert find_spec("condition_recommender.recipe_ranking") is not None
+    assert find_spec("condition_recommender.calibration") is not None
+    assert find_spec("condition_recommender.chemist_review") is not None
+    assert find_spec("condition_recommender.conversion.sharded") is not None
+    assert find_spec("condition_recommender.release_validation") is not None

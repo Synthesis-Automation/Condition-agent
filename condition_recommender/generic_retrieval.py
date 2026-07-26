@@ -6,7 +6,7 @@ import json
 from dataclasses import dataclass, replace
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Mapping, Tuple
+from typing import Any, Dict, Literal, Mapping, Tuple
 
 from .compatibility import CompatibilityAssessment, filter_compatible_precedents
 from .generic_indexing import GenericIndexedReaction, GenericReactionIndex
@@ -24,12 +24,31 @@ _SUPPORTED_RETRIEVAL_LEVELS = {
     "environment_neighbors",
     "bond_edit_signature",
 }
+RetrievalStrategy = Literal[
+    "hybrid",
+    "family_only",
+    "generic_only",
+    "transformation_prior",
+    "legacy_pilot",
+]
+_EVALUATION_STRATEGIES = {
+    "family_only",
+    "generic_only",
+    "transformation_prior",
+    "legacy_pilot",
+}
 
 
 @lru_cache(maxsize=1)
 def load_generic_retrieval_rules() -> Dict[str, Any]:
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
+    if str(rules.get("schema_version") or "") != "1.5":
+        raise ValueError("unsupported generic retrieval definition schema")
+    if str(rules.get("definition_id") or "") != "generic_retrieval.v1":
+        raise ValueError("unexpected generic retrieval definition ID")
+    if not str(rules.get("calibration_status") or "").strip():
+        raise ValueError("generic retrieval definition requires calibration status")
     ladder = tuple(str(value) for value in rules.get("retrieval_ladder") or ())
     if (
         not ladder
@@ -37,6 +56,21 @@ def load_generic_retrieval_rules() -> Dict[str, Any]:
         or set(ladder) != _SUPPORTED_RETRIEVAL_LEVELS
     ):
         raise ValueError("generic retrieval ladder is incomplete or invalid")
+    evaluation_ladders = rules.get("evaluation_ladders")
+    if not isinstance(evaluation_ladders, Mapping) or set(
+        evaluation_ladders
+    ) != _EVALUATION_STRATEGIES:
+        raise ValueError("generic retrieval evaluation ladders are incomplete")
+    for strategy, values in evaluation_ladders.items():
+        strategy_ladder = tuple(str(value) for value in values or ())
+        if (
+            not strategy_ladder
+            or len(set(strategy_ladder)) != len(strategy_ladder)
+            or not set(strategy_ladder) <= _SUPPORTED_RETRIEVAL_LEVELS
+        ):
+            raise ValueError(
+                f"generic retrieval evaluation ladder is invalid: {strategy}"
+            )
     if int(rules["environment_neighbor_limit"]) < 1:
         raise ValueError("environment_neighbor_limit must be positive")
     environment_threshold = float(rules["environment_neighbor_min_similarity"])
@@ -59,7 +93,10 @@ def _compatible_edit_positions(
 
 
 def _candidate_levels(
-    signature: Mapping[str, Any], index: GenericReactionIndex
+    signature: Mapping[str, Any],
+    index: GenericReactionIndex,
+    *,
+    strategy: RetrievalStrategy = "hybrid",
 ) -> list[tuple[str, set[int]]]:
     compatible = _compatible_edit_positions(signature, index)
     if not compatible:
@@ -95,10 +132,14 @@ def _candidate_levels(
         ),
         "bond_edit_signature": compatible,
     }
-    return [
-        (level, candidates[level])
-        for level in rules["retrieval_ladder"]
-    ]
+    ladder = (
+        rules["retrieval_ladder"]
+        if strategy == "hybrid"
+        else (rules["evaluation_ladders"] or {}).get(strategy)
+    )
+    if not ladder:
+        raise ValueError(f"Unsupported generic retrieval strategy: {strategy}")
+    return [(level, candidates[level]) for level in ladder]
 
 
 def _environment_neighbor_positions(
@@ -152,6 +193,7 @@ def retrieve_generic_pool_with_trace(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    strategy: RetrievalStrategy = "hybrid",
 ) -> tuple[
     str,
     Tuple[GenericIndexedReaction, ...],
@@ -172,7 +214,7 @@ def retrieve_generic_pool_with_trace(
             status="no_compatible_bond_edit",
         )
         return "no_compatible_bond_edit", (), (trace,)
-    levels = _candidate_levels(signature, index)
+    levels = _candidate_levels(signature, index, strategy=strategy)
     fallback: tuple[str, set[int], int] | None = None
     traces = []
     for level, positions in levels:
@@ -234,12 +276,14 @@ def retrieve_generic_pool(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    strategy: RetrievalStrategy = "hybrid",
 ) -> Tuple[str, Tuple[GenericIndexedReaction, ...]]:
     """Compatibility wrapper returning the historical two-value result."""
     level, rows, _ = retrieve_generic_pool_with_trace(
         signature,
         index,
         minimum_pool_size=minimum_pool_size,
+        strategy=strategy,
     )
     return level, rows
 
@@ -262,10 +306,11 @@ def retrieve_compatible_generic_pool_with_trace(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    strategy: RetrievalStrategy = "hybrid",
 ) -> CompatibleRetrievalResult:
     """Apply compatibility before independent-support checks at every tier."""
     minimum = _minimum_support(minimum_pool_size)
-    levels = _candidate_levels(signature, index)
+    levels = _candidate_levels(signature, index, strategy=strategy)
     if not levels:
         trace = RetrievalLevelTrace(
             level="bond_edit_gate",
@@ -393,6 +438,7 @@ def retrieve_compatible_generic_pool(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    strategy: RetrievalStrategy = "hybrid",
 ) -> tuple[
     str,
     tuple[tuple[GenericIndexedReaction, CompatibilityAssessment], ...],
@@ -404,6 +450,7 @@ def retrieve_compatible_generic_pool(
         signature,
         index,
         minimum_pool_size=minimum_pool_size,
+        strategy=strategy,
     )
     return (
         result.level,
@@ -416,6 +463,7 @@ def retrieve_compatible_generic_pool(
 __all__ = [
     "generic_signature_similarity",
     "CompatibleRetrievalResult",
+    "RetrievalStrategy",
     "load_generic_retrieval_rules",
     "reaction_scope",
     "retrieve_compatible_generic_pool",

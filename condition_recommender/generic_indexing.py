@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import json
 import hashlib
-from collections import defaultdict
+import gzip
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -19,10 +20,11 @@ from .models import (
     GENERIC_CONVERTER_DEFINITION_VERSION,
     RECOMMENDATION_RECORD_SCHEMA_VERSION,
 )
+from .evaluation_features import reaction_scaffold_key, reaction_scaffold_tokens
 from .signature_features import environment_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "1.4"
+GENERIC_INDEX_SCHEMA_VERSION = "1.5"
 
 
 @dataclass(frozen=True)
@@ -36,7 +38,10 @@ class GenericIndexedReaction:
     yield_pct: Optional[float]
     source_dataset: str
     reference_id: str
+    publication_year: Optional[int]
     reference_condition_series_id: str
+    scaffold_key: str
+    scaffold_tokens: Tuple[str, ...]
     signature: Dict[str, Any]
     recipe_id: str
     recipe_core_id: str
@@ -245,8 +250,24 @@ def build_generic_index(
                 yield_pct=yield_pct,
                 source_dataset=str(record.get("source_dataset") or ""),
                 reference_id=str(record.get("reference_id") or ""),
+                publication_year=(
+                    int((record.get("reference_identity") or {})["publication_year"])
+                    if (record.get("reference_identity") or {}).get(
+                        "publication_year"
+                    )
+                    is not None
+                    else None
+                ),
                 reference_condition_series_id=str(
                     record.get("reference_condition_series_id") or ""
+                ),
+                scaffold_key=reaction_scaffold_key(
+                    str(record.get("reaction_smiles") or ""),
+                    signature,
+                ),
+                scaffold_tokens=reaction_scaffold_tokens(
+                    str(record.get("reaction_smiles") or ""),
+                    signature,
                 ),
                 signature=dict(signature),
                 recipe_id=recipe_id,
@@ -291,7 +312,10 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "yield_pct": row.yield_pct,
             "source_dataset": row.source_dataset,
             "reference_id": row.reference_id,
+            "publication_year": row.publication_year,
             "reference_condition_series_id": row.reference_condition_series_id,
+            "scaffold_key": row.scaffold_key,
+            "scaffold_tokens": row.scaffold_tokens,
             "signature": row.signature,
             "recipe_id": row.recipe_id,
             "recipe_core_id": row.recipe_core_id,
@@ -404,8 +428,17 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             ),
             source_dataset=str(row["source_dataset"]),
             reference_id=str(row.get("reference_id") or ""),
+            publication_year=(
+                int(row["publication_year"])
+                if row.get("publication_year") is not None
+                else None
+            ),
             reference_condition_series_id=str(
                 row.get("reference_condition_series_id") or ""
+            ),
+            scaffold_key=str(row.get("scaffold_key") or ""),
+            scaffold_tokens=tuple(
+                str(value) for value in row.get("scaffold_tokens") or ()
             ),
             signature=dict(row["signature"]),
             recipe_id=str(row["recipe_id"]),
@@ -472,22 +505,140 @@ def load_generic_index(
     """Load canonical JSONL output from the generic conversion engine."""
     source = Path(path)
     if source.suffix.casefold() == ".json":
+        if source.name == "shard_manifest.json":
+            from .conversion.sharded import (
+                iter_gzip_jsonl,
+                validate_sharded_conversion,
+            )
+
+            integrity = validate_sharded_conversion(source, verify_rows=False)
+            if not integrity["valid"]:
+                raise ValueError("Sharded conversion integrity check failed")
+            manifest = json.loads(source.read_text(encoding="utf-8"))
+            records = (
+                record
+                for entry in manifest.get("shards") or ()
+                for record in iter_gzip_jsonl(source.parent / entry["output_path"])
+            )
+            return build_generic_index(records, include_review=include_review)
         return load_persisted_generic_index(source)
-    records = []
-    with source.open("r", encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            try:
-                value = json.loads(line)
-            except json.JSONDecodeError as exc:
-                raise ValueError(
-                    f"Invalid JSONL at line {line_number}: {exc.msg}"
-                ) from exc
-            if not isinstance(value, dict):
-                raise ValueError(f"JSONL line {line_number} is not an object")
-            records.append(value)
-    return build_generic_index(records, include_review=include_review)
+    opener = gzip.open if source.suffix.casefold() == ".gz" else Path.open
+    open_arguments = (
+        {"mode": "rt", "encoding": "utf-8"}
+        if source.suffix.casefold() == ".gz"
+        else {"mode": "r", "encoding": "utf-8"}
+    )
+
+    def records() -> Iterable[Dict[str, Any]]:
+        with opener(source, **open_arguments) as handle:
+            for line_number, line in enumerate(handle, start=1):
+                if not line.strip():
+                    continue
+                try:
+                    value = json.loads(line)
+                except json.JSONDecodeError as exc:
+                    raise ValueError(
+                        f"Invalid JSONL at line {line_number}: {exc.msg}"
+                    ) from exc
+                if not isinstance(value, dict):
+                    raise ValueError(f"JSONL line {line_number} is not an object")
+                yield value
+
+    return build_generic_index(records(), include_review=include_review)
+
+
+def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
+    """Validate persisted map coverage, row identity, and recipe contracts."""
+    source = Path(path)
+    index = load_persisted_generic_index(source)
+    issues = []
+    row_count = len(index.rows)
+    observation_ids = [row.observation_id for row in index.rows]
+    duplicate_observation_count = len(observation_ids) - len(set(observation_ids))
+    if duplicate_observation_count:
+        issues.append("duplicate_observation_ids")
+    maps = {
+        "exact": (index.exact, "exact_signature_key"),
+        "handles": (index.handles, "handle_signature_key"),
+        "transformations": (
+            index.transformations,
+            "transformation_signature_key",
+        ),
+        "bond_edits": (index.bond_edits, "bond_edit_signature_key"),
+        "environments": (index.environments, "environment_signature_key"),
+    }
+    for name, (mapping, field) in maps.items():
+        for positions in mapping.values():
+            if any(position < 0 or position >= row_count for position in positions):
+                issues.append(f"out_of_range_position:{name}")
+        for position, row in enumerate(index.rows):
+            key = str(row.signature.get(field) or "")
+            if key and position not in mapping.get(key, ()):
+                issues.append(f"missing_reverse_mapping:{name}")
+    for position, row in enumerate(index.rows):
+        for token in set(environment_tokens(row.signature)):
+            if position not in index.environment_features.get(token, ()):
+                issues.append("missing_environment_feature_mapping")
+        if row.named_family and position not in index.families.get(
+            row.named_family, ()
+        ):
+            issues.append("missing_family_mapping")
+        if row.resolved_recipe.get("recipe_id") != row.recipe_id:
+            issues.append("recipe_identity_mismatch")
+        if (
+            row.resolved_recipe.get("recipe_core_id") or row.recipe_core_id
+        ) != row.recipe_core_id:
+            issues.append("recipe_core_identity_mismatch")
+    payload = json.loads(source.read_text(encoding="utf-8"))
+    report = {
+        "schema_version": "1.0",
+        "artifact_type": "generic_index_integrity",
+        "path": str(source),
+        "valid": not issues,
+        "issues": sorted(set(issues)),
+        "index_id": payload["index_id"],
+        "index_schema_version": payload["schema_version"],
+        "row_count": row_count,
+        "file_size_bytes": source.stat().st_size,
+        "duplicate_observation_count": duplicate_observation_count,
+        "key_counts": {
+            "exact": len(index.exact),
+            "handles": len(index.handles),
+            "transformations": len(index.transformations),
+            "bond_edits": len(index.bond_edits),
+            "environments": len(index.environments),
+            "environment_features": len(index.environment_features),
+            "families": len(index.families),
+        },
+        "transformation_class_counts": dict(
+            sorted(Counter(row.transformation_class for row in index.rows).items())
+        ),
+        "named_family_counts": dict(
+            sorted(
+                Counter(row.named_family or "unnamed" for row in index.rows).items()
+            )
+        ),
+        "reaction_scope_counts": dict(
+            sorted(
+                Counter(
+                    str(
+                        (row.signature.get("topology") or {}).get(
+                            "reaction_scope"
+                        )
+                        or "unknown"
+                    )
+                    for row in index.rows
+                ).items()
+            )
+        ),
+        "unique_reference_count": len(
+            {row.reference_id for row in index.rows if row.reference_id}
+        ),
+        "unique_recipe_core_count": len(
+            {row.recipe_core_id for row in index.rows}
+        ),
+    }
+    return report
 
 
 __all__ = [
@@ -498,4 +649,5 @@ __all__ = [
     "load_generic_index",
     "load_persisted_generic_index",
     "save_generic_index",
+    "validate_generic_index_artifact",
 ]

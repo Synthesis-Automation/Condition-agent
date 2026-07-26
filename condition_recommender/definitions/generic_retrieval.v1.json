@@ -1,7 +1,8 @@
 {
-  "schema_version": "1.4",
+  "schema_version": "1.5",
   "definition_id": "generic_retrieval.v1",
-  "minimum_pool_size": 3,
+  "calibration_status": "calibrated_sample_v1",
+  "minimum_pool_size": 2,
   "high_confidence_family_threshold": 0.9,
   "environment_neighbor_min_similarity": 0.5,
   "environment_neighbor_limit": 50,
@@ -12,5 +13,31 @@
     "transformation_signature",
     "environment_neighbors",
     "bond_edit_signature"
-  ]
+  ],
+  "evaluation_ladders": {
+    "family_only": [
+      "named_family"
+    ],
+    "generic_only": [
+      "exact_signature",
+      "handle_signature",
+      "transformation_signature",
+      "environment_neighbors",
+      "bond_edit_signature"
+    ],
+    "transformation_prior": [
+      "transformation_signature"
+    ],
+    "legacy_pilot": [
+      "exact_signature",
+      "handle_signature",
+      "named_family",
+      "transformation_signature",
+      "bond_edit_signature"
+    ]
+  },
+  "calibration_provenance": {
+    "definition_id": "generic_calibration.v1",
+    "selected_candidate_id": "support_heavy_min2"
+  }
 }

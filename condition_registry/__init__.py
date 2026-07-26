@@ -23,7 +23,11 @@ from .recipes import (
     build_resolved_recipe_from_components,
     build_resolved_recipe_from_inputs,
 )
-from .vocabulary import ConditionDefinitionVocabulary, load_condition_vocabulary
+from .vocabulary import (
+    ConditionDefinitionVocabulary,
+    condition_registry_definition_versions,
+    load_condition_vocabulary,
+)
 from .template_loader import (
     get_recipe_template,
     load_recipe_template_set,
@@ -62,6 +66,7 @@ __all__ = [
     "build_resolved_recipe",
     "build_resolved_recipe_from_components",
     "build_resolved_recipe_from_inputs",
+    "condition_registry_definition_versions",
     "get_registry",
     "get_recipe_template",
     "load_recipe_template_set",

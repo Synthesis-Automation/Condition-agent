@@ -79,6 +79,8 @@ bucket vocabulary used when flattening, converting, and validating recipes.
 versioned registry definition for downstream validators. Adding a bucket, role,
 or family therefore has one registry-owned definition point and produces an
 explicit validation failure in stale consumers.
+`condition_registry_definition_versions()` exposes content-addressed
+definition identities for restartable conversion manifests.
 
 ## CLI tester
 

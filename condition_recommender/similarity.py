@@ -54,6 +54,8 @@ def _validated_similarity_weights(
         raise ValueError("unsupported generic similarity definition schema")
     if str(rules.get("definition_id") or "") != _DEFINITION_ID:
         raise ValueError("unexpected generic similarity definition ID")
+    if not str(rules.get("calibration_status") or "").strip():
+        raise ValueError("generic similarity definition requires calibration status")
     weights = rules.get("weights")
     if not isinstance(weights, Mapping) or set(weights) != set(_FEATURES):
         raise ValueError("generic similarity weights do not match feature vocabulary")

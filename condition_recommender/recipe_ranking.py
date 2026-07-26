@@ -60,14 +60,21 @@ def _validated_ranking_weights(
         raise ValueError("unexpected generic ranking definition ID")
     if not str(rules.get("calibration_status") or "").strip():
         raise ValueError("generic ranking definition requires calibration status")
-    weights = rules.get("weights")
-    if not isinstance(weights, Mapping) or set(weights) != set(_RANKING_COMPONENTS):
-        raise ValueError("generic ranking weights do not match component vocabulary")
-    normalized = {str(key): float(value) for key, value in weights.items()}
-    if any(value < 0.0 for value in normalized.values()):
-        raise ValueError("generic ranking weights must be non-negative")
-    if abs(sum(normalized.values()) - 1.0) > 1e-9:
-        raise ValueError("generic ranking weights must sum to one")
+    normalized = _normalize_component_weights(
+        rules.get("weights"),
+        label="generic ranking",
+    )
+    baseline_weights = rules.get("evaluation_baseline_weights")
+    if not isinstance(baseline_weights, Mapping) or set(baseline_weights) != {
+        "transformation_prior",
+        "legacy_pilot",
+    }:
+        raise ValueError("generic ranking baseline profiles are incomplete")
+    for profile, weights in baseline_weights.items():
+        _normalize_component_weights(
+            weights,
+            label=f"generic ranking baseline {profile}",
+        )
     if rules.get("missing_yield_policy") != "renormalize_available_components":
         raise ValueError("unsupported generic ranking missing-yield policy")
     if int(rules["maximum_independent_neighbors"]) < 1:
@@ -87,6 +94,21 @@ def _validated_ranking_weights(
         for name in ("independent_evidence", "canonical_reactions", "datasets")
     ):
         raise ValueError("generic ranking support saturation must be positive")
+    return normalized
+
+
+def _normalize_component_weights(
+    weights: Any,
+    *,
+    label: str,
+) -> Dict[str, float]:
+    if not isinstance(weights, Mapping) or set(weights) != set(_RANKING_COMPONENTS):
+        raise ValueError(f"{label} weights do not match component vocabulary")
+    normalized = {str(key): float(value) for key, value in weights.items()}
+    if any(value < 0.0 for value in normalized.values()):
+        raise ValueError(f"{label} weights must be non-negative")
+    if abs(sum(normalized.values()) - 1.0) > 1e-9:
+        raise ValueError(f"{label} weights must sum to one")
     return normalized
 
 
@@ -198,10 +220,13 @@ def _weighted_score(
         else 0.0
         for name in _RANKING_COMPONENTS
     }
+    rounded_contributions = {
+        name: round(contributions[name], 6) for name in _RANKING_COMPONENTS
+    }
     return (
-        sum(contributions.values()),
+        round(sum(rounded_contributions.values()), 6),
         {name: round(applied[name], 6) for name in _RANKING_COMPONENTS},
-        {name: round(contributions[name], 6) for name in _RANKING_COMPONENTS},
+        rounded_contributions,
     )
 
 
@@ -258,9 +283,26 @@ def rank_condition_recipes(
     *,
     retrieval_level: str,
     top_k: int,
+    ranking_profile: str = "default",
+    ranking_weights: Optional[Mapping[str, float]] = None,
 ) -> Tuple[GenericConditionRecommendation, ...]:
     """Aggregate recipe cores and rank them with a complete score trace."""
     rules = load_generic_ranking_rules()
+    if ranking_weights is not None:
+        ranking_weights = _normalize_component_weights(
+            ranking_weights,
+            label=f"generic ranking override {ranking_profile}",
+        )
+    elif ranking_profile == "default":
+        ranking_weights = rules["weights"]
+    else:
+        profiles = rules.get("evaluation_baseline_weights") or {}
+        if ranking_profile not in profiles:
+            raise ValueError(f"Unsupported ranking profile: {ranking_profile}")
+        ranking_weights = _normalize_component_weights(
+            profiles[ranking_profile],
+            label=f"generic ranking baseline {ranking_profile}",
+        )
     scored = [
         ScoredPrecedent(
             similarity=assess_signature_similarity(query, row.signature),
@@ -332,7 +374,7 @@ def rank_condition_recipes(
         }
         score, applied_weights, ranking_contributions = _weighted_score(
             components,
-            rules["weights"],
+            ranking_weights,
         )
         similarity_components, similarity_contributions = (
             _mean_similarity_trace(independent)
@@ -462,6 +504,7 @@ def rank_condition_recipes(
                     best.compatibility.definition_version
                 ),
             },
+            ranking_profile=ranking_profile,
         )
         recommendations.append(
             GenericConditionRecommendation(
@@ -486,6 +529,15 @@ def rank_condition_recipes(
                 retrieval_level=retrieval_level,
                 precedent_reaction_ids=tuple(
                     member.row.reaction_id for member in members[:5]
+                ),
+                precedent_reference_ids=tuple(
+                    sorted(
+                        {
+                            member.row.reference_id
+                            for member in members
+                            if member.row.reference_id
+                        }
+                    )[:5]
                 ),
                 explanation=_explanation(
                     level=retrieval_level,

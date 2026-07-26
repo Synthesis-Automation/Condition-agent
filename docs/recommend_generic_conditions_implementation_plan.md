@@ -169,9 +169,34 @@ The fourth implementation slice now also provides:
 - an added acid/hydrolysis caution while preserving hard chemistry exclusions
   before similarity.
 
-Structured multi-stage assignment, reference condition inference, standalone
-catalogs, scaffold-aware evaluation, and ranking calibration remain
-pending.
+The fifth implementation slice now also provides:
+
+- generic index schema 1.5 with publication year and molecularly derived
+  reactive-partner scaffold tokens;
+- grouped-random, strict scaffold-disjoint, source-corpus-disjoint, and
+  forward-time evaluation modes;
+- family-only, generic-only, hybrid, transformation-prior, and legacy-pilot
+  baselines behind the same chemistry and compatibility gates;
+- metrics for abstention, variants, outcomes, uncertainty, explanation
+  completeness, independent support, transformation class, and evidence;
+- development-only calibration with a separate validation promotion gate;
+- the promoted `support_heavy_min2` ranking profile and minimum independent
+  support of two;
+- blind review packets with a chemist-readable HTML view, highlighted
+  structures, randomized candidates, unmarked unsuitable controls, blank
+  review fields, and a separate answer key;
+- post-review adjudication that refuses premature unblinding, checks exact
+  form/key candidate coverage, reports recommendation/control acceptance, and
+  binds independent reviewer sign-off to artifact hashes.
+
+The Phase 6 implementation foundation now also provides restartable parallel
+canonical JSONL-gzip shards, periodic manifest checkpoints, deterministic
+recipe/reference/series catalogs, source and artifact checksums, definition
+contracts, and conversion/index/release integrity validators.
+
+Structured multi-stage assignment and reference condition inference remain
+future conversion-quality improvements. Untouched-test and full-corpus
+execution remain gated by independent review of the generated chemist packet.
 
 The first local pilot artifacts use the documented default sizes: 500 smoke,
 5,000 development, 2,000 validation, and 2,000 untouched-test rows. Reference
@@ -192,8 +217,31 @@ zero reference/reaction-group leakage, covered all five queries, and returned
 zero hard-incompatible recommendations. None of the five held-out recipes
 occurred in training, so the observed zero top-k recipe recovery is not a
 ranking comparison; the 43.34 percentage-point yield MAE is likewise a
-small-sample diagnostic. The ranking definition remains explicitly marked
-`uncalibrated_pilot` and must not be tuned on this held-out slice.
+small-sample diagnostic. At that slice the ranking definition was marked
+`uncalibrated_pilot`; it was superseded only by the later development/validation
+calibration described below.
+
+The frozen sharded sample artifacts contain:
+
+- development: 5,000 converted rows, 534 index-eligible precedents, 347 recipe
+  cores, 390 references, and zero failed shards;
+- validation: 2,000 converted rows, 251 index-eligible precedents, 186 recipe
+  cores, 177 references, and zero failed shards.
+
+The selected profile improved mean development seen-recipe top-1 recovery from
+approximately 11.0% to 12.2%. On validation, selected and prior profiles both
+achieved 25% seen-recipe top-1 and 75% top-5 recovery, full coverage, and zero
+hard-incompatible recommendations. Strict scaffold-, source-, and time-disjoint
+validation also returned zero hard-incompatible recommendations. These remain
+sample-level measurements rather than broad production-accuracy claims.
+
+The blind packet at `results/generic_evaluation/v2/chemist_review/` contains
+111 cases, 428 randomized candidates, and one unsuitable control per case.
+Review `review_packet.html` and record decisions in `review_form.csv` without
+opening `answer_key.jsonl`. Once every decision is recorded, the adjudication
+command unblinds the packet and emits a provenance-bound `review_summary.json`.
+Untouched-test evaluation and full conversion remain gated until an independent
+chemist signs that summary with no unresolved systematic defect.
 
 ## 4. Source Corpus Profile
 
