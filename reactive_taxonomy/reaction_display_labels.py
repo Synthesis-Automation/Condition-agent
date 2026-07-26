@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from functools import lru_cache
 from pathlib import Path
@@ -10,6 +11,7 @@ from typing import Any, Iterable, Optional, Sequence, Tuple
 
 from .reaction_contextual_labels import ContextualTransformationLabel
 from .reaction_label_patterns import match_reaction_label_pattern
+from .reaction_labels import load_fragment_context_symbols
 from .reaction_models import (
     ReactionDisplayLabel,
     ReactionEdit,
@@ -27,7 +29,7 @@ def load_reaction_label_rendering() -> dict[str, Any]:
     """Load the versioned declarative edit-label rendering rules."""
     with _PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    if payload.get("schema_version") != "1.1":
+    if payload.get("schema_version") != "1.2":
         raise ValueError("Unsupported reaction-label rendering schema")
     return dict(payload)
 
@@ -228,6 +230,64 @@ def _event_labels(
     )
 
 
+def _render_fragment_indices(text: str, *, style: str) -> str:
+    """Render reaction-local generic fragment indices as Unicode superscripts."""
+    if style != "unicode":
+        return text
+    symbols = load_fragment_context_symbols()
+    if not symbols:
+        return text
+    symbol_pattern = "|".join(re.escape(symbol) for symbol in symbols)
+    superscript_digits = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+
+    def replace(match: re.Match[str]) -> str:
+        return match.group(1) + match.group(2).translate(superscript_digits)
+
+    return re.sub(rf"({symbol_pattern})([0-9]+)", replace, text)
+
+
+def _topology_context(
+    topology: Optional[ReactionTopology],
+    *,
+    rendering: dict[str, Any],
+) -> str:
+    """Render topology as secondary context rather than a leading phrase."""
+    if topology is None or topology.reaction_scope != "intramolecular":
+        return ""
+    templates = rendering["templates"]
+    if len(topology.formed_ring_sizes) == 1:
+        return str(templates["intramolecular_ring_context"]).format(
+            ring_size=topology.formed_ring_sizes[0]
+        )
+    return str(templates["intramolecular_context"])
+
+
+def _make_detailed_label_readable(
+    detailed: str,
+    *,
+    topology: Optional[ReactionTopology],
+    style: str,
+    rendering: dict[str, Any],
+) -> str:
+    """Put the transformation first and apply display-only fragment typography."""
+    context = _topology_context(topology, rendering=rendering)
+    if context:
+        scope_prefix = "intramolecular "
+        had_leading_scope = detailed.startswith(scope_prefix)
+        core = detailed[len(scope_prefix) :] if had_leading_scope else detailed
+        if had_leading_scope:
+            separator = _style(style)["separator"]
+            head, delimiter, tail = core.partition(separator)
+            detailed = (
+                f"{head}{separator}{context}{separator}{tail}"
+                if delimiter
+                else f"{head}{separator}{context}"
+            )
+        else:
+            detailed = f"{core}{_style(style)['separator']}{context}"
+    return _render_fragment_indices(detailed, style=style)
+
+
 def build_reaction_display_label(
     *,
     edits: Sequence[ReactionEdit],
@@ -323,11 +383,12 @@ def build_reaction_display_label(
             if concise.startswith(scope_prefix)
             else prefix + concise
         )
-        detailed = (
-            prefix + detailed[len(scope_prefix) :]
-            if detailed.startswith(scope_prefix)
-            else prefix + detailed
-        )
+    detailed = _make_detailed_label_readable(
+        detailed,
+        topology=topology,
+        style=style,
+        rendering=rendering,
+    )
     return ReactionDisplayLabel(
         concise=concise,
         detailed=detailed,

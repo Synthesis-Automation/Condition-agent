@@ -191,6 +191,20 @@ def load_reaction_rendering() -> Dict[str, Dict[str, Any]]:
 
 
 @lru_cache(maxsize=1)
+def load_fragment_context_symbols() -> tuple[str, ...]:
+    """Return generic fragment symbols that may receive reaction-local indices."""
+    indexing = (
+        _load_reaction_rendering_definition().get("fragment_indexing") or {}
+    )
+    symbols = {
+        str(symbol)
+        for symbol in (indexing.get("context_symbols") or {}).values()
+        if str(symbol)
+    }
+    return tuple(sorted(symbols, key=lambda value: (-len(value), value)))
+
+
+@lru_cache(maxsize=1)
 def load_product_context_precedence() -> tuple[str, ...]:
     return tuple(
         _load_reaction_rendering_definition().get("product_context_precedence") or ()
@@ -709,6 +723,7 @@ def render_reaction_label(
 
 
 __all__ = [
+    "load_fragment_context_symbols",
     "load_product_context_precedence",
     "load_reaction_rendering",
     "render_context_connection",

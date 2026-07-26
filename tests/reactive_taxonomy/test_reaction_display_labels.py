@@ -73,6 +73,46 @@ def test_exact_grammar_label_is_preserved_as_overlay() -> None:
     assert "N–H loss" in result.display_label.detailed
 
 
+def test_detailed_label_uses_superscript_fragment_indices() -> None:
+    result = featurize_reaction(
+        "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1"
+    )
+
+    assert result.reaction_label == "Ar1–Br + Ar2–OH → Ar1–O–Ar2"
+    assert result.display_label is not None
+    assert result.display_label.detailed == (
+        "Ar¹–Br + Ar²–OH → Ar¹–O–Ar²; edits: "
+        "C–Br bond cleavage; C–O bond formation; O–H loss"
+    )
+
+
+def test_detailed_label_puts_seven_membered_ring_context_after_transformation() -> None:
+    result = featurize_reaction(
+        "OCCCCc1ccccc1Br>>c1ccc2c(c1)CCCCO2"
+    )
+
+    assert result.reaction_label == (
+        "intramolecular (7-membered ring) Ar–Br / R–OH → Ar–O–R"
+    )
+    assert result.display_label is not None
+    assert result.display_label.detailed == (
+        "Ar–Br / R–OH → Ar–O–R; intramolecular (7-membered ring); "
+        "edits: C–Br bond cleavage; C–O bond formation; O–H loss"
+    )
+
+
+def test_ascii_detailed_label_keeps_plain_fragment_indices() -> None:
+    result = featurize_reaction(
+        "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1",
+        label_style="ascii",
+    )
+
+    assert result.display_label is not None
+    assert result.display_label.detailed.startswith(
+        "Ar1-Br + Ar2-OH -> Ar1-O-Ar2; edits:"
+    )
+
+
 def test_conflicting_evidence_is_visible_in_label_contract() -> None:
     reaction = (
         "[Br:1][c:2]1[cH:3][cH:4][cH:5][cH:6][cH:7]1."
@@ -160,8 +200,8 @@ def test_reaction_label_definition_is_versioned() -> None:
     rendering = load_reaction_label_rendering()
     patterns = load_reaction_label_patterns()
 
-    assert rendering["schema_version"] == "1.1"
-    assert rendering["label_schema_version"] == "1.1"
+    assert rendering["schema_version"] == "1.2"
+    assert rendering["label_schema_version"] == "1.2"
     assert patterns["schema_version"] == "1.0"
     assert {pattern["id"] for pattern in patterns["patterns"]} >= {
         "substitution",
