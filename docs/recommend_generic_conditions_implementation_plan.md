@@ -132,9 +132,46 @@ The second implementation slice now also provides:
   separately;
 - publication-level deduplication for similarity and outcome aggregation.
 
-Corrected environment retrieval, structured multi-stage assignment, reference
-condition inference, standalone catalogs, scaffold-aware evaluation, and
-ranking extraction/calibration remain pending.
+The third implementation slice now also provides:
+
+- a definition-ordered retrieval ladder with validated configuration;
+- local-environment neighbor narrowing inside the hard-compatible bond-edit
+  pool, before the broad bond-edit fallback;
+- a persisted inverted environment-feature map in generic index schema 1.4, so
+  neighbor selection does not scan unrelated bond-edit precedents;
+- minimum-support decisions based on independent references, or canonical
+  reactions when a reference is unavailable;
+- a typed per-tier retrieval trace containing row, independent-support,
+  compatibility, exclusion, and selection counts;
+- a reusable `GenericConditionRecommender` that loads and validates a persisted
+  index once for repeated runtime queries;
+- evaluation-case serialization of independent counts and retrieval traces.
+
+The fourth implementation slice now also provides:
+
+- separate, validated `generic_similarity.v1` and `generic_ranking.v1`
+  definitions, leaving retrieval configuration responsible only for pool
+  selection;
+- focused similarity and recipe-ranking modules with no aggregation logic in
+  the application-facing orchestration layer;
+- a complete score trace containing structural feature values, weighted
+  contributions, ranking components, applied weights, definition versions,
+  independent evidence counts, and usable outcome counts;
+- reference-aware evidence deduplication plus saturating support, reaction
+  breadth, and dataset-diversity terms, so repeated examples from one
+  publication do not act as independent confirmations;
+- explicit omission and weight renormalization when a recipe has no usable
+  yield evidence;
+- a centralized registry-owned recipe-component vocabulary used by conversion
+  and compatibility validation;
+- compatibility definition schema 1.1, validated against registry families,
+  component buckets, and taxonomy spectator tags;
+- an added acid/hydrolysis caution while preserving hard chemistry exclusions
+  before similarity.
+
+Structured multi-stage assignment, reference condition inference, standalone
+catalogs, scaffold-aware evaluation, and ranking calibration remain
+pending.
 
 The first local pilot artifacts use the documented default sizes: 500 smoke,
 5,000 development, 2,000 validation, and 2,000 untouched-test rows. Reference
@@ -148,6 +185,15 @@ separately from chemistry and condition usability. These are diagnostic
 coverage measurements, not production performance claims. The first smoke run
 also exposed and fixed a mixed-edit sorting defect in the conserved-scaffold
 fallback, now covered by a deterministic regression.
+
+The Phase 4 grouped smoke diagnostic used the 24 index-eligible precedents with
+19 train rows and 5 test rows across disjoint connected groups. It produced
+zero reference/reaction-group leakage, covered all five queries, and returned
+zero hard-incompatible recommendations. None of the five held-out recipes
+occurred in training, so the observed zero top-k recipe recovery is not a
+ranking comparison; the 43.34 percentage-point yield MAE is likewise a
+small-sample diagnostic. The ranking definition remains explicitly marked
+`uncalibrated_pilot` and must not be tuned on this held-out slice.
 
 ## 4. Source Corpus Profile
 

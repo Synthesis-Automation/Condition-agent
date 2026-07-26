@@ -1,19 +1,39 @@
 from pathlib import Path
 
+import pytest
+
 from reactive_taxonomy import (
     REACTION_SIGNATURE_SCHEMA_VERSION,
     reaction_signature_definition_versions,
 )
 
-from condition_recommender import recommend_generic_conditions
+from condition_recommender import (
+    GenericConditionRecommender,
+    recommend_generic_conditions,
+)
+import condition_recommender.generic_api as generic_api_module
 from condition_recommender.conversion.engine import convert_datasets
 from condition_recommender.generic_api import recommend_indexed_signature
-from condition_recommender.generic_indexing import build_generic_index
+from condition_recommender.generic_indexing import (
+    build_generic_index,
+    save_generic_index,
+)
 from condition_recommender.generic_retrieval import (
     generic_signature_similarity,
     load_generic_retrieval_rules,
     retrieve_compatible_generic_pool,
+    retrieve_compatible_generic_pool_with_trace,
     retrieve_generic_pool,
+    retrieve_generic_pool_with_trace,
+)
+from condition_recommender.recipe_ranking import (
+    load_generic_ranking_rules,
+    validate_generic_ranking_rules,
+)
+from condition_recommender.similarity import (
+    assess_signature_similarity,
+    load_generic_similarity_rules,
+    validate_generic_similarity_rules,
 )
 
 
@@ -236,6 +256,124 @@ def test_compatibility_exclusion_continues_to_relaxed_tier() -> None:
     assert raw_count == 4
     assert excluded_count == 1
 
+    traced = retrieve_compatible_generic_pool_with_trace(
+        query,
+        build_generic_index([unsafe, *safe_records]),
+        minimum_pool_size=2,
+    )
+    assert traced.level == "handle_signature"
+    assert traced.independent_candidate_count == 4
+    assert traced.independent_compatible_candidate_count == 3
+    assert traced.trace[-1].status == "selected"
+    assert traced.trace[-1].excluded_candidate_count == 1
+
+
+def test_support_threshold_counts_one_reference_once() -> None:
+    query = _signature("query")
+    records = [_record(index, _signature(str(index))) for index in range(3)]
+    for record in records:
+        record["reference_id"] = "REF1:one-paper"
+
+    level, rows, trace = retrieve_generic_pool_with_trace(
+        query,
+        build_generic_index(records),
+        minimum_pool_size=3,
+    )
+
+    assert level == "exact_signature_limited_support"
+    assert len(rows) == 3
+    exact = next(item for item in trace if item.level == "exact_signature")
+    assert exact.candidate_count == 3
+    assert exact.independent_candidate_count == 1
+    assert exact.status == "selected_limited_support"
+
+
+def test_environment_neighbors_narrow_the_bond_edit_pool() -> None:
+    query = _signature(
+        "query",
+        exact="query-exact",
+        handles="query-handles",
+        transformation="query-transformation",
+        family=None,
+    )
+    records = [
+        _record(
+            index,
+            _signature(
+                str(index),
+                exact=f"exact-{index}",
+                handles=f"handles-{index}",
+                transformation=f"transformation-{index}",
+                family=None,
+            ),
+        )
+        for index in range(4)
+    ]
+    records[-1]["reaction_signature"]["partners"][0]["steric"]["class"] = "crowded"
+    records[-1]["reaction_signature"]["partners"][0]["electronic"]["class"] = (
+        "electron_poor"
+    )
+    records[-1]["reaction_signature"]["partners"][1]["steric"]["class"] = "crowded"
+    records[-1]["reaction_signature"]["partners"][1]["electronic"]["class"] = (
+        "electron_poor"
+    )
+
+    level, pool, trace = retrieve_generic_pool_with_trace(
+        query,
+        build_generic_index(records),
+        minimum_pool_size=3,
+    )
+
+    assert level == "environment_neighbors"
+    assert len(pool) == 3
+    environment = next(
+        item for item in trace if item.level == "environment_neighbors"
+    )
+    assert environment.status == "selected"
+    assert environment.candidate_count == 3
+    assert all(item.level != "bond_edit_signature" for item in trace)
+
+
+def test_bond_edit_fallback_remains_reachable_without_environment_overlap() -> None:
+    query = _signature(
+        "query",
+        exact="query-exact",
+        handles="query-handles",
+        transformation="query-transformation",
+        family=None,
+    )
+    records = [
+        _record(
+            index,
+            _signature(
+                str(index),
+                exact=f"exact-{index}",
+                handles=f"handles-{index}",
+                transformation=f"transformation-{index}",
+                family=None,
+            ),
+        )
+        for index in range(3)
+    ]
+    for record in records:
+        for partner in record["reaction_signature"]["partners"]:
+            partner["steric"]["class"] = "crowded"
+            partner["electronic"]["class"] = "electron_poor"
+
+    level, pool, trace = retrieve_generic_pool_with_trace(
+        query,
+        build_generic_index(records),
+        minimum_pool_size=3,
+    )
+
+    assert level == "bond_edit_signature"
+    assert len(pool) == 3
+    assert next(
+        item for item in trace if item.level == "environment_neighbors"
+    ).status == "empty"
+    assert trace[-1].level == "bond_edit_signature"
+    assert trace[-1].status == "selected"
+
 
 def test_similarity_does_not_treat_missing_features_as_matches() -> None:
     score, components = generic_signature_similarity(
@@ -252,6 +390,14 @@ def test_similarity_does_not_treat_missing_features_as_matches() -> None:
     assert components["handles"] == 0.0
     assert components["environment"] == 0.0
     assert 0.0 < score < 1.0
+
+    assessment = assess_signature_similarity(
+        {"formed_bond_types": ["C-N:SINGLE"], "partners": []},
+        {"formed_bond_types": ["C-N:SINGLE"], "partners": []},
+    )
+    assert assessment.score == score
+    assert round(sum(assessment.contributions.values()), 6) == score
+    assert assessment.definition_version == "1.0"
 
 
 def test_similarity_prefers_matching_reaction_topology() -> None:
@@ -322,7 +468,8 @@ def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:
     )
 
     assert result.valid
-    assert result.retrieval_level == "bond_edit_signature"
+    assert result.retrieval_level == "environment_neighbors"
+    assert result.retrieval_definition_version == "1.4"
     assert "REACTION_TOPOLOGY_FALLBACK_USED" in result.warnings
     assert any(
         caution.startswith("Reaction-scope mismatch:")
@@ -373,13 +520,93 @@ def test_recommendation_can_report_unknown_expected_yield() -> None:
     )
 
     assert result.valid
-    assert result.recommendations[0].expected_yield_pct is None
+    recommendation = result.recommendations[0]
+    assert recommendation.expected_yield_pct is None
+    assert recommendation.score_trace.ranking_components["yield"] is None
+    assert recommendation.score_trace.applied_ranking_weights["yield"] == 0.0
+    assert round(
+        sum(recommendation.score_trace.ranking_contributions.values()),
+        6,
+    ) == recommendation.score
+    assert recommendation.score_trace.observed_outcome_count == 0
+    assert any("No usable yield evidence" in item for item in recommendation.cautions)
+
+
+def test_condition_uncertainty_is_an_explicit_ranking_component() -> None:
+    certain = _record(0, _signature("certain"))
+    uncertain = _record(1, _signature("uncertain"))
+    certain["yield_pct"] = uncertain["yield_pct"] = 75.0
+    uncertain["condition_resolution"] = {"has_uncertainty": True}
+
+    result = recommend_indexed_signature(
+        _signature("query"),
+        build_generic_index([certain, uncertain]),
+        minimum_pool_size=1,
+    )
+
+    assert result.valid
+    assert len(result.recommendations) == 2
+    assert result.recommendations[0].recipe_core_id == "RCORE1:0"
+    assert (
+        result.recommendations[0].score_trace.ranking_components[
+            "condition_certainty"
+        ]
+        == 1.0
+    )
+    assert (
+        result.recommendations[1].score_trace.ranking_components[
+            "condition_certainty"
+        ]
+        == 0.0
+    )
 
 
 def test_generic_retrieval_weights_are_normalized() -> None:
     rules = load_generic_retrieval_rules()
-    assert round(sum(rules["similarity_weights"].values()), 10) == 1.0
-    assert round(sum(rules["ranking_weights"].values()), 10) == 1.0
+    similarity = load_generic_similarity_rules()
+    ranking = load_generic_ranking_rules()
+    assert round(sum(similarity["weights"].values()), 10) == 1.0
+    assert round(sum(ranking["weights"].values()), 10) == 1.0
+    assert rules["retrieval_ladder"][-2:] == [
+        "environment_neighbors",
+        "bond_edit_signature",
+    ]
+
+
+def test_similarity_and_ranking_definitions_reject_stale_schemas() -> None:
+    similarity = {**load_generic_similarity_rules(), "schema_version": "stale"}
+    ranking = {**load_generic_ranking_rules(), "schema_version": "stale"}
+
+    with pytest.raises(ValueError, match="similarity definition schema"):
+        validate_generic_similarity_rules(similarity)
+    with pytest.raises(ValueError, match="ranking definition schema"):
+        validate_generic_ranking_rules(ranking)
+
+
+def test_preloaded_recommender_loads_the_index_once(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    path = tmp_path / "index.json"
+    save_generic_index(
+        build_generic_index([_record(1, _signature("one"))]),
+        path,
+    )
+    original_loader = generic_api_module.load_generic_index
+    calls = []
+
+    def counting_loader(source):
+        calls.append(str(source))
+        return original_loader(source)
+
+    monkeypatch.setattr(generic_api_module, "load_generic_index", counting_loader)
+    recommender = GenericConditionRecommender.from_path(path)
+    reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+
+    recommender.recommend(reaction, minimum_pool_size=1)
+    recommender.recommend(reaction, minimum_pool_size=1)
+
+    assert calls == [str(path)]
 
 
 def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
@@ -401,6 +628,8 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
+    assert result.schema_version == "1.3"
+    assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")
     assert result.recommendations[0].resolved_recipe["recipe_id"].startswith("RCR1:")

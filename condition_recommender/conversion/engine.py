@@ -9,6 +9,7 @@ from contextlib import ExitStack
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from condition_registry import CONDITION_RECIPE_COMPONENT_BUCKETS
 from reactive_taxonomy import REACTION_SIGNATURE_SCHEMA_VERSION
 
 from ..models import (
@@ -132,18 +133,7 @@ def convert_datasets(
                 )
                 if record.resolved_recipe_id:
                     resolved_recipe_counts[record.resolved_recipe_id] += 1
-                for bucket in (
-                    "catalysts",
-                    "ligands",
-                    "bases",
-                    "acids",
-                    "condensation_agents",
-                    "oxidants",
-                    "reductants",
-                    "additives",
-                    "solvents",
-                    "other_components",
-                ):
+                for bucket in CONDITION_RECIPE_COMPONENT_BUCKETS:
                     for component in (record.resolved_recipe or {}).get(bucket, ()):
                         role_bucket_counts[bucket] += 1
                         confidence = float(

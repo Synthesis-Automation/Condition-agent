@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "definition_id": "compatibility.v1",
   "hard_conflicts": [
     {
@@ -78,6 +78,14 @@
       "penalty_group": "hydrolysis",
       "penalty": 0.25,
       "message": "Water may compromise an unchanged hydrolysis-sensitive group"
+    },
+    {
+      "id": "hydrolysis_sensitive_with_acid",
+      "query_tags_any": ["hydrolysis_sensitive"],
+      "recipe_buckets_any": ["acids"],
+      "penalty_group": "hydrolysis",
+      "penalty": 0.18,
+      "message": "Acidic conditions may hydrolyze an unchanged hydrolysis-sensitive group"
     },
     {
       "id": "palladium_poisoning_with_pd_catalyst",

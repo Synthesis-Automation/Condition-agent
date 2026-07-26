@@ -19,9 +19,10 @@ from .models import (
     GENERIC_CONVERTER_DEFINITION_VERSION,
     RECOMMENDATION_RECORD_SCHEMA_VERSION,
 )
+from .signature_features import environment_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "1.3"
+GENERIC_INDEX_SCHEMA_VERSION = "1.4"
 
 
 @dataclass(frozen=True)
@@ -70,6 +71,7 @@ class GenericReactionIndex:
     transformations: Mapping[str, Tuple[int, ...]]
     bond_edits: Mapping[str, Tuple[int, ...]]
     environments: Mapping[str, Tuple[int, ...]]
+    environment_features: Mapping[str, Tuple[int, ...]]
     families: Mapping[str, Tuple[int, ...]]
     reaction_signature_schema_version: str
     taxonomy_definition_versions: Tuple[Tuple[str, str], ...]
@@ -171,6 +173,7 @@ def build_generic_index_from_rows(
         name: defaultdict(list) for name in _KEY_FIELDS
     }
     families: Dict[str, list[int]] = defaultdict(list)
+    environment_features: Dict[str, list[int]] = defaultdict(list)
     for position, row in enumerate(ordered):
         for name, field in _KEY_FIELDS.items():
             key = str(row.signature.get(field) or "")
@@ -178,6 +181,8 @@ def build_generic_index_from_rows(
                 maps[name][key].append(position)
         if row.named_family:
             families[row.named_family].append(position)
+        for token in set(environment_tokens(row.signature)):
+            environment_features[token].append(position)
     return GenericReactionIndex(
         rows=tuple(ordered),
         exact=_freeze(maps["exact"]),
@@ -185,6 +190,7 @@ def build_generic_index_from_rows(
         transformations=_freeze(maps["transformations"]),
         bond_edits=_freeze(maps["bond_edits"]),
         environments=_freeze(maps["environments"]),
+        environment_features=_freeze(environment_features),
         families=_freeze(families),
         reaction_signature_schema_version=signature_schema,
         taxonomy_definition_versions=definition_versions,
@@ -305,6 +311,7 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
         "transformations": dict(index.transformations),
         "bond_edits": dict(index.bond_edits),
         "environments": dict(index.environments),
+        "environment_features": dict(index.environment_features),
         "families": dict(index.families),
     }
     identity = json.dumps(
@@ -429,6 +436,10 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
         },
         environments={
             key: tuple(value) for key, value in (maps.get("environments") or {}).items()
+        },
+        environment_features={
+            key: tuple(value)
+            for key, value in (maps.get("environment_features") or {}).items()
         },
         families={
             key: tuple(value) for key, value in (maps.get("families") or {}).items()

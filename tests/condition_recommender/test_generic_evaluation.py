@@ -96,9 +96,10 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.3"
+    assert payload["schema_version"] == "1.4"
     assert payload["reaction_signature_schema_version"] == "1.3"
     assert payload["record_schema_versions"] == ["1.9"]
+    assert payload["maps"]["environment_features"]
 
 
 def test_index_rejects_stale_converted_records() -> None:
@@ -188,8 +189,20 @@ def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
     assert report["metrics"]["query_count"] == 3
     assert report["metrics"]["coverage_rate"] == 1.0
     assert report["metrics"]["hard_incompatible_recommendation_count"] == 0
+    assert report["schema_version"] == "1.2"
+    assert report["definition_versions"] == {
+        "compatibility": "1.1",
+        "retrieval": "1.4",
+        "similarity": "1.0",
+        "ranking": "1.0",
+    }
     assert (output / "evaluation_report.json").is_file()
-    assert len((output / "evaluation_cases.jsonl").read_text().splitlines()) == 3
+    cases = [
+        json.loads(line)
+        for line in (output / "evaluation_cases.jsonl").read_text().splitlines()
+    ]
+    assert len(cases) == 3
+    assert cases[0]["top_recommendation_score_trace"] is not None
 
 
 def test_grouped_split_validates_inputs() -> None:

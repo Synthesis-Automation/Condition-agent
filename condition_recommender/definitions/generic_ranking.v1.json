@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "generic_ranking.v1",
+  "calibration_status": "uncalibrated_pilot",
+  "maximum_independent_neighbors": 50,
+  "yield_prior_strength": 3.0,
+  "minimum_similarity_yield_weight": 0.05,
+  "support_saturation": {
+    "independent_evidence": 5,
+    "canonical_reactions": 10,
+    "datasets": 3
+  },
+  "missing_yield_policy": "renormalize_available_components",
+  "weights": {
+    "similarity": 0.50,
+    "yield": 0.20,
+    "independent_support": 0.08,
+    "reaction_breadth": 0.04,
+    "dataset_diversity": 0.03,
+    "compatibility": 0.10,
+    "condition_certainty": 0.05
+  }
+}

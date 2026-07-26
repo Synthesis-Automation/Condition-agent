@@ -73,6 +73,13 @@ warnings. Typed `ConditionComponentInput` values can use exact CAS, name, or
 stable substance-ID resolution; `ConditionProcessStage` preserves ordered
 multi-stage time/temperature programs.
 
+`CONDITION_RECIPE_COMPONENT_BUCKETS` is the single package-owned component
+bucket vocabulary used when flattening, converting, and validating recipes.
+`load_condition_vocabulary()` exposes immutable role and family IDs from the
+versioned registry definition for downstream validators. Adding a bucket, role,
+or family therefore has one registry-owned definition point and produces an
+explicit validation failure in stale consumers.
+
 ## CLI tester
 
 Run the built-in smoke checks:

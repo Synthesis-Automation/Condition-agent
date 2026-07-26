@@ -1,5 +1,6 @@
 from condition_registry import (
     get_registry,
+    load_condition_vocabulary,
     resolve_condition_components,
     resolve_substance,
     resolve_substance_id,
@@ -46,3 +47,11 @@ def test_registry_audit_reconciles_all_rows() -> None:
     assert report["total_rows"] == get_registry().size
     assert report["accepted_rows"] + report["issue_rows"] == report["total_rows"]
     assert report["issue_rows"] > 0
+
+
+def test_condition_vocabulary_is_immutable_and_versioned() -> None:
+    vocabulary = load_condition_vocabulary()
+
+    assert "metal_catalyst" in vocabulary.role_ids
+    assert "pd_zero_sources" in vocabulary.family_ids
+    assert vocabulary.schema_version == "roles_families.v1"

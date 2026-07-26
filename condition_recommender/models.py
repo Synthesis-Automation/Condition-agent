@@ -164,11 +164,41 @@ class GenericConditionRecommendation:
     retrieval_level: str
     precedent_reaction_ids: Tuple[str, ...]
     explanation: Tuple[str, ...]
+    score_trace: "RecommendationScoreTrace"
     compatibility_evidence: Tuple[str, ...] = ()
     cautions: Tuple[str, ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class RetrievalLevelTrace:
+    """One attempted retrieval tier with correlated support made explicit."""
+
+    level: str
+    candidate_count: int
+    independent_candidate_count: int
+    compatible_candidate_count: int
+    independent_compatible_candidate_count: int
+    excluded_candidate_count: int
+    minimum_independent_support: int
+    status: str
+
+
+@dataclass(frozen=True)
+class RecommendationScoreTrace:
+    """Auditable similarity, ranking, support, and outcome contributions."""
+
+    similarity_components: Dict[str, float]
+    similarity_contributions: Dict[str, float]
+    ranking_components: Dict[str, Optional[float]]
+    ranking_contributions: Dict[str, float]
+    applied_ranking_weights: Dict[str, float]
+    independent_evidence_count: int
+    observed_outcome_count: int
+    pool_yield_prior_pct: Optional[float]
+    definition_versions: Dict[str, str]
 
 
 @dataclass(frozen=True)
@@ -180,14 +210,18 @@ class GenericRecommendationResult:
     query_signature_id: Optional[str] = None
     named_family: Optional[str] = None
     transformation_class: Optional[str] = None
+    retrieval_definition_version: str = ""
     retrieval_level: Optional[str] = None
     candidate_count: int = 0
+    independent_candidate_count: int = 0
     compatible_candidate_count: int = 0
+    independent_compatible_candidate_count: int = 0
     excluded_candidate_count: int = 0
+    retrieval_trace: Tuple[RetrievalLevelTrace, ...] = ()
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.1"
+    schema_version: str = "1.3"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

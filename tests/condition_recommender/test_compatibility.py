@@ -1,9 +1,13 @@
+import copy
 from types import SimpleNamespace
+
+import pytest
 
 from condition_recommender.compatibility import (
     assess_recipe_compatibility,
     filter_compatible_precedents,
     load_compatibility_rules,
+    validate_compatibility_rules,
 )
 
 
@@ -72,6 +76,17 @@ def test_hot_water_uses_stronger_hydrolysis_penalty() -> None:
     assert ambient.penalty_ids == ("hydrolysis_sensitive_with_water",)
     assert hot.score == 0.6
     assert hot.penalty_ids == ("hydrolysis_sensitive_with_hot_water",)
+
+
+def test_acidic_conditions_penalize_hydrolysis_sensitive_spectators() -> None:
+    assessment = assess_recipe_compatibility(
+        _signature("hydrolysis_sensitive"),
+        _recipe(acids=[_component("mineral_acids", "acid")]),
+    )
+
+    assert assessment.compatible
+    assert assessment.score == 0.82
+    assert assessment.penalty_ids == ("hydrolysis_sensitive_with_acid",)
 
 
 def test_only_unchanged_spectator_tags_drive_compatibility() -> None:
@@ -182,3 +197,23 @@ def test_multi_event_family_requirements_apply_to_every_event() -> None:
     assert not missing.compatible
     assert missing.hard_conflicts == ("metal_coupling_requires_catalyst",)
     assert supplied.compatible
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("query_tags_any", ["invented_tag"], "query tags"),
+        ("recipe_buckets_any", ["invented_bucket"], "recipe buckets"),
+        ("recipe_family_ids_any", ["invented_family"], "recipe families"),
+    ),
+)
+def test_compatibility_definition_rejects_unknown_vocabulary(
+    field: str,
+    value: list[str],
+    message: str,
+) -> None:
+    rules = copy.deepcopy(load_compatibility_rules())
+    rules["hard_conflicts"][0][field] = value
+
+    with pytest.raises(ValueError, match=message):
+        validate_compatibility_rules(rules)

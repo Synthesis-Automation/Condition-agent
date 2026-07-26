@@ -279,15 +279,53 @@ python -m condition_recommender.generic_recommend_cli `
 
 Retrieval follows a chemistry hierarchy: exact signature, relaxed handle
 signature, high-confidence family, generic transformation, then compatible bond
-edits and environments. Hard bond-edit and recipe-compatibility gates run before
-similarity and aggregation.
+edits narrowed by local-environment neighbors, followed by a broad compatible
+bond-edit fallback. Hard bond-edit and recipe-compatibility gates run before
+similarity and aggregation. Minimum support is counted by independent
+publication, or by canonical reaction when no reference is available; repeated
+scope examples from one paper cannot satisfy the threshold by themselves.
 
 Results aggregate by canonical `RCORE1` recipe core and expose the observed
 `RCR1` operating-condition variants. Support distinguishes raw observations,
 canonical reactions, reference-local condition series, independent references,
 and datasets. Repeated rows from one publication contribute one evidence unit
 to similarity and yield aggregation. Expected yield is omitted when no usable
-outcomes support the recipe; it is never invented from missing values.
+outcomes support the recipe; it is never invented from missing values. In that
+case the unavailable yield term receives zero applied weight and the available
+ranking terms are renormalized.
+
+Generic configuration is split by responsibility:
+
+- `definitions/generic_retrieval.v1.json` selects the narrowest adequately
+  supported candidate pool;
+- `definitions/generic_similarity.v1.json` weights interpretable molecular
+  comparison features;
+- `definitions/generic_ranking.v1.json` combines similarity, compatibility,
+  condition certainty, outcome evidence, and reference-aware support.
+
+The ranking definition is currently marked `uncalibrated_pilot`. Its weights
+are explicit and testable, but they are not production calibration claims.
+
+Every result includes a typed retrieval trace. Each attempted tier reports raw
+rows, independent support units, compatibility-filtered rows, exclusions, the
+configured minimum support, and why the tier was selected or skipped.
+Each recommendation also includes a typed score trace with similarity feature
+values and contributions, ranking components and contributions, applied
+weights, definition versions, and evidence/outcome counts.
+
+For an application or batch process, load the validated index once:
+
+```python
+from condition_recommender import GenericConditionRecommender
+
+recommender = GenericConditionRecommender.from_path(
+    "results/generic_conversion/generic_index.json"
+)
+first = recommender.recommend("<reaction_smiles>")
+second = recommender.recommend("<another_reaction_smiles>")
+```
+
+`recommend_generic_conditions()` remains the convenient one-shot entry point.
 
 Reaction topology participates in the more specific signature tiers. A
 topology-agnostic fallback is allowed only with an explicit
@@ -423,7 +461,10 @@ Hard conflicts currently include explicit oxidation, reduction, acid, moisture,
 and atmosphere conflicts. Hydrolysis, acid/base, metal coordination, and
 catalyst-poisoning risks generally remain eligible with auditable penalties and
 cautions. Within one penalty category, only the strongest matching penalty is
-applied.
+applied. The definition loader validates query tags against
+`reactive_taxonomy`, and recipe buckets and family IDs against
+`condition_registry`, so a future taxonomy extension fails explicitly if the
+matching compatibility vocabulary is stale.
 
 Compatibility evidence does not repair an unsupported transformation or make a
 draft recipe production-ready.

@@ -8,7 +8,22 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Tuple
 
+from condition_registry import (
+    CONDITION_RECIPE_COMPONENT_BUCKETS,
+    load_condition_vocabulary,
+)
+from reactive_taxonomy import load_functional_group_definitions
+
 _RULES_PATH = Path(__file__).with_name("definitions") / "compatibility.v1.json"
+_MATCH_KEYS = {
+    "query_tags_any",
+    "recipe_buckets_any",
+    "recipe_family_ids_any",
+    "recipe_family_prefixes_any",
+    "recipe_atmospheres_any",
+    "minimum_temperature_c",
+    "maximum_temperature_c",
+}
 
 
 @dataclass(frozen=True)
@@ -21,12 +36,145 @@ class CompatibilityAssessment:
     penalty_ids: Tuple[str, ...] = ()
     evidence: Tuple[str, ...] = ()
     definition_id: str = "compatibility.v1"
+    definition_version: str = "1.1"
 
 
 @lru_cache(maxsize=1)
 def load_compatibility_rules() -> Dict[str, Any]:
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
-        return dict(json.load(handle))
+        rules = dict(json.load(handle))
+    validate_compatibility_rules(rules)
+    return rules
+
+
+def _validate_match_vocabulary(
+    rule: Mapping[str, Any],
+    *,
+    query_tags: set[str],
+    family_ids: set[str],
+) -> None:
+    unknown_tags = set(rule.get("query_tags_any") or ()) - query_tags
+    if unknown_tags:
+        raise ValueError(
+            f"unknown compatibility query tags: {sorted(unknown_tags)}"
+        )
+    unknown_buckets = set(rule.get("recipe_buckets_any") or ()) - set(
+        CONDITION_RECIPE_COMPONENT_BUCKETS
+    )
+    if unknown_buckets:
+        raise ValueError(
+            f"unknown compatibility recipe buckets: {sorted(unknown_buckets)}"
+        )
+    unknown_families = set(rule.get("recipe_family_ids_any") or ()) - family_ids
+    if unknown_families:
+        raise ValueError(
+            f"unknown compatibility recipe families: {sorted(unknown_families)}"
+        )
+    for prefix in rule.get("recipe_family_prefixes_any") or ():
+        if not any(family_id.startswith(str(prefix)) for family_id in family_ids):
+            raise ValueError(
+                f"compatibility family prefix matches no registry family: {prefix}"
+            )
+
+
+def validate_compatibility_rules(rules: Mapping[str, Any]) -> None:
+    """Validate rule structure against taxonomy and registry vocabularies."""
+    if str(rules.get("schema_version") or "") != "1.1":
+        raise ValueError("unsupported compatibility definition schema")
+    vocabulary = load_condition_vocabulary()
+    query_tags = {
+        str(tag)
+        for definition in load_functional_group_definitions()
+        for tag in definition.get("tags") or ()
+    }
+    family_ids = set(vocabulary.family_ids)
+    seen = set()
+    for section in ("hard_conflicts", "soft_penalties", "regime_requirements"):
+        values = rules.get(section)
+        if not isinstance(values, list):
+            raise ValueError(f"compatibility {section} must be a list")
+        for rule in values:
+            rule_id = str(rule.get("id") or "")
+            if not rule_id or rule_id in seen:
+                raise ValueError("compatibility rule IDs must be present and unique")
+            seen.add(rule_id)
+            if not str(rule.get("message") or "").strip():
+                raise ValueError(f"compatibility rule {rule_id} requires a message")
+            if section != "regime_requirements":
+                unknown_keys = set(rule) - (_MATCH_KEYS | {
+                    "id",
+                    "message",
+                    "penalty",
+                    "penalty_group",
+                })
+                if unknown_keys:
+                    raise ValueError(
+                        f"unsupported keys for compatibility rule {rule_id}: "
+                        f"{sorted(unknown_keys)}"
+                    )
+                _validate_match_vocabulary(
+                    rule,
+                    query_tags=query_tags,
+                    family_ids=family_ids,
+                )
+                minimum = rule.get("minimum_temperature_c")
+                maximum = rule.get("maximum_temperature_c")
+                if minimum is not None:
+                    float(minimum)
+                if maximum is not None:
+                    float(maximum)
+                if (
+                    minimum is not None
+                    and maximum is not None
+                    and float(minimum) > float(maximum)
+                ):
+                    raise ValueError(
+                        f"invalid temperature range in {rule_id}"
+                    )
+            if section == "soft_penalties":
+                penalty = float(rule.get("penalty") or 0.0)
+                if not 0.0 < penalty < 1.0:
+                    raise ValueError(
+                        f"compatibility penalty must be in (0, 1): {rule_id}"
+                    )
+            if section == "regime_requirements":
+                allowed = {
+                    "id",
+                    "message",
+                    "named_families_any",
+                    "minimum_family_confidence",
+                    "required_all_buckets",
+                    "unresolved_penalty",
+                }
+                unknown_keys = set(rule) - allowed
+                if unknown_keys:
+                    raise ValueError(
+                        f"unsupported keys for compatibility rule {rule_id}: "
+                        f"{sorted(unknown_keys)}"
+                    )
+                if not tuple(rule.get("named_families_any") or ()):
+                    raise ValueError(
+                        f"compatibility regime {rule_id} requires family evidence"
+                    )
+                required = set(rule.get("required_all_buckets") or ())
+                if not required <= set(CONDITION_RECIPE_COMPONENT_BUCKETS):
+                    raise ValueError(
+                        f"unknown required recipe bucket in {rule_id}"
+                    )
+                confidence = float(
+                    rule.get("minimum_family_confidence") or 0.0
+                )
+                if not 0.0 <= confidence <= 1.0:
+                    raise ValueError(
+                        f"invalid family confidence in {rule_id}"
+                    )
+                unresolved_penalty = float(
+                    rule.get("unresolved_penalty") or 0.0
+                )
+                if not 0.0 < unresolved_penalty < 1.0:
+                    raise ValueError(
+                        f"invalid unresolved penalty in {rule_id}"
+                    )
 
 
 def _query_tags(signature: Mapping[str, Any]) -> set[str]:
@@ -64,23 +212,12 @@ def _recipe_facts(
     buckets = set()
     family_ids = set()
     has_unresolved = False
-    for bucket in (
-        "catalysts",
-        "ligands",
-        "bases",
-        "acids",
-        "condensation_agents",
-        "oxidants",
-        "reductants",
-        "additives",
-        "solvents",
-        "other_components",
-    ):
+    for bucket in CONDITION_RECIPE_COMPONENT_BUCKETS:
         components = recipe.get(bucket) or ()
         if components:
             buckets.add(bucket)
         for component in components:
-            has_unresolved |= component.get("identity_status") == "unresolved"
+            has_unresolved |= component.get("identity_status") != "resolved"
             for role in component.get("roles") or ():
                 family_id = role.get("family_id")
                 if family_id:
@@ -208,6 +345,7 @@ def assess_recipe_compatibility(
             hard_conflicts=tuple(hard),
             evidence=tuple(evidence),
             definition_id=str(rules["definition_id"]),
+            definition_version=str(rules["schema_version"]),
         )
     matched_penalties: Dict[str, Mapping[str, Any]] = {}
     for rule in rules.get("soft_penalties") or ():
@@ -243,6 +381,7 @@ def assess_recipe_compatibility(
         penalty_ids=tuple(penalties),
         evidence=tuple(evidence),
         definition_id=str(rules["definition_id"]),
+        definition_version=str(rules["schema_version"]),
     )
 
 
@@ -269,4 +408,5 @@ __all__ = [
     "assess_recipe_compatibility",
     "filter_compatible_precedents",
     "load_compatibility_rules",
+    "validate_compatibility_rules",
 ]

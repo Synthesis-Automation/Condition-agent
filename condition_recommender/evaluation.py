@@ -5,17 +5,20 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, Tuple
 
-from .compatibility import assess_recipe_compatibility
+from .compatibility import assess_recipe_compatibility, load_compatibility_rules
 from .generic_api import recommend_indexed_signature
 from .generic_indexing import (
     GenericIndexedReaction,
     build_generic_index_from_rows,
     load_generic_index,
 )
+from .generic_retrieval import load_generic_retrieval_rules
+from .recipe_ranking import load_generic_ranking_rules
+from .similarity import load_generic_similarity_rules
 
 
 @dataclass(frozen=True)
@@ -227,8 +230,17 @@ def evaluate_generic_index(
                 "valid": result.valid,
                 "retrieval_level": result.retrieval_level,
                 "candidate_count": result.candidate_count,
+                "independent_candidate_count": (
+                    result.independent_candidate_count
+                ),
                 "compatible_candidate_count": result.compatible_candidate_count,
+                "independent_compatible_candidate_count": (
+                    result.independent_compatible_candidate_count
+                ),
                 "excluded_candidate_count": result.excluded_candidate_count,
+                "retrieval_trace": tuple(
+                    asdict(item) for item in result.retrieval_trace
+                ),
                 "recommended_recipe_ids": recommended_ids,
                 "recommended_recipe_core_ids": recommended_core_ids,
                 "top1_recipe_match": top1_match,
@@ -236,6 +248,11 @@ def evaluate_generic_index(
                 "predicted_yield_pct": result.recommendations[0].expected_yield_pct
                 if result.recommendations
                 else None,
+                "top_recommendation_score_trace": (
+                    asdict(result.recommendations[0].score_trace)
+                    if result.recommendations
+                    else None
+                ),
                 "error": result.error,
             }
         )
@@ -243,9 +260,15 @@ def evaluate_generic_index(
     train_groups = set(split.train_group_ids)
     test_groups = set(split.test_group_ids)
     report: Dict[str, Any] = {
-        "schema_version": "1.0",
-        "evaluator_version": "generic_grouped_holdout.v1",
+        "schema_version": "1.2",
+        "evaluator_version": "generic_grouped_holdout.v1.2",
         "records_path": str(Path(records_path)),
+        "definition_versions": {
+            "compatibility": str(load_compatibility_rules()["schema_version"]),
+            "retrieval": str(load_generic_retrieval_rules()["schema_version"]),
+            "similarity": str(load_generic_similarity_rules()["schema_version"]),
+            "ranking": str(load_generic_ranking_rules()["schema_version"]),
+        },
         "parameters": {
             "test_fraction": test_fraction,
             "seed": seed,

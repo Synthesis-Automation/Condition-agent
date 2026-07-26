@@ -5,6 +5,19 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Optional, Tuple
 
+CONDITION_RECIPE_COMPONENT_BUCKETS = (
+    "catalysts",
+    "ligands",
+    "bases",
+    "acids",
+    "condensation_agents",
+    "oxidants",
+    "reductants",
+    "additives",
+    "solvents",
+    "other_components",
+)
+
 
 @dataclass(frozen=True)
 class ConditionComponentInput:
@@ -135,17 +148,10 @@ class ResolvedConditionRecipe:
 
     @property
     def components(self) -> Tuple[ResolvedConditionComponent, ...]:
-        return (
-            self.catalysts
-            + self.ligands
-            + self.bases
-            + self.acids
-            + self.condensation_agents
-            + self.oxidants
-            + self.reductants
-            + self.additives
-            + self.solvents
-            + self.other_components
+        return tuple(
+            component
+            for bucket in CONDITION_RECIPE_COMPONENT_BUCKETS
+            for component in getattr(self, bucket)
         )
 
     def to_dict(self) -> Dict[str, Any]:

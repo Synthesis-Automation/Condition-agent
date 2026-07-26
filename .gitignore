@@ -164,6 +164,7 @@ data-processor/dataset/*.gz
 results/hte_cache/
 results/generic_sampling/
 results/generic_conversion/
+results/generic_evaluation/
 
 # KMN index files (large ML artifacts — rebuild with scripts/build_kmn_index.py)
 data/kmn_index/

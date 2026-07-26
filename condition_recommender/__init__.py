@@ -1,7 +1,11 @@
 """Standalone condition-recommendation data and modeling package."""
 
 from .compatibility import CompatibilityAssessment, assess_recipe_compatibility
-from .generic_api import recommend_generic_conditions, recommend_indexed_signature
+from .generic_api import (
+    GenericConditionRecommender,
+    recommend_generic_conditions,
+    recommend_indexed_signature,
+)
 from .label_api import recommend_conditions_from_labels
 from .models import (
     AdmissionTier,
@@ -16,6 +20,8 @@ from .models import (
     OutcomeStatus,
     ReferenceIdentity,
     RecommendationRecord,
+    RecommendationScoreTrace,
+    RetrievalLevelTrace,
 )
 from .rules import RuleRecommendationResult, recommend_rule_conditions
 from .rule_review import build_rule_review_rows, export_rule_review_csv
@@ -27,6 +33,7 @@ __all__ = [
     "ConditionIdentity",
     "CompatibilityAssessment",
     "GenericConditionRecommendation",
+    "GenericConditionRecommender",
     "GenericRecommendationResult",
     "IndexEligibility",
     "LabelConditionRecommendation",
@@ -34,6 +41,8 @@ __all__ = [
     "OutcomeStatus",
     "ReferenceIdentity",
     "RecommendationRecord",
+    "RecommendationScoreTrace",
+    "RetrievalLevelTrace",
     "RuleRecommendationResult",
     "build_rule_review_rows",
     "recommend_generic_conditions",
