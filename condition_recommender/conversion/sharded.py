@@ -247,6 +247,19 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
                 ).items()
             )
         ),
+        "reaction_completeness_status_counts": dict(
+            sorted(
+                Counter(
+                    str(
+                        (
+                            payload.get("reaction_completeness") or {}
+                        ).get("status")
+                        or "missing"
+                    )
+                    for payload in payloads
+                ).items()
+            )
+        ),
     }
 
 
@@ -800,6 +813,9 @@ def convert_datasets_sharded(
         ),
         "reaction_scope_counts": _merge_counts(
             complete_entries, "reaction_scope_counts"
+        ),
+        "reaction_completeness_status_counts": _merge_counts(
+            complete_entries, "reaction_completeness_status_counts"
         ),
         "signature_count": sum(
             int(entry.get("signature_count") or 0) for entry in complete_entries

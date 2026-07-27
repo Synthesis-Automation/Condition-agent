@@ -27,6 +27,10 @@ GENERIC_REVIEW_FIELDS = (
     "reaction_smiles",
     "canonical_reaction_smiles",
     "evidence_quality",
+    "reaction_completeness_status",
+    "product_heavy_atom_coverage",
+    "reaction_completeness_warnings",
+    "reaction_completeness_json",
     "transformation_class",
     "transformation_confidence",
     "named_family",
@@ -76,6 +80,7 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
     status_counts = record.condition_resolution.get("status_counts") or {}
     topology = (record.reaction_signature or {}).get("topology") or {}
     signature = record.reaction_signature or {}
+    completeness = record.reaction_completeness or {}
     return {
         "schema_version": record.schema_version,
         "observation_id": record.observation_id,
@@ -97,6 +102,25 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "reaction_smiles": record.reaction_smiles,
         "canonical_reaction_smiles": record.canonical_reaction_smiles or "",
         "evidence_quality": record.evidence_quality,
+        "reaction_completeness_status": completeness.get("status", ""),
+        "product_heavy_atom_coverage": (
+            completeness.get("product_heavy_atom_coverage")
+            if completeness.get("product_heavy_atom_coverage") is not None
+            else ""
+        ),
+        "reaction_completeness_warnings": _joined(
+            completeness.get("warnings") or ()
+        ),
+        "reaction_completeness_json": (
+            json.dumps(
+                completeness,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            if completeness
+            else ""
+        ),
         "transformation_class": record.transformation_class or "",
         "transformation_confidence": record.transformation_confidence,
         "named_family": record.named_family or "",

@@ -108,9 +108,9 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "1.9"
-    assert record.converter_definition_version == "generic_conversion.v1.8"
-    assert record.reaction_signature["schema_version"] == "1.3"
+    assert record.schema_version == "2.0"
+    assert record.converter_definition_version == "generic_conversion.v1.9"
+    assert record.reaction_signature["schema_version"] == "1.4"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
     assert record.reference_identity["resolution_status"] == "bibliographic_text"
@@ -191,7 +191,44 @@ def test_grammar_only_record_is_review_not_rejected() -> None:
     record = convert_record(_raw("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1"))
 
     assert record.admission_tier == AdmissionTier.REVIEW
-    assert record.admission_reasons == ("missing_verified_reaction_signature",)
+    assert record.admission_reasons == (
+        "missing_verified_reaction_signature",
+        "reaction_completeness_unresolved",
+    )
+
+
+def test_unaccounted_product_atoms_are_ineligible_and_serialized() -> None:
+    record = convert_record(
+        _raw("[CH2:1]=[CH2:2]>>[CH3:1][CH2:2]C")
+    )
+
+    assert record.admission_tier == AdmissionTier.REJECTED
+    assert record.chemistry_status == ChemistryStatus.REJECTED
+    assert record.index_eligibility == IndexEligibility.INELIGIBLE
+    assert record.admission_reasons == (
+        "suspected_missing_reactant",
+        "unaccounted_product_heavy_atoms",
+    )
+    assert record.reaction_signature is None
+    assert record.reaction_completeness is not None
+    assert record.reaction_completeness["status"] == "incomplete"
+    assert record.reaction_completeness["product_element_excess"] == {"C": 1}
+
+
+def test_inconsistent_product_mapping_is_review_only() -> None:
+    record = convert_record(
+        _raw("[CH3:1][OH:2]>>[CH2:1]=[O:3]")
+    )
+
+    assert record.admission_tier == AdmissionTier.REVIEW
+    assert record.chemistry_status == ChemistryStatus.REVIEW
+    assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
+    assert "inconsistent_product_atom_mapping" in record.admission_reasons
+    assert record.reaction_completeness is not None
+    assert (
+        "PRODUCT_MAPS_MISSING_FROM_REACTANTS"
+        in record.reaction_completeness["warnings"]
+    )
 
 
 def test_unresolved_transformation_and_missing_conditions_are_rejected() -> None:
@@ -206,7 +243,10 @@ def test_unresolved_transformation_and_missing_conditions_are_rejected() -> None
     )
 
     assert unresolved.admission_tier == AdmissionTier.REJECTED
-    assert unresolved.admission_reasons == ("no_usable_transformation_evidence",)
+    assert unresolved.admission_reasons == (
+        "suspected_missing_reactant",
+        "unaccounted_product_heavy_atoms",
+    )
     assert no_conditions.admission_tier == AdmissionTier.REJECTED
     assert no_conditions.admission_reasons == ("no_condition_identifiers",)
 
@@ -336,10 +376,15 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     }
     assert json.loads((output / "conversion_report.json").read_text()) == report
     assert report["schema_version"] == "1.2"
-    assert report["reaction_signature_schema_version"] == "1.3"
+    assert report["reaction_signature_schema_version"] == "1.4"
     assert report["reaction_scope_counts"] == {
         "intermolecular": 1,
         "unimolecular": 1,
+    }
+    assert report["reaction_completeness_status_counts"] == {
+        "incomplete": 1,
+        "unresolved": 1,
+        "verified": 2,
     }
     assert (output / "conversion_report.md").exists()
 

@@ -17,6 +17,7 @@ from .reaction_models import (
     REACTION_SIGNATURE_SCHEMA_VERSION,
     ReactionAtomReference,
     ReactionCandidate,
+    ReactionCompletenessAssessment,
     ReactionComponent,
     ReactionFamilyEnvironment,
     ReactionPartner,
@@ -332,6 +333,7 @@ def build_reaction_signature(
     named_family: Optional[str],
     compatible_named_families: Tuple[str, ...],
     topology: ReactionTopology,
+    completeness: ReactionCompletenessAssessment,
     contextual_product_label: Optional[str] = None,
     warnings: Iterable[str] = (),
 ) -> Optional[ReactionSignature]:
@@ -563,6 +565,7 @@ def build_reaction_signature(
             )
         ),
         spectator_groups=spectators,
+        completeness=completeness,
         global_descriptors={
             "edit_count": len(edit_result.edits),
             "event_count": len(events),

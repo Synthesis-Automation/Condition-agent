@@ -36,6 +36,8 @@ class _MappedSide:
     hydrogen_counts: Dict[int, int]
     warnings: Tuple[str, ...]
     mapped_atom_count: int
+    heavy_atom_count: int
+    mapped_heavy_atom_count: int
 
 
 def _environment_id(mol: Any, atom_index: int) -> str:
@@ -89,15 +91,21 @@ def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
     hydrogen_counts: Dict[int, int] = {}
     warnings = []
     mapped_atom_count = 0
+    heavy_atom_count = 0
+    mapped_heavy_atom_count = 0
     for component in components:
         mol = parse_smiles(component.input_smiles)
         if mol is None:
             continue
         for atom in mol.GetAtoms():
+            if atom.GetAtomicNum() > 1:
+                heavy_atom_count += 1
             map_number = int(atom.GetAtomMapNum())
             if not map_number:
                 continue
             mapped_atom_count += 1
+            if atom.GetAtomicNum() > 1:
+                mapped_heavy_atom_count += 1
             if map_number in atoms:
                 warnings.append(
                     f"DUPLICATE_ATOM_MAP:{component.side}:{map_number}"
@@ -126,6 +134,8 @@ def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
         hydrogen_counts,
         tuple(sorted(set(warnings))),
         mapped_atom_count,
+        heavy_atom_count,
+        mapped_heavy_atom_count,
     )
 
 
@@ -141,6 +151,15 @@ def normalize_mapped_edits(
         return EditNormalizationResult((), "no_atom_mapping", 0.0, valid=False)
     if not left.mapped_atom_count or not right.mapped_atom_count:
         warnings.append("INCOMPLETE_REACTION_ATOM_MAPPING")
+    if (
+        left.mapped_heavy_atom_count < left.heavy_atom_count
+        or right.mapped_heavy_atom_count < right.heavy_atom_count
+    ):
+        warnings.append("PARTIAL_ATOM_MAPPING")
+    if set(right.atoms) - set(left.atoms):
+        warnings.append("PRODUCT_MAPS_MISSING_FROM_REACTANTS")
+    if set(left.atoms) - set(right.atoms):
+        warnings.append("REACTANT_MAPS_MISSING_FROM_PRODUCTS")
     for map_number in sorted(set(left.atoms).intersection(right.atoms)):
         before = left.atoms[map_number]
         after = right.atoms[map_number]

@@ -9,6 +9,7 @@ from .chemistry.rdkit_utils import parse_smiles
 from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_candidates import enumerate_reaction_candidates
+from .reaction_completeness import build_reaction_completeness
 from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_display_labels import build_reaction_display_label
 from .reaction_edits import normalize_mapped_edits, normalize_reaction_edits
@@ -195,6 +196,15 @@ def featurize_reaction(
         selected,
         selected_events,
     )
+    reaction_completeness = build_reaction_completeness(
+        reactants=parsed.reactants,
+        products=parsed.products,
+        raw_candidates=raw,
+        selected=selected,
+        selected_events=selected_events,
+        edit_result=edit_result,
+    )
+    warnings.extend(reaction_completeness.warnings)
     contextual_label = (
         None
         if edit_result.evidence == "conflicting_edit_evidence"
@@ -241,6 +251,7 @@ def featurize_reaction(
             named_family=named_family,
             compatible_named_families=compatible_named_families,
             topology=reaction_topology,
+            completeness=reaction_completeness,
             contextual_product_label=(
                 contextual_label.after
                 if contextual_label is not None
@@ -248,7 +259,10 @@ def featurize_reaction(
             ),
             warnings=warnings,
         )
-        if reaction_topology is not None
+        if (
+            reaction_topology is not None
+            and reaction_completeness.status != "incomplete"
+        )
         else None
     )
     reaction_label = selected.reaction_label if selected else None
@@ -342,6 +356,7 @@ def featurize_reaction(
         product_connection=product_connection,
         reaction_topology=reaction_topology,
         reaction_signature=reaction_signature,
+        reaction_completeness=reaction_completeness,
         warnings=tuple(sorted(set(warnings))),
     )
 

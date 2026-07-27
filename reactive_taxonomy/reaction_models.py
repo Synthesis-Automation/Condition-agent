@@ -8,7 +8,7 @@ from typing import Any, Dict, Literal, Optional, Tuple
 from .models import CompoundAnalysis
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "1.3"
+REACTION_SIGNATURE_SCHEMA_VERSION = "1.4"
 
 
 @dataclass(frozen=True)
@@ -70,6 +70,30 @@ class ReactionEdit:
     new_order: Optional[str]
     evidence: str
     confidence: float
+
+
+@dataclass(frozen=True)
+class ReactionCompletenessAssessment:
+    """Product-atom accounting without requiring reported byproducts."""
+
+    status: Literal["verified", "incomplete", "unresolved"]
+    reactant_heavy_atom_count: int
+    product_heavy_atom_count: int
+    reactant_element_counts: Dict[str, int]
+    product_element_counts: Dict[str, int]
+    product_element_excess: Dict[str, int]
+    reactant_element_excess: Dict[str, int]
+    reactant_mapped_heavy_atom_count: int
+    product_mapped_heavy_atom_count: int
+    shared_mapped_heavy_atom_count: int
+    reactant_mapping_coverage: float
+    product_mapping_coverage: float
+    product_heavy_atom_coverage: Optional[float]
+    suspected_missing_reactant: bool
+    suspected_insufficient_reactant_multiplicity: bool
+    evidence: str
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
 
 
 @dataclass(frozen=True)
@@ -314,6 +338,7 @@ class ReactionSignature:
     family_confidence: float
     compatible_named_families: Tuple[str, ...]
     spectator_groups: Tuple[ReactionSpectatorGroup, ...]
+    completeness: ReactionCompletenessAssessment
     global_descriptors: Dict[str, Any]
     warnings: Tuple[str, ...]
     evidence_quality: str
@@ -357,9 +382,10 @@ class ReactionAnalysis:
     product_connection: Optional[ProductConnection] = None
     reaction_topology: Optional[ReactionTopology] = None
     reaction_signature: Optional[ReactionSignature] = None
+    reaction_completeness: Optional[ReactionCompletenessAssessment] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.6"
+    schema_version: str = "1.7"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -374,6 +400,7 @@ __all__ = [
     "ReactionAnalysis",
     "ReactionAtomReference",
     "ReactionCandidate",
+    "ReactionCompletenessAssessment",
     "ReactionComponent",
     "ReactionDisplayLabel",
     "ReactionEdit",

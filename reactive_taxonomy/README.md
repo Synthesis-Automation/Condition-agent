@@ -20,6 +20,17 @@ Any unmatched edit set still receives a deterministic literal summary such as
 the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
+Every valid parsed reaction also receives a
+`ReactionCompletenessAssessment`. It records heavy-atom and element counts,
+product-atom coverage, mapping coverage, suspected missing reactants or
+insufficient partner multiplicity, and typed warnings. Exact reconstruction,
+complete product mapping, or conservative scaffold correspondence may verify
+product-atom provenance. Definite product-heavy-atom excess blocks signature
+generation; unresolved provenance remains explicit for downstream review.
+Reactant-side excess is retained without rejection because main-product
+reaction records commonly omit byproducts. Missing reactants or stoichiometric
+partner copies are never synthesized.
+
 Exact grammar labels use one reaction-wide namespace for repeated generic
 fragments. Distinct graph-derived fragments are numbered by semantic role and
 retain the same alias across the arrow, for example

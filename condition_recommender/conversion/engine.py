@@ -65,6 +65,7 @@ def convert_datasets(
     index_eligibility_counts = Counter()
     reason_counts = Counter()
     evidence_counts = Counter()
+    completeness_counts = Counter()
     transformation_counts = Counter()
     family_counts = Counter()
     reaction_scope_counts = Counter()
@@ -114,6 +115,12 @@ def convert_datasets(
                 index_eligibility_counts[record.index_eligibility.value] += 1
                 reason_counts.update(record.admission_reasons)
                 evidence_counts[record.evidence_quality] += 1
+                completeness_counts[
+                    str(
+                        (record.reaction_completeness or {}).get("status")
+                        or "missing"
+                    )
+                ] += 1
                 source_counts[record.source_dataset] += 1
                 source_tiers[record.source_dataset][tier] += 1
                 signature_count += int(record.reaction_signature is not None)
@@ -180,6 +187,9 @@ def convert_datasets(
         },
         "reason_counts": dict(sorted(reason_counts.items())),
         "evidence_quality_counts": dict(sorted(evidence_counts.items())),
+        "reaction_completeness_status_counts": dict(
+            sorted(completeness_counts.items())
+        ),
         "signature_count": signature_count,
         "signature_rate": round(signature_count / row_count, 6) if row_count else 0.0,
         "transformation_class_counts": dict(sorted(transformation_counts.items())),

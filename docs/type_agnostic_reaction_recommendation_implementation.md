@@ -375,6 +375,16 @@ multi-substrate assembly, insufficient scaffold conservation, candidate-limit
 overflow, and chemically distinct minimal correspondences. Symmetry-equivalent
 atom assignments may be accepted only when their normalized edit sets agree.
 
+Every valid parsed reaction also receives a typed product-atom completeness
+assessment. It records heavy-atom and element counts, product and reactant
+mapping coverage, product-heavy-atom coverage, side-specific map inconsistencies,
+and suspected missing reactants or insufficient partner multiplicity. Reactant
+atoms absent from the reported main product are retained without rejection
+because byproducts are commonly omitted. Definite product-heavy-atom excess
+blocks signature generation and indexing; unresolved provenance and
+inconsistent product mapping are retained for review. Missing reactants and
+stoichiometric partner copies must never be synthesized.
+
 ### 6.3 Reactive-site and environment features
 
 For every atom participating in an edit, capture:

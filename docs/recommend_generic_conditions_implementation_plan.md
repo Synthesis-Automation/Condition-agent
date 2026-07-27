@@ -104,8 +104,8 @@ implementation. The following gaps must be addressed before full conversion:
 
 The initial implementation slice now provides:
 
-- reaction-signature schema 1.3, with schema-level hydrogen changes included in
-  event, L2, and L3 identity;
+- reaction-signature schema 1.4, with schema-level hydrogen changes included in
+  event, L2, and L3 identity plus a typed product-atom completeness assessment;
 - deterministic DOI, patent, and normalized bibliographic reference identity;
 - reference provenance in canonical converted records and persisted indices;
 - deterministic source-balanced smoke, development, validation, and

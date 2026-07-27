@@ -30,7 +30,7 @@ class AdmissionDecision:
     condition_status: ConditionStatus
     outcome_status: OutcomeStatus
     index_eligibility: IndexEligibility
-    policy_version: str = "generic_admission.v1.2"
+    policy_version: str = "generic_admission.v1.3"
 
 
 @lru_cache(maxsize=1)
@@ -54,9 +54,17 @@ def decide_admission(
 
     chemistry_status = ChemistryStatus.VERIFIED
     chemistry_reasons: list[str] = []
+    completeness = analysis.reaction_completeness
     if not analysis.valid or canonical_identity is None:
         chemistry_status = ChemistryStatus.REJECTED
         chemistry_reasons.append("invalid_reaction_or_product")
+    elif completeness is not None and completeness.status == "incomplete":
+        chemistry_status = ChemistryStatus.REJECTED
+        chemistry_reasons.append("unaccounted_product_heavy_atoms")
+        if completeness.suspected_insufficient_reactant_multiplicity:
+            chemistry_reasons.append("insufficient_reactant_multiplicity")
+        elif completeness.suspected_missing_reactant:
+            chemistry_reasons.append("suspected_missing_reactant")
     elif analysis.reaction_signature is None:
         if analysis.candidates or analysis.evidence_quality in {
             "reactant_grammar_only",
@@ -67,6 +75,8 @@ def decide_admission(
         else:
             chemistry_status = ChemistryStatus.REJECTED
             chemistry_reasons.append("no_usable_transformation_evidence")
+        if completeness is not None and completeness.status == "unresolved":
+            chemistry_reasons.append("reaction_completeness_unresolved")
     else:
         if analysis.evidence_quality == "conflicting_edit_evidence":
             chemistry_reasons.append("conflicting_edit_evidence")
@@ -76,6 +86,18 @@ def decide_admission(
             chemistry_reasons.append("multiple_products")
         if analysis.evidence_quality not in set(policy["verified_evidence"]):
             chemistry_reasons.append("insufficient_edit_evidence")
+        if completeness is not None and completeness.status == "unresolved":
+            chemistry_reasons.append("reaction_completeness_unresolved")
+        completeness_warnings = set(
+            completeness.warnings if completeness is not None else ()
+        )
+        if "PRODUCT_MAPS_MISSING_FROM_REACTANTS" in completeness_warnings:
+            chemistry_reasons.append("inconsistent_product_atom_mapping")
+        if (
+            "PARTIAL_ATOM_MAPPING" in completeness_warnings
+            and analysis.evidence_quality == "validated_atom_mapping"
+        ):
+            chemistry_reasons.append("partial_atom_mapping")
         if chemistry_reasons:
             chemistry_status = ChemistryStatus.REVIEW
 
