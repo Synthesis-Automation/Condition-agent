@@ -4,17 +4,17 @@
     "canonical_manifest": {
       "path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\shard_manifest.json",
       "relative_path": "shard_manifest.json",
-      "size_bytes": 403618
+      "size_bytes": 435389
     },
     "fast_index": {
       "path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\generic_index.json.gz",
       "relative_path": "generic_index.json.gz",
-      "size_bytes": 5093944
+      "size_bytes": 5239623
     },
     "review_csv": {
       "path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\reaction_review.csv",
       "relative_path": "reaction_review.csv",
-      "size_bytes": 6997483
+      "size_bytes": 6970957
     }
   },
   "conversion_report_path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\conversion_report.json",
@@ -35,8 +35,8 @@
   "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\dataset_300",
   "storage": {
     "shard_file_count": 123,
-    "shard_size_bytes": 27508778,
-    "total_output_size_bytes_before_report": 43489312
+    "shard_size_bytes": 29051727,
+    "total_output_size_bytes_before_report": 45157216
   },
   "warnings": []
 }

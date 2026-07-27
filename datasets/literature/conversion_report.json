@@ -2,21 +2,25 @@
   "admission_reason_counts": {
     "condition_identifier_uncertainty": 5856,
     "insufficient_edit_evidence": 1576,
+    "insufficient_reactant_multiplicity": 335,
     "invalid_reaction_or_product": 249,
     "invalid_yield": 1,
-    "missing_verified_reaction_signature": 17523,
+    "missing_verified_reaction_signature": 11274,
     "missing_yield": 1150,
-    "multiple_products": 287,
+    "multiple_products": 59,
     "multistage_conditions_not_structured": 11213,
     "no_condition_identifiers": 822,
-    "no_usable_transformation_evidence": 3619,
+    "no_usable_transformation_evidence": 2306,
+    "reaction_completeness_unresolved": 13580,
     "solvent_only_recipe": 1800,
+    "suspected_missing_reactant": 7455,
+    "unaccounted_product_heavy_atoms": 7790,
     "unresolved_condition_identifiers": 1,
     "verified_reaction_signature_with_conditions": 2845
   },
   "admission_tier_counts": {
-    "rejected": 6002,
-    "review": 21253,
+    "rejected": 12269,
+    "review": 14986,
     "verified": 2845
   },
   "artifact_type": "generic_sharded_conversion_report",
@@ -33,13 +37,13 @@
     },
     "reference_condition_series_catalog": {
       "path": "reference_condition_series.jsonl.gz",
-      "row_count": 4895,
-      "sha256": "57ace051c9cf6b97602be6f1f230b3ec7c9fe1c567890e03896d6275d3da1335"
+      "row_count": 4746,
+      "sha256": "afc01b8eb4eec93708f39c8b212dee10176dd05f34d0c3a733adc8d29835e639"
     }
   },
   "chemistry_status_counts": {
-    "rejected": 3868,
-    "review": 19386,
+    "rejected": 10345,
+    "review": 12909,
     "verified": 6846
   },
   "complete_shard_count": 118,
@@ -53,8 +57,8 @@
   "failed_shard_count": 0,
   "index_eligibility_counts": {
     "eligible": 4188,
-    "ineligible": 6002,
-    "review_only": 19910
+    "ineligible": 12269,
+    "review_only": 13643
   },
   "input_row_count": 30100,
   "integrity": {
@@ -88,16 +92,22 @@
     "usable": 28949
   },
   "output_row_count": 30100,
+  "reaction_completeness_status_counts": {
+    "incomplete": 7790,
+    "missing": 249,
+    "unresolved": 13580,
+    "verified": 8481
+  },
   "reaction_scope_counts": {
-    "intermolecular": 4527,
+    "intermolecular": 4409,
     "intramolecular": 61,
-    "unimolecular": 4121,
-    "unknown": 21391
+    "unimolecular": 4011,
+    "unknown": 21619
   },
   "reused_shard_count": 0,
   "schema_version": "1.0",
   "shard_count": 118,
-  "signature_count": 8709,
+  "signature_count": 8481,
   "source_file_count": 118,
   "transformation_class_counts": {
     "alcohol_oxidation": 1903,

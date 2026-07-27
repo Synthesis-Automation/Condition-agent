@@ -553,6 +553,7 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
         writer.writeheader()
         writer.writerows(rows)
     output = tmp_path / "sharded"
+    progress = []
 
     first = convert_datasets_sharded(
         dataset,
@@ -560,11 +561,17 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
         shard_size=2,
         mode="test",
         workers=2,
+        progress_callback=progress.append,
     )
     first_catalog = (output / "recipe_catalog.jsonl.gz").read_bytes()
     second = convert_datasets_sharded(dataset, output, shard_size=2, mode="test")
 
     assert first["shard_count"] == 2
+    assert any(
+        update.phase == "source_processing"
+        and update.message == "Processing 1/1 (total): mixed.csv"
+        for update in progress
+    )
     assert first["output_row_count"] == 4
     assert first["index_eligibility_counts"] == {"eligible": 4}
     assert first["transformation_class_counts"] == {

@@ -651,9 +651,18 @@ def convert_datasets_sharded(
     executor = ProcessPoolExecutor(max_workers=workers) if workers > 1 else None
     pending = set()
     try:
-        for path in paths:
+        for file_number, path in enumerate(paths, start=1):
             source_path = str(path.resolve())
             source_sha256 = source_checksums[source_path]
+            notify(
+                "source_processing",
+                (
+                    f"Processing {file_number}/{len(paths)} (total): "
+                    f"{path.name}"
+                ),
+                shard_count=len(entries),
+                row_count=accepted_row_count,
+            )
             for part_number, raw_records in enumerate(
                 _chunks(iter_csv_records(path), shard_size)
             ):
