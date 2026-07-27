@@ -562,6 +562,9 @@ def rank_condition_recipes(
                 precedent_reaction_ids=tuple(
                     member.row.reaction_id for member in members[:5]
                 ),
+                precedent_reaction_smiles=tuple(
+                    member.row.reaction_smiles for member in members[:5]
+                ),
                 precedent_reference_ids=tuple(
                     sorted(
                         {

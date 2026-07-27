@@ -44,7 +44,11 @@ def _recommendation() -> GenericConditionRecommendation:
         condition_series_support=2,
         dataset_support=2,
         retrieval_level="exact_signature",
-        precedent_reaction_ids=("reaction-1",),
+        precedent_reaction_ids=("reaction-1", "reaction-2"),
+        precedent_reaction_smiles=(
+            "BrC.B(O)O>>CC",
+            "ClC.B(O)O>>CC",
+        ),
         precedent_reference_ids=("REF1:one",),
         explanation=("Exact bond-edit and handle match",),
         score_trace=trace,
@@ -79,7 +83,16 @@ def test_window_uses_literature_recommendation_data_by_default(
     )
     assert window.top_k_spin.value() == 5
     assert window.reaction_edit.metaObject().className() == "QLineEdit"
-    assert window.summary_box.height() == 58
+    assert window.summary_box.height() == 168
+    assert window.data_row_layout.indexOf(window.data_label) == 0
+    assert window.data_row_layout.indexOf(window.data_path_edit) == 1
+    assert window.query_summary_layout.count() == 2
+    assert window.reaction_image_label.objectName() == "queryReactionGraph"
+    assert window.selected_details_layout.count() == 2
+    assert (
+        window.selected_reaction_image_label.objectName()
+        == "selectedPrecedentReactionGraph"
+    )
     assert window.results_table.columnCount() == 9
     assert not window.export_button.isEnabled()
 
@@ -128,6 +141,16 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
 
     assert "Suzuki Miyaura" in window.summary_box.toPlainText()
     assert window.summary_box.toPlainText().count("\n") == 1
+    reaction_pixmap = window.reaction_image_label.pixmap()
+    assert reaction_pixmap is not None
+    assert not reaction_pixmap.isNull()
+    precedent_pixmap = window.selected_reaction_image_label.pixmap()
+    assert precedent_pixmap is not None
+    assert not precedent_pixmap.isNull()
+    assert (
+        window.selected_reaction_image_label.toolTip()
+        == "BrC.B(O)O>>CC"
+    )
     assert window.results_table.rowCount() == 1
     assert "Palladium catalyst" in window.results_table.item(0, 7).text()
     assert "Potassium carbonate" in window.details_box.toPlainText()
@@ -135,6 +158,40 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
         window.details_box.toPlainText()
     )
     assert window.status_label.text() == "Done — 1 recipe(s)"
+
+
+def test_window_requests_vector_reaction_drawing(qtbot, monkeypatch) -> None:
+    calls = []
+
+    def render(reaction_smiles, *, size, image_format):
+        calls.append((reaction_smiles, size, image_format))
+        return (
+            b'<svg xmlns="http://www.w3.org/2000/svg" '
+            b'width="560" height="142"></svg>'
+        )
+
+    monkeypatch.setattr(gui, "render_reaction_image_bytes", render)
+    window = gui.GenericRecommenderWindow()
+    qtbot.addWidget(window)
+
+    window._render_reaction_graph("CCO>>CC=O")
+
+    assert calls == [
+        ("CCO>>CC=O", gui.QUERY_REACTION_IMAGE_SIZE, "svg")
+    ]
+    assert window.reaction_image_label._source_svg
+
+
+def test_main_window_starts_maximized() -> None:
+    events = []
+
+    class FakeWindow:
+        def showMaximized(self):
+            events.append(("show", "maximized"))
+
+    gui._show_main_window(FakeWindow())
+
+    assert ("show", "maximized") in events
 
 
 def test_recipe_summary_keeps_roles_and_operating_conditions() -> None:

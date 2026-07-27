@@ -274,6 +274,9 @@ def generate_chemist_review_packet(
                     "precedent_reaction_ids": (
                         recommendation.precedent_reaction_ids
                     ),
+                    "precedent_reaction_smiles": (
+                        recommendation.precedent_reaction_smiles
+                    ),
                     "precedent_reference_ids": (
                         recommendation.precedent_reference_ids
                     ),
@@ -306,6 +309,7 @@ def generate_chemist_review_packet(
                         "Assess compatibility with the query transformation",
                     ),
                     "precedent_reaction_ids": (negative.reaction_id,),
+                    "precedent_reaction_smiles": (negative.reaction_smiles,),
                     "precedent_reference_ids": (
                         (negative.reference_id,) if negative.reference_id else ()
                     ),

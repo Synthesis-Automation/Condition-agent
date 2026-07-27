@@ -675,9 +675,10 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "1.5"
+    assert result.schema_version == "1.6"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")
     assert result.recommendations[0].resolved_recipe["recipe_id"].startswith("RCR1:")
+    assert result.recommendations[0].precedent_reaction_smiles
     assert 0.0 <= result.recommendations[0].compatibility_score <= 1.0

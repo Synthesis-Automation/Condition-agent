@@ -1822,7 +1822,7 @@ class HTERecommenderWindow(QtWidgets.QWidget):
         layout.addWidget(images_widget)
 
         try:
-            from chemtools.visualization import render_molecule_image, render_reaction_image
+            from visualization import render_molecule_image, render_reaction_image
         except Exception as exc:
             info_label.setText(f"Visualization unavailable: {exc}")
             dialog.show()

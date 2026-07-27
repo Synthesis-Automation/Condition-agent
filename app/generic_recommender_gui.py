@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtSvg, QtWidgets
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DATA_FOLDER = PROJECT_ROOT / "datasets" / "literature"
@@ -21,11 +21,15 @@ from condition_recommender import (  # noqa: E402
     GenericConditionRecommender,
     GenericRecommendationResult,
 )
+from visualization import render_reaction_image_bytes  # noqa: E402
 
 _RECOMMENDER_CACHE: Dict[
     Tuple[str, int, int],
     GenericConditionRecommender,
 ] = {}
+
+QUERY_REACTION_IMAGE_SIZE = (680, 168)
+PRECEDENT_REACTION_IMAGE_SIZE = (760, 240)
 
 _RECIPE_ROLE_LABELS = (
     ("catalysts", "Catalyst"),
@@ -139,6 +143,128 @@ def _friendly_error(error: Any) -> str:
     return messages.get(code, code.replace("_", " ").title())
 
 
+class ReactionImageLabel(QtWidgets.QLabel):
+    """Responsive label that rasterizes vector drawings at display resolution."""
+
+    def __init__(
+        self,
+        *,
+        placeholder: str = "Reaction graph will appear here.",
+        object_name: str = "reactionGraph",
+        minimum_height: int = 142,
+    ) -> None:
+        super().__init__(placeholder)
+        self._placeholder = placeholder
+        self._source_svg = b""
+        self._source_pixmap = QtGui.QPixmap()
+        self.setObjectName(object_name)
+        self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.setMinimumWidth(360)
+        self.setMinimumHeight(minimum_height)
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding,
+            QtWidgets.QSizePolicy.Policy.Expanding,
+        )
+        self.setStyleSheet(
+            "QLabel { background: white; border: 1px solid #cbd5e0; "
+            "border-radius: 4px; color: #718096; padding: 4px; }"
+        )
+
+    def set_image_bytes(self, drawing: bytes) -> bool:
+        """Load and display encoded image bytes, returning whether they decode."""
+        if b"<svg" in drawing[:512].lower():
+            renderer = QtSvg.QSvgRenderer(drawing)
+            if not renderer.isValid():
+                self.clear_image("Unable to decode reaction graph.")
+                return False
+            self._source_svg = bytes(drawing)
+            self._source_pixmap = QtGui.QPixmap()
+            self.setText("")
+            self._refresh_pixmap()
+            return True
+        pixmap = QtGui.QPixmap()
+        if not pixmap.loadFromData(drawing):
+            self.clear_image("Unable to decode reaction graph.")
+            return False
+        self._source_svg = b""
+        self._source_pixmap = pixmap
+        self.setText("")
+        self._refresh_pixmap()
+        return True
+
+    def clear_image(
+        self,
+        message: Optional[str] = None,
+    ) -> None:
+        """Remove the current drawing and show a concise placeholder."""
+        self._source_svg = b""
+        self._source_pixmap = QtGui.QPixmap()
+        self.setPixmap(QtGui.QPixmap())
+        self.setText(message or self._placeholder)
+        self.setToolTip("")
+
+    def _refresh_pixmap(self) -> None:
+        if not self._source_svg and self._source_pixmap.isNull():
+            return
+        available = self.contentsRect().size() - QtCore.QSize(8, 8)
+        if available.width() <= 0 or available.height() <= 0:
+            return
+        if self._source_svg:
+            self._refresh_svg(available)
+            return
+        self.setPixmap(
+            self._source_pixmap.scaled(
+                available,
+                QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+                QtCore.Qt.TransformationMode.SmoothTransformation,
+            )
+        )
+
+    def _refresh_svg(self, available: QtCore.QSize) -> None:
+        renderer = QtSvg.QSvgRenderer(self._source_svg)
+        source_size = renderer.defaultSize()
+        if not renderer.isValid() or source_size.isEmpty():
+            return
+        logical_size = source_size.scaled(
+            available,
+            QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+        )
+        # Supersampling also keeps strokes crisp on displays reporting DPR 1.
+        render_scale = max(float(self.devicePixelRatioF()), 2.0)
+        pixel_size = QtCore.QSize(
+            max(round(logical_size.width() * render_scale), 1),
+            max(round(logical_size.height() * render_scale), 1),
+        )
+        image = QtGui.QImage(
+            pixel_size,
+            QtGui.QImage.Format.Format_ARGB32_Premultiplied,
+        )
+        image.fill(QtCore.Qt.GlobalColor.transparent)
+        painter = QtGui.QPainter(image)
+        painter.setRenderHints(
+            QtGui.QPainter.RenderHint.Antialiasing
+            | QtGui.QPainter.RenderHint.TextAntialiasing
+            | QtGui.QPainter.RenderHint.SmoothPixmapTransform
+        )
+        renderer.render(
+            painter,
+            QtCore.QRectF(
+                0.0,
+                0.0,
+                float(pixel_size.width()),
+                float(pixel_size.height()),
+            ),
+        )
+        painter.end()
+        pixmap = QtGui.QPixmap.fromImage(image)
+        pixmap.setDevicePixelRatio(render_scale)
+        self.setPixmap(pixmap)
+
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(event)
+        self._refresh_pixmap()
+
+
 class GenericRecommendationWorker(QtCore.QObject):
     """Load the index and recommend outside the Qt event loop."""
 
@@ -243,9 +369,16 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.summary_box = QtWidgets.QPlainTextEdit()
         self.summary_box.setObjectName("recommendationSummary")
         self.summary_box.setReadOnly(True)
-        self.summary_box.setFixedHeight(58)
+        self.summary_box.setFixedHeight(QUERY_REACTION_IMAGE_SIZE[1])
         self.summary_box.setVerticalScrollBarPolicy(
             QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
+        self.reaction_image_label = ReactionImageLabel(
+            object_name="queryReactionGraph",
+            minimum_height=QUERY_REACTION_IMAGE_SIZE[1],
+        )
+        self.reaction_image_label.setFixedHeight(
+            QUERY_REACTION_IMAGE_SIZE[1]
         )
 
         self.results_table = QtWidgets.QTableWidget()
@@ -284,6 +417,11 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.details_box = QtWidgets.QPlainTextEdit()
         self.details_box.setObjectName("recommendationDetails")
         self.details_box.setReadOnly(True)
+        self.selected_reaction_image_label = ReactionImageLabel(
+            placeholder="Select a recipe to view its first precedent reaction.",
+            object_name="selectedPrecedentReactionGraph",
+            minimum_height=180,
+        )
 
         self.progress_bar = QtWidgets.QProgressBar()
         self.progress_bar.setObjectName("recommendationProgress")
@@ -303,20 +441,22 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
     def _build_layout(self) -> None:
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(18, 18, 18, 18)
-        layout.setSpacing(10)
+        layout.setSpacing(8)
 
         title = QtWidgets.QLabel("Reaction Condition Recommender")
         title.setStyleSheet("font-size: 20px; font-weight: 600;")
         layout.addWidget(title)
 
-        data_row = QtWidgets.QHBoxLayout()
-        data_row.addWidget(self.data_path_edit)
+        self.data_row_layout = QtWidgets.QHBoxLayout()
+        self.data_label = QtWidgets.QLabel("Recommendation data")
+        self.data_label.setObjectName("recommendationDataLabel")
+        self.data_row_layout.addWidget(self.data_label)
+        self.data_row_layout.addWidget(self.data_path_edit, stretch=1)
         browse = QtWidgets.QPushButton("Browse…")
         browse.clicked.connect(self.choose_data_path)
-        data_row.addWidget(browse)
-        layout.addWidget(QtWidgets.QLabel("Recommendation data"))
-        layout.addLayout(data_row)
-        layout.addWidget(self.data_summary)
+        self.data_row_layout.addWidget(browse)
+        self.data_row_layout.addWidget(self.data_summary)
+        layout.addLayout(self.data_row_layout)
 
         form = QtWidgets.QFormLayout()
         form.addRow("Reaction SMILES:", self.reaction_edit)
@@ -344,8 +484,31 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         upper = QtWidgets.QWidget()
         upper_layout = QtWidgets.QVBoxLayout(upper)
         upper_layout.setContentsMargins(0, 0, 0, 0)
-        upper_layout.addWidget(QtWidgets.QLabel("Query summary"))
-        upper_layout.addWidget(self.summary_box)
+        self.query_summary_panel = QtWidgets.QWidget()
+        self.query_summary_panel.setObjectName("querySummaryPanel")
+        self.query_summary_layout = QtWidgets.QHBoxLayout(
+            self.query_summary_panel
+        )
+        self.query_summary_layout.setContentsMargins(0, 0, 0, 0)
+        self.query_summary_layout.setSpacing(12)
+
+        text_column = QtWidgets.QWidget()
+        text_layout = QtWidgets.QVBoxLayout(text_column)
+        text_layout.setContentsMargins(0, 0, 0, 0)
+        text_layout.setSpacing(4)
+        text_layout.addWidget(QtWidgets.QLabel("Query summary"))
+        text_layout.addWidget(self.summary_box)
+
+        graph_column = QtWidgets.QWidget()
+        graph_layout = QtWidgets.QVBoxLayout(graph_column)
+        graph_layout.setContentsMargins(0, 0, 0, 0)
+        graph_layout.setSpacing(4)
+        graph_layout.addWidget(QtWidgets.QLabel("Reaction graph"))
+        graph_layout.addWidget(self.reaction_image_label)
+
+        self.query_summary_layout.addWidget(text_column, stretch=1)
+        self.query_summary_layout.addWidget(graph_column, stretch=1)
+        upper_layout.addWidget(self.query_summary_panel)
         upper_layout.addWidget(QtWidgets.QLabel("Recommended recipes"))
         upper_layout.addWidget(self.results_table)
         splitter.addWidget(upper)
@@ -353,8 +516,29 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         lower = QtWidgets.QWidget()
         lower_layout = QtWidgets.QVBoxLayout(lower)
         lower_layout.setContentsMargins(0, 0, 0, 0)
-        lower_layout.addWidget(QtWidgets.QLabel("Selected recipe details"))
-        lower_layout.addWidget(self.details_box)
+        self.selected_details_layout = QtWidgets.QHBoxLayout()
+        self.selected_details_layout.setContentsMargins(0, 0, 0, 0)
+        self.selected_details_layout.setSpacing(12)
+
+        details_column = QtWidgets.QWidget()
+        details_layout = QtWidgets.QVBoxLayout(details_column)
+        details_layout.setContentsMargins(0, 0, 0, 0)
+        details_layout.setSpacing(4)
+        details_layout.addWidget(QtWidgets.QLabel("Selected recipe details"))
+        details_layout.addWidget(self.details_box)
+
+        precedent_column = QtWidgets.QWidget()
+        precedent_layout = QtWidgets.QVBoxLayout(precedent_column)
+        precedent_layout.setContentsMargins(0, 0, 0, 0)
+        precedent_layout.setSpacing(4)
+        precedent_layout.addWidget(
+            QtWidgets.QLabel("First precedent reaction")
+        )
+        precedent_layout.addWidget(self.selected_reaction_image_label)
+
+        self.selected_details_layout.addWidget(details_column, stretch=1)
+        self.selected_details_layout.addWidget(precedent_column, stretch=1)
+        lower_layout.addLayout(self.selected_details_layout)
         splitter.addWidget(lower)
         splitter.setStretchFactor(0, 3)
         splitter.setStretchFactor(1, 2)
@@ -429,6 +613,8 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def clear_results(self) -> None:
         self.summary_box.clear()
+        self.reaction_image_label.clear_image()
+        self.selected_reaction_image_label.clear_image()
         self.details_box.clear()
         self.results_table.setSortingEnabled(False)
         self.results_table.setRowCount(0)
@@ -466,6 +652,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             return
 
         self.clear_results()
+        self._render_reaction_graph(reaction_smiles)
         self.run_button.setEnabled(False)
         self.status_label.setText("Starting…")
         self.progress_bar.setRange(0, 0)
@@ -509,6 +696,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self._render_result(result)
 
     def _render_result(self, result: GenericRecommendationResult) -> None:
+        self._render_reaction_graph(result.query_reaction_smiles)
         if not result.valid:
             self.status_label.setText("No recommendation")
             self.summary_box.setPlainText(_friendly_error(result.error))
@@ -575,11 +763,59 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         if recommendations:
             self.results_table.selectRow(0)
 
+    def _render_reaction_graph(self, reaction_smiles: str) -> None:
+        """Render the query graph without making visualization outcome-critical."""
+        try:
+            drawing = render_reaction_image_bytes(
+                reaction_smiles,
+                size=QUERY_REACTION_IMAGE_SIZE,
+                image_format="svg",
+            )
+        except (RuntimeError, ValueError) as exc:
+            self.reaction_image_label.clear_image(
+                "Reaction graph unavailable."
+            )
+            self.reaction_image_label.setToolTip(str(exc))
+            return
+        if not self.reaction_image_label.set_image_bytes(drawing):
+            self.reaction_image_label.setToolTip(
+                "The renderer returned an unsupported image."
+            )
+            return
+        self.reaction_image_label.setToolTip(reaction_smiles)
+
+    def _render_selected_reaction_graph(self, reaction_smiles: str) -> None:
+        """Render the first precedent associated with the selected recipe."""
+        if not reaction_smiles:
+            self.selected_reaction_image_label.clear_image(
+                "No precedent reaction structure is available."
+            )
+            return
+        try:
+            drawing = render_reaction_image_bytes(
+                reaction_smiles,
+                size=PRECEDENT_REACTION_IMAGE_SIZE,
+                image_format="svg",
+            )
+        except (RuntimeError, ValueError) as exc:
+            self.selected_reaction_image_label.clear_image(
+                "Precedent reaction graph unavailable."
+            )
+            self.selected_reaction_image_label.setToolTip(str(exc))
+            return
+        if not self.selected_reaction_image_label.set_image_bytes(drawing):
+            self.selected_reaction_image_label.setToolTip(
+                "The renderer returned an unsupported image."
+            )
+            return
+        self.selected_reaction_image_label.setToolTip(reaction_smiles)
+
     @QtCore.pyqtSlot()
     def _show_selected_details(self) -> None:
         row = self.results_table.currentRow()
         if row < 0:
             self.details_box.clear()
+            self.selected_reaction_image_label.clear_image()
             return
         item = self.results_table.item(row, 0)
         if item is None:
@@ -587,6 +823,14 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         recommendation = item.data(QtCore.Qt.ItemDataRole.UserRole)
         if recommendation is None:
             return
+        precedent_reaction_smiles = tuple(
+            recommendation.precedent_reaction_smiles
+        )
+        self._render_selected_reaction_graph(
+            precedent_reaction_smiles[0]
+            if precedent_reaction_smiles
+            else ""
+        )
         recipe = recommendation.resolved_recipe
         lines = [
             f"Rank {recommendation.rank}",
@@ -717,11 +961,16 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         event.accept()
 
 
+def _show_main_window(window: GenericRecommenderWindow) -> None:
+    """Show the application window in its requested initial state."""
+    window.showMaximized()
+
+
 def main() -> None:
     """Launch the generic condition recommender."""
     application = QtWidgets.QApplication(sys.argv)
     window = GenericRecommenderWindow()
-    window.show()
+    _show_main_window(window)
     raise SystemExit(application.exec())
 
 

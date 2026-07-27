@@ -179,6 +179,7 @@ class GenericConditionRecommendation:
     precedent_reference_ids: Tuple[str, ...]
     explanation: Tuple[str, ...]
     score_trace: "RecommendationScoreTrace"
+    precedent_reaction_smiles: Tuple[str, ...] = ()
     compatibility_evidence: Tuple[str, ...] = ()
     cautions: Tuple[str, ...] = ()
 
@@ -237,7 +238,7 @@ class GenericRecommendationResult:
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.5"
+    schema_version: str = "1.6"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

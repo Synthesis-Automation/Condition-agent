@@ -80,8 +80,6 @@ except Exception:  # pragma: no cover - optional dependency
 
     def predict_intermediates(*args, **kwargs):
         return _missing_mechanism("predict_intermediates")
-from .visualization import render_molecule_image, render_reaction_image
-
 # Primary exports - ChemTools is the recommended interface
 __all__ = [
     "chem",          # Global singleton instance (recommended)
@@ -107,8 +105,6 @@ __all__ = [
     "classify_mechanism_simple",  # Lightweight mechanism classifier
     "predict_electron_flow",  # Rule-based electron flow heuristics
     "predict_intermediates",  # Mechanistic intermediate heuristics
-    "render_molecule_image",  # Molecule drawing helper (RDKit)
-    "render_reaction_image",  # Reaction drawing helper (RDKit)
 ]
 
 # Version info
