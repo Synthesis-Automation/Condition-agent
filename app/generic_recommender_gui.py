@@ -167,7 +167,7 @@ class ReactionImageLabel(QtWidgets.QLabel):
         )
         self.setStyleSheet(
             "QLabel { background: white; border: 1px solid #cbd5e0; "
-            "border-radius: 4px; color: #718096; padding: 4px; }"
+            "border-radius: 4px; color: #718096; padding: 2px; }"
         )
 
     def set_image_bytes(self, drawing: bytes) -> bool:
@@ -229,8 +229,8 @@ class ReactionImageLabel(QtWidgets.QLabel):
             available,
             QtCore.Qt.AspectRatioMode.KeepAspectRatio,
         )
-        # Supersampling also keeps strokes crisp on displays reporting DPR 1.
-        render_scale = max(float(self.devicePixelRatioF()), 2.0)
+        # Extra supersampling preserves crisp strokes after whitespace trimming.
+        render_scale = max(float(self.devicePixelRatioF()), 3.0)
         pixel_size = QtCore.QSize(
             max(round(logical_size.width() * render_scale), 1),
             max(round(logical_size.height() * render_scale), 1),
@@ -256,9 +256,40 @@ class ReactionImageLabel(QtWidgets.QLabel):
             ),
         )
         painter.end()
+        image = self._trim_white_space(
+            image,
+            margin=max(round(4 * render_scale), 1),
+        )
+        target_pixel_size = QtCore.QSize(
+            max(round(available.width() * render_scale), 1),
+            max(round(available.height() * render_scale), 1),
+        )
+        image = image.scaled(
+            target_pixel_size,
+            QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+            QtCore.Qt.TransformationMode.SmoothTransformation,
+        )
         pixmap = QtGui.QPixmap.fromImage(image)
         pixmap.setDevicePixelRatio(render_scale)
         self.setPixmap(pixmap)
+
+    @staticmethod
+    def _trim_white_space(
+        image: QtGui.QImage,
+        *,
+        margin: int,
+    ) -> QtGui.QImage:
+        """Crop an RDKit drawing to visible content plus a small safe margin."""
+        mask = image.createMaskFromColor(
+            QtGui.QColor("white").rgb(),
+            QtCore.Qt.MaskMode.MaskInColor,
+        )
+        bounds = QtGui.QRegion(QtGui.QBitmap.fromImage(mask)).boundingRect()
+        if bounds.isEmpty():
+            return image
+        bounds.adjust(-margin, -margin, margin, margin)
+        bounds = bounds.intersected(image.rect())
+        return image.copy(bounds)
 
     def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
         super().resizeEvent(event)

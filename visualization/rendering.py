@@ -168,7 +168,7 @@ def _prepare_reaction(reaction_smiles: str, *, kekulize: bool) -> Any:
 
 
 def _style_draw_options(options: Any) -> None:
-    options.padding = 0.08
+    options.padding = 0.02
     options.bondLineWidth = 2.0
     if hasattr(options, "explicitMethyl"):
         options.explicitMethyl = False

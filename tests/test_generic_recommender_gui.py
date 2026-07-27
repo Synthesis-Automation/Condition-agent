@@ -182,6 +182,30 @@ def test_window_requests_vector_reaction_drawing(qtbot, monkeypatch) -> None:
     assert window.reaction_image_label._source_svg
 
 
+def test_reaction_label_trims_empty_svg_canvas_space(qtbot) -> None:
+    label = gui.ReactionImageLabel()
+    qtbot.addWidget(label)
+    image = gui.QtGui.QImage(
+        120,
+        80,
+        gui.QtGui.QImage.Format.Format_RGB32,
+    )
+    image.fill(gui.QtCore.Qt.GlobalColor.white)
+    painter = gui.QtGui.QPainter(image)
+    painter.fillRect(
+        gui.QtCore.QRect(30, 20, 60, 40),
+        gui.QtCore.Qt.GlobalColor.black,
+    )
+    painter.end()
+
+    trimmed = label._trim_white_space(image, margin=3)
+
+    assert trimmed.width() < image.width()
+    assert trimmed.height() < image.height()
+    assert trimmed.width() >= 60
+    assert trimmed.height() >= 40
+
+
 def test_main_window_starts_maximized() -> None:
     events = []
 
