@@ -6,19 +6,33 @@ import csv
 import gzip
 import json
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.1"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.2"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
     "original_reaction_type",
     "detected_reaction_family",
     "detection_status",
+    "transformation_class",
+    "signature_id",
+    "evidence_quality",
+    "transformation_confidence",
+    "reaction_completeness_status",
+    "product_heavy_atom_coverage",
+    "product_element_excess",
+    "chemistry_status",
+    "condition_status",
+    "condition_stage_status",
+    "index_eligibility",
+    "admission_reasons",
+    "warnings",
     "spectators",
     "steric_electronic_factors",
 )
@@ -48,6 +62,14 @@ def _readable_token(value: Any) -> str:
 
 def _formula_text(value: Any) -> str:
     return str(value or "").translate(_SUBSCRIPT_TRANSLATION)
+
+
+def _text_or_blank(value: Any) -> str:
+    return "" if value is None else str(value)
+
+
+def _enum_text(value: Any) -> str:
+    return str(value.value if isinstance(value, Enum) else value or "")
 
 
 def _spectator_summary(signature: Mapping[str, Any]) -> str:
@@ -203,6 +225,24 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     display_value = display if isinstance(display, Mapping) else {}
     signature = record.get("reaction_signature")
     signature_value = signature if isinstance(signature, Mapping) else {}
+    completeness = record.get("reaction_completeness")
+    completeness_value = (
+        completeness if isinstance(completeness, Mapping) else {}
+    )
+    warnings = sorted(
+        {
+            str(value)
+            for value in (
+                tuple(signature_value.get("warnings") or ())
+                + tuple(completeness_value.get("warnings") or ())
+            )
+            if value
+        }
+    )
+    element_excess = completeness_value.get("product_element_excess")
+    element_excess_value = (
+        element_excess if isinstance(element_excess, Mapping) else {}
+    )
     return {
         "canonical_reaction_smiles": str(
             record.get("canonical_reaction_smiles")
@@ -221,6 +261,40 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or record.get("reaction_label_status")
             or "unavailable"
         ),
+        "transformation_class": str(
+            record.get("transformation_class")
+            or signature_value.get("transformation_class")
+            or ""
+        ),
+        "signature_id": str(signature_value.get("signature_id") or ""),
+        "evidence_quality": str(record.get("evidence_quality") or ""),
+        "transformation_confidence": _text_or_blank(
+            record.get("transformation_confidence")
+        ),
+        "reaction_completeness_status": str(
+            completeness_value.get("status") or ""
+        ),
+        "product_heavy_atom_coverage": _text_or_blank(
+            completeness_value.get("product_heavy_atom_coverage")
+        ),
+        "product_element_excess": (
+            json.dumps(
+                dict(sorted(element_excess_value.items())),
+                separators=(",", ":"),
+            )
+            if element_excess_value
+            else ""
+        ),
+        "chemistry_status": _enum_text(record.get("chemistry_status")),
+        "condition_status": _enum_text(record.get("condition_status")),
+        "condition_stage_status": _enum_text(
+            record.get("condition_stage_status")
+        ),
+        "index_eligibility": _enum_text(record.get("index_eligibility")),
+        "admission_reasons": "; ".join(
+            str(value) for value in record.get("admission_reasons") or ()
+        ),
+        "warnings": "; ".join(warnings),
         "spectators": _spectator_summary(signature_value),
         "steric_electronic_factors": _partner_environment_summary(
             signature_value

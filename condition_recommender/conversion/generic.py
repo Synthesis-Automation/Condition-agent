@@ -198,6 +198,7 @@ def convert_record(
         conditions=conditions,
         chemistry_status=decision.chemistry_status,
         condition_status=decision.condition_status,
+        condition_stage_status=decision.condition_stage_status,
         outcome_status=decision.outcome_status,
         index_eligibility=decision.index_eligibility,
         family_environment=asdict(analysis.family_environment)

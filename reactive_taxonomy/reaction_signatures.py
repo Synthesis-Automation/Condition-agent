@@ -24,6 +24,7 @@ from .reaction_models import (
     ReactionPartner,
     ReactionSignature,
     ReactionSpectatorGroup,
+    ReactionStereoChange,
     ReactionTopology,
 )
 
@@ -97,6 +98,39 @@ def _edit_token(edit: Any, *, include_environment: bool) -> Tuple[Any, ...]:
         endpoints,
         edit.old_order or "NONE",
         edit.new_order or "NONE",
+    )
+
+
+def _stereo_token(
+    change: ReactionStereoChange,
+    *,
+    include_environment: bool,
+) -> Tuple[Any, ...]:
+    def endpoint(atom: Optional[ReactionAtomReference]) -> Tuple[Any, ...]:
+        if atom is None:
+            return ()
+        if include_environment:
+            return _atom_token(atom)
+        return (
+            atom.element,
+            atom.formal_charge,
+            atom.aromatic,
+            atom.hybridization,
+        )
+
+    endpoints = tuple(
+        sorted(
+            endpoint(atom)
+            for atom in (change.atom_1, change.atom_2)
+            if atom is not None
+        )
+    )
+    return (
+        change.stereo_type,
+        endpoints,
+        change.old_descriptor or "NONE",
+        change.new_descriptor or "NONE",
+        change.change_type,
     )
 
 
@@ -378,6 +412,18 @@ def build_reaction_signature(
             if edit.edit_type == "order_changed"
         )
     )
+    stereo_tokens = tuple(
+        sorted(
+            _stereo_token(change, include_environment=False)
+            for change in edit_result.stereo_changes
+        )
+    )
+    environment_stereo_tokens = tuple(
+        sorted(
+            _stereo_token(change, include_environment=True)
+            for change in edit_result.stereo_changes
+        )
+    )
     hydrogen_changes = tuple(
         sorted(
             f"{_bond_type(edit, edit.old_order)}>{edit.new_order or 'NONE'}"
@@ -439,7 +485,7 @@ def build_reaction_signature(
         )
         if len(event_classes) == 1:
             transformation_class = event_classes[0]
-        elif edit_result.evidence == "global_atom_correspondence":
+        elif events:
             transformation_class = (
                 "generic_graph_transformation"
                 if len(events) == 1
@@ -469,6 +515,7 @@ def build_reaction_signature(
         "L0",
         {
             "edits": environment_edit_tokens,
+            "stereo": environment_stereo_tokens,
             "events": exact_event_tokens,
             "partners": partner_environments,
             "topology": topology_token,
@@ -478,6 +525,7 @@ def build_reaction_signature(
         "L1",
         {
             "edits": edit_tokens,
+            "stereo": stereo_tokens,
             "events": handle_event_tokens,
             "partners": partner_handles,
             "topology": topology_token,
@@ -526,6 +574,7 @@ def build_reaction_signature(
     )
     product_transformation = ProductTransformation(
         edits=edit_result.edits,
+        stereo_changes=edit_result.stereo_changes,
         formed_connection_labels=(
             (product_connection.concise_label,)
             if product_connection
@@ -560,6 +609,7 @@ def build_reaction_signature(
         broken_bond_types=broken,
         order_changes=order_changes,
         hydrogen_changes=hydrogen_changes,
+        stereo_changes=edit_result.stereo_changes,
         edits=edit_result.edits,
         events=events,
         event_count=len(events),

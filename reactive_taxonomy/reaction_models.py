@@ -8,7 +8,7 @@ from typing import Any, Dict, Literal, Optional, Tuple
 from .models import CompoundAnalysis
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "1.4"
+REACTION_SIGNATURE_SCHEMA_VERSION = "1.5"
 
 
 @dataclass(frozen=True)
@@ -57,6 +57,8 @@ class ReactionAtomReference:
     aromatic: bool
     hybridization: str
     local_environment_id: str
+    chiral_tag: Optional[str] = None
+    cip_code: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -68,6 +70,22 @@ class ReactionEdit:
     atom_2: Optional[ReactionAtomReference]
     old_order: Optional[str]
     new_order: Optional[str]
+    evidence: str
+    confidence: float
+
+
+@dataclass(frozen=True)
+class ReactionStereoChange:
+    """Observed atom or bond stereochemical descriptor correspondence."""
+
+    stereo_type: Literal["atom", "bond"]
+    atom_1: ReactionAtomReference
+    atom_2: Optional[ReactionAtomReference]
+    old_descriptor: Optional[str]
+    new_descriptor: Optional[str]
+    change_type: Literal[
+        "retained", "created", "destroyed", "descriptor_changed"
+    ]
     evidence: str
     confidence: float
 
@@ -243,6 +261,7 @@ class ProductTransformation:
     """General product transformation supporting one or more graph edits."""
 
     edits: Tuple[ReactionEdit, ...]
+    stereo_changes: Tuple[ReactionStereoChange, ...]
     formed_connection_labels: Tuple[str, ...]
     concise_label: Optional[str]
     exact_product_verified: bool
@@ -324,6 +343,7 @@ class ReactionSignature:
     broken_bond_types: Tuple[str, ...]
     order_changes: Tuple[str, ...]
     hydrogen_changes: Tuple[str, ...]
+    stereo_changes: Tuple[ReactionStereoChange, ...]
     edits: Tuple[ReactionEdit, ...]
     events: Tuple[ReactionEvent, ...]
     event_count: int
@@ -385,7 +405,7 @@ class ReactionAnalysis:
     reaction_completeness: Optional[ReactionCompletenessAssessment] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.7"
+    schema_version: str = "1.8"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -413,5 +433,6 @@ __all__ = [
     "ReactionSignature",
     "ReactionSiteReference",
     "ReactionSpectatorGroup",
+    "ReactionStereoChange",
     "ReactionTopology",
 ]

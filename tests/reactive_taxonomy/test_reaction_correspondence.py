@@ -177,6 +177,47 @@ def test_global_correspondence_recovers_condensation_graph_edits() -> None:
     } == {"broken", "formed", "hydrogen_change"}
 
 
+def test_unique_scaffold_edits_receive_generic_transformation_class() -> None:
+    result = featurize_reaction(
+        "CCCCCCCCCCCCOC(=S)SC>>CCCCCCCCCCCC",
+        label_style="ascii",
+    )
+
+    assert result.evidence_quality == "unique_scaffold_correspondence"
+    assert result.reaction_signature is not None
+    assert result.transformation_class == "generic_graph_transformation"
+
+
+def test_explicit_atom_stereo_is_retained_in_signature_identity() -> None:
+    retained = featurize_reaction(
+        "C[C@H](O)C=O.CN>>C[C@H](O)C=NC",
+        label_style="ascii",
+    )
+    unspecified = featurize_reaction(
+        "C[C@H](O)C=O.CN>>CC(O)C=NC",
+        label_style="ascii",
+    )
+
+    assert retained.evidence_quality == "global_atom_correspondence"
+    assert retained.reaction_signature is not None
+    assert unspecified.reaction_signature is not None
+    assert any(
+        change.stereo_type == "atom"
+        and change.change_type == "retained"
+        and change.old_descriptor == change.new_descriptor
+        for change in retained.reaction_signature.stereo_changes
+    )
+    assert retained.reaction_signature.product_transformation is not None
+    assert (
+        retained.reaction_signature.product_transformation.stereo_changes
+        == retained.reaction_signature.stereo_changes
+    )
+    assert (
+        retained.reaction_signature.signature_id
+        != unspecified.reaction_signature.signature_id
+    )
+
+
 def test_global_correspondence_is_reactant_order_invariant() -> None:
     forward = featurize_reaction("CC=O.CN>>CC=NC")
     reversed_order = featurize_reaction("CN.CC=O>>CC=NC")

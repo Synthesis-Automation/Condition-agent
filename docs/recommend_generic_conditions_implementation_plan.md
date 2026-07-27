@@ -502,8 +502,12 @@ condition_status:
   resolved_complete
   resolved_partial
   unresolved_retained
-  multistage_ambiguous
   unusable
+
+condition_stage_status:
+  single_stage
+  structured_multistage
+  unassigned_multistage
 
 outcome_status:
   usable | missing | invalid
@@ -521,8 +525,9 @@ Important behavior:
   usable;
 - missing yield does not erase useful chemistry and condition observations, but
   excludes the row from yield modeling;
-- multi-stage ambiguity is review-only until conditions are assigned to the
-  reaction-forming stage;
+- a fully identity-resolved unassigned multistage ingredient set may enter
+  generic retrieval at review confidence, but receives a ranking penalty and
+  explicit caution; unresolved multistage sets remain review-only;
 - solvent-only records are not complete reaction recipes;
 - source reaction labels remain provenance.
 

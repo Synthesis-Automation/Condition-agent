@@ -361,7 +361,7 @@ def validate_taxonomy() -> List[str]:
     if set(reaction_rendering) != set(grammar_ids):
         errors.append("reaction_rendering_coverage_mismatch")
     signature_features = payload["signature_features.v1"]
-    if signature_features.get("signature_schema_version") != "1.4":
+    if signature_features.get("signature_schema_version") != "1.5":
         errors.append("invalid_signature_schema_version")
     signature_levels = signature_features.get("levels") or {}
     if any(

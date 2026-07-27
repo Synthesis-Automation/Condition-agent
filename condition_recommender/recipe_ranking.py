@@ -349,7 +349,12 @@ def rank_condition_recipes(
             member.compatibility.score for member in independent
         )
         condition_certainty = _mean(
-            float(not member.row.condition_uncertain) for member in independent
+            float(
+                not member.row.condition_uncertain
+                and member.row.condition_stage_status
+                != "unassigned_multistage"
+            )
+            for member in independent
         )
         support = summarize_evidence_support(member.row for member in members)
         components: Dict[str, Optional[float]] = {
@@ -435,7 +440,18 @@ def rank_condition_recipes(
         best = members[0]
         cautions = []
         if condition_certainty < 1.0:
-            cautions.append("Condition identity or contextual role is uncertain")
+            cautions.append(
+                "Condition identity, contextual role, or stage assignment "
+                "is uncertain"
+            )
+        if any(
+            member.row.condition_stage_status == "unassigned_multistage"
+            for member in members
+        ):
+            cautions.append(
+                "Ingredient set is observed, but assignment to ordered "
+                "reaction stages is unavailable"
+            )
         if expected_yield is None:
             cautions.append(
                 "No usable yield evidence; ranking excludes the outcome component"

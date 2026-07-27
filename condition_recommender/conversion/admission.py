@@ -16,6 +16,7 @@ from ..models import (
     AdmissionTier,
     ChemistryStatus,
     ConditionIdentity,
+    ConditionStageStatus,
     ConditionStatus,
     IndexEligibility,
     OutcomeStatus,
@@ -28,9 +29,10 @@ class AdmissionDecision:
     reasons: Tuple[str, ...]
     chemistry_status: ChemistryStatus
     condition_status: ConditionStatus
+    condition_stage_status: ConditionStageStatus
     outcome_status: OutcomeStatus
     index_eligibility: IndexEligibility
-    policy_version: str = "generic_admission.v1.4"
+    policy_version: str = "generic_admission.v1.5"
 
 
 @lru_cache(maxsize=1)
@@ -78,8 +80,11 @@ def decide_admission(
         if completeness is not None and completeness.status == "unresolved":
             chemistry_reasons.append("reaction_completeness_unresolved")
     else:
-        if analysis.evidence_quality == "conflicting_edit_evidence":
-            chemistry_reasons.append("conflicting_edit_evidence")
+        if analysis.evidence_quality in {
+            "conflicting_edit_evidence",
+            "conflicting_stereochemical_evidence",
+        }:
+            chemistry_reasons.append(analysis.evidence_quality)
         if any(
             warning in analysis.warnings for warning in policy["review_warnings"]
         ):
@@ -115,12 +120,10 @@ def decide_admission(
         record.catalyst_cas or record.reagent_cas or record.solvent_cas
     )
     condition_reasons: list[str] = []
+    condition_stage_status = _condition_stage_status(record.stages)
     if not raw_conditions_present:
         condition_status = ConditionStatus.UNUSABLE
         condition_reasons.append("no_condition_identifiers")
-    elif _has_ambiguous_stages(record.stages):
-        condition_status = ConditionStatus.MULTISTAGE_AMBIGUOUS
-        condition_reasons.append("multistage_conditions_not_structured")
     elif not _has_non_solvent_component(resolved_recipe):
         condition_status = ConditionStatus.UNUSABLE
         condition_reasons.append("solvent_only_recipe")
@@ -136,6 +139,8 @@ def decide_admission(
             condition_reasons.append("condition_identifier_uncertainty")
         else:
             condition_status = ConditionStatus.RESOLVED_COMPLETE
+    if condition_stage_status == ConditionStageStatus.UNASSIGNED_MULTISTAGE:
+        condition_reasons.append("multistage_conditions_not_structured")
 
     raw_identifier_count = sum(
         len(values)
@@ -162,28 +167,36 @@ def decide_admission(
         if condition_status == ConditionStatus.RESOLVED_COMPLETE:
             condition_status = ConditionStatus.RESOLVED_PARTIAL
 
-    if chemistry_status == ChemistryStatus.REJECTED or (
-        condition_status == ConditionStatus.UNUSABLE
-    ):
-        index_eligibility = IndexEligibility.INELIGIBLE
-    elif chemistry_status == ChemistryStatus.VERIFIED and condition_status in {
+    condition_is_indexable = condition_status in {
         ConditionStatus.RESOLVED_COMPLETE,
         ConditionStatus.UNRESOLVED_RETAINED,
-    }:
-        index_eligibility = IndexEligibility.ELIGIBLE
-    elif (
+    }
+    stage_is_indexable = condition_stage_status.value in set(
+        policy.get("indexable_stage_statuses") or ()
+    ) or (
+        condition_stage_status == ConditionStageStatus.UNASSIGNED_MULTISTAGE
+        and condition_status.value
+        in set(
+            policy.get(
+                "indexable_unassigned_multistage_condition_statuses"
+            )
+            or ()
+        )
+    )
+    chemistry_is_indexable = chemistry_status == ChemistryStatus.VERIFIED or (
         chemistry_status == ChemistryStatus.REVIEW
         and analysis.reaction_signature is not None
         and completeness is not None
         and completeness.status == "verified"
         and analysis.evidence_quality
         in set(policy.get("indexable_review_evidence") or ())
-        and condition_status
-        in {
-            ConditionStatus.RESOLVED_COMPLETE,
-            ConditionStatus.UNRESOLVED_RETAINED,
-        }
+    )
+    if (
+        chemistry_status == ChemistryStatus.REJECTED
+        or condition_status == ConditionStatus.UNUSABLE
     ):
+        index_eligibility = IndexEligibility.INELIGIBLE
+    elif chemistry_is_indexable and condition_is_indexable and stage_is_indexable:
         index_eligibility = IndexEligibility.ELIGIBLE
     else:
         index_eligibility = IndexEligibility.REVIEW_ONLY
@@ -193,6 +206,11 @@ def decide_admission(
     elif (
         chemistry_status == ChemistryStatus.VERIFIED
         and condition_status == ConditionStatus.RESOLVED_COMPLETE
+        and condition_stage_status
+        in {
+            ConditionStageStatus.SINGLE_STAGE,
+            ConditionStageStatus.STRUCTURED_MULTISTAGE,
+        }
         and outcome_status == OutcomeStatus.USABLE
         and index_eligibility == IndexEligibility.ELIGIBLE
     ):
@@ -210,20 +228,23 @@ def decide_admission(
         reasons=tuple(reasons),
         chemistry_status=chemistry_status,
         condition_status=condition_status,
+        condition_stage_status=condition_stage_status,
         outcome_status=outcome_status,
         index_eligibility=index_eligibility,
     )
 
 
-def _has_ambiguous_stages(raw_stages: str) -> bool:
+def _condition_stage_status(raw_stages: str) -> ConditionStageStatus:
     value = str(raw_stages or "").strip()
     if not value:
-        return False
+        return ConditionStageStatus.SINGLE_STAGE
     try:
         stage_count = int(value)
     except ValueError:
-        return True
-    return stage_count != 1
+        return ConditionStageStatus.UNASSIGNED_MULTISTAGE
+    if stage_count <= 1:
+        return ConditionStageStatus.SINGLE_STAGE
+    return ConditionStageStatus.UNASSIGNED_MULTISTAGE
 
 
 def _has_non_solvent_component(recipe: ResolvedConditionRecipe) -> bool:

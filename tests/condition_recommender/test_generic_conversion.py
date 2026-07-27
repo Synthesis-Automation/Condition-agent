@@ -32,6 +32,7 @@ from condition_recommender.generic_indexing import (
 from condition_recommender.models import (
     AdmissionTier,
     ChemistryStatus,
+    ConditionStageStatus,
     ConditionStatus,
     IndexEligibility,
     OutcomeStatus,
@@ -108,9 +109,9 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "2.0"
-    assert record.converter_definition_version == "generic_conversion.v1.10"
-    assert record.reaction_signature["schema_version"] == "1.4"
+    assert record.schema_version == "2.1"
+    assert record.converter_definition_version == "generic_conversion.v1.13"
+    assert record.reaction_signature["schema_version"] == "1.5"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
     assert record.reference_identity["resolution_status"] == "bibliographic_text"
@@ -201,6 +202,22 @@ def test_global_correspondence_is_indexable_with_review_confidence() -> None:
     index = build_generic_index([record.to_dict()])
     assert len(index.rows) == 1
     assert index.rows[0].chemistry_status == "review"
+
+
+def test_stereochemical_conflict_is_retained_but_not_indexed() -> None:
+    reaction = (
+        "COc1ccc(C)cc1B(O)O."
+        "O=C1c2ccccc2C(=O)N1C/C=C(/Br)c1ccccc1>>"
+        "COc1ccc(C)cc1/C(=C\\CN1C(=O)c2ccccc2C1=O)c1ccccc1"
+    )
+    record = convert_record(_raw(reaction))
+
+    assert record.reaction_signature is not None
+    assert record.evidence_quality == "conflicting_stereochemical_evidence"
+    assert record.chemistry_status == ChemistryStatus.REVIEW
+    assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
+    assert "conflicting_stereochemical_evidence" in record.admission_reasons
+    assert len(build_generic_index([record.to_dict()]).rows) == 0
 
 
 def test_grammar_only_record_is_review_not_rejected() -> None:
@@ -322,7 +339,7 @@ def test_valid_unknown_condition_identity_is_retained_for_retrieval() -> None:
     assert len(build_generic_index([record.to_dict()]).rows) == 1
 
 
-def test_unstructured_multistage_conditions_are_review_only() -> None:
+def test_resolved_unassigned_multistage_conditions_are_indexable_with_caution() -> None:
     record = convert_record(
         _raw(
             "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
@@ -330,7 +347,35 @@ def test_unstructured_multistage_conditions_are_review_only() -> None:
         )
     )
 
-    assert record.condition_status == ConditionStatus.MULTISTAGE_AMBIGUOUS
+    assert record.condition_status == ConditionStatus.RESOLVED_COMPLETE
+    assert (
+        record.condition_stage_status
+        == ConditionStageStatus.UNASSIGNED_MULTISTAGE
+    )
+    assert record.admission_tier == AdmissionTier.REVIEW
+    assert record.index_eligibility == IndexEligibility.ELIGIBLE
+    index = build_generic_index([record.to_dict()])
+    assert len(index.rows) == 1
+    assert index.rows[0].condition_stage_status == "unassigned_multistage"
+    assert index.rows[0].condition_uncertain
+
+
+def test_unresolved_unassigned_multistage_conditions_remain_review_only() -> None:
+    record = convert_record(
+        _raw(
+            "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1",
+            catalyst_cas="999999-99-4",
+            reagent_cas="",
+            solvent_cas="",
+            stages="2",
+        )
+    )
+
+    assert record.condition_status == ConditionStatus.UNRESOLVED_RETAINED
+    assert (
+        record.condition_stage_status
+        == ConditionStageStatus.UNASSIGNED_MULTISTAGE
+    )
     assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
     assert len(build_generic_index([record.to_dict()]).rows) == 0
 
@@ -392,7 +437,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     }
     assert json.loads((output / "conversion_report.json").read_text()) == report
     assert report["schema_version"] == "1.2"
-    assert report["reaction_signature_schema_version"] == "1.4"
+    assert report["reaction_signature_schema_version"] == "1.5"
     assert report["reaction_scope_counts"] == {
         "intermolecular": 1,
         "unimolecular": 1,
@@ -431,7 +476,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "1.1"
+    assert report["schema_version"] == "1.2"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]
@@ -439,12 +484,23 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["original_reaction_type"] == "Original Suzuki Label"
     assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
     assert review_rows[0]["detection_status"] == "family_overlay"
+    assert review_rows[0]["transformation_class"] == "c_c_transfer_coupling"
+    assert review_rows[0]["signature_id"].startswith("RS1:")
+    assert review_rows[0]["evidence_quality"] == "exact_product_reconstruction"
+    assert review_rows[0]["reaction_completeness_status"] == "verified"
+    assert review_rows[0]["chemistry_status"] == "verified"
+    assert review_rows[0]["condition_stage_status"] == "single_stage"
+    assert review_rows[0]["index_eligibility"] == "eligible"
     assert review_rows[0]["steric_electronic_factors"]
 
 
 def test_concise_review_formats_spectators_and_partner_environment() -> None:
     row = concise_reaction_review_row(
         {
+            "chemistry_status": ChemistryStatus.REVIEW,
+            "condition_status": ConditionStatus.RESOLVED_COMPLETE,
+            "condition_stage_status": ConditionStageStatus.UNASSIGNED_MULTISTAGE,
+            "index_eligibility": IndexEligibility.ELIGIBLE,
             "reaction_signature": {
                 "spectator_groups": [
                     {
@@ -488,6 +544,10 @@ def test_concise_review_formats_spectators_and_partner_environment() -> None:
         "nitrogen partner: S=primary N center, "
         "Alkyl α-C secondary, branched; E=electron poor (q=+0.40)"
     )
+    assert row["chemistry_status"] == "review"
+    assert row["condition_status"] == "resolved_complete"
+    assert row["condition_stage_status"] == "unassigned_multistage"
+    assert row["index_eligibility"] == "eligible"
 
 
 def test_recursive_dataset_folder_converts_to_one_concise_review_csv(

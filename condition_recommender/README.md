@@ -401,9 +401,11 @@ python -m condition_recommender.concise_review_cli `
 ```
 
 The output contains canonical reaction SMILES, the detailed structural label,
-the original source reaction type, the detected optional reaction family, the
-structural-label detection status, unchanged spectator groups, and a compact
-steric/electronic summary for each reactive partner. In the compact fields,
+the original source reaction type, the detected optional reaction family,
+transformation class, signature and evidence identifiers, completeness
+diagnostics, admission/index statuses, warning codes, unchanged spectator
+groups, and a compact steric/electronic summary for each reactive partner. In
+the compact fields,
 `d` is graph-bond distance from the nearest reactive site, `S` means steric
 context, `E` means electronic context, and `q` is the qualitative local
 electronic index—not a measured physical quantity. Blank detected families are
@@ -424,8 +426,9 @@ subfolders and creates:
   recommendation data. Shards are compressed and completed shards are reused
   after cancellation or restart.
 - `reaction_review.csv`: the compact file for quick human review, including
-  spectators and reactive-partner steric/electronic context. It is not used as
-  recommendation input.
+  structural-evidence and admission diagnostics, spectators, and
+  reactive-partner steric/electronic context. It is not used as recommendation
+  input.
 - `generic_index.json.gz`: a compressed, ready-to-load recommendation index.
   This is enabled by default because it makes repeated recommendations start
   faster.

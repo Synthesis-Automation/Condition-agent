@@ -413,7 +413,10 @@ def build_reaction_display_label(
         if bool(rule.get("prefer_contextual_label")):
             exact_display_label = contextual_label.concise
     rendered_event_labels: tuple[str, ...] = ()
-    if evidence == "conflicting_edit_evidence" and clauses:
+    if evidence in {
+        "conflicting_edit_evidence",
+        "conflicting_stereochemical_evidence",
+    } and clauses:
         concise = str(rendering["templates"]["conflict"]).format(
             clauses=concise_clauses
         )

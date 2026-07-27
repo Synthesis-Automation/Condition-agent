@@ -195,6 +195,7 @@ def featurize_reaction(
         parsed.products,
         selected,
         selected_events,
+        tuple(candidates),
     )
     reaction_completeness = build_reaction_completeness(
         reactants=parsed.reactants,
@@ -207,7 +208,11 @@ def featurize_reaction(
     warnings.extend(reaction_completeness.warnings)
     contextual_label = (
         None
-        if edit_result.evidence == "conflicting_edit_evidence"
+        if edit_result.evidence
+        in {
+            "conflicting_edit_evidence",
+            "conflicting_stereochemical_evidence",
+        }
         else build_contextual_transformation_label(
             parsed.reactants, edit_result.edits, style=label_style
         )
@@ -220,7 +225,10 @@ def featurize_reaction(
         edit_result=edit_result,
     )
     effective_evidence = evidence
-    if edit_result.evidence == "conflicting_edit_evidence":
+    if edit_result.evidence in {
+        "conflicting_edit_evidence",
+        "conflicting_stereochemical_evidence",
+    }:
         effective_evidence = edit_result.evidence
     elif edit_result.evidence.startswith("validated_mapping"):
         effective_evidence = edit_result.evidence

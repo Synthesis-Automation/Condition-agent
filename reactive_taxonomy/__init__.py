@@ -23,6 +23,7 @@ from .reaction_models import (
     ReactionPartnerEnvironment,
     ReactionSignature,
     ReactionSpectatorGroup,
+    ReactionStereoChange,
     ReactionTopology,
 )
 from .reaction_display_labels import (
@@ -98,6 +99,7 @@ __all__ = [
     "ReactionPartnerEnvironment",
     "ReactionSignature",
     "ReactionSpectatorGroup",
+    "ReactionStereoChange",
     "ReactionTopology",
     "ReactiveSite",
     "SiteCandidate",

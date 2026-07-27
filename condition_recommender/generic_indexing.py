@@ -25,7 +25,7 @@ from .evaluation_features import reaction_scaffold_key, reaction_scaffold_tokens
 from .signature_features import environment_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "1.5"
+GENERIC_INDEX_SCHEMA_VERSION = "1.7"
 
 
 @dataclass(frozen=True)
@@ -50,6 +50,7 @@ class GenericIndexedReaction:
     condition_uncertain: bool
     chemistry_status: str
     condition_status: str
+    condition_stage_status: str
     outcome_status: str
     record_schema_version: str
     converter_definition_version: str
@@ -276,9 +277,15 @@ def build_generic_index(
                 resolved_recipe=dict(recipe),
                 condition_uncertain=bool(
                     (record.get("condition_resolution") or {}).get("has_uncertainty")
-                ),
+                )
+                or _enum_value(record.get("condition_stage_status"))
+                == "unassigned_multistage",
                 chemistry_status=_enum_value(record.get("chemistry_status")),
                 condition_status=_enum_value(record.get("condition_status")),
+                condition_stage_status=(
+                    _enum_value(record.get("condition_stage_status"))
+                    or "single_stage"
+                ),
                 outcome_status=_enum_value(record.get("outcome_status")),
                 record_schema_version=str(record.get("schema_version") or ""),
                 converter_definition_version=str(
@@ -324,6 +331,7 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "condition_uncertain": row.condition_uncertain,
             "chemistry_status": row.chemistry_status,
             "condition_status": row.condition_status,
+            "condition_stage_status": row.condition_stage_status,
             "outcome_status": row.outcome_status,
             "record_schema_version": row.record_schema_version,
             "converter_definition_version": row.converter_definition_version,
@@ -489,6 +497,9 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             condition_uncertain=bool(row["condition_uncertain"]),
             chemistry_status=str(row.get("chemistry_status") or ""),
             condition_status=str(row.get("condition_status") or ""),
+            condition_stage_status=str(
+                row.get("condition_stage_status") or "single_stage"
+            ),
             outcome_status=str(row.get("outcome_status") or ""),
             record_schema_version=str(row["record_schema_version"]),
             converter_definition_version=str(row["converter_definition_version"]),

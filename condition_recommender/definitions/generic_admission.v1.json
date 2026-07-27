@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.4",
+  "schema_version": "1.5",
   "policy_id": "generic_admission.v1",
   "valid_yield_range": [0.0, 100.0],
   "verified_evidence": [
@@ -12,6 +12,13 @@
   "indexable_review_evidence": [
     "global_atom_correspondence",
     "unique_scaffold_correspondence"
+  ],
+  "indexable_stage_statuses": [
+    "single_stage",
+    "structured_multistage"
+  ],
+  "indexable_unassigned_multistage_condition_statuses": [
+    "resolved_complete"
   ],
   "review_warnings": ["MULTIPLE_PRODUCTS"]
 }

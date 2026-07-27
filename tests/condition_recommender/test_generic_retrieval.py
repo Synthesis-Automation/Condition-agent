@@ -108,12 +108,13 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "2.0",
-        "converter_definition_version": "generic_conversion.v1.10",
+        "schema_version": "2.1",
+        "converter_definition_version": "generic_conversion.v1.13",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",
         "condition_status": "resolved_complete",
+        "condition_stage_status": "single_stage",
         "outcome_status": "usable",
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
@@ -582,6 +583,28 @@ def test_condition_uncertainty_is_an_explicit_ranking_component() -> None:
             "condition_certainty"
         ]
         == 0.0
+    )
+
+
+def test_unassigned_multistage_ingredient_set_is_ranked_with_caution() -> None:
+    record = _record(0, _signature("unassigned-stage"))
+    record["condition_stage_status"] = "unassigned_multistage"
+
+    result = recommend_indexed_signature(
+        _signature("query"),
+        build_generic_index([record]),
+        minimum_pool_size=1,
+    )
+
+    assert result.valid
+    recommendation = result.recommendations[0]
+    assert (
+        recommendation.score_trace.ranking_components["condition_certainty"]
+        == 0.0
+    )
+    assert any(
+        "assignment to ordered reaction stages is unavailable" in caution
+        for caution in recommendation.cautions
     )
 
 

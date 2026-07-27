@@ -12,7 +12,7 @@ from .reaction_models import ReactionComponent
 
 
 AtomPair = Tuple[int, int, int, int]
-REACTION_CORRESPONDENCE_VERSION = "2.0"
+REACTION_CORRESPONDENCE_VERSION = "2.1"
 
 
 @dataclass(frozen=True)
@@ -43,19 +43,6 @@ def _element_counts(
             if atom.GetAtomicNum() > 1
         )
     return counts
-
-
-def _has_explicit_stereochemistry(molecule: Any) -> bool:
-    """Return whether correspondence would need stereochemical validation."""
-    from rdkit import Chem
-
-    return any(
-        atom.GetChiralTag() != Chem.ChiralType.CHI_UNSPECIFIED
-        for atom in molecule.GetAtoms()
-    ) or any(
-        bond.GetStereo() != Chem.BondStereo.STEREONONE
-        for bond in molecule.GetBonds()
-    )
 
 
 def _component_correspondence_candidates(
@@ -194,12 +181,6 @@ def infer_global_correspondence_candidates(
     if product_mol is None:
         return ScaffoldCorrespondenceCandidates(
             (), ("GLOBAL_CORRESPONDENCE_PARSE_FAILED",), False
-        )
-    if _has_explicit_stereochemistry(product_mol):
-        return ScaffoldCorrespondenceCandidates(
-            (),
-            ("GLOBAL_CORRESPONDENCE_STEREOCHEMISTRY_UNSUPPORTED",),
-            False,
         )
     if (
         int(product_mol.GetNumHeavyAtoms()) > max_product_heavy_atoms

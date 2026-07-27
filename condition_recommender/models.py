@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "2.0"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v1.10"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "2.1"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v1.13"
 
 
 class AdmissionTier(str, Enum):
@@ -29,8 +29,16 @@ class ConditionStatus(str, Enum):
     RESOLVED_COMPLETE = "resolved_complete"
     RESOLVED_PARTIAL = "resolved_partial"
     UNRESOLVED_RETAINED = "unresolved_retained"
-    MULTISTAGE_AMBIGUOUS = "multistage_ambiguous"
     UNUSABLE = "unusable"
+
+
+class ConditionStageStatus(str, Enum):
+    """Whether source conditions are assigned to an ordered process stage."""
+
+    UNCLASSIFIED = "unclassified"
+    SINGLE_STAGE = "single_stage"
+    STRUCTURED_MULTISTAGE = "structured_multistage"
+    UNASSIGNED_MULTISTAGE = "unassigned_multistage"
 
 
 class OutcomeStatus(str, Enum):
@@ -110,6 +118,9 @@ class RecommendationRecord:
     conditions: ConditionIdentity
     chemistry_status: ChemistryStatus = ChemistryStatus.UNCLASSIFIED
     condition_status: ConditionStatus = ConditionStatus.UNCLASSIFIED
+    condition_stage_status: ConditionStageStatus = (
+        ConditionStageStatus.UNCLASSIFIED
+    )
     outcome_status: OutcomeStatus = OutcomeStatus.UNCLASSIFIED
     index_eligibility: IndexEligibility = IndexEligibility.UNCLASSIFIED
     family_environment: Optional[Dict[str, Any]] = None

@@ -39,7 +39,7 @@ from .generic import GenericConversionCache, convert_record
 from .input_schema import RawReactionRecord, discover_csv_datasets, iter_csv_records
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
-SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v1.3"
+SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v1.4"
 
 
 @dataclass(frozen=True)
@@ -186,6 +186,7 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
         "admission_tier",
         "chemistry_status",
         "condition_status",
+        "condition_stage_status",
         "outcome_status",
         "index_eligibility",
         "evidence_quality",
@@ -804,6 +805,9 @@ def convert_datasets_sharded(
         ),
         "condition_status_counts": _merge_counts(
             complete_entries, "condition_status_counts"
+        ),
+        "condition_stage_status_counts": _merge_counts(
+            complete_entries, "condition_stage_status_counts"
         ),
         "outcome_status_counts": _merge_counts(
             complete_entries, "outcome_status_counts"

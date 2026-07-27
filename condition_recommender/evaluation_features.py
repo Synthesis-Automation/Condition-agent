@@ -61,6 +61,10 @@ def reaction_scaffold_tokens(
             continue
         scaffold = MurckoScaffold.GetScaffoldForMol(molecule)
         if scaffold.GetNumAtoms():
+            # Murcko deletion can leave E/Z metadata without the defining
+            # stereo atoms. Scaffold identity is intentionally non-isomeric,
+            # so clear stereo before canonicalization.
+            Chem.RemoveStereochemistry(scaffold)
             smiles = Chem.MolToSmiles(
                 scaffold,
                 canonical=True,

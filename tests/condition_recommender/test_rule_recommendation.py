@@ -47,7 +47,7 @@ def test_specific_structural_rules_match_without_named_family(
 
     assert analysis.named_family is None
     assert result.valid
-    assert result.reaction_signature_schema_version == "1.4"
+    assert result.reaction_signature_schema_version == "1.5"
     assert result.schema_version == "1.2"
     assert result.rule_definition_schema_version == "1.2"
     assert result.recipe_template_schema_version == "1.2"

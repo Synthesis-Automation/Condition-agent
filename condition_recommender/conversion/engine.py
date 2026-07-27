@@ -15,6 +15,7 @@ from reactive_taxonomy import REACTION_SIGNATURE_SCHEMA_VERSION
 from ..models import (
     AdmissionTier,
     ChemistryStatus,
+    ConditionStageStatus,
     ConditionStatus,
     GENERIC_CONVERTER_DEFINITION_VERSION,
     IndexEligibility,
@@ -61,6 +62,7 @@ def convert_datasets(
     tier_counts = Counter()
     chemistry_quality_counts = Counter()
     condition_quality_counts = Counter()
+    condition_stage_counts = Counter()
     outcome_quality_counts = Counter()
     index_eligibility_counts = Counter()
     reason_counts = Counter()
@@ -111,6 +113,7 @@ def convert_datasets(
                 tier_counts[tier] += 1
                 chemistry_quality_counts[record.chemistry_status.value] += 1
                 condition_quality_counts[record.condition_status.value] += 1
+                condition_stage_counts[record.condition_stage_status.value] += 1
                 outcome_quality_counts[record.outcome_status.value] += 1
                 index_eligibility_counts[record.index_eligibility.value] += 1
                 reason_counts.update(record.admission_reasons)
@@ -176,6 +179,10 @@ def convert_datasets(
         "condition_status_counts": {
             status.value: condition_quality_counts[status.value]
             for status in ConditionStatus
+        },
+        "condition_stage_status_counts": {
+            status.value: condition_stage_counts[status.value]
+            for status in ConditionStageStatus
         },
         "outcome_status_counts": {
             status.value: outcome_quality_counts[status.value]

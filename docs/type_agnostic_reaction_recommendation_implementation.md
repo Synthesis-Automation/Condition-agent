@@ -377,8 +377,12 @@ The initial release should borrow deterministic mapping validation and graph-com
 Neither fallback is a general reaction mapper. The global path is bounded by
 reactant-component, product-size, candidate, and search-combination limits. It
 rejects additional substantial products, insufficient conservation, element
-excess, explicit stereochemistry it cannot validate, overflow, and chemically
-distinct minimum-edit correspondences.
+excess, overflow, and chemically distinct minimum-edit correspondences.
+Explicit atom and E/Z descriptors are reconciled across correspondence
+candidates and participate in exact and handle signature identity. A
+structurally matching but explicitly opposite operator reconstruction is
+retained as stereochemical conflict evidence for review rather than silently
+accepted.
 Symmetry-equivalent atom assignments may be accepted only when their normalized
 edit sets agree. Accepted global results retain review-level inference evidence
 and never imply a named family.

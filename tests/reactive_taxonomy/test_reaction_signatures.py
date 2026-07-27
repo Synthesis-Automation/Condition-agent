@@ -99,8 +99,8 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
         "C-H:NONE>SINGLE",
     )
-    assert payload["schema_version"] == "1.7"
-    assert payload["reaction_signature"]["schema_version"] == "1.4"
+    assert payload["schema_version"] == "1.8"
+    assert payload["reaction_signature"]["schema_version"] == "1.5"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
     )
@@ -177,6 +177,10 @@ def test_balanced_unmapped_multi_event_reaction_is_exactly_reconstructed() -> No
     assert result.reaction_signature.event_count == 2
     assert result.reaction_signature.product_transformation is not None
     assert result.reaction_signature.product_transformation.exact_product_verified
+    assert (
+        result.transformation_class
+        == "generic_multi_event_graph_transformation"
+    )
     assert result.reaction_label == "C-O substitution + C-S substitution"
     assert [
         event.transformation_class for event in result.reaction_signature.events

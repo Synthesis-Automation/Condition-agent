@@ -14,6 +14,7 @@ from .reaction_models import (
     ReactionComponent,
     ReactionEdit,
     ReactionSiteReference,
+    ReactionStereoChange,
 )
 from .reaction_correspondence import (
     infer_global_correspondence_candidates,
@@ -30,6 +31,7 @@ class EditNormalizationResult:
     confidence: float
     warnings: Tuple[str, ...] = ()
     valid: bool = True
+    stereo_changes: Tuple[ReactionStereoChange, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -70,11 +72,19 @@ def _atom_reference(
     *,
     side: Optional[str] = None,
 ) -> ReactionAtomReference:
+    from rdkit import Chem
+
     mol = parse_smiles(component.input_smiles)
     if mol is None:
         raise ValueError(f"Cannot parse component {component.component_index}")
+    Chem.AssignStereochemistry(mol, cleanIt=True, force=True)
     atom = mol.GetAtomWithIdx(int(atom_index))
     map_number = int(atom.GetAtomMapNum()) or None
+    chiral_tag = (
+        str(atom.GetChiralTag())
+        if atom.GetChiralTag() != Chem.ChiralType.CHI_UNSPECIFIED
+        else None
+    )
     return ReactionAtomReference(
         side=side or component.side,
         component_index=component.component_index,
@@ -85,6 +95,12 @@ def _atom_reference(
         aromatic=bool(atom.GetIsAromatic()),
         hybridization=str(atom.GetHybridization()),
         local_environment_id=_environment_id(mol, int(atom_index)),
+        chiral_tag=chiral_tag,
+        cip_code=(
+            str(atom.GetProp("_CIPCode"))
+            if atom.HasProp("_CIPCode")
+            else None
+        ),
     )
 
 
@@ -231,12 +247,28 @@ def normalize_mapped_edits(
             )
     if not edits:
         warnings.append("NO_MAPPED_BOND_EDITS")
+    stereo_changes = _correspondence_stereo_changes(
+        tuple(
+            (
+                left.atoms[map_number].component_index,
+                left.atoms[map_number].atom_index,
+                right.atoms[map_number].component_index,
+                right.atoms[map_number].atom_index,
+            )
+            for map_number in sorted(set(left.atoms).intersection(right.atoms))
+        ),
+        reactants,
+        products,
+        evidence="supplied_atom_mapping",
+        confidence=1.0,
+    )
     return EditNormalizationResult(
         tuple(edits),
         "validated_atom_mapping" if edits else "atom_mapping_without_edits",
         1.0 if edits else 0.0,
         tuple(sorted(set(warnings))),
         bool(edits),
+        stereo_changes,
     )
 
 
@@ -474,6 +506,213 @@ def _correspondence_edits(
     return tuple(edits)
 
 
+def _atom_stereo_descriptor(molecule: Any, atom_index: int) -> Optional[str]:
+    from rdkit import Chem
+
+    atom = molecule.GetAtomWithIdx(int(atom_index))
+    if atom.HasProp("_CIPCode"):
+        return str(atom.GetProp("_CIPCode"))
+    tag = atom.GetChiralTag()
+    if tag == Chem.ChiralType.CHI_UNSPECIFIED:
+        return None
+    return str(tag).replace("CHI_", "")
+
+
+def _bond_stereo_descriptor(bond: Any) -> Optional[str]:
+    from rdkit import Chem
+
+    if bond is None:
+        return None
+    stereo = bond.GetStereo()
+    if stereo in {Chem.BondStereo.STEREONONE, Chem.BondStereo.STEREOANY}:
+        return None
+    value = str(stereo).replace("STEREO", "")
+    return {"CIS": "Z", "TRANS": "E"}.get(value, value)
+
+
+def _stereo_change_type(
+    old_descriptor: Optional[str],
+    new_descriptor: Optional[str],
+) -> str:
+    if old_descriptor == new_descriptor:
+        return "retained"
+    if old_descriptor is None:
+        return "created"
+    if new_descriptor is None:
+        return "destroyed"
+    return "descriptor_changed"
+
+
+def _correspondence_stereo_changes(
+    mapping: Tuple[Tuple[int, int, int, int], ...],
+    reactants: Tuple[ReactionComponent, ...],
+    products: Tuple[ReactionComponent, ...],
+    *,
+    evidence: str,
+    confidence: float,
+) -> Tuple[ReactionStereoChange, ...]:
+    """Extract explicit atom and E/Z descriptors across one correspondence."""
+    reactant_components = {
+        component.component_index: component for component in reactants
+    }
+    product_components = {
+        component.component_index: component for component in products
+    }
+    reactant_molecules = {
+        index: parse_smiles(component.input_smiles)
+        for index, component in reactant_components.items()
+    }
+    product_molecules = {
+        index: parse_smiles(component.input_smiles)
+        for index, component in product_components.items()
+    }
+    molecules = tuple(
+        molecule
+        for molecule in (
+            tuple(reactant_molecules.values())
+            + tuple(product_molecules.values())
+        )
+        if molecule is not None
+    )
+    if not any(
+        _has_explicit_stereochemistry(molecule) for molecule in molecules
+    ):
+        return ()
+    from rdkit import Chem
+
+    for molecule in molecules:
+        Chem.AssignStereochemistry(molecule, cleanIt=True, force=True)
+    forward = {
+        (reactant_component, reactant_atom): (product_component, product_atom)
+        for reactant_component, reactant_atom, product_component, product_atom
+        in mapping
+    }
+    reverse = {product: reactant for reactant, product in forward.items()}
+    changes = []
+    for reactant_key, product_key in sorted(forward.items()):
+        reactant_molecule = reactant_molecules.get(reactant_key[0])
+        product_molecule = product_molecules.get(product_key[0])
+        if reactant_molecule is None or product_molecule is None:
+            continue
+        old_descriptor = _atom_stereo_descriptor(
+            reactant_molecule, reactant_key[1]
+        )
+        new_descriptor = _atom_stereo_descriptor(
+            product_molecule, product_key[1]
+        )
+        if old_descriptor is None and new_descriptor is None:
+            continue
+        changes.append(
+            ReactionStereoChange(
+                stereo_type="atom",
+                atom_1=_atom_reference(
+                    reactant_components[reactant_key[0]], reactant_key[1]
+                ),
+                atom_2=None,
+                old_descriptor=old_descriptor,
+                new_descriptor=new_descriptor,
+                change_type=_stereo_change_type(
+                    old_descriptor, new_descriptor
+                ),
+                evidence=evidence,
+                confidence=confidence,
+            )
+        )
+    for product_component_index, product_molecule in product_molecules.items():
+        if product_molecule is None:
+            continue
+        for product_bond in product_molecule.GetBonds():
+            product_left = (
+                product_component_index,
+                int(product_bond.GetBeginAtomIdx()),
+            )
+            product_right = (
+                product_component_index,
+                int(product_bond.GetEndAtomIdx()),
+            )
+            reactant_left = reverse.get(product_left)
+            reactant_right = reverse.get(product_right)
+            if reactant_left is None or reactant_right is None:
+                continue
+            old_bond = None
+            if reactant_left[0] == reactant_right[0]:
+                reactant_molecule = reactant_molecules.get(reactant_left[0])
+                if reactant_molecule is not None:
+                    old_bond = reactant_molecule.GetBondBetweenAtoms(
+                        reactant_left[1], reactant_right[1]
+                    )
+            old_descriptor = _bond_stereo_descriptor(old_bond)
+            new_descriptor = _bond_stereo_descriptor(product_bond)
+            if old_descriptor is None and new_descriptor is None:
+                continue
+            left_component = reactant_components[reactant_left[0]]
+            right_component = reactant_components[reactant_right[0]]
+            changes.append(
+                ReactionStereoChange(
+                    stereo_type="bond",
+                    atom_1=_atom_reference(
+                        left_component, reactant_left[1]
+                    ),
+                    atom_2=_atom_reference(
+                        right_component, reactant_right[1]
+                    ),
+                    old_descriptor=old_descriptor,
+                    new_descriptor=new_descriptor,
+                    change_type=_stereo_change_type(
+                        old_descriptor, new_descriptor
+                    ),
+                    evidence=evidence,
+                    confidence=confidence,
+                )
+            )
+    return tuple(sorted(changes, key=_stereo_comparison_key))
+
+
+def _stereo_comparison_key(change: ReactionStereoChange) -> Tuple[Any, ...]:
+    endpoints = tuple(
+        sorted(
+            (
+                atom.component_index,
+                atom.atom_index,
+                atom.element,
+                atom.local_environment_id,
+            )
+            for atom in (change.atom_1, change.atom_2)
+            if atom is not None
+        )
+    )
+    return (
+        change.stereo_type,
+        endpoints,
+        change.old_descriptor or "NONE",
+        change.new_descriptor or "NONE",
+        change.change_type,
+    )
+
+
+def _chemistry_stereo_key(change: ReactionStereoChange) -> Tuple[Any, ...]:
+    endpoints = tuple(
+        sorted(
+            (
+                atom.element,
+                atom.formal_charge,
+                atom.aromatic,
+                atom.hybridization,
+                atom.local_environment_id,
+            )
+            for atom in (change.atom_1, change.atom_2)
+            if atom is not None
+        )
+    )
+    return (
+        change.stereo_type,
+        endpoints,
+        change.old_descriptor or "NONE",
+        change.new_descriptor or "NONE",
+        change.change_type,
+    )
+
+
 def _chemistry_edit_key(edit: ReactionEdit) -> Tuple[Any, ...]:
     endpoints = tuple(
         sorted(
@@ -532,30 +771,40 @@ def normalize_inferred_scaffold_edits(
             (), "unresolved", 0.0, correspondence.warnings, False
         )
     all_candidate_results = tuple(
-        _correspondence_edits(
-            mapping,
-            reactants,
-            products,
-            evidence=evidence,
-            confidence=confidence,
+        (
+            _correspondence_edits(
+                mapping,
+                reactants,
+                products,
+                evidence=evidence,
+                confidence=confidence,
+            ),
+            _correspondence_stereo_changes(
+                mapping,
+                reactants,
+                products,
+                evidence=evidence,
+                confidence=confidence,
+            ),
         )
         for mapping in correspondence.candidates
     )
     if evidence == "global_atom_correspondence":
         nonempty_costs = tuple(
             _correspondence_edit_cost(edits)
-            for edits in all_candidate_results
+            for edits, _ in all_candidate_results
             if edits
         )
         best_cost = min(nonempty_costs) if nonempty_costs else None
         candidate_results = tuple(
-            edits
-            for edits in all_candidate_results
+            result
+            for result in all_candidate_results
+            for edits, _ in (result,)
             if edits and _correspondence_edit_cost(edits) == best_cost
         )
     else:
         candidate_results = all_candidate_results
-    nonempty = tuple(edits for edits in candidate_results if edits)
+    nonempty = tuple(result for result in candidate_results if result[0])
     if not nonempty:
         return EditNormalizationResult(
             (),
@@ -565,8 +814,13 @@ def normalize_inferred_scaffold_edits(
             False,
         )
     edit_sets = {
-        tuple(sorted(_chemistry_edit_key(edit) for edit in edits))
-        for edits in nonempty
+        (
+            tuple(sorted(_chemistry_edit_key(edit) for edit in edits)),
+            tuple(
+                sorted(_chemistry_stereo_key(change) for change in stereo)
+            ),
+        )
+        for edits, stereo in nonempty
     }
     if len(edit_sets) != 1 or len(nonempty) != len(candidate_results):
         return EditNormalizationResult(
@@ -578,14 +832,22 @@ def normalize_inferred_scaffold_edits(
         )
     selected = min(
         nonempty,
-        key=lambda edits: tuple(sorted(_comparison_key(edit) for edit in edits)),
+        key=lambda result: (
+            tuple(sorted(_comparison_key(edit) for edit in result[0])),
+            tuple(
+                sorted(
+                    _stereo_comparison_key(change) for change in result[1]
+                )
+            ),
+        ),
     )
     return EditNormalizationResult(
-        selected,
+        selected[0],
         evidence,
         confidence,
         (inferred_warning,),
         True,
+        selected[1],
     )
 
 
@@ -608,11 +870,71 @@ def _comparison_key(edit: ReactionEdit) -> Tuple[Any, ...]:
     )
 
 
+def _has_explicit_stereochemistry(molecule: Any) -> bool:
+    from rdkit import Chem
+
+    return any(
+        atom.GetChiralTag() != Chem.ChiralType.CHI_UNSPECIFIED
+        for atom in molecule.GetAtoms()
+    ) or any(
+        bond.GetStereo() not in {
+            Chem.BondStereo.STEREONONE,
+            Chem.BondStereo.STEREOANY,
+        }
+        for bond in molecule.GetBonds()
+    )
+
+
+def _canonical_stereo_pair(molecule: Any) -> Tuple[str, str]:
+    from rdkit import Chem
+
+    copy = Chem.Mol(molecule)
+    for atom in copy.GetAtoms():
+        atom.SetAtomMapNum(0)
+    return (
+        Chem.MolToSmiles(copy, canonical=True, isomericSmiles=False),
+        Chem.MolToSmiles(copy, canonical=True, isomericSmiles=True),
+    )
+
+
+def _stereochemical_reconstruction_conflict(
+    candidates: Tuple[ReactionCandidate, ...],
+    products: Tuple[ReactionComponent, ...],
+) -> bool:
+    """Detect a structurally matching but explicitly opposite prediction."""
+    product_molecules = tuple(
+        molecule
+        for component in products
+        for molecule in (parse_smiles(component.input_smiles),)
+        if molecule is not None and molecule.GetNumHeavyAtoms() > 0
+    )
+    if len(product_molecules) != 1:
+        return False
+    observed = product_molecules[0]
+    if not _has_explicit_stereochemistry(observed):
+        return False
+    observed_nonisomeric, observed_isomeric = _canonical_stereo_pair(observed)
+    for candidate in candidates:
+        predicted = parse_smiles(candidate.predicted_product_smiles or "")
+        if predicted is None or not _has_explicit_stereochemistry(predicted):
+            continue
+        predicted_nonisomeric, predicted_isomeric = _canonical_stereo_pair(
+            predicted
+        )
+        if (
+            predicted_nonisomeric == observed_nonisomeric
+            and predicted_isomeric != observed_isomeric
+        ):
+            return True
+    return False
+
+
 def normalize_reaction_edits(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
     selected: Optional[ReactionCandidate],
     selected_events: Tuple[ReactionCandidate, ...] = (),
+    candidates: Tuple[ReactionCandidate, ...] = (),
 ) -> EditNormalizationResult:
     """Choose observed edits when valid and reconcile exact operator evidence."""
     mapped = normalize_mapped_edits(reactants, products)
@@ -642,12 +964,16 @@ def normalize_reaction_edits(
                 "validated_mapping_and_exact_reconstruction",
                 1.0,
                 warnings,
+                True,
+                mapped.stereo_changes,
             )
         return EditNormalizationResult(
             mapped.edits,
             "conflicting_edit_evidence",
             0.5,
             tuple(sorted(set(warnings + ("MAPPING_RECONSTRUCTION_CONFLICT",)))),
+            True,
+            mapped.stereo_changes,
         )
     if mapped.valid and predicted_multi.valid:
         mapped_keys = {_comparison_key(edit) for edit in mapped.edits}
@@ -658,16 +984,41 @@ def normalize_reaction_edits(
                 "validated_mapping_and_exact_multi_event_reconstruction",
                 1.0,
                 warnings,
+                True,
+                mapped.stereo_changes,
             )
         return EditNormalizationResult(
             mapped.edits,
             "conflicting_edit_evidence",
             0.5,
             tuple(sorted(set(warnings + ("MAPPING_RECONSTRUCTION_CONFLICT",)))),
+            True,
+            mapped.stereo_changes,
         )
     if mapped.valid:
+        if _stereochemical_reconstruction_conflict(candidates, products):
+            return EditNormalizationResult(
+                mapped.edits,
+                "conflicting_stereochemical_evidence",
+                0.5,
+                tuple(
+                    sorted(
+                        set(
+                            warnings
+                            + ("STEREOCHEMICAL_RECONSTRUCTION_CONFLICT",)
+                        )
+                    )
+                ),
+                True,
+                mapped.stereo_changes,
+            )
         return EditNormalizationResult(
-            mapped.edits, mapped.evidence, mapped.confidence, warnings
+            mapped.edits,
+            mapped.evidence,
+            mapped.confidence,
+            warnings,
+            True,
+            mapped.stereo_changes,
         )
     if predicted.valid:
         return EditNormalizationResult(
@@ -682,6 +1033,22 @@ def normalize_reaction_edits(
         )
     inferred = normalize_inferred_scaffold_edits(reactants, products)
     if inferred.valid:
+        if _stereochemical_reconstruction_conflict(candidates, products):
+            return EditNormalizationResult(
+                inferred.edits,
+                "conflicting_stereochemical_evidence",
+                0.5,
+                tuple(
+                    sorted(
+                        set(
+                            inferred.warnings
+                            + ("STEREOCHEMICAL_RECONSTRUCTION_CONFLICT",)
+                        )
+                    )
+                ),
+                True,
+                inferred.stereo_changes,
+            )
         return inferred
     return EditNormalizationResult(
         (),

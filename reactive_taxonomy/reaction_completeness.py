@@ -178,6 +178,7 @@ def build_reaction_completeness(
     correspondence_verified = edit_result.evidence in {
         "unique_scaffold_correspondence",
         "global_atom_correspondence",
+        "conflicting_stereochemical_evidence",
     }
     mapping_verified = edit_result.evidence.startswith("validated") and bool(
         product_maps

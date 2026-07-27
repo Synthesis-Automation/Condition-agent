@@ -161,8 +161,10 @@ conserved subgraphs from a bounded number of reactant components into
 non-overlapping product atoms, requires every product heavy atom to be
 accounted for, and accepts only minimum-edit alternatives that imply the same
 normalized chemistry. Candidate overflow, product element excess, additional
-substantial products, explicit stereochemistry that the fallback cannot
-validate, or chemically different best mappings remain unresolved.
+substantial products, or chemically different best mappings remain unresolved.
+Explicit atom and E/Z stereochemistry is compared across each candidate
+correspondence; alternatives that imply different stereo observations remain
+ambiguous.
 This recovers general assemblies such as additions, condensations, and
 cycloadditions without assigning a named reaction or inventing a reactant.
 
@@ -185,9 +187,24 @@ formal_charge
 aromaticity
 hybridization
 local_environment_id
+chiral_tag
+CIP_code
 evidence
 confidence
 ```
+
+Explicit atom and bond stereochemical descriptors are stored separately as
+typed `ReactionStereoChange` observations. They distinguish retained, created,
+destroyed, and descriptor-changed stereo without claiming a mechanism. If an
+operator reconstructs an explicit stereoisomer opposite to the reported
+product, the observed correspondence is retained with:
+
+```text
+conflicting_stereochemical_evidence
+STEREOCHEMICAL_RECONSTRUCTION_CONFLICT
+```
+
+This conflict remains review-only and cannot enter recommendation retrieval.
 
 When atom mapping and operator reconstruction agree, the evidence can become:
 
@@ -274,9 +291,12 @@ named_family = None
 This is intentional because the graph cannot reliably distinguish SN1, SN2,
 protection chemistry, and related mechanistic interpretations.
 
-For a valid mapped but grammar-unknown reaction, the system can still produce a
-`ReactionSignature` while leaving `named_family` and possibly
-`transformation_class` unset. The structural edit identity remains usable.
+For a valid edit-backed but grammar-unknown reaction, the system can still
+produce a `ReactionSignature` while leaving `named_family` unset. When no
+specific edit-pattern class is supported, the signature receives
+`generic_graph_transformation` or
+`generic_multi_event_graph_transformation`, so structural retrieval does not
+depend on a named mechanism.
 
 Source reaction names and `source_declared_family` are not inputs to
 `featurize_reaction()`. They are retained later as provenance and do not
@@ -293,6 +313,7 @@ After edit normalization, the system derives:
 - `reaction_topology`: intermolecular or intramolecular scope, tether distance,
   ring formation, and ring-size changes;
 - `ReactionEvent` objects: connected groups of edits;
+- retained, created, destroyed, or descriptor-changed stereochemistry;
 - event relationships such as `shared_atom`, `shared_component`, or
   `independent_sites`;
 - warnings, confidence, and evidence quality.
@@ -372,9 +393,10 @@ When normalized edits and topology are available,
 [`build_reaction_signature()`](../reactive_taxonomy/reaction_signatures.py)
 creates deterministic signature keys:
 
-- L0 `exact_signature_key`: edits, detailed environments, partners, events, and
-  topology;
-- L1 `handle_signature_key`: reactive handles and less-specific edit context;
+- L0 `exact_signature_key`: edits, explicit stereochemistry, detailed
+  environments, partners, events, and topology;
+- L1 `handle_signature_key`: reactive handles, explicit stereochemistry, and
+  less-specific edit context;
 - L2 `transformation_signature_key`: bond changes, hydrogen changes,
   transformation class, events, and topology;
 - L3 `bond_edit_signature_key`: topology-agnostic bond-edit fallback;
@@ -429,6 +451,8 @@ During dataset conversion,
 - evaluates admission;
 - rejects product-atom-incomplete records from indexing and sends unresolved
   provenance or inconsistent mapping to review;
+- admits a fully resolved ingredient set from an unassigned multistage record
+  only at review confidence, with a ranking penalty and explicit caution;
 - serializes reaction completeness in canonical JSONL and exposes its status,
   coverage, and warnings in generic review CSV;
 - serializes the nested reaction signature;

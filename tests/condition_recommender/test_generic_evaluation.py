@@ -13,6 +13,7 @@ from condition_recommender.evaluation import (
     evaluate_generic_index,
     grouped_holdout_split,
 )
+from condition_recommender.evaluation_features import reaction_scaffold_tokens
 from condition_recommender.calibration import (
     calibrate_generic_ranking,
     load_generic_calibration_rules,
@@ -75,12 +76,13 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "2.0",
-        "converter_definition_version": "generic_conversion.v1.10",
+        "schema_version": "2.1",
+        "converter_definition_version": "generic_conversion.v1.13",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "chemistry_status": "verified",
         "condition_status": "resolved_complete",
+        "condition_stage_status": "single_stage",
         "outcome_status": "usable",
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
@@ -113,9 +115,9 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.5"
-    assert payload["reaction_signature_schema_version"] == "1.4"
-    assert payload["record_schema_versions"] == ["2.0"]
+    assert payload["schema_version"] == "1.7"
+    assert payload["reaction_signature_schema_version"] == "1.5"
+    assert payload["record_schema_versions"] == ["2.1"]
     assert payload["maps"]["environment_features"]
     integrity = validate_generic_index_artifact(first_path)
     assert integrity["valid"]
@@ -269,6 +271,22 @@ def test_scaffold_disjoint_split_has_no_reactive_scaffold_overlap() -> None:
     }
     assert split.split_mode == "scaffold_disjoint"
     assert not train_tokens.intersection(test_tokens)
+
+
+def test_murcko_scaffold_clears_orphaned_double_bond_stereo() -> None:
+    reaction = (
+        "Ic1ccccc1."
+        "CCCC/C=C/C(=C(/C=C\\c1ccccc1)[Si](C)(C)O)c1ccccc1"
+        ">>CCCC/C=C/C(=C(/C=C\\c1ccccc1)c1ccccc1)c1ccccc1"
+    )
+
+    tokens = reaction_scaffold_tokens(
+        reaction,
+        {"partners": [{"component_index": 1}]},
+    )
+
+    assert tokens
+    assert all(token.startswith("BM:") for token in tokens)
 
 
 def test_forward_time_split_uses_latest_publication_groups() -> None:
