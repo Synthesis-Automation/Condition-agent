@@ -134,6 +134,10 @@ def test_mixed_c_o_c_s_reaction_is_partitioned_into_two_events() -> None:
         "C-O substitution",
         "C-S substitution",
     )
+    assert result.display_label.detailed.startswith(
+        "C-O substitution + C-S substitution; events:"
+    )
+    assert "Event 1:" in result.display_label.detailed
 
 
 def test_multi_event_signature_is_reactant_order_invariant() -> None:
@@ -164,6 +168,10 @@ def test_repeated_events_are_counted_in_display_label() -> None:
     assert result.reaction_signature is not None
     assert result.reaction_signature.event_count == 2
     assert result.reaction_label == "2 x C-S substitution"
+    assert result.display_label is not None
+    assert result.display_label.detailed.startswith(
+        "2 x C-S substitution; events:"
+    )
 
 
 def test_balanced_unmapped_multi_event_reaction_is_exactly_reconstructed() -> None:

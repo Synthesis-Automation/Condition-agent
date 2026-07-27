@@ -29,7 +29,7 @@ def load_reaction_label_rendering() -> dict[str, Any]:
     """Load the versioned declarative edit-label rendering rules."""
     with _PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    if payload.get("schema_version") != "1.3":
+    if payload.get("schema_version") != "1.4":
         raise ValueError("Unsupported reaction-label rendering schema")
     return dict(payload)
 
@@ -290,10 +290,16 @@ def _event_labels(
             if count > 1
             else label
         )
+    concise = styling["event_separator"].join(concise_parts)
+    event_details = styling["event_detail_separator"].join(details)
+    detailed = str(rendering["templates"]["multi_event_detail"]).format(
+        label=concise,
+        events=event_details,
+    )
     return (
         tuple(labels),
-        styling["event_separator"].join(concise_parts),
-        styling["event_detail_separator"].join(details),
+        concise,
+        detailed,
     )
 
 
@@ -421,8 +427,9 @@ def build_reaction_display_label(
         concise = str(rendering["templates"]["conflict"]).format(
             clauses=concise_clauses
         )
-        detailed = str(rendering["templates"]["conflict"]).format(
-            clauses=detailed_clauses
+        detailed = str(rendering["templates"]["conflict_detail"]).format(
+            label=concise_clauses,
+            clauses=detailed_clauses,
         )
         status = "conflicting_evidence"
     elif len(events) > 1 and clauses:
@@ -469,7 +476,10 @@ def build_reaction_display_label(
                 clauses=detailed_clauses,
             )
             if contextual_label
-            else detailed_clauses
+            else str(rendering["templates"]["observed_detail"]).format(
+                label=concise,
+                clauses=detailed_clauses,
+            )
         )
         status = "observed_edits"
     elif fallback_label:

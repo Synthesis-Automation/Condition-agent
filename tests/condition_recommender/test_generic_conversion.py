@@ -110,7 +110,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "2.2"
-    assert record.converter_definition_version == "generic_conversion.v1.18"
+    assert record.converter_definition_version == "generic_conversion.v1.19"
     assert record.reaction_signature["schema_version"] == "1.5"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -271,6 +271,11 @@ def test_partial_product_observation_is_serialized_but_not_indexed() -> None:
 
     review = concise_reaction_review_row(record.to_dict())
     assert review["detection_status"] == "partial_product_correspondence"
+    assert review["reaction_display_label_detailed"] == (
+        "R–C(=O)–OH → R–C(=O)–Cl; "
+        "partial conserved-scaffold observation; "
+        "the reactants do not account for Cl in the product."
+    )
     assert (
         review["partial_transformation_class"]
         == "acyl_heteroatom_substitution"
@@ -507,7 +512,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "1.3"
+    assert report["schema_version"] == "1.4"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]

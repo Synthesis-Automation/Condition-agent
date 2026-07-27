@@ -13,7 +13,9 @@ def test_mapped_unknown_reaction_receives_observed_edit_label() -> None:
     assert result.reaction_label_status == "mapped_edit_summary"
     assert result.display_label is not None
     assert result.display_label.status == "observed_edits"
-    assert result.display_label.detailed == "C(map 1)–N(map 2) bond formation"
+    assert result.display_label.detailed == (
+        "C–N bond formation; edits: C(map 1)–N(map 2) bond formation"
+    )
     assert len(result.display_label.clauses) == 1
     assert result.display_label.clauses[0].evidence == "supplied_atom_mapping"
 
@@ -153,6 +155,9 @@ def test_conflicting_evidence_is_visible_in_label_contract() -> None:
     assert result.display_label is not None
     assert result.display_label.status == "conflicting_evidence"
     assert result.display_label.confidence == 0.5
+    assert result.display_label.detailed.startswith(
+        result.display_label.structural_label + "; conflicting evidence;"
+    )
     assert "MAPPING_RECONSTRUCTION_CONFLICT" in result.display_label.warnings
 
 
@@ -161,7 +166,7 @@ def test_display_label_serializes_as_nested_evidence() -> None:
         "[CH3:1].[NH2:2]>>[CH3:1][NH2:2]"
     ).to_dict()
 
-    assert payload["display_label"]["schema_version"] == "1.3"
+    assert payload["display_label"]["schema_version"] == "1.4"
     assert payload["display_label"]["clauses"][0]["edit_type"] == "formed"
     assert payload["display_label"]["clauses"][0]["atom_map_numbers"] == (1, 2)
 
@@ -226,8 +231,8 @@ def test_reaction_label_definition_is_versioned() -> None:
     rendering = load_reaction_label_rendering()
     patterns = load_reaction_label_patterns()
 
-    assert rendering["schema_version"] == "1.3"
-    assert rendering["label_schema_version"] == "1.3"
+    assert rendering["schema_version"] == "1.4"
+    assert rendering["label_schema_version"] == "1.4"
     assert patterns["schema_version"] == "1.0"
     assert {pattern["id"] for pattern in patterns["patterns"]} >= {
         "substitution",

@@ -13,7 +13,7 @@ from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.3"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.4"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",

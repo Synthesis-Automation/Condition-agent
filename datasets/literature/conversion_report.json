@@ -2,17 +2,17 @@
   "admission_reason_counts": {
     "condition_identifier_uncertainty": 9671,
     "conflicting_stereochemical_evidence": 115,
-    "insufficient_edit_evidence": 8933,
+    "insufficient_edit_evidence": 8934,
     "insufficient_reactant_multiplicity": 335,
     "invalid_reaction_or_product": 249,
     "invalid_yield": 1,
-    "missing_verified_reaction_signature": 5118,
+    "missing_verified_reaction_signature": 5117,
     "missing_yield": 1150,
     "multiple_products": 59,
     "multistage_conditions_not_structured": 11227,
     "no_condition_identifiers": 822,
     "no_usable_transformation_evidence": 1105,
-    "reaction_completeness_unresolved": 6223,
+    "reaction_completeness_unresolved": 6222,
     "solvent_only_recipe": 2087,
     "suspected_missing_reactant": 7455,
     "unaccounted_product_heavy_atoms": 7790,
@@ -38,8 +38,8 @@
     },
     "reference_condition_series_catalog": {
       "path": "reference_condition_series.jsonl.gz",
-      "row_count": 7638,
-      "sha256": "487eb551144bdaf071ccbd005c05397f7a76a49a19436ab041c7b5a82c3edf94"
+      "row_count": 7639,
+      "sha256": "634dc0e556d8cbeb3120e68da30af51a618d8d26d9c724fc07327225de236d89"
     }
   },
   "chemistry_status_counts": {
@@ -80,7 +80,7 @@
   "merged_records": {
     "path": "records.jsonl.gz",
     "row_count": 30100,
-    "sha256": "a0bad4b29496a016dc3eb8d94b3fcc091183267d258e957eeb644fdc3eb7a41e"
+    "sha256": "76023627c7a36ff6e4dbfbf6669742bcaa293f289745d8f36d975bccc6e0532b"
   },
   "mode": "full",
   "named_family_counts": {
@@ -103,20 +103,20 @@
   "reaction_completeness_status_counts": {
     "incomplete": 7790,
     "missing": 249,
-    "unresolved": 6223,
-    "verified": 15838
+    "unresolved": 6222,
+    "verified": 15839
   },
   "reaction_scope_counts": {
-    "intermolecular": 11647,
+    "intermolecular": 11648,
     "intramolecular": 61,
     "mixed": 130,
     "unimolecular": 4000,
-    "unknown": 14262
+    "unknown": 14261
   },
   "reused_shard_count": 0,
   "schema_version": "1.0",
   "shard_count": 118,
-  "signature_count": 15838,
+  "signature_count": 15839,
   "source_file_count": 118,
   "transformation_class_counts": {
     "acyl_heteroatom_substitution": 264,
@@ -135,7 +135,7 @@
     "complete_alkyne_hydrogenation": 12,
     "dehydrogenation": 1,
     "ester_formation": 439,
-    "generic_graph_transformation": 5279,
+    "generic_graph_transformation": 5280,
     "generic_multi_event_graph_transformation": 481,
     "heteroatom_bond_oxidation": 380,
     "heteroatom_bond_reduction": 488,
@@ -154,6 +154,6 @@
     "sulfonate_formation": 159,
     "terminal_alkyne_coupling": 241,
     "thioester_formation": 26,
-    "unknown": 12758
+    "unknown": 12757
   }
 }

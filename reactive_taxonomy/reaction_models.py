@@ -186,7 +186,7 @@ class ReactionDisplayLabel:
     product_context_label: Optional[str] = None
     event_labels: Tuple[str, ...] = ()
     event_count: int = 0
-    schema_version: str = "1.3"
+    schema_version: str = "1.4"
 
 
 @dataclass(frozen=True)

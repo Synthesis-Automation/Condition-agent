@@ -19,6 +19,11 @@ def test_missing_chlorine_source_yields_partial_acyl_substitution() -> None:
     assert result.reaction_signature is None
     assert result.reaction_completeness.status == "incomplete"
     assert result.display_label.status == "partial_product_correspondence"
+    assert result.display_label.detailed == (
+        "R–C(=O)–OH → R–C(=O)–Cl; "
+        "partial conserved-scaffold observation; "
+        "the reactants do not account for Cl in the product."
+    )
     assert "Ar–I" not in result.reaction_label
 
     observation = result.partial_product_transformation
@@ -45,6 +50,9 @@ def test_partial_attachment_replacement_is_not_acyl_specific() -> None:
     assert result.transformation_class == "attachment_replacement"
     assert result.partial_product_transformation is not None
     assert result.reaction_signature is None
+    assert result.display_label.detailed.startswith(
+        "C–OH → C–Cl; partial conserved-scaffold observation;"
+    )
 
 
 def test_partial_replacement_ascii_label_is_deterministic() -> None:
@@ -57,6 +65,9 @@ def test_partial_replacement_ascii_label_is_deterministic() -> None:
         "R-C(=O)-OH -> R-C(=O)-F [F source missing]"
     )
     assert result.partial_product_transformation is not None
+    assert result.display_label.detailed.startswith(
+        "R-C(=O)-OH -> R-C(=O)-F; partial conserved-scaffold observation;"
+    )
 
 
 def test_product_growth_without_attachment_exchange_is_not_forced() -> None:

@@ -290,9 +290,10 @@ def render_partial_product_transformation(
     missing = ", ".join(transformation.missing_product_atom_elements)
     note = f"[{missing} source missing]"
     concise = f"{before} {arrow} {after} {note}"
+    equation = f"{before} {arrow} {after}"
     detailed = (
-        f"Partial conserved-scaffold observation: {before} {arrow} {after}; "
-        f"the reported reactants do not account for {missing} in the product."
+        f"{equation}; partial conserved-scaffold observation; "
+        f"the reactants do not account for {missing} in the product."
     )
     return concise, detailed
 

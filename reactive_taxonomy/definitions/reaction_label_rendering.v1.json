@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.3",
-  "label_schema_version": "1.3",
+  "schema_version": "1.4",
+  "label_schema_version": "1.4",
   "default_style": "unicode",
   "clause_order": ["broken", "order_changed", "formed", "hydrogen_change"],
   "element_precedence": ["C", "N", "O", "S", "P", "B", "Si", "H", "F", "Cl", "Br", "I"],
@@ -54,9 +54,12 @@
     "counted_clause": "{count} {times} {clause}",
     "mapped_atom": "{element}(map {map_number})",
     "conflict": "Conflicting evidence: {clauses}",
+    "conflict_detail": "{label}; conflicting evidence; details: {clauses}",
     "exact_detail": "{label}; edits: {clauses}",
     "contextual_detail": "{label}; transformation: {transformation}; edits: {clauses}",
+    "observed_detail": "{label}; edits: {clauses}",
     "event_detail": "Event {number}: {label}; edits: {clauses}",
+    "multi_event_detail": "{label}; events: {events}",
     "intramolecular_context": "intramolecular",
     "intramolecular_ring_context": "intramolecular ({ring_size}-membered ring)"
   }

@@ -8,7 +8,7 @@
       "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
       "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
     },
-    "converter_definition_version": "generic_conversion.v1.18",
+    "converter_definition_version": "generic_conversion.v1.19",
     "reaction_signature_schema_version": "1.5",
     "record_schema_version": "2.2",
     "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -63,7 +63,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -99,7 +99,7 @@
       },
       "output_path": "shards\\Acetal_ketal_formation.5c4914c69b.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "bccb0ed5dad322771ee155e9025b3782b135026d2911963edcf8f61ec8ed507c",
+      "output_sha256": "8913b70fe2aba4705f2698390e2cb2018f06413cba31e203401434228c712826",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 118,
@@ -160,7 +160,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -197,7 +197,7 @@
       },
       "output_path": "shards\\Acyl_Halides_formation.25aa507a30.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "b1ac7e1ca88917622d359829cfdce2d54a0f76a0e58ca6f2027d49db05b0e6f8",
+      "output_sha256": "2cdc6cfb5521f5e957c526cc6b1e51672d2322366b1267ab069099ce36fd8c21",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 298,
@@ -253,7 +253,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -286,7 +286,7 @@
       },
       "output_path": "shards\\Addition_of_Halogens_to_Double_or_Triple_Bonds.5201e66e9b.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "7ff5eb5457ac059f25384f2a46f06c137a7478788177311b8abce27110988692",
+      "output_sha256": "823908b297d3679a2b923e485641efec898d36de91219375e83de10ccee0829e",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 290,
@@ -338,7 +338,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -372,7 +372,7 @@
       },
       "output_path": "shards\\Addition_of_Hydrazine_Derivatives_to_Carbonyl_Compounds.c0aea46c38.part-00000.jsonl.gz",
       "output_row_count": 20,
-      "output_sha256": "560ee4354ee7979bba94dd42320782b7f5685bebb7c89d229c57938677d5b7e0",
+      "output_sha256": "f622e89bcaa0014536d1276c8098189d48448c5c78cda9ffe8a664fad41ac32c",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 1,
@@ -430,7 +430,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -466,7 +466,7 @@
       },
       "output_path": "shards\\Aldol_classic__Mukaiyama.923581ac7f.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "f6a43027e777aa2256688c4df7eae5b5e3fac1c58e5c07a022d67b06ebd60cca",
+      "output_sha256": "95e542a908d39426ca05271de1f54ba8b7ed796c94faa5ff32f35d5d5f638693",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 15,
@@ -519,7 +519,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -553,7 +553,7 @@
       },
       "output_path": "shards\\Aliphatic_Halide_Exchange.2e859e07c5.part-00000.jsonl.gz",
       "output_row_count": 256,
-      "output_sha256": "05f45e7e6f46a9c38dabb47ea37be9579d47f048b0a387a71f77835e9ae23439",
+      "output_sha256": "ce8295648421035225be555c31203c3c2f45e012e4cae3ed0e3f1792726a196f",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 256
@@ -610,7 +610,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -644,7 +644,7 @@
       },
       "output_path": "shards\\Allylic_Benzylic_and_Vinylic_Halogenations.3c41c32c22.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "bffe874f2b83e79aa161c3b21e41d52f7c3a067897d708565be982508d976699",
+      "output_sha256": "a82e0b0048297d9eb2c73b12e8873fcf5d8b91c7b5183a18463f257c28696423",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 288,
@@ -708,7 +708,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -747,7 +747,7 @@
       },
       "output_path": "shards\\Amide_formation.f686e01db6.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "1c1fb7d27d70eb1d5ae530837805ca789ad660ce9f7885bd37dedb0e0bf8f341",
+      "output_sha256": "a979c6dbaa75a88437d984a9e6fd0ad35fbdad2e0c5e23f905ad9d9a299d8ce5",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 11,
@@ -820,7 +820,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -860,7 +860,7 @@
       },
       "output_path": "shards\\Anhydride_coupling.5149a105a8.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "71c8d4b87493f9c6df5d3e97947157610a6c7057112d6558b03a9e6c8eb2a7d8",
+      "output_sha256": "4847f1f1f630049588bdebcb944897825f9f8885349b5cfd55d586e054a8fbd4",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 32,
@@ -917,7 +917,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -951,7 +951,7 @@
       },
       "output_path": "shards\\Appel_halogenation.97521e84e4.part-00000.jsonl.gz",
       "output_row_count": 202,
-      "output_sha256": "4fd6999992b1ae5df1c4f12e5a763305cfaf34cf0eac0d2547c045bfeae060ba",
+      "output_sha256": "2db0833fd38d3dd0d32aef22f236211142a2c4932a4810cebf2b098996017426",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 202
@@ -1008,7 +1008,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1043,7 +1043,7 @@
       },
       "output_path": "shards\\Aromatic_Halogen_Exchange.324979a703.part-00000.jsonl.gz",
       "output_row_count": 194,
-      "output_sha256": "2bdd416b1d1a2f7f77c863f9aed884de4597689a6750bf6e24128faf80d66fc6",
+      "output_sha256": "2915ff61f7595db220e93351e18ad8d54e381d250ece27ad3e3ecbacb119601f",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 182,
@@ -1104,7 +1104,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1143,7 +1143,7 @@
       },
       "output_path": "shards\\BAIB.b120332aa6.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "1b97db9e67c73393b173eb1e065b8af887ca75ff5c170b9a758e41dedc770a6e",
+      "output_sha256": "ffc503725de053b1c05b7b7543eb1efab1c5341045a688b7c1b73614fdc44908",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 13,
@@ -1202,7 +1202,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1234,7 +1234,7 @@
       },
       "output_path": "shards\\BalzSchiemann.1cacef8b92.part-00000.jsonl.gz",
       "output_row_count": 46,
-      "output_sha256": "b621f5538652b5e129427f13d7236ef35da15500cb966275806ee20fc0b2af1d",
+      "output_sha256": "8597debdea6349cd9e07ba718e6f99891a30a5d45ecb7afc403fc33d88bb6f20",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 1,
@@ -1289,7 +1289,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1325,7 +1325,7 @@
       },
       "output_path": "shards\\BartonMcCombie_deoxygenation.d562169f8b.part-00000.jsonl.gz",
       "output_row_count": 44,
-      "output_sha256": "851cb16982e8c79068850f5beb4dfee9e6d6572e9699622229aeea77b6bc4c54",
+      "output_sha256": "3f31667a36929f45ddb312ed9979d87e5b757f90be6ef500dd666b071ba7ab7c",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 1,
@@ -1386,7 +1386,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1420,7 +1420,7 @@
       },
       "output_path": "shards\\Beckmann_rearrangement.672a5ec4ed.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "cdfa4c8c67e69cd04e81b13a5821f6613889c8001885363961ab56bc2c397cee",
+      "output_sha256": "fac3ed4d369ac1e5c5a9893790d407cef7e0c1eebc102bd205a950bdb19d816f",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 23,
@@ -1470,7 +1470,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1504,7 +1504,7 @@
       },
       "output_path": "shards\\Benzylic_oxidation.9f0d65e66e.part-00000.jsonl.gz",
       "output_row_count": 42,
-      "output_sha256": "708a5ed77bcc24fced477b9de0fa0547bb1576fe10cd749c5cd61719a7cda0bc",
+      "output_sha256": "f37684027d9d5985b4a27829a8b3e50146f2c3130b7a5fe55ec1e31174c17c22",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 42
@@ -1560,7 +1560,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1596,7 +1596,7 @@
       },
       "output_path": "shards\\Biginelli_condensation.8278350701.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "8d8519081a946a81e015507b33b59e18371b46a39a17848b4a7cbfc00f3bcdcd",
+      "output_sha256": "6469b6a0ce9fae537049bf862a531bd63fa6adcc9b52402012b3d0467f7485fa",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 8,
@@ -1660,7 +1660,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1700,7 +1700,7 @@
       },
       "output_path": "shards\\Birch_reduction.61a95a04b1.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "5ab34fa7ebaff935fe323e63c2689a13fd2b0bf9b9d5066655acf4b751074a36",
+      "output_sha256": "0c76e6509109c1a625c232ed7e643db557fea71e2da91dea0432ead4aad2b66d",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 59,
@@ -1769,7 +1769,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1806,7 +1806,7 @@
       },
       "output_path": "shards\\Brown_Hydroboration.67dcfd7277.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "3d6e216636b405e339b4889b4536e9a8d3841b9cf2f188852e01fe4bb81ee96d",
+      "output_sha256": "4770518b1a12314e4bc8ec2cf425eb5c19850a41baa70acda052622d6f318249",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 89,
@@ -1867,7 +1867,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -1900,7 +1900,7 @@
       },
       "output_path": "shards\\BuchererBergs.728b46a5f1.part-00000.jsonl.gz",
       "output_row_count": 34,
-      "output_sha256": "0e63665b321812f8280c1989b43ecfd68c98d31f0dd1f36451298fe861fbbcd8",
+      "output_sha256": "02c8048d7597bdf86df7f06abdd4ba7dbd08f91d59001940e45956e941617462",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 4,
@@ -1963,7 +1963,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2005,7 +2005,7 @@
       },
       "output_path": "shards\\C_N_Coupling.807d2e4486.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "19fbc50912394e701ff3549eecc039de33bfb517ae3b7a171d043baba1c9a9ea",
+      "output_sha256": "b1d0a845a84b30e34c2182291821111a62bdf78606af4a088dc3b9e64b322c60",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 20,
@@ -2081,7 +2081,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2119,7 +2119,7 @@
       },
       "output_path": "shards\\C_O_Coupling.da1cc32981.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "4720857e548cebb38f242645db91b8343bc59172460b2d91a902b468a8fd51cf",
+      "output_sha256": "d7d0b0a972c591b193edcb2ac22db32551365d3c6f3b88db20988f811f5ad345",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 31,
@@ -2189,7 +2189,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2229,7 +2229,7 @@
       },
       "output_path": "shards\\C_S_Coupling.30c40f9315.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "68a6386a809e371d7c8fd7f39eef1e637fefaf65ea49f6589a08f70ee3217901",
+      "output_sha256": "d998ecc69c4d957384d1d0c50ea08f886b590c8a0c67b1c13908e0568d3c2da1",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 41,
@@ -2301,7 +2301,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2341,7 +2341,7 @@
       },
       "output_path": "shards\\Carbamate_formation.8e663d77ca.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "d8b2d062526bd8ea2e7e6996a2ff340b73c8dfb0cbcf5a24ad2a5c2f5a006e4f",
+      "output_sha256": "abc6e13f16da50ec8d5e1cfb2e30b1d8b74168f4d39790ac86917ff9abe529bd",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 23,
@@ -2409,7 +2409,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2449,7 +2449,7 @@
       },
       "output_path": "shards\\Catalytic_hydrogenation.3bddaa6793.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "1fe1fa62756537ef430cf3a3a4e44ccae75814d117b4d056286d5a5e17fa2970",
+      "output_sha256": "c0ad53972db6fe1725e1587032046a9b14b08f653b09f662d47934135ea0a6cd",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 43,
@@ -2524,7 +2524,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2564,7 +2564,7 @@
       },
       "output_path": "shards\\CDI-mediated_amidation.de7d8548d0.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "bd78a7459e2ca93a760f0b139cc2f98b52486d3f67bc52bcfd1704dacd24f184",
+      "output_sha256": "c202a5fc41c3652ff729dd6094712d400735433c12b33baf184c42a4a63e37a9",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 32,
@@ -2632,7 +2632,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2671,7 +2671,7 @@
       },
       "output_path": "shards\\CH_amination_and_azidation.f89fc70f5c.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "09c725ffc14768fc3fb49ca8dfdf3621fb3bc9e5cd9655cc8075f8f3afc3456b",
+      "output_sha256": "59dbcba5a4a1145f62b6e45ffd979b92aaa7d8b146dce2c32d4ae9e3bb249443",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 94,
@@ -2733,7 +2733,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2771,7 +2771,7 @@
       },
       "output_path": "shards\\ChanLam_Narylation.ea5cd33a27.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "60ba16788683841207e42bf7b8190ed7cc6bdad447f2563aa5d47868b9fb1ce9",
+      "output_sha256": "ec8783bb617927bdbf44b2fa2919ae6e9127b0c4fc95e6262bf3084658a35c6f",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 8,
@@ -2822,7 +2822,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2858,7 +2858,7 @@
       },
       "output_path": "shards\\ChanLam_sulfonamide_converted.09d7d18d39.part-00000.jsonl.gz",
       "output_row_count": 54,
-      "output_sha256": "a52fb5b1d376ced4ad04c767d450c30232266d190b3a743d79f12be2f3657b4f",
+      "output_sha256": "d8ae0af07d864d0f21805b8ab8c329b5015aeac1c88cd42a959e178440266d19",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "missing": 22,
@@ -2917,7 +2917,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -2953,7 +2953,7 @@
       },
       "output_path": "shards\\Chlorination_SOCl2_oxalyl_chloride.3cf827e1bc.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "d2d988e20e2c9f2bc4689bcf95a2cd06b82a79499b8d32c81ae13054769fd897",
+      "output_sha256": "41470678996d1dc6609babe8ced5af04e24c358f6de5120057b86c047b24e9e7",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 290,
@@ -3013,7 +3013,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3050,7 +3050,7 @@
       },
       "output_path": "shards\\Clemmensen_reduction.dd30309c12.part-00000.jsonl.gz",
       "output_row_count": 116,
-      "output_sha256": "e39b6a1474bd648959f81bddf35eaf002e1cf14677eb93c5e6a4d024ba0721b0",
+      "output_sha256": "9cadd5c94ca660d721d517ee456262a5abf64a42d75b0f47e30fb5a785c3aa3b",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 12,
@@ -3113,7 +3113,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3148,7 +3148,7 @@
       },
       "output_path": "shards\\CuAAC_azidealkyne.dc42da5346.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "4e7efe7bb93155dcff56c1c1ccda1c974d155eaef4e15ce6f25c44628e287da6",
+      "output_sha256": "325b0bbf0bfb75313f473fff1b08b8182213057b8a93b4f0a99d573725cdf660",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 70,
@@ -3211,7 +3211,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3246,7 +3246,7 @@
       },
       "output_path": "shards\\Curtius_rearrangement.9931191357.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "3866690191eedf7059655d3c56f4e846139dbc00817cf00be28689636ae4470a",
+      "output_sha256": "607f87d8aef701c234daa3332994912328d913bd4232e774031fae9e0cb9aff7",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 138,
@@ -3299,7 +3299,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3332,7 +3332,7 @@
       },
       "output_path": "shards\\Decarboxylative_arylation.0e49fd7007.part-00000.jsonl.gz",
       "output_row_count": 159,
-      "output_sha256": "9439e893d8daaf6ff4bf9f442c418aeaa5232667131202876d7ef03fa98087f7",
+      "output_sha256": "501c6d0648f73b09bd66a5ddffeb1a6eb76855ac722806e90794165c51fae058",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 3,
@@ -3390,7 +3390,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3427,7 +3427,7 @@
       },
       "output_path": "shards\\Deoxy_fluorination.b8575b25c7.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "d919f404e8181a6852f4f83b39ea4491c5fb07225958f710199ad6cfafdb98f5",
+      "output_sha256": "25600035561fbcd855e986af3f660fe7706dd50aeec1308686e7c815fa33aae1",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 276,
@@ -3492,7 +3492,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3530,7 +3530,7 @@
       },
       "output_path": "shards\\DessMartin_periodinane_DMP_Alcohols__aldehydesketones.cbf758ef09.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "2c72b395261fd84c22059e8f19eb93302cac2d71d5179283301ebd2f51b86392",
+      "output_sha256": "fa2631db00233795cd2c756fc2b7d6cdaf327f44c837c84f5397a717d0ba13f3",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 2,
@@ -3597,7 +3597,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3637,7 +3637,7 @@
       },
       "output_path": "shards\\DIBALH_Partial_reductions.786ec45c2c.part-00000.jsonl.gz",
       "output_row_count": 272,
-      "output_sha256": "b81504bc75d9e07e95661e927fe8bdc29187a85e400b1fd629bc43b12eb25517",
+      "output_sha256": "5ea9561fae537ef317be89c8bb93141409e1f4892301808f6ce93f1dc715751c",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 34,
@@ -3701,7 +3701,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3737,7 +3737,7 @@
       },
       "output_path": "shards\\Difluoromethylation.810f67a003.part-00000.jsonl.gz",
       "output_row_count": 292,
-      "output_sha256": "3d1ca4c9bd497d543d12632f98ae9351dec1a45ba8ed1817ee49e6c164072140",
+      "output_sha256": "4a27057d2fde4cde275c1fbab5c556717996290e03c4cb79204f212b2af05dc7",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 8,
@@ -3794,7 +3794,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3828,7 +3828,7 @@
       },
       "output_path": "shards\\Electrophilic_fluorination.afc003b331.part-00000.jsonl.gz",
       "output_row_count": 220,
-      "output_sha256": "acb95b1a74b541eb02c4041d7e99a8c8bef1c782b491b4d87e7832fc74db5e8c",
+      "output_sha256": "024b8e8869d8969cc8a7a518b5a61dbea2baea32216820f49f481fe1903406d3",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 219,
@@ -3893,7 +3893,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -3934,7 +3934,7 @@
       },
       "output_path": "shards\\EschweilerClarke_methylation.a3562ca5e7.part-00000.jsonl.gz",
       "output_row_count": 84,
-      "output_sha256": "f63252b23cdef481c719b4a033da1dff839dfa6e150f62288f02a6d6225acc65",
+      "output_sha256": "7905828ae74ccec8ebdd2861b333a9a9f595eec7aad9b61fd0898dde3882692a",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 27,
@@ -4001,7 +4001,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4038,7 +4038,7 @@
       },
       "output_path": "shards\\Fischer_esterification.81eecc3df4.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "b077f2260b9159e06689849c0078e15ff65b5f1f64ef3408c7a7540ae2e5de22",
+      "output_sha256": "4d574195c732f9f32efb6e69523c6356565647839295972eb1c4bce0db03c59d",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 59,
@@ -4101,7 +4101,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4138,7 +4138,7 @@
       },
       "output_path": "shards\\Fischer_indole_synthesis.f318a7b9e1.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "d86b6cd47d0c3cc73153c7fb0408486c8f6c42dc77d7519530a67da3889a140e",
+      "output_sha256": "d80b8be469328139b6c26fde16b09ccbd8f63f98f2748b3b57047d1855d88c2e",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 9,
@@ -4192,7 +4192,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4226,7 +4226,7 @@
       },
       "output_path": "shards\\Formation_of_Oximes.fea026602f.part-00000.jsonl.gz",
       "output_row_count": 10,
-      "output_sha256": "06b63ce95818a53ad366bba7487a13cc2e22079e93217af920b479c54ce7936b",
+      "output_sha256": "a8867ec578711927f0529752feda7cd9160b3a82ca042e8d307a7e72379d97b1",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 9,
@@ -4287,7 +4287,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4325,7 +4325,7 @@
       },
       "output_path": "shards\\Gabriel_amine_synthesis.6050d66467.part-00000.jsonl.gz",
       "output_row_count": 235,
-      "output_sha256": "4b801609a5bd5b217a126b69eef0663709cacf5586d69282efe5eed54bd978eb",
+      "output_sha256": "bd2255a8f79b2122925911f22e777d13f969b62946eac07712846a2fa5d65be3",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 15,
@@ -4379,7 +4379,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4412,7 +4412,7 @@
       },
       "output_path": "shards\\Gewald_reaction.33b92e43f9.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "cf63deaab92eaf30e090000e6fbb7e7043e7a81588a48a3475e0ae4cac8eee7b",
+      "output_sha256": "af3b829b3d6f5252522bcb892286f806a0d102c783b681f36395c8fdde0b8826",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 281,
@@ -4470,7 +4470,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4507,7 +4507,7 @@
       },
       "output_path": "shards\\Giese_radical_additions.7ed93c1a13.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "2ff744f5bcc257e725c805bdc825c8b9739ac9f6dfed1a6059390d4f15b8af43",
+      "output_sha256": "11e9568e029e9fabcbe6033cde4b9f05495d2c3784a4d6134db74d190eef405f",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 16,
@@ -4571,7 +4571,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4609,7 +4609,7 @@
       },
       "output_path": "shards\\GroebkeBlackburnBienaym.c3d920bf5d.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "b2d5f7bd65ad2e7e8a9d452b2bd1a8c9e604a233672a085b244d2073fe7aab26",
+      "output_sha256": "02c2656495152c213618a745754aecb1d223ea3de12e4e5c4918be153d5a3eee",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 30,
@@ -4669,7 +4669,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4703,7 +4703,7 @@
       },
       "output_path": "shards\\Hantzsch_synthesis.2ff7b5491d.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "655b4980f69149b2188673c3501c3a62e717d7f7f6594684f5929444e4785074",
+      "output_sha256": "dccba5960cd7b6e8b53e58d7e1b55d31042b5353bc2eb8a2fa0d1ddb878deda8",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 299,
@@ -4765,7 +4765,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4807,7 +4807,7 @@
       },
       "output_path": "shards\\HeckMizoroki_coupling.1f131e7e9d.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "30c9c57e89debb4b8ff6e88a4f4a5d894a6fc4848141b94ee419d950cbfb8655",
+      "output_sha256": "ac1555e359c561189cf1668ca810f4c719505f76475dc76421ca679846c31236",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 25,
@@ -4877,7 +4877,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -4914,7 +4914,7 @@
       },
       "output_path": "shards\\Hiyama_coupling.4ba2b15ddb.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "0974f0dc924ef947398d755fd0ea790089e32a501d263f1c49fbc9109f09f28c",
+      "output_sha256": "71aed9600688ef9fed0a6a0d1e144430ff18a300278e2eb8032238bcf3895328",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 8,
@@ -4979,7 +4979,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5016,7 +5016,7 @@
       },
       "output_path": "shards\\Hofmann_rearrangement.9e1480e116.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "288827a09511257518e5d36d82ad2f76979288b80e353c7665b6305f4c845c2b",
+      "output_sha256": "e817477e679c446b2bd17624d3b7db7aa4c50da7c73193b8800f5260966f21fb",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 28,
@@ -5076,7 +5076,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5112,7 +5112,7 @@
       },
       "output_path": "shards\\HornerWadsworthEmmons.eb82e02b46.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "9f80a7cacb47b2d14763ddc27a42b07b18cd196e5dd503dce551b1c7a058342a",
+      "output_sha256": "89bbe71cad682449bf3a4290d884f2b250fbd6357c7fb6c0f015443f91ec96b5",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 38,
@@ -5177,7 +5177,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5214,7 +5214,7 @@
       },
       "output_path": "shards\\Hydrazinolysis.8b4714414b.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "70457cc4bf257b01468139e83f32e8fce26836b39de3458fa5b1bbe8df524855",
+      "output_sha256": "fd510c736d3804c5a1ac7796c59b12e4c1df08757e9de551378c2e9d4f6402e5",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 76,
@@ -5274,7 +5274,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5312,7 +5312,7 @@
       },
       "output_path": "shards\\IBX.4749e179c3.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "eca991d36d7afe44235212ad3e98e7ea7444a8548c5e500617f49e99df55bb84",
+      "output_sha256": "ae51df02c70d2cad5ea8ba347736b5b17d65b47a0168ab37bf88b02be071143b",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 10,
@@ -5377,7 +5377,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5413,7 +5413,7 @@
       },
       "output_path": "shards\\Ircatalyzed_CH_borylation.dba3cd5fc1.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "a3920eb95b72e16a87d4a7e7a17b413979f9a2a3495586d16039becff9ab21d0",
+      "output_sha256": "72883450efc7f3c92845e01fcc06f3e6c1f1117fcb534e5190cd1d49c8b0c604",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 11,
@@ -5478,7 +5478,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5515,7 +5515,7 @@
       },
       "output_path": "shards\\Jones_oxidation.d13a012544.part-00000.jsonl.gz",
       "output_row_count": 82,
-      "output_sha256": "8773700403cd2cfb0b68b84f8f51f8697a4055243b23ca1477a4d73434ab774b",
+      "output_sha256": "453a5bb75a2fe62f413e0cd73172e91dd08f36d1a4092f23ee2cad8244c9d34b",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 5,
@@ -5579,7 +5579,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5616,7 +5616,7 @@
       },
       "output_path": "shards\\Julia-Kocienski_Olefination.b8d24ace45.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "54e74fa349811bc35f41d97776c44a81db5fc512358cab8fc7398a30ccafd765",
+      "output_sha256": "18f69f0ca48041e75718621b7fefc356829279eec9efd74fd713f16374b49e28",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 109,
@@ -5682,7 +5682,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5719,7 +5719,7 @@
       },
       "output_path": "shards\\KabachnikFields.0280900e73.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "d6c56124feff81049d7fa3b3d094420dcfa3015fbafcbbc29bc085932403f1a7",
+      "output_sha256": "08df317867dbd3fc521739c6081e67d8a22cdd0547602ddb049f8187fa8571a7",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 37,
@@ -5784,7 +5784,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5819,7 +5819,7 @@
       },
       "output_path": "shards\\Knoevenagel_condensation.3277b8dbeb.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "79fc6b824ebcd508e1b905747fa839b2cdfbf01cfbb0db8caaa804762131074b",
+      "output_sha256": "cb2bba7225bf57ba759ed2370bab07bb95f8ce7d97b5d9f05eb4e76b97b9e6ad",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 30,
@@ -5882,7 +5882,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -5918,7 +5918,7 @@
       },
       "output_path": "shards\\Knorr_pyrrole_synthesis.d5eeec4900.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "f4a2259bbf2466a5e3ab3a0b45bc014d65eddb0b45e391ede4f87c8f08413b44",
+      "output_sha256": "1725606e4e43081f4d33474ec4eb94e6d0f11dfe110d75d9a2344b455b906820",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 41,
@@ -5986,7 +5986,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6025,7 +6025,7 @@
       },
       "output_path": "shards\\Kumada_coupling.130ae9586b.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "47924eae0d938bb846ddf1084b2916046e106960498a64797ad609c5176a20a0",
+      "output_sha256": "eab415274782c0b703989e9e2eba0e2ac77f698837b78a92128e48c8959dcbca",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 46,
@@ -6093,7 +6093,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6132,7 +6132,7 @@
       },
       "output_path": "shards\\LiebeskindSrogl_coupling.036703977d.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "ad02162abd6ac9512bb2f1ead62eea02a6cd02650e8ba390b5b6fd271d05123f",
+      "output_sha256": "36b9267d4e4f3b37789668591ba2a4cb4855c6507891d4022a67f96057b7b2f5",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 7,
@@ -6197,7 +6197,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6232,7 +6232,7 @@
       },
       "output_path": "shards\\Mannich__Petasis_boronoMannich.f6e4f49307.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "322549117da84e6b4687309f172a83da4a13220259204d396f032a97f241ca42",
+      "output_sha256": "776937ddef512058548a6e6eafbaf693dccf432b4c02169eb819ce62b2ba057e",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 50,
@@ -6292,7 +6292,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6326,7 +6326,7 @@
       },
       "output_path": "shards\\mCPBA_epoxidation_Alkene__epoxide.f72e1ec448.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "ca9389a90d45cd47db2f18d369f464da06030486f689c6c9c20a454e635a565a",
+      "output_sha256": "a5c29007e7600c34278ecaf3351d3ee5bd24af1c27b3b207f95b06ec8774989c",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 292,
@@ -6383,7 +6383,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6418,7 +6418,7 @@
       },
       "output_path": "shards\\Michael_addition.916da7ee66.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "b23c2e6be152dbf98a4a722590f435fef6e085f169679f6a0c2251074098e416",
+      "output_sha256": "b33f3841037a71b233a5d2e8ef7757d84fc7ac48ab227ae2ad577a4270fcb872",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 20,
@@ -6479,7 +6479,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6515,7 +6515,7 @@
       },
       "output_path": "shards\\Minisci.7ff173f983.part-00000.jsonl.gz",
       "output_row_count": 252,
-      "output_sha256": "fcd8da61f2ac2433ac25bcec8659c5f2408002a8e3cb02cb72dcbf2a5e6ece31",
+      "output_sha256": "a34ee23a00828f99b019845fd0b524266f6376e38d5a548e442da0e3e631c055",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 8,
@@ -6576,7 +6576,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6611,7 +6611,7 @@
       },
       "output_path": "shards\\Mitsunobu_etherificationinversion.d1e05493d9.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "9ff41e6d279696c6b83bf663d6aecff8a779d06d1f92afbbc6e0773b34d52dcc",
+      "output_sha256": "a4288df174e8ed653c874994c9614ffa945a37151c8fb19081d42542133649f8",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 17,
@@ -6679,7 +6679,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6720,7 +6720,7 @@
       },
       "output_path": "shards\\NaBH4_carbonyl_reductions.e68df7cc45.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "30f58b4e8607b1bd303c476af42a2c49d0edad4fe8f2673ccac1051133ce6eca",
+      "output_sha256": "227e81b49d817390c5c1e107a84a7b3ef97af39b84e8141ce0b505dd2edeb706",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 23,
@@ -6784,7 +6784,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6817,7 +6817,7 @@
       },
       "output_path": "shards\\NBS_NCS_NIS_halogenation.c9ad903d5e.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "8d8ddaaf44b01d76c8c0f6b923f672e51f7c03f32d07a69e1a40cb553eca637d",
+      "output_sha256": "a2889c98045b513ac5b563667de824028b439d8f76f8fb24f047a65ab965feac",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 286,
@@ -6876,7 +6876,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -6915,7 +6915,7 @@
       },
       "output_path": "shards\\Negishi_coupling.3449154d55.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "b739df2fa3d0c7d4aeeed3fa4d9d5abfead8226db58676795e73742e641c0180",
+      "output_sha256": "8ceec5339471d56abf3b0a97c7ba2572f7a93160d6b95d814668f07801b1c554",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 18,
@@ -6983,7 +6983,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7022,7 +7022,7 @@
       },
       "output_path": "shards\\Nitrile_hydration_Nitrile__amide.90860deecf.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "01a7fdc7022e7c649e8d3231a0740b53971c8c82b0bb6a9d228eecfc129eaf98",
+      "output_sha256": "50d743c39988dee0e4960ff9b4e5bf6a893df3ce5a47f6e1e41fd8806b6f7e5b",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 112,
@@ -7090,7 +7090,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7127,7 +7127,7 @@
       },
       "output_path": "shards\\NozakiHiyamaKishi.7bacbde447.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "bef8ca743def062b9e322d4384c91951d7d8cb62431abde89cddca6f0ab1a82d",
+      "output_sha256": "242dae3734576be40a94fdb822a8f2cebaef573e1b0a2c80e5fd186aa4d80e4c",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 27,
@@ -7185,7 +7185,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7220,7 +7220,7 @@
       },
       "output_path": "shards\\Olefin_metathesis.1c3780cc69.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "0fed23dcf4c3e2336295f3d963700c48a223fb4ddebcc8800b0b3c94b3803cda",
+      "output_sha256": "54eddac26cd9cfec75385634f31675362b76bcb494ebf790e3fb402152f4e2eb",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 22,
@@ -7282,7 +7282,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7320,7 +7320,7 @@
       },
       "output_path": "shards\\Oxidation-BAIB.d8db267137.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "32a6ce62f8cb2274cdb3db4744a2a4841f5fc4656cf817e6092f9073a406f321",
+      "output_sha256": "ccd1ea70c326a8534c6bffcd01a6f28dbc5c4090acec89a152c0897c9370c889",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 10,
@@ -7383,7 +7383,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7421,7 +7421,7 @@
       },
       "output_path": "shards\\Oxidation_IBX.d973dbf206.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "22c369fd164ef4688d557b6a30c63053497d62ad722c4ec649b9254c4c767b96",
+      "output_sha256": "555ad257d228700d6c87100f08c2d970ae3f75a2afab34a6d11cf30623ee50b7",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 4,
@@ -7479,7 +7479,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7513,7 +7513,7 @@
       },
       "output_path": "shards\\Oxidation_of_Aromatic_Side_Chains.34df425132.part-00000.jsonl.gz",
       "output_row_count": 42,
-      "output_sha256": "8cd37709f7173025d1dc9634f606fa8ecbba24ffc4499646322198d31864011a",
+      "output_sha256": "6a00539bfcf900d3f8e4e7672c93e80805b4d53e534198c852eb108e3fdb008e",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 42
@@ -7562,7 +7562,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7596,7 +7596,7 @@
       },
       "output_path": "shards\\Oxidation_of_Arylmethanes_to_Aldehydes.0756dbb801.part-00000.jsonl.gz",
       "output_row_count": 18,
-      "output_sha256": "cd0aa076d02da8908cba45f37197a6c9db2eb9fe918157614db45d7a2ff07097",
+      "output_sha256": "d9d23ac9cdd60bd9eb0a81c9bc37ce32e4cb32c9b5455bd8e6ce68b03f7877cd",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 18
@@ -7647,7 +7647,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7681,7 +7681,7 @@
       },
       "output_path": "shards\\Oximehy_drazone_formation.3695cd7723.part-00000.jsonl.gz",
       "output_row_count": 30,
-      "output_sha256": "1b08cf329a429961ace4766b297d081c80b130c5cd02de520834820f763e7aa5",
+      "output_sha256": "fb4eea1cf76af5a53245adc8c8fc80d93bf54c4440145797406f2bb9fd48f188",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 10,
@@ -7741,7 +7741,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7778,7 +7778,7 @@
       },
       "output_path": "shards\\PaalKnorr_synthesis.157113c936.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "3318f6eb028076056b27c06a85da39322afe03616ee2d4a490c88dfc619abbe3",
+      "output_sha256": "e81eba4124181a0a3647ae9538c56ffc5e0b211b2af1e77f6c901056406e6186",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 57,
@@ -7840,7 +7840,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7874,7 +7874,7 @@
       },
       "output_path": "shards\\Passerini_3component.6efcbcd998.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "a91296f720259d2814013870f02e5bdb49ffe50d7dbe9163c3af19e35731e840",
+      "output_sha256": "7900ea5c59f7f8efc4e150f78a6cbb325058788a000f8a7f6b0ad94cbdfca48c",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 21,
@@ -7932,7 +7932,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -7968,7 +7968,7 @@
       },
       "output_path": "shards\\PictetSpengler.4bc4cd231f.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "0bf2ab8b75a3a8e6b2b1d086aaebc0970a77c32ba7f3a7c226856b70539435ae",
+      "output_sha256": "8f9fca17350d27363148ba742ce72d92adb121c793a8372c8265e05f6a3734e6",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 12,
@@ -8038,7 +8038,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8079,7 +8079,7 @@
       },
       "output_path": "shards\\Reduction-Borane.f144ede84b.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "8852022e9b366954adf823ebac25b1362132b4912d3345779ae9d6d405cf0e23",
+      "output_sha256": "adadcbdfca637f5b08ee73807c3680135a955adc29735d3506b614219e91742d",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 28,
@@ -8148,7 +8148,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8189,7 +8189,7 @@
       },
       "output_path": "shards\\Reduction_LAH_LiAlH4.69e9899730.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "943948c5e13e6df42a0c5e677b2ba636f9de9edf3d1a3b9c6d903d2165acb67a",
+      "output_sha256": "e62ee46239099e43feacdae662340deb0028388852e0808b02e8a48d71ddd318",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 50,
@@ -8259,7 +8259,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8299,7 +8299,7 @@
       },
       "output_path": "shards\\Reduction_NaBHOAc3_NaBH3CN.56bc99f5eb.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "35978077e1226f90aaf6b3dd90eee89ac87b4aebfceea50420dde5a6a849948e",
+      "output_sha256": "069fd76cd8e5d2f416ca314d5d51e9a1e129728227da2ac97585f5c0e5958752",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 48,
@@ -8372,7 +8372,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8414,7 +8414,7 @@
       },
       "output_path": "shards\\Reductive_amination.54e5d881c9.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "0bf17ff9cc504da3ed4c4da07c5ca5ec22a7df9581ce43f87aef7f8e87ec3442",
+      "output_sha256": "63377342ee22e5a42a071ee4d4f96aca841b0b466223654b503061d8871d6896",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 59,
@@ -8476,7 +8476,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8510,7 +8510,7 @@
       },
       "output_path": "shards\\Riley_oxidation.0de6b2f518.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "033891756e712bf5179d57bf4380ef55fb9b5fc6db01f53edd959069d84cfead",
+      "output_sha256": "23ec0619091ea992915aa6ea24b201c58ebc7193cdea3565d94d6ab874929c4f",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 280,
@@ -8556,7 +8556,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8588,7 +8588,7 @@
       },
       "output_path": "shards\\Rosenmund_reduction.4c1049a085.part-00000.jsonl.gz",
       "output_row_count": 16,
-      "output_sha256": "a4ebade40cbb2f6c3d1f7156d324ec4e428ec7506b52afe83e6dd95b824105f8",
+      "output_sha256": "532bac4ba62feefc8037503374ec6cd84cdddd9ddac314e6836ad1b4a2a83a10",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "verified": 16
@@ -8646,7 +8646,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8682,7 +8682,7 @@
       },
       "output_path": "shards\\RuppertPrakash_TMSCF3.e90de790c7.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "0da18f3af6a4d844f678b3c6e8c1e67f4ccda00f83a9f28b70c554251d0b6442",
+      "output_sha256": "26cff24d3900363ceb75dc0c74f41a54eca0c86f87169e6c3497779607759106",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 8,
@@ -8737,7 +8737,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8770,7 +8770,7 @@
       },
       "output_path": "shards\\Sandmeyer_reactions.c9121ad72e.part-00000.jsonl.gz",
       "output_row_count": 132,
-      "output_sha256": "1c4808403dd60b82d7fc0864c6bfa6de7fa18ecefc71ec56b29e80d5ca7aab9d",
+      "output_sha256": "9311286c91bb4c4899a9585db4632bd4bd05e015f94b2ebcf031b7ec243d2883",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 79,
@@ -8826,7 +8826,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8859,7 +8859,7 @@
       },
       "output_path": "shards\\Sharpless_dihydroxylation.536a05cc1c.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "17440e128a88a78fe71ae5bd7d1b81a03d77b8e23dcdf2431598180e984144ad",
+      "output_sha256": "4cc7669deabd7402fe3641e36b83a1813bae96538633c9301f0584eedfcc831c",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 299,
@@ -8916,7 +8916,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -8953,7 +8953,7 @@
       },
       "output_path": "shards\\Skraup_DoebnerMiller.da11afa461.part-00000.jsonl.gz",
       "output_row_count": 29,
-      "output_sha256": "4365ba54b53cdb643b6b5b2505d622567e4e4eb9fd3e136efe744d52e9f19b6d",
+      "output_sha256": "0a88e3b985332d4dc237993698fab94407b11fdafcae7099b164d86d6c31cb90",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 15,
@@ -9019,7 +9019,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -9058,7 +9058,7 @@
       },
       "output_path": "shards\\SNAr_amination.ae03395de2.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "cbf9e9de43d3b028d6843c816e38f47ffd6b8287cca9c8915c9ca991801e9abf",
+      "output_sha256": "329f9f7b974055893381628bf2fcd9236799d637c90c52e719c9b08b8cc0dc79",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 37,
@@ -9127,7 +9127,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -9166,7 +9166,7 @@
       },
       "output_path": "shards\\Sonogashira_coupling.b853401540.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "f71c9cc76896ae2dcddcdaa54cb4aabf79635f5d72d8a3422579a42de847922a",
+      "output_sha256": "5df948828f26c6f1b579306f5719442f681489c19da08f28da64bdcd11859bcf",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 44,
@@ -9232,7 +9232,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -9269,7 +9269,7 @@
       },
       "output_path": "shards\\SPAAC_strainpromoted_click.681d913368.part-00000.jsonl.gz",
       "output_row_count": 219,
-      "output_sha256": "486eae76b2cca4f66aa42c77edb4bb8c8b6db25017d68b0b4163843a644ab185",
+      "output_sha256": "9082cc5f5997de1f171941470e541e320ffe77be5588e122214528dcf681c00b",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 38,
@@ -9334,7 +9334,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -9372,7 +9372,7 @@
       },
       "output_path": "shards\\Staudinger_reduction.d86bdf7502.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "9bfa5d58ceb34deb4deaaafd8b337247b5fdd9e696f67ec89066b682c3ed6f7c",
+      "output_sha256": "38a6fd2a5efb7f61ec95e424170d8989cb790f00e6600a9002b004205dfa9a36",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 29,
@@ -9439,7 +9439,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -9476,7 +9476,7 @@
       },
       "output_path": "shards\\Steglich_esterification.f2e6fe8683.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "b5c8ff6b8de659060d3bbed5f4c29901166bf0c4888104ec95d95dbf54876008",
+      "output_sha256": "3e7bcf002f29f06b700b51bd6c644e9ecc0e4fead8cf43963846e378aab455d9",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 56,
@@ -9544,7 +9544,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -9582,7 +9582,7 @@
       },
       "output_path": "shards\\Stille_coupling.13576096f7.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "afaa23c6ad945ea62849ee4f29171d25da423797266b40a4212b12d1ed556cd1",
+      "output_sha256": "bca302bf0dff59e3bbe5b9cd5336fc91466eb38a1d10bdaf248a2fbfbb1195b6",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 39,
@@ -9648,7 +9648,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -9685,7 +9685,7 @@
       },
       "output_path": "shards\\Strainpromoted_click.f14ee2964a.part-00000.jsonl.gz",
       "output_row_count": 186,
-      "output_sha256": "9ee40b3a2629c288f7edd6f25774ae409d7a54036530eb29fb72ce2516f471c9",
+      "output_sha256": "a6c5313b7ca14e6e9923098a068807ef285dd265eae0d0451181b03f396d364d",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 28,
@@ -9751,7 +9751,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -9792,7 +9792,7 @@
       },
       "output_path": "shards\\SuFEx.bef3629eb1.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "fa3447db023c8214614b5de96f06f403843a1eda0a17c8942575cc0988142aef",
+      "output_sha256": "df77195466f471146c0a7a0d75ad5fd9d341977a7871eb2b82270dc0a2d3408e",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 25,
@@ -9862,7 +9862,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -9903,7 +9903,7 @@
       },
       "output_path": "shards\\Sulfonamide_formation.0600f78871.part-00000.jsonl.gz",
       "output_row_count": 236,
-      "output_sha256": "6ceb2963f0d79b2bb5419711f1b3ef52c015f4f57c907639955a8f8bac45d907",
+      "output_sha256": "9406cd41341f14feb7f8ce04559c6ac447674b62a6f64c7e5b6f90ddee3e1ce4",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 57,
@@ -9969,7 +9969,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10009,7 +10009,7 @@
       },
       "output_path": "shards\\suzuki_miyaura.7354993b7a.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "6484404aaf68f4bdbf30e467b3a8bdcb353afb8158e76709722661cbf4b97a85",
+      "output_sha256": "854efa0013bf8650ea6d0da38d2962d701be7515633861179597f23a7cbb0777",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 31,
@@ -10078,7 +10078,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10117,7 +10117,7 @@
       },
       "output_path": "shards\\Swern_oxidation.c984d1297c.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "1ec0249dc4e3d019eee954980047bcd7016dc706ae9bc474a87b759c8aca8c38",
+      "output_sha256": "6333c6a0eb99a1b20085cac06d8b8c4ce4af64953dfde19812f5c472267c97ee",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 4,
@@ -10185,7 +10185,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10223,7 +10223,7 @@
       },
       "output_path": "shards\\TEMPObleach-Primary_alcohols_to_aldehydesacids.3407819323.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "e13a9fe1abc2a81c264f3b1be8ca5ca16770aeb99774b9cd557f8c47586432bb",
+      "output_sha256": "58196b44c0473f40d3e0c3ea0c572c0819f32f15e4254a16593cbbd88bee7edd",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 37,
@@ -10290,7 +10290,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10329,7 +10329,7 @@
       },
       "output_path": "shards\\TEMPObleach_Oxidations_Primary_alcohols__aldehydesacids.c9bbcd032f.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "62f4b7fccb9ab2f281d4a89e9047fd9f5037998e84bbb78d3b64582abd99149b",
+      "output_sha256": "165323a0a74514239375ca97a0d6d091a0d1833d4a8df508906312ad23f1ae3e",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 32,
@@ -10359,12 +10359,12 @@
     },
     {
       "admission_reason_counts": {
-        "insufficient_edit_evidence": 67,
-        "missing_verified_reaction_signature": 44,
+        "insufficient_edit_evidence": 68,
+        "missing_verified_reaction_signature": 43,
         "multistage_conditions_not_structured": 25,
         "no_condition_identifiers": 1,
         "no_usable_transformation_evidence": 23,
-        "reaction_completeness_unresolved": 67,
+        "reaction_completeness_unresolved": 66,
         "solvent_only_recipe": 114,
         "suspected_missing_reactant": 7,
         "unaccounted_product_heavy_atoms": 7
@@ -10392,7 +10392,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10406,8 +10406,8 @@
       },
       "evidence_quality_counts": {
         "ambiguous_atom_correspondence": 11,
-        "global_atom_correspondence": 67,
-        "reactant_grammar_only": 40,
+        "global_atom_correspondence": 68,
+        "reactant_grammar_only": 39,
         "unresolved": 23
       },
       "failure_count": 0,
@@ -10429,31 +10429,31 @@
       },
       "output_path": "shards\\TetrazineTCO_iEDDA.bbf9066c49.part-00000.jsonl.gz",
       "output_row_count": 141,
-      "output_sha256": "461f169f1e932a92e4fc06aa875937c5465044a5042a7d11418b4b74b3230756",
+      "output_sha256": "4779bf5400a56ee597ce291ec8a02e26583cb84426fe9271b7343d5bc4326e1c",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 7,
-        "unresolved": 67,
-        "verified": 67
+        "unresolved": 66,
+        "verified": 68
       },
       "reaction_scope_counts": {
-        "intermolecular": 67,
-        "unknown": 74
+        "intermolecular": 68,
+        "unknown": 73
       },
       "reused": false,
       "shard_id": "TetrazineTCO_iEDDA.bbf9066c49.part-00000",
-      "signature_count": 67,
+      "signature_count": 68,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\dataset_300\\TetrazineTCO_iEDDA.csv",
       "source_row_number_end": 142,
       "source_row_number_start": 2,
       "source_sha256": "90354d99d6c773011181ef1a9f06556ee68abfc1a535b7fc658f04167e37ce13",
       "status": "complete",
       "transformation_class_counts": {
-        "generic_graph_transformation": 61,
+        "generic_graph_transformation": 62,
         "generic_multi_event_graph_transformation": 2,
         "hydrogenation": 3,
         "substitution": 1,
-        "unknown": 74
+        "unknown": 73
       }
     },
     {
@@ -10499,7 +10499,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10538,7 +10538,7 @@
       },
       "output_path": "shards\\Thioether_formation.8dfccd212e.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "57f038abe76dbf1dc71cb0553889e47ff277f7572f5057999e56821abda80eab",
+      "output_sha256": "5188a43327e45013c82b4aa6b952a5c8166c46b6abf862208eb4959a761b65fa",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 53,
@@ -10603,7 +10603,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10638,7 +10638,7 @@
       },
       "output_path": "shards\\Thiolene_and_thiolyne.824926eb2d.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "8b3bbd1fad098e56448965cfdcdab811884184fe3e03263d4df6917b6821e1bf",
+      "output_sha256": "7d4c273623dcc1855b747c09cc0e938e041de70c731e857cb573e5f2a8ade7b3",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 62,
@@ -10694,7 +10694,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10729,7 +10729,7 @@
       },
       "output_path": "shards\\TPAPNMO_Catalytic_Ru_oxidations.cd9483b5b2.part-00000.jsonl.gz",
       "output_row_count": 37,
-      "output_sha256": "07e9de4b292e0f87820ee15e5e59fec836c5fed1d2a659d715ed89244c7dc04c",
+      "output_sha256": "3f638c5fabfa8686f40848b40e640d8f110b67ee91e44d7ce4bdc292b162180b",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 1,
@@ -10790,7 +10790,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10829,7 +10829,7 @@
       },
       "output_path": "shards\\Transfer_hydrogenation.d77135eb01.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "4135522514914da55b706b0e93a2f9328021b51dd6364ccf92fbe0054b235204",
+      "output_sha256": "eeec8c324f60c5b3c8b3c8760eb48aeaa35a32d83e7e5e2f86cfde65b403c11a",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 7,
@@ -10895,7 +10895,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -10931,7 +10931,7 @@
       },
       "output_path": "shards\\Trifluoromethylation.702dc4e1d2.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "a70aa537179a73b14370fda7275e6d803dbc53baa35078bc180467dbb901ec58",
+      "output_sha256": "8e33af1060e8a83a62b28bb30472b17d4fa6e1e219d37b7109c4914cce7cfa0b",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 24,
@@ -10992,7 +10992,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -11025,7 +11025,7 @@
       },
       "output_path": "shards\\Ugi_4-component_reaction.2e08529f88.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "b9bbd5aacbf338b719944a7677314c49fcae8fd84fa0d8119b58f8ee558a2918",
+      "output_sha256": "3c435085dee7f4006ac7fff48d6d8ac4f930560cc4c61ee0a694a2ba63a3fc8b",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 23,
@@ -11084,7 +11084,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -11120,7 +11120,7 @@
       },
       "output_path": "shards\\Urea_and_thiourea_formation.8012e85be2.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "5e821ed3951be224878027ba17815a8b78481ddefd19207891a4360e99e94aa6",
+      "output_sha256": "a1523d4752d8cdb6d1b3c976d6fc1aa2e7c688dd143e27f7f91ae8c1102255ae",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 20,
@@ -11178,7 +11178,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -11212,7 +11212,7 @@
       },
       "output_path": "shards\\Wacker_oxidation.b254e015d2.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "5d627eea3195e9f1d4dbb78fda1039a4bc3f71ae2149453892c2689c8ad28c2e",
+      "output_sha256": "949cbdd3617e416477de4954650a108ad9fa65f9611d7b8efbb7bdf92235d9fd",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 292,
@@ -11270,7 +11270,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -11305,7 +11305,7 @@
       },
       "output_path": "shards\\Wacker_oxidation_Alkene__ketone_PdCl2_CuCl_O2.66a27cf930.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "71e5b5f4bd5a8d2afa1270cb41f23a632125194691eed2d3533ddbef5032b80f",
+      "output_sha256": "10a60fafea8851af75927e6661eab18f88e30939e7ecbeb664bc5e642680c5ed",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 286,
@@ -11367,7 +11367,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -11405,7 +11405,7 @@
       },
       "output_path": "shards\\Weinreb_amide.1bb78b9d25.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "383217c70ba10d1370a20bd9cd088e6a37dd0f638312790e80518fe3a6cd8e21",
+      "output_sha256": "ac7f4d3dc8cf126001937f7421a4a528d08456259b6e2210d056eebfe7250160",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 30,
@@ -11475,7 +11475,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -11513,7 +11513,7 @@
       },
       "output_path": "shards\\Williamson_ether_synthesis.9271f24268.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "e0b1c213645695a264a420a3225b8860c6071272fe7cca8016001bdf6d0adc02",
+      "output_sha256": "4afa959b5a2778f87784e891ddc3cf2693f2263e9463fd8cfd1ba6c4d8bf5764",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 67,
@@ -11578,7 +11578,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -11614,7 +11614,7 @@
       },
       "output_path": "shards\\Wittig_reaction.22c4e54190.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "5516bf6086068a2cb9a6e45fb11226b6c49d2dbd01206818d5d18ef27c78027d",
+      "output_sha256": "012c34ebcd6505ce433e90c93bb1b27264360e7d02618b3af517eedf06a82f24",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 33,
@@ -11678,7 +11678,7 @@
           "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
           "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
         },
-        "converter_definition_version": "generic_conversion.v1.18",
+        "converter_definition_version": "generic_conversion.v1.19",
         "reaction_signature_schema_version": "1.5",
         "record_schema_version": "2.2",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
@@ -11717,7 +11717,7 @@
       },
       "output_path": "shards\\WolffKishner.4289987125.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "5e0069415f5e887874515e8795ab05105b6594940c48c16e2515bccb23e97237",
+      "output_sha256": "c8d66cfd9a1c1c5bcc14492f71bda4705e1f350b70c4dd5279ce0e8cd6a76acb",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 20,
