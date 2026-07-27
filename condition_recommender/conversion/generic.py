@@ -208,6 +208,11 @@ def convert_record(
         if analysis.product_connection
         else None,
         spectator_groups=tuple(asdict(group) for group in analysis.spectator_groups),
+        partial_product_transformation=(
+            asdict(analysis.partial_product_transformation)
+            if analysis.partial_product_transformation
+            else None
+        ),
         reaction_completeness=(
             asdict(analysis.reaction_completeness)
             if analysis.reaction_completeness

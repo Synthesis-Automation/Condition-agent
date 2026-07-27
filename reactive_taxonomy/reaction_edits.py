@@ -104,6 +104,16 @@ def _atom_reference(
     )
 
 
+def reaction_atom_reference(
+    component: ReactionComponent,
+    atom_index: int,
+    *,
+    side: Optional[str] = None,
+) -> ReactionAtomReference:
+    """Build a normalized atom reference for an explicitly identified atom."""
+    return _atom_reference(component, atom_index, side=side)
+
+
 def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
     atoms: Dict[int, ReactionAtomReference] = {}
     bonds: Dict[Tuple[int, int], str] = {}
@@ -1066,4 +1076,5 @@ __all__ = [
     "normalize_predicted_edits",
     "normalize_predicted_multi_event_edits",
     "normalize_reaction_edits",
+    "reaction_atom_reference",
 ]

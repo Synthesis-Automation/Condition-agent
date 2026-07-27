@@ -115,6 +115,27 @@ class ReactionCompletenessAssessment:
 
 
 @dataclass(frozen=True)
+class PartialProductTransformation:
+    """Conservative transformation observed despite incomplete atom provenance."""
+
+    transformation_type: Literal["attachment_replacement"]
+    transformation_class: str
+    reactant_center: ReactionAtomReference
+    product_center: ReactionAtomReference
+    removed_attachment: ReactionAtomReference
+    added_attachment: ReactionAtomReference
+    old_order: str
+    new_order: str
+    conserved_atom_count: int
+    product_heavy_atom_coverage: float
+    missing_product_atom_elements: Tuple[str, ...]
+    evidence: Literal["partial_product_correspondence"]
+    confidence: float
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
 class ReactionLabelClause:
     """One deterministic, evidence-backed human-readable edit clause."""
 
@@ -142,6 +163,7 @@ class ReactionDisplayLabel:
         "generic_pattern",
         "conflicting_evidence",
         "multi_event",
+        "partial_product_correspondence",
         "reactant_only",
         "ambiguous_reactants",
         "unavailable",
@@ -402,10 +424,11 @@ class ReactionAnalysis:
     product_connection: Optional[ProductConnection] = None
     reaction_topology: Optional[ReactionTopology] = None
     reaction_signature: Optional[ReactionSignature] = None
+    partial_product_transformation: Optional[PartialProductTransformation] = None
     reaction_completeness: Optional[ReactionCompletenessAssessment] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.8"
+    schema_version: str = "1.9"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -413,6 +436,7 @@ class ReactionAnalysis:
 
 __all__ = [
     "BondChange",
+    "PartialProductTransformation",
     "ProductConnection",
     "ProductConnectionEndpoint",
     "ProductTransformation",

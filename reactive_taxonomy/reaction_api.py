@@ -22,6 +22,10 @@ from .reaction_multi_events import (
 )
 from .reaction_operators import apply_operator, apply_operator_sequence
 from .reaction_parser import parse_reaction_smiles
+from .partial_product_correspondence import (
+    infer_partial_product_transformation,
+    render_partial_product_transformation,
+)
 from .reaction_products import build_product_connection
 from .reaction_spectators import derive_spectator_groups
 from .reaction_signatures import build_reaction_signature
@@ -206,6 +210,34 @@ def featurize_reaction(
         edit_result=edit_result,
     )
     warnings.extend(reaction_completeness.warnings)
+    product_contradicted_candidates = (
+        selected is None
+        and not selected_events
+        and bool(observed_products)
+        and bool(candidates)
+        and all(
+            candidate.verification in {"construction_failed", "product_mismatch"}
+            for candidate in candidates
+        )
+    )
+    partial_product_transformation = (
+        infer_partial_product_transformation(
+            reactants=parsed.reactants,
+            products=parsed.products,
+            completeness=reaction_completeness,
+        )
+        if (
+            selected is None
+            and not selected_events
+            and not edit_result.edits
+            and not invalid_supplied_mapping
+        )
+        else None
+    )
+    if partial_product_transformation is not None:
+        warnings.extend(partial_product_transformation.warnings)
+    if product_contradicted_candidates:
+        warnings.append("PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES")
     contextual_label = (
         None
         if edit_result.evidence
@@ -236,6 +268,8 @@ def featurize_reaction(
         edit_result.valid or edit_result.evidence == "ambiguous_atom_correspondence"
     ):
         effective_evidence = edit_result.evidence
+    if partial_product_transformation is not None:
+        effective_evidence = partial_product_transformation.evidence
     display_arrow = "→" if label_style == "unicode" else "->"
     selected_product_label = None
     if (
@@ -275,7 +309,18 @@ def featurize_reaction(
     )
     reaction_label = selected.reaction_label if selected else None
     reaction_label_status = "exact_product" if selected else "unavailable"
-    if selected is None and candidates:
+    fallback_detailed_label = None
+    if partial_product_transformation is not None:
+        reaction_label, fallback_detailed_label = (
+            render_partial_product_transformation(
+                partial_product_transformation,
+                reactants=parsed.reactants,
+                products=parsed.products,
+                style=label_style,
+            )
+        )
+        reaction_label_status = "partial_product_correspondence"
+    elif selected is None and candidates and not product_contradicted_candidates:
         fallback_raw = raw
         if any(len(assignment) > 1 for _, assignment in raw):
             fallback_raw = [
@@ -298,6 +343,9 @@ def featurize_reaction(
                 + f" {display_arrow}"
             )
             reaction_label_status = "ambiguous_reactants"
+    elif product_contradicted_candidates:
+        reaction_label = None
+        reaction_label_status = "product_contradicted_candidates"
     elif selected is not None and product_connection is not None:
         reactants_label = render_reactant_label(
             selected.role_assignments, style=label_style
@@ -317,12 +365,23 @@ def featurize_reaction(
         named_family=named_family,
         fallback_label=reaction_label,
         fallback_status=reaction_label_status,
-        evidence=edit_result.evidence,
-        confidence=edit_result.confidence,
+        evidence=(
+            partial_product_transformation.evidence
+            if partial_product_transformation is not None
+            and not edit_result.edits
+            else edit_result.evidence
+        ),
+        confidence=(
+            partial_product_transformation.confidence
+            if partial_product_transformation is not None
+            and not edit_result.edits
+            else edit_result.confidence
+        ),
         events=(reaction_signature.events if reaction_signature is not None else ()),
         topology=reaction_topology,
         warnings=warnings,
         style=label_style,
+        fallback_detailed_label=fallback_detailed_label,
     )
     if display_label is not None:
         reaction_label = display_label.concise
@@ -356,6 +415,8 @@ def featurize_reaction(
             if selected
             else reaction_signature.transformation_class
             if reaction_signature is not None
+            else partial_product_transformation.transformation_class
+            if partial_product_transformation is not None
             else None
         ),
         compatible_named_families=compatible_named_families,
@@ -370,6 +431,7 @@ def featurize_reaction(
         product_connection=product_connection,
         reaction_topology=reaction_topology,
         reaction_signature=reaction_signature,
+        partial_product_transformation=partial_product_transformation,
         reaction_completeness=reaction_completeness,
         warnings=tuple(sorted(set(warnings))),
     )

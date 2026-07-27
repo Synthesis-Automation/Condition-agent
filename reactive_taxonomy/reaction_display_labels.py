@@ -384,6 +384,7 @@ def build_reaction_display_label(
     topology: Optional[ReactionTopology] = None,
     warnings: Iterable[str] = (),
     style: str = "unicode",
+    fallback_detailed_label: Optional[str] = None,
 ) -> Optional[ReactionDisplayLabel]:
     """Build the best display label while retaining its evidence and clauses."""
     rendering = load_reaction_label_rendering()
@@ -472,12 +473,21 @@ def build_reaction_display_label(
         )
         status = "observed_edits"
     elif fallback_label:
-        concise = detailed = fallback_label
+        concise = fallback_label
+        detailed = fallback_detailed_label or fallback_label
         status = (
             fallback_status
-            if fallback_status in {"reactant_only", "ambiguous_reactants"}
+            if fallback_status
+            in {
+                "partial_product_correspondence",
+                "reactant_only",
+                "ambiguous_reactants",
+            }
             else "unavailable"
         )
+        if status == "partial_product_correspondence":
+            structural_label = fallback_label
+            transformation_label = fallback_label
     else:
         return None
     prefix = topology_label_prefix(topology)

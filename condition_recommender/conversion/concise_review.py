@@ -13,7 +13,7 @@ from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.2"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.3"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -27,6 +27,8 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reaction_completeness_status",
     "product_heavy_atom_coverage",
     "product_element_excess",
+    "partial_transformation_class",
+    "missing_product_atom_elements",
     "chemistry_status",
     "condition_status",
     "condition_stage_status",
@@ -229,12 +231,16 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     completeness_value = (
         completeness if isinstance(completeness, Mapping) else {}
     )
+    partial = record.get("partial_product_transformation")
+    partial_value = partial if isinstance(partial, Mapping) else {}
     warnings = sorted(
         {
             str(value)
             for value in (
                 tuple(signature_value.get("warnings") or ())
                 + tuple(completeness_value.get("warnings") or ())
+                + tuple(display_value.get("warnings") or ())
+                + tuple(partial_value.get("warnings") or ())
             )
             if value
         }
@@ -284,6 +290,13 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             )
             if element_excess_value
             else ""
+        ),
+        "partial_transformation_class": str(
+            partial_value.get("transformation_class") or ""
+        ),
+        "missing_product_atom_elements": "; ".join(
+            str(value)
+            for value in partial_value.get("missing_product_atom_elements") or ()
         ),
         "chemistry_status": _enum_text(record.get("chemistry_status")),
         "condition_status": _enum_text(record.get("condition_status")),

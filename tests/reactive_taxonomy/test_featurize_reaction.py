@@ -160,11 +160,9 @@ def test_wrong_product_is_not_confirmed() -> None:
         and candidate.verification == "product_mismatch"
         for candidate in result.candidates
     )
-    assert result.reaction_label == (
-        "(Ar1–Br + Ar2–H) OR (Ar1–Br + Ar2–NH2) OR "
-        "(intramolecular Ar–Br / Ar–H) →"
-    )
-    assert result.reaction_label_status == "ambiguous_reactants"
+    assert result.reaction_label is None
+    assert result.reaction_label_status == "product_contradicted_candidates"
+    assert "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in result.warnings
 
 
 def test_supplied_mapping_yields_exact_bond_differences() -> None:

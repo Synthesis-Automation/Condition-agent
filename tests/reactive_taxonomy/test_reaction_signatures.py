@@ -99,7 +99,7 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
         "C-H:NONE>SINGLE",
     )
-    assert payload["schema_version"] == "1.8"
+    assert payload["schema_version"] == "1.9"
     assert payload["reaction_signature"]["schema_version"] == "1.5"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
@@ -216,10 +216,9 @@ def test_unbalanced_multi_event_reaction_does_not_invent_partner_copy() -> None:
     assert result.evidence_quality == "reactant_grammar_only"
     assert result.selected_events == ()
     assert result.reaction_signature is None
-    assert result.reaction_label == (
-        "(Ar1-F + Ar2-H) OR (Ar1-F + Ar2-SH) OR "
-        "(intramolecular Ar-F / Ar-H) ->"
-    )
+    assert result.reaction_label is None
+    assert result.reaction_label_status == "product_contradicted_candidates"
+    assert "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in result.warnings
 
 
 def test_l3_identity_includes_schema_level_hydrogen_changes() -> None:

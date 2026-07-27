@@ -252,6 +252,15 @@ reaction-signature generation, and conversion makes the record ineligible for
 indexing. The system never creates a missing reactant or duplicates a partner
 to force reconstruction.
 
+An incomplete record can still retain a typed, observation-only
+`partial_product_transformation` when a single conserved scaffold uniquely
+supports replacement of one terminal attachment. For example,
+`R-C(=O)-OH -> R-C(=O)-Cl` can be reported as an
+`acyl_heteroatom_substitution` with `Cl` explicitly marked as having no
+reactant source. This mechanism-neutral observation does not create atom
+provenance, a named family, a verified `ReactionSignature`, or index
+eligibility.
+
 Completeness and mapping warnings include:
 
 ```text
@@ -262,7 +271,15 @@ UNACCOUNTED_PRODUCT_HEAVY_ATOMS
 MISSING_REACTANT_SUSPECTED
 INSUFFICIENT_REACTANT_MULTIPLICITY
 REACTION_COMPLETENESS_UNRESOLVED
+PARTIAL_PRODUCT_CORRESPONDENCE
+PRODUCT_ATOM_SOURCE_UNRESOLVED:<element>
 ```
+
+When every enumerated reactant grammar contradicts the reported product, those
+candidates remain available as rejected evidence but are vetoed as display
+labels with `PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES`. An unreacted handle such
+as Ar-I therefore cannot become the displayed transformation merely because a
+compatible reactant-only grammar was enumerable.
 
 Reaction SMILES does not encode experimental quantities. A reported value such
 as `0.5 equiv` versus `1.0 equiv` must be preserved as separate condition or

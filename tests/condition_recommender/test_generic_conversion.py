@@ -109,8 +109,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "2.1"
-    assert record.converter_definition_version == "generic_conversion.v1.13"
+    assert record.schema_version == "2.2"
+    assert record.converter_definition_version == "generic_conversion.v1.14"
     assert record.reaction_signature["schema_version"] == "1.5"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -246,6 +246,37 @@ def test_unaccounted_product_atoms_are_ineligible_and_serialized() -> None:
     assert record.reaction_completeness is not None
     assert record.reaction_completeness["status"] == "incomplete"
     assert record.reaction_completeness["product_element_excess"] == {"C": 1}
+
+
+def test_partial_product_observation_is_serialized_but_not_indexed() -> None:
+    record = convert_record(
+        _raw("O=C(O)c1cccc(I)c1>>O=C(Cl)c1cccc(I)c1")
+    )
+
+    assert record.admission_tier == AdmissionTier.REJECTED
+    assert record.chemistry_status == ChemistryStatus.REJECTED
+    assert record.index_eligibility == IndexEligibility.INELIGIBLE
+    assert record.reaction_signature is None
+    assert record.reaction_completeness["status"] == "incomplete"
+    assert record.reaction_label == (
+        "R–C(=O)–OH → R–C(=O)–Cl [Cl source missing]"
+    )
+    assert record.reaction_label_status == "partial_product_correspondence"
+    assert record.transformation_class == "acyl_heteroatom_substitution"
+    assert record.transformation_confidence == 0.8
+    assert record.partial_product_transformation is not None
+    assert record.partial_product_transformation[
+        "missing_product_atom_elements"
+    ] == ("Cl",)
+
+    review = concise_reaction_review_row(record.to_dict())
+    assert review["detection_status"] == "partial_product_correspondence"
+    assert (
+        review["partial_transformation_class"]
+        == "acyl_heteroatom_substitution"
+    )
+    assert review["missing_product_atom_elements"] == "Cl"
+    assert "PRODUCT_ATOM_SOURCE_UNRESOLVED:Cl" in review["warnings"]
 
 
 def test_inconsistent_product_mapping_is_review_only() -> None:
@@ -476,7 +507,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "1.2"
+    assert report["schema_version"] == "1.3"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]

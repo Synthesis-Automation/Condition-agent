@@ -86,7 +86,8 @@ def test_multiple_carbonyl_partners_remain_unselected_without_verification() -> 
     ]
     assert len(reductive_candidates) == 2
     assert result.selected_candidate is None
-    assert result.reaction_label_status == "ambiguous_reactants"
+    assert result.reaction_label is None
+    assert result.reaction_label_status == "product_contradicted_candidates"
 
 
 def test_mapped_reductive_amination_agrees_with_operator() -> None:

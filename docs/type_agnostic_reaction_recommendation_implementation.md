@@ -397,6 +397,14 @@ blocks signature generation and indexing; unresolved provenance and
 inconsistent product mapping are retained for review. Missing reactants and
 stoichiometric partner copies must never be synthesized.
 
+For incomplete single-scaffold records, a separate observation-only
+correspondence may retain one uniquely supported terminal attachment
+replacement. This produces a typed `PartialProductTransformation` and a
+mechanism-neutral label such as
+`R-C(=O)-OH -> R-C(=O)-Cl [Cl source missing]`. It must retain the unresolved
+product-atom source, remain ineligible for normal indexing, and must not be
+promoted to a verified `ReactionSignature` or named family.
+
 ### 6.3 Reactive-site and environment features
 
 For every atom participating in an edit, capture:
@@ -428,8 +436,11 @@ uses an evidence-ordered ladder:
 4. when one validated bond-order event has sufficient local context, render a
    contextual before/after overlay while retaining the generic pattern label;
 5. otherwise render the normalized edits literally;
-6. use a reactant-only grammar label only when no verified edit evidence exists;
-7. report the transformation as unresolved when neither edits nor exact
+6. for incomplete atom provenance, use a unique partial product
+   correspondence and explicitly label the missing product-atom source;
+7. use a reactant-only grammar label only when no verified edit evidence exists
+   and the reported product does not contradict every candidate;
+8. report the transformation as unresolved when neither edits nor exact
    reconstruction are available.
 
 Generic label patterns are declarative and identify reusable edit combinations,
@@ -448,6 +459,11 @@ unknown family: Ar-CH=CH2 -> Ar-CH2-CH3
 reductive amination: HeteroAr-CH=O + Ar-NH2 -> HeteroAr-CH2-NH-Ar
 unmatched edit pattern: C-O bond cleavage; C-N bond formation
 ```
+
+Product-contradicted grammar candidates are retained for audit, but are vetoed
+from the display label. Unchanged handles and hydrogens therefore cannot be
+presented as the reaction center solely because a reactant grammar enumerated
+them.
 
 The initial reductive-amination implementation follows the same evidence
 ladder. A declarative grammar identifies an available aldehyde, ketone, or

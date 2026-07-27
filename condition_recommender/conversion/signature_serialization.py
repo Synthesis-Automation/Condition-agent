@@ -11,10 +11,13 @@ def signature_record_fields(analysis: Any) -> Dict[str, Any]:
     """Return RecommendationRecord keyword fields from a reaction analysis."""
     signature = analysis.reaction_signature
     if signature is None:
+        partial = analysis.partial_product_transformation
         return {
             "reaction_signature": None,
             "transformation_class": analysis.transformation_class,
-            "transformation_confidence": 0.0,
+            "transformation_confidence": (
+                partial.confidence if partial is not None else 0.0
+            ),
             "family_confidence": 0.0,
             "taxonomy_definition_versions": {},
         }

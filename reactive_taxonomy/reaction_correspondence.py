@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple
+from typing import Dict, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .chemistry.smarts_cache import compile_smarts
@@ -443,10 +443,81 @@ def infer_scaffold_correspondence_candidates(
     )
 
 
+def infer_partial_scaffold_correspondence_candidates(
+    reactants: Tuple[ReactionComponent, ...],
+    products: Tuple[ReactionComponent, ...],
+    *,
+    max_candidates: int = 512,
+) -> ScaffoldCorrespondenceCandidates:
+    """Map a conserved scaffold while allowing unmatched terminal attachments.
+
+    Unlike verified scaffold correspondence, this observation-only path does
+    not require every product atom to have a reported reactant source. It is
+    intentionally limited to one substantial substrate and one product; the
+    caller must validate any inferred local transformation across all mappings.
+    """
+    substantial_reactants = tuple(
+        component for component in reactants if _heavy_atom_count(component) >= 2
+    )
+    substantial_products = tuple(
+        component for component in products if _heavy_atom_count(component) >= 2
+    )
+    if len(substantial_reactants) != 1:
+        return ScaffoldCorrespondenceCandidates(
+            (), ("PARTIAL_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE",), False
+        )
+    if len(substantial_products) != 1 or any(
+        _heavy_atom_count(component) > 0
+        for component in products
+        if component is not substantial_products[0]
+    ):
+        return ScaffoldCorrespondenceCandidates(
+            (), ("PARTIAL_CORRESPONDENCE_REQUIRES_ONE_PRODUCT",), False
+        )
+    reactant = substantial_reactants[0]
+    product = substantial_products[0]
+    candidates, warnings = _component_correspondence_candidates(
+        reactant,
+        product,
+        max_matches=max_candidates,
+    )
+    if not candidates:
+        return ScaffoldCorrespondenceCandidates(
+            (), tuple(sorted(set(warnings))), False
+        )
+    maximum_conservation = max(len(mapping) for mapping in candidates)
+    product_heavy_count = _heavy_atom_count(product)
+    if maximum_conservation < 3 or (
+        maximum_conservation / max(product_heavy_count, 1) < 0.6
+    ):
+        return ScaffoldCorrespondenceCandidates(
+            (),
+            tuple(
+                sorted(
+                    set(warnings).union(
+                        {"PARTIAL_CORRESPONDENCE_INSUFFICIENT_CONSERVATION"}
+                    )
+                )
+            ),
+            False,
+        )
+    best = tuple(
+        sorted(
+            mapping
+            for mapping in candidates
+            if len(mapping) == maximum_conservation
+        )
+    )
+    return ScaffoldCorrespondenceCandidates(
+        best, tuple(sorted(set(warnings))), True
+    )
+
+
 __all__ = [
     "AtomPair",
     "REACTION_CORRESPONDENCE_VERSION",
     "ScaffoldCorrespondenceCandidates",
     "infer_global_correspondence_candidates",
+    "infer_partial_scaffold_correspondence_candidates",
     "infer_scaffold_correspondence_candidates",
 ]

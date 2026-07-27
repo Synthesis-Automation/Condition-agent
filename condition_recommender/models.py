@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "2.1"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v1.13"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "2.2"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v1.14"
 
 
 class AdmissionTier(str, Enum):
@@ -126,6 +126,7 @@ class RecommendationRecord:
     family_environment: Optional[Dict[str, Any]] = None
     product_connection: Optional[Dict[str, Any]] = None
     spectator_groups: Tuple[Dict[str, Any], ...] = ()
+    partial_product_transformation: Optional[Dict[str, Any]] = None
     reaction_completeness: Optional[Dict[str, Any]] = None
     reaction_signature: Optional[Dict[str, Any]] = None
     reaction_display_label: Optional[Dict[str, Any]] = None
