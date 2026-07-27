@@ -184,6 +184,7 @@ def test_heck_stereochemistry_is_not_invented() -> None:
     assert candidate.verification == "product_mismatch"
     assert result.named_family is None
     assert result.reaction_label_status == "ambiguous_reactants"
+    assert "GLOBAL_CORRESPONDENCE_STEREOCHEMISTRY_UNSUPPORTED" in result.warnings
 
 
 def test_fully_substituted_alkene_is_not_terminal_heck_partner() -> None:

@@ -24,8 +24,9 @@ Every valid parsed reaction also receives a
 `ReactionCompletenessAssessment`. It records heavy-atom and element counts,
 product-atom coverage, mapping coverage, suspected missing reactants or
 insufficient partner multiplicity, and typed warnings. Exact reconstruction,
-complete product mapping, or conservative scaffold correspondence may verify
-product-atom provenance. Definite product-heavy-atom excess blocks signature
+complete product mapping, conservative scaffold correspondence, or bounded
+global multi-reactant correspondence may verify product-atom provenance.
+Definite product-heavy-atom excess blocks signature
 generation; unresolved provenance remains explicit for downstream review.
 Reactant-side excess is retained without rejection because main-product
 reaction records commonly omit byproducts. Missing reactants or stoichiometric
@@ -110,11 +111,20 @@ product.
 
 When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
 product, a conservative correspondence fallback may supply edit evidence after
-registered grammar reconstruction has failed. It accepts only mappings whose
-best alternatives imply the same normalized chemistry, requires every product
-heavy atom to be accounted for, and reports chemically distinct alternatives as
-`ambiguous_atom_correspondence`. Multi-substrate assembly remains grammar- or
-mapping-dependent rather than being guessed by this fallback.
+registered grammar reconstruction has failed. If that narrower path fails, a
+bounded global fallback can combine conserved subgraphs from several reactants
+into non-overlapping product assignments. Both paths require every product
+heavy atom to be accounted for and accept alternatives only when the
+minimum-edit mappings imply the same normalized chemistry. The global path is
+limited by component, atom, candidate, and search-combination bounds and rejects
+additional substantial products, product element excess, overflow, and
+chemically distinct best mappings. Products with explicit stereochemistry are
+also rejected because this fallback does not validate stereochemical
+correspondence. Accepted global cases keep
+`global_atom_correspondence` evidence, review-level chemistry confidence, and no
+forced named family. Their labels describe the graph transition, while
+recognized generic edit patterns or `generic_graph_transformation` provide a
+mechanism-neutral transformation class.
 
 Integrated CLI tester:
 

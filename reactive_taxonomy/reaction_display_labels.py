@@ -179,8 +179,71 @@ def _compose_concise(
     return styling["separator"].join(parts)
 
 
+def _edit_transition_label(
+    edits: Sequence[ReactionEdit], *, style: str
+) -> str:
+    """Render a mechanism-neutral before-to-after view from observed edits."""
+    styling = _style(style)
+    before = []
+    after = []
+    endpoint_elements = []
+    for edit in edits:
+        atoms = _ordered_atoms(edit)
+        endpoint_elements.extend(atom.element for atom in atoms)
+        if edit.edit_type == "hydrogen_change":
+            token = (
+                f"{edit.atom_1.element}"
+                f"{_bond('SINGLE', styling)}H"
+            )
+            if edit.old_order and not edit.new_order:
+                before.append(token)
+            elif edit.new_order and not edit.old_order:
+                after.append(token)
+            continue
+        if len(atoms) != 2:
+            continue
+        left, right = atoms
+        if edit.edit_type in {"broken", "order_changed"}:
+            before.append(
+                f"{left.element}{_bond(edit.old_order, styling)}{right.element}"
+            )
+        if edit.edit_type in {"formed", "order_changed"}:
+            after.append(
+                f"{left.element}{_bond(edit.new_order, styling)}{right.element}"
+            )
+    if not before:
+        before.extend(sorted(set(endpoint_elements)))
+    if not after:
+        after.extend(sorted(set(endpoint_elements)))
+
+    def counted(tokens: Sequence[str]) -> str:
+        counts = Counter(tokens)
+        parts = []
+        for token in sorted(counts):
+            count = counts[token]
+            parts.append(
+                str(
+                    load_reaction_label_rendering()["templates"][
+                        "counted_clause"
+                    ]
+                ).format(
+                    count=count,
+                    times=styling["times"],
+                    clause=token,
+                )
+                if count > 1
+                else token
+            )
+        return " + ".join(parts)
+
+    return f"{counted(before)} {styling['arrow']} {counted(after)}"
+
+
 def _event_labels(
-    events: Sequence[ReactionEvent], *, style: str
+    events: Sequence[ReactionEvent],
+    *,
+    style: str,
+    prefer_transition: bool = False,
 ) -> tuple[tuple[str, ...], str, str]:
     """Render and aggregate event-local labels without changing identity."""
     rendering = load_reaction_label_rendering()
@@ -193,9 +256,13 @@ def _event_labels(
         )
         pattern = match_reaction_label_pattern(event.edits, style=style)
         label = (
-            pattern.label
-            if pattern
-            else _compose_concise(event_clauses, style=style)
+            _edit_transition_label(event.edits, style=style)
+            if prefer_transition
+            else (
+                pattern.label
+                if pattern
+                else _compose_concise(event_clauses, style=style)
+            )
         )
         labels.append(label)
         details.append(
@@ -330,6 +397,11 @@ def build_reaction_display_label(
     )
     warning_tuple = tuple(sorted(set(str(warning) for warning in warnings)))
     pattern = match_reaction_label_pattern(edits, style=style) if clauses else None
+    inferred_transition = (
+        _edit_transition_label(edits, style=style)
+        if evidence == "global_atom_correspondence" and clauses
+        else None
+    )
     structural_label = concise_clauses or None
     transformation_label = pattern.label if pattern else None
     grammar_label = selected_label if selected_exact and selected_label else None
@@ -351,7 +423,9 @@ def build_reaction_display_label(
         status = "conflicting_evidence"
     elif len(events) > 1 and clauses:
         rendered_event_labels, concise, detailed = _event_labels(
-            events, style=style
+            events,
+            style=style,
+            prefer_transition=evidence == "global_atom_correspondence",
         )
         transformation_label = concise
         status = "multi_event"
@@ -363,7 +437,11 @@ def build_reaction_display_label(
         )
         status = "family_overlay" if named_family else "exact_reconstruction"
     elif pattern is not None:
-        concise = contextual_label.concise if contextual_label else pattern.label
+        concise = (
+            contextual_label.concise
+            if contextual_label
+            else inferred_transition or pattern.label
+        )
         detail_template = (
             rendering["templates"]["contextual_detail"]
             if contextual_label
@@ -376,7 +454,11 @@ def build_reaction_display_label(
         )
         status = "generic_pattern"
     elif clauses:
-        concise = contextual_label.concise if contextual_label else concise_clauses
+        concise = (
+            contextual_label.concise
+            if contextual_label
+            else inferred_transition or concise_clauses
+        )
         detailed = (
             str(rendering["templates"]["exact_detail"]).format(
                 label=contextual_label.concise,

@@ -49,7 +49,9 @@ def test_non_acylated_product_does_not_verify() -> None:
     assert all(candidate.verification == "product_mismatch" for candidate in candidates)
     assert result.selected_candidate is None
     assert result.named_family is None
-    assert result.reaction_label_status == "reactant_only"
+    assert result.evidence_quality == "global_atom_correspondence"
+    assert result.reaction_label_status == "observed_edit_summary"
+    assert result.transformation_class == "generic_graph_transformation"
 
 
 def test_product_reconstruction_resolves_aromatic_regioisomer() -> None:

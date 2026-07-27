@@ -115,11 +115,75 @@ def test_chemically_distinct_correspondences_remain_ambiguous() -> None:
     assert "AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:2" in result.warnings
 
 
-def test_multi_substrate_assembly_is_outside_scaffold_fallback() -> None:
+def test_unresolvable_multi_substrate_assembly_remains_unresolved() -> None:
     result = featurize_reaction("CC.CN>>CCN")
 
     assert result.valid
     assert result.evidence_quality == "unresolved"
     assert result.reaction_label is None
     assert result.reaction_signature is None
-    assert "SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE" in result.warnings
+    assert "GLOBAL_CORRESPONDENCE_NOT_FOUND" in result.warnings
+
+
+def test_global_correspondence_recovers_aldol_graph_edits() -> None:
+    result = featurize_reaction(
+        "CC=O.CC=O>>CC(O)CC=O",
+        label_style="ascii",
+    )
+
+    assert result.evidence_quality == "global_atom_correspondence"
+    assert result.reaction_signature is not None
+    assert result.transformation_class == "generic_graph_transformation"
+    assert result.reaction_completeness is not None
+    assert result.reaction_completeness.status == "verified"
+    assert all(
+        edit.confidence == 0.8 for edit in result.reaction_signature.edits
+    )
+    assert result.reaction_label == "C-H + C=O -> C-C + C-O + O-H"
+    assert result.reaction_label_status == "observed_edit_summary"
+    assert "INFERRED_GLOBAL_ATOM_CORRESPONDENCE" in result.warnings
+
+
+def test_global_correspondence_recovers_cycloaddition_graph_edits() -> None:
+    result = featurize_reaction(
+        "CC#C.CN=[N+]=[N-]>>Cc1nnn(C)c1",
+        label_style="ascii",
+    )
+
+    assert result.evidence_quality == "global_atom_correspondence"
+    assert result.reaction_signature is not None
+    assert result.transformation_class == "generic_graph_transformation"
+    assert result.reaction_signature.topology.reaction_scope == "intermolecular"
+    assert result.reaction_label is not None
+    assert "->" in result.reaction_label
+    assert "C:N" in result.reaction_label
+
+
+def test_global_correspondence_recovers_condensation_graph_edits() -> None:
+    result = featurize_reaction(
+        "CC=O.CN>>CC=NC",
+        label_style="ascii",
+    )
+
+    assert result.evidence_quality == "global_atom_correspondence"
+    assert result.reaction_signature is not None
+    assert result.transformation_class == "substitution"
+    assert result.reaction_label == "C=O + 2 x N-H -> C=N"
+    assert result.reaction_signature.formed_bond_types == ("C-N:DOUBLE",)
+    assert result.reaction_signature.broken_bond_types == ("C-O:DOUBLE",)
+    assert result.reaction_signature.order_changes == ()
+    assert {
+        edit.edit_type for edit in result.reaction_signature.edits
+    } == {"broken", "formed", "hydrogen_change"}
+
+
+def test_global_correspondence_is_reactant_order_invariant() -> None:
+    forward = featurize_reaction("CC=O.CN>>CC=NC")
+    reversed_order = featurize_reaction("CN.CC=O>>CC=NC")
+
+    assert forward.reaction_signature is not None
+    assert reversed_order.reaction_signature is not None
+    assert forward.reaction_signature.signature_id == (
+        reversed_order.reaction_signature.signature_id
+    )
+    assert forward.reaction_label == reversed_order.reaction_label

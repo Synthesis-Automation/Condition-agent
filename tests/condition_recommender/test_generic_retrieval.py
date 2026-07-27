@@ -109,7 +109,7 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
         "schema_version": "2.0",
-        "converter_definition_version": "generic_conversion.v1.9",
+        "converter_definition_version": "generic_conversion.v1.10",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",
@@ -473,6 +473,26 @@ def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:
     assert "REACTION_TOPOLOGY_FALLBACK_USED" in result.warnings
     assert any(
         caution.startswith("Reaction-scope mismatch:")
+        for caution in result.recommendations[0].cautions
+    )
+
+
+def test_inferred_correspondence_precedent_discloses_review_caution() -> None:
+    query = _signature("query")
+    inferred = _signature("inferred")
+    inferred["evidence_quality"] = "global_atom_correspondence"
+    record = _record(1, inferred)
+    record["chemistry_status"] = "review"
+
+    result = recommend_indexed_signature(
+        query,
+        build_generic_index([record]),
+        minimum_pool_size=1,
+    )
+
+    assert result.valid
+    assert any(
+        "inferred atom correspondence" in caution
         for caution in result.recommendations[0].cautions
     )
 

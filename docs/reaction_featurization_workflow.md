@@ -152,7 +152,19 @@ The effective evidence priority is:
 2. Exact single-event operator reconstruction.
 3. Exact multi-event operator reconstruction.
 4. Conservative unique-scaffold correspondence.
-5. Unresolved or ambiguous evidence.
+5. Bounded global multi-reactant correspondence.
+6. Unresolved or ambiguous evidence.
+
+The global fallback is used only for unmapped, single-main-product reactions
+after exact reconstruction and the narrower scaffold fallback fail. It matches
+conserved subgraphs from a bounded number of reactant components into
+non-overlapping product atoms, requires every product heavy atom to be
+accounted for, and accepts only minimum-edit alternatives that imply the same
+normalized chemistry. Candidate overflow, product element excess, additional
+substantial products, explicit stereochemistry that the fallback cannot
+validate, or chemically different best mappings remain unresolved.
+This recovers general assemblies such as additions, condensations, and
+cycloadditions without assigning a named reaction or inventing a reactant.
 
 Normalized edit types include:
 
@@ -312,7 +324,7 @@ generates the final evidence-aware label.
 | Multiple reaction events | Aggregated event labels |
 | Exact reconstructed grammar | Full reactant-to-product grammar label |
 | Recognized generic edit pattern | `C-N substitution`, `C=C hydrogenation`, etc. |
-| Valid edits without a known pattern | Literal edit summary such as `C-N bond formation` |
+| Valid edits without a known pattern | Literal before-to-after edit summary such as `C=O + C-H -> C-C + C-O + O-H` |
 | Only one plausible reactant assignment | Reactant-only label ending in an arrow |
 | Several plausible assignments | `OR`-joined ambiguous reactant labels |
 | No usable evidence | No label |
@@ -347,6 +359,12 @@ unavailable
 ```
 
 Display labels do not participate in reaction identity.
+
+For globally inferred correspondence, the label deliberately describes the
+observed graph transition instead of claiming a mechanism. The transformation
+class uses a recognized generic edit-pattern class when one is uniquely
+supported; otherwise it is `generic_graph_transformation`. The named-family
+field remains unset.
 
 ## 9. Generate the reaction signature
 

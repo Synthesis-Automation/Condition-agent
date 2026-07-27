@@ -343,7 +343,13 @@ def featurize_reaction(
         candidates=tuple(candidates),
         selected_candidate=selected,
         selected_events=selected_events,
-        transformation_class=selected.transformation_class if selected else None,
+        transformation_class=(
+            selected.transformation_class
+            if selected
+            else reaction_signature.transformation_class
+            if reaction_signature is not None
+            else None
+        ),
         compatible_named_families=compatible_named_families,
         named_family=named_family,
         reaction_label=reaction_label,

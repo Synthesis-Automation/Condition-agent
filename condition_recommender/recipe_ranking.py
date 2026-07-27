@@ -454,6 +454,22 @@ def rank_condition_recipes(
                 "Repeated observations from the same reference count as one "
                 "independent evidence unit"
             )
+        inferred_correspondence = sorted(
+            {
+                str(member.row.signature.get("evidence_quality") or "")
+                for member in members
+                if str(member.row.signature.get("evidence_quality") or "")
+                in {
+                    "global_atom_correspondence",
+                    "unique_scaffold_correspondence",
+                }
+            }
+        )
+        if inferred_correspondence:
+            cautions.append(
+                "Precedent reaction edits use deterministic inferred atom "
+                "correspondence and retain review-level chemistry confidence"
+            )
         precedent_scopes = {
             reaction_scope(member.row.signature)
             for member in members

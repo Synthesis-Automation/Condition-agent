@@ -15,7 +15,10 @@ from .reaction_models import (
     ReactionEdit,
     ReactionSiteReference,
 )
-from .reaction_correspondence import infer_scaffold_correspondence_candidates
+from .reaction_correspondence import (
+    infer_global_correspondence_candidates,
+    infer_scaffold_correspondence_candidates,
+)
 
 
 @dataclass(frozen=True)
@@ -341,6 +344,9 @@ def _correspondence_edits(
     mapping: Tuple[Tuple[int, int, int, int], ...],
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
+    *,
+    evidence: str = "unique_scaffold_correspondence",
+    confidence: float = 0.85,
 ) -> Tuple[ReactionEdit, ...]:
     reactant_components = {
         component.component_index: component for component in reactants
@@ -398,8 +404,8 @@ def _correspondence_edits(
                     atom_2=_atom_reference(component, right[1]),
                     old_order=old_order,
                     new_order=new_order,
-                    evidence="unique_scaffold_correspondence",
-                    confidence=0.85,
+                    evidence=evidence,
+                    confidence=confidence,
                 )
             )
     for component in products:
@@ -437,8 +443,8 @@ def _correspondence_edits(
                     ),
                     old_order=None,
                     new_order=str(bond.GetBondType()).upper(),
-                    evidence="unique_scaffold_correspondence",
-                    confidence=0.85,
+                    evidence=evidence,
+                    confidence=confidence,
                 )
             )
     for reactant_key, product_key in sorted(forward.items()):
@@ -461,8 +467,8 @@ def _correspondence_edits(
                     atom_2=None,
                     old_order="SINGLE" if delta < 0 else None,
                     new_order="SINGLE" if delta > 0 else None,
-                    evidence="unique_scaffold_correspondence",
-                    confidence=0.85,
+                    evidence=evidence,
+                    confidence=confidence,
                 )
             )
     return tuple(edits)
@@ -490,20 +496,65 @@ def _chemistry_edit_key(edit: ReactionEdit) -> Tuple[Any, ...]:
     )
 
 
+def _correspondence_edit_cost(
+    edits: Tuple[ReactionEdit, ...],
+) -> Tuple[int, int, int]:
+    """Rank inferred mappings by the smallest chemically explicit edit set."""
+    heavy_edits = tuple(
+        edit for edit in edits if edit.edit_type != "hydrogen_change"
+    )
+    weighted = sum(
+        2 if edit.edit_type in {"formed", "broken"} else 1
+        for edit in heavy_edits
+    )
+    hydrogen_edits = len(edits) - len(heavy_edits)
+    return weighted, len(heavy_edits), hydrogen_edits
+
+
 def normalize_inferred_scaffold_edits(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
 ) -> EditNormalizationResult:
     """Infer edits only when all best scaffold mappings imply one chemistry."""
     correspondence = infer_scaffold_correspondence_candidates(reactants, products)
+    evidence = "unique_scaffold_correspondence"
+    confidence = 0.85
+    inferred_warning = "INFERRED_ATOM_CORRESPONDENCE"
+    if not correspondence.valid:
+        correspondence = infer_global_correspondence_candidates(
+            reactants, products
+        )
+        evidence = "global_atom_correspondence"
+        confidence = 0.8
+        inferred_warning = "INFERRED_GLOBAL_ATOM_CORRESPONDENCE"
     if not correspondence.valid:
         return EditNormalizationResult(
             (), "unresolved", 0.0, correspondence.warnings, False
         )
-    candidate_results = tuple(
-        _correspondence_edits(mapping, reactants, products)
+    all_candidate_results = tuple(
+        _correspondence_edits(
+            mapping,
+            reactants,
+            products,
+            evidence=evidence,
+            confidence=confidence,
+        )
         for mapping in correspondence.candidates
     )
+    if evidence == "global_atom_correspondence":
+        nonempty_costs = tuple(
+            _correspondence_edit_cost(edits)
+            for edits in all_candidate_results
+            if edits
+        )
+        best_cost = min(nonempty_costs) if nonempty_costs else None
+        candidate_results = tuple(
+            edits
+            for edits in all_candidate_results
+            if edits and _correspondence_edit_cost(edits) == best_cost
+        )
+    else:
+        candidate_results = all_candidate_results
     nonempty = tuple(edits for edits in candidate_results if edits)
     if not nonempty:
         return EditNormalizationResult(
@@ -531,9 +582,9 @@ def normalize_inferred_scaffold_edits(
     )
     return EditNormalizationResult(
         selected,
-        "unique_scaffold_correspondence",
-        0.85,
-        ("INFERRED_ATOM_CORRESPONDENCE",),
+        evidence,
+        confidence,
+        (inferred_warning,),
         True,
     )
 

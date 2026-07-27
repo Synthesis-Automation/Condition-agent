@@ -83,6 +83,7 @@ def test_vinyl_suzuki_rejects_opposite_product_stereoisomer() -> None:
 
     assert result.selected_candidate is None
     assert result.evidence_quality == "reactant_grammar_only"
+    assert "GLOBAL_CORRESPONDENCE_STEREOCHEMISTRY_UNSUPPORTED" in result.warnings
     assert result.candidates
     assert result.candidates[0].verification == "product_mismatch"
 

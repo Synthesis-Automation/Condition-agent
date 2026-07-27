@@ -175,9 +175,10 @@ def build_reaction_completeness(
         selected is not None
         and selected.verification == "exact_product_reconstruction"
     ) or bool(selected_events)
-    correspondence_verified = edit_result.evidence == (
-        "unique_scaffold_correspondence"
-    )
+    correspondence_verified = edit_result.evidence in {
+        "unique_scaffold_correspondence",
+        "global_atom_correspondence",
+    }
     mapping_verified = edit_result.evidence.startswith("validated") and bool(
         product_maps
     ) and (
@@ -192,7 +193,7 @@ def build_reaction_completeness(
         evidence = "exact_product_reconstruction"
     elif correspondence_verified:
         status = "verified"
-        evidence = "unique_scaffold_correspondence"
+        evidence = edit_result.evidence
     elif mapping_verified:
         status = "verified"
         evidence = "complete_product_atom_mapping"

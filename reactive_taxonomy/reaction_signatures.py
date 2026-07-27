@@ -11,6 +11,7 @@ from typing import Any, Dict, Iterable, Optional, Tuple
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_edits import EditNormalizationResult
 from .reaction_events import build_reaction_events
+from .reaction_correspondence import REACTION_CORRESPONDENCE_VERSION
 from .reaction_models import (
     ProductConnection,
     ProductTransformation,
@@ -52,7 +53,8 @@ def _definition_versions() -> Dict[str, str]:
         with path.open("r", encoding="utf-8") as handle:
             payload = json.load(handle)
         versions[filename] = str(payload.get("schema_version") or "unknown")
-    return versions
+    versions["reaction_correspondence"] = REACTION_CORRESPONDENCE_VERSION
+    return dict(sorted(versions.items()))
 
 
 def reaction_signature_definition_versions() -> Dict[str, str]:
@@ -383,7 +385,6 @@ def build_reaction_signature(
             if edit.edit_type == "hydrogen_change"
         )
     )
-    transformation_class = selected.transformation_class if selected else None
     partner_handles = tuple(
         sorted(
             (_partner_token(partner, environment=False) for partner in partners),
@@ -424,6 +425,28 @@ def build_reaction_signature(
         evidence=edit_result.evidence,
         confidence=edit_result.confidence,
     )
+    if selected is not None:
+        transformation_class = selected.transformation_class
+    else:
+        event_classes = tuple(
+            sorted(
+                {
+                    event.transformation_class
+                    for event in events
+                    if event.transformation_class is not None
+                }
+            )
+        )
+        if len(event_classes) == 1:
+            transformation_class = event_classes[0]
+        elif edit_result.evidence == "global_atom_correspondence":
+            transformation_class = (
+                "generic_graph_transformation"
+                if len(events) == 1
+                else "generic_multi_event_graph_transformation"
+            )
+        else:
+            transformation_class = None
     exact_event_tokens = tuple(event.event_signature_key for event in events)
     handle_event_tokens = tuple(
         tuple(

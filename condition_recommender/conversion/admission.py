@@ -30,7 +30,7 @@ class AdmissionDecision:
     condition_status: ConditionStatus
     outcome_status: OutcomeStatus
     index_eligibility: IndexEligibility
-    policy_version: str = "generic_admission.v1.3"
+    policy_version: str = "generic_admission.v1.4"
 
 
 @lru_cache(maxsize=1)
@@ -170,6 +170,20 @@ def decide_admission(
         ConditionStatus.RESOLVED_COMPLETE,
         ConditionStatus.UNRESOLVED_RETAINED,
     }:
+        index_eligibility = IndexEligibility.ELIGIBLE
+    elif (
+        chemistry_status == ChemistryStatus.REVIEW
+        and analysis.reaction_signature is not None
+        and completeness is not None
+        and completeness.status == "verified"
+        and analysis.evidence_quality
+        in set(policy.get("indexable_review_evidence") or ())
+        and condition_status
+        in {
+            ConditionStatus.RESOLVED_COMPLETE,
+            ConditionStatus.UNRESOLVED_RETAINED,
+        }
+    ):
         index_eligibility = IndexEligibility.ELIGIBLE
     else:
         index_eligibility = IndexEligibility.REVIEW_ONLY

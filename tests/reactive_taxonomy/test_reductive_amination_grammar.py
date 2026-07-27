@@ -71,7 +71,9 @@ def test_imine_product_does_not_verify_as_reductive_amination() -> None:
     assert len(candidates) == 1
     assert candidates[0].verification == "product_mismatch"
     assert result.named_family is None
-    assert result.reaction_label_status == "reactant_only"
+    assert result.evidence_quality == "global_atom_correspondence"
+    assert result.reaction_label_status == "generic_pattern"
+    assert result.transformation_class == "substitution"
 
 
 def test_multiple_carbonyl_partners_remain_unselected_without_verification() -> None:

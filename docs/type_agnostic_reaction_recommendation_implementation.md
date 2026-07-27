@@ -366,14 +366,22 @@ Use this order:
    correspondence fallback: exactly one substantial reactant scaffold, exactly
    one product, every product heavy atom accounted for, and all best mappings
    producing the same normalized edit set.
-5. Preserve ambiguous, unresolved, or conflicting evidence for review.
+5. If the narrow fallback fails, allow bounded global correspondence across
+   multiple reactant components for one substantial product. Require
+   non-overlapping product assignments, full product-heavy-atom accounting, and
+   chemistry agreement among minimum-edit alternatives.
+6. Preserve ambiguous, unresolved, or conflicting evidence for review.
 
 The initial release should borrow deterministic mapping validation and graph-comparison ideas from the old system where useful, but it must not depend on RXNMapper or legacy modules. A future optional mapper may implement a narrow interface and record its provenance.
 
-The conserved-scaffold fallback is not a general reaction mapper. It rejects
-multi-substrate assembly, insufficient scaffold conservation, candidate-limit
-overflow, and chemically distinct minimal correspondences. Symmetry-equivalent
-atom assignments may be accepted only when their normalized edit sets agree.
+Neither fallback is a general reaction mapper. The global path is bounded by
+reactant-component, product-size, candidate, and search-combination limits. It
+rejects additional substantial products, insufficient conservation, element
+excess, explicit stereochemistry it cannot validate, overflow, and chemically
+distinct minimum-edit correspondences.
+Symmetry-equivalent atom assignments may be accepted only when their normalized
+edit sets agree. Accepted global results retain review-level inference evidence
+and never imply a named family.
 
 Every valid parsed reaction also receives a typed product-atom completeness
 assessment. It records heavy-atom and element counts, product and reactant

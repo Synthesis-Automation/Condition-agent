@@ -109,7 +109,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "2.0"
-    assert record.converter_definition_version == "generic_conversion.v1.9"
+    assert record.converter_definition_version == "generic_conversion.v1.10"
     assert record.reaction_signature["schema_version"] == "1.4"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -185,6 +185,22 @@ def test_exact_multi_event_signature_is_verified() -> None:
     assert record.reaction_label is not None
     assert record.reaction_label.count("substitution") == 2
     assert " + " in record.reaction_label
+
+
+def test_global_correspondence_is_indexable_with_review_confidence() -> None:
+    record = convert_record(_raw("CC=O.CN>>CC=NC"))
+
+    assert record.evidence_quality == "global_atom_correspondence"
+    assert record.reaction_signature is not None
+    assert record.reaction_completeness is not None
+    assert record.reaction_completeness["status"] == "verified"
+    assert record.chemistry_status == ChemistryStatus.REVIEW
+    assert record.admission_tier == AdmissionTier.REVIEW
+    assert record.index_eligibility == IndexEligibility.ELIGIBLE
+    assert record.admission_reasons == ("insufficient_edit_evidence",)
+    index = build_generic_index([record.to_dict()])
+    assert len(index.rows) == 1
+    assert index.rows[0].chemistry_status == "review"
 
 
 def test_grammar_only_record_is_review_not_rejected() -> None:

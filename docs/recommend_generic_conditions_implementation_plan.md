@@ -106,6 +106,9 @@ The initial implementation slice now provides:
 
 - reaction-signature schema 1.4, with schema-level hydrogen changes included in
   event, L2, and L3 identity plus a typed product-atom completeness assessment;
+- bounded global multi-reactant correspondence for complete unmapped,
+  single-main-product reactions, with mechanism-neutral transition labels,
+  review-level evidence, and explicit index eligibility;
 - deterministic DOI, patent, and normalized bibliographic reference identity;
 - reference provenance in canonical converted records and persisted indices;
 - deterministic source-balanced smoke, development, validation, and
