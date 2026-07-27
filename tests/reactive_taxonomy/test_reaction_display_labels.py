@@ -22,9 +22,9 @@ def test_multiple_edits_compose_and_collapse_repeated_generic_clauses() -> None:
     result = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
 
     assert result.reaction_label == "H2C=CH2 → H3C–CH3"
-    assert result.reaction_label_status == "mapped_generic_pattern"
+    assert result.reaction_label_status == "exact_product"
     assert result.display_label is not None
-    assert result.display_label.status == "generic_pattern"
+    assert result.display_label.status == "exact_reconstruction"
     assert result.display_label.pattern_id == "hydrogenation"
     assert result.display_label.structural_label == "C=C → C–C; 2 × H gain at C"
     assert result.display_label.transformation_label == "C=C hydrogenation"

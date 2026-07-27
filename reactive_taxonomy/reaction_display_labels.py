@@ -333,6 +333,13 @@ def build_reaction_display_label(
     structural_label = concise_clauses or None
     transformation_label = pattern.label if pattern else None
     grammar_label = selected_label if selected_exact and selected_label else None
+    exact_display_label = selected_label
+    if selected_exact and contextual_label is not None and grammar_id is not None:
+        from .reaction_labels import load_reaction_rendering
+
+        rule = load_reaction_rendering().get(grammar_id) or {}
+        if bool(rule.get("prefer_contextual_label")):
+            exact_display_label = contextual_label.concise
     rendered_event_labels: tuple[str, ...] = ()
     if evidence == "conflicting_edit_evidence" and clauses:
         concise = str(rendering["templates"]["conflict"]).format(
@@ -348,10 +355,10 @@ def build_reaction_display_label(
         )
         transformation_label = concise
         status = "multi_event"
-    elif selected_exact and selected_label:
-        concise = selected_label
+    elif selected_exact and exact_display_label:
+        concise = exact_display_label
         detailed = str(rendering["templates"]["exact_detail"]).format(
-            label=selected_label,
+            label=exact_display_label,
             clauses=detailed_clauses or "none",
         )
         status = "family_overlay" if named_family else "exact_reconstruction"

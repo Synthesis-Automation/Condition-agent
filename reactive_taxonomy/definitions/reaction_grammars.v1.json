@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.7",
+  "schema_version": "1.8",
   "grammars": [
     {
       "id": "boron_transfer_coupling",
@@ -860,6 +860,234 @@
         "sulfonylation"
       ],
       "priority": 95
+    },
+    {
+      "id": "sulfonate_formation",
+      "transformation_class": "sulfonate_formation",
+      "display_name": "Sulfonate formation",
+      "generic_label": "R–S(O)2X + O–H → R–S(O)2–O",
+      "roles": {
+        "sulfonyl_partner": {
+          "site_type": "electrophilic_center",
+          "center_family": "Sulfonyl",
+          "activation_state_any": [
+            "activated"
+          ]
+        },
+        "oxygen_partner": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "O"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": ["sulfonyl_partner", "oxygen_partner"],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "operator": {
+        "id": "replace_handle_with_center",
+        "electrophile_role": "sulfonyl_partner",
+        "partner_role": "oxygen_partner"
+      },
+      "compatible_named_families": [
+        "sulfonylation"
+      ],
+      "priority": 95
+    },
+    {
+      "id": "carbonyl_reduction",
+      "transformation_class": "carbonyl_reduction",
+      "display_name": "Carbonyl reduction",
+      "generic_label": "C=O → C–OH",
+      "roles": {
+        "carbonyl": {
+          "site_type": "electrophilic_center",
+          "center_family": "Carbonyl",
+          "carbonyl_subtype_any": [
+            "formaldehyde",
+            "aldehyde",
+            "ketone"
+          ]
+        }
+      },
+      "operator": {
+        "id": "change_bond_order",
+        "site_role": "carbonyl",
+        "atom_role_1": "center",
+        "atom_role_2": "heteroatom",
+        "old_order": "DOUBLE",
+        "new_order": "SINGLE",
+        "hydrogen_changes": [
+          {
+            "atom_role": "center",
+            "direction": "added"
+          },
+          {
+            "atom_role": "heteroatom",
+            "direction": "added"
+          }
+        ]
+      },
+      "compatible_named_families": [],
+      "priority": 92
+    },
+    {
+      "id": "alcohol_oxidation",
+      "transformation_class": "alcohol_oxidation",
+      "display_name": "Alcohol oxidation",
+      "generic_label": "C–OH → C=O",
+      "roles": {
+        "alcohol": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "O"
+          ],
+          "h_count_min": 1,
+          "contexts_any": [
+            "Alkyl"
+          ],
+          "availability_any": [
+            "free"
+          ]
+        }
+      },
+      "operator": {
+        "id": "change_bond_order",
+        "site_role": "alcohol",
+        "atom_role_1": "center",
+        "atom_role_2": "attachment",
+        "old_order": "SINGLE",
+        "new_order": "DOUBLE",
+        "hydrogen_changes": [
+          {
+            "atom_role": "center",
+            "direction": "removed"
+          },
+          {
+            "atom_role": "attachment",
+            "direction": "removed"
+          }
+        ]
+      },
+      "compatible_named_families": [],
+      "priority": 92
+    },
+    {
+      "id": "alkene_hydrogenation",
+      "transformation_class": "alkene_reduction",
+      "display_name": "Alkene hydrogenation",
+      "generic_label": "C=C → C–C",
+      "roles": {
+        "unsaturated_partner": {
+          "site_type": "unsaturated_bond",
+          "handle_token_any": [
+            "Alkene"
+          ]
+        }
+      },
+      "operator": {
+        "id": "change_bond_order",
+        "site_role": "unsaturated_partner",
+        "atom_role_1": "endpoint_a",
+        "atom_role_2": "endpoint_b",
+        "old_order": "DOUBLE",
+        "new_order": "SINGLE",
+        "hydrogen_changes": [
+          {
+            "atom_role": "endpoint_a",
+            "direction": "added"
+          },
+          {
+            "atom_role": "endpoint_b",
+            "direction": "added"
+          }
+        ]
+      },
+      "compatible_named_families": [],
+      "priority": 91
+    },
+    {
+      "id": "alkyne_partial_hydrogenation",
+      "transformation_class": "alkyne_partial_reduction",
+      "display_name": "Alkyne partial hydrogenation",
+      "generic_label": "C≡C → C=C",
+      "roles": {
+        "unsaturated_partner": {
+          "site_type": "unsaturated_bond",
+          "handle_token_any": [
+            "Alkyne"
+          ]
+        }
+      },
+      "operator": {
+        "id": "change_bond_order",
+        "site_role": "unsaturated_partner",
+        "atom_role_1": "endpoint_a",
+        "atom_role_2": "endpoint_b",
+        "old_order": "TRIPLE",
+        "new_order": "DOUBLE",
+        "hydrogen_changes": [
+          {
+            "atom_role": "endpoint_a",
+            "direction": "added"
+          },
+          {
+            "atom_role": "endpoint_b",
+            "direction": "added"
+          }
+        ]
+      },
+      "compatible_named_families": [],
+      "priority": 91
+    },
+    {
+      "id": "alkyne_hydrogenation",
+      "transformation_class": "alkyne_reduction",
+      "display_name": "Alkyne hydrogenation",
+      "generic_label": "C≡C → C–C",
+      "roles": {
+        "unsaturated_partner": {
+          "site_type": "unsaturated_bond",
+          "handle_token_any": [
+            "Alkyne"
+          ]
+        }
+      },
+      "operator": {
+        "id": "change_bond_order",
+        "site_role": "unsaturated_partner",
+        "atom_role_1": "endpoint_a",
+        "atom_role_2": "endpoint_b",
+        "old_order": "TRIPLE",
+        "new_order": "SINGLE",
+        "hydrogen_changes": [
+          {
+            "atom_role": "endpoint_a",
+            "direction": "added"
+          },
+          {
+            "atom_role": "endpoint_a",
+            "direction": "added"
+          },
+          {
+            "atom_role": "endpoint_b",
+            "direction": "added"
+          },
+          {
+            "atom_role": "endpoint_b",
+            "direction": "added"
+          }
+        ]
+      },
+      "compatible_named_families": [],
+      "priority": 90
     }
   ]
 }

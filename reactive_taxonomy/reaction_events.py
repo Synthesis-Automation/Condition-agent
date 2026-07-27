@@ -225,6 +225,22 @@ def _event_sites(
 def _candidate_atom_keys(
     candidate: ReactionCandidate,
 ) -> set[Tuple[int, int]]:
+    keys: set[Tuple[int, int]] = set()
+    for change in candidate.predicted_bond_changes:
+        for role_path in (change.atom_1_role, change.atom_2_role):
+            if role_path is None or "." not in role_path:
+                continue
+            partner_role, atom_role = role_path.split(".", 1)
+            site = candidate.role_assignments.get(partner_role)
+            if site is None:
+                continue
+            atom_indices = site.atom_roles.get(atom_role) or ()
+            keys.update(
+                (site.component_index, int(atom_index))
+                for atom_index in atom_indices
+            )
+    if keys:
+        return keys
     return {
         (site.component_index, int(atom_index))
         for site in candidate.role_assignments.values()

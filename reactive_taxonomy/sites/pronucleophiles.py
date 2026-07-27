@@ -186,6 +186,15 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 str(record["activator"]) for record in activation_records
             ]
         atom_roles = {"center": (atom.GetIdx(),)}
+        heavy_neighbors = tuple(
+            sorted(
+                neighbor.GetIdx()
+                for neighbor in atom.GetNeighbors()
+                if neighbor.GetAtomicNum() > 1
+            )
+        )
+        if len(heavy_neighbors) == 1:
+            atom_roles["attachment"] = heavy_neighbors
         if activation_anchors:
             atom_roles["activation_anchor"] = activation_anchors
         sites.append(SiteCandidate(

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.7",
+  "schema_version": "1.8",
   "fragment_indexing": {
     "context_symbols": {
       "Ar": "Ar",
@@ -144,6 +144,36 @@
       "product_kind": "sulfonamide",
       "sulfonyl_role": "sulfonyl_partner",
       "nitrogen_role": "nitrogen_partner"
+    },
+    "sulfonate_formation": {
+      "product_kind": "sulfonate",
+      "sulfonyl_role": "sulfonyl_partner",
+      "oxygen_role": "oxygen_partner"
+    },
+    "carbonyl_reduction": {
+      "product_kind": "fixed_product",
+      "product_label": "C–OH",
+      "prefer_contextual_label": true
+    },
+    "alcohol_oxidation": {
+      "product_kind": "fixed_product",
+      "product_label": "C=O",
+      "prefer_contextual_label": true
+    },
+    "alkene_hydrogenation": {
+      "product_kind": "fixed_product",
+      "product_label": "C–C",
+      "prefer_contextual_label": true
+    },
+    "alkyne_partial_hydrogenation": {
+      "product_kind": "fixed_product",
+      "product_label": "C=C",
+      "prefer_contextual_label": true
+    },
+    "alkyne_hydrogenation": {
+      "product_kind": "fixed_product",
+      "product_label": "C–C",
+      "prefer_contextual_label": true
     }
   }
 }

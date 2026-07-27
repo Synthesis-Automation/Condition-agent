@@ -4,7 +4,9 @@ from reactive_taxonomy import featurize_reaction
 def test_valid_mapping_produces_typed_order_change() -> None:
     result = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
 
-    assert result.evidence_quality == "validated_atom_mapping"
+    assert result.evidence_quality == (
+        "validated_mapping_and_exact_reconstruction"
+    )
     assert result.reaction_signature is not None
     assert result.reaction_signature.named_family is None
     assert len(result.reaction_signature.edits) == 3
@@ -86,7 +88,9 @@ def test_mapping_and_reconstruction_agreement_keeps_exact_compatibility_view() -
     )
     result = featurize_reaction(reaction)
 
-    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.evidence_quality == (
+        "validated_mapping_and_exact_reconstruction"
+    )
     assert result.reaction_signature is not None
     assert (
         result.reaction_signature.evidence_quality

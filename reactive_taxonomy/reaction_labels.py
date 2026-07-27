@@ -714,6 +714,32 @@ def render_product_label(
         elif contexts:
             suffix += "".join(f"({context})" for context in contexts)
         product = f"{left}{bond}S(O)2{bond}N{suffix}"
+    elif kind == "sulfonate":
+        sulfonyl_role, oxygen_role = (
+            str(rule["sulfonyl_role"]),
+            str(rule["oxygen_role"]),
+        )
+        sulfonyl, oxygen = (
+            assignment[sulfonyl_role],
+            assignment[oxygen_role],
+        )
+        left = _context_label(
+            sulfonyl_role,
+            sulfonyl,
+            0,
+            str(sulfonyl.details["retained_context"]),
+            aliases,
+            style=style,
+        )
+        contexts = _ordered_context_labels(
+            oxygen, style=style, role=oxygen_role, aliases=aliases
+        )
+        right = contexts[0] if contexts else "R"
+        product = f"{left}{bond}S(O)2{bond}O{bond}{right}"
+    elif kind == "fixed_product":
+        product = str(rule["product_label"])
+        if style != "unicode":
+            product = product.replace("–", "-").replace("≡", "#")
     else:
         return str(grammar.get("generic_label") or grammar["id"])
     return product

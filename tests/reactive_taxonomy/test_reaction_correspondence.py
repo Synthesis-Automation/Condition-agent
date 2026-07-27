@@ -9,22 +9,22 @@ def test_unmapped_alkene_hydrogenation_receives_inferred_label() -> None:
     )
 
     assert result.valid
-    assert result.evidence_quality == "unique_scaffold_correspondence"
+    assert result.evidence_quality == "exact_product_reconstruction"
     assert result.reaction_label == "Ar–CH=CH2 → Ar–CH2–CH3"
-    assert result.reaction_label_status == "generic_pattern"
+    assert result.reaction_label_status == "exact_product"
     assert result.display_label is not None
     assert result.display_label.pattern_id == "hydrogenation"
     assert result.display_label.transformation_label == "C=C hydrogenation"
     assert result.display_label.reactant_context_label == "Ar–CH=CH2"
     assert result.display_label.product_context_label == "Ar–CH2–CH3"
-    assert result.display_label.confidence == 0.85
+    assert result.display_label.confidence == 1.0
     assert result.reaction_signature is not None
     assert result.reaction_signature.product_transformation is not None
     assert (
         result.reaction_signature.product_transformation.concise_label
         == "Ar–CH2–CH3"
     )
-    assert "INFERRED_ATOM_CORRESPONDENCE" in result.warnings
+    assert "INFERRED_ATOM_CORRESPONDENCE" not in result.warnings
 
 
 def test_unmapped_carbonyl_redox_receives_generic_labels() -> None:

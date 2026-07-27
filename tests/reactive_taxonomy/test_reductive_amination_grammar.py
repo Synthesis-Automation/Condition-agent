@@ -92,7 +92,9 @@ def test_mapped_reductive_amination_agrees_with_operator() -> None:
         "[O:1]=[CH:2]c1ccncc1.[NH2:3]c1ccccc1>>[CH2:2]([NH:3]c1ccccc1)c1ccncc1"
     )
 
-    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.evidence_quality == (
+        "validated_mapping_and_exact_reconstruction"
+    )
     assert result.reaction_signature is not None
     assert result.reaction_signature.evidence_quality == (
         "validated_mapping_and_exact_reconstruction"

@@ -151,11 +151,13 @@ def test_mapped_unknown_family_signature_is_verified() -> None:
 
     assert record.admission_tier == AdmissionTier.VERIFIED
     assert record.named_family is None
-    assert record.evidence_quality == "validated_atom_mapping"
+    assert record.evidence_quality == (
+        "validated_mapping_and_exact_reconstruction"
+    )
     assert record.reaction_label == "H2C=CH2 → H3C–CH3"
-    assert record.reaction_label_status == "mapped_generic_pattern"
+    assert record.reaction_label_status == "exact_product"
     assert record.reaction_display_label is not None
-    assert record.reaction_display_label["status"] == "generic_pattern"
+    assert record.reaction_display_label["status"] == "exact_reconstruction"
     assert record.reaction_display_label["pattern_id"] == "hydrogenation"
     assert record.reaction_display_label["transformation_label"] == (
         "C=C hydrogenation"

@@ -263,6 +263,7 @@ def validate_taxonomy() -> List[str]:
         "replace_handle_with_center",
         "replace_handle_with_alkene_endpoint",
         "replace_carbonyl_oxygen_with_amine",
+        "change_bond_order",
     }
     known_roles: Dict[str, set[str]] = {site_type: set() for site_type in required}
     for pattern in patterns:
@@ -288,6 +289,31 @@ def validate_taxonomy() -> List[str]:
         operator = grammar.get("operator") or {}
         if operator.get("id") not in allowed_operators:
             errors.append(f"invalid_reaction_operator:{grammar_id}")
+        if operator.get("id") == "change_bond_order":
+            site_role = str(operator.get("site_role") or "")
+            atom_roles = (
+                str(operator.get("atom_role_1") or ""),
+                str(operator.get("atom_role_2") or ""),
+            )
+            old_order = str(operator.get("old_order") or "")
+            new_order = str(operator.get("new_order") or "")
+            hydrogen_changes = operator.get("hydrogen_changes") or []
+            if site_role not in roles or not all(atom_roles):
+                errors.append(f"invalid_bond_order_operator_roles:{grammar_id}")
+            if (
+                old_order not in {"SINGLE", "DOUBLE", "TRIPLE"}
+                or new_order not in {"SINGLE", "DOUBLE", "TRIPLE"}
+                or old_order == new_order
+            ):
+                errors.append(f"invalid_bond_order_operator_orders:{grammar_id}")
+            if any(
+                not str(change.get("atom_role") or "")
+                or change.get("direction") not in {"added", "removed"}
+                for change in hydrogen_changes
+            ):
+                errors.append(
+                    f"invalid_bond_order_operator_hydrogens:{grammar_id}"
+                )
         if grammar.get("role_relationships") and grammar.get("distinct_components"):
             errors.append(f"conflicting_component_relationship_rules:{grammar_id}")
         for relationship in grammar.get("role_relationships") or []:
@@ -357,10 +383,17 @@ def validate_taxonomy() -> List[str]:
         "acyl_heteroatom",
         "aryl_acylation",
         "sulfonamide",
+        "sulfonate",
+        "fixed_product",
     }
     for grammar_id, rule in reaction_rendering.items():
         if rule.get("product_kind") not in allowed_product_kinds:
             errors.append(f"invalid_reaction_product_renderer:{grammar_id}")
+        if (
+            rule.get("product_kind") == "fixed_product"
+            and not str(rule.get("product_label") or "").strip()
+        ):
+            errors.append(f"missing_fixed_reaction_product:{grammar_id}")
     label_rendering = payload["reaction_label_rendering.v1"]
     label_styles = label_rendering.get("styles") or {}
     if label_rendering.get("default_style") not in label_styles:

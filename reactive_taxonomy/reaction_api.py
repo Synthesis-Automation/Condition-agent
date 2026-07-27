@@ -212,6 +212,8 @@ def featurize_reaction(
     effective_evidence = evidence
     if edit_result.evidence == "conflicting_edit_evidence":
         effective_evidence = edit_result.evidence
+    elif edit_result.evidence.startswith("validated_mapping"):
+        effective_evidence = edit_result.evidence
     elif selected is None and (
         edit_result.valid or edit_result.evidence == "ambiguous_atom_correspondence"
     ):
@@ -252,10 +254,17 @@ def featurize_reaction(
     reaction_label = selected.reaction_label if selected else None
     reaction_label_status = "exact_product" if selected else "unavailable"
     if selected is None and candidates:
+        fallback_raw = raw
+        if any(len(assignment) > 1 for _, assignment in raw):
+            fallback_raw = [
+                (grammar, assignment)
+                for grammar, assignment in raw
+                if len(assignment) > 1
+            ]
         reactant_labels = sorted(
             {
                 render_reactant_label(assignment, style=label_style)
-                for _, assignment in raw
+                for _, assignment in fallback_raw
             }
         )
         if len(reactant_labels) == 1:

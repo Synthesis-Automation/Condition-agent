@@ -63,8 +63,8 @@
       "reaction_smiles": "[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]",
       "expected_valid": true,
       "expected_edit_resolved": true,
-      "expected_evidence": "validated_atom_mapping",
-      "expected_exact_reconstruction": false,
+      "expected_evidence": "validated_mapping_and_exact_reconstruction",
+      "expected_exact_reconstruction": true,
       "expected_edits": [
         {"edit_type": "order_changed", "atom_1_map": 1, "atom_2_map": 2, "atom_1_element": "C", "atom_2_element": "C", "old_order": "DOUBLE", "new_order": "SINGLE"},
         {"edit_type": "hydrogen_change", "atom_1_map": 1, "atom_2_map": null, "atom_1_element": "C", "atom_2_element": "H", "old_order": null, "new_order": "SINGLE"},

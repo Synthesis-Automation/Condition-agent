@@ -225,6 +225,89 @@ def _build_product(
         return None
 
 
+def _bond_type(name: str) -> Any:
+    """Return an RDKit bond type from a definition-level token."""
+    from rdkit import Chem
+
+    values = {
+        "SINGLE": Chem.BondType.SINGLE,
+        "DOUBLE": Chem.BondType.DOUBLE,
+        "TRIPLE": Chem.BondType.TRIPLE,
+        "AROMATIC": Chem.BondType.AROMATIC,
+    }
+    try:
+        return values[str(name).upper()]
+    except KeyError as exc:
+        raise ValueError(f"Unsupported bond order: {name}") from exc
+
+
+def _change_site_bond_order(
+    components: Tuple[ReactionComponent, ...],
+    site: ReactionSiteReference,
+    *,
+    atom_role_1: str,
+    atom_role_2: str,
+    old_order: str,
+    new_order: str,
+    hydrogen_changes: Sequence[Dict[str, Any]] = (),
+) -> str | None:
+    """Apply one atom-provenanced bond-order edit to a reactant component."""
+    from rdkit import Chem
+
+    component = _component_by_index(components, site.component_index)
+    molecule = parse_smiles(component.input_smiles)
+    if molecule is None:
+        return None
+    indices_1 = site.atom_roles.get(atom_role_1) or ()
+    indices_2 = site.atom_roles.get(atom_role_2) or ()
+    if len(indices_1) != 1 or len(indices_2) != 1:
+        return None
+    atom_1, atom_2 = int(indices_1[0]), int(indices_2[0])
+    bond = molecule.GetBondBetweenAtoms(atom_1, atom_2)
+    expected = _bond_type(old_order)
+    replacement = _bond_type(new_order)
+    if bond is None or bond.GetBondType() != expected:
+        return None
+    rw = Chem.RWMol(molecule)
+    edited_bond = rw.GetBondBetweenAtoms(atom_1, atom_2)
+    if edited_bond is None:
+        return None
+    edited_bond.SetBondType(replacement)
+    edited_bond.SetStereo(Chem.BondStereo.STEREONONE)
+    edited_bond.SetBondDir(Chem.BondDir.NONE)
+    if replacement in {Chem.BondType.DOUBLE, Chem.BondType.TRIPLE}:
+        rw.GetAtomWithIdx(atom_1).SetChiralTag(Chem.ChiralType.CHI_UNSPECIFIED)
+        rw.GetAtomWithIdx(atom_2).SetChiralTag(Chem.ChiralType.CHI_UNSPECIFIED)
+    hydrogen_deltas: Dict[int, int] = {}
+    for change in hydrogen_changes:
+        indices = site.atom_roles.get(str(change["atom_role"])) or ()
+        if len(indices) != 1:
+            return None
+        atom_index = int(indices[0])
+        direction = str(change["direction"])
+        hydrogen_deltas[atom_index] = hydrogen_deltas.get(atom_index, 0) + (
+            1 if direction == "added" else -1
+        )
+    for atom_index, delta in hydrogen_deltas.items():
+        source_atom = molecule.GetAtomWithIdx(atom_index)
+        target_count = int(
+            source_atom.GetTotalNumHs(includeNeighbors=True)
+        ) + delta
+        if target_count < 0:
+            return None
+        product_atom = rw.GetAtomWithIdx(atom_index)
+        product_atom.SetNumExplicitHs(target_count)
+        product_atom.SetNoImplicit(True)
+    product = rw.GetMol()
+    try:
+        product.UpdatePropertyCache(strict=False)
+        Chem.SanitizeMol(product)
+        Chem.AssignStereochemistry(product, cleanIt=True, force=True)
+        return Chem.MolToSmiles(product, canonical=True, isomericSmiles=True)
+    except Exception:
+        return None
+
+
 def apply_operator(
     grammar: Dict[str, Any],
     assignment: Dict[str, ReactionSiteReference],
@@ -505,6 +588,46 @@ def apply_operator(
                 "grammar_operator",
             ),
         )
+        return predicted, changes
+    if operator["id"] == "change_bond_order":
+        site_role = str(operator["site_role"])
+        atom_role_1 = str(operator["atom_role_1"])
+        atom_role_2 = str(operator["atom_role_2"])
+        old_order = str(operator["old_order"]).upper()
+        new_order = str(operator["new_order"]).upper()
+        hydrogen_changes = tuple(operator.get("hydrogen_changes") or ())
+        site = assignment[site_role]
+        predicted = _change_site_bond_order(
+            components,
+            site,
+            atom_role_1=atom_role_1,
+            atom_role_2=atom_role_2,
+            old_order=old_order,
+            new_order=new_order,
+            hydrogen_changes=hydrogen_changes,
+        )
+        changes = (
+            BondChange(
+                "order_changed",
+                f"{site_role}.{atom_role_1}",
+                f"{site_role}.{atom_role_2}",
+                old_order,
+                new_order,
+                "grammar_operator",
+            ),
+        )
+        for hydrogen_change in hydrogen_changes:
+            direction = str(hydrogen_change["direction"])
+            changes += (
+                BondChange(
+                    "hydrogen_change",
+                    f"{site_role}.{hydrogen_change['atom_role']}",
+                    None,
+                    "SINGLE" if direction == "removed" else None,
+                    "SINGLE" if direction == "added" else None,
+                    "grammar_operator",
+                ),
+            )
         return predicted, changes
     return None, ()
 
