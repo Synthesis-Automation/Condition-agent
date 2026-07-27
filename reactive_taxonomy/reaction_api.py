@@ -321,11 +321,22 @@ def featurize_reaction(
         )
         reaction_label_status = "partial_product_correspondence"
     elif selected is None and candidates and not product_contradicted_candidates:
-        fallback_raw = raw
-        if any(len(assignment) > 1 for _, assignment in raw):
+        exact_candidate_indices = tuple(
+            index
+            for index, candidate in enumerate(candidates)
+            if candidate.verification == "exact_product_reconstruction"
+        )
+        fallback_raw = (
+            [raw[index] for index in exact_candidate_indices]
+            if exact_candidate_indices
+            else raw
+        )
+        if exact_candidate_indices and len(exact_candidate_indices) < len(candidates):
+            warnings.append("PRODUCT_MISMATCH_CANDIDATES_EXCLUDED_FROM_LABEL")
+        if any(len(assignment) > 1 for _, assignment in fallback_raw):
             fallback_raw = [
                 (grammar, assignment)
-                for grammar, assignment in raw
+                for grammar, assignment in fallback_raw
                 if len(assignment) > 1
             ]
         reactant_labels = sorted(

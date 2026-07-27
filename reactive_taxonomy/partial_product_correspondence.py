@@ -200,6 +200,12 @@ def infer_partial_product_transformation(
         completeness.status != "incomplete"
         or not completeness.product_element_excess
         or not completeness.reactant_element_excess
+        or sum(completeness.product_element_excess.values()) != 1
+        or sum(completeness.reactant_element_excess.values()) != 1
+        or (
+            completeness.reactant_heavy_atom_count
+            != completeness.product_heavy_atom_count
+        )
     ):
         return None
     correspondence = infer_partial_scaffold_correspondence_candidates(

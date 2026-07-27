@@ -165,6 +165,21 @@ def test_wrong_product_is_not_confirmed() -> None:
     assert "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in result.warnings
 
 
+def test_ambiguous_fallback_excludes_product_mismatch_candidates() -> None:
+    result = featurize_reaction(
+        "CC(C)O.CC(=O)c1ccccc1F>>CC(C)=O.CC(O)c1ccccc1F"
+    )
+
+    assert result.reaction_label_status == "ambiguous_reactants"
+    assert result.reaction_label == "(Ar–C(R)=O) OR (R–OH) →"
+    assert "Ar–F" not in result.reaction_label
+    assert "intramolecular" not in result.reaction_label
+    assert (
+        "PRODUCT_MISMATCH_CANDIDATES_EXCLUDED_FROM_LABEL"
+        in result.warnings
+    )
+
+
 def test_supplied_mapping_yields_exact_bond_differences() -> None:
     reaction = "[CH3:1][Br:2].[NH2:3][CH3:4]>>[CH3:1][NH:3][CH3:4]"
     result = featurize_reaction(reaction)

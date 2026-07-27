@@ -12,7 +12,7 @@ from .reaction_models import ReactionComponent
 
 
 AtomPair = Tuple[int, int, int, int]
-REACTION_CORRESPONDENCE_VERSION = "2.1"
+REACTION_CORRESPONDENCE_VERSION = "2.2"
 
 
 @dataclass(frozen=True)
@@ -90,7 +90,7 @@ def _component_correspondence_candidates(
         ringMatchesRingOnly=False,
         completeRingsOnly=False,
         matchValences=False,
-        timeout=1,
+        timeout=5,
     )
     if result.canceled:
         return (), ("GLOBAL_CORRESPONDENCE_TIMEOUT",)
@@ -382,7 +382,7 @@ def infer_scaffold_correspondence_candidates(
         ringMatchesRingOnly=True,
         completeRingsOnly=False,
         matchValences=False,
-        timeout=2,
+        timeout=5,
     )
     if result.canceled:
         return ScaffoldCorrespondenceCandidates(
@@ -476,40 +476,121 @@ def infer_partial_scaffold_correspondence_candidates(
         )
     reactant = substantial_reactants[0]
     product = substantial_products[0]
-    candidates, warnings = _component_correspondence_candidates(
-        reactant,
-        product,
-        max_matches=max_candidates,
-    )
-    if not candidates:
+    reactant_mol = parse_smiles(reactant.input_smiles)
+    product_mol = parse_smiles(product.input_smiles)
+    if reactant_mol is None or product_mol is None:
         return ScaffoldCorrespondenceCandidates(
-            (), tuple(sorted(set(warnings))), False
+            (), ("PARTIAL_CORRESPONDENCE_PARSE_FAILED",), False
         )
-    maximum_conservation = max(len(mapping) for mapping in candidates)
-    product_heavy_count = _heavy_atom_count(product)
-    if maximum_conservation < 3 or (
-        maximum_conservation / max(product_heavy_count, 1) < 0.6
-    ):
+    reactant_elements = _element_counts((reactant,))
+    product_elements = _element_counts((product,))
+    removed_elements = tuple(
+        element
+        for element, count in sorted(reactant_elements.items())
+        for _ in range(max(count - product_elements.get(element, 0), 0))
+    )
+    added_elements = tuple(
+        element
+        for element, count in sorted(product_elements.items())
+        for _ in range(max(count - reactant_elements.get(element, 0), 0))
+    )
+    if len(removed_elements) != 1 or len(added_elements) != 1:
         return ScaffoldCorrespondenceCandidates(
-            (),
-            tuple(
-                sorted(
-                    set(warnings).union(
-                        {"PARTIAL_CORRESPONDENCE_INSUFFICIENT_CONSERVATION"}
+            (), ("PARTIAL_CORRESPONDENCE_REQUIRES_ONE_ATOM_EXCHANGE",), False
+        )
+
+    from rdkit import Chem
+
+    def terminal_atoms(molecule: object, element: str) -> Tuple[int, ...]:
+        return tuple(
+            int(atom.GetIdx())
+            for atom in molecule.GetAtoms()
+            if atom.GetSymbol() == element
+            and atom.GetAtomicNum() > 1
+            and sum(
+                neighbor.GetAtomicNum() > 1 for neighbor in atom.GetNeighbors()
+            )
+            == 1
+        )
+
+    def delete_atom(
+        molecule: object, atom_index: int
+    ) -> tuple[object, Tuple[int, ...], str] | None:
+        original_indices = tuple(
+            index
+            for index in range(int(molecule.GetNumAtoms()))
+            if index != atom_index
+        )
+        editable = Chem.RWMol(molecule)
+        editable.RemoveAtom(int(atom_index))
+        reduced = editable.GetMol()
+        try:
+            Chem.SanitizeMol(reduced)
+            for atom in reduced.GetAtoms():
+                atom.SetAtomMapNum(0)
+            Chem.AssignStereochemistry(reduced, cleanIt=True, force=True)
+            canonical = Chem.MolToSmiles(
+                reduced, canonical=True, isomericSmiles=True
+            )
+        except Exception:
+            return None
+        return reduced, original_indices, canonical
+
+    candidates = set()
+    removed_candidates = terminal_atoms(reactant_mol, removed_elements[0])
+    added_candidates = terminal_atoms(product_mol, added_elements[0])
+    for removed_index in removed_candidates:
+        reactant_reduced = delete_atom(reactant_mol, removed_index)
+        if reactant_reduced is None:
+            continue
+        reactant_graph, reactant_original, reactant_canonical = reactant_reduced
+        for added_index in added_candidates:
+            product_reduced = delete_atom(product_mol, added_index)
+            if product_reduced is None:
+                continue
+            product_graph, product_original, product_canonical = product_reduced
+            if reactant_canonical != product_canonical:
+                continue
+            matches = product_graph.GetSubstructMatches(
+                reactant_graph,
+                uniquify=False,
+                useChirality=True,
+                maxMatches=max_candidates + 1,
+            )
+            if len(matches) > max_candidates:
+                return ScaffoldCorrespondenceCandidates(
+                    (), ("PARTIAL_CORRESPONDENCE_CANDIDATE_LIMIT",), False
+                )
+            for match in matches:
+                mapping = tuple(
+                    sorted(
+                        (
+                            reactant.component_index,
+                            int(reactant_original[reactant_atom]),
+                            product.component_index,
+                            int(product_original[product_atom]),
+                        )
+                        for reactant_atom, product_atom in enumerate(match)
+                        if reactant_graph.GetAtomWithIdx(
+                            reactant_atom
+                        ).GetAtomicNum()
+                        > 1
                     )
                 )
-            ),
-            False,
+                if len(mapping) >= 3:
+                    candidates.add(mapping)
+                    if len(candidates) > max_candidates:
+                        return ScaffoldCorrespondenceCandidates(
+                            (),
+                            ("PARTIAL_CORRESPONDENCE_CANDIDATE_LIMIT",),
+                            False,
+                        )
+    if not candidates:
+        return ScaffoldCorrespondenceCandidates(
+            (), ("PARTIAL_CORRESPONDENCE_NOT_FOUND",), False
         )
-    best = tuple(
-        sorted(
-            mapping
-            for mapping in candidates
-            if len(mapping) == maximum_conservation
-        )
-    )
     return ScaffoldCorrespondenceCandidates(
-        best, tuple(sorted(set(warnings))), True
+        tuple(sorted(candidates)), (), True
     )
 
 
