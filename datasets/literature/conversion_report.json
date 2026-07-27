@@ -1,30 +1,30 @@
 {
   "admission_reason_counts": {
     "condition_identifier_uncertainty": 5856,
-    "insufficient_edit_evidence": 3956,
+    "insufficient_edit_evidence": 1576,
     "invalid_reaction_or_product": 249,
     "invalid_yield": 1,
-    "missing_verified_reaction_signature": 8769,
+    "missing_verified_reaction_signature": 17523,
     "missing_yield": 1150,
-    "multiple_products": 149,
+    "multiple_products": 287,
     "multistage_conditions_not_structured": 11213,
     "no_condition_identifiers": 822,
-    "no_usable_transformation_evidence": 12696,
+    "no_usable_transformation_evidence": 3619,
     "solvent_only_recipe": 1800,
     "unresolved_condition_identifiers": 1,
-    "verified_reaction_signature_with_conditions": 2020
+    "verified_reaction_signature_with_conditions": 2845
   },
   "admission_tier_counts": {
-    "rejected": 14199,
-    "review": 13881,
-    "verified": 2020
+    "rejected": 6002,
+    "review": 21253,
+    "verified": 2845
   },
   "artifact_type": "generic_sharded_conversion_report",
   "catalogs": {
     "recipe_catalog": {
       "path": "recipe_catalog.jsonl.gz",
       "row_count": 8547,
-      "sha256": "9fc0becb1dbc8dd30747b3037ccb86e68d3e53edba6f7721deff328a8228a8b1"
+      "sha256": "ccc41774980eaece2d536615f71bcf1cbd1a6bac48c2bde98eff90b1d7277ae4"
     },
     "reference_catalog": {
       "path": "reference_catalog.jsonl.gz",
@@ -33,14 +33,14 @@
     },
     "reference_condition_series_catalog": {
       "path": "reference_condition_series.jsonl.gz",
-      "row_count": 4758,
-      "sha256": "4c0e810bb4236d937a72aa1c34940e3b46d21a6b16fb00fd3eaeb5fa2c037b7b"
+      "row_count": 4895,
+      "sha256": "57ace051c9cf6b97602be6f1f230b3ec7c9fe1c567890e03896d6275d3da1335"
     }
   },
   "chemistry_status_counts": {
-    "rejected": 12945,
-    "review": 12874,
-    "verified": 4281
+    "rejected": 3868,
+    "review": 19386,
+    "verified": 6846
   },
   "complete_shard_count": 118,
   "condition_status_counts": {
@@ -52,9 +52,9 @@
   },
   "failed_shard_count": 0,
   "index_eligibility_counts": {
-    "eligible": 2548,
-    "ineligible": 14199,
-    "review_only": 13353
+    "eligible": 4188,
+    "ineligible": 6002,
+    "review_only": 19910
   },
   "input_row_count": 30100,
   "integrity": {
@@ -76,11 +76,11 @@
     "chan_lam": 306,
     "friedel_crafts_acylation": 3,
     "heck": 23,
-    "reductive_amination": 379,
+    "reductive_amination": 374,
     "sonogashira": 240,
-    "sulfonylation": 134,
+    "sulfonylation": 293,
     "suzuki_miyaura": 253,
-    "unnamed": 28520
+    "unnamed": 28366
   },
   "outcome_status_counts": {
     "invalid": 1,
@@ -89,22 +89,27 @@
   },
   "output_row_count": 30100,
   "reaction_scope_counts": {
-    "intermolecular": 4369,
+    "intermolecular": 4527,
     "intramolecular": 61,
-    "unimolecular": 3956,
-    "unknown": 21714
+    "unimolecular": 4121,
+    "unknown": 21391
   },
   "reused_shard_count": 0,
   "schema_version": "1.0",
   "shard_count": 118,
-  "signature_count": 8386,
+  "signature_count": 8709,
   "source_file_count": 118,
   "transformation_class_counts": {
+    "alcohol_oxidation": 1903,
     "alkene_c_c_substitution": 23,
+    "alkene_reduction": 121,
+    "alkyne_partial_reduction": 27,
+    "alkyne_reduction": 16,
     "amide_formation": 733,
     "aromatic_c_h_acylation": 3,
     "c_c_transfer_coupling": 963,
-    "carbonyl_c_n_reductive_coupling": 379,
+    "carbonyl_c_n_reductive_coupling": 374,
+    "carbonyl_reduction": 478,
     "chan_lam_heteroatom_coupling": 306,
     "ester_formation": 439,
     "sp2_c_c_substitution": 11,
@@ -115,8 +120,9 @@
     "sp3_c_o_substitution": 207,
     "sp3_c_s_substitution": 75,
     "sulfonamide_formation": 134,
+    "sulfonate_formation": 159,
     "terminal_alkyne_coupling": 240,
     "thioester_formation": 26,
-    "unknown": 25714
+    "unknown": 23015
   }
 }
