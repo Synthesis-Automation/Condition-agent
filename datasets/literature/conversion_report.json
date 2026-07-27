@@ -1,17 +1,17 @@
 {
   "admission_reason_counts": {
     "condition_identifier_uncertainty": 5856,
-    "insufficient_edit_evidence": 1576,
+    "insufficient_edit_evidence": 7020,
     "insufficient_reactant_multiplicity": 335,
     "invalid_reaction_or_product": 249,
     "invalid_yield": 1,
-    "missing_verified_reaction_signature": 11274,
+    "missing_verified_reaction_signature": 6920,
     "missing_yield": 1150,
     "multiple_products": 59,
     "multistage_conditions_not_structured": 11213,
     "no_condition_identifiers": 822,
-    "no_usable_transformation_evidence": 2306,
-    "reaction_completeness_unresolved": 13580,
+    "no_usable_transformation_evidence": 1216,
+    "reaction_completeness_unresolved": 8136,
     "solvent_only_recipe": 1800,
     "suspected_missing_reactant": 7455,
     "unaccounted_product_heavy_atoms": 7790,
@@ -19,8 +19,8 @@
     "verified_reaction_signature_with_conditions": 2845
   },
   "admission_tier_counts": {
-    "rejected": 12269,
-    "review": 14986,
+    "rejected": 11369,
+    "review": 15886,
     "verified": 2845
   },
   "artifact_type": "generic_sharded_conversion_report",
@@ -28,7 +28,7 @@
     "recipe_catalog": {
       "path": "recipe_catalog.jsonl.gz",
       "row_count": 8547,
-      "sha256": "ccc41774980eaece2d536615f71bcf1cbd1a6bac48c2bde98eff90b1d7277ae4"
+      "sha256": "e91370fdbe308406af5b2b16b587740b03706f96da55c56f45cb104906d2cb29"
     },
     "reference_catalog": {
       "path": "reference_catalog.jsonl.gz",
@@ -37,13 +37,13 @@
     },
     "reference_condition_series_catalog": {
       "path": "reference_condition_series.jsonl.gz",
-      "row_count": 4746,
-      "sha256": "afc01b8eb4eec93708f39c8b212dee10176dd05f34d0c3a733adc8d29835e639"
+      "row_count": 6785,
+      "sha256": "b75bf80963799e0d81d91af111e53ea99efdc12864738ac462617c8ae5cf17f3"
     }
   },
   "chemistry_status_counts": {
-    "rejected": 10345,
-    "review": 12909,
+    "rejected": 9255,
+    "review": 13999,
     "verified": 6846
   },
   "complete_shard_count": 118,
@@ -56,9 +56,9 @@
   },
   "failed_shard_count": 0,
   "index_eligibility_counts": {
-    "eligible": 4188,
-    "ineligible": 12269,
-    "review_only": 13643
+    "eligible": 7916,
+    "ineligible": 11369,
+    "review_only": 10815
   },
   "input_row_count": 30100,
   "integrity": {
@@ -95,19 +95,20 @@
   "reaction_completeness_status_counts": {
     "incomplete": 7790,
     "missing": 249,
-    "unresolved": 13580,
-    "verified": 8481
+    "unresolved": 8136,
+    "verified": 13925
   },
   "reaction_scope_counts": {
-    "intermolecular": 4409,
+    "intermolecular": 9741,
     "intramolecular": 61,
+    "mixed": 112,
     "unimolecular": 4011,
-    "unknown": 21619
+    "unknown": 16175
   },
   "reused_shard_count": 0,
   "schema_version": "1.0",
   "shard_count": 118,
-  "signature_count": 8481,
+  "signature_count": 13925,
   "source_file_count": 118,
   "transformation_class_counts": {
     "alcohol_oxidation": 1903,
@@ -121,18 +122,28 @@
     "carbonyl_c_n_reductive_coupling": 374,
     "carbonyl_reduction": 478,
     "chan_lam_heteroatom_coupling": 306,
+    "complete_alkyne_hydrogenation": 8,
+    "dehydrogenation": 1,
     "ester_formation": 439,
+    "generic_graph_transformation": 3624,
+    "generic_multi_event_graph_transformation": 220,
+    "heteroatom_bond_oxidation": 329,
+    "heteroatom_bond_reduction": 466,
+    "hydrogenation": 58,
+    "partial_alkyne_hydrogenation": 26,
+    "reductive_bond_cleavage": 376,
     "sp2_c_c_substitution": 11,
-    "sp2_c_n_substitution": 370,
-    "sp2_c_o_substitution": 233,
-    "sp2_c_s_substitution": 242,
+    "sp2_c_n_substitution": 372,
+    "sp2_c_o_substitution": 234,
+    "sp2_c_s_substitution": 244,
     "sp3_c_n_substitution": 2,
-    "sp3_c_o_substitution": 207,
+    "sp3_c_o_substitution": 209,
     "sp3_c_s_substitution": 75,
+    "substitution": 1469,
     "sulfonamide_formation": 134,
     "sulfonate_formation": 159,
-    "terminal_alkyne_coupling": 240,
+    "terminal_alkyne_coupling": 241,
     "thioester_formation": 26,
-    "unknown": 23015
+    "unknown": 16430
   }
 }
