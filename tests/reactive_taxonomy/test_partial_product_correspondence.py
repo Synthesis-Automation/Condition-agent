@@ -81,10 +81,13 @@ def test_missing_cyanide_source_retains_rooted_product_fragment() -> None:
     result = featurize_reaction("Brc1ccccc1>>N#Cc1ccccc1")
 
     assert result.reaction_label == (
-        "C–Br → C–C#N [C, N source missing]"
+        "C–Br → C–C≡N [C, N source missing]"
     )
     assert result.reaction_label_status == "partial_product_correspondence"
     assert result.reaction_signature is None
+    assert result.display_label.detailed.startswith(
+        "C–Br → C–C≡N; partial conserved-scaffold observation;"
+    )
 
     observation = result.partial_product_transformation
     assert observation is not None
@@ -202,6 +205,17 @@ def test_multiple_structural_agent_sources_preserve_ambiguity() -> None:
     assert len(fragment.source_candidates) == 2
     assert "AMBIGUOUS_PRODUCT_FRAGMENT_SOURCES" in result.warnings
     assert result.reaction_label.endswith("[fragment source ambiguous]")
+
+
+def test_partial_nitrile_label_preserves_ascii_triple_bond_style() -> None:
+    result = featurize_reaction(
+        "Brc1ccccc1>>N#Cc1ccccc1",
+        label_style="ascii",
+    )
+
+    assert result.reaction_label == (
+        "C-Br -> C-C#N [C, N source missing]"
+    )
 
 
 def test_distinct_installed_fragments_receive_distinct_graph_keys() -> None:

@@ -568,6 +568,13 @@ def _attachment_label(
     return symbol
 
 
+def _display_fragment_smiles(fragment_smiles: str, *, style: str) -> str:
+    """Apply the selected bond glyphs to a canonical fragment SMILES label."""
+    if style == "unicode":
+        return fragment_smiles.replace("#", "≡")
+    return fragment_smiles
+
+
 def render_partial_product_transformation(
     transformation: PartialProductTransformation,
     *,
@@ -592,7 +599,10 @@ def render_partial_product_transformation(
         else transformation.removed_attachment.element
     )
     new_attachment = (
-        transformation.installed_fragment.canonical_fragment_smiles
+        _display_fragment_smiles(
+            transformation.installed_fragment.canonical_fragment_smiles,
+            style=style,
+        )
         or (
             _attachment_label(
                 product_component, transformation.added_attachment.atom_index
