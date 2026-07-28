@@ -493,6 +493,16 @@ def build_reaction_signature(
             )
         else:
             transformation_class = None
+    event_archetypes = tuple(
+        sorted({event.edit_archetype for event in events})
+    )
+    edit_archetype = (
+        event_archetypes[0]
+        if len(event_archetypes) == 1
+        else "composite"
+        if event_archetypes
+        else "unresolved"
+    )
     exact_event_tokens = tuple(event.event_signature_key for event in events)
     handle_event_tokens = tuple(
         tuple(
@@ -506,6 +516,7 @@ def build_reaction_signature(
             event.broken_bond_types,
             event.order_changes,
             event.hydrogen_changes,
+            event.edit_archetype,
             event.transformation_class,
             event.topology.reaction_scope,
         )
@@ -624,6 +635,7 @@ def build_reaction_signature(
         partners=partners,
         product_transformation=product_transformation,
         topology=topology,
+        edit_archetype=edit_archetype,
         transformation_class=transformation_class,
         transformation_confidence=edit_result.confidence,
         named_family=named_family,
@@ -645,7 +657,17 @@ def build_reaction_signature(
             "partner_count": len(partners),
             "spectator_count": len(spectators),
         },
-        warnings=tuple(sorted(set(warnings).union(edit_result.warnings))),
+        warnings=tuple(
+            sorted(
+                set(warnings)
+                .union(edit_result.warnings)
+                .union(
+                    warning
+                    for event in events
+                    for warning in event.warnings
+                )
+            )
+        ),
         evidence_quality=edit_result.evidence,
         definition_versions=definition_versions,
     )

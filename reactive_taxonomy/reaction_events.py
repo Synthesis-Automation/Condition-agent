@@ -8,6 +8,7 @@ from collections import defaultdict
 from typing import Any, Optional, Sequence, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
+from .reaction_archetypes import reconcile_edit_archetype
 from .reaction_label_patterns import match_reaction_label_pattern
 from .reaction_models import (
     ReactionAtomReference,
@@ -312,7 +313,7 @@ def build_reaction_events(
     for ordinal, group in enumerate(groups, start=1):
         chemistry = tuple(sorted(_edit_chemistry(edit) for edit in group))
         event_key = _digest(
-            "E0", {"edits": chemistry, "event_schema_version": "1.1"}
+            "E0", {"edits": chemistry, "event_schema_version": "1.2"}
         )
         event_id = f"{_digest('RE1', event_key)}:{ordinal}"
         component_indices = {
@@ -377,6 +378,16 @@ def build_reaction_events(
             else ()
         )
         event_family = event_families[0] if len(event_families) == 1 else None
+        declared_archetype = (
+            event_candidate.edit_archetype
+            if event_candidate is not None
+            else selected.edit_archetype
+            if single_event and selected is not None
+            else None
+        )
+        edit_archetype, archetype_warnings = reconcile_edit_archetype(
+            group, declared_archetype
+        )
         events.append(
             ReactionEvent(
                 event_id=event_id,
@@ -395,6 +406,7 @@ def build_reaction_events(
                     evidence=evidence,
                     confidence=confidence,
                 ),
+                edit_archetype=edit_archetype,
                 transformation_class=(
                     event_candidate.transformation_class
                     if event_candidate is not None
@@ -422,6 +434,7 @@ def build_reaction_events(
                 ),
                 evidence=evidence,
                 confidence=confidence,
+                warnings=archetype_warnings,
             )
         )
     event_tuple = tuple(events)

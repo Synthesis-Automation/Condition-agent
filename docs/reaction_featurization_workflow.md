@@ -99,6 +99,7 @@ Each grammar specifies:
 - same-component or different-component relationships;
 - transformation class;
 - graph operator;
+- net edit archetype (`substitution`, `addition`, or `elimination`);
 - optional compatible named families.
 
 For an aryl bromide and aryl boronic acid, a candidate may contain:
@@ -127,6 +128,12 @@ The operator:
 - records hydrogen changes;
 - produces a predicted product;
 - returns predicted bond edits.
+
+The common operator registry contains `center_replacement`, `pair_addition`,
+and `pair_elimination`. Pair addition accepts explicit A–B donors and implicit
+A–H donors through one normalized contract and may return multiple
+constitutional outcomes. Product reconstruction selects a unique orientation;
+reactants alone do not force regio- or stereochemistry.
 
 The predicted product is canonicalized without atom maps and compared with the
 observed product. Candidate verification becomes one of:

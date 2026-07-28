@@ -87,6 +87,8 @@ def validate_taxonomy() -> List[str]:
         "pronucleophile_XH",
         "nucleophile_anion",
         "transfer_group",
+        "addition_donor",
+        "eliminable_pair",
         "electrophilic_center",
         "aromatic_CH",
         "unsaturated_bond",
@@ -169,6 +171,8 @@ def validate_taxonomy() -> List[str]:
             "pronucleophile_XH": {"center"},
             "nucleophile_anion": {"center"},
             "transfer_group": {"anchor", "center"},
+            "addition_donor": {"addend_a"},
+            "eliminable_pair": {"endpoint_a", "endpoint_b", "departing_a"},
             "electrophilic_center": {"center"},
             "aromatic_CH": {"center"},
             "unsaturated_bond": {"endpoint_a", "endpoint_b"},
@@ -228,6 +232,8 @@ def validate_taxonomy() -> List[str]:
         "azo_bond",
         "disulfide_bond",
         "peroxide_bond",
+        "addition_donor",
+        "eliminable_pair",
     }
     if not required_handle_templates <= set(
         rendering.get("named_handle_templates") or {}
@@ -260,10 +266,12 @@ def validate_taxonomy() -> List[str]:
     grammar_ids: List[str] = []
     allowed_operators = {
         "join_two_anchors",
-        "replace_handle_with_center",
         "replace_handle_with_alkene_endpoint",
         "replace_carbonyl_oxygen_with_amine",
         "change_bond_order",
+        "center_replacement",
+        "pair_addition",
+        "pair_elimination",
     }
     known_roles: Dict[str, set[str]] = {site_type: set() for site_type in required}
     for pattern in patterns:
@@ -273,6 +281,14 @@ def validate_taxonomy() -> List[str]:
     for grammar in payload["reaction_grammars.v1"].get("grammars") or []:
         grammar_id = str(grammar.get("id") or "<missing>")
         grammar_ids.append(grammar_id)
+        if grammar.get("edit_archetype") not in {
+            "substitution",
+            "addition",
+            "elimination",
+            "bond_order_change",
+            "composite",
+        }:
+            errors.append(f"invalid_edit_archetype:{grammar_id}")
         roles = grammar.get("roles") or {}
         if not roles:
             errors.append(f"missing_reaction_roles:{grammar_id}")
@@ -314,6 +330,38 @@ def validate_taxonomy() -> List[str]:
                 errors.append(
                     f"invalid_bond_order_operator_hydrogens:{grammar_id}"
                 )
+        if operator.get("id") == "pair_addition":
+            acceptor_role = str(operator.get("acceptor_role") or "")
+            donor_role = str(operator.get("donor_role") or "")
+            endpoint_roles = operator.get("acceptor_endpoint_roles") or []
+            if (
+                acceptor_role not in roles
+                or donor_role not in roles
+                or len(endpoint_roles) != 2
+            ):
+                errors.append(f"invalid_pair_addition_roles:{grammar_id}")
+            if (
+                operator.get("old_order") not in {"DOUBLE", "TRIPLE"}
+                or operator.get("new_order") not in {"SINGLE", "DOUBLE"}
+            ):
+                errors.append(f"invalid_pair_addition_orders:{grammar_id}")
+        if operator.get("id") == "pair_elimination":
+            substrate_role = str(operator.get("substrate_role") or "")
+            required_operator_roles = {
+                "endpoint_a_role",
+                "endpoint_b_role",
+                "departing_a_role",
+                "hydrogen_carrier_b_role",
+            }
+            if substrate_role not in roles or any(
+                not operator.get(field) for field in required_operator_roles
+            ):
+                errors.append(f"invalid_pair_elimination_roles:{grammar_id}")
+            if (
+                operator.get("old_order") not in {"SINGLE", "DOUBLE"}
+                or operator.get("new_order") not in {"DOUBLE", "TRIPLE"}
+            ):
+                errors.append(f"invalid_pair_elimination_orders:{grammar_id}")
         if grammar.get("role_relationships") and grammar.get("distinct_components"):
             errors.append(f"conflicting_component_relationship_rules:{grammar_id}")
         for relationship in grammar.get("role_relationships") or []:
@@ -361,7 +409,7 @@ def validate_taxonomy() -> List[str]:
     if set(reaction_rendering) != set(grammar_ids):
         errors.append("reaction_rendering_coverage_mismatch")
     signature_features = payload["signature_features.v1"]
-    if signature_features.get("signature_schema_version") != "1.5":
+    if signature_features.get("signature_schema_version") != "1.6":
         errors.append("invalid_signature_schema_version")
     signature_levels = signature_features.get("levels") or {}
     if any(

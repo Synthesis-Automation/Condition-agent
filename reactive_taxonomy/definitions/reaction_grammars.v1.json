@@ -1,9 +1,10 @@
 {
-  "schema_version": "1.8",
+  "schema_version": "1.9",
   "grammars": [
     {
       "id": "boron_transfer_coupling",
       "transformation_class": "c_c_transfer_coupling",
+      "edit_archetype": "substitution",
       "display_name": "Boron transfer C–C coupling",
       "generic_label": "Ar–X + C–B → Ar–C",
       "roles": {
@@ -42,6 +43,7 @@
     {
       "id": "sp2_c_n_substitution",
       "transformation_class": "sp2_c_n_substitution",
+      "edit_archetype": "substitution",
       "display_name": "sp2 C–N substitution or coupling",
       "generic_label": "Ar–X + N–H → Ar–N",
       "roles": {
@@ -73,7 +75,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "nucleophile"
       },
@@ -87,6 +89,7 @@
     {
       "id": "carbonyl_amine_reductive_coupling",
       "transformation_class": "carbonyl_c_n_reductive_coupling",
+      "edit_archetype": "substitution",
       "display_name": "Carbonyl–amine reductive coupling",
       "generic_label": "R–C(O)R + N–H → R–CH(N)R",
       "roles": {
@@ -132,6 +135,7 @@
     {
       "id": "amide_formation",
       "transformation_class": "amide_formation",
+      "edit_archetype": "substitution",
       "display_name": "Amide formation",
       "generic_label": "R–C(O)Y + N–H → R–C(O)–N",
       "roles": {
@@ -161,7 +165,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "acyl_partner",
         "partner_role": "nitrogen_partner"
       },
@@ -174,6 +178,7 @@
     {
       "id": "sp2_c_o_substitution",
       "transformation_class": "sp2_c_o_substitution",
+      "edit_archetype": "substitution",
       "display_name": "sp2 C–O substitution or coupling",
       "generic_label": "Ar–X + O–H → Ar–O",
       "roles": {
@@ -203,7 +208,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "nucleophile"
       },
@@ -216,6 +221,7 @@
     {
       "id": "sp2_c_s_substitution",
       "transformation_class": "sp2_c_s_substitution",
+      "edit_archetype": "substitution",
       "display_name": "sp2 C–S substitution or coupling",
       "generic_label": "Ar–X + S–H → Ar–S",
       "roles": {
@@ -245,7 +251,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "nucleophile"
       },
@@ -257,6 +263,7 @@
     {
       "id": "sp2_c_s_acyl_substitution",
       "transformation_class": "sp2_c_s_substitution",
+      "edit_archetype": "substitution",
       "display_name": "sp2 C–S coupling with an acyl sulfur donor",
       "generic_label": "Ar–X + R–C(O)–SH → Ar–S–C(O)–R",
       "roles": {
@@ -289,7 +296,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "nucleophile"
       },
@@ -301,6 +308,7 @@
     {
       "id": "sp2_c_s_anion_substitution",
       "transformation_class": "sp2_c_s_substitution",
+      "edit_archetype": "substitution",
       "display_name": "sp2 C–S coupling with an anionic sulfur donor",
       "generic_label": "Ar–X + S⁻ → Ar–S",
       "roles": {
@@ -329,7 +337,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "nucleophile"
       },
@@ -341,6 +349,7 @@
     {
       "id": "sp3_c_n_substitution",
       "transformation_class": "sp3_c_n_substitution",
+      "edit_archetype": "substitution",
       "display_name": "Alkyl C–N substitution",
       "generic_label": "R–X + N–H → R–N",
       "roles": {
@@ -368,7 +377,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "nucleophile"
       },
@@ -378,6 +387,7 @@
     {
       "id": "sp3_c_o_substitution",
       "transformation_class": "sp3_c_o_substitution",
+      "edit_archetype": "substitution",
       "display_name": "Alkyl C–O substitution",
       "generic_label": "R–X + O–H → R–O",
       "roles": {
@@ -405,7 +415,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "nucleophile"
       },
@@ -415,6 +425,7 @@
     {
       "id": "sp3_c_s_substitution",
       "transformation_class": "sp3_c_s_substitution",
+      "edit_archetype": "substitution",
       "display_name": "Alkyl C–S substitution",
       "generic_label": "R–X + S–H → R–S",
       "roles": {
@@ -442,7 +453,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "nucleophile"
       },
@@ -452,6 +463,7 @@
     {
       "id": "terminal_alkene_heck_coupling",
       "transformation_class": "alkene_c_c_substitution",
+      "edit_archetype": "substitution",
       "display_name": "Terminal-alkene C–C coupling",
       "generic_label": "Ar–X + H2C=CHR → Ar–CH=CHR",
       "roles": {
@@ -492,6 +504,7 @@
     {
       "id": "sonogashira_coupling",
       "transformation_class": "terminal_alkyne_coupling",
+      "edit_archetype": "substitution",
       "display_name": "Terminal alkyne coupling",
       "generic_label": "Ar–X + C(sp)–H → Ar–C≡C–R",
       "roles": {
@@ -521,7 +534,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "alkyne_partner"
       },
@@ -533,6 +546,7 @@
     {
       "id": "sp2_c_activated_c_substitution",
       "transformation_class": "sp2_c_c_substitution",
+      "edit_archetype": "substitution",
       "display_name": "sp2 C–C substitution with an activated carbon",
       "generic_label": "Ar–X + EWG–C(sp3)–H → Ar–C(sp3)–EWG",
       "roles": {
@@ -563,7 +577,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "carbon_partner"
       },
@@ -573,6 +587,7 @@
     {
       "id": "other_metal_transfer_coupling",
       "transformation_class": "c_c_transfer_coupling",
+      "edit_archetype": "substitution",
       "display_name": "Organometallic C–C transfer coupling",
       "generic_label": "Ar–X + C–M → Ar–C",
       "roles": {
@@ -614,6 +629,7 @@
     {
       "id": "chan_lam_heteroatom_coupling",
       "transformation_class": "chan_lam_heteroatom_coupling",
+      "edit_archetype": "substitution",
       "display_name": "Boron-to-heteroatom coupling",
       "generic_label": "C–B + N/O/S–H → C–N/O/S",
       "roles": {
@@ -648,7 +664,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "transfer_partner",
         "partner_role": "nucleophile"
       },
@@ -660,6 +676,7 @@
     {
       "id": "ester_formation",
       "transformation_class": "ester_formation",
+      "edit_archetype": "substitution",
       "display_name": "Ester formation",
       "generic_label": "R–C(O)Y + O–H → R–C(O)–O",
       "roles": {
@@ -689,7 +706,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "acyl_partner",
         "partner_role": "oxygen_partner"
       },
@@ -702,6 +719,7 @@
     {
       "id": "sp2_c_aromatic_ch_substitution",
       "transformation_class": "sp2_c_c_substitution",
+      "edit_archetype": "substitution",
       "display_name": "sp2 C–C substitution with an aromatic C–H partner",
       "generic_label": "Ar–X + Ar–H → Ar–Ar",
       "roles": {
@@ -731,7 +749,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "electrophile",
         "partner_role": "aromatic_partner"
       },
@@ -741,6 +759,7 @@
     {
       "id": "friedel_crafts_acylation",
       "transformation_class": "aromatic_c_h_acylation",
+      "edit_archetype": "substitution",
       "display_name": "Friedel–Crafts acylation",
       "generic_label": "Ar–H + R–C(O)X → Ar–C(O)–R",
       "roles": {
@@ -770,7 +789,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "acyl_partner",
         "partner_role": "aromatic_partner"
       },
@@ -782,6 +801,7 @@
     {
       "id": "thioester_formation",
       "transformation_class": "thioester_formation",
+      "edit_archetype": "substitution",
       "display_name": "Thioester formation",
       "generic_label": "R–C(O)Y + S–H → R–C(O)–S",
       "roles": {
@@ -811,7 +831,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "acyl_partner",
         "partner_role": "sulfur_partner"
       },
@@ -824,6 +844,7 @@
     {
       "id": "sulfonamide_formation",
       "transformation_class": "sulfonamide_formation",
+      "edit_archetype": "substitution",
       "display_name": "Sulfonamide formation",
       "generic_label": "R–S(O)2X + N–H → R–S(O)2–N",
       "roles": {
@@ -852,7 +873,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "sulfonyl_partner",
         "partner_role": "nitrogen_partner"
       },
@@ -864,6 +885,7 @@
     {
       "id": "sulfonate_formation",
       "transformation_class": "sulfonate_formation",
+      "edit_archetype": "substitution",
       "display_name": "Sulfonate formation",
       "generic_label": "R–S(O)2X + O–H → R–S(O)2–O",
       "roles": {
@@ -892,7 +914,7 @@
         }
       ],
       "operator": {
-        "id": "replace_handle_with_center",
+        "id": "center_replacement",
         "electrophile_role": "sulfonyl_partner",
         "partner_role": "oxygen_partner"
       },
@@ -904,6 +926,7 @@
     {
       "id": "carbonyl_reduction",
       "transformation_class": "carbonyl_reduction",
+      "edit_archetype": "addition",
       "display_name": "Carbonyl reduction",
       "generic_label": "C=O → C–OH",
       "roles": {
@@ -941,6 +964,7 @@
     {
       "id": "alcohol_oxidation",
       "transformation_class": "alcohol_oxidation",
+      "edit_archetype": "elimination",
       "display_name": "Alcohol oxidation",
       "generic_label": "C–OH → C=O",
       "roles": {
@@ -982,6 +1006,7 @@
     {
       "id": "alkene_hydrogenation",
       "transformation_class": "alkene_reduction",
+      "edit_archetype": "addition",
       "display_name": "Alkene hydrogenation",
       "generic_label": "C=C → C–C",
       "roles": {
@@ -1016,6 +1041,7 @@
     {
       "id": "alkyne_partial_hydrogenation",
       "transformation_class": "alkyne_partial_reduction",
+      "edit_archetype": "addition",
       "display_name": "Alkyne partial hydrogenation",
       "generic_label": "C≡C → C=C",
       "roles": {
@@ -1050,6 +1076,7 @@
     {
       "id": "alkyne_hydrogenation",
       "transformation_class": "alkyne_reduction",
+      "edit_archetype": "addition",
       "display_name": "Alkyne hydrogenation",
       "generic_label": "C≡C → C–C",
       "roles": {
@@ -1088,6 +1115,218 @@
       },
       "compatible_named_families": [],
       "priority": 90
+    },
+    {
+      "id": "xh_addition_to_alkene",
+      "transformation_class": "xh_addition_to_c_c_pi_bond",
+      "edit_archetype": "addition",
+      "display_name": "X-H addition to alkene",
+      "generic_label": "C=C + X-H → C-C(X)-C-H",
+      "roles": {
+        "acceptor": {
+          "site_type": "unsaturated_bond",
+          "handle_token_any": [
+            "Alkene"
+          ]
+        },
+        "donor": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "N",
+            "O",
+            "S"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": [
+            "acceptor",
+            "donor"
+          ],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "operator": {
+        "id": "pair_addition",
+        "acceptor_role": "acceptor",
+        "donor_role": "donor",
+        "acceptor_endpoint_roles": [
+          "endpoint_a",
+          "endpoint_b"
+        ],
+        "old_order": "DOUBLE",
+        "new_order": "SINGLE"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 72
+    },
+    {
+      "id": "xh_addition_to_alkyne",
+      "transformation_class": "xh_addition_to_c_c_pi_bond",
+      "edit_archetype": "addition",
+      "display_name": "X-H addition to alkyne",
+      "generic_label": "C≡C + X-H → C=C(X)-C-H",
+      "roles": {
+        "acceptor": {
+          "site_type": "unsaturated_bond",
+          "handle_token_any": [
+            "Alkyne"
+          ]
+        },
+        "donor": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "N",
+            "O",
+            "S"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": [
+            "acceptor",
+            "donor"
+          ],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "operator": {
+        "id": "pair_addition",
+        "acceptor_role": "acceptor",
+        "donor_role": "donor",
+        "acceptor_endpoint_roles": [
+          "endpoint_a",
+          "endpoint_b"
+        ],
+        "old_order": "TRIPLE",
+        "new_order": "DOUBLE"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 71
+    },
+    {
+      "id": "addend_pair_addition_to_alkene",
+      "transformation_class": "sigma_bond_addition_to_c_c_pi_bond",
+      "edit_archetype": "addition",
+      "display_name": "A-B addition to alkene",
+      "generic_label": "C=C + A-B → A-C-C-B",
+      "roles": {
+        "acceptor": {
+          "site_type": "unsaturated_bond",
+          "handle_token_any": [
+            "Alkene"
+          ]
+        },
+        "donor": {
+          "site_type": "addition_donor"
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": [
+            "acceptor",
+            "donor"
+          ],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "operator": {
+        "id": "pair_addition",
+        "acceptor_role": "acceptor",
+        "donor_role": "donor",
+        "acceptor_endpoint_roles": [
+          "endpoint_a",
+          "endpoint_b"
+        ],
+        "old_order": "DOUBLE",
+        "new_order": "SINGLE"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 70
+    },
+    {
+      "id": "addend_pair_addition_to_alkyne",
+      "transformation_class": "sigma_bond_addition_to_c_c_pi_bond",
+      "edit_archetype": "addition",
+      "display_name": "A-B addition to alkyne",
+      "generic_label": "C≡C + A-B → A-C=C-B",
+      "roles": {
+        "acceptor": {
+          "site_type": "unsaturated_bond",
+          "handle_token_any": [
+            "Alkyne"
+          ]
+        },
+        "donor": {
+          "site_type": "addition_donor"
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": [
+            "acceptor",
+            "donor"
+          ],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "operator": {
+        "id": "pair_addition",
+        "acceptor_role": "acceptor",
+        "donor_role": "donor",
+        "acceptor_endpoint_roles": [
+          "endpoint_a",
+          "endpoint_b"
+        ],
+        "old_order": "TRIPLE",
+        "new_order": "DOUBLE"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 69
+    },
+    {
+      "id": "beta_halo_elimination",
+      "transformation_class": "beta_elimination",
+      "edit_archetype": "elimination",
+      "display_name": "Beta elimination",
+      "generic_label": "C-C(X)-C-H → C=C",
+      "roles": {
+        "substrate": {
+          "site_type": "eliminable_pair",
+          "departing_element_any": [
+            "Cl",
+            "Br",
+            "I"
+          ]
+        }
+      },
+      "operator": {
+        "id": "pair_elimination",
+        "substrate_role": "substrate",
+        "endpoint_a_role": "endpoint_a",
+        "endpoint_b_role": "endpoint_b",
+        "departing_a_role": "departing_a",
+        "hydrogen_carrier_b_role": "hydrogen_carrier_b",
+        "old_order": "SINGLE",
+        "new_order": "DOUBLE"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 68
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.8",
+  "schema_version": "1.9",
   "fragment_indexing": {
     "context_symbols": {
       "Ar": "Ar",
@@ -173,6 +173,31 @@
     "alkyne_hydrogenation": {
       "product_kind": "fixed_product",
       "product_label": "C–C",
+      "prefer_contextual_label": true
+    },
+    "xh_addition_to_alkene": {
+      "product_kind": "fixed_product",
+      "product_label": "C–C(X)–C–H",
+      "prefer_contextual_label": true
+    },
+    "xh_addition_to_alkyne": {
+      "product_kind": "fixed_product",
+      "product_label": "C=C(X)–C–H",
+      "prefer_contextual_label": true
+    },
+    "addend_pair_addition_to_alkene": {
+      "product_kind": "fixed_product",
+      "product_label": "A–C–C–B",
+      "prefer_contextual_label": true
+    },
+    "addend_pair_addition_to_alkyne": {
+      "product_kind": "fixed_product",
+      "product_label": "A–C=C–B",
+      "prefer_contextual_label": true
+    },
+    "beta_halo_elimination": {
+      "product_kind": "fixed_product",
+      "product_label": "C=C",
       "prefer_contextual_label": true
     }
   }

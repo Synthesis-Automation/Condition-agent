@@ -47,14 +47,14 @@ def test_specific_structural_rules_match_without_named_family(
 
     assert analysis.named_family is None
     assert result.valid
-    assert result.reaction_signature_schema_version == "1.5"
+    assert result.reaction_signature_schema_version == "1.6"
     assert result.schema_version == "1.2"
     assert result.rule_definition_schema_version == "1.2"
     assert result.recipe_template_schema_version == "1.2"
     assert result.transformation_class == "sp2_c_n_substitution"
     assert dict(result.taxonomy_definition_versions)[
         "reaction_grammars.v1.json"
-    ] == "1.8"
+    ] == "1.9"
     assert result.selected_tiers == (
         ("pd_sp2_cn.condition_regime", "specific"),
     )

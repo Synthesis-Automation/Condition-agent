@@ -8,7 +8,16 @@ from typing import Any, Dict, Literal, Optional, Tuple
 from .models import CompoundAnalysis
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "1.5"
+REACTION_SIGNATURE_SCHEMA_VERSION = "1.6"
+
+EditArchetype = Literal[
+    "substitution",
+    "addition",
+    "elimination",
+    "bond_order_change",
+    "composite",
+    "unresolved",
+]
 
 
 @dataclass(frozen=True)
@@ -42,6 +51,16 @@ class BondChange:
     old_order: Optional[str]
     new_order: Optional[str]
     evidence: str
+
+
+@dataclass(frozen=True)
+class OperatorOutcome:
+    """One deterministic constitutional outcome of a registered graph operator."""
+
+    outcome_id: str
+    predicted_product_smiles: Optional[str]
+    predicted_bond_changes: Tuple[BondChange, ...]
+    warnings: Tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -324,6 +343,7 @@ class ReactionEvent:
     hydrogen_changes: Tuple[str, ...]
     formed_connection_labels: Tuple[str, ...]
     topology: ReactionTopology
+    edit_archetype: EditArchetype
     transformation_class: Optional[str]
     transformation_confidence: float
     named_family: Optional[str]
@@ -332,7 +352,7 @@ class ReactionEvent:
     evidence: str
     confidence: float
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "1.1"
+    schema_version: str = "1.2"
 
 
 @dataclass(frozen=True)
@@ -374,6 +394,7 @@ class ReactionSignature:
     partners: Tuple[ReactionPartner, ...]
     product_transformation: Optional[ProductTransformation]
     topology: ReactionTopology
+    edit_archetype: EditArchetype
     transformation_class: Optional[str]
     transformation_confidence: float
     named_family: Optional[str]
@@ -391,6 +412,8 @@ class ReactionSignature:
 @dataclass(frozen=True)
 class ReactionCandidate:
     grammar_id: str
+    operator_outcome_id: str
+    edit_archetype: EditArchetype
     transformation_class: str
     role_assignments: Dict[str, ReactionSiteReference]
     predicted_bond_changes: Tuple[BondChange, ...]
@@ -411,6 +434,7 @@ class ReactionAnalysis:
     candidates: Tuple[ReactionCandidate, ...] = ()
     selected_candidate: Optional[ReactionCandidate] = None
     selected_events: Tuple[ReactionCandidate, ...] = ()
+    edit_archetype: EditArchetype = "unresolved"
     transformation_class: Optional[str] = None
     compatible_named_families: Tuple[str, ...] = ()
     named_family: Optional[str] = None
@@ -428,7 +452,7 @@ class ReactionAnalysis:
     reaction_completeness: Optional[ReactionCompletenessAssessment] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.9"
+    schema_version: str = "2.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -436,6 +460,8 @@ class ReactionAnalysis:
 
 __all__ = [
     "BondChange",
+    "EditArchetype",
+    "OperatorOutcome",
     "PartialProductTransformation",
     "ProductConnection",
     "ProductConnectionEndpoint",

@@ -60,13 +60,35 @@ unverified, and multiple indistinguishable assignments remain unselected.
 
 The high-ROI common-reaction layer also includes explicit alkyl C–N, C–O, and
 C–S substitution plus terminal-alkene Heck coupling. Alkyl substitution uses
-the shared leaving-group and X–H site contracts and the existing
-handle-replacement operator. It intentionally leaves `named_family` unset
+  the shared leaving-group and X–H site contracts and the registered
+  `center_replacement` operator. It intentionally leaves `named_family` unset
 because the graph alone does not distinguish SN1, SN2, or protection chemistry.
 The Heck grammar uses alkene endpoint hydrogen counts to select a terminal
 attachment site, removes Ar–X, forms Ar–C, and records alkene C–H loss. It does
 not invent E/Z stereochemistry: a stereospecified product is exact only when
-that stereochemistry is supported by the input/operator result.
+  that stereochemistry is supported by the input/operator result.
+
+The grammar registry now declares one net `edit_archetype` for every grammar.
+`substitution`, `addition`, and `elimination` describe observed graph topology,
+not mechanism. The common operator registry uses `center_replacement`,
+`pair_addition`, and `pair_elimination`. Mapped reactions receive the same
+edit-derived archetype even when no grammar or named family is available, and a
+grammar/edit contradiction is retained as review evidence.
+
+`pair_addition` combines an unsaturated-bond acceptor with either an existing
+N/O/S–H site or a curated `addition_donor`. The latter represents both explicit
+A–B bonds such as Br–Br and implicit A–H bonds such as Si–H and B–H. The
+operator enumerates both constitutional orientations for A≠B, collapses
+symmetry-equivalent products, reduces C=C or C≡C by one bond order, and emits
+formed, broken, order-changed, and schema-level hydrogen edits. Broad addition
+grammars require product verification and do not infer Markovnikov selectivity,
+syn/anti selectivity, or a named family.
+
+`pair_elimination` is the inverse net topology. The initial conservative
+`eliminable_pair` detector exposes a carbon bearing Cl/Br/I and each adjacent
+carbon bearing at least one hydrogen. Each beta site is a separate outcome, so
+the reported product resolves regioselectivity. Omitted HX is not invented as
+an observed byproduct.
 
 Friedel–Crafts acylation is represented by an activated acyl electrophile and
 an available aromatic C–H site. It reuses the generic handle-replacement

@@ -4,6 +4,8 @@ from .api import detect_sites, featurize_molecule
 from .reaction_api import featurize_reaction
 from .reaction_signatures import reaction_signature_definition_versions
 from .reaction_models import (
+    EditArchetype,
+    OperatorOutcome,
     ProductConnection,
     ProductConnectionEndpoint,
     ProductTransformation,
@@ -79,8 +81,10 @@ __all__ = [
     "CompoundAnalysis",
     "ContextClassification",
     "ContextualTransformationLabel",
+    "EditArchetype",
     "FunctionalGroup",
     "MatchIndex",
+    "OperatorOutcome",
     "ProductConnection",
     "ProductConnectionEndpoint",
     "ProductTransformation",

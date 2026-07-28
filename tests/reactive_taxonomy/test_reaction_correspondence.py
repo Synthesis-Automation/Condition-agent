@@ -105,14 +105,16 @@ def test_multiple_order_changes_render_as_repeated_events() -> None:
     assert result.reaction_label_status == "multi_event_edit_summary"
 
 
-def test_chemically_distinct_correspondences_remain_ambiguous() -> None:
+def test_beta_elimination_resolves_previously_ambiguous_correspondence() -> None:
     result = featurize_reaction("CCCBr>>CC=C")
 
     assert result.valid
-    assert result.evidence_quality == "ambiguous_atom_correspondence"
-    assert result.reaction_label is None
-    assert result.reaction_signature is None
-    assert "AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:2" in result.warnings
+    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.selected_candidate is not None
+    assert result.selected_candidate.grammar_id == "beta_halo_elimination"
+    assert result.edit_archetype == "elimination"
+    assert result.reaction_signature is not None
+    assert result.reaction_signature.edit_archetype == "elimination"
 
 
 def test_unresolvable_multi_substrate_assembly_remains_unresolved() -> None:

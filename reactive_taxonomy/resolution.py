@@ -9,6 +9,26 @@ from .models import SiteCandidate
 from .patterns import load_handle_patterns
 
 
+_SITE_TYPE_ORDER = {
+    site_type: index
+    for index, site_type in enumerate(
+        (
+            "leaving_group",
+            "pronucleophile_XH",
+            "nucleophile_anion",
+            "transfer_group",
+            "electrophilic_center",
+            "aromatic_CH",
+            "unsaturated_bond",
+            "dipolar_group",
+            "heteroatom_bond",
+            "addition_donor",
+            "eliminable_pair",
+        )
+    )
+}
+
+
 def _pattern_index() -> Dict[str, dict]:
     return {str(item["id"]): item for item in load_handle_patterns()}
 
@@ -60,7 +80,16 @@ def resolve_candidates(raw_sites: Iterable[SiteCandidate]) -> List[SiteCandidate
                         suppressed.add(target_index)
 
     resolved = [candidate for index, candidate in enumerate(candidates) if index not in suppressed]
-    return sorted(resolved, key=lambda candidate: (candidate.atom_indices, candidate.site_type, candidate.canonical_signature))
+    return sorted(
+        resolved,
+        key=lambda candidate: (
+            candidate.site_type in {"addition_donor", "eliminable_pair"},
+            min(candidate.atom_indices, default=-1),
+            _SITE_TYPE_ORDER.get(candidate.site_type, len(_SITE_TYPE_ORDER)),
+            candidate.atom_indices,
+            candidate.canonical_signature,
+        ),
+    )
 
 
 __all__ = ["resolve_candidates"]

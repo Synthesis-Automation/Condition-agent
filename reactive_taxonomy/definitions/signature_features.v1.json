@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.5",
-  "signature_schema_version": "1.5",
+  "schema_version": "1.6",
+  "signature_schema_version": "1.6",
   "levels": {
     "L0": ["edit_topology", "stereochemistry", "reaction_events", "reaction_topology", "handles", "anchor_contexts", "local_environments"],
     "L1": ["edit_topology", "stereochemistry", "reaction_events", "reaction_topology", "handles"],

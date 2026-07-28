@@ -99,8 +99,8 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
         "C-H:NONE>SINGLE",
     )
-    assert payload["schema_version"] == "1.9"
-    assert payload["reaction_signature"]["schema_version"] == "1.5"
+    assert payload["schema_version"] == "2.0"
+    assert payload["reaction_signature"]["schema_version"] == "1.6"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
     )

@@ -95,6 +95,22 @@ def _matches(site: ReactionSiteReference, constraint: Dict[str, Any]) -> bool:
         and details.get("activation_state") not in constraint["activation_state_any"]
     ):
         return False
+    if (
+        constraint.get("donor_class_any")
+        and details.get("donor_class") not in constraint["donor_class_any"]
+    ):
+        return False
+    if (
+        constraint.get("source_kind_any")
+        and details.get("source_kind") not in constraint["source_kind_any"]
+    ):
+        return False
+    if (
+        constraint.get("departing_element_any")
+        and details.get("departing_element")
+        not in constraint["departing_element_any"]
+    ):
+        return False
     if constraint.get("endpoint_h_count_max_min") is not None and max(
         (int(value) for value in details.get("endpoint_h_counts") or (0,)),
         default=0,

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List
+from typing import List, cast
 
 from .chemistry.rdkit_utils import parse_smiles
 
@@ -15,12 +15,15 @@ from .reaction_display_labels import build_reaction_display_label
 from .reaction_edits import normalize_mapped_edits, normalize_reaction_edits
 from .reaction_labels import render_reactant_label, render_reaction_label
 from .reaction_environments import build_reaction_family_environment
-from .reaction_models import ReactionAnalysis, ReactionCandidate
+from .reaction_models import EditArchetype, ReactionAnalysis, ReactionCandidate
 from .reaction_multi_events import (
     equivalent_multi_event_interpretations,
     exact_multi_event_reconstructions,
 )
-from .reaction_operators import apply_operator, apply_operator_sequence
+from .reaction_operators import (
+    apply_operator_sequence,
+    enumerate_operator_outcomes,
+)
 from .reaction_parser import parse_reaction_smiles
 from .partial_product_correspondence import (
     infer_partial_product_transformation,
@@ -44,6 +47,11 @@ def _canonical_without_maps(smiles: str) -> str | None:
         return Chem.MolToSmiles(mol, canonical=True, isomericSmiles=True)
     except Exception:
         return None
+
+
+def _grammar_archetype(grammar: dict[str, object]) -> EditArchetype:
+    """Return one validation-backed grammar archetype."""
+    return cast(EditArchetype, grammar.get("edit_archetype") or "unresolved")
 
 
 def featurize_reaction(
@@ -80,31 +88,50 @@ def featurize_reaction(
         raw = raw[:max_candidates]
         warnings.append("CANDIDATE_LIMIT_REACHED")
     candidates: List[ReactionCandidate] = []
+    candidate_sources = []
     exact: List[ReactionCandidate] = []
     for grammar, assignment in raw:
-        predicted, changes = apply_operator(grammar, assignment, parsed.reactants)
-        predicted_canonical = _canonical_without_maps(predicted) if predicted else None
-        verification = (
-            "exact_product_reconstruction"
-            if predicted_canonical in observed_products
-            else ("product_mismatch" if predicted else "construction_failed")
-        )
-        label = render_reaction_label(grammar, assignment, style=label_style)
-        candidate = ReactionCandidate(
-            grammar_id=grammar["id"],
-            transformation_class=grammar["transformation_class"],
-            role_assignments=assignment,
-            predicted_bond_changes=changes,
-            predicted_product_smiles=predicted_canonical,
-            verification=verification,
-            reaction_label=label,
-            compatible_named_families=tuple(
-                grammar.get("compatible_named_families") or []
-            ),
-        )
-        candidates.append(candidate)
-        if verification == "exact_product_reconstruction":
-            exact.append(candidate)
+        outcomes = enumerate_operator_outcomes(grammar, assignment, parsed.reactants)
+        for outcome in outcomes:
+            predicted_canonical = (
+                _canonical_without_maps(outcome.predicted_product_smiles)
+                if outcome.predicted_product_smiles
+                else None
+            )
+            verification = (
+                "exact_product_reconstruction"
+                if predicted_canonical in observed_products
+                else (
+                    "product_mismatch"
+                    if predicted_canonical
+                    else "construction_failed"
+                )
+            )
+            label = render_reaction_label(grammar, assignment, style=label_style)
+            candidate = ReactionCandidate(
+                grammar_id=grammar["id"],
+                operator_outcome_id=outcome.outcome_id,
+                edit_archetype=_grammar_archetype(grammar),
+                transformation_class=grammar["transformation_class"],
+                role_assignments=assignment,
+                predicted_bond_changes=outcome.predicted_bond_changes,
+                predicted_product_smiles=predicted_canonical,
+                verification=verification,
+                reaction_label=label,
+                compatible_named_families=tuple(
+                    grammar.get("compatible_named_families") or []
+                ),
+                warnings=outcome.warnings,
+            )
+            candidates.append(candidate)
+            candidate_sources.append((grammar, assignment))
+            if verification == "exact_product_reconstruction":
+                exact.append(candidate)
+            if len(candidates) >= max_candidates:
+                warnings.append("CANDIDATE_LIMIT_REACHED")
+                break
+        if len(candidates) >= max_candidates:
+            break
     selected = None
     selected_events: tuple[ReactionCandidate, ...] = ()
     evidence = "reactant_grammar_only" if candidates else "unresolved"
@@ -143,11 +170,17 @@ def featurize_reaction(
             selected_events = tuple(
                 ReactionCandidate(
                     grammar_id=str(grammar["id"]),
+                    operator_outcome_id=(
+                        enumerate_operator_outcomes(
+                            grammar, assignment, parsed.reactants
+                        )[0].outcome_id
+                    ),
+                    edit_archetype=_grammar_archetype(grammar),
                     transformation_class=str(grammar["transformation_class"]),
                     role_assignments=assignment,
-                    predicted_bond_changes=apply_operator(
+                    predicted_bond_changes=enumerate_operator_outcomes(
                         grammar, assignment, parsed.reactants
-                    )[1],
+                    )[0].predicted_bond_changes,
                     predicted_product_smiles=composite_product,
                     verification="exact_multi_event_reconstruction",
                     reaction_label=render_reaction_label(
@@ -327,9 +360,9 @@ def featurize_reaction(
             if candidate.verification == "exact_product_reconstruction"
         )
         fallback_raw = (
-            [raw[index] for index in exact_candidate_indices]
+            [candidate_sources[index] for index in exact_candidate_indices]
             if exact_candidate_indices
-            else raw
+            else candidate_sources
         )
         if exact_candidate_indices and len(exact_candidate_indices) < len(candidates):
             warnings.append("PRODUCT_MISMATCH_CANDIDATES_EXCLUDED_FROM_LABEL")
@@ -421,6 +454,13 @@ def featurize_reaction(
         candidates=tuple(candidates),
         selected_candidate=selected,
         selected_events=selected_events,
+        edit_archetype=(
+            selected.edit_archetype
+            if selected is not None
+            else reaction_signature.edit_archetype
+            if reaction_signature is not None
+            else "unresolved"
+        ),
         transformation_class=(
             selected.transformation_class
             if selected

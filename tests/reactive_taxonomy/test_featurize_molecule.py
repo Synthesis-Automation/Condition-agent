@@ -20,6 +20,7 @@ def test_handle_smarts_are_independent_and_mapped() -> None:
         "leaving_group", "pronucleophile_XH", "transfer_group",
         "electrophilic_center", "aromatic_CH", "unsaturated_bond",
         "dipolar_group", "heteroatom_bond", "nucleophile_anion",
+        "addition_donor", "eliminable_pair",
     }
     assert all(pattern.get("atom_roles") for pattern in patterns)
 

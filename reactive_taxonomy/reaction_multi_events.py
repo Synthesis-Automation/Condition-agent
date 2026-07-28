@@ -58,7 +58,7 @@ def exact_multi_event_reconstructions(
                 candidate
                 for candidate in raw_candidates
                 if candidate[0].get("operator", {}).get("id")
-                == "replace_handle_with_center"
+                == "center_replacement"
             ),
             key=_operation_key,
         )

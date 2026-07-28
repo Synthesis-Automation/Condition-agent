@@ -11,6 +11,8 @@ SiteType = Literal[
     "pronucleophile_XH",
     "nucleophile_anion",
     "transfer_group",
+    "addition_donor",
+    "eliminable_pair",
     "electrophilic_center",
     "aromatic_CH",
     "unsaturated_bond",

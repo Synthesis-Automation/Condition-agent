@@ -6,7 +6,12 @@ from typing import Any, Callable, Dict, Iterable, List, Sequence, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 
-from .reaction_models import BondChange, ReactionComponent, ReactionSiteReference
+from .reaction_models import (
+    BondChange,
+    OperatorOutcome,
+    ReactionComponent,
+    ReactionSiteReference,
+)
 
 
 def _component_by_index(
@@ -308,6 +313,393 @@ def _change_site_bond_order(
         return None
 
 
+def _set_total_hydrogens(
+    source_molecule: Any,
+    target_molecule: Any,
+    atom_index: int,
+    delta: int,
+) -> bool:
+    """Apply an explicit total-H delta without relying on implicit-valence guesses."""
+    source_atom = source_molecule.GetAtomWithIdx(atom_index)
+    target_count = int(source_atom.GetTotalNumHs(includeNeighbors=True)) + int(delta)
+    if target_count < 0:
+        return False
+    target_atom = target_molecule.GetAtomWithIdx(atom_index)
+    target_atom.SetNumExplicitHs(target_count)
+    target_atom.SetNoImplicit(True)
+    return True
+
+
+def _combined_participants(
+    components: Tuple[ReactionComponent, ...],
+    participants: Sequence[ReactionSiteReference],
+) -> tuple[Any, Dict[int, int]] | None:
+    """Return one editable molecule and component offsets for retained participants."""
+    from rdkit import Chem
+
+    component_indices = sorted({site.component_index for site in participants})
+    molecules = []
+    offsets: Dict[int, int] = {}
+    total = 0
+    for component_index in component_indices:
+        molecule = parse_smiles(
+            _component_by_index(components, component_index).input_smiles
+        )
+        if molecule is None:
+            return None
+        offsets[component_index] = total
+        total += molecule.GetNumAtoms()
+        molecules.append(molecule)
+    if not molecules:
+        return None
+    combined = molecules[0]
+    for molecule in molecules[1:]:
+        combined = Chem.CombineMols(combined, molecule)
+    return combined, offsets
+
+
+def _pair_addition_outcomes(
+    grammar: Dict[str, Any],
+    assignment: Dict[str, ReactionSiteReference],
+    components: Tuple[ReactionComponent, ...],
+) -> Tuple[OperatorOutcome, ...]:
+    """Enumerate constitutional A-B orientations across one unsaturated bond."""
+    from rdkit import Chem
+
+    operator = grammar["operator"]
+    acceptor_role = str(operator.get("acceptor_role") or "acceptor")
+    donor_role = str(operator.get("donor_role") or "donor")
+    acceptor = assignment[acceptor_role]
+    donor = assignment[donor_role]
+    endpoint_roles = tuple(
+        str(value)
+        for value in operator.get(
+            "acceptor_endpoint_roles", ("endpoint_a", "endpoint_b")
+        )
+    )
+    if len(endpoint_roles) != 2:
+        return ()
+    endpoint_a_values = acceptor.atom_roles.get(endpoint_roles[0]) or ()
+    endpoint_b_values = acceptor.atom_roles.get(endpoint_roles[1]) or ()
+    if len(endpoint_a_values) != 1 or len(endpoint_b_values) != 1:
+        return ()
+    source_kind = (
+        "implicit_hydrogen"
+        if donor.site_type == "pronucleophile_XH"
+        else str(donor.details.get("source_kind") or "")
+    )
+    addend_a_role = (
+        "center"
+        if donor.site_type == "pronucleophile_XH"
+        else str(operator.get("donor_addend_a_role") or "addend_a")
+    )
+    hydrogen_carrier_role = (
+        "center"
+        if donor.site_type == "pronucleophile_XH"
+        else str(operator.get("hydrogen_carrier_role") or "hydrogen_carrier")
+    )
+    addend_a_values = donor.atom_roles.get(addend_a_role) or ()
+    if len(addend_a_values) != 1:
+        return ()
+    addend_b_role = str(operator.get("donor_addend_b_role") or "addend_b")
+    addend_b_values = donor.atom_roles.get(addend_b_role) or ()
+    if source_kind == "explicit_bond" and len(addend_b_values) != 1:
+        return ()
+    if source_kind not in {"explicit_bond", "implicit_hydrogen"}:
+        return ()
+
+    endpoint_assignments = (
+        (
+            endpoint_roles[0],
+            endpoint_roles[1],
+            int(endpoint_a_values[0]),
+            int(endpoint_b_values[0]),
+        ),
+        (
+            endpoint_roles[1],
+            endpoint_roles[0],
+            int(endpoint_b_values[0]),
+            int(endpoint_a_values[0]),
+        ),
+    )
+    outcomes: list[OperatorOutcome] = []
+    seen_products: set[str] = set()
+    old_order = str(operator["old_order"]).upper()
+    new_order = str(operator["new_order"]).upper()
+    for addend_endpoint_role, other_endpoint_role, addend_endpoint, other_endpoint in (
+        endpoint_assignments
+    ):
+        combined_result = _combined_participants(
+            components, (acceptor, donor)
+        )
+        if combined_result is None:
+            continue
+        combined, offsets = combined_result
+        rw = Chem.RWMol(combined)
+        acceptor_offset = offsets[acceptor.component_index]
+        donor_offset = offsets[donor.component_index]
+        endpoint_global = acceptor_offset + addend_endpoint
+        other_endpoint_global = acceptor_offset + other_endpoint
+        addend_a_global = donor_offset + int(addend_a_values[0])
+        acceptor_bond = rw.GetBondBetweenAtoms(
+            acceptor_offset + int(endpoint_a_values[0]),
+            acceptor_offset + int(endpoint_b_values[0]),
+        )
+        if acceptor_bond is None or acceptor_bond.GetBondType() != _bond_type(
+            old_order
+        ):
+            continue
+        acceptor_bond.SetBondType(_bond_type(new_order))
+        acceptor_bond.SetStereo(Chem.BondStereo.STEREONONE)
+        acceptor_bond.SetBondDir(Chem.BondDir.NONE)
+
+        changes: Tuple[BondChange, ...] = (
+            BondChange(
+                "order_changed",
+                f"{acceptor_role}.{endpoint_roles[0]}",
+                f"{acceptor_role}.{endpoint_roles[1]}",
+                old_order,
+                new_order,
+                "grammar_operator",
+            ),
+        )
+        if source_kind == "explicit_bond":
+            addend_b_global = donor_offset + int(addend_b_values[0])
+            source_bond = rw.GetBondBetweenAtoms(addend_a_global, addend_b_global)
+            source_order = str(
+                donor.details.get("source_bond_order") or "SINGLE"
+            ).upper()
+            if source_bond is None or source_bond.GetBondType() != _bond_type(
+                source_order
+            ):
+                continue
+            rw.RemoveBond(addend_a_global, addend_b_global)
+            if (
+                rw.GetBondBetweenAtoms(endpoint_global, addend_a_global) is not None
+                or rw.GetBondBetweenAtoms(other_endpoint_global, addend_b_global)
+                is not None
+            ):
+                continue
+            rw.AddBond(endpoint_global, addend_a_global, Chem.BondType.SINGLE)
+            rw.AddBond(other_endpoint_global, addend_b_global, Chem.BondType.SINGLE)
+            changes += (
+                BondChange(
+                    "broken",
+                    f"{donor_role}.{addend_a_role}",
+                    f"{donor_role}.{addend_b_role}",
+                    source_order,
+                    None,
+                    "grammar_operator",
+                ),
+                BondChange(
+                    "formed",
+                    f"{acceptor_role}.{addend_endpoint_role}",
+                    f"{donor_role}.{addend_a_role}",
+                    None,
+                    "SINGLE",
+                    "grammar_operator",
+                ),
+                BondChange(
+                    "formed",
+                    f"{acceptor_role}.{other_endpoint_role}",
+                    f"{donor_role}.{addend_b_role}",
+                    None,
+                    "SINGLE",
+                    "grammar_operator",
+                ),
+            )
+        else:
+            carrier_values = donor.atom_roles.get(hydrogen_carrier_role) or ()
+            if len(carrier_values) != 1:
+                continue
+            if rw.GetBondBetweenAtoms(endpoint_global, addend_a_global) is not None:
+                continue
+            rw.AddBond(endpoint_global, addend_a_global, Chem.BondType.SINGLE)
+            if not _set_total_hydrogens(
+                combined, rw, donor_offset + int(carrier_values[0]), -1
+            ):
+                continue
+            if not _set_total_hydrogens(combined, rw, other_endpoint_global, 1):
+                continue
+            changes += (
+                BondChange(
+                    "formed",
+                    f"{acceptor_role}.{addend_endpoint_role}",
+                    f"{donor_role}.{addend_a_role}",
+                    None,
+                    "SINGLE",
+                    "grammar_operator",
+                ),
+                BondChange(
+                    "hydrogen_change",
+                    f"{donor_role}.{hydrogen_carrier_role}",
+                    None,
+                    "SINGLE",
+                    None,
+                    "grammar_operator",
+                ),
+                BondChange(
+                    "hydrogen_change",
+                    f"{acceptor_role}.{other_endpoint_role}",
+                    None,
+                    None,
+                    "SINGLE",
+                    "grammar_operator",
+                ),
+            )
+        product = rw.GetMol()
+        try:
+            product.UpdatePropertyCache(strict=False)
+            Chem.SanitizeMol(product)
+            Chem.AssignStereochemistry(product, cleanIt=True, force=True)
+            smiles = Chem.MolToSmiles(
+                product, canonical=True, isomericSmiles=True
+            )
+        except Exception:
+            continue
+        if smiles in seen_products:
+            continue
+        seen_products.add(smiles)
+        outcomes.append(
+            OperatorOutcome(
+                outcome_id=(
+                    f"{addend_endpoint_role}_addend_a__"
+                    f"{other_endpoint_role}_addend_b"
+                ),
+                predicted_product_smiles=smiles,
+                predicted_bond_changes=changes,
+            )
+        )
+    return tuple(sorted(outcomes, key=lambda outcome: outcome.outcome_id))
+
+
+def _pair_elimination_outcomes(
+    grammar: Dict[str, Any],
+    assignment: Dict[str, ReactionSiteReference],
+    components: Tuple[ReactionComponent, ...],
+) -> Tuple[OperatorOutcome, ...]:
+    """Apply one conservative vicinal heavy-group/H elimination."""
+    from rdkit import Chem
+
+    operator = grammar["operator"]
+    substrate_role = str(operator.get("substrate_role") or "substrate")
+    substrate = assignment[substrate_role]
+    endpoint_a_role = str(operator.get("endpoint_a_role") or "endpoint_a")
+    endpoint_b_role = str(operator.get("endpoint_b_role") or "endpoint_b")
+    departing_role = str(operator.get("departing_a_role") or "departing_a")
+    hydrogen_role = str(
+        operator.get("hydrogen_carrier_b_role") or "hydrogen_carrier_b"
+    )
+    role_values = {
+        role: substrate.atom_roles.get(role) or ()
+        for role in (
+            endpoint_a_role,
+            endpoint_b_role,
+            departing_role,
+            hydrogen_role,
+        )
+    }
+    if any(len(values) != 1 for values in role_values.values()):
+        return ()
+    endpoint_a = int(role_values[endpoint_a_role][0])
+    endpoint_b = int(role_values[endpoint_b_role][0])
+    departing = int(role_values[departing_role][0])
+    component = _component_by_index(components, substrate.component_index)
+    molecule = parse_smiles(component.input_smiles)
+    if molecule is None:
+        return ()
+    backbone = molecule.GetBondBetweenAtoms(endpoint_a, endpoint_b)
+    leaving_bond = molecule.GetBondBetweenAtoms(endpoint_a, departing)
+    old_order = str(operator["old_order"]).upper()
+    new_order = str(operator["new_order"]).upper()
+    if (
+        backbone is None
+        or backbone.GetBondType() != _bond_type(old_order)
+        or leaving_bond is None
+    ):
+        return ()
+    removals = sorted(
+        _fragment_to_remove(
+            components,
+            substrate.component_index,
+            endpoint_a,
+            departing,
+        ),
+        reverse=True,
+    )
+    if endpoint_a in removals or endpoint_b in removals:
+        return ()
+    rw = Chem.RWMol(molecule)
+    for atom_index in removals:
+        rw.RemoveAtom(atom_index)
+
+    def shifted(index: int) -> int:
+        return index - sum(removed < index for removed in removals)
+
+    shifted_a = shifted(endpoint_a)
+    shifted_b = shifted(endpoint_b)
+    edited_backbone = rw.GetBondBetweenAtoms(shifted_a, shifted_b)
+    if edited_backbone is None:
+        return ()
+    edited_backbone.SetBondType(_bond_type(new_order))
+    edited_backbone.SetStereo(Chem.BondStereo.STEREONONE)
+    edited_backbone.SetBondDir(Chem.BondDir.NONE)
+    source_hydrogen_count = int(
+        molecule.GetAtomWithIdx(endpoint_b).GetTotalNumHs(includeNeighbors=True)
+    )
+    if source_hydrogen_count < 1:
+        return ()
+    product_hydrogen_atom = rw.GetAtomWithIdx(shifted_b)
+    product_hydrogen_atom.SetNumExplicitHs(source_hydrogen_count - 1)
+    product_hydrogen_atom.SetNoImplicit(True)
+    product = rw.GetMol()
+    try:
+        product.UpdatePropertyCache(strict=False)
+        Chem.SanitizeMol(product)
+        Chem.AssignStereochemistry(product, cleanIt=True, force=True)
+        smiles = Chem.MolToSmiles(product, canonical=True, isomericSmiles=True)
+    except Exception:
+        return ()
+    leaving_order = {
+        1: "SINGLE",
+        2: "DOUBLE",
+        3: "TRIPLE",
+    }.get(int(round(float(leaving_bond.GetBondTypeAsDouble()))), "SINGLE")
+    changes = (
+        BondChange(
+            "broken",
+            f"{substrate_role}.{endpoint_a_role}",
+            f"{substrate_role}.{departing_role}",
+            leaving_order,
+            None,
+            "grammar_operator",
+        ),
+        BondChange(
+            "hydrogen_change",
+            f"{substrate_role}.{hydrogen_role}",
+            None,
+            "SINGLE",
+            None,
+            "grammar_operator",
+        ),
+        BondChange(
+            "order_changed",
+            f"{substrate_role}.{endpoint_a_role}",
+            f"{substrate_role}.{endpoint_b_role}",
+            old_order,
+            new_order,
+            "grammar_operator",
+        ),
+    )
+    return (
+        OperatorOutcome(
+            outcome_id="vicinal_pair",
+            predicted_product_smiles=smiles,
+            predicted_bond_changes=changes,
+        ),
+    )
+
+
 def apply_operator(
     grammar: Dict[str, Any],
     assignment: Dict[str, ReactionSiteReference],
@@ -461,7 +853,7 @@ def apply_operator(
             ),
         )
         return predicted, changes
-    if operator["id"] == "replace_handle_with_center":
+    if operator["id"] == "center_replacement":
         e_role, p_role = operator["electrophile_role"], operator["partner_role"]
         electrophile, partner = assignment[e_role], assignment[p_role]
         e_anchor_role = "anchor" if "anchor" in electrophile.atom_roles else "center"
@@ -632,6 +1024,27 @@ def apply_operator(
     return None, ()
 
 
+def enumerate_operator_outcomes(
+    grammar: Dict[str, Any],
+    assignment: Dict[str, ReactionSiteReference],
+    components: Tuple[ReactionComponent, ...],
+) -> Tuple[OperatorOutcome, ...]:
+    """Return every distinct constitutional outcome for one grammar assignment."""
+    operator_id = str(grammar.get("operator", {}).get("id") or "")
+    if operator_id == "pair_addition":
+        return _pair_addition_outcomes(grammar, assignment, components)
+    if operator_id == "pair_elimination":
+        return _pair_elimination_outcomes(grammar, assignment, components)
+    predicted, changes = apply_operator(grammar, assignment, components)
+    return (
+        OperatorOutcome(
+            outcome_id="default",
+            predicted_product_smiles=predicted,
+            predicted_bond_changes=changes,
+        ),
+    )
+
+
 def apply_operator_sequence(
     operations: Sequence[
         Tuple[Dict[str, Any], Dict[str, ReactionSiteReference]]
@@ -642,7 +1055,7 @@ def apply_operator_sequence(
     from rdkit import Chem
 
     if len(operations) < 2 or any(
-        grammar.get("operator", {}).get("id") != "replace_handle_with_center"
+        grammar.get("operator", {}).get("id") != "center_replacement"
         for grammar, _ in operations
     ):
         return None
@@ -765,4 +1178,8 @@ def apply_operator_sequence(
         return None
 
 
-__all__ = ["apply_operator", "apply_operator_sequence"]
+__all__ = [
+    "apply_operator",
+    "apply_operator_sequence",
+    "enumerate_operator_outcomes",
+]

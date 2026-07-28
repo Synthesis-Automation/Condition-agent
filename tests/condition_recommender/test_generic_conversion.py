@@ -111,7 +111,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "2.2"
     assert record.converter_definition_version == "generic_conversion.v1.19"
-    assert record.reaction_signature["schema_version"] == "1.5"
+    assert record.reaction_signature["schema_version"] == "1.6"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
     assert record.reference_identity["resolution_status"] == "bibliographic_text"
@@ -473,7 +473,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     }
     assert json.loads((output / "conversion_report.json").read_text()) == report
     assert report["schema_version"] == "1.2"
-    assert report["reaction_signature_schema_version"] == "1.5"
+    assert report["reaction_signature_schema_version"] == "1.6"
     assert report["reaction_scope_counts"] == {
         "intermolecular": 1,
         "unimolecular": 1,
