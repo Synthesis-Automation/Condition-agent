@@ -270,6 +270,9 @@ partner context, and local steric and electronic analyses:
 ```powershell
 python -m reactive_taxonomy.cli molecule "Brc1ccc(N)cc1C#N" --concise
 python -m reactive_taxonomy.cli reaction "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1" --concise
+
+python -m reactive_taxonomy.cli reaction "BrBr.C=CCCCCCCCCCCC>>CCCCCCCCCCCC(Br)CBr" --concise
+
 ```
 
 For reactive sites bearing alkyl groups, the readable output separates the
