@@ -352,13 +352,68 @@
     {
       "id": "heteroaryl_nitrogen",
       "label": "HetAr–N",
-      "smarts": "[n;H0:1]",
+      "smarts": "[nX2+0;H0:1]",
       "priority": 76,
       "tags": [
         "basic",
         "metal_binding",
         "strong_metal_binding",
         "electron_withdrawing"
+      ]
+    },
+    {
+      "id": "heteroaryl_n_oxide",
+      "label": "HetAr–N-oxide",
+      "smarts": "[n+:1]([O-:2])",
+      "priority": 77,
+      "tags": [
+        "electron_withdrawing",
+        "hydrogen_bond_acceptor",
+        "metal_binding",
+        "reduction_sensitive"
+      ]
+    },
+    {
+      "id": "cationic_heteroaryl_nitrogen",
+      "label": "HetAr–N+",
+      "smarts": [
+        "[nH+:1]",
+        "[n+;H0;!$([n+]([O-])):1]"
+      ],
+      "priority": 77,
+      "tags": [
+        "cationic",
+        "electron_withdrawing"
+      ]
+    },
+    {
+      "id": "pyrrolic_nitrogen",
+      "label": "HetAr–NH",
+      "smarts": "[nH+0:1]",
+      "priority": 76,
+      "tags": [
+        "hydrogen_bond_donor",
+        "oxidation_sensitive",
+        "unprotected_XH"
+      ]
+    },
+    {
+      "id": "heteroaryl_oxygen",
+      "label": "HetAr–O",
+      "smarts": "[o+0:1]",
+      "priority": 75,
+      "tags": [
+        "hydrogen_bond_acceptor",
+        "oxidation_sensitive"
+      ]
+    },
+    {
+      "id": "heteroaryl_sulfur",
+      "label": "HetAr–S",
+      "smarts": "[s+0:1]",
+      "priority": 75,
+      "tags": [
+        "oxidation_sensitive"
       ]
     },
     {

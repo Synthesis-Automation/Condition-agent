@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Set
+from typing import Any, Dict, Iterable, List, Set, Tuple
 
 from .models import ContextClassification
 from .patterns import MatchIndex
@@ -29,8 +29,126 @@ def _context_definitions() -> Dict[str, Dict[str, Any]]:
     return {item["id"]: item for item in load_context_taxonomy()["contexts"]}
 
 
+def _aromatic_ring_system(
+    mol: Any,
+    atom_index: int,
+) -> Tuple[Tuple[int, ...], ...]:
+    """Return the fused aromatic ring system containing ``atom_index``."""
+    aromatic_rings = [
+        tuple(int(index) for index in ring)
+        for ring in mol.GetRingInfo().AtomRings()
+        if all(mol.GetAtomWithIdx(index).GetIsAromatic() for index in ring)
+    ]
+    selected = [ring for ring in aromatic_rings if atom_index in ring]
+    ring_atoms = set().union(*(set(ring) for ring in selected)) if selected else set()
+    changed = True
+    while changed:
+        changed = False
+        for ring in aromatic_rings:
+            if ring in selected or not ring_atoms.intersection(ring):
+                continue
+            selected.append(ring)
+            ring_atoms.update(ring)
+            changed = True
+    return tuple(sorted(selected, key=lambda ring: (len(ring), ring)))
+
+
+def _ring_distance(
+    mol: Any,
+    start: int,
+    target: int,
+    ring_atoms: Set[int],
+) -> int | None:
+    """Return shortest graph distance restricted to one aromatic ring system."""
+    if start == target:
+        return 0
+    visited = {start}
+    frontier = {start}
+    distance = 0
+    while frontier:
+        distance += 1
+        frontier = {
+            neighbor.GetIdx()
+            for index in frontier
+            for neighbor in mol.GetAtomWithIdx(index).GetNeighbors()
+            if neighbor.GetIdx() in ring_atoms
+            and neighbor.GetIdx() not in visited
+        }
+        if target in frontier:
+            return distance
+        visited.update(frontier)
+    return None
+
+
+def _aromatic_heteroatom_type(atom: Any) -> str:
+    """Classify an aromatic heteroatom by observable graph state."""
+    symbol = atom.GetSymbol()
+    charge = int(atom.GetFormalCharge())
+    hydrogen_count = int(atom.GetTotalNumHs())
+    if symbol == "N":
+        if charge > 0 and any(
+            neighbor.GetSymbol() == "O" and neighbor.GetFormalCharge() < 0
+            for neighbor in atom.GetNeighbors()
+        ):
+            return "pyridine_n_oxide_like"
+        if charge > 0:
+            return "cationic_aromatic_nitrogen"
+        if hydrogen_count:
+            return "pyrrole_like"
+        if charge == 0:
+            return "pyridine_like"
+        return "anionic_aromatic_nitrogen"
+    if symbol == "O":
+        return "furan_like"
+    if symbol == "S":
+        return "thiophene_like"
+    return f"aromatic_{symbol.lower()}"
+
+
+def _heteroaromatic_subtype(
+    rings: Tuple[Tuple[int, ...], ...],
+    heteroatom_details: List[Dict[str, Any]],
+) -> str:
+    """Return a conservative named annotation for a graph-defined ring system."""
+    if not heteroatom_details:
+        return "carbocyclic_aromatic_ring"
+    if len(rings) > 1:
+        kinds = {str(record["aromatic_type"]) for record in heteroatom_details}
+        if len(heteroatom_details) == 1:
+            kind = next(iter(kinds))
+            if kind == "pyridine_like":
+                return "fused_pyridine_like"
+            if kind == "pyrrole_like":
+                return "fused_pyrrole_like"
+        return "fused_heteroaromatic"
+
+    ring_size = len(rings[0]) if rings else 0
+    element_counts: Dict[str, int] = {}
+    for record in heteroatom_details:
+        element = str(record["element"])
+        element_counts[element] = element_counts.get(element, 0) + 1
+    kinds = [str(record["aromatic_type"]) for record in heteroatom_details]
+    if ring_size == 6 and set(element_counts) == {"N"}:
+        if element_counts["N"] == 1:
+            if kinds[0] == "cationic_aromatic_nitrogen":
+                return "pyridinium_like"
+            return kinds[0]
+        if element_counts["N"] == 2:
+            return "diazine_like"
+        if element_counts["N"] == 3:
+            return "triazine_like"
+        return "six_membered_aza_arene"
+    if ring_size == 5 and len(heteroatom_details) == 1:
+        return kinds[0]
+    if ring_size == 5:
+        return "five_membered_heteroaromatic"
+    if ring_size == 6:
+        return "six_membered_heteroaromatic"
+    return "heteroaromatic_ring"
+
+
 def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
-    rings = [ring for ring in mol.GetRingInfo().AtomRings() if atom.GetIdx() in ring]
+    rings = _aromatic_ring_system(mol, atom.GetIdx())
     if not rings:
         return ContextClassification(
             "Ar",
@@ -42,8 +160,42 @@ def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
             display_token="Ar",
         )
     ring_atoms: Set[int] = set().union(*(set(ring) for ring in rings))
-    heteroatoms = sorted({mol.GetAtomWithIdx(i).GetSymbol() for i in ring_atoms if mol.GetAtomWithIdx(i).GetAtomicNum() != 6})
+    heteroatom_details = []
+    for index in sorted(ring_atoms):
+        ring_atom = mol.GetAtomWithIdx(index)
+        if ring_atom.GetAtomicNum() == 6:
+            continue
+        heteroatom_details.append({
+            "atom_index": index,
+            "element": ring_atom.GetSymbol(),
+            "formal_charge": int(ring_atom.GetFormalCharge()),
+            "hydrogen_count": int(ring_atom.GetTotalNumHs()),
+            "aromatic_type": _aromatic_heteroatom_type(ring_atom),
+            "distance_from_attachment": _ring_distance(
+                mol,
+                atom.GetIdx(),
+                index,
+                ring_atoms,
+            ),
+        })
+    heteroatoms = sorted({
+        str(record["element"]) for record in heteroatom_details
+    })
     token = "HeteroAr" if heteroatoms else "Ar"
+    subtype = _heteroaromatic_subtype(rings, heteroatom_details)
+    element_counts = {
+        element: sum(
+            record["element"] == element for record in heteroatom_details
+        )
+        for element in heteroatoms
+    }
+    profile_tokens = sorted(
+        f"{record['element']}:{record['aromatic_type']}:"
+        f"d{record['distance_from_attachment']}"
+        for record in heteroatom_details
+    )
+    profile = ",".join(profile_tokens)
+    ring_sizes = sorted(len(ring) for ring in rings)
     return ContextClassification(
         token=token,
         attachment_atom_index=atom.GetIdx(),
@@ -54,11 +206,18 @@ def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
             "heteroaromatic" if heteroatoms else "carbocyclic_aromatic"
         ),
         display_token=token,
-        subtype="heteroaromatic_ring" if heteroatoms else "carbocyclic_aromatic_ring",
+        subtype=subtype,
         features={
             "heteroatoms": heteroatoms,
-            "ring_sizes": sorted({len(ring) for ring in rings}),
+            "heteroatom_counts": element_counts,
+            "heteroatom_details": heteroatom_details,
+            "ring_count": len(rings),
+            "ring_sizes": ring_sizes,
             "fused": len(rings) > 1,
+            "ring_system_key": (
+                f"{token}|rings={','.join(str(size) for size in ring_sizes)}|"
+                f"hetero={profile or 'none'}|fused={int(len(rings) > 1)}"
+            ),
         },
     )
 

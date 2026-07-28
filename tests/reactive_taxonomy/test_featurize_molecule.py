@@ -234,9 +234,86 @@ def test_rich_context_record_is_exposed() -> None:
     context = site.context_features["contexts"][0]
     assert context["token"] == "HeteroAr"
     assert context["classification_method"] == "aromatic_ring_system"
-    assert context["subtype"] == "heteroaromatic_ring"
+    assert context["subtype"] == "pyridine_like"
     assert context["features"]["heteroatoms"] == ["N"]
+    assert context["features"]["heteroatom_counts"] == {"N": 1}
+    assert context["features"]["heteroatom_details"] == [{
+        "atom_index": 6,
+        "element": "N",
+        "formal_charge": 0,
+        "hydrogen_count": 0,
+        "aromatic_type": "pyridine_like",
+        "distance_from_attachment": 1,
+    }]
+    assert context["features"]["ring_system_key"] == (
+        "HeteroAr|rings=6|hetero=N:pyridine_like:d1|fused=0"
+    )
     assert len(context["fragment_atom_indices"]) == 6
+
+
+def test_heteroaromatic_context_preserves_broad_token_and_nitrogen_position() -> None:
+    examples = {
+        "Brc1ncccc1": 1,
+        "Brc1cccnc1": 2,
+        "Brc1ccncc1": 3,
+    }
+    for smiles, expected_distance in examples.items():
+        site = next(
+            candidate
+            for candidate in featurize_molecule(smiles).sites
+            if candidate.site_type == "leaving_group"
+        )
+        context = site.context_features["contexts"][0]
+        assert site.canonical_signature == "LG|HeteroAr|Br"
+        assert context["token"] == "HeteroAr"
+        assert context["subtype"] == "pyridine_like"
+        assert (
+            context["features"]["heteroatom_details"][0][
+                "distance_from_attachment"
+            ]
+            == expected_distance
+        )
+
+
+def test_graph_defined_heteroaromatic_subtypes_cover_common_ring_classes() -> None:
+    examples = {
+        "Brc1ccoc1": ("furan_like", "O"),
+        "Brc1ccsc1": ("thiophene_like", "S"),
+        "Brc1cc[nH]c1": ("pyrrole_like", "N"),
+        "Brc1ccc2ncccc2c1": ("fused_pyridine_like", "N"),
+    }
+    for smiles, (expected_subtype, expected_element) in examples.items():
+        site = next(
+            candidate
+            for candidate in featurize_molecule(smiles).sites
+            if candidate.site_type == "leaving_group"
+        )
+        context = site.context_features["contexts"][0]
+        assert context["token"] == "HeteroAr"
+        assert context["subtype"] == expected_subtype
+        assert context["features"]["heteroatom_counts"] == {
+            expected_element: 1
+        }
+
+
+def test_charged_heteroaromatic_nitrogen_states_are_distinct_contexts() -> None:
+    examples = {
+        "Brc1cccc[n+]1[O-]": "pyridine_n_oxide_like",
+        "Brc1cccc[nH+]1": "pyridinium_like",
+        "Brc1cccc[n+]1C": "pyridinium_like",
+    }
+    for smiles, expected_subtype in examples.items():
+        site = next(
+            candidate
+            for candidate in featurize_molecule(smiles).sites
+            if candidate.site_type == "leaving_group"
+        )
+        context = site.context_features["contexts"][0]
+        assert context["token"] == "HeteroAr"
+        assert context["subtype"] == expected_subtype
+        assert context["features"]["heteroatom_details"][0][
+            "formal_charge"
+        ] == 1
 
 
 def test_alkyl_leaving_groups_preserve_benzylic_allylic_and_propargylic_subtypes() -> None:

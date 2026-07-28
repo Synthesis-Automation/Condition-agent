@@ -30,6 +30,60 @@ def test_functional_group_registry_is_validated() -> None:
     assert validate_taxonomy() == []
 
 
+def test_heteroaromatic_atoms_are_localized_functional_groups() -> None:
+    examples = {
+        "c1ccncc1": "heteroaryl_nitrogen",
+        "c1cc[nH]c1": "pyrrolic_nitrogen",
+        "c1ccoc1": "heteroaryl_oxygen",
+        "c1ccsc1": "heteroaryl_sulfur",
+        "[O-][n+]1ccccc1": "heteroaryl_n_oxide",
+        "c1ccc[nH+]c1": "cationic_heteroaryl_nitrogen",
+        "C[n+]1ccccc1": "cationic_heteroaryl_nitrogen",
+    }
+    for smiles, expected in examples.items():
+        groups = featurize_molecule(smiles).functional_groups
+        matching = [group for group in groups if group.group_id == expected]
+        assert len(matching) == 1
+        assert len(matching[0].atom_indices) == (
+            2 if expected == "heteroaryl_n_oxide" else 1
+        )
+
+    n_oxide_ids = {
+        group.group_id
+        for group in featurize_molecule("[O-][n+]1ccccc1").functional_groups
+    }
+    assert "heteroaryl_nitrogen" not in n_oxide_ids
+
+
+def test_pyridine_nitrogen_is_spectator_but_reactive_ring_is_context() -> None:
+    reaction = (
+        "Brc1ncccc1.OB(O)c1ccccc1"
+        ">>c1ccc(-c2ncccc2)cc1"
+    )
+    result = featurize_reaction(reaction)
+    electrophile = next(
+        partner
+        for partner in result.reaction_signature.partners
+        if partner.role == "electrophile"
+    )
+    spectator_ids = {
+        group.group_id for group in result.spectator_groups
+    }
+
+    assert electrophile.anchor_contexts == ("HeteroAr",)
+    assert "heteroaryl_nitrogen" in spectator_ids
+    assert "aryl_halide" not in spectator_ids
+    pyridine_nitrogen = next(
+        group
+        for group in result.spectator_groups
+        if group.group_id == "heteroaryl_nitrogen"
+    )
+    assert pyridine_nitrogen.graph_distance == 1
+    assert pyridine_nitrogen.unchanged_evidence == (
+        "exact_product_reconstruction_event_exclusion"
+    )
+
+
 def test_functional_group_ownership_suppresses_generic_sulfonamide_amine() -> None:
     result = featurize_molecule("CS(=O)(=O)NC")
     ids = [group.group_id for group in result.functional_groups]
