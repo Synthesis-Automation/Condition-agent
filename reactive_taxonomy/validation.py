@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from .chemistry.smarts_cache import compile_smarts
+from .connectivity_rewrite import load_connectivity_rewrites
 
 
 DEFINITIONS_DIR = Path(__file__).with_name("definitions")
@@ -30,6 +31,7 @@ def validate_taxonomy() -> List[str]:
         return [f"taxonomy_load_failed:{exc}"]
     expected = {
         "contexts.v1",
+        "connectivity_rewrites.v1",
         "descriptor_rules.v1",
         "functional_groups.v1",
         "handles.v1",
@@ -378,6 +380,22 @@ def validate_taxonomy() -> List[str]:
                 errors.append(f"invalid_distinct_component_rule:{grammar_id}")
     if len(grammar_ids) != len(set(grammar_ids)):
         errors.append("duplicate_reaction_grammar_ids")
+    try:
+        connectivity_rewrites = load_connectivity_rewrites()
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        errors.append(f"invalid_connectivity_rewrites:{exc}")
+        connectivity_rewrites = ()
+    rewrite_grammar_ids = {
+        grammar_id
+        for rewrite in connectivity_rewrites
+        for grammar_id in rewrite.grammar_ids
+    }
+    unknown_rewrite_grammars = rewrite_grammar_ids - set(grammar_ids)
+    if unknown_rewrite_grammars:
+        errors.append(
+            "unknown_connectivity_rewrite_grammars:"
+            + ",".join(sorted(unknown_rewrite_grammars))
+        )
     reaction_rendering = payload["reaction_rendering.v1"].get("rules") or {}
     product_precedence = (
         payload["reaction_rendering.v1"].get("product_context_precedence") or []

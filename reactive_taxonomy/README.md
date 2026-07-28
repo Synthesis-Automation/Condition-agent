@@ -86,6 +86,16 @@ dual-written inside edit normalization for evaluation only and does not yet
 participate in `ReactionSignature`, serialized analyses, retrieval, or
 recommendation behavior.
 
+Phase 2 adds a separately versioned, bounded connectivity-rewrite definition
+and generic executor. Suzuki C-C coupling, aryl/alkyl C-N
+release-and-connect, Br2/Si-H alkene addition, and beta elimination now have
+declarative shadow rewrites built only from localized bond-state, schema-H,
+charge, endpoint-permutation, product-seed, and authorized-projection
+instructions. `compare_connectivity_rewrite` proves exact product, edit,
+warning, and ordering parity with the current operators. Existing operators
+remain authoritative, and the new definition version is intentionally excluded
+from public reaction-signature identity during shadow migration.
+
 `pair_addition` combines an unsaturated-bond acceptor with either an existing
 N/O/S–H site or a curated `addition_donor`. The latter represents both explicit
 A–B bonds such as Br–Br and implicit A–H bonds such as Si–H and B–H. The

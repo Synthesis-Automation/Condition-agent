@@ -4,9 +4,11 @@
 
 This document defines the target connectivity-first architecture. Phase 1, the
 evidence-scoped connectivity observation and internal shadow graph, was
-implemented on 2026-07-28. The generic rewrite executor and later grammar
-migration phases remain proposed. Phase 1 does not change current public
-reaction serialization, signature identity, or recommendation behavior.
+implemented on 2026-07-28. Phase 2, the bounded declarative rewrite compiler,
+generic executor, and pilot shadow-parity layer, was implemented on the same
+date. Normalized site interfaces and later grammar migration phases remain
+proposed. Neither phase changes current public reaction serialization,
+signature identity, or recommendation behavior.
 
 The proposal extends the graph-first principles in
 `type_agnostic_reaction_recommendation_implementation.md`. The molecular graph
@@ -1330,10 +1332,19 @@ No arbitrary Python callable may be named or imported from a JSON definition.
 
 ### Phase 2: generic executor
 
-- Add `apply_connectivity_rewrite`.
-- Compile an existing addition grammar to a declarative delta program.
-- Compile an existing C–C coupling grammar to the same executor.
-- Compare predicted products and edits with current operators.
+Implemented on 2026-07-28:
+
+- added `apply_connectivity_rewrite`;
+- compiled Br2 and R3SiH alkene addition to one declarative
+  split-and-distribute rewrite;
+- compiled Suzuki C-C and C-N release-and-connect rewrites;
+- compiled beta elimination as depart-and-unsaturate;
+- added exact product, edit, warning, ambiguity-order, and outcome-order shadow
+  comparison with current operators; and
+- kept current operators authoritative pending later migration gates.
+
+See
+[`connectivity_first_reaction_grammar_phase2_implementation.md`](connectivity_first_reaction_grammar_phase2_implementation.md).
 
 ### Phase 3: normalized site interfaces
 

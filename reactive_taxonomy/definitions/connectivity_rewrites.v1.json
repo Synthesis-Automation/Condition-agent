@@ -1,0 +1,341 @@
+{
+  "schema_version": "1.0",
+  "instruction_set_version": "1.0",
+  "rewrites": [
+    {
+      "id": "suzuki_release_and_connect",
+      "template": "release_and_connect",
+      "grammar_ids": [
+        "boron_transfer_coupling"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "instructions": [
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "electrophile.anchor",
+                "electrophile.handle"
+              ],
+              "before": "SINGLE",
+              "after": "NONE"
+            },
+            {
+              "op": "declare_projection_discardable_attachment",
+              "retained": "electrophile.anchor",
+              "discarded": "electrophile.handle"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "transfer_partner.anchor",
+                "transfer_partner.center"
+              ],
+              "before": "SINGLE",
+              "after": "NONE"
+            },
+            {
+              "op": "declare_projection_discardable_attachment",
+              "retained": "transfer_partner.anchor",
+              "discarded": "transfer_partner.center"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "electrophile.anchor",
+                "transfer_partner.anchor"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "electrophile.anchor"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "transfer_partner.anchor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c_n_release_and_connect",
+      "template": "release_and_connect",
+      "grammar_ids": [
+        "sp2_c_n_substitution",
+        "sp3_c_n_substitution"
+      ],
+      "variants": [
+        {
+          "id": "neutral_xh",
+          "outcome_id": "default",
+          "when": [
+            {
+              "role": "nucleophile",
+              "detail": "h_count",
+              "operator": "gte",
+              "value": 1
+            }
+          ],
+          "instructions": [
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "electrophile.anchor",
+                "electrophile.handle"
+              ],
+              "before": "SINGLE",
+              "after": "NONE"
+            },
+            {
+              "op": "declare_projection_discardable_attachment",
+              "retained": "electrophile.anchor",
+              "discarded": "electrophile.handle"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "electrophile.anchor",
+                "nucleophile.center"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "nucleophile.center",
+              "delta": -1
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "electrophile.anchor"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "nucleophile.center"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "alkene_split_and_distribute",
+      "template": "split_and_distribute",
+      "grammar_ids": [
+        "addend_pair_addition_to_alkene"
+      ],
+      "variants": [
+        {
+          "id": "explicit_link",
+          "when": [
+            {
+              "role": "donor",
+              "detail": "source_kind",
+              "operator": "eq",
+              "value": "explicit_bond"
+            }
+          ],
+          "instructions": [
+            {
+              "op": "enumerate_endpoint_permutation",
+              "cases": [
+                {
+                  "outcome_id": "endpoint_a_addend_a__endpoint_b_addend_b",
+                  "bindings": {
+                    "acceptor_left": "acceptor.endpoint_a",
+                    "acceptor_right": "acceptor.endpoint_b"
+                  }
+                },
+                {
+                  "outcome_id": "endpoint_b_addend_a__endpoint_a_addend_b",
+                  "bindings": {
+                    "acceptor_left": "acceptor.endpoint_b",
+                    "acceptor_right": "acceptor.endpoint_a"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "acceptor.endpoint_a",
+                "acceptor.endpoint_b"
+              ],
+              "before": "DOUBLE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "donor.addend_a",
+                "donor.addend_b"
+              ],
+              "before": "SINGLE",
+              "after": "NONE"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "$acceptor_left",
+                "donor.addend_a"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "$acceptor_right",
+                "donor.addend_b"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "acceptor.endpoint_a"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "acceptor.endpoint_b"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "donor.addend_a"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "donor.addend_b"
+            }
+          ]
+        },
+        {
+          "id": "implicit_hydrogen_link",
+          "when": [
+            {
+              "role": "donor",
+              "detail": "source_kind",
+              "operator": "eq",
+              "value": "implicit_hydrogen"
+            }
+          ],
+          "instructions": [
+            {
+              "op": "enumerate_endpoint_permutation",
+              "cases": [
+                {
+                  "outcome_id": "endpoint_a_addend_a__endpoint_b_addend_b",
+                  "bindings": {
+                    "acceptor_left": "acceptor.endpoint_a",
+                    "acceptor_right": "acceptor.endpoint_b"
+                  }
+                },
+                {
+                  "outcome_id": "endpoint_b_addend_a__endpoint_a_addend_b",
+                  "bindings": {
+                    "acceptor_left": "acceptor.endpoint_b",
+                    "acceptor_right": "acceptor.endpoint_a"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "acceptor.endpoint_a",
+                "acceptor.endpoint_b"
+              ],
+              "before": "DOUBLE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "$acceptor_left",
+                "donor.addend_a"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "donor.hydrogen_carrier",
+              "delta": -1
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "$acceptor_right",
+              "delta": 1
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "acceptor.endpoint_a"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "acceptor.endpoint_b"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "donor.addend_a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beta_depart_and_unsaturate",
+      "template": "depart_and_unsaturate",
+      "grammar_ids": [
+        "beta_halo_elimination"
+      ],
+      "variants": [
+        {
+          "id": "vicinal_pair",
+          "outcome_id": "vicinal_pair",
+          "instructions": [
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "substrate.endpoint_a",
+                "substrate.departing_a"
+              ],
+              "before": "SINGLE",
+              "after": "NONE"
+            },
+            {
+              "op": "declare_projection_discardable_attachment",
+              "retained": "substrate.endpoint_a",
+              "discarded": "substrate.departing_a"
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "substrate.hydrogen_carrier_b",
+              "delta": -1
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "substrate.endpoint_a",
+                "substrate.endpoint_b"
+              ],
+              "before": "SINGLE",
+              "after": "DOUBLE"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "substrate.endpoint_a"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "substrate.endpoint_b"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

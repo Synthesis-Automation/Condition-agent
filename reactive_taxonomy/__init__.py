@@ -3,6 +3,16 @@
 from .api import detect_sites, featurize_molecule
 from .reaction_api import featurize_reaction
 from .reaction_signatures import reaction_signature_definition_versions
+from .connectivity_rewrite import (
+    apply_connectivity_rewrite,
+    compile_connectivity_rewrite_definitions,
+    connectivity_rewrite_for_grammar,
+    load_connectivity_rewrites,
+)
+from .connectivity_rewrite_parity import (
+    ConnectivityRewriteParity,
+    compare_connectivity_rewrite,
+)
 from .reaction_models import (
     AtomStateTransition,
     BondState,
@@ -92,6 +102,7 @@ __all__ = [
     "CompoundAnalysis",
     "ConnectivityEditGraph",
     "ConnectivityObservationScope",
+    "ConnectivityRewriteParity",
     "ContextClassification",
     "ContextualTransformationLabel",
     "EditArchetype",
@@ -128,8 +139,12 @@ __all__ = [
     "SiteType",
     "SourceLabelMapping",
     "available_styles",
+    "apply_connectivity_rewrite",
     "build_contextual_transformation_label",
     "build_reaction_display_label",
+    "compare_connectivity_rewrite",
+    "compile_connectivity_rewrite_definitions",
+    "connectivity_rewrite_for_grammar",
     "detect_functional_groups",
     "detect_sites",
     "evaluate_molecular_features",
@@ -143,6 +158,7 @@ __all__ = [
     "load_reaction_label_patterns",
     "load_reaction_label_rendering",
     "load_contextual_source_label_mappings",
+    "load_connectivity_rewrites",
     "load_source_label_mappings",
     "match_reaction_label_pattern",
     "reaction_signature_definition_versions",
