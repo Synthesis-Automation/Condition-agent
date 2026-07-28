@@ -25,7 +25,7 @@ from .reaction_graph_editing import (
 )
 from .reaction_models import (
     BondChange,
-    OperatorOutcome,
+    RewriteOutcome,
     ReactionComponent,
     ReactionSiteReference,
 )
@@ -36,10 +36,10 @@ from .reaction_site_interfaces import (
 )
 
 
-CONNECTIVITY_REWRITE_SCHEMA_VERSION = "1.2"
+CONNECTIVITY_REWRITE_SCHEMA_VERSION = "2.0"
 CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION = "1.1"
 
-_PATH = Path(__file__).with_name("definitions") / "connectivity_rewrites.v1.json"
+_PATH = Path(__file__).with_name("definitions") / "connectivity_rewrites.v2.json"
 _LEGACY_SELECTOR = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
 _NORMALIZED_SELECTOR = re.compile(
     r"^[a-z][a-z0-9_]*\."
@@ -113,7 +113,6 @@ class CompiledConnectivityRewrite:
     grammar_role_bindings: Mapping[str, Mapping[str, str]] = (
         MappingProxyType({})
     )
-    authoritative_grammar_ids: Tuple[str, ...] = ()
     schema_version: str = CONNECTIVITY_REWRITE_SCHEMA_VERSION
     instruction_set_version: str = CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION
     site_interface_schema_version: str = SITE_INTERFACE_SCHEMA_VERSION
@@ -336,18 +335,6 @@ def compile_connectivity_rewrite_definitions(
         ):
             raise ValueError(f"Invalid connectivity rewrite grammar ids: {rewrite_id}")
         seen_grammar_ids.update(grammar_ids)
-        authoritative_grammar_ids = tuple(
-            str(value)
-            for value in raw.get("authoritative_grammar_ids") or ()
-        )
-        if (
-            len(authoritative_grammar_ids)
-            != len(set(authoritative_grammar_ids))
-            or not set(authoritative_grammar_ids) <= set(grammar_ids)
-        ):
-            raise ValueError(
-                f"Invalid connectivity rewrite authority: {rewrite_id}"
-            )
         raw_role_bindings = raw.get("role_bindings") or {}
         if not isinstance(raw_role_bindings, dict) or (
             set(raw_role_bindings) - set(grammar_ids)
@@ -391,7 +378,6 @@ def compile_connectivity_rewrite_definitions(
                 grammar_ids=grammar_ids,
                 variants=variants,
                 grammar_role_bindings=MappingProxyType(role_bindings),
-                authoritative_grammar_ids=authoritative_grammar_ids,
             )
         )
     return tuple(sorted(rewrites, key=lambda item: item.rewrite_id))
@@ -416,15 +402,6 @@ def connectivity_rewrite_for_grammar(
             if grammar_id in rewrite.grammar_ids
         ),
         None,
-    )
-
-
-def connectivity_rewrite_is_authoritative(grammar_id: str) -> bool:
-    """Return whether a parity-gated rewrite owns production reconstruction."""
-    rewrite = connectivity_rewrite_for_grammar(grammar_id)
-    return bool(
-        rewrite is not None
-        and grammar_id in rewrite.authoritative_grammar_ids
     )
 
 
@@ -636,7 +613,7 @@ def _bond_change(
         resolved[1][1],
         old_order,
         new_order,
-        "grammar_operator",
+        "connectivity_rewrite",
     )
 
 
@@ -671,7 +648,7 @@ def _execute_variant_case(
     normalized_assignment: Mapping[str, NormalizedSiteInterfaces],
     components: Sequence[ReactionComponent],
     label_roles: Mapping[str, str],
-) -> OperatorOutcome | None:
+) -> RewriteOutcome | None:
     from rdkit import Chem
 
     combined_result = _combined_assignment(assignment, components)
@@ -733,7 +710,7 @@ def _execute_variant_case(
                     None,
                     "SINGLE" if delta < 0 else None,
                     "SINGLE" if delta > 0 else None,
-                    "grammar_operator",
+                    "connectivity_rewrite",
                 )
             )
         elif operation == "change_observed_formal_charge":
@@ -786,8 +763,8 @@ def _execute_variant_case(
                 return None
             projection_pairs.append((retained[0], discarded[0]))
 
-    def failed_outcome() -> OperatorOutcome:
-        return OperatorOutcome(
+    def failed_outcome() -> RewriteOutcome:
+        return RewriteOutcome(
             outcome_id=outcome_id,
             predicted_product_smiles=None,
             predicted_bond_changes=tuple(changes),
@@ -890,7 +867,7 @@ def _execute_variant_case(
     if any(not set(fragment).intersection(shifted_seeds) for fragment in retained_fragments):
         return failed_outcome()
     smiles = Chem.MolToSmiles(product, canonical=True, isomericSmiles=True)
-    return OperatorOutcome(
+    return RewriteOutcome(
         outcome_id=outcome_id,
         predicted_product_smiles=smiles,
         predicted_bond_changes=tuple(changes),
@@ -901,7 +878,7 @@ def apply_connectivity_rewrite(
     grammar: Mapping[str, Any] | str,
     assignment: Mapping[str, ReactionSiteReference],
     components: Sequence[ReactionComponent],
-) -> Tuple[OperatorOutcome, ...]:
+) -> Tuple[RewriteOutcome, ...]:
     """Execute a registered connectivity rewrite for one grammar assignment.
 
     Unsupported grammars and chemistry-invalid cases return no outcomes. This
@@ -966,6 +943,5 @@ __all__ = [
     "apply_connectivity_rewrite",
     "compile_connectivity_rewrite_definitions",
     "connectivity_rewrite_for_grammar",
-    "connectivity_rewrite_is_authoritative",
     "load_connectivity_rewrites",
 ]

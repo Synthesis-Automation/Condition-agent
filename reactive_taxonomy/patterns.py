@@ -10,8 +10,8 @@ from typing import Any, Dict, Iterable, List, Set, Tuple
 from .chemistry.smarts_cache import compile_smarts
 
 
-_HANDLES_PATH = Path(__file__).with_name("definitions") / "handles.v1.json"
-_CONTEXTS_PATH = Path(__file__).with_name("definitions") / "contexts.v1.json"
+_HANDLES_PATH = Path(__file__).with_name("definitions") / "site_patterns.v2.json"
+_CONTEXTS_PATH = Path(__file__).with_name("definitions") / "context_facets.v2.json"
 
 
 @lru_cache(maxsize=1)

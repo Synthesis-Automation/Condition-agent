@@ -68,12 +68,12 @@ attachment site, removes Ar–X, forms Ar–C, and records alkene C–H loss. It
 not invent E/Z stereochemistry: a stereospecified product is exact only when
   that stereochemistry is supported by the input/operator result.
 
-The grammar registry now declares one net `edit_archetype` for every grammar.
-`substitution`, `addition`, and `elimination` describe observed graph topology,
-not mechanism. The common operator registry uses `center_replacement`,
-`pair_addition`, and `pair_elimination`. Mapped reactions receive the same
-edit-derived archetype even when no grammar or named family is available, and a
-grammar/edit contradiction is retained as review evidence.
+The v2 grammar registry declares compatible molecular roles, not executable
+operators or reaction archetypes. Every grammar selects one bounded
+connectivity rewrite. `substitution`, `addition`, and `elimination` are derived
+from the emitted or observed bond/H changes and describe graph topology, not
+mechanism. Mapped reactions receive the same edit-derived archetype even when
+no grammar or named family is available.
 
 The internal Phase 1 connectivity observation preserves stronger evidence than
 the compatibility edit view. `BondTransition` distinguishes definite
@@ -86,20 +86,18 @@ dual-written inside edit normalization for evaluation only and does not yet
 participate in `ReactionSignature`, serialized analyses, retrieval, or
 recommendation behavior.
 
-Phase 2 adds a separately versioned, bounded connectivity-rewrite definition
-and generic executor. Suzuki C-C coupling, aryl/alkyl C-N
-release-and-connect, Br2/Si-H alkene addition, and beta elimination now have
-declarative shadow rewrites built only from localized bond-state, schema-H,
-charge, endpoint-permutation, product-seed, and authorized-projection
-instructions. `compare_connectivity_rewrite` proves exact product, edit,
-warning, and ordering parity with the current operators. Existing operators
-remain authoritative, and the new definition version is intentionally excluded
-from public reaction-signature identity during shadow migration.
+V2 uses one separately versioned, bounded connectivity-rewrite definition and
+generic executor for all grammars. Suzuki C-C coupling, C-N/O/S
+release-and-connect, Br2/ICl/Si-H/Si-B addition, beta elimination, and simple
+bond-order changes use localized bond-state, schema-H, charge,
+endpoint-permutation, product-seed, and authorized-projection instructions.
+There is no shadow executor or legacy fallback.
 
-Phase 3 adds immutable `ReactiveLinkSite`, `BondCapacitySite`, and
-`ConnectionEndpointSite` adapter views. Existing leaving-group,
-transfer-group, X-H, aromatic C-H, addition-donor, and unsaturated-bond
-detectors retain their current public results and labels. The adapters expose
+Molecular featurization emits immutable `ReactiveLinkSite`,
+`BondCapacitySite`, and `ConnectionEndpointSite` records in
+`connectivity_sites`. Existing leaving-group, transfer-group, X-H, aromatic
+C-H, addition-donor, and unsaturated-bond detectors remain annotation
+provenance. Declarative adapters expose
 real or virtual endpoints, carrier provenance, bounded bond capacity,
 connection requirements, context, availability, and component-qualified IDs.
 The shadow rewrite DSL now consumes these normalized interfaces, allowing

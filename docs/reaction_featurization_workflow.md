@@ -58,7 +58,7 @@ stage.
 Each component passes through
 [`featurize_molecule()`](../reactive_taxonomy/api.py).
 
-For each molecular graph, the system detects:
+For each molecular graph, the system detects and emits:
 
 - functional groups;
 - reactive sites and handles;
@@ -67,6 +67,7 @@ For each molecular graph, the system detects:
 - aromatic, alkyl, carbonyl, heteroatom, and other local contexts;
 - local steric and electronic environments;
 - chemist-readable site labels.
+- canonical reactive links, bond capacities, and connection endpoints.
 
 For example, the molecular observations for an aryl bromide and a boronic acid
 may include:
@@ -88,8 +89,8 @@ These are molecular observations, not yet a reaction-family assignment.
 ## 3. Enumerate reaction candidates
 
 [`enumerate_reaction_candidates()`](../reactive_taxonomy/reaction_candidates.py)
-compares the detected sites with the declarative grammars in
-[`reaction_grammars.v1.json`](../reactive_taxonomy/definitions/reaction_grammars.v1.json).
+compares canonical connectivity sites with the declarative grammars in
+[`reaction_grammars.v2.json`](../reactive_taxonomy/definitions/reaction_grammars.v2.json).
 
 Each grammar specifies:
 
@@ -98,8 +99,6 @@ Each grammar specifies:
 - allowed handle and context combinations;
 - same-component or different-component relationships;
 - transformation class;
-- graph operator;
-- net edit archetype (`substitution`, `addition`, or `elimination`);
 - optional compatible named families.
 
 For an aryl bromide and aryl boronic acid, a candidate may contain:
@@ -116,12 +115,12 @@ compatible_named_families:
 
 At this stage the candidate is only structurally plausible.
 
-## 4. Apply the graph operator and verify the product
+## 4. Apply the connectivity rewrite and verify the product
 
 Each candidate is passed to
-[`apply_operator()`](../reactive_taxonomy/reaction_operators.py).
+[`apply_connectivity_rewrite()`](../reactive_taxonomy/connectivity_rewrite.py).
 
-The operator:
+The bounded rewrite:
 
 - removes or changes required bonds;
 - forms new bonds;
@@ -129,11 +128,12 @@ The operator:
 - produces a predicted product;
 - returns predicted bond edits.
 
-The common operator registry contains `center_replacement`, `pair_addition`,
-and `pair_elimination`. Pair addition accepts explicit A–B donors and implicit
-A–H donors through one normalized contract and may return multiple
-constitutional outcomes. Product reconstruction selects a unique orientation;
-reactants alone do not force regio- or stereochemistry.
+The rewrite registry uses four reusable shapes: release-and-connect,
+split-and-distribute, depart-and-unsaturate, and localized bond-state change.
+Split-and-distribute accepts explicit A–B donors and implicit A–H donors
+through one normalized contract and may return multiple constitutional
+outcomes. Product reconstruction selects a unique orientation; reactants alone
+do not force regio- or stereochemistry.
 
 The predicted product is canonicalized without atom maps and compared with the
 observed product. Candidate verification becomes one of:
@@ -146,7 +146,7 @@ A candidate is selected only when the structural evidence is sufficiently
 unique. Symmetry-equivalent candidates can collapse to one interpretation;
 chemically different exact candidates remain ambiguous.
 
-Multiple operators may also be composed for multi-event reactions.
+Multiple rewrites may also be composed for multi-event reactions.
 
 ## 5. Extract and reconcile observed reaction edits
 
@@ -156,8 +156,8 @@ establishes the actual transformation evidence.
 The effective evidence priority is:
 
 1. Valid supplied atom mapping.
-2. Exact single-event operator reconstruction.
-3. Exact multi-event operator reconstruction.
+2. Exact single-event rewrite reconstruction.
+3. Exact multi-event rewrite reconstruction.
 4. Conservative unique-scaffold correspondence.
 5. Bounded global multi-reactant correspondence.
 6. Unresolved or ambiguous evidence.

@@ -1,13 +1,16 @@
 """Normalized, mechanism-neutral reactive-site interfaces.
 
-Existing detectors retain their chemistry-specific site types and labels.
-These adapters provide the smaller connectivity contracts consumed by generic
-reaction rewrites without changing molecule or reaction serialization.
+Existing detectors retain chemistry-specific annotations and labels. Versioned
+declarative adapters convert them into the smaller connectivity contracts
+consumed by generic reaction rewrites.
 """
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+import json
+from dataclasses import asdict, dataclass, replace
+from functools import lru_cache
+from pathlib import Path
 from typing import Any, Dict, Literal, Mapping, Sequence, Tuple, cast
 
 from .chemistry.rdkit_utils import parse_smiles
@@ -18,7 +21,10 @@ from .reaction_models import (
 )
 
 
-SITE_INTERFACE_SCHEMA_VERSION = "1.0"
+SITE_INTERFACE_SCHEMA_VERSION = "2.0"
+_INTERFACE_DEFINITIONS = (
+    Path(__file__).with_name("definitions") / "site_interfaces.v2.json"
+)
 
 EndpointKind = Literal["atom", "virtual_hydrogen"]
 LinkSourceKind = Literal["explicit_bond", "implicit_hydrogen"]
@@ -29,6 +35,34 @@ EndpointSymmetry = Literal[
 ]
 
 _BOND_ORDERS = {"SINGLE", "DOUBLE", "TRIPLE"}
+
+
+@lru_cache(maxsize=1)
+def _interface_adapters() -> Tuple[Dict[str, Any], ...]:
+    with _INTERFACE_DEFINITIONS.open("r", encoding="utf-8-sig") as handle:
+        payload = json.load(handle)
+    if payload.get("schema_version") != SITE_INTERFACE_SCHEMA_VERSION:
+        raise ValueError("Site-interface definition schema does not match runtime")
+    return tuple(dict(record) for record in payload.get("adapters") or ())
+
+
+def _matching_adapters(
+    site: ReactionSiteReference,
+    emitted_interface: str,
+) -> Tuple[Dict[str, Any], ...]:
+    matches = []
+    for adapter in _interface_adapters():
+        if adapter.get("annotation_type") != site.site_type:
+            continue
+        if emitted_interface not in (adapter.get("emits") or ()):
+            continue
+        if not set(adapter.get("requires_roles") or ()) <= set(site.atom_roles):
+            continue
+        required_details = adapter.get("when_details") or {}
+        if any(site.details.get(key) != value for key, value in required_details.items()):
+            continue
+        matches.append(adapter)
+    return tuple(matches)
 
 
 @dataclass(frozen=True)
@@ -367,66 +401,39 @@ def _link_from_site(
     site: ReactionSiteReference,
     molecule: Any,
 ) -> ReactiveLinkSite | None:
-    endpoint_a_index: int | None = None
+    adapters = _matching_adapters(site, "reactive_link")
+    if len(adapters) != 1:
+        return None
+    adapter = adapters[0]
+    endpoint_a_role = str(adapter.get("endpoint_a_role") or "")
+    endpoint_b_role = str(
+        adapter.get("endpoint_b_label_role")
+        or adapter.get("endpoint_b_role")
+        or endpoint_a_role
+    )
+    endpoint_a_index = _single_role(site, endpoint_a_role)
     endpoint_b_index: int | None = None
-    endpoint_a_role = ""
-    endpoint_b_role = ""
-    source_kind: LinkSourceKind = "explicit_bond"
+    raw_source_kind = str(adapter.get("source_kind") or "")
+    if raw_source_kind not in {"explicit_bond", "implicit_hydrogen"}:
+        return None
+    source_kind = cast(LinkSourceKind, raw_source_kind)
     available_units = 1
 
-    if site.site_type == "leaving_group":
-        endpoint_a_role = "anchor"
-        endpoint_a_index = _single_role(site, endpoint_a_role)
-        if endpoint_a_index is not None:
-            bonded = _bonded_endpoint(
-                molecule,
-                site,
-                anchor_index=endpoint_a_index,
-                candidate_roles=("connector", "handle", "center"),
-            )
-            if bonded is not None:
-                endpoint_b_index, _ = bonded
-                # Keep the detector's compatibility role even when a
-                # multi-atom handle uses a bonded connector internally.
-                endpoint_b_role = "handle"
-    elif site.site_type == "transfer_group":
-        endpoint_a_role, endpoint_b_role = "anchor", "center"
-        endpoint_a_index = _single_role(site, endpoint_a_role)
-        endpoint_b_index = _single_role(site, endpoint_b_role)
-    elif site.site_type in {"pronucleophile_XH", "aromatic_CH"}:
-        endpoint_a_role = "center"
-        endpoint_a_index = _single_role(site, endpoint_a_role)
-        if endpoint_a_index is not None:
-            source_kind = "implicit_hydrogen"
-            available_units = int(site.details.get("h_count") or 0)
-    elif site.site_type == "addition_donor":
-        endpoint_a_role = "addend_a"
-        endpoint_a_index = _single_role(site, endpoint_a_role)
-        raw_source_kind = str(site.details.get("source_kind") or "")
-        if raw_source_kind not in {"explicit_bond", "implicit_hydrogen"}:
-            return None
-        source_kind = cast(LinkSourceKind, raw_source_kind)
-        if source_kind == "explicit_bond":
-            endpoint_b_role = "addend_b"
-            endpoint_b_index = _single_role(site, endpoint_b_role)
-        elif source_kind == "implicit_hydrogen":
-            endpoint_b_role = "hydrogen_carrier"
-            available_units = int(site.details.get("hydrogen_count") or 0)
-        else:
-            return None
-    elif site.site_type == "electrophilic_center":
-        endpoint_a_role, endpoint_b_role = (
-            "center",
-            "leaving_or_activatable",
+    bonded_roles = tuple(adapter.get("endpoint_b_bonded_role_candidates") or ())
+    if bonded_roles and endpoint_a_index is not None:
+        bonded = _bonded_endpoint(
+            molecule,
+            site,
+            anchor_index=endpoint_a_index,
+            candidate_roles=bonded_roles,
         )
-        endpoint_a_index = _single_role(site, endpoint_a_role)
-        endpoint_b_index = _single_role(site, endpoint_b_role)
-    elif site.site_type == "eliminable_pair":
-        endpoint_a_role, endpoint_b_role = "endpoint_a", "departing_a"
-        endpoint_a_index = _single_role(site, endpoint_a_role)
-        endpoint_b_index = _single_role(site, endpoint_b_role)
-    else:
-        return None
+        endpoint_b_index = bonded[0] if bonded is not None else None
+    elif adapter.get("endpoint_b_role"):
+        endpoint_b_index = _single_role(site, str(adapter["endpoint_b_role"]))
+    if adapter.get("available_units_detail"):
+        available_units = int(
+            site.details.get(str(adapter["available_units_detail"])) or 0
+        )
 
     if endpoint_a_index is None:
         return None
@@ -499,33 +506,22 @@ def _capacity_from_site(
     site: ReactionSiteReference,
     molecule: Any,
 ) -> BondCapacitySite | None:
-    if site.site_type == "unsaturated_bond":
-        endpoint_a_role, endpoint_b_role = "endpoint_a", "endpoint_b"
-        bond_class = {
-            "Alkene": "carbon_carbon_pi",
-            "Alkyne": "carbon_carbon_pi",
-            "Nitrile": "carbon_nitrogen_pi",
-        }.get(
-            str(site.details.get("handle_token") or ""),
-            "localized_multiple_bond",
-        )
-    elif (
-        site.site_type == "electrophilic_center"
-        and "heteroatom" in site.atom_roles
-    ):
-        endpoint_a_role, endpoint_b_role = "center", "heteroatom"
-        bond_class = "polarized_multiple_bond"
-    elif (
-        site.site_type == "pronucleophile_XH"
-        and site.details.get("derived_family") == "alcohol"
-    ):
-        endpoint_a_role, endpoint_b_role = "center", "attachment"
-        bond_class = "alcohol_carbon_heteroatom"
-    elif site.site_type == "eliminable_pair":
-        endpoint_a_role, endpoint_b_role = "endpoint_a", "endpoint_b"
-        bond_class = "eliminable_backbone"
-    else:
+    adapters = _matching_adapters(site, "bond_capacity")
+    if len(adapters) != 1:
         return None
+    adapter = adapters[0]
+    endpoint_a_role = str(adapter.get("endpoint_a_role") or "")
+    endpoint_b_role = str(adapter.get("endpoint_b_role") or "")
+    bond_class = str(adapter.get("bond_class") or "")
+    class_rule = adapter.get("bond_class_by_detail") or {}
+    if class_rule:
+        detail_name = str(class_rule.get("detail") or "")
+        bond_class = str(
+            (class_rule.get("values") or {}).get(
+                str(site.details.get(detail_name) or ""),
+                class_rule.get("default") or "localized_bond",
+            )
+        )
     endpoint_a_index = _single_role(site, endpoint_a_role)
     endpoint_b_index = _single_role(site, endpoint_b_role)
     if endpoint_a_index is None or endpoint_b_index is None:
@@ -574,55 +570,36 @@ def _connection_endpoints(
 ) -> Tuple[ConnectionEndpointSite, ...]:
     endpoints = []
     annotations = _annotation_tokens(site)
-    if site.site_type == "nucleophile_anion":
-        center_index = _single_role(site, "center")
-        if center_index is None:
-            return ()
+    for adapter in _matching_adapters(site, "connection_endpoint"):
+        endpoint_role = str(adapter.get("endpoint_role") or "")
+        endpoint_index = _single_role(site, endpoint_role)
+        if endpoint_index is None:
+            continue
         endpoint = _atom_endpoint(
             molecule,
             site,
-            atom_index=center_index,
-            source_atom_role="center",
+            atom_index=endpoint_index,
+            source_atom_role=endpoint_role,
         )
-        return (
+        endpoints.append(
             ConnectionEndpointSite(
-                site_id=_interface_id(site, "connection:center"),
+                site_id=_interface_id(site, f"connection:{endpoint_role}"),
                 source_site_id=site.site_id,
                 source_site_type=site.site_type,
                 source_signature=site.canonical_signature,
                 source_chemist_label=site.chemist_label,
                 endpoint=endpoint,
                 availability=site.availability,
-                required_formal_charge_delta=1,
-                annotation_tokens=annotations,
-            ),
-        )
-    if site.site_type == "eliminable_pair":
-        carrier_index = _single_role(site, "hydrogen_carrier_b")
-        if carrier_index is None:
-            return ()
-        endpoint = _atom_endpoint(
-            molecule,
-            site,
-            atom_index=carrier_index,
-            source_atom_role="hydrogen_carrier_b",
-        )
-        return (
-            ConnectionEndpointSite(
-                site_id=_interface_id(
-                    site, "connection:hydrogen_carrier_b"
+                required_hydrogen_delta=int(
+                    adapter.get("required_hydrogen_delta") or 0
                 ),
-                source_site_id=site.site_id,
-                source_site_type=site.site_type,
-                source_signature=site.canonical_signature,
-                source_chemist_label=site.chemist_label,
-                endpoint=endpoint,
-                availability=site.availability,
-                required_hydrogen_delta=-1,
+                required_formal_charge_delta=int(
+                    adapter.get("required_formal_charge_delta") or 0
+                ),
                 annotation_tokens=annotations,
-            ),
+            )
         )
-    if link is not None:
+    if link is not None and _matching_adapters(site, "connection_endpoints"):
         for endpoint in (link.endpoint_a, link.endpoint_b):
             if endpoint.endpoint_kind != "atom":
                 continue
@@ -653,7 +630,11 @@ def _connection_endpoints(
                     annotation_tokens=annotations,
                 )
             )
-    if capacity is not None and link is None:
+    if (
+        capacity is not None
+        and link is None
+        and _matching_adapters(site, "connection_endpoints")
+    ):
         for endpoint in (capacity.endpoint_a, capacity.endpoint_b):
             endpoints.append(
                 ConnectionEndpointSite(
@@ -776,10 +757,124 @@ def normalize_reaction_assignment(
     } - set(by_index)
     if missing_components:
         raise ValueError("Reaction assignment has missing component provenance")
-    return {
-        role: normalize_reaction_site(site, by_index[site.component_index])
-        for role, site in assignment.items()
-    }
+    normalized: Dict[str, NormalizedSiteInterfaces] = {}
+    for role, site in assignment.items():
+        component = by_index[site.component_index]
+        source_site = next(
+            (
+                candidate
+                for candidate in component.compound_analysis.sites
+                if candidate.site_id == site.site_id
+            ),
+            None,
+        )
+        if source_site is None:
+            raise ValueError("Reaction site is absent from molecular observations")
+        observed_roles = {
+            str(name): tuple(int(index) for index in indices)
+            for name, indices in (
+                source_site.details.get("atom_roles") or {}
+            ).items()
+        }
+        if (
+            observed_roles != site.atom_roles
+            or source_site.site_type != site.site_type
+            or source_site.canonical_signature != site.canonical_signature
+        ):
+            raise ValueError("Reaction site contradicts molecular observations")
+        direct = next(
+            (
+                candidate
+                for candidate in component.compound_analysis.connectivity_sites
+                if candidate.source_site_id == site.site_id
+            ),
+            None,
+        )
+        normalized[role] = (
+            _rebase_component(direct, site.component_index)
+            if direct is not None
+            else normalize_reaction_site(site, component)
+        )
+    return normalized
+
+
+def _rebase_component(
+    view: NormalizedSiteInterfaces,
+    component_index: int,
+) -> NormalizedSiteInterfaces:
+    """Place a molecule-local site into its reaction-side component scope."""
+    source_index = next(
+        (
+            endpoint.component_index
+            for item in (
+                *view.reactive_links,
+                *view.bond_capacities,
+                *view.connection_endpoints,
+            )
+            for endpoint in (
+                (item.endpoint,)
+                if isinstance(item, ConnectionEndpointSite)
+                else (item.endpoint_a, item.endpoint_b)
+            )
+        ),
+        component_index,
+    )
+    if source_index == component_index:
+        return view
+
+    source_token = f"component{source_index}:"
+    target_token = f"component{component_index}:"
+
+    def rebased_id(value: str | None) -> str | None:
+        return (
+            value.replace(source_token, target_token, 1)
+            if value is not None
+            else None
+        )
+
+    def endpoint(value: ConnectivityEndpoint) -> ConnectivityEndpoint:
+        return replace(
+            value,
+            endpoint_id=str(rebased_id(value.endpoint_id)),
+            component_index=component_index,
+        )
+
+    links = tuple(
+        replace(
+            item,
+            site_id=str(rebased_id(item.site_id)),
+            endpoint_a=endpoint(item.endpoint_a),
+            endpoint_b=endpoint(item.endpoint_b),
+        )
+        for item in view.reactive_links
+    )
+    capacities = tuple(
+        replace(
+            item,
+            site_id=str(rebased_id(item.site_id)),
+            endpoint_a=endpoint(item.endpoint_a),
+            endpoint_b=endpoint(item.endpoint_b),
+        )
+        for item in view.bond_capacities
+    )
+    connections = tuple(
+        replace(
+            item,
+            site_id=str(rebased_id(item.site_id)),
+            endpoint=endpoint(item.endpoint),
+            required_link_release_id=rebased_id(item.required_link_release_id),
+            required_bond_capacity_id=rebased_id(
+                item.required_bond_capacity_id
+            ),
+        )
+        for item in view.connection_endpoints
+    )
+    return replace(
+        view,
+        reactive_links=links,
+        bond_capacities=capacities,
+        connection_endpoints=connections,
+    )
 
 
 __all__ = [

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "precedence": [
     "SO2R",
     "P(O)R2",
@@ -27,7 +27,10 @@
           2,
           3
         ]
-      }
+      },
+      "facet": "activation",
+      "semantic_id": "sulfonyl",
+      "display_token": "SO2R"
     },
     {
       "id": "P(O)R2",
@@ -36,7 +39,10 @@
       "atom_roles": {
         "context_anchor": 1,
         "oxo": 2
-      }
+      },
+      "facet": "activation",
+      "semantic_id": "phosphoryl",
+      "display_token": "P(O)R2"
     },
     {
       "id": "C(O)NR",
@@ -46,7 +52,10 @@
         "context_anchor": 1,
         "oxo": 2,
         "substituent": 3
-      }
+      },
+      "facet": "activation",
+      "semantic_id": "amide_carbonyl",
+      "display_token": "C(O)NR"
     },
     {
       "id": "C(O)OR",
@@ -56,7 +65,10 @@
         "context_anchor": 1,
         "oxo": 2,
         "substituent": 3
-      }
+      },
+      "facet": "activation",
+      "semantic_id": "ester_carbonyl",
+      "display_token": "C(O)OR"
     },
     {
       "id": "C(O)R",
@@ -65,7 +77,10 @@
       "atom_roles": {
         "context_anchor": 1,
         "oxo": 2
-      }
+      },
+      "facet": "activation",
+      "semantic_id": "carbonyl",
+      "display_token": "C(O)R"
     },
     {
       "id": "HeteroAr",
@@ -73,7 +88,10 @@
       "constraints": {
         "anchor_element": "C",
         "ring_contains_heteroatom": true
-      }
+      },
+      "facet": "scaffold",
+      "semantic_id": "heteroaromatic",
+      "display_token": "HeteroAr"
     },
     {
       "id": "Ar",
@@ -81,7 +99,10 @@
       "constraints": {
         "anchor_element": "C",
         "ring_contains_heteroatom": false
-      }
+      },
+      "facet": "scaffold",
+      "semantic_id": "carbocyclic_aromatic",
+      "display_token": "Ar"
     },
     {
       "id": "Alkenyl",
@@ -90,7 +111,10 @@
         "anchor_element": "C",
         "aromatic": false,
         "hybridization": "SP2"
-      }
+      },
+      "facet": "scaffold",
+      "semantic_id": "alkenyl",
+      "display_token": "Alkenyl"
     },
     {
       "id": "Alkynyl",
@@ -99,7 +123,10 @@
         "anchor_element": "C",
         "aromatic": false,
         "hybridization": "SP"
-      }
+      },
+      "facet": "scaffold",
+      "semantic_id": "alkynyl",
+      "display_token": "Alkynyl"
     },
     {
       "id": "Alkyl",
@@ -111,32 +138,47 @@
           "SP3",
           "S"
         ]
-      }
+      },
+      "facet": "scaffold",
+      "semantic_id": "alkyl",
+      "display_token": "Alkyl"
     },
     {
       "id": "N",
       "classification_method": "element",
       "constraints": {
         "anchor_element": "N"
-      }
+      },
+      "facet": "element",
+      "semantic_id": "nitrogen",
+      "display_token": "N"
     },
     {
       "id": "O",
       "classification_method": "element",
       "constraints": {
         "anchor_element": "O"
-      }
+      },
+      "facet": "element",
+      "semantic_id": "oxygen",
+      "display_token": "O"
     },
     {
       "id": "S",
       "classification_method": "element",
       "constraints": {
         "anchor_element": "S"
-      }
+      },
+      "facet": "element",
+      "semantic_id": "sulfur",
+      "display_token": "S"
     },
     {
       "id": "Other",
-      "classification_method": "fallback"
+      "classification_method": "fallback",
+      "facet": "fallback",
+      "semantic_id": "other",
+      "display_token": "Other"
     }
   ]
 }

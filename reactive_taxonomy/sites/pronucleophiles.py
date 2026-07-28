@@ -77,6 +77,9 @@ def _activation_contexts(
                 attachment_atom_index=anchor,
                 fragment_atom_indices=fragment,
                 classification_method="mapped_smarts",
+                facet="activation",
+                semantic_id=f"{relationship}_{token}",
+                display_token=f"{relationship}:{token}",
                 subtype=token,
                 matched_pattern=pattern_id,
                 features={
@@ -158,7 +161,11 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 merged_atoms = tuple(sorted({idx for record in context_records for idx in record.fragment_atom_indices}))
                 context_records = [type(context_records[0])(
                     token="HeteroAr", attachment_atom_index=atom.GetIdx(), fragment_atom_indices=merged_atoms,
-                    classification_method="aromatic_ring_system", subtype="aromatic_nh_ring",
+                    classification_method="aromatic_ring_system",
+                    facet="scaffold",
+                    semantic_id="heteroaromatic",
+                    display_token="HeteroAr",
+                    subtype="aromatic_nh_ring",
                     features={"ring_neighbor_count": len(context_records)},
                 )]
         signature = f"XH|{center}|H{h_count}|{','.join(contexts)}"

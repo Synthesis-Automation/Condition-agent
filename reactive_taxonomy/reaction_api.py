@@ -2,27 +2,25 @@
 
 from __future__ import annotations
 
-from typing import List, cast
+from typing import List
 
 from .chemistry.rdkit_utils import parse_smiles
 
 from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
+from .reaction_archetypes import infer_bond_change_archetype
 from .reaction_candidates import enumerate_reaction_candidates
+from .connectivity_rewrite import apply_connectivity_rewrite
 from .reaction_completeness import build_reaction_completeness
 from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_display_labels import build_reaction_display_label
 from .reaction_edits import normalize_mapped_edits, normalize_reaction_edits
 from .reaction_labels import render_reactant_label, render_reaction_label
 from .reaction_environments import build_reaction_family_environment
-from .reaction_models import EditArchetype, ReactionAnalysis, ReactionCandidate
+from .reaction_models import ReactionAnalysis, ReactionCandidate
 from .reaction_multi_events import (
     equivalent_multi_event_interpretations,
     exact_multi_event_reconstructions,
-)
-from .reaction_operators import (
-    apply_operator_sequence,
-    enumerate_operator_outcomes,
 )
 from .reaction_parser import parse_reaction_smiles
 from .partial_product_correspondence import (
@@ -47,11 +45,6 @@ def _canonical_without_maps(smiles: str) -> str | None:
         return Chem.MolToSmiles(mol, canonical=True, isomericSmiles=True)
     except Exception:
         return None
-
-
-def _grammar_archetype(grammar: dict[str, object]) -> EditArchetype:
-    """Return one validation-backed grammar archetype."""
-    return cast(EditArchetype, grammar.get("edit_archetype") or "unresolved")
 
 
 def featurize_reaction(
@@ -91,7 +84,9 @@ def featurize_reaction(
     candidate_sources = []
     exact: List[ReactionCandidate] = []
     for grammar, assignment in raw:
-        outcomes = enumerate_operator_outcomes(grammar, assignment, parsed.reactants)
+        outcomes = apply_connectivity_rewrite(
+            grammar, assignment, parsed.reactants
+        )
         for outcome in outcomes:
             predicted_canonical = (
                 _canonical_without_maps(outcome.predicted_product_smiles)
@@ -110,8 +105,10 @@ def featurize_reaction(
             label = render_reaction_label(grammar, assignment, style=label_style)
             candidate = ReactionCandidate(
                 grammar_id=grammar["id"],
-                operator_outcome_id=outcome.outcome_id,
-                edit_archetype=_grammar_archetype(grammar),
+                rewrite_outcome_id=outcome.outcome_id,
+                edit_archetype=infer_bond_change_archetype(
+                    outcome.predicted_bond_changes
+                ),
                 transformation_class=grammar["transformation_class"],
                 role_assignments=assignment,
                 predicted_bond_changes=outcome.predicted_bond_changes,
@@ -166,32 +163,44 @@ def featurize_reaction(
         )
         if multi_exact and equivalent_multi_event_interpretations(multi_exact):
             chosen = multi_exact[0]
-            composite_product = apply_operator_sequence(chosen, parsed.reactants)
-            selected_events = tuple(
-                ReactionCandidate(
-                    grammar_id=str(grammar["id"]),
-                    operator_outcome_id=(
-                        enumerate_operator_outcomes(
-                            grammar, assignment, parsed.reactants
-                        )[0].outcome_id
-                    ),
-                    edit_archetype=_grammar_archetype(grammar),
-                    transformation_class=str(grammar["transformation_class"]),
-                    role_assignments=assignment,
-                    predicted_bond_changes=enumerate_operator_outcomes(
-                        grammar, assignment, parsed.reactants
-                    )[0].predicted_bond_changes,
-                    predicted_product_smiles=composite_product,
-                    verification="exact_multi_event_reconstruction",
-                    reaction_label=render_reaction_label(
-                        grammar, assignment, style=label_style
-                    ),
-                    compatible_named_families=tuple(
-                        grammar.get("compatible_named_families") or []
-                    ),
-                )
-                for grammar, assignment in chosen
+            from .reaction_multi_events import apply_rewrite_sequence
+
+            composite_product = apply_rewrite_sequence(
+                chosen, parsed.reactants
             )
+            event_candidates = []
+            for grammar, assignment in chosen:
+                event_outcomes = apply_connectivity_rewrite(
+                    grammar, assignment, parsed.reactants
+                )
+                if not event_outcomes:
+                    continue
+                event_outcome = event_outcomes[0]
+                event_candidates.append(
+                    ReactionCandidate(
+                        grammar_id=str(grammar["id"]),
+                        rewrite_outcome_id=event_outcome.outcome_id,
+                        edit_archetype=infer_bond_change_archetype(
+                            event_outcome.predicted_bond_changes
+                        ),
+                        transformation_class=str(
+                            grammar["transformation_class"]
+                        ),
+                        role_assignments=assignment,
+                        predicted_bond_changes=(
+                            event_outcome.predicted_bond_changes
+                        ),
+                        predicted_product_smiles=composite_product,
+                        verification="exact_multi_event_reconstruction",
+                        reaction_label=render_reaction_label(
+                            grammar, assignment, style=label_style
+                        ),
+                        compatible_named_families=tuple(
+                            grammar.get("compatible_named_families") or []
+                        ),
+                    )
+                )
+            selected_events = tuple(event_candidates)
             evidence = "exact_multi_event_reconstruction"
             if len(multi_exact) > 1:
                 warnings.append("SYMMETRY_EQUIVALENT_MULTI_EVENT_ASSIGNMENTS")

@@ -14,10 +14,10 @@ DEFINITIONS_DIR = Path(__file__).with_name("definitions")
 
 
 def load_taxonomy_data() -> Dict[str, Any]:
-    """Load all v1 taxonomy documents."""
+    """Load all versioned taxonomy documents."""
     payload: Dict[str, Any] = {}
-    for path in sorted(DEFINITIONS_DIR.glob("*.v1.json")):
-        with path.open("r", encoding="utf-8") as handle:
+    for path in sorted(DEFINITIONS_DIR.glob("*.json")):
+        with path.open("r", encoding="utf-8-sig") as handle:
             payload[path.stem] = json.load(handle)
     return payload
 
@@ -30,23 +30,25 @@ def validate_taxonomy() -> List[str]:
     except (OSError, json.JSONDecodeError) as exc:
         return [f"taxonomy_load_failed:{exc}"]
     expected = {
-        "contexts.v1",
-        "connectivity_rewrites.v1",
+        "context_facets.v2",
+        "connectivity_rewrites.v2",
         "descriptor_rules.v1",
         "functional_groups.v1",
-        "handles.v1",
+        "site_interfaces.v2",
+        "site_patterns.v2",
+        "taxonomy_manifest.v2",
         "rendering.v1",
-        "reaction_grammars.v1",
+        "reaction_grammars.v2",
         "reaction_label_patterns.v1",
         "reaction_label_rendering.v1",
         "reaction_rendering.v1",
-        "signature_features.v1",
+        "signature_features.v2",
     }
     missing = expected - set(payload)
     if missing:
         errors.append(f"missing_taxonomy_files:{','.join(sorted(missing))}")
         return errors
-    contexts = payload["contexts.v1"]
+    contexts = payload["context_facets.v2"]
     context_records = contexts.get("contexts") or []
     tokens = [str(record.get("id") or "") for record in context_records]
     precedence = contexts.get("precedence") or []
@@ -63,6 +65,15 @@ def validate_taxonomy() -> List[str]:
     }
     for record in context_records:
         context_id = str(record.get("id") or "<missing>")
+        if record.get("facet") not in {
+            "activation",
+            "scaffold",
+            "element",
+            "fallback",
+        }:
+            errors.append(f"invalid_context_facet:{context_id}")
+        if not record.get("semantic_id") or not record.get("display_token"):
+            errors.append(f"incomplete_context_identity:{context_id}")
         method = str(record.get("classification_method") or "")
         if method not in allowed_methods:
             errors.append(f"invalid_context_method:{context_id}")
@@ -83,7 +94,7 @@ def validate_taxonomy() -> List[str]:
                 role_maps = raw_maps if isinstance(raw_maps, list) else [raw_maps]
                 if {int(value) for value in role_maps} - available_maps:
                     errors.append(f"unknown_context_atom_map:{context_id}:{role}")
-    families = payload["handles.v1"].get("site_families") or {}
+    families = payload["site_patterns.v2"].get("site_families") or {}
     required = {
         "leaving_group",
         "pronucleophile_XH",
@@ -99,6 +110,52 @@ def validate_taxonomy() -> List[str]:
     }
     if set(families) != required:
         errors.append("site_family_mismatch")
+    interface_payload = payload["site_interfaces.v2"]
+    if interface_payload.get("interface_schema_version") != "2.0":
+        errors.append("invalid_site_interface_schema_version")
+    adapters = interface_payload.get("adapters") or []
+    adapter_ids = [str(adapter.get("id") or "") for adapter in adapters]
+    if not adapters or len(adapter_ids) != len(set(adapter_ids)):
+        errors.append("invalid_site_interface_adapter_ids")
+    allowed_interfaces = {
+        "reactive_link",
+        "bond_capacity",
+        "connection_endpoint",
+        "connection_endpoints",
+    }
+    for adapter in adapters:
+        adapter_id = str(adapter.get("id") or "<missing>")
+        if adapter.get("annotation_type") not in required:
+            errors.append(f"invalid_interface_annotation_type:{adapter_id}")
+        if not set(adapter.get("emits") or ()) <= allowed_interfaces:
+            errors.append(f"invalid_emitted_interface:{adapter_id}")
+        if not adapter.get("requires_roles"):
+            errors.append(f"missing_interface_roles:{adapter_id}")
+    manifest = payload["taxonomy_manifest.v2"]
+    identity_files = set(manifest.get("identity_definitions") or ())
+    annotation_files = set(manifest.get("annotation_definitions") or ())
+    manifest_files = identity_files | annotation_files
+    missing_manifest_files = {
+        filename
+        for filename in manifest_files
+        if not (DEFINITIONS_DIR / filename).is_file()
+    }
+    if manifest.get("taxonomy_version") != "2.0":
+        errors.append("invalid_taxonomy_manifest_version")
+    if missing_manifest_files:
+        errors.append(
+            "missing_manifest_definitions:"
+            + ",".join(sorted(missing_manifest_files))
+        )
+    for required_identity in {
+        "site_patterns.v2.json",
+        "context_facets.v2.json",
+        "site_interfaces.v2.json",
+        "reaction_grammars.v2.json",
+        "connectivity_rewrites.v2.json",
+    }:
+        if required_identity not in identity_files:
+            errors.append(f"missing_identity_definition:{required_identity}")
     descriptor_rules = payload["descriptor_rules.v1"].get("site_environment") or {}
     if int(descriptor_rules.get("local_group_radius", 0)) < 1:
         errors.append("invalid_local_group_radius")
@@ -147,7 +204,7 @@ def validate_taxonomy() -> List[str]:
         )
         if unknown_suppressed:
             errors.append(f"unknown_suppressed_functional_group:{group_id}")
-    patterns = payload["handles.v1"].get("patterns") or []
+    patterns = payload["site_patterns.v2"].get("patterns") or []
     pattern_ids = [str(pattern.get("id") or "") for pattern in patterns]
     if not patterns:
         errors.append("missing_handle_patterns")
@@ -266,31 +323,16 @@ def validate_taxonomy() -> List[str]:
     if any(not rule.get("template") for rule in rendering_rules):
         errors.append("missing_rendering_template")
     grammar_ids: List[str] = []
-    allowed_operators = {
-        "join_two_anchors",
-        "replace_handle_with_alkene_endpoint",
-        "replace_carbonyl_oxygen_with_amine",
-        "change_bond_order",
-        "center_replacement",
-        "pair_addition",
-        "pair_elimination",
-    }
     known_roles: Dict[str, set[str]] = {site_type: set() for site_type in required}
     for pattern in patterns:
         known_roles.get(str(pattern.get("site_type")), set()).update(
             (pattern.get("atom_roles") or {}).keys()
         )
-    for grammar in payload["reaction_grammars.v1"].get("grammars") or []:
+    for grammar in payload["reaction_grammars.v2"].get("grammars") or []:
         grammar_id = str(grammar.get("id") or "<missing>")
         grammar_ids.append(grammar_id)
-        if grammar.get("edit_archetype") not in {
-            "substitution",
-            "addition",
-            "elimination",
-            "bond_order_change",
-            "composite",
-        }:
-            errors.append(f"invalid_edit_archetype:{grammar_id}")
+        if "edit_archetype" in grammar or "operator" in grammar:
+            errors.append(f"legacy_grammar_execution_field:{grammar_id}")
         roles = grammar.get("roles") or {}
         if not roles:
             errors.append(f"missing_reaction_roles:{grammar_id}")
@@ -304,66 +346,6 @@ def validate_taxonomy() -> List[str]:
                 errors.append(
                     f"invalid_reaction_context:{grammar_id}:{role_name}"
                 )
-        operator = grammar.get("operator") or {}
-        if operator.get("id") not in allowed_operators:
-            errors.append(f"invalid_reaction_operator:{grammar_id}")
-        if operator.get("id") == "change_bond_order":
-            site_role = str(operator.get("site_role") or "")
-            atom_roles = (
-                str(operator.get("atom_role_1") or ""),
-                str(operator.get("atom_role_2") or ""),
-            )
-            old_order = str(operator.get("old_order") or "")
-            new_order = str(operator.get("new_order") or "")
-            hydrogen_changes = operator.get("hydrogen_changes") or []
-            if site_role not in roles or not all(atom_roles):
-                errors.append(f"invalid_bond_order_operator_roles:{grammar_id}")
-            if (
-                old_order not in {"SINGLE", "DOUBLE", "TRIPLE"}
-                or new_order not in {"SINGLE", "DOUBLE", "TRIPLE"}
-                or old_order == new_order
-            ):
-                errors.append(f"invalid_bond_order_operator_orders:{grammar_id}")
-            if any(
-                not str(change.get("atom_role") or "")
-                or change.get("direction") not in {"added", "removed"}
-                for change in hydrogen_changes
-            ):
-                errors.append(
-                    f"invalid_bond_order_operator_hydrogens:{grammar_id}"
-                )
-        if operator.get("id") == "pair_addition":
-            acceptor_role = str(operator.get("acceptor_role") or "")
-            donor_role = str(operator.get("donor_role") or "")
-            endpoint_roles = operator.get("acceptor_endpoint_roles") or []
-            if (
-                acceptor_role not in roles
-                or donor_role not in roles
-                or len(endpoint_roles) != 2
-            ):
-                errors.append(f"invalid_pair_addition_roles:{grammar_id}")
-            if (
-                operator.get("old_order") not in {"DOUBLE", "TRIPLE"}
-                or operator.get("new_order") not in {"SINGLE", "DOUBLE"}
-            ):
-                errors.append(f"invalid_pair_addition_orders:{grammar_id}")
-        if operator.get("id") == "pair_elimination":
-            substrate_role = str(operator.get("substrate_role") or "")
-            required_operator_roles = {
-                "endpoint_a_role",
-                "endpoint_b_role",
-                "departing_a_role",
-                "hydrogen_carrier_b_role",
-            }
-            if substrate_role not in roles or any(
-                not operator.get(field) for field in required_operator_roles
-            ):
-                errors.append(f"invalid_pair_elimination_roles:{grammar_id}")
-            if (
-                operator.get("old_order") not in {"SINGLE", "DOUBLE"}
-                or operator.get("new_order") not in {"DOUBLE", "TRIPLE"}
-            ):
-                errors.append(f"invalid_pair_elimination_orders:{grammar_id}")
         if grammar.get("role_relationships") and grammar.get("distinct_components"):
             errors.append(f"conflicting_component_relationship_rules:{grammar_id}")
         for relationship in grammar.get("role_relationships") or []:
@@ -396,6 +378,12 @@ def validate_taxonomy() -> List[str]:
             "unknown_connectivity_rewrite_grammars:"
             + ",".join(sorted(unknown_rewrite_grammars))
         )
+    missing_rewrite_grammars = set(grammar_ids) - rewrite_grammar_ids
+    if missing_rewrite_grammars:
+        errors.append(
+            "missing_connectivity_rewrite_grammars:"
+            + ",".join(sorted(missing_rewrite_grammars))
+        )
     reaction_rendering = payload["reaction_rendering.v1"].get("rules") or {}
     product_precedence = (
         payload["reaction_rendering.v1"].get("product_context_precedence") or []
@@ -426,8 +414,8 @@ def validate_taxonomy() -> List[str]:
         errors.append("invalid_reaction_fragment_alias_template")
     if set(reaction_rendering) != set(grammar_ids):
         errors.append("reaction_rendering_coverage_mismatch")
-    signature_features = payload["signature_features.v1"]
-    if signature_features.get("signature_schema_version") != "1.6":
+    signature_features = payload["signature_features.v2"]
+    if signature_features.get("signature_schema_version") != "2.0":
         errors.append("invalid_signature_schema_version")
     signature_levels = signature_features.get("levels") or {}
     if any(

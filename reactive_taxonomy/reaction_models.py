@@ -8,7 +8,7 @@ from typing import Any, Dict, Literal, Optional, Tuple
 from .models import CompoundAnalysis
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "1.6"
+REACTION_SIGNATURE_SCHEMA_VERSION = "2.0"
 
 EditArchetype = Literal[
     "substitution",
@@ -69,8 +69,8 @@ class BondChange:
 
 
 @dataclass(frozen=True)
-class OperatorOutcome:
-    """One deterministic constitutional outcome of a registered graph operator."""
+class RewriteOutcome:
+    """One deterministic constitutional outcome of a connectivity rewrite."""
 
     outcome_id: str
     predicted_product_smiles: Optional[str]
@@ -572,7 +572,7 @@ class ReactionSignature:
 @dataclass(frozen=True)
 class ReactionCandidate:
     grammar_id: str
-    operator_outcome_id: str
+    rewrite_outcome_id: str
     edit_archetype: EditArchetype
     transformation_class: str
     role_assignments: Dict[str, ReactionSiteReference]
@@ -628,7 +628,7 @@ __all__ = [
     "ConnectivityObservationScope",
     "EditArchetype",
     "HydrogenDelta",
-    "OperatorOutcome",
+    "RewriteOutcome",
     "PartialProductTransformation",
     "ProductConnection",
     "ProductConnectionEndpoint",

@@ -11,7 +11,7 @@ from .models import ContextClassification
 from .patterns import MatchIndex
 
 
-_CONTEXTS_PATH = Path(__file__).with_name("definitions") / "contexts.v1.json"
+_CONTEXTS_PATH = Path(__file__).with_name("definitions") / "context_facets.v2.json"
 
 
 @lru_cache(maxsize=1)
@@ -32,7 +32,15 @@ def _context_definitions() -> Dict[str, Dict[str, Any]]:
 def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
     rings = [ring for ring in mol.GetRingInfo().AtomRings() if atom.GetIdx() in ring]
     if not rings:
-        return ContextClassification("Ar", atom.GetIdx(), (atom.GetIdx(),), "aromatic_ring_system")
+        return ContextClassification(
+            "Ar",
+            atom.GetIdx(),
+            (atom.GetIdx(),),
+            "aromatic_ring_system",
+            facet="scaffold",
+            semantic_id="carbocyclic_aromatic",
+            display_token="Ar",
+        )
     ring_atoms: Set[int] = set().union(*(set(ring) for ring in rings))
     heteroatoms = sorted({mol.GetAtomWithIdx(i).GetSymbol() for i in ring_atoms if mol.GetAtomWithIdx(i).GetAtomicNum() != 6})
     token = "HeteroAr" if heteroatoms else "Ar"
@@ -41,6 +49,11 @@ def _aromatic_ring_context(mol: Any, atom: Any) -> ContextClassification:
         attachment_atom_index=atom.GetIdx(),
         fragment_atom_indices=tuple(sorted(ring_atoms)),
         classification_method="aromatic_ring_system",
+        facet="scaffold",
+        semantic_id=(
+            "heteroaromatic" if heteroatoms else "carbocyclic_aromatic"
+        ),
+        display_token=token,
         subtype="heteroaromatic_ring" if heteroatoms else "carbocyclic_aromatic_ring",
         features={
             "heteroatoms": heteroatoms,
@@ -82,6 +95,9 @@ def _sp3_carbon_context(mol: Any, atom: Any, excluded: Set[int]) -> ContextClass
         attachment_atom_index=atom.GetIdx(),
         fragment_atom_indices=tuple(sorted({atom.GetIdx(), *(neighbor.GetIdx() for neighbor in neighbors)})),
         classification_method="sp3_attachment_environment",
+        facet="scaffold",
+        semantic_id="alkyl",
+        display_token="Alkyl",
         subtype=subtype,
         features={
             "element": "C",
@@ -122,6 +138,13 @@ def classify_context(
                 attachment_atom_index=atom_index,
                 fragment_atom_indices=tuple(sorted(set(matched_atoms))),
                 classification_method="mapped_smarts",
+                facet=str(definitions[candidate].get("facet") or "fallback"),
+                semantic_id=str(
+                    definitions[candidate].get("semantic_id") or "other"
+                ),
+                display_token=str(
+                    definitions[candidate].get("display_token") or candidate
+                ),
                 matched_pattern=candidate,
                 features={"excluded_atom_indices": sorted(excluded_set)},
             )
@@ -144,6 +167,19 @@ def classify_context(
         attachment_atom_index=atom_index,
         fragment_atom_indices=(atom_index,),
         classification_method=method,
+        facet=(
+            "element"
+            if symbol in {"N", "O", "S"}
+            else ("fallback" if token == "Other" else "scaffold")
+        ),
+        semantic_id={
+            "N": "nitrogen",
+            "O": "oxygen",
+            "S": "sulfur",
+            "Alkenyl": "alkenyl",
+            "Alkynyl": "alkynyl",
+        }.get(token, "other"),
+        display_token=token,
         features={"element": symbol, "hybridization": str(atom.GetHybridization()), "aromatic": atom.GetIsAromatic()},
     )
 

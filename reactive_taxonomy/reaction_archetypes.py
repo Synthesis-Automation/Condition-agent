@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Iterable, Optional, Tuple, cast
 
-from .reaction_models import EditArchetype, ReactionEdit
+from .reaction_models import BondChange, EditArchetype, ReactionEdit
 
 
 _ORDER_RANK = {
@@ -89,6 +89,56 @@ def infer_edit_archetype(edits: Iterable[ReactionEdit]) -> EditArchetype:
     return "unresolved"
 
 
+def infer_bond_change_archetype(
+    changes: Iterable[BondChange],
+) -> EditArchetype:
+    """Classify an operator-free rewrite outcome from its net bond changes."""
+    normalized = tuple(changes)
+    if not normalized:
+        return "unresolved"
+
+    formed = tuple(change for change in normalized if change.change_type == "formed")
+    broken = tuple(change for change in normalized if change.change_type == "broken")
+    order_changes = tuple(
+        change for change in normalized if change.change_type == "order_changed"
+    )
+    hydrogen_added = tuple(
+        change
+        for change in normalized
+        if change.change_type == "hydrogen_change"
+        and change.old_order is None
+        and change.new_order is not None
+    )
+    hydrogen_removed = tuple(
+        change
+        for change in normalized
+        if change.change_type == "hydrogen_change"
+        and change.old_order is not None
+        and change.new_order is None
+    )
+
+    directions = []
+    for change in order_changes:
+        old = _ORDER_RANK.get(str(change.old_order or "").upper())
+        new = _ORDER_RANK.get(str(change.new_order or "").upper())
+        if old is not None and new is not None:
+            directions.append((new > old) - (new < old))
+    decreased = any(direction < 0 for direction in directions)
+    increased = any(direction > 0 for direction in directions)
+
+    if decreased and not increased and (formed or hydrogen_added):
+        return "addition"
+    if increased and not decreased and (broken or hydrogen_removed):
+        return "elimination"
+    if broken and formed and not order_changes:
+        return "substitution"
+    if order_changes and not (formed or broken or hydrogen_added or hydrogen_removed):
+        return "bond_order_change"
+    if len({change.change_type for change in normalized}) > 1:
+        return "composite"
+    return "unresolved"
+
+
 def reconcile_edit_archetype(
     edits: Iterable[ReactionEdit],
     declared: Optional[str],
@@ -116,4 +166,8 @@ def reconcile_edit_archetype(
     )
 
 
-__all__ = ["infer_edit_archetype", "reconcile_edit_archetype"]
+__all__ = [
+    "infer_bond_change_archetype",
+    "infer_edit_archetype",
+    "reconcile_edit_archetype",
+]

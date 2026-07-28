@@ -259,17 +259,20 @@ def test_normalized_ids_disambiguate_reaction_components() -> None:
     assert any("component1" in value for value in interface_ids)
 
 
-def test_normalized_views_do_not_change_public_molecule_serialization() -> None:
+def test_canonical_views_are_first_class_without_polluting_annotations() -> None:
     analysis, normalized = _interfaces("C=C.BrBr")
-    before = analysis.to_dict()
+    payload = analysis.to_dict()
 
     assert normalized
-    assert analysis.to_dict() == before
+    assert payload["connectivity_sites"]
+    assert {
+        item["schema_version"] for item in payload["connectivity_sites"]
+    } == {"2.0"}
     assert all(
         "reactive_links" not in site_payload
         and "bond_capacities" not in site_payload
         and "connection_endpoints" not in site_payload
-        for site_payload in before["sites"]
+        for site_payload in payload["sites"]
     )
 
 

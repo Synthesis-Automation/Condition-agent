@@ -1,4 +1,4 @@
-"""Isolated v1 reactive-handle taxonomy and compound featurizer."""
+"""Connectivity-first v2 molecular and reaction taxonomy."""
 
 from .api import detect_sites, featurize_molecule
 from .reaction_api import featurize_reaction
@@ -7,12 +7,7 @@ from .connectivity_rewrite import (
     apply_connectivity_rewrite,
     compile_connectivity_rewrite_definitions,
     connectivity_rewrite_for_grammar,
-    connectivity_rewrite_is_authoritative,
     load_connectivity_rewrites,
-)
-from .connectivity_rewrite_parity import (
-    ConnectivityRewriteParity,
-    compare_connectivity_rewrite,
 )
 from .reaction_site_interfaces import (
     BondCapacitySite,
@@ -35,7 +30,7 @@ from .reaction_models import (
     ConnectivityObservationScope,
     EditArchetype,
     HydrogenDelta,
-    OperatorOutcome,
+    RewriteOutcome,
     ProductConnection,
     ProductConnectionEndpoint,
     ProductTransformation,
@@ -117,7 +112,6 @@ __all__ = [
     "ConnectivityEditGraph",
     "ConnectivityEndpoint",
     "ConnectivityObservationScope",
-    "ConnectivityRewriteParity",
     "ConnectionEndpointSite",
     "ContextClassification",
     "ContextualTransformationLabel",
@@ -125,7 +119,7 @@ __all__ = [
     "FunctionalGroup",
     "HydrogenDelta",
     "MatchIndex",
-    "OperatorOutcome",
+    "RewriteOutcome",
     "NormalizedSiteInterfaces",
     "ProductConnection",
     "ProductConnectionEndpoint",
@@ -161,10 +155,8 @@ __all__ = [
     "apply_connectivity_rewrite",
     "build_contextual_transformation_label",
     "build_reaction_display_label",
-    "compare_connectivity_rewrite",
     "compile_connectivity_rewrite_definitions",
     "connectivity_rewrite_for_grammar",
-    "connectivity_rewrite_is_authoritative",
     "detect_functional_groups",
     "detect_sites",
     "evaluate_molecular_features",

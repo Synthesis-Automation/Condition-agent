@@ -109,9 +109,9 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "2.2"
-    assert record.converter_definition_version == "generic_conversion.v1.19"
-    assert record.reaction_signature["schema_version"] == "1.6"
+    assert record.schema_version == "3.0"
+    assert record.converter_definition_version == "generic_conversion.v2.0"
+    assert record.reaction_signature["schema_version"] == "2.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
     assert record.reference_identity["resolution_status"] == "bibliographic_text"
@@ -463,7 +463,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     with (output / "verified.csv").open(encoding="utf-8-sig", newline="") as handle:
         verified = list(csv.DictReader(handle))
     assert len(verified) == 2
-    assert all(row["reaction_signature_id"].startswith("RS1:") for row in verified)
+    assert all(row["reaction_signature_id"].startswith("RS2:") for row in verified)
     assert {row["reaction_event_count"] for row in verified} == {"1"}
     assert {row["reaction_event_scope"] for row in verified} == {"single_event"}
     assert verified[0]["reaction_scope"] == "intermolecular"
@@ -473,7 +473,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     }
     assert json.loads((output / "conversion_report.json").read_text()) == report
     assert report["schema_version"] == "1.2"
-    assert report["reaction_signature_schema_version"] == "1.6"
+    assert report["reaction_signature_schema_version"] == "2.0"
     assert report["reaction_scope_counts"] == {
         "intermolecular": 1,
         "unimolecular": 1,
@@ -521,7 +521,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
     assert review_rows[0]["detection_status"] == "family_overlay"
     assert review_rows[0]["transformation_class"] == "c_c_transfer_coupling"
-    assert review_rows[0]["signature_id"].startswith("RS1:")
+    assert review_rows[0]["signature_id"].startswith("RS2:")
     assert review_rows[0]["evidence_quality"] == "exact_product_reconstruction"
     assert review_rows[0]["reaction_completeness_status"] == "verified"
     assert review_rows[0]["chemistry_status"] == "verified"

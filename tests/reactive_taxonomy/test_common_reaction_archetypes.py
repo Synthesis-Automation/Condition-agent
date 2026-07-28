@@ -1,24 +1,22 @@
 """Regression coverage for reusable substitution/addition/elimination archetypes."""
 
 from reactive_taxonomy import featurize_molecule, featurize_reaction
+from reactive_taxonomy.connectivity_rewrite import load_connectivity_rewrites
 from reactive_taxonomy.reaction_grammars import load_reaction_grammars
 
 
-def test_every_grammar_declares_a_net_edit_archetype() -> None:
+def test_every_grammar_has_a_rewrite_and_no_declared_edit_archetype() -> None:
     grammars = load_reaction_grammars()
+    rewrite_grammar_ids = {
+        grammar_id
+        for rewrite in load_connectivity_rewrites()
+        for grammar_id in rewrite.grammar_ids
+    }
 
     assert grammars
-    assert all(grammar.get("edit_archetype") for grammar in grammars)
-    assert {
-        grammar["edit_archetype"] for grammar in grammars
-    } >= {"substitution", "addition", "elimination"}
-    assert all(
-        grammar["operator"]["id"] != "replace_handle_with_center"
-        for grammar in grammars
-    )
-    assert {
-        grammar["operator"]["id"] for grammar in grammars
-    } >= {"center_replacement", "pair_addition", "pair_elimination"}
+    assert {grammar["id"] for grammar in grammars} == rewrite_grammar_ids
+    assert all("edit_archetype" not in grammar for grammar in grammars)
+    assert all("operator" not in grammar for grammar in grammars)
 
 
 def test_explicit_and_implicit_addition_donors_are_distinct_sites() -> None:
@@ -59,8 +57,8 @@ def test_xh_addition_reconstructs_both_regioisomers_without_guessing() -> None:
     assert linear.selected_candidate.grammar_id == "xh_addition_to_alkene"
     assert branched.selected_candidate.grammar_id == "xh_addition_to_alkene"
     assert (
-        linear.selected_candidate.operator_outcome_id
-        != branched.selected_candidate.operator_outcome_id
+        linear.selected_candidate.rewrite_outcome_id
+        != branched.selected_candidate.rewrite_outcome_id
     )
     assert linear.edit_archetype == branched.edit_archetype == "addition"
     assert linear.named_family is None
@@ -69,7 +67,7 @@ def test_xh_addition_reconstructs_both_regioisomers_without_guessing() -> None:
         edit.edit_type for edit in linear.reaction_signature.edits
     } == {"formed", "order_changed", "hydrogen_change"}
     assert {
-        candidate.operator_outcome_id
+        candidate.rewrite_outcome_id
         for candidate in linear.candidates
         if candidate.grammar_id == "xh_addition_to_alkene"
     } == {
@@ -97,7 +95,7 @@ def test_xh_addition_mapping_agreement_and_conflict_are_preserved() -> None:
     assert conflicted.reaction_signature.edit_archetype == "addition"
 
 
-def test_dihalogen_and_hydrosilane_use_the_same_pair_addition_operator() -> None:
+def test_dihalogen_and_hydrosilane_use_the_same_pair_addition_rewrite() -> None:
     bromination = featurize_reaction("C=C.BrBr>>BrCCBr")
     hydrosilylation = featurize_reaction(
         "C=C.C[SiH](C)C>>CC[Si](C)(C)C"

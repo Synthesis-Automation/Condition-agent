@@ -1,4 +1,4 @@
-"""Normalize mapped and operator-predicted graph edits into typed contracts."""
+"""Normalize mapped and rewrite-predicted graph edits into typed contracts."""
 
 from __future__ import annotations
 
@@ -494,7 +494,7 @@ def normalize_predicted_edits(
     selected: Optional[ReactionCandidate],
     reactants: Tuple[ReactionComponent, ...],
 ) -> EditNormalizationResult:
-    """Convert operator changes for an exact selected candidate to typed edits."""
+    """Convert rewrite changes for an exact selected candidate to typed edits."""
     if selected is None or selected.verification not in {
         "exact_product_reconstruction",
         "exact_multi_event_reconstruction",
@@ -1266,7 +1266,7 @@ def normalize_reaction_edits(
     selected_events: Tuple[ReactionCandidate, ...] = (),
     candidates: Tuple[ReactionCandidate, ...] = (),
 ) -> EditNormalizationResult:
-    """Choose observed edits when valid and reconcile exact operator evidence."""
+    """Choose observed edits when valid and reconcile exact rewrite evidence."""
     mapped = normalize_mapped_edits(reactants, products)
     predicted = normalize_predicted_edits(selected, reactants)
     predicted_multi = normalize_predicted_multi_event_edits(

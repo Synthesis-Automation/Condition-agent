@@ -25,12 +25,15 @@ SiteTopology = Literal["edge", "atom", "center", "bond"]
 
 @dataclass(frozen=True)
 class ContextClassification:
-    """One retained local context attached to a reactive center."""
+    """One typed structural context facet attached to a reactive center."""
 
     token: str
     attachment_atom_index: int
     fragment_atom_indices: Tuple[int, ...]
     classification_method: str
+    facet: str = "fallback"
+    semantic_id: str = "other"
+    display_token: Optional[str] = None
     subtype: Optional[str] = None
     matched_pattern: Optional[str] = None
     features: Dict[str, Any] = field(default_factory=dict)
@@ -125,6 +128,7 @@ class ComponentAnalysis:
     sites: List[ReactiveSite] = field(default_factory=list)
     functional_groups: List[FunctionalGroup] = field(default_factory=list)
     site_environments: List[SiteEnvironment] = field(default_factory=list)
+    connectivity_sites: List[Any] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -135,6 +139,9 @@ class ComponentAnalysis:
             "sites": [site.to_dict() for site in self.sites],
             "functional_groups": [group.to_dict() for group in self.functional_groups],
             "site_environments": [environment.to_dict() for environment in self.site_environments],
+            "connectivity_sites": [
+                site.to_dict() for site in self.connectivity_sites
+            ],
         }
 
 
@@ -151,7 +158,8 @@ class CompoundAnalysis:
     error: Optional[str] = None
     functional_groups: List[FunctionalGroup] = field(default_factory=list)
     site_environments: List[SiteEnvironment] = field(default_factory=list)
-    schema_version: str = "1.1"
+    connectivity_sites: List[Any] = field(default_factory=list)
+    schema_version: str = "2.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -163,6 +171,9 @@ class CompoundAnalysis:
             "sites": [site.to_dict() for site in self.sites],
             "functional_groups": [group.to_dict() for group in self.functional_groups],
             "site_environments": [environment.to_dict() for environment in self.site_environments],
+            "connectivity_sites": [
+                site.to_dict() for site in self.connectivity_sites
+            ],
             "warnings": list(self.warnings),
             "error": self.error,
         }

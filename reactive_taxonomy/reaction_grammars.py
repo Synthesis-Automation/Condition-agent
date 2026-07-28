@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 
-_PATH = Path(__file__).with_name("definitions") / "reaction_grammars.v1.json"
+_PATH = Path(__file__).with_name("definitions") / "reaction_grammars.v2.json"
 
 
 @lru_cache(maxsize=1)

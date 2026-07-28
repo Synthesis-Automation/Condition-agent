@@ -1389,18 +1389,34 @@ See
 
 ### Phase 5: derived edit shapes
 
-- Replace grammar-declared archetype authority with edit-graph inference.
-- Keep a declared expected shape only as grammar validation metadata.
+Implemented in v2 on 2026-07-28:
+
+- Replaced grammar-declared archetype authority with edit-graph inference.
+- Removed the declared archetype from grammar definitions.
 - Add coupling, insertion, extrusion, exchange, migration, annulation, and
-  cleavage classifications where the topology is unambiguous.
-- Preserve `unresolved` rather than forcing a class.
+  cleavage classifications later where the topology is unambiguous.
+- Preserved `unresolved` rather than forcing a class.
 
 ### Phase 6: signature migration
 
-- Add canonical edit-graph tokens to L0-L3.
-- Measure collision and retrieval changes on existing datasets.
-- Bump schema and definition versions.
-- Update converted artifacts only after chemistry and retrieval gates pass.
+Implemented in v2 on 2026-07-28:
+
+- Canonical edit, event, and topology tokens remain in L0-L3.
+- Bumped reaction signatures to schema `2.0` and namespace `RS2`.
+- Added content-hashed identity-definition provenance through the v2 manifest.
+- Bumped recommendation records to `3.0` and the generic converter to
+  `generic_conversion.v2.0`.
+- Old artifacts are rejected and must be reconverted.
+
+### V2 clean cutover
+
+The v2 cutover removed legacy operators, shadow/parity routing, authority
+metadata, grammar operators, and grammar-declared archetypes. Molecular
+featurization now emits canonical connectivity sites directly, and all 32
+grammars execute registered connectivity rewrites.
+
+See
+[`connectivity_first_reaction_grammar_v2.md`](connectivity_first_reaction_grammar_v2.md).
 
 ## 16. Required test matrix
 

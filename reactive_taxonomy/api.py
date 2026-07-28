@@ -46,7 +46,7 @@ def featurize_molecule(
     include_context_features: bool = True,
     label_style: str = "unicode",
 ) -> CompoundAnalysis:
-    """Detect v1 reactive handles without using the legacy taxonomy.
+    """Detect reactive annotations and canonical v2 connectivity sites.
 
     Disconnected components and formal charges are preserved. Atom indices in
     each site are component-local; ``component_index`` disambiguates them.
@@ -71,6 +71,7 @@ def featurize_molecule(
     all_sites: List[ReactiveSite] = []
     all_functional_groups = []
     all_site_environments = []
+    all_connectivity_sites = []
     atom_offset = 0
     for component_index, component_mol in enumerate(_component_molecules(mol)):
         functional_groups = detect_functional_groups(component_mol, component_index)
@@ -127,21 +128,37 @@ def featurize_molecule(
             )
             for site in component_sites
         ]
+        from .reaction_site_interfaces import normalize_detected_site
+
+        connectivity_sites = [
+            normalize_detected_site(site, component_mol)
+            for site in component_sites
+        ]
         canonical_component = mol_to_canonical_smiles(component_mol) or ""
         input_component = canonical_component
-        components.append(ComponentAnalysis(
-            component_index, input_component, canonical_component, atom_offset,
-            component_sites, functional_groups, site_environments,
-        ))
+        components.append(
+            ComponentAnalysis(
+                component_index=component_index,
+                input_smiles=input_component,
+                canonical_smiles=canonical_component,
+                atom_offset=atom_offset,
+                sites=component_sites,
+                functional_groups=functional_groups,
+                site_environments=site_environments,
+                connectivity_sites=connectivity_sites,
+            )
+        )
         all_sites.extend(component_sites)
         all_functional_groups.extend(functional_groups)
         all_site_environments.extend(site_environments)
+        all_connectivity_sites.extend(connectivity_sites)
         atom_offset += component_mol.GetNumAtoms()
 
     return CompoundAnalysis(
         text, mol_to_canonical_smiles(mol), True, components, all_sites,
         functional_groups=all_functional_groups,
         site_environments=all_site_environments,
+        connectivity_sites=all_connectivity_sites,
     )
 
 

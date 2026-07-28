@@ -59,7 +59,7 @@ def _result() -> GenericRecommendationResult:
     return GenericRecommendationResult(
         query_reaction_smiles="BrC.B(O)O>>CC",
         valid=True,
-        query_signature_id="RS1:query",
+        query_signature_id="RS2:query",
         named_family="suzuki_miyaura",
         transformation_class="c_c_transfer_coupling",
         retrieval_level="exact_signature",

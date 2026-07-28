@@ -134,7 +134,7 @@ def test_topology_serializes_in_analysis_and_signature() -> None:
     assert payload["schema_version"] == "2.0"
     assert payload["reaction_topology"]["reaction_scope"] == "intramolecular"
     assert payload["reaction_topology"]["formed_ring_sizes"] == (5,)
-    assert payload["reaction_signature"]["schema_version"] == "1.6"
+    assert payload["reaction_signature"]["schema_version"] == "2.0"
     assert payload["reaction_signature"]["topology"] == payload["reaction_topology"]
 
 

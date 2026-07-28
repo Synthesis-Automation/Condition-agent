@@ -55,13 +55,13 @@ def test_signature_contains_versioned_hierarchical_keys() -> None:
     signature = result.reaction_signature
 
     assert signature is not None
-    assert signature.signature_id.startswith("RS1:")
+    assert signature.signature_id.startswith("RS2:")
     assert signature.exact_signature_key.startswith("L0:")
     assert signature.handle_signature_key.startswith("L1:")
     assert signature.transformation_signature_key.startswith("L2:")
     assert signature.bond_edit_signature_key.startswith("L3:")
     assert signature.environment_signature_key.startswith("L4:")
-    assert "signature_features.v1.json" in signature.definition_versions
+    assert "signature_features.v2.json" in signature.definition_versions
 
 
 def test_signature_partners_retain_context_steric_and_electronic_analysis() -> None:
@@ -100,7 +100,7 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
     )
     assert payload["schema_version"] == "2.0"
-    assert payload["reaction_signature"]["schema_version"] == "1.6"
+    assert payload["reaction_signature"]["schema_version"] == "2.0"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
     )

@@ -29,7 +29,8 @@ from .reaction_models import (
 )
 
 _DEFINITIONS = Path(__file__).with_name("definitions")
-_SIGNATURE_RULES_PATH = _DEFINITIONS / "signature_features.v1.json"
+_SIGNATURE_RULES_PATH = _DEFINITIONS / "signature_features.v2.json"
+_TAXONOMY_MANIFEST_PATH = _DEFINITIONS / "taxonomy_manifest.v2.json"
 
 
 def _canonical_json(value: Any) -> str:
@@ -43,17 +44,25 @@ def _digest(prefix: str, value: Any, *, length: int = 24) -> str:
 
 @lru_cache(maxsize=1)
 def _definition_versions() -> Dict[str, str]:
+    with _TAXONOMY_MANIFEST_PATH.open(
+        "r", encoding="utf-8-sig"
+    ) as handle:
+        manifest = json.load(handle)
     versions: Dict[str, str] = {}
-    for filename in (
-        "handles.v1.json",
-        "reaction_grammars.v1.json",
-        "descriptor_rules.v1.json",
-        "signature_features.v1.json",
-    ):
+    filenames = tuple(manifest.get("identity_definitions") or ())
+    for filename in filenames:
         path = _DEFINITIONS / filename
-        with path.open("r", encoding="utf-8") as handle:
+        raw = path.read_bytes()
+        with path.open("r", encoding="utf-8-sig") as handle:
             payload = json.load(handle)
-        versions[filename] = str(payload.get("schema_version") or "unknown")
+        schema = str(payload.get("schema_version") or "unknown")
+        digest = hashlib.sha256(raw).hexdigest()[:16]
+        versions[filename] = f"{schema}@sha256:{digest}"
+    manifest_raw = _TAXONOMY_MANIFEST_PATH.read_bytes()
+    versions[_TAXONOMY_MANIFEST_PATH.name] = (
+        f"{manifest.get('taxonomy_version', 'unknown')}@sha256:"
+        f"{hashlib.sha256(manifest_raw).hexdigest()[:16]}"
+    )
     versions["reaction_correspondence"] = REACTION_CORRESPONDENCE_VERSION
     return dict(sorted(versions.items()))
 
@@ -569,7 +578,7 @@ def build_reaction_signature(
     )
     definition_versions = _definition_versions()
     signature_id = _digest(
-        "RS1",
+        "RS2",
         {
             "keys": (
                 exact_key,

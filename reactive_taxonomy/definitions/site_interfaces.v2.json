@@ -1,0 +1,146 @@
+{
+  "schema_version": "2.0",
+  "interface_schema_version": "2.0",
+  "adapters": [
+    {
+      "id": "leaving_link",
+      "annotation_type": "leaving_group",
+      "requires_roles": ["anchor"],
+      "emits": ["reactive_link", "connection_endpoints"],
+      "endpoint_a_role": "anchor",
+      "endpoint_b_bonded_role_candidates": ["connector", "handle", "center"],
+      "endpoint_b_label_role": "handle",
+      "source_kind": "explicit_bond"
+    },
+    {
+      "id": "transfer_link",
+      "annotation_type": "transfer_group",
+      "requires_roles": ["anchor", "center"],
+      "emits": ["reactive_link", "connection_endpoints"],
+      "endpoint_a_role": "anchor",
+      "endpoint_b_role": "center",
+      "source_kind": "explicit_bond"
+    },
+    {
+      "id": "xh_link",
+      "annotation_type": "pronucleophile_XH",
+      "requires_roles": ["center"],
+      "emits": ["reactive_link", "connection_endpoints"],
+      "endpoint_a_role": "center",
+      "endpoint_b_kind": "virtual_hydrogen",
+      "available_units_detail": "h_count",
+      "source_kind": "implicit_hydrogen"
+    },
+    {
+      "id": "aromatic_ch_link",
+      "annotation_type": "aromatic_CH",
+      "requires_roles": ["center"],
+      "emits": ["reactive_link", "connection_endpoints"],
+      "endpoint_a_role": "center",
+      "endpoint_b_kind": "virtual_hydrogen",
+      "available_units_detail": "h_count",
+      "source_kind": "implicit_hydrogen"
+    },
+    {
+      "id": "explicit_addend_link",
+      "annotation_type": "addition_donor",
+      "requires_roles": ["addend_a", "addend_b"],
+      "when_details": {"source_kind": "explicit_bond"},
+      "emits": ["reactive_link", "connection_endpoints"],
+      "endpoint_a_role": "addend_a",
+      "endpoint_b_role": "addend_b",
+      "source_kind": "explicit_bond"
+    },
+    {
+      "id": "implicit_addend_link",
+      "annotation_type": "addition_donor",
+      "requires_roles": ["addend_a", "hydrogen_carrier"],
+      "when_details": {"source_kind": "implicit_hydrogen"},
+      "emits": ["reactive_link", "connection_endpoints"],
+      "endpoint_a_role": "addend_a",
+      "endpoint_b_kind": "virtual_hydrogen",
+      "endpoint_b_label_role": "hydrogen_carrier",
+      "available_units_detail": "hydrogen_count",
+      "source_kind": "implicit_hydrogen"
+    },
+    {
+      "id": "activated_center_link",
+      "annotation_type": "electrophilic_center",
+      "requires_roles": ["center", "leaving_or_activatable"],
+      "emits": ["reactive_link", "connection_endpoints"],
+      "endpoint_a_role": "center",
+      "endpoint_b_role": "leaving_or_activatable",
+      "source_kind": "explicit_bond"
+    },
+    {
+      "id": "elimination_departing_link",
+      "annotation_type": "eliminable_pair",
+      "requires_roles": ["endpoint_a", "departing_a"],
+      "emits": ["reactive_link"],
+      "endpoint_a_role": "endpoint_a",
+      "endpoint_b_role": "departing_a",
+      "source_kind": "explicit_bond"
+    },
+    {
+      "id": "unsaturated_capacity",
+      "annotation_type": "unsaturated_bond",
+      "requires_roles": ["endpoint_a", "endpoint_b"],
+      "emits": ["bond_capacity", "connection_endpoints"],
+      "endpoint_a_role": "endpoint_a",
+      "endpoint_b_role": "endpoint_b",
+      "bond_class_by_detail": {
+        "detail": "handle_token",
+        "values": {
+          "Alkene": "carbon_carbon_pi",
+          "Alkyne": "carbon_carbon_pi",
+          "Nitrile": "carbon_nitrogen_pi"
+        },
+        "default": "localized_multiple_bond"
+      }
+    },
+    {
+      "id": "carbonyl_capacity",
+      "annotation_type": "electrophilic_center",
+      "requires_roles": ["center", "heteroatom"],
+      "emits": ["bond_capacity", "connection_endpoints"],
+      "endpoint_a_role": "center",
+      "endpoint_b_role": "heteroatom",
+      "bond_class": "polarized_multiple_bond"
+    },
+    {
+      "id": "alcohol_capacity",
+      "annotation_type": "pronucleophile_XH",
+      "requires_roles": ["center", "attachment"],
+      "when_details": {"derived_family": "alcohol"},
+      "emits": ["bond_capacity"],
+      "endpoint_a_role": "center",
+      "endpoint_b_role": "attachment",
+      "bond_class": "alcohol_carbon_heteroatom"
+    },
+    {
+      "id": "elimination_backbone_capacity",
+      "annotation_type": "eliminable_pair",
+      "requires_roles": ["endpoint_a", "endpoint_b"],
+      "emits": ["bond_capacity"],
+      "endpoint_a_role": "endpoint_a",
+      "endpoint_b_role": "endpoint_b",
+      "bond_class": "eliminable_backbone"
+    },
+    {
+      "id": "anionic_connection",
+      "annotation_type": "nucleophile_anion",
+      "requires_roles": ["center"],
+      "emits": ["connection_endpoint"],
+      "endpoint_role": "center",
+      "required_formal_charge_delta": 1
+    },
+    {
+      "id": "elimination_hydrogen_connection",
+      "annotation_type": "eliminable_pair",
+      "requires_roles": ["hydrogen_carrier_b"],
+      "emits": ["connection_endpoint"],
+      "endpoint_role": "hydrogen_carrier_b",
+      "required_hydrogen_delta": -1
+    }
+  ]
+}

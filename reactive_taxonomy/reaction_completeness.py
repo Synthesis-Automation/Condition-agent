@@ -74,27 +74,23 @@ def _insufficient_partner_multiplicity_suspected(
     ] = defaultdict(set)
     partner_elements: dict[tuple[str, int, str, str], str] = {}
     for grammar, assignment in raw_candidates:
-        operator = grammar.get("operator") or {}
-        partner_role = str(operator.get("partner_role") or "")
-        electrophile_role = str(operator.get("electrophile_role") or "")
-        if not partner_role or not electrophile_role:
+        if len(assignment) < 2:
             continue
-        partner = assignment.get(partner_role)
-        electrophile = assignment.get(electrophile_role)
-        if partner is None or electrophile is None:
-            continue
-        key = (
-            str(grammar.get("id") or ""),
-            int(partner.component_index),
-            str(partner.site_id),
-            partner_role,
-        )
-        opportunities[key].add(
-            (int(electrophile.component_index), str(electrophile.site_id))
-        )
-        element = _candidate_center_element(partner, components)
-        if element:
-            partner_elements[key] = element
+        for partner_role, partner in assignment.items():
+            key = (
+                str(grammar.get("id") or ""),
+                int(partner.component_index),
+                str(partner.site_id),
+                str(partner_role),
+            )
+            opportunities[key].update(
+                (int(other.component_index), str(other.site_id))
+                for other_role, other in assignment.items()
+                if other_role != partner_role
+            )
+            element = _candidate_center_element(partner, components)
+            if element:
+                partner_elements[key] = element
     return any(
         len(event_sites) > 1
         and product_element_excess.get(partner_elements.get(key, ""), 0) > 0

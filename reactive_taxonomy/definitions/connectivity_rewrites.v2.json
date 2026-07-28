@@ -1,15 +1,11 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "2.0",
   "instruction_set_version": "1.1",
-  "site_interface_schema_version": "1.0",
+  "site_interface_schema_version": "2.0",
   "rewrites": [
     {
       "id": "suzuki_release_and_connect",
       "template": "release_and_connect",
-      "authoritative_grammar_ids": [
-        "boron_transfer_coupling",
-        "other_metal_transfer_coupling"
-      ],
       "grammar_ids": [
         "boron_transfer_coupling",
         "other_metal_transfer_coupling"
@@ -70,23 +66,6 @@
     {
       "id": "neutral_release_and_connect",
       "template": "release_and_connect",
-      "authoritative_grammar_ids": [
-        "amide_formation",
-        "ester_formation",
-        "friedel_crafts_acylation",
-        "sonogashira_coupling",
-        "sp2_c_activated_c_substitution",
-        "sp2_c_n_substitution",
-        "sp2_c_o_substitution",
-        "sp2_c_s_acyl_substitution",
-        "sp2_c_s_substitution",
-        "sp3_c_n_substitution",
-        "sp3_c_o_substitution",
-        "sp3_c_s_substitution",
-        "sulfonamide_formation",
-        "sulfonate_formation",
-        "thioester_formation"
-      ],
       "grammar_ids": [
         "amide_formation",
         "ester_formation",
@@ -228,9 +207,6 @@
     {
       "id": "anionic_release_and_connect",
       "template": "release_and_connect",
-      "authoritative_grammar_ids": [
-        "sp2_c_s_anion_substitution"
-      ],
       "grammar_ids": [
         "sp2_c_s_anion_substitution"
       ],
@@ -296,12 +272,198 @@
       ]
     },
     {
+      "id": "chan_lam_release_and_connect",
+      "template": "release_and_connect",
+      "grammar_ids": [
+        "chan_lam_heteroatom_coupling"
+      ],
+      "role_bindings": {
+        "chan_lam_heteroatom_coupling": {
+          "leaving_source": "transfer_partner",
+          "joining_partner": "nucleophile"
+        }
+      },
+      "variants": [
+        {
+          "id": "default",
+          "instructions": [
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "leaving_source.reactive_link.endpoint_a",
+                "leaving_source.reactive_link.endpoint_b"
+              ],
+              "before": "SINGLE",
+              "after": "NONE"
+            },
+            {
+              "op": "declare_projection_discardable_attachment",
+              "retained": "leaving_source.reactive_link.endpoint_a",
+              "discarded": "leaving_source.reactive_link.endpoint_b"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "leaving_source.reactive_link.endpoint_a",
+                "joining_partner.connection_endpoint.atom"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "joining_partner.reactive_link.carrier",
+              "delta": -1
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "leaving_source.reactive_link.endpoint_a"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "joining_partner.connection_endpoint.atom"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carbonyl_amine_reductive_join",
+      "template": "release_and_connect",
+      "grammar_ids": [
+        "carbonyl_amine_reductive_coupling"
+      ],
+      "role_bindings": {
+        "carbonyl_amine_reductive_coupling": {
+          "carbonyl": "carbonyl_partner",
+          "amine": "amine_partner"
+        }
+      },
+      "variants": [
+        {
+          "id": "default",
+          "instructions": [
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "carbonyl.bond_capacity.endpoint_a",
+                "carbonyl.bond_capacity.endpoint_b"
+              ],
+              "before": "DOUBLE",
+              "after": "NONE"
+            },
+            {
+              "op": "declare_projection_discardable_attachment",
+              "retained": "carbonyl.bond_capacity.endpoint_a",
+              "discarded": "carbonyl.bond_capacity.endpoint_b"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "carbonyl.bond_capacity.endpoint_a",
+                "amine.connection_endpoint.atom"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "carbonyl.bond_capacity.endpoint_a",
+              "delta": 1
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "amine.reactive_link.carrier",
+              "delta": -1
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "carbonyl.bond_capacity.endpoint_a"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "amine.connection_endpoint.atom"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "terminal_alkene_release_and_connect",
+      "template": "release_and_connect",
+      "grammar_ids": [
+        "terminal_alkene_heck_coupling"
+      ],
+      "role_bindings": {
+        "terminal_alkene_heck_coupling": {
+          "leaving_source": "electrophile",
+          "alkene": "alkene_partner"
+        }
+      },
+      "variants": [
+        {
+          "id": "endpoint_enumeration",
+          "instructions": [
+            {
+              "op": "enumerate_endpoint_permutation",
+              "cases": [
+                {
+                  "outcome_id": "endpoint_a",
+                  "bindings": {
+                    "joining_endpoint": "alkene.bond_capacity.endpoint_a"
+                  }
+                },
+                {
+                  "outcome_id": "endpoint_b",
+                  "bindings": {
+                    "joining_endpoint": "alkene.bond_capacity.endpoint_b"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "leaving_source.reactive_link.endpoint_a",
+                "leaving_source.reactive_link.endpoint_b"
+              ],
+              "before": "SINGLE",
+              "after": "NONE"
+            },
+            {
+              "op": "declare_projection_discardable_attachment",
+              "retained": "leaving_source.reactive_link.endpoint_a",
+              "discarded": "leaving_source.reactive_link.endpoint_b"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "leaving_source.reactive_link.endpoint_a",
+                "$joining_endpoint"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "$joining_endpoint",
+              "delta": -1
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "leaving_source.reactive_link.endpoint_a"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "$joining_endpoint"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "alkene_split_and_distribute",
       "template": "split_and_distribute",
-      "authoritative_grammar_ids": [
-        "addend_pair_addition_to_alkene",
-        "xh_addition_to_alkene"
-      ],
       "grammar_ids": [
         "addend_pair_addition_to_alkene",
         "xh_addition_to_alkene"
@@ -470,10 +632,6 @@
     {
       "id": "alkyne_split_and_distribute",
       "template": "split_and_distribute",
-      "authoritative_grammar_ids": [
-        "addend_pair_addition_to_alkyne",
-        "xh_addition_to_alkyne"
-      ],
       "grammar_ids": [
         "addend_pair_addition_to_alkyne",
         "xh_addition_to_alkyne"
@@ -642,10 +800,6 @@
     {
       "id": "polar_bond_order_change",
       "template": "change_bond_order",
-      "authoritative_grammar_ids": [
-        "alcohol_oxidation",
-        "carbonyl_reduction"
-      ],
       "grammar_ids": [
         "alcohol_oxidation",
         "carbonyl_reduction"
@@ -748,9 +902,6 @@
     {
       "id": "alkene_hydrogenation",
       "template": "change_bond_order",
-      "authoritative_grammar_ids": [
-        "alkene_hydrogenation"
-      ],
       "grammar_ids": [
         "alkene_hydrogenation"
       ],
@@ -797,9 +948,6 @@
     {
       "id": "alkyne_partial_hydrogenation",
       "template": "change_bond_order",
-      "authoritative_grammar_ids": [
-        "alkyne_partial_hydrogenation"
-      ],
       "grammar_ids": [
         "alkyne_partial_hydrogenation"
       ],
@@ -846,9 +994,6 @@
     {
       "id": "alkyne_hydrogenation",
       "template": "change_bond_order",
-      "authoritative_grammar_ids": [
-        "alkyne_hydrogenation"
-      ],
       "grammar_ids": [
         "alkyne_hydrogenation"
       ],
@@ -905,9 +1050,6 @@
     {
       "id": "beta_depart_and_unsaturate",
       "template": "depart_and_unsaturate",
-      "authoritative_grammar_ids": [
-        "beta_halo_elimination"
-      ],
       "grammar_ids": [
         "beta_halo_elimination"
       ],
