@@ -75,6 +75,17 @@ not mechanism. The common operator registry uses `center_replacement`,
 edit-derived archetype even when no grammar or named family is available, and a
 grammar/edit contradiction is retained as review evidence.
 
+The internal Phase 1 connectivity observation preserves stronger evidence than
+the compatibility edit view. `BondTransition` distinguishes definite
+`bond`/`no_bond` states from `endpoint_absent` and `unknown`; every transition
+retains observed-product, main-product-projection, exact-reconstruction,
+correspondence-inference, or unresolved scope. Aggregated `HydrogenDelta` and
+formal-charge `AtomStateTransition` observations are included in an internal
+`ConnectivityEditGraph` with a deterministic `CEG1` shadow key. This graph is
+dual-written inside edit normalization for evaluation only and does not yet
+participate in `ReactionSignature`, serialized analyses, retrieval, or
+recommendation behavior.
+
 `pair_addition` combines an unsaturated-bond acceptor with either an existing
 N/O/S–H site or a curated `addition_donor`. The latter represents both explicit
 A–B bonds such as Br–Br and implicit A–H bonds such as Si–H and B–H. The
@@ -206,8 +217,11 @@ python -m reactive_taxonomy.reaction_edit_evaluation_cli `
 ```
 
 Its versioned answer key is
-`benchmarks/reaction_edits/benchmark_manifest.v1.json`, and it writes the same
-five evaluation artifacts under `results/reaction_edit_evaluation/`.
+`benchmarks/reaction_edits/benchmark_manifest.v1.json`. In addition to the five
+standard evaluation artifacts, it writes
+`connectivity_shadow_report.json` with per-case shadow keys, observation-scope
+counts, compatibility parity, unsupported bond domains, and canonicalization
+overflow.
 
 Use concise mode for a chemist-readable view containing the primary labels,
 partner context, and local steric and electronic analyses:

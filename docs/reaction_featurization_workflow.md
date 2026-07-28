@@ -182,6 +182,16 @@ Normalized edit types include:
 - `order_changed`;
 - `hydrogen_change`.
 
+Phase 1 also dual-writes an internal evidence-scoped connectivity observation
+before those compatibility edit types are consumed. `BondTransition`
+distinguishes definite bond/no-bond states from an endpoint absent from the
+reported main product or an unresolved state. Aggregated `HydrogenDelta` and
+observed formal-charge `AtomStateTransition` objects join those transitions in
+a canonical `ConnectivityEditGraph`. Its `CEG1` key is currently shadow
+evaluation output only: it does not alter `ReactionSignature.signature_id`,
+serialized reaction analyses, admission, retrieval, or recommendation
+behavior.
+
 Each `ReactionEdit` retains atom-level provenance:
 
 ```text

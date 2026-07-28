@@ -19,6 +19,21 @@ EditArchetype = Literal[
     "unresolved",
 ]
 
+BondStateKind = Literal[
+    "bond",
+    "no_bond",
+    "endpoint_absent",
+    "unknown",
+]
+
+ConnectivityObservationScope = Literal[
+    "observed_product",
+    "main_product_projection",
+    "exact_reconstruction",
+    "correspondence_inference",
+    "unresolved",
+]
+
 
 @dataclass(frozen=True)
 class ReactionComponent:
@@ -78,6 +93,151 @@ class ReactionAtomReference:
     local_environment_id: str
     chiral_tag: Optional[str] = None
     cip_code: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class BondState:
+    """One typed bond state before or after a connectivity transition."""
+
+    state_kind: BondStateKind
+    order: Optional[str]
+
+    def __post_init__(self) -> None:
+        if self.state_kind == "bond":
+            if not self.order:
+                raise ValueError("bond state requires an order")
+            object.__setattr__(self, "order", str(self.order).upper())
+        elif self.order is not None:
+            raise ValueError(f"{self.state_kind} state cannot carry a bond order")
+
+
+@dataclass(frozen=True)
+class BondTransition:
+    """Evidence-scoped before/after state for one reactant-origin atom pair."""
+
+    atom_1: ReactionAtomReference
+    atom_2: ReactionAtomReference
+    before_state: BondState
+    after_state: BondState
+    delta_units: Optional[int]
+    observation_scope: ConnectivityObservationScope
+    evidence: str
+    confidence: float
+
+    def __post_init__(self) -> None:
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("confidence must be between 0 and 1")
+        localized_units = {"SINGLE": 1, "DOUBLE": 2, "TRIPLE": 3}
+        if (
+            self.delta_units is not None
+            and (
+                self.before_state.state_kind
+                not in {"bond", "no_bond"}
+                or self.after_state.state_kind
+                not in {"bond", "no_bond"}
+            )
+        ):
+            raise ValueError(
+                "delta_units requires definite bond or no-bond endpoint states"
+            )
+        if self.delta_units is not None:
+            before_units = (
+                0
+                if self.before_state.state_kind == "no_bond"
+                else localized_units.get(str(self.before_state.order or ""))
+            )
+            after_units = (
+                0
+                if self.after_state.state_kind == "no_bond"
+                else localized_units.get(str(self.after_state.order or ""))
+            )
+            if (
+                before_units is None
+                or after_units is None
+                or after_units - before_units != self.delta_units
+            ):
+                raise ValueError(
+                    "delta_units must match localized before/after bond states"
+                )
+        if (
+            self.after_state.state_kind == "endpoint_absent"
+            and self.observation_scope != "main_product_projection"
+        ):
+            raise ValueError(
+                "endpoint_absent requires main_product_projection scope"
+            )
+        if (
+            "unknown"
+            in {
+                self.before_state.state_kind,
+                self.after_state.state_kind,
+            }
+            and self.observation_scope != "unresolved"
+        ):
+            raise ValueError("unknown bond state requires unresolved scope")
+
+
+@dataclass(frozen=True)
+class HydrogenDelta:
+    """Schema-level hydrogen-count change without invented H correspondence."""
+
+    atom: ReactionAtomReference
+    before_count: int
+    after_count: int
+    delta_count: int
+    observation_scope: ConnectivityObservationScope
+    evidence: str
+    confidence: float
+
+    def __post_init__(self) -> None:
+        if self.before_count < 0 or self.after_count < 0:
+            raise ValueError("hydrogen counts must be non-negative")
+        if self.after_count - self.before_count != self.delta_count:
+            raise ValueError("hydrogen delta does not match before/after counts")
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("confidence must be between 0 and 1")
+
+
+@dataclass(frozen=True)
+class AtomStateTransition:
+    """Observed atom-state change kept orthogonal to covalent connectivity."""
+
+    reactant_atom: ReactionAtomReference
+    product_atom: ReactionAtomReference
+    before_formal_charge: int
+    after_formal_charge: int
+    before_radical_electrons: Optional[int]
+    after_radical_electrons: Optional[int]
+    before_isotope: Optional[int]
+    after_isotope: Optional[int]
+    observation_scope: ConnectivityObservationScope
+    evidence: str
+    confidence: float
+
+    def __post_init__(self) -> None:
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("confidence must be between 0 and 1")
+
+
+@dataclass(frozen=True)
+class ConnectivityEditGraph:
+    """Internal canonical connectivity observation used for shadow evaluation."""
+
+    bond_transitions: Tuple[BondTransition, ...]
+    hydrogen_deltas: Tuple[HydrogenDelta, ...]
+    atom_state_transitions: Tuple[AtomStateTransition, ...]
+    edit_component_keys: Tuple[str, ...]
+    shadow_key: str
+    evidence: str
+    confidence: float
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
+
+    def __post_init__(self) -> None:
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("confidence must be between 0 and 1")
+        if not self.shadow_key.startswith("CEG1:"):
+            raise ValueError("shadow_key must use the CEG1 namespace")
 
 
 @dataclass(frozen=True)
@@ -459,8 +619,15 @@ class ReactionAnalysis:
 
 
 __all__ = [
+    "AtomStateTransition",
+    "BondState",
+    "BondStateKind",
+    "BondTransition",
     "BondChange",
+    "ConnectivityEditGraph",
+    "ConnectivityObservationScope",
     "EditArchetype",
+    "HydrogenDelta",
     "OperatorOutcome",
     "PartialProductTransformation",
     "ProductConnection",

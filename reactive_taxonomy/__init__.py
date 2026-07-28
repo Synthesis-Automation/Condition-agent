@@ -4,7 +4,14 @@ from .api import detect_sites, featurize_molecule
 from .reaction_api import featurize_reaction
 from .reaction_signatures import reaction_signature_definition_versions
 from .reaction_models import (
+    AtomStateTransition,
+    BondState,
+    BondStateKind,
+    BondTransition,
+    ConnectivityEditGraph,
+    ConnectivityObservationScope,
     EditArchetype,
+    HydrogenDelta,
     OperatorOutcome,
     ProductConnection,
     ProductConnectionEndpoint,
@@ -77,12 +84,19 @@ from .reaction_edit_evaluation import (
 )
 
 __all__ = [
+    "AtomStateTransition",
+    "BondState",
+    "BondStateKind",
+    "BondTransition",
     "ComponentAnalysis",
     "CompoundAnalysis",
+    "ConnectivityEditGraph",
+    "ConnectivityObservationScope",
     "ContextClassification",
     "ContextualTransformationLabel",
     "EditArchetype",
     "FunctionalGroup",
+    "HydrogenDelta",
     "MatchIndex",
     "OperatorOutcome",
     "ProductConnection",

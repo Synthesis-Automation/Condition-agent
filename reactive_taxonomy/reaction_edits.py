@@ -4,17 +4,29 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Dict, Optional, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_models import (
+    AtomStateTransition,
+    ConnectivityEditGraph,
+    HydrogenDelta,
     ReactionAtomReference,
     ReactionCandidate,
     ReactionComponent,
     ReactionEdit,
     ReactionSiteReference,
     ReactionStereoChange,
+)
+from .reaction_connectivity import (
+    atom_provenance_key,
+    bond_state,
+    build_connectivity_edit_graph,
+    connectivity_graph_from_reaction_edits,
+    endpoint_absent_state,
+    make_bond_transition,
+    unknown_bond_state,
 )
 from .reaction_correspondence import (
     infer_global_correspondence_candidates,
@@ -32,6 +44,7 @@ class EditNormalizationResult:
     warnings: Tuple[str, ...] = ()
     valid: bool = True
     stereo_changes: Tuple[ReactionStereoChange, ...] = ()
+    connectivity_edit_graph: Optional[ConnectivityEditGraph] = None
 
 
 @dataclass(frozen=True)
@@ -43,6 +56,34 @@ class _MappedSide:
     mapped_atom_count: int
     heavy_atom_count: int
     mapped_heavy_atom_count: int
+
+
+def _connectivity_graph_with_warnings(
+    graph: Optional[ConnectivityEditGraph],
+    *warnings: str,
+) -> Optional[ConnectivityEditGraph]:
+    if graph is None:
+        return None
+    return replace(
+        graph,
+        warnings=tuple(sorted(set(graph.warnings).union(warnings))),
+    )
+
+
+def _connectivity_graph_has_unknown(
+    graph: Optional[ConnectivityEditGraph],
+) -> bool:
+    return bool(
+        graph
+        and any(
+            "unknown"
+            in {
+                transition.before_state.state_kind,
+                transition.after_state.state_kind,
+            }
+            for transition in graph.bond_transitions
+        )
+    )
 
 
 def _environment_id(mol: Any, atom_index: int) -> str:
@@ -168,6 +209,144 @@ def _mapped_side(components: Tuple[ReactionComponent, ...]) -> _MappedSide:
     )
 
 
+def _mapped_connectivity_graph(
+    left: _MappedSide,
+    right: _MappedSide,
+) -> ConnectivityEditGraph:
+    """Preserve exact versus projected states before compatibility collapse."""
+    transitions = []
+    hydrogens = []
+    atom_states = []
+    warnings = []
+    right_heavy_mapping_complete = (
+        right.mapped_heavy_atom_count == right.heavy_atom_count
+    )
+    for pair in sorted(set(left.bonds).union(right.bonds)):
+        old_order = left.bonds.get(pair)
+        new_order = right.bonds.get(pair)
+        if old_order == new_order:
+            continue
+        atom_1 = left.atoms.get(pair[0]) or right.atoms.get(pair[0])
+        atom_2 = left.atoms.get(pair[1]) or right.atoms.get(pair[1])
+        if atom_1 is None or atom_2 is None:
+            warnings.append(
+                f"CONNECTIVITY_TRANSITION_ENDPOINT_MISSING:{pair[0]}:{pair[1]}"
+            )
+            continue
+        left_has_both = pair[0] in left.atoms and pair[1] in left.atoms
+        right_has_both = pair[0] in right.atoms and pair[1] in right.atoms
+        before_state = (
+            bond_state(old_order)
+            if old_order is not None
+            else bond_state(None)
+            if left_has_both
+            else unknown_bond_state()
+        )
+        if new_order is not None:
+            after_state = bond_state(new_order)
+        elif right_has_both:
+            after_state = bond_state(None)
+        elif old_order is not None and right_heavy_mapping_complete:
+            after_state = endpoint_absent_state()
+        else:
+            after_state = unknown_bond_state()
+        if (
+            before_state.state_kind in {"bond", "no_bond"}
+            and after_state.state_kind in {"bond", "no_bond"}
+            and left_has_both
+            and right_has_both
+        ):
+            scope = "observed_product"
+            confidence = 1.0
+        elif after_state.state_kind == "endpoint_absent":
+            scope = "main_product_projection"
+            confidence = 1.0
+            warnings.append(
+                f"PROJECTED_ATTACHMENT_NOT_FULLY_OBSERVED:{pair[0]}:{pair[1]}"
+            )
+        else:
+            scope = "unresolved"
+            confidence = 0.0
+            warnings.append(
+                f"PRODUCT_ENDPOINT_WITHOUT_REACTANT_PROVENANCE:{pair[0]}:{pair[1]}"
+            )
+        transitions.append(
+            make_bond_transition(
+                atom_1=atom_1,
+                atom_2=atom_2,
+                before_state=before_state,
+                after_state=after_state,
+                observation_scope=scope,
+                evidence="supplied_atom_mapping",
+                confidence=confidence,
+            )
+        )
+    for map_number in sorted(
+        set(left.hydrogen_counts).intersection(right.hydrogen_counts)
+    ):
+        before_count = left.hydrogen_counts[map_number]
+        after_count = right.hydrogen_counts[map_number]
+        if before_count == after_count:
+            continue
+        hydrogens.append(
+            HydrogenDelta(
+                atom=left.atoms[map_number],
+                before_count=before_count,
+                after_count=after_count,
+                delta_count=after_count - before_count,
+                observation_scope="observed_product",
+                evidence="supplied_atom_mapping",
+                confidence=1.0,
+            )
+        )
+    for map_number in sorted(set(left.atoms).intersection(right.atoms)):
+        before = left.atoms[map_number]
+        after = right.atoms[map_number]
+        if before.formal_charge == after.formal_charge:
+            continue
+        atom_states.append(
+            AtomStateTransition(
+                reactant_atom=before,
+                product_atom=after,
+                before_formal_charge=before.formal_charge,
+                after_formal_charge=after.formal_charge,
+                before_radical_electrons=None,
+                after_radical_electrons=None,
+                before_isotope=None,
+                after_isotope=None,
+                observation_scope="observed_product",
+                evidence="supplied_atom_mapping",
+                confidence=1.0,
+            )
+        )
+    return build_connectivity_edit_graph(
+        bond_transitions=transitions,
+        hydrogen_deltas=hydrogens,
+        atom_state_transitions=atom_states,
+        evidence="validated_atom_mapping",
+        confidence=1.0 if transitions or hydrogens or atom_states else 0.0,
+        warnings=warnings,
+    )
+
+
+def _reactant_hydrogen_counts(
+    components: Tuple[ReactionComponent, ...],
+) -> Dict[Tuple[object, ...], int]:
+    counts: Dict[Tuple[object, ...], int] = {}
+    for component in components:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        for atom in molecule.GetAtoms():
+            if atom.GetSymbol() == "H":
+                continue
+            reference = _atom_reference(component, int(atom.GetIdx()))
+            counts[atom_provenance_key(reference)] = int(
+                atom.GetTotalNumHs(includeNeighbors=True)
+            )
+    return counts
+
+
 def normalize_mapped_edits(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
@@ -272,6 +451,7 @@ def normalize_mapped_edits(
         evidence="supplied_atom_mapping",
         confidence=1.0,
     )
+    connectivity_graph = _mapped_connectivity_graph(left, right)
     return EditNormalizationResult(
         tuple(edits),
         "validated_atom_mapping" if edits else "atom_mapping_without_edits",
@@ -279,6 +459,7 @@ def normalize_mapped_edits(
         tuple(sorted(set(warnings))),
         bool(edits),
         stereo_changes,
+        connectivity_graph,
     )
 
 
@@ -345,12 +526,29 @@ def normalize_predicted_edits(
                 confidence=1.0,
             )
         )
+    normalized_edits = tuple(edits)
+    evidence = (
+        "exact_product_reconstruction" if edits else "edit_normalization_failed"
+    )
+    connectivity_graph = (
+        connectivity_graph_from_reaction_edits(
+            normalized_edits,
+            observation_scope="exact_reconstruction",
+            evidence=evidence,
+            confidence=1.0,
+            hydrogen_before_counts=_reactant_hydrogen_counts(reactants),
+            warnings=warnings,
+        )
+        if normalized_edits
+        else None
+    )
     return EditNormalizationResult(
-        tuple(edits),
-        "exact_product_reconstruction" if edits else "edit_normalization_failed",
+        normalized_edits,
+        evidence,
         1.0 if edits else 0.0,
         tuple(sorted(set(warnings))),
         bool(edits),
+        connectivity_edit_graph=connectivity_graph,
     )
 
 
@@ -373,12 +571,21 @@ def normalize_predicted_multi_event_edits(
             (), "multi_event_edit_normalization_failed", 0.0, warnings, False
         )
     edits = tuple(edit for result in normalized for edit in result.edits)
+    connectivity_graph = connectivity_graph_from_reaction_edits(
+        edits,
+        observation_scope="exact_reconstruction",
+        evidence="exact_multi_event_reconstruction",
+        confidence=1.0,
+        hydrogen_before_counts=_reactant_hydrogen_counts(reactants),
+        warnings=warnings,
+    )
     return EditNormalizationResult(
         edits,
         "exact_multi_event_reconstruction",
         1.0,
         warnings,
         True,
+        connectivity_edit_graph=connectivity_graph,
     )
 
 
@@ -514,6 +721,109 @@ def _correspondence_edits(
                 )
             )
     return tuple(edits)
+
+
+def _correspondence_connectivity_graph(
+    mapping: Tuple[Tuple[int, int, int, int], ...],
+    edits: Tuple[ReactionEdit, ...],
+    reactants: Tuple[ReactionComponent, ...],
+    products: Tuple[ReactionComponent, ...],
+    *,
+    evidence: str,
+    confidence: float,
+) -> ConnectivityEditGraph:
+    """Build inferred transitions while retaining projected attachment loss."""
+    mapped_reactant_atoms = {
+        (reactant_component, reactant_atom)
+        for reactant_component, reactant_atom, _, _ in mapping
+    }
+    transitions = []
+    warnings = []
+    for edit in edits:
+        if edit.edit_type == "hydrogen_change":
+            continue
+        if edit.atom_2 is None:
+            warnings.append("CONNECTIVITY_EDIT_ENDPOINT_MISSING")
+            continue
+        left_position = (edit.atom_1.component_index, edit.atom_1.atom_index)
+        right_position = (edit.atom_2.component_index, edit.atom_2.atom_index)
+        projected = (
+            edit.edit_type == "broken"
+            and (
+                left_position not in mapped_reactant_atoms
+                or right_position not in mapped_reactant_atoms
+            )
+        )
+        transitions.append(
+            make_bond_transition(
+                atom_1=edit.atom_1,
+                atom_2=edit.atom_2,
+                before_state=bond_state(edit.old_order),
+                after_state=(
+                    endpoint_absent_state()
+                    if projected
+                    else bond_state(edit.new_order)
+                ),
+                observation_scope=(
+                    "main_product_projection"
+                    if projected
+                    else "correspondence_inference"
+                ),
+                evidence=edit.evidence,
+                confidence=edit.confidence,
+            )
+        )
+        if projected:
+            warnings.append("PROJECTED_ATTACHMENT_NOT_FULLY_OBSERVED")
+    hydrogen_graph = connectivity_graph_from_reaction_edits(
+        tuple(edit for edit in edits if edit.edit_type == "hydrogen_change"),
+        observation_scope="correspondence_inference",
+        evidence=evidence,
+        confidence=confidence,
+        hydrogen_before_counts=_reactant_hydrogen_counts(reactants),
+    )
+    reactant_components = {
+        component.component_index: component for component in reactants
+    }
+    product_components = {
+        component.component_index: component for component in products
+    }
+    atom_states = []
+    for (
+        reactant_component_index,
+        reactant_atom_index,
+        product_component_index,
+        product_atom_index,
+    ) in mapping:
+        reactant_component = reactant_components[reactant_component_index]
+        product_component = product_components[product_component_index]
+        before = _atom_reference(reactant_component, reactant_atom_index)
+        after = _atom_reference(product_component, product_atom_index)
+        if before.formal_charge == after.formal_charge:
+            continue
+        atom_states.append(
+            AtomStateTransition(
+                reactant_atom=before,
+                product_atom=after,
+                before_formal_charge=before.formal_charge,
+                after_formal_charge=after.formal_charge,
+                before_radical_electrons=None,
+                after_radical_electrons=None,
+                before_isotope=None,
+                after_isotope=None,
+                observation_scope="correspondence_inference",
+                evidence=evidence,
+                confidence=confidence,
+            )
+        )
+    return build_connectivity_edit_graph(
+        bond_transitions=transitions,
+        hydrogen_deltas=hydrogen_graph.hydrogen_deltas,
+        atom_state_transitions=atom_states,
+        evidence=evidence,
+        confidence=confidence,
+        warnings=tuple(warnings) + hydrogen_graph.warnings,
+    )
 
 
 def _atom_stereo_descriptor(molecule: Any, atom_index: int) -> Optional[str]:
@@ -782,6 +1092,7 @@ def normalize_inferred_scaffold_edits(
         )
     all_candidate_results = tuple(
         (
+            mapping,
             _correspondence_edits(
                 mapping,
                 reactants,
@@ -802,19 +1113,19 @@ def normalize_inferred_scaffold_edits(
     if evidence == "global_atom_correspondence":
         nonempty_costs = tuple(
             _correspondence_edit_cost(edits)
-            for edits, _ in all_candidate_results
+            for _, edits, _ in all_candidate_results
             if edits
         )
         best_cost = min(nonempty_costs) if nonempty_costs else None
         candidate_results = tuple(
             result
             for result in all_candidate_results
-            for edits, _ in (result,)
+            for _, edits, _ in (result,)
             if edits and _correspondence_edit_cost(edits) == best_cost
         )
     else:
         candidate_results = all_candidate_results
-    nonempty = tuple(result for result in candidate_results if result[0])
+    nonempty = tuple(result for result in candidate_results if result[1])
     if not nonempty:
         return EditNormalizationResult(
             (),
@@ -830,7 +1141,7 @@ def normalize_inferred_scaffold_edits(
                 sorted(_chemistry_stereo_key(change) for change in stereo)
             ),
         )
-        for edits, stereo in nonempty
+        for _, edits, stereo in nonempty
     }
     if len(edit_sets) != 1 or len(nonempty) != len(candidate_results):
         return EditNormalizationResult(
@@ -843,21 +1154,30 @@ def normalize_inferred_scaffold_edits(
     selected = min(
         nonempty,
         key=lambda result: (
-            tuple(sorted(_comparison_key(edit) for edit in result[0])),
+            tuple(sorted(_comparison_key(edit) for edit in result[1])),
             tuple(
                 sorted(
-                    _stereo_comparison_key(change) for change in result[1]
+                    _stereo_comparison_key(change) for change in result[2]
                 )
             ),
         ),
     )
-    return EditNormalizationResult(
+    connectivity_graph = _correspondence_connectivity_graph(
         selected[0],
+        selected[1],
+        reactants,
+        products,
+        evidence=evidence,
+        confidence=confidence,
+    )
+    return EditNormalizationResult(
+        selected[1],
         evidence,
         confidence,
         (inferred_warning,),
         True,
-        selected[1],
+        selected[2],
+        connectivity_graph,
     )
 
 
@@ -976,6 +1296,16 @@ def normalize_reaction_edits(
                 warnings,
                 True,
                 mapped.stereo_changes,
+                _connectivity_graph_with_warnings(
+                    mapped.connectivity_edit_graph,
+                    (
+                        "MAPPING_RECONSTRUCTION_NOT_COMPARABLE"
+                        if _connectivity_graph_has_unknown(
+                            mapped.connectivity_edit_graph
+                        )
+                        else "MAPPING_RECONSTRUCTION_SCOPE_DIFFERENCE"
+                    ),
+                ),
             )
         return EditNormalizationResult(
             mapped.edits,
@@ -984,6 +1314,16 @@ def normalize_reaction_edits(
             tuple(sorted(set(warnings + ("MAPPING_RECONSTRUCTION_CONFLICT",)))),
             True,
             mapped.stereo_changes,
+            _connectivity_graph_with_warnings(
+                mapped.connectivity_edit_graph,
+                (
+                    "MAPPING_RECONSTRUCTION_NOT_COMPARABLE"
+                    if _connectivity_graph_has_unknown(
+                        mapped.connectivity_edit_graph
+                    )
+                    else "MAPPING_RECONSTRUCTION_TRANSITION_CONFLICT"
+                ),
+            ),
         )
     if mapped.valid and predicted_multi.valid:
         mapped_keys = {_comparison_key(edit) for edit in mapped.edits}
@@ -996,6 +1336,16 @@ def normalize_reaction_edits(
                 warnings,
                 True,
                 mapped.stereo_changes,
+                _connectivity_graph_with_warnings(
+                    mapped.connectivity_edit_graph,
+                    (
+                        "MAPPING_RECONSTRUCTION_NOT_COMPARABLE"
+                        if _connectivity_graph_has_unknown(
+                            mapped.connectivity_edit_graph
+                        )
+                        else "MAPPING_RECONSTRUCTION_SCOPE_DIFFERENCE"
+                    ),
+                ),
             )
         return EditNormalizationResult(
             mapped.edits,
@@ -1004,6 +1354,16 @@ def normalize_reaction_edits(
             tuple(sorted(set(warnings + ("MAPPING_RECONSTRUCTION_CONFLICT",)))),
             True,
             mapped.stereo_changes,
+            _connectivity_graph_with_warnings(
+                mapped.connectivity_edit_graph,
+                (
+                    "MAPPING_RECONSTRUCTION_NOT_COMPARABLE"
+                    if _connectivity_graph_has_unknown(
+                        mapped.connectivity_edit_graph
+                    )
+                    else "MAPPING_RECONSTRUCTION_TRANSITION_CONFLICT"
+                ),
+            ),
         )
     if mapped.valid:
         if _stereochemical_reconstruction_conflict(candidates, products):
@@ -1021,6 +1381,7 @@ def normalize_reaction_edits(
                 ),
                 True,
                 mapped.stereo_changes,
+                mapped.connectivity_edit_graph,
             )
         return EditNormalizationResult(
             mapped.edits,
@@ -1029,10 +1390,15 @@ def normalize_reaction_edits(
             warnings,
             True,
             mapped.stereo_changes,
+            mapped.connectivity_edit_graph,
         )
     if predicted.valid:
         return EditNormalizationResult(
-            predicted.edits, predicted.evidence, predicted.confidence, warnings
+            predicted.edits,
+            predicted.evidence,
+            predicted.confidence,
+            warnings,
+            connectivity_edit_graph=predicted.connectivity_edit_graph,
         )
     if predicted_multi.valid:
         return EditNormalizationResult(
@@ -1040,6 +1406,7 @@ def normalize_reaction_edits(
             predicted_multi.evidence,
             predicted_multi.confidence,
             warnings,
+            connectivity_edit_graph=predicted_multi.connectivity_edit_graph,
         )
     inferred = normalize_inferred_scaffold_edits(reactants, products)
     if inferred.valid:
@@ -1058,6 +1425,7 @@ def normalize_reaction_edits(
                 ),
                 True,
                 inferred.stereo_changes,
+                inferred.connectivity_edit_graph,
             )
         return inferred
     return EditNormalizationResult(
@@ -1066,6 +1434,11 @@ def normalize_reaction_edits(
         0.0,
         tuple(sorted(set(warnings + inferred.warnings))),
         False,
+        connectivity_edit_graph=(
+            mapped.connectivity_edit_graph
+            if mapped.evidence == "atom_mapping_without_edits"
+            else inferred.connectivity_edit_graph
+        ),
     )
 
 

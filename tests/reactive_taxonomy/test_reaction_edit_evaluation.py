@@ -23,6 +23,7 @@ def test_phase2_benchmark_is_versioned_and_partitioned() -> None:
 def test_phase2_machine_gate_and_artifacts(tmp_path: Path) -> None:
     report = evaluate_reaction_edits(tmp_path)
 
+    assert report["schema_version"] == "1.1"
     assert report["machine_gate_passed"]
     assert report["human_gate_status"] == "pending_chemist_review"
     assert report["failed_case_ids"] == []
@@ -34,10 +35,14 @@ def test_phase2_machine_gate_and_artifacts(tmp_path: Path) -> None:
     assert {
         "machine_report.json",
         "case_results.jsonl",
+        "connectivity_shadow_report.json",
         "chemist_review.csv",
         "review_structures.html",
         "disagreements.csv",
     } <= {path.name for path in tmp_path.iterdir()}
+    assert report["metrics"]["connectivity_shadow_coverage"] == 1.0
+    assert report["metrics"]["connectivity_compatibility_parity_rate"] == 1.0
+    assert report["connectivity_shadow"]["canonicalization_overflow_count"] == 0
 
 
 def test_phase2_review_packet_is_blind_and_readable(tmp_path: Path) -> None:
@@ -86,6 +91,31 @@ def test_phase2_evaluation_is_deterministic(tmp_path: Path) -> None:
     assert (first / "review_structures.html").read_bytes() == (
         second / "review_structures.html"
     ).read_bytes()
+    assert (first / "connectivity_shadow_report.json").read_bytes() == (
+        second / "connectivity_shadow_report.json"
+    ).read_bytes()
+
+
+def test_phase2_connectivity_shadow_retains_observation_scope(
+    tmp_path: Path,
+) -> None:
+    evaluate_reaction_edits(tmp_path)
+    shadow = json.loads(
+        (tmp_path / "connectivity_shadow_report.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert shadow["schema_version"] == "1.0"
+    assert shadow["summary"]["scope_counts"]["observed_product"] > 0
+    mapped_coupling = next(
+        case
+        for case in shadow["cases"]
+        if case["case_id"] == "mapped_cn_exact_agreement"
+    )
+    assert mapped_coupling["shadow_key"].startswith("CEG1:")
+    assert mapped_coupling["scope_counts"]["main_product_projection"] > 0
+    assert mapped_coupling["compatibility_parity"]
 
 
 def test_phase2_case_results_retain_conflicts_and_invalid_valence(

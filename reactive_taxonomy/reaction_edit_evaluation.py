@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Sequence
 
 from .reaction_api import featurize_reaction
+from .reaction_edits import normalize_reaction_edits
 
 _DEFAULT_BENCHMARK = (
     Path(__file__).parents[1]
@@ -125,6 +126,76 @@ def _result_fingerprint(result: Any) -> str:
         ),
     }
     return json.dumps(payload, sort_keys=True, separators=(",", ":"))
+
+
+def _connectivity_shadow_record(result: Any) -> Dict[str, Any]:
+    if not result.valid:
+        return {
+            "shadow_key": None,
+            "edit_component_keys": [],
+            "scope_counts": {},
+            "bond_transition_count": 0,
+            "hydrogen_delta_count": 0,
+            "atom_state_transition_count": 0,
+            "compatibility_parity": True,
+            "warnings": [],
+        }
+    normalized = normalize_reaction_edits(
+        result.reactants,
+        result.products,
+        result.selected_candidate,
+        result.selected_events,
+        result.candidates,
+    )
+    graph = normalized.connectivity_edit_graph
+    if graph is None:
+        return {
+            "shadow_key": None,
+            "edit_component_keys": [],
+            "scope_counts": {},
+            "bond_transition_count": 0,
+            "hydrogen_delta_count": 0,
+            "atom_state_transition_count": 0,
+            "compatibility_parity": not _edits(result),
+            "warnings": [],
+        }
+    scopes = Counter(
+        transition.observation_scope for transition in graph.bond_transitions
+    )
+    scopes.update(delta.observation_scope for delta in graph.hydrogen_deltas)
+    scopes.update(
+        transition.observation_scope
+        for transition in graph.atom_state_transitions
+    )
+    normalized_fingerprint = tuple(
+        sorted(
+            (
+                edit.edit_type,
+                tuple(
+                    sorted(
+                        (
+                            edit.atom_1.element,
+                            edit.atom_2.element if edit.atom_2 else "H",
+                        )
+                    )
+                ),
+                edit.old_order or "NONE",
+                edit.new_order or "NONE",
+            )
+            for edit in normalized.edits
+        )
+    )
+    return {
+        "shadow_key": graph.shadow_key,
+        "edit_component_keys": list(graph.edit_component_keys),
+        "scope_counts": dict(sorted(scopes.items())),
+        "bond_transition_count": len(graph.bond_transitions),
+        "hydrogen_delta_count": len(graph.hydrogen_deltas),
+        "atom_state_transition_count": len(graph.atom_state_transitions),
+        "compatibility_parity": normalized_fingerprint
+        == _parity_fingerprint(result),
+        "warnings": list(graph.warnings),
+    }
 
 
 def _draw_molecule(
@@ -269,6 +340,7 @@ def evaluate_reaction_edits(
     conflict_passed = conflict_total = 0
     deterministic = 0
     case_results = []
+    shadow_results = []
     review_rows = []
     parity_results: Dict[str, list[tuple[tuple[Any, ...], ...]]] = {}
     partition_counts: Dict[str, Counter[str]] = {
@@ -281,6 +353,7 @@ def evaluate_reaction_edits(
         deterministic_case = _result_fingerprint(result) == _result_fingerprint(repeated)
         deterministic += int(deterministic_case)
         edits = _edits(result)
+        shadow = _connectivity_shadow_record(result)
         expected_counts = _expected_counts(case)
         observed_counts = _counter(edit.edit_type for edit in edits)
         expected_total.update(expected_counts)
@@ -362,6 +435,13 @@ def evaluate_reaction_edits(
                 "error": result.error,
             }
         )
+        shadow_results.append(
+            {
+                "case_id": case["case_id"],
+                "partition": partition,
+                **shadow,
+            }
+        )
         review_rows.append(
             {
                 "case_id": case["case_id"],
@@ -394,6 +474,11 @@ def evaluate_reaction_edits(
         len(fingerprints) >= 2 and len(set(fingerprints)) == 1
         for fingerprints in parity_results.values()
     ]
+    shadow_eligible = tuple(
+        row
+        for row, case in zip(shadow_results, case_results)
+        if case["observed_edits"]
+    )
     metrics = {
         "case_count": case_count,
         "passed_case_count": sum(case["case_passed"] for case in case_results),
@@ -412,6 +497,14 @@ def evaluate_reaction_edits(
         ),
         "conflict_retention_rate": ratio(conflict_passed, conflict_total),
         "determinism_rate": ratio(deterministic, case_count),
+        "connectivity_shadow_coverage": ratio(
+            sum(bool(row["shadow_key"]) for row in shadow_eligible),
+            len(shadow_eligible),
+        ),
+        "connectivity_compatibility_parity_rate": ratio(
+            sum(bool(row["compatibility_parity"]) for row in shadow_results),
+            len(shadow_results),
+        ),
     }
     thresholds = dict(benchmark["thresholds"])
     threshold_results = {
@@ -419,7 +512,7 @@ def evaluate_reaction_edits(
         for name, threshold in thresholds.items()
     }
     report: Dict[str, Any] = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "benchmark_id": benchmark["benchmark_id"],
         "benchmark_path": str(Path(benchmark_path)),
         "metrics": metrics,
@@ -438,6 +531,29 @@ def evaluate_reaction_edits(
         "failed_case_ids": [
             case["case_id"] for case in case_results if not case["case_passed"]
         ],
+        "connectivity_shadow": {
+            "schema_version": "1.0",
+            "scope_counts": dict(
+                sorted(
+                    sum(
+                        (
+                            Counter(row["scope_counts"])
+                            for row in shadow_results
+                        ),
+                        Counter(),
+                    ).items()
+                )
+            ),
+            "unsupported_bond_domain_count": sum(
+                "UNSUPPORTED_BOND_DOMAIN" in row["warnings"]
+                for row in shadow_results
+            ),
+            "canonicalization_overflow_count": sum(
+                "CONNECTIVITY_CANONICALIZATION_OVERFLOW"
+                in row["warnings"]
+                for row in shadow_results
+            ),
+        },
     }
     (destination / "machine_report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
@@ -447,6 +563,20 @@ def evaluate_reaction_edits(
             json.dumps(case, ensure_ascii=False, sort_keys=True) + "\n"
             for case in case_results
         ),
+        encoding="utf-8",
+    )
+    (destination / "connectivity_shadow_report.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "1.0",
+                "benchmark_id": benchmark["benchmark_id"],
+                "summary": report["connectivity_shadow"],
+                "cases": shadow_results,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
         encoding="utf-8",
     )
     review_fields = [key for key in review_rows[0] if key != "diagram"]

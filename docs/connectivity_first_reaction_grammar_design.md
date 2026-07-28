@@ -2,9 +2,11 @@
 
 ## Status
 
-This document is a design proposal. It defines a more uniform foundation for
-reaction featurization and grammar execution; it does not by itself change the
-current public schemas or reaction behavior.
+This document defines the target connectivity-first architecture. Phase 1, the
+evidence-scoped connectivity observation and internal shadow graph, was
+implemented on 2026-07-28. The generic rewrite executor and later grammar
+migration phases remain proposed. Phase 1 does not change current public
+reaction serialization, signature identity, or recommendation behavior.
 
 The proposal extends the graph-first principles in
 `type_agnostic_reaction_recommendation_implementation.md`. The molecular graph

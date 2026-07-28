@@ -2,7 +2,27 @@
 
 ## Status
 
-Proposed first implementation phase.
+Implemented on 2026-07-28.
+
+Implementation result:
+
+- added the typed connectivity contracts in `reaction_models.py`;
+- added canonical graph construction and the `CEG1` shadow identity in
+  `reaction_connectivity.py`;
+- dual-wrote mapped, reconstructed, and inferred observations inside
+  `EditNormalizationResult`;
+- preserved current `ReactionEdit`, `ReactionAnalysis`, signature identity,
+  admission, retrieval, and recommendation behavior;
+- added `connectivity_shadow_report.json` to reaction-edit evaluation;
+- added exact, projected, unresolved, hydrogen, charge, inference, symmetry,
+  aromatic-domain, topology, and canonicalization-overflow regressions; and
+- passed the complete repository suite with 493 tests.
+
+The 12-case reaction-edit benchmark passed its machine gate with 100% shadow
+coverage and 100% compatibility parity. It observed 21
+`observed_product`, two `main_product_projection`, and three
+`exact_reconstruction` scoped changes, with no unsupported bond-domain or
+canonicalization-overflow cases.
 
 This plan implements the observation foundation from
 [`connectivity_first_reaction_grammar_design.md`](connectivity_first_reaction_grammar_design.md).
