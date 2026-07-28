@@ -284,6 +284,40 @@ def test_partial_product_observation_is_serialized_but_not_indexed() -> None:
     assert "PRODUCT_ATOM_SOURCE_UNRESOLVED:Cl" in review["warnings"]
 
 
+def test_multi_atom_product_origin_gap_is_serialized_for_review() -> None:
+    record = convert_record(_raw("Brc1ccccc1>>N#Cc1ccccc1"))
+
+    assert record.chemistry_status == ChemistryStatus.REJECTED
+    assert record.index_eligibility == IndexEligibility.INELIGIBLE
+    assert record.reaction_signature is None
+    partial = record.partial_product_transformation
+    assert partial is not None
+    assert partial["schema_version"] == "2.0"
+    assert partial["transformation_type"] == (
+        "attachment_fragment_replacement"
+    )
+    fragment = partial["installed_fragment"]
+    assert fragment["canonical_fragment_smiles"] == "C#N"
+    assert fragment["rooted_fragment_smiles"] == "*C#N"
+    assert fragment["source_status"] == "unresolved"
+    assert fragment["source_candidates"] == ()
+    provenance = partial["product_atom_provenance"]
+    assert len(provenance) == 8
+    assert sum(
+        item["source_kind"] == "reactant_correspondence"
+        for item in provenance
+    ) == 6
+    assert sum(item["source_kind"] == "unresolved" for item in provenance) == 2
+
+    review = concise_reaction_review_row(record.to_dict())
+    assert review["removed_fragment"] == "Br"
+    assert review["installed_fragment"] == "C#N"
+    assert review["installed_fragment_key"].startswith("PFG1:")
+    assert review["fragment_source_status"] == "unresolved"
+    assert review["fragment_source_candidates"] == ""
+    assert review["missing_product_atom_elements"] == "C; N"
+
+
 def test_inconsistent_product_mapping_is_review_only() -> None:
     record = convert_record(
         _raw("[CH3:1][OH:2]>>[CH2:1]=[O:3]")
@@ -512,7 +546,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "1.4"
+    assert report["schema_version"] == "1.5"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]

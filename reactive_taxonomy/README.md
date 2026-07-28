@@ -32,6 +32,18 @@ Reactant-side excess is retained without rejection because main-product
 reaction records commonly omit byproducts. Missing reactants or stoichiometric
 partner copies are never synthesized.
 
+When one conserved scaffold uniquely exchanges one connected branch, an
+incomplete record may retain an observation-only
+`PartialProductTransformation`. Product-only atoms are grouped into a rooted
+`ProductOriginGap` with atom references, internal bonds, attachment topology,
+and a deterministic `PFG1` key. A product-heavy-atom provenance ledger links
+conserved atoms to reactant atoms and leaves gap source atoms null. This
+represents omitted multi-atom sources such as cyanide or azide without
+inventing a reagent. Structurally matching
+middle-side agents are recorded only as source support; ambiguous or absent
+sources remain explicit, and the record is not promoted to a verified
+`ReactionSignature`.
+
 Exact grammar labels use one reaction-wide namespace for repeated generic
 fragments. Distinct graph-derived fragments are numbered by semantic role and
 retain the same alias across the arrow, for example

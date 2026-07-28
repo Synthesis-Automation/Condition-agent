@@ -294,15 +294,83 @@ class ReactionCompletenessAssessment:
 
 
 @dataclass(frozen=True)
+class ProductFragmentAttachment:
+    """One observed bond from a conserved product scaffold to an origin gap."""
+
+    scaffold_atom: ReactionAtomReference
+    fragment_atom: ReactionAtomReference
+    bond_order: str
+
+
+@dataclass(frozen=True)
+class ProductFragmentSourceCandidate:
+    """One structurally compatible supplied source for a product-origin gap."""
+
+    side: Literal["reactant", "agent"]
+    component_index: int
+    canonical_smiles: str
+    evidence: str
+    confidence: float
+
+
+@dataclass(frozen=True)
+class ProductAtomProvenance:
+    """One product-heavy-atom source assignment or explicit provenance gap."""
+
+    product_atom: ReactionAtomReference
+    source_kind: Literal[
+        "reactant_correspondence",
+        "agent_supported",
+        "unresolved",
+    ]
+    source_atom: Optional[ReactionAtomReference]
+    evidence: str
+    confidence: float
+
+
+@dataclass(frozen=True)
+class ProductOriginGap:
+    """Connected product fragment lacking supplied reactant atom mapping."""
+
+    product_component_index: int
+    atom_references: Tuple[ReactionAtomReference, ...]
+    internal_bond_types: Tuple[str, ...]
+    attachments: Tuple[ProductFragmentAttachment, ...]
+    canonical_fragment_smiles: str
+    rooted_fragment_smiles: str
+    fragment_key: str
+    element_counts: Dict[str, int]
+    formal_charge: int
+    source_status: Literal[
+        "unresolved",
+        "reactant_supported",
+        "agent_supported",
+        "ambiguous",
+    ]
+    source_candidates: Tuple[ProductFragmentSourceCandidate, ...]
+    evidence: str
+    confidence: float
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
 class PartialProductTransformation:
     """Conservative transformation observed despite incomplete atom provenance."""
 
-    transformation_type: Literal["attachment_replacement"]
+    transformation_type: Literal[
+        "attachment_replacement",
+        "attachment_fragment_replacement",
+    ]
     transformation_class: str
     reactant_center: ReactionAtomReference
     product_center: ReactionAtomReference
     removed_attachment: ReactionAtomReference
     added_attachment: ReactionAtomReference
+    removed_fragment_atom_indices: Tuple[int, ...]
+    removed_fragment_smiles: str
+    removed_fragment_key: str
+    installed_fragment: ProductOriginGap
+    product_atom_provenance: Tuple[ProductAtomProvenance, ...]
     old_order: str
     new_order: str
     conserved_atom_count: int
@@ -311,7 +379,7 @@ class PartialProductTransformation:
     evidence: Literal["partial_product_correspondence"]
     confidence: float
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "1.0"
+    schema_version: str = "2.0"
 
 
 @dataclass(frozen=True)
@@ -630,6 +698,10 @@ __all__ = [
     "HydrogenDelta",
     "RewriteOutcome",
     "PartialProductTransformation",
+    "ProductAtomProvenance",
+    "ProductFragmentAttachment",
+    "ProductFragmentSourceCandidate",
+    "ProductOriginGap",
     "ProductConnection",
     "ProductConnectionEndpoint",
     "ProductTransformation",

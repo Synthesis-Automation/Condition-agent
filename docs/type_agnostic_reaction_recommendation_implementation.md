@@ -405,12 +405,20 @@ inconsistent product mapping are retained for review. Missing reactants and
 stoichiometric partner copies must never be synthesized.
 
 For incomplete single-scaffold records, a separate observation-only
-correspondence may retain one uniquely supported terminal attachment
-replacement. This produces a typed `PartialProductTransformation` and a
-mechanism-neutral label such as
-`R-C(=O)-OH -> R-C(=O)-Cl [Cl source missing]`. It must retain the unresolved
-product-atom source, remain ineligible for normal indexing, and must not be
-promoted to a verified `ReactionSignature` or named family.
+correspondence may retain one uniquely supported connected-fragment
+replacement. The product-only atoms are grouped into a rooted
+`ProductOriginGap` containing product-side atom references, internal bonds,
+the scaffold attachment, a deterministic fragment key, and source status.
+The enclosing observation carries a product-heavy-atom provenance ledger:
+conserved atoms point to their corresponding reactant atoms, while gap atoms
+retain a null source atom and explicit unresolved or agent-supported evidence.
+This supports both single-atom changes such as
+`R-C(=O)-OH -> R-C(=O)-Cl [Cl source missing]` and multi-atom installations
+such as `Ar-Br -> Ar-C#N [C, N source missing]`. Structurally matching
+middle-side agents may be retained as source candidates, but they do not
+create supplied atom mapping. The observation must retain unresolved or
+inferred source provenance, remain ineligible for normal indexing, and must
+not be promoted to a verified `ReactionSignature` or named family.
 
 ### 6.3 Reactive-site and environment features
 

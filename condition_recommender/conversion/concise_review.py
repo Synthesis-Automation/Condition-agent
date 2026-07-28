@@ -13,7 +13,7 @@ from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.4"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.5"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -28,6 +28,11 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "product_heavy_atom_coverage",
     "product_element_excess",
     "partial_transformation_class",
+    "removed_fragment",
+    "installed_fragment",
+    "installed_fragment_key",
+    "fragment_source_status",
+    "fragment_source_candidates",
     "missing_product_atom_elements",
     "chemistry_status",
     "condition_status",
@@ -233,6 +238,8 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     )
     partial = record.get("partial_product_transformation")
     partial_value = partial if isinstance(partial, Mapping) else {}
+    installed = partial_value.get("installed_fragment")
+    installed_value = installed if isinstance(installed, Mapping) else {}
     warnings = sorted(
         {
             str(value)
@@ -294,6 +301,26 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "partial_transformation_class": str(
             partial_value.get("transformation_class") or ""
         ),
+        "removed_fragment": str(
+            partial_value.get("removed_fragment_smiles") or ""
+        ),
+        "installed_fragment": str(
+            installed_value.get("canonical_fragment_smiles") or ""
+        ),
+        "installed_fragment_key": str(
+            installed_value.get("fragment_key") or ""
+        ),
+        "fragment_source_status": str(
+            installed_value.get("source_status") or ""
+        ),
+        "fragment_source_candidates": json.dumps(
+            installed_value.get("source_candidates") or (),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        if installed_value.get("source_candidates")
+        else "",
         "missing_product_atom_elements": "; ".join(
             str(value)
             for value in partial_value.get("missing_product_atom_elements") or ()

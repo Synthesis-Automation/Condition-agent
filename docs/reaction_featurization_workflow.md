@@ -271,12 +271,17 @@ to force reconstruction.
 
 An incomplete record can still retain a typed, observation-only
 `partial_product_transformation` when a single conserved scaffold uniquely
-supports replacement of one terminal attachment. For example,
-`R-C(=O)-OH -> R-C(=O)-Cl` can be reported as an
-`acyl_heteroatom_substitution` with `Cl` explicitly marked as having no
-reactant source. This mechanism-neutral observation does not create atom
-provenance, a named family, a verified `ReactionSignature`, or index
-eligibility.
+supports replacement of one connected branch. Product-only atoms are grouped
+into a rooted `ProductOriginGap`, so both `R-C(=O)-OH -> R-C(=O)-Cl` and
+multi-atom cases such as `Ar-Br -> Ar-C#N` retain the installed fragment graph
+without inventing its reagent. The gap records product-side atom references,
+internal bonds, its scaffold attachment, a deterministic key, and unresolved,
+agent-supported, or ambiguous source status. Middle-side source matching is
+structural support only and does not create supplied atom correspondence. This
+is accompanied by a product-heavy-atom provenance ledger covering both the
+conserved scaffold and every product-only fragment atom. This
+mechanism-neutral observation does not create a named family, a verified
+`ReactionSignature`, or normal index eligibility.
 
 Completeness and mapping warnings include:
 
@@ -289,6 +294,9 @@ MISSING_REACTANT_SUSPECTED
 INSUFFICIENT_REACTANT_MULTIPLICITY
 REACTION_COMPLETENESS_UNRESOLVED
 PARTIAL_PRODUCT_CORRESPONDENCE
+PRODUCT_FRAGMENT_SOURCE_UNRESOLVED
+PRODUCT_FRAGMENT_SOURCE_AGENT_SUPPORTED
+AMBIGUOUS_PRODUCT_FRAGMENT_SOURCES
 PRODUCT_ATOM_SOURCE_UNRESOLVED:<element>
 ```
 

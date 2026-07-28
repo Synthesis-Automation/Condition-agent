@@ -265,6 +265,7 @@ def featurize_reaction(
     partial_product_transformation = (
         infer_partial_product_transformation(
             reactants=parsed.reactants,
+            agents=parsed.agents,
             products=parsed.products,
             completeness=reaction_completeness,
         )
