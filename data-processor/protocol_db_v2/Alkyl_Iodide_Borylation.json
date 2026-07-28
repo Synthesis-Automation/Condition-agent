@@ -29,7 +29,7 @@
       }
     },
     "reaction": {
-      "reaction_smiles": "CCCCCCCCI.B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
+      "reaction_smiles": "CCCCCCCCI.CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C>>CCCCCCCCB1OC(C)(C)C(C)(C)O1",
       "family": "Alkyl_Iodide_Borylation",
       "notes": "General LiOtBu/MeOH borylation of primary alkyl iodide with B2pin2 to give R–B(pin).",
       "reaction_SMARTS": [
@@ -65,7 +65,7 @@
             "name": "Bis(pinacolato)diboron",
             "abbreviation": "B2pin2",
             "cas": "73183-34-3",
-            "smiles": "B(B1OC(C)(C)C(C)(C)O1)B2OC(C)(C)C(C)(C)O2",
+            "smiles": "CC1(C)OB(B2OC(C)(C)C(C)(C)O2)OC1(C)C",
             "amount": {
               "weight_g": 211.0,
               "mmol": 833.0,
