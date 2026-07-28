@@ -13,8 +13,8 @@ evidence, and named reactions remain optional interpretations.
 
 ## 1. Purpose
 
-The central representation of a reaction should be the change in atom
-connectivity between supplied reactants and observed products:
+The central representation of a reaction should be the evidence-scoped change
+in atom connectivity between supplied reactants and reported products:
 
 - which bond units disappear;
 - which bond units appear;
@@ -55,10 +55,11 @@ Those properties may be added as evidence-backed interpretation, condition
 context, or stereochemical observation, but they are not part of the primitive
 connectivity grammar.
 
-## 3. Core principle: use signed bond deltas
+## 3. Core principle: use evidence-scoped bond transitions
 
-Let the mapped reactant graph be \(G_R\) and the observed product graph be
-\(G_P\). For each conserved heavy-atom pair \((i,j)\), define:
+Let the mapped reactant graph be \(G_R\) and the reported product graph be
+\(G_P\). When both atoms have validated correspondence, a localized covalent
+bond transition may be summarized by:
 
 \[
 \Delta b(i,j) = b_P(i,j) - b_R(i,j)
@@ -79,16 +80,22 @@ The sign has one meaning everywhere:
 - `delta_units > 0`: bond unit addition;
 - `delta_units = 0`: unchanged connectivity.
 
+This arithmetic is a derived convenience, not the complete observation model.
+Reaction records frequently omit the product-side fate of leaving groups and
+carrier fragments. If Br or B is absent from the reported product, its
+product-side bond state is not an observed `0`; the endpoint is absent from the
+reported product and the full-reaction bond fate is unobserved.
+
 Examples:
 
-| Reactant state | Product state | Canonical delta |
-|---|---|---:|
-| C–Br | C + Br | -1 |
-| C + N | C–N | +1 |
-| C=C | C–C | -1 |
-| C≡C | C=C | -1 |
-| C–C | C=C | +1 |
-| C–N | C≡N | +2 |
+| Reactant state | Reported product state | Canonical representation |
+|---|---|---|
+| C + N | C–N | exact transition, delta +1 |
+| C=C | C–C | exact transition, delta -1 |
+| C≡C | C=C | exact transition, delta -1 |
+| C–C | C=C | exact transition, delta +1 |
+| C–N | C≡N | exact transition, delta +2 |
+| C–Br | Br absent | projected attachment loss; after-state unobserved |
 
 Calling C=C to C–C a "broken double bond" is potentially misleading because
 the C–C edge is retained. The precise statement is that one bond unit is
@@ -99,33 +106,63 @@ removed from an edge whose order changes from two to one.
 A future canonical contract should be equivalent to:
 
 ```python
+BondStateKind = Literal[
+    "bond",
+    "no_bond",
+    "endpoint_absent",
+    "unknown",
+]
+
+
 @dataclass(frozen=True)
-class BondDelta:
+class BondState:
+    state_kind: BondStateKind
+    order: str | None
+
+
+@dataclass(frozen=True)
+class BondTransition:
     atom_1: ReactionAtomReference
     atom_2: ReactionAtomReference
-    before_order: str | None
-    after_order: str | None
+    before_state: BondState
+    after_state: BondState
     delta_units: int | None
+    observation_scope: Literal[
+        "observed_product",
+        "main_product_projection",
+        "exact_reconstruction",
+        "correspondence_inference",
+        "unresolved",
+    ]
     evidence: str
     confidence: float
 ```
 
-The contract should store both states as well as the signed delta. Storing both
-allows validation to detect inconsistent programs and avoids relying on the
-delta alone for aromatic or nonstandard bonds. `delta_units` is required for
-localized single, double, and triple bonds and is `None` for a transition whose
-bond domain does not support integer arithmetic.
+The contract stores typed before and after states as well as an optional signed
+delta. `delta_units` is populated only when both states support localized
+covalent bond arithmetic. It is `None` when an endpoint is absent, the state is
+unknown, or the bond domain is aromatic, coordination, or otherwise
+non-arithmetic.
+
+`main_product_projection` means that an attachment is absent from the reported
+main product. It does not claim that the detached atoms are free, identify
+their byproduct, or prove their full-reaction bond state.
 
 ### 3.2 Compatibility with `ReactionEdit`
 
 The existing `ReactionEdit` representation remains useful for serialization
-and display. It can be derived from `BondDelta`:
+and display. Exact localized transitions can be projected to it:
 
 ```text
 0 -> n  => formed
 n -> 0  => broken
 n -> m  => order_changed
 ```
+
+An endpoint-absent transition may produce a temporary compatibility
+`ReactionEdit(edit_type="broken")` only when its evidence and projection scope
+remain attached. It must not be relabeled as an observed full-product
+cleavage. Unknown transitions do not produce a definite compatibility edit.
 
 `formed`, `broken`, and `order_changed` should therefore become compatibility
 views, not three independent primitive operations. This removes the current
@@ -144,6 +181,7 @@ class HydrogenDelta:
     before_count: int
     after_count: int
     delta_count: int
+    observation_scope: str
     evidence: str
     confidence: float
 ```
@@ -160,19 +198,38 @@ Examples:
 - carbonyl reduction: hydrogen gain at carbon and oxygen, when supported by the
   observed product.
 
-### 3.4 Orthogonal atom-state and stereo changes
+### 3.4 First-class atom-state and orthogonal stereo changes
 
 Formal charge, radical state, isotope, and stereochemistry are not covalent
-connectivity. They should remain orthogonal observations:
+connectivity. Atom-state changes must nevertheless be represented alongside
+bond transitions because identical connectivity can have different valence and
+charge states.
 
-- `AtomStateDelta` may later represent charge or radical changes that are
-  present in the supplied structures.
+- Phase 1 introduces observed formal-charge transitions.
+- Radical-electron and isotope transitions remain reserved fields until their
+  normalization policies are implemented.
 - `ReactionStereoChange` continues to represent created, destroyed, retained,
   or descriptor-changed stereochemistry.
 
-Neither should be silently inferred from a bond grammar. Reactions with no
-connectivity change but a real atom-state change should not be forced into a
-bond-edit class.
+```python
+@dataclass(frozen=True)
+class AtomStateTransition:
+    reactant_atom: ReactionAtomReference
+    product_atom: ReactionAtomReference
+    before_formal_charge: int
+    after_formal_charge: int
+    before_radical_electrons: int | None
+    after_radical_electrons: int | None
+    before_isotope: int | None
+    after_isotope: int | None
+    observation_scope: str
+    evidence: str
+    confidence: float
+```
+
+Atom-state and stereo changes must not be silently inferred from a bond
+grammar. Reactions with no connectivity change but a real atom-state change
+should not be forced into a bond-edit class.
 
 ### 3.5 Aromatic bonds
 
@@ -194,15 +251,18 @@ verification.
 
 ## 4. The reaction edit graph
 
-The normalized deltas form a small signed, atom-provenanced edit graph:
+The normalized transitions form a small signed, atom-provenanced edit graph:
 
-- nodes are atoms incident to at least one nonzero edit;
+- nodes are atoms incident to at least one definite or projected edit;
 - negative edges are removed bond units;
 - positive edges are added bond units;
 - a before/after pair records whether an edge disappears, appears, or changes
   multiplicity;
+- projected edges record attachment loss from the reported main product without
+  claiming a full-product after-state;
 - hydrogen deltas are signed annotations on nodes;
-- atom-state and stereo changes are separate annotations.
+- atom-state and stereo transitions are separate annotations; and
+- every edge and annotation carries observation scope, evidence, and confidence.
 
 This edit graph is the primary reaction center. Its canonical ordering must be
 invariant to:
@@ -229,17 +289,34 @@ Reaction datasets often contain the desired product but omit salts, leaving
 group products, water, hydrogen halide, spent organometallic carriers, and
 other byproducts. The system must separate three concepts:
 
-1. **Observed connectivity delta:** supported by mapped reactant and product
-   atoms.
+1. **Observed bond transition:** both endpoints have supported correspondence
+   and their before/after bond states are known.
 2. **Grammar reconstruction:** a proposed main product generated from supplied
    reactant sites.
-3. **Product projection:** which generated connected components are expected to
-   correspond to the reported main product.
+3. **Main-product projection:** an attachment or generated component is absent
+   from the reported product, while its full-product fate remains unknown.
 
 Breaking C–Br and N–H and forming C–N does not authorize the system to report
 H–Br formation unless HBr is an observed product. A grammar may identify Br
 and H as discardable endpoints for main-product reconstruction, but it must not
 serialize their hypothetical recombination as observed evidence.
+
+Exact main-product reconstruction and exact edit verification are different
+claims:
+
+```text
+exact_observed_transition:
+  both endpoint states are supported by product correspondence
+
+exact_main_product_reconstruction:
+  the generated retained product exactly matches the reported main product
+
+projection_match:
+  the retained product matches after grammar-declared attachments are omitted
+```
+
+Only the first claim directly verifies a before/after bond state. The other two
+remain valuable evidence but retain reconstruction or projection scope.
 
 ### 5.1 Atom accounting rules
 
@@ -269,8 +346,14 @@ product component policy:
   one component, several specified components, or exact supplied product set
 ```
 
-Projection affects forward reconstruction only. It does not participate in the
-canonical observed edit identity except through completeness and provenance.
+Projection is owned by the grammar role binding, not by the molecular site.
+The same isolated C–Si or C–B link may retain different endpoints in different
+rewrites.
+
+Projection affects forward reconstruction and evidence scope. Projected
+attachment loss may participate in a signature only with an explicit
+`main_product_projection` token; it must not be serialized as an exact observed
+full-product bond transition.
 
 ## 6. Reactant featurization around editable links and endpoints
 
@@ -296,7 +379,6 @@ available_units
 source_kind: explicit_bond or implicit_hydrogen
 source component and carrier provenance
 endpoint contexts
-endpoint retention hints
 availability
 symmetry class
 ```
@@ -309,17 +391,23 @@ Examples:
 - H–H, X–X, B–B, Si–B; and
 - strained C–C or C–O ring bonds when a curated detector supports them.
 
-`retention hints` describe graph construction, not mechanism:
-
-- the carbon of C–B may be retained while the boron carrier is discardable;
-- both Br atoms in Br–Br addition may be retained;
-- the hydrogen endpoint of Si–H is virtual;
-- both atoms of a multiple-bond acceptor remain retained when its order is
-  reduced.
-
 A virtual hydrogen endpoint retains its source component and optional carrier
 atom for bookkeeping. H–H may therefore expose two hydrogen endpoints even
 though neither is a heavy-atom product seed.
+
+The site does not declare which endpoint is retained, transferred, or
+discarded. Those are rewrite-specific grammar bindings:
+
+```text
+endpoint use:
+  product_seed
+  attached_to_product_seed
+  projection_discardable
+  virtual_hydrogen
+```
+
+For example, a C–Si link can support carbon transfer in one grammar, silicon
+transfer in another, or retention of both endpoints in an addition grammar.
 
 #### `BondCapacitySite`
 
@@ -417,11 +505,27 @@ Named-family compatibility and display labels are optional overlays.
 
 ### 7.1 One generic executor
 
-The executable registry should converge on one operator:
+The executable registry should converge on one bounded operator:
 
 ```text
 apply_connectivity_rewrite
 ```
+
+The grammar language is not arbitrary graph-programming JSON. Its allowed
+instructions are restricted to:
+
+```text
+change_localized_bond_state
+change_schema_hydrogen_count
+change_observed_formal_charge
+declare_product_seed
+declare_projection_discardable_attachment
+enumerate_endpoint_permutation
+```
+
+A static compiler validates these instructions before the executor sees them.
+Aromatic, coordination, radical, isotope, or other unsupported bond-domain
+instructions are rejected rather than interpreted approximately.
 
 It should:
 
@@ -439,6 +543,10 @@ It should:
 Convenience names such as `pair_addition` or `center_replacement` may remain as
 declarative rewrite-template IDs, but they should expand to delta programs.
 They should not require separate product-building implementations.
+
+The first implementation should dual-run this executor beside the current
+operators. Existing operators remain the behavioral reference until product,
+edit, warning, ambiguity, and ordering parity are demonstrated.
 
 ### 7.2 Proposed grammar shape
 
@@ -511,7 +619,7 @@ The same grammar should operate in two directions.
 For a valid mapped reaction:
 
 - derive the edit graph directly;
-- match grammar rewrite shapes against observed deltas;
+- match grammar rewrite shapes against observed and projected transitions;
 - use matching grammars only as interpretations;
 - retain the observed signature even if no grammar matches; and
 - report conflicts when a source label or candidate grammar contradicts the
@@ -704,9 +812,9 @@ explicit multi-delta programs rather than mechanism-named operators.
 
 ## 9. Deriving structural archetypes
 
-`edit_archetype` should be derived from the normalized edit graph. A grammar
-may declare an expected structural shape for validation, but declared metadata
-must not override observed deltas.
+`edit_archetype` should be derived from the normalized edit graph when the
+evidence is sufficient. A grammar may declare an expected structural shape for
+validation, but declared metadata must not override observed transitions.
 
 Counts alone are insufficient. For example, explicit A–B addition and a
 two-bond exchange may both contain two negative and two positive edges. Their
@@ -749,6 +857,13 @@ retention context. More than one interpretation may be compatible with the
 same base shape. For example, C–N bond formation after loss of C–Br and N–H may
 be called substitution or coupling depending on conditions and convention; its
 canonical edit graph and its `release_and_connect` base shape are unchanged.
+
+The classifier may return several compatible interpretations or `unresolved`.
+Product projection can change the apparent negative-edge count, so a projected
+shape must not be treated as equivalent to a fully observed shape merely
+because their chemist-facing archetype labels agree. The existing public
+`EditArchetype` should remain as a compatibility field during migration; a
+neutral `base_edit_shape` can be dual-written first.
 
 ## 10. Expansion across diverse reaction types
 
@@ -1027,9 +1142,14 @@ contract layered over the same local edit grammar.
 
 ### 10.15 Multi-event and cascade records
 
-Disconnected signed edit graphs are separate `ReactionEvent` objects.
-Connected multi-edge rewrites such as cycloaddition or rearrangement remain one
-event.
+Disconnected signed edit graphs first define separate `edit_component`
+observations. Connected multi-edge rewrites such as cycloaddition or
+rearrangement normally define one edit component.
+
+An edit component is not automatically a mechanistic reaction event. A grammar
+or other evidence may group several components into one interpreted
+`ReactionEvent`; without that evidence, the system preserves the components
+without claiming temporal or mechanistic unity.
 
 A record with several events does not establish their temporal order.
 Sequential, tandem, cascade, and one-pot labels require external evidence. The
@@ -1085,6 +1205,10 @@ matters.
 The canonical signed edit graph should become the chemistry core of the
 reaction signature.
 
+During migration, the new edit-graph token is shadow output only. Existing
+signature keys and `signature_id` remain authoritative until parity, collision,
+and dataset-impact audits pass.
+
 A proposed hierarchy is:
 
 ```text
@@ -1109,6 +1233,7 @@ L2 structural rewrite:
 
 L3 bond delta:
   before/after element-pair bond states
+  observation-scope distinction
   hydrogen delta types
   no family requirement
 
@@ -1139,7 +1264,7 @@ outranking a less similar scaffold with the correct bond rewrite.
 
 Evidence priority remains:
 
-1. validated supplied atom mapping and observed deltas;
+1. validated supplied atom mapping and observed bond/atom-state transitions;
 2. exact product reconstruction from a declarative rewrite;
 3. exact composition of multiple rewrites;
 4. conservative unique atom correspondence;
@@ -1150,12 +1275,13 @@ Grammar metadata never overrides observed edits.
 Conflicts should be typed, for example:
 
 ```text
-GRAMMAR_DELTA_CONFLICT
+GRAMMAR_TRANSITION_CONFLICT
 SOURCE_FAMILY_EDIT_CONFLICT
 PRODUCT_PROJECTION_CONFLICT
 HYDROGEN_PROVENANCE_UNRESOLVED
 AROMATIC_NORMALIZATION_UNRESOLVED
 MULTIPLE_EXACT_REWRITE_OUTCOMES
+UNSUPPORTED_BOND_DOMAIN
 ```
 
 Broad grammars should require product verification. Reactants alone generally
@@ -1170,6 +1296,8 @@ Definition loading should validate:
 - every negative delta has a compatible reactant before-state;
 - every positive delta has a valid product target state;
 - no pair receives contradictory deltas;
+- endpoint-absent and unknown states never receive an integer `delta_units`;
+- observation and reconstruction scopes are not silently upgraded;
 - hydrogen deltas reference valid carrier atoms;
 - product-retained seeds cannot be discarded;
 - permutation groups contain compatible endpoint types;
@@ -1183,12 +1311,20 @@ No arbitrary Python callable may be named or imported from a JSON definition.
 
 ## 15. Migration plan
 
-### Phase 1: canonical delta view
+### Phase 1: evidence-scoped transition view
 
-- Add typed `BondDelta` and `HydrogenDelta`.
-- Convert normalized `ReactionEdit` objects to and from the delta view.
+- Add typed `BondState`, `BondTransition`, `HydrogenDelta`,
+  `AtomStateTransition`, and `ConnectivityEditGraph`.
+- Construct transitions directly from mapping, reconstruction, or
+  correspondence evidence before information is collapsed into
+  `ReactionEdit`.
+- Derive compatibility `ReactionEdit` views from transitions while retaining
+  the stronger scoped observation internally.
 - Prove deterministic ordering and partner-order invariance.
-- Add the delta representation without changing current signature identity.
+- Add a shadow edit-graph key without changing current signature identity,
+  admission, retrieval, or recommendation behavior.
+- Follow the detailed Phase 1 plan in
+  [`connectivity_first_reaction_grammar_phase1_implementation_plan.md`](connectivity_first_reaction_grammar_phase1_implementation_plan.md).
 
 ### Phase 2: generic executor
 
@@ -1304,27 +1440,29 @@ The design is successfully implemented when:
 2. X–H and explicit A–B donors use one normalized link interface.
 3. C–C, C–N, C–O, and C–S coupling use the same generic rewrite executor.
 4. Existing `formed`, `broken`, and `order_changed` outputs are deterministically
-   derived from canonical deltas.
+   derived from evidence-scoped canonical transitions.
 5. Mapped unknown reactions receive valid signatures without a grammar or named
    family.
 6. Broad grammars do not force regioselectivity, stereochemistry, byproducts,
    or atom correspondence.
-7. Reaction retrieval is keyed first by the signed edit graph and only then by
-   unchanged molecular context.
-8. Specialized executable operators are reduced to a small, validated generic
+7. Absent product endpoints remain projected or unknown rather than becoming
+   falsely observed `no_bond` states.
+8. Reaction retrieval is keyed first by the signed edit graph and only then by
+   unchanged molecular context, after shadow-key promotion gates pass.
+9. Specialized executable operators are reduced to a small, validated generic
    registry.
-9. Aromatic, coordination, missing-reagent, and hydrogen-provenance limitations
+10. Aromatic, coordination, missing-reagent, and hydrogen-provenance limitations
    remain explicit.
-10. Chemistry parity and full-suite regression tests pass.
+11. Chemistry parity and full-suite regression tests pass.
 
 ## 18. Final architectural rule
 
 The system should answer these questions in order:
 
 ```text
-1. Which atom pairs changed bond state?
-2. Which atoms changed schema-level hydrogen state?
-3. What connected edit graph do those changes form?
+1. Which atom pairs have observed, projected, reconstructed, or unknown states?
+2. Which definite bond, hydrogen, and atom-state transitions occurred?
+3. What connected edit graph do those transitions form?
 4. Which reactant links and endpoints can express that graph?
 5. What unchanged local environments modify compatibility and conditions?
 6. Which optional structural class or named family is supported?
