@@ -586,10 +586,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         layout.setContentsMargins(18, 18, 18, 18)
         layout.setSpacing(8)
 
-        title = QtWidgets.QLabel("Reaction Condition Recommender")
-        title.setStyleSheet("font-size: 20px; font-weight: 600;")
-        layout.addWidget(title)
-
         self.data_row_layout = QtWidgets.QHBoxLayout()
         self.data_label = QtWidgets.QLabel("Recommendation data")
         self.data_label.setObjectName("recommendationDataLabel")
@@ -959,11 +955,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         recipe = recommendation.resolved_recipe
         lines = [
             f"Rank {recommendation.rank}",
-            f"Recipe core: {recommendation.recipe_core_id}",
-            (
-                "Observed recipe variants: "
-                f"{', '.join(recommendation.recipe_variant_ids)}"
-            ),
             "",
             "Conditions",
         ]

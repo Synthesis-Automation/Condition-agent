@@ -121,6 +121,10 @@ def test_window_uses_literature_recommendation_data_by_default(
     )
     assert window.results_table.columnCount() == 9
     assert not window.export_button.isEnabled()
+    assert not any(
+        label.text() == "Reaction Condition Recommender"
+        for label in window.findChildren(gui.QtWidgets.QLabel)
+    )
 
 
 def test_worker_reuses_recommender_contract(monkeypatch) -> None:
@@ -184,9 +188,14 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     )
     assert window.results_table.rowCount() == 1
     assert "Palladium catalyst" in window.results_table.item(0, 7).text()
-    assert "Potassium carbonate" in window.details_box.toPlainText()
+    details = window.details_box.toPlainText()
+    assert "Potassium carbonate" in details
+    assert "Recipe core:" not in details
+    assert "Observed recipe variants:" not in details
+    assert "RCORE1:core" not in details
+    assert "RCR1:variant" not in details
     assert "Exact bond-edit and handle match" in (
-        window.details_box.toPlainText()
+        details
     )
     assert window.status_label.text() == "Done — 1 recipe(s)"
 
