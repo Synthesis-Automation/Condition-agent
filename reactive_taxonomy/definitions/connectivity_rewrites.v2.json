@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "instruction_set_version": "1.1",
+  "instruction_set_version": "1.2",
   "site_interface_schema_version": "2.0",
   "rewrites": [
     {
@@ -195,6 +195,157 @@
             {
               "op": "declare_product_seed",
               "selector": "leaving_source.reactive_link.endpoint_a"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "joining_partner.connection_endpoint.atom"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "alcohol_xh_displacement",
+      "template": "release_and_connect",
+      "grammar_ids": [
+        "alcohol_c_n_displacement",
+        "alcohol_c_o_displacement",
+        "alcohol_c_s_displacement"
+      ],
+      "role_bindings": {
+        "alcohol_c_n_displacement": {
+          "leaving_source": "alcohol",
+          "joining_partner": "nucleophile"
+        },
+        "alcohol_c_o_displacement": {
+          "leaving_source": "alcohol",
+          "joining_partner": "nucleophile"
+        },
+        "alcohol_c_s_displacement": {
+          "leaving_source": "alcohol",
+          "joining_partner": "nucleophile"
+        }
+      },
+      "variants": [
+        {
+          "id": "xh_substitution",
+          "outcome_id": "inversion_if_defined",
+          "when": [
+            {
+              "role": "leaving_source",
+              "interface": "bond_capacity",
+              "field": "bond_class",
+              "operator": "eq",
+              "value": "alcohol_carbon_heteroatom"
+            },
+            {
+              "role": "joining_partner",
+              "interface": "reactive_link",
+              "field": "source_kind",
+              "operator": "eq",
+              "value": "implicit_hydrogen"
+            }
+          ],
+          "instructions": [
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "leaving_source.bond_capacity.endpoint_b",
+                "leaving_source.bond_capacity.endpoint_a"
+              ],
+              "before": "SINGLE",
+              "after": "NONE"
+            },
+            {
+              "op": "declare_projection_discardable_attachment",
+              "retained": "leaving_source.bond_capacity.endpoint_b",
+              "discarded": "leaving_source.bond_capacity.endpoint_a"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "leaving_source.bond_capacity.endpoint_b",
+                "joining_partner.connection_endpoint.atom"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "joining_partner.reactive_link.carrier",
+              "delta": -1
+            },
+            {
+              "op": "set_tetrahedral_outcome",
+              "selector": "leaving_source.bond_capacity.endpoint_b",
+              "outcome": "invert_if_defined"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "leaving_source.bond_capacity.endpoint_b"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "joining_partner.connection_endpoint.atom"
+            }
+          ]
+        },
+        {
+          "id": "xh_substitution_retention",
+          "outcome_id": "retention_if_defined",
+          "when": [
+            {
+              "role": "leaving_source",
+              "interface": "bond_capacity",
+              "field": "bond_class",
+              "operator": "eq",
+              "value": "alcohol_carbon_heteroatom"
+            },
+            {
+              "role": "joining_partner",
+              "interface": "reactive_link",
+              "field": "source_kind",
+              "operator": "eq",
+              "value": "implicit_hydrogen"
+            }
+          ],
+          "instructions": [
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "leaving_source.bond_capacity.endpoint_b",
+                "leaving_source.bond_capacity.endpoint_a"
+              ],
+              "before": "SINGLE",
+              "after": "NONE"
+            },
+            {
+              "op": "declare_projection_discardable_attachment",
+              "retained": "leaving_source.bond_capacity.endpoint_b",
+              "discarded": "leaving_source.bond_capacity.endpoint_a"
+            },
+            {
+              "op": "change_localized_bond_state",
+              "endpoints": [
+                "leaving_source.bond_capacity.endpoint_b",
+                "joining_partner.connection_endpoint.atom"
+              ],
+              "before": "NONE",
+              "after": "SINGLE"
+            },
+            {
+              "op": "change_schema_hydrogen_count",
+              "selector": "joining_partner.reactive_link.carrier",
+              "delta": -1
+            },
+            {
+              "op": "set_tetrahedral_outcome",
+              "selector": "leaving_source.bond_capacity.endpoint_b",
+              "outcome": "retain_if_defined"
+            },
+            {
+              "op": "declare_product_seed",
+              "selector": "leaving_source.bond_capacity.endpoint_b"
             },
             {
               "op": "declare_product_seed",

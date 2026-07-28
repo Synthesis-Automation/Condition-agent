@@ -115,6 +115,7 @@ def featurize_reaction(
                 predicted_product_smiles=predicted_canonical,
                 verification=verification,
                 reaction_label=label,
+                predicted_stereo_changes=outcome.predicted_stereo_changes,
                 compatible_named_families=tuple(
                     grammar.get("compatible_named_families") or []
                 ),
@@ -194,6 +195,9 @@ def featurize_reaction(
                         verification="exact_multi_event_reconstruction",
                         reaction_label=render_reaction_label(
                             grammar, assignment, style=label_style
+                        ),
+                        predicted_stereo_changes=(
+                            event_outcome.predicted_stereo_changes
                         ),
                         compatible_named_families=tuple(
                             grammar.get("compatible_named_families") or []

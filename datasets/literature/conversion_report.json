@@ -2,114 +2,142 @@
   "admission_reason_counts": {
     "condition_identifier_uncertainty": 468,
     "conflicting_stereochemical_evidence": 1,
-    "insufficient_edit_evidence": 196,
-    "insufficient_reactant_multiplicity": 40,
-    "invalid_reaction_or_product": 10,
-    "missing_verified_reaction_signature": 628,
-    "missing_yield": 5,
-    "multiple_products": 1,
-    "multistage_conditions_not_structured": 731,
-    "no_condition_identifiers": 27,
-    "no_usable_transformation_evidence": 127,
-    "reaction_completeness_unresolved": 755,
+    "insufficient_edit_evidence": 279,
+    "insufficient_reactant_multiplicity": 59,
+    "invalid_reaction_or_product": 12,
+    "missing_verified_reaction_signature": 476,
+    "missing_yield": 481,
+    "multiple_products": 2,
+    "multistage_conditions_not_structured": 733,
+    "no_condition_identifiers": 488,
+    "no_usable_transformation_evidence": 150,
+    "reaction_completeness_unresolved": 626,
     "solvent_only_recipe": 18,
-    "suspected_missing_reactant": 721,
-    "unaccounted_product_heavy_atoms": 761,
-    "verified_reaction_signature_with_conditions": 96
+    "suspected_missing_reactant": 746,
+    "unaccounted_product_heavy_atoms": 805,
+    "verified_reaction_signature_with_conditions": 234
   },
   "admission_tier_counts": {
-    "rejected": 925,
-    "review": 933,
-    "verified": 96
+    "rejected": 1387,
+    "review": 814,
+    "verified": 234
   },
   "artifact_type": "generic_sharded_conversion_report",
   "catalogs": {
     "recipe_catalog": {
       "path": "recipe_catalog.jsonl.gz",
-      "row_count": 766,
-      "sha256": "fcaaaee3ace837dfba6db44190c4dd6d44afcd4aa0eccdcb480ff925e148996b"
+      "row_count": 789,
+      "sha256": "e159fb05ba765789e4898dcdf421844d2f722f6addb22a2c745ffb4196dbffd7"
     },
     "reference_catalog": {
       "path": "reference_catalog.jsonl.gz",
-      "row_count": 854,
-      "sha256": "f19866fc0f6bacd1d81cb22c943f553f12aa01f5b143565ed0e664e906d72c3a"
+      "row_count": 1017,
+      "sha256": "e450b84efa0cca015efafc181dc48c3ee1514ab20d0efa48c6f91305a5c9f4ad"
     },
     "reference_condition_series_catalog": {
       "path": "reference_condition_series.jsonl.gz",
-      "row_count": 241,
-      "sha256": "5d4afb85fc48d698eaca408f4fcbea36045c4cedf7f3dec7cbe3361eaf002aec"
+      "row_count": 519,
+      "sha256": "2eb29e06506eef2a48cf9413fa61b96c6ca8deee317b567212ec158ab11c9b20"
     }
   },
   "chemistry_status_counts": {
-    "rejected": 898,
-    "review": 825,
-    "verified": 231
+    "rejected": 967,
+    "review": 757,
+    "verified": 711
   },
-  "complete_shard_count": 7,
+  "complete_shard_count": 8,
   "condition_stage_status_counts": {
-    "single_stage": 1223,
-    "unassigned_multistage": 731
+    "single_stage": 1702,
+    "unassigned_multistage": 733
   },
   "condition_status_counts": {
-    "resolved_complete": 1441,
+    "resolved_complete": 1461,
     "unresolved_retained": 468,
-    "unusable": 45
+    "unusable": 506
   },
   "failed_shard_count": 0,
   "index_eligibility_counts": {
-    "eligible": 378,
-    "ineligible": 925,
-    "review_only": 651
+    "eligible": 604,
+    "ineligible": 1387,
+    "review_only": 444
   },
-  "input_row_count": 1954,
+  "input_row_count": 2435,
   "integrity": {
     "artifact_type": "sharded_conversion_integrity",
     "duplicate_observation_count": 0,
     "issues": [],
     "manifest_path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\shard_manifest.json",
     "schema_version": "1.0",
-    "shard_count": 7,
+    "shard_count": 8,
     "valid": true,
-    "verified_row_count": 1954
+    "verified_row_count": 2435
   },
   "manifest_path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\shard_manifest.json",
   "merge_records": false,
   "merged_records": null,
   "mode": "full",
   "named_family_counts": {
-    "unnamed": 1954
+    "c_s_coupling": 20,
+    "chan_lam": 2,
+    "friedel_crafts_acylation": 1,
+    "heck": 4,
+    "reductive_amination": 11,
+    "sonogashira": 6,
+    "suzuki_miyaura": 40,
+    "unnamed": 2351
   },
   "outcome_status_counts": {
-    "missing": 5,
-    "usable": 1949
+    "missing": 481,
+    "usable": 1954
   },
-  "output_row_count": 1954,
+  "output_row_count": 2435,
   "reaction_completeness_status_counts": {
-    "incomplete": 761,
-    "missing": 10,
-    "unresolved": 755,
-    "verified": 428
+    "incomplete": 805,
+    "missing": 12,
+    "unresolved": 626,
+    "verified": 992
   },
   "reaction_scope_counts": {
-    "intermolecular": 424,
-    "intramolecular": 2,
+    "intermolecular": 906,
+    "intramolecular": 45,
     "mixed": 2,
-    "unknown": 1526
+    "unimolecular": 39,
+    "unknown": 1443
   },
-  "reused_shard_count": 0,
+  "reused_shard_count": 8,
   "schema_version": "1.0",
-  "shard_count": 7,
-  "signature_count": 428,
-  "source_file_count": 7,
+  "shard_count": 8,
+  "signature_count": 992,
+  "source_file_count": 8,
   "transformation_class_counts": {
     "acyl_heteroatom_substitution": 20,
-    "amide_formation": 233,
-    "attachment_replacement": 163,
-    "ester_formation": 1,
-    "generic_graph_transformation": 92,
-    "generic_multi_event_graph_transformation": 29,
-    "sp2_c_n_substitution": 1,
-    "substitution": 76,
-    "unknown": 1339
+    "alcohol_oxidation": 10,
+    "alkene_c_c_substitution": 4,
+    "alkene_reduction": 3,
+    "alkyne_reduction": 1,
+    "amide_formation": 256,
+    "aromatic_c_h_acylation": 1,
+    "attachment_replacement": 170,
+    "beta_elimination": 6,
+    "c_c_transfer_coupling": 53,
+    "carbonyl_c_n_reductive_coupling": 11,
+    "carbonyl_reduction": 10,
+    "chan_lam_heteroatom_coupling": 2,
+    "ester_formation": 4,
+    "generic_graph_transformation": 136,
+    "generic_multi_event_graph_transformation": 37,
+    "heteroatom_bond_oxidation": 1,
+    "hydrogenation": 1,
+    "reductive_bond_cleavage": 2,
+    "sp2_c_c_substitution": 1,
+    "sp2_c_n_substitution": 82,
+    "sp2_c_o_substitution": 9,
+    "sp2_c_s_substitution": 20,
+    "sp3_c_n_substitution": 1,
+    "sp3_c_o_substitution": 237,
+    "sp3_c_s_substitution": 2,
+    "substitution": 105,
+    "terminal_alkyne_coupling": 6,
+    "unknown": 1244
   }
 }

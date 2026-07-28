@@ -180,6 +180,40 @@ def test_compiler_rejects_projection_without_a_declared_bond_break() -> None:
         compile_connectivity_rewrite_definitions(payload)
 
 
+def test_compiler_rejects_unknown_tetrahedral_outcome() -> None:
+    payload = {
+        "schema_version": CONNECTIVITY_REWRITE_SCHEMA_VERSION,
+        "instruction_set_version": CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION,
+        "site_interface_schema_version": SITE_INTERFACE_SCHEMA_VERSION,
+        "rewrites": [
+            {
+                "id": "invalid_stereo",
+                "template": "release_and_connect",
+                "grammar_ids": ["example"],
+                "variants": [
+                    {
+                        "id": "default",
+                        "instructions": [
+                            {
+                                "op": "set_tetrahedral_outcome",
+                                "selector": "left.anchor",
+                                "outcome": "invert_unconditionally",
+                            },
+                            {
+                                "op": "declare_product_seed",
+                                "selector": "left.anchor",
+                            },
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+
+    with pytest.raises(ValueError, match="Invalid tetrahedral outcome"):
+        compile_connectivity_rewrite_definitions(payload)
+
+
 @pytest.mark.parametrize("reaction_smiles", MIGRATION_CORPUS)
 def test_v2_rewrite_corpus_reconstructs_the_observed_product(
     reaction_smiles: str,

@@ -13,7 +13,7 @@ from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.5"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.6"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -24,6 +24,7 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "signature_id",
     "evidence_quality",
     "transformation_confidence",
+    "stereochemical_changes",
     "reaction_completeness_status",
     "product_heavy_atom_coverage",
     "product_element_excess",
@@ -73,6 +74,23 @@ def _formula_text(value: Any) -> str:
 
 def _text_or_blank(value: Any) -> str:
     return "" if value is None else str(value)
+
+
+def _stereochemical_change_summary(signature: Mapping[str, Any]) -> str:
+    """Render compact, deterministic atom/bond stereo outcomes for CSV review."""
+    summaries = []
+    for change in signature.get("stereo_changes") or ():
+        if not isinstance(change, Mapping):
+            continue
+        stereo_type = _readable_token(change.get("stereo_type")) or "stereo"
+        old = str(change.get("old_descriptor") or "∅")
+        new = str(change.get("new_descriptor") or "∅")
+        outcome = _readable_token(change.get("change_type"))
+        summary = f"{stereo_type}: {old}→{new}"
+        if outcome:
+            summary += f" ({outcome})"
+        summaries.append(summary)
+    return "; ".join(sorted(set(summaries)))
 
 
 def _enum_text(value: Any) -> str:
@@ -283,6 +301,9 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "evidence_quality": str(record.get("evidence_quality") or ""),
         "transformation_confidence": _text_or_blank(
             record.get("transformation_confidence")
+        ),
+        "stereochemical_changes": _stereochemical_change_summary(
+            signature_value
         ),
         "reaction_completeness_status": str(
             completeness_value.get("status") or ""

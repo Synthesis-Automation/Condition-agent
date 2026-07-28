@@ -123,6 +123,30 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.reference_condition_series_id.startswith("RCS1:")
 
 
+def test_inverting_alcohol_displacement_serializes_stereo_without_named_family() -> None:
+    reaction = (
+        "CNCC[C@H](O)c1ccccc1.Cc1ccccc1O"
+        ">>CNCC[C@@H](Oc1ccccc1C)c1ccccc1"
+    )
+
+    record = convert_record(_raw(reaction))
+
+    assert record.chemistry_status == ChemistryStatus.VERIFIED
+    assert record.reaction_signature is not None
+    assert record.named_family is None
+    assert record.transformation_class == "sp3_c_o_substitution"
+    stereo_changes = record.reaction_signature["stereo_changes"]
+    assert len(stereo_changes) == 1
+    assert stereo_changes[0]["old_descriptor"] == "S"
+    assert stereo_changes[0]["new_descriptor"] == "R"
+    assert stereo_changes[0]["change_type"] == "inverted"
+    assert stereo_changes[0]["evidence"] == (
+        "connectivity_rewrite:invert_if_defined"
+    )
+    review = concise_reaction_review_row(record.to_dict())
+    assert review["stereochemical_changes"] == "atom: S→R (inverted)"
+
+
 def test_conversion_cache_reuses_deterministic_reaction_analysis(
     monkeypatch,
 ) -> None:
@@ -546,7 +570,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "1.5"
+    assert report["schema_version"] == "1.6"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]
@@ -572,6 +596,14 @@ def test_concise_review_formats_spectators_and_partner_environment() -> None:
             "condition_stage_status": ConditionStageStatus.UNASSIGNED_MULTISTAGE,
             "index_eligibility": IndexEligibility.ELIGIBLE,
             "reaction_signature": {
+                "stereo_changes": [
+                    {
+                        "stereo_type": "atom",
+                        "old_descriptor": "S",
+                        "new_descriptor": "R",
+                        "change_type": "inverted",
+                    }
+                ],
                 "spectator_groups": [
                     {
                         "group_id": "ether",
@@ -609,6 +641,7 @@ def test_concise_review_formats_spectators_and_partner_environment() -> None:
         }
     )
 
+    assert row["stereochemical_changes"] == "atom: S→R (inverted)"
     assert row["spectators"] == "2× R–O–R [ether] (d=1/3)"
     assert row["steric_electronic_factors"] == (
         "nitrogen partner: S=primary N center, "

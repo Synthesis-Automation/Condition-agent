@@ -25,6 +25,7 @@ from .reaction_graph_editing import (
 )
 from .reaction_models import (
     BondChange,
+    PredictedStereoChange,
     RewriteOutcome,
     ReactionComponent,
     ReactionSiteReference,
@@ -37,7 +38,7 @@ from .reaction_site_interfaces import (
 
 
 CONNECTIVITY_REWRITE_SCHEMA_VERSION = "2.0"
-CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION = "1.1"
+CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION = "1.2"
 
 _PATH = Path(__file__).with_name("definitions") / "connectivity_rewrites.v2.json"
 _LEGACY_SELECTOR = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
@@ -62,6 +63,7 @@ _ALLOWED_INSTRUCTIONS = {
     "declare_product_seed",
     "declare_projection_discardable_attachment",
     "enumerate_endpoint_permutation",
+    "set_tetrahedral_outcome",
 }
 _INTERFACE_PREDICATE_FIELDS = {
     "reactive_link": {
@@ -248,6 +250,15 @@ def _compile_variant(raw: Mapping[str, Any]) -> CompiledRewriteVariant:
             if retained == discarded:
                 raise ValueError(f"Invalid projection attachment: {variant_id}")
             projection_pairs.add(tuple(sorted((retained, discarded))))
+        elif operation == "set_tetrahedral_outcome":
+            _validate_selector(instruction.get("selector"))
+            if instruction.get("outcome") not in {
+                "invert_if_defined",
+                "retain_if_defined",
+            }:
+                raise ValueError(
+                    f"Invalid tetrahedral outcome: {variant_id}"
+                )
         elif operation == "enumerate_endpoint_permutation":
             permutation_count += 1
             cases = tuple(instruction.get("cases") or ())
@@ -639,6 +650,36 @@ def _permutation_cases(
     )
 
 
+def _atom_stereo_descriptor(atom: Any) -> str | None:
+    """Return an assigned CIP code, or a defined tetrahedral tag fallback."""
+    from rdkit import Chem
+
+    if atom.HasProp("_CIPCode"):
+        return str(atom.GetProp("_CIPCode"))
+    tag = atom.GetChiralTag()
+    if tag == Chem.ChiralType.CHI_UNSPECIFIED:
+        return None
+    return str(tag).replace("CHI_", "")
+
+
+def _permutation_is_odd(
+    logical_order: Sequence[int],
+    actual_order: Sequence[int],
+) -> bool | None:
+    """Return parity mapping a logical neighbor order to RDKit's actual order."""
+    if len(logical_order) != len(actual_order) or set(logical_order) != set(
+        actual_order
+    ):
+        return None
+    positions = [actual_order.index(value) for value in logical_order]
+    inversions = sum(
+        positions[left] > positions[right]
+        for left in range(len(positions))
+        for right in range(left + 1, len(positions))
+    )
+    return bool(inversions % 2)
+
+
 def _execute_variant_case(
     variant: CompiledRewriteVariant,
     *,
@@ -659,6 +700,7 @@ def _execute_variant_case(
     hydrogen_deltas: Dict[int, int] = {}
     charge_operations = []
     projection_pairs = []
+    tetrahedral_directives = []
     seeds: set[int] = set()
     changes = []
     for instruction in variant.instructions:
@@ -762,6 +804,24 @@ def _execute_variant_case(
             if retained is None or discarded is None:
                 return None
             projection_pairs.append((retained[0], discarded[0]))
+        elif operation == "set_tetrahedral_outcome":
+            resolved = _resolve_selector(
+                instruction["selector"],
+                bindings=bindings,
+                assignment=assignment,
+                normalized_assignment=normalized_assignment,
+                offsets=offsets,
+                label_roles=label_roles,
+            )
+            if resolved is None:
+                return None
+            tetrahedral_directives.append(
+                (
+                    resolved[0],
+                    resolved[1],
+                    str(instruction["outcome"]),
+                )
+            )
 
     def failed_outcome() -> RewriteOutcome:
         return RewriteOutcome(
@@ -819,6 +879,45 @@ def _execute_variant_case(
         if before == "NONE":
             formed_pairs.append((atom_1, atom_2))
 
+    Chem.AssignStereochemistry(source, cleanIt=True, force=True)
+    tetrahedral_states = []
+    for center_index, center_label, requested_outcome in tetrahedral_directives:
+        center = source.GetAtomWithIdx(center_index)
+        if center.GetChiralTag() == Chem.ChiralType.CHI_UNSPECIFIED:
+            continue
+        removed_neighbors = [
+            neighbor.GetIdx()
+            for neighbor in center.GetNeighbors()
+            if neighbor.GetIdx() in removable
+        ]
+        added_neighbors = [
+            atom_2 if atom_1 == center_index else atom_1
+            for atom_1, atom_2 in formed_pairs
+            if center_index in {atom_1, atom_2}
+            and (atom_2 if atom_1 == center_index else atom_1) not in removable
+        ]
+        if len(removed_neighbors) != 1 or len(added_neighbors) != 1:
+            return failed_outcome()
+        removed_neighbor = removed_neighbors[0]
+        added_neighbor = added_neighbors[0]
+        source_order = tuple(
+            int(neighbor.GetIdx()) for neighbor in center.GetNeighbors()
+        )
+        logical_order = tuple(
+            added_neighbor if index == removed_neighbor else index
+            for index in source_order
+        )
+        tetrahedral_states.append(
+            (
+                center_index,
+                center_label,
+                requested_outcome,
+                center.GetChiralTag(),
+                _atom_stereo_descriptor(center),
+                logical_order,
+            )
+        )
+
     for atom_index, delta in hydrogen_deltas.items():
         if atom_index in removable or not set_total_hydrogens(
             source, rw, atom_index, delta
@@ -855,8 +954,33 @@ def _execute_variant_case(
                 captured=captured,
                 shifted=shifted,
             )
-        else:
-            Chem.AssignStereochemistry(product, cleanIt=True, force=True)
+        for (
+            center_index,
+            _,
+            requested_outcome,
+            source_tag,
+            _,
+            logical_order,
+        ) in tetrahedral_states:
+            target_center = product.GetAtomWithIdx(shifted(center_index))
+            shifted_logical_order = tuple(shifted(index) for index in logical_order)
+            actual_order = tuple(
+                int(neighbor.GetIdx()) for neighbor in target_center.GetNeighbors()
+            )
+            odd = _permutation_is_odd(shifted_logical_order, actual_order)
+            if odd is None:
+                return failed_outcome()
+            invert = requested_outcome == "invert_if_defined"
+            flip_tag = odd != invert
+            target_tag = source_tag
+            if flip_tag:
+                target_tag = (
+                    Chem.ChiralType.CHI_TETRAHEDRAL_CCW
+                    if source_tag == Chem.ChiralType.CHI_TETRAHEDRAL_CW
+                    else Chem.ChiralType.CHI_TETRAHEDRAL_CW
+                )
+            target_center.SetChiralTag(target_tag)
+        Chem.AssignStereochemistry(product, cleanIt=True, force=True)
     except Exception:
         return failed_outcome()
 
@@ -867,10 +991,38 @@ def _execute_variant_case(
     if any(not set(fragment).intersection(shifted_seeds) for fragment in retained_fragments):
         return failed_outcome()
     smiles = Chem.MolToSmiles(product, canonical=True, isomericSmiles=True)
+    stereo_changes = []
+    for (
+        center_index,
+        center_label,
+        requested_outcome,
+        _,
+        old_descriptor,
+        _,
+    ) in tetrahedral_states:
+        new_descriptor = _atom_stereo_descriptor(
+            product.GetAtomWithIdx(shifted(center_index))
+        )
+        stereo_changes.append(
+            PredictedStereoChange(
+                stereo_type="atom",
+                atom_1_role=center_label,
+                atom_2_role=None,
+                old_descriptor=old_descriptor,
+                new_descriptor=new_descriptor,
+                change_type=(
+                    "inverted"
+                    if requested_outcome == "invert_if_defined"
+                    else "retained"
+                ),
+                evidence=f"connectivity_rewrite:{requested_outcome}",
+            )
+        )
     return RewriteOutcome(
         outcome_id=outcome_id,
         predicted_product_smiles=smiles,
         predicted_bond_changes=tuple(changes),
+        predicted_stereo_changes=tuple(stereo_changes),
     )
 
 

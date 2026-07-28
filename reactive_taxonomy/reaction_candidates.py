@@ -63,6 +63,10 @@ def _matches(site: ReactionSiteReference, constraint: Dict[str, Any]) -> bool:
         details.get("h_count", 0)
     ) < int(constraint["h_count_min"]):
         return False
+    if constraint.get("attachment_h_count_min") is not None and int(
+        details.get("attachment_h_count") or 0
+    ) < int(constraint["attachment_h_count_min"]):
+        return False
     if (
         constraint.get("activation_relationship")
         and details.get("activation_relationship")

@@ -202,6 +202,11 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
         )
         if len(heavy_neighbors) == 1:
             atom_roles["attachment"] = heavy_neighbors
+        attachment = (
+            mol.GetAtomWithIdx(int(heavy_neighbors[0]))
+            if len(heavy_neighbors) == 1
+            else None
+        )
         if activation_anchors:
             atom_roles["activation_anchor"] = activation_anchors
         sites.append(SiteCandidate(
@@ -230,6 +235,19 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 "h_count": h_count,
                 "contexts": contexts,
                 "derived_family": family,
+                "attachment_h_count": (
+                    int(attachment.GetTotalNumHs(includeNeighbors=True))
+                    if attachment is not None
+                    else None
+                ),
+                "attachment_hybridization": (
+                    str(attachment.GetHybridization()).upper()
+                    if attachment is not None
+                    else None
+                ),
+                "attachment_context": (
+                    str(contexts[0]) if attachment is not None and contexts else None
+                ),
                 "activation_relationship": (
                     "alpha_to" if activation_records else None
                 ),

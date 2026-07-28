@@ -13,11 +13,11 @@
     "record_schema_version": "3.0",
     "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
     "taxonomy_definition_versions": {
-      "connectivity_rewrites.v2.json": "2.0@sha256:a6f3d20bdf46c845",
+      "connectivity_rewrites.v2.json": "2.0@sha256:4968a58f2b6a8996",
       "context_facets.v2.json": "2.0@sha256:3ab0826efdb1d824",
       "descriptor_rules.v1.json": "1.0@sha256:9a917344dcb41849",
       "reaction_correspondence": "2.2",
-      "reaction_grammars.v2.json": "2.0@sha256:09be06ec6c380bf4",
+      "reaction_grammars.v2.json": "2.0@sha256:136a317bc5a02a24",
       "signature_features.v2.json": "2.0@sha256:5a2b778cb862f43f",
       "site_interfaces.v2.json": "2.0@sha256:e5c603b07c7f0f82",
       "site_patterns.v2.json": "2.0@sha256:42ec9ddcaa196c75",
@@ -33,14 +33,14 @@
       "admission_reason_counts": {
         "condition_identifier_uncertainty": 116,
         "insufficient_edit_evidence": 6,
-        "insufficient_reactant_multiplicity": 23,
+        "insufficient_reactant_multiplicity": 26,
         "missing_verified_reaction_signature": 175,
         "multistage_conditions_not_structured": 88,
         "no_condition_identifiers": 2,
         "no_usable_transformation_evidence": 1,
         "reaction_completeness_unresolved": 176,
         "solvent_only_recipe": 7,
-        "suspected_missing_reactant": 95,
+        "suspected_missing_reactant": 92,
         "unaccounted_product_heavy_atoms": 118
       },
       "admission_tier_counts": {
@@ -72,11 +72,11 @@
         "record_schema_version": "3.0",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
         "taxonomy_definition_versions": {
-          "connectivity_rewrites.v2.json": "2.0@sha256:a6f3d20bdf46c845",
+          "connectivity_rewrites.v2.json": "2.0@sha256:4968a58f2b6a8996",
           "context_facets.v2.json": "2.0@sha256:3ab0826efdb1d824",
           "descriptor_rules.v1.json": "1.0@sha256:9a917344dcb41849",
           "reaction_correspondence": "2.2",
-          "reaction_grammars.v2.json": "2.0@sha256:09be06ec6c380bf4",
+          "reaction_grammars.v2.json": "2.0@sha256:136a317bc5a02a24",
           "signature_features.v2.json": "2.0@sha256:5a2b778cb862f43f",
           "site_interfaces.v2.json": "2.0@sha256:e5c603b07c7f0f82",
           "site_patterns.v2.json": "2.0@sha256:42ec9ddcaa196c75",
@@ -107,7 +107,7 @@
       },
       "output_path": "shards\\Acetal_ketal_formation.034b167a6e.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "deb8f7792c83f090c38fba44592f71f84341c05675eea0d3bfec7a1d6f34dc81",
+      "output_sha256": "487dd4bf6b90157b70872882f3f361393c62a92ae30cd310b9182b4f415f73bc",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 118,
@@ -119,7 +119,7 @@
         "mixed": 1,
         "unknown": 294
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "Acetal_ketal_formation.034b167a6e.part-00000",
       "signature_count": 6,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\Acetal_ketal_formation.csv",
@@ -169,11 +169,11 @@
         "record_schema_version": "3.0",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
         "taxonomy_definition_versions": {
-          "connectivity_rewrites.v2.json": "2.0@sha256:a6f3d20bdf46c845",
+          "connectivity_rewrites.v2.json": "2.0@sha256:4968a58f2b6a8996",
           "context_facets.v2.json": "2.0@sha256:3ab0826efdb1d824",
           "descriptor_rules.v1.json": "1.0@sha256:9a917344dcb41849",
           "reaction_correspondence": "2.2",
-          "reaction_grammars.v2.json": "2.0@sha256:09be06ec6c380bf4",
+          "reaction_grammars.v2.json": "2.0@sha256:136a317bc5a02a24",
           "signature_features.v2.json": "2.0@sha256:5a2b778cb862f43f",
           "site_interfaces.v2.json": "2.0@sha256:e5c603b07c7f0f82",
           "site_patterns.v2.json": "2.0@sha256:42ec9ddcaa196c75",
@@ -210,7 +210,7 @@
       "reaction_scope_counts": {
         "unknown": 300
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "Addition_of_Halogens_to_Double_or_Triple_Bonds.a30ab31a9f.part-00000",
       "signature_count": 0,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\Addition_of_Halogens_to_Double_or_Triple_Bonds.csv",
@@ -256,11 +256,11 @@
         "record_schema_version": "3.0",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
         "taxonomy_definition_versions": {
-          "connectivity_rewrites.v2.json": "2.0@sha256:a6f3d20bdf46c845",
+          "connectivity_rewrites.v2.json": "2.0@sha256:4968a58f2b6a8996",
           "context_facets.v2.json": "2.0@sha256:3ab0826efdb1d824",
           "descriptor_rules.v1.json": "1.0@sha256:9a917344dcb41849",
           "reaction_correspondence": "2.2",
-          "reaction_grammars.v2.json": "2.0@sha256:09be06ec6c380bf4",
+          "reaction_grammars.v2.json": "2.0@sha256:136a317bc5a02a24",
           "signature_features.v2.json": "2.0@sha256:5a2b778cb862f43f",
           "site_interfaces.v2.json": "2.0@sha256:e5c603b07c7f0f82",
           "site_patterns.v2.json": "2.0@sha256:42ec9ddcaa196c75",
@@ -297,7 +297,7 @@
       "reaction_scope_counts": {
         "unknown": 202
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "Appel_halogenation.57b5d05ab0.part-00000",
       "signature_count": 0,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\Appel_halogenation.csv",
@@ -359,11 +359,11 @@
         "record_schema_version": "3.0",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
         "taxonomy_definition_versions": {
-          "connectivity_rewrites.v2.json": "2.0@sha256:a6f3d20bdf46c845",
+          "connectivity_rewrites.v2.json": "2.0@sha256:4968a58f2b6a8996",
           "context_facets.v2.json": "2.0@sha256:3ab0826efdb1d824",
           "descriptor_rules.v1.json": "1.0@sha256:9a917344dcb41849",
           "reaction_correspondence": "2.2",
-          "reaction_grammars.v2.json": "2.0@sha256:09be06ec6c380bf4",
+          "reaction_grammars.v2.json": "2.0@sha256:136a317bc5a02a24",
           "signature_features.v2.json": "2.0@sha256:5a2b778cb862f43f",
           "site_interfaces.v2.json": "2.0@sha256:e5c603b07c7f0f82",
           "site_patterns.v2.json": "2.0@sha256:42ec9ddcaa196c75",
@@ -398,7 +398,7 @@
       },
       "output_path": "shards\\CDI-mediated_amidation.e538dc6c15.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "cbef013acfe5b26b63f6cd82e0a951b53cee8e6ba57708815d1e9af149295aa5",
+      "output_sha256": "1128e3d3888856218dd7beaede75e0e40b12b91de8ca1b4af9432ae5ee53b7ac",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 32,
@@ -410,7 +410,7 @@
         "intramolecular": 2,
         "unknown": 50
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "CDI-mediated_amidation.e538dc6c15.part-00000",
       "signature_count": 250,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\CDI-mediated_amidation.csv",
@@ -471,11 +471,11 @@
         "record_schema_version": "3.0",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
         "taxonomy_definition_versions": {
-          "connectivity_rewrites.v2.json": "2.0@sha256:a6f3d20bdf46c845",
+          "connectivity_rewrites.v2.json": "2.0@sha256:4968a58f2b6a8996",
           "context_facets.v2.json": "2.0@sha256:3ab0826efdb1d824",
           "descriptor_rules.v1.json": "1.0@sha256:9a917344dcb41849",
           "reaction_correspondence": "2.2",
-          "reaction_grammars.v2.json": "2.0@sha256:09be06ec6c380bf4",
+          "reaction_grammars.v2.json": "2.0@sha256:136a317bc5a02a24",
           "signature_features.v2.json": "2.0@sha256:5a2b778cb862f43f",
           "site_interfaces.v2.json": "2.0@sha256:e5c603b07c7f0f82",
           "site_patterns.v2.json": "2.0@sha256:42ec9ddcaa196c75",
@@ -509,7 +509,7 @@
       },
       "output_path": "shards\\CH_amination_and_azidation.d879548aef.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "5ffca4220026ae41c4ea5c0b9a4ea3119a24ff88260f3d196c78d84f74d95416",
+      "output_sha256": "4d22321b6268ba2f99aac69308005c377e58eb75f1b43acc574e5cfdfda86492",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 94,
@@ -520,7 +520,7 @@
         "intermolecular": 121,
         "unknown": 179
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "CH_amination_and_azidation.d879548aef.part-00000",
       "signature_count": 121,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\CH_amination_and_azidation.csv",
@@ -575,11 +575,11 @@
         "record_schema_version": "3.0",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
         "taxonomy_definition_versions": {
-          "connectivity_rewrites.v2.json": "2.0@sha256:a6f3d20bdf46c845",
+          "connectivity_rewrites.v2.json": "2.0@sha256:4968a58f2b6a8996",
           "context_facets.v2.json": "2.0@sha256:3ab0826efdb1d824",
           "descriptor_rules.v1.json": "1.0@sha256:9a917344dcb41849",
           "reaction_correspondence": "2.2",
-          "reaction_grammars.v2.json": "2.0@sha256:09be06ec6c380bf4",
+          "reaction_grammars.v2.json": "2.0@sha256:136a317bc5a02a24",
           "signature_features.v2.json": "2.0@sha256:5a2b778cb862f43f",
           "site_interfaces.v2.json": "2.0@sha256:e5c603b07c7f0f82",
           "site_patterns.v2.json": "2.0@sha256:42ec9ddcaa196c75",
@@ -610,7 +610,7 @@
       },
       "output_path": "shards\\Minisci.f66ac5d612.part-00000.jsonl.gz",
       "output_row_count": 252,
-      "output_sha256": "ff59bdb64d58c1137d917b778c40f15d3561ead2f633d3d517c29f20d8a5cd7c",
+      "output_sha256": "ee7528b06ad5dd5004fdfffab5256f1cc77ea3bed459e7afb8ce2d2068f6c683",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 8,
@@ -621,7 +621,7 @@
         "intermolecular": 38,
         "unknown": 214
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "Minisci.f66ac5d612.part-00000",
       "signature_count": 38,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\Minisci.csv",
@@ -639,22 +639,26 @@
       "admission_reason_counts": {
         "condition_identifier_uncertainty": 50,
         "insufficient_edit_evidence": 13,
-        "insufficient_reactant_multiplicity": 2,
-        "missing_verified_reaction_signature": 270,
+        "insufficient_reactant_multiplicity": 3,
+        "missing_verified_reaction_signature": 43,
+        "multiple_products": 1,
         "multistage_conditions_not_structured": 95,
         "no_condition_identifiers": 5,
-        "reaction_completeness_unresolved": 270,
+        "reaction_completeness_unresolved": 43,
         "solvent_only_recipe": 2,
-        "suspected_missing_reactant": 15,
-        "unaccounted_product_heavy_atoms": 17
+        "suspected_missing_reactant": 14,
+        "unaccounted_product_heavy_atoms": 17,
+        "verified_reaction_signature_with_conditions": 136
       },
       "admission_tier_counts": {
         "rejected": 24,
-        "review": 276
+        "review": 140,
+        "verified": 136
       },
       "chemistry_status_counts": {
         "rejected": 17,
-        "review": 283
+        "review": 57,
+        "verified": 226
       },
       "condition_stage_status_counts": {
         "single_stage": 205,
@@ -677,11 +681,11 @@
         "record_schema_version": "3.0",
         "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
         "taxonomy_definition_versions": {
-          "connectivity_rewrites.v2.json": "2.0@sha256:a6f3d20bdf46c845",
+          "connectivity_rewrites.v2.json": "2.0@sha256:4968a58f2b6a8996",
           "context_facets.v2.json": "2.0@sha256:3ab0826efdb1d824",
           "descriptor_rules.v1.json": "1.0@sha256:9a917344dcb41849",
           "reaction_correspondence": "2.2",
-          "reaction_grammars.v2.json": "2.0@sha256:09be06ec6c380bf4",
+          "reaction_grammars.v2.json": "2.0@sha256:136a317bc5a02a24",
           "signature_features.v2.json": "2.0@sha256:5a2b778cb862f43f",
           "site_interfaces.v2.json": "2.0@sha256:e5c603b07c7f0f82",
           "site_patterns.v2.json": "2.0@sha256:42ec9ddcaa196c75",
@@ -689,15 +693,16 @@
         }
       },
       "evidence_quality_counts": {
+        "exact_product_reconstruction": 231,
         "global_atom_correspondence": 13,
-        "reactant_grammar_only": 287
+        "reactant_grammar_only": 56
       },
       "failure_count": 0,
       "failures": [],
       "index_eligibility_counts": {
-        "eligible": 13,
+        "eligible": 222,
         "ineligible": 24,
-        "review_only": 263
+        "review_only": 54
       },
       "input_position_end": 299,
       "input_position_start": 0,
@@ -711,21 +716,22 @@
       },
       "output_path": "shards\\Mitsunobu_etherificationinversion.a077575558.part-00000.jsonl.gz",
       "output_row_count": 300,
-      "output_sha256": "2dd2696c4c8df7212d85900b9bc612b5f7d02dd51cd2d37d57c2e084feb874a1",
+      "output_sha256": "b6200eb1ab00f36fc68b08dd0eb3d3cec35f95e3167132f698505ef7d335ab05",
       "part_number": 0,
       "reaction_completeness_status_counts": {
         "incomplete": 17,
-        "unresolved": 270,
-        "verified": 13
+        "unresolved": 43,
+        "verified": 240
       },
       "reaction_scope_counts": {
-        "intermolecular": 12,
+        "intermolecular": 196,
+        "intramolecular": 43,
         "mixed": 1,
-        "unknown": 287
+        "unknown": 60
       },
-      "reused": false,
+      "reused": true,
       "shard_id": "Mitsunobu_etherificationinversion.a077575558.part-00000",
-      "signature_count": 13,
+      "signature_count": 240,
       "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\Mitsunobu_etherificationinversion.csv",
       "source_row_number_end": 301,
       "source_row_number_start": 2,
@@ -733,8 +739,154 @@
       "status": "complete",
       "transformation_class_counts": {
         "generic_multi_event_graph_transformation": 12,
+        "sp3_c_o_substitution": 231,
         "substitution": 1,
-        "unknown": 287
+        "unknown": 56
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "insufficient_edit_evidence": 83,
+        "insufficient_reactant_multiplicity": 15,
+        "invalid_reaction_or_product": 2,
+        "missing_verified_reaction_signature": 75,
+        "missing_yield": 476,
+        "multistage_conditions_not_structured": 2,
+        "no_condition_identifiers": 461,
+        "no_usable_transformation_evidence": 23,
+        "reaction_completeness_unresolved": 98,
+        "suspected_missing_reactant": 29,
+        "unaccounted_product_heavy_atoms": 44,
+        "verified_reaction_signature_with_conditions": 2
+      },
+      "admission_tier_counts": {
+        "rejected": 462,
+        "review": 17,
+        "verified": 2
+      },
+      "chemistry_status_counts": {
+        "rejected": 69,
+        "review": 158,
+        "verified": 254
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 479,
+        "unassigned_multistage": 2
+      },
+      "condition_status_counts": {
+        "resolved_complete": 20,
+        "unusable": 461
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:ad8a6838bc1bedc8a3d0410ec80495ae0f4f0d3e6f7a9c8bfe20da00a1633cac",
+          "role_resolution.v1.json": "sha256:be916c23ca19714df941885e60500d545fa239183352a15fc1e7dfdc454bd391",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v2.0",
+        "reaction_signature_schema_version": "2.0",
+        "record_schema_version": "3.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v1.4",
+        "taxonomy_definition_versions": {
+          "connectivity_rewrites.v2.json": "2.0@sha256:4968a58f2b6a8996",
+          "context_facets.v2.json": "2.0@sha256:3ab0826efdb1d824",
+          "descriptor_rules.v1.json": "1.0@sha256:9a917344dcb41849",
+          "reaction_correspondence": "2.2",
+          "reaction_grammars.v2.json": "2.0@sha256:136a317bc5a02a24",
+          "signature_features.v2.json": "2.0@sha256:5a2b778cb862f43f",
+          "site_interfaces.v2.json": "2.0@sha256:e5c603b07c7f0f82",
+          "site_patterns.v2.json": "2.0@sha256:42ec9ddcaa196c75",
+          "taxonomy_manifest.v2.json": "2.0@sha256:cfccdc62c7123b23"
+        }
+      },
+      "evidence_quality_counts": {
+        "ambiguous_atom_correspondence": 1,
+        "exact_multi_event_reconstruction": 2,
+        "exact_product_reconstruction": 253,
+        "global_atom_correspondence": 74,
+        "partial_product_correspondence": 7,
+        "reactant_grammar_only": 105,
+        "unique_scaffold_correspondence": 9,
+        "unresolved": 30
+      },
+      "failure_count": 0,
+      "failures": [],
+      "index_eligibility_counts": {
+        "eligible": 17,
+        "ineligible": 462,
+        "review_only": 2
+      },
+      "input_position_end": 480,
+      "input_position_start": 0,
+      "input_row_count": 481,
+      "mode": "full",
+      "named_family_counts": {
+        "c_s_coupling": 20,
+        "chan_lam": 2,
+        "friedel_crafts_acylation": 1,
+        "heck": 4,
+        "reductive_amination": 11,
+        "sonogashira": 6,
+        "suzuki_miyaura": 40,
+        "unnamed": 397
+      },
+      "outcome_status_counts": {
+        "missing": 476,
+        "usable": 5
+      },
+      "output_path": "shards\\test_reactions.86addc8eb9.part-00000.jsonl.gz",
+      "output_row_count": 481,
+      "output_sha256": "4e31214a1f6e9c0accad9d7b059429f086c660033187b6df56ef61f6d007898f",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 44,
+        "missing": 2,
+        "unresolved": 98,
+        "verified": 337
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 298,
+        "unimolecular": 39,
+        "unknown": 144
+      },
+      "reused": true,
+      "shard_id": "test_reactions.86addc8eb9.part-00000",
+      "signature_count": 337,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\test_reactions.csv",
+      "source_row_number_end": 482,
+      "source_row_number_start": 2,
+      "source_sha256": "607457f4013e7b64b27c80e66b5e73b3cd719cc296b733dda1fbc2bc7f1d3d85",
+      "status": "complete",
+      "transformation_class_counts": {
+        "alcohol_oxidation": 10,
+        "alkene_c_c_substitution": 4,
+        "alkene_reduction": 3,
+        "alkyne_reduction": 1,
+        "amide_formation": 23,
+        "aromatic_c_h_acylation": 1,
+        "attachment_replacement": 7,
+        "beta_elimination": 6,
+        "c_c_transfer_coupling": 53,
+        "carbonyl_c_n_reductive_coupling": 11,
+        "carbonyl_reduction": 10,
+        "chan_lam_heteroatom_coupling": 2,
+        "ester_formation": 3,
+        "generic_graph_transformation": 44,
+        "generic_multi_event_graph_transformation": 8,
+        "heteroatom_bond_oxidation": 1,
+        "hydrogenation": 1,
+        "reductive_bond_cleavage": 2,
+        "sp2_c_c_substitution": 1,
+        "sp2_c_n_substitution": 81,
+        "sp2_c_o_substitution": 9,
+        "sp2_c_s_substitution": 20,
+        "sp3_c_n_substitution": 1,
+        "sp3_c_o_substitution": 6,
+        "sp3_c_s_substitution": 2,
+        "substitution": 29,
+        "terminal_alkyne_coupling": 6,
+        "unknown": 136
       }
     }
   ],
@@ -780,6 +932,12 @@
       "covered_row_count": 300,
       "path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\Mitsunobu_etherificationinversion.csv",
       "sha256": "dcadc8cfe4647f7d735bb7c18763bba97cef0e4dc02d5b40af6d8344f64887dc"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 481,
+      "path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test\\test_reactions.csv",
+      "sha256": "607457f4013e7b64b27c80e66b5e73b3cd719cc296b733dda1fbc2bc7f1d3d85"
     }
   ]
 }

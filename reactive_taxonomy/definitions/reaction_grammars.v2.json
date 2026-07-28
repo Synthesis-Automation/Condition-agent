@@ -430,6 +430,135 @@
       "priority": 88
     },
     {
+      "id": "alcohol_c_n_displacement",
+      "transformation_class": "sp3_c_n_substitution",
+      "display_name": "Alcohol C–O displacement by an N–H partner",
+      "generic_label": "R–CH(OH)–R + N–H → R–CH(N)–R",
+      "roles": {
+        "alcohol": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "O"
+          ],
+          "contexts_any": [
+            "Alkyl"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        },
+        "nucleophile": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "N",
+            "N_aromatic"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free",
+            "deactivated"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": [
+            "alcohol",
+            "nucleophile"
+          ],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "compatible_named_families": [],
+      "priority": 89
+    },
+    {
+      "id": "alcohol_c_o_displacement",
+      "transformation_class": "sp3_c_o_substitution",
+      "display_name": "Alcohol C–O displacement by an O–H partner",
+      "generic_label": "R–CH(OH)–R + O–H → R–CH(O)–R",
+      "roles": {
+        "alcohol": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "O"
+          ],
+          "contexts_any": [
+            "Alkyl"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        },
+        "nucleophile": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "O"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": [
+            "alcohol",
+            "nucleophile"
+          ],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "compatible_named_families": [],
+      "priority": 89
+    },
+    {
+      "id": "alcohol_c_s_displacement",
+      "transformation_class": "sp3_c_s_substitution",
+      "display_name": "Alcohol C–O displacement by an S–H partner",
+      "generic_label": "R–CH(OH)–R + S–H → R–CH(S)–R",
+      "roles": {
+        "alcohol": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "O"
+          ],
+          "contexts_any": [
+            "Alkyl"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free"
+          ]
+        },
+        "nucleophile": {
+          "site_type": "pronucleophile_XH",
+          "center_any": [
+            "S"
+          ],
+          "h_count_min": 1,
+          "availability_any": [
+            "free",
+            "deactivated"
+          ]
+        }
+      },
+      "role_relationships": [
+        {
+          "roles": [
+            "alcohol",
+            "nucleophile"
+          ],
+          "component_relation": "same_or_different"
+        }
+      ],
+      "compatible_named_families": [],
+      "priority": 89
+    },
+    {
       "id": "terminal_alkene_heck_coupling",
       "transformation_class": "alkene_c_c_substitution",
       "display_name": "Terminal-alkene C–C coupling",

@@ -28,11 +28,15 @@ def build_product_connection(
         connection_type = "C_C"
     elif kind == "nitrogen_substitution":
         left_role, right_role = str(rule["anchor_role"]), str(rule["nitrogen_role"])
+        left_atom_role = str(rule.get("anchor_atom_role") or "anchor")
+        left_context_key = str(rule.get("anchor_context_key") or "anchor_context")
         right_atom_role = "center"
         right_context_key = "center_token"
         connection_type = "C_N"
     elif kind == "heteroatom_substitution":
         left_role, right_role = str(rule["anchor_role"]), str(rule["partner_role"])
+        left_atom_role = str(rule.get("anchor_atom_role") or "anchor")
+        left_context_key = str(rule.get("anchor_context_key") or "anchor_context")
         right_atom_role = "center"
         right_context_key = "center_token"
         connection_type = f"C_{rule['element']}"
@@ -48,11 +52,14 @@ def build_product_connection(
         connection_type = "C_C"
     else:
         return None
+    if kind not in {"nitrogen_substitution", "heteroatom_substitution"}:
+        left_atom_role = "anchor"
+        left_context_key = "anchor_context"
     left, right = (
         selected.role_assignments[left_role],
         selected.role_assignments[right_role],
     )
-    left_context = str(left.details.get("anchor_context") or "Other")
+    left_context = str(left.details.get(left_context_key) or "Other")
     right_context = str(right.details.get(right_context_key) or "N")
     concise_label = render_product_label(
         {"id": selected.grammar_id},
@@ -63,7 +70,7 @@ def build_product_connection(
         endpoint_1=ProductConnectionEndpoint(
             role=left_role,
             component_index=left.component_index,
-            atom_index=int(left.atom_roles["anchor"][0]),
+            atom_index=int(left.atom_roles[left_atom_role][0]),
             context=left_context,
             source_site_id=left.site_id,
         ),

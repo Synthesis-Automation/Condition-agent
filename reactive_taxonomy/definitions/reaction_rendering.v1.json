@@ -80,6 +80,29 @@
       "partner_role": "nucleophile",
       "element": "S"
     },
+    "alcohol_c_n_displacement": {
+      "product_kind": "nitrogen_substitution",
+      "anchor_role": "alcohol",
+      "anchor_atom_role": "attachment",
+      "anchor_context_key": "attachment_context",
+      "nitrogen_role": "nucleophile"
+    },
+    "alcohol_c_o_displacement": {
+      "product_kind": "heteroatom_substitution",
+      "anchor_role": "alcohol",
+      "anchor_atom_role": "attachment",
+      "anchor_context_key": "attachment_context",
+      "partner_role": "nucleophile",
+      "element": "O"
+    },
+    "alcohol_c_s_displacement": {
+      "product_kind": "heteroatom_substitution",
+      "anchor_role": "alcohol",
+      "anchor_atom_role": "attachment",
+      "anchor_context_key": "attachment_context",
+      "partner_role": "nucleophile",
+      "element": "S"
+    },
     "terminal_alkene_heck_coupling": {
       "product_kind": "heck_alkene",
       "anchor_role": "electrophile",

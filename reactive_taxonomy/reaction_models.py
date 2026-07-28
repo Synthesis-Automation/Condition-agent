@@ -69,12 +69,28 @@ class BondChange:
 
 
 @dataclass(frozen=True)
+class PredictedStereoChange:
+    """Role-addressed stereochemical outcome emitted by a graph rewrite."""
+
+    stereo_type: Literal["atom", "bond"]
+    atom_1_role: str
+    atom_2_role: Optional[str]
+    old_descriptor: Optional[str]
+    new_descriptor: Optional[str]
+    change_type: Literal[
+        "retained", "inverted", "created", "destroyed", "descriptor_changed"
+    ]
+    evidence: str
+
+
+@dataclass(frozen=True)
 class RewriteOutcome:
     """One deterministic constitutional outcome of a connectivity rewrite."""
 
     outcome_id: str
     predicted_product_smiles: Optional[str]
     predicted_bond_changes: Tuple[BondChange, ...]
+    predicted_stereo_changes: Tuple[PredictedStereoChange, ...] = ()
     warnings: Tuple[str, ...] = ()
 
 
@@ -263,7 +279,7 @@ class ReactionStereoChange:
     old_descriptor: Optional[str]
     new_descriptor: Optional[str]
     change_type: Literal[
-        "retained", "created", "destroyed", "descriptor_changed"
+        "retained", "inverted", "created", "destroyed", "descriptor_changed"
     ]
     evidence: str
     confidence: float
@@ -648,6 +664,7 @@ class ReactionCandidate:
     predicted_product_smiles: Optional[str]
     verification: str
     reaction_label: Optional[str]
+    predicted_stereo_changes: Tuple[PredictedStereoChange, ...] = ()
     compatible_named_families: Tuple[str, ...] = ()
     warnings: Tuple[str, ...] = ()
 

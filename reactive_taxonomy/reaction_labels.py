@@ -427,11 +427,17 @@ def render_product_label(
             str(rule["nitrogen_role"]),
         )
         anchor, nitrogen = assignment[anchor_role], assignment[nitrogen_role]
+        anchor_context_key = str(
+            rule.get("anchor_context_key") or "anchor_context"
+        )
+        anchor_context = str(
+            anchor.details.get(anchor_context_key) or "Other"
+        )
         retained = _nitrogen_retained_labels(
             nitrogen_role, nitrogen, aliases, style=style
         )
         product = _nitrogen_product(
-            str(anchor.details["anchor_context"]),
+            anchor_context,
             nitrogen,
             bond,
             style,
@@ -439,7 +445,7 @@ def render_product_label(
                 anchor_role,
                 anchor,
                 0,
-                str(anchor.details["anchor_context"]),
+                anchor_context,
                 aliases,
                 style=style,
             ),
@@ -451,9 +457,15 @@ def render_product_label(
             assignment[anchor_role],
             assignment[partner_role],
         )
+        anchor_context_key = str(
+            rule.get("anchor_context_key") or "anchor_context"
+        )
+        anchor_context = str(
+            anchor.details.get(anchor_context_key) or "Other"
+        )
         retained = list(partner.details.get("contexts") or [])
         product = render_heteroatom_product(
-            str(anchor.details["anchor_context"]),
+            anchor_context,
             partner,
             str(rule["element"]),
             style=style,
@@ -461,7 +473,7 @@ def render_product_label(
                 anchor_role,
                 anchor,
                 0,
-                str(anchor.details["anchor_context"]),
+                anchor_context,
                 aliases,
                 style=style,
             ),

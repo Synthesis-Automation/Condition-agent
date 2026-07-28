@@ -501,6 +501,7 @@ def normalize_predicted_edits(
     }:
         return EditNormalizationResult((), "no_exact_reconstruction", 0.0, valid=False)
     edits = []
+    stereo_changes = []
     warnings = []
     for change in selected.predicted_bond_changes:
         try:
@@ -522,6 +523,31 @@ def normalize_predicted_edits(
                 atom_2=atom_2,
                 old_order=change.old_order.upper() if change.old_order else None,
                 new_order=change.new_order.upper() if change.new_order else None,
+                evidence=change.evidence,
+                confidence=1.0,
+            )
+        )
+    for change in selected.predicted_stereo_changes:
+        try:
+            atom_1 = _role_atom(
+                change.atom_1_role, selected.role_assignments, reactants
+            )
+            atom_2 = (
+                _role_atom(change.atom_2_role, selected.role_assignments, reactants)
+                if change.atom_2_role is not None
+                else None
+            )
+        except (KeyError, StopIteration, ValueError) as exc:
+            warnings.append(f"PREDICTED_STEREO_PROVENANCE_ERROR:{exc}")
+            continue
+        stereo_changes.append(
+            ReactionStereoChange(
+                stereo_type=change.stereo_type,
+                atom_1=atom_1,
+                atom_2=atom_2,
+                old_descriptor=change.old_descriptor,
+                new_descriptor=change.new_descriptor,
+                change_type=change.change_type,
                 evidence=change.evidence,
                 confidence=1.0,
             )
@@ -548,6 +574,7 @@ def normalize_predicted_edits(
         1.0 if edits else 0.0,
         tuple(sorted(set(warnings))),
         bool(edits),
+        tuple(stereo_changes),
         connectivity_edit_graph=connectivity_graph,
     )
 
@@ -585,6 +612,11 @@ def normalize_predicted_multi_event_edits(
         1.0,
         warnings,
         True,
+        tuple(
+            change
+            for result in normalized
+            for change in result.stereo_changes
+        ),
         connectivity_edit_graph=connectivity_graph,
     )
 
@@ -1398,6 +1430,8 @@ def normalize_reaction_edits(
             predicted.evidence,
             predicted.confidence,
             warnings,
+            True,
+            predicted.stereo_changes,
             connectivity_edit_graph=predicted.connectivity_edit_graph,
         )
     if predicted_multi.valid:
@@ -1406,6 +1440,8 @@ def normalize_reaction_edits(
             predicted_multi.evidence,
             predicted_multi.confidence,
             warnings,
+            True,
+            predicted_multi.stereo_changes,
             connectivity_edit_graph=predicted_multi.connectivity_edit_graph,
         )
     inferred = normalize_inferred_scaffold_edits(reactants, products)

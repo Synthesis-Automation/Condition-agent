@@ -80,6 +80,15 @@ attachment site, removes Ar–X, forms Ar–C, and records alkene C–H loss. It
 not invent E/Z stereochemistry: a stereospecified product is exact only when
   that stereochemistry is supported by the input/operator result.
 
+Alcohol C–O displacement is represented by one shared declarative rewrite for
+O–H, N–H, and S–H partners. The operator removes the alcohol oxygen from the
+reported main-product projection, forms the new C–X bond, and consumes partner
+X–H. Defined tetrahedral centers enumerate inversion and retention as separate
+structural outcomes; the observed product selects the supported outcome and the
+signature records it explicitly. No Mitsunobu or other named family is forced
+from this graph pattern alone because omitted reagents may be needed to support
+that optional annotation.
+
 The v2 grammar registry declares compatible molecular roles, not executable
 operators or reaction archetypes. Every grammar selects one bounded
 connectivity rewrite. `substitution`, `addition`, and `elimination` are derived
@@ -269,6 +278,8 @@ partner context, and local steric and electronic analyses:
 
 ```powershell
 python -m reactive_taxonomy.cli molecule "Brc1ccc(N)cc1C#N" --concise
+python -m reactive_taxonomy.cli molecule "BrBr" --concise
+
 python -m reactive_taxonomy.cli reaction "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1" --concise
 
 python -m reactive_taxonomy.cli reaction "BrBr.C=CCCCCCCCCCCC>>CCCCCCCCCCCC(Br)CBr" --concise
