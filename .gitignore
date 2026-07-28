@@ -151,7 +151,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# ALL_FAMILIES_drfp.npz
+
 dataset_combined.*
+/datasets/literature
 
 # Large dataset artifacts (keep out of git history)
 # Explicitly ignore RDF outputs and archives under data-processor/dataset
