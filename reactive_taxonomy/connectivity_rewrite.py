@@ -29,13 +29,22 @@ from .reaction_models import (
     ReactionComponent,
     ReactionSiteReference,
 )
+from .reaction_site_interfaces import (
+    NormalizedSiteInterfaces,
+    normalize_reaction_assignment,
+)
 
 
-CONNECTIVITY_REWRITE_SCHEMA_VERSION = "1.0"
-CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION = "1.0"
+CONNECTIVITY_REWRITE_SCHEMA_VERSION = "1.1"
+CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION = "1.1"
 
 _PATH = Path(__file__).with_name("definitions") / "connectivity_rewrites.v1.json"
-_SELECTOR = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
+_LEGACY_SELECTOR = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
+_NORMALIZED_SELECTOR = re.compile(
+    r"^[a-z][a-z0-9_]*\."
+    r"(reactive_link|bond_capacity|connection_endpoint)\."
+    r"[a-z][a-z0-9_]*$"
+)
 _BINDING = re.compile(r"^[a-z][a-z0-9_]*$")
 _BOND_STATES = {"NONE", "SINGLE", "DOUBLE", "TRIPLE"}
 _STATE_RANK = {"NONE": 0, "SINGLE": 1, "DOUBLE": 2, "TRIPLE": 3}
@@ -51,6 +60,28 @@ _ALLOWED_INSTRUCTIONS = {
     "declare_product_seed",
     "declare_projection_discardable_attachment",
     "enumerate_endpoint_permutation",
+}
+_INTERFACE_PREDICATE_FIELDS = {
+    "reactive_link": {
+        "available_units",
+        "availability",
+        "before_order",
+        "source_kind",
+        "symmetry_class",
+    },
+    "bond_capacity": {
+        "availability",
+        "bond_class",
+        "current_order",
+        "maximum_decrement",
+        "maximum_increment",
+    },
+    "connection_endpoint": {
+        "availability",
+        "required_bond_capacity_decrement",
+        "required_formal_charge_delta",
+        "required_hydrogen_delta",
+    },
 }
 
 
@@ -93,7 +124,10 @@ def _validate_selector(selector: object, *, allow_binding: bool = True) -> str:
         if not _BINDING.fullmatch(value[1:]):
             raise ValueError(f"Invalid rewrite binding selector: {value}")
         return value
-    if not _SELECTOR.fullmatch(value):
+    if not (
+        _LEGACY_SELECTOR.fullmatch(value)
+        or _NORMALIZED_SELECTOR.fullmatch(value)
+    ):
         raise ValueError(f"Invalid rewrite atom selector: {value}")
     return value
 
@@ -115,9 +149,20 @@ def _compile_variant(raw: Mapping[str, Any]) -> CompiledRewriteVariant:
             raise ValueError(f"Invalid predicate in rewrite variant: {variant_id}")
         if not _BINDING.fullmatch(str(predicate.get("role") or "")):
             raise ValueError(f"Invalid predicate role in rewrite variant: {variant_id}")
-        if not _BINDING.fullmatch(str(predicate.get("detail") or "")):
+        detail = str(predicate.get("detail") or "")
+        interface = str(predicate.get("interface") or "")
+        field = str(predicate.get("field") or "")
+        if detail:
+            if interface or field or not _BINDING.fullmatch(detail):
+                raise ValueError(
+                    f"Invalid predicate detail in rewrite variant: {variant_id}"
+                )
+        elif (
+            interface not in _INTERFACE_PREDICATE_FIELDS
+            or field not in _INTERFACE_PREDICATE_FIELDS[interface]
+        ):
             raise ValueError(
-                f"Invalid predicate detail in rewrite variant: {variant_id}"
+                f"Invalid interface predicate in rewrite variant: {variant_id}"
             )
         if predicate.get("operator") not in {"eq", "gte"}:
             raise ValueError(
