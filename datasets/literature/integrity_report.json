@@ -2,7 +2,7 @@
   "artifact_type": "sharded_conversion_integrity",
   "duplicate_observation_count": 0,
   "issues": [],
-  "manifest_path": "datasets\\literature\\shard_manifest.json",
+  "manifest_path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\shard_manifest.json",
   "schema_version": "1.0",
   "shard_count": 118,
   "valid": true,
