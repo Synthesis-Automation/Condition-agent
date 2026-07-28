@@ -140,6 +140,20 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "Generate Recommendation Data"
         )
         self.start_button.setObjectName("generateButton")
+        self.start_button.setDefault(True)
+        self.start_button.setStyleSheet(
+            "QPushButton#generateButton {"
+            "background-color: #0078d7;"
+            "color: white;"
+            "font-weight: 700;"
+            "padding: 10px 18px;"
+            "border-radius: 6px;"
+            "}"
+            "QPushButton#generateButton:disabled {"
+            "background-color: #a6c8f0;"
+            "color: #ffffff;"
+            "}"
+        )
         self.cancel_button = QtWidgets.QPushButton("Cancel")
         self.cancel_button.setObjectName("cancelButton")
         self.cancel_button.setEnabled(False)

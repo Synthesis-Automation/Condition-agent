@@ -4,23 +4,23 @@
     "canonical_manifest": {
       "path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\shard_manifest.json",
       "relative_path": "shard_manifest.json",
-      "size_bytes": 65864
+      "size_bytes": 32035
     },
     "fast_index": {
       "path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\generic_index.json.gz",
       "relative_path": "generic_index.json.gz",
-      "size_bytes": 2829150
+      "size_bytes": 499605
     },
     "review_csv": {
       "path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\reaction_review.csv",
       "relative_path": "reaction_review.csv",
-      "size_bytes": 2342963
+      "size_bytes": 948773
     }
   },
   "conversion_report_path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\conversion_report.json",
-  "eligible_index_record_count": 1972,
+  "eligible_index_record_count": 378,
   "output_dir": "C:\\Git-softwares\\Condition-agent\\datasets\\literature",
-  "record_count": 4152,
+  "record_count": 1954,
   "report_path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\recommendation_artifacts_report.json",
   "reused_shard_count": 0,
   "schema_version": "1.0",
@@ -30,13 +30,13 @@
     "shard_size": 1000,
     "workers": 4
   },
-  "shard_count": 14,
-  "source_file_count": 14,
-  "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_300",
+  "shard_count": 7,
+  "source_file_count": 7,
+  "source_path": "C:\\Git-softwares\\Condition-agent\\examples\\small_test",
   "storage": {
-    "shard_file_count": 138,
-    "shard_size_bytes": 43996743,
-    "total_output_size_bytes_before_report": 50085148
+    "shard_file_count": 145,
+    "shard_size_bytes": 45948229,
+    "total_output_size_bytes_before_report": 47692016
   },
   "warnings": []
 }
