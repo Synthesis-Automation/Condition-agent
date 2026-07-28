@@ -21,6 +21,11 @@ The new system must therefore be **reaction-type assisted, not reaction-type dep
 
 Every valid reaction should receive a chemistry-based representation. A named family is added only when supported by evidence. Recommendation must remain possible when the family is unknown or ambiguous.
 
+The detailed proposal for reducing addition, coupling, elimination, insertion,
+exchange, rearrangement, and other reaction patterns to one signed bond-delta
+grammar is in
+[`connectivity_first_reaction_grammar_design.md`](connectivity_first_reaction_grammar_design.md).
+
 ```text
 Named family (optional):       Suzuki
 Generic transformation:       sp2 C–X + C–B -> sp2 C–C
