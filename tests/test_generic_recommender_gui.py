@@ -190,6 +190,14 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     assert "Palladium catalyst" in window.results_table.item(0, 7).text()
     details = window.details_box.toPlainText()
     assert "Potassium carbonate" in details
+    assert (
+        "Reaction label: Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
+        in details
+    )
+    assert "Spectator groups: R–C≡N [nitrile] (reactant 1, d=3)" in details
+    assert "Steric/electronic analysis:" in details
+    assert "steric ortho hindered, 2 ortho substituent(s)" in details
+    assert "electronic electron poor (local score +0.75)" in details
     assert "Recipe core:" not in details
     assert "Observed recipe variants:" not in details
     assert "RCORE1:core" not in details

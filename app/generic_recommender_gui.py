@@ -162,22 +162,10 @@ def _electronic_summary(partner: Mapping[str, Any]) -> str:
     return electronic_class
 
 
-def format_query_summary(result: GenericRecommendationResult) -> str:
-    """Render query identity, spectators, and local reaction-partner context."""
-    label_evidence = _display_name(result.reaction_label_status)
-    lines = [
-        (
-            f"Reaction: {result.reaction_label or 'Unresolved'}  •  "
-            f"Label evidence: {label_evidence}"
-        ),
-        (
-            f"Family: {_display_name(result.named_family)}  •  "
-            f"Transformation: {_display_name(result.transformation_class)}  •  "
-            f"Retrieval: {_display_name(result.retrieval_level)}"
-        ),
-    ]
+def _spectator_summary(groups: Tuple[Dict[str, Any], ...]) -> str:
+    """Render unchanged spectator groups with reactant and distance context."""
     spectator_labels = []
-    for group in result.spectator_groups:
+    for group in groups:
         if not isinstance(group, Mapping):
             continue
         label = str(
@@ -198,13 +186,15 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
         spectator_labels.append(
             f"{label} ({', '.join(context)})" if context else label
         )
-    lines.append(
-        "Spectator groups: "
-        + ("; ".join(spectator_labels) if spectator_labels else "None detected")
-    )
-    if result.reaction_partners:
-        lines.append("Steric/electronic analysis:")
-    for partner in result.reaction_partners:
+    return "; ".join(spectator_labels) if spectator_labels else "None detected"
+
+
+def _partner_analysis_summaries(
+    partners: Tuple[Dict[str, Any], ...],
+) -> Tuple[str, ...]:
+    """Render local steric and electronic context for reaction partners."""
+    summaries = []
+    for partner in partners:
         if not isinstance(partner, Mapping):
             continue
         role = _display_name(partner.get("role"))
@@ -214,10 +204,32 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
         identity = chemist_label or context or "Unclassified partner"
         if chemist_label and context:
             identity = f"{chemist_label} ({context})"
-        lines.append(
-            f"  {role} — {identity}: steric {_steric_summary(partner)}; "
+        summaries.append(
+            f"{role} — {identity}: steric {_steric_summary(partner)}; "
             f"electronic {_electronic_summary(partner)}"
         )
+    return tuple(summaries)
+
+
+def format_query_summary(result: GenericRecommendationResult) -> str:
+    """Render query identity, spectators, and local reaction-partner context."""
+    label_evidence = _display_name(result.reaction_label_status)
+    lines = [
+        (
+            f"Reaction: {result.reaction_label or 'Unresolved'}  •  "
+            f"Label evidence: {label_evidence}"
+        ),
+        (
+            f"Family: {_display_name(result.named_family)}  •  "
+            f"Transformation: {_display_name(result.transformation_class)}  •  "
+            f"Retrieval: {_display_name(result.retrieval_level)}"
+        ),
+    ]
+    lines.append(f"Spectator groups: {_spectator_summary(result.spectator_groups)}")
+    partner_summaries = _partner_analysis_summaries(result.reaction_partners)
+    if partner_summaries:
+        lines.append("Steric/electronic analysis:")
+        lines.extend(f"  {summary}" for summary in partner_summaries)
     warnings = ", ".join(result.warnings) if result.warnings else "None"
     lines.append(
         f"Candidates: {result.candidate_count}  •  "
@@ -835,6 +847,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self._render_result(result)
 
     def _render_result(self, result: GenericRecommendationResult) -> None:
+        self.last_result = result
         self._render_reaction_graph(result.query_reaction_smiles)
         if not result.valid:
             self.status_label.setText("No recommendation")
@@ -955,9 +968,31 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         recipe = recommendation.resolved_recipe
         lines = [
             f"Rank {recommendation.rank}",
-            "",
-            "Conditions",
         ]
+        if self.last_result is not None:
+            partner_summaries = _partner_analysis_summaries(
+                self.last_result.reaction_partners
+            )
+            lines.extend(
+                (
+                    "",
+                    "Reaction context",
+                    (
+                        "Reaction label: "
+                        f"{self.last_result.reaction_label or 'Unresolved'}"
+                    ),
+                    (
+                        "Spectator groups: "
+                        f"{_spectator_summary(self.last_result.spectator_groups)}"
+                    ),
+                    "Steric/electronic analysis:",
+                )
+            )
+            if partner_summaries:
+                lines.extend(f"• {summary}" for summary in partner_summaries)
+            else:
+                lines.append("None available")
+        lines.extend(("", "Conditions"))
         for field, label in _RECIPE_ROLE_LABELS:
             names = _component_names(recipe, field)
             if names:
