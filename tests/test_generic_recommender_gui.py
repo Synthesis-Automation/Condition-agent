@@ -60,8 +60,34 @@ def _result() -> GenericRecommendationResult:
         query_reaction_smiles="BrC.B(O)O>>CC",
         valid=True,
         query_signature_id="RS2:query",
+        reaction_label="Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
+        reaction_label_status="exact_product",
         named_family="suzuki_miyaura",
         transformation_class="c_c_transfer_coupling",
+        spectator_groups=(
+            {
+                "group_id": "nitrile",
+                "chemist_label": "R–C≡N",
+                "component_index": 0,
+                "graph_distance": 3,
+            },
+        ),
+        reaction_partners=(
+            {
+                "role": "electrophile",
+                "chemist_label": "Ar–Br",
+                "anchor_contexts": ("Ar",),
+                "steric": {
+                    "class": "ortho_hindered",
+                    "ortho_substituent_count": 2,
+                    "local_heavy_atoms_r2": 6,
+                },
+                "electronic": {
+                    "class": "electron_poor",
+                    "qualitative_sum": 0.75,
+                },
+            },
+        ),
         retrieval_level="exact_signature",
         candidate_count=4,
         independent_candidate_count=3,
@@ -139,8 +165,13 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
 
     window._render_result(_result())
 
-    assert "Suzuki Miyaura" in window.summary_box.toPlainText()
-    assert window.summary_box.toPlainText().count("\n") == 1
+    summary = window.summary_box.toPlainText()
+    assert "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" in summary
+    assert "Label evidence: Exact Product" in summary
+    assert "Suzuki Miyaura" in summary
+    assert "R–C≡N [nitrile] (reactant 1, d=3)" in summary
+    assert "steric ortho hindered, 2 ortho substituent(s)" in summary
+    assert "electronic electron poor (local score +0.75)" in summary
     reaction_pixmap = window.reaction_image_label.pixmap()
     assert reaction_pixmap is not None
     assert not reaction_pixmap.isNull()

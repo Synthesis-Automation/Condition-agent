@@ -117,6 +117,118 @@ def _display_name(value: Any) -> str:
     return text.replace("_", " ").title() if text else "Unassigned"
 
 
+def _steric_summary(partner: Mapping[str, Any]) -> str:
+    """Render deterministic local steric descriptors for one query partner."""
+    steric = partner.get("steric") or {}
+    if not isinstance(steric, Mapping):
+        return "unclassified"
+    parts = [str(steric.get("class") or "unclassified").replace("_", " ")]
+    center_class = str(steric.get("center_substitution_class") or "").strip()
+    if center_class and center_class != steric.get("class"):
+        parts.append(f"{center_class.replace('_', ' ')} center")
+    ortho_count = steric.get("ortho_substituent_count")
+    if ortho_count is not None:
+        parts.append(f"{ortho_count} ortho substituent(s)")
+    local_atoms = steric.get("local_heavy_atoms_r2")
+    if local_atoms is not None:
+        parts.append(f"{local_atoms} local heavy atom(s), r≤2")
+    attached = steric.get("attached_groups") or ()
+    attached_labels = []
+    for group in attached:
+        if not isinstance(group, Mapping):
+            continue
+        label = (
+            group.get("attachment_carbon_class")
+            or group.get("context")
+            or "group"
+        )
+        attached_labels.append(str(label).replace("_", " "))
+    if attached_labels:
+        parts.append(f"attached: {', '.join(attached_labels)}")
+    return ", ".join(parts)
+
+
+def _electronic_summary(partner: Mapping[str, Any]) -> str:
+    """Render deterministic local electronic descriptors for one query partner."""
+    electronic = partner.get("electronic") or {}
+    if not isinstance(electronic, Mapping):
+        return "unclassified"
+    electronic_class = str(
+        electronic.get("class") or "unclassified"
+    ).replace("_", " ")
+    qualitative_sum = electronic.get("qualitative_sum")
+    if isinstance(qualitative_sum, (int, float)):
+        return f"{electronic_class} (local score {qualitative_sum:+g})"
+    return electronic_class
+
+
+def format_query_summary(result: GenericRecommendationResult) -> str:
+    """Render query identity, spectators, and local reaction-partner context."""
+    label_evidence = _display_name(result.reaction_label_status)
+    lines = [
+        (
+            f"Reaction: {result.reaction_label or 'Unresolved'}  •  "
+            f"Label evidence: {label_evidence}"
+        ),
+        (
+            f"Family: {_display_name(result.named_family)}  •  "
+            f"Transformation: {_display_name(result.transformation_class)}  •  "
+            f"Retrieval: {_display_name(result.retrieval_level)}"
+        ),
+    ]
+    spectator_labels = []
+    for group in result.spectator_groups:
+        if not isinstance(group, Mapping):
+            continue
+        label = str(
+            group.get("chemist_label")
+            or group.get("group_id")
+            or "Unclassified group"
+        )
+        group_id = str(group.get("group_id") or "").strip()
+        if group_id and group_id != label:
+            label = f"{label} [{group_id}]"
+        component_index = group.get("component_index")
+        distance = group.get("graph_distance")
+        context = []
+        if isinstance(component_index, int):
+            context.append(f"reactant {component_index + 1}")
+        if distance is not None:
+            context.append(f"d={distance}")
+        spectator_labels.append(
+            f"{label} ({', '.join(context)})" if context else label
+        )
+    lines.append(
+        "Spectator groups: "
+        + ("; ".join(spectator_labels) if spectator_labels else "None detected")
+    )
+    if result.reaction_partners:
+        lines.append("Steric/electronic analysis:")
+    for partner in result.reaction_partners:
+        if not isinstance(partner, Mapping):
+            continue
+        role = _display_name(partner.get("role"))
+        chemist_label = str(partner.get("chemist_label") or "").strip()
+        contexts = partner.get("anchor_contexts") or ()
+        context = "/".join(str(value) for value in contexts if value)
+        identity = chemist_label or context or "Unclassified partner"
+        if chemist_label and context:
+            identity = f"{chemist_label} ({context})"
+        lines.append(
+            f"  {role} — {identity}: steric {_steric_summary(partner)}; "
+            f"electronic {_electronic_summary(partner)}"
+        )
+    warnings = ", ".join(result.warnings) if result.warnings else "None"
+    lines.append(
+        f"Candidates: {result.candidate_count}  •  "
+        f"Compatible: {result.compatible_candidate_count}  •  "
+        f"Independent: {result.independent_compatible_candidate_count}  •  "
+        f"Excluded: {result.excluded_candidate_count}  •  "
+        f"Warnings: {warnings}"
+    )
+    return "\n".join(lines)
+
+
 def _friendly_error(error: Any) -> str:
     code = str(error or "RECOMMENDATION_FAILED")
     messages = {
@@ -402,7 +514,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.summary_box.setReadOnly(True)
         self.summary_box.setFixedHeight(QUERY_REACTION_IMAGE_SIZE[1])
         self.summary_box.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAsNeeded
         )
         self.reaction_image_label = ReactionImageLabel(
             object_name="queryReactionGraph",
@@ -730,31 +842,13 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self._render_reaction_graph(result.query_reaction_smiles)
         if not result.valid:
             self.status_label.setText("No recommendation")
-            self.summary_box.setPlainText(_friendly_error(result.error))
+            summary = format_query_summary(result)
+            self.summary_box.setPlainText(
+                f"{summary}\nRecommendation: {_friendly_error(result.error)}"
+            )
             self.results_table.setRowCount(0)
             return
-        warnings = ", ".join(result.warnings) if result.warnings else "None"
-        self.summary_box.setPlainText(
-            "\n".join(
-                (
-                    (
-                        f"Family: {_display_name(result.named_family)}  •  "
-                        "Transformation: "
-                        f"{_display_name(result.transformation_class)}  •  "
-                        "Retrieval: "
-                        f"{_display_name(result.retrieval_level)}"
-                    ),
-                    (
-                        f"Candidates: {result.candidate_count}  •  "
-                        f"Compatible: {result.compatible_candidate_count}  •  "
-                        f"Independent: "
-                        f"{result.independent_compatible_candidate_count}  •  "
-                        f"Excluded: {result.excluded_candidate_count}  •  "
-                        f"Warnings: {warnings}"
-                    ),
-                )
-            )
-        )
+        self.summary_box.setPlainText(format_query_summary(result))
         recommendations = tuple(result.recommendations)
         self.results_table.setSortingEnabled(False)
         self.results_table.setRowCount(len(recommendations))

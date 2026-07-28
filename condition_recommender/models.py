@@ -224,8 +224,12 @@ class GenericRecommendationResult:
     query_reaction_smiles: str
     valid: bool
     query_signature_id: Optional[str] = None
+    reaction_label: Optional[str] = None
+    reaction_label_status: str = "unavailable"
     named_family: Optional[str] = None
     transformation_class: Optional[str] = None
+    spectator_groups: Tuple[Dict[str, Any], ...] = ()
+    reaction_partners: Tuple[Dict[str, Any], ...] = ()
     retrieval_definition_version: str = ""
     retrieval_strategy: str = "hybrid"
     retrieval_level: Optional[str] = None
@@ -238,7 +242,7 @@ class GenericRecommendationResult:
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.6"
+    schema_version: str = "1.7"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

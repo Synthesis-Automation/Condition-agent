@@ -478,6 +478,33 @@ def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:
     )
 
 
+def test_recommendation_result_preserves_structured_query_context() -> None:
+    query = _signature("query")
+    query["spectator_groups"] = [
+        {
+            "group_id": "nitrile",
+            "chemist_label": "R–C≡N",
+            "component_index": 0,
+            "graph_distance": 3,
+        }
+    ]
+
+    result = recommend_indexed_signature(
+        query,
+        build_generic_index([_record(1, _signature("precedent"))]),
+        reaction_label="Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
+        reaction_label_status="exact_product",
+        minimum_pool_size=1,
+    )
+
+    assert result.valid
+    assert result.reaction_label == "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
+    assert result.reaction_label_status == "exact_product"
+    assert result.spectator_groups[0]["group_id"] == "nitrile"
+    assert result.reaction_partners[0]["steric"]["class"] == "open"
+    assert result.reaction_partners[0]["electronic"]["class"] == "neutral"
+
+
 def test_inferred_correspondence_precedent_discloses_review_caution() -> None:
     query = _signature("query")
     inferred = _signature("inferred")
@@ -675,7 +702,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "1.6"
+    assert result.schema_version == "1.7"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")

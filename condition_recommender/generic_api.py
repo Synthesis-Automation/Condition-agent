@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any, Dict, Mapping
 
@@ -26,12 +26,28 @@ def recommend_indexed_signature(
     index: GenericReactionIndex,
     *,
     query_reaction_smiles: str = "",
+    reaction_label: str | None = None,
+    reaction_label_status: str = "unavailable",
     top_k: int = 5,
     minimum_pool_size: int | None = None,
     retrieval_strategy: RetrievalStrategy = "hybrid",
     ranking_weights: Mapping[str, float] | None = None,
 ) -> GenericRecommendationResult:
     """Recommend from an existing signature and index without re-featurization."""
+    query_context = {
+        "reaction_label": reaction_label,
+        "reaction_label_status": reaction_label_status,
+        "spectator_groups": tuple(
+            dict(group)
+            for group in (signature.get("spectator_groups") or ())
+            if isinstance(group, Mapping)
+        ),
+        "reaction_partners": tuple(
+            dict(partner)
+            for partner in (signature.get("partners") or ())
+            if isinstance(partner, Mapping)
+        ),
+    }
     retrieval_definition_version = str(
         load_generic_retrieval_rules()["schema_version"]
     )
@@ -80,6 +96,7 @@ def recommend_indexed_signature(
             query_signature_id=str(signature.get("signature_id") or ""),
             named_family=signature.get("named_family"),
             transformation_class=signature.get("transformation_class"),
+            **query_context,
             retrieval_definition_version=retrieval_definition_version,
             retrieval_strategy=retrieval_strategy,
             retrieval_level=level,
@@ -130,6 +147,7 @@ def recommend_indexed_signature(
         query_signature_id=str(signature.get("signature_id") or ""),
         named_family=signature.get("named_family"),
         transformation_class=signature.get("transformation_class"),
+        **query_context,
         retrieval_definition_version=retrieval_definition_version,
         retrieval_strategy=retrieval_strategy,
         retrieval_level=level,
@@ -198,12 +216,18 @@ def _recommend_with_index(
             False,
             error="QUERY_HAS_NO_USABLE_REACTION_SIGNATURE",
         )
-    return recommend_indexed_signature(
+    result = recommend_indexed_signature(
         asdict(analysis.reaction_signature),
         index,
         query_reaction_smiles=reaction_smiles,
+        reaction_label=analysis.reaction_label,
+        reaction_label_status=analysis.reaction_label_status,
         top_k=top_k,
         minimum_pool_size=minimum_pool_size,
+    )
+    return replace(
+        result,
+        spectator_groups=tuple(asdict(group) for group in analysis.spectator_groups),
     )
 
 

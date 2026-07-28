@@ -4,7 +4,7 @@
   "issues": [],
   "manifest_path": "C:\\Git-softwares\\Condition-agent\\datasets\\literature\\shard_manifest.json",
   "schema_version": "1.0",
-  "shard_count": 118,
+  "shard_count": 26,
   "valid": true,
-  "verified_row_count": 30100
+  "verified_row_count": 25445
 }
