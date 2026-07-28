@@ -14,7 +14,7 @@ from .reaction_models import (
     ReactionComponent,
     ReactionSiteReference,
 )
-from .reaction_operators import enumerate_operator_outcomes
+from .reaction_operators import enumerate_legacy_operator_outcomes
 
 
 @dataclass(frozen=True)
@@ -57,7 +57,7 @@ def compare_connectivity_rewrite(
     components: Sequence[ReactionComponent],
 ) -> ConnectivityRewriteParity:
     """Dual-run one assignment while leaving legacy results authoritative."""
-    legacy = enumerate_operator_outcomes(
+    legacy = enumerate_legacy_operator_outcomes(
         dict(grammar), dict(assignment), tuple(components)
     )
     rewrite = apply_connectivity_rewrite(grammar, assignment, components)

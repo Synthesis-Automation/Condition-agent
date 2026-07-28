@@ -106,7 +106,10 @@ The repository-wide gate remains:
 pytest -q
 ```
 
-## 5. Handoff to Phase 3
+## 5. Phase 3 handoff
+
+Completed on 2026-07-28. See
+[`connectivity_first_reaction_grammar_phase3_implementation.md`](connectivity_first_reaction_grammar_phase3_implementation.md).
 
 Phase 3 should add normalized site interfaces:
 

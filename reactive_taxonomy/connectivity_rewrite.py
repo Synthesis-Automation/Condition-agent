@@ -31,11 +31,12 @@ from .reaction_models import (
 )
 from .reaction_site_interfaces import (
     NormalizedSiteInterfaces,
+    SITE_INTERFACE_SCHEMA_VERSION,
     normalize_reaction_assignment,
 )
 
 
-CONNECTIVITY_REWRITE_SCHEMA_VERSION = "1.1"
+CONNECTIVITY_REWRITE_SCHEMA_VERSION = "1.2"
 CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION = "1.1"
 
 _PATH = Path(__file__).with_name("definitions") / "connectivity_rewrites.v1.json"
@@ -49,6 +50,7 @@ _BINDING = re.compile(r"^[a-z][a-z0-9_]*$")
 _BOND_STATES = {"NONE", "SINGLE", "DOUBLE", "TRIPLE"}
 _STATE_RANK = {"NONE": 0, "SINGLE": 1, "DOUBLE": 2, "TRIPLE": 3}
 _ALLOWED_TEMPLATES = {
+    "change_bond_order",
     "release_and_connect",
     "split_and_distribute",
     "depart_and_unsaturate",
@@ -83,6 +85,11 @@ _INTERFACE_PREDICATE_FIELDS = {
         "required_hydrogen_delta",
     },
 }
+_INTERFACE_SELECTOR_MEMBERS = {
+    "reactive_link": {"endpoint_a", "endpoint_b", "carrier"},
+    "bond_capacity": {"endpoint_a", "endpoint_b"},
+    "connection_endpoint": {"atom"},
+}
 
 
 @dataclass(frozen=True)
@@ -103,8 +110,13 @@ class CompiledConnectivityRewrite:
     template: str
     grammar_ids: Tuple[str, ...]
     variants: Tuple[CompiledRewriteVariant, ...]
+    grammar_role_bindings: Mapping[str, Mapping[str, str]] = (
+        MappingProxyType({})
+    )
+    authoritative_grammar_ids: Tuple[str, ...] = ()
     schema_version: str = CONNECTIVITY_REWRITE_SCHEMA_VERSION
     instruction_set_version: str = CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION
+    site_interface_schema_version: str = SITE_INTERFACE_SCHEMA_VERSION
 
 
 def _freeze(value: Any) -> Any:
@@ -124,10 +136,12 @@ def _validate_selector(selector: object, *, allow_binding: bool = True) -> str:
         if not _BINDING.fullmatch(value[1:]):
             raise ValueError(f"Invalid rewrite binding selector: {value}")
         return value
-    if not (
-        _LEGACY_SELECTOR.fullmatch(value)
-        or _NORMALIZED_SELECTOR.fullmatch(value)
-    ):
+    if _NORMALIZED_SELECTOR.fullmatch(value):
+        _, interface, member = value.split(".", 2)
+        if member not in _INTERFACE_SELECTOR_MEMBERS[interface]:
+            raise ValueError(f"Invalid normalized selector member: {value}")
+        return value
+    if not _LEGACY_SELECTOR.fullmatch(value):
         raise ValueError(f"Invalid rewrite atom selector: {value}")
     return value
 
@@ -292,6 +306,11 @@ def compile_connectivity_rewrite_definitions(
         != CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION
     ):
         raise ValueError("Unsupported connectivity rewrite instruction set")
+    if (
+        payload.get("site_interface_schema_version")
+        != SITE_INTERFACE_SCHEMA_VERSION
+    ):
+        raise ValueError("Unsupported reactive-site interface schema")
     raw_rewrites = payload.get("rewrites")
     if not isinstance(raw_rewrites, (list, tuple)) or not raw_rewrites:
         raise ValueError("Connectivity rewrite definition has no rewrites")
@@ -317,6 +336,46 @@ def compile_connectivity_rewrite_definitions(
         ):
             raise ValueError(f"Invalid connectivity rewrite grammar ids: {rewrite_id}")
         seen_grammar_ids.update(grammar_ids)
+        authoritative_grammar_ids = tuple(
+            str(value)
+            for value in raw.get("authoritative_grammar_ids") or ()
+        )
+        if (
+            len(authoritative_grammar_ids)
+            != len(set(authoritative_grammar_ids))
+            or not set(authoritative_grammar_ids) <= set(grammar_ids)
+        ):
+            raise ValueError(
+                f"Invalid connectivity rewrite authority: {rewrite_id}"
+            )
+        raw_role_bindings = raw.get("role_bindings") or {}
+        if not isinstance(raw_role_bindings, dict) or (
+            set(raw_role_bindings) - set(grammar_ids)
+        ):
+            raise ValueError(
+                f"Invalid connectivity rewrite role bindings: {rewrite_id}"
+            )
+        role_bindings: Dict[str, Mapping[str, str]] = {}
+        for grammar_id, bindings in raw_role_bindings.items():
+            if not isinstance(bindings, dict) or not bindings:
+                raise ValueError(
+                    f"Invalid grammar role bindings: {grammar_id}"
+                )
+            normalized_bindings = {
+                str(alias): str(actual)
+                for alias, actual in bindings.items()
+            }
+            if any(
+                not _BINDING.fullmatch(alias)
+                or not _BINDING.fullmatch(actual)
+                for alias, actual in normalized_bindings.items()
+            ):
+                raise ValueError(
+                    f"Invalid grammar role binding name: {grammar_id}"
+                )
+            role_bindings[str(grammar_id)] = MappingProxyType(
+                normalized_bindings
+            )
         raw_variants = raw.get("variants")
         if not isinstance(raw_variants, (list, tuple)) or not raw_variants:
             raise ValueError(f"Invalid connectivity rewrite variants: {rewrite_id}")
@@ -331,6 +390,8 @@ def compile_connectivity_rewrite_definitions(
                 template=template,
                 grammar_ids=grammar_ids,
                 variants=variants,
+                grammar_role_bindings=MappingProxyType(role_bindings),
+                authoritative_grammar_ids=authoritative_grammar_ids,
             )
         )
     return tuple(sorted(rewrites, key=lambda item: item.rewrite_id))
@@ -358,15 +419,38 @@ def connectivity_rewrite_for_grammar(
     )
 
 
+def connectivity_rewrite_is_authoritative(grammar_id: str) -> bool:
+    """Return whether a parity-gated rewrite owns production reconstruction."""
+    rewrite = connectivity_rewrite_for_grammar(grammar_id)
+    return bool(
+        rewrite is not None
+        and grammar_id in rewrite.authoritative_grammar_ids
+    )
+
+
 def _variant_matches(
     variant: CompiledRewriteVariant,
     assignment: Mapping[str, ReactionSiteReference],
+    normalized_assignment: Mapping[str, NormalizedSiteInterfaces],
 ) -> bool:
     for predicate in variant.predicates:
-        site = assignment.get(str(predicate["role"]))
-        if site is None:
+        role = str(predicate["role"])
+        site = assignment.get(role)
+        normalized = normalized_assignment.get(role)
+        if site is None or normalized is None:
             return False
-        observed = site.details.get(str(predicate["detail"]))
+        if predicate.get("detail"):
+            observed = site.details.get(str(predicate["detail"]))
+        else:
+            interface = str(predicate["interface"])
+            collection = {
+                "reactive_link": normalized.reactive_links,
+                "bond_capacity": normalized.bond_capacities,
+                "connection_endpoint": normalized.connection_endpoints,
+            }[interface]
+            if len(collection) != 1:
+                return False
+            observed = getattr(collection[0], str(predicate["field"]))
         expected = predicate["value"]
         if predicate["operator"] == "eq" and observed != expected:
             return False
@@ -422,12 +506,58 @@ def _resolve_selector(
     *,
     bindings: Mapping[str, str],
     assignment: Mapping[str, ReactionSiteReference],
+    normalized_assignment: Mapping[str, NormalizedSiteInterfaces],
     offsets: Mapping[int, int],
+    label_roles: Mapping[str, str],
 ) -> tuple[int, str] | None:
     value = str(selector)
     if value.startswith("$"):
         value = bindings.get(value[1:], "")
-    if not _SELECTOR.fullmatch(value):
+    if _NORMALIZED_SELECTOR.fullmatch(value):
+        role, interface, member = value.split(".", 2)
+        site = assignment.get(role)
+        normalized = normalized_assignment.get(role)
+        if site is None or normalized is None:
+            return None
+        atom_index: int | None = None
+        source_atom_role = ""
+        if interface == "reactive_link" and len(normalized.reactive_links) == 1:
+            link = normalized.reactive_links[0]
+            if member in {"endpoint_a", "endpoint_b"}:
+                endpoint = getattr(link, member)
+                atom_index = endpoint.atom_index
+                source_atom_role = endpoint.source_atom_role
+            elif member == "carrier":
+                endpoint = link.endpoint_b
+                atom_index = endpoint.carrier_atom_index
+                source_atom_role = endpoint.source_atom_role
+        elif (
+            interface == "bond_capacity"
+            and len(normalized.bond_capacities) == 1
+            and member in {"endpoint_a", "endpoint_b"}
+        ):
+            endpoint = getattr(normalized.bond_capacities[0], member)
+            atom_index = endpoint.atom_index
+            source_atom_role = endpoint.source_atom_role
+        elif (
+            interface == "connection_endpoint"
+            and len(normalized.connection_endpoints) == 1
+            and member == "atom"
+        ):
+            endpoint = normalized.connection_endpoints[0].endpoint
+            atom_index = endpoint.atom_index
+            source_atom_role = endpoint.source_atom_role
+        if (
+            atom_index is None
+            or not source_atom_role
+            or site.component_index not in offsets
+        ):
+            return None
+        return (
+            offsets[site.component_index] + atom_index,
+            f"{label_roles.get(role, role)}.{source_atom_role}",
+        )
+    if not _LEGACY_SELECTOR.fullmatch(value):
         return None
     role, atom_role = value.split(".", 1)
     site = assignment.get(role)
@@ -436,7 +566,10 @@ def _resolve_selector(
     indices = site.atom_roles.get(atom_role) or ()
     if len(indices) != 1 or site.component_index not in offsets:
         return None
-    return offsets[site.component_index] + int(indices[0]), value
+    return (
+        offsets[site.component_index] + int(indices[0]),
+        f"{label_roles.get(role, role)}.{atom_role}",
+    )
 
 
 def _bond_state(molecule: Any, atom_1: int, atom_2: int) -> str | None:
@@ -535,7 +668,9 @@ def _execute_variant_case(
     outcome_id: str,
     bindings: Mapping[str, str],
     assignment: Mapping[str, ReactionSiteReference],
+    normalized_assignment: Mapping[str, NormalizedSiteInterfaces],
     components: Sequence[ReactionComponent],
+    label_roles: Mapping[str, str],
 ) -> OperatorOutcome | None:
     from rdkit import Chem
 
@@ -559,7 +694,9 @@ def _execute_variant_case(
                     selector,
                     bindings=bindings,
                     assignment=assignment,
+                    normalized_assignment=normalized_assignment,
                     offsets=offsets,
+                    label_roles=label_roles,
                 )
                 for selector in instruction["endpoints"]
             )
@@ -580,7 +717,9 @@ def _execute_variant_case(
                 instruction["selector"],
                 bindings=bindings,
                 assignment=assignment,
+                normalized_assignment=normalized_assignment,
                 offsets=offsets,
+                label_roles=label_roles,
             )
             if resolved is None:
                 return None
@@ -602,7 +741,9 @@ def _execute_variant_case(
                 instruction["selector"],
                 bindings=bindings,
                 assignment=assignment,
+                normalized_assignment=normalized_assignment,
                 offsets=offsets,
+                label_roles=label_roles,
             )
             if resolved is None:
                 return None
@@ -617,7 +758,9 @@ def _execute_variant_case(
                 instruction["selector"],
                 bindings=bindings,
                 assignment=assignment,
+                normalized_assignment=normalized_assignment,
                 offsets=offsets,
+                label_roles=label_roles,
             )
             if resolved is None:
                 return None
@@ -627,17 +770,28 @@ def _execute_variant_case(
                 instruction["retained"],
                 bindings=bindings,
                 assignment=assignment,
+                normalized_assignment=normalized_assignment,
                 offsets=offsets,
+                label_roles=label_roles,
             )
             discarded = _resolve_selector(
                 instruction["discarded"],
                 bindings=bindings,
                 assignment=assignment,
+                normalized_assignment=normalized_assignment,
                 offsets=offsets,
+                label_roles=label_roles,
             )
             if retained is None or discarded is None:
                 return None
             projection_pairs.append((retained[0], discarded[0]))
+
+    def failed_outcome() -> OperatorOutcome:
+        return OperatorOutcome(
+            outcome_id=outcome_id,
+            predicted_product_smiles=None,
+            predicted_bond_changes=tuple(changes),
+        )
 
     for atom_index, delta in hydrogen_deltas.items():
         if (
@@ -645,7 +799,7 @@ def _execute_variant_case(
             + delta
             < 0
         ):
-            return None
+            return failed_outcome()
 
     rw = Chem.RWMol(source)
     for _, _, atom_1, atom_2, before, after in bond_operations:
@@ -654,7 +808,7 @@ def _execute_variant_case(
         if not _set_bond_state(
             rw, atom_1, atom_2, before=before, after=after
         ):
-            return None
+            return failed_outcome()
 
     removable: set[int] = set()
     negative_product = rw.GetMol()
@@ -670,21 +824,21 @@ def _execute_variant_case(
             None,
         )
         if fragment is None or retained in fragment:
-            return None
+            return failed_outcome()
         removable.update(fragment)
     if removable.intersection(seeds):
-        return None
+        return failed_outcome()
 
     formed_pairs = []
     for _, _, atom_1, atom_2, before, after in bond_operations:
         if _STATE_RANK[after] <= _STATE_RANK[before]:
             continue
         if atom_1 in removable or atom_2 in removable:
-            return None
+            return failed_outcome()
         if not _set_bond_state(
             rw, atom_1, atom_2, before=before, after=after
         ):
-            return None
+            return failed_outcome()
         if before == "NONE":
             formed_pairs.append((atom_1, atom_2))
 
@@ -692,10 +846,10 @@ def _execute_variant_case(
         if atom_index in removable or not set_total_hydrogens(
             source, rw, atom_index, delta
         ):
-            return None
+            return failed_outcome()
     for atom_index, charge in charge_operations:
         if atom_index in removable:
-            return None
+            return failed_outcome()
         rw.GetAtomWithIdx(atom_index).SetFormalCharge(charge)
 
     captured = ()
@@ -727,14 +881,14 @@ def _execute_variant_case(
         else:
             Chem.AssignStereochemistry(product, cleanIt=True, force=True)
     except Exception:
-        return None
+        return failed_outcome()
 
     shifted_seeds = {shifted(index) for index in seeds}
     retained_fragments = Chem.GetMolFrags(
         product, asMols=False, sanitizeFrags=False
     )
     if any(not set(fragment).intersection(shifted_seeds) for fragment in retained_fragments):
-        return None
+        return failed_outcome()
     smiles = Chem.MolToSmiles(product, canonical=True, isomericSmiles=True)
     return OperatorOutcome(
         outcome_id=outcome_id,
@@ -757,26 +911,49 @@ def apply_connectivity_rewrite(
     rewrite = connectivity_rewrite_for_grammar(grammar_id)
     if rewrite is None:
         return ()
+    role_bindings = rewrite.grammar_role_bindings.get(grammar_id)
+    if role_bindings:
+        if any(role not in assignment for role in role_bindings.values()):
+            return ()
+        execution_assignment = {
+            alias: assignment[actual]
+            for alias, actual in role_bindings.items()
+        }
+        label_roles = {
+            alias: actual for alias, actual in role_bindings.items()
+        }
+    else:
+        execution_assignment = dict(assignment)
+        label_roles = {}
+    try:
+        normalized_assignment = normalize_reaction_assignment(
+            execution_assignment, components
+        )
+    except (KeyError, StopIteration, ValueError):
+        return ()
     outcomes = []
     seen_products: set[str] = set()
     for variant in rewrite.variants:
-        if not _variant_matches(variant, assignment):
+        if not _variant_matches(
+            variant, execution_assignment, normalized_assignment
+        ):
             continue
         for outcome_id, bindings in _permutation_cases(variant):
             outcome = _execute_variant_case(
                 variant,
                 outcome_id=outcome_id,
                 bindings=bindings,
-                assignment=assignment,
+                assignment=execution_assignment,
+                normalized_assignment=normalized_assignment,
                 components=components,
+                label_roles=label_roles,
             )
-            if (
-                outcome is None
-                or outcome.predicted_product_smiles is None
-                or outcome.predicted_product_smiles in seen_products
-            ):
+            if outcome is None:
                 continue
-            seen_products.add(outcome.predicted_product_smiles)
+            if outcome.predicted_product_smiles is not None:
+                if outcome.predicted_product_smiles in seen_products:
+                    continue
+                seen_products.add(outcome.predicted_product_smiles)
             outcomes.append(outcome)
     return tuple(sorted(outcomes, key=lambda outcome: outcome.outcome_id))
 
@@ -789,5 +966,6 @@ __all__ = [
     "apply_connectivity_rewrite",
     "compile_connectivity_rewrite_definitions",
     "connectivity_rewrite_for_grammar",
+    "connectivity_rewrite_is_authoritative",
     "load_connectivity_rewrites",
 ]

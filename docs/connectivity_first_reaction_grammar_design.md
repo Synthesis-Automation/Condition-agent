@@ -6,9 +6,10 @@ This document defines the target connectivity-first architecture. Phase 1, the
 evidence-scoped connectivity observation and internal shadow graph, was
 implemented on 2026-07-28. Phase 2, the bounded declarative rewrite compiler,
 generic executor, and pilot shadow-parity layer, was implemented on the same
-date. Normalized site interfaces and later grammar migration phases remain
-proposed. Neither phase changes current public reaction serialization,
-signature identity, or recommendation behavior.
+date. Phase 3, the normalized reactive-link, bond-capacity, and connection
+endpoint adapter layer, was also implemented on that date. Later operator
+migration phases remain proposed. None of these phases changes current public
+reaction serialization, signature identity, or recommendation behavior.
 
 The proposal extends the graph-first principles in
 `type_agnostic_reaction_recommendation_implementation.md`. The molecular graph
@@ -1348,21 +1349,43 @@ See
 
 ### Phase 3: normalized site interfaces
 
-- Introduce `ReactiveLinkSite`, `BondCapacitySite`, and
-  `ConnectionEndpointSite` interfaces.
-- Adapt existing leaving-group, transfer-group, X–H, addition-donor, and
-  unsaturated-bond detectors.
-- Preserve existing detector labels as chemistry annotations.
+Implemented on 2026-07-28:
+
+- introduced `ReactiveLinkSite`, `BondCapacitySite`, and
+  `ConnectionEndpointSite` interfaces plus real/virtual endpoint provenance;
+- adapted leaving-group, transfer-group, X-H, aromatic C-H, addition-donor,
+  and unsaturated-bond detectors without changing detector outputs;
+- preserved existing detector IDs, signatures, chemist labels, availability,
+  and context as source annotations;
+- changed the shadow rewrite definitions to normalized interface selectors;
+- compiled N/O/S-H alkene addition through the same addition rewrite as
+  explicit A-B, Si-H, and B-H donors; and
+- kept the executor non-authoritative.
+
+See
+[`connectivity_first_reaction_grammar_phase3_implementation.md`](connectivity_first_reaction_grammar_phase3_implementation.md).
 
 ### Phase 4: operator migration
 
-- Migrate `center_replacement`.
-- Migrate `join_two_anchors`.
-- Migrate `pair_addition` and `pair_elimination`.
-- Migrate simple bond-order-change grammars.
-- Migrate bespoke operators only after their complete delta and projection
-  semantics are explicit.
-- Remove obsolete executable paths after parity tests pass.
+Implemented on 2026-07-28:
+
+- migrated parity-complete `center_replacement` grammars through one
+  role-bound release-and-connect program;
+- migrated `join_two_anchors`, alkene/alkyne `pair_addition`,
+  `pair_elimination`, and the five simple bond-order-change grammars;
+- introduced grammar-specific role bindings so chemistry programs use
+  canonical connectivity roles without changing compatibility edit labels;
+- introduced per-grammar authority metadata and retained an explicit legacy
+  construction-absence fallback;
+- switched 28 parity-gated grammars to connectivity-rewrite authority;
+- retained direct aromatic C-H substitution as a shadow rewrite because two
+  same-component candidates still lack exact failed-outcome parity; and
+- retained Chan-Lam, reductive amination, Heck coupling, and multi-event
+  sequences on their existing operators until their full projection semantics
+  are explicit.
+
+See
+[`connectivity_first_reaction_grammar_phase4_implementation.md`](connectivity_first_reaction_grammar_phase4_implementation.md).
 
 ### Phase 5: derived edit shapes
 

@@ -96,6 +96,27 @@ warning, and ordering parity with the current operators. Existing operators
 remain authoritative, and the new definition version is intentionally excluded
 from public reaction-signature identity during shadow migration.
 
+Phase 3 adds immutable `ReactiveLinkSite`, `BondCapacitySite`, and
+`ConnectionEndpointSite` adapter views. Existing leaving-group,
+transfer-group, X-H, aromatic C-H, addition-donor, and unsaturated-bond
+detectors retain their current public results and labels. The adapters expose
+real or virtual endpoints, carrier provenance, bounded bond capacity,
+connection requirements, context, availability, and component-qualified IDs.
+The shadow rewrite DSL now consumes these normalized interfaces, allowing
+N/O/S-H, Si-H, B-H, and explicit A-B alkene addition to share the same
+connectivity program. The adapters are not serialized into public analyses and
+the legacy operators remain authoritative for that Phase 3 boundary.
+
+Phase 4 extends the normalized interfaces to activated acyl/sulfonyl centers,
+anionic partners, eliminable pairs, carbonyls, and alcohols. Versioned rewrite
+definitions now cover reusable release-and-connect, two-anchor coupling,
+alkene/alkyne addition, beta elimination, and simple bond-order changes.
+Authority is declared per grammar after corpus-wide exact parity; 28 grammars
+now execute through connectivity rewrites. Direct aromatic C-H substitution,
+Chan-Lam coupling, reductive amination, Heck coupling, and multi-event
+sequences remain legacy-backed where projection semantics or corpus parity are
+not complete.
+
 `pair_addition` combines an unsaturated-bond acceptor with either an existing
 N/O/S–H site or a curated `addition_donor`. The latter represents both explicit
 A–B bonds such as Br–Br and implicit A–H bonds such as Si–H and B–H. The

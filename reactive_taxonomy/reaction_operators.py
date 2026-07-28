@@ -913,12 +913,12 @@ def apply_operator(
     return None, ()
 
 
-def enumerate_operator_outcomes(
+def enumerate_legacy_operator_outcomes(
     grammar: Dict[str, Any],
     assignment: Dict[str, ReactionSiteReference],
     components: Tuple[ReactionComponent, ...],
 ) -> Tuple[OperatorOutcome, ...]:
-    """Return every distinct constitutional outcome for one grammar assignment."""
+    """Return outcomes from the pre-migration executable operator registry."""
     operator_id = str(grammar.get("operator", {}).get("id") or "")
     if operator_id == "pair_addition":
         return _pair_addition_outcomes(grammar, assignment, components)
@@ -931,6 +931,35 @@ def enumerate_operator_outcomes(
             predicted_product_smiles=predicted,
             predicted_bond_changes=changes,
         ),
+    )
+
+
+def enumerate_operator_outcomes(
+    grammar: Dict[str, Any],
+    assignment: Dict[str, ReactionSiteReference],
+    components: Tuple[ReactionComponent, ...],
+) -> Tuple[OperatorOutcome, ...]:
+    """Return outcomes from the authoritative grammar execution path.
+
+    A connectivity rewrite becomes authoritative only through versioned
+    definition metadata after exact shadow parity is established. Construction
+    failures retain the legacy outcome shape until the rewrite contract gains
+    an explicit failed-outcome representation.
+    """
+    from .connectivity_rewrite import (
+        apply_connectivity_rewrite,
+        connectivity_rewrite_is_authoritative,
+    )
+
+    grammar_id = str(grammar.get("id") or "")
+    if connectivity_rewrite_is_authoritative(grammar_id):
+        outcomes = apply_connectivity_rewrite(
+            grammar, assignment, components
+        )
+        if outcomes:
+            return outcomes
+    return enumerate_legacy_operator_outcomes(
+        grammar, assignment, components
     )
 
 
@@ -1070,5 +1099,6 @@ def apply_operator_sequence(
 __all__ = [
     "apply_operator",
     "apply_operator_sequence",
+    "enumerate_legacy_operator_outcomes",
     "enumerate_operator_outcomes",
 ]
