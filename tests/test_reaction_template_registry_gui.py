@@ -21,6 +21,12 @@ def test_qt6_registry_window_exposes_authoring_and_query_controls() -> None:
     try:
         assert window.findChild(QtWidgets.QLineEdit, "registryPath") is not None
         assert window.findChild(QtWidgets.QLineEdit, "templateId") is not None
+        assert window.findChild(QtWidgets.QLineEdit, "roleLabels") is not None
+        assert window.findChild(QtWidgets.QLineEdit, "roleTokens") is not None
+        assert (
+            window.findChild(QtWidgets.QLineEdit, "atomAlternatives")
+            is not None
+        )
         assert (
             window.findChild(
                 QtWidgets.QLineEdit, "mappedReferenceReaction"
@@ -36,6 +42,31 @@ def test_qt6_registry_window_exposes_authoring_and_query_controls() -> None:
         assert window.findChild(QtWidgets.QPushButton, "matchQuery") is not None
         assert "background-color: #ffffff" not in window.styleSheet()
         assert "color: #23313f" in window.status_label.styleSheet()
+    finally:
+        window.close()
+        application.processEvents()
+
+
+def test_qt6_registry_window_reports_darzens_label_and_site_profiles() -> None:
+    application = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    window = ReactionTemplateRegistryWindow()
+    try:
+        reaction = "CCOC(=O)CCl.CC=O>>CCOC(=O)C1OC1C"
+        window.query_edit.setText(reaction)
+        window.match_query()
+
+        details = window.details.toPlainText()
+        assert "Darzens epoxide formation" in details
+        assert "Family: darzens_reaction" in details
+        assert "Reaction label: Darzens reaction" in details
+        assert (
+            "Structural label: α-halo ester + R–CH=O → glycidic ester"
+            in details
+        )
+        assert "activated_sp3_carbon: activated C–H" in details
+        assert "carbonyl: R–CH=O" in details
+        assert "Steric: open" in details
+        assert "electronic: slightly_poor" in details
     finally:
         window.close()
         application.processEvents()

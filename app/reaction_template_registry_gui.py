@@ -25,6 +25,29 @@ from reactive_taxonomy.reaction_templates import (  # noqa: E402
 from reactive_taxonomy.reaction_api import featurize_reaction  # noqa: E402
 
 
+def _parse_key_values(text: str, *, field: str) -> dict[str, str]:
+    """Parse comma-separated KEY=VALUE authoring options."""
+    result = {}
+    for raw_value in (value.strip() for value in text.split(",")):
+        if not raw_value:
+            continue
+        if "=" not in raw_value:
+            raise ReactionTemplateError(
+                f"{field} entries must use KEY=VALUE"
+            )
+        key, value = (
+            part.strip() for part in raw_value.split("=", 1)
+        )
+        if not key or not value:
+            raise ReactionTemplateError(
+                f"{field} entries must use non-empty KEY=VALUE"
+            )
+        if key in result:
+            raise ReactionTemplateError(f"{field} repeats key {key}")
+        result[key] = value
+    return result
+
+
 def _format_template(template: ReactionTemplate) -> str:
     """Render one stored template as a compact authoring summary."""
     lines = [
@@ -46,9 +69,27 @@ def _format_template(template: ReactionTemplate) -> str:
     lines.extend(("", "SEMANTIC ROLES"))
     for role in template.roles:
         maps = ", ".join(str(value) for value in role.atom_map_numbers)
+        label = (
+            f"; display {role.display_label}"
+            if role.display_label is not None
+            else ""
+        )
+        tokens = (
+            "; requires " + ", ".join(role.required_context_tokens)
+            if role.required_context_tokens
+            else ""
+        )
         lines.append(
             f"  {role.role_id}: {role.site_type}; reference maps {maps}"
+            f"{label}{tokens}"
         )
+    if template.atom_element_alternatives:
+        lines.extend(("", "ELEMENT ALTERNATIVES"))
+        for item in template.atom_element_alternatives:
+            lines.append(
+                f"  map {item.atom_map_number}: "
+                + ", ".join(item.elements)
+            )
     lines.extend(("", "PARTICIPANTS"))
     for participant in template.participants:
         lines.append(
@@ -314,6 +355,21 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         self.product_label_edit.setPlaceholderText(
             "acetal (defaults to product)"
         )
+        self.role_labels_edit = QtWidgets.QLineEdit()
+        self.role_labels_edit.setObjectName("roleLabels")
+        self.role_labels_edit.setPlaceholderText(
+            "activated_sp3_carbon=α-halo ester (optional)"
+        )
+        self.role_tokens_edit = QtWidgets.QLineEdit()
+        self.role_tokens_edit.setObjectName("roleTokens")
+        self.role_tokens_edit.setPlaceholderText(
+            "activated_sp3_carbon=alpha_to:ester (optional)"
+        )
+        self.atom_alternatives_edit = QtWidgets.QLineEdit()
+        self.atom_alternatives_edit.setObjectName("atomAlternatives")
+        self.atom_alternatives_edit.setPlaceholderText(
+            "1=Cl|Br|I (optional)"
+        )
         self.transformation_edit = QtWidgets.QLineEdit()
         self.transformation_edit.setObjectName("transformationClass")
         self.transformation_edit.setPlaceholderText(
@@ -444,6 +500,12 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         label_row.addWidget(QtWidgets.QLabel("Product"))
         label_row.addWidget(self.product_label_edit)
         form.addRow("Reaction label", label_row)
+        generalization_row = QtWidgets.QHBoxLayout()
+        generalization_row.addWidget(self.role_labels_edit)
+        generalization_row.addWidget(QtWidgets.QLabel("Atom alternatives"))
+        generalization_row.addWidget(self.atom_alternatives_edit)
+        form.addRow("Role labels", generalization_row)
+        form.addRow("Required role tokens", self.role_tokens_edit)
         form.addRow("Mapped reference", self.mapped_reaction_edit)
         form.addRow("Notes", self.notes_edit)
         authoring_layout.addLayout(form)
@@ -518,6 +580,31 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
             if value.strip()
         )
         try:
+            role_labels = _parse_key_values(
+                self.role_labels_edit.text(),
+                field="Role labels",
+            )
+            raw_alternatives = _parse_key_values(
+                self.atom_alternatives_edit.text(),
+                field="Atom alternatives",
+            )
+            raw_role_tokens = _parse_key_values(
+                self.role_tokens_edit.text(),
+                field="Required role tokens",
+            )
+            try:
+                atom_element_alternatives = {
+                    int(map_number): tuple(
+                        element.strip()
+                        for element in elements.split("|")
+                        if element.strip()
+                    )
+                    for map_number, elements in raw_alternatives.items()
+                }
+            except ValueError as exc:
+                raise ReactionTemplateError(
+                    "Atom-alternative keys must be integer map numbers"
+                ) from exc
             template = derive_reaction_template(
                 self.mapped_reaction_edit.text().strip(),
                 template_id=self.template_id_edit.text().strip(),
@@ -530,6 +617,16 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
                 product_label=(
                     self.product_label_edit.text().strip() or None
                 ),
+                role_labels=role_labels,
+                role_required_tokens={
+                    role: tuple(
+                        token.strip()
+                        for token in tokens.split("|")
+                        if token.strip()
+                    )
+                    for role, tokens in raw_role_tokens.items()
+                },
+                atom_element_alternatives=atom_element_alternatives,
                 transformation_class=(
                     self.transformation_edit.text().strip() or None
                 ),

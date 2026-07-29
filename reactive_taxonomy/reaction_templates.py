@@ -26,7 +26,7 @@ from .reaction_models import ReactionAtomReference, ReactionEdit
 from .reaction_parser import parse_reaction_smiles
 
 
-REACTION_TEMPLATE_SCHEMA_VERSION = "1.1"
+REACTION_TEMPLATE_SCHEMA_VERSION = "1.2"
 REACTION_TEMPLATE_DEFINITION_VERSION = "reaction_templates.v1"
 DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH = (
     Path(__file__).with_name("definitions") / "reaction_templates.v1.json"
@@ -115,6 +115,16 @@ class ReactionTemplateRole:
     role_id: str
     site_type: str
     atom_map_numbers: Tuple[int, ...]
+    display_label: Optional[str] = None
+    required_context_tokens: Tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ReactionTemplateAtomAlternative:
+    """Curated element alternatives for one mapped reference atom."""
+
+    atom_map_number: int
+    elements: Tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -130,6 +140,7 @@ class ReactionTemplate:
     mapped_reference_reaction: str
     participants: Tuple[ReactionTemplateParticipant, ...]
     roles: Tuple[ReactionTemplateRole, ...]
+    atom_element_alternatives: Tuple[ReactionTemplateAtomAlternative, ...]
     edits: Tuple[ReactionTemplateEdit, ...]
     edit_fingerprint: str
     edit_component_count: int
@@ -457,7 +468,7 @@ class _CenterTransitionRequirement:
 
 @dataclass(frozen=True)
 class _RoleAtomPattern:
-    element: str
+    elements: Tuple[str, ...]
     formal_charge: int
     aromatic: bool
     minimum_hydrogen_count: int
@@ -520,6 +531,10 @@ def _compile_reactant_roles(
         if atom is not None
     }
     hydrogen_losses = _hydrogen_loss_requirements(template.edits)
+    element_alternatives = {
+        int(item.atom_map_number): tuple(item.elements)
+        for item in template.atom_element_alternatives
+    }
     instances: list[
         tuple[
             str,
@@ -561,8 +576,15 @@ def _compile_reactant_roles(
         )
         patterns = tuple(
             _RoleAtomPattern(
-                element=str(
-                    molecule.GetAtomWithIdx(mapped_atoms[map_number]).GetSymbol()
+                elements=element_alternatives.get(
+                    int(map_number),
+                    (
+                        str(
+                            molecule.GetAtomWithIdx(
+                                mapped_atoms[map_number]
+                            ).GetSymbol()
+                        ),
+                    ),
                 ),
                 formal_charge=int(
                     molecule.GetAtomWithIdx(
@@ -651,7 +673,7 @@ def _compile_reactant_roles(
 
 def _atom_matches_role_pattern(atom: Any, pattern: _RoleAtomPattern) -> bool:
     return bool(
-        atom.GetSymbol() == pattern.element
+        atom.GetSymbol() in pattern.elements
         and int(atom.GetFormalCharge()) == pattern.formal_charge
         and bool(atom.GetIsAromatic()) == pattern.aromatic
         and int(atom.GetTotalNumHs(includeNeighbors=True))
@@ -811,6 +833,9 @@ def _resolve_template_role_bindings(
                     candidate
                     for candidate in component.compound_analysis.sites
                     if str(candidate.site_type) == role.site_type
+                    and set(role.required_context_tokens).issubset(
+                        set(str(candidate.canonical_signature).split("|"))
+                    )
                     and int(atom_index)
                     in {
                         int(value)
@@ -1107,6 +1132,64 @@ def _exact_template_reconstructions(
     )
 
 
+def _has_semantic_role_assignment(
+    template: ReactionTemplate,
+    parsed_query: Any,
+) -> bool:
+    """Require centre-transition fallbacks to satisfy bound taxonomy roles."""
+    roles = _compile_reactant_roles(template)
+    if not roles:
+        return False
+    role_options = tuple(
+        _role_assignments(
+            role,
+            _role_candidates(role, parsed_query.reactants),
+        )
+        for role in roles
+    )
+    if any(not options for options in role_options):
+        return False
+    for assignment in itertools.islice(
+        itertools.product(*role_options),
+        256,
+    ):
+        component_owners: dict[int, str] = {}
+        query_atom_bindings: dict[int, tuple[int, int]] = {}
+        valid = True
+        for role, role_assignment in zip(roles, assignment):
+            for occurrence_index, candidate in enumerate(role_assignment):
+                owner = component_owners.get(candidate.component_index)
+                if owner is not None and owner != role.role_id:
+                    valid = False
+                    break
+                component_owners[candidate.component_index] = role.role_id
+                occurrence_maps = role.occurrence_map_numbers[
+                    occurrence_index
+                ]
+                if len(occurrence_maps) != len(candidate.atom_indices):
+                    valid = False
+                    break
+                for slot, map_number in enumerate(occurrence_maps):
+                    query_atom_bindings[int(map_number)] = (
+                        int(candidate.component_index),
+                        int(candidate.atom_indices[slot]),
+                    )
+            if not valid:
+                break
+        if not valid:
+            continue
+        bindings = _resolve_template_role_bindings(
+            template,
+            parsed_query,
+            query_atom_bindings,
+        )
+        if {binding.role_id for binding in bindings} == {
+            role.role_id for role in template.roles
+        }:
+            return True
+    return False
+
+
 def _build_template_interpretation(
     template: ReactionTemplate,
     outcome: _TemplateReconstruction,
@@ -1124,8 +1207,9 @@ def _build_template_interpretation(
         )
         by_label: dict[str, int] = {}
         for binding in bindings:
-            by_label[binding.chemist_label] = (
-                by_label.get(binding.chemist_label, 0)
+            label = role.display_label or binding.chemist_label
+            by_label[label] = (
+                by_label.get(label, 0)
                 + binding.multiplicity
             )
         for label, count in sorted(by_label.items()):
@@ -1471,6 +1555,115 @@ def _derive_template_roles(
     return tuple(roles)
 
 
+def _apply_role_annotations(
+    roles: Sequence[ReactionTemplateRole],
+    labels: Optional[Mapping[str, str]],
+    required_tokens: Optional[Mapping[str, Sequence[str]]],
+) -> Tuple[ReactionTemplateRole, ...]:
+    normalized = {
+        str(key).strip(): str(value).strip()
+        for key, value in (labels or {}).items()
+        if str(key).strip() and str(value).strip()
+    }
+    normalized_tokens = {
+        str(key).strip(): tuple(
+            sorted(
+                {
+                    str(token).strip()
+                    for token in tokens
+                    if str(token).strip()
+                }
+            )
+        )
+        for key, tokens in (required_tokens or {}).items()
+        if str(key).strip()
+    }
+    role_ids = {role.role_id for role in roles}
+    unknown = (set(normalized) | set(normalized_tokens)) - role_ids
+    if unknown:
+        raise ReactionTemplateError(
+            "Role labels reference unknown derived roles: "
+            + ", ".join(sorted(unknown))
+        )
+    return tuple(
+        replace(
+            role,
+            display_label=normalized.get(role.role_id),
+            required_context_tokens=normalized_tokens.get(
+                role.role_id,
+                (),
+            ),
+        )
+        for role in roles
+    )
+
+
+def _normalize_atom_element_alternatives(
+    parsed: Any,
+    alternatives: Optional[Mapping[int, Sequence[str]]],
+) -> Tuple[ReactionTemplateAtomAlternative, ...]:
+    if not alternatives:
+        return ()
+    from rdkit import Chem
+
+    reference_elements: dict[int, str] = {}
+    for component in parsed.reactants:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        reference_elements.update(
+            {
+                int(atom.GetAtomMapNum()): str(atom.GetSymbol())
+                for atom in molecule.GetAtoms()
+                if int(atom.GetAtomMapNum())
+            }
+        )
+    periodic_table = Chem.GetPeriodicTable()
+    valid_elements = {
+        str(periodic_table.GetElementSymbol(atomic_number))
+        for atomic_number in range(1, 119)
+    }
+    normalized = []
+    for raw_map_number, raw_elements in alternatives.items():
+        map_number = int(raw_map_number)
+        reference_element = reference_elements.get(map_number)
+        if reference_element is None:
+            raise ReactionTemplateError(
+                f"Element alternatives reference unknown reactant map {map_number}"
+            )
+        elements = tuple(
+            sorted(
+                {
+                    str(element).strip().capitalize()
+                    for element in raw_elements
+                    if str(element).strip()
+                }
+            )
+        )
+        if len(elements) < 2:
+            raise ReactionTemplateError(
+                f"Element alternatives for map {map_number} require "
+                "at least two elements"
+            )
+        if any(element not in valid_elements for element in elements):
+            raise ReactionTemplateError(
+                f"Element alternatives for map {map_number} contain "
+                "an unknown element"
+            )
+        if reference_element not in elements:
+            raise ReactionTemplateError(
+                f"Element alternatives for map {map_number} must include "
+                f"reference element {reference_element}"
+            )
+        normalized.append(
+            ReactionTemplateAtomAlternative(
+                atom_map_number=map_number,
+                elements=elements,
+            )
+        )
+    return tuple(sorted(normalized, key=lambda item: item.atom_map_number))
+
+
 def derive_reaction_template(
     mapped_reaction_smiles: str,
     *,
@@ -1480,6 +1673,13 @@ def derive_reaction_template(
     aliases: Sequence[str] = (),
     reaction_label: Optional[str] = None,
     product_label: Optional[str] = None,
+    role_labels: Optional[Mapping[str, str]] = None,
+    role_required_tokens: Optional[
+        Mapping[str, Sequence[str]]
+    ] = None,
+    atom_element_alternatives: Optional[
+        Mapping[int, Sequence[str]]
+    ] = None,
     transformation_class: Optional[str] = None,
     status: Literal["draft", "active", "retired"] = "draft",
     provenance: str = "manual_mapped_reference",
@@ -1548,7 +1748,15 @@ def derive_reaction_template(
         product_label=str(product_label or "product").strip(),
         mapped_reference_reaction=str(mapped_reaction_smiles).strip(),
         participants=_participants(parsed),
-        roles=_derive_template_roles(parsed, normalized.edits),
+        roles=_apply_role_annotations(
+            _derive_template_roles(parsed, normalized.edits),
+            role_labels,
+            role_required_tokens,
+        ),
+        atom_element_alternatives=_normalize_atom_element_alternatives(
+            parsed,
+            atom_element_alternatives,
+        ),
         edits=tuple(
             ReactionTemplateEdit.from_reaction_edit(edit)
             for edit in normalized.edits
@@ -1612,8 +1820,26 @@ def reaction_template_from_dict(payload: Mapping[str, Any]) -> ReactionTemplate:
                         int(value)
                         for value in item.get("atom_map_numbers") or ()
                     ),
+                    display_label=(
+                        str(item["display_label"])
+                        if item.get("display_label") is not None
+                        else None
+                    ),
+                    required_context_tokens=tuple(
+                        str(value)
+                        for value in item.get("required_context_tokens") or ()
+                    ),
                 )
                 for item in payload.get("roles") or ()
+            ),
+            atom_element_alternatives=tuple(
+                ReactionTemplateAtomAlternative(
+                    atom_map_number=int(item["atom_map_number"]),
+                    elements=tuple(
+                        str(value) for value in item.get("elements") or ()
+                    ),
+                )
+                for item in payload.get("atom_element_alternatives") or ()
             ),
             edits=tuple(
                 ReactionTemplateEdit(
@@ -1715,6 +1941,32 @@ def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
             errors.append(
                 f"{template.template_id}:missing_role_maps:{role.role_id}"
             )
+        if (
+            tuple(sorted(set(role.required_context_tokens)))
+            != role.required_context_tokens
+        ):
+            errors.append(
+                f"{template.template_id}:noncanonical_role_context_tokens:"
+                f"{role.role_id}"
+            )
+    alternative_maps = [
+        item.atom_map_number for item in template.atom_element_alternatives
+    ]
+    if len(alternative_maps) != len(set(alternative_maps)):
+        errors.append(f"{template.template_id}:duplicate_alternative_maps")
+    if tuple(sorted(alternative_maps)) != tuple(alternative_maps):
+        errors.append(f"{template.template_id}:unsorted_alternative_maps")
+    for alternative in template.atom_element_alternatives:
+        if len(alternative.elements) < 2:
+            errors.append(
+                f"{template.template_id}:insufficient_element_alternatives:"
+                f"{alternative.atom_map_number}"
+            )
+        if tuple(sorted(set(alternative.elements))) != alternative.elements:
+            errors.append(
+                f"{template.template_id}:noncanonical_element_alternatives:"
+                f"{alternative.atom_map_number}"
+            )
     try:
         compiled = derive_reaction_template(
             template.mapped_reference_reaction,
@@ -1724,6 +1976,20 @@ def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
             aliases=template.aliases,
             reaction_label=template.reaction_label,
             product_label=template.product_label,
+            role_labels={
+                role.role_id: role.display_label
+                for role in template.roles
+                if role.display_label is not None
+            },
+            role_required_tokens={
+                role.role_id: role.required_context_tokens
+                for role in template.roles
+                if role.required_context_tokens
+            },
+            atom_element_alternatives={
+                item.atom_map_number: item.elements
+                for item in template.atom_element_alternatives
+            },
             transformation_class=template.transformation_class,
             status=template.status,
             provenance=template.provenance,
@@ -1735,6 +2001,7 @@ def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
         for field_name in (
             "participants",
             "roles",
+            "atom_element_alternatives",
             "edits",
             "edit_fingerprint",
             "edit_component_count",
@@ -1930,6 +2197,8 @@ def match_reaction_templates(
             or not (include_drafts or template.status == "active")
         ):
             continue
+        if not _has_semantic_role_assignment(template, parsed_query):
+            continue
         outcomes = _exact_template_reconstructions(template, parsed_query)
         preferred_outcome = outcomes[0] if outcomes else None
         exact_matches_list.append(
@@ -1963,7 +2232,7 @@ def match_reaction_templates(
         )
     exact_matches = tuple(exact_matches_list)
     matches = exact_matches
-    if fingerprint is None and analysis.valid:
+    if not exact_matches and analysis.valid:
         reconstruction_matches = []
         for template in templates:
             if not (include_drafts or template.status == "active"):
@@ -2024,12 +2293,13 @@ def match_reaction_templates(
             }
             candidate_evidence = {match.evidence for match in matches}
             if len(candidate_fingerprints) == 1:
-                fingerprint = next(iter(candidate_fingerprints))
-                evidence = (
-                    next(iter(candidate_evidence))
-                    if len(candidate_evidence) == 1
-                    else "exact_template_reconstruction"
-                )
+                if fingerprint is None:
+                    fingerprint = next(iter(candidate_fingerprints))
+                    evidence = (
+                        next(iter(candidate_evidence))
+                        if len(candidate_evidence) == 1
+                        else "exact_template_reconstruction"
+                    )
                 warnings.append(
                     "EXACT_MAIN_PRODUCT_RECONSTRUCTION_FROM_TEMPLATE"
                 )
@@ -2055,6 +2325,7 @@ def match_reaction_templates(
                 )
                 for template in templates
                 if (include_drafts or template.status == "active")
+                and _has_semantic_role_assignment(template, parsed_query)
                 and _matches_template_center_transition(template, parsed_query)
             )
             matches = provisional_matches
@@ -2087,6 +2358,7 @@ __all__ = [
     "REACTION_TEMPLATE_SCHEMA_VERSION",
     "ReactionTemplate",
     "ReactionTemplateAtom",
+    "ReactionTemplateAtomAlternative",
     "ReactionTemplateEdit",
     "ReactionTemplateError",
     "ReactionTemplateMatch",

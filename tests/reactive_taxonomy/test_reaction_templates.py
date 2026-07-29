@@ -35,6 +35,16 @@ INCOMPLETE_REPORTED_ACETAL = (
     "CCO.COc1cccc(C=O)c1>>CCOC(OCC)c1cccc(OC)c1"
 )
 
+DARZENS_REFERENCE = (
+    "[Cl:1][CH2:2][C:3](=[O:4])[O:5][CH2:6][CH3:7]."
+    "[CH3:8][CH:9]=[O:10]"
+    ">>"
+    "[CH:2]1([C:3](=[O:4])[O:5][CH2:6][CH3:7])"
+    "[CH:9]([CH3:8])[O:10]1"
+)
+
+DARZENS_QUERY = "CCOC(=O)CCl.CC=O>>CCOC(=O)C1OC1C"
+
 
 def _acetal_template(*, status: str = "active"):
     return derive_reaction_template(
@@ -46,6 +56,25 @@ def _acetal_template(*, status: str = "active"):
         reaction_label="Acetal formation",
         product_label="acetal",
         transformation_class="carbonyl_diheteroatom_condensation",
+        status=status,  # type: ignore[arg-type]
+    )
+
+
+def _darzens_template(*, status: str = "active"):
+    return derive_reaction_template(
+        DARZENS_REFERENCE,
+        template_id="darzens_epoxide_formation",
+        display_name="Darzens epoxide formation",
+        family_id="darzens_reaction",
+        aliases=("Darzens condensation",),
+        reaction_label="Darzens reaction",
+        product_label="glycidic ester",
+        role_labels={"activated_sp3_carbon": "α-halo ester"},
+        role_required_tokens={
+            "activated_sp3_carbon": ("alpha_to:ester",)
+        },
+        atom_element_alternatives={1: ("Cl", "Br", "I")},
+        transformation_class="carbonyl_epoxide_condensation",
         status=status,  # type: ignore[arg-type]
     )
 
@@ -104,6 +133,50 @@ def test_template_requires_compact_taxonomy_role_annotations() -> None:
         "carbonyl_to_dialkoxy:reference_contract_mismatch:roles"
         in errors
     )
+
+
+def test_darzens_reference_derives_connected_roles_and_curated_halides() -> None:
+    template = _darzens_template()
+
+    assert template.edit_component_count == 1
+    assert template.edit_archetype == "addition"
+    assert len(template.edits) == 5
+    assert [
+        (
+            role.role_id,
+            role.site_type,
+            role.atom_map_numbers,
+            role.display_label,
+            role.required_context_tokens,
+        )
+        for role in template.roles
+    ] == [
+        (
+            "activated_sp3_carbon",
+            "pronucleophile_XH",
+            (2,),
+            "α-halo ester",
+            ("alpha_to:ester",),
+        ),
+        ("carbonyl", "electrophilic_center", (9,), None, ()),
+    ]
+    assert [
+        (item.atom_map_number, item.elements)
+        for item in template.atom_element_alternatives
+    ] == [(1, ("Br", "Cl", "I"))]
+
+
+def test_element_alternatives_must_include_the_reference_element() -> None:
+    with pytest.raises(
+        ReactionTemplateError,
+        match="must include reference element Cl",
+    ):
+        derive_reaction_template(
+            DARZENS_REFERENCE,
+            template_id="invalid_darzens_halides",
+            display_name="Invalid Darzens halides",
+            atom_element_alternatives={1: ("Br", "I")},
+        )
 
 
 def test_importer_rejects_disconnected_multi_event_reference() -> None:
@@ -348,6 +421,122 @@ def test_acetal_template_does_not_match_hemiacetal_or_reduction(
     assert reduction.matches == ()
 
 
+def test_darzens_template_labels_and_profiles_exact_chloro_query(
+    tmp_path,
+) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    template = _darzens_template()
+    upsert_reaction_template(template, path)
+
+    result = match_reaction_templates(DARZENS_QUERY, path=path)
+
+    assert result.signature_id is not None
+    assert result.edit_fingerprint == template.edit_fingerprint
+    assert [match.template_id for match in result.matches] == [
+        "darzens_epoxide_formation"
+    ]
+    match = result.matches[0]
+    assert match.evidence == "query_derived_edit_fingerprint"
+    assert match.confidence == 1.0
+    assert match.interpretation is not None
+    assert match.interpretation.reaction_label == "Darzens reaction"
+    assert match.interpretation.structural_label == (
+        "α-halo ester + R–CH=O → glycidic ester"
+    )
+    assert match.interpretation.predicted_product_smiles == (
+        "CCOC(=O)C1OC1C"
+    )
+    assert [
+        (
+            binding.role_id,
+            binding.steric_class,
+            binding.electronic_class,
+        )
+        for binding in match.interpretation.roles
+    ] == [
+        ("activated_sp3_carbon", "open", "slightly_poor"),
+        ("carbonyl", "open", "slightly_poor"),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("reaction", "carbonyl_label"),
+    (
+        (
+            "COC(=O)CBr.O=Cc1ccccc1"
+            ">>COC(=O)C1OC1c1ccccc1",
+            "R–CH=O",
+        ),
+        (
+            "CCOC(=O)CI.CC(C)=O"
+            ">>CCOC(=O)C1OC1(C)C",
+            "R2C=O",
+        ),
+    ),
+)
+def test_darzens_curated_halide_and_carbonyl_generalization(
+    tmp_path,
+    reaction: str,
+    carbonyl_label: str,
+) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    upsert_reaction_template(_darzens_template(), path)
+
+    result = match_reaction_templates(reaction, path=path)
+
+    assert [match.template_id for match in result.matches] == [
+        "darzens_epoxide_formation"
+    ]
+    match = result.matches[0]
+    assert match.evidence == "exact_template_reconstruction"
+    assert match.confidence == 0.95
+    assert match.interpretation is not None
+    assert match.interpretation.structural_label == (
+        f"α-halo ester + {carbonyl_label} → glycidic ester"
+    )
+    assert "EXACT_MAIN_PRODUCT_RECONSTRUCTION_FROM_TEMPLATE" in result.warnings
+
+
+def test_darzens_match_is_reactant_order_invariant(tmp_path) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    upsert_reaction_template(_darzens_template(), path)
+
+    forward = match_reaction_templates(DARZENS_QUERY, path=path)
+    reversed_order = match_reaction_templates(
+        "CC=O.CCOC(=O)CCl>>CCOC(=O)C1OC1C",
+        path=path,
+    )
+
+    assert forward.matches[0].interpretation is not None
+    assert reversed_order.matches[0].interpretation is not None
+    assert (
+        forward.matches[0].interpretation.structural_label
+        == reversed_order.matches[0].interpretation.structural_label
+    )
+
+
+def test_darzens_rejects_missing_activation_and_wrong_product(tmp_path) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    upsert_reaction_template(_darzens_template(), path)
+
+    missing_activation = match_reaction_templates(
+        "CCl.CC=O>>CC1OC1C",
+        path=path,
+    )
+    wrong_product = match_reaction_templates(
+        "CCOC(=O)CCl.CC=O>>CCOC(=O)CC(O)C",
+        path=path,
+    )
+    wrong_activation_family = match_reaction_templates(
+        "N#CCCl.CC=O>>N#CC1OC1C",
+        path=path,
+    )
+
+    assert missing_activation.matches == ()
+    assert wrong_product.matches == ()
+    assert wrong_activation_family.matches == ()
+
+
 def test_drafts_require_explicit_query_opt_in(tmp_path) -> None:
     path = tmp_path / "reaction_templates.v1.json"
     upsert_reaction_template(_acetal_template(status="draft"), path)
@@ -444,4 +633,75 @@ def test_reaction_template_cli_import_list_validate_show_and_match(
     assert incomplete["matches"][0]["provisional"] is True
     assert incomplete["matches"][0]["interpretation"]["structural_label"] == (
         "R–CH=O + 2 × R–OH → acetal"
+    )
+
+
+def test_reaction_template_cli_imports_generalized_darzens_template(
+    tmp_path,
+    capsys,
+) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    common = ["--registry", str(path)]
+
+    assert template_cli_main(
+        [
+            *common,
+            "import",
+            "--mapped-reaction",
+            DARZENS_REFERENCE,
+            "--id",
+            "darzens_epoxide_formation",
+            "--name",
+            "Darzens epoxide formation",
+            "--family",
+            "darzens_reaction",
+            "--reaction-label",
+            "Darzens reaction",
+            "--product-label",
+            "glycidic ester",
+            "--role-label",
+            "activated_sp3_carbon=α-halo ester",
+            "--role-tokens",
+            "activated_sp3_carbon=alpha_to:ester",
+            "--atom-elements",
+            "1=Cl,Br,I",
+            "--status",
+            "active",
+            "--format",
+            "json",
+        ]
+    ) == 0
+    imported = json.loads(capsys.readouterr().out)
+    assert imported["template"]["roles"][0]["display_label"] == (
+        "α-halo ester"
+    )
+    assert imported["template"]["roles"][0][
+        "required_context_tokens"
+    ] == ["alpha_to:ester"]
+    assert imported["template"]["atom_element_alternatives"] == [
+        {
+            "atom_map_number": 1,
+            "elements": ["Br", "Cl", "I"],
+        }
+    ]
+
+    bromo_query = (
+        "COC(=O)CBr.O=Cc1ccccc1"
+        ">>COC(=O)C1OC1c1ccccc1"
+    )
+    assert template_cli_main(
+        [
+            *common,
+            "match",
+            bromo_query,
+            "--format",
+            "json",
+        ]
+    ) == 0
+    matched = json.loads(capsys.readouterr().out)
+    assert matched["matches"][0]["template_id"] == (
+        "darzens_epoxide_formation"
+    )
+    assert matched["matches"][0]["evidence"] == (
+        "exact_template_reconstruction"
     )

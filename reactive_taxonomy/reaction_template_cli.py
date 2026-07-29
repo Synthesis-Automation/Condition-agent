@@ -37,7 +37,56 @@ def _mapped_reaction(args: argparse.Namespace) -> str:
     )
 
 
+def _key_value_options(
+    values: Sequence[str] | None,
+    *,
+    option_name: str,
+) -> dict[str, str]:
+    parsed = {}
+    for value in values or ():
+        if "=" not in value:
+            raise ReactionTemplateError(
+                f"{option_name} values must use KEY=VALUE"
+            )
+        key, item = (part.strip() for part in value.split("=", 1))
+        if not key or not item:
+            raise ReactionTemplateError(
+                f"{option_name} values must use non-empty KEY=VALUE"
+            )
+        if key in parsed:
+            raise ReactionTemplateError(
+                f"{option_name} repeats key {key}"
+            )
+        parsed[key] = item
+    return parsed
+
+
 def _command_import(args: argparse.Namespace) -> int:
+    role_labels = _key_value_options(
+        args.role_label,
+        option_name="--role-label",
+    )
+    atom_element_values = _key_value_options(
+        args.atom_elements,
+        option_name="--atom-elements",
+    )
+    role_token_values = _key_value_options(
+        args.role_tokens,
+        option_name="--role-tokens",
+    )
+    try:
+        atom_element_alternatives = {
+            int(map_number): tuple(
+                element.strip()
+                for element in elements.split(",")
+                if element.strip()
+            )
+            for map_number, elements in atom_element_values.items()
+        }
+    except ValueError as exc:
+        raise ReactionTemplateError(
+            "--atom-elements keys must be integer atom-map numbers"
+        ) from exc
     template = derive_reaction_template(
         _mapped_reaction(args),
         template_id=args.id,
@@ -46,6 +95,16 @@ def _command_import(args: argparse.Namespace) -> int:
         aliases=args.alias or (),
         reaction_label=args.reaction_label,
         product_label=args.product_label,
+        role_labels=role_labels,
+        role_required_tokens={
+            role: tuple(
+                token.strip()
+                for token in tokens.split("|")
+                if token.strip()
+            )
+            for role, tokens in role_token_values.items()
+        },
+        atom_element_alternatives=atom_element_alternatives,
         transformation_class=args.transformation_class,
         status=args.status,
         provenance=args.provenance,
@@ -133,7 +192,27 @@ def _command_show(args: argparse.Namespace) -> int:
         print("roles:")
         for role in template.roles:
             maps = ", ".join(str(value) for value in role.atom_map_numbers)
-            print(f"  {role.role_id}: {role.site_type}; maps {maps}")
+            label = (
+                f"; label {role.display_label}"
+                if role.display_label is not None
+                else ""
+            )
+            tokens = (
+                "; requires " + ", ".join(role.required_context_tokens)
+                if role.required_context_tokens
+                else ""
+            )
+            print(
+                f"  {role.role_id}: {role.site_type}; maps {maps}"
+                f"{label}{tokens}"
+            )
+        if template.atom_element_alternatives:
+            print("atom element alternatives:")
+            for item in template.atom_element_alternatives:
+                print(
+                    f"  map {item.atom_map_number}: "
+                    + ", ".join(item.elements)
+                )
     return 0
 
 
@@ -243,6 +322,24 @@ def build_parser() -> argparse.ArgumentParser:
     import_parser.add_argument(
         "--product-label",
         help="short structural product label; defaults to 'product'",
+    )
+    import_parser.add_argument(
+        "--role-label",
+        action="append",
+        metavar="ROLE=LABEL",
+        help="optional display label for an automatically derived role",
+    )
+    import_parser.add_argument(
+        "--role-tokens",
+        action="append",
+        metavar="ROLE=TOKENS",
+        help="required taxonomy context tokens, separated with |",
+    )
+    import_parser.add_argument(
+        "--atom-elements",
+        action="append",
+        metavar="MAP=ELEMENTS",
+        help="curated element alternatives, e.g. 1=Cl,Br,I",
     )
     import_parser.add_argument("--transformation-class")
     import_parser.add_argument(

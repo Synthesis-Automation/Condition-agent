@@ -1,13 +1,14 @@
 {
   "definition_version": "reaction_templates.v1",
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "templates": [
     {
       "aliases": [
         "acetal formation",
         "ketal formation"
       ],
-      "definition_hash": "RTD1:dba83efe7e7ca3ad426509f8c2bcda5cec32d786",
+      "atom_element_alternatives": [],
+      "definition_hash": "RTD1:4dc55d8df22662783579907f06bcd63147c0ca82",
       "display_name": "Carbonyl to dialkoxy",
       "edit_archetype": "substitution",
       "edit_component_count": 1,
@@ -125,6 +126,8 @@
           "atom_map_numbers": [
             1
           ],
+          "display_label": null,
+          "required_context_tokens": [],
           "role_id": "carbonyl",
           "site_type": "electrophilic_center"
         },
@@ -133,14 +136,177 @@
             3,
             5
           ],
+          "display_label": null,
+          "required_context_tokens": [],
           "role_id": "alcohol",
           "site_type": "pronucleophile_XH"
         }
       ],
-      "schema_version": "1.1",
+      "schema_version": "1.2",
       "status": "active",
       "template_id": "carbonyl_to_dialkoxy",
       "transformation_class": "carbonyl_diheteroatom_condensation"
+    },
+    {
+      "aliases": [
+        "Darzens condensation",
+        "glycidic ester synthesis"
+      ],
+      "atom_element_alternatives": [
+        {
+          "atom_map_number": 1,
+          "elements": [
+            "Br",
+            "Cl",
+            "I"
+          ]
+        }
+      ],
+      "definition_hash": "RTD1:75714469574d52235f3d9b0ca85ffbc201bec656",
+      "display_name": "Darzens epoxide formation",
+      "edit_archetype": "addition",
+      "edit_component_count": 1,
+      "edit_fingerprint": "RTE1:ca15e6715c4ddbef4f133a67e63d65e5",
+      "edits": [
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 1,
+            "element": "Cl",
+            "formal_charge": 0,
+            "hybridization": "SP3"
+          },
+          "atom_2": {
+            "aromatic": false,
+            "atom_map_number": 2,
+            "element": "C",
+            "formal_charge": 0,
+            "hybridization": "SP3"
+          },
+          "edit_type": "broken",
+          "new_order": null,
+          "old_order": "SINGLE"
+        },
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 2,
+            "element": "C",
+            "formal_charge": 0,
+            "hybridization": "SP3"
+          },
+          "atom_2": {
+            "aromatic": false,
+            "atom_map_number": 9,
+            "element": "C",
+            "formal_charge": 0,
+            "hybridization": "SP2"
+          },
+          "edit_type": "formed",
+          "new_order": "SINGLE",
+          "old_order": null
+        },
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 2,
+            "element": "C",
+            "formal_charge": 0,
+            "hybridization": "SP3"
+          },
+          "atom_2": {
+            "aromatic": false,
+            "atom_map_number": 10,
+            "element": "O",
+            "formal_charge": 0,
+            "hybridization": "SP2"
+          },
+          "edit_type": "formed",
+          "new_order": "SINGLE",
+          "old_order": null
+        },
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 9,
+            "element": "C",
+            "formal_charge": 0,
+            "hybridization": "SP2"
+          },
+          "atom_2": {
+            "aromatic": false,
+            "atom_map_number": 10,
+            "element": "O",
+            "formal_charge": 0,
+            "hybridization": "SP2"
+          },
+          "edit_type": "order_changed",
+          "new_order": "SINGLE",
+          "old_order": "DOUBLE"
+        },
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 2,
+            "element": "C",
+            "formal_charge": 0,
+            "hybridization": "SP3"
+          },
+          "atom_2": null,
+          "edit_type": "hydrogen_change",
+          "new_order": null,
+          "old_order": "SINGLE"
+        }
+      ],
+      "family_id": "darzens_reaction",
+      "mapped_reference_reaction": "[Cl:1][CH2:2][C:3](=[O:4])[O:5][CH2:6][CH3:7].[CH3:8][CH:9]=[O:10]>>[CH:2]1([C:3](=[O:4])[O:5][CH2:6][CH3:7])[CH:9]([CH3:8])[O:10]1",
+      "notes": "Minimum mapped Darzens condensation; base and halide byproduct are not represented.",
+      "participants": [
+        {
+          "canonical_smiles": "CCOC(=O)C1OC1C",
+          "explicit_count": 1,
+          "side": "product"
+        },
+        {
+          "canonical_smiles": "CC=O",
+          "explicit_count": 1,
+          "side": "reactant"
+        },
+        {
+          "canonical_smiles": "CCOC(=O)CCl",
+          "explicit_count": 1,
+          "side": "reactant"
+        }
+      ],
+      "product_label": "glycidic ester",
+      "provenance": "curated_minimum_mapped_reference",
+      "reaction_label": "Darzens reaction",
+      "roles": [
+        {
+          "atom_map_numbers": [
+            2
+          ],
+          "display_label": "α-halo ester",
+          "required_context_tokens": [
+            "alpha_to:ester"
+          ],
+          "role_id": "activated_sp3_carbon",
+          "site_type": "pronucleophile_XH"
+        },
+        {
+          "atom_map_numbers": [
+            9
+          ],
+          "display_label": null,
+          "required_context_tokens": [],
+          "role_id": "carbonyl",
+          "site_type": "electrophilic_center"
+        }
+      ],
+      "schema_version": "1.2",
+      "status": "active",
+      "template_id": "darzens_epoxide_formation",
+      "transformation_class": "carbonyl_epoxide_condensation"
     }
   ]
 }

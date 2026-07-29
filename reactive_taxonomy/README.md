@@ -50,6 +50,17 @@ class, nearby groups, and context flags are read from the existing
 rules or SMARTS. Repeated supplied species remain separate bindings, while a
 demonstrated inferred repeat is reported once with its multiplicity and warning.
 
+Role display labels and map-level element alternatives are the only curated
+generalization controls. For example, the registered Darzens reference labels
+its derived `activated_sp3_carbon` role as `α-halo ester` and explicitly permits
+`Br`, `Cl`, or `I` at the reference leaving-group map. The role also requires
+the existing `alpha_to:ester` taxonomy token. The executor therefore requires
+the query atom to be the ester-activated C–H site and must reconstruct the
+reported epoxide exactly. Consequently, an unactivated alkyl halide, an
+α-halo nitrile, or a ring-opened product does not match. These controls are
+available during import as `--role-label ROLE=LABEL`,
+`--role-tokens ROLE=alpha_to:ester`, and `--atom-elements MAP=Cl,Br,I`.
+
 If exact reconstruction fails, a lower conservative fallback compares the
 edited-centre before/after bond-state multisets. Neighbor hydrogen count and
 external heavy-atom degree remain in this comparison, allowing an acetal
