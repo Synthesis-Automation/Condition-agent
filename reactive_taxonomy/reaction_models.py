@@ -5,10 +5,11 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Literal, Optional, Tuple
 
+from .descriptors.models import SiteReactivityProfile
 from .models import CompoundAnalysis
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "2.0"
+REACTION_SIGNATURE_SCHEMA_VERSION = "3.0"
 
 EditArchetype = Literal[
     "substitution",
@@ -476,8 +477,6 @@ class ReactionPartnerEnvironment:
     handle_token: Optional[str]
     anchor_context: Optional[str]
     chemist_label: str
-    steric: Dict[str, Any] = field(default_factory=dict)
-    electronic: Dict[str, Any] = field(default_factory=dict)
     nearby_groups: Tuple[Dict[str, Any], ...] = ()
     spectator_group_ids: Tuple[str, ...] = ()
     competing_site_labels: Tuple[str, ...] = ()
@@ -485,6 +484,7 @@ class ReactionPartnerEnvironment:
     unprotected_xh_group_ids: Tuple[str, ...] = ()
     flags: Tuple[str, ...] = ()
     features: Dict[str, Any] = field(default_factory=dict)
+    reactivity_profile: Optional[SiteReactivityProfile] = None
 
 
 @dataclass(frozen=True)
@@ -510,11 +510,10 @@ class ReactionPartner:
     handle_tokens: Tuple[str, ...]
     anchor_contexts: Tuple[str, ...]
     chemist_label: str
-    steric: Dict[str, Any] = field(default_factory=dict)
-    electronic: Dict[str, Any] = field(default_factory=dict)
     nearby_groups: Tuple[Dict[str, Any], ...] = ()
     spectator_group_ids: Tuple[str, ...] = ()
     flags: Tuple[str, ...] = ()
+    reactivity_profile: Optional[SiteReactivityProfile] = None
 
 
 @dataclass(frozen=True)
@@ -697,7 +696,7 @@ class ReactionAnalysis:
     reaction_completeness: Optional[ReactionCompletenessAssessment] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "2.0"
+    schema_version: str = "3.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

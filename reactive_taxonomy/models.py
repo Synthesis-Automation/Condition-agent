@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
+from .descriptors.models import SiteReactivityProfile
+
 
 SiteType = Literal[
     "leaving_group",
@@ -108,10 +110,9 @@ class SiteEnvironment:
 
     site_id: str
     center_atom_index: int
+    reactivity_profile: SiteReactivityProfile
     first_shell: Tuple[str, ...] = ()
     nearby_groups: Tuple[Dict[str, Any], ...] = ()
-    steric: Dict[str, Any] = field(default_factory=dict)
-    electronic: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

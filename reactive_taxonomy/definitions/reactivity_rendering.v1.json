@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "reactivity_rendering.v1",
+  "field_order": [
+    "identity",
+    "topology",
+    "steric",
+    "electronic",
+    "reactive_center",
+    "liabilities"
+  ],
+  "compact_omissions": [
+    "atom_indices",
+    "continuous_scores",
+    "method_ids",
+    "zero_contributions",
+    "not_applicable",
+    "raw_shell_counts"
+  ],
+  "labels": {
+    "electronic_demand": "electron demand",
+    "center_polarization": "center polarization",
+    "pi_polarization": "pi polarization",
+    "carbonyl_activation": "carbonyl activation",
+    "sulfur_center_activation": "sulfur-center activation",
+    "phosphorus_center_activation": "phosphorus-center activation",
+    "lone_pair_availability": "lone-pair availability",
+    "local_electronic_influence": "electronic influence"
+  }
+}

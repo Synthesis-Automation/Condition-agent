@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Optional, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
+from .descriptors.tokens import reactivity_profile_tokens
 from .reaction_edits import EditNormalizationResult
 from .reaction_events import build_reaction_events
 from .reaction_correspondence import REACTION_CORRESPONDENCE_VERSION
@@ -29,8 +30,8 @@ from .reaction_models import (
 )
 
 _DEFINITIONS = Path(__file__).with_name("definitions")
-_SIGNATURE_RULES_PATH = _DEFINITIONS / "signature_features.v2.json"
-_TAXONOMY_MANIFEST_PATH = _DEFINITIONS / "taxonomy_manifest.v2.json"
+_SIGNATURE_RULES_PATH = _DEFINITIONS / "signature_features.v3.json"
+_TAXONOMY_MANIFEST_PATH = _DEFINITIONS / "taxonomy_manifest.v3.json"
 
 
 def _canonical_json(value: Any) -> str:
@@ -242,17 +243,20 @@ def _selected_partners(
                 handle_tokens=handles,
                 anchor_contexts=contexts,
                 chemist_label=site.chemist_label,
-                steric=dict(overlay.steric)
-                if overlay
-                else (dict(environment.steric) if environment else {}),
-                electronic=dict(overlay.electronic)
-                if overlay
-                else (dict(environment.electronic) if environment else {}),
                 nearby_groups=overlay.nearby_groups
                 if overlay
                 else (environment.nearby_groups if environment else ()),
                 spectator_group_ids=role_spectators,
                 flags=tuple(overlay.flags) if overlay else (),
+                reactivity_profile=(
+                    overlay.reactivity_profile
+                    if overlay and overlay.reactivity_profile is not None
+                    else (
+                        environment.reactivity_profile
+                        if environment
+                        else None
+                    )
+                ),
             )
         )
     return tuple(sorted(partners, key=lambda partner: partner.partner_id))
@@ -334,8 +338,6 @@ def _mapped_partners(
                 anchor_contexts=contexts,
                 chemist_label=" + ".join(site.chemist_label for site in sites)
                 or _unmapped_canonical(component),
-                steric=dict(environment.steric) if environment else {},
-                electronic=dict(environment.electronic) if environment else {},
                 nearby_groups=environment.nearby_groups if environment else (),
                 spectator_group_ids=tuple(
                     sorted(
@@ -343,6 +345,9 @@ def _mapped_partners(
                         for group in spectators
                         if group.component_index == component_index
                     )
+                ),
+                reactivity_profile=(
+                    environment.reactivity_profile if environment else None
                 ),
             )
         )
@@ -357,10 +362,25 @@ def _partner_token(partner: ReactionPartner, *, environment: bool) -> Any:
     if environment:
         base.update(
             {
-                "steric": partner.steric,
-                "electronic": partner.electronic,
-                "nearby_groups": partner.nearby_groups,
-                "flags": partner.flags,
+                "reactivity_profile_tokens": reactivity_profile_tokens(
+                    partner.reactivity_profile
+                ),
+                "nearby_groups": tuple(
+                    sorted(
+                        (
+                            str(group.get("group_id") or ""),
+                            int(group.get("distance", -1)),
+                            tuple(
+                                sorted(
+                                    str(tag)
+                                    for tag in group.get("tags") or ()
+                                )
+                            ),
+                        )
+                        for group in partner.nearby_groups
+                        if group.get("group_id")
+                    )
+                ),
             }
         )
     return base
@@ -578,7 +598,7 @@ def build_reaction_signature(
     )
     definition_versions = _definition_versions()
     signature_id = _digest(
-        "RS2",
+        "RS3",
         {
             "keys": (
                 exact_key,

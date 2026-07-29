@@ -8,6 +8,41 @@ from condition_recommender.models import (
 )
 
 
+def _aromatic_profile(
+    *,
+    access: str,
+    electronic: str,
+    ortho_count: int,
+    burden: str,
+    steric_score: float,
+    electronic_score: float,
+) -> dict:
+    return {
+        "schema_version": "1.0",
+        "context_kind": "aromatic",
+        "context": {
+            "context_kind": "aromatic",
+            "ring_family": "benzene",
+            "ring_sizes": (6,),
+            "ortho_occupancy_count": ortho_count,
+            "ortho_capacity": 2,
+            "ortho_burden_class": burden,
+            "heteroatoms": (),
+        },
+        "steric": {
+            "accessibility_class": access,
+            "accessibility_score": steric_score,
+        },
+        "electronic": {
+            "activation_axis": "electronic_demand",
+            "activation_class": electronic,
+            "activation_score": electronic_score,
+        },
+        "reactive_center": {},
+        "modifiers": (),
+    }
+
+
 def _recommendation() -> GenericConditionRecommendation:
     trace = RecommendationScoreTrace(
         similarity_components={"bond_edits": 1.0},
@@ -68,14 +103,14 @@ def _recommendation() -> GenericConditionRecommendation:
                         "role": "transfer_partner",
                         "chemist_label": "Ar–B(OH)2",
                         "anchor_contexts": ("Ar",),
-                        "steric": {
-                            "class": "open",
-                            "local_heavy_atoms_r2": 4,
-                        },
-                        "electronic": {
-                            "class": "electron_rich",
-                            "qualitative_sum": -0.5,
-                        },
+                        "reactivity_profile": _aromatic_profile(
+                            access="open",
+                            electronic="electron_rich",
+                            ortho_count=0,
+                            burden="none",
+                            steric_score=0.0,
+                            electronic_score=-0.5,
+                        ),
                     },
                 ),
             },
@@ -90,7 +125,7 @@ def _result() -> GenericRecommendationResult:
     return GenericRecommendationResult(
         query_reaction_smiles="IC.B(O)O>>CC",
         valid=True,
-        query_signature_id="RS2:query",
+        query_signature_id="RS3:query",
         reaction_label="Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
         reaction_label_status="exact_product",
         named_family="suzuki_miyaura",
@@ -108,15 +143,14 @@ def _result() -> GenericRecommendationResult:
                 "role": "electrophile",
                 "chemist_label": "Ar–Br",
                 "anchor_contexts": ("Ar",),
-                "steric": {
-                    "class": "ortho_hindered",
-                    "ortho_substituent_count": 2,
-                    "local_heavy_atoms_r2": 6,
-                },
-                "electronic": {
-                    "class": "electron_poor",
-                    "qualitative_sum": 0.75,
-                },
+                "reactivity_profile": _aromatic_profile(
+                    access="hindered",
+                    electronic="electron_poor",
+                    ortho_count=2,
+                    burden="high",
+                    steric_score=0.7,
+                    electronic_score=0.75,
+                ),
             },
         ),
         retrieval_level="exact_signature",
@@ -205,8 +239,9 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     assert "Label evidence: Exact Product" in summary
     assert "Suzuki Miyaura" in summary
     assert "R–C≡N [nitrile] (reactant 1, d=3)" in summary
-    assert "steric ortho hindered, 2 ortho substituent(s)" in summary
-    assert "electronic electron poor (local score +0.75)" in summary
+    assert "benzene (6-membered)" in summary
+    assert "ortho burden high (2/2)" in summary
+    assert "electron demand electron poor" in summary
     reaction_pixmap = window.reaction_image_label.pixmap()
     assert reaction_pixmap is not None
     assert not reaction_pixmap.isNull()
@@ -227,10 +262,10 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     assert "Selected hit reaction SMILES: IC.B(O)O>>CC" not in details
     assert "Spectator groups: R–O–R [ether] (reactant 2, d=2)" in details
     assert "R–C≡N [nitrile]" not in details
-    assert "Steric/electronic analysis:" in details
-    assert "steric open, 4 local heavy atom(s), r≤2" in details
-    assert "electronic electron rich (local score -0.5)" in details
-    assert "steric ortho hindered" not in details
+    assert "Reactivity profile:" in details
+    assert "ortho burden none (0/2)" in details
+    assert "electron demand electron rich" in details
+    assert "ortho burden high" not in details
     assert "Recipe core:" not in details
     assert "Observed recipe variants:" not in details
     assert "RCORE1:core" not in details

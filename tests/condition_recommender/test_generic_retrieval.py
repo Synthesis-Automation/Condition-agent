@@ -37,6 +37,37 @@ from condition_recommender.similarity import (
 )
 
 
+def _aromatic_profile(
+    *,
+    access: str = "open",
+    electronic: str = "balanced",
+) -> dict:
+    return {
+        "schema_version": "1.0",
+        "context_kind": "aromatic",
+        "context": {
+            "context_kind": "aromatic",
+            "ring_family": "benzene",
+            "ring_sizes": [6],
+            "ortho_occupancy_count": 0,
+            "ortho_capacity": 2,
+            "ortho_burden_class": "none",
+            "heteroatoms": [],
+        },
+        "steric": {
+            "accessibility_class": access,
+            "accessibility_score": 0.0 if access == "open" else 0.9,
+        },
+        "electronic": {
+            "activation_axis": "electronic_demand",
+            "activation_class": electronic,
+            "activation_score": 0.0 if electronic == "balanced" else 0.8,
+        },
+        "reactive_center": {},
+        "modifiers": [],
+    }
+
+
 def _signature(
     token: str,
     *,
@@ -75,17 +106,17 @@ def _signature(
         ],
         "partners": [
             {
+                "role": "transfer_partner",
                 "handle_tokens": ["B(OH)2"],
                 "anchor_contexts": ["Ar"],
-                "steric": {"class": "open"},
-                "electronic": {"class": "neutral"},
+                "reactivity_profile": _aromatic_profile(),
                 "nearby_groups": [],
             },
             {
+                "role": "nucleophile",
                 "handle_tokens": ["N-H"],
                 "anchor_contexts": ["Ar"],
-                "steric": {"class": "open"},
-                "electronic": {"class": "neutral"},
+                "reactivity_profile": _aromatic_profile(),
                 "nearby_groups": [],
             },
         ],
@@ -108,8 +139,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.0",
-        "converter_definition_version": "generic_conversion.v2.0",
+        "schema_version": "3.1",
+        "converter_definition_version": "generic_conversion.v2.1",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",
@@ -312,14 +343,11 @@ def test_environment_neighbors_narrow_the_bond_edit_pool() -> None:
         )
         for index in range(4)
     ]
-    records[-1]["reaction_signature"]["partners"][0]["steric"]["class"] = "crowded"
-    records[-1]["reaction_signature"]["partners"][0]["electronic"]["class"] = (
-        "electron_poor"
-    )
-    records[-1]["reaction_signature"]["partners"][1]["steric"]["class"] = "crowded"
-    records[-1]["reaction_signature"]["partners"][1]["electronic"]["class"] = (
-        "electron_poor"
-    )
+    for partner in records[-1]["reaction_signature"]["partners"]:
+        partner["reactivity_profile"] = _aromatic_profile(
+            access="severe",
+            electronic="electron_poor",
+        )
 
     level, pool, trace = retrieve_generic_pool_with_trace(
         query,
@@ -360,8 +388,10 @@ def test_bond_edit_fallback_remains_reachable_without_environment_overlap() -> N
     ]
     for record in records:
         for partner in record["reaction_signature"]["partners"]:
-            partner["steric"]["class"] = "crowded"
-            partner["electronic"]["class"] = "electron_poor"
+            partner["reactivity_profile"] = _aromatic_profile(
+                access="severe",
+                electronic="electron_poor",
+            )
 
     level, pool, trace = retrieve_generic_pool_with_trace(
         query,
@@ -512,13 +542,28 @@ def test_recommendation_result_preserves_structured_query_context() -> None:
     assert result.reaction_label == "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
     assert result.reaction_label_status == "exact_product"
     assert result.spectator_groups[0]["group_id"] == "nitrile"
-    assert result.reaction_partners[0]["steric"]["class"] == "open"
-    assert result.reaction_partners[0]["electronic"]["class"] == "neutral"
+    assert (
+        result.reaction_partners[0]["reactivity_profile"]["steric"][
+            "accessibility_class"
+        ]
+        == "open"
+    )
+    assert (
+        result.reaction_partners[0]["reactivity_profile"]["electronic"][
+            "activation_class"
+        ]
+        == "balanced"
+    )
     hit_context = result.recommendations[0].precedent_reaction_contexts[0]
     assert hit_context["reaction_label"] == "Precedent reaction 1"
     assert hit_context["reaction_label_status"] == "exact_product"
     assert hit_context["spectator_groups"][0]["group_id"] == "ether"
-    assert hit_context["reaction_partners"][0]["steric"]["class"] == "open"
+    assert (
+        hit_context["reaction_partners"][0]["reactivity_profile"]["steric"][
+            "accessibility_class"
+        ]
+        == "open"
+    )
 
 
 def test_inferred_correspondence_precedent_discloses_review_caution() -> None:
@@ -718,7 +763,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "1.8"
+    assert result.schema_version == "2.0"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")

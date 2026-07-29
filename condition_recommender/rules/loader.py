@@ -60,12 +60,19 @@ _PARTNER_KEYS = {
     "retained_contexts_all",
     "retained_contexts_allowed",
     "availability_any",
-    "steric_classes_any",
-    "electronic_classes_any",
-    "ortho_substituent_count_min",
-    "ortho_substituent_count_max",
+    "ortho_occupancy_min",
+    "ortho_occupancy_max",
     "alpha_branched_group_count_min",
     "alpha_branched_group_count_max",
+    "context_kinds_any",
+    "ring_families_any",
+    "steric_accessibility_any",
+    "ortho_burden_classes_any",
+    "electronic_axes_any",
+    "alkyl_substitutions_any",
+    "beta_hydrogen_statuses_any",
+    "lone_pair_availability_any",
+    "reactivity_modifiers_any",
 }
 _SELECTION_KEYS = {"group", "tier", "priority"}
 _RECOMMENDATION_KEYS = {"recipe_template_id"}
@@ -78,21 +85,32 @@ _ALLOWED_EVIDENCE_QUALITIES = {
     "validated_atom_mapping",
 }
 _ALLOWED_REACTION_SCOPES = {"intermolecular", "intramolecular", "mixed"}
-_ALLOWED_STERIC_CLASSES = {
-    "open",
-    "ortho_substituted",
-    "ortho_hindered",
-    "primary",
-    "secondary",
-    "tertiary",
-    "unclassified",
+_ALLOWED_CONTEXT_KINDS = {
+    "aromatic",
+    "alkyl",
+    "alkenyl",
+    "alkynyl",
+    "acyl",
+    "sulfonyl",
+    "phosphoryl",
+    "heteroatom",
+    "other",
 }
-_ALLOWED_ELECTRONIC_CLASSES = {
-    "electron_poor",
-    "neutral",
-    "electron_rich",
-    "unclassified",
+_ALLOWED_ACCESSIBILITY = {"open", "moderate", "hindered", "severe"}
+_ALLOWED_BURDEN = {"none", "low", "medium", "high"}
+_ALLOWED_ELECTRONIC_AXES = {
+    "electronic_demand",
+    "center_polarization",
+    "pi_polarization",
+    "carbonyl_activation",
+    "sulfur_center_activation",
+    "phosphorus_center_activation",
+    "lone_pair_availability",
+    "local_electronic_influence",
 }
+_ALLOWED_ALKYL_SUBSTITUTIONS = {"methyl", "primary", "secondary", "tertiary"}
+_ALLOWED_BINARY_STATUS = {"present", "absent"}
+_ALLOWED_LONE_PAIR_AVAILABILITY = {"high", "medium", "low"}
 
 
 def _tuple_strings(values: Iterable[Any]) -> Tuple[str, ...]:
@@ -131,21 +149,15 @@ def _partner(payload: Mapping[str, Any]) -> PartnerConstraint:
             payload.get("retained_contexts_allowed") or ()
         ),
         availability_any=_tuple_strings(payload.get("availability_any") or ()),
-        steric_classes_any=_tuple_strings(
-            payload.get("steric_classes_any") or ()
-        ),
-        electronic_classes_any=_tuple_strings(
-            payload.get("electronic_classes_any") or ()
-        ),
-        ortho_substituent_count_min=int(
-            payload["ortho_substituent_count_min"]
+        ortho_occupancy_min=int(
+            payload["ortho_occupancy_min"]
         )
-        if payload.get("ortho_substituent_count_min") is not None
+        if payload.get("ortho_occupancy_min") is not None
         else None,
-        ortho_substituent_count_max=int(
-            payload["ortho_substituent_count_max"]
+        ortho_occupancy_max=int(
+            payload["ortho_occupancy_max"]
         )
-        if payload.get("ortho_substituent_count_max") is not None
+        if payload.get("ortho_occupancy_max") is not None
         else None,
         alpha_branched_group_count_min=int(
             payload["alpha_branched_group_count_min"]
@@ -157,6 +169,33 @@ def _partner(payload: Mapping[str, Any]) -> PartnerConstraint:
         )
         if payload.get("alpha_branched_group_count_max") is not None
         else None,
+        context_kinds_any=_tuple_strings(
+            payload.get("context_kinds_any") or ()
+        ),
+        ring_families_any=_tuple_strings(
+            payload.get("ring_families_any") or ()
+        ),
+        steric_accessibility_any=_tuple_strings(
+            payload.get("steric_accessibility_any") or ()
+        ),
+        ortho_burden_classes_any=_tuple_strings(
+            payload.get("ortho_burden_classes_any") or ()
+        ),
+        electronic_axes_any=_tuple_strings(
+            payload.get("electronic_axes_any") or ()
+        ),
+        alkyl_substitutions_any=_tuple_strings(
+            payload.get("alkyl_substitutions_any") or ()
+        ),
+        beta_hydrogen_statuses_any=_tuple_strings(
+            payload.get("beta_hydrogen_statuses_any") or ()
+        ),
+        lone_pair_availability_any=_tuple_strings(
+            payload.get("lone_pair_availability_any") or ()
+        ),
+        reactivity_modifiers_any=_tuple_strings(
+            payload.get("reactivity_modifiers_any") or ()
+        ),
     )
 
 
@@ -208,7 +247,7 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
     for key in _unknown_keys(payload, _ROOT_KEYS):
         errors.append(f"unknown_root_key:{key}")
     schema_version = str(payload.get("schema_version") or "")
-    if schema_version != "1.2":
+    if schema_version != "2.0":
         errors.append(f"unsupported_schema_version:{schema_version}")
     if not str(payload.get("definition_id") or ""):
         errors.append("missing_definition_id")
@@ -393,24 +432,63 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
                         and minimum > maximum
                     ):
                         errors.append(f"{partner_prefix}:invalid_h_count_range")
-                    for value in partner.get("steric_classes_any") or ():
-                        if str(value) not in _ALLOWED_STERIC_CLASSES:
-                            errors.append(
-                                f"{partner_prefix}:"
-                                f"unknown_steric_class:{value}"
-                            )
-                    for value in partner.get("electronic_classes_any") or ():
-                        if str(value) not in _ALLOWED_ELECTRONIC_CLASSES:
-                            errors.append(
-                                f"{partner_prefix}:"
-                                f"unknown_electronic_class:{value}"
-                            )
-                    ortho_minimum = partner.get(
-                        "ortho_substituent_count_min"
+                    vocabulary_checks = (
+                        (
+                            "context_kinds_any",
+                            _ALLOWED_CONTEXT_KINDS,
+                            "unknown_context_kind",
+                        ),
+                        (
+                            "steric_accessibility_any",
+                            _ALLOWED_ACCESSIBILITY,
+                            "unknown_steric_accessibility",
+                        ),
+                        (
+                            "ortho_burden_classes_any",
+                            _ALLOWED_BURDEN,
+                            "unknown_ortho_burden",
+                        ),
+                        (
+                            "electronic_axes_any",
+                            _ALLOWED_ELECTRONIC_AXES,
+                            "unknown_electronic_axis",
+                        ),
+                        (
+                            "alkyl_substitutions_any",
+                            _ALLOWED_ALKYL_SUBSTITUTIONS,
+                            "unknown_alkyl_substitution",
+                        ),
+                        (
+                            "beta_hydrogen_statuses_any",
+                            _ALLOWED_BINARY_STATUS,
+                            "unknown_beta_hydrogen_status",
+                        ),
+                        (
+                            "lone_pair_availability_any",
+                            _ALLOWED_LONE_PAIR_AVAILABILITY,
+                            "unknown_lone_pair_availability",
+                        ),
                     )
-                    ortho_maximum = partner.get(
-                        "ortho_substituent_count_max"
-                    )
+                    for key, allowed_values, error_id in vocabulary_checks:
+                        for value in partner.get(key) or ():
+                            if str(value) not in allowed_values:
+                                errors.append(
+                                    f"{partner_prefix}:{error_id}:{value}"
+                                )
+                    for value in partner.get("ring_families_any") or ():
+                        if not str(value).strip():
+                            errors.append(
+                                f"{partner_prefix}:empty_ring_family"
+                            )
+                    for value in partner.get("reactivity_modifiers_any") or ():
+                        text = str(value)
+                        if ":" not in text or not all(text.split(":", 1)):
+                            errors.append(
+                                f"{partner_prefix}:invalid_reactivity_modifier:"
+                                f"{value}"
+                            )
+                    ortho_minimum = partner.get("ortho_occupancy_min")
+                    ortho_maximum = partner.get("ortho_occupancy_max")
                     ortho_minimum_valid = ortho_minimum is None or (
                         isinstance(ortho_minimum, int)
                         and not isinstance(ortho_minimum, bool)
@@ -422,22 +500,22 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
                     if not ortho_minimum_valid:
                         errors.append(
                             f"{partner_prefix}:"
-                            "ortho_substituent_count_min_must_be_integer"
+                            "ortho_occupancy_min_must_be_integer"
                         )
                     elif ortho_minimum is not None and ortho_minimum < 0:
                         errors.append(
                             f"{partner_prefix}:"
-                            "negative_ortho_substituent_count_min"
+                            "negative_ortho_occupancy_min"
                         )
                     if not ortho_maximum_valid:
                         errors.append(
                             f"{partner_prefix}:"
-                            "ortho_substituent_count_max_must_be_integer"
+                            "ortho_occupancy_max_must_be_integer"
                         )
                     elif ortho_maximum is not None and ortho_maximum < 0:
                         errors.append(
                             f"{partner_prefix}:"
-                            "negative_ortho_substituent_count_max"
+                            "negative_ortho_occupancy_max"
                         )
                     if (
                         ortho_minimum_valid
@@ -448,7 +526,7 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
                     ):
                         errors.append(
                             f"{partner_prefix}:"
-                            "invalid_ortho_substituent_count_range"
+                            "invalid_ortho_occupancy_range"
                         )
                     alpha_minimum = partner.get(
                         "alpha_branched_group_count_min"

@@ -1,6 +1,6 @@
 {
-  "schema_version": "2.0",
-  "taxonomy_version": "2.0",
+  "schema_version": "3.0",
+  "taxonomy_version": "3.0",
   "identity_definitions": [
     "site_patterns.v2.json",
     "context_facets.v2.json",
@@ -8,7 +8,9 @@
     "reaction_grammars.v2.json",
     "connectivity_rewrites.v2.json",
     "descriptor_rules.v1.json",
-    "signature_features.v2.json"
+    "reactivity_descriptor_rules.v1.json",
+    "aromatic_systems.v1.json",
+    "signature_features.v3.json"
   ],
   "annotation_definitions": [
     "functional_groups.v1.json",
@@ -16,6 +18,7 @@
     "reaction_label_rendering.v1.json",
     "reaction_rendering.v1.json",
     "rendering.v1.json",
+    "reactivity_rendering.v1.json",
     "source_label_crosswalk.v1.json"
   ]
 }

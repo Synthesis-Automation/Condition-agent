@@ -10,7 +10,11 @@ def test_functional_groups_and_site_environments_are_public() -> None:
         environment for environment in result.site_environments
         if environment.site_id == next(site.site_id for site in result.sites if site.site_type == "leaving_group")
     )
-    assert leaving_environment.steric["method"] == "graph_local_v1"
+    assert leaving_environment.reactivity_profile is not None
+    assert (
+        leaving_environment.reactivity_profile.steric.evidence.method
+        == "aromatic_steric_graph_v1"
+    )
     assert any(group["group_id"] == "nitrile" for group in leaving_environment.nearby_groups)
 
 
@@ -199,8 +203,11 @@ def test_suzuki_site_descriptors_distinguish_ortho_bulk_and_electronics() -> Non
     result = featurize_molecule("Brc1c(C)cccc1C#N")
     leaving_site = next(site for site in result.sites if site.site_type == "leaving_group")
     environment = next(item for item in result.site_environments if item.site_id == leaving_site.site_id)
-    assert environment.steric["ortho_substituent_count"] >= 1
-    assert environment.electronic["class"] == "electron_poor"
+    profile = environment.reactivity_profile
+    assert profile is not None
+    assert profile.context.ortho_occupancy_count == 2
+    assert profile.context.ortho_burden_class == "high"
+    assert profile.electronic.activation_class == "slightly_poor"
 
 
 def test_alkyl_attachment_sterics_are_distinct_from_amine_substitution() -> None:
@@ -214,14 +221,29 @@ def test_alkyl_attachment_sterics_are_distinct_from_amine_substitution() -> None
         result = featurize_molecule(smiles)
         site = next(item for item in result.sites if item.site_type == "pronucleophile_XH")
         environment = next(item for item in result.site_environments if item.site_id == site.site_id)
-        assert environment.steric["center_substitution_class"] == "primary"
-        alkyl = next(group for group in environment.steric["attached_groups"] if group["context"] == "Alkyl")
-        assert alkyl["attachment_carbon_class"] == expected
+        profile = environment.reactivity_profile
+        assert profile is not None
+        assert profile.reactive_center.substitution_class == "primary"
+        alkyl = next(
+            group
+            for group in profile.context.attached_groups
+            if group.context == "Alkyl"
+        )
+        assert alkyl.attachment_carbon_class == expected
 
-    tert_butyl = featurize_molecule("CC(C)(C)N").site_environments[0].steric["attached_groups"][0]
-    assert tert_butyl["alpha_branched"] is True
+    tert_butyl_profile = (
+        featurize_molecule("CC(C)(C)N")
+        .site_environments[0]
+        .reactivity_profile
+    )
+    assert tert_butyl_profile is not None
+    assert tert_butyl_profile.context.attached_groups[0].alpha_branched is True
 
 
 def test_nitrogen_substitution_class_does_not_count_sulfur_as_carbon() -> None:
     environment = featurize_molecule("CS(=O)(=O)NC").site_environments[0]
-    assert environment.steric["center_substitution_class"] == "secondary"
+    assert environment.reactivity_profile is not None
+    assert (
+        environment.reactivity_profile.reactive_center.substitution_class
+        == "secondary"
+    )

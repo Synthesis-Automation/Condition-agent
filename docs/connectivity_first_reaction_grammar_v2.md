@@ -8,6 +8,11 @@ V2 is a clean chemistry-contract cutover. It does not retain the v1 reaction
 operator path, shadow execution, parity routing, or authority flags. The
 molecular graph and the emitted connectivity rewrite are the source of truth.
 
+V2 has since been superseded for environment identity by the context-aware
+profile activation. The connectivity model remains current, while signatures
+now use schema `3.0`, the `RS3` namespace, `signature_features.v3.json`, and
+`taxonomy_manifest.v3.json`.
+
 ## Core model
 
 The base reaction description is:
@@ -143,10 +148,11 @@ The public rewrite result is `RewriteOutcome`, and candidates store
 
 ## Signature and converter versions
 
-- reaction signature schema: `2.0`;
-- signature identifier namespace: `RS2`;
-- recommendation record schema: `3.0`;
-- generic converter definition: `generic_conversion.v2.0`.
+- historical V2 reaction signature schema: `2.0`;
+- historical identifier namespace: `RS2`;
+- current reaction signature schema and namespace: `3.0` / `RS3`;
+- current recommendation record schema: `3.1`;
+- current generic converter definition: `generic_conversion.v2.1`.
 
 Old artifacts are intentionally rejected by the v2 index validation rather
 than silently mixed with new chemistry identities. They should be reconverted

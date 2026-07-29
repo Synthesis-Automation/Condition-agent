@@ -10,10 +10,12 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 
+from reactive_taxonomy import render_reactivity_profile
+
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "1.6"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.0"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -42,7 +44,7 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "admission_reasons",
     "warnings",
     "spectators",
-    "steric_electronic_factors",
+    "reactivity_profile",
 )
 
 _SUBSCRIPT_TRANSLATION = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
@@ -136,47 +138,6 @@ def _partner_label(partner: Mapping[str, Any]) -> str:
     return f"P{component} ({chemist_label})" if chemist_label else f"P{component}"
 
 
-def _steric_summary(steric: Mapping[str, Any]) -> str:
-    steric_class = _readable_token(steric.get("class"))
-    center_class = _readable_token(steric.get("center_substitution_class"))
-    values = []
-    if center_class and center_class == steric_class:
-        values.append(f"{center_class} N center")
-    else:
-        if steric_class:
-            values.append(steric_class)
-        if center_class:
-            values.append(f"{center_class} N center")
-    ortho_count = steric.get("ortho_substituent_count")
-    if ortho_count:
-        values.append(f"ortho={int(ortho_count)}")
-    attached = []
-    for group in steric.get("attached_groups") or ():
-        if not isinstance(group, Mapping):
-            continue
-        context = _readable_token(group.get("context")) or "group"
-        attachment_class = _readable_token(
-            group.get("attachment_carbon_class")
-        )
-        if attachment_class:
-            text = f"{context} α-C {attachment_class}"
-            if group.get("alpha_branched"):
-                text += ", branched"
-        else:
-            text = context
-        attached.append(text)
-    values.extend(sorted(set(attached)))
-    return ", ".join(values) or "unclassified"
-
-
-def _electronic_summary(electronic: Mapping[str, Any]) -> str:
-    electronic_class = _readable_token(electronic.get("class"))
-    qualitative_sum = electronic.get("qualitative_sum")
-    if qualitative_sum is None:
-        return electronic_class or "unclassified"
-    return f"{electronic_class or 'unclassified'} (q={float(qualitative_sum):+.2f})"
-
-
 def _partner_environment_summary(signature: Mapping[str, Any]) -> str:
     values = []
     partners = sorted(
@@ -192,18 +153,12 @@ def _partner_environment_summary(signature: Mapping[str, Any]) -> str:
         ),
     )
     for partner in partners:
-        steric = partner.get("steric")
-        electronic = partner.get("electronic")
-        steric_value = steric if isinstance(steric, Mapping) else {}
-        electronic_value = (
-            electronic if isinstance(electronic, Mapping) else {}
-        )
-        if not steric_value and not electronic_value:
+        profile = partner.get("reactivity_profile")
+        if not isinstance(profile, Mapping):
             continue
         values.append(
             f"{_partner_label(partner)}: "
-            f"S={_steric_summary(steric_value)}; "
-            f"E={_electronic_summary(electronic_value)}"
+            f"{render_reactivity_profile(profile)}"
         )
     return " | ".join(values)
 
@@ -357,7 +312,7 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         ),
         "warnings": "; ".join(warnings),
         "spectators": _spectator_summary(signature_value),
-        "steric_electronic_factors": _partner_environment_summary(
+        "reactivity_profile": _partner_environment_summary(
             signature_value
         ),
     }

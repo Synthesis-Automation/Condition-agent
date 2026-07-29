@@ -85,14 +85,20 @@ def build_reaction_family_environment(
         flags: List[str] = []
         anchor_context = reference.details.get("anchor_context")
         handle_token = reference.details.get("handle_token")
-        steric = dict(environment.steric) if environment else {}
-        electronic = dict(environment.electronic) if environment else {}
+        profile = environment.reactivity_profile if environment else None
         if anchor_context == "HeteroAr":
             flags.append("heteroaryl_partner")
-        if steric.get("class") in {"ortho_hindered", "tertiary"}:
+        if (
+            profile is not None
+            and profile.steric.accessibility_class in {"hindered", "severe"}
+        ):
             flags.append("sterically_hindered")
-        if electronic.get("class") in {"electron_poor", "electron_rich"}:
-            flags.append(str(electronic["class"]))
+        if (
+            profile is not None
+            and profile.electronic.activation_class
+            in {"electron_poor", "electron_rich"}
+        ):
+            flags.append(str(profile.electronic.activation_class))
         if competing:
             flags.append("competing_reactive_handle")
         if coordination:
@@ -115,14 +121,15 @@ def build_reaction_family_environment(
             handle_token=str(handle_token) if handle_token else None,
             anchor_context=str(anchor_context) if anchor_context else None,
             chemist_label=reference.chemist_label,
-            steric=steric,
-            electronic=electronic,
             nearby_groups=environment.nearby_groups if environment else (),
             spectator_group_ids=_unique(group.group_id for group in role_spectators),
             competing_site_labels=_unique(competing),
             coordination_group_ids=coordination,
             unprotected_xh_group_ids=unprotected_xh,
             flags=_unique(flags),
+            reactivity_profile=(
+                environment.reactivity_profile if environment else None
+            ),
         ))
     return ReactionFamilyEnvironment(
         family_id=family_id,
@@ -182,12 +189,13 @@ def _build_cn_environment(
             handle_token=str(handle_token) if handle_token else None,
             anchor_context=str(anchor_context) if anchor_context else None,
             chemist_label=reference.chemist_label,
-            steric=dict(environment.steric) if environment else {},
-            electronic=dict(environment.electronic) if environment else {},
             nearby_groups=environment.nearby_groups if environment else (),
             spectator_group_ids=_unique(group.group_id for group in role_spectators),
             competing_site_labels=_unique(competing), coordination_group_ids=coordination,
             flags=_unique(flags), features=features,
+            reactivity_profile=(
+                environment.reactivity_profile if environment else None
+            ),
         ))
     return ReactionFamilyEnvironment(
         family_id="c_n_coupling", partners=tuple(partners), flags=_unique(family_flags),
@@ -238,11 +246,12 @@ def _build_heteroatom_environment(
             handle_token=str(handle_token) if handle_token else None,
             anchor_context=str(anchor_context) if anchor_context else None,
             chemist_label=reference.chemist_label,
-            steric=dict(environment.steric) if environment else {},
-            electronic=dict(environment.electronic) if environment else {},
             nearby_groups=environment.nearby_groups if environment else (),
             spectator_group_ids=_unique(group.group_id for group in role_spectators),
             competing_site_labels=_unique(competing), flags=_unique(flags), features=features,
+            reactivity_profile=(
+                environment.reactivity_profile if environment else None
+            ),
         ))
     return ReactionFamilyEnvironment(
         family_id=family_id, partners=tuple(partners), flags=_unique(family_flags), evidence=evidence_quality,

@@ -16,7 +16,7 @@ def test_clean_pd_sp2_cn_rules_load_with_explicit_fallback() -> None:
     rule_set = load_condition_rule_set()
 
     assert rule_set.definition_id == "pd_sp2_cn_condition_rules.v1"
-    assert rule_set.schema_version == "1.2"
+    assert rule_set.schema_version == "2.0"
     assert (
         rule_set.selection_mode
         == "first_nonempty_tier_highest_priority"
@@ -101,11 +101,11 @@ def test_rule_validation_reports_malformed_h_count_without_raising() -> None:
 def test_rule_validation_rejects_unknown_environment_vocabulary() -> None:
     payload = _payload()
     payload["rules"][0]["match"]["partner_constraints"][0][
-        "steric_classes_any"
+        "steric_accessibility_any"
     ] = ["super_hindered"]
 
     assert any(
-        "unknown_steric_class:super_hindered" in error
+        "unknown_steric_accessibility:super_hindered" in error
         for error in validate_condition_rule_payload(payload)
     )
 

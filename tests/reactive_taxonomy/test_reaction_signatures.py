@@ -55,25 +55,27 @@ def test_signature_contains_versioned_hierarchical_keys() -> None:
     signature = result.reaction_signature
 
     assert signature is not None
-    assert signature.signature_id.startswith("RS2:")
+    assert signature.signature_id.startswith("RS3:")
     assert signature.exact_signature_key.startswith("L0:")
     assert signature.handle_signature_key.startswith("L1:")
     assert signature.transformation_signature_key.startswith("L2:")
     assert signature.bond_edit_signature_key.startswith("L3:")
     assert signature.environment_signature_key.startswith("L4:")
-    assert "signature_features.v2.json" in signature.definition_versions
+    assert "signature_features.v3.json" in signature.definition_versions
+    assert "reactivity_descriptor_rules.v1.json" in signature.definition_versions
 
 
-def test_signature_partners_retain_context_steric_and_electronic_analysis() -> None:
+def test_signature_partners_retain_typed_reactivity_profiles() -> None:
     cases = {
-        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1": ("Ar", "open", "neutral"),
+        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1": ("Ar", "aromatic", "open", "balanced"),
         "Brc1ccccn1.Nc1ccccc1>>c1ccc(Nc2ccccn2)cc1": (
             "HeteroAr",
+            "aromatic",
             "open",
             "electron_poor",
         ),
-        "CCBr.Nc1ccccc1>>CCNc1ccccc1": ("Alkyl", "primary", "neutral"),
-        "CC(C)Br.N>>CC(C)N": ("Alkyl", "secondary", "neutral"),
+        "CCBr.Nc1ccccc1>>CCNc1ccccc1": ("Alkyl", "alkyl", "open", "balanced"),
+        "CC(C)Br.N>>CC(C)N": ("Alkyl", "alkyl", "hindered", "balanced"),
     }
 
     for reaction, expected in cases.items():
@@ -85,8 +87,16 @@ def test_signature_partners_retain_context_steric_and_electronic_analysis() -> N
             if partner.role == "electrophile"
         )
         assert electrophile.anchor_contexts == (expected[0],)
-        assert electrophile.steric["class"] == expected[1]
-        assert electrophile.electronic["class"] == expected[2]
+        assert electrophile.reactivity_profile is not None
+        assert electrophile.reactivity_profile.context_kind == expected[1]
+        assert (
+            electrophile.reactivity_profile.steric.accessibility_class
+            == expected[2]
+        )
+        assert (
+            electrophile.reactivity_profile.electronic.activation_class
+            == expected[3]
+        )
 
 
 def test_signature_serializes_with_analysis() -> None:
@@ -99,8 +109,8 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
         "C-H:NONE>SINGLE",
     )
-    assert payload["schema_version"] == "2.0"
-    assert payload["reaction_signature"]["schema_version"] == "2.0"
+    assert payload["schema_version"] == "3.0"
+    assert payload["reaction_signature"]["schema_version"] == "3.0"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
     )

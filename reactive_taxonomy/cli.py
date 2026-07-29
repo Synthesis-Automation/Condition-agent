@@ -10,7 +10,12 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-from . import featurize_molecule, featurize_reaction, validate_taxonomy
+from . import (
+    featurize_molecule,
+    featurize_reaction,
+    render_reactivity_profile,
+    validate_taxonomy,
+)
 
 
 _MOLECULE_SITE_TYPES = (
@@ -78,62 +83,16 @@ def _partner_value(partner: Any, name: str, default: Any = None) -> Any:
     return getattr(partner, name, default)
 
 
-def _partner_context(partner: Any) -> str:
-    """Render Ar, HeteroAr, or an alkyl substitution class for one partner."""
-    contexts = tuple(_partner_value(partner, "anchor_contexts", ()) or ())
-    if not contexts:
-        context = _partner_value(partner, "anchor_context")
-        contexts = (str(context),) if context else ()
-    steric = _partner_value(partner, "steric", {}) or {}
-    rendered = []
-    for context in contexts:
-        if context == "Alkyl":
-            substitution = str(steric.get("class") or "unclassified")
-            rendered.append(f"R-{substitution}")
-        else:
-            rendered.append(str(context))
-    return "/".join(rendered) or "unclassified"
-
-
-def _partner_steric_summary(partner: Any) -> str:
-    steric = _partner_value(partner, "steric", {}) or {}
-    details = []
-    if steric.get("center_substitution_class"):
-        details.append(f"{steric['center_substitution_class']} center")
-    ortho_count = steric.get("ortho_substituent_count")
-    if ortho_count:
-        details.append(f"ortho:{ortho_count}")
-    attached = steric.get("attached_groups") or ()
-    if attached:
-        groups = []
-        for group in attached:
-            context = str(group.get("context") or "group")
-            attachment_class = group.get("attachment_carbon_class")
-            groups.append(f"{attachment_class} R" if attachment_class else context)
-        details.append(f"attached:{'+'.join(groups)}")
-    steric_class = str(steric.get("class") or "unclassified")
-    if details and details[0] == f"{steric_class} center":
-        details = details[1:]
-        steric_class = f"{steric_class} center"
-    return steric_class + (f"/{'/'.join(details)}" if details else "")
-
-
-def _partner_electronic_summary(partner: Any) -> str:
-    electronic = _partner_value(partner, "electronic", {}) or {}
-    return str(electronic.get("class") or "unclassified")
-
-
 def _partner_analysis(result: Any) -> str:
-    """Render context, sterics, and electronics in one compact field."""
+    """Render canonical context-aware profiles in one compact field."""
     partners = _reaction_partners(result)
 
     def role(partner: Any) -> str:
         return str(_partner_value(partner, "role") or "unassigned")
 
     return "; ".join(
-        f"{role(partner)}={_partner_context(partner)} "
-        f"[S:{_partner_steric_summary(partner)}, "
-        f"E:{_partner_electronic_summary(partner)}]"
+        f"{role(partner)}="
+        f"{render_reactivity_profile(_partner_value(partner, 'reactivity_profile'))}"
         for partner in partners
     )
 
@@ -148,19 +107,12 @@ def _molecule_summary(result: Any) -> str:
     ]
     for site in result.sites:
         environment = (site.context_features or {}).get("environment") or {}
-        steric = (environment.get("steric") or {}).get("class", "-")
-        electronic = (environment.get("electronic") or {}).get("class", "-")
+        profile = environment.get("reactivity_profile")
         lines.append(
             f"  {site.site_id}: {site.chemist_label} [{site.site_type}; "
-            f"availability={site.availability}; steric={steric}; electronic={electronic}]"
+            f"availability={site.availability}]"
         )
-        if site.details.get("anchor_subtype") in {"benzylic", "allylic", "propargylic"}:
-            lines.append(f"    attachment context: {site.details['anchor_subtype']}")
-        attached = (environment.get("steric") or {}).get("attached_groups") or []
-        for group in attached:
-            group_class = group.get("attachment_carbon_class") or group.get("context") or "Other"
-            branching = ", alpha-branched" if group.get("alpha_branched") else ""
-            lines.append(f"    attached group: {group.get('context', 'Other')} ({group_class}{branching})")
+        lines.append(f"    profile: {render_reactivity_profile(profile)}")
     lines.append(f"functional groups: {len(result.functional_groups)}")
     for group in result.functional_groups:
         lines.append(
@@ -236,10 +188,12 @@ def _molecule_concise_summary(result: Any) -> str:
                 f"  {site.chemist_label} — {site.site_type}, {site.availability}"
             )
             environment = (site.context_features or {}).get("environment") or {}
-            attached = (environment.get("steric") or {}).get("attached_groups") or []
-            for group in attached:
-                group_class = group.get("attachment_carbon_class") or group.get("context") or "Other"
-                lines.append(f"    attached {group.get('context', 'group')}: {group_class}")
+            lines.append(
+                "    "
+                + render_reactivity_profile(
+                    environment.get("reactivity_profile")
+                )
+            )
     else:
         lines.append("Reactive sites: none")
     if result.functional_groups:
@@ -472,9 +426,8 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
             str(group.get("group_id") or "") for group in spectator_groups
         ),
         "partner_analysis": "; ".join(
-            f"{dict_role(partner)}={_partner_context(partner)} "
-            f"[S:{_partner_steric_summary(partner)}, "
-            f"E:{_partner_electronic_summary(partner)}]"
+            f"{dict_role(partner)}="
+            f"{render_reactivity_profile(partner.get('reactivity_profile'))}"
             for partner in signature_partners
         ),
         "reaction_label_status": analysis.get("reaction_label_status") or "",

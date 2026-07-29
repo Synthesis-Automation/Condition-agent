@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.0"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.0"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.1"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.1"
 
 
 class AdmissionTier(str, Enum):
@@ -243,7 +243,7 @@ class GenericRecommendationResult:
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.8"
+    schema_version: str = "2.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

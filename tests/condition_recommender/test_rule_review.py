@@ -72,7 +72,8 @@ def test_rule_review_summarizes_constraints_and_has_blank_review_fields() -> Non
     assert hindered["rule_kind"] == "structural override"
     assert "electrophile: leaving_group" in hindered["match_summary"]
     assert "Cl" in hindered["match_summary"]
-    assert "ortho >= 2" in hindered["match_summary"]
+    assert "ortho occupancy >= 2" in hindered["match_summary"]
+    assert "high" in hindered["match_summary"]
     assert "primary_amine, secondary_amine" in hindered["match_summary"]
     assert hindered["review_decision"] == ""
     assert hindered["review_notes"] == ""

@@ -163,7 +163,7 @@ def convert_datasets(
     repeated_groups = sum(count > 1 for count in canonical_groups.values())
     multi_recipe_groups = sum(len(recipes) > 1 for recipes in group_recipes.values())
     report: Dict[str, Any] = {
-        "schema_version": "1.2",
+        "schema_version": "2.0",
         "converter_version": GENERIC_CONVERTER_DEFINITION_VERSION,
         "reaction_signature_schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
         "dataset_path": str(Path(dataset_path)),

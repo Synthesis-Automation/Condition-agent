@@ -89,8 +89,10 @@ def test_v2_definitions_cover_every_grammar_without_legacy_execution_fields() ->
         "site_interfaces.v2.json",
         "reaction_grammars.v2.json",
         "connectivity_rewrites.v2.json",
-        "signature_features.v2.json",
-        "taxonomy_manifest.v2.json",
+        "reactivity_descriptor_rules.v1.json",
+        "aromatic_systems.v1.json",
+        "signature_features.v3.json",
+        "taxonomy_manifest.v3.json",
     } <= set(versions)
     assert all("@sha256:" in value for key, value in versions.items() if key.endswith(".json"))
 
@@ -228,8 +230,8 @@ def test_v2_rewrite_corpus_reconstructs_the_observed_product(
         "validated_mapping_and_reconstruction",
     }
     assert analysis.reaction_signature is not None
-    assert analysis.reaction_signature.schema_version == "2.0"
-    assert analysis.reaction_signature.signature_id.startswith("RS2:")
+    assert analysis.reaction_signature.schema_version == "3.0"
+    assert analysis.reaction_signature.signature_id.startswith("RS3:")
 
 
 @pytest.mark.parametrize(

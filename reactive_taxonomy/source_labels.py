@@ -145,21 +145,30 @@ def validate_source_label_mappings() -> list[str]:
         site, environment = matches[0]
         if site.chemist_label != mapping.base_label:
             errors.append(f"{source}:base_label")
-        steric: Dict[str, Any] = dict(environment.steric)
+        profile = environment.reactivity_profile
+        center_class = (
+            profile.reactive_center.substitution_class
+            if profile is not None
+            else None
+        )
         if (
             mapping.center_substitution_class
-            and steric.get("center_substitution_class")
-            != mapping.center_substitution_class
+            and center_class != mapping.center_substitution_class
         ):
             errors.append(f"{source}:center_substitution_class")
-        attached = list(steric.get("attached_groups") or [])
+        attached = (
+            tuple(profile.context.attached_groups)
+            if profile is not None
+            and profile.context_kind == "heteroatom"
+            else ()
+        )
         if mapping.attachment_carbon_class and not any(
-            item.get("attachment_carbon_class") == mapping.attachment_carbon_class
+            item.attachment_carbon_class == mapping.attachment_carbon_class
             for item in attached
         ):
             errors.append(f"{source}:attachment_carbon_class")
         if mapping.alpha_branched is not None and not any(
-            item.get("alpha_branched") is mapping.alpha_branched for item in attached
+            item.alpha_branched is mapping.alpha_branched for item in attached
         ):
             errors.append(f"{source}:alpha_branched")
         if mapping.mapping_status == "qualified" and not mapping.qualifier_scope:

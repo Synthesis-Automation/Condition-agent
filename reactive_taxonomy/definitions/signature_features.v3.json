@@ -1,0 +1,40 @@
+{
+  "schema_version": "3.0",
+  "signature_schema_version": "3.0",
+  "environment_feature_contract": "typed_reactivity_profile.v1",
+  "continuous_scores_in_identity": false,
+  "levels": {
+    "L0": [
+      "edit_topology",
+      "stereochemistry",
+      "reaction_events",
+      "reaction_topology",
+      "handles",
+      "anchor_contexts",
+      "reactivity_profile_tokens"
+    ],
+    "L1": [
+      "edit_topology",
+      "stereochemistry",
+      "reaction_events",
+      "reaction_topology",
+      "handles"
+    ],
+    "L2": [
+      "bond_changes",
+      "hydrogen_changes",
+      "reaction_events",
+      "reaction_topology",
+      "transformation_class"
+    ],
+    "L3": [
+      "bond_changes",
+      "hydrogen_changes"
+    ],
+    "L4": [
+      "reactivity_profile_tokens",
+      "nearby_groups",
+      "spectator_groups"
+    ]
+  }
+}

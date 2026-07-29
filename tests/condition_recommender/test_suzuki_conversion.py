@@ -44,7 +44,7 @@ def test_exact_suzuki_with_complete_conditions_is_verified() -> None:
     assert record.product_connection["concise_label"] == "Ar1–Ar2"
     assert record.conditions.complete
     assert record.reaction_signature is not None
-    assert record.reaction_signature["signature_id"].startswith("RS2:")
+    assert record.reaction_signature["signature_id"].startswith("RS3:")
     assert record.transformation_class == "c_c_transfer_coupling"
     assert record.transformation_confidence == 1.0
     flat = flatten_record(record)
@@ -107,5 +107,5 @@ def test_convert_file_writes_three_tiers_and_report(tmp_path) -> None:
         encoding="utf-8-sig", newline=""
     ) as handle:
         verified = next(csv.DictReader(handle))
-    assert verified["reaction_signature_id"].startswith("RS2:")
+    assert verified["reaction_signature_id"].startswith("RS3:")
     assert verified["signature_l3_bond_edit"].startswith("L3:")

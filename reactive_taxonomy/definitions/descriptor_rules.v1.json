@@ -1,14 +1,7 @@
 {
   "schema_version": "1.0",
   "site_environment": {
-    "local_group_radius": 3,
-    "steric_radius": 2,
-    "electronic_threshold": 0.35,
-    "electronic_tag_weights": {
-      "electron_withdrawing": 1.0,
-      "basic": -0.35,
-      "nucleophilic": -0.25
-    }
+    "local_group_radius": 3
   },
   "reaction_families": {
     "suzuki_miyaura": {

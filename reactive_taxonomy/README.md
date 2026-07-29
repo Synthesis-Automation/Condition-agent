@@ -273,8 +273,8 @@ standard evaluation artifacts, it writes
 counts, compatibility parity, unsupported bond domains, and canonicalization
 overflow.
 
-Use concise mode for a chemist-readable view containing the primary labels,
-partner context, and local steric and electronic analyses:
+Use concise mode for a chemist-readable view containing the primary labels and
+the shared context-aware reactivity profile:
 
 ```powershell
 python -m reactive_taxonomy.cli molecule "Brc1ccc(N)cc1C#N" --concise
@@ -291,13 +291,20 @@ substitution at the reactive center from attachment-carbon sterics. For
 example, tert-butylamine remains a primary amine (`R–NH2`) but its attached
 alkyl group is reported as `tertiary` and alpha-branched.
 
-Reaction partner contexts retain `Ar` and `HeteroAr` explicitly. Alkyl
-electrophiles are rendered as `R (methyl)`, `R (primary)`, `R (secondary)`, or
-`R (tertiary)` from the reactive carbon's graph-local substitution. Concise
-reaction CSV exports combine these descriptors in one compact
-`partner_analysis` column, for example `electrophile=Ar [S:open, E:neutral]`.
-This remains a readable projection of the structured
-`reaction_signature.partners` descriptors.
+Reaction partner contexts retain generic `Ar` and `HeteroAr` handle context,
+while the nested profile records the actual aromatic family, ring sizes,
+fusion, anchor-relative heteroatoms, ortho occupancy and burden, and
+context-specific electronic-demand evidence. Alkyl profiles report
+methyl/primary/secondary/tertiary identity, branching, cyclicity,
+benzylic/allylic/propargylic activation, and beta-H status. Heteroatom profiles
+separate N/O/S/P identity from attached-group burden and lone-pair
+availability. GUI, CLI, concise review, condition rules, signature tokens, and
+retrieval all consume this same typed record.
+
+Compact output omits atom indices, raw graph-shell counts, methods, and scores.
+Expanded rendering retains scores, contributors, confidence, and provenance.
+Reaction signatures use stable categorical profile tokens under schema `3.0`
+and the `RS3` namespace; raw scores and display labels do not enter identity.
 
 Unsaturated-bond labels expose endpoint substitution rather than collapsing all
 sites to `C=C` or `C≡C`. Examples include `H2C=CH2`, `H2C=CHR1`,

@@ -13,6 +13,7 @@ from reactive_taxonomy import featurize_reaction
 
 from ..condition_normalization import normalize_conditions, optional_float
 from ..models import AdmissionTier, RecommendationRecord
+from .profile_fields import profile_classes
 from .signature_serialization import flattened_signature_fields, signature_record_fields
 
 
@@ -121,6 +122,10 @@ def _partner(record: RecommendationRecord, role: str) -> Dict[str, Any]:
 def flatten_record(record: RecommendationRecord) -> Dict[str, Any]:
     electrophile = _partner(record, "electrophile")
     transfer = _partner(record, "transfer_partner")
+    electrophile_steric, electrophile_electronic = profile_classes(
+        electrophile
+    )
+    transfer_steric, transfer_electronic = profile_classes(transfer)
     def joined(values: Iterable[Any]) -> str:
         return "|".join(str(value) for value in values)
     return {
@@ -145,14 +150,14 @@ def flatten_record(record: RecommendationRecord) -> Dict[str, Any]:
         "electrophile_label": electrophile.get("chemist_label", ""),
         "electrophile_context": electrophile.get("anchor_context", ""),
         "electrophile_handle": electrophile.get("handle_token", ""),
-        "electrophile_steric_class": (electrophile.get("steric") or {}).get("class", ""),
-        "electrophile_electronic_class": (electrophile.get("electronic") or {}).get("class", ""),
+        "electrophile_steric_class": electrophile_steric,
+        "electrophile_electronic_class": electrophile_electronic,
         "electrophile_flags": joined(electrophile.get("flags") or []),
         "transfer_label": transfer.get("chemist_label", ""),
         "transfer_context": transfer.get("anchor_context", ""),
         "transfer_handle": transfer.get("handle_token", ""),
-        "transfer_steric_class": (transfer.get("steric") or {}).get("class", ""),
-        "transfer_electronic_class": (transfer.get("electronic") or {}).get("class", ""),
+        "transfer_steric_class": transfer_steric,
+        "transfer_electronic_class": transfer_electronic,
         "transfer_flags": joined(transfer.get("flags") or []),
         "product_connection_label": (record.product_connection or {}).get("concise_label", ""),
         "product_connection_json": json.dumps(record.product_connection, ensure_ascii=False, sort_keys=True) if record.product_connection else "",

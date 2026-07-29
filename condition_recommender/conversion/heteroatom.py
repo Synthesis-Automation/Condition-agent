@@ -13,6 +13,7 @@ from reactive_taxonomy import featurize_reaction
 
 from ..condition_normalization import normalize_conditions, optional_float
 from ..models import AdmissionTier, RecommendationRecord
+from .profile_fields import profile_classes
 from .signature_serialization import flattened_signature_fields, signature_record_fields
 
 _CONFIG = {
@@ -69,6 +70,9 @@ def convert_row(row: Dict[str, Any], source_row_number: int, *, element: str) ->
 def flatten_record(record: RecommendationRecord) -> Dict[str, Any]:
     environment = record.family_environment or {}; partners = {item.get("role"): item for item in environment.get("partners") or []}
     electrophile, nucleophile = partners.get("electrophile", {}), partners.get("nucleophile", {}); features = nucleophile.get("features") or {}
+    electrophile_steric, electrophile_electronic = profile_classes(
+        electrophile
+    )
     joined = lambda values: "|".join(str(value) for value in values)
     return {
         "schema_version": record.schema_version, "reaction_id": record.reaction_id, "source_row_number": record.source_row_number,
@@ -79,8 +83,8 @@ def flatten_record(record: RecommendationRecord) -> Dict[str, Any]:
         "conditions_complete": record.conditions.complete, "catalyst_cas": joined(record.conditions.catalyst_cas),
         "reagent_cas": joined(record.conditions.reagent_cas), "solvent_cas": joined(record.conditions.solvent_cas),
         "electrophile_label": electrophile.get("chemist_label", ""), "electrophile_context": electrophile.get("anchor_context", ""),
-        "electrophile_handle": electrophile.get("handle_token", ""), "electrophile_steric_class": (electrophile.get("steric") or {}).get("class", ""),
-        "electrophile_electronic_class": (electrophile.get("electronic") or {}).get("class", ""), "electrophile_flags": joined(electrophile.get("flags") or []),
+        "electrophile_handle": electrophile.get("handle_token", ""), "electrophile_steric_class": electrophile_steric,
+        "electrophile_electronic_class": electrophile_electronic, "electrophile_flags": joined(electrophile.get("flags") or []),
         "nucleophile_label": nucleophile.get("chemist_label", ""), "nucleophile_family": features.get("derived_family", ""),
         "nucleophile_contexts": joined(features.get("retained_contexts") or []), "nucleophile_availability": features.get("availability", ""),
         "nucleophile_flags": joined(nucleophile.get("flags") or []), "product_connection_label": (record.product_connection or {}).get("concise_label", ""),

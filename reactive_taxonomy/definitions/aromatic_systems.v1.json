@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "aromatic_systems.v1",
+  "classification_method": "ring_graph_v1",
+  "monocyclic_families": {
+    "6:C6": "benzene",
+    "6:C5N1": "pyridine",
+    "6:C4N2:adjacent": "pyridazine",
+    "6:C4N2:separated": "pyrimidine",
+    "6:C4N2:opposite": "pyrazine",
+    "5:C4N1:pyrrole_like": "pyrrole",
+    "5:C4O1": "furan",
+    "5:C4S1": "thiophene",
+    "5:C3N2:adjacent": "pyrazole",
+    "5:C3N2:separated": "imidazole"
+  },
+  "fused_families": {
+    "rings2:atoms10:C10": "naphthalene",
+    "rings2:atoms9:C8N1:pyrrole_like": "indole",
+    "rings2:atoms10:C9N1:pyridine_like": "quinoline_like",
+    "rings3:atoms13:C12N1:pyrrole_like": "carbazole"
+  },
+  "fallbacks": {
+    "carbocyclic": "other_carbocyclic_aromatic",
+    "heteroaromatic": "other_heteroaromatic",
+    "mixed_fused": "ambiguous_fused_system"
+  }
+}

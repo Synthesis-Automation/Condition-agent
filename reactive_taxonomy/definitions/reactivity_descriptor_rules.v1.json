@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "reactivity_descriptor_rules.v1",
+  "profile_schema_version": "1.0",
+  "context_kinds": [
+    "aromatic",
+    "alkyl",
+    "alkenyl",
+    "alkynyl",
+    "acyl",
+    "sulfonyl",
+    "phosphoryl",
+    "heteroatom",
+    "other"
+  ],
+  "descriptor_statuses": [
+    "observed",
+    "derived",
+    "unresolved",
+    "not_applicable",
+    "not_computed"
+  ],
+  "steric": {
+    "radius": 3,
+    "distance_attenuation": {
+      "1": 1.0,
+      "2": 0.45,
+      "3": 0.2
+    },
+    "branching_weight": 0.35,
+    "ring_fusion_weight": 0.75,
+    "bins": {
+      "open": 0.22,
+      "moderate": 0.48,
+      "hindered": 0.74,
+      "severe": 1.0
+    },
+    "ortho_burden_bins": {
+      "none": 0.0,
+      "low": 0.25,
+      "medium": 0.6,
+      "high": 1.0
+    }
+  },
+  "electronic": {
+    "radius": 4,
+    "formal_charge_weight": 0.8,
+    "aromatic_heteroatom_weights": {
+      "N:pyridine_like": 0.45,
+      "N:pyrrole_like": -0.3,
+      "O:pyrrole_like": -0.35,
+      "S:pyrrole_like": -0.2,
+      "other": 0.0
+    },
+    "functional_group_tag_weights": {
+      "electron_withdrawing": 0.55,
+      "basic": -0.2,
+      "nucleophilic": -0.2
+    },
+    "bins": {
+      "electron_rich": -0.55,
+      "slightly_rich": -0.18,
+      "balanced": 0.18,
+      "slightly_poor": 0.55,
+      "electron_poor": 1.0
+    },
+    "activation_axes": {
+      "aromatic": "electronic_demand",
+      "alkyl": "center_polarization",
+      "alkenyl": "pi_polarization",
+      "alkynyl": "pi_polarization",
+      "acyl": "carbonyl_activation",
+      "sulfonyl": "sulfur_center_activation",
+      "phosphoryl": "phosphorus_center_activation",
+      "heteroatom": "lone_pair_availability",
+      "other": "local_electronic_influence"
+    }
+  },
+  "modifier_types": [
+    "leaving_group",
+    "transfer_carrier",
+    "removable_hydrogen",
+    "coordination",
+    "redox",
+    "elimination",
+    "strain",
+    "other"
+  ],
+  "signature_bins": {
+    "continuous_precision": 3,
+    "include_raw_scores": false
+  }
+}

@@ -13,6 +13,7 @@ from reactive_taxonomy import featurize_reaction
 
 from ..condition_normalization import normalize_conditions, optional_float
 from ..models import AdmissionTier, RecommendationRecord
+from .profile_fields import profile_classes
 from .signature_serialization import flattened_signature_fields, signature_record_fields
 
 
@@ -84,6 +85,9 @@ def flatten_record(record: RecommendationRecord) -> Dict[str, Any]:
     environment = record.family_environment or {}
     partners = {item.get("role"): item for item in environment.get("partners") or []}
     electrophile, nucleophile = partners.get("electrophile", {}), partners.get("nucleophile", {})
+    electrophile_steric, electrophile_electronic = profile_classes(
+        electrophile
+    )
     n_features = nucleophile.get("features") or {}
     joined = lambda values: "|".join(str(value) for value in values)
     return {
@@ -99,8 +103,8 @@ def flatten_record(record: RecommendationRecord) -> Dict[str, Any]:
         "electrophile_label": electrophile.get("chemist_label", ""),
         "electrophile_context": electrophile.get("anchor_context", ""),
         "electrophile_handle": electrophile.get("handle_token", ""),
-        "electrophile_steric_class": (electrophile.get("steric") or {}).get("class", ""),
-        "electrophile_electronic_class": (electrophile.get("electronic") or {}).get("class", ""),
+        "electrophile_steric_class": electrophile_steric,
+        "electrophile_electronic_class": electrophile_electronic,
         "electrophile_flags": joined(electrophile.get("flags") or []),
         "nucleophile_label": nucleophile.get("chemist_label", ""),
         "nucleophile_family": n_features.get("derived_family", ""),

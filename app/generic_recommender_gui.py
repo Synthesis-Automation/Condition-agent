@@ -21,6 +21,7 @@ from condition_recommender import (  # noqa: E402
     GenericConditionRecommender,
     GenericRecommendationResult,
 )
+from reactive_taxonomy import render_reactivity_profile  # noqa: E402
 from visualization import render_reaction_image_bytes  # noqa: E402
 
 _RECOMMENDER_CACHE: Dict[
@@ -117,51 +118,6 @@ def _display_name(value: Any) -> str:
     return text.replace("_", " ").title() if text else "Unassigned"
 
 
-def _steric_summary(partner: Mapping[str, Any]) -> str:
-    """Render deterministic local steric descriptors for one query partner."""
-    steric = partner.get("steric") or {}
-    if not isinstance(steric, Mapping):
-        return "unclassified"
-    parts = [str(steric.get("class") or "unclassified").replace("_", " ")]
-    center_class = str(steric.get("center_substitution_class") or "").strip()
-    if center_class and center_class != steric.get("class"):
-        parts.append(f"{center_class.replace('_', ' ')} center")
-    ortho_count = steric.get("ortho_substituent_count")
-    if ortho_count is not None:
-        parts.append(f"{ortho_count} ortho substituent(s)")
-    local_atoms = steric.get("local_heavy_atoms_r2")
-    if local_atoms is not None:
-        parts.append(f"{local_atoms} local heavy atom(s), r≤2")
-    attached = steric.get("attached_groups") or ()
-    attached_labels = []
-    for group in attached:
-        if not isinstance(group, Mapping):
-            continue
-        label = (
-            group.get("attachment_carbon_class")
-            or group.get("context")
-            or "group"
-        )
-        attached_labels.append(str(label).replace("_", " "))
-    if attached_labels:
-        parts.append(f"attached: {', '.join(attached_labels)}")
-    return ", ".join(parts)
-
-
-def _electronic_summary(partner: Mapping[str, Any]) -> str:
-    """Render deterministic local electronic descriptors for one query partner."""
-    electronic = partner.get("electronic") or {}
-    if not isinstance(electronic, Mapping):
-        return "unclassified"
-    electronic_class = str(
-        electronic.get("class") or "unclassified"
-    ).replace("_", " ")
-    qualitative_sum = electronic.get("qualitative_sum")
-    if isinstance(qualitative_sum, (int, float)):
-        return f"{electronic_class} (local score {qualitative_sum:+g})"
-    return electronic_class
-
-
 def _spectator_summary(groups: Tuple[Dict[str, Any], ...]) -> str:
     """Render unchanged spectator groups with reactant and distance context."""
     spectator_labels = []
@@ -192,21 +148,17 @@ def _spectator_summary(groups: Tuple[Dict[str, Any], ...]) -> str:
 def _partner_analysis_summaries(
     partners: Tuple[Dict[str, Any], ...],
 ) -> Tuple[str, ...]:
-    """Render local steric and electronic context for reaction partners."""
+    """Render the canonical context-aware profile for reaction partners."""
     summaries = []
     for partner in partners:
         if not isinstance(partner, Mapping):
             continue
         role = _display_name(partner.get("role"))
         chemist_label = str(partner.get("chemist_label") or "").strip()
-        contexts = partner.get("anchor_contexts") or ()
-        context = "/".join(str(value) for value in contexts if value)
-        identity = chemist_label or context or "Unclassified partner"
-        if chemist_label and context:
-            identity = f"{chemist_label} ({context})"
+        identity = chemist_label or "Unclassified partner"
         summaries.append(
-            f"{role} — {identity}: steric {_steric_summary(partner)}; "
-            f"electronic {_electronic_summary(partner)}"
+            f"{role} — {identity}: "
+            f"{render_reactivity_profile(partner.get('reactivity_profile'))}"
         )
     return tuple(summaries)
 
@@ -228,7 +180,7 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
     lines.append(f"Spectator groups: {_spectator_summary(result.spectator_groups)}")
     partner_summaries = _partner_analysis_summaries(result.reaction_partners)
     if partner_summaries:
-        lines.append("Steric/electronic analysis:")
+        lines.append("Reactivity profile:")
         lines.extend(f"  {summary}" for summary in partner_summaries)
     warnings = ", ".join(result.warnings) if result.warnings else "None"
     lines.append(
@@ -1000,7 +952,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 else "Selected hit reaction SMILES: Unavailable"
             ),
             f"Spectator groups: {_spectator_summary(spectator_groups)}",
-            "Steric/electronic analysis:",
+            "Reactivity profile:",
         ]
         if partner_summaries:
             lines.extend(f"• {summary}" for summary in partner_summaries)

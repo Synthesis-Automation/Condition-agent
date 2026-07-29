@@ -40,7 +40,7 @@ def _signature(index: int) -> dict:
     return {
         "schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
         "definition_versions": reaction_signature_definition_versions(),
-        "signature_id": f"RS2:{index}",
+        "signature_id": f"RS3:{index}",
         "exact_signature_key": f"L0:{index}",
         "handle_signature_key": "L1:shared",
         "transformation_signature_key": "L2:shared",
@@ -54,8 +54,31 @@ def _signature(index: int) -> dict:
                 "component_index": 0,
                 "handle_tokens": ["B(OH)2", "N-H"],
                 "anchor_contexts": ["Ar"],
-                "steric": {"class": "open"},
-                "electronic": {"class": "neutral"},
+                "role": "transfer_partner",
+                "reactivity_profile": {
+                    "schema_version": "1.0",
+                    "context_kind": "aromatic",
+                    "context": {
+                        "context_kind": "aromatic",
+                        "ring_family": "benzene",
+                        "ring_sizes": [6],
+                        "ortho_occupancy_count": 0,
+                        "ortho_capacity": 2,
+                        "ortho_burden_class": "none",
+                        "heteroatoms": [],
+                    },
+                    "steric": {
+                        "accessibility_class": "open",
+                        "accessibility_score": 0.0,
+                    },
+                    "electronic": {
+                        "activation_axis": "electronic_demand",
+                        "activation_class": "balanced",
+                        "activation_score": 0.0,
+                    },
+                    "reactive_center": {},
+                    "modifiers": [],
+                },
                 "nearby_groups": [],
             }
         ],
@@ -76,8 +99,8 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.0",
-        "converter_definition_version": "generic_conversion.v2.0",
+        "schema_version": "3.1",
+        "converter_definition_version": "generic_conversion.v2.1",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "chemistry_status": "verified",
@@ -115,9 +138,9 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.8"
-    assert payload["reaction_signature_schema_version"] == "2.0"
-    assert payload["record_schema_versions"] == ["3.0"]
+    assert payload["schema_version"] == "2.0"
+    assert payload["reaction_signature_schema_version"] == "3.0"
+    assert payload["record_schema_versions"] == ["3.1"]
     assert payload["maps"]["environment_features"]
     integrity = validate_generic_index_artifact(first_path)
     assert integrity["valid"]

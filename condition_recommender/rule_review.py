@@ -124,12 +124,19 @@ def _constraint_summary(constraint: PartnerConstraint) -> str:
     details.extend(constraint.retained_contexts_all)
     details.extend(constraint.retained_contexts_any)
     details.extend(constraint.availability_any)
-    details.extend(constraint.steric_classes_any)
-    details.extend(constraint.electronic_classes_any)
-    if constraint.ortho_substituent_count_min is not None:
-        details.append(f"ortho >= {constraint.ortho_substituent_count_min}")
-    if constraint.ortho_substituent_count_max is not None:
-        details.append(f"ortho <= {constraint.ortho_substituent_count_max}")
+    details.extend(constraint.context_kinds_any)
+    details.extend(constraint.ring_families_any)
+    details.extend(constraint.steric_accessibility_any)
+    details.extend(constraint.ortho_burden_classes_any)
+    details.extend(constraint.electronic_axes_any)
+    details.extend(constraint.alkyl_substitutions_any)
+    details.extend(constraint.beta_hydrogen_statuses_any)
+    details.extend(constraint.lone_pair_availability_any)
+    details.extend(constraint.reactivity_modifiers_any)
+    if constraint.ortho_occupancy_min is not None:
+        details.append(f"ortho occupancy >= {constraint.ortho_occupancy_min}")
+    if constraint.ortho_occupancy_max is not None:
+        details.append(f"ortho occupancy <= {constraint.ortho_occupancy_max}")
     if constraint.alpha_branched_group_count_min is not None:
         details.append(
             f"alpha branches >= {constraint.alpha_branched_group_count_min}"

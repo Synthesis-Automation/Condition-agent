@@ -70,6 +70,57 @@ def _environment_by_signature(result: Any) -> Dict[str, list[Any]]:
     return grouped
 
 
+def _benchmark_environment_projection(
+    environment: Any,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Project v1 benchmark expectations from the canonical typed profile."""
+    profile = environment.reactivity_profile
+    if profile is None:
+        return {}, {}
+    context = profile.context
+    if profile.context_kind == "aromatic":
+        steric_class = (
+            "ortho_hindered"
+            if context.ortho_occupancy_count >= 2
+            else "ortho_substituted"
+            if context.ortho_occupancy_count == 1
+            else "open"
+        )
+        steric = {
+            "class": steric_class,
+            "ortho_substituent_count": context.ortho_occupancy_count,
+        }
+    elif profile.context_kind == "alkyl":
+        steric = {"class": context.carbon_substitution}
+    elif profile.context_kind == "heteroatom":
+        steric = {
+            "class": profile.steric.accessibility_class,
+            "center_substitution_class": context.substitution_class,
+            "attached_groups": [
+                {
+                    "context": group.context,
+                    "attachment_carbon_class": group.attachment_carbon_class,
+                    "alpha_branched": group.alpha_branched,
+                }
+                for group in context.attached_groups
+            ],
+        }
+    else:
+        steric = {"class": profile.steric.accessibility_class}
+    activation = profile.electronic.activation_class
+    electronic_class = {
+        "electron_rich": "electron_rich",
+        "slightly_rich": "electron_rich",
+        "balanced": "neutral",
+        "slightly_poor": "electron_poor",
+        "electron_poor": "electron_poor",
+        "high": "neutral",
+        "medium": "neutral",
+        "low": "neutral",
+    }.get(activation, activation)
+    return steric, {"class": electronic_class}
+
+
 def _check_environment(
     expectation: Mapping[str, Any], grouped: Mapping[str, Sequence[Any]]
 ) -> tuple[bool, list[str]]:
@@ -80,8 +131,7 @@ def _check_environment(
     failures = []
     for environment in candidates:
         candidate_failures = []
-        steric = environment.steric or {}
-        electronic = environment.electronic or {}
+        steric, electronic = _benchmark_environment_projection(environment)
         for key, expected in (expectation.get("steric_equals") or {}).items():
             if steric.get(key) != expected:
                 candidate_failures.append(
@@ -138,15 +188,20 @@ def _feature_fingerprint(result: Any) -> Dict[str, Any]:
         environment = environments.get(site.site_id)
         if environment is None:
             continue
-        attached = tuple(
-            sorted(
-                (
-                    str(group.get("context") or ""),
-                    str(group.get("attachment_carbon_class") or ""),
-                    bool(group.get("alpha_branched")),
+        profile = environment.reactivity_profile
+        attached = (
+            tuple(
+                sorted(
+                    (
+                        group.context,
+                        str(group.attachment_carbon_class or ""),
+                        bool(group.alpha_branched),
+                    )
+                    for group in profile.context.attached_groups
                 )
-                for group in environment.steric.get("attached_groups") or ()
             )
+            if profile is not None and profile.context_kind == "heteroatom"
+            else ()
         )
         nearby = tuple(
             sorted(
@@ -154,13 +209,14 @@ def _feature_fingerprint(result: Any) -> Dict[str, Any]:
                 for group in environment.nearby_groups
             )
         )
+        steric, electronic = _benchmark_environment_projection(environment)
         environment_tokens.append(
             (
                 site.canonical_signature,
-                str(environment.steric.get("class") or ""),
-                str(environment.steric.get("center_substitution_class") or ""),
+                str(steric.get("class") or ""),
+                str(steric.get("center_substitution_class") or ""),
                 attached,
-                str(environment.electronic.get("class") or ""),
+                str(electronic.get("class") or ""),
                 nearby,
             )
         )
@@ -347,8 +403,11 @@ def evaluate_molecular_features(
         environments_summary = [
             {
                 "site_signature": site.canonical_signature,
-                "steric": environment.steric,
-                "electronic": environment.electronic,
+                "reactivity_profile": (
+                    environment.reactivity_profile.to_dict()
+                    if environment.reactivity_profile is not None
+                    else None
+                ),
                 "nearby_groups": [
                     {
                         "group_id": group.get("group_id"),

@@ -162,8 +162,7 @@ class ReactionPartner:
     handle_tokens: tuple[str, ...]
     anchor_contexts: tuple[str, ...]
     chemist_label: str
-    steric: dict[str, Any]
-    electronic: dict[str, Any]
+    reactivity_profile: SiteReactivityProfile | None
     nearby_groups: tuple[dict[str, Any], ...]
     spectator_group_ids: tuple[str, ...]
     flags: tuple[str, ...]
@@ -299,7 +298,7 @@ than presenting the precedent as topology-equivalent.
 - **L1 handle signature:** edit topology + handle families.
 - **L2 transformation signature:** formed/broken bond types + transformation class.
 - **L3 bond-edit signature:** formed/broken/order-changed atom-pair types.
-- **L4 environment signature:** local steric/electronic/group fingerprints without a family requirement.
+- **L4 environment signature:** stable categorical context-profile and nearby-group tokens without a family requirement.
 
 These keys make fallback behavior explicit and auditable.
 
@@ -427,13 +426,17 @@ For every atom participating in an edit, capture:
 - element, charge, aromaticity, hybridization, ring membership, and hydrogen count;
 - reactive handle and leaving/transfer group;
 - attachment-side context such as `Ar`, `HeteroAr`, `Alkenyl`, `Alkyl`, or `Acyl`;
-- local steric class and numerical descriptors;
-- local electronic class and interpretable contributing groups;
+- context-relative steric accessibility with auditable branch contributions;
+- a context-specific electronic activation axis with interpretable contributors;
 - nearby functional groups by graph distance;
 - coordinating, acidic, basic, oxidizable, reducible, or catalyst-poisoning flags;
 - alternative/competing reactive sites.
 
-Descriptor calculations must be mechanism-neutral at the base layer. Family-specific interpretations belong in overlays.
+Descriptor calculations must be mechanism-neutral at the base layer.
+`SiteReactivityProfile` uses a uniform envelope with typed aromatic, alkyl,
+alkenyl, alkynyl, activated-center, heteroatom, and conservative fallback
+contexts. Scores from different electronic axes are not directly comparable.
+Family-specific interpretations belong in overlays.
 
 ### 6.4 Spectator groups
 
@@ -644,8 +647,8 @@ Score remaining precedents using interpretable components:
 - edit topology similarity;
 - reactive-handle compatibility;
 - atom and attachment context;
-- local steric similarity;
-- local electronic similarity;
+- context-compatible steric accessibility similarity;
+- electronic similarity only when activation axes agree;
 - nearby functional-group similarity by distance;
 - spectator/compatibility similarity;
 - condition-regime compatibility;

@@ -9,7 +9,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Tuple
 
-from .signature_features import environment_tokens
+from .signature_features import environment_profile_similarity
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_similarity.v1.json"
 _DEFINITION_ID = "generic_similarity.v1"
@@ -215,9 +215,7 @@ def assess_signature_similarity(
             _partner_tokens(query, "anchor_contexts"),
             _partner_tokens(precedent, "anchor_contexts"),
         ),
-        "environment": jaccard(
-            environment_tokens(query), environment_tokens(precedent)
-        ),
+        "environment": environment_profile_similarity(query, precedent),
         "spectators": jaccard(
             _spectator_tokens(query), _spectator_tokens(precedent)
         ),

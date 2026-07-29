@@ -25,7 +25,7 @@ from .evaluation_features import reaction_scaffold_key, reaction_scaffold_tokens
 from .signature_features import environment_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "1.8"
+GENERIC_INDEX_SCHEMA_VERSION = "2.0"
 
 
 @dataclass(frozen=True)

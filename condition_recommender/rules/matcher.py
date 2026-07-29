@@ -32,21 +32,31 @@ def _partner_summary(facts: PartnerRuleFacts) -> str:
         values.append(f"h_count={facts.h_count}")
     if facts.retained_contexts:
         values.append("retained_contexts=" + ",".join(facts.retained_contexts))
-    if facts.steric_class:
-        values.append(f"steric_class={facts.steric_class}")
-    if facts.ortho_substituent_count is not None:
-        values.append(
-            f"ortho_substituent_count={facts.ortho_substituent_count}"
-        )
+    if facts.ortho_occupancy is not None:
+        values.append(f"ortho_occupancy={facts.ortho_occupancy}")
     if facts.alpha_branched_group_count:
         values.append(
             f"alpha_branched_group_count="
             f"{facts.alpha_branched_group_count}"
         )
-    if facts.electronic_class:
-        values.append(f"electronic_class={facts.electronic_class}")
     if facts.environment_flags:
         values.append("environment_flags=" + ",".join(facts.environment_flags))
+    for name, value in (
+        ("context_kind", facts.context_kind),
+        ("ring_family", facts.ring_family),
+        ("steric_accessibility", facts.steric_accessibility),
+        ("ortho_burden", facts.ortho_burden_class),
+        ("electronic_axis", facts.electronic_axis),
+        ("alkyl_substitution", facts.alkyl_substitution),
+        ("beta_hydrogen", facts.beta_hydrogen_status),
+        ("lone_pair_availability", facts.lone_pair_availability),
+    ):
+        if value:
+            values.append(f"{name}={value}")
+    if facts.reactivity_modifiers:
+        values.append(
+            "reactivity_modifiers=" + ",".join(facts.reactivity_modifiers)
+        )
     return ";".join(values)
 
 
@@ -127,38 +137,21 @@ def _match_partner(
         failures.append(
             f"{constraint.role}:availability:{facts.availability or 'missing'}"
         )
-    if (
-        constraint.steric_classes_any
-        and facts.steric_class not in constraint.steric_classes_any
+    if constraint.ortho_occupancy_min is not None and (
+        facts.ortho_occupancy is None
+        or facts.ortho_occupancy < constraint.ortho_occupancy_min
     ):
         failures.append(
-            f"{constraint.role}:steric_class:{facts.steric_class or 'missing'}"
+            f"{constraint.role}:ortho_occupancy_below_minimum:"
+            f"{facts.ortho_occupancy if facts.ortho_occupancy is not None else 'missing'}"
         )
-    if (
-        constraint.electronic_classes_any
-        and facts.electronic_class not in constraint.electronic_classes_any
+    if constraint.ortho_occupancy_max is not None and (
+        facts.ortho_occupancy is None
+        or facts.ortho_occupancy > constraint.ortho_occupancy_max
     ):
         failures.append(
-            f"{constraint.role}:electronic_class:"
-            f"{facts.electronic_class or 'missing'}"
-        )
-    if constraint.ortho_substituent_count_min is not None and (
-        facts.ortho_substituent_count is None
-        or facts.ortho_substituent_count
-        < constraint.ortho_substituent_count_min
-    ):
-        failures.append(
-            f"{constraint.role}:ortho_substituent_count_below_minimum:"
-            f"{facts.ortho_substituent_count if facts.ortho_substituent_count is not None else 'missing'}"
-        )
-    if constraint.ortho_substituent_count_max is not None and (
-        facts.ortho_substituent_count is None
-        or facts.ortho_substituent_count
-        > constraint.ortho_substituent_count_max
-    ):
-        failures.append(
-            f"{constraint.role}:ortho_substituent_count_above_maximum:"
-            f"{facts.ortho_substituent_count if facts.ortho_substituent_count is not None else 'missing'}"
+            f"{constraint.role}:ortho_occupancy_above_maximum:"
+            f"{facts.ortho_occupancy if facts.ortho_occupancy is not None else 'missing'}"
         )
     if (
         constraint.alpha_branched_group_count_min is not None
@@ -177,6 +170,52 @@ def _match_partner(
         failures.append(
             f"{constraint.role}:alpha_branched_group_count_above_maximum:"
             f"{facts.alpha_branched_group_count}"
+        )
+    scalar_constraints = (
+        ("context_kind", constraint.context_kinds_any, facts.context_kind),
+        ("ring_family", constraint.ring_families_any, facts.ring_family),
+        (
+            "steric_accessibility",
+            constraint.steric_accessibility_any,
+            facts.steric_accessibility,
+        ),
+        (
+            "ortho_burden",
+            constraint.ortho_burden_classes_any,
+            facts.ortho_burden_class,
+        ),
+        (
+            "electronic_axis",
+            constraint.electronic_axes_any,
+            facts.electronic_axis,
+        ),
+        (
+            "alkyl_substitution",
+            constraint.alkyl_substitutions_any,
+            facts.alkyl_substitution,
+        ),
+        (
+            "beta_hydrogen",
+            constraint.beta_hydrogen_statuses_any,
+            facts.beta_hydrogen_status,
+        ),
+        (
+            "lone_pair_availability",
+            constraint.lone_pair_availability_any,
+            facts.lone_pair_availability,
+        ),
+    )
+    for name, allowed, value in scalar_constraints:
+        if allowed and value not in allowed:
+            failures.append(
+                f"{constraint.role}:{name}:{value or 'missing'}"
+            )
+    if constraint.reactivity_modifiers_any and not set(
+        constraint.reactivity_modifiers_any
+    ).intersection(facts.reactivity_modifiers):
+        failures.append(
+            f"{constraint.role}:missing_reactivity_modifier:"
+            + ",".join(sorted(constraint.reactivity_modifiers_any))
         )
     return tuple(failures)
 

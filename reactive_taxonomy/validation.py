@@ -36,18 +36,46 @@ def validate_taxonomy() -> List[str]:
         "functional_groups.v1",
         "site_interfaces.v2",
         "site_patterns.v2",
-        "taxonomy_manifest.v2",
+        "taxonomy_manifest.v3",
         "rendering.v1",
         "reaction_grammars.v2",
         "reaction_label_patterns.v1",
         "reaction_label_rendering.v1",
         "reaction_rendering.v1",
-        "signature_features.v2",
+        "reactivity_descriptor_rules.v1",
+        "aromatic_systems.v1",
+        "reactivity_rendering.v1",
+        "signature_features.v3",
     }
     missing = expected - set(payload)
     if missing:
         errors.append(f"missing_taxonomy_files:{','.join(sorted(missing))}")
         return errors
+    descriptor_profile_rules = payload["reactivity_descriptor_rules.v1"]
+    if descriptor_profile_rules.get("profile_schema_version") != "1.0":
+        errors.append("invalid_reactivity_profile_schema_version")
+    if not descriptor_profile_rules.get("context_kinds"):
+        errors.append("missing_reactivity_context_kinds")
+    if not descriptor_profile_rules.get("descriptor_statuses"):
+        errors.append("missing_reactivity_descriptor_statuses")
+    descriptor_steric = descriptor_profile_rules.get("steric") or {}
+    descriptor_electronic = descriptor_profile_rules.get("electronic") or {}
+    if int(descriptor_steric.get("radius", 0)) < 1:
+        errors.append("invalid_reactivity_steric_radius")
+    if int(descriptor_electronic.get("radius", 0)) < 1:
+        errors.append("invalid_reactivity_electronic_radius")
+    if set(descriptor_profile_rules.get("context_kinds") or ()) != set(
+        (descriptor_electronic.get("activation_axes") or {}).keys()
+    ):
+        errors.append("reactivity_activation_axis_context_mismatch")
+    aromatic_rules = payload["aromatic_systems.v1"]
+    if aromatic_rules.get("classification_method") != "ring_graph_v1":
+        errors.append("invalid_aromatic_system_classification_method")
+    if not aromatic_rules.get("monocyclic_families"):
+        errors.append("missing_aromatic_system_families")
+    rendering_rules = payload["reactivity_rendering.v1"]
+    if not rendering_rules.get("field_order"):
+        errors.append("missing_reactivity_rendering_order")
     contexts = payload["context_facets.v2"]
     context_records = contexts.get("contexts") or []
     tokens = [str(record.get("id") or "") for record in context_records]
@@ -131,7 +159,7 @@ def validate_taxonomy() -> List[str]:
             errors.append(f"invalid_emitted_interface:{adapter_id}")
         if not adapter.get("requires_roles"):
             errors.append(f"missing_interface_roles:{adapter_id}")
-    manifest = payload["taxonomy_manifest.v2"]
+    manifest = payload["taxonomy_manifest.v3"]
     identity_files = set(manifest.get("identity_definitions") or ())
     annotation_files = set(manifest.get("annotation_definitions") or ())
     manifest_files = identity_files | annotation_files
@@ -140,7 +168,7 @@ def validate_taxonomy() -> List[str]:
         for filename in manifest_files
         if not (DEFINITIONS_DIR / filename).is_file()
     }
-    if manifest.get("taxonomy_version") != "2.0":
+    if manifest.get("taxonomy_version") != "3.0":
         errors.append("invalid_taxonomy_manifest_version")
     if missing_manifest_files:
         errors.append(
@@ -153,16 +181,14 @@ def validate_taxonomy() -> List[str]:
         "site_interfaces.v2.json",
         "reaction_grammars.v2.json",
         "connectivity_rewrites.v2.json",
+        "reactivity_descriptor_rules.v1.json",
+        "aromatic_systems.v1.json",
     }:
         if required_identity not in identity_files:
             errors.append(f"missing_identity_definition:{required_identity}")
     descriptor_rules = payload["descriptor_rules.v1"].get("site_environment") or {}
     if int(descriptor_rules.get("local_group_radius", 0)) < 1:
         errors.append("invalid_local_group_radius")
-    if int(descriptor_rules.get("steric_radius", 0)) < 1:
-        errors.append("invalid_steric_radius")
-    if not isinstance(descriptor_rules.get("electronic_tag_weights"), dict):
-        errors.append("invalid_electronic_tag_weights")
     family_rules = payload["descriptor_rules.v1"].get("reaction_families") or {}
     suzuki_rules = family_rules.get("suzuki_miyaura") or {}
     if set(suzuki_rules.get("roles") or []) != {"electrophile", "transfer_partner"}:
@@ -414,9 +440,14 @@ def validate_taxonomy() -> List[str]:
         errors.append("invalid_reaction_fragment_alias_template")
     if set(reaction_rendering) != set(grammar_ids):
         errors.append("reaction_rendering_coverage_mismatch")
-    signature_features = payload["signature_features.v2"]
-    if signature_features.get("signature_schema_version") != "2.0":
+    signature_features = payload["signature_features.v3"]
+    if signature_features.get("signature_schema_version") != "3.0":
         errors.append("invalid_signature_schema_version")
+    if (
+        signature_features.get("environment_feature_contract")
+        != "typed_reactivity_profile.v1"
+    ):
+        errors.append("invalid_signature_environment_contract")
     signature_levels = signature_features.get("levels") or {}
     if any(
         "reaction_topology" not in (signature_levels.get(level) or [])

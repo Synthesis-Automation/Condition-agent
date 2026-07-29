@@ -47,9 +47,9 @@ def test_specific_structural_rules_match_without_named_family(
 
     assert analysis.named_family is None
     assert result.valid
-    assert result.reaction_signature_schema_version == "2.0"
-    assert result.schema_version == "1.2"
-    assert result.rule_definition_schema_version == "1.2"
+    assert result.reaction_signature_schema_version == "3.0"
+    assert result.schema_version == "2.0"
+    assert result.rule_definition_schema_version == "2.0"
     assert result.recipe_template_schema_version == "1.2"
     assert result.transformation_class == "sp2_c_n_substitution"
     assert dict(result.taxonomy_definition_versions)[

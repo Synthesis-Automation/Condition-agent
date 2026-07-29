@@ -11,8 +11,11 @@ from typing import Any, Dict, Literal, Mapping, Tuple
 from .compatibility import CompatibilityAssessment, filter_compatible_precedents
 from .generic_indexing import GenericIndexedReaction, GenericReactionIndex
 from .models import RetrievalLevelTrace
-from .signature_features import environment_tokens
-from .similarity import generic_signature_similarity, jaccard, reaction_scope
+from .signature_features import (
+    environment_profile_similarity,
+    environment_tokens,
+)
+from .similarity import generic_signature_similarity, reaction_scope
 from .support import summarize_evidence_support
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_retrieval.v1.json"
@@ -159,9 +162,9 @@ def _environment_neighbor_positions(
         token_positions.update(index.environment_features.get(token, ()))
     scored = []
     for position in compatible & token_positions:
-        score = jaccard(
-            query_tokens,
-            environment_tokens(index.rows[position].signature),
+        score = environment_profile_similarity(
+            signature,
+            index.rows[position].signature,
         )
         if score >= threshold:
             scored.append((score, position))

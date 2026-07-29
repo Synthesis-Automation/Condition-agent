@@ -76,25 +76,37 @@ def _query_participants(analysis: Any) -> Tuple[QueryParticipant, ...]:
     participants = []
     for role, site in selected.role_assignments.items():
         environment = environments.get((site.component_index, site.site_id))
-        steric = dict(environment.steric) if environment is not None else {}
-        attached = list(steric.get("attached_groups") or [])
+        profile = (
+            environment.reactivity_profile
+            if environment is not None
+            else None
+        )
+        attached = (
+            tuple(profile.context.attached_groups)
+            if profile is not None
+            and profile.context_kind == "heteroatom"
+            else ()
+        )
         alpha_values = [
-            item.get("alpha_branched")
+            item.alpha_branched
             for item in attached
-            if item.get("alpha_branched") is not None
         ]
         participants.append(
             QueryParticipant(
                 role=str(role),
                 signature=str(site.canonical_signature),
                 label=str(site.chemist_label),
-                center_class=str(steric.get("center_substitution_class") or "") or None,
+                center_class=(
+                    profile.reactive_center.substitution_class
+                    if profile is not None
+                    else None
+                ),
                 attachment_classes=tuple(
                     sorted(
                         {
-                            str(item["attachment_carbon_class"])
+                            str(item.attachment_carbon_class)
                             for item in attached
-                            if item.get("attachment_carbon_class")
+                            if item.attachment_carbon_class
                         }
                     )
                 ),
