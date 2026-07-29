@@ -1,5 +1,127 @@
 {
   "definition_version": "reaction_templates.v1",
   "schema_version": "1.0",
-  "templates": []
+  "templates": [
+    {
+      "aliases": [
+        "acetal formation",
+        "ketal formation"
+      ],
+      "definition_hash": "RTD1:1a24743565a3951a9b8f57b28b2ad24627f29e2e",
+      "display_name": "Carbonyl to dialkoxy",
+      "edit_archetype": "substitution",
+      "edit_component_count": 1,
+      "edit_fingerprint": "RTE1:cce224f7406b5a37a261b0111f8cd980",
+      "edits": [
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 1,
+            "element": "C",
+            "formal_charge": 0,
+            "hybridization": "SP2"
+          },
+          "atom_2": {
+            "aromatic": false,
+            "atom_map_number": 2,
+            "element": "O",
+            "formal_charge": 0,
+            "hybridization": "SP2"
+          },
+          "edit_type": "broken",
+          "new_order": null,
+          "old_order": "DOUBLE"
+        },
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 1,
+            "element": "C",
+            "formal_charge": 0,
+            "hybridization": "SP2"
+          },
+          "atom_2": {
+            "aromatic": false,
+            "atom_map_number": 3,
+            "element": "O",
+            "formal_charge": 0,
+            "hybridization": "SP3"
+          },
+          "edit_type": "formed",
+          "new_order": "SINGLE",
+          "old_order": null
+        },
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 1,
+            "element": "C",
+            "formal_charge": 0,
+            "hybridization": "SP2"
+          },
+          "atom_2": {
+            "aromatic": false,
+            "atom_map_number": 5,
+            "element": "O",
+            "formal_charge": 0,
+            "hybridization": "SP3"
+          },
+          "edit_type": "formed",
+          "new_order": "SINGLE",
+          "old_order": null
+        },
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 3,
+            "element": "O",
+            "formal_charge": 0,
+            "hybridization": "SP3"
+          },
+          "atom_2": null,
+          "edit_type": "hydrogen_change",
+          "new_order": null,
+          "old_order": "SINGLE"
+        },
+        {
+          "atom_1": {
+            "aromatic": false,
+            "atom_map_number": 5,
+            "element": "O",
+            "formal_charge": 0,
+            "hybridization": "SP3"
+          },
+          "atom_2": null,
+          "edit_type": "hydrogen_change",
+          "new_order": null,
+          "old_order": "SINGLE"
+        }
+      ],
+      "family_id": "acetalization",
+      "mapped_reference_reaction": "[CH3:7][CH:1]=[O:2].[CH3:4][OH:3].[CH3:6][OH:5]>>[CH3:7][CH:1]([O:3][CH3:4])[O:5][CH3:6]",
+      "notes": "Minimum mapped acetal reference; omitted water is not treated as an observed product.",
+      "participants": [
+        {
+          "canonical_smiles": "COC(C)OC",
+          "explicit_count": 1,
+          "side": "product"
+        },
+        {
+          "canonical_smiles": "CC=O",
+          "explicit_count": 1,
+          "side": "reactant"
+        },
+        {
+          "canonical_smiles": "CO",
+          "explicit_count": 2,
+          "side": "reactant"
+        }
+      ],
+      "provenance": "curated_minimum_mapped_reference",
+      "schema_version": "1.0",
+      "status": "active",
+      "template_id": "carbonyl_to_dialkoxy",
+      "transformation_class": "carbonyl_diheteroatom_condensation"
+    }
+  ]
 }

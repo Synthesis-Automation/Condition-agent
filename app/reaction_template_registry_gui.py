@@ -177,8 +177,21 @@ def _format_match_result(result: object) -> str:
             f"{getattr(result, 'edit_fingerprint', None) or 'unavailable'}"
         ),
     ]
+    lines.extend(("", _format_match_section(result)))
+    warnings = tuple(getattr(result, "warnings", ()) or ())
+    if warnings:
+        lines.extend(("", "WARNINGS"))
+        lines.extend(f"  • {warning}" for warning in warnings)
+    error = getattr(result, "error", None)
+    if error:
+        lines.extend(("", "ERROR", f"  {error}"))
+    return "\n".join(lines)
+
+
+def _format_match_section(result: object) -> str:
+    """Render only the registry interpretation section for combined analysis."""
     matches = tuple(getattr(result, "matches", ()) or ())
-    lines.extend(("", f"MATCHES ({len(matches)})"))
+    lines = [f"TEMPLATE REGISTRY MATCHES ({len(matches)})"]
     if not matches:
         lines.append("  None")
     for match in matches:
@@ -194,13 +207,6 @@ def _format_match_result(result: object) -> str:
                 f"    Confidence: {match.confidence:.2f}",
             )
         )
-    warnings = tuple(getattr(result, "warnings", ()) or ())
-    if warnings:
-        lines.extend(("", "WARNINGS"))
-        lines.extend(f"  • {warning}" for warning in warnings)
-    error = getattr(result, "error", None)
-    if error:
-        lines.extend(("", "ERROR", f"  {error}"))
     return "\n".join(lines)
 
 
@@ -546,7 +552,25 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
             )
             return
         analysis = featurize_reaction(reaction)
-        self.details.setPlainText(_format_reaction_analysis(analysis))
+        try:
+            template_result = match_reaction_templates(
+                reaction,
+                path=self._registry_path(),
+                include_drafts=self.include_drafts_check.isChecked(),
+            )
+        except (OSError, ReactionTemplateError) as exc:
+            template_result = None
+            template_summary = (
+                "TEMPLATE REGISTRY\n"
+                f"  Match unavailable: {exc}"
+            )
+        else:
+            template_summary = _format_match_section(template_result)
+        self.details.setPlainText(
+            _format_reaction_analysis(analysis)
+            + "\n\n"
+            + template_summary
+        )
         completeness = analysis.reaction_completeness
         completeness_status = (
             completeness.status if completeness is not None else "unavailable"
@@ -556,10 +580,27 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
             if analysis.reaction_signature is not None
             else "unavailable"
         )
+        match_status = "template matching unavailable"
+        if template_result is not None:
+            if template_result.matches:
+                first_match = template_result.matches[0]
+                match_kind = (
+                    "provisional"
+                    if first_match.provisional
+                    else "verified-edit"
+                )
+                match_status = (
+                    f"{len(template_result.matches)} template match(es), "
+                    f"{first_match.family_id or first_match.template_id} "
+                    f"({match_kind})"
+                )
+            else:
+                match_status = "no template match"
         self.status_label.setText(
             f"Featurization: {'valid' if analysis.valid else 'invalid'}; "
             f"evidence {analysis.evidence_quality}; completeness "
-            f"{completeness_status}; signature {signature_id}."
+            f"{completeness_status}; signature {signature_id}; "
+            f"{match_status}."
         )
 
     @QtCore.pyqtSlot()
