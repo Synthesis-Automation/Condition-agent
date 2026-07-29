@@ -241,13 +241,22 @@ def _reaction_concise_summary(result: Any) -> str:
     return "\n".join(lines)
 
 
+def format_concise_analysis(result: Any) -> str:
+    """Render a molecule or reaction analysis in the concise CLI format."""
+    if hasattr(result, "input_reaction_smiles"):
+        return _reaction_concise_summary(result)
+    return _molecule_concise_summary(result)
+
+
 def _print_result(result: Any, output_format: str, *, concise: bool = False) -> None:
     if output_format == "json":
         print(_json_dump(result.to_dict()))
+    elif concise:
+        print(format_concise_analysis(result))
     elif hasattr(result, "input_reaction_smiles"):
-        print(_reaction_concise_summary(result) if concise else _reaction_summary(result))
+        print(_reaction_summary(result))
     else:
-        print(_molecule_concise_summary(result) if concise else _molecule_summary(result))
+        print(_molecule_summary(result))
 
 
 def _command_validate(args: argparse.Namespace) -> int:
