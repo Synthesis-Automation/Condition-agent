@@ -109,8 +109,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "3.1"
-    assert record.converter_definition_version == "generic_conversion.v2.1"
+    assert record.schema_version == "3.3"
+    assert record.converter_definition_version == "generic_conversion.v2.3"
     assert record.reaction_signature["schema_version"] == "3.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -123,11 +123,10 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.reference_condition_series_id.startswith("RCS1:")
 
 
-def test_inverting_alcohol_displacement_serializes_stereo_without_named_family() -> None:
-    reaction = (
-        "CNCC[C@H](O)c1ccccc1.Cc1ccccc1O"
-        ">>CNCC[C@@H](Oc1ccccc1C)c1ccccc1"
-    )
+def test_inverting_alcohol_displacement_serializes_stereo_without_named_family() -> (
+    None
+):
+    reaction = "CNCC[C@H](O)c1ccccc1.Cc1ccccc1O>>CNCC[C@@H](Oc1ccccc1C)c1ccccc1"
 
     record = convert_record(_raw(reaction))
 
@@ -140,9 +139,7 @@ def test_inverting_alcohol_displacement_serializes_stereo_without_named_family()
     assert stereo_changes[0]["old_descriptor"] == "S"
     assert stereo_changes[0]["new_descriptor"] == "R"
     assert stereo_changes[0]["change_type"] == "inverted"
-    assert stereo_changes[0]["evidence"] == (
-        "connectivity_rewrite:invert_if_defined"
-    )
+    assert stereo_changes[0]["evidence"] == ("connectivity_rewrite:invert_if_defined")
     review = concise_reaction_review_row(record.to_dict())
     assert review["stereochemical_changes"] == "atom: S→R (inverted)"
 
@@ -176,9 +173,7 @@ def test_mapped_unknown_family_signature_is_verified() -> None:
 
     assert record.admission_tier == AdmissionTier.VERIFIED
     assert record.named_family is None
-    assert record.evidence_quality == (
-        "validated_mapping_and_exact_reconstruction"
-    )
+    assert record.evidence_quality == ("validated_mapping_and_exact_reconstruction")
     assert record.reaction_label == "H2C=CH2 → H3C–CH3"
     assert record.reaction_label_status == "exact_product"
     assert record.reaction_display_label is not None
@@ -197,9 +192,7 @@ def test_mapped_unknown_family_signature_is_verified() -> None:
 
 
 def test_exact_multi_event_signature_is_verified() -> None:
-    record = convert_record(
-        _raw("CO.CS.Fc1ccc(F)cc1>>COc1ccc(SC)cc1")
-    )
+    record = convert_record(_raw("CO.CS.Fc1ccc(F)cc1>>COc1ccc(SC)cc1"))
 
     assert record.admission_tier == AdmissionTier.VERIFIED
     assert record.evidence_quality == "exact_multi_event_reconstruction"
@@ -252,12 +245,27 @@ def test_grammar_only_record_is_review_not_rejected() -> None:
         "missing_verified_reaction_signature",
         "reaction_completeness_unresolved",
     )
+    assert record.fallback_descriptor is not None
+    assert record.fallback_descriptor["schema_version"] == "1.1"
+    assert not record.fallback_descriptor["retrieval_eligible"]
+
+
+def test_unresolved_record_serializes_eligible_fallback_descriptor() -> None:
+    record = convert_record(_raw("CC.CN>>CCN"))
+
+    assert record.reaction_signature is None
+    assert record.fallback_descriptor is not None
+    assert record.fallback_descriptor["descriptor_id"].startswith("RFD1:")
+    assert record.fallback_descriptor["evidence_mode"] == ("structure_inventory_only")
+    assert record.fallback_descriptor["retrieval_eligible"]
+    assert record.fallback_descriptor["reactant_component_tokens"] == (
+        "CC",
+        "CN",
+    )
 
 
 def test_unaccounted_product_atoms_are_ineligible_and_serialized() -> None:
-    record = convert_record(
-        _raw("[CH2:1]=[CH2:2]>>[CH3:1][CH2:2]C")
-    )
+    record = convert_record(_raw("[CH2:1]=[CH2:2]>>[CH3:1][CH2:2]C"))
 
     assert record.admission_tier == AdmissionTier.REJECTED
     assert record.chemistry_status == ChemistryStatus.REJECTED
@@ -273,25 +281,21 @@ def test_unaccounted_product_atoms_are_ineligible_and_serialized() -> None:
 
 
 def test_partial_product_observation_is_serialized_but_not_indexed() -> None:
-    record = convert_record(
-        _raw("O=C(O)c1cccc(I)c1>>O=C(Cl)c1cccc(I)c1")
-    )
+    record = convert_record(_raw("O=C(O)c1cccc(I)c1>>O=C(Cl)c1cccc(I)c1"))
 
     assert record.admission_tier == AdmissionTier.REJECTED
     assert record.chemistry_status == ChemistryStatus.REJECTED
     assert record.index_eligibility == IndexEligibility.INELIGIBLE
     assert record.reaction_signature is None
     assert record.reaction_completeness["status"] == "incomplete"
-    assert record.reaction_label == (
-        "R–C(=O)–OH → R–C(=O)–Cl [Cl source missing]"
-    )
+    assert record.reaction_label == ("R–C(=O)–OH → R–C(=O)–Cl [Cl source missing]")
     assert record.reaction_label_status == "partial_product_correspondence"
     assert record.transformation_class == "acyl_heteroatom_substitution"
     assert record.transformation_confidence == 0.8
     assert record.partial_product_transformation is not None
-    assert record.partial_product_transformation[
-        "missing_product_atom_elements"
-    ] == ("Cl",)
+    assert record.partial_product_transformation["missing_product_atom_elements"] == (
+        "Cl",
+    )
 
     review = concise_reaction_review_row(record.to_dict())
     assert review["detection_status"] == "partial_product_correspondence"
@@ -300,10 +304,7 @@ def test_partial_product_observation_is_serialized_but_not_indexed() -> None:
         "partial conserved-scaffold observation; "
         "the reactants do not account for Cl in the product."
     )
-    assert (
-        review["partial_transformation_class"]
-        == "acyl_heteroatom_substitution"
-    )
+    assert review["partial_transformation_class"] == "acyl_heteroatom_substitution"
     assert review["missing_product_atom_elements"] == "Cl"
     assert "PRODUCT_ATOM_SOURCE_UNRESOLVED:Cl" in review["warnings"]
 
@@ -317,9 +318,7 @@ def test_multi_atom_product_origin_gap_is_serialized_for_review() -> None:
     partial = record.partial_product_transformation
     assert partial is not None
     assert partial["schema_version"] == "2.0"
-    assert partial["transformation_type"] == (
-        "attachment_fragment_replacement"
-    )
+    assert partial["transformation_type"] == ("attachment_fragment_replacement")
     fragment = partial["installed_fragment"]
     assert fragment["canonical_fragment_smiles"] == "C#N"
     assert fragment["rooted_fragment_smiles"] == "*C#N"
@@ -327,10 +326,10 @@ def test_multi_atom_product_origin_gap_is_serialized_for_review() -> None:
     assert fragment["source_candidates"] == ()
     provenance = partial["product_atom_provenance"]
     assert len(provenance) == 8
-    assert sum(
-        item["source_kind"] == "reactant_correspondence"
-        for item in provenance
-    ) == 6
+    assert (
+        sum(item["source_kind"] == "reactant_correspondence" for item in provenance)
+        == 6
+    )
     assert sum(item["source_kind"] == "unresolved" for item in provenance) == 2
 
     review = concise_reaction_review_row(record.to_dict())
@@ -343,9 +342,7 @@ def test_multi_atom_product_origin_gap_is_serialized_for_review() -> None:
 
 
 def test_inconsistent_product_mapping_is_review_only() -> None:
-    record = convert_record(
-        _raw("[CH3:1][OH:2]>>[CH2:1]=[O:3]")
-    )
+    record = convert_record(_raw("[CH3:1][OH:2]>>[CH2:1]=[O:3]"))
 
     assert record.admission_tier == AdmissionTier.REVIEW
     assert record.chemistry_status == ChemistryStatus.REVIEW
@@ -442,10 +439,7 @@ def test_resolved_unassigned_multistage_conditions_are_indexable_with_caution() 
     )
 
     assert record.condition_status == ConditionStatus.RESOLVED_COMPLETE
-    assert (
-        record.condition_stage_status
-        == ConditionStageStatus.UNASSIGNED_MULTISTAGE
-    )
+    assert record.condition_stage_status == ConditionStageStatus.UNASSIGNED_MULTISTAGE
     assert record.admission_tier == AdmissionTier.REVIEW
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
     index = build_generic_index([record.to_dict()])
@@ -466,10 +460,7 @@ def test_unresolved_unassigned_multistage_conditions_remain_review_only() -> Non
     )
 
     assert record.condition_status == ConditionStatus.UNRESOLVED_RETAINED
-    assert (
-        record.condition_stage_status
-        == ConditionStageStatus.UNASSIGNED_MULTISTAGE
-    )
+    assert record.condition_stage_status == ConditionStageStatus.UNASSIGNED_MULTISTAGE
     assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
     assert len(build_generic_index([record.to_dict()]).rows) == 0
 
@@ -570,7 +561,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "2.0"
+    assert report["schema_version"] == "2.1"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]
@@ -579,6 +570,8 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
     assert review_rows[0]["detection_status"] == "family_overlay"
     assert review_rows[0]["transformation_class"] == "c_c_transfer_coupling"
+    assert review_rows[0]["fallback_descriptor_id"].startswith("RFD1:")
+    assert review_rows[0]["fallback_retrieval_eligible"] == "True"
     assert review_rows[0]["signature_id"].startswith("RS3:")
     assert review_rows[0]["evidence_quality"] == "exact_product_reconstruction"
     assert review_rows[0]["reaction_completeness_status"] == "verified"
@@ -648,7 +641,7 @@ def test_concise_review_formats_spectators_and_partner_environment() -> None:
                         },
                     }
                 ],
-            }
+            },
         }
     )
 
@@ -765,9 +758,7 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
     )
     assert first["output_row_count"] == 4
     assert first["index_eligibility_counts"] == {"eligible": 4}
-    assert first["transformation_class_counts"] == {
-        "c_c_transfer_coupling": 4
-    }
+    assert first["transformation_class_counts"] == {"c_c_transfer_coupling": 4}
     assert first["named_family_counts"] == {"suzuki_miyaura": 4}
     assert first["integrity"]["valid"]
     assert second["reused_shard_count"] == 2
@@ -784,8 +775,7 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
     )
     assert not integrity["valid"]
     assert any(
-        issue.startswith("output_checksum_mismatch")
-        for issue in integrity["issues"]
+        issue.startswith("output_checksum_mismatch") for issue in integrity["issues"]
     )
 
 

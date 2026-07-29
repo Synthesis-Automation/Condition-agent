@@ -139,8 +139,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.1",
-        "converter_definition_version": "generic_conversion.v2.1",
+        "schema_version": "3.3",
+        "converter_definition_version": "generic_conversion.v2.3",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",
@@ -357,9 +357,7 @@ def test_environment_neighbors_narrow_the_bond_edit_pool() -> None:
 
     assert level == "environment_neighbors"
     assert len(pool) == 3
-    environment = next(
-        item for item in trace if item.level == "environment_neighbors"
-    )
+    environment = next(item for item in trace if item.level == "environment_neighbors")
     assert environment.status == "selected"
     assert environment.candidate_count == 3
     assert all(item.level != "bond_edit_signature" for item in trace)
@@ -401,9 +399,10 @@ def test_bond_edit_fallback_remains_reachable_without_environment_overlap() -> N
 
     assert level == "bond_edit_signature"
     assert len(pool) == 3
-    assert next(
-        item for item in trace if item.level == "environment_neighbors"
-    ).status == "empty"
+    assert (
+        next(item for item in trace if item.level == "environment_neighbors").status
+        == "empty"
+    )
     assert trace[-1].level == "bond_edit_signature"
     assert trace[-1].status == "selected"
 
@@ -637,10 +636,13 @@ def test_recommendation_can_report_unknown_expected_yield() -> None:
     assert recommendation.expected_yield_pct is None
     assert recommendation.score_trace.ranking_components["yield"] is None
     assert recommendation.score_trace.applied_ranking_weights["yield"] == 0.0
-    assert round(
-        sum(recommendation.score_trace.ranking_contributions.values()),
-        6,
-    ) == recommendation.score
+    assert (
+        round(
+            sum(recommendation.score_trace.ranking_contributions.values()),
+            6,
+        )
+        == recommendation.score
+    )
     assert recommendation.score_trace.observed_outcome_count == 0
     assert any("No usable yield evidence" in item for item in recommendation.cautions)
 
@@ -661,15 +663,11 @@ def test_condition_uncertainty_is_an_explicit_ranking_component() -> None:
     assert len(result.recommendations) == 2
     assert result.recommendations[0].recipe_core_id == "RCORE1:0"
     assert (
-        result.recommendations[0].score_trace.ranking_components[
-            "condition_certainty"
-        ]
+        result.recommendations[0].score_trace.ranking_components["condition_certainty"]
         == 1.0
     )
     assert (
-        result.recommendations[1].score_trace.ranking_components[
-            "condition_certainty"
-        ]
+        result.recommendations[1].score_trace.ranking_components["condition_certainty"]
         == 0.0
     )
 
@@ -686,10 +684,7 @@ def test_unassigned_multistage_ingredient_set_is_ranked_with_caution() -> None:
 
     assert result.valid
     recommendation = result.recommendations[0]
-    assert (
-        recommendation.score_trace.ranking_components["condition_certainty"]
-        == 0.0
-    )
+    assert recommendation.score_trace.ranking_components["condition_certainty"] == 0.0
     assert any(
         "assignment to ordered reaction stages is unavailable" in caution
         for caution in recommendation.cautions
@@ -763,7 +758,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "2.0"
+    assert result.schema_version == "2.1"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")

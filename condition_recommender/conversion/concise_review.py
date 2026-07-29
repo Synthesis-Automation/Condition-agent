@@ -15,7 +15,7 @@ from reactive_taxonomy import render_reactivity_profile
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.0"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.1"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -24,6 +24,10 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "detection_status",
     "transformation_class",
     "signature_id",
+    "fallback_descriptor_id",
+    "fallback_evidence_mode",
+    "fallback_retrieval_eligible",
+    "fallback_ineligibility_reasons",
     "evidence_quality",
     "transformation_confidence",
     "stereochemical_changes",
@@ -121,9 +125,7 @@ def _spectator_summary(signature: Mapping[str, Any]) -> str:
         if count > 1:
             display = f"{count}× {display}"
         if distances:
-            distance_text = "/".join(
-                str(value) for value in sorted(set(distances))
-            )
+            distance_text = "/".join(str(value) for value in sorted(set(distances)))
             display += f" (d={distance_text})"
         values.append(display)
     return "; ".join(values)
@@ -157,8 +159,7 @@ def _partner_environment_summary(signature: Mapping[str, Any]) -> str:
         if not isinstance(profile, Mapping):
             continue
         values.append(
-            f"{_partner_label(partner)}: "
-            f"{render_reactivity_profile(profile)}"
+            f"{_partner_label(partner)}: {render_reactivity_profile(profile)}"
         )
     return " | ".join(values)
 
@@ -173,9 +174,7 @@ def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
         for entry in payload.get("shards") or ():
             if entry.get("status") != "complete":
                 continue
-            yield from iter_canonical_records(
-                source.parent / str(entry["output_path"])
-            )
+            yield from iter_canonical_records(source.parent / str(entry["output_path"]))
         return
     handle = (
         gzip.open(source, mode="rt", encoding="utf-8")
@@ -205,10 +204,10 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     display_value = display if isinstance(display, Mapping) else {}
     signature = record.get("reaction_signature")
     signature_value = signature if isinstance(signature, Mapping) else {}
+    fallback = record.get("fallback_descriptor")
+    fallback_value = fallback if isinstance(fallback, Mapping) else {}
     completeness = record.get("reaction_completeness")
-    completeness_value = (
-        completeness if isinstance(completeness, Mapping) else {}
-    )
+    completeness_value = completeness if isinstance(completeness, Mapping) else {}
     partial = record.get("partial_product_transformation")
     partial_value = partial if isinstance(partial, Mapping) else {}
     installed = partial_value.get("installed_fragment")
@@ -221,26 +220,21 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
                 + tuple(completeness_value.get("warnings") or ())
                 + tuple(display_value.get("warnings") or ())
                 + tuple(partial_value.get("warnings") or ())
+                + tuple(fallback_value.get("warnings") or ())
             )
             if value
         }
     )
     element_excess = completeness_value.get("product_element_excess")
-    element_excess_value = (
-        element_excess if isinstance(element_excess, Mapping) else {}
-    )
+    element_excess_value = element_excess if isinstance(element_excess, Mapping) else {}
     return {
         "canonical_reaction_smiles": str(
             record.get("canonical_reaction_smiles")
             or record.get("reaction_smiles")
             or ""
         ),
-        "reaction_display_label_detailed": str(
-            display_value.get("detailed") or ""
-        ),
-        "original_reaction_type": str(
-            record.get("source_declared_family") or ""
-        ),
+        "reaction_display_label_detailed": str(display_value.get("detailed") or ""),
+        "original_reaction_type": str(record.get("source_declared_family") or ""),
         "detected_reaction_family": str(record.get("named_family") or ""),
         "detection_status": str(
             display_value.get("status")
@@ -253,16 +247,20 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or ""
         ),
         "signature_id": str(signature_value.get("signature_id") or ""),
+        "fallback_descriptor_id": str(fallback_value.get("descriptor_id") or ""),
+        "fallback_evidence_mode": str(fallback_value.get("evidence_mode") or ""),
+        "fallback_retrieval_eligible": _text_or_blank(
+            fallback_value.get("retrieval_eligible")
+        ),
+        "fallback_ineligibility_reasons": "; ".join(
+            str(value) for value in fallback_value.get("ineligibility_reasons") or ()
+        ),
         "evidence_quality": str(record.get("evidence_quality") or ""),
         "transformation_confidence": _text_or_blank(
             record.get("transformation_confidence")
         ),
-        "stereochemical_changes": _stereochemical_change_summary(
-            signature_value
-        ),
-        "reaction_completeness_status": str(
-            completeness_value.get("status") or ""
-        ),
+        "stereochemical_changes": _stereochemical_change_summary(signature_value),
+        "reaction_completeness_status": str(completeness_value.get("status") or ""),
         "product_heavy_atom_coverage": _text_or_blank(
             completeness_value.get("product_heavy_atom_coverage")
         ),
@@ -277,18 +275,12 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "partial_transformation_class": str(
             partial_value.get("transformation_class") or ""
         ),
-        "removed_fragment": str(
-            partial_value.get("removed_fragment_smiles") or ""
-        ),
+        "removed_fragment": str(partial_value.get("removed_fragment_smiles") or ""),
         "installed_fragment": str(
             installed_value.get("canonical_fragment_smiles") or ""
         ),
-        "installed_fragment_key": str(
-            installed_value.get("fragment_key") or ""
-        ),
-        "fragment_source_status": str(
-            installed_value.get("source_status") or ""
-        ),
+        "installed_fragment_key": str(installed_value.get("fragment_key") or ""),
+        "fragment_source_status": str(installed_value.get("source_status") or ""),
         "fragment_source_candidates": json.dumps(
             installed_value.get("source_candidates") or (),
             ensure_ascii=False,
@@ -303,18 +295,14 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         ),
         "chemistry_status": _enum_text(record.get("chemistry_status")),
         "condition_status": _enum_text(record.get("condition_status")),
-        "condition_stage_status": _enum_text(
-            record.get("condition_stage_status")
-        ),
+        "condition_stage_status": _enum_text(record.get("condition_stage_status")),
         "index_eligibility": _enum_text(record.get("index_eligibility")),
         "admission_reasons": "; ".join(
             str(value) for value in record.get("admission_reasons") or ()
         ),
         "warnings": "; ".join(warnings),
         "spectators": _spectator_summary(signature_value),
-        "reactivity_profile": _partner_environment_summary(
-            signature_value
-        ),
+        "reactivity_profile": _partner_environment_summary(signature_value),
     }
 
 
@@ -346,15 +334,10 @@ def export_concise_reaction_review_csv(
             writer.writeheader()
             for record in iter_canonical_records(source):
                 if cancel_check is not None and cancel_check():
-                    raise ConciseReviewConversionCancelled(
-                        "Review export cancelled"
-                    )
+                    raise ConciseReviewConversionCancelled("Review export cancelled")
                 writer.writerow(concise_reaction_review_row(record))
                 row_count += 1
-                if (
-                    progress_callback is not None
-                    and row_count % progress_interval == 0
-                ):
+                if progress_callback is not None and row_count % progress_interval == 0:
                     progress_callback(
                         ConciseReviewProgress(
                             phase="rows_exported",
@@ -362,9 +345,7 @@ def export_concise_reaction_review_csv(
                             file_count=1,
                             row_count=row_count,
                             current_file=source.name,
-                            message=(
-                                f"Exported {row_count} review row(s)."
-                            ),
+                            message=(f"Exported {row_count} review row(s)."),
                         )
                     )
         temporary.replace(destination)
@@ -466,8 +447,7 @@ def convert_dataset_folder_to_concise_review_csv(
                     file_index=file_index,
                     current_file=relative_path,
                     message=(
-                        f"Processing file {file_index}/{len(paths)}: "
-                        f"{relative_path}"
+                        f"Processing file {file_index}/{len(paths)}: {relative_path}"
                     ),
                 )
                 file_row_count = 0
@@ -477,9 +457,7 @@ def convert_dataset_folder_to_concise_review_csv(
                             "Review conversion cancelled"
                         )
                     converted = convert_record(raw_record, cache=cache)
-                    writer.writerow(
-                        concise_reaction_review_row(converted.to_dict())
-                    )
+                    writer.writerow(concise_reaction_review_row(converted.to_dict()))
                     row_count += 1
                     file_row_count += 1
                     if file_row_count % progress_interval == 0:
@@ -497,8 +475,7 @@ def convert_dataset_folder_to_concise_review_csv(
                     file_index=file_index,
                     current_file=relative_path,
                     message=(
-                        f"Completed {relative_path}: "
-                        f"{file_row_count} reaction(s)."
+                        f"Completed {relative_path}: {file_row_count} reaction(s)."
                     ),
                 )
         temporary.replace(destination)

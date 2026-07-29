@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.1"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.1"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.3"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.3"
 
 
 class AdmissionTier(str, Enum):
@@ -118,9 +118,7 @@ class RecommendationRecord:
     conditions: ConditionIdentity
     chemistry_status: ChemistryStatus = ChemistryStatus.UNCLASSIFIED
     condition_status: ConditionStatus = ConditionStatus.UNCLASSIFIED
-    condition_stage_status: ConditionStageStatus = (
-        ConditionStageStatus.UNCLASSIFIED
-    )
+    condition_stage_status: ConditionStageStatus = ConditionStageStatus.UNCLASSIFIED
     outcome_status: OutcomeStatus = OutcomeStatus.UNCLASSIFIED
     index_eligibility: IndexEligibility = IndexEligibility.UNCLASSIFIED
     family_environment: Optional[Dict[str, Any]] = None
@@ -129,6 +127,7 @@ class RecommendationRecord:
     partial_product_transformation: Optional[Dict[str, Any]] = None
     reaction_completeness: Optional[Dict[str, Any]] = None
     reaction_signature: Optional[Dict[str, Any]] = None
+    fallback_descriptor: Optional[Dict[str, Any]] = None
     reaction_display_label: Optional[Dict[str, Any]] = None
     transformation_class: Optional[str] = None
     transformation_confidence: float = 0.0
@@ -158,7 +157,7 @@ class RecommendationRecord:
 
 @dataclass(frozen=True)
 class GenericConditionRecommendation:
-    """One canonical recipe aggregated from structure-verified precedents."""
+    """One canonical recipe aggregated from admitted structural precedents."""
 
     rank: int
     recipe_id: str
@@ -225,6 +224,8 @@ class GenericRecommendationResult:
     query_reaction_smiles: str
     valid: bool
     query_signature_id: Optional[str] = None
+    query_fallback_descriptor_id: Optional[str] = None
+    recommendation_mode: str = "verified_signature"
     reaction_label: Optional[str] = None
     reaction_label_status: str = "unavailable"
     named_family: Optional[str] = None
@@ -243,7 +244,7 @@ class GenericRecommendationResult:
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "2.0"
+    schema_version: str = "2.1"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

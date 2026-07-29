@@ -98,9 +98,7 @@ def test_mapped_unknown_intramolecular_reaction_gets_generic_topology_label() ->
 
 def test_inter_and_intramolecular_scope_have_separate_signature_tiers() -> None:
     intramolecular = featurize_reaction(INTRAMOLECULAR_CN)
-    intermolecular = featurize_reaction(
-        "Brc1ccccc1.CCN>>CCNc1ccccc1"
-    )
+    intermolecular = featurize_reaction("Brc1ccccc1.CCN>>CCNc1ccccc1")
 
     assert intramolecular.reaction_signature is not None
     assert intermolecular.reaction_signature is not None
@@ -131,7 +129,7 @@ def test_mapped_and_unmapped_topology_signatures_are_identical() -> None:
 def test_topology_serializes_in_analysis_and_signature() -> None:
     payload = featurize_reaction(INTRAMOLECULAR_CN).to_dict()
 
-    assert payload["schema_version"] == "3.0"
+    assert payload["schema_version"] == "3.1"
     assert payload["reaction_topology"]["reaction_scope"] == "intramolecular"
     assert payload["reaction_topology"]["formed_ring_sizes"] == (5,)
     assert payload["reaction_signature"]["schema_version"] == "3.0"
@@ -140,9 +138,7 @@ def test_topology_serializes_in_analysis_and_signature() -> None:
 
 def test_same_and_different_relationship_constraints_are_enforced() -> None:
     intramolecular = featurize_reaction(INTRAMOLECULAR_CN)
-    intermolecular = featurize_reaction(
-        "Brc1ccccc1.CCN>>CCNc1ccccc1"
-    )
+    intermolecular = featurize_reaction("Brc1ccccc1.CCN>>CCNc1ccccc1")
     base_grammar = next(
         grammar
         for grammar in load_reaction_grammars()

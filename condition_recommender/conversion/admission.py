@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Optional, Tuple
@@ -21,6 +21,7 @@ from ..models import (
     IndexEligibility,
     OutcomeStatus,
 )
+from ..fallback_similarity import assess_condition_source_support
 
 
 @dataclass(frozen=True)
@@ -32,7 +33,7 @@ class AdmissionDecision:
     condition_stage_status: ConditionStageStatus
     outcome_status: OutcomeStatus
     index_eligibility: IndexEligibility
-    policy_version: str = "generic_admission.v1.5"
+    policy_version: str = "generic_admission.v1.6"
 
 
 @lru_cache(maxsize=1)
@@ -57,16 +58,47 @@ def decide_admission(
     chemistry_status = ChemistryStatus.VERIFIED
     chemistry_reasons: list[str] = []
     completeness = analysis.reaction_completeness
+    fallback_descriptor = analysis.fallback_descriptor
+    condition_source_supported = False
+    condition_source_evidence: tuple[str, ...] = ()
+    if (
+        fallback_descriptor is not None
+        and fallback_descriptor.required_condition_source_elements
+    ):
+        condition_source_supported, condition_source_evidence = (
+            assess_condition_source_support(
+                asdict(fallback_descriptor),
+                resolved_recipe.to_dict(),
+            )
+        )
     if not analysis.valid or canonical_identity is None:
         chemistry_status = ChemistryStatus.REJECTED
         chemistry_reasons.append("invalid_reaction_or_product")
     elif completeness is not None and completeness.status == "incomplete":
-        chemistry_status = ChemistryStatus.REJECTED
-        chemistry_reasons.append("unaccounted_product_heavy_atoms")
-        if completeness.suspected_insufficient_reactant_multiplicity:
-            chemistry_reasons.append("insufficient_reactant_multiplicity")
-        elif completeness.suspected_missing_reactant:
-            chemistry_reasons.append("suspected_missing_reactant")
+        if (
+            fallback_descriptor is not None
+            and fallback_descriptor.retrieval_eligible
+            and condition_source_supported
+        ):
+            chemistry_status = ChemistryStatus.REVIEW
+            chemistry_reasons.extend(
+                (
+                    "condition_supplied_fragment_partial_correspondence",
+                    *condition_source_evidence,
+                )
+            )
+        else:
+            chemistry_status = ChemistryStatus.REJECTED
+            chemistry_reasons.append("unaccounted_product_heavy_atoms")
+            if completeness.suspected_insufficient_reactant_multiplicity:
+                chemistry_reasons.append("insufficient_reactant_multiplicity")
+            elif completeness.suspected_missing_reactant:
+                chemistry_reasons.append("suspected_missing_reactant")
+            if (
+                fallback_descriptor is not None
+                and fallback_descriptor.required_condition_source_elements
+            ):
+                chemistry_reasons.extend(condition_source_evidence)
     elif analysis.reaction_signature is None:
         if analysis.candidates or analysis.evidence_quality in {
             "reactant_grammar_only",
@@ -85,9 +117,7 @@ def decide_admission(
             "conflicting_stereochemical_evidence",
         }:
             chemistry_reasons.append(analysis.evidence_quality)
-        if any(
-            warning in analysis.warnings for warning in policy["review_warnings"]
-        ):
+        if any(warning in analysis.warnings for warning in policy["review_warnings"]):
             chemistry_reasons.append("multiple_products")
         if analysis.evidence_quality not in set(policy["verified_evidence"]):
             chemistry_reasons.append("insufficient_edit_evidence")
@@ -128,7 +158,9 @@ def decide_admission(
         condition_status = ConditionStatus.UNUSABLE
         condition_reasons.append("solvent_only_recipe")
     else:
-        statuses = {component.identity_status for component in resolved_recipe.components}
+        statuses = {
+            component.identity_status for component in resolved_recipe.components
+        }
         if "invalid_identifier" in statuses:
             condition_status = ConditionStatus.RESOLVED_PARTIAL
             condition_reasons.extend(
@@ -176,20 +208,24 @@ def decide_admission(
     ) or (
         condition_stage_status == ConditionStageStatus.UNASSIGNED_MULTISTAGE
         and condition_status.value
-        in set(
-            policy.get(
-                "indexable_unassigned_multistage_condition_statuses"
-            )
-            or ()
-        )
+        in set(policy.get("indexable_unassigned_multistage_condition_statuses") or ())
     )
-    chemistry_is_indexable = chemistry_status == ChemistryStatus.VERIFIED or (
-        chemistry_status == ChemistryStatus.REVIEW
-        and analysis.reaction_signature is not None
-        and completeness is not None
-        and completeness.status == "verified"
-        and analysis.evidence_quality
-        in set(policy.get("indexable_review_evidence") or ())
+    chemistry_is_indexable = (
+        chemistry_status == ChemistryStatus.VERIFIED
+        or (
+            chemistry_status == ChemistryStatus.REVIEW
+            and analysis.reaction_signature is not None
+            and completeness is not None
+            and completeness.status == "verified"
+            and analysis.evidence_quality
+            in set(policy.get("indexable_review_evidence") or ())
+        )
+        or (
+            chemistry_status == ChemistryStatus.REVIEW
+            and fallback_descriptor is not None
+            and fallback_descriptor.retrieval_eligible
+            and condition_source_supported
+        )
     )
     if (
         chemistry_status == ChemistryStatus.REJECTED
@@ -218,9 +254,7 @@ def decide_admission(
     else:
         tier = AdmissionTier.REVIEW
 
-    reasons = sorted(
-        set(chemistry_reasons + condition_reasons + outcome_reasons)
-    )
+    reasons = sorted(set(chemistry_reasons + condition_reasons + outcome_reasons))
     if tier == AdmissionTier.VERIFIED:
         reasons = ["verified_reaction_signature_with_conditions"]
     return AdmissionDecision(
@@ -248,9 +282,7 @@ def _condition_stage_status(raw_stages: str) -> ConditionStageStatus:
 
 
 def _has_non_solvent_component(recipe: ResolvedConditionRecipe) -> bool:
-    return any(
-        component.primary_role != "solvent" for component in recipe.components
-    )
+    return any(component.primary_role != "solvent" for component in recipe.components)
 
 
 __all__ = ["AdmissionDecision", "decide_admission", "load_admission_policy"]

@@ -6,7 +6,10 @@ import json
 from typing import Any, Dict, Iterable
 
 from ..models import RecommendationRecord
-from .signature_serialization import flattened_signature_fields
+from .signature_serialization import (
+    flattened_fallback_fields,
+    flattened_signature_fields,
+)
 
 GENERIC_REVIEW_FIELDS = (
     "schema_version",
@@ -68,6 +71,10 @@ GENERIC_REVIEW_FIELDS = (
     "signature_l3_bond_edit",
     "signature_l4_environment",
     "reaction_signature_json",
+    "fallback_descriptor_id",
+    "fallback_descriptor_evidence_mode",
+    "fallback_descriptor_retrieval_eligible",
+    "fallback_descriptor_json",
     "reference",
 )
 
@@ -110,9 +117,7 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
             if completeness.get("product_heavy_atom_coverage") is not None
             else ""
         ),
-        "reaction_completeness_warnings": _joined(
-            completeness.get("warnings") or ()
-        ),
+        "reaction_completeness_warnings": _joined(completeness.get("warnings") or ()),
         "reaction_completeness_json": (
             json.dumps(
                 completeness,
@@ -178,6 +183,7 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "reaction_event_count": signature.get("event_count", ""),
         "reaction_event_scope": signature.get("event_scope", ""),
         **flattened_signature_fields(record.reaction_signature),
+        **flattened_fallback_fields(record.fallback_descriptor),
         "reference": record.source.get("reference", ""),
     }
 

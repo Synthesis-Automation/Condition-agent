@@ -10,6 +10,7 @@ from .models import CompoundAnalysis
 
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.0"
+REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.1"
 
 EditArchetype = Literal[
     "substitution",
@@ -145,14 +146,9 @@ class BondTransition:
         if not 0.0 <= self.confidence <= 1.0:
             raise ValueError("confidence must be between 0 and 1")
         localized_units = {"SINGLE": 1, "DOUBLE": 2, "TRIPLE": 3}
-        if (
-            self.delta_units is not None
-            and (
-                self.before_state.state_kind
-                not in {"bond", "no_bond"}
-                or self.after_state.state_kind
-                not in {"bond", "no_bond"}
-            )
+        if self.delta_units is not None and (
+            self.before_state.state_kind not in {"bond", "no_bond"}
+            or self.after_state.state_kind not in {"bond", "no_bond"}
         ):
             raise ValueError(
                 "delta_units requires definite bond or no-bond endpoint states"
@@ -180,9 +176,7 @@ class BondTransition:
             self.after_state.state_kind == "endpoint_absent"
             and self.observation_scope != "main_product_projection"
         ):
-            raise ValueError(
-                "endpoint_absent requires main_product_projection scope"
-            )
+            raise ValueError("endpoint_absent requires main_product_projection scope")
         if (
             "unknown"
             in {
@@ -614,6 +608,43 @@ class ReactionEventRelation:
 
 
 @dataclass(frozen=True)
+class ReactionFallbackDescriptor:
+    """Structure-derived retrieval features that do not assert atom correspondence."""
+
+    descriptor_id: str
+    evidence_mode: Literal[
+        "verified_signature",
+        "partial_product_correspondence",
+        "candidate_hypotheses",
+        "structure_inventory_only",
+    ]
+    confidence: float
+    retrieval_eligible: bool
+    ineligibility_reasons: Tuple[str, ...]
+    reactant_component_tokens: Tuple[str, ...]
+    product_component_tokens: Tuple[str, ...]
+    reactant_site_tokens: Tuple[str, ...]
+    product_site_tokens: Tuple[str, ...]
+    reactant_group_tokens: Tuple[str, ...]
+    product_group_tokens: Tuple[str, ...]
+    context_tokens: Tuple[str, ...]
+    candidate_grammar_tokens: Tuple[str, ...]
+    candidate_transformation_tokens: Tuple[str, ...]
+    candidate_handle_tokens: Tuple[str, ...]
+    candidate_edit_tokens: Tuple[str, ...]
+    candidate_hypothesis_tokens: Tuple[str, ...]
+    verified_edit_tokens: Tuple[str, ...]
+    bond_inventory_delta_tokens: Tuple[str, ...]
+    element_delta_tokens: Tuple[str, ...]
+    compatibility_tags: Tuple[str, ...]
+    required_condition_source_elements: Tuple[str, ...]
+    condition_source_requirement_id: Optional[str]
+    definition_versions: Dict[str, str]
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION
+
+
+@dataclass(frozen=True)
 class ReactionSignature:
     """Versioned chemistry identity used by conversion and recommendation."""
 
@@ -692,11 +723,12 @@ class ReactionAnalysis:
     product_connection: Optional[ProductConnection] = None
     reaction_topology: Optional[ReactionTopology] = None
     reaction_signature: Optional[ReactionSignature] = None
+    fallback_descriptor: Optional[ReactionFallbackDescriptor] = None
     partial_product_transformation: Optional[PartialProductTransformation] = None
     reaction_completeness: Optional[ReactionCompletenessAssessment] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "3.0"
+    schema_version: str = "3.1"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -721,6 +753,7 @@ __all__ = [
     "ProductConnection",
     "ProductConnectionEndpoint",
     "ProductTransformation",
+    "REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION",
     "REACTION_SIGNATURE_SCHEMA_VERSION",
     "ReactionAnalysis",
     "ReactionAtomReference",
@@ -731,6 +764,7 @@ __all__ = [
     "ReactionEdit",
     "ReactionEvent",
     "ReactionEventRelation",
+    "ReactionFallbackDescriptor",
     "ReactionFamilyEnvironment",
     "ReactionLabelClause",
     "ReactionPartner",

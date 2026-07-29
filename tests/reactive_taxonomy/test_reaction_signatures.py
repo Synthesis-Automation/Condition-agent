@@ -34,6 +34,12 @@ def test_signature_is_stable_across_reactant_order() -> None:
         forward.reaction_signature.exact_signature_key
         == reversed_order.reaction_signature.exact_signature_key
     )
+    assert forward.fallback_descriptor is not None
+    assert reversed_order.fallback_descriptor is not None
+    assert (
+        forward.fallback_descriptor.descriptor_id
+        == reversed_order.fallback_descriptor.descriptor_id
+    )
 
 
 def test_signature_identity_is_display_style_independent() -> None:
@@ -67,7 +73,12 @@ def test_signature_contains_versioned_hierarchical_keys() -> None:
 
 def test_signature_partners_retain_typed_reactivity_profiles() -> None:
     cases = {
-        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1": ("Ar", "aromatic", "open", "balanced"),
+        "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1": (
+            "Ar",
+            "aromatic",
+            "open",
+            "balanced",
+        ),
         "Brc1ccccn1.Nc1ccccc1>>c1ccc(Nc2ccccn2)cc1": (
             "HeteroAr",
             "aromatic",
@@ -89,13 +100,9 @@ def test_signature_partners_retain_typed_reactivity_profiles() -> None:
         assert electrophile.anchor_contexts == (expected[0],)
         assert electrophile.reactivity_profile is not None
         assert electrophile.reactivity_profile.context_kind == expected[1]
+        assert electrophile.reactivity_profile.steric.accessibility_class == expected[2]
         assert (
-            electrophile.reactivity_profile.steric.accessibility_class
-            == expected[2]
-        )
-        assert (
-            electrophile.reactivity_profile.electronic.activation_class
-            == expected[3]
+            electrophile.reactivity_profile.electronic.activation_class == expected[3]
         )
 
 
@@ -109,7 +116,7 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
         "C-H:NONE>SINGLE",
     )
-    assert payload["schema_version"] == "3.0"
+    assert payload["schema_version"] == "3.1"
     assert payload["reaction_signature"]["schema_version"] == "3.0"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
@@ -179,9 +186,7 @@ def test_repeated_events_are_counted_in_display_label() -> None:
     assert result.reaction_signature.event_count == 2
     assert result.reaction_label == "2 x C-S substitution"
     assert result.display_label is not None
-    assert result.display_label.detailed.startswith(
-        "2 x C-S substitution; events:"
-    )
+    assert result.display_label.detailed.startswith("2 x C-S substitution; events:")
 
 
 def test_balanced_unmapped_multi_event_reaction_is_exactly_reconstructed() -> None:
@@ -195,10 +200,7 @@ def test_balanced_unmapped_multi_event_reaction_is_exactly_reconstructed() -> No
     assert result.reaction_signature.event_count == 2
     assert result.reaction_signature.product_transformation is not None
     assert result.reaction_signature.product_transformation.exact_product_verified
-    assert (
-        result.transformation_class
-        == "generic_multi_event_graph_transformation"
-    )
+    assert result.transformation_class == "generic_multi_event_graph_transformation"
     assert result.reaction_label == "C-O substitution + C-S substitution"
     assert [
         event.transformation_class for event in result.reaction_signature.events

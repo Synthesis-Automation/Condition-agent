@@ -120,6 +120,8 @@ Use `result.to_dict()` when a JSON-serializable audit payload is needed.
 Applications should inspect:
 
 - `valid`, `error`, and `warnings` before using any recommendation;
+- `recommendation_mode`, which distinguishes verified-signature retrieval from
+  the explicitly unverified structure fallback;
 - `retrieval_level` and `retrieval_trace` to see which fallback was required;
 - `resolved_recipe` for canonical condition components and operating variants;
 - independent `reference_support` and `precedent_reference_ids`, not only raw
@@ -129,6 +131,44 @@ Applications should inspect:
 
 An empty recommendation list or typed error is a valid abstention. It must not
 be replaced by a reaction-name guess.
+
+### Unresolved-query structure fallback
+
+When parsing succeeds but no verified `ReactionSignature` can be constructed,
+the generic API may use a separate `ReactionFallbackDescriptor`. Conversion
+creates this descriptor from canonical reactant and product inventories,
+taxonomy reactive sites, functional groups, local contexts, candidate grammar
+and edit hypotheses, and net bond/element inventory changes. It is deliberately
+not a `ReactionSignature`: candidate edits are hypotheses and are never
+serialized as observed bond edits.
+
+The fallback normally searches structure-verified, condition-resolved
+precedents in the generic index. It can also use a narrowly defined partial
+product correspondence when the only missing product fragment is declared in a
+versioned fallback rule and every retained precedent has a resolved condition
+component that supplies that fragment. The first supported case is replacement
+of a single C-I bond by C-F, where the recipe must contain a recognized fluoride
+source such as KF, CsF, or TBAF. A superficially similar row without a resolved
+fluoride source remains ineligible.
+
+The route requires multiple shared high-signal feature groups, a configured
+similarity threshold, conservative compatibility screening against all observed
+query functional-group tags, and normally two independent evidence units. A
+single precedent is accepted only at the stricter limited-support threshold.
+Results use
+`recommendation_mode="unverified_structure_fallback"` and include
+`QUERY_TRANSFORMATION_NOT_VERIFIED`,
+`UNVERIFIED_REACTION_FALLBACK_USED`, and
+`FALLBACK_RECOMMENDATIONS_REQUIRE_EXPERT_REVIEW`. Condition-supplied fragment
+retrieval additionally reports `QUERY_REQUIRES_CONDITION_SOURCE:<element>` and
+`CONDITION_SUPPLIED_FRAGMENT_FALLBACK_USED:<element>`.
+
+The route still abstains for invalid or conflicting atom maps, contradicted
+grammar/product evidence outside a declared condition-source rule, incomplete
+product atom provenance outside that rule, suspected missing reactants or
+multiplicity, and reactions without a discriminating structural change. An
+index created before fallback descriptors were added or before a fallback
+descriptor/condition-source definition changed must be rebuilt.
 
 ## Expert rule-based recommendation
 
@@ -515,6 +555,10 @@ similarity and aggregation. Minimum support is counted by independent
 publication, or by canonical reaction when no reference is available; repeated
 scope examples from one paper cannot satisfy the threshold by themselves.
 
+If the query has no signature, this hierarchy is not entered. The separate
+unverified-query fallback above uses its own similarity gate and trace and must
+not be presented as a bond-edit-compatible result.
+
 Results aggregate by canonical `RCORE1` recipe core and expose the observed
 `RCR1` operating-condition variants. Support distinguishes raw observations,
 canonical reactions, reference-local condition series, independent references,
@@ -532,6 +576,8 @@ Generic configuration is split by responsibility:
   comparison features;
 - `definitions/generic_ranking.v1.json` combines similarity, compatibility,
   condition certainty, outcome evidence, and reference-aware support.
+- `definitions/fallback_retrieval.v1.json` controls the isolated unresolved-query
+  structure fallback and its stricter support gates.
 
 Ranking and retrieval parameters are selected on development splits and
 promoted only after a separate validation gate. Similarity weights remain an

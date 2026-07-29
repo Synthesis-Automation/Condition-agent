@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "fallback_fragments.v1",
+  "rules": [
+    {
+      "rule_id": "condition_supplied_fluoride.v1",
+      "transformation_types": ["attachment_replacement"],
+      "center_elements": ["C"],
+      "removed_attachment_elements": ["I"],
+      "installed_fragment_elements": ["F"],
+      "maximum_missing_atom_count": 1,
+      "minimum_confidence": 0.8,
+      "minimum_product_heavy_atom_coverage": 0.9,
+      "old_orders": ["SINGLE"],
+      "new_orders": ["SINGLE"],
+      "condition_source_requirement_id": "fluoride_source"
+    }
+  ]
+}

@@ -8,7 +8,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Tuple
 
 from .compatibility import CompatibilityAssessment
 from .generic_indexing import GenericIndexedReaction
@@ -16,7 +16,6 @@ from .models import GenericConditionRecommendation, RecommendationScoreTrace
 from .similarity import (
     SimilarityAssessment,
     assess_signature_similarity,
-    load_generic_similarity_rules,
     reaction_scope,
 )
 from .support import evidence_unit, summarize_evidence_support
@@ -45,7 +44,7 @@ class ScoredPrecedent:
 def _precedent_reaction_context(
     precedent: GenericIndexedReaction,
 ) -> Dict[str, Any]:
-    """Return display context from one indexed, structure-verified precedent."""
+    """Return display context from one indexed structural precedent."""
     spectators = tuple(
         dict(group)
         for group in (precedent.signature.get("spectator_groups") or ())
@@ -105,13 +104,9 @@ def _validated_ranking_weights(
         raise ValueError("maximum_independent_neighbors must be positive")
     if float(rules["yield_prior_strength"]) < 0.0:
         raise ValueError("yield_prior_strength must be non-negative")
-    minimum_similarity_weight = float(
-        rules["minimum_similarity_yield_weight"]
-    )
+    minimum_similarity_weight = float(rules["minimum_similarity_yield_weight"])
     if not 0.0 < minimum_similarity_weight <= 1.0:
-        raise ValueError(
-            "minimum_similarity_yield_weight must be in (0, 1]"
-        )
+        raise ValueError("minimum_similarity_yield_weight must be in (0, 1]")
     saturation = rules.get("support_saturation") or {}
     if any(
         int(saturation.get(name) or 0) < 1
@@ -210,8 +205,7 @@ def _expected_yield(
     if not known or pool_prior is None:
         return None, 0
     similarity_weight = sum(
-        max(member.similarity.score, minimum_similarity_weight)
-        for member in known
+        max(member.similarity.score, minimum_similarity_weight) for member in known
     )
     weighted_yield = sum(
         max(member.similarity.score, minimum_similarity_weight)
@@ -228,14 +222,10 @@ def _weighted_score(
     components: Mapping[str, Optional[float]],
     base_weights: Mapping[str, float],
 ) -> tuple[float, Dict[str, float], Dict[str, float]]:
-    available = {
-        name: value for name, value in components.items() if value is not None
-    }
+    available = {name: value for name, value in components.items() if value is not None}
     denominator = sum(float(base_weights[name]) for name in available)
     applied = {
-        name: (
-            float(base_weights[name]) / denominator if name in available else 0.0
-        )
+        name: (float(base_weights[name]) / denominator if name in available else 0.0)
         for name in _RANKING_COMPONENTS
     }
     contributions = {
@@ -278,7 +268,7 @@ def _explanation(
         "family": "named family",
     }
     matches = [
-        labels[name]
+        labels.get(name, name.replace("_", " "))
         for name, score in similarity_components.items()
         if score >= 0.999
     ]
@@ -286,8 +276,7 @@ def _explanation(
         notes.append("Exact match: " + ", ".join(matches))
     if query_scope and precedent_scope and query_scope != precedent_scope:
         notes.append(
-            f"Reaction-scope mismatch: query {query_scope}; "
-            f"precedent {precedent_scope}"
+            f"Reaction-scope mismatch: query {query_scope}; precedent {precedent_scope}"
         )
     notes.append(f"Recipe compatibility score: {compatibility_score:.2f}")
     notes.append(
@@ -309,6 +298,12 @@ def rank_condition_recipes(
     top_k: int,
     ranking_profile: str = "default",
     ranking_weights: Optional[Mapping[str, float]] = None,
+    similarity_assessor: Optional[
+        Callable[
+            [Mapping[str, Any], GenericIndexedReaction],
+            SimilarityAssessment,
+        ]
+    ] = None,
 ) -> Tuple[GenericConditionRecommendation, ...]:
     """Aggregate recipe cores and rank them with a complete score trace."""
     rules = load_generic_ranking_rules()
@@ -327,9 +322,18 @@ def rank_condition_recipes(
             profiles[ranking_profile],
             label=f"generic ranking baseline {ranking_profile}",
         )
+    assessor = similarity_assessor
+    if assessor is None:
+
+        def assessor(
+            query_value: Mapping[str, Any],
+            row: GenericIndexedReaction,
+        ) -> SimilarityAssessment:
+            return assess_signature_similarity(query_value, row.signature)
+
     scored = [
         ScoredPrecedent(
-            similarity=assess_signature_similarity(query, row.signature),
+            similarity=assessor(query, row),
             row=row,
             compatibility=compatibility,
         )
@@ -362,30 +366,23 @@ def rank_condition_recipes(
             members,
             pool_prior=pool_prior,
             prior_strength=float(rules["yield_prior_strength"]),
-            minimum_similarity_weight=float(
-                rules["minimum_similarity_yield_weight"]
-            ),
+            minimum_similarity_weight=float(rules["minimum_similarity_yield_weight"]),
         )
-        similarity_score = _mean(
-            member.similarity.score for member in independent
-        )
+        similarity_score = _mean(member.similarity.score for member in independent)
         compatibility_score = _mean(
             member.compatibility.score for member in independent
         )
         condition_certainty = _mean(
             float(
                 not member.row.condition_uncertain
-                and member.row.condition_stage_status
-                != "unassigned_multistage"
+                and member.row.condition_stage_status != "unassigned_multistage"
             )
             for member in independent
         )
         support = summarize_evidence_support(member.row for member in members)
         components: Dict[str, Optional[float]] = {
             "similarity": similarity_score,
-            "yield": expected_yield / 100.0
-            if expected_yield is not None
-            else None,
+            "yield": expected_yield / 100.0 if expected_yield is not None else None,
             "independent_support": _saturated_log(
                 len(independent),
                 int(saturation["independent_evidence"]),
@@ -405,12 +402,10 @@ def rank_condition_recipes(
             components,
             ranking_weights,
         )
-        similarity_components, similarity_contributions = (
-            _mean_similarity_trace(independent)
+        similarity_components, similarity_contributions = _mean_similarity_trace(
+            independent
         )
-        recipe_variants = tuple(
-            sorted({member.row.recipe_id for member in members})
-        )
+        recipe_variants = tuple(sorted({member.row.recipe_id for member in members}))
         ranking_rows.append(
             (
                 score,
@@ -441,7 +436,6 @@ def rank_condition_recipes(
     )
     recommendations = []
     query_scope = reaction_scope(query)
-    similarity_rules = load_generic_similarity_rules()
     for rank, item in enumerate(ranking_rows[:top_k], start=1):
         (
             score,
@@ -465,8 +459,7 @@ def rank_condition_recipes(
         cautions = []
         if condition_certainty < 1.0:
             cautions.append(
-                "Condition identity, contextual role, or stage assignment "
-                "is uncertain"
+                "Condition identity, contextual role, or stage assignment is uncertain"
             )
         if any(
             member.row.condition_stage_status == "unassigned_multistage"
@@ -481,13 +474,10 @@ def rank_condition_recipes(
                 "No usable yield evidence; ranking excludes the outcome component"
             )
         if retrieval_level.endswith("limited_support"):
-            cautions.append(
-                "Retrieval pool is below the configured support threshold"
-            )
+            cautions.append("Retrieval pool is below the configured support threshold")
         if len(recipe_variants) > 1:
             cautions.append(
-                f"Recipe core has {len(recipe_variants)} "
-                "operating-condition variants"
+                f"Recipe core has {len(recipe_variants)} operating-condition variants"
             )
         if len(members) > len(independent):
             cautions.append(
@@ -510,15 +500,24 @@ def rank_condition_recipes(
                 "Precedent reaction edits use deterministic inferred atom "
                 "correspondence and retain review-level chemistry confidence"
             )
+        if any(
+            not member.row.signature
+            and member.row.fallback_descriptor.get("evidence_mode")
+            == "partial_product_correspondence"
+            for member in members
+        ):
+            cautions.append(
+                "Precedent transformation uses partial product correspondence; "
+                "its resolved condition recipe supplies the otherwise missing "
+                "product fragment"
+            )
         precedent_scopes = {
             reaction_scope(member.row.signature)
             for member in members
             if reaction_scope(member.row.signature)
         }
         mismatched_scopes = sorted(
-            scope
-            for scope in precedent_scopes
-            if query_scope and scope != query_scope
+            scope for scope in precedent_scopes if query_scope and scope != query_scope
         )
         if mismatched_scopes:
             cautions.append(
@@ -539,9 +538,7 @@ def rank_condition_recipes(
             similarity_components=similarity_components,
             similarity_contributions=similarity_contributions,
             ranking_components={
-                name: (
-                    round(value, 6) if value is not None else None
-                )
+                name: (round(value, 6) if value is not None else None)
                 for name, value in components.items()
             },
             ranking_contributions=ranking_contributions,
@@ -552,9 +549,7 @@ def rank_condition_recipes(
                 round(pool_prior, 6) if pool_prior is not None else None
             ),
             definition_versions={
-                str(similarity_rules["definition_id"]): str(
-                    similarity_rules["schema_version"]
-                ),
+                best.similarity.definition_id: best.similarity.definition_version,
                 str(rules["definition_id"]): str(rules["schema_version"]),
                 best.compatibility.definition_id: (
                     best.compatibility.definition_version
@@ -573,9 +568,7 @@ def rank_condition_recipes(
                 similarity_score=round(similarity_score, 6),
                 compatibility_score=round(compatibility_score, 6),
                 expected_yield_pct=(
-                    round(expected_yield, 2)
-                    if expected_yield is not None
-                    else None
+                    round(expected_yield, 2) if expected_yield is not None else None
                 ),
                 support=support.reaction_count,
                 observation_support=support.observation_count,
@@ -590,8 +583,7 @@ def rank_condition_recipes(
                     member.row.reaction_smiles for member in members[:5]
                 ),
                 precedent_reaction_contexts=tuple(
-                    _precedent_reaction_context(member.row)
-                    for member in members[:5]
+                    _precedent_reaction_context(member.row) for member in members[:5]
                 ),
                 precedent_reference_ids=tuple(
                     sorted(

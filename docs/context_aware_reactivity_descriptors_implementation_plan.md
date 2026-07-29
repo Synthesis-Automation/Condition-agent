@@ -8,8 +8,8 @@ descriptor path. The intentional identity migration is active:
 - profile schema `1.0`;
 - reaction-signature schema `3.0` and `RS3` identifiers;
 - `signature_features.v3.json` and `taxonomy_manifest.v3.json`;
-- recommendation-record schema `3.1`;
-- generic converter `generic_conversion.v2.1`;
+- recommendation-record schema `3.3`;
+- generic converter `generic_conversion.v2.3`;
 - generic-index, concise-review, and condition-rule schemas `2.0`.
 
 GUI, CLI, review exports, rule facts, signatures, indexing, retrieval, and

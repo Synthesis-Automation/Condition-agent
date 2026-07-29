@@ -7,13 +7,15 @@ import hashlib
 import gzip
 import io
 from collections import Counter, defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field as dataclass_field
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
 
 from reactive_taxonomy import (
+    REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
+    reaction_fallback_definition_versions,
     reaction_signature_definition_versions,
 )
 
@@ -23,9 +25,10 @@ from .models import (
 )
 from .evaluation_features import reaction_scaffold_key, reaction_scaffold_tokens
 from .signature_features import environment_tokens
+from .fallback_similarity import fallback_index_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "2.0"
+GENERIC_INDEX_SCHEMA_VERSION = "2.2"
 
 
 @dataclass(frozen=True)
@@ -56,6 +59,7 @@ class GenericIndexedReaction:
     converter_definition_version: str
     reaction_label: str = ""
     reaction_label_status: str = "unavailable"
+    fallback_descriptor: Dict[str, Any] = dataclass_field(default_factory=dict)
 
     @property
     def named_family(self) -> str:
@@ -81,9 +85,12 @@ class GenericReactionIndex:
     bond_edits: Mapping[str, Tuple[int, ...]]
     environments: Mapping[str, Tuple[int, ...]]
     environment_features: Mapping[str, Tuple[int, ...]]
+    fallback_features: Mapping[str, Tuple[int, ...]]
     families: Mapping[str, Tuple[int, ...]]
     reaction_signature_schema_version: str
     taxonomy_definition_versions: Tuple[Tuple[str, str], ...]
+    fallback_descriptor_schema_version: str
+    fallback_definition_versions: Tuple[Tuple[str, str], ...]
     record_schema_versions: Tuple[str, ...]
     converter_definition_versions: Tuple[str, ...]
 
@@ -123,19 +130,54 @@ def _validate_index_rows(
 ]:
     values = tuple(rows)
     signature_schemas = {
-        str(row.signature.get("schema_version") or "") for row in values
+        str(row.signature.get("schema_version") or "")
+        for row in values
+        if row.signature
     }
     if signature_schemas and signature_schemas != {REACTION_SIGNATURE_SCHEMA_VERSION}:
         raise ValueError(
             "Incompatible reaction signature schema; regenerate converted records"
         )
-    definition_sets = {_definition_version_tuple(row.signature) for row in values}
+    definition_sets = {
+        _definition_version_tuple(row.signature) for row in values if row.signature
+    }
     current_definitions = tuple(
         sorted(reaction_signature_definition_versions().items())
     )
     if definition_sets and definition_sets != {current_definitions}:
         raise ValueError(
             "Incompatible reaction taxonomy definitions; regenerate converted records"
+        )
+    fallback_descriptors = tuple(
+        row.fallback_descriptor for row in values if row.fallback_descriptor
+    )
+    fallback_schemas = {
+        str(descriptor.get("schema_version") or "")
+        for descriptor in fallback_descriptors
+    }
+    if fallback_schemas and fallback_schemas != {
+        REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION
+    }:
+        raise ValueError(
+            "Incompatible fallback descriptor schema; regenerate converted records"
+        )
+    current_fallback_definitions = tuple(
+        sorted(reaction_fallback_definition_versions().items())
+    )
+    fallback_definition_sets = {
+        tuple(
+            sorted(
+                (str(key), str(value))
+                for key, value in (descriptor.get("definition_versions") or {}).items()
+            )
+        )
+        for descriptor in fallback_descriptors
+    }
+    if fallback_definition_sets and fallback_definition_sets != {
+        current_fallback_definitions
+    }:
+        raise ValueError(
+            "Incompatible fallback descriptor definitions; regenerate converted records"
         )
     record_schemas = tuple(sorted({row.record_schema_version for row in values}))
     if record_schemas and record_schemas != (RECOMMENDATION_RECORD_SCHEMA_VERSION,):
@@ -183,6 +225,7 @@ def build_generic_index_from_rows(
     }
     families: Dict[str, list[int]] = defaultdict(list)
     environment_features: Dict[str, list[int]] = defaultdict(list)
+    fallback_features: Dict[str, list[int]] = defaultdict(list)
     for position, row in enumerate(ordered):
         for name, field in _KEY_FIELDS.items():
             key = str(row.signature.get(field) or "")
@@ -192,6 +235,8 @@ def build_generic_index_from_rows(
             families[row.named_family].append(position)
         for token in set(environment_tokens(row.signature)):
             environment_features[token].append(position)
+        for token in fallback_index_tokens(row.fallback_descriptor):
+            fallback_features[token].append(position)
     return GenericReactionIndex(
         rows=tuple(ordered),
         exact=_freeze(maps["exact"]),
@@ -200,9 +245,16 @@ def build_generic_index_from_rows(
         bond_edits=_freeze(maps["bond_edits"]),
         environments=_freeze(maps["environments"]),
         environment_features=_freeze(environment_features),
+        fallback_features=_freeze(fallback_features),
         families=_freeze(families),
         reaction_signature_schema_version=signature_schema,
         taxonomy_definition_versions=definition_versions,
+        fallback_descriptor_schema_version=(
+            REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION
+        ),
+        fallback_definition_versions=tuple(
+            sorted(reaction_fallback_definition_versions().items())
+        ),
         record_schema_versions=record_schemas,
         converter_definition_versions=converter_versions,
     )
@@ -222,6 +274,7 @@ def build_generic_index(
         ):
             continue
         signature = record.get("reaction_signature")
+        fallback_descriptor = record.get("fallback_descriptor")
         recipe = record.get("resolved_recipe")
         recipe_id = str(record.get("resolved_recipe_id") or "")
         recipe_core_id = str(
@@ -230,7 +283,10 @@ def build_generic_index(
             or recipe_id
         )
         outcome = record.get("yield_pct")
-        if not isinstance(signature, Mapping) or not isinstance(recipe, Mapping):
+        if (
+            not isinstance(signature, Mapping)
+            and not isinstance(fallback_descriptor, Mapping)
+        ) or not isinstance(recipe, Mapping):
             continue
         if not recipe_id or not recipe_core_id:
             continue
@@ -256,9 +312,7 @@ def build_generic_index(
                 reference_id=str(record.get("reference_id") or ""),
                 publication_year=(
                     int((record.get("reference_identity") or {})["publication_year"])
-                    if (record.get("reference_identity") or {}).get(
-                        "publication_year"
-                    )
+                    if (record.get("reference_identity") or {}).get("publication_year")
                     is not None
                     else None
                 ),
@@ -267,13 +321,13 @@ def build_generic_index(
                 ),
                 scaffold_key=reaction_scaffold_key(
                     str(record.get("reaction_smiles") or ""),
-                    signature,
+                    signature if isinstance(signature, Mapping) else {},
                 ),
                 scaffold_tokens=reaction_scaffold_tokens(
                     str(record.get("reaction_smiles") or ""),
-                    signature,
+                    signature if isinstance(signature, Mapping) else {},
                 ),
-                signature=dict(signature),
+                signature=(dict(signature) if isinstance(signature, Mapping) else {}),
                 recipe_id=recipe_id,
                 recipe_core_id=recipe_core_id,
                 resolved_recipe=dict(recipe),
@@ -285,8 +339,7 @@ def build_generic_index(
                 chemistry_status=_enum_value(record.get("chemistry_status")),
                 condition_status=_enum_value(record.get("condition_status")),
                 condition_stage_status=(
-                    _enum_value(record.get("condition_stage_status"))
-                    or "single_stage"
+                    _enum_value(record.get("condition_stage_status")) or "single_stage"
                 ),
                 outcome_status=_enum_value(record.get("outcome_status")),
                 record_schema_version=str(record.get("schema_version") or ""),
@@ -296,6 +349,11 @@ def build_generic_index(
                 reaction_label=str(record.get("reaction_label") or ""),
                 reaction_label_status=str(
                     record.get("reaction_label_status") or "unavailable"
+                ),
+                fallback_descriptor=(
+                    dict(fallback_descriptor or {})
+                    if isinstance(fallback_descriptor, Mapping)
+                    else {}
                 ),
             )
         )
@@ -343,6 +401,7 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "converter_definition_version": row.converter_definition_version,
             "reaction_label": row.reaction_label,
             "reaction_label_status": row.reaction_label_status,
+            "fallback_descriptor": row.fallback_descriptor,
         }
         for row in index.rows
     ]
@@ -353,6 +412,7 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
         "bond_edits": dict(index.bond_edits),
         "environments": dict(index.environments),
         "environment_features": dict(index.environment_features),
+        "fallback_features": dict(index.fallback_features),
         "families": dict(index.families),
     }
     identity = json.dumps(
@@ -363,6 +423,10 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
                 index.reaction_signature_schema_version
             ),
             "taxonomy_definition_versions": dict(index.taxonomy_definition_versions),
+            "fallback_descriptor_schema_version": (
+                index.fallback_descriptor_schema_version
+            ),
+            "fallback_definition_versions": dict(index.fallback_definition_versions),
             "record_schema_versions": index.record_schema_versions,
             "converter_definition_versions": index.converter_definition_versions,
         },
@@ -375,6 +439,10 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
         "artifact_type": "generic_reaction_index",
         "reaction_signature_schema_version": (index.reaction_signature_schema_version),
         "taxonomy_definition_versions": dict(index.taxonomy_definition_versions),
+        "fallback_descriptor_schema_version": (
+            index.fallback_descriptor_schema_version
+        ),
+        "fallback_definition_versions": dict(index.fallback_definition_versions),
         "record_schema_versions": index.record_schema_versions,
         "converter_definition_versions": index.converter_definition_versions,
         "index_id": "GRI1:" + hashlib.sha256(identity.encode("utf-8")).hexdigest(),
@@ -434,6 +502,10 @@ def save_generic_index(index: GenericReactionIndex, path: str | Path) -> Dict[st
             "reaction_signature_schema_version"
         ],
         "taxonomy_definition_versions": payload["taxonomy_definition_versions"],
+        "fallback_descriptor_schema_version": payload[
+            "fallback_descriptor_schema_version"
+        ],
+        "fallback_definition_versions": payload["fallback_definition_versions"],
         "record_schema_versions": payload["record_schema_versions"],
         "converter_definition_versions": payload["converter_definition_versions"],
         "index_id": payload["index_id"],
@@ -466,6 +538,17 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
     if payload.get("taxonomy_definition_versions") != current_definitions:
         raise ValueError(
             "Incompatible reaction taxonomy definitions; rebuild the index"
+        )
+    if (
+        payload.get("fallback_descriptor_schema_version")
+        != REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION
+    ):
+        raise ValueError("Incompatible fallback descriptor schema; rebuild the index")
+    if payload.get("fallback_definition_versions") != (
+        reaction_fallback_definition_versions()
+    ):
+        raise ValueError(
+            "Incompatible fallback descriptor definitions; rebuild the index"
         )
     if tuple(payload.get("record_schema_versions") or ()) != (
         RECOMMENDATION_RECORD_SCHEMA_VERSION,
@@ -515,6 +598,7 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             reaction_label_status=str(
                 row.get("reaction_label_status") or "unavailable"
             ),
+            fallback_descriptor=dict(row.get("fallback_descriptor") or {}),
         )
         for row in payload.get("rows") or ()
     )
@@ -539,6 +623,10 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             key: tuple(value)
             for key, value in (maps.get("environment_features") or {}).items()
         },
+        fallback_features={
+            key: tuple(value)
+            for key, value in (maps.get("fallback_features") or {}).items()
+        },
         families={
             key: tuple(value) for key, value in (maps.get("families") or {}).items()
         },
@@ -549,6 +637,15 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             sorted(
                 (str(key), str(value))
                 for key, value in payload["taxonomy_definition_versions"].items()
+            )
+        ),
+        fallback_descriptor_schema_version=str(
+            payload["fallback_descriptor_schema_version"]
+        ),
+        fallback_definition_versions=tuple(
+            sorted(
+                (str(key), str(value))
+                for key, value in payload["fallback_definition_versions"].items()
             )
         ),
         record_schema_versions=tuple(payload["record_schema_versions"]),
@@ -646,6 +743,9 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
         for token in set(environment_tokens(row.signature)):
             if position not in index.environment_features.get(token, ()):
                 issues.append("missing_environment_feature_mapping")
+        for token in fallback_index_tokens(row.fallback_descriptor):
+            if position not in index.fallback_features.get(token, ()):
+                issues.append("missing_fallback_feature_mapping")
         if row.named_family and position not in index.families.get(
             row.named_family, ()
         ):
@@ -682,23 +782,20 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
             "bond_edits": len(index.bond_edits),
             "environments": len(index.environments),
             "environment_features": len(index.environment_features),
+            "fallback_features": len(index.fallback_features),
             "families": len(index.families),
         },
         "transformation_class_counts": dict(
             sorted(Counter(row.transformation_class for row in index.rows).items())
         ),
         "named_family_counts": dict(
-            sorted(
-                Counter(row.named_family or "unnamed" for row in index.rows).items()
-            )
+            sorted(Counter(row.named_family or "unnamed" for row in index.rows).items())
         ),
         "reaction_scope_counts": dict(
             sorted(
                 Counter(
                     str(
-                        (row.signature.get("topology") or {}).get(
-                            "reaction_scope"
-                        )
+                        (row.signature.get("topology") or {}).get("reaction_scope")
                         or "unknown"
                     )
                     for row in index.rows
@@ -708,9 +805,7 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
         "unique_reference_count": len(
             {row.reference_id for row in index.rows if row.reference_id}
         ),
-        "unique_recipe_core_count": len(
-            {row.recipe_core_id for row in index.rows}
-        ),
+        "unique_recipe_core_count": len({row.recipe_core_id for row in index.rows}),
     }
     return report
 

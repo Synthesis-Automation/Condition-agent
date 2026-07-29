@@ -99,8 +99,8 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.1",
-        "converter_definition_version": "generic_conversion.v2.1",
+        "schema_version": "3.3",
+        "converter_definition_version": "generic_conversion.v2.3",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "chemistry_status": "verified",
@@ -138,9 +138,9 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "2.0"
+    assert payload["schema_version"] == "2.2"
     assert payload["reaction_signature_schema_version"] == "3.0"
-    assert payload["record_schema_versions"] == ["3.1"]
+    assert payload["record_schema_versions"] == ["3.3"]
     assert payload["maps"]["environment_features"]
     integrity = validate_generic_index_artifact(first_path)
     assert integrity["valid"]
@@ -286,12 +286,8 @@ def test_scaffold_disjoint_split_has_no_reactive_scaffold_overlap() -> None:
         split_mode="scaffold_disjoint",
     )
 
-    train_tokens = {
-        token for row in split.train_rows for token in row.scaffold_tokens
-    }
-    test_tokens = {
-        token for row in split.test_rows for token in row.scaffold_tokens
-    }
+    train_tokens = {token for row in split.train_rows for token in row.scaffold_tokens}
+    test_tokens = {token for row in split.test_rows for token in row.scaffold_tokens}
     assert split.split_mode == "scaffold_disjoint"
     assert not train_tokens.intersection(test_tokens)
 
@@ -324,12 +320,8 @@ def test_forward_time_split_uses_latest_publication_groups() -> None:
         split_mode="forward_time",
     )
 
-    train_years = {
-        row.publication_year for row in split.train_rows
-    }
-    test_years = {
-        row.publication_year for row in split.test_rows
-    }
+    train_years = {row.publication_year for row in split.train_rows}
+    test_years = {row.publication_year for row in split.test_rows}
     assert split.split_mode == "forward_time"
     assert max(train_years) <= min(test_years)
     assert split.cutoff_year == min(test_years)
@@ -344,9 +336,9 @@ def test_source_disjoint_split_has_no_dataset_overlap() -> None:
         split_mode="source_disjoint",
     )
 
-    assert not {
-        row.source_dataset for row in split.train_rows
-    }.intersection(row.source_dataset for row in split.test_rows)
+    assert not {row.source_dataset for row in split.train_rows}.intersection(
+        row.source_dataset for row in split.test_rows
+    )
 
 
 def test_grouped_split_validates_inputs() -> None:
@@ -387,9 +379,9 @@ def test_baseline_comparison_uses_one_split_and_writes_report(
     assert comparison["strategies"]["generic_only"]["coverage_rate"] == 1.0
     assert (
         comparison["split"]
-        == json.loads(
-            (output / "hybrid" / "evaluation_report.json").read_text()
-        )["split"]
+        == json.loads((output / "hybrid" / "evaluation_report.json").read_text())[
+            "split"
+        ]
     )
     assert (output / "baseline_comparison.json").is_file()
     assert (output / "baseline_comparison.md").is_file()

@@ -17,6 +17,7 @@ from .reaction_display_labels import build_reaction_display_label
 from .reaction_edits import normalize_mapped_edits, normalize_reaction_edits
 from .reaction_labels import render_reactant_label, render_reaction_label
 from .reaction_environments import build_reaction_family_environment
+from .reaction_fallback_descriptors import build_reaction_fallback_descriptor
 from .reaction_models import ReactionAnalysis, ReactionCandidate
 from .reaction_multi_events import (
     equivalent_multi_event_interpretations,
@@ -84,9 +85,7 @@ def featurize_reaction(
     candidate_sources = []
     exact: List[ReactionCandidate] = []
     for grammar, assignment in raw:
-        outcomes = apply_connectivity_rewrite(
-            grammar, assignment, parsed.reactants
-        )
+        outcomes = apply_connectivity_rewrite(grammar, assignment, parsed.reactants)
         for outcome in outcomes:
             predicted_canonical = (
                 _canonical_without_maps(outcome.predicted_product_smiles)
@@ -97,9 +96,7 @@ def featurize_reaction(
                 "exact_product_reconstruction"
                 if predicted_canonical in observed_products
                 else (
-                    "product_mismatch"
-                    if predicted_canonical
-                    else "construction_failed"
+                    "product_mismatch" if predicted_canonical else "construction_failed"
                 )
             )
             label = render_reaction_label(grammar, assignment, style=label_style)
@@ -166,9 +163,7 @@ def featurize_reaction(
             chosen = multi_exact[0]
             from .reaction_multi_events import apply_rewrite_sequence
 
-            composite_product = apply_rewrite_sequence(
-                chosen, parsed.reactants
-            )
+            composite_product = apply_rewrite_sequence(chosen, parsed.reactants)
             event_candidates = []
             for grammar, assignment in chosen:
                 event_outcomes = apply_connectivity_rewrite(
@@ -184,13 +179,9 @@ def featurize_reaction(
                         edit_archetype=infer_bond_change_archetype(
                             event_outcome.predicted_bond_changes
                         ),
-                        transformation_class=str(
-                            grammar["transformation_class"]
-                        ),
+                        transformation_class=str(grammar["transformation_class"]),
                         role_assignments=assignment,
-                        predicted_bond_changes=(
-                            event_outcome.predicted_bond_changes
-                        ),
+                        predicted_bond_changes=(event_outcome.predicted_bond_changes),
                         predicted_product_smiles=composite_product,
                         verification="exact_multi_event_reconstruction",
                         reaction_label=render_reaction_label(
@@ -325,9 +316,9 @@ def featurize_reaction(
         and selected.reaction_label
         and display_arrow in selected.reaction_label
     ):
-        selected_product_label = selected.reaction_label.split(
-            display_arrow, 1
-        )[1].strip()
+        selected_product_label = selected.reaction_label.split(display_arrow, 1)[
+            1
+        ].strip()
     reaction_signature = (
         build_reaction_signature(
             reactants=parsed.reactants,
@@ -358,13 +349,11 @@ def featurize_reaction(
     reaction_label_status = "exact_product" if selected else "unavailable"
     fallback_detailed_label = None
     if partial_product_transformation is not None:
-        reaction_label, fallback_detailed_label = (
-            render_partial_product_transformation(
-                partial_product_transformation,
-                reactants=parsed.reactants,
-                products=parsed.products,
-                style=label_style,
-            )
+        reaction_label, fallback_detailed_label = render_partial_product_transformation(
+            partial_product_transformation,
+            reactants=parsed.reactants,
+            products=parsed.products,
+            style=label_style,
         )
         reaction_label_status = "partial_product_correspondence"
     elif selected is None and candidates and not product_contradicted_candidates:
@@ -409,8 +398,7 @@ def featurize_reaction(
             selected.role_assignments, style=label_style
         )
         reaction_label = (
-            f"{reactants_label} {display_arrow} "
-            f"{product_connection.concise_label}"
+            f"{reactants_label} {display_arrow} {product_connection.concise_label}"
         )
     display_label = build_reaction_display_label(
         edits=edit_result.edits,
@@ -425,14 +413,12 @@ def featurize_reaction(
         fallback_status=reaction_label_status,
         evidence=(
             partial_product_transformation.evidence
-            if partial_product_transformation is not None
-            and not edit_result.edits
+            if partial_product_transformation is not None and not edit_result.edits
             else edit_result.evidence
         ),
         confidence=(
             partial_product_transformation.confidence
-            if partial_product_transformation is not None
-            and not edit_result.edits
+            if partial_product_transformation is not None and not edit_result.edits
             else edit_result.confidence
         ),
         events=(reaction_signature.events if reaction_signature is not None else ()),
@@ -459,6 +445,16 @@ def featurize_reaction(
             reaction_label_status = "conflicting_edit_summary"
         elif display_label.status == "multi_event":
             reaction_label_status = "multi_event_edit_summary"
+    fallback_descriptor = build_reaction_fallback_descriptor(
+        reactants=parsed.reactants,
+        products=parsed.products,
+        candidates=tuple(candidates),
+        signature=reaction_signature,
+        partial_transformation=partial_product_transformation,
+        completeness=reaction_completeness,
+        evidence_quality=effective_evidence,
+        warnings=warnings,
+    )
     return ReactionAnalysis(
         input_reaction_smiles=reaction_smiles,
         valid=True,
@@ -496,6 +492,7 @@ def featurize_reaction(
         product_connection=product_connection,
         reaction_topology=reaction_topology,
         reaction_signature=reaction_signature,
+        fallback_descriptor=fallback_descriptor,
         partial_product_transformation=partial_product_transformation,
         reaction_completeness=reaction_completeness,
         warnings=tuple(sorted(set(warnings))),

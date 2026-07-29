@@ -17,6 +17,11 @@ from .generic_retrieval import (
     load_generic_retrieval_rules,
     retrieve_compatible_generic_pool_with_trace,
 )
+from .fallback_retrieval import retrieve_fallback_pool_with_trace
+from .fallback_similarity import (
+    assess_fallback_similarity,
+    load_fallback_retrieval_rules,
+)
 from .models import GenericRecommendationResult
 from .recipe_ranking import rank_condition_recipes
 
@@ -48,9 +53,7 @@ def recommend_indexed_signature(
             if isinstance(partner, Mapping)
         ),
     }
-    retrieval_definition_version = str(
-        load_generic_retrieval_rules()["schema_version"]
-    )
+    retrieval_definition_version = str(load_generic_retrieval_rules()["schema_version"])
     if top_k < 1:
         return GenericRecommendationResult(
             query_reaction_smiles, False, error="TOP_K_MUST_BE_POSITIVE"
@@ -118,8 +121,7 @@ def recommend_indexed_signature(
         warnings.append("TYPE_AGNOSTIC_FALLBACK_USED")
     if retrieval.excluded_candidate_count:
         warnings.append(
-            "INCOMPATIBLE_PRECEDENTS_EXCLUDED:"
-            f"{retrieval.excluded_candidate_count}"
+            f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{retrieval.excluded_candidate_count}"
         )
     recommendations = rank_condition_recipes(
         signature,
@@ -211,10 +213,11 @@ def _recommend_with_index(
             error=analysis.error or "INVALID_REACTION",
         )
     if analysis.reaction_signature is None:
-        return GenericRecommendationResult(
-            reaction_smiles,
-            False,
-            error="QUERY_HAS_NO_USABLE_REACTION_SIGNATURE",
+        return _recommend_fallback_with_index(
+            analysis,
+            index,
+            top_k=top_k,
+            minimum_pool_size=minimum_pool_size,
         )
     result = recommend_indexed_signature(
         asdict(analysis.reaction_signature),
@@ -228,6 +231,172 @@ def _recommend_with_index(
     return replace(
         result,
         spectator_groups=tuple(asdict(group) for group in analysis.spectator_groups),
+    )
+
+
+def _recommend_fallback_with_index(
+    analysis: Any,
+    index: GenericReactionIndex,
+    *,
+    top_k: int,
+    minimum_pool_size: int | None,
+) -> GenericRecommendationResult:
+    """Recommend only when the unresolved-query fallback clears safety gates."""
+    reaction_smiles = str(analysis.input_reaction_smiles)
+    descriptor_model = analysis.fallback_descriptor
+    if descriptor_model is None:
+        return GenericRecommendationResult(
+            reaction_smiles,
+            False,
+            recommendation_mode="abstained",
+            error="QUERY_HAS_NO_USABLE_REACTION_SIGNATURE",
+        )
+    descriptor = asdict(descriptor_model)
+    descriptor_id = str(descriptor.get("descriptor_id") or "")
+    retrieval_definition_version = str(
+        load_fallback_retrieval_rules()["schema_version"]
+    )
+    base_warnings = [
+        "QUERY_TRANSFORMATION_NOT_VERIFIED",
+        "UNVERIFIED_REACTION_FALLBACK_CONSIDERED",
+    ]
+    required_source_elements = tuple(
+        str(value)
+        for value in descriptor.get("required_condition_source_elements") or ()
+    )
+    if required_source_elements:
+        base_warnings.append(
+            f"QUERY_REQUIRES_CONDITION_SOURCE:{','.join(required_source_elements)}"
+        )
+    if not bool(descriptor.get("retrieval_eligible")):
+        base_warnings.extend(
+            f"FALLBACK_BLOCKED:{reason}"
+            for reason in descriptor.get("ineligibility_reasons") or ()
+        )
+        return GenericRecommendationResult(
+            query_reaction_smiles=reaction_smiles,
+            valid=False,
+            query_fallback_descriptor_id=descriptor_id,
+            recommendation_mode="abstained",
+            reaction_label=analysis.reaction_label,
+            reaction_label_status=analysis.reaction_label_status,
+            transformation_class=analysis.transformation_class,
+            warnings=tuple(base_warnings),
+            error="QUERY_NOT_ELIGIBLE_FOR_UNVERIFIED_FALLBACK",
+        )
+    if not index.fallback_features:
+        return GenericRecommendationResult(
+            query_reaction_smiles=reaction_smiles,
+            valid=False,
+            query_fallback_descriptor_id=descriptor_id,
+            recommendation_mode="abstained",
+            reaction_label=analysis.reaction_label,
+            reaction_label_status=analysis.reaction_label_status,
+            transformation_class=analysis.transformation_class,
+            warnings=tuple(
+                base_warnings + ["GENERIC_INDEX_REQUIRES_FALLBACK_FEATURE_REBUILD"]
+            ),
+            error="INDEX_HAS_NO_FALLBACK_DESCRIPTORS",
+        )
+    retrieval = retrieve_fallback_pool_with_trace(
+        descriptor,
+        index,
+        minimum_pool_size=minimum_pool_size,
+    )
+    if not retrieval.pool:
+        return GenericRecommendationResult(
+            query_reaction_smiles=reaction_smiles,
+            valid=False,
+            query_fallback_descriptor_id=descriptor_id,
+            recommendation_mode="abstained",
+            reaction_label=analysis.reaction_label,
+            reaction_label_status=analysis.reaction_label_status,
+            transformation_class=analysis.transformation_class,
+            retrieval_definition_version=retrieval_definition_version,
+            retrieval_strategy="unverified_structure_fallback",
+            retrieval_level=retrieval.level,
+            candidate_count=retrieval.candidate_count,
+            independent_candidate_count=retrieval.independent_candidate_count,
+            excluded_candidate_count=retrieval.excluded_candidate_count,
+            retrieval_trace=retrieval.trace,
+            warnings=tuple(base_warnings),
+            error="NO_SAFE_FALLBACK_PRECEDENT",
+        )
+    recommendations = rank_condition_recipes(
+        descriptor,
+        retrieval.pool,
+        retrieval_level=retrieval.level,
+        top_k=top_k,
+        similarity_assessor=(
+            lambda query, row: assess_fallback_similarity(
+                query,
+                row.fallback_descriptor,
+            )
+        ),
+    )
+    fallback_cautions = (
+        "Query atom correspondence and bond edits are not verified; the "
+        "recommendation is an analogy, not a chemistry-confirmed match",
+        "Fallback similarity uses taxonomy features, candidate hypotheses, "
+        "and global structure inventories",
+        "Condition compatibility was checked conservatively against every "
+        "observed query functional-group tag",
+        *(
+            (
+                "The reactant structures do not contain "
+                f"{', '.join(required_source_elements)}; each retained precedent "
+                "has a resolved condition identity that can supply it",
+            )
+            if required_source_elements
+            else ()
+        ),
+    )
+    recommendations = tuple(
+        replace(
+            recommendation,
+            cautions=tuple(
+                dict.fromkeys((*fallback_cautions, *recommendation.cautions))
+            ),
+        )
+        for recommendation in recommendations
+    )
+    warnings = [
+        *base_warnings,
+        "UNVERIFIED_REACTION_FALLBACK_USED",
+        "FALLBACK_RECOMMENDATIONS_REQUIRE_EXPERT_REVIEW",
+    ]
+    if retrieval.level.endswith("limited_support"):
+        warnings.append("LIMITED_PRECEDENT_SUPPORT")
+    if required_source_elements:
+        warnings.append(
+            "CONDITION_SUPPLIED_FRAGMENT_FALLBACK_USED:"
+            f"{','.join(required_source_elements)}"
+        )
+    if retrieval.excluded_candidate_count:
+        warnings.append(
+            f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{retrieval.excluded_candidate_count}"
+        )
+    return GenericRecommendationResult(
+        query_reaction_smiles=reaction_smiles,
+        valid=True,
+        query_fallback_descriptor_id=descriptor_id,
+        recommendation_mode="unverified_structure_fallback",
+        reaction_label=analysis.reaction_label,
+        reaction_label_status=analysis.reaction_label_status,
+        transformation_class=analysis.transformation_class,
+        retrieval_definition_version=retrieval_definition_version,
+        retrieval_strategy="unverified_structure_fallback",
+        retrieval_level=retrieval.level,
+        candidate_count=retrieval.candidate_count,
+        independent_candidate_count=retrieval.independent_candidate_count,
+        compatible_candidate_count=len(retrieval.pool),
+        independent_compatible_candidate_count=(
+            retrieval.independent_compatible_candidate_count
+        ),
+        excluded_candidate_count=retrieval.excluded_candidate_count,
+        retrieval_trace=retrieval.trace,
+        recommendations=recommendations,
+        warnings=tuple(warnings),
     )
 
 

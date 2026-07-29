@@ -14,6 +14,11 @@ def signature_record_fields(analysis: Any) -> Dict[str, Any]:
         partial = analysis.partial_product_transformation
         return {
             "reaction_signature": None,
+            "fallback_descriptor": (
+                asdict(analysis.fallback_descriptor)
+                if analysis.fallback_descriptor is not None
+                else None
+            ),
             "transformation_class": analysis.transformation_class,
             "transformation_confidence": (
                 partial.confidence if partial is not None else 0.0
@@ -23,6 +28,11 @@ def signature_record_fields(analysis: Any) -> Dict[str, Any]:
         }
     return {
         "reaction_signature": asdict(signature),
+        "fallback_descriptor": (
+            asdict(analysis.fallback_descriptor)
+            if analysis.fallback_descriptor is not None
+            else None
+        ),
         "transformation_class": signature.transformation_class,
         "transformation_confidence": signature.transformation_confidence,
         "family_confidence": signature.family_confidence,
@@ -37,9 +47,7 @@ def flattened_signature_fields(signature: Dict[str, Any] | None) -> Dict[str, An
         "reaction_signature_id": value.get("signature_id", ""),
         "signature_l0_exact": value.get("exact_signature_key", ""),
         "signature_l1_handle": value.get("handle_signature_key", ""),
-        "signature_l2_transformation": value.get(
-            "transformation_signature_key", ""
-        ),
+        "signature_l2_transformation": value.get("transformation_signature_key", ""),
         "signature_l3_bond_edit": value.get("bond_edit_signature_key", ""),
         "signature_l4_environment": value.get("environment_signature_key", ""),
         "reaction_signature_json": json.dumps(
@@ -50,4 +58,27 @@ def flattened_signature_fields(signature: Dict[str, Any] | None) -> Dict[str, An
     }
 
 
-__all__ = ["flattened_signature_fields", "signature_record_fields"]
+def flattened_fallback_fields(
+    descriptor: Dict[str, Any] | None,
+) -> Dict[str, Any]:
+    """Expose the fallback descriptor identity and canonical review JSON."""
+    value = descriptor or {}
+    return {
+        "fallback_descriptor_id": value.get("descriptor_id", ""),
+        "fallback_descriptor_evidence_mode": value.get("evidence_mode", ""),
+        "fallback_descriptor_retrieval_eligible": value.get(
+            "retrieval_eligible", False
+        ),
+        "fallback_descriptor_json": json.dumps(
+            descriptor, ensure_ascii=False, sort_keys=True
+        )
+        if descriptor
+        else "",
+    }
+
+
+__all__ = [
+    "flattened_fallback_fields",
+    "flattened_signature_fields",
+    "signature_record_fields",
+]

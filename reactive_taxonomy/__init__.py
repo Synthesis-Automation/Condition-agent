@@ -3,6 +3,7 @@
 from .api import detect_sites, featurize_molecule
 from .reaction_api import featurize_reaction
 from .reaction_signatures import reaction_signature_definition_versions
+from .reaction_fallback_descriptors import reaction_fallback_definition_versions
 from .descriptors import (
     ActivatedCenterContextDescriptor,
     AlkylContextDescriptor,
@@ -61,6 +62,7 @@ from .reaction_models import (
     ProductTransformation,
     PredictedStereoChange,
     PartialProductTransformation,
+    REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
     ReactionAnalysis,
     ReactionAtomReference,
@@ -71,6 +73,7 @@ from .reaction_models import (
     ReactionEdit,
     ReactionEvent,
     ReactionEventRelation,
+    ReactionFallbackDescriptor,
     ReactionFamilyEnvironment,
     ReactionLabelClause,
     ReactionPartner,
@@ -193,6 +196,7 @@ __all__ = [
     "ProductTransformation",
     "PredictedStereoChange",
     "PartialProductTransformation",
+    "REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION",
     "REACTION_SIGNATURE_SCHEMA_VERSION",
     "REACTION_TEMPLATE_DEFINITION_VERSION",
     "REACTION_TEMPLATE_SCHEMA_VERSION",
@@ -205,6 +209,7 @@ __all__ = [
     "ReactionEdit",
     "ReactionEvent",
     "ReactionEventRelation",
+    "ReactionFallbackDescriptor",
     "ReactionFamilyEnvironment",
     "ReactionLabelClause",
     "ReactionPartner",
@@ -250,6 +255,7 @@ __all__ = [
     "evaluate_reaction_edits",
     "featurize_molecule",
     "featurize_reaction",
+    "reaction_fallback_definition_versions",
     "load_functional_group_definitions",
     "load_handle_patterns",
     "load_molecular_feature_benchmark",
