@@ -8,8 +8,6 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Tuple
 
-from condition_registry import CONDITION_RECIPE_COMPONENT_BUCKETS
-
 from .similarity import SimilarityAssessment
 
 
@@ -48,7 +46,7 @@ def load_fallback_retrieval_rules() -> dict[str, Any]:
     """Load and validate the conservative fallback policy."""
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if str(rules.get("schema_version") or "") != "1.1":
+    if str(rules.get("schema_version") or "") != "1.2":
         raise ValueError("unsupported fallback retrieval definition schema")
     if str(rules.get("definition_id") or "") != "fallback_retrieval.v1":
         raise ValueError("unexpected fallback retrieval definition ID")
@@ -136,15 +134,27 @@ def assess_fallback_similarity(
 ) -> SimilarityAssessment:
     """Score two descriptors while exposing every chemistry feature group."""
     rules = load_fallback_retrieval_rules()
-    components = {
-        name: _multiset_jaccard(
+    feature_tokens = {
+        name: (
             _tokens(query, fields),
             _tokens(precedent, fields),
         )
         for name, fields in _FEATURE_FIELDS.items()
     }
+    components = {
+        name: _multiset_jaccard(left, right)
+        for name, (left, right) in feature_tokens.items()
+    }
+    available = {
+        name for name, (left, right) in feature_tokens.items() if left or right
+    }
+    denominator = sum(float(rules["weights"][name]) for name in available)
     contributions = {
-        name: float(rules["weights"][name]) * components[name]
+        name: (
+            float(rules["weights"][name]) / denominator * components[name]
+            if denominator and name in available
+            else 0.0
+        )
         for name in _FEATURE_FIELDS
     }
     return SimilarityAssessment(
@@ -178,60 +188,8 @@ def compatibility_signature_from_fallback(
     }
 
 
-def assess_condition_source_support(
-    descriptor: Mapping[str, Any],
-    recipe: Mapping[str, Any],
-) -> tuple[bool, Tuple[str, ...]]:
-    """Require a resolved recipe identity that can supply a missing product atom."""
-    requirement_id = str(descriptor.get("condition_source_requirement_id") or "")
-    required_elements = tuple(
-        sorted(
-            set(
-                str(value)
-                for value in descriptor.get("required_condition_source_elements") or ()
-            )
-        )
-    )
-    if not requirement_id and not required_elements:
-        return True, ()
-    rules = load_fallback_retrieval_rules()
-    requirement = (rules.get("condition_source_requirements") or {}).get(requirement_id)
-    if not isinstance(requirement, Mapping):
-        return False, (f"unknown_condition_source_requirement:{requirement_id}",)
-    allowed_elements = {str(value) for value in requirement.get("elements") or ()}
-    if not required_elements or not set(required_elements) <= allowed_elements:
-        return False, (
-            "condition_source_requirement_element_mismatch:"
-            f"{','.join(required_elements)}",
-        )
-    allowed_families = {str(value) for value in requirement.get("family_ids") or ()}
-    allowed_substances = {
-        str(value) for value in requirement.get("substance_ids") or ()
-    }
-    matched = []
-    for bucket in CONDITION_RECIPE_COMPONENT_BUCKETS:
-        for component in recipe.get(bucket) or ():
-            substance_id = str(component.get("substance_id") or "")
-            family_ids = {
-                str(role.get("family_id") or "")
-                for role in component.get("roles") or ()
-                if role.get("family_id")
-            }
-            if substance_id in allowed_substances or family_ids & allowed_families:
-                matched.append(
-                    "condition_source_supported:"
-                    f"{requirement_id}:{substance_id or 'family'}"
-                )
-    if not matched:
-        return False, (
-            f"condition_source_missing:{requirement_id}:{','.join(required_elements)}",
-        )
-    return True, tuple(sorted(set(matched)))
-
-
 __all__ = [
     "assess_fallback_similarity",
-    "assess_condition_source_support",
     "compatibility_signature_from_fallback",
     "fallback_index_tokens",
     "load_fallback_retrieval_rules",

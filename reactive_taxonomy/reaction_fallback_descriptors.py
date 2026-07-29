@@ -553,8 +553,7 @@ def build_reaction_fallback_descriptor(
             sorted(
                 set(warning_values).union(
                     {
-                        "CONDITION_SOURCE_REQUIRED:"
-                        f"{condition_source_requirement_id}:"
+                        "PRODUCT_ATOM_SOURCE_UNVERIFIED:"
                         f"{','.join(required_condition_source_elements)}"
                     }
                     if condition_source_required

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Optional, Tuple
@@ -21,7 +21,6 @@ from ..models import (
     IndexEligibility,
     OutcomeStatus,
 )
-from ..fallback_similarity import assess_condition_source_support
 
 
 @dataclass(frozen=True)
@@ -59,34 +58,13 @@ def decide_admission(
     chemistry_reasons: list[str] = []
     completeness = analysis.reaction_completeness
     fallback_descriptor = analysis.fallback_descriptor
-    condition_source_supported = False
-    condition_source_evidence: tuple[str, ...] = ()
-    if (
-        fallback_descriptor is not None
-        and fallback_descriptor.required_condition_source_elements
-    ):
-        condition_source_supported, condition_source_evidence = (
-            assess_condition_source_support(
-                asdict(fallback_descriptor),
-                resolved_recipe.to_dict(),
-            )
-        )
     if not analysis.valid or canonical_identity is None:
         chemistry_status = ChemistryStatus.REJECTED
         chemistry_reasons.append("invalid_reaction_or_product")
     elif completeness is not None and completeness.status == "incomplete":
-        if (
-            fallback_descriptor is not None
-            and fallback_descriptor.retrieval_eligible
-            and condition_source_supported
-        ):
+        if fallback_descriptor is not None and fallback_descriptor.retrieval_eligible:
             chemistry_status = ChemistryStatus.REVIEW
-            chemistry_reasons.extend(
-                (
-                    "condition_supplied_fragment_partial_correspondence",
-                    *condition_source_evidence,
-                )
-            )
+            chemistry_reasons.append("exploratory_partial_product_correspondence")
         else:
             chemistry_status = ChemistryStatus.REJECTED
             chemistry_reasons.append("unaccounted_product_heavy_atoms")
@@ -94,11 +72,6 @@ def decide_admission(
                 chemistry_reasons.append("insufficient_reactant_multiplicity")
             elif completeness.suspected_missing_reactant:
                 chemistry_reasons.append("suspected_missing_reactant")
-            if (
-                fallback_descriptor is not None
-                and fallback_descriptor.required_condition_source_elements
-            ):
-                chemistry_reasons.extend(condition_source_evidence)
     elif analysis.reaction_signature is None:
         if analysis.candidates or analysis.evidence_quality in {
             "reactant_grammar_only",
@@ -224,7 +197,6 @@ def decide_admission(
             chemistry_status == ChemistryStatus.REVIEW
             and fallback_descriptor is not None
             and fallback_descriptor.retrieval_eligible
-            and condition_source_supported
         )
     )
     if (

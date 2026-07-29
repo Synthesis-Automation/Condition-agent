@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
 from typing import Any, Mapping
 
 from .compatibility import filter_compatible_precedents
 from .fallback_similarity import (
-    assess_condition_source_support,
     assess_fallback_similarity,
     compatibility_signature_from_fallback,
     fallback_index_tokens,
@@ -85,39 +83,12 @@ def retrieve_fallback_pool_with_trace(
         )
     )
     matched_rows = tuple(item[2] for item in scored[: int(rules["candidate_limit"])])
-    source_supported = []
-    source_excluded = []
-    source_evidence: dict[int, tuple[str, ...]] = {}
-    for row in matched_rows:
-        supported, evidence = assess_condition_source_support(
-            descriptor,
-            row.resolved_recipe,
-        )
-        if supported:
-            source_supported.append(row)
-            source_evidence[id(row)] = evidence
-        else:
-            source_excluded.append(row)
     compatibility_signature = compatibility_signature_from_fallback(descriptor)
     accepted, compatibility_excluded = filter_compatible_precedents(
         compatibility_signature,
-        tuple(source_supported),
+        matched_rows,
     )
-    accepted = tuple(
-        (
-            row,
-            replace(
-                assessment,
-                evidence=tuple(
-                    dict.fromkeys(
-                        (*source_evidence.get(id(row), ()), *assessment.evidence)
-                    )
-                ),
-            ),
-        )
-        for row, assessment in accepted
-    )
-    excluded_count = len(source_excluded) + len(compatibility_excluded)
+    excluded_count = len(compatibility_excluded)
     accepted_rows = tuple(row for row, _ in accepted)
     accepted_support = summarize_evidence_support(accepted_rows)
     matched_support = summarize_evidence_support(matched_rows)

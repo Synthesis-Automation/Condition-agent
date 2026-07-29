@@ -266,7 +266,7 @@ def _recommend_fallback_with_index(
     )
     if required_source_elements:
         base_warnings.append(
-            f"QUERY_REQUIRES_CONDITION_SOURCE:{','.join(required_source_elements)}"
+            f"QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:{','.join(required_source_elements)}"
         )
     if not bool(descriptor.get("retrieval_eligible")):
         base_warnings.extend(
@@ -344,8 +344,8 @@ def _recommend_fallback_with_index(
         *(
             (
                 "The reactant structures do not contain "
-                f"{', '.join(required_source_elements)}; each retained precedent "
-                "has a resolved condition identity that can supply it",
+                f"{', '.join(required_source_elements)}; the fallback does not "
+                "verify which condition component supplies it",
             )
             if required_source_elements
             else ()
@@ -369,7 +369,7 @@ def _recommend_fallback_with_index(
         warnings.append("LIMITED_PRECEDENT_SUPPORT")
     if required_source_elements:
         warnings.append(
-            "CONDITION_SUPPLIED_FRAGMENT_FALLBACK_USED:"
+            "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:"
             f"{','.join(required_source_elements)}"
         )
     if retrieval.excluded_candidate_count:

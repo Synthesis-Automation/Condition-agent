@@ -508,8 +508,8 @@ def rank_condition_recipes(
         ):
             cautions.append(
                 "Precedent transformation uses partial product correspondence; "
-                "its resolved condition recipe supplies the otherwise missing "
-                "product fragment"
+                "the source of the otherwise missing product fragment is not "
+                "verified"
             )
         precedent_scopes = {
             reaction_scope(member.row.signature)

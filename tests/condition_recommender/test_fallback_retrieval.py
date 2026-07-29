@@ -8,6 +8,7 @@ _MAPPED_PRECEDENT = "[CH3:1][CH3:2].[NH2:3][CH3:4]>>[CH3:1][CH2:2][NH2:3]"
 _CONDITION_SUPPLIED_FLUORINATION = (
     "CC(C)(I)CCOS(=O)(=O)c1ccc(F)cc1>>CC(C)(F)CCOS(=O)(=O)c1ccc(F)cc1"
 )
+_CONDITION_SUPPLIED_IODINATION = "CCCCCCCCC(C)(F)CC>>CCCCCCCCC(C)(I)CC"
 
 
 def _precedent(index: int) -> dict:
@@ -45,6 +46,23 @@ def _fluorination_precedent(index: int, fluoride_cas: str) -> dict:
     return convert_record(record).to_dict()
 
 
+def _iodination_precedent(index: int, iodine_cas: str) -> dict:
+    record = adapt_row(
+        {
+            "reaction_id": f"iodination-{index}",
+            "reaction_smiles": _CONDITION_SUPPLIED_IODINATION,
+            "yield_pct": "90",
+            "reagent_cas": iodine_cas,
+            "solvent_cas": "110-54-3",
+            "reference": f"Iodination reference {index}",
+        },
+        source_dataset="fallback-test",
+        source_path="iodination.csv",
+        source_row_number=index,
+    )
+    return convert_record(record).to_dict()
+
+
 def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
     index = build_generic_index([_precedent(1), _precedent(2)])
 
@@ -54,7 +72,7 @@ def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
     assert result.query_signature_id is None
     assert result.query_fallback_descriptor_id.startswith("RFD1:")
     assert result.recommendation_mode == "unverified_structure_fallback"
-    assert result.retrieval_definition_version == "1.1"
+    assert result.retrieval_definition_version == "1.2"
     assert result.retrieval_level == "unverified_structure_fallback"
     assert result.independent_compatible_candidate_count == 2
     assert "UNVERIFIED_REACTION_FALLBACK_USED" in result.warnings
@@ -62,7 +80,7 @@ def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
     assert result.recommendations
     recommendation = result.recommendations[0]
     assert (
-        recommendation.score_trace.definition_versions["fallback_retrieval.v1"] == "1.1"
+        recommendation.score_trace.definition_versions["fallback_retrieval.v1"] == "1.2"
     )
     assert any(
         "atom correspondence and bond edits are not verified" in caution
@@ -83,15 +101,15 @@ def test_contradicted_query_is_blocked_before_fallback_retrieval() -> None:
     assert "FALLBACK_BLOCKED:contradicted_or_incomplete_structure" in result.warnings
 
 
-def test_single_moderate_analogue_does_not_clear_support_gate() -> None:
+def test_single_exact_analogue_uses_limited_support_route() -> None:
     index = build_generic_index([_precedent(1)])
 
     result = GenericConditionRecommender(index).recommend("CC.CN>>CCN")
 
-    assert not result.valid
-    assert result.error == "NO_SAFE_FALLBACK_PRECEDENT"
-    assert result.retrieval_level == "insufficient_safe_fallback_support"
-    assert result.recommendations == ()
+    assert result.valid
+    assert result.retrieval_level == "unverified_structure_fallback_limited_support"
+    assert "LIMITED_PRECEDENT_SUPPORT" in result.warnings
+    assert len(result.recommendations) == 1
 
 
 def test_invalid_atom_mapping_is_not_rescued_by_fallback() -> None:
@@ -106,7 +124,7 @@ def test_invalid_atom_mapping_is_not_rescued_by_fallback() -> None:
     assert "FALLBACK_BLOCKED:invalid_atom_mapping" in result.warnings
 
 
-def test_condition_supplied_fluoride_partial_precedents_are_retrievable() -> None:
+def test_exploratory_fluoride_partial_precedents_are_retrievable() -> None:
     records = [
         _fluorination_precedent(1, "429-41-4"),
         _fluorination_precedent(2, "13400-13-0"),
@@ -132,25 +150,62 @@ def test_condition_supplied_fluoride_partial_precedents_are_retrievable() -> Non
     assert result.valid
     assert result.recommendation_mode == "unverified_structure_fallback"
     assert result.candidate_count == 2
-    assert "QUERY_REQUIRES_CONDITION_SOURCE:F" in result.warnings
-    assert "CONDITION_SUPPLIED_FRAGMENT_FALLBACK_USED:F" in result.warnings
+    assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:F" in result.warnings
+    assert "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:F" in result.warnings
+    assert len(result.recommendations) == 2
+
+
+def test_partial_fluorination_keeps_unverified_source_as_a_warning() -> None:
+    record = _fluorination_precedent(1, "584-08-7")
+
+    assert record["chemistry_status"] == "review"
+    assert record["index_eligibility"] == "eligible"
+    assert "exploratory_partial_product_correspondence" in record["admission_reasons"]
+    assert (
+        "PRODUCT_ATOM_SOURCE_UNVERIFIED:F" in record["fallback_descriptor"]["warnings"]
+    )
+    assert len(build_generic_index([record]).rows) == 1
+
+
+def test_exploratory_iodine_partial_precedents_are_retrievable() -> None:
+    records = [
+        _iodination_precedent(1, "97-93-8"),
+        _iodination_precedent(2, "584-08-7"),
+    ]
+
+    for record in records:
+        assert record["reaction_signature"] is None
+        assert record["chemistry_status"] == "review"
+        assert record["index_eligibility"] == "eligible"
+        assert record["fallback_descriptor"]["retrieval_eligible"]
+        assert record["fallback_descriptor"]["required_condition_source_elements"] == (
+            "I",
+        )
+
+    result = GenericConditionRecommender(build_generic_index(records)).recommend(
+        _CONDITION_SUPPLIED_IODINATION
+    )
+
+    assert result.valid
+    assert result.recommendation_mode == "unverified_structure_fallback"
+    assert result.candidate_count == 2
+    assert result.retrieval_definition_version == "1.2"
+    assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:I" in result.warnings
+    assert "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:I" in result.warnings
     assert len(result.recommendations) == 2
     assert all(
-        any(
-            evidence.startswith("condition_source_supported:fluoride_source:")
-            for evidence in recommendation.compatibility_evidence
-        )
+        recommendation.similarity_score == 1.0
         for recommendation in result.recommendations
     )
 
 
-def test_partial_fluorination_without_fluoride_condition_stays_ineligible() -> None:
-    record = _fluorination_precedent(1, "584-08-7")
+def test_partial_iodination_keeps_unverified_source_as_a_warning() -> None:
+    record = _iodination_precedent(1, "97-93-8")
 
-    assert record["chemistry_status"] == "rejected"
-    assert record["index_eligibility"] == "ineligible"
-    assert any(
-        reason.startswith("condition_source_missing:fluoride_source:F")
-        for reason in record["admission_reasons"]
+    assert record["chemistry_status"] == "review"
+    assert record["index_eligibility"] == "eligible"
+    assert "exploratory_partial_product_correspondence" in record["admission_reasons"]
+    assert (
+        "PRODUCT_ATOM_SOURCE_UNVERIFIED:I" in record["fallback_descriptor"]["warnings"]
     )
-    assert not build_generic_index([record]).rows
+    assert len(build_generic_index([record]).rows) == 1

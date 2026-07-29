@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "definition_id": "fallback_retrieval.v1",
   "calibration_status": "conservative_initial_policy",
   "minimum_similarity": 0.55,
@@ -7,18 +7,7 @@
   "minimum_independent_support": 2,
   "minimum_shared_high_signal_features": 2,
   "candidate_limit": 100,
-  "condition_source_requirements": {
-    "fluoride_source": {
-      "elements": ["F"],
-      "family_ids": ["fluoride", "fluoride_sources_activators"],
-      "substance_ids": [
-        "cas:429-41-4",
-        "cas:13400-13-0",
-        "cas:7789-23-3",
-        "cas:7775-41-9"
-      ]
-    }
-  },
+  "condition_source_requirements": {},
   "weights": {
     "reactant_components": 0.14,
     "product_components": 0.14,
