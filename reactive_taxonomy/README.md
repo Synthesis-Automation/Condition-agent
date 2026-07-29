@@ -31,12 +31,19 @@ show, validation, and query matching commands. The PyQt6 wrapper is available
 as `python -m app.reaction_template_registry_gui`.
 
 When an incomplete query has no normalized edit set, active templates may
-provide a conservative provisional match from the edited-centre before/after
-bond-state multisets. Neighbor hydrogen count and external heavy-atom degree
-remain in this comparison, allowing an acetal centre to remain distinct from
-a hemiacetal. A unique match exposes the template `RTE1` edit fingerprint with
-`template_center_transition_hypothesis` evidence; it never creates atom
-correspondence or an `RS3` signature.
+first compile minimal edit-bearing reactant roles from the mapped reference.
+Repeated reference participants become explicit multiplicity requirements.
+The bounded executor may reuse one supplied query species only for such a
+repeatable role, applies the stored bond and schema-H edits, validates valence,
+and requires exact canonical reconstruction of the reported main product.
+This emits `exact_template_reconstruction_with_inferred_multiplicity` evidence
+without inventing atom correspondence or an `RS3` signature.
+
+If exact reconstruction fails, a lower conservative fallback compares the
+edited-centre before/after bond-state multisets. Neighbor hydrogen count and
+external heavy-atom degree remain in this comparison, allowing an acetal
+centre to remain distinct from a hemiacetal. This fallback emits
+`template_center_transition_hypothesis` evidence.
 
 Every valid parsed reaction also receives a
 `ReactionCompletenessAssessment`. It records heavy-atom and element counts,

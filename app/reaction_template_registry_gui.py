@@ -195,7 +195,17 @@ def _format_match_section(result: object) -> str:
     if not matches:
         lines.append("  None")
     for match in matches:
-        mode = "provisional" if match.provisional else "verified edit match"
+        if (
+            match.evidence
+            == "exact_template_reconstruction_with_inferred_multiplicity"
+        ):
+            mode = "multiplicity-assisted exact reconstruction"
+        elif match.evidence == "exact_template_reconstruction":
+            mode = "exact template reconstruction"
+        elif match.provisional:
+            mode = "provisional centre-transition match"
+        else:
+            mode = "verified edit match"
         lines.extend(
             (
                 f"  {match.display_name}",
@@ -207,6 +217,13 @@ def _format_match_section(result: object) -> str:
                 f"    Confidence: {match.confidence:.2f}",
             )
         )
+        if match.predicted_product_smiles:
+            lines.append(
+                f"    Reconstructed product: "
+                f"{match.predicted_product_smiles}"
+            )
+        if match.inferred_multiplicity:
+            lines.append("    Inferred repeated participant: yes")
     return "\n".join(lines)
 
 
@@ -584,11 +601,17 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         if template_result is not None:
             if template_result.matches:
                 first_match = template_result.matches[0]
-                match_kind = (
-                    "provisional"
-                    if first_match.provisional
-                    else "verified-edit"
-                )
+                if (
+                    first_match.evidence
+                    == "exact_template_reconstruction_with_inferred_multiplicity"
+                ):
+                    match_kind = "multiplicity-assisted exact"
+                elif first_match.evidence == "exact_template_reconstruction":
+                    match_kind = "exact reconstruction"
+                elif first_match.provisional:
+                    match_kind = "provisional centre match"
+                else:
+                    match_kind = "verified-edit"
                 match_status = (
                     f"{len(template_result.matches)} template match(es), "
                     f"{first_match.family_id or first_match.template_id} "

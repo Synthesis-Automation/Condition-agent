@@ -149,21 +149,119 @@ def test_minimum_acetal_template_matches_requested_incomplete_example(
 
     assert result.valid
     assert result.signature_id is None
-    assert result.evidence == "template_center_transition_hypothesis"
+    assert result.evidence == (
+        "exact_template_reconstruction_with_inferred_multiplicity"
+    )
     assert result.edit_fingerprint == template.edit_fingerprint
     assert [match.template_id for match in result.matches] == [
         "carbonyl_to_dialkoxy"
     ]
     assert result.matches[0].provisional is True
-    assert result.matches[0].confidence == 0.7
+    assert result.matches[0].confidence == 0.85
     assert result.matches[0].evidence == (
-        "template_center_transition_hypothesis"
+        "exact_template_reconstruction_with_inferred_multiplicity"
     )
+    assert result.matches[0].predicted_product_smiles == (
+        "CCOC(OCC)c1cccc(OC)c1"
+    )
+    assert result.matches[0].inferred_multiplicity is True
     assert (
-        "PROVISIONAL_TEMPLATE_MATCH_WITHOUT_ATOM_PROVENANCE"
+        "EXACT_MAIN_PRODUCT_RECONSTRUCTION_FROM_TEMPLATE"
         in result.warnings
     )
+    assert "INFERRED_REACTANT_MULTIPLICITY" in result.warnings
     assert "UNACCOUNTED_PRODUCT_HEAVY_ATOMS" in result.warnings
+
+
+def test_explicit_second_alcohol_upgrades_reconstruction_evidence(
+    tmp_path,
+) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    template = _acetal_template()
+    upsert_reaction_template(template, path)
+
+    result = match_reaction_templates(
+        "CCO.CCO.COc1cccc(C=O)c1>>CCOC(OCC)c1cccc(OC)c1",
+        path=path,
+    )
+
+    assert result.signature_id is None
+    assert result.evidence == "exact_template_reconstruction"
+    assert result.edit_fingerprint == template.edit_fingerprint
+    assert result.matches[0].confidence == 0.95
+    assert result.matches[0].provisional is False
+    assert result.matches[0].inferred_multiplicity is False
+    assert "INFERRED_REACTANT_MULTIPLICITY" not in result.warnings
+
+
+def test_same_template_reconstructs_a_ketal_with_repeated_methanol(
+    tmp_path,
+) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    upsert_reaction_template(_acetal_template(), path)
+
+    result = match_reaction_templates(
+        "CO.CC(=O)C>>COC(C)(C)OC",
+        path=path,
+    )
+
+    assert result.evidence == (
+        "exact_template_reconstruction_with_inferred_multiplicity"
+    )
+    assert result.matches[0].family_id == "acetalization"
+    assert result.matches[0].confidence == 0.85
+
+
+def test_center_match_does_not_claim_exact_reconstruction_for_wrong_alcohol(
+    tmp_path,
+) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    upsert_reaction_template(_acetal_template(), path)
+
+    result = match_reaction_templates(
+        "CO.COc1cccc(C=O)c1>>CCOC(OCC)c1cccc(OC)c1",
+        path=path,
+    )
+
+    assert result.evidence == "template_center_transition_hypothesis"
+    assert result.matches[0].confidence == 0.7
+    assert (
+        "EXACT_MAIN_PRODUCT_RECONSTRUCTION_FROM_TEMPLATE"
+        not in result.warnings
+    )
+
+
+def test_equivalent_template_families_preserve_interpretation_ambiguity(
+    tmp_path,
+) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    first = _acetal_template()
+    second = derive_reaction_template(
+        ACETAL_REFERENCE,
+        template_id="alternative_dialkoxy_interpretation",
+        display_name="Alternative dialkoxy interpretation",
+        family_id="alternative_acetal_family",
+        status="active",
+    )
+    upsert_reaction_template(first, path)
+    upsert_reaction_template(second, path)
+
+    result = match_reaction_templates(
+        INCOMPLETE_REPORTED_ACETAL,
+        path=path,
+    )
+
+    assert result.edit_fingerprint == first.edit_fingerprint
+    assert result.signature_id is None
+    assert {match.family_id for match in result.matches} == {
+        "acetalization",
+        "alternative_acetal_family",
+    }
+    assert all(
+        match.evidence
+        == "exact_template_reconstruction_with_inferred_multiplicity"
+        for match in result.matches
+    )
 
 
 def test_acetal_template_does_not_match_hemiacetal_or_reduction(
@@ -266,5 +364,7 @@ def test_reaction_template_cli_import_list_validate_show_and_match(
     ) == 0
     incomplete = json.loads(capsys.readouterr().out)
     assert incomplete["signature_id"] is None
-    assert incomplete["evidence"] == "template_center_transition_hypothesis"
+    assert incomplete["evidence"] == (
+        "exact_template_reconstruction_with_inferred_multiplicity"
+    )
     assert incomplete["matches"][0]["provisional"] is True

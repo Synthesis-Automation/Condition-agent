@@ -8,6 +8,7 @@ query-derived structural evidence.
 from __future__ import annotations
 
 import hashlib
+import itertools
 import json
 import os
 import re
@@ -20,6 +21,7 @@ from .chemistry.rdkit_utils import mol_to_canonical_smiles, parse_smiles
 from .reaction_archetypes import infer_edit_archetype
 from .reaction_edits import normalize_mapped_edits
 from .reaction_events import partition_reaction_edits
+from .reaction_graph_editing import bond_type, set_total_hydrogens
 from .reaction_models import ReactionAtomReference, ReactionEdit
 from .reaction_parser import parse_reaction_smiles
 
@@ -144,6 +146,8 @@ class ReactionTemplateMatch:
     evidence: str
     confidence: float
     provisional: bool
+    predicted_product_smiles: Optional[str]
+    inferred_multiplicity: bool
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the match."""
@@ -391,6 +395,509 @@ class _CenterTransitionRequirement:
     aromatic: bool
     before_tokens: Tuple[str, ...]
     after_tokens: Tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class _RoleAtomPattern:
+    element: str
+    formal_charge: int
+    aromatic: bool
+    minimum_hydrogen_count: int
+
+
+@dataclass(frozen=True)
+class _RoleBondPattern:
+    atom_slot_1: int
+    atom_slot_2: int
+    order: str
+
+
+@dataclass(frozen=True)
+class _CompiledReactantRole:
+    role_id: str
+    required_count: int
+    allow_repeated_component: bool
+    atom_patterns: Tuple[_RoleAtomPattern, ...]
+    bond_patterns: Tuple[_RoleBondPattern, ...]
+    occurrence_map_numbers: Tuple[Tuple[int, ...], ...]
+
+
+@dataclass(frozen=True)
+class _RoleCandidate:
+    component_index: int
+    atom_indices: Tuple[int, ...]
+
+
+@dataclass(frozen=True)
+class _TemplateReconstruction:
+    predicted_product_smiles: str
+    inferred_multiplicity: bool
+
+
+def _hydrogen_loss_requirements(
+    edits: Sequence[ReactionTemplateEdit],
+) -> dict[int, int]:
+    losses: dict[int, int] = {}
+    for edit in edits:
+        if (
+            edit.edit_type == "hydrogen_change"
+            and edit.old_order is not None
+            and edit.new_order is None
+        ):
+            map_number = int(edit.atom_1.atom_map_number)
+            losses[map_number] = losses.get(map_number, 0) + 1
+    return losses
+
+
+def _compile_reactant_roles(
+    template: ReactionTemplate,
+) -> Tuple[_CompiledReactantRole, ...]:
+    """Compile minimal edit-bearing reactant roles from a mapped reference."""
+    parsed = parse_reaction_smiles(template.mapped_reference_reaction)
+    edited_maps = {
+        int(atom.atom_map_number)
+        for edit in template.edits
+        for atom in (edit.atom_1, edit.atom_2)
+        if atom is not None
+    }
+    hydrogen_losses = _hydrogen_loss_requirements(template.edits)
+    instances: list[
+        tuple[
+            str,
+            Tuple[_RoleAtomPattern, ...],
+            Tuple[_RoleBondPattern, ...],
+            Tuple[int, ...],
+            str,
+        ]
+    ] = []
+    for component in parsed.reactants:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        mapped_atoms = {
+            int(atom.GetAtomMapNum()): int(atom.GetIdx())
+            for atom in molecule.GetAtoms()
+            if int(atom.GetAtomMapNum()) in edited_maps
+        }
+        if not mapped_atoms:
+            continue
+        ordered_maps = tuple(
+            sorted(
+                mapped_atoms,
+                key=lambda map_number: (
+                    molecule.GetAtomWithIdx(mapped_atoms[map_number]).GetSymbol(),
+                    bool(
+                        molecule.GetAtomWithIdx(
+                            mapped_atoms[map_number]
+                        ).GetIsAromatic()
+                    ),
+                    int(
+                        molecule.GetAtomWithIdx(
+                            mapped_atoms[map_number]
+                        ).GetFormalCharge()
+                    ),
+                    map_number,
+                ),
+            )
+        )
+        patterns = tuple(
+            _RoleAtomPattern(
+                element=str(
+                    molecule.GetAtomWithIdx(mapped_atoms[map_number]).GetSymbol()
+                ),
+                formal_charge=int(
+                    molecule.GetAtomWithIdx(
+                        mapped_atoms[map_number]
+                    ).GetFormalCharge()
+                ),
+                aromatic=bool(
+                    molecule.GetAtomWithIdx(
+                        mapped_atoms[map_number]
+                    ).GetIsAromatic()
+                ),
+                minimum_hydrogen_count=int(
+                    hydrogen_losses.get(map_number, 0)
+                ),
+            )
+            for map_number in ordered_maps
+        )
+        slot_by_map = {
+            map_number: slot for slot, map_number in enumerate(ordered_maps)
+        }
+        bonds = []
+        for left_position, left_map in enumerate(ordered_maps):
+            for right_map in ordered_maps[left_position + 1 :]:
+                bond = molecule.GetBondBetweenAtoms(
+                    mapped_atoms[left_map],
+                    mapped_atoms[right_map],
+                )
+                if bond is not None:
+                    bonds.append(
+                        _RoleBondPattern(
+                            atom_slot_1=slot_by_map[left_map],
+                            atom_slot_2=slot_by_map[right_map],
+                            order=str(bond.GetBondType()).upper(),
+                        )
+                    )
+        pattern_key = _canonical_json(
+            {
+                "atoms": [asdict(pattern) for pattern in patterns],
+                "bonds": [asdict(bond) for bond in bonds],
+            }
+        )
+        instances.append(
+            (
+                pattern_key,
+                patterns,
+                tuple(bonds),
+                ordered_maps,
+                _unmapped_canonical_smiles(component.input_smiles),
+            )
+        )
+    grouped: dict[
+        str,
+        list[
+            tuple[
+                Tuple[_RoleAtomPattern, ...],
+                Tuple[_RoleBondPattern, ...],
+                Tuple[int, ...],
+                str,
+            ]
+        ],
+    ] = {}
+    for pattern_key, patterns, bonds, maps, canonical in instances:
+        grouped.setdefault(pattern_key, []).append(
+            (patterns, bonds, maps, canonical)
+        )
+    roles = []
+    for role_index, pattern_key in enumerate(sorted(grouped), start=1):
+        group = grouped[pattern_key]
+        canonicals = {item[3] for item in group}
+        roles.append(
+            _CompiledReactantRole(
+                role_id=f"reactant_role_{role_index}",
+                required_count=len(group),
+                allow_repeated_component=(
+                    len(group) > 1 and len(canonicals) == 1
+                ),
+                atom_patterns=group[0][0],
+                bond_patterns=group[0][1],
+                occurrence_map_numbers=tuple(
+                    item[2] for item in sorted(group, key=lambda value: value[2])
+                ),
+            )
+        )
+    return tuple(roles)
+
+
+def _atom_matches_role_pattern(atom: Any, pattern: _RoleAtomPattern) -> bool:
+    return bool(
+        atom.GetSymbol() == pattern.element
+        and int(atom.GetFormalCharge()) == pattern.formal_charge
+        and bool(atom.GetIsAromatic()) == pattern.aromatic
+        and int(atom.GetTotalNumHs(includeNeighbors=True))
+        >= pattern.minimum_hydrogen_count
+    )
+
+
+def _role_candidates(
+    role: _CompiledReactantRole,
+    components: Sequence[Any],
+) -> Tuple[_RoleCandidate, ...]:
+    """Enumerate bounded atom bindings for one compiled reactant role."""
+    candidates = []
+    for component in components:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        atom_options = tuple(
+            tuple(
+                int(atom.GetIdx())
+                for atom in molecule.GetAtoms()
+                if _atom_matches_role_pattern(atom, pattern)
+            )
+            for pattern in role.atom_patterns
+        )
+        if not atom_options or any(not options for options in atom_options):
+            continue
+        for assignment in itertools.product(*atom_options):
+            if len(set(assignment)) != len(assignment):
+                continue
+            if any(
+                (
+                    molecule.GetBondBetweenAtoms(
+                        assignment[bond.atom_slot_1],
+                        assignment[bond.atom_slot_2],
+                    )
+                    is None
+                    or str(
+                        molecule.GetBondBetweenAtoms(
+                            assignment[bond.atom_slot_1],
+                            assignment[bond.atom_slot_2],
+                        ).GetBondType()
+                    ).upper()
+                    != bond.order
+                )
+                for bond in role.bond_patterns
+            ):
+                continue
+            candidates.append(
+                _RoleCandidate(
+                    component_index=int(component.component_index),
+                    atom_indices=tuple(int(value) for value in assignment),
+                )
+            )
+            if len(candidates) >= 64:
+                break
+        if len(candidates) >= 64:
+            break
+    return tuple(
+        sorted(
+            set(candidates),
+            key=lambda candidate: (
+                candidate.component_index,
+                candidate.atom_indices,
+            ),
+        )
+    )
+
+
+def _role_assignments(
+    role: _CompiledReactantRole,
+    candidates: Sequence[_RoleCandidate],
+) -> Tuple[Tuple[_RoleCandidate, ...], ...]:
+    if not candidates:
+        return ()
+    if role.required_count == 1:
+        return tuple((candidate,) for candidate in candidates)
+    if role.allow_repeated_component:
+        assignments = itertools.combinations_with_replacement(
+            candidates,
+            role.required_count,
+        )
+    else:
+        assignments = itertools.combinations(candidates, role.required_count)
+    return tuple(itertools.islice(assignments, 128))
+
+
+def _bond_order(molecule: Any, atom_1: int, atom_2: int) -> Optional[str]:
+    bond = molecule.GetBondBetweenAtoms(int(atom_1), int(atom_2))
+    return str(bond.GetBondType()).upper() if bond is not None else None
+
+
+def _set_template_bond(
+    molecule: Any,
+    atom_1: int,
+    atom_2: int,
+    *,
+    before: Optional[str],
+    after: Optional[str],
+) -> bool:
+    current = _bond_order(molecule, atom_1, atom_2)
+    if current != before:
+        return False
+    if current is not None:
+        molecule.RemoveBond(int(atom_1), int(atom_2))
+    if after is not None:
+        molecule.AddBond(int(atom_1), int(atom_2), bond_type(after))
+    return True
+
+
+def _canonical_fragment_smiles(molecule: Any) -> Tuple[str, ...]:
+    from rdkit import Chem
+
+    values = []
+    for fragment in Chem.GetMolFrags(
+        molecule,
+        asMols=True,
+        sanitizeFrags=True,
+    ):
+        for atom in fragment.GetAtoms():
+            atom.SetAtomMapNum(0)
+        values.append(
+            str(
+                Chem.MolToSmiles(
+                    fragment,
+                    canonical=True,
+                    isomericSmiles=True,
+                )
+            )
+        )
+    return tuple(sorted(values))
+
+
+def _execute_template_assignment(
+    template: ReactionTemplate,
+    roles: Sequence[_CompiledReactantRole],
+    assignment: Sequence[Sequence[_RoleCandidate]],
+    parsed_query: Any,
+    observed_products: set[str],
+) -> Optional[_TemplateReconstruction]:
+    """Apply stored normalized edits to bound query reactant instances."""
+    from rdkit import Chem
+
+    components = {
+        int(component.component_index): component
+        for component in parsed_query.reactants
+    }
+    source = None
+    map_bindings: dict[int, int] = {}
+    offset = 0
+    used_components: list[int] = []
+    for role, role_assignment in zip(roles, assignment):
+        for occurrence_index, candidate in enumerate(role_assignment):
+            component = components.get(candidate.component_index)
+            molecule = (
+                parse_smiles(component.input_smiles)
+                if component is not None
+                else None
+            )
+            if molecule is None:
+                return None
+            source = molecule if source is None else Chem.CombineMols(source, molecule)
+            occurrence_maps = role.occurrence_map_numbers[occurrence_index]
+            if len(occurrence_maps) != len(candidate.atom_indices):
+                return None
+            for slot, map_number in enumerate(occurrence_maps):
+                map_bindings[int(map_number)] = (
+                    offset + int(candidate.atom_indices[slot])
+                )
+            offset += int(molecule.GetNumAtoms())
+            used_components.append(candidate.component_index)
+    if source is None:
+        return None
+    rw = Chem.RWMol(source)
+    negative = tuple(
+        edit
+        for edit in template.edits
+        if edit.edit_type in {"broken", "order_changed"}
+    )
+    positive = tuple(
+        edit for edit in template.edits if edit.edit_type == "formed"
+    )
+    for edit in negative:
+        if edit.atom_2 is None:
+            return None
+        atom_1 = map_bindings.get(int(edit.atom_1.atom_map_number))
+        atom_2 = map_bindings.get(int(edit.atom_2.atom_map_number))
+        if atom_1 is None or atom_2 is None or not _set_template_bond(
+            rw,
+            atom_1,
+            atom_2,
+            before=edit.old_order,
+            after=edit.new_order,
+        ):
+            return None
+    for edit in positive:
+        if edit.atom_2 is None:
+            return None
+        atom_1 = map_bindings.get(int(edit.atom_1.atom_map_number))
+        atom_2 = map_bindings.get(int(edit.atom_2.atom_map_number))
+        if atom_1 is None or atom_2 is None or not _set_template_bond(
+            rw,
+            atom_1,
+            atom_2,
+            before=None,
+            after=edit.new_order,
+        ):
+            return None
+    hydrogen_deltas: dict[int, int] = {}
+    for edit in template.edits:
+        if edit.edit_type != "hydrogen_change":
+            continue
+        atom_index = map_bindings.get(int(edit.atom_1.atom_map_number))
+        if atom_index is None:
+            return None
+        delta = (
+            -1
+            if edit.old_order is not None and edit.new_order is None
+            else 1
+            if edit.old_order is None and edit.new_order is not None
+            else 0
+        )
+        hydrogen_deltas[atom_index] = (
+            hydrogen_deltas.get(atom_index, 0) + delta
+        )
+    for atom_index, delta in hydrogen_deltas.items():
+        if not set_total_hydrogens(source, rw, atom_index, delta):
+            return None
+    product = rw.GetMol()
+    try:
+        product.UpdatePropertyCache(strict=False)
+        Chem.SanitizeMol(product)
+        fragments = _canonical_fragment_smiles(product)
+    except Exception:
+        return None
+    matched = sorted(observed_products.intersection(fragments))
+    if not matched:
+        return None
+    inferred_multiplicity = len(used_components) != len(set(used_components))
+    return _TemplateReconstruction(
+        predicted_product_smiles=matched[0],
+        inferred_multiplicity=inferred_multiplicity,
+    )
+
+
+def _exact_template_reconstructions(
+    template: ReactionTemplate,
+    parsed_query: Any,
+) -> Tuple[_TemplateReconstruction, ...]:
+    """Return distinct exact main-product reconstructions for one template."""
+    roles = _compile_reactant_roles(template)
+    if not roles:
+        return ()
+    role_options = tuple(
+        _role_assignments(
+            role,
+            _role_candidates(role, parsed_query.reactants),
+        )
+        for role in roles
+    )
+    if any(not options for options in role_options):
+        return ()
+    observed_products = {
+        _unmapped_canonical_smiles(component.input_smiles)
+        for component in parsed_query.products
+    }
+    outcomes = []
+    for assignment in itertools.islice(
+        itertools.product(*role_options),
+        256,
+    ):
+        # Different reference components must bind different supplied
+        # components. Reuse within one explicitly repeatable role is the only
+        # permitted multiplicity hypothesis.
+        component_owners: dict[int, str] = {}
+        valid = True
+        for role, role_assignment in zip(roles, assignment):
+            for candidate in role_assignment:
+                owner = component_owners.get(candidate.component_index)
+                if owner is not None and owner != role.role_id:
+                    valid = False
+                    break
+                component_owners[candidate.component_index] = role.role_id
+            if not valid:
+                break
+        if not valid:
+            continue
+        outcome = _execute_template_assignment(
+            template,
+            roles,
+            assignment,
+            parsed_query,
+            observed_products,
+        )
+        if outcome is not None:
+            outcomes.append(outcome)
+    return tuple(
+        sorted(
+            set(outcomes),
+            key=lambda outcome: (
+                outcome.predicted_product_smiles,
+                outcome.inferred_multiplicity,
+            ),
+        )
+    )
 
 
 def _center_transition_requirements(
@@ -1059,6 +1566,8 @@ def match_reaction_templates(
             evidence="query_derived_edit_fingerprint",
             confidence=1.0,
             provisional=False,
+            predicted_product_smiles=None,
+            inferred_multiplicity=False,
         )
         for template in templates
         if fingerprint is not None
@@ -1068,34 +1577,97 @@ def match_reaction_templates(
     matches = exact_matches
     if fingerprint is None and analysis.valid:
         parsed_query = parse_reaction_smiles(reaction_smiles)
-        provisional_matches = tuple(
-            ReactionTemplateMatch(
-                template_id=template.template_id,
-                display_name=template.display_name,
-                family_id=template.family_id,
-                status=template.status,
-                edit_fingerprint=template.edit_fingerprint,
-                definition_hash=template.definition_hash,
-                evidence="template_center_transition_hypothesis",
-                confidence=0.7,
-                provisional=True,
+        reconstruction_matches = []
+        for template in templates:
+            if not (include_drafts or template.status == "active"):
+                continue
+            outcomes = _exact_template_reconstructions(template, parsed_query)
+            if not outcomes:
+                continue
+            inferred_multiplicity = all(
+                outcome.inferred_multiplicity for outcome in outcomes
             )
-            for template in templates
-            if (include_drafts or template.status == "active")
-            and _matches_template_center_transition(template, parsed_query)
-        )
-        matches = provisional_matches
-        candidate_fingerprints = {
-            match.edit_fingerprint for match in provisional_matches
-        }
-        if len(candidate_fingerprints) == 1:
-            fingerprint = next(iter(candidate_fingerprints))
-            evidence = "template_center_transition_hypothesis"
-            warnings.append(
-                "PROVISIONAL_TEMPLATE_MATCH_WITHOUT_ATOM_PROVENANCE"
+            preferred_outcome = next(
+                (
+                    outcome
+                    for outcome in outcomes
+                    if not outcome.inferred_multiplicity
+                ),
+                outcomes[0],
             )
-        elif len(candidate_fingerprints) > 1:
-            warnings.append("AMBIGUOUS_TEMPLATE_CENTER_TRANSITIONS")
+            reconstruction_matches.append(
+                ReactionTemplateMatch(
+                    template_id=template.template_id,
+                    display_name=template.display_name,
+                    family_id=template.family_id,
+                    status=template.status,
+                    edit_fingerprint=template.edit_fingerprint,
+                    definition_hash=template.definition_hash,
+                    evidence=(
+                        "exact_template_reconstruction_with_"
+                        "inferred_multiplicity"
+                        if inferred_multiplicity
+                        else "exact_template_reconstruction"
+                    ),
+                    confidence=0.85 if inferred_multiplicity else 0.95,
+                    provisional=inferred_multiplicity,
+                    predicted_product_smiles=(
+                        preferred_outcome.predicted_product_smiles
+                    ),
+                    inferred_multiplicity=inferred_multiplicity,
+                )
+            )
+        if reconstruction_matches:
+            matches = tuple(reconstruction_matches)
+            candidate_fingerprints = {
+                match.edit_fingerprint for match in matches
+            }
+            candidate_evidence = {match.evidence for match in matches}
+            if len(candidate_fingerprints) == 1:
+                fingerprint = next(iter(candidate_fingerprints))
+                evidence = (
+                    next(iter(candidate_evidence))
+                    if len(candidate_evidence) == 1
+                    else "exact_template_reconstruction"
+                )
+                warnings.append(
+                    "EXACT_MAIN_PRODUCT_RECONSTRUCTION_FROM_TEMPLATE"
+                )
+                if any(match.provisional for match in matches):
+                    warnings.append("INFERRED_REACTANT_MULTIPLICITY")
+            else:
+                warnings.append("AMBIGUOUS_TEMPLATE_RECONSTRUCTIONS")
+        else:
+            provisional_matches = tuple(
+                ReactionTemplateMatch(
+                    template_id=template.template_id,
+                    display_name=template.display_name,
+                    family_id=template.family_id,
+                    status=template.status,
+                    edit_fingerprint=template.edit_fingerprint,
+                    definition_hash=template.definition_hash,
+                    evidence="template_center_transition_hypothesis",
+                    confidence=0.7,
+                    provisional=True,
+                    predicted_product_smiles=None,
+                    inferred_multiplicity=False,
+                )
+                for template in templates
+                if (include_drafts or template.status == "active")
+                and _matches_template_center_transition(template, parsed_query)
+            )
+            matches = provisional_matches
+            candidate_fingerprints = {
+                match.edit_fingerprint for match in provisional_matches
+            }
+            if len(candidate_fingerprints) == 1:
+                fingerprint = next(iter(candidate_fingerprints))
+                evidence = "template_center_transition_hypothesis"
+                warnings.append(
+                    "PROVISIONAL_TEMPLATE_MATCH_WITHOUT_ATOM_PROVENANCE"
+                )
+            elif len(candidate_fingerprints) > 1:
+                warnings.append("AMBIGUOUS_TEMPLATE_CENTER_TRANSITIONS")
     return ReactionTemplateQueryResult(
         reaction_smiles=reaction_smiles,
         valid=bool(analysis.valid),

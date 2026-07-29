@@ -57,11 +57,20 @@ def test_qt6_registry_window_featurizes_reaction_test_input() -> None:
         assert "RS3 signature: unavailable" in details
         assert "TEMPLATE REGISTRY MATCHES (1)" in details
         assert "Family: acetalization" in details
-        assert "Match: provisional" in details
+        assert "Match: multiplicity-assisted exact reconstruction" in details
+        assert "Confidence: 0.85" in details
+        assert (
+            "Reconstructed product: CCOC(OCC)c1cccc(OC)c1"
+            in details
+        )
+        assert "Inferred repeated participant: yes" in details
         assert not details.lstrip().startswith("{")
         assert "Featurization: valid" in window.status_label.text()
         assert "completeness incomplete" in window.status_label.text()
-        assert "acetalization (provisional)" in window.status_label.text()
+        assert (
+            "acetalization (multiplicity-assisted exact)"
+            in window.status_label.text()
+        )
     finally:
         window.close()
         application.processEvents()
