@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 
 from .chemistry.smarts_cache import compile_smarts
 from .connectivity_rewrite import load_connectivity_rewrites
+from .reaction_templates import validate_reaction_template_registry
 
 
 DEFINITIONS_DIR = Path(__file__).with_name("definitions")
@@ -42,6 +43,7 @@ def validate_taxonomy() -> List[str]:
         "reaction_label_patterns.v1",
         "reaction_label_rendering.v1",
         "reaction_rendering.v1",
+        "reaction_templates.v1",
         "reactivity_descriptor_rules.v1",
         "aromatic_systems.v1",
         "reactivity_rendering.v1",
@@ -175,6 +177,13 @@ def validate_taxonomy() -> List[str]:
             "missing_manifest_definitions:"
             + ",".join(sorted(missing_manifest_files))
         )
+    template_errors = validate_reaction_template_registry(
+        DEFINITIONS_DIR / "reaction_templates.v1.json"
+    )
+    errors.extend(
+        f"invalid_reaction_template_registry:{error}"
+        for error in template_errors
+    )
     for required_identity in {
         "site_patterns.v2.json",
         "context_facets.v2.json",

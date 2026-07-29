@@ -1,0 +1,804 @@
+"""Versioned, single-event reaction-template registry.
+
+The registry is an authoring and interpretation layer over normalized reaction
+edits.  It does not execute arbitrary code and template names never replace
+query-derived structural evidence.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import re
+import tempfile
+from dataclasses import asdict, dataclass, replace
+from pathlib import Path
+from typing import Any, Iterable, Literal, Mapping, Optional, Sequence, Tuple
+
+from .chemistry.rdkit_utils import mol_to_canonical_smiles, parse_smiles
+from .reaction_archetypes import infer_edit_archetype
+from .reaction_edits import normalize_mapped_edits
+from .reaction_events import partition_reaction_edits
+from .reaction_models import ReactionAtomReference, ReactionEdit
+from .reaction_parser import parse_reaction_smiles
+
+
+REACTION_TEMPLATE_SCHEMA_VERSION = "1.0"
+REACTION_TEMPLATE_DEFINITION_VERSION = "reaction_templates.v1"
+DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH = (
+    Path(__file__).with_name("definitions") / "reaction_templates.v1.json"
+)
+
+_TEMPLATE_ID_RE = re.compile(r"^[a-z][a-z0-9_]{2,79}$")
+_VALID_STATUS = {"draft", "active", "retired"}
+
+
+class ReactionTemplateError(ValueError):
+    """Raised when a template or registry violates its public contract."""
+
+
+@dataclass(frozen=True)
+class ReactionTemplateAtom:
+    """One mapped atom participating in a reference reaction edit."""
+
+    atom_map_number: int
+    element: str
+    formal_charge: int
+    aromatic: bool
+    hybridization: str
+
+    @classmethod
+    def from_reference(
+        cls, reference: ReactionAtomReference
+    ) -> "ReactionTemplateAtom":
+        """Build an atom contract from a mapped reaction reference."""
+        if reference.atom_map_number is None:
+            raise ReactionTemplateError(
+                "Template edit atoms require atom-map numbers"
+            )
+        return cls(
+            atom_map_number=int(reference.atom_map_number),
+            element=str(reference.element),
+            formal_charge=int(reference.formal_charge),
+            aromatic=bool(reference.aromatic),
+            hybridization=str(reference.hybridization),
+        )
+
+
+@dataclass(frozen=True)
+class ReactionTemplateEdit:
+    """One normalized edit derived from the mapped reference reaction."""
+
+    edit_type: Literal[
+        "formed", "broken", "order_changed", "hydrogen_change"
+    ]
+    atom_1: ReactionTemplateAtom
+    atom_2: Optional[ReactionTemplateAtom]
+    old_order: Optional[str]
+    new_order: Optional[str]
+
+    @classmethod
+    def from_reaction_edit(
+        cls, edit: ReactionEdit
+    ) -> "ReactionTemplateEdit":
+        """Convert a normalized reaction edit into a serializable template edit."""
+        return cls(
+            edit_type=edit.edit_type,
+            atom_1=ReactionTemplateAtom.from_reference(edit.atom_1),
+            atom_2=(
+                ReactionTemplateAtom.from_reference(edit.atom_2)
+                if edit.atom_2 is not None
+                else None
+            ),
+            old_order=edit.old_order,
+            new_order=edit.new_order,
+        )
+
+
+@dataclass(frozen=True)
+class ReactionTemplateParticipant:
+    """One canonical species and its explicit reference multiplicity."""
+
+    side: Literal["reactant", "agent", "product"]
+    canonical_smiles: str
+    explicit_count: int
+
+
+@dataclass(frozen=True)
+class ReactionTemplate:
+    """One validated, declarative single-event reaction template."""
+
+    template_id: str
+    display_name: str
+    family_id: Optional[str]
+    aliases: Tuple[str, ...]
+    mapped_reference_reaction: str
+    participants: Tuple[ReactionTemplateParticipant, ...]
+    edits: Tuple[ReactionTemplateEdit, ...]
+    edit_fingerprint: str
+    edit_component_count: int
+    edit_archetype: str
+    transformation_class: Optional[str]
+    status: Literal["draft", "active", "retired"]
+    provenance: str
+    notes: str
+    definition_hash: str
+    schema_version: str = REACTION_TEMPLATE_SCHEMA_VERSION
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize the template with deterministic field values."""
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class ReactionTemplateMatch:
+    """One template whose edit fingerprint matches a query reaction."""
+
+    template_id: str
+    display_name: str
+    family_id: Optional[str]
+    status: str
+    edit_fingerprint: str
+    definition_hash: str
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize the match."""
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class ReactionTemplateQueryResult:
+    """Query-derived signature information and matching registry templates."""
+
+    reaction_smiles: str
+    valid: bool
+    evidence: str
+    edit_fingerprint: Optional[str]
+    signature_id: Optional[str]
+    matches: Tuple[ReactionTemplateMatch, ...]
+    warnings: Tuple[str, ...] = ()
+    error: Optional[str] = None
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize the query result."""
+        return asdict(self)
+
+
+def _canonical_json(value: Any) -> str:
+    return json.dumps(
+        value, ensure_ascii=True, sort_keys=True, separators=(",", ":")
+    )
+
+
+def _digest(prefix: str, value: Any, *, length: int = 32) -> str:
+    encoded = _canonical_json(value).encode("utf-8")
+    return f"{prefix}:" + hashlib.sha256(encoded).hexdigest()[:length]
+
+
+def _atom_identity(atom: ReactionAtomReference) -> tuple[object, ...]:
+    if atom.atom_map_number is not None:
+        return ("map", int(atom.atom_map_number))
+    return (
+        "atom",
+        str(atom.side),
+        int(atom.component_index),
+        int(atom.atom_index),
+    )
+
+
+def _atom_label(atom: ReactionAtomReference) -> str:
+    return "|".join(
+        (
+            str(atom.element),
+            str(int(atom.formal_charge)),
+            "aromatic" if atom.aromatic else "aliphatic",
+            str(atom.hybridization),
+        )
+    )
+
+
+def reaction_edit_fingerprint(edits: Sequence[ReactionEdit]) -> str:
+    """Return a map- and component-order-invariant edit-graph fingerprint.
+
+    The fingerprint intentionally excludes local-environment IDs, source
+    labels, template names, and atom-map numbers.  Per-atom incident edit
+    multisets retain the connectivity of a compact single event more strongly
+    than a flat multiset of bond changes.
+    """
+    if not edits:
+        raise ReactionTemplateError("Cannot fingerprint an empty edit set")
+    node_labels: dict[tuple[object, ...], str] = {}
+    incidents: dict[tuple[object, ...], list[str]] = {}
+    edit_tokens = []
+    for edit in edits:
+        left_key = _atom_identity(edit.atom_1)
+        left_label = _atom_label(edit.atom_1)
+        node_labels[left_key] = left_label
+        incidents.setdefault(left_key, [])
+        if edit.atom_2 is None:
+            token = "|".join(
+                (
+                    edit.edit_type,
+                    left_label,
+                    "H",
+                    edit.old_order or "NONE",
+                    edit.new_order or "NONE",
+                )
+            )
+            incidents[left_key].append(
+                "|".join(
+                    (
+                        edit.edit_type,
+                        "H",
+                        edit.old_order or "NONE",
+                        edit.new_order or "NONE",
+                    )
+                )
+            )
+            edit_tokens.append(token)
+            continue
+        right_key = _atom_identity(edit.atom_2)
+        right_label = _atom_label(edit.atom_2)
+        node_labels[right_key] = right_label
+        incidents.setdefault(right_key, [])
+        endpoint_labels = tuple(sorted((left_label, right_label)))
+        token = "|".join(
+            (
+                edit.edit_type,
+                endpoint_labels[0],
+                endpoint_labels[1],
+                edit.old_order or "NONE",
+                edit.new_order or "NONE",
+            )
+        )
+        edit_tokens.append(token)
+        incidents[left_key].append(
+            "|".join(
+                (
+                    edit.edit_type,
+                    right_label,
+                    edit.old_order or "NONE",
+                    edit.new_order or "NONE",
+                )
+            )
+        )
+        incidents[right_key].append(
+            "|".join(
+                (
+                    edit.edit_type,
+                    left_label,
+                    edit.old_order or "NONE",
+                    edit.new_order or "NONE",
+                )
+            )
+        )
+    node_tokens = sorted(
+        [
+            {
+                "label": node_labels[key],
+                "incidents": sorted(values),
+            }
+            for key, values in incidents.items()
+        ],
+        key=_canonical_json,
+    )
+    return _digest(
+        "RTE1",
+        {
+            "edits": sorted(edit_tokens),
+            "nodes": node_tokens,
+        },
+    )
+
+
+def _unmapped_canonical_smiles(smiles: str) -> str:
+    molecule = parse_smiles(smiles)
+    if molecule is None:
+        raise ReactionTemplateError(f"Invalid component SMILES: {smiles}")
+    for atom in molecule.GetAtoms():
+        atom.SetAtomMapNum(0)
+    canonical = mol_to_canonical_smiles(molecule)
+    if canonical is None:
+        raise ReactionTemplateError(f"Cannot canonicalize component: {smiles}")
+    return canonical
+
+
+def _participants(parsed: Any) -> Tuple[ReactionTemplateParticipant, ...]:
+    counts: dict[tuple[str, str], int] = {}
+    for component in (*parsed.reactants, *parsed.agents, *parsed.products):
+        canonical = _unmapped_canonical_smiles(component.input_smiles)
+        key = (str(component.side), canonical)
+        counts[key] = counts.get(key, 0) + 1
+    return tuple(
+        ReactionTemplateParticipant(
+            side=side,
+            canonical_smiles=canonical,
+            explicit_count=count,
+        )
+        for (side, canonical), count in sorted(counts.items())
+    )
+
+
+def _map_statistics(components: Iterable[Any]) -> tuple[int, int, set[int]]:
+    heavy_count = 0
+    mapped_heavy_count = 0
+    maps: set[int] = set()
+    for component in components:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        for atom in molecule.GetAtoms():
+            if atom.GetAtomicNum() <= 1:
+                continue
+            heavy_count += 1
+            map_number = int(atom.GetAtomMapNum())
+            if map_number:
+                mapped_heavy_count += 1
+                maps.add(map_number)
+    return heavy_count, mapped_heavy_count, maps
+
+
+def _template_hash_payload(template: ReactionTemplate) -> dict[str, Any]:
+    payload = template.to_dict()
+    payload.pop("definition_hash", None)
+    return payload
+
+
+def _definition_hash(template: ReactionTemplate) -> str:
+    return _digest("RTD1", _template_hash_payload(template), length=40)
+
+
+def derive_reaction_template(
+    mapped_reaction_smiles: str,
+    *,
+    template_id: str,
+    display_name: str,
+    family_id: Optional[str] = None,
+    aliases: Sequence[str] = (),
+    transformation_class: Optional[str] = None,
+    status: Literal["draft", "active", "retired"] = "draft",
+    provenance: str = "manual_mapped_reference",
+    notes: str = "",
+) -> ReactionTemplate:
+    """Compile one fully mapped reference into a single-event template draft."""
+    template_id = str(template_id or "").strip()
+    if not _TEMPLATE_ID_RE.fullmatch(template_id):
+        raise ReactionTemplateError(
+            "template_id must use lowercase snake_case and contain 3-80 characters"
+        )
+    display_name = str(display_name or "").strip()
+    if not display_name:
+        raise ReactionTemplateError("display_name is required")
+    if status not in _VALID_STATUS:
+        raise ReactionTemplateError(f"Unsupported template status: {status}")
+    parsed = parse_reaction_smiles(mapped_reaction_smiles)
+    if not parsed.valid:
+        raise ReactionTemplateError(
+            f"Invalid mapped reference reaction: {parsed.error or parsed.warnings}"
+        )
+    reactant_heavy, reactant_mapped, reactant_maps = _map_statistics(
+        parsed.reactants
+    )
+    product_heavy, product_mapped, product_maps = _map_statistics(parsed.products)
+    if reactant_mapped != reactant_heavy:
+        raise ReactionTemplateError(
+            "Every reactant heavy atom in a template reference must be mapped"
+        )
+    if product_mapped != product_heavy:
+        raise ReactionTemplateError(
+            "Every product heavy atom in a template reference must be mapped"
+        )
+    missing_sources = product_maps - reactant_maps
+    if missing_sources:
+        raise ReactionTemplateError(
+            "Product atom maps lack reactant provenance: "
+            + ", ".join(str(value) for value in sorted(missing_sources))
+        )
+    normalized = normalize_mapped_edits(parsed.reactants, parsed.products)
+    if not normalized.valid or not normalized.edits:
+        raise ReactionTemplateError(
+            "Mapped reference did not yield valid edits: "
+            + ", ".join(normalized.warnings or (normalized.evidence,))
+        )
+    edit_groups = partition_reaction_edits(normalized.edits)
+    if len(edit_groups) != 1:
+        raise ReactionTemplateError(
+            "Reaction templates must contain exactly one connected edit event; "
+            f"found {len(edit_groups)}"
+        )
+    template = ReactionTemplate(
+        template_id=template_id,
+        display_name=display_name,
+        family_id=str(family_id).strip() if family_id else None,
+        aliases=tuple(
+            sorted(
+                {
+                    str(alias).strip()
+                    for alias in aliases
+                    if str(alias).strip()
+                }
+            )
+        ),
+        mapped_reference_reaction=str(mapped_reaction_smiles).strip(),
+        participants=_participants(parsed),
+        edits=tuple(
+            ReactionTemplateEdit.from_reaction_edit(edit)
+            for edit in normalized.edits
+        ),
+        edit_fingerprint=reaction_edit_fingerprint(normalized.edits),
+        edit_component_count=1,
+        edit_archetype=infer_edit_archetype(normalized.edits),
+        transformation_class=(
+            str(transformation_class).strip()
+            if transformation_class
+            else None
+        ),
+        status=status,
+        provenance=str(provenance or "manual_mapped_reference").strip(),
+        notes=str(notes or "").strip(),
+        definition_hash="",
+    )
+    return replace(template, definition_hash=_definition_hash(template))
+
+
+def _atom_from_dict(payload: Mapping[str, Any]) -> ReactionTemplateAtom:
+    return ReactionTemplateAtom(
+        atom_map_number=int(payload["atom_map_number"]),
+        element=str(payload["element"]),
+        formal_charge=int(payload["formal_charge"]),
+        aromatic=bool(payload["aromatic"]),
+        hybridization=str(payload["hybridization"]),
+    )
+
+
+def reaction_template_from_dict(payload: Mapping[str, Any]) -> ReactionTemplate:
+    """Load and validate one serialized reaction template."""
+    try:
+        template = ReactionTemplate(
+            template_id=str(payload["template_id"]),
+            display_name=str(payload["display_name"]),
+            family_id=(
+                str(payload["family_id"])
+                if payload.get("family_id") is not None
+                else None
+            ),
+            aliases=tuple(str(value) for value in payload.get("aliases") or ()),
+            mapped_reference_reaction=str(payload["mapped_reference_reaction"]),
+            participants=tuple(
+                ReactionTemplateParticipant(
+                    side=str(item["side"]),  # type: ignore[arg-type]
+                    canonical_smiles=str(item["canonical_smiles"]),
+                    explicit_count=int(item["explicit_count"]),
+                )
+                for item in payload.get("participants") or ()
+            ),
+            edits=tuple(
+                ReactionTemplateEdit(
+                    edit_type=str(item["edit_type"]),  # type: ignore[arg-type]
+                    atom_1=_atom_from_dict(item["atom_1"]),
+                    atom_2=(
+                        _atom_from_dict(item["atom_2"])
+                        if item.get("atom_2") is not None
+                        else None
+                    ),
+                    old_order=(
+                        str(item["old_order"])
+                        if item.get("old_order") is not None
+                        else None
+                    ),
+                    new_order=(
+                        str(item["new_order"])
+                        if item.get("new_order") is not None
+                        else None
+                    ),
+                )
+                for item in payload.get("edits") or ()
+            ),
+            edit_fingerprint=str(payload["edit_fingerprint"]),
+            edit_component_count=int(payload["edit_component_count"]),
+            edit_archetype=str(payload["edit_archetype"]),
+            transformation_class=(
+                str(payload["transformation_class"])
+                if payload.get("transformation_class") is not None
+                else None
+            ),
+            status=str(payload["status"]),  # type: ignore[arg-type]
+            provenance=str(payload.get("provenance") or ""),
+            notes=str(payload.get("notes") or ""),
+            definition_hash=str(payload["definition_hash"]),
+            schema_version=str(
+                payload.get("schema_version")
+                or REACTION_TEMPLATE_SCHEMA_VERSION
+            ),
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ReactionTemplateError(f"Invalid reaction template record: {exc}") from exc
+    errors = validate_reaction_template(template)
+    if errors:
+        raise ReactionTemplateError("; ".join(errors))
+    return template
+
+
+def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
+    """Return deterministic validation errors for one template."""
+    errors = []
+    if template.schema_version != REACTION_TEMPLATE_SCHEMA_VERSION:
+        errors.append(
+            f"{template.template_id}:unsupported_schema_version:"
+            f"{template.schema_version}"
+        )
+    if not _TEMPLATE_ID_RE.fullmatch(template.template_id):
+        errors.append(f"{template.template_id}:invalid_template_id")
+    if not template.display_name.strip():
+        errors.append(f"{template.template_id}:missing_display_name")
+    if template.status not in _VALID_STATUS:
+        errors.append(f"{template.template_id}:invalid_status:{template.status}")
+    if template.edit_component_count != 1:
+        errors.append(
+            f"{template.template_id}:not_single_event:"
+            f"{template.edit_component_count}"
+        )
+    if not template.edits:
+        errors.append(f"{template.template_id}:missing_edits")
+    if not template.edit_fingerprint.startswith("RTE1:"):
+        errors.append(f"{template.template_id}:invalid_edit_fingerprint")
+    if not template.definition_hash.startswith("RTD1:"):
+        errors.append(f"{template.template_id}:invalid_definition_hash")
+    elif _definition_hash(replace(template, definition_hash="")) != (
+        template.definition_hash
+    ):
+        errors.append(f"{template.template_id}:definition_hash_mismatch")
+    if len(set(template.aliases)) != len(template.aliases):
+        errors.append(f"{template.template_id}:duplicate_aliases")
+    try:
+        compiled = derive_reaction_template(
+            template.mapped_reference_reaction,
+            template_id=template.template_id,
+            display_name=template.display_name,
+            family_id=template.family_id,
+            aliases=template.aliases,
+            transformation_class=template.transformation_class,
+            status=template.status,
+            provenance=template.provenance,
+            notes=template.notes,
+        )
+    except ReactionTemplateError as exc:
+        errors.append(f"{template.template_id}:invalid_mapped_reference:{exc}")
+    else:
+        for field_name in (
+            "participants",
+            "edits",
+            "edit_fingerprint",
+            "edit_component_count",
+            "edit_archetype",
+        ):
+            if getattr(template, field_name) != getattr(compiled, field_name):
+                errors.append(
+                    f"{template.template_id}:reference_contract_mismatch:"
+                    f"{field_name}"
+                )
+    return tuple(sorted(errors))
+
+
+def empty_reaction_template_registry() -> dict[str, Any]:
+    """Return the canonical empty registry document."""
+    return {
+        "schema_version": REACTION_TEMPLATE_SCHEMA_VERSION,
+        "definition_version": REACTION_TEMPLATE_DEFINITION_VERSION,
+        "templates": [],
+    }
+
+
+def load_reaction_template_registry(
+    path: str | Path = DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH,
+) -> Tuple[ReactionTemplate, ...]:
+    """Load a versioned reaction-template registry."""
+    registry_path = Path(path)
+    if not registry_path.exists():
+        return ()
+    try:
+        payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ReactionTemplateError(
+            f"Cannot read reaction-template registry {registry_path}: {exc}"
+        ) from exc
+    if not isinstance(payload, Mapping):
+        raise ReactionTemplateError("Reaction-template registry must be an object")
+    if payload.get("schema_version") != REACTION_TEMPLATE_SCHEMA_VERSION:
+        raise ReactionTemplateError(
+            "Unsupported reaction-template registry schema version"
+        )
+    if payload.get("definition_version") != REACTION_TEMPLATE_DEFINITION_VERSION:
+        raise ReactionTemplateError(
+            "Unsupported reaction-template registry definition version"
+        )
+    records = payload.get("templates")
+    if not isinstance(records, list):
+        raise ReactionTemplateError(
+            "Reaction-template registry templates must be a list"
+        )
+    templates = tuple(reaction_template_from_dict(record) for record in records)
+    ids = [template.template_id for template in templates]
+    if len(ids) != len(set(ids)):
+        raise ReactionTemplateError("Duplicate reaction-template IDs")
+    return tuple(sorted(templates, key=lambda item: item.template_id))
+
+
+def save_reaction_template_registry(
+    templates: Sequence[ReactionTemplate],
+    path: str | Path = DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH,
+) -> Path:
+    """Atomically save validated templates to a versioned registry file."""
+    registry_path = Path(path)
+    normalized = tuple(sorted(templates, key=lambda item: item.template_id))
+    ids = [template.template_id for template in normalized]
+    if len(ids) != len(set(ids)):
+        raise ReactionTemplateError("Duplicate reaction-template IDs")
+    errors = tuple(
+        error
+        for template in normalized
+        for error in validate_reaction_template(template)
+    )
+    if errors:
+        raise ReactionTemplateError("; ".join(errors))
+    payload = empty_reaction_template_registry()
+    payload["templates"] = [template.to_dict() for template in normalized]
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    encoded = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, indent=2
+    ) + "\n"
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{registry_path.name}.",
+        suffix=".tmp",
+        dir=str(registry_path.parent),
+        text=True,
+    )
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(encoded)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary_name, registry_path)
+    except Exception:
+        try:
+            os.unlink(temporary_name)
+        except OSError:
+            pass
+        raise
+    return registry_path
+
+
+def upsert_reaction_template(
+    template: ReactionTemplate,
+    path: str | Path = DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH,
+    *,
+    replace_existing: bool = False,
+) -> Path:
+    """Add one template, requiring explicit permission to replace an ID."""
+    templates = list(load_reaction_template_registry(path))
+    existing_index = next(
+        (
+            index
+            for index, current in enumerate(templates)
+            if current.template_id == template.template_id
+        ),
+        None,
+    )
+    if existing_index is not None and not replace_existing:
+        raise ReactionTemplateError(
+            f"Template already exists: {template.template_id}"
+        )
+    if existing_index is None:
+        templates.append(template)
+    else:
+        templates[existing_index] = template
+    return save_reaction_template_registry(templates, path)
+
+
+def validate_reaction_template_registry(
+    path: str | Path = DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH,
+) -> Tuple[str, ...]:
+    """Return registry validation errors without raising."""
+    try:
+        templates = load_reaction_template_registry(path)
+    except ReactionTemplateError as exc:
+        return (str(exc),)
+    errors = [
+        error
+        for template in templates
+        for error in validate_reaction_template(template)
+    ]
+    aliases: dict[str, str] = {}
+    for template in templates:
+        for alias in (template.display_name, *template.aliases):
+            normalized = alias.casefold().strip()
+            owner = aliases.get(normalized)
+            if owner is not None and owner != template.template_id:
+                errors.append(
+                    f"ambiguous_template_alias:{alias}:{owner}:"
+                    f"{template.template_id}"
+                )
+            aliases[normalized] = template.template_id
+    return tuple(sorted(set(errors)))
+
+
+def match_reaction_templates(
+    reaction_smiles: str,
+    *,
+    path: str | Path = DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH,
+    include_drafts: bool = False,
+) -> ReactionTemplateQueryResult:
+    """Match a query-derived edit graph against registered templates.
+
+    This function never copies a stored signature.  The query signature is
+    generated by :func:`featurize_reaction`; the template registry contributes
+    only structural interpretation candidates.
+    """
+    from .reaction_api import featurize_reaction
+
+    analysis = featurize_reaction(reaction_smiles)
+    signature = analysis.reaction_signature
+    edits: Tuple[ReactionEdit, ...] = (
+        tuple(signature.edits) if signature is not None else ()
+    )
+    evidence = analysis.evidence_quality
+    warnings = list(analysis.warnings)
+    if not edits:
+        parsed = parse_reaction_smiles(reaction_smiles)
+        if parsed.valid:
+            mapped = normalize_mapped_edits(parsed.reactants, parsed.products)
+            if mapped.valid:
+                edits = mapped.edits
+                evidence = mapped.evidence
+                warnings.extend(mapped.warnings)
+    fingerprint = reaction_edit_fingerprint(edits) if edits else None
+    templates = load_reaction_template_registry(path)
+    matches = tuple(
+        ReactionTemplateMatch(
+            template_id=template.template_id,
+            display_name=template.display_name,
+            family_id=template.family_id,
+            status=template.status,
+            edit_fingerprint=template.edit_fingerprint,
+            definition_hash=template.definition_hash,
+        )
+        for template in templates
+        if fingerprint is not None
+        and template.edit_fingerprint == fingerprint
+        and (include_drafts or template.status == "active")
+    )
+    return ReactionTemplateQueryResult(
+        reaction_smiles=reaction_smiles,
+        valid=bool(analysis.valid),
+        evidence=evidence,
+        edit_fingerprint=fingerprint,
+        signature_id=signature.signature_id if signature else None,
+        matches=matches,
+        warnings=tuple(sorted(set(warnings))),
+        error=analysis.error,
+    )
+
+
+__all__ = [
+    "DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH",
+    "REACTION_TEMPLATE_DEFINITION_VERSION",
+    "REACTION_TEMPLATE_SCHEMA_VERSION",
+    "ReactionTemplate",
+    "ReactionTemplateAtom",
+    "ReactionTemplateEdit",
+    "ReactionTemplateError",
+    "ReactionTemplateMatch",
+    "ReactionTemplateParticipant",
+    "ReactionTemplateQueryResult",
+    "derive_reaction_template",
+    "empty_reaction_template_registry",
+    "load_reaction_template_registry",
+    "match_reaction_templates",
+    "reaction_edit_fingerprint",
+    "reaction_template_from_dict",
+    "save_reaction_template_registry",
+    "upsert_reaction_template",
+    "validate_reaction_template",
+    "validate_reaction_template_registry",
+]

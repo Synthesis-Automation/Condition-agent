@@ -20,6 +20,16 @@ Any unmatched edit set still receives a deterministic literal summary such as
 the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
+Mapped, single-event references can also be compiled into the versioned
+`reaction_templates.v1.json` registry. This authoring registry stores a
+map-number- and reactant-order-invariant edit fingerprint, optional family
+annotations, provenance, and the mapped reference; it does not store or copy a
+final reaction signature. Query signatures remain structure-derived, while
+matching active templates contribute interpretation candidates. Use
+`python -m reactive_taxonomy.reaction_template_cli --help` for import, list,
+show, validation, and query matching commands. The PyQt6 wrapper is available
+as `python -m app.reaction_template_registry_gui`.
+
 Every valid parsed reaction also receives a
 `ReactionCompletenessAssessment`. It records heavy-atom and element counts,
 product-atom coverage, mapping coverage, suspected missing reactants or
