@@ -23,14 +23,41 @@ def test_qt6_registry_window_exposes_authoring_and_query_controls() -> None:
         assert window.findChild(QtWidgets.QLineEdit, "templateId") is not None
         assert (
             window.findChild(
-                QtWidgets.QPlainTextEdit, "mappedReferenceReaction"
+                QtWidgets.QLineEdit, "mappedReferenceReaction"
             )
             is not None
         )
+        assert window.findChild(QtWidgets.QLineEdit, "queryReaction") is not None
         assert window.findChild(QtWidgets.QPushButton, "importTemplate") is not None
+        assert (
+            window.findChild(QtWidgets.QPushButton, "featurizeQuery")
+            is not None
+        )
         assert window.findChild(QtWidgets.QPushButton, "matchQuery") is not None
         assert "background-color: #ffffff" not in window.styleSheet()
         assert "color: #23313f" in window.status_label.styleSheet()
+    finally:
+        window.close()
+        application.processEvents()
+
+
+def test_qt6_registry_window_featurizes_reaction_test_input() -> None:
+    application = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    window = ReactionTemplateRegistryWindow()
+    try:
+        reaction = "CCO.COc1cccc(C=O)c1>>CCOC(OCC)c1cccc(OC)c1"
+        window.query_edit.setText(reaction)
+        window.featurize_query()
+
+        details = window.details.toPlainText()
+        assert details.startswith("REACTION FEATURIZATION")
+        assert f"Input: {reaction}" in details
+        assert "Status: valid" in details
+        assert "Status: incomplete" in details
+        assert "RS3 signature: unavailable" in details
+        assert not details.lstrip().startswith("{")
+        assert "Featurization: valid" in window.status_label.text()
+        assert "completeness incomplete" in window.status_label.text()
     finally:
         window.close()
         application.processEvents()

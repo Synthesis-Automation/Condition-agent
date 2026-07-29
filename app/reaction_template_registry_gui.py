@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 from typing import Optional
@@ -23,6 +22,186 @@ from reactive_taxonomy.reaction_templates import (  # noqa: E402
     upsert_reaction_template,
     validate_reaction_template_registry,
 )
+from reactive_taxonomy.reaction_api import featurize_reaction  # noqa: E402
+
+
+def _format_template(template: ReactionTemplate) -> str:
+    """Render one stored template as a compact authoring summary."""
+    lines = [
+        "REACTION TEMPLATE",
+        "",
+        f"ID: {template.template_id}",
+        f"Name: {template.display_name}",
+        f"Status: {template.status}",
+        f"Family: {template.family_id or 'unassigned'}",
+        f"Transformation: {template.transformation_class or 'unassigned'}",
+        f"Edit archetype: {template.edit_archetype}",
+        f"Edit fingerprint: {template.edit_fingerprint}",
+        f"Definition hash: {template.definition_hash}",
+    ]
+    if template.aliases:
+        lines.append(f"Aliases: {', '.join(template.aliases)}")
+    lines.extend(("", "PARTICIPANTS"))
+    for participant in template.participants:
+        lines.append(
+            f"  {participant.side} × {participant.explicit_count}: "
+            f"{participant.canonical_smiles}"
+        )
+    lines.extend(("", "NORMALIZED EDITS"))
+    for edit in template.edits:
+        atom_1 = (
+            f"{edit.atom_1.element}(map {edit.atom_1.atom_map_number})"
+        )
+        atom_2 = (
+            f"{edit.atom_2.element}(map {edit.atom_2.atom_map_number})"
+            if edit.atom_2 is not None
+            else "H"
+        )
+        lines.append(
+            f"  {edit.edit_type}: {atom_1}–{atom_2}, "
+            f"{edit.old_order or 'none'} → {edit.new_order or 'none'}"
+        )
+    lines.extend(
+        (
+            "",
+            "MAPPED REFERENCE",
+            f"  {template.mapped_reference_reaction}",
+        )
+    )
+    if template.notes:
+        lines.extend(("", "NOTES", f"  {template.notes}"))
+    return "\n".join(lines)
+
+
+def _format_reaction_analysis(analysis: object) -> str:
+    """Render a full reaction analysis without exposing raw nested JSON."""
+    completeness = getattr(analysis, "reaction_completeness", None)
+    signature = getattr(analysis, "reaction_signature", None)
+    display_label = getattr(analysis, "display_label", None)
+    lines = [
+        "REACTION FEATURIZATION",
+        "",
+        f"Input: {getattr(analysis, 'input_reaction_smiles', '')}",
+        f"Status: {'valid' if getattr(analysis, 'valid', False) else 'invalid'}",
+        f"Evidence: {getattr(analysis, 'evidence_quality', 'unresolved')}",
+        f"Reaction: {getattr(analysis, 'reaction_label', None) or 'unavailable'}",
+        (
+            "Structural label: "
+            f"{getattr(display_label, 'structural_label', None) or 'unavailable'}"
+        ),
+        (
+            "Transformation: "
+            f"{getattr(analysis, 'transformation_class', None) or 'unresolved'}"
+        ),
+        f"Named family: {getattr(analysis, 'named_family', None) or 'unassigned'}",
+    ]
+    compatible = tuple(
+        getattr(analysis, "compatible_named_families", ()) or ()
+    )
+    if compatible:
+        lines.append(f"Compatible families: {', '.join(compatible)}")
+    if completeness is not None:
+        coverage = getattr(completeness, "product_heavy_atom_coverage", None)
+        lines.extend(
+            (
+                "",
+                "COMPLETENESS",
+                f"  Status: {completeness.status}",
+                f"  Evidence: {completeness.evidence}",
+                (
+                    "  Product heavy-atom coverage: "
+                    + (
+                        f"{100.0 * float(coverage):.1f}%"
+                        if coverage is not None
+                        else "unavailable"
+                    )
+                ),
+            )
+        )
+        product_excess = dict(
+            getattr(completeness, "product_element_excess", {}) or {}
+        )
+        if product_excess:
+            lines.append(
+                "  Unaccounted product atoms: "
+                + ", ".join(
+                    f"{element} × {count}"
+                    for element, count in sorted(product_excess.items())
+                )
+            )
+    lines.extend(("", "SIGNATURE"))
+    if signature is None:
+        lines.append("  RS3 signature: unavailable")
+    else:
+        lines.extend(
+            (
+                f"  ID: {signature.signature_id}",
+                f"  Event scope: {signature.event_scope}",
+                f"  Event count: {signature.event_count}",
+                f"  Edit archetype: {signature.edit_archetype}",
+                f"  Bond-edit key: {signature.bond_edit_signature_key}",
+            )
+        )
+        if signature.edits:
+            lines.append("  Edits:")
+            for edit in signature.edits:
+                atom_2 = edit.atom_2.element if edit.atom_2 is not None else "H"
+                lines.append(
+                    f"    {edit.edit_type}: {edit.atom_1.element}–{atom_2}, "
+                    f"{edit.old_order or 'none'} → "
+                    f"{edit.new_order or 'none'}"
+                )
+    candidates = tuple(getattr(analysis, "candidates", ()) or ())
+    lines.extend(("", f"Candidate interpretations: {len(candidates)}"))
+    warnings = tuple(getattr(analysis, "warnings", ()) or ())
+    if warnings:
+        lines.extend(("", "WARNINGS"))
+        lines.extend(f"  • {warning}" for warning in warnings)
+    error = getattr(analysis, "error", None)
+    if error:
+        lines.extend(("", "ERROR", f"  {error}"))
+    return "\n".join(lines)
+
+
+def _format_match_result(result: object) -> str:
+    """Render template matches and provisional evidence clearly."""
+    lines = [
+        "REACTION TEMPLATE MATCH",
+        "",
+        f"Input: {getattr(result, 'reaction_smiles', '')}",
+        f"Status: {'valid' if getattr(result, 'valid', False) else 'invalid'}",
+        f"Evidence: {getattr(result, 'evidence', 'unresolved')}",
+        f"RS3 signature: {getattr(result, 'signature_id', None) or 'unavailable'}",
+        (
+            "Generic edit key: "
+            f"{getattr(result, 'edit_fingerprint', None) or 'unavailable'}"
+        ),
+    ]
+    matches = tuple(getattr(result, "matches", ()) or ())
+    lines.extend(("", f"MATCHES ({len(matches)})"))
+    if not matches:
+        lines.append("  None")
+    for match in matches:
+        mode = "provisional" if match.provisional else "verified edit match"
+        lines.extend(
+            (
+                f"  {match.display_name}",
+                f"    ID: {match.template_id}",
+                f"    Family: {match.family_id or 'unassigned'}",
+                f"    Status: {match.status}",
+                f"    Match: {mode}",
+                f"    Evidence: {match.evidence}",
+                f"    Confidence: {match.confidence:.2f}",
+            )
+        )
+    warnings = tuple(getattr(result, "warnings", ()) or ())
+    if warnings:
+        lines.extend(("", "WARNINGS"))
+        lines.extend(f"  • {warning}" for warning in warnings)
+    error = getattr(result, "error", None)
+    if error:
+        lines.extend(("", "ERROR", f"  {error}"))
+    return "\n".join(lines)
 
 
 class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
@@ -61,12 +240,11 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         self.status_combo = QtWidgets.QComboBox()
         self.status_combo.setObjectName("templateStatus")
         self.status_combo.addItems(("draft", "active", "retired"))
-        self.mapped_reaction_edit = QtWidgets.QPlainTextEdit()
+        self.mapped_reaction_edit = QtWidgets.QLineEdit()
         self.mapped_reaction_edit.setObjectName("mappedReferenceReaction")
         self.mapped_reaction_edit.setPlaceholderText(
             "Paste one fully atom-mapped, single-event reaction SMILES"
         )
-        self.mapped_reaction_edit.setMinimumHeight(110)
         self.notes_edit = QtWidgets.QPlainTextEdit()
         self.notes_edit.setObjectName("templateNotes")
         self.notes_edit.setPlaceholderText(
@@ -105,23 +283,25 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
             3, QtWidgets.QHeaderView.ResizeMode.Stretch
         )
 
-        self.query_edit = QtWidgets.QPlainTextEdit()
+        self.query_edit = QtWidgets.QLineEdit()
         self.query_edit.setObjectName("queryReaction")
         self.query_edit.setPlaceholderText(
             "Paste a query reaction SMILES to derive its signature and match "
             "registered edit templates"
         )
-        self.query_edit.setMaximumHeight(90)
         self.include_drafts_check = QtWidgets.QCheckBox(
             "Include draft templates"
         )
         self.include_drafts_check.setChecked(True)
+        self.featurize_button = QtWidgets.QPushButton("Featurize reaction")
+        self.featurize_button.setObjectName("featurizeQuery")
         self.match_button = QtWidgets.QPushButton("Match query")
         self.match_button.setObjectName("matchQuery")
 
         self.details = QtWidgets.QPlainTextEdit()
         self.details.setObjectName("templateDetails")
         self.details.setReadOnly(True)
+        self.details.setMinimumHeight(280)
         self.status_label = QtWidgets.QLabel()
         self.status_label.setObjectName("registryStatus")
         self.status_label.setWordWrap(True)
@@ -190,19 +370,20 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         browser = QtWidgets.QWidget()
         browser_layout = QtWidgets.QVBoxLayout(browser)
         browser_layout.addWidget(QtWidgets.QLabel("Registered templates"))
-        browser_layout.addWidget(self.table, stretch=2)
+        browser_layout.addWidget(self.table, stretch=1)
         query_row = QtWidgets.QHBoxLayout()
         query_row.addWidget(self.query_edit, stretch=1)
         query_actions = QtWidgets.QVBoxLayout()
         query_actions.addWidget(self.include_drafts_check)
+        query_actions.addWidget(self.featurize_button)
         query_actions.addWidget(self.match_button)
         query_actions.addStretch()
         query_row.addLayout(query_actions)
         browser_layout.addLayout(query_row)
         browser_layout.addWidget(QtWidgets.QLabel("Details / query result"))
-        browser_layout.addWidget(self.details, stretch=1)
+        browser_layout.addWidget(self.details, stretch=2)
         splitter.addWidget(browser)
-        splitter.setSizes((330, 440))
+        splitter.setSizes((245, 565))
 
         self.status_label.setStyleSheet(
             "background: #eef4fa; border: 1px solid #ccd9e5; "
@@ -214,6 +395,7 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         self.import_button.clicked.connect(self.import_template)
         self.validate_button.clicked.connect(self.validate_registry)
         self.refresh_button.clicked.connect(self.refresh_registry)
+        self.featurize_button.clicked.connect(self.featurize_query)
         self.match_button.clicked.connect(self.match_query)
         self.table.itemSelectionChanged.connect(self.show_selected_template)
         self.registry_edit.editingFinished.connect(self.refresh_registry)
@@ -250,7 +432,7 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         )
         try:
             template = derive_reaction_template(
-                self.mapped_reaction_edit.toPlainText().strip(),
+                self.mapped_reaction_edit.text().strip(),
                 template_id=self.template_id_edit.text().strip(),
                 display_name=self.name_edit.text().strip(),
                 family_id=self.family_edit.text().strip() or None,
@@ -351,18 +533,38 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
             None,
         )
         if template is not None:
-            self.details.setPlainText(
-                json.dumps(
-                    template.to_dict(),
-                    ensure_ascii=False,
-                    sort_keys=True,
-                    indent=2,
-                )
+            self.details.setPlainText(_format_template(template))
+
+    @QtCore.pyqtSlot()
+    def featurize_query(self) -> None:
+        """Run full standalone reaction featurization for the test input."""
+        reaction = self.query_edit.text().strip()
+        if not reaction:
+            self._show_error(
+                "Reaction required",
+                ReactionTemplateError("Paste a reaction SMILES to featurize"),
             )
+            return
+        analysis = featurize_reaction(reaction)
+        self.details.setPlainText(_format_reaction_analysis(analysis))
+        completeness = analysis.reaction_completeness
+        completeness_status = (
+            completeness.status if completeness is not None else "unavailable"
+        )
+        signature_id = (
+            analysis.reaction_signature.signature_id
+            if analysis.reaction_signature is not None
+            else "unavailable"
+        )
+        self.status_label.setText(
+            f"Featurization: {'valid' if analysis.valid else 'invalid'}; "
+            f"evidence {analysis.evidence_quality}; completeness "
+            f"{completeness_status}; signature {signature_id}."
+        )
 
     @QtCore.pyqtSlot()
     def match_query(self) -> None:
-        reaction = self.query_edit.toPlainText().strip()
+        reaction = self.query_edit.text().strip()
         if not reaction:
             self._show_error(
                 "Query required",
@@ -378,14 +580,7 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         except (OSError, ReactionTemplateError) as exc:
             self._show_error("Query match failed", exc)
             return
-        self.details.setPlainText(
-            json.dumps(
-                result.to_dict(),
-                ensure_ascii=False,
-                sort_keys=True,
-                indent=2,
-            )
-        )
+        self.details.setPlainText(_format_match_result(result))
         self.status_label.setText(
             f"Query: signature {result.signature_id or 'unavailable'}; "
             f"{len(result.matches)} template match(es); evidence "
