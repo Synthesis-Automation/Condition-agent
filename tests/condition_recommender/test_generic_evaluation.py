@@ -99,8 +99,8 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.3",
-        "converter_definition_version": "generic_conversion.v2.3",
+        "schema_version": "3.4",
+        "converter_definition_version": "generic_conversion.v2.4",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "chemistry_status": "verified",
@@ -138,9 +138,9 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "2.2"
+    assert payload["schema_version"] == "2.3"
     assert payload["reaction_signature_schema_version"] == "3.0"
-    assert payload["record_schema_versions"] == ["3.3"]
+    assert payload["record_schema_versions"] == ["3.4"]
     assert payload["maps"]["environment_features"]
     integrity = validate_generic_index_artifact(first_path)
     assert integrity["valid"]

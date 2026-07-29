@@ -149,10 +149,21 @@ least 90% of product heavy atoms have provenance. The missing product atom is
 retained as unresolved evidence. At this stage, the route does not require or
 claim that a particular condition component supplies that atom.
 
+Candidate generation is event-first when partial or observed edit tokens are
+available: precedents must share the normalized edit before structural ranking.
+Similarity then compares deterministic reactant-side reaction-center features
+at radius zero through radius three. Radius zero records center element,
+hybridization, charge, hydrogen count, ring state, and substitution class;
+successive shells compare atom, bond, branching, and topology features without
+requiring identical whole-molecule SMILES. Whole-component identity remains a
+low-weight tie-breaker.
+
 The route requires multiple shared high-signal feature groups, a configured
 similarity threshold, conservative compatibility screening against all observed
 query functional-group tags, and normally two independent evidence units. A
 single precedent is accepted only at the stricter limited-support threshold.
+For exploratory partial correspondence, evidence support changes confidence
+and warnings but does not suppress otherwise compatible edit-matched analogues.
 Results use
 `recommendation_mode="unverified_structure_fallback"` and include
 `QUERY_TRANSFORMATION_NOT_VERIFIED`,

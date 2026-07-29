@@ -109,8 +109,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "3.3"
-    assert record.converter_definition_version == "generic_conversion.v2.3"
+    assert record.schema_version == "3.4"
+    assert record.converter_definition_version == "generic_conversion.v2.4"
     assert record.reaction_signature["schema_version"] == "3.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -246,7 +246,7 @@ def test_grammar_only_record_is_review_not_rejected() -> None:
         "reaction_completeness_unresolved",
     )
     assert record.fallback_descriptor is not None
-    assert record.fallback_descriptor["schema_version"] == "1.1"
+    assert record.fallback_descriptor["schema_version"] == "1.2"
     assert not record.fallback_descriptor["retrieval_eligible"]
 
 

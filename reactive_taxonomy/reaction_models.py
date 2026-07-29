@@ -10,7 +10,7 @@ from .models import CompoundAnalysis
 
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.0"
-REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.1"
+REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.2"
 
 EditArchetype = Literal[
     "substitution",
@@ -634,6 +634,10 @@ class ReactionFallbackDescriptor:
     candidate_edit_tokens: Tuple[str, ...]
     candidate_hypothesis_tokens: Tuple[str, ...]
     verified_edit_tokens: Tuple[str, ...]
+    reaction_center_core_tokens: Tuple[str, ...]
+    reaction_center_radius_1_tokens: Tuple[str, ...]
+    reaction_center_radius_2_tokens: Tuple[str, ...]
+    reaction_center_radius_3_tokens: Tuple[str, ...]
     bond_inventory_delta_tokens: Tuple[str, ...]
     element_delta_tokens: Tuple[str, ...]
     compatibility_tags: Tuple[str, ...]

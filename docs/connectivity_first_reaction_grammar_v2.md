@@ -151,8 +151,8 @@ The public rewrite result is `RewriteOutcome`, and candidates store
 - historical V2 reaction signature schema: `2.0`;
 - historical identifier namespace: `RS2`;
 - current reaction signature schema and namespace: `3.0` / `RS3`;
-- current recommendation record schema: `3.3`;
-- current generic converter definition: `generic_conversion.v2.3`.
+- current recommendation record schema: `3.4`;
+- current generic converter definition: `generic_conversion.v2.4`.
 
 Old artifacts are intentionally rejected by the v2 index validation rather
 than silently mixed with new chemistry identities. They should be reconverted

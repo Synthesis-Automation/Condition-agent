@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "reaction_center_fallback.v1",
+  "maximum_radius": 3,
+  "atom_features": [
+    "element",
+    "formal_charge",
+    "aromatic",
+    "hybridization",
+    "degree",
+    "total_hydrogens",
+    "ring"
+  ],
+  "center_features": [
+    "carbon_neighbor_count",
+    "hetero_neighbor_count",
+    "substitution_class",
+    "smallest_ring_size"
+  ],
+  "shell_features": [
+    "atom_features",
+    "element_degree",
+    "element_hybridization",
+    "inward_bond_order"
+  ]
+}

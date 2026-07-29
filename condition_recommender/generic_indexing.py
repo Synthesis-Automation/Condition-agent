@@ -28,7 +28,7 @@ from .signature_features import environment_tokens
 from .fallback_similarity import fallback_index_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "2.2"
+GENERIC_INDEX_SCHEMA_VERSION = "2.3"
 
 
 @dataclass(frozen=True)

@@ -27,6 +27,10 @@ _FEATURE_FIELDS = {
     "candidate_handles": ("candidate_handle_tokens",),
     "candidate_edits": ("candidate_edit_tokens",),
     "observed_or_partial_edits": ("verified_edit_tokens",),
+    "reaction_center_core": ("reaction_center_core_tokens",),
+    "reaction_center_radius_1": ("reaction_center_radius_1_tokens",),
+    "reaction_center_radius_2": ("reaction_center_radius_2_tokens",),
+    "reaction_center_radius_3": ("reaction_center_radius_3_tokens",),
     "bond_inventory_delta": ("bond_inventory_delta_tokens",),
     "element_delta": ("element_delta_tokens",),
 }
@@ -35,6 +39,8 @@ _HIGH_SIGNAL_FIELDS = (
     "candidate_transformation_tokens",
     "candidate_edit_tokens",
     "verified_edit_tokens",
+    "reaction_center_core_tokens",
+    "reaction_center_radius_1_tokens",
     "bond_inventory_delta_tokens",
     "reactant_site_tokens",
     "product_group_tokens",
@@ -46,7 +52,7 @@ def load_fallback_retrieval_rules() -> dict[str, Any]:
     """Load and validate the conservative fallback policy."""
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if str(rules.get("schema_version") or "") != "1.2":
+    if str(rules.get("schema_version") or "") != "1.3":
         raise ValueError("unsupported fallback retrieval definition schema")
     if str(rules.get("definition_id") or "") != "fallback_retrieval.v1":
         raise ValueError("unexpected fallback retrieval definition ID")
@@ -71,6 +77,13 @@ def load_fallback_retrieval_rules() -> dict[str, Any]:
         raise ValueError("fallback high-signal requirement must be positive")
     if int(rules["candidate_limit"]) < 1:
         raise ValueError("fallback candidate limit must be positive")
+    exploratory = rules.get("exploratory_partial_correspondence")
+    if not isinstance(exploratory, Mapping):
+        raise ValueError("fallback exploratory policy must be an object")
+    if not 0.0 <= float(exploratory.get("minimum_similarity") or 0.0) <= 1.0:
+        raise ValueError("invalid exploratory fallback similarity")
+    if int(exploratory.get("candidate_limit") or 0) < 1:
+        raise ValueError("exploratory fallback candidate limit must be positive")
     source_requirements = rules.get("condition_source_requirements")
     if not isinstance(source_requirements, Mapping):
         raise ValueError("fallback condition source requirements must be an object")
@@ -114,6 +127,13 @@ def fallback_index_tokens(descriptor: Mapping[str, Any]) -> Tuple[str, ...]:
     return tuple(sorted(set(_tokens(descriptor, _HIGH_SIGNAL_FIELDS))))
 
 
+def fallback_edit_index_tokens(descriptor: Mapping[str, Any]) -> Tuple[str, ...]:
+    """Return exact normalized edit tokens for event-first candidate retrieval."""
+    if not bool(descriptor.get("retrieval_eligible")):
+        return ()
+    return tuple(sorted(set(_tokens(descriptor, ("verified_edit_tokens",)))))
+
+
 def shared_high_signal_count(
     query: Mapping[str, Any],
     precedent: Mapping[str, Any],
@@ -146,7 +166,7 @@ def assess_fallback_similarity(
         for name, (left, right) in feature_tokens.items()
     }
     available = {
-        name for name, (left, right) in feature_tokens.items() if left or right
+        name for name, (left, right) in feature_tokens.items() if left and right
     }
     denominator = sum(float(rules["weights"][name]) for name in available)
     contributions = {
@@ -191,6 +211,7 @@ def compatibility_signature_from_fallback(
 __all__ = [
     "assess_fallback_similarity",
     "compatibility_signature_from_fallback",
+    "fallback_edit_index_tokens",
     "fallback_index_tokens",
     "load_fallback_retrieval_rules",
     "shared_high_signal_count",

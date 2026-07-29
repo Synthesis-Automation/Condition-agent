@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from typing import Any, Mapping
 
 from .compatibility import filter_compatible_precedents
 from .fallback_similarity import (
     assess_fallback_similarity,
     compatibility_signature_from_fallback,
+    fallback_edit_index_tokens,
     fallback_index_tokens,
     load_fallback_retrieval_rules,
     shared_high_signal_count,
@@ -31,18 +33,40 @@ def retrieve_fallback_pool_with_trace(
         configured_minimum,
         int(minimum_pool_size) if minimum_pool_size is not None else configured_minimum,
     )
-    query_tokens = fallback_index_tokens(descriptor)
-    positions = set()
-    for token in query_tokens:
-        positions.update(index.fallback_features.get(token, ()))
+    edit_tokens = fallback_edit_index_tokens(descriptor)
+    edit_position_sets = [
+        set(index.fallback_features.get(token, ())) for token in edit_tokens
+    ]
+    if edit_position_sets:
+        positions = set.intersection(*edit_position_sets)
+        candidate_level = "fallback_edit_candidates"
+    else:
+        query_tokens = fallback_index_tokens(descriptor)
+        positions = set()
+        for token in query_tokens:
+            positions.update(index.fallback_features.get(token, ()))
+        candidate_level = "fallback_descriptor_candidates"
     raw_rows = tuple(
         index.rows[position]
         for position in sorted(positions)
         if index.rows[position].fallback_descriptor
     )
+    query_edits = Counter(
+        str(value) for value in descriptor.get("verified_edit_tokens") or ()
+    )
+    if query_edits:
+        raw_rows = tuple(
+            row
+            for row in raw_rows
+            if Counter(
+                str(value)
+                for value in row.fallback_descriptor.get("verified_edit_tokens") or ()
+            )
+            == query_edits
+        )
     raw_support = summarize_evidence_support(raw_rows)
     candidate_trace = RetrievalLevelTrace(
-        level="fallback_descriptor_candidates",
+        level=candidate_level,
         candidate_count=len(raw_rows),
         independent_candidate_count=raw_support.independent_count,
         compatible_candidate_count=len(raw_rows),
@@ -62,8 +86,24 @@ def retrieve_fallback_pool_with_trace(
             trace=(candidate_trace,),
         )
 
-    minimum_similarity = float(rules["minimum_similarity"])
-    minimum_shared = int(rules["minimum_shared_high_signal_features"])
+    exploratory_policy = rules["exploratory_partial_correspondence"]
+    exploratory = bool(exploratory_policy.get("enabled")) and (
+        descriptor.get("evidence_mode") == "partial_product_correspondence"
+        and bool(edit_tokens)
+    )
+    minimum_similarity = (
+        float(exploratory_policy["minimum_similarity"])
+        if exploratory
+        else float(rules["minimum_similarity"])
+    )
+    minimum_shared = (
+        1 if exploratory else int(rules["minimum_shared_high_signal_features"])
+    )
+    candidate_limit = (
+        int(exploratory_policy["candidate_limit"])
+        if exploratory
+        else int(rules["candidate_limit"])
+    )
     scored = []
     for row in raw_rows:
         precedent = row.fallback_descriptor
@@ -82,7 +122,7 @@ def retrieve_fallback_pool_with_trace(
             item[2].observation_id,
         )
     )
-    matched_rows = tuple(item[2] for item in scored[: int(rules["candidate_limit"])])
+    matched_rows = tuple(item[2] for item in scored[:candidate_limit])
     compatibility_signature = compatibility_signature_from_fallback(descriptor)
     accepted, compatibility_excluded = filter_compatible_precedents(
         compatibility_signature,
@@ -118,42 +158,52 @@ def retrieve_fallback_pool_with_trace(
             trace=(candidate_trace, trace),
         )
 
-    selected_level = "unverified_structure_fallback"
-    status = "selected"
+    selected_level = (
+        "unverified_structure_fallback_exploratory"
+        if exploratory
+        else "unverified_structure_fallback"
+    )
+    status = "selected_exploratory" if exploratory else "selected"
     if accepted_support.independent_count < minimum:
-        best_score = max(
-            assess_fallback_similarity(
-                descriptor,
-                row.fallback_descriptor,
-            ).score
-            for row in accepted_rows
-        )
-        if best_score < float(rules["limited_support_minimum_similarity"]):
-            trace = RetrievalLevelTrace(
-                level="unverified_structure_similarity",
-                candidate_count=len(matched_rows),
-                independent_candidate_count=matched_support.independent_count,
-                compatible_candidate_count=len(accepted),
-                independent_compatible_candidate_count=(
-                    accepted_support.independent_count
-                ),
-                excluded_candidate_count=excluded_count,
-                minimum_independent_support=minimum,
-                status="insufficient_independent_support",
+        if exploratory and bool(
+            exploratory_policy.get("support_affects_confidence_only")
+        ):
+            selected_level += "_limited_support"
+            status = "selected_exploratory_limited_support"
+        else:
+            best_score = max(
+                assess_fallback_similarity(
+                    descriptor,
+                    row.fallback_descriptor,
+                ).score
+                for row in accepted_rows
             )
-            return CompatibleRetrievalResult(
-                level="insufficient_safe_fallback_support",
-                pool=(),
-                candidate_count=len(matched_rows),
-                independent_candidate_count=matched_support.independent_count,
-                excluded_candidate_count=excluded_count,
-                independent_compatible_candidate_count=(
-                    accepted_support.independent_count
-                ),
-                trace=(candidate_trace, trace),
-            )
-        selected_level += "_limited_support"
-        status = "selected_limited_support"
+            if best_score < float(rules["limited_support_minimum_similarity"]):
+                trace = RetrievalLevelTrace(
+                    level="unverified_structure_similarity",
+                    candidate_count=len(matched_rows),
+                    independent_candidate_count=matched_support.independent_count,
+                    compatible_candidate_count=len(accepted),
+                    independent_compatible_candidate_count=(
+                        accepted_support.independent_count
+                    ),
+                    excluded_candidate_count=excluded_count,
+                    minimum_independent_support=minimum,
+                    status="insufficient_independent_support",
+                )
+                return CompatibleRetrievalResult(
+                    level="insufficient_safe_fallback_support",
+                    pool=(),
+                    candidate_count=len(matched_rows),
+                    independent_candidate_count=matched_support.independent_count,
+                    excluded_candidate_count=excluded_count,
+                    independent_compatible_candidate_count=(
+                        accepted_support.independent_count
+                    ),
+                    trace=(candidate_trace, trace),
+                )
+            selected_level += "_limited_support"
+            status = "selected_limited_support"
     trace = RetrievalLevelTrace(
         level="unverified_structure_similarity",
         candidate_count=len(matched_rows),

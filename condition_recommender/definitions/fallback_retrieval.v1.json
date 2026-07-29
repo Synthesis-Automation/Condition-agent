@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "definition_id": "fallback_retrieval.v1",
   "calibration_status": "conservative_initial_policy",
   "minimum_similarity": 0.55,
@@ -7,20 +7,30 @@
   "minimum_independent_support": 2,
   "minimum_shared_high_signal_features": 2,
   "candidate_limit": 100,
+  "exploratory_partial_correspondence": {
+    "enabled": true,
+    "minimum_similarity": 0.0,
+    "candidate_limit": 25,
+    "support_affects_confidence_only": true
+  },
   "condition_source_requirements": {},
   "weights": {
-    "reactant_components": 0.14,
-    "product_components": 0.14,
-    "reactant_sites": 0.10,
-    "product_sites": 0.05,
-    "functional_groups": 0.07,
-    "contexts": 0.07,
-    "candidate_grammars": 0.06,
-    "candidate_transformations": 0.05,
-    "candidate_handles": 0.06,
-    "candidate_edits": 0.05,
-    "observed_or_partial_edits": 0.15,
-    "bond_inventory_delta": 0.04,
-    "element_delta": 0.02
+    "reactant_components": 0.02,
+    "product_components": 0.02,
+    "reactant_sites": 0.06,
+    "product_sites": 0.03,
+    "functional_groups": 0.04,
+    "contexts": 0.06,
+    "candidate_grammars": 0.02,
+    "candidate_transformations": 0.02,
+    "candidate_handles": 0.02,
+    "candidate_edits": 0.02,
+    "observed_or_partial_edits": 0.17,
+    "reaction_center_core": 0.16,
+    "reaction_center_radius_1": 0.14,
+    "reaction_center_radius_2": 0.09,
+    "reaction_center_radius_3": 0.05,
+    "bond_inventory_delta": 0.05,
+    "element_delta": 0.03
   }
 }

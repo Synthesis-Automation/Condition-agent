@@ -55,6 +55,7 @@ def _precedent_reaction_context(
         for partner in (precedent.signature.get("partners") or ())
         if isinstance(partner, Mapping)
     )
+    fallback = precedent.fallback_descriptor
     return {
         "reaction_id": precedent.reaction_id,
         "reaction_smiles": precedent.reaction_smiles,
@@ -62,6 +63,11 @@ def _precedent_reaction_context(
         "reaction_label_status": precedent.reaction_label_status,
         "spectator_groups": spectators,
         "reaction_partners": partners,
+        "fallback_evidence_mode": fallback.get("evidence_mode") or None,
+        "observed_or_partial_edits": tuple(fallback.get("verified_edit_tokens") or ()),
+        "reaction_center_core": tuple(
+            fallback.get("reaction_center_core_tokens") or ()
+        ),
     }
 
 
@@ -274,6 +280,19 @@ def _explanation(
     ]
     if matches:
         notes.append("Exact match: " + ", ".join(matches))
+    local_scores = [
+        (name, score)
+        for name, score in similarity_components.items()
+        if name.startswith("reaction_center_")
+    ]
+    if local_scores:
+        notes.append(
+            "Reaction-center similarity: "
+            + ", ".join(
+                f"{name.removeprefix('reaction_center_').replace('_', ' ')} {score:.2f}"
+                for name, score in local_scores
+            )
+        )
     if query_scope and precedent_scope and query_scope != precedent_scope:
         notes.append(
             f"Reaction-scope mismatch: query {query_scope}; precedent {precedent_scope}"
@@ -596,7 +615,7 @@ def rank_condition_recipes(
                 ),
                 explanation=_explanation(
                     level=retrieval_level,
-                    similarity_components=best.similarity.components,
+                    similarity_components=similarity_components,
                     reaction_support=support.reaction_count,
                     reference_support=support.reference_count,
                     dataset_support=support.dataset_count,

@@ -1,5 +1,10 @@
+from dataclasses import asdict
+
+from reactive_taxonomy import featurize_reaction
+
 from condition_recommender.conversion.generic import convert_record
 from condition_recommender.conversion.input_schema import adapt_row
+from condition_recommender.fallback_similarity import assess_fallback_similarity
 from condition_recommender.generic_api import GenericConditionRecommender
 from condition_recommender.generic_indexing import build_generic_index
 
@@ -63,6 +68,28 @@ def _iodination_precedent(index: int, iodine_cas: str) -> dict:
     return convert_record(record).to_dict()
 
 
+def _analogue_precedent(
+    index: int,
+    reaction_smiles: str,
+    *,
+    reference: str = "Shared analogue reference",
+) -> dict:
+    record = adapt_row(
+        {
+            "reaction_id": f"analogue-{index}",
+            "reaction_smiles": reaction_smiles,
+            "yield_pct": "90",
+            "reagent_cas": "97-93-8",
+            "solvent_cas": "110-54-3",
+            "reference": reference,
+        },
+        source_dataset="fallback-test",
+        source_path="analogues.csv",
+        source_row_number=index,
+    )
+    return convert_record(record).to_dict()
+
+
 def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
     index = build_generic_index([_precedent(1), _precedent(2)])
 
@@ -72,7 +99,7 @@ def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
     assert result.query_signature_id is None
     assert result.query_fallback_descriptor_id.startswith("RFD1:")
     assert result.recommendation_mode == "unverified_structure_fallback"
-    assert result.retrieval_definition_version == "1.2"
+    assert result.retrieval_definition_version == "1.3"
     assert result.retrieval_level == "unverified_structure_fallback"
     assert result.independent_compatible_candidate_count == 2
     assert "UNVERIFIED_REACTION_FALLBACK_USED" in result.warnings
@@ -80,7 +107,7 @@ def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
     assert result.recommendations
     recommendation = result.recommendations[0]
     assert (
-        recommendation.score_trace.definition_versions["fallback_retrieval.v1"] == "1.2"
+        recommendation.score_trace.definition_versions["fallback_retrieval.v1"] == "1.3"
     )
     assert any(
         "atom correspondence and bond edits are not verified" in caution
@@ -189,7 +216,7 @@ def test_exploratory_iodine_partial_precedents_are_retrievable() -> None:
     assert result.valid
     assert result.recommendation_mode == "unverified_structure_fallback"
     assert result.candidate_count == 2
-    assert result.retrieval_definition_version == "1.2"
+    assert result.retrieval_definition_version == "1.3"
     assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:I" in result.warnings
     assert "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:I" in result.warnings
     assert len(result.recommendations) == 2
@@ -209,3 +236,78 @@ def test_partial_iodination_keeps_unverified_source_as_a_warning() -> None:
         "PRODUCT_ATOM_SOURCE_UNVERIFIED:I" in record["fallback_descriptor"]["warnings"]
     )
     assert len(build_generic_index([record]).rows) == 1
+
+
+def test_local_center_signature_ranks_nonidentical_same_edit_analogues() -> None:
+    query = asdict(
+        featurize_reaction(_CONDITION_SUPPLIED_IODINATION).fallback_descriptor
+    )
+    secondary = asdict(
+        featurize_reaction("CCCCCCCCCCC(C)F>>CCCCCCCCCCC(C)I").fallback_descriptor
+    )
+    bridged_tertiary = asdict(
+        featurize_reaction(
+            "FC12CC3CC(CC(C3)C1)C2>>IC12CC3CC(CC(C3)C1)C2"
+        ).fallback_descriptor
+    )
+
+    assert "center:substitution_class:tertiary" in query["reaction_center_core_tokens"]
+    assert (
+        "center:substitution_class:secondary"
+        in secondary["reaction_center_core_tokens"]
+    )
+    assert (
+        "center:substitution_class:tertiary"
+        in bridged_tertiary["reaction_center_core_tokens"]
+    )
+    assert query["reaction_center_radius_1_tokens"]
+    assert query["reaction_center_radius_2_tokens"]
+    assert query["reaction_center_radius_3_tokens"]
+
+    secondary_score = assess_fallback_similarity(query, secondary).score
+    bridged_score = assess_fallback_similarity(query, bridged_tertiary).score
+    assert secondary_score > 0.65
+    assert bridged_score > secondary_score
+
+
+def test_leave_one_reaction_out_returns_nonidentical_edit_analogues() -> None:
+    records = [
+        _analogue_precedent(
+            1,
+            "CCCCCCCCCCC(C)F>>CCCCCCCCCCC(C)I",
+        ),
+        _analogue_precedent(
+            2,
+            "FC12CC3CC(CC(C3)C1)C2>>IC12CC3CC(CC(C3)C1)C2",
+        ),
+    ]
+
+    result = GenericConditionRecommender(build_generic_index(records)).recommend(
+        _CONDITION_SUPPLIED_IODINATION
+    )
+
+    assert result.valid
+    assert result.candidate_count == 2
+    assert result.independent_compatible_candidate_count == 1
+    assert (
+        result.retrieval_level
+        == "unverified_structure_fallback_exploratory_limited_support"
+    )
+    assert "LIMITED_PRECEDENT_SUPPORT" in result.warnings
+    assert result.recommendations
+    recommendation = result.recommendations[0]
+    assert set(recommendation.precedent_reaction_ids) == {
+        "analogue-1",
+        "analogue-2",
+    }
+    assert (
+        recommendation.score_trace.similarity_components["reaction_center_core"] > 0.0
+    )
+    assert any(
+        note.startswith("Reaction-center similarity:")
+        for note in recommendation.explanation
+    )
+    assert all(
+        context["reaction_center_core"]
+        for context in recommendation.precedent_reaction_contexts
+    )

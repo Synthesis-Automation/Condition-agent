@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections import Counter
+from collections import Counter, deque
 from functools import lru_cache
 from pathlib import Path
 from typing import Iterable, Mapping, Optional, Tuple
@@ -26,25 +26,30 @@ from .reaction_signatures import reaction_signature_definition_versions
 
 
 _DEFINITION_ID = "reaction_fallback_descriptor.v1"
-_DEFINITION_VERSION = "1.1"
+_DEFINITION_VERSION = "1.2"
 _DEFINITIONS = Path(__file__).with_name("definitions")
 _FALLBACK_FRAGMENT_RULES_PATH = _DEFINITIONS / "fallback_fragments.v1.json"
+_REACTION_CENTER_RULES_PATH = _DEFINITIONS / "reaction_center_fallback.v1.json"
 
 
 def reaction_fallback_definition_versions() -> dict[str, str]:
     """Return chemistry definitions participating in fallback descriptor identity."""
-    raw = _FALLBACK_FRAGMENT_RULES_PATH.read_bytes()
-    with _FALLBACK_FRAGMENT_RULES_PATH.open("r", encoding="utf-8-sig") as handle:
-        payload = json.load(handle)
-    rule_version = (
-        f"{payload.get('schema_version', 'unknown')}@sha256:"
-        f"{hashlib.sha256(raw).hexdigest()[:16]}"
-    )
-    return {
+    versions = {
         **reaction_signature_definition_versions(),
         _DEFINITION_ID: _DEFINITION_VERSION,
-        _FALLBACK_FRAGMENT_RULES_PATH.name: rule_version,
     }
+    for path in (
+        _FALLBACK_FRAGMENT_RULES_PATH,
+        _REACTION_CENTER_RULES_PATH,
+    ):
+        raw = path.read_bytes()
+        with path.open("r", encoding="utf-8-sig") as handle:
+            payload = json.load(handle)
+        versions[path.name] = (
+            f"{payload.get('schema_version', 'unknown')}@sha256:"
+            f"{hashlib.sha256(raw).hexdigest()[:16]}"
+        )
+    return versions
 
 
 @lru_cache(maxsize=1)
@@ -83,6 +88,49 @@ def _load_fallback_fragment_rules() -> tuple[dict[str, object], ...]:
                 "fallback fragment rule needs a condition-source requirement"
             )
     return rules
+
+
+@lru_cache(maxsize=1)
+def _load_reaction_center_rules() -> dict[str, object]:
+    with _REACTION_CENTER_RULES_PATH.open("r", encoding="utf-8-sig") as handle:
+        payload = dict(json.load(handle))
+    if str(payload.get("schema_version") or "") != "1.0":
+        raise ValueError("unsupported reaction-center fallback definition schema")
+    if str(payload.get("definition_id") or "") != "reaction_center_fallback.v1":
+        raise ValueError("unexpected reaction-center fallback definition ID")
+    if int(payload.get("maximum_radius") or 0) != 3:
+        raise ValueError("reaction-center fallback requires radii zero through three")
+    vocabularies = {
+        "atom_features": {
+            "element",
+            "formal_charge",
+            "aromatic",
+            "hybridization",
+            "degree",
+            "total_hydrogens",
+            "ring",
+        },
+        "center_features": {
+            "carbon_neighbor_count",
+            "hetero_neighbor_count",
+            "substitution_class",
+            "smallest_ring_size",
+        },
+        "shell_features": {
+            "atom_features",
+            "element_degree",
+            "element_hybridization",
+            "inward_bond_order",
+        },
+    }
+    for field, allowed in vocabularies.items():
+        configured = tuple(str(value) for value in payload.get(field) or ())
+        if not configured or len(set(configured)) != len(configured):
+            raise ValueError(f"reaction-center fallback has invalid {field}")
+        if not set(configured) <= allowed:
+            raise ValueError(f"reaction-center fallback has unknown {field}")
+        payload[field] = configured
+    return payload
 
 
 def _canonical_without_maps(smiles: str) -> str:
@@ -336,6 +384,204 @@ def _verified_edit_tokens(
     return ()
 
 
+def _reaction_center_indices(
+    signature: Optional[ReactionSignature],
+    partial: Optional[PartialProductTransformation],
+) -> tuple[tuple[int, int], ...]:
+    """Return reactant atoms that anchor observed or reconstructed edits."""
+    if partial is not None:
+        return (
+            (
+                partial.reactant_center.component_index,
+                partial.reactant_center.atom_index,
+            ),
+        )
+    if signature is None:
+        return ()
+    participation: Counter[tuple[int, int]] = Counter()
+    formed_atoms: set[tuple[int, int]] = set()
+    broken_atoms: set[tuple[int, int]] = set()
+    for edit in signature.edits:
+        if edit.edit_type not in {"formed", "broken", "order_changed"}:
+            continue
+        references = (edit.atom_1, edit.atom_2)
+        for reference in references:
+            if reference is None or reference.side != "reactant":
+                continue
+            key = (reference.component_index, reference.atom_index)
+            participation[key] += 1
+            if edit.edit_type == "formed":
+                formed_atoms.add(key)
+            elif edit.edit_type == "broken":
+                broken_atoms.add(key)
+    shared = tuple(sorted(key for key, count in participation.items() if count > 1))
+    if shared:
+        return shared
+    if formed_atoms:
+        return tuple(sorted(formed_atoms))
+    return tuple(sorted(broken_atoms))
+
+
+def _atom_feature_tokens(
+    atom: Chem.Atom,
+    feature_names: Iterable[str],
+) -> tuple[str, ...]:
+    """Return interpretable atom invariants used by local reaction descriptors."""
+    values = {
+        "element": atom.GetSymbol(),
+        "formal_charge": atom.GetFormalCharge(),
+        "aromatic": int(atom.GetIsAromatic()),
+        "hybridization": str(atom.GetHybridization()),
+        "degree": atom.GetDegree(),
+        "total_hydrogens": atom.GetTotalNumHs(includeNeighbors=True),
+        "ring": int(atom.IsInRing()),
+    }
+    return tuple(f"{name}:{values[name]}" for name in feature_names)
+
+
+def _carbon_substitution_class(atom: Chem.Atom) -> str:
+    if atom.GetSymbol() != "C":
+        return "not_carbon"
+    if atom.GetIsAromatic():
+        return "aryl"
+    carbon_neighbors = sum(
+        neighbor.GetSymbol() == "C" for neighbor in atom.GetNeighbors()
+    )
+    return {
+        0: "methyl",
+        1: "primary",
+        2: "secondary",
+        3: "tertiary",
+        4: "quaternary",
+    }.get(carbon_neighbors, "other")
+
+
+def _atom_distances(
+    molecule: Chem.Mol,
+    center_index: int,
+    *,
+    maximum_radius: int = 3,
+) -> dict[int, int]:
+    distances = {center_index: 0}
+    frontier = deque((center_index,))
+    while frontier:
+        current = frontier.popleft()
+        if distances[current] >= maximum_radius:
+            continue
+        distance = distances[current] + 1
+        atom = molecule.GetAtomWithIdx(current)
+        for neighbor in atom.GetNeighbors():
+            neighbor_index = neighbor.GetIdx()
+            if neighbor_index in distances:
+                continue
+            distances[neighbor_index] = distance
+            frontier.append(neighbor_index)
+    return distances
+
+
+def _reaction_center_tokens(
+    reactants: Tuple[ReactionComponent, ...],
+    signature: Optional[ReactionSignature],
+    partial: Optional[PartialProductTransformation],
+) -> tuple[
+    tuple[str, ...],
+    tuple[str, ...],
+    tuple[str, ...],
+    tuple[str, ...],
+]:
+    """Describe reactant-side edit centers with radius-zero to radius-three shells."""
+    rules = _load_reaction_center_rules()
+    atom_features = tuple(str(value) for value in rules["atom_features"])
+    center_features = set(str(value) for value in rules["center_features"])
+    shell_features = set(str(value) for value in rules["shell_features"])
+    maximum_radius = int(rules["maximum_radius"])
+    components = {component.component_index: component for component in reactants}
+    centers = _reaction_center_indices(signature, partial)
+    core_tokens = [f"center_count:{len(centers)}"] if centers else []
+    radius_tokens: dict[int, list[str]] = {1: [], 2: [], 3: []}
+    for component_index, atom_index in centers:
+        component = components.get(component_index)
+        molecule = parse_smiles(component.input_smiles) if component else None
+        if molecule is None or atom_index >= molecule.GetNumAtoms():
+            continue
+        center = molecule.GetAtomWithIdx(atom_index)
+        core_tokens.extend(
+            f"center:{token}" for token in _atom_feature_tokens(center, atom_features)
+        )
+        carbon_neighbors = sum(
+            neighbor.GetSymbol() == "C" for neighbor in center.GetNeighbors()
+        )
+        hetero_neighbors = sum(
+            neighbor.GetSymbol() != "C" for neighbor in center.GetNeighbors()
+        )
+        center_values = {
+            "carbon_neighbor_count": carbon_neighbors,
+            "hetero_neighbor_count": hetero_neighbors,
+            "substitution_class": _carbon_substitution_class(center),
+        }
+        core_tokens.extend(
+            f"center:{name}:{center_values[name]}"
+            for name in (
+                "carbon_neighbor_count",
+                "hetero_neighbor_count",
+                "substitution_class",
+            )
+            if name in center_features
+        )
+        ring_sizes = sorted(
+            len(ring)
+            for ring in molecule.GetRingInfo().AtomRings()
+            if atom_index in ring
+        )
+        if "smallest_ring_size" in center_features:
+            core_tokens.append(
+                f"center:smallest_ring_size:{ring_sizes[0] if ring_sizes else 0}"
+            )
+        distances = _atom_distances(
+            molecule,
+            atom_index,
+            maximum_radius=maximum_radius,
+        )
+        for neighbor_index, distance in distances.items():
+            if distance not in radius_tokens:
+                continue
+            atom = molecule.GetAtomWithIdx(neighbor_index)
+            prefix = f"d{distance}"
+            if "atom_features" in shell_features:
+                radius_tokens[distance].extend(
+                    f"{prefix}:{token}"
+                    for token in _atom_feature_tokens(atom, atom_features)
+                )
+            if "element_degree" in shell_features:
+                radius_tokens[distance].append(
+                    f"{prefix}:element_degree:{atom.GetSymbol()}:{atom.GetDegree()}",
+                )
+            if "element_hybridization" in shell_features:
+                radius_tokens[distance].append(
+                    f"{prefix}:element_hybridization:"
+                    f"{atom.GetSymbol()}:{str(atom.GetHybridization())}",
+                )
+            inward_orders = sorted(
+                str(
+                    molecule.GetBondBetweenAtoms(
+                        neighbor_index, neighbor.GetIdx()
+                    ).GetBondType()
+                ).upper()
+                for neighbor in atom.GetNeighbors()
+                if distances.get(neighbor.GetIdx()) == distance - 1
+            )
+            if "inward_bond_order" in shell_features:
+                radius_tokens[distance].extend(
+                    f"{prefix}:inward_bond_order:{order}" for order in inward_orders
+                )
+    return (
+        tuple(sorted(core_tokens)),
+        tuple(sorted(radius_tokens[1])),
+        tuple(sorted(radius_tokens[2])),
+        tuple(sorted(radius_tokens[3])),
+    )
+
+
 def _condition_source_requirement(
     partial: Optional[PartialProductTransformation],
     completeness: Optional[ReactionCompletenessAssessment],
@@ -430,6 +676,13 @@ def build_reaction_fallback_descriptor(
         _element_inventory(products),
     )
     verified_edits = _verified_edit_tokens(signature, partial_transformation)
+    center_core, center_radius_1, center_radius_2, center_radius_3 = (
+        _reaction_center_tokens(
+            reactants,
+            signature,
+            partial_transformation,
+        )
+    )
     (
         condition_source_requirement_id,
         required_condition_source_elements,
@@ -517,6 +770,10 @@ def build_reaction_fallback_descriptor(
         "candidate_edits": candidate_features[3],
         "candidate_hypotheses": candidate_features[4],
         "verified_edits": verified_edits,
+        "reaction_center_core": center_core,
+        "reaction_center_radius_1": center_radius_1,
+        "reaction_center_radius_2": center_radius_2,
+        "reaction_center_radius_3": center_radius_3,
         "bond_inventory_delta": bond_delta,
         "element_delta": element_delta,
         "required_condition_source_elements": required_condition_source_elements,
@@ -543,6 +800,10 @@ def build_reaction_fallback_descriptor(
         candidate_edit_tokens=candidate_features[3],
         candidate_hypothesis_tokens=candidate_features[4],
         verified_edit_tokens=verified_edits,
+        reaction_center_core_tokens=center_core,
+        reaction_center_radius_1_tokens=center_radius_1,
+        reaction_center_radius_2_tokens=center_radius_2,
+        reaction_center_radius_3_tokens=center_radius_3,
         bond_inventory_delta_tokens=bond_delta,
         element_delta_tokens=element_delta,
         compatibility_tags=tuple(sorted(set(reactant_tags).union(product_tags))),
