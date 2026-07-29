@@ -29,6 +29,10 @@ RENORMALIZED_ACETAL_REFERENCE = (
     "[CH3:71][CH:11]([O:51][CH3:61])[O:31][CH3:41]"
 )
 
+INCOMPLETE_REPORTED_ACETAL = (
+    "CCO.COc1cccc(C=O)c1>>CCOC(OCC)c1cccc(OC)c1"
+)
+
 
 def _acetal_template(*, status: str = "active"):
     return derive_reaction_template(
@@ -131,6 +135,53 @@ def test_query_signature_is_derived_and_template_is_interpretive(tmp_path) -> No
     assert result.matches[0].family_id == "acetalization"
 
 
+def test_minimum_acetal_template_matches_requested_incomplete_example(
+    tmp_path,
+) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    template = _acetal_template()
+    upsert_reaction_template(template, path)
+
+    result = match_reaction_templates(
+        INCOMPLETE_REPORTED_ACETAL,
+        path=path,
+    )
+
+    assert result.valid
+    assert result.signature_id is None
+    assert result.evidence == "template_center_transition_hypothesis"
+    assert result.edit_fingerprint == template.edit_fingerprint
+    assert [match.template_id for match in result.matches] == [
+        "carbonyl_to_dialkoxy"
+    ]
+    assert result.matches[0].provisional is True
+    assert result.matches[0].confidence == 0.7
+    assert result.matches[0].evidence == (
+        "template_center_transition_hypothesis"
+    )
+    assert (
+        "PROVISIONAL_TEMPLATE_MATCH_WITHOUT_ATOM_PROVENANCE"
+        in result.warnings
+    )
+    assert "UNACCOUNTED_PRODUCT_HEAVY_ATOMS" in result.warnings
+
+
+def test_acetal_template_does_not_match_hemiacetal_or_reduction(
+    tmp_path,
+) -> None:
+    path = tmp_path / "reaction_templates.v1.json"
+    upsert_reaction_template(_acetal_template(), path)
+
+    hemiacetal = match_reaction_templates(
+        "CC=O.CO>>CC(O)OC",
+        path=path,
+    )
+    reduction = match_reaction_templates("CC=O>>CCO", path=path)
+
+    assert hemiacetal.matches == ()
+    assert reduction.matches == ()
+
+
 def test_drafts_require_explicit_query_opt_in(tmp_path) -> None:
     path = tmp_path / "reaction_templates.v1.json"
     upsert_reaction_template(_acetal_template(status="draft"), path)
@@ -203,3 +254,17 @@ def test_reaction_template_cli_import_list_validate_show_and_match(
     matched = json.loads(capsys.readouterr().out)
     assert matched["signature_id"].startswith("RS3:")
     assert matched["matches"][0]["template_id"] == "carbonyl_to_dialkoxy"
+
+    assert template_cli_main(
+        [
+            *common,
+            "match",
+            INCOMPLETE_REPORTED_ACETAL,
+            "--format",
+            "json",
+        ]
+    ) == 0
+    incomplete = json.loads(capsys.readouterr().out)
+    assert incomplete["signature_id"] is None
+    assert incomplete["evidence"] == "template_center_transition_hypothesis"
+    assert incomplete["matches"][0]["provisional"] is True

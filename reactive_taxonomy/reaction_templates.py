@@ -141,6 +141,9 @@ class ReactionTemplateMatch:
     status: str
     edit_fingerprint: str
     definition_hash: str
+    evidence: str
+    confidence: float
+    provisional: bool
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the match."""
@@ -318,6 +321,297 @@ def _participants(parsed: Any) -> Tuple[ReactionTemplateParticipant, ...]:
         )
         for (side, canonical), count in sorted(counts.items())
     )
+
+
+def _neighbor_token(
+    *,
+    element: str,
+    aromatic: bool,
+    order: Optional[str],
+    hydrogen_count: Optional[int] = None,
+    external_heavy_count: Optional[int] = None,
+) -> str:
+    values = [
+        str(element),
+        "aromatic" if aromatic else "aliphatic",
+        str(order or "NONE").upper(),
+    ]
+    if hydrogen_count is not None:
+        values.append(f"H{int(hydrogen_count)}")
+    if external_heavy_count is not None:
+        values.append(f"X{int(external_heavy_count)}")
+    return "|".join(values)
+
+
+def _mapped_atom_states(
+    components: Sequence[Any],
+) -> dict[int, tuple[int, int]]:
+    """Return map-number keyed H count and heavy-atom degree."""
+    states: dict[int, tuple[int, int]] = {}
+    for component in components:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        for atom in molecule.GetAtoms():
+            map_number = int(atom.GetAtomMapNum())
+            if not map_number:
+                continue
+            states[map_number] = (
+                int(atom.GetTotalNumHs(includeNeighbors=True)),
+                sum(
+                    neighbor.GetAtomicNum() > 1
+                    for neighbor in atom.GetNeighbors()
+                ),
+            )
+    return states
+
+
+def _template_neighbor_token(
+    *,
+    atom: ReactionTemplateAtom,
+    order: Optional[str],
+    side_states: Mapping[int, tuple[int, int]],
+) -> str:
+    hydrogen_count, heavy_degree = side_states.get(
+        int(atom.atom_map_number),
+        (0, 1),
+    )
+    return _neighbor_token(
+        element=atom.element,
+        aromatic=atom.aromatic,
+        order=order,
+        hydrogen_count=hydrogen_count,
+        external_heavy_count=max(0, heavy_degree - 1),
+    )
+
+
+@dataclass(frozen=True)
+class _CenterTransitionRequirement:
+    element: str
+    aromatic: bool
+    before_tokens: Tuple[str, ...]
+    after_tokens: Tuple[str, ...]
+
+
+def _center_transition_requirements(
+    template: ReactionTemplate,
+) -> Tuple[_CenterTransitionRequirement, ...]:
+    """Extract minimal edited-centre states without unchanged substituents."""
+    parsed = parse_reaction_smiles(template.mapped_reference_reaction)
+    before_states = _mapped_atom_states(parsed.reactants)
+    after_states = _mapped_atom_states(parsed.products)
+    incidence: dict[int, int] = {}
+    atoms: dict[int, ReactionTemplateAtom] = {}
+    for edit in template.edits:
+        for atom in (edit.atom_1, edit.atom_2):
+            if atom is None:
+                continue
+            map_number = int(atom.atom_map_number)
+            atoms[map_number] = atom
+            incidence[map_number] = incidence.get(map_number, 0) + 1
+    if not incidence:
+        return ()
+    maximum = max(incidence.values())
+    center_maps = {
+        map_number
+        for map_number, count in incidence.items()
+        if count == maximum
+    }
+    before: dict[int, list[str]] = {value: [] for value in center_maps}
+    after: dict[int, list[str]] = {value: [] for value in center_maps}
+    for edit in template.edits:
+        left_map = int(edit.atom_1.atom_map_number)
+        if edit.atom_2 is None:
+            if left_map in center_maps:
+                if edit.old_order is not None:
+                    before[left_map].append(
+                        _neighbor_token(
+                            element="H",
+                            aromatic=False,
+                            order=edit.old_order,
+                        )
+                    )
+                if edit.new_order is not None:
+                    after[left_map].append(
+                        _neighbor_token(
+                            element="H",
+                            aromatic=False,
+                            order=edit.new_order,
+                        )
+                    )
+            continue
+        right_map = int(edit.atom_2.atom_map_number)
+        if left_map in center_maps:
+            if edit.old_order is not None:
+                before[left_map].append(
+                    _template_neighbor_token(
+                        atom=edit.atom_2,
+                        order=edit.old_order,
+                        side_states=before_states,
+                    )
+                )
+            if edit.new_order is not None:
+                after[left_map].append(
+                    _template_neighbor_token(
+                        atom=edit.atom_2,
+                        order=edit.new_order,
+                        side_states=after_states,
+                    )
+                )
+        if right_map in center_maps:
+            if edit.old_order is not None:
+                before[right_map].append(
+                    _template_neighbor_token(
+                        atom=edit.atom_1,
+                        order=edit.old_order,
+                        side_states=before_states,
+                    )
+                )
+            if edit.new_order is not None:
+                after[right_map].append(
+                    _template_neighbor_token(
+                        atom=edit.atom_1,
+                        order=edit.new_order,
+                        side_states=after_states,
+                    )
+                )
+    return tuple(
+        _CenterTransitionRequirement(
+            element=atoms[map_number].element,
+            aromatic=atoms[map_number].aromatic,
+            before_tokens=tuple(sorted(before[map_number])),
+            after_tokens=tuple(sorted(after[map_number])),
+        )
+        for map_number in sorted(center_maps)
+        if before[map_number] and after[map_number]
+    )
+
+
+def _atom_neighbor_tokens(molecule: Any, atom_index: int) -> Tuple[str, ...]:
+    atom = molecule.GetAtomWithIdx(int(atom_index))
+    tokens = [
+        _neighbor_token(
+            element=neighbor.GetSymbol(),
+            aromatic=bool(neighbor.GetIsAromatic()),
+            order=str(
+                molecule.GetBondBetweenAtoms(
+                    int(atom_index), int(neighbor.GetIdx())
+                ).GetBondType()
+            ).upper(),
+            hydrogen_count=int(
+                neighbor.GetTotalNumHs(includeNeighbors=True)
+            ),
+            external_heavy_count=sum(
+                other.GetAtomicNum() > 1
+                and int(other.GetIdx()) != int(atom_index)
+                for other in neighbor.GetNeighbors()
+            ),
+        )
+        for neighbor in atom.GetNeighbors()
+        if neighbor.GetAtomicNum() > 1
+    ]
+    tokens.extend(
+        _neighbor_token(element="H", aromatic=False, order="SINGLE")
+        for _ in range(int(atom.GetTotalNumHs(includeNeighbors=True)))
+    )
+    return tuple(sorted(tokens))
+
+
+def _contains_token_multiset(
+    available: Sequence[str],
+    required: Sequence[str],
+) -> bool:
+    counts: dict[str, int] = {}
+    for token in available:
+        counts[token] = counts.get(token, 0) + 1
+    for token in required:
+        remaining = counts.get(token, 0)
+        if remaining <= 0:
+            return False
+        counts[token] = remaining - 1
+    return True
+
+
+def _center_candidates(
+    components: Sequence[Any],
+    requirement: _CenterTransitionRequirement,
+    *,
+    product_side: bool,
+) -> Tuple[tuple[int, int], ...]:
+    required = (
+        requirement.after_tokens
+        if product_side
+        else requirement.before_tokens
+    )
+    candidates = []
+    for component in components:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        for atom in molecule.GetAtoms():
+            if (
+                atom.GetSymbol() != requirement.element
+                or bool(atom.GetIsAromatic()) != requirement.aromatic
+                or not _contains_token_multiset(
+                    _atom_neighbor_tokens(molecule, int(atom.GetIdx())),
+                    required,
+                )
+            ):
+                continue
+            candidates.append(
+                (int(component.component_index), int(atom.GetIdx()))
+            )
+    return tuple(candidates)
+
+
+def _has_distinct_center_assignment(
+    candidate_sets: Sequence[Sequence[tuple[int, int]]],
+) -> bool:
+    """Return whether each required center can bind to a distinct query atom."""
+    ordered = sorted(candidate_sets, key=len)
+
+    def assign(index: int, used: set[tuple[int, int]]) -> bool:
+        if index == len(ordered):
+            return True
+        for candidate in ordered[index]:
+            if candidate in used:
+                continue
+            used.add(candidate)
+            if assign(index + 1, used):
+                return True
+            used.remove(candidate)
+        return False
+
+    return bool(ordered) and all(ordered) and assign(0, set())
+
+
+def _matches_template_center_transition(
+    template: ReactionTemplate,
+    parsed_query: Any,
+) -> bool:
+    """Conservatively match edited before/after center-state multisets."""
+    requirements = _center_transition_requirements(template)
+    if not requirements:
+        return False
+    before_candidates = tuple(
+        _center_candidates(
+            parsed_query.reactants,
+            requirement,
+            product_side=False,
+        )
+        for requirement in requirements
+    )
+    after_candidates = tuple(
+        _center_candidates(
+            parsed_query.products,
+            requirement,
+            product_side=True,
+        )
+        for requirement in requirements
+    )
+    return _has_distinct_center_assignment(
+        before_candidates
+    ) and _has_distinct_center_assignment(after_candidates)
 
 
 def _map_statistics(components: Iterable[Any]) -> tuple[int, int, set[int]]:
@@ -754,7 +1048,7 @@ def match_reaction_templates(
                 warnings.extend(mapped.warnings)
     fingerprint = reaction_edit_fingerprint(edits) if edits else None
     templates = load_reaction_template_registry(path)
-    matches = tuple(
+    exact_matches = tuple(
         ReactionTemplateMatch(
             template_id=template.template_id,
             display_name=template.display_name,
@@ -762,12 +1056,46 @@ def match_reaction_templates(
             status=template.status,
             edit_fingerprint=template.edit_fingerprint,
             definition_hash=template.definition_hash,
+            evidence="query_derived_edit_fingerprint",
+            confidence=1.0,
+            provisional=False,
         )
         for template in templates
         if fingerprint is not None
         and template.edit_fingerprint == fingerprint
         and (include_drafts or template.status == "active")
     )
+    matches = exact_matches
+    if fingerprint is None and analysis.valid:
+        parsed_query = parse_reaction_smiles(reaction_smiles)
+        provisional_matches = tuple(
+            ReactionTemplateMatch(
+                template_id=template.template_id,
+                display_name=template.display_name,
+                family_id=template.family_id,
+                status=template.status,
+                edit_fingerprint=template.edit_fingerprint,
+                definition_hash=template.definition_hash,
+                evidence="template_center_transition_hypothesis",
+                confidence=0.7,
+                provisional=True,
+            )
+            for template in templates
+            if (include_drafts or template.status == "active")
+            and _matches_template_center_transition(template, parsed_query)
+        )
+        matches = provisional_matches
+        candidate_fingerprints = {
+            match.edit_fingerprint for match in provisional_matches
+        }
+        if len(candidate_fingerprints) == 1:
+            fingerprint = next(iter(candidate_fingerprints))
+            evidence = "template_center_transition_hypothesis"
+            warnings.append(
+                "PROVISIONAL_TEMPLATE_MATCH_WITHOUT_ATOM_PROVENANCE"
+            )
+        elif len(candidate_fingerprints) > 1:
+            warnings.append("AMBIGUOUS_TEMPLATE_CENTER_TRANSITIONS")
     return ReactionTemplateQueryResult(
         reaction_smiles=reaction_smiles,
         valid=bool(analysis.valid),

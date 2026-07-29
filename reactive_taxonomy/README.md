@@ -30,6 +30,14 @@ matching active templates contribute interpretation candidates. Use
 show, validation, and query matching commands. The PyQt6 wrapper is available
 as `python -m app.reaction_template_registry_gui`.
 
+When an incomplete query has no normalized edit set, active templates may
+provide a conservative provisional match from the edited-centre before/after
+bond-state multisets. Neighbor hydrogen count and external heavy-atom degree
+remain in this comparison, allowing an acetal centre to remain distinct from
+a hemiacetal. A unique match exposes the template `RTE1` edit fingerprint with
+`template_center_transition_hypothesis` evidence; it never creates atom
+correspondence or an `RS3` signature.
+
 Every valid parsed reaction also receives a
 `ReactionCompletenessAssessment`. It records heavy-atom and element counts,
 product-atom coverage, mapping coverage, suspected missing reactants or

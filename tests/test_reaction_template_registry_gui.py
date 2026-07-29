@@ -29,6 +29,8 @@ def test_qt6_registry_window_exposes_authoring_and_query_controls() -> None:
         )
         assert window.findChild(QtWidgets.QPushButton, "importTemplate") is not None
         assert window.findChild(QtWidgets.QPushButton, "matchQuery") is not None
+        assert "background-color: #ffffff" not in window.styleSheet()
+        assert "color: #23313f" in window.status_label.styleSheet()
     finally:
         window.close()
         application.processEvents()

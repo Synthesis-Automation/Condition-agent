@@ -206,7 +206,7 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
 
         self.status_label.setStyleSheet(
             "background: #eef4fa; border: 1px solid #ccd9e5; "
-            "padding: 7px; border-radius: 4px;"
+            "color: #23313f; padding: 7px; border-radius: 4px;"
         )
         layout.addWidget(self.status_label)
 
