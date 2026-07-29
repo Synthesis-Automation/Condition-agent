@@ -1,13 +1,13 @@
 {
   "definition_version": "reaction_templates.v1",
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "templates": [
     {
       "aliases": [
         "acetal formation",
         "ketal formation"
       ],
-      "definition_hash": "RTD1:1a24743565a3951a9b8f57b28b2ad24627f29e2e",
+      "definition_hash": "RTD1:dba83efe7e7ca3ad426509f8c2bcda5cec32d786",
       "display_name": "Carbonyl to dialkoxy",
       "edit_archetype": "substitution",
       "edit_component_count": 1,
@@ -117,8 +117,27 @@
           "side": "reactant"
         }
       ],
+      "product_label": "acetal",
       "provenance": "curated_minimum_mapped_reference",
-      "schema_version": "1.0",
+      "reaction_label": "Acetal formation",
+      "roles": [
+        {
+          "atom_map_numbers": [
+            1
+          ],
+          "role_id": "carbonyl",
+          "site_type": "electrophilic_center"
+        },
+        {
+          "atom_map_numbers": [
+            3,
+            5
+          ],
+          "role_id": "alcohol",
+          "site_type": "pronucleophile_XH"
+        }
+      ],
+      "schema_version": "1.1",
       "status": "active",
       "template_id": "carbonyl_to_dialkoxy",
       "transformation_class": "carbonyl_diheteroatom_condensation"

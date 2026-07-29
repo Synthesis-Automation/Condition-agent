@@ -44,6 +44,8 @@ def _command_import(args: argparse.Namespace) -> int:
         display_name=args.name,
         family_id=args.family,
         aliases=args.alias or (),
+        reaction_label=args.reaction_label,
+        product_label=args.product_label,
         transformation_class=args.transformation_class,
         status=args.status,
         provenance=args.provenance,
@@ -119,6 +121,8 @@ def _command_show(args: argparse.Namespace) -> int:
         print(f"id: {template.template_id}")
         print(f"name: {template.display_name}")
         print(f"family: {template.family_id or '-'}")
+        print(f"reaction label: {template.reaction_label}")
+        print(f"product label: {template.product_label}")
         print(f"status: {template.status}")
         print(f"archetype: {template.edit_archetype}")
         print(f"transformation: {template.transformation_class or '-'}")
@@ -126,6 +130,10 @@ def _command_show(args: argparse.Namespace) -> int:
         print(f"fingerprint: {template.edit_fingerprint}")
         print(f"definition hash: {template.definition_hash}")
         print(f"mapped reference: {template.mapped_reference_reaction}")
+        print("roles:")
+        for role in template.roles:
+            maps = ", ".join(str(value) for value in role.atom_map_numbers)
+            print(f"  {role.role_id}: {role.site_type}; maps {maps}")
     return 0
 
 
@@ -168,6 +176,33 @@ def _command_match(args: argparse.Namespace) -> int:
                     f"  {match.template_id}: {match.display_name} "
                     f"[{match.status}; family={match.family_id or '-'}]"
                 )
+                if match.interpretation is not None:
+                    print(
+                        f"    label: {match.interpretation.reaction_label}"
+                    )
+                    print(
+                        "    structure: "
+                        f"{match.interpretation.structural_label}"
+                    )
+                    for binding in match.interpretation.roles:
+                        multiplicity = (
+                            f" x{binding.multiplicity}"
+                            if binding.multiplicity > 1
+                            else ""
+                        )
+                        steric = (
+                            f"{binding.steric_class}/"
+                            f"{binding.steric_score:.2f}"
+                            if binding.steric_class is not None
+                            and binding.steric_score is not None
+                            else "-"
+                        )
+                        print(
+                            f"    role {binding.role_id}{multiplicity}: "
+                            f"{binding.chemist_label}; "
+                            f"steric={steric}; electronic="
+                            f"{binding.electronic_class or '-'}"
+                        )
         else:
             print("matches: none")
         if result.warnings:
@@ -201,6 +236,14 @@ def build_parser() -> argparse.ArgumentParser:
     import_parser.add_argument("--name", required=True)
     import_parser.add_argument("--family")
     import_parser.add_argument("--alias", action="append")
+    import_parser.add_argument(
+        "--reaction-label",
+        help="chemist-facing label; defaults to --name",
+    )
+    import_parser.add_argument(
+        "--product-label",
+        help="short structural product label; defaults to 'product'",
+    )
     import_parser.add_argument("--transformation-class")
     import_parser.add_argument(
         "--status", choices=("draft", "active", "retired"), default="draft"

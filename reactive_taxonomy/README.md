@@ -24,8 +24,11 @@ Mapped, single-event references can also be compiled into the versioned
 `reaction_templates.v1.json` registry. This authoring registry stores a
 map-number- and reactant-order-invariant edit fingerprint, optional family
 annotations, provenance, and the mapped reference; it does not store or copy a
-final reaction signature. Query signatures remain structure-derived, while
-matching active templates contribute interpretation candidates. Use
+final reaction signature. Its semantic layer is intentionally small: each
+template has a reaction label, a product label, and automatically derived roles
+that link reference atom maps to canonical taxonomy site types. Query signatures
+remain structure-derived, while matching active templates contribute
+interpretation candidates. Use
 `python -m reactive_taxonomy.reaction_template_cli --help` for import, list,
 show, validation, and query matching commands. The PyQt6 wrapper is available
 as `python -m app.reaction_template_registry_gui`.
@@ -38,6 +41,14 @@ repeatable role, applies the stored bond and schema-H edits, validates valence,
 and requires exact canonical reconstruction of the reported main product.
 This emits `exact_template_reconstruction_with_inferred_multiplicity` evidence
 without inventing atom correspondence or an `RS3` signature.
+
+Successful execution also emits a typed `TemplateReactionInterpretation`.
+It retains the actual query component/atom/site bindings and renders a concise
+label such as `R–CH=O + 2 × R–OH → acetal`. Steric accessibility, electronic
+class, nearby groups, and context flags are read from the existing
+`SiteReactivityProfile` for each bound site; templates do not contain descriptor
+rules or SMARTS. Repeated supplied species remain separate bindings, while a
+demonstrated inferred repeat is reported once with its multiplicity and warning.
 
 If exact reconstruction fails, a lower conservative fallback compares the
 edited-centre before/after bond-state multisets. Neighbor hydrogen count and

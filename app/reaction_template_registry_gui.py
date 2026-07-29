@@ -34,6 +34,8 @@ def _format_template(template: ReactionTemplate) -> str:
         f"Name: {template.display_name}",
         f"Status: {template.status}",
         f"Family: {template.family_id or 'unassigned'}",
+        f"Reaction label: {template.reaction_label}",
+        f"Product label: {template.product_label}",
         f"Transformation: {template.transformation_class or 'unassigned'}",
         f"Edit archetype: {template.edit_archetype}",
         f"Edit fingerprint: {template.edit_fingerprint}",
@@ -41,6 +43,12 @@ def _format_template(template: ReactionTemplate) -> str:
     ]
     if template.aliases:
         lines.append(f"Aliases: {', '.join(template.aliases)}")
+    lines.extend(("", "SEMANTIC ROLES"))
+    for role in template.roles:
+        maps = ", ".join(str(value) for value in role.atom_map_numbers)
+        lines.append(
+            f"  {role.role_id}: {role.site_type}; reference maps {maps}"
+        )
     lines.extend(("", "PARTICIPANTS"))
     for participant in template.participants:
         lines.append(
@@ -224,6 +232,47 @@ def _format_match_section(result: object) -> str:
             )
         if match.inferred_multiplicity:
             lines.append("    Inferred repeated participant: yes")
+        interpretation = match.interpretation
+        if interpretation is not None:
+            lines.extend(
+                (
+                    f"    Reaction label: {interpretation.reaction_label}",
+                    f"    Structural label: "
+                    f"{interpretation.structural_label}",
+                    "    Bound roles:",
+                )
+            )
+            for binding in interpretation.roles:
+                count = (
+                    f" × {binding.multiplicity}"
+                    if binding.multiplicity > 1
+                    else ""
+                )
+                steric = (
+                    f"{binding.steric_class} "
+                    f"({binding.steric_score:.2f})"
+                    if binding.steric_class is not None
+                    and binding.steric_score is not None
+                    else "unavailable"
+                )
+                lines.extend(
+                    (
+                        f"      {binding.role_id}{count}: "
+                        f"{binding.chemist_label}",
+                        f"        Site: {binding.site_type}; component "
+                        f"{binding.component_index}; atoms "
+                        + ", ".join(
+                            str(value) for value in binding.atom_indices
+                        ),
+                        f"        Steric: {steric}; electronic: "
+                        f"{binding.electronic_class or 'unavailable'}",
+                    )
+                )
+                if binding.nearby_groups:
+                    lines.append(
+                        "        Nearby groups: "
+                        + ", ".join(binding.nearby_groups)
+                    )
     return "\n".join(lines)
 
 
@@ -254,6 +303,16 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         self.aliases_edit.setObjectName("aliases")
         self.aliases_edit.setPlaceholderText(
             "comma-separated aliases (optional)"
+        )
+        self.reaction_label_edit = QtWidgets.QLineEdit()
+        self.reaction_label_edit.setObjectName("reactionLabel")
+        self.reaction_label_edit.setPlaceholderText(
+            "Acetal formation (defaults to name)"
+        )
+        self.product_label_edit = QtWidgets.QLineEdit()
+        self.product_label_edit.setObjectName("productLabel")
+        self.product_label_edit.setPlaceholderText(
+            "acetal (defaults to product)"
         )
         self.transformation_edit = QtWidgets.QLineEdit()
         self.transformation_edit.setObjectName("transformationClass")
@@ -380,6 +439,11 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         family_row.addWidget(self.status_combo)
         form.addRow("Family", family_row)
         form.addRow("Aliases", self.aliases_edit)
+        label_row = QtWidgets.QHBoxLayout()
+        label_row.addWidget(self.reaction_label_edit)
+        label_row.addWidget(QtWidgets.QLabel("Product"))
+        label_row.addWidget(self.product_label_edit)
+        form.addRow("Reaction label", label_row)
         form.addRow("Mapped reference", self.mapped_reaction_edit)
         form.addRow("Notes", self.notes_edit)
         authoring_layout.addLayout(form)
@@ -460,6 +524,12 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
                 display_name=self.name_edit.text().strip(),
                 family_id=self.family_edit.text().strip() or None,
                 aliases=aliases,
+                reaction_label=(
+                    self.reaction_label_edit.text().strip() or None
+                ),
+                product_label=(
+                    self.product_label_edit.text().strip() or None
+                ),
                 transformation_class=(
                     self.transformation_edit.text().strip() or None
                 ),

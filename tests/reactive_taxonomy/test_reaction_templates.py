@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 
 import pytest
 
@@ -12,6 +13,7 @@ from reactive_taxonomy import (
     load_reaction_template_registry,
     match_reaction_templates,
     upsert_reaction_template,
+    validate_reaction_template,
     validate_reaction_template_registry,
 )
 from reactive_taxonomy.reaction_template_cli import main as template_cli_main
@@ -41,6 +43,8 @@ def _acetal_template(*, status: str = "active"):
         display_name="Carbonyl to dialkoxy",
         family_id="acetalization",
         aliases=("acetal formation",),
+        reaction_label="Acetal formation",
+        product_label="acetal",
         transformation_class="carbonyl_diheteroatom_condensation",
         status=status,  # type: ignore[arg-type]
     )
@@ -65,6 +69,17 @@ def test_mapped_reference_compiles_to_one_deterministic_event() -> None:
     assert template.edit_fingerprint == renormalized.edit_fingerprint
     assert template.edit_fingerprint.startswith("RTE1:")
     assert template.definition_hash.startswith("RTD1:")
+    assert [
+        (
+            role.role_id,
+            role.site_type,
+            role.atom_map_numbers,
+        )
+        for role in template.roles
+    ] == [
+        ("carbonyl", "electrophilic_center", (1,)),
+        ("alcohol", "pronucleophile_XH", (3, 5)),
+    ]
 
 
 def test_reference_requires_complete_heavy_atom_mapping() -> None:
@@ -77,6 +92,18 @@ def test_reference_requires_complete_heavy_atom_mapping() -> None:
             template_id="invalid_partial_map",
             display_name="Invalid partial map",
         )
+
+
+def test_template_requires_compact_taxonomy_role_annotations() -> None:
+    template = _acetal_template()
+
+    errors = validate_reaction_template(replace(template, roles=()))
+
+    assert "carbonyl_to_dialkoxy:missing_roles" in errors
+    assert (
+        "carbonyl_to_dialkoxy:reference_contract_mismatch:roles"
+        in errors
+    )
 
 
 def test_importer_rejects_disconnected_multi_event_reference() -> None:
@@ -165,6 +192,35 @@ def test_minimum_acetal_template_matches_requested_incomplete_example(
         "CCOC(OCC)c1cccc(OC)c1"
     )
     assert result.matches[0].inferred_multiplicity is True
+    interpretation = result.matches[0].interpretation
+    assert interpretation is not None
+    assert interpretation.reaction_label == "Acetal formation"
+    assert interpretation.structural_label == (
+        "R–CH=O + 2 × R–OH → acetal"
+    )
+    assert interpretation.predicted_product_smiles == (
+        "CCOC(OCC)c1cccc(OC)c1"
+    )
+    assert [
+        (
+            binding.role_id,
+            binding.site_type,
+            binding.multiplicity,
+            binding.inferred_multiplicity,
+        )
+        for binding in interpretation.roles
+    ] == [
+        ("carbonyl", "electrophilic_center", 1, False),
+        ("alcohol", "pronucleophile_XH", 2, True),
+    ]
+    carbonyl = interpretation.roles[0]
+    alcohol = interpretation.roles[1]
+    assert carbonyl.steric_class == "moderate"
+    assert carbonyl.steric_score == pytest.approx(0.278)
+    assert carbonyl.electronic_class == "slightly_poor"
+    assert alcohol.steric_class == "open"
+    assert alcohol.steric_score == pytest.approx(0.1)
+    assert alcohol.electronic_class == "medium"
     assert (
         "EXACT_MAIN_PRODUCT_RECONSTRUCTION_FROM_TEMPLATE"
         in result.warnings
@@ -191,6 +247,17 @@ def test_explicit_second_alcohol_upgrades_reconstruction_evidence(
     assert result.matches[0].confidence == 0.95
     assert result.matches[0].provisional is False
     assert result.matches[0].inferred_multiplicity is False
+    interpretation = result.matches[0].interpretation
+    assert interpretation is not None
+    assert [
+        binding.component_index
+        for binding in interpretation.roles
+        if binding.role_id == "alcohol"
+    ] == [0, 1]
+    assert all(
+        not binding.inferred_multiplicity
+        for binding in interpretation.roles
+    )
     assert "INFERRED_REACTANT_MULTIPLICITY" not in result.warnings
 
 
@@ -225,6 +292,7 @@ def test_center_match_does_not_claim_exact_reconstruction_for_wrong_alcohol(
 
     assert result.evidence == "template_center_transition_hypothesis"
     assert result.matches[0].confidence == 0.7
+    assert result.matches[0].interpretation is None
     assert (
         "EXACT_MAIN_PRODUCT_RECONSTRUCTION_FROM_TEMPLATE"
         not in result.warnings
@@ -311,6 +379,10 @@ def test_reaction_template_cli_import_list_validate_show_and_match(
             "Carbonyl to dialkoxy",
             "--family",
             "acetalization",
+            "--reaction-label",
+            "Acetal formation",
+            "--product-label",
+            "acetal",
             "--status",
             "active",
             "--format",
@@ -320,6 +392,8 @@ def test_reaction_template_cli_import_list_validate_show_and_match(
     imported = json.loads(capsys.readouterr().out)
     assert imported["saved"] is True
     assert imported["template"]["edit_component_count"] == 1
+    assert imported["template"]["roles"][0]["role_id"] == "carbonyl"
+    assert imported["template"]["reaction_label"] == "Acetal formation"
 
     assert template_cli_main([*common, "validate", "--format", "json"]) == 0
     assert json.loads(capsys.readouterr().out)["valid"] is True
@@ -368,3 +442,6 @@ def test_reaction_template_cli_import_list_validate_show_and_match(
         "exact_template_reconstruction_with_inferred_multiplicity"
     )
     assert incomplete["matches"][0]["provisional"] is True
+    assert incomplete["matches"][0]["interpretation"]["structural_label"] == (
+        "R–CH=O + 2 × R–OH → acetal"
+    )

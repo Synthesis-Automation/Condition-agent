@@ -26,13 +26,14 @@ from .reaction_models import ReactionAtomReference, ReactionEdit
 from .reaction_parser import parse_reaction_smiles
 
 
-REACTION_TEMPLATE_SCHEMA_VERSION = "1.0"
+REACTION_TEMPLATE_SCHEMA_VERSION = "1.1"
 REACTION_TEMPLATE_DEFINITION_VERSION = "reaction_templates.v1"
 DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH = (
     Path(__file__).with_name("definitions") / "reaction_templates.v1.json"
 )
 
 _TEMPLATE_ID_RE = re.compile(r"^[a-z][a-z0-9_]{2,79}$")
+_ROLE_ID_RE = re.compile(r"^[a-z][a-z0-9_]{1,79}$")
 _VALID_STATUS = {"draft", "active", "retired"}
 
 
@@ -108,6 +109,15 @@ class ReactionTemplateParticipant:
 
 
 @dataclass(frozen=True)
+class ReactionTemplateRole:
+    """Small semantic annotation linking reference maps to a taxonomy site."""
+
+    role_id: str
+    site_type: str
+    atom_map_numbers: Tuple[int, ...]
+
+
+@dataclass(frozen=True)
 class ReactionTemplate:
     """One validated, declarative single-event reaction template."""
 
@@ -115,8 +125,11 @@ class ReactionTemplate:
     display_name: str
     family_id: Optional[str]
     aliases: Tuple[str, ...]
+    reaction_label: str
+    product_label: str
     mapped_reference_reaction: str
     participants: Tuple[ReactionTemplateParticipant, ...]
+    roles: Tuple[ReactionTemplateRole, ...]
     edits: Tuple[ReactionTemplateEdit, ...]
     edit_fingerprint: str
     edit_component_count: int
@@ -148,9 +161,54 @@ class ReactionTemplateMatch:
     provisional: bool
     predicted_product_smiles: Optional[str]
     inferred_multiplicity: bool
+    interpretation: Optional["TemplateReactionInterpretation"] = None
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the match."""
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class TemplateRoleBinding:
+    """One template role bound to observed query atoms and site descriptors."""
+
+    role_id: str
+    site_type: str
+    component_index: int
+    atom_indices: Tuple[int, ...]
+    site_id: str
+    chemist_label: str
+    multiplicity: int
+    inferred_multiplicity: bool
+    steric_class: Optional[str]
+    steric_score: Optional[float]
+    electronic_class: Optional[str]
+    context_flags: Tuple[str, ...] = ()
+    nearby_groups: Tuple[str, ...] = ()
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize the query-bound role context."""
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class TemplateReactionInterpretation:
+    """Typed structural label and query-bound context from one template."""
+
+    template_id: str
+    family_id: Optional[str]
+    reaction_label: str
+    structural_label: str
+    product_label: str
+    predicted_product_smiles: str
+    roles: Tuple[TemplateRoleBinding, ...]
+    evidence: str
+    confidence: float
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize the template interpretation."""
         return asdict(self)
 
 
@@ -432,6 +490,7 @@ class _RoleCandidate:
 class _TemplateReconstruction:
     predicted_product_smiles: str
     inferred_multiplicity: bool
+    role_bindings: Tuple[TemplateRoleBinding, ...]
 
 
 def _hydrogen_loss_requirements(
@@ -726,6 +785,131 @@ def _canonical_fragment_smiles(molecule: Any) -> Tuple[str, ...]:
     return tuple(sorted(values))
 
 
+def _resolve_template_role_bindings(
+    template: ReactionTemplate,
+    parsed_query: Any,
+    query_atom_bindings: Mapping[int, tuple[int, int]],
+) -> Tuple[TemplateRoleBinding, ...]:
+    """Resolve executed map bindings to canonical observed query sites."""
+    components = {
+        int(component.component_index): component
+        for component in parsed_query.reactants
+    }
+    resolved = []
+    for role in template.roles:
+        grouped: dict[tuple[int, int, str], int] = {}
+        for map_number in role.atom_map_numbers:
+            query_binding = query_atom_bindings.get(int(map_number))
+            if query_binding is None:
+                continue
+            component_index, atom_index = query_binding
+            component = components.get(component_index)
+            if component is None:
+                continue
+            site = next(
+                (
+                    candidate
+                    for candidate in component.compound_analysis.sites
+                    if str(candidate.site_type) == role.site_type
+                    and int(atom_index)
+                    in {
+                        int(value)
+                        for value in (
+                            (
+                                candidate.details.get("atom_roles") or {}
+                            ).get("center")
+                            or (
+                                candidate.details.get("center_atom_index"),
+                            )
+                        )
+                        if value is not None
+                    }
+                ),
+                None,
+            )
+            if site is None:
+                continue
+            key = (component_index, atom_index, str(site.site_id))
+            grouped[key] = grouped.get(key, 0) + 1
+        for (
+            component_index,
+            atom_index,
+            site_id,
+        ), multiplicity in sorted(grouped.items()):
+            component = components[component_index]
+            site = next(
+                candidate
+                for candidate in component.compound_analysis.sites
+                if candidate.site_id == site_id
+            )
+            environment = next(
+                (
+                    item
+                    for item in component.compound_analysis.site_environments
+                    if item.site_id == site_id
+                ),
+                None,
+            )
+            profile = (
+                environment.reactivity_profile
+                if environment is not None
+                else None
+            )
+            nearby_groups = tuple(
+                sorted(
+                    {
+                        str(
+                            item.get("chemist_label")
+                            or item.get("label")
+                            or item.get("group_id")
+                        )
+                        for item in (
+                            environment.nearby_groups
+                            if environment is not None
+                            else ()
+                        )
+                        if (
+                            item.get("chemist_label")
+                            or item.get("label")
+                            or item.get("group_id")
+                        )
+                    }
+                )
+            )
+            resolved.append(
+                TemplateRoleBinding(
+                    role_id=role.role_id,
+                    site_type=role.site_type,
+                    component_index=component_index,
+                    atom_indices=(atom_index,),
+                    site_id=site_id,
+                    chemist_label=str(site.chemist_label),
+                    multiplicity=multiplicity,
+                    inferred_multiplicity=multiplicity > 1,
+                    steric_class=(
+                        str(profile.steric.accessibility_class)
+                        if profile is not None
+                        else None
+                    ),
+                    steric_score=(
+                        float(profile.steric.accessibility_score)
+                        if profile is not None
+                        else None
+                    ),
+                    electronic_class=(
+                        str(profile.electronic.activation_class)
+                        if profile is not None
+                        else None
+                    ),
+                    context_flags=(
+                        tuple(profile.flags) if profile is not None else ()
+                    ),
+                    nearby_groups=nearby_groups,
+                )
+            )
+    return tuple(resolved)
+
+
 def _execute_template_assignment(
     template: ReactionTemplate,
     roles: Sequence[_CompiledReactantRole],
@@ -742,6 +926,7 @@ def _execute_template_assignment(
     }
     source = None
     map_bindings: dict[int, int] = {}
+    query_atom_bindings: dict[int, tuple[int, int]] = {}
     offset = 0
     used_components: list[int] = []
     for role, role_assignment in zip(roles, assignment):
@@ -761,6 +946,10 @@ def _execute_template_assignment(
             for slot, map_number in enumerate(occurrence_maps):
                 map_bindings[int(map_number)] = (
                     offset + int(candidate.atom_indices[slot])
+                )
+                query_atom_bindings[int(map_number)] = (
+                    int(candidate.component_index),
+                    int(candidate.atom_indices[slot]),
                 )
             offset += int(molecule.GetNumAtoms())
             used_components.append(candidate.component_index)
@@ -832,9 +1021,19 @@ def _execute_template_assignment(
     if not matched:
         return None
     inferred_multiplicity = len(used_components) != len(set(used_components))
+    role_bindings = _resolve_template_role_bindings(
+        template,
+        parsed_query,
+        query_atom_bindings,
+    )
+    if {binding.role_id for binding in role_bindings} != {
+        role.role_id for role in template.roles
+    }:
+        return None
     return _TemplateReconstruction(
         predicted_product_smiles=matched[0],
         inferred_multiplicity=inferred_multiplicity,
+        role_bindings=role_bindings,
     )
 
 
@@ -895,8 +1094,63 @@ def _exact_template_reconstructions(
             key=lambda outcome: (
                 outcome.predicted_product_smiles,
                 outcome.inferred_multiplicity,
+                tuple(
+                    (
+                        binding.role_id,
+                        binding.component_index,
+                        binding.atom_indices,
+                    )
+                    for binding in outcome.role_bindings
+                ),
             ),
         )
+    )
+
+
+def _build_template_interpretation(
+    template: ReactionTemplate,
+    outcome: _TemplateReconstruction,
+    *,
+    evidence: str,
+    confidence: float,
+) -> TemplateReactionInterpretation:
+    """Render a compact label from query-bound taxonomy observations."""
+    terms = []
+    for role in template.roles:
+        bindings = tuple(
+            binding
+            for binding in outcome.role_bindings
+            if binding.role_id == role.role_id
+        )
+        by_label: dict[str, int] = {}
+        for binding in bindings:
+            by_label[binding.chemist_label] = (
+                by_label.get(binding.chemist_label, 0)
+                + binding.multiplicity
+            )
+        for label, count in sorted(by_label.items()):
+            terms.append(f"{count} × {label}" if count > 1 else label)
+    structural_label = (
+        f"{' + '.join(terms)} → {template.product_label}"
+        if terms
+        else f"→ {template.product_label}"
+    )
+    warnings = (
+        ("INFERRED_REACTANT_MULTIPLICITY",)
+        if outcome.inferred_multiplicity
+        else ()
+    )
+    return TemplateReactionInterpretation(
+        template_id=template.template_id,
+        family_id=template.family_id,
+        reaction_label=template.reaction_label,
+        structural_label=structural_label,
+        product_label=template.product_label,
+        predicted_product_smiles=outcome.predicted_product_smiles,
+        roles=outcome.role_bindings,
+        evidence=evidence,
+        confidence=confidence,
+        warnings=warnings,
     )
 
 
@@ -1150,6 +1404,73 @@ def _definition_hash(template: ReactionTemplate) -> str:
     return _digest("RTD1", _template_hash_payload(template), length=40)
 
 
+def _role_token(value: str) -> str:
+    token = re.sub(r"[^a-z0-9]+", "_", str(value).casefold()).strip("_")
+    return token or "reactant"
+
+
+def _derive_template_roles(
+    parsed: Any,
+    edits: Sequence[ReactionEdit],
+) -> Tuple[ReactionTemplateRole, ...]:
+    """Link edit-bearing reference atoms to existing taxonomy sites."""
+    edited_maps = {
+        int(atom.atom_map_number)
+        for edit in edits
+        for atom in (edit.atom_1, edit.atom_2)
+        if atom is not None and atom.atom_map_number is not None
+    }
+    grouped: dict[tuple[str, str], list[int]] = {}
+    for component in parsed.reactants:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        map_by_index = {
+            int(atom.GetIdx()): int(atom.GetAtomMapNum())
+            for atom in molecule.GetAtoms()
+            if int(atom.GetAtomMapNum())
+        }
+        for site in component.compound_analysis.sites:
+            center_index = site.details.get("center_atom_index")
+            if center_index is None:
+                center_indices = tuple(
+                    int(value)
+                    for value in (
+                        (site.details.get("atom_roles") or {}).get("center")
+                        or ()
+                    )
+                )
+                center_index = center_indices[0] if center_indices else None
+            map_number = (
+                map_by_index.get(int(center_index))
+                if center_index is not None
+                else None
+            )
+            if map_number not in edited_maps:
+                continue
+            semantic = (
+                site.details.get("center_family")
+                or site.details.get("derived_family")
+                or site.site_type
+            )
+            key = (_role_token(str(semantic)), str(site.site_type))
+            grouped.setdefault(key, []).append(int(map_number))
+    roles = []
+    used_ids: dict[str, int] = {}
+    for (base_id, site_type), map_numbers in grouped.items():
+        ordinal = used_ids.get(base_id, 0) + 1
+        used_ids[base_id] = ordinal
+        role_id = base_id if ordinal == 1 else f"{base_id}_{ordinal}"
+        roles.append(
+            ReactionTemplateRole(
+                role_id=role_id,
+                site_type=site_type,
+                atom_map_numbers=tuple(sorted(set(map_numbers))),
+            )
+        )
+    return tuple(roles)
+
+
 def derive_reaction_template(
     mapped_reaction_smiles: str,
     *,
@@ -1157,6 +1478,8 @@ def derive_reaction_template(
     display_name: str,
     family_id: Optional[str] = None,
     aliases: Sequence[str] = (),
+    reaction_label: Optional[str] = None,
+    product_label: Optional[str] = None,
     transformation_class: Optional[str] = None,
     status: Literal["draft", "active", "retired"] = "draft",
     provenance: str = "manual_mapped_reference",
@@ -1221,8 +1544,11 @@ def derive_reaction_template(
                 }
             )
         ),
+        reaction_label=str(reaction_label or display_name).strip(),
+        product_label=str(product_label or "product").strip(),
         mapped_reference_reaction=str(mapped_reaction_smiles).strip(),
         participants=_participants(parsed),
+        roles=_derive_template_roles(parsed, normalized.edits),
         edits=tuple(
             ReactionTemplateEdit.from_reaction_edit(edit)
             for edit in normalized.edits
@@ -1265,6 +1591,10 @@ def reaction_template_from_dict(payload: Mapping[str, Any]) -> ReactionTemplate:
                 else None
             ),
             aliases=tuple(str(value) for value in payload.get("aliases") or ()),
+            reaction_label=str(
+                payload.get("reaction_label") or payload["display_name"]
+            ),
+            product_label=str(payload.get("product_label") or "product"),
             mapped_reference_reaction=str(payload["mapped_reference_reaction"]),
             participants=tuple(
                 ReactionTemplateParticipant(
@@ -1273,6 +1603,17 @@ def reaction_template_from_dict(payload: Mapping[str, Any]) -> ReactionTemplate:
                     explicit_count=int(item["explicit_count"]),
                 )
                 for item in payload.get("participants") or ()
+            ),
+            roles=tuple(
+                ReactionTemplateRole(
+                    role_id=str(item["role_id"]),
+                    site_type=str(item["site_type"]),
+                    atom_map_numbers=tuple(
+                        int(value)
+                        for value in item.get("atom_map_numbers") or ()
+                    ),
+                )
+                for item in payload.get("roles") or ()
             ),
             edits=tuple(
                 ReactionTemplateEdit(
@@ -1333,6 +1674,10 @@ def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
         errors.append(f"{template.template_id}:invalid_template_id")
     if not template.display_name.strip():
         errors.append(f"{template.template_id}:missing_display_name")
+    if not template.reaction_label.strip():
+        errors.append(f"{template.template_id}:missing_reaction_label")
+    if not template.product_label.strip():
+        errors.append(f"{template.template_id}:missing_product_label")
     if template.status not in _VALID_STATUS:
         errors.append(f"{template.template_id}:invalid_status:{template.status}")
     if template.edit_component_count != 1:
@@ -1352,6 +1697,24 @@ def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
         errors.append(f"{template.template_id}:definition_hash_mismatch")
     if len(set(template.aliases)) != len(template.aliases):
         errors.append(f"{template.template_id}:duplicate_aliases")
+    role_ids = [role.role_id for role in template.roles]
+    if not template.roles:
+        errors.append(f"{template.template_id}:missing_roles")
+    if len(role_ids) != len(set(role_ids)):
+        errors.append(f"{template.template_id}:duplicate_role_ids")
+    for role in template.roles:
+        if not _ROLE_ID_RE.fullmatch(role.role_id):
+            errors.append(
+                f"{template.template_id}:invalid_role_id:{role.role_id}"
+            )
+        if not role.site_type:
+            errors.append(
+                f"{template.template_id}:missing_role_site_type:{role.role_id}"
+            )
+        if not role.atom_map_numbers:
+            errors.append(
+                f"{template.template_id}:missing_role_maps:{role.role_id}"
+            )
     try:
         compiled = derive_reaction_template(
             template.mapped_reference_reaction,
@@ -1359,6 +1722,8 @@ def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
             display_name=template.display_name,
             family_id=template.family_id,
             aliases=template.aliases,
+            reaction_label=template.reaction_label,
+            product_label=template.product_label,
             transformation_class=template.transformation_class,
             status=template.status,
             provenance=template.provenance,
@@ -1369,6 +1734,7 @@ def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
     else:
         for field_name in (
             "participants",
+            "roles",
             "edits",
             "edit_fingerprint",
             "edit_component_count",
@@ -1555,28 +1921,49 @@ def match_reaction_templates(
                 warnings.extend(mapped.warnings)
     fingerprint = reaction_edit_fingerprint(edits) if edits else None
     templates = load_reaction_template_registry(path)
-    exact_matches = tuple(
-        ReactionTemplateMatch(
-            template_id=template.template_id,
-            display_name=template.display_name,
-            family_id=template.family_id,
-            status=template.status,
-            edit_fingerprint=template.edit_fingerprint,
-            definition_hash=template.definition_hash,
-            evidence="query_derived_edit_fingerprint",
-            confidence=1.0,
-            provisional=False,
-            predicted_product_smiles=None,
-            inferred_multiplicity=False,
+    parsed_query = parse_reaction_smiles(reaction_smiles)
+    exact_matches_list = []
+    for template in templates:
+        if (
+            fingerprint is None
+            or template.edit_fingerprint != fingerprint
+            or not (include_drafts or template.status == "active")
+        ):
+            continue
+        outcomes = _exact_template_reconstructions(template, parsed_query)
+        preferred_outcome = outcomes[0] if outcomes else None
+        exact_matches_list.append(
+            ReactionTemplateMatch(
+                template_id=template.template_id,
+                display_name=template.display_name,
+                family_id=template.family_id,
+                status=template.status,
+                edit_fingerprint=template.edit_fingerprint,
+                definition_hash=template.definition_hash,
+                evidence="query_derived_edit_fingerprint",
+                confidence=1.0,
+                provisional=False,
+                predicted_product_smiles=(
+                    preferred_outcome.predicted_product_smiles
+                    if preferred_outcome is not None
+                    else None
+                ),
+                inferred_multiplicity=False,
+                interpretation=(
+                    _build_template_interpretation(
+                        template,
+                        preferred_outcome,
+                        evidence="query_derived_edit_fingerprint",
+                        confidence=1.0,
+                    )
+                    if preferred_outcome is not None
+                    else None
+                ),
+            )
         )
-        for template in templates
-        if fingerprint is not None
-        and template.edit_fingerprint == fingerprint
-        and (include_drafts or template.status == "active")
-    )
+    exact_matches = tuple(exact_matches_list)
     matches = exact_matches
     if fingerprint is None and analysis.valid:
-        parsed_query = parse_reaction_smiles(reaction_smiles)
         reconstruction_matches = []
         for template in templates:
             if not (include_drafts or template.status == "active"):
@@ -1615,6 +2002,19 @@ def match_reaction_templates(
                         preferred_outcome.predicted_product_smiles
                     ),
                     inferred_multiplicity=inferred_multiplicity,
+                    interpretation=_build_template_interpretation(
+                        template,
+                        preferred_outcome,
+                        evidence=(
+                            "exact_template_reconstruction_with_"
+                            "inferred_multiplicity"
+                            if inferred_multiplicity
+                            else "exact_template_reconstruction"
+                        ),
+                        confidence=(
+                            0.85 if inferred_multiplicity else 0.95
+                        ),
+                    ),
                 )
             )
         if reconstruction_matches:
@@ -1651,6 +2051,7 @@ def match_reaction_templates(
                     provisional=True,
                     predicted_product_smiles=None,
                     inferred_multiplicity=False,
+                    interpretation=None,
                 )
                 for template in templates
                 if (include_drafts or template.status == "active")
@@ -1691,6 +2092,9 @@ __all__ = [
     "ReactionTemplateMatch",
     "ReactionTemplateParticipant",
     "ReactionTemplateQueryResult",
+    "ReactionTemplateRole",
+    "TemplateReactionInterpretation",
+    "TemplateRoleBinding",
     "derive_reaction_template",
     "empty_reaction_template_registry",
     "load_reaction_template_registry",

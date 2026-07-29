@@ -59,6 +59,15 @@ def test_qt6_registry_window_featurizes_reaction_test_input() -> None:
         assert "Family: acetalization" in details
         assert "Match: multiplicity-assisted exact reconstruction" in details
         assert "Confidence: 0.85" in details
+        assert "Reaction label: Acetal formation" in details
+        assert (
+            "Structural label: R–CH=O + 2 × R–OH → acetal"
+            in details
+        )
+        assert "carbonyl: R–CH=O" in details
+        assert "Steric: moderate (0.28); electronic: slightly_poor" in details
+        assert "alcohol × 2: R–OH" in details
+        assert "Steric: open (0.10); electronic: medium" in details
         assert (
             "Reconstructed product: CCOC(OCC)c1cccc(OC)c1"
             in details
