@@ -42,6 +42,30 @@ class ScoredPrecedent:
     compatibility: CompatibilityAssessment
 
 
+def _precedent_reaction_context(
+    precedent: GenericIndexedReaction,
+) -> Dict[str, Any]:
+    """Return display context from one indexed, structure-verified precedent."""
+    spectators = tuple(
+        dict(group)
+        for group in (precedent.signature.get("spectator_groups") or ())
+        if isinstance(group, Mapping)
+    )
+    partners = tuple(
+        dict(partner)
+        for partner in (precedent.signature.get("partners") or ())
+        if isinstance(partner, Mapping)
+    )
+    return {
+        "reaction_id": precedent.reaction_id,
+        "reaction_smiles": precedent.reaction_smiles,
+        "reaction_label": precedent.reaction_label or None,
+        "reaction_label_status": precedent.reaction_label_status,
+        "spectator_groups": spectators,
+        "reaction_partners": partners,
+    }
+
+
 @lru_cache(maxsize=1)
 def load_generic_ranking_rules() -> Dict[str, Any]:
     """Load and validate the pilot ranking definition."""
@@ -564,6 +588,10 @@ def rank_condition_recipes(
                 ),
                 precedent_reaction_smiles=tuple(
                     member.row.reaction_smiles for member in members[:5]
+                ),
+                precedent_reaction_contexts=tuple(
+                    _precedent_reaction_context(member.row)
+                    for member in members[:5]
                 ),
                 precedent_reference_ids=tuple(
                     sorted(

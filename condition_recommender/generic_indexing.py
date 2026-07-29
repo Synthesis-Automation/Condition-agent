@@ -25,7 +25,7 @@ from .evaluation_features import reaction_scaffold_key, reaction_scaffold_tokens
 from .signature_features import environment_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "1.7"
+GENERIC_INDEX_SCHEMA_VERSION = "1.8"
 
 
 @dataclass(frozen=True)
@@ -54,6 +54,8 @@ class GenericIndexedReaction:
     outcome_status: str
     record_schema_version: str
     converter_definition_version: str
+    reaction_label: str = ""
+    reaction_label_status: str = "unavailable"
 
     @property
     def named_family(self) -> str:
@@ -291,6 +293,10 @@ def build_generic_index(
                 converter_definition_version=str(
                     record.get("converter_definition_version") or ""
                 ),
+                reaction_label=str(record.get("reaction_label") or ""),
+                reaction_label_status=str(
+                    record.get("reaction_label_status") or "unavailable"
+                ),
             )
         )
     return build_generic_index_from_rows(rows)
@@ -335,6 +341,8 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "outcome_status": row.outcome_status,
             "record_schema_version": row.record_schema_version,
             "converter_definition_version": row.converter_definition_version,
+            "reaction_label": row.reaction_label,
+            "reaction_label_status": row.reaction_label_status,
         }
         for row in index.rows
     ]
@@ -503,6 +511,10 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             outcome_status=str(row.get("outcome_status") or ""),
             record_schema_version=str(row["record_schema_version"]),
             converter_definition_version=str(row["converter_definition_version"]),
+            reaction_label=str(row.get("reaction_label") or ""),
+            reaction_label_status=str(
+                row.get("reaction_label_status") or "unavailable"
+            ),
         )
         for row in payload.get("rows") or ()
     )

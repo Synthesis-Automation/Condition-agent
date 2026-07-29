@@ -49,6 +49,37 @@ def _recommendation() -> GenericConditionRecommendation:
             "BrC.B(O)O>>CC",
             "ClC.B(O)O>>CC",
         ),
+        precedent_reaction_contexts=(
+            {
+                "reaction_id": "reaction-1",
+                "reaction_smiles": "BrC.B(O)O>>CC",
+                "reaction_label": "Precedent Ar–Br coupling",
+                "reaction_label_status": "exact_product",
+                "spectator_groups": (
+                    {
+                        "group_id": "ether",
+                        "chemist_label": "R–O–R",
+                        "component_index": 1,
+                        "graph_distance": 2,
+                    },
+                ),
+                "reaction_partners": (
+                    {
+                        "role": "transfer_partner",
+                        "chemist_label": "Ar–B(OH)2",
+                        "anchor_contexts": ("Ar",),
+                        "steric": {
+                            "class": "open",
+                            "local_heavy_atoms_r2": 4,
+                        },
+                        "electronic": {
+                            "class": "electron_rich",
+                            "qualitative_sum": -0.5,
+                        },
+                    },
+                ),
+            },
+        ),
         precedent_reference_ids=("REF1:one",),
         explanation=("Exact bond-edit and handle match",),
         score_trace=trace,
@@ -57,7 +88,7 @@ def _recommendation() -> GenericConditionRecommendation:
 
 def _result() -> GenericRecommendationResult:
     return GenericRecommendationResult(
-        query_reaction_smiles="BrC.B(O)O>>CC",
+        query_reaction_smiles="IC.B(O)O>>CC",
         valid=True,
         query_signature_id="RS2:query",
         reaction_label="Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
@@ -190,14 +221,16 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     assert "Palladium catalyst" in window.results_table.item(0, 7).text()
     details = window.details_box.toPlainText()
     assert "Potassium carbonate" in details
-    assert (
-        "Reaction label: Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
-        in details
-    )
-    assert "Spectator groups: R–C≡N [nitrile] (reactant 1, d=3)" in details
+    assert "Reaction label: Precedent Ar–Br coupling" in details
+    assert "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" not in details
+    assert "Selected hit reaction SMILES: BrC.B(O)O>>CC" in details
+    assert "Selected hit reaction SMILES: IC.B(O)O>>CC" not in details
+    assert "Spectator groups: R–O–R [ether] (reactant 2, d=2)" in details
+    assert "R–C≡N [nitrile]" not in details
     assert "Steric/electronic analysis:" in details
-    assert "steric ortho hindered, 2 ortho substituent(s)" in details
-    assert "electronic electron poor (local score +0.75)" in details
+    assert "steric open, 4 local heavy atom(s), r≤2" in details
+    assert "electronic electron rich (local score -0.5)" in details
+    assert "steric ortho hindered" not in details
     assert "Recipe core:" not in details
     assert "Observed recipe variants:" not in details
     assert "RCORE1:core" not in details

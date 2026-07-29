@@ -119,6 +119,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
         "reaction_smiles": "C.N>>CN",
+        "reaction_label": f"Precedent reaction {index}",
+        "reaction_label_status": "exact_product",
         "yield_pct": 60.0 + index,
         "source_dataset": f"dataset-{index % 2}",
         "reference_id": f"REF1:{index}",
@@ -489,9 +491,18 @@ def test_recommendation_result_preserves_structured_query_context() -> None:
         }
     ]
 
+    precedent_signature = _signature("precedent")
+    precedent_signature["spectator_groups"] = [
+        {
+            "group_id": "ether",
+            "chemist_label": "R–O–R",
+            "component_index": 1,
+            "graph_distance": 2,
+        }
+    ]
     result = recommend_indexed_signature(
         query,
-        build_generic_index([_record(1, _signature("precedent"))]),
+        build_generic_index([_record(1, precedent_signature)]),
         reaction_label="Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
         reaction_label_status="exact_product",
         minimum_pool_size=1,
@@ -503,6 +514,11 @@ def test_recommendation_result_preserves_structured_query_context() -> None:
     assert result.spectator_groups[0]["group_id"] == "nitrile"
     assert result.reaction_partners[0]["steric"]["class"] == "open"
     assert result.reaction_partners[0]["electronic"]["class"] == "neutral"
+    hit_context = result.recommendations[0].precedent_reaction_contexts[0]
+    assert hit_context["reaction_label"] == "Precedent reaction 1"
+    assert hit_context["reaction_label_status"] == "exact_product"
+    assert hit_context["spectator_groups"][0]["group_id"] == "ether"
+    assert hit_context["reaction_partners"][0]["steric"]["class"] == "open"
 
 
 def test_inferred_correspondence_precedent_discloses_review_caution() -> None:
@@ -702,7 +718,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "1.7"
+    assert result.schema_version == "1.8"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")

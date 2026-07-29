@@ -115,7 +115,7 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.7"
+    assert payload["schema_version"] == "1.8"
     assert payload["reaction_signature_schema_version"] == "2.0"
     assert payload["record_schema_versions"] == ["3.0"]
     assert payload["maps"]["environment_features"]

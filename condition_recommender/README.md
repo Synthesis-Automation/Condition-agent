@@ -499,7 +499,9 @@ The window shows:
 - the retrieval fallback level and compatible precedent counts;
 - ranked catalysts, ligands, bases, solvents, additives, temperature, and time;
 - similarity, compatibility, expected yield, and independent support;
-- explanations, cautions, and precedent IDs for the selected recipe.
+- explanations, cautions, and precedent IDs for the selected recipe;
+- the displayed precedent hit's reaction SMILES, structural label, spectator
+  groups, and local steric/electronic partner analysis.
 
 Recommendation runs in a background thread. The validated index is cached in
 memory after its first load and is automatically reloaded if the selected file

@@ -847,7 +847,6 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self._render_result(result)
 
     def _render_result(self, result: GenericRecommendationResult) -> None:
-        self.last_result = result
         self._render_reaction_graph(result.query_reaction_smiles)
         if not result.valid:
             self.status_label.setText("No recommendation")
@@ -966,32 +965,47 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             else ""
         )
         recipe = recommendation.resolved_recipe
+        precedent_contexts = tuple(
+            recommendation.precedent_reaction_contexts
+        )
+        selected_context = (
+            precedent_contexts[0]
+            if precedent_contexts
+            and isinstance(precedent_contexts[0], Mapping)
+            else {}
+        )
+        spectator_groups = tuple(
+            dict(group)
+            for group in (selected_context.get("spectator_groups") or ())
+            if isinstance(group, Mapping)
+        )
+        reaction_partners = tuple(
+            dict(partner)
+            for partner in (selected_context.get("reaction_partners") or ())
+            if isinstance(partner, Mapping)
+        )
+        partner_summaries = _partner_analysis_summaries(reaction_partners)
         lines = [
             f"Rank {recommendation.rank}",
+            "",
+            "Displayed precedent context",
+            (
+                "Reaction label: "
+                f"{selected_context.get('reaction_label') or 'Unresolved'}"
+            ),
+            (
+                "Selected hit reaction SMILES: "
+                f"{precedent_reaction_smiles[0]}"
+                if precedent_reaction_smiles
+                else "Selected hit reaction SMILES: Unavailable"
+            ),
+            f"Spectator groups: {_spectator_summary(spectator_groups)}",
+            "Steric/electronic analysis:",
         ]
-        if self.last_result is not None:
-            partner_summaries = _partner_analysis_summaries(
-                self.last_result.reaction_partners
-            )
-            lines.extend(
-                (
-                    "",
-                    "Reaction context",
-                    (
-                        "Reaction label: "
-                        f"{self.last_result.reaction_label or 'Unresolved'}"
-                    ),
-                    (
-                        "Spectator groups: "
-                        f"{_spectator_summary(self.last_result.spectator_groups)}"
-                    ),
-                    "Steric/electronic analysis:",
-                )
-            )
-            if partner_summaries:
-                lines.extend(f"• {summary}" for summary in partner_summaries)
-            else:
-                lines.append("None available")
+        if partner_summaries:
+            lines.extend(f"• {summary}" for summary in partner_summaries)
+        else:
+            lines.append("None available")
         lines.extend(("", "Conditions"))
         for field, label in _RECIPE_ROLE_LABELS:
             names = _component_names(recipe, field)
