@@ -383,12 +383,6 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         self.mapped_reaction_edit.setPlaceholderText(
             "Paste one fully atom-mapped, single-event reaction SMILES"
         )
-        self.notes_edit = QtWidgets.QPlainTextEdit()
-        self.notes_edit.setObjectName("templateNotes")
-        self.notes_edit.setPlaceholderText(
-            "Provenance or generalization decisions (optional)"
-        )
-        self.notes_edit.setMaximumHeight(80)
         self.replace_check = QtWidgets.QCheckBox(
             "Replace an existing template with the same ID"
         )
@@ -439,7 +433,7 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         self.details = QtWidgets.QPlainTextEdit()
         self.details.setObjectName("templateDetails")
         self.details.setReadOnly(True)
-        self.details.setMinimumHeight(280)
+        self.details.setMinimumHeight(180)
         self.status_label = QtWidgets.QLabel()
         self.status_label.setObjectName("registryStatus")
         self.status_label.setWordWrap(True)
@@ -507,7 +501,6 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         form.addRow("Role labels", generalization_row)
         form.addRow("Required role tokens", self.role_tokens_edit)
         form.addRow("Mapped reference", self.mapped_reaction_edit)
-        form.addRow("Notes", self.notes_edit)
         authoring_layout.addLayout(form)
         action_row = QtWidgets.QHBoxLayout()
         action_row.addWidget(self.import_button)
@@ -519,20 +512,17 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         browser = QtWidgets.QWidget()
         browser_layout = QtWidgets.QVBoxLayout(browser)
         browser_layout.addWidget(QtWidgets.QLabel("Registered templates"))
-        browser_layout.addWidget(self.table, stretch=1)
+        browser_layout.addWidget(self.table, stretch=2)
         query_row = QtWidgets.QHBoxLayout()
         query_row.addWidget(self.query_edit, stretch=1)
-        query_actions = QtWidgets.QVBoxLayout()
-        query_actions.addWidget(self.include_drafts_check)
-        query_actions.addWidget(self.featurize_button)
-        query_actions.addWidget(self.match_button)
-        query_actions.addStretch()
-        query_row.addLayout(query_actions)
+        query_row.addWidget(self.include_drafts_check)
+        query_row.addWidget(self.featurize_button)
+        query_row.addWidget(self.match_button)
         browser_layout.addLayout(query_row)
         browser_layout.addWidget(QtWidgets.QLabel("Details / query result"))
-        browser_layout.addWidget(self.details, stretch=2)
+        browser_layout.addWidget(self.details, stretch=1)
         splitter.addWidget(browser)
-        splitter.setSizes((245, 565))
+        splitter.setSizes((220, 590))
 
         self.status_label.setStyleSheet(
             "background: #eef4fa; border: 1px solid #ccd9e5; "
@@ -632,7 +622,6 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
                 ),
                 status=self.status_combo.currentText(),  # type: ignore[arg-type]
                 provenance="qt6_manual_mapped_reference",
-                notes=self.notes_edit.toPlainText().strip(),
             )
             path = upsert_reaction_template(
                 template,

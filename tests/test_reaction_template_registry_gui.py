@@ -33,6 +33,10 @@ def test_qt6_registry_window_exposes_authoring_and_query_controls() -> None:
             )
             is not None
         )
+        assert (
+            window.findChild(QtWidgets.QPlainTextEdit, "templateNotes")
+            is None
+        )
         assert window.findChild(QtWidgets.QLineEdit, "queryReaction") is not None
         assert window.findChild(QtWidgets.QPushButton, "importTemplate") is not None
         assert (
@@ -42,6 +46,7 @@ def test_qt6_registry_window_exposes_authoring_and_query_controls() -> None:
         assert window.findChild(QtWidgets.QPushButton, "matchQuery") is not None
         assert "background-color: #ffffff" not in window.styleSheet()
         assert "color: #23313f" in window.status_label.styleSheet()
+        assert window.details.minimumHeight() == 180
     finally:
         window.close()
         application.processEvents()
