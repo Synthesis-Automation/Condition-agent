@@ -404,7 +404,6 @@ SN1 substitution,tert-Butyl chloride tert-butanol,CC(C)(C)Cl.O>>CC(C)(C)O
 E2 elimination,2-bromobutane but-2-ene,CCC(Br)C.CC(C)(C)[O-]>>CC=CC
 Hydrogenation,Styrene ethylbenzene,C=CC1=CC=CC=C1>>CCc1ccccc1
 Hydroboration-oxidation,1-hexene 1-hexanol,CCCCCC=C>>CCCCCCO
-Epoxidation,Cyclohexene cyclohexene oxide,C1=CCCCC1>>O1CCCCC1
 Dihydroxylation,"Cyclohexene cis-1,2-diol",C1=CCCCC1>>OC1CCCCC1O
 Aldol addition,Acetone + formaldehyde,CC(=O)C.C=O>>CC(=O)CCO
 Aldol condensation,Acetone self-condensation,CC(=O)C.CC(=O)C>>CC(=O)C=C(C)C
@@ -412,7 +411,6 @@ Grignard addition,Benzaldehyde + MeMgBr,O=CC1=CC=CC=C1.C[Mg]Br>>CC(O)c1ccccc1
 Reductive amination,Cyclohexanone + methylamine,O=C1CCCCC1.CNC>>CN(C)C2CCCCC2
 Imine formation,Benzaldehyde + aniline,O=CC1=CC=CC=C1.Nc1ccccc1>>c1ccc(/C=N\c2ccccc2)cc1
 Wittig,Benzaldehyde styrene,O=CC1=CC=CC=C1.C=P(c1ccccc1)(c1ccccc1)c1ccccc1>>C=CC1=CC=CC=C1
-HWE olefination,Benzaldehyde cinnamate,O=CC1=CC=CC=C1.CCOP(=O)(OCC)C=C(C(=O)OCC)[O-]>>CCOC(=O)C=CC1=CC=CC=C1
 FriedelCrafts alkylation,Benzene + tert-butyl chloride,c1ccccc1.CC(C)(C)Cl>>CC(C)(C)c1ccccc1
 FriedelCrafts acylation,Benzene + acetyl chloride,c1ccccc1.CC(=O)Cl>>CC(=O)c1ccccc1
 Electrophilic nitration,Benzene nitrobenzene,c1ccccc1>>O=[N+]([O-])c1ccccc1
