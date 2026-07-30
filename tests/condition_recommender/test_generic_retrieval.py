@@ -241,7 +241,7 @@ def test_low_confidence_family_uses_transformation_fallback() -> None:
     assert len(pool) == 3
 
 
-def test_family_fallback_never_crosses_bond_edit_gate() -> None:
+def test_related_edit_graph_can_cross_exact_bond_key_gate() -> None:
     query = _signature("query")
     records = [
         _record(
@@ -257,8 +257,8 @@ def test_family_fallback_never_crosses_bond_edit_gate() -> None:
         for index in range(3)
     ]
     level, pool = retrieve_generic_pool(query, build_generic_index(records))
-    assert level == "no_compatible_bond_edit"
-    assert pool == ()
+    assert level == "edit_graph_neighbors"
+    assert len(pool) == 3
 
 
 def test_compatibility_exclusion_continues_to_relaxed_tier() -> None:
@@ -501,7 +501,7 @@ def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:
 
     assert result.valid
     assert result.retrieval_level == "environment_neighbors"
-    assert result.retrieval_definition_version == "1.5"
+    assert result.retrieval_definition_version == "1.6"
     assert "REACTION_TOPOLOGY_FALLBACK_USED" in result.warnings
     assert any(
         caution.startswith("Reaction-scope mismatch:")
@@ -697,9 +697,10 @@ def test_generic_retrieval_weights_are_normalized() -> None:
     ranking = load_generic_ranking_rules()
     assert round(sum(similarity["weights"].values()), 10) == 1.0
     assert round(sum(ranking["weights"].values()), 10) == 1.0
-    assert rules["retrieval_ladder"][-2:] == [
+    assert rules["retrieval_ladder"][-3:] == [
         "environment_neighbors",
         "bond_edit_signature",
+        "edit_graph_neighbors",
     ]
 
 

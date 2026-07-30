@@ -230,3 +230,41 @@ def test_global_correspondence_is_reactant_order_invariant() -> None:
         reversed_order.reaction_signature.signature_id
     )
     assert forward.reaction_label == reversed_order.reaction_label
+
+
+def test_fragmented_correspondence_recovers_topology_changing_scaffold() -> None:
+    result = featurize_reaction("CNCCCN>>CN1CCC1", label_style="ascii")
+
+    assert result.evidence_quality == "fragmented_scaffold_correspondence"
+    assert result.reaction_signature is not None
+    assert result.reaction_signature.named_family is None
+    assert result.reaction_signature.topology.ring_count_delta == 1
+    assert result.reaction_signature.formed_bond_types == ("C-N:SINGLE",)
+    assert result.reaction_signature.broken_bond_types == ("C-N:SINGLE",)
+    assert "INFERRED_FRAGMENTED_SCAFFOLD_CORRESPONDENCE" in result.warnings
+
+
+def test_fragmented_correspondence_is_smiles_serialization_invariant() -> None:
+    forward = featurize_reaction("CNCCCN>>CN1CCC1")
+    reversed_smiles = featurize_reaction("NCCCNC>>C1CCN(C)1")
+
+    assert forward.reaction_signature is not None
+    assert reversed_smiles.reaction_signature is not None
+    assert (
+        forward.reaction_signature.signature_id
+        == reversed_smiles.reaction_signature.signature_id
+    )
+
+
+def test_fragmented_correspondence_abstains_for_competing_nitrogen_origins() -> None:
+    result = featurize_reaction(
+        "CCOC(=O)/C(CC)=N\\Nc1c(Cl)cccc1Cl"
+        ">>CCOC(=O)c1[nH]c2c(Cl)cc(Cl)cc2c1C"
+    )
+
+    assert result.evidence_quality == "ambiguous_atom_correspondence"
+    assert result.reaction_signature is None
+    assert any(
+        warning.startswith("AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:")
+        for warning in result.warnings
+    )

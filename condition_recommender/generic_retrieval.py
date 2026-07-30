@@ -9,6 +9,10 @@ from pathlib import Path
 from typing import Any, Dict, Literal, Mapping, Tuple
 
 from .compatibility import CompatibilityAssessment, filter_compatible_precedents
+from .edit_prototypes import (
+    anonymous_edit_prototype,
+    anonymous_edit_similarity,
+)
 from .generic_indexing import GenericIndexedReaction, GenericReactionIndex
 from .models import RetrievalLevelTrace
 from .signature_features import (
@@ -26,6 +30,7 @@ _SUPPORTED_RETRIEVAL_LEVELS = {
     "transformation_signature",
     "environment_neighbors",
     "bond_edit_signature",
+    "edit_graph_neighbors",
 }
 RetrievalStrategy = Literal[
     "hybrid",
@@ -46,7 +51,7 @@ _EVALUATION_STRATEGIES = {
 def load_generic_retrieval_rules() -> Dict[str, Any]:
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if str(rules.get("schema_version") or "") != "1.5":
+    if str(rules.get("schema_version") or "") != "1.6":
         raise ValueError("unsupported generic retrieval definition schema")
     if str(rules.get("definition_id") or "") != "generic_retrieval.v1":
         raise ValueError("unexpected generic retrieval definition ID")
@@ -81,6 +86,13 @@ def load_generic_retrieval_rules() -> Dict[str, Any]:
         raise ValueError(
             "environment_neighbor_min_similarity must be in (0, 1]"
         )
+    if int(rules["edit_graph_neighbor_limit"]) < 1:
+        raise ValueError("edit_graph_neighbor_limit must be positive")
+    edit_threshold = float(rules["edit_graph_neighbor_min_similarity"])
+    if not 0.0 < edit_threshold <= 1.0:
+        raise ValueError(
+            "edit_graph_neighbor_min_similarity must be in (0, 1]"
+        )
     return rules
 
 
@@ -102,7 +114,12 @@ def _candidate_levels(
     strategy: RetrievalStrategy = "hybrid",
 ) -> list[tuple[str, set[int]]]:
     compatible = _compatible_edit_positions(signature, index)
-    if not compatible:
+    edit_graph_neighbors = _edit_graph_neighbor_positions(
+        signature,
+        index,
+        exclude=compatible,
+    )
+    if not compatible and not edit_graph_neighbors:
         return []
     rules = load_generic_retrieval_rules()
     family = str(signature.get("named_family") or "")
@@ -134,6 +151,7 @@ def _candidate_levels(
             signature, index, compatible
         ),
         "bond_edit_signature": compatible,
+        "edit_graph_neighbors": edit_graph_neighbors,
     }
     ladder = (
         rules["retrieval_ladder"]
@@ -143,6 +161,41 @@ def _candidate_levels(
     if not ladder:
         raise ValueError(f"Unsupported generic retrieval strategy: {strategy}")
     return [(level, candidates[level]) for level in ladder]
+
+
+def _edit_graph_neighbor_positions(
+    signature: Mapping[str, Any],
+    index: GenericReactionIndex,
+    *,
+    exclude: set[int],
+) -> set[int]:
+    """Find chemistry-gated approximate edit graphs without family routing."""
+    query = anonymous_edit_prototype(signature)
+    if query is None:
+        return set()
+    rules = load_generic_retrieval_rules()
+    threshold = float(rules["edit_graph_neighbor_min_similarity"])
+    limit = int(rules["edit_graph_neighbor_limit"])
+    scored = []
+    for position, row in enumerate(index.rows):
+        if position in exclude or not row.signature:
+            continue
+        candidate = anonymous_edit_prototype(row.signature)
+        if candidate is None:
+            continue
+        score = anonymous_edit_similarity(query, candidate)
+        if score >= threshold:
+            scored.append(
+                (
+                    score,
+                    row.canonical_reaction_id,
+                    row.reaction_id,
+                    row.observation_id,
+                    position,
+                )
+            )
+    scored.sort(key=lambda item: (-item[0],) + item[1:])
+    return {item[-1] for item in scored[:limit]}
 
 
 def _environment_neighbor_positions(
@@ -204,8 +257,8 @@ def retrieve_generic_pool_with_trace(
 ]:
     """Select by independent support and retain every attempted tier."""
     minimum = _minimum_support(minimum_pool_size)
-    compatible = _compatible_edit_positions(signature, index)
-    if not compatible:
+    levels = _candidate_levels(signature, index, strategy=strategy)
+    if not levels:
         trace = RetrievalLevelTrace(
             level="bond_edit_gate",
             candidate_count=0,
@@ -217,7 +270,6 @@ def retrieve_generic_pool_with_trace(
             status="no_compatible_bond_edit",
         )
         return "no_compatible_bond_edit", (), (trace,)
-    levels = _candidate_levels(signature, index, strategy=strategy)
     fallback: tuple[str, set[int], int] | None = None
     traces = []
     for level, positions in levels:

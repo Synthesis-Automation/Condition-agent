@@ -1,0 +1,124 @@
+{
+  "schema_version": "2.0",
+  "converter_version": "generic_conversion.v2.4",
+  "reaction_signature_schema_version": "3.0",
+  "dataset_path": "data-processor\\reaction_dataset\\Fischer_indole_synthesis.csv",
+  "input_files": [
+    "data-processor\\reaction_dataset\\Fischer_indole_synthesis.csv"
+  ],
+  "file_count": 1,
+  "max_rows": null,
+  "row_count": 542,
+  "tier_counts": {
+    "verified": 0,
+    "review": 395,
+    "rejected": 147
+  },
+  "chemistry_status_counts": {
+    "unclassified": 0,
+    "verified": 0,
+    "review": 438,
+    "rejected": 104
+  },
+  "condition_status_counts": {
+    "unclassified": 0,
+    "resolved_complete": 319,
+    "resolved_partial": 0,
+    "unresolved_retained": 169,
+    "unusable": 54
+  },
+  "condition_stage_status_counts": {
+    "unclassified": 0,
+    "single_stage": 405,
+    "structured_multistage": 0,
+    "unassigned_multistage": 137
+  },
+  "outcome_status_counts": {
+    "unclassified": 0,
+    "usable": 542,
+    "missing": 0,
+    "invalid": 0
+  },
+  "index_eligibility_counts": {
+    "unclassified": 0,
+    "eligible": 45,
+    "review_only": 350,
+    "ineligible": 147
+  },
+  "reason_counts": {
+    "condition_identifier_uncertainty": 169,
+    "insufficient_edit_evidence": 59,
+    "insufficient_reactant_multiplicity": 1,
+    "missing_verified_reaction_signature": 379,
+    "multistage_conditions_not_structured": 137,
+    "no_condition_identifiers": 25,
+    "no_usable_transformation_evidence": 94,
+    "reaction_completeness_unresolved": 473,
+    "solvent_only_recipe": 29,
+    "suspected_missing_reactant": 9,
+    "unaccounted_product_heavy_atoms": 10
+  },
+  "evidence_quality_counts": {
+    "ambiguous_atom_correspondence": 362,
+    "fragmented_scaffold_correspondence": 4,
+    "global_atom_correspondence": 55,
+    "reactant_grammar_only": 77,
+    "unresolved": 44
+  },
+  "reaction_completeness_status_counts": {
+    "incomplete": 10,
+    "unresolved": 473,
+    "verified": 59
+  },
+  "signature_count": 59,
+  "signature_rate": 0.108856,
+  "transformation_class_counts": {
+    "generic_graph_transformation": 49,
+    "generic_multi_event_graph_transformation": 10
+  },
+  "named_family_counts": {},
+  "reaction_scope_counts": {
+    "intermolecular": 55,
+    "intramolecular": 4
+  },
+  "condition_resolution_status_counts": {
+    "resolved": 1016,
+    "unresolved": 173
+  },
+  "resolved_recipe_count": 120,
+  "recipe_warning_counts": {
+    "CONDITION_IDENTITY_UNCERTAINTY": 173,
+    "DUPLICATE_SOURCE_IDENTITY_MERGED": 21,
+    "MULTIPLE_POSSIBLE_ROLES": 70,
+    "SOURCE_FIELD_ROLE_MISMATCH": 229
+  },
+  "resolved_role_bucket_counts": {
+    "acids": 115,
+    "additives": 70,
+    "bases": 68,
+    "catalysts": 14,
+    "condensation_agents": 11,
+    "other_components": 369,
+    "solvents": 542
+  },
+  "role_confidence_counts": {
+    "high": 717,
+    "low": 369,
+    "medium": 103
+  },
+  "source_row_counts": {
+    "Fischer_indole_synthesis": 542
+  },
+  "source_tier_counts": {
+    "Fischer_indole_synthesis": {
+      "verified": 0,
+      "review": 395,
+      "rejected": 147
+    }
+  },
+  "duplicate_summary": {
+    "unique_canonical_reactions": 354,
+    "repeated_reaction_groups": 52,
+    "multi_recipe_groups": 47
+  }
+}

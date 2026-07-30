@@ -29,6 +29,7 @@ from .reaction_connectivity import (
     unknown_bond_state,
 )
 from .reaction_correspondence import (
+    infer_fragmented_scaffold_correspondence_candidates,
     infer_global_correspondence_candidates,
     infer_scaffold_correspondence_candidates,
 )
@@ -1108,6 +1109,7 @@ def normalize_inferred_scaffold_edits(
 ) -> EditNormalizationResult:
     """Infer edits only when all best scaffold mappings imply one chemistry."""
     correspondence = infer_scaffold_correspondence_candidates(reactants, products)
+    correspondence_warnings = set(correspondence.warnings)
     evidence = "unique_scaffold_correspondence"
     confidence = 0.85
     inferred_warning = "INFERRED_ATOM_CORRESPONDENCE"
@@ -1115,12 +1117,25 @@ def normalize_inferred_scaffold_edits(
         correspondence = infer_global_correspondence_candidates(
             reactants, products
         )
+        correspondence_warnings.update(correspondence.warnings)
         evidence = "global_atom_correspondence"
         confidence = 0.8
         inferred_warning = "INFERRED_GLOBAL_ATOM_CORRESPONDENCE"
     if not correspondence.valid:
+        correspondence = infer_fragmented_scaffold_correspondence_candidates(
+            reactants, products
+        )
+        correspondence_warnings.update(correspondence.warnings)
+        evidence = "fragmented_scaffold_correspondence"
+        confidence = 0.75
+        inferred_warning = "INFERRED_FRAGMENTED_SCAFFOLD_CORRESPONDENCE"
+    if not correspondence.valid:
         return EditNormalizationResult(
-            (), "unresolved", 0.0, correspondence.warnings, False
+            (),
+            "unresolved",
+            0.0,
+            tuple(sorted(correspondence_warnings)),
+            False,
         )
     all_candidate_results = tuple(
         (
@@ -1142,18 +1157,44 @@ def normalize_inferred_scaffold_edits(
         )
         for mapping in correspondence.candidates
     )
-    if evidence == "global_atom_correspondence":
+    if evidence in {
+        "global_atom_correspondence",
+        "fragmented_scaffold_correspondence",
+    }:
         nonempty_costs = tuple(
             _correspondence_edit_cost(edits)
             for _, edits, _ in all_candidate_results
             if edits
+            and (
+                evidence != "fragmented_scaffold_correspondence"
+                or sum(
+                    edit.edit_type != "hydrogen_change"
+                    for edit in edits
+                )
+                <= 12
+            )
         )
         best_cost = min(nonempty_costs) if nonempty_costs else None
         candidate_results = tuple(
             result
             for result in all_candidate_results
             for _, edits, _ in (result,)
-            if edits and _correspondence_edit_cost(edits) == best_cost
+            if edits
+            and (
+                evidence != "fragmented_scaffold_correspondence"
+                or sum(
+                    edit.edit_type != "hydrogen_change"
+                    for edit in edits
+                )
+                <= 12
+            )
+            and (
+                _correspondence_edit_cost(edits) == best_cost
+                if evidence != "fragmented_scaffold_correspondence"
+                else best_cost is not None
+                and _correspondence_edit_cost(edits)[0] <= best_cost[0] + 3
+                and _correspondence_edit_cost(edits)[1] <= best_cost[1] + 2
+            )
         )
     else:
         candidate_results = all_candidate_results

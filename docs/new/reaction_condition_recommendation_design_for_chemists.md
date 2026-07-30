@@ -146,7 +146,15 @@ The evidence order is:
 3. exact composition of multiple rewrites;
 4. conservative unique-scaffold correspondence;
 5. bounded global correspondence across supplied reactants;
-6. unresolved, ambiguous, or conflicting evidence.
+6. bounded fragmented-scaffold correspondence for topology-changing,
+   single-substrate reactions;
+7. unresolved, ambiguous, or conflicting evidence.
+
+Fragmented-scaffold correspondence is useful when cyclization or atom loss
+splits the conserved graph into pieces that an ordinary connected scaffold
+match cannot span. It enumerates symmetry-equivalent alternatives and accepts
+only one normalized edit interpretation. Close alternatives with different
+edits are reported as ambiguous rather than resolved by the reaction name.
 
 The system records:
 
@@ -268,6 +276,15 @@ explainable steps:
 
 Topology belongs in L0–L2. L3 can cross an intra/intermolecular boundary only
 as a disclosed fallback and must carry an explicit caution.
+
+After exact L3 retrieval, an additional anonymous edit-graph neighbor tier may
+relate reactions whose precursor forms produce similar but non-identical net
+edits. It requires shared formed-bond chemistry, compatible broken-bond
+chemistry, and compatible ring-count direction before similarity is evaluated.
+For example, a carbonyl plus arylhydrazine and its preformed hydrazone may enter
+an indole-forming transformation through different exact edit sets. This tier
+can relate them without using the words “Fischer indole” as a routing key. The
+result explicitly states that the exact bond-edit signatures differ.
 
 ## 6. Local reactivity profiles
 

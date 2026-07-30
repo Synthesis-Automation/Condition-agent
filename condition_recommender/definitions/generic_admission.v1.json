@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.6",
+  "schema_version": "1.7",
   "policy_id": "generic_admission.v1",
   "valid_yield_range": [0.0, 100.0],
   "verified_evidence": [
@@ -10,6 +10,7 @@
     "validated_mapping_and_exact_multi_event_reconstruction"
   ],
   "indexable_review_evidence": [
+    "fragmented_scaffold_correspondence",
     "global_atom_correspondence",
     "unique_scaffold_correspondence"
   ],

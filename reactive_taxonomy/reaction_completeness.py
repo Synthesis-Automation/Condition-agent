@@ -172,6 +172,7 @@ def build_reaction_completeness(
         and selected.verification == "exact_product_reconstruction"
     ) or bool(selected_events)
     correspondence_verified = edit_result.evidence in {
+        "fragmented_scaffold_correspondence",
         "unique_scaffold_correspondence",
         "global_atom_correspondence",
         "conflicting_stereochemical_evidence",

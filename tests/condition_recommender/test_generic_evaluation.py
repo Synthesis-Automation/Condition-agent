@@ -252,7 +252,7 @@ def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
     assert report["schema_version"] == "1.4"
     assert report["definition_versions"] == {
         "compatibility": "1.1",
-        "retrieval": "1.5",
+        "retrieval": "1.6",
         "similarity": "1.0",
         "ranking": "1.0",
     }

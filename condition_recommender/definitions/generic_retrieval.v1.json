@@ -1,18 +1,21 @@
 {
-  "schema_version": "1.5",
+  "schema_version": "1.6",
   "definition_id": "generic_retrieval.v1",
   "calibration_status": "calibrated_sample_v1",
   "minimum_pool_size": 2,
   "high_confidence_family_threshold": 0.9,
   "environment_neighbor_min_similarity": 0.5,
   "environment_neighbor_limit": 50,
+  "edit_graph_neighbor_min_similarity": 0.6,
+  "edit_graph_neighbor_limit": 100,
   "retrieval_ladder": [
     "exact_signature",
     "handle_signature",
     "named_family",
     "transformation_signature",
     "environment_neighbors",
-    "bond_edit_signature"
+    "bond_edit_signature",
+    "edit_graph_neighbors"
   ],
   "evaluation_ladders": {
     "family_only": [
@@ -23,7 +26,8 @@
       "handle_signature",
       "transformation_signature",
       "environment_neighbors",
-      "bond_edit_signature"
+      "bond_edit_signature",
+      "edit_graph_neighbors"
     ],
     "transformation_prior": [
       "transformation_signature"
@@ -33,7 +37,8 @@
       "handle_signature",
       "named_family",
       "transformation_signature",
-      "bond_edit_signature"
+      "bond_edit_signature",
+      "edit_graph_neighbors"
     ]
   },
   "calibration_provenance": {

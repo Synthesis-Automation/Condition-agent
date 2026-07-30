@@ -48,7 +48,7 @@ reactive_taxonomy       condition_registry
 | Molecular features | Implemented | Functional groups, reactive sites, canonical connectivity interfaces, typed reactivity profiles |
 | Reaction parsing | Implemented | Two- and three-part reaction SMILES with component, map, and source preservation |
 | Connectivity execution | V2 implemented | One bounded declarative rewrite path for all registered grammars; no legacy reaction-operator fallback |
-| Edit evidence | Implemented | Mapping, exact single/multi-event reconstruction, conservative scaffold correspondence, bounded global correspondence, conflicts, H/charge/stereo observations |
+| Edit evidence | Implemented | Mapping, exact single/multi-event reconstruction, conservative scaffold correspondence, bounded global and fragmented-scaffold correspondence, conflicts, H/charge/stereo observations |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting plus observation-only product-origin gaps |
 | Reaction signatures | Implemented | Deterministic RS3 L0–L4 signatures, events, topology, profiles, spectators, unknown-family support |
 | Reactivity descriptors | Implemented and active | Typed context-aware profiles are the sole active environment path |
@@ -84,6 +84,9 @@ The current code declares:
 | Generic converter definition | `generic_conversion.v2.4` |
 | Generic persisted index | `2.3` |
 | Generic recommendation result | `2.1` |
+| Reaction correspondence definitions | `2.3` |
+| Generic retrieval definition | `1.6` |
+| Generic admission policy | `generic_admission.v1.7` |
 
 Do not copy this table into executable code. The constants and definition files
 remain authoritative, and stale artifacts must fail validation rather than
@@ -115,6 +118,45 @@ sample and that unnamed reactions are retained. They are coverage and integrity
 measurements, not recommendation-accuracy claims. Because the source is capped
 per dataset, this artifact must not be described as a full-corpus production
 index.
+
+### 2.4 Grammar-independent Fischer POC
+
+The executable benchmark
+`benchmarks/fischer_indole_edit_poc.py` evaluates the 542-row Fischer source
+cohort without passing its source reaction name into featurization, signature
+identity, or retrieval. The current report is
+`results/fischer_indole_edit_poc.json`.
+
+The 2026-07-30 run found 356 unique reaction SMILES:
+
+| Measurement | Count |
+| --- | ---: |
+| Existing global-correspondence signatures | 54 |
+| New fragmented-scaffold signatures | 4 |
+| Total signatures | 58 |
+| Ambiguous correspondences retained as abstentions | 205 |
+| Anonymous edit prototypes among signatures | 3 |
+| Reference-disjoint signed queries with exact L3 support | 54 / 58 |
+| Reference-disjoint signed queries with edit-graph support | 58 / 58 |
+| Reference-disjoint queries linked across precursor modes | 58 / 58 |
+
+This is a successful retrieval POC but not a solved atom-mapping POC. The
+approximate edit graph connects the separate-reactant and preformed-hydrazone
+views for every currently signed query. The conservative correspondence
+provider admits only four additional reactions because competing nitrogen
+origins or symmetry-related mappings remain genuinely ambiguous from the
+unmapped source structures. Those 205 cases must not be bulk-admitted without
+curated mapping or an independently validated correspondence provider.
+
+The normal generic converter was also run over all 542 source rows. It produced
+59 signed observations and 45 index-eligible precedents; the compact report is
+`results/fischer_indole_poc_conversion/conversion_report.json`. A representative
+accepted preformed-hydrazone query used the persisted index and selected
+`edit_graph_neighbors`: 41 compatible candidates from 18 independent
+references. Its exact-signature through L3 pools contained only one independent
+reference, so the new tier supplied genuinely broader support. The result
+retained `named_family=None`, disclosed the intramolecular/intermolecular scope
+mismatch, and warned that the exact edit signatures differed.
 
 ## 3. Implemented chemistry contracts
 
@@ -184,11 +226,15 @@ exact signature
   -> transformation signature
   -> environment neighbors within compatible bond edits
   -> broad compatible bond edits
+  -> chemistry-gated anonymous edit-graph neighbors
   -> abstain
 ```
 
 The current minimum adequate pool is two independent support units. Family use
-requires high confidence and never bypasses edit compatibility.
+requires high confidence and never bypasses edit compatibility. The anonymous
+edit-graph tier may cross an exact L3 key only after shared formed/broken bond
+and ring-direction gates pass, and its use is disclosed in recommendation
+cautions.
 
 Compatibility runs before similarity. Ranking definitions are separated from
 retrieval definitions. Recipes are aggregated by `RCORE1`, while `RCR1`

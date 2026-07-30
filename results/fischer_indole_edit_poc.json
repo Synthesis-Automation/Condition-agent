@@ -1,0 +1,83 @@
+{
+  "ambiguous_correspondence_count": 205,
+  "anonymous_prototype_count": 3,
+  "artifact_type": "grammar_independent_edit_poc",
+  "elapsed_seconds": 190.309,
+  "evidence_quality_counts": {
+    "ambiguous_atom_correspondence": 205,
+    "fragmented_scaffold_correspondence": 4,
+    "global_atom_correspondence": 54,
+    "reactant_grammar_only": 54,
+    "unresolved": 39
+  },
+  "fragmented_signature_count": 4,
+  "holdout_signed_query_count": 4,
+  "named_family_count": 0,
+  "precursor_mode_counts": {
+    "multi_component": 165,
+    "single_substrate": 191
+  },
+  "reaction_name_used_in_signature_identity": false,
+  "reference_disjoint_retrieval_counts": {
+    "cross_mode_edit_graph": 58,
+    "edit_graph": 58,
+    "exact_l3": 54
+  },
+  "reference_disjoint_signed_query_count": 58,
+  "retrieval_counts": {
+    "cross_mode_edit_graph": 4,
+    "edit_graph": 4,
+    "exact_l3": 4
+  },
+  "retrieval_examples": {
+    "cross_mode_edit_graph": [
+      "31-467-CAS-11763730",
+      "31-467-CAS-13614546",
+      "31-467-CAS-18150568",
+      "31-467-CAS-2366366"
+    ],
+    "edit_graph": [
+      "31-467-CAS-11763730",
+      "31-467-CAS-13614546",
+      "31-467-CAS-18150568",
+      "31-467-CAS-2366366"
+    ],
+    "exact_l3": [
+      "31-467-CAS-11763730",
+      "31-467-CAS-13614546",
+      "31-467-CAS-18150568",
+      "31-467-CAS-2366366"
+    ],
+    "no_match": []
+  },
+  "row_count": 542,
+  "schema_version": "1.0",
+  "signature_count": 58,
+  "signature_coverage": 0.162921,
+  "source": "C:\\Git-softwares\\Condition-agent\\data-processor\\reaction_dataset\\Fischer_indole_synthesis.csv",
+  "source_label_role": "evaluation_cohort_only",
+  "source_label_used_for_routing": false,
+  "split_counts": {
+    "holdout": 64,
+    "train": 292
+  },
+  "top_warnings": {
+    "AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:2": 119,
+    "AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:3": 13,
+    "AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:4": 49,
+    "AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:6": 17,
+    "FRAGMENT_CORRESPONDENCE_CANDIDATE_LIMIT": 42,
+    "FRAGMENT_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE": 39,
+    "GLOBAL_CORRESPONDENCE_NOT_FOUND": 36,
+    "GLOBAL_CORRESPONDENCE_REQUIRES_MULTIPLE_PARTNERS": 47,
+    "INFERRED_GLOBAL_ATOM_CORRESPONDENCE": 54,
+    "MISSING_REACTANT_SUSPECTED": 9,
+    "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES": 265,
+    "REACTION_COMPLETENESS_UNRESOLVED": 288,
+    "SCAFFOLD_CORRESPONDENCE_INSUFFICIENT_CONSERVATION": 51,
+    "SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE": 39,
+    "UNACCOUNTED_PRODUCT_HEAVY_ATOMS": 10
+  },
+  "unique_reaction_count": 356,
+  "unique_reference_count": 104
+}

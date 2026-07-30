@@ -494,6 +494,11 @@ def rank_condition_recipes(
             )
         if retrieval_level.endswith("limited_support"):
             cautions.append("Retrieval pool is below the configured support threshold")
+        if retrieval_level.startswith("edit_graph_neighbors"):
+            cautions.append(
+                "Retrieval uses a chemistry-gated approximate edit graph; "
+                "the exact net bond-edit signature differs from the query"
+            )
         if len(recipe_variants) > 1:
             cautions.append(
                 f"Recipe core has {len(recipe_variants)} operating-condition variants"
@@ -509,6 +514,7 @@ def rank_condition_recipes(
                 for member in members
                 if str(member.row.signature.get("evidence_quality") or "")
                 in {
+                    "fragmented_scaffold_correspondence",
                     "global_atom_correspondence",
                     "unique_scaffold_correspondence",
                 }

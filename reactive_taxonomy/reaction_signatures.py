@@ -286,7 +286,11 @@ def _mapped_partners(
                     for site in component.compound_analysis.sites
                     if indices.intersection(site.atom_indices)
                 ),
-                key=lambda site: site.site_id,
+                key=lambda site: (
+                    site.chemist_label,
+                    site.site_type,
+                    tuple(sorted(str(value) for value in site.details.values())),
+                ),
             )
         )
         handles = tuple(
