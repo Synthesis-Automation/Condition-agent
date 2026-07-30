@@ -15,7 +15,11 @@ from .connectivity_rewrite import apply_connectivity_rewrite
 from .reaction_completeness import build_reaction_completeness
 from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_display_labels import build_reaction_display_label
-from .reaction_edits import normalize_mapped_edits, resolve_reaction_evidence
+from .reaction_edits import (
+    EditNormalizationResult,
+    normalize_mapped_edits,
+    resolve_reaction_evidence,
+)
 from .reaction_labels import render_reactant_label, render_reaction_label
 from .reaction_environments import build_reaction_family_environment
 from .reaction_fallback_descriptors import build_reaction_fallback_descriptor
@@ -54,6 +58,8 @@ def featurize_reaction(
     *,
     label_style: str = "unicode",
     max_candidates: int = 500,
+    _mapped_edit_override: EditNormalizationResult | None = None,
+    _mapped_provider: str = "supplied_atom_mapping",
 ) -> ReactionAnalysis:
     """Analyze a reaction with site grammars and product reconstruction."""
     parsed = parse_reaction_smiles(reaction_smiles)
@@ -77,7 +83,11 @@ def featurize_reaction(
     observed_products.discard(None)
     raw = enumerate_reaction_candidates(parsed.reactants)
     warnings = list(parsed.warnings)
-    supplied_mapping = normalize_mapped_edits(parsed.reactants, parsed.products)
+    supplied_mapping = (
+        _mapped_edit_override
+        if _mapped_edit_override is not None
+        else normalize_mapped_edits(parsed.reactants, parsed.products)
+    )
     invalid_supplied_mapping = supplied_mapping.evidence == "invalid_atom_mapping"
     if len(raw) > max_candidates:
         raw = raw[:max_candidates]
@@ -238,6 +248,8 @@ def featurize_reaction(
         selected,
         selected_events,
         tuple(candidates),
+        mapped_override=_mapped_edit_override,
+        mapped_provider=_mapped_provider,
     )
     reaction_completeness = build_reaction_completeness(
         reactants=parsed.reactants,
@@ -339,6 +351,8 @@ def featurize_reaction(
     }:
         effective_evidence = edit_result.evidence
     elif edit_result.evidence.startswith("validated_mapping"):
+        effective_evidence = edit_result.evidence
+    elif edit_result.evidence.startswith("external_mapping"):
         effective_evidence = edit_result.evidence
     elif selected is None and (
         edit_result.valid or edit_result.evidence == "ambiguous_atom_correspondence"

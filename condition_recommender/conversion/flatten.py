@@ -36,6 +36,11 @@ GENERIC_REVIEW_FIELDS = (
     "reaction_completeness_warnings",
     "reaction_completeness_json",
     "reaction_evidence_providers",
+    "external_mapping_status",
+    "external_mapping_provider",
+    "external_mapping_confidence",
+    "external_mapping_matched_hypothesis_ids",
+    "external_atom_mapping_json",
     "reaction_edit_hypothesis_count",
     "reaction_edit_hypothesis_ids",
     "reaction_edit_hypotheses_json",
@@ -93,6 +98,7 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
     topology = (record.reaction_signature or {}).get("topology") or {}
     signature = record.reaction_signature or {}
     completeness = record.reaction_completeness or {}
+    external_mapping = record.external_atom_mapping or {}
     return {
         "schema_version": record.schema_version,
         "observation_id": record.observation_id,
@@ -136,6 +142,28 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
             candidate.get("provider", "")
             for candidate in record.reaction_evidence_candidates
             if candidate.get("provider")
+        ),
+        "external_mapping_status": external_mapping.get("status", ""),
+        "external_mapping_provider": (
+            (external_mapping.get("provider") or {}).get("provider_id", "")
+        ),
+        "external_mapping_confidence": (
+            external_mapping.get("mapper_confidence")
+            if external_mapping.get("mapper_confidence") is not None
+            else ""
+        ),
+        "external_mapping_matched_hypothesis_ids": _joined(
+            external_mapping.get("matched_hypothesis_ids") or ()
+        ),
+        "external_atom_mapping_json": (
+            json.dumps(
+                external_mapping,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            if external_mapping
+            else ""
         ),
         "reaction_edit_hypothesis_count": len(
             record.reaction_edit_hypotheses

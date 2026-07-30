@@ -1518,16 +1518,24 @@ def resolve_reaction_evidence(
     selected: Optional[ReactionCandidate],
     selected_events: Tuple[ReactionCandidate, ...] = (),
     candidates: Tuple[ReactionCandidate, ...] = (),
+    *,
+    mapped_override: Optional[EditNormalizationResult] = None,
+    mapped_provider: str = "supplied_atom_mapping",
 ) -> EditNormalizationResult:
     """Collect provider evidence and resolve it through one authority ladder."""
-    mapped = normalize_mapped_edits(reactants, products)
+    mapped = (
+        mapped_override
+        if mapped_override is not None
+        else normalize_mapped_edits(reactants, products)
+    )
+    external_mapping = mapped_provider != "supplied_atom_mapping"
     predicted = normalize_predicted_edits(selected, reactants)
     predicted_multi = normalize_predicted_multi_event_edits(
         selected_events, reactants
     )
     provider_candidates = _provider_candidates(
         (
-            ("supplied_atom_mapping", mapped),
+            (mapped_provider, mapped),
             ("exact_reconstruction", predicted),
             ("exact_multi_event_reconstruction", predicted_multi),
         )
@@ -1552,8 +1560,12 @@ def resolve_reaction_evidence(
         if mapped_keys == predicted_keys:
             return EditNormalizationResult(
                 mapped.edits,
-                "validated_mapping_and_exact_reconstruction",
-                1.0,
+                (
+                    "external_mapping_and_exact_reconstruction"
+                    if external_mapping
+                    else "validated_mapping_and_exact_reconstruction"
+                ),
+                min(mapped.confidence, predicted.confidence),
                 warnings,
                 True,
                 mapped.stereo_changes,
@@ -1594,8 +1606,12 @@ def resolve_reaction_evidence(
         if mapped_keys == predicted_keys:
             return EditNormalizationResult(
                 mapped.edits,
-                "validated_mapping_and_exact_multi_event_reconstruction",
-                1.0,
+                (
+                    "external_mapping_and_exact_multi_event_reconstruction"
+                    if external_mapping
+                    else "validated_mapping_and_exact_multi_event_reconstruction"
+                ),
+                min(mapped.confidence, predicted_multi.confidence),
                 warnings,
                 True,
                 mapped.stereo_changes,
@@ -1730,6 +1746,9 @@ def normalize_reaction_edits(
     selected: Optional[ReactionCandidate],
     selected_events: Tuple[ReactionCandidate, ...] = (),
     candidates: Tuple[ReactionCandidate, ...] = (),
+    *,
+    mapped_override: Optional[EditNormalizationResult] = None,
+    mapped_provider: str = "supplied_atom_mapping",
 ) -> EditNormalizationResult:
     """Compatibility alias for the evidence-provider resolver."""
     return resolve_reaction_evidence(
@@ -1738,6 +1757,8 @@ def normalize_reaction_edits(
         selected,
         selected_events,
         candidates,
+        mapped_override=mapped_override,
+        mapped_provider=mapped_provider,
     )
 
 

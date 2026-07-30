@@ -7,7 +7,12 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Hashable, TypeVar
 
 from condition_registry import ResolvedConditionRecipe, build_resolved_recipe
-from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy import (
+    AtomMappingProvider,
+    ExternalMappingAssessment,
+    analyze_reaction_with_external_mapping,
+    featurize_reaction,
+)
 
 from ..condition_normalization import normalize_cas_list
 from ..models import ConditionIdentity, RecommendationRecord
@@ -27,6 +32,7 @@ class GenericConversionCache:
 
     max_entries: int = 100_000
     analyses: Dict[Hashable, Any] = field(default_factory=dict)
+    external_assessments: Dict[Hashable, Any] = field(default_factory=dict)
     canonical_reactions: Dict[Hashable, Any] = field(default_factory=dict)
     references: Dict[Hashable, Any] = field(default_factory=dict)
     recipes: Dict[Hashable, Any] = field(default_factory=dict)
@@ -90,18 +96,58 @@ def convert_record(
     record: RawReactionRecord,
     *,
     cache: GenericConversionCache | None = None,
+    mapping_provider: AtomMappingProvider | None = None,
 ) -> RecommendationRecord:
     """Convert one source-faithful row without a declared-family requirement."""
-    if cache is None:
+    assessment: ExternalMappingAssessment | None = None
+    if mapping_provider is not None:
+        provider_metadata = mapping_provider.metadata
+        base_analysis = (
+            featurize_reaction(record.reaction_smiles)
+            if cache is None
+            else cache.get(
+                cache.analyses,
+                record.reaction_smiles,
+                lambda: featurize_reaction(record.reaction_smiles),
+            )
+        )
+        assessment_key = (
+            record.reaction_smiles,
+            provider_metadata.provider_id,
+            provider_metadata.provider_version,
+            provider_metadata.model_id,
+            provider_metadata.model_sha256,
+        )
+        assessment = (
+            analyze_reaction_with_external_mapping(
+                record.reaction_smiles,
+                mapping_provider,
+                base_analysis=base_analysis,
+            )
+            if cache is None
+            else cache.get(
+                cache.external_assessments,
+                assessment_key,
+                lambda: analyze_reaction_with_external_mapping(
+                    record.reaction_smiles,
+                    mapping_provider,
+                    base_analysis=base_analysis,
+                ),
+            )
+        )
+        analysis = assessment.analysis
+    elif cache is None:
         analysis = featurize_reaction(record.reaction_smiles)
-        canonical_identity = canonical_reaction_identity(record.reaction_smiles)
-        reference_identity = normalize_reference(record.reference)
     else:
         analysis = cache.get(
             cache.analyses,
             record.reaction_smiles,
             lambda: featurize_reaction(record.reaction_smiles),
         )
+    if cache is None:
+        canonical_identity = canonical_reaction_identity(record.reaction_smiles)
+        reference_identity = normalize_reference(record.reference)
+    else:
         canonical_identity = cache.get(
             cache.canonical_reactions,
             record.reaction_smiles,
@@ -222,6 +268,11 @@ def convert_record(
         if analysis.display_label
         else None,
         **signature_record_fields(analysis),
+        external_atom_mapping=(
+            assessment.to_provenance_dict()
+            if assessment is not None
+            else None
+        ),
         source_dataset=record.source_dataset,
         source_path=record.source_path,
         source_declared_family=record.source_declared_family,

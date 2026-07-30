@@ -443,6 +443,23 @@ python -m condition_recommender.generic_conversion_cli `
   results/generic_conversion
 ```
 
+For unresolved or ambiguous reactions, the standard converter can optionally
+run the installed RXNMapper provider:
+
+```powershell
+python -m pip install -r requirements-mapping.txt
+
+python -m condition_recommender.generic_conversion_cli `
+  data-processor/reaction_dataset/Fischer_indole_synthesis.csv `
+  results/fischer_indole_rxnmapper_conversion `
+  --use-rxnmapper
+```
+
+The generated mapping, provider/model provenance, confidence, coverage,
+internal-hypothesis match, and disposition are stored in canonical JSONL and
+review CSV. Mapper-derived records remain `review_only` and are excluded from
+the default index.
+
 The converter writes canonical nested `records.jsonl`, tiered CSV review views,
 and JSON/Markdown coverage reports. Exact reconstructed signatures and valid
 mapped signatures may be admitted even when `named_family` is absent. Source
@@ -521,6 +538,18 @@ python -m condition_recommender.generic_index_cli `
 python -m condition_recommender.generic_recommend_cli `
   "<reaction_smiles>" `
   --records results/generic_conversion/generic_index.json
+```
+
+Add `--use-rxnmapper` for an unmapped query that ordinary featurization cannot
+resolve. A mapper-supported query can retrieve independently verified
+precedents, but the result reports the external-mapping status and adds
+expert-review cautions:
+
+```powershell
+python -m condition_recommender.generic_recommend_cli `
+  "O=C1CCCCC1.Cl.NNc1ccc(F)cc1>>Fc1ccc2[nH]c3c(c2c1)CCCC3" `
+  --records results/generic_conversion/generic_index.json `
+  --use-rxnmapper
 ```
 
 For output made by the desktop app, use the fast index directly:

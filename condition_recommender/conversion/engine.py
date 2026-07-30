@@ -10,7 +10,10 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from condition_registry import CONDITION_RECIPE_COMPONENT_BUCKETS
-from reactive_taxonomy import REACTION_SIGNATURE_SCHEMA_VERSION
+from reactive_taxonomy import (
+    REACTION_SIGNATURE_SCHEMA_VERSION,
+    AtomMappingProvider,
+)
 
 from ..models import (
     AdmissionTier,
@@ -22,7 +25,7 @@ from ..models import (
     OutcomeStatus,
 )
 from .flatten import GENERIC_REVIEW_FIELDS, flatten_generic_record
-from .generic import convert_record
+from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
 
@@ -38,6 +41,10 @@ def _markdown(report: Dict[str, Any]) -> str:
             f"- Rejected: {report['tier_counts']['rejected']}",
             f"- Index eligible: {report['index_eligibility_counts']['eligible']}",
             f"- Signature coverage: {report['signature_count']}/{report['row_count']}",
+            (
+                "- External atom mapping: "
+                f"{'enabled' if report['external_atom_mapping']['enabled'] else 'disabled'}"
+            ),
             f"- Unique canonical reactions: {report['duplicate_summary']['unique_canonical_reactions']}",
             f"- Multi-recipe groups: {report['duplicate_summary']['multi_recipe_groups']}",
             "",
@@ -52,6 +59,7 @@ def convert_datasets(
     output_dir: str | Path,
     *,
     max_rows: Optional[int] = None,
+    mapping_provider: AtomMappingProvider | None = None,
 ) -> Dict[str, Any]:
     """Convert one CSV or a directory of CSVs through the common engine."""
     paths = discover_csv_datasets(dataset_path)
@@ -78,9 +86,11 @@ def convert_datasets(
     resolved_recipe_counts = Counter()
     role_bucket_counts = Counter()
     role_confidence_counts = Counter()
+    external_mapping_status_counts = Counter()
     canonical_groups: Counter[str] = Counter()
     group_recipes: Dict[str, set[str]] = defaultdict(set)
     row_count = signature_count = 0
+    cache = GenericConversionCache()
     with ExitStack() as stack:
         jsonl = stack.enter_context(
             (destination / "records.jsonl").open("w", encoding="utf-8")
@@ -103,7 +113,11 @@ def convert_datasets(
                 if max_rows is not None and row_count >= max_rows:
                     stop = True
                     break
-                record = convert_record(raw_record)
+                record = convert_record(
+                    raw_record,
+                    cache=cache,
+                    mapping_provider=mapping_provider,
+                )
                 payload = record.to_dict()
                 jsonl.write(json.dumps(payload, ensure_ascii=False, sort_keys=True))
                 jsonl.write("\n")
@@ -118,6 +132,13 @@ def convert_datasets(
                 index_eligibility_counts[record.index_eligibility.value] += 1
                 reason_counts.update(record.admission_reasons)
                 evidence_counts[record.evidence_quality] += 1
+                if record.external_atom_mapping is not None:
+                    external_mapping_status_counts[
+                        str(
+                            record.external_atom_mapping.get("status")
+                            or "missing"
+                        )
+                    ] += 1
                 completeness_counts[
                     str(
                         (record.reaction_completeness or {}).get("status")
@@ -163,7 +184,7 @@ def convert_datasets(
     repeated_groups = sum(count > 1 for count in canonical_groups.values())
     multi_recipe_groups = sum(len(recipes) > 1 for recipes in group_recipes.values())
     report: Dict[str, Any] = {
-        "schema_version": "2.0",
+        "schema_version": "2.1",
         "converter_version": GENERIC_CONVERTER_DEFINITION_VERSION,
         "reaction_signature_schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
         "dataset_path": str(Path(dataset_path)),
@@ -194,6 +215,22 @@ def convert_datasets(
         },
         "reason_counts": dict(sorted(reason_counts.items())),
         "evidence_quality_counts": dict(sorted(evidence_counts.items())),
+        "external_atom_mapping": {
+            "enabled": mapping_provider is not None,
+            "provider": (
+                {
+                    "provider_id": mapping_provider.metadata.provider_id,
+                    "provider_version": mapping_provider.metadata.provider_version,
+                    "model_id": mapping_provider.metadata.model_id,
+                    "model_sha256": mapping_provider.metadata.model_sha256,
+                }
+                if mapping_provider is not None
+                else None
+            ),
+            "status_counts": dict(
+                sorted(external_mapping_status_counts.items())
+            ),
+        },
         "reaction_completeness_status_counts": dict(
             sorted(completeness_counts.items())
         ),

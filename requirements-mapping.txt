@@ -1,0 +1,2 @@
+# Optional offline atom-correspondence provider for POCs and review-mode APIs.
+rxnmapper==0.4.3

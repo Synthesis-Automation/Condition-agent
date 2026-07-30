@@ -178,6 +178,52 @@ are providers of structural evidence; they are not separate recommendation
 pipelines. The resolver applies one precedence and contradiction policy after
 the providers run. `normalize_reaction_edits()` remains a compatibility alias.
 
+An optional RXNMapper provider is available for offline benchmarks and explicit
+converter/query-time review mode:
+
+```powershell
+python -m pip install -r requirements-mapping.txt
+python benchmarks/fischer_rxnmapper_poc.py --progress
+
+python -m condition_recommender.generic_conversion_cli `
+  data-processor/reaction_dataset/Fischer_indole_synthesis.csv `
+  results/fischer_indole_rxnmapper_conversion `
+  --use-rxnmapper
+
+python -m condition_recommender.generic_recommend_cli `
+  "<reaction_smiles>" `
+  --records "<generic_index.json>" `
+  --use-rxnmapper
+```
+
+The adapter is implemented in
+[`external_atom_mapping.py`](../reactive_taxonomy/external_atom_mapping.py).
+It verifies that mapper serialization preserved the input chemistry, projects
+only retained-to-unreported attachment boundaries, and reuses the typed mapped
+edit normalizer. Generated edits use `external_atom_mapping` evidence and carry
+the mapper confidence. They are not silently treated as supplied maps.
+
+The integration first runs ordinary internal analysis. It skips the mapper for
+reactions with supplied maps or an existing resolved signature. For an
+unresolved or ambiguous reaction it records one of these dispositions:
+
+- `external_mapping_internal_consensus`: exactly one internal edit hypothesis
+  matches the external normalized edit profile;
+- `external_mapping_only`: the mapper supplies a valid edit profile where no
+  internal hypotheses exist;
+- `external_mapping_hypothesis_conflict` or
+  `external_mapping_ambiguous_hypothesis_match`: retain the original
+  hypotheses and route to review;
+- `external_mapping_signature_unavailable` or `external_mapping_failed`: retain
+  the base analysis and failure provenance.
+
+Converter records serialize this assessment as `external_atom_mapping`.
+Mapper-derived signatures are always `review_only` and excluded from the
+default index. At query time the first two dispositions may use the normal
+signature retrieval ladder against already-verified precedents, with mapper
+status, provider, confidence, and mandatory expert-review cautions in the
+result.
+
 The global fallback is used only for unmapped, single-main-product reactions
 after exact reconstruction and the narrower scaffold fallback fail. It matches
 conserved subgraphs from a bounded number of reactant components into
@@ -536,6 +582,8 @@ During dataset conversion,
 - serializes the nested reaction signature;
 - serializes provider evidence and edit hypotheses for review even when no
   signature can be issued;
+- optionally reconciles RXNMapper proposals, serializes their full provenance,
+  and keeps every mapper-derived precedent review-only;
 - exposes L0-L4 keys in review exports;
 - places the record into verified, review, or rejected tiers.
 

@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.5"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.5"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.6"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.6"
 
 
 class AdmissionTier(str, Enum):
@@ -129,6 +129,7 @@ class RecommendationRecord:
     reaction_signature: Optional[Dict[str, Any]] = None
     reaction_evidence_candidates: Tuple[Dict[str, Any], ...] = ()
     reaction_edit_hypotheses: Tuple[Dict[str, Any], ...] = ()
+    external_atom_mapping: Optional[Dict[str, Any]] = None
     fallback_descriptor: Optional[Dict[str, Any]] = None
     reaction_display_label: Optional[Dict[str, Any]] = None
     transformation_class: Optional[str] = None
@@ -228,6 +229,9 @@ class GenericRecommendationResult:
     query_signature_id: Optional[str] = None
     query_fallback_descriptor_id: Optional[str] = None
     query_edit_hypothesis_ids: Tuple[str, ...] = ()
+    external_mapping_status: Optional[str] = None
+    external_mapping_provider: Optional[str] = None
+    external_mapping_confidence: Optional[float] = None
     recommendation_mode: str = "verified_signature"
     reaction_label: Optional[str] = None
     reaction_label_status: str = "unavailable"
@@ -247,7 +251,7 @@ class GenericRecommendationResult:
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "2.2"
+    schema_version: str = "2.3"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

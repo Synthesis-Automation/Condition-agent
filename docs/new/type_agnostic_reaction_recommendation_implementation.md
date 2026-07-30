@@ -49,6 +49,7 @@ reactive_taxonomy       condition_registry
 | Reaction parsing | Implemented | Two- and three-part reaction SMILES with component, map, and source preservation |
 | Connectivity execution | V2 implemented | One bounded declarative rewrite path for all registered grammars; no legacy reaction-operator fallback |
 | Edit evidence | Implemented | Typed provider candidates from mapping, exact single/multi-event reconstruction, conservative scaffold, bounded global, and fragmented-scaffold correspondence; distinct ambiguous edit hypotheses; conflicts and H/charge/stereo observations |
+| External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, persisted with model provenance, and never admitted as verified precedents |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting plus observation-only product-origin gaps |
 | Reaction signatures | Implemented | Deterministic RS3 L0–L4 signatures, events, topology, profiles, spectators, unknown-family support |
 | Reactivity descriptors | Implemented and active | Typed context-aware profiles are the sole active environment path |
@@ -80,13 +81,13 @@ The current code declares:
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `1.2` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `3.5` |
-| Generic converter definition | `generic_conversion.v2.5` |
+| Recommendation record | `3.6` |
+| Generic converter definition | `generic_conversion.v2.6` |
 | Generic persisted index | `2.3` |
-| Generic recommendation result | `2.2` |
+| Generic recommendation result | `2.3` |
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.6` |
-| Generic admission policy | `generic_admission.v1.7` |
+| Generic admission policy | `generic_admission.v1.8` |
 
 Do not copy this table into executable code. The constants and definition files
 remain authoritative, and stale artifacts must fail validation rather than
@@ -113,9 +114,9 @@ The sharded conversion report records zero failed shards and zero duplicate
 observations. The artifact itself is index schema `2.3`, but it was generated
 with reaction-correspondence definition `2.2`. Current code declares `2.3` and
 therefore rejects this index until it is regenerated. This is deliberate:
-record-schema `3.4` and converter `v2.4` are explicitly index-compatible with
-their review-only successors, but chemistry-definition identities are not
-silently mixed.
+record-schema `3.4`/converter `v2.4` and record-schema `3.5`/converter `v2.5`
+are explicitly index-compatible with the current review-provenance additions
+in `3.6`/`v2.6`, but chemistry-definition identities are not silently mixed.
 
 These counts demonstrate that the type-agnostic path works on a broad bounded
 sample and that unnamed reactions are retained. They are coverage and integrity
@@ -180,7 +181,113 @@ reference, so the new tier supplied genuinely broader support. The result
 retained `named_family=None`, disclosed the intramolecular/intermolecular scope
 mismatch, and warned that the exact edit signatures differed.
 
-### 2.5 Knorr/Paal–Knorr transfer audit
+### 2.5 External RXNMapper Fischer POC
+
+The optional offline dependency is pinned in `requirements-mapping.txt`.
+`reactive_taxonomy.external_atom_mapping` provides an instance-scoped
+`RxnMapperProvider`; it does not import or depend on the legacy `chemtools`
+adapter. Every generated mapping is reparsed, checked for exact preservation of
+the original reactant/product structures, and passed through the typed mapped
+edit normalizer. Provider and model version, model SHA-256, confidence,
+coverage, warnings, and the mapped reaction are retained.
+
+RXNMapper normally leaves atoms absent from the reported product unnumbered.
+The adapter identifies only an unmapped reactant atom directly attached to a
+mapped retained atom as a projected boundary. This recovers attachment losses
+such as C=O and N–N cleavage in Fischer cyclization without mapping all bonds in
+an unreported fragment or treating an unattached chloride as a broken bond.
+
+`benchmarks/fischer_rxnmapper_poc.py` evaluated all 542 rows (356 unique
+reaction SMILES). The compact report is
+`results/fischer_rxnmapper_poc/report.json`; auditable per-reaction mappings
+and normalized edits are in
+`results/fischer_rxnmapper_poc/mapped_reactions.jsonl.gz`.
+
+| Measurement | Result |
+| --- | ---: |
+| Valid, structure-preserving mappings | 356 / 356 |
+| Full reported-product atom coverage | 356 / 356 |
+| Exact agreement with existing signed edit sets | 58 / 58 |
+| Ambiguous cases selecting exactly one internal hypothesis | 188 / 205 |
+| Ambiguous cases matching no internal hypothesis | 17 / 205 |
+| Mapper-only cases retained for review | 93 |
+| Reactant-order stable edit profiles | 24 / 24 |
+| Alternate-SMILES stable edit profiles | 24 / 24 |
+| Median / mean mapper confidence | 0.661 / 0.628 |
+| Batch mapping time, excluding existing analysis | 24.4 s |
+
+The representative cyclohexanone/4-fluorophenylhydrazine reaction receives the
+expected two formed aromatic bonds, C=O and N–N attachment losses, two bond
+order changes, and three hydrogen losses. RXNMapper selects exactly one of the
+two existing edit hypotheses at confidence 0.656.
+
+This evidence is now available through an optional converter and query-time
+integration, while retaining the POC's trust boundary:
+
+- the provider runs only when supplied mapping and resolved internal evidence
+  are absent;
+- one external profile matching exactly one retained internal hypothesis
+  receives `external_mapping_internal_consensus`;
+- a valid external profile with no internal hypothesis receives
+  `external_atom_mapping`;
+- zero or multiple hypothesis matches preserve the original unresolved
+  analysis and record an explicit conflict;
+- every converted mapper-derived signature is `review_only` and therefore
+  excluded from the default precedent index;
+- the recommender may use a mapper-supported query signature to retrieve only
+  already-verified indexed precedents, and adds mapper provenance and mandatory
+  expert-review cautions.
+
+Enable this mode explicitly:
+
+```powershell
+python -m condition_recommender.generic_conversion_cli `
+  data-processor/reaction_dataset/Fischer_indole_synthesis.csv `
+  results/fischer_indole_rxnmapper_conversion `
+  --use-rxnmapper
+
+python -m condition_recommender.generic_index_cli `
+  results/fischer_indole_rxnmapper_conversion/records.jsonl `
+  results/fischer_indole_rxnmapper_conversion/generic_index.json
+
+python -m condition_recommender.generic_recommend_cli `
+  "O=C1CCCCC1.Cl.NNc1ccc(F)cc1>>Fc1ccc2[nH]c3c(c2c1)CCCC3" `
+  --records results/fischer_indole_rxnmapper_conversion/generic_index.json `
+  --use-rxnmapper
+```
+
+The converter writes the assessment status, provider/model version and hash,
+confidence, mapping coverage, mapped reaction, matched hypothesis IDs,
+warnings, and error into `external_atom_mapping`. Review CSVs expose the
+high-value fields plus the complete nested JSON. Mapper confidence is not an
+admission or tie-breaking authority. The 188 selected hypotheses and 93
+mapper-only POC results still require broader cross-chemistry or independent
+chemist/provider validation before any future verified-precedent promotion;
+the 17 disagreements remain explicit review cases.
+
+The integrated converter was run over all 542 Fischer rows. Its report is
+`results/fischer_indole_rxnmapper_conversion/conversion_report.json`:
+
+| Integrated conversion measurement | Rows |
+| --- | ---: |
+| Mapper/internal single-hypothesis consensus | 324 |
+| Mapper-only signatures | 111 |
+| External/internal hypothesis conflicts | 38 |
+| External signature unavailable | 10 |
+| Existing internally resolved rows; mapper skipped | 59 |
+| Rows with a reaction signature | 494 / 542 |
+| Default-index eligible rows | 45 |
+| Review-only / ineligible rows | 430 / 67 |
+
+The 45-row default index is unchanged from the internal-only Fischer
+precedent set; none of the mapper-participating rows entered it. The
+representative cyclohexanone/4-fluorophenylhydrazine query then ran through the
+persisted index with `external_mapping_internal_consensus` at mapper confidence
+0.656. It selected `handle_signature`, found 11 compatible observations from
+two independent support units, and returned two recipes with external-mapping
+and expert-review cautions.
+
+### 2.6 Knorr/Paal–Knorr transfer audit
 
 The same name-free benchmark was run against the 652-row
 `Knorr_pyrrole_synthesis.csv` source. The report is
@@ -206,7 +313,7 @@ without an independent edit-graph neighbor and the three non-consensus
 ambiguous reactions remain abstentions in this cohort. These are neighbor
 coverage measurements, not validation of condition suitability.
 
-### 2.6 High-ROI canonical-site expansion
+### 2.7 High-ROI canonical-site expansion
 
 The current identity definitions add five conservative observation classes
 without adding a named-family route or automatically registering a reaction
@@ -293,6 +400,8 @@ The converter serializes:
 
 - source row, file, reaction, and reference provenance;
 - reaction analysis, signature, completeness, fallback, and conflicts;
+- optional external-mapping disposition, mapped proposal, coverage, confidence,
+  provider/model identity, matched internal hypotheses, and warnings;
 - chemistry, condition, stage, outcome, and index-eligibility statuses;
 - resolved recipe core and variants;
 - reference-local condition-series identity;
@@ -349,6 +458,12 @@ query-only branch before ordinary structure fallback. The policy in
 
 This branch consumes only verified indexed precedents. It does not issue an
 RS3 identity for the query and does not alter converter admission.
+
+When optional external mapping produces a review-qualified query signature,
+the normal verified-signature ladder is used against the same verified index.
+The result reports `external_mapping_status`, provider, confidence,
+`recommendation_mode`, and mandatory expert-review warnings. External
+mapper-derived converted rows do not enter that index by default.
 
 ## 5. What is not complete
 

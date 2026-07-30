@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "generic_index_integrity",
+  "path": "results\\fischer_indole_rxnmapper_conversion\\generic_index.json",
+  "valid": true,
+  "issues": [],
+  "index_id": "GRI1:42c0f161784967f323dd5e77df52421112c2f9438e2110853782afdb823e2fbe",
+  "index_schema_version": "2.3",
+  "row_count": 45,
+  "file_size_bytes": 1923555,
+  "duplicate_observation_count": 0,
+  "key_counts": {
+    "exact": 26,
+    "handles": 9,
+    "transformations": 3,
+    "bond_edits": 3,
+    "environments": 22,
+    "environment_features": 40,
+    "fallback_features": 0,
+    "families": 0
+  },
+  "transformation_class_counts": {
+    "generic_graph_transformation": 37,
+    "generic_multi_event_graph_transformation": 8
+  },
+  "named_family_counts": {
+    "unnamed": 45
+  },
+  "reaction_scope_counts": {
+    "intermolecular": 41,
+    "intramolecular": 4
+  },
+  "unique_reference_count": 19,
+  "unique_recipe_core_count": 17
+}

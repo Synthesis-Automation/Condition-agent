@@ -30,14 +30,19 @@ from .fallback_similarity import fallback_index_tokens
 
 GENERIC_INDEX_SCHEMA_VERSION = "2.3"
 
-# Record schema 3.5 / converter v2.5 add query-review evidence only. They do not
-# change the verified signature, fallback descriptor, recipe, or index-row
-# contracts, so existing v3.4/v2.4 persisted indices remain chemistry-compatible.
+# Record schema 3.6 / converter v2.6 add optional external-mapping review
+# provenance only. They do not change verified signature, fallback descriptor,
+# recipe, or index-row contracts, so persisted v3.4/v2.4 and v3.5/v2.5 indices
+# remain chemistry-compatible.
 _INDEX_COMPATIBLE_RECORD_SCHEMAS = frozenset(
-    {"3.4", RECOMMENDATION_RECORD_SCHEMA_VERSION}
+    {"3.4", "3.5", RECOMMENDATION_RECORD_SCHEMA_VERSION}
 )
 _INDEX_COMPATIBLE_CONVERTER_VERSIONS = frozenset(
-    {"generic_conversion.v2.4", GENERIC_CONVERTER_DEFINITION_VERSION}
+    {
+        "generic_conversion.v2.4",
+        "generic_conversion.v2.5",
+        GENERIC_CONVERTER_DEFINITION_VERSION,
+    }
 )
 
 
@@ -280,6 +285,18 @@ def build_generic_index(
     """Build lookup maps, admitting only records with signatures and recipes."""
     rows = []
     for record in records:
+        external_mapping = record.get("external_atom_mapping")
+        external_mapping_status = (
+            str(external_mapping.get("status") or "")
+            if isinstance(external_mapping, Mapping)
+            else ""
+        )
+        if (
+            not include_review
+            and external_mapping_status
+            and not external_mapping_status.startswith("not_requested_")
+        ):
+            continue
         eligibility = _enum_value(record.get("index_eligibility"))
         if eligibility != "eligible" and not (
             include_review and eligibility == "review_only"

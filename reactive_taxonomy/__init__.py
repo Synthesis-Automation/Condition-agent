@@ -4,6 +4,19 @@ from .api import detect_sites, featurize_molecule
 from .reaction_api import featurize_reaction
 from .reaction_signatures import reaction_signature_definition_versions
 from .reaction_fallback_descriptors import reaction_fallback_definition_versions
+from .external_atom_mapping import (
+    analyze_reaction_with_external_mapping,
+    AtomMappingProvider,
+    AtomMappingProviderMetadata,
+    EXTERNAL_ATOM_MAPPING_SCHEMA_VERSION,
+    EXTERNAL_MAPPING_EVIDENCE,
+    ExternalAtomMappingResult,
+    ExternalMappingAssessment,
+    ExternalMappingAssessmentStatus,
+    normalized_edit_profile,
+    RxnMapperProvider,
+    validate_external_atom_mapping,
+)
 from .descriptors import (
     ActivatedCenterContextDescriptor,
     AlkylContextDescriptor,
@@ -179,11 +192,18 @@ __all__ = [
     "ContextualTransformationLabel",
     "DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH",
     "EditArchetype",
+    "AtomMappingProvider",
+    "AtomMappingProviderMetadata",
     "DescriptorEvidence",
     "ElectronicContribution",
     "ElectronicProfile",
     "FunctionalGroup",
     "HydrogenDelta",
+    "EXTERNAL_ATOM_MAPPING_SCHEMA_VERSION",
+    "EXTERNAL_MAPPING_EVIDENCE",
+    "ExternalAtomMappingResult",
+    "ExternalMappingAssessment",
+    "ExternalMappingAssessmentStatus",
     "HeteroatomContextDescriptor",
     "MatchIndex",
     "RewriteOutcome",
@@ -222,6 +242,7 @@ __all__ = [
     "ReactionSpectatorGroup",
     "ReactionStereoChange",
     "ReactionTopology",
+    "RxnMapperProvider",
     "ReactionTemplate",
     "ReactionTemplateAtom",
     "ReactionTemplateAtomAlternative",
@@ -288,4 +309,7 @@ __all__ = [
     "validate_reaction_template_registry",
     "validate_source_label_mappings",
     "validate_taxonomy",
+    "validate_external_atom_mapping",
+    "analyze_reaction_with_external_mapping",
+    "normalized_edit_profile",
 ]

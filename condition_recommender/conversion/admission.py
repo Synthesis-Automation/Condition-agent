@@ -32,7 +32,7 @@ class AdmissionDecision:
     condition_stage_status: ConditionStageStatus
     outcome_status: OutcomeStatus
     index_eligibility: IndexEligibility
-    policy_version: str = "generic_admission.v1.7"
+    policy_version: str = "generic_admission.v1.8"
 
 
 @lru_cache(maxsize=1)
@@ -58,6 +58,7 @@ def decide_admission(
     chemistry_reasons: list[str] = []
     completeness = analysis.reaction_completeness
     fallback_descriptor = analysis.fallback_descriptor
+    external_mapping_review_required = False
     if not analysis.valid or canonical_identity is None:
         chemistry_status = ChemistryStatus.REJECTED
         chemistry_reasons.append("invalid_reaction_or_product")
@@ -94,6 +95,11 @@ def decide_admission(
             chemistry_reasons.append("multiple_products")
         if analysis.evidence_quality not in set(policy["verified_evidence"]):
             chemistry_reasons.append("insufficient_edit_evidence")
+        if analysis.evidence_quality in set(
+            policy.get("external_mapping_review_evidence") or ()
+        ):
+            external_mapping_review_required = True
+            chemistry_reasons.append("external_mapping_review_required")
         if completeness is not None and completeness.status == "unresolved":
             chemistry_reasons.append("reaction_completeness_unresolved")
         completeness_warnings = set(
@@ -107,6 +113,15 @@ def decide_admission(
         ):
             chemistry_reasons.append("partial_atom_mapping")
         if chemistry_reasons:
+            chemistry_status = ChemistryStatus.REVIEW
+    if any(
+        warning
+        in set(policy.get("external_mapping_review_warnings") or ())
+        for warning in analysis.warnings
+    ):
+        external_mapping_review_required = True
+        chemistry_reasons.append("external_mapping_conflict")
+        if chemistry_status == ChemistryStatus.VERIFIED:
             chemistry_status = ChemistryStatus.REVIEW
 
     if record.yield_pct is None:
@@ -184,19 +199,22 @@ def decide_admission(
         in set(policy.get("indexable_unassigned_multistage_condition_statuses") or ())
     )
     chemistry_is_indexable = (
-        chemistry_status == ChemistryStatus.VERIFIED
-        or (
-            chemistry_status == ChemistryStatus.REVIEW
-            and analysis.reaction_signature is not None
-            and completeness is not None
-            and completeness.status == "verified"
-            and analysis.evidence_quality
-            in set(policy.get("indexable_review_evidence") or ())
-        )
-        or (
-            chemistry_status == ChemistryStatus.REVIEW
-            and fallback_descriptor is not None
-            and fallback_descriptor.retrieval_eligible
+        not external_mapping_review_required
+        and (
+            chemistry_status == ChemistryStatus.VERIFIED
+            or (
+                chemistry_status == ChemistryStatus.REVIEW
+                and analysis.reaction_signature is not None
+                and completeness is not None
+                and completeness.status == "verified"
+                and analysis.evidence_quality
+                in set(policy.get("indexable_review_evidence") or ())
+            )
+            or (
+                chemistry_status == ChemistryStatus.REVIEW
+                and fallback_descriptor is not None
+                and fallback_descriptor.retrieval_eligible
+            )
         )
     )
     if (

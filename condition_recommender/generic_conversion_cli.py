@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import json
 
+from reactive_taxonomy import RxnMapperProvider
+
 from .conversion.engine import convert_datasets
 
 
@@ -20,11 +22,26 @@ def main() -> None:
         default=None,
         help="Optional file-order row limit for a conversion smoke test",
     )
+    parser.add_argument(
+        "--use-rxnmapper",
+        action="store_true",
+        help=(
+            "Use optional RXNMapper evidence for unresolved/ambiguous reactions; "
+            "generated precedents remain review-only"
+        ),
+    )
     args = parser.parse_args()
+    if args.use_rxnmapper and not RxnMapperProvider.is_available():
+        parser.error(
+            "RXNMapper is not installed; run "
+            "'python -m pip install -r requirements-mapping.txt'"
+        )
+    mapping_provider = RxnMapperProvider() if args.use_rxnmapper else None
     report = convert_datasets(
         args.dataset_path,
         args.output_dir,
         max_rows=args.max_rows,
+        mapping_provider=mapping_provider,
     )
     print(json.dumps(report, indent=2, ensure_ascii=False))
 

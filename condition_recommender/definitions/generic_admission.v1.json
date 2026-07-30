@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.7",
+  "schema_version": "1.8",
   "policy_id": "generic_admission.v1",
   "valid_yield_range": [0.0, 100.0],
   "verified_evidence": [
@@ -13,6 +13,18 @@
     "fragmented_scaffold_correspondence",
     "global_atom_correspondence",
     "unique_scaffold_correspondence"
+  ],
+  "external_mapping_review_evidence": [
+    "external_atom_mapping",
+    "external_mapping_internal_consensus",
+    "external_mapping_and_exact_reconstruction",
+    "external_mapping_and_exact_multi_event_reconstruction"
+  ],
+  "external_mapping_review_warnings": [
+    "EXTERNAL_MAPPING_HYPOTHESIS_CONFLICT",
+    "EXTERNAL_MAPPING_AMBIGUOUS_HYPOTHESIS_MATCH",
+    "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE",
+    "EXTERNAL_MAPPING_FAILED"
   ],
   "indexable_stage_statuses": [
     "single_stage",

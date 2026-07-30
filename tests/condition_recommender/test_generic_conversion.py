@@ -109,8 +109,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "3.5"
-    assert record.converter_definition_version == "generic_conversion.v2.5"
+    assert record.schema_version == "3.6"
+    assert record.converter_definition_version == "generic_conversion.v2.6"
     assert record.reaction_signature["schema_version"] == "3.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -550,7 +550,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
         "unimolecular",
     }
     assert json.loads((output / "conversion_report.json").read_text()) == report
-    assert report["schema_version"] == "2.0"
+    assert report["schema_version"] == "2.1"
     assert report["reaction_signature_schema_version"] == "3.0"
     assert report["reaction_scope_counts"] == {
         "intermolecular": 1,
