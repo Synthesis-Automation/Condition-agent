@@ -32,7 +32,7 @@ def _stereochemistry(bond: Any) -> str:
 
 
 def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
-    """Return non-aromatic C=C and C#C bonds as two-endpoint sites."""
+    """Return localized C=C, C#C, C=N, and C#N bond-capacity sites."""
     sites: List[SiteCandidate] = []
     candidate_endpoint_a = match_index.role_atoms("unsaturated_bond", "endpoint_a")
     candidate_endpoint_b = match_index.role_atoms("unsaturated_bond", "endpoint_b")
@@ -99,6 +99,58 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                         "attachment_element": attachment.GetSymbol(),
                         "electrophilic_endpoint_atom_index": carbon.GetIdx(),
                         "reaction_modes": ["addition", "reduction"],
+                    },
+                    availability="available",
+                )
+            )
+            continue
+        if order == 2.0 and {left.GetAtomicNum(), right.GetAtomicNum()} == {6, 7}:
+            carbon = left if left.GetAtomicNum() == 6 else right
+            nitrogen = right if carbon is left else left
+            if (
+                carbon.GetIdx() not in candidate_endpoint_a
+                or nitrogen.GetIdx() not in candidate_endpoint_b
+            ):
+                continue
+            patterns = tuple(
+                definition["id"]
+                for definition in match_index.patterns_for_atom(
+                    "unsaturated_bond",
+                    "carbon_endpoint",
+                    carbon.GetIdx(),
+                )
+                if definition.get("id")
+                == "carbon_nitrogen_polarized_double_bond"
+            )
+            if not patterns:
+                continue
+            sites.append(
+                SiteCandidate(
+                    site_type="unsaturated_bond",
+                    topology="bond",
+                    atom_roles={
+                        "endpoint_a": (carbon.GetIdx(),),
+                        "endpoint_b": (nitrogen.GetIdx(),),
+                        "carbon_endpoint": (carbon.GetIdx(),),
+                        "nitrogen_endpoint": (nitrogen.GetIdx(),),
+                    },
+                    atom_indices=(carbon.GetIdx(), nitrogen.GetIdx()),
+                    bond_indices=(bond.GetIdx(),),
+                    canonical_signature="PI|PolarizedC=N",
+                    render_kind="named_handle",
+                    render_data={"template_id": "polarized_c_n"},
+                    matched_patterns=patterns,
+                    details={
+                        "handle_token": "PolarizedC=N",
+                        "bond_order": 2,
+                        "endpoint_elements": ["C", "N"],
+                        "electrophilic_endpoint_atom_index": carbon.GetIdx(),
+                        "nucleophilic_endpoint_atom_index": nitrogen.GetIdx(),
+                        "reaction_modes": [
+                            "addition",
+                            "reduction",
+                            "hydrolysis",
+                        ],
                     },
                     availability="available",
                 )

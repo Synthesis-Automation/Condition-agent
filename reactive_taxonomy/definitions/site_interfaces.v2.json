@@ -102,6 +102,7 @@
       "id": "carbonyl_capacity",
       "annotation_type": "electrophilic_center",
       "requires_roles": ["center", "heteroatom"],
+      "when_details": {"center_family": "Carbonyl"},
       "emits": ["bond_capacity", "connection_endpoints"],
       "endpoint_a_role": "center",
       "endpoint_b_role": "heteroatom",

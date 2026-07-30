@@ -206,6 +206,44 @@ without an independent edit-graph neighbor and the three non-consensus
 ambiguous reactions remain abstentions in this cohort. These are neighbor
 coverage measurements, not validation of condition suitability.
 
+### 2.6 High-ROI canonical-site expansion
+
+The current identity definitions add five conservative observation classes
+without adding a named-family route or automatically registering a reaction
+grammar:
+
+| New observation | Canonical representation | Connectivity interface |
+| --- | --- | --- |
+| Explicit C⁻, N⁻, and O⁻ nucleophiles | `nucleophile_anion` | Connection endpoint requiring formal-charge neutralization |
+| Imine, oxime, and hydrazone C=N | `PI\|PolarizedC=N` | Localized bond capacity and two connection endpoints |
+| Epoxide and aziridine carbons | `EC\|StrainedRing\|...` | One C–O or C–N release link per possible opening carbon |
+| Carbon-bound silyl ethers | `LG\|O\|SiR3` | Conditional O–Si release link |
+| Bonded organolithium, organocopper, and H-free organoaluminium | `TM\|...\|Li/Cu/Al` | Carbon–metal transfer link |
+
+The definitions deliberately do not infer anions from neutral molecules.
+Nitro and azide resonance anions are not exposed as free nucleophiles, silanols
+and siloxanes are not treated as silyl ethers, cyclopropanes are not strained
+heterocycle centers, and DIBAL alkyl groups are not marked as carbon-transfer
+partners.
+
+`benchmarks/high_roi_site_coverage.py` scanned ten rows from each of the 118
+bounded mixed datasets. The report
+`results/high_roi_reactive_site_coverage.json` records 1,168 valid analyzed
+rows and 120 rows containing at least one new observation:
+
+| Observation | Rows | Datasets |
+| --- | ---: | ---: |
+| Explicit C/N/O anion | 28 | 4 |
+| Polarized C=N | 53 | 14 |
+| Silyl-ether O–Si link | 30 | 14 |
+| Strained heterocycle | 10 | 6 |
+| Li/Cu/Al transfer link | 4 | 2 |
+
+Rows can contain more than one observation, so category counts are not
+additive. This measures site incidence, not verified transformation or
+recommendation coverage. New grammars and rewrites require their own chemistry
+validation before they may consume these observations.
+
 ## 3. Implemented chemistry contracts
 
 ### 3.1 Observation

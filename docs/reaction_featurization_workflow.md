@@ -68,6 +68,14 @@ For each molecular graph, the system detects and emits:
 - local steric and electronic environments;
 - chemist-readable site labels.
 - canonical reactive links, bond capacities, and connection endpoints.
+- explicit C/N/O/S anion endpoints, polarized C=N capacities, strained
+  epoxide/aziridine release links, silyl-ether O–Si links, and selected
+  Li/Cu/Al transfer links.
+
+Detection is intentionally conservative. It does not infer anions from neutral
+precursors, treat nitro or azide resonance atoms as free anions, classify
+cyclopropane as a strained heterocycle, or treat DIBAL alkyl groups as
+carbon-transfer partners.
 
 For example, the molecular observations for an aryl bromide and a boronic acid
 may include:

@@ -125,6 +125,11 @@ features such as:
 - N–H, O–H, S–H, B–H, Si–H, and related X–H links;
 - organoboron and other transfer-carrier links;
 - carbonyl, acyl, sulfonyl, and other activated centers;
+- polarized C=N bonds in imines, oximes, and hydrazones;
+- explicit C, N, O, and S anions without inferred deprotonation;
+- epoxide and aziridine ring-opening carbons;
+- conditional O–Si release links in carbon-bound silyl ethers;
+- bonded Li, Cu, and hydrogen-free Al carbon-transfer links;
 - aromatic C–H sites;
 - alkenes, alkynes, and other bonds with localized bond-order capacity.
 
@@ -139,6 +144,12 @@ interfaces:
 
 The presence of a handle is not evidence that it reacted. Product evidence
 selects the participating site.
+
+Newly detected sites do not automatically create a reaction grammar. For
+example, detecting both an epoxide carbon and an alkoxide only records two
+possible reactive features. A verified ring-opening interpretation still
+requires product mapping, correspondence, or a separately validated bounded
+rewrite.
 
 ### 3.3 Establish what changed
 

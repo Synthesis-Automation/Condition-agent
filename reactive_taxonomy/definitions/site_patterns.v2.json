@@ -9,7 +9,8 @@
       "OTf",
       "OTs",
       "OMs",
-      "OSO2R"
+      "OSO2R",
+      "SiR3"
     ],
     "pronucleophile_XH": [
       "N",
@@ -19,6 +20,9 @@
       "Csp3"
     ],
     "nucleophile_anion": [
+      "C",
+      "N",
+      "O",
       "S"
     ],
     "transfer_group": [
@@ -28,6 +32,9 @@
       "BPin",
       "ZnX",
       "MgX",
+      "Li",
+      "Cu",
+      "Al",
       "SnR3",
       "SiR3"
     ],
@@ -45,7 +52,8 @@
     "electrophilic_center": [
       "Acyl",
       "Sulfonyl",
-      "Carbonyl"
+      "Carbonyl",
+      "StrainedRing"
     ],
     "aromatic_CH": [
       "ArH",
@@ -54,7 +62,8 @@
     "unsaturated_bond": [
       "Alkene",
       "Alkyne",
-      "Nitrile"
+      "Nitrile",
+      "PolarizedC=N"
     ],
     "dipolar_group": [
       "Azide"
@@ -107,6 +116,25 @@
       }
     },
     {
+      "id": "silyl_ether_link",
+      "site_type": "leaving_group",
+      "tokens": [
+        "SiR3"
+      ],
+      "priority": 75,
+      "smarts": "[C:3]-[O;+0;H0:1]-[Si;+0:2]([#6:4])([#6:5])-[#6:6]",
+      "atom_roles": {
+        "anchor": 1,
+        "handle": 2,
+        "attachment": 3,
+        "handle_substituents": [
+          4,
+          5,
+          6
+        ]
+      }
+    },
+    {
       "id": "neutral_nh",
       "site_type": "pronucleophile_XH",
       "tokens": [
@@ -150,6 +178,55 @@
       ],
       "priority": 60,
       "smarts": "[S;-1:1]",
+      "atom_roles": {
+        "center": 1
+      }
+    },
+    {
+      "id": "anionic_oxygen",
+      "site_type": "nucleophile_anion",
+      "tokens": [
+        "O"
+      ],
+      "priority": 65,
+      "smarts": "[O;-1;D0:1]",
+      "atom_roles": {
+        "center": 1
+      }
+    },
+    {
+      "id": "carbon_bound_anionic_oxygen",
+      "site_type": "nucleophile_anion",
+      "tokens": [
+        "O"
+      ],
+      "priority": 65,
+      "smarts": "[O;-1;D1:1]-[C,c:2]",
+      "atom_roles": {
+        "center": 1,
+        "attachment": 2
+      }
+    },
+    {
+      "id": "anionic_nitrogen",
+      "site_type": "nucleophile_anion",
+      "tokens": [
+        "N"
+      ],
+      "priority": 65,
+      "smarts": "[N,n;-1:1]",
+      "atom_roles": {
+        "center": 1
+      }
+    },
+    {
+      "id": "anionic_carbon",
+      "site_type": "nucleophile_anion",
+      "tokens": [
+        "C"
+      ],
+      "priority": 65,
+      "smarts": "[C,c;-1:1]",
       "atom_roles": {
         "center": 1
       }
@@ -395,6 +472,45 @@
       }
     },
     {
+      "id": "carbon_lithium",
+      "site_type": "transfer_group",
+      "tokens": [
+        "Li"
+      ],
+      "priority": 60,
+      "smarts": "[#6:1]-[Li:2]",
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2
+      }
+    },
+    {
+      "id": "carbon_copper",
+      "site_type": "transfer_group",
+      "tokens": [
+        "Cu"
+      ],
+      "priority": 60,
+      "smarts": "[#6:1]-[Cu:2]",
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2
+      }
+    },
+    {
+      "id": "carbon_aluminum",
+      "site_type": "transfer_group",
+      "tokens": [
+        "Al"
+      ],
+      "priority": 60,
+      "smarts": "[#6:1]-[Al;H0:2]",
+      "atom_roles": {
+        "anchor": 1,
+        "center": 2
+      }
+    },
+    {
       "id": "carbon_tin",
       "site_type": "transfer_group",
       "tokens": [
@@ -451,6 +567,56 @@
         "substituents": [
           3,
           4
+        ]
+      }
+    },
+    {
+      "id": "epoxide_ring",
+      "site_type": "electrophilic_center",
+      "tokens": [
+        "StrainedRing"
+      ],
+      "center_family": "StrainedRing",
+      "subtype": "epoxide",
+      "reaction_mode": "ring_opening",
+      "priority": 82,
+      "smarts": "[C;r3:1]1[O;r3;+0:2][C;r3:3]1",
+      "atom_roles": {
+        "center": [
+          1,
+          3
+        ],
+        "heteroatom": 2,
+        "leaving_or_activatable": 2,
+        "ring_atoms": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "id": "aziridine_ring",
+      "site_type": "electrophilic_center",
+      "tokens": [
+        "StrainedRing"
+      ],
+      "center_family": "StrainedRing",
+      "subtype": "aziridine",
+      "reaction_mode": "ring_opening",
+      "priority": 82,
+      "smarts": "[C;r3:1]1[N;r3;+0:2][C;r3:3]1",
+      "atom_roles": {
+        "center": [
+          1,
+          3
+        ],
+        "heteroatom": 2,
+        "leaving_or_activatable": 2,
+        "ring_atoms": [
+          1,
+          2,
+          3
         ]
       }
     },
@@ -570,6 +736,21 @@
         "carbon_endpoint": 1,
         "nitrogen_endpoint": 2,
         "attachment": 3
+      }
+    },
+    {
+      "id": "carbon_nitrogen_polarized_double_bond",
+      "site_type": "unsaturated_bond",
+      "tokens": [
+        "PolarizedC=N"
+      ],
+      "priority": 58,
+      "smarts": "[C;X3;+0:1]=[N;X2,X3;+0:2]",
+      "atom_roles": {
+        "endpoint_a": 1,
+        "endpoint_b": 2,
+        "carbon_endpoint": 1,
+        "nitrogen_endpoint": 2
       }
     },
     {

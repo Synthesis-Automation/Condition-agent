@@ -10,7 +10,15 @@ from ..patterns import MatchIndex
 from .common import bond_index, unique_indices
 
 
-_METAL_TOKENS = {"Zn": "ZnX", "Mg": "MgX", "Sn": "SnR3", "Si": "SiR3"}
+_METAL_TOKENS = {
+    "Zn": "ZnX",
+    "Mg": "MgX",
+    "Li": "Li",
+    "Cu": "Cu",
+    "Al": "Al",
+    "Sn": "SnR3",
+    "Si": "SiR3",
+}
 _ANCHOR_CONTEXT_RANK = {"HeteroAr": 50, "Ar": 45, "Alkenyl": 40, "Alkynyl": 35, "Alkyl": 10}
 
 

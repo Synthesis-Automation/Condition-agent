@@ -237,7 +237,10 @@
       "smiles": "c1ccccc1C1CO1",
       "expected_valid": true,
       "expected_group_counts": {"epoxide": 1},
-      "expected_site_counts": {"CH|ArH": 5}
+      "expected_site_counts": {
+        "CH|ArH": 5,
+        "EC|StrainedRing|epoxide|Alkyl|ring_opening": 2
+      }
     },
     {
       "case_id": "terminal_alkene",

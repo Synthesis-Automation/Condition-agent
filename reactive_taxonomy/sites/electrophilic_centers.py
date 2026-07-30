@@ -16,17 +16,131 @@ def _single_bond_neighbors(atom: Any) -> List[Any]:
 
 def _acyl_group(neighbors: List[Any]) -> Optional[Tuple[Any, str, str]]:
     for neighbor in neighbors:
-        if neighbor.GetSymbol() in {"Cl", "Br", "F"}: return neighbor, neighbor.GetSymbol(), "activated"
+        if neighbor.GetSymbol() in {"Cl", "Br", "F"}:
+            return neighbor, neighbor.GetSymbol(), "activated"
     for neighbor in neighbors:
         if neighbor.GetSymbol() == "O":
-            if neighbor.GetFormalCharge() < 0: return neighbor, "O-", "ionic"
-            if neighbor.GetTotalNumHs(includeNeighbors=True) > 0: return neighbor, "OH", "latent"
+            if neighbor.GetFormalCharge() < 0:
+                return neighbor, "O-", "ionic"
+            if neighbor.GetTotalNumHs(includeNeighbors=True) > 0:
+                return neighbor, "OH", "latent"
             return neighbor, "OR", "ester"
     return None
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+def _strained_ring_sites(
+    mol: Any,
+    match_index: MatchIndex,
+) -> List[SiteCandidate]:
+    """Expose each carbon of an epoxide or aziridine as a ring-opening center."""
     sites: List[SiteCandidate] = []
+    candidate_centers = match_index.role_atoms(
+        "electrophilic_center",
+        "center",
+    )
+    candidate_heteroatoms = match_index.role_atoms(
+        "electrophilic_center",
+        "heteroatom",
+    )
+    for center_index in sorted(candidate_centers):
+        definitions = [
+            definition
+            for definition in match_index.patterns_for_atom(
+                "electrophilic_center",
+                "center",
+                center_index,
+            )
+            if definition.get("center_family") == "StrainedRing"
+        ]
+        if not definitions:
+            continue
+        center = mol.GetAtomWithIdx(center_index)
+        heteroatoms = [
+            neighbor
+            for neighbor in center.GetNeighbors()
+            if neighbor.GetIdx() in candidate_heteroatoms
+            and neighbor.IsInRingSize(3)
+            and neighbor.GetSymbol() in {"N", "O"}
+        ]
+        for heteroatom in heteroatoms:
+            partners = [
+                neighbor
+                for neighbor in heteroatom.GetNeighbors()
+                if neighbor.GetIdx() != center_index
+                and neighbor.GetIdx() in candidate_centers
+                and neighbor.GetSymbol() == "C"
+                and neighbor.IsInRingSize(3)
+                and mol.GetBondBetweenAtoms(
+                    center_index,
+                    neighbor.GetIdx(),
+                )
+                is not None
+            ]
+            if len(partners) != 1:
+                continue
+            partner = partners[0]
+            subtype = "epoxide" if heteroatom.GetSymbol() == "O" else "aziridine"
+            pattern_id = f"{subtype}_ring"
+            if not any(
+                definition.get("id") == pattern_id
+                for definition in definitions
+            ):
+                continue
+            context = classify_context(
+                mol,
+                center_index,
+                {heteroatom.GetIdx()},
+                match_index=match_index,
+            )
+            sites.append(
+                SiteCandidate(
+                    site_type="electrophilic_center",
+                    topology="center",
+                    atom_roles={
+                        "center": (center_index,),
+                        "heteroatom": (heteroatom.GetIdx(),),
+                        "leaving_or_activatable": (heteroatom.GetIdx(),),
+                        "ring_partner": (partner.GetIdx(),),
+                    },
+                    atom_indices=tuple(
+                        unique_indices(
+                            [
+                                center_index,
+                                heteroatom.GetIdx(),
+                                partner.GetIdx(),
+                            ]
+                        )
+                    ),
+                    bond_indices=(
+                        bond_index(
+                            mol,
+                            center_index,
+                            heteroatom.GetIdx(),
+                        ),
+                    ),
+                    canonical_signature=(
+                        f"EC|StrainedRing|{subtype}|"
+                        f"{context.token}|ring_opening"
+                    ),
+                    render_kind="named_handle",
+                    render_data={"template_id": f"{subtype}_carbon"},
+                    matched_patterns=(pattern_id,),
+                    details={
+                        "center_family": "StrainedRing",
+                        "strained_ring_type": subtype,
+                        "reaction_mode": "ring_opening",
+                        "anchor_context": context.token,
+                        "activation_state": "strain_activated",
+                    },
+                    context_records=(context,),
+                    availability="activated",
+                )
+            )
+    return sites
+
+
+def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+    sites: List[SiteCandidate] = _strained_ring_sites(mol, match_index)
     candidate_centers = match_index.role_atoms("electrophilic_center", "center")
     for center in mol.GetAtoms():
         if center.GetIdx() not in candidate_centers:
@@ -100,7 +214,8 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             ))
         elif symbol == "S" and len(double_oxygens) >= 2:
             leaving = next((neighbor for neighbor in singles if neighbor.GetSymbol() in {"Cl", "Br", "F"}), None)
-            if leaving is None: continue
+            if leaving is None:
+                continue
             retained = next((neighbor for neighbor in singles if neighbor.GetIdx() != leaving.GetIdx()), None)
             context = classify_context(mol, retained.GetIdx(), {center.GetIdx()}, match_index=match_index) if retained is not None else None
             context_token = context.token if context is not None else "Other"
