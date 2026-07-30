@@ -22,6 +22,7 @@ from condition_recommender.conversion.artifacts import (  # noqa: E402
 from condition_recommender.conversion.input_schema import (  # noqa: E402
     discover_csv_datasets,
 )
+from reactive_taxonomy import RxnMapperProvider  # noqa: E402
 
 
 def _human_size(size_bytes: int) -> str:
@@ -47,6 +48,7 @@ class ReviewConversionWorker(QtCore.QObject):
         shard_size: int = 1_000,
         workers: int = 1,
         build_fast_index: bool = True,
+        use_rxnmapper: bool = True,
     ) -> None:
         super().__init__()
         self.source_folder = source_folder
@@ -54,6 +56,7 @@ class ReviewConversionWorker(QtCore.QObject):
         self.shard_size = shard_size
         self.workers = workers
         self.build_fast_index = build_fast_index
+        self.use_rxnmapper = use_rxnmapper
         self._cancel_requested = False
 
     def request_cancel(self) -> None:
@@ -70,6 +73,7 @@ class ReviewConversionWorker(QtCore.QObject):
                 shard_size=self.shard_size,
                 workers=self.workers,
                 build_fast_index=self.build_fast_index,
+                use_rxnmapper=self.use_rxnmapper,
                 progress_callback=self.progress.emit,
                 cancel_check=lambda: self._cancel_requested,
             )
@@ -121,7 +125,8 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self.worker_count_spin = QtWidgets.QSpinBox()
         self.worker_count_spin.setObjectName("workerCount")
         self.worker_count_spin.setRange(1, cpu_count)
-        self.worker_count_spin.setValue(min(4, cpu_count))
+        self._parallel_worker_count = min(4, cpu_count)
+        self.worker_count_spin.setValue(self._parallel_worker_count)
         self.worker_count_spin.setToolTip(
             "Parallel chemistry workers. More workers can be faster but use "
             "more memory."
@@ -135,6 +140,20 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "Recommended for repeated use. It takes extra conversion time and "
             "disk space, but avoids rebuilding lookup maps when recommending."
         )
+        self.use_rxnmapper_check = QtWidgets.QCheckBox(
+            "Use RXNMapper for unresolved or ambiguous reactions"
+        )
+        self.use_rxnmapper_check.setObjectName("useRxnMapper")
+        self.use_rxnmapper_check.setChecked(True)
+        self.use_rxnmapper_check.setToolTip(
+            "Checked by default. RXNMapper proposals are reconciled with "
+            "internal evidence and remain review-only as converted precedents. "
+            "One worker is used to avoid loading multiple model copies."
+        )
+        self.use_rxnmapper_check.toggled.connect(
+            self._sync_rxnmapper_worker_setting
+        )
+        self._sync_rxnmapper_worker_setting(True)
 
         self.start_button = QtWidgets.QPushButton(
             "Generate Recommendation Data"
@@ -222,6 +241,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         settings_row.addWidget(self.worker_count_spin)
         settings_row.addStretch()
         form.addRow("Performance:", settings_row)
+        form.addRow("", self.use_rxnmapper_check)
         form.addRow("", self.build_index_check)
         layout.addLayout(form)
         layout.addWidget(self.source_summary)
@@ -299,6 +319,18 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             scrollbar = self.status_box.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
 
+    @QtCore.pyqtSlot(bool)
+    def _sync_rxnmapper_worker_setting(self, enabled: bool) -> None:
+        """Use one process for RXNMapper and restore parallelism when disabled."""
+        if enabled:
+            if self.worker_count_spin.isEnabled():
+                self._parallel_worker_count = self.worker_count_spin.value()
+            self.worker_count_spin.setValue(1)
+            self.worker_count_spin.setEnabled(False)
+        else:
+            self.worker_count_spin.setEnabled(True)
+            self.worker_count_spin.setValue(self._parallel_worker_count)
+
     @QtCore.pyqtSlot()
     def start_conversion(self) -> None:
         if self.thread is not None:
@@ -326,6 +358,18 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
                 "Choose an output folder.",
             )
             return
+        if (
+            self.use_rxnmapper_check.isChecked()
+            and not RxnMapperProvider.is_available()
+        ):
+            QtWidgets.QMessageBox.warning(
+                self,
+                "RXNMapper unavailable",
+                "RXNMapper is checked but not installed. Run "
+                "'python -m pip install -r requirements-mapping.txt' or "
+                "clear the RXNMapper checkbox.",
+            )
+            return
         output = Path(output_text)
         source_resolved = source.resolve()
         output_resolved = output.resolve()
@@ -346,6 +390,8 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
         self._append_status(
             f"Settings: {self.shard_size_spin.value()} rows/shard, "
             f"{self.worker_count_spin.value()} worker(s), "
+            f"RXNMapper "
+            f"{'on' if self.use_rxnmapper_check.isChecked() else 'off'}, "
             f"fast index {'on' if self.build_index_check.isChecked() else 'off'}"
         )
         self.start_button.setEnabled(False)
@@ -361,6 +407,7 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             shard_size=self.shard_size_spin.value(),
             workers=self.worker_count_spin.value(),
             build_fast_index=self.build_index_check.isChecked(),
+            use_rxnmapper=self.use_rxnmapper_check.isChecked(),
         )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)

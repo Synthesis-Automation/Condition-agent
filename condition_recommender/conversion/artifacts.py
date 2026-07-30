@@ -20,7 +20,7 @@ from .sharded import (
     convert_datasets_sharded,
 )
 
-RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "1.0"
+RECOMMENDATION_ARTIFACT_WORKFLOW_SCHEMA_VERSION = "1.1"
 
 
 @dataclass(frozen=True)
@@ -72,6 +72,7 @@ def build_recommendation_artifacts(
     shard_size: int = 1_000,
     workers: int = 1,
     build_fast_index: bool = True,
+    use_rxnmapper: bool = False,
     checkpoint_interval: int = 1,
     progress_callback: Optional[
         Callable[[RecommendationArtifactProgress], None]
@@ -125,15 +126,17 @@ def build_recommendation_artifacts(
             shard_count=progress.shard_count,
         )
 
+    effective_workers = 1 if use_rxnmapper else workers
     try:
         conversion_report = convert_datasets_sharded(
             source,
             destination,
             shard_size=shard_size,
             mode="full",
-            workers=workers,
+            workers=effective_workers,
             checkpoint_interval=checkpoint_interval,
             merge_records=False,
+            use_rxnmapper=use_rxnmapper,
             progress_callback=on_conversion_progress,
             cancel_check=cancel_check,
         )
@@ -142,9 +145,20 @@ def build_recommendation_artifacts(
 
     failed_shards = int(conversion_report.get("failed_shard_count") or 0)
     if failed_shards:
+        failure_entries = conversion_report.get("failed_shards") or ()
+        first_failure = (
+            (failure_entries[0].get("failures") or [{}])[0]
+            if failure_entries
+            else {}
+        )
+        first_detail = str(first_failure.get("message") or "").strip()
+        detail_suffix = (
+            f" First failure: {first_detail}" if first_detail else ""
+        )
         raise RuntimeError(
             f"Canonical conversion has {failed_shards} failed shard(s); "
             "review and index artifacts were not built."
+            f"{detail_suffix} See {destination / 'shard_manifest.json'}."
         )
     records_path = destination / "shard_manifest.json"
     total_rows = int(conversion_report.get("output_row_count") or 0)
@@ -240,6 +254,11 @@ def build_recommendation_artifacts(
     shard_size_bytes = sum(path.stat().st_size for path in shard_paths)
     all_files = tuple(path for path in destination.rglob("*") if path.is_file())
     warnings = []
+    if use_rxnmapper and workers != effective_workers:
+        warnings.append(
+            "RXNMapper uses one conversion worker to avoid loading a separate "
+            "model in each process."
+        )
     if not build_fast_index and index_path.is_file():
         warnings.append(
             "An older generic_index.json.gz exists but was not rebuilt; do "
@@ -252,8 +271,10 @@ def build_recommendation_artifacts(
         "output_dir": str(destination.resolve()),
         "settings": {
             "shard_size": shard_size,
-            "workers": workers,
+            "workers": effective_workers,
+            "requested_workers": workers,
             "build_fast_index": build_fast_index,
+            "use_rxnmapper": use_rxnmapper,
             "compression": "gzip",
         },
         "source_file_count": int(conversion_report["source_file_count"]),

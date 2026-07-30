@@ -82,6 +82,14 @@ def build_reaction_topology(
 
     for edit in _formed_edits(edit_result.edits):
         assert edit.atom_2 is not None
+        if {
+            edit.atom_1.side,
+            edit.atom_2.side,
+        } != {"reactant"}:
+            # Product-only endpoints can occur in partial external mappings
+            # when a reported product atom has no supplied reactant origin.
+            # They cannot establish reactant component scope or tether length.
+            continue
         if edit.atom_1.component_index != edit.atom_2.component_index:
             formed_scopes.append("intermolecular")
             continue
@@ -92,6 +100,11 @@ def build_reaction_topology(
             continue
         left = int(edit.atom_1.atom_index)
         right = int(edit.atom_2.atom_index)
+        if not (
+            0 <= left < molecule.GetNumAtoms()
+            and 0 <= right < molecule.GetNumAtoms()
+        ):
+            continue
         if left == right or molecule.GetBondBetweenAtoms(left, right) is not None:
             continue
         try:

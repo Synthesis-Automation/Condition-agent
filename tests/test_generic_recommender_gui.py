@@ -1,3 +1,4 @@
+from dataclasses import replace
 from pathlib import Path
 
 from app import reaction_recommender_gui as gui
@@ -174,6 +175,8 @@ def test_window_uses_literature_recommendation_data_by_default(
     )
     assert window.top_k_spin.value() == 5
     assert not window.unrestricted_fallback_check.isChecked()
+    assert window.use_rxnmapper_check.isChecked()
+    assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
     assert (
         window.unrestricted_fallback_check.objectName()
         == "unrestrictedFallback"
@@ -223,7 +226,10 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
     monkeypatch.setattr(
         gui,
         "_get_cached_recommender",
-        lambda path: FakeRecommender(),
+        lambda path, *, use_rxnmapper: (
+            calls.append(("use_rxnmapper", use_rxnmapper))
+            or FakeRecommender()
+        ),
     )
     worker = gui.GenericRecommendationWorker(
         "index.json.gz",
@@ -231,6 +237,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
         top_k=3,
         minimum_pool_size=2,
         unrestricted_fallback=True,
+        use_rxnmapper=True,
     )
     progress = []
     finished = []
@@ -243,7 +250,10 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
 
     worker.run()
 
-    assert calls == [("A.B>>P", 3, 2, True)]
+    assert calls == [
+        ("use_rxnmapper", True),
+        ("A.B>>P", 3, 2, True),
+    ]
     assert len(progress) == 2
     assert finished == [(True, expected, "")]
 
@@ -295,6 +305,22 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
         details
     )
     assert window.status_label.text() == "Done — 1 recipe(s)"
+
+
+def test_query_summary_discloses_external_mapping_provenance() -> None:
+    result = replace(
+        _result(),
+        external_mapping_status="external_mapping_internal_consensus",
+        external_mapping_provider="rxnmapper",
+        external_mapping_confidence=0.656,
+        recommendation_mode="external_mapping_internal_consensus",
+    )
+
+    summary = gui.format_query_summary(result)
+
+    assert "External Mapping Internal Consensus" in summary
+    assert "provider rxnmapper" in summary
+    assert "confidence 0.656" in summary
 
 
 def test_window_requests_vector_reaction_drawing(qtbot, monkeypatch) -> None:

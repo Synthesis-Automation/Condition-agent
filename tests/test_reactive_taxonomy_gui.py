@@ -30,12 +30,18 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert "background: #f4f7f9" not in window.styleSheet()
         assert "background: #ffffff" not in window.styleSheet()
         assert "background-color: #0078d7" in window.styleSheet()
+        assert window.use_rxnmapper_check.isChecked()
+        assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
 
         window.input_edit.setText(REACTION_EXAMPLE)
         assert window.kind_label.text() == "Detected: reaction"
         window.analyze()
         reaction_output = window.output.toPlainText()
         assert reaction_output.startswith("REACTION FEATURIZATION")
+        assert (
+            "RXNMapper: not_requested_resolved_internal_evidence"
+            in reaction_output
+        )
         assert "Reaction: Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" in reaction_output
         assert "Evidence: exact_product_reconstruction" in reaction_output
         assert "reaction input · valid" in window.status_label.text()
@@ -86,10 +92,12 @@ def test_window_explains_ambiguous_reaction_evidence() -> None:
         ">>Fc1ccc2[nH]c3c(c2c1)CCCC3"
     )
     try:
+        window.use_rxnmapper_check.setChecked(False)
         window.input_edit.setText(reaction)
         window.analyze()
         output = window.output.toPlainText()
 
+        assert "RXNMapper: disabled" in output
         assert "Correspondence ambiguity: 2 distinct edit hypotheses" in output
         assert output.count("REH1:") == 2
         assert "4 correspondences; unverified" in output

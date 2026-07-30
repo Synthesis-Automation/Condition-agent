@@ -27,6 +27,8 @@ from typing import (
 from condition_registry import condition_registry_definition_versions
 from reactive_taxonomy import (
     REACTION_SIGNATURE_SCHEMA_VERSION,
+    AtomMappingProvider,
+    RxnMapperProvider,
     reaction_signature_definition_versions,
 )
 from rdkit import RDLogger
@@ -39,7 +41,7 @@ from .generic import GenericConversionCache, convert_record
 from .input_schema import RawReactionRecord, discover_csv_datasets, iter_csv_records
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
-SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v1.4"
+SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v1.5"
 
 
 @dataclass(frozen=True)
@@ -65,7 +67,12 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _definition_contract() -> Dict[str, Any]:
+def _definition_contract(
+    mapping_provider: AtomMappingProvider | None = None,
+) -> Dict[str, Any]:
+    mapping_metadata = (
+        mapping_provider.metadata if mapping_provider is not None else None
+    )
     return {
         "record_schema_version": RECOMMENDATION_RECORD_SCHEMA_VERSION,
         "converter_definition_version": GENERIC_CONVERTER_DEFINITION_VERSION,
@@ -77,6 +84,25 @@ def _definition_contract() -> Dict[str, Any]:
         "sharded_conversion_definition_version": (
             SHARDED_CONVERSION_DEFINITION_VERSION
         ),
+        "external_atom_mapping": {
+            "enabled": mapping_provider is not None,
+            "provider_id": (
+                mapping_metadata.provider_id if mapping_metadata is not None else None
+            ),
+            "provider_version": (
+                mapping_metadata.provider_version
+                if mapping_metadata is not None
+                else None
+            ),
+            "model_id": (
+                mapping_metadata.model_id if mapping_metadata is not None else None
+            ),
+            "model_sha256": (
+                mapping_metadata.model_sha256
+                if mapping_metadata is not None
+                else None
+            ),
+        },
     }
 
 
@@ -261,20 +287,39 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
                 ).items()
             )
         ),
+        "external_mapping_status_counts": dict(
+            sorted(
+                Counter(
+                    str(mapping.get("status") or "missing")
+                    for payload in payloads
+                    for mapping in (payload.get("external_atom_mapping"),)
+                    if isinstance(mapping, Mapping)
+                ).items()
+            )
+        ),
     }
 
 
 def _convert_shard_task(
     task: tuple[Mapping[str, Any], tuple[RawReactionRecord, ...], str],
+    *,
+    cache: GenericConversionCache | None = None,
+    mapping_provider: AtomMappingProvider | None = None,
 ) -> Dict[str, Any]:
     expected, raw_records, output_value = task
     output = Path(output_value)
     RDLogger.DisableLog("rdApp.warning")
     RDLogger.DisableLog("rdApp.error")
-    cache = GenericConversionCache(max_entries=max(1_000, len(raw_records) * 2))
+    conversion_cache = cache or GenericConversionCache(
+        max_entries=max(1_000, len(raw_records) * 2)
+    )
     try:
         payloads = [
-            convert_record(raw_record, cache=cache).to_dict()
+            convert_record(
+                raw_record,
+                cache=conversion_cache,
+                mapping_provider=mapping_provider,
+            ).to_dict()
             for raw_record in raw_records
         ]
         output_count = _write_gzip_jsonl(output, payloads)
@@ -454,7 +499,12 @@ def validate_sharded_conversion(
     issues = []
     if manifest.get("schema_version") != SHARD_MANIFEST_SCHEMA_VERSION:
         issues.append("unsupported_manifest_schema")
-    if manifest.get("definition_contract") != _definition_contract():
+    stored_contract = manifest.get("definition_contract") or {}
+    stored_mapping = stored_contract.get("external_atom_mapping") or {}
+    validation_provider = (
+        RxnMapperProvider() if stored_mapping.get("enabled") else None
+    )
+    if stored_contract != _definition_contract(validation_provider):
         issues.append("stale_definition_contract")
     observation_ids = set()
     duplicate_observations = 0
@@ -528,6 +578,7 @@ def convert_datasets_sharded(
     workers: int = 1,
     checkpoint_interval: int = 10,
     merge_records: bool = True,
+    use_rxnmapper: bool = False,
     progress: bool = False,
     progress_callback: Optional[
         Callable[[ShardedConversionProgress], None]
@@ -541,6 +592,11 @@ def convert_datasets_sharded(
         raise ValueError("max_shards must be positive")
     if workers < 1:
         raise ValueError("workers must be positive")
+    if use_rxnmapper and workers != 1:
+        raise ValueError(
+            "RXNMapper sharded conversion requires workers=1 to avoid loading "
+            "one mapper model per process"
+        )
     if checkpoint_interval < 1:
         raise ValueError("checkpoint_interval must be positive")
     paths = discover_csv_datasets(dataset_path)
@@ -582,7 +638,15 @@ def convert_datasets_sharded(
             str(entry["shard_id"]): entry
             for entry in previous_manifest.get("shards") or ()
         }
-    contract = _definition_contract()
+    mapping_provider = None
+    if use_rxnmapper:
+        if not RxnMapperProvider.is_available():
+            raise RuntimeError(
+                "RXNMapper is not installed; run "
+                "'python -m pip install -r requirements-mapping.txt'"
+            )
+        mapping_provider = RxnMapperProvider()
+    contract = _definition_contract(mapping_provider)
     entries = []
     source_row_counts = Counter()
     source_checksums = {}
@@ -642,7 +706,7 @@ def convert_datasets_sharded(
         notify(
             "shard_completed",
             (
-                f"{'Reused' if entry.get('reused') else 'Converted'} "
+                f"{'Reused' if entry.get('reused') else 'Converted' if entry.get('status') == 'complete' else 'Failed'} "
                 f"{entry['shard_id']}: {entry['input_row_count']} row(s)."
             ),
             shard_count=len(entries),
@@ -650,6 +714,7 @@ def convert_datasets_sharded(
         )
 
     executor = ProcessPoolExecutor(max_workers=workers) if workers > 1 else None
+    shared_cache = GenericConversionCache() if executor is None else None
     pending = set()
     try:
         for file_number, path in enumerate(paths, start=1):
@@ -704,7 +769,13 @@ def convert_datasets_sharded(
                     str((destination / output_path).resolve()),
                 )
                 if executor is None:
-                    accept(_convert_shard_task(task))
+                    accept(
+                        _convert_shard_task(
+                            task,
+                            cache=shared_cache,
+                            mapping_provider=mapping_provider,
+                        )
+                    )
                     continue
                 pending.add(executor.submit(_convert_shard_task, task))
                 if len(pending) >= workers * 2:
@@ -792,6 +863,14 @@ def convert_datasets_sharded(
         "shard_count": len(entries),
         "complete_shard_count": len(complete_entries),
         "failed_shard_count": len(failed_entries),
+        "failed_shards": [
+            {
+                "shard_id": str(entry.get("shard_id") or ""),
+                "source_path": str(entry.get("source_path") or ""),
+                "failures": list(entry.get("failures") or ()),
+            }
+            for entry in failed_entries
+        ],
         "reused_shard_count": sum(int(entry.get("reused", False)) for entry in entries),
         "input_row_count": sum(int(entry["input_row_count"]) for entry in entries),
         "output_row_count": sum(
@@ -830,6 +909,13 @@ def convert_datasets_sharded(
         "reaction_completeness_status_counts": _merge_counts(
             complete_entries, "reaction_completeness_status_counts"
         ),
+        "external_atom_mapping": {
+            **contract["external_atom_mapping"],
+            "status_counts": _merge_counts(
+                complete_entries,
+                "external_mapping_status_counts",
+            ),
+        },
         "signature_count": sum(
             int(entry.get("signature_count") or 0) for entry in complete_entries
         ),

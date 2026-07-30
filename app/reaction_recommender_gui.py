@@ -21,12 +21,15 @@ from condition_recommender import (  # noqa: E402
     GenericConditionRecommender,
     GenericRecommendationResult,
 )
-from reactive_taxonomy import render_reactivity_profile  # noqa: E402
+from reactive_taxonomy import (  # noqa: E402
+    RxnMapperProvider,
+    render_reactivity_profile,
+)
 from visualization import render_reaction_image_bytes  # noqa: E402
 from visualization.qt_widgets import StructureImageLabel  # noqa: E402
 
 _RECOMMENDER_CACHE: Dict[
-    Tuple[str, int, int],
+    Tuple[str, int, int, bool],
     GenericConditionRecommender,
 ] = {}
 
@@ -54,16 +57,20 @@ def default_recommendation_data_path() -> Path:
     return DEFAULT_MANIFEST_PATH
 
 
-def _cache_key(path: Path) -> Tuple[str, int, int]:
+def _cache_key(path: Path, use_rxnmapper: bool) -> Tuple[str, int, int, bool]:
     resolved = path.resolve()
     stat = resolved.stat()
-    return str(resolved), stat.st_size, stat.st_mtime_ns
+    return str(resolved), stat.st_size, stat.st_mtime_ns, use_rxnmapper
 
 
-def _get_cached_recommender(path: str | Path) -> GenericConditionRecommender:
+def _get_cached_recommender(
+    path: str | Path,
+    *,
+    use_rxnmapper: bool = True,
+) -> GenericConditionRecommender:
     """Load a validated index once and invalidate it when the file changes."""
     source = Path(path)
-    key = _cache_key(source)
+    key = _cache_key(source, use_rxnmapper)
     recommender = _RECOMMENDER_CACHE.get(key)
     if recommender is not None:
         return recommender
@@ -71,7 +78,10 @@ def _get_cached_recommender(path: str | Path) -> GenericConditionRecommender:
     for old_key in tuple(_RECOMMENDER_CACHE):
         if old_key[0] == resolved:
             _RECOMMENDER_CACHE.pop(old_key, None)
-    recommender = GenericConditionRecommender.from_path(source)
+    recommender = GenericConditionRecommender.from_path(
+        source,
+        mapping_provider=RxnMapperProvider() if use_rxnmapper else None,
+    )
     _RECOMMENDER_CACHE[key] = recommender
     return recommender
 
@@ -184,6 +194,18 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
             "Ambiguous edit alternatives (all must agree): "
             + ", ".join(result.query_edit_hypothesis_ids)
         )
+    if result.external_mapping_status:
+        confidence = (
+            f"{result.external_mapping_confidence:.3f}"
+            if result.external_mapping_confidence is not None
+            else "unavailable"
+        )
+        lines.append(
+            "External mapping: "
+            f"{_display_name(result.external_mapping_status)} • "
+            f"provider {result.external_mapping_provider or 'unavailable'} • "
+            f"confidence {confidence}"
+        )
     lines.append(f"Spectator groups: {_spectator_summary(result.spectator_groups)}")
     partner_summaries = _partner_analysis_summaries(result.reaction_partners)
     if partner_summaries:
@@ -243,6 +265,7 @@ class GenericRecommendationWorker(QtCore.QObject):
         top_k: int,
         minimum_pool_size: Optional[int],
         unrestricted_fallback: bool = False,
+        use_rxnmapper: bool = True,
     ) -> None:
         super().__init__()
         self.data_path = data_path
@@ -250,14 +273,22 @@ class GenericRecommendationWorker(QtCore.QObject):
         self.top_k = top_k
         self.minimum_pool_size = minimum_pool_size
         self.unrestricted_fallback = unrestricted_fallback
+        self.use_rxnmapper = use_rxnmapper
 
     @QtCore.pyqtSlot()
     def run(self) -> None:
         """Load or reuse the index and execute one recommendation."""
         try:
             self.progress.emit("Loading recommendation index…")
-            recommender = _get_cached_recommender(self.data_path)
-            self.progress.emit("Analyzing reaction and ranking conditions…")
+            recommender = _get_cached_recommender(
+                self.data_path,
+                use_rxnmapper=self.use_rxnmapper,
+            )
+            self.progress.emit(
+                "Analyzing reaction with RXNMapper and ranking conditions…"
+                if self.use_rxnmapper
+                else "Analyzing reaction and ranking conditions…"
+            )
             result = recommender.recommend(
                 self.reaction_smiles,
                 top_k=self.top_k,
@@ -328,6 +359,15 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             "For unresolved reactions, bypass fallback eligibility, "
             "similarity, independent-support, and condition-compatibility "
             "gates. Results can be chemically incompatible."
+        )
+        self.use_rxnmapper_check = QtWidgets.QCheckBox(
+            "Use RXNMapper for unresolved or ambiguous queries"
+        )
+        self.use_rxnmapper_check.setObjectName("useRxnMapper")
+        self.use_rxnmapper_check.setChecked(True)
+        self.use_rxnmapper_check.setToolTip(
+            "Checked by default. Generated correspondence is clearly reported "
+            "and recommendations remain expert-review required."
         )
 
         self.run_button = QtWidgets.QPushButton("Recommend Conditions")
@@ -443,6 +483,8 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         options.addWidget(self.minimum_pool_spin)
         options.addSpacing(18)
         options.addWidget(self.unrestricted_fallback_check)
+        options.addSpacing(18)
+        options.addWidget(self.use_rxnmapper_check)
         options.addStretch()
         form.addRow("Options:", options)
         layout.addLayout(form)
@@ -627,6 +669,18 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 "Use reaction SMILES in reactants>>product form.",
             )
             return
+        if (
+            self.use_rxnmapper_check.isChecked()
+            and not RxnMapperProvider.is_available()
+        ):
+            QtWidgets.QMessageBox.warning(
+                self,
+                "RXNMapper unavailable",
+                "RXNMapper is checked but not installed. Run "
+                "'python -m pip install -r requirements-mapping.txt' or "
+                "clear the RXNMapper checkbox.",
+            )
+            return
 
         self.clear_results()
         self._render_reaction_graph(reaction_smiles)
@@ -645,6 +699,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             unrestricted_fallback=(
                 self.unrestricted_fallback_check.isChecked()
             ),
+            use_rxnmapper=self.use_rxnmapper_check.isChecked(),
         )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)

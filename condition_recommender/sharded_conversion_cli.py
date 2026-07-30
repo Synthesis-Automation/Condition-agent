@@ -19,6 +19,14 @@ def main() -> None:
     parser.add_argument("--mode", default="full")
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--checkpoint-interval", type=int, default=10)
+    parser.add_argument(
+        "--use-rxnmapper",
+        action="store_true",
+        help=(
+            "Use RXNMapper for unresolved/ambiguous reactions; requires "
+            "--workers 1 and keeps mapper-derived records review-only"
+        ),
+    )
     args = parser.parse_args()
     report = convert_datasets_sharded(
         args.dataset_path,
@@ -28,6 +36,7 @@ def main() -> None:
         mode=args.mode,
         workers=args.workers,
         checkpoint_interval=args.checkpoint_interval,
+        use_rxnmapper=args.use_rxnmapper,
         progress=True,
     )
     print(json.dumps(report, indent=2, ensure_ascii=False))

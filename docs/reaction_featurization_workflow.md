@@ -224,6 +224,21 @@ signature retrieval ladder against already-verified precedents, with mapper
 status, provider, confidence, and mandatory expert-review cautions in the
 result.
 
+The three desktop applications expose a `Use RXNMapper` checkbox that is
+checked by default:
+
+```powershell
+python -m app.featurizer_gui
+python -m app.reaction_converter_gui
+python -m app.reaction_recommender_gui
+```
+
+The featurizer displays whether mapping was skipped, reached consensus, was the
+only edit source, conflicted, or failed. The converter includes the mapper/model
+identity in restartable shard identity and uses one worker to avoid loading
+multiple model copies. The recommender caches mapper-enabled and internal-only
+instances separately. Clearing a checkbox restores the internal-only path.
+
 The global fallback is used only for unmapped, single-main-product reactions
 after exact reconstruction and the narrower scaffold fallback fail. It matches
 conserved subgraphs from a bounded number of reactant components into

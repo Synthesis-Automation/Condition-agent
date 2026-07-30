@@ -30,10 +30,10 @@ from .fallback_similarity import fallback_index_tokens
 
 GENERIC_INDEX_SCHEMA_VERSION = "2.3"
 
-# Record schema 3.6 / converter v2.6 add optional external-mapping review
-# provenance only. They do not change verified signature, fallback descriptor,
-# recipe, or index-row contracts, so persisted v3.4/v2.4 and v3.5/v2.5 indices
-# remain chemistry-compatible.
+# Record schema 3.6 / converters v2.6-v2.7 add optional external-mapping review
+# provenance and safer incomplete-reaction topology handling. They do not
+# change verified signature, fallback descriptor, recipe, or index-row
+# contracts, so persisted v3.4-v3.6 indices remain chemistry-compatible.
 _INDEX_COMPATIBLE_RECORD_SCHEMAS = frozenset(
     {"3.4", "3.5", RECOMMENDATION_RECORD_SCHEMA_VERSION}
 )
@@ -41,6 +41,7 @@ _INDEX_COMPATIBLE_CONVERTER_VERSIONS = frozenset(
     {
         "generic_conversion.v2.4",
         "generic_conversion.v2.5",
+        "generic_conversion.v2.6",
         GENERIC_CONVERTER_DEFINITION_VERSION,
     }
 )

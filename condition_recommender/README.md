@@ -502,8 +502,9 @@ subfolders and creates:
   after cancellation or restart.
 - `reaction_review.csv`: the compact file for quick human review, including
   structural-evidence and admission diagnostics, spectators, and
-  reactive-partner steric/electronic context. It is not used as recommendation
-  input.
+  reactive-partner steric/electronic context. When RXNMapper is enabled it also
+  shows mapping disposition, provider, confidence, and matched internal
+  hypotheses. It is not used as recommendation input.
 - `generic_index.json.gz`: a compressed, ready-to-load recommendation index.
   This is enabled by default because it makes repeated recommendations start
   faster.
@@ -519,8 +520,10 @@ The default settings are intended for large datasets:
 
 - `1,000` rows per shard gives useful restart points without creating too many
   small files.
-- Up to `4` workers convert independent shards in parallel. Reduce this when
-  memory is limited.
+- `Use RXNMapper` is checked by default. It runs one conversion worker so one
+  model copy is loaded; clear the checkbox to restore parallel workers.
+- Mapper-derived records remain review-only and do not enter the default fast
+  index. The mapper setting and model hash participate in shard reuse identity.
 - Keep the fast index enabled for routine recommendation. Disable it only when
   conversion size matters more than startup speed.
 
@@ -579,6 +582,9 @@ python -m app.reaction_recommender_gui
 It automatically selects `datasets/literature/generic_index.json.gz` when the
 fast index exists, with `shard_manifest.json` as a fallback. Paste a complete
 `reactants>>product` reaction SMILES and choose how many recipes to return.
+`Use RXNMapper` is checked by default; it is invoked only when supplied mapping
+and ordinary internal analysis do not already resolve the query. Clear the
+checkbox to use internal evidence alone.
 
 The window shows:
 
@@ -587,6 +593,8 @@ The window shows:
 - ranked catalysts, ligands, bases, solvents, additives, temperature, and time;
 - similarity, compatibility, expected yield, and independent support;
 - explanations, cautions, and precedent IDs for the selected recipe;
+- external-mapping disposition, provider, confidence, and mandatory review
+  cautions when RXNMapper participates;
 - the displayed precedent hit's reaction SMILES, structural label, spectator
   groups, and local steric/electronic partner analysis.
 

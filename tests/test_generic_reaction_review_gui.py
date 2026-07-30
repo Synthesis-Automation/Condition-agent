@@ -24,6 +24,15 @@ def test_review_window_reports_recursive_csv_count(qtbot, tmp_path: Path) -> Non
     assert Path(window.output_edit.text()) == gui.DEFAULT_OUTPUT_FOLDER
     assert window.shard_size_spin.value() == 1_000
     assert window.build_index_check.isChecked()
+    assert window.use_rxnmapper_check.isChecked()
+    assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
+    assert window.worker_count_spin.value() == 1
+    assert not window.worker_count_spin.isEnabled()
+    window.use_rxnmapper_check.setChecked(False)
+    assert window.worker_count_spin.isEnabled()
+    window.use_rxnmapper_check.setChecked(True)
+    assert window.worker_count_spin.value() == 1
+    assert not window.worker_count_spin.isEnabled()
 
 
 def test_review_worker_forwards_progress_and_result(monkeypatch) -> None:
@@ -42,6 +51,7 @@ def test_review_worker_forwards_progress_and_result(monkeypatch) -> None:
         shard_size,
         workers,
         build_fast_index,
+        use_rxnmapper,
         progress_callback,
         cancel_check,
     ):
@@ -50,6 +60,7 @@ def test_review_worker_forwards_progress_and_result(monkeypatch) -> None:
         assert shard_size == 500
         assert workers == 2
         assert build_fast_index
+        assert use_rxnmapper
         assert not cancel_check()
         progress_callback(progress)
         return {"record_count": 10, "output_dir": output}
@@ -65,6 +76,7 @@ def test_review_worker_forwards_progress_and_result(monkeypatch) -> None:
         shard_size=500,
         workers=2,
         build_fast_index=True,
+        use_rxnmapper=True,
     )
     updates = []
     results = []

@@ -82,7 +82,10 @@ The current code declares:
 | Reaction fallback descriptor | `1.2` |
 | Resolved condition recipe | `1.2` |
 | Recommendation record | `3.6` |
-| Generic converter definition | `generic_conversion.v2.6` |
+| Generic converter definition | `generic_conversion.v2.7` |
+| Generic sharded converter definition | `generic_sharded_conversion.v1.5` |
+| Concise reaction review | `2.3` |
+| Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `2.3` |
 | Generic recommendation result | `2.3` |
 | Reaction correspondence definitions | `2.3` |
@@ -115,8 +118,9 @@ observations. The artifact itself is index schema `2.3`, but it was generated
 with reaction-correspondence definition `2.2`. Current code declares `2.3` and
 therefore rejects this index until it is regenerated. This is deliberate:
 record-schema `3.4`/converter `v2.4` and record-schema `3.5`/converter `v2.5`
-are explicitly index-compatible with the current review-provenance additions
-in `3.6`/`v2.6`, but chemistry-definition identities are not silently mixed.
+are explicitly index-compatible with the current review-provenance and
+topology-safety additions in `3.6`/`v2.7`, but chemistry-definition identities
+are not silently mixed.
 
 These counts demonstrate that the type-agnostic path works on a broad bounded
 sample and that unnamed reactions are retained. They are coverage and integrity
@@ -286,6 +290,13 @@ persisted index with `external_mapping_internal_consensus` at mapper confidence
 0.656. It selected `handle_signature`, found 11 compatible observations from
 two independent support units, and returned two recipes with external-mapping
 and expert-review cautions.
+
+The featurizer, dataset-converter, and recommender desktop applications now
+show a checked-by-default `Use RXNMapper` control. The converter runs one worker
+while checked, records provider/model identity in the shard-reuse contract, and
+exports mapping columns in the concise chemist review. The recommender caches
+mapper-enabled and internal-only instances separately. The featurizer reports
+the mapper disposition and confidence beside the structural analysis.
 
 ### 2.6 Knorr/Paal–Knorr transfer audit
 

@@ -12,7 +12,14 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from reactive_taxonomy import featurize_molecule, featurize_reaction  # noqa: E402
+from reactive_taxonomy import (  # noqa: E402
+    AtomMappingProvider,
+    ExternalMappingAssessment,
+    RxnMapperProvider,
+    analyze_reaction_with_external_mapping,
+    featurize_molecule,
+    featurize_reaction,
+)
 from reactive_taxonomy.cli import format_concise_analysis  # noqa: E402
 from visualization import (  # noqa: E402
     render_molecule_image_bytes,
@@ -41,18 +48,33 @@ def detect_input_kind(text: str) -> InputKind:
     return "reaction" if ">" in text else "molecule"
 
 
-def featurize_text(text: str) -> tuple[InputKind, object]:
+def featurize_text(
+    text: str,
+    *,
+    mapping_provider: AtomMappingProvider | None = None,
+) -> tuple[InputKind, object, ExternalMappingAssessment | None]:
     """Featurize stripped text through the appropriate public taxonomy API."""
     value = text.strip()
     if not value:
         raise ValueError("Enter a molecule or reaction SMILES.")
     kind = detect_input_kind(value)
-    analysis = (
-        featurize_reaction(value)
-        if kind == "reaction"
-        else featurize_molecule(value)
-    )
-    return kind, analysis
+    if kind == "reaction":
+        base_analysis = featurize_reaction(value)
+        assessment = (
+            analyze_reaction_with_external_mapping(
+                value,
+                mapping_provider,
+                base_analysis=base_analysis,
+            )
+            if mapping_provider is not None
+            else None
+        )
+        return (
+            kind,
+            assessment.analysis if assessment is not None else base_analysis,
+            assessment,
+        )
+    return kind, featurize_molecule(value), None
 
 
 class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
@@ -64,6 +86,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.setFont(QtGui.QFont("Segoe UI", 9))
         self.setWindowTitle("Reactive Taxonomy Featurizer")
         self.resize(900, 620)
+        self._mapping_provider: RxnMapperProvider | None = None
         self._build_ui()
         self._connect_signals()
         self._apply_style()
@@ -111,6 +134,16 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.kind_label = QtWidgets.QLabel()
         self.kind_label.setObjectName("detectedKind")
         controls.addWidget(self.kind_label)
+        self.use_rxnmapper_check = QtWidgets.QCheckBox(
+            "Use RXNMapper for unresolved or ambiguous reactions"
+        )
+        self.use_rxnmapper_check.setObjectName("useRxnMapper")
+        self.use_rxnmapper_check.setChecked(True)
+        self.use_rxnmapper_check.setToolTip(
+            "Checked by default. Supplied maps and resolved internal evidence "
+            "still take precedence; generated mapping remains review evidence."
+        )
+        controls.addWidget(self.use_rxnmapper_check)
         controls.addStretch(1)
 
         self.reaction_example_button = QtWidgets.QPushButton("Reaction example")
@@ -259,16 +292,60 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             QtCore.QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents
         )
         try:
-            kind, analysis = featurize_text(self.input_edit.text())
+            input_text = self.input_edit.text()
+            requested_kind = detect_input_kind(input_text.strip())
+            mapping_provider = None
+            if (
+                requested_kind == "reaction"
+                and self.use_rxnmapper_check.isChecked()
+            ):
+                if not RxnMapperProvider.is_available():
+                    raise RuntimeError(
+                        "RXNMapper is not installed. Run "
+                        "'python -m pip install -r requirements-mapping.txt' "
+                        "or clear the RXNMapper checkbox."
+                    )
+                if self._mapping_provider is None:
+                    self._mapping_provider = RxnMapperProvider()
+                mapping_provider = self._mapping_provider
+            kind, analysis, assessment = featurize_text(
+                input_text,
+                mapping_provider=mapping_provider,
+            )
             heading = f"{kind.upper()} FEATURIZATION"
+            mapping_summary = ""
+            if kind == "reaction":
+                if assessment is None:
+                    mapping_summary = "\nRXNMapper: disabled"
+                else:
+                    result = assessment.mapping_result
+                    confidence = (
+                        f"{result.mapper_confidence:.3f}"
+                        if result is not None
+                        and result.mapper_confidence is not None
+                        else "not run"
+                    )
+                    mapping_summary = (
+                        f"\nRXNMapper: {assessment.status}"
+                        f"\nMapper provider: "
+                        f"{assessment.provider_metadata.provider_id}"
+                        f"\nMapper confidence: {confidence}"
+                    )
             self.output.setPlainText(
-                f"{heading}\n\n{format_concise_analysis(analysis)}"
+                f"{heading}{mapping_summary}\n\n"
+                f"{format_concise_analysis(analysis)}"
             )
             self._render_structure(kind, self.input_edit.text().strip())
             valid = bool(getattr(analysis, "valid", False))
             state = "valid" if valid else "invalid"
             self.status_label.setText(
                 f"Complete · {kind} input · {state}"
+                + (
+                    " · RXNMapper on"
+                    if kind == "reaction"
+                    and self.use_rxnmapper_check.isChecked()
+                    else ""
+                )
             )
             self.copy_button.setEnabled(True)
         except Exception as exc:

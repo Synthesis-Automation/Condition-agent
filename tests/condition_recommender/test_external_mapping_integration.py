@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 
 from reactive_taxonomy import (
@@ -13,10 +14,15 @@ from reactive_taxonomy import (
 
 from condition_recommender import GenericConditionRecommender
 from condition_recommender.conversion.engine import convert_datasets
+from condition_recommender.conversion.concise_review import (
+    concise_reaction_review_row,
+)
 from condition_recommender.conversion.generic import (
     GenericConversionCache,
     convert_record,
 )
+import condition_recommender.conversion.sharded as sharded_module
+from condition_recommender.conversion.sharded import convert_datasets_sharded
 from condition_recommender.conversion.input_schema import adapt_row
 from condition_recommender.generic_indexing import build_generic_index
 from condition_recommender.models import (
@@ -54,6 +60,18 @@ MAPPER_ONLY_RXNMAPPER_OUTPUT = (
     "[cH:7][cH:8][cH:9]2)[cH:10][c:11]2[cH:12][cH:13][cH:14]"
     "[cH:15][c:16]12"
 )
+INCOMPLETE_ACETAL_REACTION = (
+    "CC(C)=O.OCC(O)C(O)C(O)CO"
+    ">>CC1(C)OC[C@@H]([C@H]2OC(C)(C)O[C@H]2CO)O1"
+)
+INCOMPLETE_ACETAL_RXNMAPPER_OUTPUT = (
+    "[CH3:1][C:9](=[O:8])[CH3:10]."
+    "[OH:17][CH:7]([CH:6]([CH2:5][OH:4])[OH:16])"
+    "[CH:13]([OH:12])[CH2:14][OH:15]"
+    ">>[CH3:1][C:2]1([CH3:3])[O:4][CH2:5][C@@H:6]"
+    "([C@H:7]2[O:8][C:9]([CH3:10])([CH3:11])[O:12]"
+    "[C@H:13]2[CH2:14][OH:15])[O:16]1"
+)
 METADATA = AtomMappingProviderMetadata(
     provider_id="fixture_mapper",
     provider_version="1.0",
@@ -83,6 +101,12 @@ class _FixtureProvider:
             )
             for reaction in reaction_smiles
         )
+
+
+class _ShardedFixtureProvider(_FixtureProvider):
+    @staticmethod
+    def is_available() -> bool:
+        return True
 
 
 def _raw_record():
@@ -153,6 +177,23 @@ def test_mapper_only_edits_create_review_qualified_signature() -> None:
     )
 
 
+def test_product_only_mapped_endpoints_do_not_break_reaction_topology() -> None:
+    assessment = analyze_reaction_with_external_mapping(
+        INCOMPLETE_ACETAL_REACTION,
+        _FixtureProvider(
+            mapped_reaction=INCOMPLETE_ACETAL_RXNMAPPER_OUTPUT,
+            confidence=0.35,
+        ),
+    )
+
+    assert assessment.status == "external_mapping_signature_unavailable"
+    assert assessment.analysis.valid
+    assert assessment.analysis.reaction_signature is None
+    assert assessment.analysis.reaction_completeness is not None
+    assert assessment.analysis.reaction_completeness.status == "incomplete"
+    assert "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE" in assessment.warnings
+
+
 def test_converter_persists_mapper_provenance_but_excludes_precedent() -> None:
     provider = _FixtureProvider()
     record = convert_record(_raw_record(), mapping_provider=provider)
@@ -170,6 +211,12 @@ def test_converter_persists_mapper_provenance_but_excludes_precedent() -> None:
     assert record.admission_tier == AdmissionTier.REVIEW
     assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
     assert "external_mapping_review_required" in record.admission_reasons
+    review = concise_reaction_review_row(record.to_dict())
+    assert review["external_mapping_status"] == (
+        "external_mapping_internal_consensus"
+    )
+    assert review["external_mapping_provider"] == "fixture_mapper"
+    assert review["external_mapping_confidence"] == "0.65"
     assert not build_generic_index([record.to_dict()]).rows
     incorrectly_promoted = record.to_dict()
     incorrectly_promoted["index_eligibility"] = "eligible"
@@ -231,6 +278,53 @@ def test_conversion_engine_reports_external_mapping_dispositions(tmp_path) -> No
     ).splitlines()[0]
     assert "external_mapping_status" in review_header
     assert "external_atom_mapping_json" in review_header
+
+
+def test_sharded_converter_carries_mapping_into_manifest_and_records(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    source = tmp_path / "fischer.csv"
+    source.write_text(
+        "reaction_id,reaction_type,reaction_smiles,yield_pct,reagent_cas,"
+        "solvent_cas,reference,stages\n"
+        f'fischer-1,Fischer indole synthesis,"{FISCHER_REACTION}",82,'
+        "7647-01-0,64-17-5,Fixture reference,1\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        sharded_module,
+        "RxnMapperProvider",
+        _ShardedFixtureProvider,
+    )
+
+    report = convert_datasets_sharded(
+        source,
+        tmp_path / "sharded",
+        shard_size=1,
+        workers=1,
+        use_rxnmapper=True,
+    )
+
+    assert report["external_atom_mapping"]["enabled"]
+    assert report["external_atom_mapping"]["provider_id"] == "fixture_mapper"
+    assert report["external_atom_mapping"]["status_counts"] == {
+        "external_mapping_internal_consensus": 1
+    }
+    assert report["index_eligibility_counts"] == {"review_only": 1}
+    manifest = json.loads(
+        (tmp_path / "sharded" / "shard_manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert manifest["definition_contract"]["external_atom_mapping"] == {
+        "enabled": True,
+        "provider_id": "fixture_mapper",
+        "provider_version": "1.0",
+        "model_id": "fixture",
+        "model_sha256": "abc",
+    }
+    assert report["integrity"]["valid"]
 
 
 def test_recommender_uses_mapper_supported_query_with_review_cautions() -> None:

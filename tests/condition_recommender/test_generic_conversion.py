@@ -110,7 +110,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "3.6"
-    assert record.converter_definition_version == "generic_conversion.v2.6"
+    assert record.converter_definition_version == "generic_conversion.v2.7"
     assert record.reaction_signature["schema_version"] == "3.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -590,7 +590,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "2.2"
+    assert report["schema_version"] == "2.3"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]

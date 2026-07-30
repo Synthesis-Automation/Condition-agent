@@ -15,7 +15,7 @@ from reactive_taxonomy import render_reactivity_profile
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.2"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.3"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -29,6 +29,10 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "fallback_retrieval_eligible",
     "fallback_ineligibility_reasons",
     "evidence_quality",
+    "external_mapping_status",
+    "external_mapping_provider",
+    "external_mapping_confidence",
+    "external_mapping_matched_hypotheses",
     "transformation_confidence",
     "stereochemical_changes",
     "reaction_completeness_status",
@@ -219,6 +223,10 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         for value in record.get("reaction_edit_hypotheses") or ()
         if isinstance(value, Mapping)
     )
+    external_mapping = record.get("external_atom_mapping")
+    external_mapping_value = (
+        external_mapping if isinstance(external_mapping, Mapping) else {}
+    )
     warnings = sorted(
         {
             str(value)
@@ -228,6 +236,7 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
                 + tuple(display_value.get("warnings") or ())
                 + tuple(partial_value.get("warnings") or ())
                 + tuple(fallback_value.get("warnings") or ())
+                + tuple(external_mapping_value.get("warnings") or ())
             )
             if value
         }
@@ -263,6 +272,20 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             str(value) for value in fallback_value.get("ineligibility_reasons") or ()
         ),
         "evidence_quality": str(record.get("evidence_quality") or ""),
+        "external_mapping_status": str(
+            external_mapping_value.get("status") or ""
+        ),
+        "external_mapping_provider": str(
+            (external_mapping_value.get("provider") or {}).get("provider_id")
+            or ""
+        ),
+        "external_mapping_confidence": _text_or_blank(
+            external_mapping_value.get("mapper_confidence")
+        ),
+        "external_mapping_matched_hypotheses": "; ".join(
+            str(value)
+            for value in external_mapping_value.get("matched_hypothesis_ids") or ()
+        ),
         "transformation_confidence": _text_or_blank(
             record.get("transformation_confidence")
         ),
