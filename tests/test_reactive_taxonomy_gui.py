@@ -10,7 +10,7 @@ import pytest
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 QtWidgets = pytest.importorskip("PyQt6.QtWidgets")
 
-from app.reactive_taxonomy_gui import (  # noqa: E402
+from app.reactive_featurizer_gui import (  # noqa: E402
     REACTION_EXAMPLE,
     ReactiveTaxonomyWindow,
     detect_input_kind,
