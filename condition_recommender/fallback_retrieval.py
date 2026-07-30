@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any, Mapping
 
-from .compatibility import filter_compatible_precedents
+from .compatibility import CompatibilityAssessment, filter_compatible_precedents
 from .fallback_similarity import (
     assess_fallback_similarity,
     compatibility_signature_from_fallback,
@@ -25,27 +25,43 @@ def retrieve_fallback_pool_with_trace(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    unrestricted: bool = False,
 ) -> CompatibleRetrievalResult:
-    """Retrieve high-similarity precedents without asserting query bond edits."""
+    """Retrieve precedents without asserting query bond edits.
+
+    The unrestricted expert mode bypasses chemistry eligibility, similarity,
+    support, and recipe-compatibility gates. Feature-index overlap and the
+    configured candidate limit remain as computational bounds.
+    """
     rules = load_fallback_retrieval_rules()
     configured_minimum = int(rules["minimum_independent_support"])
     minimum = max(
         configured_minimum,
         int(minimum_pool_size) if minimum_pool_size is not None else configured_minimum,
     )
-    edit_tokens = fallback_edit_index_tokens(descriptor)
+    edit_tokens = fallback_edit_index_tokens(
+        descriptor,
+        require_eligible=not unrestricted,
+    )
     edit_position_sets = [
         set(index.fallback_features.get(token, ())) for token in edit_tokens
     ]
-    if edit_position_sets:
+    if edit_position_sets and not unrestricted:
         positions = set.intersection(*edit_position_sets)
         candidate_level = "fallback_edit_candidates"
     else:
-        query_tokens = fallback_index_tokens(descriptor)
+        query_tokens = fallback_index_tokens(
+            descriptor,
+            require_eligible=not unrestricted,
+        )
         positions = set()
         for token in query_tokens:
             positions.update(index.fallback_features.get(token, ()))
-        candidate_level = "fallback_descriptor_candidates"
+        candidate_level = (
+            "unrestricted_fallback_descriptor_candidates"
+            if unrestricted
+            else "fallback_descriptor_candidates"
+        )
     raw_rows = tuple(
         index.rows[position]
         for position in sorted(positions)
@@ -54,7 +70,7 @@ def retrieve_fallback_pool_with_trace(
     query_edits = Counter(
         str(value) for value in descriptor.get("verified_edit_tokens") or ()
     )
-    if query_edits:
+    if query_edits and not unrestricted:
         raw_rows = tuple(
             row
             for row in raw_rows
@@ -84,6 +100,63 @@ def retrieve_fallback_pool_with_trace(
             excluded_candidate_count=0,
             independent_compatible_candidate_count=0,
             trace=(candidate_trace,),
+        )
+
+    if unrestricted:
+        candidate_limit = int(rules["candidate_limit"])
+        scored = [
+            (
+                assess_fallback_similarity(
+                    descriptor,
+                    row.fallback_descriptor,
+                ).score,
+                shared_high_signal_count(
+                    descriptor,
+                    row.fallback_descriptor,
+                ),
+                row,
+            )
+            for row in raw_rows
+        ]
+        scored.sort(
+            key=lambda item: (
+                -item[0],
+                -item[1],
+                item[2].canonical_reaction_id,
+                item[2].reaction_id,
+                item[2].observation_id,
+            )
+        )
+        matched_rows = tuple(item[2] for item in scored[:candidate_limit])
+        neutral_compatibility = CompatibilityAssessment(
+            compatible=True,
+            score=1.0,
+            evidence=(
+                "Condition compatibility gates were explicitly bypassed",
+            ),
+        )
+        accepted = tuple(
+            (row, neutral_compatibility) for row in matched_rows
+        )
+        support = summarize_evidence_support(matched_rows)
+        trace = RetrievalLevelTrace(
+            level="unrestricted_unverified_structure_similarity",
+            candidate_count=len(matched_rows),
+            independent_candidate_count=support.independent_count,
+            compatible_candidate_count=len(matched_rows),
+            independent_compatible_candidate_count=support.independent_count,
+            excluded_candidate_count=0,
+            minimum_independent_support=0,
+            status="selected_without_gates",
+        )
+        return CompatibleRetrievalResult(
+            level="unrestricted_unverified_structure_fallback",
+            pool=accepted,
+            candidate_count=len(matched_rows),
+            independent_candidate_count=support.independent_count,
+            excluded_candidate_count=0,
+            independent_compatible_candidate_count=support.independent_count,
+            trace=(candidate_trace, trace),
         )
 
     exploratory_policy = rules["exploratory_partial_correspondence"]

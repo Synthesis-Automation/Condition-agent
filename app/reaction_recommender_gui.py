@@ -385,12 +385,14 @@ class GenericRecommendationWorker(QtCore.QObject):
         *,
         top_k: int,
         minimum_pool_size: Optional[int],
+        unrestricted_fallback: bool = False,
     ) -> None:
         super().__init__()
         self.data_path = data_path
         self.reaction_smiles = reaction_smiles
         self.top_k = top_k
         self.minimum_pool_size = minimum_pool_size
+        self.unrestricted_fallback = unrestricted_fallback
 
     @QtCore.pyqtSlot()
     def run(self) -> None:
@@ -403,6 +405,7 @@ class GenericRecommendationWorker(QtCore.QObject):
                 self.reaction_smiles,
                 top_k=self.top_k,
                 minimum_pool_size=self.minimum_pool_size,
+                unrestricted_fallback=self.unrestricted_fallback,
             )
         except Exception as exc:
             self.finished.emit(
@@ -456,6 +459,18 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         self.minimum_pool_spin.setToolTip(
             "Default uses the versioned retrieval definition. A larger value "
             "may force a broader chemistry fallback."
+        )
+        self.unrestricted_fallback_check = QtWidgets.QCheckBox(
+            "Unrestricted fallback matching (expert use)"
+        )
+        self.unrestricted_fallback_check.setObjectName(
+            "unrestrictedFallback"
+        )
+        self.unrestricted_fallback_check.setChecked(False)
+        self.unrestricted_fallback_check.setToolTip(
+            "For unresolved reactions, bypass fallback eligibility, "
+            "similarity, independent-support, and condition-compatibility "
+            "gates. Results can be chemically incompatible."
         )
 
         self.run_button = QtWidgets.QPushButton("Recommend Conditions")
@@ -569,6 +584,8 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
         options.addSpacing(18)
         options.addWidget(QtWidgets.QLabel("Minimum precedent pool"))
         options.addWidget(self.minimum_pool_spin)
+        options.addSpacing(18)
+        options.addWidget(self.unrestricted_fallback_check)
         options.addStretch()
         form.addRow("Options:", options)
         layout.addLayout(form)
@@ -768,6 +785,9 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             reaction_smiles,
             top_k=self.top_k_spin.value(),
             minimum_pool_size=minimum or None,
+            unrestricted_fallback=(
+                self.unrestricted_fallback_check.isChecked()
+            ),
         )
         worker.moveToThread(thread)
         thread.started.connect(worker.run)

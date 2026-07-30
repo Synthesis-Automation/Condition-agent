@@ -128,6 +128,57 @@ def test_contradicted_query_is_blocked_before_fallback_retrieval() -> None:
     assert "FALLBACK_BLOCKED:contradicted_or_incomplete_structure" in result.warnings
 
 
+def test_unrestricted_fallback_bypasses_all_chemistry_gates() -> None:
+    records = [
+        _analogue_precedent(
+            1,
+            "CC(=O)O.CN>>CC(=O)NC",
+            reference="Independent amide reference 1",
+        ),
+        _analogue_precedent(
+            2,
+            "CCC(=O)O.CN>>CCC(=O)NC",
+            reference="Independent amide reference 2",
+        ),
+    ]
+    index = build_generic_index(records)
+    query = "c1ccc(c(N)c1)O.CC(=O)O>>Cc1nc2ccccc2o1"
+
+    gated = GenericConditionRecommender(index).recommend(query)
+    unrestricted = GenericConditionRecommender(index).recommend(
+        query,
+        unrestricted_fallback=True,
+    )
+
+    assert not gated.valid
+    assert gated.error == "QUERY_NOT_ELIGIBLE_FOR_UNVERIFIED_FALLBACK"
+    assert unrestricted.valid
+    assert (
+        unrestricted.recommendation_mode
+        == "unrestricted_unverified_structure_fallback"
+    )
+    assert (
+        unrestricted.retrieval_level
+        == "unrestricted_unverified_structure_fallback"
+    )
+    assert unrestricted.recommendations
+    assert "UNRESTRICTED_FALLBACK_REQUESTED" in unrestricted.warnings
+    assert "UNRESTRICTED_FALLBACK_USED" in unrestricted.warnings
+    assert (
+        "FALLBACK_GATE_OVERRIDDEN:contradicted_or_incomplete_structure"
+        in unrestricted.warnings
+    )
+    assert (
+        "FALLBACK_SIMILARITY_SUPPORT_AND_COMPATIBILITY_GATES_BYPASSED"
+        in unrestricted.warnings
+    )
+    assert any(
+        "condition-compatibility gates were explicitly bypassed" in caution
+        for recommendation in unrestricted.recommendations
+        for caution in recommendation.cautions
+    )
+
+
 def test_single_exact_analogue_uses_limited_support_route() -> None:
     index = build_generic_index([_precedent(1)])
 

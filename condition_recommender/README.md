@@ -180,6 +180,14 @@ multiplicity, and reactions without a discriminating structural change. An
 index created before fallback descriptors were added or before a fallback
 descriptor definition changed must be rebuilt.
 
+The desktop recommender and Python API also expose an opt-in
+`unrestricted_fallback` expert mode. It bypasses fallback eligibility,
+similarity, independent-support, and condition-compatibility gates while
+retaining feature-index candidate generation and the finite candidate limit.
+The mode is disabled by default and reports distinct unrestricted-fallback
+warnings and cautions; its output is exploratory and may be chemically
+incompatible with the query.
+
 ## Expert rule-based recommendation
 
 ### Design
@@ -465,7 +473,7 @@ The desktop app can now build both recommendation-ready data and the simple
 review CSV:
 
 ```powershell
-python -m app.generic_reaction_converter_review_gui
+python -m app.reaction_converter_gui
 ```
 
 Choose the source dataset folder. The output defaults to
@@ -536,7 +544,7 @@ python -m condition_recommender.generic_recommend_cli `
 Launch the simpler Qt6 interface:
 
 ```powershell
-python -m app.generic_recommender_gui
+python -m app.reaction_recommender_gui
 ```
 
 It automatically selects `datasets/literature/generic_index.json.gz` when the

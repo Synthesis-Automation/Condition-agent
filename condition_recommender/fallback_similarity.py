@@ -120,16 +120,29 @@ def _multiset_jaccard(left: Iterable[str], right: Iterable[str]) -> float:
     return intersection / union if union else 0.0
 
 
-def fallback_index_tokens(descriptor: Mapping[str, Any]) -> Tuple[str, ...]:
-    """Return high-signal tokens used only to narrow fallback comparisons."""
-    if not bool(descriptor.get("retrieval_eligible")):
+def fallback_index_tokens(
+    descriptor: Mapping[str, Any],
+    *,
+    require_eligible: bool = True,
+) -> Tuple[str, ...]:
+    """Return high-signal tokens used only to narrow fallback comparisons.
+
+    ``require_eligible=False`` is reserved for the explicit unrestricted
+    expert fallback. It changes candidate generation only; it does not turn
+    hypothesis tokens into observed reaction evidence.
+    """
+    if require_eligible and not bool(descriptor.get("retrieval_eligible")):
         return ()
     return tuple(sorted(set(_tokens(descriptor, _HIGH_SIGNAL_FIELDS))))
 
 
-def fallback_edit_index_tokens(descriptor: Mapping[str, Any]) -> Tuple[str, ...]:
+def fallback_edit_index_tokens(
+    descriptor: Mapping[str, Any],
+    *,
+    require_eligible: bool = True,
+) -> Tuple[str, ...]:
     """Return exact normalized edit tokens for event-first candidate retrieval."""
-    if not bool(descriptor.get("retrieval_eligible")):
+    if require_eligible and not bool(descriptor.get("retrieval_eligible")):
         return ()
     return tuple(sorted(set(_tokens(descriptor, ("verified_edit_tokens",)))))
 

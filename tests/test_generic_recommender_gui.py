@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app import generic_recommender_gui as gui
+from app import reaction_recommender_gui as gui
 from condition_recommender.models import (
     GenericConditionRecommendation,
     GenericRecommendationResult,
@@ -173,6 +173,11 @@ def test_window_uses_literature_recommendation_data_by_default(
         gui.default_recommendation_data_path()
     )
     assert window.top_k_spin.value() == 5
+    assert not window.unrestricted_fallback_check.isChecked()
+    assert (
+        window.unrestricted_fallback_check.objectName()
+        == "unrestrictedFallback"
+    )
     assert window.reaction_edit.metaObject().className() == "QLineEdit"
     assert window.summary_box.height() == 168
     assert window.data_row_layout.indexOf(window.data_label) == 0
@@ -197,8 +202,22 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
     calls = []
 
     class FakeRecommender:
-        def recommend(self, reaction, *, top_k, minimum_pool_size):
-            calls.append((reaction, top_k, minimum_pool_size))
+        def recommend(
+            self,
+            reaction,
+            *,
+            top_k,
+            minimum_pool_size,
+            unrestricted_fallback,
+        ):
+            calls.append(
+                (
+                    reaction,
+                    top_k,
+                    minimum_pool_size,
+                    unrestricted_fallback,
+                )
+            )
             return expected
 
     monkeypatch.setattr(
@@ -211,6 +230,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
         "A.B>>P",
         top_k=3,
         minimum_pool_size=2,
+        unrestricted_fallback=True,
     )
     progress = []
     finished = []
@@ -223,7 +243,7 @@ def test_worker_reuses_recommender_contract(monkeypatch) -> None:
 
     worker.run()
 
-    assert calls == [("A.B>>P", 3, 2)]
+    assert calls == [("A.B>>P", 3, 2, True)]
     assert len(progress) == 2
     assert finished == [(True, expected, "")]
 

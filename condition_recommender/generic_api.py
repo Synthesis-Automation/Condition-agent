@@ -184,6 +184,7 @@ class GenericConditionRecommender:
         *,
         top_k: int = 5,
         minimum_pool_size: int | None = None,
+        unrestricted_fallback: bool = False,
     ) -> GenericRecommendationResult:
         """Featurize a query and recommend without reloading the index."""
         return _recommend_with_index(
@@ -191,6 +192,7 @@ class GenericConditionRecommender:
             self.index,
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
+            unrestricted_fallback=unrestricted_fallback,
         )
 
 
@@ -200,6 +202,7 @@ def _recommend_with_index(
     *,
     top_k: int,
     minimum_pool_size: int | None,
+    unrestricted_fallback: bool,
 ) -> GenericRecommendationResult:
     if top_k < 1:
         return GenericRecommendationResult(
@@ -218,6 +221,7 @@ def _recommend_with_index(
             index,
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
+            unrestricted=unrestricted_fallback,
         )
     result = recommend_indexed_signature(
         asdict(analysis.reaction_signature),
@@ -240,8 +244,9 @@ def _recommend_fallback_with_index(
     *,
     top_k: int,
     minimum_pool_size: int | None,
+    unrestricted: bool = False,
 ) -> GenericRecommendationResult:
-    """Recommend only when the unresolved-query fallback clears safety gates."""
+    """Recommend through the gated or explicit unrestricted fallback route."""
     reaction_smiles = str(analysis.input_reaction_smiles)
     descriptor_model = analysis.fallback_descriptor
     if descriptor_model is None:
@@ -260,6 +265,8 @@ def _recommend_fallback_with_index(
         "QUERY_TRANSFORMATION_NOT_VERIFIED",
         "UNVERIFIED_REACTION_FALLBACK_CONSIDERED",
     ]
+    if unrestricted:
+        base_warnings.append("UNRESTRICTED_FALLBACK_REQUESTED")
     required_source_elements = tuple(
         str(value)
         for value in descriptor.get("required_condition_source_elements") or ()
@@ -268,7 +275,7 @@ def _recommend_fallback_with_index(
         base_warnings.append(
             f"QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:{','.join(required_source_elements)}"
         )
-    if not bool(descriptor.get("retrieval_eligible")):
+    if not bool(descriptor.get("retrieval_eligible")) and not unrestricted:
         base_warnings.extend(
             f"FALLBACK_BLOCKED:{reason}"
             for reason in descriptor.get("ineligibility_reasons") or ()
@@ -283,6 +290,11 @@ def _recommend_fallback_with_index(
             transformation_class=analysis.transformation_class,
             warnings=tuple(base_warnings),
             error="QUERY_NOT_ELIGIBLE_FOR_UNVERIFIED_FALLBACK",
+        )
+    if unrestricted:
+        base_warnings.extend(
+            f"FALLBACK_GATE_OVERRIDDEN:{reason}"
+            for reason in descriptor.get("ineligibility_reasons") or ()
         )
     if not index.fallback_features:
         return GenericRecommendationResult(
@@ -302,6 +314,7 @@ def _recommend_fallback_with_index(
         descriptor,
         index,
         minimum_pool_size=minimum_pool_size,
+        unrestricted=unrestricted,
     )
     if not retrieval.pool:
         return GenericRecommendationResult(
@@ -320,7 +333,11 @@ def _recommend_fallback_with_index(
             excluded_candidate_count=retrieval.excluded_candidate_count,
             retrieval_trace=retrieval.trace,
             warnings=tuple(base_warnings),
-            error="NO_SAFE_FALLBACK_PRECEDENT",
+            error=(
+                "NO_UNRESTRICTED_FALLBACK_PRECEDENT"
+                if unrestricted
+                else "NO_SAFE_FALLBACK_PRECEDENT"
+            ),
         )
     recommendations = rank_condition_recipes(
         descriptor,
@@ -339,8 +356,19 @@ def _recommend_fallback_with_index(
         "recommendation is an analogy, not a chemistry-confirmed match",
         "Fallback similarity uses taxonomy features, candidate hypotheses, "
         "and global structure inventories",
-        "Condition compatibility was checked conservatively against every "
-        "observed query functional-group tag",
+        *(
+            (
+                "Fallback eligibility, similarity, independent-support, and "
+                "condition-compatibility gates were explicitly bypassed",
+                "Returned recipes may be structurally weak or chemically "
+                "incompatible with the query",
+            )
+            if unrestricted
+            else (
+                "Condition compatibility was checked conservatively against "
+                "every observed query functional-group tag",
+            )
+        ),
         *(
             (
                 "The reactant structures do not contain "
@@ -365,6 +393,13 @@ def _recommend_fallback_with_index(
         "UNVERIFIED_REACTION_FALLBACK_USED",
         "FALLBACK_RECOMMENDATIONS_REQUIRE_EXPERT_REVIEW",
     ]
+    if unrestricted:
+        warnings.extend(
+            (
+                "UNRESTRICTED_FALLBACK_USED",
+                "FALLBACK_SIMILARITY_SUPPORT_AND_COMPATIBILITY_GATES_BYPASSED",
+            )
+        )
     if retrieval.level.endswith("limited_support"):
         warnings.append("LIMITED_PRECEDENT_SUPPORT")
     if required_source_elements:
@@ -380,12 +415,20 @@ def _recommend_fallback_with_index(
         query_reaction_smiles=reaction_smiles,
         valid=True,
         query_fallback_descriptor_id=descriptor_id,
-        recommendation_mode="unverified_structure_fallback",
+        recommendation_mode=(
+            "unrestricted_unverified_structure_fallback"
+            if unrestricted
+            else "unverified_structure_fallback"
+        ),
         reaction_label=analysis.reaction_label,
         reaction_label_status=analysis.reaction_label_status,
         transformation_class=analysis.transformation_class,
         retrieval_definition_version=retrieval_definition_version,
-        retrieval_strategy="unverified_structure_fallback",
+        retrieval_strategy=(
+            "unrestricted_unverified_structure_fallback"
+            if unrestricted
+            else "unverified_structure_fallback"
+        ),
         retrieval_level=retrieval.level,
         candidate_count=retrieval.candidate_count,
         independent_candidate_count=retrieval.independent_candidate_count,
@@ -406,6 +449,7 @@ def recommend_generic_conditions(
     records_path: str | Path = "results/generic_conversion/records.jsonl",
     top_k: int = 5,
     minimum_pool_size: int | None = None,
+    unrestricted_fallback: bool = False,
 ) -> GenericRecommendationResult:
     """Featurize a reaction and recommend canonical resolved recipes."""
     recommender = GenericConditionRecommender.from_path(records_path)
@@ -413,6 +457,7 @@ def recommend_generic_conditions(
         reaction_smiles,
         top_k=top_k,
         minimum_pool_size=minimum_pool_size,
+        unrestricted_fallback=unrestricted_fallback,
     )
 
 
