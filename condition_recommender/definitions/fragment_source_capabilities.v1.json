@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "fragment_source_capabilities.v1",
+  "capabilities": [
+    {
+      "capability_id": "single_atom_fluorine_source.v1",
+      "match": {
+        "element_counts": {"F": 1},
+        "maximum_atom_count": 1
+      },
+      "substance_ids": [
+        "cas:429-41-4",
+        "cas:63517-29-3",
+        "cas:7681-49-4",
+        "cas:7789-23-3",
+        "cas:13400-13-0",
+        "cas:1629684-53-2",
+        "cas:164298-23-1",
+        "cas:164298-25-3"
+      ],
+      "family_ids": [
+        "acyl_halide_fluoride_generators",
+        "fluoride"
+      ],
+      "raw_identifiers": [],
+      "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
+    },
+    {
+      "capability_id": "single_atom_chlorine_source.v1",
+      "match": {
+        "element_counts": {"Cl": 1},
+        "maximum_atom_count": 1
+      },
+      "substance_ids": [
+        "cas:79-37-8",
+        "cas:10025-87-3",
+        "cas:10026-13-8",
+        "cas:10294-34-5"
+      ],
+      "family_ids": [],
+      "raw_identifiers": ["7719-09-7"],
+      "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
+    },
+    {
+      "capability_id": "single_atom_bromine_source.v1",
+      "match": {
+        "element_counts": {"Br": 1},
+        "maximum_atom_count": 1
+      },
+      "substance_ids": [
+        "cas:77-48-5",
+        "cas:128-08-5",
+        "cas:7726-95-6",
+        "cas:7550-35-8"
+      ],
+      "family_ids": [],
+      "raw_identifiers": [],
+      "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
+    },
+    {
+      "capability_id": "single_atom_iodine_source.v1",
+      "match": {
+        "element_counts": {"I": 1},
+        "maximum_atom_count": 1
+      },
+      "substance_ids": [
+        "cas:7553-56-2",
+        "cas:7681-11-0"
+      ],
+      "family_ids": ["iodide_promoters"],
+      "raw_identifiers": [],
+      "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
+    },
+    {
+      "capability_id": "cyanide_fragment_source.v1",
+      "match": {
+        "rooted_fragment_smiles_any": ["*C#N"],
+        "maximum_atom_count": 2
+      },
+      "substance_ids": [
+        "cas:143-33-9",
+        "cas:151-50-8",
+        "cas:7677-24-9"
+      ],
+      "family_ids": [],
+      "raw_identifiers": [],
+      "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
+    },
+    {
+      "capability_id": "azide_fragment_source.v1",
+      "match": {
+        "rooted_fragment_smiles_any": ["*N=[N+]=[N-]"],
+        "maximum_atom_count": 3
+      },
+      "substance_ids": [
+        "cas:26628-22-8",
+        "cas:4648-54-8"
+      ],
+      "family_ids": [],
+      "raw_identifiers": [],
+      "allowed_source_fields": ["reagent_cas", "catalyst_cas"]
+    }
+  ]
+}

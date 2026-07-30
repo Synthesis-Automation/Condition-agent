@@ -41,6 +41,15 @@ def test_missing_chlorine_source_yields_partial_acyl_substitution() -> None:
         in {"construction_failed", "product_mismatch"}
         for candidate in result.candidates
     )
+    descriptor = result.fallback_descriptor
+    assert descriptor is not None
+    assert descriptor.partial_transformation_key.startswith("PTS1:")
+    assert len(descriptor.source_requirements) == 1
+    requirement = descriptor.source_requirements[0]
+    assert requirement.requirement_id.startswith("FSR1:")
+    assert requirement.element_counts == {"Cl": 1}
+    assert requirement.attachment_element == "Cl"
+    assert requirement.removed_attachment_element == "O"
 
 
 def test_partial_attachment_replacement_is_not_acyl_specific() -> None:

@@ -3,17 +3,24 @@
   "definition_id": "fallback_fragments.v1",
   "rules": [
     {
-      "rule_id": "exploratory_single_halogen_replacement.v1",
-      "transformation_types": ["attachment_replacement"],
-      "center_elements": ["C"],
-      "removed_attachment_elements": ["F", "Cl", "Br", "I"],
-      "installed_fragment_elements": ["F", "Cl", "Br", "I"],
-      "maximum_missing_atom_count": 1,
+      "rule_id": "bounded_condition_supplied_attachment_replacement.v1",
+      "transformation_types": [
+        "attachment_replacement",
+        "attachment_fragment_replacement"
+      ],
+      "center_elements": ["B", "C", "N", "O", "P", "S", "Si"],
+      "removed_attachment_elements": [
+        "B", "C", "F", "Cl", "Br", "I", "N", "O", "P", "S", "Si"
+      ],
+      "installed_fragment_elements": [
+        "B", "C", "F", "Cl", "Br", "I", "N", "O", "P", "S", "Si"
+      ],
+      "maximum_missing_atom_count": 8,
       "minimum_confidence": 0.8,
-      "minimum_product_heavy_atom_coverage": 0.9,
+      "minimum_product_heavy_atom_coverage": 0.6,
       "old_orders": ["SINGLE"],
       "new_orders": ["SINGLE"],
-      "condition_source_requirement_id": "unverified_single_atom_source"
+      "condition_source_requirement_id": "condition_supplied_fragment"
     }
   ]
 }

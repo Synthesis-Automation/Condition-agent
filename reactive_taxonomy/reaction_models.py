@@ -10,7 +10,7 @@ from .models import CompoundAnalysis
 
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.0"
-REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.2"
+REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.3"
 
 EditArchetype = Literal[
     "substitution",
@@ -394,6 +394,25 @@ class PartialProductTransformation:
 
 
 @dataclass(frozen=True)
+class FragmentSourceRequirement:
+    """Product-only fragment that a reported condition component must supply."""
+
+    requirement_id: str
+    fragment_key: str
+    canonical_fragment_smiles: str
+    rooted_fragment_smiles: str
+    element_counts: Dict[str, int]
+    atom_count: int
+    center_element: str
+    attachment_element: str
+    attachment_bond_order: str
+    removed_attachment_element: str
+    evidence: Literal["partial_product_correspondence"]
+    confidence: float
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
 class ReactionLabelClause:
     """One deterministic, evidence-backed human-readable edit clause."""
 
@@ -701,6 +720,8 @@ class ReactionFallbackDescriptor:
     bond_inventory_delta_tokens: Tuple[str, ...]
     element_delta_tokens: Tuple[str, ...]
     compatibility_tags: Tuple[str, ...]
+    partial_transformation_key: Optional[str]
+    source_requirements: Tuple[FragmentSourceRequirement, ...]
     required_condition_source_elements: Tuple[str, ...]
     condition_source_requirement_id: Optional[str]
     definition_versions: Dict[str, str]
@@ -794,7 +815,7 @@ class ReactionAnalysis:
     reaction_completeness: Optional[ReactionCompletenessAssessment] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "3.2"
+    schema_version: str = "3.3"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -809,6 +830,7 @@ __all__ = [
     "ConnectivityEditGraph",
     "ConnectivityObservationScope",
     "EditArchetype",
+    "FragmentSourceRequirement",
     "HydrogenDelta",
     "RewriteOutcome",
     "PartialProductTransformation",

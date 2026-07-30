@@ -14,6 +14,7 @@ from rdkit import Chem
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_models import (
     REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
+    FragmentSourceRequirement,
     PartialProductTransformation,
     ReactionCandidate,
     ReactionCompletenessAssessment,
@@ -26,7 +27,7 @@ from .reaction_signatures import reaction_signature_definition_versions
 
 
 _DEFINITION_ID = "reaction_fallback_descriptor.v1"
-_DEFINITION_VERSION = "1.2"
+_DEFINITION_VERSION = "1.3"
 _DEFINITIONS = Path(__file__).with_name("definitions")
 _FALLBACK_FRAGMENT_RULES_PATH = _DEFINITIONS / "fallback_fragments.v1.json"
 _REACTION_CENTER_RULES_PATH = _DEFINITIONS / "reaction_center_fallback.v1.json"
@@ -585,10 +586,15 @@ def _reaction_center_tokens(
 def _condition_source_requirement(
     partial: Optional[PartialProductTransformation],
     completeness: Optional[ReactionCompletenessAssessment],
-) -> tuple[Optional[str], tuple[str, ...]]:
+) -> tuple[
+    Optional[str],
+    Optional[str],
+    tuple[FragmentSourceRequirement, ...],
+    tuple[str, ...],
+]:
     """Recognize bounded product fragments that conditions may legitimately supply."""
     if partial is None or completeness is None:
-        return None, ()
+        return None, None, (), ()
     missing_elements = tuple(sorted(partial.missing_product_atom_elements))
     installed_elements = tuple(
         sorted(
@@ -599,7 +605,7 @@ def _condition_source_requirement(
     )
     missing_count = len(installed_elements)
     if not missing_elements or missing_elements != installed_elements:
-        return None, ()
+        return None, None, (), ()
     for rule in _load_fallback_fragment_rules():
         if partial.transformation_type not in tuple(
             str(value) for value in rule.get("transformation_types") or ()
@@ -634,11 +640,72 @@ def _condition_source_requirement(
             str(value) for value in rule.get("new_orders") or ()
         ):
             continue
+        transformation_payload = {
+            "transformation_type": partial.transformation_type,
+            "transformation_class": partial.transformation_class,
+            "center_element": partial.reactant_center.element,
+            "removed_fragment_key": partial.removed_fragment_key,
+            "installed_fragment_key": partial.installed_fragment.fragment_key,
+            "old_order": partial.old_order,
+            "new_order": partial.new_order,
+            "schema_version": "1.0",
+        }
+        transformation_key = "PTS1:" + hashlib.sha256(
+            json.dumps(
+                transformation_payload,
+                ensure_ascii=True,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        requirement_payload = {
+            "fragment_key": partial.installed_fragment.fragment_key,
+            "rooted_fragment_smiles": (
+                partial.installed_fragment.rooted_fragment_smiles
+            ),
+            "element_counts": dict(
+                sorted(partial.installed_fragment.element_counts.items())
+            ),
+            "center_element": partial.reactant_center.element,
+            "attachment_element": partial.added_attachment.element,
+            "attachment_bond_order": partial.new_order,
+            "schema_version": "1.0",
+        }
+        requirement_id = "FSR1:" + hashlib.sha256(
+            json.dumps(
+                requirement_payload,
+                ensure_ascii=True,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        requirement = FragmentSourceRequirement(
+            requirement_id=requirement_id,
+            fragment_key=partial.installed_fragment.fragment_key,
+            canonical_fragment_smiles=(
+                partial.installed_fragment.canonical_fragment_smiles
+            ),
+            rooted_fragment_smiles=(
+                partial.installed_fragment.rooted_fragment_smiles
+            ),
+            element_counts=dict(
+                sorted(partial.installed_fragment.element_counts.items())
+            ),
+            atom_count=missing_count,
+            center_element=partial.reactant_center.element,
+            attachment_element=partial.added_attachment.element,
+            attachment_bond_order=partial.new_order,
+            removed_attachment_element=partial.removed_attachment.element,
+            evidence="partial_product_correspondence",
+            confidence=float(partial.confidence),
+        )
         return (
+            transformation_key,
             str(rule.get("condition_source_requirement_id") or ""),
+            (requirement,),
             missing_elements,
         )
-    return None, ()
+    return None, None, (), ()
 
 
 def _digest(payload: Mapping[str, object]) -> str:
@@ -684,11 +751,15 @@ def build_reaction_fallback_descriptor(
         )
     )
     (
+        partial_transformation_key,
         condition_source_requirement_id,
+        source_requirements,
         required_condition_source_elements,
     ) = _condition_source_requirement(partial_transformation, completeness)
     condition_source_required = bool(
-        condition_source_requirement_id and required_condition_source_elements
+        partial_transformation_key
+        and condition_source_requirement_id
+        and source_requirements
     )
     if signature is not None:
         evidence_mode = "verified_signature"
@@ -776,6 +847,27 @@ def build_reaction_fallback_descriptor(
         "reaction_center_radius_3": center_radius_3,
         "bond_inventory_delta": bond_delta,
         "element_delta": element_delta,
+        "partial_transformation_key": partial_transformation_key,
+        "source_requirements": tuple(
+            {
+                "requirement_id": requirement.requirement_id,
+                "fragment_key": requirement.fragment_key,
+                "canonical_fragment_smiles": (
+                    requirement.canonical_fragment_smiles
+                ),
+                "rooted_fragment_smiles": requirement.rooted_fragment_smiles,
+                "element_counts": requirement.element_counts,
+                "atom_count": requirement.atom_count,
+                "center_element": requirement.center_element,
+                "attachment_element": requirement.attachment_element,
+                "attachment_bond_order": requirement.attachment_bond_order,
+                "removed_attachment_element": (
+                    requirement.removed_attachment_element
+                ),
+                "schema_version": requirement.schema_version,
+            }
+            for requirement in source_requirements
+        ),
         "required_condition_source_elements": required_condition_source_elements,
         "condition_source_requirement_id": condition_source_requirement_id,
         "definitions": versions,
@@ -807,6 +899,8 @@ def build_reaction_fallback_descriptor(
         bond_inventory_delta_tokens=bond_delta,
         element_delta_tokens=element_delta,
         compatibility_tags=tuple(sorted(set(reactant_tags).union(product_tags))),
+        partial_transformation_key=partial_transformation_key,
+        source_requirements=source_requirements,
         required_condition_source_elements=required_condition_source_elements,
         condition_source_requirement_id=condition_source_requirement_id,
         definition_versions=versions,

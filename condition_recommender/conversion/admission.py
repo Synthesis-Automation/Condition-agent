@@ -10,6 +10,8 @@ from typing import Any, Optional, Tuple
 
 from condition_registry import ResolvedConditionRecipe
 
+from ..fragment_source_support import fragment_source_support_is_complete
+from ..models import FragmentSourceSupport
 from .identities import CanonicalReactionIdentity
 from .input_schema import RawReactionRecord
 from ..models import (
@@ -32,7 +34,7 @@ class AdmissionDecision:
     condition_stage_status: ConditionStageStatus
     outcome_status: OutcomeStatus
     index_eligibility: IndexEligibility
-    policy_version: str = "generic_admission.v1.8"
+    policy_version: str = "generic_admission.v1.9"
 
 
 @lru_cache(maxsize=1)
@@ -49,6 +51,7 @@ def decide_admission(
     canonical_identity: Optional[CanonicalReactionIdentity],
     conditions: ConditionIdentity,
     resolved_recipe: ResolvedConditionRecipe,
+    fragment_source_support: Tuple[FragmentSourceSupport, ...] = (),
 ) -> AdmissionDecision:
     """Assess independent evidence dimensions and derive the legacy tier."""
     policy = load_admission_policy()
@@ -58,17 +61,34 @@ def decide_admission(
     chemistry_reasons: list[str] = []
     completeness = analysis.reaction_completeness
     fallback_descriptor = analysis.fallback_descriptor
+    source_requirements = (
+        fallback_descriptor.source_requirements
+        if fallback_descriptor is not None
+        else ()
+    )
+    source_supported_partial = bool(
+        fallback_descriptor is not None
+        and fallback_descriptor.retrieval_eligible
+        and fragment_source_support_is_complete(
+            source_requirements,
+            fragment_source_support,
+        )
+    )
     external_mapping_review_required = False
     if not analysis.valid or canonical_identity is None:
         chemistry_status = ChemistryStatus.REJECTED
         chemistry_reasons.append("invalid_reaction_or_product")
     elif completeness is not None and completeness.status == "incomplete":
-        if fallback_descriptor is not None and fallback_descriptor.retrieval_eligible:
+        if source_supported_partial:
             chemistry_status = ChemistryStatus.REVIEW
-            chemistry_reasons.append("exploratory_partial_product_correspondence")
+            chemistry_reasons.append(
+                "condition_supported_partial_product_correspondence"
+            )
         else:
             chemistry_status = ChemistryStatus.REJECTED
             chemistry_reasons.append("unaccounted_product_heavy_atoms")
+            if source_requirements:
+                chemistry_reasons.append("missing_condition_fragment_source")
             if completeness.suspected_insufficient_reactant_multiplicity:
                 chemistry_reasons.append("insufficient_reactant_multiplicity")
             elif completeness.suspected_missing_reactant:
@@ -114,11 +134,20 @@ def decide_admission(
             chemistry_reasons.append("partial_atom_mapping")
         if chemistry_reasons:
             chemistry_status = ChemistryStatus.REVIEW
-    if any(
+    external_review_warnings = {
         warning
-        in set(policy.get("external_mapping_review_warnings") or ())
         for warning in analysis.warnings
-    ):
+        if warning in set(policy.get("external_mapping_review_warnings") or ())
+    }
+    blocking_external_warnings = {
+        warning
+        for warning in external_review_warnings
+        if not (
+            source_supported_partial
+            and warning == "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE"
+        )
+    }
+    if blocking_external_warnings:
         external_mapping_review_required = True
         chemistry_reasons.append("external_mapping_conflict")
         if chemistry_status == ChemistryStatus.VERIFIED:
@@ -214,6 +243,10 @@ def decide_admission(
                 chemistry_status == ChemistryStatus.REVIEW
                 and fallback_descriptor is not None
                 and fallback_descriptor.retrieval_eligible
+                and (
+                    not fallback_descriptor.source_requirements
+                    or source_supported_partial
+                )
             )
         )
     )

@@ -256,6 +256,15 @@ forced named family. Their labels describe the graph transition, while
 recognized generic edit patterns or `generic_graph_transformation` provide a
 mechanism-neutral transformation class.
 
+If product atoms cannot be sourced from the reported reactant side, a bounded
+single-attachment correspondence may instead retain an observation-only
+product-origin gap. The fallback descriptor represents it with a deterministic
+`PTS1` partial-transformation key and typed `FSR1` fragment-source
+requirements. These are structural observations only: they do not create a
+reaction signature, named family, or atom correspondence. The recommender may
+later compare the requirements with its separately owned, curated condition
+capability registry.
+
 Integrated CLI tester:
 
 ```powershell

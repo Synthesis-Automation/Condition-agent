@@ -143,11 +143,33 @@ not a `ReactionSignature`: candidate edits are hypotheses and are never
 serialized as observed bond edits.
 
 The fallback normally searches structure-verified, condition-resolved
-precedents in the generic index. Its exploratory partial-correspondence scope
-also admits high-confidence single-atom carbon-halogen replacements when at
-least 90% of product heavy atoms have provenance. The missing product atom is
-retained as unresolved evidence. At this stage, the route does not require or
-claim that a particular condition component supplies that atom.
+precedents in the generic index. A separate review-qualified path handles
+source-incomplete attachment replacements such as
+`R-C(=O)-OH -> R-C(=O)-F`, `Ar-Br -> Ar-C#N`, or analogous bounded fragment
+changes. Taxonomy emits:
+
+- a deterministic `PTS1` partial-transformation key describing the center,
+  removed branch, installed fragment graph, and attachment bond;
+- one or more typed `FSR1` fragment-source requirements; and
+- an explicit product-origin gap. This remains an observation, not a verified
+  atom correspondence or `ReactionSignature`.
+
+During conversion,
+[`fragment_source_capabilities.v1.json`](definitions/fragment_source_capabilities.v1.json)
+matches each requirement against curated resolved condition substances,
+families, or narrowly allowlisted raw identities. A precedent is eligible for
+the partial index only when every required fragment has a reported
+reagent/catalyst source capability. Elemental presence alone is insufficient:
+for example, a fluorinated solvent is not inferred to be a fluoride donor.
+The capability match supports the recipe as a precedent but does not prove
+which atoms in the product came from that component.
+
+At query time, the recommender first searches the exact `PTS1` pool and applies
+a hard requirement-ID/source-support filter. Thus an acid-to-acyl-fluoride
+query can retrieve acid-to-acyl-fluoride precedents with curated fluorinating
+conditions, while an amidation cannot enter that pool. Only after this isolated
+path is unavailable does the ordinary unsigned-query policy decide whether a
+different fallback is permitted.
 
 Candidate generation is event-first when partial or observed edit tokens are
 available: precedents must share the normalized edit before structural ranking.
@@ -158,12 +180,13 @@ successive shells compare atom, bond, branching, and topology features without
 requiring identical whole-molecule SMILES. Whole-component identity remains a
 low-weight tie-breaker.
 
-The route requires multiple shared high-signal feature groups, a configured
-similarity threshold, conservative compatibility screening against all observed
-query functional-group tags, and normally two independent evidence units. A
-single precedent is accepted only at the stricter limited-support threshold.
-For exploratory partial correspondence, evidence support changes confidence
-and warnings but does not suppress otherwise compatible edit-matched analogues.
+The ordinary structure-neighbor route requires multiple shared high-signal
+feature groups, a configured similarity threshold, conservative compatibility
+screening against all observed query functional-group tags, and normally two
+independent evidence units. A single precedent is accepted only at the stricter
+limited-support threshold. Exact source-supported partial transformations use
+the same independent-evidence accounting, but do not admit structurally similar
+rows with a different partial-transformation identity.
 Results use
 `recommendation_mode="unverified_structure_fallback"` and include
 `QUERY_TRANSFORMATION_NOT_VERIFIED`,
@@ -171,14 +194,17 @@ Results use
 `FALLBACK_RECOMMENDATIONS_REQUIRE_EXPERT_REVIEW`. Partial-correspondence
 retrieval additionally reports
 `QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:<element>` and
-`EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:<element>`.
+`SOURCE_SUPPORTED_PARTIAL_TRANSFORMATION_USED`.
 
-The route still abstains for invalid or conflicting atom maps, contradicted
-grammar/product evidence outside the bounded single-halogen rule, lower product
-coverage, multi-atom missing fragments, suspected missing reactants or
-multiplicity, and reactions without a discriminating structural change. An
-index created before fallback descriptors were added or before a fallback
-descriptor definition changed must be rebuilt.
+The source-supported route still abstains for invalid or conflicting atom maps,
+ambiguous scaffold correspondence, transformations outside the bounded
+attachment-replacement definition, insufficient product coverage, unsupported
+fragment requirements, suspected reactant multiplicity problems, and reactions
+without a discriminating structural change. Its current curated capability
+seed covers selected single-atom F/Cl/Br/I and multi-atom cyanide/azide sources;
+coverage expands by validating the general capability registry, not by adding a
+reaction-name branch. An index created before the descriptor, capability,
+converter, or index definition changed must be rebuilt.
 
 The desktop recommender and Python API also expose an opt-in
 `unrestricted_fallback` expert mode. It bypasses fallback eligibility,
@@ -631,6 +657,9 @@ Generic configuration is split by responsibility:
   comparison features;
 - `definitions/generic_ranking.v1.json` combines similarity, compatibility,
   condition certainty, outcome evidence, and reference-aware support.
+- `definitions/fragment_source_capabilities.v1.json` states which curated
+  reported condition identities can satisfy typed product-fragment
+  requirements;
 - `definitions/fallback_retrieval.v1.json` controls the isolated unresolved-query
   structure fallback and its stricter support gates.
 

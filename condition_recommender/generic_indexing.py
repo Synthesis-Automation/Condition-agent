@@ -28,20 +28,20 @@ from .signature_features import environment_tokens
 from .fallback_similarity import fallback_index_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "2.3"
+GENERIC_INDEX_SCHEMA_VERSION = "2.4"
 
-# Record schema 3.6 / converters v2.6-v2.7 add optional external-mapping review
-# provenance and safer incomplete-reaction topology handling. They do not
-# change verified signature, fallback descriptor, recipe, or index-row
-# contracts, so persisted v3.4-v3.6 indices remain chemistry-compatible.
+# Older fully verified records remain source-compatible. Records carrying old
+# fallback descriptors still fail the descriptor schema/definition checks and
+# must be regenerated before they can enter the new partial-transformation map.
 _INDEX_COMPATIBLE_RECORD_SCHEMAS = frozenset(
-    {"3.4", "3.5", RECOMMENDATION_RECORD_SCHEMA_VERSION}
+    {"3.4", "3.5", "3.6", RECOMMENDATION_RECORD_SCHEMA_VERSION}
 )
 _INDEX_COMPATIBLE_CONVERTER_VERSIONS = frozenset(
     {
         "generic_conversion.v2.4",
         "generic_conversion.v2.5",
         "generic_conversion.v2.6",
+        "generic_conversion.v2.7",
         GENERIC_CONVERTER_DEFINITION_VERSION,
     }
 )
@@ -76,6 +76,7 @@ class GenericIndexedReaction:
     reaction_label: str = ""
     reaction_label_status: str = "unavailable"
     fallback_descriptor: Dict[str, Any] = dataclass_field(default_factory=dict)
+    fragment_source_support: Tuple[Dict[str, Any], ...] = ()
 
     @property
     def named_family(self) -> str:
@@ -102,6 +103,7 @@ class GenericReactionIndex:
     environments: Mapping[str, Tuple[int, ...]]
     environment_features: Mapping[str, Tuple[int, ...]]
     fallback_features: Mapping[str, Tuple[int, ...]]
+    partial_transformations: Mapping[str, Tuple[int, ...]]
     families: Mapping[str, Tuple[int, ...]]
     reaction_signature_schema_version: str
     taxonomy_definition_versions: Tuple[Tuple[str, str], ...]
@@ -244,6 +246,7 @@ def build_generic_index_from_rows(
     families: Dict[str, list[int]] = defaultdict(list)
     environment_features: Dict[str, list[int]] = defaultdict(list)
     fallback_features: Dict[str, list[int]] = defaultdict(list)
+    partial_transformations: Dict[str, list[int]] = defaultdict(list)
     for position, row in enumerate(ordered):
         for name, field in _KEY_FIELDS.items():
             key = str(row.signature.get(field) or "")
@@ -255,6 +258,11 @@ def build_generic_index_from_rows(
             environment_features[token].append(position)
         for token in fallback_index_tokens(row.fallback_descriptor):
             fallback_features[token].append(position)
+        partial_key = str(
+            row.fallback_descriptor.get("partial_transformation_key") or ""
+        )
+        if partial_key:
+            partial_transformations[partial_key].append(position)
     return GenericReactionIndex(
         rows=tuple(ordered),
         exact=_freeze(maps["exact"]),
@@ -264,6 +272,7 @@ def build_generic_index_from_rows(
         environments=_freeze(maps["environments"]),
         environment_features=_freeze(environment_features),
         fallback_features=_freeze(fallback_features),
+        partial_transformations=_freeze(partial_transformations),
         families=_freeze(families),
         reaction_signature_schema_version=signature_schema,
         taxonomy_definition_versions=definition_versions,
@@ -292,10 +301,27 @@ def build_generic_index(
             if isinstance(external_mapping, Mapping)
             else ""
         )
+        fragment_source_support = tuple(
+            dict(value)
+            for value in record.get("fragment_source_support") or ()
+            if isinstance(value, Mapping)
+        )
+        source_supported_partial = bool(
+            fragment_source_support
+            and all(
+                str(value.get("status") or "") == "supported"
+                for value in fragment_source_support
+            )
+        )
         if (
             not include_review
             and external_mapping_status
             and not external_mapping_status.startswith("not_requested_")
+            and not (
+                external_mapping_status
+                == "external_mapping_signature_unavailable"
+                and source_supported_partial
+            )
         ):
             continue
         eligibility = _enum_value(record.get("index_eligibility"))
@@ -385,6 +411,7 @@ def build_generic_index(
                     if isinstance(fallback_descriptor, Mapping)
                     else {}
                 ),
+                fragment_source_support=fragment_source_support,
             )
         )
     return build_generic_index_from_rows(rows)
@@ -432,6 +459,7 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "reaction_label": row.reaction_label,
             "reaction_label_status": row.reaction_label_status,
             "fallback_descriptor": row.fallback_descriptor,
+            "fragment_source_support": row.fragment_source_support,
         }
         for row in index.rows
     ]
@@ -443,6 +471,7 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
         "environments": dict(index.environments),
         "environment_features": dict(index.environment_features),
         "fallback_features": dict(index.fallback_features),
+        "partial_transformations": dict(index.partial_transformations),
         "families": dict(index.families),
     }
     identity = json.dumps(
@@ -633,6 +662,11 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
                 row.get("reaction_label_status") or "unavailable"
             ),
             fallback_descriptor=dict(row.get("fallback_descriptor") or {}),
+            fragment_source_support=tuple(
+                dict(value)
+                for value in row.get("fragment_source_support") or ()
+                if isinstance(value, Mapping)
+            ),
         )
         for row in payload.get("rows") or ()
     )
@@ -660,6 +694,10 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
         fallback_features={
             key: tuple(value)
             for key, value in (maps.get("fallback_features") or {}).items()
+        },
+        partial_transformations={
+            key: tuple(value)
+            for key, value in (maps.get("partial_transformations") or {}).items()
         },
         families={
             key: tuple(value) for key, value in (maps.get("families") or {}).items()
@@ -780,6 +818,13 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
         for token in fallback_index_tokens(row.fallback_descriptor):
             if position not in index.fallback_features.get(token, ()):
                 issues.append("missing_fallback_feature_mapping")
+        partial_key = str(
+            row.fallback_descriptor.get("partial_transformation_key") or ""
+        )
+        if partial_key and position not in index.partial_transformations.get(
+            partial_key, ()
+        ):
+            issues.append("missing_partial_transformation_mapping")
         if row.named_family and position not in index.families.get(
             row.named_family, ()
         ):
@@ -812,6 +857,7 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
         "key_counts": {
             "exact": len(index.exact),
             "handles": len(index.handles),
+            "partial_transformations": len(index.partial_transformations),
             "transformations": len(index.transformations),
             "bond_edits": len(index.bond_edits),
             "environments": len(index.environments),

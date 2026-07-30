@@ -72,6 +72,11 @@ INCOMPLETE_ACETAL_RXNMAPPER_OUTPUT = (
     "([C@H:7]2[O:8][C:9]([CH3:10])([CH3:11])[O:12]"
     "[C@H:13]2[CH2:14][OH:15])[O:16]1"
 )
+ACYL_FLUORIDE_REACTION = "O=C(O)c1ccccc1>>O=C(F)c1ccccc1"
+ACYL_FLUORIDE_RXNMAPPER_OUTPUT = (
+    "[OH:10][C:2](=[O:1])[c:4]1[cH:5][cH:6][cH:7][cH:8][cH:9]1"
+    ">>[O:1]=[C:2]([F:3])[c:4]1[cH:5][cH:6][cH:7][cH:8][cH:9]1"
+)
 METADATA = AtomMappingProviderMetadata(
     provider_id="fixture_mapper",
     provider_version="1.0",
@@ -192,6 +197,38 @@ def test_product_only_mapped_endpoints_do_not_break_reaction_topology() -> None:
     assert assessment.analysis.reaction_completeness is not None
     assert assessment.analysis.reaction_completeness.status == "incomplete"
     assert "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE" in assessment.warnings
+
+
+def test_mapper_unavailable_signature_does_not_block_supported_partial_record() -> None:
+    raw = adapt_row(
+        {
+            "reaction_id": "acyl-fluoride-1",
+            "reaction_smiles": ACYL_FLUORIDE_REACTION,
+            "yield_pct": "90",
+            "reagent_cas": "63517-29-3",
+            "solvent_cas": "141-78-6",
+            "reference": "Acyl fluoride reference",
+        },
+        source_dataset="acyl-fluoride",
+        source_path="acyl-fluoride.csv",
+        source_row_number=1,
+    )
+    record = convert_record(
+        raw,
+        mapping_provider=_FixtureProvider(
+            mapped_reaction=ACYL_FLUORIDE_RXNMAPPER_OUTPUT,
+            confidence=0.88,
+        ),
+    )
+
+    assert record.external_atom_mapping is not None
+    assert record.external_atom_mapping["status"] == (
+        "external_mapping_signature_unavailable"
+    )
+    assert record.chemistry_status == ChemistryStatus.REVIEW
+    assert record.index_eligibility == IndexEligibility.ELIGIBLE
+    assert record.fragment_source_support[0]["status"] == "supported"
+    assert len(build_generic_index([record.to_dict()]).rows) == 1
 
 
 def test_converter_persists_mapper_provenance_but_excludes_precedent() -> None:

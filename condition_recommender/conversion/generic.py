@@ -15,6 +15,7 @@ from reactive_taxonomy import (
 )
 
 from ..condition_normalization import normalize_cas_list
+from ..fragment_source_support import assess_fragment_source_support
 from ..models import ConditionIdentity, RecommendationRecord
 from .admission import decide_admission
 from .identities import canonical_reaction_identity, observation_id, raw_recipe_id
@@ -187,12 +188,22 @@ def convert_record(
         if cache is None
         else cache.get(cache.recipes, recipe_key, build_recipe)
     )
+    source_requirements = (
+        analysis.fallback_descriptor.source_requirements
+        if analysis.fallback_descriptor is not None
+        else ()
+    )
+    fragment_source_support = assess_fragment_source_support(
+        source_requirements,
+        resolved_recipe,
+    )
     decision = decide_admission(
         record=record,
         analysis=analysis,
         canonical_identity=canonical_identity,
         conditions=conditions,
         resolved_recipe=resolved_recipe,
+        fragment_source_support=fragment_source_support,
     )
     condition_series_id = reference_condition_series_id(
         reference_id=reference_identity.reference_id,
@@ -267,6 +278,9 @@ def convert_record(
         reaction_display_label=asdict(analysis.display_label)
         if analysis.display_label
         else None,
+        fragment_source_support=tuple(
+            support.to_dict() for support in fragment_source_support
+        ),
         **signature_record_fields(analysis),
         external_atom_mapping=(
             assessment.to_provenance_dict()

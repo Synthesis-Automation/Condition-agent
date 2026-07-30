@@ -14,6 +14,9 @@ _CONDITION_SUPPLIED_FLUORINATION = (
     "CC(C)(I)CCOS(=O)(=O)c1ccc(F)cc1>>CC(C)(F)CCOS(=O)(=O)c1ccc(F)cc1"
 )
 _CONDITION_SUPPLIED_IODINATION = "CCCCCCCCC(C)(F)CC>>CCCCCCCCC(C)(I)CC"
+_ACYL_FLUORIDE_QUERY = (
+    "N#Cc1ccc(C(=O)O)cc1>>N#Cc1ccc(C(=O)F)cc1"
+)
 
 
 def _precedent(index: int) -> dict:
@@ -68,18 +71,36 @@ def _iodination_precedent(index: int, iodine_cas: str) -> dict:
     return convert_record(record).to_dict()
 
 
+def _acyl_fluoride_precedent(index: int, reaction_smiles: str) -> dict:
+    record = adapt_row(
+        {
+            "reaction_id": f"acyl-fluoride-{index}",
+            "reaction_smiles": reaction_smiles,
+            "yield_pct": "90",
+            "reagent_cas": "63517-29-3",
+            "solvent_cas": "141-78-6",
+            "reference": f"Acyl fluoride reference {index}",
+        },
+        source_dataset="fallback-test",
+        source_path="acyl-fluoride.csv",
+        source_row_number=index,
+    )
+    return convert_record(record).to_dict()
+
+
 def _analogue_precedent(
     index: int,
     reaction_smiles: str,
     *,
     reference: str = "Shared analogue reference",
+    reagent_cas: str = "97-93-8",
 ) -> dict:
     record = adapt_row(
         {
             "reaction_id": f"analogue-{index}",
             "reaction_smiles": reaction_smiles,
             "yield_pct": "90",
-            "reagent_cas": "97-93-8",
+            "reagent_cas": reagent_cas,
             "solvent_cas": "110-54-3",
             "reference": reference,
         },
@@ -99,7 +120,7 @@ def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
     assert result.query_signature_id is None
     assert result.query_fallback_descriptor_id.startswith("RFD1:")
     assert result.recommendation_mode == "unverified_structure_fallback"
-    assert result.retrieval_definition_version == "1.3"
+    assert result.retrieval_definition_version == "1.4"
     assert result.retrieval_level == "unverified_structure_fallback"
     assert result.independent_compatible_candidate_count == 2
     assert "UNVERIFIED_REACTION_FALLBACK_USED" in result.warnings
@@ -107,7 +128,7 @@ def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
     assert result.recommendations
     recommendation = result.recommendations[0]
     assert (
-        recommendation.score_trace.definition_versions["fallback_retrieval.v1"] == "1.3"
+        recommendation.score_trace.definition_versions["fallback_retrieval.v1"] == "1.4"
     )
     assert any(
         "atom correspondence and bond edits are not verified" in caution
@@ -227,28 +248,68 @@ def test_exploratory_fluoride_partial_precedents_are_retrievable() -> None:
 
     assert result.valid
     assert result.recommendation_mode == "unverified_structure_fallback"
+    assert result.retrieval_level == "source_supported_partial_transformation"
     assert result.candidate_count == 2
     assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:F" in result.warnings
     assert "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:F" in result.warnings
     assert len(result.recommendations) == 2
 
 
-def test_partial_fluorination_keeps_unverified_source_as_a_warning() -> None:
+def test_partial_fluorination_without_capable_source_is_not_indexed() -> None:
     record = _fluorination_precedent(1, "584-08-7")
 
-    assert record["chemistry_status"] == "review"
-    assert record["index_eligibility"] == "eligible"
-    assert "exploratory_partial_product_correspondence" in record["admission_reasons"]
-    assert (
-        "PRODUCT_ATOM_SOURCE_UNVERIFIED:F" in record["fallback_descriptor"]["warnings"]
+    assert record["chemistry_status"] == "rejected"
+    assert record["index_eligibility"] == "ineligible"
+    assert "missing_condition_fragment_source" in record["admission_reasons"]
+    assert record["fragment_source_support"][0]["status"] == "unsupported"
+    assert len(build_generic_index([record]).rows) == 0
+
+
+def test_acyl_fluoride_query_prefers_exact_partial_transformation_to_amidation() -> None:
+    acyl_fluorides = [
+        _acyl_fluoride_precedent(
+            1,
+            "COc1cccc(C(=O)O)c1>>COc1cccc(C(=O)F)c1",
+        ),
+        _acyl_fluoride_precedent(
+            2,
+            "O=C(O)c1ccccc1>>O=C(F)c1ccccc1",
+        ),
+    ]
+    amide = _analogue_precedent(
+        3,
+        "COC(=O)c1ccc(C(=O)O)cc1.CN>>"
+        "COC(=O)c1ccc(C(=O)NC)cc1",
+        reference="Amidation reference",
     )
-    assert len(build_generic_index([record]).rows) == 1
+
+    result = GenericConditionRecommender(
+        build_generic_index([*acyl_fluorides, amide])
+    ).recommend(_ACYL_FLUORIDE_QUERY)
+
+    assert result.valid
+    assert result.retrieval_level == "source_supported_partial_transformation"
+    assert result.candidate_count == 2
+    assert "SOURCE_SUPPORTED_PARTIAL_TRANSFORMATION_USED" in result.warnings
+    hit_ids = {
+        reaction_id
+        for recommendation in result.recommendations
+        for reaction_id in recommendation.precedent_reaction_ids
+    }
+    assert hit_ids == {"acyl-fluoride-1", "acyl-fluoride-2"}
+    assert all(
+        recommendation.precedent_reaction_contexts[0][
+            "fragment_source_support"
+        ][0]["status"]
+        == "supported"
+        for recommendation in result.recommendations
+    )
 
 
 def test_exploratory_iodine_partial_precedents_are_retrievable() -> None:
     records = [
-        _iodination_precedent(1, "97-93-8"),
-        _iodination_precedent(2, "584-08-7"),
+        _iodination_precedent(1, "7553-56-2"),
+        _iodination_precedent(2, "7681-11-0"),
     ]
 
     for record in records:
@@ -267,7 +328,8 @@ def test_exploratory_iodine_partial_precedents_are_retrievable() -> None:
     assert result.valid
     assert result.recommendation_mode == "unverified_structure_fallback"
     assert result.candidate_count == 2
-    assert result.retrieval_definition_version == "1.3"
+    assert result.retrieval_definition_version == "1.4"
+    assert result.retrieval_level == "source_supported_partial_transformation"
     assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:I" in result.warnings
     assert "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:I" in result.warnings
     assert len(result.recommendations) == 2
@@ -277,16 +339,13 @@ def test_exploratory_iodine_partial_precedents_are_retrievable() -> None:
     )
 
 
-def test_partial_iodination_keeps_unverified_source_as_a_warning() -> None:
+def test_partial_iodination_without_capable_source_is_not_indexed() -> None:
     record = _iodination_precedent(1, "97-93-8")
 
-    assert record["chemistry_status"] == "review"
-    assert record["index_eligibility"] == "eligible"
-    assert "exploratory_partial_product_correspondence" in record["admission_reasons"]
-    assert (
-        "PRODUCT_ATOM_SOURCE_UNVERIFIED:I" in record["fallback_descriptor"]["warnings"]
-    )
-    assert len(build_generic_index([record]).rows) == 1
+    assert record["chemistry_status"] == "rejected"
+    assert record["index_eligibility"] == "ineligible"
+    assert "missing_condition_fragment_source" in record["admission_reasons"]
+    assert len(build_generic_index([record]).rows) == 0
 
 
 def test_local_center_signature_ranks_nonidentical_same_edit_analogues() -> None:
@@ -326,10 +385,12 @@ def test_leave_one_reaction_out_returns_nonidentical_edit_analogues() -> None:
         _analogue_precedent(
             1,
             "CCCCCCCCCCC(C)F>>CCCCCCCCCCC(C)I",
+            reagent_cas="7553-56-2",
         ),
         _analogue_precedent(
             2,
             "FC12CC3CC(CC(C3)C1)C2>>IC12CC3CC(CC(C3)C1)C2",
+            reagent_cas="7553-56-2",
         ),
     ]
 
@@ -342,7 +403,7 @@ def test_leave_one_reaction_out_returns_nonidentical_edit_analogues() -> None:
     assert result.independent_compatible_candidate_count == 1
     assert (
         result.retrieval_level
-        == "unverified_structure_fallback_exploratory_limited_support"
+        == "source_supported_partial_transformation_limited_support"
     )
     assert "LIMITED_PRECEDENT_SUPPORT" in result.warnings
     assert result.recommendations

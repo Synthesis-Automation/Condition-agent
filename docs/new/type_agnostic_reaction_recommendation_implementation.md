@@ -50,14 +50,15 @@ reactive_taxonomy       condition_registry
 | Connectivity execution | V2 implemented | One bounded declarative rewrite path for all registered grammars; no legacy reaction-operator fallback |
 | Edit evidence | Implemented | Typed provider candidates from mapping, exact single/multi-event reconstruction, conservative scaffold, bounded global, and fragmented-scaffold correspondence; distinct ambiguous edit hypotheses; conflicts and H/charge/stereo observations |
 | External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, persisted with model provenance, and never admitted as verified precedents |
-| Product completeness | Implemented | Verified/incomplete/unresolved accounting plus observation-only product-origin gaps |
+| Product completeness | Implemented | Verified/incomplete/unresolved accounting, observation-only product-origin gaps, and typed fragment-source requirements |
 | Reaction signatures | Implemented | Deterministic RS3 L0–L4 signatures, events, topology, profiles, spectators, unknown-family support |
 | Reactivity descriptors | Implemented and active | Typed context-aware profiles are the sole active environment path |
 | Condition registry | Implemented, curation incomplete | Conservative identity resolution, contextual roles, RCORE1/RCR1 recipes, stages, provenance |
 | Generic conversion | Implemented | Nested canonical records, independent quality dimensions, review exports, sharding, restart/integrity checks |
-| Generic index | Implemented | Version-checked persisted index with signature, environment, family, fallback, recipe, and reference keys |
+| Generic index | Implemented | Version-checked persisted index with signature, exact partial-transformation, environment, family, fallback, recipe, and reference keys |
 | Generic retrieval | Implemented pilot | Explicit verified-signature ladder plus conservative all-hypothesis query consensus, independent-support thresholds, hard compatibility, similarity, and reference-aware recipe aggregation |
-| Unverified-query fallback | Implemented, conservative | Separate structure-derived fallback; not represented as verified edit retrieval |
+| Source-supported partial transformations | Implemented, review-qualified | Product-observed attachment replacement may retrieve only exact partial transformations whose precedent conditions have a curated source capability |
+| Unverified-query fallback | Implemented, conservative | Separate structure-derived fallback for other unsigned queries; not represented as verified edit retrieval |
 | Evaluation and calibration | Implemented tooling | Grouped, scaffold-, source-, and time-disjoint modes; baselines; calibration; blind review/adjudication |
 | Release validation | Implemented tooling | Machine artifact checks plus hash-bound independent chemist sign-off |
 | Expert rules | Separate limited path | One active C–N protocol; other templates are draft/review-only |
@@ -73,24 +74,26 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `3.2` |
+| Reaction analysis | `3.3` |
 | Reaction signature / ID namespace | `3.0` / `RS3` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
 | Connectivity rewrite | `2.0` |
 | Typed reactivity profile | `1.0` |
-| Reaction fallback descriptor | `1.2` |
+| Reaction fallback descriptor | `1.3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `3.6` |
-| Generic converter definition | `generic_conversion.v2.7` |
-| Generic sharded converter definition | `generic_sharded_conversion.v1.5` |
-| Concise reaction review | `2.3` |
+| Recommendation record | `3.7` |
+| Generic converter definition | `generic_conversion.v2.8` |
+| Generic sharded converter definition | `generic_sharded_conversion.v1.6` |
+| Concise reaction review | `2.4` |
 | Recommendation artifact workflow | `1.1` |
-| Generic persisted index | `2.3` |
+| Generic persisted index | `2.4` |
 | Generic recommendation result | `2.3` |
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.6` |
-| Generic admission policy | `generic_admission.v1.8` |
+| Generic admission policy | `generic_admission.v1.9` |
+| Fragment-source capabilities | `fragment_source_capabilities.v1@1.0` |
+| Fallback retrieval definition | `1.4` |
 
 Do not copy this table into executable code. The constants and definition files
 remain authoritative, and stale artifacts must fail validation rather than
@@ -98,29 +101,20 @@ silently mixing chemistry identities.
 
 ### 2.3 Current local literature artifact
 
-The checked local artifact under `datasets/literature/` is a complete
-conversion of the bounded `examples/all_dataset_300` collection, not the full
-source corpus. Its report records:
+The checked local artifact under `datasets/literature/` was most recently built
+from the bounded `examples/small_300` collection, not the full source corpus.
+Its pre-source-support report records:
 
 | Measurement | Count |
 | --- | ---: |
-| Source files / converted rows | 118 / 30,100 |
-| Verified product-provenance signatures | 16,118 |
-| Index-eligible records | 12,816 |
-| Chemistry verified / review / rejected | 7,417 / 13,793 / 8,890 |
-| Records without an assigned named family | 28,351 |
-| Generic-index rows | 12,816 |
-| Unique references in the index | 5,330 |
-| Unique recipe cores in the index | 3,820 |
+| Source files / converted rows | 19 / 5,510 |
+| Generic-index rows | 2,603 |
 
 The sharded conversion report records zero failed shards and zero duplicate
-observations. The artifact itself is index schema `2.3`, but it was generated
-with reaction-correspondence definition `2.2`. Current code declares `2.3` and
-therefore rejects this index until it is regenerated. This is deliberate:
-record-schema `3.4`/converter `v2.4` and record-schema `3.5`/converter `v2.5`
-are explicitly index-compatible with the current review-provenance and
-topology-safety additions in `3.6`/`v2.7`, but chemistry-definition identities
-are not silently mixed.
+observations. The artifact predates fallback descriptor `1.3`, converter
+`v2.8`, and index `2.4`; current code therefore rejects it until it is
+regenerated. This is deliberate because exact partial-transformation keys and
+fragment-source support change chemistry admission and index membership.
 
 These counts demonstrate that the type-agnostic path works on a broad bounded
 sample and that unnamed reactions are retained. They are coverage and integrity
@@ -380,7 +374,8 @@ validation before they may consume these observations.
   endpoints;
 - exact single-event and composable multi-event reconstruction;
 - reaction topology and event relationships;
-- typed product-atom completeness and partial product-origin gaps;
+- typed product-atom completeness, partial product-origin gaps, deterministic
+  `PTS1` partial-transformation keys, and `FSR1` fragment-source requirements;
 - graph-derived local reactivity profiles and unchanged spectators.
 
 The internal `CEG1` connectivity-edit graph remains evaluation/shadow output.
@@ -414,6 +409,7 @@ The converter serializes:
 - optional external-mapping disposition, mapped proposal, coverage, confidence,
   provider/model identity, matched internal hypotheses, and warnings;
 - chemistry, condition, stage, outcome, and index-eligibility statuses;
+- condition-source capability matches for each typed fragment requirement;
 - resolved recipe core and variants;
 - reference-local condition-series identity;
 - outcome values and their usability;
@@ -455,6 +451,23 @@ The fallback descriptor and retrieval policy are separate from RS3 retrieval.
 They must return `recommendation_mode`, fallback evidence, stricter thresholds,
 and cautions. A structure-neighbor fallback must never be described as a
 verified reaction-center match.
+
+Source-incomplete attachment replacements use an isolated exact-transformation
+branch within that fallback path:
+
+```text
+exact PTS1 partial transformation
+  -> hard FSR1 condition-source support
+  -> compatibility and independent-support gates
+  -> local-environment ranking
+  -> review-qualified recommendation or abstention
+```
+
+The condition capability registry is generic over fragment graph, composition,
+attachment element, resolved substance/family identity, and reported recipe
+role. Its initial F/Cl/Br/I/CN/N3 entries are coverage seeds, not
+reaction-family routing rules. A condition match supports reagent plausibility
+but never upgrades the incomplete observation to verified atom mapping.
 
 An unsigned query with two or more typed edit hypotheses takes a separate
 query-only branch before ordinary structure fallback. The policy in

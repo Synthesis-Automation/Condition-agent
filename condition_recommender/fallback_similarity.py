@@ -52,7 +52,7 @@ def load_fallback_retrieval_rules() -> dict[str, Any]:
     """Load and validate the conservative fallback policy."""
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if str(rules.get("schema_version") or "") != "1.3":
+    if str(rules.get("schema_version") or "") != "1.4":
         raise ValueError("unsupported fallback retrieval definition schema")
     if str(rules.get("definition_id") or "") != "fallback_retrieval.v1":
         raise ValueError("unexpected fallback retrieval definition ID")

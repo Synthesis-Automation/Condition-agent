@@ -43,10 +43,18 @@ def retrieve_fallback_pool_with_trace(
         descriptor,
         require_eligible=not unrestricted,
     )
+    partial_transformation_key = str(
+        descriptor.get("partial_transformation_key") or ""
+    )
     edit_position_sets = [
         set(index.fallback_features.get(token, ())) for token in edit_tokens
     ]
-    if edit_position_sets and not unrestricted:
+    if partial_transformation_key and not unrestricted:
+        positions = set(
+            index.partial_transformations.get(partial_transformation_key, ())
+        )
+        candidate_level = "partial_transformation_exact"
+    elif edit_position_sets and not unrestricted:
         positions = set.intersection(*edit_position_sets)
         candidate_level = "fallback_edit_candidates"
     else:
@@ -67,13 +75,33 @@ def retrieve_fallback_pool_with_trace(
         for position in sorted(positions)
         if index.rows[position].fallback_descriptor
     )
+    required_source_ids = {
+        str(value.get("requirement_id") or "")
+        for value in descriptor.get("source_requirements") or ()
+        if isinstance(value, Mapping)
+    }
+    source_excluded_count = 0
+    if required_source_ids and not unrestricted:
+        source_supported_rows = tuple(
+            row
+            for row in raw_rows
+            if required_source_ids
+            <= {
+                str(value.get("requirement_id") or "")
+                for value in row.fragment_source_support
+                if str(value.get("status") or "") == "supported"
+            }
+        )
+        source_excluded_count = len(raw_rows) - len(source_supported_rows)
+    else:
+        source_supported_rows = raw_rows
     query_edits = Counter(
         str(value) for value in descriptor.get("verified_edit_tokens") or ()
     )
     if query_edits and not unrestricted:
-        raw_rows = tuple(
+        source_supported_rows = tuple(
             row
-            for row in raw_rows
+            for row in source_supported_rows
             if Counter(
                 str(value)
                 for value in row.fallback_descriptor.get("verified_edit_tokens") or ()
@@ -81,26 +109,40 @@ def retrieve_fallback_pool_with_trace(
             == query_edits
         )
     raw_support = summarize_evidence_support(raw_rows)
+    source_supported_support = summarize_evidence_support(source_supported_rows)
     candidate_trace = RetrievalLevelTrace(
         level=candidate_level,
         candidate_count=len(raw_rows),
         independent_candidate_count=raw_support.independent_count,
-        compatible_candidate_count=len(raw_rows),
-        independent_compatible_candidate_count=raw_support.independent_count,
-        excluded_candidate_count=0,
+        compatible_candidate_count=len(source_supported_rows),
+        independent_compatible_candidate_count=(
+            source_supported_support.independent_count
+        ),
+        excluded_candidate_count=source_excluded_count,
         minimum_independent_support=minimum,
-        status="scored" if raw_rows else "empty",
+        status=(
+            "source_supported"
+            if source_supported_rows
+            else "missing_condition_fragment_source"
+            if raw_rows
+            else "empty"
+        ),
     )
-    if not raw_rows:
+    if not source_supported_rows:
         return CompatibleRetrievalResult(
-            level="no_fallback_descriptor_candidate",
+            level=(
+                "no_condition_fragment_source_precedent"
+                if raw_rows
+                else "no_fallback_descriptor_candidate"
+            ),
             pool=(),
-            candidate_count=0,
-            independent_candidate_count=0,
-            excluded_candidate_count=0,
+            candidate_count=len(raw_rows),
+            independent_candidate_count=raw_support.independent_count,
+            excluded_candidate_count=source_excluded_count,
             independent_compatible_candidate_count=0,
             trace=(candidate_trace,),
         )
+    raw_rows = source_supported_rows
 
     if unrestricted:
         candidate_limit = int(rules["candidate_limit"])
@@ -201,7 +243,7 @@ def retrieve_fallback_pool_with_trace(
         compatibility_signature,
         matched_rows,
     )
-    excluded_count = len(compatibility_excluded)
+    excluded_count = len(compatibility_excluded) + source_excluded_count
     accepted_rows = tuple(row for row, _ in accepted)
     accepted_support = summarize_evidence_support(accepted_rows)
     matched_support = summarize_evidence_support(matched_rows)
@@ -232,17 +274,29 @@ def retrieve_fallback_pool_with_trace(
         )
 
     selected_level = (
-        "unverified_structure_fallback_exploratory"
+        "source_supported_partial_transformation"
+        if candidate_level == "partial_transformation_exact"
+        else "unverified_structure_fallback_exploratory"
         if exploratory
         else "unverified_structure_fallback"
     )
-    status = "selected_exploratory" if exploratory else "selected"
+    status = (
+        "selected_source_supported_partial"
+        if candidate_level == "partial_transformation_exact"
+        else "selected_exploratory"
+        if exploratory
+        else "selected"
+    )
     if accepted_support.independent_count < minimum:
         if exploratory and bool(
             exploratory_policy.get("support_affects_confidence_only")
         ):
             selected_level += "_limited_support"
-            status = "selected_exploratory_limited_support"
+            status = (
+                "selected_source_supported_partial_limited_support"
+                if candidate_level == "partial_transformation_exact"
+                else "selected_exploratory_limited_support"
+            )
         else:
             best_score = max(
                 assess_fallback_similarity(

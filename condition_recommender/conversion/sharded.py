@@ -41,7 +41,7 @@ from .generic import GenericConversionCache, convert_record
 from .input_schema import RawReactionRecord, discover_csv_datasets, iter_csv_records
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
-SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v1.5"
+SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v1.6"
 
 
 @dataclass(frozen=True)
@@ -294,6 +294,16 @@ def _converted_counts(payloads: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
                     for payload in payloads
                     for mapping in (payload.get("external_atom_mapping"),)
                     if isinstance(mapping, Mapping)
+                ).items()
+            )
+        ),
+        "fragment_source_support_status_counts": dict(
+            sorted(
+                Counter(
+                    str(support.get("status") or "missing")
+                    for payload in payloads
+                    for support in payload.get("fragment_source_support") or ()
+                    if isinstance(support, Mapping)
                 ).items()
             )
         ),
@@ -908,6 +918,10 @@ def convert_datasets_sharded(
         ),
         "reaction_completeness_status_counts": _merge_counts(
             complete_entries, "reaction_completeness_status_counts"
+        ),
+        "fragment_source_support_status_counts": _merge_counts(
+            complete_entries,
+            "fragment_source_support_status_counts",
         ),
         "external_atom_mapping": {
             **contract["external_atom_mapping"],

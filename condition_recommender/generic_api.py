@@ -614,9 +614,10 @@ def _recommend_fallback_with_index(
         ),
         *(
             (
-                "The reactant structures do not contain "
-                f"{', '.join(required_source_elements)}; the fallback does not "
-                "verify which condition component supplies it",
+                "The query reactant structures do not contain "
+                f"{', '.join(required_source_elements)}; retrieved precedents "
+                "must contain a curated condition source, but direct atom "
+                "origin remains unverified",
             )
             if required_source_elements
             else ()
@@ -650,6 +651,8 @@ def _recommend_fallback_with_index(
             "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:"
             f"{','.join(required_source_elements)}"
         )
+    if retrieval.level.startswith("source_supported_partial_transformation"):
+        warnings.append("SOURCE_SUPPORTED_PARTIAL_TRANSFORMATION_USED")
     if retrieval.excluded_candidate_count:
         warnings.append(
             f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{retrieval.excluded_candidate_count}"

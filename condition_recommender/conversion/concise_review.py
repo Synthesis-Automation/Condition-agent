@@ -15,7 +15,7 @@ from reactive_taxonomy import render_reactivity_profile
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.3"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.4"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -44,8 +44,12 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "removed_fragment",
     "installed_fragment",
     "installed_fragment_key",
+    "partial_transformation_key",
     "fragment_source_status",
     "fragment_source_candidates",
+    "condition_source_support_status",
+    "condition_source_components",
+    "condition_source_capabilities",
     "missing_product_atom_elements",
     "chemistry_status",
     "condition_status",
@@ -227,6 +231,11 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     external_mapping_value = (
         external_mapping if isinstance(external_mapping, Mapping) else {}
     )
+    source_support = tuple(
+        value
+        for value in record.get("fragment_source_support") or ()
+        if isinstance(value, Mapping)
+    )
     warnings = sorted(
         {
             str(value)
@@ -316,6 +325,9 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             installed_value.get("canonical_fragment_smiles") or ""
         ),
         "installed_fragment_key": str(installed_value.get("fragment_key") or ""),
+        "partial_transformation_key": str(
+            fallback_value.get("partial_transformation_key") or ""
+        ),
         "fragment_source_status": str(installed_value.get("source_status") or ""),
         "fragment_source_candidates": json.dumps(
             installed_value.get("source_candidates") or (),
@@ -325,6 +337,29 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         )
         if installed_value.get("source_candidates")
         else "",
+        "condition_source_support_status": "; ".join(
+            str(value.get("status") or "") for value in source_support
+        ),
+        "condition_source_components": "; ".join(
+            sorted(
+                {
+                    str(identifier)
+                    for value in source_support
+                    for identifier in (
+                        value.get("component_raw_identifiers") or ()
+                    )
+                }
+            )
+        ),
+        "condition_source_capabilities": "; ".join(
+            sorted(
+                {
+                    str(capability)
+                    for value in source_support
+                    for capability in value.get("capability_ids") or ()
+                }
+            )
+        ),
         "missing_product_atom_elements": "; ".join(
             str(value)
             for value in partial_value.get("missing_product_atom_elements") or ()

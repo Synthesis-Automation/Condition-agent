@@ -83,6 +83,10 @@ GENERIC_REVIEW_FIELDS = (
     "fallback_descriptor_id",
     "fallback_descriptor_evidence_mode",
     "fallback_descriptor_retrieval_eligible",
+    "partial_transformation_key",
+    "fragment_source_support_status",
+    "fragment_source_support_components",
+    "fragment_source_support_json",
     "fallback_descriptor_json",
     "reference",
 )
@@ -99,6 +103,7 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
     signature = record.reaction_signature or {}
     completeness = record.reaction_completeness or {}
     external_mapping = record.external_atom_mapping or {}
+    source_support = tuple(record.fragment_source_support)
     return {
         "schema_version": record.schema_version,
         "observation_id": record.observation_id,
@@ -238,6 +243,36 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "reaction_event_count": signature.get("event_count", ""),
         "reaction_event_scope": signature.get("event_scope", ""),
         **flattened_signature_fields(record.reaction_signature),
+        "partial_transformation_key": (
+            (record.fallback_descriptor or {}).get(
+                "partial_transformation_key",
+                "",
+            )
+        ),
+        "fragment_source_support_status": _joined(
+            value.get("status", "") for value in source_support
+        ),
+        "fragment_source_support_components": _joined(
+            sorted(
+                {
+                    str(identifier)
+                    for value in source_support
+                    for identifier in (
+                        value.get("component_raw_identifiers") or ()
+                    )
+                }
+            )
+        ),
+        "fragment_source_support_json": (
+            json.dumps(
+                source_support,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            if source_support
+            else ""
+        ),
         **flattened_fallback_fields(record.fallback_descriptor),
         "reference": record.source.get("reference", ""),
     }

@@ -378,6 +378,26 @@ conserved scaffold and every product-only fragment atom. This
 mechanism-neutral observation does not create a named family, a verified
 `ReactionSignature`, or normal index eligibility.
 
+The fallback descriptor projects this observation into two deterministic,
+mechanism-neutral contracts:
+
+```text
+PTS1 partial-transformation key
+  = center + removed branch + installed fragment graph + attachment bond
+
+FSR1 fragment-source requirement
+  = installed fragment graph + composition + attachment context
+```
+
+These keys are derived from molecular structure, not a reaction label. During
+dataset conversion, `condition_recommender` evaluates every `FSR1` requirement
+against a versioned registry of curated condition-source capabilities. Only a
+precedent whose reported reagent/catalyst recipe supports every requirement may
+enter the exact partial-transformation index. A capability match is evidence
+that the recipe can supply the fragment; it is not asserted atom
+correspondence. Merely containing the same element does not qualify a condition
+component.
+
 Completeness and mapping warnings include:
 
 ```text
@@ -586,14 +606,21 @@ During dataset conversion,
 
 - runs reaction featurization;
 - resolves conditions through `condition_registry`;
+- evaluates typed product-fragment source requirements against curated,
+  versioned condition capabilities;
 - attaches source provenance;
 - evaluates admission;
-- rejects product-atom-incomplete records from indexing and sends unresolved
-  provenance or inconsistent mapping to review;
+- rejects unsupported product-atom-incomplete records from indexing;
+- admits a uniquely observed, source-supported partial transformation only to
+  the separate review-qualified partial index, never as a verified signature;
+- sends unresolved provenance, ambiguous correspondence, and inconsistent
+  mapping to review or rejection as appropriate;
 - admits a fully resolved ingredient set from an unassigned multistage record
   only at review confidence, with a ranking penalty and explicit caution;
 - serializes reaction completeness in canonical JSONL and exposes its status,
   coverage, and warnings in generic review CSV;
+- serializes the `PTS1` key, `FSR1` requirements, matched condition components,
+  capability IDs, and support status;
 - serializes the nested reaction signature;
 - serializes provider evidence and edit hypotheses for review even when no
   signature can be issued;
@@ -614,3 +641,18 @@ molecular graph
 
 The label explains the structural analysis; it does not create or control that
 analysis.
+
+For an unsigned query carrying an exact `PTS1` key, recommendation checks the
+partial-transformation index before ordinary structural fallback:
+
+```text
+exact PTS1 identity
+  -> all FSR1 requirements supported by each precedent recipe
+  -> compatibility and independent-support gates
+  -> local-environment ranking within that exact transformation
+  -> expert-review result or abstention
+```
+
+This makes the behavior general across curated fragment replacements while
+preventing a superficially similar but different edit—such as amidation—from
+competing with acid-to-acyl-fluoride precedents.

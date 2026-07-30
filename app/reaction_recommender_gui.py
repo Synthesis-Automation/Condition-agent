@@ -868,6 +868,23 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             for partner in (selected_context.get("reaction_partners") or ())
             if isinstance(partner, Mapping)
         )
+        fragment_source_support = tuple(
+            dict(value)
+            for value in (selected_context.get("fragment_source_support") or ())
+            if isinstance(value, Mapping)
+        )
+        source_support_summary = "; ".join(
+            (
+                f"{_display_name(value.get('status'))}: "
+                + ", ".join(
+                    str(identifier)
+                    for identifier in (
+                        value.get("component_raw_identifiers") or ()
+                    )
+                )
+            ).rstrip(": ")
+            for value in fragment_source_support
+        ) or "Not required"
         partner_summaries = _partner_analysis_summaries(reaction_partners)
         lines = [
             f"Rank {recommendation.rank}",
@@ -883,6 +900,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
                 if precedent_reaction_smiles
                 else "Selected hit reaction SMILES: Unavailable"
             ),
+            f"Fragment source support: {source_support_summary}",
             f"Spectator groups: {_spectator_summary(spectator_groups)}",
             "Reactivity profile:",
         ]

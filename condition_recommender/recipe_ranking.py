@@ -68,6 +68,10 @@ def _precedent_reaction_context(
         "reaction_center_core": tuple(
             fallback.get("reaction_center_core_tokens") or ()
         ),
+        "partial_transformation_key": (
+            fallback.get("partial_transformation_key") or None
+        ),
+        "fragment_source_support": tuple(precedent.fragment_source_support),
     }
 
 
@@ -535,6 +539,25 @@ def rank_condition_recipes(
                 "Precedent transformation uses partial product correspondence; "
                 "the source of the otherwise missing product fragment is not "
                 "verified"
+            )
+        supported_fragment_sources = tuple(
+            sorted(
+                {
+                    raw_identifier
+                    for member in members
+                    for support in member.row.fragment_source_support
+                    if str(support.get("status") or "") == "supported"
+                    for raw_identifier in (
+                        support.get("component_raw_identifiers") or ()
+                    )
+                }
+            )
+        )
+        if supported_fragment_sources:
+            cautions.append(
+                "Installed product fragment is supported by reported condition "
+                "component(s), but direct atom origin is not verified: "
+                + ", ".join(supported_fragment_sources)
             )
         precedent_scopes = {
             reaction_scope(member.row.signature)

@@ -87,6 +87,7 @@ def convert_datasets(
     role_bucket_counts = Counter()
     role_confidence_counts = Counter()
     external_mapping_status_counts = Counter()
+    fragment_source_support_status_counts = Counter()
     canonical_groups: Counter[str] = Counter()
     group_recipes: Dict[str, set[str]] = defaultdict(set)
     row_count = signature_count = 0
@@ -139,6 +140,10 @@ def convert_datasets(
                             or "missing"
                         )
                     ] += 1
+                fragment_source_support_status_counts.update(
+                    str(value.get("status") or "missing")
+                    for value in record.fragment_source_support
+                )
                 completeness_counts[
                     str(
                         (record.reaction_completeness or {}).get("status")
@@ -233,6 +238,9 @@ def convert_datasets(
         },
         "reaction_completeness_status_counts": dict(
             sorted(completeness_counts.items())
+        ),
+        "fragment_source_support_status_counts": dict(
+            sorted(fragment_source_support_status_counts.items())
         ),
         "signature_count": signature_count,
         "signature_rate": round(signature_count / row_count, 6) if row_count else 0.0,

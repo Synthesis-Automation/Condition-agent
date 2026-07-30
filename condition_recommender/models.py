@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.6"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.7"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.7"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.8"
 
 
 class AdmissionTier(str, Enum):
@@ -100,6 +100,25 @@ class ReferenceIdentity:
 
 
 @dataclass(frozen=True)
+class FragmentSourceSupport:
+    """Condition evidence that can supply one product-only fragment."""
+
+    requirement_id: str
+    fragment_key: str
+    status: str
+    component_substance_ids: Tuple[str, ...] = ()
+    component_raw_identifiers: Tuple[str, ...] = ()
+    capability_ids: Tuple[str, ...] = ()
+    evidence: Tuple[str, ...] = ()
+    confidence: float = 0.0
+    definition_version: str = "fragment_source_capabilities.v1@1.0"
+    schema_version: str = "1.0"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class RecommendationRecord:
     """One converted reaction observation with admission provenance."""
 
@@ -132,6 +151,7 @@ class RecommendationRecord:
     external_atom_mapping: Optional[Dict[str, Any]] = None
     fallback_descriptor: Optional[Dict[str, Any]] = None
     reaction_display_label: Optional[Dict[str, Any]] = None
+    fragment_source_support: Tuple[Dict[str, Any], ...] = ()
     transformation_class: Optional[str] = None
     transformation_confidence: float = 0.0
     family_confidence: float = 0.0
