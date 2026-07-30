@@ -14,6 +14,11 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from reactive_taxonomy import featurize_molecule, featurize_reaction  # noqa: E402
 from reactive_taxonomy.cli import format_concise_analysis  # noqa: E402
+from visualization import (  # noqa: E402
+    render_molecule_image_bytes,
+    render_reaction_image_bytes,
+)
+from visualization.qt_widgets import StructureImageLabel  # noqa: E402
 
 
 InputKind = Literal["molecule", "reaction"]
@@ -22,6 +27,8 @@ REACTION_EXAMPLE = (
     "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
 )
 MOLECULE_EXAMPLE = "Brc1ccc(N)cc1C#N"
+REACTION_IMAGE_SIZE = (680, 168)
+MOLECULE_IMAGE_SIZE = (480, 300)
 
 
 def detect_input_kind(text: str) -> InputKind:
@@ -120,6 +127,17 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         controls.addWidget(self.copy_button)
         layout.addLayout(controls)
 
+        result_panel = QtWidgets.QWidget()
+        result_layout = QtWidgets.QHBoxLayout(result_panel)
+        result_layout.setContentsMargins(0, 0, 0, 0)
+        result_layout.setSpacing(12)
+
+        analysis_column = QtWidgets.QWidget()
+        analysis_layout = QtWidgets.QVBoxLayout(analysis_column)
+        analysis_layout.setContentsMargins(0, 0, 0, 0)
+        analysis_layout.setSpacing(4)
+        analysis_layout.addWidget(QtWidgets.QLabel("Analysis"))
+
         self.output = QtWidgets.QPlainTextEdit()
         self.output.setObjectName("analysisOutput")
         self.output.setReadOnly(True)
@@ -132,7 +150,25 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         )
         fixed_font.setPointSize(10)
         self.output.setFont(fixed_font)
-        layout.addWidget(self.output, 1)
+        analysis_layout.addWidget(self.output)
+
+        graph_column = QtWidgets.QWidget()
+        graph_layout = QtWidgets.QVBoxLayout(graph_column)
+        graph_layout.setContentsMargins(0, 0, 0, 0)
+        graph_layout.setSpacing(4)
+        self.graph_heading = QtWidgets.QLabel("Structure graph")
+        self.graph_heading.setObjectName("structureGraphHeading")
+        graph_layout.addWidget(self.graph_heading)
+        self.structure_image_label = StructureImageLabel(
+            placeholder="Reaction or compound graph will appear here.",
+            object_name="featurizedStructureGraph",
+            minimum_height=220,
+        )
+        graph_layout.addWidget(self.structure_image_label)
+
+        result_layout.addWidget(analysis_column, stretch=1)
+        result_layout.addWidget(graph_column, stretch=1)
+        layout.addWidget(result_panel, 1)
 
         self.status_label = QtWidgets.QLabel("Ready")
         self.status_label.setObjectName("statusLabel")
@@ -228,6 +264,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self.output.setPlainText(
                 f"{heading}\n\n{format_concise_analysis(analysis)}"
             )
+            self._render_structure(kind, self.input_edit.text().strip())
             valid = bool(getattr(analysis, "valid", False))
             state = "valid" if valid else "invalid"
             self.status_label.setText(
@@ -236,10 +273,45 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self.copy_button.setEnabled(True)
         except Exception as exc:
             self.output.setPlainText(f"Unable to analyze input.\n\n{exc}")
+            self.graph_heading.setText("Structure graph")
+            self.structure_image_label.clear_image(
+                "Structure graph unavailable."
+            )
             self.status_label.setText("Analysis failed")
             self.copy_button.setEnabled(True)
         finally:
             self.analyze_button.setEnabled(True)
+
+    def _render_structure(self, kind: InputKind, text: str) -> None:
+        """Render the analyzed molecule or reaction without affecting analysis."""
+        self.graph_heading.setText(
+            "Reaction graph" if kind == "reaction" else "Compound graph"
+        )
+        try:
+            if kind == "reaction":
+                drawing = render_reaction_image_bytes(
+                    text,
+                    size=REACTION_IMAGE_SIZE,
+                    image_format="svg",
+                )
+            else:
+                drawing = render_molecule_image_bytes(
+                    text,
+                    size=MOLECULE_IMAGE_SIZE,
+                    image_format="svg",
+                )
+        except (RuntimeError, ValueError) as exc:
+            self.structure_image_label.clear_image(
+                f"{self.graph_heading.text()} unavailable."
+            )
+            self.structure_image_label.setToolTip(str(exc))
+            return
+        if not self.structure_image_label.set_image_bytes(drawing):
+            self.structure_image_label.setToolTip(
+                "The renderer returned an unsupported image."
+            )
+            return
+        self.structure_image_label.setToolTip(text)
 
     @QtCore.pyqtSlot()
     def copy_result(self) -> None:

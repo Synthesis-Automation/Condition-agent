@@ -39,6 +39,11 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert "Reaction: Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" in reaction_output
         assert "Evidence: exact_product_reconstruction" in reaction_output
         assert "reaction input · valid" in window.status_label.text()
+        reaction_pixmap = window.structure_image_label.pixmap()
+        assert reaction_pixmap is not None
+        assert not reaction_pixmap.isNull()
+        assert window.graph_heading.text() == "Reaction graph"
+        assert window.structure_image_label.toolTip() == REACTION_EXAMPLE
 
         window.input_edit.setText("Brc1ccccc1")
         assert window.kind_label.text() == "Detected: molecule"
@@ -48,6 +53,11 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert "Reactive sites:" in molecule_output
         assert "Ar–Br — leaving_group, available" in molecule_output
         assert "molecule input · valid" in window.status_label.text()
+        molecule_pixmap = window.structure_image_label.pixmap()
+        assert molecule_pixmap is not None
+        assert not molecule_pixmap.isNull()
+        assert window.graph_heading.text() == "Compound graph"
+        assert window.structure_image_label.toolTip() == "Brc1ccccc1"
     finally:
         window.close()
         application.processEvents()
@@ -60,6 +70,9 @@ def test_window_reports_empty_input_without_crashing() -> None:
         window.analyze()
         assert "Enter a molecule or reaction SMILES." in window.output.toPlainText()
         assert window.status_label.text() == "Analysis failed"
+        assert window.structure_image_label.text() == (
+            "Structure graph unavailable."
+        )
     finally:
         window.close()
         application.processEvents()
