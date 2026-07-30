@@ -63,3 +63,25 @@ def test_window_reports_empty_input_without_crashing() -> None:
     finally:
         window.close()
         application.processEvents()
+
+
+def test_window_explains_ambiguous_reaction_evidence() -> None:
+    application = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    window = ReactiveTaxonomyWindow()
+    reaction = (
+        "O=C1CCCCC1.Cl.NNc1ccc(F)cc1"
+        ">>Fc1ccc2[nH]c3c(c2c1)CCCC3"
+    )
+    try:
+        window.input_edit.setText(reaction)
+        window.analyze()
+        output = window.output.toPlainText()
+
+        assert "Correspondence ambiguity: 2 distinct edit hypotheses" in output
+        assert "Atoms not in the main product: Cl × 1, N × 1, O × 1" in output
+        assert "Net bond inventory (unmapped, not verified edits):" in output
+        assert "Retrieval: not eligible" in output
+        assert "does not invalidate the product structure" in output
+    finally:
+        window.close()
+        application.processEvents()

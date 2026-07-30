@@ -97,6 +97,207 @@ def _partner_analysis(result: Any) -> str:
     )
 
 
+def _counted_elements(values: Mapping[str, Any]) -> str:
+    """Render a deterministic elemental count for chemist-facing summaries."""
+    return ", ".join(
+        f"{element} × {int(count)}"
+        for element, count in sorted(values.items())
+        if int(count)
+    ) or "none"
+
+
+def _bond_inventory_summary(tokens: Iterable[str]) -> str:
+    """Render non-corresponded bond-inventory deltas without claiming edits."""
+    counts = Counter(str(token) for token in tokens)
+    action_order = {"gained": 0, "lost": 1, "changed": 2}
+
+    def sort_key(item: tuple[str, int]) -> tuple[Any, ...]:
+        token, _ = item
+        parts = token.split(":", 2)
+        action = parts[0] if parts else ""
+        return (action_order.get(action, 99), token)
+
+    rendered = []
+    for token, count in sorted(counts.items(), key=sort_key):
+        parts = token.split(":", 2)
+        if len(parts) != 3:
+            rendered.append(f"{count} × {token}" if count > 1 else token)
+            continue
+        action, elements, order = parts
+        bond = elements.replace("-", "–")
+        multiplicity = f"{count} × " if count > 1 else ""
+        rendered.append(f"{action} {multiplicity}{bond} {order.lower()}")
+    return "; ".join(rendered)
+
+
+def _group_inventory_summary(tokens: Iterable[str]) -> str:
+    """Render fallback functional-group tokens as readable names."""
+    names = sorted(
+        {
+            str(token).removeprefix("group:").replace("_", " ")
+            for token in tokens
+            if str(token).startswith("group:")
+        }
+    )
+    return _joined(names)
+
+
+_GRAMMAR_DISPLAY_NAMES = {
+    "carbonyl_amine_reductive_coupling": "reductive carbonyl–amine coupling",
+    "carbonyl_reduction": "carbonyl reduction",
+    "sp2_c_activated_c_substitution": "activated sp² C–C substitution",
+    "sp2_c_aromatic_ch_substitution": "aromatic C–H substitution",
+    "sp2_c_n_substitution": "sp² C–N substitution",
+}
+
+
+def _grammar_display_name(grammar_id: str) -> str:
+    """Return a compact chemist-facing grammar description."""
+    return _GRAMMAR_DISPLAY_NAMES.get(
+        grammar_id,
+        grammar_id.replace("_", " "),
+    )
+
+
+def _ambiguity_count(warnings: Iterable[str]) -> int | None:
+    """Read the public ambiguity count from a structured warning code."""
+    prefix = "AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:"
+    for warning in warnings:
+        value = str(warning)
+        if not value.startswith(prefix):
+            continue
+        try:
+            return int(value.removeprefix(prefix))
+        except ValueError:
+            return None
+    return None
+
+
+def _reaction_diagnostic_lines(result: Any) -> list[str]:
+    """Explain unresolved reaction evidence using already-public observations."""
+    lines: list[str] = []
+    completeness = getattr(result, "reaction_completeness", None)
+    warnings = tuple(getattr(result, "warnings", ()) or ())
+
+    if completeness is not None:
+        lines.append(
+            "Atom accounting: "
+            f"{completeness.reactant_heavy_atom_count} reactant → "
+            f"{completeness.product_heavy_atom_count} product heavy atoms"
+        )
+        lines.append(
+            "Unaccounted product atoms: "
+            f"{_counted_elements(completeness.product_element_excess)}"
+        )
+        lines.append(
+            "Atoms not in the main product: "
+            f"{_counted_elements(completeness.reactant_element_excess)}"
+        )
+        coverage = completeness.product_heavy_atom_coverage
+        coverage_text = (
+            f"{100.0 * float(coverage):.1f}%"
+            if coverage is not None
+            else "not verifiable without atom provenance"
+        )
+        lines.append(
+            f"Completeness: {completeness.status} "
+            f"({completeness.evidence}; coverage {coverage_text})"
+        )
+
+    ambiguity_count = _ambiguity_count(warnings)
+    if ambiguity_count is not None:
+        lines.append(
+            "Correspondence ambiguity: "
+            f"{ambiguity_count} distinct edit hypotheses; "
+            "verified edits withheld"
+        )
+
+    fallback = getattr(result, "fallback_descriptor", None)
+    if fallback is not None:
+        lines.append(
+            "Detected functional groups: reactants "
+            f"[{_group_inventory_summary(fallback.reactant_group_tokens)}] → "
+            "product "
+            f"[{_group_inventory_summary(fallback.product_group_tokens)}]"
+        )
+    if fallback is not None and fallback.bond_inventory_delta_tokens:
+        bond_summary = _bond_inventory_summary(
+            fallback.bond_inventory_delta_tokens
+        )
+        if bond_summary:
+            lines.append(
+                "Net bond inventory (unmapped, not verified edits): "
+                f"{bond_summary}"
+            )
+
+    candidates = tuple(getattr(result, "candidates", ()) or ())
+    selected = getattr(result, "selected_candidate", None)
+    selected_events = tuple(getattr(result, "selected_events", ()) or ())
+    if candidates and selected is None and not selected_events:
+        verification_counts = Counter(
+            str(candidate.verification) for candidate in candidates
+        )
+        outcomes = ", ".join(
+            f"{count} {verification.replace('_', ' ')}"
+            for verification, count in sorted(verification_counts.items())
+        )
+        lines.append(f"Grammar checks: {len(candidates)} candidates ({outcomes})")
+        grammar_names = sorted(
+            {
+                _grammar_display_name(str(candidate.grammar_id))
+                for candidate in candidates
+            }
+        )
+        heading = (
+            "Rejected interpretations"
+            if all(
+                candidate.verification
+                in {"construction_failed", "product_mismatch"}
+                for candidate in candidates
+            )
+            else "Grammars checked"
+        )
+        lines.append(f"{heading}: {_joined(grammar_names)}")
+
+    signature = getattr(result, "reaction_signature", None)
+    if signature is not None:
+        lines.append(f"Retrieval: verified signature {signature.signature_id}")
+    elif fallback is not None:
+        mode = str(fallback.evidence_mode).replace("_", " ")
+        if fallback.retrieval_eligible:
+            lines.append(
+                f"Retrieval: eligible via {mode} "
+                f"(confidence {fallback.confidence:.2f})"
+            )
+        else:
+            reasons = ", ".join(
+                str(reason).replace("_", " ")
+                for reason in fallback.ineligibility_reasons
+            ) or "insufficient structural evidence"
+            lines.append(
+                f"Retrieval: not eligible — {reasons} "
+                f"({mode}, confidence {fallback.confidence:.2f})"
+            )
+    else:
+        lines.append("Retrieval: unavailable")
+
+    if "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in warnings:
+        lines.append(
+            "Interpretation note: registered grammars did not reconstruct the "
+            "supplied product; this does not invalidate the product structure"
+        )
+    if (
+        "REACTION_COMPLETENESS_UNRESOLVED" in warnings
+        and completeness is not None
+        and not completeness.product_element_excess
+    ):
+        lines.append(
+            "Completeness note: the product has no unexplained elements, but "
+            "individual atom origins are not uniquely verified"
+        )
+    return lines
+
+
 def _molecule_summary(result: Any) -> str:
     lines = [
         f"valid: {result.valid}",
@@ -234,6 +435,10 @@ def _reaction_concise_summary(result: Any) -> str:
     if result.spectator_groups:
         spectators = sorted({group.chemist_label for group in result.spectator_groups})
         lines.append(f"Spectator groups: {_joined(spectators)}")
+    diagnostic_lines = _reaction_diagnostic_lines(result)
+    if diagnostic_lines:
+        lines.extend(("", "Structural evidence:"))
+        lines.extend(f"  {line}" for line in diagnostic_lines)
     if result.warnings:
         lines.append(f"Warnings: {_joined(result.warnings)}")
     if result.error:

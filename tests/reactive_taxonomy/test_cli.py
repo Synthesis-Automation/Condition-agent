@@ -72,6 +72,46 @@ def test_concise_molecule_and_reaction_output(capsys) -> None:
     assert "attached Alkyl: tertiary" in tert_butylamine_output
 
 
+def test_concise_ambiguous_reaction_explains_structural_evidence(capsys) -> None:
+    reaction = (
+        "O=C1CCCCC1.Cl.NNc1ccc(F)cc1"
+        ">>Fc1ccc2[nH]c3c(c2c1)CCCC3"
+    )
+
+    assert main(["reaction", reaction, "--concise"]) == 0
+    output = capsys.readouterr().out
+
+    assert "Evidence: ambiguous_atom_correspondence" in output
+    assert "Atom accounting: 17 reactant → 14 product heavy atoms" in output
+    assert "Unaccounted product atoms: none" in output
+    assert "Atoms not in the main product: Cl × 1, N × 1, O × 1" in output
+    assert (
+        "Correspondence ambiguity: 2 distinct edit hypotheses; "
+        "verified edits withheld"
+        in output
+    )
+    assert (
+        "Detected functional groups: reactants "
+        "[aryl halide, ketone, primary amine, secondary amine] → "
+        "product [aryl halide, pyrrolic nitrogen]"
+        in output
+    )
+    assert "Net bond inventory (unmapped, not verified edits):" in output
+    assert "Grammar checks: 9 candidates (9 product mismatch)" in output
+    assert "Rejected interpretations:" in output
+    assert "reductive carbonyl–amine coupling" in output
+    assert (
+        "Retrieval: not eligible — contradicted or incomplete structure "
+        "(candidate hypotheses, confidence 0.40)"
+        in output
+    )
+    assert (
+        "registered grammars did not reconstruct the supplied product; "
+        "this does not invalidate the product structure"
+        in output
+    )
+
+
 def test_batch_autodetects_column_and_writes_jsonl(tmp_path, capsys) -> None:
     source = tmp_path / "molecules.csv"
     output = tmp_path / "results.jsonl"
