@@ -91,6 +91,8 @@ def test_window_explains_ambiguous_reaction_evidence() -> None:
         output = window.output.toPlainText()
 
         assert "Correspondence ambiguity: 2 distinct edit hypotheses" in output
+        assert output.count("REH1:") == 2
+        assert "4 correspondences; unverified" in output
         assert "Atoms not in the main product: Cl × 1, N × 1, O × 1" in output
         assert "Net bond inventory (unmapped, not verified edits):" in output
         assert "Retrieval: not eligible" in output

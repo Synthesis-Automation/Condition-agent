@@ -35,6 +35,10 @@ GENERIC_REVIEW_FIELDS = (
     "product_heavy_atom_coverage",
     "reaction_completeness_warnings",
     "reaction_completeness_json",
+    "reaction_evidence_providers",
+    "reaction_edit_hypothesis_count",
+    "reaction_edit_hypothesis_ids",
+    "reaction_edit_hypotheses_json",
     "transformation_class",
     "transformation_confidence",
     "named_family",
@@ -126,6 +130,29 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
                 separators=(",", ":"),
             )
             if completeness
+            else ""
+        ),
+        "reaction_evidence_providers": _joined(
+            candidate.get("provider", "")
+            for candidate in record.reaction_evidence_candidates
+            if candidate.get("provider")
+        ),
+        "reaction_edit_hypothesis_count": len(
+            record.reaction_edit_hypotheses
+        ),
+        "reaction_edit_hypothesis_ids": _joined(
+            hypothesis.get("hypothesis_id", "")
+            for hypothesis in record.reaction_edit_hypotheses
+            if hypothesis.get("hypothesis_id")
+        ),
+        "reaction_edit_hypotheses_json": (
+            json.dumps(
+                record.reaction_edit_hypotheses,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            if record.reaction_edit_hypotheses
             else ""
         ),
         "transformation_class": record.transformation_class or "",

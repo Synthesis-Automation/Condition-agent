@@ -16,6 +16,8 @@ from .reaction_models import (
     ReactionCandidate,
     ReactionComponent,
     ReactionEdit,
+    ReactionEditHypothesis,
+    ReactionEvidenceCandidate,
     ReactionSiteReference,
     ReactionStereoChange,
 )
@@ -46,6 +48,8 @@ class EditNormalizationResult:
     valid: bool = True
     stereo_changes: Tuple[ReactionStereoChange, ...] = ()
     connectivity_edit_graph: Optional[ConnectivityEditGraph] = None
+    evidence_candidates: Tuple[ReactionEvidenceCandidate, ...] = ()
+    edit_hypotheses: Tuple[ReactionEditHypothesis, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -1103,6 +1107,105 @@ def _correspondence_edit_cost(
     return weighted, len(heavy_edits), hydrogen_edits
 
 
+def _correspondence_provider(evidence: str) -> str:
+    return {
+        "unique_scaffold_correspondence": "scaffold_correspondence",
+        "global_atom_correspondence": "global_correspondence",
+        "fragmented_scaffold_correspondence": (
+            "fragmented_scaffold_correspondence"
+        ),
+    }.get(evidence, "correspondence")
+
+
+def _edit_hypotheses(
+    candidate_results: Tuple[
+        Tuple[
+            Tuple[Tuple[int, int, int, int], ...],
+            Tuple[ReactionEdit, ...],
+            Tuple[ReactionStereoChange, ...],
+        ],
+        ...,
+    ],
+    *,
+    evidence: str,
+    confidence: float,
+) -> Tuple[ReactionEditHypothesis, ...]:
+    """Collapse mapping multiplicity while retaining distinct edit alternatives."""
+    grouped: Dict[
+        Tuple[Tuple[Any, ...], Tuple[Any, ...]],
+        list[
+            Tuple[
+                Tuple[Tuple[int, int, int, int], ...],
+                Tuple[ReactionEdit, ...],
+                Tuple[ReactionStereoChange, ...],
+            ]
+        ],
+    ] = {}
+    for result in candidate_results:
+        _, edits, stereo = result
+        if not edits:
+            continue
+        key = (
+            tuple(sorted(_chemistry_edit_key(edit) for edit in edits)),
+            tuple(
+                sorted(_chemistry_stereo_key(change) for change in stereo)
+            ),
+        )
+        grouped.setdefault(key, []).append(result)
+
+    hypotheses = []
+    provider = _correspondence_provider(evidence)
+    for key, values in sorted(
+        grouped.items(),
+        key=lambda item: json.dumps(
+            item[0],
+            sort_keys=True,
+            separators=(",", ":"),
+        ),
+    ):
+        selected = min(
+            values,
+            key=lambda result: (
+                tuple(sorted(_comparison_key(edit) for edit in result[1])),
+                tuple(
+                    sorted(
+                        _stereo_comparison_key(change)
+                        for change in result[2]
+                    )
+                ),
+            ),
+        )
+        canonical = json.dumps(
+            {
+                "provider": provider,
+                "evidence": evidence,
+                "edits": key[0],
+                "stereo": key[1],
+                "schema_version": "1.0",
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        hypothesis_id = (
+            "REH1:"
+            + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:24]
+        )
+        hypotheses.append(
+            ReactionEditHypothesis(
+                hypothesis_id=hypothesis_id,
+                provider=provider,
+                evidence=evidence,
+                confidence=confidence,
+                edits=selected[1],
+                stereo_changes=selected[2],
+                correspondence_count=len(values),
+                edit_cost=_correspondence_edit_cost(selected[1]),
+                warnings=("UNVERIFIED_EDIT_HYPOTHESIS",),
+            )
+        )
+    return tuple(hypotheses)
+
+
 def normalize_inferred_scaffold_edits(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
@@ -1130,12 +1233,20 @@ def normalize_inferred_scaffold_edits(
         confidence = 0.75
         inferred_warning = "INFERRED_FRAGMENTED_SCAFFOLD_CORRESPONDENCE"
     if not correspondence.valid:
+        unresolved_candidate = ReactionEvidenceCandidate(
+            provider="correspondence",
+            status="unresolved",
+            evidence="unresolved",
+            confidence=0.0,
+            warnings=tuple(sorted(correspondence_warnings)),
+        )
         return EditNormalizationResult(
             (),
             "unresolved",
             0.0,
             tuple(sorted(correspondence_warnings)),
             False,
+            evidence_candidates=(unresolved_candidate,),
         )
     all_candidate_results = tuple(
         (
@@ -1200,29 +1311,45 @@ def normalize_inferred_scaffold_edits(
         candidate_results = all_candidate_results
     nonempty = tuple(result for result in candidate_results if result[1])
     if not nonempty:
+        unresolved_candidate = ReactionEvidenceCandidate(
+            provider=_correspondence_provider(evidence),
+            status="unresolved",
+            evidence="unresolved",
+            confidence=0.0,
+            warnings=("SCAFFOLD_CORRESPONDENCE_WITHOUT_EDITS",),
+        )
         return EditNormalizationResult(
             (),
             "unresolved",
             0.0,
             ("SCAFFOLD_CORRESPONDENCE_WITHOUT_EDITS",),
             False,
+            evidence_candidates=(unresolved_candidate,),
         )
-    edit_sets = {
-        (
-            tuple(sorted(_chemistry_edit_key(edit) for edit in edits)),
-            tuple(
-                sorted(_chemistry_stereo_key(change) for change in stereo)
+    hypotheses = _edit_hypotheses(
+        nonempty,
+        evidence=evidence,
+        confidence=confidence,
+    )
+    if len(hypotheses) != 1 or len(nonempty) != len(candidate_results):
+        ambiguous_candidate = ReactionEvidenceCandidate(
+            provider=_correspondence_provider(evidence),
+            status="ambiguous",
+            evidence="ambiguous_atom_correspondence",
+            confidence=0.0,
+            edit_hypotheses=hypotheses,
+            warnings=(
+                f"AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:{len(hypotheses)}",
             ),
         )
-        for _, edits, stereo in nonempty
-    }
-    if len(edit_sets) != 1 or len(nonempty) != len(candidate_results):
         return EditNormalizationResult(
             (),
             "ambiguous_atom_correspondence",
             0.0,
-            (f"AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:{len(edit_sets)}",),
+            (f"AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:{len(hypotheses)}",),
             False,
+            evidence_candidates=(ambiguous_candidate,),
+            edit_hypotheses=hypotheses,
         )
     selected = min(
         nonempty,
@@ -1243,6 +1370,15 @@ def normalize_inferred_scaffold_edits(
         evidence=evidence,
         confidence=confidence,
     )
+    verified_candidate = ReactionEvidenceCandidate(
+        provider=_correspondence_provider(evidence),
+        status="verified",
+        evidence=evidence,
+        confidence=confidence,
+        edits=selected[1],
+        stereo_changes=selected[2],
+        warnings=(inferred_warning,),
+    )
     return EditNormalizationResult(
         selected[1],
         evidence,
@@ -1251,6 +1387,7 @@ def normalize_inferred_scaffold_edits(
         True,
         selected[2],
         connectivity_graph,
+        evidence_candidates=(verified_candidate,),
     )
 
 
@@ -1332,18 +1469,68 @@ def _stereochemical_reconstruction_conflict(
     return False
 
 
-def normalize_reaction_edits(
+def _provider_evidence_candidate(
+    provider: str,
+    result: EditNormalizationResult,
+) -> Optional[ReactionEvidenceCandidate]:
+    """Expose one attempted provider without changing evidence authority."""
+    if result.evidence in {
+        "no_atom_mapping",
+        "no_predicted_edits",
+        "no_predicted_multi_event_edits",
+    }:
+        return None
+    status = (
+        "verified"
+        if result.valid and bool(result.edits)
+        else "invalid"
+        if result.evidence == "invalid_atom_mapping"
+        else "ambiguous"
+        if result.edit_hypotheses
+        else "unresolved"
+    )
+    return ReactionEvidenceCandidate(
+        provider=provider,
+        status=status,
+        evidence=result.evidence,
+        confidence=result.confidence,
+        edits=result.edits if status == "verified" else (),
+        stereo_changes=result.stereo_changes if status == "verified" else (),
+        edit_hypotheses=result.edit_hypotheses,
+        warnings=result.warnings,
+    )
+
+
+def _provider_candidates(
+    values: Tuple[Tuple[str, EditNormalizationResult], ...],
+) -> Tuple[ReactionEvidenceCandidate, ...]:
+    return tuple(
+        candidate
+        for provider, result in values
+        for candidate in (_provider_evidence_candidate(provider, result),)
+        if candidate is not None
+    )
+
+
+def resolve_reaction_evidence(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
     selected: Optional[ReactionCandidate],
     selected_events: Tuple[ReactionCandidate, ...] = (),
     candidates: Tuple[ReactionCandidate, ...] = (),
 ) -> EditNormalizationResult:
-    """Choose observed edits when valid and reconcile exact rewrite evidence."""
+    """Collect provider evidence and resolve it through one authority ladder."""
     mapped = normalize_mapped_edits(reactants, products)
     predicted = normalize_predicted_edits(selected, reactants)
     predicted_multi = normalize_predicted_multi_event_edits(
         selected_events, reactants
+    )
+    provider_candidates = _provider_candidates(
+        (
+            ("supplied_atom_mapping", mapped),
+            ("exact_reconstruction", predicted),
+            ("exact_multi_event_reconstruction", predicted_multi),
+        )
     )
     warnings = tuple(
         sorted(
@@ -1357,6 +1544,7 @@ def normalize_reaction_edits(
             0.0,
             warnings,
             False,
+            evidence_candidates=provider_candidates,
         )
     if mapped.valid and predicted.valid:
         mapped_keys = {_comparison_key(edit) for edit in mapped.edits}
@@ -1379,6 +1567,7 @@ def normalize_reaction_edits(
                         else "MAPPING_RECONSTRUCTION_SCOPE_DIFFERENCE"
                     ),
                 ),
+                evidence_candidates=provider_candidates,
             )
         return EditNormalizationResult(
             mapped.edits,
@@ -1397,6 +1586,7 @@ def normalize_reaction_edits(
                     else "MAPPING_RECONSTRUCTION_TRANSITION_CONFLICT"
                 ),
             ),
+            evidence_candidates=provider_candidates,
         )
     if mapped.valid and predicted_multi.valid:
         mapped_keys = {_comparison_key(edit) for edit in mapped.edits}
@@ -1419,6 +1609,7 @@ def normalize_reaction_edits(
                         else "MAPPING_RECONSTRUCTION_SCOPE_DIFFERENCE"
                     ),
                 ),
+                evidence_candidates=provider_candidates,
             )
         return EditNormalizationResult(
             mapped.edits,
@@ -1437,6 +1628,7 @@ def normalize_reaction_edits(
                     else "MAPPING_RECONSTRUCTION_TRANSITION_CONFLICT"
                 ),
             ),
+            evidence_candidates=provider_candidates,
         )
     if mapped.valid:
         if _stereochemical_reconstruction_conflict(candidates, products):
@@ -1455,6 +1647,7 @@ def normalize_reaction_edits(
                 True,
                 mapped.stereo_changes,
                 mapped.connectivity_edit_graph,
+                evidence_candidates=provider_candidates,
             )
         return EditNormalizationResult(
             mapped.edits,
@@ -1464,6 +1657,7 @@ def normalize_reaction_edits(
             True,
             mapped.stereo_changes,
             mapped.connectivity_edit_graph,
+            evidence_candidates=provider_candidates,
         )
     if predicted.valid:
         return EditNormalizationResult(
@@ -1474,6 +1668,7 @@ def normalize_reaction_edits(
             True,
             predicted.stereo_changes,
             connectivity_edit_graph=predicted.connectivity_edit_graph,
+            evidence_candidates=provider_candidates,
         )
     if predicted_multi.valid:
         return EditNormalizationResult(
@@ -1484,8 +1679,12 @@ def normalize_reaction_edits(
             True,
             predicted_multi.stereo_changes,
             connectivity_edit_graph=predicted_multi.connectivity_edit_graph,
+            evidence_candidates=provider_candidates,
         )
     inferred = normalize_inferred_scaffold_edits(reactants, products)
+    combined_candidates = (
+        provider_candidates + inferred.evidence_candidates
+    )
     if inferred.valid:
         if _stereochemical_reconstruction_conflict(candidates, products):
             return EditNormalizationResult(
@@ -1503,8 +1702,12 @@ def normalize_reaction_edits(
                 True,
                 inferred.stereo_changes,
                 inferred.connectivity_edit_graph,
+                evidence_candidates=combined_candidates,
             )
-        return inferred
+        return replace(
+            inferred,
+            evidence_candidates=combined_candidates,
+        )
     return EditNormalizationResult(
         (),
         inferred.evidence,
@@ -1516,6 +1719,25 @@ def normalize_reaction_edits(
             if mapped.evidence == "atom_mapping_without_edits"
             else inferred.connectivity_edit_graph
         ),
+        evidence_candidates=combined_candidates,
+        edit_hypotheses=inferred.edit_hypotheses,
+    )
+
+
+def normalize_reaction_edits(
+    reactants: Tuple[ReactionComponent, ...],
+    products: Tuple[ReactionComponent, ...],
+    selected: Optional[ReactionCandidate],
+    selected_events: Tuple[ReactionCandidate, ...] = (),
+    candidates: Tuple[ReactionCandidate, ...] = (),
+) -> EditNormalizationResult:
+    """Compatibility alias for the evidence-provider resolver."""
+    return resolve_reaction_evidence(
+        reactants,
+        products,
+        selected,
+        selected_events,
+        candidates,
     )
 
 
@@ -1527,4 +1749,5 @@ __all__ = [
     "normalize_predicted_multi_event_edits",
     "normalize_reaction_edits",
     "reaction_atom_reference",
+    "resolve_reaction_evidence",
 ]

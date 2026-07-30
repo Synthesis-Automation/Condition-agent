@@ -15,7 +15,7 @@ from reactive_taxonomy import render_reactivity_profile
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.1"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.2"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -32,6 +32,8 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "transformation_confidence",
     "stereochemical_changes",
     "reaction_completeness_status",
+    "edit_hypothesis_count",
+    "edit_hypothesis_ids",
     "product_heavy_atom_coverage",
     "product_element_excess",
     "partial_transformation_class",
@@ -212,6 +214,11 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     partial_value = partial if isinstance(partial, Mapping) else {}
     installed = partial_value.get("installed_fragment")
     installed_value = installed if isinstance(installed, Mapping) else {}
+    hypotheses = tuple(
+        value
+        for value in record.get("reaction_edit_hypotheses") or ()
+        if isinstance(value, Mapping)
+    )
     warnings = sorted(
         {
             str(value)
@@ -261,6 +268,12 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         ),
         "stereochemical_changes": _stereochemical_change_summary(signature_value),
         "reaction_completeness_status": str(completeness_value.get("status") or ""),
+        "edit_hypothesis_count": str(len(hypotheses)),
+        "edit_hypothesis_ids": "; ".join(
+            str(value.get("hypothesis_id") or "")
+            for value in hypotheses
+            if value.get("hypothesis_id")
+        ),
         "product_heavy_atom_coverage": _text_or_blank(
             completeness_value.get("product_heavy_atom_coverage")
         ),

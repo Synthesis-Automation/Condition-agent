@@ -173,6 +173,48 @@ def _ambiguity_count(warnings: Iterable[str]) -> int | None:
     return None
 
 
+def _atom_reference_label(atom: Any) -> str:
+    """Render one provenance-bearing atom compactly for review."""
+    if atom is None:
+        return "H"
+    side = "r" if str(getattr(atom, "side", "")) == "reactant" else "p"
+    return (
+        f"{getattr(atom, 'element', '?')}"
+        f"({side}{int(getattr(atom, 'component_index', 0))}:"
+        f"a{int(getattr(atom, 'atom_index', 0))})"
+    )
+
+
+def _edit_hypothesis_lines(result: Any) -> list[str]:
+    """Render retained alternatives without promoting them to observations."""
+    lines = []
+    for index, hypothesis in enumerate(
+        getattr(result, "edit_hypotheses", ()) or (),
+        start=1,
+    ):
+        lines.append(
+            f"Edit hypothesis {index}: {hypothesis.hypothesis_id} "
+            f"({hypothesis.provider}; "
+            f"{hypothesis.correspondence_count} correspondences; unverified)"
+        )
+        hydrogen_change_count = 0
+        for edit in hypothesis.edits:
+            if edit.edit_type == "hydrogen_change":
+                hydrogen_change_count += 1
+                continue
+            left = _atom_reference_label(edit.atom_1)
+            right = _atom_reference_label(edit.atom_2)
+            lines.append(
+                f"  {edit.edit_type}: {left}–{right}, "
+                f"{edit.old_order or 'none'} → {edit.new_order or 'none'}"
+            )
+        if hydrogen_change_count:
+            lines.append(
+                f"  hydrogen-count changes: {hydrogen_change_count}"
+            )
+    return lines
+
+
 def _reaction_diagnostic_lines(result: Any) -> list[str]:
     """Explain unresolved reaction evidence using already-public observations."""
     lines: list[str] = []
@@ -211,6 +253,7 @@ def _reaction_diagnostic_lines(result: Any) -> list[str]:
             f"{ambiguity_count} distinct edit hypotheses; "
             "verified edits withheld"
         )
+        lines.extend(_edit_hypothesis_lines(result))
 
     fallback = getattr(result, "fallback_descriptor", None)
     if fallback is not None:

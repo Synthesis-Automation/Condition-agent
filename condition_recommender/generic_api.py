@@ -22,6 +22,12 @@ from .fallback_similarity import (
     assess_fallback_similarity,
     load_fallback_retrieval_rules,
 )
+from .hypothesis_retrieval import (
+    assess_hypothesis_consensus_similarity,
+    build_hypothesis_retrieval_query,
+    load_edit_hypothesis_retrieval_rules,
+    retrieve_hypothesis_consensus_pool_with_trace,
+)
 from .models import GenericRecommendationResult
 from .recipe_ranking import rank_condition_recipes
 
@@ -216,6 +222,19 @@ def _recommend_with_index(
             error=analysis.error or "INVALID_REACTION",
         )
     if analysis.reaction_signature is None:
+        if analysis.edit_hypotheses:
+            hypothesis_result = _recommend_hypotheses_with_index(
+                analysis,
+                index,
+                top_k=top_k,
+                minimum_pool_size=minimum_pool_size,
+            )
+            if (
+                hypothesis_result.valid
+                or hypothesis_result.error
+                != "QUERY_EDIT_HYPOTHESES_NOT_RETRIEVABLE"
+            ):
+                return hypothesis_result
         return _recommend_fallback_with_index(
             analysis,
             index,
@@ -235,6 +254,134 @@ def _recommend_with_index(
     return replace(
         result,
         spectator_groups=tuple(asdict(group) for group in analysis.spectator_groups),
+    )
+
+
+def _recommend_hypotheses_with_index(
+    analysis: Any,
+    index: GenericReactionIndex,
+    *,
+    top_k: int,
+    minimum_pool_size: int | None,
+) -> GenericRecommendationResult:
+    """Recommend only from precedents robust across every retained edit hypothesis."""
+    reaction_smiles = str(analysis.input_reaction_smiles)
+    hypotheses = tuple(asdict(value) for value in analysis.edit_hypotheses)
+    fallback_model = analysis.fallback_descriptor
+    fallback = asdict(fallback_model) if fallback_model is not None else {}
+    query = build_hypothesis_retrieval_query(hypotheses, fallback)
+    hypothesis_ids = tuple(
+        str(value.get("hypothesis_id") or "") for value in hypotheses
+    )
+    if query is None:
+        return GenericRecommendationResult(
+            query_reaction_smiles=reaction_smiles,
+            valid=False,
+            query_edit_hypothesis_ids=hypothesis_ids,
+            recommendation_mode="abstained",
+            warnings=("AMBIGUOUS_EDIT_HYPOTHESES_RETAINED",),
+            error="QUERY_EDIT_HYPOTHESES_NOT_RETRIEVABLE",
+        )
+    rules = load_edit_hypothesis_retrieval_rules()
+    retrieval = retrieve_hypothesis_consensus_pool_with_trace(
+        query,
+        index,
+        minimum_pool_size=minimum_pool_size,
+    )
+    base_warnings = [
+        "QUERY_TRANSFORMATION_NOT_VERIFIED",
+        "AMBIGUOUS_EDIT_HYPOTHESES_RETAINED",
+        "EDIT_HYPOTHESIS_CONSENSUS_REQUIRED",
+    ]
+    if not retrieval.pool:
+        compatibility_failure = (
+            retrieval.level == "no_compatible_condition_precedent"
+        )
+        return GenericRecommendationResult(
+            query_reaction_smiles=reaction_smiles,
+            valid=False,
+            query_edit_hypothesis_ids=hypothesis_ids,
+            recommendation_mode="ambiguous_edit_hypotheses",
+            reaction_label=analysis.reaction_label,
+            reaction_label_status=analysis.reaction_label_status,
+            transformation_class=analysis.transformation_class,
+            retrieval_definition_version=str(rules["schema_version"]),
+            retrieval_strategy="edit_hypothesis_consensus",
+            retrieval_level=retrieval.level,
+            candidate_count=retrieval.candidate_count,
+            independent_candidate_count=retrieval.independent_candidate_count,
+            excluded_candidate_count=retrieval.excluded_candidate_count,
+            retrieval_trace=retrieval.trace,
+            warnings=tuple(
+                base_warnings
+                + (
+                    ["ALL_RETRIEVED_RECIPES_FAILED_COMPATIBILITY"]
+                    if compatibility_failure
+                    else []
+                )
+            ),
+            error=(
+                "NO_COMPATIBLE_CONDITION_PRECEDENT"
+                if compatibility_failure
+                else "NO_ROBUST_EDIT_HYPOTHESIS_PRECEDENT"
+            ),
+        )
+    recommendations = rank_condition_recipes(
+        query.to_mapping(),
+        retrieval.pool,
+        retrieval_level=retrieval.level,
+        top_k=top_k,
+        similarity_assessor=assess_hypothesis_consensus_similarity,
+    )
+    hypothesis_cautions = (
+        "Query atom correspondence is ambiguous; no hypothesis is presented "
+        "as the verified reaction center",
+        "Every returned precedent passed the anonymous edit-graph threshold "
+        "for every retained query hypothesis",
+        "Recipe ranking uses the worst-case edit similarity across hypotheses",
+        "Ambiguous query records remain excluded from the verified precedent index",
+    )
+    recommendations = tuple(
+        replace(
+            recommendation,
+            cautions=tuple(
+                dict.fromkeys(
+                    (*hypothesis_cautions, *recommendation.cautions)
+                )
+            ),
+        )
+        for recommendation in recommendations
+    )
+    warnings = [
+        *base_warnings,
+        "AMBIGUOUS_EDIT_HYPOTHESIS_RETRIEVAL_USED",
+        "RECOMMENDATIONS_REQUIRE_EXPERT_REVIEW",
+    ]
+    if retrieval.excluded_candidate_count:
+        warnings.append(
+            f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{retrieval.excluded_candidate_count}"
+        )
+    return GenericRecommendationResult(
+        query_reaction_smiles=reaction_smiles,
+        valid=True,
+        query_edit_hypothesis_ids=hypothesis_ids,
+        recommendation_mode="ambiguous_edit_hypotheses",
+        reaction_label=analysis.reaction_label,
+        reaction_label_status=analysis.reaction_label_status,
+        transformation_class=analysis.transformation_class,
+        retrieval_definition_version=str(rules["schema_version"]),
+        retrieval_strategy="edit_hypothesis_consensus",
+        retrieval_level=retrieval.level,
+        candidate_count=retrieval.candidate_count,
+        independent_candidate_count=retrieval.independent_candidate_count,
+        compatible_candidate_count=len(retrieval.pool),
+        independent_compatible_candidate_count=(
+            retrieval.independent_compatible_candidate_count
+        ),
+        excluded_candidate_count=retrieval.excluded_candidate_count,
+        retrieval_trace=retrieval.trace,
+        recommendations=recommendations,
+        warnings=tuple(warnings),
     )
 
 

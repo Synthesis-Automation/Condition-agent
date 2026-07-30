@@ -30,6 +30,16 @@ from .fallback_similarity import fallback_index_tokens
 
 GENERIC_INDEX_SCHEMA_VERSION = "2.3"
 
+# Record schema 3.5 / converter v2.5 add query-review evidence only. They do not
+# change the verified signature, fallback descriptor, recipe, or index-row
+# contracts, so existing v3.4/v2.4 persisted indices remain chemistry-compatible.
+_INDEX_COMPATIBLE_RECORD_SCHEMAS = frozenset(
+    {"3.4", RECOMMENDATION_RECORD_SCHEMA_VERSION}
+)
+_INDEX_COMPATIBLE_CONVERTER_VERSIONS = frozenset(
+    {"generic_conversion.v2.4", GENERIC_CONVERTER_DEFINITION_VERSION}
+)
+
 
 @dataclass(frozen=True)
 class GenericIndexedReaction:
@@ -180,15 +190,17 @@ def _validate_index_rows(
             "Incompatible fallback descriptor definitions; regenerate converted records"
         )
     record_schemas = tuple(sorted({row.record_schema_version for row in values}))
-    if record_schemas and record_schemas != (RECOMMENDATION_RECORD_SCHEMA_VERSION,):
+    if record_schemas and not set(record_schemas).issubset(
+        _INDEX_COMPATIBLE_RECORD_SCHEMAS
+    ):
         raise ValueError(
             "Incompatible recommendation record schema; regenerate converted records"
         )
     converter_versions = tuple(
         sorted({row.converter_definition_version for row in values})
     )
-    if converter_versions and converter_versions != (
-        GENERIC_CONVERTER_DEFINITION_VERSION,
+    if converter_versions and not set(converter_versions).issubset(
+        _INDEX_COMPATIBLE_CONVERTER_VERSIONS
     ):
         raise ValueError(
             "Incompatible generic converter version; regenerate converted records"
@@ -550,13 +562,17 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
         raise ValueError(
             "Incompatible fallback descriptor definitions; rebuild the index"
         )
-    if tuple(payload.get("record_schema_versions") or ()) != (
-        RECOMMENDATION_RECORD_SCHEMA_VERSION,
+    record_schema_versions = tuple(payload.get("record_schema_versions") or ())
+    if not record_schema_versions or not set(record_schema_versions).issubset(
+        _INDEX_COMPATIBLE_RECORD_SCHEMAS
     ):
         raise ValueError("Incompatible recommendation record schema; rebuild the index")
-    if tuple(payload.get("converter_definition_versions") or ()) != (
-        GENERIC_CONVERTER_DEFINITION_VERSION,
-    ):
+    converter_definition_versions = tuple(
+        payload.get("converter_definition_versions") or ()
+    )
+    if not converter_definition_versions or not set(
+        converter_definition_versions
+    ).issubset(_INDEX_COMPATIBLE_CONVERTER_VERSIONS):
         raise ValueError("Incompatible generic converter version; rebuild the index")
     rows = tuple(
         GenericIndexedReaction(

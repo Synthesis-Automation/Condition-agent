@@ -48,14 +48,14 @@ reactive_taxonomy       condition_registry
 | Molecular features | Implemented | Functional groups, reactive sites, canonical connectivity interfaces, typed reactivity profiles |
 | Reaction parsing | Implemented | Two- and three-part reaction SMILES with component, map, and source preservation |
 | Connectivity execution | V2 implemented | One bounded declarative rewrite path for all registered grammars; no legacy reaction-operator fallback |
-| Edit evidence | Implemented | Mapping, exact single/multi-event reconstruction, conservative scaffold correspondence, bounded global and fragmented-scaffold correspondence, conflicts, H/charge/stereo observations |
+| Edit evidence | Implemented | Typed provider candidates from mapping, exact single/multi-event reconstruction, conservative scaffold, bounded global, and fragmented-scaffold correspondence; distinct ambiguous edit hypotheses; conflicts and H/charge/stereo observations |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting plus observation-only product-origin gaps |
 | Reaction signatures | Implemented | Deterministic RS3 L0–L4 signatures, events, topology, profiles, spectators, unknown-family support |
 | Reactivity descriptors | Implemented and active | Typed context-aware profiles are the sole active environment path |
 | Condition registry | Implemented, curation incomplete | Conservative identity resolution, contextual roles, RCORE1/RCR1 recipes, stages, provenance |
 | Generic conversion | Implemented | Nested canonical records, independent quality dimensions, review exports, sharding, restart/integrity checks |
 | Generic index | Implemented | Version-checked persisted index with signature, environment, family, fallback, recipe, and reference keys |
-| Generic retrieval | Implemented pilot | Explicit ladder, independent-support threshold, hard compatibility, similarity, reference-aware recipe aggregation |
+| Generic retrieval | Implemented pilot | Explicit verified-signature ladder plus conservative all-hypothesis query consensus, independent-support thresholds, hard compatibility, similarity, and reference-aware recipe aggregation |
 | Unverified-query fallback | Implemented, conservative | Separate structure-derived fallback; not represented as verified edit retrieval |
 | Evaluation and calibration | Implemented tooling | Grouped, scaffold-, source-, and time-disjoint modes; baselines; calibration; blind review/adjudication |
 | Release validation | Implemented tooling | Machine artifact checks plus hash-bound independent chemist sign-off |
@@ -72,7 +72,7 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `3.1` |
+| Reaction analysis | `3.2` |
 | Reaction signature / ID namespace | `3.0` / `RS3` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
@@ -80,10 +80,10 @@ The current code declares:
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `1.2` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `3.4` |
-| Generic converter definition | `generic_conversion.v2.4` |
+| Recommendation record | `3.5` |
+| Generic converter definition | `generic_conversion.v2.5` |
 | Generic persisted index | `2.3` |
-| Generic recommendation result | `2.1` |
+| Generic recommendation result | `2.2` |
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.6` |
 | Generic admission policy | `generic_admission.v1.7` |
@@ -110,8 +110,12 @@ source corpus. Its report records:
 | Unique recipe cores in the index | 3,820 |
 
 The sharded conversion report records zero failed shards and zero duplicate
-observations. The current generic-index integrity command also validates the
-artifact as schema `2.3`.
+observations. The artifact itself is index schema `2.3`, but it was generated
+with reaction-correspondence definition `2.2`. Current code declares `2.3` and
+therefore rejects this index until it is regenerated. This is deliberate:
+record-schema `3.4` and converter `v2.4` are explicitly index-compatible with
+their review-only successors, but chemistry-definition identities are not
+silently mixed.
 
 These counts demonstrate that the type-agnostic path works on a broad bounded
 sample and that unnamed reactions are retained. They are coverage and integrity
@@ -135,6 +139,10 @@ The 2026-07-30 run found 356 unique reaction SMILES:
 | New fragmented-scaffold signatures | 4 |
 | Total signatures | 58 |
 | Ambiguous correspondences retained as abstentions | 205 |
+| Ambiguous queries with typed edit hypotheses | 205 / 205 |
+| Queries whose hypotheses share one anonymous edit prototype | 116 / 205 |
+| Reference-disjoint queries with a verified all-hypothesis consensus neighbor | 195 / 205 |
+| Consensus links across precursor modes | 117 / 205 |
 | Anonymous edit prototypes among signatures | 3 |
 | Reference-disjoint signed queries with exact L3 support | 54 / 58 |
 | Reference-disjoint signed queries with edit-graph support | 58 / 58 |
@@ -142,11 +150,25 @@ The 2026-07-30 run found 356 unique reaction SMILES:
 
 This is a successful retrieval POC but not a solved atom-mapping POC. The
 approximate edit graph connects the separate-reactant and preformed-hydrazone
-views for every currently signed query. The conservative correspondence
-provider admits only four additional reactions because competing nitrogen
-origins or symmetry-related mappings remain genuinely ambiguous from the
-unmapped source structures. Those 205 cases must not be bulk-admitted without
-curated mapping or an independently validated correspondence provider.
+views for every currently signed query. All 205 ambiguous cases now preserve
+their distinct edit alternatives as typed `ReactionEditHypothesis` objects.
+For query use only, each hypothesis is independently compared with verified
+precedents; a precedent survives only when it is compatible with every
+hypothesis, and ranking uses the worst hypothesis match. This recovers a
+reference-disjoint consensus neighbor for 195 cases without promoting any
+ambiguous dataset row into the verified index. The remaining ten abstain.
+
+Competing nitrogen origins or symmetry-related mappings remain genuinely
+ambiguous from the unmapped source structures. The query-consensus result is
+therefore explicitly review-required; those 205 cases must not be bulk-admitted
+without curated mapping or an independently validated correspondence provider.
+
+The representative cyclohexanone/4-fluorophenylhydrazine query now retains two
+`REH1` alternatives. Against the 45-row verified Fischer POC index, both
+hypotheses converge on 45 compatible precedents from 19 independent support
+units and the API returns five review-required recipes through
+`edit_hypothesis_consensus`. This is an executable end-to-end demonstration of
+query coverage; it does not resolve which atom correspondence is correct.
 
 The normal generic converter was also run over all 542 source rows. It produced
 59 signed observations and 45 index-eligible precedents; the compact report is
@@ -158,6 +180,32 @@ reference, so the new tier supplied genuinely broader support. The result
 retained `named_family=None`, disclosed the intramolecular/intermolecular scope
 mismatch, and warned that the exact edit signatures differed.
 
+### 2.5 Knorr/Paal–Knorr transfer audit
+
+The same name-free benchmark was run against the 652-row
+`Knorr_pyrrole_synthesis.csv` source. The report is
+`results/knorr_pyrrole_edit_poc.json`; the source reaction type selects the
+cohort but is not passed to featurization or retrieval.
+
+Among 519 unique reaction SMILES:
+
+| Measurement | Count |
+| --- | ---: |
+| Verified name-free signatures | 310 (59.7%) |
+| Global / fragmented correspondence signatures | 306 / 4 |
+| Reference-disjoint queries with exact L3 support | 261 / 310 |
+| Reference-disjoint queries with anonymous edit-graph support | 286 / 310 |
+| Ambiguous queries with typed edit hypotheses | 5 / 5 |
+| Ambiguous queries with a reference-disjoint all-hypothesis neighbor | 2 / 5 |
+| Ambiguous queries with no consensus neighbor | 3 / 5 |
+
+The hypothesis feature therefore helps Knorr/Paal–Knorr coverage, but its
+increment is smaller than in Fischer because most usable Knorr records already
+obtain a unique global-correspondence signature. The 24 signed reactions
+without an independent edit-graph neighbor and the three non-consensus
+ambiguous reactions remain abstentions in this cohort. These are neighbor
+coverage measurements, not validation of condition suitability.
+
 ## 3. Implemented chemistry contracts
 
 ### 3.1 Observation
@@ -165,6 +213,10 @@ mismatch, and warned that the exact edit signatures differed.
 `reactive_taxonomy` currently provides:
 
 - immutable atom-provenanced bond and schema-level hydrogen edits;
+- typed `ReactionEvidenceCandidate` records for each attempted evidence
+  provider, so failed interpretation does not erase the observation trail;
+- deterministic `ReactionEditHypothesis` alternatives when correspondence
+  supports several chemically distinct minimum-edit explanations;
 - stronger internal before/after connectivity observations with explicit
   observed, projected, reconstructed, inferred, or unresolved scope;
 - formal-charge and explicit stereochemical observations;
@@ -245,6 +297,20 @@ The fallback descriptor and retrieval policy are separate from RS3 retrieval.
 They must return `recommendation_mode`, fallback evidence, stricter thresholds,
 and cautions. A structure-neighbor fallback must never be described as a
 verified reaction-center match.
+
+An unsigned query with two or more typed edit hypotheses takes a separate
+query-only branch before ordinary structure fallback. The policy in
+`condition_recommender/definitions/edit_hypothesis_retrieval.v1.json` requires:
+
+- an anonymous edit prototype for every retained hypothesis;
+- compatibility and minimum edit similarity for every hypothesis;
+- intersection of the per-hypothesis verified-precedent pools;
+- at least two independent support units;
+- worst-case edit similarity for ranking; and
+- explicit ambiguity and expert-review cautions.
+
+This branch consumes only verified indexed precedents. It does not issue an
+RS3 identity for the query and does not alter converter admission.
 
 ## 5. What is not complete
 

@@ -175,9 +175,15 @@ def format_query_summary(result: GenericRecommendationResult) -> str:
         (
             f"Family: {_display_name(result.named_family)}  •  "
             f"Transformation: {_display_name(result.transformation_class)}  •  "
+            f"Mode: {_display_name(result.recommendation_mode)}  •  "
             f"Retrieval: {_display_name(result.retrieval_level)}"
         ),
     ]
+    if result.query_edit_hypothesis_ids:
+        lines.append(
+            "Ambiguous edit alternatives (all must agree): "
+            + ", ".join(result.query_edit_hypothesis_ids)
+        )
     lines.append(f"Spectator groups: {_spectator_summary(result.spectator_groups)}")
     partner_summaries = _partner_analysis_summaries(result.reaction_partners)
     if partner_summaries:

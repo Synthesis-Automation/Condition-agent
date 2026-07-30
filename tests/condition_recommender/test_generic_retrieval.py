@@ -18,6 +18,9 @@ from condition_recommender.generic_indexing import (
     build_generic_index,
     save_generic_index,
 )
+from condition_recommender.hypothesis_retrieval import (
+    load_edit_hypothesis_retrieval_rules,
+)
 from condition_recommender.generic_retrieval import (
     generic_signature_similarity,
     load_generic_retrieval_rules,
@@ -139,8 +142,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.4",
-        "converter_definition_version": "generic_conversion.v2.4",
+        "schema_version": "3.5",
+        "converter_definition_version": "generic_conversion.v2.5",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",
@@ -165,6 +168,33 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
         },
         "condition_resolution": {"has_uncertainty": False},
     }
+
+
+def _fischer_signature(token: str) -> dict:
+    signature = _signature(
+        token,
+        exact=f"exact-{token}",
+        handles=f"handles-{token}",
+        transformation=f"transformation-{token}",
+        bond=f"bond-{token}",
+        environment=f"environment-{token}",
+        family=None,
+        family_confidence=0.0,
+        reaction_scope="intermolecular",
+        ring_size=5,
+    )
+    signature.update(
+        {
+            "formed_bond_types": ["C-C:AROMATIC", "C-N:AROMATIC"],
+            "broken_bond_types": ["C-O:DOUBLE", "N-N:SINGLE"],
+            "order_changes": [
+                "C-C:SINGLE>AROMATIC",
+                "C-N:SINGLE>AROMATIC",
+            ],
+            "transformation_class": "generic_multi_event_graph_transformation",
+        }
+    )
+    return signature
 
 
 def test_generic_index_admits_only_usable_verified_records() -> None:
@@ -702,6 +732,15 @@ def test_generic_retrieval_weights_are_normalized() -> None:
         "bond_edit_signature",
         "edit_graph_neighbors",
     ]
+    hypothesis_rules = load_edit_hypothesis_retrieval_rules()
+    assert round(
+        sum(hypothesis_rules["similarity_weights"].values()),
+        10,
+    ) == 1.0
+    assert (
+        hypothesis_rules["consensus_policy"]
+        == "intersection_across_all_hypotheses"
+    )
 
 
 def test_similarity_and_ranking_definitions_reject_stale_schemas() -> None:
@@ -740,6 +779,60 @@ def test_preloaded_recommender_loads_the_index_once(
     assert calls == [str(path)]
 
 
+def test_ambiguous_query_retrieves_only_edit_hypothesis_consensus() -> None:
+    index = build_generic_index(
+        [
+            _record(201, _fischer_signature("fischer-a")),
+            _record(202, _fischer_signature("fischer-b")),
+            _record(203, _signature("unrelated")),
+        ]
+    )
+    recommender = GenericConditionRecommender(index)
+
+    result = recommender.recommend(
+        "O=C1CCCCC1.Cl.NNc1ccc(F)cc1"
+        ">>Fc1ccc2[nH]c3c(c2c1)CCCC3"
+    )
+
+    assert result.valid
+    assert result.recommendation_mode == "ambiguous_edit_hypotheses"
+    assert result.retrieval_strategy == "edit_hypothesis_consensus"
+    assert result.retrieval_level == "edit_hypothesis_consensus"
+    assert len(result.query_edit_hypothesis_ids) == 2
+    assert result.compatible_candidate_count == 2
+    assert result.independent_compatible_candidate_count == 2
+    assert "AMBIGUOUS_EDIT_HYPOTHESIS_RETRIEVAL_USED" in result.warnings
+    assert result.recommendations
+    assert all(
+        any(
+            caution.startswith("Query atom correspondence is ambiguous")
+            for caution in recommendation.cautions
+        )
+        for recommendation in result.recommendations
+    )
+
+
+def test_ambiguous_query_abstains_without_independent_consensus_support() -> None:
+    index = build_generic_index(
+        [_record(201, _fischer_signature("fischer-a"))]
+    )
+    recommender = GenericConditionRecommender(index)
+
+    result = recommender.recommend(
+        "O=C1CCCCC1.Cl.NNc1ccc(F)cc1"
+        ">>Fc1ccc2[nH]c3c(c2c1)CCCC3"
+    )
+
+    assert not result.valid
+    assert result.recommendation_mode == "ambiguous_edit_hypotheses"
+    assert (
+        result.retrieval_level
+        == "insufficient_edit_hypothesis_consensus_support"
+    )
+    assert result.recommendations == ()
+    assert result.error == "NO_ROBUST_EDIT_HYPOTHESIS_PRECEDENT"
+
+
 def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     output = tmp_path / "generic_conversion_chan_lam_pilot"
     convert_datasets(
@@ -759,7 +852,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "2.1"
+    assert result.schema_version == "2.2"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")

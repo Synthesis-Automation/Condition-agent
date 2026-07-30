@@ -90,6 +90,10 @@ def test_concise_ambiguous_reaction_explains_structural_evidence(capsys) -> None
         "verified edits withheld"
         in output
     )
+    assert output.count("Edit hypothesis ") == 2
+    assert output.count("REH1:") == 2
+    assert "global_correspondence; 4 correspondences; unverified" in output
+    assert "formed: C(" in output
     assert (
         "Detected functional groups: reactants "
         "[aryl halide, ketone, primary amine, secondary amine] → "

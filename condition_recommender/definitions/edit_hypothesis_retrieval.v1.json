@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "edit_hypothesis_retrieval.v1",
+  "calibration_status": "conservative_query_only_poc",
+  "minimum_hypothesis_count": 2,
+  "minimum_prototype_similarity": 0.6,
+  "minimum_independent_support": 2,
+  "candidate_limit": 100,
+  "consensus_policy": "intersection_across_all_hypotheses",
+  "precedent_policy": "verified_signatures_only",
+  "similarity_weights": {
+    "edit_hypothesis_consensus": 0.75,
+    "structure_context": 0.25
+  }
+}

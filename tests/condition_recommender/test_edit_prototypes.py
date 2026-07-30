@@ -1,8 +1,13 @@
 """Tests for grammar-independent anonymous edit prototypes."""
 
+from dataclasses import asdict
+
+from reactive_taxonomy import featurize_reaction
+
 from condition_recommender.edit_prototypes import (
     anonymous_edit_compatible,
     anonymous_edit_prototype,
+    anonymous_edit_prototype_from_hypothesis,
     anonymous_edit_similarity,
 )
 
@@ -86,3 +91,21 @@ def test_unrelated_non_ring_edit_fails_prototype_compatibility_gate() -> None:
     assert reduction is not None
     assert not anonymous_edit_compatible(annulation, reduction)
     assert anonymous_edit_similarity(annulation, reduction) == 0.0
+
+
+def test_ambiguous_fischer_hypotheses_share_one_anonymous_prototype() -> None:
+    analysis = featurize_reaction(
+        "O=C1CCCCC1.Cl.NNc1ccc(F)cc1"
+        ">>Fc1ccc2[nH]c3c(c2c1)CCCC3"
+    )
+
+    prototypes = tuple(
+        anonymous_edit_prototype_from_hypothesis(asdict(hypothesis))
+        for hypothesis in analysis.edit_hypotheses
+    )
+
+    assert len(prototypes) == 2
+    assert all(prototype is not None for prototype in prototypes)
+    assert prototypes[0] == prototypes[1]
+    assert prototypes[0].formed_element_pairs == ("C-C", "C-N")
+    assert prototypes[0].broken_element_pairs == ("C-O", "N-N")

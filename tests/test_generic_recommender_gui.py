@@ -258,6 +258,7 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
     assert "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" in summary
     assert "Label evidence: Exact Product" in summary
     assert "Suzuki Miyaura" in summary
+    assert "Mode: Verified Signature" in summary
     assert "R–C≡N [nitrile] (reactant 1, d=3)" in summary
     assert "benzene (6-membered)" in summary
     assert "ortho burden high (2/2)" in summary

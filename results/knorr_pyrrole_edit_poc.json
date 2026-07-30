@@ -1,0 +1,107 @@
+{
+  "ambiguous_correspondence_count": 5,
+  "anonymous_prototype_count": 11,
+  "artifact_type": "grammar_independent_edit_poc",
+  "edit_hypothesis_query_count": 5,
+  "elapsed_seconds": 211.531,
+  "evidence_quality_counts": {
+    "ambiguous_atom_correspondence": 5,
+    "fragmented_scaffold_correspondence": 4,
+    "global_atom_correspondence": 306,
+    "reactant_grammar_only": 204
+  },
+  "fragmented_signature_count": 4,
+  "fully_prototyped_edit_hypothesis_query_count": 5,
+  "holdout_signed_query_count": 56,
+  "named_family_count": 0,
+  "precursor_mode_counts": {
+    "multi_component": 428,
+    "single_substrate": 91
+  },
+  "reaction_name_used_in_signature_identity": false,
+  "reference_disjoint_hypothesis_retrieval_counts": {
+    "consensus_edit_graph": 2,
+    "no_consensus_match": 3
+  },
+  "reference_disjoint_retrieval_counts": {
+    "edit_graph": 286,
+    "exact_l3": 261,
+    "no_match": 24
+  },
+  "reference_disjoint_signed_query_count": 310,
+  "retrieval_counts": {
+    "edit_graph": 44,
+    "exact_l3": 36,
+    "no_match": 12
+  },
+  "retrieval_examples": {
+    "cross_mode_edit_graph": [],
+    "edit_graph": [
+      "31-309-CAS-10156755",
+      "31-309-CAS-10288279",
+      "31-309-CAS-10361213",
+      "31-309-CAS-10614448",
+      "31-309-CAS-10632016",
+      "31-309-CAS-1127712",
+      "31-309-CAS-1159018",
+      "31-309-CAS-12419557",
+      "31-309-CAS-12627853",
+      "31-309-CAS-12737375"
+    ],
+    "exact_l3": [
+      "31-309-CAS-10156755",
+      "31-309-CAS-10288279",
+      "31-309-CAS-10361213",
+      "31-309-CAS-10614448",
+      "31-309-CAS-10632016",
+      "31-309-CAS-1127712",
+      "31-309-CAS-1159018",
+      "31-309-CAS-12419557",
+      "31-309-CAS-12627853",
+      "31-309-CAS-12737375"
+    ],
+    "no_match": [
+      "31-309-CAS-10484489",
+      "31-309-CAS-4080896",
+      "31-309-CAS-4368079",
+      "31-309-CAS-6226315",
+      "31-309-CAS-6501684",
+      "31-309-CAS-8351508",
+      "31-574-CAS-10768237",
+      "31-574-CAS-12898638",
+      "31-574-CAS-15017917",
+      "31-574-CAS-1641969"
+    ]
+  },
+  "row_count": 652,
+  "schema_version": "1.1",
+  "shared_prototype_edit_hypothesis_query_count": 1,
+  "signature_count": 310,
+  "signature_coverage": 0.597303,
+  "source": "data-processor\\reaction_dataset\\Knorr_pyrrole_synthesis.csv",
+  "source_label_role": "evaluation_cohort_only",
+  "source_label_used_for_routing": false,
+  "split_counts": {
+    "holdout": 84,
+    "train": 435
+  },
+  "top_warnings": {
+    "FRAGMENT_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE": 122,
+    "FRAGMENT_CORRESPONDENCE_UNACCOUNTED_PRODUCT_ATOMS": 27,
+    "GLOBAL_CORRESPONDENCE_NOT_FOUND": 81,
+    "GLOBAL_CORRESPONDENCE_REQUIRES_MULTIPLE_PARTNERS": 42,
+    "GLOBAL_CORRESPONDENCE_REQUIRES_ONE_PRODUCT": 30,
+    "GLOBAL_CORRESPONDENCE_UNACCOUNTED_PRODUCT_ATOMS": 50,
+    "INFERRED_GLOBAL_ATOM_CORRESPONDENCE": 306,
+    "INSUFFICIENT_REACTANT_MULTIPLICITY": 30,
+    "MISSING_REACTANT_SUSPECTED": 44,
+    "MULTIPLE_PRODUCTS": 30,
+    "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES": 518,
+    "REACTION_COMPLETENESS_UNRESOLVED": 135,
+    "SCAFFOLD_CORRESPONDENCE_INSUFFICIENT_CONSERVATION": 69,
+    "SCAFFOLD_CORRESPONDENCE_REQUIRES_ONE_SUBSTRATE": 122,
+    "UNACCOUNTED_PRODUCT_HEAVY_ATOMS": 74
+  },
+  "unique_reaction_count": 519,
+  "unique_reference_count": 69
+}

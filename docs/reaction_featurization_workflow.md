@@ -7,9 +7,9 @@ name or source label is never the primary classifier.
 Reaction SMILES
   -> parse molecules
   -> detect functional groups and reactive sites
-  -> enumerate grammar-compatible candidates
-  -> reconstruct possible products
-  -> extract and reconcile graph edits
+  -> collect mapping, reconstruction, and correspondence evidence
+  -> reconcile providers and retain distinct edit hypotheses
+  -> select verified graph edits when the evidence is unique
   -> assign transformation and optional family interpretations
   -> build topology, environments, spectators, and events
   -> generate display labels
@@ -43,8 +43,8 @@ side into components and preserves:
 - supplied atom-map numbers;
 - parsing errors and warnings.
 
-Agents are analyzed, but they are not used as reaction partners during grammar
-candidate enumeration.
+Agents are analyzed, but they are not used as reaction partners during
+structure-evidence collection or grammar candidate enumeration.
 
 Parsing validates syntax and component SMILES; it does not require a globally
 balanced chemical equation. Reaction records commonly report only the main
@@ -150,7 +150,7 @@ Multiple rewrites may also be composed for multi-event reactions.
 
 ## 5. Extract and reconcile observed reaction edits
 
-[`normalize_reaction_edits()`](../reactive_taxonomy/reaction_edits.py)
+[`resolve_reaction_evidence()`](../reactive_taxonomy/reaction_edits.py)
 establishes the actual transformation evidence.
 
 The effective evidence priority is:
@@ -160,7 +160,15 @@ The effective evidence priority is:
 3. Exact multi-event rewrite reconstruction.
 4. Conservative unique-scaffold correspondence.
 5. Bounded global multi-reactant correspondence.
-6. Unresolved or ambiguous evidence.
+6. Bounded fragmented-scaffold correspondence for topology-changing,
+   single-substrate reactions.
+7. Unresolved, ambiguous, or conflicting evidence.
+
+The resolver exposes each attempted source as a typed
+`ReactionEvidenceCandidate`. Mapping, exact reconstruction, and correspondence
+are providers of structural evidence; they are not separate recommendation
+pipelines. The resolver applies one precedence and contradiction policy after
+the providers run. `normalize_reaction_edits()` remains a compatibility alias.
 
 The global fallback is used only for unmapped, single-main-product reactions
 after exact reconstruction and the narrower scaffold fallback fail. It matches
@@ -174,6 +182,24 @@ correspondence; alternatives that imply different stereo observations remain
 ambiguous.
 This recovers general assemblies such as additions, condensations, and
 cycloadditions without assigning a named reaction or inventing a reactant.
+
+When minimum-cost correspondences imply different normalized chemistry, the
+resolver does not discard the alternatives. It emits deterministic
+`ReactionEditHypothesis` objects containing:
+
+```text
+hypothesis_id (REH1)
+provider and evidence
+confidence
+atom-provenanced edits and stereo observations
+number of correspondences collapsed into this chemistry alternative
+edit cost
+topology
+warnings
+```
+
+These hypotheses are review and query evidence, not observed edits. They do not
+create a reaction signature or make a dataset record index-eligible.
 
 Normalized edit types include:
 
@@ -469,6 +495,8 @@ The full output is
 parsed components
 candidate interpretations
 selected candidate and events
+evidence candidates from every attempted structural provider
+distinct ambiguous edit hypotheses
 transformation class
 compatible named families
 named family
@@ -498,6 +526,8 @@ During dataset conversion,
 - serializes reaction completeness in canonical JSONL and exposes its status,
   coverage, and warnings in generic review CSV;
 - serializes the nested reaction signature;
+- serializes provider evidence and edit hypotheses for review even when no
+  signature can be issued;
 - exposes L0-L4 keys in review exports;
 - places the record into verified, review, or rejected tiers.
 

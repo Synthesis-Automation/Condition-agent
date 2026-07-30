@@ -566,6 +566,66 @@ class ReactionTopology:
 
 
 @dataclass(frozen=True)
+class ReactionEditHypothesis:
+    """One unresolved but chemically explicit alternative edit interpretation."""
+
+    hypothesis_id: str
+    provider: str
+    evidence: str
+    confidence: float
+    edits: Tuple[ReactionEdit, ...]
+    stereo_changes: Tuple[ReactionStereoChange, ...]
+    correspondence_count: int
+    edit_cost: Tuple[int, int, int]
+    topology: Optional[ReactionTopology] = None
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
+
+    def __post_init__(self) -> None:
+        if not self.hypothesis_id.startswith("REH1:"):
+            raise ValueError("hypothesis_id must use the REH1 namespace")
+        if not self.provider or not self.evidence:
+            raise ValueError("an edit hypothesis requires provider and evidence")
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("confidence must be between 0 and 1")
+        if not self.edits:
+            raise ValueError("an edit hypothesis requires at least one edit")
+        if self.correspondence_count < 1:
+            raise ValueError("correspondence_count must be positive")
+        if len(self.edit_cost) != 3 or any(value < 0 for value in self.edit_cost):
+            raise ValueError("edit_cost must contain three non-negative values")
+
+
+@dataclass(frozen=True)
+class ReactionEvidenceCandidate:
+    """Provider-scoped structural evidence before authority reconciliation."""
+
+    provider: str
+    status: Literal["verified", "ambiguous", "unresolved", "invalid"]
+    evidence: str
+    confidence: float
+    edits: Tuple[ReactionEdit, ...] = ()
+    stereo_changes: Tuple[ReactionStereoChange, ...] = ()
+    edit_hypotheses: Tuple[ReactionEditHypothesis, ...] = ()
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
+
+    def __post_init__(self) -> None:
+        if not self.provider:
+            raise ValueError("evidence provider must be present")
+        if not self.evidence:
+            raise ValueError("evidence description must be present")
+        if self.status not in {"verified", "ambiguous", "unresolved", "invalid"}:
+            raise ValueError("unsupported evidence-provider status")
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("confidence must be between 0 and 1")
+        if self.status == "verified" and not self.edits:
+            raise ValueError("verified evidence requires edits")
+        if self.status == "ambiguous" and not self.edit_hypotheses:
+            raise ValueError("ambiguous evidence requires edit hypotheses")
+
+
+@dataclass(frozen=True)
 class ReactionEvent:
     """One connected, atom-provenanced transformation within a reaction."""
 
@@ -726,13 +786,15 @@ class ReactionAnalysis:
     family_environment: Optional[ReactionFamilyEnvironment] = None
     product_connection: Optional[ProductConnection] = None
     reaction_topology: Optional[ReactionTopology] = None
+    evidence_candidates: Tuple[ReactionEvidenceCandidate, ...] = ()
+    edit_hypotheses: Tuple[ReactionEditHypothesis, ...] = ()
     reaction_signature: Optional[ReactionSignature] = None
     fallback_descriptor: Optional[ReactionFallbackDescriptor] = None
     partial_product_transformation: Optional[PartialProductTransformation] = None
     reaction_completeness: Optional[ReactionCompletenessAssessment] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "3.1"
+    schema_version: str = "3.2"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -766,6 +828,8 @@ __all__ = [
     "ReactionComponent",
     "ReactionDisplayLabel",
     "ReactionEdit",
+    "ReactionEditHypothesis",
+    "ReactionEvidenceCandidate",
     "ReactionEvent",
     "ReactionEventRelation",
     "ReactionFallbackDescriptor",

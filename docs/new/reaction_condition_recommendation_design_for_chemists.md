@@ -75,6 +75,9 @@ obtain atom correspondence or exactly reconstruct the product
     v
 normalize bond, hydrogen, charge, topology, and stereo observations
     |
+    +----> if correspondence is ambiguous, retain every distinct edit
+    |      hypothesis without declaring one to be observed
+    |
     v
 build a versioned reaction signature
     |
@@ -286,6 +289,15 @@ an indole-forming transformation through different exact edit sets. This tier
 can relate them without using the words “Fischer indole” as a routing key. The
 result explicitly states that the exact bond-edit signatures differ.
 
+An ambiguous query does not receive an RS3 signature merely because its
+alternatives look plausible. Instead, each distinct edit hypothesis is
+converted to an anonymous edit prototype and searched independently against
+verified precedents. Recommendations are possible only from the intersection:
+the same precedent chemistry must pass the edit and compatibility gates for
+every hypothesis. Ranking uses the weakest hypothesis-to-precedent match. This
+is useful when ambiguity concerns atom origin or symmetry but all alternatives
+still imply the same practical chemistry; otherwise the system abstains.
+
 ## 6. Local reactivity profiles
 
 Every selected site has a typed, graph-derived profile with a common outer
@@ -374,14 +386,18 @@ The current verified-signature ladder is:
 4. generic transformation signature;
 5. local-environment neighbors inside the compatible bond-edit pool;
 6. broad compatible bond-edit fallback;
-7. abstention.
+7. chemistry-gated anonymous edit-graph neighbors;
+8. abstention.
 
 The first tier with enough independent compatible support is selected. Family
 evidence never crosses an incompatible-edit gate.
 
-A query without a verified signature does not enter this ladder. It may use a
-separate, conservative structure fallback with its own thresholds, trace, and
-warnings. Such a result must not be described as edit-verified.
+A query without a verified signature does not enter this ladder. If it has
+multiple typed edit hypotheses, it may use the separate all-hypothesis
+consensus search described above. That search uses only verified precedents,
+requires independent support, remains review-required, and does not make the
+query itself edit-verified. If consensus is unavailable, a conservative
+structure fallback with its own thresholds, trace, and warnings may be tried.
 
 ### 8.3 Compatibility precedes similarity
 

@@ -10,21 +10,28 @@ import argparse
 import csv
 import hashlib
 import json
+import sys
 import time
 from collections import Counter
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from condition_recommender.edit_prototypes import (
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from condition_recommender.edit_prototypes import (  # noqa: E402
     anonymous_edit_prototype,
+    anonymous_edit_prototype_from_hypothesis,
     anonymous_edit_similarity,
 )
-from reactive_taxonomy import featurize_reaction
-from reactive_taxonomy.chemistry.rdkit_utils import parse_smiles
+from reactive_taxonomy import featurize_reaction  # noqa: E402
+from reactive_taxonomy.chemistry.rdkit_utils import parse_smiles  # noqa: E402
 
 
-POC_SCHEMA_VERSION = "1.0"
+POC_SCHEMA_VERSION = "1.1"
 DEFAULT_SOURCE = (
     Path(__file__).parents[1]
     / "data-processor"
@@ -101,6 +108,18 @@ def evaluate_fischer_edit_poc(
             if isinstance(signature, Mapping)
             else None
         )
+        hypotheses = tuple(
+            asdict(hypothesis)
+            for hypothesis in analysis.edit_hypotheses
+        )
+        hypothesis_prototypes = tuple(
+            prototype
+            for hypothesis in hypotheses
+            for prototype in (
+                anonymous_edit_prototype_from_hypothesis(hypothesis),
+            )
+            if prototype is not None
+        )
         reference = str(row.get("reference") or "").strip()
         observations.append(
             {
@@ -111,6 +130,8 @@ def evaluate_fischer_edit_poc(
                 "evidence_quality": analysis.evidence_quality,
                 "signature": signature,
                 "prototype": prototype,
+                "edit_hypotheses": hypotheses,
+                "hypothesis_prototypes": hypothesis_prototypes,
                 "warnings": tuple(analysis.warnings),
             }
         )
@@ -218,6 +239,45 @@ def evaluate_fischer_edit_poc(
         for observation in observations
         for warning in observation["warnings"]
     )
+    ambiguous_queries = tuple(
+        observation
+        for observation in observations
+        if observation["edit_hypotheses"]
+    )
+    hypothesis_retrieval = Counter()
+    for query in ambiguous_queries:
+        prototypes = query["hypothesis_prototypes"]
+        if len(prototypes) != len(query["edit_hypotheses"]):
+            hypothesis_retrieval["prototype_incomplete"] += 1
+            continue
+        independent = tuple(
+            candidate
+            for candidate in signatures
+            if candidate["reference"] != query["reference"]
+        )
+        robust = tuple(
+            candidate
+            for candidate in independent
+            if all(
+                anonymous_edit_similarity(
+                    prototype,
+                    candidate["prototype"],
+                )
+                >= edit_graph_threshold
+                for prototype in prototypes
+            )
+        )
+        cross_mode = tuple(
+            candidate
+            for candidate in robust
+            if candidate["precursor_mode"] != query["precursor_mode"]
+        )
+        if robust:
+            hypothesis_retrieval["consensus_edit_graph"] += 1
+        else:
+            hypothesis_retrieval["no_consensus_match"] += 1
+        if cross_mode:
+            hypothesis_retrieval["cross_mode_consensus_edit_graph"] += 1
     return {
         "schema_version": POC_SCHEMA_VERSION,
         "artifact_type": "grammar_independent_edit_poc",
@@ -253,6 +313,26 @@ def evaluate_fischer_edit_poc(
             observation["evidence_quality"]
             == "ambiguous_atom_correspondence"
             for observation in observations
+        ),
+        "edit_hypothesis_query_count": len(ambiguous_queries),
+        "fully_prototyped_edit_hypothesis_query_count": sum(
+            len(observation["hypothesis_prototypes"])
+            == len(observation["edit_hypotheses"])
+            for observation in ambiguous_queries
+        ),
+        "shared_prototype_edit_hypothesis_query_count": sum(
+            len(
+                {
+                    prototype.prototype_id
+                    for prototype in observation["hypothesis_prototypes"]
+                }
+            )
+            == 1
+            for observation in ambiguous_queries
+            if observation["hypothesis_prototypes"]
+        ),
+        "reference_disjoint_hypothesis_retrieval_counts": dict(
+            sorted(hypothesis_retrieval.items())
         ),
         "named_family_count": len(named_families),
         "anonymous_prototype_count": len(

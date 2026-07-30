@@ -2,7 +2,8 @@
   "ambiguous_correspondence_count": 205,
   "anonymous_prototype_count": 3,
   "artifact_type": "grammar_independent_edit_poc",
-  "elapsed_seconds": 190.309,
+  "edit_hypothesis_query_count": 205,
+  "elapsed_seconds": 160.26,
   "evidence_quality_counts": {
     "ambiguous_atom_correspondence": 205,
     "fragmented_scaffold_correspondence": 4,
@@ -11,6 +12,7 @@
     "unresolved": 39
   },
   "fragmented_signature_count": 4,
+  "fully_prototyped_edit_hypothesis_query_count": 205,
   "holdout_signed_query_count": 4,
   "named_family_count": 0,
   "precursor_mode_counts": {
@@ -18,6 +20,11 @@
     "single_substrate": 191
   },
   "reaction_name_used_in_signature_identity": false,
+  "reference_disjoint_hypothesis_retrieval_counts": {
+    "consensus_edit_graph": 195,
+    "cross_mode_consensus_edit_graph": 117,
+    "no_consensus_match": 10
+  },
   "reference_disjoint_retrieval_counts": {
     "cross_mode_edit_graph": 58,
     "edit_graph": 58,
@@ -51,7 +58,8 @@
     "no_match": []
   },
   "row_count": 542,
-  "schema_version": "1.0",
+  "schema_version": "1.1",
+  "shared_prototype_edit_hypothesis_query_count": 116,
   "signature_count": 58,
   "signature_coverage": 0.162921,
   "source": "C:\\Git-softwares\\Condition-agent\\data-processor\\reaction_dataset\\Fischer_indole_synthesis.csv",

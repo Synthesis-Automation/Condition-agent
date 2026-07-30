@@ -26,6 +26,38 @@ def _counter_tokens(values: Any, parser: Any) -> Tuple[str, ...]:
     return tuple(sorted(parser(value) for value in values or () if str(value)))
 
 
+def _build_prototype(
+    *,
+    formed: Tuple[str, ...],
+    broken: Tuple[str, ...],
+    changed: Tuple[str, ...],
+    topology: Mapping[str, Any],
+    event_count: int,
+) -> "AnonymousEditPrototype | None":
+    if not formed and not broken and not changed:
+        return None
+    payload = {
+        "formed_element_pairs": formed,
+        "broken_element_pairs": broken,
+        "order_changed_element_pairs": changed,
+        "ring_count_delta": int(topology.get("ring_count_delta") or 0),
+        "formed_ring_sizes": tuple(
+            sorted(int(value) for value in topology.get("formed_ring_sizes") or ())
+        ),
+        "event_count": int(event_count),
+        "version": ANONYMOUS_EDIT_PROTOTYPE_VERSION,
+    }
+    canonical = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    prototype_id = "EP1:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[
+        :24
+    ]
+    return AnonymousEditPrototype(prototype_id=prototype_id, **payload)
+
+
 @dataclass(frozen=True)
 class AnonymousEditPrototype:
     """Coarse edit graph used only after deterministic chemistry gates."""
@@ -47,29 +79,100 @@ def anonymous_edit_prototype(
     formed = _counter_tokens(signature.get("formed_bond_types"), _bond_pair)
     broken = _counter_tokens(signature.get("broken_bond_types"), _bond_pair)
     changed = _counter_tokens(signature.get("order_changes"), _order_pair)
-    if not formed and not broken and not changed:
-        return None
     topology = signature.get("topology") or {}
-    payload = {
-        "formed_element_pairs": formed,
-        "broken_element_pairs": broken,
-        "order_changed_element_pairs": changed,
-        "ring_count_delta": int(topology.get("ring_count_delta") or 0),
-        "formed_ring_sizes": tuple(
-            sorted(int(value) for value in topology.get("formed_ring_sizes") or ())
-        ),
-        "event_count": int(signature.get("event_count") or 0),
-        "version": ANONYMOUS_EDIT_PROTOTYPE_VERSION,
-    }
-    canonical = json.dumps(
-        payload,
-        sort_keys=True,
-        separators=(",", ":"),
+    return _build_prototype(
+        formed=formed,
+        broken=broken,
+        changed=changed,
+        topology=topology,
+        event_count=int(signature.get("event_count") or 0),
     )
-    prototype_id = "EP1:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[
-        :24
-    ]
-    return AnonymousEditPrototype(prototype_id=prototype_id, **payload)
+
+
+def _hypothesis_atom_key(atom: Mapping[str, Any]) -> tuple[Any, ...]:
+    map_number = atom.get("atom_map_number")
+    if map_number is not None:
+        return ("map", int(map_number))
+    return (
+        str(atom.get("side") or ""),
+        int(atom.get("component_index") or 0),
+        int(atom.get("atom_index") or 0),
+    )
+
+
+def _hypothesis_element_pair(edit: Mapping[str, Any]) -> str | None:
+    atom_1 = edit.get("atom_1")
+    atom_2 = edit.get("atom_2")
+    if not isinstance(atom_1, Mapping) or not isinstance(atom_2, Mapping):
+        return None
+    elements = sorted(
+        (str(atom_1.get("element") or ""), str(atom_2.get("element") or ""))
+    )
+    if not all(elements):
+        return None
+    return "-".join(elements)
+
+
+def _hypothesis_event_count(edits: Tuple[Mapping[str, Any], ...]) -> int:
+    adjacency: dict[tuple[Any, ...], set[tuple[Any, ...]]] = {}
+    for edit in edits:
+        atom_1 = edit.get("atom_1")
+        atom_2 = edit.get("atom_2")
+        if not isinstance(atom_1, Mapping):
+            continue
+        left = _hypothesis_atom_key(atom_1)
+        adjacency.setdefault(left, set())
+        if not isinstance(atom_2, Mapping):
+            continue
+        right = _hypothesis_atom_key(atom_2)
+        adjacency.setdefault(right, set())
+        adjacency[left].add(right)
+        adjacency[right].add(left)
+    remaining = set(adjacency)
+    count = 0
+    while remaining:
+        count += 1
+        stack = [remaining.pop()]
+        while stack:
+            current = stack.pop()
+            neighbors = adjacency.get(current, set()) & remaining
+            remaining.difference_update(neighbors)
+            stack.extend(neighbors)
+    return count
+
+
+def anonymous_edit_prototype_from_hypothesis(
+    hypothesis: Mapping[str, Any],
+) -> AnonymousEditPrototype | None:
+    """Derive an EP1 query prototype from one unverified edit hypothesis."""
+    edits = tuple(
+        edit
+        for edit in hypothesis.get("edits") or ()
+        if isinstance(edit, Mapping)
+    )
+    formed = []
+    broken = []
+    changed = []
+    for edit in edits:
+        pair = _hypothesis_element_pair(edit)
+        if not pair:
+            continue
+        edit_type = str(edit.get("edit_type") or "")
+        if edit_type == "formed":
+            formed.append(pair)
+        elif edit_type == "broken":
+            broken.append(pair)
+        elif edit_type == "order_changed":
+            changed.append(pair)
+    topology = hypothesis.get("topology")
+    topology_value = topology if isinstance(topology, Mapping) else {}
+    return _build_prototype(
+        formed=tuple(sorted(formed)),
+        broken=tuple(sorted(broken)),
+        changed=tuple(sorted(changed)),
+        topology=topology_value,
+        event_count=_hypothesis_event_count(edits),
+    )
 
 
 def _multiset_jaccard(left: Tuple[str, ...], right: Tuple[str, ...]) -> float:
@@ -152,5 +255,6 @@ __all__ = [
     "AnonymousEditPrototype",
     "anonymous_edit_compatible",
     "anonymous_edit_prototype",
+    "anonymous_edit_prototype_from_hypothesis",
     "anonymous_edit_similarity",
 ]

@@ -109,8 +109,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "3.4"
-    assert record.converter_definition_version == "generic_conversion.v2.4"
+    assert record.schema_version == "3.5"
+    assert record.converter_definition_version == "generic_conversion.v2.5"
     assert record.reaction_signature["schema_version"] == "3.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -248,6 +248,35 @@ def test_grammar_only_record_is_review_not_rejected() -> None:
     assert record.fallback_descriptor is not None
     assert record.fallback_descriptor["schema_version"] == "1.2"
     assert not record.fallback_descriptor["retrieval_eligible"]
+
+
+def test_ambiguous_edit_hypotheses_are_serialized_but_not_indexed() -> None:
+    record = convert_record(
+        _raw(
+            "O=C1CCCCC1.Cl.NNc1ccc(F)cc1"
+            ">>Fc1ccc2[nH]c3c(c2c1)CCCC3"
+        )
+    )
+
+    assert record.reaction_signature is None
+    assert len(record.reaction_edit_hypotheses) == 2
+    assert {
+        value["provider"] for value in record.reaction_evidence_candidates
+    } == {
+        "exact_reconstruction",
+        "exact_multi_event_reconstruction",
+        "global_correspondence",
+    }
+    assert all(
+        value["hypothesis_id"].startswith("REH1:")
+        for value in record.reaction_edit_hypotheses
+    )
+    assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
+    assert not build_generic_index([record.to_dict()]).rows
+
+    review = concise_reaction_review_row(record.to_dict())
+    assert review["edit_hypothesis_count"] == "2"
+    assert review["edit_hypothesis_ids"].count("REH1:") == 2
 
 
 def test_unresolved_record_serializes_eligible_fallback_descriptor() -> None:
@@ -561,7 +590,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "2.1"
+    assert report["schema_version"] == "2.2"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]

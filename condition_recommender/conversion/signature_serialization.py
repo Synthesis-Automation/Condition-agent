@@ -10,6 +10,16 @@ from typing import Any, Dict
 def signature_record_fields(analysis: Any) -> Dict[str, Any]:
     """Return RecommendationRecord keyword fields from a reaction analysis."""
     signature = analysis.reaction_signature
+    evidence_fields = {
+        "reaction_evidence_candidates": tuple(
+            asdict(candidate)
+            for candidate in analysis.evidence_candidates
+        ),
+        "reaction_edit_hypotheses": tuple(
+            asdict(hypothesis)
+            for hypothesis in analysis.edit_hypotheses
+        ),
+    }
     if signature is None:
         partial = analysis.partial_product_transformation
         return {
@@ -25,6 +35,7 @@ def signature_record_fields(analysis: Any) -> Dict[str, Any]:
             ),
             "family_confidence": 0.0,
             "taxonomy_definition_versions": {},
+            **evidence_fields,
         }
     return {
         "reaction_signature": asdict(signature),
@@ -37,6 +48,7 @@ def signature_record_fields(analysis: Any) -> Dict[str, Any]:
         "transformation_confidence": signature.transformation_confidence,
         "family_confidence": signature.family_confidence,
         "taxonomy_definition_versions": dict(signature.definition_versions),
+        **evidence_fields,
     }
 
 

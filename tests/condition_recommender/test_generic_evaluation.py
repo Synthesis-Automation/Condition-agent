@@ -99,8 +99,8 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.4",
-        "converter_definition_version": "generic_conversion.v2.4",
+        "schema_version": "3.5",
+        "converter_definition_version": "generic_conversion.v2.5",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "chemistry_status": "verified",
@@ -140,7 +140,7 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     payload = json.loads(first_path.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "2.3"
     assert payload["reaction_signature_schema_version"] == "3.0"
-    assert payload["record_schema_versions"] == ["3.4"]
+    assert payload["record_schema_versions"] == ["3.5"]
     assert payload["maps"]["environment_features"]
     integrity = validate_generic_index_artifact(first_path)
     assert integrity["valid"]
@@ -158,6 +158,43 @@ def test_compressed_persisted_index_round_trip(tmp_path: Path) -> None:
     assert load_persisted_generic_index(path) == index
     assert load_generic_index(path) == index
     assert validate_generic_index_artifact(path)["valid"]
+
+
+def test_index_accepts_previous_review_only_record_contract(tmp_path: Path) -> None:
+    record = _record(1)
+    record["schema_version"] = "3.4"
+    record["converter_definition_version"] = "generic_conversion.v2.4"
+    index = build_generic_index([record])
+    path = tmp_path / "previous-compatible-index.json"
+
+    save_generic_index(index, path)
+    loaded = load_persisted_generic_index(path)
+
+    assert loaded.record_schema_versions == ("3.4",)
+    assert loaded.converter_definition_versions == ("generic_conversion.v2.4",)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("schema_version", "stale", "record schema"),
+        (
+            "converter_definition_version",
+            "generic_conversion.stale",
+            "converter version",
+        ),
+    ),
+)
+def test_index_rejects_unlisted_record_contracts(
+    field: str,
+    value: str,
+    message: str,
+) -> None:
+    record = _record(1)
+    record[field] = value
+
+    with pytest.raises(ValueError, match=message):
+        build_generic_index([record])
 
 
 def test_index_rejects_stale_converted_records() -> None:

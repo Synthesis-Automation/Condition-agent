@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import List
 
 from .chemistry.rdkit_utils import parse_smiles
@@ -14,7 +15,7 @@ from .connectivity_rewrite import apply_connectivity_rewrite
 from .reaction_completeness import build_reaction_completeness
 from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_display_labels import build_reaction_display_label
-from .reaction_edits import normalize_mapped_edits, normalize_reaction_edits
+from .reaction_edits import normalize_mapped_edits, resolve_reaction_evidence
 from .reaction_labels import render_reactant_label, render_reaction_label
 from .reaction_environments import build_reaction_family_environment
 from .reaction_fallback_descriptors import build_reaction_fallback_descriptor
@@ -231,7 +232,7 @@ def featurize_reaction(
             )
         )
     )
-    edit_result = normalize_reaction_edits(
+    edit_result = resolve_reaction_evidence(
         parsed.reactants,
         parsed.products,
         selected,
@@ -293,6 +294,43 @@ def featurize_reaction(
         products=parsed.products,
         selected=selected,
         edit_result=edit_result,
+    )
+    edit_hypotheses = tuple(
+        replace(
+            hypothesis,
+            topology=build_reaction_topology(
+                reactants=parsed.reactants,
+                products=parsed.products,
+                selected=None,
+                edit_result=replace(
+                    edit_result,
+                    edits=hypothesis.edits,
+                    evidence=hypothesis.evidence,
+                    confidence=hypothesis.confidence,
+                    valid=False,
+                    stereo_changes=hypothesis.stereo_changes,
+                    edit_hypotheses=(),
+                ),
+            ),
+        )
+        for hypothesis in edit_result.edit_hypotheses
+    )
+    hypotheses_by_id = {
+        hypothesis.hypothesis_id: hypothesis
+        for hypothesis in edit_hypotheses
+    }
+    evidence_candidates = tuple(
+        replace(
+            candidate,
+            edit_hypotheses=tuple(
+                hypotheses_by_id.get(
+                    hypothesis.hypothesis_id,
+                    hypothesis,
+                )
+                for hypothesis in candidate.edit_hypotheses
+            ),
+        )
+        for candidate in edit_result.evidence_candidates
     )
     effective_evidence = evidence
     if edit_result.evidence in {
@@ -491,6 +529,8 @@ def featurize_reaction(
         family_environment=family_environment,
         product_connection=product_connection,
         reaction_topology=reaction_topology,
+        evidence_candidates=evidence_candidates,
+        edit_hypotheses=edit_hypotheses,
         reaction_signature=reaction_signature,
         fallback_descriptor=fallback_descriptor,
         partial_product_transformation=partial_product_transformation,
