@@ -1,0 +1,1439 @@
+{
+  "baseline": {
+    "completeness_status": {
+      "": 1,
+      "incomplete": 39,
+      "unresolved": 68,
+      "verified": 338
+    },
+    "evidence_quality": {
+      "ambiguous_atom_correspondence": 5,
+      "exact_product_reconstruction": 278,
+      "fragmented_scaffold_correspondence": 1,
+      "global_atom_correspondence": 50,
+      "partial_product_correspondence": 6,
+      "reactant_grammar_only": 73,
+      "unique_scaffold_correspondence": 9,
+      "unresolved": 21,
+      "validated_atom_mapping": 3
+    },
+    "valid": 445,
+    "with_named_family": 82,
+    "with_signature": 341
+  },
+  "by_reaction_type": {
+    "Acetonide Deprotection": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Acetonide Protection": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Acyl chloride esterification": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Aldol": {
+      "baseline_signatures": 1,
+      "cores": 5,
+      "high_review_priority": 1,
+      "new_core_coverage": 4,
+      "rows": 5,
+      "valid_mappings": 5
+    },
+    "Aldol addition": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Aldol condensation": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Allylic SN2": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Allylic substitution": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amidation": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Amide: 2-Methylbutyric acid + N-methylpiperazine": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: 2-Naphthoic acid + 4-aminopiperidine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: 3-Chlorobenzoic acid + 4-picolylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: 4-Bromobenzoic acid + morpholine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: 4-Cyanobenzoic acid + butylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: 4-Fluorobenzoic acid + phenethylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: 4-Nitrobenzoic acid + tert-butylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Acetic acid + benzylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Acetic acid + pyrrolidine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Benzoic acid + N,N-dimethylaniline tertiary amide": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Benzoic acid + aniline": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Cyclohexanecarboxylic acid + tryptamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: DCC/NHS coupling": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: EDC/HOBt coupling": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Isonicotinic acid + aniline": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Isovaleric acid + 4-chlorobenzylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Leucine + benzylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Octanoic acid + p-anisidine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Phenylacetic acid + cyclohexylamine": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Phenylalanine + cyclohexylamine": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Pivalic acid + p-toluidine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Pyrimidine-2-carboxylic acid + 4-fluorobenzylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Pyrrole-2-carboxylic acid + 4,4-dimethylcyclohexylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Pyrrole-3-carboxylic acid + 2-phenoxyethylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: Thiophene-3-carboxylic acid + morpholine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Amide: p-Methoxybenzoic acid + cyclopropylamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Appel": {
+      "baseline_signatures": 1,
+      "cores": 2,
+      "high_review_priority": 2,
+      "new_core_coverage": 1,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Azo reduction": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 0
+    },
+    "Baeyer-Villiger": {
+      "baseline_signatures": 1,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Benzimidazole": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Benzimidazole from o-phenylenediamine": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Benzothiazole": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Benzoxazole": {
+      "baseline_signatures": 0,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 2,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Biginelli": {
+      "baseline_signatures": 0,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 2,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Birch Reduction": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Bn Deprotection": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Bn Protection": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Boc Deprotection": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Boc Protection": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 2,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Buchwald-Hartwig": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Buchwald-Hartwig amination": {
+      "baseline_signatures": 107,
+      "cores": 112,
+      "high_review_priority": 12,
+      "new_core_coverage": 5,
+      "rows": 112,
+      "valid_mappings": 112
+    },
+    "CS coupling": {
+      "baseline_signatures": 5,
+      "cores": 5,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 5,
+      "valid_mappings": 5
+    },
+    "Carbazole synthesis": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Cbz Deprotection": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Cbz Protection": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 2,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "ChanLam": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "ChanLam coupling": {
+      "baseline_signatures": 3,
+      "cores": 3,
+      "high_review_priority": 3,
+      "new_core_coverage": 0,
+      "rows": 3,
+      "valid_mappings": 3
+    },
+    "Claisen": {
+      "baseline_signatures": 0,
+      "cores": 2,
+      "high_review_priority": 2,
+      "new_core_coverage": 2,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Click": {
+      "baseline_signatures": 0,
+      "cores": 3,
+      "high_review_priority": 1,
+      "new_core_coverage": 3,
+      "rows": 3,
+      "valid_mappings": 3
+    },
+    "Cross-Metathesis": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "CuAAC Click": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "DIBAL": {
+      "baseline_signatures": 1,
+      "cores": 2,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Dess-Martin": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "DielsAlder": {
+      "baseline_signatures": 0,
+      "cores": 4,
+      "high_review_priority": 3,
+      "new_core_coverage": 4,
+      "rows": 4,
+      "valid_mappings": 4
+    },
+    "Dihydroxylation": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Disulfide reduction": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 0
+    },
+    "E1": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "E2": {
+      "baseline_signatures": 4,
+      "cores": 4,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 4,
+      "valid_mappings": 4
+    },
+    "E2 elimination": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Electrophilic bromination": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Electrophilic nitration": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Esterification": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "FMOC Deprotection": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "FMOC Protection": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Finkelstein": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Fischer Indole": {
+      "baseline_signatures": 0,
+      "cores": 2,
+      "high_review_priority": 1,
+      "new_core_coverage": 2,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "FriedelCrafts acylation": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "FriedelCrafts alkylation": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Grignard": {
+      "baseline_signatures": 2,
+      "cores": 3,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 3,
+      "valid_mappings": 3
+    },
+    "Grignard addition": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "HWE": {
+      "baseline_signatures": 0,
+      "cores": 2,
+      "high_review_priority": 2,
+      "new_core_coverage": 2,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Hantzsch": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Heck": {
+      "baseline_signatures": 8,
+      "cores": 8,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 8,
+      "valid_mappings": 8
+    },
+    "Henry": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Hydroboration-oxidation": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Hydrogenation": {
+      "baseline_signatures": 9,
+      "cores": 9,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 9,
+      "valid_mappings": 9
+    },
+    "IBX": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Imidazole": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Imine formation": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Jones Oxidation": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Knoevenagel": {
+      "baseline_signatures": 0,
+      "cores": 2,
+      "high_review_priority": 1,
+      "new_core_coverage": 2,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Kumada": {
+      "baseline_signatures": 5,
+      "cores": 5,
+      "high_review_priority": 5,
+      "new_core_coverage": 0,
+      "rows": 5,
+      "valid_mappings": 5
+    },
+    "LiAlH4": {
+      "baseline_signatures": 3,
+      "cores": 5,
+      "high_review_priority": 2,
+      "new_core_coverage": 2,
+      "rows": 5,
+      "valid_mappings": 5
+    },
+    "LiAlH4 reduction": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Mannich": {
+      "baseline_signatures": 1,
+      "cores": 2,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Michael": {
+      "baseline_signatures": 1,
+      "cores": 3,
+      "high_review_priority": 1,
+      "new_core_coverage": 2,
+      "rows": 3,
+      "valid_mappings": 3
+    },
+    "Mitsunobu": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "MnO2": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "NaBH(OAc)3": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "NaBH4": {
+      "baseline_signatures": 2,
+      "cores": 3,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 3,
+      "valid_mappings": 3
+    },
+    "NaBH4 reduction": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Negishi": {
+      "baseline_signatures": 5,
+      "cores": 5,
+      "high_review_priority": 5,
+      "new_core_coverage": 0,
+      "rows": 5,
+      "valid_mappings": 5
+    },
+    "Oxidation": {
+      "baseline_signatures": 3,
+      "cores": 3,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 3,
+      "valid_mappings": 3
+    },
+    "Ozonolysis": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "PCC": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "PCC Oxidation": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "PMB Deprotection": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "PMB Protection": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Paal-Knorr": {
+      "baseline_signatures": 2,
+      "cores": 3,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 3,
+      "valid_mappings": 3
+    },
+    "Peroxide reduction": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 0
+    },
+    "Pictet-Spengler": {
+      "baseline_signatures": 0,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 2,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Quinoline synthesis": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Rearrangement": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Reductive Amination": {
+      "baseline_signatures": 27,
+      "cores": 29,
+      "high_review_priority": 4,
+      "new_core_coverage": 2,
+      "rows": 29,
+      "valid_mappings": 29
+    },
+    "Reductive amination": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Reformatsky": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Ring-Closing Metathesis": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Ring-closing metathesis": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "SN1": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "SN1 substitution": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "SN2": {
+      "baseline_signatures": 4,
+      "cores": 8,
+      "high_review_priority": 1,
+      "new_core_coverage": 4,
+      "rows": 9,
+      "valid_mappings": 8
+    },
+    "SN2 substitution": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "SNAr": {
+      "baseline_signatures": 4,
+      "cores": 5,
+      "high_review_priority": 2,
+      "new_core_coverage": 1,
+      "rows": 5,
+      "valid_mappings": 5
+    },
+    "Sonogashira": {
+      "baseline_signatures": 7,
+      "cores": 9,
+      "high_review_priority": 2,
+      "new_core_coverage": 2,
+      "rows": 9,
+      "valid_mappings": 9
+    },
+    "Stille": {
+      "baseline_signatures": 3,
+      "cores": 3,
+      "high_review_priority": 3,
+      "new_core_coverage": 0,
+      "rows": 3,
+      "valid_mappings": 3
+    },
+    "Sulfide to sulfone": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Sulfide to sulfoxide": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Suzuki": {
+      "baseline_signatures": 40,
+      "cores": 44,
+      "high_review_priority": 44,
+      "new_core_coverage": 4,
+      "rows": 44,
+      "valid_mappings": 44
+    },
+    "Swern oxidation": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Swern-type oxidation": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "TBS Deprotection": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "TBS Protection": {
+      "baseline_signatures": 1,
+      "cores": 2,
+      "high_review_priority": 2,
+      "new_core_coverage": 1,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "TEMPO": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Transfer Hydrogenation": {
+      "baseline_signatures": 2,
+      "cores": 2,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 2,
+      "valid_mappings": 2
+    },
+    "Trityl Deprotection": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Trityl Protection": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Ugi-type reaction": {
+      "baseline_signatures": 0,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 1,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Ullmann CN": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "Ullmann CO coupling": {
+      "baseline_signatures": 5,
+      "cores": 5,
+      "high_review_priority": 1,
+      "new_core_coverage": 0,
+      "rows": 5,
+      "valid_mappings": 5
+    },
+    "Wittig": {
+      "baseline_signatures": 0,
+      "cores": 5,
+      "high_review_priority": 5,
+      "new_core_coverage": 5,
+      "rows": 5,
+      "valid_mappings": 5
+    },
+    "Zn/HCl": {
+      "baseline_signatures": 1,
+      "cores": 1,
+      "high_review_priority": 0,
+      "new_core_coverage": 0,
+      "rows": 1,
+      "valid_mappings": 1
+    },
+    "mCPBA": {
+      "baseline_signatures": 2,
+      "cores": 3,
+      "high_review_priority": 1,
+      "new_core_coverage": 1,
+      "rows": 3,
+      "valid_mappings": 3
+    },
+    "minisci_alkylation": {
+      "baseline_signatures": 3,
+      "cores": 12,
+      "high_review_priority": 7,
+      "new_core_coverage": 9,
+      "rows": 12,
+      "valid_mappings": 12
+    }
+  },
+  "elapsed_seconds": 51.677,
+  "mapping": {
+    "attempted": 442,
+    "invalid": 0,
+    "mean_confidence": 0.728995,
+    "median_confidence": 0.788682,
+    "valid": 442
+  },
+  "reaction_core": {
+    "available": 445,
+    "boundary_classes": {
+      "acyl": 58,
+      "alkenyl": 24,
+      "alkyl": 173,
+      "alkynyl": 10,
+      "aryl": 311,
+      "heteroaryl": 79,
+      "heteroatom": 136,
+      "ring_aliphatic": 39
+    },
+    "center_count": {
+      "1": 353,
+      "2": 86,
+      "3": 2,
+      "4": 2,
+      "5": 1,
+      "6": 1
+    },
+    "event_count": {
+      "1": 421,
+      "2": 24
+    },
+    "generic_labels": {
+      "C(#R)(Ar) → C(H)2(Ar)(R)": 1,
+      "C(#R)(ArC) → C(R)(:ArC)(:N)": 1,
+      "C(#R)(R) → C(H)(#R) + C(:HetAr)2(I) → C(:HetAr)2(R)": 1,
+      "C(#R)(R) → C(R)(:ArC)(:N) + N(Ar)(N-(N)) → N(Ar)(:ArC)(:N)": 1,
+      "C(:Ar)(B)(:ArC) → C(:Ar)(N-R)(:ArC) + C(H)(:Ar)(:ArC) → C(H)(:Ar)(:N)": 1,
+      "C(:Ar)(B)(:ArC) → C(H)(:Ar)(:ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)(B)(:O) → C(:Ar)(ArC)(:ArC)": 1,
+      "C(:Ar)(Br)(:ArC) → C(:Ar)(ArC)(:ArC)": 1,
+      "C(:Ar)(Br)(:ArC) → C(H)(:Ar)(:ArC) + C(Br)(:ArC)2 → C(N-R)(:ArC)2": 1,
+      "C(:Ar)(Cl)(:N) → C(:Ar)(N-R)(:N)": 1,
+      "C(:Ar)(N-(O,O))(:ArC) → C(:Ar)(:ArC)2 + N(H)2(ArC) → N(H)(:ArC)2": 1,
+      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 4,
+      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:Ar)2(Cl) → C(:Ar)2(ArC)": 3,
+      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:HetAr)2(Br) → C(:HetAr)2(ArC)": 3,
+      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:HetAr)2(I) → C(:HetAr)2(ArC)": 2,
+      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(Br)(:ArC)2 → C(ArC)(:ArC)2": 1,
+      "C(:Ar)2(B) → C(:Ar)2(N-R)": 3,
+      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 9,
+      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:Ar)2(Zn) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:HetAr)2(B) → C(:HetAr)2(ArC)": 1,
+      "C(:Ar)2(Br) → C(:Ar)2(N)": 16,
+      "C(:Ar)2(Br) → C(:Ar)2(N-R)": 59,
+      "C(:Ar)2(Br) → C(:Ar)2(O-R)": 2,
+      "C(:Ar)2(Br) → C(:Ar)2(R)": 12,
+      "C(:Ar)2(Br) → C(:Ar)2(S-R)": 2,
+      "C(:Ar)2(Br) → C(H)(:Ar)2 + C(H)(:ArC)2 → C(H)(:ArC)2": 1,
+      "C(:Ar)2(Cl) → C(:Ar)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(Cl) → C(:Ar)2(ArC) + C(:Ar)2(Mg) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(Cl) → C(:Ar)2(N)": 2,
+      "C(:Ar)2(Cl) → C(:Ar)2(N-R)": 6,
+      "C(:Ar)2(Cl) → C(:Ar)2(O-R)": 1,
+      "C(:Ar)2(Cl) → C(:Ar)2(R)": 3,
+      "C(:Ar)2(Cl) → C(:Ar)2(S-R)": 1,
+      "C(:Ar)2(F) → C(:Ar)2(N-R)": 1,
+      "C(:Ar)2(F) → C(:Ar)2(O-R)": 1,
+      "C(:Ar)2(I) → C(:Ar)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(I) → C(:Ar)2(N)": 1,
+      "C(:Ar)2(I) → C(:Ar)2(N-R)": 5,
+      "C(:Ar)2(I) → C(:Ar)2(R)": 4,
+      "C(:Ar)2(I) → C(:Ar)2(S-R)": 1,
+      "C(:Ar)2(Mg) → C(:Ar)2(ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(O-(S)) → C(:Ar)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(O-H) → C(:Ar)2(O-R)": 1,
+      "C(:Ar)2(Sn) → C(:Ar)2(ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(Zn) → C(:Ar)2(ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 1,
+      "C(:HetAr)(B)(:ArC) → C(:HetAr)(ArC)(:N)": 1,
+      "C(:HetAr)(Br)(:ArC) → C(H)(:HetAr)(:ArC) + N(H)(Cycloalkyl)2 → N(ArC)(Cycloalkyl)2": 1,
+      "C(:HetAr)(Cl)(:ArC) → C(:HetAr)(R)(:ArC)": 1,
+      "C(:HetAr)2(B) → C(:HetAr)2(ArC) + C(:HetAr)2(Br) → C(:HetAr)2(ArC)": 1,
+      "C(:HetAr)2(B) → C(:HetAr)2(ArC) + C(:HetAr)2(Cl) → C(:HetAr)2(ArC)": 2,
+      "C(:HetAr)2(B) → C(H)(:HetAr)2 + C(:Ar)2(Cl) → C(:Ar)2(ArC)": 1,
+      "C(:HetAr)2(Br) → C(:HetAr)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 2,
+      "C(:HetAr)2(Br) → C(:HetAr)2(ArC) + C(:HetAr)2(B) → C(:HetAr)2(ArC)": 1,
+      "C(:HetAr)2(Br) → C(:HetAr)2(N)": 1,
+      "C(:HetAr)2(Br) → C(:HetAr)2(N-R)": 8,
+      "C(:HetAr)2(Br) → C(:HetAr)2(O-R)": 1,
+      "C(:HetAr)2(Br) → C(:HetAr)2(R)": 4,
+      "C(:HetAr)2(Br) → C(:HetAr)2(S-R)": 1,
+      "C(:HetAr)2(Cl) → C(:HetAr)2(N)": 1,
+      "C(:HetAr)2(Cl) → C(:HetAr)2(N-R)": 10,
+      "C(:HetAr)2(Cl) → C(:HetAr)2(O-R)": 2,
+      "C(:HetAr)2(I) → C(:HetAr)2(O-R)": 1,
+      "C(:HetAr)2(I) → C(:HetAr)2(R)": 3,
+      "C(:HetAr)2(R) → C(:HetAr)2(N-R)": 3,
+      "C(=Alkenyl)(R)(B) → C(=Alkenyl)(R)(ArC) + C(:HetAr)2(Br) → C(:HetAr)2(R)": 1,
+      "C(=R)(Alkenyl)(R) → C(=R)(Alkenyl)(R)": 1,
+      "C(=R)(R)2 → C(R)3(O-R)": 1,
+      "C(Alkenyl)(Ar)(=O) → C(H)(Alkenyl)(Ar)(O-H)": 1,
+      "C(Ar)(#N) → C(H)2(Ar)(N-H)": 2,
+      "C(Ar)(Br)(Cycloalkyl)2 → C(Ar)(ArC)(Cycloalkyl)2": 1,
+      "C(Ar)(N)(=O) → C(H)2(Ar)(N)": 1,
+      "C(Ar)(O-H)(=O) → C(Ar)(N-R)(=O)": 10,
+      "C(Ar)(O-H)(=O) → C(Ar)(O-R)(=O)": 1,
+      "C(Ar)(O-R)(=O) → C(Ar)(R)(=O)": 1,
+      "C(Ar)(O-R)(=O) → C(H)2(Ar)(R)": 1,
+      "C(Ar)(R)(=O) → C(Ar)(:ArC)(:N) + C(Ar)(R)(=O) → C(Ar)(:ArC)(:N)": 1,
+      "C(Ar)(R)(=O) → C(H)(Ar)(R)(N-R)": 2,
+      "C(Ar)(R)(=O) → C(H)(Ar)(R)(O-H)": 4,
+      "C(Ar)(R)2(Cl) → C(Ar)(R)2(O-H)": 1,
+      "C(Ar)3(Cl) → C(Ar)3(O-R)": 1,
+      "C(ArC)(O)(=O) → C(H)2(R)(O) + C(R)(:ArC)2 → C(R)(:ArC)2": 1,
+      "C(Br)(:ArC)2 → C(H)(:ArC)2": 1,
+      "C(Br)(:ArC)2 → C(R)(N-R)(=O) + C(Br)(:ArC)2 → C(N-R)(:ArC)2": 1,
+      "C(Cycloalkyl)(O-H)(=O) → C(Cycloalkyl)(N-R)(=O)": 1,
+      "C(Cycloalkyl)2(=O) → C(H)(Cycloalkyl)2(N-R)": 2,
+      "C(Cycloalkyl)2(=O) → C(H)(Cycloalkyl)2(O-H)": 1,
+      "C(H)(:Ar)(:HetAr) → C(:Ar)(:HetAr)(Br) + C(R)2(=O) → C(R)(ArC)(=O)": 1,
+      "C(H)(:Ar)2 → C(:Ar)2(Br)": 1,
+      "C(H)(:Ar)2 → C(:Ar)2(N-(O,O))": 1,
+      "C(H)(:ArC)2 → C(H)(:ArC)2 + C(Br)(:ArC)2 → C(ArC)(:ArC)2 + C(H)(:ArC)2 → C(H)(:ArC)2 + C(Br)(:ArC)2 → C(ArC)(:ArC)2": 1,
+      "C(H)(:ArC)2 → C(H)(=R)(R)": 1,
+      "C(H)(:ArC)2 → C(H)(=R)(R) + C(H)(:ArC)2 → C(H)(=R)(R) + C(H)(:ArC)2 → C(H)2(R)2 + C(H)(:ArC)2 → C(H)2(R)2 + C(H)(:ArC)2 → C(H)2(R)2 + C(H)(:ArC)2 → C(H)2(R)2": 1,
+      "C(H)(:ArC)2 → C(H)(=R)(R) + C(H)(:ArC)2 → C(H)2(R)(N-R) + C(R)(:ArC)2 → C(H)(=R)(R) + C(H)2(R)2 → C(=R)(R)2 + C(H)2(=O) → C(H)(=R)(R)": 1,
+      "C(H)(:ArC)2 → C(H)3(R) + C(H)2(=P-R) → C(H)(=R)(R)": 1,
+      "C(H)(:ArC)2 → C(R)(:ArC)2 + C(H)(R)(=O) → C(H)2(R)(N-R)": 1,
+      "C(H)(:HetAr)2 → C(:HetAr)2(R) + C(H)(Ar)(=O) → C(Ar)(ArC)(=O)": 1,
+      "C(H)(=Alkenyl)(B) → C(H)(=Alkenyl)(R) + C(H)(=Alkenyl)(Br) → C(H)(=Alkenyl)(R)": 1,
+      "C(H)(=R)(Acyl) → C(H)2(Acyl)(R) + C(H)(=R)(Ar) → C(H)2(Ar)(R)": 1,
+      "C(H)(=R)(Acyl) → C(H)2(Acyl)(R) + C(H)(=R)(Ar) → C(H)2(Ar)(R) + C(H)(:Ar)2 → C(:Ar)2(R)": 1,
+      "C(H)(=R)(Ar) → C(H)(Ar)(=O)": 1,
+      "C(H)(=R)(Ar) → C(H)(Ar)(R)(O-R)": 1,
+      "C(H)(=R)(Ar) → C(H)(Ar)(R)2": 1,
+      "C(H)(=R)(Ar) → C(H)2(Ar)(R)": 2,
+      "C(H)(=R)(Cycloalkyl) → C(H)(R)(Cycloalkyl)(O-H) + C(H)(=R)(Cycloalkyl) → C(H)(R)(Cycloalkyl)(O-H)": 1,
+      "C(H)(=R)(R) → C(H)(R)2(O-R)": 1,
+      "C(H)(=R)(R) → C(H)2(R)(Cycloalkyl)": 1,
+      "C(H)(=R)(R) → C(H)2(R)(O-H)": 1,
+      "C(H)(Alkynyl)2(R) → C(=R)(Alkynyl)2": 1,
+      "C(H)(Ar)(=O) → C(Ar)(:N)(:O)": 1,
+      "C(H)(Ar)(=O) → C(Ar)(:N)(:S)": 1,
+      "C(H)(Ar)(=O) → C(Ar)(:N)2": 1,
+      "C(H)(Ar)(=O) → C(Ar)(ArC)(=O) + C(H)(:HetAr)2 → C(:HetAr)2(R)": 1,
+      "C(H)(Ar)(=O) → C(H)(=R)(Ar)": 2,
+      "C(H)(Ar)(=O) → C(H)(Ar)(=N-R)": 1,
+      "C(H)(Ar)(=O) → C(H)(Ar)(R)(N-R) + C(R)2(=O) → C(=R)(R)(N-R)": 1,
+      "C(H)(Ar)(=O) → C(H)(Ar)(R)(O-H)": 4,
+      "C(H)(Ar)(=O) → C(H)2(Ar)(N-R)": 13,
+      "C(H)(Ar)(=O) → C(H)2(Ar)(O-H)": 3,
+      "C(H)(Ar)(R)(Br) → C(H)(=R)(Ar)": 1,
+      "C(H)(Ar)(R)(O-H) → C(Ar)(R)(=O)": 2,
+      "C(H)(HetAr)(=O) → C(H)2(HetAr)(N-R)": 3,
+      "C(H)(R)(=O) → C(=R)(R)(O-R)": 1,
+      "C(H)(R)(=O) → C(H)(=R)(R)": 1,
+      "C(H)(R)(=O) → C(H)(=R)(R) + C(H)2(Acyl)(P-(O,O,O)) → C(H)(=R)(Acyl)": 1,
+      "C(H)(R)(=O) → C(H)(R)2(N-R) + C(R)2(=O) → C(=R)(R)(N-R)": 1,
+      "C(H)(R)(=O) → C(H)(R)2(O-H)": 2,
+      "C(H)(R)(=O) → C(H)(R)2(O-H) + C(R)2(=O) → C(H)(R)3": 1,
+      "C(H)(R)(=O) → C(H)2(R)(N-R)": 4,
+      "C(H)(R)(=O) → C(H)2(R)2": 1,
+      "C(H)(R)(=O) → C(R)(:ArC)(:N)": 1,
+      "C(H)(R)(=O) → C(R)(ArC)(=O) + C(H)(:HetAr)2 → C(:HetAr)2(R)": 1,
+      "C(H)(R)(=O) → C(R)2(=O)": 1,
+      "C(H)(R)(=O) → C(R)3(O-H)": 1,
+      "C(H)(R)2(Br) → C(H)(=R)(R)": 3,
+      "C(H)(R)2(Br) → C(H)(R)2(O-H)": 2,
+      "C(H)(R)2(Cl) → C(H)(R)2(S-R)": 1,
+      "C(H)(R)2(N-H) → C(H)2(R)(N-R)": 1,
+      "C(H)(R)2(O-H) → C(R)2(=O)": 1,
+      "C(H)(R)2(O-H) → C(R)2(=O) + C(H)2(R)(O-H) → C(H)(R)(=O)": 1,
+      "C(H)(R)3 → C(H)(R)2(ArC) + C(H)3(Ar) → C(H)2(Ar)(F)": 1,
+      "C(H)2(=O) → C(H)2(R)(O-H)": 1,
+      "C(H)2(=R) → C(H)(=R)(R)": 1,
+      "C(H)2(=R) → C(H)2(=R) + C(H)2(=R) → C(H)(=R)(R)": 1,
+      "C(H)2(=R) → C(H)3(R) + C(H)(=R)(R) → C(H)2(R)2 + C(H)(=R)(R) → C(H)2(R)2 + C(H)2(=R) → C(H)3(R)": 1,
+      "C(H)2(Acyl)(Br) → C(H)2(Acyl)(R) + C(H)(Ar)(=O) → C(H)(Ar)(R)(O-H)": 1,
+      "C(H)2(Acyl)(Br) → C(H)2(Acyl)(R) + C(H)(R)(=O) → C(H)(R)2(O-H)": 1,
+      "C(H)2(Acyl)(P-(O,O,O)) → C(H)(=R)(Acyl) + C(H)(Ar)(=O) → C(H)(=R)(Ar)": 1,
+      "C(H)2(Ar)(Br) → C(H)2(Ar)(O-R)": 2,
+      "C(H)2(Ar)(Cl) → C(H)2(Ar)(I)": 1,
+      "C(H)2(Ar)(I) → C(H)2(Ar)(O-H)": 1,
+      "C(H)2(Ar)(O-H) → C(Ar)(O-H)(=O)": 1,
+      "C(H)2(Ar)(O-H) → C(H)(Ar)(=O)": 3,
+      "C(H)2(Ar)(O-H) → C(H)2(Ar)(Cl)": 1,
+      "C(H)2(Cycloalkyl)(O-H) → C(H)(Cycloalkyl)(=O)": 1,
+      "C(H)2(R)(Br) → C(H)2(R)(I)": 2,
+      "C(H)2(R)(Br) → C(H)2(R)(O-H)": 1,
+      "C(H)2(R)(Br) → C(H)2(R)(O-R)": 1,
+      "C(H)2(R)(Br) → C(H)2(R)2": 2,
+      "C(H)2(R)(Br) → C(H)2(R)2 + C(H)2(R)(Cl) → C(H)2(R)(N-H)": 1,
+      "C(H)2(R)(Cycloalkyl) → C(H)2(R)(Cycloalkyl) + C(R)(O-H)(=O) → C(R)(N-R)(=O)": 1,
+      "C(H)2(R)(Cycloalkyl) → C(H)2(R)(O-H) + C(Cycloalkyl)(O-R)(=O) → C(H)2(R)(O-H)": 1,
+      "C(H)2(R)(O-H) → C(H)(R)(=O)": 3,
+      "C(H)2(R)(O-H) → C(H)2(R)(Br)": 1,
+      "C(H)2(R)(O-H) → C(H)2(R)(N-R)": 1,
+      "C(H)2(R)2 → C(H)(=R)(R)": 1,
+      "C(H)2(R)2 → C(H)2(R)(ArC)": 3,
+      "C(H)2(R)2 → C(H)2(R)(N-R)": 1,
+      "C(H)3(I) → C(H)3(S-R)": 1,
+      "C(H)3(N-R) → C(H)(:ArC)2": 1,
+      "C(H)3(R) → C(H)2(=R) + C(H)2(R)2 → C(H)(=R)(R) + C(H)2(R)(Br) → C(H)3(R)": 1,
+      "C(H)3(R) → C(H)3(ArC)": 2,
+      "C(H)3(R) → C(H)3(R) + C(H)3(R) → C(H)(=R)(R)": 1,
+      "C(H)3(R) → C(R)3(Si)": 1,
+      "C(HetAr)(O-H)(=O) → C(HetAr)(N-R)(=O)": 5,
+      "C(N-(N))(:ArC)2 → C(H)3(R) + N(H)(ArC)(N-H) → N(H)(:ArC)2": 1,
+      "C(N-H)(:ArC)2 → C(:ArC)2(:N)": 1,
+      "C(O)(:ArC)2 → C(H)(R)2(O)": 1,
+      "C(O)(O-R)(=O) → C(N-R)(O)(=O)": 4,
+      "C(R)(:ArC)2 → C(ArC)(:ArC)(:N) + C(H)(:ArC)2 → C(ArC)(:ArC)2": 1,
+      "C(R)(ArC)(=O) → C(R)(O-R)(=O) + C(:Ar)2(R) → C(:Ar)2(O-R)": 1,
+      "C(R)(Cl)(=O) → C(R)(ArC)(=O)": 1,
+      "C(R)(Cl)(=O) → C(R)(O-R)(=O)": 1,
+      "C(R)(Cycloalkyl)(=O) → C(Cycloalkyl)(O-R)(=O)": 1,
+      "C(R)(O-H)(=O) → C(H)3(ArC)": 2,
+      "C(R)(O-H)(=O) → C(R)(:N)(:O)": 1,
+      "C(R)(O-H)(=O) → C(R)(:N)2": 1,
+      "C(R)(O-H)(=O) → C(R)(N-R)(=O)": 8,
+      "C(R)(O-H)(=O) → C(R)(O-R)(=O)": 1,
+      "C(R)(O-R)(=O) → C(H)(R)(=O)": 1,
+      "C(R)(O-R)(=O) → C(H)2(R)(O-H)": 1,
+      "C(R)(O-R)(=O) → C(R)2(=O)": 1,
+      "C(R)2(=O) → C(=R)(R)2": 2,
+      "C(R)2(=O) → C(H)(=R)(R)": 1,
+      "C(R)2(=O) → C(H)(R)2(N-R)": 2,
+      "C(R)2(=O) → C(H)(R)2(O-H)": 1,
+      "C(R)2(=O) → C(H)(R)2(O-H) + C(H)(R)(=O) → C(H)(R)(=O)": 1,
+      "C(R)2(=O) → C(H)3(R)": 1,
+      "C(R)2(=O) → C(R)(:ArC)(:N)": 1,
+      "C(R)2(=O) → C(R)(:ArC)(:N) + C(R)2(=O) → C(R)(:ArC)(:N)": 1,
+      "C(R)2(=O) → C(R)(:N)2 + C(H)(N-H)(=O) → C(H)3(N)": 1,
+      "C(R)2(=O) → C(R)(O-R)(=O)": 1,
+      "C(R)2(=O) → C(R)2(=O)": 1,
+      "C(R)2(=O) → C(R)2(ArC)(O-H)": 1,
+      "C(R)2(=O) → C(R)2(O-R)2": 1,
+      "C(R)3(Br) → C(=R)(R)2": 1,
+      "C(R)3(Br) → C(R)3(O-H)": 1,
+      "C(R)3(Cl) → C(R)3(ArC)": 1,
+      "C(R)3(Cl) → C(R)3(O-H)": 1,
+      "N(#N-(N)) → N(:ArC)(:N) + N(N-R)(#N) → N(:ArC)(:N)": 1,
+      "N(Ar)(=N-R) → N(H)2(Ar) + N(Ar)(=N-R) → N(H)2(Ar)": 1,
+      "N(Ar)(O)(=O) → N(Ar)(O)(=O)": 1,
+      "N(Ar)(O)(=O) → N(H)2(Ar)": 2,
+      "N(H)(Ar)(R) → N(H)2(Ar)": 3,
+      "N(N-R)(#N) → N(R)(:ArC)(:N) + C(#R)(R) → C(R)(:ArC)(:N)": 1,
+      "O(Acyl) → O(H)(Acyl) + C(H)(Acyl)(R)2 → C(Acyl)(R)3": 1,
+      "O(R)(Cycloalkyl) → O(H)(R) + O(R)(Cycloalkyl) → O(H)(R)": 1,
+      "O(R)(O-R) → O(H)(R) + O(R)(O-R) → O(H)(R)": 1,
+      "O(R)(Si) → O(H)(R)": 1,
+      "O(R)2 → O(H)(R)": 4,
+      "S(Ar)(R) → S(Ar)(R)(=O)": 1,
+      "S(Ar)(R) → S(Ar)(R)(=O)2": 1,
+      "S(R)(S-R) → S(H)(R) + S(R)(S-R) → S(H)(R)": 1,
+      "Si(R)3(Cl) → Si(R)3(O-R)": 1
+    },
+    "mixed_source_label_clusters": 30,
+    "new_coverage_without_baseline_signature": 104,
+    "repeated_center_transition_keys": 54,
+    "rows_in_mixed_source_label_clusters": 146,
+    "rows_in_repeated_center_clusters": 241,
+    "unavailable": 1,
+    "unique_center_transition_keys": 258
+  },
+  "report_schema_version": "1.0",
+  "report_status": {
+    "core_available": 445,
+    "core_unavailable": 1
+  },
+  "review_priority": {
+    "high": 152,
+    "low": 1,
+    "medium": 293
+  },
+  "rows": 446,
+  "source": "C:\\Git-softwares\\Condition-agent\\examples\\sample_reactions.csv"
+}
