@@ -237,7 +237,7 @@ result.
 ### Template-free reaction minimization
 
 When normalized edits retain atom correspondence across both sides,
-[`build_reaction_core_projection()`](../reactive_taxonomy/reaction_core.py)
+[`build_reaction_core_projection()`](../reactive_taxonomy/reaction_core/builder.py)
 builds a `ReactionCoreProjection` directly from the molecular graphs and edits.
 It does not load a reaction grammar, template, source label, or reaction name.
 

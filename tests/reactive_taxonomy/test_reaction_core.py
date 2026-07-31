@@ -4,7 +4,20 @@ from __future__ import annotations
 
 from typing import Any
 
-from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy import build_reaction_core_projection, featurize_reaction
+from reactive_taxonomy.reaction_core import (
+    ReactionCoreProjection,
+    build_reaction_core_projection as package_build_reaction_core_projection,
+)
+
+
+def test_reaction_core_package_preserves_the_public_constructor() -> None:
+    """The focused package remains the sole implementation import surface."""
+    assert (
+        package_build_reaction_core_projection
+        is build_reaction_core_projection
+    )
+    assert ReactionCoreProjection.__name__ == "ReactionCoreProjection"
 
 
 RXNMAPPER_STYLE_ACETAL = (
