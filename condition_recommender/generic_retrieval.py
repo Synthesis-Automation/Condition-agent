@@ -31,7 +31,9 @@ _SUPPORTED_RETRIEVAL_LEVELS = {
     "transformation_signature",
     "environment_neighbors",
     "bond_edit_signature",
-    "reaction_core_shape",
+    "reaction_core_exact",
+    "reaction_core_local",
+    "reaction_core_context",
     "edit_graph_neighbors",
 }
 RetrievalStrategy = Literal[
@@ -53,7 +55,7 @@ _EVALUATION_STRATEGIES = {
 def load_generic_retrieval_rules() -> Dict[str, Any]:
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if str(rules.get("schema_version") or "") != "1.7":
+    if str(rules.get("schema_version") or "") != "1.8":
         raise ValueError("unsupported generic retrieval definition schema")
     if str(rules.get("definition_id") or "") != "generic_retrieval.v1":
         raise ValueError("unexpected generic retrieval definition ID")
@@ -122,8 +124,8 @@ def _candidate_levels(
         index,
         exclude=compatible,
     )
-    core_shape_positions = _core_shape_positions(reaction_core, index)
-    if not compatible and not edit_graph_neighbors and not core_shape_positions:
+    core_positions = _core_level_positions(reaction_core, index)
+    if not compatible and not edit_graph_neighbors and not any(core_positions.values()):
         return []
     rules = load_generic_retrieval_rules()
     family = str(signature.get("named_family") or "")
@@ -155,7 +157,7 @@ def _candidate_levels(
             signature, index, compatible
         ),
         "bond_edit_signature": compatible,
-        "reaction_core_shape": core_shape_positions,
+        **core_positions,
         "edit_graph_neighbors": edit_graph_neighbors,
     }
     ladder = (
@@ -168,27 +170,46 @@ def _candidate_levels(
     return [(level, candidates[level]) for level in ladder]
 
 
-def _core_shape_positions(
+def _core_level_positions(
     reaction_core: Mapping[str, Any] | None,
     index: GenericReactionIndex,
-) -> set[int]:
-    """Return verified precedents sharing the mapping-robust core shape."""
+) -> dict[str, set[int]]:
+    """Return verified precedents for exact, local, and contextual cores."""
+    empty = {
+        "reaction_core_exact": set(),
+        "reaction_core_local": set(),
+        "reaction_core_context": set(),
+    }
     if not reaction_core:
-        return set()
+        return empty
     eligible, _ = reaction_core_query_eligible(reaction_core, index)
     if not eligible:
-        return set()
-    shape_key = str(reaction_core.get("shape_core_key") or "")
-    if not shape_key:
-        return set()
+        return empty
     event_count = int(reaction_core.get("event_count") or 0)
+    definitions = {
+        "reaction_core_exact": (
+            index.core_exact,
+            str(reaction_core.get("exact_core_key") or ""),
+        ),
+        "reaction_core_local": (
+            index.core_typed,
+            str(reaction_core.get("typed_core_key") or ""),
+        ),
+        "reaction_core_context": (
+            index.core_shapes,
+            str(reaction_core.get("shape_core_key") or ""),
+        ),
+    }
     return {
-        position
-        for position in index.core_shapes.get(shape_key, ())
-        if index.rows[position].signature
-        and index.rows[position].reaction_core
-        and int(index.rows[position].reaction_core.get("event_count") or 0)
-        == event_count
+        level: {
+            position
+            for position in mapping.get(key, ())
+            if index.rows[position].signature
+            and index.rows[position].reaction_core
+            and int(index.rows[position].reaction_core.get("event_count") or 0)
+            == event_count
+        }
+        for level, (mapping, key) in definitions.items()
     }
 
 

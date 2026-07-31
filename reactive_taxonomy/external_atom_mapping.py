@@ -703,6 +703,7 @@ def _mapped_core_proposal(
         reactants=base.reactants,
         products=base.products,
         edits=mapping.normalization.edits,
+        stereo_changes=mapping.normalization.stereo_changes,
         evidence=evidence,
         confidence=confidence,
         topology=base.reaction_topology,

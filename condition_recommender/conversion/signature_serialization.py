@@ -100,6 +100,16 @@ def flattened_reaction_core_fields(
     """Expose minimized-core identity and canonical review JSON."""
     value = core or {}
     abstraction = value.get("abstraction") or {}
+    quality = value.get("quality") or {}
+    presentation = value.get("presentation") or {}
+    summary_sections = (
+        presentation.get("equation"),
+        *tuple(presentation.get("bond_changes") or ()),
+        *tuple(presentation.get("atom_state_changes") or ()),
+        *tuple(presentation.get("retained_context") or ()),
+        *tuple(presentation.get("departing_context") or ()),
+        *tuple(presentation.get("appearing_context") or ()),
+    )
     return {
         "reaction_core_id": value.get("core_id", ""),
         "reaction_core_exact": value.get("exact_core_key", ""),
@@ -108,6 +118,22 @@ def flattened_reaction_core_fields(
         "reaction_core_center_transition": value.get(
             "center_transition_key",
             "",
+        ),
+        "reaction_core_mapping_equivalence": value.get(
+            "mapping_equivalence_key", ""
+        ),
+        "reaction_core_quality_status": quality.get("status", ""),
+        "reaction_core_quality_reasons": "; ".join(
+            tuple(quality.get("review_reasons") or ())
+            + tuple(quality.get("blocking_reasons") or ())
+        ),
+        "reaction_core_state_changes": json.dumps(
+            value.get("state_changes") or (),
+            ensure_ascii=False,
+            sort_keys=True,
+        ),
+        "reaction_core_chemist_summary": " | ".join(
+            str(section) for section in summary_sections if section
         ),
         "reaction_core_motif_key": abstraction.get("motif_key", ""),
         "reaction_core_general_label": abstraction.get("general_label", ""),

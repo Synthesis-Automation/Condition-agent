@@ -15,7 +15,7 @@ from reactive_taxonomy import build_reaction_review_summary
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.8"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.9"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -27,11 +27,19 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "signature_id",
     "reaction_core_id",
     "reaction_core_shape_key",
+    "reaction_core_mapping_equivalence_key",
     "reaction_core_motif_key",
     "reaction_core_limiter",
     "reaction_core_atom_label",
     "reaction_core_evidence_status",
     "reaction_core_status",
+    "reaction_core_quality_status",
+    "reaction_core_quality_reasons",
+    "reaction_core_bond_changes",
+    "reaction_core_state_changes",
+    "reaction_core_retained_context",
+    "reaction_core_departing_context",
+    "reaction_core_appearing_context",
     "reaction_core_unavailability_reasons",
     "reaction_core_remote_classes",
     "fallback_descriptor_id",
@@ -216,6 +224,8 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         reaction_core if isinstance(reaction_core, Mapping) else {}
     )
     abstraction_value = reaction_core_value.get("abstraction") or {}
+    quality_value = reaction_core_value.get("quality") or {}
+    presentation_value = reaction_core_value.get("presentation") or {}
     fallback = record.get("fallback_descriptor")
     fallback_value = fallback if isinstance(fallback, Mapping) else {}
     completeness = record.get("reaction_completeness")
@@ -286,6 +296,9 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "reaction_core_shape_key": str(
             reaction_core_value.get("shape_core_key") or ""
         ),
+        "reaction_core_mapping_equivalence_key": str(
+            reaction_core_value.get("mapping_equivalence_key") or ""
+        ),
         "reaction_core_motif_key": str(
             abstraction_value.get("motif_key") or ""
         ),
@@ -296,6 +309,28 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             reaction_core_value.get("evidence_status") or ""
         ),
         "reaction_core_status": core_status,
+        "reaction_core_quality_status": str(
+            quality_value.get("status") or ""
+        ),
+        "reaction_core_quality_reasons": "; ".join(
+            tuple(quality_value.get("review_reasons") or ())
+            + tuple(quality_value.get("blocking_reasons") or ())
+        ),
+        "reaction_core_bond_changes": "; ".join(
+            presentation_value.get("bond_changes") or ()
+        ),
+        "reaction_core_state_changes": "; ".join(
+            presentation_value.get("atom_state_changes") or ()
+        ),
+        "reaction_core_retained_context": "; ".join(
+            presentation_value.get("retained_context") or ()
+        ),
+        "reaction_core_departing_context": "; ".join(
+            presentation_value.get("departing_context") or ()
+        ),
+        "reaction_core_appearing_context": "; ".join(
+            presentation_value.get("appearing_context") or ()
+        ),
         "reaction_core_unavailability_reasons": "; ".join(
             core_unavailability_reasons
         ),

@@ -24,7 +24,7 @@ from condition_recommender.generic_indexing import (
     save_generic_index,
 )
 from condition_recommender.core_retrieval import (
-    retrieve_core_shape_pool_with_trace,
+    retrieve_core_pool_with_trace,
 )
 from condition_recommender.hypothesis_retrieval import (
     load_edit_hypothesis_retrieval_rules,
@@ -150,8 +150,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.8",
-        "converter_definition_version": "generic_conversion.v3.2",
+        "schema_version": "3.9",
+        "converter_definition_version": "generic_conversion.v3.3",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",
@@ -320,7 +320,7 @@ def test_related_edit_graph_can_cross_exact_bond_key_gate() -> None:
     assert len(pool) == 3
 
 
-def test_retrieval_uses_core_shape_after_exact_edit_tiers() -> None:
+def test_retrieval_uses_context_core_after_exact_edit_tiers() -> None:
     query = _signature(
         "query",
         exact="query-exact",
@@ -353,8 +353,60 @@ def test_retrieval_uses_core_shape_after_exact_edit_tiers() -> None:
         reaction_core=_core("query", evidence_status="external"),
     )
 
-    assert level == "reaction_core_shape"
+    assert level == "reaction_core_context"
     assert len(pool) == 2
+
+
+def test_core_ladder_prefers_exact_then_local_before_context() -> None:
+    exact_records = []
+    for index in range(2):
+        record = _record(index, _signature(str(index)))
+        record["reaction_core"] = _core("shared-exact")
+        exact_records.append(record)
+    exact = retrieve_core_pool_with_trace(
+        _core("shared-exact", evidence_status="external"),
+        _signature("compatibility"),
+        build_generic_index(exact_records),
+    )
+
+    local_records = []
+    for index in range(2):
+        record = _record(index, _signature(str(index)))
+        core = _core(f"candidate-{index}")
+        core["typed_core_key"] = "RCT2:shared-local"
+        record["reaction_core"] = core
+        local_records.append(record)
+    local_query = _core("query", evidence_status="external")
+    local_query["typed_core_key"] = "RCT2:shared-local"
+    local = retrieve_core_pool_with_trace(
+        local_query,
+        _signature("compatibility"),
+        build_generic_index(local_records),
+    )
+
+    assert exact.level == "reaction_core_exact"
+    assert [value.status for value in exact.trace] == ["selected"]
+    assert local.level == "reaction_core_local"
+    assert [value.status for value in local.trace] == ["empty", "selected"]
+
+
+def test_blocked_core_quality_cannot_retrieve() -> None:
+    record = _record(1, _signature("one"))
+    record["reaction_core"] = _core("shared")
+    query = _core("shared", evidence_status="external")
+    query["quality"] = {
+        "status": "blocked",
+        "blocking_reasons": ["formed_bond_state_inconsistent"],
+    }
+
+    result = retrieve_core_pool_with_trace(
+        query,
+        _signature("compatibility"),
+        build_generic_index([record]),
+    )
+
+    assert result.level == "reaction_core_quality_blocked"
+    assert not result.pool
 
 
 def test_core_center_key_alone_cannot_retrieve_precedents() -> None:
@@ -369,7 +421,7 @@ def test_core_center_key_alone_cannot_retrieve_precedents() -> None:
         records.append(record)
     index = build_generic_index(records)
 
-    result = retrieve_core_shape_pool_with_trace(
+    result = retrieve_core_pool_with_trace(
         _core(
             "query",
             shape="RSH2:query-only",
@@ -380,12 +432,12 @@ def test_core_center_key_alone_cannot_retrieve_precedents() -> None:
         index,
     )
 
-    assert result.level == "no_reaction_core_shape_precedent"
+    assert result.level == "no_reaction_core_precedent"
     assert not result.pool
     assert index.core_centers["RCS2:coarse-shared"] == (0, 1)
 
 
-def test_reaction_core_with_unresolved_remote_continuity_is_blocked() -> None:
+def test_reaction_core_with_unresolved_remote_continuity_uses_review_tier() -> None:
     record = _record(1, _signature("one"))
     record["reaction_core"] = _core("one")
     query_core = _core("query", evidence_status="external")
@@ -393,14 +445,14 @@ def test_reaction_core_with_unresolved_remote_continuity_is_blocked() -> None:
         "REACTION_CORE_REMOTE_CONTINUITY_UNRESOLVED"
     ]
 
-    result = retrieve_core_shape_pool_with_trace(
+    result = retrieve_core_pool_with_trace(
         query_core,
         _signature("compatibility"),
         build_generic_index([record]),
     )
 
-    assert result.level == "reaction_core_has_blocking_warning"
-    assert not result.pool
+    assert result.level == "reaction_core_context_limited_support"
+    assert result.pool
 
 
 def test_unsigned_mapped_core_query_returns_review_qualified_result() -> None:
@@ -434,12 +486,12 @@ def test_unsigned_mapped_core_query_returns_review_qualified_result() -> None:
 
     assert result.valid
     assert result.recommendation_mode == "reaction_core_review"
-    assert result.retrieval_strategy == "reaction_core_shape"
-    assert result.retrieval_level == "reaction_core_shape"
+    assert result.retrieval_strategy == "reaction_core_ladder"
+    assert result.retrieval_level == "reaction_core_exact"
     assert result.query_signature_id is None
     assert result.query_reaction_core_id == core["core_id"]
     assert "QUERY_TRANSFORMATION_NOT_VERIFIED" in result.warnings
-    assert "REACTION_CORE_SHAPE_RETRIEVAL_USED" in result.warnings
+    assert "REACTION_CORE_RETRIEVAL_USED" in result.warnings
 
 
 def test_compatibility_exclusion_continues_to_relaxed_tier() -> None:
@@ -682,7 +734,7 @@ def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:
 
     assert result.valid
     assert result.retrieval_level == "environment_neighbors"
-    assert result.retrieval_definition_version == "1.7"
+    assert result.retrieval_definition_version == "1.8"
     assert "REACTION_TOPOLOGY_FALLBACK_USED" in result.warnings
     assert any(
         caution.startswith("Reaction-scope mismatch:")
@@ -878,10 +930,12 @@ def test_generic_retrieval_weights_are_normalized() -> None:
     ranking = load_generic_ranking_rules()
     assert round(sum(similarity["weights"].values()), 10) == 1.0
     assert round(sum(ranking["weights"].values()), 10) == 1.0
-    assert rules["retrieval_ladder"][-4:] == [
+    assert rules["retrieval_ladder"][-6:] == [
         "environment_neighbors",
         "bond_edit_signature",
-        "reaction_core_shape",
+        "reaction_core_exact",
+        "reaction_core_local",
+        "reaction_core_context",
         "edit_graph_neighbors",
     ]
     hypothesis_rules = load_edit_hypothesis_retrieval_rules()

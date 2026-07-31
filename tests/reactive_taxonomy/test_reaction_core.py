@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from reactive_taxonomy import build_reaction_core_projection, featurize_reaction
@@ -157,7 +158,10 @@ def test_center_transition_is_robust_to_acetal_oxygen_origin_mapping() -> None:
     )
     assert mapper_core.generic_label == curated_core.generic_label
     assert mapper_core.warnings == ()
-    assert curated_core.warnings == ()
+    assert curated_core.warnings == ("REACTION_CORE_QUALITY_REVIEW",)
+    assert curated_core.quality.review_reasons == (
+        "not_all_edits_graph_checked",
+    )
 
 
 def test_single_center_label_includes_an_external_formed_bond_partner() -> None:
@@ -306,10 +310,49 @@ def test_reaction_core_identity_is_reactant_order_invariant() -> None:
     assert forward.core_id == reversed_order.core_id
     assert forward.exact_core_key == reversed_order.exact_core_key
     assert (
+        forward.mapping_equivalence_key
+        == reversed_order.mapping_equivalence_key
+    )
+    assert (
         forward.center_transition_key
         == reversed_order.center_transition_key
     )
     assert forward.shape_core_key == reversed_order.shape_core_key
+
+
+def test_mapping_equivalence_ignores_atom_map_numbering() -> None:
+    reaction = (
+        "[CH3:1][Br:2].[NH2:3][CH3:4]"
+        ">>"
+        "[CH3:1][NH:3][CH3:4]"
+    )
+    renumbered = re.sub(
+        r":(\d+)",
+        lambda match: f":{int(match.group(1)) + 40}",
+        reaction,
+    )
+    original = featurize_reaction(reaction).reaction_core
+    remapped = featurize_reaction(renumbered).reaction_core
+
+    assert original is not None
+    assert remapped is not None
+    assert original.mapping_equivalence_key == remapped.mapping_equivalence_key
+    assert original.exact_core_key == remapped.exact_core_key
+
+
+def test_core_exposes_quality_state_changes_and_chemist_presentation() -> None:
+    core = featurize_reaction(
+        "[CH3:1][Br:2].[NH2:3][CH3:4]"
+        ">>"
+        "[CH3:1][NH:3][CH3:4]"
+    ).reaction_core
+
+    assert core is not None
+    assert core.quality.status in {"pass", "review"}
+    assert any(change.change_type == "hydrogen" for change in core.state_changes)
+    assert any("formed:" in value for value in core.presentation.bond_changes)
+    assert core.presentation.equation == core.generic_label
+    assert core.presentation.evidence_label == "verified structural evidence"
 
 
 def test_shape_key_separates_same_center_transition_with_different_handles() -> None:
@@ -367,8 +410,8 @@ def test_reaction_core_serializes_but_does_not_invent_unmapped_observation() -> 
     )
 
     assert mapped_payload["schema_version"] == "3.5"
-    assert mapped_payload["reaction_core"]["schema_version"] == "2.1"
+    assert mapped_payload["reaction_core"]["schema_version"] == "2.2"
     assert mapped_payload["reaction_core"]["algorithm_version"] == (
-        "reaction_core_projection.v7"
+        "reaction_core_projection.v8"
     )
     assert unmapped.reaction_core is None

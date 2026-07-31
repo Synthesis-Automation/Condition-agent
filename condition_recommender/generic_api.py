@@ -20,7 +20,7 @@ from .generic_indexing import (
 )
 from .core_retrieval import (
     load_reaction_core_retrieval_rules,
-    retrieve_core_shape_pool_with_trace,
+    retrieve_core_pool_with_trace,
 )
 from .generic_retrieval import (
     RetrievalStrategy,
@@ -142,8 +142,8 @@ def recommend_indexed_signature(
         warnings.append("LIMITED_PRECEDENT_SUPPORT")
     if level not in {"exact_signature", "handle_signature", "named_family"}:
         warnings.append("TYPE_AGNOSTIC_FALLBACK_USED")
-    if level.startswith("reaction_core_shape"):
-        warnings.append("REACTION_CORE_SHAPE_RETRIEVAL_USED")
+    if level.startswith("reaction_core_"):
+        warnings.append("REACTION_CORE_RETRIEVAL_USED")
     if retrieval.excluded_candidate_count:
         warnings.append(
             f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{retrieval.excluded_candidate_count}"
@@ -368,7 +368,7 @@ def _recommend_core_with_index(
     fallback_model = analysis.fallback_descriptor
     fallback = asdict(fallback_model) if fallback_model is not None else {}
     compatibility_signature = compatibility_signature_from_fallback(fallback)
-    retrieval = retrieve_core_shape_pool_with_trace(
+    retrieval = retrieve_core_pool_with_trace(
         core,
         compatibility_signature,
         index,
@@ -393,7 +393,7 @@ def _recommend_core_with_index(
             ),
             transformation_class=analysis.transformation_class,
             retrieval_definition_version=str(rules["schema_version"]),
-            retrieval_strategy="reaction_core_shape",
+            retrieval_strategy="reaction_core_ladder",
             retrieval_level=retrieval.level,
             candidate_count=retrieval.candidate_count,
             independent_candidate_count=retrieval.independent_candidate_count,
@@ -428,7 +428,7 @@ def _recommend_core_with_index(
         similarity_assessor=core_similarity,
     )
     cautions = (
-        "Query retrieval used a minimized reaction-core shape, not a verified "
+        "Query retrieval used minimized reaction-core evidence, not a verified "
         "query reaction signature",
         "Only independently admitted verified precedents supplied conditions",
         "The center-transition key alone was not used for retrieval",
@@ -445,7 +445,7 @@ def _recommend_core_with_index(
     )
     warnings = [
         "QUERY_TRANSFORMATION_NOT_VERIFIED",
-        "REACTION_CORE_SHAPE_RETRIEVAL_USED",
+        "REACTION_CORE_RETRIEVAL_USED",
         "RECOMMENDATIONS_REQUIRE_EXPERT_REVIEW",
     ]
     if retrieval.level.endswith("limited_support"):
@@ -475,7 +475,7 @@ def _recommend_core_with_index(
             asdict(group) for group in analysis.spectator_groups
         ),
         retrieval_definition_version=str(rules["schema_version"]),
-        retrieval_strategy="reaction_core_shape",
+        retrieval_strategy="reaction_core_ladder",
         retrieval_level=retrieval.level,
         candidate_count=retrieval.candidate_count,
         independent_candidate_count=retrieval.independent_candidate_count,

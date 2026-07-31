@@ -262,6 +262,7 @@ def featurize_reaction(
         reactants=parsed.reactants,
         products=parsed.products,
         edits=edit_result.edits,
+        stereo_changes=edit_result.stereo_changes,
         evidence=edit_result.evidence,
         confidence=edit_result.confidence,
         topology=reaction_topology,

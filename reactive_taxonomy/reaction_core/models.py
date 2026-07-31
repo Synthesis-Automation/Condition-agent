@@ -13,9 +13,12 @@ from ..reaction_models import (
     ReactionCoreAtomState,
     ReactionCoreAtomTransition,
     ReactionCoreEvent,
+    ReactionCorePresentation,
     ReactionCoreProjection,
+    ReactionCoreQuality,
     ReactionCoreRemoteClass,
     ReactionCoreRemoteSubgraph,
+    ReactionCoreStateChange,
 )
 
 __all__ = [
@@ -26,7 +29,10 @@ __all__ = [
     "ReactionCoreAtomState",
     "ReactionCoreAtomTransition",
     "ReactionCoreEvent",
+    "ReactionCorePresentation",
     "ReactionCoreProjection",
+    "ReactionCoreQuality",
     "ReactionCoreRemoteClass",
     "ReactionCoreRemoteSubgraph",
+    "ReactionCoreStateChange",
 ]

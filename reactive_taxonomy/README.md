@@ -21,7 +21,7 @@ the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
 Mapped observations also receive a template-free `ReactionCoreProjection`.
-The version 2.1 schema keeps every edit-participating atom, selects primary
+The version 2.2 schema keeps every edit-participating atom, selects primary
 centers only for explanation, removes each remote connected component once,
 and records all cut
 connections as typed attachment ports. Remote classes such as aryl,

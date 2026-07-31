@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "reaction_core_quality.v1",
+  "definition_version": "1.0",
+  "minimum_active_atom_mapping_coverage": 1.0,
+  "maximum_active_atom_count_without_review": 16,
+  "maximum_event_count_without_review": 3
+}

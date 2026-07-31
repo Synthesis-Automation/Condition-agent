@@ -53,6 +53,14 @@ _REACTION_CORE_CSV_FIELDS = (
     "reaction_core_typed_key",
     "reaction_core_shape_key",
     "reaction_core_center_transition_key",
+    "reaction_core_mapping_equivalence_key",
+    "reaction_core_quality_status",
+    "reaction_core_quality_reasons",
+    "reaction_core_bond_changes",
+    "reaction_core_state_changes",
+    "reaction_core_retained_context",
+    "reaction_core_departing_context",
+    "reaction_core_appearing_context",
     "reaction_core_motif_key",
     "reaction_core_general_label",
     "reaction_core_limiter",
@@ -757,6 +765,8 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         ),
     )
     atom_transitions = reaction_core.get("atom_transitions") or []
+    core_quality = reaction_core.get("quality") or {}
+    core_presentation = reaction_core.get("presentation") or {}
     remote_subgraphs = reaction_core.get("remote_subgraphs") or []
     remote_classes = sorted(
         {
@@ -803,6 +813,29 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         "reaction_core_shape_key": reaction_core.get("shape_core_key") or "",
         "reaction_core_center_transition_key": (
             reaction_core.get("center_transition_key") or ""
+        ),
+        "reaction_core_mapping_equivalence_key": (
+            reaction_core.get("mapping_equivalence_key") or ""
+        ),
+        "reaction_core_quality_status": core_quality.get("status") or "",
+        "reaction_core_quality_reasons": "; ".join(
+            tuple(core_quality.get("review_reasons") or ())
+            + tuple(core_quality.get("blocking_reasons") or ())
+        ),
+        "reaction_core_bond_changes": "; ".join(
+            core_presentation.get("bond_changes") or ()
+        ),
+        "reaction_core_state_changes": "; ".join(
+            core_presentation.get("atom_state_changes") or ()
+        ),
+        "reaction_core_retained_context": "; ".join(
+            core_presentation.get("retained_context") or ()
+        ),
+        "reaction_core_departing_context": "; ".join(
+            core_presentation.get("departing_context") or ()
+        ),
+        "reaction_core_appearing_context": "; ".join(
+            core_presentation.get("appearing_context") or ()
         ),
         "reaction_core_motif_key": core_abstraction.get("motif_key") or "",
         "reaction_core_general_label": (

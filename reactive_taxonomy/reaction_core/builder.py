@@ -16,6 +16,7 @@ from ..chemistry.rdkit_utils import parse_smiles
 from ..reaction_models import (
     ReactionComponent,
     ReactionEdit,
+    ReactionStereoChange,
     ReactionTopology,
 )
 from .annotations import (
@@ -42,15 +43,18 @@ from .models import (
     ReactionCoreRemoteSubgraph,
 )
 from .rendering import (
+    build_core_presentation,
     multi_center_edit_label as _multi_center_edit_label,
     single_center_transition_label as _single_center_transition_label,
     state_label as _state_label,
 )
+from .quality import assess_reaction_core_quality, validate_core_edits
 from .remote import (
     _build_remote_subgraphs_for_side,
     _functional_group_ids,
     _with_remote_continuity,
 )
+from .state_changes import build_state_changes
 
 
 def _component_locations(
@@ -190,6 +194,8 @@ def _build_atom_state(
         "heavy_atom_degree": sum(
             neighbor.GetAtomicNum() > 1 for neighbor in atom.GetNeighbors()
         ),
+        "radical_electrons": int(atom.GetNumRadicalElectrons()),
+        "isotope": int(atom.GetIsotope()),
         "neighbor_tokens": neighbor_tokens,
     }
     return ReactionCoreAtomState(
@@ -203,6 +209,8 @@ def _build_atom_state(
         hybridization=str(atom.GetHybridization()),
         total_hydrogens=state_payload["total_hydrogens"],
         heavy_atom_degree=state_payload["heavy_atom_degree"],
+        radical_electrons=state_payload["radical_electrons"],
+        isotope=state_payload["isotope"],
         neighbor_tokens=neighbor_tokens,
         functional_group_ids=_functional_group_ids(component, (atom_index,)),
         concise_label=_state_label(
@@ -408,6 +416,8 @@ def _state_identity(
             state.formal_charge,
             state.aromatic,
             state.total_hydrogens,
+            state.radical_electrons,
+            state.isotope,
             neighbor_tokens,
         )
     return (
@@ -417,6 +427,8 @@ def _state_identity(
         state.hybridization,
         state.total_hydrogens,
         state.heavy_atom_degree,
+        state.radical_electrons,
+        state.isotope,
         state.neighbor_tokens,
     )
 
@@ -489,6 +501,7 @@ def build_reaction_core_projection(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
     edits: Sequence[ReactionEdit],
+    stereo_changes: Sequence[ReactionStereoChange] = (),
     evidence: str,
     confidence: float,
     topology: Optional[ReactionTopology] = None,
@@ -695,6 +708,22 @@ def build_reaction_core_projection(
     )
     if not transitions or not primary_identities:
         return None
+    state_changes = build_state_changes(
+        transitions,
+        stereo_changes,
+        evidence=str(evidence),
+    )
+    state_change_payload = tuple(
+        sorted(
+            (
+                change.change_type,
+                change.elements,
+                change.before_value,
+                change.after_value,
+            )
+            for change in state_changes
+        )
+    )
 
     events = []
     for event in event_components:
@@ -801,40 +830,39 @@ def build_reaction_core_projection(
             key=repr,
         )
     )
-    exact_key = _digest(
-        "RCX2",
-        {
-            "edit_graph": edit_graph_payload,
-            "transitions": all_transition_payload,
-            "remote_subgraphs": tuple(
-                sorted(
-                    (
-                        _remote_identity(subgraph, exact=True)
-                        for subgraph in remote_subgraphs
-                    ),
-                    key=repr,
-                )
-            ),
-            "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
-        },
-    )
-    typed_key = _digest(
-        "RCT2",
-        {
-            "edit_graph": edit_graph_payload,
-            "transitions": all_transition_payload,
-            "remote_subgraphs": tuple(
-                sorted(
-                    (
-                        _remote_identity(subgraph, exact=False)
-                        for subgraph in remote_subgraphs
-                    ),
-                    key=repr,
-                )
-            ),
-            "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
-        },
-    )
+    exact_identity_payload = {
+        "edit_graph": edit_graph_payload,
+        "transitions": all_transition_payload,
+        "state_changes": state_change_payload,
+        "remote_subgraphs": tuple(
+            sorted(
+                (
+                    _remote_identity(subgraph, exact=True)
+                    for subgraph in remote_subgraphs
+                ),
+                key=repr,
+            )
+        ),
+        "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+    }
+    typed_identity_payload = {
+        "edit_graph": edit_graph_payload,
+        "transitions": all_transition_payload,
+        "state_changes": state_change_payload,
+        "remote_subgraphs": tuple(
+            sorted(
+                (
+                    _remote_identity(subgraph, exact=False)
+                    for subgraph in remote_subgraphs
+                ),
+                key=repr,
+            )
+        ),
+        "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+    }
+    exact_key = _digest("RCX2", exact_identity_payload)
+    typed_key = _digest("RCT2", typed_identity_payload)
+    mapping_equivalence_key = _digest("RME1", exact_identity_payload)
     shape_key = _digest(
         "RSH2",
         {
@@ -867,22 +895,54 @@ def build_reaction_core_projection(
         product_by_map=product_by_map,
         topology=topology,
     )
-    warnings = set()
-    if any(
+    checked_edit_count, consistency_issues = validate_core_edits(
+        edits,
+        reactant_by_map=reactant_by_map,
+        product_by_map=product_by_map,
+    )
+    remote_continuity_unresolved = any(
         subgraph.continuity == "unresolved"
         for subgraph in remote_subgraphs
-    ):
+    )
+    no_op_primary_center = any(
+        _state_identity(transition.before_state, generic=False)
+        == _state_identity(transition.after_state, generic=False)
+        for transition in primary
+    )
+    quality = assess_reaction_core_quality(
+        active_atom_count=len(identities),
+        mapped_active_atom_count=sum(
+            identity[0] == "map" for identity in identities
+        ),
+        edit_count=len(edits),
+        heavy_atom_edit_count=sum(edit.atom_2 is not None for edit in edits),
+        checked_edit_count=checked_edit_count,
+        consistency_issues=consistency_issues,
+        event_count=len(events),
+        remote_continuity_unresolved=remote_continuity_unresolved,
+        no_op_primary_center=no_op_primary_center,
+    )
+    warnings = set()
+    if remote_continuity_unresolved:
         warnings.add("REACTION_CORE_REMOTE_CONTINUITY_UNRESOLVED")
     if any(identity[0] != "map" for identity in identities):
         warnings.add("REACTION_CORE_PARTIAL_ATOM_PROVENANCE")
     if str(evidence).startswith("external"):
         warnings.add("REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL")
-    if any(
-        _state_identity(transition.before_state, generic=False)
-        == _state_identity(transition.after_state, generic=False)
-        for transition in primary
-    ):
+    if no_op_primary_center:
         warnings.add("REACTION_CORE_NO_OP_PRIMARY_CENTER")
+    if quality.status == "review":
+        warnings.add("REACTION_CORE_QUALITY_REVIEW")
+    elif quality.status == "blocked":
+        warnings.add("REACTION_CORE_QUALITY_BLOCKED")
+    presentation = build_core_presentation(
+        equation=generic_label,
+        edits=edits,
+        state_changes=state_changes,
+        remote_subgraphs=remote_subgraphs,
+        evidence_status=_evidence_status(str(evidence)),
+        quality=quality,
+    )
     core_id = _digest(
         "RCP2",
         {
@@ -891,6 +951,7 @@ def build_reaction_core_projection(
                 typed_key,
                 shape_key,
                 center_transition_key,
+                mapping_equivalence_key,
             ),
             "algorithm_version": REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
             "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
@@ -906,12 +967,16 @@ def build_reaction_core_projection(
         typed_core_key=typed_key,
         shape_core_key=shape_key,
         center_transition_key=center_transition_key,
+        mapping_equivalence_key=mapping_equivalence_key,
         atom_transitions=transitions,
+        state_changes=state_changes,
         events=tuple(events),
         remote_subgraphs=remote_subgraphs,
         edit_tokens=edit_tokens,
         participant_tokens=participant_tokens,
         generic_label=generic_label,
+        presentation=presentation,
+        quality=quality,
         abstraction=abstraction,
         active_atom_count=len(identities),
         event_count=len(events),

@@ -109,8 +109,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "3.8"
-    assert record.converter_definition_version == "generic_conversion.v3.2"
+    assert record.schema_version == "3.9"
+    assert record.converter_definition_version == "generic_conversion.v3.3"
     assert record.reaction_signature["schema_version"] == "3.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -135,9 +135,9 @@ def test_mapped_unknown_reaction_serializes_reaction_core_for_review() -> None:
 
     assert record.admission_tier == AdmissionTier.REVIEW
     assert record.reaction_core is not None
-    assert record.reaction_core["schema_version"] == "2.1"
+    assert record.reaction_core["schema_version"] == "2.2"
     assert record.reaction_core["algorithm_version"] == (
-        "reaction_core_projection.v7"
+        "reaction_core_projection.v8"
     )
     assert record.reaction_core["shape_core_key"].startswith("RSH2:")
     assert record.reaction_core["generic_label"] == (
@@ -612,7 +612,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "2.8"
+    assert report["schema_version"] == "2.9"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert CONCISE_REACTION_REVIEW_FIELDS.index("reaction_core_label") == (

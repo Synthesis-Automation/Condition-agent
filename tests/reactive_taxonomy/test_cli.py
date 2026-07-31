@@ -275,6 +275,8 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
             "spectator_groups",
         ]
         assert "reaction_core_shape_key" in reader.fieldnames
+        assert "reaction_core_quality_status" in reader.fieldnames
+        assert "reaction_core_state_changes" in reader.fieldnames
         assert "reaction_core_remote_subgraphs" in reader.fieldnames
         rows = list(reader)
 
@@ -329,6 +331,8 @@ def test_batch_reaction_csv_exposes_minimized_core(tmp_path, capsys) -> None:
     assert row["reaction_core_exact_key"].startswith("RCX2:")
     assert row["reaction_core_typed_key"].startswith("RCT2:")
     assert row["reaction_core_shape_key"].startswith("RSH2:")
+    assert row["reaction_core_mapping_equivalence_key"].startswith("RME1:")
+    assert row["reaction_core_quality_status"] in {"pass", "review"}
     assert row["reaction_core_center_transition_key"].startswith("RCS2:")
     assert row["reaction_core_event_count"] == "1"
     assert row["reaction_core_primary_center_count"] == "1"

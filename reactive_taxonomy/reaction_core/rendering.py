@@ -12,7 +12,11 @@ from typing import Any, Mapping, Optional, Sequence
 from ..reaction_models import (
     ReactionAtomReference,
     ReactionCoreAtomTransition,
+    ReactionCorePresentation,
+    ReactionCoreQuality,
     ReactionCoreRemoteClass,
+    ReactionCoreRemoteSubgraph,
+    ReactionCoreStateChange,
     ReactionEdit,
 )
 from .common import AtomIdentity, Coordinate, atom_identity
@@ -293,7 +297,104 @@ def state_label(
     return f"{atom.GetSymbol()}{''.join(rendered)}"
 
 
+def _bond_change_label(edit: ReactionEdit) -> str | None:
+    if edit.atom_2 is None:
+        return None
+    before = _edit_bond_display(edit.atom_1, edit.atom_2, edit.old_order)
+    after = _edit_bond_display(edit.atom_1, edit.atom_2, edit.new_order)
+    if edit.edit_type == "formed":
+        return f"formed: {after}"
+    if edit.edit_type == "broken":
+        return f"broken: {before}"
+    if edit.edit_type == "order_changed":
+        return f"order changed: {before} → {after}"
+    return None
+
+
+def _state_change_label(change: ReactionCoreStateChange) -> str:
+    center = "–".join(change.elements) or "atom"
+    names = {
+        "hydrogen": "hydrogen count",
+        "formal_charge": "formal charge",
+        "radical": "radical electrons",
+        "isotope": "isotope",
+        "aromaticity": "aromaticity",
+        "hybridization": "hybridization",
+        "atom_stereochemistry": "stereochemistry",
+        "bond_stereochemistry": "bond stereochemistry",
+    }
+    return (
+        f"{center} {names[change.change_type]}: "
+        f"{change.before_value} → {change.after_value}"
+    )
+
+
+def _remote_context_label(subgraph: ReactionCoreRemoteSubgraph) -> str:
+    label = _remote_display(subgraph.remote_class)
+    details = []
+    if subgraph.fragment_smiles:
+        details.append(subgraph.fragment_smiles)
+    if subgraph.functional_group_ids:
+        details.append("groups=" + ",".join(subgraph.functional_group_ids))
+    return f"{label} ({'; '.join(details)})" if details else label
+
+
+def build_core_presentation(
+    *,
+    equation: str,
+    edits: Sequence[ReactionEdit],
+    state_changes: Sequence[ReactionCoreStateChange],
+    remote_subgraphs: Sequence[ReactionCoreRemoteSubgraph],
+    evidence_status: str,
+    quality: ReactionCoreQuality,
+) -> ReactionCorePresentation:
+    """Render a concise audit view without affecting chemical identity."""
+    bond_changes = tuple(
+        label
+        for edit in edits
+        if (label := _bond_change_label(edit)) is not None
+    )
+    contexts = {
+        continuity: tuple(
+            sorted(
+                {
+                    _remote_context_label(subgraph)
+                    for subgraph in remote_subgraphs
+                    if subgraph.continuity == continuity
+                }
+            )
+        )
+        for continuity in ("retained", "departing", "appearing")
+    }
+    evidence_label = {
+        "verified": "verified structural evidence",
+        "inferred": "inferred structural correspondence",
+        "external": "external atom mapping",
+        "hypothesis": "review-only structural hypothesis",
+    }.get(evidence_status, evidence_status)
+    quality_label = (
+        "checks passed"
+        if quality.status == "pass"
+        else "review: " + ", ".join(quality.review_reasons)
+        if quality.status == "review"
+        else "blocked: " + ", ".join(quality.blocking_reasons)
+    )
+    return ReactionCorePresentation(
+        equation=equation,
+        bond_changes=bond_changes,
+        atom_state_changes=tuple(
+            _state_change_label(change) for change in state_changes
+        ),
+        retained_context=contexts["retained"],
+        departing_context=contexts["departing"],
+        appearing_context=contexts["appearing"],
+        evidence_label=evidence_label,
+        quality_label=quality_label,
+    )
+
+
 __all__ = [
+    "build_core_presentation",
     "multi_center_edit_label",
     "single_center_transition_label",
     "state_label",

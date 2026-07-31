@@ -11,8 +11,8 @@ from .models import CompoundAnalysis
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.0"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.3"
-REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.1"
-REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v7"
+REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.2"
+REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v8"
 
 EditArchetype = Literal[
     "substitution",
@@ -758,6 +758,8 @@ class ReactionCoreAtomState:
     hybridization: str
     total_hydrogens: int
     heavy_atom_degree: int
+    radical_electrons: int
+    isotope: int
     neighbor_tokens: Tuple[str, ...]
     functional_group_ids: Tuple[str, ...]
     concise_label: str
@@ -775,6 +777,70 @@ class ReactionCoreAtomTransition:
     incident_edit_count: int
     stable_remote_subgraph_count: int
     role: Literal["primary_center", "participant"]
+
+
+@dataclass(frozen=True)
+class ReactionCoreStateChange:
+    """One explicit atom or bond property change within the observed core."""
+
+    change_id: str
+    change_type: Literal[
+        "hydrogen",
+        "formal_charge",
+        "radical",
+        "isotope",
+        "aromaticity",
+        "hybridization",
+        "atom_stereochemistry",
+        "bond_stereochemistry",
+    ]
+    atom_map_numbers: Tuple[int, ...]
+    elements: Tuple[str, ...]
+    before_value: str
+    after_value: str
+    evidence: str
+
+
+@dataclass(frozen=True)
+class ReactionCoreQuality:
+    """Deterministic trust assessment for one constructed reaction core."""
+
+    status: Literal["pass", "review", "blocked"]
+    active_atom_mapping_coverage: float
+    checked_edit_fraction: float
+    edit_count: int
+    heavy_atom_edit_count: int
+    event_count: int
+    passed_checks: Tuple[str, ...]
+    review_reasons: Tuple[str, ...]
+    blocking_reasons: Tuple[str, ...]
+    definition_version: str
+
+    def __post_init__(self) -> None:
+        if not 0.0 <= self.active_atom_mapping_coverage <= 1.0:
+            raise ValueError("active atom mapping coverage must be in [0, 1]")
+        if not 0.0 <= self.checked_edit_fraction <= 1.0:
+            raise ValueError("checked edit fraction must be in [0, 1]")
+        if self.status == "pass" and (
+            self.review_reasons or self.blocking_reasons
+        ):
+            raise ValueError("passing core quality cannot contain cautions")
+        if self.status == "blocked" and not self.blocking_reasons:
+            raise ValueError("blocked core quality requires a blocking reason")
+
+
+@dataclass(frozen=True)
+class ReactionCorePresentation:
+    """Chemist-facing rendering excluded from all reaction-core identities."""
+
+    equation: str
+    bond_changes: Tuple[str, ...]
+    atom_state_changes: Tuple[str, ...]
+    retained_context: Tuple[str, ...]
+    departing_context: Tuple[str, ...]
+    appearing_context: Tuple[str, ...]
+    evidence_label: str
+    quality_label: str
 
 
 @dataclass(frozen=True)
@@ -850,12 +916,16 @@ class ReactionCoreProjection:
     typed_core_key: str
     shape_core_key: str
     center_transition_key: str
+    mapping_equivalence_key: str
     atom_transitions: Tuple[ReactionCoreAtomTransition, ...]
+    state_changes: Tuple[ReactionCoreStateChange, ...]
     events: Tuple[ReactionCoreEvent, ...]
     remote_subgraphs: Tuple[ReactionCoreRemoteSubgraph, ...]
     edit_tokens: Tuple[str, ...]
     participant_tokens: Tuple[str, ...]
     generic_label: str
+    presentation: ReactionCorePresentation
+    quality: ReactionCoreQuality
     abstraction: Optional[ReactionCoreAbstraction]
     active_atom_count: int
     event_count: int
@@ -878,6 +948,10 @@ class ReactionCoreProjection:
         if not self.center_transition_key.startswith("RCS2:"):
             raise ValueError(
                 "center_transition_key must use the RCS2 namespace"
+            )
+        if not self.mapping_equivalence_key.startswith("RME1:"):
+            raise ValueError(
+                "mapping_equivalence_key must use the RME1 namespace"
             )
         if not 0.0 <= self.confidence <= 1.0:
             raise ValueError("confidence must be between 0 and 1")

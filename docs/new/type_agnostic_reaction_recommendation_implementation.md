@@ -77,23 +77,23 @@ The current code declares:
 | --- | --- |
 | Reaction analysis | `3.5` |
 | Reaction signature / ID namespace | `3.0` / `RS3` |
-| Reaction core projection / algorithm | `2.1` / `reaction_core_projection.v7` |
+| Reaction core projection / algorithm | `2.2` / `reaction_core_projection.v8` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
 | Connectivity rewrite | `2.0` |
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `1.3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `3.8` |
-| Generic converter definition | `generic_conversion.v3.2` |
-| Generic sharded converter definition | `generic_sharded_conversion.v1.9` |
+| Recommendation record | `3.9` |
+| Generic converter definition | `generic_conversion.v3.3` |
+| Generic sharded converter definition | `generic_sharded_conversion.v2.0` |
 | Concise reaction review | `2.7` |
 | Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `2.5` |
 | Generic recommendation result | `2.4` |
 | Reaction correspondence definitions | `2.3` |
-| Generic retrieval definition | `1.7` |
-| Reaction-core retrieval policy | `reaction_core_retrieval.v1@1.0` |
+| Generic retrieval definition | `1.8` |
+| Reaction-core retrieval policy | `reaction_core_retrieval.v2@1.0` |
 | Generic admission policy | `generic_admission.v2.0` |
 | Fragment-source capabilities | `fragment_source_capabilities.v1@1.0` |
 | Fallback retrieval definition | `1.4` |
@@ -610,11 +610,13 @@ mapper-derived converted rows do not enter that index by default.
 An unsigned query may also have a usable reaction core but no RS3 signature.
 After edit-hypothesis consensus and before ordinary structure fallback, the
 query-only core branch applies
-`condition_recommender/definitions/reaction_core_retrieval.v1.json`:
+`condition_recommender/definitions/reaction_core_retrieval.v2.json`:
 
 ```text
-eligible mapped core with exact RSH2 shape
-  -> verified indexed precedents with the same event count
+eligible mapped core with passing or review-qualified controls
+  -> exact RCX2 identity when independently supported
+  -> typed-local RCT2 identity when exact support is sparse
+  -> mapping-robust RSH2 context when local support is sparse
   -> hard condition compatibility
   -> independent-support gate
   -> fallback-environment ranking
@@ -622,17 +624,21 @@ eligible mapped core with exact RSH2 shape
 ```
 
 This branch returns `recommendation_mode = reaction_core_review`,
-`retrieval_strategy = reaction_core_shape`, and mandatory expert-review
+`retrieval_strategy = reaction_core_ladder`, and mandatory expert-review
 cautions. It never creates an RS3 signature for the query, upgrades its
 admission, or admits external-mapper records as precedents. A core-only failure
 continues to the existing structure fallback with both attempts preserved in
 the retrieval trace.
 
-The index stores exact, typed, shape, and center maps for audit and analysis,
-but production retrieval reads only the shape map. Indexed rows remain subject
-to the existing verified-record admission gate. Consequently, useful
-reaction-core coverage requires mapped, internally verified precedents; an
-external mapper may expand query coverage but does not manufacture trusted
+The index stores exact, typed, shape, and center maps. Production retrieval
+uses the first three as a narrow-to-broad ladder; the center-transition map is
+audit-only because it is too coarse for condition transfer. Each core also
+records map-number-independent equivalence, explicit H/charge/radical/isotope/
+aromaticity/hybridization/stereo changes, graph-edit consistency, mapping
+coverage, and pass/review/blocked quality. Presentation strings are generated
+after identity construction and never participate in retrieval keys. Indexed
+rows remain subject to the verified-record admission gate. Consequently,
+external mapping may expand query coverage but does not manufacture trusted
 training evidence.
 
 ## 5. What is not complete
