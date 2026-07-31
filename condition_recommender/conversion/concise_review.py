@@ -16,10 +16,10 @@ from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "3.1"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "3.2"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
-    "reaction_display_label",
+    "reaction_core_lable_display",
     "reaction_display_label_detailed",
     "reaction_core_label",
     "original_reaction_type",
@@ -291,7 +291,7 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or record.get("reaction_smiles")
             or ""
         ),
-        "reaction_display_label": str(
+        "reaction_core_lable_display": str(
             display_value.get("concise")
             or record.get("reaction_label")
             or ""

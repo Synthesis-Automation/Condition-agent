@@ -50,7 +50,7 @@ GENERIC_REVIEW_FIELDS = (
     "transformation_confidence",
     "named_family",
     "family_confidence",
-    "reaction_display_label",
+    "reaction_core_lable_display",
     "reaction_display_label_detailed",
     "reaction_core_label",
     "reaction_label_status",
@@ -212,7 +212,7 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "transformation_confidence": record.transformation_confidence,
         "named_family": record.named_family or "",
         "family_confidence": record.family_confidence,
-        "reaction_display_label": (
+        "reaction_core_lable_display": (
             record.reaction_display_label.get("concise", "")
             if record.reaction_display_label
             else ""

@@ -452,9 +452,9 @@ def test_conversion_engine_reports_external_mapping_dispositions(tmp_path) -> No
     assert "external_mapping_status" in review_header
     assert "external_atom_mapping_json" in review_header
     review_fields = review_header.split(",")
-    label_index = review_fields.index("reaction_display_label")
+    label_index = review_fields.index("reaction_core_lable_display")
     assert review_fields[label_index : label_index + 3] == [
-        "reaction_display_label",
+        "reaction_core_lable_display",
         "reaction_display_label_detailed",
         "reaction_core_label",
     ]
