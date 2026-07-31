@@ -10,6 +10,8 @@ from typing import Any, Dict, Mapping, Tuple
 
 from reactive_taxonomy.chemistry.rdkit_utils import parse_smiles, rdkit_available
 
+from .rendering import apply_render_preset
+
 try:  # pragma: no cover - public helpers exercise availability
     from rdkit import Chem
     from rdkit.Chem import Draw, rdChemReactions
@@ -375,17 +377,20 @@ def _build_side_molecules(
     return tuple(output)
 
 
-def _style_draw_options(options: Any) -> None:
-    options.padding = 0.04
-    options.bondLineWidth = 2.2
-    if hasattr(options, "minFontSize"):
-        options.minFontSize = 18
-    if hasattr(options, "maxFontSize"):
-        options.maxFontSize = 36
+def _style_draw_options(
+    options: Any,
+    *,
+    render_preset: str,
+    molecules: tuple[Any, ...],
+) -> None:
+    apply_render_preset(
+        options,
+        render_preset,
+        molecules=molecules,
+        context="reaction_core",
+    )
     if hasattr(options, "addAtomIndices"):
         options.addAtomIndices = False
-    if hasattr(options, "useDefaultAtomPalette"):
-        options.useDefaultAtomPalette()
 
 
 def build_reaction_core_graphic(
@@ -393,6 +398,7 @@ def build_reaction_core_graphic(
     *,
     size: tuple[int, int] = (960, 260),
     image_format: str = "svg",
+    render_preset: str = "current",
 ) -> ReactionCoreGraphic:
     """Build a compact graphic from active atoms and retained remote groups."""
     _require_rdkit()
@@ -428,7 +434,11 @@ def build_reaction_core_graphic(
     for molecule in products:
         reaction.AddProductTemplate(molecule)
     options = rdMolDraw2D.MolDrawOptions()
-    _style_draw_options(options)
+    _style_draw_options(
+        options,
+        render_preset=render_preset,
+        molecules=tuple(reactants) + tuple(products),
+    )
     panel_count = max(len(reactants) + len(products) + 1, 3)
     panel_size = (
         max(width // panel_count, 120),
@@ -472,12 +482,14 @@ def render_reaction_core_image_bytes(
     *,
     size: tuple[int, int] = (960, 260),
     image_format: str = "svg",
+    render_preset: str = "current",
 ) -> bytes:
     """Return just the SVG or PNG bytes for a minimized reaction scheme."""
     return build_reaction_core_graphic(
         analysis,
         size=size,
         image_format=image_format,
+        render_preset=render_preset,
     ).image_bytes
 
 

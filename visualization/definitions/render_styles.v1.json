@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "render_styles.v1",
+  "default_preset": "current",
+  "presets": {
+    "current": {
+      "label": "Current",
+      "mode": "custom",
+      "target_bond_length_pixels": null,
+      "standard": {
+        "padding": 0.02,
+        "bond_line_width": 2.0,
+        "min_font_size": 14,
+        "max_font_size": 36
+      },
+      "reaction_core": {
+        "padding": 0.04,
+        "bond_line_width": 2.2,
+        "min_font_size": 18,
+        "max_font_size": 36
+      }
+    },
+    "acs_1996_compact": {
+      "label": "ACS 1996 compact",
+      "mode": "acs_1996",
+      "target_bond_length_pixels": 18.0,
+      "standard": {
+        "padding": 0.04
+      },
+      "reaction_core": {
+        "padding": 0.04
+      }
+    }
+  }
+}

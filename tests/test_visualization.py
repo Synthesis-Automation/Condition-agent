@@ -1,12 +1,16 @@
+import math
 from pathlib import Path
+import re
 
 import pytest
 
 from reactive_taxonomy import featurize_reaction
 from visualization import (
     RenderStyle,
+    available_render_presets,
     build_reaction_core_graphic,
     load_reaction_core_graphic_definition,
+    load_render_style_definitions,
     render_molecule_image,
     render_molecule_image_bytes,
     render_reaction_core_image_bytes,
@@ -36,6 +40,48 @@ MAPPED_RING_ACYLATION = (
     "[c:10]1[n:11][cH:12][c:13](-[c:14]2[cH:15][cH:16][cH:17]"
     "[cH:18][cH:19]2)[c:20]2[cH:21][cH:22][cH:23][cH:24][c:25]12"
 )
+
+
+def _first_svg_bond_length(drawing: bytes) -> float:
+    text = drawing.decode("utf-8")
+    line = next(line for line in text.splitlines() if "class='bond-0" in line)
+    match = re.search(
+        r"M ([0-9.]+),([0-9.]+) L ([0-9.]+),([0-9.]+)",
+        line,
+    )
+    assert match is not None
+    coordinates = tuple(float(value) for value in match.groups())
+    return math.dist(coordinates[:2], coordinates[2:])
+
+
+def test_render_presets_are_versioned_and_include_compact_acs() -> None:
+    definition = load_render_style_definitions()
+
+    assert definition["definition_id"] == "render_styles.v1"
+    assert definition["schema_version"] == "1.0"
+    assert available_render_presets() == (
+        ("current", "Current"),
+        ("acs_1996_compact", "ACS 1996 compact"),
+    )
+
+
+def test_acs_preset_caps_bonds_and_uses_acs_line_width() -> None:
+    current = render_molecule_image_bytes(
+        "CCC",
+        size=(480, 300),
+        image_format="svg",
+        render_preset="current",
+    )
+    compact = render_molecule_image_bytes(
+        "CCC",
+        size=(480, 300),
+        image_format="svg",
+        render_preset="acs_1996_compact",
+    )
+
+    assert _first_svg_bond_length(current) > 200.0
+    assert _first_svg_bond_length(compact) == pytest.approx(18.0, abs=0.2)
+    assert b"stroke-width:0.6px" in compact
 
 
 def test_molecule_renderer_supports_in_memory_png_and_file_output(
@@ -85,6 +131,18 @@ def test_reaction_renderer_supports_vector_output() -> None:
     assert b"<svg" in drawing[:512]
 
 
+def test_reaction_renderer_supports_compact_acs_style() -> None:
+    drawing = render_reaction_image_bytes(
+        "CCO>>CC=O",
+        size=(480, 180),
+        image_format="svg",
+        render_preset="acs_1996_compact",
+    )
+
+    assert b"<svg" in drawing[:512]
+    assert b"stroke-width:0.6px" in drawing
+
+
 def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
     None
 ):
@@ -124,6 +182,20 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
         "max_heavy_atom_count": 1,
         "remote_classes": ["heteroatom"],
     }
+
+
+def test_reaction_core_renderer_supports_compact_acs_style() -> None:
+    analysis = featurize_reaction(MAPPED_CLICK_REACTION)
+
+    graphic = build_reaction_core_graphic(
+        analysis,
+        size=(1200, 260),
+        image_format="svg",
+        render_preset="acs_1996_compact",
+    )
+
+    assert b"<svg" in graphic.image_bytes[:512]
+    assert b"stroke-width:0.6px" in graphic.image_bytes
 
 
 def test_reaction_core_renderer_supports_multi_port_ring_boundaries() -> None:
@@ -185,3 +257,8 @@ def test_reaction_renderer_rejects_invalid_reaction_smiles(
 def test_render_style_rejects_invalid_sizes(size) -> None:
     with pytest.raises(ValueError):
         RenderStyle(size=size).validated_size()
+
+
+def test_render_style_rejects_unknown_preset() -> None:
+    with pytest.raises(ValueError, match="render_preset"):
+        RenderStyle(size=(100, 100), render_preset="unknown").validated_preset()

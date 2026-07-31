@@ -24,6 +24,7 @@ from reactive_taxonomy import (  # noqa: E402
 )
 from reactive_taxonomy.cli import format_concise_analysis  # noqa: E402
 from visualization import (  # noqa: E402
+    available_render_presets,
     build_reaction_core_graphic,
     render_molecule_image_bytes,
     render_reaction_image_bytes,
@@ -92,6 +93,9 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Reactive Taxonomy Featurizer")
         self.resize(900, 620)
         self._mapping_provider: RxnMapperProvider | None = None
+        self._last_analysis: object | None = None
+        self._last_kind: InputKind | None = None
+        self._last_input_text = ""
         self._build_ui()
         self._connect_signals()
         self._apply_style()
@@ -222,9 +226,25 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         graph_layout = QtWidgets.QVBoxLayout(graph_column)
         graph_layout.setContentsMargins(0, 0, 0, 0)
         graph_layout.setSpacing(4)
+        graph_header = QtWidgets.QHBoxLayout()
         self.graph_heading = QtWidgets.QLabel("Structure graph")
         self.graph_heading.setObjectName("structureGraphHeading")
-        graph_layout.addWidget(self.graph_heading)
+        graph_header.addWidget(self.graph_heading)
+        graph_header.addStretch(1)
+        graph_header.addWidget(QtWidgets.QLabel("Drawing style"))
+        self.render_style_combo = QtWidgets.QComboBox()
+        self.render_style_combo.setObjectName("renderStylePreset")
+        for preset_id, label in available_render_presets():
+            self.render_style_combo.addItem(label, preset_id)
+        compact_index = self.render_style_combo.findData("acs_1996_compact")
+        if compact_index >= 0:
+            self.render_style_combo.setCurrentIndex(compact_index)
+        self.render_style_combo.setToolTip(
+            "ACS 1996 compact uses publication-style monochrome drawing and "
+            "caps bond length at 18 pixels."
+        )
+        graph_header.addWidget(self.render_style_combo)
+        graph_layout.addLayout(graph_header)
         self.graph_tabs = QtWidgets.QTabWidget()
         self.graph_tabs.setObjectName("reactionGraphicTabs")
 
@@ -287,6 +307,9 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             lambda: self._load_example(MOLECULE_EXAMPLE)
         )
         self.copy_button.clicked.connect(self.copy_result)
+        self.render_style_combo.currentIndexChanged.connect(
+            self._rerender_last_structure
+        )
 
     def _apply_style(self) -> None:
         """Add converter-style accents while preserving the native dark palette."""
@@ -407,6 +430,9 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
                 self.review_output.setPlainText(
                     "Reaction review applies to reaction SMILES."
                 )
+            self._last_analysis = analysis
+            self._last_kind = kind
+            self._last_input_text = self.input_edit.text().strip()
             self._render_structure(
                 kind,
                 self.input_edit.text().strip(),
@@ -425,6 +451,9 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             )
             self.copy_button.setEnabled(True)
         except Exception as exc:
+            self._last_analysis = None
+            self._last_kind = None
+            self._last_input_text = ""
             self.output.setPlainText(f"Unable to analyze input.\n\n{exc}")
             self.review_output.setPlainText("Priority reaction review unavailable.")
             self.graph_heading.setText("Structure graph")
@@ -451,18 +480,21 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.graph_heading.setText(
             "Reaction graph" if kind == "reaction" else "Compound graph"
         )
+        render_preset = str(self.render_style_combo.currentData() or "current")
         try:
             if kind == "reaction":
                 drawing = render_reaction_image_bytes(
                     text,
                     size=REACTION_IMAGE_SIZE,
                     image_format="svg",
+                    render_preset=render_preset,
                 )
             else:
                 drawing = render_molecule_image_bytes(
                     text,
                     size=MOLECULE_IMAGE_SIZE,
                     image_format="svg",
+                    render_preset=render_preset,
                 )
         except (RuntimeError, ValueError) as exc:
             self.structure_image_label.clear_image(
@@ -470,7 +502,10 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             )
             self.structure_image_label.setToolTip(str(exc))
             return
-        if not self.structure_image_label.set_image_bytes(drawing):
+        if not self.structure_image_label.set_image_bytes(
+            drawing,
+            trim_white_space=(render_preset != "acs_1996_compact"),
+        ):
             self.structure_image_label.setToolTip(
                 "The renderer returned an unsupported image."
             )
@@ -503,6 +538,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
                 analysis,
                 size=REACTION_IMAGE_SIZE,
                 image_format="svg",
+                render_preset=render_preset,
             )
         except (RuntimeError, ValueError) as exc:
             self.core_image_label.clear_image(
@@ -511,7 +547,10 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self.core_graphic_note.setText(str(exc))
             self.graph_tabs.setCurrentIndex(0)
             return
-        if not self.core_image_label.set_image_bytes(graphic.image_bytes):
+        if not self.core_image_label.set_image_bytes(
+            graphic.image_bytes,
+            trim_white_space=(render_preset != "acs_1996_compact"),
+        ):
             self.core_graphic_note.setText(
                 "The minimized renderer returned an unsupported image."
             )
@@ -534,6 +573,22 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.core_graphic_note.setText(note)
         self.core_image_label.setToolTip(note)
         self.graph_tabs.setCurrentIndex(1)
+
+    @QtCore.pyqtSlot()
+    def _rerender_last_structure(self) -> None:
+        """Apply a newly selected drawing style without rerunning chemistry."""
+        current_text = self.input_edit.text().strip()
+        if (
+            self._last_analysis is None
+            or self._last_kind is None
+            or current_text != self._last_input_text
+        ):
+            return
+        self._render_structure(
+            self._last_kind,
+            current_text,
+            analysis=self._last_analysis,
+        )
 
     @QtCore.pyqtSlot()
     def copy_result(self) -> None:

@@ -8,8 +8,10 @@ functions let application layers display drawings without temporary files.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
+import json
 from pathlib import Path
-from typing import Any, Tuple, Union
+from typing import Any, Dict, Mapping, Tuple, Union
 
 from reactive_taxonomy.chemistry.rdkit_utils import (
     parse_smiles,
@@ -33,6 +35,9 @@ RenderedImage = Union[bytes, str]
 DEFAULT_MOLECULE_SIZE: ImageSize = (480, 300)
 DEFAULT_REACTION_SIZE: ImageSize = (960, 320)
 SUPPORTED_FORMATS = frozenset({"png", "svg"})
+RENDER_STYLE_DEFINITION_PATH = (
+    Path(__file__).with_name("definitions") / "render_styles.v1.json"
+)
 
 _HETEROATOM_PALETTE = {
     5: (0.85, 0.35, 0.10),  # B: brick orange
@@ -55,6 +60,7 @@ class RenderStyle:
     size: ImageSize
     image_format: str = "png"
     kekulize: bool = True
+    render_preset: str = "current"
 
     def normalized_format(self) -> str:
         """Return a supported lowercase output format."""
@@ -81,6 +87,66 @@ class RenderStyle:
         ):
             raise ValueError("size width and height must be positive integers.")
         return width, height
+
+    def validated_preset(self) -> str:
+        """Return a known versioned rendering preset identifier."""
+        preset = str(self.render_preset or "current")
+        definitions = load_render_style_definitions()
+        if preset not in definitions["presets"]:
+            raise ValueError(
+                "render_preset must be one of "
+                f"{sorted(definitions['presets'])}, got {preset!r}"
+            )
+        return preset
+
+
+@lru_cache(maxsize=1)
+def load_render_style_definitions() -> Dict[str, Any]:
+    """Load and validate the versioned molecule-drawing presets."""
+    with RENDER_STYLE_DEFINITION_PATH.open("r", encoding="utf-8") as handle:
+        definition = dict(json.load(handle))
+    if definition.get("schema_version") != "1.0":
+        raise ValueError("unsupported render-style schema")
+    if definition.get("definition_id") != "render_styles.v1":
+        raise ValueError("unexpected render-style definition ID")
+    presets = definition.get("presets")
+    if not isinstance(presets, Mapping) or not presets:
+        raise ValueError("render-style definition requires presets")
+    if definition.get("default_preset") not in presets:
+        raise ValueError("render-style default preset is not defined")
+    for preset_id, preset in presets.items():
+        if not isinstance(preset_id, str) or not preset_id:
+            raise ValueError("render-style preset IDs must be non-empty strings")
+        if not isinstance(preset, Mapping):
+            raise ValueError(
+                f"render-style preset {preset_id!r} must be an object"
+            )
+        if preset.get("mode") not in {"custom", "acs_1996"}:
+            raise ValueError(
+                f"render-style preset {preset_id!r} has invalid mode"
+            )
+        target_length = preset.get("target_bond_length_pixels")
+        if target_length is not None and (
+            not isinstance(target_length, (int, float)) or target_length <= 0
+        ):
+            raise ValueError(
+                f"render-style preset {preset_id!r} has invalid bond length"
+            )
+        for context in ("standard", "reaction_core"):
+            if not isinstance(preset.get(context), Mapping):
+                raise ValueError(
+                    f"render-style preset {preset_id!r} requires {context} options"
+                )
+    return definition
+
+
+def available_render_presets() -> Tuple[Tuple[str, str], ...]:
+    """Return deterministic preset identifiers and display labels."""
+    presets = load_render_style_definitions()["presets"]
+    return tuple(
+        (str(preset_id), str(preset.get("label") or preset_id))
+        for preset_id, preset in presets.items()
+    )
 
 
 def _require_rdkit() -> None:
@@ -167,30 +233,73 @@ def _prepare_reaction(reaction_smiles: str, *, kekulize: bool) -> Any:
     return reaction
 
 
-def _style_draw_options(options: Any) -> None:
-    options.padding = 0.02
-    options.bondLineWidth = 2.0
+def _mean_bond_length(molecules: Tuple[Any, ...]) -> float:
+    values = []
+    for molecule in molecules:
+        if molecule is None or molecule.GetNumBonds() <= 0:
+            continue
+        try:
+            values.append(float(rdMolDraw2D.MeanBondLength(molecule)))
+        except (RuntimeError, ValueError):
+            continue
+    return sum(values) / len(values) if values else 1.5
+
+
+def apply_render_preset(
+    options: Any,
+    render_preset: str,
+    *,
+    molecules: Tuple[Any, ...],
+    context: str = "standard",
+) -> None:
+    """Apply one validated definition-backed RDKit drawing preset."""
+    definitions = load_render_style_definitions()
+    if render_preset not in definitions["presets"]:
+        raise ValueError(
+            "render_preset must be one of "
+            f"{sorted(definitions['presets'])}, got {render_preset!r}"
+        )
+    preset = definitions["presets"][render_preset]
+    if context not in {"standard", "reaction_core"}:
+        raise ValueError(f"unknown rendering context: {context!r}")
+    context_options = preset[context]
+    mean_bond_length = _mean_bond_length(molecules)
+    if preset["mode"] == "acs_1996":
+        rdMolDraw2D.SetACS1996Mode(options, mean_bond_length)
+    if "padding" in context_options:
+        options.padding = float(context_options["padding"])
+    if "bond_line_width" in context_options:
+        options.bondLineWidth = float(context_options["bond_line_width"])
+    if "min_font_size" in context_options and hasattr(options, "minFontSize"):
+        options.minFontSize = int(context_options["min_font_size"])
+    if "max_font_size" in context_options and hasattr(options, "maxFontSize"):
+        options.maxFontSize = int(context_options["max_font_size"])
+    target_bond_length = preset.get("target_bond_length_pixels")
+    if target_bond_length is not None and hasattr(options, "fixedBondLength"):
+        options.fixedBondLength = float(target_bond_length) / mean_bond_length
     if hasattr(options, "explicitMethyl"):
         options.explicitMethyl = False
     if hasattr(options, "addStereoAnnotation"):
         options.addStereoAnnotation = True
-    if hasattr(options, "minFontSize"):
-        options.minFontSize = 14
-    if hasattr(options, "maxFontSize"):
-        options.maxFontSize = 36
-    if hasattr(options, "useDefaultAtomPalette"):
+    if preset["mode"] != "acs_1996" and hasattr(
+        options, "useDefaultAtomPalette"
+    ):
         options.useDefaultAtomPalette()
-    if hasattr(options, "updateAtomPalette"):
+    if preset["mode"] != "acs_1996" and hasattr(options, "updateAtomPalette"):
         options.updateAtomPalette(_HETEROATOM_PALETTE)
 
 
-def _make_molecule_drawer(style: RenderStyle) -> Any:
+def _make_molecule_drawer(style: RenderStyle, molecule: Any) -> Any:
     width, height = style.validated_size()
     if style.normalized_format() == "png":
         drawer = rdMolDraw2D.MolDraw2DCairo(width, height)
     else:
         drawer = rdMolDraw2D.MolDraw2DSVG(width, height)
-    _style_draw_options(drawer.drawOptions())
+    apply_render_preset(
+        drawer.drawOptions(),
+        style.validated_preset(),
+        molecules=(molecule,),
+    )
     try:
         drawer.SetBackgroundColour((1, 1, 1))
     except AttributeError:
@@ -211,12 +320,18 @@ def render_molecule_image_bytes(
     image_format: str = "png",
     kekulize: bool = True,
     legend: str | None = None,
+    render_preset: str = "current",
 ) -> bytes:
     """Render a molecule from SMILES and return PNG or UTF-8 SVG bytes."""
     _require_rdkit()
-    style = RenderStyle(size=size, image_format=image_format, kekulize=kekulize)
+    style = RenderStyle(
+        size=size,
+        image_format=image_format,
+        kekulize=kekulize,
+        render_preset=render_preset,
+    )
     molecule = _prepare_molecule(smiles, kekulize=style.kekulize)
-    drawer = _make_molecule_drawer(style)
+    drawer = _make_molecule_drawer(style, molecule)
     drawer.DrawMolecule(molecule, legend=legend or "")
     drawer.FinishDrawing()
     return _drawing_bytes(drawer.GetDrawingText())
@@ -228,17 +343,32 @@ def render_reaction_image_bytes(
     size: ImageSize = DEFAULT_REACTION_SIZE,
     image_format: str = "png",
     kekulize: bool = True,
+    render_preset: str = "current",
 ) -> bytes:
     """Render reaction SMILES and return PNG or UTF-8 SVG bytes."""
     _require_rdkit()
-    style = RenderStyle(size=size, image_format=image_format, kekulize=kekulize)
+    style = RenderStyle(
+        size=size,
+        image_format=image_format,
+        kekulize=kekulize,
+        render_preset=render_preset,
+    )
     width, height = style.validated_size()
     reaction = _prepare_reaction(
         reaction_smiles,
         kekulize=style.kekulize,
     )
     options = rdMolDraw2D.MolDrawOptions()
-    _style_draw_options(options)
+    molecules = (
+        tuple(reaction.GetReactants())
+        + tuple(reaction.GetAgents())
+        + tuple(reaction.GetProducts())
+    )
+    apply_render_preset(
+        options,
+        style.validated_preset(),
+        molecules=molecules,
+    )
     panel_count = max(
         reaction.GetNumReactantTemplates()
         + reaction.GetNumAgentTemplates()
@@ -278,6 +408,7 @@ def render_molecule_image(
     image_format: str = "png",
     kekulize: bool = True,
     legend: str | None = None,
+    render_preset: str = "current",
 ) -> Path:
     """Render a molecule from SMILES to a PNG or SVG file."""
     drawing = render_molecule_image_bytes(
@@ -286,6 +417,7 @@ def render_molecule_image(
         image_format=image_format,
         kekulize=kekulize,
         legend=legend,
+        render_preset=render_preset,
     )
     return _write_image(output_path, drawing)
 
@@ -297,6 +429,7 @@ def render_reaction_image(
     size: ImageSize = DEFAULT_REACTION_SIZE,
     image_format: str = "png",
     kekulize: bool = True,
+    render_preset: str = "current",
 ) -> Path:
     """Render reaction SMILES to a PNG or SVG file."""
     drawing = render_reaction_image_bytes(
@@ -304,5 +437,6 @@ def render_reaction_image(
         size=size,
         image_format=image_format,
         kekulize=kekulize,
+        render_preset=render_preset,
     )
     return _write_image(output_path, drawing)

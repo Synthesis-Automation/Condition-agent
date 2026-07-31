@@ -15,6 +15,7 @@ from app.featurizer_gui import (  # noqa: E402
     ReactiveTaxonomyWindow,
     detect_input_kind,
 )
+import app.featurizer_gui as gui  # noqa: E402
 
 
 def test_detect_input_kind() -> None:
@@ -34,6 +35,8 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
         assert not window.force_core_mapping_check.isChecked()
         assert window.force_core_mapping_check.objectName() == "forceCoreMapping"
+        assert window.render_style_combo.objectName() == "renderStylePreset"
+        assert window.render_style_combo.currentData() == "acs_1996_compact"
 
         window.input_edit.setText(REACTION_EXAMPLE)
         assert window.kind_label.text() == "Detected: reaction"
@@ -152,6 +155,34 @@ def test_window_displays_mapped_reaction_minimization() -> None:
         assert window.graph_tabs.currentIndex() == 1
         assert "Ar = Fc1ccccc1" in window.core_graphic_note.text()
         assert "R = C" in window.core_graphic_note.text()
+    finally:
+        window.close()
+        application.processEvents()
+
+
+def test_drawing_style_switch_rerenders_without_reanalysis(monkeypatch) -> None:
+    application = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    calls = []
+    original_renderer = gui.render_molecule_image_bytes
+
+    def recording_renderer(*args, **kwargs):
+        calls.append(kwargs.get("render_preset"))
+        return original_renderer(*args, **kwargs)
+
+    monkeypatch.setattr(gui, "render_molecule_image_bytes", recording_renderer)
+    window = ReactiveTaxonomyWindow()
+    try:
+        window.input_edit.setText("CCO")
+        window.analyze()
+        assert calls == ["acs_1996_compact"]
+        assert not window.structure_image_label._trim_svg_white_space
+
+        current_index = window.render_style_combo.findData("current")
+        window.render_style_combo.setCurrentIndex(current_index)
+
+        assert calls == ["acs_1996_compact", "current"]
+        assert window.structure_image_label._trim_svg_white_space
+        assert window.output.toPlainText().startswith("MOLECULE FEATURIZATION")
     finally:
         window.close()
         application.processEvents()

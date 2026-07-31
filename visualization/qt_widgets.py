@@ -21,6 +21,7 @@ class StructureImageLabel(QtWidgets.QLabel):
         self._placeholder = placeholder
         self._source_svg = b""
         self._source_pixmap = QtGui.QPixmap()
+        self._trim_svg_white_space = True
         self.setObjectName(object_name)
         self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setMinimumWidth(360)
@@ -34,8 +35,13 @@ class StructureImageLabel(QtWidgets.QLabel):
             "border-radius: 4px; color: #718096; padding: 2px; }"
         )
 
-    def set_image_bytes(self, drawing: bytes) -> bool:
-        """Load and display encoded image bytes, returning whether they decode."""
+    def set_image_bytes(
+        self,
+        drawing: bytes,
+        *,
+        trim_white_space: bool = True,
+    ) -> bool:
+        """Load image bytes, optionally cropping vector-canvas whitespace."""
         if b"<svg" in drawing[:512].lower():
             renderer = QtSvg.QSvgRenderer(drawing)
             if not renderer.isValid():
@@ -43,6 +49,7 @@ class StructureImageLabel(QtWidgets.QLabel):
                 return False
             self._source_svg = bytes(drawing)
             self._source_pixmap = QtGui.QPixmap()
+            self._trim_svg_white_space = trim_white_space
             self.setText("")
             self._refresh_pixmap()
             return True
@@ -52,6 +59,7 @@ class StructureImageLabel(QtWidgets.QLabel):
             return False
         self._source_svg = b""
         self._source_pixmap = pixmap
+        self._trim_svg_white_space = True
         self.setText("")
         self._refresh_pixmap()
         return True
@@ -63,6 +71,7 @@ class StructureImageLabel(QtWidgets.QLabel):
         """Remove the current drawing and show a concise placeholder."""
         self._source_svg = b""
         self._source_pixmap = QtGui.QPixmap()
+        self._trim_svg_white_space = True
         self.setPixmap(QtGui.QPixmap())
         self.setText(message or self._placeholder)
         self.setToolTip("")
@@ -120,10 +129,11 @@ class StructureImageLabel(QtWidgets.QLabel):
             ),
         )
         painter.end()
-        image = self._trim_white_space(
-            image,
-            margin=max(round(4 * render_scale), 1),
-        )
+        if self._trim_svg_white_space:
+            image = self._trim_white_space(
+                image,
+                margin=max(round(4 * render_scale), 1),
+            )
         target_pixel_size = QtCore.QSize(
             max(round(available.width() * render_scale), 1),
             max(round(available.height() * render_scale), 1),
