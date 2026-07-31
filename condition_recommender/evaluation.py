@@ -20,6 +20,7 @@ from .generic_retrieval import load_generic_retrieval_rules
 from .generic_retrieval import RetrievalStrategy
 from .recipe_ranking import load_generic_ranking_rules
 from .similarity import load_generic_similarity_rules
+from .support import load_evidence_support_rules, mapping_equivalence_key
 
 
 @dataclass(frozen=True)
@@ -64,6 +65,9 @@ def _evaluation_groups(
             tokens.append(f"reference:{row.reference_id}")
         if row.canonical_reaction_id:
             tokens.append(f"reaction:{row.canonical_reaction_id}")
+        equivalence = mapping_equivalence_key(row)
+        if equivalence and not row.reference_id:
+            tokens.append(f"mapping_equivalence:{equivalence}")
         if include_scaffolds:
             tokens.extend(
                 f"scaffold:{token}" for token in row.scaffold_tokens
@@ -529,14 +533,17 @@ def evaluate_generic_index(
     train_groups = set(split.train_group_ids)
     test_groups = set(split.test_group_ids)
     report: Dict[str, Any] = {
-        "schema_version": "1.4",
-        "evaluator_version": "generic_leakage_safe.v1.4",
+        "schema_version": "1.5",
+        "evaluator_version": "generic_leakage_safe.v1.5",
         "records_path": str(Path(records_path)),
         "definition_versions": {
             "compatibility": str(load_compatibility_rules()["schema_version"]),
             "retrieval": str(load_generic_retrieval_rules()["schema_version"]),
             "similarity": str(load_generic_similarity_rules()["schema_version"]),
             "ranking": str(load_generic_ranking_rules()["schema_version"]),
+            "evidence_support": str(
+                load_evidence_support_rules()["definition_version"]
+            ),
         },
         "parameters": {
             "test_fraction": test_fraction,

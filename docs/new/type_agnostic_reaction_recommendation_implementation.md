@@ -87,13 +87,16 @@ The current code declares:
 | Recommendation record | `3.9` |
 | Generic converter definition | `generic_conversion.v3.3` |
 | Generic sharded converter definition | `generic_sharded_conversion.v2.0` |
-| Concise reaction review | `2.7` |
+| Concise reaction review | `2.9` |
 | Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `2.5` |
 | Generic recommendation result | `2.4` |
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.8` |
 | Reaction-core retrieval policy | `reaction_core_retrieval.v2@1.0` |
+| Evidence-support policy | `evidence_support.v1@1.0` |
+| Generic held-out evaluation | `generic_leakage_safe.v1.5` |
+| Reaction-core calibration | `reaction_core_calibration.v1` |
 | Generic admission policy | `generic_admission.v2.0` |
 | Fragment-source capabilities | `fragment_source_capabilities.v1@1.0` |
 | Fallback retrieval definition | `1.4` |
@@ -474,12 +477,14 @@ derived from the removed molecular graph. They are not selected from a reaction
 template or inferred from a source reaction name. Exact fragment SMILES and
 functional-group evidence remain available beside the concise class.
 
-`RSH2` is the only minimized identity used for retrieval. It includes generic
-primary-center transitions, participant handle/site tokens, retained remote
-shape, and event count. This prevents the broad center-only conflation seen in
-V1, such as assigning the same retrieval identity to Suzuki and Heck reactions
-that share a coarse carbon-center transition. `RCS2` remains explanation and
-analysis output and is never a retrieval key.
+`RCX2`, `RCT2`, and `RSH2` form an exact-to-local-to-context retrieval ladder.
+`RSH2` includes generic primary-center transitions, participant handle/site
+tokens, retained remote shape, and event count. This prevents the broad
+center-only conflation seen in V1, such as assigning the same retrieval
+identity to Suzuki and Heck reactions that share a coarse carbon-center
+transition. `RCS2` remains explanation and analysis output and is never a
+retrieval key. `RME1` identifies map-number-independent exact core chemistry
+for support deduplication and evaluation grouping.
 
 Reaction-core projection is a sibling observation to RS3, not a substitute for
 it. It does not change reaction-signature identity, named-family assignment, or
@@ -545,17 +550,20 @@ exact signature
   -> transformation signature
   -> environment neighbors within compatible bond edits
   -> broad compatible bond edits
-  -> exact reaction-core shape
+  -> exact reaction core
+  -> typed-local reaction core
+  -> contextual reaction-core shape
   -> chemistry-gated anonymous edit-graph neighbors
   -> abstain
 ```
 
 The current minimum adequate pool is two independent support units. Family use
-requires high confidence and never bypasses edit compatibility. The
-reaction-core tier uses exact `RSH2` equality and matching event count; it
-never uses `RCS2` center equality. It is below verified bond-edit retrieval
-because RS3 is more specific, and above anonymous edit-graph neighbors because
-`RSH2` retains mapped center-state and participant evidence. The anonymous
+requires high confidence and never bypasses edit compatibility. Reaction-core
+tiers require exact equality at their respective level and matching event
+count; they never use `RCS2` center equality. They are below verified bond-edit
+retrieval because RS3 is more specific, and above anonymous edit-graph
+neighbors because even `RSH2` retains mapped center-state and participant
+evidence. The anonymous
 edit-graph tier may cross an exact L3 key only after shared formed/broken bond
 and ring-direction gates pass. Both fallback tiers disclose their use in
 recommendation cautions.

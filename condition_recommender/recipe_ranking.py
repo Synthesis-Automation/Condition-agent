@@ -18,7 +18,11 @@ from .similarity import (
     assess_signature_similarity,
     reaction_scope,
 )
-from .support import evidence_unit, summarize_evidence_support
+from .support import (
+    evidence_unit,
+    load_evidence_support_rules,
+    summarize_evidence_support,
+)
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "generic_ranking.v1.json"
 _DEFINITION_ID = "generic_ranking.v1"
@@ -512,6 +516,11 @@ def rank_condition_recipes(
                 "Repeated observations from the same reference count as one "
                 "independent evidence unit"
             )
+        if support.mapping_deduplicated_independent_count:
+            cautions.append(
+                "Mapping-equivalent unreferenced observations count as one "
+                "independent evidence unit"
+            )
         inferred_correspondence = sorted(
             {
                 str(member.row.signature.get("evidence_quality") or "")
@@ -599,6 +608,9 @@ def rank_condition_recipes(
             definition_versions={
                 best.similarity.definition_id: best.similarity.definition_version,
                 str(rules["definition_id"]): str(rules["schema_version"]),
+                str(load_evidence_support_rules()["definition_id"]): str(
+                    load_evidence_support_rules()["definition_version"]
+                ),
                 best.compatibility.definition_id: (
                     best.compatibility.definition_version
                 ),

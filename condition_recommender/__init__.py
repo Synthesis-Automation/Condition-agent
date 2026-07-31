@@ -1,6 +1,7 @@
 """Standalone condition-recommendation data and modeling package."""
 
 from .compatibility import CompatibilityAssessment, assess_recipe_compatibility
+from .core_evaluation import evaluate_reaction_core_index
 from .generic_api import (
     GenericConditionRecommender,
     recommend_generic_conditions,
@@ -49,6 +50,7 @@ __all__ = [
     "RetrievalLevelTrace",
     "RuleRecommendationResult",
     "build_rule_review_rows",
+    "evaluate_reaction_core_index",
     "recommend_generic_conditions",
     "recommend_indexed_signature",
     "recommend_rule_conditions",

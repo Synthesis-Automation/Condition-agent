@@ -193,6 +193,7 @@ def _core(
         "typed_core_key": f"RCT2:{token}",
         "shape_core_key": shape,
         "center_transition_key": center,
+        "mapping_equivalence_key": f"RME1:{token}",
         "event_count": 1,
         "evidence_status": evidence_status,
         "warnings": [],
@@ -407,6 +408,32 @@ def test_blocked_core_quality_cannot_retrieve() -> None:
 
     assert result.level == "reaction_core_quality_blocked"
     assert not result.pool
+
+
+def test_mapping_variants_do_not_inflate_core_support() -> None:
+    records = []
+    for index in range(2):
+        record = _record(index, _signature(str(index)))
+        record["reference_id"] = ""
+        record["canonical_reaction_id"] = f"CRX1:map-variant-{index}"
+        core = _core("shared")
+        core["mapping_equivalence_key"] = "RME1:same-chemistry"
+        record["reaction_core"] = core
+        records.append(record)
+    query = _core("shared", evidence_status="external")
+    query["mapping_equivalence_key"] = "RME1:same-chemistry"
+
+    result = retrieve_core_pool_with_trace(
+        query,
+        _signature("compatibility"),
+        build_generic_index(records),
+        minimum_pool_size=2,
+    )
+
+    assert result.level == "reaction_core_exact_limited_support"
+    assert result.candidate_count == 2
+    assert result.independent_candidate_count == 1
+    assert result.independent_compatible_candidate_count == 1
 
 
 def test_core_center_key_alone_cannot_retrieve_precedents() -> None:

@@ -908,6 +908,13 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
     duplicate_observation_count = len(observation_ids) - len(set(observation_ids))
     if duplicate_observation_count:
         issues.append("duplicate_observation_ids")
+    mapping_equivalence_counts = Counter(
+        str(row.reaction_core.get("mapping_equivalence_key") or "")
+        for row in index.rows
+        if str(row.reaction_core.get("mapping_equivalence_key") or "").startswith(
+            "RME1:"
+        )
+    )
     maps = {
         "exact": (index.exact, "exact_signature_key"),
         "handles": (index.handles, "handle_signature_key"),
@@ -973,7 +980,7 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
     with opener(source, **arguments) as handle:
         payload = json.load(handle)
     report = {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "artifact_type": "generic_index_integrity",
         "path": str(source),
         "valid": not issues,
@@ -983,6 +990,16 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
         "row_count": row_count,
         "file_size_bytes": source.stat().st_size,
         "duplicate_observation_count": duplicate_observation_count,
+        "mapping_equivalence": {
+            "row_count": sum(mapping_equivalence_counts.values()),
+            "group_count": len(mapping_equivalence_counts),
+            "multirow_group_count": sum(
+                count > 1 for count in mapping_equivalence_counts.values()
+            ),
+            "largest_group_size": max(
+                mapping_equivalence_counts.values(), default=0
+            ),
+        },
         "key_counts": {
             "exact": len(index.exact),
             "handles": len(index.handles),

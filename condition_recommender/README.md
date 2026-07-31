@@ -138,12 +138,19 @@ Mapped edit observations carry a template-free reaction-core projection beside
 the ordinary reaction signature. Converted records and persisted indices retain
 its exact, typed, robust-shape, and diagnostic center keys.
 
-For a signed query, exact `RSH2` shape is a conservative fallback after exact
-bond-edit retrieval and before anonymous edit-graph neighbors. For an unsigned
-query with a usable mapped core, a separate query-only branch runs before the
-ordinary structure fallback. It retrieves only verified indexed precedents
-with the same `RSH2` shape and event count, applies hard condition
-compatibility, and requires independent support.
+For a signed query, reaction-core retrieval is a conservative fallback after
+exact bond-edit retrieval and before anonymous edit-graph neighbors. For an
+unsigned query with a usable mapped core, a separate query-only branch runs
+before the ordinary structure fallback. Both use a narrow-to-broad ladder:
+exact `RCX2`, typed-local `RCT2`, then mapping-robust contextual `RSH2`.
+Every tier uses verified indexed precedents, matching event count, hard
+condition compatibility, and independent support.
+
+Independent support prefers publication identity. When publication identity
+is absent, `RME1` mapping equivalence prevents alternate atom-map assignments
+from being counted as independent evidence; every source observation remains
+available for audit. Passing and review-qualified cores may retrieve, while a
+blocked core abstains.
 
 The center-only `RCS2` key is never used for retrieval. External-mapper and
 core-only queries remain review-qualified and never become verified indexed
@@ -756,6 +763,20 @@ version with the current version on exactly the same split and seed.
 Recipe recovery is deliberately strict: a chemically reasonable alternative
 still counts as a miss when it differs from the recorded recipe. This is why
 the numerical test and independent chemist check are both needed.
+
+Calibrate the reaction-core path separately:
+
+```powershell
+python -m condition_recommender.core_evaluation_cli `
+  results/generic_conversion/v2/development/generic_index.json `
+  results/reaction_core_evaluation/v1/development `
+  --test-fraction 0.2 --seed 17 --top-k 5
+```
+
+This writes exact/local/context and pass/review metrics,
+mapping-equivalence deduplication statistics, per-query JSONL, and
+`reaction_core_chemist_review.csv`. The review CSV deliberately leaves the
+chemist assessment and notes blank and omits the expected recipe.
 
 A simple acceptance checklist is:
 

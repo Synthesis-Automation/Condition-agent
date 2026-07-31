@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 from reactive_taxonomy import (
+    REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
+    REACTION_CORE_PROJECTION_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
     reaction_signature_definition_versions,
 )
@@ -13,6 +15,7 @@ from condition_recommender.evaluation import (
     evaluate_generic_index,
     grouped_holdout_split,
 )
+from condition_recommender.core_evaluation import evaluate_reaction_core_index
 from condition_recommender.evaluation_features import reaction_scaffold_tokens
 from condition_recommender.calibration import (
     calibrate_generic_ranking,
@@ -30,6 +33,11 @@ from condition_recommender.generic_indexing import (
     load_persisted_generic_index,
     save_generic_index,
     validate_generic_index_artifact,
+)
+from condition_recommender.support import (
+    evidence_unit,
+    load_evidence_support_rules,
+    summarize_evidence_support,
 )
 from condition_recommender.release_validation import (
     build_release_readiness_report,
@@ -126,6 +134,25 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     }
 
 
+def _core(token: str = "shared") -> dict:
+    return {
+        "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+        "algorithm_version": REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
+        "core_id": f"RCP2:{token}",
+        "exact_core_key": "RCX2:shared",
+        "typed_core_key": "RCT2:shared",
+        "shape_core_key": "RSH2:shared",
+        "center_transition_key": "RCS2:shared",
+        "mapping_equivalence_key": "RME1:shared",
+        "event_count": 1,
+        "evidence_status": "verified",
+        "generic_label": "C–Br + N–H → C–N",
+        "presentation": {"equation": "C–Br + N–H → C–N"},
+        "quality": {"status": "pass"},
+        "warnings": [],
+    }
+
+
 def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     index = build_generic_index([_record(1), _record(2)])
     first_path = tmp_path / "first.json"
@@ -149,6 +176,8 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     integrity = validate_generic_index_artifact(first_path)
     assert integrity["valid"]
     assert integrity["row_count"] == 2
+    assert integrity["schema_version"] == "1.1"
+    assert integrity["mapping_equivalence"]["row_count"] == 0
 
 
 def test_compressed_persisted_index_round_trip(tmp_path: Path) -> None:
@@ -162,6 +191,77 @@ def test_compressed_persisted_index_round_trip(tmp_path: Path) -> None:
     assert load_persisted_generic_index(path) == index
     assert load_generic_index(path) == index
     assert validate_generic_index_artifact(path)["valid"]
+
+
+def test_mapping_equivalence_deduplicates_only_unreferenced_support() -> None:
+    first = _record(1, canonical_group="CRX1:first-map")
+    second = _record(2, canonical_group="CRX1:second-map")
+    replicated = _record(3, canonical_group="CRX1:third-map")
+    for index, record in enumerate((first, second, replicated), start=1):
+        record["reaction_core"] = _core(str(index))
+    first["reference_id"] = ""
+    second["reference_id"] = ""
+    index = build_generic_index([first, second, replicated])
+
+    support = summarize_evidence_support(index.rows)
+    units = {evidence_unit(row) for row in index.rows}
+
+    assert load_evidence_support_rules()["definition_id"] == (
+        "evidence_support.v1"
+    )
+    assert support.observation_count == 3
+    assert support.mapping_equivalence_count == 1
+    assert support.mapping_equivalence_row_count == 3
+    assert support.independent_count == 2
+    assert support.mapping_deduplicated_independent_count == 1
+    assert units == {
+        "mapping_equivalence:RME1:shared",
+        "reference:REF1:3",
+    }
+
+
+def test_reaction_core_calibration_report_and_blind_review(
+    tmp_path: Path,
+) -> None:
+    records = []
+    for index in range(10):
+        record = _record(index)
+        record["reaction_core"] = _core(str(index))
+        records.append(record)
+    index_path = tmp_path / "index.json"
+    save_generic_index(build_generic_index(records), index_path)
+    output = tmp_path / "core_calibration"
+
+    report = evaluate_reaction_core_index(
+        index_path,
+        output,
+        test_fraction=0.3,
+        seed=11,
+        top_k=2,
+        minimum_pool_size=1,
+    )
+
+    assert report["schema_version"] == "1.0"
+    assert report["split"]["leakage_group_count"] == 0
+    assert report["metrics"]["core_query_count"] == 3
+    assert report["metrics"]["coverage_rate"] == 1.0
+    assert report["metrics"]["topk_recipe_recovery_rate"] == 1.0
+    assert report["by_retrieval_level"]["reaction_core_exact"][
+        "query_count"
+    ] == 3
+    assert report["by_quality_status"]["pass"]["coverage_rate"] == 1.0
+    assert report["mapping_equivalence"]["all_rows"][
+        "mapping_equivalence_group_count"
+    ] == 1
+    assert (output / "reaction_core_calibration_report.json").is_file()
+    assert (output / "reaction_core_calibration_report.md").is_file()
+    assert (output / "reaction_core_calibration_cases.jsonl").is_file()
+    review_path = output / "reaction_core_chemist_review.csv"
+    with review_path.open("r", encoding="utf-8-sig", newline="") as handle:
+        review_rows = list(csv.DictReader(handle))
+    assert len(review_rows) == 3
+    assert review_rows[0]["chemist_core_match"] == ""
+    assert review_rows[0]["chemist_notes"] == ""
 
 
 def test_index_rejects_previous_record_contract() -> None:
@@ -285,12 +385,13 @@ def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
     assert report["metrics"]["query_count"] == 3
     assert report["metrics"]["coverage_rate"] == 1.0
     assert report["metrics"]["hard_incompatible_recommendation_count"] == 0
-    assert report["schema_version"] == "1.4"
+    assert report["schema_version"] == "1.5"
     assert report["definition_versions"] == {
         "compatibility": "1.1",
         "retrieval": "1.8",
         "similarity": "1.0",
         "ranking": "1.0",
+        "evidence_support": "1.0",
     }
     assert (output / "evaluation_report.json").is_file()
     cases = [

@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "evidence_support.v1",
+  "definition_version": "1.0",
+  "independence_priority": [
+    "reference_id",
+    "reaction_core.mapping_equivalence_key",
+    "canonical_reaction_id",
+    "observation_id",
+    "reaction_id"
+  ],
+  "preserve_all_observations": true,
+  "mapping_equivalence_applies_without_reference": true
+}
