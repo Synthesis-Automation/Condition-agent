@@ -14,6 +14,7 @@ from .reaction_candidates import enumerate_reaction_candidates
 from .connectivity_rewrite import apply_connectivity_rewrite
 from .reaction_completeness import build_reaction_completeness
 from .reaction_contextual_labels import build_contextual_transformation_label
+from .reaction_core import build_reaction_core_projection
 from .reaction_display_labels import build_reaction_display_label
 from .reaction_edits import (
     EditNormalizationResult,
@@ -250,6 +251,13 @@ def featurize_reaction(
         tuple(candidates),
         mapped_override=_mapped_edit_override,
         mapped_provider=_mapped_provider,
+    )
+    reaction_core = build_reaction_core_projection(
+        reactants=parsed.reactants,
+        products=parsed.products,
+        edits=edit_result.edits,
+        evidence=edit_result.evidence,
+        confidence=edit_result.confidence,
     )
     reaction_completeness = build_reaction_completeness(
         reactants=parsed.reactants,
@@ -549,6 +557,7 @@ def featurize_reaction(
         fallback_descriptor=fallback_descriptor,
         partial_product_transformation=partial_product_transformation,
         reaction_completeness=reaction_completeness,
+        reaction_core=reaction_core,
         warnings=tuple(sorted(set(warnings))),
     )
 

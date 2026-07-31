@@ -196,6 +196,12 @@ def test_product_only_mapped_endpoints_do_not_break_reaction_topology() -> None:
     assert assessment.analysis.reaction_signature is None
     assert assessment.analysis.reaction_completeness is not None
     assert assessment.analysis.reaction_completeness.status == "incomplete"
+    assert assessment.analysis.reaction_core is not None
+    assert assessment.analysis.reaction_core.evidence == "external_atom_mapping"
+    assert (
+        "REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL"
+        in assessment.analysis.reaction_core.warnings
+    )
     assert "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE" in assessment.warnings
 
 

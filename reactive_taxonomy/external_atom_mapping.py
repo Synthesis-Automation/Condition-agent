@@ -722,6 +722,7 @@ def analyze_reaction_with_external_mapping(
                     base.evidence_candidates,
                     (external_candidate,),
                 ),
+                reaction_core=mapped_analysis.reaction_core,
                 warnings=tuple(sorted(set(base.warnings).union((warning,)))),
             ),
             provider_metadata=provider.metadata,

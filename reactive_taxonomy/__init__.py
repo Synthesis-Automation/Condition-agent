@@ -2,6 +2,7 @@
 
 from .api import detect_sites, featurize_molecule
 from .reaction_api import featurize_reaction
+from .reaction_core import build_reaction_core_projection
 from .reaction_signatures import reaction_signature_definition_versions
 from .reaction_fallback_descriptors import reaction_fallback_definition_versions
 from .external_atom_mapping import (
@@ -76,6 +77,7 @@ from .reaction_models import (
     ProductTransformation,
     PredictedStereoChange,
     PartialProductTransformation,
+    REACTION_CORE_PROJECTION_SCHEMA_VERSION,
     REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
     ReactionAnalysis,
@@ -83,6 +85,11 @@ from .reaction_models import (
     ReactionCandidate,
     ReactionCompletenessAssessment,
     ReactionComponent,
+    ReactionCoreAtomState,
+    ReactionCoreBoundary,
+    ReactionCoreBoundaryClass,
+    ReactionCoreCenter,
+    ReactionCoreProjection,
     ReactionDisplayLabel,
     ReactionEdit,
     ReactionEditHypothesis,
@@ -220,6 +227,7 @@ __all__ = [
     "ProductTransformation",
     "PredictedStereoChange",
     "PartialProductTransformation",
+    "REACTION_CORE_PROJECTION_SCHEMA_VERSION",
     "REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION",
     "REACTION_SIGNATURE_SCHEMA_VERSION",
     "REACTION_TEMPLATE_DEFINITION_VERSION",
@@ -229,6 +237,11 @@ __all__ = [
     "ReactionCandidate",
     "ReactionCompletenessAssessment",
     "ReactionComponent",
+    "ReactionCoreAtomState",
+    "ReactionCoreBoundary",
+    "ReactionCoreBoundaryClass",
+    "ReactionCoreCenter",
+    "ReactionCoreProjection",
     "ReactionDisplayLabel",
     "ReactionEdit",
     "ReactionEditHypothesis",
@@ -272,6 +285,7 @@ __all__ = [
     "available_styles",
     "apply_connectivity_rewrite",
     "build_contextual_transformation_label",
+    "build_reaction_core_projection",
     "build_reaction_display_label",
     "compile_connectivity_rewrite_definitions",
     "connectivity_rewrite_for_grammar",

@@ -20,6 +20,25 @@ Any unmatched edit set still receives a deterministic literal summary such as
 the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
+Mapped observations also receive a template-free `ReactionCoreProjection`.
+The projection selects centers independently for each connected edit event,
+removes graph-remote branches, and classifies every cut attachment from the
+removed molecular subgraph as aryl, heteroaryl, alkyl, alkenyl, alkynyl,
+acyl, ring-aliphatic, heteroatom-linked, or generic R.  The exact fragment
+SMILES and functional-group annotations remain in the boundary record even
+when the concise label uses `Ar`, `HetAr`, or `R`.
+
+Four versioned keys separate different uses of the minimized observation:
+`RCX1` retains exact mapped-edit and fragment identity, `RCT1` retains typed
+boundaries, `RCG1` is a broad generic core, and `RCS1` compares the complete
+before/after states of selected conserved centers without encoding peripheral
+atom origins.  The last key allows chemically equivalent center transitions
+to agree when an external mapper chooses a different same-element atom origin,
+while the exact keys still expose that disagreement.  Construction does not
+load reaction grammars or the reaction-template registry.  It abstains when no
+edited mapped atom is observed on both sides and does not change `RS3`,
+admission, retrieval, or named-family results.
+
 Mapped, single-event references can also be compiled into the versioned
 `reaction_templates.v1.json` registry. This authoring registry stores a
 map-number- and reactant-order-invariant edit fingerprint, optional family

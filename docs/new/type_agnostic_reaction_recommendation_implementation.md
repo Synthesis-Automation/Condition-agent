@@ -74,7 +74,7 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `3.3` |
+| Reaction analysis | `3.4` |
 | Reaction signature / ID namespace | `3.0` / `RS3` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
@@ -377,6 +377,10 @@ validation before they may consume these observations.
 - typed product-atom completeness, partial product-origin gaps, deterministic
   `PTS1` partial-transformation keys, and `FSR1` fragment-source requirements;
 - graph-derived local reactivity profiles and unchanged spectators.
+- a serialized, template-free `ReactionCoreProjection` for mapped observations,
+  with exact, typed-boundary, generic, and atom-origin-robust center-transition
+  keys. This POC is shadow observation output and does not yet affect signature
+  identity, admission, retrieval, or ranking.
 
 The internal `CEG1` connectivity-edit graph remains evaluation/shadow output.
 The public and persisted chemistry identity is the RS3 reaction signature.
