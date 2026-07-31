@@ -132,6 +132,24 @@ Applications should inspect:
 An empty recommendation list or typed error is a valid abstention. It must not
 be replaced by a reaction-name guess.
 
+### Reaction-core retrieval
+
+Mapped edit observations carry a template-free reaction-core projection beside
+the ordinary reaction signature. Converted records and persisted indices retain
+its exact, typed, robust-shape, and diagnostic center keys.
+
+For a signed query, exact `RSH2` shape is a conservative fallback after exact
+bond-edit retrieval and before anonymous edit-graph neighbors. For an unsigned
+query with a usable mapped core, a separate query-only branch runs before the
+ordinary structure fallback. It retrieves only verified indexed precedents
+with the same `RSH2` shape and event count, applies hard condition
+compatibility, and requires independent support.
+
+The center-only `RCS2` key is never used for retrieval. External-mapper and
+core-only queries remain review-qualified and never become verified indexed
+precedents. Successful unsigned-core results use
+`recommendation_mode="reaction_core_review"` and require expert review.
+
 ### Unresolved-query structure fallback
 
 When parsing succeeds but no verified `ReactionSignature` can be constructed,
@@ -630,15 +648,17 @@ changes. Results can be exported as the complete typed JSON response.
 
 Retrieval follows a chemistry hierarchy: exact signature, relaxed handle
 signature, high-confidence family, generic transformation, then compatible bond
-edits narrowed by local-environment neighbors, followed by a broad compatible
-bond-edit fallback. Hard bond-edit and recipe-compatibility gates run before
-similarity and aggregation. Minimum support is counted by independent
+edits narrowed by local-environment neighbors, followed by broad compatible
+bond edits, exact reaction-core shape, and anonymous edit-graph neighbors. Hard
+chemistry and recipe-compatibility gates run before similarity and aggregation.
+Minimum support is counted by independent
 publication, or by canonical reaction when no reference is available; repeated
 scope examples from one paper cannot satisfy the threshold by themselves.
 
-If the query has no signature, this hierarchy is not entered. The separate
-unverified-query fallback above uses its own similarity gate and trace and must
-not be presented as a bond-edit-compatible result.
+If the query has no signature, this hierarchy is not entered. Typed edit
+hypotheses and eligible reaction cores have their own query-only review routes;
+otherwise the unverified structure fallback uses its own similarity gate and
+trace. None may be presented as a verified bond-edit-compatible result.
 
 Results aggregate by canonical `RCORE1` recipe core and expose the observed
 `RCR1` operating-condition variants. Support distinguishes raw observations,
@@ -661,7 +681,9 @@ Generic configuration is split by responsibility:
   reported condition identities can satisfy typed product-fragment
   requirements;
 - `definitions/fallback_retrieval.v1.json` controls the isolated unresolved-query
-  structure fallback and its stricter support gates.
+  structure fallback and its stricter support gates;
+- `definitions/reaction_core_retrieval.v1.json` controls unsigned reaction-core
+  evidence status, blocking warnings, and independent support.
 
 Ranking and retrieval parameters are selected on development splits and
 promoted only after a separate validation gate. Similarity weights remain an

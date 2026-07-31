@@ -1,15 +1,16 @@
-"""Template-free reaction-center minimization from normalized graph edits.
+"""Template-free minimization of an observed reaction edit graph.
 
-The projection in this module is an observation layer.  It does not consult
-reaction grammars, reaction templates, source labels, or named families.
-Remote branches are cut only after their molecular graph has been inspected,
-and both exact mapped-edit identity and correspondence-robust center-state
-identity are retained.
+The projection is an observation contract.  It consumes normalized edits and
+parsed molecular graphs, but never reaction grammars, templates, source labels,
+or named families.  Every edit-participating atom remains in the active graph;
+unchanged connected components are represented once as typed remote subgraphs
+with one or more attachment ports.
 """
 
 from __future__ import annotations
 
 from collections import Counter, defaultdict, deque
+from dataclasses import replace
 import hashlib
 import json
 from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple
@@ -17,13 +18,16 @@ from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_models import (
     REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+    REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
     ReactionAtomReference,
     ReactionComponent,
+    ReactionCoreAttachmentPort,
     ReactionCoreAtomState,
-    ReactionCoreBoundary,
-    ReactionCoreBoundaryClass,
-    ReactionCoreCenter,
+    ReactionCoreAtomTransition,
+    ReactionCoreEvent,
     ReactionCoreProjection,
+    ReactionCoreRemoteClass,
+    ReactionCoreRemoteSubgraph,
     ReactionEdit,
 )
 
@@ -31,6 +35,7 @@ from .reaction_models import (
 _AtomIdentity = Tuple[object, ...]
 _Coordinate = Tuple[int, int]
 _Location = Tuple[ReactionComponent, Any, int]
+_EditRecord = Tuple[str, Tuple[_AtomIdentity, ...]]
 
 
 def _canonical_json(value: Any) -> str:
@@ -61,10 +66,7 @@ def _atom_identity(reference: ReactionAtomReference) -> _AtomIdentity:
 
 def _component_locations(
     components: Sequence[ReactionComponent],
-) -> tuple[
-    Dict[int, _Location],
-    Dict[_Coordinate, _Location],
-]:
+) -> tuple[Dict[int, _Location], Dict[_Coordinate, _Location]]:
     by_map: Dict[int, _Location] = {}
     by_coordinate: Dict[_Coordinate, _Location] = {}
     for component in components:
@@ -132,29 +134,67 @@ def _functional_group_ids(
     )
 
 
-def _fragment_indices(
-    molecule: Any,
-    start_index: int,
+def _participant_tokens(
+    components: Sequence[ReactionComponent],
+    active_coordinates: set[_Coordinate],
     *,
-    blocked: set[int],
-) -> Tuple[int, ...]:
-    queue = deque((int(start_index),))
-    visited = set(blocked)
+    side: str,
+) -> Tuple[str, ...]:
+    """Return mapping-number-independent typed handles touching active atoms."""
     values = []
-    while queue:
-        atom_index = queue.popleft()
-        if atom_index in visited:
+    for component in components:
+        active = {
+            atom_index
+            for component_index, atom_index in active_coordinates
+            if component_index == component.component_index
+        }
+        if not active:
             continue
-        visited.add(atom_index)
-        atom = molecule.GetAtomWithIdx(atom_index)
-        if atom.GetAtomicNum() <= 1:
-            continue
-        values.append(atom_index)
-        for neighbor in atom.GetNeighbors():
-            neighbor_index = int(neighbor.GetIdx())
-            if neighbor.GetAtomicNum() > 1 and neighbor_index not in visited:
-                queue.append(neighbor_index)
-    return tuple(sorted(values))
+        for group in component.compound_analysis.functional_groups:
+            if active.intersection(int(value) for value in group.atom_indices):
+                values.append(f"{side}:group:{group.group_id}")
+        for site in component.compound_analysis.sites:
+            if active.intersection(int(value) for value in site.atom_indices):
+                values.append(f"{side}:site:{site.site_type}")
+    return tuple(sorted(set(values)))
+
+
+def _connected_remote_components(
+    molecule: Any,
+    active_atom_indices: set[int],
+) -> Tuple[Tuple[int, ...], ...]:
+    remaining = {
+        int(atom.GetIdx())
+        for atom in molecule.GetAtoms()
+        if atom.GetAtomicNum() > 1 and int(atom.GetIdx()) not in active_atom_indices
+    }
+    values = []
+    while remaining:
+        start = min(remaining)
+        queue = deque((start,))
+        component = set()
+        while queue:
+            atom_index = queue.popleft()
+            if atom_index in component or atom_index not in remaining:
+                continue
+            component.add(atom_index)
+            atom = molecule.GetAtomWithIdx(atom_index)
+            for neighbor in atom.GetNeighbors():
+                neighbor_index = int(neighbor.GetIdx())
+                if (
+                    neighbor.GetAtomicNum() > 1
+                    and neighbor_index in remaining
+                    and neighbor_index not in component
+                ):
+                    queue.append(neighbor_index)
+        remaining.difference_update(component)
+        if any(
+            int(neighbor.GetIdx()) in active_atom_indices
+            for atom_index in component
+            for neighbor in molecule.GetAtomWithIdx(atom_index).GetNeighbors()
+        ):
+            values.append(tuple(sorted(component)))
+    return tuple(values)
 
 
 def _fragment_smiles(molecule: Any, atom_indices: Sequence[int]) -> str:
@@ -176,221 +216,305 @@ def _fragment_smiles(molecule: Any, atom_indices: Sequence[int]) -> str:
         return ""
 
 
-def _aromatic_system_indices(
+def _remote_class(
     molecule: Any,
-    start_index: int,
-    allowed: set[int],
-) -> set[int]:
-    values = set()
-    queue = deque((int(start_index),))
-    while queue:
-        atom_index = queue.popleft()
-        if atom_index in values or atom_index not in allowed:
-            continue
-        atom = molecule.GetAtomWithIdx(atom_index)
-        if not atom.GetIsAromatic():
-            continue
-        values.add(atom_index)
-        for neighbor in atom.GetNeighbors():
-            if neighbor.GetIsAromatic():
-                queue.append(int(neighbor.GetIdx()))
-    return values
-
-
-def _boundary_class(
-    molecule: Any,
-    attachment_atom_index: int,
-    fragment_indices: Sequence[int],
-) -> ReactionCoreBoundaryClass:
-    atom = molecule.GetAtomWithIdx(int(attachment_atom_index))
-    fragment_set = set(int(value) for value in fragment_indices)
-    if atom.GetIsAromatic():
-        aromatic_system = _aromatic_system_indices(
-            molecule,
-            int(attachment_atom_index),
-            fragment_set,
-        )
-        if any(
-            molecule.GetAtomWithIdx(atom_index).GetAtomicNum() != 6
-            for atom_index in aromatic_system
-        ):
+    atom_indices: Sequence[int],
+    attachment_indices: Sequence[int],
+) -> ReactionCoreRemoteClass:
+    atoms = [
+        molecule.GetAtomWithIdx(int(atom_index))
+        for atom_index in attachment_indices
+    ]
+    if any(atom.GetIsAromatic() for atom in atoms):
+        aromatic_atoms = [
+            molecule.GetAtomWithIdx(int(atom_index))
+            for atom_index in atom_indices
+            if molecule.GetAtomWithIdx(int(atom_index)).GetIsAromatic()
+        ]
+        if any(atom.GetAtomicNum() != 6 for atom in aromatic_atoms):
             return "heteroaryl"
         return "aryl"
-    if atom.GetAtomicNum() == 6:
-        has_heteroatom_double_bond = any(
-            int(neighbor.GetIdx()) in fragment_set
-            and neighbor.GetAtomicNum() in {7, 8, 16}
+    if atoms and all(atom.GetAtomicNum() == 6 for atom in atoms):
+        fragment = set(int(value) for value in atom_indices)
+        if any(
+            neighbor.GetAtomicNum() in {7, 8, 16}
+            and int(neighbor.GetIdx()) in fragment
             and str(
                 molecule.GetBondBetweenAtoms(
-                    int(attachment_atom_index),
+                    int(atom.GetIdx()),
                     int(neighbor.GetIdx()),
                 ).GetBondType()
             ).upper()
             == "DOUBLE"
+            for atom in atoms
             for neighbor in atom.GetNeighbors()
-        )
-        if has_heteroatom_double_bond:
+        ):
             return "acyl"
-        hybridization = str(atom.GetHybridization()).upper()
-        if hybridization == "SP":
+        hybridizations = {str(atom.GetHybridization()).upper() for atom in atoms}
+        if hybridizations == {"SP"}:
             return "alkynyl"
-        if hybridization == "SP2":
+        if "SP2" in hybridizations:
             return "alkenyl"
-        if atom.IsInRing():
+        if any(atom.IsInRing() for atom in atoms):
             return "ring_aliphatic"
         return "alkyl"
-    if atom.GetAtomicNum() in {7, 8, 9, 15, 16, 17, 35, 53}:
+    if atoms and all(
+        atom.GetAtomicNum() in {7, 8, 9, 15, 16, 17, 35, 53}
+        for atom in atoms
+    ):
         return "heteroatom"
     return "generic_R"
 
 
-def _boundary_continuity(
-    *,
-    side: str,
-    core_map_number: Optional[int],
-    attachment_map_number: Optional[int],
-    bond_order: str,
-    opposite_by_map: Mapping[int, _Location],
-    opposite_active_coordinates: set[_Coordinate],
-) -> str:
-    if core_map_number is None or attachment_map_number is None:
-        return "unresolved"
-    core = opposite_by_map.get(int(core_map_number))
-    attachment = opposite_by_map.get(int(attachment_map_number))
-    if core is None or attachment is None or core[0] is not attachment[0]:
-        return "reactant_only" if side == "reactant" else "product_only"
-    component, molecule, core_atom_index = core
-    _, _, attachment_atom_index = attachment
-    bond = molecule.GetBondBetweenAtoms(core_atom_index, attachment_atom_index)
-    if (
-        bond is not None
-        and str(bond.GetBondType()).upper() == bond_order
-        and (
-            component.component_index,
-            attachment_atom_index,
-        )
-        not in opposite_active_coordinates
-    ):
-        return "retained"
-    return "reactant_only" if side == "reactant" else "product_only"
-
-
-def _build_boundaries_for_side(
+def _build_remote_subgraphs_for_side(
     *,
     side: str,
     components: Sequence[ReactionComponent],
     active_coordinates: set[_Coordinate],
-    opposite_by_map: Mapping[int, _Location],
-    opposite_active_coordinates: set[_Coordinate],
-) -> Tuple[ReactionCoreBoundary, ...]:
+) -> Tuple[ReactionCoreRemoteSubgraph, ...]:
     values = []
     for component in components:
         molecule = parse_smiles(component.input_smiles)
         if molecule is None:
             continue
-        component_active = {
+        active = {
             atom_index
             for component_index, atom_index in active_coordinates
             if component_index == component.component_index
         }
-        for core_atom_index in sorted(component_active):
-            core_atom = molecule.GetAtomWithIdx(core_atom_index)
-            core_map_number = int(core_atom.GetAtomMapNum()) or None
-            for attachment in core_atom.GetNeighbors():
-                attachment_atom_index = int(attachment.GetIdx())
-                if (
-                    component.component_index,
-                    attachment_atom_index,
-                ) in active_coordinates:
-                    continue
-                if attachment.GetAtomicNum() <= 1:
-                    continue
-                bond = molecule.GetBondBetweenAtoms(
-                    core_atom_index,
-                    attachment_atom_index,
-                )
-                bond_order = str(bond.GetBondType()).upper()
-                fragment_indices = _fragment_indices(
-                    molecule,
-                    attachment_atom_index,
-                    blocked=component_active,
-                )
-                boundary_class = _boundary_class(
-                    molecule,
-                    attachment_atom_index,
-                    fragment_indices,
-                )
-                attachment_map_number = (
-                    int(attachment.GetAtomMapNum()) or None
-                )
-                continuity = _boundary_continuity(
-                    side=side,
-                    core_map_number=core_map_number,
-                    attachment_map_number=attachment_map_number,
-                    bond_order=bond_order,
-                    opposite_by_map=opposite_by_map,
-                    opposite_active_coordinates=opposite_active_coordinates,
-                )
-                fragment = _fragment_smiles(molecule, fragment_indices)
-                heavy_atom_count = len(fragment_indices)
-                heteroatom_count = sum(
-                    molecule.GetAtomWithIdx(atom_index).GetAtomicNum()
-                    not in {1, 6}
-                    for atom_index in fragment_indices
-                )
-                aromatic_atom_count = sum(
-                    molecule.GetAtomWithIdx(atom_index).GetIsAromatic()
-                    for atom_index in fragment_indices
-                )
-                functional_group_ids = _functional_group_ids(
-                    component,
-                    fragment_indices,
-                )
-                boundary_payload = {
-                    "side": side,
-                    "core_element": core_atom.GetSymbol(),
-                    "attachment_element": attachment.GetSymbol(),
-                    "bond_order": bond_order,
-                    "boundary_class": boundary_class,
-                    "continuity": continuity,
-                    "fragment_smiles": fragment,
-                    "functional_group_ids": functional_group_ids,
-                }
-                values.append(
-                    ReactionCoreBoundary(
-                        boundary_id=_digest(
-                            "RCB1",
-                            boundary_payload,
-                            length=24,
-                        ),
-                        side=side,  # type: ignore[arg-type]
-                        core_component_index=component.component_index,
-                        core_atom_index=core_atom_index,
-                        core_atom_map_number=core_map_number,
-                        attachment_atom_index=attachment_atom_index,
-                        attachment_atom_map_number=attachment_map_number,
-                        attachment_element=attachment.GetSymbol(),
-                        bond_order=bond_order,
-                        boundary_class=boundary_class,
-                        continuity=continuity,  # type: ignore[arg-type]
-                        fragment_smiles=fragment,
-                        fragment_heavy_atom_count=heavy_atom_count,
-                        fragment_heteroatom_count=heteroatom_count,
-                        fragment_aromatic_atom_count=aromatic_atom_count,
-                        functional_group_ids=functional_group_ids,
+        for atom_indices in _connected_remote_components(molecule, active):
+            fragment = set(atom_indices)
+            ports = []
+            for attachment_index in atom_indices:
+                attachment = molecule.GetAtomWithIdx(attachment_index)
+                for core_atom in attachment.GetNeighbors():
+                    core_index = int(core_atom.GetIdx())
+                    if core_index not in active:
+                        continue
+                    bond = molecule.GetBondBetweenAtoms(
+                        core_index,
+                        attachment_index,
                     )
+                    ports.append(
+                        ReactionCoreAttachmentPort(
+                            side=side,  # type: ignore[arg-type]
+                            core_component_index=component.component_index,
+                            core_atom_index=core_index,
+                            core_atom_map_number=(
+                                int(core_atom.GetAtomMapNum()) or None
+                            ),
+                            attachment_atom_index=attachment_index,
+                            attachment_atom_map_number=(
+                                int(attachment.GetAtomMapNum()) or None
+                            ),
+                            attachment_element=attachment.GetSymbol(),
+                            bond_order=str(bond.GetBondType()).upper(),
+                        )
+                    )
+            if not ports:
+                continue
+            ports = sorted(
+                ports,
+                key=lambda port: (
+                    port.core_component_index,
+                    port.core_atom_index,
+                    port.attachment_atom_index,
+                    port.bond_order,
+                ),
+            )
+            attachment_indices = tuple(
+                sorted({port.attachment_atom_index for port in ports})
+            )
+            fragment_smiles = _fragment_smiles(molecule, atom_indices)
+            remote_class = _remote_class(
+                molecule,
+                atom_indices,
+                attachment_indices,
+            )
+            map_numbers = tuple(
+                sorted(
+                    int(atom.GetAtomMapNum())
+                    for atom_index in atom_indices
+                    if (atom := molecule.GetAtomWithIdx(atom_index)).GetAtomMapNum()
+                    > 0
                 )
+            )
+            payload = {
+                "side": side,
+                "component_index": component.component_index,
+                "atom_indices": atom_indices,
+                "fragment_smiles": fragment_smiles,
+                "remote_class": remote_class,
+                "ports": tuple(
+                    (
+                        port.core_atom_index,
+                        port.attachment_atom_index,
+                        port.attachment_element,
+                        port.bond_order,
+                    )
+                    for port in ports
+                ),
+            }
+            values.append(
+                ReactionCoreRemoteSubgraph(
+                    subgraph_id=_digest("RCR2", payload, length=24),
+                    side=side,  # type: ignore[arg-type]
+                    component_index=component.component_index,
+                    atom_indices=atom_indices,
+                    atom_map_numbers=map_numbers,
+                    remote_class=remote_class,
+                    continuity="unresolved",
+                    attachment_ports=tuple(ports),
+                    fragment_smiles=fragment_smiles,
+                    fragment_heavy_atom_count=len(fragment),
+                    fragment_heteroatom_count=sum(
+                        molecule.GetAtomWithIdx(atom_index).GetAtomicNum()
+                        not in {1, 6}
+                        for atom_index in fragment
+                    ),
+                    fragment_aromatic_atom_count=sum(
+                        molecule.GetAtomWithIdx(atom_index).GetIsAromatic()
+                        for atom_index in fragment
+                    ),
+                    functional_group_ids=_functional_group_ids(
+                        component,
+                        atom_indices,
+                    ),
+                )
+            )
     return tuple(
         sorted(
             values,
-            key=lambda boundary: (
-                boundary.side,
-                boundary.boundary_class,
-                boundary.fragment_smiles,
-                boundary.bond_order,
-                boundary.core_component_index,
-                boundary.core_atom_index,
-                boundary.attachment_atom_index,
+            key=lambda subgraph: (
+                subgraph.side,
+                subgraph.remote_class,
+                subgraph.fragment_smiles,
+                subgraph.component_index,
+                subgraph.atom_indices,
+            ),
+        )
+    )
+
+
+def _mapped_port_tokens(
+    subgraph: ReactionCoreRemoteSubgraph,
+) -> Tuple[Tuple[int, int, str], ...]:
+    return tuple(
+        sorted(
+            (
+                int(port.core_atom_map_number),
+                int(port.attachment_atom_map_number),
+                port.bond_order,
+            )
+            for port in subgraph.attachment_ports
+            if port.core_atom_map_number is not None
+            and port.attachment_atom_map_number is not None
+        )
+    )
+
+
+def _remote_continuity(
+    subgraph: ReactionCoreRemoteSubgraph,
+    opposite: Sequence[ReactionCoreRemoteSubgraph],
+    *,
+    opposite_by_map: Mapping[int, _Location],
+) -> str:
+    mapped = set(subgraph.atom_map_numbers)
+    if mapped:
+        exact = [
+            candidate
+            for candidate in opposite
+            if set(candidate.atom_map_numbers) == mapped
+        ]
+        if exact:
+            candidate = min(
+                exact,
+                key=lambda value: (
+                    value.fragment_smiles,
+                    value.component_index,
+                    value.atom_indices,
+                ),
+            )
+            if (
+                candidate.fragment_smiles == subgraph.fragment_smiles
+                and candidate.remote_class == subgraph.remote_class
+                and _mapped_port_tokens(candidate)
+                == _mapped_port_tokens(subgraph)
+            ):
+                return "retained"
+            return "changed"
+        if any(mapped.intersection(candidate.atom_map_numbers) for candidate in opposite):
+            return "changed"
+        return "departing" if subgraph.side == "reactant" else "appearing"
+    core_maps = {
+        int(port.core_atom_map_number)
+        for port in subgraph.attachment_ports
+        if port.core_atom_map_number is not None
+    }
+    if core_maps and all(map_number not in opposite_by_map for map_number in core_maps):
+        return "departing" if subgraph.side == "reactant" else "appearing"
+    port_shapes = {
+        (
+            int(port.core_atom_map_number),
+            port.attachment_element,
+            port.bond_order,
+        )
+        for port in subgraph.attachment_ports
+        if port.core_atom_map_number is not None
+    }
+    opposite_port_shapes = {
+        (
+            int(port.core_atom_map_number),
+            port.attachment_element,
+            port.bond_order,
+        )
+        for candidate in opposite
+        for port in candidate.attachment_ports
+        if port.core_atom_map_number is not None
+    }
+    if port_shapes and not port_shapes.intersection(opposite_port_shapes):
+        return "departing" if subgraph.side == "reactant" else "appearing"
+    return "unresolved"
+
+
+def _with_remote_continuity(
+    reactant_subgraphs: Sequence[ReactionCoreRemoteSubgraph],
+    product_subgraphs: Sequence[ReactionCoreRemoteSubgraph],
+    *,
+    reactant_by_map: Mapping[int, _Location],
+    product_by_map: Mapping[int, _Location],
+) -> Tuple[ReactionCoreRemoteSubgraph, ...]:
+    values = [
+        replace(
+            subgraph,
+            continuity=_remote_continuity(
+                subgraph,
+                product_subgraphs,
+                opposite_by_map=product_by_map,
+            ),  # type: ignore[arg-type]
+        )
+        for subgraph in reactant_subgraphs
+    ]
+    values.extend(
+        replace(
+            subgraph,
+            continuity=_remote_continuity(
+                subgraph,
+                reactant_subgraphs,
+                opposite_by_map=reactant_by_map,
+            ),  # type: ignore[arg-type]
+        )
+        for subgraph in product_subgraphs
+    )
+    return tuple(
+        sorted(
+            values,
+            key=lambda subgraph: (
+                subgraph.side,
+                subgraph.remote_class,
+                subgraph.fragment_smiles,
+                subgraph.component_index,
+                subgraph.atom_indices,
             ),
         )
     )
@@ -416,7 +540,7 @@ def _neighbor_token(molecule: Any, center_index: int, neighbor_index: int) -> st
     )
 
 
-def _boundary_display(boundary_class: ReactionCoreBoundaryClass) -> str:
+def _remote_display(remote_class: ReactionCoreRemoteClass) -> str:
     return {
         "aryl": "Ar",
         "heteroaryl": "HetAr",
@@ -427,7 +551,7 @@ def _boundary_display(boundary_class: ReactionCoreBoundaryClass) -> str:
         "ring_aliphatic": "Cycloalkyl",
         "heteroatom": "X",
         "generic_R": "R",
-    }[boundary_class]
+    }[remote_class]
 
 
 def _bond_prefix(order: str) -> str:
@@ -476,7 +600,10 @@ def _state_label(
     component_index: int,
     atom_index: int,
     active_coordinates: set[_Coordinate],
-    boundary_classes: Mapping[tuple[str, int, int, int], ReactionCoreBoundaryClass],
+    remote_classes: Mapping[
+        tuple[str, int, int, int],
+        ReactionCoreRemoteClass,
+    ],
     side: str,
 ) -> str:
     atom = molecule.GetAtomWithIdx(int(atom_index))
@@ -489,20 +616,16 @@ def _state_label(
             molecule.GetBondBetweenAtoms(atom_index, neighbor_index).GetBondType()
         ).upper()
         if (component_index, neighbor_index) in active_coordinates:
-            value = _active_neighbor_display(
-                molecule,
-                atom_index,
-                neighbor_index,
-            )
+            value = _active_neighbor_display(molecule, atom_index, neighbor_index)
         else:
-            boundary_class = boundary_classes.get(
+            remote_class = remote_classes.get(
                 (side, component_index, atom_index, neighbor_index),
                 "generic_R",
             )
             value = (
                 neighbor.GetSymbol()
-                if boundary_class == "heteroatom"
-                else _boundary_display(boundary_class)
+                if remote_class == "heteroatom"
+                else _remote_display(remote_class)
             )
         tokens.append(f"{_bond_prefix(order)}{value}")
 
@@ -510,7 +633,14 @@ def _state_label(
         plain = token.lstrip("=#:~")
         if plain == "H":
             return 0, token
-        if plain in {"Ar", "HetAr", "R", "Alkenyl", "Alkynyl", "Acyl"}:
+        if plain in {
+            "Ar",
+            "HetAr",
+            "R",
+            "Alkenyl",
+            "Alkynyl",
+            "Acyl",
+        }:
             return 1, token
         if token.startswith(("=", "#", ":", "~")):
             return 3, token
@@ -529,7 +659,10 @@ def _build_atom_state(
     side: str,
     location: _Location,
     active_coordinates: set[_Coordinate],
-    boundary_classes: Mapping[tuple[str, int, int, int], ReactionCoreBoundaryClass],
+    remote_classes: Mapping[
+        tuple[str, int, int, int],
+        ReactionCoreRemoteClass,
+    ],
 ) -> ReactionCoreAtomState:
     component, molecule, atom_index = location
     atom = molecule.GetAtomWithIdx(atom_index)
@@ -545,9 +678,7 @@ def _build_atom_state(
         "formal_charge": int(atom.GetFormalCharge()),
         "aromatic": bool(atom.GetIsAromatic()),
         "hybridization": str(atom.GetHybridization()),
-        "total_hydrogens": int(
-            atom.GetTotalNumHs(includeNeighbors=True)
-        ),
+        "total_hydrogens": int(atom.GetTotalNumHs(includeNeighbors=True)),
         "heavy_atom_degree": sum(
             neighbor.GetAtomicNum() > 1 for neighbor in atom.GetNeighbors()
         ),
@@ -571,10 +702,10 @@ def _build_atom_state(
             component_index=component.component_index,
             atom_index=atom_index,
             active_coordinates=active_coordinates,
-            boundary_classes=boundary_classes,
+            remote_classes=remote_classes,
             side=side,
         ),
-        state_key=_digest("RAS1", state_payload, length=24),
+        state_key=_digest("RAS2", state_payload, length=24),
     )
 
 
@@ -584,24 +715,30 @@ def _edit_graph(
     set[_AtomIdentity],
     Dict[_AtomIdentity, set[_AtomIdentity]],
     Counter[_AtomIdentity],
+    Counter[_AtomIdentity],
     tuple[object, ...],
     Tuple[str, ...],
+    Tuple[_EditRecord, ...],
 ]:
     identities: set[_AtomIdentity] = set()
     adjacency: Dict[_AtomIdentity, set[_AtomIdentity]] = defaultdict(set)
+    incidence: Counter[_AtomIdentity] = Counter()
     heavy_incidence: Counter[_AtomIdentity] = Counter()
     atom_labels: Dict[_AtomIdentity, tuple[object, ...]] = {}
     incidents: Dict[_AtomIdentity, list[tuple[object, ...]]] = defaultdict(list)
     public_tokens = []
+    records = []
     for edit in edits:
         left = _atom_identity(edit.atom_1)
         identities.add(left)
+        incidence[left] += 1
         atom_labels[left] = (
             edit.atom_1.element,
             edit.atom_1.formal_charge,
             edit.atom_1.aromatic,
             edit.atom_1.hybridization,
         )
+        record_identities = [left]
         if edit.atom_2 is None:
             neighbor_label: tuple[object, ...] = ("H",)
             incidents[left].append(
@@ -616,10 +753,12 @@ def _edit_graph(
         else:
             right = _atom_identity(edit.atom_2)
             identities.add(right)
-            adjacency[left].add(right)
-            adjacency[right].add(left)
+            incidence[right] += 1
             heavy_incidence[left] += 1
             heavy_incidence[right] += 1
+            record_identities.append(right)
+            adjacency[left].add(right)
+            adjacency[right].add(left)
             atom_labels[right] = (
                 edit.atom_2.element,
                 edit.atom_2.formal_charge,
@@ -644,13 +783,13 @@ def _edit_graph(
                     edit.new_order or "NONE",
                 )
             )
-            pair = "-".join(
-                sorted((edit.atom_1.element, edit.atom_2.element))
-            )
-        public_tokens.append(
+            pair = "-".join(sorted((edit.atom_1.element, edit.atom_2.element)))
+        token = (
             f"{edit.edit_type}:{pair}:"
             f"{edit.old_order or 'NONE'}>{edit.new_order or 'NONE'}"
         )
+        public_tokens.append(token)
+        records.append((token, tuple(record_identities)))
     graph_payload = tuple(
         sorted(
             (
@@ -663,9 +802,11 @@ def _edit_graph(
     return (
         identities,
         adjacency,
+        incidence,
         heavy_incidence,
         graph_payload,
         tuple(sorted(public_tokens)),
+        tuple(records),
     )
 
 
@@ -690,7 +831,7 @@ def _event_components(
     return tuple(values)
 
 
-def _stable_boundary_count(
+def _stable_remote_count(
     identity: _AtomIdentity,
     *,
     reactant_by_map: Mapping[int, _Location],
@@ -743,10 +884,7 @@ def _state_identity(
         return ("ABSENT",)
     if generic:
         neighbor_tokens = tuple(
-            sorted(
-                "|".join(token.split("|")[:3])
-                for token in state.neighbor_tokens
-            )
+            sorted("|".join(token.split("|")[:3]) for token in state.neighbor_tokens)
         )
         return (
             state.element,
@@ -766,27 +904,67 @@ def _state_identity(
     )
 
 
-def _boundary_identity(
-    boundary: ReactionCoreBoundary,
+def _port_identity(port: ReactionCoreAttachmentPort) -> object:
+    return (
+        port.side,
+        port.attachment_element,
+        port.bond_order,
+    )
+
+
+def _remote_identity(
+    subgraph: ReactionCoreRemoteSubgraph,
     *,
     exact: bool,
 ) -> object:
     base = (
-        boundary.side,
-        boundary.attachment_element,
-        boundary.bond_order,
-        boundary.boundary_class,
-        boundary.continuity,
+        subgraph.side,
+        subgraph.remote_class,
+        subgraph.continuity,
+        tuple(sorted((_port_identity(port) for port in subgraph.attachment_ports))),
     )
     if not exact:
         return base
     return base + (
-        boundary.fragment_smiles,
-        boundary.fragment_heavy_atom_count,
-        boundary.fragment_heteroatom_count,
-        boundary.fragment_aromatic_atom_count,
-        boundary.functional_group_ids,
+        subgraph.fragment_smiles,
+        subgraph.fragment_heavy_atom_count,
+        subgraph.fragment_heteroatom_count,
+        subgraph.fragment_aromatic_atom_count,
+        subgraph.functional_group_ids,
     )
+
+
+def _shape_remote_identity(
+    subgraph: ReactionCoreRemoteSubgraph,
+) -> object:
+    return (
+        subgraph.remote_class,
+        len(subgraph.attachment_ports),
+        tuple(sorted(port.attachment_element for port in subgraph.attachment_ports)),
+        tuple(sorted(port.bond_order for port in subgraph.attachment_ports)),
+        subgraph.functional_group_ids,
+    )
+
+
+def _evidence_status(evidence: str) -> str:
+    if str(evidence).startswith("external"):
+        return "external"
+    if evidence in {
+        "validated_atom_mapping",
+        "validated_mapping_and_exact_reconstruction",
+        "validated_mapping_and_exact_multi_event_reconstruction",
+        "exact_product_reconstruction",
+        "exact_multi_event_reconstruction",
+    }:
+        return "verified"
+    if evidence in {
+        "unique_scaffold_correspondence",
+        "global_atom_correspondence",
+        "fragmented_scaffold_correspondence",
+        "partial_product_correspondence",
+    }:
+        return "inferred"
+    return "hypothesis"
 
 
 def build_reaction_core_projection(
@@ -797,20 +975,17 @@ def build_reaction_core_projection(
     evidence: str,
     confidence: float,
 ) -> Optional[ReactionCoreProjection]:
-    """Build a grammar- and template-free minimized reaction-core projection.
-
-    At least one edited mapped atom must be observed on both sides.  This POC
-    deliberately abstains when only a reactant-side rewrite is available,
-    because it would otherwise present a predicted product state as observed.
-    """
+    """Build a grammar- and template-free minimized reaction-core projection."""
     if not edits:
         return None
     (
         identities,
         adjacency,
+        incidence,
         heavy_incidence,
         edit_graph_payload,
         edit_tokens,
+        edit_records,
     ) = _edit_graph(edits)
     reactant_by_map, reactant_by_coordinate = _component_locations(reactants)
     product_by_map, product_by_coordinate = _component_locations(products)
@@ -839,47 +1014,55 @@ def build_reaction_core_projection(
         "reactant": reactant_active,
         "product": product_active,
     }
-    boundaries = (
-        _build_boundaries_for_side(
-            side="reactant",
-            components=reactants,
-            active_coordinates=reactant_active,
-            opposite_by_map=product_by_map,
-            opposite_active_coordinates=product_active,
-        )
-        + _build_boundaries_for_side(
-            side="product",
-            components=products,
-            active_coordinates=product_active,
-            opposite_by_map=reactant_by_map,
-            opposite_active_coordinates=reactant_active,
-        )
+    reactant_remote = _build_remote_subgraphs_for_side(
+        side="reactant",
+        components=reactants,
+        active_coordinates=reactant_active,
     )
-    boundary_classes = {
+    product_remote = _build_remote_subgraphs_for_side(
+        side="product",
+        components=products,
+        active_coordinates=product_active,
+    )
+    remote_subgraphs = _with_remote_continuity(
+        reactant_remote,
+        product_remote,
+        reactant_by_map=reactant_by_map,
+        product_by_map=product_by_map,
+    )
+    remote_classes = {
         (
-            boundary.side,
-            boundary.core_component_index,
-            boundary.core_atom_index,
-            boundary.attachment_atom_index,
-        ): boundary.boundary_class
-        for boundary in boundaries
+            port.side,
+            port.core_component_index,
+            port.core_atom_index,
+            port.attachment_atom_index,
+        ): subgraph.remote_class
+        for subgraph in remote_subgraphs
+        for port in subgraph.attachment_ports
     }
     event_components = _event_components(identities, adjacency)
-    selected: list[tuple[_AtomIdentity, int]] = []
+    primary_identities = set()
     for event in event_components:
         candidates = [
             identity for identity in event if identity in shared_identities
         ]
         if not candidates:
             continue
-        maximum_incidence = max(heavy_incidence[identity] for identity in candidates)
+        selection_incidence = (
+            heavy_incidence
+            if any(heavy_incidence[identity] for identity in candidates)
+            else incidence
+        )
+        maximum_incidence = max(
+            selection_incidence[identity] for identity in candidates
+        )
         candidates = [
             identity
             for identity in candidates
-            if heavy_incidence[identity] == maximum_incidence
+            if selection_incidence[identity] == maximum_incidence
         ]
         stable_counts = {
-            identity: _stable_boundary_count(
+            identity: _stable_remote_count(
                 identity,
                 reactant_by_map=reactant_by_map,
                 product_by_map=product_by_map,
@@ -888,13 +1071,17 @@ def build_reaction_core_projection(
             for identity in candidates
         }
         maximum_stable = max(stable_counts.values(), default=0)
-        selected.extend(
-            (identity, stable_counts[identity])
+        primary_identities.update(
+            identity
             for identity in candidates
             if stable_counts[identity] == maximum_stable
         )
-    centers = []
-    for identity, stable_count in sorted(selected, key=lambda value: repr(value[0])):
+
+    transition_by_identity: Dict[
+        _AtomIdentity,
+        ReactionCoreAtomTransition,
+    ] = {}
+    for identity in sorted(identities, key=repr):
         before_location = _location_for_identity(
             identity,
             side="reactant",
@@ -912,7 +1099,7 @@ def build_reaction_core_projection(
                 side="reactant",
                 location=before_location,
                 active_coordinates=reactant_active,
-                boundary_classes=boundary_classes,
+                remote_classes=remote_classes,
             )
             if before_location is not None
             else None
@@ -922,59 +1109,169 @@ def build_reaction_core_projection(
                 side="product",
                 location=after_location,
                 active_coordinates=product_active,
-                boundary_classes=boundary_classes,
+                remote_classes=remote_classes,
             )
             if after_location is not None
             else None
         )
-        center_payload = {
+        role = (
+            "primary_center"
+            if identity in primary_identities
+            else "participant"
+        )
+        stable_count = _stable_remote_count(
+            identity,
+            reactant_by_map=reactant_by_map,
+            product_by_map=product_by_map,
+            active_coordinates_by_side=active_coordinates_by_side,
+        )
+        transition_payload = {
             "before": _state_identity(before_state, generic=False),
             "after": _state_identity(after_state, generic=False),
-            "incident_edit_count": heavy_incidence[identity],
-            "stable_boundary_count": stable_count,
+            "incident_edit_count": incidence[identity],
+            "stable_remote_subgraph_count": stable_count,
+            "role": role,
         }
-        centers.append(
-            ReactionCoreCenter(
-                center_id=_digest("RCC1", center_payload, length=24),
-                atom_map_number=(
-                    int(identity[1]) if identity[0] == "map" else None
-                ),
-                before_state=before_state,
-                after_state=after_state,
-                incident_edit_count=heavy_incidence[identity],
-                stable_boundary_count=stable_count,
+        transition_by_identity[identity] = ReactionCoreAtomTransition(
+            transition_id=_digest("RCA2", transition_payload, length=24),
+            atom_map_number=(
+                int(identity[1]) if identity[0] == "map" else None
+            ),
+            before_state=before_state,
+            after_state=after_state,
+            incident_edit_count=incidence[identity],
+            stable_remote_subgraph_count=stable_count,
+            role=role,  # type: ignore[arg-type]
+        )
+    transitions = tuple(
+        sorted(
+            transition_by_identity.values(),
+            key=lambda transition: (
+                transition.role,
+                repr(_state_identity(transition.before_state, generic=False)),
+                repr(_state_identity(transition.after_state, generic=False)),
+                transition.transition_id,
+            ),
+        )
+    )
+    if not transitions or not primary_identities:
+        return None
+
+    events = []
+    for event in event_components:
+        if not any(identity in shared_identities for identity in event):
+            continue
+        event_set = set(event)
+        event_edit_tokens = tuple(
+            sorted(
+                token
+                for token, record_identities in edit_records
+                if set(record_identities).intersection(event_set)
             )
         )
-    if not centers:
-        return None
+        transition_ids = tuple(
+            sorted(transition_by_identity[identity].transition_id for identity in event)
+        )
+        events.append(
+            ReactionCoreEvent(
+                event_id=_digest(
+                    "RCE2",
+                    {
+                        "transitions": tuple(
+                            sorted(
+                                (
+                                    _state_identity(
+                                        transition_by_identity[identity].before_state,
+                                        generic=False,
+                                    ),
+                                    _state_identity(
+                                        transition_by_identity[identity].after_state,
+                                        generic=False,
+                                    ),
+                                )
+                                for identity in event
+                            )
+                        ),
+                        "edits": event_edit_tokens,
+                    },
+                    length=24,
+                ),
+                transition_ids=transition_ids,
+                edit_tokens=event_edit_tokens,
+            )
+        )
+    events = sorted(events, key=lambda event: (event.edit_tokens, event.event_id))
+
+    primary = tuple(
+        transition
+        for transition in transitions
+        if transition.role == "primary_center"
+    )
     center_transition_payload = tuple(
         sorted(
             (
-                _state_identity(center.before_state, generic=False),
-                _state_identity(center.after_state, generic=False),
+                _state_identity(transition.before_state, generic=False),
+                _state_identity(transition.after_state, generic=False),
             )
-            for center in centers
+            for transition in primary
         )
     )
-    generic_transition_payload = tuple(
+    generic_center_payload = tuple(
         sorted(
             (
-                _state_identity(center.before_state, generic=True),
-                _state_identity(center.after_state, generic=True),
+                _state_identity(transition.before_state, generic=True),
+                _state_identity(transition.after_state, generic=True),
             )
-            for center in centers
+            for transition in primary
+        )
+    )
+    all_transition_payload = tuple(
+        sorted(
+            (
+                transition.role,
+                _state_identity(transition.before_state, generic=False),
+                _state_identity(transition.after_state, generic=False),
+                transition.incident_edit_count,
+            )
+            for transition in transitions
+        )
+    )
+    participant_tokens = tuple(
+        sorted(
+            (
+                *_participant_tokens(
+                    reactants,
+                    reactant_active,
+                    side="reactant",
+                ),
+                *_participant_tokens(
+                    products,
+                    product_active,
+                    side="product",
+                ),
+            )
+        )
+    )
+    retained_shape = tuple(
+        sorted(
+            {
+                _shape_remote_identity(subgraph)
+                for subgraph in remote_subgraphs
+                if subgraph.continuity == "retained"
+            },
+            key=repr,
         )
     )
     exact_key = _digest(
-        "RCX1",
+        "RCX2",
         {
             "edit_graph": edit_graph_payload,
-            "centers": center_transition_payload,
-            "boundaries": tuple(
+            "transitions": all_transition_payload,
+            "remote_subgraphs": tuple(
                 sorted(
                     (
-                        _boundary_identity(boundary, exact=True)
-                        for boundary in boundaries
+                        _remote_identity(subgraph, exact=True)
+                        for subgraph in remote_subgraphs
                     ),
                     key=repr,
                 )
@@ -983,15 +1280,15 @@ def build_reaction_core_projection(
         },
     )
     typed_key = _digest(
-        "RCT1",
+        "RCT2",
         {
             "edit_graph": edit_graph_payload,
-            "centers": center_transition_payload,
-            "boundaries": tuple(
+            "transitions": all_transition_payload,
+            "remote_subgraphs": tuple(
                 sorted(
                     (
-                        _boundary_identity(boundary, exact=False)
-                        for boundary in boundaries
+                        _remote_identity(subgraph, exact=False)
+                        for subgraph in remote_subgraphs
                     ),
                     key=repr,
                 )
@@ -999,16 +1296,18 @@ def build_reaction_core_projection(
             "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
         },
     )
-    generic_key = _digest(
-        "RCG1",
+    shape_key = _digest(
+        "RSH2",
         {
-            "centers": generic_transition_payload,
-            "edit_tokens": edit_tokens,
+            "primary_centers": generic_center_payload,
+            "participant_tokens": participant_tokens,
+            "retained_remote_subgraphs": retained_shape,
+            "event_count": len(events),
             "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
         },
     )
     center_transition_key = _digest(
-        "RCS1",
+        "RCS2",
         {
             "centers": center_transition_payload,
             "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
@@ -1016,31 +1315,38 @@ def build_reaction_core_projection(
     )
     generic_label = " + ".join(
         (
-            f"{center.before_state.concise_label if center.before_state else '∅'}"
+            f"{transition.before_state.concise_label if transition.before_state else '∅'}"
             " → "
-            f"{center.after_state.concise_label if center.after_state else '∅'}"
+            f"{transition.after_state.concise_label if transition.after_state else '∅'}"
         )
-        for center in centers
+        for transition in primary
     )
     warnings = set()
     if any(
-        boundary.continuity == "unresolved" for boundary in boundaries
+        subgraph.continuity == "unresolved"
+        for subgraph in remote_subgraphs
     ):
-        warnings.add("REACTION_CORE_BOUNDARY_CONTINUITY_UNRESOLVED")
+        warnings.add("REACTION_CORE_REMOTE_CONTINUITY_UNRESOLVED")
     if any(identity[0] != "map" for identity in identities):
         warnings.add("REACTION_CORE_PARTIAL_ATOM_PROVENANCE")
     if str(evidence).startswith("external"):
         warnings.add("REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL")
+    if any(
+        _state_identity(transition.before_state, generic=False)
+        == _state_identity(transition.after_state, generic=False)
+        for transition in primary
+    ):
+        warnings.add("REACTION_CORE_NO_OP_PRIMARY_CENTER")
     core_id = _digest(
-        "RCP1",
+        "RCP2",
         {
             "keys": (
                 exact_key,
                 typed_key,
-                generic_key,
+                shape_key,
                 center_transition_key,
             ),
-            "algorithm_version": "reaction_core_projection.v1",
+            "algorithm_version": REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
             "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
         },
         length=64,
@@ -1049,32 +1355,18 @@ def build_reaction_core_projection(
         core_id=core_id,
         exact_core_key=exact_key,
         typed_core_key=typed_key,
-        generic_core_key=generic_key,
+        shape_core_key=shape_key,
         center_transition_key=center_transition_key,
-        centers=tuple(centers),
-        boundaries=tuple(
-            sorted(
-                boundaries,
-                key=lambda boundary: (
-                    boundary.side,
-                    boundary.boundary_class,
-                    boundary.fragment_smiles,
-                    boundary.core_component_index,
-                    boundary.core_atom_index,
-                ),
-            )
-        ),
+        atom_transitions=transitions,
+        events=tuple(events),
+        remote_subgraphs=remote_subgraphs,
         edit_tokens=edit_tokens,
+        participant_tokens=participant_tokens,
         generic_label=generic_label,
         active_atom_count=len(identities),
-        event_count=len(
-            [
-                event
-                for event in event_components
-                if any(identity in shared_identities for identity in event)
-            ]
-        ),
+        event_count=len(events),
         evidence=str(evidence),
+        evidence_status=_evidence_status(str(evidence)),  # type: ignore[arg-type]
         confidence=float(confidence),
         warnings=tuple(sorted(warnings)),
     )

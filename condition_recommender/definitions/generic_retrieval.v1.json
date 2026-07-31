@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.6",
+  "schema_version": "1.7",
   "definition_id": "generic_retrieval.v1",
   "calibration_status": "calibrated_sample_v1",
   "minimum_pool_size": 2,
@@ -15,6 +15,7 @@
     "transformation_signature",
     "environment_neighbors",
     "bond_edit_signature",
+    "reaction_core_shape",
     "edit_graph_neighbors"
   ],
   "evaluation_ladders": {
@@ -27,6 +28,7 @@
       "transformation_signature",
       "environment_neighbors",
       "bond_edit_signature",
+      "reaction_core_shape",
       "edit_graph_neighbors"
     ],
     "transformation_prior": [
@@ -38,6 +40,7 @@
       "named_family",
       "transformation_signature",
       "bond_edit_signature",
+      "reaction_core_shape",
       "edit_graph_neighbors"
     ]
   },

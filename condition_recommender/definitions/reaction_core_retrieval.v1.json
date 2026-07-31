@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "reaction_core_retrieval.v1",
+  "calibration_status": "poc_review_only_not_calibrated",
+  "minimum_pool_size": 2,
+  "allowed_query_evidence_statuses": [
+    "verified",
+    "inferred",
+    "external"
+  ],
+  "blocking_query_warnings": [
+    "REACTION_CORE_NO_OP_PRIMARY_CENTER",
+    "REACTION_CORE_REMOTE_CONTINUITY_UNRESOLVED"
+  ],
+  "verified_precedents_only": true
+}

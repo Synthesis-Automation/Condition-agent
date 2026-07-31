@@ -8,6 +8,7 @@ from typing import Any, Dict, Iterable
 from ..models import RecommendationRecord
 from .signature_serialization import (
     flattened_fallback_fields,
+    flattened_reaction_core_fields,
     flattened_signature_fields,
 )
 
@@ -80,6 +81,14 @@ GENERIC_REVIEW_FIELDS = (
     "signature_l3_bond_edit",
     "signature_l4_environment",
     "reaction_signature_json",
+    "reaction_core_id",
+    "reaction_core_exact",
+    "reaction_core_typed",
+    "reaction_core_shape",
+    "reaction_core_center_transition",
+    "reaction_core_label",
+    "reaction_core_evidence_status",
+    "reaction_core_json",
     "fallback_descriptor_id",
     "fallback_descriptor_evidence_mode",
     "fallback_descriptor_retrieval_eligible",
@@ -243,6 +252,7 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "reaction_event_count": signature.get("event_count", ""),
         "reaction_event_scope": signature.get("event_scope", ""),
         **flattened_signature_fields(record.reaction_signature),
+        **flattened_reaction_core_fields(record.reaction_core),
         "partial_transformation_key": (
             (record.fallback_descriptor or {}).get(
                 "partial_transformation_key",

@@ -1,9 +1,13 @@
+from dataclasses import asdict
 from pathlib import Path
 
 import pytest
 
 from reactive_taxonomy import (
+    REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
+    REACTION_CORE_PROJECTION_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
+    featurize_reaction,
     reaction_signature_definition_versions,
 )
 
@@ -16,7 +20,11 @@ from condition_recommender.conversion.engine import convert_datasets
 from condition_recommender.generic_api import recommend_indexed_signature
 from condition_recommender.generic_indexing import (
     build_generic_index,
+    load_generic_index,
     save_generic_index,
+)
+from condition_recommender.core_retrieval import (
+    retrieve_core_shape_pool_with_trace,
 )
 from condition_recommender.hypothesis_retrieval import (
     load_edit_hypothesis_retrieval_rules,
@@ -142,8 +150,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.5",
-        "converter_definition_version": "generic_conversion.v2.5",
+        "schema_version": "3.8",
+        "converter_definition_version": "generic_conversion.v2.9",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",
@@ -167,6 +175,27 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
             "recipe_core_id": recipe_core_id,
         },
         "condition_resolution": {"has_uncertainty": False},
+    }
+
+
+def _core(
+    token: str,
+    *,
+    shape: str = "RSH2:shared",
+    center: str = "RCS2:shared",
+    evidence_status: str = "verified",
+) -> dict:
+    return {
+        "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+        "algorithm_version": REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
+        "core_id": f"RCP2:{token}",
+        "exact_core_key": f"RCX2:{token}",
+        "typed_core_key": f"RCT2:{token}",
+        "shape_core_key": shape,
+        "center_transition_key": center,
+        "event_count": 1,
+        "evidence_status": evidence_status,
+        "warnings": [],
     }
 
 
@@ -289,6 +318,128 @@ def test_related_edit_graph_can_cross_exact_bond_key_gate() -> None:
     level, pool = retrieve_generic_pool(query, build_generic_index(records))
     assert level == "edit_graph_neighbors"
     assert len(pool) == 3
+
+
+def test_retrieval_uses_core_shape_after_exact_edit_tiers() -> None:
+    query = _signature(
+        "query",
+        exact="query-exact",
+        handles="query-handles",
+        transformation="query-transformation",
+        bond="query-bond",
+        environment="query-environment",
+        family=None,
+    )
+    records = []
+    for index in range(2):
+        record = _record(
+            index,
+            _signature(
+                str(index),
+                exact=f"exact-{index}",
+                handles=f"handles-{index}",
+                transformation=f"transformation-{index}",
+                bond=f"bond-{index}",
+                environment=f"environment-{index}",
+                family=None,
+            ),
+        )
+        record["reaction_core"] = _core(str(index))
+        records.append(record)
+
+    level, pool = retrieve_generic_pool(
+        query,
+        build_generic_index(records),
+        reaction_core=_core("query", evidence_status="external"),
+    )
+
+    assert level == "reaction_core_shape"
+    assert len(pool) == 2
+
+
+def test_core_center_key_alone_cannot_retrieve_precedents() -> None:
+    records = []
+    for index in range(2):
+        record = _record(index, _signature(str(index)))
+        record["reaction_core"] = _core(
+            str(index),
+            shape=f"RSH2:candidate-{index}",
+            center="RCS2:coarse-shared",
+        )
+        records.append(record)
+    index = build_generic_index(records)
+
+    result = retrieve_core_shape_pool_with_trace(
+        _core(
+            "query",
+            shape="RSH2:query-only",
+            center="RCS2:coarse-shared",
+            evidence_status="external",
+        ),
+        _signature("compatibility"),
+        index,
+    )
+
+    assert result.level == "no_reaction_core_shape_precedent"
+    assert not result.pool
+    assert index.core_centers["RCS2:coarse-shared"] == (0, 1)
+
+
+def test_reaction_core_with_unresolved_remote_continuity_is_blocked() -> None:
+    record = _record(1, _signature("one"))
+    record["reaction_core"] = _core("one")
+    query_core = _core("query", evidence_status="external")
+    query_core["warnings"] = [
+        "REACTION_CORE_REMOTE_CONTINUITY_UNRESOLVED"
+    ]
+
+    result = retrieve_core_shape_pool_with_trace(
+        query_core,
+        _signature("compatibility"),
+        build_generic_index([record]),
+    )
+
+    assert result.level == "reaction_core_has_blocking_warning"
+    assert not result.pool
+
+
+def test_unsigned_mapped_core_query_returns_review_qualified_result() -> None:
+    reaction = (
+        "[Br:19][c:5]1[cH:4][cH:1][c:8]([Br:20])[cH:7][cH:6]1."
+        "O[B:21](O)[c:9]1[cH:10][cH:11][cH:12][cH:13][cH:14]1"
+        ">>[cH:1]1[cH:2][cH:3][c:4](-[c:5]2[cH:6][cH:7]"
+        "[c:8](-[c:9]3[cH:10][cH:11][cH:12][cH:13][cH:14]3)"
+        "[cH:15][cH:16]2)[cH:17][cH:18]1"
+    )
+    analysis = featurize_reaction(reaction)
+    assert analysis.reaction_signature is None
+    assert analysis.reaction_core is not None
+    assert analysis.partial_product_transformation is None
+    core = asdict(analysis.reaction_core)
+    fallback = (
+        asdict(analysis.fallback_descriptor)
+        if analysis.fallback_descriptor is not None
+        else {}
+    )
+    records = []
+    for index in range(2):
+        record = _record(index, _signature(str(index)))
+        record["reaction_core"] = core
+        record["fallback_descriptor"] = fallback
+        records.append(record)
+
+    result = GenericConditionRecommender(
+        build_generic_index(records)
+    ).recommend(reaction)
+
+    assert result.valid
+    assert result.recommendation_mode == "reaction_core_review"
+    assert result.retrieval_strategy == "reaction_core_shape"
+    assert result.retrieval_level == "reaction_core_shape"
+    assert result.query_signature_id is None
+    assert result.query_reaction_core_id == core["core_id"]
+    assert "QUERY_TRANSFORMATION_NOT_VERIFIED" in result.warnings
+    assert "REACTION_CORE_SHAPE_RETRIEVAL_USED" in result.warnings
 
 
 def test_compatibility_exclusion_continues_to_relaxed_tier() -> None:
@@ -531,7 +682,7 @@ def test_generic_fallback_discloses_reaction_scope_mismatch() -> None:
 
     assert result.valid
     assert result.retrieval_level == "environment_neighbors"
-    assert result.retrieval_definition_version == "1.6"
+    assert result.retrieval_definition_version == "1.7"
     assert "REACTION_TOPOLOGY_FALLBACK_USED" in result.warnings
     assert any(
         caution.startswith("Reaction-scope mismatch:")
@@ -727,9 +878,10 @@ def test_generic_retrieval_weights_are_normalized() -> None:
     ranking = load_generic_ranking_rules()
     assert round(sum(similarity["weights"].values()), 10) == 1.0
     assert round(sum(ranking["weights"].values()), 10) == 1.0
-    assert rules["retrieval_ladder"][-3:] == [
+    assert rules["retrieval_ladder"][-4:] == [
         "environment_neighbors",
         "bond_edit_signature",
+        "reaction_core_shape",
         "edit_graph_neighbors",
     ]
     hypothesis_rules = load_edit_hypothesis_retrieval_rules()
@@ -777,6 +929,26 @@ def test_preloaded_recommender_loads_the_index_once(
     recommender.recommend(reaction, minimum_pool_size=1)
 
     assert calls == [str(path)]
+
+
+def test_reaction_core_index_round_trip_preserves_lookup_maps(
+    tmp_path: Path,
+) -> None:
+    record = _record(1, _signature("one"))
+    record["reaction_core"] = _core("one")
+    path = tmp_path / "index.json"
+
+    save_generic_index(build_generic_index([record]), path)
+    restored = load_generic_index(path)
+
+    assert restored.rows[0].reaction_core["core_id"] == "RCP2:one"
+    assert restored.core_shapes["RSH2:shared"] == (0,)
+    assert restored.reaction_core_schema_version == (
+        REACTION_CORE_PROJECTION_SCHEMA_VERSION
+    )
+    assert restored.reaction_core_algorithm_version == (
+        REACTION_CORE_PROJECTION_ALGORITHM_VERSION
+    )
 
 
 def test_ambiguous_query_retrieves_only_edit_hypothesis_consensus() -> None:
@@ -852,7 +1024,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "2.3"
+    assert result.schema_version == "2.4"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")

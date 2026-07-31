@@ -15,7 +15,7 @@ from reactive_taxonomy import render_reactivity_profile
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.4"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.5"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -24,6 +24,11 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "detection_status",
     "transformation_class",
     "signature_id",
+    "reaction_core_id",
+    "reaction_core_shape_key",
+    "reaction_core_label",
+    "reaction_core_evidence_status",
+    "reaction_core_remote_classes",
     "fallback_descriptor_id",
     "fallback_evidence_mode",
     "fallback_retrieval_eligible",
@@ -214,6 +219,10 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     display_value = display if isinstance(display, Mapping) else {}
     signature = record.get("reaction_signature")
     signature_value = signature if isinstance(signature, Mapping) else {}
+    reaction_core = record.get("reaction_core")
+    reaction_core_value = (
+        reaction_core if isinstance(reaction_core, Mapping) else {}
+    )
     fallback = record.get("fallback_descriptor")
     fallback_value = fallback if isinstance(fallback, Mapping) else {}
     completeness = record.get("reaction_completeness")
@@ -246,6 +255,7 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
                 + tuple(partial_value.get("warnings") or ())
                 + tuple(fallback_value.get("warnings") or ())
                 + tuple(external_mapping_value.get("warnings") or ())
+                + tuple(reaction_core_value.get("warnings") or ())
             )
             if value
         }
@@ -272,6 +282,27 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or ""
         ),
         "signature_id": str(signature_value.get("signature_id") or ""),
+        "reaction_core_id": str(reaction_core_value.get("core_id") or ""),
+        "reaction_core_shape_key": str(
+            reaction_core_value.get("shape_core_key") or ""
+        ),
+        "reaction_core_label": str(
+            reaction_core_value.get("generic_label") or ""
+        ),
+        "reaction_core_evidence_status": str(
+            reaction_core_value.get("evidence_status") or ""
+        ),
+        "reaction_core_remote_classes": "; ".join(
+            sorted(
+                {
+                    str(value.get("remote_class") or "")
+                    for value in (
+                        reaction_core_value.get("remote_subgraphs") or ()
+                    )
+                    if isinstance(value, Mapping) and value.get("remote_class")
+                }
+            )
+        ),
         "fallback_descriptor_id": str(fallback_value.get("descriptor_id") or ""),
         "fallback_evidence_mode": str(fallback_value.get("evidence_mode") or ""),
         "fallback_retrieval_eligible": _text_or_blank(

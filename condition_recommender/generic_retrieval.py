@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, Literal, Mapping, Tuple
 
 from .compatibility import CompatibilityAssessment, filter_compatible_precedents
+from .core_retrieval import reaction_core_query_eligible
 from .edit_prototypes import (
     anonymous_edit_prototype,
     anonymous_edit_similarity,
@@ -30,6 +31,7 @@ _SUPPORTED_RETRIEVAL_LEVELS = {
     "transformation_signature",
     "environment_neighbors",
     "bond_edit_signature",
+    "reaction_core_shape",
     "edit_graph_neighbors",
 }
 RetrievalStrategy = Literal[
@@ -51,7 +53,7 @@ _EVALUATION_STRATEGIES = {
 def load_generic_retrieval_rules() -> Dict[str, Any]:
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if str(rules.get("schema_version") or "") != "1.6":
+    if str(rules.get("schema_version") or "") != "1.7":
         raise ValueError("unsupported generic retrieval definition schema")
     if str(rules.get("definition_id") or "") != "generic_retrieval.v1":
         raise ValueError("unexpected generic retrieval definition ID")
@@ -111,6 +113,7 @@ def _candidate_levels(
     signature: Mapping[str, Any],
     index: GenericReactionIndex,
     *,
+    reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
 ) -> list[tuple[str, set[int]]]:
     compatible = _compatible_edit_positions(signature, index)
@@ -119,7 +122,8 @@ def _candidate_levels(
         index,
         exclude=compatible,
     )
-    if not compatible and not edit_graph_neighbors:
+    core_shape_positions = _core_shape_positions(reaction_core, index)
+    if not compatible and not edit_graph_neighbors and not core_shape_positions:
         return []
     rules = load_generic_retrieval_rules()
     family = str(signature.get("named_family") or "")
@@ -151,6 +155,7 @@ def _candidate_levels(
             signature, index, compatible
         ),
         "bond_edit_signature": compatible,
+        "reaction_core_shape": core_shape_positions,
         "edit_graph_neighbors": edit_graph_neighbors,
     }
     ladder = (
@@ -161,6 +166,30 @@ def _candidate_levels(
     if not ladder:
         raise ValueError(f"Unsupported generic retrieval strategy: {strategy}")
     return [(level, candidates[level]) for level in ladder]
+
+
+def _core_shape_positions(
+    reaction_core: Mapping[str, Any] | None,
+    index: GenericReactionIndex,
+) -> set[int]:
+    """Return verified precedents sharing the mapping-robust core shape."""
+    if not reaction_core:
+        return set()
+    eligible, _ = reaction_core_query_eligible(reaction_core, index)
+    if not eligible:
+        return set()
+    shape_key = str(reaction_core.get("shape_core_key") or "")
+    if not shape_key:
+        return set()
+    event_count = int(reaction_core.get("event_count") or 0)
+    return {
+        position
+        for position in index.core_shapes.get(shape_key, ())
+        if index.rows[position].signature
+        and index.rows[position].reaction_core
+        and int(index.rows[position].reaction_core.get("event_count") or 0)
+        == event_count
+    }
 
 
 def _edit_graph_neighbor_positions(
@@ -249,6 +278,7 @@ def retrieve_generic_pool_with_trace(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
 ) -> tuple[
     str,
@@ -257,7 +287,12 @@ def retrieve_generic_pool_with_trace(
 ]:
     """Select by independent support and retain every attempted tier."""
     minimum = _minimum_support(minimum_pool_size)
-    levels = _candidate_levels(signature, index, strategy=strategy)
+    levels = _candidate_levels(
+        signature,
+        index,
+        reaction_core=reaction_core,
+        strategy=strategy,
+    )
     if not levels:
         trace = RetrievalLevelTrace(
             level="bond_edit_gate",
@@ -331,6 +366,7 @@ def retrieve_generic_pool(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
 ) -> Tuple[str, Tuple[GenericIndexedReaction, ...]]:
     """Compatibility wrapper returning the historical two-value result."""
@@ -338,6 +374,7 @@ def retrieve_generic_pool(
         signature,
         index,
         minimum_pool_size=minimum_pool_size,
+        reaction_core=reaction_core,
         strategy=strategy,
     )
     return level, rows
@@ -361,11 +398,17 @@ def retrieve_compatible_generic_pool_with_trace(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
 ) -> CompatibleRetrievalResult:
     """Apply compatibility before independent-support checks at every tier."""
     minimum = _minimum_support(minimum_pool_size)
-    levels = _candidate_levels(signature, index, strategy=strategy)
+    levels = _candidate_levels(
+        signature,
+        index,
+        reaction_core=reaction_core,
+        strategy=strategy,
+    )
     if not levels:
         trace = RetrievalLevelTrace(
             level="bond_edit_gate",
@@ -493,6 +536,7 @@ def retrieve_compatible_generic_pool(
     index: GenericReactionIndex,
     *,
     minimum_pool_size: int | None = None,
+    reaction_core: Mapping[str, Any] | None = None,
     strategy: RetrievalStrategy = "hybrid",
 ) -> tuple[
     str,
@@ -505,6 +549,7 @@ def retrieve_compatible_generic_pool(
         signature,
         index,
         minimum_pool_size=minimum_pool_size,
+        reaction_core=reaction_core,
         strategy=strategy,
     )
     return (

@@ -1,4 +1,4 @@
-"""Temporary shared serialization helpers for Phase A reaction signatures."""
+"""Canonical serialization helpers for reaction observations and signatures."""
 
 from __future__ import annotations
 
@@ -11,6 +11,11 @@ def signature_record_fields(analysis: Any) -> Dict[str, Any]:
     """Return RecommendationRecord keyword fields from a reaction analysis."""
     signature = analysis.reaction_signature
     evidence_fields = {
+        "reaction_core": (
+            asdict(analysis.reaction_core)
+            if analysis.reaction_core is not None
+            else None
+        ),
         "reaction_evidence_candidates": tuple(
             asdict(candidate)
             for candidate in analysis.evidence_candidates
@@ -89,8 +94,35 @@ def flattened_fallback_fields(
     }
 
 
+def flattened_reaction_core_fields(
+    core: Dict[str, Any] | None,
+) -> Dict[str, Any]:
+    """Expose minimized-core identity and canonical review JSON."""
+    value = core or {}
+    return {
+        "reaction_core_id": value.get("core_id", ""),
+        "reaction_core_exact": value.get("exact_core_key", ""),
+        "reaction_core_typed": value.get("typed_core_key", ""),
+        "reaction_core_shape": value.get("shape_core_key", ""),
+        "reaction_core_center_transition": value.get(
+            "center_transition_key",
+            "",
+        ),
+        "reaction_core_label": value.get("generic_label", ""),
+        "reaction_core_evidence_status": value.get("evidence_status", ""),
+        "reaction_core_json": json.dumps(
+            core,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        if core
+        else "",
+    }
+
+
 __all__ = [
     "flattened_fallback_fields",
+    "flattened_reaction_core_fields",
     "flattened_signature_fields",
     "signature_record_fields",
 ]

@@ -11,7 +11,8 @@ from .models import CompoundAnalysis
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.0"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.3"
-REACTION_CORE_PROJECTION_SCHEMA_VERSION = "1.0"
+REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.0"
+REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v2"
 
 EditArchetype = Literal[
     "substitution",
@@ -730,7 +731,7 @@ class ReactionFallbackDescriptor:
     schema_version: str = REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION
 
 
-ReactionCoreBoundaryClass = Literal[
+ReactionCoreRemoteClass = Literal[
     "aryl",
     "heteroaryl",
     "alkyl",
@@ -764,22 +765,22 @@ class ReactionCoreAtomState:
 
 
 @dataclass(frozen=True)
-class ReactionCoreCenter:
-    """One template-free center selected from a connected edit event."""
+class ReactionCoreAtomTransition:
+    """Before/after state of one atom participating in the minimized graph."""
 
-    center_id: str
+    transition_id: str
     atom_map_number: Optional[int]
     before_state: Optional[ReactionCoreAtomState]
     after_state: Optional[ReactionCoreAtomState]
     incident_edit_count: int
-    stable_boundary_count: int
+    stable_remote_subgraph_count: int
+    role: Literal["primary_center", "participant"]
 
 
 @dataclass(frozen=True)
-class ReactionCoreBoundary:
-    """One typed attachment from the retained edit core to a removed branch."""
+class ReactionCoreAttachmentPort:
+    """One cut connection between an active atom and a remote subgraph."""
 
-    boundary_id: str
     side: Literal["reactant", "product"]
     core_component_index: int
     core_atom_index: int
@@ -788,15 +789,36 @@ class ReactionCoreBoundary:
     attachment_atom_map_number: Optional[int]
     attachment_element: str
     bond_order: str
-    boundary_class: ReactionCoreBoundaryClass
+
+
+@dataclass(frozen=True)
+class ReactionCoreRemoteSubgraph:
+    """One connected graph removed from the active minimized reaction graph."""
+
+    subgraph_id: str
+    side: Literal["reactant", "product"]
+    component_index: int
+    atom_indices: Tuple[int, ...]
+    atom_map_numbers: Tuple[int, ...]
+    remote_class: ReactionCoreRemoteClass
     continuity: Literal[
-        "retained", "reactant_only", "product_only", "unresolved"
+        "retained", "departing", "appearing", "changed", "unresolved"
     ]
+    attachment_ports: Tuple[ReactionCoreAttachmentPort, ...]
     fragment_smiles: str
     fragment_heavy_atom_count: int
     fragment_heteroatom_count: int
     fragment_aromatic_atom_count: int
     functional_group_ids: Tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class ReactionCoreEvent:
+    """One connected minimized edit event."""
+
+    event_id: str
+    transition_ids: Tuple[str, ...]
+    edit_tokens: Tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -806,37 +828,45 @@ class ReactionCoreProjection:
     core_id: str
     exact_core_key: str
     typed_core_key: str
-    generic_core_key: str
+    shape_core_key: str
     center_transition_key: str
-    centers: Tuple[ReactionCoreCenter, ...]
-    boundaries: Tuple[ReactionCoreBoundary, ...]
+    atom_transitions: Tuple[ReactionCoreAtomTransition, ...]
+    events: Tuple[ReactionCoreEvent, ...]
+    remote_subgraphs: Tuple[ReactionCoreRemoteSubgraph, ...]
     edit_tokens: Tuple[str, ...]
+    participant_tokens: Tuple[str, ...]
     generic_label: str
     active_atom_count: int
     event_count: int
     evidence: str
+    evidence_status: Literal["verified", "inferred", "external", "hypothesis"]
     confidence: float
     warnings: Tuple[str, ...] = ()
-    algorithm_version: str = "reaction_core_projection.v1"
+    algorithm_version: str = REACTION_CORE_PROJECTION_ALGORITHM_VERSION
     schema_version: str = REACTION_CORE_PROJECTION_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
-        if not self.core_id.startswith("RCP1:"):
-            raise ValueError("core_id must use the RCP1 namespace")
-        if not self.exact_core_key.startswith("RCX1:"):
-            raise ValueError("exact_core_key must use the RCX1 namespace")
-        if not self.typed_core_key.startswith("RCT1:"):
-            raise ValueError("typed_core_key must use the RCT1 namespace")
-        if not self.generic_core_key.startswith("RCG1:"):
-            raise ValueError("generic_core_key must use the RCG1 namespace")
-        if not self.center_transition_key.startswith("RCS1:"):
+        if not self.core_id.startswith("RCP2:"):
+            raise ValueError("core_id must use the RCP2 namespace")
+        if not self.exact_core_key.startswith("RCX2:"):
+            raise ValueError("exact_core_key must use the RCX2 namespace")
+        if not self.typed_core_key.startswith("RCT2:"):
+            raise ValueError("typed_core_key must use the RCT2 namespace")
+        if not self.shape_core_key.startswith("RSH2:"):
+            raise ValueError("shape_core_key must use the RSH2 namespace")
+        if not self.center_transition_key.startswith("RCS2:"):
             raise ValueError(
-                "center_transition_key must use the RCS1 namespace"
+                "center_transition_key must use the RCS2 namespace"
             )
         if not 0.0 <= self.confidence <= 1.0:
             raise ValueError("confidence must be between 0 and 1")
-        if not self.centers:
-            raise ValueError("a reaction-core projection requires a center")
+        if not self.atom_transitions:
+            raise ValueError("a reaction-core projection requires active atoms")
+        if not any(
+            transition.role == "primary_center"
+            for transition in self.atom_transitions
+        ):
+            raise ValueError("a reaction-core projection requires a primary center")
 
 
 @dataclass(frozen=True)
@@ -926,7 +956,7 @@ class ReactionAnalysis:
     reaction_core: Optional[ReactionCoreProjection] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "3.4"
+    schema_version: str = "3.5"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -952,6 +982,7 @@ __all__ = [
     "ProductConnection",
     "ProductConnectionEndpoint",
     "ProductTransformation",
+    "REACTION_CORE_PROJECTION_ALGORITHM_VERSION",
     "REACTION_CORE_PROJECTION_SCHEMA_VERSION",
     "REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION",
     "REACTION_SIGNATURE_SCHEMA_VERSION",
@@ -961,10 +992,12 @@ __all__ = [
     "ReactionCompletenessAssessment",
     "ReactionComponent",
     "ReactionCoreAtomState",
-    "ReactionCoreBoundary",
-    "ReactionCoreBoundaryClass",
-    "ReactionCoreCenter",
+    "ReactionCoreAtomTransition",
+    "ReactionCoreAttachmentPort",
+    "ReactionCoreEvent",
     "ReactionCoreProjection",
+    "ReactionCoreRemoteClass",
+    "ReactionCoreRemoteSubgraph",
     "ReactionDisplayLabel",
     "ReactionEdit",
     "ReactionEditHypothesis",

@@ -52,11 +52,12 @@ reactive_taxonomy       condition_registry
 | External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, persisted with model provenance, and never admitted as verified precedents |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting, observation-only product-origin gaps, and typed fragment-source requirements |
 | Reaction signatures | Implemented | Deterministic RS3 L0–L4 signatures, events, topology, profiles, spectators, unknown-family support |
+| Reaction minimization | V2 integrated, calibration pending | Template-free mapped-edit core projection with atom transitions, remote subgraphs, typed attachment ports, robust shape keys, review export, verified-precedent index maps, and conservative query routing |
 | Reactivity descriptors | Implemented and active | Typed context-aware profiles are the sole active environment path |
 | Condition registry | Implemented, curation incomplete | Conservative identity resolution, contextual roles, RCORE1/RCR1 recipes, stages, provenance |
 | Generic conversion | Implemented | Nested canonical records, independent quality dimensions, review exports, sharding, restart/integrity checks |
-| Generic index | Implemented | Version-checked persisted index with signature, exact partial-transformation, environment, family, fallback, recipe, and reference keys |
-| Generic retrieval | Implemented pilot | Explicit verified-signature ladder plus conservative all-hypothesis query consensus, independent-support thresholds, hard compatibility, similarity, and reference-aware recipe aggregation |
+| Generic index | Implemented | Version-checked persisted index with signature, reaction-core, exact partial-transformation, environment, family, fallback, recipe, and reference keys |
+| Generic retrieval | Implemented pilot | Explicit verified-signature ladder, robust reaction-core shape tier, conservative unsigned-query core and all-hypothesis routes, independent-support thresholds, hard compatibility, similarity, and reference-aware recipe aggregation |
 | Source-supported partial transformations | Implemented, review-qualified | Product-observed attachment replacement may retrieve only exact partial transformations whose precedent conditions have a curated source capability |
 | Unverified-query fallback | Implemented, conservative | Separate structure-derived fallback for other unsigned queries; not represented as verified edit retrieval |
 | Evaluation and calibration | Implemented tooling | Grouped, scaffold-, source-, and time-disjoint modes; baselines; calibration; blind review/adjudication |
@@ -74,23 +75,25 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `3.4` |
+| Reaction analysis | `3.5` |
 | Reaction signature / ID namespace | `3.0` / `RS3` |
+| Reaction core projection / algorithm | `2.0` / `reaction_core_projection.v2` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
 | Connectivity rewrite | `2.0` |
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `1.3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `3.7` |
-| Generic converter definition | `generic_conversion.v2.8` |
+| Recommendation record | `3.8` |
+| Generic converter definition | `generic_conversion.v2.9` |
 | Generic sharded converter definition | `generic_sharded_conversion.v1.6` |
-| Concise reaction review | `2.4` |
+| Concise reaction review | `2.5` |
 | Recommendation artifact workflow | `1.1` |
-| Generic persisted index | `2.4` |
-| Generic recommendation result | `2.3` |
+| Generic persisted index | `2.5` |
+| Generic recommendation result | `2.4` |
 | Reaction correspondence definitions | `2.3` |
-| Generic retrieval definition | `1.6` |
+| Generic retrieval definition | `1.7` |
+| Reaction-core retrieval policy | `reaction_core_retrieval.v1@1.0` |
 | Generic admission policy | `generic_admission.v1.9` |
 | Fragment-source capabilities | `fragment_source_capabilities.v1@1.0` |
 | Fallback retrieval definition | `1.4` |
@@ -111,10 +114,10 @@ Its pre-source-support report records:
 | Generic-index rows | 2,603 |
 
 The sharded conversion report records zero failed shards and zero duplicate
-observations. The artifact predates fallback descriptor `1.3`, converter
-`v2.8`, and index `2.4`; current code therefore rejects it until it is
-regenerated. This is deliberate because exact partial-transformation keys and
-fragment-source support change chemistry admission and index membership.
+observations. The artifact predates reaction-core projection `2.0`, converter
+`v2.9`, and index `2.5`; current code therefore rejects it until it is
+regenerated. This is deliberate because reaction-core identity and index maps
+change artifact identity and retrieval coverage.
 
 These counts demonstrate that the type-agnostic path works on a broad bounded
 sample and that unnamed reactions are retained. They are coverage and integrity
@@ -179,7 +182,53 @@ reference, so the new tier supplied genuinely broader support. The result
 retained `named_family=None`, disclosed the intramolecular/intermolecular scope
 mismatch, and warned that the exact edit signatures differed.
 
-### 2.5 External RXNMapper Fischer POC
+### 2.5 Template-free reaction-minimization POC
+
+`benchmarks/reaction_core_sample_report.py` evaluates
+`examples/sample_reactions.csv` without passing source reaction types into
+mapping, minimization, keys, or labels. The current V2 artifacts are
+`results/reaction_core_sample_report.csv` and
+`results/reaction_core_sample_report_summary.json`.
+
+The 2026-07-30 run reports:
+
+| Measurement | Count |
+| --- | ---: |
+| Rows / valid reactions | 446 / 445 |
+| Baseline RS3 signatures | 341 |
+| Available reaction-core projections | 445 |
+| Core coverage where the baseline had no signature | 104 |
+| One-event / two-event cores | 421 / 24 |
+| Unique center-transition keys | 258 |
+| Unique robust shape keys | 351 |
+| Rows in repeated center clusters | 241 |
+| Rows in repeated shape clusters | 141 |
+| Rows in mixed-source-label center clusters | 146 |
+| Rows in mixed-source-label shape clusters | 58 |
+| No-op primary-center warnings | 6 |
+| Unresolved remote-continuity warnings | 3 |
+
+The shape key substantially reduces conflation from the center-only key by
+including participant handle/site evidence, retained remote shape, and event
+count. A hard-negative regression confirms that a vinyl Suzuki and a Heck
+reaction may share `RCS2` while receiving different `RSH2` keys. This is why
+`RCS2` is diagnostic only.
+
+The sample contains an acetonide-protection reaction for which the baseline has
+no signature. V2 produces the grammar-independent minimized label
+`C(R)2(=O) → C(R)2(O-R)2` and derives the remote classes `alkyl` and
+`ring_aliphatic` from the cut molecular graph. The supplied mapped
+benzaldehyde/methanol acetal regression similarly produces
+`C(H)(Ar)(=O) → C(H)(Ar)(O-R)2`; mapper atom-origin alternatives keep the same
+shape and center keys while exact and typed identities preserve provenance.
+
+These measurements demonstrate coverage and improved cluster discrimination,
+not recommendation accuracy. Of the 445 cores, 434 are external-mapper
+proposals and therefore remain review evidence. The core retrieval policy is
+still marked `poc_review_only_not_calibrated`; verified-precedent coverage,
+false-neighbor review, and blind condition review remain release gates.
+
+### 2.6 External RXNMapper Fischer POC
 
 The optional offline dependency is pinned in `requirements-mapping.txt`.
 `reactive_taxonomy.external_atom_mapping` provides an instance-scoped
@@ -292,7 +341,7 @@ exports mapping columns in the concise chemist review. The recommender caches
 mapper-enabled and internal-only instances separately. The featurizer reports
 the mapper disposition and confidence beside the structural analysis.
 
-### 2.6 Knorr/Paal–Knorr transfer audit
+### 2.7 Knorr/Paal–Knorr transfer audit
 
 The same name-free benchmark was run against the 652-row
 `Knorr_pyrrole_synthesis.csv` source. The report is
@@ -318,7 +367,7 @@ without an independent edit-graph neighbor and the three non-consensus
 ambiguous reactions remain abstentions in this cohort. These are neighbor
 coverage measurements, not validation of condition suitability.
 
-### 2.7 High-ROI canonical-site expansion
+### 2.8 High-ROI canonical-site expansion
 
 The current identity definitions add five conservative observation classes
 without adding a named-family route or automatically registering a reaction
@@ -376,11 +425,31 @@ validation before they may consume these observations.
 - reaction topology and event relationships;
 - typed product-atom completeness, partial product-origin gaps, deterministic
   `PTS1` partial-transformation keys, and `FSR1` fragment-source requirements;
-- graph-derived local reactivity profiles and unchanged spectators.
-- a serialized, template-free `ReactionCoreProjection` for mapped observations,
-  with exact, typed-boundary, generic, and atom-origin-robust center-transition
-  keys. This POC is shadow observation output and does not yet affect signature
-  identity, admission, retrieval, or ranking.
+- graph-derived local reactivity profiles and unchanged spectators;
+- a serialized, template-free `ReactionCoreProjection` for mapped edit
+  observations. V2 keeps every edit-participating atom as an atom transition,
+  chooses a smaller set of primary centers only for explanation, removes each
+  unchanged remote connected component once, and records every cut as a typed
+  attachment port on that remote subgraph;
+- four purpose-specific reaction-core identities: exact `RCX2`, typed `RCT2`,
+  mapping-robust shape `RSH2`, and diagnostic center transition `RCS2`.
+
+The remote classes (`aryl`, `heteroaryl`, `alkyl`, and related classes) are
+derived from the removed molecular graph. They are not selected from a reaction
+template or inferred from a source reaction name. Exact fragment SMILES and
+functional-group evidence remain available beside the concise class.
+
+`RSH2` is the only minimized identity used for retrieval. It includes generic
+primary-center transitions, participant handle/site tokens, retained remote
+shape, and event count. This prevents the broad center-only conflation seen in
+V1, such as assigning the same retrieval identity to Suzuki and Heck reactions
+that share a coarse carbon-center transition. `RCS2` remains explanation and
+analysis output and is never a retrieval key.
+
+Reaction-core projection is a sibling observation to RS3, not a substitute for
+it. It does not change reaction-signature identity, named-family assignment, or
+converter admission. Its schema and algorithm versions are serialized
+explicitly, and stale core artifacts are rejected.
 
 The internal `CEG1` connectivity-edit graph remains evaluation/shadow output.
 The public and persisted chemistry identity is the RS3 reaction signature.
@@ -410,6 +479,8 @@ The converter serializes:
 
 - source row, file, reaction, and reference provenance;
 - reaction analysis, signature, completeness, fallback, and conflicts;
+- reaction-core projection, evidence status, exact/typed/shape/center keys,
+  atom transitions, events, remote subgraphs, attachment ports, and warnings;
 - optional external-mapping disposition, mapped proposal, coverage, confidence,
   provider/model identity, matched internal hypotheses, and warnings;
 - chemistry, condition, stage, outcome, and index-eligibility statuses;
@@ -436,15 +507,20 @@ exact signature
   -> transformation signature
   -> environment neighbors within compatible bond edits
   -> broad compatible bond edits
+  -> exact reaction-core shape
   -> chemistry-gated anonymous edit-graph neighbors
   -> abstain
 ```
 
 The current minimum adequate pool is two independent support units. Family use
-requires high confidence and never bypasses edit compatibility. The anonymous
+requires high confidence and never bypasses edit compatibility. The
+reaction-core tier uses exact `RSH2` equality and matching event count; it
+never uses `RCS2` center equality. It is below verified bond-edit retrieval
+because RS3 is more specific, and above anonymous edit-graph neighbors because
+`RSH2` retains mapped center-state and participant evidence. The anonymous
 edit-graph tier may cross an exact L3 key only after shared formed/broken bond
-and ring-direction gates pass, and its use is disclosed in recommendation
-cautions.
+and ring-direction gates pass. Both fallback tiers disclose their use in
+recommendation cautions.
 
 Compatibility runs before similarity. Ranking definitions are separated from
 retrieval definitions. Recipes are aggregated by `RCORE1`, while `RCR1`
@@ -493,6 +569,34 @@ The result reports `external_mapping_status`, provider, confidence,
 `recommendation_mode`, and mandatory expert-review warnings. External
 mapper-derived converted rows do not enter that index by default.
 
+An unsigned query may also have a usable reaction core but no RS3 signature.
+After edit-hypothesis consensus and before ordinary structure fallback, the
+query-only core branch applies
+`condition_recommender/definitions/reaction_core_retrieval.v1.json`:
+
+```text
+eligible mapped core with exact RSH2 shape
+  -> verified indexed precedents with the same event count
+  -> hard condition compatibility
+  -> independent-support gate
+  -> fallback-environment ranking
+  -> review-qualified recommendation or abstention
+```
+
+This branch returns `recommendation_mode = reaction_core_review`,
+`retrieval_strategy = reaction_core_shape`, and mandatory expert-review
+cautions. It never creates an RS3 signature for the query, upgrades its
+admission, or admits external-mapper records as precedents. A core-only failure
+continues to the existing structure fallback with both attempts preserved in
+the retrieval trace.
+
+The index stores exact, typed, shape, and center maps for audit and analysis,
+but production retrieval reads only the shape map. Indexed rows remain subject
+to the existing verified-record admission gate. Consequently, useful
+reaction-core coverage requires mapped, internally verified precedents; an
+external mapper may expand query coverage but does not manufacture trusted
+training evidence.
+
 ## 5. What is not complete
 
 ### 5.1 Production validation
@@ -518,6 +622,8 @@ Remaining limitations include:
 - unstructured multi-stage procedures;
 - incomplete condition-substance and contextual-role curation;
 - sparse independent support for many transformation/environment combinations;
+- sparse mapped, internally verified precedent coverage for many `RSH2`
+  reaction-core shapes and no production calibration of the core-only route;
 - complex insertion, extrusion, metathesis, migration, annulation,
   cycloaddition, rearrangement, cascade, and protection chemistry without
   fully validated general contracts;
@@ -570,6 +676,8 @@ Include:
 - intramolecular and multi-event examples;
 - high-confidence family and unnamed reactions;
 - exact, relaxed, environment, broad-edit, and abstaining retrieval results;
+- reaction-core shape hits, center-only hard negatives, core-only query hits,
+  and core-to-structure-fallback abstentions;
 - deliberately unsuitable condition controls.
 
 The reviewer should see structures, highlighted reaction centers, concise
@@ -610,6 +718,8 @@ Minimum reporting:
 - seen-recipe top-1 and top-k recovery with denominators;
 - variant recovery where the variant exists in training;
 - fallback-level distribution;
+- reaction-core shape coverage, independent support, mixed-label cluster audit,
+  and false-neighbor review versus the center-only key;
 - hard-incompatible recommendation count;
 - independent-reference support;
 - yield error only with usable-outcome counts;

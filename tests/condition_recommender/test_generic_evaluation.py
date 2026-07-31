@@ -99,8 +99,8 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.5",
-        "converter_definition_version": "generic_conversion.v2.5",
+        "schema_version": "3.8",
+        "converter_definition_version": "generic_conversion.v2.9",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "chemistry_status": "verified",
@@ -138,9 +138,13 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "2.4"
+    assert payload["schema_version"] == "2.5"
     assert payload["reaction_signature_schema_version"] == "3.0"
-    assert payload["record_schema_versions"] == ["3.5"]
+    assert payload["record_schema_versions"] == ["3.8"]
+    assert payload["reaction_core_schema_version"] == "2.0"
+    assert payload["reaction_core_algorithm_version"] == (
+        "reaction_core_projection.v2"
+    )
     assert payload["maps"]["environment_features"]
     integrity = validate_generic_index_artifact(first_path)
     assert integrity["valid"]
@@ -160,18 +164,13 @@ def test_compressed_persisted_index_round_trip(tmp_path: Path) -> None:
     assert validate_generic_index_artifact(path)["valid"]
 
 
-def test_index_accepts_previous_review_only_record_contract(tmp_path: Path) -> None:
+def test_index_rejects_previous_record_contract() -> None:
     record = _record(1)
     record["schema_version"] = "3.4"
     record["converter_definition_version"] = "generic_conversion.v2.4"
-    index = build_generic_index([record])
-    path = tmp_path / "previous-compatible-index.json"
 
-    save_generic_index(index, path)
-    loaded = load_persisted_generic_index(path)
-
-    assert loaded.record_schema_versions == ("3.4",)
-    assert loaded.converter_definition_versions == ("generic_conversion.v2.4",)
+    with pytest.raises(ValueError, match="regenerate converted records"):
+        build_generic_index([record])
 
 
 @pytest.mark.parametrize(
@@ -289,7 +288,7 @@ def test_grouped_evaluation_writes_leakage_safe_metrics(tmp_path: Path) -> None:
     assert report["schema_version"] == "1.4"
     assert report["definition_versions"] == {
         "compatibility": "1.1",
-        "retrieval": "1.6",
+        "retrieval": "1.7",
         "similarity": "1.0",
         "ranking": "1.0",
     }

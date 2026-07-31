@@ -109,8 +109,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "3.7"
-    assert record.converter_definition_version == "generic_conversion.v2.8"
+    assert record.schema_version == "3.8"
+    assert record.converter_definition_version == "generic_conversion.v2.9"
     assert record.reaction_signature["schema_version"] == "3.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -121,6 +121,28 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
     assert record.resolved_recipe_core_id.startswith("RCORE1:")
     assert record.reference_condition_series_id.startswith("RCS1:")
+
+
+def test_mapped_unknown_reaction_serializes_reaction_core_for_review() -> None:
+    reaction = (
+        "[CH3:1][OH:2].O[CH3:5]."
+        "[CH:3](=[O:4])[c:6]1[cH:7][cH:8][cH:9][cH:10][c:11]1[F:12]"
+        ">>[CH3:1][O:2][CH:3]([O:4][CH3:5])"
+        "[c:6]1[cH:7][cH:8][cH:9][cH:10][c:11]1[F:12]"
+    )
+
+    record = convert_record(_raw(reaction))
+
+    assert record.admission_tier == AdmissionTier.REVIEW
+    assert record.reaction_core is not None
+    assert record.reaction_core["schema_version"] == "2.0"
+    assert record.reaction_core["algorithm_version"] == (
+        "reaction_core_projection.v2"
+    )
+    assert record.reaction_core["shape_core_key"].startswith("RSH2:")
+    assert record.reaction_core["generic_label"] == (
+        "C(H)(Ar)(=O) → C(H)(Ar)(O-R)2"
+    )
 
 
 def test_inverting_alcohol_displacement_serializes_stereo_without_named_family() -> (
@@ -590,7 +612,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "2.4"
+    assert report["schema_version"] == "2.5"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]

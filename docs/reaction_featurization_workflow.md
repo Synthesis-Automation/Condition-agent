@@ -10,6 +10,7 @@ Reaction SMILES
   -> collect mapping, reconstruction, and correspondence evidence
   -> reconcile providers and retain distinct edit hypotheses
   -> select verified graph edits when the evidence is unique
+  -> minimize mapped edits into atom transitions and remote subgraphs
   -> assign transformation and optional family interpretations
   -> build topology, environments, spectators, and events
   -> generate display labels
@@ -223,6 +224,51 @@ default index. At query time the first two dispositions may use the normal
 signature retrieval ladder against already-verified precedents, with mapper
 status, provider, confidence, and mandatory expert-review cautions in the
 result.
+
+### Template-free reaction minimization
+
+When normalized edits retain atom correspondence across both sides,
+[`build_reaction_core_projection()`](../reactive_taxonomy/reaction_core.py)
+builds a `ReactionCoreProjection` directly from the molecular graphs and edits.
+It does not load a reaction grammar, template, source label, or reaction name.
+
+The projection:
+
+1. keeps every edit-participating atom as a before/after atom transition;
+2. groups connected edits into events;
+3. selects a smaller set of primary centers for a concise explanation;
+4. removes active atoms from each molecular graph;
+5. records each remaining connected component once as a remote subgraph;
+6. records every cut connection as a typed attachment port; and
+7. matches remote subgraphs across sides as retained, departing, appearing,
+   changed, or unresolved.
+
+Classes such as `aryl`, `heteroaryl`, and `alkyl` come from the removed graph:
+aromaticity, ring composition, element composition, unsaturation, and
+attachment topology. They are not a fixed grammar vocabulary applied before
+the cut. Exact fragment SMILES, functional groups, attachment atoms, and bond
+orders remain in the result even when the label displays `Ar`, `HetAr`, or
+`R`.
+
+For the mapped acetal example, the concise minimized transition is:
+
+```text
+C(H)(Ar)(=O) -> C(H)(Ar)(O-R)2
+```
+
+The projection emits four keys:
+
+- `RCX2`: exact edit, atom-state, and fragment identity;
+- `RCT2`: typed remote-subgraph identity;
+- `RSH2`: mapping-robust retrieval shape containing the generic center
+  transition, participant handles/sites, retained remote shape, and event
+  count;
+- `RCS2`: diagnostic center transition only.
+
+Only `RSH2` is retrieval-eligible. `RCS2` is intentionally too broad:
+reactions can share a carbon-center transition while requiring different
+partner chemistry and conditions. The projection is a sibling observation to
+RS3 and never upgrades ambiguous or externally mapped evidence.
 
 The three desktop applications expose a `Use RXNMapper` checkbox that is
 checked by default:
@@ -470,6 +516,8 @@ After edit normalization, the system derives:
 - `reaction_topology`: intermolecular or intramolecular scope, tether distance,
   ring formation, and ring-size changes;
 - `ReactionEvent` objects: connected groups of edits;
+- template-free reaction-core atom transitions, events, remote subgraphs, and
+  typed attachment ports when mapped evidence is available;
 - retained, created, destroyed, or descriptor-changed stereochemistry;
 - event relationships such as `shared_atom`, `shared_component`, or
   `independent_sites`;
@@ -597,6 +645,7 @@ product connection
 reaction topology
 reaction completeness assessment
 reaction signature
+reaction core projection
 evidence quality
 warnings and errors
 ```
@@ -622,6 +671,7 @@ During dataset conversion,
 - serializes the `PTS1` key, `FSR1` requirements, matched condition components,
   capability IDs, and support status;
 - serializes the nested reaction signature;
+- serializes the nested reaction-core projection and flattened review keys;
 - serializes provider evidence and edit hypotheses for review even when no
   signature can be issued;
 - optionally reconciles RXNMapper proposals, serializes their full provenance,

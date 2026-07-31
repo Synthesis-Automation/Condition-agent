@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
 
 from reactive_taxonomy import (
+    REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
+    REACTION_CORE_PROJECTION_SCHEMA_VERSION,
     REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
     reaction_fallback_definition_versions,
@@ -28,23 +30,7 @@ from .signature_features import environment_tokens
 from .fallback_similarity import fallback_index_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "2.4"
-
-# Older fully verified records remain source-compatible. Records carrying old
-# fallback descriptors still fail the descriptor schema/definition checks and
-# must be regenerated before they can enter the new partial-transformation map.
-_INDEX_COMPATIBLE_RECORD_SCHEMAS = frozenset(
-    {"3.4", "3.5", "3.6", RECOMMENDATION_RECORD_SCHEMA_VERSION}
-)
-_INDEX_COMPATIBLE_CONVERTER_VERSIONS = frozenset(
-    {
-        "generic_conversion.v2.4",
-        "generic_conversion.v2.5",
-        "generic_conversion.v2.6",
-        "generic_conversion.v2.7",
-        GENERIC_CONVERTER_DEFINITION_VERSION,
-    }
-)
+GENERIC_INDEX_SCHEMA_VERSION = "2.5"
 
 
 @dataclass(frozen=True)
@@ -63,6 +49,7 @@ class GenericIndexedReaction:
     scaffold_key: str
     scaffold_tokens: Tuple[str, ...]
     signature: Dict[str, Any]
+    reaction_core: Dict[str, Any]
     recipe_id: str
     recipe_core_id: str
     resolved_recipe: Dict[str, Any]
@@ -101,11 +88,17 @@ class GenericReactionIndex:
     transformations: Mapping[str, Tuple[int, ...]]
     bond_edits: Mapping[str, Tuple[int, ...]]
     environments: Mapping[str, Tuple[int, ...]]
+    core_exact: Mapping[str, Tuple[int, ...]]
+    core_typed: Mapping[str, Tuple[int, ...]]
+    core_shapes: Mapping[str, Tuple[int, ...]]
+    core_centers: Mapping[str, Tuple[int, ...]]
     environment_features: Mapping[str, Tuple[int, ...]]
     fallback_features: Mapping[str, Tuple[int, ...]]
     partial_transformations: Mapping[str, Tuple[int, ...]]
     families: Mapping[str, Tuple[int, ...]]
     reaction_signature_schema_version: str
+    reaction_core_schema_version: str
+    reaction_core_algorithm_version: str
     taxonomy_definition_versions: Tuple[Tuple[str, str], ...]
     fallback_descriptor_schema_version: str
     fallback_definition_versions: Tuple[Tuple[str, str], ...]
@@ -143,6 +136,8 @@ def _validate_index_rows(
 ) -> tuple[
     str,
     Tuple[Tuple[str, str], ...],
+    str,
+    str,
     Tuple[str, ...],
     Tuple[str, ...],
 ]:
@@ -165,6 +160,28 @@ def _validate_index_rows(
     if definition_sets and definition_sets != {current_definitions}:
         raise ValueError(
             "Incompatible reaction taxonomy definitions; regenerate converted records"
+        )
+    core_schemas = {
+        str(row.reaction_core.get("schema_version") or "")
+        for row in values
+        if row.reaction_core
+    }
+    if core_schemas and core_schemas != {
+        REACTION_CORE_PROJECTION_SCHEMA_VERSION
+    }:
+        raise ValueError(
+            "Incompatible reaction core schema; regenerate converted records"
+        )
+    core_algorithms = {
+        str(row.reaction_core.get("algorithm_version") or "")
+        for row in values
+        if row.reaction_core
+    }
+    if core_algorithms and core_algorithms != {
+        REACTION_CORE_PROJECTION_ALGORITHM_VERSION
+    }:
+        raise ValueError(
+            "Incompatible reaction core algorithm; regenerate converted records"
         )
     fallback_descriptors = tuple(
         row.fallback_descriptor for row in values if row.fallback_descriptor
@@ -198,8 +215,8 @@ def _validate_index_rows(
             "Incompatible fallback descriptor definitions; regenerate converted records"
         )
     record_schemas = tuple(sorted({row.record_schema_version for row in values}))
-    if record_schemas and not set(record_schemas).issubset(
-        _INDEX_COMPATIBLE_RECORD_SCHEMAS
+    if record_schemas and record_schemas != (
+        RECOMMENDATION_RECORD_SCHEMA_VERSION,
     ):
         raise ValueError(
             "Incompatible recommendation record schema; regenerate converted records"
@@ -207,8 +224,8 @@ def _validate_index_rows(
     converter_versions = tuple(
         sorted({row.converter_definition_version for row in values})
     )
-    if converter_versions and not set(converter_versions).issubset(
-        _INDEX_COMPATIBLE_CONVERTER_VERSIONS
+    if converter_versions and converter_versions != (
+        GENERIC_CONVERTER_DEFINITION_VERSION,
     ):
         raise ValueError(
             "Incompatible generic converter version; regenerate converted records"
@@ -216,6 +233,8 @@ def _validate_index_rows(
     return (
         REACTION_SIGNATURE_SCHEMA_VERSION,
         current_definitions,
+        REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+        REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
         record_schemas or (RECOMMENDATION_RECORD_SCHEMA_VERSION,),
         converter_versions or (GENERIC_CONVERTER_DEFINITION_VERSION,),
     )
@@ -237,6 +256,8 @@ def build_generic_index_from_rows(
     (
         signature_schema,
         definition_versions,
+        core_schema,
+        core_algorithm,
         record_schemas,
         converter_versions,
     ) = _validate_index_rows(ordered)
@@ -244,6 +265,10 @@ def build_generic_index_from_rows(
         name: defaultdict(list) for name in _KEY_FIELDS
     }
     families: Dict[str, list[int]] = defaultdict(list)
+    core_maps: Dict[str, Dict[str, list[int]]] = {
+        name: defaultdict(list)
+        for name in ("exact", "typed", "shapes", "centers")
+    }
     environment_features: Dict[str, list[int]] = defaultdict(list)
     fallback_features: Dict[str, list[int]] = defaultdict(list)
     partial_transformations: Dict[str, list[int]] = defaultdict(list)
@@ -252,6 +277,16 @@ def build_generic_index_from_rows(
             key = str(row.signature.get(field) or "")
             if key:
                 maps[name][key].append(position)
+        core_fields = {
+            "exact": "exact_core_key",
+            "typed": "typed_core_key",
+            "shapes": "shape_core_key",
+            "centers": "center_transition_key",
+        }
+        for name, field in core_fields.items():
+            key = str(row.reaction_core.get(field) or "")
+            if key:
+                core_maps[name][key].append(position)
         if row.named_family:
             families[row.named_family].append(position)
         for token in set(environment_tokens(row.signature)):
@@ -270,11 +305,17 @@ def build_generic_index_from_rows(
         transformations=_freeze(maps["transformations"]),
         bond_edits=_freeze(maps["bond_edits"]),
         environments=_freeze(maps["environments"]),
+        core_exact=_freeze(core_maps["exact"]),
+        core_typed=_freeze(core_maps["typed"]),
+        core_shapes=_freeze(core_maps["shapes"]),
+        core_centers=_freeze(core_maps["centers"]),
         environment_features=_freeze(environment_features),
         fallback_features=_freeze(fallback_features),
         partial_transformations=_freeze(partial_transformations),
         families=_freeze(families),
         reaction_signature_schema_version=signature_schema,
+        reaction_core_schema_version=core_schema,
+        reaction_core_algorithm_version=core_algorithm,
         taxonomy_definition_versions=definition_versions,
         fallback_descriptor_schema_version=(
             REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION
@@ -330,6 +371,7 @@ def build_generic_index(
         ):
             continue
         signature = record.get("reaction_signature")
+        reaction_core = record.get("reaction_core")
         fallback_descriptor = record.get("fallback_descriptor")
         recipe = record.get("resolved_recipe")
         recipe_id = str(record.get("resolved_recipe_id") or "")
@@ -384,6 +426,11 @@ def build_generic_index(
                     signature if isinstance(signature, Mapping) else {},
                 ),
                 signature=(dict(signature) if isinstance(signature, Mapping) else {}),
+                reaction_core=(
+                    dict(reaction_core)
+                    if isinstance(reaction_core, Mapping)
+                    else {}
+                ),
                 recipe_id=recipe_id,
                 recipe_core_id=recipe_core_id,
                 resolved_recipe=dict(recipe),
@@ -446,6 +493,7 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "scaffold_key": row.scaffold_key,
             "scaffold_tokens": row.scaffold_tokens,
             "signature": row.signature,
+            "reaction_core": row.reaction_core,
             "recipe_id": row.recipe_id,
             "recipe_core_id": row.recipe_core_id,
             "resolved_recipe": row.resolved_recipe,
@@ -469,6 +517,10 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
         "transformations": dict(index.transformations),
         "bond_edits": dict(index.bond_edits),
         "environments": dict(index.environments),
+        "core_exact": dict(index.core_exact),
+        "core_typed": dict(index.core_typed),
+        "core_shapes": dict(index.core_shapes),
+        "core_centers": dict(index.core_centers),
         "environment_features": dict(index.environment_features),
         "fallback_features": dict(index.fallback_features),
         "partial_transformations": dict(index.partial_transformations),
@@ -480,6 +532,10 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "maps": maps,
             "reaction_signature_schema_version": (
                 index.reaction_signature_schema_version
+            ),
+            "reaction_core_schema_version": index.reaction_core_schema_version,
+            "reaction_core_algorithm_version": (
+                index.reaction_core_algorithm_version
             ),
             "taxonomy_definition_versions": dict(index.taxonomy_definition_versions),
             "fallback_descriptor_schema_version": (
@@ -497,6 +553,8 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
         "schema_version": GENERIC_INDEX_SCHEMA_VERSION,
         "artifact_type": "generic_reaction_index",
         "reaction_signature_schema_version": (index.reaction_signature_schema_version),
+        "reaction_core_schema_version": index.reaction_core_schema_version,
+        "reaction_core_algorithm_version": index.reaction_core_algorithm_version,
         "taxonomy_definition_versions": dict(index.taxonomy_definition_versions),
         "fallback_descriptor_schema_version": (
             index.fallback_descriptor_schema_version
@@ -560,6 +618,12 @@ def save_generic_index(index: GenericReactionIndex, path: str | Path) -> Dict[st
         "reaction_signature_schema_version": payload[
             "reaction_signature_schema_version"
         ],
+        "reaction_core_schema_version": payload[
+            "reaction_core_schema_version"
+        ],
+        "reaction_core_algorithm_version": payload[
+            "reaction_core_algorithm_version"
+        ],
         "taxonomy_definition_versions": payload["taxonomy_definition_versions"],
         "fallback_descriptor_schema_version": payload[
             "fallback_descriptor_schema_version"
@@ -593,6 +657,16 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
         != REACTION_SIGNATURE_SCHEMA_VERSION
     ):
         raise ValueError("Incompatible reaction signature schema; rebuild the index")
+    if (
+        payload.get("reaction_core_schema_version")
+        != REACTION_CORE_PROJECTION_SCHEMA_VERSION
+    ):
+        raise ValueError("Incompatible reaction core schema; rebuild the index")
+    if (
+        payload.get("reaction_core_algorithm_version")
+        != REACTION_CORE_PROJECTION_ALGORITHM_VERSION
+    ):
+        raise ValueError("Incompatible reaction core algorithm; rebuild the index")
     current_definitions = reaction_signature_definition_versions()
     if payload.get("taxonomy_definition_versions") != current_definitions:
         raise ValueError(
@@ -610,16 +684,12 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             "Incompatible fallback descriptor definitions; rebuild the index"
         )
     record_schema_versions = tuple(payload.get("record_schema_versions") or ())
-    if not record_schema_versions or not set(record_schema_versions).issubset(
-        _INDEX_COMPATIBLE_RECORD_SCHEMAS
-    ):
+    if record_schema_versions != (RECOMMENDATION_RECORD_SCHEMA_VERSION,):
         raise ValueError("Incompatible recommendation record schema; rebuild the index")
     converter_definition_versions = tuple(
         payload.get("converter_definition_versions") or ()
     )
-    if not converter_definition_versions or not set(
-        converter_definition_versions
-    ).issubset(_INDEX_COMPATIBLE_CONVERTER_VERSIONS):
+    if converter_definition_versions != (GENERIC_CONVERTER_DEFINITION_VERSION,):
         raise ValueError("Incompatible generic converter version; rebuild the index")
     rows = tuple(
         GenericIndexedReaction(
@@ -645,6 +715,7 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
                 str(value) for value in row.get("scaffold_tokens") or ()
             ),
             signature=dict(row["signature"]),
+            reaction_core=dict(row.get("reaction_core") or {}),
             recipe_id=str(row["recipe_id"]),
             recipe_core_id=str(row.get("recipe_core_id") or row["recipe_id"]),
             resolved_recipe=dict(row["resolved_recipe"]),
@@ -687,6 +758,22 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
         environments={
             key: tuple(value) for key, value in (maps.get("environments") or {}).items()
         },
+        core_exact={
+            key: tuple(value)
+            for key, value in (maps.get("core_exact") or {}).items()
+        },
+        core_typed={
+            key: tuple(value)
+            for key, value in (maps.get("core_typed") or {}).items()
+        },
+        core_shapes={
+            key: tuple(value)
+            for key, value in (maps.get("core_shapes") or {}).items()
+        },
+        core_centers={
+            key: tuple(value)
+            for key, value in (maps.get("core_centers") or {}).items()
+        },
         environment_features={
             key: tuple(value)
             for key, value in (maps.get("environment_features") or {}).items()
@@ -704,6 +791,10 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
         },
         reaction_signature_schema_version=str(
             payload["reaction_signature_schema_version"]
+        ),
+        reaction_core_schema_version=str(payload["reaction_core_schema_version"]),
+        reaction_core_algorithm_version=str(
+            payload["reaction_core_algorithm_version"]
         ),
         taxonomy_definition_versions=tuple(
             sorted(
@@ -811,6 +902,20 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
             key = str(row.signature.get(field) or "")
             if key and position not in mapping.get(key, ()):
                 issues.append(f"missing_reverse_mapping:{name}")
+    core_maps = {
+        "core_exact": (index.core_exact, "exact_core_key"),
+        "core_typed": (index.core_typed, "typed_core_key"),
+        "core_shapes": (index.core_shapes, "shape_core_key"),
+        "core_centers": (index.core_centers, "center_transition_key"),
+    }
+    for name, (mapping, field) in core_maps.items():
+        for positions in mapping.values():
+            if any(position < 0 or position >= row_count for position in positions):
+                issues.append(f"out_of_range_position:{name}")
+        for position, row in enumerate(index.rows):
+            key = str(row.reaction_core.get(field) or "")
+            if key and position not in mapping.get(key, ()):
+                issues.append(f"missing_reverse_mapping:{name}")
     for position, row in enumerate(index.rows):
         for token in set(environment_tokens(row.signature)):
             if position not in index.environment_features.get(token, ()):
@@ -861,6 +966,10 @@ def validate_generic_index_artifact(path: str | Path) -> Dict[str, Any]:
             "transformations": len(index.transformations),
             "bond_edits": len(index.bond_edits),
             "environments": len(index.environments),
+            "core_exact": len(index.core_exact),
+            "core_typed": len(index.core_typed),
+            "core_shapes": len(index.core_shapes),
+            "core_centers": len(index.core_centers),
             "environment_features": len(index.environment_features),
             "fallback_features": len(index.fallback_features),
             "families": len(index.families),

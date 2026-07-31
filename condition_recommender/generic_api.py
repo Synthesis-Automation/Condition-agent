@@ -18,6 +18,10 @@ from .generic_indexing import (
     GenericReactionIndex,
     load_generic_index,
 )
+from .core_retrieval import (
+    load_reaction_core_retrieval_rules,
+    retrieve_core_shape_pool_with_trace,
+)
 from .generic_retrieval import (
     RetrievalStrategy,
     load_generic_retrieval_rules,
@@ -26,6 +30,7 @@ from .generic_retrieval import (
 from .fallback_retrieval import retrieve_fallback_pool_with_trace
 from .fallback_similarity import (
     assess_fallback_similarity,
+    compatibility_signature_from_fallback,
     load_fallback_retrieval_rules,
 )
 from .hypothesis_retrieval import (
@@ -42,6 +47,7 @@ def recommend_indexed_signature(
     signature: Dict[str, Any],
     index: GenericReactionIndex,
     *,
+    reaction_core: Mapping[str, Any] | None = None,
     query_reaction_smiles: str = "",
     reaction_label: str | None = None,
     reaction_label_status: str = "unavailable",
@@ -99,6 +105,7 @@ def recommend_indexed_signature(
         signature,
         index,
         minimum_pool_size=minimum_pool_size,
+        reaction_core=reaction_core,
         strategy=retrieval_strategy,
     )
     level = retrieval.level
@@ -109,6 +116,10 @@ def recommend_indexed_signature(
             query_reaction_smiles=query_reaction_smiles,
             valid=False,
             query_signature_id=str(signature.get("signature_id") or ""),
+            query_reaction_core_id=str(
+                (reaction_core or {}).get("core_id") or ""
+            )
+            or None,
             named_family=signature.get("named_family"),
             transformation_class=signature.get("transformation_class"),
             **query_context,
@@ -131,6 +142,8 @@ def recommend_indexed_signature(
         warnings.append("LIMITED_PRECEDENT_SUPPORT")
     if level not in {"exact_signature", "handle_signature", "named_family"}:
         warnings.append("TYPE_AGNOSTIC_FALLBACK_USED")
+    if level.startswith("reaction_core_shape"):
+        warnings.append("REACTION_CORE_SHAPE_RETRIEVAL_USED")
     if retrieval.excluded_candidate_count:
         warnings.append(
             f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:{retrieval.excluded_candidate_count}"
@@ -159,6 +172,10 @@ def recommend_indexed_signature(
         query_reaction_smiles=query_reaction_smiles,
         valid=True,
         query_signature_id=str(signature.get("signature_id") or ""),
+        query_reaction_core_id=str(
+            (reaction_core or {}).get("core_id") or ""
+        )
+        or None,
         named_family=signature.get("named_family"),
         transformation_class=signature.get("transformation_class"),
         **query_context,
@@ -250,6 +267,7 @@ def _recommend_with_index(
             error=analysis.error or "INVALID_REACTION",
         )
     if analysis.reaction_signature is None:
+        core_attempt = None
         if analysis.edit_hypotheses:
             hypothesis_result = _recommend_hypotheses_with_index(
                 analysis,
@@ -266,6 +284,21 @@ def _recommend_with_index(
                     hypothesis_result,
                     assessment,
                 )
+        if (
+            analysis.reaction_core is not None
+            and analysis.partial_product_transformation is None
+        ):
+            core_attempt = _recommend_core_with_index(
+                analysis,
+                index,
+                top_k=top_k,
+                minimum_pool_size=minimum_pool_size,
+            )
+            if core_attempt.valid:
+                return _attach_external_mapping_assessment(
+                    core_attempt,
+                    assessment,
+                )
         result = _recommend_fallback_with_index(
             analysis,
             index,
@@ -273,10 +306,33 @@ def _recommend_with_index(
             minimum_pool_size=minimum_pool_size,
             unrestricted=unrestricted_fallback,
         )
+        if core_attempt is not None:
+            result = replace(
+                result,
+                retrieval_trace=(
+                    *core_attempt.retrieval_trace,
+                    *result.retrieval_trace,
+                ),
+                warnings=tuple(
+                    dict.fromkeys(
+                        (
+                            *result.warnings,
+                            "REACTION_CORE_RETRIEVAL_ATTEMPTED",
+                            f"REACTION_CORE_RETRIEVAL_RESULT:"
+                            f"{core_attempt.retrieval_level}",
+                        )
+                    )
+                ),
+            )
     else:
         result = recommend_indexed_signature(
             asdict(analysis.reaction_signature),
             index,
+            reaction_core=(
+                asdict(analysis.reaction_core)
+                if analysis.reaction_core is not None
+                else None
+            ),
             query_reaction_smiles=reaction_smiles,
             reaction_label=analysis.reaction_label,
             reaction_label_status=analysis.reaction_label_status,
@@ -290,6 +346,148 @@ def _recommend_with_index(
             ),
         )
     return _attach_external_mapping_assessment(result, assessment)
+
+
+def _recommend_core_with_index(
+    analysis: Any,
+    index: GenericReactionIndex,
+    *,
+    top_k: int,
+    minimum_pool_size: int | None,
+) -> GenericRecommendationResult:
+    """Recommend from a review-qualified core against verified precedents."""
+    core_model = analysis.reaction_core
+    if core_model is None:
+        return GenericRecommendationResult(
+            query_reaction_smiles=str(analysis.input_reaction_smiles),
+            valid=False,
+            recommendation_mode="abstained",
+            error="QUERY_REACTION_CORE_NOT_RETRIEVABLE",
+        )
+    core = asdict(core_model)
+    fallback_model = analysis.fallback_descriptor
+    fallback = asdict(fallback_model) if fallback_model is not None else {}
+    compatibility_signature = compatibility_signature_from_fallback(fallback)
+    retrieval = retrieve_core_shape_pool_with_trace(
+        core,
+        compatibility_signature,
+        index,
+        minimum_pool_size=minimum_pool_size,
+    )
+    rules = load_reaction_core_retrieval_rules()
+    if not retrieval.pool:
+        return GenericRecommendationResult(
+            query_reaction_smiles=str(analysis.input_reaction_smiles),
+            valid=False,
+            query_reaction_core_id=str(core.get("core_id") or "") or None,
+            recommendation_mode="reaction_core_review",
+            reaction_label=(
+                analysis.reaction_label
+                or str(core.get("generic_label") or "")
+                or None
+            ),
+            reaction_label_status=(
+                analysis.reaction_label_status
+                if analysis.reaction_label
+                else "reaction_core_projection"
+            ),
+            transformation_class=analysis.transformation_class,
+            retrieval_definition_version=str(rules["schema_version"]),
+            retrieval_strategy="reaction_core_shape",
+            retrieval_level=retrieval.level,
+            candidate_count=retrieval.candidate_count,
+            independent_candidate_count=retrieval.independent_candidate_count,
+            excluded_candidate_count=retrieval.excluded_candidate_count,
+            retrieval_trace=retrieval.trace,
+            warnings=(
+                "QUERY_TRANSFORMATION_NOT_VERIFIED",
+                "REACTION_CORE_RETRIEVAL_ATTEMPTED",
+            ),
+            error="QUERY_REACTION_CORE_NOT_RETRIEVABLE",
+        )
+
+    query = {
+        "reaction_core": core,
+        "fallback_descriptor": fallback,
+    }
+
+    def core_similarity(
+        query_value: Mapping[str, Any],
+        row: Any,
+    ) -> Any:
+        return assess_fallback_similarity(
+            query_value["fallback_descriptor"],
+            row.fallback_descriptor,
+        )
+
+    recommendations = rank_condition_recipes(
+        query,
+        retrieval.pool,
+        retrieval_level=retrieval.level,
+        top_k=top_k,
+        similarity_assessor=core_similarity,
+    )
+    cautions = (
+        "Query retrieval used a minimized reaction-core shape, not a verified "
+        "query reaction signature",
+        "Only independently admitted verified precedents supplied conditions",
+        "The center-transition key alone was not used for retrieval",
+        "Reaction-core recommendations require expert review",
+    )
+    recommendations = tuple(
+        replace(
+            recommendation,
+            cautions=tuple(
+                dict.fromkeys((*cautions, *recommendation.cautions))
+            ),
+        )
+        for recommendation in recommendations
+    )
+    warnings = [
+        "QUERY_TRANSFORMATION_NOT_VERIFIED",
+        "REACTION_CORE_SHAPE_RETRIEVAL_USED",
+        "RECOMMENDATIONS_REQUIRE_EXPERT_REVIEW",
+    ]
+    if retrieval.level.endswith("limited_support"):
+        warnings.append("LIMITED_PRECEDENT_SUPPORT")
+    if retrieval.excluded_candidate_count:
+        warnings.append(
+            f"INCOMPATIBLE_PRECEDENTS_EXCLUDED:"
+            f"{retrieval.excluded_candidate_count}"
+        )
+    return GenericRecommendationResult(
+        query_reaction_smiles=str(analysis.input_reaction_smiles),
+        valid=True,
+        query_reaction_core_id=str(core.get("core_id") or "") or None,
+        recommendation_mode="reaction_core_review",
+        reaction_label=(
+            analysis.reaction_label
+            or str(core.get("generic_label") or "")
+            or None
+        ),
+        reaction_label_status=(
+            analysis.reaction_label_status
+            if analysis.reaction_label
+            else "reaction_core_projection"
+        ),
+        transformation_class=analysis.transformation_class,
+        spectator_groups=tuple(
+            asdict(group) for group in analysis.spectator_groups
+        ),
+        retrieval_definition_version=str(rules["schema_version"]),
+        retrieval_strategy="reaction_core_shape",
+        retrieval_level=retrieval.level,
+        candidate_count=retrieval.candidate_count,
+        independent_candidate_count=retrieval.independent_candidate_count,
+        compatible_candidate_count=len(retrieval.pool),
+        independent_compatible_candidate_count=(
+            retrieval.independent_compatible_candidate_count
+        ),
+        excluded_candidate_count=retrieval.excluded_candidate_count,
+        retrieval_trace=retrieval.trace,
+        recommendations=recommendations,
+        warnings=tuple(warnings),
+    )
 
 
 def _attach_external_mapping_assessment(

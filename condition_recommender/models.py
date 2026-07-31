@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.7"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.8"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "3.8"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v2.9"
 
 
 class AdmissionTier(str, Enum):
@@ -146,6 +146,7 @@ class RecommendationRecord:
     partial_product_transformation: Optional[Dict[str, Any]] = None
     reaction_completeness: Optional[Dict[str, Any]] = None
     reaction_signature: Optional[Dict[str, Any]] = None
+    reaction_core: Optional[Dict[str, Any]] = None
     reaction_evidence_candidates: Tuple[Dict[str, Any], ...] = ()
     reaction_edit_hypotheses: Tuple[Dict[str, Any], ...] = ()
     external_atom_mapping: Optional[Dict[str, Any]] = None
@@ -247,6 +248,7 @@ class GenericRecommendationResult:
     query_reaction_smiles: str
     valid: bool
     query_signature_id: Optional[str] = None
+    query_reaction_core_id: Optional[str] = None
     query_fallback_descriptor_id: Optional[str] = None
     query_edit_hypothesis_ids: Tuple[str, ...] = ()
     external_mapping_status: Optional[str] = None
@@ -271,7 +273,7 @@ class GenericRecommendationResult:
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "2.3"
+    schema_version: str = "2.4"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

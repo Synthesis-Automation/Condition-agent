@@ -21,23 +21,23 @@ the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
 Mapped observations also receive a template-free `ReactionCoreProjection`.
-The projection selects centers independently for each connected edit event,
-removes graph-remote branches, and classifies every cut attachment from the
-removed molecular subgraph as aryl, heteroaryl, alkyl, alkenyl, alkynyl,
-acyl, ring-aliphatic, heteroatom-linked, or generic R.  The exact fragment
-SMILES and functional-group annotations remain in the boundary record even
+V2 keeps every edit-participating atom, selects primary centers only for
+explanation, removes each remote connected component once, and records all cut
+connections as typed attachment ports. Remote classes such as aryl,
+heteroaryl, alkyl, alkenyl, alkynyl, acyl, ring-aliphatic,
+heteroatom-linked, or generic R are derived from the removed molecular graph.
+Exact fragment SMILES and functional-group annotations remain available even
 when the concise label uses `Ar`, `HetAr`, or `R`.
 
 Four versioned keys separate different uses of the minimized observation:
-`RCX1` retains exact mapped-edit and fragment identity, `RCT1` retains typed
-boundaries, `RCG1` is a broad generic core, and `RCS1` compares the complete
-before/after states of selected conserved centers without encoding peripheral
-atom origins.  The last key allows chemically equivalent center transitions
-to agree when an external mapper chooses a different same-element atom origin,
-while the exact keys still expose that disagreement.  Construction does not
-load reaction grammars or the reaction-template registry.  It abstains when no
-edited mapped atom is observed on both sides and does not change `RS3`,
-admission, retrieval, or named-family results.
+`RCX2` retains exact mapped-edit and fragment identity, `RCT2` retains typed
+remote-subgraph identity, `RSH2` is the mapping-robust retrieval shape, and
+`RCS2` is a diagnostic primary-center transition. `RSH2` also includes
+participant handles/sites, retained remote shape, and event count so reactions
+with similar centers but different partner chemistry do not collapse. `RCS2`
+is never used for retrieval. Construction does not load reaction grammars or
+the reaction-template registry. It abstains when no edited atom is observed on
+both sides and does not change `RS3`, admission, or named-family results.
 
 Mapped, single-event references can also be compiled into the versioned
 `reaction_templates.v1.json` registry. This authoring registry stores a

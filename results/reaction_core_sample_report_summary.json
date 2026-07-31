@@ -25,7 +25,7 @@
     "Acetonide Deprotection": {
       "baseline_signatures": 1,
       "cores": 1,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 0,
       "rows": 1,
       "valid_mappings": 1
@@ -241,7 +241,7 @@
     "Amide: Phenylacetic acid + cyclohexylamine": {
       "baseline_signatures": 0,
       "cores": 1,
-      "high_review_priority": 0,
+      "high_review_priority": 1,
       "new_core_coverage": 1,
       "rows": 1,
       "valid_mappings": 1
@@ -305,7 +305,7 @@
     "Appel": {
       "baseline_signatures": 1,
       "cores": 2,
-      "high_review_priority": 2,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 2,
       "valid_mappings": 2
@@ -377,7 +377,7 @@
     "Bn Deprotection": {
       "baseline_signatures": 0,
       "cores": 1,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 1,
       "valid_mappings": 1
@@ -393,7 +393,7 @@
     "Boc Deprotection": {
       "baseline_signatures": 0,
       "cores": 1,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 1,
       "valid_mappings": 1
@@ -417,7 +417,7 @@
     "Buchwald-Hartwig amination": {
       "baseline_signatures": 107,
       "cores": 112,
-      "high_review_priority": 12,
+      "high_review_priority": 13,
       "new_core_coverage": 5,
       "rows": 112,
       "valid_mappings": 112
@@ -441,7 +441,7 @@
     "Cbz Deprotection": {
       "baseline_signatures": 0,
       "cores": 1,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 1,
       "valid_mappings": 1
@@ -449,7 +449,7 @@
     "Cbz Protection": {
       "baseline_signatures": 2,
       "cores": 2,
-      "high_review_priority": 2,
+      "high_review_priority": 1,
       "new_core_coverage": 0,
       "rows": 2,
       "valid_mappings": 2
@@ -465,7 +465,7 @@
     "ChanLam coupling": {
       "baseline_signatures": 3,
       "cores": 3,
-      "high_review_priority": 3,
+      "high_review_priority": 2,
       "new_core_coverage": 0,
       "rows": 3,
       "valid_mappings": 3
@@ -473,7 +473,7 @@
     "Claisen": {
       "baseline_signatures": 0,
       "cores": 2,
-      "high_review_priority": 2,
+      "high_review_priority": 0,
       "new_core_coverage": 2,
       "rows": 2,
       "valid_mappings": 2
@@ -505,7 +505,7 @@
     "DIBAL": {
       "baseline_signatures": 1,
       "cores": 2,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 2,
       "valid_mappings": 2
@@ -521,7 +521,7 @@
     "DielsAlder": {
       "baseline_signatures": 0,
       "cores": 4,
-      "high_review_priority": 3,
+      "high_review_priority": 2,
       "new_core_coverage": 4,
       "rows": 4,
       "valid_mappings": 4
@@ -593,7 +593,7 @@
     "FMOC Deprotection": {
       "baseline_signatures": 0,
       "cores": 1,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 1,
       "valid_mappings": 1
@@ -649,7 +649,7 @@
     "Grignard addition": {
       "baseline_signatures": 0,
       "cores": 1,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 1,
       "valid_mappings": 1
@@ -657,7 +657,7 @@
     "HWE": {
       "baseline_signatures": 0,
       "cores": 2,
-      "high_review_priority": 2,
+      "high_review_priority": 0,
       "new_core_coverage": 2,
       "rows": 2,
       "valid_mappings": 2
@@ -745,7 +745,7 @@
     "Kumada": {
       "baseline_signatures": 5,
       "cores": 5,
-      "high_review_priority": 5,
+      "high_review_priority": 1,
       "new_core_coverage": 0,
       "rows": 5,
       "valid_mappings": 5
@@ -753,7 +753,7 @@
     "LiAlH4": {
       "baseline_signatures": 3,
       "cores": 5,
-      "high_review_priority": 2,
+      "high_review_priority": 1,
       "new_core_coverage": 2,
       "rows": 5,
       "valid_mappings": 5
@@ -825,7 +825,7 @@
     "Negishi": {
       "baseline_signatures": 5,
       "cores": 5,
-      "high_review_priority": 5,
+      "high_review_priority": 2,
       "new_core_coverage": 0,
       "rows": 5,
       "valid_mappings": 5
@@ -865,7 +865,7 @@
     "PMB Deprotection": {
       "baseline_signatures": 0,
       "cores": 1,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 1,
       "valid_mappings": 1
@@ -921,7 +921,7 @@
     "Reductive Amination": {
       "baseline_signatures": 27,
       "cores": 29,
-      "high_review_priority": 4,
+      "high_review_priority": 2,
       "new_core_coverage": 2,
       "rows": 29,
       "valid_mappings": 29
@@ -993,7 +993,7 @@
     "SNAr": {
       "baseline_signatures": 4,
       "cores": 5,
-      "high_review_priority": 2,
+      "high_review_priority": 3,
       "new_core_coverage": 1,
       "rows": 5,
       "valid_mappings": 5
@@ -1009,7 +1009,7 @@
     "Stille": {
       "baseline_signatures": 3,
       "cores": 3,
-      "high_review_priority": 3,
+      "high_review_priority": 1,
       "new_core_coverage": 0,
       "rows": 3,
       "valid_mappings": 3
@@ -1033,7 +1033,7 @@
     "Suzuki": {
       "baseline_signatures": 40,
       "cores": 44,
-      "high_review_priority": 44,
+      "high_review_priority": 9,
       "new_core_coverage": 4,
       "rows": 44,
       "valid_mappings": 44
@@ -1057,7 +1057,7 @@
     "TBS Deprotection": {
       "baseline_signatures": 0,
       "cores": 1,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 1,
       "valid_mappings": 1
@@ -1089,7 +1089,7 @@
     "Trityl Deprotection": {
       "baseline_signatures": 0,
       "cores": 1,
-      "high_review_priority": 1,
+      "high_review_priority": 0,
       "new_core_coverage": 1,
       "rows": 1,
       "valid_mappings": 1
@@ -1129,7 +1129,7 @@
     "Wittig": {
       "baseline_signatures": 0,
       "cores": 5,
-      "high_review_priority": 5,
+      "high_review_priority": 3,
       "new_core_coverage": 5,
       "rows": 5,
       "valid_mappings": 5
@@ -1153,13 +1153,13 @@
     "minisci_alkylation": {
       "baseline_signatures": 3,
       "cores": 12,
-      "high_review_priority": 7,
+      "high_review_priority": 2,
       "new_core_coverage": 9,
       "rows": 12,
       "valid_mappings": 12
     }
   },
-  "elapsed_seconds": 94.251,
+  "elapsed_seconds": 54.984,
   "mapping": {
     "attempted": 442,
     "invalid": 0,
@@ -1169,24 +1169,6 @@
   },
   "reaction_core": {
     "available": 445,
-    "boundary_classes": {
-      "acyl": 58,
-      "alkenyl": 24,
-      "alkyl": 173,
-      "alkynyl": 10,
-      "aryl": 311,
-      "heteroaryl": 79,
-      "heteroatom": 136,
-      "ring_aliphatic": 39
-    },
-    "center_count": {
-      "1": 353,
-      "2": 86,
-      "3": 2,
-      "4": 2,
-      "5": 1,
-      "6": 1
-    },
     "event_count": {
       "1": 421,
       "2": 24
@@ -1196,21 +1178,22 @@
       "C(#R)(ArC) → C(R)(:ArC)(:N)": 1,
       "C(#R)(R) → C(H)(#R) + C(:HetAr)2(I) → C(:HetAr)2(R)": 1,
       "C(#R)(R) → C(R)(:ArC)(:N) + N(Ar)(N-(N)) → N(Ar)(:ArC)(:N)": 1,
+      "C(#R)(R) → C(R)(:ArC)(:N) + N(N-R)(#N) → N(R)(:ArC)(:N)": 1,
       "C(:Ar)(B)(:ArC) → C(:Ar)(N-R)(:ArC) + C(H)(:Ar)(:ArC) → C(H)(:Ar)(:N)": 1,
-      "C(:Ar)(B)(:ArC) → C(H)(:Ar)(:ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 1,
       "C(:Ar)(B)(:O) → C(:Ar)(ArC)(:ArC)": 1,
       "C(:Ar)(Br)(:ArC) → C(:Ar)(ArC)(:ArC)": 1,
-      "C(:Ar)(Br)(:ArC) → C(H)(:Ar)(:ArC) + C(Br)(:ArC)2 → C(N-R)(:ArC)2": 1,
       "C(:Ar)(Cl)(:N) → C(:Ar)(N-R)(:N)": 1,
       "C(:Ar)(N-(O,O))(:ArC) → C(:Ar)(:ArC)2 + N(H)2(ArC) → N(H)(:ArC)2": 1,
-      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 4,
-      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:Ar)2(Cl) → C(:Ar)2(ArC)": 3,
-      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:HetAr)2(Br) → C(:HetAr)2(ArC)": 3,
+      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:Ar)2(Cl) → C(:Ar)2(ArC)": 4,
+      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:Ar)2(I) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:Ar)2(O-(S)) → C(:Ar)2(ArC)": 1,
       "C(:Ar)2(B) → C(:Ar)2(ArC) + C(:HetAr)2(I) → C(:HetAr)2(ArC)": 2,
-      "C(:Ar)2(B) → C(:Ar)2(ArC) + C(Br)(:ArC)2 → C(ArC)(:ArC)2": 1,
       "C(:Ar)2(B) → C(:Ar)2(N-R)": 3,
-      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 9,
-      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:Ar)2(Zn) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:Ar)(B)(:ArC) → C(H)(:Ar)(:ArC)": 1,
+      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 13,
+      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:Ar)2(Mg) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:Ar)2(Sn) → C(:Ar)2(ArC)": 1,
+      "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:Ar)2(Zn) → C(:Ar)2(ArC)": 2,
       "C(:Ar)2(Br) → C(:Ar)2(ArC) + C(:HetAr)2(B) → C(:HetAr)2(ArC)": 1,
       "C(:Ar)2(Br) → C(:Ar)2(N)": 16,
       "C(:Ar)2(Br) → C(:Ar)2(N-R)": 59,
@@ -1218,7 +1201,6 @@
       "C(:Ar)2(Br) → C(:Ar)2(R)": 12,
       "C(:Ar)2(Br) → C(:Ar)2(S-R)": 2,
       "C(:Ar)2(Br) → C(H)(:Ar)2 + C(H)(:ArC)2 → C(H)(:ArC)2": 1,
-      "C(:Ar)2(Cl) → C(:Ar)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 1,
       "C(:Ar)2(Cl) → C(:Ar)2(ArC) + C(:Ar)2(Mg) → C(:Ar)2(ArC)": 1,
       "C(:Ar)2(Cl) → C(:Ar)2(N)": 2,
       "C(:Ar)2(Cl) → C(:Ar)2(N-R)": 6,
@@ -1227,24 +1209,18 @@
       "C(:Ar)2(Cl) → C(:Ar)2(S-R)": 1,
       "C(:Ar)2(F) → C(:Ar)2(N-R)": 1,
       "C(:Ar)2(F) → C(:Ar)2(O-R)": 1,
-      "C(:Ar)2(I) → C(:Ar)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 1,
       "C(:Ar)2(I) → C(:Ar)2(N)": 1,
       "C(:Ar)2(I) → C(:Ar)2(N-R)": 5,
       "C(:Ar)2(I) → C(:Ar)2(R)": 4,
       "C(:Ar)2(I) → C(:Ar)2(S-R)": 1,
-      "C(:Ar)2(Mg) → C(:Ar)2(ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 1,
-      "C(:Ar)2(O-(S)) → C(:Ar)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 1,
       "C(:Ar)2(O-H) → C(:Ar)2(O-R)": 1,
-      "C(:Ar)2(Sn) → C(:Ar)2(ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 1,
-      "C(:Ar)2(Zn) → C(:Ar)2(ArC) + C(:Ar)2(Br) → C(:Ar)2(ArC)": 1,
       "C(:HetAr)(B)(:ArC) → C(:HetAr)(ArC)(:N)": 1,
       "C(:HetAr)(Br)(:ArC) → C(H)(:HetAr)(:ArC) + N(H)(Cycloalkyl)2 → N(ArC)(Cycloalkyl)2": 1,
       "C(:HetAr)(Cl)(:ArC) → C(:HetAr)(R)(:ArC)": 1,
-      "C(:HetAr)2(B) → C(:HetAr)2(ArC) + C(:HetAr)2(Br) → C(:HetAr)2(ArC)": 1,
       "C(:HetAr)2(B) → C(:HetAr)2(ArC) + C(:HetAr)2(Cl) → C(:HetAr)2(ArC)": 2,
       "C(:HetAr)2(B) → C(H)(:HetAr)2 + C(:Ar)2(Cl) → C(:Ar)2(ArC)": 1,
-      "C(:HetAr)2(Br) → C(:HetAr)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 2,
-      "C(:HetAr)2(Br) → C(:HetAr)2(ArC) + C(:HetAr)2(B) → C(:HetAr)2(ArC)": 1,
+      "C(:HetAr)2(Br) → C(:HetAr)2(ArC) + C(:Ar)2(B) → C(:Ar)2(ArC)": 5,
+      "C(:HetAr)2(Br) → C(:HetAr)2(ArC) + C(:HetAr)2(B) → C(:HetAr)2(ArC)": 2,
       "C(:HetAr)2(Br) → C(:HetAr)2(N)": 1,
       "C(:HetAr)2(Br) → C(:HetAr)2(N-R)": 8,
       "C(:HetAr)2(Br) → C(:HetAr)2(O-R)": 1,
@@ -1273,41 +1249,42 @@
       "C(Ar)(R)2(Cl) → C(Ar)(R)2(O-H)": 1,
       "C(Ar)3(Cl) → C(Ar)3(O-R)": 1,
       "C(ArC)(O)(=O) → C(H)2(R)(O) + C(R)(:ArC)2 → C(R)(:ArC)2": 1,
+      "C(Br)(:ArC)2 → C(ArC)(:ArC)2 + C(:Ar)2(B) → C(:Ar)2(ArC)": 1,
+      "C(Br)(:ArC)2 → C(ArC)(:ArC)2 + C(Br)(:ArC)2 → C(ArC)(:ArC)2 + C(H)(:ArC)2 → C(H)(:ArC)2 + C(H)(:ArC)2 → C(H)(:ArC)2": 1,
       "C(Br)(:ArC)2 → C(H)(:ArC)2": 1,
+      "C(Br)(:ArC)2 → C(N-R)(:ArC)2 + C(:Ar)(Br)(:ArC) → C(H)(:Ar)(:ArC)": 1,
       "C(Br)(:ArC)2 → C(R)(N-R)(=O) + C(Br)(:ArC)2 → C(N-R)(:ArC)2": 1,
       "C(Cycloalkyl)(O-H)(=O) → C(Cycloalkyl)(N-R)(=O)": 1,
+      "C(Cycloalkyl)(O-R)(=O) → C(H)2(R)(O-H) + C(H)2(R)(Cycloalkyl) → C(H)2(R)(O-H)": 1,
       "C(Cycloalkyl)2(=O) → C(H)(Cycloalkyl)2(N-R)": 2,
       "C(Cycloalkyl)2(=O) → C(H)(Cycloalkyl)2(O-H)": 1,
-      "C(H)(:Ar)(:HetAr) → C(:Ar)(:HetAr)(Br) + C(R)2(=O) → C(R)(ArC)(=O)": 1,
       "C(H)(:Ar)2 → C(:Ar)2(Br)": 1,
       "C(H)(:Ar)2 → C(:Ar)2(N-(O,O))": 1,
-      "C(H)(:ArC)2 → C(H)(:ArC)2 + C(Br)(:ArC)2 → C(ArC)(:ArC)2 + C(H)(:ArC)2 → C(H)(:ArC)2 + C(Br)(:ArC)2 → C(ArC)(:ArC)2": 1,
       "C(H)(:ArC)2 → C(H)(=R)(R)": 1,
       "C(H)(:ArC)2 → C(H)(=R)(R) + C(H)(:ArC)2 → C(H)(=R)(R) + C(H)(:ArC)2 → C(H)2(R)2 + C(H)(:ArC)2 → C(H)2(R)2 + C(H)(:ArC)2 → C(H)2(R)2 + C(H)(:ArC)2 → C(H)2(R)2": 1,
-      "C(H)(:ArC)2 → C(H)(=R)(R) + C(H)(:ArC)2 → C(H)2(R)(N-R) + C(R)(:ArC)2 → C(H)(=R)(R) + C(H)2(R)2 → C(=R)(R)2 + C(H)2(=O) → C(H)(=R)(R)": 1,
-      "C(H)(:ArC)2 → C(H)3(R) + C(H)2(=P-R) → C(H)(=R)(R)": 1,
-      "C(H)(:ArC)2 → C(R)(:ArC)2 + C(H)(R)(=O) → C(H)2(R)(N-R)": 1,
-      "C(H)(:HetAr)2 → C(:HetAr)2(R) + C(H)(Ar)(=O) → C(Ar)(ArC)(=O)": 1,
-      "C(H)(=Alkenyl)(B) → C(H)(=Alkenyl)(R) + C(H)(=Alkenyl)(Br) → C(H)(=Alkenyl)(R)": 1,
+      "C(H)(=Alkenyl)(Br) → C(H)(=Alkenyl)(R) + C(H)(=Alkenyl)(B) → C(H)(=Alkenyl)(R)": 1,
       "C(H)(=R)(Acyl) → C(H)2(Acyl)(R) + C(H)(=R)(Ar) → C(H)2(Ar)(R)": 1,
-      "C(H)(=R)(Acyl) → C(H)2(Acyl)(R) + C(H)(=R)(Ar) → C(H)2(Ar)(R) + C(H)(:Ar)2 → C(:Ar)2(R)": 1,
+      "C(H)(=R)(Alkenyl) → C(H)2(Alkenyl)(R)": 1,
       "C(H)(=R)(Ar) → C(H)(Ar)(=O)": 1,
       "C(H)(=R)(Ar) → C(H)(Ar)(R)(O-R)": 1,
       "C(H)(=R)(Ar) → C(H)(Ar)(R)2": 1,
       "C(H)(=R)(Ar) → C(H)2(Ar)(R)": 2,
+      "C(H)(=R)(Ar) → C(H)2(Ar)(R) + C(H)(=R)(Acyl) → C(H)2(Acyl)(R) + C(H)(:Ar)2 → C(:Ar)2(R)": 1,
       "C(H)(=R)(Cycloalkyl) → C(H)(R)(Cycloalkyl)(O-H) + C(H)(=R)(Cycloalkyl) → C(H)(R)(Cycloalkyl)(O-H)": 1,
       "C(H)(=R)(R) → C(H)(R)2(O-R)": 1,
-      "C(H)(=R)(R) → C(H)2(R)(Cycloalkyl)": 1,
       "C(H)(=R)(R) → C(H)2(R)(O-H)": 1,
+      "C(H)(=R)(R) → C(H)2(R)2 + C(H)(=R)(R) → C(H)2(R)2 + C(H)2(=R) → C(H)3(R) + C(H)2(=R) → C(H)3(R)": 1,
+      "C(H)(Acyl)(R)2 → C(Acyl)(R)3 + O(Acyl) → O(H)(Acyl)": 1,
       "C(H)(Alkynyl)2(R) → C(=R)(Alkynyl)2": 1,
       "C(H)(Ar)(=O) → C(Ar)(:N)(:O)": 1,
       "C(H)(Ar)(=O) → C(Ar)(:N)(:S)": 1,
       "C(H)(Ar)(=O) → C(Ar)(:N)2": 1,
-      "C(H)(Ar)(=O) → C(Ar)(ArC)(=O) + C(H)(:HetAr)2 → C(:HetAr)2(R)": 1,
+      "C(H)(Ar)(=O) → C(Ar)(ArC)(=O) + C(H)(:HetAr)2 → C(:HetAr)2(R)": 2,
       "C(H)(Ar)(=O) → C(H)(=R)(Ar)": 2,
+      "C(H)(Ar)(=O) → C(H)(=R)(Ar) + C(H)2(Acyl)(P-(O,O,O)) → C(H)(=R)(Acyl)": 1,
       "C(H)(Ar)(=O) → C(H)(Ar)(=N-R)": 1,
-      "C(H)(Ar)(=O) → C(H)(Ar)(R)(N-R) + C(R)2(=O) → C(=R)(R)(N-R)": 1,
       "C(H)(Ar)(=O) → C(H)(Ar)(R)(O-H)": 4,
+      "C(H)(Ar)(=O) → C(H)(Ar)(R)(O-H) + C(H)2(Acyl)(Br) → C(H)2(Acyl)(R)": 1,
       "C(H)(Ar)(=O) → C(H)2(Ar)(N-R)": 13,
       "C(H)(Ar)(=O) → C(H)2(Ar)(O-H)": 3,
       "C(H)(Ar)(R)(Br) → C(H)(=R)(Ar)": 1,
@@ -1316,10 +1293,10 @@
       "C(H)(R)(=O) → C(=R)(R)(O-R)": 1,
       "C(H)(R)(=O) → C(H)(=R)(R)": 1,
       "C(H)(R)(=O) → C(H)(=R)(R) + C(H)2(Acyl)(P-(O,O,O)) → C(H)(=R)(Acyl)": 1,
-      "C(H)(R)(=O) → C(H)(R)2(N-R) + C(R)2(=O) → C(=R)(R)(N-R)": 1,
       "C(H)(R)(=O) → C(H)(R)2(O-H)": 2,
-      "C(H)(R)(=O) → C(H)(R)2(O-H) + C(R)2(=O) → C(H)(R)3": 1,
+      "C(H)(R)(=O) → C(H)(R)2(O-H) + C(H)2(Acyl)(Br) → C(H)2(Acyl)(R)": 1,
       "C(H)(R)(=O) → C(H)2(R)(N-R)": 4,
+      "C(H)(R)(=O) → C(H)2(R)(N-R) + C(H)(:ArC)2 → C(R)(:ArC)2": 1,
       "C(H)(R)(=O) → C(H)2(R)2": 1,
       "C(H)(R)(=O) → C(R)(:ArC)(:N)": 1,
       "C(H)(R)(=O) → C(R)(ArC)(=O) + C(H)(:HetAr)2 → C(:HetAr)2(R)": 1,
@@ -1332,13 +1309,11 @@
       "C(H)(R)2(O-H) → C(R)2(=O)": 1,
       "C(H)(R)2(O-H) → C(R)2(=O) + C(H)2(R)(O-H) → C(H)(R)(=O)": 1,
       "C(H)(R)3 → C(H)(R)2(ArC) + C(H)3(Ar) → C(H)2(Ar)(F)": 1,
+      "C(H)2(=O) → C(H)(=R)(R) + C(H)2(R)2 → C(=R)(R)2 + C(R)(:ArC)2 → C(H)(=R)(R) + C(H)(:ArC)2 → C(H)(=R)(R) + C(H)(:ArC)2 → C(H)2(R)(N-R)": 1,
       "C(H)2(=O) → C(H)2(R)(O-H)": 1,
+      "C(H)2(=P-R) → C(H)(=R)(R) + C(H)(:ArC)2 → C(H)3(R)": 1,
       "C(H)2(=R) → C(H)(=R)(R)": 1,
-      "C(H)2(=R) → C(H)2(=R) + C(H)2(=R) → C(H)(=R)(R)": 1,
-      "C(H)2(=R) → C(H)3(R) + C(H)(=R)(R) → C(H)2(R)2 + C(H)(=R)(R) → C(H)2(R)2 + C(H)2(=R) → C(H)3(R)": 1,
-      "C(H)2(Acyl)(Br) → C(H)2(Acyl)(R) + C(H)(Ar)(=O) → C(H)(Ar)(R)(O-H)": 1,
-      "C(H)2(Acyl)(Br) → C(H)2(Acyl)(R) + C(H)(R)(=O) → C(H)(R)2(O-H)": 1,
-      "C(H)2(Acyl)(P-(O,O,O)) → C(H)(=R)(Acyl) + C(H)(Ar)(=O) → C(H)(=R)(Ar)": 1,
+      "C(H)2(=R) → C(H)(=R)(R) + C(H)2(=R) → C(H)2(=R)": 1,
       "C(H)2(Ar)(Br) → C(H)2(Ar)(O-R)": 2,
       "C(H)2(Ar)(Cl) → C(H)2(Ar)(I)": 1,
       "C(H)2(Ar)(I) → C(H)2(Ar)(O-H)": 1,
@@ -1351,8 +1326,7 @@
       "C(H)2(R)(Br) → C(H)2(R)(O-R)": 1,
       "C(H)2(R)(Br) → C(H)2(R)2": 2,
       "C(H)2(R)(Br) → C(H)2(R)2 + C(H)2(R)(Cl) → C(H)2(R)(N-H)": 1,
-      "C(H)2(R)(Cycloalkyl) → C(H)2(R)(Cycloalkyl) + C(R)(O-H)(=O) → C(R)(N-R)(=O)": 1,
-      "C(H)2(R)(Cycloalkyl) → C(H)2(R)(O-H) + C(Cycloalkyl)(O-R)(=O) → C(H)2(R)(O-H)": 1,
+      "C(H)2(R)(Br) → C(H)3(R) + C(H)2(R)2 → C(H)(=R)(R) + C(H)3(R) → C(H)2(=R)": 1,
       "C(H)2(R)(O-H) → C(H)(R)(=O)": 3,
       "C(H)2(R)(O-H) → C(H)2(R)(Br)": 1,
       "C(H)2(R)(O-H) → C(H)2(R)(N-R)": 1,
@@ -1361,7 +1335,6 @@
       "C(H)2(R)2 → C(H)2(R)(N-R)": 1,
       "C(H)3(I) → C(H)3(S-R)": 1,
       "C(H)3(N-R) → C(H)(:ArC)2": 1,
-      "C(H)3(R) → C(H)2(=R) + C(H)2(R)2 → C(H)(=R)(R) + C(H)2(R)(Br) → C(H)3(R)": 1,
       "C(H)3(R) → C(H)3(ArC)": 2,
       "C(H)3(R) → C(H)3(R) + C(H)3(R) → C(H)(=R)(R)": 1,
       "C(H)3(R) → C(R)3(Si)": 1,
@@ -1379,19 +1352,24 @@
       "C(R)(O-H)(=O) → C(R)(:N)(:O)": 1,
       "C(R)(O-H)(=O) → C(R)(:N)2": 1,
       "C(R)(O-H)(=O) → C(R)(N-R)(=O)": 8,
+      "C(R)(O-H)(=O) → C(R)(N-R)(=O) + C(H)2(R)(Cycloalkyl) → C(H)2(R)(Cycloalkyl)": 1,
       "C(R)(O-H)(=O) → C(R)(O-R)(=O)": 1,
       "C(R)(O-R)(=O) → C(H)(R)(=O)": 1,
       "C(R)(O-R)(=O) → C(H)2(R)(O-H)": 1,
       "C(R)(O-R)(=O) → C(R)2(=O)": 1,
+      "C(R)2(=O) → C(=R)(R)(N-R) + C(H)(Ar)(=O) → C(H)(Ar)(R)(N-R)": 1,
+      "C(R)2(=O) → C(=R)(R)(N-R) + C(H)(R)(=O) → C(H)(R)2(N-R)": 1,
       "C(R)2(=O) → C(=R)(R)2": 2,
       "C(R)2(=O) → C(H)(=R)(R)": 1,
       "C(R)2(=O) → C(H)(R)2(N-R)": 2,
       "C(R)2(=O) → C(H)(R)2(O-H)": 1,
       "C(R)2(=O) → C(H)(R)2(O-H) + C(H)(R)(=O) → C(H)(R)(=O)": 1,
+      "C(R)2(=O) → C(H)(R)3 + C(H)(R)(=O) → C(H)(R)2(O-H)": 1,
       "C(R)2(=O) → C(H)3(R)": 1,
       "C(R)2(=O) → C(R)(:ArC)(:N)": 1,
       "C(R)2(=O) → C(R)(:ArC)(:N) + C(R)2(=O) → C(R)(:ArC)(:N)": 1,
       "C(R)2(=O) → C(R)(:N)2 + C(H)(N-H)(=O) → C(H)3(N)": 1,
+      "C(R)2(=O) → C(R)(ArC)(=O) + C(H)(:Ar)(:HetAr) → C(:Ar)(:HetAr)(Br)": 1,
       "C(R)2(=O) → C(R)(O-R)(=O)": 1,
       "C(R)2(=O) → C(R)2(=O)": 1,
       "C(R)2(=O) → C(R)2(ArC)(O-H)": 1,
@@ -1405,8 +1383,6 @@
       "N(Ar)(O)(=O) → N(Ar)(O)(=O)": 1,
       "N(Ar)(O)(=O) → N(H)2(Ar)": 2,
       "N(H)(Ar)(R) → N(H)2(Ar)": 3,
-      "N(N-R)(#N) → N(R)(:ArC)(:N) + C(#R)(R) → C(R)(:ArC)(:N)": 1,
-      "O(Acyl) → O(H)(Acyl) + C(H)(Acyl)(R)2 → C(Acyl)(R)3": 1,
       "O(R)(Cycloalkyl) → O(H)(R) + O(R)(Cycloalkyl) → O(H)(R)": 1,
       "O(R)(O-R) → O(H)(R) + O(R)(O-R) → O(H)(R)": 1,
       "O(R)(Si) → O(H)(R)": 1,
@@ -1417,26 +1393,51 @@
       "Si(R)3(Cl) → Si(R)3(O-R)": 1
     },
     "mixed_source_label_clusters": 30,
+    "mixed_source_label_shape_clusters": 21,
     "new_coverage_without_baseline_signature": 104,
+    "primary_center_count": {
+      "1": 353,
+      "2": 86,
+      "3": 2,
+      "4": 2,
+      "5": 1,
+      "6": 1
+    },
+    "remote_classes": {
+      "acyl": 57,
+      "alkenyl": 24,
+      "alkyl": 172,
+      "alkynyl": 10,
+      "aryl": 311,
+      "generic_R": 2,
+      "heteroaryl": 79,
+      "heteroatom": 136,
+      "ring_aliphatic": 34
+    },
     "repeated_center_transition_keys": 54,
+    "repeated_shape_core_keys": 47,
     "rows_in_mixed_source_label_clusters": 146,
+    "rows_in_mixed_source_label_shape_clusters": 58,
     "rows_in_repeated_center_clusters": 241,
+    "rows_in_repeated_shape_clusters": 141,
     "unavailable": 1,
-    "unique_center_transition_keys": 258
+    "unique_center_transition_keys": 258,
+    "unique_shape_core_keys": 351
   },
-  "report_schema_version": "1.0",
+  "report_schema_version": "2.0",
   "report_status": {
     "core_available": 445,
     "core_unavailable": 1
   },
   "review_priority": {
-    "high": 152,
-    "low": 1,
-    "medium": 293
+    "high": 82,
+    "low": 2,
+    "medium": 362
   },
   "review_reasons": {
-    "REACTION_CORE_BOUNDARY_CONTINUITY_UNRESOLVED": 103,
     "REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL": 434,
+    "REACTION_CORE_NO_OP_PRIMARY_CENTER": 6,
+    "REACTION_CORE_REMOTE_CONTINUITY_UNRESOLVED": 3,
     "baseline_signature_unavailable": 105,
     "invalid_reaction": 1,
     "low_mapper_confidence": 73,

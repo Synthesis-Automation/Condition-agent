@@ -2,7 +2,7 @@
 
 Source reaction types are copied to the report for evaluation only.  They are
 never passed to atom mapping, reaction featurization, center selection,
-boundary classification, key construction, or generic-label rendering.
+remote-subgraph classification, key construction, or generic-label rendering.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ from reactive_taxonomy import (  # noqa: E402
 )
 
 
-REPORT_SCHEMA_VERSION = "1.0"
+REPORT_SCHEMA_VERSION = "2.0"
 DEFAULT_SOURCE = PROJECT_ROOT / "examples" / "sample_reactions.csv"
 DEFAULT_OUTPUT = (
     PROJECT_ROOT / "results" / "reaction_core_sample_report.csv"
@@ -74,17 +74,17 @@ REPORT_FIELDS = (
     "core_id",
     "exact_core_key",
     "typed_core_key",
-    "generic_core_key",
+    "shape_core_key",
     "center_transition_key",
     "core_generic_label",
     "core_active_atom_count",
     "core_event_count",
-    "core_center_count",
-    "core_center_states",
-    "boundary_classes",
-    "retained_boundary_classes",
-    "boundary_fragments",
-    "core_boundaries",
+    "core_primary_center_count",
+    "core_atom_transitions",
+    "remote_classes",
+    "retained_remote_classes",
+    "remote_fragments",
+    "core_remote_subgraphs",
     "core_evidence",
     "core_confidence",
     "core_warnings",
@@ -159,41 +159,55 @@ def _mapped_analysis(
     )
 
 
-def _core_center_states(core: ReactionCoreProjection) -> list[dict[str, Any]]:
+def _core_atom_transitions(
+    core: ReactionCoreProjection,
+) -> list[dict[str, Any]]:
     return [
         {
-            "atom_map_number": center.atom_map_number,
+            "atom_map_number": transition.atom_map_number,
             "before": (
-                center.before_state.concise_label
-                if center.before_state is not None
+                transition.before_state.concise_label
+                if transition.before_state is not None
                 else None
             ),
             "after": (
-                center.after_state.concise_label
-                if center.after_state is not None
+                transition.after_state.concise_label
+                if transition.after_state is not None
                 else None
             ),
-            "incident_edit_count": center.incident_edit_count,
-            "stable_boundary_count": center.stable_boundary_count,
+            "incident_edit_count": transition.incident_edit_count,
+            "stable_remote_subgraph_count": (
+                transition.stable_remote_subgraph_count
+            ),
+            "role": transition.role,
         }
-        for center in core.centers
+        for transition in core.atom_transitions
     ]
 
 
-def _core_boundaries(core: ReactionCoreProjection) -> list[dict[str, Any]]:
+def _core_remote_subgraphs(
+    core: ReactionCoreProjection,
+) -> list[dict[str, Any]]:
     return [
         {
-            "side": boundary.side,
-            "core_atom_map_number": boundary.core_atom_map_number,
-            "attachment_atom_map_number": boundary.attachment_atom_map_number,
-            "attachment_element": boundary.attachment_element,
-            "bond_order": boundary.bond_order,
-            "boundary_class": boundary.boundary_class,
-            "continuity": boundary.continuity,
-            "fragment_smiles": boundary.fragment_smiles,
-            "functional_group_ids": list(boundary.functional_group_ids),
+            "side": subgraph.side,
+            "remote_class": subgraph.remote_class,
+            "continuity": subgraph.continuity,
+            "fragment_smiles": subgraph.fragment_smiles,
+            "functional_group_ids": list(subgraph.functional_group_ids),
+            "attachment_ports": [
+                {
+                    "core_atom_map_number": port.core_atom_map_number,
+                    "attachment_atom_map_number": (
+                        port.attachment_atom_map_number
+                    ),
+                    "attachment_element": port.attachment_element,
+                    "bond_order": port.bond_order,
+                }
+                for port in subgraph.attachment_ports
+            ],
         }
-        for boundary in core.boundaries
+        for subgraph in core.remote_subgraphs
     ]
 
 
@@ -220,7 +234,11 @@ def _review(
         reasons.extend(core.warnings)
         if core.event_count > 1:
             reasons.append("multi_event_core")
-        if len(core.centers) > 2:
+        primary_count = sum(
+            transition.role == "primary_center"
+            for transition in core.atom_transitions
+        )
+        if primary_count > 2:
             reasons.append("many_selected_centers")
     if mapped_analysis is not None and mapped_analysis.reaction_signature is None:
         reasons.append("mapped_signature_unavailable")
@@ -232,7 +250,8 @@ def _review(
         "invalid_reaction",
         "low_mapper_confidence",
         "reaction_core_unavailable",
-        "REACTION_CORE_BOUNDARY_CONTINUITY_UNRESOLVED",
+        "REACTION_CORE_NO_OP_PRIMARY_CENTER",
+        "REACTION_CORE_REMOTE_CONTINUITY_UNRESOLVED",
     }
     if high_markers.intersection(reasons):
         priority = "high"
@@ -265,28 +284,28 @@ def _report_row(
     )
     mapping_attempted = mapping is not None
     mapping_warnings = mapping.warnings if mapping is not None else ()
-    boundary_classes = (
-        sorted({boundary.boundary_class for boundary in core.boundaries})
+    remote_classes = (
+        sorted({subgraph.remote_class for subgraph in core.remote_subgraphs})
         if core is not None
         else []
     )
-    retained_boundary_classes = (
+    retained_remote_classes = (
         sorted(
             {
-                boundary.boundary_class
-                for boundary in core.boundaries
-                if boundary.continuity == "retained"
+                subgraph.remote_class
+                for subgraph in core.remote_subgraphs
+                if subgraph.continuity == "retained"
             }
         )
         if core is not None
         else []
     )
-    boundary_fragments = (
+    remote_fragments = (
         sorted(
             {
-                boundary.fragment_smiles
-                for boundary in core.boundaries
-                if boundary.fragment_smiles
+                subgraph.fragment_smiles
+                for subgraph in core.remote_subgraphs
+                if subgraph.fragment_smiles
             }
         )
         if core is not None
@@ -369,7 +388,7 @@ def _report_row(
         "core_id": core.core_id if core is not None else "",
         "exact_core_key": core.exact_core_key if core is not None else "",
         "typed_core_key": core.typed_core_key if core is not None else "",
-        "generic_core_key": core.generic_core_key if core is not None else "",
+        "shape_core_key": core.shape_core_key if core is not None else "",
         "center_transition_key": (
             core.center_transition_key if core is not None else ""
         ),
@@ -378,15 +397,22 @@ def _report_row(
             core.active_atom_count if core is not None else ""
         ),
         "core_event_count": core.event_count if core is not None else "",
-        "core_center_count": len(core.centers) if core is not None else "",
-        "core_center_states": (
-            _json(_core_center_states(core)) if core is not None else "[]"
+        "core_primary_center_count": (
+            sum(
+                transition.role == "primary_center"
+                for transition in core.atom_transitions
+            )
+            if core is not None
+            else ""
         ),
-        "boundary_classes": _json(boundary_classes),
-        "retained_boundary_classes": _json(retained_boundary_classes),
-        "boundary_fragments": _json(boundary_fragments),
-        "core_boundaries": (
-            _json(_core_boundaries(core)) if core is not None else "[]"
+        "core_atom_transitions": (
+            _json(_core_atom_transitions(core)) if core is not None else "[]"
+        ),
+        "remote_classes": _json(remote_classes),
+        "retained_remote_classes": _json(retained_remote_classes),
+        "remote_fragments": _json(remote_fragments),
+        "core_remote_subgraphs": (
+            _json(_core_remote_subgraphs(core)) if core is not None else "[]"
         ),
         "core_evidence": core.evidence if core is not None else "",
         "core_confidence": (
@@ -427,14 +453,24 @@ def _summary(
         if row["mapper_confidence"] != ""
     ]
     clusters: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
+    shape_clusters: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for row in core_rows:
         clusters[str(row["center_transition_key"])].append(row)
+        shape_clusters[str(row["shape_core_key"])].append(row)
     repeated_clusters = {
         key: rows for key, rows in clusters.items() if len(rows) > 1
     }
     mixed_clusters = {
         key: rows
         for key, rows in repeated_clusters.items()
+        if len({str(row["reaction_type"]) for row in rows}) > 1
+    }
+    repeated_shape_clusters = {
+        key: rows for key, rows in shape_clusters.items() if len(rows) > 1
+    }
+    mixed_shape_clusters = {
+        key: rows
+        for key, rows in repeated_shape_clusters.items()
         if len({str(row["reaction_type"]) for row in rows}) > 1
     }
     by_type = {}
@@ -512,20 +548,29 @@ def _summary(
             "rows_in_mixed_source_label_clusters": sum(
                 len(rows) for rows in mixed_clusters.values()
             ),
+            "unique_shape_core_keys": len(shape_clusters),
+            "repeated_shape_core_keys": len(repeated_shape_clusters),
+            "rows_in_repeated_shape_clusters": sum(
+                len(rows) for rows in repeated_shape_clusters.values()
+            ),
+            "mixed_source_label_shape_clusters": len(mixed_shape_clusters),
+            "rows_in_mixed_source_label_shape_clusters": sum(
+                len(rows) for rows in mixed_shape_clusters.values()
+            ),
             "event_count": _counts(
                 str(row["core_event_count"]) for row in core_rows
             ),
-            "center_count": _counts(
-                str(row["core_center_count"]) for row in core_rows
+            "primary_center_count": _counts(
+                str(row["core_primary_center_count"]) for row in core_rows
             ),
             "generic_labels": _counts(
                 str(row["core_generic_label"]) for row in core_rows
             ),
-            "boundary_classes": _counts(
-                boundary_class
+            "remote_classes": _counts(
+                remote_class
                 for row in core_rows
-                for boundary_class in json.loads(
-                    str(row["boundary_classes"])
+                for remote_class in json.loads(
+                    str(row["remote_classes"])
                 )
             ),
         },
