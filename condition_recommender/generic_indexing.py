@@ -328,6 +328,35 @@ def build_generic_index_from_rows(
     )
 
 
+def _external_mapping_blocks_precedent(
+    record: Mapping[str, Any],
+    *,
+    status: str,
+    source_supported_partial: bool,
+) -> bool:
+    """Return whether external mapping supplied or contradicted chemistry.
+
+    A resolved shadow pass may add only a minimized reaction core while the
+    signature and admission evidence remain internal. That provenance must not
+    disqualify an otherwise eligible precedent. Mapper-derived or conflicting
+    chemistry remains excluded from the trusted index.
+    """
+    if not status or status.startswith("not_requested_"):
+        return False
+    if (
+        status == "external_mapping_signature_unavailable"
+        and source_supported_partial
+    ):
+        return False
+    evidence_quality = str(record.get("evidence_quality") or "")
+    core_only_shadow = (
+        status == "external_mapping_internal_consensus"
+        and evidence_quality != "external_atom_mapping"
+        and not evidence_quality.startswith("external_mapping")
+    )
+    return not core_only_shadow
+
+
 def build_generic_index(
     records: Iterable[Mapping[str, Any]],
     *,
@@ -354,15 +383,10 @@ def build_generic_index(
                 for value in fragment_source_support
             )
         )
-        if (
-            not include_review
-            and external_mapping_status
-            and not external_mapping_status.startswith("not_requested_")
-            and not (
-                external_mapping_status
-                == "external_mapping_signature_unavailable"
-                and source_supported_partial
-            )
+        if not include_review and _external_mapping_blocks_precedent(
+            record,
+            status=external_mapping_status,
+            source_supported_partial=source_supported_partial,
         ):
             continue
         eligibility = _enum_value(record.get("index_eligibility"))

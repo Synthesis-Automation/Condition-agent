@@ -110,7 +110,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "3.8"
-    assert record.converter_definition_version == "generic_conversion.v3.0"
+    assert record.converter_definition_version == "generic_conversion.v3.2"
     assert record.reaction_signature["schema_version"] == "3.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -137,7 +137,7 @@ def test_mapped_unknown_reaction_serializes_reaction_core_for_review() -> None:
     assert record.reaction_core is not None
     assert record.reaction_core["schema_version"] == "2.1"
     assert record.reaction_core["algorithm_version"] == (
-        "reaction_core_projection.v6"
+        "reaction_core_projection.v7"
     )
     assert record.reaction_core["shape_core_key"].startswith("RSH2:")
     assert record.reaction_core["generic_label"] == (

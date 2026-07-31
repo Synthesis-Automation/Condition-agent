@@ -233,20 +233,22 @@ def test_converter_shadow_maps_resolved_reaction_with_missing_core() -> None:
     )
     assert record.chemistry_status == ChemistryStatus.VERIFIED
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
+    assert len(build_generic_index([record.to_dict()]).rows) == 1
     review = concise_reaction_review_row(record.to_dict())
     assert review["reaction_core_label"]
     assert review["reaction_core_status"] == "available_external"
     assert review["reaction_core_unavailability_reasons"] == ""
 
 
-def test_converter_retains_blank_core_and_reports_shadow_mapping_conflict() -> None:
+def test_converter_retains_hypothesis_core_for_shadow_mapping_conflict() -> None:
     record = convert_record(
         _resolved_raw_record(),
         mapping_provider=_ResolvedFixtureProvider(signature_conflict=True),
     )
 
     assert record.reaction_signature is not None
-    assert record.reaction_core is None
+    assert record.reaction_core is not None
+    assert record.reaction_core["evidence_status"] == "hypothesis"
     assert record.external_atom_mapping is not None
     assert record.external_atom_mapping["status"] == (
         "external_mapping_signature_conflict"
@@ -254,10 +256,8 @@ def test_converter_retains_blank_core_and_reports_shadow_mapping_conflict() -> N
     assert record.chemistry_status == ChemistryStatus.REVIEW
     assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
     review = concise_reaction_review_row(record.to_dict())
-    assert review["reaction_core_status"] == "unavailable"
-    assert review["reaction_core_unavailability_reasons"] == (
-        "external_mapping_signature_conflict"
-    )
+    assert review["reaction_core_status"] == "available_hypothesis"
+    assert review["reaction_core_unavailability_reasons"] == ""
 
 
 def test_external_mapping_selects_one_internal_fischer_hypothesis() -> None:
@@ -288,6 +288,8 @@ def test_external_mapping_conflict_retains_internal_hypotheses() -> None:
 
     assert assessment.status == "external_mapping_hypothesis_conflict"
     assert assessment.analysis.reaction_signature is None
+    assert assessment.analysis.reaction_core is not None
+    assert assessment.analysis.reaction_core.evidence_status == "hypothesis"
     assert len(assessment.analysis.edit_hypotheses) == 2
     assert "EXTERNAL_MAPPING_HYPOTHESIS_CONFLICT" in assessment.analysis.warnings
 

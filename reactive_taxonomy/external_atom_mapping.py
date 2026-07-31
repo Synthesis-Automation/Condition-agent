@@ -21,6 +21,7 @@ from .reaction_models import (
     ReactionAnalysis,
     ReactionAtomReference,
     ReactionComponent,
+    ReactionCoreProjection,
     ReactionEdit,
     ReactionEvidenceCandidate,
 )
@@ -201,11 +202,11 @@ def _indexed_graph(molecule: Any) -> tuple[object, ...]:
     return atoms, bonds
 
 
-def _mapped_component_in_original_order(
+def _component_map_numbers_in_original_order(
     original: ReactionComponent,
     mapped: ReactionComponent,
-) -> Optional[str]:
-    """Transfer validated map numbers without changing original coordinates."""
+) -> Optional[dict[int, int]]:
+    """Project validated map numbers onto original atom coordinates."""
     from rdkit import Chem
 
     original_molecule = parse_smiles(original.input_smiles)
@@ -228,37 +229,26 @@ def _mapped_component_in_original_order(
     if not matches:
         return None
     match = min(matches)
-    projected = Chem.Mol(original_molecule)
-    for mapped_index, original_index in enumerate(match):
-        projected.GetAtomWithIdx(int(original_index)).SetAtomMapNum(
-            int(mapped_molecule.GetAtomWithIdx(mapped_index).GetAtomMapNum())
+    return {
+        int(original_index): int(
+            mapped_molecule.GetAtomWithIdx(mapped_index).GetAtomMapNum()
         )
-    projected_smiles = str(
-        Chem.MolToSmiles(
-            projected,
-            canonical=False,
-            isomericSmiles=True,
-        )
-    )
-    reparsed = parse_smiles(projected_smiles)
-    if (
-        reparsed is None
-        or _indexed_graph(reparsed) != _indexed_graph(original_molecule)
-    ):
-        return None
-    return projected_smiles
+        for mapped_index, original_index in enumerate(match)
+        if int(mapped_molecule.GetAtomWithIdx(mapped_index).GetAtomMapNum()) > 0
+    }
 
 
-def _mapping_in_original_component_order(
+def _mapping_in_original_coordinates(
     base: ReactionAnalysis,
     mapped: ParsedReaction,
-) -> Optional[ParsedReaction]:
-    """Build mapped components whose indices match the base analysis graphs."""
+) -> Optional[dict[tuple[str, int, int], int]]:
+    """Return validated map numbers keyed by base-analysis coordinates."""
 
     def project_side(
+        side: str,
         originals: Sequence[ReactionComponent],
         mapped_components: Sequence[ReactionComponent],
-    ) -> Optional[tuple[str, ...]]:
+    ) -> Optional[dict[tuple[str, int, int], int]]:
         available: dict[str, list[ReactionComponent]] = {}
         for component in mapped_components:
             identity = _canonical_without_maps(component.input_smiles)
@@ -267,37 +257,34 @@ def _mapping_in_original_component_order(
             available.setdefault(identity, []).append(component)
         for values in available.values():
             values.sort(key=lambda component: component.component_index)
-        projected = []
+        projected: dict[tuple[str, int, int], int] = {}
         for original in originals:
             identity = _canonical_without_maps(original.input_smiles)
             candidates = available.get(str(identity), [])
             if identity is None or not candidates:
                 return None
             mapped_component = candidates.pop(0)
-            smiles = _mapped_component_in_original_order(
+            map_numbers = _component_map_numbers_in_original_order(
                 original,
                 mapped_component,
             )
-            if smiles is None:
+            if map_numbers is None:
                 return None
-            projected.append(smiles)
+            projected.update(
+                {
+                    (side, original.component_index, atom_index): map_number
+                    for atom_index, map_number in map_numbers.items()
+                }
+            )
         if any(available.values()):
             return None
-        return tuple(projected)
+        return projected
 
-    reactants = project_side(base.reactants, mapped.reactants)
-    products = project_side(base.products, mapped.products)
+    reactants = project_side("reactant", base.reactants, mapped.reactants)
+    products = project_side("product", base.products, mapped.products)
     if reactants is None or products is None:
         return None
-    agents = tuple(component.input_smiles for component in base.agents)
-    if agents:
-        reaction_smiles = (
-            f"{'.'.join(reactants)}>{'.'.join(agents)}>{'.'.join(products)}"
-        )
-    else:
-        reaction_smiles = f"{'.'.join(reactants)}>>{'.'.join(products)}"
-    projected = parse_reaction_smiles(reaction_smiles)
-    return projected if projected.valid else None
+    return {**reactants, **products}
 
 
 def _mapping_coverage(
@@ -698,6 +685,32 @@ def _merge_evidence_candidates(
     return tuple(values)
 
 
+def _mapped_core_proposal(
+    *,
+    base: ReactionAnalysis,
+    mapped: ParsedReaction,
+    mapping: ExternalAtomMappingResult,
+    evidence: str,
+    confidence: float,
+) -> tuple[Optional[ReactionCoreProjection], bool]:
+    """Build a mapped core on base coordinates without a SMILES round-trip."""
+    from .reaction_core import build_reaction_core_projection
+
+    atom_map_overrides = _mapping_in_original_coordinates(base, mapped)
+    if atom_map_overrides is None or mapping.normalization is None:
+        return None, False
+    core = build_reaction_core_projection(
+        reactants=base.reactants,
+        products=base.products,
+        edits=mapping.normalization.edits,
+        evidence=evidence,
+        confidence=confidence,
+        topology=base.reaction_topology,
+        atom_map_overrides=atom_map_overrides,
+    )
+    return core, True
+
+
 def analyze_reaction_with_external_mapping(
     reaction_smiles: str,
     provider: AtomMappingProvider,
@@ -784,6 +797,25 @@ def analyze_reaction_with_external_mapping(
     if force_resolved_shadow and base.reaction_signature is not None:
         if not signature_matches:
             warning = "EXTERNAL_MAPPING_SIGNATURE_CONFLICT"
+            reaction_core, _ = _mapped_core_proposal(
+                base=base,
+                mapped=mapped_parsed,
+                mapping=mapping,
+                evidence="conflicting_edit_evidence",
+                confidence=mapping.normalization.confidence,
+            )
+            proposal_warning = "REACTION_CORE_CONFLICTING_EVIDENCE_PROPOSAL"
+            if reaction_core is not None:
+                reaction_core = replace(
+                    reaction_core,
+                    warnings=tuple(
+                        sorted(
+                            set(reaction_core.warnings).union(
+                                (proposal_warning,)
+                            )
+                        )
+                    ),
+                )
             return ExternalMappingAssessment(
                 input_reaction_smiles=reaction_smiles,
                 status="external_mapping_signature_conflict",
@@ -793,8 +825,18 @@ def analyze_reaction_with_external_mapping(
                         base.evidence_candidates,
                         (external_candidate,),
                     ),
+                    reaction_core=reaction_core,
                     warnings=tuple(
-                        sorted(set(base.warnings).union((warning,)))
+                        sorted(
+                            set(base.warnings).union(
+                                (warning,)
+                                + (
+                                    (proposal_warning,)
+                                    if reaction_core is not None
+                                    else ()
+                                )
+                            )
+                        )
                     ),
                 ),
                 provider_metadata=provider.metadata,
@@ -805,8 +847,6 @@ def analyze_reaction_with_external_mapping(
         # Forced mapping of an already resolved reaction is a shadow operation:
         # it supplies atom correspondence for the minimized graphic, but must
         # not replace the internally resolved interpretation or its labels.
-        from .reaction_core import build_reaction_core_projection
-
         confidence = min(
             mapping.normalization.confidence,
             min(
@@ -819,8 +859,14 @@ def analyze_reaction_with_external_mapping(
             "EXTERNAL_MAPPING_INTERNAL_CONSENSUS",
             "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW",
         )
-        core_parsed = _mapping_in_original_component_order(base, mapped_parsed)
-        if core_parsed is None:
+        reaction_core, coordinates_projected = _mapped_core_proposal(
+            base=base,
+            mapped=mapped_parsed,
+            mapping=mapping,
+            evidence=evidence,
+            confidence=confidence,
+        )
+        if not coordinates_projected:
             warning = "EXTERNAL_MAPPING_CORE_COORDINATE_PROJECTION_FAILED"
             return ExternalMappingAssessment(
                 input_reaction_smiles=reaction_smiles,
@@ -839,14 +885,6 @@ def analyze_reaction_with_external_mapping(
                 mapping_result=mapping,
                 warnings=(warning, "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW"),
             )
-        reaction_core = build_reaction_core_projection(
-            reactants=core_parsed.reactants,
-            products=core_parsed.products,
-            edits=mapping.normalization.edits,
-            evidence=evidence,
-            confidence=confidence,
-            topology=base.reaction_topology,
-        )
         if reaction_core is None:
             warning = "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE"
             return ExternalMappingAssessment(
@@ -897,6 +935,23 @@ def analyze_reaction_with_external_mapping(
             if matches
             else "EXTERNAL_MAPPING_HYPOTHESIS_CONFLICT"
         )
+        reaction_core, _ = _mapped_core_proposal(
+            base=base,
+            mapped=mapped_parsed,
+            mapping=mapping,
+            evidence="conflicting_edit_evidence",
+            confidence=mapping.normalization.confidence,
+        )
+        proposal_warning = "REACTION_CORE_CONFLICTING_EVIDENCE_PROPOSAL"
+        if reaction_core is not None:
+            reaction_core = replace(
+                reaction_core,
+                warnings=tuple(
+                    sorted(
+                        set(reaction_core.warnings).union((proposal_warning,))
+                    )
+                ),
+            )
         return ExternalMappingAssessment(
             input_reaction_smiles=reaction_smiles,
             status=status,
@@ -906,7 +961,19 @@ def analyze_reaction_with_external_mapping(
                     base.evidence_candidates,
                     (external_candidate,),
                 ),
-                warnings=tuple(sorted(set(base.warnings).union((warning,)))),
+                reaction_core=reaction_core,
+                warnings=tuple(
+                    sorted(
+                        set(base.warnings).union(
+                            (warning,)
+                            + (
+                                (proposal_warning,)
+                                if reaction_core is not None
+                                else ()
+                            )
+                        )
+                    )
+                ),
             ),
             provider_metadata=provider.metadata,
             mapping_result=mapping,

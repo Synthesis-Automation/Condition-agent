@@ -77,7 +77,7 @@ The current code declares:
 | --- | --- |
 | Reaction analysis | `3.5` |
 | Reaction signature / ID namespace | `3.0` / `RS3` |
-| Reaction core projection / algorithm | `2.1` / `reaction_core_projection.v6` |
+| Reaction core projection / algorithm | `2.1` / `reaction_core_projection.v7` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
 | Connectivity rewrite | `2.0` |
@@ -85,8 +85,8 @@ The current code declares:
 | Reaction fallback descriptor | `1.3` |
 | Resolved condition recipe | `1.2` |
 | Recommendation record | `3.8` |
-| Generic converter definition | `generic_conversion.v3.0` |
-| Generic sharded converter definition | `generic_sharded_conversion.v1.7` |
+| Generic converter definition | `generic_conversion.v3.2` |
+| Generic sharded converter definition | `generic_sharded_conversion.v1.9` |
 | Concise reaction review | `2.7` |
 | Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `2.5` |

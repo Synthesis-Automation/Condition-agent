@@ -68,6 +68,9 @@ def _atom_identity(reference: ReactionAtomReference) -> _AtomIdentity:
 
 def _component_locations(
     components: Sequence[ReactionComponent],
+    *,
+    side: str,
+    atom_map_overrides: Optional[Mapping[tuple[str, int, int], int]] = None,
 ) -> tuple[Dict[int, _Location], Dict[_Coordinate, _Location]]:
     by_map: Dict[int, _Location] = {}
     by_coordinate: Dict[_Coordinate, _Location] = {}
@@ -79,10 +82,33 @@ def _component_locations(
             atom_index = int(atom.GetIdx())
             location = (component, molecule, atom_index)
             by_coordinate[(component.component_index, atom_index)] = location
-            map_number = int(atom.GetAtomMapNum())
+            map_number = _atom_map_number(
+                atom,
+                side=side,
+                component_index=component.component_index,
+                atom_index=atom_index,
+                atom_map_overrides=atom_map_overrides,
+            )
             if map_number > 0:
                 by_map[map_number] = location
     return by_map, by_coordinate
+
+
+def _atom_map_number(
+    atom: Any,
+    *,
+    side: str,
+    component_index: int,
+    atom_index: int,
+    atom_map_overrides: Optional[Mapping[tuple[str, int, int], int]],
+) -> int:
+    """Return an atom map while preserving the parsed component coordinates."""
+    return int(
+        (atom_map_overrides or {}).get(
+            (side, component_index, atom_index),
+            int(atom.GetAtomMapNum()),
+        )
+    )
 
 
 def _location_for_identity(
@@ -273,6 +299,9 @@ def _build_remote_subgraphs_for_side(
     side: str,
     components: Sequence[ReactionComponent],
     active_coordinates: set[_Coordinate],
+    atom_map_overrides: Optional[
+        Mapping[tuple[str, int, int], int]
+    ] = None,
 ) -> Tuple[ReactionCoreRemoteSubgraph, ...]:
     values = []
     for component in components:
@@ -303,11 +332,25 @@ def _build_remote_subgraphs_for_side(
                             core_component_index=component.component_index,
                             core_atom_index=core_index,
                             core_atom_map_number=(
-                                int(core_atom.GetAtomMapNum()) or None
+                                _atom_map_number(
+                                    core_atom,
+                                    side=side,
+                                    component_index=component.component_index,
+                                    atom_index=core_index,
+                                    atom_map_overrides=atom_map_overrides,
+                                )
+                                or None
                             ),
                             attachment_atom_index=attachment_index,
                             attachment_atom_map_number=(
-                                int(attachment.GetAtomMapNum()) or None
+                                _atom_map_number(
+                                    attachment,
+                                    side=side,
+                                    component_index=component.component_index,
+                                    atom_index=attachment_index,
+                                    atom_map_overrides=atom_map_overrides,
+                                )
+                                or None
                             ),
                             attachment_element=attachment.GetSymbol(),
                             bond_order=str(bond.GetBondType()).upper(),
@@ -335,10 +378,21 @@ def _build_remote_subgraphs_for_side(
             )
             map_numbers = tuple(
                 sorted(
-                    int(atom.GetAtomMapNum())
+                    _atom_map_number(
+                        atom,
+                        side=side,
+                        component_index=component.component_index,
+                        atom_index=atom_index,
+                        atom_map_overrides=atom_map_overrides,
+                    )
                     for atom_index in atom_indices
-                    if (atom := molecule.GetAtomWithIdx(atom_index)).GetAtomMapNum()
-                    > 0
+                    if _atom_map_number(
+                        (atom := molecule.GetAtomWithIdx(atom_index)),
+                        side=side,
+                        component_index=component.component_index,
+                        atom_index=atom_index,
+                        atom_map_overrides=atom_map_overrides,
+                    ) > 0
                 )
             )
             payload = {
@@ -836,6 +890,7 @@ def _build_atom_state(
         tuple[str, int, int, int],
         ReactionCoreRemoteClass,
     ],
+    atom_map_number: Optional[int] = None,
 ) -> ReactionCoreAtomState:
     component, molecule, atom_index = location
     atom = molecule.GetAtomWithIdx(atom_index)
@@ -861,7 +916,7 @@ def _build_atom_state(
         side=side,  # type: ignore[arg-type]
         component_index=component.component_index,
         atom_index=atom_index,
-        atom_map_number=int(atom.GetAtomMapNum()) or None,
+        atom_map_number=atom_map_number or int(atom.GetAtomMapNum()) or None,
         element=atom.GetSymbol(),
         formal_charge=int(atom.GetFormalCharge()),
         aromatic=bool(atom.GetIsAromatic()),
@@ -1010,6 +1065,9 @@ def _stable_remote_count(
     reactant_by_map: Mapping[int, _Location],
     product_by_map: Mapping[int, _Location],
     active_coordinates_by_side: Mapping[str, set[_Coordinate]],
+    atom_map_overrides: Optional[
+        Mapping[tuple[str, int, int], int]
+    ] = None,
 ) -> int:
     if identity[0] != "map":
         return 0
@@ -1029,7 +1087,13 @@ def _stable_remote_count(
                 neighbor_index,
             ) in active_coordinates_by_side[side]:
                 continue
-            neighbor_map = int(neighbor.GetAtomMapNum())
+            neighbor_map = _atom_map_number(
+                neighbor,
+                side=side,
+                component_index=component.component_index,
+                atom_index=neighbor_index,
+                atom_map_overrides=atom_map_overrides,
+            )
             if neighbor_map <= 0:
                 continue
             values.add(
@@ -1396,6 +1460,9 @@ def build_reaction_core_projection(
     evidence: str,
     confidence: float,
     topology: Optional[ReactionTopology] = None,
+    atom_map_overrides: Optional[
+        Mapping[tuple[str, int, int], int]
+    ] = None,
 ) -> Optional[ReactionCoreProjection]:
     """Build a grammar- and template-free minimized reaction-core projection."""
     if not edits:
@@ -1409,8 +1476,16 @@ def build_reaction_core_projection(
         edit_tokens,
         edit_records,
     ) = _edit_graph(edits)
-    reactant_by_map, reactant_by_coordinate = _component_locations(reactants)
-    product_by_map, product_by_coordinate = _component_locations(products)
+    reactant_by_map, reactant_by_coordinate = _component_locations(
+        reactants,
+        side="reactant",
+        atom_map_overrides=atom_map_overrides,
+    )
+    product_by_map, product_by_coordinate = _component_locations(
+        products,
+        side="product",
+        atom_map_overrides=atom_map_overrides,
+    )
     shared_identities = {
         identity
         for identity in identities
@@ -1440,11 +1515,13 @@ def build_reaction_core_projection(
         side="reactant",
         components=reactants,
         active_coordinates=reactant_active,
+        atom_map_overrides=atom_map_overrides,
     )
     product_remote = _build_remote_subgraphs_for_side(
         side="product",
         components=products,
         active_coordinates=product_active,
+        atom_map_overrides=atom_map_overrides,
     )
     remote_subgraphs = _with_remote_continuity(
         reactant_remote,
@@ -1489,6 +1566,7 @@ def build_reaction_core_projection(
                 reactant_by_map=reactant_by_map,
                 product_by_map=product_by_map,
                 active_coordinates_by_side=active_coordinates_by_side,
+                atom_map_overrides=atom_map_overrides,
             )
             for identity in candidates
         }
@@ -1522,6 +1600,9 @@ def build_reaction_core_projection(
                 location=before_location,
                 active_coordinates=reactant_active,
                 remote_classes=remote_classes,
+                atom_map_number=(
+                    int(identity[1]) if identity[0] == "map" else None
+                ),
             )
             if before_location is not None
             else None
@@ -1532,6 +1613,9 @@ def build_reaction_core_projection(
                 location=after_location,
                 active_coordinates=product_active,
                 remote_classes=remote_classes,
+                atom_map_number=(
+                    int(identity[1]) if identity[0] == "map" else None
+                ),
             )
             if after_location is not None
             else None
@@ -1546,6 +1630,7 @@ def build_reaction_core_projection(
             reactant_by_map=reactant_by_map,
             product_by_map=product_by_map,
             active_coordinates_by_side=active_coordinates_by_side,
+            atom_map_overrides=atom_map_overrides,
         )
         transition_payload = {
             "before": _state_identity(before_state, generic=False),

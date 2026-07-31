@@ -151,7 +151,7 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
         "schema_version": "3.8",
-        "converter_definition_version": "generic_conversion.v3.0",
+        "converter_definition_version": "generic_conversion.v3.2",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",

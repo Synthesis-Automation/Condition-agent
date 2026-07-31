@@ -46,6 +46,17 @@ RESOLVED_SUZUKI_MAPPING = (
     "[c:8](-[c:9]2[cH:10][cH:11][cH:12][cH:13][cH:14]2)"
     "[cH:15][cH:16]1"
 )
+KEKULIZED_SUZUKI_REACTION = (
+    "COC(=O)C1=CC=C(Br)C=C1.OB(O)C1=CC=C(F)C=C1"
+    ">>COC(=O)c1ccc(-c2ccc(F)cc2)cc1"
+)
+KEKULIZED_SUZUKI_MAPPING = (
+    "[Br:18][c:8]1[cH:7][cH:6][c:5]([C:3]([O:2][CH3:1])=[O:4])"
+    "[cH:17][cH:16]1.O[B:19](O)[c:9]1[cH:10][cH:11][c:12]([F:13])"
+    "[cH:14][cH:15]1>>[CH3:1][O:2][C:3](=[O:4])[c:5]1[cH:6]"
+    "[cH:7][c:8](-[c:9]2[cH:10][cH:11][c:12]([F:13])[cH:14]"
+    "[cH:15]2)[cH:16][cH:17]1"
+)
 REPEATED_SUZUKI_REACTION = (
     "Brc1ccc(Br)cc1.OB(O)c1ccccc1.OB(O)c1ccccc1"
     ">>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1"
@@ -247,6 +258,32 @@ def test_forced_resolved_mapping_only_enriches_the_minimized_core() -> None:
     ).detailed_reaction_label
 
 
+def test_forced_mapping_projects_maps_without_smiles_coordinate_round_trip() -> None:
+    base = featurize_reaction(KEKULIZED_SUZUKI_REACTION)
+    assert base.reaction_signature is not None
+    assert base.reaction_core is None
+
+    assessment = analyze_reaction_with_external_mapping(
+        KEKULIZED_SUZUKI_REACTION,
+        _ResolvedFixtureProvider(
+            mapped_reaction=KEKULIZED_SUZUKI_MAPPING,
+            allowed_pairs=frozenset(
+                {("B", "C"), ("Br", "C"), ("C", "C")}
+            ),
+        ),
+        base_analysis=base,
+        force_resolved_shadow=True,
+    )
+
+    assert assessment.status == "external_mapping_internal_consensus"
+    assert assessment.analysis.reaction_signature == base.reaction_signature
+    assert assessment.analysis.reaction_core is not None
+    assert assessment.analysis.reaction_core.evidence_status == "external"
+    assert "EXTERNAL_MAPPING_CORE_COORDINATE_PROJECTION_FAILED" not in (
+        assessment.analysis.warnings
+    )
+
+
 def test_forced_mapping_conflict_retains_the_resolved_interpretation() -> None:
     base = featurize_reaction(RESOLVED_SUZUKI_REACTION)
 
@@ -261,7 +298,11 @@ def test_forced_mapping_conflict_retains_the_resolved_interpretation() -> None:
     assert assessment.analysis.reaction_label == base.reaction_label
     assert assessment.analysis.display_label == base.display_label
     assert assessment.analysis.reaction_signature == base.reaction_signature
-    assert assessment.analysis.reaction_core is None
+    assert assessment.analysis.reaction_core is not None
+    assert assessment.analysis.reaction_core.evidence_status == "hypothesis"
+    assert "REACTION_CORE_CONFLICTING_EVIDENCE_PROPOSAL" in (
+        assessment.analysis.reaction_core.warnings
+    )
     assert "EXTERNAL_MAPPING_SIGNATURE_CONFLICT" in assessment.analysis.warnings
 
 

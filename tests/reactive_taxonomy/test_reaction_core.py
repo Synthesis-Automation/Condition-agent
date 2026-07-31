@@ -356,6 +356,6 @@ def test_reaction_core_serializes_but_does_not_invent_unmapped_observation() -> 
     assert mapped_payload["schema_version"] == "3.5"
     assert mapped_payload["reaction_core"]["schema_version"] == "2.1"
     assert mapped_payload["reaction_core"]["algorithm_version"] == (
-        "reaction_core_projection.v6"
+        "reaction_core_projection.v7"
     )
     assert unmapped.reaction_core is None
