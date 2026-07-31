@@ -122,14 +122,35 @@ def _first_svg_bond_length(drawing: bytes) -> float:
     return math.dist(coordinates[:2], coordinates[2:])
 
 
-def test_render_presets_are_versioned_and_include_compact_acs() -> None:
+def test_render_presets_are_versioned_and_include_drawing_styles() -> None:
     definition = load_render_style_definitions()
 
     assert definition["definition_id"] == "render_styles.v1"
     assert definition["schema_version"] == "1.0"
     assert available_render_presets() == (
         ("current", "Current"),
+        ("short_bond", "Short bond"),
         ("acs_1996_compact", "ACS 1996"),
+    )
+
+
+def test_short_bond_preset_uses_85_percent_of_current_bond_length() -> None:
+    current = render_molecule_image_bytes(
+        "CCC",
+        size=(480, 300),
+        image_format="svg",
+        render_preset="current",
+    )
+    short_bond = render_molecule_image_bytes(
+        "CCC",
+        size=(480, 300),
+        image_format="svg",
+        render_preset="short_bond",
+    )
+
+    assert _first_svg_bond_length(short_bond) == pytest.approx(
+        _first_svg_bond_length(current) * 0.85,
+        rel=0.002,
     )
 
 

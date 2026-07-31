@@ -132,6 +132,15 @@ def load_render_style_definitions() -> Dict[str, Any]:
             raise ValueError(
                 f"render-style preset {preset_id!r} has invalid bond length"
             )
+        bond_length_scale = preset.get("bond_length_scale", 1.0)
+        if (
+            isinstance(bond_length_scale, bool)
+            or not isinstance(bond_length_scale, (int, float))
+            or not 0 < bond_length_scale <= 1
+        ):
+            raise ValueError(
+                f"render-style preset {preset_id!r} has invalid bond-length scale"
+            )
         for context in ("standard", "reaction_core"):
             if not isinstance(preset.get(context), Mapping):
                 raise ValueError(
@@ -267,7 +276,14 @@ def apply_render_preset(
     if preset["mode"] == "acs_1996":
         rdMolDraw2D.SetACS1996Mode(options, mean_bond_length)
     if "padding" in context_options:
-        options.padding = float(context_options["padding"])
+        padding = float(context_options["padding"])
+        bond_length_scale = float(preset.get("bond_length_scale", 1.0))
+        # RDKit's automatic fit has no relative bond-length option. Scaling the
+        # drawable span preserves automatic fitting while shortening every bond
+        # by the requested proportion: span = 1 - (2 * padding).
+        options.padding = (
+            1.0 - bond_length_scale * (1.0 - 2.0 * padding)
+        ) / 2.0
     if "bond_line_width" in context_options:
         options.bondLineWidth = float(context_options["bond_line_width"])
     if "min_font_size" in context_options and hasattr(options, "minFontSize"):
