@@ -87,9 +87,9 @@ The current code declares:
 | Reaction fallback descriptor | `1.3` |
 | Resolved condition recipe | `1.2` |
 | Recommendation record | `4.0` |
-| Generic converter definition | `generic_conversion.v3.6` |
-| Generic sharded converter definition | `generic_sharded_conversion.v2.3` |
-| Concise reaction review | `3.2` |
+| Generic converter definition | `generic_conversion.v3.7` |
+| Generic sharded converter definition | `generic_sharded_conversion.v2.4` |
+| Concise reaction review | `3.3` |
 | Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `2.6` |
 | Generic recommendation result | `2.4` |

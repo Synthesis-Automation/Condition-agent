@@ -110,7 +110,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "4.0"
-    assert record.converter_definition_version == "generic_conversion.v3.6"
+    assert record.converter_definition_version == "generic_conversion.v3.7"
     assert record.reaction_signature["schema_version"] == "3.1"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -157,7 +157,7 @@ def test_cycloaddition_ring_observation_is_chemist_readable_in_review() -> None:
     assert change["element_sequence"] == ("C", "C", "N", "N", "N")
     assert change["formed_bond_types"] == ("C-N", "C-N")
     review = concise_reaction_review_row(record.to_dict())
-    assert review["reaction_core_lable_display"] == (
+    assert review["reaction_display_label"] == (
         "C≡C + N=N=N → aromatic 5-membered C₂N₃ ring"
     )
     assert review["reaction_display_label_detailed"].startswith(
@@ -638,19 +638,19 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "3.2"
+    assert report["schema_version"] == "3.3"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
-        "reaction_core_lable_display"
+        "reaction_display_label"
     )
     assert CONCISE_REACTION_REVIEW_FIELDS[label_index : label_index + 3] == (
-        "reaction_core_lable_display",
+        "reaction_display_label",
         "reaction_display_label_detailed",
         "reaction_core_label",
     )
     assert review_rows[0]["canonical_reaction_smiles"]
-    assert review_rows[0]["reaction_core_lable_display"]
+    assert review_rows[0]["reaction_display_label"]
     assert review_rows[0]["reaction_display_label_detailed"]
     assert review_rows[0]["original_reaction_type"] == "Original Suzuki Label"
     assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
