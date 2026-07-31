@@ -72,6 +72,27 @@ def test_concise_molecule_and_reaction_output(capsys) -> None:
     assert "attached Alkyl: tertiary" in tert_butylamine_output
 
 
+def test_concise_reaction_output_exposes_minimized_core(capsys) -> None:
+    reaction = (
+        "[CH3:1][OH:2].O[CH3:5]."
+        "[CH:3](=[O:4])[c:6]1[cH:7][cH:8][cH:9][cH:10][c:11]1[F:12]"
+        ">>[CH3:1][O:2][CH:3]([O:4][CH3:5])"
+        "[c:6]1[cH:7][cH:8][cH:9][cH:10][c:11]1[F:12]"
+    )
+
+    assert main(["reaction", reaction, "--concise"]) == 0
+    output = capsys.readouterr().out
+
+    assert "Reaction minimization:" in output
+    assert "Minimized reaction: C(H)(Ar)(=O) → C(H)(Ar)(O-R)2" in output
+    assert "Core evidence: verified (validated_atom_mapping" in output
+    assert "Core shape (retrieval): RSH2:" in output
+    assert "Center transition (diagnostic only): RCS2:" in output
+    assert "1 event(s); 1 primary center(s); 4 active atom(s)" in output
+    assert "retained aryl [Fc1ccccc1] (1 port)" in output
+    assert "departing heteroatom [O] (1 port)" in output
+
+
 def test_concise_ambiguous_reaction_explains_structural_evidence(capsys) -> None:
     reaction = (
         "O=C1CCCCC1.Cl.NNc1ccc(F)cc1"
@@ -243,12 +264,15 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
     assert "CSV output:" in capsys.readouterr().out
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
-        assert reader.fieldnames == [
+        assert reader.fieldnames is not None
+        assert reader.fieldnames[:4] == [
             "reaction_smiles",
             "reaction_label",
             "partner_analysis",
             "spectator_groups",
         ]
+        assert "reaction_core_shape_key" in reader.fieldnames
+        assert "reaction_core_remote_subgraphs" in reader.fieldnames
         rows = list(reader)
 
     assert len(rows) == 1
@@ -259,3 +283,51 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
         "ortho burden none (0/2); electron demand balanced"
     )
     assert rows[0]["spectator_groups"] == "nitrile"
+    assert rows[0]["reaction_core_available"] == "False"
+
+
+def test_batch_reaction_csv_exposes_minimized_core(tmp_path, capsys) -> None:
+    source = tmp_path / "mapped_reactions.csv"
+    output = tmp_path / "mapped_results.csv"
+    reaction = (
+        "[CH3:1][OH:2].O[CH3:5]."
+        "[CH:3](=[O:4])[c:6]1[cH:7][cH:8][cH:9][cH:10][c:11]1[F:12]"
+        ">>[CH3:1][O:2][CH:3]([O:4][CH3:5])"
+        "[c:6]1[cH:7][cH:8][cH:9][cH:10][c:11]1[F:12]"
+    )
+    with source.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["reaction_smiles"])
+        writer.writeheader()
+        writer.writerow({"reaction_smiles": reaction})
+
+    assert (
+        main(
+            [
+                "batch",
+                str(source),
+                "--mode",
+                "reaction",
+                "--concise",
+                "--output",
+                str(output),
+            ]
+        )
+        == 0
+    )
+    assert "CSV output:" in capsys.readouterr().out
+    with output.open("r", encoding="utf-8-sig", newline="") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert row["reaction_core_available"] == "True"
+    assert row["reaction_core_label"] == "C(H)(Ar)(=O) → C(H)(Ar)(O-R)2"
+    assert row["reaction_core_evidence_status"] == "verified"
+    assert row["reaction_core_exact_key"].startswith("RCX2:")
+    assert row["reaction_core_typed_key"].startswith("RCT2:")
+    assert row["reaction_core_shape_key"].startswith("RSH2:")
+    assert row["reaction_core_center_transition_key"].startswith("RCS2:")
+    assert row["reaction_core_event_count"] == "1"
+    assert row["reaction_core_primary_center_count"] == "1"
+    assert row["reaction_core_remote_classes"] == "alkyl; aryl; heteroatom"
+    assert "reactant:retained:aryl:Fc1ccccc1:1" in row[
+        "reaction_core_remote_subgraphs"
+    ]

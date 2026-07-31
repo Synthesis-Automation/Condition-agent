@@ -449,7 +449,10 @@ analysis output and is never a retrieval key.
 Reaction-core projection is a sibling observation to RS3, not a substitute for
 it. It does not change reaction-signature identity, named-family assignment, or
 converter admission. Its schema and algorithm versions are serialized
-explicitly, and stale core artifacts are rejected.
+explicitly, and stale core artifacts are rejected. The CLI and desktop
+featurizer expose the minimized label, evidence, `RSH2`, diagnostic `RCS2`,
+core size, remote subgraphs, attachment counts, and warnings; reaction batch
+CSV exports the corresponding audit fields.
 
 The internal `CEG1` connectivity-edit graph remains evaluation/shadow output.
 The public and persisted chemistry identity is the RS3 reaction signature.

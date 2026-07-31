@@ -38,6 +38,10 @@ with similar centers but different partner chemistry do not collapse. `RCS2`
 is never used for retrieval. Construction does not load reaction grammars or
 the reaction-template registry. It abstains when no edited atom is observed on
 both sides and does not change `RS3`, admission, or named-family results.
+The reaction CLI and desktop featurizer show the minimized label, evidence,
+shape and center keys, core size, remote subgraphs, attachment counts, and
+warnings. Batch reaction CSV exports the same audit fields; JSON retains the
+complete nested projection.
 
 Mapped, single-event references can also be compiled into the versioned
 `reaction_templates.v1.json` registry. This authoring registry stores a

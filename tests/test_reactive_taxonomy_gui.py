@@ -108,3 +108,29 @@ def test_window_explains_ambiguous_reaction_evidence() -> None:
     finally:
         window.close()
         application.processEvents()
+
+
+def test_window_displays_mapped_reaction_minimization() -> None:
+    application = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    window = ReactiveTaxonomyWindow()
+    reaction = (
+        "[CH3:1][OH:2].O[CH3:5]."
+        "[CH:3](=[O:4])[c:6]1[cH:7][cH:8][cH:9][cH:10][c:11]1[F:12]"
+        ">>[CH3:1][O:2][CH:3]([O:4][CH3:5])"
+        "[c:6]1[cH:7][cH:8][cH:9][cH:10][c:11]1[F:12]"
+    )
+    try:
+        window.use_rxnmapper_check.setChecked(False)
+        window.input_edit.setText(reaction)
+        window.analyze()
+        output = window.output.toPlainText()
+
+        assert "Reaction minimization:" in output
+        assert "Minimized reaction: C(H)(Ar)(=O) → C(H)(Ar)(O-R)2" in output
+        assert "Core evidence: verified (validated_atom_mapping" in output
+        assert "Core shape (retrieval): RSH2:" in output
+        assert "Center transition (diagnostic only): RCS2:" in output
+        assert "retained aryl [Fc1ccccc1] (1 port)" in output
+    finally:
+        window.close()
+        application.processEvents()

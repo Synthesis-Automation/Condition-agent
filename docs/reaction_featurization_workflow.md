@@ -270,6 +270,19 @@ reactions can share a carbon-center transition while requiring different
 partner chemistry and conditions. The projection is a sibling observation to
 RS3 and never upgrades ambiguous or externally mapped evidence.
 
+The reaction CLI and desktop featurizer display this observation in a
+`Reaction minimization` section. The concise view includes the minimized label,
+evidence status and confidence, `RSH2`, diagnostic `RCS2`, event/center/active
+atom counts, remote-subgraph classes, continuity, exact fragment SMILES,
+attachment-port counts, and core warnings. When no core is available, it says
+that mapped edit correspondence is required instead of silently omitting the
+section.
+
+Reaction batch CSV exports include `reaction_core_available`, the four core
+keys, minimized label, evidence status, event and center counts, remote classes
+and subgraph summaries, and warnings. Nested JSON remains the complete
+lossless representation.
+
 The three desktop applications expose a `Use RXNMapper` checkbox that is
 checked by default:
 

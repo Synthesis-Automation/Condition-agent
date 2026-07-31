@@ -44,6 +44,22 @@ _SELF_TEST_REACTIONS = (
     "Brc1ccccc1.Sc1ccccc1>>c1ccc(Sc2ccccc2)cc1",
 )
 
+_REACTION_CORE_CSV_FIELDS = (
+    "reaction_core_available",
+    "reaction_core_id",
+    "reaction_core_label",
+    "reaction_core_evidence_status",
+    "reaction_core_exact_key",
+    "reaction_core_typed_key",
+    "reaction_core_shape_key",
+    "reaction_core_center_transition_key",
+    "reaction_core_event_count",
+    "reaction_core_primary_center_count",
+    "reaction_core_remote_classes",
+    "reaction_core_remote_subgraphs",
+    "reaction_core_warnings",
+)
+
 
 def _json_dump(value: Any, *, compact: bool = False) -> str:
     return json.dumps(
@@ -413,6 +429,7 @@ def _reaction_summary(result: Any) -> str:
     partner_analysis = _partner_analysis(result)
     if partner_analysis:
         lines.append(f"partner analysis: {partner_analysis}")
+    lines.extend(_reaction_core_lines(result))
     if result.warnings:
         lines.append(f"warnings: {_joined(result.warnings)}")
     if result.error:
@@ -452,6 +469,62 @@ def _molecule_concise_summary(result: Any) -> str:
     return "\n".join(lines)
 
 
+def _reaction_core_lines(result: Any) -> list[str]:
+    """Render the minimized mapped-edit observation without overstating it."""
+    core = getattr(result, "reaction_core", None)
+    if core is None:
+        return [
+            "Reaction minimization: unavailable "
+            "(mapped edit correspondence required)"
+        ]
+    primary_center_count = sum(
+        transition.role == "primary_center"
+        for transition in core.atom_transitions
+    )
+    lines = [
+        "Reaction minimization:",
+        f"  Minimized reaction: {core.generic_label}",
+        (
+            f"  Core evidence: {core.evidence_status} "
+            f"({core.evidence}; confidence {core.confidence:.3f})"
+        ),
+        f"  Core shape (retrieval): {core.shape_core_key}",
+        (
+            "  Center transition (diagnostic only): "
+            f"{core.center_transition_key}"
+        ),
+        (
+            f"  Core size: {core.event_count} event(s); "
+            f"{primary_center_count} primary center(s); "
+            f"{core.active_atom_count} active atom(s)"
+        ),
+    ]
+    if core.remote_subgraphs:
+        remote = []
+        for subgraph in core.remote_subgraphs:
+            fragment = (
+                f" [{subgraph.fragment_smiles}]"
+                if subgraph.fragment_smiles
+                else ""
+            )
+            port_label = (
+                "port"
+                if len(subgraph.attachment_ports) == 1
+                else "ports"
+            )
+            remote.append(
+                f"{subgraph.side} {subgraph.continuity} "
+                f"{subgraph.remote_class}{fragment} "
+                f"({len(subgraph.attachment_ports)} {port_label})"
+            )
+        lines.append(f"  Remote subgraphs: {'; '.join(remote)}")
+    else:
+        lines.append("  Remote subgraphs: none")
+    if core.warnings:
+        lines.append(f"  Core warnings: {_joined(core.warnings)}")
+    return lines
+
+
 def _reaction_concise_summary(result: Any) -> str:
     lines = [
         f"Reaction: {result.reaction_label or '-'}",
@@ -478,6 +551,7 @@ def _reaction_concise_summary(result: Any) -> str:
     if result.spectator_groups:
         spectators = sorted({group.chemist_label for group in result.spectator_groups})
         lines.append(f"Spectator groups: {_joined(spectators)}")
+    lines.extend(("", *_reaction_core_lines(result)))
     diagnostic_lines = _reaction_diagnostic_lines(result)
     if diagnostic_lines:
         lines.extend(("", "Structural evidence:"))
@@ -647,7 +721,7 @@ def _reaction_csv_columns(
             columns.extend(("reaction_label", "spectator_groups"))
     columns.extend((
         "valid", "evidence_quality", "transformation_class", "named_family",
-        "partner_analysis",
+        "partner_analysis", *_REACTION_CORE_CSV_FIELDS,
         "reaction_label_status", "candidate_count", "warnings", "error",
     ))
     return columns
@@ -655,6 +729,7 @@ def _reaction_csv_columns(
 
 def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     analysis = record["analysis"]
+    reaction_core = analysis.get("reaction_core") or {}
     spectator_groups = analysis.get("spectator_groups") or []
     signature_partners = (analysis.get("reaction_signature") or {}).get("partners") or []
 
@@ -669,6 +744,25 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
             dict_role(partner),
             int(partner.get("component_index", -1)),
         ),
+    )
+    atom_transitions = reaction_core.get("atom_transitions") or []
+    remote_subgraphs = reaction_core.get("remote_subgraphs") or []
+    remote_classes = sorted(
+        {
+            str(subgraph.get("remote_class") or "")
+            for subgraph in remote_subgraphs
+            if subgraph.get("remote_class")
+        }
+    )
+    remote_summary = sorted(
+        (
+            f"{subgraph.get('side') or 'unknown'}:"
+            f"{subgraph.get('continuity') or 'unknown'}:"
+            f"{subgraph.get('remote_class') or 'generic_R'}:"
+            f"{subgraph.get('fragment_smiles') or '-'}:"
+            f"{len(subgraph.get('attachment_ports') or [])}"
+        )
+        for subgraph in remote_subgraphs
     )
 
     return {
@@ -686,6 +780,32 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
             f"{dict_role(partner)}="
             f"{render_reactivity_profile(partner.get('reactivity_profile'))}"
             for partner in signature_partners
+        ),
+        "reaction_core_available": bool(reaction_core),
+        "reaction_core_id": reaction_core.get("core_id") or "",
+        "reaction_core_label": reaction_core.get("generic_label") or "",
+        "reaction_core_evidence_status": (
+            reaction_core.get("evidence_status") or ""
+        ),
+        "reaction_core_exact_key": reaction_core.get("exact_core_key") or "",
+        "reaction_core_typed_key": reaction_core.get("typed_core_key") or "",
+        "reaction_core_shape_key": reaction_core.get("shape_core_key") or "",
+        "reaction_core_center_transition_key": (
+            reaction_core.get("center_transition_key") or ""
+        ),
+        "reaction_core_event_count": reaction_core.get("event_count") or "",
+        "reaction_core_primary_center_count": (
+            sum(
+                transition.get("role") == "primary_center"
+                for transition in atom_transitions
+            )
+            if reaction_core
+            else ""
+        ),
+        "reaction_core_remote_classes": "; ".join(remote_classes),
+        "reaction_core_remote_subgraphs": "; ".join(remote_summary),
+        "reaction_core_warnings": "; ".join(
+            str(value) for value in reaction_core.get("warnings") or []
         ),
         "reaction_label_status": analysis.get("reaction_label_status") or "",
         "candidate_count": len(analysis.get("candidates") or []),
@@ -709,6 +829,7 @@ def _write_batch_csv(
             "reaction_label",
             "partner_analysis",
             "spectator_groups",
+            *_REACTION_CORE_CSV_FIELDS,
         ]
         row_builder = _reaction_csv_row
     else:
