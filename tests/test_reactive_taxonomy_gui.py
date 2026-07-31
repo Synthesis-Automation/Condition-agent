@@ -39,6 +39,7 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert window.kind_label.text() == "Detected: reaction"
         window.analyze()
         reaction_output = window.output.toPlainText()
+        priority_review = window.review_output.toPlainText()
         assert reaction_output.startswith("REACTION FEATURIZATION")
         assert (
             "RXNMapper: not_requested_resolved_internal_evidence"
@@ -46,6 +47,12 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         )
         assert "Reaction: Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" in reaction_output
         assert "Evidence: exact_product_reconstruction" in reaction_output
+        assert priority_review.startswith(
+            "Detailed reaction label: Ar¹–Br + Ar²–B(OH)₂ → Ar¹–Ar²"
+        )
+        assert "Graphic core label: Unavailable" in priority_review
+        assert "Spectators: None detected" in priority_review
+        assert "Electronic / steric analysis: electrophile:" in priority_review
         assert "reaction input · valid" in window.status_label.text()
         reaction_pixmap = window.structure_image_label.pixmap()
         assert reaction_pixmap is not None
@@ -61,6 +68,9 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         molecule_output = window.output.toPlainText()
         assert molecule_output.startswith("MOLECULE FEATURIZATION")
         assert "Reactive sites:" in molecule_output
+        assert window.review_output.toPlainText() == (
+            "Reaction review applies to reaction SMILES."
+        )
         assert "Ar–Br — leaving_group, available" in molecule_output
         assert "molecule input · valid" in window.status_label.text()
         molecule_pixmap = window.structure_image_label.pixmap()

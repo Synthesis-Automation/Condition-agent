@@ -17,8 +17,10 @@ from reactive_taxonomy import (  # noqa: E402
     ExternalMappingAssessment,
     RxnMapperProvider,
     analyze_reaction_with_external_mapping,
+    build_reaction_review_summary,
     featurize_molecule,
     featurize_reaction,
+    format_reaction_review_summary,
 )
 from reactive_taxonomy.cli import format_concise_analysis  # noqa: E402
 from visualization import (  # noqa: E402
@@ -183,7 +185,24 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         analysis_layout = QtWidgets.QVBoxLayout(analysis_column)
         analysis_layout.setContentsMargins(0, 0, 0, 0)
         analysis_layout.setSpacing(4)
-        analysis_layout.addWidget(QtWidgets.QLabel("Analysis"))
+        priority_heading = QtWidgets.QLabel("Priority reaction review")
+        priority_heading.setObjectName("priorityReviewHeading")
+        analysis_layout.addWidget(priority_heading)
+
+        self.review_output = QtWidgets.QPlainTextEdit()
+        self.review_output.setObjectName("priorityReviewOutput")
+        self.review_output.setReadOnly(True)
+        self.review_output.setPlaceholderText(
+            "Detailed label, graphic core label, spectators, and local "
+            "electronic/steric analysis appear here."
+        )
+        self.review_output.setLineWrapMode(
+            QtWidgets.QPlainTextEdit.LineWrapMode.WidgetWidth
+        )
+        self.review_output.setMaximumHeight(156)
+        analysis_layout.addWidget(self.review_output)
+
+        analysis_layout.addWidget(QtWidgets.QLabel("Additional analysis"))
 
         self.output = QtWidgets.QPlainTextEdit()
         self.output.setObjectName("analysisOutput")
@@ -378,6 +397,16 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
                 f"{heading}{mapping_summary}\n\n"
                 f"{format_concise_analysis(analysis)}"
             )
+            if kind == "reaction":
+                self.review_output.setPlainText(
+                    format_reaction_review_summary(
+                        build_reaction_review_summary(analysis)
+                    )
+                )
+            else:
+                self.review_output.setPlainText(
+                    "Reaction review applies to reaction SMILES."
+                )
             self._render_structure(
                 kind,
                 self.input_edit.text().strip(),
@@ -397,6 +426,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self.copy_button.setEnabled(True)
         except Exception as exc:
             self.output.setPlainText(f"Unable to analyze input.\n\n{exc}")
+            self.review_output.setPlainText("Priority reaction review unavailable.")
             self.graph_heading.setText("Structure graph")
             self.structure_image_label.clear_image(
                 "Structure graph unavailable."
@@ -508,7 +538,13 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def copy_result(self) -> None:
         """Copy the visible analysis to the system clipboard."""
-        QtWidgets.QApplication.clipboard().setText(self.output.toPlainText())
+        sections = (
+            self.review_output.toPlainText().strip(),
+            self.output.toPlainText().strip(),
+        )
+        QtWidgets.QApplication.clipboard().setText(
+            "\n\n".join(section for section in sections if section)
+        )
         self.status_label.setText("Result copied to clipboard")
 
 

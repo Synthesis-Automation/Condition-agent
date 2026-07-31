@@ -709,6 +709,28 @@ def test_concise_review_formats_spectators_and_partner_environment() -> None:
     assert row["index_eligibility"] == "eligible"
 
 
+def test_concise_review_uses_shared_detailed_and_graphic_labels() -> None:
+    row = concise_reaction_review_row(
+        {
+            "reaction_display_label": {
+                "detailed": "structural detailed label",
+                "status": "observed_edits",
+            },
+            "reaction_core": {
+                "generic_label": "R–X + R′ → R–R′",
+                "evidence_status": "verified",
+            },
+            "reaction_signature": {
+                "spectator_groups": [],
+                "partners": [],
+            },
+        }
+    )
+
+    assert row["reaction_display_label_detailed"] == "structural detailed label"
+    assert row["reaction_core_label"] == "R–X + R′ → R–R′"
+
+
 def test_recursive_dataset_folder_converts_to_one_concise_review_csv(
     tmp_path: Path,
 ) -> None:

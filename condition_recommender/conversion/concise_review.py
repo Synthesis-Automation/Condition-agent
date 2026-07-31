@@ -10,7 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, Mapping, Optional
 
-from reactive_taxonomy import render_reactivity_profile
+from reactive_taxonomy import build_reaction_review_summary
 
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
@@ -66,9 +66,6 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reactivity_profile",
 )
 
-_SUBSCRIPT_TRANSLATION = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
-
-
 @dataclass(frozen=True)
 class ConciseReviewProgress:
     """Progress update for a recursive dataset-folder review export."""
@@ -87,10 +84,6 @@ class ConciseReviewConversionCancelled(RuntimeError):
 
 def _readable_token(value: Any) -> str:
     return str(value or "").replace("_", " ").strip()
-
-
-def _formula_text(value: Any) -> str:
-    return str(value or "").translate(_SUBSCRIPT_TRANSLATION)
 
 
 def _text_or_blank(value: Any) -> str:
@@ -116,67 +109,6 @@ def _stereochemical_change_summary(signature: Mapping[str, Any]) -> str:
 
 def _enum_text(value: Any) -> str:
     return str(value.value if isinstance(value, Enum) else value or "")
-
-
-def _spectator_summary(signature: Mapping[str, Any]) -> str:
-    grouped: Dict[tuple[str, str], list[int]] = {}
-    for group in signature.get("spectator_groups") or ():
-        if not isinstance(group, Mapping):
-            continue
-        group_id = str(group.get("group_id") or "")
-        label = str(group.get("chemist_label") or "")
-        key = (label, group_id)
-        distance = group.get("graph_distance")
-        distances = grouped.setdefault(key, [])
-        if distance is not None:
-            distances.append(int(distance))
-    values = []
-    for (label, group_id), distances in sorted(grouped.items()):
-        readable_group = _readable_token(group_id)
-        display = _formula_text(label) or readable_group
-        if readable_group and readable_group.casefold() != display.casefold():
-            display += f" [{readable_group}]"
-        count = max(1, len(distances))
-        if count > 1:
-            display = f"{count}× {display}"
-        if distances:
-            distance_text = "/".join(str(value) for value in sorted(set(distances)))
-            display += f" (d={distance_text})"
-        values.append(display)
-    return "; ".join(values)
-
-
-def _partner_label(partner: Mapping[str, Any]) -> str:
-    role = _readable_token(partner.get("role"))
-    if role:
-        return role
-    component = int(partner.get("component_index") or 0) + 1
-    chemist_label = _formula_text(partner.get("chemist_label"))
-    return f"P{component} ({chemist_label})" if chemist_label else f"P{component}"
-
-
-def _partner_environment_summary(signature: Mapping[str, Any]) -> str:
-    values = []
-    partners = sorted(
-        (
-            partner
-            for partner in signature.get("partners") or ()
-            if isinstance(partner, Mapping)
-        ),
-        key=lambda partner: (
-            int(partner.get("component_index") or 0),
-            str(partner.get("role") or ""),
-            str(partner.get("partner_id") or ""),
-        ),
-    )
-    for partner in partners:
-        profile = partner.get("reactivity_profile")
-        if not isinstance(profile, Mapping):
-            continue
-        values.append(
-            f"{_partner_label(partner)}: {render_reactivity_profile(profile)}"
-        )
-    return " | ".join(values)
 
 
 def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
@@ -215,6 +147,7 @@ def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
 
 def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     """Select compact chemistry fields needed for rapid structural review."""
+    review_summary = build_reaction_review_summary(record)
     display = record.get("reaction_display_label")
     display_value = display if isinstance(display, Mapping) else {}
     signature = record.get("reaction_signature")
@@ -268,7 +201,7 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or record.get("reaction_smiles")
             or ""
         ),
-        "reaction_display_label_detailed": str(display_value.get("detailed") or ""),
+        "reaction_display_label_detailed": review_summary.detailed_reaction_label,
         "original_reaction_type": str(record.get("source_declared_family") or ""),
         "detected_reaction_family": str(record.get("named_family") or ""),
         "detection_status": str(
@@ -286,9 +219,7 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "reaction_core_shape_key": str(
             reaction_core_value.get("shape_core_key") or ""
         ),
-        "reaction_core_label": str(
-            reaction_core_value.get("generic_label") or ""
-        ),
+        "reaction_core_label": review_summary.graphic_reaction_label,
         "reaction_core_evidence_status": str(
             reaction_core_value.get("evidence_status") or ""
         ),
@@ -403,8 +334,8 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             str(value) for value in record.get("admission_reasons") or ()
         ),
         "warnings": "; ".join(warnings),
-        "spectators": _spectator_summary(signature_value),
-        "reactivity_profile": _partner_environment_summary(signature_value),
+        "spectators": review_summary.spectators,
+        "reactivity_profile": review_summary.electronic_steric_analysis,
     }
 
 
