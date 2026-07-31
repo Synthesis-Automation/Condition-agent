@@ -1159,7 +1159,7 @@
       "valid_mappings": 12
     }
   },
-  "elapsed_seconds": 51.677,
+  "elapsed_seconds": 94.251,
   "mapping": {
     "attempted": 442,
     "invalid": 0,
@@ -1433,6 +1433,18 @@
     "high": 152,
     "low": 1,
     "medium": 293
+  },
+  "review_reasons": {
+    "REACTION_CORE_BOUNDARY_CONTINUITY_UNRESOLVED": 103,
+    "REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL": 434,
+    "baseline_signature_unavailable": 105,
+    "invalid_reaction": 1,
+    "low_mapper_confidence": 73,
+    "many_selected_centers": 6,
+    "mapped_signature_unavailable": 39,
+    "moderate_mapper_confidence": 133,
+    "multi_event_core": 24,
+    "reaction_core_unavailable": 1
   },
   "rows": 446,
   "source": "C:\\Git-softwares\\Condition-agent\\examples\\sample_reactions.csv"
