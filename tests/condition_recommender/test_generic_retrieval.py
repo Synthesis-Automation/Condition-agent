@@ -136,6 +136,7 @@ def _signature(
         "named_family": family,
         "family_confidence": family_confidence,
         "topology": {
+            "schema_version": "1.1",
             "reaction_scope": reaction_scope,
             "formed_bond_scopes": [reaction_scope]
             if reaction_scope in {"intramolecular", "intermolecular"}
@@ -150,8 +151,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "3.9",
-        "converter_definition_version": "generic_conversion.v3.3",
+        "schema_version": "4.0",
+        "converter_definition_version": "generic_conversion.v3.5",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",

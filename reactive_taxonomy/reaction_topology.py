@@ -2,18 +2,205 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Iterable, Optional, Tuple
+from collections import defaultdict, deque
+import hashlib
+import json
+from typing import Dict, Iterable, Optional, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
-from .reaction_edits import EditNormalizationResult
+from .reaction_edits import EditNormalizationResult, reaction_atom_reference
 from .reaction_models import (
     ReactionCandidate,
     ReactionComponent,
     ReactionEdit,
+    ReactionRingChange,
     ReactionSiteReference,
     ReactionTopology,
 )
+
+
+_Coordinate = tuple[int, int]
+_Edge = tuple[_Coordinate, _Coordinate]
+
+
+def _edge(left: _Coordinate, right: _Coordinate) -> _Edge:
+    return tuple(sorted((left, right)))  # type: ignore[return-value]
+
+
+def _shortest_path_without_edge(
+    adjacency: Dict[_Coordinate, set[_Coordinate]],
+    start: _Coordinate,
+    end: _Coordinate,
+    excluded: _Edge,
+) -> tuple[_Coordinate, ...]:
+    queue = deque(((start,),))
+    visited = {start}
+    while queue:
+        path = queue.popleft()
+        current = path[-1]
+        for neighbor in sorted(adjacency.get(current, ())):
+            if _edge(current, neighbor) == excluded:
+                continue
+            if neighbor == end:
+                return (*path, neighbor)
+            if neighbor in visited:
+                continue
+            visited.add(neighbor)
+            queue.append((*path, neighbor))
+    return ()
+
+
+def _canonical_cycle(
+    cycle: tuple[_Coordinate, ...],
+) -> tuple[_Coordinate, ...]:
+    variants = []
+    for values in (cycle, tuple(reversed(cycle))):
+        variants.extend(
+            values[offset:] + values[:offset]
+            for offset in range(len(values))
+        )
+    return min(variants)
+
+
+def _cycle_edges(cycle: tuple[_Coordinate, ...]) -> tuple[_Edge, ...]:
+    return tuple(
+        _edge(cycle[index], cycle[(index + 1) % len(cycle)])
+        for index in range(len(cycle))
+    )
+
+
+def _ring_change_id(payload: object) -> str:
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return "RRG1:" + hashlib.sha256(encoded).hexdigest()[:32]
+
+
+def build_reaction_ring_changes(
+    *,
+    reactants: Tuple[ReactionComponent, ...],
+    edit_result: EditNormalizationResult,
+) -> Tuple[ReactionRingChange, ...]:
+    """Return minimal graph facts for cycles closed by observed formed bonds."""
+    components = {component.component_index: component for component in reactants}
+    adjacency: Dict[_Coordinate, set[_Coordinate]] = defaultdict(set)
+    bond_orders: Dict[_Edge, str] = {}
+    valid_atoms: set[_Coordinate] = set()
+    for component in reactants:
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        for atom in molecule.GetAtoms():
+            if atom.GetAtomicNum() > 1:
+                valid_atoms.add((component.component_index, int(atom.GetIdx())))
+        for bond in molecule.GetBonds():
+            left_atom = bond.GetBeginAtom()
+            right_atom = bond.GetEndAtom()
+            if left_atom.GetAtomicNum() <= 1 or right_atom.GetAtomicNum() <= 1:
+                continue
+            left = (component.component_index, int(left_atom.GetIdx()))
+            right = (component.component_index, int(right_atom.GetIdx()))
+            adjacency[left].add(right)
+            adjacency[right].add(left)
+            bond_orders[_edge(left, right)] = str(bond.GetBondType()).upper()
+
+    formed_edges: Dict[_Edge, ReactionEdit] = {}
+    for edit in edit_result.edits:
+        if edit.atom_2 is None or {
+            edit.atom_1.side,
+            edit.atom_2.side,
+        } != {"reactant"}:
+            continue
+        left = (edit.atom_1.component_index, edit.atom_1.atom_index)
+        right = (edit.atom_2.component_index, edit.atom_2.atom_index)
+        if left not in valid_atoms or right not in valid_atoms or left == right:
+            continue
+        edge = _edge(left, right)
+        if edit.edit_type == "broken":
+            adjacency[left].discard(right)
+            adjacency[right].discard(left)
+            bond_orders.pop(edge, None)
+        elif edit.edit_type == "formed":
+            adjacency[left].add(right)
+            adjacency[right].add(left)
+            bond_orders[edge] = str(edit.new_order or "SINGLE").upper()
+            formed_edges[edge] = edit
+        elif edit.edit_type == "order_changed":
+            bond_orders[edge] = str(edit.new_order or "SINGLE").upper()
+
+    cycles: Dict[tuple[_Edge, ...], tuple[_Coordinate, ...]] = {}
+    for formed_edge in sorted(formed_edges):
+        left, right = formed_edge
+        path = _shortest_path_without_edge(
+            adjacency,
+            left,
+            right,
+            formed_edge,
+        )
+        if len(path) < 3:
+            continue
+        cycle = _canonical_cycle(path)
+        edges = tuple(sorted(_cycle_edges(cycle)))
+        if any(edge in formed_edges for edge in edges):
+            cycles.setdefault(edges, cycle)
+
+    changes = []
+    for edges, cycle in sorted(cycles.items()):
+        references = tuple(
+            reaction_atom_reference(
+                components[component_index],
+                atom_index,
+                side="reactant",
+            )
+            for component_index, atom_index in cycle
+        )
+        orders = tuple(
+            bond_orders.get(edge, "UNKNOWN") for edge in _cycle_edges(cycle)
+        )
+        formed_types = tuple(
+            sorted(
+                "-".join(
+                    sorted(
+                        (
+                            formed_edges[edge].atom_1.element,
+                            formed_edges[edge].atom_2.element,  # type: ignore[union-attr]
+                        )
+                    )
+                )
+                for edge in edges
+                if edge in formed_edges
+            )
+        )
+        payload = {
+            "atoms": cycle,
+            "elements": tuple(reference.element for reference in references),
+            "orders": orders,
+            "formed_bonds": formed_types,
+            "evidence": edit_result.evidence,
+        }
+        changes.append(
+            ReactionRingChange(
+                change_id=_ring_change_id(payload),
+                change_type="formed",
+                atom_references=references,
+                element_sequence=tuple(
+                    reference.element for reference in references
+                ),
+                bond_orders_after=orders,
+                source_component_indices=tuple(
+                    sorted({reference.component_index for reference in references})
+                ),
+                formed_bond_types=formed_types,
+                aromatic_after=bool(orders) and all(
+                    order == "AROMATIC" for order in orders
+                ),
+                evidence=edit_result.evidence,
+                confidence=edit_result.confidence,
+            )
+        )
+    return tuple(changes)
 
 
 def _cycle_rank(components: Tuple[ReactionComponent, ...]) -> Optional[int]:
@@ -78,6 +265,10 @@ def build_reaction_topology(
     formed_scopes = []
     tether_distances = []
     formed_ring_sizes = []
+    ring_changes = build_reaction_ring_changes(
+        reactants=reactants,
+        edit_result=edit_result,
+    )
     from rdkit import Chem
 
     for edit in _formed_edits(edit_result.edits):
@@ -150,10 +341,17 @@ def build_reaction_topology(
         same_component_role_groups=_same_component_role_groups(selected),
         formed_bond_scopes=tuple(sorted(formed_scopes)),
         reactant_tether_distances=tuple(sorted(tether_distances)),
-        formed_ring_sizes=tuple(sorted(formed_ring_sizes)),
+        formed_ring_sizes=tuple(
+            sorted(
+                set(formed_ring_sizes).union(
+                    change.ring_size for change in ring_changes
+                )
+            )
+        ),
         ring_count_delta=ring_count_delta,
         evidence=edit_result.evidence,
         confidence=edit_result.confidence,
+        ring_changes=ring_changes,
     )
 
 
@@ -183,6 +381,7 @@ def assignment_component_scope(
 
 __all__ = [
     "assignment_component_scope",
+    "build_reaction_ring_changes",
     "build_reaction_topology",
     "topology_label_prefix",
 ]

@@ -17,6 +17,7 @@ from reactive_taxonomy import (
     REACTION_CORE_PROJECTION_SCHEMA_VERSION,
     REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
     REACTION_SIGNATURE_SCHEMA_VERSION,
+    REACTION_TOPOLOGY_SCHEMA_VERSION,
     reaction_fallback_definition_versions,
     reaction_signature_definition_versions,
 )
@@ -30,7 +31,7 @@ from .signature_features import environment_tokens
 from .fallback_similarity import fallback_index_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "2.5"
+GENERIC_INDEX_SCHEMA_VERSION = "2.6"
 
 
 @dataclass(frozen=True)
@@ -160,6 +161,17 @@ def _validate_index_rows(
     if definition_sets and definition_sets != {current_definitions}:
         raise ValueError(
             "Incompatible reaction taxonomy definitions; regenerate converted records"
+        )
+    topology_schemas = {
+        str((row.signature.get("topology") or {}).get("schema_version") or "")
+        for row in values
+        if row.signature and row.signature.get("topology")
+    }
+    if topology_schemas and topology_schemas != {
+        REACTION_TOPOLOGY_SCHEMA_VERSION
+    }:
+        raise ValueError(
+            "Incompatible reaction topology schema; regenerate converted records"
         )
     core_schemas = {
         str(row.reaction_core.get("schema_version") or "")

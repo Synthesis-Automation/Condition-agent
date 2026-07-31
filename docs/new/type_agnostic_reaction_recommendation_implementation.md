@@ -51,7 +51,7 @@ reactive_taxonomy       condition_registry
 | Edit evidence | Implemented | Typed provider candidates from mapping, exact single/multi-event reconstruction, conservative scaffold, bounded global, and fragmented-scaffold correspondence; distinct ambiguous edit hypotheses; conflicts and H/charge/stereo observations |
 | External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, persisted with model provenance, and never admitted as verified precedents |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting, observation-only product-origin gaps, and typed fragment-source requirements |
-| Reaction signatures | Implemented | Deterministic RS3 L0–L4 signatures, events, topology, profiles, spectators, unknown-family support |
+| Reaction signatures | Implemented | Deterministic RS3 L0–L4 signatures, events, ring-change observations, topology, profiles, spectators, unknown-family support |
 | Reaction minimization | V2 integrated, calibration pending | Template-free mapped-edit core projection with atom transitions, remote subgraphs, typed attachment ports, robust shape keys, review export, verified-precedent index maps, and conservative query routing |
 | Reactivity descriptors | Implemented and active | Typed context-aware profiles are the sole active environment path |
 | Condition registry | Implemented, curation incomplete | Conservative identity resolution, contextual roles, RCORE1/RCR1 recipes, stages, provenance |
@@ -75,8 +75,10 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `3.5` |
-| Reaction signature / ID namespace | `3.0` / `RS3` |
+| Reaction analysis | `3.6` |
+| Reaction signature / ID namespace | `3.1` / `RS3` |
+| Reaction ring change | `1.0` |
+| Reaction topology | `1.1` |
 | Reaction core projection / algorithm | `2.2` / `reaction_core_projection.v8` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
@@ -84,12 +86,12 @@ The current code declares:
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `1.3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `3.9` |
-| Generic converter definition | `generic_conversion.v3.3` |
-| Generic sharded converter definition | `generic_sharded_conversion.v2.0` |
-| Concise reaction review | `2.9` |
+| Recommendation record | `4.0` |
+| Generic converter definition | `generic_conversion.v3.5` |
+| Generic sharded converter definition | `generic_sharded_conversion.v2.2` |
+| Concise reaction review | `3.1` |
 | Recommendation artifact workflow | `1.1` |
-| Generic persisted index | `2.5` |
+| Generic persisted index | `2.6` |
 | Generic recommendation result | `2.4` |
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.8` |
@@ -117,10 +119,10 @@ Its pre-source-support report records:
 | Generic-index rows | 2,603 |
 
 The sharded conversion report records zero failed shards and zero duplicate
-observations. The artifact predates reaction-core projection `2.0`, converter
-`v2.9`, and index `2.5`; current code therefore rejects it until it is
-regenerated. This is deliberate because reaction-core identity and index maps
-change artifact identity and retrieval coverage.
+observations. The artifact predates the current reaction-core, reaction-ring,
+converter, record, and index contracts; current code therefore rejects it until
+it is regenerated. This is deliberate because chemistry observations and index
+maps change artifact identity and retrieval coverage.
 
 These counts demonstrate that the type-agnostic path works on a broad bounded
 sample and that unnamed reactions are retained. They are coverage and integrity

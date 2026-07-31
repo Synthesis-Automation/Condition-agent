@@ -14,11 +14,13 @@ from .reaction_label_patterns import match_reaction_label_pattern
 from .reaction_labels import load_fragment_context_symbols
 from .reaction_models import (
     ReactionDisplayLabel,
+    ReactionComponent,
     ReactionEdit,
     ReactionEvent,
     ReactionLabelClause,
     ReactionTopology,
 )
+from .reaction_ring_rendering import render_ring_change
 from .reaction_topology import topology_label_prefix
 
 _PATH = Path(__file__).with_name("definitions") / "reaction_label_rendering.v1.json"
@@ -29,7 +31,7 @@ def load_reaction_label_rendering() -> dict[str, Any]:
     """Load the versioned declarative edit-label rendering rules."""
     with _PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    if payload.get("schema_version") != "1.4":
+    if payload.get("schema_version") != "1.5":
         raise ValueError("Unsupported reaction-label rendering schema")
     return dict(payload)
 
@@ -376,6 +378,7 @@ def _make_detailed_label_readable(
 
 def build_reaction_display_label(
     *,
+    reactants: Sequence[ReactionComponent],
     edits: Sequence[ReactionEdit],
     selected_label: Optional[str],
     selected_exact: bool,
@@ -420,6 +423,25 @@ def build_reaction_display_label(
         if bool(rule.get("prefer_contextual_label")):
             exact_display_label = contextual_label.concise
     rendered_event_labels: tuple[str, ...] = ()
+    ring_change = next(
+        (
+            change
+            for change in (topology.ring_changes if topology is not None else ())
+            if len(change.formed_bond_types) >= 2
+        ),
+        None,
+    )
+    ring_display = (
+        render_ring_change(
+            ring_change,
+            reactants=reactants,
+            style=styling,
+            templates=rendering["templates"],
+            raw_edit_audit=detailed_clauses or "none",
+        )
+        if ring_change is not None
+        else None
+    )
     if evidence in {
         "conflicting_edit_evidence",
         "conflicting_stereochemical_evidence",
@@ -447,6 +469,12 @@ def build_reaction_display_label(
             clauses=detailed_clauses or "none",
         )
         status = "family_overlay" if named_family else "exact_reconstruction"
+    elif ring_display is not None:
+        concise = ring_display.concise
+        detailed = ring_display.detailed
+        structural_label = ring_display.concise
+        transformation_label = ring_display.concise
+        status = "ring_formation"
     elif pattern is not None:
         concise = (
             contextual_label.concise

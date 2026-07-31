@@ -13,6 +13,20 @@ MAPPED_INTRAMOLECULAR_CN = (
     "[c:9]1[Br:10]>>"
     "[NH:1]1[CH2:2][CH2:3][c:4]2[cH:5][cH:6][cH:7][cH:8][c:9]21"
 )
+AZIDE_CYCLOADDITION = (
+    "C#Cc1ccc(Cl)cc1."
+    "[N-]=[N+]=NC1COc2c(Br)cc([N+](=O)[O-])c3cccc1c23"
+    ">>O=[N+]([O-])c1cc(Br)c2c3c(cccc13)"
+    "C(n1cc(-c3ccc(Cl)cc3)nn1)CO2"
+)
+MAPPED_DIELS_ALDER = (
+    "[CH2:1]=[CH:2][CH:3]=[CH2:4].[CH2:5]=[CH2:6]"
+    ">>[CH2:1]1[CH:2]=[CH:3][CH2:4][CH2:5][CH2:6]1"
+)
+MAPPED_TWO_PLUS_TWO = (
+    "[CH2:1]=[CH2:2].[CH2:3]=[CH2:4]"
+    ">>[CH2:1]1[CH2:2][CH2:3][CH2:4]1"
+)
 
 
 def test_grammars_use_general_role_relationships() -> None:
@@ -96,6 +110,81 @@ def test_mapped_unknown_intramolecular_reaction_gets_generic_topology_label() ->
     assert result.reaction_topology.reaction_scope == "intramolecular"
 
 
+@pytest.mark.parametrize(
+    ("reaction", "size", "elements", "formed_bonds", "aromatic", "label"),
+    (
+        (
+            AZIDE_CYCLOADDITION,
+            5,
+            ("C", "C", "N", "N", "N"),
+            ("C-N", "C-N"),
+            True,
+            "C≡C + N=N=N → aromatic 5-membered C₂N₃ ring",
+        ),
+        (
+            MAPPED_DIELS_ALDER,
+            6,
+            ("C", "C", "C", "C", "C", "C"),
+            ("C-C", "C-C"),
+            False,
+            "C=C + C=C–C=C → 6-membered C₆ ring",
+        ),
+        (
+            MAPPED_TWO_PLUS_TWO,
+            4,
+            ("C", "C", "C", "C"),
+            ("C-C", "C-C"),
+            False,
+            "C=C + C=C → 4-membered C₄ ring",
+        ),
+        (
+            "C=C.C=[N+]([O-])C>>C1CON(C)C1",
+            5,
+            ("C", "C", "O", "N", "C"),
+            ("C-C", "C-O"),
+            False,
+            "C=C + O–N=C → 5-membered C₃NO ring",
+        ),
+    ),
+)
+def test_generic_ring_observation_and_renderer_cover_cycloadditions(
+    reaction: str,
+    size: int,
+    elements: tuple[str, ...],
+    formed_bonds: tuple[str, ...],
+    aromatic: bool,
+    label: str,
+) -> None:
+    result = featurize_reaction(reaction)
+
+    assert result.reaction_topology is not None
+    assert result.reaction_topology.formed_ring_sizes == (size,)
+    assert result.reaction_topology.ring_count_delta == 1
+    assert len(result.reaction_topology.ring_changes) == 1
+    change = result.reaction_topology.ring_changes[0]
+    assert change.ring_size == size
+    assert change.element_sequence == elements
+    assert change.source_component_indices == (0, 1)
+    assert change.formed_bond_types == formed_bonds
+    assert change.aromatic_after is aromatic
+    assert result.reaction_label == label
+    assert result.reaction_label_status == "ring_formation"
+    assert result.display_label is not None
+    assert result.display_label.status == "ring_formation"
+    assert "key connectivity:" in result.display_label.detailed
+    assert "raw edits:" in result.display_label.detailed
+
+
+def test_ring_renderer_is_reactant_order_invariant() -> None:
+    left, product = AZIDE_CYCLOADDITION.split(">>", 1)
+    reversed_reactants = ".".join(reversed(left.split("."))) + ">>" + product
+
+    forward = featurize_reaction(AZIDE_CYCLOADDITION)
+    reversed_result = featurize_reaction(reversed_reactants)
+
+    assert forward.reaction_label == reversed_result.reaction_label
+
+
 def test_inter_and_intramolecular_scope_have_separate_signature_tiers() -> None:
     intramolecular = featurize_reaction(INTRAMOLECULAR_CN)
     intermolecular = featurize_reaction("Brc1ccccc1.CCN>>CCNc1ccccc1")
@@ -129,10 +218,11 @@ def test_mapped_and_unmapped_topology_signatures_are_identical() -> None:
 def test_topology_serializes_in_analysis_and_signature() -> None:
     payload = featurize_reaction(INTRAMOLECULAR_CN).to_dict()
 
-    assert payload["schema_version"] == "3.5"
+    assert payload["schema_version"] == "3.6"
     assert payload["reaction_topology"]["reaction_scope"] == "intramolecular"
     assert payload["reaction_topology"]["formed_ring_sizes"] == (5,)
-    assert payload["reaction_signature"]["schema_version"] == "3.0"
+    assert payload["reaction_signature"]["schema_version"] == "3.1"
+    assert payload["reaction_topology"]["schema_version"] == "1.1"
     assert payload["reaction_signature"]["topology"] == payload["reaction_topology"]
 
 

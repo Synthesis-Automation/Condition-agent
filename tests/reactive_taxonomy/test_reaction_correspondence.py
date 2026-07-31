@@ -158,7 +158,9 @@ def test_global_correspondence_recovers_cycloaddition_graph_edits() -> None:
     assert result.reaction_signature.topology.reaction_scope == "intermolecular"
     assert result.reaction_label is not None
     assert "->" in result.reaction_label
-    assert "C:N" in result.reaction_label
+    assert result.reaction_label == "C#C + N=N=N -> aromatic 5-membered C2N3 ring"
+    assert result.reaction_label_status == "ring_formation"
+    assert result.reaction_signature.topology.formed_ring_sizes == (5,)
 
 
 def test_global_correspondence_recovers_condensation_graph_edits() -> None:

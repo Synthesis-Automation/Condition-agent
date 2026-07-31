@@ -9,6 +9,7 @@ from ..models import RecommendationRecord
 from .signature_serialization import (
     flattened_fallback_fields,
     flattened_reaction_core_fields,
+    flattened_ring_change_fields,
     flattened_signature_fields,
 )
 
@@ -49,11 +50,11 @@ GENERIC_REVIEW_FIELDS = (
     "transformation_confidence",
     "named_family",
     "family_confidence",
-    "reaction_label",
+    "reaction_display_label",
+    "reaction_display_label_detailed",
     "reaction_core_label",
     "reaction_label_status",
     "reaction_display_label_status",
-    "reaction_display_label_detailed",
     "reaction_display_label_json",
     "yield_pct",
     "temperature_c",
@@ -73,6 +74,8 @@ GENERIC_REVIEW_FIELDS = (
     "reaction_scope",
     "formed_ring_sizes",
     "ring_count_delta",
+    "ring_change_count",
+    "ring_change_summaries",
     "reaction_event_count",
     "reaction_event_scope",
     "reaction_signature_id",
@@ -209,7 +212,13 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "transformation_confidence": record.transformation_confidence,
         "named_family": record.named_family or "",
         "family_confidence": record.family_confidence,
-        "reaction_label": record.reaction_label or "",
+        "reaction_display_label": (
+            record.reaction_display_label.get("concise", "")
+            if record.reaction_display_label
+            else ""
+        )
+        or record.reaction_label
+        or "",
         "reaction_label_status": record.reaction_label_status,
         "reaction_display_label_status": (
             record.reaction_display_label.get("status", "")
@@ -257,6 +266,7 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
             if topology.get("ring_count_delta") is not None
             else ""
         ),
+        **flattened_ring_change_fields(record.reaction_signature),
         "reaction_event_count": signature.get("event_count", ""),
         "reaction_event_scope": signature.get("event_scope", ""),
         **flattened_signature_fields(record.reaction_signature),

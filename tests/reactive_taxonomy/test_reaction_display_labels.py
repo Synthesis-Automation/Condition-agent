@@ -231,8 +231,8 @@ def test_reaction_label_definition_is_versioned() -> None:
     rendering = load_reaction_label_rendering()
     patterns = load_reaction_label_patterns()
 
-    assert rendering["schema_version"] == "1.4"
-    assert rendering["label_schema_version"] == "1.4"
+    assert rendering["schema_version"] == "1.5"
+    assert rendering["label_schema_version"] == "1.5"
     assert patterns["schema_version"] == "1.0"
     assert {pattern["id"] for pattern in patterns["patterns"]} >= {
         "substitution",

@@ -71,6 +71,14 @@ _REACTION_CORE_CSV_FIELDS = (
     "reaction_core_warnings",
 )
 
+_REACTION_RING_CSV_FIELDS = (
+    "reaction_label_detailed",
+    "formed_ring_sizes",
+    "ring_count_delta",
+    "ring_change_count",
+    "ring_changes_json",
+)
+
 
 def _json_dump(value: Any, *, compact: bool = False) -> str:
     return json.dumps(
@@ -739,7 +747,8 @@ def _reaction_csv_columns(
             columns.extend(("reaction_label", "spectator_groups"))
     columns.extend((
         "valid", "evidence_quality", "transformation_class", "named_family",
-        "partner_analysis", *_REACTION_CORE_CSV_FIELDS,
+        "partner_analysis", *_REACTION_RING_CSV_FIELDS,
+        *_REACTION_CORE_CSV_FIELDS,
         "reaction_label_status", "candidate_count", "warnings", "error",
     ))
     return columns
@@ -767,6 +776,9 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     atom_transitions = reaction_core.get("atom_transitions") or []
     core_quality = reaction_core.get("quality") or {}
     core_presentation = reaction_core.get("presentation") or {}
+    topology = analysis.get("reaction_topology") or {}
+    ring_changes = topology.get("ring_changes") or []
+    display_label = analysis.get("display_label") or {}
     remote_subgraphs = reaction_core.get("remote_subgraphs") or []
     remote_classes = sorted(
         {
@@ -802,6 +814,19 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
             f"{render_reactivity_profile(partner.get('reactivity_profile'))}"
             for partner in signature_partners
         ),
+        "reaction_label_detailed": display_label.get("detailed") or "",
+        "formed_ring_sizes": "; ".join(
+            str(value) for value in topology.get("formed_ring_sizes") or []
+        ),
+        "ring_count_delta": (
+            topology.get("ring_count_delta")
+            if topology.get("ring_count_delta") is not None
+            else ""
+        ),
+        "ring_change_count": len(ring_changes),
+        "ring_changes_json": _json_dump(ring_changes, compact=True)
+        if ring_changes
+        else "",
         "reaction_core_available": bool(reaction_core),
         "reaction_core_id": reaction_core.get("core_id") or "",
         "reaction_core_label": reaction_core.get("generic_label") or "",
@@ -880,6 +905,7 @@ def _write_batch_csv(
             "reaction_label",
             "partner_analysis",
             "spectator_groups",
+            *_REACTION_RING_CSV_FIELDS,
             *_REACTION_CORE_CSV_FIELDS,
         ]
         row_builder = _reaction_csv_row

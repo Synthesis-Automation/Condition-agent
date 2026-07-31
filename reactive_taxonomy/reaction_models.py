@@ -9,10 +9,12 @@ from .descriptors.models import SiteReactivityProfile
 from .models import CompoundAnalysis
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "3.0"
+REACTION_SIGNATURE_SCHEMA_VERSION = "3.1"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.3"
 REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.2"
 REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v8"
+REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
+REACTION_TOPOLOGY_SCHEMA_VERSION = "1.1"
 
 EditArchetype = Literal[
     "substitution",
@@ -442,6 +444,7 @@ class ReactionDisplayLabel:
         "generic_pattern",
         "conflicting_evidence",
         "multi_event",
+        "ring_formation",
         "partial_product_correspondence",
         "reactant_only",
         "ambiguous_reactants",
@@ -568,6 +571,41 @@ class ProductTransformation:
 
 
 @dataclass(frozen=True)
+class ReactionRingChange:
+    """Minimal graph facts for one newly formed cycle."""
+
+    change_id: str
+    change_type: Literal["formed"]
+    atom_references: Tuple[ReactionAtomReference, ...]
+    element_sequence: Tuple[str, ...]
+    bond_orders_after: Tuple[str, ...]
+    source_component_indices: Tuple[int, ...]
+    formed_bond_types: Tuple[str, ...]
+    aromatic_after: bool
+    evidence: str
+    confidence: float
+    schema_version: str = REACTION_RING_CHANGE_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if not self.change_id.startswith("RRG1:"):
+            raise ValueError("ring-change ID must use the RRG1 namespace")
+        if len(self.atom_references) < 3:
+            raise ValueError("a formed ring requires at least three atoms")
+        if len(self.element_sequence) != len(self.atom_references):
+            raise ValueError("ring element sequence must match its atoms")
+        if len(self.bond_orders_after) != len(self.atom_references):
+            raise ValueError("ring bond-order sequence must close the cycle")
+        if not self.source_component_indices:
+            raise ValueError("ring change requires reactant component provenance")
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("ring-change confidence must be in [0, 1]")
+
+    @property
+    def ring_size(self) -> int:
+        return len(self.atom_references)
+
+
+@dataclass(frozen=True)
 class ReactionTopology:
     """Component and ring topology of an observed or reconstructed event."""
 
@@ -583,7 +621,8 @@ class ReactionTopology:
     ring_count_delta: Optional[int]
     evidence: str
     confidence: float
-    schema_version: str = "1.0"
+    ring_changes: Tuple[ReactionRingChange, ...] = ()
+    schema_version: str = REACTION_TOPOLOGY_SCHEMA_VERSION
 
 
 @dataclass(frozen=True)
@@ -1051,7 +1090,7 @@ class ReactionAnalysis:
     reaction_core: Optional[ReactionCoreProjection] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "3.5"
+    schema_version: str = "3.6"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -1080,7 +1119,9 @@ __all__ = [
     "REACTION_CORE_PROJECTION_ALGORITHM_VERSION",
     "REACTION_CORE_PROJECTION_SCHEMA_VERSION",
     "REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION",
+    "REACTION_RING_CHANGE_SCHEMA_VERSION",
     "REACTION_SIGNATURE_SCHEMA_VERSION",
+    "REACTION_TOPOLOGY_SCHEMA_VERSION",
     "ReactionAnalysis",
     "ReactionAtomReference",
     "ReactionCandidate",
@@ -1105,6 +1146,7 @@ __all__ = [
     "ReactionLabelClause",
     "ReactionPartner",
     "ReactionPartnerEnvironment",
+    "ReactionRingChange",
     "ReactionSignature",
     "ReactionSiteReference",
     "ReactionSpectatorGroup",

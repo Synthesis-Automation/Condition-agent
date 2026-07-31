@@ -278,6 +278,11 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
         assert "reaction_core_quality_status" in reader.fieldnames
         assert "reaction_core_state_changes" in reader.fieldnames
         assert "reaction_core_remote_subgraphs" in reader.fieldnames
+        assert "reaction_label_detailed" in reader.fieldnames
+        assert "formed_ring_sizes" in reader.fieldnames
+        assert "ring_count_delta" in reader.fieldnames
+        assert "ring_change_count" in reader.fieldnames
+        assert "ring_changes_json" in reader.fieldnames
         rows = list(reader)
 
     assert len(rows) == 1

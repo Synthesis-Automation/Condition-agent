@@ -7,6 +7,44 @@ from dataclasses import asdict
 from typing import Any, Dict
 
 
+def ring_change_summary(change: Dict[str, Any]) -> str:
+    """Render compact graph facts for one serialized ring change."""
+    elements = tuple(str(value) for value in change.get("element_sequence") or ())
+    counts: Dict[str, int] = {}
+    for element in elements:
+        counts[element] = counts.get(element, 0) + 1
+    formula = "".join(
+        element + (str(count) if count > 1 else "")
+        for element, count in sorted(
+            counts.items(), key=lambda value: (value[0] != "C", value[0])
+        )
+    )
+    aromatic = "aromatic " if change.get("aromatic_after") else ""
+    formed = ",".join(str(value) for value in change.get("formed_bond_types") or ())
+    return (
+        f"{aromatic}{len(elements)}-membered {formula} ring"
+        + (f"; formed={formed}" if formed else "")
+    )
+
+
+def flattened_ring_change_fields(
+    signature: Dict[str, Any] | None,
+) -> Dict[str, Any]:
+    """Expose lower-level ring observations in a compact review form."""
+    topology = (signature or {}).get("topology") or {}
+    changes = tuple(
+        value
+        for value in topology.get("ring_changes") or ()
+        if isinstance(value, dict)
+    )
+    return {
+        "ring_change_count": len(changes),
+        "ring_change_summaries": " | ".join(
+            ring_change_summary(change) for change in changes
+        ),
+    }
+
+
 def signature_record_fields(analysis: Any) -> Dict[str, Any]:
     """Return RecommendationRecord keyword fields from a reaction analysis."""
     signature = analysis.reaction_signature
@@ -153,6 +191,8 @@ def flattened_reaction_core_fields(
 __all__ = [
     "flattened_fallback_fields",
     "flattened_reaction_core_fields",
+    "flattened_ring_change_fields",
     "flattened_signature_fields",
     "signature_record_fields",
+    "ring_change_summary",
 ]

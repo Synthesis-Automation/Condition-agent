@@ -14,16 +14,22 @@ from reactive_taxonomy import build_reaction_review_summary
 
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
+from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.9"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "3.1"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
+    "reaction_display_label",
     "reaction_display_label_detailed",
     "reaction_core_label",
     "original_reaction_type",
     "detected_reaction_family",
     "detection_status",
     "transformation_class",
+    "ring_change_count",
+    "formed_ring_sizes",
+    "ring_count_delta",
+    "ring_change_summaries",
     "signature_id",
     "reaction_core_id",
     "reaction_core_shape_key",
@@ -219,6 +225,13 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     display_value = display if isinstance(display, Mapping) else {}
     signature = record.get("reaction_signature")
     signature_value = signature if isinstance(signature, Mapping) else {}
+    topology = signature_value.get("topology")
+    topology_value = topology if isinstance(topology, Mapping) else {}
+    ring_changes = tuple(
+        value
+        for value in topology_value.get("ring_changes") or ()
+        if isinstance(value, Mapping)
+    )
     reaction_core = record.get("reaction_core")
     reaction_core_value = (
         reaction_core if isinstance(reaction_core, Mapping) else {}
@@ -278,6 +291,11 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or record.get("reaction_smiles")
             or ""
         ),
+        "reaction_display_label": str(
+            display_value.get("concise")
+            or record.get("reaction_label")
+            or ""
+        ),
         "reaction_display_label_detailed": review_summary.detailed_reaction_label,
         "original_reaction_type": str(record.get("source_declared_family") or ""),
         "detected_reaction_family": str(record.get("named_family") or ""),
@@ -290,6 +308,16 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             record.get("transformation_class")
             or signature_value.get("transformation_class")
             or ""
+        ),
+        "ring_change_count": str(len(ring_changes)),
+        "formed_ring_sizes": "; ".join(
+            str(value) for value in topology_value.get("formed_ring_sizes") or ()
+        ),
+        "ring_count_delta": _text_or_blank(
+            topology_value.get("ring_count_delta")
+        ),
+        "ring_change_summaries": " | ".join(
+            ring_change_summary(dict(change)) for change in ring_changes
         ),
         "signature_id": str(signature_value.get("signature_id") or ""),
         "reaction_core_id": str(reaction_core_value.get("core_id") or ""),

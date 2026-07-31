@@ -20,6 +20,17 @@ Any unmatched edit set still receives a deterministic literal summary such as
 the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
+Topology analysis also records minimal, family-independent ring-formation
+facts. A `ReactionRingChange` contains the ring atoms, product bond orders,
+source components, formed ring bonds, aromaticity, and evidence; it does not
+name a reaction class. The display layer converts multi-bond closures into
+chemist-facing equations such as
+`C≡C + N=N=N → aromatic 5-membered C₂N₃ ring`,
+`C=C + C=C–C=C → 6-membered C₆ ring`, or
+`C=C + C=C → 4-membered C₄ ring`. This separates reusable graph evidence
+from presentation and supports cycloadditions not present in a named-family
+registry. Ordinary single-bond cyclizations keep their existing labels.
+
 Mapped observations also receive a template-free `ReactionCoreProjection`.
 The version 2.2 schema keeps every edit-participating atom, selects primary
 centers only for explanation, removes each remote connected component once,
@@ -407,7 +418,7 @@ retrieval all consume this same typed record.
 
 Compact output omits atom indices, raw graph-shell counts, methods, and scores.
 Expanded rendering retains scores, contributors, confidence, and provenance.
-Reaction signatures use stable categorical profile tokens under schema `3.0`
+Reaction signatures use stable categorical profile tokens under schema `3.1`
 and the `RS3` namespace; raw scores and display labels do not enter identity.
 
 Unsaturated-bond labels expose endpoint substitution rather than collapsing all

@@ -463,6 +463,7 @@ def featurize_reaction(
             f"{reactants_label} {display_arrow} {product_connection.concise_label}"
         )
     display_label = build_reaction_display_label(
+        reactants=parsed.reactants,
         edits=edit_result.edits,
         selected_label=reaction_label if selected is not None else None,
         selected_exact=bool(
@@ -507,6 +508,8 @@ def featurize_reaction(
             reaction_label_status = "conflicting_edit_summary"
         elif display_label.status == "multi_event":
             reaction_label_status = "multi_event_edit_summary"
+        elif display_label.status == "ring_formation":
+            reaction_label_status = "ring_formation"
     fallback_descriptor = build_reaction_fallback_descriptor(
         reactants=parsed.reactants,
         products=parsed.products,
