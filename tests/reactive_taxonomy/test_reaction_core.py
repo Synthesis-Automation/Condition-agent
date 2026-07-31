@@ -40,6 +40,14 @@ MAPPED_ARYL_DECARBOXYLATIVE_COUPLING = (
     ">>[c:1]1(-[c:7]2[cH:8][cH:9][cH:10][cH:11][cH:12]2)"
     "[cH:2][cH:3][cH:4][cH:5][cH:6]1"
 )
+MAPPED_INTRAMOLECULAR_DECARBOXYLATIVE_CYCLIZATION = (
+    "O=[C:19](O)[C:2](=[O:1])[c:3]1[cH:4][c:5]"
+    "([C:6]([F:7])([F:8])[F:9])[cH:10][cH:11][c:12]1-"
+    "[c:13]1[cH:14][cH:15][cH:16][n:17][cH:18]1"
+    ">>[O:1]=[C:2]1[c:3]2[cH:4][c:5]"
+    "([C:6]([F:7])([F:8])[F:9])[cH:10][cH:11][c:12]2-"
+    "[c:13]2[cH:14][cH:15][cH:16][n:17][c:18]21"
+)
 
 
 def _unexpected_template_load(*args: Any, **kwargs: Any) -> None:
@@ -208,6 +216,29 @@ def test_decarboxylative_abstraction_separates_motif_and_limiters() -> None:
     assert primary.abstraction.limiter_label == (
         "R = R′–CH₂– (primary alkyl); Ar = HetAr"
     )
+
+
+def test_decarboxylative_abstraction_respects_intramolecular_topology() -> None:
+    result = featurize_reaction(
+        MAPPED_INTRAMOLECULAR_DECARBOXYLATIVE_CYCLIZATION
+    )
+    core = result.reaction_core
+
+    assert result.reaction_topology is not None
+    assert result.reaction_topology.reaction_scope == "intramolecular"
+    assert result.reaction_topology.formed_ring_sizes == (5,)
+    assert core is not None and core.abstraction is not None
+    assert core.abstraction.general_label == (
+        "R–C(=O)OH + Ar–H → R–Ar; intramolecular, "
+        "5-membered ring"
+    )
+    assert core.abstraction.limiter_label == (
+        "acyl center = R′–C(=O)– (acyl); partner center = HetAr"
+    )
+    assert "topology:intramolecular_cyclization" in (
+        core.abstraction.limiter_tokens
+    )
+    assert "transfer_center:acyl" in core.abstraction.limiter_tokens
 
 
 def test_reaction_core_identity_is_reactant_order_invariant() -> None:

@@ -845,6 +845,7 @@ def analyze_reaction_with_external_mapping(
             edits=mapping.normalization.edits,
             evidence=evidence,
             confidence=confidence,
+            topology=base.reaction_topology,
         )
         if reaction_core is None:
             warning = "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE"

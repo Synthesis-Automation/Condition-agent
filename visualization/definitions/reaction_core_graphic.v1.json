@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.2",
-  "definition_id": "reaction_core_graphic.v1.2",
+  "schema_version": "1.3",
+  "definition_id": "reaction_core_graphic.v1.3",
   "remote_class_labels": {
     "aryl": "Ar",
     "heteroaryl": "HetAr",
@@ -16,6 +16,7 @@
     "retained"
   ],
   "collapse_retained_multisite_scaffolds": true,
+  "preserve_intramolecular_tethers": true,
   "render_nonretained_subgraphs_explicitly": true,
   "explicit_retained_subgraphs": {
     "max_heavy_atom_count": 1,
@@ -24,5 +25,5 @@
     ]
   },
   "indexed_label_template": "{label}{index}",
-  "rendering_note": "Only unchanged retained remote subgraphs are abstracted. Departing, appearing, changed, and unresolved subgraphs remain explicit. Configured small chemically informative retained fragments also remain explicit. A multi-port ring or scaffold remainder surrounding one active atom absorbs that atom into its placeholder. Multiple retained ring paths split by two or more active sites are reunited as one mapped multi-site scaffold placeholder; other multi-port fragments use one boundary node per port."
+  "rendering_note": "Only unchanged retained remote subgraphs are abstracted. Departing, appearing, changed, and unresolved subgraphs remain explicit. Configured small chemically informative retained fragments also remain explicit. A retained multi-port subgraph spanning two or more active atoms remains explicit when an intramolecular edit forms a ring, preserving the tether and cycle topology. Outside that case, a multi-port ring or scaffold remainder surrounding one active atom absorbs that atom into its placeholder. Multiple retained ring paths split by two or more active sites are reunited as one mapped multi-site scaffold placeholder; other multi-port fragments use one boundary node per port."
 }

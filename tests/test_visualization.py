@@ -64,9 +64,27 @@ MAPPED_DECARBOXYLATIVE_COUPLING = (
     ">>[CH3:1][CH2:2][c:3]1[cH:4][c:5]([CH3:6])[n:7]"
     "[c:8]2[cH:9][cH:10][c:11]([F:12])[cH:13][c:14]12"
 )
+MAPPED_INTRAMOLECULAR_DECARBOXYLATIVE_CYCLIZATION = (
+    "O=[C:19](O)[C:2](=[O:1])[c:3]1[cH:4][c:5]"
+    "([C:6]([F:7])([F:8])[F:9])[cH:10][cH:11][c:12]1-"
+    "[c:13]1[cH:14][cH:15][cH:16][n:17][cH:18]1"
+    ">>[O:1]=[C:2]1[c:3]2[cH:4][c:5]"
+    "([C:6]([F:7])([F:8])[F:9])[cH:10][cH:11][c:12]2-"
+    "[c:13]2[cH:14][cH:15][cH:16][n:17][c:18]21"
+)
+MAPPED_INTRAMOLECULAR_CN = (
+    "[NH2:1][CH2:2][CH2:3][c:4]1[cH:5][cH:6][cH:7][cH:8]"
+    "[c:9]1[Br:10]>>"
+    "[NH:1]1[CH2:2][CH2:3][c:4]2[cH:5][cH:6][cH:7][cH:8]"
+    "[c:9]21"
+)
 REPEATED_SUZUKI = (
     "Brc1ccc(Br)cc1.OB(O)c1ccccc1.OB(O)c1ccccc1"
     ">>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1"
+)
+INTRAMOLECULAR_DECARBOXYLATIVE_CYCLIZATION = (
+    "O=C(O)C(=O)c1cc(C(F)(F)F)ccc1-c1cccnc1"
+    ">>O=C1c2cc(C(F)(F)F)ccc2-c2cccnc21"
 )
 
 
@@ -100,6 +118,39 @@ class _RepeatedSuzukiMappingProvider:
                     )
                 )
                 in {("B", "C"), ("Br", "C"), ("C", "C")}
+            )
+            results.append(
+                replace(
+                    result,
+                    normalization=replace(result.normalization, edits=edits),
+                )
+            )
+        return tuple(results)
+
+
+class _IntramolecularCyclizationMappingProvider:
+    metadata = AtomMappingProviderMetadata(
+        provider_id="rxnmapper",
+        provider_version="test",
+        model_id="fixture",
+        model_sha256="fixture",
+    )
+
+    def map_reactions(self, reactions):
+        results = []
+        for reaction in reactions:
+            result = validate_external_atom_mapping(
+                reaction,
+                MAPPED_INTRAMOLECULAR_DECARBOXYLATIVE_CYCLIZATION,
+                provider_metadata=self.metadata,
+                mapper_confidence=0.99,
+            )
+            assert result.normalization is not None
+            edits = tuple(
+                edit
+                for edit in result.normalization.edits
+                if edit.atom_2 is None
+                or {edit.atom_1.element, edit.atom_2.element} == {"C"}
             )
             results.append(
                 replace(
@@ -268,8 +319,8 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
 
     assert b"<svg" in graphic.image_bytes[:512]
     assert png.startswith(b"\x89PNG\r\n\x1a\n")
-    assert graphic.definition_id == "reaction_core_graphic.v1.2"
-    assert graphic.schema_version == "1.2"
+    assert graphic.definition_id == "reaction_core_graphic.v1.3"
+    assert graphic.schema_version == "1.3"
     assert [placeholder.label for placeholder in graphic.placeholders] == [
         "R1",
         "R2",
@@ -285,6 +336,9 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
     ] == ["retained"]
     assert load_reaction_core_graphic_definition()[
         "collapse_retained_multisite_scaffolds"
+    ] is True
+    assert load_reaction_core_graphic_definition()[
+        "preserve_intramolecular_tethers"
     ] is True
     assert load_reaction_core_graphic_definition()[
         "render_nonretained_subgraphs_explicitly"
@@ -417,6 +471,82 @@ def test_renderer_keeps_departing_carboxyl_oxygens_explicit() -> None:
         size=(1200, 260),
         image_format="svg",
     )
+    assert b"<svg" in graphic.image_bytes[:512]
+
+
+@pytest.mark.parametrize(
+    "reaction_smiles",
+    (
+        MAPPED_INTRAMOLECULAR_DECARBOXYLATIVE_CYCLIZATION,
+        MAPPED_INTRAMOLECULAR_CN,
+    ),
+)
+def test_renderer_preserves_intramolecular_ring_tethers(
+    reaction_smiles: str,
+) -> None:
+    from visualization.reaction_core_graphic import (
+        _build_side_molecules,
+        _placeholder_assignments,
+    )
+
+    analysis = featurize_reaction(reaction_smiles)
+    assignments, placeholders, collapses = _placeholder_assignments(analysis)
+
+    assert analysis.reaction_topology is not None
+    assert analysis.reaction_topology.reaction_scope == "intramolecular"
+    assert analysis.reaction_topology.ring_count_delta == 1
+    assert placeholders == ()
+    assert collapses == ()
+
+    for side, components in (
+        ("reactant", analysis.reactants),
+        ("product", analysis.products),
+    ):
+        reduced = _build_side_molecules(
+            analysis,
+            side=side,
+            assignments=assignments,
+            scaffold_collapses=collapses,
+        )
+        assert len(reduced) == len(components) == 1
+        expected = Chem.MolFromSmiles(components[0].input_smiles)
+        assert expected is not None
+        assert len(Chem.GetMolFrags(reduced[0])) == 1
+        assert reduced[0].GetNumAtoms() == expected.GetNumAtoms()
+        assert reduced[0].GetNumBonds() == expected.GetNumBonds()
+
+    graphic = build_reaction_core_graphic(
+        analysis,
+        size=(1200, 260),
+        image_format="svg",
+    )
+    assert b"<svg" in graphic.image_bytes[:512]
+
+
+def test_external_mapping_preserves_intramolecular_core_topology() -> None:
+    base = featurize_reaction(
+        INTRAMOLECULAR_DECARBOXYLATIVE_CYCLIZATION
+    )
+    assessment = analyze_reaction_with_external_mapping(
+        INTRAMOLECULAR_DECARBOXYLATIVE_CYCLIZATION,
+        _IntramolecularCyclizationMappingProvider(),
+        base_analysis=base,
+        force_resolved_shadow=True,
+    )
+
+    assert assessment.status == "external_mapping_internal_consensus"
+    core = assessment.analysis.reaction_core
+    assert core is not None and core.abstraction is not None
+    assert core.abstraction.general_label == (
+        "R–C(=O)OH + Ar–H → R–Ar; intramolecular, "
+        "5-membered ring"
+    )
+    graphic = build_reaction_core_graphic(
+        assessment.analysis,
+        size=(1200, 260),
+        image_format="svg",
+    )
+    assert graphic.placeholders == ()
     assert b"<svg" in graphic.image_bytes[:512]
 
 

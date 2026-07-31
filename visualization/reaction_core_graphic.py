@@ -82,10 +82,10 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     """Load and validate the versioned placeholder-rendering definition."""
     with _DEFINITION_PATH.open("r", encoding="utf-8") as handle:
         definition = dict(json.load(handle))
-    if str(definition.get("schema_version") or "") != "1.2":
+    if str(definition.get("schema_version") or "") != "1.3":
         raise ValueError("unsupported reaction-core graphic schema")
     if str(definition.get("definition_id") or "") != (
-        "reaction_core_graphic.v1.2"
+        "reaction_core_graphic.v1.3"
     ):
         raise ValueError("unexpected reaction-core graphic definition ID")
     labels = definition.get("remote_class_labels")
@@ -102,6 +102,10 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     if definition.get("collapse_retained_multisite_scaffolds") is not True:
         raise ValueError(
             "reaction-core graphic must collapse retained multi-site scaffolds"
+        )
+    if definition.get("preserve_intramolecular_tethers") is not True:
+        raise ValueError(
+            "reaction-core graphic must preserve intramolecular tethers"
         )
     if definition.get("render_nonretained_subgraphs_explicitly") is not True:
         raise ValueError(
@@ -181,6 +185,50 @@ def _render_remote_explicitly(subgraph: Any) -> bool:
     )
 
 
+def _topology_protected_subgraph_ids(
+    analysis: Any,
+    *,
+    side: str | None = None,
+) -> set[str]:
+    """Return retained tethers that cannot be safely contracted to dummies.
+
+    A connected remote graph spanning multiple active atoms carries the path
+    closed by an intramolecular formed bond. Replacing each attachment port by
+    an unrelated dummy atom destroys that path and therefore the observed ring
+    topology. Keep such graphs explicit whenever the analysis establishes a
+    ring-forming intramolecular event.
+    """
+    topology = getattr(analysis, "reaction_topology", None)
+    if topology is None or str(topology.reaction_scope) not in {
+        "intramolecular",
+        "mixed",
+    }:
+        return set()
+    ring_sizes = tuple(getattr(topology, "formed_ring_sizes", ()) or ())
+    ring_count_delta = getattr(topology, "ring_count_delta", None)
+    if not ring_sizes and not (
+        ring_count_delta is not None and int(ring_count_delta) > 0
+    ):
+        return set()
+    core = getattr(analysis, "reaction_core", None)
+    if core is None:
+        return set()
+    protected = set()
+    for subgraph in core.remote_subgraphs:
+        if (
+            subgraph.continuity != "retained"
+            or (side is not None and str(subgraph.side) != side)
+        ):
+            continue
+        boundary = {
+            (int(port.core_component_index), int(port.core_atom_index))
+            for port in subgraph.attachment_ports
+        }
+        if len(boundary) >= 2:
+            protected.add(str(subgraph.subgraph_id))
+    return protected
+
+
 def _multisite_scaffold_collapses(
     analysis: Any,
 ) -> Tuple[_MultisiteScaffoldCollapse, ...]:
@@ -188,6 +236,7 @@ def _multisite_scaffold_collapses(
     from rdkit import Chem
 
     core = analysis.reaction_core
+    topology_protected = _topology_protected_subgraph_ids(analysis)
     values = []
     for side, components in (
         ("reactant", analysis.reactants),
@@ -202,6 +251,7 @@ def _multisite_scaffold_collapses(
                 subgraph.side == side
                 and subgraph.continuity == "retained"
                 and not _render_remote_explicitly(subgraph)
+                and str(subgraph.subgraph_id) not in topology_protected
             ):
                 core_atom_indices = tuple(
                     sorted(
@@ -339,6 +389,7 @@ def _placeholder_assignments(
     definition = load_reaction_core_graphic_definition()
     labels = definition["remote_class_labels"]
     scaffold_collapses = _multisite_scaffold_collapses(analysis)
+    topology_protected = _topology_protected_subgraph_ids(analysis)
     collapsed_subgraph_ids = {
         subgraph_id
         for collapse in scaffold_collapses
@@ -350,6 +401,7 @@ def _placeholder_assignments(
         if (
             subgraph.continuity == "retained"
             and not _render_remote_explicitly(subgraph)
+            and str(subgraph.subgraph_id) not in topology_protected
             and str(subgraph.subgraph_id) not in collapsed_subgraph_ids
         )
     )
@@ -429,6 +481,7 @@ def _embedded_core_placeholders(
     component_index: int,
     active_atom_indices: set[int],
     assignments: Mapping[tuple[Any, ...], str],
+    topology_protected: set[str],
 ) -> tuple[Dict[int, str], set[str]]:
     """Find ring/scaffold fragments that can absorb one embedded core atom.
 
@@ -444,6 +497,7 @@ def _embedded_core_placeholders(
             subgraph.side != side
             or subgraph.continuity != "retained"
             or _render_remote_explicitly(subgraph)
+            or str(subgraph.subgraph_id) in topology_protected
             or subgraph.component_index != component_index
         ):
             continue
@@ -484,6 +538,10 @@ def _build_side_molecules(
     for component_index, atom_index in active:
         active_by_component.setdefault(component_index, set()).add(atom_index)
     output = []
+    topology_protected = _topology_protected_subgraph_ids(
+        analysis,
+        side=side,
+    )
     for component_index, atom_indices in sorted(active_by_component.items()):
         source = parse_smiles(components[component_index].input_smiles)
         if source is None:
@@ -510,6 +568,7 @@ def _build_side_molecules(
             component_index=component_index,
             active_atom_indices=atom_indices,
             assignments=assignments,
+            topology_protected=topology_protected,
         )
         collapsed_subgraph_ids.update(
             subgraph_id
@@ -567,6 +626,7 @@ def _build_side_molecules(
             if (
                 subgraph.continuity != "retained"
                 or _render_remote_explicitly(subgraph)
+                or str(subgraph.subgraph_id) in topology_protected
             ):
                 remote_old_to_new: Dict[int, int] = {}
                 for atom_index in sorted(subgraph.atom_indices):

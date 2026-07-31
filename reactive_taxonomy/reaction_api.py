@@ -252,12 +252,19 @@ def featurize_reaction(
         mapped_override=_mapped_edit_override,
         mapped_provider=_mapped_provider,
     )
+    reaction_topology = build_reaction_topology(
+        reactants=parsed.reactants,
+        products=parsed.products,
+        selected=selected,
+        edit_result=edit_result,
+    )
     reaction_core = build_reaction_core_projection(
         reactants=parsed.reactants,
         products=parsed.products,
         edits=edit_result.edits,
         evidence=edit_result.evidence,
         confidence=edit_result.confidence,
+        topology=reaction_topology,
     )
     reaction_completeness = build_reaction_completeness(
         reactants=parsed.reactants,
@@ -309,12 +316,6 @@ def featurize_reaction(
         )
     )
     warnings.extend(edit_result.warnings)
-    reaction_topology = build_reaction_topology(
-        reactants=parsed.reactants,
-        products=parsed.products,
-        selected=selected,
-        edit_result=edit_result,
-    )
     edit_hypotheses = tuple(
         replace(
             hypothesis,
