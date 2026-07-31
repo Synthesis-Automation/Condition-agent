@@ -53,6 +53,9 @@ _REACTION_CORE_CSV_FIELDS = (
     "reaction_core_typed_key",
     "reaction_core_shape_key",
     "reaction_core_center_transition_key",
+    "reaction_core_motif_key",
+    "reaction_core_general_label",
+    "reaction_core_limiter",
     "reaction_core_event_count",
     "reaction_core_primary_center_count",
     "reaction_core_remote_classes",
@@ -499,6 +502,13 @@ def _reaction_core_lines(result: Any) -> list[str]:
             f"{core.active_atom_count} active atom(s)"
         ),
     ]
+    if core.abstraction is not None:
+        lines[1:2] = [
+            f"  General motif: {core.abstraction.general_label}",
+            f"  Specific limiter: {core.abstraction.limiter_label}",
+            f"  Atom-level reaction: {core.generic_label}",
+            f"  Motif key (future retrieval tier): {core.abstraction.motif_key}",
+        ]
     if core.remote_subgraphs:
         remote = []
         for subgraph in core.remote_subgraphs:
@@ -730,6 +740,7 @@ def _reaction_csv_columns(
 def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     analysis = record["analysis"]
     reaction_core = analysis.get("reaction_core") or {}
+    core_abstraction = reaction_core.get("abstraction") or {}
     spectator_groups = analysis.get("spectator_groups") or []
     signature_partners = (analysis.get("reaction_signature") or {}).get("partners") or []
 
@@ -792,6 +803,13 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         "reaction_core_shape_key": reaction_core.get("shape_core_key") or "",
         "reaction_core_center_transition_key": (
             reaction_core.get("center_transition_key") or ""
+        ),
+        "reaction_core_motif_key": core_abstraction.get("motif_key") or "",
+        "reaction_core_general_label": (
+            core_abstraction.get("general_label") or ""
+        ),
+        "reaction_core_limiter": (
+            core_abstraction.get("limiter_label") or ""
         ),
         "reaction_core_event_count": reaction_core.get("event_count") or "",
         "reaction_core_primary_center_count": (

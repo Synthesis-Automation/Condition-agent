@@ -15,7 +15,7 @@ from .descriptors import render_reactivity_profile
 from .reaction_models import ReactionAnalysis
 
 
-REACTION_REVIEW_SUMMARY_SCHEMA_VERSION = "1.0"
+REACTION_REVIEW_SUMMARY_SCHEMA_VERSION = "1.1"
 _SUBSCRIPT_TRANSLATION = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
 
@@ -25,6 +25,8 @@ class ReactionReviewSummary:
 
     detailed_reaction_label: str
     graphic_reaction_label: str
+    graphic_core_limiter: str
+    atom_level_core_label: str
     spectators: str
     electronic_steric_analysis: str
     display_label_status: str
@@ -119,6 +121,7 @@ def build_reaction_review_summary(
     if display is None:
         display = _member(source, "reaction_display_label")
     core = _member(source, "reaction_core")
+    abstraction = _member(core, "abstraction")
     signature = _member(source, "reaction_signature")
 
     detailed_label = str(_member(display, "detailed", "") or "")
@@ -136,7 +139,19 @@ def build_reaction_review_summary(
 
     return ReactionReviewSummary(
         detailed_reaction_label=detailed_label,
-        graphic_reaction_label=str(_member(core, "generic_label", "") or ""),
+        graphic_reaction_label=str(
+            _member(abstraction, "general_label", "")
+            or _member(core, "generic_label", "")
+            or ""
+        ),
+        graphic_core_limiter=str(
+            _member(abstraction, "limiter_label", "") or ""
+        ),
+        atom_level_core_label=(
+            str(_member(core, "generic_label", "") or "")
+            if abstraction is not None
+            else ""
+        ),
         spectators=_spectator_summary(spectators),
         electronic_steric_analysis=_partner_environment_summary(partners),
         display_label_status=str(_member(display, "status", "") or ""),
@@ -153,14 +168,21 @@ def format_reaction_review_summary(summary: ReactionReviewSummary) -> str:
     graphic = summary.graphic_reaction_label or "Unavailable"
     spectators = summary.spectators or "None detected"
     profile = summary.electronic_steric_analysis or "Unavailable"
-    return "\n".join(
+    lines = [
+        f"Detailed reaction label: {detailed}",
+        f"Graphic core label: {graphic}",
+    ]
+    if summary.graphic_core_limiter:
+        lines.append(f"Graphic core limiter: {summary.graphic_core_limiter}")
+    if summary.atom_level_core_label:
+        lines.append(f"Atom-level core: {summary.atom_level_core_label}")
+    lines.extend(
         (
-            f"Detailed reaction label: {detailed}",
-            f"Graphic core label: {graphic}",
             f"Spectators: {spectators}",
             f"Electronic / steric analysis: {profile}",
         )
     )
+    return "\n".join(lines)
 
 
 __all__ = [

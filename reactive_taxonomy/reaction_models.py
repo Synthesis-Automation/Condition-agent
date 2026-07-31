@@ -11,8 +11,8 @@ from .models import CompoundAnalysis
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.0"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.3"
-REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.0"
-REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v4"
+REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.1"
+REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v5"
 
 EditArchetype = Literal[
     "substitution",
@@ -822,6 +822,26 @@ class ReactionCoreEvent:
 
 
 @dataclass(frozen=True)
+class ReactionCoreAbstraction:
+    """Broad graph-derived motif plus narrower environment limiters."""
+
+    motif_id: str
+    motif_key: str
+    general_label: str
+    limiter_label: str
+    motif_tokens: Tuple[str, ...]
+    limiter_tokens: Tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not self.motif_id:
+            raise ValueError("reaction-core abstraction requires a motif ID")
+        if not self.motif_key.startswith("RCM1:"):
+            raise ValueError("motif_key must use the RCM1 namespace")
+        if not self.motif_tokens:
+            raise ValueError("reaction-core abstraction requires motif tokens")
+
+
+@dataclass(frozen=True)
 class ReactionCoreProjection:
     """Template-free, scaffold-abstracted view of observed reaction edits."""
 
@@ -836,6 +856,7 @@ class ReactionCoreProjection:
     edit_tokens: Tuple[str, ...]
     participant_tokens: Tuple[str, ...]
     generic_label: str
+    abstraction: Optional[ReactionCoreAbstraction]
     active_atom_count: int
     event_count: int
     evidence: str
@@ -994,6 +1015,7 @@ __all__ = [
     "ReactionCoreAtomState",
     "ReactionCoreAtomTransition",
     "ReactionCoreAttachmentPort",
+    "ReactionCoreAbstraction",
     "ReactionCoreEvent",
     "ReactionCoreProjection",
     "ReactionCoreRemoteClass",

@@ -252,7 +252,7 @@ The projection:
 7. matches remote subgraphs across sides as retained, departing, appearing,
    changed, or unresolved.
 
-Its algorithm-v4 concise label uses a local atom-state transition for a
+Its algorithm-v5 concise label uses a local atom-state transition for a
 single-center event. For a multi-center event it instead renders one
 normalized edit equation, preventing a shared formed bond from being shown
 twice (for example, `Ar–B + Ar–O → Ar–Ar`).
@@ -263,6 +263,17 @@ Carbonyl-bearing active neighbors retain their local heteroatom environment in
 the single-center label. A decarboxylative connection can therefore appear as
 `C(H)2(R)(C(=O)(O-H)) -> C(H)2(R)(ArC)`, instead of reducing the departing
 carboxyl group to an indistinguishable `R` substituent.
+
+Conservatively recognized motifs may also expose two graph-derived abstraction
+layers. Decarboxylative C-C coupling uses the broad label
+`R-C(=O)OH + Ar-H -> R-Ar` and a stable `RCM1` motif key across alkyl and aryl
+carboxylic acids. Separate limiter tokens retain distinctions such as
+`transfer_center:primary_alkyl`, `transfer_center:secondary_alkyl`,
+`transfer_center:aryl`, and `partner_center:heteroaryl`. The GUI therefore
+shows a readable limiter such as
+`R = R'-CH2- (primary alkyl); Ar = HetAr` alongside the atom-level core. The
+motif key is serialized as foundation for a future retrieval tier; current
+admission and retrieval behavior is unchanged.
 
 Classes such as `aryl`, `heteroaryl`, and `alkyl` come from the removed graph:
 aromaticity, ring composition, element composition, unsaturation, and

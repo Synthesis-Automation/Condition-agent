@@ -99,6 +99,7 @@ def flattened_reaction_core_fields(
 ) -> Dict[str, Any]:
     """Expose minimized-core identity and canonical review JSON."""
     value = core or {}
+    abstraction = value.get("abstraction") or {}
     return {
         "reaction_core_id": value.get("core_id", ""),
         "reaction_core_exact": value.get("exact_core_key", ""),
@@ -108,6 +109,9 @@ def flattened_reaction_core_fields(
             "center_transition_key",
             "",
         ),
+        "reaction_core_motif_key": abstraction.get("motif_key", ""),
+        "reaction_core_general_label": abstraction.get("general_label", ""),
+        "reaction_core_limiter": abstraction.get("limiter_label", ""),
         "reaction_core_label": value.get("generic_label", ""),
         "reaction_core_evidence_status": value.get("evidence_status", ""),
         "reaction_core_json": json.dumps(

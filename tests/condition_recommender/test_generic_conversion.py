@@ -135,9 +135,9 @@ def test_mapped_unknown_reaction_serializes_reaction_core_for_review() -> None:
 
     assert record.admission_tier == AdmissionTier.REVIEW
     assert record.reaction_core is not None
-    assert record.reaction_core["schema_version"] == "2.0"
+    assert record.reaction_core["schema_version"] == "2.1"
     assert record.reaction_core["algorithm_version"] == (
-        "reaction_core_projection.v4"
+        "reaction_core_projection.v5"
     )
     assert record.reaction_core["shape_core_key"].startswith("RSH2:")
     assert record.reaction_core["generic_label"] == (
@@ -612,7 +612,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "2.5"
+    assert report["schema_version"] == "2.6"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert review_rows[0]["canonical_reaction_smiles"]

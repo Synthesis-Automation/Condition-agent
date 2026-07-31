@@ -203,7 +203,7 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.review_output.setLineWrapMode(
             QtWidgets.QPlainTextEdit.LineWrapMode.WidgetWidth
         )
-        self.review_output.setMaximumHeight(156)
+        self.review_output.setMaximumHeight(210)
         analysis_layout.addWidget(self.review_output)
 
         analysis_layout.addWidget(QtWidgets.QLabel("Additional analysis"))

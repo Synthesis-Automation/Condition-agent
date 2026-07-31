@@ -22,6 +22,7 @@ from .reaction_models import (
     ReactionAtomReference,
     ReactionComponent,
     ReactionCoreAttachmentPort,
+    ReactionCoreAbstraction,
     ReactionCoreAtomState,
     ReactionCoreAtomTransition,
     ReactionCoreEvent,
@@ -1078,6 +1079,182 @@ def _evidence_status(evidence: str) -> str:
     return "hypothesis"
 
 
+def _aromatic_center_class(molecule: Any, atom_index: int) -> str:
+    """Classify the connected aromatic system around one active carbon."""
+    remaining = {int(atom_index)}
+    visited = set()
+    while remaining:
+        current = remaining.pop()
+        if current in visited:
+            continue
+        atom = molecule.GetAtomWithIdx(current)
+        if not atom.GetIsAromatic():
+            continue
+        visited.add(current)
+        remaining.update(
+            int(neighbor.GetIdx())
+            for neighbor in atom.GetNeighbors()
+            if neighbor.GetIsAromatic()
+        )
+    return (
+        "heteroaryl"
+        if any(
+            molecule.GetAtomWithIdx(index).GetAtomicNum() != 6
+            for index in visited
+        )
+        else "aryl"
+    )
+
+
+def _transfer_center_limiter(
+    molecule: Any,
+    atom_index: int,
+    carboxyl_atom_index: int,
+) -> tuple[str, str]:
+    """Return a typed token and readable limiter for the transferred group."""
+    atom = molecule.GetAtomWithIdx(atom_index)
+    if atom.GetIsAromatic():
+        center_class = _aromatic_center_class(molecule, atom_index)
+        label = (
+            "HetAr– (heteroaryl)"
+            if center_class == "heteroaryl"
+            else "Ar– (aryl)"
+        )
+        return center_class, label
+    hybridization = str(atom.GetHybridization()).upper()
+    if hybridization == "SP":
+        return "alkynyl", "R′–C≡C– (alkynyl)"
+    if hybridization == "SP2":
+        return "alkenyl", "R′–CH=CH– (alkenyl)"
+    hydrogens = int(atom.GetTotalNumHs(includeNeighbors=True))
+    carbon_neighbors = sum(
+        neighbor.GetAtomicNum() == 6
+        and int(neighbor.GetIdx()) != int(carboxyl_atom_index)
+        for neighbor in atom.GetNeighbors()
+    )
+    if hydrogens >= 3 and carbon_neighbors == 0:
+        return "methyl", "CH₃– (methyl)"
+    if hydrogens == 2 and carbon_neighbors == 1:
+        return "primary_alkyl", "R′–CH₂– (primary alkyl)"
+    if hydrogens == 1 and carbon_neighbors == 2:
+        return "secondary_alkyl", "R′R″CH– (secondary alkyl)"
+    if hydrogens == 0 and carbon_neighbors >= 3:
+        return "tertiary_alkyl", "R′R″R‴C– (tertiary alkyl)"
+    return "alkyl_other", "alkyl group"
+
+
+def _decarboxylative_abstraction(
+    *,
+    edits: Sequence[ReactionEdit],
+    reactant_by_map: Mapping[int, _Location],
+    product_by_map: Mapping[int, _Location],
+) -> Optional[ReactionCoreAbstraction]:
+    """Recognize C–C formation coupled to loss of a carboxylic-acid carbon."""
+    formed = tuple(
+        edit
+        for edit in edits
+        if edit.edit_type == "formed" and edit.atom_2 is not None
+    )
+    for broken in edits:
+        if broken.edit_type != "broken" or broken.atom_2 is None:
+            continue
+        endpoints = (broken.atom_1, broken.atom_2)
+        for carboxyl, transfer in (endpoints, endpoints[::-1]):
+            if carboxyl.element != "C" or transfer.element != "C":
+                continue
+            carboxyl_identity = _atom_identity(carboxyl)
+            transfer_identity = _atom_identity(transfer)
+            if carboxyl_identity[0] != "map" or transfer_identity[0] != "map":
+                continue
+            carboxyl_map = int(carboxyl_identity[1])
+            transfer_map = int(transfer_identity[1])
+            carboxyl_location = reactant_by_map.get(carboxyl_map)
+            transfer_location = reactant_by_map.get(transfer_map)
+            if (
+                carboxyl_location is None
+                or transfer_location is None
+                or carboxyl_map in product_by_map
+                or transfer_map not in product_by_map
+            ):
+                continue
+            component, molecule, carboxyl_index = carboxyl_location
+            if not any(
+                str(group.group_id) == "carboxylic_acid"
+                and int(carboxyl_index) in set(group.atom_indices)
+                for group in component.compound_analysis.functional_groups
+            ):
+                continue
+            partner_reference = None
+            for edit in formed:
+                formed_endpoints = (edit.atom_1, edit.atom_2)
+                formed_identities = tuple(
+                    _atom_identity(endpoint) for endpoint in formed_endpoints
+                )
+                if transfer_identity not in formed_identities:
+                    continue
+                partner_reference = formed_endpoints[
+                    1 if formed_identities[0] == transfer_identity else 0
+                ]
+                if partner_reference.element == "C":
+                    break
+                partner_reference = None
+            if partner_reference is None:
+                continue
+            transfer_component, transfer_molecule, transfer_index = (
+                transfer_location
+            )
+            if transfer_component.component_index != component.component_index:
+                continue
+            transfer_token, transfer_label = _transfer_center_limiter(
+                transfer_molecule,
+                transfer_index,
+                carboxyl_index,
+            )
+            partner_identity = _atom_identity(partner_reference)
+            partner_location = (
+                reactant_by_map.get(int(partner_identity[1]))
+                if partner_identity[0] == "map"
+                else None
+            )
+            partner_token = "carbon"
+            partner_label = "C"
+            if partner_location is not None:
+                _, partner_molecule, partner_index = partner_location
+                partner_atom = partner_molecule.GetAtomWithIdx(partner_index)
+                if partner_atom.GetIsAromatic():
+                    partner_token = _aromatic_center_class(
+                        partner_molecule,
+                        partner_index,
+                    )
+                    partner_label = (
+                        "HetAr" if partner_token == "heteroaryl" else "Ar"
+                    )
+            motif_tokens = (
+                "bond_formed:C-C",
+                "departing_handle:carboxylic_acid",
+                "motif:decarboxylative_coupling",
+            )
+            limiter_tokens = tuple(
+                sorted(
+                    (
+                        f"partner_center:{partner_token}",
+                        f"transfer_center:{transfer_token}",
+                    )
+                )
+            )
+            return ReactionCoreAbstraction(
+                motif_id="decarboxylative_c_c_coupling",
+                motif_key=_digest("RCM1", motif_tokens),
+                general_label="R–C(=O)OH + Ar–H → R–Ar",
+                limiter_label=(
+                    f"R = {transfer_label}; Ar = {partner_label}"
+                ),
+                motif_tokens=motif_tokens,
+                limiter_tokens=limiter_tokens,
+            )
+    return None
+
+
 def build_reaction_core_projection(
     *,
     reactants: Tuple[ReactionComponent, ...],
@@ -1436,6 +1613,11 @@ def build_reaction_core_projection(
             for transition in primary
         )
     )
+    abstraction = _decarboxylative_abstraction(
+        edits=edits,
+        reactant_by_map=reactant_by_map,
+        product_by_map=product_by_map,
+    )
     warnings = set()
     if any(
         subgraph.continuity == "unresolved"
@@ -1463,6 +1645,9 @@ def build_reaction_core_projection(
             ),
             "algorithm_version": REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
             "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
+            "abstraction": (
+                abstraction.motif_key if abstraction is not None else None
+            ),
         },
         length=64,
     )
@@ -1478,6 +1663,7 @@ def build_reaction_core_projection(
         edit_tokens=edit_tokens,
         participant_tokens=participant_tokens,
         generic_label=generic_label,
+        abstraction=abstraction,
         active_atom_count=len(identities),
         event_count=len(events),
         evidence=str(evidence),

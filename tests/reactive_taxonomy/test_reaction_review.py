@@ -55,3 +55,28 @@ def test_review_summary_formats_duplicate_spectators_without_distances() -> None
     )
 
     assert summary.spectators == "2× R–O–R [ether]"
+
+
+def test_review_summary_shows_general_motif_and_specific_limiter() -> None:
+    analysis = featurize_reaction(
+        "O=[C:15](O)[CH2:2][CH3:1]."
+        "[cH:3]1[cH:4][c:5]([CH3:6])[n:7][c:8]2[cH:9][cH:10]"
+        "[c:11]([F:12])[cH:13][c:14]12"
+        ">>[CH3:1][CH2:2][c:3]1[cH:4][c:5]([CH3:6])[n:7]"
+        "[c:8]2[cH:9][cH:10][c:11]([F:12])[cH:13][c:14]12"
+    )
+
+    summary = build_reaction_review_summary(analysis)
+    rendered = format_reaction_review_summary(summary)
+
+    assert summary.graphic_reaction_label == (
+        "R–C(=O)OH + Ar–H → R–Ar"
+    )
+    assert summary.graphic_core_limiter == (
+        "R = R′–CH₂– (primary alkyl); Ar = HetAr"
+    )
+    assert summary.atom_level_core_label == (
+        "C(H)2(R)(C(=O)(O-H)) → C(H)2(R)(ArC)"
+    )
+    assert "Graphic core limiter:" in rendered
+    assert "Atom-level core:" in rendered
