@@ -46,12 +46,32 @@ RESOLVED_SUZUKI_MAPPING = (
     "[c:8](-[c:9]2[cH:10][cH:11][cH:12][cH:13][cH:14]2)"
     "[cH:15][cH:16]1"
 )
+REPEATED_SUZUKI_REACTION = (
+    "Brc1ccc(Br)cc1.OB(O)c1ccccc1.OB(O)c1ccccc1"
+    ">>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1"
+)
+REPEATED_SUZUKI_MAPPING = (
+    "[Br:19][c:5]1[cH:6][cH:7][c:8]([Br:20])[cH:15][cH:16]1."
+    "O[B:21](O)[c:4]1[cH:3][cH:2][cH:1][cH:18][cH:17]1."
+    "O[B:22](O)[c:9]1[cH:10][cH:11][cH:12][cH:13][cH:14]1"
+    ">>[cH:1]1[cH:2][cH:3][c:4](-[c:5]2[cH:6][cH:7]"
+    "[c:8](-[c:9]3[cH:10][cH:11][cH:12][cH:13][cH:14]3)"
+    "[cH:15][cH:16]2)[cH:17][cH:18]1"
+)
 
 
 class _ResolvedFixtureProvider:
     metadata = METADATA
 
-    def __init__(self, *, signature_conflict=False):
+    def __init__(
+        self,
+        *,
+        mapped_reaction=RESOLVED_SUZUKI_MAPPING,
+        allowed_pairs=frozenset({("B", "C"), ("C", "C"), ("C", "O")}),
+        signature_conflict=False,
+    ):
+        self.mapped_reaction = mapped_reaction
+        self.allowed_pairs = allowed_pairs
         self.signature_conflict = signature_conflict
 
     def map_reactions(self, reactions):
@@ -59,7 +79,7 @@ class _ResolvedFixtureProvider:
         for reaction in reactions:
             result = validate_external_atom_mapping(
                 reaction,
-                RESOLVED_SUZUKI_MAPPING,
+                self.mapped_reaction,
                 provider_metadata=self.metadata,
                 mapper_confidence=0.44,
             )
@@ -75,7 +95,7 @@ class _ResolvedFixtureProvider:
                         )
                     )
                 )
-                in {("B", "C"), ("C", "C"), ("C", "O")}
+                in self.allowed_pairs
             )
             if self.signature_conflict:
                 core_edits = tuple(
@@ -243,3 +263,28 @@ def test_forced_mapping_conflict_retains_the_resolved_interpretation() -> None:
     assert assessment.analysis.reaction_signature == base.reaction_signature
     assert assessment.analysis.reaction_core is None
     assert "EXTERNAL_MAPPING_SIGNATURE_CONFLICT" in assessment.analysis.warnings
+
+
+def test_forced_mapping_builds_one_core_with_two_suzuki_events() -> None:
+    base = featurize_reaction(REPEATED_SUZUKI_REACTION)
+
+    assessment = analyze_reaction_with_external_mapping(
+        REPEATED_SUZUKI_REACTION,
+        _ResolvedFixtureProvider(
+            mapped_reaction=REPEATED_SUZUKI_MAPPING,
+            allowed_pairs=frozenset(
+                {("B", "C"), ("Br", "C"), ("C", "C")}
+            ),
+        ),
+        base_analysis=base,
+        force_resolved_shadow=True,
+    )
+
+    assert assessment.status == "external_mapping_internal_consensus"
+    assert assessment.analysis.reaction_signature == base.reaction_signature
+    assert assessment.analysis.display_label == base.display_label
+    assert assessment.analysis.reaction_core is not None
+    assert assessment.analysis.reaction_core.event_count == 2
+    assert assessment.analysis.reaction_core.generic_label == (
+        "2 × Ar–B + 2 × Ar–Br → 2 × Ar–Ar"
+    )

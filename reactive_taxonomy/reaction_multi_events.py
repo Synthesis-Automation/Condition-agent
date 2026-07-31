@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from itertools import combinations
 from typing import Any, Dict, Iterable, Sequence, Tuple
 
@@ -12,24 +13,118 @@ from .reaction_site_interfaces import normalize_reaction_assignment
 
 
 RawCandidate = Tuple[Dict[str, Any], Dict[str, ReactionSiteReference]]
+_Coordinate = Tuple[int, int]
+
+
+@dataclass(frozen=True)
+class _EventProgram:
+    """One composable release-and-connect program in reactant coordinates."""
+
+    participants: Tuple[ReactionSiteReference, ...]
+    join: Tuple[_Coordinate, _Coordinate]
+    removals: Tuple[Tuple[int, int, int], ...]
+
+
+def _instruction_atom(
+    selector: object,
+    normalized: Dict[str, Any],
+) -> _Coordinate | None:
+    """Resolve the instruction selectors needed by multi-event composition."""
+    parts = str(selector or "").split(".")
+    if len(parts) != 3 or parts[0] not in normalized:
+        return None
+    role, interface, attribute = parts
+    view = normalized[role]
+    if interface == "reactive_link" and len(view.reactive_links) == 1:
+        link = view.reactive_links[0]
+        endpoint = getattr(link, attribute, None)
+    elif (
+        interface == "connection_endpoint"
+        and attribute == "atom"
+        and len(view.connection_endpoints) == 1
+    ):
+        endpoint = view.connection_endpoints[0].endpoint
+    else:
+        return None
+    atom_index = getattr(endpoint, "atom_index", None)
+    component_index = getattr(endpoint, "component_index", None)
+    if atom_index is None or component_index is None:
+        return None
+    return int(component_index), int(atom_index)
+
+
+def _instruction_event_program(
+    candidate: RawCandidate,
+    reactants: Tuple[ReactionComponent, ...],
+) -> _EventProgram | None:
+    """Compile one declarative release-and-connect variant for composition."""
+    grammar, assignment = candidate
+    rewrite = connectivity_rewrite_for_grammar(str(grammar.get("id") or ""))
+    if rewrite is None or len(rewrite.variants) != 1:
+        return None
+    try:
+        normalized = normalize_reaction_assignment(assignment, reactants)
+    except (KeyError, StopIteration, ValueError):
+        return None
+    joins = []
+    removals = []
+    for instruction in rewrite.variants[0].instructions:
+        operation = str(instruction.get("op") or "")
+        if operation == "change_localized_bond_state" and (
+            str(instruction.get("before") or "").upper() == "NONE"
+            and str(instruction.get("after") or "").upper() == "SINGLE"
+        ):
+            endpoints = tuple(instruction.get("endpoints") or ())
+            if len(endpoints) != 2:
+                return None
+            left = _instruction_atom(endpoints[0], normalized)
+            right = _instruction_atom(endpoints[1], normalized)
+            if left is None or right is None:
+                return None
+            joins.append((left, right))
+        elif operation == "declare_projection_discardable_attachment":
+            retained = _instruction_atom(instruction.get("retained"), normalized)
+            discarded = _instruction_atom(
+                instruction.get("discarded"), normalized
+            )
+            if (
+                retained is None
+                or discarded is None
+                or retained[0] != discarded[0]
+            ):
+                return None
+            removals.append((retained[0], retained[1], discarded[1]))
+    if len(joins) != 1 or not removals:
+        return None
+    participants = tuple(
+        sorted(
+            assignment.values(),
+            key=lambda site: (
+                site.component_index,
+                site.site_id,
+                site.canonical_signature,
+            ),
+        )
+    )
+    return _EventProgram(
+        participants=participants,
+        join=joins[0],
+        removals=tuple(sorted(set(removals))),
+    )
 
 
 def _event_sites(
     candidate: RawCandidate,
     reactants: Tuple[ReactionComponent, ...],
-) -> tuple[
-    ReactionSiteReference,
-    ReactionSiteReference,
-    int,
-    int,
-    int,
-] | None:
+) -> _EventProgram | None:
     grammar, assignment = candidate
     rewrite = connectivity_rewrite_for_grammar(str(grammar.get("id") or ""))
     if rewrite is None:
         return None
     bindings = rewrite.grammar_role_bindings.get(str(grammar["id"]))
-    if not bindings or {
+    if not bindings:
+        return _instruction_event_program(candidate, reactants)
+    if {
         "leaving_source",
         "joining_partner",
     } - set(bindings):
@@ -56,36 +151,36 @@ def _event_sites(
         or endpoint.atom_index is None
     ):
         return None
-    return (
-        source,
-        partner,
-        link.endpoint_a.atom_index,
-        link.endpoint_b.atom_index,
-        endpoint.atom_index,
+    return _EventProgram(
+        participants=(source, partner),
+        join=(
+            (source.component_index, int(link.endpoint_a.atom_index)),
+            (partner.component_index, int(endpoint.atom_index)),
+        ),
+        removals=(
+            (
+                source.component_index,
+                int(link.endpoint_a.atom_index),
+                int(link.endpoint_b.atom_index),
+            ),
+        ),
     )
 
 
 def _operation_key(candidate: RawCandidate) -> Tuple[Any, ...]:
     grammar, assignment = candidate
-    rewrite = connectivity_rewrite_for_grammar(str(grammar.get("id") or ""))
-    bindings = (
-        rewrite.grammar_role_bindings.get(str(grammar["id"]))
-        if rewrite is not None
-        else None
-    )
-    if not bindings:
-        return (str(grammar.get("id") or ""),)
-    electrophile = assignment[bindings["leaving_source"]]
-    partner = assignment[bindings["joining_partner"]]
-    anchor_role = (
-        "anchor" if "anchor" in electrophile.atom_roles else "center"
-    )
     return (
         grammar["id"],
-        electrophile.component_index,
-        int(electrophile.atom_roles[anchor_role][0]),
-        partner.component_index,
-        int(partner.atom_roles["center"][0]),
+        tuple(
+            sorted(
+                (
+                    site.component_index,
+                    site.site_id,
+                    site.canonical_signature,
+                )
+                for site in assignment.values()
+            )
+        ),
     )
 
 
@@ -144,32 +239,31 @@ def apply_rewrite_sequence(
     if any(event is None for event in resolved):
         return None
     events = [event for event in resolved if event is not None]
-    participants: dict[int, ReactionSiteReference] = {}
+    participant_indices: set[int] = set()
     removals: Dict[int, set[int]] = {}
     joins: list[Tuple[Tuple[int, int], Tuple[int, int]]] = []
-    used_sources: set[Tuple[int, int]] = set()
-    used_partners: set[Tuple[int, int]] = set()
-    for source, partner, retained, discarded, joining in events:
-        source_key = (source.component_index, retained)
-        partner_key = (partner.component_index, joining)
-        if source_key in used_sources or partner_key in used_partners:
+    used_join_atoms: set[_Coordinate] = set()
+    for event in events:
+        left, right = event.join
+        if left in used_join_atoms or right in used_join_atoms:
             return None
-        used_sources.add(source_key)
-        used_partners.add(partner_key)
-        fragment = _fragment_to_remove(
-            components,
-            source.component_index,
-            retained,
-            discarded,
+        used_join_atoms.update((left, right))
+        for component_index, retained, discarded in event.removals:
+            fragment = _fragment_to_remove(
+                components,
+                component_index,
+                retained,
+                discarded,
+            )
+            if not fragment:
+                return None
+            removals.setdefault(component_index, set()).update(fragment)
+        joins.append(event.join)
+        participant_indices.update(
+            site.component_index for site in event.participants
         )
-        if not fragment:
-            return None
-        removals.setdefault(source.component_index, set()).update(fragment)
-        joins.append((source_key, partner_key))
-        participants[source.component_index] = source
-        participants[partner.component_index] = partner
 
-    used_indices = sorted(participants)
+    used_indices = sorted(participant_indices)
     molecules = []
     offsets: Dict[int, int] = {}
     total = 0

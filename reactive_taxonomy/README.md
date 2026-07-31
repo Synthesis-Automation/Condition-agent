@@ -271,6 +271,12 @@ assignments may be composed and accepted only when the combined graph operators
 exactly reconstruct the observed product. An atom-unbalanced record is not
 assigned invented partner copies or atom correspondence merely to explain its
 product.
+Composition consumes the discardable attachments and formed bond declared by
+the registered connectivity rewrite, including transfer couplings that release
+both an electrophile leaving group and a transfer carrier. Thus two distinct
+boronic-acid components can satisfy two Suzuki events, while one component
+cannot be silently reused twice. A mapped or externally mapped consensus can
+then project both events into one minimized `ReactionCoreProjection`.
 
 When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
 product, a conservative correspondence fallback may supply edit evidence after

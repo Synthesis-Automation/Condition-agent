@@ -155,7 +155,13 @@ A candidate is selected only when the structural evidence is sufficiently
 unique. Symmetry-equivalent candidates can collapse to one interpretation;
 chemically different exact candidates remain ambiguous.
 
-Multiple rewrites may also be composed for multi-event reactions.
+Multiple rewrites may also be composed for multi-event reactions. The
+composer reads each registered rewrite's declared discardable attachments and
+formed bond, so it supports both one-release substitutions and two-release
+transfer couplings. It consumes distinct reactive sites and partner component
+instances for every event, then accepts the composition only when the combined
+operator reconstructs the observed product exactly. It never duplicates a
+missing reactant to balance an equation.
 
 ## 5. Extract and reconcile observed reaction edits
 
@@ -250,6 +256,9 @@ Its algorithm-v3 concise label uses a local atom-state transition for a
 single-center event. For a multi-center event it instead renders one
 normalized edit equation, preventing a shared formed bond from being shown
 twice (for example, `Ar–B + Ar–O → Ar–Ar`).
+Repeated mapped events are retained in one projection and counted rather than
+collapsed; a double Suzuki core is rendered as
+`2 × Ar–B + 2 × Ar–Br → 2 × Ar–Ar` with `event_count=2`.
 
 Classes such as `aryl`, `heteroaryl`, and `alkyl` come from the removed graph:
 aromaticity, ring composition, element composition, unsaturation, and

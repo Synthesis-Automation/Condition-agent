@@ -241,6 +241,48 @@ def test_unbalanced_multi_event_reaction_does_not_invent_partner_copy() -> None:
     assert "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in result.warnings
 
 
+def test_balanced_repeated_suzuki_events_are_exactly_reconstructed() -> None:
+    reaction = (
+        "Brc1ccc(Br)cc1.OB(O)c1ccccc1.OB(O)c1ccccc1"
+        ">>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1"
+    )
+
+    result = featurize_reaction(reaction)
+
+    assert result.evidence_quality == "exact_multi_event_reconstruction"
+    assert len(result.selected_events) == 2
+    assert result.reaction_signature is not None
+    assert result.reaction_signature.event_count == 2
+    assert result.reaction_signature.event_scope == "multi_event"
+    assert result.reaction_completeness is not None
+    assert result.reaction_completeness.status == "verified"
+    assert result.compatible_named_families == ("suzuki_miyaura",)
+    assert all(
+        event.named_family == "suzuki_miyaura"
+        for event in result.reaction_signature.events
+    )
+    assert result.reaction_label == (
+        "2 × C–B bond cleavage; C–Br bond cleavage; C–C bond formation"
+    )
+
+
+def test_repeated_suzuki_does_not_invent_a_missing_partner_copy() -> None:
+    reaction = (
+        "Brc1ccc(Br)cc1.OB(O)c1ccccc1"
+        ">>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1"
+    )
+
+    result = featurize_reaction(reaction)
+
+    assert result.evidence_quality == "reactant_grammar_only"
+    assert result.selected_events == ()
+    assert result.reaction_signature is None
+    assert result.reaction_completeness is not None
+    assert result.reaction_completeness.status == "incomplete"
+    assert result.reaction_completeness.suspected_insufficient_reactant_multiplicity
+    assert "INSUFFICIENT_REACTANT_MULTIPLICITY" in result.warnings
+
+
 def test_l3_identity_includes_schema_level_hydrogen_changes() -> None:
     hydrogenation = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
     order_change_only = featurize_reaction("[CH2:1]=[CH2:2]>>[CH2:1][CH2:2]")
