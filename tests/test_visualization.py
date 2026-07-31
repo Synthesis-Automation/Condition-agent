@@ -3,10 +3,13 @@ from pathlib import Path
 import re
 
 import pytest
+from rdkit import Chem
+from rdkit.Chem.Draw import rdMolDraw2D
 
 from reactive_taxonomy import featurize_reaction
 from visualization import (
     RenderStyle,
+    apply_render_preset,
     available_render_presets,
     build_reaction_core_graphic,
     load_reaction_core_graphic_definition,
@@ -61,11 +64,11 @@ def test_render_presets_are_versioned_and_include_compact_acs() -> None:
     assert definition["schema_version"] == "1.0"
     assert available_render_presets() == (
         ("current", "Current"),
-        ("acs_1996_compact", "ACS 1996 compact"),
+        ("acs_1996_compact", "ACS 1996"),
     )
 
 
-def test_acs_preset_caps_bonds_and_uses_acs_line_width() -> None:
+def test_acs_preset_uses_native_bond_length_and_line_width() -> None:
     current = render_molecule_image_bytes(
         "CCC",
         size=(480, 300),
@@ -80,8 +83,26 @@ def test_acs_preset_caps_bonds_and_uses_acs_line_width() -> None:
     )
 
     assert _first_svg_bond_length(current) > 200.0
-    assert _first_svg_bond_length(compact) == pytest.approx(18.0, abs=0.2)
+    assert _first_svg_bond_length(compact) == pytest.approx(14.4, abs=0.2)
     assert b"stroke-width:0.6px" in compact
+
+
+def test_acs_preset_preserves_native_atom_font_to_bond_proportion() -> None:
+    molecule = rdMolDraw2D.PrepareMolForDrawing(Chem.MolFromSmiles("CCl"))
+    mean_bond_length = rdMolDraw2D.MeanBondLength(molecule)
+    options = rdMolDraw2D.MolDrawOptions()
+
+    apply_render_preset(
+        options,
+        "acs_1996_compact",
+        molecules=(molecule,),
+    )
+
+    rendered_bond_length = options.fixedBondLength * mean_bond_length
+    assert rendered_bond_length == pytest.approx(14.4)
+    assert options.fixedFontSize == 10
+    assert options.fixedFontSize / rendered_bond_length > 0.69
+    assert options.multipleBondOffset == pytest.approx(0.18)
 
 
 def test_molecule_renderer_supports_in_memory_png_and_file_output(

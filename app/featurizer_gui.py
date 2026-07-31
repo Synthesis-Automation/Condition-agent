@@ -240,8 +240,9 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         if compact_index >= 0:
             self.render_style_combo.setCurrentIndex(compact_index)
         self.render_style_combo.setToolTip(
-            "ACS 1996 compact uses publication-style monochrome drawing and "
-            "caps bond length at 18 pixels."
+            "ACS 1996 uses RDKit's native publication-style monochrome "
+            "drawing, 14.4-pixel bonds, and fixed 10-pixel atom labels before "
+            "uniform display scaling."
         )
         graph_header.addWidget(self.render_style_combo)
         graph_layout.addLayout(graph_header)
@@ -504,7 +505,8 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             return
         if not self.structure_image_label.set_image_bytes(
             drawing,
-            trim_white_space=(render_preset != "acs_1996_compact"),
+            trim_white_space=True,
+            max_upscale=(6.0 if render_preset == "acs_1996_compact" else None),
         ):
             self.structure_image_label.setToolTip(
                 "The renderer returned an unsupported image."
@@ -549,7 +551,8 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             return
         if not self.core_image_label.set_image_bytes(
             graphic.image_bytes,
-            trim_white_space=(render_preset != "acs_1996_compact"),
+            trim_white_space=True,
+            max_upscale=(6.0 if render_preset == "acs_1996_compact" else None),
         ):
             self.core_graphic_note.setText(
                 "The minimized renderer returned an unsupported image."

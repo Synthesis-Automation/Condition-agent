@@ -175,13 +175,21 @@ def test_drawing_style_switch_rerenders_without_reanalysis(monkeypatch) -> None:
         window.input_edit.setText("CCO")
         window.analyze()
         assert calls == ["acs_1996_compact"]
-        assert not window.structure_image_label._trim_svg_white_space
+        assert window.structure_image_label._trim_svg_white_space
+        assert window.structure_image_label._svg_max_upscale == 6.0
+        compact_pixmap = window.structure_image_label.pixmap()
+        compact_width = compact_pixmap.width() / compact_pixmap.devicePixelRatio()
 
         current_index = window.render_style_combo.findData("current")
         window.render_style_combo.setCurrentIndex(current_index)
 
         assert calls == ["acs_1996_compact", "current"]
         assert window.structure_image_label._trim_svg_white_space
+        assert window.structure_image_label._svg_max_upscale is None
+        current_pixmap = window.structure_image_label.pixmap()
+        current_width = current_pixmap.width() / current_pixmap.devicePixelRatio()
+        assert compact_width > current_width * 0.15
+        assert compact_width < current_width * 0.60
         assert window.output.toPlainText().startswith("MOLECULE FEATURIZATION")
     finally:
         window.close()

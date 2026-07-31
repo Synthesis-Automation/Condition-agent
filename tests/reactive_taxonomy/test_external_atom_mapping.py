@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from reactive_taxonomy import (
     AtomMappingProviderMetadata,
     EXTERNAL_MAPPING_EVIDENCE,
     RxnMapperProvider,
+    analyze_reaction_with_external_mapping,
+    build_reaction_review_summary,
+    featurize_reaction,
     validate_external_atom_mapping,
 )
 from reactive_taxonomy.chemistry.rdkit_utils import parse_smiles
@@ -28,6 +33,64 @@ METADATA = AtomMappingProviderMetadata(
     model_id="fixture",
     model_sha256="abc",
 )
+
+RESOLVED_SUZUKI_REACTION = (
+    "CC(C)(C)c1ccc(OS(C)(=O)=O)cc1.OB(O)c1ccccc1"
+    ">>CC(C)(C)c1ccc(-c2ccccc2)cc1"
+)
+RESOLVED_SUZUKI_MAPPING = (
+    "CS(=O)(=O)[O:17][c:8]1[cH:7][cH:6][c:5]"
+    "([C:2]([CH3:1])([CH3:3])[CH3:4])[cH:16][cH:15]1."
+    "O[B:18](O)[c:9]1[cH:10][cH:11][cH:12][cH:13][cH:14]1"
+    ">>[CH3:1][C:2]([CH3:3])([CH3:4])[c:5]1[cH:6][cH:7]"
+    "[c:8](-[c:9]2[cH:10][cH:11][cH:12][cH:13][cH:14]2)"
+    "[cH:15][cH:16]1"
+)
+
+
+class _ResolvedFixtureProvider:
+    metadata = METADATA
+
+    def __init__(self, *, signature_conflict=False):
+        self.signature_conflict = signature_conflict
+
+    def map_reactions(self, reactions):
+        results = []
+        for reaction in reactions:
+            result = validate_external_atom_mapping(
+                reaction,
+                RESOLVED_SUZUKI_MAPPING,
+                provider_metadata=self.metadata,
+                mapper_confidence=0.44,
+            )
+            assert result.normalization is not None
+            core_edits = tuple(
+                edit
+                for edit in result.normalization.edits
+                if tuple(
+                    sorted(
+                        (
+                            edit.atom_1.element,
+                            edit.atom_2.element if edit.atom_2 else "H",
+                        )
+                    )
+                )
+                in {("B", "C"), ("C", "C"), ("C", "O")}
+            )
+            if self.signature_conflict:
+                core_edits = tuple(
+                    edit for edit in core_edits if edit.edit_type != "formed"
+                )
+            results.append(
+                replace(
+                    result,
+                    normalization=replace(
+                        result.normalization,
+                        edits=core_edits,
+                    ),
+                )
+            )
+        return tuple(results)
 
 
 def test_external_mapping_preserves_structure_and_extracts_fischer_edits() -> None:
@@ -115,3 +178,51 @@ def test_rxnmapper_provider_batches_and_retains_model_provenance() -> None:
     assert provider.metadata.provider_id == "rxnmapper"
     assert provider.metadata.provider_version
     assert provider.metadata.model_id == "albert_heads_8_uspto_all_1310k"
+
+
+def test_forced_resolved_mapping_only_enriches_the_minimized_core() -> None:
+    base = featurize_reaction(RESOLVED_SUZUKI_REACTION)
+
+    assessment = analyze_reaction_with_external_mapping(
+        RESOLVED_SUZUKI_REACTION,
+        _ResolvedFixtureProvider(),
+        base_analysis=base,
+        force_resolved_shadow=True,
+    )
+
+    assert assessment.status == "external_mapping_internal_consensus"
+    assert assessment.analysis.reaction_label == base.reaction_label
+    assert assessment.analysis.reaction_label_status == base.reaction_label_status
+    assert assessment.analysis.display_label == base.display_label
+    assert assessment.analysis.reaction_signature == base.reaction_signature
+    assert assessment.analysis.reaction_core is not None
+    assert assessment.analysis.reaction_core.evidence_status == "external"
+    assert assessment.analysis.reaction_core.evidence == (
+        "external_mapping_internal_consensus"
+    )
+    assert "REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL" in (
+        assessment.analysis.reaction_core.warnings
+    )
+    assert build_reaction_review_summary(
+        assessment.analysis
+    ).detailed_reaction_label == build_reaction_review_summary(
+        base
+    ).detailed_reaction_label
+
+
+def test_forced_mapping_conflict_retains_the_resolved_interpretation() -> None:
+    base = featurize_reaction(RESOLVED_SUZUKI_REACTION)
+
+    assessment = analyze_reaction_with_external_mapping(
+        RESOLVED_SUZUKI_REACTION,
+        _ResolvedFixtureProvider(signature_conflict=True),
+        base_analysis=base,
+        force_resolved_shadow=True,
+    )
+
+    assert assessment.status == "external_mapping_signature_conflict"
+    assert assessment.analysis.reaction_label == base.reaction_label
+    assert assessment.analysis.display_label == base.display_label
+    assert assessment.analysis.reaction_signature == base.reaction_signature
+    assert assessment.analysis.reaction_core is None
+    assert "EXTERNAL_MAPPING_SIGNATURE_CONFLICT" in assessment.analysis.warnings

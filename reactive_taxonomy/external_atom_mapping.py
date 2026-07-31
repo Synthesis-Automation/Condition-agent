@@ -68,6 +68,7 @@ ExternalMappingAssessmentStatus = Literal[
     "external_mapping_failed",
     "external_mapping_internal_consensus",
     "external_mapping_hypothesis_conflict",
+    "external_mapping_signature_conflict",
     "external_mapping_ambiguous_hypothesis_match",
     "external_mapping_only",
     "external_mapping_signature_unavailable",
@@ -638,6 +639,15 @@ def analyze_reaction_with_external_mapping(
         mapped_parsed.reactants,
         mapped_parsed.products,
     )
+    signature_matches = bool(
+        base.reaction_signature is not None
+        and normalized_edit_profile(
+            base.reaction_signature.edits,
+            base.reactants,
+            base.products,
+        )
+        == external_profile
+    )
     matches = tuple(
         hypothesis
         for hypothesis in base.edit_hypotheses
@@ -649,6 +659,90 @@ def analyze_reaction_with_external_mapping(
         == external_profile
     )
     matched_ids = tuple(hypothesis.hypothesis_id for hypothesis in matches)
+    if force_resolved_shadow and base.reaction_signature is not None:
+        if not signature_matches:
+            warning = "EXTERNAL_MAPPING_SIGNATURE_CONFLICT"
+            return ExternalMappingAssessment(
+                input_reaction_smiles=reaction_smiles,
+                status="external_mapping_signature_conflict",
+                analysis=replace(
+                    base,
+                    evidence_candidates=_merge_evidence_candidates(
+                        base.evidence_candidates,
+                        (external_candidate,),
+                    ),
+                    warnings=tuple(
+                        sorted(set(base.warnings).union((warning,)))
+                    ),
+                ),
+                provider_metadata=provider.metadata,
+                mapping_result=mapping,
+                warnings=(warning, "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW"),
+            )
+
+        # Forced mapping of an already resolved reaction is a shadow operation:
+        # it supplies atom correspondence for the minimized graphic, but must
+        # not replace the internally resolved interpretation or its labels.
+        from .reaction_core import build_reaction_core_projection
+
+        confidence = min(
+            mapping.normalization.confidence,
+            min(
+                (edit.confidence for edit in base.reaction_signature.edits),
+                default=1.0,
+            ),
+        )
+        evidence = "external_mapping_internal_consensus"
+        assessment_warnings = (
+            "EXTERNAL_MAPPING_INTERNAL_CONSENSUS",
+            "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW",
+        )
+        reaction_core = build_reaction_core_projection(
+            reactants=mapped_parsed.reactants,
+            products=mapped_parsed.products,
+            edits=mapping.normalization.edits,
+            evidence=evidence,
+            confidence=confidence,
+        )
+        if reaction_core is None:
+            warning = "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE"
+            return ExternalMappingAssessment(
+                input_reaction_smiles=reaction_smiles,
+                status="external_mapping_signature_unavailable",
+                analysis=replace(
+                    base,
+                    evidence_candidates=_merge_evidence_candidates(
+                        base.evidence_candidates,
+                        (external_candidate,),
+                    ),
+                    warnings=tuple(
+                        sorted(set(base.warnings).union((warning,)))
+                    ),
+                ),
+                provider_metadata=provider.metadata,
+                mapping_result=mapping,
+                warnings=(warning, "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW"),
+            )
+        effective = replace(
+            base,
+            evidence_candidates=_merge_evidence_candidates(
+                base.evidence_candidates,
+                (external_candidate,),
+            ),
+            reaction_core=reaction_core,
+            warnings=tuple(
+                sorted(set(base.warnings).union(assessment_warnings))
+            ),
+        )
+        return ExternalMappingAssessment(
+            input_reaction_smiles=reaction_smiles,
+            status="external_mapping_internal_consensus",
+            analysis=effective,
+            provider_metadata=provider.metadata,
+            mapping_result=mapping,
+            warnings=assessment_warnings,
+        )
+
     if base.edit_hypotheses and len(matches) != 1:
         status: ExternalMappingAssessmentStatus = (
             "external_mapping_ambiguous_hypothesis_match"

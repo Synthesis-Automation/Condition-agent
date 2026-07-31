@@ -21,9 +21,9 @@
       }
     },
     "acs_1996_compact": {
-      "label": "ACS 1996 compact",
+      "label": "ACS 1996",
       "mode": "acs_1996",
-      "target_bond_length_pixels": 18.0,
+      "target_bond_length_pixels": null,
       "standard": {
         "padding": 0.04
       },

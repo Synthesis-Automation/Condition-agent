@@ -22,6 +22,7 @@ class StructureImageLabel(QtWidgets.QLabel):
         self._source_svg = b""
         self._source_pixmap = QtGui.QPixmap()
         self._trim_svg_white_space = True
+        self._svg_max_upscale: float | None = None
         self.setObjectName(object_name)
         self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setMinimumWidth(360)
@@ -40,8 +41,11 @@ class StructureImageLabel(QtWidgets.QLabel):
         drawing: bytes,
         *,
         trim_white_space: bool = True,
+        max_upscale: float | None = None,
     ) -> bool:
-        """Load image bytes, optionally cropping vector-canvas whitespace."""
+        """Load image bytes with optional cropping and bounded enlargement."""
+        if max_upscale is not None and max_upscale <= 0:
+            raise ValueError("max_upscale must be positive")
         if b"<svg" in drawing[:512].lower():
             renderer = QtSvg.QSvgRenderer(drawing)
             if not renderer.isValid():
@@ -50,6 +54,7 @@ class StructureImageLabel(QtWidgets.QLabel):
             self._source_svg = bytes(drawing)
             self._source_pixmap = QtGui.QPixmap()
             self._trim_svg_white_space = trim_white_space
+            self._svg_max_upscale = max_upscale
             self.setText("")
             self._refresh_pixmap()
             return True
@@ -60,6 +65,7 @@ class StructureImageLabel(QtWidgets.QLabel):
         self._source_svg = b""
         self._source_pixmap = pixmap
         self._trim_svg_white_space = True
+        self._svg_max_upscale = None
         self.setText("")
         self._refresh_pixmap()
         return True
@@ -72,6 +78,7 @@ class StructureImageLabel(QtWidgets.QLabel):
         self._source_svg = b""
         self._source_pixmap = QtGui.QPixmap()
         self._trim_svg_white_space = True
+        self._svg_max_upscale = None
         self.setPixmap(QtGui.QPixmap())
         self.setText(message or self._placeholder)
         self.setToolTip("")
@@ -138,6 +145,17 @@ class StructureImageLabel(QtWidgets.QLabel):
             max(round(available.width() * render_scale), 1),
             max(round(available.height() * render_scale), 1),
         )
+        if self._svg_max_upscale is not None:
+            target_pixel_size = QtCore.QSize(
+                min(
+                    target_pixel_size.width(),
+                    max(round(image.width() * self._svg_max_upscale), 1),
+                ),
+                min(
+                    target_pixel_size.height(),
+                    max(round(image.height() * self._svg_max_upscale), 1),
+                ),
+            )
         image = image.scaled(
             target_pixel_size,
             QtCore.Qt.AspectRatioMode.KeepAspectRatio,

@@ -208,13 +208,16 @@ The integration first runs ordinary internal analysis. It skips the mapper for
 reactions with supplied maps or an existing resolved signature. For an
 unresolved or ambiguous reaction it records one of these dispositions:
 
-- `external_mapping_internal_consensus`: exactly one internal edit hypothesis
-  matches the external normalized edit profile;
+- `external_mapping_internal_consensus`: exactly one internal edit hypothesis,
+  or an already resolved reaction signature requested in shadow mode, matches
+  the external normalized edit profile;
 - `external_mapping_only`: the mapper supplies a valid edit profile where no
   internal hypotheses exist;
 - `external_mapping_hypothesis_conflict` or
   `external_mapping_ambiguous_hypothesis_match`: retain the original
   hypotheses and route to review;
+- `external_mapping_signature_conflict`: retain an already resolved analysis
+  when a shadow mapping proposal contradicts its reaction signature;
 - `external_mapping_signature_unavailable` or `external_mapping_failed`: retain
   the base analysis and failure provenance.
 
@@ -322,6 +325,10 @@ For a resolved but unmapped input, `Map resolved reactions for minimized
 graphic` may be enabled to run the optional mapper solely to obtain the
 mapped-core evidence needed for this view. This is off by default because it
 is slower and because an externally mapped core remains a review proposal.
+The mapped edits are reconciled with the existing reaction signature; on
+consensus, the original interpretation, detailed label, and signature remain
+unchanged and only the external core and provenance are attached. A conflict
+retains the original analysis and does not silently replace its chemistry.
 The tab displays evidence status, confidence, the exact placeholder legend,
 and the expert-review warning.
 
