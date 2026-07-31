@@ -32,6 +32,8 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert "background-color: #0078d7" in window.styleSheet()
         assert window.use_rxnmapper_check.isChecked()
         assert window.use_rxnmapper_check.objectName() == "useRxnMapper"
+        assert not window.force_core_mapping_check.isChecked()
+        assert window.force_core_mapping_check.objectName() == "forceCoreMapping"
 
         window.input_edit.setText(REACTION_EXAMPLE)
         assert window.kind_label.text() == "Detected: reaction"
@@ -50,6 +52,8 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert not reaction_pixmap.isNull()
         assert window.graph_heading.text() == "Reaction graph"
         assert window.structure_image_label.toolTip() == REACTION_EXAMPLE
+        assert window.graph_tabs.currentIndex() == 0
+        assert window.core_image_label.text() == "Mapped reaction core unavailable."
 
         window.input_edit.setText("Brc1ccccc1")
         assert window.kind_label.text() == "Detected: molecule"
@@ -64,6 +68,7 @@ def test_window_analyzes_reaction_and_molecule() -> None:
         assert not molecule_pixmap.isNull()
         assert window.graph_heading.text() == "Compound graph"
         assert window.structure_image_label.toolTip() == "Brc1ccccc1"
+        assert not window.graph_tabs.isTabEnabled(1)
     finally:
         window.close()
         application.processEvents()
@@ -131,6 +136,12 @@ def test_window_displays_mapped_reaction_minimization() -> None:
         assert "Core shape (retrieval): RSH2:" in output
         assert "Center transition (diagnostic only): RCS2:" in output
         assert "retained aryl [Fc1ccccc1] (1 port)" in output
+        core_pixmap = window.core_image_label.pixmap()
+        assert core_pixmap is not None
+        assert not core_pixmap.isNull()
+        assert window.graph_tabs.currentIndex() == 1
+        assert "Ar = Fc1ccccc1" in window.core_graphic_note.text()
+        assert "R = C" in window.core_graphic_note.text()
     finally:
         window.close()
         application.processEvents()

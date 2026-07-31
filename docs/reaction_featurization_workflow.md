@@ -283,6 +283,51 @@ keys, minimized label, evidence status, event and center counts, remote classes
 and subgraph summaries, and warnings. Nested JSON remains the complete
 lossless representation.
 
+### Graphical minimized reaction
+
+The desktop featurizer can render a `ReactionCoreProjection` as a compact
+reaction scheme. The renderer is implemented in
+[`visualization/reaction_core_graphic.py`](../visualization/reaction_core_graphic.py);
+it is a presentation of the existing molecular observation, not another
+reaction classifier.
+
+The renderer:
+
+1. draws every active atom and active-atom bond on each side;
+2. replaces only `retained` remote subgraphs with short placeholders;
+3. pairs the same retained mapped subgraph across both sides;
+4. assigns deterministic labels such as `Ar`, `HetAr`, `R`, or indexed
+   variants such as `R1` and `R2`; and
+5. retains a visible legend from every placeholder to its exact fragment
+   SMILES.
+
+The remote class is read from the graph-derived core projection. Rendering
+does not infer `aryl` or `alkyl` from reaction names and does not hide
+departing, appearing, changed, or unresolved fragments. Placeholder vocabulary
+and abstraction policy are versioned in
+[`reaction_core_graphic.v1.json`](../visualization/definitions/reaction_core_graphic.v1.json).
+
+The featurizer has separate `Full structure` and `Minimized reaction` tabs.
+For a resolved but unmapped input, `Map resolved reactions for minimized
+graphic` may be enabled to run the optional mapper solely to obtain the
+mapped-core evidence needed for this view. This is off by default because it
+is slower and because an externally mapped core remains a review proposal.
+The tab displays evidence status, confidence, the exact placeholder legend,
+and the expert-review warning.
+
+For the complex alkyne/azide example in
+[`click_reaction_core_graphic_poc.py`](../benchmarks/click_reaction_core_graphic_poc.py),
+the five active atoms render as:
+
+```text
+R1-C#CH + R2-N3 -> 1,2,3-triazole(R1,R2)
+```
+
+The generated PNG, SVG, and evidence report are
+`results/click_minimized_reaction_poc.*`. The current RXNMapper confidence for
+this example is about `0.291`, so the chemically useful graphic is explicitly
+shown as external review evidence rather than verified reaction identity.
+
 The three desktop applications expose a `Use RXNMapper` checkbox that is
 checked by default:
 

@@ -43,6 +43,13 @@ shape and center keys, core size, remote subgraphs, attachment counts, and
 warnings. Batch reaction CSV exports the same audit fields; JSON retains the
 complete nested projection.
 
+The desktop featurizer also presents mapped cores graphically. The renderer in
+`visualization` draws active atoms and replaces only unchanged retained remote
+subgraphs with deterministic `Ar`, `HetAr`, `R`, or indexed placeholders. It
+always exposes the exact fragment-SMILES legend and the core evidence status;
+external mapping is visibly review-only. This rendering does not affect core
+identity, signatures, admission, or retrieval.
+
 Mapped, single-event references can also be compiled into the versioned
 `reaction_templates.v1.json` registry. This authoring registry stores a
 map-number- and reactant-order-invariant edit fingerprint, optional family

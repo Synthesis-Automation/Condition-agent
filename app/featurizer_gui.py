@@ -22,6 +22,7 @@ from reactive_taxonomy import (  # noqa: E402
 )
 from reactive_taxonomy.cli import format_concise_analysis  # noqa: E402
 from visualization import (  # noqa: E402
+    build_reaction_core_graphic,
     render_molecule_image_bytes,
     render_reaction_image_bytes,
 )
@@ -52,6 +53,7 @@ def featurize_text(
     text: str,
     *,
     mapping_provider: AtomMappingProvider | None = None,
+    force_resolved_mapping: bool = False,
 ) -> tuple[InputKind, object, ExternalMappingAssessment | None]:
     """Featurize stripped text through the appropriate public taxonomy API."""
     value = text.strip()
@@ -65,6 +67,7 @@ def featurize_text(
                 value,
                 mapping_provider,
                 base_analysis=base_analysis,
+                force_resolved_shadow=force_resolved_mapping,
             )
             if mapping_provider is not None
             else None
@@ -144,6 +147,17 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             "still take precedence; generated mapping remains review evidence."
         )
         controls.addWidget(self.use_rxnmapper_check)
+        self.force_core_mapping_check = QtWidgets.QCheckBox(
+            "Map resolved reactions for minimized graphic"
+        )
+        self.force_core_mapping_check.setObjectName("forceCoreMapping")
+        self.force_core_mapping_check.setChecked(False)
+        self.force_core_mapping_check.setToolTip(
+            "Optional and slower. Runs RXNMapper even when internal evidence "
+            "already resolves the reaction, so a mapped graphical core can be "
+            "drawn. The mapped result remains review evidence."
+        )
+        controls.addWidget(self.force_core_mapping_check)
         controls.addStretch(1)
 
         self.reaction_example_button = QtWidgets.QPushButton("Reaction example")
@@ -192,12 +206,34 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
         self.graph_heading = QtWidgets.QLabel("Structure graph")
         self.graph_heading.setObjectName("structureGraphHeading")
         graph_layout.addWidget(self.graph_heading)
+        self.graph_tabs = QtWidgets.QTabWidget()
+        self.graph_tabs.setObjectName("reactionGraphicTabs")
+
         self.structure_image_label = StructureImageLabel(
             placeholder="Reaction or compound graph will appear here.",
             object_name="featurizedStructureGraph",
             minimum_height=220,
         )
-        graph_layout.addWidget(self.structure_image_label)
+        self.graph_tabs.addTab(self.structure_image_label, "Full structure")
+
+        minimized_panel = QtWidgets.QWidget()
+        minimized_layout = QtWidgets.QVBoxLayout(minimized_panel)
+        minimized_layout.setContentsMargins(0, 0, 0, 0)
+        minimized_layout.setSpacing(4)
+        self.core_image_label = StructureImageLabel(
+            placeholder="Mapped minimized reaction will appear here.",
+            object_name="minimizedReactionGraphic",
+            minimum_height=190,
+        )
+        minimized_layout.addWidget(self.core_image_label, 1)
+        self.core_graphic_note = QtWidgets.QLabel(
+            "A mapped reaction core is required."
+        )
+        self.core_graphic_note.setObjectName("coreGraphicNote")
+        self.core_graphic_note.setWordWrap(True)
+        minimized_layout.addWidget(self.core_graphic_note)
+        self.graph_tabs.addTab(minimized_panel, "Minimized reaction")
+        graph_layout.addWidget(self.graph_tabs)
 
         result_layout.addWidget(analysis_column, stretch=1)
         result_layout.addWidget(graph_column, stretch=1)
@@ -220,6 +256,9 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
 
     def _connect_signals(self) -> None:
         self.input_edit.textChanged.connect(self._update_detected_kind)
+        self.use_rxnmapper_check.toggled.connect(
+            self.force_core_mapping_check.setEnabled
+        )
         self.input_edit.returnPressed.connect(self.analyze)
         self.analyze_button.clicked.connect(self.analyze)
         self.reaction_example_button.clicked.connect(
@@ -311,6 +350,10 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             kind, analysis, assessment = featurize_text(
                 input_text,
                 mapping_provider=mapping_provider,
+                force_resolved_mapping=(
+                    requested_kind == "reaction"
+                    and self.force_core_mapping_check.isChecked()
+                ),
             )
             heading = f"{kind.upper()} FEATURIZATION"
             mapping_summary = ""
@@ -335,7 +378,11 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
                 f"{heading}{mapping_summary}\n\n"
                 f"{format_concise_analysis(analysis)}"
             )
-            self._render_structure(kind, self.input_edit.text().strip())
+            self._render_structure(
+                kind,
+                self.input_edit.text().strip(),
+                analysis=analysis,
+            )
             valid = bool(getattr(analysis, "valid", False))
             state = "valid" if valid else "invalid"
             self.status_label.setText(
@@ -354,13 +401,23 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self.structure_image_label.clear_image(
                 "Structure graph unavailable."
             )
+            self.core_image_label.clear_image(
+                "Minimized reaction graphic unavailable."
+            )
+            self.core_graphic_note.setText(str(exc))
             self.status_label.setText("Analysis failed")
             self.copy_button.setEnabled(True)
         finally:
             self.analyze_button.setEnabled(True)
 
-    def _render_structure(self, kind: InputKind, text: str) -> None:
-        """Render the analyzed molecule or reaction without affecting analysis."""
+    def _render_structure(
+        self,
+        kind: InputKind,
+        text: str,
+        *,
+        analysis: object,
+    ) -> None:
+        """Render the full graph and, when available, its minimized core."""
         self.graph_heading.setText(
             "Reaction graph" if kind == "reaction" else "Compound graph"
         )
@@ -389,6 +446,60 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             )
             return
         self.structure_image_label.setToolTip(text)
+        if kind != "reaction":
+            self.core_image_label.clear_image(
+                "Reaction minimization applies only to reactions."
+            )
+            self.core_graphic_note.setText(
+                "Enter a reaction SMILES to generate a minimized graphic."
+            )
+            self.graph_tabs.setTabEnabled(1, False)
+            self.graph_tabs.setCurrentIndex(0)
+            return
+        self.graph_tabs.setTabEnabled(1, True)
+        core = getattr(analysis, "reaction_core", None)
+        if core is None:
+            self.core_image_label.clear_image(
+                "Mapped reaction core unavailable."
+            )
+            self.core_graphic_note.setText(
+                "Supply atom mapping, use RXNMapper for an unresolved "
+                "reaction, or enable resolved-reaction mapping."
+            )
+            self.graph_tabs.setCurrentIndex(0)
+            return
+        try:
+            graphic = build_reaction_core_graphic(
+                analysis,
+                size=REACTION_IMAGE_SIZE,
+                image_format="svg",
+            )
+        except (RuntimeError, ValueError) as exc:
+            self.core_image_label.clear_image(
+                "Unable to render minimized reaction."
+            )
+            self.core_graphic_note.setText(str(exc))
+            self.graph_tabs.setCurrentIndex(0)
+            return
+        if not self.core_image_label.set_image_bytes(graphic.image_bytes):
+            self.core_graphic_note.setText(
+                "The minimized renderer returned an unsupported image."
+            )
+            self.graph_tabs.setCurrentIndex(0)
+            return
+        legend = "; ".join(
+            f"{placeholder.label} = {placeholder.fragment_smiles}"
+            for placeholder in graphic.placeholders
+        ) or "no remote placeholders"
+        note = (
+            f"{graphic.evidence_status} evidence; "
+            f"confidence {graphic.confidence:.3f}; {legend}"
+        )
+        if graphic.evidence_status == "external":
+            note += "; external mapping requires expert review"
+        self.core_graphic_note.setText(note)
+        self.core_image_label.setToolTip(note)
+        self.graph_tabs.setCurrentIndex(1)
 
     @QtCore.pyqtSlot()
     def copy_result(self) -> None:

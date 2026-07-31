@@ -228,6 +228,35 @@ proposals and therefore remain review evidence. The core retrieval policy is
 still marked `poc_review_only_not_calibrated`; verified-precedent coverage,
 false-neighbor review, and blind condition review remain release gates.
 
+#### Graphical-core feasibility POC
+
+`benchmarks/click_reaction_core_graphic_poc.py` exercises graphical
+minimization on a large alkyne/azide cycloaddition without passing the source
+reaction name into featurization. The mapped projection contains five active
+atoms and one connected event. Two unchanged retained substituents are cut at
+their attachment bonds, paired across the reaction by mapped identity, and
+rendered as `R1` and `R2`. The resulting scheme is an alkyne plus azide forming
+a substituted five-membered triazole.
+
+The versioned renderer lives in `visualization`, while atom transitions,
+continuity, remote classes, exact fragments, and typed attachment ports remain
+owned by `reactive_taxonomy`. This keeps drawing policy out of core chemistry
+and out of the application layer. Only retained remote subgraphs may be
+abstracted; the graphic result always includes a placeholder-to-fragment
+legend.
+
+Artifacts are:
+
+- `results/click_minimized_reaction_poc.svg`;
+- `results/click_minimized_reaction_poc.png`; and
+- `results/click_minimized_reaction_poc.json`.
+
+The current external mapping confidence is `0.29134308160116135`, with
+`EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW`. Therefore this POC establishes
+drawing feasibility and UI usefulness, not validated mapper accuracy. The
+featurizer keeps resolved-reaction shadow mapping off by default and exposes it
+as an explicit option for generating this review graphic.
+
 ### 2.6 External RXNMapper Fischer POC
 
 The optional offline dependency is pinned in `requirements-mapping.txt`.

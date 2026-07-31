@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "definition_id": "reaction_core_graphic.v1",
+  "remote_class_labels": {
+    "aryl": "Ar",
+    "heteroaryl": "HetAr",
+    "alkyl": "R",
+    "alkenyl": "R",
+    "alkynyl": "R",
+    "acyl": "Acyl",
+    "ring_aliphatic": "Cy",
+    "heteroatom": "X",
+    "generic_R": "R"
+  },
+  "continuities_replaced_by_labels": [
+    "retained"
+  ],
+  "indexed_label_template": "{label}{index}",
+  "rendering_note": "Only unchanged retained remote subgraphs are abstracted."
+}

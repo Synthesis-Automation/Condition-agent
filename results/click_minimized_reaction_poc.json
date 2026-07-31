@@ -1,0 +1,320 @@
+{
+  "artifact_type": "reaction_core_graphic_poc",
+  "base_analysis": {
+    "evidence_quality": "global_atom_correspondence",
+    "has_reaction_core": false,
+    "has_signature": true,
+    "named_family": null
+  },
+  "expected_reaction_type": "click",
+  "external_mapping": {
+    "confidence": 0.29134308160116135,
+    "mapped_reaction_smiles": "[CH3:1][O:2][c:3]1[cH:4][cH:5][c:6]2[n:7][c:8]([N:9]([CH2:10][C:11]#[CH:12])[c:31]3[n:32][c:33]4[cH:34][cH:35][c:36]([F:37])[cH:38][c:39]4[s:40]3)[s:41][c:42]2[cH:43]1.[N:13]([CH2:14][C:15](=[O:16])[NH:17][c:18]1[cH:19][cH:20][c:21]([S:22][C:23]([F:24])([F:25])[F:26])[cH:27][cH:28]1)=[N+:29]=[N-:30]>>[CH3:1][O:2][c:3]1[cH:4][cH:5][c:6]2[n:7][c:8]([N:9]([CH2:10][c:11]3[cH:12][n:13]([CH2:14][C:15](=[O:16])[NH:17][c:18]4[cH:19][cH:20][c:21]([S:22][C:23]([F:24])([F:25])[F:26])[cH:27][cH:28]4)[n:29][n:30]3)[c:31]3[n:32][c:33]4[cH:34][cH:35][c:36]([F:37])[cH:38][c:39]4[s:40]3)[s:41][c:42]2[cH:43]1",
+    "provider": "rxnmapper",
+    "status": "external_mapping_only",
+    "warnings": [
+      "EXTERNAL_MAPPING_WITHOUT_INTERNAL_CONSENSUS",
+      "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW"
+    ]
+  },
+  "feasibility": {
+    "abstraction": "two unchanged retained substituents are rendered as R1 and R2",
+    "active_graph": "two alkyne carbons plus three azide nitrogens form a five-membered triazole",
+    "drawable": true,
+    "limitation": "low-confidence external mapping makes this a review graphic, not verified reaction identity"
+  },
+  "graphic": {
+    "definition_id": "reaction_core_graphic.v1",
+    "placeholders": [
+      {
+        "fragment_smiles": "COc1ccc2nc(N(C)c3nc4ccc(F)cc4s3)sc2c1",
+        "functional_group_ids": [
+          "aryl_halide",
+          "ether",
+          "heteroaryl_nitrogen",
+          "heteroaryl_sulfur",
+          "tertiary_amine"
+        ],
+        "label": "R1",
+        "remote_class": "alkyl"
+      },
+      {
+        "fragment_smiles": "CC(=O)Nc1ccc(SC(F)(F)F)cc1",
+        "functional_group_ids": [
+          "amide"
+        ],
+        "label": "R2",
+        "remote_class": "alkyl"
+      }
+    ],
+    "png_path": "C:\\Git-softwares\\Condition-agent\\results\\click_minimized_reaction_poc.png",
+    "schema_version": "1.0",
+    "svg_path": "C:\\Git-softwares\\Condition-agent\\results\\click_minimized_reaction_poc.svg"
+  },
+  "input_reaction_smiles": "C#CCN(c1nc2ccc(F)cc2s1)c1nc2ccc(OC)cc2s1.[N-]=[N+]=NCC(=O)Nc1ccc(SC(F)(F)F)cc1>>COc1ccc2nc(N(Cc3cn(CC(=O)Nc4ccc(SC(F)(F)F)cc4)nn3)c3nc4ccc(F)cc4s3)sc2c1",
+  "reaction_core": {
+    "active_atom_count": 5,
+    "atom_transitions": [
+      {
+        "after_state": {
+          "aromatic": true,
+          "atom_index": 11,
+          "atom_map_number": 12,
+          "component_index": 0,
+          "concise_label": "C(H)(:ArC)(:N)",
+          "element": "C",
+          "formal_charge": 0,
+          "functional_group_ids": [],
+          "heavy_atom_degree": 2,
+          "hybridization": "SP2",
+          "neighbor_tokens": [
+            "C|aromatic|AROMATIC|Q0|H0|X2|R1",
+            "N|aromatic|AROMATIC|Q0|H0|X2|R1"
+          ],
+          "side": "product",
+          "state_key": "RAS2:c50341e434d5c319875f9d52",
+          "total_hydrogens": 1
+        },
+        "atom_map_number": 12,
+        "before_state": {
+          "aromatic": false,
+          "atom_index": 11,
+          "atom_map_number": 12,
+          "component_index": 0,
+          "concise_label": "C(H)(#R)",
+          "element": "C",
+          "formal_charge": 0,
+          "functional_group_ids": [
+            "alkyne"
+          ],
+          "heavy_atom_degree": 1,
+          "hybridization": "SP",
+          "neighbor_tokens": [
+            "C|aliphatic|TRIPLE|Q0|H0|X1|R0"
+          ],
+          "side": "reactant",
+          "state_key": "RAS2:72286e5a64157776aadbf1b3",
+          "total_hydrogens": 1
+        },
+        "incident_edit_count": 2,
+        "role": "participant",
+        "stable_remote_subgraph_count": 0,
+        "transition_id": "RCA2:ab039950d5f0a09077d6e372"
+      },
+      {
+        "after_state": {
+          "aromatic": true,
+          "atom_index": 29,
+          "atom_map_number": 30,
+          "component_index": 0,
+          "concise_label": "N(:ArC)(:N)",
+          "element": "N",
+          "formal_charge": 0,
+          "functional_group_ids": [
+            "heteroaryl_nitrogen"
+          ],
+          "heavy_atom_degree": 2,
+          "hybridization": "SP2",
+          "neighbor_tokens": [
+            "C|aromatic|AROMATIC|Q0|H0|X2|R1",
+            "N|aromatic|AROMATIC|Q0|H0|X1|R1"
+          ],
+          "side": "product",
+          "state_key": "RAS2:59922dd1ddbc4849e699c1ea",
+          "total_hydrogens": 0
+        },
+        "atom_map_number": 30,
+        "before_state": {
+          "aromatic": false,
+          "atom_index": 17,
+          "atom_map_number": 30,
+          "component_index": 1,
+          "concise_label": "N(=N-(N))",
+          "element": "N",
+          "formal_charge": -1,
+          "functional_group_ids": [
+            "azide"
+          ],
+          "heavy_atom_degree": 1,
+          "hybridization": "SP2",
+          "neighbor_tokens": [
+            "N|aliphatic|DOUBLE|Q1|H0|X1|R0"
+          ],
+          "side": "reactant",
+          "state_key": "RAS2:a9202bed83c4a3a6270c580b",
+          "total_hydrogens": 0
+        },
+        "incident_edit_count": 2,
+        "role": "participant",
+        "stable_remote_subgraph_count": 0,
+        "transition_id": "RCA2:6187287586267ae343bf5a27"
+      },
+      {
+        "after_state": {
+          "aromatic": true,
+          "atom_index": 28,
+          "atom_map_number": 29,
+          "component_index": 0,
+          "concise_label": "N(:N)2",
+          "element": "N",
+          "formal_charge": 0,
+          "functional_group_ids": [
+            "heteroaryl_nitrogen"
+          ],
+          "heavy_atom_degree": 2,
+          "hybridization": "SP2",
+          "neighbor_tokens": [
+            "N|aromatic|AROMATIC|Q0|H0|X1|R1",
+            "N|aromatic|AROMATIC|Q0|H0|X2|R1"
+          ],
+          "side": "product",
+          "state_key": "RAS2:cb436384af07d19c612513b9",
+          "total_hydrogens": 0
+        },
+        "atom_map_number": 29,
+        "before_state": {
+          "aromatic": false,
+          "atom_index": 16,
+          "atom_map_number": 29,
+          "component_index": 1,
+          "concise_label": "N(=N)(=N-R)",
+          "element": "N",
+          "formal_charge": 1,
+          "functional_group_ids": [
+            "azide"
+          ],
+          "heavy_atom_degree": 2,
+          "hybridization": "SP",
+          "neighbor_tokens": [
+            "N|aliphatic|DOUBLE|Q-1|H0|X0|R0",
+            "N|aliphatic|DOUBLE|Q0|H0|X1|R0"
+          ],
+          "side": "reactant",
+          "state_key": "RAS2:523038f5d179cbe9a3a1e62b",
+          "total_hydrogens": 0
+        },
+        "incident_edit_count": 2,
+        "role": "participant",
+        "stable_remote_subgraph_count": 0,
+        "transition_id": "RCA2:ce997279c7108de482580c91"
+      },
+      {
+        "after_state": {
+          "aromatic": true,
+          "atom_index": 10,
+          "atom_map_number": 11,
+          "component_index": 0,
+          "concise_label": "C(R)(:ArC)(:N)",
+          "element": "C",
+          "formal_charge": 0,
+          "functional_group_ids": [],
+          "heavy_atom_degree": 3,
+          "hybridization": "SP2",
+          "neighbor_tokens": [
+            "C|aliphatic|SINGLE|Q0|H2|X1|R0",
+            "C|aromatic|AROMATIC|Q0|H1|X1|R1",
+            "N|aromatic|AROMATIC|Q0|H0|X1|R1"
+          ],
+          "side": "product",
+          "state_key": "RAS2:f159d734adfa8d7cd20653aa",
+          "total_hydrogens": 0
+        },
+        "atom_map_number": 11,
+        "before_state": {
+          "aromatic": false,
+          "atom_index": 10,
+          "atom_map_number": 11,
+          "component_index": 0,
+          "concise_label": "C(#R)(R)",
+          "element": "C",
+          "formal_charge": 0,
+          "functional_group_ids": [
+            "alkyne"
+          ],
+          "heavy_atom_degree": 2,
+          "hybridization": "SP",
+          "neighbor_tokens": [
+            "C|aliphatic|SINGLE|Q0|H2|X1|R0",
+            "C|aliphatic|TRIPLE|Q0|H1|X0|R0"
+          ],
+          "side": "reactant",
+          "state_key": "RAS2:c217cc68a37fc219243c5953",
+          "total_hydrogens": 0
+        },
+        "incident_edit_count": 2,
+        "role": "primary_center",
+        "stable_remote_subgraph_count": 1,
+        "transition_id": "RCA2:6f5dede59ecca5e59b12fb29"
+      },
+      {
+        "after_state": {
+          "aromatic": true,
+          "atom_index": 12,
+          "atom_map_number": 13,
+          "component_index": 0,
+          "concise_label": "N(R)(:ArC)(:N)",
+          "element": "N",
+          "formal_charge": 0,
+          "functional_group_ids": [],
+          "heavy_atom_degree": 3,
+          "hybridization": "SP2",
+          "neighbor_tokens": [
+            "C|aliphatic|SINGLE|Q0|H2|X1|R0",
+            "C|aromatic|AROMATIC|Q0|H1|X1|R1",
+            "N|aromatic|AROMATIC|Q0|H0|X1|R1"
+          ],
+          "side": "product",
+          "state_key": "RAS2:50754faa767369d28f22cd1b",
+          "total_hydrogens": 0
+        },
+        "atom_map_number": 13,
+        "before_state": {
+          "aromatic": false,
+          "atom_index": 0,
+          "atom_map_number": 13,
+          "component_index": 1,
+          "concise_label": "N(R)(=N-(N))",
+          "element": "N",
+          "formal_charge": 0,
+          "functional_group_ids": [
+            "azide"
+          ],
+          "heavy_atom_degree": 2,
+          "hybridization": "SP2",
+          "neighbor_tokens": [
+            "C|aliphatic|SINGLE|Q0|H2|X1|R0",
+            "N|aliphatic|DOUBLE|Q1|H0|X1|R0"
+          ],
+          "side": "reactant",
+          "state_key": "RAS2:30b2b0940882632a644376e1",
+          "total_hydrogens": 0
+        },
+        "incident_edit_count": 2,
+        "role": "primary_center",
+        "stable_remote_subgraph_count": 1,
+        "transition_id": "RCA2:3acbfbf511e172ba32c4c9e2"
+      }
+    ],
+    "center_transition_key": "RCS2:46ee6f331569a75f708c16be98aac6f5",
+    "confidence": 0.29134308160116135,
+    "core_id": "RCP2:0517ef206c984379ba0d0d10bd8bb4077e0b1c4fa4b7774e43f58034cb508992",
+    "event_count": 1,
+    "evidence_status": "external",
+    "generic_label": "C(#R)(R) → C(R)(:ArC)(:N) + N(R)(=N-(N)) → N(R)(:ArC)(:N)",
+    "participant_tokens": [
+      "product:group:heteroaryl_nitrogen",
+      "product:site:aromatic_CH",
+      "reactant:group:alkyne",
+      "reactant:group:azide",
+      "reactant:site:dipolar_group",
+      "reactant:site:pronucleophile_XH",
+      "reactant:site:unsaturated_bond"
+    ],
+    "shape_core_key": "RSH2:e50aa15fe74ec9207fb2fa32f2e6ba82",
+    "warnings": [
+      "REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL"
+    ]
+  },
+  "schema_version": "1.0",
+  "source_label_used_for_analysis": false
+}
