@@ -77,7 +77,7 @@ The current code declares:
 | --- | --- |
 | Reaction analysis | `3.5` |
 | Reaction signature / ID namespace | `3.0` / `RS3` |
-| Reaction core projection / algorithm | `2.0` / `reaction_core_projection.v3` |
+| Reaction core projection / algorithm | `2.0` / `reaction_core_projection.v4` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
 | Connectivity rewrite | `2.0` |

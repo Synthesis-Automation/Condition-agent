@@ -82,10 +82,10 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     """Load and validate the versioned placeholder-rendering definition."""
     with _DEFINITION_PATH.open("r", encoding="utf-8") as handle:
         definition = dict(json.load(handle))
-    if str(definition.get("schema_version") or "") != "1.1":
+    if str(definition.get("schema_version") or "") != "1.2":
         raise ValueError("unsupported reaction-core graphic schema")
     if str(definition.get("definition_id") or "") != (
-        "reaction_core_graphic.v1.1"
+        "reaction_core_graphic.v1.2"
     ):
         raise ValueError("unexpected reaction-core graphic definition ID")
     labels = definition.get("remote_class_labels")
@@ -102,6 +102,10 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     if definition.get("collapse_retained_multisite_scaffolds") is not True:
         raise ValueError(
             "reaction-core graphic must collapse retained multi-site scaffolds"
+        )
+    if definition.get("render_nonretained_subgraphs_explicitly") is not True:
+        raise ValueError(
+            "reaction-core graphic must render non-retained subgraphs"
         )
     explicit = definition.get("explicit_retained_subgraphs")
     if not isinstance(explicit, Mapping):
@@ -548,7 +552,7 @@ def _build_side_molecules(
                     bond.GetBondType(),
                 )
         for subgraph in core.remote_subgraphs:
-            if subgraph.side != side or subgraph.continuity != "retained":
+            if subgraph.side != side:
                 continue
             if str(subgraph.subgraph_id) in collapsed_subgraph_ids:
                 continue
@@ -560,7 +564,10 @@ def _build_side_molecules(
             )
             if not matching_ports:
                 continue
-            if _render_remote_explicitly(subgraph):
+            if (
+                subgraph.continuity != "retained"
+                or _render_remote_explicitly(subgraph)
+            ):
                 remote_old_to_new: Dict[int, int] = {}
                 for atom_index in sorted(subgraph.atom_indices):
                     atom = Chem.Atom(source.GetAtomWithIdx(atom_index))

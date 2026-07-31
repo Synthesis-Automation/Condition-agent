@@ -252,13 +252,17 @@ The projection:
 7. matches remote subgraphs across sides as retained, departing, appearing,
    changed, or unresolved.
 
-Its algorithm-v3 concise label uses a local atom-state transition for a
+Its algorithm-v4 concise label uses a local atom-state transition for a
 single-center event. For a multi-center event it instead renders one
 normalized edit equation, preventing a shared formed bond from being shown
 twice (for example, `Ar–B + Ar–O → Ar–Ar`).
 Repeated mapped events are retained in one projection and counted rather than
 collapsed; a double Suzuki core is rendered as
 `2 × Ar–B + 2 × Ar–Br → 2 × Ar–Ar` with `event_count=2`.
+Carbonyl-bearing active neighbors retain their local heteroatom environment in
+the single-center label. A decarboxylative connection can therefore appear as
+`C(H)2(R)(C(=O)(O-H)) -> C(H)2(R)(ArC)`, instead of reducing the departing
+carboxyl group to an indistinguishable `R` substituent.
 
 Classes such as `aryl`, `heteroaryl`, and `alkyl` come from the removed graph:
 aromaticity, ring composition, element composition, unsaturation, and
@@ -325,6 +329,10 @@ and abstraction policy are versioned in
 [`reaction_core_graphic.v1.json`](../visualization/definitions/reaction_core_graphic.v1.json).
 Configured one-atom retained heteroatom fragments remain explicit, preserving
 chemically important atoms such as a carbonyl oxygen.
+Departing, appearing, changed, and unresolved subgraphs are always drawn
+explicitly. Thus, atoms omitted from the reported main product remain visible
+on the reactant side of a minimized scheme. The renderer does not invent a
+specific side product such as `CO2` or `H2O` when that product was not supplied.
 
 A retained ring or scaffold remainder may have multiple attachment ports. If
 all its ports surround one active atom, that atom is rendered as the scaffold

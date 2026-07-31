@@ -22,6 +22,13 @@ CHEMICALLY_CURATED_ACETAL = (
     "[CH3:1][O:2][CH:3]([O:13][CH3:5])"
     "[c:6]1[cH:7][cH:8][cH:9][cH:10][c:11]1[F:12]"
 )
+MAPPED_DECARBOXYLATIVE_COUPLING = (
+    "O=[C:15](O)[CH2:2][CH3:1]."
+    "[cH:3]1[cH:4][c:5]([CH3:6])[n:7][c:8]2[cH:9][cH:10]"
+    "[c:11]([F:12])[cH:13][c:14]12"
+    ">>[CH3:1][CH2:2][c:3]1[cH:4][c:5]([CH3:6])[n:7]"
+    "[c:8]2[cH:9][cH:10][c:11]([F:12])[cH:13][c:14]12"
+)
 
 
 def _unexpected_template_load(*args: Any, **kwargs: Any) -> None:
@@ -140,6 +147,21 @@ def test_removed_heteroaryl_and_alkyl_graphs_receive_distinct_types() -> None:
     )
 
 
+def test_core_label_exposes_a_departing_carboxyl_neighbor() -> None:
+    core = featurize_reaction(MAPPED_DECARBOXYLATIVE_COUPLING).reaction_core
+
+    assert core is not None
+    assert core.generic_label == (
+        "C(H)2(R)(C(=O)(O-H)) → C(H)2(R)(ArC)"
+    )
+    assert any(
+        transition.before_state is not None
+        and transition.before_state.concise_label == "C(R)(O)(=O)"
+        and transition.after_state is None
+        for transition in core.atom_transitions
+    )
+
+
 def test_reaction_core_identity_is_reactant_order_invariant() -> None:
     forward = featurize_reaction(
         "[CH3:1][Br:2].[NH2:3][CH3:4]"
@@ -220,6 +242,6 @@ def test_reaction_core_serializes_but_does_not_invent_unmapped_observation() -> 
     assert mapped_payload["schema_version"] == "3.5"
     assert mapped_payload["reaction_core"]["schema_version"] == "2.0"
     assert mapped_payload["reaction_core"]["algorithm_version"] == (
-        "reaction_core_projection.v3"
+        "reaction_core_projection.v4"
     )
     assert unmapped.reaction_core is None

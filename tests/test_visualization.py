@@ -57,6 +57,13 @@ MAPPED_REPEATED_SUZUKI = (
     "[c:8](-[c:9]3[cH:10][cH:11][cH:12][cH:13][cH:14]3)"
     "[cH:15][cH:16]2)[cH:17][cH:18]1"
 )
+MAPPED_DECARBOXYLATIVE_COUPLING = (
+    "O=[C:15](O)[CH2:2][CH3:1]."
+    "[cH:3]1[cH:4][c:5]([CH3:6])[n:7][c:8]2[cH:9][cH:10]"
+    "[c:11]([F:12])[cH:13][c:14]12"
+    ">>[CH3:1][CH2:2][c:3]1[cH:4][c:5]([CH3:6])[n:7]"
+    "[c:8]2[cH:9][cH:10][c:11]([F:12])[cH:13][c:14]12"
+)
 REPEATED_SUZUKI = (
     "Brc1ccc(Br)cc1.OB(O)c1ccccc1.OB(O)c1ccccc1"
     ">>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1"
@@ -240,8 +247,8 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
 
     assert b"<svg" in graphic.image_bytes[:512]
     assert png.startswith(b"\x89PNG\r\n\x1a\n")
-    assert graphic.definition_id == "reaction_core_graphic.v1.1"
-    assert graphic.schema_version == "1.1"
+    assert graphic.definition_id == "reaction_core_graphic.v1.2"
+    assert graphic.schema_version == "1.2"
     assert [placeholder.label for placeholder in graphic.placeholders] == [
         "R1",
         "R2",
@@ -257,6 +264,9 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
     ] == ["retained"]
     assert load_reaction_core_graphic_definition()[
         "collapse_retained_multisite_scaffolds"
+    ] is True
+    assert load_reaction_core_graphic_definition()[
+        "render_nonretained_subgraphs_explicitly"
     ] is True
     assert load_reaction_core_graphic_definition()[
         "explicit_retained_subgraphs"
@@ -360,6 +370,33 @@ def test_renderer_reunites_externally_mapped_repeated_suzuki_scaffold() -> None:
         placeholder.fragment_smiles == "c1ccccc1"
         for placeholder in graphic.placeholders
     ) == 1
+
+
+def test_renderer_keeps_departing_carboxyl_oxygens_explicit() -> None:
+    from visualization.reaction_core_graphic import (
+        _build_side_molecules,
+        _placeholder_assignments,
+    )
+
+    analysis = featurize_reaction(MAPPED_DECARBOXYLATIVE_COUPLING)
+    assignments, _, collapses = _placeholder_assignments(analysis)
+    reactants = _build_side_molecules(
+        analysis,
+        side="reactant",
+        assignments=assignments,
+        scaffold_collapses=collapses,
+    )
+
+    assert any(
+        sum(atom.GetAtomicNum() == 8 for atom in molecule.GetAtoms()) == 2
+        for molecule in reactants
+    )
+    graphic = build_reaction_core_graphic(
+        analysis,
+        size=(1200, 260),
+        image_format="svg",
+    )
+    assert b"<svg" in graphic.image_bytes[:512]
 
 
 def test_reaction_core_renderer_requires_mapped_core() -> None:

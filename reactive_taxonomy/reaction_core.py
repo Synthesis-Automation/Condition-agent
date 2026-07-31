@@ -646,13 +646,50 @@ def _active_neighbor_display(
     symbol = neighbor.GetSymbol()
     if neighbor.GetIsAromatic():
         return "ArC" if symbol == "C" else symbol
-    if symbol not in {"N", "O", "P", "S"}:
-        return "R" if symbol == "C" else symbol
     external = [
         atom
         for atom in neighbor.GetNeighbors()
         if atom.GetAtomicNum() > 1 and int(atom.GetIdx()) != int(center_index)
     ]
+    if symbol == "C":
+        carbonyl_atoms = tuple(
+            atom
+            for atom in external
+            if str(
+                molecule.GetBondBetweenAtoms(
+                    int(neighbor_index),
+                    int(atom.GetIdx()),
+                ).GetBondType()
+            ).upper()
+            == "DOUBLE"
+            and atom.GetSymbol() in {"N", "O", "S"}
+        )
+        if carbonyl_atoms:
+            substituents = []
+            for atom in external:
+                bond = molecule.GetBondBetweenAtoms(
+                    int(neighbor_index),
+                    int(atom.GetIdx()),
+                )
+                prefix = _bond_prefix(str(bond.GetBondType()).upper())
+                value = atom.GetSymbol()
+                onward = tuple(
+                    other
+                    for other in atom.GetNeighbors()
+                    if (
+                        other.GetAtomicNum() > 1
+                        and int(other.GetIdx()) != int(neighbor_index)
+                    )
+                )
+                if onward and all(other.GetAtomicNum() == 6 for other in onward):
+                    value = f"{value}-R"
+                elif int(atom.GetTotalNumHs(includeNeighbors=True)) > 0:
+                    value = f"{value}-H"
+                substituents.append(f"({prefix}{value})")
+            return f"C{''.join(sorted(substituents))}"
+        return "R"
+    if symbol not in {"N", "O", "P", "S"}:
+        return symbol
     if external:
         if all(atom.GetAtomicNum() == 6 for atom in external):
             return f"{symbol}-R"
