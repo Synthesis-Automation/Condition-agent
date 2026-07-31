@@ -76,7 +76,7 @@ def test_review_summary_shows_general_motif_and_specific_limiter() -> None:
         "R = R′–CH₂– (primary alkyl); Ar = HetAr"
     )
     assert summary.atom_level_core_label == (
-        "C(H)2(R)(C(=O)(O-H)) → C(H)2(R)(ArC)"
+        "C(H)2(R)(C(=O)(O-H)) + C(H)(:HetAr)2 → C(H)2(R)(ArC)"
     )
     assert "Graphic core limiter:" in rendered
     assert "Atom-level core:" in rendered

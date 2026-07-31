@@ -639,6 +639,66 @@ def _multi_center_edit_label(edits: Sequence[ReactionEdit]) -> str:
     )
 
 
+def _single_center_transition_label(
+    *,
+    primary_identity: _AtomIdentity,
+    transition_by_identity: Mapping[
+        _AtomIdentity,
+        ReactionCoreAtomTransition,
+    ],
+    edits: Sequence[ReactionEdit],
+) -> str:
+    """Render one center transition with external formed-bond partners.
+
+    A center-only state transition can conceal a second reactant because the
+    incoming atom is already folded into the center's product-side neighbor
+    label.  Include the incoming atom's reactant state when a formed bond joins
+    distinct reactant components.  Same-component partners remain implicit so
+    intramolecular reactions are not presented as intermolecular equations.
+    """
+    primary = transition_by_identity[primary_identity]
+    before_label = (
+        primary.before_state.concise_label
+        if primary.before_state is not None
+        else "∅"
+    )
+    after_label = (
+        primary.after_state.concise_label
+        if primary.after_state is not None
+        else "∅"
+    )
+    if primary.before_state is None:
+        return f"{before_label} → {after_label}"
+
+    partner_labels = set()
+    primary_component = primary.before_state.component_index
+    for edit in edits:
+        if edit.edit_type != "formed" or edit.atom_2 is None:
+            continue
+        identities = (_atom_identity(edit.atom_1), _atom_identity(edit.atom_2))
+        if primary_identity not in identities:
+            continue
+        partner_identity = (
+            identities[1]
+            if identities[0] == primary_identity
+            else identities[0]
+        )
+        partner = transition_by_identity.get(partner_identity)
+        if (
+            partner is None
+            or partner.before_state is None
+            or partner.after_state is None
+            or partner.before_state.component_index == primary_component
+        ):
+            continue
+        partner_labels.add(partner.before_state.concise_label)
+
+    reactant_terms = [before_label]
+    if partner_labels:
+        reactant_terms.extend(sorted(partner_labels))
+    return f"{' + '.join(reactant_terms)} → {after_label}"
+
+
 def _active_neighbor_display(
     molecule: Any,
     center_index: int,
@@ -1678,13 +1738,10 @@ def build_reaction_core_projection(
     generic_label = (
         _multi_center_edit_label(edits)
         if len(primary) > 1
-        else " + ".join(
-            (
-                f"{transition.before_state.concise_label if transition.before_state else '∅'}"
-                " → "
-                f"{transition.after_state.concise_label if transition.after_state else '∅'}"
-            )
-            for transition in primary
+        else _single_center_transition_label(
+            primary_identity=next(iter(primary_identities)),
+            transition_by_identity=transition_by_identity,
+            edits=edits,
         )
     )
     abstraction = _decarboxylative_abstraction(

@@ -75,6 +75,11 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
         review_rows = list(csv.DictReader(handle))
     assert len(review_rows) == 2
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
+    assert tuple(review_rows[0])[:3] == (
+        "canonical_reaction_smiles",
+        "reaction_display_label_detailed",
+        "reaction_core_label",
+    )
     assert progress[0].phase == "canonical_discovered"
     assert progress[-1].phase == "completed"
 

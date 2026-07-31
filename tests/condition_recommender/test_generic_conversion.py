@@ -137,11 +137,11 @@ def test_mapped_unknown_reaction_serializes_reaction_core_for_review() -> None:
     assert record.reaction_core is not None
     assert record.reaction_core["schema_version"] == "2.1"
     assert record.reaction_core["algorithm_version"] == (
-        "reaction_core_projection.v5"
+        "reaction_core_projection.v6"
     )
     assert record.reaction_core["shape_core_key"].startswith("RSH2:")
     assert record.reaction_core["generic_label"] == (
-        "C(H)(Ar)(=O) → C(H)(Ar)(O-R)2"
+        "C(H)(Ar)(=O) + O(H)(R) → C(H)(Ar)(O-R)2"
     )
 
 
@@ -612,9 +612,15 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "2.6"
+    assert report["schema_version"] == "2.7"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
+    assert CONCISE_REACTION_REVIEW_FIELDS.index("reaction_core_label") == (
+        CONCISE_REACTION_REVIEW_FIELDS.index(
+            "reaction_display_label_detailed"
+        )
+        + 1
+    )
     assert review_rows[0]["canonical_reaction_smiles"]
     assert review_rows[0]["reaction_display_label_detailed"]
     assert review_rows[0]["original_reaction_type"] == "Original Suzuki Label"

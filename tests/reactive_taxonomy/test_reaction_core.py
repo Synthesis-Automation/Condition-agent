@@ -48,6 +48,15 @@ MAPPED_INTRAMOLECULAR_DECARBOXYLATIVE_CYCLIZATION = (
     "([C:6]([F:7])([F:8])[F:9])[cH:10][cH:11][c:12]2-"
     "[c:13]2[cH:14][cH:15][cH:16][n:17][c:18]21"
 )
+MAPPED_HETEROARYL_AMIDE_FORMATION = (
+    "[CH3:1][C:2]1([CH3:3])[CH2:4][CH2:5][CH:6]([NH2:7])"
+    "[CH2:8][CH2:9]1."
+    "[O:10]=[C:11]([OH:12])[c:13]1[cH:14][cH:15][cH:16][nH:17]1"
+    ">>"
+    "[CH3:1][C:2]1([CH3:3])[CH2:4][CH2:5][CH:6]"
+    "([NH:7][C:11](=[O:10])[c:13]2[cH:14][cH:15][cH:16][nH:17]2)"
+    "[CH2:8][CH2:9]1"
+)
 
 
 def _unexpected_template_load(*args: Any, **kwargs: Any) -> None:
@@ -73,7 +82,7 @@ def test_acetal_core_is_built_without_template_or_grammar_lookup(
     assert core.shape_core_key.startswith("RSH2:")
     assert core.center_transition_key.startswith("RCS2:")
     assert core.generic_label == (
-        "C(H)(Ar)(=O) → C(H)(Ar)(O-R)2"
+        "C(H)(Ar)(=O) + O(H)(R) → C(H)(Ar)(O-R)2"
     )
     primary = [
         transition
@@ -138,6 +147,32 @@ def test_center_transition_is_robust_to_acetal_oxygen_origin_mapping() -> None:
     assert curated_core.warnings == ()
 
 
+def test_single_center_label_includes_an_external_formed_bond_partner() -> None:
+    forward = featurize_reaction(
+        MAPPED_HETEROARYL_AMIDE_FORMATION
+    ).reaction_core
+    reversed_reactants = featurize_reaction(
+        MAPPED_HETEROARYL_AMIDE_FORMATION.replace(
+            MAPPED_HETEROARYL_AMIDE_FORMATION.split(">>")[0],
+            ".".join(
+                reversed(
+                    MAPPED_HETEROARYL_AMIDE_FORMATION.split(">>")[0].split(".")
+                )
+            ),
+            1,
+        )
+    ).reaction_core
+
+    assert forward is not None
+    assert reversed_reactants is not None
+    expected = (
+        "C(HetAr)(O-H)(=O) + N(H)2(Cycloalkyl) "
+        "→ C(HetAr)(N-R)(=O)"
+    )
+    assert forward.generic_label == expected
+    assert reversed_reactants.generic_label == expected
+
+
 def test_removed_heteroaryl_and_alkyl_graphs_receive_distinct_types() -> None:
     heteroaryl = featurize_reaction(
         "[CH:1](=[O:2])[c:3]1[n:4][cH:5][cH:6][cH:7][cH:8]1"
@@ -171,7 +206,7 @@ def test_core_label_exposes_a_departing_carboxyl_neighbor() -> None:
 
     assert core is not None
     assert core.generic_label == (
-        "C(H)2(R)(C(=O)(O-H)) → C(H)2(R)(ArC)"
+        "C(H)2(R)(C(=O)(O-H)) + C(H)(:HetAr)2 → C(H)2(R)(ArC)"
     )
     assert any(
         transition.before_state is not None
@@ -321,6 +356,6 @@ def test_reaction_core_serializes_but_does_not_invent_unmapped_observation() -> 
     assert mapped_payload["schema_version"] == "3.5"
     assert mapped_payload["reaction_core"]["schema_version"] == "2.1"
     assert mapped_payload["reaction_core"]["algorithm_version"] == (
-        "reaction_core_projection.v5"
+        "reaction_core_projection.v6"
     )
     assert unmapped.reaction_core is None

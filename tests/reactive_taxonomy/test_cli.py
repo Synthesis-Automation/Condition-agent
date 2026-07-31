@@ -84,7 +84,10 @@ def test_concise_reaction_output_exposes_minimized_core(capsys) -> None:
     output = capsys.readouterr().out
 
     assert "Reaction minimization:" in output
-    assert "Minimized reaction: C(H)(Ar)(=O) → C(H)(Ar)(O-R)2" in output
+    assert (
+        "Minimized reaction: C(H)(Ar)(=O) + O(H)(R) "
+        "→ C(H)(Ar)(O-R)2"
+    ) in output
     assert "Core evidence: verified (validated_atom_mapping" in output
     assert "Core shape (retrieval): RSH2:" in output
     assert "Center transition (diagnostic only): RCS2:" in output
@@ -319,7 +322,9 @@ def test_batch_reaction_csv_exposes_minimized_core(tmp_path, capsys) -> None:
         row = next(csv.DictReader(handle))
 
     assert row["reaction_core_available"] == "True"
-    assert row["reaction_core_label"] == "C(H)(Ar)(=O) → C(H)(Ar)(O-R)2"
+    assert row["reaction_core_label"] == (
+        "C(H)(Ar)(=O) + O(H)(R) → C(H)(Ar)(O-R)2"
+    )
     assert row["reaction_core_evidence_status"] == "verified"
     assert row["reaction_core_exact_key"].startswith("RCX2:")
     assert row["reaction_core_typed_key"].startswith("RCT2:")

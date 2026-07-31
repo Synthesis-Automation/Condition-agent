@@ -321,6 +321,10 @@ def test_conversion_engine_reports_external_mapping_dispositions(tmp_path) -> No
     ).splitlines()[0]
     assert "external_mapping_status" in review_header
     assert "external_atom_mapping_json" in review_header
+    review_fields = review_header.split(",")
+    assert review_fields.index("reaction_core_label") == (
+        review_fields.index("reaction_label") + 1
+    )
 
 
 def test_sharded_converter_carries_mapping_into_manifest_and_records(

@@ -15,10 +15,11 @@ from reactive_taxonomy import build_reaction_review_summary
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.6"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.7"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
+    "reaction_core_label",
     "original_reaction_type",
     "detected_reaction_family",
     "detection_status",
@@ -27,7 +28,6 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reaction_core_id",
     "reaction_core_shape_key",
     "reaction_core_motif_key",
-    "reaction_core_label",
     "reaction_core_limiter",
     "reaction_core_atom_label",
     "reaction_core_evidence_status",

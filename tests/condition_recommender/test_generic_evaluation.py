@@ -143,7 +143,7 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert payload["record_schema_versions"] == ["3.8"]
     assert payload["reaction_core_schema_version"] == "2.1"
     assert payload["reaction_core_algorithm_version"] == (
-        "reaction_core_projection.v5"
+        "reaction_core_projection.v6"
     )
     assert payload["maps"]["environment_features"]
     integrity = validate_generic_index_artifact(first_path)

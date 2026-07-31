@@ -77,7 +77,7 @@ The current code declares:
 | --- | --- |
 | Reaction analysis | `3.5` |
 | Reaction signature / ID namespace | `3.0` / `RS3` |
-| Reaction core projection / algorithm | `2.1` / `reaction_core_projection.v5` |
+| Reaction core projection / algorithm | `2.1` / `reaction_core_projection.v6` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
 | Connectivity rewrite | `2.0` |
@@ -87,7 +87,7 @@ The current code declares:
 | Recommendation record | `3.8` |
 | Generic converter definition | `generic_conversion.v2.9` |
 | Generic sharded converter definition | `generic_sharded_conversion.v1.6` |
-| Concise reaction review | `2.5` |
+| Concise reaction review | `2.7` |
 | Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `2.5` |
 | Generic recommendation result | `2.4` |
@@ -219,8 +219,10 @@ no signature. V2 produces the grammar-independent minimized label
 `C(R)2(=O) → C(R)2(O-R)2` and derives the remote classes `alkyl` and
 `ring_aliphatic` from the cut molecular graph. The supplied mapped
 benzaldehyde/methanol acetal regression similarly produces
-`C(H)(Ar)(=O) → C(H)(Ar)(O-R)2`; mapper atom-origin alternatives keep the same
-shape and center keys while exact and typed identities preserve provenance.
+`C(H)(Ar)(=O) + O(H)(R) → C(H)(Ar)(O-R)2`; mapper atom-origin alternatives
+keep the same shape and center keys while exact and typed identities preserve
+provenance. Single-center labels include a distinct external reactant when its
+atom forms a bond to the primary center.
 
 These measurements demonstrate coverage and improved cluster discrimination,
 not recommendation accuracy. Of the 445 cores, 434 are external-mapper
