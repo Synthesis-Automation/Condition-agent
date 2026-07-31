@@ -240,12 +240,17 @@ def _multisite_scaffold_collapses(
             mapped_atoms = tuple(
                 sorted(
                     {
-                        int(molecule.GetAtomWithIdx(atom_index).GetAtomMapNum())
-                        for atom_index in scaffold_atom_indices
-                        if int(
-                            molecule.GetAtomWithIdx(atom_index).GetAtomMapNum()
+                        int(map_number)
+                        for subgraph in subgraphs
+                        for map_number in (
+                            *subgraph.atom_map_numbers,
+                            *(
+                                port.core_atom_map_number
+                                for port in subgraph.attachment_ports
+                                if port.core_atom_index in core_atom_indices
+                            ),
                         )
-                        > 0
+                        if map_number is not None and int(map_number) > 0
                     }
                 )
             )

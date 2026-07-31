@@ -1,4 +1,5 @@
 import math
+from dataclasses import replace
 from pathlib import Path
 import re
 
@@ -6,7 +7,12 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem.Draw import rdMolDraw2D
 
-from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy import (
+    AtomMappingProviderMetadata,
+    analyze_reaction_with_external_mapping,
+    featurize_reaction,
+    validate_external_atom_mapping,
+)
 from visualization import (
     RenderStyle,
     apply_render_preset,
@@ -51,6 +57,50 @@ MAPPED_REPEATED_SUZUKI = (
     "[c:8](-[c:9]3[cH:10][cH:11][cH:12][cH:13][cH:14]3)"
     "[cH:15][cH:16]2)[cH:17][cH:18]1"
 )
+REPEATED_SUZUKI = (
+    "Brc1ccc(Br)cc1.OB(O)c1ccccc1.OB(O)c1ccccc1"
+    ">>c1ccc(-c2ccc(-c3ccccc3)cc2)cc1"
+)
+
+
+class _RepeatedSuzukiMappingProvider:
+    metadata = AtomMappingProviderMetadata(
+        provider_id="rxnmapper",
+        provider_version="test",
+        model_id="fixture",
+        model_sha256="fixture",
+    )
+
+    def map_reactions(self, reactions):
+        results = []
+        for reaction in reactions:
+            result = validate_external_atom_mapping(
+                reaction,
+                MAPPED_REPEATED_SUZUKI,
+                provider_metadata=self.metadata,
+                mapper_confidence=0.99,
+            )
+            assert result.normalization is not None
+            edits = tuple(
+                edit
+                for edit in result.normalization.edits
+                if tuple(
+                    sorted(
+                        (
+                            edit.atom_1.element,
+                            edit.atom_2.element if edit.atom_2 else "H",
+                        )
+                    )
+                )
+                in {("B", "C"), ("Br", "C"), ("C", "C")}
+            )
+            results.append(
+                replace(
+                    result,
+                    normalization=replace(result.normalization, edits=edits),
+                )
+            )
+        return tuple(results)
 
 
 def _first_svg_bond_length(drawing: bytes) -> float:
@@ -283,6 +333,33 @@ def test_reaction_core_renderer_reunites_repeated_suzuki_scaffold() -> None:
         and placeholder.fragment_smiles == "c1ccccc1"
     )
     assert len(central_scaffolds) == 1
+
+
+def test_renderer_reunites_externally_mapped_repeated_suzuki_scaffold() -> None:
+    base = featurize_reaction(REPEATED_SUZUKI)
+    assessment = analyze_reaction_with_external_mapping(
+        REPEATED_SUZUKI,
+        _RepeatedSuzukiMappingProvider(),
+        base_analysis=base,
+        force_resolved_shadow=True,
+    )
+
+    assert assessment.status == "external_mapping_internal_consensus"
+    graphic = build_reaction_core_graphic(
+        assessment.analysis,
+        size=(1200, 260),
+        image_format="svg",
+    )
+
+    assert [placeholder.label for placeholder in graphic.placeholders] == [
+        "Ar1",
+        "Ar2",
+        "Ar3",
+    ]
+    assert sum(
+        placeholder.fragment_smiles == "c1ccccc1"
+        for placeholder in graphic.placeholders
+    ) == 1
 
 
 def test_reaction_core_renderer_requires_mapped_core() -> None:
