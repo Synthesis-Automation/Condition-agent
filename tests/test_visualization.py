@@ -43,6 +43,14 @@ MAPPED_RING_ACYLATION = (
     "[c:10]1[n:11][cH:12][c:13](-[c:14]2[cH:15][cH:16][cH:17]"
     "[cH:18][cH:19]2)[c:20]2[cH:21][cH:22][cH:23][cH:24][c:25]12"
 )
+MAPPED_REPEATED_SUZUKI = (
+    "[Br:19][c:5]1[cH:6][cH:7][c:8]([Br:20])[cH:15][cH:16]1."
+    "O[B:21](O)[c:4]1[cH:3][cH:2][cH:1][cH:18][cH:17]1."
+    "O[B:22](O)[c:9]1[cH:10][cH:11][cH:12][cH:13][cH:14]1"
+    ">>[cH:1]1[cH:2][cH:3][c:4](-[c:5]2[cH:6][cH:7]"
+    "[c:8](-[c:9]3[cH:10][cH:11][cH:12][cH:13][cH:14]3)"
+    "[cH:15][cH:16]2)[cH:17][cH:18]1"
+)
 
 
 def _first_svg_bond_length(drawing: bytes) -> float:
@@ -182,8 +190,8 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
 
     assert b"<svg" in graphic.image_bytes[:512]
     assert png.startswith(b"\x89PNG\r\n\x1a\n")
-    assert graphic.definition_id == "reaction_core_graphic.v1"
-    assert graphic.schema_version == "1.0"
+    assert graphic.definition_id == "reaction_core_graphic.v1.1"
+    assert graphic.schema_version == "1.1"
     assert [placeholder.label for placeholder in graphic.placeholders] == [
         "R1",
         "R2",
@@ -197,6 +205,9 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
     assert load_reaction_core_graphic_definition()[
         "continuities_replaced_by_labels"
     ] == ["retained"]
+    assert load_reaction_core_graphic_definition()[
+        "collapse_retained_multisite_scaffolds"
+    ] is True
     assert load_reaction_core_graphic_definition()[
         "explicit_retained_subgraphs"
     ] == {
@@ -248,6 +259,30 @@ def test_reaction_core_renderer_supports_multi_port_ring_boundaries() -> None:
         placeholder.remote_class != "heteroatom"
         for placeholder in graphic.placeholders
     )
+
+
+def test_reaction_core_renderer_reunites_repeated_suzuki_scaffold() -> None:
+    analysis = featurize_reaction(MAPPED_REPEATED_SUZUKI)
+
+    graphic = build_reaction_core_graphic(
+        analysis,
+        size=(1200, 260),
+        image_format="svg",
+    )
+
+    assert b"<svg" in graphic.image_bytes[:512]
+    assert [placeholder.label for placeholder in graphic.placeholders] == [
+        "Ar1",
+        "Ar2",
+        "Ar3",
+    ]
+    central_scaffolds = tuple(
+        placeholder
+        for placeholder in graphic.placeholders
+        if placeholder.attachment_port_count == 2
+        and placeholder.fragment_smiles == "c1ccccc1"
+    )
+    assert len(central_scaffolds) == 1
 
 
 def test_reaction_core_renderer_requires_mapped_core() -> None:

@@ -62,15 +62,30 @@ class ReactionCoreGraphic:
     schema_version: str
 
 
+@dataclass(frozen=True)
+class _MultisiteScaffoldCollapse:
+    """One retained ring/scaffold shared by multiple active center atoms."""
+
+    identity: tuple[Any, ...]
+    side: str
+    component_index: int
+    core_atom_indices: Tuple[int, ...]
+    subgraph_ids: Tuple[str, ...]
+    remote_class: str
+    fragment_smiles: str
+    functional_group_ids: Tuple[str, ...]
+    attachment_port_count: int
+
+
 @lru_cache(maxsize=1)
 def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     """Load and validate the versioned placeholder-rendering definition."""
     with _DEFINITION_PATH.open("r", encoding="utf-8") as handle:
         definition = dict(json.load(handle))
-    if str(definition.get("schema_version") or "") != "1.0":
+    if str(definition.get("schema_version") or "") != "1.1":
         raise ValueError("unsupported reaction-core graphic schema")
     if str(definition.get("definition_id") or "") != (
-        "reaction_core_graphic.v1"
+        "reaction_core_graphic.v1.1"
     ):
         raise ValueError("unexpected reaction-core graphic definition ID")
     labels = definition.get("remote_class_labels")
@@ -83,6 +98,10 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     if continuities != ("retained",):
         raise ValueError(
             "reaction-core graphic may abstract only retained subgraphs"
+        )
+    if definition.get("collapse_retained_multisite_scaffolds") is not True:
+        raise ValueError(
+            "reaction-core graphic must collapse retained multi-site scaffolds"
         )
     explicit = definition.get("explicit_retained_subgraphs")
     if not isinstance(explicit, Mapping):
@@ -158,31 +177,197 @@ def _render_remote_explicitly(subgraph: Any) -> bool:
     )
 
 
+def _multisite_scaffold_collapses(
+    analysis: Any,
+) -> Tuple[_MultisiteScaffoldCollapse, ...]:
+    """Recognize one retained ring remainder split by several active sites."""
+    from rdkit import Chem
+
+    core = analysis.reaction_core
+    values = []
+    for side, components in (
+        ("reactant", analysis.reactants),
+        ("product", analysis.products),
+    ):
+        component_by_index = {
+            component.component_index: component for component in components
+        }
+        grouped: Dict[tuple[int, Tuple[int, ...]], list[Any]] = {}
+        for subgraph in core.remote_subgraphs:
+            if (
+                subgraph.side == side
+                and subgraph.continuity == "retained"
+                and not _render_remote_explicitly(subgraph)
+            ):
+                core_atom_indices = tuple(
+                    sorted(
+                        {
+                            int(port.core_atom_index)
+                            for port in subgraph.attachment_ports
+                            if port.core_component_index
+                            == subgraph.component_index
+                        }
+                    )
+                )
+                if len(core_atom_indices) >= 2:
+                    grouped.setdefault(
+                        (subgraph.component_index, core_atom_indices),
+                        [],
+                    ).append(subgraph)
+        for (component_index, core_atom_indices), subgraphs in grouped.items():
+            if len(subgraphs) < 2:
+                continue
+            component = component_by_index.get(component_index)
+            molecule = (
+                parse_smiles(component.input_smiles)
+                if component is not None
+                else None
+            )
+            if molecule is None or not all(
+                molecule.GetAtomWithIdx(atom_index).IsInRing()
+                for atom_index in core_atom_indices
+            ):
+                continue
+            scaffold_atom_indices = tuple(
+                sorted(
+                    set(core_atom_indices).union(
+                        atom_index
+                        for subgraph in subgraphs
+                        for atom_index in subgraph.atom_indices
+                    )
+                )
+            )
+            mapped_atoms = tuple(
+                sorted(
+                    {
+                        int(molecule.GetAtomWithIdx(atom_index).GetAtomMapNum())
+                        for atom_index in scaffold_atom_indices
+                        if int(
+                            molecule.GetAtomWithIdx(atom_index).GetAtomMapNum()
+                        )
+                        > 0
+                    }
+                )
+            )
+            if not mapped_atoms:
+                continue
+            remote_classes = {str(value.remote_class) for value in subgraphs}
+            remote_class = (
+                next(iter(remote_classes))
+                if len(remote_classes) == 1
+                else "generic_R"
+            )
+            copied = Chem.Mol(molecule)
+            for atom in copied.GetAtoms():
+                atom.SetAtomMapNum(0)
+            fragment_smiles = str(
+                Chem.MolFragmentToSmiles(
+                    copied,
+                    atomsToUse=list(scaffold_atom_indices),
+                    canonical=True,
+                    isomericSmiles=True,
+                )
+            )
+            active_coordinates = _active_coordinates(core, side)
+            external_neighbors = {
+                int(neighbor.GetIdx())
+                for atom_index in core_atom_indices
+                for neighbor in molecule.GetAtomWithIdx(atom_index).GetNeighbors()
+                if (
+                    component_index,
+                    int(neighbor.GetIdx()),
+                )
+                in active_coordinates
+                and int(neighbor.GetIdx()) not in scaffold_atom_indices
+            }
+            identity = (
+                remote_class,
+                ("multisite_mapped_atoms", mapped_atoms),
+            )
+            values.append(
+                _MultisiteScaffoldCollapse(
+                    identity=identity,
+                    side=side,
+                    component_index=component_index,
+                    core_atom_indices=core_atom_indices,
+                    subgraph_ids=tuple(
+                        sorted(str(value.subgraph_id) for value in subgraphs)
+                    ),
+                    remote_class=remote_class,
+                    fragment_smiles=fragment_smiles,
+                    functional_group_ids=tuple(
+                        sorted(
+                            {
+                                group_id
+                                for value in subgraphs
+                                for group_id in value.functional_group_ids
+                            }
+                        )
+                    ),
+                    attachment_port_count=len(external_neighbors),
+                )
+            )
+    return tuple(
+        sorted(
+            values,
+            key=lambda value: (
+                value.side,
+                value.component_index,
+                value.identity,
+            ),
+        )
+    )
+
+
 def _placeholder_assignments(
-    core: Any,
+    analysis: Any,
 ) -> tuple[
     Dict[tuple[Any, ...], str],
     Tuple[ReactionCoreGraphicPlaceholder, ...],
+    Tuple[_MultisiteScaffoldCollapse, ...],
 ]:
+    core = analysis.reaction_core
     definition = load_reaction_core_graphic_definition()
     labels = definition["remote_class_labels"]
+    scaffold_collapses = _multisite_scaffold_collapses(analysis)
+    collapsed_subgraph_ids = {
+        subgraph_id
+        for collapse in scaffold_collapses
+        for subgraph_id in collapse.subgraph_ids
+    }
     retained = tuple(
         subgraph
         for subgraph in core.remote_subgraphs
         if (
             subgraph.continuity == "retained"
             and not _render_remote_explicitly(subgraph)
+            and str(subgraph.subgraph_id) not in collapsed_subgraph_ids
         )
     )
-    representative_by_identity: Dict[tuple[Any, ...], Any] = {}
+    representative_by_identity: Dict[tuple[Any, ...], tuple[Any, ...]] = {}
     for subgraph in retained:
         representative_by_identity.setdefault(
             _remote_identity(subgraph),
-            subgraph,
+            (
+                str(subgraph.remote_class),
+                str(subgraph.fragment_smiles),
+                tuple(subgraph.functional_group_ids),
+                len(subgraph.attachment_ports),
+            ),
+        )
+    for collapse in scaffold_collapses:
+        representative_by_identity.setdefault(
+            collapse.identity,
+            (
+                collapse.remote_class,
+                collapse.fragment_smiles,
+                collapse.functional_group_ids,
+                collapse.attachment_port_count,
+            ),
         )
     identities_by_base: Dict[str, list[tuple[Any, ...]]] = {}
-    for identity, subgraph in representative_by_identity.items():
-        base = str(labels.get(subgraph.remote_class) or "R")
+    for identity, record in representative_by_identity.items():
+        base = str(labels.get(record[0]) or "R")
         identities_by_base.setdefault(base, []).append(identity)
     assignments: Dict[tuple[Any, ...], str] = {}
     template = str(definition["indexed_label_template"])
@@ -197,17 +382,17 @@ def _placeholder_assignments(
     placeholders = tuple(
         ReactionCoreGraphicPlaceholder(
             label=assignments[identity],
-            remote_class=str(subgraph.remote_class),
-            fragment_smiles=str(subgraph.fragment_smiles),
-            functional_group_ids=tuple(subgraph.functional_group_ids),
-            attachment_port_count=len(subgraph.attachment_ports),
+            remote_class=str(record[0]),
+            fragment_smiles=str(record[1]),
+            functional_group_ids=tuple(record[2]),
+            attachment_port_count=int(record[3]),
         )
-        for identity, subgraph in sorted(
+        for identity, record in sorted(
             representative_by_identity.items(),
             key=lambda item: assignments[item[0]],
         )
     )
-    return assignments, placeholders
+    return assignments, placeholders, scaffold_collapses
 
 
 def _active_coordinates(core: Any, side: str) -> Dict[tuple[int, int], Any]:
@@ -281,6 +466,7 @@ def _build_side_molecules(
     *,
     side: str,
     assignments: Mapping[tuple[Any, ...], str],
+    scaffold_collapses: Tuple[_MultisiteScaffoldCollapse, ...],
 ) -> Tuple[Any, ...]:
     core = analysis.reaction_core
     components = analysis.reactants if side == "reactant" else analysis.products
@@ -295,6 +481,20 @@ def _build_side_molecules(
             raise ValueError("reaction-core component could not be reparsed")
         editable = Chem.RWMol()
         old_to_new: Dict[int, int] = {}
+        component_scaffolds = tuple(
+            collapse
+            for collapse in scaffold_collapses
+            if (
+                collapse.side == side
+                and collapse.component_index == component_index
+            )
+        )
+        scaffold_by_atom = {
+            atom_index: collapse
+            for collapse in component_scaffolds
+            for atom_index in collapse.core_atom_indices
+        }
+        scaffold_node_indices: Dict[tuple[Any, ...], int] = {}
         embedded_labels, collapsed_subgraph_ids = _embedded_core_placeholders(
             core,
             side=side,
@@ -302,7 +502,22 @@ def _build_side_molecules(
             active_atom_indices=atom_indices,
             assignments=assignments,
         )
+        collapsed_subgraph_ids.update(
+            subgraph_id
+            for collapse in component_scaffolds
+            for subgraph_id in collapse.subgraph_ids
+        )
         for atom_index in sorted(atom_indices):
+            scaffold = scaffold_by_atom.get(atom_index)
+            if scaffold is not None:
+                if scaffold.identity not in scaffold_node_indices:
+                    atom = Chem.Atom(0)
+                    label = assignments[scaffold.identity]
+                    atom.SetProp("atomLabel", label)
+                    atom.SetProp("_displayLabel", label)
+                    scaffold_node_indices[scaffold.identity] = editable.AddAtom(atom)
+                old_to_new[atom_index] = scaffold_node_indices[scaffold.identity]
+                continue
             if atom_index in embedded_labels:
                 atom = Chem.Atom(0)
                 label = embedded_labels[atom_index]
@@ -316,6 +531,12 @@ def _build_side_molecules(
             begin = int(bond.GetBeginAtomIdx())
             end = int(bond.GetEndAtomIdx())
             if begin in atom_indices and end in atom_indices:
+                if old_to_new[begin] == old_to_new[end]:
+                    continue
+                if editable.GetBondBetweenAtoms(
+                    old_to_new[begin], old_to_new[end]
+                ) is not None:
+                    continue
                 editable.AddBond(
                     old_to_new[begin],
                     old_to_new[end],
@@ -415,17 +636,21 @@ def build_reaction_core_graphic(
         raise ValueError(
             f"image_format must be one of {sorted(_SUPPORTED_FORMATS)}"
         )
-    assignments, placeholders = _placeholder_assignments(core)
+    assignments, placeholders, scaffold_collapses = _placeholder_assignments(
+        analysis
+    )
     reaction = rdChemReactions.ChemicalReaction()
     reactants = _build_side_molecules(
         analysis,
         side="reactant",
         assignments=assignments,
+        scaffold_collapses=scaffold_collapses,
     )
     products = _build_side_molecules(
         analysis,
         side="product",
         assignments=assignments,
+        scaffold_collapses=scaffold_collapses,
     )
     if not reactants or not products:
         raise ValueError("reaction-core graphic has no drawable reaction")

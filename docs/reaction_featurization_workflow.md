@@ -330,9 +330,13 @@ A retained ring or scaffold remainder may have multiple attachment ports. If
 all its ports surround one active atom, that atom is rendered as the scaffold
 placeholder while its bonds to other active atoms are preserved. This turns a
 ring-site transformation into a readable scheme such as
-`Ar-CHO + HetAr-H -> Ar-C(=O)-HetAr`. If a multi-port remainder spans multiple
-active atoms, the renderer instead creates a distinct boundary node for each
-port; it never attempts unsupported parallel bonds to one dummy atom.
+`Ar-CHO + HetAr-H -> Ar-C(=O)-HetAr`. When mapped identity shows that multiple
+retained ring paths belong to one scaffold spanning several active atoms, the
+renderer reunites the paths and active atoms into one shared placeholder. For
+example, a double coupling is drawn conceptually as
+`Br-Ar3-Br + Ar1-B + Ar2-B -> Ar1-Ar3-Ar2`, rather than duplicating the central
+ring or inventing separate placeholders for its two paths. Other multi-port
+fragments retain one boundary node per port.
 
 The featurizer has separate `Full structure` and `Minimized reaction` tabs.
 For a resolved but unmapped input, `Map resolved reactions for minimized
