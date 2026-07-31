@@ -15,7 +15,7 @@ from reactive_taxonomy import build_reaction_review_summary
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.7"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "2.8"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label_detailed",
@@ -31,6 +31,8 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reaction_core_limiter",
     "reaction_core_atom_label",
     "reaction_core_evidence_status",
+    "reaction_core_status",
+    "reaction_core_unavailability_reasons",
     "reaction_core_remote_classes",
     "fallback_descriptor_id",
     "fallback_evidence_mode",
@@ -114,6 +116,60 @@ def _enum_text(value: Any) -> str:
     return str(value.value if isinstance(value, Enum) else value or "")
 
 
+def _reaction_core_diagnostics(
+    *,
+    record: Mapping[str, Any],
+    reaction_core: Mapping[str, Any],
+    signature: Mapping[str, Any],
+    external_mapping: Mapping[str, Any],
+    hypotheses: tuple[Mapping[str, Any], ...],
+) -> tuple[str, tuple[str, ...]]:
+    """Explain core availability without treating a blank label as chemistry."""
+    if reaction_core:
+        evidence_status = str(
+            reaction_core.get("evidence_status") or "inferred"
+        )
+        return f"available_{evidence_status}", ()
+
+    mapping_status = str(external_mapping.get("status") or "")
+    reasons = set()
+    status_reason = {
+        "not_requested_invalid_reaction": "invalid_reaction",
+        "not_requested_resolved_internal_evidence": (
+            "missing_cross_side_atom_correspondence"
+        ),
+        "not_requested_supplied_mapping": "supplied_mapping_core_unavailable",
+        "external_mapping_failed": "external_mapping_failed",
+        "external_mapping_signature_conflict": (
+            "external_mapping_signature_conflict"
+        ),
+        "external_mapping_hypothesis_conflict": (
+            "external_mapping_hypothesis_conflict"
+        ),
+        "external_mapping_ambiguous_hypothesis_match": (
+            "external_mapping_ambiguous_hypothesis_match"
+        ),
+        "external_mapping_signature_unavailable": (
+            "external_mapping_core_unavailable"
+        ),
+    }.get(mapping_status)
+    if status_reason:
+        reasons.add(status_reason)
+    if hypotheses:
+        reasons.add("ambiguous_atom_correspondence")
+    if signature and not reasons:
+        reasons.add("missing_cross_side_atom_correspondence")
+    completeness = record.get("reaction_completeness")
+    completeness_value = (
+        completeness if isinstance(completeness, Mapping) else {}
+    )
+    if completeness_value.get("status") == "incomplete":
+        reasons.add("incomplete_reaction_observation")
+    if not reasons:
+        reasons.add("no_core_eligible_edit_correspondence")
+    return "unavailable", tuple(sorted(reasons))
+
+
 def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
     """Stream records from canonical JSONL or a sharded manifest."""
     source = Path(path)
@@ -177,6 +233,13 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     external_mapping_value = (
         external_mapping if isinstance(external_mapping, Mapping) else {}
     )
+    core_status, core_unavailability_reasons = _reaction_core_diagnostics(
+        record=record,
+        reaction_core=reaction_core_value,
+        signature=signature_value,
+        external_mapping=external_mapping_value,
+        hypotheses=hypotheses,
+    )
     source_support = tuple(
         value
         for value in record.get("fragment_source_support") or ()
@@ -231,6 +294,10 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "reaction_core_atom_label": review_summary.atom_level_core_label,
         "reaction_core_evidence_status": str(
             reaction_core_value.get("evidence_status") or ""
+        ),
+        "reaction_core_status": core_status,
+        "reaction_core_unavailability_reasons": "; ".join(
+            core_unavailability_reasons
         ),
         "reaction_core_remote_classes": "; ".join(
             sorted(

@@ -118,12 +118,18 @@ def convert_record(
             provider_metadata.provider_version,
             provider_metadata.model_id,
             provider_metadata.model_sha256,
+            "shadow_missing_reaction_core",
+        )
+        force_resolved_shadow = bool(
+            base_analysis.reaction_signature is not None
+            and base_analysis.reaction_core is None
         )
         assessment = (
             analyze_reaction_with_external_mapping(
                 record.reaction_smiles,
                 mapping_provider,
                 base_analysis=base_analysis,
+                force_resolved_shadow=force_resolved_shadow,
             )
             if cache is None
             else cache.get(
@@ -133,6 +139,7 @@ def convert_record(
                     record.reaction_smiles,
                     mapping_provider,
                     base_analysis=base_analysis,
+                    force_resolved_shadow=force_resolved_shadow,
                 ),
             )
         )

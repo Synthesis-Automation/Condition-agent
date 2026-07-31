@@ -85,8 +85,8 @@ The current code declares:
 | Reaction fallback descriptor | `1.3` |
 | Resolved condition recipe | `1.2` |
 | Recommendation record | `3.8` |
-| Generic converter definition | `generic_conversion.v2.9` |
-| Generic sharded converter definition | `generic_sharded_conversion.v1.6` |
+| Generic converter definition | `generic_conversion.v3.0` |
+| Generic sharded converter definition | `generic_sharded_conversion.v1.7` |
 | Concise reaction review | `2.7` |
 | Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `2.5` |
@@ -94,7 +94,7 @@ The current code declares:
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.7` |
 | Reaction-core retrieval policy | `reaction_core_retrieval.v1@1.0` |
-| Generic admission policy | `generic_admission.v1.9` |
+| Generic admission policy | `generic_admission.v2.0` |
 | Fragment-source capabilities | `fragment_source_capabilities.v1@1.0` |
 | Fallback retrieval definition | `1.4` |
 

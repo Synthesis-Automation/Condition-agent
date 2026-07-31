@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.9",
+  "schema_version": "2.0",
   "policy_id": "generic_admission.v1",
   "valid_yield_range": [0.0, 100.0],
   "verified_evidence": [
@@ -22,6 +22,7 @@
   ],
   "external_mapping_review_warnings": [
     "EXTERNAL_MAPPING_HYPOTHESIS_CONFLICT",
+    "EXTERNAL_MAPPING_SIGNATURE_CONFLICT",
     "EXTERNAL_MAPPING_AMBIGUOUS_HYPOTHESIS_MATCH",
     "EXTERNAL_MAPPING_SIGNATURE_UNAVAILABLE",
     "EXTERNAL_MAPPING_FAILED"

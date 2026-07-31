@@ -110,7 +110,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "3.8"
-    assert record.converter_definition_version == "generic_conversion.v2.9"
+    assert record.converter_definition_version == "generic_conversion.v3.0"
     assert record.reaction_signature["schema_version"] == "3.0"
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
@@ -612,7 +612,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "2.7"
+    assert report["schema_version"] == "2.8"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     assert CONCISE_REACTION_REVIEW_FIELDS.index("reaction_core_label") == (
@@ -632,6 +632,10 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["signature_id"].startswith("RS3:")
     assert review_rows[0]["evidence_quality"] == "exact_product_reconstruction"
     assert review_rows[0]["reaction_completeness_status"] == "verified"
+    assert review_rows[0]["reaction_core_status"] == "unavailable"
+    assert review_rows[0]["reaction_core_unavailability_reasons"] == (
+        "missing_cross_side_atom_correspondence"
+    )
     assert review_rows[0]["chemistry_status"] == "verified"
     assert review_rows[0]["condition_stage_status"] == "single_stage"
     assert review_rows[0]["index_eligibility"] == "eligible"
@@ -735,6 +739,8 @@ def test_concise_review_uses_shared_detailed_and_graphic_labels() -> None:
 
     assert row["reaction_display_label_detailed"] == "structural detailed label"
     assert row["reaction_core_label"] == "R–X + R′ → R–R′"
+    assert row["reaction_core_status"] == "available_verified"
+    assert row["reaction_core_unavailability_reasons"] == ""
 
 
 def test_recursive_dataset_folder_converts_to_one_concise_review_csv(

@@ -141,13 +141,14 @@ class GenericReactionReviewWindow(QtWidgets.QWidget):
             "disk space, but avoids rebuilding lookup maps when recommending."
         )
         self.use_rxnmapper_check = QtWidgets.QCheckBox(
-            "Use RXNMapper for unresolved or ambiguous reactions"
+            "Use RXNMapper for unresolved, ambiguous, or missing-core reactions"
         )
         self.use_rxnmapper_check.setObjectName("useRxnMapper")
         self.use_rxnmapper_check.setChecked(True)
         self.use_rxnmapper_check.setToolTip(
             "Checked by default. RXNMapper proposals are reconciled with "
-            "internal evidence and remain review-only as converted precedents. "
+            "internal evidence; resolved reactions retain their internal "
+            "signature while consensus mapping supplies only a missing core. "
             "One worker is used to avoid loading multiple model copies."
         )
         self.use_rxnmapper_check.toggled.connect(

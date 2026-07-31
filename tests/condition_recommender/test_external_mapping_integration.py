@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from reactive_taxonomy import (
     AtomMappingProviderMetadata,
     ExternalAtomMappingResult,
     analyze_reaction_with_external_mapping,
+    featurize_reaction,
     validate_external_atom_mapping,
 )
 
@@ -77,6 +78,18 @@ ACYL_FLUORIDE_RXNMAPPER_OUTPUT = (
     "[OH:10][C:2](=[O:1])[c:4]1[cH:5][cH:6][cH:7][cH:8][cH:9]1"
     ">>[O:1]=[C:2]([F:3])[c:4]1[cH:5][cH:6][cH:7][cH:8][cH:9]1"
 )
+RESOLVED_SUZUKI_REACTION = (
+    "CC(C)(C)c1ccc(OS(C)(=O)=O)cc1.OB(O)c1ccccc1"
+    ">>CC(C)(C)c1ccc(-c2ccccc2)cc1"
+)
+RESOLVED_SUZUKI_MAPPING = (
+    "CS(=O)(=O)[O:17][c:8]1[cH:7][cH:6][c:5]"
+    "([C:2]([CH3:1])([CH3:3])[CH3:4])[cH:16][cH:15]1."
+    "O[B:18](O)[c:9]1[cH:10][cH:11][cH:12][cH:13][cH:14]1"
+    ">>[CH3:1][C:2]([CH3:3])([CH3:4])[c:5]1[cH:6][cH:7]"
+    "[c:8](-[c:9]2[cH:10][cH:11][cH:12][cH:13][cH:14]2)"
+    "[cH:15][cH:16]1"
+)
 METADATA = AtomMappingProviderMetadata(
     provider_id="fixture_mapper",
     provider_version="1.0",
@@ -114,6 +127,52 @@ class _ShardedFixtureProvider(_FixtureProvider):
         return True
 
 
+@dataclass
+class _ResolvedFixtureProvider:
+    signature_conflict: bool = False
+    call_count: int = 0
+    metadata: AtomMappingProviderMetadata = METADATA
+
+    def map_reactions(
+        self,
+        reaction_smiles: tuple[str, ...],
+    ) -> tuple[ExternalAtomMappingResult, ...]:
+        self.call_count += 1
+        results = []
+        for reaction in reaction_smiles:
+            result = validate_external_atom_mapping(
+                reaction,
+                RESOLVED_SUZUKI_MAPPING,
+                provider_metadata=self.metadata,
+                mapper_confidence=0.84,
+            )
+            assert result.normalization is not None
+            edits = tuple(
+                edit
+                for edit in result.normalization.edits
+                if tuple(
+                    sorted(
+                        (
+                            edit.atom_1.element,
+                            edit.atom_2.element if edit.atom_2 else "H",
+                        )
+                    )
+                )
+                in {("B", "C"), ("C", "C"), ("C", "O")}
+            )
+            if self.signature_conflict:
+                edits = tuple(
+                    edit for edit in edits if edit.edit_type != "formed"
+                )
+            results.append(
+                replace(
+                    result,
+                    normalization=replace(result.normalization, edits=edits),
+                )
+            )
+        return tuple(results)
+
+
 def _raw_record():
     return adapt_row(
         {
@@ -129,6 +188,75 @@ def _raw_record():
         source_dataset="fischer",
         source_path="fischer.csv",
         source_row_number=2,
+    )
+
+
+def _resolved_raw_record():
+    return adapt_row(
+        {
+            "reaction_id": "resolved-suzuki-1",
+            "reaction_type": "source label is review metadata only",
+            "reaction_smiles": RESOLVED_SUZUKI_REACTION,
+            "yield_pct": "88",
+            "reagent_cas": "584-08-7",
+            "solvent_cas": "108-88-3",
+            "reference": "Resolved fixture reference",
+            "stages": "1",
+        },
+        source_dataset="resolved",
+        source_path="resolved.csv",
+        source_row_number=2,
+    )
+
+
+def test_converter_shadow_maps_resolved_reaction_with_missing_core() -> None:
+    base = featurize_reaction(RESOLVED_SUZUKI_REACTION)
+    assert base.reaction_signature is not None
+    assert base.reaction_core is None
+    provider = _ResolvedFixtureProvider()
+
+    record = convert_record(
+        _resolved_raw_record(),
+        mapping_provider=provider,
+    )
+
+    assert provider.call_count == 1
+    assert record.reaction_signature is not None
+    assert record.reaction_signature["signature_id"] == (
+        base.reaction_signature.signature_id
+    )
+    assert record.reaction_core is not None
+    assert record.reaction_core["evidence_status"] == "external"
+    assert record.external_atom_mapping is not None
+    assert record.external_atom_mapping["status"] == (
+        "external_mapping_internal_consensus"
+    )
+    assert record.chemistry_status == ChemistryStatus.VERIFIED
+    assert record.index_eligibility == IndexEligibility.ELIGIBLE
+    review = concise_reaction_review_row(record.to_dict())
+    assert review["reaction_core_label"]
+    assert review["reaction_core_status"] == "available_external"
+    assert review["reaction_core_unavailability_reasons"] == ""
+
+
+def test_converter_retains_blank_core_and_reports_shadow_mapping_conflict() -> None:
+    record = convert_record(
+        _resolved_raw_record(),
+        mapping_provider=_ResolvedFixtureProvider(signature_conflict=True),
+    )
+
+    assert record.reaction_signature is not None
+    assert record.reaction_core is None
+    assert record.external_atom_mapping is not None
+    assert record.external_atom_mapping["status"] == (
+        "external_mapping_signature_conflict"
+    )
+    assert record.chemistry_status == ChemistryStatus.REVIEW
+    assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
+    review = concise_reaction_review_row(record.to_dict())
+    assert review["reaction_core_status"] == "unavailable"
+    assert review["reaction_core_unavailability_reasons"] == (
+        "external_mapping_signature_conflict"
     )
 
 

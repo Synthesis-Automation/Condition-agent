@@ -41,7 +41,7 @@ from .generic import GenericConversionCache, convert_record
 from .input_schema import RawReactionRecord, discover_csv_datasets, iter_csv_records
 
 SHARD_MANIFEST_SCHEMA_VERSION = "1.0"
-SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v1.6"
+SHARDED_CONVERSION_DEFINITION_VERSION = "generic_sharded_conversion.v1.7"
 
 
 @dataclass(frozen=True)

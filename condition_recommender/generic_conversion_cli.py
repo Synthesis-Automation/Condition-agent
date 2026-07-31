@@ -26,8 +26,8 @@ def main() -> None:
         "--use-rxnmapper",
         action="store_true",
         help=(
-            "Use optional RXNMapper evidence for unresolved/ambiguous reactions; "
-            "generated precedents remain review-only"
+            "Use optional RXNMapper evidence for unresolved/ambiguous reactions "
+            "and consensus-only core enrichment for resolved reactions"
         ),
     )
     args = parser.parse_args()

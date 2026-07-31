@@ -23,8 +23,9 @@ def main() -> None:
         "--use-rxnmapper",
         action="store_true",
         help=(
-            "Use RXNMapper for unresolved/ambiguous reactions; requires "
-            "--workers 1 and keeps mapper-derived records review-only"
+            "Use RXNMapper for unresolved/ambiguous reactions and missing-core "
+            "enrichment; requires "
+            "--workers 1 and keeps mapper-only chemistry review-only"
         ),
     )
     args = parser.parse_args()

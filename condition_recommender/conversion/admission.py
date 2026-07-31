@@ -34,7 +34,7 @@ class AdmissionDecision:
     condition_stage_status: ConditionStageStatus
     outcome_status: OutcomeStatus
     index_eligibility: IndexEligibility
-    policy_version: str = "generic_admission.v1.9"
+    policy_version: str = "generic_admission.v2.0"
 
 
 @lru_cache(maxsize=1)
