@@ -200,6 +200,23 @@ def test_forced_resolved_mapping_only_enriches_the_minimized_core() -> None:
     assert assessment.analysis.reaction_core.evidence == (
         "external_mapping_internal_consensus"
     )
+    assert assessment.analysis.reaction_core.generic_label == (
+        "Ar–B + Ar–O → Ar–Ar"
+    )
+    for transition in assessment.analysis.reaction_core.atom_transitions:
+        for state, components in (
+            (transition.before_state, base.reactants),
+            (transition.after_state, base.products),
+        ):
+            if state is None:
+                continue
+            molecule = parse_smiles(
+                components[state.component_index].input_smiles
+            )
+            assert molecule is not None
+            assert molecule.GetAtomWithIdx(state.atom_index).GetSymbol() == (
+                state.element
+            )
     assert "REACTION_CORE_EXTERNAL_MAPPING_PROPOSAL" in (
         assessment.analysis.reaction_core.warnings
     )

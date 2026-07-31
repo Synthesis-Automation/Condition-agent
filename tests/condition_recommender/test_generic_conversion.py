@@ -137,7 +137,7 @@ def test_mapped_unknown_reaction_serializes_reaction_core_for_review() -> None:
     assert record.reaction_core is not None
     assert record.reaction_core["schema_version"] == "2.0"
     assert record.reaction_core["algorithm_version"] == (
-        "reaction_core_projection.v2"
+        "reaction_core_projection.v3"
     )
     assert record.reaction_core["shape_core_key"].startswith("RSH2:")
     assert record.reaction_core["generic_label"] == (

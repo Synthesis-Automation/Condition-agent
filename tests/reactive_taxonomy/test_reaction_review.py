@@ -17,9 +17,7 @@ def test_review_summary_combines_detailed_and_graphic_labels() -> None:
 
     assert summary.schema_version == REACTION_REVIEW_SUMMARY_SCHEMA_VERSION
     assert "H₂C=CH₂ → H₃C–CH₃" in summary.detailed_reaction_label
-    assert summary.graphic_reaction_label == (
-        "C(H)2(=R) → C(H)3(R) + C(H)2(=R) → C(H)3(R)"
-    )
+    assert summary.graphic_reaction_label == "C=C → C–C"
     assert "unsaturated partner" in summary.electronic_steric_analysis
     assert "access open" in summary.electronic_steric_analysis
 
@@ -57,4 +55,3 @@ def test_review_summary_formats_duplicate_spectators_without_distances() -> None
     )
 
     assert summary.spectators == "2× R–O–R [ether]"
-

@@ -77,7 +77,7 @@ The current code declares:
 | --- | --- |
 | Reaction analysis | `3.5` |
 | Reaction signature / ID namespace | `3.0` / `RS3` |
-| Reaction core projection / algorithm | `2.0` / `reaction_core_projection.v2` |
+| Reaction core projection / algorithm | `2.0` / `reaction_core_projection.v3` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
 | Connectivity rewrite | `2.0` |
@@ -460,7 +460,7 @@ validation before they may consume these observations.
   `PTS1` partial-transformation keys, and `FSR1` fragment-source requirements;
 - graph-derived local reactivity profiles and unchanged spectators;
 - a serialized, template-free `ReactionCoreProjection` for mapped edit
-  observations. V2 keeps every edit-participating atom as an atom transition,
+  observations. The version 2 schema keeps every edit-participating atom as an atom transition,
   chooses a smaller set of primary centers only for explanation, removes each
   unchanged remote connected component once, and records every cut as a typed
   attachment port on that remote subgraph;

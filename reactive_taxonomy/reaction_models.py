@@ -12,7 +12,7 @@ from .models import CompoundAnalysis
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.0"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.3"
 REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.0"
-REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v2"
+REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v3"
 
 EditArchetype = Literal[
     "substitution",

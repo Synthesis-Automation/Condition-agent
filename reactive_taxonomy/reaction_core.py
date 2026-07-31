@@ -563,6 +563,80 @@ def _bond_prefix(order: str) -> str:
     }.get(str(order).upper(), "~")
 
 
+def _edit_atom_display(atom: ReactionAtomReference) -> str:
+    """Render an edit endpoint without duplicating its aromatic scaffold."""
+    if atom.aromatic:
+        return "Ar" if atom.element == "C" else "HetAr"
+    return atom.element
+
+
+def _edit_bond_display(
+    atom_1: ReactionAtomReference,
+    atom_2: Optional[ReactionAtomReference],
+    order: Optional[str],
+) -> str:
+    """Render one schema-level bond state for an event equation."""
+    left = _edit_atom_display(atom_1)
+    right = "H" if atom_2 is None else _edit_atom_display(atom_2)
+    bond = {
+        "SINGLE": "–",
+        "DOUBLE": "=",
+        "TRIPLE": "≡",
+        "AROMATIC": ":",
+    }.get(str(order or "SINGLE").upper(), "~")
+    endpoints = sorted((left, right))
+    return f"{endpoints[0]}{bond}{endpoints[1]}"
+
+
+def _counted_edit_terms(values: Sequence[str]) -> str:
+    counts = Counter(values)
+    return " + ".join(
+        (
+            f"{count} × {term}"
+            if count > 1
+            else term
+        )
+        for term, count in sorted(counts.items())
+    )
+
+
+def _multi_center_edit_label(edits: Sequence[ReactionEdit]) -> str:
+    """Render a multi-center event once instead of once per center atom."""
+    before = []
+    after = []
+    heavy_edits = tuple(edit for edit in edits if edit.atom_2 is not None)
+    suppress_hydrogen = bool(heavy_edits) and all(
+        edit.edit_type == "order_changed" for edit in heavy_edits
+    )
+    for edit in edits:
+        if edit.edit_type == "broken":
+            before.append(
+                _edit_bond_display(edit.atom_1, edit.atom_2, edit.old_order)
+            )
+        elif edit.edit_type == "formed":
+            after.append(
+                _edit_bond_display(edit.atom_1, edit.atom_2, edit.new_order)
+            )
+        elif edit.edit_type == "order_changed":
+            before.append(
+                _edit_bond_display(edit.atom_1, edit.atom_2, edit.old_order)
+            )
+            after.append(
+                _edit_bond_display(edit.atom_1, edit.atom_2, edit.new_order)
+            )
+        elif edit.edit_type == "hydrogen_change" and not suppress_hydrogen:
+            term = _edit_bond_display(edit.atom_1, None, "SINGLE")
+            if edit.old_order is not None:
+                before.append(term)
+            if edit.new_order is not None:
+                after.append(term)
+    return (
+        f"{_counted_edit_terms(before) or '∅'}"
+        " → "
+        f"{_counted_edit_terms(after) or '∅'}"
+    )
+
+
 def _active_neighbor_display(
     molecule: Any,
     center_index: int,
@@ -1313,13 +1387,17 @@ def build_reaction_core_projection(
             "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
         },
     )
-    generic_label = " + ".join(
-        (
-            f"{transition.before_state.concise_label if transition.before_state else '∅'}"
-            " → "
-            f"{transition.after_state.concise_label if transition.after_state else '∅'}"
+    generic_label = (
+        _multi_center_edit_label(edits)
+        if len(primary) > 1
+        else " + ".join(
+            (
+                f"{transition.before_state.concise_label if transition.before_state else '∅'}"
+                " → "
+                f"{transition.after_state.concise_label if transition.after_state else '∅'}"
+            )
+            for transition in primary
         )
-        for transition in primary
     )
     warnings = set()
     if any(

@@ -21,13 +21,16 @@ the literal structural label, evidence, and confidence. Display style and label
 definitions are explicitly excluded from reaction-signature identity.
 
 Mapped observations also receive a template-free `ReactionCoreProjection`.
-V2 keeps every edit-participating atom, selects primary centers only for
+The version 2 schema keeps every edit-participating atom, selects primary centers only for
 explanation, removes each remote connected component once, and records all cut
 connections as typed attachment ports. Remote classes such as aryl,
 heteroaryl, alkyl, alkenyl, alkynyl, acyl, ring-aliphatic,
 heteroatom-linked, or generic R are derived from the removed molecular graph.
 Exact fragment SMILES and functional-group annotations remain available even
 when the concise label uses `Ar`, `HetAr`, or `R`.
+Algorithm v3 renders multi-center cores as one normalized edit equation, such
+as `Ar–B + Ar–O → Ar–Ar`, rather than repeating the shared product environment
+once for each center. Single-center cores retain their local-state transition.
 
 Four versioned keys separate different uses of the minimized observation:
 `RCX2` retains exact mapped-edit and fragment identity, `RCT2` retains typed

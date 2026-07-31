@@ -178,6 +178,128 @@ def _reaction_identity(
     return reactants, agents, products
 
 
+def _indexed_graph(molecule: Any) -> tuple[object, ...]:
+    """Return atom-order-sensitive graph data while ignoring map numbers."""
+    atoms = tuple(
+        (
+            atom.GetSymbol(),
+            int(atom.GetFormalCharge()),
+            bool(atom.GetIsAromatic()),
+        )
+        for atom in molecule.GetAtoms()
+    )
+    bonds = tuple(
+        sorted(
+            (
+                min(int(bond.GetBeginAtomIdx()), int(bond.GetEndAtomIdx())),
+                max(int(bond.GetBeginAtomIdx()), int(bond.GetEndAtomIdx())),
+                str(bond.GetBondType()).upper(),
+            )
+            for bond in molecule.GetBonds()
+        )
+    )
+    return atoms, bonds
+
+
+def _mapped_component_in_original_order(
+    original: ReactionComponent,
+    mapped: ReactionComponent,
+) -> Optional[str]:
+    """Transfer validated map numbers without changing original coordinates."""
+    from rdkit import Chem
+
+    original_molecule = parse_smiles(original.input_smiles)
+    mapped_molecule = parse_smiles(mapped.input_smiles)
+    if original_molecule is None or mapped_molecule is None:
+        return None
+    query = Chem.Mol(mapped_molecule)
+    for atom in query.GetAtoms():
+        atom.SetAtomMapNum(0)
+    matches = tuple(
+        match
+        for match in original_molecule.GetSubstructMatches(
+            query,
+            uniquify=False,
+            useChirality=True,
+            maxMatches=1000,
+        )
+        if len(match) == original_molecule.GetNumAtoms()
+    )
+    if not matches:
+        return None
+    match = min(matches)
+    projected = Chem.Mol(original_molecule)
+    for mapped_index, original_index in enumerate(match):
+        projected.GetAtomWithIdx(int(original_index)).SetAtomMapNum(
+            int(mapped_molecule.GetAtomWithIdx(mapped_index).GetAtomMapNum())
+        )
+    projected_smiles = str(
+        Chem.MolToSmiles(
+            projected,
+            canonical=False,
+            isomericSmiles=True,
+        )
+    )
+    reparsed = parse_smiles(projected_smiles)
+    if (
+        reparsed is None
+        or _indexed_graph(reparsed) != _indexed_graph(original_molecule)
+    ):
+        return None
+    return projected_smiles
+
+
+def _mapping_in_original_component_order(
+    base: ReactionAnalysis,
+    mapped: ParsedReaction,
+) -> Optional[ParsedReaction]:
+    """Build mapped components whose indices match the base analysis graphs."""
+
+    def project_side(
+        originals: Sequence[ReactionComponent],
+        mapped_components: Sequence[ReactionComponent],
+    ) -> Optional[tuple[str, ...]]:
+        available: dict[str, list[ReactionComponent]] = {}
+        for component in mapped_components:
+            identity = _canonical_without_maps(component.input_smiles)
+            if identity is None:
+                return None
+            available.setdefault(identity, []).append(component)
+        for values in available.values():
+            values.sort(key=lambda component: component.component_index)
+        projected = []
+        for original in originals:
+            identity = _canonical_without_maps(original.input_smiles)
+            candidates = available.get(str(identity), [])
+            if identity is None or not candidates:
+                return None
+            mapped_component = candidates.pop(0)
+            smiles = _mapped_component_in_original_order(
+                original,
+                mapped_component,
+            )
+            if smiles is None:
+                return None
+            projected.append(smiles)
+        if any(available.values()):
+            return None
+        return tuple(projected)
+
+    reactants = project_side(base.reactants, mapped.reactants)
+    products = project_side(base.products, mapped.products)
+    if reactants is None or products is None:
+        return None
+    agents = tuple(component.input_smiles for component in base.agents)
+    if agents:
+        reaction_smiles = (
+            f"{'.'.join(reactants)}>{'.'.join(agents)}>{'.'.join(products)}"
+        )
+    else:
+        reaction_smiles = f"{'.'.join(reactants)}>>{'.'.join(products)}"
+    projected = parse_reaction_smiles(reaction_smiles)
+    return projected if projected.valid else None
+
+
 def _mapping_coverage(
     components: Tuple[ReactionComponent, ...],
 ) -> tuple[int, int, set[int]]:
@@ -697,9 +819,29 @@ def analyze_reaction_with_external_mapping(
             "EXTERNAL_MAPPING_INTERNAL_CONSENSUS",
             "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW",
         )
+        core_parsed = _mapping_in_original_component_order(base, mapped_parsed)
+        if core_parsed is None:
+            warning = "EXTERNAL_MAPPING_CORE_COORDINATE_PROJECTION_FAILED"
+            return ExternalMappingAssessment(
+                input_reaction_smiles=reaction_smiles,
+                status="external_mapping_signature_unavailable",
+                analysis=replace(
+                    base,
+                    evidence_candidates=_merge_evidence_candidates(
+                        base.evidence_candidates,
+                        (external_candidate,),
+                    ),
+                    warnings=tuple(
+                        sorted(set(base.warnings).union((warning,)))
+                    ),
+                ),
+                provider_metadata=provider.metadata,
+                mapping_result=mapping,
+                warnings=(warning, "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW"),
+            )
         reaction_core = build_reaction_core_projection(
-            reactants=mapped_parsed.reactants,
-            products=mapped_parsed.products,
+            reactants=core_parsed.reactants,
+            products=core_parsed.products,
             edits=mapping.normalization.edits,
             evidence=evidence,
             confidence=confidence,

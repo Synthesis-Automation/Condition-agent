@@ -246,6 +246,11 @@ The projection:
 7. matches remote subgraphs across sides as retained, departing, appearing,
    changed, or unresolved.
 
+Its algorithm-v3 concise label uses a local atom-state transition for a
+single-center event. For a multi-center event it instead renders one
+normalized edit equation, preventing a shared formed bond from being shown
+twice (for example, `Ar–B + Ar–O → Ar–Ar`).
+
 Classes such as `aryl`, `heteroaryl`, and `alkyl` come from the removed graph:
 aromaticity, ring composition, element composition, unsaturation, and
 attachment topology. They are not a fixed grammar vocabulary applied before
@@ -329,6 +334,10 @@ The mapped edits are reconciled with the existing reaction signature; on
 consensus, the original interpretation, detailed label, and signature remain
 unchanged and only the external core and provenance are attached. A conflict
 retains the original analysis and does not silently replace its chemistry.
+Before core construction, validated external map numbers are projected onto
+the original component and atom ordering. This keeps core coordinates aligned
+with the unmapped structures consumed by the graphic renderer even when the
+mapper canonicalizes or reorders its SMILES output.
 The tab displays evidence status, confidence, the exact placeholder legend,
 and the expert-review warning.
 
