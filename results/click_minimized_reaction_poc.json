@@ -27,6 +27,7 @@
     "definition_id": "reaction_core_graphic.v1",
     "placeholders": [
       {
+        "attachment_port_count": 1,
         "fragment_smiles": "COc1ccc2nc(N(C)c3nc4ccc(F)cc4s3)sc2c1",
         "functional_group_ids": [
           "aryl_halide",
@@ -39,6 +40,7 @@
         "remote_class": "alkyl"
       },
       {
+        "attachment_port_count": 1,
         "fragment_smiles": "CC(=O)Nc1ccc(SC(F)(F)F)cc1",
         "functional_group_ids": [
           "amide"

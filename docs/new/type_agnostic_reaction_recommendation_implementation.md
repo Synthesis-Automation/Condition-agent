@@ -243,7 +243,11 @@ continuity, remote classes, exact fragments, and typed attachment ports remain
 owned by `reactive_taxonomy`. This keeps drawing policy out of core chemistry
 and out of the application layer. Only retained remote subgraphs may be
 abstracted; the graphic result always includes a placeholder-to-fragment
-legend.
+legend. Singleton retained heteroatoms remain explicit. Multi-port ring
+remainders surrounding one active atom absorb that atom into a scaffold
+placeholder while retaining its active bonds; other multi-port topologies use
+one boundary node per port. This avoids parallel dummy bonds and supports
+transformations at atoms embedded in fused rings.
 
 Artifacts are:
 

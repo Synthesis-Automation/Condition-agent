@@ -42,6 +42,7 @@ class ReactionCoreGraphicPlaceholder:
     remote_class: str
     fragment_smiles: str
     functional_group_ids: Tuple[str, ...]
+    attachment_port_count: int
 
 
 @dataclass(frozen=True)
@@ -80,6 +81,25 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     if continuities != ("retained",):
         raise ValueError(
             "reaction-core graphic may abstract only retained subgraphs"
+        )
+    explicit = definition.get("explicit_retained_subgraphs")
+    if not isinstance(explicit, Mapping):
+        raise ValueError(
+            "reaction-core graphic requires an explicit-fragment policy"
+        )
+    max_heavy_atoms = explicit.get("max_heavy_atom_count")
+    if not isinstance(max_heavy_atoms, int) or max_heavy_atoms < 0:
+        raise ValueError(
+            "explicit-fragment maximum heavy-atom count must be non-negative"
+        )
+    explicit_classes = explicit.get("remote_classes")
+    if (
+        not isinstance(explicit_classes, list)
+        or not explicit_classes
+        or not all(isinstance(value, str) and value for value in explicit_classes)
+    ):
+        raise ValueError(
+            "explicit-fragment remote classes must be a non-empty string list"
         )
     template = str(definition.get("indexed_label_template") or "")
     if "{label}" not in template or "{index}" not in template:
@@ -124,6 +144,18 @@ def _remote_identity(subgraph: Any) -> tuple[Any, ...]:
     )
 
 
+def _render_remote_explicitly(subgraph: Any) -> bool:
+    """Return whether a retained fragment must remain chemically visible."""
+    definition = load_reaction_core_graphic_definition()
+    policy = definition["explicit_retained_subgraphs"]
+    return (
+        subgraph.continuity == "retained"
+        and int(subgraph.fragment_heavy_atom_count)
+        <= int(policy["max_heavy_atom_count"])
+        and str(subgraph.remote_class) in set(policy["remote_classes"])
+    )
+
+
 def _placeholder_assignments(
     core: Any,
 ) -> tuple[
@@ -135,7 +167,10 @@ def _placeholder_assignments(
     retained = tuple(
         subgraph
         for subgraph in core.remote_subgraphs
-        if subgraph.continuity == "retained"
+        if (
+            subgraph.continuity == "retained"
+            and not _render_remote_explicitly(subgraph)
+        )
     )
     representative_by_identity: Dict[tuple[Any, ...], Any] = {}
     for subgraph in retained:
@@ -163,6 +198,7 @@ def _placeholder_assignments(
             remote_class=str(subgraph.remote_class),
             fragment_smiles=str(subgraph.fragment_smiles),
             functional_group_ids=tuple(subgraph.functional_group_ids),
+            attachment_port_count=len(subgraph.attachment_ports),
         )
         for identity, subgraph in sorted(
             representative_by_identity.items(),
@@ -190,6 +226,54 @@ def _bond_type(token: str) -> Any:
     return getattr(Chem.BondType, name)
 
 
+def _embedded_core_placeholders(
+    core: Any,
+    *,
+    side: str,
+    component_index: int,
+    active_atom_indices: set[int],
+    assignments: Mapping[tuple[Any, ...], str],
+) -> tuple[Dict[int, str], set[str]]:
+    """Find ring/scaffold fragments that can absorb one embedded core atom.
+
+    A retained fragment with multiple ports to the same active atom is the
+    remainder of a ring or scaffold around that atom. Rendering a dummy for
+    every port is safe but visually misleading. When exactly one such fragment
+    surrounds an active atom, render the core atom itself as the fragment
+    placeholder and preserve its bonds to the other active atoms.
+    """
+    candidates: Dict[int, list[Any]] = {}
+    for subgraph in core.remote_subgraphs:
+        if (
+            subgraph.side != side
+            or subgraph.continuity != "retained"
+            or _render_remote_explicitly(subgraph)
+            or subgraph.component_index != component_index
+        ):
+            continue
+        ports = tuple(
+            port
+            for port in subgraph.attachment_ports
+            if (
+                port.core_component_index == component_index
+                and port.core_atom_index in active_atom_indices
+            )
+        )
+        core_indices = {port.core_atom_index for port in ports}
+        if len(ports) > 1 and len(core_indices) == 1:
+            core_index = next(iter(core_indices))
+            candidates.setdefault(core_index, []).append(subgraph)
+    labels: Dict[int, str] = {}
+    collapsed_subgraph_ids: set[str] = set()
+    for core_index, subgraphs in candidates.items():
+        if len(subgraphs) != 1:
+            continue
+        subgraph = subgraphs[0]
+        labels[core_index] = assignments[_remote_identity(subgraph)]
+        collapsed_subgraph_ids.add(str(subgraph.subgraph_id))
+    return labels, collapsed_subgraph_ids
+
+
 def _build_side_molecules(
     analysis: Any,
     *,
@@ -209,9 +293,22 @@ def _build_side_molecules(
             raise ValueError("reaction-core component could not be reparsed")
         editable = Chem.RWMol()
         old_to_new: Dict[int, int] = {}
+        embedded_labels, collapsed_subgraph_ids = _embedded_core_placeholders(
+            core,
+            side=side,
+            component_index=component_index,
+            active_atom_indices=atom_indices,
+            assignments=assignments,
+        )
         for atom_index in sorted(atom_indices):
-            atom = Chem.Atom(source.GetAtomWithIdx(atom_index))
-            atom.SetAtomMapNum(0)
+            if atom_index in embedded_labels:
+                atom = Chem.Atom(0)
+                label = embedded_labels[atom_index]
+                atom.SetProp("atomLabel", label)
+                atom.SetProp("_displayLabel", label)
+            else:
+                atom = Chem.Atom(source.GetAtomWithIdx(atom_index))
+                atom.SetAtomMapNum(0)
             old_to_new[atom_index] = editable.AddAtom(atom)
         for bond in source.GetBonds():
             begin = int(bond.GetBeginAtomIdx())
@@ -225,6 +322,8 @@ def _build_side_molecules(
         for subgraph in core.remote_subgraphs:
             if subgraph.side != side or subgraph.continuity != "retained":
                 continue
+            if str(subgraph.subgraph_id) in collapsed_subgraph_ids:
+                continue
             matching_ports = tuple(
                 port
                 for port in subgraph.attachment_ports
@@ -233,12 +332,35 @@ def _build_side_molecules(
             )
             if not matching_ports:
                 continue
-            placeholder = Chem.Atom(0)
+            if _render_remote_explicitly(subgraph):
+                remote_old_to_new: Dict[int, int] = {}
+                for atom_index in sorted(subgraph.atom_indices):
+                    atom = Chem.Atom(source.GetAtomWithIdx(atom_index))
+                    atom.SetAtomMapNum(0)
+                    remote_old_to_new[atom_index] = editable.AddAtom(atom)
+                remote_indices = set(subgraph.atom_indices)
+                for bond in source.GetBonds():
+                    begin = int(bond.GetBeginAtomIdx())
+                    end = int(bond.GetEndAtomIdx())
+                    if begin in remote_indices and end in remote_indices:
+                        editable.AddBond(
+                            remote_old_to_new[begin],
+                            remote_old_to_new[end],
+                            bond.GetBondType(),
+                        )
+                for port in matching_ports:
+                    editable.AddBond(
+                        old_to_new[port.core_atom_index],
+                        remote_old_to_new[port.attachment_atom_index],
+                        _bond_type(port.bond_order),
+                    )
+                continue
             label = assignments[_remote_identity(subgraph)]
-            placeholder.SetProp("atomLabel", label)
-            placeholder.SetProp("_displayLabel", label)
-            placeholder_index = editable.AddAtom(placeholder)
             for port in matching_ports:
+                placeholder = Chem.Atom(0)
+                placeholder.SetProp("atomLabel", label)
+                placeholder.SetProp("_displayLabel", label)
+                placeholder_index = editable.AddAtom(placeholder)
                 editable.AddBond(
                     old_to_new[port.core_atom_index],
                     placeholder_index,

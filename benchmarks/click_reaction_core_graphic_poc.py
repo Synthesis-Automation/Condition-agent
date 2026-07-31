@@ -41,6 +41,7 @@ def _placeholder_payload(value: Any) -> dict[str, Any]:
         "remote_class": value.remote_class,
         "fragment_smiles": value.fragment_smiles,
         "functional_group_ids": list(value.functional_group_ids),
+        "attachment_port_count": value.attachment_port_count,
     }
 
 

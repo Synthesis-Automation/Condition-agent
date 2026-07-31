@@ -488,7 +488,11 @@ class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):
             self.graph_tabs.setCurrentIndex(0)
             return
         legend = "; ".join(
-            f"{placeholder.label} = {placeholder.fragment_smiles}"
+            (
+                f"{placeholder.label}"
+                f"{f' ({placeholder.attachment_port_count} ports)' if placeholder.attachment_port_count > 1 else ''}"
+                f" = {placeholder.fragment_smiles}"
+            )
             for placeholder in graphic.placeholders
         ) or "no remote placeholders"
         note = (

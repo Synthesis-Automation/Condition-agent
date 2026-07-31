@@ -28,6 +28,14 @@ MAPPED_CLICK_REACTION = (
     "[n:29][n:30]3)[c:31]3[n:32][c:33]4[cH:34][cH:35]"
     "[c:36]([F:37])[cH:38][c:39]4[s:40]3)[s:41][c:42]2[cH:43]1"
 )
+MAPPED_RING_ACYLATION = (
+    "[CH3:1][c:2]1[cH:3][cH:4][cH:5][cH:6][c:7]1[CH:8]=[O:9]."
+    "[cH:10]1[n:11][cH:12][c:13](-[c:14]2[cH:15][cH:16][cH:17]"
+    "[cH:18][cH:19]2)[c:20]2[cH:21][cH:22][cH:23][cH:24][c:25]12"
+    ">>[CH3:1][c:2]1[cH:3][cH:4][cH:5][cH:6][c:7]1[C:8](=[O:9])"
+    "[c:10]1[n:11][cH:12][c:13](-[c:14]2[cH:15][cH:16][cH:17]"
+    "[cH:18][cH:19]2)[c:20]2[cH:21][cH:22][cH:23][cH:24][c:25]12"
+)
 
 
 def test_molecule_renderer_supports_in_memory_png_and_file_output(
@@ -110,6 +118,43 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
     assert load_reaction_core_graphic_definition()[
         "continuities_replaced_by_labels"
     ] == ["retained"]
+    assert load_reaction_core_graphic_definition()[
+        "explicit_retained_subgraphs"
+    ] == {
+        "max_heavy_atom_count": 1,
+        "remote_classes": ["heteroatom"],
+    }
+
+
+def test_reaction_core_renderer_supports_multi_port_ring_boundaries() -> None:
+    analysis = featurize_reaction(MAPPED_RING_ACYLATION)
+
+    graphic = build_reaction_core_graphic(
+        analysis,
+        size=(1200, 260),
+        image_format="svg",
+    )
+    png = render_reaction_core_image_bytes(
+        analysis,
+        size=(1200, 260),
+        image_format="png",
+    )
+
+    assert b"<svg" in graphic.image_bytes[:512]
+    assert png.startswith(b"\x89PNG\r\n\x1a\n")
+    placeholders = {
+        placeholder.label: placeholder for placeholder in graphic.placeholders
+    }
+    assert set(placeholders) == {"Ar", "HetAr"}
+    assert placeholders["Ar"].attachment_port_count == 1
+    assert placeholders["HetAr"].attachment_port_count == 2
+    assert placeholders["HetAr"].fragment_smiles == (
+        "ncc(-c1ccccc1)c1ccccc1"
+    )
+    assert all(
+        placeholder.remote_class != "heteroatom"
+        for placeholder in graphic.placeholders
+    )
 
 
 def test_reaction_core_renderer_requires_mapped_core() -> None:

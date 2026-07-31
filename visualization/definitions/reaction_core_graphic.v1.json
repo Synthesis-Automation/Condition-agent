@@ -15,6 +15,12 @@
   "continuities_replaced_by_labels": [
     "retained"
   ],
+  "explicit_retained_subgraphs": {
+    "max_heavy_atom_count": 1,
+    "remote_classes": [
+      "heteroatom"
+    ]
+  },
   "indexed_label_template": "{label}{index}",
-  "rendering_note": "Only unchanged retained remote subgraphs are abstracted."
+  "rendering_note": "Only unchanged retained remote subgraphs are abstracted. Configured small chemically informative fragments remain explicit. A multi-port ring or scaffold remainder surrounding one active atom absorbs that atom into its placeholder; other multi-port fragments use one boundary node per port."
 }
