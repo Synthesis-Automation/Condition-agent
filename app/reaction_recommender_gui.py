@@ -176,10 +176,11 @@ def _partner_analysis_summaries(
 
 def format_query_summary(result: GenericRecommendationResult) -> str:
     """Render query identity, spectators, and local reaction-partner context."""
-    label_evidence = _display_name(result.reaction_label_status)
+    reaction_label = result.reaction_label or {}
+    label_evidence = _display_name(str(reaction_label.get("status") or "unavailable"))
     lines = [
         (
-            f"Reaction: {result.reaction_label or 'Unresolved'}  •  "
+            f"Reaction: {reaction_label.get('concise') or 'Unresolved'}  •  "
             f"Label evidence: {label_evidence}"
         ),
         (
@@ -892,7 +893,7 @@ class GenericRecommenderWindow(QtWidgets.QWidget):
             "Displayed precedent context",
             (
                 "Reaction label: "
-                f"{selected_context.get('reaction_label') or 'Unresolved'}"
+                f"{(selected_context.get('reaction_label') or {}).get('concise') or 'Unresolved'}"
             ),
             (
                 "Selected hit reaction SMILES: "

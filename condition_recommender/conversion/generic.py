@@ -254,8 +254,11 @@ def convert_record(
         admission_reasons=decision.reasons,
         evidence_quality=analysis.evidence_quality,
         named_family=analysis.named_family,
-        reaction_label=analysis.reaction_label,
-        reaction_label_status=analysis.reaction_label_status,
+        reaction_label=(
+            asdict(analysis.reaction_label)
+            if analysis.reaction_label is not None
+            else None
+        ),
         yield_pct=record.yield_pct,
         temperature_c=record.temperature_c,
         time_h=record.time_h,
@@ -282,9 +285,6 @@ def convert_record(
             if analysis.reaction_completeness
             else None
         ),
-        reaction_display_label=asdict(analysis.display_label)
-        if analysis.display_label
-        else None,
         reaction_observation=(
             asdict(analysis.observation)
             if analysis.observation is not None

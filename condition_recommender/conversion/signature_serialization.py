@@ -174,9 +174,9 @@ def flattened_reaction_core_fields(
             str(section) for section in summary_sections if section
         ),
         "reaction_core_motif_key": abstraction.get("motif_key", ""),
-        "reaction_core_general_label": abstraction.get("general_label", ""),
+        "reaction_core_general_equation": abstraction.get("general_label", ""),
         "reaction_core_limiter": abstraction.get("limiter_label", ""),
-        "reaction_core_raw_label": value.get("generic_label", ""),
+        "reaction_core_label": value.get("generic_label", ""),
         "reaction_core_evidence_status": value.get("evidence_status", ""),
         "reaction_core_json": json.dumps(
             core,

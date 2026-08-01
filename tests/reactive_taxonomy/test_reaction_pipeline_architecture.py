@@ -82,10 +82,10 @@ def test_signature_and_core_do_not_depend_on_loaded_grammars(monkeypatch) -> Non
     assert interpreted.reaction_core.core_id == generic.reaction_core.core_id
     assert interpreted.selected_candidate is not None
     assert generic.named_family is None
-    assert interpreted.display_label is not None
-    assert generic.display_label is not None
-    assert interpreted.display_label.source == "verified_grammar"
-    assert generic.display_label.source != "verified_grammar"
+    assert interpreted.reaction_label is not None
+    assert generic.reaction_label is not None
+    assert interpreted.reaction_label.source == "verified_grammar"
+    assert generic.reaction_label.source != "verified_grammar"
 
 
 def test_public_operator_registry_excludes_grammar_metadata() -> None:
@@ -100,8 +100,24 @@ def test_cycloaddition_uses_generic_topology_renderer() -> None:
     reaction = "CC#C.CN=[N+]=[N-]>>Cc1nnn(C)c1"
     result = featurize_reaction(reaction)
 
-    assert result.display_label is not None
-    assert result.display_label.source == "generic_topology"
-    assert result.reaction_label == (
+    assert result.reaction_label is not None
+    assert result.reaction_label.source == "generic_topology"
+    assert result.reaction_label.concise == (
         "C≡C + N=N=N → aromatic 5-membered C₂N₃ ring"
     )
+
+
+def test_analysis_serializes_one_canonical_reaction_label_contract() -> None:
+    result = featurize_reaction(UNMAPPED_SUZUKI)
+    payload = asdict(result)
+
+    assert set(payload) & {
+        "display_label",
+        "reaction_display_label",
+        "reaction_label_status",
+    } == set()
+    assert payload["reaction_label"]["concise"]
+    assert payload["reaction_label"]["detailed"]
+    assert payload["reaction_label"]["schema_version"] == "2.0"
+    assert "reaction_label" not in payload["candidates"][0]
+    assert payload["candidates"][0]["grammar_label"]

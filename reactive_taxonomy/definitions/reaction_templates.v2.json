@@ -1,6 +1,6 @@
 {
-  "definition_version": "reaction_templates.v1",
-  "schema_version": "1.2",
+  "definition_version": "reaction_templates.v2",
+  "schema_version": "2.0",
   "templates": [
     {
       "aliases": [
@@ -8,7 +8,7 @@
         "ketal formation"
       ],
       "atom_element_alternatives": [],
-      "definition_hash": "RTD1:4dc55d8df22662783579907f06bcd63147c0ca82",
+      "definition_hash": "RTD1:b7d147be6aeb61083c77d80e6d3230ae7be5a3e9",
       "display_name": "Carbonyl to dialkoxy",
       "edit_archetype": "substitution",
       "edit_component_count": 1,
@@ -120,7 +120,6 @@
       ],
       "product_label": "acetal",
       "provenance": "curated_minimum_mapped_reference",
-      "reaction_label": "Acetal formation",
       "roles": [
         {
           "atom_map_numbers": [
@@ -142,9 +141,10 @@
           "site_type": "pronucleophile_XH"
         }
       ],
-      "schema_version": "1.2",
+      "schema_version": "2.0",
       "status": "active",
       "template_id": "carbonyl_to_dialkoxy",
+      "template_label": "Acetal formation",
       "transformation_class": "carbonyl_diheteroatom_condensation"
     },
     {
@@ -162,7 +162,7 @@
           ]
         }
       ],
-      "definition_hash": "RTD1:75714469574d52235f3d9b0ca85ffbc201bec656",
+      "definition_hash": "RTD1:d9cd06055159f01a1b430727b562e909464f2f00",
       "display_name": "Darzens epoxide formation",
       "edit_archetype": "addition",
       "edit_component_count": 1,
@@ -280,7 +280,6 @@
       ],
       "product_label": "glycidic ester",
       "provenance": "curated_minimum_mapped_reference",
-      "reaction_label": "Darzens reaction",
       "roles": [
         {
           "atom_map_numbers": [
@@ -303,9 +302,10 @@
           "site_type": "electrophilic_center"
         }
       ],
-      "schema_version": "1.2",
+      "schema_version": "2.0",
       "status": "active",
       "template_id": "darzens_epoxide_formation",
+      "template_label": "Darzens reaction",
       "transformation_class": "carbonyl_epoxide_condensation"
     }
   ]

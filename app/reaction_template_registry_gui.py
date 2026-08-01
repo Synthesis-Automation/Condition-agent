@@ -57,7 +57,7 @@ def _format_template(template: ReactionTemplate) -> str:
         f"Name: {template.display_name}",
         f"Status: {template.status}",
         f"Family: {template.family_id or 'unassigned'}",
-        f"Reaction label: {template.reaction_label}",
+        f"Template label: {template.template_label}",
         f"Product label: {template.product_label}",
         f"Transformation: {template.transformation_class or 'unassigned'}",
         f"Edit archetype: {template.edit_archetype}",
@@ -126,17 +126,17 @@ def _format_reaction_analysis(analysis: object) -> str:
     """Render a full reaction analysis without exposing raw nested JSON."""
     completeness = getattr(analysis, "reaction_completeness", None)
     signature = getattr(analysis, "reaction_signature", None)
-    display_label = getattr(analysis, "display_label", None)
+    reaction_label = getattr(analysis, "reaction_label", None)
     lines = [
         "REACTION FEATURIZATION",
         "",
         f"Input: {getattr(analysis, 'input_reaction_smiles', '')}",
         f"Status: {'valid' if getattr(analysis, 'valid', False) else 'invalid'}",
         f"Evidence: {getattr(analysis, 'evidence_quality', 'unresolved')}",
-        f"Reaction: {getattr(analysis, 'reaction_label', None) or 'unavailable'}",
+        f"Reaction: {reaction_label.concise if reaction_label else 'unavailable'}",
         (
             "Structural label: "
-            f"{getattr(display_label, 'structural_label', None) or 'unavailable'}"
+            f"{getattr(reaction_label, 'structural_label', None) or 'unavailable'}"
         ),
         (
             "Transformation: "
@@ -277,7 +277,7 @@ def _format_match_section(result: object) -> str:
         if interpretation is not None:
             lines.extend(
                 (
-                    f"    Reaction label: {interpretation.reaction_label}",
+                    f"    Template label: {interpretation.template_label}",
                     f"    Structural label: "
                     f"{interpretation.structural_label}",
                     "    Bound roles:",
@@ -345,9 +345,9 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         self.aliases_edit.setPlaceholderText(
             "comma-separated aliases (optional)"
         )
-        self.reaction_label_edit = QtWidgets.QLineEdit()
-        self.reaction_label_edit.setObjectName("reactionLabel")
-        self.reaction_label_edit.setPlaceholderText(
+        self.template_label_edit = QtWidgets.QLineEdit()
+        self.template_label_edit.setObjectName("templateLabel")
+        self.template_label_edit.setPlaceholderText(
             "Acetal formation (defaults to name)"
         )
         self.product_label_edit = QtWidgets.QLineEdit()
@@ -490,10 +490,10 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
         form.addRow("Family", family_row)
         form.addRow("Aliases", self.aliases_edit)
         label_row = QtWidgets.QHBoxLayout()
-        label_row.addWidget(self.reaction_label_edit)
+        label_row.addWidget(self.template_label_edit)
         label_row.addWidget(QtWidgets.QLabel("Product"))
         label_row.addWidget(self.product_label_edit)
-        form.addRow("Reaction label", label_row)
+        form.addRow("Template label", label_row)
         generalization_row = QtWidgets.QHBoxLayout()
         generalization_row.addWidget(self.role_labels_edit)
         generalization_row.addWidget(QtWidgets.QLabel("Atom alternatives"))
@@ -601,8 +601,8 @@ class ReactionTemplateRegistryWindow(QtWidgets.QMainWindow):
                 display_name=self.name_edit.text().strip(),
                 family_id=self.family_edit.text().strip() or None,
                 aliases=aliases,
-                reaction_label=(
-                    self.reaction_label_edit.text().strip() or None
+                template_label=(
+                    self.template_label_edit.text().strip() or None
                 ),
                 product_label=(
                     self.product_label_edit.text().strip() or None

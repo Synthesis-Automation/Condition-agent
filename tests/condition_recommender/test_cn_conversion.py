@@ -4,12 +4,16 @@ from condition_recommender.models import AdmissionTier
 
 def _row(reaction: str, **updates: str) -> dict[str, str]:
     row = {
-        "reaction_id": "cn-1", "reaction_type": "C_N_Coupling",
-        "reaction_smiles": reaction, "yield_pct": "80",
-        "catalyst_cas": "14221-01-3", "reagent_cas": "584-08-7",
+        "reaction_id": "cn-1",
+        "reaction_type": "C_N_Coupling",
+        "reaction_smiles": reaction,
+        "yield_pct": "80",
+        "catalyst_cas": "14221-01-3",
+        "reagent_cas": "584-08-7",
         "solvent_cas": "108-88-3",
     }
-    row.update(updates); return row
+    row.update(updates)
+    return row
 
 
 def test_exact_cn_record_is_verified() -> None:
@@ -25,7 +29,7 @@ def test_exact_cn_record_is_verified() -> None:
 def test_partial_cn_record_keeps_product_empty() -> None:
     record = convert_row(_row("Brc1ccccc1.CNC>>c1ccccc1"), 2)
     assert record.admission_tier == AdmissionTier.REVIEW
-    assert record.reaction_label.endswith("→")
+    assert record.reaction_label["concise"].endswith("→")
     assert record.product_connection is None
 
 

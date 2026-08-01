@@ -64,7 +64,6 @@ def _precedent_reaction_context(
         "reaction_id": precedent.reaction_id,
         "reaction_smiles": precedent.reaction_smiles,
         "reaction_label": precedent.reaction_label or None,
-        "reaction_label_status": precedent.reaction_label_status,
         "spectator_groups": spectators,
         "reaction_partners": partners,
         "fallback_evidence_mode": fallback.get("evidence_mode") or None,

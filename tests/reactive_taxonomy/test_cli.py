@@ -20,7 +20,9 @@ def test_molecule_and_reaction_json(capsys) -> None:
     assert main(["reaction", reaction, "--format", "json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["evidence_quality"] == "exact_product_reconstruction"
-    assert payload["reaction_label"] == "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
+    assert payload["reaction_label"]["concise"] == (
+        "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
+    )
 
 
 def test_concise_molecule_and_reaction_output(capsys) -> None:
@@ -224,7 +226,7 @@ def test_batch_autodetects_clean_reaction_column(tmp_path, capsys) -> None:
         assert reader.fieldnames is not None
         smiles_index = reader.fieldnames.index("rxn_smiles_clean")
         assert reader.fieldnames[smiles_index + 1 : smiles_index + 3] == [
-            "reaction_label",
+            "reaction_display_label",
             "spectator_groups",
         ]
         rows = list(reader)
@@ -270,7 +272,7 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
         assert reader.fieldnames is not None
         assert reader.fieldnames[:4] == [
             "reaction_smiles",
-            "reaction_label",
+            "reaction_display_label",
             "partner_analysis",
             "spectator_groups",
         ]
@@ -278,7 +280,7 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
         assert "reaction_core_quality_status" in reader.fieldnames
         assert "reaction_core_state_changes" in reader.fieldnames
         assert "reaction_core_remote_subgraphs" in reader.fieldnames
-        assert "reaction_label_detailed" in reader.fieldnames
+        assert "reaction_display_label_detailed" in reader.fieldnames
         assert "formed_ring_sizes" in reader.fieldnames
         assert "ring_count_delta" in reader.fieldnames
         assert "ring_change_count" in reader.fieldnames
@@ -329,7 +331,7 @@ def test_batch_reaction_csv_exposes_minimized_core(tmp_path, capsys) -> None:
         row = next(csv.DictReader(handle))
 
     assert row["reaction_core_available"] == "True"
-    assert row["reaction_core_raw_label"] == (
+    assert row["reaction_core_raw_equation"] == (
         "C(H)(Ar)(=O) + O(H)(R) → C(H)(Ar)(O-R)2"
     )
     assert row["reaction_core_evidence_status"] == "verified"

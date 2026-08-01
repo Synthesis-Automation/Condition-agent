@@ -44,10 +44,10 @@ def test_grammars_use_general_role_relationships() -> None:
 def test_unmapped_intramolecular_cn_cyclization_is_exactly_reconstructed() -> None:
     result = featurize_reaction(INTRAMOLECULAR_CN)
 
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "intramolecular (5-membered ring) Ar–Br / R–NH2 → Ar–NH–R"
     )
-    assert result.reaction_label_status == "exact_product"
+    assert result.reaction_label.status == "exact_reconstruction"
     assert result.transformation_class == "sp2_c_n_substitution"
     assert result.reaction_topology is not None
     assert result.reaction_topology.reaction_scope == "intramolecular"
@@ -78,7 +78,10 @@ def test_shared_substitution_grammars_support_intramolecular_closure(
 ) -> None:
     result = featurize_reaction(reaction)
 
-    assert result.reaction_label_status == "exact_product"
+    assert result.reaction_label.status in {
+        "exact_reconstruction",
+        "family_overlay",
+    }
     assert result.transformation_class == transformation_class
     assert result.reaction_topology is not None
     assert result.reaction_topology.reaction_scope == "intramolecular"
@@ -107,10 +110,10 @@ def test_mapped_unknown_intramolecular_reaction_gets_generic_topology_label() ->
     )
 
     assert result.selected_candidate is None
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "intramolecular (5-membered ring) C–C substitution"
     )
-    assert result.reaction_label_status == "mapped_generic_pattern"
+    assert result.reaction_label.status == "generic_pattern"
     assert result.reaction_topology is not None
     assert result.reaction_topology.role_component_indices == {}
     assert result.reaction_topology.reaction_scope == "intramolecular"
@@ -173,13 +176,13 @@ def test_generic_ring_observation_and_renderer_cover_cycloadditions(
     assert change.source_component_indices == (0, 1)
     assert change.formed_bond_types == formed_bonds
     assert change.aromatic_after is aromatic
-    assert result.reaction_label == label
-    assert result.reaction_label_status == "ring_formation"
-    assert result.display_label is not None
-    assert result.display_label.status == "ring_formation"
-    assert result.display_label.source == "generic_topology"
-    assert "key connectivity:" in result.display_label.detailed
-    assert "raw edits:" in result.display_label.detailed
+    assert result.reaction_label.concise == label
+    assert result.reaction_label.status == "ring_formation"
+    assert result.reaction_label is not None
+    assert result.reaction_label.status == "ring_formation"
+    assert result.reaction_label.source == "generic_topology"
+    assert "key connectivity:" in result.reaction_label.detailed
+    assert "raw edits:" in result.reaction_label.detailed
 
 
 def test_ring_renderer_is_reactant_order_invariant() -> None:
@@ -225,7 +228,7 @@ def test_mapped_and_unmapped_topology_signatures_are_identical() -> None:
 def test_topology_serializes_in_analysis_and_signature() -> None:
     payload = featurize_reaction(INTRAMOLECULAR_CN).to_dict()
 
-    assert payload["schema_version"] == "4.0"
+    assert payload["schema_version"] == "5.0"
     assert payload["reaction_topology"]["reaction_scope"] == "intramolecular"
     assert payload["reaction_topology"]["formed_ring_sizes"] == (5,)
     assert payload["reaction_signature"]["schema_version"] == "3.2"

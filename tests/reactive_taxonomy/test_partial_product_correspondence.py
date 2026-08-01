@@ -9,22 +9,22 @@ def test_missing_chlorine_source_yields_partial_acyl_substitution() -> None:
     )
 
     assert result.valid
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "R–C(=O)–OH → R–C(=O)–Cl [Cl source missing]"
     )
-    assert result.reaction_label_status == "partial_product_correspondence"
+    assert result.reaction_label.status == "partial_product_correspondence"
     assert result.evidence_quality == "partial_product_correspondence"
     assert result.transformation_class == "acyl_heteroatom_substitution"
     assert result.named_family is None
     assert result.reaction_signature is None
     assert result.reaction_completeness.status == "incomplete"
-    assert result.display_label.status == "partial_product_correspondence"
-    assert result.display_label.detailed == (
+    assert result.reaction_label.status == "partial_product_correspondence"
+    assert result.reaction_label.detailed == (
         "R–C(=O)–OH → R–C(=O)–Cl; "
         "partial conserved-scaffold observation; "
         "the reactants do not account for Cl in the product."
     )
-    assert "Ar–I" not in result.reaction_label
+    assert "Ar–I" not in result.reaction_label.concise
 
     observation = result.partial_product_transformation
     assert observation is not None
@@ -55,11 +55,11 @@ def test_missing_chlorine_source_yields_partial_acyl_substitution() -> None:
 def test_partial_attachment_replacement_is_not_acyl_specific() -> None:
     result = featurize_reaction("CC(C)O>>CC(C)Cl")
 
-    assert result.reaction_label == "C–OH → C–Cl [Cl source missing]"
+    assert result.reaction_label.concise == "C–OH → C–Cl [Cl source missing]"
     assert result.transformation_class == "attachment_replacement"
     assert result.partial_product_transformation is not None
     assert result.reaction_signature is None
-    assert result.display_label.detailed.startswith(
+    assert result.reaction_label.detailed.startswith(
         "C–OH → C–Cl; partial conserved-scaffold observation;"
     )
 
@@ -70,11 +70,11 @@ def test_partial_replacement_ascii_label_is_deterministic() -> None:
         label_style="ascii",
     )
 
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "R-C(=O)-OH -> R-C(=O)-F [F source missing]"
     )
     assert result.partial_product_transformation is not None
-    assert result.display_label.detailed.startswith(
+    assert result.reaction_label.detailed.startswith(
         "R-C(=O)-OH -> R-C(=O)-F; partial conserved-scaffold observation;"
     )
 
@@ -89,12 +89,12 @@ def test_product_growth_without_attachment_exchange_is_not_forced() -> None:
 def test_missing_cyanide_source_retains_rooted_product_fragment() -> None:
     result = featurize_reaction("Brc1ccccc1>>N#Cc1ccccc1")
 
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "C–Br → C–C≡N [C, N source missing]"
     )
-    assert result.reaction_label_status == "partial_product_correspondence"
+    assert result.reaction_label.status == "partial_product_correspondence"
     assert result.reaction_signature is None
-    assert result.display_label.detailed.startswith(
+    assert result.reaction_label.detailed.startswith(
         "C–Br → C–C≡N; partial conserved-scaffold observation;"
     )
 
@@ -135,7 +135,7 @@ def test_missing_azide_source_retains_multi_atom_origin_gap() -> None:
 
     observation = result.partial_product_transformation
     assert observation is not None
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "C-Br -> C-[N-]=[N+]=N [N, N, N source missing]"
     )
     assert observation.installed_fragment.element_counts == {"N": 3}
@@ -195,7 +195,7 @@ def test_middle_side_cyanide_is_structural_support_not_invented_mapping() -> Non
     )
     assert len(agent_supported) == 2
     assert all(item.source_atom is None for item in agent_supported)
-    assert result.reaction_label.endswith(
+    assert result.reaction_label.concise.endswith(
         "[fragment source supported by agent]"
     )
     assert "PRODUCT_FRAGMENT_SOURCE_AGENT_SUPPORTED" in result.warnings
@@ -213,7 +213,7 @@ def test_multiple_structural_agent_sources_preserve_ambiguity() -> None:
     assert fragment.source_status == "ambiguous"
     assert len(fragment.source_candidates) == 2
     assert "AMBIGUOUS_PRODUCT_FRAGMENT_SOURCES" in result.warnings
-    assert result.reaction_label.endswith("[fragment source ambiguous]")
+    assert result.reaction_label.concise.endswith("[fragment source ambiguous]")
 
 
 def test_partial_nitrile_label_preserves_ascii_triple_bond_style() -> None:
@@ -222,7 +222,7 @@ def test_partial_nitrile_label_preserves_ascii_triple_bond_style() -> None:
         label_style="ascii",
     )
 
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "C-Br -> C-C#N [C, N source missing]"
     )
 

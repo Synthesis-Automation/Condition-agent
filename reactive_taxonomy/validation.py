@@ -43,7 +43,7 @@ def validate_taxonomy() -> List[str]:
         "reaction_label_patterns.v1",
         "reaction_label_rendering.v1",
         "reaction_rendering.v1",
-        "reaction_templates.v1",
+        "reaction_templates.v2",
         "reactivity_descriptor_rules.v1",
         "aromatic_systems.v1",
         "reactivity_rendering.v1",
@@ -178,7 +178,7 @@ def validate_taxonomy() -> List[str]:
             + ",".join(sorted(missing_manifest_files))
         )
     template_errors = validate_reaction_template_registry(
-        DEFINITIONS_DIR / "reaction_templates.v1.json"
+        DEFINITIONS_DIR / "reaction_templates.v2.json"
     )
     errors.extend(
         f"invalid_reaction_template_registry:{error}"

@@ -31,7 +31,7 @@ from .signature_features import environment_tokens
 from .fallback_similarity import fallback_index_tokens
 
 
-GENERIC_INDEX_SCHEMA_VERSION = "3.0"
+GENERIC_INDEX_SCHEMA_VERSION = "4.0"
 
 
 @dataclass(frozen=True)
@@ -61,8 +61,7 @@ class GenericIndexedReaction:
     outcome_status: str
     record_schema_version: str
     converter_definition_version: str
-    reaction_label: str = ""
-    reaction_label_status: str = "unavailable"
+    reaction_label: Dict[str, Any] = dataclass_field(default_factory=dict)
     fallback_descriptor: Dict[str, Any] = dataclass_field(default_factory=dict)
     fragment_source_support: Tuple[Dict[str, Any], ...] = ()
 
@@ -485,9 +484,10 @@ def build_generic_index(
                 converter_definition_version=str(
                     record.get("converter_definition_version") or ""
                 ),
-                reaction_label=str(record.get("reaction_label") or ""),
-                reaction_label_status=str(
-                    record.get("reaction_label_status") or "unavailable"
+                reaction_label=(
+                    dict(record.get("reaction_label") or {})
+                    if isinstance(record.get("reaction_label"), Mapping)
+                    else {}
                 ),
                 fallback_descriptor=(
                     dict(fallback_descriptor or {})
@@ -541,7 +541,6 @@ def _index_payload(index: GenericReactionIndex) -> Dict[str, Any]:
             "record_schema_version": row.record_schema_version,
             "converter_definition_version": row.converter_definition_version,
             "reaction_label": row.reaction_label,
-            "reaction_label_status": row.reaction_label_status,
             "fallback_descriptor": row.fallback_descriptor,
             "fragment_source_support": row.fragment_source_support,
         }
@@ -764,10 +763,7 @@ def load_persisted_generic_index(path: str | Path) -> GenericReactionIndex:
             outcome_status=str(row.get("outcome_status") or ""),
             record_schema_version=str(row["record_schema_version"]),
             converter_definition_version=str(row["converter_definition_version"]),
-            reaction_label=str(row.get("reaction_label") or ""),
-            reaction_label_status=str(
-                row.get("reaction_label_status") or "unavailable"
-            ),
+            reaction_label=dict(row.get("reaction_label") or {}),
             fallback_descriptor=dict(row.get("fallback_descriptor") or {}),
             fragment_source_support=tuple(
                 dict(value)

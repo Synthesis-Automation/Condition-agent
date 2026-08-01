@@ -43,14 +43,22 @@ from .models import GenericRecommendationResult
 from .recipe_ranking import rank_condition_recipes
 
 
+def _reaction_label_payload(analysis: Any) -> Dict[str, Any]:
+    """Serialize the one canonical rendered reaction label."""
+    return (
+        asdict(analysis.reaction_label)
+        if analysis.reaction_label is not None
+        else {}
+    )
+
+
 def recommend_indexed_signature(
     signature: Dict[str, Any],
     index: GenericReactionIndex,
     *,
     reaction_core: Mapping[str, Any] | None = None,
     query_reaction_smiles: str = "",
-    reaction_label: str | None = None,
-    reaction_label_status: str = "unavailable",
+    reaction_label: Mapping[str, Any] | None = None,
     top_k: int = 5,
     minimum_pool_size: int | None = None,
     retrieval_strategy: RetrievalStrategy = "hybrid",
@@ -58,8 +66,7 @@ def recommend_indexed_signature(
 ) -> GenericRecommendationResult:
     """Recommend from an existing signature and index without re-featurization."""
     query_context = {
-        "reaction_label": reaction_label,
-        "reaction_label_status": reaction_label_status,
+        "reaction_label": dict(reaction_label or {}),
         "spectator_groups": tuple(
             dict(group)
             for group in (signature.get("spectator_groups") or ())
@@ -334,8 +341,7 @@ def _recommend_with_index(
                 else None
             ),
             query_reaction_smiles=reaction_smiles,
-            reaction_label=analysis.reaction_label,
-            reaction_label_status=analysis.reaction_label_status,
+            reaction_label=_reaction_label_payload(analysis),
             top_k=top_k,
             minimum_pool_size=minimum_pool_size,
         )
@@ -381,16 +387,7 @@ def _recommend_core_with_index(
             valid=False,
             query_reaction_core_id=str(core.get("core_id") or "") or None,
             recommendation_mode="reaction_core_review",
-            reaction_label=(
-                analysis.reaction_label
-                or str(core.get("generic_label") or "")
-                or None
-            ),
-            reaction_label_status=(
-                analysis.reaction_label_status
-                if analysis.reaction_label
-                else "reaction_core_projection"
-            ),
+            reaction_label=_reaction_label_payload(analysis),
             transformation_class=analysis.transformation_class,
             retrieval_definition_version=str(rules["schema_version"]),
             retrieval_strategy="reaction_core_ladder",
@@ -460,16 +457,7 @@ def _recommend_core_with_index(
         valid=True,
         query_reaction_core_id=str(core.get("core_id") or "") or None,
         recommendation_mode="reaction_core_review",
-        reaction_label=(
-            analysis.reaction_label
-            or str(core.get("generic_label") or "")
-            or None
-        ),
-        reaction_label_status=(
-            analysis.reaction_label_status
-            if analysis.reaction_label
-            else "reaction_core_projection"
-        ),
+        reaction_label=_reaction_label_payload(analysis),
         transformation_class=analysis.transformation_class,
         spectator_groups=tuple(
             asdict(group) for group in analysis.spectator_groups
@@ -596,8 +584,7 @@ def _recommend_hypotheses_with_index(
             valid=False,
             query_edit_hypothesis_ids=hypothesis_ids,
             recommendation_mode="ambiguous_edit_hypotheses",
-            reaction_label=analysis.reaction_label,
-            reaction_label_status=analysis.reaction_label_status,
+            reaction_label=_reaction_label_payload(analysis),
             transformation_class=analysis.transformation_class,
             retrieval_definition_version=str(rules["schema_version"]),
             retrieval_strategy="edit_hypothesis_consensus",
@@ -660,8 +647,7 @@ def _recommend_hypotheses_with_index(
         valid=True,
         query_edit_hypothesis_ids=hypothesis_ids,
         recommendation_mode="ambiguous_edit_hypotheses",
-        reaction_label=analysis.reaction_label,
-        reaction_label_status=analysis.reaction_label_status,
+        reaction_label=_reaction_label_payload(analysis),
         transformation_class=analysis.transformation_class,
         retrieval_definition_version=str(rules["schema_version"]),
         retrieval_strategy="edit_hypothesis_consensus",
@@ -726,8 +712,7 @@ def _recommend_fallback_with_index(
             valid=False,
             query_fallback_descriptor_id=descriptor_id,
             recommendation_mode="abstained",
-            reaction_label=analysis.reaction_label,
-            reaction_label_status=analysis.reaction_label_status,
+            reaction_label=_reaction_label_payload(analysis),
             transformation_class=analysis.transformation_class,
             warnings=tuple(base_warnings),
             error="QUERY_NOT_ELIGIBLE_FOR_UNVERIFIED_FALLBACK",
@@ -743,8 +728,7 @@ def _recommend_fallback_with_index(
             valid=False,
             query_fallback_descriptor_id=descriptor_id,
             recommendation_mode="abstained",
-            reaction_label=analysis.reaction_label,
-            reaction_label_status=analysis.reaction_label_status,
+            reaction_label=_reaction_label_payload(analysis),
             transformation_class=analysis.transformation_class,
             warnings=tuple(
                 base_warnings + ["GENERIC_INDEX_REQUIRES_FALLBACK_FEATURE_REBUILD"]
@@ -763,8 +747,7 @@ def _recommend_fallback_with_index(
             valid=False,
             query_fallback_descriptor_id=descriptor_id,
             recommendation_mode="abstained",
-            reaction_label=analysis.reaction_label,
-            reaction_label_status=analysis.reaction_label_status,
+            reaction_label=_reaction_label_payload(analysis),
             transformation_class=analysis.transformation_class,
             retrieval_definition_version=retrieval_definition_version,
             retrieval_strategy="unverified_structure_fallback",
@@ -864,8 +847,7 @@ def _recommend_fallback_with_index(
             if unrestricted
             else "unverified_structure_fallback"
         ),
-        reaction_label=analysis.reaction_label,
-        reaction_label_status=analysis.reaction_label_status,
+        reaction_label=_reaction_label_payload(analysis),
         transformation_class=analysis.transformation_class,
         retrieval_definition_version=retrieval_definition_version,
         retrieval_strategy=(

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_display_labels import (
-    build_reaction_display_label,
+    _build_reaction_label,
     load_reaction_label_rendering,
 )
 from .reaction_models import (
@@ -61,7 +61,7 @@ def render_reaction(
         and selected.verification == "exact_product_reconstruction"
         and not interpretation_conflict
     )
-    rendered = build_reaction_display_label(
+    rendered = _build_reaction_label(
         reactants=observation.reactants,
         edits=observation.edits,
         selected_label=selected.grammar_label if selected_exact else None,

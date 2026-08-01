@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "4.1"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v4.0"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "5.0"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v5.0"
 
 
 class AdmissionTier(str, Enum):
@@ -129,8 +129,7 @@ class RecommendationRecord:
     admission_reasons: Tuple[str, ...]
     evidence_quality: str
     named_family: Optional[str]
-    reaction_label: Optional[str]
-    reaction_label_status: str
+    reaction_label: Optional[Dict[str, Any]]
     yield_pct: Optional[float]
     temperature_c: Optional[float]
     time_h: Optional[float]
@@ -151,7 +150,6 @@ class RecommendationRecord:
     reaction_edit_hypotheses: Tuple[Dict[str, Any], ...] = ()
     external_atom_mapping: Optional[Dict[str, Any]] = None
     fallback_descriptor: Optional[Dict[str, Any]] = None
-    reaction_display_label: Optional[Dict[str, Any]] = None
     reaction_observation: Optional[Dict[str, Any]] = None
     reaction_interpretation: Optional[Dict[str, Any]] = None
     fragment_source_support: Tuple[Dict[str, Any], ...] = ()
@@ -257,8 +255,7 @@ class GenericRecommendationResult:
     external_mapping_provider: Optional[str] = None
     external_mapping_confidence: Optional[float] = None
     recommendation_mode: str = "verified_signature"
-    reaction_label: Optional[str] = None
-    reaction_label_status: str = "unavailable"
+    reaction_label: Optional[Dict[str, Any]] = None
     named_family: Optional[str] = None
     transformation_class: Optional[str] = None
     spectator_groups: Tuple[Dict[str, Any], ...] = ()
@@ -275,7 +272,7 @@ class GenericRecommendationResult:
     recommendations: Tuple[GenericConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "2.4"
+    schema_version: str = "3.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

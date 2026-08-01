@@ -26,10 +26,10 @@ from .reaction_models import ReactionAtomReference, ReactionEdit
 from .reaction_parser import parse_reaction_smiles
 
 
-REACTION_TEMPLATE_SCHEMA_VERSION = "1.2"
-REACTION_TEMPLATE_DEFINITION_VERSION = "reaction_templates.v1"
+REACTION_TEMPLATE_SCHEMA_VERSION = "2.0"
+REACTION_TEMPLATE_DEFINITION_VERSION = "reaction_templates.v2"
 DEFAULT_REACTION_TEMPLATE_REGISTRY_PATH = (
-    Path(__file__).with_name("definitions") / "reaction_templates.v1.json"
+    Path(__file__).with_name("definitions") / "reaction_templates.v2.json"
 )
 
 _TEMPLATE_ID_RE = re.compile(r"^[a-z][a-z0-9_]{2,79}$")
@@ -135,7 +135,7 @@ class ReactionTemplate:
     display_name: str
     family_id: Optional[str]
     aliases: Tuple[str, ...]
-    reaction_label: str
+    template_label: str
     product_label: str
     mapped_reference_reaction: str
     participants: Tuple[ReactionTemplateParticipant, ...]
@@ -208,7 +208,7 @@ class TemplateReactionInterpretation:
 
     template_id: str
     family_id: Optional[str]
-    reaction_label: str
+    template_label: str
     structural_label: str
     product_label: str
     predicted_product_smiles: str
@@ -1227,7 +1227,7 @@ def _build_template_interpretation(
     return TemplateReactionInterpretation(
         template_id=template.template_id,
         family_id=template.family_id,
-        reaction_label=template.reaction_label,
+        template_label=template.template_label,
         structural_label=structural_label,
         product_label=template.product_label,
         predicted_product_smiles=outcome.predicted_product_smiles,
@@ -1671,7 +1671,7 @@ def derive_reaction_template(
     display_name: str,
     family_id: Optional[str] = None,
     aliases: Sequence[str] = (),
-    reaction_label: Optional[str] = None,
+    template_label: Optional[str] = None,
     product_label: Optional[str] = None,
     role_labels: Optional[Mapping[str, str]] = None,
     role_required_tokens: Optional[
@@ -1744,7 +1744,7 @@ def derive_reaction_template(
                 }
             )
         ),
-        reaction_label=str(reaction_label or display_name).strip(),
+        template_label=str(template_label or display_name).strip(),
         product_label=str(product_label or "product").strip(),
         mapped_reference_reaction=str(mapped_reaction_smiles).strip(),
         participants=_participants(parsed),
@@ -1799,8 +1799,8 @@ def reaction_template_from_dict(payload: Mapping[str, Any]) -> ReactionTemplate:
                 else None
             ),
             aliases=tuple(str(value) for value in payload.get("aliases") or ()),
-            reaction_label=str(
-                payload.get("reaction_label") or payload["display_name"]
+            template_label=str(
+                payload.get("template_label") or payload["display_name"]
             ),
             product_label=str(payload.get("product_label") or "product"),
             mapped_reference_reaction=str(payload["mapped_reference_reaction"]),
@@ -1900,8 +1900,8 @@ def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
         errors.append(f"{template.template_id}:invalid_template_id")
     if not template.display_name.strip():
         errors.append(f"{template.template_id}:missing_display_name")
-    if not template.reaction_label.strip():
-        errors.append(f"{template.template_id}:missing_reaction_label")
+    if not template.template_label.strip():
+        errors.append(f"{template.template_id}:missing_template_label")
     if not template.product_label.strip():
         errors.append(f"{template.template_id}:missing_product_label")
     if template.status not in _VALID_STATUS:
@@ -1974,7 +1974,7 @@ def validate_reaction_template(template: ReactionTemplate) -> Tuple[str, ...]:
             display_name=template.display_name,
             family_id=template.family_id,
             aliases=template.aliases,
-            reaction_label=template.reaction_label,
+            template_label=template.template_label,
             product_label=template.product_label,
             role_labels={
                 role.role_id: role.display_label

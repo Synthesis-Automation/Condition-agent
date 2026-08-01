@@ -93,7 +93,7 @@ def _command_import(args: argparse.Namespace) -> int:
         display_name=args.name,
         family_id=args.family,
         aliases=args.alias or (),
-        reaction_label=args.reaction_label,
+        template_label=args.template_label,
         product_label=args.product_label,
         role_labels=role_labels,
         role_required_tokens={
@@ -180,7 +180,7 @@ def _command_show(args: argparse.Namespace) -> int:
         print(f"id: {template.template_id}")
         print(f"name: {template.display_name}")
         print(f"family: {template.family_id or '-'}")
-        print(f"reaction label: {template.reaction_label}")
+        print(f"template label: {template.template_label}")
         print(f"product label: {template.product_label}")
         print(f"status: {template.status}")
         print(f"archetype: {template.edit_archetype}")
@@ -257,7 +257,7 @@ def _command_match(args: argparse.Namespace) -> int:
                 )
                 if match.interpretation is not None:
                     print(
-                        f"    label: {match.interpretation.reaction_label}"
+                        f"    label: {match.interpretation.template_label}"
                     )
                     print(
                         "    structure: "
@@ -316,7 +316,7 @@ def build_parser() -> argparse.ArgumentParser:
     import_parser.add_argument("--family")
     import_parser.add_argument("--alias", action="append")
     import_parser.add_argument(
-        "--reaction-label",
+        "--template-label",
         help="chemist-facing label; defaults to --name",
     )
     import_parser.add_argument(

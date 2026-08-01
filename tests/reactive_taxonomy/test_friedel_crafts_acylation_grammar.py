@@ -6,8 +6,8 @@ from reactive_taxonomy import featurize_reaction
 def test_acyl_chloride_and_benzene_reconstruct_aryl_ketone() -> None:
     result = featurize_reaction("c1ccccc1.CC(=O)Cl>>CC(=O)c1ccccc1")
 
-    assert result.reaction_label == "R–C(O)Cl + Ar–H → Ar–C(O)–R"
-    assert result.reaction_label_status == "exact_product"
+    assert result.reaction_label.concise == "R–C(O)Cl + Ar–H → Ar–C(O)–R"
+    assert result.reaction_label.status == "family_overlay"
     assert result.transformation_class == "aromatic_c_h_acylation"
     assert result.named_family == "friedel_crafts_acylation"
     assert result.evidence_quality == "exact_product_reconstruction"
@@ -17,13 +17,13 @@ def test_acyl_chloride_and_benzene_reconstruct_aryl_ketone() -> None:
 def test_two_aryl_fragments_keep_role_provenance_in_product_label() -> None:
     result = featurize_reaction("O=C(Cl)c1ccccc1.c1ccccc1>>O=C(c1ccccc1)c1ccccc1")
 
-    assert result.reaction_label == ("Ar1–C(O)Cl + Ar2–H → Ar2–C(O)–Ar1")
+    assert result.reaction_label.concise == ("Ar1–C(O)Cl + Ar2–H → Ar2–C(O)–Ar1")
 
 
 def test_acid_anhydride_is_an_activated_acyl_partner() -> None:
     result = featurize_reaction("CC(=O)OC(=O)C.c1ccccc1>>CC(=O)c1ccccc1")
 
-    assert result.reaction_label == ("R–C(O)OC(O)R + Ar–H → Ar–C(O)–R")
+    assert result.reaction_label.concise == ("R–C(O)OC(O)R + Ar–H → Ar–C(O)–R")
     assert result.named_family == "friedel_crafts_acylation"
 
 
@@ -50,7 +50,7 @@ def test_non_acylated_product_does_not_verify() -> None:
     assert result.selected_candidate is None
     assert result.named_family is None
     assert result.evidence_quality == "global_atom_correspondence"
-    assert result.reaction_label_status == "observed_edit_summary"
+    assert result.reaction_label.status == "observed_edits"
     assert result.transformation_class == "generic_graph_transformation"
 
 
@@ -102,7 +102,7 @@ def test_mapping_operator_conflict_remains_visible() -> None:
         "[c:8]([CH3:9])[cH:10][cH:11]1"
     )
 
-    assert result.reaction_label_status == "conflicting_edit_summary"
+    assert result.reaction_label.status == "conflicting_evidence"
     assert result.evidence_quality == "conflicting_edit_evidence"
     assert "MAPPING_RECONSTRUCTION_CONFLICT" in result.warnings
 

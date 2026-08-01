@@ -287,9 +287,9 @@ def _review_html(rows: Sequence[Mapping[str, Any]]) -> str:
             + str(row["diagram"])
             + "<p><b>Orange:</b> reactant edit atoms; <b>green:</b> mapped product atoms.</p>"
             + "<p><b>Reaction label:</b> "
-            + html.escape(str(row["reaction_label"]))
+            + html.escape(str(row["reaction_display_label"]))
             + "</p><p><b>Structured-label status:</b> "
-            + html.escape(str(row["display_label_status"]))
+            + html.escape(str(row["reaction_display_status"]))
             + "</p><p><b>Observed edits:</b> "
             + html.escape(str(row["edit_descriptions"]))
             + "</p><p><b>Edit evidence:</b> "
@@ -412,9 +412,9 @@ def evaluate_reaction_edits(
         partition_counts[partition]["passed"] += int(case_passed)
         descriptions = (
             "; ".join(
-                clause.detailed for clause in result.display_label.clauses
+                clause.detailed for clause in result.reaction_label.clauses
             )
-            if result.display_label is not None and result.display_label.clauses
+            if result.reaction_label is not None and result.reaction_label.clauses
             else "none"
         )
         case_results.append(
@@ -447,9 +447,14 @@ def evaluate_reaction_edits(
                 "case_id": case["case_id"],
                 "partition": partition,
                 "reaction_smiles": reaction_smiles,
-                "reaction_label": result.reaction_label or "",
-                "display_label_status": (
-                    result.display_label.status if result.display_label else "unavailable"
+                "reaction_display_label": (
+                    result.reaction_label.concise if result.reaction_label else ""
+                ),
+                "reaction_display_label_detailed": (
+                    result.reaction_label.detailed if result.reaction_label else ""
+                ),
+                "reaction_display_status": (
+                    result.reaction_label.status if result.reaction_label else "unavailable"
                 ),
                 "edit_descriptions": descriptions,
                 "edit_evidence": observed_evidence,

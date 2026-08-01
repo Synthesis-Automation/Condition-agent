@@ -353,6 +353,11 @@ def recommend_conditions_from_labels(
             False,
             error=analysis.error or "INVALID_REACTION",
         )
+    query_label = (
+        analysis.reaction_label.concise
+        if analysis.reaction_label is not None
+        else None
+    )
     if (
         analysis.evidence_quality != "exact_product_reconstruction"
         or analysis.selected_candidate is None
@@ -360,7 +365,7 @@ def recommend_conditions_from_labels(
         return LabelRecommendationResult(
             reaction_smiles,
             False,
-            query_label=analysis.reaction_label,
+            query_label=query_label,
             error="QUERY_REACTION_NOT_EXACTLY_VERIFIED",
         )
 
@@ -373,7 +378,7 @@ def recommend_conditions_from_labels(
         return LabelRecommendationResult(
             reaction_smiles,
             False,
-            query_label=analysis.reaction_label,
+            query_label=query_label,
             grammar_id=selected.grammar_id,
             warnings=("LABEL_DATASET_HAS_NO_REACTION_TOPOLOGY",),
             error="QUERY_TOPOLOGY_NOT_SUPPORTED_BY_LABEL_DATASET",
@@ -385,7 +390,7 @@ def recommend_conditions_from_labels(
         return LabelRecommendationResult(
             reaction_smiles,
             False,
-            query_label=analysis.reaction_label,
+            query_label=query_label,
             grammar_id=selected.grammar_id,
             error="QUERY_GRAMMAR_NOT_SUPPORTED_BY_LABEL_DATASET",
         )
@@ -394,7 +399,7 @@ def recommend_conditions_from_labels(
         return LabelRecommendationResult(
             reaction_smiles,
             False,
-            query_label=analysis.reaction_label,
+            query_label=query_label,
             grammar_id=selected.grammar_id,
             error="QUERY_REQUIRES_TWO_REACTIVE_PARTICIPANTS",
         )
@@ -408,7 +413,7 @@ def recommend_conditions_from_labels(
         return LabelRecommendationResult(
             reaction_smiles,
             False,
-            query_label=analysis.reaction_label,
+            query_label=query_label,
             grammar_id=selected.grammar_id,
             query_signatures=tuple(item.signature for item in participants),
             error="NO_FAMILY_COMPATIBLE_PRECEDENTS",
@@ -418,7 +423,7 @@ def recommend_conditions_from_labels(
         return LabelRecommendationResult(
             reaction_smiles,
             False,
-            query_label=analysis.reaction_label,
+            query_label=query_label,
             grammar_id=selected.grammar_id,
             query_signatures=tuple(item.signature for item in participants),
             candidate_count=len(rows),
@@ -428,7 +433,7 @@ def recommend_conditions_from_labels(
     return LabelRecommendationResult(
         query_reaction_smiles=reaction_smiles,
         valid=True,
-        query_label=analysis.reaction_label,
+        query_label=query_label,
         grammar_id=selected.grammar_id,
         query_signatures=tuple(item.signature for item in participants),
         candidate_count=len(rows),

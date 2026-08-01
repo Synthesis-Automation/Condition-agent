@@ -53,7 +53,7 @@ def _acetal_template(*, status: str = "active"):
         display_name="Carbonyl to dialkoxy",
         family_id="acetalization",
         aliases=("acetal formation",),
-        reaction_label="Acetal formation",
+        template_label="Acetal formation",
         product_label="acetal",
         transformation_class="carbonyl_diheteroatom_condensation",
         status=status,  # type: ignore[arg-type]
@@ -67,7 +67,7 @@ def _darzens_template(*, status: str = "active"):
         display_name="Darzens epoxide formation",
         family_id="darzens_reaction",
         aliases=("Darzens condensation",),
-        reaction_label="Darzens reaction",
+        template_label="Darzens reaction",
         product_label="glycidic ester",
         role_labels={"activated_sp3_carbon": "α-halo ester"},
         role_required_tokens={
@@ -197,7 +197,7 @@ def test_importer_rejects_disconnected_multi_event_reference() -> None:
 
 
 def test_registry_round_trip_and_explicit_replace(tmp_path) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     template = _acetal_template()
     upsert_reaction_template(template, path)
 
@@ -219,7 +219,7 @@ def test_registry_round_trip_and_explicit_replace(tmp_path) -> None:
 
 
 def test_query_signature_is_derived_and_template_is_interpretive(tmp_path) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     template = _acetal_template()
     upsert_reaction_template(template, path)
 
@@ -238,7 +238,7 @@ def test_query_signature_is_derived_and_template_is_interpretive(tmp_path) -> No
 def test_minimum_acetal_template_matches_requested_incomplete_example(
     tmp_path,
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     template = _acetal_template()
     upsert_reaction_template(template, path)
 
@@ -267,7 +267,7 @@ def test_minimum_acetal_template_matches_requested_incomplete_example(
     assert result.matches[0].inferred_multiplicity is True
     interpretation = result.matches[0].interpretation
     assert interpretation is not None
-    assert interpretation.reaction_label == "Acetal formation"
+    assert interpretation.template_label == "Acetal formation"
     assert interpretation.structural_label == (
         "R–CH=O + 2 × R–OH → acetal"
     )
@@ -305,7 +305,7 @@ def test_minimum_acetal_template_matches_requested_incomplete_example(
 def test_explicit_second_alcohol_upgrades_reconstruction_evidence(
     tmp_path,
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     template = _acetal_template()
     upsert_reaction_template(template, path)
 
@@ -337,7 +337,7 @@ def test_explicit_second_alcohol_upgrades_reconstruction_evidence(
 def test_same_template_reconstructs_a_ketal_with_repeated_methanol(
     tmp_path,
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     upsert_reaction_template(_acetal_template(), path)
 
     result = match_reaction_templates(
@@ -355,7 +355,7 @@ def test_same_template_reconstructs_a_ketal_with_repeated_methanol(
 def test_center_match_does_not_claim_exact_reconstruction_for_wrong_alcohol(
     tmp_path,
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     upsert_reaction_template(_acetal_template(), path)
 
     result = match_reaction_templates(
@@ -375,7 +375,7 @@ def test_center_match_does_not_claim_exact_reconstruction_for_wrong_alcohol(
 def test_equivalent_template_families_preserve_interpretation_ambiguity(
     tmp_path,
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     first = _acetal_template()
     second = derive_reaction_template(
         ACETAL_REFERENCE,
@@ -408,7 +408,7 @@ def test_equivalent_template_families_preserve_interpretation_ambiguity(
 def test_acetal_template_does_not_match_hemiacetal_or_reduction(
     tmp_path,
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     upsert_reaction_template(_acetal_template(), path)
 
     hemiacetal = match_reaction_templates(
@@ -424,7 +424,7 @@ def test_acetal_template_does_not_match_hemiacetal_or_reduction(
 def test_darzens_template_labels_and_profiles_exact_chloro_query(
     tmp_path,
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     template = _darzens_template()
     upsert_reaction_template(template, path)
 
@@ -439,7 +439,7 @@ def test_darzens_template_labels_and_profiles_exact_chloro_query(
     assert match.evidence == "query_derived_edit_fingerprint"
     assert match.confidence == 1.0
     assert match.interpretation is not None
-    assert match.interpretation.reaction_label == "Darzens reaction"
+    assert match.interpretation.template_label == "Darzens reaction"
     assert match.interpretation.structural_label == (
         "α-halo ester + R–CH=O → glycidic ester"
     )
@@ -479,7 +479,7 @@ def test_darzens_curated_halide_and_carbonyl_generalization(
     reaction: str,
     carbonyl_label: str,
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     upsert_reaction_template(_darzens_template(), path)
 
     result = match_reaction_templates(reaction, path=path)
@@ -498,7 +498,7 @@ def test_darzens_curated_halide_and_carbonyl_generalization(
 
 
 def test_darzens_match_is_reactant_order_invariant(tmp_path) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     upsert_reaction_template(_darzens_template(), path)
 
     forward = match_reaction_templates(DARZENS_QUERY, path=path)
@@ -516,7 +516,7 @@ def test_darzens_match_is_reactant_order_invariant(tmp_path) -> None:
 
 
 def test_darzens_rejects_missing_activation_and_wrong_product(tmp_path) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     upsert_reaction_template(_darzens_template(), path)
 
     missing_activation = match_reaction_templates(
@@ -538,7 +538,7 @@ def test_darzens_rejects_missing_activation_and_wrong_product(tmp_path) -> None:
 
 
 def test_drafts_require_explicit_query_opt_in(tmp_path) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     upsert_reaction_template(_acetal_template(status="draft"), path)
 
     assert match_reaction_templates(ACETAL_REFERENCE, path=path).matches == ()
@@ -554,7 +554,7 @@ def test_drafts_require_explicit_query_opt_in(tmp_path) -> None:
 def test_reaction_template_cli_import_list_validate_show_and_match(
     tmp_path, capsys
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     common = ["--registry", str(path)]
     assert template_cli_main(
         [
@@ -568,7 +568,7 @@ def test_reaction_template_cli_import_list_validate_show_and_match(
             "Carbonyl to dialkoxy",
             "--family",
             "acetalization",
-            "--reaction-label",
+            "--template-label",
             "Acetal formation",
             "--product-label",
             "acetal",
@@ -582,7 +582,7 @@ def test_reaction_template_cli_import_list_validate_show_and_match(
     assert imported["saved"] is True
     assert imported["template"]["edit_component_count"] == 1
     assert imported["template"]["roles"][0]["role_id"] == "carbonyl"
-    assert imported["template"]["reaction_label"] == "Acetal formation"
+    assert imported["template"]["template_label"] == "Acetal formation"
 
     assert template_cli_main([*common, "validate", "--format", "json"]) == 0
     assert json.loads(capsys.readouterr().out)["valid"] is True
@@ -640,7 +640,7 @@ def test_reaction_template_cli_imports_generalized_darzens_template(
     tmp_path,
     capsys,
 ) -> None:
-    path = tmp_path / "reaction_templates.v1.json"
+    path = tmp_path / "reaction_templates.v2.json"
     common = ["--registry", str(path)]
 
     assert template_cli_main(
@@ -655,7 +655,7 @@ def test_reaction_template_cli_imports_generalized_darzens_template(
             "Darzens epoxide formation",
             "--family",
             "darzens_reaction",
-            "--reaction-label",
+            "--template-label",
             "Darzens reaction",
             "--product-label",
             "glycidic ester",

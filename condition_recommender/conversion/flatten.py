@@ -31,6 +31,7 @@ GENERIC_REVIEW_FIELDS = (
     "outcome_status",
     "index_eligibility",
     "reaction_smiles",
+    "reaction_core_label",
     "canonical_reaction_smiles",
     "evidence_quality",
     "reaction_completeness_status",
@@ -53,12 +54,9 @@ GENERIC_REVIEW_FIELDS = (
     "reaction_display_label",
     "reaction_display_label_detailed",
     "reaction_display_source",
+    "reaction_display_status",
     "reaction_display_confidence",
     "reaction_display_warnings",
-    "reaction_core_raw_label",
-    "reaction_label_status",
-    "reaction_display_label_status",
-    "reaction_display_label_json",
     "yield_pct",
     "temperature_c",
     "time_h",
@@ -99,7 +97,7 @@ GENERIC_REVIEW_FIELDS = (
     "reaction_core_state_changes",
     "reaction_core_chemist_summary",
     "reaction_core_motif_key",
-    "reaction_core_general_label",
+    "reaction_core_general_equation",
     "reaction_core_limiter",
     "reaction_core_evidence_status",
     "reaction_core_json",
@@ -147,6 +145,9 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "outcome_status": record.outcome_status.value,
         "index_eligibility": record.index_eligibility.value,
         "reaction_smiles": record.reaction_smiles,
+        "reaction_core_label": (
+            (record.reaction_core or {}).get("generic_label", "")
+        ),
         "canonical_reaction_smiles": record.canonical_reaction_smiles or "",
         "evidence_quality": record.evidence_quality,
         "reaction_completeness_status": completeness.get("status", ""),
@@ -216,31 +217,18 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
         "named_family": record.named_family or "",
         "family_confidence": record.family_confidence,
         "reaction_display_label": (
-            record.reaction_display_label.get("concise", "")
-            if record.reaction_display_label
+            record.reaction_label.get("concise", "")
+            if record.reaction_label
             else ""
-        )
-        or record.reaction_label
-        or "",
-        "reaction_label_status": record.reaction_label_status,
-        "reaction_display_label_status": (
-            record.reaction_display_label.get("status", "")
-            if record.reaction_display_label
+        ),
+        "reaction_display_status": (
+            record.reaction_label.get("status", "")
+            if record.reaction_label
             else ""
         ),
         "reaction_display_label_detailed": (
-            record.reaction_display_label.get("detailed", "")
-            if record.reaction_display_label
-            else ""
-        ),
-        "reaction_display_label_json": (
-            json.dumps(
-                record.reaction_display_label,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-            )
-            if record.reaction_display_label
+            record.reaction_label.get("detailed", "")
+            if record.reaction_label
             else ""
         ),
         "yield_pct": record.yield_pct if record.yield_pct is not None else "",
@@ -270,18 +258,18 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
             else ""
         ),
         "reaction_display_source": (
-            record.reaction_display_label.get("source", "")
-            if record.reaction_display_label
+            record.reaction_label.get("source", "")
+            if record.reaction_label
             else ""
         ),
         "reaction_display_confidence": (
-            record.reaction_display_label.get("confidence", "")
-            if record.reaction_display_label
+            record.reaction_label.get("confidence", "")
+            if record.reaction_label
             else ""
         ),
         "reaction_display_warnings": _joined(
-            record.reaction_display_label.get("warnings", ())
-            if record.reaction_display_label
+            record.reaction_label.get("warnings", ())
+            if record.reaction_label
             else ()
         ),
         **flattened_ring_change_fields(record.reaction_signature),

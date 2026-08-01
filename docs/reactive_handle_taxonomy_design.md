@@ -1218,7 +1218,11 @@ Retained electrophile context:
 {
   "reaction_class": "C_N_coupling",
   "reaction_family": "buchwald_hartwig_cn",
-  "reaction_label": "Ar–Br + Ar–NH2 → Ar1Ar2–NH",
+  "reaction_label": {
+    "concise": "Ar–Br + Ar–NH2 → Ar1Ar2–NH",
+    "detailed": "Ar–Br + Ar–NH2 → Ar1Ar2–NH; C–Br cleavage; C–N formation",
+    "status": "family_overlay"
+  },
   "roles": {
     "electrophile": "LG|Ar|Br",
     "nucleophile": "XH|N|H2|Ar"

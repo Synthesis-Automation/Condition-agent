@@ -227,7 +227,7 @@ def featurize_reaction(
             style=label_style,
         )
         fallback_status = "partial_product_correspondence"
-    elif selected is None and candidates and not product_contradicted_candidates:
+    elif selected is None and candidates:
         exact_candidate_indices = tuple(
             index
             for index, candidate in enumerate(candidates)
@@ -254,16 +254,21 @@ def featurize_reaction(
         )
         if len(reactant_labels) == 1:
             fallback_label = f"{reactant_labels[0]} {display_arrow}"
-            fallback_status = "reactant_only"
+            fallback_status = (
+                "product_contradicted_reactants"
+                if product_contradicted_candidates
+                else "reactant_only"
+            )
         elif reactant_labels:
             fallback_label = (
                 " OR ".join(f"({label})" for label in reactant_labels)
                 + f" {display_arrow}"
             )
-            fallback_status = "ambiguous_reactants"
-    elif product_contradicted_candidates:
-        fallback_label = None
-        fallback_status = "product_contradicted_candidates"
+            fallback_status = (
+                "product_contradicted_reactants"
+                if product_contradicted_candidates
+                else "ambiguous_reactants"
+            )
     elif selected is not None and product_connection is not None:
         reactants_label = render_reactant_label(
             selected.role_assignments, style=label_style

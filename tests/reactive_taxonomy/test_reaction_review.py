@@ -17,7 +17,7 @@ def test_review_summary_combines_detailed_and_graphic_labels() -> None:
 
     assert summary.schema_version == REACTION_REVIEW_SUMMARY_SCHEMA_VERSION
     assert "H₂C=CH₂ → H₃C–CH₃" in summary.detailed_reaction_label
-    assert summary.graphic_reaction_label == "C=C → C–C"
+    assert summary.reaction_core_equation == "C=C → C–C"
     assert "unsaturated partner" in summary.electronic_steric_analysis
     assert "access open" in summary.electronic_steric_analysis
 
@@ -28,7 +28,6 @@ def test_live_analysis_and_serialized_record_share_review_rendering() -> None:
     )
     live = build_reaction_review_summary(analysis)
     serialized = analysis.to_dict()
-    serialized["reaction_display_label"] = serialized.pop("display_label")
     record = build_reaction_review_summary(serialized)
 
     assert record == live
@@ -69,13 +68,13 @@ def test_review_summary_shows_general_motif_and_specific_limiter() -> None:
     summary = build_reaction_review_summary(analysis)
     rendered = format_reaction_review_summary(summary)
 
-    assert summary.graphic_reaction_label == (
+    assert summary.reaction_core_equation == (
         "R–C(=O)OH + Ar–H → R–Ar"
     )
-    assert summary.graphic_core_limiter == (
+    assert summary.core_limiter == (
         "R = R′–CH₂– (primary alkyl); Ar = HetAr"
     )
-    assert summary.atom_level_core_label == (
+    assert summary.atom_level_core_equation == (
         "C(H)2(R)(C(=O)(O-H)) + C(H)(:HetAr)2 → C(H)2(R)(ArC)"
     )
     assert "Graphic core limiter:" in rendered

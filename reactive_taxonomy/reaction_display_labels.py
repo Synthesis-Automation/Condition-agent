@@ -32,7 +32,7 @@ def load_reaction_label_rendering() -> dict[str, Any]:
     """Load the versioned declarative edit-label rendering rules."""
     with _PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    if payload.get("schema_version") != "1.5":
+    if payload.get("schema_version") != "2.0":
         raise ValueError("Unsupported reaction-label rendering schema")
     return dict(payload)
 
@@ -377,7 +377,7 @@ def _make_detailed_label_readable(
     return _render_formula_counts(detailed, style=style)
 
 
-def build_reaction_display_label(
+def _build_reaction_label(
     *,
     reactants: Sequence[ReactionComponent],
     edits: Sequence[ReactionEdit],
@@ -558,6 +558,7 @@ def build_reaction_display_label(
                 "partial_product_correspondence",
                 "reactant_only",
                 "ambiguous_reactants",
+                "product_contradicted_reactants",
             }
             else "unavailable"
         )
@@ -565,7 +566,11 @@ def build_reaction_display_label(
             structural_label = fallback_label
             transformation_label = fallback_label
             source = "partial_product_correspondence"
-        elif status in {"reactant_only", "ambiguous_reactants"}:
+        elif status in {
+            "reactant_only",
+            "ambiguous_reactants",
+            "product_contradicted_reactants",
+        }:
             source = "reactant_only"
         else:
             source = "unavailable"
@@ -612,7 +617,6 @@ def build_reaction_display_label(
 
 
 __all__ = [
-    "build_reaction_display_label",
     "load_reaction_label_rendering",
     "render_reaction_label_clause",
 ]

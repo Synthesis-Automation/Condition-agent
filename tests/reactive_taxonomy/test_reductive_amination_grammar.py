@@ -7,8 +7,8 @@ def test_aldehyde_primary_amine_exact_reconstruction() -> None:
     result = featurize_reaction("O=Cc1ccncc1.Nc1ccccc1>>c1ccc(NCc2ccncc2)cc1")
 
     assert result.valid
-    assert result.reaction_label == ("HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar")
-    assert result.reaction_label_status == "exact_product"
+    assert result.reaction_label.concise == ("HeteroAr–CH=O + Ar–NH2 → HeteroAr–CH2–NH–Ar")
+    assert result.reaction_label.status == "family_overlay"
     assert result.transformation_class == "carbonyl_c_n_reductive_coupling"
     assert result.named_family == "reductive_amination"
     assert result.selected_candidate is not None
@@ -23,21 +23,21 @@ def test_aldehyde_primary_amine_exact_reconstruction() -> None:
 def test_ketone_primary_amine_exact_reconstruction() -> None:
     result = featurize_reaction("CC(=O)c1ccccc1.Nc1ccccc1>>CC(Nc1ccccc1)c1ccccc1")
 
-    assert result.reaction_label == ("Ar1–C(R)=O + Ar2–NH2 → Ar1–CH(R)–NH–Ar2")
+    assert result.reaction_label.concise == ("Ar1–C(R)=O + Ar2–NH2 → Ar1–CH(R)–NH–Ar2")
     assert result.evidence_quality == "exact_product_reconstruction"
 
 
 def test_formaldehyde_primary_amine_exact_reconstruction() -> None:
     result = featurize_reaction("C=O.Nc1ccccc1>>CNc1ccccc1")
 
-    assert result.reaction_label == "H2C=O + Ar–NH2 → H3C–NH–Ar"
+    assert result.reaction_label.concise == "H2C=O + Ar–NH2 → H3C–NH–Ar"
     assert result.named_family == "reductive_amination"
 
 
 def test_aldehyde_secondary_amine_exact_reconstruction() -> None:
     result = featurize_reaction("O=Cc1ccccc1.CNC>>CN(C)Cc1ccccc1")
 
-    assert result.reaction_label == "Ar–CH=O + R1R2–NH → Ar–CH2–NR1R2"
+    assert result.reaction_label.concise == "Ar–CH=O + R1R2–NH → Ar–CH2–NR1R2"
     assert result.named_family == "reductive_amination"
 
 
@@ -72,7 +72,7 @@ def test_imine_product_does_not_verify_as_reductive_amination() -> None:
     assert candidates[0].verification == "product_mismatch"
     assert result.named_family is None
     assert result.evidence_quality == "global_atom_correspondence"
-    assert result.reaction_label_status == "generic_pattern"
+    assert result.reaction_label.status == "generic_pattern"
     assert result.transformation_class == "substitution"
 
 
@@ -86,8 +86,7 @@ def test_multiple_carbonyl_partners_remain_unselected_without_verification() -> 
     ]
     assert len(reductive_candidates) == 2
     assert result.selected_candidate is None
-    assert result.reaction_label is None
-    assert result.reaction_label_status == "product_contradicted_candidates"
+    assert result.reaction_label.status == "product_contradicted_reactants"
 
 
 def test_mapped_reductive_amination_agrees_with_operator() -> None:
@@ -109,7 +108,7 @@ def test_mapping_operator_conflict_is_visible() -> None:
         "[O:1]=[CH:2][c:4]1ccccc1.[NH2:3]c1ccccc1>>[CH2:4]([NH:3]c1ccccc1)[c:2]1ccccc1"
     )
 
-    assert result.reaction_label_status == "conflicting_edit_summary"
+    assert result.reaction_label.status == "conflicting_evidence"
     assert result.evidence_quality == "conflicting_edit_evidence"
     assert "MAPPING_RECONSTRUCTION_CONFLICT" in result.warnings
 

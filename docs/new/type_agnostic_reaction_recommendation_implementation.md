@@ -538,7 +538,9 @@ The converter serializes:
 - reaction-core projection, evidence status, exact/typed/shape/center keys,
   atom transitions, events, remote subgraphs, attachment ports, and warnings;
 - one primary `reaction_display_label` review column and a separate
-  `reaction_core_raw_label` audit column;
+  `reaction_display_label_detailed` column, both projected from the canonical
+  nested `reaction_label` object;
+- a separate `reaction_core_raw_equation` audit column;
 - optional external-mapping disposition, mapped proposal, coverage, confidence,
   provider/model identity, matched internal hypotheses, and warnings;
 - chemistry, condition, stage, outcome, and index-eligibility statuses;

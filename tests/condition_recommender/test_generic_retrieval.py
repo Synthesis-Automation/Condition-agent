@@ -151,8 +151,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "4.1",
-        "converter_definition_version": "generic_conversion.v4.0",
+        "schema_version": "5.0",
+        "converter_definition_version": "generic_conversion.v5.0",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",
@@ -162,8 +162,11 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
         "reaction_id": f"reaction-{index}",
         "observation_id": f"observation-{index}",
         "reaction_smiles": "C.N>>CN",
-        "reaction_label": f"Precedent reaction {index}",
-        "reaction_label_status": "exact_product",
+        "reaction_label": {
+            "concise": f"Precedent reaction {index}",
+            "detailed": f"Precedent reaction {index}",
+            "status": "exact_reconstruction",
+        },
         "yield_pct": 60.0 + index,
         "source_dataset": f"dataset-{index % 2}",
         "reference_id": f"REF1:{index}",
@@ -793,14 +796,17 @@ def test_recommendation_result_preserves_structured_query_context() -> None:
     result = recommend_indexed_signature(
         query,
         build_generic_index([_record(1, precedent_signature)]),
-        reaction_label="Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
-        reaction_label_status="exact_product",
+        reaction_label={
+            "concise": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
+            "detailed": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
+            "status": "exact_reconstruction",
+        },
         minimum_pool_size=1,
     )
 
     assert result.valid
-    assert result.reaction_label == "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
-    assert result.reaction_label_status == "exact_product"
+    assert result.reaction_label["concise"] == "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
+    assert result.reaction_label["status"] == "exact_reconstruction"
     assert result.spectator_groups[0]["group_id"] == "nitrile"
     assert (
         result.reaction_partners[0]["reactivity_profile"]["steric"][
@@ -815,8 +821,8 @@ def test_recommendation_result_preserves_structured_query_context() -> None:
         == "balanced"
     )
     hit_context = result.recommendations[0].precedent_reaction_contexts[0]
-    assert hit_context["reaction_label"] == "Precedent reaction 1"
-    assert hit_context["reaction_label_status"] == "exact_product"
+    assert hit_context["reaction_label"]["concise"] == "Precedent reaction 1"
+    assert hit_context["reaction_label"]["status"] == "exact_reconstruction"
     assert hit_context["spectator_groups"][0]["group_id"] == "ether"
     assert (
         hit_context["reaction_partners"][0]["reactivity_profile"]["steric"][
@@ -1106,7 +1112,7 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     assert result.candidate_count == 1
     assert result.compatible_candidate_count == 1
     assert result.excluded_candidate_count == 0
-    assert result.schema_version == "2.4"
+    assert result.schema_version == "3.0"
     assert result.retrieval_trace[-1].status == "selected"
     assert result.recommendations
     assert result.recommendations[0].recipe_id.startswith("RCR1:")

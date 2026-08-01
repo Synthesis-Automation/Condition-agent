@@ -9,32 +9,32 @@ def test_mapped_unknown_reaction_receives_observed_edit_label() -> None:
     result = featurize_reaction("[CH3:1].[NH2:2]>>[CH3:1][NH2:2]")
 
     assert result.named_family is None
-    assert result.reaction_label == "C–N bond formation"
-    assert result.reaction_label_status == "mapped_edit_summary"
-    assert result.display_label is not None
-    assert result.display_label.status == "observed_edits"
-    assert result.display_label.detailed == (
+    assert result.reaction_label.concise == "C–N bond formation"
+    assert result.reaction_label.status == "observed_edits"
+    assert result.reaction_label is not None
+    assert result.reaction_label.status == "observed_edits"
+    assert result.reaction_label.detailed == (
         "C–N bond formation; edits: C(map 1)–N(map 2) bond formation"
     )
-    assert len(result.display_label.clauses) == 1
-    assert result.display_label.clauses[0].evidence == "supplied_atom_mapping"
+    assert len(result.reaction_label.clauses) == 1
+    assert result.reaction_label.clauses[0].evidence == "supplied_atom_mapping"
 
 
 def test_multiple_edits_compose_and_collapse_repeated_generic_clauses() -> None:
     result = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
 
-    assert result.reaction_label == "H2C=CH2 → H3C–CH3"
-    assert result.reaction_label_status == "exact_product"
-    assert result.display_label is not None
-    assert result.display_label.status == "exact_reconstruction"
-    assert result.display_label.pattern_id == "hydrogenation"
-    assert result.display_label.structural_label == "C=C → C–C; 2 × H gain at C"
-    assert result.display_label.transformation_label == "C=C hydrogenation"
-    assert result.display_label.contextual_label == "H2C=CH2 → H3C–CH3"
-    assert result.display_label.product_context_label == "H3C–CH3"
-    assert len(result.display_label.clauses) == 3
-    assert "H gain at C(map 1)" in result.display_label.detailed
-    assert "H gain at C(map 2)" in result.display_label.detailed
+    assert result.reaction_label.concise == "H2C=CH2 → H3C–CH3"
+    assert result.reaction_label.status == "exact_reconstruction"
+    assert result.reaction_label is not None
+    assert result.reaction_label.status == "exact_reconstruction"
+    assert result.reaction_label.pattern_id == "hydrogenation"
+    assert result.reaction_label.structural_label == "C=C → C–C; 2 × H gain at C"
+    assert result.reaction_label.transformation_label == "C=C hydrogenation"
+    assert result.reaction_label.contextual_label == "H2C=CH2 → H3C–CH3"
+    assert result.reaction_label.product_context_label == "H3C–CH3"
+    assert len(result.reaction_label.clauses) == 3
+    assert "H gain at C(map 1)" in result.reaction_label.detailed
+    assert "H gain at C(map 2)" in result.reaction_label.detailed
 
 
 def test_generic_label_is_invariant_to_reactant_component_order() -> None:
@@ -42,9 +42,9 @@ def test_generic_label_is_invariant_to_reactant_component_order() -> None:
     reversed_order = featurize_reaction("[NH2:2].[CH3:1]>>[CH3:1][NH2:2]")
 
     assert forward.reaction_label == reversed_order.reaction_label
-    assert forward.display_label is not None
-    assert reversed_order.display_label is not None
-    assert forward.display_label.detailed == reversed_order.display_label.detailed
+    assert forward.reaction_label is not None
+    assert reversed_order.reaction_label is not None
+    assert forward.reaction_label.detailed == reversed_order.reaction_label.detailed
 
 
 def test_ascii_rendering_changes_display_only() -> None:
@@ -53,8 +53,8 @@ def test_ascii_rendering_changes_display_only() -> None:
         "[CH3:1].[NH2:2]>>[CH3:1][NH2:2]", label_style="ascii"
     )
 
-    assert unicode_result.reaction_label == "C–N bond formation"
-    assert ascii_result.reaction_label == "C-N bond formation"
+    assert unicode_result.reaction_label.concise == "C–N bond formation"
+    assert ascii_result.reaction_label.concise == "C-N bond formation"
     assert unicode_result.reaction_signature is not None
     assert ascii_result.reaction_signature is not None
     assert (
@@ -66,13 +66,13 @@ def test_ascii_rendering_changes_display_only() -> None:
 def test_exact_grammar_label_is_preserved_as_overlay() -> None:
     result = featurize_reaction("Brc1ccccc1.CN>>CNc1ccccc1")
 
-    assert result.reaction_label == "Ar–Br + R–NH2 → Ar–NH–R"
-    assert result.reaction_label_status == "exact_product"
-    assert result.display_label is not None
-    assert result.display_label.status == "exact_reconstruction"
-    assert "C–Br bond cleavage" in result.display_label.detailed
-    assert "C–N bond formation" in result.display_label.detailed
-    assert "N–H loss" in result.display_label.detailed
+    assert result.reaction_label.concise == "Ar–Br + R–NH2 → Ar–NH–R"
+    assert result.reaction_label.status == "exact_reconstruction"
+    assert result.reaction_label is not None
+    assert result.reaction_label.status == "exact_reconstruction"
+    assert "C–Br bond cleavage" in result.reaction_label.detailed
+    assert "C–N bond formation" in result.reaction_label.detailed
+    assert "N–H loss" in result.reaction_label.detailed
 
 
 def test_detailed_label_uses_superscript_fragment_indices() -> None:
@@ -80,9 +80,9 @@ def test_detailed_label_uses_superscript_fragment_indices() -> None:
         "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1"
     )
 
-    assert result.reaction_label == "Ar1–Br + Ar2–OH → Ar1–O–Ar2"
-    assert result.display_label is not None
-    assert result.display_label.detailed == (
+    assert result.reaction_label.concise == "Ar1–Br + Ar2–OH → Ar1–O–Ar2"
+    assert result.reaction_label is not None
+    assert result.reaction_label.detailed == (
         "Ar¹–Br + Ar²–OH → Ar¹–O–Ar²; edits: "
         "C–Br bond cleavage; C–O bond formation; O–H loss"
     )
@@ -91,11 +91,11 @@ def test_detailed_label_uses_superscript_fragment_indices() -> None:
 def test_detailed_label_uses_subscripts_for_molecular_formula_counts() -> None:
     result = featurize_reaction("CC(=O)O.CN>>CC(=O)NC")
 
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "R1–C(O)OH + R2–NH2 → R1–C(O)–NH–R2"
     )
-    assert result.display_label is not None
-    assert result.display_label.detailed == (
+    assert result.reaction_label is not None
+    assert result.reaction_label.detailed == (
         "R¹–C(O)OH + R²–NH₂ → R¹–C(O)–NH–R²; edits: "
         "C–O bond cleavage; C–N bond formation; N–H loss"
     )
@@ -107,11 +107,11 @@ def test_formula_subscripts_do_not_change_maps_ring_sizes_or_edit_counts() -> No
         "OCCCCc1ccccc1Br>>c1ccc2c(c1)CCCCO2"
     )
 
-    assert mapped.display_label is not None
-    assert mapped.display_label.detailed.startswith("H₂C=CH₂ → H₃C–CH₃")
-    assert "C(map 1)=C(map 2)" in mapped.display_label.detailed
-    assert ring.display_label is not None
-    assert "(7-membered ring)" in ring.display_label.detailed
+    assert mapped.reaction_label is not None
+    assert mapped.reaction_label.detailed.startswith("H₂C=CH₂ → H₃C–CH₃")
+    assert "C(map 1)=C(map 2)" in mapped.reaction_label.detailed
+    assert ring.reaction_label is not None
+    assert "(7-membered ring)" in ring.reaction_label.detailed
 
 
 def test_detailed_label_puts_seven_membered_ring_context_after_transformation() -> None:
@@ -119,11 +119,11 @@ def test_detailed_label_puts_seven_membered_ring_context_after_transformation() 
         "OCCCCc1ccccc1Br>>c1ccc2c(c1)CCCCO2"
     )
 
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "intramolecular (7-membered ring) Ar–Br / R–OH → Ar–O–R"
     )
-    assert result.display_label is not None
-    assert result.display_label.detailed == (
+    assert result.reaction_label is not None
+    assert result.reaction_label.detailed == (
         "Ar–Br / R–OH → Ar–O–R; intramolecular (7-membered ring); "
         "edits: C–Br bond cleavage; C–O bond formation; O–H loss"
     )
@@ -135,8 +135,8 @@ def test_ascii_detailed_label_keeps_plain_fragment_indices() -> None:
         label_style="ascii",
     )
 
-    assert result.display_label is not None
-    assert result.display_label.detailed.startswith(
+    assert result.reaction_label is not None
+    assert result.reaction_label.detailed.startswith(
         "Ar1-Br + Ar2-OH -> Ar1-O-Ar2; edits:"
     )
 
@@ -149,16 +149,16 @@ def test_conflicting_evidence_is_visible_in_label_contract() -> None:
     )
     result = featurize_reaction(reaction)
 
-    assert result.reaction_label_status == "conflicting_edit_summary"
+    assert result.reaction_label.status == "conflicting_evidence"
     assert result.reaction_label is not None
-    assert result.reaction_label.startswith("Conflicting evidence:")
-    assert result.display_label is not None
-    assert result.display_label.status == "conflicting_evidence"
-    assert result.display_label.confidence == 0.5
-    assert result.display_label.detailed.startswith(
-        result.display_label.structural_label + "; conflicting evidence;"
+    assert result.reaction_label.concise.startswith("Conflicting evidence:")
+    assert result.reaction_label is not None
+    assert result.reaction_label.status == "conflicting_evidence"
+    assert result.reaction_label.confidence == 0.5
+    assert result.reaction_label.detailed.startswith(
+        result.reaction_label.structural_label + "; conflicting evidence;"
     )
-    assert "MAPPING_RECONSTRUCTION_CONFLICT" in result.display_label.warnings
+    assert "MAPPING_RECONSTRUCTION_CONFLICT" in result.reaction_label.warnings
 
 
 def test_display_label_serializes_as_nested_evidence() -> None:
@@ -166,10 +166,10 @@ def test_display_label_serializes_as_nested_evidence() -> None:
         "[CH3:1].[NH2:2]>>[CH3:1][NH2:2]"
     ).to_dict()
 
-    assert payload["display_label"]["schema_version"] == "1.5"
-    assert payload["display_label"]["source"] == "literal_edits"
-    assert payload["display_label"]["clauses"][0]["edit_type"] == "formed"
-    assert payload["display_label"]["clauses"][0]["atom_map_numbers"] == (1, 2)
+    assert payload["reaction_label"]["schema_version"] == "2.0"
+    assert payload["reaction_label"]["source"] == "literal_edits"
+    assert payload["reaction_label"]["clauses"][0]["edit_type"] == "formed"
+    assert payload["reaction_label"]["clauses"][0]["atom_map_numbers"] == (1, 2)
 
 
 def test_unknown_mapped_substitution_receives_generic_pattern_label() -> None:
@@ -180,13 +180,13 @@ def test_unknown_mapped_substitution_receives_generic_pattern_label() -> None:
 
     assert result.named_family is None
     assert result.selected_candidate is None
-    assert result.reaction_label == "C–N substitution"
-    assert result.reaction_label_status == "mapped_generic_pattern"
-    assert result.display_label is not None
-    assert result.display_label.pattern_id == "substitution"
-    assert result.display_label.grammar_id is None
-    assert result.display_label.contextual_label is None
-    assert result.display_label.structural_label == (
+    assert result.reaction_label.concise == "C–N substitution"
+    assert result.reaction_label.status == "generic_pattern"
+    assert result.reaction_label is not None
+    assert result.reaction_label.pattern_id == "substitution"
+    assert result.reaction_label.grammar_id is None
+    assert result.reaction_label.contextual_label is None
+    assert result.reaction_label.structural_label == (
         "C–O bond cleavage; C–N bond formation; N–H loss"
     )
 
@@ -195,10 +195,10 @@ def test_unknown_mapped_dehydrogenation_receives_generic_pattern_label() -> None
     result = featurize_reaction("[CH3:1][CH3:2]>>[CH2:1]=[CH2:2]")
 
     assert result.named_family is None
-    assert result.reaction_label == "H3C–CH3 → H2C=CH2"
-    assert result.display_label is not None
-    assert result.display_label.pattern_id == "dehydrogenation"
-    assert result.display_label.transformation_label == (
+    assert result.reaction_label.concise == "H3C–CH3 → H2C=CH2"
+    assert result.reaction_label is not None
+    assert result.reaction_label.pattern_id == "dehydrogenation"
+    assert result.reaction_label.transformation_label == (
         "C=C formation by dehydrogenation"
     )
 
@@ -209,12 +209,12 @@ def test_unknown_intramolecular_formation_receives_ring_closure_pattern() -> Non
     )
 
     assert result.named_family is None
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "intramolecular (3-membered ring) C–N bond formation"
     )
-    assert result.display_label is not None
-    assert result.display_label.pattern_id == "intramolecular_bond_formation"
-    assert result.display_label.structural_label == (
+    assert result.reaction_label is not None
+    assert result.reaction_label.pattern_id == "intramolecular_bond_formation"
+    assert result.reaction_label.structural_label == (
         "C–N bond formation; C–H loss; N–H loss"
     )
 
@@ -222,18 +222,18 @@ def test_unknown_intramolecular_formation_receives_ring_closure_pattern() -> Non
 def test_exact_grammar_label_records_grammar_overlay_provenance() -> None:
     result = featurize_reaction("Brc1ccccc1.CN>>CNc1ccccc1")
 
-    assert result.display_label is not None
-    assert result.display_label.grammar_id == "sp2_c_n_substitution"
-    assert result.display_label.grammar_label == result.reaction_label
-    assert result.display_label.pattern_id == "substitution"
+    assert result.reaction_label is not None
+    assert result.reaction_label.grammar_id == "sp2_c_n_substitution"
+    assert result.reaction_label.grammar_label == result.reaction_label.concise
+    assert result.reaction_label.pattern_id == "substitution"
 
 
 def test_reaction_label_definition_is_versioned() -> None:
     rendering = load_reaction_label_rendering()
     patterns = load_reaction_label_patterns()
 
-    assert rendering["schema_version"] == "1.5"
-    assert rendering["label_schema_version"] == "1.5"
+    assert rendering["schema_version"] == "2.0"
+    assert rendering["label_schema_version"] == "2.0"
     assert patterns["schema_version"] == "1.0"
     assert {pattern["id"] for pattern in patterns["patterns"]} >= {
         "substitution",
@@ -270,10 +270,10 @@ def test_mapped_heteroatom_bond_reductions_receive_generic_labels() -> None:
     for reaction, (label, handle_signature) in examples.items():
         result = featurize_reaction(reaction)
         assert result.valid
-        assert result.reaction_label == label
-        assert result.reaction_label_status == "mapped_generic_pattern"
-        assert result.display_label is not None
-        assert result.display_label.pattern_id == "reductive_bond_cleavage"
+        assert result.reaction_label.concise == label
+        assert result.reaction_label.status == "generic_pattern"
+        assert result.reaction_label is not None
+        assert result.reaction_label.pattern_id == "reductive_bond_cleavage"
         assert any(
             site.canonical_signature == handle_signature
             for component in result.reactants

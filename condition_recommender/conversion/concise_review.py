@@ -16,18 +16,18 @@ from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "4.0"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "6.0"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
+    "reaction_core_label",
     "reaction_display_label",
     "reaction_display_label_detailed",
     "reaction_display_source",
+    "reaction_display_status",
     "reaction_display_confidence",
     "reaction_display_warnings",
-    "reaction_core_raw_label",
     "original_reaction_type",
     "detected_reaction_family",
-    "detection_status",
     "transformation_class",
     "ring_change_count",
     "formed_ring_sizes",
@@ -39,7 +39,7 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reaction_core_mapping_equivalence_key",
     "reaction_core_motif_key",
     "reaction_core_limiter",
-    "reaction_core_atom_label",
+    "reaction_core_atom_equation",
     "reaction_core_evidence_status",
     "reaction_core_status",
     "reaction_core_quality_status",
@@ -224,7 +224,7 @@ def iter_canonical_records(path: str | Path) -> Iterator[Dict[str, Any]]:
 def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     """Select compact chemistry fields needed for rapid structural review."""
     review_summary = build_reaction_review_summary(record)
-    display = record.get("reaction_display_label")
+    display = record.get("reaction_label")
     display_value = display if isinstance(display, Mapping) else {}
     signature = record.get("reaction_signature")
     signature_value = signature if isinstance(signature, Mapping) else {}
@@ -294,13 +294,17 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or record.get("reaction_smiles")
             or ""
         ),
+        "reaction_core_label": str(
+            reaction_core_value.get("generic_label") or ""
+        ),
         "reaction_display_label": str(
-            display_value.get("concise")
-            or record.get("reaction_label")
-            or ""
+            display_value.get("concise") or ""
         ),
         "reaction_display_label_detailed": review_summary.detailed_reaction_label,
         "reaction_display_source": str(display_value.get("source") or ""),
+        "reaction_display_status": str(
+            display_value.get("status") or "unavailable"
+        ),
         "reaction_display_confidence": _text_or_blank(
             display_value.get("confidence")
         ),
@@ -309,11 +313,6 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         ),
         "original_reaction_type": str(record.get("source_declared_family") or ""),
         "detected_reaction_family": str(record.get("named_family") or ""),
-        "detection_status": str(
-            display_value.get("status")
-            or record.get("reaction_label_status")
-            or "unavailable"
-        ),
         "transformation_class": str(
             record.get("transformation_class")
             or signature_value.get("transformation_class")
@@ -340,11 +339,8 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "reaction_core_motif_key": str(
             abstraction_value.get("motif_key") or ""
         ),
-        "reaction_core_raw_label": str(
-            reaction_core_value.get("generic_label") or ""
-        ),
-        "reaction_core_limiter": review_summary.graphic_core_limiter,
-        "reaction_core_atom_label": review_summary.atom_level_core_label,
+        "reaction_core_limiter": review_summary.core_limiter,
+        "reaction_core_atom_equation": review_summary.atom_level_core_equation,
         "reaction_core_evidence_status": str(
             reaction_core_value.get("evidence_status") or ""
         ),

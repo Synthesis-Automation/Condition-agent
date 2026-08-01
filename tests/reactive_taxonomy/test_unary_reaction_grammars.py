@@ -84,7 +84,7 @@ def test_sufex_sulfonate_reconstructs_without_source_label_routing() -> None:
     assert result.selected_candidate.grammar_id == "sulfonate_formation"
     assert result.transformation_class == "sulfonate_formation"
     assert result.named_family == "sulfonylation"
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "R–S(O)2F + Ar–OH → R–S(O)2–O–Ar"
     )
     assert result.reaction_signature is not None
@@ -149,5 +149,5 @@ def test_mapping_operator_conflict_remains_review_evidence() -> None:
 
     assert result.reaction_signature is not None
     assert result.evidence_quality == "conflicting_edit_evidence"
-    assert result.reaction_label_status == "conflicting_edit_summary"
+    assert result.reaction_label.status == "conflicting_evidence"
     assert "MAPPING_RECONSTRUCTION_CONFLICT" in result.warnings

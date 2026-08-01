@@ -108,8 +108,8 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "4.1",
-        "converter_definition_version": "generic_conversion.v4.0",
+        "schema_version": "5.0",
+        "converter_definition_version": "generic_conversion.v5.0",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "chemistry_status": "verified",
@@ -166,9 +166,9 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert loaded == index
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "3.0"
+    assert payload["schema_version"] == "4.0"
     assert payload["reaction_signature_schema_version"] == "3.2"
-    assert payload["record_schema_versions"] == ["4.1"]
+    assert payload["record_schema_versions"] == ["5.0"]
     assert payload["reaction_core_schema_version"] == "2.2"
     assert payload["reaction_core_algorithm_version"] == (
         "reaction_core_projection.v8"

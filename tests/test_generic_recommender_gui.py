@@ -89,8 +89,11 @@ def _recommendation() -> GenericConditionRecommendation:
             {
                 "reaction_id": "reaction-1",
                 "reaction_smiles": "BrC.B(O)O>>CC",
-                "reaction_label": "Precedent Ar–Br coupling",
-                "reaction_label_status": "exact_product",
+                "reaction_label": {
+                    "concise": "Precedent Ar–Br coupling",
+                    "detailed": "Precedent Ar–Br coupling",
+                    "status": "exact_reconstruction",
+                },
                 "spectator_groups": (
                     {
                         "group_id": "ether",
@@ -127,8 +130,11 @@ def _result() -> GenericRecommendationResult:
         query_reaction_smiles="IC.B(O)O>>CC",
         valid=True,
         query_signature_id="RS3:query",
-        reaction_label="Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
-        reaction_label_status="exact_product",
+        reaction_label={
+            "concise": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
+            "detailed": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
+            "status": "exact_reconstruction",
+        },
         named_family="suzuki_miyaura",
         transformation_class="c_c_transfer_coupling",
         spectator_groups=(
@@ -266,7 +272,7 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
 
     summary = window.summary_box.toPlainText()
     assert "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" in summary
-    assert "Label evidence: Exact Product" in summary
+    assert "Label evidence: Exact Reconstruction" in summary
     assert "Suzuki Miyaura" in summary
     assert "Mode: Verified Signature" in summary
     assert "R–C≡N [nitrile] (reactant 1, d=3)" in summary

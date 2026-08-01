@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.5",
-  "label_schema_version": "1.5",
+  "schema_version": "2.0",
+  "label_schema_version": "2.0",
   "default_style": "unicode",
   "clause_order": ["broken", "order_changed", "formed", "hydrogen_change"],
   "element_precedence": ["C", "N", "O", "S", "P", "B", "Si", "H", "F", "Cl", "Br", "I"],

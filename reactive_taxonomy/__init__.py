@@ -134,7 +134,6 @@ from .reaction_models import (
     RenderedReactionLabel,
 )
 from .reaction_display_labels import (
-    build_reaction_display_label,
     load_reaction_label_rendering,
     render_reaction_label_clause,
 )
@@ -336,7 +335,6 @@ __all__ = [
     "build_contextual_transformation_label",
     "build_reaction_core_projection",
     "build_observation_signature",
-    "build_reaction_display_label",
     "build_reaction_review_summary",
     "compile_connectivity_rewrite_definitions",
     "connectivity_rewrite_for_grammar",

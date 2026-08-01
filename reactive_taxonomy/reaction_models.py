@@ -449,6 +449,7 @@ class RenderedReactionLabel:
         "partial_product_correspondence",
         "reactant_only",
         "ambiguous_reactants",
+        "product_contradicted_reactants",
         "unavailable",
     ]
     source: Literal[
@@ -478,7 +479,7 @@ class RenderedReactionLabel:
     product_context_label: Optional[str] = None
     event_labels: Tuple[str, ...] = ()
     event_count: int = 0
-    schema_version: str = "1.5"
+    schema_version: str = "2.0"
 
 @dataclass(frozen=True)
 class ReactionSpectatorGroup:

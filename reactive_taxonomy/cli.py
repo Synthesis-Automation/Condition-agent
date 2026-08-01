@@ -47,7 +47,6 @@ _SELF_TEST_REACTIONS = (
 _REACTION_CORE_CSV_FIELDS = (
     "reaction_core_available",
     "reaction_core_id",
-    "reaction_core_raw_label",
     "reaction_core_evidence_status",
     "reaction_core_exact_key",
     "reaction_core_typed_key",
@@ -62,7 +61,7 @@ _REACTION_CORE_CSV_FIELDS = (
     "reaction_core_departing_context",
     "reaction_core_appearing_context",
     "reaction_core_motif_key",
-    "reaction_core_general_label",
+    "reaction_core_general_equation",
     "reaction_core_limiter",
     "reaction_core_event_count",
     "reaction_core_primary_center_count",
@@ -72,7 +71,10 @@ _REACTION_CORE_CSV_FIELDS = (
 )
 
 _REACTION_RING_CSV_FIELDS = (
-    "reaction_label_detailed",
+    "reaction_display_label_detailed",
+    "reaction_display_source",
+    "reaction_display_status",
+    "reaction_display_confidence",
     "formed_ring_sizes",
     "ring_count_delta",
     "ring_change_count",
@@ -422,6 +424,7 @@ def _molecule_summary(result: Any) -> str:
 
 
 def _reaction_summary(result: Any) -> str:
+    reaction_label = result.reaction_label
     lines = [
         f"valid: {result.valid}",
         f"input: {result.input_reaction_smiles}",
@@ -429,8 +432,8 @@ def _reaction_summary(result: Any) -> str:
         f"transformation: {result.transformation_class or '-'}",
         f"named family: {result.named_family or '-'}",
         f"compatible families: {_joined(result.compatible_named_families)}",
-        f"reaction label: {result.reaction_label or '-'}",
-        f"label status: {result.reaction_label_status}",
+        f"reaction label: {reaction_label.concise if reaction_label else '-'}",
+        f"label status: {reaction_label.status if reaction_label else 'unavailable'}",
         f"candidates: {len(result.candidates)}",
         f"mapped bond changes: {len(result.mapped_bond_changes)}",
     ]
@@ -568,8 +571,9 @@ def _reaction_core_lines(result: Any) -> list[str]:
 
 
 def _reaction_concise_summary(result: Any) -> str:
+    reaction_label = result.reaction_label
     lines = [
-        f"Reaction: {result.reaction_label or '-'}",
+        f"Reaction: {reaction_label.concise if reaction_label else '-'}",
         f"Status: {'valid' if result.valid else 'invalid'}",
         f"Evidence: {result.evidence_quality}",
         f"Transformation: {result.transformation_class or 'unknown'}",
@@ -697,7 +701,9 @@ def _batch_summary(records: Sequence[dict[str, Any]], mode: str) -> dict[str, An
             for record in records
         ).items()))
         summary["label_status_counts"] = dict(sorted(Counter(
-            record["analysis"].get("reaction_label_status", "unavailable")
+            (record["analysis"].get("reaction_label") or {}).get(
+                "status", "unavailable"
+            )
             for record in records
         ).items()))
     return summary
@@ -760,12 +766,18 @@ def _reaction_csv_columns(
             continue
         columns.append(field)
         if field == reaction_smiles_column:
-            columns.extend(("reaction_label", "spectator_groups"))
+            columns.extend(
+                (
+                    "reaction_core_label",
+                    "reaction_display_label",
+                    "spectator_groups",
+                )
+            )
     columns.extend((
         "valid", "evidence_quality", "transformation_class", "named_family",
         "partner_analysis", *_REACTION_RING_CSV_FIELDS,
         *_REACTION_CORE_CSV_FIELDS,
-        "reaction_label_status", "candidate_count", "warnings", "error",
+        "candidate_count", "warnings", "error",
     ))
     return columns
 
@@ -805,7 +817,7 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     core_presentation = reaction_core.get("presentation") or {}
     topology = analysis.get("reaction_topology") or {}
     ring_changes = topology.get("ring_changes") or []
-    display_label = analysis.get("display_label") or {}
+    reaction_label = analysis.get("reaction_label") or {}
     remote_subgraphs = reaction_core.get("remote_subgraphs") or []
     remote_classes = sorted(
         {
@@ -832,7 +844,8 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         "evidence_quality": analysis.get("evidence_quality") or "",
         "transformation_class": analysis.get("transformation_class") or "",
         "named_family": analysis.get("named_family") or "",
-        "reaction_label": analysis.get("reaction_label") or "",
+        "reaction_core_label": reaction_core.get("generic_label") or "",
+        "reaction_display_label": reaction_label.get("concise") or "",
         "spectator_groups": "; ".join(
             str(group.get("group_id") or "") for group in spectator_groups
         ),
@@ -841,7 +854,14 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
             f"{render_reactivity_profile(partner.get('reactivity_profile'))}"
             for partner in signature_partners
         ),
-        "reaction_label_detailed": display_label.get("detailed") or "",
+        "reaction_display_label_detailed": reaction_label.get("detailed") or "",
+        "reaction_display_source": reaction_label.get("source") or "",
+        "reaction_display_status": reaction_label.get("status") or "",
+        "reaction_display_confidence": (
+            reaction_label.get("confidence")
+            if reaction_label.get("confidence") is not None
+            else ""
+        ),
         "formed_ring_sizes": "; ".join(
             str(value) for value in topology.get("formed_ring_sizes") or []
         ),
@@ -856,7 +876,6 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         else "",
         "reaction_core_available": bool(reaction_core),
         "reaction_core_id": reaction_core.get("core_id") or "",
-        "reaction_core_raw_label": reaction_core.get("generic_label") or "",
         "reaction_core_evidence_status": (
             reaction_core.get("evidence_status") or ""
         ),
@@ -890,7 +909,7 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
             core_presentation.get("appearing_context") or ()
         ),
         "reaction_core_motif_key": core_abstraction.get("motif_key") or "",
-        "reaction_core_general_label": (
+        "reaction_core_general_equation": (
             core_abstraction.get("general_label") or ""
         ),
         "reaction_core_limiter": (
@@ -910,7 +929,6 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         "reaction_core_warnings": "; ".join(
             str(value) for value in reaction_core.get("warnings") or []
         ),
-        "reaction_label_status": analysis.get("reaction_label_status") or "",
         "candidate_count": len(analysis.get("candidates") or []),
         "warnings": "; ".join(str(value) for value in analysis.get("warnings") or []),
         "error": analysis.get("error") or "",
@@ -929,7 +947,8 @@ def _write_batch_csv(
     if concise:
         columns = [
             "reaction_smiles",
-            "reaction_label",
+            "reaction_core_label",
+            "reaction_display_label",
             "partner_analysis",
             "spectator_groups",
             *_REACTION_RING_CSV_FIELDS,
@@ -1042,7 +1061,8 @@ def _command_self_test(args: argparse.Namespace) -> int:
                   f"{len(result.sites)} sites, {len(result.functional_groups)} groups")
         print("\nreaction feature checks")
         for result in reaction_results:
-            print(f"  {'PASS' if result.valid else 'FAIL'} {result.reaction_label or result.input_reaction_smiles}: "
+            print(f"  {'PASS' if result.valid else 'FAIL'} "
+                  f"{result.reaction_label.concise if result.reaction_label else result.input_reaction_smiles}: "
                   f"{result.evidence_quality}, family={result.named_family or 'unknown'}")
         print(f"\noverall: {'PASS' if passed else 'FAIL'}")
     return 0 if passed else 1
@@ -1088,7 +1108,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help=(
             "for reaction CSV output, write only reaction_smiles, "
-            "reaction_label, and spectator_groups"
+            "reaction_display_label, and spectator_groups"
         ),
     )
     batch_parser.add_argument("--label-style", choices=("unicode", "ascii", "hte_legacy"), default="unicode")

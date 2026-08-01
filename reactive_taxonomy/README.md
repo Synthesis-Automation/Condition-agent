@@ -76,7 +76,7 @@ the reaction-template registry. It abstains when no edited atom is observed on
 both sides and does not change `RS3`, admission, or named-family results.
 The reaction CLI and desktop featurizer show the minimized raw label, evidence,
 shape and center keys, core size, remote subgraphs, attachment counts, and
-warnings. Batch reaction CSV exports it as `reaction_core_raw_label`; JSON
+warnings. Batch reaction CSV exports it as `reaction_core_raw_equation`; JSON
 retains the complete nested projection.
 
 The desktop featurizer also presents mapped cores graphically. The renderer in
@@ -87,11 +87,11 @@ external mapping is visibly review-only. This rendering does not affect core
 identity, signatures, admission, or retrieval.
 
 Mapped, single-event references can also be compiled into the versioned
-`reaction_templates.v1.json` registry. This authoring registry stores a
+`reaction_templates.v2.json` registry. This authoring registry stores a
 map-number- and reactant-order-invariant edit fingerprint, optional family
 annotations, provenance, and the mapped reference; it does not store or copy a
 final reaction signature. Its semantic layer is intentionally small: each
-template has a reaction label, a product label, and automatically derived roles
+template has an optional template label, a product label, and automatically derived roles
 that link reference atom maps to canonical taxonomy site types. Query signatures
 remain structure-derived, while matching active templates contribute
 interpretation candidates. Use
@@ -367,10 +367,11 @@ python -m reactive_taxonomy.cli batch data-processor/reaction_dataset/Amide_form
 
 ```
 
-Reaction-mode CSV output places a semicolon-separated `spectator_groups`
-column immediately after `reaction_label`. Values are stable functional-group
-IDs such as `nitrile`. Add `--concise` to write only `reaction_smiles`,
-`reaction_label`, and `spectator_groups`, in that order.
+Reaction-mode CSV output exposes the canonical rendered label as
+`reaction_display_label` and `reaction_display_label_detailed`. The nested JSON
+contract is a single `reaction_label` object containing both forms plus source,
+status, evidence, confidence, and warnings. Add `--concise` to write the
+reaction SMILES and concise display label only.
 
 Phase 1 molecular-feature evaluation, including machine metrics and a blind
 chemist-review packet:

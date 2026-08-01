@@ -644,7 +644,7 @@ absent.
 
 ## 8. Generate the reaction label
 
-There are two label-generation stages.
+There are two interpretation and rendering stages.
 
 First, every grammar candidate receives a prospective grammar label:
 
@@ -656,9 +656,9 @@ This label is rendered from the assigned reactive sites and a declarative
 product-rendering rule. It is not accepted as the final label merely because
 the reactants match.
 
-Then
-[`build_reaction_display_label()`](../reactive_taxonomy/reaction_display_labels.py)
-generates the final evidence-aware label.
+Then the sole public renderer,
+[`render_reaction()`](../reactive_taxonomy/reaction_rendering.py), generates one
+final evidence-aware `RenderedReactionLabel`.
 
 | Situation | Final label type |
 | --- | --- |
@@ -669,9 +669,10 @@ generates the final evidence-aware label.
 | Valid edits without a known pattern | Literal before-to-after edit summary such as `C=O + C-H -> C-C + C-O + O-H` |
 | Only one plausible reactant assignment | Reactant-only label ending in an arrow |
 | Several plausible assignments | `OR`-joined ambiguous reactant labels |
-| No usable evidence | No label |
+| Product contradicts candidates | Reactant-side handles only, with contradiction status |
+| No usable evidence | Explicit `Unavailable` label |
 
-The structured `display_label` also preserves:
+The structured `reaction_label` preserves:
 
 - concise and detailed labels;
 - individual edit clauses;
@@ -682,25 +683,27 @@ The structured `display_label` also preserves:
 - pattern and grammar IDs;
 - status, evidence, confidence, and warnings.
 
-The final top-level `reaction_label` is the concise projection of this
-structured display.
-
-Typical `reaction_label_status` values include:
+Its `status` values include:
 
 ```text
-exact_product
-mapped_edit_summary
-observed_edit_summary
-mapped_generic_pattern
+exact_reconstruction
+family_overlay
+observed_edits
 generic_pattern
-multi_event_edit_summary
-conflicting_edit_summary
+multi_event
+ring_formation
+core_projection
+partial_product_correspondence
 reactant_only
 ambiguous_reactants
+product_contradicted_reactants
 unavailable
 ```
 
-Display labels do not participate in reaction identity.
+There is no parallel string label or standalone label-status field. JSON keeps
+the nested object; review CSV projects only its concise and detailed text as
+`reaction_display_label` and `reaction_display_label_detailed`. Display labels
+do not participate in reaction identity.
 
 For globally inferred correspondence, the label deliberately describes the
 observed graph transition instead of claiming a mechanism. The transformation

@@ -11,7 +11,7 @@ def test_suzuki_exact_product_reconstruction() -> None:
     assert result.valid
     assert result.transformation_class == "c_c_transfer_coupling"
     assert result.evidence_quality == "exact_product_reconstruction"
-    assert result.reaction_label == "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
+    assert result.reaction_label.concise == "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
     assert [
         change.change_type
         for change in result.selected_candidate.predicted_bond_changes
@@ -24,7 +24,7 @@ def test_suzuki_exact_product_reconstruction() -> None:
 def test_product_connection_canonicalizes_display_without_swapping_provenance() -> None:
     result = featurize_reaction("ClC=C.OB(O)c1ccccc1>>C=Cc1ccccc1")
     assert result.evidence_quality == "exact_product_reconstruction"
-    assert result.reaction_label == "Alkenyl–Cl + Ar–B(OH)2 → Ar–Alkenyl"
+    assert result.reaction_label.concise == "Alkenyl–Cl + Ar–B(OH)2 → Ar–Alkenyl"
     connection = result.product_connection
     assert connection.concise_label == "Ar–Alkenyl"
     assert connection.endpoint_1.role == "electrophile"
@@ -44,7 +44,7 @@ def test_vinyl_suzuki_preserves_defined_alkene_stereochemistry() -> None:
     assert result.evidence_quality == "exact_product_reconstruction"
     assert result.transformation_class == "c_c_transfer_coupling"
     assert result.named_family == "suzuki_miyaura"
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "Alkenyl–Br + Ar–B(OH)2 → Ar–Alkenyl"
     )
     assert result.selected_candidate is not None
@@ -96,7 +96,7 @@ def test_cn_exact_product_reconstruction() -> None:
     reaction = "Brc1ccccc1.Nc1ccccc1>>c1ccc(Nc2ccccc2)cc1"
     result = featurize_reaction(reaction)
     assert result.transformation_class == "sp2_c_n_substitution"
-    assert result.reaction_label == "Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2"
+    assert result.reaction_label.concise == "Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2"
     assert result.product_connection.connection_type == "C_N"
     assert result.family_environment.family_id == "c_n_coupling"
 
@@ -105,7 +105,7 @@ def test_secondary_amine_uses_one_reaction_wide_r_namespace() -> None:
     forward = featurize_reaction("CCBr.CNC>>CCN(C)C")
     reversed_order = featurize_reaction("CNC.CCBr>>CCN(C)C")
 
-    assert forward.reaction_label == "R1–Br + R2R3–NH → R1–NR2R3"
+    assert forward.reaction_label.concise == "R1–Br + R2R3–NH → R1–NR2R3"
     assert reversed_order.reaction_label == forward.reaction_label
     assert forward.product_connection is not None
     assert forward.product_connection.concise_label == "R1–NR2R3"
@@ -122,8 +122,8 @@ def test_fragment_indices_are_style_independent() -> None:
     unicode_result = featurize_reaction(reaction, label_style="unicode")
     ascii_result = featurize_reaction(reaction, label_style="ascii")
 
-    assert unicode_result.reaction_label == ("Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2")
-    assert ascii_result.reaction_label == "Ar1-Br + Ar2-NH2 -> Ar1-NH-Ar2"
+    assert unicode_result.reaction_label.concise == ("Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2")
+    assert ascii_result.reaction_label.concise == "Ar1-Br + Ar2-NH2 -> Ar1-NH-Ar2"
 
 
 def test_secondary_amine_product_consumes_nitrogen_hydrogen() -> None:
@@ -143,7 +143,7 @@ def test_amide_exact_product_reconstruction() -> None:
     reaction = "CC(=O)Cl.CN>>CC(=O)NC"
     result = featurize_reaction(reaction)
     assert result.transformation_class == "amide_formation"
-    assert result.reaction_label == "R1–C(O)Cl + R2–NH2 → R1–C(O)–NH–R2"
+    assert result.reaction_label.concise == "R1–C(O)Cl + R2–NH2 → R1–C(O)–NH–R2"
 
 
 def test_wrong_product_is_not_confirmed() -> None:
@@ -160,8 +160,7 @@ def test_wrong_product_is_not_confirmed() -> None:
         and candidate.verification == "product_mismatch"
         for candidate in result.candidates
     )
-    assert result.reaction_label is None
-    assert result.reaction_label_status == "product_contradicted_candidates"
+    assert result.reaction_label.status == "product_contradicted_reactants"
     assert "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in result.warnings
 
 
@@ -170,10 +169,10 @@ def test_ambiguous_fallback_excludes_product_mismatch_candidates() -> None:
         "CC(C)O.CC(=O)c1ccccc1F>>CC(C)=O.CC(O)c1ccccc1F"
     )
 
-    assert result.reaction_label_status == "ambiguous_reactants"
-    assert result.reaction_label == "(Ar–C(R)=O) OR (R–OH) →"
-    assert "Ar–F" not in result.reaction_label
-    assert "intramolecular" not in result.reaction_label
+    assert result.reaction_label.status == "ambiguous_reactants"
+    assert result.reaction_label.concise == "(Ar–C(R)=O) OR (R–OH) →"
+    assert "Ar–F" not in result.reaction_label.concise
+    assert "intramolecular" not in result.reaction_label.concise
     assert (
         "PRODUCT_MISMATCH_CANDIDATES_EXCLUDED_FROM_LABEL"
         in result.warnings

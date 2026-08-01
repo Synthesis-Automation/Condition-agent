@@ -223,8 +223,8 @@ def test_forced_resolved_mapping_only_enriches_the_minimized_core() -> None:
 
     assert assessment.status == "external_mapping_internal_consensus"
     assert assessment.analysis.reaction_label == base.reaction_label
-    assert assessment.analysis.reaction_label_status == base.reaction_label_status
-    assert assessment.analysis.display_label == base.display_label
+    assert assessment.analysis.reaction_label.status == base.reaction_label.status
+    assert assessment.analysis.reaction_label == base.reaction_label
     assert assessment.analysis.reaction_signature == base.reaction_signature
     assert assessment.analysis.reaction_core is not None
     assert assessment.analysis.reaction_core.evidence_status == "external"
@@ -296,7 +296,7 @@ def test_forced_mapping_conflict_retains_the_resolved_interpretation() -> None:
 
     assert assessment.status == "external_mapping_signature_conflict"
     assert assessment.analysis.reaction_label == base.reaction_label
-    assert assessment.analysis.display_label == base.display_label
+    assert assessment.analysis.reaction_label == base.reaction_label
     assert assessment.analysis.reaction_signature == base.reaction_signature
     assert assessment.analysis.reaction_core is not None
     assert assessment.analysis.reaction_core.evidence_status == "hypothesis"
@@ -323,7 +323,7 @@ def test_forced_mapping_builds_one_core_with_two_suzuki_events() -> None:
 
     assert assessment.status == "external_mapping_internal_consensus"
     assert assessment.analysis.reaction_signature == base.reaction_signature
-    assert assessment.analysis.display_label == base.display_label
+    assert assessment.analysis.reaction_label == base.reaction_label
     assert assessment.analysis.reaction_core is not None
     assert assessment.analysis.reaction_core.event_count == 2
     assert assessment.analysis.reaction_core.generic_label == (

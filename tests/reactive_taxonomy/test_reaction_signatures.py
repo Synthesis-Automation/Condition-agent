@@ -47,7 +47,7 @@ def test_signature_identity_is_display_style_independent() -> None:
     unicode_result = featurize_reaction(reaction, label_style="unicode")
     ascii_result = featurize_reaction(reaction, label_style="ascii")
 
-    assert unicode_result.reaction_label != ascii_result.reaction_label
+    assert unicode_result.reaction_label.concise != ascii_result.reaction_label.concise
     assert unicode_result.reaction_signature is not None
     assert ascii_result.reaction_signature is not None
     assert (
@@ -125,7 +125,7 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
         "C-H:NONE>SINGLE",
     )
-    assert payload["schema_version"] == "4.0"
+    assert payload["schema_version"] == "5.0"
     assert payload["reaction_signature"]["schema_version"] == "3.2"
     assert payload["observation"]["schema_version"] == "1.0"
     assert payload["interpretation"]["schema_version"] == "1.0"
@@ -155,17 +155,17 @@ def test_mixed_c_o_c_s_reaction_is_partitioned_into_two_events() -> None:
     assert [relation.relation_type for relation in signature.event_relations] == [
         "shared_component"
     ]
-    assert result.reaction_label == "C-O substitution + C-S substitution"
-    assert result.reaction_label_status == "multi_event_edit_summary"
-    assert result.display_label is not None
-    assert result.display_label.event_labels == (
+    assert result.reaction_label.concise == "C-O substitution + C-S substitution"
+    assert result.reaction_label.status == "multi_event"
+    assert result.reaction_label is not None
+    assert result.reaction_label.event_labels == (
         "C-O substitution",
         "C-S substitution",
     )
-    assert result.display_label.detailed.startswith(
+    assert result.reaction_label.detailed.startswith(
         "C-O substitution + C-S substitution; events:"
     )
-    assert "Event 1:" in result.display_label.detailed
+    assert "Event 1:" in result.reaction_label.detailed
 
 
 def test_multi_event_signature_is_reactant_order_invariant() -> None:
@@ -195,9 +195,9 @@ def test_repeated_events_are_counted_in_display_label() -> None:
 
     assert result.reaction_signature is not None
     assert result.reaction_signature.event_count == 2
-    assert result.reaction_label == "2 x C-S substitution"
-    assert result.display_label is not None
-    assert result.display_label.detailed.startswith("2 x C-S substitution; events:")
+    assert result.reaction_label.concise == "2 x C-S substitution"
+    assert result.reaction_label is not None
+    assert result.reaction_label.detailed.startswith("2 x C-S substitution; events:")
 
 
 def test_balanced_unmapped_multi_event_reaction_is_exactly_reconstructed() -> None:
@@ -212,7 +212,7 @@ def test_balanced_unmapped_multi_event_reaction_is_exactly_reconstructed() -> No
     assert result.reaction_signature.product_transformation is not None
     assert result.reaction_signature.product_transformation.exact_product_verified
     assert result.transformation_class == "generic_multi_event_graph_transformation"
-    assert result.reaction_label == "C-O substitution + C-S substitution"
+    assert result.reaction_label.concise == "C-O substitution + C-S substitution"
     assert [
         event.transformation_class for event in result.reaction_signature.events
     ] == [
@@ -238,7 +238,7 @@ def test_overlapping_multi_event_candidates_do_not_use_removed_join_atoms() -> N
 
     assert result.valid
     assert result.evidence_quality == "exact_multi_event_reconstruction"
-    assert result.reaction_label == "C-O substitution + C-N substitution"
+    assert result.reaction_label.concise == "C-O substitution + C-N substitution"
     assert len(result.selected_events) == 2
 
 
@@ -251,8 +251,7 @@ def test_unbalanced_multi_event_reaction_does_not_invent_partner_copy() -> None:
     assert result.evidence_quality == "reactant_grammar_only"
     assert result.selected_events == ()
     assert result.reaction_signature is None
-    assert result.reaction_label is None
-    assert result.reaction_label_status == "product_contradicted_candidates"
+    assert result.reaction_label.status == "product_contradicted_reactants"
     assert "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in result.warnings
 
 
@@ -281,7 +280,7 @@ def test_balanced_repeated_suzuki_events_are_exactly_reconstructed() -> None:
         event.compatible_named_families == ("suzuki_miyaura",)
         for event in result.selected_events
     )
-    assert result.reaction_label == (
+    assert result.reaction_label.concise == (
         "2 × C–B bond cleavage; C–Br bond cleavage; C–C bond formation"
     )
 

@@ -63,7 +63,7 @@ def test_qt6_registry_window_reports_darzens_label_and_site_profiles() -> None:
         details = window.details.toPlainText()
         assert "Darzens epoxide formation" in details
         assert "Family: darzens_reaction" in details
-        assert "Reaction label: Darzens reaction" in details
+        assert "Template label: Darzens reaction" in details
         assert (
             "Structural label: α-halo ester + R–CH=O → glycidic ester"
             in details
@@ -95,7 +95,7 @@ def test_qt6_registry_window_featurizes_reaction_test_input() -> None:
         assert "Family: acetalization" in details
         assert "Match: multiplicity-assisted exact reconstruction" in details
         assert "Confidence: 0.85" in details
-        assert "Reaction label: Acetal formation" in details
+        assert "Template label: Acetal formation" in details
         assert (
             "Structural label: R–CH=O + 2 × R–OH → acetal"
             in details
