@@ -3,15 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import List
-
-from .chemistry.rdkit_utils import parse_smiles
-
 from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
-from .reaction_archetypes import infer_bond_change_archetype
-from .reaction_candidates import enumerate_reaction_candidates
-from .connectivity_rewrite import apply_connectivity_rewrite
 from .reaction_completeness import build_reaction_completeness
 from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_core import build_reaction_core_projection
@@ -21,13 +14,13 @@ from .reaction_edits import (
     normalize_mapped_edits,
     resolve_reaction_evidence,
 )
-from .reaction_labels import render_reactant_label, render_reaction_label
+from .reaction_labels import render_reactant_label
 from .reaction_environments import build_reaction_family_environment
 from .reaction_fallback_descriptors import build_reaction_fallback_descriptor
-from .reaction_models import ReactionAnalysis, ReactionCandidate
-from .reaction_multi_events import (
-    equivalent_multi_event_interpretations,
-    exact_multi_event_reconstructions,
+from .reaction_models import ReactionAnalysis
+from .reaction_interpretation import (
+    build_reaction_interpretation_candidates,
+    canonical_without_maps,
 )
 from .reaction_parser import parse_reaction_smiles
 from .partial_product_correspondence import (
@@ -35,25 +28,9 @@ from .partial_product_correspondence import (
     render_partial_product_transformation,
 )
 from .reaction_products import build_product_connection
-from .reaction_spectators import derive_spectator_groups
+from .reaction_spectators import derive_observed_spectator_groups
 from .reaction_signatures import build_reaction_signature
 from .reaction_topology import build_reaction_topology
-
-
-def _canonical_without_maps(smiles: str) -> str | None:
-    from rdkit import Chem
-
-    mol = parse_smiles(smiles)
-    if mol is None:
-        return None
-    for atom in mol.GetAtoms():
-        atom.SetAtomMapNum(0)
-    try:
-        return Chem.MolToSmiles(mol, canonical=True, isomericSmiles=True)
-    except Exception:
-        return None
-
-
 def featurize_reaction(
     reaction_smiles: str,
     *,
@@ -79,169 +56,34 @@ def featurize_reaction(
             error=parsed.error,
         )
     observed_products = {
-        _canonical_without_maps(component.input_smiles) for component in parsed.products
+        canonical_without_maps(component.input_smiles)
+        for component in parsed.products
     }
     observed_products.discard(None)
-    raw = enumerate_reaction_candidates(parsed.reactants)
-    warnings = list(parsed.warnings)
     supplied_mapping = (
         _mapped_edit_override
         if _mapped_edit_override is not None
         else normalize_mapped_edits(parsed.reactants, parsed.products)
     )
     invalid_supplied_mapping = supplied_mapping.evidence == "invalid_atom_mapping"
-    if len(raw) > max_candidates:
-        raw = raw[:max_candidates]
-        warnings.append("CANDIDATE_LIMIT_REACHED")
-    candidates: List[ReactionCandidate] = []
-    candidate_sources = []
-    exact: List[ReactionCandidate] = []
-    for grammar, assignment in raw:
-        outcomes = apply_connectivity_rewrite(grammar, assignment, parsed.reactants)
-        for outcome in outcomes:
-            predicted_canonical = (
-                _canonical_without_maps(outcome.predicted_product_smiles)
-                if outcome.predicted_product_smiles
-                else None
-            )
-            verification = (
-                "exact_product_reconstruction"
-                if predicted_canonical in observed_products
-                else (
-                    "product_mismatch" if predicted_canonical else "construction_failed"
-                )
-            )
-            label = render_reaction_label(grammar, assignment, style=label_style)
-            candidate = ReactionCandidate(
-                grammar_id=grammar["id"],
-                rewrite_outcome_id=outcome.outcome_id,
-                edit_archetype=infer_bond_change_archetype(
-                    outcome.predicted_bond_changes
-                ),
-                transformation_class=grammar["transformation_class"],
-                role_assignments=assignment,
-                predicted_bond_changes=outcome.predicted_bond_changes,
-                predicted_product_smiles=predicted_canonical,
-                verification=verification,
-                reaction_label=label,
-                predicted_stereo_changes=outcome.predicted_stereo_changes,
-                compatible_named_families=tuple(
-                    grammar.get("compatible_named_families") or []
-                ),
-                warnings=outcome.warnings,
-            )
-            candidates.append(candidate)
-            candidate_sources.append((grammar, assignment))
-            if verification == "exact_product_reconstruction":
-                exact.append(candidate)
-            if len(candidates) >= max_candidates:
-                warnings.append("CANDIDATE_LIMIT_REACHED")
-                break
-        if len(candidates) >= max_candidates:
-            break
-    selected = None
-    selected_events: tuple[ReactionCandidate, ...] = ()
-    evidence = "reactant_grammar_only" if candidates else "unresolved"
-    if invalid_supplied_mapping:
-        evidence = "unresolved"
-    elif len(exact) == 1:
-        selected, evidence = exact[0], "exact_product_reconstruction"
-    elif len(exact) > 1:
-        signatures = {
-            (
-                candidate.grammar_id,
-                tuple(
-                    sorted(
-                        site.canonical_signature
-                        for site in candidate.role_assignments.values()
-                    )
-                ),
-            )
-            for candidate in exact
-        }
-        if len(signatures) == 1:
-            selected, evidence = exact[0], "exact_product_reconstruction"
-            warnings.append("SYMMETRY_EQUIVALENT_ASSIGNMENTS")
-        else:
-            evidence = "ambiguous"
-            warnings.append("AMBIGUOUS_PARTICIPATING_SITES")
-    elif candidates and not invalid_supplied_mapping:
-        multi_exact = exact_multi_event_reconstructions(
-            raw,
-            parsed.reactants,
-            {str(product) for product in observed_products},
-        )
-        if multi_exact and equivalent_multi_event_interpretations(multi_exact):
-            chosen = multi_exact[0]
-            from .reaction_multi_events import apply_rewrite_sequence
-
-            composite_product = apply_rewrite_sequence(chosen, parsed.reactants)
-            event_candidates = []
-            for grammar, assignment in chosen:
-                event_outcomes = apply_connectivity_rewrite(
-                    grammar, assignment, parsed.reactants
-                )
-                if not event_outcomes:
-                    continue
-                event_outcome = event_outcomes[0]
-                event_candidates.append(
-                    ReactionCandidate(
-                        grammar_id=str(grammar["id"]),
-                        rewrite_outcome_id=event_outcome.outcome_id,
-                        edit_archetype=infer_bond_change_archetype(
-                            event_outcome.predicted_bond_changes
-                        ),
-                        transformation_class=str(grammar["transformation_class"]),
-                        role_assignments=assignment,
-                        predicted_bond_changes=(event_outcome.predicted_bond_changes),
-                        predicted_product_smiles=composite_product,
-                        verification="exact_multi_event_reconstruction",
-                        reaction_label=render_reaction_label(
-                            grammar, assignment, style=label_style
-                        ),
-                        predicted_stereo_changes=(
-                            event_outcome.predicted_stereo_changes
-                        ),
-                        compatible_named_families=tuple(
-                            grammar.get("compatible_named_families") or []
-                        ),
-                    )
-                )
-            selected_events = tuple(event_candidates)
-            evidence = "exact_multi_event_reconstruction"
-            if len(multi_exact) > 1:
-                warnings.append("SYMMETRY_EQUIVALENT_MULTI_EVENT_ASSIGNMENTS")
-        elif multi_exact:
-            evidence = "ambiguous"
-            warnings.append("AMBIGUOUS_MULTI_EVENT_ASSIGNMENTS")
+    interpretation_build = build_reaction_interpretation_candidates(
+        reactants=parsed.reactants,
+        observed_products={str(product) for product in observed_products},
+        invalid_supplied_mapping=invalid_supplied_mapping,
+        label_style=label_style,
+        max_candidates=max_candidates,
+    )
+    raw = interpretation_build.raw_candidates
+    candidates = interpretation_build.candidates
+    candidate_sources = interpretation_build.candidate_sources
+    selected = interpretation_build.selected_candidate
+    selected_events = interpretation_build.selected_events
+    evidence = interpretation_build.evidence_quality
+    warnings = list(parsed.warnings) + list(interpretation_build.warnings)
     mapped_changes = tuple(supplied_map_bond_changes(reaction_smiles))
-    spectators = derive_spectator_groups(
-        parsed.reactants,
-        selected,
-        evidence,
-        selected_events,
-    )
-    family_environment = build_reaction_family_environment(
-        parsed.reactants, selected, spectators, evidence
-    )
-    product_connection = build_product_connection(selected, evidence, style=label_style)
-    named_family = (
-        selected.compatible_named_families[0]
-        if selected and len(selected.compatible_named_families) == 1
-        else None
-    )
+    named_family = interpretation_build.named_family
     compatible_named_families = (
-        selected.compatible_named_families
-        if selected
-        else tuple(
-            sorted(
-                {
-                    family
-                    for event in selected_events
-                    for family in event.compatible_named_families
-                }
-            )
-        )
+        interpretation_build.compatible_named_families
     )
     edit_result = resolve_reaction_evidence(
         parsed.reactants,
@@ -252,10 +94,26 @@ def featurize_reaction(
         mapped_override=_mapped_edit_override,
         mapped_provider=_mapped_provider,
     )
+    spectators = derive_observed_spectator_groups(
+        parsed.reactants,
+        edit_result.edits,
+        edit_result.evidence,
+    )
+    family_environment = build_reaction_family_environment(
+        parsed.reactants,
+        selected,
+        spectators,
+        evidence,
+    )
+    product_connection = build_product_connection(
+        selected,
+        evidence,
+        style=label_style,
+    )
     reaction_topology = build_reaction_topology(
         reactants=parsed.reactants,
         products=parsed.products,
-        selected=selected,
+        selected=None,
         edit_result=edit_result,
     )
     reaction_core = build_reaction_core_projection(
@@ -277,14 +135,7 @@ def featurize_reaction(
     )
     warnings.extend(reaction_completeness.warnings)
     product_contradicted_candidates = (
-        selected is None
-        and not selected_events
-        and bool(observed_products)
-        and bool(candidates)
-        and all(
-            candidate.verification in {"construction_failed", "product_mismatch"}
-            for candidate in candidates
-        )
+        interpretation_build.product_contradicted_candidates
     )
     partial_product_transformation = (
         infer_partial_product_transformation(

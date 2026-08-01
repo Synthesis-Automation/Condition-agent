@@ -471,6 +471,10 @@ class ReactionDisplayLabel:
     schema_version: str = "1.4"
 
 
+# Compatibility alias while callers migrate to the unified rendering name.
+RenderedReactionLabel = ReactionDisplayLabel
+
+
 @dataclass(frozen=True)
 class ReactionSpectatorGroup:
     """Functional group retained outside the selected reaction event."""
@@ -1059,6 +1063,60 @@ class ReactionCandidate:
 
 
 @dataclass(frozen=True)
+class ReactionObservation:
+    """Grammar-independent structural facts derived from one reaction graph."""
+
+    input_reaction_smiles: str
+    valid: bool
+    reactants: Tuple[ReactionComponent, ...] = ()
+    agents: Tuple[ReactionComponent, ...] = ()
+    products: Tuple[ReactionComponent, ...] = ()
+    edits: Tuple[ReactionEdit, ...] = ()
+    stereo_changes: Tuple[ReactionStereoChange, ...] = ()
+    evidence_quality: str = "unresolved"
+    evidence_confidence: float = 0.0
+    connectivity_edit_graph: Optional[ConnectivityEditGraph] = None
+    evidence_candidates: Tuple[ReactionEvidenceCandidate, ...] = ()
+    edit_hypotheses: Tuple[ReactionEditHypothesis, ...] = ()
+    mapped_bond_changes: Tuple[Dict[str, Any], ...] = ()
+    spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
+    topology: Optional[ReactionTopology] = None
+    completeness: Optional[ReactionCompletenessAssessment] = None
+    core: Optional[ReactionCoreProjection] = None
+    warnings: Tuple[str, ...] = ()
+    error: Optional[str] = None
+    schema_version: str = "1.0"
+
+    def __post_init__(self) -> None:
+        if not 0.0 <= self.evidence_confidence <= 1.0:
+            raise ValueError("observation confidence must be between 0 and 1")
+        if not self.valid and self.edits:
+            raise ValueError("an invalid reaction observation cannot contain edits")
+
+
+@dataclass(frozen=True)
+class ReactionInterpretation:
+    """Optional grammar and family interpretation of an observation."""
+
+    candidates: Tuple[ReactionCandidate, ...] = ()
+    selected_candidate: Optional[ReactionCandidate] = None
+    selected_events: Tuple[ReactionCandidate, ...] = ()
+    compatible_named_families: Tuple[str, ...] = ()
+    named_family: Optional[str] = None
+    family_environment: Optional[ReactionFamilyEnvironment] = None
+    product_connection: Optional[ProductConnection] = None
+    evidence_quality: str = "unresolved"
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
+
+    def __post_init__(self) -> None:
+        if self.named_family and self.named_family not in (
+            self.compatible_named_families
+        ):
+            raise ValueError("named family must be one compatible family")
+
+
+@dataclass(frozen=True)
 class ReactionAnalysis:
     input_reaction_smiles: str
     valid: bool
@@ -1088,6 +1146,8 @@ class ReactionAnalysis:
     partial_product_transformation: Optional[PartialProductTransformation] = None
     reaction_completeness: Optional[ReactionCompletenessAssessment] = None
     reaction_core: Optional[ReactionCoreProjection] = None
+    observation: Optional[ReactionObservation] = None
+    interpretation: Optional[ReactionInterpretation] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
     schema_version: str = "3.6"
@@ -1136,6 +1196,7 @@ __all__ = [
     "ReactionCoreRemoteClass",
     "ReactionCoreRemoteSubgraph",
     "ReactionDisplayLabel",
+    "RenderedReactionLabel",
     "ReactionEdit",
     "ReactionEditHypothesis",
     "ReactionEvidenceCandidate",
@@ -1144,6 +1205,8 @@ __all__ = [
     "ReactionFallbackDescriptor",
     "ReactionFamilyEnvironment",
     "ReactionLabelClause",
+    "ReactionInterpretation",
+    "ReactionObservation",
     "ReactionPartner",
     "ReactionPartnerEnvironment",
     "ReactionRingChange",
