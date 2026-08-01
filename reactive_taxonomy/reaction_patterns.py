@@ -17,12 +17,13 @@ from .reaction_models import (
     ReactionObservation,
     ReactionPatternMatch,
 )
+from .reaction_pattern_predicates import ReactionPatternContext, unique_indices
 
 
-REACTION_PATTERN_DEFINITION_SCHEMA_VERSION = "1.0"
+REACTION_PATTERN_DEFINITION_SCHEMA_VERSION = "2.0"
 _DEFINITION_FILES = (
-    "transformation_patterns.v1.json",
-    "synthesis_patterns.v1.json",
+    "transformation_patterns.v2.json",
+    "synthesis_patterns.v2.json",
 )
 _ORDER_RANK = {
     "NONE": 0.0,
@@ -40,6 +41,7 @@ def load_reaction_pattern_definitions() -> Tuple[dict[str, Any], ...]:
     patterns = []
     identifiers: set[str] = set()
     forbidden = {
+        "matcher",
         "operator_id",
         "predicted_bond_changes",
         "reconstruction_rule_id",
@@ -62,8 +64,13 @@ def load_reaction_pattern_definitions() -> Tuple[dict[str, Any], ...]:
                 )
             if pattern.get("tier") not in {"generic", "synthesis"}:
                 raise ValueError(f"Invalid reaction-pattern tier: {pattern_id}")
-            if not str(pattern.get("matcher") or ""):
-                raise ValueError(f"Reaction pattern has no matcher: {pattern_id}")
+            predicate_id = str(pattern.get("predicate_id") or "")
+            if not predicate_id:
+                raise ValueError(f"Reaction pattern has no predicate: {pattern_id}")
+            if predicate_id not in _PREDICATES:
+                raise ValueError(
+                    f"Unknown reaction-pattern predicate: {predicate_id}"
+                )
             identifiers.add(pattern_id)
             patterns.append(pattern)
     return tuple(sorted(patterns, key=lambda item: str(item["id"])))
@@ -273,7 +280,9 @@ def _amide_formation_like(observation: ReactionObservation) -> tuple[int, ...]:
     return ()
 
 
-def _boron_transfer_coupling_like(observation: ReactionObservation) -> tuple[int, ...]:
+def _organoboron_c_c_coupling_like(
+    observation: ReactionObservation,
+) -> tuple[int, ...]:
     broken_cb = _indices(
         observation.edits,
         lambda edit: edit.edit_type == "broken" and _element_pair(edit) == {"B", "C"},
@@ -375,19 +384,602 @@ def _decarboxylative_coupling_like(
     return ()
 
 
-_MATCHERS: Mapping[str, Callable[[ReactionObservation], tuple[int, ...]]] = {
-    "net_substitution": _net_substitution,
-    "net_elimination": _net_elimination,
-    "net_addition": _net_addition,
-    "net_bond_order_change": _net_bond_order_change,
-    "net_coupling": _net_coupling,
-    "net_ring_closure": _net_ring_closure,
-    "reductive_amination_like": _reductive_amination_like,
-    "amide_formation_like": _amide_formation_like,
-    "boron_transfer_coupling_like": _boron_transfer_coupling_like,
-    "heck_coupling_like": _heck_coupling_like,
-    "cycloaddition_like": _cycloaddition_like,
-    "decarboxylative_coupling_like": _decarboxylative_coupling_like,
+_LEAVING_ELEMENTS = frozenset({"F", "Cl", "Br", "I", "O", "S"})
+
+
+def _centered_replacement(
+    context: ReactionPatternContext,
+    *,
+    installed_element: str,
+    carbon_kind: str,
+) -> tuple[int, ...]:
+    """Match C–leaving-group replacement at one carbon center."""
+    for formed_index, formed in enumerate(context.edits):
+        if (
+            formed.edit_type != "formed"
+            or context.element_pair(formed) != {"C", installed_element}
+        ):
+            continue
+        carbon = context.endpoint_for_element(formed, "C")
+        if carbon is None:
+            continue
+        _, carbon_reference, center_key = carbon
+        if context.is_carbonyl_carbon(center_key):
+            continue
+        if carbon_kind == "sp2" and not context.is_sp2_carbon(carbon_reference):
+            continue
+        if carbon_kind == "sp3" and not context.is_sp3_carbon(carbon_reference):
+            continue
+        leaving = []
+        for broken_index in context.edits_at(center_key, edit_type="broken"):
+            broken = context.edits[broken_index]
+            other_elements = context.element_pair(broken) - {"C"}
+            if other_elements and other_elements <= _LEAVING_ELEMENTS:
+                leaving.append(broken_index)
+        if leaving:
+            hydrogen = context.indices(
+                lambda edit: edit.edit_type == "hydrogen_change"
+                and edit.atom_1.element == installed_element
+            )
+            return unique_indices(leaving, (formed_index,), hydrogen)
+    return ()
+
+
+def _sp2_c_n_substitution_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    return _centered_replacement(
+        context, installed_element="N", carbon_kind="sp2"
+    )
+
+
+def _sp3_c_n_substitution_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    return _centered_replacement(
+        context, installed_element="N", carbon_kind="sp3"
+    )
+
+
+def _sp2_c_o_substitution_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    return _centered_replacement(
+        context, installed_element="O", carbon_kind="sp2"
+    )
+
+
+def _sp3_c_o_substitution_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    return _centered_replacement(
+        context, installed_element="O", carbon_kind="sp3"
+    )
+
+
+def _sulfonyl_transfer_like(
+    context: ReactionPatternContext,
+    installed_element: str,
+) -> tuple[int, ...]:
+    for formed_index, formed in enumerate(context.edits):
+        if (
+            formed.edit_type != "formed"
+            or context.element_pair(formed) != {"S", installed_element}
+        ):
+            continue
+        sulfur = context.endpoint_for_element(formed, "S")
+        if sulfur is None or not context.is_sulfonyl_sulfur(sulfur[2]):
+            continue
+        leaving = tuple(
+            index
+            for index in context.edits_at(sulfur[2], edit_type="broken")
+            if bool(context.element_pair(context.edits[index]) & {"F", "Cl", "Br", "I"})
+        )
+        if leaving:
+            return unique_indices(leaving, (formed_index,))
+    return ()
+
+
+def _sulfonamide_formation_like(
+    context: ReactionPatternContext,
+) -> tuple[int, ...]:
+    return _sulfonyl_transfer_like(context, "N")
+
+
+def _o_sulfonylation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    return _sulfonyl_transfer_like(context, "O")
+
+
+def _acyl_substitution(
+    context: ReactionPatternContext,
+    installed_element: str,
+) -> tuple[tuple[int, ...], tuple[int, int] | None, tuple[str, ...]]:
+    """Return acyl-substitution edits, center, and retained single neighbors."""
+    for formed_index, formed in enumerate(context.edits):
+        if (
+            formed.edit_type != "formed"
+            or context.element_pair(formed) != {"C", installed_element}
+        ):
+            continue
+        carbon = context.endpoint_for_element(formed, "C")
+        if carbon is None or not context.is_carbonyl_carbon(carbon[2]):
+            continue
+        leaving_indices = []
+        leaving_atom_indices = []
+        for broken_index in context.edits_at(carbon[2], edit_type="broken"):
+            broken = context.edits[broken_index]
+            if str(broken.old_order or "").upper() != "SINGLE":
+                continue
+            other = (
+                broken.atom_2
+                if context.atom_key(broken, 1) == carbon[2]
+                else broken.atom_1
+            )
+            if other is not None:
+                leaving_indices.append(broken_index)
+                leaving_atom_indices.append(other.atom_index)
+        if not leaving_indices:
+            continue
+        molecule = context.molecule("reactant", carbon[2][0])
+        retained = []
+        if molecule is not None:
+            atom = molecule.GetAtomWithIdx(carbon[2][1])
+            for neighbor in atom.GetNeighbors():
+                if neighbor.GetIdx() in leaving_atom_indices:
+                    continue
+                bond = molecule.GetBondBetweenAtoms(carbon[2][1], neighbor.GetIdx())
+                if str(bond.GetBondType()).upper() == "SINGLE":
+                    retained.append(str(neighbor.GetSymbol()))
+        return (
+            unique_indices(tuple(leaving_indices), (formed_index,)),
+            carbon[2],
+            tuple(sorted(retained)),
+        )
+    return (), None, ()
+
+
+def _amide_formation(context: ReactionPatternContext) -> tuple[int, ...]:
+    indices, _, retained = _acyl_substitution(context, "N")
+    return indices if indices and not ({"O", "N"} & set(retained)) else ()
+
+
+def _ester_formation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    indices, _, retained = _acyl_substitution(context, "O")
+    return indices if indices and "O" not in retained else ()
+
+
+def _carbamate_formation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    indices, _, retained = _acyl_substitution(context, "N")
+    return indices if indices and "O" in retained else ()
+
+
+def _carbonate_formation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    indices, _, retained = _acyl_substitution(context, "O")
+    return indices if indices and "O" in retained else ()
+
+
+def _urea_formation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    formed_cn = context.indices(
+        lambda edit: edit.edit_type == "formed"
+        and context.element_pair(edit) == {"C", "N"}
+    )
+    for formed_index in formed_cn:
+        carbon = context.endpoint_for_element(context.edits[formed_index], "C")
+        if carbon is None or not context.is_carbonyl_carbon(carbon[2]):
+            continue
+        if not context.has_neighbor(carbon[2], element="N", order="DOUBLE"):
+            continue
+        order_changes = tuple(
+            index
+            for index in context.edits_at(carbon[2], edit_type="order_changed")
+            if context.element_pair(context.edits[index]) == {"C", "N"}
+            and context.order_direction(context.edits[index]) < 0
+        )
+        if order_changes:
+            return unique_indices((formed_index,), order_changes)
+    return ()
+
+
+def _organoboron_transfer_like(
+    context: ReactionPatternContext,
+    installed_element: str,
+) -> tuple[int, ...]:
+    broken_cb = context.indices(
+        lambda edit: edit.edit_type == "broken"
+        and context.element_pair(edit) == {"B", "C"}
+    )
+    for broken_index in broken_cb:
+        carbon = context.endpoint_for_element(context.edits[broken_index], "C")
+        if carbon is None:
+            continue
+        formed = tuple(
+            index
+            for index in context.edits_at(carbon[2], edit_type="formed")
+            if context.element_pair(context.edits[index]) == {"C", installed_element}
+        )
+        if formed:
+            return unique_indices((broken_index,), formed)
+    return ()
+
+
+def _organoboron_c_n_coupling_like(
+    context: ReactionPatternContext,
+) -> tuple[int, ...]:
+    return _organoboron_transfer_like(context, "N")
+
+
+def _organoboron_c_o_coupling_like(
+    context: ReactionPatternContext,
+) -> tuple[int, ...]:
+    return _organoboron_transfer_like(context, "O")
+
+
+def _organoboron_c_s_coupling_like(
+    context: ReactionPatternContext,
+) -> tuple[int, ...]:
+    return _organoboron_transfer_like(context, "S")
+
+
+def _sonogashira_coupling_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    for formed_index, formed in enumerate(context.edits):
+        if formed.edit_type != "formed" or context.element_pair(formed) != {"C"}:
+            continue
+        endpoint_keys = (context.atom_key(formed, 1), context.atom_key(formed, 2))
+        for alkynyl_key, electrophile_key in (endpoint_keys, endpoint_keys[::-1]):
+            if alkynyl_key is None or electrophile_key is None:
+                continue
+            if not context.has_neighbor(alkynyl_key, element="C", order="TRIPLE"):
+                continue
+            leaving = tuple(
+                index
+                for index in context.edits_at(electrophile_key, edit_type="broken")
+                if bool(context.element_pair(context.edits[index]) & {"F", "Cl", "Br", "I"})
+            )
+            if leaving:
+                return unique_indices(leaving, (formed_index,))
+    return ()
+
+
+def _borylation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    for formed_index, formed in enumerate(context.edits):
+        if formed.edit_type != "formed" or context.element_pair(formed) != {"B", "C"}:
+            continue
+        carbon = context.endpoint_for_element(formed, "C")
+        if carbon is None:
+            continue
+        leaving = tuple(
+            index
+            for index in context.edits_at(carbon[2], edit_type="broken")
+            if bool(context.element_pair(context.edits[index]) & {"F", "Cl", "Br", "I"})
+        )
+        if leaving:
+            return unique_indices(leaving, (formed_index,))
+    return ()
+
+
+def _alkene_hydrogenation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    order = context.indices(
+        lambda edit: edit.edit_type == "order_changed"
+        and context.element_pair(edit) == {"C"}
+        and str(edit.old_order or "").upper() == "DOUBLE"
+        and context.order_direction(edit) < 0
+    )
+    hydrogen = context.indices(
+        lambda edit: edit.edit_type == "hydrogen_change"
+        and edit.atom_1.element == "C"
+        and edit.old_order is None
+        and edit.new_order is not None
+    )
+    return unique_indices(order, hydrogen) if order and hydrogen else ()
+
+
+def _alkyne_hydrogenation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    order = context.indices(
+        lambda edit: edit.edit_type == "order_changed"
+        and context.element_pair(edit) == {"C"}
+        and str(edit.old_order or "").upper() == "TRIPLE"
+        and context.order_direction(edit) < 0
+    )
+    hydrogen = context.indices(
+        lambda edit: edit.edit_type == "hydrogen_change"
+        and edit.atom_1.element == "C"
+        and edit.old_order is None
+        and edit.new_order is not None
+    )
+    return unique_indices(order, hydrogen) if order and hydrogen else ()
+
+
+def _carbonyl_reduction_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    for index, edit in enumerate(context.edits):
+        if not (
+            edit.edit_type == "order_changed"
+            and context.element_pair(edit) == {"C", "O"}
+            and context.order_direction(edit) < 0
+        ):
+            continue
+        carbon = context.endpoint_for_element(edit, "C")
+        if carbon is None:
+            continue
+        if any(
+            context.edits[related_index].edit_type in {"formed", "broken"}
+            for related_index in context.edits_at(carbon[2])
+        ):
+            continue
+        if not (
+            context.has_neighbor(carbon[2], element="O", order="SINGLE")
+            or context.has_neighbor(carbon[2], element="N", order="SINGLE")
+        ):
+            return (index,)
+    return ()
+
+
+def _alcohol_oxidation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    order = context.indices(
+        lambda edit: edit.edit_type == "order_changed"
+        and context.element_pair(edit) == {"C", "O"}
+        and context.order_direction(edit) > 0
+    )
+    return order
+
+
+def _nitro_reduction_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    broken_no = context.indices(
+        lambda edit: edit.edit_type == "broken"
+        and context.element_pair(edit) == {"N", "O"}
+    )
+    hydrogen_n = context.indices(
+        lambda edit: edit.edit_type == "hydrogen_change"
+        and edit.atom_1.element == "N"
+        and edit.old_order is None
+        and edit.new_order is not None
+    )
+    return unique_indices(broken_no, hydrogen_n) if broken_no and hydrogen_n else ()
+
+
+def _heteroatom_deprotection_like(
+    context: ReactionPatternContext,
+    element: str,
+) -> tuple[int, ...]:
+    hydrogen = context.indices(
+        lambda edit: edit.edit_type == "hydrogen_change"
+        and edit.atom_1.element == element
+        and edit.old_order is None
+        and edit.new_order is not None
+    )
+    for hydrogen_index in hydrogen:
+        key = context.atom_key(context.edits[hydrogen_index], 1)
+        if key is None:
+            continue
+        if element == "O":
+            molecule = context.molecule("reactant", key[0])
+            if molecule is not None:
+                oxygen = molecule.GetAtomWithIdx(key[1])
+                if any(
+                    neighbor.GetSymbol() == "C"
+                    and context.is_carbonyl_carbon((key[0], neighbor.GetIdx()))
+                    for neighbor in oxygen.GetNeighbors()
+                ):
+                    continue
+        broken = tuple(
+            index
+            for index in context.edits_at(key, edit_type="broken")
+            if bool(context.element_pair(context.edits[index]) & {"C", "Si", "S"})
+        )
+        formed = context.edits_at(key, edit_type="formed")
+        if broken and not formed:
+            return unique_indices(broken, (hydrogen_index,))
+    return ()
+
+
+def _amine_deprotection_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    return _heteroatom_deprotection_like(context, "N")
+
+
+def _alcohol_deprotection_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    return _heteroatom_deprotection_like(context, "O")
+
+
+def _ester_hydrolysis_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    """Match ester cleavage that restores a carboxylic-acid O–H bond."""
+    hydrogen_o = context.indices(
+        lambda edit: edit.edit_type == "hydrogen_change"
+        and edit.atom_1.element == "O"
+        and edit.old_order is None
+        and edit.new_order is not None
+    )
+    for hydrogen_index in hydrogen_o:
+        oxygen_key = context.atom_key(context.edits[hydrogen_index], 1)
+        if oxygen_key is None:
+            continue
+        molecule = context.molecule("reactant", oxygen_key[0])
+        if molecule is None:
+            continue
+        oxygen = molecule.GetAtomWithIdx(oxygen_key[1])
+        carbonyl_neighbors = tuple(
+            neighbor.GetIdx()
+            for neighbor in oxygen.GetNeighbors()
+            if neighbor.GetSymbol() == "C"
+            and context.is_carbonyl_carbon((oxygen_key[0], neighbor.GetIdx()))
+        )
+        if not carbonyl_neighbors:
+            continue
+        broken = context.edits_at(oxygen_key, edit_type="broken")
+        if broken:
+            return unique_indices(broken, (hydrogen_index,))
+    return ()
+
+
+def _acid_chloride_formation_like(
+    context: ReactionPatternContext,
+) -> tuple[int, ...]:
+    for formed_index, formed in enumerate(context.edits):
+        if formed.edit_type != "formed" or context.element_pair(formed) != {"C", "Cl"}:
+            continue
+        carbon = context.endpoint_for_element(formed, "C")
+        if carbon is None or not context.is_carbonyl_carbon(carbon[2]):
+            continue
+        broken = tuple(
+            index
+            for index in context.edits_at(carbon[2], edit_type="broken")
+            if "O" in context.element_pair(context.edits[index])
+        )
+        if broken:
+            return unique_indices(broken, (formed_index,))
+    return ()
+
+
+def _alcohol_to_halide_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    for formed_index, formed in enumerate(context.edits):
+        if formed.edit_type != "formed" or not (
+            "C" in context.element_pair(formed)
+            and context.element_pair(formed) & {"F", "Cl", "Br", "I"}
+        ):
+            continue
+        carbon = context.endpoint_for_element(formed, "C")
+        if carbon is None or context.is_carbonyl_carbon(carbon[2]):
+            continue
+        broken = tuple(
+            index
+            for index in context.edits_at(carbon[2], edit_type="broken")
+            if "O" in context.element_pair(context.edits[index])
+        )
+        if broken:
+            return unique_indices(broken, (formed_index,))
+    return ()
+
+
+def _cyanation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    for formed_index, formed in enumerate(context.edits):
+        if formed.edit_type != "formed" or context.element_pair(formed) != {"C"}:
+            continue
+        keys = (context.atom_key(formed, 1), context.atom_key(formed, 2))
+        for nitrile_key, electrophile_key in (keys, keys[::-1]):
+            if nitrile_key is None or electrophile_key is None:
+                continue
+            if not context.has_neighbor(nitrile_key, element="N", order="TRIPLE"):
+                continue
+            leaving = tuple(
+                index
+                for index in context.edits_at(electrophile_key, edit_type="broken")
+                if bool(context.element_pair(context.edits[index]) & _LEAVING_ELEMENTS)
+            )
+            if leaving:
+                return unique_indices(leaving, (formed_index,))
+    return ()
+
+
+def _sulfide_oxidation_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    formed_so = context.indices(
+        lambda edit: edit.edit_type == "formed"
+        and context.element_pair(edit) == {"O", "S"}
+        and str(edit.new_order or "").upper() in {"SINGLE", "DOUBLE"}
+    )
+    for index in formed_so:
+        sulfur = context.endpoint_for_element(context.edits[index], "S")
+        if sulfur is not None and not context.is_sulfonyl_sulfur(sulfur[2]):
+            return (index,)
+    return ()
+
+
+def _carboxyl_derivative_reduction_like(
+    context: ReactionPatternContext,
+) -> tuple[int, ...]:
+    order = context.indices(
+        lambda edit: edit.edit_type == "order_changed"
+        and context.element_pair(edit) == {"C", "O"}
+        and context.order_direction(edit) < 0
+    )
+    for index in order:
+        carbon = context.endpoint_for_element(context.edits[index], "C")
+        if carbon is not None and context.has_neighbor(
+            carbon[2], element="O", order="SINGLE"
+        ):
+            related = context.edits_at(carbon[2])
+            return unique_indices((index,), related)
+    return ()
+
+
+def _net_bond_cleavage(observation: ReactionObservation) -> tuple[int, ...]:
+    broken = _indices(observation.edits, lambda edit: edit.edit_type == "broken")
+    formed = _indices(observation.edits, lambda edit: edit.edit_type == "formed")
+    return broken if broken and not formed else ()
+
+
+def _net_ring_opening(observation: ReactionObservation) -> tuple[int, ...]:
+    topology = observation.topology
+    if topology is None or not (
+        topology.ring_count_delta is not None and topology.ring_count_delta < 0
+    ):
+        return ()
+    return _indices(observation.edits, lambda edit: edit.edit_type == "broken")
+
+
+def _net_bond_order_direction(
+    observation: ReactionObservation,
+    direction: int,
+) -> tuple[int, ...]:
+    return _indices(
+        observation.edits,
+        lambda edit: edit.edit_type == "order_changed"
+        and _order_direction(edit) == direction,
+    )
+
+
+_PREDICATES: Mapping[str, Callable[[ReactionPatternContext], tuple[int, ...]]] = {
+    "net_substitution": lambda context: _net_substitution(context.observation),
+    "net_elimination": lambda context: _net_elimination(context.observation),
+    "net_addition": lambda context: _net_addition(context.observation),
+    "net_bond_order_change": lambda context: _net_bond_order_change(
+        context.observation
+    ),
+    "net_coupling": lambda context: _net_coupling(context.observation),
+    "net_ring_closure": lambda context: _net_ring_closure(context.observation),
+    "net_bond_cleavage": lambda context: _net_bond_cleavage(
+        context.observation
+    ),
+    "net_ring_opening": lambda context: _net_ring_opening(context.observation),
+    "net_bond_order_increase": lambda context: _net_bond_order_direction(
+        context.observation, 1
+    ),
+    "net_bond_order_decrease": lambda context: _net_bond_order_direction(
+        context.observation, -1
+    ),
+    "reductive_amination_like": lambda context: _reductive_amination_like(
+        context.observation
+    ),
+    "amide_formation_like": _amide_formation,
+    "ester_formation_like": _ester_formation_like,
+    "carbamate_formation_like": _carbamate_formation_like,
+    "carbonate_formation_like": _carbonate_formation_like,
+    "urea_formation_like": _urea_formation_like,
+    "sp2_c_n_substitution_like": _sp2_c_n_substitution_like,
+    "sp3_c_n_substitution_like": _sp3_c_n_substitution_like,
+    "sp2_c_o_substitution_like": _sp2_c_o_substitution_like,
+    "sp3_c_o_substitution_like": _sp3_c_o_substitution_like,
+    "sulfonamide_formation_like": _sulfonamide_formation_like,
+    "o_sulfonylation_like": _o_sulfonylation_like,
+    "organoboron_c_c_coupling_like": lambda context: _organoboron_c_c_coupling_like(
+        context.observation
+    ),
+    "organoboron_c_n_coupling_like": _organoboron_c_n_coupling_like,
+    "organoboron_c_o_coupling_like": _organoboron_c_o_coupling_like,
+    "organoboron_c_s_coupling_like": _organoboron_c_s_coupling_like,
+    "sonogashira_coupling_like": _sonogashira_coupling_like,
+    "borylation_like": _borylation_like,
+    "alkene_hydrogenation_like": _alkene_hydrogenation_like,
+    "alkyne_hydrogenation_like": _alkyne_hydrogenation_like,
+    "carbonyl_reduction_like": _carbonyl_reduction_like,
+    "alcohol_oxidation_like": _alcohol_oxidation_like,
+    "nitro_reduction_like": _nitro_reduction_like,
+    "amine_deprotection_like": _amine_deprotection_like,
+    "alcohol_deprotection_like": _alcohol_deprotection_like,
+    "ester_hydrolysis_like": _ester_hydrolysis_like,
+    "acid_chloride_formation_like": _acid_chloride_formation_like,
+    "alcohol_to_halide_like": _alcohol_to_halide_like,
+    "cyanation_like": _cyanation_like,
+    "sulfide_oxidation_like": _sulfide_oxidation_like,
+    "carboxyl_derivative_reduction_like": _carboxyl_derivative_reduction_like,
+    "heck_coupling_like": lambda context: _heck_coupling_like(
+        context.observation
+    ),
+    "cycloaddition_like": lambda context: _cycloaddition_like(
+        context.observation
+    ),
+    "decarboxylative_coupling_like": lambda context: _decarboxylative_coupling_like(
+        context.observation
+    ),
 }
 
 
@@ -402,12 +994,13 @@ def match_reaction_patterns(
     if not observation.valid or not observation.edits:
         return ()
     matches = []
+    context = ReactionPatternContext(observation)
     for definition in load_reaction_pattern_definitions():
-        matcher_name = str(definition["matcher"])
-        matcher = _MATCHERS.get(matcher_name)
-        if matcher is None:
-            raise ValueError(f"Unknown reaction-pattern matcher: {matcher_name}")
-        indices = tuple(sorted(set(matcher(observation))))
+        predicate_id = str(definition["predicate_id"])
+        predicate = _PREDICATES.get(predicate_id)
+        if predicate is None:
+            raise ValueError(f"Unknown reaction-pattern predicate: {predicate_id}")
+        indices = tuple(sorted(set(predicate(context))))
         if not indices:
             continue
         matches.append(
@@ -426,6 +1019,9 @@ def match_reaction_patterns(
                 ),
                 compatible_named_families=tuple(
                     definition.get("compatible_named_families") or ()
+                ),
+                requires_condition_evidence=bool(
+                    definition.get("requires_condition_evidence", False)
                 ),
             )
         )

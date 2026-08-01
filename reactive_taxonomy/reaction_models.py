@@ -12,7 +12,7 @@ from .models import MoleculeAnalysis, MolecularStructureObservation
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.4"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "3.0"
 REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.4"
-REACTION_PATTERN_MATCH_SCHEMA_VERSION = "2.0"
+REACTION_PATTERN_MATCH_SCHEMA_VERSION = "3.0"
 REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v10"
 REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
 REACTION_TOPOLOGY_SCHEMA_VERSION = "2.0"
@@ -465,7 +465,7 @@ class RenderedReactionLabel:
     product_context_label: Optional[str] = None
     event_labels: Tuple[str, ...] = ()
     event_count: int = 0
-    schema_version: str = "4.0"
+    schema_version: str = "5.0"
 
 @dataclass(frozen=True)
 class ReactionSpectatorGroup:
@@ -1016,6 +1016,7 @@ class ReactionPatternMatch:
     evidence: Tuple[str, ...]
     display_label: Optional[str] = None
     compatible_named_families: Tuple[str, ...] = ()
+    requires_condition_evidence: bool = False
     warnings: Tuple[str, ...] = ()
     schema_version: str = REACTION_PATTERN_MATCH_SCHEMA_VERSION
 
@@ -1075,7 +1076,7 @@ class ReactionInterpretation:
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
     evidence_quality: str = "unresolved"
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "5.0"
+    schema_version: str = "6.0"
 
     def __post_init__(self) -> None:
         if self.named_family and self.named_family not in (

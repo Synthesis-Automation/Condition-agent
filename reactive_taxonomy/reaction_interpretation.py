@@ -33,6 +33,7 @@ def interpret_reaction(
                 family
                 for match in pattern_matches
                 if match.tier == "synthesis" and match.confidence >= 0.8
+                and not match.requires_condition_evidence
                 for family in match.compatible_named_families
             }
         )

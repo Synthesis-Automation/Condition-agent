@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "label_schema_version": "4.0",
+  "label_schema_version": "5.0",
   "default_style": "unicode",
   "clause_order": ["broken", "order_changed", "formed", "hydrogen_change"],
   "element_precedence": ["C", "N", "O", "S", "P", "B", "Si", "H", "F", "Cl", "Br", "I"],
@@ -76,6 +76,8 @@
     "core_evidence": "core evidence: {evidence}",
     "core_quality": "core quality: {quality}",
     "literal_edit_audit": "literal edits: {clauses}",
-    "pattern_overlay": "transformation pattern: {label}"
+    "pattern_overlay": "transformation pattern: {label}",
+    "compatible_families": "compatible families: {families}",
+    "condition_evidence_required": "named family requires condition evidence"
   }
 }

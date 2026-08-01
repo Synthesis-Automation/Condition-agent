@@ -514,6 +514,8 @@ def _build_reaction_label(
     reaction_core: Optional[ReactionCoreProjection] = None,
     interpretation_pattern_label: Optional[str] = None,
     interpretation_pattern_id: Optional[str] = None,
+    interpretation_family_candidates: Sequence[str] = (),
+    interpretation_requires_condition_evidence: bool = False,
     warnings: Iterable[str] = (),
     style: str = "unicode",
     fallback_detailed_label: Optional[str] = None,
@@ -597,6 +599,22 @@ def _build_reaction_label(
             label=concise,
             clauses=detailed_clauses,
         )
+        if interpretation_family_candidates:
+            detailed = styling["separator"].join(
+                (
+                    detailed,
+                    str(rendering["templates"]["compatible_families"]).format(
+                        families=", ".join(interpretation_family_candidates)
+                    ),
+                )
+            )
+        if interpretation_requires_condition_evidence:
+            detailed = styling["separator"].join(
+                (
+                    detailed,
+                    str(rendering["templates"]["condition_evidence_required"]),
+                )
+            )
         transformation_label = concise
         status = "generic_pattern"
         source = "optional_pattern"

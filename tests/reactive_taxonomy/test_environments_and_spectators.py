@@ -68,7 +68,7 @@ def test_pyridine_nitrogen_is_spectator_but_reactive_ring_is_context() -> None:
     assert result.interpretation is not None
     assert result.interpretation.family_environment is None
     assert result.interpretation.primary_pattern_id == (
-        "boron_transfer_coupling_like"
+        "organoboron_c_c_coupling_like"
     )
     spectator_ids = {
     group.group_id for group in result.spectator_groups
@@ -180,7 +180,7 @@ def test_suzuki_pattern_is_optional_and_does_not_assign_partner_roles() -> None:
     assert result.family_environment is None
     assert result.interpretation is not None
     assert result.interpretation.primary_pattern_id == (
-        "boron_transfer_coupling_like"
+        "organoboron_c_c_coupling_like"
     )
     assert result.interpretation.partners == ()
 
@@ -190,7 +190,7 @@ def test_molecular_annotations_remain_available_beside_suzuki_pattern() -> None:
     result = featurize_reaction(reaction)
     assert result.interpretation is not None
     assert result.interpretation.primary_pattern_id == (
-        "boron_transfer_coupling_like"
+        "organoboron_c_c_coupling_like"
     )
     leaving_groups = [
         site

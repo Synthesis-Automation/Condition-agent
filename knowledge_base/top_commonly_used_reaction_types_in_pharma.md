@@ -22,7 +22,7 @@ Consequently, ranks 1–15 are highly stable, ranks 16–31 are broadly common b
 The Roche study processed 688,659 structurally valid reaction records and classified 560,260 reactions. Four top-level classes account for approximately **71%** of classified reactions:
 
 | Roche top-level class | Share of classified reactions |
-|---|---:|
+| --- | ---: |
 | Heteroatom alkylation and arylation | 24.9% |
 | Acylation and related processes | 18.8% |
 | Deprotection reactions | 15.3% |
@@ -35,7 +35,7 @@ The operational repertoire is therefore concentrated around amide formation, N-a
 ## Evidence codes
 
 | Code | Source type |
-|---|---|
+| --- | --- |
 | **R** | Roche enterprise ELN study, 2010–2024 |
 | **C** | Carey et al., process chemistry survey at GSK, AstraZeneca, and Pfizer |
 | **RJ** | Roughley and Jordan medicinal chemistry toolbox analysis |
@@ -383,7 +383,7 @@ These are strategically important but generally occur less often than the core m
 The Roche departmental analysis shows that a single global ranking can obscure different operational needs.
 
 | Reaction superclass | Medicinal chemistry | Preclinical chemistry manufacturing | Pharma technical development |
-|---|---:|---:|---:|
+| --- | ---: | ---: | ---: |
 | Heteroatom alkylation and arylation | 25.8% | 18.8% | 24.6% |
 | Acylation and related processes | 20.5% | 10.8% | 12.0% |
 | Deprotection reactions | 16.1% | 12.9% | 10.5% |

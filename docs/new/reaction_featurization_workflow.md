@@ -115,10 +115,18 @@ signature unchanged.
 
 [`match_reaction_patterns()`](../reactive_taxonomy/reaction_patterns.py) then
 matches optional patterns against the completed observation. Generic patterns
-include net substitution, elimination, addition, coupling, bond-order change,
-and ring closure. More specific synthesis patterns include reductive-amination-
-like, amide-formation-like, boron-transfer-coupling-like, Heck-like,
-cycloaddition-like, and decarboxylative-coupling-like observations.
+include net substitution, elimination, addition, coupling, bond cleavage,
+bond-order direction, and ring opening or closure. Reusable graph queries live
+in `reaction_pattern_predicates.py`; validated v2 metadata lives in
+`transformation_patterns.v2.json` and `synthesis_patterns.v2.json`.
+
+Synthesis patterns combine those facts into chemist-facing structural classes.
+For example, SNAr, Buchwald–Hartwig C–N, and Ullmann C–N products share one
+`sp2_c_n_substitution_like` pattern because their graph-observable change is the
+same. The pattern retains all compatible named families and requires condition
+evidence to resolve them. Organoboron C–N/O/S coupling is separate and may
+support a Chan–Lam candidate, while organoboron C–C coupling supports a
+Suzuki-like interpretation.
 
 Pattern definitions contain no operators, structural slots, predicted edits,
 or reconstruction instructions. They may rank display interpretations or add

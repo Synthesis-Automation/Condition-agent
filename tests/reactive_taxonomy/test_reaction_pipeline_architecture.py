@@ -52,7 +52,7 @@ def test_interpretation_adds_optional_family_semantics() -> None:
     observation = observe_reaction(UNMAPPED_SUZUKI)
     interpretation = interpret_reaction(observation)
 
-    assert interpretation.primary_pattern_id == "boron_transfer_coupling_like"
+    assert interpretation.primary_pattern_id == "organoboron_c_c_coupling_like"
     assert interpretation.named_family == "suzuki_miyaura"
     assert interpretation.partners == ()
     signature = build_observation_signature(observation)
@@ -129,5 +129,5 @@ def test_analysis_serializes_one_canonical_reaction_label_contract() -> None:
     } == set()
     assert payload["reaction_label"]["concise"]
     assert payload["reaction_label"]["detailed"]
-    assert payload["reaction_label"]["schema_version"] == "4.0"
+    assert payload["reaction_label"]["schema_version"] == "5.0"
     assert payload["interpretation"]["pattern_matches"]

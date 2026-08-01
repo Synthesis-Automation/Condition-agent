@@ -67,6 +67,7 @@ def test_pattern_registry_cannot_change_structural_observation(monkeypatch) -> N
 
 def test_pattern_definitions_contain_no_structural_execution_data() -> None:
     forbidden = {
+        "matcher",
         "operator_id",
         "predicted_bond_changes",
         "reconstruction_rule_id",

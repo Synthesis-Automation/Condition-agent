@@ -12,13 +12,13 @@ CLICK = (
 def test_generic_label_is_derived_from_normalized_edits() -> None:
     result = featurize_reaction("Brc1ccccc1.CN>>CNc1ccccc1")
     assert result.reaction_label is not None
-    assert result.reaction_label.concise == "C–Br + N–H → C–N"
+    assert result.reaction_label.concise == "C(sp²)–N bond formation"
+    assert "snar_amination" in result.reaction_label.detailed
+    assert "named family requires condition evidence" in (
+        result.reaction_label.detailed
+    )
     assert result.reaction_label.detailed
-    assert result.reaction_label.source in {
-        "generic_pattern",
-        "generic_topology",
-        "literal_edits",
-    }
+    assert result.reaction_label.source == "optional_pattern"
 
 
 def test_cycloaddition_receives_chemist_friendly_topology_rendering() -> None:

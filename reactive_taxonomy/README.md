@@ -60,10 +60,16 @@ are annotation definitions.
 Reaction patterns are split into two optional tiers:
 
 - transformation patterns describe common net edit shapes such as substitution,
-  addition, elimination, bond-order change, coupling, and ring closure;
+  addition, elimination, cleavage, bond-order direction, coupling, and ring
+  opening or closure;
 - synthesis patterns add stronger chemist-facing interpretations such as
-  Suzuki-like coupling, amide formation, reductive-amination-like change, or
-  cycloaddition.
+  organoboron coupling, sp2/sp3 C–N or C–O bond formation, acyl and sulfonyl
+  transfer, redox changes, reductive amination, or cycloaddition.
+
+Patterns may expose compatible named families without resolving one. SNAr,
+Buchwald–Hartwig C–N, and Ullmann C–N therefore share a structural sp2 C–N
+substitution pattern. Organoboron C–N/O/S formation is represented separately
+and requires condition evidence before a Chan–Lam family name is assigned.
 
 Pattern definitions contain no graph operators, predicted products, structural
 slots, or reconstruction instructions.
@@ -79,4 +85,4 @@ All SMARTS compilation goes through
 `reactive_taxonomy.chemistry.smarts_cache.compile_smarts`.
 
 The concise architectural walkthrough is in
-[`docs/reaction_featurization_workflow.md`](../docs/reaction_featurization_workflow.md).
+[`docs/new/reaction_featurization_workflow.md`](../docs/new/reaction_featurization_workflow.md).

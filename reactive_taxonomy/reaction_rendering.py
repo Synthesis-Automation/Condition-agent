@@ -21,8 +21,8 @@ from .reaction_signatures import build_observation_signature
 _REACTION_LABEL_DEFINITION_FILES = (
     "reaction_label_rendering.v1.json",
     "reaction_label_patterns.v1.json",
-    "synthesis_patterns.v1.json",
-    "transformation_patterns.v1.json",
+    "synthesis_patterns.v2.json",
+    "transformation_patterns.v2.json",
 )
 
 
@@ -113,6 +113,16 @@ def render_reaction(
         ),
         interpretation_pattern_id=(
             primary_pattern.pattern_id if primary_pattern is not None else None
+        ),
+        interpretation_family_candidates=(
+            primary_pattern.compatible_named_families
+            if primary_pattern is not None
+            else ()
+        ),
+        interpretation_requires_condition_evidence=(
+            primary_pattern.requires_condition_evidence
+            if primary_pattern is not None
+            else False
         ),
         warnings=(
             tuple(observation.warnings)
