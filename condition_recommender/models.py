@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "6.0"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v6.0"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "7.0"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v7.0"
 
 
 class AdmissionTier(str, Enum):
@@ -308,14 +308,14 @@ class LabelRecommendationResult:
     query_reaction_smiles: str
     valid: bool
     query_label: Optional[str] = None
-    grammar_id: Optional[str] = None
+    interpretation_id: Optional[str] = None
     query_signatures: Tuple[str, ...] = ()
     candidate_count: int = 0
     recipe_count: int = 0
     recommendations: Tuple[LabelConditionRecommendation, ...] = ()
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.0"
+    schema_version: str = "2.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

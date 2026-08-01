@@ -18,12 +18,12 @@ from .signature_serialization import flattened_signature_fields, signature_recor
 
 _CONFIG = {
     "O": {
-        "grammar": "sp2_c_o_substitution",
+        "interpretation": "sp2_c_o_substitution",
         "family": "c_o_coupling",
         "connection": "C_O",
     },
     "S": {
-        "grammar": "sp2_c_s_substitution",
+        "interpretation": "sp2_c_s_substitution",
         "family": "c_s_coupling",
         "connection": "C_S",
     },
@@ -50,8 +50,13 @@ def convert_row(
         selected = analysis.selected_candidate
         if analysis.evidence_quality != "exact_product_reconstruction":
             reasons.append("reaction_not_exactly_verified")
-        if selected is None or selected.grammar_id != config["grammar"]:
-            reasons.append(f"not_verified_as_{config['grammar']}")
+        if (
+            selected is None
+            or selected.annotation_id != config["interpretation"]
+        ):
+            reasons.append(
+                f"not_verified_as_{config['interpretation']}"
+            )
         if (
             analysis.family_environment is None
             or analysis.family_environment.family_id != config["family"]

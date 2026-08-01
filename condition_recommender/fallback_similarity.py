@@ -22,7 +22,7 @@ _FEATURE_FIELDS = {
         "product_group_tokens",
     ),
     "contexts": ("context_tokens",),
-    "candidate_grammars": ("candidate_grammar_tokens",),
+    "candidate_interpretations": ("candidate_interpretation_tokens",),
     "candidate_transformations": ("candidate_transformation_tokens",),
     "candidate_handles": ("candidate_handle_tokens",),
     "candidate_edits": ("candidate_edit_tokens",),
@@ -35,7 +35,7 @@ _FEATURE_FIELDS = {
     "element_delta": ("element_delta_tokens",),
 }
 _HIGH_SIGNAL_FIELDS = (
-    "candidate_grammar_tokens",
+    "candidate_interpretation_tokens",
     "candidate_transformation_tokens",
     "candidate_edit_tokens",
     "verified_edit_tokens",
@@ -52,7 +52,7 @@ def load_fallback_retrieval_rules() -> dict[str, Any]:
     """Load and validate the conservative fallback policy."""
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    if str(rules.get("schema_version") or "") != "1.4":
+    if str(rules.get("schema_version") or "") != "2.0":
         raise ValueError("unsupported fallback retrieval definition schema")
     if str(rules.get("definition_id") or "") != "fallback_retrieval.v1":
         raise ValueError("unexpected fallback retrieval definition ID")

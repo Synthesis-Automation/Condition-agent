@@ -1,4 +1,4 @@
-"""Grammar-free structural reconstruction evidence from registered operators."""
+"""Interpretation-independent reconstruction evidence from graph operators."""
 
 from __future__ import annotations
 
@@ -172,7 +172,7 @@ def enumerate_reconstruction_assignments(
 def enumerate_reconstruction_candidates(
     components: Tuple[ReactionComponent, ...],
 ) -> Tuple[RawReconstructionCandidate, ...]:
-    """Enumerate grammar-free structural rule and site bindings."""
+    """Enumerate structural rule and site bindings."""
     return tuple(
         (rule, assignment)
         for rule in load_reaction_reconstruction_rules()
@@ -254,7 +254,7 @@ def build_reaction_reconstruction_candidates(
     invalid_supplied_mapping: bool,
     max_candidates: int,
 ) -> ReactionReconstructionBuild:
-    """Collect exact-product operator evidence without grammar semantics."""
+    """Collect exact-product operator evidence without interpretation semantics."""
     raw_values = list(enumerate_reconstruction_candidates(reactants))
     warnings: List[str] = []
     if len(raw_values) > max_candidates:

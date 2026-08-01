@@ -8,13 +8,13 @@ from reactive_taxonomy import (
     ReactiveLinkSite,
     featurize_molecule,
     normalize_compound_sites,
-    normalize_reaction_assignment,
+    normalize_site_assignment,
 )
 from reactive_taxonomy.reaction_reconstruction import (
     enumerate_reconstruction_candidates,
 )
-from reactive_taxonomy.reaction_grammar_annotations import (
-    load_reaction_grammar_annotations,
+from reactive_taxonomy.reaction_interpretation_annotations import (
+    load_reaction_interpretation_annotations,
 )
 from reactive_taxonomy.reaction_parser import parse_reaction_smiles
 
@@ -27,23 +27,23 @@ def _interfaces(smiles: str):
     return analysis, normalized
 
 
-def _assignment(reaction_smiles: str, grammar_id: str):
+def _assignment(reaction_smiles: str, annotation_id: str):
     parsed = parse_reaction_smiles(reaction_smiles)
     match = next(
         (
-            (grammar, assignment)
-            for grammar, assignment in enumerate_reconstruction_candidates(
+            (rule, assignment)
+            for rule, assignment in enumerate_reconstruction_candidates(
                 parsed.reactants
             )
-            if grammar["id"] == grammar_id
+            if rule["id"] == annotation_id
         ),
         None,
     )
     assert match is not None
     annotation = next(
         item
-        for item in load_reaction_grammar_annotations()
-        if item["reconstruction_rule_id"] == grammar_id
+        for item in load_reaction_interpretation_annotations()
+        if item["reconstruction_rule_id"] == annotation_id
     )
     semantic_assignment = {
         role: match[1][slot]
@@ -252,7 +252,7 @@ def test_normalized_ids_disambiguate_reaction_components() -> None:
         "C=C.BrBr>>BrCCBr",
         "addend_pair_addition_to_alkene",
     )
-    normalized = normalize_reaction_assignment(assignment, parsed.reactants)
+    normalized = normalize_site_assignment(assignment, parsed.reactants)
     interface_ids = {
         item.site_id
         for view in normalized.values()
@@ -302,7 +302,7 @@ def test_interface_chemistry_is_component_order_invariant() -> None:
 
     def chemistry_key(case) -> tuple:
         parsed, _, assignment = case
-        normalized = normalize_reaction_assignment(
+        normalized = normalize_site_assignment(
             assignment, parsed.reactants
         )
         return tuple(
@@ -341,7 +341,7 @@ def test_activated_acyl_center_exposes_one_releasable_link() -> None:
         "CC(=O)Cl.CN>>CC(=O)NC",
         "amide_formation",
     )
-    normalized = normalize_reaction_assignment(
+    normalized = normalize_site_assignment(
         assignment, parsed.reactants
     )
     link = normalized["acyl_partner"].reactive_links[0]
@@ -354,7 +354,7 @@ def test_activated_acyl_center_exposes_one_releasable_link() -> None:
 
 
 @pytest.mark.parametrize(
-    ("reaction", "grammar_id", "role", "bond_class", "order"),
+    ("reaction", "annotation_id", "role", "bond_class", "order"),
     [
         (
             "CC(=O)C>>CC(O)C",
@@ -374,13 +374,13 @@ def test_activated_acyl_center_exposes_one_releasable_link() -> None:
 )
 def test_simple_polar_order_changes_expose_bond_capacity(
     reaction: str,
-    grammar_id: str,
+    annotation_id: str,
     role: str,
     bond_class: str,
     order: str,
 ) -> None:
-    parsed, _, assignment = _assignment(reaction, grammar_id)
-    normalized = normalize_reaction_assignment(
+    parsed, _, assignment = _assignment(reaction, annotation_id)
+    normalized = normalize_site_assignment(
         assignment, parsed.reactants
     )
     capacity = normalized[role].bond_capacities[0]
@@ -394,7 +394,7 @@ def test_eliminable_pair_exposes_link_capacity_and_hydrogen_endpoint() -> None:
         "CCC(C)Br>>CC=CC",
         "beta_halo_elimination",
     )
-    normalized = normalize_reaction_assignment(
+    normalized = normalize_site_assignment(
         assignment, parsed.reactants
     )["substrate"]
 
@@ -419,7 +419,7 @@ def test_anionic_partner_exposes_charge_normalizing_connection() -> None:
         "CC(=O)[S-].[K+].Ic1ccccc1>>CC(=O)Sc1ccccc1",
         "sp2_c_s_anion_substitution",
     )
-    normalized = normalize_reaction_assignment(
+    normalized = normalize_site_assignment(
         assignment, parsed.reactants
     )["nucleophile"]
 

@@ -16,7 +16,7 @@ from .reaction_models import (
     REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
     FragmentSourceRequirement,
     PartialProductTransformation,
-    ReactionCandidate,
+    ReactionInterpretationCandidate,
     ReactionCompletenessAssessment,
     ReactionComponent,
     ReactionFallbackDescriptor,
@@ -234,7 +234,7 @@ def _atom_for_role(
 
 
 def _candidate_features(
-    candidates: Tuple[ReactionCandidate, ...],
+    candidates: Tuple[ReactionInterpretationCandidate, ...],
     reactants: Tuple[ReactionComponent, ...],
 ) -> tuple[
     tuple[str, ...],
@@ -244,13 +244,13 @@ def _candidate_features(
     tuple[str, ...],
 ]:
     components = {component.component_index: component for component in reactants}
-    grammars = set()
+    interpretations = set()
     transformations = set()
     handles = set()
     edits = set()
     hypotheses = set()
     for candidate in candidates:
-        grammars.add(str(candidate.grammar_id))
+        interpretations.add(str(candidate.annotation_id))
         transformations.add(str(candidate.transformation_class))
         role_tokens = tuple(
             sorted(
@@ -288,7 +288,7 @@ def _candidate_features(
         hypotheses.add(
             json.dumps(
                 {
-                    "grammar": candidate.grammar_id,
+                    "interpretation": candidate.annotation_id,
                     "transformation": candidate.transformation_class,
                     "archetype": candidate.edit_archetype,
                     "roles": role_tokens,
@@ -300,7 +300,7 @@ def _candidate_features(
             )
         )
     return (
-        tuple(sorted(grammars)),
+        tuple(sorted(interpretations)),
         tuple(sorted(transformations)),
         tuple(sorted(handles)),
         tuple(sorted(edits)),
@@ -715,14 +715,14 @@ def _digest(payload: Mapping[str, object]) -> str:
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
-    return "RFD1:" + hashlib.sha256(encoded).hexdigest()
+    return "RFD2:" + hashlib.sha256(encoded).hexdigest()
 
 
 def build_reaction_fallback_descriptor(
     *,
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
-    candidates: Tuple[ReactionCandidate, ...],
+    candidates: Tuple[ReactionInterpretationCandidate, ...],
     signature: Optional[ReactionSignature],
     partial_transformation: Optional[PartialProductTransformation],
     completeness: Optional[ReactionCompletenessAssessment],
@@ -789,7 +789,7 @@ def build_reaction_fallback_descriptor(
     }:
         ineligibility_reasons.append(evidence_quality)
     blocking_warnings = {
-        "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES",
+        "PRODUCT_CONTRADICTED_INTERPRETATION_CANDIDATES",
         "PRODUCT_MAPS_MISSING_FROM_REACTANTS",
         "UNACCOUNTED_PRODUCT_HEAVY_ATOMS",
         "MISSING_REACTANT_SUSPECTED",
@@ -835,7 +835,7 @@ def build_reaction_fallback_descriptor(
         "reactant_groups": reactant_groups,
         "product_groups": product_groups,
         "contexts": _context_tokens(reactants),
-        "candidate_grammars": candidate_features[0],
+        "candidate_interpretations": candidate_features[0],
         "candidate_transformations": candidate_features[1],
         "candidate_handles": candidate_features[2],
         "candidate_edits": candidate_features[3],
@@ -886,7 +886,7 @@ def build_reaction_fallback_descriptor(
         reactant_group_tokens=reactant_groups,
         product_group_tokens=product_groups,
         context_tokens=payload["contexts"],
-        candidate_grammar_tokens=candidate_features[0],
+        candidate_interpretation_tokens=candidate_features[0],
         candidate_transformation_tokens=candidate_features[1],
         candidate_handle_tokens=candidate_features[2],
         candidate_edit_tokens=candidate_features[3],

@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_models import (
-    ReactionCandidate,
+    ReactionInterpretationCandidate,
     ReactionComponent,
     ReactionEdit,
     ReactionSpectatorGroup,
@@ -109,9 +109,9 @@ def derive_observed_spectator_groups(
 
 def derive_spectator_groups(
     components: Tuple[ReactionComponent, ...],
-    selected: ReactionCandidate | None,
+    selected: ReactionInterpretationCandidate | None,
     evidence_quality: str,
-    selected_events: Tuple[ReactionCandidate, ...] = (),
+    selected_events: Tuple[ReactionInterpretationCandidate, ...] = (),
 ) -> Tuple[ReactionSpectatorGroup, ...]:
     """Return substrate groups that do not intersect the selected site atoms."""
     selections = (selected,) if selected is not None else selected_events

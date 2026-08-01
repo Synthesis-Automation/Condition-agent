@@ -95,7 +95,7 @@ def decide_admission(
                 chemistry_reasons.append("suspected_missing_reactant")
     elif analysis.reaction_signature is None:
         if analysis.candidates or analysis.evidence_quality in {
-            "reactant_grammar_only",
+            "reactant_interpretation_only",
             "structural_reconstruction_candidates",
             "ambiguous",
         }:

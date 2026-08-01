@@ -111,7 +111,7 @@ def test_beta_elimination_resolves_previously_ambiguous_correspondence() -> None
     assert result.valid
     assert result.evidence_quality == "exact_product_reconstruction"
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == "beta_halo_elimination"
+    assert result.selected_candidate.annotation_id == "beta_halo_elimination"
     assert result.edit_archetype == "elimination"
     assert result.reaction_signature is not None
     assert result.reaction_signature.edit_archetype == "elimination"

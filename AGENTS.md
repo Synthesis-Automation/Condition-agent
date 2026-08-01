@@ -20,7 +20,7 @@ design reference for this work.
 The clean system consists of three standalone packages:
 
 - `reactive_taxonomy/`: molecular and reaction chemistry, including parsing,
-  functional groups, reactive sites, reaction grammars, graph operators, bond
+  functional groups, reactive sites, interpretation annotations, graph operators, bond
   edits, environments, spectators, family evidence, and reaction signatures.
 - `condition_registry/`: condition-substance identity, aliases, families,
   contextual roles, provenance, validation, and canonical condition recipes.
@@ -102,7 +102,7 @@ Use evidence in this order:
 
 1. validated supplied atom mapping and observed bond edits;
 2. exact product reconstruction from a registered taxonomy operator;
-3. uniquely supported reactive-site grammar;
+3. uniquely supported interpretation annotation consistent with reconstruction;
 4. unresolved or conflicting candidates retained for review.
 
 Never invent atom correspondence, force a named family, or present a predicted
@@ -111,7 +111,7 @@ and provenance in typed outputs.
 
 ### Declarative definitions
 
-- Put handles, grammars, rendering rules, feature vocabularies, compatibility
+- Put handles, interpretation annotations, rendering rules, feature vocabularies, compatibility
   rules, and scoring weights in validated, versioned definitions.
 - Keep graph edits, descriptor calculations, validation, and other executable
   behavior in explicit Python registries.

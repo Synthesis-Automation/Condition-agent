@@ -48,7 +48,7 @@ def test_concise_molecule_and_reaction_output(capsys) -> None:
         "ortho burden none (0/2); electron demand balanced"
         in reaction_output
     )
-    assert "selected grammar" not in reaction_output
+    assert "selected interpretation" not in reaction_output
 
     cn_reaction = "Brc1ccccn1.Nc1ccccc1>>c1ccc(Nc2ccccn2)cc1"
     assert main(["reaction", cn_reaction, "--concise"]) == 0
@@ -127,7 +127,7 @@ def test_concise_ambiguous_reaction_explains_structural_evidence(capsys) -> None
         in output
     )
     assert "Net bond inventory (unmapped, not verified edits):" in output
-    assert "Grammar checks: 9 candidates (9 product mismatch)" in output
+    assert "Interpretation checks: 9 candidates (9 product mismatch)" in output
     assert "Rejected interpretations:" in output
     assert "reductive carbonyl–amine coupling" in output
     assert (
@@ -136,7 +136,7 @@ def test_concise_ambiguous_reaction_explains_structural_evidence(capsys) -> None
         in output
     )
     assert (
-        "registered grammars did not reconstruct the supplied product; "
+        "registered annotations did not match the supplied product; "
         "this does not invalidate the product structure"
         in output
     )

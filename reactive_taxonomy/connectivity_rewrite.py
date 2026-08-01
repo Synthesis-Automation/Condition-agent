@@ -106,7 +106,7 @@ class CompiledRewriteVariant:
 
 @dataclass(frozen=True)
 class CompiledConnectivityRewrite:
-    """One compiled, grammar-independent graph rewrite."""
+    """One compiled, interpretation-independent graph rewrite."""
 
     rewrite_id: str
     template: str
@@ -325,11 +325,11 @@ def compile_connectivity_rewrite_definitions(
     for raw in raw_rewrites:
         if not isinstance(raw, dict):
             raise ValueError("Connectivity rewrite records must be objects")
-        legacy_keys = {"grammar_ids", "role_bindings"}.intersection(raw)
-        if legacy_keys:
+        interpretation_keys = {"annotation_ids", "role_bindings"}.intersection(raw)
+        if interpretation_keys:
             raise ValueError(
-                "Graph operators cannot contain grammar metadata: "
-                + ",".join(sorted(legacy_keys))
+                "Graph operators cannot contain interpretation metadata: "
+                + ",".join(sorted(interpretation_keys))
             )
         rewrite_id = str(raw.get("id") or "")
         if not _BINDING.fullmatch(rewrite_id) or rewrite_id in seen_rewrite_ids:
@@ -995,7 +995,7 @@ def apply_reaction_operator(
     *,
     output_role_labels: Mapping[str, str] | None = None,
 ) -> Tuple[RewriteOutcome, ...]:
-    """Execute one graph operator without loading grammar or family metadata."""
+    """Execute one graph operator without interpretation metadata."""
     rewrite = (
         connectivity_rewrite_by_id(operator)
         if isinstance(operator, str)

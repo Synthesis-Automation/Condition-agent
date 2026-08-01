@@ -1,5 +1,6 @@
 {
   "schema_version": "1.0",
+  "definition_version": "reaction_interpretation_annotations.v1",
   "annotations": [
     {
       "id": "boron_transfer_coupling",

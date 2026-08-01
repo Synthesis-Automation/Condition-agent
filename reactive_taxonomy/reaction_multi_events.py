@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterable, Sequence, Tuple
 from .chemistry.rdkit_utils import parse_smiles
 from .connectivity_rewrite import connectivity_rewrite_by_id
 from .reaction_models import ReactionComponent, ReactionSiteReference
-from .reaction_site_interfaces import normalize_reaction_assignment
+from .reaction_site_interfaces import normalize_site_assignment
 
 
 RawCandidate = Tuple[Dict[str, Any], Dict[str, ReactionSiteReference]]
@@ -68,7 +68,7 @@ def _instruction_event_program(
         for operator_slot, rule_slot in bindings.items()
     }
     try:
-        normalized = normalize_reaction_assignment(execution_assignment, reactants)
+        normalized = normalize_site_assignment(execution_assignment, reactants)
     except (KeyError, StopIteration, ValueError):
         return None
     joins = []

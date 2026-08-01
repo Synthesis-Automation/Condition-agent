@@ -1,4 +1,4 @@
-"""Grammar-independent public graph-operator registry."""
+"""Interpretation-independent public graph-operator registry."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from .reaction_models import (
 
 @dataclass(frozen=True)
 class ReactionOperator:
-    """Executable structural transformation without grammar semantics."""
+    """Executable structural transformation without interpretation semantics."""
 
     operator_id: str
     template: str

@@ -1,7 +1,7 @@
 """Template-free minimization of an observed reaction edit graph.
 
 The projection is an observation contract.  It consumes normalized edits and
-parsed molecular graphs, but never reaction grammars, templates, source labels,
+parsed molecular graphs, but never interpretation annotations, templates, source labels,
 or named families.  Every edit-participating atom remains in the active graph;
 unchanged connected components are represented once as typed remote subgraphs
 with one or more attachment ports.
@@ -509,7 +509,7 @@ def build_reaction_core_projection(
         Mapping[tuple[str, int, int], int]
     ] = None,
 ) -> Optional[ReactionCoreProjection]:
-    """Build a grammar- and template-free minimized reaction-core projection."""
+    """Build an interpretation- and template-free reaction-core projection."""
     if not edits:
         return None
     (

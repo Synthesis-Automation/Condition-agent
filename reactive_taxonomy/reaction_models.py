@@ -10,7 +10,7 @@ from .models import CompoundAnalysis
 
 
 REACTION_SIGNATURE_SCHEMA_VERSION = "3.2"
-REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.3"
+REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "2.0"
 REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.2"
 REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v8"
 REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
@@ -453,7 +453,7 @@ class RenderedReactionLabel:
         "unavailable",
     ]
     source: Literal[
-        "verified_grammar",
+        "verified_interpretation",
         "generic_topology",
         "reaction_core",
         "literal_edits",
@@ -469,17 +469,17 @@ class RenderedReactionLabel:
     definition_version: str
     structural_label: Optional[str] = None
     transformation_label: Optional[str] = None
-    grammar_label: Optional[str] = None
+    interpretation_label: Optional[str] = None
     family_label: Optional[str] = None
     pattern_id: Optional[str] = None
     pattern_definition_version: Optional[str] = None
-    grammar_id: Optional[str] = None
+    interpretation_id: Optional[str] = None
     contextual_label: Optional[str] = None
     reactant_context_label: Optional[str] = None
     product_context_label: Optional[str] = None
     event_labels: Tuple[str, ...] = ()
     event_count: int = 0
-    schema_version: str = "2.0"
+    schema_version: str = "3.0"
 
 @dataclass(frozen=True)
 class ReactionSpectatorGroup:
@@ -758,7 +758,7 @@ class ReactionFallbackDescriptor:
     reactant_group_tokens: Tuple[str, ...]
     product_group_tokens: Tuple[str, ...]
     context_tokens: Tuple[str, ...]
-    candidate_grammar_tokens: Tuple[str, ...]
+    candidate_interpretation_tokens: Tuple[str, ...]
     candidate_transformation_tokens: Tuple[str, ...]
     candidate_handle_tokens: Tuple[str, ...]
     candidate_edit_tokens: Tuple[str, ...]
@@ -1054,7 +1054,7 @@ class ReactionSignature:
 
 @dataclass(frozen=True)
 class ReactionReconstructionCandidate:
-    """Grammar-free structural operator proposal for one reported product."""
+    """Interpretation-independent operator proposal for one reported product."""
 
     rule_id: str
     operator_id: str
@@ -1070,8 +1070,10 @@ class ReactionReconstructionCandidate:
 
 
 @dataclass(frozen=True)
-class ReactionCandidate:
-    grammar_id: str
+class ReactionInterpretationCandidate:
+    """Optional semantic annotation over one structural reconstruction."""
+
+    annotation_id: str
     rewrite_outcome_id: str
     edit_archetype: EditArchetype
     transformation_class: str
@@ -1079,15 +1081,16 @@ class ReactionCandidate:
     predicted_bond_changes: Tuple[BondChange, ...]
     predicted_product_smiles: Optional[str]
     verification: str
-    grammar_label: Optional[str]
+    interpretation_label: Optional[str]
     predicted_stereo_changes: Tuple[PredictedStereoChange, ...] = ()
     compatible_named_families: Tuple[str, ...] = ()
     warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
 
 
 @dataclass(frozen=True)
 class ReactionObservation:
-    """Grammar-independent structural facts derived from one reaction graph."""
+    """Interpretation-independent facts derived from one reaction graph."""
 
     input_reaction_smiles: str
     valid: bool
@@ -1122,11 +1125,11 @@ class ReactionObservation:
 
 @dataclass(frozen=True)
 class ReactionInterpretation:
-    """Optional grammar and family interpretation of an observation."""
+    """Optional semantic and family interpretation of an observation."""
 
-    candidates: Tuple[ReactionCandidate, ...] = ()
-    selected_candidate: Optional[ReactionCandidate] = None
-    selected_events: Tuple[ReactionCandidate, ...] = ()
+    candidates: Tuple[ReactionInterpretationCandidate, ...] = ()
+    selected_candidate: Optional[ReactionInterpretationCandidate] = None
+    selected_events: Tuple[ReactionInterpretationCandidate, ...] = ()
     partners: Tuple[ReactionPartner, ...] = ()
     compatible_named_families: Tuple[str, ...] = ()
     named_family: Optional[str] = None
@@ -1134,7 +1137,7 @@ class ReactionInterpretation:
     product_connection: Optional[ProductConnection] = None
     evidence_quality: str = "unresolved"
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "2.0"
+    schema_version: str = "3.0"
 
     def __post_init__(self) -> None:
         if self.named_family and self.named_family not in (
@@ -1150,9 +1153,9 @@ class ReactionAnalysis:
     reactants: Tuple[ReactionComponent, ...] = ()
     agents: Tuple[ReactionComponent, ...] = ()
     products: Tuple[ReactionComponent, ...] = ()
-    candidates: Tuple[ReactionCandidate, ...] = ()
-    selected_candidate: Optional[ReactionCandidate] = None
-    selected_events: Tuple[ReactionCandidate, ...] = ()
+    candidates: Tuple[ReactionInterpretationCandidate, ...] = ()
+    selected_candidate: Optional[ReactionInterpretationCandidate] = None
+    selected_events: Tuple[ReactionInterpretationCandidate, ...] = ()
     edit_archetype: EditArchetype = "unresolved"
     transformation_class: Optional[str] = None
     compatible_named_families: Tuple[str, ...] = ()
@@ -1175,7 +1178,7 @@ class ReactionAnalysis:
     interpretation: Optional[ReactionInterpretation] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "6.0"
+    schema_version: str = "7.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -1209,7 +1212,7 @@ __all__ = [
     "REACTION_TOPOLOGY_SCHEMA_VERSION",
     "ReactionAnalysis",
     "ReactionAtomReference",
-    "ReactionCandidate",
+    "ReactionInterpretationCandidate",
     "ReactionCompletenessAssessment",
     "ReactionComponent",
     "ReactionCoreAtomState",

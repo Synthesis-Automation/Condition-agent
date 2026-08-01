@@ -1,4 +1,4 @@
-"""Anonymous, grammar-independent reaction edit prototypes."""
+"""Anonymous, interpretation-independent reaction edit prototypes."""
 
 from __future__ import annotations
 

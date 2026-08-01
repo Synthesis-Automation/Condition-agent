@@ -96,9 +96,13 @@ def render_reaction(
     rendered = _build_reaction_label(
         reactants=observation.reactants,
         edits=observation.edits,
-        selected_label=selected.grammar_label if selected_exact else None,
+        selected_label=(
+            selected.interpretation_label if selected_exact else None
+        ),
         selected_exact=selected_exact,
-        grammar_id=selected.grammar_id if selected_exact else None,
+        interpretation_id=(
+            selected.annotation_id if selected_exact else None
+        ),
         contextual_label=contextual,
         named_family=(
             interpretation.named_family if interpretation and selected_exact else None

@@ -110,8 +110,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "6.0"
-    assert record.converter_definition_version == "generic_conversion.v6.0"
+    assert record.schema_version == "7.0"
+    assert record.converter_definition_version == "generic_conversion.v7.0"
     assert record.reaction_signature["schema_version"] == "3.2"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None
@@ -295,7 +295,7 @@ def test_stereochemical_conflict_is_retained_but_not_indexed() -> None:
     assert len(build_generic_index([record.to_dict()]).rows) == 0
 
 
-def test_grammar_only_record_is_review_not_rejected() -> None:
+def test_interpretation_only_record_is_review_not_rejected() -> None:
     record = convert_record(_raw("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1"))
 
     assert record.admission_tier == AdmissionTier.REVIEW
@@ -304,7 +304,7 @@ def test_grammar_only_record_is_review_not_rejected() -> None:
         "reaction_completeness_unresolved",
     )
     assert record.fallback_descriptor is not None
-    assert record.fallback_descriptor["schema_version"] == "1.3"
+    assert record.fallback_descriptor["schema_version"] == "2.0"
     assert not record.fallback_descriptor["retrieval_eligible"]
 
 
@@ -342,7 +342,7 @@ def test_unresolved_record_serializes_eligible_fallback_descriptor() -> None:
 
     assert record.reaction_signature is None
     assert record.fallback_descriptor is not None
-    assert record.fallback_descriptor["descriptor_id"].startswith("RFD1:")
+    assert record.fallback_descriptor["descriptor_id"].startswith("RFD2:")
     assert record.fallback_descriptor["evidence_mode"] == ("structure_inventory_only")
     assert record.fallback_descriptor["retrieval_eligible"]
     assert record.fallback_descriptor["reactant_component_tokens"] == (
@@ -648,7 +648,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "6.0"
+    assert report["schema_version"] == "7.0"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
@@ -673,7 +673,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
     assert review_rows[0]["reaction_display_status"] == "family_overlay"
     assert review_rows[0]["transformation_class"] == "c_c_transfer_coupling"
-    assert review_rows[0]["fallback_descriptor_id"].startswith("RFD1:")
+    assert review_rows[0]["fallback_descriptor_id"].startswith("RFD2:")
     assert review_rows[0]["fallback_retrieval_eligible"] == "True"
     assert review_rows[0]["signature_id"].startswith("RS3:")
     assert review_rows[0]["evidence_quality"] == "exact_product_reconstruction"

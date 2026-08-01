@@ -10,7 +10,7 @@ from typing import Dict, Iterable, Optional, Tuple
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_edits import EditNormalizationResult, reaction_atom_reference
 from .reaction_models import (
-    ReactionCandidate,
+    ReactionInterpretationCandidate,
     ReactionComponent,
     ReactionEdit,
     ReactionRingChange,
@@ -218,7 +218,7 @@ def _cycle_rank(components: Tuple[ReactionComponent, ...]) -> Optional[int]:
 
 
 def _same_component_role_groups(
-    selected: Optional[ReactionCandidate],
+    selected: Optional[ReactionInterpretationCandidate],
 ) -> Tuple[Tuple[str, ...], ...]:
     if selected is None:
         return ()
@@ -246,7 +246,7 @@ def build_reaction_topology(
     *,
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
-    selected: Optional[ReactionCandidate],
+    selected: Optional[ReactionInterpretationCandidate],
     edit_result: EditNormalizationResult,
 ) -> Optional[ReactionTopology]:
     """Derive topology from atom-provenanced edits, independent of family names."""
@@ -367,7 +367,7 @@ def topology_label_prefix(topology: Optional[ReactionTopology]) -> str:
 def assignment_component_scope(
     assignment: dict[str, ReactionSiteReference],
 ) -> str:
-    """Describe whether assigned grammar roles share reactant components."""
+    """Describe whether interpreted roles share reactant components."""
     component_indices = [site.component_index for site in assignment.values()]
     if len(component_indices) < 2:
         return "unresolved"

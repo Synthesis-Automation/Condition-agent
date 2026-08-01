@@ -379,14 +379,14 @@ def _reduced_amine_fragment(
 
 
 def render_product_label(
-    grammar: Dict[str, Any],
+    annotation: Dict[str, Any],
     assignment: Dict[str, ReactionSiteReference],
     *,
     style: str = "unicode",
 ) -> str:
     bond = "–" if style == "unicode" else "-"
     aliases = _fragment_alias_index(assignment)
-    rule = load_reaction_rendering().get(str(grammar["id"]), {})
+    rule = load_reaction_rendering().get(str(annotation["id"]), {})
     kind = rule.get("product_kind")
     if kind == "join_contexts":
         left_role, right_role = str(rule["left_role"]), str(rule["right_role"])
@@ -753,19 +753,19 @@ def render_product_label(
         if style != "unicode":
             product = product.replace("–", "-").replace("≡", "#")
     else:
-        return str(grammar.get("generic_label") or grammar["id"])
+        return str(annotation.get("generic_label") or annotation["id"])
     return product
 
 
 def render_reaction_label(
-    grammar: Dict[str, Any],
+    annotation: Dict[str, Any],
     assignment: Dict[str, ReactionSiteReference],
     *,
     style: str = "unicode",
 ) -> str:
     arrow = "→" if style == "unicode" else "->"
     reactant_labels = render_reactant_label(assignment, style=style)
-    product = render_product_label(grammar, assignment, style=style)
+    product = render_product_label(annotation, assignment, style=style)
     return f"{reactant_labels} {arrow} {product}"
 
 

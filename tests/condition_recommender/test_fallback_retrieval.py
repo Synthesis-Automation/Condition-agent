@@ -118,9 +118,9 @@ def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
 
     assert result.valid
     assert result.query_signature_id is None
-    assert result.query_fallback_descriptor_id.startswith("RFD1:")
+    assert result.query_fallback_descriptor_id.startswith("RFD2:")
     assert result.recommendation_mode == "unverified_structure_fallback"
-    assert result.retrieval_definition_version == "1.4"
+    assert result.retrieval_definition_version == "2.0"
     assert result.retrieval_level == "unverified_structure_fallback"
     assert result.independent_compatible_candidate_count == 2
     assert "UNVERIFIED_REACTION_FALLBACK_USED" in result.warnings
@@ -128,7 +128,7 @@ def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
     assert result.recommendations
     recommendation = result.recommendations[0]
     assert (
-        recommendation.score_trace.definition_versions["fallback_retrieval.v1"] == "1.4"
+        recommendation.score_trace.definition_versions["fallback_retrieval.v1"] == "2.0"
     )
     assert any(
         "atom correspondence and bond edits are not verified" in caution
@@ -328,7 +328,7 @@ def test_exploratory_iodine_partial_precedents_are_retrievable() -> None:
     assert result.valid
     assert result.recommendation_mode == "unverified_structure_fallback"
     assert result.candidate_count == 2
-    assert result.retrieval_definition_version == "1.4"
+    assert result.retrieval_definition_version == "2.0"
     assert result.retrieval_level == "source_supported_partial_transformation"
     assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:I" in result.warnings
     assert "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:I" in result.warnings

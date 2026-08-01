@@ -195,7 +195,7 @@ def _group_inventory_summary(tokens: Iterable[str]) -> str:
     return _joined(names)
 
 
-_GRAMMAR_DISPLAY_NAMES = {
+_INTERPRETATION_DISPLAY_NAMES = {
     "carbonyl_amine_reductive_coupling": "reductive carbonyl–amine coupling",
     "carbonyl_reduction": "carbonyl reduction",
     "sp2_c_activated_c_substitution": "activated sp² C–C substitution",
@@ -204,11 +204,11 @@ _GRAMMAR_DISPLAY_NAMES = {
 }
 
 
-def _grammar_display_name(grammar_id: str) -> str:
-    """Return a compact chemist-facing grammar description."""
-    return _GRAMMAR_DISPLAY_NAMES.get(
-        grammar_id,
-        grammar_id.replace("_", " "),
+def _interpretation_display_name(annotation_id: str) -> str:
+    """Return a compact chemist-facing interpretation description."""
+    return _INTERPRETATION_DISPLAY_NAMES.get(
+        annotation_id,
+        annotation_id.replace("_", " "),
     )
 
 
@@ -337,10 +337,13 @@ def _reaction_diagnostic_lines(result: Any) -> list[str]:
             f"{count} {verification.replace('_', ' ')}"
             for verification, count in sorted(verification_counts.items())
         )
-        lines.append(f"Grammar checks: {len(candidates)} candidates ({outcomes})")
-        grammar_names = sorted(
+        lines.append(
+            f"Interpretation checks: {len(candidates)} candidates "
+            f"({outcomes})"
+        )
+        interpretation_names = sorted(
             {
-                _grammar_display_name(str(candidate.grammar_id))
+                _interpretation_display_name(str(candidate.annotation_id))
                 for candidate in candidates
             }
         )
@@ -351,9 +354,9 @@ def _reaction_diagnostic_lines(result: Any) -> list[str]:
                 in {"construction_failed", "product_mismatch"}
                 for candidate in candidates
             )
-            else "Grammars checked"
+            else "Interpretations checked"
         )
-        lines.append(f"{heading}: {_joined(grammar_names)}")
+        lines.append(f"{heading}: {_joined(interpretation_names)}")
 
     signature = getattr(result, "reaction_signature", None)
     if signature is not None:
@@ -377,9 +380,9 @@ def _reaction_diagnostic_lines(result: Any) -> list[str]:
     else:
         lines.append("Retrieval: unavailable")
 
-    if "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in warnings:
+    if "PRODUCT_CONTRADICTED_INTERPRETATION_CANDIDATES" in warnings:
         lines.append(
-            "Interpretation note: registered grammars did not reconstruct the "
+            "Interpretation note: registered annotations did not match the "
             "supplied product; this does not invalidate the product structure"
         )
     if (
@@ -438,7 +441,10 @@ def _reaction_summary(result: Any) -> str:
         f"mapped bond changes: {len(result.mapped_bond_changes)}",
     ]
     if result.selected_candidate:
-        lines.append(f"selected grammar: {result.selected_candidate.grammar_id}")
+        lines.append(
+            "selected interpretation: "
+            f"{result.selected_candidate.annotation_id}"
+        )
         for change in result.selected_candidate.predicted_bond_changes:
             lines.append(
                 f"  edit: {change.change_type} {change.atom_1_role}-{change.atom_2_role} "

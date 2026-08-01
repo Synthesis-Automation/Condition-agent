@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "label_schema_version": "2.1",
+  "label_schema_version": "3.0",
   "default_style": "unicode",
   "clause_order": ["broken", "order_changed", "formed", "hydrogen_change"],
   "element_precedence": ["C", "N", "O", "S", "P", "B", "Si", "H", "F", "Cl", "Br", "I"],
@@ -76,12 +76,12 @@
     "core_quality": "core quality: {quality}",
     "literal_edit_audit": "literal edits: {clauses}",
     "pattern_overlay": "transformation pattern: {label}",
-    "reactant_candidates": "reactant grammar candidates: {reactants}",
+    "reactant_candidates": "reactant interpretation candidates: {reactants}",
     "reactant_only": "Reactants: {reactants} [product unresolved]",
     "ambiguous_reactants": "Reactant candidates: {reactants} [product unresolved]",
     "product_contradicted_reactants": "Reactant candidates: {reactants} [product contradicted]",
     "reactant_only_detail": "no product transformation is asserted",
     "ambiguous_reactants_detail": "multiple reactant interpretations remain; no product transformation is asserted",
-    "product_contradicted_reactants_detail": "reactant grammar candidates contradict the observed product; no candidate product transformation is asserted"
+    "product_contradicted_reactants_detail": "reactant interpretation candidates contradict the observed product; no candidate product transformation is asserted"
   }
 }

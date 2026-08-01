@@ -1,4 +1,4 @@
-"""Validated declarative rules for grammar-free structural reconstruction."""
+"""Validated declarative rules for structural reconstruction."""
 
 from __future__ import annotations
 

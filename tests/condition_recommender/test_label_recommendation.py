@@ -143,7 +143,7 @@ def test_label_recommender_uses_family_and_unordered_signature_pair(
     )
 
     assert result.valid
-    assert result.grammar_id == "boron_transfer_coupling"
+    assert result.interpretation_id == "boron_transfer_coupling"
     assert result.candidate_count == 3
     assert len(result.recommendations) == 3
     assert "exact-a" in _raw_identifiers(result.recommendations[0])
@@ -219,7 +219,7 @@ def test_label_recommender_supports_alkylation_as_sp3_c_n_substitution(
     )
 
     assert result.valid
-    assert result.grammar_id == "sp3_c_n_substitution"
+    assert result.interpretation_id == "sp3_c_n_substitution"
     assert result.candidate_count == 1
     assert result.recommendations[0].signature_similarity == 1.0
     assert "sp3-cn" in _raw_identifiers(result.recommendations[0])
@@ -250,7 +250,7 @@ def test_label_recommender_supports_heck_with_alkene_label(
     )
 
     assert result.valid
-    assert result.grammar_id == "terminal_alkene_heck_coupling"
+    assert result.interpretation_id == "terminal_alkene_heck_coupling"
     assert result.candidate_count == 1
     assert result.recommendations[0].signature_similarity == 1.0
     assert "heck" in _raw_identifiers(result.recommendations[0])
@@ -280,7 +280,7 @@ def test_label_recommender_supports_acid_or_carboxylate_amide_label(
     )
 
     assert result.valid
-    assert result.grammar_id == "amide_formation"
+    assert result.interpretation_id == "amide_formation"
     assert result.candidate_count == 1
     assert result.recommendations[0].signature_similarity == 1.0
     assert "amide" in _raw_identifiers(result.recommendations[0])
@@ -317,7 +317,7 @@ def test_label_recommender_supports_activated_carbon_arylation(
     )
 
     assert result.valid
-    assert result.grammar_id == "sp2_c_activated_c_substitution"
+    assert result.interpretation_id == "sp2_c_activated_c_substitution"
     assert result.candidate_count == 2
     assert len(result.recommendations) == 1
     assert "activated-carbon" in _raw_identifiers(result.recommendations[0])
@@ -355,7 +355,7 @@ def test_label_recommender_supports_aromatic_ch_arylation_without_alkyne_leakage
     )
 
     assert result.valid
-    assert result.grammar_id == "sp2_c_aromatic_ch_substitution"
+    assert result.interpretation_id == "sp2_c_aromatic_ch_substitution"
     assert result.candidate_count == 2
     assert len(result.recommendations) == 1
     assert result.recommendations[0].signature_similarity == 1.0
@@ -386,7 +386,7 @@ def test_label_recommender_supports_contextual_terminal_alkyne_signature(
     )
 
     assert result.valid
-    assert result.grammar_id == "sonogashira_coupling"
+    assert result.interpretation_id == "sonogashira_coupling"
     assert result.recommendations[0].signature_similarity == 1.0
     assert "sonogashira" in _raw_identifiers(result.recommendations[0])
 
@@ -415,7 +415,7 @@ def test_label_recommender_rejects_incomplete_two_partner_precedent(
     )
 
     assert not result.valid
-    assert result.grammar_id == "other_metal_transfer_coupling"
+    assert result.interpretation_id == "other_metal_transfer_coupling"
     assert result.error == "NO_SIGNATURE_COMPATIBLE_PRECEDENTS"
 
 
@@ -460,7 +460,7 @@ def test_label_recommender_rejects_unrepresented_intramolecular_topology() -> No
     result = recommend_conditions_from_labels("NCCc1ccccc1Br>>c1ccc2c(c1)CCN2")
 
     assert not result.valid
-    assert result.grammar_id == "sp2_c_n_substitution"
+    assert result.interpretation_id == "sp2_c_n_substitution"
     assert result.error == "QUERY_TOPOLOGY_NOT_SUPPORTED_BY_LABEL_DATASET"
     assert result.warnings == ("LABEL_DATASET_HAS_NO_REACTION_TOPOLOGY",)
 

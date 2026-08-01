@@ -143,7 +143,7 @@ def reconcile_edit_archetype(
     edits: Iterable[ReactionEdit],
     declared: Optional[str],
 ) -> Tuple[EditArchetype, Tuple[str, ...]]:
-    """Prefer observed edits and expose disagreement with grammar interpretation."""
+    """Prefer observed edits and expose interpretation disagreement."""
     inferred = infer_edit_archetype(edits)
     declared_value = (
         cast(EditArchetype, declared)

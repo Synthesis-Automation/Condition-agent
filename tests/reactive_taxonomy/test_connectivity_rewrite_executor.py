@@ -1,4 +1,4 @@
-"""V3 contract tests for grammar-independent connectivity rewrites."""
+"""V3 contract tests for interpretation-independent connectivity rewrites."""
 
 from dataclasses import replace
 
@@ -91,7 +91,7 @@ def test_v3_definitions_separate_rules_from_graph_operators() -> None:
     rewrite_ids = {rewrite.rewrite_id for rewrite in rewrites}
 
     assert {str(rule["operator_id"]) for rule in rules} <= rewrite_ids
-    assert all(not hasattr(rewrite, "grammar_ids") for rewrite in rewrites)
+    assert all(not hasattr(rewrite, "annotation_ids") for rewrite in rewrites)
     assert {
         rewrite.site_interface_schema_version for rewrite in rewrites
     } == {SITE_INTERFACE_SCHEMA_VERSION}
@@ -228,22 +228,22 @@ def test_compiler_rejects_unknown_tetrahedral_outcome() -> None:
         compile_connectivity_rewrite_definitions(payload)
 
 
-def test_compiler_rejects_grammar_metadata_in_graph_operators() -> None:
+def test_compiler_rejects_interpretation_metadata_in_graph_operators() -> None:
     payload = {
         "schema_version": CONNECTIVITY_REWRITE_SCHEMA_VERSION,
         "instruction_set_version": CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION,
         "site_interface_schema_version": SITE_INTERFACE_SCHEMA_VERSION,
         "rewrites": [
             {
-                "id": "invalid_grammar_coupling",
+                "id": "invalid_interpretation_coupling",
                 "template": "release_and_connect",
-                "grammar_ids": ["named_reaction"],
+                "annotation_ids": ["named_reaction"],
                 "variants": [],
             }
         ],
     }
 
-    with pytest.raises(ValueError, match="cannot contain grammar metadata"):
+    with pytest.raises(ValueError, match="cannot contain interpretation metadata"):
         compile_connectivity_rewrite_definitions(payload)
 
 
@@ -282,7 +282,7 @@ def test_general_ab_additions_share_one_edit_derived_archetype(
 
     assert analysis.edit_archetype == "addition"
     assert analysis.selected_candidate is not None
-    assert analysis.selected_candidate.grammar_id == "addend_pair_addition_to_alkene"
+    assert analysis.selected_candidate.annotation_id == "addend_pair_addition_to_alkene"
     edits = analysis.reaction_signature.edits
     observed_elements = {
         atom.element
@@ -308,12 +308,12 @@ def test_si_b_is_exposed_as_an_explicit_reactive_link() -> None:
 
 
 def test_pair_addition_enumerates_and_orders_both_regioisomers() -> None:
-    parsed, grammar, assignment = _assignment(
+    parsed, interpretation, assignment = _assignment(
         "CC=C.C[SiH](C)C>>CCC[Si](C)(C)C",
         "addend_pair_addition_to_alkene",
     )
 
-    outcomes = _apply(grammar, assignment, parsed.reactants)
+    outcomes = _apply(interpretation, assignment, parsed.reactants)
 
     assert [
         (outcome.outcome_id, outcome.predicted_product_smiles)
@@ -344,24 +344,24 @@ def test_rewrite_product_is_invariant_to_reactant_component_order() -> None:
 
 
 def test_release_and_connect_supports_intramolecular_ring_closure() -> None:
-    parsed, grammar, assignment = _assignment(
+    parsed, interpretation, assignment = _assignment(
         "NCCCCBr>>C1CCCN1",
         "sp3_c_n_substitution",
     )
 
-    outcomes = _apply(grammar, assignment, parsed.reactants)
+    outcomes = _apply(interpretation, assignment, parsed.reactants)
 
     assert outcomes[0].predicted_product_smiles == "C1CCNC1"
 
 
 def test_executor_rejects_an_invalid_declared_before_state() -> None:
-    parsed, grammar, assignment = _assignment(
+    parsed, interpretation, assignment = _assignment(
         "CCBr.CN>>CCNC",
         "sp3_c_n_substitution",
     )
     leaving_slot = next(
         slot
-        for slot, constraint in grammar["slots"].items()
+        for slot, constraint in interpretation["slots"].items()
         if constraint["site_type"] == "leaving_group"
     )
     electrophile = assignment[leaving_slot]
@@ -376,7 +376,7 @@ def test_executor_rejects_an_invalid_declared_before_state() -> None:
         ),
     }
 
-    assert _apply(grammar, invalid_assignment, parsed.reactants) == ()
+    assert _apply(interpretation, invalid_assignment, parsed.reactants) == ()
 
 
 def test_executor_does_not_guess_for_an_unregistered_operator() -> None:

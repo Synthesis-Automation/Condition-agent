@@ -88,7 +88,7 @@ def test_ascii_rendering_changes_display_only() -> None:
     )
 
 
-def test_exact_grammar_label_is_preserved_as_overlay() -> None:
+def test_exact_interpretation_label_is_preserved_as_overlay() -> None:
     result = featurize_reaction("Brc1ccccc1.CN>>CNc1ccccc1")
 
     assert result.reaction_label.concise == "Ar–Br + R–NH2 → Ar–NH–R"
@@ -191,7 +191,7 @@ def test_display_label_serializes_as_nested_evidence() -> None:
         "[CH3:1].[NH2:2]>>[CH3:1][NH2:2]"
     ).to_dict()
 
-    assert payload["reaction_label"]["schema_version"] == "2.0"
+    assert payload["reaction_label"]["schema_version"] == "3.0"
     assert payload["reaction_label"]["source"] == "literal_edits"
     assert payload["reaction_label"]["clauses"][0]["edit_type"] == "formed"
     assert payload["reaction_label"]["clauses"][0]["atom_map_numbers"] == (1, 2)
@@ -212,7 +212,7 @@ def test_unknown_mapped_substitution_combines_core_and_pattern_label() -> None:
     assert result.reaction_label.source == "reaction_core"
     assert result.reaction_label is not None
     assert result.reaction_label.pattern_id == "substitution"
-    assert result.reaction_label.grammar_id is None
+    assert result.reaction_label.interpretation_id is None
     assert result.reaction_label.contextual_label is None
     assert result.reaction_label.structural_label == (
         "C(H)3(O-R) + N(H)2 → C(H)3(N-H)"
@@ -222,7 +222,7 @@ def test_unknown_mapped_substitution_combines_core_and_pattern_label() -> None:
     )
 
 
-def test_exact_grammar_keeps_concise_label_and_adds_core_context() -> None:
+def test_exact_interpretation_keeps_concise_label_and_adds_core_context() -> None:
     result = featurize_reaction(
         "[O:1]=[C:2]1[CH2:3][CH2:4][CH2:5][CH2:6][CH2:7]1>>"
         "[OH:1][CH:2]1[CH2:3][CH2:4][CH2:5][CH2:6][CH2:7]1"
@@ -230,7 +230,7 @@ def test_exact_grammar_keeps_concise_label_and_adds_core_context() -> None:
 
     assert result.reaction_label.concise == "R–C(R)=O → R–CH(R)–OH"
     assert result.reaction_label.status == "exact_reconstruction"
-    assert result.reaction_label.source == "verified_grammar"
+    assert result.reaction_label.source == "verified_interpretation"
     assert "core projection: C(Cycloalkyl)₂(=O)" in (
         result.reaction_label.detailed
     )
@@ -278,12 +278,12 @@ def test_unknown_intramolecular_formation_receives_ring_closure_pattern() -> Non
     )
 
 
-def test_exact_grammar_label_records_grammar_overlay_provenance() -> None:
+def test_exact_interpretation_label_records_interpretation_overlay_provenance() -> None:
     result = featurize_reaction("Brc1ccccc1.CN>>CNc1ccccc1")
 
     assert result.reaction_label is not None
-    assert result.reaction_label.grammar_id == "sp2_c_n_substitution"
-    assert result.reaction_label.grammar_label == result.reaction_label.concise
+    assert result.reaction_label.interpretation_id == "sp2_c_n_substitution"
+    assert result.reaction_label.interpretation_label == result.reaction_label.concise
     assert result.reaction_label.pattern_id == "substitution"
 
 
@@ -292,7 +292,7 @@ def test_reaction_label_definition_is_versioned() -> None:
     patterns = load_reaction_label_patterns()
 
     assert rendering["schema_version"] == "2.0"
-    assert rendering["label_schema_version"] == "2.1"
+    assert rendering["label_schema_version"] == "3.0"
     assert patterns["schema_version"] == "1.0"
     assert {pattern["id"] for pattern in patterns["patterns"]} >= {
         "substitution",
@@ -313,7 +313,7 @@ def test_reaction_label_definition_is_versioned() -> None:
         "reaction_label_rendering.v1.json",
     }
     assert versions["reaction_label_rendering.v1.json"].startswith(
-        "2.1@sha256:"
+        "3.0@sha256:"
     )
 
 

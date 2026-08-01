@@ -125,10 +125,10 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
         "C-H:NONE>SINGLE",
     )
-    assert payload["schema_version"] == "6.0"
+    assert payload["schema_version"] == "7.0"
     assert payload["reaction_signature"]["schema_version"] == "3.2"
     assert payload["observation"]["schema_version"] == "2.0"
-    assert payload["interpretation"]["schema_version"] == "2.0"
+    assert payload["interpretation"]["schema_version"] == "3.0"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
     )
@@ -252,7 +252,7 @@ def test_unbalanced_multi_event_reaction_does_not_invent_partner_copy() -> None:
     assert result.selected_events == ()
     assert result.reaction_signature is None
     assert result.reaction_label.status == "product_contradicted_reactants"
-    assert "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in result.warnings
+    assert "PRODUCT_CONTRADICTED_INTERPRETATION_CANDIDATES" in result.warnings
 
 
 def test_balanced_repeated_suzuki_events_are_exactly_reconstructed() -> None:

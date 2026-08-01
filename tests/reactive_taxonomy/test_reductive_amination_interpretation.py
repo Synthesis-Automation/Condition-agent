@@ -1,4 +1,4 @@
-"""Regression coverage for carbonyl–amine reductive coupling grammar."""
+"""Regression coverage for carbonyl–amine reductive coupling interpretation."""
 
 from reactive_taxonomy import featurize_reaction
 
@@ -12,7 +12,7 @@ def test_aldehyde_primary_amine_exact_reconstruction() -> None:
     assert result.transformation_class == "carbonyl_c_n_reductive_coupling"
     assert result.named_family == "reductive_amination"
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == ("carbonyl_amine_reductive_coupling")
+    assert result.selected_candidate.annotation_id == ("carbonyl_amine_reductive_coupling")
     assert result.reaction_signature is not None
     assert result.reaction_signature.product_transformation is not None
     assert result.reaction_signature.product_transformation.concise_label is None
@@ -43,7 +43,7 @@ def test_tertiary_amine_is_not_a_reductive_amination_partner() -> None:
     result = featurize_reaction("O=Cc1ccccc1.CN(C)C>>C[N+](C)(C)Cc1ccccc1")
 
     assert all(
-        candidate.grammar_id != "carbonyl_amine_reductive_coupling"
+        candidate.annotation_id != "carbonyl_amine_reductive_coupling"
         for candidate in result.candidates
     )
     assert result.named_family is None
@@ -53,7 +53,7 @@ def test_amide_nitrogen_is_not_a_reductive_amination_partner() -> None:
     result = featurize_reaction("O=Cc1ccccc1.NC(=O)c1ccccc1>>O=C(NCc1ccccc1)c1ccccc1")
 
     assert all(
-        candidate.grammar_id != "carbonyl_amine_reductive_coupling"
+        candidate.annotation_id != "carbonyl_amine_reductive_coupling"
         for candidate in result.candidates
     )
 
@@ -64,7 +64,7 @@ def test_imine_product_does_not_verify_as_reductive_amination() -> None:
     candidates = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "carbonyl_amine_reductive_coupling"
+        if candidate.annotation_id == "carbonyl_amine_reductive_coupling"
     ]
     assert len(candidates) == 1
     assert candidates[0].verification == "product_mismatch"
@@ -80,7 +80,7 @@ def test_multiple_carbonyl_partners_remain_unselected_without_verification() -> 
     reductive_candidates = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "carbonyl_amine_reductive_coupling"
+        if candidate.annotation_id == "carbonyl_amine_reductive_coupling"
     ]
     assert len(reductive_candidates) == 2
     assert result.selected_candidate is None

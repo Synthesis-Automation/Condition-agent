@@ -76,7 +76,7 @@ def test_unmapped_intramolecular_cn_cyclization_is_exactly_reconstructed() -> No
         ("NCCCCBr>>C1CCCN1", "sp3_c_n_substitution", 5),
     ],
 )
-def test_shared_substitution_grammars_support_intramolecular_closure(
+def test_shared_substitution_interpretations_support_intramolecular_closure(
     reaction: str, transformation_class: str, ring_size: int
 ) -> None:
     result = featurize_reaction(reaction)
@@ -91,7 +91,7 @@ def test_shared_substitution_grammars_support_intramolecular_closure(
     assert result.reaction_topology.formed_ring_sizes == (ring_size,)
 
 
-def test_other_shared_grammars_can_opt_into_same_component_roles() -> None:
+def test_other_shared_interpretations_can_opt_into_same_component_roles() -> None:
     reductive_amination = featurize_reaction("O=CCCCN>>C1CCCN1")
     lactamization = featurize_reaction("NCCCC(=O)O>>O=C1CCCN1")
 
@@ -231,7 +231,7 @@ def test_mapped_and_unmapped_topology_signatures_are_identical() -> None:
 def test_topology_serializes_in_analysis_and_signature() -> None:
     payload = featurize_reaction(INTRAMOLECULAR_CN).to_dict()
 
-    assert payload["schema_version"] == "6.0"
+    assert payload["schema_version"] == "7.0"
     assert payload["reaction_topology"]["reaction_scope"] == "intramolecular"
     assert payload["reaction_topology"]["formed_ring_sizes"] == (5,)
     assert payload["reaction_signature"]["schema_version"] == "3.2"

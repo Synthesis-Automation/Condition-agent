@@ -16,7 +16,7 @@ def test_inverting_alcohol_etherification_is_exactly_reconstructed() -> None:
 
     assert analysis.evidence_quality == "exact_product_reconstruction"
     assert analysis.selected_candidate is not None
-    assert analysis.selected_candidate.grammar_id == "alcohol_c_o_displacement"
+    assert analysis.selected_candidate.annotation_id == "alcohol_c_o_displacement"
     assert analysis.selected_candidate.rewrite_outcome_id == "inversion_if_defined"
     assert analysis.transformation_class == "sp3_c_o_substitution"
     assert analysis.named_family is None
@@ -61,7 +61,7 @@ def test_observed_retention_is_not_forced_into_an_inversion_outcome() -> None:
 
 
 @pytest.mark.parametrize(
-    ("reaction", "grammar_id", "connection_type"),
+    ("reaction", "annotation_id", "connection_type"),
     [
         ("CC(O)C.CN>>CNC(C)C", "alcohol_c_n_displacement", "C_N"),
         ("CC(O)C.CO>>COC(C)C", "alcohol_c_o_displacement", "C_O"),
@@ -70,14 +70,14 @@ def test_observed_retention_is_not_forced_into_an_inversion_outcome() -> None:
 )
 def test_alcohol_displacement_is_shared_across_xh_partner_elements(
     reaction: str,
-    grammar_id: str,
+    annotation_id: str,
     connection_type: str,
 ) -> None:
     analysis = featurize_reaction(reaction)
 
     assert analysis.evidence_quality == "exact_product_reconstruction"
     assert analysis.selected_candidate is not None
-    assert analysis.selected_candidate.grammar_id == grammar_id
+    assert analysis.selected_candidate.annotation_id == annotation_id
     assert analysis.product_connection is not None
     assert analysis.product_connection.connection_type == connection_type
 
@@ -87,7 +87,7 @@ def test_achiral_tertiary_alcohol_displacement_remains_structurally_generic() ->
 
     assert analysis.evidence_quality == "exact_product_reconstruction"
     assert analysis.selected_candidate is not None
-    assert analysis.selected_candidate.grammar_id == "alcohol_c_o_displacement"
+    assert analysis.selected_candidate.annotation_id == "alcohol_c_o_displacement"
     assert analysis.reaction_signature is not None
     assert analysis.reaction_signature.stereo_changes == ()
 

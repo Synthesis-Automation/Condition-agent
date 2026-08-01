@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.4",
+  "schema_version": "2.0",
   "definition_id": "fallback_retrieval.v1",
   "calibration_status": "conservative_initial_policy",
   "minimum_similarity": 0.55,
@@ -21,7 +21,7 @@
     "product_sites": 0.03,
     "functional_groups": 0.04,
     "contexts": 0.06,
-    "candidate_grammars": 0.02,
+    "candidate_interpretations": 0.02,
     "candidate_transformations": 0.02,
     "candidate_handles": 0.02,
     "candidate_edits": 0.02,

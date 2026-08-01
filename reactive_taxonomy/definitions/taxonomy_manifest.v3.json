@@ -14,7 +14,7 @@
   ],
   "annotation_definitions": [
     "functional_groups.v1.json",
-    "reaction_grammar_annotations.v1.json",
+    "reaction_interpretation_annotations.v1.json",
     "reaction_label_patterns.v1.json",
     "reaction_label_rendering.v1.json",
     "reaction_rendering.v1.json",

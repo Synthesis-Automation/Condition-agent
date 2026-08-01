@@ -1,4 +1,4 @@
-"""Tests for grammar-independent anonymous edit prototypes."""
+"""Tests for interpretation-independent anonymous edit prototypes."""
 
 from dataclasses import asdict
 

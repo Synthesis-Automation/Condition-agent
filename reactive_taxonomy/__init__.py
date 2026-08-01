@@ -15,7 +15,9 @@ from .reaction_reconstruction import (
     enumerate_reconstruction_candidates,
 )
 from .reaction_reconstruction_rules import load_reaction_reconstruction_rules
-from .reaction_grammar_annotations import load_reaction_grammar_annotations
+from .reaction_interpretation_annotations import (
+    load_reaction_interpretation_annotations,
+)
 from .reaction_rendering import reaction_label_definition_versions, render_reaction
 from .reaction_fallback_descriptors import reaction_fallback_definition_versions
 from .external_atom_mapping import (
@@ -73,7 +75,6 @@ from .reaction_site_interfaces import (
     SITE_INTERFACE_SCHEMA_VERSION,
     normalize_compound_sites,
     normalize_detected_site,
-    normalize_reaction_assignment,
     normalize_reaction_site,
     normalize_site_assignment,
 )
@@ -105,7 +106,7 @@ from .reaction_models import (
     REACTION_TOPOLOGY_SCHEMA_VERSION,
     ReactionAnalysis,
     ReactionAtomReference,
-    ReactionCandidate,
+    ReactionInterpretationCandidate,
     ReactionCompletenessAssessment,
     ReactionComponent,
     ReactionCoreAttachmentPort,
@@ -276,7 +277,7 @@ __all__ = [
     "REACTION_TEMPLATE_SCHEMA_VERSION",
     "ReactionAnalysis",
     "ReactionAtomReference",
-    "ReactionCandidate",
+    "ReactionInterpretationCandidate",
     "ReactionCompletenessAssessment",
     "ReactionComponent",
     "ReactionCoreAttachmentPort",
@@ -367,14 +368,13 @@ __all__ = [
     "load_reaction_template_registry",
     "load_contextual_source_label_mappings",
     "load_connectivity_rewrites",
-    "load_reaction_grammar_annotations",
+    "load_reaction_interpretation_annotations",
     "load_reaction_reconstruction_rules",
     "load_source_label_mappings",
     "match_reaction_label_pattern",
     "match_reaction_templates",
     "normalize_detected_site",
     "normalize_compound_sites",
-    "normalize_reaction_assignment",
     "normalize_reaction_site",
     "normalize_site_assignment",
     "observe_reaction",

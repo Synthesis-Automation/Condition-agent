@@ -12,7 +12,7 @@ from .reaction_archetypes import reconcile_edit_archetype
 from .reaction_label_patterns import match_reaction_label_pattern
 from .reaction_models import (
     ReactionAtomReference,
-    ReactionCandidate,
+    ReactionInterpretationCandidate,
     ReactionComponent,
     ReactionEdit,
     ReactionEvent,
@@ -231,7 +231,7 @@ def _event_sites(
 
 
 def _candidate_atom_keys(
-    candidate: ReactionCandidate,
+    candidate: ReactionInterpretationCandidate,
 ) -> set[Tuple[int, int]]:
     keys: set[Tuple[int, int]] = set()
     for change in candidate.predicted_bond_changes:
@@ -307,8 +307,8 @@ def build_reaction_events(
     reactants: Tuple[ReactionComponent, ...],
     edits: Sequence[ReactionEdit],
     partners: Sequence[ReactionPartner],
-    selected: Optional[ReactionCandidate],
-    selected_events: Sequence[ReactionCandidate],
+    selected: Optional[ReactionInterpretationCandidate],
+    selected_events: Sequence[ReactionInterpretationCandidate],
     named_family: Optional[str],
     compatible_named_families: Tuple[str, ...],
     evidence: str,

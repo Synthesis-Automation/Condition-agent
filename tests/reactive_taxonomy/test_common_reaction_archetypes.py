@@ -54,8 +54,8 @@ def test_xh_addition_reconstructs_both_regioisomers_without_guessing() -> None:
 
     assert linear.selected_candidate is not None
     assert branched.selected_candidate is not None
-    assert linear.selected_candidate.grammar_id == "xh_addition_to_alkene"
-    assert branched.selected_candidate.grammar_id == "xh_addition_to_alkene"
+    assert linear.selected_candidate.annotation_id == "xh_addition_to_alkene"
+    assert branched.selected_candidate.annotation_id == "xh_addition_to_alkene"
     assert (
         linear.selected_candidate.rewrite_outcome_id
         != branched.selected_candidate.rewrite_outcome_id
@@ -69,7 +69,7 @@ def test_xh_addition_reconstructs_both_regioisomers_without_guessing() -> None:
     assert {
         candidate.rewrite_outcome_id
         for candidate in linear.candidates
-        if candidate.grammar_id == "xh_addition_to_alkene"
+        if candidate.annotation_id == "xh_addition_to_alkene"
     } == {
         "endpoint_a_addend_a__endpoint_b_addend_b",
         "endpoint_b_addend_a__endpoint_a_addend_b",
@@ -103,10 +103,10 @@ def test_dihalogen_and_hydrosilane_use_the_same_pair_addition_rewrite() -> None:
 
     assert bromination.selected_candidate is not None
     assert hydrosilylation.selected_candidate is not None
-    assert bromination.selected_candidate.grammar_id == (
+    assert bromination.selected_candidate.annotation_id == (
         "addend_pair_addition_to_alkene"
     )
-    assert hydrosilylation.selected_candidate.grammar_id == (
+    assert hydrosilylation.selected_candidate.annotation_id == (
         "addend_pair_addition_to_alkene"
     )
     assert bromination.edit_archetype == hydrosilylation.edit_archetype == (
@@ -124,7 +124,7 @@ def test_one_equivalent_alkyne_pair_addition_stops_at_alkene() -> None:
     result = featurize_reaction("C#C.BrBr>>BrC=CBr")
 
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == (
+    assert result.selected_candidate.annotation_id == (
         "addend_pair_addition_to_alkyne"
     )
     assert result.reaction_signature.order_changes == (
@@ -150,8 +150,8 @@ def test_beta_elimination_resolves_each_available_beta_site() -> None:
 
     assert internal.selected_candidate is not None
     assert terminal.selected_candidate is not None
-    assert internal.selected_candidate.grammar_id == "beta_halo_elimination"
-    assert terminal.selected_candidate.grammar_id == "beta_halo_elimination"
+    assert internal.selected_candidate.annotation_id == "beta_halo_elimination"
+    assert terminal.selected_candidate.annotation_id == "beta_halo_elimination"
     assert internal.edit_archetype == terminal.edit_archetype == "elimination"
     assert {
         edit.edit_type for edit in internal.reaction_signature.edits
@@ -164,6 +164,6 @@ def test_beta_elimination_requires_an_adjacent_hydrogen() -> None:
 
     assert all(site.site_type != "eliminable_pair" for site in molecule.sites)
     assert all(
-        candidate.grammar_id != "beta_halo_elimination"
+        candidate.annotation_id != "beta_halo_elimination"
         for candidate in result.candidates
     )

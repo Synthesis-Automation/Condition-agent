@@ -1,4 +1,4 @@
-"""Regression coverage for high-ROI unary transformation grammars."""
+"""Regression coverage for high-ROI unary transformation interpretations."""
 
 import pytest
 
@@ -8,7 +8,7 @@ from reactive_taxonomy import featurize_reaction
 @pytest.mark.parametrize(
     (
         "reaction",
-        "grammar_id",
+        "annotation_id",
         "transformation_class",
         "order_change",
         "hydrogen_change_count",
@@ -51,9 +51,9 @@ from reactive_taxonomy import featurize_reaction
         ),
     ),
 )
-def test_unary_bond_order_grammar_reconstructs_exact_product(
+def test_unary_bond_order_interpretation_reconstructs_exact_product(
     reaction: str,
-    grammar_id: str,
+    annotation_id: str,
     transformation_class: str,
     order_change: str,
     hydrogen_change_count: int,
@@ -62,7 +62,7 @@ def test_unary_bond_order_grammar_reconstructs_exact_product(
 
     assert result.evidence_quality == "exact_product_reconstruction"
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == grammar_id
+    assert result.selected_candidate.annotation_id == annotation_id
     assert result.transformation_class == transformation_class
     assert result.named_family is None
     assert result.reaction_signature is not None
@@ -81,7 +81,7 @@ def test_sufex_sulfonate_reconstructs_without_source_label_routing() -> None:
 
     assert result.evidence_quality == "exact_product_reconstruction"
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == "sulfonate_formation"
+    assert result.selected_candidate.annotation_id == "sulfonate_formation"
     assert result.transformation_class == "sulfonate_formation"
     assert result.named_family == "sulfonylation"
     assert result.reaction_label.concise == (
@@ -97,7 +97,7 @@ def test_unary_operator_does_not_select_a_mismatched_product() -> None:
     candidates = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "carbonyl_reduction"
+        if candidate.annotation_id == "carbonyl_reduction"
     ]
 
     assert len(candidates) == 1
@@ -110,7 +110,7 @@ def test_tertiary_alcohol_is_not_invented_as_a_carbonyl() -> None:
     candidates = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "alcohol_oxidation"
+        if candidate.annotation_id == "alcohol_oxidation"
     ]
 
     assert len(candidates) == 1
@@ -124,7 +124,7 @@ def test_equivalent_carbonyl_sites_are_deterministic() -> None:
     )
 
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == "carbonyl_reduction"
+    assert result.selected_candidate.annotation_id == "carbonyl_reduction"
     assert result.evidence_quality == "exact_product_reconstruction"
     assert "SYMMETRY_EQUIVALENT_ASSIGNMENTS" in result.warnings
 

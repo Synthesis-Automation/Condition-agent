@@ -1,4 +1,4 @@
-"""Regression coverage for the Friedel–Crafts acylation grammar."""
+"""Regression coverage for the Friedel–Crafts acylation interpretation."""
 
 from reactive_taxonomy import featurize_reaction
 
@@ -31,7 +31,7 @@ def test_carboxylic_acid_is_not_promoted_to_activated_acyl_partner() -> None:
     result = featurize_reaction("CC(=O)O.c1ccccc1>>CC(=O)c1ccccc1")
 
     assert all(
-        candidate.grammar_id != "friedel_crafts_acylation"
+        candidate.annotation_id != "friedel_crafts_acylation"
         for candidate in result.candidates
     )
     assert result.named_family is None
@@ -43,7 +43,7 @@ def test_non_acylated_product_does_not_verify() -> None:
     candidates = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "friedel_crafts_acylation"
+        if candidate.annotation_id == "friedel_crafts_acylation"
     ]
     assert len(candidates) == 6
     assert all(candidate.verification == "product_mismatch" for candidate in candidates)
@@ -60,7 +60,7 @@ def test_product_reconstruction_resolves_aromatic_regioisomer() -> None:
     exact = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "friedel_crafts_acylation"
+        if candidate.annotation_id == "friedel_crafts_acylation"
         and candidate.verification == "exact_product_reconstruction"
     ]
     assert len(exact) == 1
@@ -74,7 +74,7 @@ def test_disagreeing_product_leaves_multiple_sites_unselected() -> None:
     candidates = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "friedel_crafts_acylation"
+        if candidate.annotation_id == "friedel_crafts_acylation"
     ]
     assert len(candidates) == 5
     assert result.selected_candidate is None

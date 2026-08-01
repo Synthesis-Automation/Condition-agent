@@ -73,12 +73,12 @@ def _insufficient_partner_multiplicity_suspected(
         tuple[str, int, str, str], set[tuple[int, str]]
     ] = defaultdict(set)
     partner_elements: dict[tuple[str, int, str, str], str] = {}
-    for grammar, assignment in raw_candidates:
+    for rule, assignment in raw_candidates:
         if len(assignment) < 2:
             continue
         for partner_role, partner in assignment.items():
             key = (
-                str(grammar.get("id") or ""),
+                str(rule.get("id") or ""),
                 int(partner.component_index),
                 str(partner.site_id),
                 str(partner_role),

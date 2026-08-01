@@ -136,13 +136,13 @@ be replaced by a reaction-name guess.
 
 Converted records serialize `reaction_observation` and the optional
 `reaction_interpretation` separately. The nested `reaction_signature` is built
-from the observation and remains generic; grammar roles and named-family
+from the observation and remains generic; interpretation roles and named-family
 evidence stay in the interpretation. Review CSVs expose one primary
 `reaction_display_label` from the shared renderer, plus
 `reaction_core_label` immediately after the reaction-SMILES column as an audit
 field for the unpolished minimum-core
 projection. Neither display field participates in identity or retrieval.
-The shared display renderer composes verified grammar/topology language with
+The shared display renderer composes verified interpretation and topology language with
 additional core context when that context is informative, marks review-only
 cores as provisional, and renders unresolved products explicitly rather than
 ending labels with an incomplete reaction arrow.
@@ -177,7 +177,7 @@ precedents. Successful unsigned-core results use
 When parsing succeeds but no verified `ReactionSignature` can be constructed,
 the generic API may use a separate `ReactionFallbackDescriptor`. Conversion
 creates this descriptor from canonical reactant and product inventories,
-taxonomy reactive sites, functional groups, local contexts, candidate grammar
+taxonomy reactive sites, functional groups, local contexts, candidate interpretation annotations
 and edit hypotheses, and net bond/element inventory changes. It is deliberately
 not a `ReactionSignature`: candidate edits are hypotheses and are never
 serialized as observed bond edits.
@@ -1003,7 +1003,7 @@ python -m condition_recommender.recommend_cli "<reaction_smiles>" `
 The query reaction is structure-verified with `reactive_taxonomy`, but precedent
 rows are not. The implementation:
 
-1. assigns a query reaction grammar;
+1. assigns a query reaction interpretation annotation;
 2. restricts source reaction types through a declarative crosswalk;
 3. matches two reactive participants as an unordered pair;
 4. ranks by functional-group signature and structural qualifiers;
@@ -1020,18 +1020,18 @@ to support an exact activated-carbon query without allowing N–H or O–H rows 
 leak into the candidate recipes.
 
 For the cleaned HTE data, `CH-Activation` is routed to the intermolecular
-`Ar–X + Ar–H → Ar–Ar` grammar. The same source reaction type also contains
+`Ar–X + Ar–H → Ar–Ar` interpretation annotation. The same source reaction type also contains
 `Ar–H + alkyne` records, so the generic `alkyne` label is normalized to
 `PI|Alkyne`; those records then fail participant compatibility instead of
 entering direct-arylation recommendations. Friedel–Crafts remains a separate
-structure grammar and is not backed by this CSV because the dataset has no
+structural interpretation and is not backed by this CSV because the dataset has no
 corresponding acylation source type.
 
 Source reaction context disambiguates the same `alkyne` label in Sonogashira
 rows as the terminal reactive handle `XH|Csp|H1|Alkynyl`. Two-partner
 retrieval requires both precedent signatures, and transfer handles from
 different element families (for example Zn, Mg, Sn, and B) are hard
-incompatible even when the generic transformation grammar is shared.
+incompatible even when the generic transformation pattern is shared.
 
 Important limitations:
 

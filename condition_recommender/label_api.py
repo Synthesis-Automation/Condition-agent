@@ -11,8 +11,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from reactive_taxonomy import featurize_reaction
-from reactive_taxonomy.reaction_grammar_annotations import (
-    load_reaction_grammar_annotations,
+from reactive_taxonomy.reaction_interpretation_annotations import (
+    load_reaction_interpretation_annotations,
 )
 
 from .label_indexing import LabelIndexedReaction, LabelParticipant, load_label_index
@@ -37,13 +37,18 @@ def load_label_retrieval_rules() -> Dict[str, Any]:
     """Load and validate weak-label retrieval configuration."""
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    grammar_ids = {
-        str(item["id"]) for item in load_reaction_grammar_annotations()
+    interpretation_ids = {
+        str(item["id"])
+        for item in load_reaction_interpretation_annotations()
     }
-    configured = set((rules.get("grammar_source_reaction_types") or {}).keys())
-    unknown = sorted(configured - grammar_ids)
+    configured = set(
+        (rules.get("interpretation_source_reaction_types") or {}).keys()
+    )
+    unknown = sorted(configured - interpretation_ids)
     if unknown:
-        raise ValueError(f"Unknown configured reaction grammars: {unknown}")
+        raise ValueError(
+            f"Unknown configured reaction interpretations: {unknown}"
+        )
     supported_scopes = set(rules.get("supported_reaction_scopes") or ())
     allowed_scopes = {
         "intramolecular",
@@ -306,7 +311,7 @@ def _rank_recipes(
             members,
         ) = item
         best_row = members[0][3]
-        explanation = ["Compatible reactive-taxonomy grammar"]
+        explanation = ["Compatible reaction interpretation"]
         if signature_score == 1.0:
             explanation.append("Exact unordered FG-signature pair")
         else:
@@ -345,7 +350,7 @@ def recommend_conditions_from_labels(
     records_path: str | Path = "datasets/reaction_label/v2.1_cleaned.csv",
     top_k: int = 5,
 ) -> LabelRecommendationResult:
-    """Return top condition recipes using reaction grammar and FG signatures."""
+    """Return recipes using interpreted roles and FG signatures."""
     if top_k < 1:
         return LabelRecommendationResult(
             reaction_smiles, False, error="TOP_K_MUST_BE_POSITIVE"
@@ -383,20 +388,22 @@ def recommend_conditions_from_labels(
             reaction_smiles,
             False,
             query_label=query_label,
-            grammar_id=selected.grammar_id,
+            interpretation_id=selected.annotation_id,
             warnings=("LABEL_DATASET_HAS_NO_REACTION_TOPOLOGY",),
             error="QUERY_TOPOLOGY_NOT_SUPPORTED_BY_LABEL_DATASET",
         )
     source_types = tuple(
-        (rules.get("grammar_source_reaction_types") or {}).get(selected.grammar_id, ())
+        (rules.get("interpretation_source_reaction_types") or {}).get(
+            selected.annotation_id, ()
+        )
     )
     if not source_types:
         return LabelRecommendationResult(
             reaction_smiles,
             False,
             query_label=query_label,
-            grammar_id=selected.grammar_id,
-            error="QUERY_GRAMMAR_NOT_SUPPORTED_BY_LABEL_DATASET",
+            interpretation_id=selected.annotation_id,
+            error="QUERY_INTERPRETATION_NOT_SUPPORTED_BY_LABEL_DATASET",
         )
     participants = _query_participants(analysis)
     if len(participants) != 2:
@@ -404,7 +411,7 @@ def recommend_conditions_from_labels(
             reaction_smiles,
             False,
             query_label=query_label,
-            grammar_id=selected.grammar_id,
+            interpretation_id=selected.annotation_id,
             error="QUERY_REQUIRES_TWO_REACTIVE_PARTICIPANTS",
         )
 
@@ -418,7 +425,7 @@ def recommend_conditions_from_labels(
             reaction_smiles,
             False,
             query_label=query_label,
-            grammar_id=selected.grammar_id,
+            interpretation_id=selected.annotation_id,
             query_signatures=tuple(item.signature for item in participants),
             error="NO_FAMILY_COMPATIBLE_PRECEDENTS",
         )
@@ -428,7 +435,7 @@ def recommend_conditions_from_labels(
             reaction_smiles,
             False,
             query_label=query_label,
-            grammar_id=selected.grammar_id,
+            interpretation_id=selected.annotation_id,
             query_signatures=tuple(item.signature for item in participants),
             candidate_count=len(rows),
             error="NO_SIGNATURE_COMPATIBLE_PRECEDENTS",
@@ -438,7 +445,7 @@ def recommend_conditions_from_labels(
         query_reaction_smiles=reaction_smiles,
         valid=True,
         query_label=query_label,
-        grammar_id=selected.grammar_id,
+        interpretation_id=selected.annotation_id,
         query_signatures=tuple(item.signature for item in participants),
         candidate_count=len(rows),
         recipe_count=recipe_count,

@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
 from .reaction_models import (
-    ReactionCandidate,
+    ReactionInterpretationCandidate,
     ReactionComponent,
     ReactionFamilyEnvironment,
     ReactionPartnerEnvironment,
@@ -34,17 +34,17 @@ def _unique(values: Iterable[str]) -> Tuple[str, ...]:
 
 def build_reaction_family_environment(
     components: Tuple[ReactionComponent, ...],
-    selected: ReactionCandidate | None,
+    selected: ReactionInterpretationCandidate | None,
     spectators: Tuple[ReactionSpectatorGroup, ...],
     evidence_quality: str,
 ) -> ReactionFamilyEnvironment | None:
     """Build an interpretable family feature overlay for a selected event."""
     if selected is None:
         return None
-    if selected.grammar_id == "sp2_c_n_substitution":
+    if selected.annotation_id == "sp2_c_n_substitution":
         return _build_cn_environment(components, selected, spectators, evidence_quality)
-    if selected.grammar_id in {"sp2_c_o_substitution", "sp2_c_s_substitution"}:
-        element = "O" if selected.grammar_id == "sp2_c_o_substitution" else "S"
+    if selected.annotation_id in {"sp2_c_o_substitution", "sp2_c_s_substitution"}:
+        element = "O" if selected.annotation_id == "sp2_c_o_substitution" else "S"
         return _build_heteroatom_environment(components, selected, spectators, evidence_quality, element)
     if "suzuki_miyaura" not in selected.compatible_named_families:
         return None
@@ -141,7 +141,7 @@ def build_reaction_family_environment(
 
 def _build_cn_environment(
     components: Tuple[ReactionComponent, ...],
-    selected: ReactionCandidate,
+    selected: ReactionInterpretationCandidate,
     spectators: Tuple[ReactionSpectatorGroup, ...],
     evidence_quality: str,
 ) -> ReactionFamilyEnvironment:
@@ -205,7 +205,7 @@ def _build_cn_environment(
 
 def _build_heteroatom_environment(
     components: Tuple[ReactionComponent, ...],
-    selected: ReactionCandidate,
+    selected: ReactionInterpretationCandidate,
     spectators: Tuple[ReactionSpectatorGroup, ...],
     evidence_quality: str,
     element: str,

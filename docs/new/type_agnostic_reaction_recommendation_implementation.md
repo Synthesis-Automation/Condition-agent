@@ -47,7 +47,7 @@ reactive_taxonomy       condition_registry
 | --- | --- | --- |
 | Molecular features | Implemented | Functional groups, reactive sites, canonical connectivity interfaces, typed reactivity profiles |
 | Reaction parsing | Implemented | Two- and three-part reaction SMILES with component, map, and source preservation |
-| Connectivity execution | V3 implemented | Grammar-free reconstruction rules select bounded graph operators; optional grammar/family annotations are applied only after core/signature construction |
+| Connectivity execution | V3 implemented | Interpretation-independent reconstruction rules select bounded graph operators; optional interpretation and family annotations are applied only after core/signature construction |
 | Edit evidence | Implemented | Typed provider candidates from mapping, exact single/multi-event reconstruction, conservative scaffold, bounded global, and fragmented-scaffold correspondence; distinct ambiguous edit hypotheses; conflicts and H/charge/stereo observations |
 | External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, persisted with model provenance, and never admitted as verified precedents |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting, observation-only product-origin gaps, and typed fragment-source requirements |
@@ -75,10 +75,10 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `6.0` |
+| Reaction analysis | `7.0` |
 | Reaction observation | `2.0` |
-| Reaction interpretation | `2.0` |
-| Rendered reaction label | `2.0` |
+| Reaction interpretation | `3.0` |
+| Rendered reaction label | `3.0` |
 | Reaction signature / ID namespace | `3.2` / `RS3` |
 | Reaction ring change | `1.0` |
 | Reaction topology | `1.2` |
@@ -87,12 +87,12 @@ The current code declares:
 | Connectivity site interface | `2.0` |
 | Connectivity rewrite | `3.0` |
 | Typed reactivity profile | `1.0` |
-| Reaction fallback descriptor | `1.3` |
+| Reaction fallback descriptor | `2.0` / `RFD2` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `6.0` |
-| Generic converter definition | `generic_conversion.v6.0` |
+| Recommendation record | `7.0` |
+| Generic converter definition | `generic_conversion.v7.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v3.0` |
-| Concise reaction review | `4.0` |
+| Concise reaction review | `7.0` |
 | Shared chemist review summary | `1.2` |
 | Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `3.0` |
@@ -105,7 +105,7 @@ The current code declares:
 | Reaction-core calibration | `reaction_core_calibration.v1` |
 | Generic admission policy | `generic_admission.v2.0` |
 | Fragment-source capabilities | `fragment_source_capabilities.v1@1.0` |
-| Fallback retrieval definition | `1.4` |
+| Fallback retrieval definition | `2.0` |
 
 Do not copy this table into executable code. The constants and definition files
 remain authoritative, and stale artifacts must fail validation rather than
@@ -134,7 +134,7 @@ measurements, not recommendation-accuracy claims. Because the source is capped
 per dataset, this artifact must not be described as a full-corpus production
 index.
 
-### 2.4 Grammar-independent Fischer POC
+### 2.4 Interpretation-independent Fischer POC
 
 The executable benchmark
 `benchmarks/fischer_indole_edit_poc.py` evaluates the 542-row Fischer source
@@ -224,7 +224,7 @@ reaction may share `RCS2` while receiving different `RSH2` keys. This is why
 `RCS2` is diagnostic only.
 
 The sample contains an acetonide-protection reaction for which the baseline has
-no signature. V2 produces the grammar-independent minimized label
+no signature. V2 produces the interpretation-independent minimized label
 `C(R)2(=O) → C(R)2(O-R)2` and derives the remote classes `alkyl` and
 `ring_aliphatic` from the cut molecular graph. The supplied mapped
 benzaldehyde/methanol acetal regression similarly produces
@@ -414,8 +414,8 @@ coverage measurements, not validation of condition suitability.
 ### 2.8 High-ROI canonical-site expansion
 
 The current identity definitions add five conservative observation classes
-without adding a named-family route or automatically registering a reaction
-grammar:
+without adding a named-family route or automatically registering an
+interpretation annotation:
 
 | New observation | Canonical representation | Connectivity interface |
 | --- | --- | --- |
@@ -446,8 +446,9 @@ rows and 120 rows containing at least one new observation:
 
 Rows can contain more than one observation, so category counts are not
 additive. This measures site incidence, not verified transformation or
-recommendation coverage. New grammars and rewrites require their own chemistry
-validation before they may consume these observations.
+recommendation coverage. New interpretation annotations and reconstruction
+rules require their own chemistry validation before they may consume these
+observations.
 
 ## 3. Implemented chemistry contracts
 
@@ -455,7 +456,7 @@ validation before they may consume these observations.
 
 `reactive_taxonomy` currently provides:
 
-- a public grammar-free `ReactionObservation` contract containing parsed
+- a public interpretation-independent `ReactionObservation` contract containing parsed
   components, correspondence evidence, normalized edits, topology,
   completeness, spectators, and minimum-core projection;
 - immutable atom-provenanced bond and schema-level hydrogen edits;
@@ -524,7 +525,7 @@ Source-declared family is stored as provenance outside
 `featurize_reaction()`. It cannot determine the structural output.
 
 One `render_reaction()` entry point builds the chemist-facing label after
-structural analysis. It records whether the result came from verified grammar,
+structural analysis. It records whether the result came from verified interpretation,
 generic topology, an edit pattern, the minimum-core projection, or literal
 edits. Its wording and rendering version do not affect signature identity.
 

@@ -77,7 +77,7 @@ def _unexpected_template_load(*args: Any, **kwargs: Any) -> None:
     raise AssertionError("reaction-core construction consulted a template")
 
 
-def test_acetal_core_is_built_without_template_or_grammar_lookup(
+def test_acetal_core_is_built_without_template_or_interpretation_lookup(
     monkeypatch: Any,
 ) -> None:
     monkeypatch.setattr(
@@ -409,7 +409,7 @@ def test_reaction_core_serializes_but_does_not_invent_unmapped_observation() -> 
         "CO.CO.O=Cc1ccccc1F>>COC(OC)c1ccccc1F"
     )
 
-    assert mapped_payload["schema_version"] == "6.0"
+    assert mapped_payload["schema_version"] == "7.0"
     assert mapped_payload["reaction_core"]["schema_version"] == "2.2"
     assert mapped_payload["reaction_core"]["algorithm_version"] == (
         "reaction_core_projection.v8"

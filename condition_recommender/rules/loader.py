@@ -9,8 +9,8 @@ from typing import Any, Iterable, Mapping, Tuple
 
 from condition_registry import load_recipe_template_set
 from reactive_taxonomy import load_handle_patterns
-from reactive_taxonomy.reaction_grammar_annotations import (
-    load_reaction_grammar_annotations,
+from reactive_taxonomy.reaction_interpretation_annotations import (
+    load_reaction_interpretation_annotations,
 )
 from reactive_taxonomy.reaction_reconstruction_rules import (
     load_reaction_reconstruction_rules,
@@ -270,14 +270,14 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
     reconstruction_rules = {
         str(rule["id"]): rule for rule in load_reaction_reconstruction_rules()
     }
-    grammar_roles = {}
-    for annotation in load_reaction_grammar_annotations():
+    interpretation_roles = {}
+    for annotation in load_reaction_interpretation_annotations():
         transformation = str(annotation.get("transformation_class") or "")
         rule = reconstruction_rules.get(
             str(annotation.get("reconstruction_rule_id") or ""), {}
         )
         slots = rule.get("slots") or {}
-        grammar_roles.setdefault(transformation, {}).update(
+        interpretation_roles.setdefault(transformation, {}).update(
             {
                 str(role): str(
                     (slots.get(str(slot)) or {}).get("site_type") or ""
@@ -331,7 +331,7 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
             else:
                 transformations = _tuple_strings(values)
                 for value in transformations:
-                    if value not in grammar_roles:
+                    if value not in interpretation_roles:
                         errors.append(
                             f"{prefix}.scope:unknown_transformation_class:{value}"
                         )
@@ -404,7 +404,9 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
                     if not role or not site_type:
                         errors.append(f"{partner_prefix}:missing_role_or_site_type")
                     for transformation in transformations:
-                        expected = grammar_roles.get(transformation, {}).get(role)
+                        expected = interpretation_roles.get(
+                            transformation, {}
+                        ).get(role)
                         if expected is None:
                             errors.append(
                                 f"{partner_prefix}:unknown_role_for_transformation:"

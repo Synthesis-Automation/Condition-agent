@@ -190,7 +190,9 @@ def featurize_reaction(
         interpretation_build.product_contradicted_candidates
     )
     if product_contradicted_candidates:
-        warnings.append("PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES")
+        warnings.append(
+            "PRODUCT_CONTRADICTED_INTERPRETATION_CANDIDATES"
+        )
     edit_hypotheses = observation.edit_hypotheses
     evidence_candidates = observation.evidence_candidates
     effective_evidence = reconstruction_build.evidence_quality
@@ -210,7 +212,7 @@ def featurize_reaction(
     if partial_product_transformation is not None:
         effective_evidence = partial_product_transformation.evidence
     display_arrow = "→" if label_style == "unicode" else "->"
-    fallback_label = selected.grammar_label if selected else None
+    fallback_label = selected.interpretation_label if selected else None
     fallback_status = "exact_product" if selected else "unavailable"
     fallback_detailed_label = None
     if partial_product_transformation is not None:
@@ -236,8 +238,8 @@ def featurize_reaction(
             warnings.append("PRODUCT_MISMATCH_CANDIDATES_EXCLUDED_FROM_LABEL")
         if any(len(assignment) > 1 for _, assignment in fallback_raw):
             fallback_raw = [
-                (grammar, assignment)
-                for grammar, assignment in fallback_raw
+                (annotation, assignment)
+                for annotation, assignment in fallback_raw
                 if len(assignment) > 1
             ]
         reactant_labels = sorted(
@@ -273,7 +275,7 @@ def featurize_reaction(
     interpretation_warnings = set(interpretation_build.warnings)
     if product_contradicted_candidates:
         interpretation_warnings.add(
-            "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES"
+            "PRODUCT_CONTRADICTED_INTERPRETATION_CANDIDATES"
         )
     if interpretation_conflict:
         interpretation_warnings.add("INTERPRETATION_OBSERVATION_CONFLICT")

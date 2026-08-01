@@ -1,7 +1,7 @@
 from reactive_taxonomy import featurize_reaction, validate_taxonomy
 
 
-def test_reaction_grammar_taxonomy_validates() -> None:
+def test_reaction_interpretation_taxonomy_validates() -> None:
     assert validate_taxonomy() == []
 
 
@@ -156,12 +156,12 @@ def test_wrong_product_is_not_confirmed() -> None:
         for candidate in result.candidates
     )
     assert any(
-        candidate.grammar_id == "sp2_c_n_substitution"
+        candidate.annotation_id == "sp2_c_n_substitution"
         and candidate.verification == "product_mismatch"
         for candidate in result.candidates
     )
     assert result.reaction_label.status == "product_contradicted_reactants"
-    assert "PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES" in result.warnings
+    assert "PRODUCT_CONTRADICTED_INTERPRETATION_CANDIDATES" in result.warnings
 
 
 def test_ambiguous_fallback_excludes_product_mismatch_candidates() -> None:
@@ -200,7 +200,7 @@ def test_three_part_reaction_smiles_preserves_agents() -> None:
     assert result.transformation_class == "sp2_c_n_substitution"
 
 
-def test_additional_v1_grammars_reconstruct_products() -> None:
+def test_additional_v1_interpretations_reconstruct_products() -> None:
     cases = {
         "Brc1ccccc1.Oc1ccccc1>>c1ccc(Oc2ccccc2)cc1": "sp2_c_o_substitution",
         "Brc1ccccc1.Sc1ccccc1>>c1ccc(Sc2ccccc2)cc1": "sp2_c_s_substitution",
@@ -211,10 +211,10 @@ def test_additional_v1_grammars_reconstruct_products() -> None:
         "CC(=O)Cl.CCS>>CCSC(C)=O": "thioester_formation",
         "CS(=O)(=O)Cl.CN>>CS(=O)(=O)NC": "sulfonamide_formation",
     }
-    for reaction, grammar_id in cases.items():
+    for reaction, annotation_id in cases.items():
         result = featurize_reaction(reaction)
         assert result.evidence_quality == "exact_product_reconstruction", reaction
-        assert result.selected_candidate.grammar_id == grammar_id
+        assert result.selected_candidate.annotation_id == annotation_id
 
 
 def test_oxygen_and_sulfur_products_have_typed_connections_and_environments() -> None:
@@ -238,7 +238,7 @@ def test_composite_triflate_handle_is_removed_as_complete_fragment() -> None:
     reaction = "Fc1ccc(OS(=O)(=O)C(F)(F)F)cc1.c1ccc(B(O)O)cc1>>Fc1ccc(-c2ccccc2)cc1"
     result = featurize_reaction(reaction)
     assert result.evidence_quality == "exact_product_reconstruction"
-    assert result.selected_candidate.grammar_id == "boron_transfer_coupling"
+    assert result.selected_candidate.annotation_id == "boron_transfer_coupling"
     assert result.selected_candidate.predicted_product_smiles == "Fc1ccc(-c2ccccc2)cc1"
 
 

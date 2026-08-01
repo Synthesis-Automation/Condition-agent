@@ -40,7 +40,7 @@ def validate_taxonomy() -> List[str]:
         "taxonomy_manifest.v3",
         "rendering.v1",
         "reaction_reconstruction_rules.v1",
-        "reaction_grammar_annotations.v1",
+        "reaction_interpretation_annotations.v1",
         "reaction_label_patterns.v1",
         "reaction_label_rendering.v1",
         "reaction_rendering.v1",
@@ -412,15 +412,17 @@ def validate_taxonomy() -> List[str]:
             "unknown_reconstruction_operators:"
             + ",".join(sorted(unknown_rewrite_ids))
         )
-    grammar_annotations = (
-        payload["reaction_grammar_annotations.v1"].get("annotations") or []
+    interpretation_annotations = (
+        payload["reaction_interpretation_annotations.v1"].get("annotations")
+        or []
     )
     annotation_ids = {
-        str(annotation.get("id") or "") for annotation in grammar_annotations
+        str(annotation.get("id") or "")
+        for annotation in interpretation_annotations
     }
     annotation_rules = {
         str(annotation.get("reconstruction_rule_id") or "")
-        for annotation in grammar_annotations
+        for annotation in interpretation_annotations
     }
     unknown_annotation_rules = annotation_rules - set(rule_ids)
     if unknown_annotation_rules:
@@ -489,14 +491,16 @@ def validate_taxonomy() -> List[str]:
         "sulfonate",
         "fixed_product",
     }
-    for grammar_id, rule in reaction_rendering.items():
+    for annotation_id, rule in reaction_rendering.items():
         if rule.get("product_kind") not in allowed_product_kinds:
-            errors.append(f"invalid_reaction_product_renderer:{grammar_id}")
+            errors.append(
+                f"invalid_reaction_product_renderer:{annotation_id}"
+            )
         if (
             rule.get("product_kind") == "fixed_product"
             and not str(rule.get("product_label") or "").strip()
         ):
-            errors.append(f"missing_fixed_reaction_product:{grammar_id}")
+            errors.append(f"missing_fixed_reaction_product:{annotation_id}")
     label_rendering = payload["reaction_label_rendering.v1"]
     label_styles = label_rendering.get("styles") or {}
     if label_rendering.get("default_style") not in label_styles:

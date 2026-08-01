@@ -30,7 +30,7 @@ def _admission(
     selected = analysis.selected_candidate
     if analysis.evidence_quality != "exact_product_reconstruction":
         reasons.append("reaction_not_exactly_verified")
-    if selected is None or selected.grammar_id != "sp2_c_n_substitution":
+    if selected is None or selected.annotation_id != "sp2_c_n_substitution":
         reasons.append("not_verified_as_sp2_c_n")
     if (
         analysis.family_environment is None

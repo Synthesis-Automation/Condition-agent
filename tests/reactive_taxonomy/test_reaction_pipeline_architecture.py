@@ -25,7 +25,7 @@ UNMAPPED_SUZUKI = (
 )
 
 
-def test_observation_is_grammar_free_and_builds_generic_products() -> None:
+def test_observation_is_interpretation_free_and_builds_generic_products() -> None:
     observation = observe_reaction(MAPPED_SUZUKI)
 
     assert observation.valid
@@ -37,10 +37,10 @@ def test_observation_is_grammar_free_and_builds_generic_products() -> None:
     assert signature.named_family is None
     assert signature.compatible_named_families == ()
     payload = json.dumps(asdict(observation), sort_keys=True)
-    assert '"grammar_id"' not in payload
+    assert '"annotation_id"' not in payload
     assert '"named_family"' not in payload
     assert '"transformation_class"' not in payload
-    assert '"grammar_label"' not in payload
+    assert '"interpretation_label"' not in payload
     assert observation.selected_reconstruction is not None
     assert observation.reconstruction_candidates
 
@@ -50,7 +50,7 @@ def test_interpretation_adds_optional_family_semantics() -> None:
     interpretation = interpret_reaction(observation)
 
     assert interpretation.selected_candidate is not None
-    assert interpretation.selected_candidate.grammar_id == (
+    assert interpretation.selected_candidate.annotation_id == (
         "boron_transfer_coupling"
     )
     assert interpretation.named_family == "suzuki_miyaura"
@@ -63,15 +63,15 @@ def test_interpretation_adds_optional_family_semantics() -> None:
     assert signature is not None
     assert all(partner.role is None for partner in signature.partners)
     rendered = render_reaction(observation, interpretation)
-    assert rendered.source == "verified_grammar"
+    assert rendered.source == "verified_interpretation"
 
 
-def test_signature_and_core_do_not_depend_on_loaded_grammars(monkeypatch) -> None:
+def test_signature_and_core_do_not_depend_on_loaded_interpretations(monkeypatch) -> None:
     reaction = "[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]"
     interpreted = featurize_reaction(reaction)
     monkeypatch.setattr(
         interpretation_module,
-        "load_reaction_grammar_annotations",
+        "load_reaction_interpretation_annotations",
         lambda: (),
     )
     generic = featurize_reaction(reaction)
@@ -89,16 +89,16 @@ def test_signature_and_core_do_not_depend_on_loaded_grammars(monkeypatch) -> Non
     assert generic.named_family is None
     assert interpreted.reaction_label is not None
     assert generic.reaction_label is not None
-    assert interpreted.reaction_label.source == "verified_grammar"
-    assert generic.reaction_label.source != "verified_grammar"
+    assert interpreted.reaction_label.source == "verified_interpretation"
+    assert generic.reaction_label.source != "verified_interpretation"
 
 
-def test_public_operator_registry_excludes_grammar_metadata() -> None:
+def test_public_operator_registry_excludes_interpretation_metadata() -> None:
     operators = load_reaction_operators()
 
     assert operators
     assert len({operator.operator_id for operator in operators}) == len(operators)
-    assert all(not hasattr(operator, "grammar_ids") for operator in operators)
+    assert all(not hasattr(operator, "annotation_ids") for operator in operators)
 
 
 def test_cycloaddition_uses_generic_topology_renderer() -> None:
@@ -123,6 +123,6 @@ def test_analysis_serializes_one_canonical_reaction_label_contract() -> None:
     } == set()
     assert payload["reaction_label"]["concise"]
     assert payload["reaction_label"]["detailed"]
-    assert payload["reaction_label"]["schema_version"] == "2.0"
+    assert payload["reaction_label"]["schema_version"] == "3.0"
     assert "reaction_label" not in payload["candidates"][0]
-    assert payload["candidates"][0]["grammar_label"]
+    assert payload["candidates"][0]["interpretation_label"]

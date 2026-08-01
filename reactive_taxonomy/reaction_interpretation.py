@@ -1,4 +1,4 @@
-"""Optional grammar and family annotations over structural observations."""
+"""Optional interpretation annotations over structural observations."""
 
 from __future__ import annotations
 
@@ -7,10 +7,12 @@ from typing import Any, Mapping, Tuple
 
 from .reaction_edits import normalize_predicted_edits
 from .reaction_environments import build_reaction_family_environment
-from .reaction_grammar_annotations import load_reaction_grammar_annotations
+from .reaction_interpretation_annotations import (
+    load_reaction_interpretation_annotations,
+)
 from .reaction_labels import render_reaction_label
 from .reaction_models import (
-    ReactionCandidate,
+    ReactionInterpretationCandidate,
     ReactionInterpretation,
     ReactionObservation,
     ReactionPartner,
@@ -20,7 +22,7 @@ from .reaction_models import (
 from .reaction_products import build_product_connection
 
 
-ReactionCandidateSource = Tuple[
+ReactionInterpretationCandidateSource = Tuple[
     Mapping[str, Any],
     Mapping[str, ReactionSiteReference],
 ]
@@ -28,12 +30,12 @@ ReactionCandidateSource = Tuple[
 
 @dataclass(frozen=True)
 class ReactionInterpretationBuild:
-    """Grammar annotations derived from an existing structural observation."""
+    """Interpretation annotations derived from a structural observation."""
 
-    candidate_sources: Tuple[ReactionCandidateSource, ...]
-    candidates: Tuple[ReactionCandidate, ...]
-    selected_candidate: ReactionCandidate | None
-    selected_events: Tuple[ReactionCandidate, ...]
+    candidate_sources: Tuple[ReactionInterpretationCandidateSource, ...]
+    candidates: Tuple[ReactionInterpretationCandidate, ...]
+    selected_candidate: ReactionInterpretationCandidate | None
+    selected_events: Tuple[ReactionInterpretationCandidate, ...]
     evidence_quality: str
     compatible_named_families: Tuple[str, ...]
     named_family: str | None
@@ -43,10 +45,10 @@ class ReactionInterpretationBuild:
 
 def build_interpreted_partners(
     observation: ReactionObservation,
-    selected: ReactionCandidate | None,
-    selected_events: Tuple[ReactionCandidate, ...] = (),
+    selected: ReactionInterpretationCandidate | None,
+    selected_events: Tuple[ReactionInterpretationCandidate, ...] = (),
 ) -> Tuple[ReactionPartner, ...]:
-    """Overlay optional grammar roles on graph-derived site environments."""
+    """Overlay optional semantic roles on graph-derived site environments."""
     candidates = selected_events or ((selected,) if selected is not None else ())
     partners = []
     seen = set()
@@ -162,7 +164,10 @@ def _annotate_candidate(
     reconstruction: ReactionReconstructionCandidate,
     *,
     label_style: str,
-) -> tuple[ReactionCandidate, ReactionCandidateSource]:
+) -> tuple[
+    ReactionInterpretationCandidate,
+    ReactionInterpretationCandidateSource,
+]:
     assignment = _semantic_assignment(annotation, reconstruction)
     semantic_by_slot = {
         str(slot): str(role)
@@ -196,8 +201,8 @@ def _annotate_candidate(
         )
         for change in reconstruction.predicted_stereo_changes
     )
-    candidate = ReactionCandidate(
-        grammar_id=str(annotation["id"]),
+    candidate = ReactionInterpretationCandidate(
+        annotation_id=str(annotation["id"]),
         rewrite_outcome_id=reconstruction.rewrite_outcome_id,
         edit_archetype=reconstruction.edit_archetype,
         transformation_class=str(annotation["transformation_class"]),
@@ -205,7 +210,7 @@ def _annotate_candidate(
         predicted_bond_changes=predicted_bond_changes,
         predicted_product_smiles=reconstruction.predicted_product_smiles,
         verification=reconstruction.verification,
-        grammar_label=render_reaction_label(
+        interpretation_label=render_reaction_label(
             dict(annotation), assignment, style=label_style
         ),
         predicted_stereo_changes=predicted_stereo_changes,
@@ -224,7 +229,7 @@ def build_reaction_interpretation_candidates(
 ) -> ReactionInterpretationBuild:
     """Annotate lower-level reconstruction evidence; never reconstruct graphs."""
     annotations_by_rule: dict[str, list[Mapping[str, Any]]] = {}
-    for annotation in load_reaction_grammar_annotations():
+    for annotation in load_reaction_interpretation_annotations():
         annotations_by_rule.setdefault(
             str(annotation["reconstruction_rule_id"]), []
         ).append(annotation)
@@ -239,7 +244,7 @@ def build_reaction_interpretation_candidates(
 
     def annotate_selected(
         reconstruction: ReactionReconstructionCandidate | None,
-    ) -> ReactionCandidate | None:
+    ) -> ReactionInterpretationCandidate | None:
         if reconstruction is None:
             return None
         annotations = annotations_by_rule.get(reconstruction.rule_id, ())
@@ -289,7 +294,7 @@ def build_reaction_interpretation_candidates(
         if selected is not None and observation.selected_reconstruction is not None
         else "exact_multi_event_reconstruction"
         if selected_events
-        else "reactant_grammar_only"
+        else "reactant_interpretation_only"
         if candidates
         else "unresolved"
     )
@@ -333,7 +338,7 @@ def interpret_reaction(
     *,
     label_style: str = "unicode",
 ) -> ReactionInterpretation:
-    """Add optional grammar semantics to an immutable observation."""
+    """Add optional interpretation semantics to an immutable observation."""
     if not observation.valid:
         return ReactionInterpretation(
             evidence_quality="unresolved",
@@ -396,7 +401,7 @@ def interpret_reaction(
 
 
 __all__ = [
-    "ReactionCandidateSource",
+    "ReactionInterpretationCandidateSource",
     "ReactionInterpretationBuild",
     "build_interpreted_partners",
     "build_reaction_interpretation_candidates",

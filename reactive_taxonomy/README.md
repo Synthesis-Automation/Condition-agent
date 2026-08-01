@@ -20,12 +20,12 @@ The reaction pipeline has one dependency direction:
 molecular graphs
     -> ReactionObservation (correspondence, normalized edits, topology, core)
     -> ReactionSignature (type-agnostic identity)
-    -> optional ReactionInterpretation (grammar, operator, named family)
+    -> optional ReactionInterpretation (annotation, roles, named-family evidence)
     -> RenderedReactionLabel
 ```
 
-`observe_reaction()` does not load reaction grammars. Grammar/operator evidence
-may add an interpretation, but it cannot replace contradictory observations or
+`observe_reaction()` does not load reaction interpretation annotations. A later
+annotation may add an interpretation, but it cannot replace contradictory observations or
 change signature identity. `render_reaction()` is the only public chemist-facing
 reaction-label renderer. It prefers an exact, edit-consistent interpretation,
 then generic ring topology, edit patterns, the polished minimum core, and
@@ -71,7 +71,7 @@ remote-subgraph identity, `RSH2` is the mapping-robust retrieval shape, and
 `RCS2` is a diagnostic primary-center transition. `RSH2` also includes
 participant handles/sites, retained remote shape, and event count so reactions
 with similar centers but different partner chemistry do not collapse. `RCS2`
-is never used for retrieval. Construction does not load reaction grammars or
+is never used for retrieval. Construction does not load reaction interpretation annotations or
 the reaction-template registry. It abstains when no edited atom is observed on
 both sides and does not change `RS3`, admission, or named-family results.
 The reaction CLI and desktop featurizer show the minimized raw label, evidence,
@@ -158,7 +158,7 @@ middle-side agents are recorded only as source support; ambiguous or absent
 sources remain explicit, and the record is not promoted to a verified
 `ReactionSignature`.
 
-Exact grammar labels use one reaction-wide namespace for repeated generic
+Exact interpretation labels use one reaction-wide namespace for repeated generic
 fragments. Distinct graph-derived fragments are numbered by semantic role and
 retain the same alias across the arrow, for example
 `Ar1–Br + Ar2–NH2 → Ar1–NH–Ar2`. Existing site-local notation is reconciled
@@ -175,9 +175,9 @@ retains `structural_label`, `reactant_context_label`, and
 `product_context_label`. Multi-edit cases that cannot be rendered safely keep
 their literal edit summary.
 
-Reductive amination is represented as one declarative two-partner grammar plus
+Reductive amination is represented as one declarative two-partner interpretation annotation plus
 one registered graph operator, rather than a reaction-name special case. The
-grammar accepts available aldehyde, ketone, or formaldehyde carbonyl sites and
+interpretation annotation accepts available aldehyde, ketone, or formaldehyde carbonyl sites and
 free primary or secondary amines. The operator removes the carbonyl oxygen,
 forms C–N, adds H at carbon, and consumes N–H. Exact product reconstruction can
 therefore render labels such as
@@ -189,7 +189,7 @@ C–S substitution plus terminal-alkene Heck coupling. Alkyl substitution uses
   the shared leaving-group and X–H site contracts and the registered
   `center_replacement` operator. It intentionally leaves `named_family` unset
 because the graph alone does not distinguish SN1, SN2, or protection chemistry.
-The Heck grammar uses alkene endpoint hydrogen counts to select a terminal
+The Heck interpretation annotation uses alkene endpoint hydrogen counts to select a terminal
 attachment site, removes Ar–X, forms Ar–C, and records alkene C–H loss. It does
 not invent E/Z stereochemistry: a stereospecified product is exact only when
   that stereochemistry is supported by the input/operator result.
@@ -203,12 +203,13 @@ signature records it explicitly. No Mitsunobu or other named family is forced
 from this graph pattern alone because omitted reagents may be needed to support
 that optional annotation.
 
-The v2 grammar registry declares compatible molecular roles, not executable
-operators or reaction archetypes. Every grammar selects one bounded
-connectivity rewrite. `substitution`, `addition`, and `elimination` are derived
+The v1 interpretation-annotation registry declares semantic role bindings,
+chemist-facing wording, and optional family evidence. Each annotation references
+an already evaluated structural reconstruction rule; it does not select or
+execute a graph operator. `substitution`, `addition`, and `elimination` are derived
 from the emitted or observed bond/H changes and describe graph topology, not
 mechanism. Mapped reactions receive the same edit-derived archetype even when
-no grammar or named family is available.
+no interpretation annotation or named family is available.
 
 The internal Phase 1 connectivity observation preserves stronger evidence than
 the compatibility edit view. `BondTransition` distinguishes definite
@@ -221,9 +222,9 @@ dual-written inside edit normalization for evaluation only and does not yet
 participate in `ReactionSignature`, serialized analyses, retrieval, or
 recommendation behavior.
 
-V2 uses one separately versioned, bounded connectivity-rewrite definition and
-generic executor for all grammars. Suzuki C-C coupling, C-N/O/S
-release-and-connect, Br2/ICl/Si-H/Si-B addition, beta elimination, and simple
+V3 uses one separately versioned, bounded connectivity-rewrite definition and
+generic executor selected by interpretation-independent reconstruction rules.
+Suzuki C-C coupling, C-N/O/S release-and-connect, Br2/ICl/Si-H/Si-B addition, beta elimination, and simple
 bond-order changes use localized bond-state, schema-H, charge,
 endpoint-permutation, product-seed, and authorized-projection instructions.
 There is no shadow executor or legacy fallback.
@@ -235,20 +236,17 @@ C-H, addition-donor, and unsaturated-bond detectors remain annotation
 provenance. Declarative adapters expose
 real or virtual endpoints, carrier provenance, bounded bond capacity,
 connection requirements, context, availability, and component-qualified IDs.
-The shadow rewrite DSL now consumes these normalized interfaces, allowing
+The rewrite DSL consumes these normalized interfaces, allowing
 N/O/S-H, Si-H, B-H, and explicit A-B alkene addition to share the same
-connectivity program. The adapters are not serialized into public analyses and
-the legacy operators remain authoritative for that Phase 3 boundary.
+connectivity program. The adapters are not serialized into public analyses.
 
-Phase 4 extends the normalized interfaces to activated acyl/sulfonyl centers,
+The normalized interfaces cover activated acyl/sulfonyl centers,
 anionic partners, eliminable pairs, carbonyls, and alcohols. Versioned rewrite
 definitions now cover reusable release-and-connect, two-anchor coupling,
 alkene/alkyne addition, beta elimination, and simple bond-order changes.
-Authority is declared per grammar after corpus-wide exact parity; 28 grammars
-now execute through connectivity rewrites. Direct aromatic C-H substitution,
-Chan-Lam coupling, reductive amination, Heck coupling, and multi-event
-sequences remain legacy-backed where projection semantics or corpus parity are
-not complete.
+Structural reconstruction remains separate from the 28 current interpretation
+annotations, which are loaded only after the observation, minimum core, and
+generic signature have been built.
 
 `pair_addition` combines an unsaturated-bond acceptor with either an existing
 N/O/S–H site or a curated `addition_donor`. The latter represents both explicit
@@ -256,7 +254,7 @@ A–B bonds such as Br–Br and implicit A–H bonds such as Si–H and B–H. T
 operator enumerates both constitutional orientations for A≠B, collapses
 symmetry-equivalent products, reduces C=C or C≡C by one bond order, and emits
 formed, broken, order-changed, and schema-level hydrogen edits. Broad addition
-grammars require product verification and do not infer Markovnikov selectivity,
+interpretation annotations require product verification and do not infer Markovnikov selectivity,
 syn/anti selectivity, or a named family.
 
 `pair_elimination` is the inverse net topology. The initial conservative
@@ -273,7 +271,7 @@ latent rather than activated. Regioisomers are selected only by exact product
 reconstruction; unresolved sites and mapping conflicts remain visible.
 
 Intramolecularity is a shared reaction-topology dimension rather than a second
-set of family grammars. Grammar roles declare `same`, `different`, or
+set of family interpretation annotations. Interpretation roles declare `same`, `different`, or
 `same_or_different` component relationships. The same graph operators therefore
 handle intermolecular joining and same-component ring closure. Every normalized
 edit signature now carries `ReactionTopology`, including reaction scope, role
@@ -287,7 +285,7 @@ the same topology analysis without requiring a named family.
 
 For example, `NCCc1ccccc1Br>>c1ccc2c(c1)CCN2` is rendered as
 `intramolecular (5-membered ring) Ar–Br / R–NH2 → Ar–NH–R` using the same
-`sp2_c_n_substitution` grammar as the corresponding intermolecular reaction.
+`sp2_c_n_substitution` interpretation annotation as the corresponding intermolecular reaction.
 
 Normalized edits are also partitioned into deterministic `ReactionEvent`
 objects. Edits that share atom provenance form one event; disconnected edit
@@ -300,8 +298,8 @@ optional interpretation. The reaction signature stores the ordered event
 multiset and cross-event relations such as `shared_component`.
 
 Multi-event inference still follows the normal evidence hierarchy. Valid atom
-mapping is preferred. For balanced unmapped substitutions, distinct grammar
-assignments may be composed and accepted only when the combined graph operators
+mapping is preferred. For balanced unmapped substitutions, distinct
+reconstruction-rule assignments may be composed and accepted only when the combined graph operators
 exactly reconstruct the observed product. An atom-unbalanced record is not
 assigned invented partner copies or atom correspondence merely to explain its
 product.
@@ -314,7 +312,7 @@ then project both events into one minimized `ReactionCoreProjection`.
 
 When an unmapped reaction has exactly one conserved heavy-atom scaffold and one
 product, a conservative correspondence fallback may supply edit evidence after
-registered grammar reconstruction has failed. If that narrower path fails, a
+exact registered reconstruction has failed. If that narrower path fails, a
 bounded global fallback can combine conserved subgraphs from several reactants
 into non-overlapping product assignments. Both paths require every product
 heavy atom to be accounted for and accept alternatives only when the
@@ -374,7 +372,7 @@ contract is a single `reaction_label` object containing both forms plus source,
 status, evidence, confidence, and warnings. Add `--concise` to write the
 reaction SMILES and concise display label only.
 
-Display rendering is compositional. Verified grammar and topology labels remain
+Display rendering is compositional. Verified interpretation annotation and topology labels remain
 the readable transformation headline, while materially new reaction-core
 context is retained in the detailed label. For generic edit patterns, a
 non-blocked, sufficiently informative core may become the headline; inferred,
@@ -480,7 +478,7 @@ JSONL retains the complete typed analysis. Use `--column NAME` when a CSV does
 not use a standard `smiles` or `reaction_smiles` header.
 
 Definitions own handle detection, functional groups, rendering, reaction
-grammars, and descriptor weights. Python implements graph interpretation,
+interpretation annotations, and descriptor weights. Python implements graph interpretation,
 candidate resolution, reaction operators, and typed result contracts.
 
 Dependency direction:
@@ -509,6 +507,6 @@ sulfone, or nitro rules; ordinary alkane C–H sites remain excluded.
 
 The source aliases `ArH` and `Ar-H` both resolve canonically to the
 atom-localized aromatic C–H signature `CH|ArH` and display label `Ar–H`.
-This handle is shared by structurally distinct grammars, including
+This handle is shared by structurally distinct interpretation annotations, including
 intermolecular direct arylation and Friedel–Crafts acylation; the handle alone
 does not imply either reaction.

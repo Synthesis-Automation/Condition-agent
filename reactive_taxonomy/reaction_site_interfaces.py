@@ -798,14 +798,6 @@ def normalize_site_assignment(
     return normalized
 
 
-def normalize_reaction_assignment(
-    assignment: Mapping[str, ReactionSiteReference],
-    components: Sequence[ReactionComponent],
-) -> Dict[str, NormalizedSiteInterfaces]:
-    """Compatibility alias for grammar-role adapters."""
-    return normalize_site_assignment(assignment, components)
-
-
 def _rebase_component(
     view: NormalizedSiteInterfaces,
     component_index: int,
@@ -897,7 +889,6 @@ __all__ = [
     "SITE_INTERFACE_SCHEMA_VERSION",
     "normalize_compound_sites",
     "normalize_detected_site",
-    "normalize_reaction_assignment",
     "normalize_site_assignment",
     "normalize_reaction_site",
 ]

@@ -538,7 +538,7 @@ def _build_reaction_label(
     edits: Sequence[ReactionEdit],
     selected_label: Optional[str],
     selected_exact: bool,
-    grammar_id: Optional[str],
+    interpretation_id: Optional[str],
     contextual_label: Optional[ContextualTransformationLabel],
     named_family: Optional[str],
     fallback_label: Optional[str],
@@ -571,12 +571,18 @@ def _build_reaction_label(
     )
     structural_label = concise_clauses or None
     transformation_label = pattern.label if pattern else None
-    grammar_label = selected_label if selected_exact and selected_label else None
+    interpretation_label = (
+        selected_label if selected_exact and selected_label else None
+    )
     exact_display_label = selected_label
-    if selected_exact and contextual_label is not None and grammar_id is not None:
+    if (
+        selected_exact
+        and contextual_label is not None
+        and interpretation_id is not None
+    ):
         from .reaction_labels import load_reaction_rendering
 
-        rule = load_reaction_rendering().get(grammar_id) or {}
+        rule = load_reaction_rendering().get(interpretation_id) or {}
         if bool(rule.get("prefer_contextual_label")):
             exact_display_label = contextual_label.concise
     rendered_event_labels: tuple[str, ...] = ()
@@ -633,7 +639,7 @@ def _build_reaction_label(
             clauses=detailed_clauses or "none",
         )
         status = "family_overlay" if named_family else "exact_reconstruction"
-        source = "verified_grammar"
+        source = "verified_interpretation"
     elif ring_display is not None:
         concise = ring_display.concise
         detailed = ring_display.detailed
@@ -861,11 +867,13 @@ def _build_reaction_label(
         definition_version=str(rendering["label_schema_version"]),
         structural_label=structural_label,
         transformation_label=transformation_label,
-        grammar_label=grammar_label,
+        interpretation_label=interpretation_label,
         family_label=named_family,
         pattern_id=pattern.pattern_id if pattern else None,
         pattern_definition_version=pattern.definition_version if pattern else None,
-        grammar_id=grammar_id if grammar_label else None,
+        interpretation_id=(
+            interpretation_id if interpretation_label else None
+        ),
         contextual_label=contextual_label.concise if contextual_label else None,
         reactant_context_label=contextual_label.before if contextual_label else None,
         product_context_label=contextual_label.after if contextual_label else None,

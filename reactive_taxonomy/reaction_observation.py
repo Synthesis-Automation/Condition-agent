@@ -1,4 +1,4 @@
-"""Grammar-independent assembly of structural reaction observations."""
+"""Interpretation-independent assembly of structural reaction observations."""
 
 from __future__ import annotations
 
@@ -91,7 +91,7 @@ def build_reaction_observation(
     """Finalize generic facts after evidence providers have been reconciled.
 
     Reconstruction candidates are structural operator evidence. They contain no
-    grammar, family, or display semantics.
+    interpretation, family, or display semantics.
     """
     topology = build_reaction_topology(
         reactants=reactants,
@@ -159,7 +159,7 @@ def build_reaction_observation(
 
 
 def observe_reaction(reaction_smiles: str) -> ReactionObservation:
-    """Build the type-agnostic reaction foundation without loading grammars."""
+    """Build the type-agnostic foundation without interpretation metadata."""
     parsed = parse_reaction_smiles(reaction_smiles)
     if not parsed.valid:
         return ReactionObservation(

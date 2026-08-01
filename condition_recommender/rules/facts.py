@@ -10,7 +10,7 @@ from .models import PartnerRuleFacts, RuleQueryFacts
 def build_rule_query_facts(
     analysis: Any,
 ) -> tuple[Optional[RuleQueryFacts], Optional[str]]:
-    """Build facts only for one verified, grammar-assigned reaction event."""
+    """Build facts only for one verified, interpreted reaction event."""
     if not analysis.valid:
         return None, analysis.error or "INVALID_REACTION"
     signature = analysis.reaction_signature
@@ -25,7 +25,7 @@ def build_rule_query_facts(
         else None
     )
     if selected is None:
-        return None, "QUERY_HAS_NO_SELECTED_REACTION_GRAMMAR"
+        return None, "QUERY_HAS_NO_SELECTED_REACTION_INTERPRETATION"
     if (
         interpretation.evidence_quality
         == "conflicting_interpretation_evidence"

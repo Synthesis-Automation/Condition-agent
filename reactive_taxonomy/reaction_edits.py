@@ -13,7 +13,7 @@ from .reaction_models import (
     ConnectivityEditGraph,
     HydrogenDelta,
     ReactionAtomReference,
-    ReactionCandidate,
+    ReactionInterpretationCandidate,
     ReactionComponent,
     ReactionEdit,
     ReactionEditHypothesis,
@@ -38,7 +38,9 @@ from .reaction_correspondence import (
 )
 
 
-ReconstructionCandidate = ReactionCandidate | ReactionReconstructionCandidate
+ReconstructionCandidate = (
+    ReactionInterpretationCandidate | ReactionReconstructionCandidate
+)
 
 
 @dataclass(frozen=True)

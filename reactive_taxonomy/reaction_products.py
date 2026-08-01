@@ -6,12 +6,12 @@ from .reaction_labels import load_reaction_rendering, render_product_label
 from .reaction_models import (
     ProductConnection,
     ProductConnectionEndpoint,
-    ReactionCandidate,
+    ReactionInterpretationCandidate,
 )
 
 
 def build_product_connection(
-    selected: ReactionCandidate | None,
+    selected: ReactionInterpretationCandidate | None,
     evidence_quality: str,
     *,
     style: str = "unicode",
@@ -19,7 +19,7 @@ def build_product_connection(
     """Build a role-preserving connection for verified two-anchor C–C joins."""
     if selected is None or evidence_quality != "exact_product_reconstruction":
         return None
-    rule = load_reaction_rendering().get(selected.grammar_id) or {}
+    rule = load_reaction_rendering().get(selected.annotation_id) or {}
     kind = rule.get("product_kind")
     if kind == "join_contexts":
         left_role, right_role = str(rule["left_role"]), str(rule["right_role"])
@@ -62,7 +62,7 @@ def build_product_connection(
     left_context = str(left.details.get(left_context_key) or "Other")
     right_context = str(right.details.get(right_context_key) or "N")
     concise_label = render_product_label(
-        {"id": selected.grammar_id},
+        {"id": selected.annotation_id},
         selected.role_assignments,
         style=style,
     )

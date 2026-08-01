@@ -1,4 +1,4 @@
-"""Regression coverage for reusable high-ROI reaction grammars."""
+"""Regression coverage for reusable high-ROI reaction interpretations."""
 
 from reactive_taxonomy import featurize_reaction
 
@@ -35,7 +35,7 @@ def test_acyl_sulfur_donor_reconstructs_sp2_c_s_coupling() -> None:
     assert result.transformation_class == "sp2_c_s_substitution"
     assert result.named_family == "c_s_coupling"
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == "sp2_c_s_acyl_substitution"
+    assert result.selected_candidate.annotation_id == "sp2_c_s_acyl_substitution"
     assert result.reaction_label.concise == (
         "Ar–I + R–C(O)–SH → Ar–S–C(O)–R"
     )
@@ -74,7 +74,7 @@ def test_explicit_potassium_thioacetate_reconstructs_without_h_loss() -> None:
     assert result.evidence_quality == "exact_product_reconstruction"
     assert result.named_family == "c_s_coupling"
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == "sp2_c_s_anion_substitution"
+    assert result.selected_candidate.annotation_id == "sp2_c_s_anion_substitution"
     assert result.reaction_label.concise == (
         "Ar–I + R–C(O)–S⁻ → Ar–S–C(O)–R"
     )
@@ -94,7 +94,7 @@ def test_acyl_sulfur_candidate_is_not_selected_for_wrong_product() -> None:
     candidates = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "sp2_c_s_acyl_substitution"
+        if candidate.annotation_id == "sp2_c_s_acyl_substitution"
     ]
     assert len(candidates) == 1
     assert candidates[0].verification == "product_mismatch"
@@ -117,7 +117,7 @@ def test_sp3_product_mismatch_is_not_selected() -> None:
     candidates = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "sp3_c_n_substitution"
+        if candidate.annotation_id == "sp3_c_n_substitution"
     ]
     assert len(candidates) == 1
     assert candidates[0].verification == "product_mismatch"
@@ -130,7 +130,7 @@ def test_multiple_sp3_assignments_remain_unselected_when_product_disagrees() -> 
     candidates = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "sp3_c_o_substitution"
+        if candidate.annotation_id == "sp3_c_o_substitution"
     ]
     assert len(candidates) == 2
     assert result.selected_candidate is None
@@ -179,7 +179,7 @@ def test_heck_stereochemistry_is_not_invented() -> None:
     candidate = next(
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "terminal_alkene_heck_coupling"
+        if candidate.annotation_id == "terminal_alkene_heck_coupling"
     )
     assert candidate.verification == "product_mismatch"
     assert result.named_family is None
@@ -197,7 +197,7 @@ def test_fully_substituted_alkene_is_not_terminal_heck_partner() -> None:
     result = featurize_reaction("Brc1ccccc1.CC(C)=C(C)C>>c1ccc(C2(C)C(C)(C)C2)cc1")
 
     assert all(
-        candidate.grammar_id != "terminal_alkene_heck_coupling"
+        candidate.annotation_id != "terminal_alkene_heck_coupling"
         for candidate in result.candidates
     )
 
@@ -231,20 +231,20 @@ def test_activated_sp3_carbon_arylation_reconstructs_product() -> None:
     assert result.named_family is None
     assert result.evidence_quality == "exact_product_reconstruction"
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == (
+    assert result.selected_candidate.annotation_id == (
         "sp2_c_activated_c_substitution"
     )
     assert result.product_connection is not None
     assert result.product_connection.connection_type == "C_C"
 
 
-def test_activated_carbon_grammar_rejects_unactivated_alkane() -> None:
+def test_activated_carbon_interpretation_rejects_unactivated_alkane() -> None:
     result = featurize_reaction(
         "Brc1ccccc1.CC>>CCc1ccccc1"
     )
 
     assert all(
-        candidate.grammar_id != "sp2_c_activated_c_substitution"
+        candidate.annotation_id != "sp2_c_activated_c_substitution"
         for candidate in result.candidates
     )
 
@@ -258,7 +258,7 @@ def test_aromatic_ch_arylation_reconstructs_biaryl_product() -> None:
     assert result.named_family is None
     assert result.evidence_quality == "exact_product_reconstruction"
     assert result.selected_candidate is not None
-    assert result.selected_candidate.grammar_id == (
+    assert result.selected_candidate.annotation_id == (
         "sp2_c_aromatic_ch_substitution"
     )
     assert result.reaction_label.concise == "Ar1–Br + Ar2–H → Ar1–Ar2"
@@ -289,7 +289,7 @@ def test_aromatic_ch_arylation_does_not_select_product_mismatch() -> None:
     direct_arylation = [
         candidate
         for candidate in result.candidates
-        if candidate.grammar_id == "sp2_c_aromatic_ch_substitution"
+        if candidate.annotation_id == "sp2_c_aromatic_ch_substitution"
     ]
     assert direct_arylation
     assert all(

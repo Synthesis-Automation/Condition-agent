@@ -14,7 +14,7 @@ RecipeVariantStatus = Literal["draft", "active", "retired"]
 
 @dataclass(frozen=True)
 class PartnerConstraint:
-    """Allowlisted structural predicates for one grammar-assigned partner."""
+    """Allowlisted predicates for one interpreted reaction partner."""
 
     role: str
     site_type: str
