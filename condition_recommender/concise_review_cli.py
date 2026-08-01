@@ -10,7 +10,7 @@ from .conversion.concise_review import export_concise_reaction_review_csv
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Export five high-value reaction-family review columns"
+        description="Export structural labels and identified reaction patterns"
     )
     parser.add_argument("records_path", help="Canonical records JSONL or JSONL.GZ")
     parser.add_argument("output_path", help="Destination review CSV")

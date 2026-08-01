@@ -6,7 +6,7 @@ from .api import (
     interpret_molecular_reactivity,
     observe_molecular_structure,
 )
-from .reaction_api import featurize_reaction
+from .reaction_api import featurize_reaction, identify_reaction_patterns
 from .reaction_core import build_reaction_core_projection
 from .reaction_signatures import (
     build_observation_signature,
@@ -292,6 +292,7 @@ __all__ = [
     "interpret_molecular_reactivity",
     "observe_molecular_structure",
     "featurize_reaction",
+    "identify_reaction_patterns",
     "interpret_reaction",
     "reaction_fallback_definition_versions",
     "load_molecular_motif_definitions",

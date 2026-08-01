@@ -148,6 +148,21 @@ reaction_display_label
 reaction_display_label_detailed
 ```
 
+They also expose optional interpretation without parsing display text:
+
+```text
+primary_reaction_pattern
+reaction_pattern_matches
+identified_reaction_type
+compatible_reaction_types
+reaction_pattern_confidence
+reaction_pattern_requires_condition_evidence
+```
+
+For example, Suzuki chemistry may resolve to `suzuki_miyaura`, while an sp2
+C–N substitution retains SNAr, Buchwald–Hartwig, and Ullmann as compatible
+types until condition evidence distinguishes them.
+
 The first is the low-level minimum-core label. The latter two are concise and
 detailed projections from the single renderer. Canonical nested JSON or Parquet
 remains the lossless converted artifact; CSV is a review view.

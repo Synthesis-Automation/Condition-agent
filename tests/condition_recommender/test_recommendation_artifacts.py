@@ -78,12 +78,12 @@ def test_artifact_workflow_builds_recommendation_data_and_review_csv(
     assert tuple(review_rows[0])[:8] == (
         "canonical_reaction_smiles",
         "reaction_core_label",
-        "reaction_display_label",
-        "reaction_display_label_detailed",
-        "reaction_display_source",
-        "reaction_display_status",
-        "reaction_display_confidence",
-        "reaction_display_warnings",
+        "primary_reaction_pattern",
+        "reaction_pattern_matches",
+        "identified_reaction_type",
+        "compatible_reaction_types",
+        "reaction_pattern_confidence",
+        "reaction_pattern_requires_condition_evidence",
     )
     assert progress[0].phase == "canonical_discovered"
     assert progress[-1].phase == "completed"

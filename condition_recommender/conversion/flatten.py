@@ -12,6 +12,10 @@ from .signature_serialization import (
     flattened_ring_change_fields,
     flattened_signature_fields,
 )
+from .pattern_serialization import (
+    REACTION_PATTERN_REVIEW_FIELDS,
+    flattened_reaction_pattern_fields,
+)
 
 GENERIC_REVIEW_FIELDS = (
     "schema_version",
@@ -33,6 +37,7 @@ GENERIC_REVIEW_FIELDS = (
     "reaction_smiles",
     "reaction_core_label",
     "canonical_reaction_smiles",
+    *REACTION_PATTERN_REVIEW_FIELDS,
     "evidence_quality",
     "reaction_completeness_status",
     "product_heavy_atom_coverage",
@@ -146,6 +151,10 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
             (record.reaction_core or {}).get("generic_label", "")
         ),
         "canonical_reaction_smiles": record.canonical_reaction_smiles or "",
+        **flattened_reaction_pattern_fields(
+            record.reaction_interpretation,
+            named_family=record.named_family,
+        ),
         "evidence_quality": record.evidence_quality,
         "reaction_completeness_status": completeness.get("status", ""),
         "product_heavy_atom_coverage": (

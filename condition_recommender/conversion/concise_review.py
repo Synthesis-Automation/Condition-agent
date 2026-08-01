@@ -14,12 +14,17 @@ from reactive_taxonomy import build_reaction_review_summary
 
 from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
+from .pattern_serialization import (
+    REACTION_PATTERN_REVIEW_FIELDS,
+    flattened_reaction_pattern_fields,
+)
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "8.0"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "9.0"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_core_label",
+    *REACTION_PATTERN_REVIEW_FIELDS,
     "reaction_display_label",
     "reaction_display_label_detailed",
     "reaction_display_source",
@@ -27,7 +32,6 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reaction_display_confidence",
     "reaction_display_warnings",
     "original_reaction_type",
-    "detected_reaction_family",
     "transformation_class",
     "ring_change_count",
     "formed_ring_sizes",
@@ -223,6 +227,10 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     review_summary = build_reaction_review_summary(record)
     display = record.get("reaction_label")
     display_value = display if isinstance(display, Mapping) else {}
+    interpretation = record.get("reaction_interpretation")
+    interpretation_value = (
+        interpretation if isinstance(interpretation, Mapping) else {}
+    )
     signature = record.get("reaction_signature")
     signature_value = signature if isinstance(signature, Mapping) else {}
     topology = signature_value.get("topology")
@@ -293,6 +301,11 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "reaction_core_label": str(
             reaction_core_value.get("generic_label") or ""
         ),
+        **flattened_reaction_pattern_fields(
+            interpretation_value,
+            named_family=record.get("named_family"),
+            separator="; ",
+        ),
         "reaction_display_label": str(
             display_value.get("concise") or ""
         ),
@@ -308,7 +321,6 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             str(value) for value in display_value.get("warnings") or ()
         ),
         "original_reaction_type": str(record.get("source_declared_family") or ""),
-        "detected_reaction_family": str(record.get("named_family") or ""),
         "transformation_class": str(
             record.get("transformation_class")
             or signature_value.get("transformation_class")

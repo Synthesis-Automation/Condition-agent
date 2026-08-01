@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from reactive_taxonomy import featurize_reaction
+from reactive_taxonomy import featurize_reaction, identify_reaction_patterns
 
 
 def _patterns(reaction: str) -> dict[str, object]:
@@ -34,6 +34,16 @@ def test_sp2_c_n_pattern_retains_named_family_ambiguity() -> None:
     assert result.reaction_label is not None
     assert result.reaction_label.concise == "C(sp²)–N bond formation"
     assert "named family requires condition evidence" in result.reaction_label.detailed
+
+
+def test_public_pattern_identification_accepts_reaction_smiles() -> None:
+    interpretation = identify_reaction_patterns(
+        "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
+    )
+
+    assert interpretation is not None
+    assert interpretation.primary_pattern_id == "organoboron_c_c_coupling_like"
+    assert interpretation.named_family == "suzuki_miyaura"
 
 
 def test_sp2_c_n_pattern_excludes_acylation_and_reductive_amination() -> None:

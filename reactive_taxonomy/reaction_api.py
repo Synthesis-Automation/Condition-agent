@@ -13,7 +13,7 @@ from .reaction_edits import (
     resolve_structural_evidence,
 )
 from .reaction_fallback_descriptors import build_reaction_fallback_descriptor
-from .reaction_models import ReactionAnalysis
+from .reaction_models import ReactionAnalysis, ReactionInterpretation
 from .reaction_interpretation import interpret_reaction
 from .reaction_observation import build_reaction_observation
 from .reaction_spectators import derive_observed_spectator_groups
@@ -218,4 +218,16 @@ def featurize_reaction(
     )
 
 
-__all__ = ["featurize_reaction"]
+def identify_reaction_patterns(
+    reaction_smiles: str,
+    *,
+    label_style: str = "unicode",
+) -> ReactionInterpretation | None:
+    """Identify optional structural patterns directly from reaction SMILES."""
+    return featurize_reaction(
+        reaction_smiles,
+        label_style=label_style,
+    ).interpretation
+
+
+__all__ = ["featurize_reaction", "identify_reaction_patterns"]

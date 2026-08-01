@@ -88,7 +88,7 @@ The current code declares:
 | Recommendation record | `8.0` |
 | Generic converter definition | `generic_conversion.v8.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v3.0` |
-| Concise reaction review | `8.0` |
+| Concise reaction review | `9.0` |
 | Shared chemist review summary | `3.0` |
 | Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `3.0` |

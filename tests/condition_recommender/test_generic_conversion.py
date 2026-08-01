@@ -115,6 +115,9 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.reaction_signature["schema_version"] == "3.4"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None
+    assert record.reaction_interpretation["primary_pattern_id"] == (
+        "organoboron_c_c_coupling_like"
+    )
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
     assert record.reference_identity["resolution_status"] == "bibliographic_text"
@@ -651,7 +654,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "8.0"
+    assert report["schema_version"] == "9.0"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
@@ -660,6 +663,14 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert CONCISE_REACTION_REVIEW_FIELDS[:2] == (
         "canonical_reaction_smiles",
         "reaction_core_label",
+    )
+    assert CONCISE_REACTION_REVIEW_FIELDS[2:8] == (
+        "primary_reaction_pattern",
+        "reaction_pattern_matches",
+        "identified_reaction_type",
+        "compatible_reaction_types",
+        "reaction_pattern_confidence",
+        "reaction_pattern_requires_condition_evidence",
     )
     assert CONCISE_REACTION_REVIEW_FIELDS[label_index : label_index + 6] == (
         "reaction_display_label",
@@ -673,7 +684,17 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["reaction_display_label"]
     assert review_rows[0]["reaction_display_label_detailed"]
     assert review_rows[0]["original_reaction_type"] == "Original Suzuki Label"
-    assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
+    assert review_rows[0]["primary_reaction_pattern"] == (
+        "organoboron_c_c_coupling_like"
+    )
+    assert review_rows[0]["reaction_pattern_matches"].startswith(
+        "organoboron_c_c_coupling_like"
+    )
+    assert review_rows[0]["identified_reaction_type"] == "suzuki_miyaura"
+    assert review_rows[0]["compatible_reaction_types"] == "suzuki_miyaura"
+    assert review_rows[0][
+        "reaction_pattern_requires_condition_evidence"
+    ] == "False"
     assert review_rows[0]["reaction_display_status"] == "observed_edits"
     assert review_rows[0]["transformation_class"] == (
         "generic_graph_transformation"
@@ -690,6 +711,19 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["condition_stage_status"] == "single_stage"
     assert review_rows[0]["index_eligibility"] == "eligible"
     assert review_rows[0]["reactivity_profile"] == ""
+
+
+def test_review_exports_ambiguous_structural_pattern_candidates() -> None:
+    record = convert_record(_raw("Brc1ccccc1.CN>>CNc1ccccc1"))
+
+    row = concise_reaction_review_row(record.to_dict())
+
+    assert row["primary_reaction_pattern"] == "sp2_c_n_substitution_like"
+    assert row["identified_reaction_type"] == ""
+    assert row["compatible_reaction_types"] == (
+        "buchwald_hartwig_c_n; snar_amination; ullmann_c_n"
+    )
+    assert row["reaction_pattern_requires_condition_evidence"] == "True"
 
 
 def test_concise_review_formats_spectators_and_partner_environment() -> None:
