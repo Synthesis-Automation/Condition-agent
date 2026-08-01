@@ -1,15 +1,11 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "instruction_set_version": "1.2",
   "site_interface_schema_version": "2.0",
   "rewrites": [
     {
       "id": "suzuki_release_and_connect",
       "template": "release_and_connect",
-      "grammar_ids": [
-        "boron_transfer_coupling",
-        "other_metal_transfer_coupling"
-      ],
       "variants": [
         {
           "id": "default",
@@ -66,90 +62,6 @@
     {
       "id": "neutral_release_and_connect",
       "template": "release_and_connect",
-      "grammar_ids": [
-        "amide_formation",
-        "ester_formation",
-        "friedel_crafts_acylation",
-        "sonogashira_coupling",
-        "sp2_c_activated_c_substitution",
-        "sp2_c_aromatic_ch_substitution",
-        "sp2_c_n_substitution",
-        "sp2_c_o_substitution",
-        "sp2_c_s_acyl_substitution",
-        "sp2_c_s_substitution",
-        "sp3_c_n_substitution",
-        "sp3_c_o_substitution",
-        "sp3_c_s_substitution",
-        "sulfonamide_formation",
-        "sulfonate_formation",
-        "thioester_formation"
-      ],
-      "role_bindings": {
-        "amide_formation": {
-          "leaving_source": "acyl_partner",
-          "joining_partner": "nitrogen_partner"
-        },
-        "ester_formation": {
-          "leaving_source": "acyl_partner",
-          "joining_partner": "oxygen_partner"
-        },
-        "friedel_crafts_acylation": {
-          "leaving_source": "acyl_partner",
-          "joining_partner": "aromatic_partner"
-        },
-        "sonogashira_coupling": {
-          "leaving_source": "electrophile",
-          "joining_partner": "alkyne_partner"
-        },
-        "sp2_c_activated_c_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "carbon_partner"
-        },
-        "sp2_c_aromatic_ch_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "aromatic_partner"
-        },
-        "sp2_c_n_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "nucleophile"
-        },
-        "sp2_c_o_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "nucleophile"
-        },
-        "sp2_c_s_acyl_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "nucleophile"
-        },
-        "sp2_c_s_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "nucleophile"
-        },
-        "sp3_c_n_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "nucleophile"
-        },
-        "sp3_c_o_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "nucleophile"
-        },
-        "sp3_c_s_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "nucleophile"
-        },
-        "sulfonamide_formation": {
-          "leaving_source": "sulfonyl_partner",
-          "joining_partner": "nitrogen_partner"
-        },
-        "sulfonate_formation": {
-          "leaving_source": "sulfonyl_partner",
-          "joining_partner": "oxygen_partner"
-        },
-        "thioester_formation": {
-          "leaving_source": "acyl_partner",
-          "joining_partner": "sulfur_partner"
-        }
-      },
       "variants": [
         {
           "id": "neutral_xh",
@@ -207,25 +119,6 @@
     {
       "id": "alcohol_xh_displacement",
       "template": "release_and_connect",
-      "grammar_ids": [
-        "alcohol_c_n_displacement",
-        "alcohol_c_o_displacement",
-        "alcohol_c_s_displacement"
-      ],
-      "role_bindings": {
-        "alcohol_c_n_displacement": {
-          "leaving_source": "alcohol",
-          "joining_partner": "nucleophile"
-        },
-        "alcohol_c_o_displacement": {
-          "leaving_source": "alcohol",
-          "joining_partner": "nucleophile"
-        },
-        "alcohol_c_s_displacement": {
-          "leaving_source": "alcohol",
-          "joining_partner": "nucleophile"
-        }
-      },
       "variants": [
         {
           "id": "xh_substitution",
@@ -358,15 +251,6 @@
     {
       "id": "anionic_release_and_connect",
       "template": "release_and_connect",
-      "grammar_ids": [
-        "sp2_c_s_anion_substitution"
-      ],
-      "role_bindings": {
-        "sp2_c_s_anion_substitution": {
-          "leaving_source": "electrophile",
-          "joining_partner": "nucleophile"
-        }
-      },
       "variants": [
         {
           "id": "anionic_partner",
@@ -425,15 +309,6 @@
     {
       "id": "chan_lam_release_and_connect",
       "template": "release_and_connect",
-      "grammar_ids": [
-        "chan_lam_heteroatom_coupling"
-      ],
-      "role_bindings": {
-        "chan_lam_heteroatom_coupling": {
-          "leaving_source": "transfer_partner",
-          "joining_partner": "nucleophile"
-        }
-      },
       "variants": [
         {
           "id": "default",
@@ -481,15 +356,6 @@
     {
       "id": "carbonyl_amine_reductive_join",
       "template": "release_and_connect",
-      "grammar_ids": [
-        "carbonyl_amine_reductive_coupling"
-      ],
-      "role_bindings": {
-        "carbonyl_amine_reductive_coupling": {
-          "carbonyl": "carbonyl_partner",
-          "amine": "amine_partner"
-        }
-      },
       "variants": [
         {
           "id": "default",
@@ -542,15 +408,6 @@
     {
       "id": "terminal_alkene_release_and_connect",
       "template": "release_and_connect",
-      "grammar_ids": [
-        "terminal_alkene_heck_coupling"
-      ],
-      "role_bindings": {
-        "terminal_alkene_heck_coupling": {
-          "leaving_source": "electrophile",
-          "alkene": "alkene_partner"
-        }
-      },
       "variants": [
         {
           "id": "endpoint_enumeration",
@@ -615,10 +472,6 @@
     {
       "id": "alkene_split_and_distribute",
       "template": "split_and_distribute",
-      "grammar_ids": [
-        "addend_pair_addition_to_alkene",
-        "xh_addition_to_alkene"
-      ],
       "variants": [
         {
           "id": "explicit_link",
@@ -783,10 +636,6 @@
     {
       "id": "alkyne_split_and_distribute",
       "template": "split_and_distribute",
-      "grammar_ids": [
-        "addend_pair_addition_to_alkyne",
-        "xh_addition_to_alkyne"
-      ],
       "variants": [
         {
           "id": "explicit_link",
@@ -951,18 +800,6 @@
     {
       "id": "polar_bond_order_change",
       "template": "change_bond_order",
-      "grammar_ids": [
-        "alcohol_oxidation",
-        "carbonyl_reduction"
-      ],
-      "role_bindings": {
-        "alcohol_oxidation": {
-          "site": "alcohol"
-        },
-        "carbonyl_reduction": {
-          "site": "carbonyl"
-        }
-      },
       "variants": [
         {
           "id": "alcohol_oxidation",
@@ -1053,14 +890,6 @@
     {
       "id": "alkene_hydrogenation",
       "template": "change_bond_order",
-      "grammar_ids": [
-        "alkene_hydrogenation"
-      ],
-      "role_bindings": {
-        "alkene_hydrogenation": {
-          "site": "unsaturated_partner"
-        }
-      },
       "variants": [
         {
           "id": "default",
@@ -1099,14 +928,6 @@
     {
       "id": "alkyne_partial_hydrogenation",
       "template": "change_bond_order",
-      "grammar_ids": [
-        "alkyne_partial_hydrogenation"
-      ],
-      "role_bindings": {
-        "alkyne_partial_hydrogenation": {
-          "site": "unsaturated_partner"
-        }
-      },
       "variants": [
         {
           "id": "default",
@@ -1145,14 +966,6 @@
     {
       "id": "alkyne_hydrogenation",
       "template": "change_bond_order",
-      "grammar_ids": [
-        "alkyne_hydrogenation"
-      ],
-      "role_bindings": {
-        "alkyne_hydrogenation": {
-          "site": "unsaturated_partner"
-        }
-      },
       "variants": [
         {
           "id": "default",
@@ -1201,9 +1014,6 @@
     {
       "id": "beta_depart_and_unsaturate",
       "template": "depart_and_unsaturate",
-      "grammar_ids": [
-        "beta_halo_elimination"
-      ],
       "variants": [
         {
           "id": "vicinal_pair",

@@ -1,4 +1,4 @@
-"""V2 contract tests for declarative connectivity rewrites."""
+"""V3 contract tests for grammar-independent connectivity rewrites."""
 
 from dataclasses import replace
 
@@ -6,7 +6,7 @@ import pytest
 
 from reactive_taxonomy import (
     SITE_INTERFACE_SCHEMA_VERSION,
-    apply_connectivity_rewrite,
+    apply_reaction_operator,
     compile_connectivity_rewrite_definitions,
     featurize_molecule,
     featurize_reaction,
@@ -17,20 +17,41 @@ from reactive_taxonomy.connectivity_rewrite import (
     CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION,
     CONNECTIVITY_REWRITE_SCHEMA_VERSION,
 )
-from reactive_taxonomy.reaction_candidates import enumerate_reaction_candidates
-from reactive_taxonomy.reaction_grammars import load_reaction_grammars
 from reactive_taxonomy.reaction_parser import parse_reaction_smiles
+from reactive_taxonomy.reaction_reconstruction import (
+    enumerate_reconstruction_candidates,
+)
+from reactive_taxonomy.reaction_reconstruction_rules import (
+    load_reaction_reconstruction_rules,
+)
 
 
-def _assignment(reaction_smiles: str, grammar_id: str):
+def _assignment(reaction_smiles: str, rule_id: str):
     parsed = parse_reaction_smiles(reaction_smiles)
     matches = [
-        (grammar, assignment)
-        for grammar, assignment in enumerate_reaction_candidates(parsed.reactants)
-        if grammar["id"] == grammar_id
+        (rule, assignment)
+        for rule, assignment in enumerate_reconstruction_candidates(parsed.reactants)
+        if rule["id"] == rule_id
     ]
     assert matches
     return parsed, matches[0][0], matches[0][1]
+
+
+def _apply(rule, assignment, components):
+    bindings = rule["operator_slot_bindings"]
+    operator_assignment = {
+        operator_slot: assignment[rule_slot]
+        for operator_slot, rule_slot in bindings.items()
+    }
+    return apply_reaction_operator(
+        rule["operator_id"],
+        operator_assignment,
+        components,
+        output_role_labels={
+            operator_slot: rule_slot
+            for operator_slot, rule_slot in bindings.items()
+        },
+    )
 
 
 MIGRATION_CORPUS = (
@@ -64,19 +85,13 @@ MIGRATION_CORPUS = (
 )
 
 
-def test_v2_definitions_cover_every_grammar_without_legacy_execution_fields() -> None:
-    grammars = load_reaction_grammars()
+def test_v3_definitions_separate_rules_from_graph_operators() -> None:
+    rules = load_reaction_reconstruction_rules()
     rewrites = load_connectivity_rewrites()
-    grammar_ids = {str(grammar["id"]) for grammar in grammars}
-    rewrite_grammar_ids = {
-        grammar_id
-        for rewrite in rewrites
-        for grammar_id in rewrite.grammar_ids
-    }
+    rewrite_ids = {rewrite.rewrite_id for rewrite in rewrites}
 
-    assert rewrite_grammar_ids == grammar_ids
-    assert all("operator" not in grammar for grammar in grammars)
-    assert all("edit_archetype" not in grammar for grammar in grammars)
+    assert {str(rule["operator_id"]) for rule in rules} <= rewrite_ids
+    assert all(not hasattr(rewrite, "grammar_ids") for rewrite in rewrites)
     assert {
         rewrite.site_interface_schema_version for rewrite in rewrites
     } == {SITE_INTERFACE_SCHEMA_VERSION}
@@ -87,8 +102,8 @@ def test_v2_definitions_cover_every_grammar_without_legacy_execution_fields() ->
         "site_patterns.v2.json",
         "context_facets.v2.json",
         "site_interfaces.v2.json",
-        "reaction_grammars.v2.json",
-        "connectivity_rewrites.v2.json",
+        "reaction_reconstruction_rules.v1.json",
+        "connectivity_rewrites.v3.json",
         "reactivity_descriptor_rules.v1.json",
         "aromatic_systems.v1.json",
         "signature_features.v3.json",
@@ -127,7 +142,6 @@ def test_compiler_rejects_unbounded_or_invalid_instructions(instruction) -> None
             {
                 "id": "invalid",
                 "template": "release_and_connect",
-                "grammar_ids": ["example"],
                 "variants": [
                     {
                         "id": "default",
@@ -157,7 +171,6 @@ def test_compiler_rejects_projection_without_a_declared_bond_break() -> None:
             {
                 "id": "unsafe_projection",
                 "template": "release_and_connect",
-                "grammar_ids": ["example"],
                 "variants": [
                     {
                         "id": "default",
@@ -191,7 +204,6 @@ def test_compiler_rejects_unknown_tetrahedral_outcome() -> None:
             {
                 "id": "invalid_stereo",
                 "template": "release_and_connect",
-                "grammar_ids": ["example"],
                 "variants": [
                     {
                         "id": "default",
@@ -213,6 +225,25 @@ def test_compiler_rejects_unknown_tetrahedral_outcome() -> None:
     }
 
     with pytest.raises(ValueError, match="Invalid tetrahedral outcome"):
+        compile_connectivity_rewrite_definitions(payload)
+
+
+def test_compiler_rejects_grammar_metadata_in_graph_operators() -> None:
+    payload = {
+        "schema_version": CONNECTIVITY_REWRITE_SCHEMA_VERSION,
+        "instruction_set_version": CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION,
+        "site_interface_schema_version": SITE_INTERFACE_SCHEMA_VERSION,
+        "rewrites": [
+            {
+                "id": "invalid_grammar_coupling",
+                "template": "release_and_connect",
+                "grammar_ids": ["named_reaction"],
+                "variants": [],
+            }
+        ],
+    }
+
+    with pytest.raises(ValueError, match="cannot contain grammar metadata"):
         compile_connectivity_rewrite_definitions(payload)
 
 
@@ -282,7 +313,7 @@ def test_pair_addition_enumerates_and_orders_both_regioisomers() -> None:
         "addend_pair_addition_to_alkene",
     )
 
-    outcomes = apply_connectivity_rewrite(grammar, assignment, parsed.reactants)
+    outcomes = _apply(grammar, assignment, parsed.reactants)
 
     assert [
         (outcome.outcome_id, outcome.predicted_product_smiles)
@@ -303,9 +334,9 @@ def test_rewrite_product_is_invariant_to_reactant_component_order() -> None:
         "boron_transfer_coupling",
     )
 
-    assert apply_connectivity_rewrite(
+    assert _apply(
         forward[1], forward[2], forward[0].reactants
-    ) == apply_connectivity_rewrite(
+    ) == _apply(
         reversed_partners[1],
         reversed_partners[2],
         reversed_partners[0].reactants,
@@ -318,7 +349,7 @@ def test_release_and_connect_supports_intramolecular_ring_closure() -> None:
         "sp3_c_n_substitution",
     )
 
-    outcomes = apply_connectivity_rewrite(grammar, assignment, parsed.reactants)
+    outcomes = _apply(grammar, assignment, parsed.reactants)
 
     assert outcomes[0].predicted_product_smiles == "C1CCNC1"
 
@@ -328,10 +359,15 @@ def test_executor_rejects_an_invalid_declared_before_state() -> None:
         "CCBr.CN>>CCNC",
         "sp3_c_n_substitution",
     )
-    electrophile = assignment["electrophile"]
+    leaving_slot = next(
+        slot
+        for slot, constraint in grammar["slots"].items()
+        if constraint["site_type"] == "leaving_group"
+    )
+    electrophile = assignment[leaving_slot]
     invalid_assignment = {
         **assignment,
-        "electrophile": replace(
+        leaving_slot: replace(
             electrophile,
             atom_roles={
                 **electrophile.atom_roles,
@@ -340,17 +376,15 @@ def test_executor_rejects_an_invalid_declared_before_state() -> None:
         ),
     }
 
-    assert apply_connectivity_rewrite(
-        grammar, invalid_assignment, parsed.reactants
-    ) == ()
+    assert _apply(grammar, invalid_assignment, parsed.reactants) == ()
 
 
-def test_executor_does_not_guess_for_an_unregistered_grammar() -> None:
+def test_executor_does_not_guess_for_an_unregistered_operator() -> None:
     parsed, _, assignment = _assignment(
         "CCBr.CN>>CCNC",
         "sp3_c_n_substitution",
     )
 
-    assert apply_connectivity_rewrite(
-        {"id": "not_registered"}, assignment, parsed.reactants
+    assert apply_reaction_operator(
+        "not_registered", assignment, parsed.reactants
     ) == ()

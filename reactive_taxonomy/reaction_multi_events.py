@@ -7,7 +7,7 @@ from itertools import combinations
 from typing import Any, Dict, Iterable, Sequence, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
-from .connectivity_rewrite import connectivity_rewrite_for_grammar
+from .connectivity_rewrite import connectivity_rewrite_by_id
 from .reaction_models import ReactionComponent, ReactionSiteReference
 from .reaction_site_interfaces import normalize_reaction_assignment
 
@@ -58,12 +58,17 @@ def _instruction_event_program(
     reactants: Tuple[ReactionComponent, ...],
 ) -> _EventProgram | None:
     """Compile one declarative release-and-connect variant for composition."""
-    grammar, assignment = candidate
-    rewrite = connectivity_rewrite_for_grammar(str(grammar.get("id") or ""))
+    rule, assignment = candidate
+    rewrite = connectivity_rewrite_by_id(str(rule.get("operator_id") or ""))
     if rewrite is None or len(rewrite.variants) != 1:
         return None
+    bindings = rule.get("operator_slot_bindings") or {}
+    execution_assignment = {
+        str(operator_slot): assignment[str(rule_slot)]
+        for operator_slot, rule_slot in bindings.items()
+    }
     try:
-        normalized = normalize_reaction_assignment(assignment, reactants)
+        normalized = normalize_reaction_assignment(execution_assignment, reactants)
     except (KeyError, StopIteration, ValueError):
         return None
     joins = []
@@ -117,60 +122,13 @@ def _event_sites(
     candidate: RawCandidate,
     reactants: Tuple[ReactionComponent, ...],
 ) -> _EventProgram | None:
-    grammar, assignment = candidate
-    rewrite = connectivity_rewrite_for_grammar(str(grammar.get("id") or ""))
-    if rewrite is None:
-        return None
-    bindings = rewrite.grammar_role_bindings.get(str(grammar["id"]))
-    if not bindings:
-        return _instruction_event_program(candidate, reactants)
-    if {
-        "leaving_source",
-        "joining_partner",
-    } - set(bindings):
-        return None
-    source = assignment.get(bindings["leaving_source"])
-    partner = assignment.get(bindings["joining_partner"])
-    if source is None or partner is None:
-        return None
-    normalized = normalize_reaction_assignment(
-        {"source": source, "partner": partner},
-        reactants,
-    )
-    if (
-        len(normalized["source"].reactive_links) != 1
-        or len(normalized["partner"].connection_endpoints) != 1
-    ):
-        return None
-    link = normalized["source"].reactive_links[0]
-    endpoint = normalized["partner"].connection_endpoints[0].endpoint
-    if (
-        link.source_kind != "explicit_bond"
-        or link.endpoint_a.atom_index is None
-        or link.endpoint_b.atom_index is None
-        or endpoint.atom_index is None
-    ):
-        return None
-    return _EventProgram(
-        participants=(source, partner),
-        join=(
-            (source.component_index, int(link.endpoint_a.atom_index)),
-            (partner.component_index, int(endpoint.atom_index)),
-        ),
-        removals=(
-            (
-                source.component_index,
-                int(link.endpoint_a.atom_index),
-                int(link.endpoint_b.atom_index),
-            ),
-        ),
-    )
+    return _instruction_event_program(candidate, reactants)
 
 
 def _operation_key(candidate: RawCandidate) -> Tuple[Any, ...]:
-    grammar, assignment = candidate
+    rule, assignment = candidate
     return (
-        grammar["id"],
+        rule["id"],
         tuple(
             sorted(
                 (
@@ -335,14 +293,14 @@ def _interpretation_key(candidates: Sequence[RawCandidate]) -> Tuple[Any, ...]:
     return tuple(
         sorted(
             (
-                grammar["id"],
+                rule["id"],
                 tuple(
                     sorted(
                         site.canonical_signature for site in assignment.values()
                     )
                 ),
             )
-            for grammar, assignment in candidates
+            for rule, assignment in candidates
         )
     )
 

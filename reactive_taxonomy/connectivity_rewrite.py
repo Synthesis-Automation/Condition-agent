@@ -37,10 +37,10 @@ from .reaction_site_interfaces import (
 )
 
 
-CONNECTIVITY_REWRITE_SCHEMA_VERSION = "2.0"
+CONNECTIVITY_REWRITE_SCHEMA_VERSION = "3.0"
 CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION = "1.2"
 
-_PATH = Path(__file__).with_name("definitions") / "connectivity_rewrites.v2.json"
+_PATH = Path(__file__).with_name("definitions") / "connectivity_rewrites.v3.json"
 _LEGACY_SELECTOR = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
 _NORMALIZED_SELECTOR = re.compile(
     r"^[a-z][a-z0-9_]*\."
@@ -106,15 +106,11 @@ class CompiledRewriteVariant:
 
 @dataclass(frozen=True)
 class CompiledConnectivityRewrite:
-    """One compiled rewrite shared by one or more reaction grammars."""
+    """One compiled, grammar-independent graph rewrite."""
 
     rewrite_id: str
     template: str
-    grammar_ids: Tuple[str, ...]
     variants: Tuple[CompiledRewriteVariant, ...]
-    grammar_role_bindings: Mapping[str, Mapping[str, str]] = (
-        MappingProxyType({})
-    )
     schema_version: str = CONNECTIVITY_REWRITE_SCHEMA_VERSION
     instruction_set_version: str = CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION
     site_interface_schema_version: str = SITE_INTERFACE_SCHEMA_VERSION
@@ -326,10 +322,15 @@ def compile_connectivity_rewrite_definitions(
         raise ValueError("Connectivity rewrite definition has no rewrites")
     rewrites = []
     seen_rewrite_ids: set[str] = set()
-    seen_grammar_ids: set[str] = set()
     for raw in raw_rewrites:
         if not isinstance(raw, dict):
             raise ValueError("Connectivity rewrite records must be objects")
+        legacy_keys = {"grammar_ids", "role_bindings"}.intersection(raw)
+        if legacy_keys:
+            raise ValueError(
+                "Graph operators cannot contain grammar metadata: "
+                + ",".join(sorted(legacy_keys))
+            )
         rewrite_id = str(raw.get("id") or "")
         if not _BINDING.fullmatch(rewrite_id) or rewrite_id in seen_rewrite_ids:
             raise ValueError(f"Invalid or duplicate connectivity rewrite id: {rewrite_id}")
@@ -337,43 +338,6 @@ def compile_connectivity_rewrite_definitions(
         template = str(raw.get("template") or "")
         if template not in _ALLOWED_TEMPLATES:
             raise ValueError(f"Unsupported connectivity rewrite template: {template}")
-        grammar_ids = tuple(str(value) for value in raw.get("grammar_ids") or ())
-        if (
-            not grammar_ids
-            or len(grammar_ids) != len(set(grammar_ids))
-            or any(not _BINDING.fullmatch(value) for value in grammar_ids)
-            or seen_grammar_ids.intersection(grammar_ids)
-        ):
-            raise ValueError(f"Invalid connectivity rewrite grammar ids: {rewrite_id}")
-        seen_grammar_ids.update(grammar_ids)
-        raw_role_bindings = raw.get("role_bindings") or {}
-        if not isinstance(raw_role_bindings, dict) or (
-            set(raw_role_bindings) - set(grammar_ids)
-        ):
-            raise ValueError(
-                f"Invalid connectivity rewrite role bindings: {rewrite_id}"
-            )
-        role_bindings: Dict[str, Mapping[str, str]] = {}
-        for grammar_id, bindings in raw_role_bindings.items():
-            if not isinstance(bindings, dict) or not bindings:
-                raise ValueError(
-                    f"Invalid grammar role bindings: {grammar_id}"
-                )
-            normalized_bindings = {
-                str(alias): str(actual)
-                for alias, actual in bindings.items()
-            }
-            if any(
-                not _BINDING.fullmatch(alias)
-                or not _BINDING.fullmatch(actual)
-                for alias, actual in normalized_bindings.items()
-            ):
-                raise ValueError(
-                    f"Invalid grammar role binding name: {grammar_id}"
-                )
-            role_bindings[str(grammar_id)] = MappingProxyType(
-                normalized_bindings
-            )
         raw_variants = raw.get("variants")
         if not isinstance(raw_variants, (list, tuple)) or not raw_variants:
             raise ValueError(f"Invalid connectivity rewrite variants: {rewrite_id}")
@@ -386,9 +350,7 @@ def compile_connectivity_rewrite_definitions(
             CompiledConnectivityRewrite(
                 rewrite_id=rewrite_id,
                 template=template,
-                grammar_ids=grammar_ids,
                 variants=variants,
-                grammar_role_bindings=MappingProxyType(role_bindings),
             )
         )
     return tuple(sorted(rewrites, key=lambda item: item.rewrite_id))
@@ -400,20 +362,6 @@ def load_connectivity_rewrites() -> Tuple[CompiledConnectivityRewrite, ...]:
     with _PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
     return compile_connectivity_rewrite_definitions(payload)
-
-
-def connectivity_rewrite_for_grammar(
-    grammar_id: str,
-) -> CompiledConnectivityRewrite | None:
-    """Return the registered rewrite for a grammar, if Phase 2 migrated it."""
-    return next(
-        (
-            rewrite
-            for rewrite in load_connectivity_rewrites()
-            if grammar_id in rewrite.grammar_ids
-        ),
-        None,
-    )
 
 
 def connectivity_rewrite_by_id(
@@ -1087,51 +1035,13 @@ def apply_reaction_operator(
     return tuple(sorted(outcomes, key=lambda outcome: outcome.outcome_id))
 
 
-def apply_connectivity_rewrite(
-    grammar: Mapping[str, Any] | str,
-    assignment: Mapping[str, ReactionSiteReference],
-    components: Sequence[ReactionComponent],
-) -> Tuple[RewriteOutcome, ...]:
-    """Adapt one grammar assignment to a registered graph operator.
-
-    Unsupported grammars and chemistry-invalid cases return no outcomes. This
-    keeps absence distinct from a failed product represented as an outcome.
-    """
-    grammar_id = str(grammar if isinstance(grammar, str) else grammar.get("id") or "")
-    rewrite = connectivity_rewrite_for_grammar(grammar_id)
-    if rewrite is None:
-        return ()
-    role_bindings = rewrite.grammar_role_bindings.get(grammar_id)
-    if role_bindings:
-        if any(role not in assignment for role in role_bindings.values()):
-            return ()
-        execution_assignment = {
-            alias: assignment[actual]
-            for alias, actual in role_bindings.items()
-        }
-        label_roles = {
-            alias: actual for alias, actual in role_bindings.items()
-        }
-    else:
-        execution_assignment = dict(assignment)
-        label_roles = {}
-    return apply_reaction_operator(
-        rewrite,
-        execution_assignment,
-        components,
-        output_role_labels=label_roles,
-    )
-
-
 __all__ = [
     "CONNECTIVITY_REWRITE_INSTRUCTION_SET_VERSION",
     "CONNECTIVITY_REWRITE_SCHEMA_VERSION",
     "CompiledConnectivityRewrite",
     "CompiledRewriteVariant",
-    "apply_connectivity_rewrite",
     "apply_reaction_operator",
     "compile_connectivity_rewrite_definitions",
-    "connectivity_rewrite_for_grammar",
     "connectivity_rewrite_by_id",
     "load_connectivity_rewrites",
 ]

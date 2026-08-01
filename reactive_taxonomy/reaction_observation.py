@@ -8,16 +8,24 @@ from typing import Any, Iterable, Mapping, Sequence, Tuple
 from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_completeness import build_reaction_completeness
 from .reaction_core import build_reaction_core_projection
-from .reaction_edits import EditNormalizationResult, resolve_reaction_evidence
+from .reaction_edits import (
+    EditNormalizationResult,
+    normalize_mapped_edits,
+    resolve_reaction_evidence,
+)
 from .reaction_models import (
-    ReactionCandidate,
     ReactionComponent,
     ReactionObservation,
+    ReactionReconstructionCandidate,
     ReactionSiteReference,
 )
 from .reaction_spectators import derive_observed_spectator_groups
 from .reaction_topology import build_reaction_topology
 from .reaction_parser import parse_reaction_smiles
+from .reaction_reconstruction import (
+    build_reaction_reconstruction_candidates,
+    canonical_without_maps,
+)
 
 
 RawCandidate = Tuple[
@@ -74,15 +82,16 @@ def build_reaction_observation(
     products: Tuple[ReactionComponent, ...],
     edit_result: EditNormalizationResult,
     mapped_bond_changes: Tuple[dict[str, Any], ...] = (),
-    operator_candidates: Sequence[RawCandidate] = (),
-    selected_operator_candidate: ReactionCandidate | None = None,
-    selected_operator_events: Tuple[ReactionCandidate, ...] = (),
+    reconstruction_sources: Sequence[RawCandidate] = (),
+    reconstruction_candidates: Tuple[ReactionReconstructionCandidate, ...] = (),
+    selected_reconstruction: ReactionReconstructionCandidate | None = None,
+    selected_reconstruction_events: Tuple[ReactionReconstructionCandidate, ...] = (),
     warnings: Iterable[str] = (),
 ) -> ReactionObservation:
     """Finalize generic facts after evidence providers have been reconciled.
 
-    Operator candidates are accepted only for product-provenance accounting.
-    Their grammar or family semantics are never copied into the observation.
+    Reconstruction candidates are structural operator evidence. They contain no
+    grammar, family, or display semantics.
     """
     topology = build_reaction_topology(
         reactants=reactants,
@@ -102,9 +111,9 @@ def build_reaction_observation(
     completeness = build_reaction_completeness(
         reactants=reactants,
         products=products,
-        raw_candidates=operator_candidates,
-        selected=selected_operator_candidate,
-        selected_events=selected_operator_events,
+        raw_candidates=reconstruction_sources,
+        selected=selected_reconstruction,
+        selected_events=selected_reconstruction_events,
         edit_result=edit_result,
     )
     spectators = derive_observed_spectator_groups(
@@ -138,6 +147,9 @@ def build_reaction_observation(
         evidence_candidates=evidence_candidates,
         edit_hypotheses=hypotheses,
         mapped_bond_changes=mapped_bond_changes,
+        reconstruction_candidates=reconstruction_candidates,
+        selected_reconstruction=selected_reconstruction,
+        selected_reconstruction_events=selected_reconstruction_events,
         spectator_groups=spectators,
         topology=topology,
         completeness=completeness,
@@ -159,10 +171,30 @@ def observe_reaction(reaction_smiles: str) -> ReactionObservation:
             warnings=parsed.warnings,
             error=parsed.error,
         )
+    observed_products = {
+        canonical
+        for component in parsed.products
+        for canonical in (canonical_without_maps(component.input_smiles),)
+        if canonical is not None
+    }
+    supplied_mapping = normalize_mapped_edits(
+        parsed.reactants, parsed.products
+    )
+    reconstruction = build_reaction_reconstruction_candidates(
+        reactants=parsed.reactants,
+        observed_products=observed_products,
+        invalid_supplied_mapping=(
+            supplied_mapping.evidence == "invalid_atom_mapping"
+        ),
+        max_candidates=100,
+    )
     edit_result = resolve_reaction_evidence(
         parsed.reactants,
         parsed.products,
-        selected=None,
+        selected=reconstruction.selected_candidate,
+        selected_events=reconstruction.selected_events,
+        candidates=reconstruction.candidates,
+        mapped_override=supplied_mapping,
     )
     return build_reaction_observation(
         input_reaction_smiles=reaction_smiles,
@@ -173,7 +205,11 @@ def observe_reaction(reaction_smiles: str) -> ReactionObservation:
         mapped_bond_changes=tuple(
             supplied_map_bond_changes(reaction_smiles)
         ),
-        warnings=parsed.warnings,
+        reconstruction_sources=reconstruction.raw_candidates,
+        reconstruction_candidates=reconstruction.candidates,
+        selected_reconstruction=reconstruction.selected_candidate,
+        selected_reconstruction_events=reconstruction.selected_events,
+        warnings=parsed.warnings + reconstruction.warnings,
     )
 
 

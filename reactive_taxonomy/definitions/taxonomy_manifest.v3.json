@@ -5,8 +5,8 @@
     "site_patterns.v2.json",
     "context_facets.v2.json",
     "site_interfaces.v2.json",
-    "reaction_grammars.v2.json",
-    "connectivity_rewrites.v2.json",
+    "reaction_reconstruction_rules.v1.json",
+    "connectivity_rewrites.v3.json",
     "descriptor_rules.v1.json",
     "reactivity_descriptor_rules.v1.json",
     "aromatic_systems.v1.json",
@@ -14,6 +14,7 @@
   ],
   "annotation_definitions": [
     "functional_groups.v1.json",
+    "reaction_grammar_annotations.v1.json",
     "reaction_label_patterns.v1.json",
     "reaction_label_rendering.v1.json",
     "reaction_rendering.v1.json",

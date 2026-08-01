@@ -1,13 +1,11 @@
 {
-  "schema_version": "2.0",
-  "grammars": [
+  "schema_version": "1.0",
+  "rules": [
     {
       "id": "boron_transfer_coupling",
-      "transformation_class": "c_c_transfer_coupling",
-      "display_name": "Boron transfer C–C coupling",
-      "generic_label": "Ar–X + C–B → Ar–C",
-      "roles": {
-        "electrophile": {
+      "operator_id": "suzuki_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
@@ -15,7 +13,7 @@
             "Alkenyl"
           ]
         },
-        "transfer_partner": {
+        "slot_2": {
           "site_type": "transfer_group",
           "handle_token_any": [
             "B(OH)2",
@@ -25,27 +23,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "transfer_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "suzuki_miyaura"
-      ],
+      "operator_slot_bindings": {
+        "electrophile": "slot_1",
+        "transfer_partner": "slot_2"
+      },
       "priority": 100
     },
     {
       "id": "sp2_c_n_substitution",
-      "transformation_class": "sp2_c_n_substitution",
-      "display_name": "sp2 C–N substitution or coupling",
-      "generic_label": "Ar–X + N–H → Ar–N",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
@@ -53,7 +50,7 @@
             "Alkenyl"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "N",
@@ -66,29 +63,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "buchwald_hartwig",
-        "ullmann_goldberg",
-        "snar"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 90
     },
     {
       "id": "carbonyl_amine_reductive_coupling",
-      "transformation_class": "carbonyl_c_n_reductive_coupling",
-      "display_name": "Carbonyl–amine reductive coupling",
-      "generic_label": "R–C(O)R + N–H → R–CH(N)R",
-      "roles": {
-        "carbonyl_partner": {
+      "operator_id": "carbonyl_amine_reductive_join",
+      "slots": {
+        "slot_1": {
           "site_type": "electrophilic_center",
           "center_family": "Carbonyl",
           "carbonyl_subtype_any": [
@@ -100,7 +94,7 @@
             "available"
           ]
         },
-        "amine_partner": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "N"
@@ -111,27 +105,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "carbonyl_partner",
-            "amine_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "reductive_amination"
-      ],
+      "operator_slot_bindings": {
+        "carbonyl": "slot_1",
+        "amine": "slot_2"
+      },
       "priority": 98
     },
     {
       "id": "amide_formation",
-      "transformation_class": "amide_formation",
-      "display_name": "Amide formation",
-      "generic_label": "R–C(O)Y + N–H → R–C(O)–N",
-      "roles": {
-        "acyl_partner": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "electrophilic_center",
           "center_family": "Acyl",
           "activation_state_any": [
@@ -139,7 +132,7 @@
             "latent"
           ]
         },
-        "nitrogen_partner": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "N"
@@ -150,28 +143,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "acyl_partner",
-            "nitrogen_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "amide_coupling",
-        "acylation"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 95
     },
     {
       "id": "sp2_c_o_substitution",
-      "transformation_class": "sp2_c_o_substitution",
-      "display_name": "sp2 C–O substitution or coupling",
-      "generic_label": "Ar–X + O–H → Ar–O",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
@@ -179,7 +170,7 @@
             "Alkenyl"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "O"
@@ -190,28 +181,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "ullmann_c_o",
-        "nucleophilic_aromatic_substitution"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 85
     },
     {
       "id": "sp2_c_s_substitution",
-      "transformation_class": "sp2_c_s_substitution",
-      "display_name": "sp2 C–S substitution or coupling",
-      "generic_label": "Ar–X + S–H → Ar–S",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
@@ -219,7 +208,7 @@
             "Alkenyl"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "S"
@@ -230,27 +219,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "c_s_coupling"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 85
     },
     {
       "id": "sp2_c_s_acyl_substitution",
-      "transformation_class": "sp2_c_s_substitution",
-      "display_name": "sp2 C–S coupling with an acyl sulfur donor",
-      "generic_label": "Ar–X + R–C(O)–SH → Ar–S–C(O)–R",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
@@ -258,7 +246,7 @@
             "Alkenyl"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "S"
@@ -272,27 +260,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "c_s_coupling"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 86
     },
     {
       "id": "sp2_c_s_anion_substitution",
-      "transformation_class": "sp2_c_s_substitution",
-      "display_name": "sp2 C–S coupling with an anionic sulfur donor",
-      "generic_label": "Ar–X + S⁻ → Ar–S",
-      "roles": {
-        "electrophile": {
+      "operator_id": "anionic_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
@@ -300,7 +287,7 @@
             "Alkenyl"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "nucleophile_anion",
           "center_any": [
             "S"
@@ -310,33 +297,32 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "c_s_coupling"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 87
     },
     {
       "id": "sp3_c_n_substitution",
-      "transformation_class": "sp3_c_n_substitution",
-      "display_name": "Alkyl C–N substitution",
-      "generic_label": "R–X + N–H → R–N",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Alkyl"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "N"
@@ -347,31 +333,32 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 88
     },
     {
       "id": "sp3_c_o_substitution",
-      "transformation_class": "sp3_c_o_substitution",
-      "display_name": "Alkyl C–O substitution",
-      "generic_label": "R–X + O–H → R–O",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Alkyl"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "O"
@@ -382,31 +369,32 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 88
     },
     {
       "id": "sp3_c_s_substitution",
-      "transformation_class": "sp3_c_s_substitution",
-      "display_name": "Alkyl C–S substitution",
-      "generic_label": "R–X + S–H → R–S",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Alkyl"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "S"
@@ -417,25 +405,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 88
     },
     {
       "id": "alcohol_c_n_displacement",
-      "transformation_class": "sp3_c_n_substitution",
-      "display_name": "Alcohol C–O displacement by an N–H partner",
-      "generic_label": "R–CH(OH)–R + N–H → R–CH(N)–R",
-      "roles": {
-        "alcohol": {
+      "operator_id": "alcohol_xh_displacement",
+      "slots": {
+        "slot_1": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "O"
@@ -448,7 +437,7 @@
             "free"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "N",
@@ -461,25 +450,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "alcohol",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 89
     },
     {
       "id": "alcohol_c_o_displacement",
-      "transformation_class": "sp3_c_o_substitution",
-      "display_name": "Alcohol C–O displacement by an O–H partner",
-      "generic_label": "R–CH(OH)–R + O–H → R–CH(O)–R",
-      "roles": {
-        "alcohol": {
+      "operator_id": "alcohol_xh_displacement",
+      "slots": {
+        "slot_1": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "O"
@@ -492,7 +482,7 @@
             "free"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "O"
@@ -503,25 +493,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "alcohol",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 89
     },
     {
       "id": "alcohol_c_s_displacement",
-      "transformation_class": "sp3_c_s_substitution",
-      "display_name": "Alcohol C–O displacement by an S–H partner",
-      "generic_label": "R–CH(OH)–R + S–H → R–CH(S)–R",
-      "roles": {
-        "alcohol": {
+      "operator_id": "alcohol_xh_displacement",
+      "slots": {
+        "slot_1": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "O"
@@ -534,7 +525,7 @@
             "free"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "S"
@@ -546,32 +537,33 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "alcohol",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 89
     },
     {
       "id": "terminal_alkene_heck_coupling",
-      "transformation_class": "alkene_c_c_substitution",
-      "display_name": "Terminal-alkene C–C coupling",
-      "generic_label": "Ar–X + H2C=CHR → Ar–CH=CHR",
-      "roles": {
-        "electrophile": {
+      "operator_id": "terminal_alkene_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
             "HeteroAr"
           ]
         },
-        "alkene_partner": {
+        "slot_2": {
           "site_type": "unsaturated_bond",
           "handle_token_any": [
             "Alkene"
@@ -582,27 +574,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "alkene_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "heck"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "alkene": "slot_2"
+      },
       "priority": 92
     },
     {
       "id": "sonogashira_coupling",
-      "transformation_class": "terminal_alkyne_coupling",
-      "display_name": "Terminal alkyne coupling",
-      "generic_label": "Ar–X + C(sp)–H → Ar–C≡C–R",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
@@ -610,7 +601,7 @@
             "Alkenyl"
           ]
         },
-        "alkyne_partner": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "Csp"
@@ -621,27 +612,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "alkyne_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "sonogashira"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 95
     },
     {
       "id": "sp2_c_activated_c_substitution",
-      "transformation_class": "sp2_c_c_substitution",
-      "display_name": "sp2 C–C substitution with an activated carbon",
-      "generic_label": "Ar–X + EWG–C(sp3)–H → Ar–C(sp3)–EWG",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
@@ -649,7 +639,7 @@
             "Alkenyl"
           ]
         },
-        "carbon_partner": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "Csp3"
@@ -661,25 +651,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "carbon_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 94
     },
     {
       "id": "other_metal_transfer_coupling",
-      "transformation_class": "c_c_transfer_coupling",
-      "display_name": "Organometallic C–C transfer coupling",
-      "generic_label": "Ar–X + C–M → Ar–C",
-      "roles": {
-        "electrophile": {
+      "operator_id": "suzuki_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
@@ -687,7 +678,7 @@
             "Alkenyl"
           ]
         },
-        "transfer_partner": {
+        "slot_2": {
           "site_type": "transfer_group",
           "handle_token_any": [
             "ZnX",
@@ -697,30 +688,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "transfer_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "negishi",
-        "kumada",
-        "stille",
-        "hiyama"
-      ],
+      "operator_slot_bindings": {
+        "electrophile": "slot_1",
+        "transfer_partner": "slot_2"
+      },
       "priority": 90
     },
     {
       "id": "chan_lam_heteroatom_coupling",
-      "transformation_class": "chan_lam_heteroatom_coupling",
-      "display_name": "Boron-to-heteroatom coupling",
-      "generic_label": "C–B + N/O/S–H → C–N/O/S",
-      "roles": {
-        "transfer_partner": {
+      "operator_id": "chan_lam_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "transfer_group",
           "handle_token_any": [
             "B(OH)2",
@@ -729,7 +716,7 @@
             "BF3K"
           ]
         },
-        "nucleophile": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "N",
@@ -744,27 +731,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "transfer_partner",
-            "nucleophile"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "chan_lam"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 80
     },
     {
       "id": "ester_formation",
-      "transformation_class": "ester_formation",
-      "display_name": "Ester formation",
-      "generic_label": "R–C(O)Y + O–H → R–C(O)–O",
-      "roles": {
-        "acyl_partner": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "electrophilic_center",
           "center_family": "Acyl",
           "activation_state_any": [
@@ -772,7 +758,7 @@
             "latent"
           ]
         },
-        "oxygen_partner": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "O"
@@ -783,35 +769,33 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "acyl_partner",
-            "oxygen_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "esterification",
-        "acylation"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 90
     },
     {
       "id": "sp2_c_aromatic_ch_substitution",
-      "transformation_class": "sp2_c_c_substitution",
-      "display_name": "sp2 C–C substitution with an aromatic C–H partner",
-      "generic_label": "Ar–X + Ar–H → Ar–Ar",
-      "roles": {
-        "electrophile": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "leaving_group",
           "anchor_context_any": [
             "Ar",
             "HeteroAr"
           ]
         },
-        "aromatic_partner": {
+        "slot_2": {
           "site_type": "aromatic_CH",
           "ring_context_any": [
             "Ar",
@@ -823,32 +807,33 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "electrophile",
-            "aromatic_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 93
     },
     {
       "id": "friedel_crafts_acylation",
-      "transformation_class": "aromatic_c_h_acylation",
-      "display_name": "Friedel–Crafts acylation",
-      "generic_label": "Ar–H + R–C(O)X → Ar–C(O)–R",
-      "roles": {
-        "acyl_partner": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "electrophilic_center",
           "center_family": "Acyl",
           "activation_state_any": [
             "activated"
           ]
         },
-        "aromatic_partner": {
+        "slot_2": {
           "site_type": "aromatic_CH",
           "ring_context_any": [
             "Ar",
@@ -860,27 +845,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "acyl_partner",
-            "aromatic_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "friedel_crafts_acylation"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 94
     },
     {
       "id": "thioester_formation",
-      "transformation_class": "thioester_formation",
-      "display_name": "Thioester formation",
-      "generic_label": "R–C(O)Y + S–H → R–C(O)–S",
-      "roles": {
-        "acyl_partner": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "electrophilic_center",
           "center_family": "Acyl",
           "activation_state_any": [
@@ -888,7 +872,7 @@
             "latent"
           ]
         },
-        "sulfur_partner": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "S"
@@ -899,35 +883,33 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "acyl_partner",
-            "sulfur_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "thioesterification",
-        "acylation"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 90
     },
     {
       "id": "sulfonamide_formation",
-      "transformation_class": "sulfonamide_formation",
-      "display_name": "Sulfonamide formation",
-      "generic_label": "R–S(O)2X + N–H → R–S(O)2–N",
-      "roles": {
-        "sulfonyl_partner": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "electrophilic_center",
           "center_family": "Sulfonyl",
           "activation_state_any": [
             "activated"
           ]
         },
-        "nitrogen_partner": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "N"
@@ -938,34 +920,33 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "sulfonyl_partner",
-            "nitrogen_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "sulfonylation"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 95
     },
     {
       "id": "sulfonate_formation",
-      "transformation_class": "sulfonate_formation",
-      "display_name": "Sulfonate formation",
-      "generic_label": "R–S(O)2X + O–H → R–S(O)2–O",
-      "roles": {
-        "sulfonyl_partner": {
+      "operator_id": "neutral_release_and_connect",
+      "slots": {
+        "slot_1": {
           "site_type": "electrophilic_center",
           "center_family": "Sulfonyl",
           "activation_state_any": [
             "activated"
           ]
         },
-        "oxygen_partner": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "O"
@@ -976,27 +957,26 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "sulfonyl_partner",
-            "oxygen_partner"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [
-        "sulfonylation"
-      ],
+      "operator_slot_bindings": {
+        "leaving_source": "slot_1",
+        "joining_partner": "slot_2"
+      },
       "priority": 95
     },
     {
       "id": "carbonyl_reduction",
-      "transformation_class": "carbonyl_reduction",
-      "display_name": "Carbonyl reduction",
-      "generic_label": "C=O → C–OH",
-      "roles": {
-        "carbonyl": {
+      "operator_id": "polar_bond_order_change",
+      "slots": {
+        "slot_1": {
           "site_type": "electrophilic_center",
           "center_family": "Carbonyl",
           "carbonyl_subtype_any": [
@@ -1006,16 +986,17 @@
           ]
         }
       },
-      "compatible_named_families": [],
+      "slot_relationships": [],
+      "operator_slot_bindings": {
+        "site": "slot_1"
+      },
       "priority": 92
     },
     {
       "id": "alcohol_oxidation",
-      "transformation_class": "alcohol_oxidation",
-      "display_name": "Alcohol oxidation",
-      "generic_label": "C–OH → C=O",
-      "roles": {
-        "alcohol": {
+      "operator_id": "polar_bond_order_change",
+      "slots": {
+        "slot_1": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "O"
@@ -1029,70 +1010,74 @@
           ]
         }
       },
-      "compatible_named_families": [],
+      "slot_relationships": [],
+      "operator_slot_bindings": {
+        "site": "slot_1"
+      },
       "priority": 92
     },
     {
       "id": "alkene_hydrogenation",
-      "transformation_class": "alkene_reduction",
-      "display_name": "Alkene hydrogenation",
-      "generic_label": "C=C → C–C",
-      "roles": {
-        "unsaturated_partner": {
+      "operator_id": "alkene_hydrogenation",
+      "slots": {
+        "slot_1": {
           "site_type": "unsaturated_bond",
           "handle_token_any": [
             "Alkene"
           ]
         }
       },
-      "compatible_named_families": [],
+      "slot_relationships": [],
+      "operator_slot_bindings": {
+        "site": "slot_1"
+      },
       "priority": 91
     },
     {
       "id": "alkyne_partial_hydrogenation",
-      "transformation_class": "alkyne_partial_reduction",
-      "display_name": "Alkyne partial hydrogenation",
-      "generic_label": "C≡C → C=C",
-      "roles": {
-        "unsaturated_partner": {
+      "operator_id": "alkyne_partial_hydrogenation",
+      "slots": {
+        "slot_1": {
           "site_type": "unsaturated_bond",
           "handle_token_any": [
             "Alkyne"
           ]
         }
       },
-      "compatible_named_families": [],
+      "slot_relationships": [],
+      "operator_slot_bindings": {
+        "site": "slot_1"
+      },
       "priority": 91
     },
     {
       "id": "alkyne_hydrogenation",
-      "transformation_class": "alkyne_reduction",
-      "display_name": "Alkyne hydrogenation",
-      "generic_label": "C≡C → C–C",
-      "roles": {
-        "unsaturated_partner": {
+      "operator_id": "alkyne_hydrogenation",
+      "slots": {
+        "slot_1": {
           "site_type": "unsaturated_bond",
           "handle_token_any": [
             "Alkyne"
           ]
         }
       },
-      "compatible_named_families": [],
+      "slot_relationships": [],
+      "operator_slot_bindings": {
+        "site": "slot_1"
+      },
       "priority": 90
     },
     {
       "id": "xh_addition_to_alkene",
-      "transformation_class": "xh_addition_to_c_c_pi_bond",
-      "display_name": "X-H addition to alkene",
-      "generic_label": "C=C + X-H → C-C(X)-C-H",
-      "roles": {
-        "acceptor": {
+      "operator_id": "alkene_split_and_distribute",
+      "slots": {
+        "slot_1": {
           "site_type": "unsaturated_bond",
           "handle_token_any": [
             "Alkene"
           ]
         },
-        "donor": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "N",
@@ -1105,32 +1090,32 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "acceptor",
-            "donor"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
-      "requires_product_verification": true,
+      "operator_slot_bindings": {
+        "acceptor": "slot_1",
+        "donor": "slot_2"
+      },
       "priority": 72
     },
     {
       "id": "xh_addition_to_alkyne",
-      "transformation_class": "xh_addition_to_c_c_pi_bond",
-      "display_name": "X-H addition to alkyne",
-      "generic_label": "C≡C + X-H → C=C(X)-C-H",
-      "roles": {
-        "acceptor": {
+      "operator_id": "alkyne_split_and_distribute",
+      "slots": {
+        "slot_1": {
           "site_type": "unsaturated_bond",
           "handle_token_any": [
             "Alkyne"
           ]
         },
-        "donor": {
+        "slot_2": {
           "site_type": "pronucleophile_XH",
           "center_any": [
             "N",
@@ -1143,84 +1128,84 @@
           ]
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "acceptor",
-            "donor"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
-      "requires_product_verification": true,
+      "operator_slot_bindings": {
+        "acceptor": "slot_1",
+        "donor": "slot_2"
+      },
       "priority": 71
     },
     {
       "id": "addend_pair_addition_to_alkene",
-      "transformation_class": "sigma_bond_addition_to_c_c_pi_bond",
-      "display_name": "A-B addition to alkene",
-      "generic_label": "C=C + A-B → A-C-C-B",
-      "roles": {
-        "acceptor": {
+      "operator_id": "alkene_split_and_distribute",
+      "slots": {
+        "slot_1": {
           "site_type": "unsaturated_bond",
           "handle_token_any": [
             "Alkene"
           ]
         },
-        "donor": {
+        "slot_2": {
           "site_type": "addition_donor"
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "acceptor",
-            "donor"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
-      "requires_product_verification": true,
+      "operator_slot_bindings": {
+        "acceptor": "slot_1",
+        "donor": "slot_2"
+      },
       "priority": 70
     },
     {
       "id": "addend_pair_addition_to_alkyne",
-      "transformation_class": "sigma_bond_addition_to_c_c_pi_bond",
-      "display_name": "A-B addition to alkyne",
-      "generic_label": "C≡C + A-B → A-C=C-B",
-      "roles": {
-        "acceptor": {
+      "operator_id": "alkyne_split_and_distribute",
+      "slots": {
+        "slot_1": {
           "site_type": "unsaturated_bond",
           "handle_token_any": [
             "Alkyne"
           ]
         },
-        "donor": {
+        "slot_2": {
           "site_type": "addition_donor"
         }
       },
-      "role_relationships": [
+      "slot_relationships": [
         {
-          "roles": [
-            "acceptor",
-            "donor"
+          "slots": [
+            "slot_1",
+            "slot_2"
           ],
           "component_relation": "same_or_different"
         }
       ],
-      "compatible_named_families": [],
-      "requires_product_verification": true,
+      "operator_slot_bindings": {
+        "acceptor": "slot_1",
+        "donor": "slot_2"
+      },
       "priority": 69
     },
     {
       "id": "beta_halo_elimination",
-      "transformation_class": "beta_elimination",
-      "display_name": "Beta elimination",
-      "generic_label": "C-C(X)-C-H → C=C",
-      "roles": {
-        "substrate": {
+      "operator_id": "beta_depart_and_unsaturate",
+      "slots": {
+        "slot_1": {
           "site_type": "eliminable_pair",
           "departing_element_any": [
             "Cl",
@@ -1229,8 +1214,10 @@
           ]
         }
       },
-      "compatible_named_families": [],
-      "requires_product_verification": true,
+      "slot_relationships": [],
+      "operator_slot_bindings": {
+        "substrate": "slot_1"
+      },
       "priority": 68
     }
   ]

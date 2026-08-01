@@ -1,4 +1,4 @@
-"""Connectivity-first v2 molecular and reaction taxonomy."""
+"""Connectivity-first molecular and reaction taxonomy."""
 
 from .api import detect_sites, featurize_molecule
 from .reaction_api import featurize_reaction
@@ -9,6 +9,13 @@ from .reaction_signatures import (
 )
 from .reaction_observation import observe_reaction
 from .reaction_interpretation import interpret_reaction
+from .reaction_reconstruction import (
+    build_reaction_reconstruction_candidates,
+    enumerate_reconstruction_assignments,
+    enumerate_reconstruction_candidates,
+)
+from .reaction_reconstruction_rules import load_reaction_reconstruction_rules
+from .reaction_grammar_annotations import load_reaction_grammar_annotations
 from .reaction_rendering import reaction_label_definition_versions, render_reaction
 from .reaction_fallback_descriptors import reaction_fallback_definition_versions
 from .external_atom_mapping import (
@@ -46,11 +53,9 @@ from .descriptors import (
     render_reactivity_profile_expanded,
 )
 from .connectivity_rewrite import (
-    apply_connectivity_rewrite,
     apply_reaction_operator,
     compile_connectivity_rewrite_definitions,
     connectivity_rewrite_by_id,
-    connectivity_rewrite_for_grammar,
     load_connectivity_rewrites,
 )
 from .reaction_operators import (
@@ -126,6 +131,7 @@ from .reaction_models import (
     ReactionPartner,
     ReactionPartnerEnvironment,
     ReactionObservation,
+    ReactionReconstructionCandidate,
     ReactionRingChange,
     ReactionSignature,
     ReactionSpectatorGroup,
@@ -297,6 +303,7 @@ __all__ = [
     "ReactionPartner",
     "ReactionPartnerEnvironment",
     "ReactionObservation",
+    "ReactionReconstructionCandidate",
     "ReactionRingChange",
     "ReactionSignature",
     "ReactionReviewSummary",
@@ -330,14 +337,13 @@ __all__ = [
     "TemplateReactionInterpretation",
     "TemplateRoleBinding",
     "available_styles",
-    "apply_connectivity_rewrite",
     "apply_reaction_operator",
     "build_contextual_transformation_label",
     "build_reaction_core_projection",
+    "build_reaction_reconstruction_candidates",
     "build_observation_signature",
     "build_reaction_review_summary",
     "compile_connectivity_rewrite_definitions",
-    "connectivity_rewrite_for_grammar",
     "connectivity_rewrite_by_id",
     "detect_functional_groups",
     "detect_sites",
@@ -345,6 +351,8 @@ __all__ = [
     "evaluate_molecular_features",
     "evaluate_reaction_edits",
     "execute_reaction_operator",
+    "enumerate_reconstruction_assignments",
+    "enumerate_reconstruction_candidates",
     "featurize_molecule",
     "featurize_reaction",
     "interpret_reaction",
@@ -359,6 +367,8 @@ __all__ = [
     "load_reaction_template_registry",
     "load_contextual_source_label_mappings",
     "load_connectivity_rewrites",
+    "load_reaction_grammar_annotations",
+    "load_reaction_reconstruction_rules",
     "load_source_label_mappings",
     "match_reaction_label_pattern",
     "match_reaction_templates",

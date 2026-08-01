@@ -150,7 +150,7 @@ def test_wrong_product_is_not_confirmed() -> None:
     result = featurize_reaction("Brc1ccccc1.Nc1ccccc1>>c1ccccc1")
     assert result.valid
     assert result.selected_candidate is None
-    assert result.evidence_quality == "reactant_grammar_only"
+    assert result.evidence_quality == "structural_reconstruction_candidates"
     assert all(
         candidate.verification != "exact_product_reconstruction"
         for candidate in result.candidates

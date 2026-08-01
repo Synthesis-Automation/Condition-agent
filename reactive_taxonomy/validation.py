@@ -32,14 +32,15 @@ def validate_taxonomy() -> List[str]:
         return [f"taxonomy_load_failed:{exc}"]
     expected = {
         "context_facets.v2",
-        "connectivity_rewrites.v2",
+        "connectivity_rewrites.v3",
         "descriptor_rules.v1",
         "functional_groups.v1",
         "site_interfaces.v2",
         "site_patterns.v2",
         "taxonomy_manifest.v3",
         "rendering.v1",
-        "reaction_grammars.v2",
+        "reaction_reconstruction_rules.v1",
+        "reaction_grammar_annotations.v1",
         "reaction_label_patterns.v1",
         "reaction_label_rendering.v1",
         "reaction_rendering.v1",
@@ -188,8 +189,8 @@ def validate_taxonomy() -> List[str]:
         "site_patterns.v2.json",
         "context_facets.v2.json",
         "site_interfaces.v2.json",
-        "reaction_grammars.v2.json",
-        "connectivity_rewrites.v2.json",
+        "reaction_reconstruction_rules.v1.json",
+        "connectivity_rewrites.v3.json",
         "reactivity_descriptor_rules.v1.json",
         "aromatic_systems.v1.json",
     }:
@@ -357,67 +358,75 @@ def validate_taxonomy() -> List[str]:
         errors.append("duplicate_rendering_rule_ids")
     if any(not rule.get("template") for rule in rendering_rules):
         errors.append("missing_rendering_template")
-    grammar_ids: List[str] = []
+    rule_ids: List[str] = []
     known_roles: Dict[str, set[str]] = {site_type: set() for site_type in required}
     for pattern in patterns:
         known_roles.get(str(pattern.get("site_type")), set()).update(
             (pattern.get("atom_roles") or {}).keys()
         )
-    for grammar in payload["reaction_grammars.v2"].get("grammars") or []:
-        grammar_id = str(grammar.get("id") or "<missing>")
-        grammar_ids.append(grammar_id)
-        if "edit_archetype" in grammar or "operator" in grammar:
-            errors.append(f"legacy_grammar_execution_field:{grammar_id}")
-        roles = grammar.get("roles") or {}
-        if not roles:
-            errors.append(f"missing_reaction_roles:{grammar_id}")
-        for role_name, constraint in roles.items():
+    reconstruction_rules = (
+        payload["reaction_reconstruction_rules.v1"].get("rules") or []
+    )
+    for rule in reconstruction_rules:
+        rule_id = str(rule.get("id") or "<missing>")
+        rule_ids.append(rule_id)
+        slots = rule.get("slots") or {}
+        if not slots:
+            errors.append(f"missing_reconstruction_slots:{rule_id}")
+        for slot_name, constraint in slots.items():
             if constraint.get("site_type") not in required:
-                errors.append(f"invalid_reaction_site_type:{grammar_id}:{role_name}")
+                errors.append(f"invalid_reaction_site_type:{rule_id}:{slot_name}")
             unknown_contexts = set(constraint.get("contexts_any") or ()) - set(
                 tokens
             )
             if unknown_contexts:
                 errors.append(
-                    f"invalid_reaction_context:{grammar_id}:{role_name}"
+                    f"invalid_reaction_context:{rule_id}:{slot_name}"
                 )
-        if grammar.get("role_relationships") and grammar.get("distinct_components"):
-            errors.append(f"conflicting_component_relationship_rules:{grammar_id}")
-        for relationship in grammar.get("role_relationships") or []:
-            relationship_roles = relationship.get("roles") or []
+        for relationship in rule.get("slot_relationships") or []:
+            relationship_roles = relationship.get("slots") or []
             if (
                 len(relationship_roles) < 2
-                or any(role not in roles for role in relationship_roles)
+                or any(role not in slots for role in relationship_roles)
                 or relationship.get("component_relation")
                 not in {"same", "different", "same_or_different"}
             ):
-                errors.append(f"invalid_role_relationship:{grammar_id}")
-        for pair in grammar.get("distinct_components") or []:
-            if len(pair) != 2 or any(role not in roles for role in pair):
-                errors.append(f"invalid_distinct_component_rule:{grammar_id}")
-    if len(grammar_ids) != len(set(grammar_ids)):
-        errors.append("duplicate_reaction_grammar_ids")
+                errors.append(f"invalid_slot_relationship:{rule_id}")
+        bindings = rule.get("operator_slot_bindings") or {}
+        if not bindings or any(slot not in slots for slot in bindings.values()):
+            errors.append(f"invalid_operator_slot_bindings:{rule_id}")
+    if len(rule_ids) != len(set(rule_ids)):
+        errors.append("duplicate_reconstruction_rule_ids")
     try:
         connectivity_rewrites = load_connectivity_rewrites()
     except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
         errors.append(f"invalid_connectivity_rewrites:{exc}")
         connectivity_rewrites = ()
-    rewrite_grammar_ids = {
-        grammar_id
-        for rewrite in connectivity_rewrites
-        for grammar_id in rewrite.grammar_ids
+    rewrite_ids = {rewrite.rewrite_id for rewrite in connectivity_rewrites}
+    referenced_rewrite_ids = {
+        str(rule.get("operator_id") or "") for rule in reconstruction_rules
     }
-    unknown_rewrite_grammars = rewrite_grammar_ids - set(grammar_ids)
-    if unknown_rewrite_grammars:
+    unknown_rewrite_ids = referenced_rewrite_ids - rewrite_ids
+    if unknown_rewrite_ids:
         errors.append(
-            "unknown_connectivity_rewrite_grammars:"
-            + ",".join(sorted(unknown_rewrite_grammars))
+            "unknown_reconstruction_operators:"
+            + ",".join(sorted(unknown_rewrite_ids))
         )
-    missing_rewrite_grammars = set(grammar_ids) - rewrite_grammar_ids
-    if missing_rewrite_grammars:
+    grammar_annotations = (
+        payload["reaction_grammar_annotations.v1"].get("annotations") or []
+    )
+    annotation_ids = {
+        str(annotation.get("id") or "") for annotation in grammar_annotations
+    }
+    annotation_rules = {
+        str(annotation.get("reconstruction_rule_id") or "")
+        for annotation in grammar_annotations
+    }
+    unknown_annotation_rules = annotation_rules - set(rule_ids)
+    if unknown_annotation_rules:
         errors.append(
-            "missing_connectivity_rewrite_grammars:"
-            + ",".join(sorted(missing_rewrite_grammars))
+            "unknown_annotation_reconstruction_rules:"
+            + ",".join(sorted(unknown_annotation_rules))
         )
     reaction_rendering = payload["reaction_rendering.v1"].get("rules") or {}
     product_precedence = (
@@ -447,7 +456,7 @@ def validate_taxonomy() -> List[str]:
     alias_template = str(fragment_indexing.get("alias_template") or "")
     if "{symbol}" not in alias_template or "{index}" not in alias_template:
         errors.append("invalid_reaction_fragment_alias_template")
-    if set(reaction_rendering) != set(grammar_ids):
+    if set(reaction_rendering) != annotation_ids:
         errors.append("reaction_rendering_coverage_mismatch")
     signature_features = payload["signature_features.v3"]
     if signature_features.get("signature_schema_version") != "3.2":

@@ -9,7 +9,12 @@ from typing import Any, Iterable, Mapping, Tuple
 
 from condition_registry import load_recipe_template_set
 from reactive_taxonomy import load_handle_patterns
-from reactive_taxonomy.reaction_grammars import load_reaction_grammars
+from reactive_taxonomy.reaction_grammar_annotations import (
+    load_reaction_grammar_annotations,
+)
+from reactive_taxonomy.reaction_reconstruction_rules import (
+    load_reaction_reconstruction_rules,
+)
 
 from .models import (
     ConditionRule,
@@ -262,14 +267,24 @@ def validate_condition_rule_payload(payload: Mapping[str, Any]) -> Tuple[str, ..
         if tuple(policy.get("tier_order") or ()) != ("specific", "fallback"):
             errors.append("tier_order_must_be_specific_then_fallback")
 
-    grammars = load_reaction_grammars()
+    reconstruction_rules = {
+        str(rule["id"]): rule for rule in load_reaction_reconstruction_rules()
+    }
     grammar_roles = {}
-    for grammar in grammars:
-        transformation = str(grammar.get("transformation_class") or "")
+    for annotation in load_reaction_grammar_annotations():
+        transformation = str(annotation.get("transformation_class") or "")
+        rule = reconstruction_rules.get(
+            str(annotation.get("reconstruction_rule_id") or ""), {}
+        )
+        slots = rule.get("slots") or {}
         grammar_roles.setdefault(transformation, {}).update(
             {
-                str(role): str(constraint.get("site_type") or "")
-                for role, constraint in (grammar.get("roles") or {}).items()
+                str(role): str(
+                    (slots.get(str(slot)) or {}).get("site_type") or ""
+                )
+                for role, slot in (
+                    annotation.get("role_bindings") or {}
+                ).items()
             }
         )
     handle_tokens_by_site = {}

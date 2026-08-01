@@ -96,6 +96,7 @@ def decide_admission(
     elif analysis.reaction_signature is None:
         if analysis.candidates or analysis.evidence_quality in {
             "reactant_grammar_only",
+            "structural_reconstruction_candidates",
             "ambiguous",
         }:
             chemistry_status = ChemistryStatus.REVIEW

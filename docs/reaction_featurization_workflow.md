@@ -1,22 +1,44 @@
 # Reaction Featurization Workflow
 
-The reaction featurization system is graph-first and label-last. A reaction
-name or source label is never the primary classifier.
+The system is graph-first and label-last. Reaction names and source labels are
+optional annotations, never primary structural evidence.
 
 ```text
 Reaction SMILES
-  -> parse molecules
-  -> detect functional groups and reactive sites
-  -> collect mapping, reconstruction, and correspondence evidence
-  -> reconcile providers and retain distinct edit hypotheses
-  -> select verified graph edits when the evidence is unique
-  -> minimize mapped edits into atom transitions and remote subgraphs
-  -> assign transformation and optional family interpretations
-  -> build topology, environments, spectators, and events
-  -> generate display labels
-  -> generate a deterministic reaction signature
-  -> serialize into recommendation records
+  ↓
+Parse molecular graphs
+and featurize every component
+  ↓
+Enumerate grammar-free structural reconstructions
+  ↓
+Resolve normalized edits
+  ↓
+Build the structural observation
+(alternatives, topology, minimum core, completeness, spectators)
+  ↓
+Build the generic signature and retrieval keys
+  ├─ sufficient evidence → versioned ReactionSignature
+  └─ insufficient evidence → structural fallback or abstention
+  ↓
+Optional grammar and family interpretation
+  ↓
+Render concise and detailed labels
 ```
+
+Structural evidence includes detected sites, supplied mapping, product
+reconstruction, and graph correspondence. The reconciled evidence is stored in
+one grammar-free `ReactionObservation`, which owns the alternatives, topology,
+minimum `ReactionCoreProjection`, completeness, and spectators. The generic
+signature is built from that observation. Ambiguous or conflicting alternatives
+remain explicit review evidence rather than being erased. Optional
+interpretation may then add semantic roles, grammar and family meaning, while
+rendering produces one structured `reaction_label` with concise and detailed
+text.
+
+This is also the strict execution order in `featurize_reaction()`. Structural
+reconstruction rules contain no grammar, family, transformation-class, or
+display metadata. Grammar annotations are loaded only after the observation,
+minimum core, topology, and signature have been built.
 
 ## 1. Parse the reaction
 
@@ -36,7 +58,8 @@ reactants >> products
 ```
 
 [`parse_reaction_smiles()`](../reactive_taxonomy/reaction_parser.py) splits each
-side into components and preserves:
+side into components and calls `featurize_molecule()` while constructing each
+component. It preserves:
 
 - component index;
 - original and canonical SMILES;
@@ -45,7 +68,7 @@ side into components and preserves:
 - parsing errors and warnings.
 
 Agents are analyzed, but they are not used as reaction partners during
-structure-evidence collection or grammar candidate enumeration.
+structure-evidence collection or reconstruction-candidate enumeration.
 
 Parsing validates syntax and component SMILES; it does not require a globally
 balanced chemical equation. Reaction records commonly report only the main
@@ -54,7 +77,7 @@ atom provenance is therefore evaluated later by a dedicated
 `ReactionCompletenessAssessment` instead of by naive formula equality at this
 stage.
 
-## 2. Featurize every molecule
+## 2. Featurize every molecular component
 
 Each component passes through
 [`featurize_molecule()`](../reactive_taxonomy/api.py).
@@ -67,8 +90,8 @@ For each molecular graph, the system detects and emits:
 - site availability, such as available or blocked;
 - aromatic, alkyl, carbonyl, heteroatom, and other local contexts;
 - local steric and electronic environments;
-- chemist-readable site labels.
-- canonical reactive links, bond capacities, and connection endpoints.
+- chemist-readable site labels;
+- canonical reactive links, bond capacities, and connection endpoints; and
 - explicit C/N/O/S anion endpoints, polarized C=N capacities, strained
   epoxide/aziridine release links, silyl-ether O–Si links, and selected
   Li/Cu/Al transfer links.
@@ -95,39 +118,38 @@ boronic acid:
 
 These are molecular observations, not yet a reaction-family assignment.
 
-## 3. Enumerate reaction candidates
+## 3. Enumerate structural reconstruction candidates
 
-[`enumerate_reaction_candidates()`](../reactive_taxonomy/reaction_candidates.py)
-compares canonical connectivity sites with the declarative grammars in
-[`reaction_grammars.v2.json`](../reactive_taxonomy/definitions/reaction_grammars.v2.json).
+[`enumerate_reconstruction_candidates()`](../reactive_taxonomy/reaction_reconstruction.py)
+compares canonical connectivity sites with the declarative structural rules in
+[`reaction_reconstruction_rules.v1.json`](../reactive_taxonomy/definitions/reaction_reconstruction_rules.v1.json).
 
-Each grammar specifies:
+Each rule specifies:
 
-- required partner roles;
+- anonymous structural slots;
 - site-type constraints;
 - allowed handle and context combinations;
-- same-component or different-component relationships;
-- transformation class;
-- optional compatible named families.
+- same-component or different-component relationships; and
+- a registered graph operator with explicit slot bindings.
 
 For an aryl bromide and aryl boronic acid, a candidate may contain:
 
 ```text
-grammar_id: suzuki_miyaura
-transformation_class: c_c_transfer_coupling
-roles:
-  electrophile -> aryl bromide site
-  transfer_partner -> aryl boronic acid site
-compatible_named_families:
-  suzuki_miyaura
+rule_id: boron_transfer_coupling
+operator_id: suzuki_release_and_connect
+slots:
+  slot_1 -> aryl bromide site
+  slot_2 -> aryl boronic acid site
 ```
 
-At this stage the candidate is only structurally plausible.
+At this stage the candidate is only structurally plausible. It contains no
+chemist-facing role names, named family, transformation class, or display
+label.
 
 ## 4. Apply the connectivity rewrite and verify the product
 
-Each candidate is passed to
-[`apply_connectivity_rewrite()`](../reactive_taxonomy/connectivity_rewrite.py).
+Each candidate's registered operator is passed to
+[`apply_reaction_operator()`](../reactive_taxonomy/connectivity_rewrite.py).
 
 The bounded rewrite:
 
@@ -163,7 +185,7 @@ instances for every event, then accepts the composition only when the combined
 operator reconstructs the observed product exactly. It never duplicates a
 missing reactant to balance an equation.
 
-## 5. Extract and reconcile observed reaction edits
+## 5. Resolve edits and build the structural observation
 
 [`resolve_reaction_evidence()`](../reactive_taxonomy/reaction_edits.py)
 establishes the actual transformation evidence.
@@ -183,7 +205,25 @@ The resolver exposes each attempted source as a typed
 `ReactionEvidenceCandidate`. Mapping, exact reconstruction, and correspondence
 are providers of structural evidence; they are not separate recommendation
 pipelines. The resolver applies one precedence and contradiction policy after
-the providers run. `normalize_reaction_edits()` remains a compatibility alias.
+the providers run through `resolve_reaction_evidence()`.
+
+After reconciliation,
+[`build_reaction_observation()`](../reactive_taxonomy/reaction_observation.py)
+assembles the grammar-free `ReactionObservation`. In one place it builds or
+retains:
+
+- normalized edits, stereo changes, evidence providers, and edit hypotheses;
+- generic reaction topology;
+- the minimum reaction-core projection;
+- product-atom completeness;
+- observed spectator groups; and
+- structural reconstruction candidates and their selected single- or
+  multi-event reconstruction.
+
+The stored reconstruction candidates use anonymous structural slots and do not
+contain semantic roles, transformation classes, named families, or display
+labels. An interpretation failure therefore cannot erase or change the
+observation.
 
 An optional RXNMapper provider is available for offline benchmarks and explicit
 converter/query-time review mode:
@@ -577,17 +617,58 @@ AMBIGUOUS_PRODUCT_FRAGMENT_SOURCES
 PRODUCT_ATOM_SOURCE_UNRESOLVED:<element>
 ```
 
-When every enumerated reactant grammar contradicts the reported product, those
-candidates remain available as rejected evidence but are vetoed as display
-labels with `PRODUCT_CONTRADICTED_GRAMMAR_CANDIDATES`. An unreacted handle such
-as Ar-I therefore cannot become the displayed transformation merely because a
-compatible reactant-only grammar was enumerable.
-
 Reaction SMILES does not encode experimental quantities. A reported value such
 as `0.5 equiv` versus `1.0 equiv` must be preserved as separate condition or
 procedure data; it is not inferred from molecular component counts.
 
-## 6. Generate the transformation class and named family
+## 6. Build the generic reaction signature
+
+When the observation has usable normalized edits, topology, and adequate
+product completeness,
+[`build_observation_signature()`](../reactive_taxonomy/reaction_signatures.py)
+creates a grammar-independent `ReactionSignature`. It delegates the typed key
+construction to `build_reaction_signature()`, but its only chemistry input is
+the already-built `ReactionObservation`.
+
+The deterministic retrieval levels are:
+
+- L0 `exact_signature_key`: edits, explicit stereochemistry, detailed local
+  environments, generic partners, events, and topology;
+- L1 `handle_signature_key`: reactive handles, explicit stereochemistry, and
+  less-specific edit context;
+- L2 `transformation_signature_key`: bond changes, hydrogen changes, generic
+  structural transformation class, events, and topology;
+- L3 `bond_edit_signature_key`: topology-agnostic bond-edit fallback; and
+- L4 `environment_signature_key`: generic partner environments and spectators.
+
+The final `signature_id` hashes:
+
+```text
+L0-L4 keys
++ signature schema version
++ identity-bearing chemistry definition versions
+```
+
+It deliberately excludes reaction display labels, grammar labels, named
+families, source reaction names, source row order, irrelevant reactant order,
+and serialization formatting. Removing all optional grammar annotations must
+therefore leave the same signature ID and minimum core.
+
+## 7. Evaluate structural fallback evidence
+
+If no exact reconstruction or normalized edit set is available, the system may
+derive the conservative `partial_product_transformation` described under
+product-atom completeness. This happens after the generic signature attempt and
+before optional interpretation. It does not create a verified signature or a
+named family.
+
+Later, the serialized analysis also receives a mechanism-neutral
+`ReactionFallbackDescriptor`. That descriptor projects verified signatures,
+partial transformations, retained edit hypotheses, or structure inventory into
+explicit fallback evidence for review and retrieval. It never upgrades weak
+evidence into an observed transformation.
+
+## 8. Add optional grammar and family interpretation
 
 These are separate fields:
 
@@ -596,8 +677,23 @@ These are separate fields:
 - `named_family` is an optional chemistry interpretation, such as
   `suzuki_miyaura`.
 
-The current implementation assigns `named_family` only when the selected
-grammar has exactly one compatible named family.
+[`reaction_grammar_annotations.v1.json`](../reactive_taxonomy/definitions/reaction_grammar_annotations.v1.json)
+maps a structural reconstruction rule to semantic roles, a transformation
+class, rendering metadata, and compatible named families. It cannot change the
+observation, minimum core, topology, or signature already produced. The system
+assigns `named_family` only when the selected annotation has exactly one
+compatible named family.
+
+[`build_reaction_interpretation_candidates()`](../reactive_taxonomy/reaction_interpretation.py)
+maps lower-level reconstruction slots onto chemist-facing roles. The resulting
+`ReactionInterpretation` owns:
+
+- grammar candidates and the selected interpreted candidate or events;
+- semantic reaction partners and role confidence;
+- compatible named families and the optional selected family;
+- the role-specific family environment;
+- the role-labelled product-connection view; and
+- interpretation-only warnings and conflicts.
 
 For example:
 
@@ -621,30 +717,9 @@ Source reaction names and `source_declared_family` are not inputs to
 `featurize_reaction()`. They are retained later as provenance and do not
 determine the structural result.
 
-## 7. Build the other reaction features
+## 9. Render the reaction label
 
-After edit normalization, the system derives:
-
-- `spectator_groups`: unchanged functional groups outside the selected event;
-- `family_environment`: role-specific steric, electronic, nearby-group,
-  coordination, and competing-site features;
-- `product_connection`: a compatibility view of a newly formed bond;
-- `reaction_topology`: intermolecular or intramolecular scope, tether distance,
-  ring formation, and ring-size changes;
-- `ReactionEvent` objects: connected groups of edits;
-- template-free reaction-core atom transitions, events, remote subgraphs, and
-  typed attachment ports when mapped evidence is available;
-- retained, created, destroyed, or descriptor-changed stereochemistry;
-- event relationships such as `shared_atom`, `shared_component`, or
-  `independent_sites`;
-- warnings, confidence, and evidence quality.
-
-These observations remain available even if the named-family interpretation is
-absent.
-
-## 8. Generate the reaction label
-
-There are two interpretation and rendering stages.
+Interpretation and rendering remain separate stages.
 
 First, every grammar candidate receives a prospective grammar label:
 
@@ -798,14 +873,16 @@ During dataset conversion,
 - exposes L0-L4 keys in review exports;
 - places the record into verified, review, or rejected tiers.
 
-The central design principle is:
+In compact form, the architectural flow is:
 
 ```text
-molecular graph
-  -> observed or reconstructed edits
-  -> optional interpretation
-  -> human-readable label
-  -> recommendation features
+parse
+  -> collect structural evidence
+  -> resolve normalized edits
+       consistent -> minimum core + topology -> signature/retrieval keys
+       ambiguous  -> retained alternatives; review or abstain
+  -> optional grammar interpretation
+  -> rendering
 ```
 
 The label explains the structural analysis; it does not create or control that

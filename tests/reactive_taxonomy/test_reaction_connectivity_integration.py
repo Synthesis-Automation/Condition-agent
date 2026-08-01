@@ -3,7 +3,7 @@ from reactive_taxonomy.reaction_edits import (
     normalize_inferred_scaffold_edits,
     normalize_mapped_edits,
     normalize_predicted_edits,
-    normalize_reaction_edits,
+    resolve_reaction_evidence,
 )
 from reactive_taxonomy.reaction_parser import parse_reaction_smiles
 
@@ -120,7 +120,7 @@ def test_formal_charge_change_is_retained_as_atom_state() -> None:
 def test_charge_only_mapping_survives_internal_normalization() -> None:
     parsed = parse_reaction_smiles("[Na:1]>>[Na+:1]")
     assert parsed.valid
-    normalized = normalize_reaction_edits(
+    normalized = resolve_reaction_evidence(
         parsed.reactants,
         parsed.products,
         None,

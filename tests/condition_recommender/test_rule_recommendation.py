@@ -53,8 +53,8 @@ def test_specific_structural_rules_match_without_named_family(
     assert result.recipe_template_schema_version == "1.2"
     assert result.transformation_class == "sp2_c_n_substitution"
     assert dict(result.taxonomy_definition_versions)[
-        "reaction_grammars.v2.json"
-    ].startswith("2.0@sha256:")
+        "reaction_reconstruction_rules.v1.json"
+    ].startswith("1.0@sha256:")
     assert result.selected_tiers == (
         ("pd_sp2_cn.condition_regime", "specific"),
     )

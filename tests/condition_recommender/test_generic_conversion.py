@@ -110,8 +110,8 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "5.0"
-    assert record.converter_definition_version == "generic_conversion.v5.2"
+    assert record.schema_version == "6.0"
+    assert record.converter_definition_version == "generic_conversion.v6.0"
     assert record.reaction_signature["schema_version"] == "3.2"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None

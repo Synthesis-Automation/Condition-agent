@@ -5,7 +5,9 @@ from __future__ import annotations
 import pytest
 
 from reactive_taxonomy import featurize_molecule
-from reactive_taxonomy.reaction_candidates import enumerate_reaction_candidates
+from reactive_taxonomy.reaction_reconstruction import (
+    enumerate_reconstruction_candidates,
+)
 from reactive_taxonomy.reaction_parser import parse_reaction_smiles
 
 
@@ -180,8 +182,8 @@ def test_dibal_carbon_groups_are_not_marked_as_transfer_partners() -> None:
     assert not _sites("CC(C)C[AlH]CC(C)C", "transfer_group")
 
 
-def test_new_observations_do_not_create_unregistered_reaction_grammars() -> None:
+def test_new_observations_do_not_create_unregistered_reconstruction_rules() -> None:
     parsed = parse_reaction_smiles("C1CO1.[O-]C>>COCCO")
 
     assert parsed.valid
-    assert enumerate_reaction_candidates(parsed.reactants) == []
+    assert enumerate_reconstruction_candidates(parsed.reactants) == ()

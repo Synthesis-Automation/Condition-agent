@@ -47,7 +47,7 @@ reactive_taxonomy       condition_registry
 | --- | --- | --- |
 | Molecular features | Implemented | Functional groups, reactive sites, canonical connectivity interfaces, typed reactivity profiles |
 | Reaction parsing | Implemented | Two- and three-part reaction SMILES with component, map, and source preservation |
-| Connectivity execution | V2 implemented | One bounded declarative rewrite path for all registered grammars; no legacy reaction-operator fallback |
+| Connectivity execution | V3 implemented | Grammar-free reconstruction rules select bounded graph operators; optional grammar/family annotations are applied only after core/signature construction |
 | Edit evidence | Implemented | Typed provider candidates from mapping, exact single/multi-event reconstruction, conservative scaffold, bounded global, and fragmented-scaffold correspondence; distinct ambiguous edit hypotheses; conflicts and H/charge/stereo observations |
 | External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, persisted with model provenance, and never admitted as verified precedents |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting, observation-only product-origin gaps, and typed fragment-source requirements |
@@ -75,22 +75,22 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `4.0` |
-| Reaction observation | `1.0` |
-| Reaction interpretation | `1.0` |
-| Rendered reaction label | `1.5` |
+| Reaction analysis | `6.0` |
+| Reaction observation | `2.0` |
+| Reaction interpretation | `2.0` |
+| Rendered reaction label | `2.0` |
 | Reaction signature / ID namespace | `3.2` / `RS3` |
 | Reaction ring change | `1.0` |
 | Reaction topology | `1.2` |
 | Reaction core projection / algorithm | `2.2` / `reaction_core_projection.v8` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
-| Connectivity rewrite | `2.0` |
+| Connectivity rewrite | `3.0` |
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `1.3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `4.1` |
-| Generic converter definition | `generic_conversion.v4.0` |
+| Recommendation record | `6.0` |
+| Generic converter definition | `generic_conversion.v6.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v3.0` |
 | Concise reaction review | `4.0` |
 | Shared chemist review summary | `1.2` |
@@ -916,8 +916,8 @@ Required chemistry regressions include:
 | --- | --- |
 | [`../type_agnostic_reaction_recommendation_implementation.md`](../type_agnostic_reaction_recommendation_implementation.md) | Primary historical architecture and phase plan. Its Phase A “immediate work” is implemented; current status and versions are superseded by this document. |
 | [`../reaction_featurization_workflow.md`](../reaction_featurization_workflow.md) | Detailed near-current technical walkthrough. Retain for code-level flow; read CEG1 as an internal shadow observation and RS3 as public identity. |
-| [`../connectivity_first_reaction_grammar_v2.md`](../connectivity_first_reaction_grammar_v2.md) | Current summary of the V2 connectivity executor. Its own note correctly says environment/signature identity advanced to RS3. |
-| [`../connectivity_first_reaction_grammar_design.md`](../connectivity_first_reaction_grammar_design.md) | Design rationale and migration history. Shadow/authority/legacy-operator stages are historical; V2 is the active executor state. |
+| [`../connectivity_first_reaction_grammar_v2.md`](../connectivity_first_reaction_grammar_v2.md) | Historical summary of the removed combined v2 grammar/rewrite contract. |
+| [`../connectivity_first_reaction_grammar_design.md`](../connectivity_first_reaction_grammar_design.md) | Design rationale and migration history; combined grammar/executor stages are historical. |
 | [`../context_aware_reactivity_descriptors_implementation_plan.md`](../context_aware_reactivity_descriptors_implementation_plan.md) | Completed descriptor migration record and useful detailed contract. The phase sequence is history; typed profiles are already active. |
 | [`../aromatic_reactivity_descriptor_proposal.md`](../aromatic_reactivity_descriptor_proposal.md) | Historical rationale for the aromatic slice, now generalized and implemented by typed profiles. |
 | [`../recommend_generic_conditions_implementation_plan.md`](../recommend_generic_conditions_implementation_plan.md) | Most detailed recommendation/evaluation plan and historical pilot metrics. Its implementation-slice versions and artifact paths may lag current code. |

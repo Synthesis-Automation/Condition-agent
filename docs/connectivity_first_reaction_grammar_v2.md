@@ -2,7 +2,9 @@
 
 ## Status
 
-Implemented on 2026-07-28.
+Historical design record. The combined v2 grammar/rewrite contract has been
+removed. The current structural-first workflow is documented in
+[`reaction_featurization_workflow.md`](reaction_featurization_workflow.md).
 
 V2 is a clean chemistry-contract cutover. It does not retain the v1 reaction
 operator path, shadow execution, parity routing, or authority flags. The

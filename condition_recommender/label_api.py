@@ -11,7 +11,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from reactive_taxonomy import featurize_reaction
-from reactive_taxonomy.reaction_grammars import load_reaction_grammars
+from reactive_taxonomy.reaction_grammar_annotations import (
+    load_reaction_grammar_annotations,
+)
 
 from .label_indexing import LabelIndexedReaction, LabelParticipant, load_label_index
 from .models import LabelConditionRecommendation, LabelRecommendationResult
@@ -35,7 +37,9 @@ def load_label_retrieval_rules() -> Dict[str, Any]:
     """Load and validate weak-label retrieval configuration."""
     with _RULES_PATH.open("r", encoding="utf-8") as handle:
         rules = dict(json.load(handle))
-    grammar_ids = {str(item["id"]) for item in load_reaction_grammars()}
+    grammar_ids = {
+        str(item["id"]) for item in load_reaction_grammar_annotations()
+    }
     configured = set((rules.get("grammar_source_reaction_types") or {}).keys())
     unknown = sorted(configured - grammar_ids)
     if unknown:

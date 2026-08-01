@@ -15,9 +15,7 @@ def test_aldehyde_primary_amine_exact_reconstruction() -> None:
     assert result.selected_candidate.grammar_id == ("carbonyl_amine_reductive_coupling")
     assert result.reaction_signature is not None
     assert result.reaction_signature.product_transformation is not None
-    assert result.reaction_signature.product_transformation.concise_label == (
-        "HeteroAr–CH2–NH–Ar"
-    )
+    assert result.reaction_signature.product_transformation.concise_label is None
 
 
 def test_ketone_primary_amine_exact_reconstruction() -> None:

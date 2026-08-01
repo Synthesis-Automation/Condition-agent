@@ -3,8 +3,12 @@
 import pytest
 
 from reactive_taxonomy import featurize_reaction
-from reactive_taxonomy.reaction_candidates import enumerate_role_assignments
-from reactive_taxonomy.reaction_grammars import load_reaction_grammars
+from reactive_taxonomy.reaction_reconstruction import (
+    enumerate_reconstruction_assignments,
+)
+from reactive_taxonomy.reaction_reconstruction_rules import (
+    load_reaction_reconstruction_rules,
+)
 
 
 INTRAMOLECULAR_CN = "NCCc1ccccc1Br>>c1ccc2c(c1)CCN2"
@@ -29,15 +33,14 @@ MAPPED_TWO_PLUS_TWO = (
 )
 
 
-def test_grammars_use_general_role_relationships() -> None:
-    grammars = load_reaction_grammars()
+def test_reconstruction_rules_use_general_slot_relationships() -> None:
+    rules = load_reaction_reconstruction_rules()
 
-    assert grammars
-    assert all("distinct_components" not in grammar for grammar in grammars)
+    assert rules
     assert all(
         relationship["component_relation"] == "same_or_different"
-        for grammar in grammars
-        for relationship in grammar.get("role_relationships") or ()
+        for rule in rules
+        for relationship in rule.get("slot_relationships") or ()
     )
 
 
@@ -228,7 +231,7 @@ def test_mapped_and_unmapped_topology_signatures_are_identical() -> None:
 def test_topology_serializes_in_analysis_and_signature() -> None:
     payload = featurize_reaction(INTRAMOLECULAR_CN).to_dict()
 
-    assert payload["schema_version"] == "5.0"
+    assert payload["schema_version"] == "6.0"
     assert payload["reaction_topology"]["reaction_scope"] == "intramolecular"
     assert payload["reaction_topology"]["formed_ring_sizes"] == (5,)
     assert payload["reaction_signature"]["schema_version"] == "3.2"
@@ -239,32 +242,32 @@ def test_topology_serializes_in_analysis_and_signature() -> None:
 def test_same_and_different_relationship_constraints_are_enforced() -> None:
     intramolecular = featurize_reaction(INTRAMOLECULAR_CN)
     intermolecular = featurize_reaction("Brc1ccccc1.CCN>>CCNc1ccccc1")
-    base_grammar = next(
-        grammar
-        for grammar in load_reaction_grammars()
-        if grammar["id"] == "sp2_c_n_substitution"
+    base_rule = next(
+        rule
+        for rule in load_reaction_reconstruction_rules()
+        if rule["id"] == "sp2_c_n_substitution"
     )
 
     same = {
-        **base_grammar,
-        "role_relationships": [
+        **base_rule,
+        "slot_relationships": [
             {
-                "roles": ["electrophile", "nucleophile"],
+                "slots": ["slot_1", "slot_2"],
                 "component_relation": "same",
             }
         ],
     }
     different = {
-        **base_grammar,
-        "role_relationships": [
+        **base_rule,
+        "slot_relationships": [
             {
-                "roles": ["electrophile", "nucleophile"],
+                "slots": ["slot_1", "slot_2"],
                 "component_relation": "different",
             }
         ],
     }
 
-    assert len(enumerate_role_assignments(intramolecular.reactants, same)) == 1
-    assert enumerate_role_assignments(intramolecular.reactants, different) == []
-    assert enumerate_role_assignments(intermolecular.reactants, same) == []
-    assert len(enumerate_role_assignments(intermolecular.reactants, different)) == 1
+    assert len(enumerate_reconstruction_assignments(intramolecular.reactants, same)) == 1
+    assert enumerate_reconstruction_assignments(intramolecular.reactants, different) == ()
+    assert enumerate_reconstruction_assignments(intermolecular.reactants, same) == ()
+    assert len(enumerate_reconstruction_assignments(intermolecular.reactants, different)) == 1

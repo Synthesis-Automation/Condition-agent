@@ -1053,6 +1053,23 @@ class ReactionSignature:
 
 
 @dataclass(frozen=True)
+class ReactionReconstructionCandidate:
+    """Grammar-free structural operator proposal for one reported product."""
+
+    rule_id: str
+    operator_id: str
+    rewrite_outcome_id: str
+    edit_archetype: EditArchetype
+    slot_assignments: Dict[str, ReactionSiteReference]
+    predicted_bond_changes: Tuple[BondChange, ...]
+    predicted_product_smiles: Optional[str]
+    verification: str
+    predicted_stereo_changes: Tuple[PredictedStereoChange, ...] = ()
+    warnings: Tuple[str, ...] = ()
+    schema_version: str = "1.0"
+
+
+@dataclass(frozen=True)
 class ReactionCandidate:
     grammar_id: str
     rewrite_outcome_id: str
@@ -1085,13 +1102,16 @@ class ReactionObservation:
     evidence_candidates: Tuple[ReactionEvidenceCandidate, ...] = ()
     edit_hypotheses: Tuple[ReactionEditHypothesis, ...] = ()
     mapped_bond_changes: Tuple[Dict[str, Any], ...] = ()
+    reconstruction_candidates: Tuple[ReactionReconstructionCandidate, ...] = ()
+    selected_reconstruction: Optional[ReactionReconstructionCandidate] = None
+    selected_reconstruction_events: Tuple[ReactionReconstructionCandidate, ...] = ()
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
     topology: Optional[ReactionTopology] = None
     completeness: Optional[ReactionCompletenessAssessment] = None
     core: Optional[ReactionCoreProjection] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "1.0"
+    schema_version: str = "2.0"
 
     def __post_init__(self) -> None:
         if not 0.0 <= self.evidence_confidence <= 1.0:
@@ -1114,7 +1134,7 @@ class ReactionInterpretation:
     product_connection: Optional[ProductConnection] = None
     evidence_quality: str = "unresolved"
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "1.0"
+    schema_version: str = "2.0"
 
     def __post_init__(self) -> None:
         if self.named_family and self.named_family not in (
@@ -1155,7 +1175,7 @@ class ReactionAnalysis:
     interpretation: Optional[ReactionInterpretation] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "5.0"
+    schema_version: str = "6.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -1212,6 +1232,7 @@ __all__ = [
     "ReactionInterpretation",
     "ReactionObservation",
     "ReactionPartner",
+    "ReactionReconstructionCandidate",
     "ReactionPartnerEnvironment",
     "ReactionRingChange",
     "ReactionSignature",

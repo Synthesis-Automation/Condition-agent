@@ -18,6 +18,7 @@ from .reaction_models import (
     ReactionEdit,
     ReactionEditHypothesis,
     ReactionEvidenceCandidate,
+    ReactionReconstructionCandidate,
     ReactionSiteReference,
     ReactionStereoChange,
 )
@@ -35,6 +36,9 @@ from .reaction_correspondence import (
     infer_global_correspondence_candidates,
     infer_scaffold_correspondence_candidates,
 )
+
+
+ReconstructionCandidate = ReactionCandidate | ReactionReconstructionCandidate
 
 
 @dataclass(frozen=True)
@@ -496,7 +500,7 @@ def _role_atom(
 
 
 def normalize_predicted_edits(
-    selected: Optional[ReactionCandidate],
+    selected: Optional[ReconstructionCandidate],
     reactants: Tuple[ReactionComponent, ...],
 ) -> EditNormalizationResult:
     """Convert rewrite changes for an exact selected candidate to typed edits."""
@@ -505,16 +509,21 @@ def normalize_predicted_edits(
         "exact_multi_event_reconstruction",
     }:
         return EditNormalizationResult((), "no_exact_reconstruction", 0.0, valid=False)
+    assignments = (
+        selected.slot_assignments
+        if isinstance(selected, ReactionReconstructionCandidate)
+        else selected.role_assignments
+    )
     edits = []
     stereo_changes = []
     warnings = []
     for change in selected.predicted_bond_changes:
         try:
             atom_1 = _role_atom(
-                change.atom_1_role, selected.role_assignments, reactants
+                change.atom_1_role, assignments, reactants
             )
             atom_2 = (
-                _role_atom(change.atom_2_role, selected.role_assignments, reactants)
+                _role_atom(change.atom_2_role, assignments, reactants)
                 if change.atom_2_role is not None
                 else None
             )
@@ -535,10 +544,10 @@ def normalize_predicted_edits(
     for change in selected.predicted_stereo_changes:
         try:
             atom_1 = _role_atom(
-                change.atom_1_role, selected.role_assignments, reactants
+                change.atom_1_role, assignments, reactants
             )
             atom_2 = (
-                _role_atom(change.atom_2_role, selected.role_assignments, reactants)
+                _role_atom(change.atom_2_role, assignments, reactants)
                 if change.atom_2_role is not None
                 else None
             )
@@ -585,7 +594,7 @@ def normalize_predicted_edits(
 
 
 def normalize_predicted_multi_event_edits(
-    selected_events: Tuple[ReactionCandidate, ...],
+    selected_events: Tuple[ReconstructionCandidate, ...],
     reactants: Tuple[ReactionComponent, ...],
 ) -> EditNormalizationResult:
     """Normalize an exactly reconstructed collection of reaction events."""
@@ -1438,7 +1447,7 @@ def _canonical_stereo_pair(molecule: Any) -> Tuple[str, str]:
 
 
 def _stereochemical_reconstruction_conflict(
-    candidates: Tuple[ReactionCandidate, ...],
+    candidates: Tuple[ReconstructionCandidate, ...],
     products: Tuple[ReactionComponent, ...],
 ) -> bool:
     """Detect a structurally matching but explicitly opposite prediction."""
@@ -1515,9 +1524,9 @@ def _provider_candidates(
 def resolve_reaction_evidence(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
-    selected: Optional[ReactionCandidate],
-    selected_events: Tuple[ReactionCandidate, ...] = (),
-    candidates: Tuple[ReactionCandidate, ...] = (),
+    selected: Optional[ReconstructionCandidate],
+    selected_events: Tuple[ReconstructionCandidate, ...] = (),
+    candidates: Tuple[ReconstructionCandidate, ...] = (),
     *,
     mapped_override: Optional[EditNormalizationResult] = None,
     mapped_provider: str = "supplied_atom_mapping",
@@ -1740,35 +1749,12 @@ def resolve_reaction_evidence(
     )
 
 
-def normalize_reaction_edits(
-    reactants: Tuple[ReactionComponent, ...],
-    products: Tuple[ReactionComponent, ...],
-    selected: Optional[ReactionCandidate],
-    selected_events: Tuple[ReactionCandidate, ...] = (),
-    candidates: Tuple[ReactionCandidate, ...] = (),
-    *,
-    mapped_override: Optional[EditNormalizationResult] = None,
-    mapped_provider: str = "supplied_atom_mapping",
-) -> EditNormalizationResult:
-    """Compatibility alias for the evidence-provider resolver."""
-    return resolve_reaction_evidence(
-        reactants,
-        products,
-        selected,
-        selected_events,
-        candidates,
-        mapped_override=mapped_override,
-        mapped_provider=mapped_provider,
-    )
-
-
 __all__ = [
     "EditNormalizationResult",
     "normalize_mapped_edits",
     "normalize_inferred_scaffold_edits",
     "normalize_predicted_edits",
     "normalize_predicted_multi_event_edits",
-    "normalize_reaction_edits",
     "reaction_atom_reference",
     "resolve_reaction_evidence",
 ]

@@ -39,6 +39,10 @@ def test_observation_is_grammar_free_and_builds_generic_products() -> None:
     payload = json.dumps(asdict(observation), sort_keys=True)
     assert '"grammar_id"' not in payload
     assert '"named_family"' not in payload
+    assert '"transformation_class"' not in payload
+    assert '"grammar_label"' not in payload
+    assert observation.selected_reconstruction is not None
+    assert observation.reconstruction_candidates
 
 
 def test_interpretation_adds_optional_family_semantics() -> None:
@@ -67,8 +71,8 @@ def test_signature_and_core_do_not_depend_on_loaded_grammars(monkeypatch) -> Non
     interpreted = featurize_reaction(reaction)
     monkeypatch.setattr(
         interpretation_module,
-        "enumerate_reaction_candidates",
-        lambda _reactants: (),
+        "load_reaction_grammar_annotations",
+        lambda: (),
     )
     generic = featurize_reaction(reaction)
 
@@ -81,6 +85,7 @@ def test_signature_and_core_do_not_depend_on_loaded_grammars(monkeypatch) -> Non
     assert generic.reaction_core is not None
     assert interpreted.reaction_core.core_id == generic.reaction_core.core_id
     assert interpreted.selected_candidate is not None
+    assert generic.selected_candidate is None
     assert generic.named_family is None
     assert interpreted.reaction_label is not None
     assert generic.reaction_label is not None

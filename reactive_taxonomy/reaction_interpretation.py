@@ -1,39 +1,26 @@
-"""Optional grammar and family interpretation of reaction observations.
-
-This module owns grammar enumeration and operator-backed product
-reconstruction.  It returns interpretations and edit-evidence proposals; it
-does not build generic topology, reaction cores, or signature identity.
-"""
+"""Optional grammar and family annotations over structural observations."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, List, Mapping, Tuple
+from dataclasses import dataclass, replace
+from typing import Any, Mapping, Tuple
 
-from .chemistry.rdkit_utils import parse_smiles
-from .connectivity_rewrite import apply_connectivity_rewrite
-from .reaction_archetypes import infer_bond_change_archetype
-from .reaction_candidates import enumerate_reaction_candidates
-from .reaction_labels import render_reaction_label
 from .reaction_edits import normalize_predicted_edits
 from .reaction_environments import build_reaction_family_environment
+from .reaction_grammar_annotations import load_reaction_grammar_annotations
+from .reaction_labels import render_reaction_label
 from .reaction_models import (
     ReactionCandidate,
-    ReactionComponent,
     ReactionInterpretation,
     ReactionObservation,
     ReactionPartner,
+    ReactionReconstructionCandidate,
     ReactionSiteReference,
 )
 from .reaction_products import build_product_connection
-from .reaction_multi_events import (
-    apply_rewrite_sequence,
-    equivalent_multi_event_interpretations,
-    exact_multi_event_reconstructions,
-)
 
 
-RawReactionCandidate = Tuple[
+ReactionCandidateSource = Tuple[
     Mapping[str, Any],
     Mapping[str, ReactionSiteReference],
 ]
@@ -41,10 +28,9 @@ RawReactionCandidate = Tuple[
 
 @dataclass(frozen=True)
 class ReactionInterpretationBuild:
-    """Internal build result retaining inputs needed by later reconciliation."""
+    """Grammar annotations derived from an existing structural observation."""
 
-    raw_candidates: Tuple[RawReactionCandidate, ...]
-    candidate_sources: Tuple[RawReactionCandidate, ...]
+    candidate_sources: Tuple[ReactionCandidateSource, ...]
     candidates: Tuple[ReactionCandidate, ...]
     selected_candidate: ReactionCandidate | None
     selected_events: Tuple[ReactionCandidate, ...]
@@ -65,7 +51,15 @@ def build_interpreted_partners(
     partners = []
     seen = set()
     for candidate in candidates:
-        confidence = 1.0 if candidate.verification == "exact_product_reconstruction" else 0.7
+        confidence = (
+            1.0
+            if candidate.verification
+            in {
+                "exact_product_reconstruction",
+                "exact_multi_event_reconstruction",
+            }
+            else 0.7
+        )
         for role, reference in sorted(candidate.role_assignments.items()):
             key = (str(role), int(reference.component_index), str(reference.site_id))
             if key in seen:
@@ -128,9 +122,7 @@ def build_interpreted_partners(
                     handle_tokens=handles,
                     anchor_contexts=contexts,
                     chemist_label=reference.chemist_label,
-                    nearby_groups=(
-                        environment.nearby_groups if environment else ()
-                    ),
+                    nearby_groups=(environment.nearby_groups if environment else ()),
                     spectator_group_ids=tuple(
                         sorted(
                             group.group_id
@@ -155,218 +147,118 @@ def build_interpreted_partners(
     )
 
 
-def canonical_without_maps(smiles: str) -> str | None:
-    """Return canonical isomeric SMILES after removing map numbers."""
-    from rdkit import Chem
-
-    molecule = parse_smiles(smiles)
-    if molecule is None:
-        return None
-    for atom in molecule.GetAtoms():
-        atom.SetAtomMapNum(0)
-    try:
-        return Chem.MolToSmiles(
-            molecule,
-            canonical=True,
-            isomericSmiles=True,
-        )
-    except Exception:
-        return None
-
-
-def _candidate(
-    *,
-    grammar: Mapping[str, Any],
-    assignment: Mapping[str, ReactionSiteReference],
-    outcome: Any,
-    observed_products: set[str],
-    label_style: str,
-) -> ReactionCandidate:
-    predicted_canonical = (
-        canonical_without_maps(outcome.predicted_product_smiles)
-        if outcome.predicted_product_smiles
-        else None
-    )
-    verification = (
-        "exact_product_reconstruction"
-        if predicted_canonical in observed_products
-        else "product_mismatch"
-        if predicted_canonical
-        else "construction_failed"
-    )
-    return ReactionCandidate(
-        grammar_id=str(grammar["id"]),
-        rewrite_outcome_id=outcome.outcome_id,
-        edit_archetype=infer_bond_change_archetype(
-            outcome.predicted_bond_changes
-        ),
-        transformation_class=str(grammar["transformation_class"]),
-        role_assignments=dict(assignment),
-        predicted_bond_changes=outcome.predicted_bond_changes,
-        predicted_product_smiles=predicted_canonical,
-        verification=verification,
-        grammar_label=render_reaction_label(
-            dict(grammar),
-            dict(assignment),
-            style=label_style,
-        ),
-        predicted_stereo_changes=outcome.predicted_stereo_changes,
-        compatible_named_families=tuple(
-            grammar.get("compatible_named_families") or ()
-        ),
-        warnings=outcome.warnings,
-    )
-
-
-def _equivalent_exact_candidates(
-    candidates: Tuple[ReactionCandidate, ...],
-) -> bool:
-    signatures = {
-        (
-            candidate.grammar_id,
-            tuple(
-                sorted(
-                    site.canonical_signature
-                    for site in candidate.role_assignments.values()
-                )
-            ),
-        )
-        for candidate in candidates
+def _semantic_assignment(
+    annotation: Mapping[str, Any],
+    reconstruction: ReactionReconstructionCandidate,
+) -> dict[str, ReactionSiteReference]:
+    return {
+        str(role): reconstruction.slot_assignments[str(slot)]
+        for role, slot in (annotation.get("role_bindings") or {}).items()
     }
-    return len(signatures) == 1
+
+
+def _annotate_candidate(
+    annotation: Mapping[str, Any],
+    reconstruction: ReactionReconstructionCandidate,
+    *,
+    label_style: str,
+) -> tuple[ReactionCandidate, ReactionCandidateSource]:
+    assignment = _semantic_assignment(annotation, reconstruction)
+    semantic_by_slot = {
+        str(slot): str(role)
+        for role, slot in (annotation.get("role_bindings") or {}).items()
+    }
+
+    def semantic_path(path: str | None) -> str | None:
+        if path is None:
+            return None
+        slot, separator, atom_role = path.partition(".")
+        semantic_role = semantic_by_slot.get(slot, slot)
+        return (
+            f"{semantic_role}.{atom_role}"
+            if separator
+            else semantic_role
+        )
+
+    predicted_bond_changes = tuple(
+        replace(
+            change,
+            atom_1_role=str(semantic_path(change.atom_1_role)),
+            atom_2_role=semantic_path(change.atom_2_role),
+        )
+        for change in reconstruction.predicted_bond_changes
+    )
+    predicted_stereo_changes = tuple(
+        replace(
+            change,
+            atom_1_role=str(semantic_path(change.atom_1_role)),
+            atom_2_role=semantic_path(change.atom_2_role),
+        )
+        for change in reconstruction.predicted_stereo_changes
+    )
+    candidate = ReactionCandidate(
+        grammar_id=str(annotation["id"]),
+        rewrite_outcome_id=reconstruction.rewrite_outcome_id,
+        edit_archetype=reconstruction.edit_archetype,
+        transformation_class=str(annotation["transformation_class"]),
+        role_assignments=assignment,
+        predicted_bond_changes=predicted_bond_changes,
+        predicted_product_smiles=reconstruction.predicted_product_smiles,
+        verification=reconstruction.verification,
+        grammar_label=render_reaction_label(
+            dict(annotation), assignment, style=label_style
+        ),
+        predicted_stereo_changes=predicted_stereo_changes,
+        compatible_named_families=tuple(
+            annotation.get("compatible_named_families") or ()
+        ),
+        warnings=reconstruction.warnings,
+    )
+    return candidate, (annotation, assignment)
 
 
 def build_reaction_interpretation_candidates(
+    observation: ReactionObservation,
     *,
-    reactants: Tuple[ReactionComponent, ...],
-    observed_products: set[str],
-    invalid_supplied_mapping: bool,
     label_style: str,
-    max_candidates: int,
 ) -> ReactionInterpretationBuild:
-    """Build optional grammar candidates without constructing generic facts."""
-    raw_values = list(enumerate_reaction_candidates(reactants))
-    warnings: List[str] = []
-    if len(raw_values) > max_candidates:
-        raw_values = raw_values[:max_candidates]
-        warnings.append("CANDIDATE_LIMIT_REACHED")
-    raw = tuple((grammar, assignment) for grammar, assignment in raw_values)
-    candidates: List[ReactionCandidate] = []
-    candidate_sources: List[RawReactionCandidate] = []
-    exact: List[ReactionCandidate] = []
-    for grammar, assignment in raw:
-        outcomes = apply_connectivity_rewrite(grammar, assignment, reactants)
-        for outcome in outcomes:
-            candidate = _candidate(
-                grammar=grammar,
-                assignment=assignment,
-                outcome=outcome,
-                observed_products=observed_products,
-                label_style=label_style,
-            )
-            candidates.append(candidate)
-            candidate_sources.append((grammar, assignment))
-            if candidate.verification == "exact_product_reconstruction":
-                exact.append(candidate)
-            if len(candidates) >= max_candidates:
-                warnings.append("CANDIDATE_LIMIT_REACHED")
-                break
-        if len(candidates) >= max_candidates:
-            break
+    """Annotate lower-level reconstruction evidence; never reconstruct graphs."""
+    annotations_by_rule: dict[str, list[Mapping[str, Any]]] = {}
+    for annotation in load_reaction_grammar_annotations():
+        annotations_by_rule.setdefault(
+            str(annotation["reconstruction_rule_id"]), []
+        ).append(annotation)
 
-    selected = None
-    selected_events: Tuple[ReactionCandidate, ...] = ()
-    evidence = "reactant_grammar_only" if candidates else "unresolved"
-    if invalid_supplied_mapping:
-        evidence = "unresolved"
-    elif len(exact) == 1:
-        selected, evidence = exact[0], "exact_product_reconstruction"
-    elif len(exact) > 1:
-        exact_tuple = tuple(exact)
-        if _equivalent_exact_candidates(exact_tuple):
-            selected, evidence = exact[0], "exact_product_reconstruction"
-            warnings.append("SYMMETRY_EQUIVALENT_ASSIGNMENTS")
-        else:
-            evidence = "ambiguous"
-            warnings.append("AMBIGUOUS_PARTICIPATING_SITES")
-    elif candidates and not invalid_supplied_mapping:
-        multi_exact = exact_multi_event_reconstructions(
-            raw,
-            reactants,
-            observed_products,
-        )
-        if multi_exact and equivalent_multi_event_interpretations(multi_exact):
-            chosen = multi_exact[0]
-            composite_product = apply_rewrite_sequence(chosen, reactants)
-            event_candidates = []
-            for grammar, assignment in chosen:
-                outcomes = apply_connectivity_rewrite(
-                    grammar,
-                    assignment,
-                    reactants,
-                )
-                if not outcomes:
-                    continue
-                outcome = outcomes[0]
-                event_candidates.append(
-                    ReactionCandidate(
-                        grammar_id=str(grammar["id"]),
-                        rewrite_outcome_id=outcome.outcome_id,
-                        edit_archetype=infer_bond_change_archetype(
-                            outcome.predicted_bond_changes
-                        ),
-                        transformation_class=str(
-                            grammar["transformation_class"]
-                        ),
-                        role_assignments=dict(assignment),
-                        predicted_bond_changes=outcome.predicted_bond_changes,
-                        predicted_product_smiles=composite_product,
-                        verification="exact_multi_event_reconstruction",
-                        grammar_label=render_reaction_label(
-                            dict(grammar),
-                            dict(assignment),
-                            style=label_style,
-                        ),
-                        predicted_stereo_changes=(
-                            outcome.predicted_stereo_changes
-                        ),
-                        compatible_named_families=tuple(
-                            grammar.get("compatible_named_families") or ()
-                        ),
-                    )
-                )
-            selected_events = tuple(event_candidates)
-            evidence = "exact_multi_event_reconstruction"
-            if len(multi_exact) > 1:
-                warnings.append(
-                    "SYMMETRY_EQUIVALENT_MULTI_EVENT_ASSIGNMENTS"
-                )
-        elif multi_exact:
-            evidence = "ambiguous"
-            warnings.append("AMBIGUOUS_MULTI_EVENT_ASSIGNMENTS")
+    candidate_pairs = [
+        _annotate_candidate(annotation, reconstruction, label_style=label_style)
+        for reconstruction in observation.reconstruction_candidates
+        for annotation in annotations_by_rule.get(reconstruction.rule_id, ())
+    ]
+    candidates = tuple(pair[0] for pair in candidate_pairs)
+    sources = tuple(pair[1] for pair in candidate_pairs)
 
-    candidate_tuple = tuple(candidates)
-    product_contradicted = (
-        selected is None
-        and not selected_events
-        and bool(observed_products)
-        and bool(candidate_tuple)
-        and all(
-            candidate.verification in {
-                "construction_failed",
-                "product_mismatch",
-            }
-            for candidate in candidate_tuple
-        )
-    )
-    named_family = (
-        selected.compatible_named_families[0]
-        if selected and len(selected.compatible_named_families) == 1
-        else None
+    def annotate_selected(
+        reconstruction: ReactionReconstructionCandidate | None,
+    ) -> ReactionCandidate | None:
+        if reconstruction is None:
+            return None
+        annotations = annotations_by_rule.get(reconstruction.rule_id, ())
+        if not annotations:
+            return None
+        return _annotate_candidate(
+            annotations[0], reconstruction, label_style=label_style
+        )[0]
+
+    selected = annotate_selected(observation.selected_reconstruction)
+    selected_events = tuple(
+        candidate
+        for reconstruction in observation.selected_reconstruction_events
+        for candidate in (annotate_selected(reconstruction),)
+        if candidate is not None
     )
     compatible_families = (
         selected.compatible_named_families
-        if selected
+        if selected is not None
         else tuple(
             sorted(
                 {
@@ -377,17 +269,43 @@ def build_reaction_interpretation_candidates(
             )
         )
     )
+    named_family = (
+        compatible_families[0]
+        if selected is not None and len(compatible_families) == 1
+        else None
+    )
+    product_contradicted = (
+        selected is None
+        and not selected_events
+        and bool(observation.products)
+        and bool(candidates)
+        and all(
+            candidate.verification in {"construction_failed", "product_mismatch"}
+            for candidate in candidates
+        )
+    )
+    evidence = (
+        observation.selected_reconstruction.verification
+        if selected is not None and observation.selected_reconstruction is not None
+        else "exact_multi_event_reconstruction"
+        if selected_events
+        else "reactant_grammar_only"
+        if candidates
+        else "unresolved"
+    )
+    warnings = ()
+    if observation.selected_reconstruction is not None and selected is None:
+        warnings = ("UNANNOTATED_SELECTED_RECONSTRUCTION",)
     return ReactionInterpretationBuild(
-        raw_candidates=raw,
-        candidate_sources=tuple(candidate_sources),
-        candidates=candidate_tuple,
+        candidate_sources=sources,
+        candidates=candidates,
         selected_candidate=selected,
         selected_events=selected_events,
         evidence_quality=evidence,
         compatible_named_families=compatible_families,
         named_family=named_family,
         product_contradicted_candidates=product_contradicted,
-        warnings=tuple(sorted(set(warnings))),
+        warnings=warnings,
     )
 
 
@@ -400,12 +318,7 @@ def _edit_key(edit: Any) -> tuple[Any, ...]:
             endpoints.append(("map", atom.atom_map_number))
         else:
             endpoints.append(
-                (
-                    "atom",
-                    atom.component_index,
-                    atom.atom_index,
-                    atom.element,
-                )
+                ("atom", atom.component_index, atom.atom_index, atom.element)
             )
     return (
         edit.edit_type,
@@ -419,30 +332,15 @@ def interpret_reaction(
     observation: ReactionObservation,
     *,
     label_style: str = "unicode",
-    max_candidates: int = 500,
 ) -> ReactionInterpretation:
-    """Interpret an immutable observation with optional grammar semantics."""
+    """Add optional grammar semantics to an immutable observation."""
     if not observation.valid:
         return ReactionInterpretation(
             evidence_quality="unresolved",
             warnings=("INVALID_REACTION_OBSERVATION",),
         )
-    observed_products = {
-        canonical
-        for component in observation.products
-        for canonical in (canonical_without_maps(component.input_smiles),)
-        if canonical is not None
-    }
-    invalid_mapping = any(
-        candidate.evidence == "invalid_atom_mapping"
-        for candidate in observation.evidence_candidates
-    )
     build = build_reaction_interpretation_candidates(
-        reactants=observation.reactants,
-        observed_products=observed_products,
-        invalid_supplied_mapping=invalid_mapping,
-        label_style=label_style,
-        max_candidates=max_candidates,
+        observation, label_style=label_style
     )
     conflict = observation.evidence_quality in {
         "conflicting_edit_evidence",
@@ -450,13 +348,12 @@ def interpret_reaction(
     }
     if build.selected_candidate is not None and observation.edits:
         predicted = normalize_predicted_edits(
-            build.selected_candidate,
-            observation.reactants,
+            build.selected_candidate, observation.reactants
         )
         if predicted.valid:
-            conflict = {
-                _edit_key(edit) for edit in predicted.edits
-            } != {_edit_key(edit) for edit in observation.edits}
+            conflict = {_edit_key(edit) for edit in predicted.edits} != {
+                _edit_key(edit) for edit in observation.edits
+            }
     warnings = set(build.warnings)
     if conflict:
         warnings.add("INTERPRETATION_OBSERVATION_CONFLICT")
@@ -472,11 +369,7 @@ def interpret_reaction(
         else None
     )
     product_connection = (
-        build_product_connection(
-            selected,
-            build.evidence_quality,
-            style=label_style,
-        )
+        build_product_connection(selected, build.evidence_quality, style=label_style)
         if not conflict
         else None
     )
@@ -485,9 +378,7 @@ def interpret_reaction(
         selected_candidate=selected,
         selected_events=build.selected_events,
         partners=build_interpreted_partners(
-            observation,
-            selected,
-            build.selected_events,
+            observation, selected, build.selected_events
         ),
         compatible_named_families=(
             () if conflict else build.compatible_named_families
@@ -505,10 +396,9 @@ def interpret_reaction(
 
 
 __all__ = [
-    "RawReactionCandidate",
+    "ReactionCandidateSource",
     "ReactionInterpretationBuild",
     "build_interpreted_partners",
     "build_reaction_interpretation_candidates",
-    "canonical_without_maps",
     "interpret_reaction",
 ]

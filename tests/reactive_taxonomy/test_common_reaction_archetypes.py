@@ -2,21 +2,21 @@
 
 from reactive_taxonomy import featurize_molecule, featurize_reaction
 from reactive_taxonomy.connectivity_rewrite import load_connectivity_rewrites
-from reactive_taxonomy.reaction_grammars import load_reaction_grammars
+from reactive_taxonomy.reaction_reconstruction_rules import (
+    load_reaction_reconstruction_rules,
+)
 
 
-def test_every_grammar_has_a_rewrite_and_no_declared_edit_archetype() -> None:
-    grammars = load_reaction_grammars()
-    rewrite_grammar_ids = {
-        grammar_id
-        for rewrite in load_connectivity_rewrites()
-        for grammar_id in rewrite.grammar_ids
+def test_every_reconstruction_rule_has_a_registered_operator() -> None:
+    rules = load_reaction_reconstruction_rules()
+    rewrite_ids = {
+        rewrite.rewrite_id for rewrite in load_connectivity_rewrites()
     }
 
-    assert grammars
-    assert {grammar["id"] for grammar in grammars} == rewrite_grammar_ids
-    assert all("edit_archetype" not in grammar for grammar in grammars)
-    assert all("operator" not in grammar for grammar in grammars)
+    assert rules
+    assert {rule["operator_id"] for rule in rules} <= rewrite_ids
+    assert all("transformation_class" not in rule for rule in rules)
+    assert all("compatible_named_families" not in rule for rule in rules)
 
 
 def test_explicit_and_implicit_addition_donors_are_distinct_sites() -> None:

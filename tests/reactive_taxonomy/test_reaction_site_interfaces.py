@@ -10,7 +10,12 @@ from reactive_taxonomy import (
     normalize_compound_sites,
     normalize_reaction_assignment,
 )
-from reactive_taxonomy.reaction_candidates import enumerate_reaction_candidates
+from reactive_taxonomy.reaction_reconstruction import (
+    enumerate_reconstruction_candidates,
+)
+from reactive_taxonomy.reaction_grammar_annotations import (
+    load_reaction_grammar_annotations,
+)
 from reactive_taxonomy.reaction_parser import parse_reaction_smiles
 
 
@@ -27,7 +32,7 @@ def _assignment(reaction_smiles: str, grammar_id: str):
     match = next(
         (
             (grammar, assignment)
-            for grammar, assignment in enumerate_reaction_candidates(
+            for grammar, assignment in enumerate_reconstruction_candidates(
                 parsed.reactants
             )
             if grammar["id"] == grammar_id
@@ -35,7 +40,16 @@ def _assignment(reaction_smiles: str, grammar_id: str):
         None,
     )
     assert match is not None
-    return parsed, match[0], match[1]
+    annotation = next(
+        item
+        for item in load_reaction_grammar_annotations()
+        if item["reconstruction_rule_id"] == grammar_id
+    )
+    semantic_assignment = {
+        role: match[1][slot]
+        for role, slot in annotation["role_bindings"].items()
+    }
+    return parsed, match[0], semantic_assignment
 
 
 @pytest.mark.parametrize(

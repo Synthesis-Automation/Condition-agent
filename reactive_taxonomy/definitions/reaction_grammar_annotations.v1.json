@@ -1,0 +1,532 @@
+{
+  "schema_version": "1.0",
+  "annotations": [
+    {
+      "id": "boron_transfer_coupling",
+      "reconstruction_rule_id": "boron_transfer_coupling",
+      "transformation_class": "c_c_transfer_coupling",
+      "display_name": "Boron transfer C–C coupling",
+      "generic_label": "Ar–X + C–B → Ar–C",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "transfer_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "suzuki_miyaura"
+      ],
+      "requires_product_verification": false,
+      "priority": 100
+    },
+    {
+      "id": "sp2_c_n_substitution",
+      "reconstruction_rule_id": "sp2_c_n_substitution",
+      "transformation_class": "sp2_c_n_substitution",
+      "display_name": "sp2 C–N substitution or coupling",
+      "generic_label": "Ar–X + N–H → Ar–N",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [
+        "buchwald_hartwig",
+        "ullmann_goldberg",
+        "snar"
+      ],
+      "requires_product_verification": false,
+      "priority": 90
+    },
+    {
+      "id": "carbonyl_amine_reductive_coupling",
+      "reconstruction_rule_id": "carbonyl_amine_reductive_coupling",
+      "transformation_class": "carbonyl_c_n_reductive_coupling",
+      "display_name": "Carbonyl–amine reductive coupling",
+      "generic_label": "R–C(O)R + N–H → R–CH(N)R",
+      "role_bindings": {
+        "carbonyl_partner": "slot_1",
+        "amine_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "reductive_amination"
+      ],
+      "requires_product_verification": false,
+      "priority": 98
+    },
+    {
+      "id": "amide_formation",
+      "reconstruction_rule_id": "amide_formation",
+      "transformation_class": "amide_formation",
+      "display_name": "Amide formation",
+      "generic_label": "R–C(O)Y + N–H → R–C(O)–N",
+      "role_bindings": {
+        "acyl_partner": "slot_1",
+        "nitrogen_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "amide_coupling",
+        "acylation"
+      ],
+      "requires_product_verification": false,
+      "priority": 95
+    },
+    {
+      "id": "sp2_c_o_substitution",
+      "reconstruction_rule_id": "sp2_c_o_substitution",
+      "transformation_class": "sp2_c_o_substitution",
+      "display_name": "sp2 C–O substitution or coupling",
+      "generic_label": "Ar–X + O–H → Ar–O",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [
+        "ullmann_c_o",
+        "nucleophilic_aromatic_substitution"
+      ],
+      "requires_product_verification": false,
+      "priority": 85
+    },
+    {
+      "id": "sp2_c_s_substitution",
+      "reconstruction_rule_id": "sp2_c_s_substitution",
+      "transformation_class": "sp2_c_s_substitution",
+      "display_name": "sp2 C–S substitution or coupling",
+      "generic_label": "Ar–X + S–H → Ar–S",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [
+        "c_s_coupling"
+      ],
+      "requires_product_verification": false,
+      "priority": 85
+    },
+    {
+      "id": "sp2_c_s_acyl_substitution",
+      "reconstruction_rule_id": "sp2_c_s_acyl_substitution",
+      "transformation_class": "sp2_c_s_substitution",
+      "display_name": "sp2 C–S coupling with an acyl sulfur donor",
+      "generic_label": "Ar–X + R–C(O)–SH → Ar–S–C(O)–R",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [
+        "c_s_coupling"
+      ],
+      "requires_product_verification": false,
+      "priority": 86
+    },
+    {
+      "id": "sp2_c_s_anion_substitution",
+      "reconstruction_rule_id": "sp2_c_s_anion_substitution",
+      "transformation_class": "sp2_c_s_substitution",
+      "display_name": "sp2 C–S coupling with an anionic sulfur donor",
+      "generic_label": "Ar–X + S⁻ → Ar–S",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [
+        "c_s_coupling"
+      ],
+      "requires_product_verification": false,
+      "priority": 87
+    },
+    {
+      "id": "sp3_c_n_substitution",
+      "reconstruction_rule_id": "sp3_c_n_substitution",
+      "transformation_class": "sp3_c_n_substitution",
+      "display_name": "Alkyl C–N substitution",
+      "generic_label": "R–X + N–H → R–N",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 88
+    },
+    {
+      "id": "sp3_c_o_substitution",
+      "reconstruction_rule_id": "sp3_c_o_substitution",
+      "transformation_class": "sp3_c_o_substitution",
+      "display_name": "Alkyl C–O substitution",
+      "generic_label": "R–X + O–H → R–O",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 88
+    },
+    {
+      "id": "sp3_c_s_substitution",
+      "reconstruction_rule_id": "sp3_c_s_substitution",
+      "transformation_class": "sp3_c_s_substitution",
+      "display_name": "Alkyl C–S substitution",
+      "generic_label": "R–X + S–H → R–S",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 88
+    },
+    {
+      "id": "alcohol_c_n_displacement",
+      "reconstruction_rule_id": "alcohol_c_n_displacement",
+      "transformation_class": "sp3_c_n_substitution",
+      "display_name": "Alcohol C–O displacement by an N–H partner",
+      "generic_label": "R–CH(OH)–R + N–H → R–CH(N)–R",
+      "role_bindings": {
+        "alcohol": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 89
+    },
+    {
+      "id": "alcohol_c_o_displacement",
+      "reconstruction_rule_id": "alcohol_c_o_displacement",
+      "transformation_class": "sp3_c_o_substitution",
+      "display_name": "Alcohol C–O displacement by an O–H partner",
+      "generic_label": "R–CH(OH)–R + O–H → R–CH(O)–R",
+      "role_bindings": {
+        "alcohol": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 89
+    },
+    {
+      "id": "alcohol_c_s_displacement",
+      "reconstruction_rule_id": "alcohol_c_s_displacement",
+      "transformation_class": "sp3_c_s_substitution",
+      "display_name": "Alcohol C–O displacement by an S–H partner",
+      "generic_label": "R–CH(OH)–R + S–H → R–CH(S)–R",
+      "role_bindings": {
+        "alcohol": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 89
+    },
+    {
+      "id": "terminal_alkene_heck_coupling",
+      "reconstruction_rule_id": "terminal_alkene_heck_coupling",
+      "transformation_class": "alkene_c_c_substitution",
+      "display_name": "Terminal-alkene C–C coupling",
+      "generic_label": "Ar–X + H2C=CHR → Ar–CH=CHR",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "alkene_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "heck"
+      ],
+      "requires_product_verification": false,
+      "priority": 92
+    },
+    {
+      "id": "sonogashira_coupling",
+      "reconstruction_rule_id": "sonogashira_coupling",
+      "transformation_class": "terminal_alkyne_coupling",
+      "display_name": "Terminal alkyne coupling",
+      "generic_label": "Ar–X + C(sp)–H → Ar–C≡C–R",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "alkyne_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "sonogashira"
+      ],
+      "requires_product_verification": false,
+      "priority": 95
+    },
+    {
+      "id": "sp2_c_activated_c_substitution",
+      "reconstruction_rule_id": "sp2_c_activated_c_substitution",
+      "transformation_class": "sp2_c_c_substitution",
+      "display_name": "sp2 C–C substitution with an activated carbon",
+      "generic_label": "Ar–X + EWG–C(sp3)–H → Ar–C(sp3)–EWG",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "carbon_partner": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 94
+    },
+    {
+      "id": "other_metal_transfer_coupling",
+      "reconstruction_rule_id": "other_metal_transfer_coupling",
+      "transformation_class": "c_c_transfer_coupling",
+      "display_name": "Organometallic C–C transfer coupling",
+      "generic_label": "Ar–X + C–M → Ar–C",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "transfer_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "negishi",
+        "kumada",
+        "stille",
+        "hiyama"
+      ],
+      "requires_product_verification": false,
+      "priority": 90
+    },
+    {
+      "id": "chan_lam_heteroatom_coupling",
+      "reconstruction_rule_id": "chan_lam_heteroatom_coupling",
+      "transformation_class": "chan_lam_heteroatom_coupling",
+      "display_name": "Boron-to-heteroatom coupling",
+      "generic_label": "C–B + N/O/S–H → C–N/O/S",
+      "role_bindings": {
+        "transfer_partner": "slot_1",
+        "nucleophile": "slot_2"
+      },
+      "compatible_named_families": [
+        "chan_lam"
+      ],
+      "requires_product_verification": false,
+      "priority": 80
+    },
+    {
+      "id": "ester_formation",
+      "reconstruction_rule_id": "ester_formation",
+      "transformation_class": "ester_formation",
+      "display_name": "Ester formation",
+      "generic_label": "R–C(O)Y + O–H → R–C(O)–O",
+      "role_bindings": {
+        "acyl_partner": "slot_1",
+        "oxygen_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "esterification",
+        "acylation"
+      ],
+      "requires_product_verification": false,
+      "priority": 90
+    },
+    {
+      "id": "sp2_c_aromatic_ch_substitution",
+      "reconstruction_rule_id": "sp2_c_aromatic_ch_substitution",
+      "transformation_class": "sp2_c_c_substitution",
+      "display_name": "sp2 C–C substitution with an aromatic C–H partner",
+      "generic_label": "Ar–X + Ar–H → Ar–Ar",
+      "role_bindings": {
+        "electrophile": "slot_1",
+        "aromatic_partner": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 93
+    },
+    {
+      "id": "friedel_crafts_acylation",
+      "reconstruction_rule_id": "friedel_crafts_acylation",
+      "transformation_class": "aromatic_c_h_acylation",
+      "display_name": "Friedel–Crafts acylation",
+      "generic_label": "Ar–H + R–C(O)X → Ar–C(O)–R",
+      "role_bindings": {
+        "acyl_partner": "slot_1",
+        "aromatic_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "friedel_crafts_acylation"
+      ],
+      "requires_product_verification": false,
+      "priority": 94
+    },
+    {
+      "id": "thioester_formation",
+      "reconstruction_rule_id": "thioester_formation",
+      "transformation_class": "thioester_formation",
+      "display_name": "Thioester formation",
+      "generic_label": "R–C(O)Y + S–H → R–C(O)–S",
+      "role_bindings": {
+        "acyl_partner": "slot_1",
+        "sulfur_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "thioesterification",
+        "acylation"
+      ],
+      "requires_product_verification": false,
+      "priority": 90
+    },
+    {
+      "id": "sulfonamide_formation",
+      "reconstruction_rule_id": "sulfonamide_formation",
+      "transformation_class": "sulfonamide_formation",
+      "display_name": "Sulfonamide formation",
+      "generic_label": "R–S(O)2X + N–H → R–S(O)2–N",
+      "role_bindings": {
+        "sulfonyl_partner": "slot_1",
+        "nitrogen_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "sulfonylation"
+      ],
+      "requires_product_verification": false,
+      "priority": 95
+    },
+    {
+      "id": "sulfonate_formation",
+      "reconstruction_rule_id": "sulfonate_formation",
+      "transformation_class": "sulfonate_formation",
+      "display_name": "Sulfonate formation",
+      "generic_label": "R–S(O)2X + O–H → R–S(O)2–O",
+      "role_bindings": {
+        "sulfonyl_partner": "slot_1",
+        "oxygen_partner": "slot_2"
+      },
+      "compatible_named_families": [
+        "sulfonylation"
+      ],
+      "requires_product_verification": false,
+      "priority": 95
+    },
+    {
+      "id": "carbonyl_reduction",
+      "reconstruction_rule_id": "carbonyl_reduction",
+      "transformation_class": "carbonyl_reduction",
+      "display_name": "Carbonyl reduction",
+      "generic_label": "C=O → C–OH",
+      "role_bindings": {
+        "carbonyl": "slot_1"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 92
+    },
+    {
+      "id": "alcohol_oxidation",
+      "reconstruction_rule_id": "alcohol_oxidation",
+      "transformation_class": "alcohol_oxidation",
+      "display_name": "Alcohol oxidation",
+      "generic_label": "C–OH → C=O",
+      "role_bindings": {
+        "alcohol": "slot_1"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 92
+    },
+    {
+      "id": "alkene_hydrogenation",
+      "reconstruction_rule_id": "alkene_hydrogenation",
+      "transformation_class": "alkene_reduction",
+      "display_name": "Alkene hydrogenation",
+      "generic_label": "C=C → C–C",
+      "role_bindings": {
+        "unsaturated_partner": "slot_1"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 91
+    },
+    {
+      "id": "alkyne_partial_hydrogenation",
+      "reconstruction_rule_id": "alkyne_partial_hydrogenation",
+      "transformation_class": "alkyne_partial_reduction",
+      "display_name": "Alkyne partial hydrogenation",
+      "generic_label": "C≡C → C=C",
+      "role_bindings": {
+        "unsaturated_partner": "slot_1"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 91
+    },
+    {
+      "id": "alkyne_hydrogenation",
+      "reconstruction_rule_id": "alkyne_hydrogenation",
+      "transformation_class": "alkyne_reduction",
+      "display_name": "Alkyne hydrogenation",
+      "generic_label": "C≡C → C–C",
+      "role_bindings": {
+        "unsaturated_partner": "slot_1"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": false,
+      "priority": 90
+    },
+    {
+      "id": "xh_addition_to_alkene",
+      "reconstruction_rule_id": "xh_addition_to_alkene",
+      "transformation_class": "xh_addition_to_c_c_pi_bond",
+      "display_name": "X-H addition to alkene",
+      "generic_label": "C=C + X-H → C-C(X)-C-H",
+      "role_bindings": {
+        "acceptor": "slot_1",
+        "donor": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 72
+    },
+    {
+      "id": "xh_addition_to_alkyne",
+      "reconstruction_rule_id": "xh_addition_to_alkyne",
+      "transformation_class": "xh_addition_to_c_c_pi_bond",
+      "display_name": "X-H addition to alkyne",
+      "generic_label": "C≡C + X-H → C=C(X)-C-H",
+      "role_bindings": {
+        "acceptor": "slot_1",
+        "donor": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 71
+    },
+    {
+      "id": "addend_pair_addition_to_alkene",
+      "reconstruction_rule_id": "addend_pair_addition_to_alkene",
+      "transformation_class": "sigma_bond_addition_to_c_c_pi_bond",
+      "display_name": "A-B addition to alkene",
+      "generic_label": "C=C + A-B → A-C-C-B",
+      "role_bindings": {
+        "acceptor": "slot_1",
+        "donor": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 70
+    },
+    {
+      "id": "addend_pair_addition_to_alkyne",
+      "reconstruction_rule_id": "addend_pair_addition_to_alkyne",
+      "transformation_class": "sigma_bond_addition_to_c_c_pi_bond",
+      "display_name": "A-B addition to alkyne",
+      "generic_label": "C≡C + A-B → A-C=C-B",
+      "role_bindings": {
+        "acceptor": "slot_1",
+        "donor": "slot_2"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 69
+    },
+    {
+      "id": "beta_halo_elimination",
+      "reconstruction_rule_id": "beta_halo_elimination",
+      "transformation_class": "beta_elimination",
+      "display_name": "Beta elimination",
+      "generic_label": "C-C(X)-C-H → C=C",
+      "role_bindings": {
+        "substrate": "slot_1"
+      },
+      "compatible_named_families": [],
+      "requires_product_verification": true,
+      "priority": 68
+    }
+  ]
+}

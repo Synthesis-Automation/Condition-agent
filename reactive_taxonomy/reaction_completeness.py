@@ -8,9 +8,9 @@ from typing import Any, Iterable, Mapping, Sequence, Tuple
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_edits import EditNormalizationResult
 from .reaction_models import (
-    ReactionCandidate,
     ReactionCompletenessAssessment,
     ReactionComponent,
+    ReactionReconstructionCandidate,
     ReactionSiteReference,
 )
 
@@ -103,8 +103,8 @@ def build_reaction_completeness(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
     raw_candidates: Sequence[RawCandidate],
-    selected: ReactionCandidate | None,
-    selected_events: Tuple[ReactionCandidate, ...],
+    selected: ReactionReconstructionCandidate | None,
+    selected_events: Tuple[ReactionReconstructionCandidate, ...],
     edit_result: EditNormalizationResult,
 ) -> ReactionCompletenessAssessment:
     """Assess whether every reported product heavy atom has reactant provenance.

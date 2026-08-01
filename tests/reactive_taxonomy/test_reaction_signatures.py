@@ -125,10 +125,10 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
         "C-H:NONE>SINGLE",
     )
-    assert payload["schema_version"] == "5.0"
+    assert payload["schema_version"] == "6.0"
     assert payload["reaction_signature"]["schema_version"] == "3.2"
-    assert payload["observation"]["schema_version"] == "1.0"
-    assert payload["interpretation"]["schema_version"] == "1.0"
+    assert payload["observation"]["schema_version"] == "2.0"
+    assert payload["interpretation"]["schema_version"] == "2.0"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
     )
@@ -248,7 +248,7 @@ def test_unbalanced_multi_event_reaction_does_not_invent_partner_copy() -> None:
     )
     result = featurize_reaction(reaction, label_style="ascii")
 
-    assert result.evidence_quality == "reactant_grammar_only"
+    assert result.evidence_quality == "structural_reconstruction_candidates"
     assert result.selected_events == ()
     assert result.reaction_signature is None
     assert result.reaction_label.status == "product_contradicted_reactants"
@@ -293,7 +293,7 @@ def test_repeated_suzuki_does_not_invent_a_missing_partner_copy() -> None:
 
     result = featurize_reaction(reaction)
 
-    assert result.evidence_quality == "reactant_grammar_only"
+    assert result.evidence_quality == "structural_reconstruction_candidates"
     assert result.selected_events == ()
     assert result.reaction_signature is None
     assert result.reaction_completeness is not None

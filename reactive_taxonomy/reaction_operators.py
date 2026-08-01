@@ -1,8 +1,4 @@
-"""Grammar-independent public graph-operator registry.
-
-The compatibility rewrite loader still retains grammar-to-role adapters, but
-this public surface exposes only executable structural operator definitions.
-"""
+"""Grammar-independent public graph-operator registry."""
 
 from __future__ import annotations
 

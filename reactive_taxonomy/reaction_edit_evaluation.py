@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Sequence
 
 from .reaction_api import featurize_reaction
-from .reaction_edits import normalize_reaction_edits
+from .reaction_edits import resolve_reaction_evidence
 
 _DEFAULT_BENCHMARK = (
     Path(__file__).parents[1]
@@ -140,7 +140,7 @@ def _connectivity_shadow_record(result: Any) -> Dict[str, Any]:
             "compatibility_parity": True,
             "warnings": [],
         }
-    normalized = normalize_reaction_edits(
+    normalized = resolve_reaction_evidence(
         result.reactants,
         result.products,
         result.selected_candidate,
