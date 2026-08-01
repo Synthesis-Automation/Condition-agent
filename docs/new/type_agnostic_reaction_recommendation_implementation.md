@@ -540,7 +540,8 @@ The converter serializes:
 - one primary `reaction_display_label` review column and a separate
   `reaction_display_label_detailed` column, both projected from the canonical
   nested `reaction_label` object;
-- a separate `reaction_core_raw_equation` audit column;
+- a separate `reaction_core_label` audit column immediately after reaction
+  SMILES;
 - optional external-mapping disposition, mapped proposal, coverage, confidence,
   provider/model identity, matched internal hypotheses, and warnings;
 - chemistry, condition, stage, outcome, and index-eligibility statuses;

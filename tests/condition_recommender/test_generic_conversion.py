@@ -647,20 +647,23 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "5.0"
+    assert report["schema_version"] == "6.0"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
         "reaction_display_label"
     )
-    assert CONCISE_REACTION_REVIEW_FIELDS[label_index : label_index + 7] == (
+    assert CONCISE_REACTION_REVIEW_FIELDS[:2] == (
+        "canonical_reaction_smiles",
+        "reaction_core_label",
+    )
+    assert CONCISE_REACTION_REVIEW_FIELDS[label_index : label_index + 6] == (
         "reaction_display_label",
         "reaction_display_label_detailed",
         "reaction_display_source",
         "reaction_display_status",
         "reaction_display_confidence",
         "reaction_display_warnings",
-        "reaction_core_raw_equation",
     )
     assert review_rows[0]["canonical_reaction_smiles"]
     assert review_rows[0]["reaction_display_label"]
@@ -781,7 +784,7 @@ def test_concise_review_uses_shared_detailed_and_graphic_labels() -> None:
     )
 
     assert row["reaction_display_label_detailed"] == "structural detailed label"
-    assert row["reaction_core_raw_equation"] == "R–X + R′ → R–R′"
+    assert row["reaction_core_label"] == "R–X + R′ → R–R′"
     assert row["reaction_core_status"] == "available_verified"
     assert row["reaction_core_unavailability_reasons"] == ""
 

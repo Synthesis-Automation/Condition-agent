@@ -139,7 +139,8 @@ Converted records serialize `reaction_observation` and the optional
 from the observation and remains generic; grammar roles and named-family
 evidence stay in the interpretation. Review CSVs expose one primary
 `reaction_display_label` from the shared renderer, plus
-`reaction_core_raw_equation` as an audit field for the unpolished minimum-core
+`reaction_core_label` immediately after the reaction-SMILES column as an audit
+field for the unpolished minimum-core
 projection. Neither display field participates in identity or retrieval.
 
 ### Reaction-core retrieval

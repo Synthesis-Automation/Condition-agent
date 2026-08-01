@@ -225,7 +225,8 @@ def test_batch_autodetects_clean_reaction_column(tmp_path, capsys) -> None:
         reader = csv.DictReader(handle)
         assert reader.fieldnames is not None
         smiles_index = reader.fieldnames.index("rxn_smiles_clean")
-        assert reader.fieldnames[smiles_index + 1 : smiles_index + 3] == [
+        assert reader.fieldnames[smiles_index + 1 : smiles_index + 4] == [
+            "reaction_core_label",
             "reaction_display_label",
             "spectator_groups",
         ]
@@ -270,8 +271,9 @@ def test_batch_writes_concise_reaction_csv(tmp_path, capsys) -> None:
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
         assert reader.fieldnames is not None
-        assert reader.fieldnames[:4] == [
+        assert reader.fieldnames[:5] == [
             "reaction_smiles",
+            "reaction_core_label",
             "reaction_display_label",
             "partner_analysis",
             "spectator_groups",
@@ -331,7 +333,12 @@ def test_batch_reaction_csv_exposes_minimized_core(tmp_path, capsys) -> None:
         row = next(csv.DictReader(handle))
 
     assert row["reaction_core_available"] == "True"
-    assert row["reaction_core_raw_equation"] == (
+    assert list(row)[:3] == [
+        "reaction_smiles",
+        "reaction_core_label",
+        "reaction_display_label",
+    ]
+    assert row["reaction_core_label"] == (
         "C(H)(Ar)(=O) + O(H)(R) → C(H)(Ar)(O-R)2"
     )
     assert row["reaction_core_evidence_status"] == "verified"

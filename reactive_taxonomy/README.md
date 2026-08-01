@@ -76,7 +76,8 @@ the reaction-template registry. It abstains when no edited atom is observed on
 both sides and does not change `RS3`, admission, or named-family results.
 The reaction CLI and desktop featurizer show the minimized raw label, evidence,
 shape and center keys, core size, remote subgraphs, attachment counts, and
-warnings. Batch reaction CSV exports it as `reaction_core_raw_equation`; JSON
+warnings. Batch reaction CSV exports it as `reaction_core_label` immediately
+after reaction SMILES; JSON
 retains the complete nested projection.
 
 The desktop featurizer also presents mapped cores graphically. The renderer in
