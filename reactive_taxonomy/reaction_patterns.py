@@ -300,19 +300,94 @@ def _organoboron_c_c_coupling_like(
     return tuple(sorted(broken_cb + formed_cc + broken_cx)) if broken_cb and formed_cc and broken_cx else ()
 
 
-def _heck_coupling_like(observation: ReactionObservation) -> tuple[int, ...]:
-    substitution = _net_substitution(observation)
-    formed_cc = _indices(
-        observation.edits,
-        lambda edit: edit.edit_type == "formed" and _element_pair(edit) == {"C"},
+def _broken_leaving_group_at(
+    context: ReactionPatternContext,
+    key: tuple[int, int],
+) -> tuple[int, ...]:
+    return tuple(
+        index
+        for index in context.edits_at(key, edit_type="broken")
+        if bool(context.element_pair(context.edits[index]) & _LEAVING_ELEMENTS)
     )
-    h_loss = _indices(
-        observation.edits,
-        lambda edit: edit.edit_type == "hydrogen_change"
-        and edit.old_order is not None
-        and edit.new_order is None,
+
+
+def _hydrogen_loss_at(
+    context: ReactionPatternContext,
+    key: tuple[int, int],
+) -> tuple[int, ...]:
+    return tuple(
+        index
+        for index in context.edits_at(key, edit_type="hydrogen_change")
+        if context.edits[index].old_order is not None
+        and context.edits[index].new_order is None
     )
-    return tuple(sorted(set(substitution + formed_cc + h_loss))) if substitution and formed_cc and h_loss else ()
+
+
+def _heck_coupling_like(context: ReactionPatternContext) -> tuple[int, ...]:
+    """Match C(sp2)–X coupling specifically to an alkene-derived carbon."""
+    for formed_index, formed in enumerate(context.edits):
+        if formed.edit_type != "formed" or context.element_pair(formed) != {"C"}:
+            continue
+        endpoints = (
+            (formed.atom_1, context.atom_key(formed, 1)),
+            (formed.atom_2, context.atom_key(formed, 2)),
+        )
+        for (electrophile, electrophile_key), (partner, partner_key) in (
+            endpoints,
+            endpoints[::-1],
+        ):
+            if (
+                electrophile is None
+                or partner is None
+                or electrophile_key is None
+                or partner_key is None
+                or not context.is_sp2_carbon(electrophile)
+            ):
+                continue
+            leaving = _broken_leaving_group_at(context, electrophile_key)
+            hydrogen_loss = _hydrogen_loss_at(context, partner_key)
+            if not (
+                leaving
+                and hydrogen_loss
+                and context.has_neighbor(
+                    partner_key,
+                    element="C",
+                    order="DOUBLE",
+                )
+            ):
+                continue
+            return unique_indices(leaving, (formed_index,), hydrogen_loss)
+    return ()
+
+
+def _carbonyl_alpha_c_h_sp2_c_c_coupling_like(
+    context: ReactionPatternContext,
+) -> tuple[int, ...]:
+    """Match C(sp2)–X replacement by a carbonyl-activated alpha C–H."""
+    for formed_index, formed in enumerate(context.edits):
+        if formed.edit_type != "formed" or context.element_pair(formed) != {"C"}:
+            continue
+        endpoints = (
+            (formed.atom_1, context.atom_key(formed, 1)),
+            (formed.atom_2, context.atom_key(formed, 2)),
+        )
+        for (electrophile, electrophile_key), (_, partner_key) in (
+            endpoints,
+            endpoints[::-1],
+        ):
+            if (
+                electrophile is None
+                or electrophile_key is None
+                or partner_key is None
+                or not context.is_sp2_carbon(electrophile)
+                or not context.is_alpha_to_carbonyl(partner_key)
+            ):
+                continue
+            leaving = _broken_leaving_group_at(context, electrophile_key)
+            hydrogen_loss = _hydrogen_loss_at(context, partner_key)
+            if leaving and hydrogen_loss:
+                return unique_indices(leaving, (formed_index,), hydrogen_loss)
+    return ()
 
 
 def _cycloaddition_like(observation: ReactionObservation) -> tuple[int, ...]:
@@ -971,8 +1046,9 @@ _PREDICATES: Mapping[str, Callable[[ReactionPatternContext], tuple[int, ...]]] =
     "cyanation_like": _cyanation_like,
     "sulfide_oxidation_like": _sulfide_oxidation_like,
     "carboxyl_derivative_reduction_like": _carboxyl_derivative_reduction_like,
-    "heck_coupling_like": lambda context: _heck_coupling_like(
-        context.observation
+    "heck_coupling_like": _heck_coupling_like,
+    "carbonyl_alpha_c_h_sp2_c_c_coupling_like": (
+        _carbonyl_alpha_c_h_sp2_c_c_coupling_like
     ),
     "cycloaddition_like": lambda context: _cycloaddition_like(
         context.observation

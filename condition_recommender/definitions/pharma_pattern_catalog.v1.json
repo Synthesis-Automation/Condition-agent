@@ -37,7 +37,7 @@
     {"rank": 31, "id": "chiral_resolution", "pattern": null, "implementation": "excluded_operation", "family_resolution": "not_covalent"},
     {"rank": 32, "id": "grignard_or_organolithium_addition", "pattern": "net_addition", "implementation": "generic", "family_resolution": "condition_required"},
     {"rank": 33, "id": "wittig_or_hwe_olefination", "pattern": "net_bond_order_change", "implementation": "generic", "family_resolution": "condition_required"},
-    {"rank": 34, "id": "enolate_alpha_functionalization", "pattern": "net_coupling", "implementation": "generic", "family_resolution": "condition_required"},
+    {"rank": 34, "id": "enolate_alpha_functionalization", "pattern": "carbonyl_alpha_c_h_sp2_c_c_coupling_like", "implementation": "implemented", "family_resolution": "structural"},
     {"rank": 35, "id": "aldol_claisen_or_knoevenagel", "pattern": "net_coupling", "implementation": "generic", "family_resolution": "condition_required"},
     {"rank": 36, "id": "mitsunobu_reaction", "pattern": "sp3_c_o_substitution_like", "implementation": "implemented", "family_resolution": "condition_required"},
     {"rank": 37, "id": "diazotization_or_sandmeyer", "pattern": "net_substitution", "implementation": "generic", "family_resolution": "condition_required"},

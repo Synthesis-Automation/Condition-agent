@@ -194,6 +194,24 @@ class ReactionPatternContext:
         """Whether a carbon endpoint is sp3."""
         return reference.element == "C" and reference.hybridization.upper() == "SP3"
 
+    def is_alpha_to_carbonyl(self, key: AtomKey) -> bool:
+        """Whether a reactant carbon is single-bonded to a carbonyl carbon."""
+        molecule = self.molecule("reactant", key[0])
+        if molecule is None or not 0 <= key[1] < molecule.GetNumAtoms():
+            return False
+        atom = molecule.GetAtomWithIdx(key[1])
+        if atom.GetSymbol() != "C":
+            return False
+        return any(
+            neighbor.GetSymbol() == "C"
+            and str(
+                molecule.GetBondBetweenAtoms(key[1], neighbor.GetIdx()).GetBondType()
+            ).upper()
+            == "SINGLE"
+            and self.is_carbonyl_carbon((key[0], neighbor.GetIdx()))
+            for neighbor in atom.GetNeighbors()
+        )
+
     def edits_at(self, key: AtomKey, *, edit_type: str | None = None) -> tuple[int, ...]:
         """Return normalized edits incident to one reactant atom."""
         return tuple(

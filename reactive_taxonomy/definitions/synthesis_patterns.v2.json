@@ -262,6 +262,15 @@
       "display_label": "carboxylic-acid derivative reduction"
     },
     {
+      "id": "carbonyl_alpha_c_h_sp2_c_c_coupling_like",
+      "tier": "synthesis",
+      "predicate_id": "carbonyl_alpha_c_h_sp2_c_c_coupling_like",
+      "specificity": 93,
+      "display_importance": 96,
+      "display_label": "C(sp²)–C coupling at carbonyl α-C–H",
+      "compatible_named_families": ["carbonyl_alpha_c_h_coupling"]
+    },
+    {
       "id": "heck_coupling_like",
       "tier": "synthesis",
       "predicate_id": "heck_coupling_like",

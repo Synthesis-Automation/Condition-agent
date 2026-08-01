@@ -91,6 +91,34 @@ def test_chan_lam_like_connectivity_is_distinct_from_suzuki_and_sp2_substitution
     assert suzuki.named_family == "suzuki_miyaura"
 
 
+def test_carbonyl_alpha_c_h_coupling_is_not_mislabeled_as_heck() -> None:
+    alpha_c_h = featurize_reaction(
+        "CC(=O)c1ccc(Br)cc1.O=C1CCCC1"
+        ">>CC(=O)c1ccc(C2CCCC2=O)cc1"
+    )
+    heck = featurize_reaction("Brc1ccccc1.C=C>>C=Cc1ccccc1")
+
+    assert alpha_c_h.interpretation is not None
+    assert alpha_c_h.interpretation.primary_pattern_id == (
+        "carbonyl_alpha_c_h_sp2_c_c_coupling_like"
+    )
+    assert alpha_c_h.named_family == "carbonyl_alpha_c_h_coupling"
+    assert "heck_coupling_like" not in {
+        match.pattern_id for match in alpha_c_h.interpretation.pattern_matches
+    }
+    assert alpha_c_h.reaction_label is not None
+    assert alpha_c_h.reaction_label.concise == (
+        "C(sp²)–C coupling at carbonyl α-C–H"
+    )
+
+    assert heck.interpretation is not None
+    assert heck.interpretation.primary_pattern_id == "heck_coupling_like"
+    assert heck.named_family == "heck"
+    assert "carbonyl_alpha_c_h_sp2_c_c_coupling_like" not in {
+        match.pattern_id for match in heck.interpretation.pattern_matches
+    }
+
+
 def test_acyl_and_sulfonyl_products_receive_specific_patterns() -> None:
     examples = {
         "CC(=O)Cl.CN>>CC(=O)NC": "amide_formation_like",

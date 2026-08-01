@@ -726,6 +726,25 @@ def test_review_exports_ambiguous_structural_pattern_candidates() -> None:
     assert row["reaction_pattern_requires_condition_evidence"] == "True"
 
 
+def test_review_exports_carbonyl_alpha_c_h_coupling_not_heck() -> None:
+    record = convert_record(
+        _raw(
+            "CC(=O)c1ccc(Br)cc1.O=C1CCCC1"
+            ">>CC(=O)c1ccc(C2CCCC2=O)cc1"
+        )
+    )
+
+    row = concise_reaction_review_row(record.to_dict())
+
+    assert row["primary_reaction_pattern"] == (
+        "carbonyl_alpha_c_h_sp2_c_c_coupling_like"
+    )
+    assert row["identified_reaction_type"] == (
+        "carbonyl_alpha_c_h_coupling"
+    )
+    assert "heck_coupling_like" not in row["reaction_pattern_matches"]
+
+
 def test_concise_review_formats_spectators_and_partner_environment() -> None:
     row = concise_reaction_review_row(
         {
