@@ -6,7 +6,6 @@ from typing import Dict, List, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_models import (
-    ReactionInterpretationCandidate,
     ReactionComponent,
     ReactionEdit,
     ReactionSpectatorGroup,
@@ -29,7 +28,7 @@ def _spectator_groups_from_atoms(
         if mol is None:
             continue
         consumed = set().union(*sites.values()) if sites else set()
-        for group in component.compound_analysis.functional_groups:
+        for group in component.molecule_analysis.interpretation.motifs:
             if consumed.intersection(group.atom_indices):
                 continue
             nearest_id = None
@@ -57,7 +56,7 @@ def _spectator_groups_from_atoms(
                             nearest_id, nearest_distance = site_id, distance
             spectators.append(
                 ReactionSpectatorGroup(
-                    group_id=group.group_id,
+                    group_id=group.motif_id,
                     chemist_label=group.chemist_label,
                     component_index=component.component_index,
                     atom_indices=group.atom_indices,
@@ -107,44 +106,4 @@ def derive_observed_spectator_groups(
     )
 
 
-def derive_spectator_groups(
-    components: Tuple[ReactionComponent, ...],
-    selected: ReactionInterpretationCandidate | None,
-    evidence_quality: str,
-    selected_events: Tuple[ReactionInterpretationCandidate, ...] = (),
-) -> Tuple[ReactionSpectatorGroup, ...]:
-    """Return substrate groups that do not intersect the selected site atoms."""
-    selections = (selected,) if selected is not None else selected_events
-    if not selections:
-        return ()
-    multi_event = len(selections) > 1
-    reactive_by_component: Dict[int, Dict[str, set[int]]] = {}
-    for candidate in selections:
-        for site in candidate.role_assignments.values():
-            site_atoms = {
-                index for indices in site.atom_roles.values() for index in indices
-            }
-            key = (
-                f"r{site.component_index}:{site.site_id}"
-                if multi_event
-                else site.site_id
-            )
-            reactive_by_component.setdefault(site.component_index, {})[key] = (
-                site_atoms
-            )
-    evidence = (
-        "exact_product_reconstruction_event_exclusion"
-        if evidence_quality in {
-            "exact_product_reconstruction",
-            "exact_multi_event_reconstruction",
-        }
-        else "selected_event_exclusion"
-    )
-    return _spectator_groups_from_atoms(
-        components,
-        reactive_by_component,
-        evidence=evidence,
-    )
-
-
-__all__ = ["derive_observed_spectator_groups", "derive_spectator_groups"]
+__all__ = ["derive_observed_spectator_groups"]

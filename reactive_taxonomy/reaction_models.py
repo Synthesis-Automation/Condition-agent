@@ -6,15 +6,16 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Literal, Optional, Tuple
 
 from .descriptors.models import SiteReactivityProfile
-from .models import CompoundAnalysis
+from .models import MoleculeAnalysis, MolecularStructureObservation
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "3.2"
-REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "2.0"
-REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.2"
-REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v8"
+REACTION_SIGNATURE_SCHEMA_VERSION = "3.4"
+REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "3.0"
+REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.4"
+REACTION_PATTERN_MATCH_SCHEMA_VERSION = "2.0"
+REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v10"
 REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
-REACTION_TOPOLOGY_SCHEMA_VERSION = "1.2"
+REACTION_TOPOLOGY_SCHEMA_VERSION = "2.0"
 
 EditArchetype = Literal[
     "substitution",
@@ -35,7 +36,6 @@ BondStateKind = Literal[
 ConnectivityObservationScope = Literal[
     "observed_product",
     "main_product_projection",
-    "exact_reconstruction",
     "correspondence_inference",
     "unresolved",
 ]
@@ -43,12 +43,43 @@ ConnectivityObservationScope = Literal[
 
 @dataclass(frozen=True)
 class ReactionComponent:
+    """Parsed reaction component with optional molecular annotations.
+
+    This composed component is used by the public analysis and interpretation
+    layers.  The structural observation receives ``ReactionStructureComponent``
+    instead, so site hypotheses and motif matches cannot leak into reaction
+    evidence or identity.
+    """
+
     side: Literal["reactant", "agent", "product"]
     component_index: int
     input_smiles: str
     canonical_smiles: str
     atom_mapped: bool
-    compound_analysis: CompoundAnalysis
+    molecule_analysis: MoleculeAnalysis
+
+    def structure_only(self) -> "ReactionStructureComponent":
+        """Project this component onto graph facts only."""
+        return ReactionStructureComponent(
+            side=self.side,
+            component_index=self.component_index,
+            input_smiles=self.input_smiles,
+            canonical_smiles=self.canonical_smiles,
+            atom_mapped=self.atom_mapped,
+            molecular_structure=self.molecule_analysis.structure,
+        )
+
+
+@dataclass(frozen=True)
+class ReactionStructureComponent:
+    """One reaction component containing only parsed molecular graph facts."""
+
+    side: Literal["reactant", "agent", "product"]
+    component_index: int
+    input_smiles: str
+    canonical_smiles: str
+    atom_mapped: bool
+    molecular_structure: MolecularStructureObservation
 
 
 @dataclass(frozen=True)
@@ -62,42 +93,6 @@ class ReactionSiteReference:
     availability: str
     atom_roles: Dict[str, Tuple[int, ...]]
     details: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass(frozen=True)
-class BondChange:
-    change_type: Literal["formed", "broken", "order_changed", "hydrogen_change"]
-    atom_1_role: str
-    atom_2_role: Optional[str]
-    old_order: Optional[str]
-    new_order: Optional[str]
-    evidence: str
-
-
-@dataclass(frozen=True)
-class PredictedStereoChange:
-    """Role-addressed stereochemical outcome emitted by a graph rewrite."""
-
-    stereo_type: Literal["atom", "bond"]
-    atom_1_role: str
-    atom_2_role: Optional[str]
-    old_descriptor: Optional[str]
-    new_descriptor: Optional[str]
-    change_type: Literal[
-        "retained", "inverted", "created", "destroyed", "descriptor_changed"
-    ]
-    evidence: str
-
-
-@dataclass(frozen=True)
-class RewriteOutcome:
-    """One deterministic constitutional outcome of a connectivity rewrite."""
-
-    outcome_id: str
-    predicted_product_smiles: Optional[str]
-    predicted_bond_changes: Tuple[BondChange, ...]
-    predicted_stereo_changes: Tuple[PredictedStereoChange, ...] = ()
-    warnings: Tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -439,26 +434,20 @@ class RenderedReactionLabel:
     detailed: str
     status: Literal[
         "observed_edits",
-        "exact_reconstruction",
-        "family_overlay",
         "generic_pattern",
         "conflicting_evidence",
         "multi_event",
         "ring_formation",
         "core_projection",
         "partial_product_correspondence",
-        "reactant_only",
-        "ambiguous_reactants",
-        "product_contradicted_reactants",
         "unavailable",
     ]
     source: Literal[
-        "verified_interpretation",
         "generic_topology",
+        "optional_pattern",
         "reaction_core",
         "literal_edits",
         "partial_product_correspondence",
-        "reactant_only",
         "unavailable",
     ]
     clauses: Tuple[ReactionLabelClause, ...]
@@ -469,17 +458,14 @@ class RenderedReactionLabel:
     definition_version: str
     structural_label: Optional[str] = None
     transformation_label: Optional[str] = None
-    interpretation_label: Optional[str] = None
-    family_label: Optional[str] = None
     pattern_id: Optional[str] = None
     pattern_definition_version: Optional[str] = None
-    interpretation_id: Optional[str] = None
     contextual_label: Optional[str] = None
     reactant_context_label: Optional[str] = None
     product_context_label: Optional[str] = None
     event_labels: Tuple[str, ...] = ()
     event_count: int = 0
-    schema_version: str = "3.0"
+    schema_version: str = "4.0"
 
 @dataclass(frozen=True)
 class ReactionSpectatorGroup:
@@ -528,20 +514,14 @@ class ReactionFamilyEnvironment:
 
 @dataclass(frozen=True)
 class ReactionPartner:
-    """Mechanism-neutral reaction partner with an optional interpreted role."""
+    """Graph-derived participating component with optional semantic role."""
 
     partner_id: str
     component_index: int
     role: Optional[str]
     role_confidence: float
-    reactive_site_ids: Tuple[str, ...]
-    handle_tokens: Tuple[str, ...]
     anchor_contexts: Tuple[str, ...]
     chemist_label: str
-    nearby_groups: Tuple[Dict[str, Any], ...] = ()
-    spectator_group_ids: Tuple[str, ...] = ()
-    flags: Tuple[str, ...] = ()
-    reactivity_profile: Optional[SiteReactivityProfile] = None
 
 
 @dataclass(frozen=True)
@@ -623,8 +603,6 @@ class ReactionTopology:
         "intramolecular", "intermolecular", "mixed", "unimolecular", "unresolved"
     ]
     participating_component_indices: Tuple[int, ...]
-    role_component_indices: Dict[str, int]
-    same_component_role_groups: Tuple[Tuple[str, ...], ...]
     formed_bond_scopes: Tuple[Literal["intramolecular", "intermolecular"], ...]
     reactant_tether_distances: Tuple[int, ...]
     formed_ring_sizes: Tuple[int, ...]
@@ -647,6 +625,7 @@ class ReactionEditHypothesis:
     stereo_changes: Tuple[ReactionStereoChange, ...]
     correspondence_count: int
     edit_cost: Tuple[int, int, int]
+    atom_correspondence: Tuple[Tuple[int, int, int, int], ...] = ()
     topology: Optional[ReactionTopology] = None
     warnings: Tuple[str, ...] = ()
     schema_version: str = "1.0"
@@ -703,7 +682,7 @@ class ReactionEvent:
     event_signature_key: str
     edits: Tuple[ReactionEdit, ...]
     partner_ids: Tuple[str, ...]
-    reactive_site_ids: Tuple[str, ...]
+    active_atom_ids: Tuple[str, ...]
     formed_bond_types: Tuple[str, ...]
     broken_bond_types: Tuple[str, ...]
     order_changes: Tuple[str, ...]
@@ -719,7 +698,7 @@ class ReactionEvent:
     evidence: str
     confidence: float
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "1.2"
+    schema_version: str = "2.0"
 
 
 @dataclass(frozen=True)
@@ -758,11 +737,6 @@ class ReactionFallbackDescriptor:
     reactant_group_tokens: Tuple[str, ...]
     product_group_tokens: Tuple[str, ...]
     context_tokens: Tuple[str, ...]
-    candidate_interpretation_tokens: Tuple[str, ...]
-    candidate_transformation_tokens: Tuple[str, ...]
-    candidate_handle_tokens: Tuple[str, ...]
-    candidate_edit_tokens: Tuple[str, ...]
-    candidate_hypothesis_tokens: Tuple[str, ...]
     verified_edit_tokens: Tuple[str, ...]
     reaction_center_core_tokens: Tuple[str, ...]
     reaction_center_radius_1_tokens: Tuple[str, ...]
@@ -810,7 +784,6 @@ class ReactionCoreAtomState:
     radical_electrons: int
     isotope: int
     neighbor_tokens: Tuple[str, ...]
-    functional_group_ids: Tuple[str, ...]
     concise_label: str
     state_key: str
 
@@ -924,7 +897,6 @@ class ReactionCoreRemoteSubgraph:
     fragment_heavy_atom_count: int
     fragment_heteroatom_count: int
     fragment_aromatic_atom_count: int
-    functional_group_ids: Tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -934,26 +906,6 @@ class ReactionCoreEvent:
     event_id: str
     transition_ids: Tuple[str, ...]
     edit_tokens: Tuple[str, ...]
-
-
-@dataclass(frozen=True)
-class ReactionCoreAbstraction:
-    """Broad graph-derived motif plus narrower environment limiters."""
-
-    motif_id: str
-    motif_key: str
-    general_label: str
-    limiter_label: str
-    motif_tokens: Tuple[str, ...]
-    limiter_tokens: Tuple[str, ...]
-
-    def __post_init__(self) -> None:
-        if not self.motif_id:
-            raise ValueError("reaction-core abstraction requires a motif ID")
-        if not self.motif_key.startswith("RCM1:"):
-            raise ValueError("motif_key must use the RCM1 namespace")
-        if not self.motif_tokens:
-            raise ValueError("reaction-core abstraction requires motif tokens")
 
 
 @dataclass(frozen=True)
@@ -975,7 +927,6 @@ class ReactionCoreProjection:
     generic_label: str
     presentation: ReactionCorePresentation
     quality: ReactionCoreQuality
-    abstraction: Optional[ReactionCoreAbstraction]
     active_atom_count: int
     event_count: int
     evidence: str
@@ -1053,39 +1004,30 @@ class ReactionSignature:
 
 
 @dataclass(frozen=True)
-class ReactionReconstructionCandidate:
-    """Interpretation-independent operator proposal for one reported product."""
+class ReactionPatternMatch:
+    """One optional interpretation supported by an existing observation."""
 
-    rule_id: str
-    operator_id: str
-    rewrite_outcome_id: str
-    edit_archetype: EditArchetype
-    slot_assignments: Dict[str, ReactionSiteReference]
-    predicted_bond_changes: Tuple[BondChange, ...]
-    predicted_product_smiles: Optional[str]
-    verification: str
-    predicted_stereo_changes: Tuple[PredictedStereoChange, ...] = ()
-    warnings: Tuple[str, ...] = ()
-    schema_version: str = "1.0"
-
-
-@dataclass(frozen=True)
-class ReactionInterpretationCandidate:
-    """Optional semantic annotation over one structural reconstruction."""
-
-    annotation_id: str
-    rewrite_outcome_id: str
-    edit_archetype: EditArchetype
-    transformation_class: str
-    role_assignments: Dict[str, ReactionSiteReference]
-    predicted_bond_changes: Tuple[BondChange, ...]
-    predicted_product_smiles: Optional[str]
-    verification: str
-    interpretation_label: Optional[str]
-    predicted_stereo_changes: Tuple[PredictedStereoChange, ...] = ()
+    pattern_id: str
+    tier: Literal["generic", "synthesis"]
+    confidence: float
+    specificity: int
+    display_importance: int
+    matched_edit_indices: Tuple[int, ...]
+    evidence: Tuple[str, ...]
+    display_label: Optional[str] = None
     compatible_named_families: Tuple[str, ...] = ()
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "1.0"
+    schema_version: str = REACTION_PATTERN_MATCH_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if not self.pattern_id:
+            raise ValueError("reaction pattern requires an ID")
+        if not 0.0 <= self.confidence <= 1.0:
+            raise ValueError("reaction pattern confidence must be between 0 and 1")
+        if self.specificity < 0 or self.display_importance < 0:
+            raise ValueError("reaction pattern ranking values cannot be negative")
+        if tuple(sorted(set(self.matched_edit_indices))) != self.matched_edit_indices:
+            raise ValueError("reaction pattern edit indices must be unique and sorted")
 
 
 @dataclass(frozen=True)
@@ -1094,9 +1036,9 @@ class ReactionObservation:
 
     input_reaction_smiles: str
     valid: bool
-    reactants: Tuple[ReactionComponent, ...] = ()
-    agents: Tuple[ReactionComponent, ...] = ()
-    products: Tuple[ReactionComponent, ...] = ()
+    reactants: Tuple[ReactionStructureComponent, ...] = ()
+    agents: Tuple[ReactionStructureComponent, ...] = ()
+    products: Tuple[ReactionStructureComponent, ...] = ()
     edits: Tuple[ReactionEdit, ...] = ()
     stereo_changes: Tuple[ReactionStereoChange, ...] = ()
     evidence_quality: str = "unresolved"
@@ -1105,16 +1047,12 @@ class ReactionObservation:
     evidence_candidates: Tuple[ReactionEvidenceCandidate, ...] = ()
     edit_hypotheses: Tuple[ReactionEditHypothesis, ...] = ()
     mapped_bond_changes: Tuple[Dict[str, Any], ...] = ()
-    reconstruction_candidates: Tuple[ReactionReconstructionCandidate, ...] = ()
-    selected_reconstruction: Optional[ReactionReconstructionCandidate] = None
-    selected_reconstruction_events: Tuple[ReactionReconstructionCandidate, ...] = ()
-    spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
     topology: Optional[ReactionTopology] = None
     completeness: Optional[ReactionCompletenessAssessment] = None
     core: Optional[ReactionCoreProjection] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "2.0"
+    schema_version: str = "3.0"
 
     def __post_init__(self) -> None:
         if not 0.0 <= self.evidence_confidence <= 1.0:
@@ -1127,23 +1065,26 @@ class ReactionObservation:
 class ReactionInterpretation:
     """Optional semantic and family interpretation of an observation."""
 
-    candidates: Tuple[ReactionInterpretationCandidate, ...] = ()
-    selected_candidate: Optional[ReactionInterpretationCandidate] = None
-    selected_events: Tuple[ReactionInterpretationCandidate, ...] = ()
+    pattern_matches: Tuple[ReactionPatternMatch, ...] = ()
+    primary_pattern_id: Optional[str] = None
     partners: Tuple[ReactionPartner, ...] = ()
     compatible_named_families: Tuple[str, ...] = ()
     named_family: Optional[str] = None
     family_environment: Optional[ReactionFamilyEnvironment] = None
     product_connection: Optional[ProductConnection] = None
+    spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
     evidence_quality: str = "unresolved"
     warnings: Tuple[str, ...] = ()
-    schema_version: str = "3.0"
+    schema_version: str = "5.0"
 
     def __post_init__(self) -> None:
         if self.named_family and self.named_family not in (
             self.compatible_named_families
         ):
             raise ValueError("named family must be one compatible family")
+        pattern_ids = {pattern.pattern_id for pattern in self.pattern_matches}
+        if self.primary_pattern_id and self.primary_pattern_id not in pattern_ids:
+            raise ValueError("primary pattern must refer to a matched pattern")
 
 
 @dataclass(frozen=True)
@@ -1153,9 +1094,6 @@ class ReactionAnalysis:
     reactants: Tuple[ReactionComponent, ...] = ()
     agents: Tuple[ReactionComponent, ...] = ()
     products: Tuple[ReactionComponent, ...] = ()
-    candidates: Tuple[ReactionInterpretationCandidate, ...] = ()
-    selected_candidate: Optional[ReactionInterpretationCandidate] = None
-    selected_events: Tuple[ReactionInterpretationCandidate, ...] = ()
     edit_archetype: EditArchetype = "unresolved"
     transformation_class: Optional[str] = None
     compatible_named_families: Tuple[str, ...] = ()
@@ -1178,7 +1116,7 @@ class ReactionAnalysis:
     interpretation: Optional[ReactionInterpretation] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "7.0"
+    schema_version: str = "9.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -1189,13 +1127,11 @@ __all__ = [
     "BondState",
     "BondStateKind",
     "BondTransition",
-    "BondChange",
     "ConnectivityEditGraph",
     "ConnectivityObservationScope",
     "EditArchetype",
     "FragmentSourceRequirement",
     "HydrogenDelta",
-    "RewriteOutcome",
     "PartialProductTransformation",
     "ProductAtomProvenance",
     "ProductFragmentAttachment",
@@ -1212,13 +1148,12 @@ __all__ = [
     "REACTION_TOPOLOGY_SCHEMA_VERSION",
     "ReactionAnalysis",
     "ReactionAtomReference",
-    "ReactionInterpretationCandidate",
     "ReactionCompletenessAssessment",
     "ReactionComponent",
+    "ReactionStructureComponent",
     "ReactionCoreAtomState",
     "ReactionCoreAtomTransition",
     "ReactionCoreAttachmentPort",
-    "ReactionCoreAbstraction",
     "ReactionCoreEvent",
     "ReactionCoreProjection",
     "ReactionCoreRemoteClass",
@@ -1235,7 +1170,7 @@ __all__ = [
     "ReactionInterpretation",
     "ReactionObservation",
     "ReactionPartner",
-    "ReactionReconstructionCandidate",
+    "ReactionPatternMatch",
     "ReactionPartnerEnvironment",
     "ReactionRingChange",
     "ReactionSignature",

@@ -8,7 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Literal, Optional
 
-from .api import featurize_molecule
+from .api import analyze_molecule
 from .validation import validate_taxonomy
 
 
@@ -119,17 +119,17 @@ def validate_source_label_mappings() -> list[str]:
         in load_contextual_source_label_mappings().items()
     )
     for source, mapping in mappings:
-        analysis = featurize_molecule(
+        analysis = analyze_molecule(
             mapping.representative_smiles,
             label_style="hte_legacy",
         )
         environments = {
-            environment.site_id: environment
-            for environment in analysis.site_environments
+            environment.hypothesis_id: environment
+            for environment in analysis.reactive_site_environments
         }
         matches = [
-            (site, environments[site.site_id])
-            for site in analysis.sites
+            (site, environments[site.hypothesis_id])
+            for site in analysis.reactive_site_hypotheses
             if (
                 site.canonical_signature == mapping.canonical_signature
                 if mapping.signature_scope == "exact"
@@ -137,7 +137,7 @@ def validate_source_label_mappings() -> list[str]:
                     f"{mapping.canonical_signature}|"
                 )
             )
-            and site.site_id in environments
+            and site.hypothesis_id in environments
         ]
         if not analysis.valid or len(matches) != 1:
             errors.append(f"{source}:signature")

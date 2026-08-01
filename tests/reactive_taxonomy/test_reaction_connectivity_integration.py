@@ -2,8 +2,7 @@ from reactive_taxonomy import featurize_reaction
 from reactive_taxonomy.reaction_edits import (
     normalize_inferred_scaffold_edits,
     normalize_mapped_edits,
-    normalize_predicted_edits,
-    resolve_reaction_evidence,
+    resolve_structural_evidence,
 )
 from reactive_taxonomy.reaction_parser import parse_reaction_smiles
 
@@ -120,10 +119,9 @@ def test_formal_charge_change_is_retained_as_atom_state() -> None:
 def test_charge_only_mapping_survives_internal_normalization() -> None:
     parsed = parse_reaction_smiles("[Na:1]>>[Na+:1]")
     assert parsed.valid
-    normalized = resolve_reaction_evidence(
+    normalized = resolve_structural_evidence(
         parsed.reactants,
         parsed.products,
-        None,
     )
     graph = normalized.connectivity_edit_graph
     assert graph is not None
@@ -182,38 +180,29 @@ def test_shadow_key_ignores_component_order_and_atom_map_values() -> None:
     )
 
 
-def test_exact_operator_reconstruction_keeps_reconstruction_scope() -> None:
+def test_split_reagent_addition_uses_correspondence_scope() -> None:
     analysis = featurize_reaction("C=C.BrBr>>BrCCBr")
-    assert analysis.selected_candidate is not None
-    normalized = normalize_predicted_edits(
-        analysis.selected_candidate,
-        analysis.reactants,
-    )
-    graph = normalized.connectivity_edit_graph
+    assert analysis.observation is not None
+    graph = analysis.observation.connectivity_edit_graph
     assert graph is not None
-
-    assert normalized.evidence == "exact_product_reconstruction"
+    assert analysis.evidence_quality == "global_atom_correspondence"
     assert {
         transition.observation_scope for transition in graph.bond_transitions
-    } == {"exact_reconstruction"}
+    } == {"correspondence_inference"}
 
 
-def test_hydrosilane_reconstruction_uses_hydrogen_delta_not_mapped_h() -> None:
+def test_hydrosilane_correspondence_uses_hydrogen_delta_not_mapped_h() -> None:
     analysis = featurize_reaction(
         "C=C.C[SiH](C)C>>CC[Si](C)(C)C"
     )
-    assert analysis.selected_candidate is not None
-    normalized = normalize_predicted_edits(
-        analysis.selected_candidate,
-        analysis.reactants,
-    )
-    graph = normalized.connectivity_edit_graph
+    assert analysis.observation is not None
+    graph = analysis.observation.connectivity_edit_graph
     assert graph is not None
 
     assert len(graph.hydrogen_deltas) == 2
     assert {delta.delta_count for delta in graph.hydrogen_deltas} == {-1, 1}
     assert all(
-        delta.observation_scope == "exact_reconstruction"
+        delta.observation_scope == "correspondence_inference"
         for delta in graph.hydrogen_deltas
     )
     assert all(

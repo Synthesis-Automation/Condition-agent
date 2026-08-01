@@ -137,7 +137,7 @@ def build_reactivity_modifiers(
     coordinating = tuple(
         sorted(
             {
-                str(group.get("group_id") or "")
+                str(group.get("motif_id") or "")
                 for group in nearby_groups
                 if set(group.get("tags") or ())
                 & {"strong_metal_binding", "palladium_poisoning"}
@@ -151,7 +151,7 @@ def build_reactivity_modifiers(
                 modifier_type="coordination",
                 modifier_id="nearby_coordination",
                 class_name="potential_catalyst_coordination",
-                attributes=(("group_ids", ",".join(coordinating)),),
+                attributes=(("motif_ids", ",".join(coordinating)),),
                 evidence=DescriptorEvidence(
                     source="functional_group_detection",
                     method="nearby_group_modifier_v1",

@@ -334,8 +334,6 @@ def _remote_context_label(subgraph: ReactionCoreRemoteSubgraph) -> str:
     details = []
     if subgraph.fragment_smiles:
         details.append(subgraph.fragment_smiles)
-    if subgraph.functional_group_ids:
-        details.append("groups=" + ",".join(subgraph.functional_group_ids))
     return f"{label} ({'; '.join(details)})" if details else label
 
 

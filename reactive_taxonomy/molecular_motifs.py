@@ -1,4 +1,4 @@
-"""Taxonomy-driven detection of general substrate functional groups."""
+"""Definition-driven, non-exclusive molecular motif annotations."""
 
 from __future__ import annotations
 
@@ -8,14 +8,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 from .chemistry.smarts_cache import compile_smarts
-from .models import FunctionalGroup
+from .models import MolecularMotifMatch
 
-_PATH = Path(__file__).with_name("definitions") / "functional_groups.v1.json"
+_PATH = Path(__file__).with_name("definitions") / "molecular_motifs.v1.json"
 
 
 @lru_cache(maxsize=1)
-def load_functional_group_definitions() -> Tuple[Dict[str, Any], ...]:
-    """Load ordered functional-group definitions."""
+def load_molecular_motif_definitions() -> Tuple[Dict[str, Any], ...]:
+    """Load ordered molecular-motif definitions."""
     with _PATH.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
     return tuple(sorted(
@@ -24,11 +24,11 @@ def load_functional_group_definitions() -> Tuple[Dict[str, Any], ...]:
     ))
 
 
-def detect_functional_groups(mol: Any, component_index: int) -> List[FunctionalGroup]:
-    """Detect deduplicated functional groups in one molecular component."""
-    candidates: List[Tuple[Dict[str, Any], FunctionalGroup]] = []
+def detect_molecular_motifs(mol: Any, component_index: int) -> List[MolecularMotifMatch]:
+    """Detect deduplicated molecular motifs in one component."""
+    candidates: List[Tuple[Dict[str, Any], MolecularMotifMatch]] = []
     seen = set()
-    for definition in load_functional_group_definitions():
+    for definition in load_molecular_motif_definitions():
         raw_patterns = definition.get("smarts") or ""
         patterns = raw_patterns if isinstance(raw_patterns, list) else [raw_patterns]
         for smarts in patterns:
@@ -46,8 +46,8 @@ def detect_functional_groups(mol: Any, component_index: int) -> List[FunctionalG
                     continue
                 seen.add(key)
                 anchor_position = map_positions.get(1, 0)
-                candidates.append((definition, FunctionalGroup(
-                    group_id=str(definition["id"]),
+                candidates.append((definition, MolecularMotifMatch(
+                    motif_id=str(definition["id"]),
                     chemist_label=str(definition.get("label") or definition["id"]),
                     component_index=component_index,
                     atom_indices=atoms,
@@ -55,11 +55,11 @@ def detect_functional_groups(mol: Any, component_index: int) -> List[FunctionalG
                     tags=tuple(str(tag) for tag in definition.get("tags", [])),
                     matched_pattern=str(smarts),
                 )))
-    retained: List[Tuple[Dict[str, Any], FunctionalGroup]] = []
+    retained: List[Tuple[Dict[str, Any], MolecularMotifMatch]] = []
     for definition, candidate in candidates:
         candidate_atoms = set(candidate.atom_indices)
         suppressed = any(
-            candidate.group_id in set(owner_definition.get("suppresses_on_overlap") or [])
+            candidate.motif_id in set(owner_definition.get("suppresses_on_overlap") or [])
             and bool(candidate_atoms.intersection(owner.atom_indices))
             for owner_definition, owner in retained
         )
@@ -68,4 +68,4 @@ def detect_functional_groups(mol: Any, component_index: int) -> List[FunctionalG
     return [group for _, group in retained]
 
 
-__all__ = ["detect_functional_groups", "load_functional_group_definitions"]
+__all__ = ["detect_molecular_motifs", "load_molecular_motif_definitions"]

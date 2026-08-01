@@ -1,24 +1,17 @@
 {
   "schema_version": "2.0",
-  "policy_id": "generic_admission.v1",
+  "policy_id": "generic_admission.v3.0",
   "valid_yield_range": [0.0, 100.0],
   "verified_evidence": [
-    "exact_product_reconstruction",
-    "exact_multi_event_reconstruction",
     "validated_atom_mapping",
-    "validated_mapping_and_exact_reconstruction",
-    "validated_mapping_and_exact_multi_event_reconstruction"
-  ],
-  "indexable_review_evidence": [
     "fragmented_scaffold_correspondence",
     "global_atom_correspondence",
     "unique_scaffold_correspondence"
   ],
+  "indexable_review_evidence": [],
   "external_mapping_review_evidence": [
     "external_atom_mapping",
-    "external_mapping_internal_consensus",
-    "external_mapping_and_exact_reconstruction",
-    "external_mapping_and_exact_multi_event_reconstruction"
+    "external_mapping_internal_consensus"
   ],
   "external_mapping_review_warnings": [
     "EXTERNAL_MAPPING_HYPOTHESIS_CONFLICT",

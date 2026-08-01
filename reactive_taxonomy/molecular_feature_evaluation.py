@@ -9,7 +9,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Sequence
 
-from .api import featurize_molecule
+from .api import analyze_molecule
 from .validation import validate_taxonomy
 
 _DEFAULT_BENCHMARK = (
@@ -61,10 +61,10 @@ def _overlap(expected: Counter[Any], observed: Counter[Any]) -> int:
 
 
 def _environment_by_signature(result: Any) -> Dict[str, list[Any]]:
-    environments = {item.site_id: item for item in result.site_environments}
+    environments = {item.hypothesis_id: item for item in result.reactive_site_environments}
     grouped: Dict[str, list[Any]] = {}
-    for site in result.sites:
-        environment = environments.get(site.site_id)
+    for site in result.reactive_site_hypotheses:
+        environment = environments.get(site.hypothesis_id)
         if environment is not None:
             grouped.setdefault(site.canonical_signature, []).append(environment)
     return grouped
@@ -169,7 +169,9 @@ def _check_environment(
                 "electronic.class: expected "
                 f"{expected_electronic!r}, observed {electronic.get('class')!r}"
             )
-        nearby = {str(group.get("group_id")) for group in environment.nearby_groups}
+        nearby = {
+            str(group.get("motif_id")) for group in environment.nearby_motifs
+        }
         missing_nearby = set(expectation.get("nearby_group_ids_present") or ()) - nearby
         if missing_nearby:
             candidate_failures.append(
@@ -182,10 +184,10 @@ def _check_environment(
 
 
 def _feature_fingerprint(result: Any) -> Dict[str, Any]:
-    environments = {item.site_id: item for item in result.site_environments}
+    environments = {item.hypothesis_id: item for item in result.reactive_site_environments}
     environment_tokens = []
-    for site in result.sites:
-        environment = environments.get(site.site_id)
+    for site in result.reactive_site_hypotheses:
+        environment = environments.get(site.hypothesis_id)
         if environment is None:
             continue
         profile = environment.reactivity_profile
@@ -205,8 +207,8 @@ def _feature_fingerprint(result: Any) -> Dict[str, Any]:
         )
         nearby = tuple(
             sorted(
-                (str(group.get("group_id")), int(group.get("distance", -1)))
-                for group in environment.nearby_groups
+                (str(group.get("motif_id")), int(group.get("distance", -1)))
+                for group in environment.nearby_motifs
             )
         )
         steric, electronic = _benchmark_environment_projection(environment)
@@ -221,8 +223,8 @@ def _feature_fingerprint(result: Any) -> Dict[str, Any]:
             )
         )
     return {
-        "groups": sorted(_counter(group.group_id for group in result.functional_groups).items()),
-        "sites": sorted(_counter(site.canonical_signature for site in result.sites).items()),
+        "groups": sorted(_counter(group.motif_id for group in result.motifs).items()),
+        "sites": sorted(_counter(site.canonical_signature for site in result.reactive_site_hypotheses).items()),
         "environments": sorted(environment_tokens),
     }
 
@@ -238,12 +240,12 @@ def _draw_svg(smiles: str, result: Any) -> str:
         return "<p class='invalid'>Structure could not be rendered</p>"
     site_atoms = {
         int(index)
-        for site in result.sites
+        for site in result.reactive_site_hypotheses
         for index in site.atom_indices
     }
     group_atoms = {
         int(index)
-        for group in result.functional_groups
+        for group in result.motifs
         for index in group.atom_indices
     }
     highlighted = sorted(site_atoms | group_atoms)
@@ -297,7 +299,7 @@ code { background: #f4f6f7; padding: 0.2rem 0.4rem; }
 .invalid { color: #a93226; font-weight: bold; }
 </style></head><body><h1>Phase 1 molecular-feature chemist review</h1>
 <p>This report intentionally omits benchmark expectations. Review atom highlights,
-functional groups, reactive sites, sterics, electronic context, and missing features
+molecular motifs, reactive-site hypotheses, sterics, electronic context, and missing features
 without using the automated answer key.</p>""" + "".join(cards) + "</body></html>\n"
 
 
@@ -326,13 +328,13 @@ def evaluate_molecular_features(
         str(partition): Counter() for partition in benchmark["partitions"]
     }
     for case in benchmark["cases"]:
-        result = featurize_molecule(str(case["smiles"]))
-        repeated = featurize_molecule(str(case["smiles"]))
+        result = analyze_molecule(str(case["smiles"]))
+        repeated = analyze_molecule(str(case["smiles"]))
         deterministic += int(result.to_dict() == repeated.to_dict())
         expected_groups = _expected_counter(case.get("expected_group_counts") or {})
-        observed_groups = _counter(group.group_id for group in result.functional_groups)
+        observed_groups = _counter(group.motif_id for group in result.motifs)
         expected_sites = _expected_counter(case.get("expected_site_counts") or {})
-        observed_sites = _counter(site.canonical_signature for site in result.sites)
+        observed_sites = _counter(site.canonical_signature for site in result.reactive_site_hypotheses)
         group_expected += sum(expected_groups.values())
         group_observed += sum(observed_groups.values())
         group_true_positive += _overlap(expected_groups, observed_groups)
@@ -351,7 +353,7 @@ def evaluate_molecular_features(
             baseline_fingerprint = _feature_fingerprint(result)
             for equivalent in case.get("equivalent_smiles") or ():
                 invariant_total += 1
-                equivalent_result = featurize_molecule(str(equivalent))
+                equivalent_result = analyze_molecule(str(equivalent))
                 passed = (
                     equivalent_result.valid
                     and _feature_fingerprint(equivalent_result) == baseline_fingerprint
@@ -362,13 +364,13 @@ def evaluate_molecular_features(
         validity_passed = result.valid == bool(case["expected_valid"])
         error_passed = (
             case.get("expected_error") is None
-            or result.error == case.get("expected_error")
+            or result.structure.error == case.get("expected_error")
         )
         groups_passed = observed_groups == expected_groups
         sites_passed = observed_sites == expected_sites
         atom_failures = []
         observed_atoms: Dict[str, Counter[tuple[int, ...]]] = {}
-        for site in result.sites:
+        for site in result.reactive_site_hypotheses:
             observed_atoms.setdefault(site.canonical_signature, Counter())[
                 tuple(sorted(int(index) for index in site.atom_indices))
             ] += 1
@@ -410,15 +412,15 @@ def evaluate_molecular_features(
                 ),
                 "nearby_groups": [
                     {
-                        "group_id": group.get("group_id"),
+                        "motif_id": group.get("motif_id"),
                         "distance": group.get("distance"),
                     }
-                    for group in environment.nearby_groups
+                    for group in environment.nearby_motifs
                 ],
             }
-            for site in result.sites
-            for environment in result.site_environments
-            if environment.site_id == site.site_id
+            for site in result.reactive_site_hypotheses
+            for environment in result.reactive_site_environments
+            if environment.hypothesis_id == site.hypothesis_id
             and site.site_type != "aromatic_CH"
         ]
         case_result = {
@@ -434,7 +436,7 @@ def evaluate_molecular_features(
             "environment_failures": environment_failures,
             "invariance_failures": invariance_failures,
             "case_passed": case_passed,
-            "error": result.error,
+            "error": result.structure.error,
         }
         case_results.append(case_result)
         partition_counts[case_result["partition"]]["total"] += 1
@@ -452,7 +454,7 @@ def evaluate_molecular_features(
                     f"{key} ({count})"
                     for key, count in sorted(
                         _counter(
-                            group.chemist_label for group in result.functional_groups
+                            group.chemist_label for group in result.motifs
                         ).items()
                     )
                 ),
@@ -462,7 +464,7 @@ def evaluate_molecular_features(
                 "detected_site_labels": "; ".join(
                     f"{key} ({count})"
                     for key, count in sorted(
-                        _counter(site.chemist_label for site in result.sites).items()
+                        _counter(site.chemist_label for site in result.reactive_site_hypotheses).items()
                     )
                 ),
                 "detected_environments": json.dumps(

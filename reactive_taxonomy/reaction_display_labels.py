@@ -11,7 +11,6 @@ from typing import Any, Iterable, Optional, Sequence, Tuple
 
 from .reaction_contextual_labels import ContextualTransformationLabel
 from .reaction_label_patterns import match_reaction_label_pattern
-from .reaction_labels import load_fragment_context_symbols
 from .reaction_models import (
     RenderedReactionLabel,
     ReactionComponent,
@@ -35,6 +34,19 @@ def load_reaction_label_rendering() -> dict[str, Any]:
     if payload.get("schema_version") != "2.0":
         raise ValueError("Unsupported reaction-label rendering schema")
     return dict(payload)
+
+
+def _fragment_context_symbols() -> tuple[str, ...]:
+    """Return generic fragments eligible for reaction-local indexing."""
+    values = (
+        load_reaction_label_rendering().get("fragment_context_symbols") or ()
+    )
+    return tuple(
+        sorted(
+            {str(value) for value in values},
+            key=lambda value: (-len(value), value),
+        )
+    )
 
 
 def _style(name: str) -> dict[str, str]:
@@ -310,7 +322,7 @@ def _render_fragment_indices(text: str, *, style: str) -> str:
     """Render reaction-local generic fragment indices as Unicode superscripts."""
     if _style(style).get("fragment_index_format") != "superscript":
         return text
-    symbols = load_fragment_context_symbols()
+    symbols = _fragment_context_symbols()
     if not symbols:
         return text
     symbol_pattern = "|".join(re.escape(symbol) for symbol in symbols)
@@ -415,14 +427,7 @@ def _core_display_parts(
     styling = _style(style)
     presentation = reaction_core.presentation
     atom_equation = _render_core_text(presentation.equation, style=style)
-    concise = _render_core_text(
-        (
-            reaction_core.abstraction.general_label
-            if reaction_core.abstraction is not None
-            else reaction_core.generic_label
-        ),
-        style=style,
-    )
+    concise = _render_core_text(reaction_core.generic_label, style=style)
     sections = [
         str(templates["core_projection"]).format(equation=atom_equation),
     ]
@@ -489,58 +494,17 @@ def _core_should_lead(
     """Prefer a trustworthy, materially richer core over a generic edit label."""
     if reaction_core is None or reaction_core.quality.status == "blocked":
         return False
-    if reaction_core.abstraction is not None:
-        return True
     return (
         reaction_core.quality.status == "pass"
         and _core_adds_context(base_label, reaction_core.generic_label)
     )
 
 
-def _strip_terminal_arrow(label: str, *, style: str) -> str:
-    """Remove a renderer-internal unresolved-product arrow from reactant text."""
-    arrows = ("→", "->") if style == "unicode" else ("->", "→")
-    stripped = label.rstrip()
-    for arrow in arrows:
-        if stripped.endswith(arrow):
-            return stripped[: -len(arrow)].rstrip()
-    return stripped
-
-
-def _render_unresolved_reactants(
-    fallback_label: str,
-    *,
-    fallback_status: str,
-    style: str,
-    rendering: dict[str, Any],
-) -> tuple[str, str, str]:
-    """Render unresolved reactants without implying an unobserved product."""
-    templates = rendering["templates"]
-    reactants = _strip_terminal_arrow(fallback_label, style=style)
-    status = (
-        fallback_status
-        if fallback_status
-        in {
-            "reactant_only",
-            "ambiguous_reactants",
-            "product_contradicted_reactants",
-        }
-        else "reactant_only"
-    )
-    concise = str(templates[status]).format(reactants=reactants)
-    detail = str(templates[f"{status}_detail"])
-    return concise, detail, reactants
-
-
 def _build_reaction_label(
     *,
     reactants: Sequence[ReactionComponent],
     edits: Sequence[ReactionEdit],
-    selected_label: Optional[str],
-    selected_exact: bool,
-    interpretation_id: Optional[str],
     contextual_label: Optional[ContextualTransformationLabel],
-    named_family: Optional[str],
     fallback_label: Optional[str],
     fallback_status: str,
     evidence: str,
@@ -548,6 +512,8 @@ def _build_reaction_label(
     events: Sequence[ReactionEvent] = (),
     topology: Optional[ReactionTopology] = None,
     reaction_core: Optional[ReactionCoreProjection] = None,
+    interpretation_pattern_label: Optional[str] = None,
+    interpretation_pattern_id: Optional[str] = None,
     warnings: Iterable[str] = (),
     style: str = "unicode",
     fallback_detailed_label: Optional[str] = None,
@@ -571,20 +537,6 @@ def _build_reaction_label(
     )
     structural_label = concise_clauses or None
     transformation_label = pattern.label if pattern else None
-    interpretation_label = (
-        selected_label if selected_exact and selected_label else None
-    )
-    exact_display_label = selected_label
-    if (
-        selected_exact
-        and contextual_label is not None
-        and interpretation_id is not None
-    ):
-        from .reaction_labels import load_reaction_rendering
-
-        rule = load_reaction_rendering().get(interpretation_id) or {}
-        if bool(rule.get("prefer_contextual_label")):
-            exact_display_label = contextual_label.concise
     rendered_event_labels: tuple[str, ...] = ()
     ring_change = next(
         (
@@ -632,14 +584,6 @@ def _build_reaction_label(
         transformation_label = concise
         status = "multi_event"
         source = "literal_edits"
-    elif selected_exact and exact_display_label:
-        concise = exact_display_label
-        detailed = str(rendering["templates"]["exact_detail"]).format(
-            label=exact_display_label,
-            clauses=detailed_clauses or "none",
-        )
-        status = "family_overlay" if named_family else "exact_reconstruction"
-        source = "verified_interpretation"
     elif ring_display is not None:
         concise = ring_display.concise
         detailed = ring_display.detailed
@@ -647,6 +591,15 @@ def _build_reaction_label(
         transformation_label = ring_display.concise
         status = "ring_formation"
         source = "generic_topology"
+    elif interpretation_pattern_label and clauses:
+        concise = interpretation_pattern_label
+        detailed = str(rendering["templates"]["exact_detail"]).format(
+            label=concise,
+            clauses=detailed_clauses,
+        )
+        transformation_label = concise
+        status = "generic_pattern"
+        source = "optional_pattern"
     elif pattern is not None:
         pattern_concise = (
             contextual_label.concise
@@ -739,47 +692,6 @@ def _build_reaction_label(
             )
             status = "observed_edits"
             source = "literal_edits"
-    elif fallback_label and fallback_status in {
-        "reactant_only",
-        "ambiguous_reactants",
-        "product_contradicted_reactants",
-    }:
-        unresolved_concise, unresolved_detail, reactant_text = (
-            _render_unresolved_reactants(
-                fallback_label,
-                fallback_status=fallback_status,
-                style=style,
-                rendering=rendering,
-            )
-        )
-        status = fallback_status
-        if core_display is not None:
-            assert reaction_core is not None
-            core_concise, core_detailed = core_display
-            concise = _core_primary_label(
-                reaction_core,
-                core_concise,
-                rendering=rendering,
-            )
-            detailed = styling["separator"].join(
-                (
-                    concise,
-                    core_detailed,
-                    str(rendering["templates"]["reactant_candidates"]).format(
-                        reactants=reactant_text
-                    ),
-                    unresolved_detail,
-                )
-            )
-            structural_label = reaction_core.generic_label
-            transformation_label = core_concise
-            source = "reaction_core"
-        else:
-            concise = unresolved_concise
-            detailed = styling["separator"].join(
-                (unresolved_concise, unresolved_detail)
-            )
-            source = "reactant_only"
     elif fallback_status == "partial_product_correspondence" and fallback_label:
         concise = fallback_label
         detailed = fallback_detailed_label or fallback_label
@@ -803,25 +715,8 @@ def _build_reaction_label(
     elif fallback_label:
         concise = fallback_label
         detailed = fallback_detailed_label or fallback_label
-        status = (
-            fallback_status
-            if fallback_status
-            in {
-                "partial_product_correspondence",
-                "reactant_only",
-                "ambiguous_reactants",
-                "product_contradicted_reactants",
-            }
-            else "unavailable"
-        )
-        if status in {
-            "reactant_only",
-            "ambiguous_reactants",
-            "product_contradicted_reactants",
-        }:
-            source = "reactant_only"
-        else:
-            source = "unavailable"
+        status = "unavailable"
+        source = "unavailable"
     else:
         return None
     if (
@@ -829,10 +724,7 @@ def _build_reaction_label(
         and source != "reaction_core"
         and status != "conflicting_evidence"
         and reaction_core is not None
-        and (
-            reaction_core.abstraction is not None
-            or _core_adds_context(concise, core_display[0])
-        )
+        and _core_adds_context(concise, core_display[0])
     ):
         detailed = styling["separator"].join((detailed, core_display[1]))
     label_evidence = evidence
@@ -867,12 +759,15 @@ def _build_reaction_label(
         definition_version=str(rendering["label_schema_version"]),
         structural_label=structural_label,
         transformation_label=transformation_label,
-        interpretation_label=interpretation_label,
-        family_label=named_family,
-        pattern_id=pattern.pattern_id if pattern else None,
-        pattern_definition_version=pattern.definition_version if pattern else None,
-        interpretation_id=(
-            interpretation_id if interpretation_label else None
+        pattern_id=(
+            interpretation_pattern_id
+            if interpretation_pattern_label
+            else pattern.pattern_id if pattern else None
+        ),
+        pattern_definition_version=(
+            "2.0"
+            if interpretation_pattern_label
+            else pattern.definition_version if pattern else None
         ),
         contextual_label=contextual_label.concise if contextual_label else None,
         reactant_context_label=contextual_label.before if contextual_label else None,

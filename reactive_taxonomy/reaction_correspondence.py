@@ -544,6 +544,75 @@ def infer_global_correspondence_candidates(
             product,
             max_matches=max_component_matches,
         )
+        # Retain bounded one-atom-loss alternatives.  Maximum common
+        # substructure matching otherwise forces a leaving atom to consume the
+        # product atom that should be assigned to another partner (for example
+        # choosing which alcohol oxygen survives an etherification).  These are
+        # correspondence hypotheses only; minimum-edit consensus decides which
+        # alternative, if any, is usable.
+        if candidates:
+            partial = []
+            for mapping in candidates:
+                if len(mapping) < 2:
+                    continue
+                for removed_index in range(len(mapping)):
+                    partial.append(
+                        mapping[:removed_index] + mapping[removed_index + 1 :]
+                    )
+                    if len(partial) >= max_component_matches:
+                        break
+                if len(partial) >= max_component_matches:
+                    break
+            candidates = tuple(sorted(set(candidates).union(partial)))
+        # A small connected reagent may become disconnected in the product
+        # (Br-Br addition is the simplest example).  MCS matching can map only
+        # one resulting fragment.  Add a bounded, element-preserving atomwise
+        # option for small components; edit-set minimization and consensus
+        # remain responsible for accepting or rejecting the alternatives.
+        reactant_mol = parse_smiles(reactant.input_smiles)
+        if reactant_mol is not None and reactant_mol.GetNumHeavyAtoms() <= 4:
+            from itertools import product as cartesian_product
+
+            heavy_atoms = tuple(
+                int(atom.GetIdx())
+                for atom in reactant_mol.GetAtoms()
+                if atom.GetAtomicNum() > 1
+            )
+            product_atoms_by_element: Dict[str, Tuple[int, ...]] = {}
+            for atom in product_mol.GetAtoms():
+                if atom.GetAtomicNum() > 1:
+                    product_atoms_by_element.setdefault(
+                        str(atom.GetSymbol()), ()
+                    )
+                    product_atoms_by_element[str(atom.GetSymbol())] += (
+                        int(atom.GetIdx()),
+                    )
+            pools = tuple(
+                product_atoms_by_element.get(
+                    str(reactant_mol.GetAtomWithIdx(index).GetSymbol()),
+                    (),
+                )
+                for index in heavy_atoms
+            )
+            atomwise = []
+            if heavy_atoms and all(pools):
+                for targets in cartesian_product(*pools):
+                    if len(set(targets)) != len(targets):
+                        continue
+                    atomwise.append(
+                        tuple(
+                            (
+                                reactant.component_index,
+                                source,
+                                product.component_index,
+                                target,
+                            )
+                            for source, target in zip(heavy_atoms, targets)
+                        )
+                    )
+                    if len(atomwise) >= max_component_matches:
+                        break
+            candidates = tuple(sorted(set(candidates).union(atomwise)))
         warnings.extend(candidate_warnings)
         if candidates:
             options[reactant.component_index] = candidates

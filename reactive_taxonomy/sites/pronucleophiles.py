@@ -6,7 +6,7 @@ from collections import Counter
 from typing import Any, Dict, List, Tuple
 
 from ..context import classify_neighbor_contexts
-from ..models import ContextClassification, SiteCandidate
+from ..models import ContextClassification, ReactiveSiteCandidate
 from ..patterns import MatchIndex
 
 
@@ -108,8 +108,8 @@ def _activation_contexts(
     return contexts, context_records, activation_records, anchors
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
-    sites: List[SiteCandidate] = []
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
+    sites: List[ReactiveSiteCandidate] = []
     candidate_centers = match_index.role_atoms("pronucleophile_XH", "center")
     for atom in mol.GetAtoms():
         symbol = atom.GetSymbol()
@@ -209,7 +209,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
         )
         if activation_anchors:
             atom_roles["activation_anchor"] = activation_anchors
-        sites.append(SiteCandidate(
+        sites.append(ReactiveSiteCandidate(
             site_type="pronucleophile_XH", topology="atom",
             atom_roles=atom_roles, atom_indices=(atom.GetIdx(),), bond_indices=(),
             canonical_signature=signature, render_kind="xh",

@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, List
 
 from ..context import classify_neighbor_contexts
-from ..models import SiteCandidate
+from ..models import ReactiveSiteCandidate
 from ..patterns import MatchIndex
 
 
@@ -36,9 +36,9 @@ def _derived_family(element: str, contexts: List[str]) -> str:
     return "anionic_nucleophile"
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
     """Detect explicit C/N/O/S anions without inferring deprotonation or salts."""
-    sites: List[SiteCandidate] = []
+    sites: List[ReactiveSiteCandidate] = []
     candidate_centers = match_index.role_atoms("nucleophile_anion", "center")
     for atom_index in sorted(candidate_centers):
         atom = mol.GetAtomWithIdx(atom_index)
@@ -63,7 +63,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             atom_index,
         )
         sites.append(
-            SiteCandidate(
+            ReactiveSiteCandidate(
                 site_type="nucleophile_anion",
                 topology="atom",
                 atom_roles={"center": (atom_index,)},

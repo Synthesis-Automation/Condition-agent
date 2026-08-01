@@ -153,7 +153,7 @@ def test_negative_charge_is_retained_as_high_lone_pair_availability() -> None:
 
 def test_unsupported_center_is_explicitly_unresolved() -> None:
     site = SimpleNamespace(
-        site_id="manual:0",
+        hypothesis_id="manual:0",
         site_type="electrophilic_center",
         details={},
         confidence=1.0,

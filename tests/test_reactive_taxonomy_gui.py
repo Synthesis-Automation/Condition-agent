@@ -48,29 +48,31 @@ def test_window_analyzes_reaction_and_molecule() -> None:
             "RXNMapper: not_requested_resolved_internal_evidence"
             in reaction_output
         )
-        assert "Reaction: Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" in reaction_output
-        assert "Evidence: exact_product_reconstruction" in reaction_output
+        assert "Reaction: C–B + C–Br → C–C" in reaction_output
+        assert "Evidence: global_atom_correspondence" in reaction_output
         assert priority_review.startswith(
-            "Detailed reaction label: Ar¹–Br + Ar²–B(OH)₂ → Ar¹–Ar²"
+            "Detailed reaction label: C–B + C–Br → C–C"
         )
-        assert "Graphic core label: Unavailable" in priority_review
+        assert "Graphic core label: Ar–B + Ar–Br → Ar–Ar" in priority_review
         assert "Spectators: None detected" in priority_review
-        assert "Electronic / steric analysis: electrophile:" in priority_review
+        assert "Electronic / steric analysis: Unavailable" in priority_review
         assert "reaction input · valid" in window.status_label.text()
         reaction_pixmap = window.structure_image_label.pixmap()
         assert reaction_pixmap is not None
         assert not reaction_pixmap.isNull()
         assert window.graph_heading.text() == "Reaction graph"
         assert window.structure_image_label.toolTip() == REACTION_EXAMPLE
-        assert window.graph_tabs.currentIndex() == 0
-        assert window.core_image_label.text() == "Mapped reaction core unavailable."
+        assert window.graph_tabs.currentIndex() == 1
+        core_pixmap = window.core_image_label.pixmap()
+        assert core_pixmap is not None
+        assert not core_pixmap.isNull()
 
         window.input_edit.setText("Brc1ccccc1")
         assert window.kind_label.text() == "Detected: molecule"
         window.analyze()
         molecule_output = window.output.toPlainText()
         assert molecule_output.startswith("MOLECULE FEATURIZATION")
-        assert "Reactive sites:" in molecule_output
+        assert "Reactive-site hypotheses:" in molecule_output
         assert window.review_output.toPlainText() == (
             "Reaction review applies to reaction SMILES."
         )
@@ -122,7 +124,7 @@ def test_window_explains_ambiguous_reaction_evidence() -> None:
         assert "Atoms not in the main product: Cl × 1, N × 1, O × 1" in output
         assert "Net bond inventory (unmapped, not verified edits):" in output
         assert "Retrieval: not eligible" in output
-        assert "does not invalidate the product structure" in output
+        assert "ambiguous edit hypotheses" in output
     finally:
         window.close()
         application.processEvents()

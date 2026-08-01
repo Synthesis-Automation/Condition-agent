@@ -15,7 +15,7 @@ from .descriptors import render_reactivity_profile
 from .reaction_models import ReactionAnalysis
 
 
-REACTION_REVIEW_SUMMARY_SCHEMA_VERSION = "2.0"
+REACTION_REVIEW_SUMMARY_SCHEMA_VERSION = "3.0"
 _SUBSCRIPT_TRANSLATION = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
 
@@ -25,8 +25,6 @@ class ReactionReviewSummary:
 
     detailed_reaction_label: str
     reaction_core_equation: str
-    core_limiter: str
-    atom_level_core_equation: str
     spectators: str
     electronic_steric_analysis: str
     display_status: str
@@ -118,7 +116,6 @@ def build_reaction_review_summary(
     """
     display = _member(source, "reaction_label")
     core = _member(source, "reaction_core")
-    abstraction = _member(core, "abstraction")
     signature = _member(source, "reaction_signature")
 
     detailed_label = str(_member(display, "detailed", "") or "")
@@ -139,19 +136,7 @@ def build_reaction_review_summary(
 
     return ReactionReviewSummary(
         detailed_reaction_label=detailed_label,
-        reaction_core_equation=str(
-            _member(abstraction, "general_label", "")
-            or _member(core, "generic_label", "")
-            or ""
-        ),
-        core_limiter=str(
-            _member(abstraction, "limiter_label", "") or ""
-        ),
-        atom_level_core_equation=(
-            str(_member(core, "generic_label", "") or "")
-            if abstraction is not None
-            else ""
-        ),
+        reaction_core_equation=str(_member(core, "generic_label", "") or ""),
         spectators=_spectator_summary(spectators),
         electronic_steric_analysis=_partner_environment_summary(partners),
         display_status=str(_member(display, "status", "") or ""),
@@ -172,10 +157,6 @@ def format_reaction_review_summary(summary: ReactionReviewSummary) -> str:
         f"Detailed reaction label: {detailed}",
         f"Graphic core label: {graphic}",
     ]
-    if summary.core_limiter:
-        lines.append(f"Graphic core limiter: {summary.core_limiter}")
-    if summary.atom_level_core_equation:
-        lines.append(f"Atom-level core: {summary.atom_level_core_equation}")
     lines.extend(
         (
             f"Spectators: {spectators}",

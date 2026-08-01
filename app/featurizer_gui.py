@@ -18,7 +18,7 @@ from reactive_taxonomy import (  # noqa: E402
     RxnMapperProvider,
     analyze_reaction_with_external_mapping,
     build_reaction_review_summary,
-    featurize_molecule,
+    analyze_molecule,
     featurize_reaction,
     format_reaction_review_summary,
 )
@@ -80,7 +80,7 @@ def featurize_text(
             assessment.analysis if assessment is not None else base_analysis,
             assessment,
         )
-    return kind, featurize_molecule(value), None
+    return kind, analyze_molecule(value), None
 
 
 class ReactiveTaxonomyWindow(QtWidgets.QMainWindow):

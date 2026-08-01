@@ -17,10 +17,6 @@ from ..reaction_models import (
     ReactionComponent,
     ReactionEdit,
     ReactionStereoChange,
-    ReactionTopology,
-)
-from .annotations import (
-    decarboxylative_abstraction as _decarboxylative_abstraction,
 )
 from .common import (
     AtomIdentity as _AtomIdentity,
@@ -51,7 +47,6 @@ from .rendering import (
 from .quality import assess_reaction_core_quality, validate_core_edits
 from .remote import (
     _build_remote_subgraphs_for_side,
-    _functional_group_ids,
     _with_remote_continuity,
 )
 from .state_changes import build_state_changes
@@ -126,7 +121,7 @@ def _participant_tokens(
     *,
     side: str,
 ) -> Tuple[str, ...]:
-    """Return mapping-number-independent typed handles touching active atoms."""
+    """Return graph-only atom tokens touching the active core."""
     values = []
     for component in components:
         active = {
@@ -136,12 +131,25 @@ def _participant_tokens(
         }
         if not active:
             continue
-        for group in component.compound_analysis.functional_groups:
-            if active.intersection(int(value) for value in group.atom_indices):
-                values.append(f"{side}:group:{group.group_id}")
-        for site in component.compound_analysis.sites:
-            if active.intersection(int(value) for value in site.atom_indices):
-                values.append(f"{side}:site:{site.site_type}")
+        molecule = parse_smiles(component.input_smiles)
+        if molecule is None:
+            continue
+        for atom_index in sorted(active):
+            atom = molecule.GetAtomWithIdx(atom_index)
+            values.append(
+                "|".join(
+                    (
+                        side,
+                        "atom",
+                        atom.GetSymbol(),
+                        f"Q{int(atom.GetFormalCharge())}",
+                        "aromatic" if atom.GetIsAromatic() else "aliphatic",
+                        str(atom.GetHybridization()).upper(),
+                        f"H{int(atom.GetTotalNumHs(includeNeighbors=True))}",
+                        f"D{int(atom.GetDegree())}",
+                    )
+                )
+            )
     return tuple(sorted(set(values)))
 
 
@@ -212,7 +220,6 @@ def _build_atom_state(
         radical_electrons=state_payload["radical_electrons"],
         isotope=state_payload["isotope"],
         neighbor_tokens=neighbor_tokens,
-        functional_group_ids=_functional_group_ids(component, (atom_index,)),
         concise_label=_state_label(
             molecule=molecule,
             component_index=component.component_index,
@@ -227,6 +234,9 @@ def _build_atom_state(
 
 def _edit_graph(
     edits: Sequence[ReactionEdit],
+    atom_map_overrides: Optional[
+        Mapping[tuple[str, int, int], int]
+    ] = None,
 ) -> tuple[
     set[_AtomIdentity],
     Dict[_AtomIdentity, set[_AtomIdentity]],
@@ -245,7 +255,18 @@ def _edit_graph(
     public_tokens = []
     records = []
     for edit in edits:
-        left = _atom_identity(edit.atom_1)
+        left_override = (atom_map_overrides or {}).get(
+            (
+                edit.atom_1.side,
+                edit.atom_1.component_index,
+                edit.atom_1.atom_index,
+            )
+        )
+        left = (
+            ("map", int(left_override))
+            if left_override is not None
+            else _atom_identity(edit.atom_1)
+        )
         identities.add(left)
         incidence[left] += 1
         atom_labels[left] = (
@@ -267,7 +288,18 @@ def _edit_graph(
             )
             pair = f"{edit.atom_1.element}-H"
         else:
-            right = _atom_identity(edit.atom_2)
+            right_override = (atom_map_overrides or {}).get(
+                (
+                    edit.atom_2.side,
+                    edit.atom_2.component_index,
+                    edit.atom_2.atom_index,
+                )
+            )
+            right = (
+                ("map", int(right_override))
+                if right_override is not None
+                else _atom_identity(edit.atom_2)
+            )
             identities.add(right)
             incidence[right] += 1
             heavy_incidence[left] += 1
@@ -459,7 +491,6 @@ def _remote_identity(
         subgraph.fragment_heavy_atom_count,
         subgraph.fragment_heteroatom_count,
         subgraph.fragment_aromatic_atom_count,
-        subgraph.functional_group_ids,
     )
 
 
@@ -471,7 +502,6 @@ def _shape_remote_identity(
         len(subgraph.attachment_ports),
         tuple(sorted(port.attachment_element for port in subgraph.attachment_ports)),
         tuple(sorted(port.bond_order for port in subgraph.attachment_ports)),
-        subgraph.functional_group_ids,
     )
 
 
@@ -480,10 +510,6 @@ def _evidence_status(evidence: str) -> str:
         return "external"
     if evidence in {
         "validated_atom_mapping",
-        "validated_mapping_and_exact_reconstruction",
-        "validated_mapping_and_exact_multi_event_reconstruction",
-        "exact_product_reconstruction",
-        "exact_multi_event_reconstruction",
     }:
         return "verified"
     if evidence in {
@@ -504,7 +530,6 @@ def build_reaction_core_projection(
     stereo_changes: Sequence[ReactionStereoChange] = (),
     evidence: str,
     confidence: float,
-    topology: Optional[ReactionTopology] = None,
     atom_map_overrides: Optional[
         Mapping[tuple[str, int, int], int]
     ] = None,
@@ -520,7 +545,7 @@ def build_reaction_core_projection(
         edit_graph_payload,
         edit_tokens,
         edit_records,
-    ) = _edit_graph(edits)
+    ) = _edit_graph(edits, atom_map_overrides=atom_map_overrides)
     reactant_by_map, reactant_by_coordinate = _component_locations(
         reactants,
         side="reactant",
@@ -889,12 +914,6 @@ def build_reaction_core_projection(
             edits=edits,
         )
     )
-    abstraction = _decarboxylative_abstraction(
-        edits=edits,
-        reactant_by_map=reactant_by_map,
-        product_by_map=product_by_map,
-        topology=topology,
-    )
     checked_edit_count, consistency_issues = validate_core_edits(
         edits,
         reactant_by_map=reactant_by_map,
@@ -955,9 +974,6 @@ def build_reaction_core_projection(
             ),
             "algorithm_version": REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
             "schema_version": REACTION_CORE_PROJECTION_SCHEMA_VERSION,
-            "abstraction": (
-                abstraction.motif_key if abstraction is not None else None
-            ),
         },
         length=64,
     )
@@ -977,7 +993,6 @@ def build_reaction_core_projection(
         generic_label=generic_label,
         presentation=presentation,
         quality=quality,
-        abstraction=abstraction,
         active_atom_count=len(identities),
         event_count=len(events),
         evidence=str(evidence),

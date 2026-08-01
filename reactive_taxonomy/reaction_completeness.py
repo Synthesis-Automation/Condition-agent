@@ -2,20 +2,15 @@
 
 from __future__ import annotations
 
-from collections import Counter, defaultdict
-from typing import Any, Iterable, Mapping, Sequence, Tuple
+from collections import Counter
+from typing import Iterable, Mapping, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_edits import EditNormalizationResult
 from .reaction_models import (
     ReactionCompletenessAssessment,
     ReactionComponent,
-    ReactionReconstructionCandidate,
-    ReactionSiteReference,
 )
-
-
-RawCandidate = Tuple[Mapping[str, Any], Mapping[str, ReactionSiteReference]]
 
 
 def _side_statistics(
@@ -50,61 +45,10 @@ def _positive_difference(
     }
 
 
-def _candidate_center_element(
-    site: ReactionSiteReference,
-    components: Mapping[int, ReactionComponent],
-) -> str | None:
-    indices = site.atom_roles.get("center") or site.atom_roles.get("anchor")
-    component = components.get(int(site.component_index))
-    molecule = parse_smiles(component.input_smiles) if component else None
-    if not indices or molecule is None:
-        return None
-    return str(molecule.GetAtomWithIdx(int(indices[0])).GetSymbol())
-
-
-def _insufficient_partner_multiplicity_suspected(
-    raw_candidates: Sequence[RawCandidate],
-    reactants: Tuple[ReactionComponent, ...],
-    product_element_excess: Mapping[str, int],
-) -> bool:
-    """Detect one partner instance offered to multiple compatible event sites."""
-    components = {component.component_index: component for component in reactants}
-    opportunities: dict[
-        tuple[str, int, str, str], set[tuple[int, str]]
-    ] = defaultdict(set)
-    partner_elements: dict[tuple[str, int, str, str], str] = {}
-    for rule, assignment in raw_candidates:
-        if len(assignment) < 2:
-            continue
-        for partner_role, partner in assignment.items():
-            key = (
-                str(rule.get("id") or ""),
-                int(partner.component_index),
-                str(partner.site_id),
-                str(partner_role),
-            )
-            opportunities[key].update(
-                (int(other.component_index), str(other.site_id))
-                for other_role, other in assignment.items()
-                if other_role != partner_role
-            )
-            element = _candidate_center_element(partner, components)
-            if element:
-                partner_elements[key] = element
-    return any(
-        len(event_sites) > 1
-        and product_element_excess.get(partner_elements.get(key, ""), 0) > 0
-        for key, event_sites in opportunities.items()
-    )
-
-
 def build_reaction_completeness(
     *,
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
-    raw_candidates: Sequence[RawCandidate],
-    selected: ReactionReconstructionCandidate | None,
-    selected_events: Tuple[ReactionReconstructionCandidate, ...],
     edit_result: EditNormalizationResult,
 ) -> ReactionCompletenessAssessment:
     """Assess whether every reported product heavy atom has reactant provenance.
@@ -150,15 +94,8 @@ def build_reaction_completeness(
     if reactant_maps_missing:
         warnings.append("REACTANT_MAPS_MISSING_FROM_PRODUCTS")
 
-    insufficient_multiplicity = (
-        bool(product_element_excess)
-        and _insufficient_partner_multiplicity_suspected(
-            raw_candidates, reactants, product_element_excess
-        )
-    )
-    suspected_missing_reactant = bool(product_element_excess) and not (
-        insufficient_multiplicity
-    )
+    insufficient_multiplicity = False
+    suspected_missing_reactant = bool(product_element_excess)
     if product_element_excess:
         warnings.append("UNACCOUNTED_PRODUCT_HEAVY_ATOMS")
         warnings.append(
@@ -167,10 +104,6 @@ def build_reaction_completeness(
             else "MISSING_REACTANT_SUSPECTED"
         )
 
-    exact_reconstruction = bool(
-        selected is not None
-        and selected.verification == "exact_product_reconstruction"
-    ) or bool(selected_events)
     correspondence_verified = edit_result.evidence in {
         "fragmented_scaffold_correspondence",
         "unique_scaffold_correspondence",
@@ -186,9 +119,6 @@ def build_reaction_completeness(
     if product_element_excess:
         status = "incomplete"
         evidence = "product_element_excess"
-    elif exact_reconstruction:
-        status = "verified"
-        evidence = "exact_product_reconstruction"
     elif correspondence_verified:
         status = "verified"
         evidence = edit_result.evidence

@@ -1,271 +1,155 @@
 # Reaction Featurization Workflow
 
-The reaction system is graph-first, type-agnostic, and label-last. Molecular
-structure is the source of truth. Reaction names, interpretation annotations, named
-families, and display labels cannot create or override structural evidence.
+The system is graph-first, type-agnostic, and label-last. Molecular structures
+and normalized graph changes are the source of truth. Molecular reactivity
+hypotheses, synthesis patterns, family names, and display labels are optional
+annotations and cannot create or override structural evidence.
 
 ## Canonical workflow
 
 ```text
 Reaction SMILES
   ↓
-Parse and featurize molecular graphs
+Parse molecular graph facts
   ↓
-Enumerate interpretation-independent structural reconstructions
+Infer atom correspondence
   ↓
-Resolve mapping, reconstruction, and correspondence into normalized edits
+Normalize observed edits or retain explicit edit hypotheses
   ↓
 Build ReactionObservation
-  ├─ evidence and alternatives
-  ├─ topology and minimum reaction core
-  └─ completeness and spectators
+  ├─ topology and completeness
+  ├─ minimum ReactionCoreProjection
+  └─ generic ReactionSignature when evidence is sufficient
   ↓
-Build generic ReactionSignature or retain partial-product evidence
-  ↓
-Add optional interpretation annotations and named-family evidence
+Add optional annotations
+  ├─ molecular motifs and reactive-site hypotheses
+  └─ generic transformation and synthesis-pattern matches
   ↓
 Render one concise/detailed reaction label
   ↓
-Serialize ReactionAnalysis for conversion and recommendation
+Serialize for conversion and recommendation
 ```
 
 This is the execution order in
-[`featurize_reaction()`](../reactive_taxonomy/reaction_api.py). Interpretation
-annotations are loaded only after the observation, minimum core, topology, and
-generic signature have been built.
+[`featurize_reaction()`](../reactive_taxonomy/reaction_api.py). Optional molecular
+annotations are deliberately attached only after `ReactionObservation` has
+been built.
 
-## Contract ownership
+## Layer ownership
 
-| Layer | Owns | Must not own |
+| Layer | Owns | Excludes |
 | --- | --- | --- |
-| Molecular graphs | Functional groups, reactive sites, local environments, connectivity interfaces | Reaction families or reaction labels |
-| Structural reconstruction | Anonymous site slots, component relationships, graph operators, predicted products and edits | Semantic partner roles, named families, display text |
-| Evidence resolution | Normalized edits, alternatives, conflicts, confidence, provenance | Forced correspondence or family routing |
-| `ReactionObservation` | Edits, hypotheses, topology, minimum core, completeness, spectators, reconstruction evidence | Interpretation labels or named-family identity |
-| `ReactionSignature` | Versioned generic chemistry and retrieval identity | Display labels, source names, interpretation or family identity |
-| `ReactionInterpretation` | Semantic roles, transformation annotation, family candidates, family environment, product-connection view | Changes to the observation, core, or signature |
-| Rendering | One chemist-facing concise/detailed label | Chemistry identity or recommendation routing |
+| Molecular structure | Parsed atoms, bonds, components, maps, charge, aromaticity, stereo | Motifs, reactive sites, reaction families |
+| Correspondence and edits | Atom-origin alternatives, formed/broken/order/H changes, confidence, provenance | Named reactions and reaction-site routing |
+| `ReactionObservation` | Structure-only components, edits or hypotheses, topology, completeness, minimum core | Molecular annotations, patterns, family labels, display text |
+| `ReactionSignature` | Versioned generic chemistry identity | Display labels, source names, motifs, reactive-site hypotheses, family identity |
+| Molecular interpretation | Motif matches, reactive-site hypotheses, local reactivity profiles, connectivity hypotheses | Reaction evidence or identity |
+| Reaction interpretation | Patterns supported by existing edits, optional family evidence | Atom correspondence, edits, predicted products |
+| Rendering | One chemist-facing concise and detailed label | Chemistry identity or recommendation routing |
 
-## 1. Parse and featurize molecular graphs
+## 1. Parse molecular graph facts
 
-[`parse_reaction_smiles()`](../reactive_taxonomy/reaction_parser.py) accepts:
+[`parse_reaction_smiles()`](../reactive_taxonomy/reaction_parser.py) accepts
+`reactants>>products` and `reactants>agents>products`. It calls
+[`observe_molecular_structure()`](../reactive_taxonomy/api.py) for each
+component and records structure only.
 
-```text
-reactants >> products
-reactants > agents > products
-```
+`MolecularStructureObservation` contains parsed atoms, bonds, disconnected
+components, canonical SMILES, supplied maps, warnings, and errors.
+`MolecularInterpretation` is a separate contract. The composed
+`MoleculeAnalysis` is convenient for molecular tools, but only its `structure`
+projection may enter a reaction observation.
 
-It splits each side into components and calls
-[`featurize_molecule()`](../reactive_taxonomy/api.py) for every component. Each
-`ReactionComponent` retains its side, component index, input and canonical
-SMILES, supplied atom-map status, and molecular analysis.
+## 2. Infer correspondence and normalize edits
 
-Molecular featurization detects:
-
-- functional groups and reactive sites;
-- atom roles and site availability;
-- canonical reactive links, bond capacities, and connection endpoints; and
-- local structural, steric, and electronic environments.
-
-These are molecular observations, not reaction-family assignments. Agents are
-featurized for provenance and later condition analysis, but they are not used
-as reactant partners during structural reconstruction.
-
-## 2. Enumerate structural reconstructions
-
-[`enumerate_reconstruction_candidates()`](../reactive_taxonomy/reaction_reconstruction.py)
-matches reactant sites to the anonymous slots in
-[`reaction_reconstruction_rules.v1.json`](../reactive_taxonomy/definitions/reaction_reconstruction_rules.v1.json).
-Each rule contains only:
-
-- site and availability constraints;
-- same- or different-component relationships;
-- a registered graph-operator ID; and
-- bindings from operator inputs to anonymous structural slots.
-
-The selected operator from
-[`connectivity_rewrites.v3.json`](../reactive_taxonomy/definitions/connectivity_rewrites.v3.json)
-is executed by `apply_reaction_operator()`. It may break or form bonds, change
-bond order, adjust schema-level hydrogen or charge state, and predict a product.
-
-A `ReactionReconstructionCandidate` records the structural rule, operator,
-anonymous slot assignments, predicted edits and product, verification status,
-and warnings. It deliberately has no interpretation annotation ID, semantic reaction role,
-transformation class, named family, or display label.
-
-Exact single-event and balanced multi-event reconstruction are supported.
-Multi-event reconstruction consumes distinct site and component instances; it
-never duplicates a missing reactant to force product agreement.
-
-## 3. Resolve normalized reaction evidence
-
-[`resolve_reaction_evidence()`](../reactive_taxonomy/reaction_edits.py) reconciles
-three structural evidence sources:
+[`resolve_structural_evidence()`](../reactive_taxonomy/reaction_edits.py) uses:
 
 1. validated supplied atom mapping;
-2. exact single- or multi-event operator reconstruction; and
-3. conservative graph correspondence for otherwise unresolved products.
+2. bounded whole-graph, scaffold, and fragmented-scaffold correspondence; and
+3. an optional externally mapped proposal after structural validation.
 
-Agreement strengthens confidence. Contradictory mapping and reconstruction are
-retained as conflicting evidence; neither is silently discarded. Ambiguous
-correspondence is stored as deterministic `ReactionEditHypothesis` alternatives
-rather than converted into invented observed edits.
+There are no reaction-specific reconstruction rules in this evidence path.
+Substitution, elimination, reductive amination, and similar concepts do not
+select mappings or generate edits.
 
-Normalized evidence can include formed, broken, order-changed, hydrogen, charge,
-and stereochemical changes. Each atom reference retains component and atom
-provenance, element, charge, aromaticity, hybridization, mapping, and local
-environment identity.
+When all best correspondences imply the same chemistry, the system emits typed
+normalized edits. When atom origins remain chemically distinct, it retains
+deterministic `ReactionEditHypothesis` alternatives. Ambiguity is not converted
+into a false observation.
 
-Optional external atom mapping is a separate review/query enrichment path. It
-must pass structural validation and reconciliation and cannot silently replace
-the internal analysis. Operational details belong in the primary
-[type-agnostic implementation document](new/type_agnostic_reaction_recommendation_implementation.md),
-not in this workflow.
-
-## 4. Build the structural observation and minimum core
+## 3. Build the observation, minimum core, and signature
 
 [`build_reaction_observation()`](../reactive_taxonomy/reaction_observation.py)
-assembles one interpretation-independent `ReactionObservation` containing:
+projects parsed components to `ReactionStructureComponent` and builds:
 
-- parsed reactants, agents, and products;
+- provider evidence and correspondence alternatives;
 - normalized edits and stereochemical changes;
-- provider evidence and unresolved edit hypotheses;
-- reconstruction candidates and selected reconstruction events;
-- generic reaction topology;
-- product-atom completeness;
-- spectator groups; and
-- the minimum `ReactionCoreProjection`, when supported.
+- generic topology and product completeness;
+- the minimum [`ReactionCoreProjection`](../reactive_taxonomy/reaction_core/builder.py);
+- a generic [`ReactionSignature`](../reactive_taxonomy/reaction_signatures.py)
+  when evidence is sufficient.
 
-The topology describes component scope, participating components, formed-ring
-changes, tether distances, and other generic graph facts. Product completeness
-is `verified`, `incomplete`, or `unresolved`; missing reported product atoms are
-not invented, and omitted byproducts are not treated as missing main products.
+For inferred correspondence, deterministic internal atom IDs allow the minimum
+core to be generated without mutating or pretending that the input was mapped.
+The core keeps active atom transitions, connected events, remote graph shape,
+and attachment ports. It does not use motifs, reactive-site hypotheses, source
+labels, or family names.
 
-[`build_reaction_core_projection()`](../reactive_taxonomy/reaction_core/builder.py)
-minimizes the reaction directly from molecular graphs and normalized edits. It
-retains active atom transitions, connected edit events, remote subgraphs, and
-typed attachment ports. It does not load an interpretation annotation, source label, or
-reaction name.
+The signature hashes normalized chemistry and identity-bearing definition
+versions. It is invariant to irrelevant component order and serialization. A
+missing family never prevents a structurally supported generic signature.
 
-An interpretation failure cannot erase or modify any observation field.
+## 4. Add optional annotations
 
-## 5. Build generic identity and partial-product evidence
+After the observation exists,
+[`interpret_parsed_molecules()`](../reactive_taxonomy/reaction_parser.py) may add:
 
-When normalized edits, topology, and completeness are adequate,
-[`build_observation_signature()`](../reactive_taxonomy/reaction_signatures.py)
-builds a generic `ReactionSignature` directly from the observation.
+- [`MolecularMotifMatch`](../reactive_taxonomy/models.py) records;
+- `ReactiveSiteHypothesis` records;
+- local reactivity profiles; and
+- optional connectivity hypotheses for downstream reasoning.
 
-Its deterministic retrieval levels are:
+These are useful priors for compatibility, explanations, and recommendation,
+but disabling their definitions must leave the observation, minimum core, and
+signature unchanged.
 
-- L0: exact edits, detailed environments, events, and topology;
-- L1: reactive handles and less-specific edit context;
-- L2: generic structural transformation, events, and topology;
-- L3: topology-agnostic bond-edit identity; and
-- L4: generic partner environments and spectators.
+[`match_reaction_patterns()`](../reactive_taxonomy/reaction_patterns.py) then
+matches optional patterns against the completed observation. Generic patterns
+include net substitution, elimination, addition, coupling, bond-order change,
+and ring closure. More specific synthesis patterns include reductive-amination-
+like, amide-formation-like, boron-transfer-coupling-like, Heck-like,
+cycloaddition-like, and decarboxylative-coupling-like observations.
 
-`signature_id` hashes the normalized L0-L4 chemistry, schema version, and
-identity-bearing definition versions. It excludes display labels, interpretation
-labels, named families, source reaction names, row order, and irrelevant
-reactant serialization or ordering.
+Pattern definitions contain no operators, structural slots, predicted edits,
+or reconstruction instructions. They may rank display interpretations or add
+optional family evidence; they cannot modify structural facts.
 
-If verified signature evidence is unavailable, the system retains explicit
-structural evidence instead of guessing:
+## 5. Render and serialize
 
-- a unique partial product transformation for conservative branch replacement;
-- or the unresolved edit hypotheses already stored in the observation.
+[`render_reaction()`](../reactive_taxonomy/reaction_rendering.py) returns one
+`RenderedReactionLabel` with `concise` and `detailed` text plus evidence,
+confidence, provenance, and warnings. Rendering may polish a minimum-core label
+or add a supported pattern overlay, but display text never participates in core,
+signature, conversion admission, or retrieval identity.
 
-These fallbacks can support review or bounded retrieval, but they do not become
-verified observations or named reactions.
-
-## 6. Add optional interpretation annotations
-
-Only after generic identity exists does
-[`build_reaction_interpretation_candidates()`](../reactive_taxonomy/reaction_interpretation.py)
-apply
-[`reaction_interpretation_annotations.v1.json`](../reactive_taxonomy/definitions/reaction_interpretation_annotations.v1.json).
-
-An annotation maps anonymous reconstruction slots to chemist-facing roles and
-may add:
-
-- a more specific transformation-class interpretation;
-- compatible named families and an optional uniquely supported family;
-- semantic reaction partners and role confidence;
-- a role-specific family environment; and
-- a role-labelled product-connection view.
-
-Family identity remains optional. A valid unknown-family reaction can retain
-its core and generic signature with `named_family=None`. Interpretation
-conflicts are reported and cannot change structural edits, core identity, or
-signature identity.
-
-## 7. Render one reaction label
-
-[`render_reaction()`](../reactive_taxonomy/reaction_rendering.py) is the sole
-public reaction-label renderer. It combines structural evidence with any valid
-optional interpretation and returns one `RenderedReactionLabel` containing:
-
-- `concise` and `detailed` text;
-- structured edit clauses;
-- structural, contextual, interpretation, and family overlays when supported;
-- status, evidence, confidence, provenance IDs, and warnings.
-
-The renderer prefers the strongest non-contradicted evidence. Typical outputs
-include exact interpreted labels, multi-event summaries, generic edit-pattern
-labels, ring-formation labels, minimum-core labels, partial-product labels, or
-an explicit unavailable result.
-
-A reactant-side annotation that contradicts the reported product cannot become
-the final product label. Display text never participates in core, signature, or
-retrieval identity.
-
-Review CSV exports project the same nested label contract into:
+Review CSV exports use the same label contract:
 
 ```text
+reaction_core_label
 reaction_display_label
 reaction_display_label_detailed
 ```
 
-There is no parallel reaction-label pipeline.
-
-## 8. Serialize for conversion and recommendation
-
-The API returns one
-[`ReactionAnalysis`](../reactive_taxonomy/reaction_models.py) containing:
-
-```text
-parsed molecular components
-structural observation and minimum core
-generic signature or explicit fallback evidence
-optional interpretation
-one rendered reaction label
-evidence quality, warnings, and errors
-```
-
-Dataset conversion serializes the nested chemistry contracts before condition
-normalization, admission, indexing, and retrieval. The review CSV is only a
-flattened inspection view; canonical JSON or Parquet remains the lossless
-artifact.
-
-Before returning the analysis,
-[`build_reaction_fallback_descriptor()`](../reactive_taxonomy/reaction_fallback_descriptors.py)
-projects the available signature, partial transformation, interpreted
-candidates, retained hypotheses, or structure inventory into one explicit
-fallback descriptor. This late projection does not alter any earlier chemistry
-contract.
-
-`condition_recommender` may use verified signature tiers, conservative fallback
-evidence, chemistry compatibility, and optional family information. It must not
-derive chemistry identity from the rendered label or source reaction name.
-
-Recommendation architecture and admission details are documented in the
-[type-agnostic reaction recommendation implementation](new/type_agnostic_reaction_recommendation_implementation.md).
+The first is the low-level minimum-core label. The latter two are concise and
+detailed projections from the single renderer. Canonical nested JSON or Parquet
+remains the lossless converted artifact; CSV is a review view.
 
 ## Invariants
 
-- Molecular graphs and normalized edits are the source of truth.
-- Structural reconstruction is interpretation-independent.
-- The minimum core and generic signature are built before interpretation.
-- Interpretation annotations and named-family evidence are optional overlays.
-- Ambiguity and conflicts remain typed evidence.
-- Rendering explains chemistry but does not define it.
-- Conversion and recommendation consume one canonical analysis path.
+- Parse graph facts before running molecular annotation definitions.
+- Correspondence and normalized edits do not depend on reaction patterns.
+- The minimum core is the base generic reaction representation.
+- Molecular annotations and reaction patterns are optional overlays.
+- Patterns consume edits; they never generate them.
+- Ambiguity, conflicts, confidence, and provenance remain explicit.
+- Rendering explains chemistry but does not define chemistry identity.

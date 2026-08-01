@@ -1,12 +1,12 @@
-from reactive_taxonomy import MatchIndex, SiteCandidate, available_styles, featurize_molecule, load_handle_patterns, validate_taxonomy
+from reactive_taxonomy import MatchIndex, ReactiveSiteCandidate, available_styles, analyze_molecule, load_handle_patterns, validate_taxonomy
 from reactive_taxonomy.context import load_context_taxonomy
 from reactive_taxonomy.sites import pronucleophiles
 
 
 def signatures(smiles: str) -> set[str]:
-    result = featurize_molecule(smiles)
+    result = analyze_molecule(smiles)
     assert result.valid, result.error
-    return {site.canonical_signature for site in result.sites}
+    return {site.canonical_signature for site in result.reactive_site_hypotheses}
 
 
 def test_taxonomy_bundle_validates() -> None:
@@ -26,7 +26,7 @@ def test_handle_smarts_are_independent_and_mapped() -> None:
 
 
 def test_site_reports_pattern_provenance() -> None:
-    site = featurize_molecule("Brc1ccccc1").sites[0]
+    site = analyze_molecule("Brc1ccccc1").reactive_site_hypotheses[0]
     assert site.details["matched_pattern"] == "terminal_carbon_halogen"
     assert site.details["alternative_patterns"] == []
 
@@ -62,25 +62,25 @@ def test_pronucleophiles() -> None:
 
 
 def test_explicit_sulfur_anions_are_separate_nucleophile_sites() -> None:
-    thioacetate = featurize_molecule("CC(=O)[S-]")
-    methylthiolate = featurize_molecule("C[S-]")
+    thioacetate = analyze_molecule("CC(=O)[S-]")
+    methylthiolate = analyze_molecule("C[S-]")
 
     assert {
         (site.site_type, site.canonical_signature, site.chemist_label)
-        for site in thioacetate.sites
+        for site in thioacetate.reactive_site_hypotheses
     } == {
         ("nucleophile_anion", "NU-|S|-1|C(O)R", "R–C(O)–S⁻")
     }
     assert {
         (site.site_type, site.canonical_signature, site.chemist_label)
-        for site in methylthiolate.sites
+        for site in methylthiolate.reactive_site_hypotheses
     } == {
         ("nucleophile_anion", "NU-|S|-1|Alkyl", "R–S⁻")
     }
 
 
 def test_hydrazine_has_two_sites() -> None:
-    nh_sites = [s for s in featurize_molecule("CNN").sites if s.site_type == "pronucleophile_XH" and s.details["center_element"] == "N"]
+    nh_sites = [s for s in analyze_molecule("CNN").reactive_site_hypotheses if s.site_type == "pronucleophile_XH" and s.details["center_element"] == "N"]
     assert len(nh_sites) == 2
 
 
@@ -96,27 +96,27 @@ def test_electrophilic_centers() -> None:
 
 
 def test_invalid_input_and_family_filter() -> None:
-    assert featurize_molecule("not smiles").error == "INVALID_SMILES"
-    result = featurize_molecule("Brc1ccccc1N", site_types={"leaving_group"})
+    assert analyze_molecule("not smiles").structure.error == "INVALID_SMILES"
+    result = analyze_molecule("Brc1ccccc1N", site_types={"leaving_group"})
     assert result.valid
-    assert {s.site_type for s in result.sites} == {"leaving_group"}
+    assert {s.site_type for s in result.reactive_site_hypotheses} == {"leaving_group"}
 
 
 def test_components_are_preserved() -> None:
-    result = featurize_molecule("Nc1ccccc1.[K+]")
+    result = analyze_molecule("Nc1ccccc1.[K+]")
     assert result.valid
     assert len(result.components) == 2
 
 
 def test_composite_handles_do_not_emit_internal_sites() -> None:
-    result = featurize_molecule("c1ccc(B(O)O)cc1")
-    non_aromatic_ch = [site for site in result.sites if site.site_type != "aromatic_CH"]
+    result = analyze_molecule("c1ccc(B(O)O)cc1")
+    non_aromatic_ch = [site for site in result.reactive_site_hypotheses if site.site_type != "aromatic_CH"]
     assert [site.canonical_signature for site in non_aromatic_ch] == ["TM|Ar|B(OH)2"]
 
 
 def test_retained_fluorines_are_not_leaving_groups() -> None:
     sigs = {
-        site.canonical_signature for site in featurize_molecule("Brc1ccc(C(F)(F)F)cc1").sites
+        site.canonical_signature for site in analyze_molecule("Brc1ccc(C(F)(F)F)cc1").reactive_site_hypotheses
         if site.site_type == "leaving_group"
     }
     assert sigs == {"LG|Ar|Br"}
@@ -124,21 +124,21 @@ def test_retained_fluorines_are_not_leaving_groups() -> None:
 
 def test_sn_and_si_emit_only_transferable_carbon_site() -> None:
     tin_sites = [
-        site.canonical_signature for site in featurize_molecule("c1ccc([Sn](C)(C)C)cc1").sites
+        site.canonical_signature for site in analyze_molecule("c1ccc([Sn](C)(C)C)cc1").reactive_site_hypotheses
         if site.site_type == "transfer_group"
     ]
     assert tin_sites == ["TM|Ar|SnR3"]
     silicon_sites = {
-        site.canonical_signature for site in featurize_molecule("C#C[Si](C)(C)C").sites
+        site.canonical_signature for site in analyze_molecule("C#C[Si](C)(C)C").reactive_site_hypotheses
         if site.site_type in {"pronucleophile_XH", "transfer_group"}
     }
     assert silicon_sites == {"XH|Csp|H1|Alkynyl", "TM|Alkynyl|SiR3"}
 
 
 def test_silyl_ether_is_not_a_transfer_group() -> None:
-    result = featurize_molecule("Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1")
-    assert not [site for site in result.sites if site.site_type == "transfer_group"]
-    assert {site.canonical_signature for site in result.sites if site.site_type == "leaving_group"} == {"LG|Ar|Br"}
+    result = analyze_molecule("Brc1ccc(O[Si](C)(C)C(C)(C)C)cc1")
+    assert not [site for site in result.reactive_site_hypotheses if site.site_type == "transfer_group"]
+    assert {site.canonical_signature for site in result.reactive_site_hypotheses if site.site_type == "leaving_group"} == {"LG|Ar|Br"}
 
 
 def test_bridging_metal_halogen_is_not_a_leaving_group() -> None:
@@ -146,16 +146,16 @@ def test_bridging_metal_halogen_is_not_a_leaving_group() -> None:
 
 
 def test_acyl_halide_owns_halogen_site() -> None:
-    result = featurize_molecule("CC(=O)Cl")
-    assert [site.canonical_signature for site in result.sites] == [
+    result = analyze_molecule("CC(=O)Cl")
+    assert [site.canonical_signature for site in result.reactive_site_hypotheses] == [
         "EC|Acyl|Alkyl|Cl|activated"
     ]
 
 
 def test_ammonia_is_supported_nh_pronucleophile() -> None:
-    result = featurize_molecule("N")
-    assert [site.canonical_signature for site in result.sites] == ["XH|N|H3|"]
-    assert result.sites[0].chemist_label == "NH3"
+    result = analyze_molecule("N")
+    assert [site.canonical_signature for site in result.reactive_site_hypotheses] == ["XH|N|H3|"]
+    assert result.reactive_site_hypotheses[0].chemist_label == "NH3"
 
 
 def test_expanded_condensation_and_nitrogen_classes() -> None:
@@ -173,7 +173,7 @@ def test_expanded_condensation_and_nitrogen_classes() -> None:
 def test_aromatic_nh_is_one_ring_context() -> None:
     for smiles in ("c1cc[nH]c1", "c1ccc2[nH]ccc2c1"):
         sites = [
-            site for site in featurize_molecule(smiles).sites
+            site for site in analyze_molecule(smiles).reactive_site_hypotheses
             if site.site_type == "pronucleophile_XH"
         ]
         assert len(sites) == 1
@@ -185,7 +185,7 @@ def test_aromatic_nh_is_one_ring_context() -> None:
 
 def test_bromopyrrole_keeps_both_distinct_sites() -> None:
     legacy_sites = {
-        site.canonical_signature for site in featurize_molecule("Brc1cc[nH]c1").sites
+        site.canonical_signature for site in analyze_molecule("Brc1cc[nH]c1").reactive_site_hypotheses
         if site.site_type in {"leaving_group", "pronucleophile_XH"}
     }
     assert legacy_sites == {
@@ -195,9 +195,9 @@ def test_bromopyrrole_keeps_both_distinct_sites() -> None:
 
 
 def test_rendering_styles_preserve_signature() -> None:
-    unicode_site = featurize_molecule("Nc1ccccc1").sites[0]
-    ascii_site = featurize_molecule("Nc1ccccc1", label_style="ascii").sites[0]
-    hte_site = featurize_molecule("Nc1ccccc1", label_style="hte_legacy").sites[0]
+    unicode_site = analyze_molecule("Nc1ccccc1").reactive_site_hypotheses[0]
+    ascii_site = analyze_molecule("Nc1ccccc1", label_style="ascii").reactive_site_hypotheses[0]
+    hte_site = analyze_molecule("Nc1ccccc1", label_style="hte_legacy").reactive_site_hypotheses[0]
     assert available_styles() == ("unicode", "ascii", "hte_legacy")
     assert unicode_site.chemist_label == "Ar–NH2"
     assert ascii_site.chemist_label == "Ar-NH2"
@@ -205,12 +205,12 @@ def test_rendering_styles_preserve_signature() -> None:
     assert len({unicode_site.canonical_signature, ascii_site.canonical_signature, hte_site.canonical_signature}) == 1
     amide_nh = next(
         site
-        for site in featurize_molecule("CC(=O)NC").sites
+        for site in analyze_molecule("CC(=O)NC").reactive_site_hypotheses
         if site.details.get("center_token") == "N"
     )
     sulfonamide_nh = next(
         site
-        for site in featurize_molecule("CS(=O)(=O)NC").sites
+        for site in analyze_molecule("CS(=O)(=O)NC").reactive_site_hypotheses
         if site.details.get("center_token") == "N"
     )
     assert amide_nh.chemist_label == "R–C(O)–NHR"
@@ -218,19 +218,19 @@ def test_rendering_styles_preserve_signature() -> None:
 
 
 def test_availability_distinguishes_chemical_site_state() -> None:
-    assert featurize_molecule("CCN").sites[0].availability == "free"
+    assert analyze_molecule("CCN").reactive_site_hypotheses[0].availability == "free"
     assert next(
         site
-        for site in featurize_molecule("CC(=O)NC").sites
+        for site in analyze_molecule("CC(=O)NC").reactive_site_hypotheses
         if site.details.get("center_token") == "N"
     ).availability == "deactivated"
-    assert next(site for site in featurize_molecule("CC(=O)O").sites if site.site_type == "electrophilic_center").availability == "latent"
-    assert featurize_molecule("CC(=O)Cl").sites[0].availability == "activated"
-    assert featurize_molecule("OB(O)c1ccccc1").sites[0].availability == "transferable"
+    assert next(site for site in analyze_molecule("CC(=O)O").reactive_site_hypotheses if site.site_type == "electrophilic_center").availability == "latent"
+    assert analyze_molecule("CC(=O)Cl").reactive_site_hypotheses[0].availability == "activated"
+    assert analyze_molecule("OB(O)c1ccccc1").reactive_site_hypotheses[0].availability == "transferable"
 
 
 def test_rich_context_record_is_exposed() -> None:
-    site = featurize_molecule("Nc1ccccn1").sites[0]
+    site = analyze_molecule("Nc1ccccn1").reactive_site_hypotheses[0]
     context = site.context_features["contexts"][0]
     assert context["token"] == "HeteroAr"
     assert context["classification_method"] == "aromatic_ring_system"
@@ -260,7 +260,7 @@ def test_heteroaromatic_context_preserves_broad_token_and_nitrogen_position() ->
     for smiles, expected_distance in examples.items():
         site = next(
             candidate
-            for candidate in featurize_molecule(smiles).sites
+            for candidate in analyze_molecule(smiles).reactive_site_hypotheses
             if candidate.site_type == "leaving_group"
         )
         context = site.context_features["contexts"][0]
@@ -285,7 +285,7 @@ def test_graph_defined_heteroaromatic_subtypes_cover_common_ring_classes() -> No
     for smiles, (expected_subtype, expected_element) in examples.items():
         site = next(
             candidate
-            for candidate in featurize_molecule(smiles).sites
+            for candidate in analyze_molecule(smiles).reactive_site_hypotheses
             if candidate.site_type == "leaving_group"
         )
         context = site.context_features["contexts"][0]
@@ -305,7 +305,7 @@ def test_charged_heteroaromatic_nitrogen_states_are_distinct_contexts() -> None:
     for smiles, expected_subtype in examples.items():
         site = next(
             candidate
-            for candidate in featurize_molecule(smiles).sites
+            for candidate in analyze_molecule(smiles).reactive_site_hypotheses
             if candidate.site_type == "leaving_group"
         )
         context = site.context_features["contexts"][0]
@@ -324,7 +324,11 @@ def test_alkyl_leaving_groups_preserve_benzylic_allylic_and_propargylic_subtypes
         "CCCCl": ("simple_alkyl", "R–Cl"),
     }
     for smiles, (subtype, label) in examples.items():
-        site = featurize_molecule(smiles).sites[0]
+        site = next(
+            item
+            for item in analyze_molecule(smiles).reactive_site_hypotheses
+            if item.site_type == "leaving_group"
+        )
         context = site.context_features["contexts"][0]
         assert site.details["anchor_context"] == "Alkyl"
         assert site.details["anchor_subtype"] == subtype
@@ -333,46 +337,46 @@ def test_alkyl_leaving_groups_preserve_benzylic_allylic_and_propargylic_subtypes
 
 
 def test_benzyl_chloride_and_aryl_bromide_are_separate_sites() -> None:
-    result = featurize_molecule("ClCc1ccccc1Br")
+    result = analyze_molecule("ClCc1ccccc1Br")
     assert {
-        site.chemist_label for site in result.sites if site.site_type == "leaving_group"
+        site.chemist_label for site in result.reactive_site_hypotheses if site.site_type == "leaving_group"
     } == {"Benzyl–Cl", "Ar–Br"}
 
 
 def test_aldehydes_and_ketones_are_carbonyl_addition_centers() -> None:
-    aldehyde = next(site for site in featurize_molecule("CC=O").sites if site.site_type == "electrophilic_center")
+    aldehyde = next(site for site in analyze_molecule("CC=O").reactive_site_hypotheses if site.site_type == "electrophilic_center")
     assert aldehyde.canonical_signature == "EC|Carbonyl|aldehyde|Alkyl|addition"
     assert aldehyde.details["reaction_mode"] == "addition"
     assert aldehyde.details["atom_roles"] == {"center": [1], "heteroatom": [2], "substituents": [0]}
     assert aldehyde.chemist_label == "R–CH=O"
 
-    ketone = next(site for site in featurize_molecule("CC(=O)C").sites if site.site_type == "electrophilic_center")
+    ketone = next(site for site in analyze_molecule("CC(=O)C").reactive_site_hypotheses if site.site_type == "electrophilic_center")
     assert ketone.canonical_signature == "EC|Carbonyl|ketone|Alkyl,Alkyl|addition"
     assert ketone.chemist_label == "R2C=O"
 
 
 def test_acyl_substitution_and_carbonyl_addition_are_distinct() -> None:
-    acid_sites = [site for site in featurize_molecule("CC(=O)O").sites if site.site_type == "electrophilic_center"]
+    acid_sites = [site for site in analyze_molecule("CC(=O)O").reactive_site_hypotheses if site.site_type == "electrophilic_center"]
     assert [site.details["center_family"] for site in acid_sites] == ["Acyl"]
     assert acid_sites[0].details["reaction_mode"] == "substitution"
-    assert not [site for site in featurize_molecule("CC(=O)N").sites if site.site_type == "electrophilic_center"]
+    assert not [site for site in analyze_molecule("CC(=O)N").reactive_site_hypotheses if site.site_type == "electrophilic_center"]
 
 
 def test_aromatic_ch_sites_are_atom_localized_and_ring_classified() -> None:
-    benzene_sites = [site for site in featurize_molecule("c1ccccc1").sites if site.site_type == "aromatic_CH"]
+    benzene_sites = [site for site in analyze_molecule("c1ccccc1").reactive_site_hypotheses if site.site_type == "aromatic_CH"]
     assert len(benzene_sites) == 6
     assert {site.canonical_signature for site in benzene_sites} == {"CH|ArH"}
     assert {site.topology for site in benzene_sites} == {"atom"}
     assert {site.chemist_label for site in benzene_sites} == {"Ar–H"}
 
-    pyridine_sites = [site for site in featurize_molecule("c1ccncc1").sites if site.site_type == "aromatic_CH"]
+    pyridine_sites = [site for site in analyze_molecule("c1ccncc1").reactive_site_hypotheses if site.site_type == "aromatic_CH"]
     assert len(pyridine_sites) == 5
     assert {site.details["handle_token"] for site in pyridine_sites} == {"HetArH"}
     assert {site.chemist_label for site in pyridine_sites} == {"HeteroAr–H"}
 
 
 def test_unsaturated_carbon_bonds_are_bond_localized() -> None:
-    alkene = next(site for site in featurize_molecule("CC=C").sites if site.site_type == "unsaturated_bond")
+    alkene = next(site for site in analyze_molecule("CC=C").reactive_site_hypotheses if site.site_type == "unsaturated_bond")
     assert alkene.topology == "bond"
     assert alkene.canonical_signature == "PI|Alkene"
     assert alkene.details["bond_order"] == 2
@@ -381,7 +385,7 @@ def test_unsaturated_carbon_bonds_are_bond_localized() -> None:
     assert alkene.details["endpoint_h_counts"] == [2, 1]
     assert alkene.details["endpoint_substituent_counts"] == [0, 1]
 
-    alkyne_sites = featurize_molecule("CC#C").sites
+    alkyne_sites = analyze_molecule("CC#C").reactive_site_hypotheses
     assert {site.site_type for site in alkyne_sites} == {"unsaturated_bond", "pronucleophile_XH"}
     assert next(
         site for site in alkyne_sites if site.site_type == "unsaturated_bond"
@@ -400,7 +404,7 @@ def test_alkene_labels_expose_all_hydrogen_and_substituent_positions() -> None:
     for smiles, expected in examples.items():
         site = next(
             site
-            for site in featurize_molecule(smiles).sites
+            for site in analyze_molecule(smiles).reactive_site_hypotheses
             if site.site_type == "unsaturated_bond"
         )
         assert site.chemist_label == expected
@@ -412,12 +416,12 @@ def test_alkene_labels_expose_all_hydrogen_and_substituent_positions() -> None:
 def test_alkene_labels_retain_defined_e_z_stereochemistry() -> None:
     trans = next(
         site
-        for site in featurize_molecule("c1ccc(/C=C/c2ccccc2)cc1").sites
+        for site in analyze_molecule("c1ccc(/C=C/c2ccccc2)cc1").reactive_site_hypotheses
         if site.site_type == "unsaturated_bond"
     )
     cis = next(
         site
-        for site in featurize_molecule("c1ccc(/C=C\\c2ccccc2)cc1").sites
+        for site in analyze_molecule("c1ccc(/C=C\\c2ccccc2)cc1").reactive_site_hypotheses
         if site.site_type == "unsaturated_bond"
     )
 
@@ -436,14 +440,14 @@ def test_alkyne_labels_distinguish_acetylene_terminal_and_internal() -> None:
     for smiles, expected in examples.items():
         site = next(
             site
-            for site in featurize_molecule(smiles).sites
+            for site in analyze_molecule(smiles).reactive_site_hypotheses
             if site.site_type == "unsaturated_bond"
         )
         assert site.chemist_label == expected
 
     acetylene_xh = next(
         site
-        for site in featurize_molecule("C#C").sites
+        for site in analyze_molecule("C#C").reactive_site_hypotheses
         if site.site_type == "pronucleophile_XH"
     )
     assert acetylene_xh.chemist_label == "H–C≡C–H"
@@ -453,12 +457,12 @@ def test_alkyne_labels_distinguish_acetylene_terminal_and_internal() -> None:
 def test_unsaturated_labels_support_ascii_style_without_changing_signature() -> None:
     unicode_site = next(
         site
-        for site in featurize_molecule("CC#C").sites
+        for site in analyze_molecule("CC#C").reactive_site_hypotheses
         if site.site_type == "unsaturated_bond"
     )
     ascii_site = next(
         site
-        for site in featurize_molecule("CC#C", label_style="ascii").sites
+        for site in analyze_molecule("CC#C", label_style="ascii").reactive_site_hypotheses
         if site.site_type == "unsaturated_bond"
     )
 
@@ -469,10 +473,10 @@ def test_unsaturated_labels_support_ascii_style_without_changing_signature() -> 
 
 def test_organic_nitriles_are_typed_pi_handles() -> None:
     for smiles in ("CC#N", "N#Cc1ccccc1"):
-        result = featurize_molecule(smiles)
+        result = analyze_molecule(smiles)
         site = next(
             site
-            for site in result.sites
+            for site in result.reactive_site_hypotheses
             if site.canonical_signature == "PI|Nitrile"
         )
         assert site.site_type == "unsaturated_bond"
@@ -488,13 +492,13 @@ def test_organic_nitriles_are_typed_pi_handles() -> None:
         assert site.details["electrophilic_endpoint_atom_index"] == (
             site.details["carbon_endpoint_atom_index"]
         )
-        group = next(group for group in result.functional_groups if group.group_id == "nitrile")
+        group = next(group for group in result.motifs if group.motif_id == "nitrile")
         assert group.chemist_label == "R–C≡N"
         assert {"electrophilic", "reduction_sensitive"} <= set(group.tags)
 
     ascii_site = next(
         site
-        for site in featurize_molecule("CC#N", label_style="ascii").sites
+        for site in analyze_molecule("CC#N", label_style="ascii").reactive_site_hypotheses
         if site.canonical_signature == "PI|Nitrile"
     )
     assert ascii_site.chemist_label == "R-C#N"
@@ -504,8 +508,8 @@ def test_cyanide_and_isocyanide_are_not_organic_nitrile_handles() -> None:
     for smiles in ("[Na+].[C-]#N", "C[N+]#[C-]"):
         assert "PI|Nitrile" not in signatures(smiles)
         assert all(
-            group.group_id != "nitrile"
-            for group in featurize_molecule(smiles).functional_groups
+            group.motif_id != "nitrile"
+            for group in analyze_molecule(smiles).motifs
         )
 
 
@@ -516,8 +520,8 @@ def test_organic_azide_resonance_forms_share_one_dipolar_handle() -> None:
         "C[N-][N+]#N": "organic_azide_triple_bond_resonance",
     }
     for smiles, matched_pattern in examples.items():
-        result = featurize_molecule(smiles)
-        sites = [site for site in result.sites if site.site_type == "dipolar_group"]
+        result = analyze_molecule(smiles)
+        sites = [site for site in result.reactive_site_hypotheses if site.site_type == "dipolar_group"]
         assert len(sites) == 1
         site = sites[0]
         assert site.canonical_signature == "DG|Azide|Organic"
@@ -531,23 +535,23 @@ def test_organic_azide_resonance_forms_share_one_dipolar_handle() -> None:
             "central_nitrogen",
             "terminal_nitrogen",
         }
-        assert any(group.group_id == "azide" for group in result.functional_groups)
+        assert any(group.motif_id == "azide" for group in result.motifs)
 
     ascii_site = next(
         site
-        for site in featurize_molecule(
+        for site in analyze_molecule(
             "CN=[N+]=[N-]", label_style="ascii"
-        ).sites
+        ).reactive_site_hypotheses
         if site.site_type == "dipolar_group"
     )
     assert ascii_site.chemist_label == "R-N3"
 
 
 def test_inorganic_azide_is_not_an_organic_dipolar_handle() -> None:
-    result = featurize_molecule("[Na+].[N-]=[N+]=[N-]")
+    result = analyze_molecule("[Na+].[N-]=[N+]=[N-]")
 
     assert result.valid
-    assert all(site.site_type != "dipolar_group" for site in result.sites)
+    assert all(site.site_type != "dipolar_group" for site in result.reactive_site_hypotheses)
 
 
 def test_organic_heteroatom_pair_bonds_are_typed_handles() -> None:
@@ -573,8 +577,8 @@ def test_organic_heteroatom_pair_bonds_are_typed_handles() -> None:
     }
 
     for smiles, (signature, label, modes, group_id) in examples.items():
-        result = featurize_molecule(smiles)
-        sites = [site for site in result.sites if site.site_type == "heteroatom_bond"]
+        result = analyze_molecule(smiles)
+        sites = [site for site in result.reactive_site_hypotheses if site.site_type == "heteroatom_bond"]
         assert len(sites) == 1
         site = sites[0]
         assert site.canonical_signature == signature
@@ -585,21 +589,21 @@ def test_organic_heteroatom_pair_bonds_are_typed_handles() -> None:
             "attachment_a", "endpoint_a", "endpoint_b", "attachment_b"
         }
         group = next(
-            group for group in result.functional_groups if group.group_id == group_id
+            group for group in result.motifs if group.motif_id == group_id
         )
         assert group.chemist_label == label
         if group_id == "peroxide":
             assert all(
-                candidate.group_id != "ether"
-                for candidate in result.functional_groups
+                candidate.motif_id != "ether"
+                for candidate in result.motifs
             )
 
 
 def test_heteroatom_pair_handles_require_two_organic_attachments() -> None:
     for smiles in ("NN", "N=N", "SS", "CSC", "OO", "COO", "COC"):
-        result = featurize_molecule(smiles)
+        result = analyze_molecule(smiles)
         assert result.valid, smiles
-        assert all(site.site_type != "heteroatom_bond" for site in result.sites)
+        assert all(site.site_type != "heteroatom_bond" for site in result.reactive_site_hypotheses)
 
 
 def test_heteroatom_pair_labels_support_ascii_style() -> None:
@@ -611,7 +615,7 @@ def test_heteroatom_pair_labels_support_ascii_style() -> None:
     for smiles, label in expected.items():
         site = next(
             site
-            for site in featurize_molecule(smiles, label_style="ascii").sites
+            for site in analyze_molecule(smiles, label_style="ascii").reactive_site_hypotheses
             if site.site_type == "heteroatom_bond"
         )
         assert site.chemist_label == label
@@ -622,5 +626,5 @@ def test_detector_emits_typed_candidates_from_shared_match_index() -> None:
     mol = Chem.MolFromSmiles("CCN")
     candidates = pronucleophiles.detect(mol, MatchIndex(mol))
     assert len(candidates) == 1
-    assert isinstance(candidates[0], SiteCandidate)
+    assert isinstance(candidates[0], ReactiveSiteCandidate)
     assert candidates[0].atom_roles["center"] == (2,)

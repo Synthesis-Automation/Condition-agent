@@ -43,7 +43,6 @@ class ReactionCoreGraphicPlaceholder:
     label: str
     remote_class: str
     fragment_smiles: str
-    functional_group_ids: Tuple[str, ...]
     attachment_port_count: int
 
 
@@ -73,7 +72,6 @@ class _MultisiteScaffoldCollapse:
     subgraph_ids: Tuple[str, ...]
     remote_class: str
     fragment_smiles: str
-    functional_group_ids: Tuple[str, ...]
     attachment_port_count: int
 
 
@@ -82,10 +80,10 @@ def load_reaction_core_graphic_definition() -> Dict[str, Any]:
     """Load and validate the versioned placeholder-rendering definition."""
     with _DEFINITION_PATH.open("r", encoding="utf-8") as handle:
         definition = dict(json.load(handle))
-    if str(definition.get("schema_version") or "") != "1.3":
+    if str(definition.get("schema_version") or "") != "1.4":
         raise ValueError("unsupported reaction-core graphic schema")
     if str(definition.get("definition_id") or "") != (
-        "reaction_core_graphic.v1.3"
+        "reaction_core_graphic.v1.4"
     ):
         raise ValueError("unexpected reaction-core graphic definition ID")
     labels = definition.get("remote_class_labels")
@@ -354,15 +352,6 @@ def _multisite_scaffold_collapses(
                     ),
                     remote_class=remote_class,
                     fragment_smiles=fragment_smiles,
-                    functional_group_ids=tuple(
-                        sorted(
-                            {
-                                group_id
-                                for value in subgraphs
-                                for group_id in value.functional_group_ids
-                            }
-                        )
-                    ),
                     attachment_port_count=len(external_neighbors),
                 )
             )
@@ -412,7 +401,6 @@ def _placeholder_assignments(
             (
                 str(subgraph.remote_class),
                 str(subgraph.fragment_smiles),
-                tuple(subgraph.functional_group_ids),
                 len(subgraph.attachment_ports),
             ),
         )
@@ -422,7 +410,6 @@ def _placeholder_assignments(
             (
                 collapse.remote_class,
                 collapse.fragment_smiles,
-                collapse.functional_group_ids,
                 collapse.attachment_port_count,
             ),
         )
@@ -445,8 +432,7 @@ def _placeholder_assignments(
             label=assignments[identity],
             remote_class=str(record[0]),
             fragment_smiles=str(record[1]),
-            functional_group_ids=tuple(record[2]),
-            attachment_port_count=int(record[3]),
+            attachment_port_count=int(record[2]),
         )
         for identity, record in sorted(
             representative_by_identity.items(),

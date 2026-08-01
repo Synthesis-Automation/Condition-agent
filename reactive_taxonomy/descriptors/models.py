@@ -338,7 +338,7 @@ class ReactivityModifier:
 class SiteReactivityProfile:
     """Complete typed reactivity observation for one molecular site."""
 
-    site_id: str
+    hypothesis_id: str
     center_atom_index: int
     context_kind: str
     context: ContextDescriptor

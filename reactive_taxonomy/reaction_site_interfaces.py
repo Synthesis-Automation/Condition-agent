@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Dict, Literal, Mapping, Sequence, Tuple, cast
 
 from .chemistry.rdkit_utils import parse_smiles
-from .models import CompoundAnalysis, ReactiveSite
+from .models import MoleculeAnalysis, ReactiveSiteHypothesis
 from .reaction_models import (
     ReactionComponent,
     ReactionSiteReference,
@@ -691,7 +691,7 @@ def _normalize_with_molecule(
 
 
 def normalize_detected_site(
-    site: ReactiveSite,
+    site: ReactiveSiteHypothesis,
     component_molecule: Any,
 ) -> NormalizedSiteInterfaces:
     """Adapt a detector site using its atom-index-identical RDKit component."""
@@ -701,7 +701,7 @@ def normalize_detected_site(
     reference = ReactionSiteReference(
         side="reactant",
         component_index=site.component_index,
-        site_id=site.site_id,
+        site_id=site.hypothesis_id,
         site_type=site.site_type,
         canonical_signature=site.canonical_signature,
         chemist_label=site.chemist_label,
@@ -716,23 +716,21 @@ def normalize_detected_site(
 
 
 def normalize_compound_sites(
-    analysis: CompoundAnalysis,
+    analysis: MoleculeAnalysis,
 ) -> Tuple[NormalizedSiteInterfaces, ...]:
     """Normalize all sites while preserving detector atom-index provenance."""
-    from rdkit import Chem
-
-    molecule = parse_smiles(analysis.input_smiles)
-    if molecule is None:
-        raise ValueError("Cannot normalize sites from an invalid compound")
     component_molecules = tuple(
-        Chem.GetMolFrags(molecule, asMols=True, sanitizeFrags=True)
+        parse_smiles(component.input_smiles)
+        for component in analysis.structure.components
     )
-    if len(component_molecules) != len(analysis.components):
+    if any(molecule is None for molecule in component_molecules):
+        raise ValueError("Cannot normalize sites from an invalid compound")
+    if len(component_molecules) != len(analysis.structure.components):
         raise ValueError("Compound components do not match detector provenance")
     if any(
         site.component_index < 0
         or site.component_index >= len(component_molecules)
-        for site in analysis.sites
+        for site in analysis.interpretation.reactive_site_hypotheses
     ):
         raise ValueError("Detected site has invalid component provenance")
     return tuple(
@@ -740,7 +738,7 @@ def normalize_compound_sites(
             site,
             component_molecules[site.component_index],
         )
-        for site in analysis.sites
+        for site in analysis.interpretation.reactive_site_hypotheses
     )
 
 
@@ -763,8 +761,8 @@ def normalize_site_assignment(
         source_site = next(
             (
                 candidate
-                for candidate in component.compound_analysis.sites
-                if candidate.site_id == site.site_id
+                for candidate in component.molecule_analysis.interpretation.reactive_site_hypotheses
+                if candidate.hypothesis_id == site.site_id
             ),
             None,
         )
@@ -785,7 +783,7 @@ def normalize_site_assignment(
         direct = next(
             (
                 candidate
-                for candidate in component.compound_analysis.connectivity_sites
+                for candidate in component.molecule_analysis.interpretation.connectivity_hypotheses
                 if candidate.source_site_id == site.site_id
             ),
             None,

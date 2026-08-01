@@ -4,21 +4,17 @@ from __future__ import annotations
 
 import pytest
 
-from reactive_taxonomy import featurize_molecule
-from reactive_taxonomy.reaction_reconstruction import (
-    enumerate_reconstruction_candidates,
-)
-from reactive_taxonomy.reaction_parser import parse_reaction_smiles
+from reactive_taxonomy import analyze_molecule
 
 
 def _sites(smiles: str, site_type: str):
-    analysis = featurize_molecule(smiles)
+    analysis = analyze_molecule(smiles)
     assert analysis.valid, analysis.error
     return tuple(
         (site, interface)
         for site, interface in zip(
-            analysis.sites,
-            analysis.connectivity_sites,
+            analysis.reactive_site_hypotheses,
+            analysis.connectivity_hypotheses,
         )
         if site.site_type == site_type
     )
@@ -89,7 +85,7 @@ def test_nitrile_and_carbonyl_do_not_collapse_to_polarized_c_n() -> None:
     for smiles in ("CC#N", "CC=O", "CC(=O)N"):
         assert all(
             site.canonical_signature != "PI|PolarizedC=N"
-            for site in featurize_molecule(smiles).sites
+            for site in analyze_molecule(smiles).reactive_site_hypotheses
         )
 
 
@@ -150,7 +146,7 @@ def test_silanol_and_siloxane_are_not_silyl_ether_release_sites() -> None:
     for smiles in ("O[Si](C)(C)C", "C[Si](C)(C)O[Si](C)(C)C"):
         assert all(
             site.canonical_signature != "LG|O|SiR3"
-            for site in featurize_molecule(smiles).sites
+            for site in analyze_molecule(smiles).reactive_site_hypotheses
         )
 
 
@@ -180,10 +176,3 @@ def test_additional_organometallic_links_are_transfer_sites(
 
 def test_dibal_carbon_groups_are_not_marked_as_transfer_partners() -> None:
     assert not _sites("CC(C)C[AlH]CC(C)C", "transfer_group")
-
-
-def test_new_observations_do_not_create_unregistered_reconstruction_rules() -> None:
-    parsed = parse_reaction_smiles("C1CO1.[O-]C>>COCCO")
-
-    assert parsed.valid
-    assert enumerate_reconstruction_candidates(parsed.reactants) == ()

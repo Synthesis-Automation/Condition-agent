@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, List, Optional, Tuple
 
 from ..context import classify_context, classify_neighbor_contexts
-from ..models import SiteCandidate
+from ..models import ReactiveSiteCandidate
 from ..patterns import MatchIndex
 from .common import bond_index, unique_indices
 
@@ -31,9 +31,9 @@ def _acyl_group(neighbors: List[Any]) -> Optional[Tuple[Any, str, str]]:
 def _strained_ring_sites(
     mol: Any,
     match_index: MatchIndex,
-) -> List[SiteCandidate]:
+) -> List[ReactiveSiteCandidate]:
     """Expose each carbon of an epoxide or aziridine as a ring-opening center."""
-    sites: List[SiteCandidate] = []
+    sites: List[ReactiveSiteCandidate] = []
     candidate_centers = match_index.role_atoms(
         "electrophilic_center",
         "center",
@@ -93,7 +93,7 @@ def _strained_ring_sites(
                 match_index=match_index,
             )
             sites.append(
-                SiteCandidate(
+                ReactiveSiteCandidate(
                     site_type="electrophilic_center",
                     topology="center",
                     atom_roles={
@@ -139,8 +139,8 @@ def _strained_ring_sites(
     return sites
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
-    sites: List[SiteCandidate] = _strained_ring_sites(mol, match_index)
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
+    sites: List[ReactiveSiteCandidate] = _strained_ring_sites(mol, match_index)
     candidate_centers = match_index.role_atoms("electrophilic_center", "center")
     for center in mol.GetAtoms():
         if center.GetIdx() not in candidate_centers:
@@ -162,7 +162,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 context = classify_context(mol, retained.GetIdx(), {center.GetIdx()}, match_index=match_index) if retained is not None else None
                 context_token = context.token if context is not None else "Other"
                 atoms = tuple(unique_indices([center.GetIdx(), double_oxygens[0].GetIdx(), leaving.GetIdx(), *([retained.GetIdx()] if retained else [])]))
-                sites.append(SiteCandidate(
+                sites.append(ReactiveSiteCandidate(
                     site_type="electrophilic_center", topology="center",
                     atom_roles={"center": (center.GetIdx(),), "oxo": (double_oxygens[0].GetIdx(),), "leaving_or_activatable": (leaving.GetIdx(),), **({"retained": (retained.GetIdx(),)} if retained else {})},
                     atom_indices=atoms, bond_indices=(bond_index(mol, center.GetIdx(), leaving.GetIdx()),),
@@ -193,7 +193,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             context_tokens = [record.token for record in contexts]
             context_label = ",".join(context_tokens) if context_tokens else "Other"
             substituents = tuple(neighbor.GetIdx() for neighbor in singles if neighbor.GetAtomicNum() == 6)
-            sites.append(SiteCandidate(
+            sites.append(ReactiveSiteCandidate(
                 site_type="electrophilic_center", topology="center",
                 atom_roles={
                     "center": (center.GetIdx(),),
@@ -220,7 +220,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             context = classify_context(mol, retained.GetIdx(), {center.GetIdx()}, match_index=match_index) if retained is not None else None
             context_token = context.token if context is not None else "Other"
             token = leaving.GetSymbol()
-            sites.append(SiteCandidate(
+            sites.append(ReactiveSiteCandidate(
                 site_type="electrophilic_center", topology="center",
                 atom_roles={"center": (center.GetIdx(),), "oxo": tuple(oxygen.GetIdx() for oxygen in double_oxygens), "leaving_or_activatable": (leaving.GetIdx(),), **({"retained": (retained.GetIdx(),)} if retained else {})},
                 atom_indices=tuple(unique_indices([center.GetIdx(), leaving.GetIdx(), *(oxygen.GetIdx() for oxygen in double_oxygens), *([retained.GetIdx()] if retained else [])])),

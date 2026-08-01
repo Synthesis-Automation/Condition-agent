@@ -111,29 +111,17 @@ def _analogue_precedent(
     return convert_record(record).to_dict()
 
 
-def test_unresolved_query_retrieves_supported_structural_analogues() -> None:
+def test_ambiguous_query_requires_edit_hypothesis_consensus() -> None:
     index = build_generic_index([_precedent(1), _precedent(2)])
 
     result = GenericConditionRecommender(index).recommend("CC.CN>>CCN")
 
-    assert result.valid
+    assert not result.valid
     assert result.query_signature_id is None
-    assert result.query_fallback_descriptor_id.startswith("RFD2:")
-    assert result.recommendation_mode == "unverified_structure_fallback"
-    assert result.retrieval_definition_version == "2.0"
-    assert result.retrieval_level == "unverified_structure_fallback"
-    assert result.independent_compatible_candidate_count == 2
-    assert "UNVERIFIED_REACTION_FALLBACK_USED" in result.warnings
-    assert "FALLBACK_RECOMMENDATIONS_REQUIRE_EXPERT_REVIEW" in result.warnings
-    assert result.recommendations
-    recommendation = result.recommendations[0]
-    assert (
-        recommendation.score_trace.definition_versions["fallback_retrieval.v1"] == "2.0"
-    )
-    assert any(
-        "atom correspondence and bond edits are not verified" in caution
-        for caution in recommendation.cautions
-    )
+    assert result.query_fallback_descriptor_id is None
+    assert result.recommendation_mode == "ambiguous_edit_hypotheses"
+    assert result.error == "NO_ROBUST_EDIT_HYPOTHESIS_PRECEDENT"
+    assert "EDIT_HYPOTHESIS_CONSENSUS_REQUIRED" in result.warnings
 
 
 def test_contradicted_query_is_blocked_before_fallback_retrieval() -> None:
@@ -145,11 +133,10 @@ def test_contradicted_query_is_blocked_before_fallback_retrieval() -> None:
 
     assert not result.valid
     assert result.recommendation_mode == "abstained"
-    assert result.error == "QUERY_NOT_ELIGIBLE_FOR_UNVERIFIED_FALLBACK"
-    assert "FALLBACK_BLOCKED:contradicted_or_incomplete_structure" in result.warnings
+    assert result.error == "NO_SAFE_FALLBACK_PRECEDENT"
 
 
-def test_unrestricted_fallback_bypasses_all_chemistry_gates() -> None:
+def test_unrestricted_fallback_cannot_bypass_chemistry_compatibility() -> None:
     records = [
         _analogue_precedent(
             1,
@@ -172,43 +159,20 @@ def test_unrestricted_fallback_bypasses_all_chemistry_gates() -> None:
     )
 
     assert not gated.valid
-    assert gated.error == "QUERY_NOT_ELIGIBLE_FOR_UNVERIFIED_FALLBACK"
-    assert unrestricted.valid
-    assert (
-        unrestricted.recommendation_mode
-        == "unrestricted_unverified_structure_fallback"
-    )
-    assert (
-        unrestricted.retrieval_level
-        == "unrestricted_unverified_structure_fallback"
-    )
-    assert unrestricted.recommendations
-    assert "UNRESTRICTED_FALLBACK_REQUESTED" in unrestricted.warnings
-    assert "UNRESTRICTED_FALLBACK_USED" in unrestricted.warnings
-    assert (
-        "FALLBACK_GATE_OVERRIDDEN:contradicted_or_incomplete_structure"
-        in unrestricted.warnings
-    )
-    assert (
-        "FALLBACK_SIMILARITY_SUPPORT_AND_COMPATIBILITY_GATES_BYPASSED"
-        in unrestricted.warnings
-    )
-    assert any(
-        "condition-compatibility gates were explicitly bypassed" in caution
-        for recommendation in unrestricted.recommendations
-        for caution in recommendation.cautions
-    )
+    assert gated.error == "NO_CHEMICALLY_COMPATIBLE_PRECEDENT"
+    assert not unrestricted.valid
+    assert unrestricted.error == "NO_CHEMICALLY_COMPATIBLE_PRECEDENT"
+    assert unrestricted.recommendations == ()
 
 
-def test_single_exact_analogue_uses_limited_support_route() -> None:
+def test_single_analogue_cannot_resolve_ambiguous_edit_hypotheses() -> None:
     index = build_generic_index([_precedent(1)])
 
     result = GenericConditionRecommender(index).recommend("CC.CN>>CCN")
 
-    assert result.valid
-    assert result.retrieval_level == "unverified_structure_fallback_limited_support"
-    assert "LIMITED_PRECEDENT_SUPPORT" in result.warnings
-    assert len(result.recommendations) == 1
+    assert not result.valid
+    assert result.error == "NO_ROBUST_EDIT_HYPOTHESIS_PRECEDENT"
+    assert "EDIT_HYPOTHESIS_CONSENSUS_REQUIRED" in result.warnings
 
 
 def test_invalid_atom_mapping_is_not_rescued_by_fallback() -> None:
@@ -328,7 +292,7 @@ def test_exploratory_iodine_partial_precedents_are_retrievable() -> None:
     assert result.valid
     assert result.recommendation_mode == "unverified_structure_fallback"
     assert result.candidate_count == 2
-    assert result.retrieval_definition_version == "2.0"
+    assert result.retrieval_definition_version == "3.0"
     assert result.retrieval_level == "source_supported_partial_transformation"
     assert "QUERY_PRODUCT_ATOM_SOURCE_UNVERIFIED:I" in result.warnings
     assert "EXPLORATORY_PARTIAL_CORRESPONDENCE_FALLBACK_USED:I" in result.warnings

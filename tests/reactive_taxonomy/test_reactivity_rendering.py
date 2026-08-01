@@ -1,6 +1,6 @@
 import json
 
-from reactive_taxonomy import featurize_molecule
+from reactive_taxonomy import analyze_molecule
 from reactive_taxonomy.descriptors import (
     reactivity_profile_tokens,
     render_reactivity_profile,
@@ -9,13 +9,13 @@ from reactive_taxonomy.descriptors import (
 
 
 def _profile(smiles: str, site_type: str):
-    result = featurize_molecule(smiles)
+    result = analyze_molecule(smiles)
     assert result.valid
-    site = next(site for site in result.sites if site.site_type == site_type)
+    site = next(site for site in result.reactive_site_hypotheses if site.site_type == site_type)
     environment = next(
         item
-        for item in result.site_environments
-        if item.site_id == site.site_id
+        for item in result.reactive_site_environments
+        if item.hypothesis_id == site.hypothesis_id
     )
     assert environment.reactivity_profile is not None
     return environment.reactivity_profile

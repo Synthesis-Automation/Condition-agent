@@ -21,6 +21,8 @@ from .reaction_signatures import build_observation_signature
 _REACTION_LABEL_DEFINITION_FILES = (
     "reaction_label_rendering.v1.json",
     "reaction_label_patterns.v1.json",
+    "synthesis_patterns.v1.json",
+    "transformation_patterns.v1.json",
 )
 
 
@@ -83,30 +85,18 @@ def render_reaction(
         and observation.completeness.status != "incomplete"
         else None
     )
-    selected = interpretation.selected_candidate if interpretation else None
-    interpretation_conflict = bool(
-        interpretation
-        and "INTERPRETATION_OBSERVATION_CONFLICT" in interpretation.warnings
-    )
-    selected_exact = bool(
-        selected
-        and selected.verification == "exact_product_reconstruction"
-        and not interpretation_conflict
+    primary_pattern = next(
+        (
+            match
+            for match in (interpretation.pattern_matches if interpretation else ())
+            if match.pattern_id == interpretation.primary_pattern_id
+        ),
+        None,
     )
     rendered = _build_reaction_label(
         reactants=observation.reactants,
         edits=observation.edits,
-        selected_label=(
-            selected.interpretation_label if selected_exact else None
-        ),
-        selected_exact=selected_exact,
-        interpretation_id=(
-            selected.annotation_id if selected_exact else None
-        ),
         contextual_label=contextual,
-        named_family=(
-            interpretation.named_family if interpretation and selected_exact else None
-        ),
         fallback_label=fallback_label,
         fallback_status=fallback_status,
         evidence=fallback_evidence or observation.evidence_quality,
@@ -118,6 +108,12 @@ def render_reaction(
         events=signature.events if signature is not None else (),
         topology=observation.topology,
         reaction_core=observation.core,
+        interpretation_pattern_label=(
+            primary_pattern.display_label if primary_pattern is not None else None
+        ),
+        interpretation_pattern_id=(
+            primary_pattern.pattern_id if primary_pattern is not None else None
+        ),
         warnings=(
             tuple(observation.warnings)
             + (tuple(interpretation.warnings) if interpretation else ())

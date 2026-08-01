@@ -34,12 +34,12 @@ class AdmissionDecision:
     condition_stage_status: ConditionStageStatus
     outcome_status: OutcomeStatus
     index_eligibility: IndexEligibility
-    policy_version: str = "generic_admission.v2.0"
+    policy_version: str = "generic_admission.v3.0"
 
 
 @lru_cache(maxsize=1)
 def load_admission_policy() -> dict[str, Any]:
-    path = Path(__file__).parents[1] / "definitions" / "generic_admission.v1.json"
+    path = Path(__file__).parents[1] / "definitions" / "generic_admission.v3.json"
     with path.open("r", encoding="utf-8") as handle:
         return dict(json.load(handle))
 
@@ -53,7 +53,7 @@ def decide_admission(
     resolved_recipe: ResolvedConditionRecipe,
     fragment_source_support: Tuple[FragmentSourceSupport, ...] = (),
 ) -> AdmissionDecision:
-    """Assess independent evidence dimensions and derive the legacy tier."""
+    """Assess independent evidence dimensions and derive an admission tier."""
     policy = load_admission_policy()
     minimum_yield, maximum_yield = policy["valid_yield_range"]
 
@@ -94,7 +94,7 @@ def decide_admission(
             elif completeness.suspected_missing_reactant:
                 chemistry_reasons.append("suspected_missing_reactant")
     elif analysis.reaction_signature is None:
-        if analysis.candidates or analysis.evidence_quality in {
+        if analysis.edit_hypotheses or analysis.evidence_quality in {
             "reactant_interpretation_only",
             "structural_reconstruction_candidates",
             "ambiguous",
@@ -242,6 +242,7 @@ def decide_admission(
             )
             or (
                 chemistry_status == ChemistryStatus.REVIEW
+                and not analysis.edit_hypotheses
                 and fallback_descriptor is not None
                 and fallback_descriptor.retrieval_eligible
                 and (

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import Any, Iterable, Mapping, Sequence, Tuple
+from typing import Any, Iterable, Tuple
 
 from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_completeness import build_reaction_completeness
@@ -11,27 +11,29 @@ from .reaction_core import build_reaction_core_projection
 from .reaction_edits import (
     EditNormalizationResult,
     normalize_mapped_edits,
-    resolve_reaction_evidence,
+    resolve_structural_evidence,
 )
 from .reaction_models import (
     ReactionComponent,
     ReactionObservation,
-    ReactionReconstructionCandidate,
-    ReactionSiteReference,
+    ReactionStructureComponent,
 )
-from .reaction_spectators import derive_observed_spectator_groups
 from .reaction_topology import build_reaction_topology
 from .reaction_parser import parse_reaction_smiles
-from .reaction_reconstruction import (
-    build_reaction_reconstruction_candidates,
-    canonical_without_maps,
-)
 
 
-RawCandidate = Tuple[
-    Mapping[str, Any],
-    Mapping[str, ReactionSiteReference],
-]
+def _synthetic_atom_maps(
+    correspondence: Tuple[Tuple[int, int, int, int], ...],
+) -> dict[tuple[str, int, int], int]:
+    """Give one correspondence hypothesis deterministic internal atom IDs."""
+    overrides: dict[tuple[str, int, int], int] = {}
+    for number, (reactant_component, reactant_atom, product_component, product_atom) in enumerate(
+        sorted(correspondence),
+        start=1,
+    ):
+        overrides[("reactant", reactant_component, reactant_atom)] = number
+        overrides[("product", product_component, product_atom)] = number
+    return overrides
 
 
 def _observation_hypotheses(
@@ -46,7 +48,6 @@ def _observation_hypotheses(
             topology=build_reaction_topology(
                 reactants=reactants,
                 products=products,
-                selected=None,
                 edit_result=replace(
                     edit_result,
                     edits=hypothesis.edits,
@@ -82,50 +83,77 @@ def build_reaction_observation(
     products: Tuple[ReactionComponent, ...],
     edit_result: EditNormalizationResult,
     mapped_bond_changes: Tuple[dict[str, Any], ...] = (),
-    reconstruction_sources: Sequence[RawCandidate] = (),
-    reconstruction_candidates: Tuple[ReactionReconstructionCandidate, ...] = (),
-    selected_reconstruction: ReactionReconstructionCandidate | None = None,
-    selected_reconstruction_events: Tuple[ReactionReconstructionCandidate, ...] = (),
     warnings: Iterable[str] = (),
 ) -> ReactionObservation:
-    """Finalize generic facts after evidence providers have been reconciled.
-
-    Reconstruction candidates are structural operator evidence. They contain no
-    interpretation, family, or display semantics.
-    """
+    """Finalize graph facts after correspondence providers are reconciled."""
+    structural_reactants = tuple(component.structure_only() for component in reactants)
+    structural_agents = tuple(component.structure_only() for component in agents)
+    structural_products = tuple(component.structure_only() for component in products)
     topology = build_reaction_topology(
-        reactants=reactants,
-        products=products,
-        selected=None,
+        reactants=structural_reactants,
+        products=structural_products,
         edit_result=edit_result,
     )
     core = build_reaction_core_projection(
-        reactants=reactants,
-        products=products,
+        reactants=structural_reactants,
+        products=structural_products,
         edits=edit_result.edits,
         stereo_changes=edit_result.stereo_changes,
         evidence=edit_result.evidence,
         confidence=edit_result.confidence,
-        topology=topology,
+        atom_map_overrides=(
+            _synthetic_atom_maps(edit_result.atom_correspondence)
+            if edit_result.atom_correspondence
+            else None
+        ),
     )
     completeness = build_reaction_completeness(
-        reactants=reactants,
-        products=products,
-        raw_candidates=reconstruction_sources,
-        selected=selected_reconstruction,
-        selected_events=selected_reconstruction_events,
+        reactants=structural_reactants,
+        products=structural_products,
         edit_result=edit_result,
-    )
-    spectators = derive_observed_spectator_groups(
-        reactants,
-        edit_result.edits,
-        edit_result.evidence,
     )
     hypotheses, evidence_candidates = _observation_hypotheses(
-        reactants=reactants,
-        products=products,
+        reactants=structural_reactants,
+        products=structural_products,
         edit_result=edit_result,
     )
+    if core is None and hypotheses:
+        hypothesis_cores = tuple(
+            candidate
+            for hypothesis in hypotheses
+            for candidate in (
+                build_reaction_core_projection(
+                    reactants=structural_reactants,
+                    products=structural_products,
+                    edits=hypothesis.edits,
+                    stereo_changes=hypothesis.stereo_changes,
+                    evidence=hypothesis.evidence,
+                    confidence=hypothesis.confidence,
+                    atom_map_overrides=_synthetic_atom_maps(
+                        hypothesis.atom_correspondence
+                    ),
+                ),
+            )
+            if candidate is not None
+        )
+        shape_keys = {candidate.shape_core_key for candidate in hypothesis_cores}
+        labels = {candidate.generic_label for candidate in hypothesis_cores}
+        if hypothesis_cores and len(shape_keys) == 1 and len(labels) == 1:
+            core = replace(
+                min(hypothesis_cores, key=lambda candidate: candidate.core_id),
+                evidence="ambiguous_correspondence_core_consensus",
+                evidence_status="hypothesis",
+                warnings=tuple(
+                    sorted(
+                        set(
+                            min(
+                                hypothesis_cores,
+                                key=lambda candidate: candidate.core_id,
+                            ).warnings
+                        ).union({"CORE_SHARED_BY_ALL_EDIT_HYPOTHESES"})
+                    )
+                ),
+            )
     combined_warnings = tuple(
         sorted(
             set(warnings)
@@ -136,9 +164,9 @@ def build_reaction_observation(
     return ReactionObservation(
         input_reaction_smiles=input_reaction_smiles,
         valid=True,
-        reactants=reactants,
-        agents=agents,
-        products=products,
+        reactants=structural_reactants,
+        agents=structural_agents,
+        products=structural_products,
         edits=edit_result.edits,
         stereo_changes=edit_result.stereo_changes,
         evidence_quality=edit_result.evidence,
@@ -147,10 +175,6 @@ def build_reaction_observation(
         evidence_candidates=evidence_candidates,
         edit_hypotheses=hypotheses,
         mapped_bond_changes=mapped_bond_changes,
-        reconstruction_candidates=reconstruction_candidates,
-        selected_reconstruction=selected_reconstruction,
-        selected_reconstruction_events=selected_reconstruction_events,
-        spectator_groups=spectators,
         topology=topology,
         completeness=completeness,
         core=core,
@@ -160,40 +184,26 @@ def build_reaction_observation(
 
 def observe_reaction(reaction_smiles: str) -> ReactionObservation:
     """Build the type-agnostic foundation without interpretation metadata."""
-    parsed = parse_reaction_smiles(reaction_smiles)
+    parsed = parse_reaction_smiles(
+        reaction_smiles,
+        include_molecular_interpretation=False,
+    )
     if not parsed.valid:
         return ReactionObservation(
             input_reaction_smiles=reaction_smiles,
             valid=False,
-            reactants=parsed.reactants,
-            agents=parsed.agents,
-            products=parsed.products,
+            reactants=tuple(component.structure_only() for component in parsed.reactants),
+            agents=tuple(component.structure_only() for component in parsed.agents),
+            products=tuple(component.structure_only() for component in parsed.products),
             warnings=parsed.warnings,
             error=parsed.error,
         )
-    observed_products = {
-        canonical
-        for component in parsed.products
-        for canonical in (canonical_without_maps(component.input_smiles),)
-        if canonical is not None
-    }
     supplied_mapping = normalize_mapped_edits(
         parsed.reactants, parsed.products
     )
-    reconstruction = build_reaction_reconstruction_candidates(
-        reactants=parsed.reactants,
-        observed_products=observed_products,
-        invalid_supplied_mapping=(
-            supplied_mapping.evidence == "invalid_atom_mapping"
-        ),
-        max_candidates=100,
-    )
-    edit_result = resolve_reaction_evidence(
+    edit_result = resolve_structural_evidence(
         parsed.reactants,
         parsed.products,
-        selected=reconstruction.selected_candidate,
-        selected_events=reconstruction.selected_events,
-        candidates=reconstruction.candidates,
         mapped_override=supplied_mapping,
     )
     return build_reaction_observation(
@@ -205,11 +215,7 @@ def observe_reaction(reaction_smiles: str) -> ReactionObservation:
         mapped_bond_changes=tuple(
             supplied_map_bond_changes(reaction_smiles)
         ),
-        reconstruction_sources=reconstruction.raw_candidates,
-        reconstruction_candidates=reconstruction.candidates,
-        selected_reconstruction=reconstruction.selected_candidate,
-        selected_reconstruction_events=reconstruction.selected_events,
-        warnings=parsed.warnings + reconstruction.warnings,
+        warnings=parsed.warnings,
     )
 
 

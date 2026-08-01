@@ -1,4 +1,4 @@
-"""Normalize mapped and rewrite-predicted graph edits into typed contracts."""
+"""Normalize mapped and inferred graph edits into typed contracts."""
 
 from __future__ import annotations
 
@@ -13,13 +13,10 @@ from .reaction_models import (
     ConnectivityEditGraph,
     HydrogenDelta,
     ReactionAtomReference,
-    ReactionInterpretationCandidate,
     ReactionComponent,
     ReactionEdit,
     ReactionEditHypothesis,
     ReactionEvidenceCandidate,
-    ReactionReconstructionCandidate,
-    ReactionSiteReference,
     ReactionStereoChange,
 )
 from .reaction_connectivity import (
@@ -38,11 +35,6 @@ from .reaction_correspondence import (
 )
 
 
-ReconstructionCandidate = (
-    ReactionInterpretationCandidate | ReactionReconstructionCandidate
-)
-
-
 @dataclass(frozen=True)
 class EditNormalizationResult:
     """Normalized edits plus validation and reconciliation evidence."""
@@ -56,6 +48,7 @@ class EditNormalizationResult:
     connectivity_edit_graph: Optional[ConnectivityEditGraph] = None
     evidence_candidates: Tuple[ReactionEvidenceCandidate, ...] = ()
     edit_hypotheses: Tuple[ReactionEditHypothesis, ...] = ()
+    atom_correspondence: Tuple[Tuple[int, int, int, int], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -67,34 +60,6 @@ class _MappedSide:
     mapped_atom_count: int
     heavy_atom_count: int
     mapped_heavy_atom_count: int
-
-
-def _connectivity_graph_with_warnings(
-    graph: Optional[ConnectivityEditGraph],
-    *warnings: str,
-) -> Optional[ConnectivityEditGraph]:
-    if graph is None:
-        return None
-    return replace(
-        graph,
-        warnings=tuple(sorted(set(graph.warnings).union(warnings))),
-    )
-
-
-def _connectivity_graph_has_unknown(
-    graph: Optional[ConnectivityEditGraph],
-) -> bool:
-    return bool(
-        graph
-        and any(
-            "unknown"
-            in {
-                transition.before_state.state_kind,
-                transition.after_state.state_kind,
-            }
-            for transition in graph.bond_transitions
-        )
-    )
 
 
 def _environment_id(mol: Any, atom_index: int) -> str:
@@ -471,169 +436,6 @@ def normalize_mapped_edits(
         bool(edits),
         stereo_changes,
         connectivity_graph,
-    )
-
-
-def _component(
-    components: Tuple[ReactionComponent, ...], component_index: int
-) -> ReactionComponent:
-    return next(
-        component
-        for component in components
-        if component.component_index == component_index
-    )
-
-
-def _role_atom(
-    role_path: str,
-    assignments: Dict[str, ReactionSiteReference],
-    components: Tuple[ReactionComponent, ...],
-) -> ReactionAtomReference:
-    partner_role, atom_role = role_path.split(".", 1)
-    site = assignments[partner_role]
-    indices = site.atom_roles.get(atom_role)
-    if not indices and atom_role == "handle":
-        indices = site.atom_roles.get("leaving_or_activatable")
-    if not indices:
-        raise ValueError(f"Missing atom role {role_path}")
-    return _atom_reference(
-        _component(components, site.component_index), int(indices[0])
-    )
-
-
-def normalize_predicted_edits(
-    selected: Optional[ReconstructionCandidate],
-    reactants: Tuple[ReactionComponent, ...],
-) -> EditNormalizationResult:
-    """Convert rewrite changes for an exact selected candidate to typed edits."""
-    if selected is None or selected.verification not in {
-        "exact_product_reconstruction",
-        "exact_multi_event_reconstruction",
-    }:
-        return EditNormalizationResult((), "no_exact_reconstruction", 0.0, valid=False)
-    assignments = (
-        selected.slot_assignments
-        if isinstance(selected, ReactionReconstructionCandidate)
-        else selected.role_assignments
-    )
-    edits = []
-    stereo_changes = []
-    warnings = []
-    for change in selected.predicted_bond_changes:
-        try:
-            atom_1 = _role_atom(
-                change.atom_1_role, assignments, reactants
-            )
-            atom_2 = (
-                _role_atom(change.atom_2_role, assignments, reactants)
-                if change.atom_2_role is not None
-                else None
-            )
-        except (KeyError, StopIteration, ValueError) as exc:
-            warnings.append(f"PREDICTED_EDIT_PROVENANCE_ERROR:{exc}")
-            continue
-        edits.append(
-            ReactionEdit(
-                edit_type=change.change_type,
-                atom_1=atom_1,
-                atom_2=atom_2,
-                old_order=change.old_order.upper() if change.old_order else None,
-                new_order=change.new_order.upper() if change.new_order else None,
-                evidence=change.evidence,
-                confidence=1.0,
-            )
-        )
-    for change in selected.predicted_stereo_changes:
-        try:
-            atom_1 = _role_atom(
-                change.atom_1_role, assignments, reactants
-            )
-            atom_2 = (
-                _role_atom(change.atom_2_role, assignments, reactants)
-                if change.atom_2_role is not None
-                else None
-            )
-        except (KeyError, StopIteration, ValueError) as exc:
-            warnings.append(f"PREDICTED_STEREO_PROVENANCE_ERROR:{exc}")
-            continue
-        stereo_changes.append(
-            ReactionStereoChange(
-                stereo_type=change.stereo_type,
-                atom_1=atom_1,
-                atom_2=atom_2,
-                old_descriptor=change.old_descriptor,
-                new_descriptor=change.new_descriptor,
-                change_type=change.change_type,
-                evidence=change.evidence,
-                confidence=1.0,
-            )
-        )
-    normalized_edits = tuple(edits)
-    evidence = (
-        "exact_product_reconstruction" if edits else "edit_normalization_failed"
-    )
-    connectivity_graph = (
-        connectivity_graph_from_reaction_edits(
-            normalized_edits,
-            observation_scope="exact_reconstruction",
-            evidence=evidence,
-            confidence=1.0,
-            hydrogen_before_counts=_reactant_hydrogen_counts(reactants),
-            warnings=warnings,
-        )
-        if normalized_edits
-        else None
-    )
-    return EditNormalizationResult(
-        normalized_edits,
-        evidence,
-        1.0 if edits else 0.0,
-        tuple(sorted(set(warnings))),
-        bool(edits),
-        tuple(stereo_changes),
-        connectivity_edit_graph=connectivity_graph,
-    )
-
-
-def normalize_predicted_multi_event_edits(
-    selected_events: Tuple[ReconstructionCandidate, ...],
-    reactants: Tuple[ReactionComponent, ...],
-) -> EditNormalizationResult:
-    """Normalize an exactly reconstructed collection of reaction events."""
-    if len(selected_events) < 2:
-        return EditNormalizationResult((), "no_exact_multi_event_reconstruction", 0.0, valid=False)
-    normalized = tuple(
-        normalize_predicted_edits(candidate, reactants)
-        for candidate in selected_events
-    )
-    warnings = tuple(
-        sorted({warning for result in normalized for warning in result.warnings})
-    )
-    if not all(result.valid for result in normalized):
-        return EditNormalizationResult(
-            (), "multi_event_edit_normalization_failed", 0.0, warnings, False
-        )
-    edits = tuple(edit for result in normalized for edit in result.edits)
-    connectivity_graph = connectivity_graph_from_reaction_edits(
-        edits,
-        observation_scope="exact_reconstruction",
-        evidence="exact_multi_event_reconstruction",
-        confidence=1.0,
-        hydrogen_before_counts=_reactant_hydrogen_counts(reactants),
-        warnings=warnings,
-    )
-    return EditNormalizationResult(
-        edits,
-        "exact_multi_event_reconstruction",
-        1.0,
-        warnings,
-        True,
-        tuple(
-            change
-            for result in normalized
-            for change in result.stereo_changes
-        ),
-        connectivity_edit_graph=connectivity_graph,
     )
 
 
@@ -1211,6 +1013,7 @@ def _edit_hypotheses(
                 stereo_changes=selected[2],
                 correspondence_count=len(values),
                 edit_cost=_correspondence_edit_cost(selected[1]),
+                atom_correspondence=selected[0],
                 warnings=("UNVERIFIED_EDIT_HYPOTHESIS",),
             )
         )
@@ -1399,6 +1202,7 @@ def normalize_inferred_scaffold_edits(
         selected[2],
         connectivity_graph,
         evidence_candidates=(verified_candidate,),
+        atom_correspondence=selected[0],
     )
 
 
@@ -1434,50 +1238,6 @@ def _has_explicit_stereochemistry(molecule: Any) -> bool:
         }
         for bond in molecule.GetBonds()
     )
-
-
-def _canonical_stereo_pair(molecule: Any) -> Tuple[str, str]:
-    from rdkit import Chem
-
-    copy = Chem.Mol(molecule)
-    for atom in copy.GetAtoms():
-        atom.SetAtomMapNum(0)
-    return (
-        Chem.MolToSmiles(copy, canonical=True, isomericSmiles=False),
-        Chem.MolToSmiles(copy, canonical=True, isomericSmiles=True),
-    )
-
-
-def _stereochemical_reconstruction_conflict(
-    candidates: Tuple[ReconstructionCandidate, ...],
-    products: Tuple[ReactionComponent, ...],
-) -> bool:
-    """Detect a structurally matching but explicitly opposite prediction."""
-    product_molecules = tuple(
-        molecule
-        for component in products
-        for molecule in (parse_smiles(component.input_smiles),)
-        if molecule is not None and molecule.GetNumHeavyAtoms() > 0
-    )
-    if len(product_molecules) != 1:
-        return False
-    observed = product_molecules[0]
-    if not _has_explicit_stereochemistry(observed):
-        return False
-    observed_nonisomeric, observed_isomeric = _canonical_stereo_pair(observed)
-    for candidate in candidates:
-        predicted = parse_smiles(candidate.predicted_product_smiles or "")
-        if predicted is None or not _has_explicit_stereochemistry(predicted):
-            continue
-        predicted_nonisomeric, predicted_isomeric = _canonical_stereo_pair(
-            predicted
-        )
-        if (
-            predicted_nonisomeric == observed_nonisomeric
-            and predicted_isomeric != observed_isomeric
-        ):
-            return True
-    return False
 
 
 def _provider_evidence_candidate(
@@ -1523,223 +1283,45 @@ def _provider_candidates(
     )
 
 
-def resolve_reaction_evidence(
+def resolve_structural_evidence(
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
-    selected: Optional[ReconstructionCandidate],
-    selected_events: Tuple[ReconstructionCandidate, ...] = (),
-    candidates: Tuple[ReconstructionCandidate, ...] = (),
     *,
     mapped_override: Optional[EditNormalizationResult] = None,
     mapped_provider: str = "supplied_atom_mapping",
 ) -> EditNormalizationResult:
-    """Collect provider evidence and resolve it through one authority ladder."""
+    """Resolve only observed mapping and graph-correspondence evidence.
+
+    This is the canonical low-level path.  It deliberately does not evaluate
+    reaction operators, reconstruction candidates, or named chemistry patterns.
+    """
     mapped = (
         mapped_override
         if mapped_override is not None
         else normalize_mapped_edits(reactants, products)
     )
-    external_mapping = mapped_provider != "supplied_atom_mapping"
-    predicted = normalize_predicted_edits(selected, reactants)
-    predicted_multi = normalize_predicted_multi_event_edits(
-        selected_events, reactants
-    )
-    provider_candidates = _provider_candidates(
-        (
-            (mapped_provider, mapped),
-            ("exact_reconstruction", predicted),
-            ("exact_multi_event_reconstruction", predicted_multi),
-        )
-    )
-    warnings = tuple(
-        sorted(
-            set(mapped.warnings + predicted.warnings + predicted_multi.warnings)
-        )
-    )
+    mapped_candidates = _provider_candidates(((mapped_provider, mapped),))
     if mapped.evidence == "invalid_atom_mapping":
         return EditNormalizationResult(
             (),
             "unresolved",
             0.0,
-            warnings,
+            mapped.warnings,
             False,
-            evidence_candidates=provider_candidates,
-        )
-    if mapped.valid and predicted.valid:
-        mapped_keys = {_comparison_key(edit) for edit in mapped.edits}
-        predicted_keys = {_comparison_key(edit) for edit in predicted.edits}
-        if mapped_keys == predicted_keys:
-            return EditNormalizationResult(
-                mapped.edits,
-                (
-                    "external_mapping_and_exact_reconstruction"
-                    if external_mapping
-                    else "validated_mapping_and_exact_reconstruction"
-                ),
-                min(mapped.confidence, predicted.confidence),
-                warnings,
-                True,
-                mapped.stereo_changes,
-                _connectivity_graph_with_warnings(
-                    mapped.connectivity_edit_graph,
-                    (
-                        "MAPPING_RECONSTRUCTION_NOT_COMPARABLE"
-                        if _connectivity_graph_has_unknown(
-                            mapped.connectivity_edit_graph
-                        )
-                        else "MAPPING_RECONSTRUCTION_SCOPE_DIFFERENCE"
-                    ),
-                ),
-                evidence_candidates=provider_candidates,
-            )
-        return EditNormalizationResult(
-            mapped.edits,
-            "conflicting_edit_evidence",
-            0.5,
-            tuple(sorted(set(warnings + ("MAPPING_RECONSTRUCTION_CONFLICT",)))),
-            True,
-            mapped.stereo_changes,
-            _connectivity_graph_with_warnings(
-                mapped.connectivity_edit_graph,
-                (
-                    "MAPPING_RECONSTRUCTION_NOT_COMPARABLE"
-                    if _connectivity_graph_has_unknown(
-                        mapped.connectivity_edit_graph
-                    )
-                    else "MAPPING_RECONSTRUCTION_TRANSITION_CONFLICT"
-                ),
-            ),
-            evidence_candidates=provider_candidates,
-        )
-    if mapped.valid and predicted_multi.valid:
-        mapped_keys = {_comparison_key(edit) for edit in mapped.edits}
-        predicted_keys = {_comparison_key(edit) for edit in predicted_multi.edits}
-        if mapped_keys == predicted_keys:
-            return EditNormalizationResult(
-                mapped.edits,
-                (
-                    "external_mapping_and_exact_multi_event_reconstruction"
-                    if external_mapping
-                    else "validated_mapping_and_exact_multi_event_reconstruction"
-                ),
-                min(mapped.confidence, predicted_multi.confidence),
-                warnings,
-                True,
-                mapped.stereo_changes,
-                _connectivity_graph_with_warnings(
-                    mapped.connectivity_edit_graph,
-                    (
-                        "MAPPING_RECONSTRUCTION_NOT_COMPARABLE"
-                        if _connectivity_graph_has_unknown(
-                            mapped.connectivity_edit_graph
-                        )
-                        else "MAPPING_RECONSTRUCTION_SCOPE_DIFFERENCE"
-                    ),
-                ),
-                evidence_candidates=provider_candidates,
-            )
-        return EditNormalizationResult(
-            mapped.edits,
-            "conflicting_edit_evidence",
-            0.5,
-            tuple(sorted(set(warnings + ("MAPPING_RECONSTRUCTION_CONFLICT",)))),
-            True,
-            mapped.stereo_changes,
-            _connectivity_graph_with_warnings(
-                mapped.connectivity_edit_graph,
-                (
-                    "MAPPING_RECONSTRUCTION_NOT_COMPARABLE"
-                    if _connectivity_graph_has_unknown(
-                        mapped.connectivity_edit_graph
-                    )
-                    else "MAPPING_RECONSTRUCTION_TRANSITION_CONFLICT"
-                ),
-            ),
-            evidence_candidates=provider_candidates,
+            evidence_candidates=mapped_candidates,
         )
     if mapped.valid:
-        if _stereochemical_reconstruction_conflict(candidates, products):
-            return EditNormalizationResult(
-                mapped.edits,
-                "conflicting_stereochemical_evidence",
-                0.5,
-                tuple(
-                    sorted(
-                        set(
-                            warnings
-                            + ("STEREOCHEMICAL_RECONSTRUCTION_CONFLICT",)
-                        )
-                    )
-                ),
-                True,
-                mapped.stereo_changes,
-                mapped.connectivity_edit_graph,
-                evidence_candidates=provider_candidates,
-            )
-        return EditNormalizationResult(
-            mapped.edits,
-            mapped.evidence,
-            mapped.confidence,
-            warnings,
-            True,
-            mapped.stereo_changes,
-            mapped.connectivity_edit_graph,
-            evidence_candidates=provider_candidates,
-        )
-    if predicted.valid:
-        return EditNormalizationResult(
-            predicted.edits,
-            predicted.evidence,
-            predicted.confidence,
-            warnings,
-            True,
-            predicted.stereo_changes,
-            connectivity_edit_graph=predicted.connectivity_edit_graph,
-            evidence_candidates=provider_candidates,
-        )
-    if predicted_multi.valid:
-        return EditNormalizationResult(
-            predicted_multi.edits,
-            predicted_multi.evidence,
-            predicted_multi.confidence,
-            warnings,
-            True,
-            predicted_multi.stereo_changes,
-            connectivity_edit_graph=predicted_multi.connectivity_edit_graph,
-            evidence_candidates=provider_candidates,
-        )
+        return replace(mapped, evidence_candidates=mapped_candidates)
+
     inferred = normalize_inferred_scaffold_edits(reactants, products)
-    combined_candidates = (
-        provider_candidates + inferred.evidence_candidates
-    )
+    combined_candidates = mapped_candidates + inferred.evidence_candidates
     if inferred.valid:
-        if _stereochemical_reconstruction_conflict(candidates, products):
-            return EditNormalizationResult(
-                inferred.edits,
-                "conflicting_stereochemical_evidence",
-                0.5,
-                tuple(
-                    sorted(
-                        set(
-                            inferred.warnings
-                            + ("STEREOCHEMICAL_RECONSTRUCTION_CONFLICT",)
-                        )
-                    )
-                ),
-                True,
-                inferred.stereo_changes,
-                inferred.connectivity_edit_graph,
-                evidence_candidates=combined_candidates,
-            )
-        return replace(
-            inferred,
-            evidence_candidates=combined_candidates,
-        )
+        return replace(inferred, evidence_candidates=combined_candidates)
     return EditNormalizationResult(
         (),
         inferred.evidence,
         0.0,
-        tuple(sorted(set(warnings + inferred.warnings))),
+        tuple(sorted(set(mapped.warnings + inferred.warnings))),
         False,
         connectivity_edit_graph=(
             mapped.connectivity_edit_graph
@@ -1755,8 +1337,6 @@ __all__ = [
     "EditNormalizationResult",
     "normalize_mapped_edits",
     "normalize_inferred_scaffold_edits",
-    "normalize_predicted_edits",
-    "normalize_predicted_multi_event_edits",
     "reaction_atom_reference",
-    "resolve_reaction_evidence",
+    "resolve_structural_evidence",
 ]

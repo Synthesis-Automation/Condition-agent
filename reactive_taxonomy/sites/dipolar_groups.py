@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from typing import Any, List
 
-from ..models import SiteCandidate
+from ..models import ReactiveSiteCandidate
 from ..patterns import MatchIndex
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
     """Return carbon- or silicon-attached organic azides with typed N roles."""
     candidate_proximal = match_index.role_atoms(
         "dipolar_group", "proximal_nitrogen"
@@ -18,7 +18,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
         "dipolar_group", "terminal_nitrogen"
     )
     candidate_attachments = match_index.role_atoms("dipolar_group", "attachment")
-    sites: List[SiteCandidate] = []
+    sites: List[ReactiveSiteCandidate] = []
     for central in mol.GetAtoms():
         if central.GetIdx() not in candidate_central:
             continue
@@ -66,7 +66,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 )
             )
             sites.append(
-                SiteCandidate(
+                ReactiveSiteCandidate(
                     site_type="dipolar_group",
                     topology="edge",
                     atom_roles={

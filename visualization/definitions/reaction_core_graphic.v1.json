@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.3",
-  "definition_id": "reaction_core_graphic.v1.3",
+  "schema_version": "1.4",
+  "definition_id": "reaction_core_graphic.v1.4",
   "remote_class_labels": {
     "aryl": "Ar",
     "heteroaryl": "HetAr",

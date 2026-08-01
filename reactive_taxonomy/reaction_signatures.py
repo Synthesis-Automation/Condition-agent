@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Optional, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
-from .descriptors.tokens import reactivity_profile_tokens
 from .reaction_edits import EditNormalizationResult
 from .reaction_events import build_reaction_events
 from .reaction_correspondence import REACTION_CORRESPONDENCE_VERSION
@@ -149,17 +148,6 @@ def _bond_type(edit: Any, order: Optional[str]) -> str:
     return f"{elements[0]}-{elements[1]}:{order or 'NONE'}"
 
 
-def _site_environment(component: ReactionComponent, site_id: str) -> Any:
-    return next(
-        (
-            environment
-            for environment in component.compound_analysis.site_environments
-            if environment.site_id == site_id
-        ),
-        None,
-    )
-
-
 def _component(
     components: Tuple[ReactionComponent, ...], component_index: int
 ) -> Optional[ReactionComponent]:
@@ -190,47 +178,35 @@ def _mapped_partners(
         component = _component(components, component_index)
         if component is None:
             continue
-        sites = tuple(
-            sorted(
-                (
-                    site
-                    for site in component.compound_analysis.sites
-                    if indices.intersection(site.atom_indices)
-                ),
-                key=lambda site: (
-                    site.chemist_label,
-                    site.site_type,
-                    tuple(sorted(str(value) for value in site.details.values())),
-                ),
-            )
-        )
-        handles = tuple(
+        active_atoms = tuple(
             sorted(
                 {
-                    str(token)
-                    for site in sites
-                    for token in (
-                        site.details.get("handle_token"),
-                        site.details.get("center_token"),
-                    )
-                    if token
-                }
+                    atom
+                    for edit in edit_result.edits
+                    for atom in (edit.atom_1, edit.atom_2)
+                    if atom is not None
+                    and atom.side == "reactant"
+                    and atom.component_index == component_index
+                },
+                key=lambda atom: atom.atom_index,
             )
         )
         contexts = tuple(
             sorted(
                 {
-                    str(context)
-                    for site in sites
-                    for context in (
-                        [site.details.get("anchor_context")]
-                        + list(site.details.get("contexts") or ())
+                    "|".join(
+                        (
+                            atom.element,
+                            str(atom.formal_charge),
+                            "aromatic" if atom.aromatic else "aliphatic",
+                            atom.hybridization,
+                            atom.local_environment_id,
+                        )
                     )
-                    if context
+                    for atom in active_atoms
                 }
             )
         )
-        environment = _site_environment(component, sites[0].site_id) if sites else None
         identity = {
             "component": _unmapped_canonical(component),
             "atoms": sorted(
@@ -239,7 +215,6 @@ def _mapped_partners(
                 for atom in (edit.atom_1, edit.atom_2)
                 if atom is not None and atom.component_index == component_index
             ),
-            "handles": handles,
             "contexts": contexts,
         }
         partners.append(
@@ -248,57 +223,16 @@ def _mapped_partners(
                 component_index=component_index,
                 role=None,
                 role_confidence=0.0,
-                reactive_site_ids=tuple(site.site_id for site in sites),
-                handle_tokens=handles,
                 anchor_contexts=contexts,
-                chemist_label=" + ".join(site.chemist_label for site in sites)
-                or _unmapped_canonical(component),
-                nearby_groups=environment.nearby_groups if environment else (),
-                spectator_group_ids=tuple(
-                    sorted(
-                        group.group_id
-                        for group in spectators
-                        if group.component_index == component_index
-                    )
-                ),
-                reactivity_profile=(
-                    environment.reactivity_profile if environment else None
-                ),
+                chemist_label=_unmapped_canonical(component),
             )
         )
     return tuple(sorted(partners, key=lambda partner: partner.partner_id))
 
 
 def _partner_token(partner: ReactionPartner, *, environment: bool) -> Any:
-    base = {
-        "handles": partner.handle_tokens,
-        "contexts": partner.anchor_contexts,
-    }
-    if environment:
-        base.update(
-            {
-                "reactivity_profile_tokens": reactivity_profile_tokens(
-                    partner.reactivity_profile
-                ),
-                "nearby_groups": tuple(
-                    sorted(
-                        (
-                            str(group.get("group_id") or ""),
-                            int(group.get("distance", -1)),
-                            tuple(
-                                sorted(
-                                    str(tag)
-                                    for tag in group.get("tags") or ()
-                                )
-                            ),
-                        )
-                        for group in partner.nearby_groups
-                        if group.get("group_id")
-                    )
-                ),
-            }
-        )
-    return base
+    del environment
+    return {"contexts": partner.anchor_contexts}
 
 
 def build_reaction_signature(
@@ -377,18 +311,9 @@ def build_reaction_signature(
             key=_canonical_json,
         )
     )
-    spectator_tokens = tuple(
-        sorted(
-            (
-                (group.group_id, group.graph_distance, group.tags)
-                for group in spectators
-            ),
-            key=_canonical_json,
-        )
-    )
+    spectator_tokens: tuple[Any, ...] = ()
     topology_token = {
         "reaction_scope": topology.reaction_scope,
-        "same_component_role_groups": topology.same_component_role_groups,
         "formed_bond_scopes": topology.formed_bond_scopes,
         "reactant_tether_distances": topology.reactant_tether_distances,
         "formed_ring_sizes": topology.formed_ring_sizes,
@@ -398,10 +323,6 @@ def build_reaction_signature(
         reactants=reactants,
         edits=edit_result.edits,
         partners=partners,
-        selected=None,
-        selected_events=(),
-        named_family=None,
-        compatible_named_families=(),
         evidence=edit_result.evidence,
         confidence=edit_result.confidence,
     )
@@ -528,11 +449,6 @@ def build_reaction_signature(
         exact_product_verified=bool(
             edit_result.evidence.startswith("validated_atom_mapping")
             or edit_result.evidence.startswith("validated_mapping")
-            or edit_result.evidence
-            in {
-                "exact_product_reconstruction",
-                "exact_multi_event_reconstruction",
-            }
         ),
         evidence=edit_result.evidence,
     )
@@ -569,13 +485,13 @@ def build_reaction_signature(
         named_family=None,
         family_confidence=0.0,
         compatible_named_families=(),
-        spectator_groups=spectators,
+        spectator_groups=(),
         completeness=completeness,
         global_descriptors={
             "edit_count": len(edit_result.edits),
             "event_count": len(events),
             "partner_count": len(partners),
-            "spectator_count": len(spectators),
+            "spectator_count": 0,
         },
         warnings=tuple(
             sorted(
@@ -616,7 +532,7 @@ def build_observation_signature(
     return build_reaction_signature(
         reactants=observation.reactants,
         edit_result=edit_result,
-        spectators=observation.spectator_groups,
+        spectators=(),
         topology=observation.topology,
         completeness=observation.completeness,
         contextual_product_label=contextual_product_label,

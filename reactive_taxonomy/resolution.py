@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Dict, Iterable, List, Set, Tuple
 
-from .models import SiteCandidate
+from .models import ReactiveSiteCandidate
 from .patterns import load_handle_patterns
 
 
@@ -33,21 +33,21 @@ def _pattern_index() -> Dict[str, dict]:
     return {str(item["id"]): item for item in load_handle_patterns()}
 
 
-def _candidate_key(candidate: SiteCandidate) -> Tuple[object, ...]:
+def _candidate_key(candidate: ReactiveSiteCandidate) -> Tuple[object, ...]:
     return (
         candidate.site_type, candidate.topology, candidate.atom_indices,
         candidate.bond_indices, candidate.canonical_signature,
     )
 
 
-def _priority(candidate: SiteCandidate, definitions: Dict[str, dict]) -> int:
+def _priority(candidate: ReactiveSiteCandidate, definitions: Dict[str, dict]) -> int:
     return max((int(definitions.get(pattern_id, {}).get("priority", 0)) for pattern_id in candidate.matched_patterns), default=0)
 
 
-def resolve_candidates(raw_sites: Iterable[SiteCandidate]) -> List[SiteCandidate]:
+def resolve_candidates(raw_sites: Iterable[ReactiveSiteCandidate]) -> List[ReactiveSiteCandidate]:
     """Resolve exact duplicates and taxonomy-declared ownership conflicts."""
     definitions = _pattern_index()
-    deduped: Dict[Tuple[object, ...], SiteCandidate] = {}
+    deduped: Dict[Tuple[object, ...], ReactiveSiteCandidate] = {}
     for candidate in raw_sites:
         pattern_ids = tuple(sorted(
             set(candidate.matched_patterns),

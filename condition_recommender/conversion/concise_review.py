@@ -16,7 +16,7 @@ from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "7.0"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "8.0"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_core_label",
@@ -37,9 +37,6 @@ CONCISE_REACTION_REVIEW_FIELDS = (
     "reaction_core_id",
     "reaction_core_shape_key",
     "reaction_core_mapping_equivalence_key",
-    "reaction_core_motif_key",
-    "reaction_core_limiter",
-    "reaction_core_atom_equation",
     "reaction_core_evidence_status",
     "reaction_core_status",
     "reaction_core_quality_status",
@@ -239,7 +236,6 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
     reaction_core_value = (
         reaction_core if isinstance(reaction_core, Mapping) else {}
     )
-    abstraction_value = reaction_core_value.get("abstraction") or {}
     quality_value = reaction_core_value.get("quality") or {}
     presentation_value = reaction_core_value.get("presentation") or {}
     fallback = record.get("fallback_descriptor")
@@ -336,11 +332,6 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "reaction_core_mapping_equivalence_key": str(
             reaction_core_value.get("mapping_equivalence_key") or ""
         ),
-        "reaction_core_motif_key": str(
-            abstraction_value.get("motif_key") or ""
-        ),
-        "reaction_core_limiter": review_summary.core_limiter,
-        "reaction_core_atom_equation": review_summary.atom_level_core_equation,
         "reaction_core_evidence_status": str(
             reaction_core_value.get("evidence_status") or ""
         ),

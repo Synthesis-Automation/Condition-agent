@@ -1,7 +1,7 @@
 {
-  "schema_version": "3.2",
-  "signature_schema_version": "3.2",
-  "environment_feature_contract": "typed_reactivity_profile.v1",
+  "schema_version": "3.4",
+  "signature_schema_version": "3.4",
+  "environment_feature_contract": "graph_local_environment.v1",
   "continuous_scores_in_identity": false,
   "levels": {
     "L0": [
@@ -9,16 +9,14 @@
       "stereochemistry",
       "reaction_events",
       "reaction_topology",
-      "handles",
-      "anchor_contexts",
-      "reactivity_profile_tokens"
+      "partner_local_environments"
     ],
     "L1": [
       "edit_topology",
       "stereochemistry",
       "reaction_events",
       "reaction_topology",
-      "handles"
+      "partner_active_atom_contexts"
     ],
     "L2": [
       "bond_changes",
@@ -32,9 +30,7 @@
       "hydrogen_changes"
     ],
     "L4": [
-      "reactivity_profile_tokens",
-      "nearby_groups",
-      "spectator_groups"
+      "partner_local_environments"
     ]
   }
 }

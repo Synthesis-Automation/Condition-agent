@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from typing import Any, List
 
-from ..models import SiteCandidate
+from ..models import ReactiveSiteCandidate
 from ..patterns import MatchIndex
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
     """Return C-X/C-H vicinal motifs with explicit atom provenance."""
-    sites: List[SiteCandidate] = []
+    sites: List[ReactiveSiteCandidate] = []
     seen: set[tuple[int, int, int]] = set()
     candidates = match_index.role_atoms("eliminable_pair", "endpoint_a")
     for atom_index in sorted(candidates):
@@ -44,7 +44,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 continue
             departing_element = mol.GetAtomWithIdx(departing_a).GetSymbol()
             sites.append(
-                SiteCandidate(
+                ReactiveSiteCandidate(
                     site_type="eliminable_pair",
                     topology="bond",
                     atom_roles={

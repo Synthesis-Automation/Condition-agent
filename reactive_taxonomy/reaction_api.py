@@ -2,34 +2,27 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from .labels import available_styles
 from .reaction_bond_changes import supplied_map_bond_changes
 from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_edits import (
     EditNormalizationResult,
     normalize_mapped_edits,
-    resolve_reaction_evidence,
+    resolve_structural_evidence,
 )
-from .reaction_labels import render_reactant_label
-from .reaction_environments import build_reaction_family_environment
 from .reaction_fallback_descriptors import build_reaction_fallback_descriptor
-from .reaction_models import ReactionAnalysis, ReactionInterpretation
-from .reaction_interpretation import (
-    build_interpreted_partners,
-    build_reaction_interpretation_candidates,
-)
+from .reaction_models import ReactionAnalysis
+from .reaction_interpretation import interpret_reaction
 from .reaction_observation import build_reaction_observation
-from .reaction_reconstruction import (
-    build_reaction_reconstruction_candidates,
-    canonical_without_maps,
-)
+from .reaction_spectators import derive_observed_spectator_groups
 from .reaction_rendering import render_reaction
-from .reaction_parser import parse_reaction_smiles
+from .reaction_parser import interpret_parsed_molecules, parse_reaction_smiles
 from .partial_product_correspondence import (
     infer_partial_product_transformation,
     render_partial_product_transformation,
 )
-from .reaction_products import build_product_connection
 from .reaction_signatures import build_observation_signature
 
 
@@ -37,12 +30,14 @@ def featurize_reaction(
     reaction_smiles: str,
     *,
     label_style: str = "unicode",
-    max_candidates: int = 500,
     _mapped_edit_override: EditNormalizationResult | None = None,
     _mapped_provider: str = "supplied_atom_mapping",
 ) -> ReactionAnalysis:
     """Analyze structural evidence before optional chemistry interpretation."""
-    parsed = parse_reaction_smiles(reaction_smiles)
+    parsed = parse_reaction_smiles(
+        reaction_smiles,
+        include_molecular_interpretation=False,
+    )
     if label_style not in available_styles():
         return ReactionAnalysis(
             reaction_smiles, False, error=f"UNKNOWN_LABEL_STYLE:{label_style}"
@@ -57,31 +52,17 @@ def featurize_reaction(
             warnings=parsed.warnings,
             error=parsed.error,
         )
-    observed_products = {
-        canonical_without_maps(component.input_smiles)
-        for component in parsed.products
-    }
-    observed_products.discard(None)
     supplied_mapping = (
         _mapped_edit_override
         if _mapped_edit_override is not None
         else normalize_mapped_edits(parsed.reactants, parsed.products)
     )
     invalid_supplied_mapping = supplied_mapping.evidence == "invalid_atom_mapping"
-    reconstruction_build = build_reaction_reconstruction_candidates(
-        reactants=parsed.reactants,
-        observed_products={str(product) for product in observed_products},
-        invalid_supplied_mapping=invalid_supplied_mapping,
-        max_candidates=max_candidates,
-    )
-    warnings = list(parsed.warnings) + list(reconstruction_build.warnings)
+    warnings = list(parsed.warnings)
     mapped_changes = tuple(supplied_map_bond_changes(reaction_smiles))
-    edit_result = resolve_reaction_evidence(
+    edit_result = resolve_structural_evidence(
         parsed.reactants,
         parsed.products,
-        reconstruction_build.selected_candidate,
-        reconstruction_build.selected_events,
-        reconstruction_build.candidates,
         mapped_override=_mapped_edit_override,
         mapped_provider=_mapped_provider,
     )
@@ -92,13 +73,14 @@ def featurize_reaction(
         products=parsed.products,
         edit_result=edit_result,
         mapped_bond_changes=mapped_changes,
-        reconstruction_sources=reconstruction_build.raw_candidates,
-        reconstruction_candidates=reconstruction_build.candidates,
-        selected_reconstruction=reconstruction_build.selected_candidate,
-        selected_reconstruction_events=reconstruction_build.selected_events,
         warnings=warnings,
     )
-    spectators = observation.spectator_groups
+    parsed = interpret_parsed_molecules(parsed)
+    spectators = derive_observed_spectator_groups(
+        parsed.reactants,
+        observation.edits,
+        observation.evidence_quality,
+    )
     reaction_topology = observation.topology
     reaction_core = observation.core
     reaction_completeness = observation.completeness
@@ -137,9 +119,7 @@ def featurize_reaction(
             completeness=reaction_completeness,
         )
         if (
-            reconstruction_build.selected_candidate is None
-            and not reconstruction_build.selected_events
-            and not edit_result.edits
+            not edit_result.edits
             and not invalid_supplied_mapping
         )
         else None
@@ -148,72 +128,19 @@ def featurize_reaction(
         warnings.extend(partial_product_transformation.warnings)
 
     # Optional interpretation starts only after the generic signature exists.
-    interpretation_build = build_reaction_interpretation_candidates(
-        observation,
-        label_style=label_style,
+    interpretation = replace(
+        interpret_reaction(observation, label_style=label_style),
+        spectator_groups=spectators,
     )
-    candidates = interpretation_build.candidates
-    candidate_sources = interpretation_build.candidate_sources
-    selected = interpretation_build.selected_candidate
-    selected_events = interpretation_build.selected_events
-    evidence = interpretation_build.evidence_quality
-    named_family = interpretation_build.named_family
-    compatible_named_families = interpretation_build.compatible_named_families
-    interpretation_conflict = edit_result.evidence in {
-        "conflicting_edit_evidence",
-        "conflicting_stereochemical_evidence",
-    }
-    if interpretation_conflict:
-        named_family = None
-        compatible_named_families = ()
-        warnings.append("INTERPRETATION_OBSERVATION_CONFLICT")
-    family_environment = (
-        build_reaction_family_environment(
-            parsed.reactants,
-            selected,
-            spectators,
-            evidence,
-        )
-        if not interpretation_conflict
-        else None
-    )
-    product_connection = (
-        build_product_connection(
-            selected,
-            evidence,
-            style=label_style,
-        )
-        if not interpretation_conflict
-        else None
-    )
-    product_contradicted_candidates = (
-        interpretation_build.product_contradicted_candidates
-    )
-    if product_contradicted_candidates:
-        warnings.append(
-            "PRODUCT_CONTRADICTED_INTERPRETATION_CANDIDATES"
-        )
     edit_hypotheses = observation.edit_hypotheses
     evidence_candidates = observation.evidence_candidates
-    effective_evidence = reconstruction_build.evidence_quality
-    if edit_result.evidence in {
-        "conflicting_edit_evidence",
-        "conflicting_stereochemical_evidence",
-    }:
-        effective_evidence = edit_result.evidence
-    elif edit_result.evidence.startswith("validated_mapping"):
-        effective_evidence = edit_result.evidence
-    elif edit_result.evidence.startswith("external_mapping"):
-        effective_evidence = edit_result.evidence
-    elif selected is None and (
-        edit_result.valid or edit_result.evidence == "ambiguous_atom_correspondence"
-    ):
-        effective_evidence = edit_result.evidence
-    if partial_product_transformation is not None:
-        effective_evidence = partial_product_transformation.evidence
-    display_arrow = "→" if label_style == "unicode" else "->"
-    fallback_label = selected.interpretation_label if selected else None
-    fallback_status = "exact_product" if selected else "unavailable"
+    effective_evidence = (
+        partial_product_transformation.evidence
+        if partial_product_transformation is not None
+        else edit_result.evidence
+    )
+    fallback_label = None
+    fallback_status = "unavailable"
     fallback_detailed_label = None
     if partial_product_transformation is not None:
         fallback_label, fallback_detailed_label = render_partial_product_transformation(
@@ -223,82 +150,6 @@ def featurize_reaction(
             style=label_style,
         )
         fallback_status = "partial_product_correspondence"
-    elif selected is None and candidates:
-        exact_candidate_indices = tuple(
-            index
-            for index, candidate in enumerate(candidates)
-            if candidate.verification == "exact_product_reconstruction"
-        )
-        fallback_raw = (
-            [candidate_sources[index] for index in exact_candidate_indices]
-            if exact_candidate_indices
-            else candidate_sources
-        )
-        if exact_candidate_indices and len(exact_candidate_indices) < len(candidates):
-            warnings.append("PRODUCT_MISMATCH_CANDIDATES_EXCLUDED_FROM_LABEL")
-        if any(len(assignment) > 1 for _, assignment in fallback_raw):
-            fallback_raw = [
-                (annotation, assignment)
-                for annotation, assignment in fallback_raw
-                if len(assignment) > 1
-            ]
-        reactant_labels = sorted(
-            {
-                render_reactant_label(assignment, style=label_style)
-                for _, assignment in fallback_raw
-            }
-        )
-        if len(reactant_labels) == 1:
-            fallback_label = f"{reactant_labels[0]} {display_arrow}"
-            fallback_status = (
-                "product_contradicted_reactants"
-                if product_contradicted_candidates
-                else "reactant_only"
-            )
-        elif reactant_labels:
-            fallback_label = (
-                " OR ".join(f"({label})" for label in reactant_labels)
-                + f" {display_arrow}"
-            )
-            fallback_status = (
-                "product_contradicted_reactants"
-                if product_contradicted_candidates
-                else "ambiguous_reactants"
-            )
-    elif selected is not None and product_connection is not None:
-        reactants_label = render_reactant_label(
-            selected.role_assignments, style=label_style
-        )
-        fallback_label = (
-            f"{reactants_label} {display_arrow} {product_connection.concise_label}"
-        )
-    interpretation_warnings = set(interpretation_build.warnings)
-    if product_contradicted_candidates:
-        interpretation_warnings.add(
-            "PRODUCT_CONTRADICTED_INTERPRETATION_CANDIDATES"
-        )
-    if interpretation_conflict:
-        interpretation_warnings.add("INTERPRETATION_OBSERVATION_CONFLICT")
-    interpretation = ReactionInterpretation(
-        candidates=candidates,
-        selected_candidate=selected,
-        selected_events=selected_events,
-        partners=build_interpreted_partners(
-            observation,
-            selected,
-            selected_events,
-        ),
-        compatible_named_families=compatible_named_families,
-        named_family=named_family,
-        family_environment=family_environment,
-        product_connection=product_connection,
-        evidence_quality=(
-            "conflicting_interpretation_evidence"
-            if interpretation_conflict
-            else evidence
-        ),
-        warnings=tuple(sorted(interpretation_warnings)),
-    )
     reaction_label = render_reaction(
         observation,
         interpretation,
@@ -320,11 +171,11 @@ def featurize_reaction(
     fallback_descriptor = build_reaction_fallback_descriptor(
         reactants=parsed.reactants,
         products=parsed.products,
-        candidates=tuple(candidates),
         signature=reaction_signature,
         partial_transformation=partial_product_transformation,
         completeness=reaction_completeness,
         evidence_quality=effective_evidence,
+        has_edit_hypotheses=bool(edit_hypotheses),
         warnings=warnings,
     )
     return ReactionAnalysis(
@@ -333,33 +184,26 @@ def featurize_reaction(
         reactants=parsed.reactants,
         agents=parsed.agents,
         products=parsed.products,
-        candidates=tuple(candidates),
-        selected_candidate=selected,
-        selected_events=selected_events,
         edit_archetype=(
-            selected.edit_archetype
-            if selected is not None
-            else reaction_signature.edit_archetype
+            reaction_signature.edit_archetype
             if reaction_signature is not None
             else "unresolved"
         ),
         transformation_class=(
-            selected.transformation_class
-            if selected
-            else reaction_signature.transformation_class
+            reaction_signature.transformation_class
             if reaction_signature is not None
             else partial_product_transformation.transformation_class
             if partial_product_transformation is not None
             else None
         ),
-        compatible_named_families=compatible_named_families,
-        named_family=named_family,
+        compatible_named_families=interpretation.compatible_named_families,
+        named_family=interpretation.named_family,
         reaction_label=reaction_label,
         evidence_quality=effective_evidence,
         mapped_bond_changes=mapped_changes,
         spectator_groups=spectators,
-        family_environment=family_environment,
-        product_connection=product_connection,
+        family_environment=interpretation.family_environment,
+        product_connection=interpretation.product_connection,
         reaction_topology=reaction_topology,
         evidence_candidates=evidence_candidates,
         edit_hypotheses=edit_hypotheses,

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, List
 
-from ..models import SiteCandidate
+from ..models import ReactiveSiteCandidate
 from ..patterns import MatchIndex
 
 
@@ -13,9 +13,9 @@ def _bond_order_name(bond: Any) -> str:
     return {1: "SINGLE", 2: "DOUBLE", 3: "TRIPLE"}.get(value, "UNKNOWN")
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
     """Return curated explicit A-B and implicit A-H addition donors."""
-    sites: List[SiteCandidate] = []
+    sites: List[ReactiveSiteCandidate] = []
     seen: set[tuple[object, ...]] = set()
     candidate_atoms = match_index.role_atoms("addition_donor", "addend_a")
     for atom_index in sorted(candidate_atoms):
@@ -40,7 +40,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 seen.add(key)
                 token = str((definition.get("tokens") or ["XH"])[0])
                 sites.append(
-                    SiteCandidate(
+                    ReactiveSiteCandidate(
                         site_type="addition_donor",
                         topology="atom",
                         atom_roles={
@@ -82,7 +82,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             seen.add(key)
             token = str((definition.get("tokens") or ["AddendPair"])[0])
             sites.append(
-                SiteCandidate(
+                ReactiveSiteCandidate(
                     site_type="addition_donor",
                     topology="bond",
                     atom_roles={

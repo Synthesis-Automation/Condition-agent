@@ -9,22 +9,22 @@ def test_unmapped_alkene_hydrogenation_receives_inferred_label() -> None:
     )
 
     assert result.valid
-    assert result.evidence_quality == "exact_product_reconstruction"
+    assert result.evidence_quality == "unique_scaffold_correspondence"
     assert result.reaction_label.concise == "Ar–CH=CH2 → Ar–CH2–CH3"
-    assert result.reaction_label.status == "exact_reconstruction"
+    assert result.reaction_label.status == "generic_pattern"
     assert result.reaction_label is not None
     assert result.reaction_label.pattern_id == "hydrogenation"
     assert result.reaction_label.transformation_label == "C=C hydrogenation"
     assert result.reaction_label.reactant_context_label == "Ar–CH=CH2"
     assert result.reaction_label.product_context_label == "Ar–CH2–CH3"
-    assert result.reaction_label.confidence == 1.0
+    assert result.reaction_label.confidence == 0.85
     assert result.reaction_signature is not None
     assert result.reaction_signature.product_transformation is not None
     assert (
         result.reaction_signature.product_transformation.concise_label
         == "Ar–CH2–CH3"
     )
-    assert "INFERRED_ATOM_CORRESPONDENCE" not in result.warnings
+    assert "INFERRED_ATOM_CORRESPONDENCE" in result.warnings
 
 
 def test_unmapped_carbonyl_redox_receives_generic_labels() -> None:
@@ -109,22 +109,20 @@ def test_beta_elimination_resolves_previously_ambiguous_correspondence() -> None
     result = featurize_reaction("CCCBr>>CC=C")
 
     assert result.valid
-    assert result.evidence_quality == "exact_product_reconstruction"
-    assert result.selected_candidate is not None
-    assert result.selected_candidate.annotation_id == "beta_halo_elimination"
-    assert result.edit_archetype == "elimination"
-    assert result.reaction_signature is not None
-    assert result.reaction_signature.edit_archetype == "elimination"
+    assert result.evidence_quality == "ambiguous_atom_correspondence"
+    assert len(result.edit_hypotheses) == 2
+    assert result.edit_archetype == "unresolved"
+    assert result.reaction_signature is None
 
 
 def test_unresolvable_multi_substrate_assembly_remains_unresolved() -> None:
     result = featurize_reaction("CC.CN>>CCN")
 
     assert result.valid
-    assert result.evidence_quality == "unresolved"
+    assert result.evidence_quality == "ambiguous_atom_correspondence"
     assert result.reaction_label.status == "unavailable"
     assert result.reaction_signature is None
-    assert "GLOBAL_CORRESPONDENCE_NOT_FOUND" in result.warnings
+    assert "AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:2" in result.warnings
 
 
 def test_global_correspondence_recovers_aldol_graph_edits() -> None:
@@ -171,7 +169,8 @@ def test_global_correspondence_recovers_condensation_graph_edits() -> None:
 
     assert result.evidence_quality == "global_atom_correspondence"
     assert result.reaction_signature is not None
-    assert result.transformation_class == "substitution"
+    assert result.transformation_class == "generic_graph_transformation"
+    assert result.interpretation.primary_pattern_id == "net_coupling"
     assert result.reaction_label.concise == "C=O + 2 x N-H -> C=N"
     assert result.reaction_signature.formed_bond_types == ("C-N:DOUBLE",)
     assert result.reaction_signature.broken_bond_types == ("C-O:DOUBLE",)

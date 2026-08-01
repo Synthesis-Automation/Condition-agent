@@ -1,14 +1,14 @@
 """Regression coverage for explicitly activated sp3 C-H pronucleophiles."""
 
-from reactive_taxonomy import featurize_molecule
+from reactive_taxonomy import analyze_molecule
 
 
 def _activated_sites(smiles: str):
-    result = featurize_molecule(smiles)
+    result = analyze_molecule(smiles)
     assert result.valid, result.error
     return [
         site
-        for site in result.sites
+        for site in result.reactive_site_hypotheses
         if site.site_type == "pronucleophile_XH"
         and site.details.get("center_token") == "Csp3"
     ]
@@ -62,10 +62,10 @@ def test_unactivated_and_other_carbon_hydrogens_are_not_reclassified() -> None:
     assert _activated_sites("CCC") == []
     assert _activated_sites("Cc1ccccc1") == []
 
-    terminal_alkyne = featurize_molecule("CC#C")
+    terminal_alkyne = analyze_molecule("CC#C")
     carbon_sites = [
         site
-        for site in terminal_alkyne.sites
+        for site in terminal_alkyne.reactive_site_hypotheses
         if site.site_type == "pronucleophile_XH"
     ]
     assert [site.canonical_signature for site in carbon_sites] == [

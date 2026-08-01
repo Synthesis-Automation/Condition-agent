@@ -4,11 +4,12 @@ from dataclasses import asdict
 import json
 
 import reactive_taxonomy.reaction_interpretation as interpretation_module
+import reactive_taxonomy.reaction_patterns as pattern_module
+import reactive_taxonomy.reaction_api as reaction_api_module
 from reactive_taxonomy import (
     build_observation_signature,
     featurize_reaction,
     interpret_reaction,
-    load_reaction_operators,
     observe_reaction,
     render_reaction,
 )
@@ -41,37 +42,32 @@ def test_observation_is_interpretation_free_and_builds_generic_products() -> Non
     assert '"named_family"' not in payload
     assert '"transformation_class"' not in payload
     assert '"interpretation_label"' not in payload
-    assert observation.selected_reconstruction is not None
-    assert observation.reconstruction_candidates
+    assert all(
+        not hasattr(component, "molecule_analysis")
+        for component in observation.reactants + observation.products
+    )
 
 
 def test_interpretation_adds_optional_family_semantics() -> None:
     observation = observe_reaction(UNMAPPED_SUZUKI)
     interpretation = interpret_reaction(observation)
 
-    assert interpretation.selected_candidate is not None
-    assert interpretation.selected_candidate.annotation_id == (
-        "boron_transfer_coupling"
-    )
+    assert interpretation.primary_pattern_id == "boron_transfer_coupling_like"
     assert interpretation.named_family == "suzuki_miyaura"
-    assert {partner.role for partner in interpretation.partners} == {
-        "electrophile",
-        "transfer_partner",
-    }
-    assert all(partner.role is not None for partner in interpretation.partners)
+    assert interpretation.partners == ()
     signature = build_observation_signature(observation)
     assert signature is not None
     assert all(partner.role is None for partner in signature.partners)
     rendered = render_reaction(observation, interpretation)
-    assert rendered.source == "verified_interpretation"
+    assert rendered.source != "verified_interpretation"
 
 
-def test_signature_and_core_do_not_depend_on_loaded_interpretations(monkeypatch) -> None:
+def test_signature_and_core_do_not_depend_on_optional_annotations(monkeypatch) -> None:
     reaction = "[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]"
     interpreted = featurize_reaction(reaction)
     monkeypatch.setattr(
-        interpretation_module,
-        "load_reaction_interpretation_annotations",
+        pattern_module,
+        "load_reaction_pattern_definitions",
         lambda: (),
     )
     generic = featurize_reaction(reaction)
@@ -84,21 +80,31 @@ def test_signature_and_core_do_not_depend_on_loaded_interpretations(monkeypatch)
     assert interpreted.reaction_core is not None
     assert generic.reaction_core is not None
     assert interpreted.reaction_core.core_id == generic.reaction_core.core_id
-    assert interpreted.selected_candidate is not None
-    assert generic.selected_candidate is None
     assert generic.named_family is None
     assert interpreted.reaction_label is not None
     assert generic.reaction_label is not None
-    assert interpreted.reaction_label.source == "verified_interpretation"
-    assert generic.reaction_label.source != "verified_interpretation"
+    assert interpreted.reaction_label.concise == generic.reaction_label.concise
 
 
-def test_public_operator_registry_excludes_interpretation_metadata() -> None:
-    operators = load_reaction_operators()
+def test_molecular_reactivity_hypotheses_cannot_change_observation(monkeypatch) -> None:
+    reaction = UNMAPPED_SUZUKI
+    baseline = featurize_reaction(reaction)
+    monkeypatch.setattr(
+        reaction_api_module,
+        "interpret_parsed_molecules",
+        lambda parsed: parsed,
+    )
+    without_annotations = featurize_reaction(reaction)
 
-    assert operators
-    assert len({operator.operator_id for operator in operators}) == len(operators)
-    assert all(not hasattr(operator, "annotation_ids") for operator in operators)
+    assert asdict(baseline.observation) == asdict(without_annotations.observation)
+    assert baseline.reaction_core is not None
+    assert without_annotations.reaction_core is not None
+    assert baseline.reaction_core.core_id == without_annotations.reaction_core.core_id
+    assert baseline.reaction_signature is not None
+    assert without_annotations.reaction_signature is not None
+    assert baseline.reaction_signature.signature_id == (
+        without_annotations.reaction_signature.signature_id
+    )
 
 
 def test_cycloaddition_uses_generic_topology_renderer() -> None:
@@ -123,6 +129,5 @@ def test_analysis_serializes_one_canonical_reaction_label_contract() -> None:
     } == set()
     assert payload["reaction_label"]["concise"]
     assert payload["reaction_label"]["detailed"]
-    assert payload["reaction_label"]["schema_version"] == "3.0"
-    assert "reaction_label" not in payload["candidates"][0]
-    assert payload["candidates"][0]["interpretation_label"]
+    assert payload["reaction_label"]["schema_version"] == "4.0"
+    assert payload["interpretation"]["pattern_matches"]

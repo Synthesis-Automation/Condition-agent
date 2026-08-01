@@ -4,9 +4,7 @@ from reactive_taxonomy import featurize_reaction
 def test_valid_mapping_produces_typed_order_change() -> None:
     result = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
 
-    assert result.evidence_quality == (
-        "validated_mapping_and_exact_reconstruction"
-    )
+    assert result.evidence_quality == "validated_atom_mapping"
     assert result.reaction_signature is not None
     assert result.reaction_signature.named_family is None
     assert len(result.reaction_signature.edits) == 3
@@ -64,7 +62,7 @@ def test_atom_map_element_mismatch_is_rejected() -> None:
     assert "ATOM_MAP_ELEMENT_MISMATCH:1:C:N" in result.warnings
 
 
-def test_mapping_and_reconstruction_conflict_is_preserved() -> None:
+def test_validated_mapping_is_not_overridden_by_a_reaction_pattern() -> None:
     reaction = (
         "[Br:1][c:2]1[cH:3][cH:4][cH:5][cH:6][cH:7]1."
         "[NH2:8][CH3:9]>>"
@@ -72,15 +70,13 @@ def test_mapping_and_reconstruction_conflict_is_preserved() -> None:
     )
     result = featurize_reaction(reaction)
 
-    assert result.selected_candidate is not None
-    assert result.evidence_quality == "conflicting_edit_evidence"
-    assert "MAPPING_RECONSTRUCTION_CONFLICT" in result.warnings
+    assert result.evidence_quality == "validated_atom_mapping"
     assert result.reaction_signature is not None
-    assert result.reaction_signature.evidence_quality == "conflicting_edit_evidence"
-    assert result.reaction_signature.transformation_confidence == 0.5
+    assert result.reaction_signature.evidence_quality == "validated_atom_mapping"
+    assert result.reaction_signature.transformation_confidence == 1.0
 
 
-def test_mapping_and_reconstruction_agreement_keeps_exact_compatibility_view() -> None:
+def test_valid_mapping_builds_graph_identity_without_compatibility_overlay() -> None:
     reaction = (
         "[Br:1][c:2]1[cH:3][cH:4][cH:5][cH:6][cH:7]1."
         "[NH2:8][CH3:9]>>"
@@ -88,15 +84,13 @@ def test_mapping_and_reconstruction_agreement_keeps_exact_compatibility_view() -
     )
     result = featurize_reaction(reaction)
 
-    assert result.evidence_quality == (
-        "validated_mapping_and_exact_reconstruction"
-    )
+    assert result.evidence_quality == "validated_atom_mapping"
     assert result.reaction_signature is not None
     assert (
         result.reaction_signature.evidence_quality
-        == "validated_mapping_and_exact_reconstruction"
+        == "validated_atom_mapping"
     )
-    assert result.product_connection is not None
+    assert result.product_connection is None
 
 
 def test_scaffold_fallback_sorts_mixed_edit_orders_deterministically() -> None:

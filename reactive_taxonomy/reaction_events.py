@@ -9,10 +9,8 @@ from typing import Any, Optional, Sequence, Tuple
 
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_archetypes import reconcile_edit_archetype
-from .reaction_label_patterns import match_reaction_label_pattern
 from .reaction_models import (
     ReactionAtomReference,
-    ReactionInterpretationCandidate,
     ReactionComponent,
     ReactionEdit,
     ReactionEvent,
@@ -199,8 +197,6 @@ def _event_topology(
     return ReactionTopology(
         reaction_scope=reaction_scope,
         participating_component_indices=tuple(sorted(participating)),
-        role_component_indices={},
-        same_component_role_groups=(),
         formed_bond_scopes=tuple(sorted(formed_scopes)),
         reactant_tether_distances=tuple(sorted(tether_distances)),
         formed_ring_sizes=tuple(sorted(formed_ring_sizes)),
@@ -210,51 +206,20 @@ def _event_topology(
     )
 
 
-def _event_sites(
+def _active_atom_ids(
     reactants: Tuple[ReactionComponent, ...], edits: Sequence[ReactionEdit]
 ) -> Tuple[str, ...]:
+    """Return graph-coordinate loci without reactive-site interpretation."""
     atoms_by_component: dict[int, set[int]] = defaultdict(set)
     for edit in edits:
         for atom in (edit.atom_1, edit.atom_2):
             if atom is not None and atom.side == "reactant":
                 atoms_by_component[atom.component_index].add(atom.atom_index)
     return tuple(
-        sorted(
-            f"r{component.component_index}:{site.site_id}"
-            for component in reactants
-            for site in component.compound_analysis.sites
-            if atoms_by_component.get(component.component_index, set()).intersection(
-                site.atom_indices
-            )
-        )
+        f"r{component_index}:atom{atom_index}"
+        for component_index, atom_indices in sorted(atoms_by_component.items())
+        for atom_index in sorted(atom_indices)
     )
-
-
-def _candidate_atom_keys(
-    candidate: ReactionInterpretationCandidate,
-) -> set[Tuple[int, int]]:
-    keys: set[Tuple[int, int]] = set()
-    for change in candidate.predicted_bond_changes:
-        for role_path in (change.atom_1_role, change.atom_2_role):
-            if role_path is None or "." not in role_path:
-                continue
-            partner_role, atom_role = role_path.split(".", 1)
-            site = candidate.role_assignments.get(partner_role)
-            if site is None:
-                continue
-            atom_indices = site.atom_roles.get(atom_role) or ()
-            keys.update(
-                (site.component_index, int(atom_index))
-                for atom_index in atom_indices
-            )
-    if keys:
-        return keys
-    return {
-        (site.component_index, int(atom_index))
-        for site in candidate.role_assignments.values()
-        for atom_indices in site.atom_roles.values()
-        for atom_index in atom_indices
-    }
 
 
 def _event_relations(
@@ -307,10 +272,6 @@ def build_reaction_events(
     reactants: Tuple[ReactionComponent, ...],
     edits: Sequence[ReactionEdit],
     partners: Sequence[ReactionPartner],
-    selected: Optional[ReactionInterpretationCandidate],
-    selected_events: Sequence[ReactionInterpretationCandidate],
-    named_family: Optional[str],
-    compatible_named_families: Tuple[str, ...],
     evidence: str,
     confidence: float,
 ) -> Tuple[Tuple[ReactionEvent, ...], Tuple[ReactionEventRelation, ...]]:
@@ -320,7 +281,7 @@ def build_reaction_events(
     for ordinal, group in enumerate(groups, start=1):
         chemistry = tuple(sorted(_edit_chemistry(edit) for edit in group))
         event_key = _digest(
-            "E0", {"edits": chemistry, "event_schema_version": "1.2"}
+            "E0", {"edits": chemistry, "event_schema_version": "2.0"}
         )
         event_id = f"{_digest('RE1', event_key)}:{ordinal}"
         component_indices = {
@@ -364,36 +325,9 @@ def build_reaction_events(
                 if edit.edit_type == "hydrogen_change"
             )
         )
-        pattern = match_reaction_label_pattern(group, style="ascii")
-        single_event = len(groups) == 1
-        event_site_ids = _event_sites(reactants, group)
-        event_atom_keys = {
-            (atom.component_index, atom.atom_index)
-            for edit in group
-            for atom in (edit.atom_1, edit.atom_2)
-            if atom is not None and atom.side == "reactant"
-        }
-        interpreted = tuple(
-            candidate
-            for candidate in selected_events
-            if _candidate_atom_keys(candidate).issubset(event_atom_keys)
-        )
-        event_candidate = interpreted[0] if len(interpreted) == 1 else None
-        event_families = (
-            tuple(sorted(set(event_candidate.compatible_named_families)))
-            if event_candidate is not None
-            else ()
-        )
-        event_family = event_families[0] if len(event_families) == 1 else None
-        declared_archetype = (
-            event_candidate.edit_archetype
-            if event_candidate is not None
-            else selected.edit_archetype
-            if single_event and selected is not None
-            else None
-        )
+        active_atom_ids = _active_atom_ids(reactants, group)
         edit_archetype, archetype_warnings = reconcile_edit_archetype(
-            group, declared_archetype
+            group, None
         )
         events.append(
             ReactionEvent(
@@ -401,7 +335,7 @@ def build_reaction_events(
                 event_signature_key=event_key,
                 edits=group,
                 partner_ids=event_partners,
-                reactive_site_ids=event_site_ids,
+                active_atom_ids=active_atom_ids,
                 formed_bond_types=formed,
                 broken_bond_types=broken,
                 order_changes=order_changes,
@@ -414,31 +348,11 @@ def build_reaction_events(
                     confidence=confidence,
                 ),
                 edit_archetype=edit_archetype,
-                transformation_class=(
-                    event_candidate.transformation_class
-                    if event_candidate is not None
-                    else selected.transformation_class
-                    if single_event and selected is not None
-                    else pattern.pattern_id if pattern is not None else None
-                ),
+                transformation_class="generic_graph_transformation",
                 transformation_confidence=confidence,
-                named_family=(
-                    event_family
-                    if event_candidate is not None
-                    else named_family if single_event else None
-                ),
-                family_confidence=(
-                    1.0
-                    if event_family or (single_event and named_family)
-                    else 0.0
-                ),
-                compatible_named_families=(
-                    event_families
-                    if event_candidate is not None
-                    else tuple(sorted(set(compatible_named_families)))
-                    if single_event
-                    else ()
-                ),
+                named_family=None,
+                family_confidence=0.0,
+                compatible_named_families=(),
                 evidence=evidence,
                 confidence=confidence,
                 warnings=archetype_warnings,

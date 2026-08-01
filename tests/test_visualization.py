@@ -319,8 +319,8 @@ def test_reaction_core_renderer_draws_click_core_with_stable_placeholders() -> (
 
     assert b"<svg" in graphic.image_bytes[:512]
     assert png.startswith(b"\x89PNG\r\n\x1a\n")
-    assert graphic.definition_id == "reaction_core_graphic.v1.3"
-    assert graphic.schema_version == "1.3"
+    assert graphic.definition_id == "reaction_core_graphic.v1.4"
+    assert graphic.schema_version == "1.4"
     assert [placeholder.label for placeholder in graphic.placeholders] == [
         "R1",
         "R2",
@@ -429,7 +429,7 @@ def test_renderer_reunites_externally_mapped_repeated_suzuki_scaffold() -> None:
         force_resolved_shadow=True,
     )
 
-    assert assessment.status == "external_mapping_internal_consensus"
+    assert assessment.status == "external_mapping_only"
     graphic = build_reaction_core_graphic(
         assessment.analysis,
         size=(1200, 260),
@@ -536,11 +536,8 @@ def test_external_mapping_preserves_intramolecular_core_topology() -> None:
 
     assert assessment.status == "external_mapping_internal_consensus"
     core = assessment.analysis.reaction_core
-    assert core is not None and core.abstraction is not None
-    assert core.abstraction.general_label == (
-        "R–C(=O)OH + Ar–H → R–Ar; intramolecular, "
-        "5-membered ring"
-    )
+    assert core is not None
+    assert not hasattr(core, "abstraction")
     graphic = build_reaction_core_graphic(
         assessment.analysis,
         size=(1200, 260),
@@ -550,11 +547,12 @@ def test_external_mapping_preserves_intramolecular_core_topology() -> None:
     assert b"<svg" in graphic.image_bytes[:512]
 
 
-def test_reaction_core_renderer_requires_mapped_core() -> None:
+def test_reaction_core_renderer_accepts_inferred_minimum_core() -> None:
     analysis = featurize_reaction("CCO>>CC=O")
 
-    with pytest.raises(ValueError, match="ReactionCoreProjection"):
-        build_reaction_core_graphic(analysis)
+    assert analysis.reaction_core is not None
+    graphic = build_reaction_core_graphic(analysis)
+    assert graphic.image_bytes
 
 
 @pytest.mark.parametrize(

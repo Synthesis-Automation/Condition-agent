@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import replace
-from typing import Any, Iterable, Mapping, Optional, Sequence, Tuple
+from typing import Any, Mapping, Optional, Sequence, Tuple
 
 from ..chemistry.rdkit_utils import parse_smiles
 from ..reaction_models import ReactionComponent
@@ -16,22 +16,6 @@ from .models import (
     ReactionCoreRemoteClass,
     ReactionCoreRemoteSubgraph,
 )
-
-
-def _functional_group_ids(
-    component: ReactionComponent,
-    atom_indices: Iterable[int],
-) -> Tuple[str, ...]:
-    selected = {int(value) for value in atom_indices}
-    return tuple(
-        sorted(
-            {
-                str(group.group_id)
-                for group in component.compound_analysis.functional_groups
-                if selected.intersection(int(value) for value in group.atom_indices)
-            }
-        )
-    )
 
 
 def _connected_remote_components(
@@ -279,10 +263,6 @@ def _build_remote_subgraphs_for_side(
                         molecule.GetAtomWithIdx(atom_index).GetIsAromatic()
                         for atom_index in fragment
                     ),
-                    functional_group_ids=_functional_group_ids(
-                        component,
-                        atom_indices,
-                    ),
                 )
             )
     return tuple(
@@ -425,6 +405,5 @@ def _with_remote_continuity(
 
 __all__ = [
     "_build_remote_subgraphs_for_side",
-    "_functional_group_ids",
     "_with_remote_continuity",
 ]

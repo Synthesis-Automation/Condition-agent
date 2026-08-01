@@ -7,7 +7,6 @@ rendering.  Callers should construct cores through
 
 from .builder import build_reaction_core_projection
 from .models import (
-    ReactionCoreAbstraction,
     ReactionCoreAttachmentPort,
     ReactionCoreAtomState,
     ReactionCoreAtomTransition,
@@ -20,7 +19,6 @@ from .models import (
 )
 
 __all__ = [
-    "ReactionCoreAbstraction",
     "ReactionCoreAttachmentPort",
     "ReactionCoreAtomState",
     "ReactionCoreAtomTransition",

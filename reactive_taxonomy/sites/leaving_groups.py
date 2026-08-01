@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, List
 
 from ..context import classify_context
-from ..models import SiteCandidate
+from ..models import ReactiveSiteCandidate
 from ..patterns import MatchIndex
 from .common import bond_index, unique_indices
 
@@ -24,8 +24,8 @@ def _sulfonate_token(sulfur: Any) -> str:
     return "OSO2R"
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
-    sites: List[SiteCandidate] = []
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
+    sites: List[ReactiveSiteCandidate] = []
     candidate_handles = match_index.role_atoms("leaving_group", "handle")
     candidate_connectors = match_index.role_atoms("leaving_group", "connector")
     for handle in mol.GetAtoms():
@@ -46,7 +46,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 "allylic": "Allyl",
                 "propargylic": "Propargyl",
             }.get(context.subtype, context.token)
-            sites.append(SiteCandidate(
+            sites.append(ReactiveSiteCandidate(
                 site_type="leaving_group", topology="edge",
                 atom_roles={"anchor": (anchor.GetIdx(),), "handle": (handle.GetIdx(),)},
                 atom_indices=(anchor.GetIdx(), handle.GetIdx()),
@@ -91,7 +91,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                     match_index=match_index,
                 )
                 sites.append(
-                    SiteCandidate(
+                    ReactiveSiteCandidate(
                         site_type="leaving_group",
                         topology="edge",
                         atom_roles={
@@ -148,7 +148,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             "propargylic": "Propargyl",
         }.get(context.subtype, context.token)
         handle_atoms = tuple(unique_indices([handle.GetIdx(), sulfur.GetIdx(), *(n.GetIdx() for n in sulfur.GetNeighbors() if n.GetIdx() != handle.GetIdx())]))
-        sites.append(SiteCandidate(
+        sites.append(ReactiveSiteCandidate(
             site_type="leaving_group", topology="edge",
             atom_roles={"anchor": (anchor.GetIdx(),), "connector": (handle.GetIdx(),), "center": (sulfur.GetIdx(),), "handle": handle_atoms},
             atom_indices=tuple(unique_indices([anchor.GetIdx(), *handle_atoms])),

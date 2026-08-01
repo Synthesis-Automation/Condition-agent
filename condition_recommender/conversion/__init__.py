@@ -14,7 +14,6 @@ from .generic import convert_record as convert_generic_record
 from .references import normalize_reference
 from .reference_series import reference_condition_series_id
 from .sampling import build_reference_safe_samples
-from .suzuki import convert_file, convert_row
 
 __all__ = [
     "build_recommendation_artifacts",
@@ -22,9 +21,7 @@ __all__ = [
     "RecommendationArtifactProgress",
     "convert_datasets",
     "convert_dataset_folder_to_concise_review_csv",
-    "convert_file",
     "convert_generic_record",
-    "convert_row",
     "build_reference_safe_samples",
     "export_concise_reaction_review_csv",
     "normalize_reference",

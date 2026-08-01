@@ -61,7 +61,7 @@ def _functional_group_contributions(
             contribution = max(-1.0, min(1.0, weight / distance))
             values.append(
                 ElectronicContribution(
-                    source_id=f"functional_group:{group.group_id}:{tag}",
+                    source_id=f"molecular_motif:{group.motif_id}:{tag}",
                     effect="withdrawing" if contribution > 0 else "donating",
                     pathway="inductive",
                     positional_relation=f"distance_{distance}",
@@ -351,7 +351,7 @@ def build_site_reactivity_profile(
     ):
         flags.append("coordination_risk")
     return SiteReactivityProfile(
-        site_id=str(site.site_id),
+        hypothesis_id=str(site.hypothesis_id),
         center_atom_index=center,
         context_kind=context_kind,
         context=context,
@@ -385,7 +385,7 @@ def build_site_reactivity_profile(
             activation_score=electronic_score,
             contributions=electronic_contributions,
             evidence=DescriptorEvidence(
-                source="molecular_graph_and_functional_groups",
+                source="molecular_graph_and_motifs",
                 method=f"{context_kind}_electronic_contributions_v1",
                 confidence=(
                     1.0 if electronic_contributions else 0.65

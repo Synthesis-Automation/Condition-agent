@@ -12,7 +12,7 @@ from condition_registry import (
     CONDITION_RECIPE_COMPONENT_BUCKETS,
     load_condition_vocabulary,
 )
-from reactive_taxonomy import load_functional_group_definitions
+from reactive_taxonomy import load_molecular_motif_definitions
 
 _RULES_PATH = Path(__file__).with_name("definitions") / "compatibility.v1.json"
 _MATCH_KEYS = {
@@ -84,7 +84,7 @@ def validate_compatibility_rules(rules: Mapping[str, Any]) -> None:
     vocabulary = load_condition_vocabulary()
     query_tags = {
         str(tag)
-        for definition in load_functional_group_definitions()
+        for definition in load_molecular_motif_definitions()
         for tag in definition.get("tags") or ()
     }
     family_ids = set(vocabulary.family_ids)

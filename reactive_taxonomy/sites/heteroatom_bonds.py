@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, List
 
-from ..models import SiteCandidate
+from ..models import ReactiveSiteCandidate
 from ..patterns import MatchIndex
 
 _KINDS = {
@@ -29,7 +29,7 @@ _KINDS = {
 }
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
     """Return organic R–N=N–R, R–S–S–R, and R–O–O–R bonds."""
     endpoint_a_candidates = match_index.role_atoms("heteroatom_bond", "endpoint_a")
     endpoint_b_candidates = match_index.role_atoms("heteroatom_bond", "endpoint_b")
@@ -39,7 +39,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
     attachment_b_candidates = match_index.role_atoms(
         "heteroatom_bond", "attachment_b"
     )
-    sites: List[SiteCandidate] = []
+    sites: List[ReactiveSiteCandidate] = []
     for bond in mol.GetBonds():
         left = bond.GetBeginAtom()
         right = bond.GetEndAtom()
@@ -93,7 +93,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             )
         )
         sites.append(
-            SiteCandidate(
+            ReactiveSiteCandidate(
                 site_type="heteroatom_bond",
                 topology="bond",
                 atom_roles={

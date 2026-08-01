@@ -92,7 +92,7 @@ def _recommendation() -> GenericConditionRecommendation:
                 "reaction_label": {
                     "concise": "Precedent Ar–Br coupling",
                     "detailed": "Precedent Ar–Br coupling",
-                    "status": "exact_reconstruction",
+                    "status": "observed_edits",
                 },
                 "spectator_groups": (
                     {
@@ -133,7 +133,7 @@ def _result() -> GenericRecommendationResult:
         reaction_label={
             "concise": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
             "detailed": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
-            "status": "exact_reconstruction",
+            "status": "observed_edits",
         },
         named_family="suzuki_miyaura",
         transformation_class="c_c_transfer_coupling",
@@ -272,7 +272,7 @@ def test_window_renders_recipe_summary_and_details(qtbot) -> None:
 
     summary = window.summary_box.toPlainText()
     assert "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2" in summary
-    assert "Label evidence: Exact Reconstruction" in summary
+    assert "Label evidence: Observed Edits" in summary
     assert "Suzuki Miyaura" in summary
     assert "Mode: Verified Signature" in summary
     assert "R–C≡N [nitrile] (reactant 1, d=3)" in summary

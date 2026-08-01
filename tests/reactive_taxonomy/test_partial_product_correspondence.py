@@ -35,12 +35,7 @@ def test_missing_chlorine_source_yields_partial_acyl_substitution() -> None:
     assert observation.missing_product_atom_elements == ("Cl",)
     assert observation.product_heavy_atom_coverage == 0.9
     assert "PRODUCT_ATOM_SOURCE_UNRESOLVED:Cl" in result.warnings
-    assert "PRODUCT_CONTRADICTED_INTERPRETATION_CANDIDATES" in result.warnings
-    assert all(
-        candidate.verification
-        in {"construction_failed", "product_mismatch"}
-        for candidate in result.candidates
-    )
+    assert "PARTIAL_PRODUCT_CORRESPONDENCE" in result.warnings
     descriptor = result.fallback_descriptor
     assert descriptor is not None
     assert descriptor.partial_transformation_key.startswith("PTS1:")

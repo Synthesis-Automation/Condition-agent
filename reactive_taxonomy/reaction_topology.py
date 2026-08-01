@@ -10,7 +10,6 @@ from typing import Dict, Iterable, Optional, Tuple
 from .chemistry.rdkit_utils import parse_smiles
 from .reaction_edits import EditNormalizationResult, reaction_atom_reference
 from .reaction_models import (
-    ReactionInterpretationCandidate,
     ReactionComponent,
     ReactionEdit,
     ReactionRingChange,
@@ -217,23 +216,6 @@ def _cycle_rank(components: Tuple[ReactionComponent, ...]) -> Optional[int]:
     return total
 
 
-def _same_component_role_groups(
-    selected: Optional[ReactionInterpretationCandidate],
-) -> Tuple[Tuple[str, ...], ...]:
-    if selected is None:
-        return ()
-    by_component: dict[int, list[str]] = defaultdict(list)
-    for role, site in selected.role_assignments.items():
-        by_component[int(site.component_index)].append(str(role))
-    return tuple(
-        sorted(
-            tuple(sorted(roles))
-            for roles in by_component.values()
-            if len(roles) > 1
-        )
-    )
-
-
 def _formed_edits(edits: Iterable[ReactionEdit]) -> Tuple[ReactionEdit, ...]:
     return tuple(
         edit
@@ -246,7 +228,6 @@ def build_reaction_topology(
     *,
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
-    selected: Optional[ReactionInterpretationCandidate],
     edit_result: EditNormalizationResult,
 ) -> Optional[ReactionTopology]:
     """Derive topology from atom-provenanced edits, independent of family names."""
@@ -326,19 +307,9 @@ def build_reaction_topology(
         if reactant_rank is not None and product_rank is not None
         else None
     )
-    role_components = (
-        {
-            str(role): int(site.component_index)
-            for role, site in selected.role_assignments.items()
-        }
-        if selected is not None
-        else {}
-    )
     return ReactionTopology(
         reaction_scope=reaction_scope,
         participating_component_indices=tuple(sorted(participating)),
-        role_component_indices=role_components,
-        same_component_role_groups=_same_component_role_groups(selected),
         formed_bond_scopes=tuple(sorted(formed_scopes)),
         reactant_tether_distances=tuple(sorted(tether_distances)),
         formed_ring_sizes=tuple(

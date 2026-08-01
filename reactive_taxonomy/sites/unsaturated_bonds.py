@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, List
 
-from ..models import SiteCandidate
+from ..models import ReactiveSiteCandidate
 from ..patterns import MatchIndex
 
 
@@ -31,9 +31,9 @@ def _stereochemistry(bond: Any) -> str:
     return ""
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
     """Return localized C=C, C#C, C=N, and C#N bond-capacity sites."""
-    sites: List[SiteCandidate] = []
+    sites: List[ReactiveSiteCandidate] = []
     candidate_endpoint_a = match_index.role_atoms("unsaturated_bond", "endpoint_a")
     candidate_endpoint_b = match_index.role_atoms("unsaturated_bond", "endpoint_b")
     for bond in mol.GetBonds():
@@ -76,7 +76,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
                 )
             )
             sites.append(
-                SiteCandidate(
+                ReactiveSiteCandidate(
                     site_type="unsaturated_bond",
                     topology="bond",
                     atom_roles={
@@ -125,7 +125,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
             if not patterns:
                 continue
             sites.append(
-                SiteCandidate(
+                ReactiveSiteCandidate(
                     site_type="unsaturated_bond",
                     topology="bond",
                     atom_roles={
@@ -193,7 +193,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
         )
         heavy_substitution = sum(endpoint_substituent_counts)
         stereo = _stereochemistry(bond)
-        sites.append(SiteCandidate(
+        sites.append(ReactiveSiteCandidate(
             site_type="unsaturated_bond", topology="bond",
             atom_roles={"endpoint_a": (endpoint_a,), "endpoint_b": (endpoint_b,)},
             atom_indices=(endpoint_a, endpoint_b), bond_indices=(bond.GetIdx(),),

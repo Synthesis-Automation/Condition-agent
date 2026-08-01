@@ -1,7 +1,7 @@
 # Type-Agnostic Reaction Recommendation: Implementation Status and Roadmap
 
 **Status:** Consolidated implementation reference  
-**Reviewed against code, definitions, tests, and local artifacts:** 2026-07-30  
+**Reviewed against code, definitions, tests, and local artifacts:** 2026-08-01
 **Companion design:** 
 [`reaction_condition_recommendation_design_for_chemists.md`](reaction_condition_recommendation_design_for_chemists.md)
 
@@ -45,15 +45,15 @@ reactive_taxonomy       condition_registry
 
 | Area | Current state | Principal implementation |
 | --- | --- | --- |
-| Molecular features | Implemented | Functional groups, reactive sites, canonical connectivity interfaces, typed reactivity profiles |
+| Molecular structure and annotations | Implemented | Structure-only graph observations plus optional motifs, reactive-site hypotheses, connectivity hypotheses, and typed reactivity profiles |
 | Reaction parsing | Implemented | Two- and three-part reaction SMILES with component, map, and source preservation |
-| Connectivity execution | V3 implemented | Interpretation-independent reconstruction rules select bounded graph operators; optional interpretation and family annotations are applied only after core/signature construction |
-| Edit evidence | Implemented | Typed provider candidates from mapping, exact single/multi-event reconstruction, conservative scaffold, bounded global, and fragmented-scaffold correspondence; distinct ambiguous edit hypotheses; conflicts and H/charge/stereo observations |
+| Structural evidence | Implemented | Validated maps and bounded scaffold, global, and fragmented correspondence produce normalized edits or explicit alternatives; reaction patterns never generate edits |
+| Optional patterns | Implemented | Generic transformation and synthesis-pattern matches consume completed observations and may add display/family evidence only |
 | External atom mapping | Optional review/query integration | RXNMapper proposals are structure-validated, reconciled against internal hypotheses, persisted with model provenance, and never admitted as verified precedents |
 | Product completeness | Implemented | Verified/incomplete/unresolved accounting, observation-only product-origin gaps, and typed fragment-source requirements |
-| Reaction signatures | Implemented | Deterministic RS3 L0–L4 signatures, events, ring-change observations, topology, profiles, spectators, unknown-family support |
-| Reaction minimization | V2 integrated, calibration pending | Template-free mapped-edit core projection with atom transitions, remote subgraphs, typed attachment ports, robust shape keys, review export, verified-precedent index maps, and conservative query routing |
-| Reactivity descriptors | Implemented and active | Typed context-aware profiles are the sole active environment path |
+| Reaction signatures | Implemented | Deterministic graph-only RS3 L0–L4 signatures, events, ring-change observations, topology, and unknown-family support |
+| Reaction minimization | V2.4 integrated, calibration pending | Template-free minimum-core projection from mapped or inferred correspondence, with atom transitions, remote subgraphs, typed attachment ports, robust shape keys, and review export |
+| Reactivity descriptors | Optional annotation | Typed context-aware molecular profiles are available above structural observation and do not affect core or signature identity |
 | Condition registry | Implemented, curation incomplete | Conservative identity resolution, contextual roles, RCORE1/RCR1 recipes, stages, provenance |
 | Generic conversion | Implemented | Nested canonical records, independent quality dimensions, review exports, sharding, restart/integrity checks |
 | Generic index | Implemented | Version-checked persisted index with signature, reaction-core, exact partial-transformation, environment, family, fallback, recipe, and reference keys |
@@ -62,12 +62,9 @@ reactive_taxonomy       condition_registry
 | Unverified-query fallback | Implemented, conservative | Separate structure-derived fallback for other unsigned queries; not represented as verified edit retrieval |
 | Evaluation and calibration | Implemented tooling | Grouped, scaffold-, source-, and time-disjoint modes; baselines; calibration; blind review/adjudication |
 | Release validation | Implemented tooling | Machine artifact checks plus hash-bound independent chemist sign-off |
-| Expert rules | Separate limited path | One active C–N protocol; other templates are draft/review-only |
-| Weak-label retrieval | Transitional separate path | Works with structure-poor precedents but carries explicit weaker-evidence warnings |
 
-The generic structure-backed path is the intended cross-family direction.
-There is no automatic fallback among generic retrieval, expert rules, and
-weak-label retrieval. A caller must select the path and preserve its provenance.
+The generic structure-backed path is the single recommendation direction.
+The former expert-rule and weak-label recommendation paths have been removed.
 
 ### 2.2 Active contract versions
 
@@ -75,25 +72,24 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `7.0` |
-| Reaction observation | `2.0` |
-| Reaction interpretation | `3.0` |
-| Rendered reaction label | `3.0` |
-| Reaction signature / ID namespace | `3.2` / `RS3` |
+| Reaction analysis | `9.0` |
+| Reaction observation | `3.0` |
+| Reaction interpretation | `5.0` |
+| Rendered reaction label | `4.0` |
+| Reaction signature / ID namespace | `3.4` / `RS3` |
 | Reaction ring change | `1.0` |
-| Reaction topology | `1.2` |
-| Reaction core projection / algorithm | `2.2` / `reaction_core_projection.v8` |
+| Reaction topology | `2.0` |
+| Reaction core projection / algorithm | `2.4` / `reaction_core_projection.v10` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
-| Connectivity rewrite | `3.0` |
 | Typed reactivity profile | `1.0` |
-| Reaction fallback descriptor | `2.0` / `RFD2` |
+| Reaction fallback descriptor | `3.0` / `RFD3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `7.0` |
-| Generic converter definition | `generic_conversion.v7.0` |
+| Recommendation record | `8.0` |
+| Generic converter definition | `generic_conversion.v8.0` |
 | Generic sharded converter definition | `generic_sharded_conversion.v3.0` |
-| Concise reaction review | `7.0` |
-| Shared chemist review summary | `1.2` |
+| Concise reaction review | `8.0` |
+| Shared chemist review summary | `3.0` |
 | Recommendation artifact workflow | `1.1` |
 | Generic persisted index | `3.0` |
 | Generic recommendation result | `2.4` |
@@ -103,9 +99,9 @@ The current code declares:
 | Evidence-support policy | `evidence_support.v1@1.0` |
 | Generic held-out evaluation | `generic_leakage_safe.v1.5` |
 | Reaction-core calibration | `reaction_core_calibration.v1` |
-| Generic admission policy | `generic_admission.v2.0` |
+| Generic admission policy | `generic_admission.v3.0` |
 | Fragment-source capabilities | `fragment_source_capabilities.v1@1.0` |
-| Fallback retrieval definition | `2.0` |
+| Fallback retrieval definition | `3.0` |
 
 Do not copy this table into executable code. The constants and definition files
 remain authoritative, and stale artifacts must fail validation rather than
@@ -218,7 +214,7 @@ The 2026-07-30 run reports:
 | Unresolved remote-continuity warnings | 3 |
 
 The shape key substantially reduces conflation from the center-only key by
-including participant handle/site evidence, retained remote shape, and event
+including graph-derived participant context, retained remote shape, and event
 count. A hard-negative regression confirms that a vinyl Suzuki and a Heck
 reaction may share `RCS2` while receiving different `RSH2` keys. This is why
 `RCS2` is diagnostic only.
@@ -446,8 +442,8 @@ rows and 120 rows containing at least one new observation:
 
 Rows can contain more than one observation, so category counts are not
 additive. This measures site incidence, not verified transformation or
-recommendation coverage. New interpretation annotations and reconstruction
-rules require their own chemistry validation before they may consume these
+recommendation coverage. New molecular annotations and reaction patterns
+require their own chemistry validation before they may consume these
 observations.
 
 ## 3. Implemented chemistry contracts
@@ -456,23 +452,24 @@ observations.
 
 `reactive_taxonomy` currently provides:
 
-- a public interpretation-independent `ReactionObservation` contract containing parsed
-  components, correspondence evidence, normalized edits, topology,
-  completeness, spectators, and minimum-core projection;
+- a public interpretation-independent `ReactionObservation` contract containing
+  structure-only components, correspondence evidence, normalized edits,
+  topology, completeness, and minimum-core projection;
 - immutable atom-provenanced bond and schema-level hydrogen edits;
 - typed `ReactionEvidenceCandidate` records for each attempted evidence
   provider, so failed interpretation does not erase the observation trail;
 - deterministic `ReactionEditHypothesis` alternatives when correspondence
   supports several chemically distinct minimum-edit explanations;
 - stronger internal before/after connectivity observations with explicit
-  observed, projected, reconstructed, inferred, or unresolved scope;
+  observed, projected, inferred, or unresolved scope;
 - formal-charge and explicit stereochemical observations;
-- canonical molecular reactive links, bond capacities, and connection
-  endpoints;
+- optional molecular motif, reactive-site, local-environment, and connectivity
+  hypotheses kept outside the observation;
 - generic reaction topology and edit-event relationships;
 - typed product-atom completeness, partial product-origin gaps, deterministic
   `PTS1` partial-transformation keys, and `FSR1` fragment-source requirements;
-- graph-derived local reactivity profiles and unchanged spectators;
+- graph-derived local reactivity profiles and unchanged spectators in the
+  optional annotation layer;
 - a serialized, template-free `ReactionCoreProjection` for mapped edit
   observations. The version 2 schema keeps every edit-participating atom as an atom transition,
   chooses a smaller set of primary centers only for explanation, removes each
@@ -484,11 +481,11 @@ observations.
 The remote classes (`aryl`, `heteroaryl`, `alkyl`, and related classes) are
 derived from the removed molecular graph. They are not selected from a reaction
 template or inferred from a source reaction name. Exact fragment SMILES and
-functional-group evidence remain available beside the concise class.
+graph-derived fragment statistics remain available beside the concise class.
 
 `RCX2`, `RCT2`, and `RSH2` form an exact-to-local-to-context retrieval ladder.
-`RSH2` includes generic primary-center transitions, participant handle/site
-tokens, retained remote shape, and event count. This prevents the broad
+`RSH2` includes generic primary-center transitions, graph-derived participant
+context, retained remote shape, and event count. This prevents the broad
 center-only conflation seen in V1, such as assigning the same retrieval
 identity to Suzuki and Heck reactions that share a coarse carbon-center
 transition. `RCS2` remains explanation and analysis output and is never a
@@ -503,18 +500,16 @@ featurizer expose the minimized label, evidence, `RSH2`, diagnostic `RCS2`,
 core size, remote subgraphs, attachment counts, and warnings; reaction batch
 CSV exports the corresponding audit fields.
 
-The internal `CEG1` connectivity-edit graph remains evaluation/shadow output.
-The public and persisted chemistry identity is the RS3 reaction signature.
-Connectivity V2 refers to the active rewrite executor, not promotion of CEG1
-into public identity.
+The internal `CEG1` connectivity-edit graph is the normalized structural
+evidence from which the minimum core and RS3 signature are derived; it is not a
+separate public identity.
 
 ### 3.2 Interpretation
 
-Structural archetypes are derived from edits. Transformation classes and named
-families are optional `ReactionInterpretation` values. Exact single-event and
-composable multi-event reconstruction live in this layer, not in the
-observation contract. Mapped or otherwise verified unknown
-chemistry can receive:
+Generic transformation and synthesis patterns are derived from existing edits.
+They are optional `ReactionInterpretation` values and contain no operators,
+structural slots, predicted products, or edit-generation instructions. Mapped
+or otherwise verified unknown chemistry can receive:
 
 ```text
 transformation_class = generic_graph_transformation
@@ -525,9 +520,9 @@ Source-declared family is stored as provenance outside
 `featurize_reaction()`. It cannot determine the structural output.
 
 One `render_reaction()` entry point builds the chemist-facing label after
-structural analysis. It records whether the result came from verified interpretation,
-generic topology, an edit pattern, the minimum-core projection, or literal
-edits. Its wording and rendering version do not affect signature identity.
+structural analysis. It records whether the result came from generic topology,
+an optional edit pattern, the minimum-core projection, or literal edits. Its
+wording and rendering version do not affect signature identity.
 
 ### 3.3 Recommendation records
 
@@ -701,22 +696,15 @@ Remaining limitations include:
 - coordination, ionic association, isotope exchange, and some radical or
   charge-only chemistry outside the ordinary covalent-edit model.
 
-The template registry can preserve and execute selected mapped reference
-transformations, including explicit multiplicity and curated role constraints.
-It is an interpretation/reconstruction aid, not permission to invent
-correspondence or issue an RS3 signature for incomplete chemistry.
-
 ### 5.3 Architectural cleanup
 
-The desired end state is one canonical structure-backed recommendation path.
-That cleanup is not finished:
+The package now exposes one canonical structure-backed recommendation path.
+Remaining cleanup is outside that package boundary:
 
-- expert rule recommendation remains a separate deliberately limited path;
-- weak-label retrieval remains a transitional lower-evidence path;
 - legacy `chemtools` and legacy application paths still exist outside the new
   package dependency graph;
-- duplicate or transitional paths should be removed only after parity,
-  evaluation, migration, and user-facing replacement are demonstrated.
+- those legacy application paths should be removed after their user-facing
+  replacement is demonstrated.
 
 ## 6. Required next sequence
 
@@ -742,7 +730,7 @@ Include:
 
 - verified, review, rejected, and fallback cases;
 - common and rare transformation classes;
-- mapped, reconstructed, global-correspondence, incomplete, and conflict
+- mapped, inferred-correspondence, ambiguous, incomplete, and conflict
   evidence;
 - intramolecular and multi-event examples;
 - high-confidence family and unnamed reactions;
@@ -834,11 +822,11 @@ by dataset filename or source reaction name.
 
 A chemistry increment must include:
 
-1. molecular site/interface definitions;
-2. a bounded connectivity rewrite or a demonstrated need for a new instruction;
-3. product projection and atom-conservation rules;
+1. graph-correspondence and normalized-edit coverage;
+2. atom-conservation and product-provenance checks;
+3. optional molecular or reaction-pattern definitions when useful;
 4. positive, negative, ambiguous, conflict, and invariance tests;
-5. mapped and exact-reconstruction evidence where applicable;
+5. mapped and inferred-correspondence evidence where applicable;
 6. condition compatibility and explanation updates;
 7. a stratified dataset-impact report and chemist review.
 

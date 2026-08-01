@@ -17,11 +17,7 @@ def test_ambiguous_correspondence_retains_typed_edit_hypotheses() -> None:
     assert len(analysis.edit_hypotheses) == 2
     assert {
         candidate.provider for candidate in analysis.evidence_candidates
-    } == {
-        "exact_reconstruction",
-        "exact_multi_event_reconstruction",
-        "global_correspondence",
-    }
+    } == {"global_correspondence"}
     correspondence = next(
         candidate
         for candidate in analysis.evidence_candidates
@@ -72,7 +68,7 @@ def test_verified_reaction_exposes_provider_evidence_without_hypotheses() -> Non
     assert analysis.reaction_signature is not None
     assert not analysis.edit_hypotheses
     assert any(
-        candidate.provider == "exact_reconstruction"
+        candidate.provider == "global_correspondence"
         and candidate.status == "verified"
         for candidate in analysis.evidence_candidates
     )

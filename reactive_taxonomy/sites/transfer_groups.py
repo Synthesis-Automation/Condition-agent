@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, List
 
 from ..context import classify_context
-from ..models import SiteCandidate
+from ..models import ReactiveSiteCandidate
 from ..patterns import MatchIndex
 from .common import bond_index, unique_indices
 
@@ -37,8 +37,8 @@ def _boron_token(boron: Any) -> str:
     return "B"
 
 
-def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
-    sites: List[SiteCandidate] = []
+def detect(mol: Any, match_index: MatchIndex) -> List[ReactiveSiteCandidate]:
+    sites: List[ReactiveSiteCandidate] = []
     candidate_centers = match_index.role_atoms("transfer_group", "center")
     for handle in mol.GetAtoms():
         symbol = handle.GetSymbol()
@@ -61,7 +61,7 @@ def detect(mol: Any, match_index: MatchIndex) -> List[SiteCandidate]:
         for anchor in carbon_anchors:
             context = classify_context(mol, anchor.GetIdx(), {handle.GetIdx()}, match_index=match_index)
             handle_atoms = tuple(unique_indices([handle.GetIdx(), *(n.GetIdx() for n in handle.GetNeighbors() if n.GetIdx() != anchor.GetIdx())]))
-            sites.append(SiteCandidate(
+            sites.append(ReactiveSiteCandidate(
                 site_type="transfer_group", topology="edge",
                 atom_roles={"anchor": (anchor.GetIdx(),), "center": (handle.GetIdx(),), "handle": handle_atoms},
                 atom_indices=tuple(unique_indices([anchor.GetIdx(), *handle_atoms])),

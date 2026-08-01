@@ -8,7 +8,6 @@ focused import surface for reaction-core implementation and new callers.
 from ..reaction_models import (
     REACTION_CORE_PROJECTION_ALGORITHM_VERSION,
     REACTION_CORE_PROJECTION_SCHEMA_VERSION,
-    ReactionCoreAbstraction,
     ReactionCoreAttachmentPort,
     ReactionCoreAtomState,
     ReactionCoreAtomTransition,
@@ -24,7 +23,6 @@ from ..reaction_models import (
 __all__ = [
     "REACTION_CORE_PROJECTION_ALGORITHM_VERSION",
     "REACTION_CORE_PROJECTION_SCHEMA_VERSION",
-    "ReactionCoreAbstraction",
     "ReactionCoreAttachmentPort",
     "ReactionCoreAtomState",
     "ReactionCoreAtomTransition",

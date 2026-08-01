@@ -7,8 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from .chemistry.smarts_cache import compile_smarts
-from .connectivity_rewrite import load_connectivity_rewrites
-from .reaction_templates import validate_reaction_template_registry
+from .reaction_patterns import load_reaction_pattern_definitions
 
 
 DEFINITIONS_DIR = Path(__file__).with_name("definitions")
@@ -32,19 +31,14 @@ def validate_taxonomy() -> List[str]:
         return [f"taxonomy_load_failed:{exc}"]
     expected = {
         "context_facets.v2",
-        "connectivity_rewrites.v3",
         "descriptor_rules.v1",
-        "functional_groups.v1",
+        "molecular_motifs.v1",
         "site_interfaces.v2",
         "site_patterns.v2",
         "taxonomy_manifest.v3",
         "rendering.v1",
-        "reaction_reconstruction_rules.v1",
-        "reaction_interpretation_annotations.v1",
         "reaction_label_patterns.v1",
         "reaction_label_rendering.v1",
-        "reaction_rendering.v1",
-        "reaction_templates.v2",
         "reactivity_descriptor_rules.v1",
         "aromatic_systems.v1",
         "reactivity_rendering.v1",
@@ -178,22 +172,11 @@ def validate_taxonomy() -> List[str]:
             "missing_manifest_definitions:"
             + ",".join(sorted(missing_manifest_files))
         )
-    template_errors = validate_reaction_template_registry(
-        DEFINITIONS_DIR / "reaction_templates.v2.json"
-    )
-    errors.extend(
-        f"invalid_reaction_template_registry:{error}"
-        for error in template_errors
-    )
-    for required_identity in {
-        "site_patterns.v2.json",
-        "context_facets.v2.json",
-        "site_interfaces.v2.json",
-        "reaction_reconstruction_rules.v1.json",
-        "connectivity_rewrites.v3.json",
-        "reactivity_descriptor_rules.v1.json",
-        "aromatic_systems.v1.json",
-    }:
+    try:
+        load_reaction_pattern_definitions()
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        errors.append(f"invalid_reaction_patterns:{exc}")
+    for required_identity in {"signature_features.v3.json"}:
         if required_identity not in identity_files:
             errors.append(f"missing_identity_definition:{required_identity}")
     descriptor_rules = payload["descriptor_rules.v1"].get("site_environment") or {}
@@ -214,16 +197,16 @@ def validate_taxonomy() -> List[str]:
             "nucleophile",
         }:
             errors.append(f"invalid_heteroatom_environment_roles:{family_id}")
-    group_records = payload["functional_groups.v1"].get("groups") or []
+    group_records = payload["molecular_motifs.v1"].get("groups") or []
     group_ids = [str(record.get("id") or "") for record in group_records]
     if not group_records:
-        errors.append("missing_functional_groups")
+        errors.append("missing_molecular_motifs")
     if len(group_ids) != len(set(group_ids)):
-        errors.append("duplicate_functional_group_ids")
+        errors.append("duplicate_molecular_motif_ids")
     for record in group_records:
         group_id = str(record.get("id") or "<missing>")
         if not record.get("label"):
-            errors.append(f"missing_functional_group_label:{group_id}")
+            errors.append(f"missing_molecular_motif_label:{group_id}")
         raw_group_patterns = record.get("smarts") or ""
         group_patterns = (
             raw_group_patterns
@@ -234,12 +217,12 @@ def validate_taxonomy() -> List[str]:
             compile_smarts(str(smarts), validate=False) is None
             for smarts in group_patterns
         ):
-            errors.append(f"invalid_functional_group_smarts:{group_id}")
+            errors.append(f"invalid_molecular_motif_smarts:{group_id}")
         unknown_suppressed = set(record.get("suppresses_on_overlap") or []) - set(
             group_ids
         )
         if unknown_suppressed:
-            errors.append(f"unknown_suppressed_functional_group:{group_id}")
+            errors.append(f"unknown_suppressed_molecular_motif:{group_id}")
     patterns = payload["site_patterns.v2"].get("patterns") or []
     pattern_ids = [str(pattern.get("id") or "") for pattern in patterns]
     if not patterns:
@@ -358,114 +341,12 @@ def validate_taxonomy() -> List[str]:
         errors.append("duplicate_rendering_rule_ids")
     if any(not rule.get("template") for rule in rendering_rules):
         errors.append("missing_rendering_template")
-    rule_ids: List[str] = []
-    known_roles: Dict[str, set[str]] = {site_type: set() for site_type in required}
-    for pattern in patterns:
-        known_roles.get(str(pattern.get("site_type")), set()).update(
-            (pattern.get("atom_roles") or {}).keys()
-        )
-    reconstruction_rules = (
-        payload["reaction_reconstruction_rules.v1"].get("rules") or []
-    )
-    for rule in reconstruction_rules:
-        rule_id = str(rule.get("id") or "<missing>")
-        rule_ids.append(rule_id)
-        slots = rule.get("slots") or {}
-        if not slots:
-            errors.append(f"missing_reconstruction_slots:{rule_id}")
-        for slot_name, constraint in slots.items():
-            if constraint.get("site_type") not in required:
-                errors.append(f"invalid_reaction_site_type:{rule_id}:{slot_name}")
-            unknown_contexts = set(constraint.get("contexts_any") or ()) - set(
-                tokens
-            )
-            if unknown_contexts:
-                errors.append(
-                    f"invalid_reaction_context:{rule_id}:{slot_name}"
-                )
-        for relationship in rule.get("slot_relationships") or []:
-            relationship_roles = relationship.get("slots") or []
-            if (
-                len(relationship_roles) < 2
-                or any(role not in slots for role in relationship_roles)
-                or relationship.get("component_relation")
-                not in {"same", "different", "same_or_different"}
-            ):
-                errors.append(f"invalid_slot_relationship:{rule_id}")
-        bindings = rule.get("operator_slot_bindings") or {}
-        if not bindings or any(slot not in slots for slot in bindings.values()):
-            errors.append(f"invalid_operator_slot_bindings:{rule_id}")
-    if len(rule_ids) != len(set(rule_ids)):
-        errors.append("duplicate_reconstruction_rule_ids")
-    try:
-        connectivity_rewrites = load_connectivity_rewrites()
-    except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
-        errors.append(f"invalid_connectivity_rewrites:{exc}")
-        connectivity_rewrites = ()
-    rewrite_ids = {rewrite.rewrite_id for rewrite in connectivity_rewrites}
-    referenced_rewrite_ids = {
-        str(rule.get("operator_id") or "") for rule in reconstruction_rules
-    }
-    unknown_rewrite_ids = referenced_rewrite_ids - rewrite_ids
-    if unknown_rewrite_ids:
-        errors.append(
-            "unknown_reconstruction_operators:"
-            + ",".join(sorted(unknown_rewrite_ids))
-        )
-    interpretation_annotations = (
-        payload["reaction_interpretation_annotations.v1"].get("annotations")
-        or []
-    )
-    annotation_ids = {
-        str(annotation.get("id") or "")
-        for annotation in interpretation_annotations
-    }
-    annotation_rules = {
-        str(annotation.get("reconstruction_rule_id") or "")
-        for annotation in interpretation_annotations
-    }
-    unknown_annotation_rules = annotation_rules - set(rule_ids)
-    if unknown_annotation_rules:
-        errors.append(
-            "unknown_annotation_reconstruction_rules:"
-            + ",".join(sorted(unknown_annotation_rules))
-        )
-    reaction_rendering = payload["reaction_rendering.v1"].get("rules") or {}
-    product_precedence = (
-        payload["reaction_rendering.v1"].get("product_context_precedence") or []
-    )
-    if (
-        len(product_precedence) != len(set(product_precedence))
-        or not product_precedence
-    ):
-        errors.append("invalid_product_context_precedence")
-    if "Other" not in product_precedence:
-        errors.append("missing_product_context_fallback")
-    attachment_labels = (
-        payload["reaction_rendering.v1"].get(
-            "attachment_oriented_context_labels"
-        )
-        or {}
-    )
-    if set(attachment_labels) - set(tokens):
-        errors.append("unknown_attachment_oriented_context")
-    if any(not str(template).strip() for template in attachment_labels.values()):
-        errors.append("invalid_attachment_oriented_context_template")
-    fragment_indexing = payload["reaction_rendering.v1"].get("fragment_indexing") or {}
-    context_symbols = fragment_indexing.get("context_symbols") or {}
-    if not isinstance(context_symbols, dict) or not context_symbols:
-        errors.append("invalid_reaction_fragment_context_symbols")
-    alias_template = str(fragment_indexing.get("alias_template") or "")
-    if "{symbol}" not in alias_template or "{index}" not in alias_template:
-        errors.append("invalid_reaction_fragment_alias_template")
-    if set(reaction_rendering) != annotation_ids:
-        errors.append("reaction_rendering_coverage_mismatch")
     signature_features = payload["signature_features.v3"]
-    if signature_features.get("signature_schema_version") != "3.2":
+    if signature_features.get("signature_schema_version") != "3.4":
         errors.append("invalid_signature_schema_version")
     if (
         signature_features.get("environment_feature_contract")
-        != "typed_reactivity_profile.v1"
+        != "graph_local_environment.v1"
     ):
         errors.append("invalid_signature_environment_contract")
     signature_levels = signature_features.get("levels") or {}
@@ -474,39 +355,15 @@ def validate_taxonomy() -> List[str]:
         for level in ("L0", "L1", "L2")
     ):
         errors.append("missing_signature_reaction_topology")
-    allowed_product_kinds = {
-        "join_contexts",
-        "nitrogen_substitution",
-        "heteroatom_substitution",
-        "terminal_alkyne",
-        "activated_carbon_substitution",
-        "aromatic_ch_substitution",
-        "heck_alkene",
-        "chan_lam",
-        "reductive_amination",
-        "amide",
-        "acyl_heteroatom",
-        "aryl_acylation",
-        "sulfonamide",
-        "sulfonate",
-        "fixed_product",
-    }
-    for annotation_id, rule in reaction_rendering.items():
-        if rule.get("product_kind") not in allowed_product_kinds:
-            errors.append(
-                f"invalid_reaction_product_renderer:{annotation_id}"
-            )
-        if (
-            rule.get("product_kind") == "fixed_product"
-            and not str(rule.get("product_label") or "").strip()
-        ):
-            errors.append(f"missing_fixed_reaction_product:{annotation_id}")
     label_rendering = payload["reaction_label_rendering.v1"]
     label_styles = label_rendering.get("styles") or {}
     if label_rendering.get("default_style") not in label_styles:
         errors.append("invalid_default_reaction_label_style")
     if set(label_styles) != set(styles):
         errors.append("reaction_label_style_mismatch")
+    fragment_symbols = label_rendering.get("fragment_context_symbols") or []
+    if not fragment_symbols or len(fragment_symbols) != len(set(fragment_symbols)):
+        errors.append("invalid_reaction_fragment_context_symbols")
     edit_types = {"formed", "broken", "order_changed", "hydrogen_change"}
     clause_order = label_rendering.get("clause_order") or []
     if set(clause_order) != edit_types or len(clause_order) != len(edit_types):

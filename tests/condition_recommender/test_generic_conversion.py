@@ -110,9 +110,9 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "7.0"
-    assert record.converter_definition_version == "generic_conversion.v7.0"
-    assert record.reaction_signature["schema_version"] == "3.2"
+    assert record.schema_version == "8.0"
+    assert record.converter_definition_version == "generic_conversion.v8.0"
+    assert record.reaction_signature["schema_version"] == "3.4"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
@@ -145,9 +145,9 @@ def test_mapped_unknown_reaction_serializes_reaction_core_for_review() -> None:
 
     assert record.admission_tier == AdmissionTier.REVIEW
     assert record.reaction_core is not None
-    assert record.reaction_core["schema_version"] == "2.2"
+    assert record.reaction_core["schema_version"] == "2.4"
     assert record.reaction_core["algorithm_version"] == (
-        "reaction_core_projection.v8"
+        "reaction_core_projection.v10"
     )
     assert record.reaction_core["shape_core_key"].startswith("RSH2:")
     assert record.reaction_core["generic_label"] == (
@@ -183,25 +183,26 @@ def test_cycloaddition_ring_observation_is_chemist_readable_in_review() -> None:
     )
 
 
-def test_inverting_alcohol_displacement_serializes_stereo_without_named_family() -> (
+def test_ambiguous_alcohol_displacement_retains_structural_hypotheses() -> (
     None
 ):
     reaction = "CNCC[C@H](O)c1ccccc1.Cc1ccccc1O>>CNCC[C@@H](Oc1ccccc1C)c1ccccc1"
 
     record = convert_record(_raw(reaction))
 
-    assert record.chemistry_status == ChemistryStatus.VERIFIED
-    assert record.reaction_signature is not None
+    assert record.chemistry_status == ChemistryStatus.REVIEW
+    assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
+    assert record.reaction_signature is None
     assert record.named_family is None
-    assert record.transformation_class == "sp3_c_o_substitution"
-    stereo_changes = record.reaction_signature["stereo_changes"]
-    assert len(stereo_changes) == 1
-    assert stereo_changes[0]["old_descriptor"] == "S"
-    assert stereo_changes[0]["new_descriptor"] == "R"
-    assert stereo_changes[0]["change_type"] == "inverted"
-    assert stereo_changes[0]["evidence"] == ("connectivity_rewrite:invert_if_defined")
+    assert record.transformation_class is None
+    assert len(record.reaction_edit_hypotheses) == 2
+    assert all(
+        hypothesis["stereo_changes"][0]["change_type"]
+        == "descriptor_changed"
+        for hypothesis in record.reaction_edit_hypotheses
+    )
     review = concise_reaction_review_row(record.to_dict())
-    assert review["stereochemical_changes"] == "atom: S→R (inverted)"
+    assert review["edit_hypothesis_count"] == "2"
 
 
 def test_conversion_cache_reuses_deterministic_reaction_analysis(
@@ -233,9 +234,9 @@ def test_mapped_unknown_family_signature_is_verified() -> None:
 
     assert record.admission_tier == AdmissionTier.VERIFIED
     assert record.named_family is None
-    assert record.evidence_quality == ("validated_mapping_and_exact_reconstruction")
+    assert record.evidence_quality == "validated_atom_mapping"
     assert record.reaction_label["concise"] == "H2C=CH2 → H3C–CH3"
-    assert record.reaction_label["status"] == "exact_reconstruction"
+    assert record.reaction_label["status"] == "generic_pattern"
     assert record.reaction_label["pattern_id"] == "hydrogenation"
     assert record.reaction_label["transformation_label"] == (
         "C=C hydrogenation"
@@ -253,33 +254,36 @@ def test_exact_multi_event_signature_is_verified() -> None:
     record = convert_record(_raw("CO.CS.Fc1ccc(F)cc1>>COc1ccc(SC)cc1"))
 
     assert record.admission_tier == AdmissionTier.VERIFIED
-    assert record.evidence_quality == "exact_multi_event_reconstruction"
+    assert record.evidence_quality == "global_atom_correspondence"
     assert record.named_family is None
     assert record.reaction_signature is not None
     assert record.reaction_signature["event_count"] == 2
     assert record.reaction_signature["event_scope"] == "multi_event"
     assert record.reaction_label is not None
-    assert record.reaction_label["concise"].count("substitution") == 2
+    assert record.reaction_label["event_count"] == 2
+    assert len(record.reaction_label["event_labels"]) == 2
     assert " + " in record.reaction_label["concise"]
 
 
-def test_global_correspondence_is_indexable_with_review_confidence() -> None:
+def test_global_correspondence_is_verified_structural_evidence() -> None:
     record = convert_record(_raw("CC=O.CN>>CC=NC"))
 
     assert record.evidence_quality == "global_atom_correspondence"
     assert record.reaction_signature is not None
     assert record.reaction_completeness is not None
     assert record.reaction_completeness["status"] == "verified"
-    assert record.chemistry_status == ChemistryStatus.REVIEW
-    assert record.admission_tier == AdmissionTier.REVIEW
+    assert record.chemistry_status == ChemistryStatus.VERIFIED
+    assert record.admission_tier == AdmissionTier.VERIFIED
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
-    assert record.admission_reasons == ("insufficient_edit_evidence",)
+    assert record.admission_reasons == (
+        "verified_reaction_signature_with_conditions",
+    )
     index = build_generic_index([record.to_dict()])
     assert len(index.rows) == 1
-    assert index.rows[0].chemistry_status == "review"
+    assert index.rows[0].chemistry_status == "verified"
 
 
-def test_stereochemical_conflict_is_retained_but_not_indexed() -> None:
+def test_optional_patterns_do_not_create_stereochemical_conflicts() -> None:
     reaction = (
         "COc1ccc(C)cc1B(O)O."
         "O=C1c2ccccc2C(=O)N1C/C=C(/Br)c1ccccc1>>"
@@ -288,24 +292,24 @@ def test_stereochemical_conflict_is_retained_but_not_indexed() -> None:
     record = convert_record(_raw(reaction))
 
     assert record.reaction_signature is not None
-    assert record.evidence_quality == "conflicting_stereochemical_evidence"
-    assert record.chemistry_status == ChemistryStatus.REVIEW
-    assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
-    assert "conflicting_stereochemical_evidence" in record.admission_reasons
-    assert len(build_generic_index([record.to_dict()]).rows) == 0
+    assert record.evidence_quality == "global_atom_correspondence"
+    assert record.chemistry_status == ChemistryStatus.VERIFIED
+    assert record.index_eligibility == IndexEligibility.ELIGIBLE
+    assert "conflicting_stereochemical_evidence" not in record.admission_reasons
+    assert len(build_generic_index([record.to_dict()]).rows) == 1
 
 
-def test_interpretation_only_record_is_review_not_rejected() -> None:
+def test_unresolved_record_is_rejected_even_with_fallback_descriptor() -> None:
     record = convert_record(_raw("Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1"))
 
-    assert record.admission_tier == AdmissionTier.REVIEW
+    assert record.admission_tier == AdmissionTier.REJECTED
     assert record.admission_reasons == (
-        "missing_verified_reaction_signature",
+        "no_usable_transformation_evidence",
         "reaction_completeness_unresolved",
     )
     assert record.fallback_descriptor is not None
-    assert record.fallback_descriptor["schema_version"] == "2.0"
-    assert not record.fallback_descriptor["retrieval_eligible"]
+    assert record.fallback_descriptor["schema_version"] == "3.0"
+    assert record.fallback_descriptor["retrieval_eligible"]
 
 
 def test_ambiguous_edit_hypotheses_are_serialized_but_not_indexed() -> None:
@@ -320,11 +324,7 @@ def test_ambiguous_edit_hypotheses_are_serialized_but_not_indexed() -> None:
     assert len(record.reaction_edit_hypotheses) == 2
     assert {
         value["provider"] for value in record.reaction_evidence_candidates
-    } == {
-        "exact_reconstruction",
-        "exact_multi_event_reconstruction",
-        "global_correspondence",
-    }
+    } == {"global_correspondence"}
     assert all(
         value["hypothesis_id"].startswith("REH1:")
         for value in record.reaction_edit_hypotheses
@@ -337,14 +337,17 @@ def test_ambiguous_edit_hypotheses_are_serialized_but_not_indexed() -> None:
     assert review["edit_hypothesis_ids"].count("REH1:") == 2
 
 
-def test_unresolved_record_serializes_eligible_fallback_descriptor() -> None:
+def test_ambiguous_record_serializes_ineligible_fallback_descriptor() -> None:
     record = convert_record(_raw("CC.CN>>CCN"))
 
     assert record.reaction_signature is None
     assert record.fallback_descriptor is not None
-    assert record.fallback_descriptor["descriptor_id"].startswith("RFD2:")
+    assert record.fallback_descriptor["descriptor_id"].startswith("RFD3:")
     assert record.fallback_descriptor["evidence_mode"] == ("structure_inventory_only")
-    assert record.fallback_descriptor["retrieval_eligible"]
+    assert not record.fallback_descriptor["retrieval_eligible"]
+    assert "ambiguous_edit_hypotheses" in (
+        record.fallback_descriptor["ineligibility_reasons"]
+    )
     assert record.fallback_descriptor["reactant_component_tokens"] == (
         "CC",
         "CN",
@@ -582,8 +585,8 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
 
     assert report["tier_counts"] == {
         "verified": 2,
-        "review": 1,
-        "rejected": 1,
+        "review": 0,
+        "rejected": 2,
     }
     assert report["signature_count"] == 2
     assert report["resolved_recipe_count"] > 0
@@ -609,7 +612,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     }
     assert json.loads((output / "conversion_report.json").read_text()) == report
     assert report["schema_version"] == "2.1"
-    assert report["reaction_signature_schema_version"] == "3.2"
+    assert report["reaction_signature_schema_version"] == "3.4"
     assert report["reaction_scope_counts"] == {
         "intermolecular": 1,
         "unimolecular": 1,
@@ -648,7 +651,7 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "7.0"
+    assert report["schema_version"] == "8.0"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
@@ -671,21 +674,22 @@ def test_concise_reaction_review_export_has_only_requested_columns(
     assert review_rows[0]["reaction_display_label_detailed"]
     assert review_rows[0]["original_reaction_type"] == "Original Suzuki Label"
     assert review_rows[0]["detected_reaction_family"] == "suzuki_miyaura"
-    assert review_rows[0]["reaction_display_status"] == "family_overlay"
-    assert review_rows[0]["transformation_class"] == "c_c_transfer_coupling"
-    assert review_rows[0]["fallback_descriptor_id"].startswith("RFD2:")
+    assert review_rows[0]["reaction_display_status"] == "observed_edits"
+    assert review_rows[0]["transformation_class"] == (
+        "generic_graph_transformation"
+    )
+    assert review_rows[0]["fallback_descriptor_id"].startswith("RFD3:")
     assert review_rows[0]["fallback_retrieval_eligible"] == "True"
     assert review_rows[0]["signature_id"].startswith("RS3:")
-    assert review_rows[0]["evidence_quality"] == "exact_product_reconstruction"
+    assert review_rows[0]["evidence_quality"] == "global_atom_correspondence"
     assert review_rows[0]["reaction_completeness_status"] == "verified"
-    assert review_rows[0]["reaction_core_status"] == "unavailable"
-    assert review_rows[0]["reaction_core_unavailability_reasons"] == (
-        "missing_cross_side_atom_correspondence"
-    )
+    assert review_rows[0]["reaction_core_status"] == "available_inferred"
+    assert review_rows[0]["reaction_core_label"] == "Ar–B + Ar–Br → Ar–Ar"
+    assert review_rows[0]["reaction_core_unavailability_reasons"] == ""
     assert review_rows[0]["chemistry_status"] == "verified"
     assert review_rows[0]["condition_stage_status"] == "single_stage"
     assert review_rows[0]["index_eligibility"] == "eligible"
-    assert review_rows[0]["reactivity_profile"]
+    assert review_rows[0]["reactivity_profile"] == ""
 
 
 def test_concise_review_formats_spectators_and_partner_environment() -> None:
@@ -891,7 +895,9 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
     )
     assert first["output_row_count"] == 4
     assert first["index_eligibility_counts"] == {"eligible": 4}
-    assert first["transformation_class_counts"] == {"c_c_transfer_coupling": 4}
+    assert first["transformation_class_counts"] == {
+        "generic_graph_transformation": 4
+    }
     assert first["named_family_counts"] == {"suzuki_miyaura": 4}
     assert first["integrity"]["valid"]
     assert second["reused_shard_count"] == 2

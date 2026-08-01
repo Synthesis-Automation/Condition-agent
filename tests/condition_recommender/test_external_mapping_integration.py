@@ -209,10 +209,10 @@ def _resolved_raw_record():
     )
 
 
-def test_converter_shadow_maps_resolved_reaction_with_missing_core() -> None:
+def test_converter_uses_inferred_core_without_external_mapping() -> None:
     base = featurize_reaction(RESOLVED_SUZUKI_REACTION)
     assert base.reaction_signature is not None
-    assert base.reaction_core is None
+    assert base.reaction_core is not None
     provider = _ResolvedFixtureProvider()
 
     record = convert_record(
@@ -220,43 +220,45 @@ def test_converter_shadow_maps_resolved_reaction_with_missing_core() -> None:
         mapping_provider=provider,
     )
 
-    assert provider.call_count == 1
+    assert provider.call_count == 0
     assert record.reaction_signature is not None
     assert record.reaction_signature["signature_id"] == (
         base.reaction_signature.signature_id
     )
     assert record.reaction_core is not None
-    assert record.reaction_core["evidence_status"] == "external"
+    assert record.reaction_core["evidence_status"] == "inferred"
     assert record.external_atom_mapping is not None
     assert record.external_atom_mapping["status"] == (
-        "external_mapping_internal_consensus"
+        "not_requested_resolved_internal_evidence"
     )
     assert record.chemistry_status == ChemistryStatus.VERIFIED
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
     assert len(build_generic_index([record.to_dict()]).rows) == 1
     review = concise_reaction_review_row(record.to_dict())
     assert review["reaction_core_label"]
-    assert review["reaction_core_status"] == "available_external"
+    assert review["reaction_core_status"] == "available_inferred"
     assert review["reaction_core_unavailability_reasons"] == ""
 
 
-def test_converter_retains_hypothesis_core_for_shadow_mapping_conflict() -> None:
+def test_resolved_internal_evidence_does_not_request_conflict_probe() -> None:
+    provider = _ResolvedFixtureProvider(signature_conflict=True)
     record = convert_record(
         _resolved_raw_record(),
-        mapping_provider=_ResolvedFixtureProvider(signature_conflict=True),
+        mapping_provider=provider,
     )
 
+    assert provider.call_count == 0
     assert record.reaction_signature is not None
     assert record.reaction_core is not None
-    assert record.reaction_core["evidence_status"] == "hypothesis"
+    assert record.reaction_core["evidence_status"] == "inferred"
     assert record.external_atom_mapping is not None
     assert record.external_atom_mapping["status"] == (
-        "external_mapping_signature_conflict"
+        "not_requested_resolved_internal_evidence"
     )
-    assert record.chemistry_status == ChemistryStatus.REVIEW
-    assert record.index_eligibility == IndexEligibility.REVIEW_ONLY
+    assert record.chemistry_status == ChemistryStatus.VERIFIED
+    assert record.index_eligibility == IndexEligibility.ELIGIBLE
     review = concise_reaction_review_row(record.to_dict())
-    assert review["reaction_core_status"] == "available_hypothesis"
+    assert review["reaction_core_status"] == "available_inferred"
     assert review["reaction_core_unavailability_reasons"] == ""
 
 

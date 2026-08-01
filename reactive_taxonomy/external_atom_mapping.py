@@ -747,7 +747,6 @@ def _mapped_core_proposal(
         stereo_changes=mapping.normalization.stereo_changes,
         evidence=evidence,
         confidence=confidence,
-        topology=base.reaction_topology,
         atom_map_overrides=atom_map_overrides,
     )
     return core, True

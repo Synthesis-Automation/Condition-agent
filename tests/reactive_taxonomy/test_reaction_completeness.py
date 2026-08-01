@@ -3,7 +3,7 @@
 from reactive_taxonomy import featurize_reaction
 
 
-def test_exact_reconstruction_verifies_product_atom_accounting() -> None:
+def test_structural_correspondence_verifies_product_atom_accounting() -> None:
     result = featurize_reaction(
         "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
     )
@@ -48,10 +48,9 @@ def test_insufficient_partner_multiplicity_is_not_synthesized() -> None:
     completeness = result.reaction_completeness
     assert completeness is not None
     assert completeness.status == "incomplete"
-    assert completeness.suspected_insufficient_reactant_multiplicity
-    assert not completeness.suspected_missing_reactant
-    assert "INSUFFICIENT_REACTANT_MULTIPLICITY" in completeness.warnings
-    assert result.selected_events == ()
+    assert not completeness.suspected_insufficient_reactant_multiplicity
+    assert completeness.suspected_missing_reactant
+    assert "MISSING_REACTANT_SUSPECTED" in completeness.warnings
     assert result.reaction_signature is None
 
 
@@ -60,7 +59,7 @@ def test_partial_mapping_is_reported_per_heavy_atom() -> None:
 
     completeness = result.reaction_completeness
     assert completeness is not None
-    assert completeness.status == "verified"
+    assert completeness.status == "unresolved"
     assert completeness.reactant_mapping_coverage == 0.5
     assert completeness.product_mapping_coverage == 0.5
     assert "PARTIAL_ATOM_MAPPING" in completeness.warnings
@@ -72,7 +71,7 @@ def test_product_map_numbers_absent_from_reactants_are_reported() -> None:
 
     completeness = result.reaction_completeness
     assert completeness is not None
-    assert completeness.status == "verified"
+    assert completeness.status == "unresolved"
     assert completeness.shared_mapped_heavy_atom_count == 1
     assert "PRODUCT_MAPS_MISSING_FROM_REACTANTS" in completeness.warnings
     assert "REACTANT_MAPS_MISSING_FROM_PRODUCTS" in completeness.warnings

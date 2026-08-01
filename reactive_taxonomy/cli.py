@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 from . import (
-    featurize_molecule,
+    analyze_molecule,
     featurize_reaction,
     render_reactivity_profile,
     validate_taxonomy,
@@ -60,9 +60,6 @@ _REACTION_CORE_CSV_FIELDS = (
     "reaction_core_retained_context",
     "reaction_core_departing_context",
     "reaction_core_appearing_context",
-    "reaction_core_motif_key",
-    "reaction_core_general_equation",
-    "reaction_core_limiter",
     "reaction_core_event_count",
     "reaction_core_primary_center_count",
     "reaction_core_remote_classes",
@@ -195,23 +192,6 @@ def _group_inventory_summary(tokens: Iterable[str]) -> str:
     return _joined(names)
 
 
-_INTERPRETATION_DISPLAY_NAMES = {
-    "carbonyl_amine_reductive_coupling": "reductive carbonyl–amine coupling",
-    "carbonyl_reduction": "carbonyl reduction",
-    "sp2_c_activated_c_substitution": "activated sp² C–C substitution",
-    "sp2_c_aromatic_ch_substitution": "aromatic C–H substitution",
-    "sp2_c_n_substitution": "sp² C–N substitution",
-}
-
-
-def _interpretation_display_name(annotation_id: str) -> str:
-    """Return a compact chemist-facing interpretation description."""
-    return _INTERPRETATION_DISPLAY_NAMES.get(
-        annotation_id,
-        annotation_id.replace("_", " "),
-    )
-
-
 def _ambiguity_count(warnings: Iterable[str]) -> int | None:
     """Read the public ambiguity count from a structured warning code."""
     prefix = "AMBIGUOUS_SCAFFOLD_CORRESPONDENCE:"
@@ -311,7 +291,7 @@ def _reaction_diagnostic_lines(result: Any) -> list[str]:
     fallback = getattr(result, "fallback_descriptor", None)
     if fallback is not None:
         lines.append(
-            "Detected functional groups: reactants "
+            "Detected molecular motifs: reactants "
             f"[{_group_inventory_summary(fallback.reactant_group_tokens)}] → "
             "product "
             f"[{_group_inventory_summary(fallback.product_group_tokens)}]"
@@ -325,38 +305,6 @@ def _reaction_diagnostic_lines(result: Any) -> list[str]:
                 "Net bond inventory (unmapped, not verified edits): "
                 f"{bond_summary}"
             )
-
-    candidates = tuple(getattr(result, "candidates", ()) or ())
-    selected = getattr(result, "selected_candidate", None)
-    selected_events = tuple(getattr(result, "selected_events", ()) or ())
-    if candidates and selected is None and not selected_events:
-        verification_counts = Counter(
-            str(candidate.verification) for candidate in candidates
-        )
-        outcomes = ", ".join(
-            f"{count} {verification.replace('_', ' ')}"
-            for verification, count in sorted(verification_counts.items())
-        )
-        lines.append(
-            f"Interpretation checks: {len(candidates)} candidates "
-            f"({outcomes})"
-        )
-        interpretation_names = sorted(
-            {
-                _interpretation_display_name(str(candidate.annotation_id))
-                for candidate in candidates
-            }
-        )
-        heading = (
-            "Rejected interpretations"
-            if all(
-                candidate.verification
-                in {"construction_failed", "product_mismatch"}
-                for candidate in candidates
-            )
-            else "Interpretations checked"
-        )
-        lines.append(f"{heading}: {_joined(interpretation_names)}")
 
     signature = getattr(result, "reaction_signature", None)
     if signature is not None:
@@ -403,26 +351,26 @@ def _molecule_summary(result: Any) -> str:
         f"input: {result.input_smiles}",
         f"canonical: {result.canonical_smiles or '-'}",
         f"components: {len(result.components)}",
-        f"reactive sites: {len(result.sites)}",
+        f"reactive-site hypotheses: {len(result.reactive_site_hypotheses)}",
     ]
-    for site in result.sites:
+    for site in result.reactive_site_hypotheses:
         environment = (site.context_features or {}).get("environment") or {}
         profile = environment.get("reactivity_profile")
         lines.append(
-            f"  {site.site_id}: {site.chemist_label} [{site.site_type}; "
+            f"  {site.hypothesis_id}: {site.chemist_label} [{site.site_type}; "
             f"availability={site.availability}]"
         )
         lines.append(f"    profile: {render_reactivity_profile(profile)}")
-    lines.append(f"functional groups: {len(result.functional_groups)}")
-    for group in result.functional_groups:
+    lines.append(f"molecular motifs: {len(result.motifs)}")
+    for group in result.motifs:
         lines.append(
             f"  component {group.component_index}: {group.chemist_label} "
-            f"[{group.group_id}; atoms={_joined(group.atom_indices)}]"
+            f"[{group.motif_id}; atoms={_joined(group.atom_indices)}]"
         )
-    if result.warnings:
-        lines.append(f"warnings: {_joined(result.warnings)}")
-    if result.error:
-        lines.append(f"error: {result.error}")
+    if result.structure.warnings:
+        lines.append(f"warnings: {_joined(result.structure.warnings)}")
+    if result.structure.error:
+        lines.append(f"error: {result.structure.error}")
     return "\n".join(lines)
 
 
@@ -437,19 +385,8 @@ def _reaction_summary(result: Any) -> str:
         f"compatible families: {_joined(result.compatible_named_families)}",
         f"reaction label: {reaction_label.concise if reaction_label else '-'}",
         f"label status: {reaction_label.status if reaction_label else 'unavailable'}",
-        f"candidates: {len(result.candidates)}",
         f"mapped bond changes: {len(result.mapped_bond_changes)}",
     ]
-    if result.selected_candidate:
-        lines.append(
-            "selected interpretation: "
-            f"{result.selected_candidate.annotation_id}"
-        )
-        for change in result.selected_candidate.predicted_bond_changes:
-            lines.append(
-                f"  edit: {change.change_type} {change.atom_1_role}-{change.atom_2_role} "
-                f"{change.old_order or '-'}->{change.new_order or '-'}"
-            )
     if result.product_connection:
         lines.append(
             f"product connection: {result.product_connection.concise_label} "
@@ -460,7 +397,7 @@ def _reaction_summary(result: Any) -> str:
         distance = "-" if group.graph_distance is None else group.graph_distance
         lines.append(
             f"  component {group.component_index}: {group.chemist_label} "
-            f"[{group.group_id}; distance={distance}]"
+            f"[{group.motif_id}; distance={distance}]"
         )
     if result.family_environment:
         lines.append(f"family environment: {result.family_environment.family_id}")
@@ -486,9 +423,9 @@ def _molecule_concise_summary(result: Any) -> str:
         f"Molecule: {result.canonical_smiles or result.input_smiles}",
         f"Status: {'valid' if result.valid else 'invalid'}",
     ]
-    if result.sites:
-        lines.append("Reactive sites:")
-        for site in result.sites:
+    if result.reactive_site_hypotheses:
+        lines.append("Reactive-site hypotheses:")
+        for site in result.reactive_site_hypotheses:
             lines.append(
                 f"  {site.chemist_label} — {site.site_type}, {site.availability}"
             )
@@ -500,16 +437,16 @@ def _molecule_concise_summary(result: Any) -> str:
                 )
             )
     else:
-        lines.append("Reactive sites: none")
-    if result.functional_groups:
-        groups = sorted({group.chemist_label for group in result.functional_groups})
-        lines.append(f"Functional groups: {_joined(groups)}")
+        lines.append("Reactive-site hypotheses: none")
+    if result.motifs:
+        groups = sorted({group.chemist_label for group in result.motifs})
+        lines.append(f"Molecular motifs: {_joined(groups)}")
     else:
-        lines.append("Functional groups: none")
-    if result.warnings:
-        lines.append(f"Warnings: {_joined(result.warnings)}")
-    if result.error:
-        lines.append(f"Error: {result.error}")
+        lines.append("Molecular motifs: none")
+    if result.structure.warnings:
+        lines.append(f"Warnings: {_joined(result.structure.warnings)}")
+    if result.structure.error:
+        lines.append(f"Error: {result.structure.error}")
     return "\n".join(lines)
 
 
@@ -543,13 +480,6 @@ def _reaction_core_lines(result: Any) -> list[str]:
             f"{core.active_atom_count} active atom(s)"
         ),
     ]
-    if core.abstraction is not None:
-        lines[1:2] = [
-            f"  General motif: {core.abstraction.general_label}",
-            f"  Specific limiter: {core.abstraction.limiter_label}",
-            f"  Atom-level reaction: {core.generic_label}",
-            f"  Motif key (future retrieval tier): {core.abstraction.motif_key}",
-        ]
     if core.remote_subgraphs:
         remote = []
         for subgraph in core.remote_subgraphs:
@@ -648,7 +578,7 @@ def _command_validate(args: argparse.Namespace) -> int:
 
 
 def _command_molecule(args: argparse.Namespace) -> int:
-    result = featurize_molecule(
+    result = analyze_molecule(
         args.smiles,
         site_types=args.site_type or None,
         include_context_features=not args.no_context,
@@ -662,7 +592,6 @@ def _command_reaction(args: argparse.Namespace) -> int:
     result = featurize_reaction(
         args.reaction_smiles,
         label_style=args.label_style,
-        max_candidates=args.max_candidates,
     )
     _print_result(result, args.format, concise=args.concise)
     return 0 if result.valid else 1
@@ -679,7 +608,12 @@ def _detect_column(fieldnames: Sequence[str], mode: str) -> str | None:
 
 
 def _batch_summary(records: Sequence[dict[str, Any]], mode: str) -> dict[str, Any]:
-    valid_count = sum(bool(record["analysis"].get("valid")) for record in records)
+    valid_count = sum(
+        bool((record["analysis"].get("structure") or {}).get("valid"))
+        if mode == "molecule"
+        else bool(record["analysis"].get("valid"))
+        for record in records
+    )
     summary: dict[str, Any] = {
         "mode": mode,
         "total": len(records),
@@ -690,12 +624,16 @@ def _batch_summary(records: Sequence[dict[str, Any]], mode: str) -> dict[str, An
         summary["site_type_counts"] = dict(sorted(Counter(
             site["site_type"]
             for record in records
-            for site in record["analysis"].get("sites", [])
+            for site in (record["analysis"].get("interpretation") or {}).get(
+                "reactive_site_hypotheses", []
+            )
         ).items()))
         summary["functional_group_counts"] = dict(sorted(Counter(
-            group["group_id"]
+            group["motif_id"]
             for record in records
-            for group in record["analysis"].get("functional_groups", [])
+            for group in (record["analysis"].get("interpretation") or {}).get(
+                "motifs", []
+            )
         ).items()))
     else:
         summary["evidence_counts"] = dict(sorted(Counter(
@@ -738,22 +676,24 @@ def _molecule_csv_columns(
 
 def _molecule_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     analysis = record["analysis"]
-    sites = list(analysis.get("sites") or [])
-    groups = list(analysis.get("functional_groups") or [])
+    structure = analysis.get("structure") or {}
+    interpretation = analysis.get("interpretation") or {}
+    sites = list(interpretation.get("reactive_site_hypotheses") or [])
+    groups = list(interpretation.get("motifs") or [])
     row: dict[str, Any] = {
         "source_row": record["source_row"],
         **record["source"],
-        "valid": bool(analysis.get("valid")),
-        "canonical_smiles": analysis.get("canonical_smiles") or "",
-        "component_count": len(analysis.get("components") or []),
+        "valid": bool(structure.get("valid")),
+        "canonical_smiles": structure.get("canonical_smiles") or "",
+        "component_count": len(structure.get("components") or []),
         "reactive_site_count": len(sites),
         "reactive_site_labels": "; ".join(str(site.get("chemist_label") or "") for site in sites),
         "canonical_signatures": "; ".join(str(site.get("canonical_signature") or "") for site in sites),
         "functional_group_count": len(groups),
-        "functional_group_ids": "; ".join(str(group.get("group_id") or "") for group in groups),
+        "functional_group_ids": "; ".join(str(group.get("motif_id") or "") for group in groups),
         "functional_group_labels": "; ".join(str(group.get("chemist_label") or "") for group in groups),
-        "warnings": "; ".join(str(value) for value in analysis.get("warnings") or []),
-        "error": analysis.get("error") or "",
+        "warnings": "; ".join(str(value) for value in structure.get("warnings") or []),
+        "error": structure.get("error") or "",
     }
     for site_type in _MOLECULE_SITE_TYPES:
         selected = [site for site in sites if site.get("site_type") == site_type]
@@ -791,7 +731,6 @@ def _reaction_csv_columns(
 def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     analysis = record["analysis"]
     reaction_core = analysis.get("reaction_core") or {}
-    core_abstraction = reaction_core.get("abstraction") or {}
     spectator_groups = analysis.get("spectator_groups") or []
     interpretation = analysis.get("interpretation") or {}
     family_environment = (
@@ -914,13 +853,6 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         "reaction_core_appearing_context": "; ".join(
             core_presentation.get("appearing_context") or ()
         ),
-        "reaction_core_motif_key": core_abstraction.get("motif_key") or "",
-        "reaction_core_general_equation": (
-            core_abstraction.get("general_label") or ""
-        ),
-        "reaction_core_limiter": (
-            core_abstraction.get("limiter_label") or ""
-        ),
         "reaction_core_event_count": reaction_core.get("event_count") or "",
         "reaction_core_primary_center_count": (
             sum(
@@ -998,9 +930,9 @@ def _command_batch(args: argparse.Namespace) -> int:
     for source_row, row in enumerate(rows, start=2):
         value = str(row.get(column) or "").strip()
         analysis = (
-            featurize_reaction(value, label_style=args.label_style, max_candidates=args.max_candidates)
+            featurize_reaction(value, label_style=args.label_style)
             if args.mode == "reaction"
-            else featurize_molecule(value, label_style=args.label_style)
+            else analyze_molecule(value, label_style=args.label_style)
         )
         records.append({
             "source_row": source_row,
@@ -1048,7 +980,7 @@ def _command_batch(args: argparse.Namespace) -> int:
 
 def _command_self_test(args: argparse.Namespace) -> int:
     taxonomy_errors = validate_taxonomy()
-    molecule_results = [featurize_molecule(value, label_style=args.label_style) for value in _SELF_TEST_MOLECULES]
+    molecule_results = [analyze_molecule(value, label_style=args.label_style) for value in _SELF_TEST_MOLECULES]
     reaction_results = [featurize_reaction(value, label_style=args.label_style) for value in _SELF_TEST_REACTIONS]
     payload = {
         "taxonomy_valid": not taxonomy_errors,
@@ -1064,7 +996,7 @@ def _command_self_test(args: argparse.Namespace) -> int:
         print("\nmolecule feature checks")
         for result in molecule_results:
             print(f"  {'PASS' if result.valid else 'FAIL'} {result.input_smiles}: "
-                  f"{len(result.sites)} sites, {len(result.functional_groups)} groups")
+                  f"{len(result.reactive_site_hypotheses)} sites, {len(result.motifs)} groups")
         print("\nreaction feature checks")
         for result in reaction_results:
             print(f"  {'PASS' if result.valid else 'FAIL'} "
@@ -1096,7 +1028,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     reaction_parser = subparsers.add_parser("reaction", help="featurize one reaction SMILES")
     reaction_parser.add_argument("reaction_smiles")
-    reaction_parser.add_argument("--max-candidates", type=int, default=500)
     reaction_parser.add_argument("--concise", action="store_true", help="show only key chemist-readable features")
     reaction_parser.add_argument("--label-style", choices=("unicode", "ascii", "hte_legacy"), default="unicode")
     reaction_parser.add_argument("--format", choices=("text", "json"), default="text")
@@ -1108,7 +1039,6 @@ def build_parser() -> argparse.ArgumentParser:
     batch_parser.add_argument("--column", help="input column; auto-detected when omitted")
     batch_parser.add_argument("--output", help="optional JSONL or CSV result path")
     batch_parser.add_argument("--output-format", choices=("jsonl", "csv"), help="infer from --output suffix when omitted")
-    batch_parser.add_argument("--max-candidates", type=int, default=500)
     batch_parser.add_argument(
         "--concise",
         action="store_true",

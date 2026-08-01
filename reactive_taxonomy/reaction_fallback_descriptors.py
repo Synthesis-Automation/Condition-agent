@@ -16,18 +16,16 @@ from .reaction_models import (
     REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION,
     FragmentSourceRequirement,
     PartialProductTransformation,
-    ReactionInterpretationCandidate,
     ReactionCompletenessAssessment,
     ReactionComponent,
     ReactionFallbackDescriptor,
     ReactionSignature,
-    ReactionSiteReference,
 )
 from .reaction_signatures import reaction_signature_definition_versions
 
 
 _DEFINITION_ID = "reaction_fallback_descriptor.v1"
-_DEFINITION_VERSION = "1.3"
+_DEFINITION_VERSION = "2.0"
 _DEFINITIONS = Path(__file__).with_name("definitions")
 _FALLBACK_FRAGMENT_RULES_PATH = _DEFINITIONS / "fallback_fragments.v1.json"
 _REACTION_CENTER_RULES_PATH = _DEFINITIONS / "reaction_center_fallback.v1.json"
@@ -160,7 +158,7 @@ def _site_tokens(
 ) -> tuple[str, ...]:
     tokens = []
     for component in components:
-        for site in component.compound_analysis.sites:
+        for site in component.molecule_analysis.interpretation.reactive_site_hypotheses:
             tokens.extend(
                 (
                     f"type:{site.site_type}",
@@ -177,8 +175,8 @@ def _group_tokens(
     groups = []
     tags = []
     for component in components:
-        for group in component.compound_analysis.functional_groups:
-            groups.append(f"group:{group.group_id}")
+        for group in component.molecule_analysis.interpretation.motifs:
+            groups.append(f"motif:{group.motif_id}")
             tags.extend(str(tag) for tag in group.tags)
     return tuple(sorted(groups)), tuple(sorted(tags))
 
@@ -188,7 +186,7 @@ def _context_tokens(
 ) -> tuple[str, ...]:
     tokens = []
     for component in components:
-        for environment in component.compound_analysis.site_environments:
+        for environment in component.molecule_analysis.interpretation.reactive_site_environments:
             profile = environment.reactivity_profile
             tokens.extend(f"shell:{value}" for value in environment.first_shell)
             tokens.extend(
@@ -205,107 +203,11 @@ def _context_tokens(
                 )
             )
             tokens.extend(
-                f"nearby:{group.get('group_id')}:{group.get('distance')}"
-                for group in environment.nearby_groups
-                if group.get("group_id")
+                f"nearby:{group.get('motif_id')}:{group.get('distance')}"
+                for group in environment.nearby_motifs
+                if group.get("motif_id")
             )
     return tuple(sorted(tokens))
-
-
-def _atom_for_role(
-    role: str,
-    assignments: Mapping[str, ReactionSiteReference],
-    components: Mapping[int, ReactionComponent],
-) -> str:
-    participant, separator, atom_role = role.partition(".")
-    site = assignments.get(participant)
-    if site is None:
-        return f"role:{role}"
-    indices = site.atom_roles.get(atom_role if separator else role) or ()
-    component = components.get(int(site.component_index))
-    molecule = parse_smiles(component.input_smiles) if component else None
-    if not indices or molecule is None:
-        return f"site:{site.site_type}:{atom_role or role}"
-    atom = molecule.GetAtomWithIdx(int(indices[0]))
-    return (
-        f"{atom.GetSymbol()}:{atom.GetFormalCharge()}:"
-        f"{int(atom.GetIsAromatic())}:{str(atom.GetHybridization())}"
-    )
-
-
-def _candidate_features(
-    candidates: Tuple[ReactionInterpretationCandidate, ...],
-    reactants: Tuple[ReactionComponent, ...],
-) -> tuple[
-    tuple[str, ...],
-    tuple[str, ...],
-    tuple[str, ...],
-    tuple[str, ...],
-    tuple[str, ...],
-]:
-    components = {component.component_index: component for component in reactants}
-    interpretations = set()
-    transformations = set()
-    handles = set()
-    edits = set()
-    hypotheses = set()
-    for candidate in candidates:
-        interpretations.add(str(candidate.annotation_id))
-        transformations.add(str(candidate.transformation_class))
-        role_tokens = tuple(
-            sorted(
-                f"{role}:{site.site_type}:{site.canonical_signature}"
-                for role, site in candidate.role_assignments.items()
-            )
-        )
-        handles.update(
-            f"{site.site_type}:{site.canonical_signature}"
-            for site in candidate.role_assignments.values()
-        )
-        candidate_edits = []
-        for edit in candidate.predicted_bond_changes:
-            atom_1 = _atom_for_role(
-                edit.atom_1_role,
-                candidate.role_assignments,
-                components,
-            )
-            atom_2 = (
-                _atom_for_role(
-                    edit.atom_2_role,
-                    candidate.role_assignments,
-                    components,
-                )
-                if edit.atom_2_role
-                else "H"
-            )
-            endpoints = tuple(sorted((atom_1, atom_2)))
-            token = (
-                f"{edit.change_type}:{endpoints[0]}~{endpoints[1]}:"
-                f"{edit.old_order or 'NONE'}>{edit.new_order or 'NONE'}"
-            )
-            edits.add(token)
-            candidate_edits.append(token)
-        hypotheses.add(
-            json.dumps(
-                {
-                    "interpretation": candidate.annotation_id,
-                    "transformation": candidate.transformation_class,
-                    "archetype": candidate.edit_archetype,
-                    "roles": role_tokens,
-                    "edits": tuple(sorted(candidate_edits)),
-                },
-                ensure_ascii=True,
-                sort_keys=True,
-                separators=(",", ":"),
-            )
-        )
-    return (
-        tuple(sorted(interpretations)),
-        tuple(sorted(transformations)),
-        tuple(sorted(handles)),
-        tuple(sorted(edits)),
-        tuple(sorted(hypotheses)),
-    )
 
 
 def _bond_inventory(
@@ -715,25 +617,24 @@ def _digest(payload: Mapping[str, object]) -> str:
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
-    return "RFD2:" + hashlib.sha256(encoded).hexdigest()
+    return "RFD3:" + hashlib.sha256(encoded).hexdigest()
 
 
 def build_reaction_fallback_descriptor(
     *,
     reactants: Tuple[ReactionComponent, ...],
     products: Tuple[ReactionComponent, ...],
-    candidates: Tuple[ReactionInterpretationCandidate, ...],
     signature: Optional[ReactionSignature],
     partial_transformation: Optional[PartialProductTransformation],
     completeness: Optional[ReactionCompletenessAssessment],
     evidence_quality: str,
+    has_edit_hypotheses: bool = False,
     warnings: Iterable[str] = (),
 ) -> ReactionFallbackDescriptor:
-    """Build a deterministic descriptor from typed observations and hypotheses."""
+    """Build a deterministic descriptor from structural observations."""
     warning_values = tuple(sorted(set(str(value) for value in warnings)))
     reactant_groups, reactant_tags = _group_tokens(reactants)
     product_groups, product_tags = _group_tokens(products)
-    candidate_features = _candidate_features(candidates, reactants)
     bond_delta = _delta_tokens(
         _bond_inventory(reactants),
         _bond_inventory(products),
@@ -767,9 +668,6 @@ def build_reaction_fallback_descriptor(
     elif partial_transformation is not None:
         evidence_mode = "partial_product_correspondence"
         confidence = float(partial_transformation.confidence)
-    elif candidates:
-        evidence_mode = "candidate_hypotheses"
-        confidence = 0.4
     else:
         evidence_mode = "structure_inventory_only"
         confidence = 0.25
@@ -780,6 +678,8 @@ def build_reaction_fallback_descriptor(
     product_components = Counter(_component_tokens(products))
     if not reactants or not products:
         ineligibility_reasons.append("missing_reaction_side")
+    if has_edit_hypotheses:
+        ineligibility_reasons.append("ambiguous_edit_hypotheses")
     if completeness_status == "incomplete" and not condition_source_required:
         ineligibility_reasons.append("incomplete_product_atom_provenance")
     if evidence_quality in {
@@ -810,7 +710,7 @@ def build_reaction_fallback_descriptor(
         ineligibility_reasons.append("invalid_atom_mapping")
     if (
         signature is None
-        and not candidate_features[3]
+        and not verified_edits
         and not bond_delta
         and not element_delta
     ):
@@ -835,11 +735,6 @@ def build_reaction_fallback_descriptor(
         "reactant_groups": reactant_groups,
         "product_groups": product_groups,
         "contexts": _context_tokens(reactants),
-        "candidate_interpretations": candidate_features[0],
-        "candidate_transformations": candidate_features[1],
-        "candidate_handles": candidate_features[2],
-        "candidate_edits": candidate_features[3],
-        "candidate_hypotheses": candidate_features[4],
         "verified_edits": verified_edits,
         "reaction_center_core": center_core,
         "reaction_center_radius_1": center_radius_1,
@@ -886,11 +781,6 @@ def build_reaction_fallback_descriptor(
         reactant_group_tokens=reactant_groups,
         product_group_tokens=product_groups,
         context_tokens=payload["contexts"],
-        candidate_interpretation_tokens=candidate_features[0],
-        candidate_transformation_tokens=candidate_features[1],
-        candidate_handle_tokens=candidate_features[2],
-        candidate_edit_tokens=candidate_features[3],
-        candidate_hypothesis_tokens=candidate_features[4],
         verified_edit_tokens=verified_edits,
         reaction_center_core_tokens=center_core,
         reaction_center_radius_1_tokens=center_radius_1,

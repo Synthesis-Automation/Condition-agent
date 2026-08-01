@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "definition_version": "transformation_patterns.v1",
+  "patterns": [
+    {
+      "id": "net_substitution",
+      "tier": "generic",
+      "matcher": "net_substitution",
+      "specificity": 30,
+      "display_importance": 70
+    },
+    {
+      "id": "net_elimination",
+      "tier": "generic",
+      "matcher": "net_elimination",
+      "specificity": 30,
+      "display_importance": 70
+    },
+    {
+      "id": "net_addition",
+      "tier": "generic",
+      "matcher": "net_addition",
+      "specificity": 30,
+      "display_importance": 70
+    },
+    {
+      "id": "net_bond_order_change",
+      "tier": "generic",
+      "matcher": "net_bond_order_change",
+      "specificity": 20,
+      "display_importance": 50
+    },
+    {
+      "id": "net_coupling",
+      "tier": "generic",
+      "matcher": "net_coupling",
+      "specificity": 40,
+      "display_importance": 75
+    },
+    {
+      "id": "net_ring_closure",
+      "tier": "generic",
+      "matcher": "net_ring_closure",
+      "specificity": 45,
+      "display_importance": 80
+    }
+  ]
+}

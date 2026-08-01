@@ -95,7 +95,7 @@ def _signature(index: int) -> dict:
         "named_family": None,
         "family_confidence": 0.0,
         "topology": {
-            "schema_version": "1.2",
+            "schema_version": "2.0",
             "reaction_scope": "intermolecular",
             "formed_bond_scopes": ["intermolecular"],
             "formed_ring_sizes": [],
@@ -108,8 +108,8 @@ def _record(index: int, *, canonical_group: str | None = None) -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "7.0",
-        "converter_definition_version": "generic_conversion.v7.0",
+        "schema_version": "8.0",
+        "converter_definition_version": "generic_conversion.v8.0",
         "admission_tier": "verified",
         "index_eligibility": "eligible",
         "chemistry_status": "verified",
@@ -167,11 +167,11 @@ def test_persisted_index_round_trip_is_deterministic(tmp_path: Path) -> None:
     assert load_generic_index(first_path) == index
     payload = json.loads(first_path.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "4.0"
-    assert payload["reaction_signature_schema_version"] == "3.2"
-    assert payload["record_schema_versions"] == ["7.0"]
-    assert payload["reaction_core_schema_version"] == "2.2"
+    assert payload["reaction_signature_schema_version"] == "3.4"
+    assert payload["record_schema_versions"] == ["8.0"]
+    assert payload["reaction_core_schema_version"] == "2.4"
     assert payload["reaction_core_algorithm_version"] == (
-        "reaction_core_projection.v8"
+        "reaction_core_projection.v10"
     )
     assert payload["maps"]["environment_features"]
     integrity = validate_generic_index_artifact(first_path)

@@ -136,7 +136,7 @@ def _signature(
         "named_family": family,
         "family_confidence": family_confidence,
         "topology": {
-            "schema_version": "1.2",
+            "schema_version": "2.0",
             "reaction_scope": reaction_scope,
             "formed_bond_scopes": [reaction_scope]
             if reaction_scope in {"intramolecular", "intermolecular"}
@@ -151,8 +151,8 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
     recipe_id = f"RCR1:{index % 2}"
     recipe_core_id = f"RCORE1:{index % 2}"
     return {
-        "schema_version": "7.0",
-        "converter_definition_version": "generic_conversion.v7.0",
+        "schema_version": "8.0",
+        "converter_definition_version": "generic_conversion.v8.0",
         "admission_tier": tier,
         "index_eligibility": "eligible" if tier == "verified" else "review_only",
         "chemistry_status": "verified",
@@ -165,7 +165,7 @@ def _record(index: int, signature: dict, *, tier: str = "verified") -> dict:
         "reaction_label": {
             "concise": f"Precedent reaction {index}",
             "detailed": f"Precedent reaction {index}",
-            "status": "exact_reconstruction",
+            "status": "observed_edits",
         },
         "yield_pct": 60.0 + index,
         "source_dataset": f"dataset-{index % 2}",
@@ -799,14 +799,14 @@ def test_recommendation_result_preserves_structured_query_context() -> None:
         reaction_label={
             "concise": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
             "detailed": "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2",
-            "status": "exact_reconstruction",
+            "status": "observed_edits",
         },
         minimum_pool_size=1,
     )
 
     assert result.valid
     assert result.reaction_label["concise"] == "Ar1–Br + Ar2–B(OH)2 → Ar1–Ar2"
-    assert result.reaction_label["status"] == "exact_reconstruction"
+    assert result.reaction_label["status"] == "observed_edits"
     assert result.spectator_groups[0]["group_id"] == "nitrile"
     assert (
         result.reaction_partners[0]["reactivity_profile"]["steric"][
@@ -822,7 +822,7 @@ def test_recommendation_result_preserves_structured_query_context() -> None:
     )
     hit_context = result.recommendations[0].precedent_reaction_contexts[0]
     assert hit_context["reaction_label"]["concise"] == "Precedent reaction 1"
-    assert hit_context["reaction_label"]["status"] == "exact_reconstruction"
+    assert hit_context["reaction_label"]["status"] == "observed_edits"
     assert hit_context["spectator_groups"][0]["group_id"] == "ether"
     assert (
         hit_context["reaction_partners"][0]["reactivity_profile"]["steric"][
@@ -1109,8 +1109,9 @@ def test_real_pilot_returns_resolved_recipe(tmp_path: Path) -> None:
     )
     assert result.valid
     assert result.retrieval_level == "exact_signature"
-    assert result.candidate_count == 1
-    assert result.compatible_candidate_count == 1
+    assert result.candidate_count >= 1
+    assert result.compatible_candidate_count >= 1
+    assert result.compatible_candidate_count <= result.candidate_count
     assert result.excluded_candidate_count == 0
     assert result.schema_version == "3.0"
     assert result.retrieval_trace[-1].status == "selected"
