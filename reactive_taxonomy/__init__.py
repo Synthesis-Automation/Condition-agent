@@ -9,7 +9,7 @@ from .reaction_signatures import (
 )
 from .reaction_observation import observe_reaction
 from .reaction_interpretation import interpret_reaction
-from .reaction_rendering import render_reaction
+from .reaction_rendering import reaction_label_definition_versions, render_reaction
 from .reaction_fallback_descriptors import reaction_fallback_definition_versions
 from .external_atom_mapping import (
     analyze_reaction_with_external_mapping,
@@ -373,6 +373,7 @@ __all__ = [
     "reaction_edit_fingerprint",
     "render_reaction_label_clause",
     "render_reaction",
+    "reaction_label_definition_versions",
     "format_reaction_review_summary",
     "render_reactivity_profile",
     "render_reactivity_profile_expanded",

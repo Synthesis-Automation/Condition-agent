@@ -1,5 +1,6 @@
 from reactive_taxonomy import (
     featurize_reaction,
+    reaction_label_definition_versions,
     load_reaction_label_patterns,
     load_reaction_label_rendering,
 )
@@ -306,6 +307,14 @@ def test_reaction_label_definition_is_versioned() -> None:
         "order_changed",
         "hydrogen_change",
     }
+    versions = reaction_label_definition_versions()
+    assert set(versions) == {
+        "reaction_label_patterns.v1.json",
+        "reaction_label_rendering.v1.json",
+    }
+    assert versions["reaction_label_rendering.v1.json"].startswith(
+        "2.1@sha256:"
+    )
 
 
 def test_mapped_heteroatom_bond_reductions_receive_generic_labels() -> None:

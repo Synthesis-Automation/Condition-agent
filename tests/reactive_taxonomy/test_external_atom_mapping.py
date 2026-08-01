@@ -222,9 +222,12 @@ def test_forced_resolved_mapping_only_enriches_the_minimized_core() -> None:
     )
 
     assert assessment.status == "external_mapping_internal_consensus"
-    assert assessment.analysis.reaction_label == base.reaction_label
+    assert assessment.analysis.reaction_label.concise == base.reaction_label.concise
     assert assessment.analysis.reaction_label.status == base.reaction_label.status
-    assert assessment.analysis.reaction_label == base.reaction_label
+    assert assessment.analysis.reaction_label.detailed == base.reaction_label.detailed
+    assert "EXTERNAL_MAPPING_INTERNAL_CONSENSUS" in (
+        assessment.analysis.reaction_label.warnings
+    )
     assert assessment.analysis.reaction_signature == base.reaction_signature
     assert assessment.analysis.reaction_core is not None
     assert assessment.analysis.reaction_core.evidence_status == "external"
@@ -256,6 +259,45 @@ def test_forced_resolved_mapping_only_enriches_the_minimized_core() -> None:
     ).detailed_reaction_label == build_reaction_review_summary(
         base
     ).detailed_reaction_label
+
+
+def test_forced_resolved_mapping_rerenders_material_core_context() -> None:
+    reaction = "CSC.[O]>>CS(C)=O"
+    mapped = (
+        "[CH3:1][S:2][CH3:3].[O:4]>>"
+        "[CH3:1][S:2]([CH3:3])=[O:4]"
+    )
+    base = featurize_reaction(reaction)
+
+    assessment = analyze_reaction_with_external_mapping(
+        reaction,
+        _ResolvedFixtureProvider(
+            mapped_reaction=mapped,
+            allowed_pairs=frozenset({("O", "S")}),
+        ),
+        base_analysis=base,
+        force_resolved_shadow=True,
+    )
+
+    assert assessment.status == "external_mapping_internal_consensus"
+    assert assessment.analysis.reaction_signature == base.reaction_signature
+    assert assessment.analysis.reaction_core is not None
+    assert assessment.analysis.observation is not None
+    assert (
+        assessment.analysis.observation.core
+        == assessment.analysis.reaction_core
+    )
+    assert assessment.analysis.reaction_label.source == "reaction_core"
+    assert assessment.analysis.reaction_label.concise == (
+        "Provisional core (external atom mapping): "
+        "S(R)2 + O → S(R)2(=O)"
+    )
+    assert assessment.analysis.reaction_label.evidence == (
+        "external_mapping_internal_consensus"
+    )
+    assert "retained context: R (C)" in (
+        assessment.analysis.reaction_label.detailed
+    )
 
 
 def test_forced_mapping_projects_maps_without_smiles_coordinate_round_trip() -> None:
@@ -323,7 +365,8 @@ def test_forced_mapping_builds_one_core_with_two_suzuki_events() -> None:
 
     assert assessment.status == "external_mapping_internal_consensus"
     assert assessment.analysis.reaction_signature == base.reaction_signature
-    assert assessment.analysis.reaction_label == base.reaction_label
+    assert assessment.analysis.reaction_label.concise == base.reaction_label.concise
+    assert assessment.analysis.reaction_label.status == base.reaction_label.status
     assert assessment.analysis.reaction_core is not None
     assert assessment.analysis.reaction_core.event_count == 2
     assert assessment.analysis.reaction_core.generic_label == (

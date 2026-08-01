@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+from pathlib import Path
+
 from .reaction_contextual_labels import build_contextual_transformation_label
 from .reaction_display_labels import (
     _build_reaction_label,
@@ -13,6 +17,34 @@ from .reaction_models import (
     RenderedReactionLabel,
 )
 from .reaction_signatures import build_observation_signature
+
+_REACTION_LABEL_DEFINITION_FILES = (
+    "reaction_label_rendering.v1.json",
+    "reaction_label_patterns.v1.json",
+)
+
+
+def reaction_label_definition_versions() -> dict[str, str]:
+    """Return content-addressed versions of display-label definitions.
+
+    Display labels are excluded from reaction identity, but converted records
+    serialize them. Sharded conversion therefore uses this separate provenance
+    contract to invalidate cached records when presentation rules change.
+    """
+    root = Path(__file__).with_name("definitions")
+    versions = {}
+    for filename in _REACTION_LABEL_DEFINITION_FILES:
+        raw = (root / filename).read_bytes()
+        payload = json.loads(raw)
+        version = str(
+            payload.get("label_schema_version")
+            or payload.get("schema_version")
+            or "unknown"
+        )
+        versions[filename] = (
+            f"{version}@sha256:{hashlib.sha256(raw).hexdigest()[:16]}"
+        )
+    return dict(sorted(versions.items()))
 
 
 def render_reaction(
@@ -106,4 +138,4 @@ def render_reaction(
     )
 
 
-__all__ = ["render_reaction"]
+__all__ = ["reaction_label_definition_versions", "render_reaction"]

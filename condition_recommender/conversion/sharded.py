@@ -29,6 +29,7 @@ from reactive_taxonomy import (
     REACTION_SIGNATURE_SCHEMA_VERSION,
     AtomMappingProvider,
     RxnMapperProvider,
+    reaction_label_definition_versions,
     reaction_signature_definition_versions,
 )
 from rdkit import RDLogger
@@ -78,6 +79,7 @@ def _definition_contract(
         "converter_definition_version": GENERIC_CONVERTER_DEFINITION_VERSION,
         "reaction_signature_schema_version": REACTION_SIGNATURE_SCHEMA_VERSION,
         "taxonomy_definition_versions": reaction_signature_definition_versions(),
+        "reaction_label_definition_versions": reaction_label_definition_versions(),
         "condition_registry_definition_versions": (
             condition_registry_definition_versions()
         ),

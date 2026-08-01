@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 import condition_recommender.conversion.generic as generic_module
+import condition_recommender.conversion.sharded as sharded_module
 import pytest
 from condition_recommender.conversion.concise_review import (
     CONCISE_REACTION_REVIEW_FIELDS,
@@ -110,7 +111,7 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
     assert record.schema_version == "5.0"
-    assert record.converter_definition_version == "generic_conversion.v5.0"
+    assert record.converter_definition_version == "generic_conversion.v5.2"
     assert record.reaction_signature["schema_version"] == "3.2"
     assert record.reaction_observation is not None
     assert record.reaction_interpretation is not None
@@ -852,6 +853,7 @@ def test_recursive_concise_review_cancellation_removes_temporary_file(
 
 def test_sharded_conversion_is_restartable_and_integrity_checked(
     tmp_path,
+    monkeypatch,
 ) -> None:
     dataset = tmp_path / "mixed.csv"
     reaction = "Brc1ccccc1.OB(O)c1ccccc1>>c1ccc(-c2ccccc2)cc1"
@@ -896,6 +898,19 @@ def test_sharded_conversion_is_restartable_and_integrity_checked(
     assert (output / "recipe_catalog.jsonl.gz").read_bytes() == first_catalog
     assert len(load_generic_index(output / "records.jsonl.gz").rows) == 4
     assert len(load_generic_index(output / "shard_manifest.json").rows) == 4
+
+    monkeypatch.setattr(
+        sharded_module,
+        "reaction_label_definition_versions",
+        lambda: {"reaction_label_rendering.v1.json": "changed"},
+    )
+    invalidated = convert_datasets_sharded(
+        dataset,
+        output,
+        shard_size=2,
+        mode="test",
+    )
+    assert invalidated["reused_shard_count"] == 0
 
     manifest = json.loads((output / "shard_manifest.json").read_text())
     first_shard = output / manifest["shards"][0]["output_path"]

@@ -26,10 +26,51 @@ from .reaction_models import (
     ReactionEvidenceCandidate,
 )
 from .reaction_parser import ParsedReaction, parse_reaction_smiles
+from .reaction_rendering import render_reaction
 
 
 EXTERNAL_ATOM_MAPPING_SCHEMA_VERSION = "1.0"
 EXTERNAL_MAPPING_EVIDENCE = "external_atom_mapping"
+
+
+def _attach_core_and_rerender(
+    base: ReactionAnalysis,
+    reaction_core: ReactionCoreProjection,
+    *,
+    warnings: Iterable[str],
+) -> ReactionAnalysis:
+    """Attach a compatible core to both contracts and refresh presentation.
+
+    External mapping may add retained-context information after the internal
+    reaction interpretation was completed. Identity, signature, and family
+    interpretation remain unchanged; only the evidence-aware display label is
+    rendered again from the enriched observation.
+    """
+    combined_warnings = tuple(sorted(set(base.warnings).union(warnings)))
+    observation = base.observation
+    if observation is None:
+        return replace(
+            base,
+            reaction_core=reaction_core,
+            warnings=combined_warnings,
+        )
+    enriched_observation = replace(
+        observation,
+        core=reaction_core,
+        warnings=tuple(
+            sorted(set(observation.warnings).union(warnings))
+        ),
+    )
+    return replace(
+        base,
+        reaction_core=reaction_core,
+        observation=enriched_observation,
+        reaction_label=render_reaction(
+            enriched_observation,
+            base.interpretation,
+        ),
+        warnings=combined_warnings,
+    )
 
 
 @dataclass(frozen=True)
@@ -846,8 +887,9 @@ def analyze_reaction_with_external_mapping(
             )
 
         # Forced mapping of an already resolved reaction is a shadow operation:
-        # it supplies atom correspondence for the minimized graphic, but must
-        # not replace the internally resolved interpretation or its labels.
+        # it supplies atom correspondence for the minimized graphic without
+        # replacing the internally resolved identity or interpretation. The
+        # display label is rerendered so compatible core context is not lost.
         confidence = min(
             mapping.normalization.confidence,
             min(
@@ -905,16 +947,16 @@ def analyze_reaction_with_external_mapping(
                 mapping_result=mapping,
                 warnings=(warning, "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW"),
             )
-        effective = replace(
-            base,
-            evidence_candidates=_merge_evidence_candidates(
-                base.evidence_candidates,
-                (external_candidate,),
+        effective = _attach_core_and_rerender(
+            replace(
+                base,
+                evidence_candidates=_merge_evidence_candidates(
+                    base.evidence_candidates,
+                    (external_candidate,),
+                ),
             ),
-            reaction_core=reaction_core,
-            warnings=tuple(
-                sorted(set(base.warnings).union(assessment_warnings))
-            ),
+            reaction_core,
+            warnings=assessment_warnings,
         )
         return ExternalMappingAssessment(
             input_reaction_smiles=reaction_smiles,
@@ -1021,14 +1063,32 @@ def analyze_reaction_with_external_mapping(
         return ExternalMappingAssessment(
             input_reaction_smiles=reaction_smiles,
             status="external_mapping_signature_unavailable",
-            analysis=replace(
-                base,
-                evidence_candidates=_merge_evidence_candidates(
-                    base.evidence_candidates,
-                    (external_candidate,),
-                ),
-                reaction_core=mapped_analysis.reaction_core,
-                warnings=tuple(sorted(set(base.warnings).union((warning,)))),
+            analysis=(
+                _attach_core_and_rerender(
+                    replace(
+                        base,
+                        evidence_candidates=_merge_evidence_candidates(
+                            base.evidence_candidates,
+                            (external_candidate,),
+                        ),
+                    ),
+                    mapped_analysis.reaction_core,
+                    warnings=(
+                        warning,
+                        "EXTERNAL_MAPPING_REQUIRES_EXPERT_REVIEW",
+                    ),
+                )
+                if mapped_analysis.reaction_core is not None
+                else replace(
+                    base,
+                    evidence_candidates=_merge_evidence_candidates(
+                        base.evidence_candidates,
+                        (external_candidate,),
+                    ),
+                    warnings=tuple(
+                        sorted(set(base.warnings).union((warning,)))
+                    ),
+                )
             ),
             provider_metadata=provider.metadata,
             mapping_result=mapping,

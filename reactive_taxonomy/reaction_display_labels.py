@@ -829,6 +829,11 @@ def _build_reaction_label(
         )
     ):
         detailed = styling["separator"].join((detailed, core_display[1]))
+    label_evidence = evidence
+    label_confidence = confidence
+    if source == "reaction_core" and reaction_core is not None:
+        label_evidence = reaction_core.evidence
+        label_confidence = min(confidence, reaction_core.confidence)
     prefix = topology_label_prefix(topology)
     if prefix:
         scope_prefix = "intramolecular "
@@ -849,8 +854,8 @@ def _build_reaction_label(
         status=status,
         source=source,
         clauses=clauses,
-        evidence=evidence,
-        confidence=confidence,
+        evidence=label_evidence,
+        confidence=label_confidence,
         warnings=warning_tuple,
         style=style,
         definition_version=str(rendering["label_schema_version"]),
