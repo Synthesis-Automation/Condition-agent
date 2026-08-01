@@ -142,6 +142,10 @@ evidence stay in the interpretation. Review CSVs expose one primary
 `reaction_core_label` immediately after the reaction-SMILES column as an audit
 field for the unpolished minimum-core
 projection. Neither display field participates in identity or retrieval.
+The shared display renderer composes verified grammar/topology language with
+additional core context when that context is informative, marks review-only
+cores as provisional, and renders unresolved products explicitly rather than
+ending labels with an incomplete reaction arrow.
 
 ### Reaction-core retrieval
 

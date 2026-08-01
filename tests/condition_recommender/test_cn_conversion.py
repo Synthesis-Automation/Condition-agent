@@ -29,7 +29,8 @@ def test_exact_cn_record_is_verified() -> None:
 def test_partial_cn_record_keeps_product_empty() -> None:
     record = convert_row(_row("Brc1ccccc1.CNC>>c1ccccc1"), 2)
     assert record.admission_tier == AdmissionTier.REVIEW
-    assert record.reaction_label["concise"].endswith("→")
+    assert not record.reaction_label["concise"].endswith("→")
+    assert "[product contradicted]" in record.reaction_label["concise"]
     assert record.product_connection is None
 
 

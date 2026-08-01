@@ -170,7 +170,10 @@ def test_ambiguous_fallback_excludes_product_mismatch_candidates() -> None:
     )
 
     assert result.reaction_label.status == "ambiguous_reactants"
-    assert result.reaction_label.concise == "(Ar–C(R)=O) OR (R–OH) →"
+    assert result.reaction_label.concise == (
+        "Reactant candidates: (Ar–C(R)=O) OR (R–OH) "
+        "[product unresolved]"
+    )
     assert "Ar–F" not in result.reaction_label.concise
     assert "intramolecular" not in result.reaction_label.concise
     assert (

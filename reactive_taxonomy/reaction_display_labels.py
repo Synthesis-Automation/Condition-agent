@@ -377,6 +377,161 @@ def _make_detailed_label_readable(
     return _render_formula_counts(detailed, style=style)
 
 
+def _render_core_text(text: str, *, style: str) -> str:
+    """Apply display style to presentation-only reaction-core text."""
+    if style == "unicode":
+        return text
+    return (
+        text.replace("→", "->")
+        .replace("–", "-")
+        .replace("≡", "#")
+        .replace("×", "x")
+        .replace("∅", "none")
+    )
+
+
+def _core_context_tokens(label: str) -> frozenset[str]:
+    """Return broad substituent classes that make a core label informative."""
+    return frozenset(
+        match.group(1)
+        for match in re.finditer(
+            r"(?<![A-Za-z])(Cycloalkyl|HetAr|Alkenyl|Alkynyl|Acyl|Ar|R)"
+            r"(?![a-z])",
+            label,
+        )
+    )
+
+
+def _core_display_parts(
+    reaction_core: Optional[ReactionCoreProjection],
+    *,
+    style: str,
+    rendering: dict[str, Any],
+) -> Optional[tuple[str, str]]:
+    """Render a non-blocked core as a concise equation and typed audit detail."""
+    if reaction_core is None or reaction_core.quality.status == "blocked":
+        return None
+    templates = rendering["templates"]
+    styling = _style(style)
+    presentation = reaction_core.presentation
+    atom_equation = _render_core_text(presentation.equation, style=style)
+    concise = _render_core_text(
+        (
+            reaction_core.abstraction.general_label
+            if reaction_core.abstraction is not None
+            else reaction_core.generic_label
+        ),
+        style=style,
+    )
+    sections = [
+        str(templates["core_projection"]).format(equation=atom_equation),
+    ]
+    typed_sections = (
+        ("core_bond_changes", "changes", presentation.bond_changes),
+        ("core_atom_state_changes", "changes", presentation.atom_state_changes),
+        ("core_retained_context", "contexts", presentation.retained_context),
+        ("core_departing_context", "contexts", presentation.departing_context),
+        ("core_appearing_context", "contexts", presentation.appearing_context),
+    )
+    for template_key, value_key, values in typed_sections:
+        if values:
+            sections.append(
+                str(templates[template_key]).format(
+                    **{
+                        value_key: ", ".join(
+                            _render_core_text(value, style=style)
+                            for value in values
+                        )
+                    }
+                )
+            )
+    sections.extend(
+        (
+            str(templates["core_evidence"]).format(
+                evidence=presentation.evidence_label
+            ),
+            str(templates["core_quality"]).format(
+                quality=presentation.quality_label
+            ),
+        )
+    )
+    return concise, styling["separator"].join(sections)
+
+
+def _core_primary_label(
+    reaction_core: ReactionCoreProjection,
+    core_concise: str,
+    *,
+    rendering: dict[str, Any],
+) -> str:
+    """Mark review-only or inferred core equations as provisional."""
+    if (
+        reaction_core.evidence_status == "verified"
+        and reaction_core.quality.status == "pass"
+    ):
+        return core_concise
+    return str(rendering["templates"]["provisional_core"]).format(
+        evidence=reaction_core.presentation.evidence_label,
+        core=core_concise,
+    )
+
+
+def _core_adds_context(base_label: str, core_label: str) -> bool:
+    """Whether the core retains substituent classes absent from a base label."""
+    return bool(_core_context_tokens(core_label) - _core_context_tokens(base_label))
+
+
+def _core_should_lead(
+    reaction_core: Optional[ReactionCoreProjection],
+    *,
+    base_label: str,
+) -> bool:
+    """Prefer a trustworthy, materially richer core over a generic edit label."""
+    if reaction_core is None or reaction_core.quality.status == "blocked":
+        return False
+    if reaction_core.abstraction is not None:
+        return True
+    return (
+        reaction_core.quality.status == "pass"
+        and _core_adds_context(base_label, reaction_core.generic_label)
+    )
+
+
+def _strip_terminal_arrow(label: str, *, style: str) -> str:
+    """Remove a renderer-internal unresolved-product arrow from reactant text."""
+    arrows = ("→", "->") if style == "unicode" else ("->", "→")
+    stripped = label.rstrip()
+    for arrow in arrows:
+        if stripped.endswith(arrow):
+            return stripped[: -len(arrow)].rstrip()
+    return stripped
+
+
+def _render_unresolved_reactants(
+    fallback_label: str,
+    *,
+    fallback_status: str,
+    style: str,
+    rendering: dict[str, Any],
+) -> tuple[str, str, str]:
+    """Render unresolved reactants without implying an unobserved product."""
+    templates = rendering["templates"]
+    reactants = _strip_terminal_arrow(fallback_label, style=style)
+    status = (
+        fallback_status
+        if fallback_status
+        in {
+            "reactant_only",
+            "ambiguous_reactants",
+            "product_contradicted_reactants",
+        }
+        else "reactant_only"
+    )
+    concise = str(templates[status]).format(reactants=reactants)
+    detail = str(templates[f"{status}_detail"])
+    return concise, detail, reactants
+
+
 def _build_reaction_label(
     *,
     reactants: Sequence[ReactionComponent],
@@ -444,30 +599,11 @@ def _build_reaction_label(
         if ring_change is not None
         else None
     )
-    core_display = None
-    if (
-        reaction_core is not None
-        and reaction_core.abstraction is not None
-        and reaction_core.quality.status != "blocked"
-    ):
-        core_concise = reaction_core.abstraction.general_label
-        presentation = reaction_core.presentation
-        core_sections = (
-            presentation.equation,
-            *presentation.bond_changes,
-            *presentation.atom_state_changes,
-            *presentation.retained_context,
-            *presentation.departing_context,
-            *presentation.appearing_context,
-            presentation.evidence_label,
-            presentation.quality_label,
-        )
-        core_display = (
-            core_concise,
-            styling["separator"].join(
-                section for section in core_sections if section
-            ),
-        )
+    core_display = _core_display_parts(
+        reaction_core,
+        style=style,
+        rendering=rendering,
+    )
     if evidence in {
         "conflicting_edit_evidence",
         "conflicting_stereochemical_evidence",
@@ -506,48 +642,158 @@ def _build_reaction_label(
         status = "ring_formation"
         source = "generic_topology"
     elif pattern is not None:
-        concise = (
+        pattern_concise = (
             contextual_label.concise
             if contextual_label
             else inferred_transition or pattern.label
         )
-        detail_template = (
-            rendering["templates"]["contextual_detail"]
-            if contextual_label
-            else rendering["templates"]["exact_detail"]
-        )
-        detailed = str(detail_template).format(
-            label=concise,
-            transformation=pattern.label,
-            clauses=detailed_clauses,
-        )
-        status = "generic_pattern"
-        source = "literal_edits"
-    elif core_display is not None:
-        concise, detailed = core_display
-        structural_label = reaction_core.generic_label
-        transformation_label = concise
-        status = "core_projection"
-        source = "reaction_core"
+        if (
+            core_display is not None
+            and _core_should_lead(reaction_core, base_label=pattern_concise)
+        ):
+            assert reaction_core is not None
+            core_concise, core_detailed = core_display
+            concise = _core_primary_label(
+                reaction_core,
+                core_concise,
+                rendering=rendering,
+            )
+            detailed = styling["separator"].join(
+                (
+                    concise,
+                    core_detailed,
+                    str(rendering["templates"]["pattern_overlay"]).format(
+                        label=pattern_concise
+                    ),
+                    str(rendering["templates"]["literal_edit_audit"]).format(
+                        clauses=detailed_clauses
+                    ),
+                )
+            )
+            structural_label = reaction_core.generic_label
+            transformation_label = core_concise
+            status = "core_projection"
+            source = "reaction_core"
+        else:
+            concise = pattern_concise
+            detail_template = (
+                rendering["templates"]["contextual_detail"]
+                if contextual_label
+                else rendering["templates"]["exact_detail"]
+            )
+            detailed = str(detail_template).format(
+                label=concise,
+                transformation=pattern.label,
+                clauses=detailed_clauses,
+            )
+            status = "generic_pattern"
+            source = "literal_edits"
     elif clauses:
-        concise = (
+        observed_concise = (
             contextual_label.concise
             if contextual_label
             else inferred_transition or concise_clauses
         )
-        detailed = (
-            str(rendering["templates"]["exact_detail"]).format(
-                label=contextual_label.concise,
-                clauses=detailed_clauses,
+        if (
+            core_display is not None
+            and _core_should_lead(reaction_core, base_label=observed_concise)
+        ):
+            assert reaction_core is not None
+            core_concise, core_detailed = core_display
+            concise = _core_primary_label(
+                reaction_core,
+                core_concise,
+                rendering=rendering,
             )
-            if contextual_label
-            else str(rendering["templates"]["observed_detail"]).format(
-                label=concise,
-                clauses=detailed_clauses,
+            detailed = styling["separator"].join(
+                (
+                    concise,
+                    core_detailed,
+                    str(rendering["templates"]["literal_edit_audit"]).format(
+                        clauses=detailed_clauses
+                    ),
+                )
+            )
+            structural_label = reaction_core.generic_label
+            transformation_label = core_concise
+            status = "core_projection"
+            source = "reaction_core"
+        else:
+            concise = observed_concise
+            detailed = (
+                str(rendering["templates"]["exact_detail"]).format(
+                    label=contextual_label.concise,
+                    clauses=detailed_clauses,
+                )
+                if contextual_label
+                else str(rendering["templates"]["observed_detail"]).format(
+                    label=concise,
+                    clauses=detailed_clauses,
+                )
+            )
+            status = "observed_edits"
+            source = "literal_edits"
+    elif fallback_label and fallback_status in {
+        "reactant_only",
+        "ambiguous_reactants",
+        "product_contradicted_reactants",
+    }:
+        unresolved_concise, unresolved_detail, reactant_text = (
+            _render_unresolved_reactants(
+                fallback_label,
+                fallback_status=fallback_status,
+                style=style,
+                rendering=rendering,
             )
         )
-        status = "observed_edits"
-        source = "literal_edits"
+        status = fallback_status
+        if core_display is not None:
+            assert reaction_core is not None
+            core_concise, core_detailed = core_display
+            concise = _core_primary_label(
+                reaction_core,
+                core_concise,
+                rendering=rendering,
+            )
+            detailed = styling["separator"].join(
+                (
+                    concise,
+                    core_detailed,
+                    str(rendering["templates"]["reactant_candidates"]).format(
+                        reactants=reactant_text
+                    ),
+                    unresolved_detail,
+                )
+            )
+            structural_label = reaction_core.generic_label
+            transformation_label = core_concise
+            source = "reaction_core"
+        else:
+            concise = unresolved_concise
+            detailed = styling["separator"].join(
+                (unresolved_concise, unresolved_detail)
+            )
+            source = "reactant_only"
+    elif fallback_status == "partial_product_correspondence" and fallback_label:
+        concise = fallback_label
+        detailed = fallback_detailed_label or fallback_label
+        structural_label = fallback_label
+        transformation_label = fallback_label
+        status = "partial_product_correspondence"
+        source = "partial_product_correspondence"
+    elif core_display is not None:
+        assert reaction_core is not None
+        core_concise, core_detailed = core_display
+        concise = _core_primary_label(
+            reaction_core,
+            core_concise,
+            rendering=rendering,
+        )
+        detailed = styling["separator"].join((concise, core_detailed))
+        structural_label = reaction_core.generic_label
+        transformation_label = core_concise
+        status = "core_projection"
+        source = "reaction_core"
     elif fallback_label:
         concise = fallback_label
         detailed = fallback_detailed_label or fallback_label
@@ -562,11 +808,7 @@ def _build_reaction_label(
             }
             else "unavailable"
         )
-        if status == "partial_product_correspondence":
-            structural_label = fallback_label
-            transformation_label = fallback_label
-            source = "partial_product_correspondence"
-        elif status in {
+        if status in {
             "reactant_only",
             "ambiguous_reactants",
             "product_contradicted_reactants",
@@ -576,6 +818,17 @@ def _build_reaction_label(
             source = "unavailable"
     else:
         return None
+    if (
+        core_display is not None
+        and source != "reaction_core"
+        and status != "conflicting_evidence"
+        and reaction_core is not None
+        and (
+            reaction_core.abstraction is not None
+            or _core_adds_context(concise, core_display[0])
+        )
+    ):
+        detailed = styling["separator"].join((detailed, core_display[1]))
     prefix = topology_label_prefix(topology)
     if prefix:
         scope_prefix = "intramolecular "

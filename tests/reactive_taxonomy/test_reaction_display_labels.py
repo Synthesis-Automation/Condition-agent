@@ -20,6 +20,30 @@ def test_mapped_unknown_reaction_receives_observed_edit_label() -> None:
     assert result.reaction_label.clauses[0].evidence == "supplied_atom_mapping"
 
 
+def test_verified_core_enriches_generic_observed_edit_label() -> None:
+    result = featurize_reaction(
+        "[CH3:1][S:2][CH3:3].[O:4]>>[CH3:1][S:2](=[O:4])[CH3:3]"
+    )
+
+    assert result.reaction_label.concise == "S(R)2 + O → S(R)2(=O)"
+    assert result.reaction_label.status == "core_projection"
+    assert result.reaction_label.source == "reaction_core"
+    assert result.reaction_label.structural_label == "S(R)2 + O → S(R)2(=O)"
+    assert "retained context: R (C)" in result.reaction_label.detailed
+    assert "literal edits: O(map 4)=S(map 2) bond formation" in (
+        result.reaction_label.detailed
+    )
+
+
+def test_simple_mapped_formation_keeps_clearer_literal_edit_label() -> None:
+    result = featurize_reaction("[CH3:1].[NH2:2]>>[CH3:1][NH2:2]")
+
+    assert result.reaction_core is not None
+    assert result.reaction_core.generic_label == "∅ → C–N"
+    assert result.reaction_label.concise == "C–N bond formation"
+    assert result.reaction_label.source == "literal_edits"
+
+
 def test_multiple_edits_compose_and_collapse_repeated_generic_clauses() -> None:
     result = featurize_reaction("[CH2:1]=[CH2:2]>>[CH3:1][CH3:2]")
 
@@ -172,7 +196,7 @@ def test_display_label_serializes_as_nested_evidence() -> None:
     assert payload["reaction_label"]["clauses"][0]["atom_map_numbers"] == (1, 2)
 
 
-def test_unknown_mapped_substitution_receives_generic_pattern_label() -> None:
+def test_unknown_mapped_substitution_combines_core_and_pattern_label() -> None:
     result = featurize_reaction(
         "[CH3:1][O:2][CH3:5].[NH2:3]>>"
         "[CH3:1][NH:3].[O-:2][CH3:5]"
@@ -180,14 +204,48 @@ def test_unknown_mapped_substitution_receives_generic_pattern_label() -> None:
 
     assert result.named_family is None
     assert result.selected_candidate is None
-    assert result.reaction_label.concise == "C–N substitution"
-    assert result.reaction_label.status == "generic_pattern"
+    assert result.reaction_label.concise == (
+        "C(H)3(O-R) + N(H)2 → C(H)3(N-H)"
+    )
+    assert result.reaction_label.status == "core_projection"
+    assert result.reaction_label.source == "reaction_core"
     assert result.reaction_label is not None
     assert result.reaction_label.pattern_id == "substitution"
     assert result.reaction_label.grammar_id is None
     assert result.reaction_label.contextual_label is None
     assert result.reaction_label.structural_label == (
-        "C–O bond cleavage; C–N bond formation; N–H loss"
+        "C(H)3(O-R) + N(H)2 → C(H)3(N-H)"
+    )
+    assert "transformation pattern: C–N substitution" in (
+        result.reaction_label.detailed
+    )
+
+
+def test_exact_grammar_keeps_concise_label_and_adds_core_context() -> None:
+    result = featurize_reaction(
+        "[O:1]=[C:2]1[CH2:3][CH2:4][CH2:5][CH2:6][CH2:7]1>>"
+        "[OH:1][CH:2]1[CH2:3][CH2:4][CH2:5][CH2:6][CH2:7]1"
+    )
+
+    assert result.reaction_label.concise == "R–C(R)=O → R–CH(R)–OH"
+    assert result.reaction_label.status == "exact_reconstruction"
+    assert result.reaction_label.source == "verified_grammar"
+    assert "core projection: C(Cycloalkyl)₂(=O)" in (
+        result.reaction_label.detailed
+    )
+    assert "retained context: Cycloalkyl" in result.reaction_label.detailed
+
+
+def test_contradicted_reactant_fallback_never_ends_in_arrow() -> None:
+    result = featurize_reaction(
+        "Brc1ccccc1.OB(O)c1ccccc1>>c1ccccc1"
+    )
+
+    assert result.reaction_label.status == "product_contradicted_reactants"
+    assert not result.reaction_label.concise.endswith("→")
+    assert result.reaction_label.concise.endswith("[product contradicted]")
+    assert "no candidate product transformation is asserted" in (
+        result.reaction_label.detailed
     )
 
 
@@ -233,7 +291,7 @@ def test_reaction_label_definition_is_versioned() -> None:
     patterns = load_reaction_label_patterns()
 
     assert rendering["schema_version"] == "2.0"
-    assert rendering["label_schema_version"] == "2.0"
+    assert rendering["label_schema_version"] == "2.1"
     assert patterns["schema_version"] == "1.0"
     assert {pattern["id"] for pattern in patterns["patterns"]} >= {
         "substitution",

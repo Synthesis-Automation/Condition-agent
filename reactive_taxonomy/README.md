@@ -374,6 +374,16 @@ contract is a single `reaction_label` object containing both forms plus source,
 status, evidence, confidence, and warnings. Add `--concise` to write the
 reaction SMILES and concise display label only.
 
+Display rendering is compositional. Verified grammar and topology labels remain
+the readable transformation headline, while materially new reaction-core
+context is retained in the detailed label. For generic edit patterns, a
+non-blocked, sufficiently informative core may become the headline; inferred,
+external, or review-quality cores are explicitly marked provisional. Reactant-
+only and product-contradicted interpretations never render a dangling product
+arrow: they state that the product is unresolved or contradicted without
+asserting an unobserved transformation. These presentation choices do not
+affect signature identity, admission, or retrieval.
+
 Phase 1 molecular-feature evaluation, including machine metrics and a blind
 chemist-review packet:
 

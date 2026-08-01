@@ -28,5 +28,6 @@ def test_exact_cs_record_is_verified() -> None:
 def test_unverified_heteroatom_product_is_reviewed_with_blank_product() -> None:
     record = convert_row(_row("Brc1ccccc1.CCO>>c1ccccc1"), 2, element="O")
     assert record.admission_tier == AdmissionTier.REVIEW
-    assert record.reaction_label["concise"].endswith("→")
+    assert not record.reaction_label["concise"].endswith("→")
+    assert "[product contradicted]" in record.reaction_label["concise"]
     assert record.product_connection is None

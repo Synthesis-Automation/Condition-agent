@@ -60,7 +60,11 @@ def test_unverified_product_is_sent_to_review() -> None:
     assert record.admission_tier == AdmissionTier.REVIEW
     assert "reaction_not_exactly_verified" in record.admission_reasons
     assert "Ar1–Br + Ar2–B(OH)2" in record.reaction_label["concise"]
-    assert record.reaction_label["concise"].endswith("→")
+    assert not record.reaction_label["concise"].endswith("→")
+    assert "[product contradicted]" in record.reaction_label["concise"]
+    assert "no candidate product transformation is asserted" in (
+        record.reaction_label["detailed"]
+    )
     assert record.reaction_label["status"] == "product_contradicted_reactants"
 
 

@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "label_schema_version": "2.0",
+  "label_schema_version": "2.1",
   "default_style": "unicode",
   "clause_order": ["broken", "order_changed", "formed", "hydrogen_change"],
   "element_precedence": ["C", "N", "O", "S", "P", "B", "Si", "H", "F", "Cl", "Br", "I"],
@@ -64,6 +64,24 @@
     "intramolecular_ring_context": "intramolecular ({ring_size}-membered ring)",
     "ring_formation_concise": "{fragments} {arrow} {aromatic}{ring_size}-membered {formula} ring",
     "ring_formation_detail": "{component_count}-component ring formation: {concise}; key connectivity: {formed_bonds}; ring count +1{electronic}; evidence: {evidence} (confidence {confidence}); raw edits: {raw_edits}",
-    "ring_aromatization": "; electronic reorganization: reactant pi system {arrow} aromatic ring"
+    "ring_aromatization": "; electronic reorganization: reactant pi system {arrow} aromatic ring",
+    "provisional_core": "Provisional core ({evidence}): {core}",
+    "core_projection": "core projection: {equation}",
+    "core_bond_changes": "bond changes: {changes}",
+    "core_atom_state_changes": "atom-state changes: {changes}",
+    "core_retained_context": "retained context: {contexts}",
+    "core_departing_context": "departing context: {contexts}",
+    "core_appearing_context": "appearing context: {contexts}",
+    "core_evidence": "core evidence: {evidence}",
+    "core_quality": "core quality: {quality}",
+    "literal_edit_audit": "literal edits: {clauses}",
+    "pattern_overlay": "transformation pattern: {label}",
+    "reactant_candidates": "reactant grammar candidates: {reactants}",
+    "reactant_only": "Reactants: {reactants} [product unresolved]",
+    "ambiguous_reactants": "Reactant candidates: {reactants} [product unresolved]",
+    "product_contradicted_reactants": "Reactant candidates: {reactants} [product contradicted]",
+    "reactant_only_detail": "no product transformation is asserted",
+    "ambiguous_reactants_detail": "multiple reactant interpretations remain; no product transformation is asserted",
+    "product_contradicted_reactants_detail": "reactant grammar candidates contradict the observed product; no candidate product transformation is asserted"
   }
 }
