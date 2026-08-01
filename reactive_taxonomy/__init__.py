@@ -3,7 +3,13 @@
 from .api import detect_sites, featurize_molecule
 from .reaction_api import featurize_reaction
 from .reaction_core import build_reaction_core_projection
-from .reaction_signatures import reaction_signature_definition_versions
+from .reaction_signatures import (
+    build_observation_signature,
+    reaction_signature_definition_versions,
+)
+from .reaction_observation import observe_reaction
+from .reaction_interpretation import interpret_reaction
+from .reaction_rendering import render_reaction
 from .reaction_fallback_descriptors import reaction_fallback_definition_versions
 from .external_atom_mapping import (
     analyze_reaction_with_external_mapping,
@@ -41,9 +47,17 @@ from .descriptors import (
 )
 from .connectivity_rewrite import (
     apply_connectivity_rewrite,
+    apply_reaction_operator,
     compile_connectivity_rewrite_definitions,
+    connectivity_rewrite_by_id,
     connectivity_rewrite_for_grammar,
     load_connectivity_rewrites,
+)
+from .reaction_operators import (
+    ReactionOperator,
+    execute_reaction_operator,
+    get_reaction_operator,
+    load_reaction_operators,
 )
 from .reaction_site_interfaces import (
     BondCapacitySite,
@@ -56,6 +70,7 @@ from .reaction_site_interfaces import (
     normalize_detected_site,
     normalize_reaction_assignment,
     normalize_reaction_site,
+    normalize_site_assignment,
 )
 from .reaction_models import (
     AtomStateTransition,
@@ -99,7 +114,6 @@ from .reaction_models import (
     ReactionCoreRemoteClass,
     ReactionCoreRemoteSubgraph,
     ReactionCoreStateChange,
-    ReactionDisplayLabel,
     ReactionEdit,
     ReactionEditHypothesis,
     ReactionEvidenceCandidate,
@@ -107,14 +121,17 @@ from .reaction_models import (
     ReactionEventRelation,
     ReactionFallbackDescriptor,
     ReactionFamilyEnvironment,
+    ReactionInterpretation,
     ReactionLabelClause,
     ReactionPartner,
     ReactionPartnerEnvironment,
+    ReactionObservation,
     ReactionRingChange,
     ReactionSignature,
     ReactionSpectatorGroup,
     ReactionStereoChange,
     ReactionTopology,
+    RenderedReactionLabel,
 )
 from .reaction_display_labels import (
     build_reaction_display_label,
@@ -268,7 +285,7 @@ __all__ = [
     "ReactionCoreRemoteClass",
     "ReactionCoreRemoteSubgraph",
     "ReactionCoreStateChange",
-    "ReactionDisplayLabel",
+    "RenderedReactionLabel",
     "ReactionEdit",
     "ReactionEditHypothesis",
     "ReactionEvidenceCandidate",
@@ -276,9 +293,11 @@ __all__ = [
     "ReactionEventRelation",
     "ReactionFallbackDescriptor",
     "ReactionFamilyEnvironment",
+    "ReactionInterpretation",
     "ReactionLabelClause",
     "ReactionPartner",
     "ReactionPartnerEnvironment",
+    "ReactionObservation",
     "ReactionRingChange",
     "ReactionSignature",
     "ReactionReviewSummary",
@@ -295,6 +314,7 @@ __all__ = [
     "ReactionTemplateParticipant",
     "ReactionTemplateQueryResult",
     "ReactionTemplateRole",
+    "ReactionOperator",
     "ReactiveCenterProfile",
     "ReactivityModifier",
     "ReactiveLinkSite",
@@ -312,19 +332,24 @@ __all__ = [
     "TemplateRoleBinding",
     "available_styles",
     "apply_connectivity_rewrite",
+    "apply_reaction_operator",
     "build_contextual_transformation_label",
     "build_reaction_core_projection",
+    "build_observation_signature",
     "build_reaction_display_label",
     "build_reaction_review_summary",
     "compile_connectivity_rewrite_definitions",
     "connectivity_rewrite_for_grammar",
+    "connectivity_rewrite_by_id",
     "detect_functional_groups",
     "detect_sites",
     "derive_reaction_template",
     "evaluate_molecular_features",
     "evaluate_reaction_edits",
+    "execute_reaction_operator",
     "featurize_molecule",
     "featurize_reaction",
+    "interpret_reaction",
     "reaction_fallback_definition_versions",
     "load_functional_group_definitions",
     "load_handle_patterns",
@@ -332,6 +357,7 @@ __all__ = [
     "load_reaction_edit_benchmark",
     "load_reaction_label_patterns",
     "load_reaction_label_rendering",
+    "load_reaction_operators",
     "load_reaction_template_registry",
     "load_contextual_source_label_mappings",
     "load_connectivity_rewrites",
@@ -342,9 +368,13 @@ __all__ = [
     "normalize_compound_sites",
     "normalize_reaction_assignment",
     "normalize_reaction_site",
+    "normalize_site_assignment",
+    "observe_reaction",
     "reaction_signature_definition_versions",
+    "get_reaction_operator",
     "reaction_edit_fingerprint",
     "render_reaction_label_clause",
+    "render_reaction",
     "format_reaction_review_summary",
     "render_reactivity_profile",
     "render_reactivity_profile_expanded",

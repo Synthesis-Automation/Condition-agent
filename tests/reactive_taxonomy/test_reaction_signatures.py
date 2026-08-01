@@ -92,11 +92,20 @@ def test_signature_partners_retain_typed_reactivity_profiles() -> None:
     for reaction, expected in cases.items():
         result = featurize_reaction(reaction)
         assert result.reaction_signature is not None
+        assert result.interpretation is not None
+        assert result.interpretation.selected_candidate is not None
+        interpreted_electrophile = (
+            result.interpretation.selected_candidate.role_assignments[
+                "electrophile"
+            ]
+        )
         electrophile = next(
             partner
             for partner in result.reaction_signature.partners
-            if partner.role == "electrophile"
+            if partner.component_index
+            == interpreted_electrophile.component_index
         )
+        assert electrophile.role is None
         assert electrophile.anchor_contexts == (expected[0],)
         assert electrophile.reactivity_profile is not None
         assert electrophile.reactivity_profile.context_kind == expected[1]
@@ -116,8 +125,10 @@ def test_signature_serializes_with_analysis() -> None:
         "C-H:NONE>SINGLE",
         "C-H:NONE>SINGLE",
     )
-    assert payload["schema_version"] == "3.6"
-    assert payload["reaction_signature"]["schema_version"] == "3.1"
+    assert payload["schema_version"] == "4.0"
+    assert payload["reaction_signature"]["schema_version"] == "3.2"
+    assert payload["observation"]["schema_version"] == "1.0"
+    assert payload["interpretation"]["schema_version"] == "1.0"
     assert payload["reaction_signature"]["topology"]["reaction_scope"] == (
         "unimolecular"
     )
@@ -205,6 +216,10 @@ def test_balanced_unmapped_multi_event_reaction_is_exactly_reconstructed() -> No
     assert [
         event.transformation_class for event in result.reaction_signature.events
     ] == [
+        "substitution",
+        "substitution",
+    ]
+    assert [event.transformation_class for event in result.selected_events] == [
         "sp2_c_o_substitution",
         "sp2_c_s_substitution",
     ]
@@ -257,9 +272,14 @@ def test_balanced_repeated_suzuki_events_are_exactly_reconstructed() -> None:
     assert result.reaction_completeness is not None
     assert result.reaction_completeness.status == "verified"
     assert result.compatible_named_families == ("suzuki_miyaura",)
+    assert all(event.named_family is None for event in result.reaction_signature.events)
     assert all(
-        event.named_family == "suzuki_miyaura"
+        event.compatible_named_families == ()
         for event in result.reaction_signature.events
+    )
+    assert all(
+        event.compatible_named_families == ("suzuki_miyaura",)
+        for event in result.selected_events
     )
     assert result.reaction_label == (
         "2 × C–B bond cleavage; C–Br bond cleavage; C–C bond formation"

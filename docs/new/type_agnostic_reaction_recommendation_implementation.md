@@ -75,10 +75,13 @@ The current code declares:
 
 | Contract | Version |
 | --- | --- |
-| Reaction analysis | `3.6` |
-| Reaction signature / ID namespace | `3.1` / `RS3` |
+| Reaction analysis | `4.0` |
+| Reaction observation | `1.0` |
+| Reaction interpretation | `1.0` |
+| Rendered reaction label | `1.5` |
+| Reaction signature / ID namespace | `3.2` / `RS3` |
 | Reaction ring change | `1.0` |
-| Reaction topology | `1.1` |
+| Reaction topology | `1.2` |
 | Reaction core projection / algorithm | `2.2` / `reaction_core_projection.v8` |
 | Taxonomy identity manifest | `3.0` |
 | Connectivity site interface | `2.0` |
@@ -86,12 +89,13 @@ The current code declares:
 | Typed reactivity profile | `1.0` |
 | Reaction fallback descriptor | `1.3` |
 | Resolved condition recipe | `1.2` |
-| Recommendation record | `4.0` |
-| Generic converter definition | `generic_conversion.v3.7` |
-| Generic sharded converter definition | `generic_sharded_conversion.v2.4` |
-| Concise reaction review | `3.3` |
+| Recommendation record | `4.1` |
+| Generic converter definition | `generic_conversion.v4.0` |
+| Generic sharded converter definition | `generic_sharded_conversion.v3.0` |
+| Concise reaction review | `4.0` |
+| Shared chemist review summary | `1.2` |
 | Recommendation artifact workflow | `1.1` |
-| Generic persisted index | `2.6` |
+| Generic persisted index | `3.0` |
 | Generic recommendation result | `2.4` |
 | Reaction correspondence definitions | `2.3` |
 | Generic retrieval definition | `1.8` |
@@ -451,6 +455,9 @@ validation before they may consume these observations.
 
 `reactive_taxonomy` currently provides:
 
+- a public grammar-free `ReactionObservation` contract containing parsed
+  components, correspondence evidence, normalized edits, topology,
+  completeness, spectators, and minimum-core projection;
 - immutable atom-provenanced bond and schema-level hydrogen edits;
 - typed `ReactionEvidenceCandidate` records for each attempted evidence
   provider, so failed interpretation does not erase the observation trail;
@@ -461,8 +468,7 @@ validation before they may consume these observations.
 - formal-charge and explicit stereochemical observations;
 - canonical molecular reactive links, bond capacities, and connection
   endpoints;
-- exact single-event and composable multi-event reconstruction;
-- reaction topology and event relationships;
+- generic reaction topology and edit-event relationships;
 - typed product-atom completeness, partial product-origin gaps, deterministic
   `PTS1` partial-transformation keys, and `FSR1` fragment-source requirements;
 - graph-derived local reactivity profiles and unchanged spectators;
@@ -504,7 +510,9 @@ into public identity.
 ### 3.2 Interpretation
 
 Structural archetypes are derived from edits. Transformation classes and named
-families are optional interpretations. Mapped or otherwise verified unknown
+families are optional `ReactionInterpretation` values. Exact single-event and
+composable multi-event reconstruction live in this layer, not in the
+observation contract. Mapped or otherwise verified unknown
 chemistry can receive:
 
 ```text
@@ -515,17 +523,22 @@ named_family = None
 Source-declared family is stored as provenance outside
 `featurize_reaction()`. It cannot determine the structural output.
 
-Display labels are built after the structural analysis. Their wording and
-rendering versions do not affect signature identity.
+One `render_reaction()` entry point builds the chemist-facing label after
+structural analysis. It records whether the result came from verified grammar,
+generic topology, an edit pattern, the minimum-core projection, or literal
+edits. Its wording and rendering version do not affect signature identity.
 
 ### 3.3 Recommendation records
 
 The converter serializes:
 
 - source row, file, reaction, and reference provenance;
-- reaction analysis, signature, completeness, fallback, and conflicts;
+- nested observation and optional interpretation, plus the generic reaction
+  signature, completeness, fallback, and conflicts;
 - reaction-core projection, evidence status, exact/typed/shape/center keys,
   atom transitions, events, remote subgraphs, attachment ports, and warnings;
+- one primary `reaction_display_label` review column and a separate
+  `reaction_core_raw_label` audit column;
 - optional external-mapping disposition, mapped proposal, coverage, confidence,
   provider/model identity, matched internal hypotheses, and warnings;
 - chemistry, condition, stage, outcome, and index-eligibility statuses;

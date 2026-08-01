@@ -18,22 +18,27 @@ def build_rule_query_facts(
         return None, "QUERY_HAS_NO_USABLE_REACTION_SIGNATURE"
     if signature.event_scope != "single_event":
         return None, "RULE_QUERY_REQUIRES_SINGLE_EVENT"
-    selected = analysis.selected_candidate
+    interpretation = analysis.interpretation
+    selected = (
+        interpretation.selected_candidate
+        if interpretation is not None
+        else None
+    )
     if selected is None:
         return None, "QUERY_HAS_NO_SELECTED_REACTION_GRAMMAR"
-    if selected.transformation_class != signature.transformation_class:
-        return None, "RULE_QUERY_TRANSFORMATION_CONFLICT"
+    if (
+        interpretation.evidence_quality
+        == "conflicting_interpretation_evidence"
+    ):
+        return None, "RULE_QUERY_INTERPRETATION_CONFLICT"
     topology = analysis.reaction_topology
     if topology is None:
         return None, "QUERY_HAS_NO_REACTION_TOPOLOGY"
 
     environment_by_role = {
         str(partner.role): partner
-        for partner in (
-            analysis.family_environment.partners
-            if analysis.family_environment is not None
-            else ()
-        )
+        for partner in interpretation.partners
+        if partner.role is not None
     }
 
     partners = []
@@ -151,7 +156,7 @@ def build_rule_query_facts(
         RuleQueryFacts(
             signature_id=signature.signature_id,
             reaction_signature_schema_version=signature.schema_version,
-            transformation_class=str(signature.transformation_class or ""),
+            transformation_class=str(selected.transformation_class or ""),
             event_scope=signature.event_scope,
             evidence_quality=analysis.evidence_quality,
             reaction_scope=str(topology.reaction_scope),

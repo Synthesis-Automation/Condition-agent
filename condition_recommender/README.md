@@ -132,6 +132,16 @@ Applications should inspect:
 An empty recommendation list or typed error is a valid abstention. It must not
 be replaced by a reaction-name guess.
 
+### Canonical reaction layers
+
+Converted records serialize `reaction_observation` and the optional
+`reaction_interpretation` separately. The nested `reaction_signature` is built
+from the observation and remains generic; grammar roles and named-family
+evidence stay in the interpretation. Review CSVs expose one primary
+`reaction_display_label` from the shared renderer, plus
+`reaction_core_raw_label` as an audit field for the unpolished minimum-core
+projection. Neither display field participates in identity or retrieval.
+
 ### Reaction-core retrieval
 
 Mapped edit observations carry a template-free reaction-core projection beside

@@ -9,12 +9,12 @@ from .descriptors.models import SiteReactivityProfile
 from .models import CompoundAnalysis
 
 
-REACTION_SIGNATURE_SCHEMA_VERSION = "3.1"
+REACTION_SIGNATURE_SCHEMA_VERSION = "3.2"
 REACTION_FALLBACK_DESCRIPTOR_SCHEMA_VERSION = "1.3"
 REACTION_CORE_PROJECTION_SCHEMA_VERSION = "2.2"
 REACTION_CORE_PROJECTION_ALGORITHM_VERSION = "reaction_core_projection.v8"
 REACTION_RING_CHANGE_SCHEMA_VERSION = "1.0"
-REACTION_TOPOLOGY_SCHEMA_VERSION = "1.1"
+REACTION_TOPOLOGY_SCHEMA_VERSION = "1.2"
 
 EditArchetype = Literal[
     "substitution",
@@ -432,7 +432,7 @@ class ReactionLabelClause:
 
 
 @dataclass(frozen=True)
-class ReactionDisplayLabel:
+class RenderedReactionLabel:
     """Structured display label that never participates in signature identity."""
 
     concise: str
@@ -445,9 +445,19 @@ class ReactionDisplayLabel:
         "conflicting_evidence",
         "multi_event",
         "ring_formation",
+        "core_projection",
         "partial_product_correspondence",
         "reactant_only",
         "ambiguous_reactants",
+        "unavailable",
+    ]
+    source: Literal[
+        "verified_grammar",
+        "generic_topology",
+        "reaction_core",
+        "literal_edits",
+        "partial_product_correspondence",
+        "reactant_only",
         "unavailable",
     ]
     clauses: Tuple[ReactionLabelClause, ...]
@@ -468,12 +478,7 @@ class ReactionDisplayLabel:
     product_context_label: Optional[str] = None
     event_labels: Tuple[str, ...] = ()
     event_count: int = 0
-    schema_version: str = "1.4"
-
-
-# Compatibility alias while callers migrate to the unified rendering name.
-RenderedReactionLabel = ReactionDisplayLabel
-
+    schema_version: str = "1.5"
 
 @dataclass(frozen=True)
 class ReactionSpectatorGroup:
@@ -1056,7 +1061,7 @@ class ReactionCandidate:
     predicted_bond_changes: Tuple[BondChange, ...]
     predicted_product_smiles: Optional[str]
     verification: str
-    reaction_label: Optional[str]
+    grammar_label: Optional[str]
     predicted_stereo_changes: Tuple[PredictedStereoChange, ...] = ()
     compatible_named_families: Tuple[str, ...] = ()
     warnings: Tuple[str, ...] = ()
@@ -1101,6 +1106,7 @@ class ReactionInterpretation:
     candidates: Tuple[ReactionCandidate, ...] = ()
     selected_candidate: Optional[ReactionCandidate] = None
     selected_events: Tuple[ReactionCandidate, ...] = ()
+    partners: Tuple[ReactionPartner, ...] = ()
     compatible_named_families: Tuple[str, ...] = ()
     named_family: Optional[str] = None
     family_environment: Optional[ReactionFamilyEnvironment] = None
@@ -1130,9 +1136,7 @@ class ReactionAnalysis:
     transformation_class: Optional[str] = None
     compatible_named_families: Tuple[str, ...] = ()
     named_family: Optional[str] = None
-    reaction_label: Optional[str] = None
-    reaction_label_status: str = "unavailable"
-    display_label: Optional[ReactionDisplayLabel] = None
+    reaction_label: Optional[RenderedReactionLabel] = None
     evidence_quality: str = "unresolved"
     mapped_bond_changes: Tuple[Dict[str, Any], ...] = ()
     spectator_groups: Tuple[ReactionSpectatorGroup, ...] = ()
@@ -1150,7 +1154,7 @@ class ReactionAnalysis:
     interpretation: Optional[ReactionInterpretation] = None
     warnings: Tuple[str, ...] = ()
     error: Optional[str] = None
-    schema_version: str = "3.6"
+    schema_version: str = "5.0"
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -1195,7 +1199,6 @@ __all__ = [
     "ReactionCoreProjection",
     "ReactionCoreRemoteClass",
     "ReactionCoreRemoteSubgraph",
-    "ReactionDisplayLabel",
     "RenderedReactionLabel",
     "ReactionEdit",
     "ReactionEditHypothesis",

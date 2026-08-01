@@ -33,7 +33,7 @@ from .reaction_models import (
 from .reaction_site_interfaces import (
     NormalizedSiteInterfaces,
     SITE_INTERFACE_SCHEMA_VERSION,
-    normalize_reaction_assignment,
+    normalize_site_assignment,
 )
 
 
@@ -411,6 +411,20 @@ def connectivity_rewrite_for_grammar(
             rewrite
             for rewrite in load_connectivity_rewrites()
             if grammar_id in rewrite.grammar_ids
+        ),
+        None,
+    )
+
+
+def connectivity_rewrite_by_id(
+    rewrite_id: str,
+) -> CompiledConnectivityRewrite | None:
+    """Return one generic graph operator by its stable rewrite ID."""
+    return next(
+        (
+            rewrite
+            for rewrite in load_connectivity_rewrites()
+            if rewrite.rewrite_id == rewrite_id
         ),
         None,
     )
@@ -1026,12 +1040,59 @@ def _execute_variant_case(
     )
 
 
+def apply_reaction_operator(
+    operator: CompiledConnectivityRewrite | str,
+    assignment: Mapping[str, ReactionSiteReference],
+    components: Sequence[ReactionComponent],
+    *,
+    output_role_labels: Mapping[str, str] | None = None,
+) -> Tuple[RewriteOutcome, ...]:
+    """Execute one graph operator without loading grammar or family metadata."""
+    rewrite = (
+        connectivity_rewrite_by_id(operator)
+        if isinstance(operator, str)
+        else operator
+    )
+    if rewrite is None:
+        return ()
+    try:
+        normalized_assignment = normalize_site_assignment(
+            assignment,
+            components,
+        )
+    except (KeyError, StopIteration, ValueError):
+        return ()
+    outcomes = []
+    seen_products: set[str] = set()
+    for variant in rewrite.variants:
+        if not _variant_matches(variant, assignment, normalized_assignment):
+            continue
+        for outcome_id, bindings in _permutation_cases(variant):
+            outcome = _execute_variant_case(
+                variant,
+                outcome_id=outcome_id,
+                bindings=bindings,
+                assignment=assignment,
+                normalized_assignment=normalized_assignment,
+                components=components,
+                label_roles=dict(output_role_labels or {}),
+            )
+            if outcome is None:
+                continue
+            if outcome.predicted_product_smiles is not None:
+                if outcome.predicted_product_smiles in seen_products:
+                    continue
+                seen_products.add(outcome.predicted_product_smiles)
+            outcomes.append(outcome)
+    return tuple(sorted(outcomes, key=lambda outcome: outcome.outcome_id))
+
+
 def apply_connectivity_rewrite(
     grammar: Mapping[str, Any] | str,
     assignment: Mapping[str, ReactionSiteReference],
     components: Sequence[ReactionComponent],
 ) -> Tuple[RewriteOutcome, ...]:
-    """Execute a registered connectivity rewrite for one grammar assignment.
+    """Adapt one grammar assignment to a registered graph operator.
 
     Unsupported grammars and chemistry-invalid cases return no outcomes. This
     keeps absence distinct from a failed product represented as an outcome.
@@ -1054,37 +1115,12 @@ def apply_connectivity_rewrite(
     else:
         execution_assignment = dict(assignment)
         label_roles = {}
-    try:
-        normalized_assignment = normalize_reaction_assignment(
-            execution_assignment, components
-        )
-    except (KeyError, StopIteration, ValueError):
-        return ()
-    outcomes = []
-    seen_products: set[str] = set()
-    for variant in rewrite.variants:
-        if not _variant_matches(
-            variant, execution_assignment, normalized_assignment
-        ):
-            continue
-        for outcome_id, bindings in _permutation_cases(variant):
-            outcome = _execute_variant_case(
-                variant,
-                outcome_id=outcome_id,
-                bindings=bindings,
-                assignment=execution_assignment,
-                normalized_assignment=normalized_assignment,
-                components=components,
-                label_roles=label_roles,
-            )
-            if outcome is None:
-                continue
-            if outcome.predicted_product_smiles is not None:
-                if outcome.predicted_product_smiles in seen_products:
-                    continue
-                seen_products.add(outcome.predicted_product_smiles)
-            outcomes.append(outcome)
-    return tuple(sorted(outcomes, key=lambda outcome: outcome.outcome_id))
+    return apply_reaction_operator(
+        rewrite,
+        execution_assignment,
+        components,
+        output_role_labels=label_roles,
+    )
 
 
 __all__ = [
@@ -1093,7 +1129,9 @@ __all__ = [
     "CompiledConnectivityRewrite",
     "CompiledRewriteVariant",
     "apply_connectivity_rewrite",
+    "apply_reaction_operator",
     "compile_connectivity_rewrite_definitions",
     "connectivity_rewrite_for_grammar",
+    "connectivity_rewrite_by_id",
     "load_connectivity_rewrites",
 ]

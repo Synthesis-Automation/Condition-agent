@@ -14,15 +14,13 @@ from .reaction_edits import EditNormalizationResult
 from .reaction_events import build_reaction_events
 from .reaction_correspondence import REACTION_CORRESPONDENCE_VERSION
 from .reaction_models import (
-    ProductConnection,
     ProductTransformation,
     REACTION_SIGNATURE_SCHEMA_VERSION,
     ReactionAtomReference,
-    ReactionCandidate,
     ReactionCompletenessAssessment,
     ReactionComponent,
-    ReactionFamilyEnvironment,
     ReactionPartner,
+    ReactionObservation,
     ReactionSignature,
     ReactionSpectatorGroup,
     ReactionStereoChange,
@@ -175,93 +173,6 @@ def _component(
     )
 
 
-def _family_partner(environment: Optional[ReactionFamilyEnvironment], role: str) -> Any:
-    if environment is None:
-        return None
-    return next(
-        (partner for partner in environment.partners if partner.role == role), None
-    )
-
-
-def _selected_partners(
-    components: Tuple[ReactionComponent, ...],
-    selected: ReactionCandidate,
-    family_environment: Optional[ReactionFamilyEnvironment],
-    spectators: Tuple[ReactionSpectatorGroup, ...],
-) -> Tuple[ReactionPartner, ...]:
-    partners = []
-    for role, site in selected.role_assignments.items():
-        component = _component(components, site.component_index)
-        if component is None:
-            continue
-        overlay = _family_partner(family_environment, role)
-        environment = _site_environment(component, site.site_id)
-        handles = tuple(
-            sorted(
-                {
-                    str(value)
-                    for value in (
-                        site.details.get("handle_token"),
-                        site.details.get("center_token"),
-                    )
-                    if value
-                }
-            )
-        )
-        contexts = tuple(
-            sorted(
-                {
-                    str(value)
-                    for value in (
-                        [site.details.get("anchor_context")]
-                        + list(site.details.get("contexts") or ())
-                    )
-                    if value
-                }
-            )
-        )
-        identity = {
-            "component": _unmapped_canonical(component),
-            "site_signature": site.canonical_signature,
-            "handles": handles,
-            "contexts": contexts,
-        }
-        role_spectators = tuple(
-            sorted(
-                group.group_id
-                for group in spectators
-                if group.component_index == site.component_index
-            )
-        )
-        partners.append(
-            ReactionPartner(
-                partner_id=_digest("RP1", identity),
-                component_index=site.component_index,
-                role=role,
-                role_confidence=1.0,
-                reactive_site_ids=(site.site_id,),
-                handle_tokens=handles,
-                anchor_contexts=contexts,
-                chemist_label=site.chemist_label,
-                nearby_groups=overlay.nearby_groups
-                if overlay
-                else (environment.nearby_groups if environment else ()),
-                spectator_group_ids=role_spectators,
-                flags=tuple(overlay.flags) if overlay else (),
-                reactivity_profile=(
-                    overlay.reactivity_profile
-                    if overlay and overlay.reactivity_profile is not None
-                    else (
-                        environment.reactivity_profile
-                        if environment
-                        else None
-                    )
-                ),
-            )
-        )
-    return tuple(sorted(partners, key=lambda partner: partner.partner_id))
-
-
 def _mapped_partners(
     components: Tuple[ReactionComponent, ...],
     edit_result: EditNormalizationResult,
@@ -393,27 +304,17 @@ def _partner_token(partner: ReactionPartner, *, environment: bool) -> Any:
 def build_reaction_signature(
     *,
     reactants: Tuple[ReactionComponent, ...],
-    selected: Optional[ReactionCandidate],
-    selected_events: Tuple[ReactionCandidate, ...],
     edit_result: EditNormalizationResult,
-    family_environment: Optional[ReactionFamilyEnvironment],
-    product_connection: Optional[ProductConnection],
     spectators: Tuple[ReactionSpectatorGroup, ...],
-    named_family: Optional[str],
-    compatible_named_families: Tuple[str, ...],
     topology: ReactionTopology,
     completeness: ReactionCompletenessAssessment,
     contextual_product_label: Optional[str] = None,
     warnings: Iterable[str] = (),
 ) -> Optional[ReactionSignature]:
-    """Build a versioned signature when verified edit evidence is available."""
+    """Build a versioned signature solely from finalized observations."""
     if not edit_result.edits:
         return None
-    partners = (
-        _selected_partners(reactants, selected, family_environment, spectators)
-        if selected is not None
-        else _mapped_partners(reactants, edit_result, spectators)
-    )
+    partners = _mapped_partners(reactants, edit_result, spectators)
     edit_tokens = tuple(
         sorted(
             _edit_token(edit, include_environment=False) for edit in edit_result.edits
@@ -497,35 +398,34 @@ def build_reaction_signature(
         reactants=reactants,
         edits=edit_result.edits,
         partners=partners,
-        selected=selected,
-        selected_events=selected_events,
-        named_family=named_family,
-        compatible_named_families=compatible_named_families,
+        selected=None,
+        selected_events=(),
+        named_family=None,
+        compatible_named_families=(),
         evidence=edit_result.evidence,
         confidence=edit_result.confidence,
     )
-    if selected is not None:
-        transformation_class = selected.transformation_class
-    else:
-        event_classes = tuple(
-            sorted(
-                {
-                    event.transformation_class
-                    for event in events
-                    if event.transformation_class is not None
-                }
-            )
+    event_classes = tuple(
+        sorted(
+            {
+                event.transformation_class
+                for event in events
+                if event.transformation_class is not None
+            }
         )
-        if len(event_classes) == 1:
-            transformation_class = event_classes[0]
-        elif events:
-            transformation_class = (
-                "generic_graph_transformation"
-                if len(events) == 1
-                else "generic_multi_event_graph_transformation"
-            )
-        else:
-            transformation_class = None
+    )
+    if len(events) > 1:
+        transformation_class = "generic_multi_event_graph_transformation"
+    elif len(event_classes) == 1:
+        transformation_class = event_classes[0]
+    elif events:
+        transformation_class = (
+            "generic_graph_transformation"
+            if len(events) == 1
+            else "generic_multi_event_graph_transformation"
+        )
+    else:
+        transformation_class = None
     event_archetypes = tuple(
         sorted({event.edit_archetype for event in events})
     )
@@ -619,25 +519,20 @@ def build_reaction_signature(
     product_transformation = ProductTransformation(
         edits=edit_result.edits,
         stereo_changes=edit_result.stereo_changes,
-        formed_connection_labels=(
-            (product_connection.concise_label,)
-            if product_connection
-            else tuple(
-                label
-                for event in events
-                for label in event.formed_connection_labels
-            )
+        formed_connection_labels=tuple(
+            label
+            for event in events
+            for label in event.formed_connection_labels
         ),
-        concise_label=(
-            product_connection.concise_label
-            if product_connection
-            else contextual_product_label
-        ),
+        concise_label=contextual_product_label,
         exact_product_verified=bool(
-            (selected and selected.verification == "exact_product_reconstruction")
-            or edit_result.evidence.startswith("validated_atom_mapping")
+            edit_result.evidence.startswith("validated_atom_mapping")
             or edit_result.evidence.startswith("validated_mapping")
-            or edit_result.evidence == "exact_multi_event_reconstruction"
+            or edit_result.evidence
+            in {
+                "exact_product_reconstruction",
+                "exact_multi_event_reconstruction",
+            }
         ),
         evidence=edit_result.evidence,
     )
@@ -671,17 +566,9 @@ def build_reaction_signature(
         edit_archetype=edit_archetype,
         transformation_class=transformation_class,
         transformation_confidence=edit_result.confidence,
-        named_family=named_family,
-        family_confidence=1.0 if named_family else 0.0,
-        compatible_named_families=tuple(
-            sorted(
-                set(compatible_named_families).union(
-                    family
-                    for event in events
-                    for family in event.compatible_named_families
-                )
-            )
-        ),
+        named_family=None,
+        family_confidence=0.0,
+        compatible_named_families=(),
         spectator_groups=spectators,
         completeness=completeness,
         global_descriptors={
@@ -706,4 +593,39 @@ def build_reaction_signature(
     )
 
 
-__all__ = ["build_reaction_signature", "reaction_signature_definition_versions"]
+def build_observation_signature(
+    observation: ReactionObservation,
+    *,
+    contextual_product_label: Optional[str] = None,
+    warnings: Iterable[str] = (),
+) -> Optional[ReactionSignature]:
+    """Build generic signature identity directly from one observation."""
+    if observation.topology is None or observation.completeness is None:
+        return None
+    edit_result = EditNormalizationResult(
+        edits=observation.edits,
+        evidence=observation.evidence_quality,
+        confidence=observation.evidence_confidence,
+        warnings=observation.warnings,
+        valid=bool(observation.edits),
+        stereo_changes=observation.stereo_changes,
+        connectivity_edit_graph=observation.connectivity_edit_graph,
+        evidence_candidates=observation.evidence_candidates,
+        edit_hypotheses=observation.edit_hypotheses,
+    )
+    return build_reaction_signature(
+        reactants=observation.reactants,
+        edit_result=edit_result,
+        spectators=observation.spectator_groups,
+        topology=observation.topology,
+        completeness=observation.completeness,
+        contextual_product_label=contextual_product_label,
+        warnings=tuple(observation.warnings) + tuple(warnings),
+    )
+
+
+__all__ = [
+    "build_observation_signature",
+    "build_reaction_signature",
+    "reaction_signature_definition_versions",
+]

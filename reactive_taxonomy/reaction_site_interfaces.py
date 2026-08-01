@@ -744,11 +744,11 @@ def normalize_compound_sites(
     )
 
 
-def normalize_reaction_assignment(
+def normalize_site_assignment(
     assignment: Mapping[str, ReactionSiteReference],
     components: Sequence[ReactionComponent],
 ) -> Dict[str, NormalizedSiteInterfaces]:
-    """Normalize every grammar role assignment without changing its source site."""
+    """Normalize generic site bindings without assigning reaction semantics."""
     by_index = {
         component.component_index: component for component in components
     }
@@ -796,6 +796,14 @@ def normalize_reaction_assignment(
             else normalize_reaction_site(site, component)
         )
     return normalized
+
+
+def normalize_reaction_assignment(
+    assignment: Mapping[str, ReactionSiteReference],
+    components: Sequence[ReactionComponent],
+) -> Dict[str, NormalizedSiteInterfaces]:
+    """Compatibility alias for grammar-role adapters."""
+    return normalize_site_assignment(assignment, components)
 
 
 def _rebase_component(
@@ -890,5 +898,6 @@ __all__ = [
     "normalize_compound_sites",
     "normalize_detected_site",
     "normalize_reaction_assignment",
+    "normalize_site_assignment",
     "normalize_reaction_site",
 ]

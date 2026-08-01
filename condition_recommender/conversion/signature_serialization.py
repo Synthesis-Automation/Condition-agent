@@ -87,9 +87,9 @@ def signature_record_fields(analysis: Any) -> Dict[str, Any]:
             if analysis.fallback_descriptor is not None
             else None
         ),
-        "transformation_class": signature.transformation_class,
+        "transformation_class": analysis.transformation_class,
         "transformation_confidence": signature.transformation_confidence,
-        "family_confidence": signature.family_confidence,
+        "family_confidence": 1.0 if analysis.named_family else 0.0,
         "taxonomy_definition_versions": dict(signature.definition_versions),
         **evidence_fields,
     }
@@ -176,7 +176,7 @@ def flattened_reaction_core_fields(
         "reaction_core_motif_key": abstraction.get("motif_key", ""),
         "reaction_core_general_label": abstraction.get("general_label", ""),
         "reaction_core_limiter": abstraction.get("limiter_label", ""),
-        "reaction_core_label": value.get("generic_label", ""),
+        "reaction_core_raw_label": value.get("generic_label", ""),
         "reaction_core_evidence_status": value.get("evidence_status", ""),
         "reaction_core_json": json.dumps(
             core,

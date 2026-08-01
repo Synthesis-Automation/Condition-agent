@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
 
-RECOMMENDATION_RECORD_SCHEMA_VERSION = "4.0"
-GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v3.7"
+RECOMMENDATION_RECORD_SCHEMA_VERSION = "4.1"
+GENERIC_CONVERTER_DEFINITION_VERSION = "generic_conversion.v4.0"
 
 
 class AdmissionTier(str, Enum):
@@ -152,6 +152,8 @@ class RecommendationRecord:
     external_atom_mapping: Optional[Dict[str, Any]] = None
     fallback_descriptor: Optional[Dict[str, Any]] = None
     reaction_display_label: Optional[Dict[str, Any]] = None
+    reaction_observation: Optional[Dict[str, Any]] = None
+    reaction_interpretation: Optional[Dict[str, Any]] = None
     fragment_source_support: Tuple[Dict[str, Any], ...] = ()
     transformation_class: Optional[str] = None
     transformation_confidence: float = 0.0

@@ -157,6 +157,8 @@ def _event_topology(
     for edit in edits:
         if edit.edit_type != "formed" or edit.atom_2 is None:
             continue
+        if edit.atom_1.side != "reactant" or edit.atom_2.side != "reactant":
+            continue
         if edit.atom_1.component_index != edit.atom_2.component_index:
             formed_scopes.append("intermolecular")
             continue
@@ -167,6 +169,11 @@ def _event_topology(
             continue
         left = int(edit.atom_1.atom_index)
         right = int(edit.atom_2.atom_index)
+        if not (
+            0 <= left < molecule.GetNumAtoms()
+            and 0 <= right < molecule.GetNumAtoms()
+        ):
+            continue
         if left == right or molecule.GetBondBetweenAtoms(left, right) is not None:
             continue
         try:

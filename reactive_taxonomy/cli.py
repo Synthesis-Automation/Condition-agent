@@ -47,7 +47,7 @@ _SELF_TEST_REACTIONS = (
 _REACTION_CORE_CSV_FIELDS = (
     "reaction_core_available",
     "reaction_core_id",
-    "reaction_core_label",
+    "reaction_core_raw_label",
     "reaction_core_evidence_status",
     "reaction_core_exact_key",
     "reaction_core_typed_key",
@@ -94,13 +94,29 @@ def _joined(values: Iterable[Any]) -> str:
 
 
 def _reaction_partners(result: Any) -> tuple[Any, ...]:
-    """Return type-agnostic partners, with the family overlay as a fallback."""
+    """Return interpreted partners, with generic partners as a fallback."""
+    interpretation = getattr(result, "interpretation", None)
+    interpreted_partners = (
+        getattr(interpretation, "partners", ())
+        if interpretation is not None
+        else ()
+    )
+    environment = (
+        getattr(interpretation, "family_environment", None)
+        if interpretation is not None
+        else None
+    )
+    if environment is None:
+        environment = getattr(result, "family_environment", None)
     signature = getattr(result, "reaction_signature", None)
-    if signature and signature.partners:
+    if interpreted_partners:
+        partners = interpreted_partners
+    elif environment and environment.partners:
+        partners = environment.partners
+    elif signature and signature.partners:
         partners = signature.partners
     else:
-        environment = getattr(result, "family_environment", None)
-        partners = environment.partners if environment else ()
+        partners = ()
     role_order = {"electrophile": 0, "nucleophile": 1, "transfer_partner": 2}
     return tuple(sorted(
         partners,
@@ -759,7 +775,18 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
     reaction_core = analysis.get("reaction_core") or {}
     core_abstraction = reaction_core.get("abstraction") or {}
     spectator_groups = analysis.get("spectator_groups") or []
-    signature_partners = (analysis.get("reaction_signature") or {}).get("partners") or []
+    interpretation = analysis.get("interpretation") or {}
+    family_environment = (
+        interpretation.get("family_environment")
+        or analysis.get("family_environment")
+        or {}
+    )
+    signature_partners = (
+        interpretation.get("partners")
+        or family_environment.get("partners")
+        or (analysis.get("reaction_signature") or {}).get("partners")
+        or []
+    )
 
     def dict_role(partner: dict[str, Any]) -> str:
         return str(partner.get("role") or "unassigned")
@@ -829,7 +856,7 @@ def _reaction_csv_row(record: dict[str, Any]) -> dict[str, Any]:
         else "",
         "reaction_core_available": bool(reaction_core),
         "reaction_core_id": reaction_core.get("core_id") or "",
-        "reaction_core_label": reaction_core.get("generic_label") or "",
+        "reaction_core_raw_label": reaction_core.get("generic_label") or "",
         "reaction_core_evidence_status": (
             reaction_core.get("evidence_status") or ""
         ),

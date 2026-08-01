@@ -7,18 +7,31 @@ Public entry points:
 
 - `featurize_molecule(smiles)`
 - `featurize_reaction(reaction_smiles)`
+- `observe_reaction(reaction_smiles)`
+- `interpret_reaction(observation)`
+- `render_reaction(observation, interpretation=None)`
 - `resolve_source_label(source_label)`
 - `validate_taxonomy()`
 - `validate_source_label_mappings()`
 
-Every reaction with normalized edit evidence also receives a structured
-`display_label`. An exact, edit-consistent grammar label is preferred when one
-is available. Otherwise, versioned generic edit patterns render transformations
-such as `C–N substitution`, `C=C hydrogenation`, or `N=N reductive cleavage`.
-Any unmatched edit set still receives a deterministic literal summary such as
-`C–N bond formation`. The structured result retains the grammar or pattern ID,
-the literal structural label, evidence, and confidence. Display style and label
-definitions are explicitly excluded from reaction-signature identity.
+The reaction pipeline has one dependency direction:
+
+```text
+molecular graphs
+    -> ReactionObservation (correspondence, normalized edits, topology, core)
+    -> ReactionSignature (type-agnostic identity)
+    -> optional ReactionInterpretation (grammar, operator, named family)
+    -> RenderedReactionLabel
+```
+
+`observe_reaction()` does not load reaction grammars. Grammar/operator evidence
+may add an interpretation, but it cannot replace contradictory observations or
+change signature identity. `render_reaction()` is the only public chemist-facing
+reaction-label renderer. It prefers an exact, edit-consistent interpretation,
+then generic ring topology, edit patterns, the polished minimum core, and
+finally literal edit text. The structured result records which source was used,
+its evidence and confidence. Display wording and definitions are explicitly
+excluded from reaction-signature identity.
 
 Topology analysis also records minimal, family-independent ring-formation
 facts. A `ReactionRingChange` contains the ring atoms, product bond orders,
@@ -40,7 +53,7 @@ heteroaryl, alkyl, alkenyl, alkynyl, acyl, ring-aliphatic,
 heteroatom-linked, or generic R are derived from the removed molecular graph.
 Exact fragment SMILES and functional-group annotations remain available even
 when the concise label uses `Ar`, `HetAr`, or `R`.
-Algorithm v7 renders multi-center cores as one normalized edit equation, such
+Algorithm v8 renders multi-center cores as one normalized edit equation, such
 as `Ar–B + Ar–O → Ar–Ar`, rather than repeating the shared product environment
 once for each center. Single-center cores retain their local-state transition.
 
@@ -61,10 +74,10 @@ with similar centers but different partner chemistry do not collapse. `RCS2`
 is never used for retrieval. Construction does not load reaction grammars or
 the reaction-template registry. It abstains when no edited atom is observed on
 both sides and does not change `RS3`, admission, or named-family results.
-The reaction CLI and desktop featurizer show the minimized label, evidence,
+The reaction CLI and desktop featurizer show the minimized raw label, evidence,
 shape and center keys, core size, remote subgraphs, attachment counts, and
-warnings. Batch reaction CSV exports the same audit fields; JSON retains the
-complete nested projection.
+warnings. Batch reaction CSV exports it as `reaction_core_raw_label`; JSON
+retains the complete nested projection.
 
 The desktop featurizer also presents mapped cores graphically. The renderer in
 `visualization` draws active atoms and replaces only unchanged retained remote
@@ -418,7 +431,7 @@ retrieval all consume this same typed record.
 
 Compact output omits atom indices, raw graph-shell counts, methods, and scores.
 Expanded rendering retains scores, contributors, confidence, and provenance.
-Reaction signatures use stable categorical profile tokens under schema `3.1`
+Reaction signatures use stable categorical profile tokens under schema `3.2`
 and the `RS3` namespace; raw scores and display labels do not enter identity.
 
 Unsaturated-bond labels expose endpoint substitution rather than collapsing all

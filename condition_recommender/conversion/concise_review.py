@@ -16,12 +16,15 @@ from .generic import GenericConversionCache, convert_record
 from .input_schema import discover_csv_datasets, iter_csv_records
 from .signature_serialization import ring_change_summary
 
-CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "3.3"
+CONCISE_REACTION_REVIEW_SCHEMA_VERSION = "4.0"
 CONCISE_REACTION_REVIEW_FIELDS = (
     "canonical_reaction_smiles",
     "reaction_display_label",
     "reaction_display_label_detailed",
-    "reaction_core_label",
+    "reaction_display_source",
+    "reaction_display_confidence",
+    "reaction_display_warnings",
+    "reaction_core_raw_label",
     "original_reaction_type",
     "detected_reaction_family",
     "detection_status",
@@ -297,6 +300,13 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
             or ""
         ),
         "reaction_display_label_detailed": review_summary.detailed_reaction_label,
+        "reaction_display_source": str(display_value.get("source") or ""),
+        "reaction_display_confidence": _text_or_blank(
+            display_value.get("confidence")
+        ),
+        "reaction_display_warnings": "; ".join(
+            str(value) for value in display_value.get("warnings") or ()
+        ),
         "original_reaction_type": str(record.get("source_declared_family") or ""),
         "detected_reaction_family": str(record.get("named_family") or ""),
         "detection_status": str(
@@ -330,7 +340,9 @@ def concise_reaction_review_row(record: Mapping[str, Any]) -> Dict[str, str]:
         "reaction_core_motif_key": str(
             abstraction_value.get("motif_key") or ""
         ),
-        "reaction_core_label": review_summary.graphic_reaction_label,
+        "reaction_core_raw_label": str(
+            reaction_core_value.get("generic_label") or ""
+        ),
         "reaction_core_limiter": review_summary.graphic_core_limiter,
         "reaction_core_atom_label": review_summary.atom_level_core_label,
         "reaction_core_evidence_status": str(

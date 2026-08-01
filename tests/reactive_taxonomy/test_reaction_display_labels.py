@@ -166,7 +166,8 @@ def test_display_label_serializes_as_nested_evidence() -> None:
         "[CH3:1].[NH2:2]>>[CH3:1][NH2:2]"
     ).to_dict()
 
-    assert payload["display_label"]["schema_version"] == "1.4"
+    assert payload["display_label"]["schema_version"] == "1.5"
+    assert payload["display_label"]["source"] == "literal_edits"
     assert payload["display_label"]["clauses"][0]["edit_type"] == "formed"
     assert payload["display_label"]["clauses"][0]["atom_map_numbers"] == (1, 2)
 

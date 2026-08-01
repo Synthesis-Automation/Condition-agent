@@ -27,7 +27,7 @@ def test_reaction_spectators_exclude_consumed_handle_and_keep_nitrile() -> None:
     assert "aryl_halide" not in ids
     nitrile = next(group for group in result.spectator_groups if group.group_id == "nitrile")
     assert nitrile.graph_distance is not None
-    assert nitrile.unchanged_evidence == "exact_product_reconstruction_event_exclusion"
+    assert nitrile.unchanged_evidence == "exact_product_reconstruction_edit_exclusion"
 
 
 def test_functional_group_registry_is_validated() -> None:
@@ -65,16 +65,18 @@ def test_pyridine_nitrogen_is_spectator_but_reactive_ring_is_context() -> None:
         ">>c1ccc(-c2ncccc2)cc1"
     )
     result = featurize_reaction(reaction)
+    assert result.interpretation is not None
+    assert result.interpretation.family_environment is not None
     electrophile = next(
         partner
-        for partner in result.reaction_signature.partners
+        for partner in result.interpretation.family_environment.partners
         if partner.role == "electrophile"
     )
     spectator_ids = {
         group.group_id for group in result.spectator_groups
     }
 
-    assert electrophile.anchor_contexts == ("HeteroAr",)
+    assert electrophile.anchor_context == "HeteroAr"
     assert "heteroaryl_nitrogen" in spectator_ids
     assert "aryl_halide" not in spectator_ids
     pyridine_nitrogen = next(
@@ -84,7 +86,7 @@ def test_pyridine_nitrogen_is_spectator_but_reactive_ring_is_context() -> None:
     )
     assert pyridine_nitrogen.graph_distance == 1
     assert pyridine_nitrogen.unchanged_evidence == (
-        "exact_product_reconstruction_event_exclusion"
+        "exact_product_reconstruction_edit_exclusion"
     )
 
 

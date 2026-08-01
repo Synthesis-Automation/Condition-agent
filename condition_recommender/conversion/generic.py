@@ -285,6 +285,16 @@ def convert_record(
         reaction_display_label=asdict(analysis.display_label)
         if analysis.display_label
         else None,
+        reaction_observation=(
+            asdict(analysis.observation)
+            if analysis.observation is not None
+            else None
+        ),
+        reaction_interpretation=(
+            asdict(analysis.interpretation)
+            if analysis.interpretation is not None
+            else None
+        ),
         fragment_source_support=tuple(
             support.to_dict() for support in fragment_source_support
         ),

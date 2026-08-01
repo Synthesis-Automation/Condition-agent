@@ -13,8 +13,9 @@ from .reaction_contextual_labels import ContextualTransformationLabel
 from .reaction_label_patterns import match_reaction_label_pattern
 from .reaction_labels import load_fragment_context_symbols
 from .reaction_models import (
-    ReactionDisplayLabel,
+    RenderedReactionLabel,
     ReactionComponent,
+    ReactionCoreProjection,
     ReactionEdit,
     ReactionEvent,
     ReactionLabelClause,
@@ -391,10 +392,11 @@ def build_reaction_display_label(
     confidence: float,
     events: Sequence[ReactionEvent] = (),
     topology: Optional[ReactionTopology] = None,
+    reaction_core: Optional[ReactionCoreProjection] = None,
     warnings: Iterable[str] = (),
     style: str = "unicode",
     fallback_detailed_label: Optional[str] = None,
-) -> Optional[ReactionDisplayLabel]:
+) -> Optional[RenderedReactionLabel]:
     """Build the best display label while retaining its evidence and clauses."""
     rendering = load_reaction_label_rendering()
     styling = _style(style)
@@ -442,6 +444,30 @@ def build_reaction_display_label(
         if ring_change is not None
         else None
     )
+    core_display = None
+    if (
+        reaction_core is not None
+        and reaction_core.abstraction is not None
+        and reaction_core.quality.status != "blocked"
+    ):
+        core_concise = reaction_core.abstraction.general_label
+        presentation = reaction_core.presentation
+        core_sections = (
+            presentation.equation,
+            *presentation.bond_changes,
+            *presentation.atom_state_changes,
+            *presentation.retained_context,
+            *presentation.departing_context,
+            *presentation.appearing_context,
+            presentation.evidence_label,
+            presentation.quality_label,
+        )
+        core_display = (
+            core_concise,
+            styling["separator"].join(
+                section for section in core_sections if section
+            ),
+        )
     if evidence in {
         "conflicting_edit_evidence",
         "conflicting_stereochemical_evidence",
@@ -454,6 +480,7 @@ def build_reaction_display_label(
             clauses=detailed_clauses,
         )
         status = "conflicting_evidence"
+        source = "literal_edits"
     elif len(events) > 1 and clauses:
         rendered_event_labels, concise, detailed = _event_labels(
             events,
@@ -462,6 +489,7 @@ def build_reaction_display_label(
         )
         transformation_label = concise
         status = "multi_event"
+        source = "literal_edits"
     elif selected_exact and exact_display_label:
         concise = exact_display_label
         detailed = str(rendering["templates"]["exact_detail"]).format(
@@ -469,12 +497,14 @@ def build_reaction_display_label(
             clauses=detailed_clauses or "none",
         )
         status = "family_overlay" if named_family else "exact_reconstruction"
+        source = "verified_grammar"
     elif ring_display is not None:
         concise = ring_display.concise
         detailed = ring_display.detailed
         structural_label = ring_display.concise
         transformation_label = ring_display.concise
         status = "ring_formation"
+        source = "generic_topology"
     elif pattern is not None:
         concise = (
             contextual_label.concise
@@ -492,6 +522,13 @@ def build_reaction_display_label(
             clauses=detailed_clauses,
         )
         status = "generic_pattern"
+        source = "literal_edits"
+    elif core_display is not None:
+        concise, detailed = core_display
+        structural_label = reaction_core.generic_label
+        transformation_label = concise
+        status = "core_projection"
+        source = "reaction_core"
     elif clauses:
         concise = (
             contextual_label.concise
@@ -510,6 +547,7 @@ def build_reaction_display_label(
             )
         )
         status = "observed_edits"
+        source = "literal_edits"
     elif fallback_label:
         concise = fallback_label
         detailed = fallback_detailed_label or fallback_label
@@ -526,6 +564,11 @@ def build_reaction_display_label(
         if status == "partial_product_correspondence":
             structural_label = fallback_label
             transformation_label = fallback_label
+            source = "partial_product_correspondence"
+        elif status in {"reactant_only", "ambiguous_reactants"}:
+            source = "reactant_only"
+        else:
+            source = "unavailable"
     else:
         return None
     prefix = topology_label_prefix(topology)
@@ -542,10 +585,11 @@ def build_reaction_display_label(
         style=style,
         rendering=rendering,
     )
-    return ReactionDisplayLabel(
+    return RenderedReactionLabel(
         concise=concise,
         detailed=detailed,
         status=status,
+        source=source,
         clauses=clauses,
         evidence=evidence,
         confidence=confidence,

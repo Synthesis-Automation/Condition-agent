@@ -235,7 +235,7 @@ def test_converter_shadow_maps_resolved_reaction_with_missing_core() -> None:
     assert record.index_eligibility == IndexEligibility.ELIGIBLE
     assert len(build_generic_index([record.to_dict()]).rows) == 1
     review = concise_reaction_review_row(record.to_dict())
-    assert review["reaction_core_label"]
+    assert review["reaction_core_raw_label"]
     assert review["reaction_core_status"] == "available_external"
     assert review["reaction_core_unavailability_reasons"] == ""
 
@@ -453,10 +453,13 @@ def test_conversion_engine_reports_external_mapping_dispositions(tmp_path) -> No
     assert "external_atom_mapping_json" in review_header
     review_fields = review_header.split(",")
     label_index = review_fields.index("reaction_display_label")
-    assert review_fields[label_index : label_index + 3] == [
+    assert review_fields[label_index : label_index + 6] == [
         "reaction_display_label",
         "reaction_display_label_detailed",
-        "reaction_core_label",
+        "reaction_display_source",
+        "reaction_display_confidence",
+        "reaction_display_warnings",
+        "reaction_core_raw_label",
     ]
 
 

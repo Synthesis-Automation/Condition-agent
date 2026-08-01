@@ -15,7 +15,7 @@ from .descriptors import render_reactivity_profile
 from .reaction_models import ReactionAnalysis
 
 
-REACTION_REVIEW_SUMMARY_SCHEMA_VERSION = "1.1"
+REACTION_REVIEW_SUMMARY_SCHEMA_VERSION = "1.2"
 _SUBSCRIPT_TRANSLATION = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
 
@@ -113,29 +113,29 @@ def build_reaction_review_summary(
 ) -> ReactionReviewSummary:
     """Build one review summary from live analysis or its serialized record.
 
-    Recommendation records use ``reaction_display_label`` while live taxonomy
-    analyses use ``display_label``.  This adapter deliberately handles both
-    public representations so review CSV and GUI output share one formatter.
+    Live analyses and recommendation records both use the same nested
+    ``reaction_label`` contract.
     """
-    display = _member(source, "display_label")
-    if display is None:
-        display = _member(source, "reaction_display_label")
+    display = _member(source, "reaction_label")
     core = _member(source, "reaction_core")
     abstraction = _member(core, "abstraction")
     signature = _member(source, "reaction_signature")
 
     detailed_label = str(_member(display, "detailed", "") or "")
-    if not detailed_label:
-        detailed_label = str(_member(source, "reaction_label", "") or "")
 
     spectators = _member(signature, "spectator_groups")
     if spectators is None:
         spectators = _member(source, "spectator_groups", ())
 
-    partners = _member(signature, "partners")
-    if partners is None:
+    interpretation = _member(source, "interpretation")
+    family_environment = _member(interpretation, "family_environment")
+    if family_environment is None:
         family_environment = _member(source, "family_environment")
-        partners = _member(family_environment, "partners", ())
+    partners = _member(interpretation, "partners")
+    if not partners:
+        partners = _member(family_environment, "partners")
+    if not partners:
+        partners = _member(signature, "partners", ())
 
     return ReactionReviewSummary(
         detailed_reaction_label=detailed_label,

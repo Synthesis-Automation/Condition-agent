@@ -109,9 +109,11 @@ def test_exact_signature_is_verified_without_trusting_source_family() -> None:
     assert record.resolved_recipe["catalysts"][0]["primary_role"] == ("metal_catalyst")
     assert record.resolved_recipe["bases"][0]["primary_role"] == "base"
     assert record.condition_resolution["component_count"] == 3
-    assert record.schema_version == "4.0"
-    assert record.converter_definition_version == "generic_conversion.v3.7"
-    assert record.reaction_signature["schema_version"] == "3.1"
+    assert record.schema_version == "4.1"
+    assert record.converter_definition_version == "generic_conversion.v4.0"
+    assert record.reaction_signature["schema_version"] == "3.2"
+    assert record.reaction_observation is not None
+    assert record.reaction_interpretation is not None
     assert record.reaction_signature["topology"]["reaction_scope"] == ("intermolecular")
     assert record.reference_id.startswith("REF1:")
     assert record.reference_identity["resolution_status"] == "bibliographic_text"
@@ -157,6 +159,8 @@ def test_cycloaddition_ring_observation_is_chemist_readable_in_review() -> None:
     assert change["element_sequence"] == ("C", "C", "N", "N", "N")
     assert change["formed_bond_types"] == ("C-N", "C-N")
     review = concise_reaction_review_row(record.to_dict())
+    assert record.reaction_display_label is not None
+    assert record.reaction_display_label["source"] == "generic_topology"
     assert review["reaction_display_label"] == (
         "C≡C + N=N=N → aromatic 5-membered C₂N₃ ring"
     )
@@ -599,7 +603,7 @@ def test_mixed_engine_writes_canonical_jsonl_and_review_views(tmp_path) -> None:
     }
     assert json.loads((output / "conversion_report.json").read_text()) == report
     assert report["schema_version"] == "2.1"
-    assert report["reaction_signature_schema_version"] == "3.1"
+    assert report["reaction_signature_schema_version"] == "3.2"
     assert report["reaction_scope_counts"] == {
         "intermolecular": 1,
         "unimolecular": 1,
@@ -638,16 +642,19 @@ def test_concise_reaction_review_export_has_only_requested_columns(
 
     with output.open("r", encoding="utf-8-sig", newline="") as handle:
         review_rows = list(csv.DictReader(handle))
-    assert report["schema_version"] == "3.3"
+    assert report["schema_version"] == "4.0"
     assert report["row_count"] == 1
     assert tuple(review_rows[0]) == CONCISE_REACTION_REVIEW_FIELDS
     label_index = CONCISE_REACTION_REVIEW_FIELDS.index(
         "reaction_display_label"
     )
-    assert CONCISE_REACTION_REVIEW_FIELDS[label_index : label_index + 3] == (
+    assert CONCISE_REACTION_REVIEW_FIELDS[label_index : label_index + 6] == (
         "reaction_display_label",
         "reaction_display_label_detailed",
-        "reaction_core_label",
+        "reaction_display_source",
+        "reaction_display_confidence",
+        "reaction_display_warnings",
+        "reaction_core_raw_label",
     )
     assert review_rows[0]["canonical_reaction_smiles"]
     assert review_rows[0]["reaction_display_label"]
@@ -767,7 +774,7 @@ def test_concise_review_uses_shared_detailed_and_graphic_labels() -> None:
     )
 
     assert row["reaction_display_label_detailed"] == "structural detailed label"
-    assert row["reaction_core_label"] == "R–X + R′ → R–R′"
+    assert row["reaction_core_raw_label"] == "R–X + R′ → R–R′"
     assert row["reaction_core_status"] == "available_verified"
     assert row["reaction_core_unavailability_reasons"] == ""
 

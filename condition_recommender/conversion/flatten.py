@@ -52,7 +52,10 @@ GENERIC_REVIEW_FIELDS = (
     "family_confidence",
     "reaction_display_label",
     "reaction_display_label_detailed",
-    "reaction_core_label",
+    "reaction_display_source",
+    "reaction_display_confidence",
+    "reaction_display_warnings",
+    "reaction_core_raw_label",
     "reaction_label_status",
     "reaction_display_label_status",
     "reaction_display_label_json",
@@ -265,6 +268,21 @@ def flatten_generic_record(record: RecommendationRecord) -> Dict[str, Any]:
             topology["ring_count_delta"]
             if topology.get("ring_count_delta") is not None
             else ""
+        ),
+        "reaction_display_source": (
+            record.reaction_display_label.get("source", "")
+            if record.reaction_display_label
+            else ""
+        ),
+        "reaction_display_confidence": (
+            record.reaction_display_label.get("confidence", "")
+            if record.reaction_display_label
+            else ""
+        ),
+        "reaction_display_warnings": _joined(
+            record.reaction_display_label.get("warnings", ())
+            if record.reaction_display_label
+            else ()
         ),
         **flattened_ring_change_fields(record.reaction_signature),
         "reaction_event_count": signature.get("event_count", ""),

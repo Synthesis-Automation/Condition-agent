@@ -230,7 +230,7 @@ def test_v2_rewrite_corpus_reconstructs_the_observed_product(
         "validated_mapping_and_reconstruction",
     }
     assert analysis.reaction_signature is not None
-    assert analysis.reaction_signature.schema_version == "3.1"
+    assert analysis.reaction_signature.schema_version == "3.2"
     assert analysis.reaction_signature.signature_id.startswith("RS3:")
 
 

@@ -54,9 +54,15 @@ def test_unmapped_intramolecular_cn_cyclization_is_exactly_reconstructed() -> No
     assert result.reaction_topology.reactant_tether_distances == (4,)
     assert result.reaction_topology.formed_ring_sizes == (5,)
     assert result.reaction_topology.ring_count_delta == 1
-    assert result.reaction_topology.same_component_role_groups == (
-        ("electrophile", "nucleophile"),
-    )
+    assert result.reaction_topology.same_component_role_groups == ()
+    assert result.reaction_topology.role_component_indices == {}
+    assert result.interpretation is not None
+    assert result.interpretation.selected_candidate is not None
+    role_components = {
+        site.component_index
+        for site in result.interpretation.selected_candidate.role_assignments.values()
+    }
+    assert role_components == {0}
 
 
 @pytest.mark.parametrize(
@@ -171,6 +177,7 @@ def test_generic_ring_observation_and_renderer_cover_cycloadditions(
     assert result.reaction_label_status == "ring_formation"
     assert result.display_label is not None
     assert result.display_label.status == "ring_formation"
+    assert result.display_label.source == "generic_topology"
     assert "key connectivity:" in result.display_label.detailed
     assert "raw edits:" in result.display_label.detailed
 
@@ -218,11 +225,11 @@ def test_mapped_and_unmapped_topology_signatures_are_identical() -> None:
 def test_topology_serializes_in_analysis_and_signature() -> None:
     payload = featurize_reaction(INTRAMOLECULAR_CN).to_dict()
 
-    assert payload["schema_version"] == "3.6"
+    assert payload["schema_version"] == "4.0"
     assert payload["reaction_topology"]["reaction_scope"] == "intramolecular"
     assert payload["reaction_topology"]["formed_ring_sizes"] == (5,)
-    assert payload["reaction_signature"]["schema_version"] == "3.1"
-    assert payload["reaction_topology"]["schema_version"] == "1.1"
+    assert payload["reaction_signature"]["schema_version"] == "3.2"
+    assert payload["reaction_topology"]["schema_version"] == "1.2"
     assert payload["reaction_signature"]["topology"] == payload["reaction_topology"]
 
 

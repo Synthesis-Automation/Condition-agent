@@ -15,11 +15,17 @@ from .connectivity_rewrite import apply_connectivity_rewrite
 from .reaction_archetypes import infer_bond_change_archetype
 from .reaction_candidates import enumerate_reaction_candidates
 from .reaction_labels import render_reaction_label
+from .reaction_edits import normalize_predicted_edits
+from .reaction_environments import build_reaction_family_environment
 from .reaction_models import (
     ReactionCandidate,
     ReactionComponent,
+    ReactionInterpretation,
+    ReactionObservation,
+    ReactionPartner,
     ReactionSiteReference,
 )
+from .reaction_products import build_product_connection
 from .reaction_multi_events import (
     apply_rewrite_sequence,
     equivalent_multi_event_interpretations,
@@ -47,6 +53,106 @@ class ReactionInterpretationBuild:
     named_family: str | None
     product_contradicted_candidates: bool
     warnings: Tuple[str, ...]
+
+
+def build_interpreted_partners(
+    observation: ReactionObservation,
+    selected: ReactionCandidate | None,
+    selected_events: Tuple[ReactionCandidate, ...] = (),
+) -> Tuple[ReactionPartner, ...]:
+    """Overlay optional grammar roles on graph-derived site environments."""
+    candidates = selected_events or ((selected,) if selected is not None else ())
+    partners = []
+    seen = set()
+    for candidate in candidates:
+        confidence = 1.0 if candidate.verification == "exact_product_reconstruction" else 0.7
+        for role, reference in sorted(candidate.role_assignments.items()):
+            key = (str(role), int(reference.component_index), str(reference.site_id))
+            if key in seen:
+                continue
+            seen.add(key)
+            component = next(
+                (
+                    item
+                    for item in observation.reactants
+                    if item.component_index == reference.component_index
+                ),
+                None,
+            )
+            environment = next(
+                (
+                    item
+                    for item in (
+                        component.compound_analysis.site_environments
+                        if component is not None
+                        else ()
+                    )
+                    if item.site_id == reference.site_id
+                ),
+                None,
+            )
+            handles = tuple(
+                sorted(
+                    {
+                        str(value)
+                        for value in (
+                            reference.details.get("handle_token"),
+                            reference.details.get("center_token"),
+                        )
+                        if value
+                    }
+                )
+            )
+            contexts = tuple(
+                sorted(
+                    {
+                        str(value)
+                        for value in (
+                            [reference.details.get("anchor_context")]
+                            + list(reference.details.get("contexts") or ())
+                        )
+                        if value
+                    }
+                )
+            )
+            partners.append(
+                ReactionPartner(
+                    partner_id=(
+                        f"RPI1:{reference.component_index}:"
+                        f"{reference.site_id}:{role}"
+                    ),
+                    component_index=reference.component_index,
+                    role=str(role),
+                    role_confidence=confidence,
+                    reactive_site_ids=(reference.site_id,),
+                    handle_tokens=handles,
+                    anchor_contexts=contexts,
+                    chemist_label=reference.chemist_label,
+                    nearby_groups=(
+                        environment.nearby_groups if environment else ()
+                    ),
+                    spectator_group_ids=tuple(
+                        sorted(
+                            group.group_id
+                            for group in observation.spectator_groups
+                            if group.component_index == reference.component_index
+                        )
+                    ),
+                    reactivity_profile=(
+                        environment.reactivity_profile if environment else None
+                    ),
+                )
+            )
+    return tuple(
+        sorted(
+            partners,
+            key=lambda partner: (
+                partner.component_index,
+                partner.role or "",
+                partner.partner_id,
+            ),
+        )
+    )
 
 
 def canonical_without_maps(smiles: str) -> str | None:
@@ -99,7 +205,7 @@ def _candidate(
         predicted_bond_changes=outcome.predicted_bond_changes,
         predicted_product_smiles=predicted_canonical,
         verification=verification,
-        reaction_label=render_reaction_label(
+        grammar_label=render_reaction_label(
             dict(grammar),
             dict(assignment),
             style=label_style,
@@ -216,7 +322,7 @@ def build_reaction_interpretation_candidates(
                         predicted_bond_changes=outcome.predicted_bond_changes,
                         predicted_product_smiles=composite_product,
                         verification="exact_multi_event_reconstruction",
-                        reaction_label=render_reaction_label(
+                        grammar_label=render_reaction_label(
                             dict(grammar),
                             dict(assignment),
                             style=label_style,
@@ -285,9 +391,124 @@ def build_reaction_interpretation_candidates(
     )
 
 
+def _edit_key(edit: Any) -> tuple[Any, ...]:
+    endpoints = []
+    for atom in (edit.atom_1, edit.atom_2):
+        if atom is None:
+            endpoints.append(("H",))
+        elif atom.atom_map_number is not None:
+            endpoints.append(("map", atom.atom_map_number))
+        else:
+            endpoints.append(
+                (
+                    "atom",
+                    atom.component_index,
+                    atom.atom_index,
+                    atom.element,
+                )
+            )
+    return (
+        edit.edit_type,
+        tuple(sorted(endpoints)),
+        edit.old_order or "NONE",
+        edit.new_order or "NONE",
+    )
+
+
+def interpret_reaction(
+    observation: ReactionObservation,
+    *,
+    label_style: str = "unicode",
+    max_candidates: int = 500,
+) -> ReactionInterpretation:
+    """Interpret an immutable observation with optional grammar semantics."""
+    if not observation.valid:
+        return ReactionInterpretation(
+            evidence_quality="unresolved",
+            warnings=("INVALID_REACTION_OBSERVATION",),
+        )
+    observed_products = {
+        canonical
+        for component in observation.products
+        for canonical in (canonical_without_maps(component.input_smiles),)
+        if canonical is not None
+    }
+    invalid_mapping = any(
+        candidate.evidence == "invalid_atom_mapping"
+        for candidate in observation.evidence_candidates
+    )
+    build = build_reaction_interpretation_candidates(
+        reactants=observation.reactants,
+        observed_products=observed_products,
+        invalid_supplied_mapping=invalid_mapping,
+        label_style=label_style,
+        max_candidates=max_candidates,
+    )
+    conflict = observation.evidence_quality in {
+        "conflicting_edit_evidence",
+        "conflicting_stereochemical_evidence",
+    }
+    if build.selected_candidate is not None and observation.edits:
+        predicted = normalize_predicted_edits(
+            build.selected_candidate,
+            observation.reactants,
+        )
+        if predicted.valid:
+            conflict = {
+                _edit_key(edit) for edit in predicted.edits
+            } != {_edit_key(edit) for edit in observation.edits}
+    warnings = set(build.warnings)
+    if conflict:
+        warnings.add("INTERPRETATION_OBSERVATION_CONFLICT")
+    selected = build.selected_candidate
+    family_environment = (
+        build_reaction_family_environment(
+            observation.reactants,
+            selected,
+            observation.spectator_groups,
+            build.evidence_quality,
+        )
+        if not conflict
+        else None
+    )
+    product_connection = (
+        build_product_connection(
+            selected,
+            build.evidence_quality,
+            style=label_style,
+        )
+        if not conflict
+        else None
+    )
+    return ReactionInterpretation(
+        candidates=build.candidates,
+        selected_candidate=selected,
+        selected_events=build.selected_events,
+        partners=build_interpreted_partners(
+            observation,
+            selected,
+            build.selected_events,
+        ),
+        compatible_named_families=(
+            () if conflict else build.compatible_named_families
+        ),
+        named_family=None if conflict else build.named_family,
+        family_environment=family_environment,
+        product_connection=product_connection,
+        evidence_quality=(
+            "conflicting_interpretation_evidence"
+            if conflict
+            else build.evidence_quality
+        ),
+        warnings=tuple(sorted(warnings)),
+    )
+
+
 __all__ = [
     "RawReactionCandidate",
     "ReactionInterpretationBuild",
+    "build_interpreted_partners",
     "build_reaction_interpretation_candidates",
     "canonical_without_maps",
+    "interpret_reaction",
 ]

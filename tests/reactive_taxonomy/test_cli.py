@@ -329,7 +329,7 @@ def test_batch_reaction_csv_exposes_minimized_core(tmp_path, capsys) -> None:
         row = next(csv.DictReader(handle))
 
     assert row["reaction_core_available"] == "True"
-    assert row["reaction_core_label"] == (
+    assert row["reaction_core_raw_label"] == (
         "C(H)(Ar)(=O) + O(H)(R) → C(H)(Ar)(O-R)2"
     )
     assert row["reaction_core_evidence_status"] == "verified"
