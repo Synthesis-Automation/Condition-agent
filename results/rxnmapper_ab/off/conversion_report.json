@@ -1,0 +1,129 @@
+{
+  "admission_reason_counts": {
+    "condition_identifier_uncertainty": 1249,
+    "condition_supported_partial_product_correspondence": 333,
+    "invalid_reaction_or_product": 20,
+    "missing_condition_fragment_source": 281,
+    "missing_verified_reaction_signature": 435,
+    "missing_yield": 29,
+    "multistage_conditions_not_structured": 1886,
+    "no_condition_identifiers": 79,
+    "no_usable_transformation_evidence": 436,
+    "reaction_completeness_unresolved": 871,
+    "solvent_only_recipe": 187,
+    "suspected_missing_reactant": 1148,
+    "unaccounted_product_heavy_atoms": 1148,
+    "verified_reaction_signature_with_conditions": 1536
+  },
+  "admission_tier_counts": {
+    "rejected": 1795,
+    "review": 2179,
+    "verified": 1536
+  },
+  "artifact_type": "generic_sharded_conversion_report",
+  "catalogs": {
+    "recipe_catalog": {
+      "path": "recipe_catalog.jsonl.gz",
+      "row_count": 2136,
+      "sha256": "6bdc42b17b2ba9cac09bd8d2d4c5f4f111f91de79d0f17f26be099843fd3da5d"
+    },
+    "reference_catalog": {
+      "path": "reference_catalog.jsonl.gz",
+      "row_count": 2799,
+      "sha256": "176fa8c465eea839e4c5da4d73d8d8dfa79e34c411fbb958512bb4aefc5ba9de"
+    },
+    "reference_condition_series_catalog": {
+      "path": "reference_condition_series.jsonl.gz",
+      "row_count": 1898,
+      "sha256": "288242581ae18d562370740d34f36132963fda1611cde6d7a04d5ffa53119524"
+    }
+  },
+  "chemistry_status_counts": {
+    "rejected": 1604,
+    "review": 768,
+    "verified": 3138
+  },
+  "complete_shard_count": 19,
+  "condition_stage_status_counts": {
+    "single_stage": 3624,
+    "unassigned_multistage": 1886
+  },
+  "condition_status_counts": {
+    "resolved_complete": 3995,
+    "unresolved_retained": 1249,
+    "unusable": 266
+  },
+  "external_atom_mapping": {
+    "enabled": false,
+    "model_id": null,
+    "model_sha256": null,
+    "provider_id": null,
+    "provider_version": null,
+    "status_counts": {}
+  },
+  "failed_shard_count": 0,
+  "failed_shards": [],
+  "fragment_source_support_status_counts": {
+    "supported": 333,
+    "unsupported": 281
+  },
+  "index_eligibility_counts": {
+    "eligible": 3059,
+    "ineligible": 1795,
+    "review_only": 656
+  },
+  "input_row_count": 5510,
+  "integrity": {
+    "artifact_type": "sharded_conversion_integrity",
+    "duplicate_observation_count": 0,
+    "issues": [],
+    "manifest_path": "results\\rxnmapper_ab\\off\\shard_manifest.json",
+    "schema_version": "1.0",
+    "shard_count": 19,
+    "valid": true,
+    "verified_row_count": 5510
+  },
+  "manifest_path": "results\\rxnmapper_ab\\off\\shard_manifest.json",
+  "merge_records": false,
+  "merged_records": null,
+  "mode": "full",
+  "named_family_counts": {
+    "carbonyl_alpha_c_h_coupling": 7,
+    "miyaura_borylation": 9,
+    "n_alkylation": 4,
+    "reductive_amination": 6,
+    "sonogashira": 1,
+    "suzuki_miyaura": 275,
+    "unnamed": 5208
+  },
+  "outcome_status_counts": {
+    "missing": 29,
+    "usable": 5481
+  },
+  "output_row_count": 5510,
+  "reaction_completeness_status_counts": {
+    "incomplete": 1481,
+    "missing": 20,
+    "unresolved": 871,
+    "verified": 3138
+  },
+  "reaction_scope_counts": {
+    "intermolecular": 2850,
+    "intramolecular": 47,
+    "mixed": 17,
+    "unimolecular": 224,
+    "unknown": 2372
+  },
+  "reused_shard_count": 19,
+  "schema_version": "1.0",
+  "shard_count": 19,
+  "signature_count": 3138,
+  "source_file_count": 19,
+  "transformation_class_counts": {
+    "acyl_heteroatom_substitution": 272,
+    "attachment_replacement": 345,
+    "generic_graph_transformation": 2842,
+    "generic_multi_event_graph_transformation": 296,
+    "unknown": 1755
+  }
+}

@@ -1,0 +1,2243 @@
+{
+  "artifact_type": "generic_sharded_conversion",
+  "dataset_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input",
+  "definition_contract": {
+    "condition_registry_definition_versions": {
+      "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+      "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+      "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+      "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+    },
+    "converter_definition_version": "generic_conversion.v8.0",
+    "external_atom_mapping": {
+      "enabled": true,
+      "model_id": "albert_heads_8_uspto_all_1310k",
+      "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+      "provider_id": "rxnmapper",
+      "provider_version": "0.4.3"
+    },
+    "reaction_label_definition_versions": {
+      "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+      "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+      "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+      "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+    },
+    "reaction_signature_schema_version": "3.4",
+    "record_schema_version": "8.0",
+    "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+    "taxonomy_definition_versions": {
+      "reaction_correspondence": "2.3",
+      "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+      "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+    }
+  },
+  "max_shards": null,
+  "mode": "full",
+  "schema_version": "1.0",
+  "shard_size": 1000,
+  "shards": [
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 6,
+        "external_mapping_conflict": 1,
+        "external_mapping_review_required": 1,
+        "insufficient_edit_evidence": 1,
+        "multiple_products": 1,
+        "multistage_conditions_not_structured": 4,
+        "reaction_completeness_unresolved": 1,
+        "suspected_missing_reactant": 1,
+        "unaccounted_product_heavy_atoms": 1,
+        "verified_reaction_signature_with_conditions": 2
+      },
+      "admission_tier_counts": {
+        "rejected": 1,
+        "review": 7,
+        "verified": 2
+      },
+      "chemistry_status_counts": {
+        "rejected": 1,
+        "review": 1,
+        "verified": 8
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 6,
+        "unassigned_multistage": 4
+      },
+      "condition_status_counts": {
+        "resolved_complete": 4,
+        "unresolved_retained": 6
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 1,
+        "global_atom_correspondence": 8,
+        "unresolved": 1
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_only": 1,
+        "external_mapping_signature_unavailable": 1,
+        "not_requested_resolved_internal_evidence": 8
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 7,
+        "ineligible": 1,
+        "review_only": 2
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\Acetal_ketal_formation.b698c567e6.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "6b3ba4b63f39128f7d29ba40dfc682f10736df1c0a5dc479582a77cbfffb47f9",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 1,
+        "unresolved": 1,
+        "verified": 8
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 7,
+        "mixed": 2,
+        "unknown": 1
+      },
+      "reused": false,
+      "shard_id": "Acetal_ketal_formation.b698c567e6.part-00000",
+      "signature_count": 9,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Acetal_ketal_formation.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "d45831e55c54babce51829a5deadb2f25f9f77d64b700b8eec0349aced9e9846",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 8,
+        "generic_multi_event_graph_transformation": 1,
+        "unknown": 1
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 5,
+        "condition_supported_partial_product_correspondence": 9,
+        "external_mapping_conflict": 1,
+        "missing_condition_fragment_source": 1,
+        "suspected_missing_reactant": 1,
+        "unaccounted_product_heavy_atoms": 1
+      },
+      "admission_tier_counts": {
+        "rejected": 1,
+        "review": 9
+      },
+      "chemistry_status_counts": {
+        "rejected": 1,
+        "review": 9
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 10
+      },
+      "condition_status_counts": {
+        "resolved_complete": 5,
+        "unresolved_retained": 5
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "partial_product_correspondence": 10
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_signature_unavailable": 10
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {
+        "supported": 9,
+        "unsupported": 1
+      },
+      "index_eligibility_counts": {
+        "eligible": 9,
+        "ineligible": 1
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\Acyl_Halides_formation.ff86d8fe4c.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "dd3fb10259baa09365e6e8e6b6eedb2f6c36bce7c1db4064e5ca2a75d9a7e04e",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 10
+      },
+      "reaction_scope_counts": {
+        "unknown": 10
+      },
+      "reused": false,
+      "shard_id": "Acyl_Halides_formation.ff86d8fe4c.part-00000",
+      "signature_count": 0,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Acyl_Halides_formation.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "66d7c53ada29c5d830acafb9f5af50f9d5d026c5659010756620eaab73bef399",
+      "status": "complete",
+      "transformation_class_counts": {
+        "acyl_heteroatom_substitution": 10
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 3,
+        "external_mapping_conflict": 10,
+        "multistage_conditions_not_structured": 3,
+        "suspected_missing_reactant": 10,
+        "unaccounted_product_heavy_atoms": 10
+      },
+      "admission_tier_counts": {
+        "rejected": 10
+      },
+      "chemistry_status_counts": {
+        "rejected": 10
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 7,
+        "unassigned_multistage": 3
+      },
+      "condition_status_counts": {
+        "resolved_complete": 7,
+        "unresolved_retained": 3
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "unresolved": 10
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_signature_unavailable": 10
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "ineligible": 10
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\Addition_of_Halogens_to_Double_or_Triple_Bonds.6817e15ed7.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "2db41d92dea66b9a6c2c909849cb3954a2b00e996484c5f63504ce22240b2a53",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 10
+      },
+      "reaction_scope_counts": {
+        "unknown": 10
+      },
+      "reused": false,
+      "shard_id": "Addition_of_Halogens_to_Double_or_Triple_Bonds.6817e15ed7.part-00000",
+      "signature_count": 0,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Addition_of_Halogens_to_Double_or_Triple_Bonds.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "ccfcb71b57223c0459816a366606d0eb045d2b1cade96af25796a90d8f90951e",
+      "status": "complete",
+      "transformation_class_counts": {
+        "unknown": 10
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 1,
+        "condition_supported_partial_product_correspondence": 2,
+        "external_mapping_conflict": 8,
+        "missing_condition_fragment_source": 3,
+        "multistage_conditions_not_structured": 5,
+        "suspected_missing_reactant": 8,
+        "unaccounted_product_heavy_atoms": 8
+      },
+      "admission_tier_counts": {
+        "rejected": 8,
+        "review": 2
+      },
+      "chemistry_status_counts": {
+        "rejected": 8,
+        "review": 2
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 5,
+        "unassigned_multistage": 5
+      },
+      "condition_status_counts": {
+        "resolved_complete": 9,
+        "unresolved_retained": 1
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "partial_product_correspondence": 5,
+        "unresolved": 5
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_signature_unavailable": 10
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {
+        "supported": 2,
+        "unsupported": 3
+      },
+      "index_eligibility_counts": {
+        "eligible": 2,
+        "ineligible": 8
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\Aliphatic_Halide_Exchange.a1ae10fbdb.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "9fd235d21a2b46cef19549ee5b5fb035d7147e90466def7bcf52d07543d63080",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 10
+      },
+      "reaction_scope_counts": {
+        "unknown": 10
+      },
+      "reused": false,
+      "shard_id": "Aliphatic_Halide_Exchange.a1ae10fbdb.part-00000",
+      "signature_count": 0,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Aliphatic_Halide_Exchange.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "7b85b2d0afd4d3c7a8329fa3665ed542f1792247b17e9aef339b27dda233ae78",
+      "status": "complete",
+      "transformation_class_counts": {
+        "attachment_replacement": 5,
+        "unknown": 5
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 1,
+        "external_mapping_conflict": 1,
+        "external_mapping_review_required": 3,
+        "insufficient_edit_evidence": 3,
+        "multistage_conditions_not_structured": 7,
+        "no_condition_identifiers": 1,
+        "reaction_completeness_unresolved": 3,
+        "suspected_missing_reactant": 1,
+        "unaccounted_product_heavy_atoms": 1,
+        "verified_reaction_signature_with_conditions": 1
+      },
+      "admission_tier_counts": {
+        "rejected": 2,
+        "review": 7,
+        "verified": 1
+      },
+      "chemistry_status_counts": {
+        "rejected": 1,
+        "review": 3,
+        "verified": 6
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 3,
+        "unassigned_multistage": 7
+      },
+      "condition_status_counts": {
+        "resolved_complete": 8,
+        "unresolved_retained": 1,
+        "unusable": 1
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 2,
+        "external_mapping_internal_consensus": 1,
+        "global_atom_correspondence": 6,
+        "unresolved": 1
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_internal_consensus": 1,
+        "external_mapping_only": 2,
+        "external_mapping_signature_unavailable": 1,
+        "not_requested_resolved_internal_evidence": 6
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 6,
+        "ineligible": 2,
+        "review_only": 2
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\Amide_formation.26febe1616.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "c8c03c5700ef620441fa52d315e581d3270c495e0ff7778a78a06fd0a06a6d61",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 1,
+        "unresolved": 3,
+        "verified": 6
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 8,
+        "unimolecular": 1,
+        "unknown": 1
+      },
+      "reused": false,
+      "shard_id": "Amide_formation.26febe1616.part-00000",
+      "signature_count": 9,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Amide_formation.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "bea6e0ff15b69ef86e4017d92c5132dbeaba495e2d5f98a20a33f4c59b6d7e84",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 2,
+        "generic_multi_event_graph_transformation": 7,
+        "unknown": 1
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 2,
+        "condition_supported_partial_product_correspondence": 2,
+        "external_mapping_conflict": 8,
+        "missing_condition_fragment_source": 8,
+        "multistage_conditions_not_structured": 6,
+        "suspected_missing_reactant": 8,
+        "unaccounted_product_heavy_atoms": 8
+      },
+      "admission_tier_counts": {
+        "rejected": 8,
+        "review": 2
+      },
+      "chemistry_status_counts": {
+        "rejected": 8,
+        "review": 2
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 4,
+        "unassigned_multistage": 6
+      },
+      "condition_status_counts": {
+        "resolved_complete": 8,
+        "unresolved_retained": 2
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "partial_product_correspondence": 10
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_signature_unavailable": 10
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {
+        "supported": 2,
+        "unsupported": 8
+      },
+      "index_eligibility_counts": {
+        "eligible": 2,
+        "ineligible": 8
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\Appel_halogenation.244c21ecbf.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "850cda74b0b0c0010c1699c93d8d0b4f53dfa5fa44a244fceee01af67e40a115",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 10
+      },
+      "reaction_scope_counts": {
+        "unknown": 10
+      },
+      "reused": false,
+      "shard_id": "Appel_halogenation.244c21ecbf.part-00000",
+      "signature_count": 0,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Appel_halogenation.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "0e8a2236ecba71f1b230a047b496736f434059eff82a7e98e573b2c667b628a1",
+      "status": "complete",
+      "transformation_class_counts": {
+        "attachment_replacement": 10
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 2,
+        "external_mapping_conflict": 1,
+        "external_mapping_review_required": 3,
+        "insufficient_edit_evidence": 3,
+        "multistage_conditions_not_structured": 2,
+        "reaction_completeness_unresolved": 3,
+        "suspected_missing_reactant": 1,
+        "unaccounted_product_heavy_atoms": 1,
+        "verified_reaction_signature_with_conditions": 4
+      },
+      "admission_tier_counts": {
+        "rejected": 1,
+        "review": 5,
+        "verified": 4
+      },
+      "chemistry_status_counts": {
+        "rejected": 1,
+        "review": 3,
+        "verified": 6
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 8,
+        "unassigned_multistage": 2
+      },
+      "condition_status_counts": {
+        "resolved_complete": 8,
+        "unresolved_retained": 2
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 3,
+        "global_atom_correspondence": 6,
+        "unresolved": 1
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_only": 3,
+        "external_mapping_signature_unavailable": 1,
+        "not_requested_resolved_internal_evidence": 6
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 6,
+        "ineligible": 1,
+        "review_only": 3
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "n_alkylation": 1,
+        "unnamed": 9
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\C_N_Coupling.6308899649.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "6de36ded03a48edf81237ce45cb47dfea08e28098dc5a785df242a0e6175e68e",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 1,
+        "unresolved": 3,
+        "verified": 6
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 9,
+        "unknown": 1
+      },
+      "reused": false,
+      "shard_id": "C_N_Coupling.6308899649.part-00000",
+      "signature_count": 9,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\C_N_Coupling.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "09406d0952eb4d22d51b59776f3d27db2cf8c4c297f59bd2fe811f715ea45da0",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 7,
+        "generic_multi_event_graph_transformation": 2,
+        "unknown": 1
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 2,
+        "external_mapping_conflict": 4,
+        "multistage_conditions_not_structured": 5,
+        "suspected_missing_reactant": 4,
+        "unaccounted_product_heavy_atoms": 4,
+        "verified_reaction_signature_with_conditions": 3
+      },
+      "admission_tier_counts": {
+        "rejected": 4,
+        "review": 3,
+        "verified": 3
+      },
+      "chemistry_status_counts": {
+        "rejected": 4,
+        "verified": 6
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 5,
+        "unassigned_multistage": 5
+      },
+      "condition_status_counts": {
+        "resolved_complete": 8,
+        "unresolved_retained": 2
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "global_atom_correspondence": 6,
+        "unresolved": 4
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_signature_unavailable": 4,
+        "not_requested_resolved_internal_evidence": 6
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 5,
+        "ineligible": 4,
+        "review_only": 1
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\C_O_Coupling.8415612b75.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "60584c7ba24dedf8299d155b99a295dee4b24ac79dadefb64c62718f20ebfbbb",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 4,
+        "verified": 6
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 6,
+        "unknown": 4
+      },
+      "reused": false,
+      "shard_id": "C_O_Coupling.8415612b75.part-00000",
+      "signature_count": 6,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\C_O_Coupling.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "c16ef5898f725d35c0ebc9f55a4d6a7135b2c6a3c27e7158936d893796129fef",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 3,
+        "generic_multi_event_graph_transformation": 3,
+        "unknown": 4
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 2,
+        "external_mapping_conflict": 6,
+        "external_mapping_review_required": 1,
+        "insufficient_edit_evidence": 1,
+        "multiple_products": 1,
+        "multistage_conditions_not_structured": 6,
+        "no_usable_transformation_evidence": 1,
+        "reaction_completeness_unresolved": 2,
+        "solvent_only_recipe": 1,
+        "suspected_missing_reactant": 5,
+        "unaccounted_product_heavy_atoms": 5,
+        "verified_reaction_signature_with_conditions": 1
+      },
+      "admission_tier_counts": {
+        "rejected": 6,
+        "review": 3,
+        "verified": 1
+      },
+      "chemistry_status_counts": {
+        "rejected": 6,
+        "review": 1,
+        "verified": 3
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 4,
+        "unassigned_multistage": 6
+      },
+      "condition_status_counts": {
+        "resolved_complete": 7,
+        "unresolved_retained": 2,
+        "unusable": 1
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 1,
+        "global_atom_correspondence": 3,
+        "unresolved": 6
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_only": 1,
+        "external_mapping_signature_unavailable": 6,
+        "not_requested_resolved_internal_evidence": 3
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 3,
+        "ineligible": 6,
+        "review_only": 1
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\C_S_Coupling.56e126cb5c.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "be90f4e014755ad20073d776dc31fa196a65471ab7c7a73954df2d0c0eebf9b4",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 5,
+        "unresolved": 2,
+        "verified": 3
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 4,
+        "unknown": 6
+      },
+      "reused": false,
+      "shard_id": "C_S_Coupling.56e126cb5c.part-00000",
+      "signature_count": 4,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\C_S_Coupling.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "67f965539e5c118b746cf09289ef72271698c0b42e2b15f9ca52f1d4d85720c3",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 1,
+        "generic_multi_event_graph_transformation": 3,
+        "unknown": 6
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 1,
+        "external_mapping_conflict": 3,
+        "external_mapping_review_required": 1,
+        "insufficient_edit_evidence": 1,
+        "multistage_conditions_not_structured": 10,
+        "reaction_completeness_unresolved": 1,
+        "suspected_missing_reactant": 3,
+        "unaccounted_product_heavy_atoms": 3
+      },
+      "admission_tier_counts": {
+        "rejected": 3,
+        "review": 7
+      },
+      "chemistry_status_counts": {
+        "rejected": 3,
+        "review": 1,
+        "verified": 6
+      },
+      "condition_stage_status_counts": {
+        "unassigned_multistage": 10
+      },
+      "condition_status_counts": {
+        "resolved_complete": 9,
+        "unresolved_retained": 1
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 1,
+        "global_atom_correspondence": 6,
+        "unresolved": 3
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_only": 1,
+        "external_mapping_signature_unavailable": 3,
+        "not_requested_resolved_internal_evidence": 6
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 5,
+        "ineligible": 3,
+        "review_only": 2
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "reductive_amination": 4,
+        "unnamed": 6
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\CDI-mediated_amidation.787ac0b3e0.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "dd1d5716c08fe6b95c5b86d499e9ea687ed464f2935dc9e6d7d0593f416d414c",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 3,
+        "unresolved": 1,
+        "verified": 6
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 7,
+        "unknown": 3
+      },
+      "reused": false,
+      "shard_id": "CDI-mediated_amidation.787ac0b3e0.part-00000",
+      "signature_count": 7,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\CDI-mediated_amidation.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "1a549dffad6d99043a1f5e123660fdb9611e627173d46d3794c7c6bdae3b4fef",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 5,
+        "generic_multi_event_graph_transformation": 2,
+        "unknown": 3
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 7,
+        "external_mapping_conflict": 10,
+        "missing_yield": 1,
+        "multistage_conditions_not_structured": 5,
+        "suspected_missing_reactant": 10,
+        "unaccounted_product_heavy_atoms": 10
+      },
+      "admission_tier_counts": {
+        "rejected": 10
+      },
+      "chemistry_status_counts": {
+        "rejected": 10
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 5,
+        "unassigned_multistage": 5
+      },
+      "condition_status_counts": {
+        "resolved_complete": 3,
+        "unresolved_retained": 7
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "unresolved": 10
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_signature_unavailable": 10
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "ineligible": 10
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "missing": 1,
+        "usable": 9
+      },
+      "output_path": "shards\\CH_amination_and_azidation.11e3f7c36b.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "fe8a925fc456d300e41f393309a7ba1a6f9740dbcbcb1fd123cdf3089d9e2471",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 10
+      },
+      "reaction_scope_counts": {
+        "unknown": 10
+      },
+      "reused": false,
+      "shard_id": "CH_amination_and_azidation.11e3f7c36b.part-00000",
+      "signature_count": 0,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\CH_amination_and_azidation.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "afd297761fc4195f11020e792f925f2c3878bfda70f8d7dbb28d541c241b8144",
+      "status": "complete",
+      "transformation_class_counts": {
+        "unknown": 10
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 6,
+        "external_mapping_conflict": 1,
+        "multistage_conditions_not_structured": 1,
+        "suspected_missing_reactant": 1,
+        "unaccounted_product_heavy_atoms": 1,
+        "verified_reaction_signature_with_conditions": 4
+      },
+      "admission_tier_counts": {
+        "rejected": 1,
+        "review": 5,
+        "verified": 4
+      },
+      "chemistry_status_counts": {
+        "rejected": 1,
+        "verified": 9
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 9,
+        "unassigned_multistage": 1
+      },
+      "condition_status_counts": {
+        "resolved_complete": 4,
+        "unresolved_retained": 6
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "global_atom_correspondence": 9,
+        "unresolved": 1
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_signature_unavailable": 1,
+        "not_requested_resolved_internal_evidence": 9
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 9,
+        "ineligible": 1
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\ChanLam_Narylation.eb07472f0c.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "c45ff31c355b73d6df16afbe1317f96f9b651bbd7e9a7a1c1ac1d947fd23d284",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 1,
+        "verified": 9
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 9,
+        "unknown": 1
+      },
+      "reused": false,
+      "shard_id": "ChanLam_Narylation.eb07472f0c.part-00000",
+      "signature_count": 9,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\ChanLam_Narylation.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "9cfde2ee1ac52b71dffaaa0ecd84f73741ca82e9a90b5512d2bba342dc2e55e3",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 8,
+        "generic_multi_event_graph_transformation": 1,
+        "unknown": 1
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 2,
+        "external_mapping_conflict": 1,
+        "external_mapping_review_required": 9,
+        "insufficient_edit_evidence": 9,
+        "multistage_conditions_not_structured": 8,
+        "no_condition_identifiers": 1,
+        "reaction_completeness_unresolved": 9,
+        "suspected_missing_reactant": 1,
+        "unaccounted_product_heavy_atoms": 1
+      },
+      "admission_tier_counts": {
+        "rejected": 2,
+        "review": 8
+      },
+      "chemistry_status_counts": {
+        "rejected": 1,
+        "review": 9
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 2,
+        "unassigned_multistage": 8
+      },
+      "condition_status_counts": {
+        "resolved_complete": 7,
+        "unresolved_retained": 2,
+        "unusable": 1
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 7,
+        "external_mapping_internal_consensus": 2,
+        "unresolved": 1
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_internal_consensus": 2,
+        "external_mapping_only": 7,
+        "external_mapping_signature_unavailable": 1
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "ineligible": 2,
+        "review_only": 8
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\Fischer_indole_synthesis.6950cd36b9.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "56f09dcefce7b173996f95b725f6ab2383ffadf4373e9bd1b141238a81e9f344",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 1,
+        "unresolved": 9
+      },
+      "reaction_scope_counts": {
+        "intramolecular": 2,
+        "mixed": 7,
+        "unknown": 1
+      },
+      "reused": false,
+      "shard_id": "Fischer_indole_synthesis.6950cd36b9.part-00000",
+      "signature_count": 9,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Fischer_indole_synthesis.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "c59e85768cfdba09d3864322396f8664eb9847ebeb4c13f4aed25f145dbcd039",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 3,
+        "generic_multi_event_graph_transformation": 6,
+        "unknown": 1
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "external_mapping_conflict": 2,
+        "missing_yield": 1,
+        "multistage_conditions_not_structured": 1,
+        "no_condition_identifiers": 1,
+        "solvent_only_recipe": 1,
+        "suspected_missing_reactant": 2,
+        "unaccounted_product_heavy_atoms": 2,
+        "verified_reaction_signature_with_conditions": 6
+      },
+      "admission_tier_counts": {
+        "rejected": 4,
+        "verified": 6
+      },
+      "chemistry_status_counts": {
+        "rejected": 2,
+        "verified": 8
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 9,
+        "unassigned_multistage": 1
+      },
+      "condition_status_counts": {
+        "resolved_complete": 8,
+        "unusable": 2
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "global_atom_correspondence": 8,
+        "unresolved": 2
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_signature_unavailable": 2,
+        "not_requested_resolved_internal_evidence": 8
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 6,
+        "ineligible": 4
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "reductive_amination": 1,
+        "unnamed": 9
+      },
+      "outcome_status_counts": {
+        "missing": 1,
+        "usable": 9
+      },
+      "output_path": "shards\\Knorr_pyrrole_synthesis.37a0d29b8b.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "33691c4731b42e360235c5694e4369c4549740db186d9296686bb02ab5e409b0",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 2,
+        "verified": 8
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 8,
+        "unknown": 2
+      },
+      "reused": false,
+      "shard_id": "Knorr_pyrrole_synthesis.37a0d29b8b.part-00000",
+      "signature_count": 8,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Knorr_pyrrole_synthesis.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "e716da62aee2240379dfed42e74858c234a4dadd43c97541a6d241d681cd884d",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 7,
+        "generic_multi_event_graph_transformation": 1,
+        "unknown": 2
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 1,
+        "external_mapping_conflict": 1,
+        "external_mapping_review_required": 3,
+        "insufficient_edit_evidence": 3,
+        "multistage_conditions_not_structured": 4,
+        "reaction_completeness_unresolved": 3,
+        "suspected_missing_reactant": 1,
+        "unaccounted_product_heavy_atoms": 1,
+        "verified_reaction_signature_with_conditions": 5
+      },
+      "admission_tier_counts": {
+        "rejected": 1,
+        "review": 4,
+        "verified": 5
+      },
+      "chemistry_status_counts": {
+        "rejected": 1,
+        "review": 3,
+        "verified": 6
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 6,
+        "unassigned_multistage": 4
+      },
+      "condition_status_counts": {
+        "resolved_complete": 9,
+        "unresolved_retained": 1
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 3,
+        "global_atom_correspondence": 6,
+        "unresolved": 1
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_only": 3,
+        "external_mapping_signature_unavailable": 1,
+        "not_requested_resolved_internal_evidence": 6
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 6,
+        "ineligible": 1,
+        "review_only": 3
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "suzuki_miyaura": 5,
+        "unnamed": 5
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\LiebeskindSrogl_coupling.8450fd4a8f.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "0dac8f98db4e161d59c3b5eb4cfb2817dd31cecb6325d14a61171ac8fb8b7b61",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 1,
+        "unresolved": 3,
+        "verified": 6
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 9,
+        "unknown": 1
+      },
+      "reused": false,
+      "shard_id": "LiebeskindSrogl_coupling.8450fd4a8f.part-00000",
+      "signature_count": 9,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\LiebeskindSrogl_coupling.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "334be0be094a0cc9c369905ccbb373979a821b376fbae3a08da496ad65bfc06c",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 5,
+        "generic_multi_event_graph_transformation": 4,
+        "unknown": 1
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "external_mapping_conflict": 3,
+        "multistage_conditions_not_structured": 4,
+        "suspected_missing_reactant": 3,
+        "unaccounted_product_heavy_atoms": 3,
+        "verified_reaction_signature_with_conditions": 5
+      },
+      "admission_tier_counts": {
+        "rejected": 3,
+        "review": 2,
+        "verified": 5
+      },
+      "chemistry_status_counts": {
+        "rejected": 3,
+        "verified": 7
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 6,
+        "unassigned_multistage": 4
+      },
+      "condition_status_counts": {
+        "resolved_complete": 10
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "global_atom_correspondence": 7,
+        "unresolved": 3
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_signature_unavailable": 3,
+        "not_requested_resolved_internal_evidence": 7
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 7,
+        "ineligible": 3
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\Minisci.1f7c4b7011.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "6cadffc9b8c466b5670f285c5efdb39bc332f0187c58eca3438ac0b4eed648d2",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 3,
+        "verified": 7
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 7,
+        "unknown": 3
+      },
+      "reused": false,
+      "shard_id": "Minisci.1f7c4b7011.part-00000",
+      "signature_count": 7,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Minisci.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "2b037e0c6fa32fdfd697eb9d13badc5495e0d472cac003f4ecba9c84d5630836",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 7,
+        "unknown": 3
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 1,
+        "external_mapping_review_required": 9,
+        "insufficient_edit_evidence": 9,
+        "multistage_conditions_not_structured": 4,
+        "reaction_completeness_unresolved": 9,
+        "solvent_only_recipe": 1,
+        "verified_reaction_signature_with_conditions": 1
+      },
+      "admission_tier_counts": {
+        "rejected": 1,
+        "review": 8,
+        "verified": 1
+      },
+      "chemistry_status_counts": {
+        "review": 9,
+        "verified": 1
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 6,
+        "unassigned_multistage": 4
+      },
+      "condition_status_counts": {
+        "resolved_complete": 8,
+        "unresolved_retained": 1,
+        "unusable": 1
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 3,
+        "external_mapping_internal_consensus": 6,
+        "fragmented_scaffold_correspondence": 1
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_internal_consensus": 6,
+        "external_mapping_only": 3,
+        "not_requested_resolved_internal_evidence": 1
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 1,
+        "ineligible": 1,
+        "review_only": 8
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "carbonyl_alpha_c_h_coupling": 1,
+        "unnamed": 9
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\Mitsunobu_etherificationinversion.2c0a8a04ca.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "84c8f70bcdc0062ae981db475c981d66affc12842d0c5e7115c584d45aeff457",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "unresolved": 9,
+        "verified": 1
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 7,
+        "intramolecular": 2,
+        "mixed": 1
+      },
+      "reused": false,
+      "shard_id": "Mitsunobu_etherificationinversion.2c0a8a04ca.part-00000",
+      "signature_count": 10,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Mitsunobu_etherificationinversion.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "10e8e8d1ee13a2854d0cfcf233801d39f5e00628f726ac22f652211f80ed1e19",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 7,
+        "generic_multi_event_graph_transformation": 3
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 6,
+        "external_mapping_conflict": 5,
+        "external_mapping_review_required": 1,
+        "insufficient_edit_evidence": 1,
+        "multistage_conditions_not_structured": 4,
+        "no_usable_transformation_evidence": 1,
+        "reaction_completeness_unresolved": 2,
+        "suspected_missing_reactant": 4,
+        "unaccounted_product_heavy_atoms": 4,
+        "verified_reaction_signature_with_conditions": 1
+      },
+      "admission_tier_counts": {
+        "rejected": 5,
+        "review": 4,
+        "verified": 1
+      },
+      "chemistry_status_counts": {
+        "rejected": 5,
+        "review": 1,
+        "verified": 4
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 6,
+        "unassigned_multistage": 4
+      },
+      "condition_status_counts": {
+        "resolved_complete": 4,
+        "unresolved_retained": 6
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 1,
+        "global_atom_correspondence": 1,
+        "unique_scaffold_correspondence": 3,
+        "unresolved": 5
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_only": 1,
+        "external_mapping_signature_unavailable": 5,
+        "not_requested_resolved_internal_evidence": 4
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 4,
+        "ineligible": 5,
+        "review_only": 1
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "unnamed": 10
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\NaBH4_carbonyl_reductions.0acff3d70c.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "ce96e294ce0a34fa580dbf84ee89a2d1954812cb582c16aaca06465cdbcc6e4b",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "incomplete": 4,
+        "unresolved": 2,
+        "verified": 4
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 1,
+        "unimolecular": 4,
+        "unknown": 5
+      },
+      "reused": false,
+      "shard_id": "NaBH4_carbonyl_reductions.0acff3d70c.part-00000",
+      "signature_count": 5,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\NaBH4_carbonyl_reductions.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "28fedba2caa9862f0031e37f074d99252cac2344991dcee6a77a42bc704a212d",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_multi_event_graph_transformation": 5,
+        "unknown": 5
+      }
+    },
+    {
+      "admission_reason_counts": {
+        "condition_identifier_uncertainty": 5,
+        "external_mapping_review_required": 4,
+        "insufficient_edit_evidence": 4,
+        "multistage_conditions_not_structured": 2,
+        "reaction_completeness_unresolved": 4,
+        "verified_reaction_signature_with_conditions": 3
+      },
+      "admission_tier_counts": {
+        "review": 7,
+        "verified": 3
+      },
+      "chemistry_status_counts": {
+        "review": 4,
+        "verified": 6
+      },
+      "condition_stage_status_counts": {
+        "single_stage": 8,
+        "unassigned_multistage": 2
+      },
+      "condition_status_counts": {
+        "resolved_complete": 5,
+        "unresolved_retained": 5
+      },
+      "definition_contract": {
+        "condition_registry_definition_versions": {
+          "recipe_templates.v1.json": "sha256:49c18c6ed5c51802b8f688bbdc90ea0d19caba80f65e6fcf6f787c2691dcf69a",
+          "role_resolution.v1.json": "sha256:9e975fdb6454075bf3013c24346456d57987e1936464b2d06fca787e450ca448",
+          "roles_families.v1.json": "sha256:afefb2d6463b12c4ec0bb64691d6400f45bb5746bde85c62f352346d0c30d037",
+          "substances.v1.csv": "sha256:9f80b08caabb44b2ef8dd345c2951c575f76d8d7d71287a488096f9f64dca765"
+        },
+        "converter_definition_version": "generic_conversion.v8.0",
+        "external_atom_mapping": {
+          "enabled": true,
+          "model_id": "albert_heads_8_uspto_all_1310k",
+          "model_sha256": "8541f3f500dae71abe678d546bd035ca946e2d1c819f6b2cf41a97faedd7e6a2",
+          "provider_id": "rxnmapper",
+          "provider_version": "0.4.3"
+        },
+        "reaction_label_definition_versions": {
+          "reaction_label_patterns.v1.json": "1.0@sha256:6b751880f475bee0",
+          "reaction_label_rendering.v1.json": "5.0@sha256:21436a5904162e91",
+          "synthesis_patterns.v2.json": "2.0@sha256:9b4a4137a0c7eaf8",
+          "transformation_patterns.v2.json": "2.0@sha256:7ecad3cb72ad2fd0"
+        },
+        "reaction_signature_schema_version": "3.4",
+        "record_schema_version": "8.0",
+        "sharded_conversion_definition_version": "generic_sharded_conversion.v4.0",
+        "taxonomy_definition_versions": {
+          "reaction_correspondence": "2.3",
+          "signature_features.v3.json": "3.4@sha256:0fb7a3e381f44ed5",
+          "taxonomy_manifest.v3.json": "3.0@sha256:56a1d74101438b76"
+        }
+      },
+      "evidence_quality_counts": {
+        "external_atom_mapping": 3,
+        "external_mapping_internal_consensus": 1,
+        "global_atom_correspondence": 6
+      },
+      "external_mapping_status_counts": {
+        "external_mapping_internal_consensus": 1,
+        "external_mapping_only": 3,
+        "not_requested_resolved_internal_evidence": 6
+      },
+      "failure_count": 0,
+      "failures": [],
+      "fragment_source_support_status_counts": {},
+      "index_eligibility_counts": {
+        "eligible": 6,
+        "review_only": 4
+      },
+      "input_position_end": 9,
+      "input_position_start": 0,
+      "input_row_count": 10,
+      "mode": "full",
+      "named_family_counts": {
+        "miyaura_borylation": 1,
+        "suzuki_miyaura": 3,
+        "unnamed": 6
+      },
+      "outcome_status_counts": {
+        "usable": 10
+      },
+      "output_path": "shards\\suzuki_miyaura.e38370e9dd.part-00000.jsonl.gz",
+      "output_row_count": 10,
+      "output_sha256": "e70aa99cfd3ca3a03c851426f772885d48704a4bcd4b6efae5bc6cc9ef5ac09b",
+      "part_number": 0,
+      "reaction_completeness_status_counts": {
+        "unresolved": 4,
+        "verified": 6
+      },
+      "reaction_scope_counts": {
+        "intermolecular": 10
+      },
+      "reused": false,
+      "shard_id": "suzuki_miyaura.e38370e9dd.part-00000",
+      "signature_count": 10,
+      "source_path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\suzuki_miyaura.csv",
+      "source_row_number_end": 11,
+      "source_row_number_start": 2,
+      "source_sha256": "b4986e7714479c763d42aff0c1c1c174e01a45410892fd5c16bc978cdc0fe679",
+      "status": "complete",
+      "transformation_class_counts": {
+        "generic_graph_transformation": 4,
+        "generic_multi_event_graph_transformation": 6
+      }
+    }
+  ],
+  "source_files": [
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Acetal_ketal_formation.csv",
+      "sha256": "d45831e55c54babce51829a5deadb2f25f9f77d64b700b8eec0349aced9e9846"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Acyl_Halides_formation.csv",
+      "sha256": "66d7c53ada29c5d830acafb9f5af50f9d5d026c5659010756620eaab73bef399"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Addition_of_Halogens_to_Double_or_Triple_Bonds.csv",
+      "sha256": "ccfcb71b57223c0459816a366606d0eb045d2b1cade96af25796a90d8f90951e"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Aliphatic_Halide_Exchange.csv",
+      "sha256": "7b85b2d0afd4d3c7a8329fa3665ed542f1792247b17e9aef339b27dda233ae78"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Amide_formation.csv",
+      "sha256": "bea6e0ff15b69ef86e4017d92c5132dbeaba495e2d5f98a20a33f4c59b6d7e84"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Appel_halogenation.csv",
+      "sha256": "0e8a2236ecba71f1b230a047b496736f434059eff82a7e98e573b2c667b628a1"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\C_N_Coupling.csv",
+      "sha256": "09406d0952eb4d22d51b59776f3d27db2cf8c4c297f59bd2fe811f715ea45da0"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\C_O_Coupling.csv",
+      "sha256": "c16ef5898f725d35c0ebc9f55a4d6a7135b2c6a3c27e7158936d893796129fef"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\C_S_Coupling.csv",
+      "sha256": "67f965539e5c118b746cf09289ef72271698c0b42e2b15f9ca52f1d4d85720c3"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\CDI-mediated_amidation.csv",
+      "sha256": "1a549dffad6d99043a1f5e123660fdb9611e627173d46d3794c7c6bdae3b4fef"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\CH_amination_and_azidation.csv",
+      "sha256": "afd297761fc4195f11020e792f925f2c3878bfda70f8d7dbb28d541c241b8144"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\ChanLam_Narylation.csv",
+      "sha256": "9cfde2ee1ac52b71dffaaa0ecd84f73741ca82e9a90b5512d2bba342dc2e55e3"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Fischer_indole_synthesis.csv",
+      "sha256": "c59e85768cfdba09d3864322396f8664eb9847ebeb4c13f4aed25f145dbcd039"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Knorr_pyrrole_synthesis.csv",
+      "sha256": "e716da62aee2240379dfed42e74858c234a4dadd43c97541a6d241d681cd884d"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\LiebeskindSrogl_coupling.csv",
+      "sha256": "334be0be094a0cc9c369905ccbb373979a821b376fbae3a08da496ad65bfc06c"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Minisci.csv",
+      "sha256": "2b037e0c6fa32fdfd697eb9d13badc5495e0d472cac003f4ecba9c84d5630836"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\Mitsunobu_etherificationinversion.csv",
+      "sha256": "10e8e8d1ee13a2854d0cfcf233801d39f5e00628f726ac22f652211f80ed1e19"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\NaBH4_carbonyl_reductions.csv",
+      "sha256": "28fedba2caa9862f0031e37f074d99252cac2344991dcee6a77a42bc704a212d"
+    },
+    {
+      "coverage_complete": true,
+      "covered_row_count": 10,
+      "path": "C:\\Git-softwares\\Condition-agent\\results\\rxnmapper_ab\\sample_input\\suzuki_miyaura.csv",
+      "sha256": "b4986e7714479c763d42aff0c1c1c174e01a45410892fd5c16bc978cdc0fe679"
+    }
+  ]
+}
