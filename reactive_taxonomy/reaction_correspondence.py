@@ -12,7 +12,7 @@ from .reaction_models import ReactionComponent
 
 
 AtomPair = Tuple[int, int, int, int]
-REACTION_CORRESPONDENCE_VERSION = "2.3"
+REACTION_CORRESPONDENCE_VERSION = "2.4"
 
 
 @dataclass(frozen=True)
@@ -184,7 +184,8 @@ def _single_cut_fragment_correspondence_candidates(
     if reactant_mol is None or product_mol is None:
         return (), ("GLOBAL_CORRESPONDENCE_FRAGMENT_PARSE_FAILED",)
     candidates: set[Tuple[AtomPair, ...]] = set()
-    fragment_count = 0
+    largest_candidate_size = 0
+    fragment_atom_sets: set[Tuple[int, ...]] = set()
     for bond in reactant_mol.GetBonds():
         if bond.IsInRing():
             continue
@@ -210,47 +211,58 @@ def _single_cut_fragment_correspondence_candidates(
             )
             if len(atom_indices) < 2:
                 continue
-            fragment_count += 1
-            if fragment_count > max_fragments:
+            fragment_atom_sets.add(atom_indices)
+            if len(fragment_atom_sets) > max_fragments:
                 return (), ("GLOBAL_CORRESPONDENCE_FRAGMENT_LIMIT",)
-            query = _induced_molecule(reactant_mol, atom_indices)
-            matches = product_mol.GetSubstructMatches(
-                query,
-                uniquify=False,
-                maxMatches=max_matches + 1,
+
+    # Only maximum-size fragment mappings are returned below.  Search larger
+    # fragments first so a dominated, highly symmetric fragment cannot exhaust
+    # the match limit before a more informative fragment is considered.  This
+    # branch-and-bound ordering is independent of reactant bond serialization.
+    ordered_fragments = tuple(
+        sorted(fragment_atom_sets, key=lambda value: (-len(value), value))
+    )
+    for atom_indices in ordered_fragments:
+        if len(atom_indices) < largest_candidate_size:
+            break
+        query = _induced_molecule(reactant_mol, atom_indices)
+        matches = product_mol.GetSubstructMatches(
+            query,
+            uniquify=False,
+            maxMatches=max_matches + 1,
+        )
+        if len(matches) > max_matches:
+            return (), ("GLOBAL_CORRESPONDENCE_FRAGMENT_MATCH_LIMIT",)
+        source_indices = tuple(
+            int(
+                query.GetAtomWithIdx(index).GetIntProp(
+                    "_correspondence_original_index"
+                )
             )
-            if len(matches) > max_matches:
-                return (), ("GLOBAL_CORRESPONDENCE_FRAGMENT_MATCH_LIMIT",)
-            source_indices = tuple(
-                int(
-                    query.GetAtomWithIdx(index).GetIntProp(
-                        "_correspondence_original_index"
+            for index in range(query.GetNumAtoms())
+        )
+        for match in matches:
+            candidate = tuple(
+                sorted(
+                    (
+                        reactant.component_index,
+                        source_index,
+                        product.component_index,
+                        int(product_index),
+                    )
+                    for source_index, product_index in zip(
+                        source_indices, match
                     )
                 )
-                for index in range(query.GetNumAtoms())
             )
-            for match in matches:
-                candidates.add(
-                    tuple(
-                        sorted(
-                            (
-                                reactant.component_index,
-                                source_index,
-                                product.component_index,
-                                int(product_index),
-                            )
-                            for source_index, product_index in zip(
-                                source_indices, match
-                            )
-                        )
-                    )
-                )
+            candidate_size = len(candidate)
+            if candidate_size > largest_candidate_size:
+                candidates.clear()
+                largest_candidate_size = candidate_size
+            candidates.add(candidate)
     if not candidates:
         return (), ()
-    largest = max(len(candidate) for candidate in candidates)
-    return tuple(
-        sorted(candidate for candidate in candidates if len(candidate) == largest)
-    ), ()
+    return tuple(sorted(candidates)), ()
 
 
 def _global_correspondence_assignments(

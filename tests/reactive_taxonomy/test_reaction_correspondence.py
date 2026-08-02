@@ -226,6 +226,33 @@ def test_global_correspondence_is_reactant_order_invariant() -> None:
     assert forward.reaction_label == reversed_order.reaction_label
 
 
+def test_largest_single_cut_fragment_avoids_dominated_symmetry_limit() -> None:
+    product = "O=C(c1ccccc1)c1ncc(-c2ccccc2)c2ccccc12"
+    forward = featurize_reaction(
+        "O=C(O)C(=O)c1ccccc1.c1ccc(-c2cncc3ccccc23)cc1>>" + product
+    )
+    reordered = featurize_reaction(
+        "c1ccc(-c2cncc3ccccc23)cc1.O=C(c1ccccc1)C(=O)O>>" + product
+    )
+
+    assert forward.evidence_quality == "global_atom_correspondence"
+    assert forward.reaction_signature is not None
+    assert forward.reaction_signature.named_family is None
+    assert forward.reaction_completeness is not None
+    assert forward.reaction_completeness.status == "verified"
+    assert forward.reaction_signature.formed_bond_types == ("C-C:SINGLE",)
+    assert forward.reaction_signature.broken_bond_types == ("C-C:SINGLE",)
+    assert forward.reaction_signature.hydrogen_changes == (
+        "C-H:SINGLE>NONE",
+    )
+    assert "GLOBAL_CORRESPONDENCE_FRAGMENT_MATCH_LIMIT" not in forward.warnings
+    assert reordered.reaction_signature is not None
+    assert (
+        reordered.reaction_signature.signature_id
+        == forward.reaction_signature.signature_id
+    )
+
+
 def test_fragmented_correspondence_recovers_topology_changing_scaffold() -> None:
     result = featurize_reaction("CNCCCN>>CN1CCC1", label_style="ascii")
 
