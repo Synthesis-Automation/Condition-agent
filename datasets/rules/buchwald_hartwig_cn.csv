@@ -1,6 +1,0 @@
-reaction_type,rule_id,rule_tier,reactant_1,reactant_2,reactant_3,catalyst,ligand,base,solvent,additive,Secondary Solvent,Coupling Reagent,temperature_C,time_h,atmosphere,pressure_bar,concentration_M,yield,z_score,notes
-C_N_Coupling,BH_CN_01,1,Alkyl-NH2,@sp2_electrophiles,,Buchwald (allyl/crotyl or G-series),tBuBrettPhos / BippyPhos,K3PO4 (aq) / Cs2CO3 / NaOtBu / KHMDS,MeCN,,,,100,,N2,,,95,2,Primary alkyl amines
-C_N_Coupling,BH_CN_02,1,Alkyl-NHR,@sp2_electrophiles,,Buchwald (allyl/crotyl or G-series),QPhos / XantPhos / tBuBrettPhos,Cs2CO3 / KHMDS / NaOtBu,Dioxane,,,,,,N2,,,95,2,Secondary alkyl amines
-C_N_Coupling,BH_CN_03,1,AromN-H,@sp2_electrophiles,,Buchwald (allyl/crotyl or G-series),Josiphos SL-009 / tBuBrettPhos / XantPhos,K3PO4 (aq) / Cs2CO3 / NaOtBu,Dioxane,,,,,,N2,,,95,2,N-heteroaromatic amination
-C_N_Coupling,BH_CN_04,1,@amides,@sp2_electrophiles,,Buchwald (allyl/crotyl or G-series),tBuXPhos / tBuBrettPhos / AlPhos,K3PO4 (aq) / Cs2CO3 / NaOtBu,Dioxane,,,,,,N2,,,95,2,Amide coupling
-C_N_Coupling,BH_CN_05,0,@amines_nh,@sp2_electrophiles,,Buchwald precatalyst (allyl/crotyl > G1-4 > LxPdCl2; avoid Pd2(dba)3),tBuBrettPhos-Class,"K3PO4 (aq, ~3.25 M) / Cs2CO3",MeCN,,,,,,N2,,,95,2,General amine fallback
